@@ -28,6 +28,13 @@ class Emotes extends Overlay {
     '<3': 'https://static-cdn.jtvnw.net/emoticons/v1/9/'
   }
 
+  fetch = {
+    global: false,
+    subscribers: false,
+    ffz: false,
+    bttv: false
+  }
+
   constructor () {
     const settings = {
       _: {
@@ -106,7 +113,12 @@ class Emotes extends Overlay {
     super({ settings, ui })
     if (cluster.isMaster) {
       global.db.engine.index({ table: this.collection.cache, index: 'code' })
-      setInterval(() => this.fetchEmotes(), 10000)
+      setTimeout(() => {
+        if (!this.fetch.global) this.fetchEmotesGlobal()
+        if (!this.fetch.subscribers) this.fetchEmotesSubsribers()
+        if (!this.fetch.ffz) this.fetchEmotesFFZ()
+        if (!this.fetch.bttv) this.fetchEmotesBTTV()
+      }, 10000)
     }
   }
 
@@ -127,15 +139,20 @@ class Emotes extends Overlay {
     this.settings._.lastFFZEmoteChk = 0
     this.settings._.lastBTTVEmoteChk = 0
     await global.db.engine.remove(this.collection.cache, {})
-    this.fetchEmotes()
+
+    if (!this.fetch.global) this.fetchEmotesGlobal()
+    if (!this.fetch.subscribers) this.fetchEmotesSubsribers()
+    if (!this.fetch.ffz) this.fetchEmotesFFZ()
+    if (!this.fetch.bttv) this.fetchEmotesBTTV()
   }
 
-  async fetchEmotes () {
-    const cid = global.oauth.channelId
-    const channel = global.oauth.currentChannel
+  async fetchEmotesGlobal () {
+    this.fetch.global = true
+    this.lastFetch.global = Date.now()
 
     // we want to update once every week
     if (Date.now() - this.settings._.lastGlobalEmoteChk > 1000 * 60 * 60 * 24 * 7) {
+      global.log.info('EMOTES: Fetching global emotes')
       this.settings._.lastGlobalEmoteChk = Date.now()
       try {
         const request = await axios.get('https://twitchemotes.com/api_cache/v3/global.json')
@@ -154,12 +171,21 @@ class Emotes extends Overlay {
               }
             })
         }
+        global.log.info('EMOTES: Fetched global emotes')
       } catch (e) {
         global.log.error(e)
       }
     }
 
+    this.fetch.global = false
+  }
+
+  async fetchEmotesSubsribers () {
+    const cid = global.oauth.channelId
+    this.fetch.subscribers = true
+
     if (cid && (Date.now() - this.settings._.lastSubscriberEmoteChk > 1000 * 60 * 60 * 24 * 7 || this.settings._.lastChannelChk !== cid)) {
+      global.log.info('EMOTES: Fetching subscriber emotes')
       this.settings._.lastSubscriberEmoteChk = Date.now()
       this.settings._.lastChannelChk = cid
       try {
@@ -184,13 +210,22 @@ class Emotes extends Overlay {
             }
           }
         }
+        global.log.info('EMOTES: Fetched subscriber emotes')
       } catch (e) {
         global.log.error(e)
       }
+
+      this.fetch.subscribers = false
     }
+  }
+
+  async fetchEmotesFFZ () {
+    const cid = global.oauth.channelId
+    this.fetch.ffz = true
 
     // fetch FFZ emotes
     if (cid && Date.now() - this.settings._.lastFFZEmoteChk > 1000 * 60 * 60 * 24 * 7) {
+      global.log.info('EMOTES: Fetching ffz emotes')
       this.settings._.lastFFZEmoteChk = Date.now()
       try {
         const request = await axios.get('https://api.frankerfacez.com/v1/room/id/' + cid)
@@ -210,13 +245,22 @@ class Emotes extends Overlay {
               urls: emotes[i].urls
             })
         }
+        global.log.info('EMOTES: Fetched ffz emotes')
       } catch (e) {
         global.log.error(e)
       }
+
+      this.fetch.ffz = false
     }
+  }
+
+  async fetchEmotesBTTV () {
+    const channel = global.oauth.currentChannel
+    this.fetch.bttv = true
 
     // fetch BTTV emotes
     if (channel && Date.now() - this.settings._.lastBTTVEmoteChk > 1000 * 60 * 60 * 24 * 7) {
+      global.log.info('EMOTES: Fetching bttv emotes')
       this.settings._.lastBTTVEmoteChk = Date.now()
       try {
         const request = await axios.get('https://api.betterttv.net/2/channels/' + channel)
@@ -239,10 +283,13 @@ class Emotes extends Overlay {
 
             })
         }
+        global.log.info('EMOTES: Fetched bttv emotes')
       } catch (e) {
         global.log.error(e)
       }
     }
+
+    this.fetch.bttv = false
   }
 
   async _testFireworks () {
