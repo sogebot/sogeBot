@@ -479,6 +479,7 @@
     "cooldown-quiet-toggle-yes": "Neupozornit",
     "cooldown-moderators": "Moderátoři",
     "cooldown-owners": "Vlastník bota",
+    "cooldown-subscribers": "Subscribeři",
     "in-seconds": "v sekundách",
     "show-usernames-with-at": "Zobrazit uživatelské jména s @",
     "twitter-send-message": "Tweet",
@@ -1023,7 +1024,9 @@
     "cooldown-was-enabled-for-moderators": "$sender, cooldown pro $command je nastaven i pro moderatory",
     "cooldown-was-disabled-for-moderators": "$sender, cooldown pro $command ignoruje moderatory",
     "cooldown-was-enabled-for-owners": "$sender, cooldown pro $command je nastaven i pro vlastnika",
-    "cooldown-was-disabled-for-owners": "$sender, cooldown pro $command ignoruje vlastnika"
+    "cooldown-was-disabled-for-owners": "$sender, cooldown pro $command ignoruje vlastnika",
+    "cooldown-was-enabled-for-subscribers": "$sender, cooldown pro $command je nastaven i pro subscribery",
+    "cooldown-was-disabled-for-subscribers": "$sender, cooldown pro $command ignoruje subscribery"
   },
   "timers": {
     "id-must-be-defined": "$sender, id odpovedi musi byt zadano.",

@@ -663,6 +663,20 @@ let migration = {
       console.info(` => ${processed} processed`)
       console.info(` !! cooldowns collections can be deleted`)
     }
+  }, {
+    version: '8.1.2',
+    do: async () => {
+      console.log('Updating cooldowns for subscribers')
+      let processed = 0
+      for (let o of await global.db.engine.find('systems.cooldown')) {
+        if (_.isNil(o.subscriber)) {
+          await global.global.db.engine.update('permissions', { _id: String(o._id) }, { subscriber: true })
+          processed++
+        }
+      }
+
+      console.info(` => ${processed} processed`)
+    }
   }],
   alias: [{
     version: '8.0.0',

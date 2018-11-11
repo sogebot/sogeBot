@@ -468,6 +468,7 @@
     "cooldown-quiet-toggle-yes": "Won't notify",
     "cooldown-moderators": "Moderators",
     "cooldown-owners": "Owners",
+    "cooldown-subscribers": "Subscribers",
     "in-seconds": "in seconds",
     "songs": "Songs",
     "show-usernames-with-at": "Show usernames with @",
@@ -1008,7 +1009,9 @@
     "cooldown-was-enabled-for-moderators": "$sender, cooldown for $command was enabled for moderators",
     "cooldown-was-disabled-for-moderators": "$sender, cooldown for $command was disabled for moderators",
     "cooldown-was-enabled-for-owners": "$sender, cooldown for $command was enabled for owners",
-    "cooldown-was-disabled-for-owners": "$sender, cooldown for $command was disabled for owners"
+    "cooldown-was-disabled-for-owners": "$sender, cooldown for $command was disabled for owners",
+    "cooldown-was-enabled-for-subscribers": "$sender, cooldown for $command was enabled for subscribers",
+    "cooldown-was-disabled-for-subscribers": "$sender, cooldown for $command was disabled for subscribers"
   },
   "timers": {
     "id-must-be-defined": "$sender, response id must be defined.",

@@ -46,6 +46,10 @@
             <button type="button" class="btn btn-block" v-on:click="owner = !owner" v-bind:class="[ owner ? 'btn-success' : 'btn-danger' ]" aria-hidden="true">{{ (owner ? commons.translate('enabled') : commons.translate('disabled')) | capitalize }}</button>
           </div>
           <div class="col-md-2">
+            <label style="margin: 0px 0px 3px; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px;">{{commons.translate('cooldown-subscribers')}}</label>
+            <button type="button" class="btn btn-block" v-on:click="subscriber = !subscriber" v-bind:class="[ subscriber ? 'btn-success' : 'btn-danger' ]" aria-hidden="true">{{ (subscriber ? commons.translate('enabled') : commons.translate('disabled')) | capitalize }}</button>
+          </div>
+          <div class="col-md-2">
             <label style="margin: 0px 0px 3px; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px;">{{commons.translate('type')}}</label>
             <button type="button" class="btn btn-block" v-on:click="type = type === 'global' ? 'user' : 'global'" v-bind:class="[ type === 'global' ? 'btn-warning' : 'btn-info' ]" aria-hidden="true">{{ commons.translate(type) | capitalize }}</button>
           </div>
@@ -83,6 +87,7 @@
           miliseconds: 60,
           quiet: true,
           owner: true,
+          subscriber: true,
           moderator: true,
           enabled: true,
           type: 'global',

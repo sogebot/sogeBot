@@ -10,9 +10,9 @@ const message = require('../../general.js').message
 
 // users
 const owner = { username: 'soge__' }
-const mod = { username: 'mod', isModerator: true }
+const subscriber = { username: 'sub1', isSubscriber: true }
 
-describe('Cooldowns - toggleModerators()', () => {
+describe('Cooldowns - toggleSubscribers()', () => {
   beforeEach(async () => {
     await db.cleanup()
     await message.prepare()
@@ -23,7 +23,7 @@ describe('Cooldowns - toggleModerators()', () => {
     global.systems.cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` })
     await message.isSent('cooldowns.cooldown-was-set', owner, { command: command, type: type, seconds: seconds, sender: owner.username })
 
-    global.systems.cooldown.toggleModerators({ sender: owner, parameters: command })
+    global.systems.cooldown.toggleSubscribers({ sender: owner, parameters: command })
     await message.isSent('cooldowns.cooldown-parse-failed', owner, { sender: owner.username })
   })
 
@@ -32,15 +32,20 @@ describe('Cooldowns - toggleModerators()', () => {
     global.systems.cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` })
     await message.isSent('cooldowns.cooldown-was-set', owner, { command: command, type: type, seconds: seconds, sender: owner.username })
 
-    global.systems.cooldown.toggleModerators({ sender: owner, parameters: `${command} ${type}` })
-    await message.isSent('cooldowns.cooldown-was-enabled-for-moderators', owner, { command: command, sender: owner.username })
+    global.systems.cooldown.toggleSubscribers({ sender: owner, parameters: `${command} ${type}` })
+    await message.isSent('cooldowns.cooldown-was-disabled-for-subscribers', owner, { command: command, sender: owner.username })
 
-    let isOk = await global.systems.cooldown.check({ sender: mod, message: '!me' })
+    let isOk = await global.systems.cooldown.check({ sender: subscriber, message: '!me' })
     assert.isTrue(isOk)
-    isOk = await global.systems.cooldown.check({ sender: mod, message: '!me' })
-    assert.isFalse(isOk)
+    isOk = await global.systems.cooldown.check({ sender: subscriber, message: '!me' })
+    assert.isTrue(isOk)
 
-    global.systems.cooldown.toggleModerators({ sender: owner, parameters: `${command} ${type}` })
-    await message.isSent('cooldowns.cooldown-was-disabled-for-moderators', owner, { command: command, sender: owner.username })
+    global.systems.cooldown.toggleSubscribers({ sender: owner, parameters: `${command} ${type}` })
+    await message.isSent('cooldowns.cooldown-was-enabled-for-subscribers', owner, { command: command, sender: owner.username })
+
+    isOk = await global.systems.cooldown.check({ sender: subscriber, message: '!me' })
+    assert.isTrue(isOk)
+    isOk = await global.systems.cooldown.check({ sender: subscriber, message: '!me' })
+    assert.isFalse(isOk)
   })
 })
