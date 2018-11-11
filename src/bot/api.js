@@ -1235,8 +1235,7 @@ class API {
   }
 
   async createMarker () {
-    if (cluster.isWorker) throw new Error('API can run only on master')
-    const token = await global.oauth.settings.bot.accessToken
+    const token = global.oauth.settings.bot.accessToken
     const cid = global.oauth.channelId
 
     const url = 'https://api.twitch.tv/helix/streams/markers'
@@ -1263,7 +1262,7 @@ class API {
       this.calls.bot.limit = request.headers['ratelimit-limit']
       global.commons.processAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', request.headers['ratelimit-limit'], request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] })
 
-      if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'createMarker', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining })
+      if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'createMarker', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining, data: request.data })
     } catch (e) {
       if (e.errno === 'ECONNRESET' || e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT') return this.createMarker()
       global.log.error(`API: Marker was not created - ${e.message}`)

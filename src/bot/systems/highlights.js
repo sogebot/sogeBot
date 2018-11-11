@@ -5,12 +5,14 @@ var _ = require('lodash')
 var moment = require('moment')
 require('moment-precise-range-plugin')
 const cluster = require('cluster')
+const axios = require('axios')
 
 // bot libraries
 const constants = require('../constants')
 const System = require('./_interface')
 
 const ERROR_STREAM_NOT_ONLINE = '1'
+const ERROR_MISSING_TOKEN = '2'
 
 /*
  * !highlight <?description> - save highlight with optional description
@@ -53,33 +55,49 @@ class Highlights extends System {
   }
 
   async main (opts) {
-    if (cluster.isWorker) {
-      // as we are using API, go through master
-      if (process.send) process.send({ type: 'highlight', opts })
-    } else {
-      const when = await global.cache.when()
+    const when = await global.cache.when()
+    const token = global.oauth.settings.bot.accessToken
+    const cid = global.oauth.channelId
+    const url = `https://api.twitch.tv/helix/videos?user_id=${cid}&type=archive&first=1`
 
-      try {
-        if (_.isNil(when.online)) throw Error(ERROR_STREAM_NOT_ONLINE)
+    try {
+      if (_.isNil(when.online)) throw Error(ERROR_STREAM_NOT_ONLINE)
+      if (token === '' || cid === '') throw Error(ERROR_MISSING_TOKEN)
 
-        const token = await global.oauth.settings.bot.accessToken
-        if (token === '') return
-
-        let timestamp = moment.preciseDiff(moment().valueOf(), moment(global.api.streamStartedAt).valueOf(), true)
-        let highlight = {
-          id: global.api.streamId,
-          timestamp: { hours: timestamp.hours, minutes: timestamp.minutes, seconds: timestamp.seconds },
-          game: _.get(await global.db.engine.findOne('api.current', { key: 'game' }), 'value', 'n/a'),
-          title: _.get(await global.db.engine.findOne('api.current', { key: 'title' }), 'value', 'n/a')
+      // we need to load video id
+      const request = await axios.get(url, {
+        headers: {
+          'Authorization': 'Bearer ' + token
         }
+      })
+      // save remaining api calls
+      global.api.remainingAPICalls = request.headers['ratelimit-remaining']
+      global.api.refreshAPICalls = request.headers['ratelimit-reset']
 
-        this.add(highlight, timestamp, opts.sender)
-      } catch (e) {
-        switch (e.message) {
-          case ERROR_STREAM_NOT_ONLINE:
-            global.commons.sendMessage(global.translate('highlights.offline'), opts.sender)
-            break
-        }
+      let timestamp = moment.preciseDiff(moment().valueOf(), moment(global.api.streamStartedAt).valueOf(), true)
+      let highlight = {
+        id: request.data.data[0].id,
+        timestamp: { hours: timestamp.hours, minutes: timestamp.minutes, seconds: timestamp.seconds },
+        game: _.get(await global.db.engine.findOne('api.current', { key: 'game' }), 'value', 'n/a'),
+        title: _.get(await global.db.engine.findOne('api.current', { key: 'title' }), 'value', 'n/a'),
+        created_at: Date.now()
+      }
+
+      global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'highlights', api: 'helix', endpoint: url, code: request.status, remaining: global.api.remainingAPICalls })
+
+      this.add(highlight, timestamp, opts.sender)
+    } catch (e) {
+      global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'highlights', api: 'helix', endpoint: url, code: e.stack, remaining: global.api.remainingAPICalls })
+      switch (e.message) {
+        case ERROR_STREAM_NOT_ONLINE:
+          global.log.error('Cannot highlight - stream offline')
+          global.commons.sendMessage(global.translate('highlights.offline'), opts.sender)
+          break
+        case ERROR_MISSING_TOKEN:
+          global.log.error('Cannot highlight - missing token')
+          break
+        default:
+          global.log.error(e.stack)
       }
     }
   }
