@@ -36,7 +36,9 @@ describe('libs/webhooks - follower()', () => {
       await global.webhooks.follower({
         data: {
           from_id: id,
-          to_id: global.oauth.channelId
+          from_name: 'testuser',
+          to_id: global.oauth.channelId,
+          to_name: 'channeluser'
         }
       })
     }
@@ -55,7 +57,9 @@ describe('libs/webhooks - follower()', () => {
       await global.webhooks.follower({
         data: {
           from_id: 3,
-          to_id: 2
+          from_name: 'testuser',
+          to_id: 2,
+          to_name: 'channeluser'
         }
       })
     }

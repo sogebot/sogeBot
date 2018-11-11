@@ -570,7 +570,7 @@ class API {
       if (request.status === 200 && !_.isNil(request.data.data)) {
         // check if user id is in db, not in db load username from API
         for (let f of request.data.data) {
-          let user = await global.users.getByID(f.from_id)
+          let user = await global.users.getById(f.from_id)
           if (!_.get(user, 'is.follower', false)) {
             if (new Date().getTime() - moment(_.get(user, 'time.follow', 0)).format('X') * 1000 < 60000 * 60 && !global.webhooks.existsInCache('follow', user.id)) {
               global.webhooks.addIdToCache('follow', user.id)
