@@ -169,8 +169,10 @@ Commons.prototype.message = async function (type, username, message, retry) {
 }
 
 Commons.prototype.timeout = async function (username, reason, timeout) {
-  if (cluster.isMaster) global.tmi.client.bot.chat.timeout(global.oauth.settings.general.channel, username, timeout, reason)
-  else if (process.send) process.send({ type: 'timeout', username: username, timeout: timeout, reason: reason })
+  if (cluster.isMaster) {
+    reason = reason.replace(/\$sender/g, username)
+    global.tmi.client.bot.chat.timeout(global.oauth.settings.general.channel, username, timeout, reason)
+  } else if (process.send) process.send({ type: 'timeout', username: username, timeout: timeout, reason: reason })
 }
 
 Commons.prototype.getOwner = function () {
