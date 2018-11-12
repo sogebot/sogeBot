@@ -28,7 +28,7 @@ class Seppuku extends Game {
     }
 
     global.commons.sendMessage(global.translate('gambling.seppuku.text'), opts.sender)
-    global.commons.timeout(opts.sender.username, global.translate('gambling.seppuku.text'), await this.settings.timeout)
+    global.commons.timeout(opts.sender.username, global.translate('gambling.seppuku.text'), this.settings.timeout)
   }
 }
 
