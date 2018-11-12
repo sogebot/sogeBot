@@ -32,6 +32,7 @@ finished: {{ (getCurrentAlertList() || []).filter(o => o.finished) }}
             :data-index="index"
             :data-src="alert.url"
             :class="[ alert.class ? alert.class : '']"
+            :style="{ top: alert['y-offset'] ? alert['y-offset'] + 'px' : 'inherit', left: alert['x-offset'] ? alert['x-offset'] + 'px' : 'inherit' }"
             v-show="alert.run && !alert.finished && !alert.leaveAnimation"
             v-if="alert.type === 'video' || alert.type === 'clip'">
             <source :src="alert.url" type="video/mp4">
@@ -42,15 +43,17 @@ finished: {{ (getCurrentAlertList() || []).filter(o => o.finished) }}
             :data-index="index"
             :class="[ alert.class ? alert.class : '']"
             v-show="alert.run && !alert.finished && !alert.leaveAnimation"
+            :style="{ top: alert['y-offset'] ? alert['y-offset'] + 'px' : 'inherit', left: alert['x-offset'] ? alert['x-offset'] + 'px' : 'inherit', 'text-align': alert.align || 'left' }"
             v-if="alert.type === 'text'">{{alert.text}}</div>
 
           <img
-          class="image"
-          :data-index="index"
-          :class="[ alert.class ? alert.class : '']"
-          v-show="alert.run && !alert.finished && !alert.leaveAnimation"
-          v-if="alert.type === 'image'"
-          :src="alert.url">
+            class="image"
+            :data-index="index"
+            :class="[ alert.class ? alert.class : '']"
+            v-show="alert.run && !alert.finished && !alert.leaveAnimation"
+            v-if="alert.type === 'image'"
+            :style="{ top: alert['y-offset'] ? alert['y-offset'] + 'px' : 'inherit', left: alert['x-offset'] ? alert['x-offset'] + 'px' : 'inherit' }"
+            :src="alert.url"/>
         </transition>
     </div>
   </div>
@@ -170,8 +173,10 @@ export default {
       if (val) {
         this.isPlaying = false,
         this.alerts.shift()
-        for (let a of this.alerts[0]) {
-          a.receivedAt = Date.now()
+        if (this.alerts[0]) {
+          for (let a of this.alerts[0]) {
+            a.receivedAt = Date.now()
+          }
         }
       }
     }
@@ -231,6 +236,7 @@ export default {
 
   iframe, audio, video, .text, img {
     opacity: 0;
+    position: relative;
   }
 
   iframe, video {
