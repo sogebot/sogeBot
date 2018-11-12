@@ -108,23 +108,24 @@ export default {
           withoutPadding = false
         }
 
-        for (let o of object) {
-          let html = o.username
+        const groupByUsername = Object.entries(_.groupBy(object, 'username'))
+        for (let [username, o] of groupByUsername) {
+          let html = username
           if (key === 'cheer') {
-            html = `<strong style="font-size:65%">${o.bits} bits</strong> <br> ${o.username}`
+            html = `<strong style="font-size:65%">${o.reduce((a, b) => ({ bits: Number(a.bits) + Number(b.bits) })).bits} bits</strong> <br> ${username}`
           } else if (['raid', 'host'].includes(key)) {
-            html = `<strong style="font-size:65%">${o.viewers} viewers</strong> <br> ${o.username}`
+            html = `<strong style="font-size:65%">${o.reduce((a, b) => ({ viewers: Number(a.viewers) + Number(b.viewers) })).viewers} viewers</strong> <br> ${username}`
           } else if (['resub'].includes(key)) {
-            html = `<strong style="font-size:65%">${o.months} months</strong> <br> ${o.username}`
+            html = `<strong style="font-size:65%">${o[0].months} months</strong> <br> ${username}`
           } else if (['tip'].includes(key)) {
-            html = `<strong style="font-size:65%">${Number(o.amount).toFixed(2)} ${o.currency}</strong> <br> ${o.username}`
+            html = `<strong style="font-size:65%">${Number(o.reduce((a, b) => ({ amount: Number(a.amount) + Number(b.amount) })).amount).toFixed(2)} ${o[0].currency}</strong> <br> ${username}`
           }
           page.push({
             text: html,
             class: "text4 column"
           })
         }
-        for (let i = 0; i < 3 - (object.length % 3); i++) {
+        for (let i = 0; i < 3 - (groupByUsername.length % 3); i++) {
           page.push({
             text: '',
             class: "text4 column"
