@@ -30,11 +30,11 @@
   - **Default value**: *empty*
   - **EXAMPLE:** `!alert type=text text='Lorem Ipsum Dolor Sit Amet' class=myFancyClass`
 - **x-offset**
-  - Set X offset of video in pixels
+  - Set X offset of text in pixels
   - **Default value**: *not set*
   - **EXAMPLE:** `!alert type=text text='Lorem Ipsum Dolor Sit Amet' x-offset=100`
 - **y-offset**
-  - Set Y offset of video in pixels
+  - Set Y offset of text in pixels
   - **Default value**: *not set*
   - **EXAMPLE:** `!alert type=text text='Lorem Ipsum Dolor Sit Amet' y-offset=100`
 - **align**
@@ -167,11 +167,11 @@
   - **Default value**: *empty*
   - **EXAMPLE:** `!alert type=clip id=JollyDeliciousLyrebirdYee class=myFancyClass`
 - **x-offset**
-  - Set X offset of video in pixels
+  - Set X offset of clip in pixels
   - **Default value**: *not set*
   - **EXAMPLE:** `!alert type=clip id=JollyDeliciousLyrebirdYee x-offset=100`
 - **y-offset**
-  - Set Y offset of video in pixels
+  - Set Y offset of clip in pixels
   - **Default value**: *not set*
   - **EXAMPLE:** `!alert type=clip id=JollyDeliciousLyrebirdYee y-offset=100`
 
