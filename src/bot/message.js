@@ -193,6 +193,13 @@ class Message {
       '$querystring': async function (filter) {
         if (!_.isUndefined(attr.param) && attr.param.length !== 0) return querystring.escape(attr.param)
         return ''
+      },
+      '(url|#)': async function (filter) {
+        try {
+          return encodeURI(/\(url\|(.*)\)/g.exec(filter)[1])
+        } catch (e) {
+          return ''
+        }
       }
     }
     let info = {

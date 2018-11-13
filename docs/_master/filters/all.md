@@ -118,6 +118,11 @@
     - _chat:_ `!say Awesome!`
     - _bot response_: `@foobar said: Awesome!`
 
+## URI safe strings
+`(url|Lorem Ipsum Dolor)` - will generate url safe string to be used in GET
+
+`(url|$param)` - will generate url safe from variable $param
+
 ## Custom APIs
 `(api|http://your.desired.url)` - will load data from specified url - only **UTF-8** responses are supported
 
