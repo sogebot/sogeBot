@@ -8,5 +8,7 @@
   "generate": "Generate",
   "thumbnail": "Thumbnail",
   "yes": "Yes",
-  "no": "No"
+  "no": "No",
+  "show-more": "Show more",
+  "show-less": "Show less"
 }

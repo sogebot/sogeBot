@@ -29,14 +29,20 @@
 
             <div style="word-break: break-all; " class="col-sm-6">
               <div style="margin: 0; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 3px;">{{commons.translate('text')}}</div>
-              <pre v-show="item.text.length > 0"><code class="language-markup">{{ item.text }}</code></pre>
+
+              <template v-show="item.text.length > 0">
+                <pre :style="{ display: !showMore.includes(item._id) ? 'none': 'inherit'}"><code class="language-markup">{{ item.text }}</code></pre>
+                <pre :style="{ display: showMore.includes(item._id) ? 'none': 'inherit'}"><code class="language-markup">{{ item.text | less }}</code></pre>
+              </template>
             </div>
           </div>
 
           <div class="card-body border-top p-0 text-right">
             <div class="btn-group" role="group">
+              <button class="btn btn-outline-dark p-3 border-0" @click="toggleShowMore(item._id)"><i class="fas mr-1" :class="[!showMore.includes(item._id) ? 'fa-ellipsis-h' : 'fa-ellipsis-v']"></i> {{ !showMore.includes(item._id) ? commons.translate('commons.show-more') : commons.translate('commons.show-less') }}</button>
               <a v-bind:href="'/overlays/text?id='+ item._id" class="btn btn-outline-dark p-3 border-0" target="_blank"><i class="fas fa-link"></i> /overlays/text?id={{ item._id }}</a>
               <a v-bind:href="'?id='+ item._id + '#registry/textOverlay/edit'" class="btn btn-outline-dark p-3 border-0"><i class="fas fa-pencil-alt mr-1" aria-hidden="true"></i> {{ commons.translate('dialog.buttons.edit') }}</a>
+              <hold-button class="btn-outline-dark p-3 border-0" @trigger="remove(item._id)" :holdtitle="commons.translate('dialog.buttons.hold-to-delete')" :title="commons.translate('dialog.buttons.delete')" icon="fa-trash"></hold-button>
             </div>
           </div>
         </div>
@@ -54,11 +60,14 @@
       el: '#registryTextOverlayApp',
       components: {
         'toggle': toggleEnable,
-        'command-input': commandInput
+        'command-input': commandInput,
+        'hold-button': holdButton
       },
       data: {
         showAs: 'cards',
         search: '',
+
+        showMore: [],
 
         items: [],
 
@@ -83,12 +92,33 @@
         })
         if (localStorage.getItem('/overlays/text/showAs')) this.showAs = JSON.parse(localStorage.getItem('/overlays/text/showAs'));
       },
+      methods: {
+        toggleShowMore: function (_id) {
+          let idx = this.showMore.indexOf(_id)
+          if(idx !== -1) {
+            this.showMore.splice(idx, 1)
+          } else {
+            this.showMore.push(_id)
+          }
+          console.log(this.showMore)
+        },
+        remove: function (_id) {
+          this.socket.emit('delete', { _id }, () => {
+            this.items = this.items.filter(o => o._id != _id)
+          })
+        },
+      },
       watch: {
         showAs: function(val) {
           localStorage.setItem('/overlays/text/showAs', JSON.stringify(this.showAs))
         }
       },
       filters: {
+        less: function (value) {
+          value = value.split(/\r?\n/g).slice(0, 5).join('\n')
+          value += '\n\n<!-- '  + (value.length - 5) + ' lines hidden, click show more -->'
+          return value
+        },
         capitalize: function (value) {
           if (!value) return ''
           value = value.toString()

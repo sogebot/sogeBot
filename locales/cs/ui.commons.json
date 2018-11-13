@@ -8,5 +8,7 @@
   "generate": "Vygenerovat",
   "thumbnail": "Miniatura",
   "yes": "Ano",
-  "no": "Ne"
+  "no": "Ne",
+  "show-more": "Zobrazit více",
+  "show-less": "Zobrazit méně"
 }

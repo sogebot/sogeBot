@@ -100,7 +100,7 @@ window.commandInputWithPermissions = {
         if (_.isFinite(Number(this.currentValue))) this.currentValue = Number(this.currentValue)
         else this.currentValue = this.value
       }
-      this.$emit('update', {value: this.currentValue, permissions: this.currentPermissions})
+      this.$emit('update', { value: this.currentValue, permissions: this.currentPermissions })
     }
   },
   data: function () {
@@ -636,4 +636,67 @@ window.selector = {
       </select>
     </div>
     `
+}
+
+/* hold button */
+window.holdButton = {
+  props: ['holdtitle', 'title', 'ttc', 'icon'],
+  data: function () {
+    return {
+      onMouseDownStarted: 0,
+      isMouseOver: false,
+      trigger: false,
+      percentage: 0
+    }
+  },
+  watch: {
+    trigger: function (val) {
+      if (val) {
+        this.$emit('trigger')
+      }
+    },
+    isMouseOver: function (val) {
+      if (!val) {
+        this.onMouseDownStarted = 0
+        this.trigger = false
+        this.percentage = 0
+      }
+    }
+  },
+  mounted: function () {
+    setInterval(() => this.shouldBeTriggered(), 10)
+  },
+  methods: {
+    shouldBeTriggered: function () {
+      const ttc = this.ttc || 1000
+      if (this.isMouseOver && this.onMouseDownStarted !== 0) {
+        this.percentage = (ttc / 10) * ((Date.now() - this.onMouseDownStarted) / 1000)
+        if (this.percentage > 100) this.percentage = 100
+
+        if (Date.now() - this.onMouseDownStarted > ttc) {
+          this.trigger = true
+        }
+      }
+    },
+    onMouseDown: function () {
+      this.onMouseDownStarted = Date.now()
+    },
+    onMouseUp: function () {
+      this.onMouseDownStarted = 0
+      this.trigger = false
+      this.percentage = 0
+    }
+  },
+  template: `
+    <button class="btn" @mouseup="onMouseUp" @mousedown="onMouseDown" @mouseenter="isMouseOver = true" @mouseleave="isMouseOver = false">
+      <div style="left: 0; top:0; position: absolute; height: 100%;background-color: rgba(100, 100, 100, 0.4);" :style="{ width: this.percentage + '%' }"></div> <!-- move to own style when move to full vue -->
+      <i class="fas mr-1 fa-fw" :class="[icon]" aria-hidden="true"></i>
+      <template v-if="onMouseDownStarted === 0">
+        {{ title }}
+      </template>
+      <template v-else>
+        {{ holdtitle }}
+      </template>
+    </button>
+  `
 }
