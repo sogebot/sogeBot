@@ -61,10 +61,12 @@ import { faMusic, faList, faPlay, faPause, faForward } from '@fortawesome/free-s
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
 
-import 'vue-plyr'
-import 'vue-plyr/dist/vue-plyr.css'
+import Vue from 'vue'
+import VuePlyr from 'vue-plyr'
 
 library.add(faMusic, faList, faPlay, faPause, faForward)
+
+Vue.use(VuePlyr)
 
 export default {
   props: ['token', 'commons'],
@@ -101,7 +103,6 @@ export default {
         this.initialized = true
         setInterval(() => {
           if (this.autoplay && !this.player.playing && !this.player.loading && !this.waitingForNext) {
-            console.log(this.player)
             this.next()
           }
         }, 1000)
@@ -120,6 +121,9 @@ export default {
     },
     play: function () {
       this.autoplay = true
+      console.log(this.$refs)
+      console.log('play')
+      console.log(this.player)
       this.player.play()
     }
   },
@@ -144,6 +148,7 @@ export default {
       this.player.once('ready', event => {
         if (item.startTime) this.player.currentTime = item.startTime
         if (this.autoplay) {
+      console.log(this.player)
           this.player.play()
         }
         this.player.volume = item.volume / 100
