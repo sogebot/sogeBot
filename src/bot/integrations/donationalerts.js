@@ -50,6 +50,8 @@ class Donationalerts {
         })
     } else this.socket.connect()
 
+    setTimeout(() => this.reconnect(), 1 * 60 * 60 * 1000) // restart socket each hour
+
     this.socket.emit('add-user', { token: (await this.clientSecret), type: 'minor' })
 
     this.socket.off('connect').on('connect', () => { global.log.info('donationalerts.ru: Successfully connected socket to service') })
@@ -116,6 +118,10 @@ class Donationalerts {
       if (!_.isNil(this.socket)) this.socket.disconnect()
     }
     return enabled
+  }
+
+  async reconnect() {
+    this.socket.disconnect()
   }
 }
 
