@@ -55,7 +55,7 @@
       data: {
         search: '',
 
-        items: {},
+        items: [],
 
         changed: [],
         isDataChanged: false,
@@ -67,9 +67,14 @@
       },
       computed: {
         filtered: function () {
-          if (this.search.length === 0) return this.items
-          return this.items.filter((o) => {
-            return !_.isNil(o.title.match(new RegExp(this.search, 'ig'))) || !_.isNil(o.game.match(new RegExp(this.search, 'ig')))
+          let items = this.items
+          if (this.search.length > 0) {
+            items = this.items.filter((o) => {
+              return !_.isNil(o.title.match(new RegExp(this.search, 'ig'))) || !_.isNil(o.game.match(new RegExp(this.search, 'ig')))
+            })
+          }
+          return items.sort((a, b) => {
+            return new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime()
           })
         }
       },
