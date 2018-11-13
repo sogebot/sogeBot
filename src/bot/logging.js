@@ -29,6 +29,7 @@ const levels = {
   follow: 5,
   unfollow: 5,
   cheer: 5,
+  tip: 5,
   sub: 5,
   subgift: 5,
   subcommunitygift: 5,
@@ -74,6 +75,7 @@ if (cluster.isWorker) {
         if (info.level === 'raid') level = '+raid'
         if (info.level === 'unfollow') level = '-follow'
         if (info.level === 'cheer') level = '+cheer'
+        if (info.level === 'tip') level = '+tip'
         if (info.level === 'sub') level = '+sub'
         if (info.level === 'subgift') level = '+subgift'
         if (info.level === 'subcommunitygift') level = '+subcommunitygift'

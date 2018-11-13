@@ -71,8 +71,12 @@ class Donationalerts {
         song_title: _.get(additionalData, 'media_data.title', undefined),
         song_url: _.get(additionalData, 'media_data.url', undefined)
       })
+
+      global.log.tip(`${data.username.toLowerCase()}, amount: ${data.amount}${data.currency}, message: ${data.message}`)
       global.events.fire('tip', { username: data.username.toLowerCase(), amount: parseFloat(data.amount).toFixed(2), message: data.message, currency: data.currency })
-      global.db.engine.insert('users.tips', { username: data.username.toLowerCase(), amount: data.amount, message: data.message, currency: data.currency, timestamp: _.now() })
+
+      const id = await global.users.getIdByName(data.username.toLowerCase(), false)
+      if (id) global.db.engine.insert('users.tips', { id, amount: data.amount, message: data.message, currency: data.currency, timestamp: _.now() })
       if (await global.cache.isOnline()) await global.db.engine.increment('api.current', { key: 'tips' }, { value: parseFloat(global.currency.exchange(data.amount, data.currency, await global.configuration.getValue('currency'))) })
     })
   }
