@@ -51,7 +51,7 @@ class Donationalerts {
         })
     } else this.socket.connect()
 
-    setTimeout(() => this.reconnect(), constants.HOUR) // restart socket each hour
+    this.restartInverval = setInterval(() => this.reconnect(), constants.HOUR) // restart socket each hour
 
     this.socket.emit('add-user', { token: (await this.clientSecret), type: 'minor' })
 
@@ -116,7 +116,10 @@ class Donationalerts {
     if (enabled) {
       this.connect()
     } else if (!enabled) {
-      if (!_.isNil(this.socket)) this.socket.disconnect()
+      if (!_.isNil(this.socket)) {
+        this.socket.disconnect()
+        clearInterval(this.restartInverval)
+      }
     }
     return enabled
   }
