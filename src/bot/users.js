@@ -289,9 +289,9 @@ class Users extends Core {
     return username || null
   }
 
-  async getIdByName (username: string) {
+  async getIdByName (username: string, fetch: boolean = true) {
     let id = (await global.db.engine.findOne('users', { username })).id
-    if (typeof id === 'undefined' || id === 'null') {
+    if ((typeof id === 'undefined' || id === 'null') && fetch) {
       id = await global.api.getIdFromTwitch(username)
       await global.db.engine.update('users', { id }, { username })
     }
