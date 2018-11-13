@@ -29,6 +29,18 @@
   - Set custom class for styling in OBS, XSplit, etc.
   - **Default value**: *empty*
   - **EXAMPLE:** `!alert type=text text='Lorem Ipsum Dolor Sit Amet' class=myFancyClass`
+- **x-offset**
+  - Set X offset of text in pixels
+  - **Default value**: *not set*
+  - **EXAMPLE:** `!alert type=text text='Lorem Ipsum Dolor Sit Amet' x-offset=100`
+- **y-offset**
+  - Set Y offset of text in pixels
+  - **Default value**: *not set*
+  - **EXAMPLE:** `!alert type=text text='Lorem Ipsum Dolor Sit Amet' y-offset=100`
+- **align**
+  - Set align of text - left, center, right
+  - **Default value**: left
+  - **EXAMPLE:** `!alert type=text text='Lorem Ipsum Dolor Sit Amet' align=center`
 
 ## Image
 
@@ -61,6 +73,14 @@
   - Set custom class for styling in OBS, XSplit, etc.
   - **Default value**: *empty*
   - **EXAMPLE:** `!alert type=image url=https://vignette3.wikia.nocookie.net/nonciclopedia/images/c/c5/Nelson_Muntz.png/revision/latest?cb=20100615074911 class=myFancyClass`
+- **x-offset**
+  - Set X offset of image in pixels
+  - **Default value**: *not set*
+  - **EXAMPLE:** `!alert type=image url=https://vignette3.wikia.nocookie.net/nonciclopedia/images/c/c5/Nelson_Muntz.png/revision/latest?cb=20100615074911 x-offset=100`
+- **y-offset**
+  - Set Y offset of image in pixels
+  - **Default value**: *not set*
+  - **EXAMPLE:** `!alert type=image url=https://vignette3.wikia.nocookie.net/nonciclopedia/images/c/c5/Nelson_Muntz.png/revision/latest?cb=20100615074911 y-offset=100`
 
 ## Audio
 
@@ -109,6 +129,14 @@
   - Set custom class for styling in OBS, XSplit, etc.
   - **Default value**: *empty*
   - **EXAMPLE:** `!alert type=video url=http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4 class=myFancyClass`
+- **x-offset**
+  - Set X offset of video in pixels
+  - **Default value**: *not set*
+  - **EXAMPLE:** `!alert type=video url=http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4 x-offset=100`
+- **y-offset**
+  - Set Y offset of video in pixels
+  - **Default value**: *not set*
+  - **EXAMPLE:** `!alert type=video url=http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4 y-offset=100`
 
 ## Clip
 
@@ -138,35 +166,14 @@
   - Set custom class for styling in OBS, XSplit, etc.
   - **Default value**: *empty*
   - **EXAMPLE:** `!alert type=clip id=JollyDeliciousLyrebirdYee class=myFancyClass`
-
-
-
-
-`!alert type=video`
-
-### Parameters
-
-- **type**
-  - For video alert you need to set it to `video`
-  - **EXAMPLE:** `!alert type=video`
-- **url**
-  - URL of video to be shown in alert, only **mp4** videos are supported
-  - **EXAMPLE:** `!alert type=video url=http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4`
-
-### Optional parameters
-
-- **duration**
-  - How long will be fadeIn and fadeOut animation
-  - **Default value**: 1000
-  - **EXAMPLE:** `!alert type=video url=http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4 duration=5000`
-- **delay**
-  - How long will alert wait to be played
-  - **Default value**: 0
-  - **EXAMPLE:** `!alert type=video url=http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4 delay=5000`
-- **class**
-  - Set custom class for styling in OBS, XSplit, etc.
-  - **Default value**: *empty*
-  - **EXAMPLE:** `!alert type=video url=http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4 class=myFancyClass`
+- **x-offset**
+  - Set X offset of clip in pixels
+  - **Default value**: *not set*
+  - **EXAMPLE:** `!alert type=clip id=JollyDeliciousLyrebirdYee x-offset=100`
+- **y-offset**
+  - Set Y offset of clip in pixels
+  - **Default value**: *not set*
+  - **EXAMPLE:** `!alert type=clip id=JollyDeliciousLyrebirdYee y-offset=100`
 
 ## Iframe
 
