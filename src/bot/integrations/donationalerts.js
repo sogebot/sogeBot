@@ -3,6 +3,7 @@
 // 3rdparty libraries
 const _ = require('lodash')
 const chalk = require('chalk')
+const constants = require('../constants.js')
 
 class Donationalerts {
   constructor () {
@@ -50,7 +51,7 @@ class Donationalerts {
         })
     } else this.socket.connect()
 
-    setTimeout(() => this.reconnect(), 1 * 60 * 60 * 1000) // restart socket each hour
+    setTimeout(() => this.reconnect(), constants.HOUR) // restart socket each hour
 
     this.socket.emit('add-user', { token: (await this.clientSecret), type: 'minor' })
 
@@ -120,7 +121,7 @@ class Donationalerts {
     return enabled
   }
 
-  async reconnect() {
+  async reconnect () {
     this.socket.disconnect()
   }
 }
