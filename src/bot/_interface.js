@@ -295,7 +295,6 @@ class Module {
                 return o
               })
             }
-            console.log(items)
             cb(null, items)
           }
         })
