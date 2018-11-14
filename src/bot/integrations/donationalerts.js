@@ -42,7 +42,7 @@ class Donationalerts {
 
   async connect () {
     if (_.isNil(this.socket)) {
-      this.socket = require('socket.io-client').connect('http://socket.donationalerts.ru:80',
+      this.socket = require('socket.io-client').connect('wss://socket.donationalerts.ru:443',
         {
           reconnection: true,
           reconnectionDelay: 1000,
