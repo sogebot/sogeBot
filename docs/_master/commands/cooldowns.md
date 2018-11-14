@@ -7,4 +7,6 @@
 
 `!cooldown toggle subscribers <keyword|!command> <global|user>` - **OWNER** - enable/disable specified keyword or !command cooldown for subscribers (by default enabled)
 
+`!cooldown toggle followers <keyword|!command> <global|user>` - **OWNER** - enable/disable specified keyword or !command cooldown for followers (by default enabled)
+
 `!cooldown toggle enabled <keyword|!command> <global|user>` - **OWNER** - enable/disable specified keyword or !command cooldown

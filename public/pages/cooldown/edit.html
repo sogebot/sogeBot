@@ -50,6 +50,10 @@
             <button type="button" class="btn btn-block" v-on:click="subscriber = !subscriber" v-bind:class="[ subscriber ? 'btn-success' : 'btn-danger' ]" aria-hidden="true">{{ (subscriber ? commons.translate('enabled') : commons.translate('disabled')) | capitalize }}</button>
           </div>
           <div class="col-md-2">
+            <label style="margin: 0px 0px 3px; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px;">{{commons.translate('cooldown-followers')}}</label>
+            <button type="button" class="btn btn-block" v-on:click="follower = !follower" v-bind:class="[ follower ? 'btn-success' : 'btn-danger' ]" aria-hidden="true">{{ (follower ? commons.translate('enabled') : commons.translate('disabled')) | capitalize }}</button>
+          </div>
+          <div class="col-md-2">
             <label style="margin: 0px 0px 3px; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px;">{{commons.translate('type')}}</label>
             <button type="button" class="btn btn-block" v-on:click="type = type === 'global' ? 'user' : 'global'" v-bind:class="[ type === 'global' ? 'btn-warning' : 'btn-info' ]" aria-hidden="true">{{ commons.translate(type) | capitalize }}</button>
           </div>
@@ -88,6 +92,7 @@
           quiet: true,
           owner: true,
           subscriber: true,
+          follower: true,
           moderator: true,
           enabled: true,
           type: 'global',
@@ -130,6 +135,8 @@
                 key: this.key.trim(),
                 miliseconds: Number(this.miliseconds) * 1000,
                 moderator: this.moderator,
+                subscriber: this.subscriber,
+                follower: this.follower,
                 type: this.type,
                 owner: this.owner,
                 quiet: this.quiet,
@@ -199,6 +206,8 @@
           cooldownEdit.quiet = data.quiet
           cooldownEdit.type = data.type
           cooldownEdit.enabled = data.enabled
+          cooldownEdit.subcriber = data.subcriber
+          cooldownEdit.follower = data.follower
           cooldownEdit.$nextTick(() => { cooldownEdit.pending = false; cooldownEdit.loading = false })
         })
       }
