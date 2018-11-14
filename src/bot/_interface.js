@@ -281,12 +281,23 @@ class Module {
         })
         socket.on('find', async (opts, cb) => {
           opts.collection = opts.collection || 'data'
+          opts.omit = opts.omit || []
           if (opts.collection.startsWith('_')) {
             opts.collection = opts.collection.replace('_', '')
           } else opts.collection = this.collection[opts.collection]
 
           opts.where = opts.where || {}
-          if (_.isFunction(cb)) cb(null, await global.db.engine.find(opts.collection, opts.where))
+          if (_.isFunction(cb)) {
+            let items = await global.db.engine.find(opts.collection, opts.where)
+            if (opts.omit.length > 0) {
+              items = items.map(o => {
+                for (let omit of opts.omit) delete o[omit]
+                return o
+              })
+            }
+            console.log(items)
+            cb(null, items)
+          }
         })
         socket.on('findOne', async (opts, cb) => {
           opts.collection = opts.collection || 'data'
@@ -295,7 +306,16 @@ class Module {
           } else opts.collection = this.collection[opts.collection]
 
           opts.where = opts.where || {}
-          if (_.isFunction(cb)) cb(null, await global.db.engine.findOne(opts.collection, opts.where))
+          if (_.isFunction(cb)) {
+            let items = await global.db.engine.findOne(opts.collection, opts.where)
+            if (opts.omit.length > 0) {
+              items = items.map(o => {
+                for (let omit of opts.omit) delete o[omit]
+                return o
+              })
+            }
+            cb(null, items)
+          }
         })
       })
     }
