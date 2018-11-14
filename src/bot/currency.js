@@ -1,6 +1,8 @@
 const getSymbolFromCurrency = require('currency-symbol-map')
 const axios = require('axios')
 const _ = require('lodash')
+const chalk = require('chalk')
+const constants = require('./constants')
 
 class Currency {
   constructor () {
@@ -11,7 +13,7 @@ class Currency {
 
     global.configuration.register('currency', 'core.no-response', 'string', 'EUR')
 
-    this.updateRates()
+    setTimeout(() => this.updateRates(), 5 * constants.SECOND)
   }
 
   isCodeSupported (code) {
@@ -45,8 +47,9 @@ class Currency {
   async updateRates () {
     clearTimeout(this.timeouts['updateRates'])
 
-    let refresh = 1000 * 60 * 60 * 24
+    let refresh = constants.DAY
     try {
+      global.log.info(chalk.yellow('CURRENCY:') + ' fetching rates')
       // base is always CZK
       const result = await axios.get('http://www.cnb.cz/cs/financni_trhy/devizovy_trh/kurzy_devizoveho_trhu/denni_kurz.txt')
       let linenum = 0
@@ -58,12 +61,13 @@ class Currency {
         line = line.split('|')
         let count = line[2]
         let code = line[3]
-        let rate = line[3]
+        let rate = line[4]
         this.rates[code] = parseFloat(rate.replace(',', '.') / count).toFixed(3)
       }
+      global.log.info(chalk.yellow('CURRENCY:') + ' fetched rates')
     } catch (e) {
-      console.error(e.stack)
-      refresh = 1000
+      global.log.error(e.stack)
+      refresh = constants.SECOND
     }
 
     this.timeouts['updateRates'] = setTimeout(() => this.updateRates(), refresh)
