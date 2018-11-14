@@ -114,7 +114,8 @@ class OAuth extends Core {
 
     const onChange = {
       'broadcaster.accessToken': [ 'onChangeAccessToken' ],
-      'bot.accessToken': [ 'onChangeAccessToken' ]
+      'bot.accessToken': [ 'onChangeAccessToken' ],
+      'broadcaster.username': [ 'onChangeBroadcasterUsername' ]
     }
 
     super({ settings, ui, onChange })
@@ -147,6 +148,13 @@ class OAuth extends Core {
     }
 
     this.timeouts['getChannelId'] = setTimeout(() => this.getChannelId(), timeout)
+  }
+
+  async onChangeBroadcasterUsername (key: string, value: any) {
+    console.log({ key, value })
+    if (!this.settings.general.owners.includes(value)) {
+      this.settings.general.owners.push(value)
+    }
   }
 
   async onChangeAccessToken (key: string, value: any) {
