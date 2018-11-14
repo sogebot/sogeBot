@@ -356,7 +356,6 @@ class Twitch {
     } else {
       message += 'no data available'
     }
-    console.log(message)
     global.commons.sendMessage(message, opts.sender)
   }
 
