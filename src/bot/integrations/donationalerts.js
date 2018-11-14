@@ -3,6 +3,7 @@
 // 3rdparty libraries
 const _ = require('lodash')
 const chalk = require('chalk')
+const constants = require('../constants.js')
 
 class Donationalerts {
   constructor () {
@@ -41,7 +42,7 @@ class Donationalerts {
 
   async connect () {
     if (_.isNil(this.socket)) {
-      this.socket = require('socket.io-client').connect('http://socket.donationalerts.ru:80',
+      this.socket = require('socket.io-client').connect('wss://socket.donationalerts.ru:443',
         {
           reconnection: true,
           reconnectionDelay: 1000,
@@ -50,9 +51,12 @@ class Donationalerts {
         })
     } else this.socket.connect()
 
-    this.socket.emit('add-user', { token: (await this.clientSecret), type: 'minor' })
+    setInterval(() => this.reconnect(), constants.HOUR) // restart socket each hour
 
-    this.socket.off('connect').on('connect', () => { global.log.info('donationalerts.ru: Successfully connected socket to service') })
+    this.socket.off('connect').on('connect', async () => {
+      this.socket.emit('add-user', { token: (await this.clientSecret), type: 'minor' })
+      global.log.info('donationalerts.ru: Successfully connected socket to service')
+    })
     this.socket.off('reconnect_attempt').on('reconnect_attempt', () => global.log.info('donationalerts.ru: Trying to reconnect to service'))
     this.socket.off('disconnect').on('disconnect', () => {
       this.socket.open()
@@ -117,9 +121,19 @@ class Donationalerts {
     if (enabled) {
       this.connect()
     } else if (!enabled) {
-      if (!_.isNil(this.socket)) this.socket.disconnect()
+      if (!_.isNil(this.socket)) {
+        this.socket.disconnect()
+      }
     }
     return enabled
+  }
+
+  async reconnect () {
+    let enabled = await this.enabled
+    if (enabled && !_.isNil(this.socket)) {
+      this.socket.disconnect()
+      this.socket.connect()
+    }
   }
 }
 
