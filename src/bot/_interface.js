@@ -88,6 +88,14 @@ class Module {
       for (let w of Object.entries(cluster.workers)) {
         if (w[1].isConnected()) w[1].send(proc)
       }
+
+      if (this.onChange[key]) {
+        // run onChange functions only on master
+        for (let fnc of this.onChange[key]) {
+          if (typeof this[fnc] === 'function') this[fnc](key, value)
+          else global.log.error(`${fnc}() is not function in ${this._name}/${this.constructor.name.toLowerCase()}`)
+        }
+      }
     } else {
       // send to master to update
       if (process.send) process.send(proc)
@@ -123,13 +131,6 @@ class Module {
 
               target[key] = value
               this.updateSettings(`${path}.${key}`, value)
-
-              if (this.onChange[`${path}.${key}`] && cluster.isMaster) {
-                // run onChange functions only on master
-                for (let fnc of this.onChange[`${path}.${key}`]) {
-                  this[fnc](`${path}.${key}`, value)
-                }
-              }
               return true
             }
           })
@@ -144,12 +145,6 @@ class Module {
 
         target[key] = value
         this.updateSettings(key, value)
-
-        if (this.onChange[key]) {
-          for (let fnc of this.onChange[key]) {
-            this[fnc](key, value)
-          }
-        }
         return true
       }
     })
