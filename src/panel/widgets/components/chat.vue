@@ -61,8 +61,9 @@ import { faCommentAlt, faUsers, faExternalLinkAlt } from '@fortawesome/free-soli
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
 library.add(faCommentAlt, faUsers, faExternalLinkAlt)
+
 export default {
-  props: ['socket', 'commons', 'popout'],
+  props: ['socket', 'commons', 'popout', 'configuration'],
   components: {
     'font-awesome-icon': FontAwesomeIcon
   },
@@ -93,7 +94,7 @@ export default {
     this.socket.emit('getChatRoom');
     this.socket.once('chatRoom', function (room) {
       $("#chat-room").html('<iframe frameborder="0" scrolling="no" id="chat_embed" src="' + window.location.protocol +
-        '//twitch.tv/embed/' + room + '/chat" width="100%"></iframe>')
+        '//twitch.tv/embed/' + room + '/chat' + (configuration.theme.includes('dark') ? '?darkpopout' : '') +'" width="100%"></iframe>')
     })
   }
 }
