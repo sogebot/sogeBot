@@ -308,7 +308,7 @@ class Twitch {
       for (let tip of tips) {
         const username = await global.users.getNameById(tip.id)
         if (_.isNil(users[username])) users[username] = { username: username, amount: 0 }
-        users[username].amount += global.currency.exchange(tip.amount, tip.currency, await global.configuration.getValue('currency'))
+        users[username].amount += global.currency.exchange(tip.amount, tip.currency, global.currency.settings.currency.mainCurrency)
       }
       sorted = _.orderBy(users, 'amount', 'desc')
     } else if (type === 'messages') {
@@ -342,7 +342,7 @@ class Twitch {
       for (let user of sorted) {
         message += (i + 1) + '. ' + (await global.configuration.getValue('atUsername') ? '@' : '') + (user.username || 'unknown') + ' - '
         if (type === 'time') message += (user.watched / 1000 / 60 / 60).toFixed(1) + 'h'
-        else if (type === 'tips') message += user.amount.toFixed(2) + global.currency.symbol(await global.configuration.getValue('currency'))
+        else if (type === 'tips') message += user.amount.toFixed(2) + global.currency.symbol(global.currency.settings.currency.mainCurrency)
         else if (type === 'points') {
           let points = user.points
           message += points + ' ' + await global.systems.points.getPointsName(user.points)

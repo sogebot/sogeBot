@@ -412,13 +412,11 @@ var social = {
             settings[name] = value
           }
           delete settings.settings
-          console.log(settings)
 
           this.socket[this.selected].emit('settings.update', settings, (err) => {
             setTimeout(() => this.state.settings = 0, 1000)
             if (err) {
               this.state.settings = 3
-              console.error(err)
             } else {
               this.state.settings = 2
               this.isDataChanged = false

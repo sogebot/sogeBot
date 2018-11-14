@@ -1,30 +1,47 @@
+// @flow
+
+'use strict'
+
 const getSymbolFromCurrency = require('currency-symbol-map')
 const axios = require('axios')
 const _ = require('lodash')
 const chalk = require('chalk')
 const constants = require('./constants')
 
-class Currency {
+const Core = require('./_interface')
+
+class Currency extends Core {
+  rates: RatesObject = {}
+  timeouts: Object = {}
+  base: string = 'CZK'
   constructor () {
-    this.timeouts = {}
-
-    this.base = 'CZK'
-    this.rates = {}
-
-    global.configuration.register('currency', 'core.no-response', 'string', 'EUR')
+    const settings = {
+      currency: {
+        mainCurrency: 'EUR'
+      }
+    }
+    const ui = {
+      currency: {
+        mainCurrency: {
+          type: 'selector',
+          values: ['USD', 'AUD', 'BGN', 'BRL', 'CAD', 'CHF', 'CNY', 'CZK', 'DKK', 'EUR', 'GBP', 'HKD', 'HRK', 'HUF', 'IDR', 'ILS', 'INR', 'ISK', 'JPY', 'KRW', 'MXN', 'MYR', 'NOK', 'NZD', 'PHP', 'PLN', 'RON', 'RUB', 'SEK', 'SGD', 'THB', 'TRY', 'ZAR']
+        }
+      }
+    }
+    super({ settings, ui })
 
     setTimeout(() => this.updateRates(), 5 * constants.SECOND)
   }
 
-  isCodeSupported (code) {
+  isCodeSupported (code: string) {
     return code === this.base || !_.isNil(this.rates[code])
   }
 
-  symbol (code) {
+  symbol (code: string) {
     return getSymbolFromCurrency(code)
   }
 
-  exchange (value, from, to) {
+  exchange (value: number, from: string, to: string) {
     try {
       value = parseFloat(value)
       this.rates[this.base] = 1 // base is always 1:1

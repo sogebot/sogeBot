@@ -86,7 +86,7 @@ class Streamlabs {
           if (!event.isTest) {
             const id = await global.users.getIdByName(event.from.toLowerCase(), false)
             if (id) global.db.engine.insert('users.tips', { id, amount: event.amount, message: event.message, currency: event.currency, timestamp: _.now() })
-            if (await global.cache.isOnline()) await global.db.engine.increment('api.current', { key: 'tips' }, { value: parseFloat(global.currency.exchange(event.amount, event.currency, await global.configuration.getValue('currency'))) })
+            if (await global.cache.isOnline()) await global.db.engine.increment('api.current', { key: 'tips' }, { value: parseFloat(global.currency.exchange(event.amount, event.currency, global.currency.settings.currency.mainCurrency)) })
           }
           global.overlays.eventlist.add({
             type: 'tip',

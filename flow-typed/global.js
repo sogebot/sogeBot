@@ -30,3 +30,7 @@ declare type EventType = {
   song_title?: string,
   song_url?: string
 }
+
+declare type RatesObject = {
+  [string]: number
+}

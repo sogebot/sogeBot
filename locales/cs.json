@@ -59,6 +59,7 @@
     }
   },
   "webpanel": {
+    "mainCurrency": "Základní měna",
     "display-as": "Zobrazit jako",
     "set-default": "Výchozí nastavení",
     "add": "Přidat",
