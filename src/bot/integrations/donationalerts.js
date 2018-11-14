@@ -51,11 +51,12 @@ class Donationalerts {
         })
     } else this.socket.connect()
 
-    this.restartInverval = setInterval(() => this.reconnect(), constants.HOUR) // restart socket each hour
+    setInterval(() => this.reconnect(), constants.HOUR) // restart socket each hour
 
-    this.socket.emit('add-user', { token: (await this.clientSecret), type: 'minor' })
-
-    this.socket.off('connect').on('connect', () => { global.log.info('donationalerts.ru: Successfully connected socket to service') })
+    this.socket.off('connect').on('connect', async () => {
+      this.socket.emit('add-user', { token: (await this.clientSecret), type: 'minor' })
+      global.log.info('donationalerts.ru: Successfully connected socket to service')
+    })
     this.socket.off('reconnect_attempt').on('reconnect_attempt', () => global.log.info('donationalerts.ru: Trying to reconnect to service'))
     this.socket.off('disconnect').on('disconnect', () => {
       this.socket.open()
@@ -118,14 +119,17 @@ class Donationalerts {
     } else if (!enabled) {
       if (!_.isNil(this.socket)) {
         this.socket.disconnect()
-        clearInterval(this.restartInverval)
       }
     }
     return enabled
   }
 
   async reconnect () {
-    this.socket.disconnect()
+    let enabled = await this.enabled
+    if (enabled && !_.isNil(this.socket)) {
+      this.socket.disconnect()
+      this.socket.connect()
+    }
   }
 }
 
