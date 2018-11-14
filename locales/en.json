@@ -323,6 +323,7 @@
         "count": "Count",
         "link": "Link (translated)",
         "winner": "Winner",
+        "loser": "Loser",
         "challenger": "Challenger",
         "min": "Minimum",
         "max": "Maximum",
@@ -1063,11 +1064,11 @@
       "cannotFightWithYourself": "$sender, you cannot fight with yourself!",
       "cooldown": "$sender, you cannot use $command for $cooldown $minutesName.",
       "challenge": "(ง'̀-'́)ง $sender wants to fight you $username! If you accept, send $command $sender",
-      "winner": "٩(^ᴗ^)۶ $winner is proud winner! Who's next?",
+      "winner": "٩(^ᴗ^)۶ $winner is proud winner and $loser is sore loser! Who's next?",
       "notEnoughOptions": "$sender, you need to select user to fight.",
-      "broadcaster": "ψ(｀∇´)ψ $winner is a god among you. This fight was decided even before it started.",
+      "broadcaster": "ψ(｀∇´)ψ $winner is a god among you. Beware $loser! This fight was decided even before it started.",
       "bothModerators": "$challenger (*-`ω´- )人(*-`ω´- ) $sender, this fight will take milleniums to decide!",
-      "oneModerator": "¯\\_(ツ)_/¯ $winner is under divine protection. Sorry."
+      "oneModerator": "¯\\_(ツ)_/¯ $winner is under divine protection. Sorry, $loser."
     },
     "gamble": {
       "chanceToWin": "$sender, chance to win !gamble set to $value%",

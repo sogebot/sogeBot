@@ -333,6 +333,7 @@
         "count": "Počet",
         "link": "Link (přeloženo)",
         "winner": "Vítěz",
+        "loser": "Poražený",
         "challenger": "Vyzyvatel",
         "min": "Minimum",
         "max": "Maximum",
@@ -1078,11 +1079,11 @@
       "cannotFightWithYourself": "$sender, nemuzes se porvat sam se sebou!",
       "cooldown": "$sender, nemuzes pouzit $command jeste $cooldown $minutesName.",
       "challenge": "(ง'̀-'́)ง $sender se chce s tebou porvat $username! Pokud souhlasis, posli $command $sender",
-      "winner": "٩(^ᴗ^)۶ $winner je hrdym vitezem! Kdo je dalsim na rade?",
+      "winner": "٩(^ᴗ^)۶ $winner je hrdym vitezem a porazi $loser! Kdo je dalsim na rade?",
       "notEnoughOptions": "$sender, musis vybrat uzivatele k souboji.",
-      "broadcaster": "ψ(｀∇´)ψ $winner je zde bohem. Tento souboj byl rozhodnut jeste nez vubec zacal.",
+      "broadcaster": "ψ(｀∇´)ψ $winner je zde bohem. Kaj se $loser! Tento souboj byl rozhodnut jeste nez vubec zacal.",
       "bothModerators": "$challenger (*-`ω´- )人(*-`ω´- ) $sender, tento souboj bude trvat tisicileti, nez se rozhodne!",
-      "oneModerator": "¯\\_(ツ)_/¯ $winner je pod ochranou. Sorry."
+      "oneModerator": "¯\\_(ツ)_/¯ $winner je pod ochranou. Sorry, $loser."
     },
     "gamble": {
       "chanceToWin": "$sender, sance na vyhru v !gamble nastavena na $value%",

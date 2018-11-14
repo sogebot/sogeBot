@@ -78,8 +78,8 @@ describe('game/fightme - !fightme', () => {
         })
         it(`Expecting ${test.expected}`, async () => {
           await message.isSent(test.expected, test.challenging, [
-            { winner: test.challenging.username, challenger: test.challenging.username },
-            { winner: test.challenger.username, challenger: test.challenger.username }
+            { winner: test.challenging.username, loser: test.challenger.username, challenger: test.challenging.username },
+            { winner: test.challenger.username, loser: test.challenging.username, challenger: test.challenger.username }
           ])
         })
       }
