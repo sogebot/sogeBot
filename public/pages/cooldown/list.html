@@ -51,6 +51,9 @@
               <button v-on:click="item.subscriber = !item.subscriber; sendUpdate(item._id)"  class="btn btn-outline-dark p-3 border-0">
                 <span v-bind:style="{ 'color': !item.subscriber ? 'tomato' : 'inherit', 'text-decoration': !item.subscriber ? 'line-through': 'inherit'}" style="margin: 0; font-size: 14px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">{{commons.translate('cooldown-subscribers').toUpperCase()}}</span>
               </button>
+              <button v-on:click="item.follower = !item.follower; sendUpdate(item._id)"  class="btn btn-outline-dark p-3 border-0">
+                <span v-bind:style="{ 'color': !item.follower ? 'tomato' : 'inherit', 'text-decoration': !item.follower ? 'line-through': 'inherit'}" style="margin: 0; font-size: 14px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">{{commons.translate('cooldown-followers').toUpperCase()}}</span>
+              </button>
               <button v-on:click="item.enabled = !item.enabled; sendUpdate(item._id)"  class="btn btn-outline-dark p-3 border-0"><i class="fas mr-1"  v-bind:class="[ item.enabled ? 'fa-toggle-on' : 'fa-toggle-off' ]" aria-hidden="true"></i> {{ item.enabled ? commons.translate('enabled') : commons.translate('disabled') }}</button>
               <button type="button" type="button" v-on:click="deleteItem(item._id)" class="btn btn-outline-dark p-3 border-0"><i class="far fa-trash-alt mr-1" aria-hidden="true"></i> {{ commons.translate('delete') }}</button>
             </div>
