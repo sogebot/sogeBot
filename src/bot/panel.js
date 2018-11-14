@@ -267,7 +267,7 @@ function Panel () {
     })
     socket.on('core', async (cb) => {
       let toEmit = []
-      for (let system of ['oauth', 'users']) {
+      for (let system of ['oauth', 'users', 'currency']) {
         if (!global[system].settings) continue
         toEmit.push({
           name: system.toLowerCase()
@@ -409,7 +409,7 @@ Panel.prototype.sendStreamData = async function (self, socket) {
     currentSubscribers: _.get(await global.db.engine.findOne('api.current', { key: 'subscribers' }), 'value', 0),
     currentBits: _.get(await global.db.engine.findOne('api.current', { key: 'bits' }), 'value', 0),
     currentTips: _.get(await global.db.engine.findOne('api.current', { key: 'tips' }), 'value', 0),
-    currency: global.currency.symbol(await global.configuration.getValue('currency')),
+    currency: global.currency.symbol(global.currency.settings.currency.mainCurrency),
     chatMessages: await global.cache.isOnline() ? global.linesParsed - global.api.chatMessagesAtStart : 0,
     currentFollowers: _.get(await global.db.engine.findOne('api.current', { key: 'followers' }), 'value', 0),
     currentViews: _.get(await global.db.engine.findOne('api.current', { key: 'views' }), 'value', 0),

@@ -163,6 +163,41 @@ let migration = {
       console.info(' => DONE')
     }
   }, {
+    version: '8.2.0',
+    do: async () => {
+      let processed = 0
+
+      const mappings = {
+        'currency': 'core.currency.settings.currency.mainCurrency'
+      }
+
+      console.info('Updating settings to 8.2.0')
+      console.info(' -> entries')
+      for (let [o, n] of Object.entries(mappings)) {
+        if (n !== null) {
+          let item = await global.db.engine.findOne('settings', { key: o })
+          if (!_.isEmpty(item)) {
+            let regexp = XRegExp(`
+              (?<collection> [a-zA-Z]*.[a-zA-Z]*.settings)
+              .
+              (?<category> [a-zA-Z]*)
+              ?.
+              ?(?<key> [a-zA-Z]*)`, 'ix')
+            const match = XRegExp.exec(n, regexp)
+            if (match.key.trim().length === 0) match.key = undefined
+            if (!_.isNil(item.value)) {
+              await global.db.engine.insert(match.collection, { category: match.category, key: match.key, isMultiValue: false, value: item.value })
+              processed++
+            } else {
+              console.warn(`Settings ${match.category} ${match.key} is missing value`)
+            }
+          }
+          await global.db.engine.remove('settings', { key: o })
+        }
+      }
+      console.info(` => ${processed} processed`)
+    }
+  }, {
     version: '8.1.0',
     do: async () => {
       let processed = 0

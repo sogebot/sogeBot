@@ -350,12 +350,12 @@ class Users extends Core {
           let tipsOfViewer = _.filter(tips, (o) => o.id === viewer.id)
           if (!_.isEmpty(tipsOfViewer)) {
             let tipsAmount = 0
-            for (let tip of tipsOfViewer) tipsAmount += global.currency.exchange(tip.amount, tip.currency, await global.configuration.getValue('currency'))
+            for (let tip of tipsOfViewer) tipsAmount += global.currency.exchange(tip.amount, tip.currency, global.currency.settings.currency.mainCurrency)
             _.set(viewer, 'stats.tips', tipsAmount)
           } else {
             _.set(viewer, 'stats.tips', 0)
           }
-          _.set(viewer, 'custom.currency', global.currency.symbol(await global.configuration.getValue('currency')))
+          _.set(viewer, 'custom.currency', global.currency.symbol(global.currency.settings.currency.mainCurrency))
 
           // BITS
           let bitsOfViewer = _.filter(bits, (o) => o.id === viewer.id)

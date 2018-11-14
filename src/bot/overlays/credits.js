@@ -103,9 +103,9 @@ class Credits extends Overlay {
         for (let event of events) {
           if (!_.isNil(event.amount) && !_.isNil(event.currency)) {
             event.amount = await global.configuration.getValue('creditsAggregate')
-              ? global.currency.exchange(event.amount, event.currency, await global.configuration.getValue('currency'))
+              ? global.currency.exchange(event.amount, event.currency, global.currency.settings.currency.mainCurrency)
               : event.amount
-            event.currency = global.currency.symbol(await global.configuration.getValue('creditsAggregate') ? await global.configuration.getValue('currency') : event.currency)
+            event.currency = global.currency.symbol(await global.configuration.getValue('creditsAggregate') ? global.currency.settings.currency.mainCurrency : event.currency)
           }
         }
 

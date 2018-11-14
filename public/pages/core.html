@@ -26,6 +26,7 @@
                     :readonly="ui[category][defaultValue].readOnly"
                     :secret="ui[category][defaultValue].secret"
                     :value="currentValue"
+                    :values="ui[category][defaultValue].values"
                     @update="value[defaultValue] = $event.value; triggerDataChange()"
                     :title="defaultValue"
                     :current="value[ui[category][defaultValue].current]"
@@ -123,7 +124,8 @@
         'text-input': textInput,
         'command-input-with-permission': commandInputWithPermissions,
         'textarea-from-array': textAreaFromArray,
-        'check-list': checkList
+        'check-list': checkList,
+        'selector': selector
       },
       data: {
         socket: { _panel: io({ query: "token=" + token }) },
