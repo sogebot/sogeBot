@@ -15,6 +15,7 @@ class Donationalerts {
 
     this.status()
     this.sockets()
+    setInterval(() => this.reconnect(), constants.HOUR) // restart socket each hour
   }
 
   get enabled () {
@@ -50,8 +51,6 @@ class Donationalerts {
           reconnectionAttempts: Infinity
         })
     } else this.socket.connect()
-
-    setInterval(() => this.reconnect(), constants.HOUR) // restart socket each hour
 
     this.socket.off('connect').on('connect', async () => {
       this.socket.emit('add-user', { token: (await this.clientSecret), type: 'minor' })
