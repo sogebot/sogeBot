@@ -373,7 +373,6 @@ class TMI extends Core {
   }
 
   async cheer (message: Object) {
-    console.log(message)
     try {
       const username = message.tags.username
       const userId = message.tags.userId

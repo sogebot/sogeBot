@@ -151,7 +151,6 @@ class OAuth extends Core {
   }
 
   async onChangeBroadcasterUsername (key: string, value: any) {
-    console.log({ key, value })
     if (!this.settings.general.owners.includes(value)) {
       this.settings.general.owners.push(value)
     }
