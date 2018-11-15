@@ -258,8 +258,7 @@ class Module {
               const _id = item._id; delete item._id
               if (_.isNil(_id)) itemFromDb = await global.db.engine.insert(opts.collection, item)
               else await global.db.engine.update(opts.collection, { _id }, item)
-
-              if (_.isFunction(cb)) cb(null, itemFromDb)
+              if (_.isFunction(cb)) cb(null, Object.assign({ _id }, itemFromDb))
             }
           } else {
             if (_.isFunction(cb)) cb(null, [])
@@ -300,6 +299,7 @@ class Module {
         })
         socket.on('findOne', async (opts, cb) => {
           opts.collection = opts.collection || 'data'
+          opts.omit = opts.omit || []
           if (opts.collection.startsWith('_')) {
             opts.collection = opts.collection.replace('_', '')
           } else opts.collection = this.collection[opts.collection]
