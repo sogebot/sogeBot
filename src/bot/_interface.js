@@ -23,6 +23,7 @@ class Module {
     this._parsers = []
     this._name = opts.name || 'core'
     this._ui = opts.ui || {}
+    this._opts = opts
 
     this.collection = new Proxy({}, {
       get: (target, name, receiver) => {
@@ -56,7 +57,8 @@ class Module {
   async loadVariableValues () {
     const variables = await global.db.engine.find(this.collection.settings)
     for (let i = 0, length = variables.length; i < length; i++) {
-      _.set(this._settings, variables[i].key, variables[i].value)
+      if (_.has(this._opts.settings, variables[i].key)) _.set(this._settings, variables[i].key, variables[i].value)
+      else await global.db.engine.remove(this.collection.settings, { _id: String(variables[i]._id) })
     }
   }
 
