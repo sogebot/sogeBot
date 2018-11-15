@@ -80,6 +80,12 @@
                 <button v-on:click="item.owner = !item.owner; sendUpdate(item._id)"  class="btn btn-outline-dark p-3 border-0">
                   <span v-bind:style="{ 'color': !item.owner ? 'tomato' : 'inherit', 'text-decoration': !item.owner ? 'line-through': 'inherit'}" style="margin: 0; font-size: 14px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">{{commons.translate('cooldown-owners').toUpperCase()}}</span>
                 </button>
+                <button v-on:click="item.subscriber = !item.subscriber; sendUpdate(item._id)"  class="btn btn-outline-dark p-3 border-0">
+                  <span v-bind:style="{ 'color': !item.subscriber ? 'tomato' : 'inherit', 'text-decoration': !item.subscriber ? 'line-through': 'inherit'}" style="margin: 0; font-size: 14px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">{{commons.translate('cooldown-subscribers').toUpperCase()}}</span>
+                </button>
+                <button v-on:click="item.follower = !item.follower; sendUpdate(item._id)"  class="btn btn-outline-dark p-3 border-0">
+                  <span v-bind:style="{ 'color': !item.follower ? 'tomato' : 'inherit', 'text-decoration': !item.follower ? 'line-through': 'inherit'}" style="margin: 0; font-size: 14px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">{{commons.translate('cooldown-followers').toUpperCase()}}</span>
+                </button>
                 <button v-bind:title="item.enabled ? commons.translate('enabled') : commons.translate('disabled')" v-on:click="item.enabled = !item.enabled; sendUpdate(item._id)"  class="btn btn-outline-dark p-1 border-0"><i class="fas m-1"  v-bind:class="[ item.enabled ? 'fa-toggle-on' : 'fa-toggle-off' ]" aria-hidden="true"></i></button>
                 <button type="button" v-on:click="deleteItem(item._id)" v-bind:title="commons.translate('delete')" class="btn btn-outline-dark p-1 border-0"><i class="far fa-trash-alt m-1" aria-hidden="true"></i></button>
 
@@ -126,13 +132,12 @@
         }
       },
       created: function () {
-        this.socket.emit('list', (err, items) => {
-          this.cooldowns = _.orderBy(items, 'key', 'asc')
-        })
-        this.socket.emit('settings', (err, items) => {
-          this.enabled = items.enabled
-          this.cooldownNotifyAsWhisper = items.cooldownNotifyAsWhisper
-          this.commands = items.commands
+        this.socket.emit('find', {}, (err, items) => {
+          this.cooldowns = _.orderBy(items.map(o => {
+            o.subscriber = typeof o.subscriber !== 'undefined' ? o.subscriber : true
+            o.follower = typeof o.follower !== 'undefined' ? o.follower : true
+            return o
+          }), 'key', 'asc')
         })
 
         if (localStorage.getItem('/systems/Cooldown/showAs')) this.showAs = JSON.parse(localStorage.getItem('/systems/Cooldown/showAs'));
@@ -156,7 +161,7 @@
           })
         },
         sendUpdate: function (_id) {
-          this.socket.emit('update', this.cooldowns.filter((o) => o._id === _id))
+          this.socket.emit('update', { items: this.cooldowns.filter((o) => o._id === _id) })
         }
       }
     })

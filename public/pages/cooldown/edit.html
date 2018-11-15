@@ -142,7 +142,7 @@
                 quiet: this.quiet,
                 enabled: this.enabled
               }
-              this.socket.emit('update', [data], (err, data) => {
+              this.socket.emit('update', { items: [data] }, (err, data) => {
                 if (err) {
                   console.error(err)
                   return this.states.save = 3
@@ -150,7 +150,7 @@
                 this.states.save = 2
                 this.pending = false
                 this.id = String(data._id)
-                page('?id=' + this.id + '/#cooldown/edit', )
+                page('?id=' + this.id + '#cooldown/edit', )
                 setTimeout(() => this.states.save = 0, 1000)
               })
             }
@@ -198,7 +198,7 @@
       if (commons.urlParam('id')) {
         cooldownEdit.loading = true
         cooldownEdit.id = commons.urlParam('id')
-        cooldownEdit.socket.emit('get', commons.urlParam('id'), (err, data) => {
+        cooldownEdit.socket.emit('findOne', { where: { _id: commons.urlParam('id') } }, (err, data) => {
           cooldownEdit.key = data.key
           cooldownEdit.miliseconds = data.miliseconds / 1000
           cooldownEdit.moderator = data.moderator
@@ -206,8 +206,8 @@
           cooldownEdit.quiet = data.quiet
           cooldownEdit.type = data.type
           cooldownEdit.enabled = data.enabled
-          cooldownEdit.subcriber = data.subcriber
-          cooldownEdit.follower = data.follower
+          cooldownEdit.subscriber = typeof data.subscriber !== 'undefined' ? data.subscriber : true
+          cooldownEdit.follower = typeof data.follower !== 'undefined' ? data.follower : true
           cooldownEdit.$nextTick(() => { cooldownEdit.pending = false; cooldownEdit.loading = false })
         })
       }
