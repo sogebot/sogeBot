@@ -1,6 +1,6 @@
 {
   "settings": {
     "enabled": "Status",
-    "betPercentGain": "Přidejte x procent do výplaty sázek každé možnosti"
+    "betPercentGain": "Přidejte x% do výplaty sázek každé možnosti"
   }
 }

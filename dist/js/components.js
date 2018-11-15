@@ -25,6 +25,50 @@ window.textWithTags = {
     `
 }
 
+/* number input for settings  */
+window.numberInput = {
+  props: ['value', 'title', 'readonly', 'min', 'max', 'step'],
+  methods: {
+    update: function () {
+      let step = String(this.step || 0)
+
+      if (step.includes('.')) {
+        step = step.split('.')[1].length
+      }
+
+      this.currentValue = Number(Number(this.currentValue).toFixed(step))
+
+      if (this.min && this.min > this.currentValue) this.currentValue = this.min
+      if (this.max && this.max < this.currentValue) this.currentValue = this.max
+
+      this.$emit('update', { value: Number(this.currentValue) })
+    }
+  },
+  data: function () {
+    return {
+      show: false,
+      currentValue: this.value,
+      translatedTitle: commons.translate(this.title)
+    }
+  },
+  mounted: function () {
+    $('.textInputTooltip').tooltip()
+  },
+  template: `
+    <div class="input-group">
+      <div class="input-group-prepend">
+        <span class="input-group-text">
+          <template v-if="typeof translatedTitle === 'string'">{{ translatedTitle }}</template>
+          <template v-else>
+            {{ translatedTitle.title }}
+            <small class="textInputTooltip text-info" data-toggle="tooltip" data-html="true" :title="translatedTitle.help">[?]</small>
+          </template>
+        </span>
+      </div>
+      <input :min="min" :max="max" v-on:keyup="update" @focus="show = true" @blur="show = false" v-model="currentValue" :step="step || 1" type="number" class="form-control" :readonly="readonly" />
+    </div>`
+}
+
 /* text input for settings  */
 window.textInput = {
   props: ['value', 'title', 'type', 'readonly', 'secret'],

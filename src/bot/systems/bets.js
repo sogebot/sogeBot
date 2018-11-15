@@ -44,8 +44,16 @@ class Bets extends System {
         { name: '!bet', isHelper: true }
       ]
     }
+    const ui = {
+      betPercentGain: {
+        type: 'number-input',
+        step: '1',
+        min: '0',
+        max: '100'
+      }
+    }
 
-    super({ settings, dependsOn })
+    super({ settings, dependsOn, ui })
 
     this.timeouts = {}
 
@@ -230,7 +238,7 @@ class Bets extends System {
       if (_.isEmpty(currentBet)) throw Error(ERROR_NOT_RUNNING)
       if (_.isNil(currentBet.options[index])) throw Error(ERROR_NOT_OPTION)
 
-      var percentGain = (currentBet.options.length * parseInt(await this.settings.betPercentGain, 10)) / 100
+      var percentGain = (currentBet.options.length * parseInt(this.settings.betPercentGain, 10)) / 100
 
       const users = await global.db.engine.find(this.collection.users)
       let total = 0

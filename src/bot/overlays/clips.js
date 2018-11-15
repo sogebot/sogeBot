@@ -15,6 +15,12 @@ class Clips extends Overlay {
 
     const ui = {
       clips: {
+        volume: {
+          type: 'number-input',
+          step: '1',
+          min: '0',
+          max: '100'
+        },
         filter: {
           type: 'selector',
           values: ['none', 'grayscale', 'sepia', 'tint', 'washed']

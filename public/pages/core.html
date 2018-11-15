@@ -20,15 +20,18 @@
           <div class="card mb-2" >
             <div class="card-body">
               <div v-if="typeof value === 'object' && !defaultValue.startsWith('_')" class="p-0 pl-2 pr-2 " v-for="(currentValue, defaultValue) of value">
-                <template v-if="typeof ui[category] !== 'undefined' && ui[category][defaultValue]">
+                <template v-if="typeof ui[category] !== 'undefined' && typeof ui[category][defaultValue] !== 'undefined'">
                   <component
                     :is="ui[category][defaultValue].type"
                     :readonly="ui[category][defaultValue].readOnly"
                     :secret="ui[category][defaultValue].secret"
+                    :step="ui[category][defaultValue].step"
+                    :min="ui[category][defaultValue].min"
+                    :max="ui[category][defaultValue].max"
                     :value="currentValue"
                     :values="ui[category][defaultValue].values"
                     @update="value[defaultValue] = $event.value; triggerDataChange()"
-                    :title="defaultValue"
+                    :title="'systems.' + selected + '.settings.' + defaultValue"
                     :current="value[ui[category][defaultValue].current]"
                     class="pt-1 pb-1"></component>
                 </template>
@@ -56,6 +59,15 @@
                     v-bind:title="commons.translate('systems.' + selectedSystem + '.settings.' + defaultValue)"
                     v-on:update="value[defaultValue] = $event; triggerDataChange()"
                   ></textarea-from-array>
+                  <number-input
+                    v-else-if="typeof currentValue === 'number'"
+                    class="pt-1 pb-1"
+                    v-bind:type="typeof currentValue"
+                    v-bind:value="currentValue"
+                    v-bind:title="'systems.' + selected + '.settings.' + defaultValue"
+                    :permission="settings._permissions[defaultValue]"
+                    v-on:update="value[defaultValue] = $event.value; triggerDataChange()">
+                  </number-input>
                   <text-input
                     v-else
                     class="pt-1 pb-1"
@@ -122,6 +134,7 @@
       components: {
         'toggle': toggleEnable,
         'text-input': textInput,
+        'number-input': numberInput,
         'command-input-with-permission': commandInputWithPermissions,
         'textarea-from-array': textAreaFromArray,
         'check-list': checkList,
@@ -132,7 +145,7 @@
         listOfSystems: [],
         selectedSystem: null,
         settings: { settings: {} },
-        ui: {},
+        ui: { settings: {} },
         isDataChanged: false,
 
         state: {
@@ -166,10 +179,9 @@
           this.socket[system].emit('settings', (err, settings, ui) => {
             if (system !== this.selectedSystem) return // skip if we quickly changed system
 
-            this.ui = ui
-
             this.state.loading = 0
             let _settings = _(settings).toPairs().value()
+            let _ui = _(ui).toPairs().value()
 
             // sorting
             this.settings.settings = {}
@@ -184,6 +196,21 @@
             // commands at last
             for (let [name, value] of _(_settings.filter(o => o[0] === 'commands')).value()) {
               this.settings[name] = value
+            }
+
+            // ui
+            // everything else except commands and enabled and are string|number|bool
+            for (let [name, value] of _(_ui.filter(o => o[0] !== '_' && o[0] !== 'enabled' && o[0] !== 'commands' && typeof o[1] !== 'object')).value()) {
+              if (typeof this.settings.settings[name] === 'undefined') this.settings.settings[name] = null
+              this.ui.settings[name] = value
+            }
+            // everything else except commands and enabled and are objects -> own category
+            for (let [name, value] of _(_ui.filter(o => o[0] !== '_' && o[0] !== 'enabled' && o[0] !== 'commands' && typeof o[1] === 'object')).value()) {
+              if (typeof this.settings[name] === 'undefined') this.settings[name] = {}
+              for (let [k, v] of Object.entries(value)) {
+                if (typeof this.settings[name][k] === 'undefined') this.settings[name][k] = null
+              }
+              this.ui[name] = value
             }
             this.isDataChanged = false
           })
