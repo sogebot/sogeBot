@@ -133,7 +133,6 @@
       },
       created: function () {
         this.socket.emit('find', {}, (err, items) => {
-          console.log(items)
           this.cooldowns = _.orderBy(items.map(o => {
             o.subscriber = typeof o.subscriber !== 'undefined' ? o.subscriber : true
             o.follower = typeof o.follower !== 'undefined' ? o.follower : true
