@@ -57,7 +57,7 @@ class Module {
   async loadVariableValues () {
     const variables = await global.db.engine.find(this.collection.settings)
     for (let i = 0, length = variables.length; i < length; i++) {
-      if (_.has(this._opts.settings, variables[i].key)) _.set(this._settings, variables[i].key, variables[i].value)
+      if (_.has(this._opts.settings, variables[i].key) && variables[i].value !== null) _.set(this._settings, variables[i].key, variables[i].value)
       else await global.db.engine.remove(this.collection.settings, { _id: String(variables[i]._id) })
     }
   }
@@ -416,6 +416,7 @@ class Module {
       if (!_.isEmpty(permission)) promisedSettings._permissions[key] = permission.permission // change to custom permission
       else promisedSettings._permissions[key] = _.isNil(command.permission) ? constants.VIEWERS : command.permission
     }
+
     return promisedSettings
   }
 

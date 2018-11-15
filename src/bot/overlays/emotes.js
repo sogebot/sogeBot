@@ -63,6 +63,25 @@ class Emotes extends Overlay {
     }
 
     const ui = {
+      explosion: {
+        numOfEmotes: {
+          type: 'number-input',
+          step: '1',
+          min: '1'
+        }
+      },
+      fireworks: {
+        numOfEmotesPerExplosion: {
+          type: 'number-input',
+          step: '1',
+          min: '1'
+        },
+        numOfExplosions: {
+          type: 'number-input',
+          step: '1',
+          min: '1'
+        }
+      },
       test: {
         /* type test are only for overlays */
         explosion: {
@@ -107,6 +126,11 @@ class Emotes extends Overlay {
         size: {
           type: 'selector',
           values: ['1', '2', '3']
+        },
+        numOfEmotes: {
+          type: 'number-input',
+          step: '1',
+          min: '1'
         }
       }
     }

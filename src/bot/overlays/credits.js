@@ -53,6 +53,28 @@ class Credits extends Overlay {
     }
 
     const ui = {
+      clips: {
+        volume: {
+          type: 'number-input',
+          step: '1',
+          min: '0',
+          max: '100'
+        },
+        numOfClips: {
+          type: 'number-input',
+          step: '1',
+          min: '0'
+        },
+        customPeriodInDays: {
+          type: 'number-input',
+          step: '1',
+          min: '0'
+        },
+        period: {
+          type: 'selector',
+          values: ['stream', 'custom']
+        }
+      },
       customTexts: {
         values: {
           type: 'custom-texts'
@@ -67,12 +89,6 @@ class Credits extends Overlay {
         speed: {
           type: 'selector',
           values: ['very slow', 'slow', 'medium', 'fast', 'very fast']
-        }
-      },
-      clips: {
-        period: {
-          type: 'selector',
-          values: ['stream', 'custom']
         }
       },
       links: {

@@ -37,7 +37,15 @@ class Songs extends System {
         { name: '!playlist', fnc: 'help', permission: constants.OWNER_ONLY }
       ]
     }
-    super({ settings })
+    const ui = {
+      volume: {
+        type: 'number-input',
+        step: '1',
+        min: '0',
+        max: '100'
+      }
+    }
+    super({ settings, ui })
 
     if (cluster.isMaster) {
       cluster.on('message', (worker, d) => {
