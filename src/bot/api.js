@@ -5,10 +5,12 @@ const moment = require('moment')
 const cluster = require('cluster')
 const stacktrace = require('stacktrace-parser')
 const fs = require('fs')
+const chalk = require('chalk')
 
 const __DEBUG__ = {
   STREAM: (process.env.DEBUG && process.env.DEBUG.includes('api.stream')),
-  CALLS: (process.env.DEBUG && process.env.DEBUG.includes('api.calls'))
+  CALLS: (process.env.DEBUG && process.env.DEBUG.includes('api.calls')),
+  INTERVAL: (process.env.DEBUG && process.env.DEBUG.includes('api.interval'))
 }
 
 class API {
@@ -85,18 +87,222 @@ class API {
 
       this._loadCachedStatusAndGame()
 
-      this.getCurrentStreamData({ interval: true })
-      this.getLatest100Followers(true)
-      this.updateChannelViews()
-      this.getChannelHosts()
+      setInterval(async () => {
+        if (typeof this.timeouts['getCurrentStreamData'] === 'undefined') this.timeouts['getCurrentStreamData'] = { opts: { interval: true }, isRunning: false }
 
-      this.getChannelChattersUnofficialAPI({ saveToWidget: false })
+        if (!this.timeouts['getCurrentStreamData'].isRunning) {
+          this.timeouts['getCurrentStreamData'].isRunning = true
+          if (__DEBUG__.INTERVAL) global.log.info(chalk.yellow('getCurrentStreamData() ') + 'start')
+          const value = await Promise.race([
+            this.getCurrentStreamData(this.timeouts['getCurrentStreamData'].opts),
+            this.timeoutAfterMs(10000)
+          ])
+          if (__DEBUG__.INTERVAL) global.log.info(chalk.yellow('getCurrentStreamData() ') + JSON.stringify(value))
 
-      this.getChannelSubscribersOldAPI() // remove this after twitch add total subscribers
-      this.getChannelDataOldAPI({ forceUpdate: true }) // remove this after twitch game and status for new API
+          if (value.state) { // if is ok, update opts and run unlock after a while
+            value.opts = value.opts || {}
+            setTimeout(() => {
+              this.timeouts['getCurrentStreamData'].opts = value.opts
+              this.timeouts['getCurrentStreamData'].isRunning = false
+            }, 60000)
+          } else { // else run next tick
+            this.timeouts['getCurrentStreamData'].isRunning = false
+          }
+        }
+      }, 1000)
 
-      this.intervalFollowerUpdate()
-      this.checkClips()
+      setInterval(async () => {
+        if (typeof this.timeouts['updateChannelViews'] === 'undefined') this.timeouts['updateChannelViews'] = { opts: true, isRunning: false }
+
+        if (!this.timeouts['updateChannelViews'].isRunning) {
+          this.timeouts['updateChannelViews'].isRunning = true
+          if (__DEBUG__.INTERVAL) global.log.info(chalk.yellow('updateChannelViews() ') + 'start')
+          const value = await Promise.race([
+            this.updateChannelViews(this.timeouts['updateChannelViews'].opts),
+            this.timeoutAfterMs(10000)
+          ])
+          if (__DEBUG__.INTERVAL) global.log.info(chalk.yellow('updateChannelViews() ') + JSON.stringify(value))
+
+          if (value.state) { // if is ok, update opts and run unlock after a while
+            value.opts = value.opts || {}
+            setTimeout(() => {
+              this.timeouts['updateChannelViews'].opts = value.opts
+              this.timeouts['updateChannelViews'].isRunning = false
+            }, 60000)
+          } else { // else run next tick
+            this.timeouts['updateChannelViews'].isRunning = false
+          }
+        }
+      }, 1000)
+
+      setInterval(async () => {
+        if (typeof this.timeouts['getLatest100Followers'] === 'undefined') this.timeouts['getLatest100Followers'] = { opts: true, isRunning: false }
+
+        if (!this.timeouts['getLatest100Followers'].isRunning) {
+          this.timeouts['getLatest100Followers'].isRunning = true
+          if (__DEBUG__.INTERVAL) global.log.info(chalk.yellow('getLatest100Followers() ') + 'start')
+          const value = await Promise.race([
+            this.getLatest100Followers(this.timeouts['getLatest100Followers'].opts),
+            this.timeoutAfterMs(10000)
+          ])
+          if (__DEBUG__.INTERVAL) global.log.info(chalk.yellow('getLatest100Followers() ') + JSON.stringify(value))
+
+          if (value.state) { // if is ok, update opts and run unlock after a while
+            value.opts = value.opts || {}
+            setTimeout(() => {
+              this.timeouts['getLatest100Followers'].opts = value.opts
+              this.timeouts['getLatest100Followers'].isRunning = false
+            }, 60000)
+          } else { // else run next tick
+            this.timeouts['getLatest100Followers'].isRunning = false
+          }
+        }
+      }, 1000)
+
+      setInterval(async () => {
+        if (typeof this.timeouts['getChannelHosts'] === 'undefined') this.timeouts['getChannelHosts'] = { opts: {}, isRunning: false }
+
+        if (!this.timeouts['getChannelHosts'].isRunning) {
+          this.timeouts['getChannelHosts'].isRunning = true
+          if (__DEBUG__.INTERVAL) global.log.info(chalk.yellow('getChannelHosts() ') + 'start')
+          const value = await Promise.race([
+            this.getChannelHosts(this.timeouts['getChannelHosts'].opts),
+            this.timeoutAfterMs(10000)
+          ])
+          if (__DEBUG__.INTERVAL) global.log.info(chalk.yellow('getChannelHosts() ') + JSON.stringify(value))
+
+          if (value.state) { // if is ok, update opts and run unlock after a while
+            value.opts = value.opts || {}
+            setTimeout(() => {
+              this.timeouts['getChannelHosts'].opts = value.opts
+              this.timeouts['getChannelHosts'].isRunning = false
+            }, 60000)
+          } else { // else run next tick
+            this.timeouts['getChannelHosts'].isRunning = false
+          }
+        }
+      }, 1000)
+
+      setInterval(async () => {
+        if (typeof this.timeouts['getChannelChattersUnofficialAPI'] === 'undefined') this.timeouts['getChannelChattersUnofficialAPI'] = { opts: { saveToWidget: false }, isRunning: false }
+
+        if (!this.timeouts['getChannelChattersUnofficialAPI'].isRunning) {
+          this.timeouts['getChannelChattersUnofficialAPI'].isRunning = true
+          if (__DEBUG__.INTERVAL) global.log.info(chalk.yellow('getChannelChattersUnofficialAPI() ') + 'start')
+          const value = await Promise.race([
+            this.getChannelChattersUnofficialAPI(this.timeouts['getChannelChattersUnofficialAPI'].opts),
+            this.timeoutAfterMs(10000)
+          ])
+          if (__DEBUG__.INTERVAL) global.log.info(chalk.yellow('getChannelChattersUnofficialAPI() ') + JSON.stringify(value))
+
+          if (value.state) { // if is ok, update opts and run unlock after a while
+            value.opts = value.opts || {}
+            setTimeout(() => {
+              this.timeouts['getChannelChattersUnofficialAPI'].opts = value.opts
+              this.timeouts['getChannelChattersUnofficialAPI'].isRunning = false
+            }, 60000)
+          } else { // else run next tick
+            this.timeouts['getChannelChattersUnofficialAPI'].isRunning = false
+          }
+        }
+      }, 1000)
+
+      setInterval(async () => {
+        if (typeof this.timeouts['getChannelSubscribersOldAPI'] === 'undefined') this.timeouts['getChannelSubscribersOldAPI'] = { opts: {}, isRunning: false }
+
+        if (!this.timeouts['getChannelSubscribersOldAPI'].isRunning) {
+          this.timeouts['getChannelSubscribersOldAPI'].isRunning = true
+          if (__DEBUG__.INTERVAL) global.log.info(chalk.yellow('getChannelSubscribersOldAPI() ') + 'start')
+          const value = await Promise.race([
+            this.getChannelSubscribersOldAPI(this.timeouts['getChannelSubscribersOldAPI'].opts),
+            this.timeoutAfterMs(10000)
+          ])
+          if (__DEBUG__.INTERVAL) global.log.info(chalk.yellow('getChannelSubscribersOldAPI() ') + JSON.stringify(value))
+
+          if (value.disable) return
+          if (value.state) { // if is ok, update opts and run unlock after a while
+            value.opts = value.opts || {}
+            setTimeout(() => {
+              this.timeouts['getChannelSubscribersOldAPI'].opts = value.opts
+              this.timeouts['getChannelSubscribersOldAPI'].isRunning = false
+            }, 60000)
+          } else { // else run next tick
+            this.timeouts['getChannelSubscribersOldAPI'].isRunning = false
+          }
+        }
+      }, 1000)
+
+      setInterval(async () => {
+        if (typeof this.timeouts['getChannelDataOldAPI'] === 'undefined') this.timeouts['getChannelDataOldAPI'] = { opts: { forceUpdate: true }, isRunning: false }
+
+        if (!this.timeouts['getChannelDataOldAPI'].isRunning) {
+          this.timeouts['getChannelDataOldAPI'].isRunning = true
+          if (__DEBUG__.INTERVAL) global.log.info(chalk.yellow('getChannelDataOldAPI() ') + 'start')
+          const value = await Promise.race([
+            this.getChannelDataOldAPI(this.timeouts['getChannelDataOldAPI'].opts),
+            this.timeoutAfterMs(10000)
+          ])
+          if (__DEBUG__.INTERVAL) global.log.info(chalk.yellow('getChannelDataOldAPI() ') + JSON.stringify(value))
+
+          if (value.state) { // if is ok, update opts and run unlock after a while
+            value.opts = value.opts || {}
+            setTimeout(() => {
+              this.timeouts['getChannelDataOldAPI'].opts = value.opts
+              this.timeouts['getChannelDataOldAPI'].isRunning = false
+            }, 60000)
+          } else { // else run next tick
+            this.timeouts['getChannelDataOldAPI'].isRunning = false
+          }
+        }
+      }, 1000)
+
+      setInterval(async () => {
+        if (typeof this.timeouts['intervalFollowerUpdate'] === 'undefined') this.timeouts['intervalFollowerUpdate'] = { opts: {}, isRunning: false }
+
+        if (!this.timeouts['intervalFollowerUpdate'].isRunning) {
+          this.timeouts['intervalFollowerUpdate'].isRunning = true
+          if (__DEBUG__.INTERVAL) global.log.info(chalk.yellow('intervalFollowerUpdate() ') + 'start')
+          const value = await Promise.race([
+            this.intervalFollowerUpdate(this.timeouts['intervalFollowerUpdate'].opts),
+            this.timeoutAfterMs(10000)
+          ])
+          if (__DEBUG__.INTERVAL) global.log.info(chalk.yellow('intervalFollowerUpdate() ') + JSON.stringify(value))
+
+          if (value.state) { // if is ok, update opts and run unlock after a while
+            value.opts = value.opts || {}
+            setTimeout(() => {
+              this.timeouts['intervalFollowerUpdate'].opts = value.opts
+              this.timeouts['intervalFollowerUpdate'].isRunning = false
+            }, 60000)
+          } else { // else run next tick
+            this.timeouts['intervalFollowerUpdate'].isRunning = false
+          }
+        }
+      }, 1000)
+
+      setInterval(async () => {
+        if (typeof this.timeouts['checkClips'] === 'undefined') this.timeouts['checkClips'] = { opts: {}, isRunning: false }
+
+        if (!this.timeouts['checkClips'].isRunning) {
+          this.timeouts['checkClips'].isRunning = true
+          if (__DEBUG__.INTERVAL) global.log.info(chalk.yellow('checkClips() ') + 'start')
+          const value = await Promise.race([
+            this.checkClips(this.timeouts['checkClips'].opts),
+            this.timeoutAfterMs(10000)
+          ])
+          if (__DEBUG__.INTERVAL) global.log.info(chalk.yellow('checkClips() ') + JSON.stringify(value))
+
+          if (value.state) { // if is ok, update opts and run unlock after a while
+            value.opts = value.opts || {}
+            setTimeout(() => {
+              this.timeouts['checkClips'].opts = value.opts
+              this.timeouts['checkClips'].isRunning = false
+            }, 60000)
+          } else { // else run next tick
+            this.timeouts['checkClips'].isRunning = false
+          }
+        }
+      }, 1000)
     } else {
       this.calls = {
         bot: {
@@ -113,6 +319,12 @@ class API {
     }
   }
 
+  async timeoutAfterMs (ms) {
+    return new Promise((resolve) => {
+      setTimeout(() => resolve({ state: false }), ms)
+    })
+  }
+
   async setRateLimit (type, limit, remaining, reset) {
     this.calls[type].limit = limit
     this.calls[type].remaining = remaining
@@ -121,7 +333,6 @@ class API {
 
   async intervalFollowerUpdate () {
     if (cluster.isWorker) throw new Error('API can run only on master')
-    clearTimeout(this.timeouts['intervalFollowerUpdate'])
 
     for (let username of this.rate_limit_follower_check) {
       const user = await global.users.getByName(username)
@@ -136,7 +347,7 @@ class API {
       this.rate_limit_follower_check.delete(user.username)
       await this.isFollowerUpdate(user)
     }
-    this.timeouts['intervalFollowerUpdate'] = setTimeout(() => this.intervalFollowerUpdate(), 10000)
+    return { state: true }
   }
 
   async _loadCachedStatusAndGame () {
@@ -258,7 +469,6 @@ class API {
 
   async getChannelChattersUnofficialAPI (opts) {
     if (cluster.isWorker) throw new Error('API can run only on master')
-    clearTimeout(this.timeouts['getChannelChattersUnofficialAPI'])
 
     const sendJoinEvent = async function (bulk) {
       for (let user of bulk) {
@@ -277,21 +487,17 @@ class API {
     const url = `https://tmi.twitch.tv/group/user/${global.commons.getBroadcaster().toLowerCase()}/chatters`
     const needToWait = _.isNil(global.widgets)
     if (needToWait) {
-      this.timeouts['getChannelChattersUnofficialAPI'] = setTimeout(() => this.getChannelChattersUnofficialAPI(opts), 1000)
-      return
+      return { state: false, opts }
     }
 
-    let timeout = 60000
     var request
     try {
       request = await axios.get(url)
       if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'getChannelChattersUnofficialAPI', api: 'unofficial', endpoint: url, code: request.status })
       opts.saveToWidget = true
     } catch (e) {
-      timeout = e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT' ? 10000 : timeout
       if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getChannelChattersUnofficialAPI', api: 'unofficial', endpoint: url, code: e.stack })
-      this.timeouts['getChannelChattersUnofficialAPI'] = setTimeout(() => this.getChannelChattersUnofficialAPI(opts), timeout)
-      return
+      return { state: false, opts }
     }
 
     const chatters = _.flatMap(request.data.chatters)
@@ -333,12 +539,11 @@ class API {
     if (opts.saveToWidget) sendPartEvent(bulkParted)
     if (opts.saveToWidget) sendJoinEvent(bulkInsert)
 
-    this.timeouts['getChannelChattersUnofficialAPI'] = setTimeout(() => this.getChannelChattersUnofficialAPI(opts), timeout)
+    return { state: true, opts }
   }
 
   async getChannelSubscribersOldAPI () {
     if (cluster.isWorker) throw new Error('API can run only on master')
-    clearTimeout(this.timeouts['getChannelSubscribersOldAPI'])
 
     const cid = global.oauth.channelId
     const url = `https://api.twitch.tv/kraken/channels/${cid}/subscriptions?limit=100`
@@ -346,12 +551,11 @@ class API {
     const token = await global.oauth.settings.broadcaster.accessToken
     const needToWait = _.isNil(cid) || cid === '' || _.isNil(global.overlays) || token === ''
     if (needToWait) {
-      this.timeouts['getChannelSubscribersOldAPI'] = setTimeout(() => this.getChannelSubscribersOldAPI(), 1000)
-      return
+      return { state: false }
     }
 
     var request
-    let timeout = 30000
+    let disable = false
     try {
       request = await axios.get(url, {
         headers: {
@@ -378,31 +582,25 @@ class API {
          (e.response.data.status === 400 && e.response.data.message === `${global.commons.getBroadcaster} does not have a subscription program`))
       if (!isChannelPartnerOrAffiliate) {
         if (this.retries.getChannelSubscribersOldAPI >= 15) {
-          timeout = 0
+          disable = true
           global.log.warning('Broadcaster is not affiliate/partner, will not check subs')
           global.db.engine.update('api.current', { key: 'subscribers' }, { value: 0 })
           // caster is not affiliate or partner, don't do calls again
-        } else {
-          timeout = 10000
         }
       } else if (e.message === '403 Forbidden') {
-        timeout = 0
+        disable = true
         global.log.warning('Broadcaster have not correct oauth, will not check subs')
         global.db.engine.update('api.current', { key: 'subscribers' }, { value: 0 })
       } else {
-        timeout = e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT' ? 10000 : timeout
         global.log.error(`${url} - ${e.message}`)
         if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getChannelSubscribersOldAPI', api: 'kraken', endpoint: url, code: e.stack })
       }
     }
-    if (timeout !== 0) {
-      this.timeouts['getChannelSubscribersOldAPI'] = setTimeout(() => this.getChannelSubscribersOldAPI(), timeout)
-    }
+    return { state: true, disable }
   }
 
   async getChannelDataOldAPI (opts) {
     if (cluster.isWorker) throw new Error('API can run only on master')
-    clearTimeout(this.timeouts['getChannelDataOldAPI'])
 
     const cid = global.oauth.channelId
     const url = `https://api.twitch.tv/kraken/channels/${cid}`
@@ -410,12 +608,10 @@ class API {
     const token = await global.oauth.settings.bot.accessToken
     const needToWait = _.isNil(cid) || cid === '' || _.isNil(global.overlays) || token === ''
     if (needToWait) {
-      this.timeouts['getChannelDataOldAPI'] = setTimeout(() => this.getChannelDataOldAPI(opts), 1000)
-      return
+      return { state: false, opts }
     }
 
     var request
-    let timeout = 60000
     try {
       request = await axios.get(url, {
         headers: {
@@ -451,27 +647,25 @@ class API {
         this.gameOrTitleChangedManually = false
       }
     } catch (e) {
-      timeout = e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT' ? 10000 : timeout
       global.log.error(`${url} - ${e.message}`)
       if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getChannelDataOldAPI', api: 'kraken', endpoint: url, code: e.stack })
+      return { state: false, opts }
     }
-    this.timeouts['getChannelDataOldAPI'] = setTimeout(() => this.getChannelDataOldAPI({ forceUpdate: false }), timeout)
+
+    return { state: true, opts }
   }
 
   async getChannelHosts () {
     if (cluster.isWorker) throw new Error('API can run only on master')
-    clearTimeout(this.timeouts['getChannelHosts'])
 
     const cid = global.oauth.channelId
 
     if (_.isNil(cid) || cid === '') {
-      this.timeouts['getChannelHosts'] = setTimeout(() => this.getChannelHosts(), 1000)
-      return
+      return { state: false }
     }
 
     var request
     const url = `http://tmi.twitch.tv/hosts?include_logins=1&target=${cid}`
-    let timeout = 30000
     try {
       request = await axios.get(url)
       if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'getChannelHosts', api: 'tmi', endpoint: url, code: request.status })
@@ -483,16 +677,14 @@ class API {
         await global.db.engine.update('cache.hosts', { username: host }, { username: host })
       }
     } catch (e) {
-      timeout = e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT' ? 10000 : timeout
       global.log.error(`${url} - ${e.message}`)
       if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getChannelHosts', api: 'tmi', endpoint: url, code: e.stack })
+      return { state: false }
     }
-    this.timeouts['getChannelHosts'] = setTimeout(() => this.getChannelHosts(), timeout)
+    return { state: true }
   }
 
   async updateChannelViews () {
-    if (cluster.isWorker) throw new Error('API can run only on master')
-    clearTimeout(this.timeouts['updateChannelViews'])
     const cid = global.oauth.channelId
     const url = `https://api.twitch.tv/helix/users/?id=${cid}`
 
@@ -500,12 +692,10 @@ class API {
     const needToWait = _.isNil(cid) || cid === '' || _.isNil(global.overlays) || token === ''
     const notEnoughAPICalls = this.calls.bot.remaining <= 30 && this.calls.bot.refresh > _.now() / 1000
     if (needToWait || notEnoughAPICalls) {
-      this.timeouts['updateChannelViews'] = setTimeout(() => this.updateChannelViews(), 1000)
-      return
+      return { state: false }
     }
 
     var request
-    let timeout = 60000 * 2
     try {
       request = await axios.get(url, {
         headers: {
@@ -528,17 +718,13 @@ class API {
         this.calls.bot.refresh = e.response.headers['ratelimit-reset']
       }
 
-      timeout = e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT' ? 10000 : timeout
       global.log.error(`${url} - ${e.message}`)
       if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'updateChannelViews', api: 'helix', endpoint: url, code: e.stack, remaining: this.calls.bot.remaining })
     }
-    this.timeouts['updateChannelViews'] = setTimeout(() => this.updateChannelViews(), timeout)
+    return { state: true }
   }
 
   async getLatest100Followers (quiet) {
-    if (cluster.isWorker) throw new Error('API can run only on master')
-    clearTimeout(this.timeouts['getLatest100Followers'])
-
     const cid = global.oauth.channelId
     const url = `https://api.twitch.tv/helix/users/follows?to_id=${cid}&first=100`
 
@@ -546,12 +732,10 @@ class API {
     const needToWait = _.isNil(cid) || cid === '' || _.isNil(global.overlays) || token === ''
     const notEnoughAPICalls = this.calls.bot.remaining <= 30 && this.calls.bot.refresh > _.now() / 1000
     if (needToWait || notEnoughAPICalls) {
-      this.timeouts['getLatest100Followers'] = setTimeout(() => this.getLatest100Followers(), 1000)
-      return
+      return { state: false, opts: quiet }
     }
 
     var request
-    let timeout = 30000
     try {
       request = await axios.get(url, {
         headers: {
@@ -571,10 +755,13 @@ class API {
         // check if user id is in db, not in db load username from API
         for (let f of request.data.data) {
           let user = await global.users.getById(f.from_id)
-          if (!_.get(user, 'is.follower', false)) {
-            if (new Date().getTime() - moment(_.get(user, 'time.follow', 0)).format('X') * 1000 < 60000 * 60 && !global.webhooks.existsInCache('follow', user.id)) {
-              global.webhooks.addIdToCache('follow', user.id)
 
+          user.username = f.from_name
+          global.db.engine.update('users', { _id: f.from_id }, { username: f.from_name })
+
+          if (!_.get(user, 'is.follower', false)) {
+            if ((_.get(user, 'time.follow', 0) === 0 || new Date().getTime() - _.get(user, 'time.follow', 0) > 60000 * 60) && !global.webhooks.existsInCache('follow', user.id)) {
+              global.webhooks.addIdToCache('follow', user.id)
               global.overlays.eventlist.add({
                 type: 'follow',
                 username: user.username
@@ -596,6 +783,7 @@ class API {
       }
 
       global.db.engine.update('api.current', { key: 'followers' }, { value: request.data.total })
+      quiet = false
     } catch (e) {
       if (typeof e.response !== 'undefined' && e.response.status === 429) {
         global.commons.processAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', 120, 0, e.response.headers['ratelimit-reset'] ] })
@@ -603,11 +791,11 @@ class API {
         this.calls.bot.refresh = e.response.headers['ratelimit-reset']
       }
 
-      timeout = e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT' ? 10000 : timeout
+      quiet = e.errno !== 'ECONNREFUSED' && e.errno !== 'ETIMEDOUT'
       global.log.error(`${url} - ${e.message}`)
       if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getLatest100Followers', api: 'helix', endpoint: url, code: e.stack, remaining: this.calls.bot.remaining })
     }
-    this.timeouts['getLatest100Followers'] = setTimeout(() => this.getLatest100Followers(timeout === 1000), timeout)
+    return { state: true, opts: quiet }
   }
 
   async getGameFromId (id) {
@@ -659,7 +847,6 @@ class API {
 
   async getCurrentStreamData (opts) {
     if (cluster.isWorker) throw new Error('API can run only on master')
-    clearTimeout(this.timeouts['getCurrentStreamData'])
 
     const cid = global.oauth.channelId
     const url = `https://api.twitch.tv/helix/streams?user_id=${cid}`
@@ -668,12 +855,10 @@ class API {
     const needToWait = _.isNil(cid) || cid === '' || _.isNil(global.overlays) || token === ''
     const notEnoughAPICalls = this.calls.bot.remaining <= 30 && this.calls.bot.refresh > _.now() / 1000
     if (needToWait || notEnoughAPICalls) {
-      this.timeouts['getCurrentStreamData'] = setTimeout(() => this.getCurrentStreamData(opts), 1000)
-      return
+      return { state: false, opts }
     }
 
     var request
-    let timeout = 60000
     try {
       request = await axios.get(url, {
         headers: {
@@ -746,8 +931,7 @@ class API {
               await global.cache.rawStatus(rawStatus)
             } else {
               this.retries.getCurrentStreamData++
-              this.timeouts['getCurrentStreamData'] = setTimeout(() => this.getCurrentStreamData(opts), 10000)
-              return
+              return { state: false, opts }
             }
           } else {
             this.retries.getCurrentStreamData = 0
@@ -792,11 +976,11 @@ class API {
         this.calls.bot.refresh = e.response.headers['ratelimit-reset']
       }
 
-      timeout = e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT' ? 10000 : timeout
       global.log.error(`${url} - ${e.message}`)
       if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getCurrentStreamData', api: 'helix', endpoint: url, code: e.stack, remaining: this.calls.bot.remaining })
+      return { state: false, opts }
     }
-    this.timeouts['getCurrentStreamData'] = setTimeout(() => this.getCurrentStreamData(opts), timeout)
+    return { state: true, opts }
   }
 
   async saveStreamData (stream) {
@@ -852,7 +1036,6 @@ class API {
 
   async setTitleAndGame (sender, args) {
     if (cluster.isWorker) throw new Error('API can run only on master')
-    clearTimeout(this.timeouts['setTitleAndGame'])
 
     args = _.defaults(args, { title: null }, { game: null })
     const cid = global.oauth.channelId
@@ -861,7 +1044,7 @@ class API {
     const token = await global.oauth.settings.bot.accessToken
     const needToWait = _.isNil(cid) || cid === '' || _.isNil(global.overlays) || token === ''
     if (needToWait) {
-      this.timeouts['setTitleAndGame'] = setTimeout(() => this.setTitleAndGame(sender, args), 1000)
+      setTimeout(() => this.setTitleAndGame(sender, args), 1000)
       return
     }
 
@@ -963,12 +1146,10 @@ class API {
 
   async checkClips () {
     if (cluster.isWorker) throw new Error('API can run only on master')
-    clearTimeout(this.timeouts['checkClips'])
 
     const token = global.oauth.settings.bot.accessToken
     if (token === '') {
-      this.timeouts['checkClips'] = setTimeout(() => this.checkClips(), 1000)
-      return
+      return { state: false }
     }
 
     let notCheckedClips = (await global.db.engine.find('api.clips', { isChecked: false }))
@@ -981,14 +1162,12 @@ class API {
     const url = `https://api.twitch.tv/helix/clips?id=${notCheckedClips.map((o) => o.clipId).join(',')}`
 
     if (notCheckedClips.length === 0) { // nothing to do
-      this.timeouts['checkClips'] = setTimeout(() => this.checkClips(), 1000)
-      return
+      return { state: true }
     }
 
     const notEnoughAPICalls = this.calls.bot.remaining <= 30 && this.calls.bot.refresh > _.now() / 1000
     if (notEnoughAPICalls) {
-      this.timeouts['checkClips'] = setTimeout(() => this.checkClips(), 1000)
-      return
+      return { state: false }
     }
 
     var request
@@ -1021,12 +1200,11 @@ class API {
       global.log.error(`API: ${url} - ${e.stack}`)
       if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'checkClips', api: 'helix', endpoint: url, code: e.stack })
     }
-    this.timeouts['checkClips'] = setTimeout(() => this.checkClips(), 1000)
+    return { state: true }
   }
 
   async createClip (opts) {
     if (cluster.isWorker) throw new Error('API can run only on master')
-    clearTimeout(this.timeouts['createClip'])
 
     if (!(await global.cache.isOnline())) return // do nothing if stream is offline
 
@@ -1052,7 +1230,7 @@ class API {
     const needToWait = _.isNil(cid) || cid === '' || _.isNil(global.overlays) || token === ''
     const notEnoughAPICalls = this.calls.bot.remaining <= 30 && this.calls.bot.refresh > _.now() / 1000
     if (needToWait || notEnoughAPICalls) {
-      this.timeouts['createClip'] = setTimeout(() => this.createClip(opts), 1000)
+      setTimeout(() => this.createClip(opts), 1000)
       return
     }
 
