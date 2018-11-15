@@ -187,7 +187,11 @@ class Webhooks {
     this.addIdToCache('follow', data.from_id)
 
     const user = await global.users.getById(data.from_id)
-    if (!_.get(user, 'is.follower', false) && _.now() - _.get(user, 'time.follow', 0) > 60000 * 60) {
+
+    user.username = data.from_name
+    global.db.engine.update('users', { _id: data.from_id }, { username: data.from_name })
+
+    if (!_.get(user, 'is.follower', false) && (_.get(user, 'time.follow', 0) === 0 || _.now() - _.get(user, 'time.follow', 0) > 60000 * 60)) {
       if (!await global.commons.isBot(data.from_name)) {
         global.overlays.eventlist.add({
           type: 'follow',
