@@ -611,7 +611,6 @@ class API {
   }
 
   async getGameFromId (id) {
-    if (cluster.isWorker) throw new Error('API can run only on master')
     var request
     const url = `https://api.twitch.tv/helix/games?id=${id}`
 
