@@ -76,7 +76,7 @@
                   <a v-bind:href="'?id='+ command._id + '#customcommands/edit'" class="btn btn-outline-dark p-3 border-0"><i class="fas fa-pencil-alt mr-1" aria-hidden="true"></i> {{ commons.translate('dialog.buttons.edit') }}</a>
                   <button v-on:click="command.visible = !command.visible; sendUpdate(command._id)" class="btn btn-outline-dark p-3 border-0"><i class="fas mr-1" v-bind:class="[ command.visible ? 'fa-eye' : 'fa-eye-slash' ]" aria-hidden="true"></i> {{ (command.visible ? commons.translate('visible') : commons.translate('hidden')) | capitalize }}</button>
                   <button v-on:click="command.enabled = !command.enabled; sendUpdate(command._id)"  class="btn btn-outline-dark p-3 border-0"><i class="fas mr-1"  v-bind:class="[ command.enabled ? 'fa-toggle-on' : 'fa-toggle-off' ]" aria-hidden="true"></i> {{ command.enabled ? commons.translate('enabled') : commons.translate('disabled') }}</button>
-                  <button type="button" type="button" v-on:click="deleteCommand(command._id)" class="btn btn-outline-dark p-3 border-0"><i class="far fa-trash-alt mr-1" aria-hidden="true"></i> {{ commons.translate('delete') }}</button>
+                  <hold-button class="btn-outline-dark p-3 border-0" @trigger="deleteCommand(command._id)" :holdtitle="commons.translate('dialog.buttons.hold-to-delete')" :title="commons.translate('dialog.buttons.delete')" icon="fa-trash"></hold-button>
                 </div>
               </div>
             </div>
@@ -132,7 +132,7 @@
                 <a v-bind:href="'?id='+ command._id + '#customcommands/edit'" v-bind:title="commons.translate('dialog.buttons.edit')" class="btn btn-outline-dark p-1 border-0"><i class="fas fa-pencil-alt m-1" aria-hidden="true"></i></a>
                 <button v-bind:title="(command.visible ? commons.translate('visible') : commons.translate('hidden'))" v-on:click="command.visible = !command.visible; sendUpdate(command._id)" class="btn btn-outline-dark p-1 border-0"><i class="fas m-1" v-bind:class="[ command.visible ? 'fa-eye' : 'fa-eye-slash' ]" aria-hidden="true"></i></button>
                 <button v-bind:title="command.enabled ? commons.translate('enabled') : commons.translate('disabled')" v-on:click="command.enabled = !command.enabled; sendUpdate(command._id)"  class="btn btn-outline-dark p-1 border-0"><i class="fas m-1"  v-bind:class="[ command.enabled ? 'fa-toggle-on' : 'fa-toggle-off' ]" aria-hidden="true"></i></button>
-                <button type="button" v-on:click="deleteCommand(command._id)" v-bind:title="commons.translate('delete')" class="btn btn-outline-dark p-1 border-0"><i class="far fa-trash-alt m-1" aria-hidden="true"></i></button>
+                <hold-button class="btn-outline-dark p-1 border-0" @trigger="deleteCommand(command._id)" holdtitle="" title="" icon="fa-trash m-1"></hold-button>
               </div>
             </div>
           </div>
@@ -152,7 +152,8 @@
       components: {
         'toggle': toggleEnable,
         'command-input': commandInput,
-        'text-with-tags': textWithTags
+        'text-with-tags': textWithTags,
+        'hold-button': holdButton
       },
       data: {
         showAs: 'cards',
@@ -181,10 +182,6 @@
       created: function () {
         this.socket.emit('find.commands', {}, (err, items) => {
           this.commands = _.orderBy(items, 'command', 'asc')
-        })
-        this.socket.emit('settings', (err, items) => {
-          this.s_enabled = items.enabled
-          this.s_commands = items.commands
         })
 
         if (localStorage.getItem('/systems/CustomCommands/showAs')) this.showAs = JSON.parse(localStorage.getItem('/systems/CustomCommands/showAs'));
