@@ -157,7 +157,7 @@
               this.pending = false
               this.timer = data.timer
               this.responses = data.responses
-              page('?id=' + this.id + '/#timers/edit')
+              page('?id=' + this.id + '#timers/edit')
               setTimeout(() => this.states.save = 0, 1000)
             })
           }
