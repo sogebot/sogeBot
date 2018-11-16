@@ -757,7 +757,7 @@ class API {
           let user = await global.users.getById(f.from_id)
 
           user.username = f.from_name
-          global.db.engine.update('users', { _id: f.from_id }, { username: f.from_name })
+          global.db.engine.update('users', { id: f.from_id }, { username: f.from_name })
 
           if (!_.get(user, 'is.follower', false)) {
             if ((_.get(user, 'time.follow', 0) === 0 || new Date().getTime() - _.get(user, 'time.follow', 0) > 60000 * 60) && !global.webhooks.existsInCache('follow', user.id)) {
