@@ -11,16 +11,16 @@ isEnded: {{ isEnded }}
 current: {{ current }}
   </pre>
   <div ref="page" class="page">
-    <template v-for="(el, index) of current">
-      <video class="video" v-if="el.type === 'video'" playsinline ref="video" :key="el.clip">
+    <template v-for="el of current">
+      <video class="video" v-if="el.type === 'video'" playsinline ref="video" :key="el.index">
         <source :src="el.clip" type="video/mp4">
       </video>
-      <div v-if="el.type ==='with-icon'" :key="index" class="text4" style="text-align: left; padding-left:5vw; padding-top: 0;">
+      <div v-else-if="el.type ==='with-icon'" :key="el.index" class="text4" style="text-align: left; padding-left:5vw; padding-top: 0;">
         <font-awesome-icon :icon="['fab', el.class]" fixed-width />
         {{el.text}}
       </div>
-      <img v-if="el.type === 'image'" :src="el.image" :class="el.class" :key="index" />
-      <div v-else :class="el.class" :key="index" v-html="el.text"></div>
+      <img v-else-if="el.type === 'image'" :src="el.image" :class="el.class" :key="el.index" />
+      <div v-else :class="el.class" :key="el.index" v-html="el.text"></div>
     </template>
   </div>
 </div>
@@ -69,28 +69,34 @@ export default {
       this.pages.push([
         {
           text: opts.game.value,
-          class: "game"
+          class: "game",
+          index: Math.random()
         },
         {
           text: opts.title.value,
-          class: "title"
+          class: "title",
+          index: Math.random()
         },
         {
           text: opts.settings.text.streamBy,
-          class: "header3"
+          class: "header3",
+          index: Math.random()
         },
         {
           text: opts.streamer,
-          class: "streamer"
+          class: "streamer",
+          index: Math.random()
         },
         {
           text: '',
-          class: "separator"
+          class: "separator",
+          index: Math.random()
         },
         {
           image: 'https://static-cdn.jtvnw.net/ttv-boxart/' + encodeURIComponent(opts.game.value) + '-600x840.jpg',
           type: 'image',
-          class: 'image'
+          class: 'image',
+          index: Math.random()
         }
       ])
 
@@ -103,7 +109,8 @@ export default {
           currentKey = key
           page.push({
             text: opts.settings.text[key],
-            class: withoutPadding ? "header1 withoutPadding" : "header1"
+            class: withoutPadding ? "header1 withoutPadding" : "header1",
+            index: Math.random()
           })
           withoutPadding = false
         }
@@ -122,13 +129,15 @@ export default {
           }
           page.push({
             text: html,
-            class: "text4 column"
+            class: "text4 column",
+            index: Math.random()
           })
         }
         for (let i = 0; i < 3 - (groupByUsername.length % 3); i++) {
           page.push({
             text: '',
-            class: "text4 column"
+            class: "text4 column",
+            index: Math.random()
           })
         }
       }
@@ -142,24 +151,29 @@ export default {
         this.pages.push([
           {
             text: clip.game,
-            class: "clip_game"
+            class: "clip_game",
+            index: Math.random()
           },
           {
             text: clip.title,
-            class: "clip_title"
+            class: "clip_title",
+            index: Math.random()
           },
           {
             text: clip.creator_name,
-            class: "clip_createdBy"
+            class: "clip_createdBy",
+            index: Math.random()
           },
           {
             text: i + 1,
-            class: "clip_index"
+            class: "clip_index",
+            index: Math.random()
           },
           {
             clip: clip.mp4,
             class: "clip_video",
-            type: "video"
+            type: "video",
+            index: Math.random()
           }
         ])
       }
@@ -181,15 +195,18 @@ export default {
 
           page.push({
             text: ct.left,
-            class: cl + ' column'
+            class: cl + ' column',
+            index: Math.random()
           })
           page.push({
             text: ct.middle,
-            class: cl + ' column'
+            class: cl + ' column',
+            index: Math.random()
           })
           page.push({
             text: ct.right,
-            class: cl + ' column'
+            class: cl + ' column',
+            index: Math.random()
           })
         }
         if (page.length > 0) this.pages.push(page)
@@ -201,21 +218,25 @@ export default {
         social.push({
           text: s.text,
           type: 'with-icon',
-          class: s.type
+          class: s.type,
+          index: Math.random()
         })
       }
 
       this.pages.push([
         {
           text: opts.settings.text.lastMessage,
-          class: "header1"
+          class: "header1",
+          index: Math.random()
         }, {
           text: opts.settings.text.lastSubMessage,
-          class: "text2"
+          class: "text2",
+          index: Math.random()
         },
         {
           text: '',
-          class: "separator"
+          class: "separator",
+          index: Math.random()
         },
         ...social
       ])
