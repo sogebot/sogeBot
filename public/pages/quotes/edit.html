@@ -92,7 +92,7 @@
               quote: this.quote,
               tags: this.tags.split(',').map((o) => o.trim())
             }
-            this.socket.emit('update', [data], (err, _id) => {
+            this.socket.emit('update', { items: [data] }, (err, _id) => {
               if (err) {
                 console.error(err)
                 return this.states.save = 3
