@@ -40,7 +40,7 @@
             <div class="btn-group" role="group">
               <a v-bind:href="'?id='+ item._id + '#keywords/edit'" class="btn btn-outline-dark p-3 border-0"><i class="fas fa-pencil-alt mr-1" aria-hidden="true"></i> {{ commons.translate('dialog.buttons.edit') }}</a>
               <button v-on:click="item.enabled = !item.enabled; updateItem(item._id)"  class="btn btn-outline-dark p-3 border-0"><i class="fas mr-1"  v-bind:class="[ item.enabled ? 'fa-toggle-on' : 'fa-toggle-off' ]" aria-hidden="true"></i> {{ item.enabled ? commons.translate('enabled') : commons.translate('disabled') }}</button>
-              <button type="button" type="button" v-on:click="deleteItem(item._id)" class="btn btn-outline-dark p-3 border-0"><i class="far fa-trash-alt mr-1" aria-hidden="true"></i> {{ commons.translate('delete') }}</button>
+              <hold-button class="btn-outline-dark p-3 border-0" @trigger="deleteItem(item._id)" :holdtitle="commons.translate('dialog.buttons.hold-to-delete')" :title="commons.translate('dialog.buttons.delete')" icon="fa-trash"></hold-button>
             </div>
           </div>
         </div>
@@ -59,7 +59,7 @@
               <div class="p-0 text-right">
                 <a v-bind:href="'?id='+ item._id + '#keywords/edit'" v-bind:title="commons.translate('dialog.buttons.edit')" class="btn btn-outline-dark p-1 border-0"><i class="fas fa-pencil-alt m-1" aria-hidden="true"></i></a>
                 <button v-bind:title="item.enabled ? commons.translate('enabled') : commons.translate('disabled')" v-on:click="item.enabled = !item.enabled; updateItem(item._id)"  class="btn btn-outline-dark p-1 border-0"><i class="fas m-1"  v-bind:class="[ item.enabled ? 'fa-toggle-on' : 'fa-toggle-off' ]" aria-hidden="true"></i></button>
-                <button type="button" v-on:click="deleteItem(item._id)" v-bind:title="commons.translate('delete')" class="btn btn-outline-dark p-1 border-0"><i class="far fa-trash-alt m-1" aria-hidden="true"></i></button>
+                <hold-button class="btn-outline-dark p-1 border-0" @trigger="deleteItem(item._id)" holdtitle="" title="" icon="fa-trash m-1"></hold-button>
               </div>
             </div>
           </div>
@@ -79,7 +79,8 @@
       components: {
         'toggle': toggleEnable,
         'command-input': commandInput,
-        'text-with-tags': textWithTags
+        'text-with-tags': textWithTags,
+        'hold-button': holdButton
       },
       data: {
         showAs: 'cards',
@@ -130,7 +131,7 @@
       },
       methods: {
         updateItem: function (_id) {
-          this.socket.emit('update', this.items.filter((o) => o._id === _id))
+          this.socket.emit('update', { items: this.items.filter((o) => o._id === _id) })
         },
         deleteItem: function (id) {
           this.socket.emit('delete', {_id: id}, () => {
