@@ -101,7 +101,7 @@
             return _.filter(this.hasError, (o) => o === true).length === 0
           },
           deleteAlias: function () {
-            this.socket.emit('alias.delete', this.id, () => {
+            this.socket.emit('delete', {_id: this.id}, () => {
               page('/#alias/list')
             })
           },
@@ -116,7 +116,7 @@
                 visible: this.visible,
                 enabled: this.enabled
               }
-              this.socket.emit('alias.update', [data], (err, data) => {
+              this.socket.emit('update', { items: [data] }, (err, data) => {
                 if (err) {
                   console.error(err)
                   return this.states.save = 3
@@ -124,7 +124,7 @@
                 this.states.save = 2
                 this.pending = false
                 this.id = String(data._id)
-                page('?id=' + this.id + '/#alias/edit', )
+                page('?id=' + this.id + '#alias/edit', )
                 setTimeout(() => this.states.save = 0, 1000)
               })
             }
@@ -174,7 +174,7 @@
       // load up from db
       if (commons.urlParam('id')) {
         aliasEdit.id = commons.urlParam('id')
-        aliasEdit.socket.emit('alias.get', commons.urlParam('id'), (err, data) => {
+        aliasEdit.socket.emit('findOne', { where: { _id: commons.urlParam('id') } }, (err, data) => {
           aliasEdit.alias = data.alias
           aliasEdit.command = data.command
           aliasEdit.permission = data.permission
