@@ -26,7 +26,7 @@ class CustomVariables {
     if (_.isNil(global.panel)) {
       this.timeouts[`${this.constructor.name}.addMenuAndListenersToPanel`] = setTimeout(() => this.addMenuAndListenersToPanel(), 1000)
     } else {
-      global.panel.addMenu({ category: 'registry', name: 'custom-variables', id: 'registry.customVariables' })
+      global.panel.addMenu({ category: 'registry', name: 'custom-variables', id: 'registry.customVariables/list' })
       this.sockets()
     }
   }

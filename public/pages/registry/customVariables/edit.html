@@ -309,7 +309,7 @@
         deleteState: function (cur, old) {
           if (cur === 'deleted') {
             this.socket.emit('delete', commons.urlParam('id'), () => {
-              page('/#registry/customVariables')
+              page('/#registry/customVariables/list')
             })
           }
         },
