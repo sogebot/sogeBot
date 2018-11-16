@@ -38,16 +38,16 @@
           <div class="card-body border-top p-0 text-right">
             <div class="btn-group" role="group">
               <a v-bind:href="'?id='+ alias._id + '#alias/edit'" class="btn btn-outline-dark p-3 border-0"><i class="fas fa-pencil-alt mr-1" aria-hidden="true"></i> {{ commons.translate('dialog.buttons.edit') }}</a>
-              <button v-on:click="alias.visible = !alias.visible; sendUpdate(alias._id)" class="btn btn-outline-dark p-3 border-0"><i class="fas mr-1" v-bind:class="[ alias.visible ? 'fa-eye' : 'fa-eye-slash' ]" aria-hidden="true"></i> {{ (alias.visible ? commons.translate('visible') : commons.translate('hidden')) | capitalize }}</button>
+              <button v-on:click="alias.visible = !alias.visible; update(alias._id)" class="btn btn-outline-dark p-3 border-0"><i class="fas mr-1" v-bind:class="[ alias.visible ? 'fa-eye' : 'fa-eye-slash' ]" aria-hidden="true"></i> {{ (alias.visible ? commons.translate('visible') : commons.translate('hidden')) | capitalize }}</button>
               <button id="permissionsMenuButton" data-toggle="dropdown" class="btn btn-outline-dark p-3 border-0"><i class="fas fa-key mr-1" aria-hidden="true"></i> {{ commons.translate('permission') }}</button>
               <div class="dropdown-menu" aria-labelledby="permissionsMenuButton">
                 <a class="dropdown-item" style="cursor: pointer" v-on:click="updatePermission(alias._id, 1)">{{ commons.translate('systems.alias.forViewers') | capitalize }}</a>
-                <a class="dropdown-item" style="cursor: pointer" v-on:click="updatePermission(alias._id, 2)">{{ commons.translate('systems.alias.forRegulars') | capitalize }}</a>
-                <a class="dropdown-item" style="cursor: pointer" v-on:click="updatePermission(alias._id, 3)">{{ commons.translate('systems.alias.forMods') | capitalize }}</a>
+                <a class="dropdown-item" style="cursor: pointer" v-on:click="updatePermission(alias._id, 3)">{{ commons.translate('systems.alias.forRegulars') | capitalize }}</a>
+                <a class="dropdown-item" style="cursor: pointer" v-on:click="updatePermission(alias._id, 2)">{{ commons.translate('systems.alias.forMods') | capitalize }}</a>
                 <a class="dropdown-item" style="cursor: pointer" v-on:click="updatePermission(alias._id, 0)">{{ commons.translate('systems.alias.forOwners') | capitalize }}</a>
               </div>
-              <button v-on:click="alias.enabled = !alias.enabled; sendUpdate(alias._id)"  class="btn btn-outline-dark p-3 border-0"><i class="fas mr-1"  v-bind:class="[ alias.enabled ? 'fa-toggle-on' : 'fa-toggle-off' ]" aria-hidden="true"></i> {{ alias.enabled ? commons.translate('enabled') : commons.translate('disabled') }}</button>
-              <button type="button" type="button" v-on:click="deleteAlias(alias._id)" class="btn btn-outline-dark p-3 border-0"><i class="far fa-trash-alt mr-1" aria-hidden="true"></i> {{ commons.translate('delete') }}</button>
+              <button v-on:click="alias.enabled = !alias.enabled; update(alias._id)"  class="btn btn-outline-dark p-3 border-0"><i class="fas mr-1"  v-bind:class="[ alias.enabled ? 'fa-toggle-on' : 'fa-toggle-off' ]" aria-hidden="true"></i> {{ alias.enabled ? commons.translate('enabled') : commons.translate('disabled') }}</button>
+              <hold-button class="btn-outline-dark p-3 border-0" @trigger="remove(alias._id)" :holdtitle="commons.translate('dialog.buttons.hold-to-delete')" :title="commons.translate('dialog.buttons.delete')" icon="fa-trash"></hold-button>
             </div>
           </div>
         </div>
@@ -64,17 +64,17 @@
             <div class="col-md-9" style="word-break: break-word" v-bind:style="{ opacity: !alias.visible ? 0.6 : 1 }">{{ alias.command }}</div>
             <div class="col-md-2">
               <div class="p-0 text-right">
-                <a v-bind:href="'?id='+ alias._id + '#alias/edit'" v-bind:title="commons.translate('dialog.buttons.edit')" class="btn btn-outline-dark p-1 border-0"><i class="fas fa-pencil-alt m-1" aria-hidden="true"></i></a>
-                <button v-bind:title="(alias.visible ? commons.translate('visible') : commons.translate('hidden'))" v-on:click="alias.visible = !alias.visible; sendUpdate(alias._id)" class="btn btn-outline-dark p-1 border-0"><i class="fas m-1" v-bind:class="[ alias.visible ? 'fa-eye' : 'fa-eye-slash' ]" aria-hidden="true"></i></button>
-                <button id="permissionsMenuButton" data-toggle="dropdown" v-bind:title="commons.translate('permission')" class="btn btn-outline-dark p-1 border-0"><i class="fas fa-key m-1" aria-hidden="true"></i></button>
+                <a v-bind:href="'?id='+ alias._id + '#alias/edit'" v-bind:title="commons.translate('dialog.buttons.edit')" class="btn btn-outline-dark p-1 border-0"><i class="fas fa-pencil-alt m-1 fa-fw" aria-hidden="true"></i></a>
+                <button v-bind:title="(alias.visible ? commons.translate('visible') : commons.translate('hidden'))" v-on:click="alias.visible = !alias.visible; update(alias._id)" class="btn btn-outline-dark p-1 border-0"><i class="fas m-1 fa-fw" v-bind:class="[ alias.visible ? 'fa-eye' : 'fa-eye-slash' ]" aria-hidden="true"></i></button>
+                <button id="permissionsMenuButton" data-toggle="dropdown" v-bind:title="commons.translate('permission')" class="btn btn-outline-dark p-1 border-0"><i class="fas fa-key m-1 fa-fw" aria-hidden="true"></i></button>
                 <div class="dropdown-menu" aria-labelledby="permissionsMenuButton">
                   <a class="dropdown-item" style="cursor: pointer" v-on:click="updatePermission(alias._id, 1)">{{ commons.translate('systems.alias.forViewers') | capitalize }}</a>
                   <a class="dropdown-item" style="cursor: pointer" v-on:click="updatePermission(alias._id, 2)">{{ commons.translate('systems.alias.forRegulars') | capitalize }}</a>
                   <a class="dropdown-item" style="cursor: pointer" v-on:click="updatePermission(alias._id, 3)">{{ commons.translate('systems.alias.forMods') | capitalize }}</a>
                   <a class="dropdown-item" style="cursor: pointer" v-on:click="updatePermission(alias._id, 0)">{{ commons.translate('systems.alias.forOwners') | capitalize }}</a>
                 </div>
-                <button v-bind:title="alias.enabled ? commons.translate('enabled') : commons.translate('disabled')" v-on:click="alias.enabled = !alias.enabled; sendUpdate(alias._id)"  class="btn btn-outline-dark p-1 border-0"><i class="fas m-1"  v-bind:class="[ alias.enabled ? 'fa-toggle-on' : 'fa-toggle-off' ]" aria-hidden="true"></i></button>
-                <button type="button" v-on:click="deleteAlias(alias._id)" v-bind:title="commons.translate('delete')" class="btn btn-outline-dark p-1 border-0"><i class="far fa-trash-alt m-1" aria-hidden="true"></i></button>
+                <button v-bind:title="alias.enabled ? commons.translate('enabled') : commons.translate('disabled')" v-on:click="alias.enabled = !alias.enabled; update(alias._id)"  class="btn btn-outline-dark p-1 border-0"><i class="fas m-1 fa-fw"  v-bind:class="[ alias.enabled ? 'fa-toggle-on' : 'fa-toggle-off' ]" aria-hidden="true"></i></button>
+                <hold-button class="btn-outline-dark p-1 border-0" @trigger="remove(alias._id)" holdtitle="" title="" icon="fa-trash m-1"></hold-button>
               </div>
             </div>
           </div>
@@ -93,7 +93,8 @@
       el: '#systemAliasApp',
       components: {
         'toggle': toggleEnable,
-        'command-input': commandInput
+        'command-input': commandInput,
+        'hold-button': holdButton
       },
       data: {
         showAs: 'cards',
@@ -120,12 +121,8 @@
         }
       },
       created: function () {
-        this.socket.emit('alias', (err, items) => {
+        this.socket.emit('find', {}, (err, items) => {
           this.aliases = _.orderBy(items, 'alias', 'asc')
-        })
-        this.socket.emit('settings', (err, items) => {
-          this.enabled = items.enabled
-          this.commands = items.commands
         })
 
         if (localStorage.getItem('/systems/Alias/showAs')) this.showAs = JSON.parse(localStorage.getItem('/systems/Alias/showAs'));
@@ -155,16 +152,16 @@
         updatePermission: function (id, permission) {
           let alias = this.aliases.filter((o) => o._id === id)[0]
           alias.permission = permission
-          this.socket.emit('alias.update', [alias])
+          this.socket.emit('update', { items: [alias] })
 
         },
-        deleteAlias: function (id) {
-          this.socket.emit('alias.delete', id, () => {
-            this.aliases = this.aliases.filter((o) => o._id !== id)
+        remove: function (_id) {
+          this.socket.emit('delete', { _id }, () => {
+            this.aliases = this.aliases.filter((o) => o._id !== _id)
           })
         },
-        sendUpdate: function (_id) {
-          this.socket.emit('alias.update', this.aliases.filter((o) => o._id === _id))
+        update: function (_id) {
+          this.socket.emit('update', { items: this.aliases.filter((o) => o._id === _id) })
         }
       }
     })

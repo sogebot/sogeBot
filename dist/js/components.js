@@ -690,7 +690,8 @@ window.holdButton = {
       onMouseDownStarted: 0,
       isMouseOver: false,
       trigger: false,
-      percentage: 0
+      percentage: 0,
+      intervals: []
     }
   },
   watch: {
@@ -707,8 +708,11 @@ window.holdButton = {
       }
     }
   },
+  destroyed: function () {
+    for (let i of this.intervals) clearInterval(i)
+  },
   mounted: function () {
-    setInterval(() => this.shouldBeTriggered(), 10)
+    this.intervals.push(setInterval(() => this.shouldBeTriggered(), 10))
   },
   methods: {
     shouldBeTriggered: function () {
@@ -732,15 +736,16 @@ window.holdButton = {
     }
   },
   template: `
-    <button class="btn" @mouseup="onMouseUp" @mousedown="onMouseDown" @mouseenter="isMouseOver = true" @mouseleave="isMouseOver = false">
-      <div style="left: 0; top:0; position: absolute; height: 100%;background-color: rgba(100, 100, 100, 0.4);" :style="{ width: this.percentage + '%' }"></div> <!-- move to own style when move to full vue -->
-      <i class="fas mr-1 fa-fw" :class="[icon]" aria-hidden="true"></i>
-      <template v-if="onMouseDownStarted === 0">
-        {{ title }}
-      </template>
-      <template v-else>
-        {{ holdtitle }}
-      </template>
+    <button ref="button" class="btn" @mouseup="onMouseUp" @mousedown="onMouseDown" @mouseenter="isMouseOver = true" @mouseleave="isMouseOver = false">
+      <span :style="{opacity: 1 - this.percentage / 100 }">
+        <i class="fas mr-1 fa-fw" :class="[icon]" aria-hidden="true"></i>
+        <template v-if="onMouseDownStarted === 0">
+          {{ title }}
+        </template>
+        <template v-else>
+          {{ holdtitle }}
+        </template>
+      </span>
     </button>
   `
 }

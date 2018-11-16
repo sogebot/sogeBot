@@ -41,31 +41,6 @@ class Alias extends System {
     this.addMenu({ category: 'settings', name: 'systems', id: 'systems' })
   }
 
-  sockets () {
-    this.socket.on('connection', (socket) => {
-      socket.on('alias', async (cb) => {
-        cb(null, await global.db.engine.find(this.collection.data))
-      })
-      socket.on('alias.get', async (_id, cb) => {
-        cb(null, await global.db.engine.findOne(this.collection.data, { _id }))
-      })
-      socket.on('alias.delete', async (_id, cb) => {
-        await global.db.engine.remove(this.collection.data, { _id })
-        cb(null)
-      })
-      socket.on('alias.update', async (aliases, cb) => {
-        for (let alias of aliases) {
-          const _id = alias._id; delete alias._id
-          let aliasFromDb = alias
-          if (_.isNil(_id)) aliasFromDb = await global.db.engine.insert(this.collection.data, alias)
-          else await global.db.engine.update(this.collection.data, { _id }, alias)
-
-          if (_.isFunction(cb)) cb(null, aliasFromDb)
-        }
-      })
-    })
-  }
-
   async run (opts) {
     const parser = new Parser()
     let alias
