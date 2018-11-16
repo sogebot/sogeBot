@@ -116,7 +116,7 @@
                 this.states.save = 2
                 this.pending = false
                 this.id = String(data._id)
-                page('?id=' + this.id + '/#keywords/edit')
+                page('?id=' + this.id + '#keywords/edit')
                 setTimeout(() => this.states.save = 0, 1000)
               })
             }
