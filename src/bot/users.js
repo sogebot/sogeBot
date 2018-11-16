@@ -321,15 +321,13 @@ class Users extends Core {
       message.push(messages + ' ' + global.commons.getLocalizedName(messages, 'core.messages'))
 
       // tips
-      const [tips, currency] = await Promise.all([
-        global.db.engine.find('users.tips', { id: opts.sender.userId }),
-        global.configuration.getValue('currency')
-      ])
+      const tips = await global.db.engine.find('users.tips', { id: opts.sender.userId })
+      const currency = global.currency.settings.currency.mainCurrency
       let tipAmount = 0
       for (let t of tips) {
         tipAmount += global.currency.exchange(t.amount, t.currency, currency)
       }
-      message.push(`${Number(tipAmount).toFixed(2)} ${currency}`)
+      message.push(`${Number(tipAmount).toFixed(2)}${global.currency.symbol(currency)}`)
 
       global.commons.sendMessage(message.join(' | '), opts.sender)
     } catch (e) {
