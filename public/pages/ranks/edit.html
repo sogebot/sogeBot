@@ -102,7 +102,7 @@
                 this.states.save = 2
                 this.pending = false
                 this.id = String(data._id)
-                page('?id=' + this.id + '/#ranks/edit')
+                page('?id=' + this.id + '#ranks/edit')
                 setTimeout(() => this.states.save = 0, 1000)
               })
             }
