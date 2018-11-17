@@ -1,0 +1,6 @@
+{
+  "settings": {
+    "customPeriodInDays": "Time interval (days)",
+    "numOfClips": "Number of clips"
+  }
+}
