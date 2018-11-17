@@ -11,17 +11,8 @@
 <script>
 import { TweenMax } from 'gsap/TweenMax'
 
-import { library } from '@fortawesome/fontawesome-svg-core'
-import { faCircle } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-
-library.add(faCircle)
-
 export default {
   props: ['token'],
-  components: {
-    'font-awesome-icon': FontAwesomeIcon
-  },
   data: function () {
     return {
       socket: io('/overlays/clipscarousel', {
