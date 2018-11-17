@@ -34,6 +34,10 @@ export default {
   },
   created: function () {
     this.socket.emit('clips', (err, data) => {
+      data.clips = data.clips
+        .map((a) => ({sort: Math.random(), value: a}))
+        .sort((a, b) => a.sort - b.sort)
+        .map((a) => a.value)
       for (let i = 0, len = data.clips.length; i < len; i++) {
         data.clips[i].index = Math.random()
         this.clips.push(data.clips[i])
