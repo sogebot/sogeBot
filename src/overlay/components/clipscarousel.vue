@@ -63,31 +63,5 @@ export default {
 </script>
 
 <style scoped>
-  @import url('https://fonts.googleapis.com/css?family=Cabin');
-
-  .fade-enter-active, .fade-leave-active {
-    transition: opacity 2s;
-  }
-  .fade-enter, .fade-leave-to {
-    opacity: 0;
-  }
   video { width: 40vw; padding: 5vw; display: inline-block }
-
-  /* filters */
-  .filter-grayscale {
-    -webkit-filter: grayscale(1);
-    filter: grayscale(1);
-  }
-  .filter-sepia {
-    -webkit-filter: sepia(1);
-    filter: sepia(1);
-  }
-  .filter-tint {
-    -webkit-filter: sepia(1) hue-rotate(200deg);
-    filter: sepia(1) hue-rotate(200deg);
-  }
-  .filter-washed {
-    -webkit-filter: contrast(1.4) saturate(1.8) sepia(.6);
-    filter: contrast(1.4) saturate(1.8) sepia(.6);
-  }
 </style>
