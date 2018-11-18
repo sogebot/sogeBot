@@ -113,6 +113,8 @@ class IMasterController extends Interface {
   }
 
   async update (table, where, object) {
+    if (_.isEmpty(object)) throw Error('Object to update cannot be empty')
+
     const id = crypto.randomBytes(64).toString('hex')
     const data = { type: 'db', fnc: 'update', table: table, where: where, object: object, id: id }
 
