@@ -174,11 +174,23 @@ class Webhooks {
     res.send(req.query['hub.challenge'])
   }
 
+  /*
+  {
+   "data":
+      [{
+         "from_id":"1336",
+         "from_name":"ebi",
+         "to_id":"1337",
+         "to_name":"oliver0823nagy",
+         "followed_at": "2017-08-22T22:55:24Z"
+      }]
+  }
+  */
   async follower (aEvent) {
     const cid = global.oauth.channelId
+    const data = aEvent.data[0]
     if (_.isEmpty(cid)) setTimeout(() => this.follower(aEvent), 10) // wait until channelId is set
-    if (parseInt(aEvent.data.to_id, 10) !== parseInt(cid, 10)) return
-    const data = aEvent.data
+    if (parseInt(data.to_id, 10) !== parseInt(cid, 10)) return
 
     // is in webhooks cache
     if (this.existsInCache('follow', data.from_id)) return
