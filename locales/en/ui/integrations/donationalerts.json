@@ -1,0 +1,6 @@
+{
+  "settings": {
+    "enabled": "Status",
+    "secretToken": "Secret token"
+  }
+}

@@ -224,19 +224,18 @@
 
             // ui
             // everything else except commands and enabled and are string|number|bool
-            for (let [name, value] of _(_ui.filter(o => o[0] !== '_' && o[0] !== 'enabled' && o[0] !== 'commands' && typeof o[1] !== 'object')).value()) {
+            for (let [name, value] of _(_ui.filter(o => o[0] !== '_' && o[0] !== 'enabled' && o[0] !== 'commands' && typeof o[1].type !== 'undefined')).value()) {
               if (typeof this.settings.settings[name] === 'undefined') this.settings.settings[name] = null
               this.ui.settings[name] = value
             }
             // everything else except commands and enabled and are objects -> own category
-            for (let [name, value] of _(_ui.filter(o => o[0] !== '_' && o[0] !== 'enabled' && o[0] !== 'commands' && typeof o[1] === 'object')).value()) {
+            for (let [name, value] of _(_ui.filter(o => o[0] !== '_' && o[0] !== 'enabled' && o[0] !== 'commands' && typeof o[1].type === 'undefined')).value()) {
               if (typeof this.settings[name] === 'undefined') this.settings[name] = {}
               for (let [k, v] of Object.entries(value)) {
                 if (typeof this.settings[name][k] === 'undefined') this.settings[name][k] = null
               }
               this.ui[name] = value
             }
-
             this.isDataChanged = false
           })
         },

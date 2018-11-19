@@ -14,7 +14,6 @@ class INeDB extends Interface {
 
     if (!fs.existsSync('./db')) fs.mkdirSync('./db')
     if (!fs.existsSync('./db/nedb')) fs.mkdirSync('./db/nedb')
-
     this.table = {}
   }
 

@@ -1,7 +1,0 @@
-{
-  "enabled": "Status",
-  "clientSecret": "Secret token",
-  "tooltips": {
-    "clientSecret": ""
-  }
-}
