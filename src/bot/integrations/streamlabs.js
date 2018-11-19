@@ -11,7 +11,7 @@ const chalk = require('chalk')
 const Integration = require('./_interface')
 
 class Streamlabs extends Integration {
-  socket = null
+  socket: Socket = null
 
   constructor () {
     const settings = {
@@ -30,29 +30,34 @@ class Streamlabs extends Integration {
     super({ settings, onChange, ui })
   }
 
-  onStateChange (key, val) {
+  onStateChange (key: String, val: String) {
     if (val) this.connect()
     else this.disconnect()
   }
 
   async disconnect () {
-    if (!_.isNil(this.socket)) this.socket.close().off()
+    if (this.socket !== null) {
+      this.socket.close().off()
+      this.socket.removeAllListeners()
+    }
   }
 
   async connect () {
     this.disconnect()
 
-    if (this.settings.socketToken.trim() === '') return
+    if (this.settings.socketToken.trim() === '' || !this.settings.enabled) return
 
     this.socket = io.connect('https://sockets.streamlabs.com?token=' + this.settings.socketToken)
 
-    this.socket.off('reconnect_attempt').on('reconnect_attempt', () => {
+    this.socket.on('reconnect_attempt', () => {
       global.log.info(chalk.yellow('STREAMLABS:') + ' Trying to reconnect to service')
     })
-    this.socket.off('connect').on('connect', () => {
+
+    this.socket.on('connect', () => {
       global.log.info(chalk.yellow('STREAMLABS:') + ' Successfully connected socket to service')
     })
-    this.socket.off('disconnect').on('disconnect', () => {
+
+    this.socket.on('disconnect', () => {
       global.log.info(chalk.yellow('STREAMLABS:') + ' Socket disconnected from service')
       this.socket.open()
     })
