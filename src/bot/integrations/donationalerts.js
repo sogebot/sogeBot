@@ -58,7 +58,7 @@ class Donationalerts extends Integration {
       })
 
     if (this.socket !== null) {
-      this.socket.on('connect', async () => {
+      this.socket.on('connect', () => {
         this.socket.emit('add-user', { token: this.settings.secretToken, type: 'minor' })
         global.log.info(chalk.yellow('DONATIONALERTS.RU:') + ' Successfully connected socket to service')
       })
