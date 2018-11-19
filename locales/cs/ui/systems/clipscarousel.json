@@ -1,6 +1,7 @@
 {
   "settings": {
     "customPeriodInDays": "Za časové období (dny)",
-    "numOfClips": "Počet klipů"
+    "numOfClips": "Počet klipů",
+    "timeToNextClip": "Čas do dalšího klipu (s)"
   }
 }
