@@ -74,7 +74,7 @@
                     class="pt-1 pb-1"
                     v-bind:type="typeof currentValue"
                     v-bind:value="currentValue"
-                    v-bind:title="'systems.' + selectedGames + '.settings.' + defaultValue"
+                    v-bind:title="'games.' + selectedGames + '.settings.' + defaultValue"
                     :permission="settings._permissions[defaultValue]"
                     v-on:update="value[defaultValue] = $event.value; triggerDataChange()">
                   </number-input>
