@@ -98,7 +98,7 @@ window.textInput = {
           <template v-if="typeof translatedTitle === 'string'">{{ translatedTitle }}</template>
           <template v-else>
             {{ translatedTitle.title }}
-            <small class="textInputTooltip text-info" data-toggle="tooltip" data-html="true" :title="translatedTitle.help">[?]</small>
+            <small style="cursor: help;" class="textInputTooltip text-info ml-1" data-toggle="tooltip" data-html="true" :title="translatedTitle.help"><i class="fas fa-question"></i></small>
           </template>
         </span>
       </div>
