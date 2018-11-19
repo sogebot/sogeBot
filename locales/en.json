@@ -49,7 +49,6 @@
     "offline": "Stream is currently offline for (if $days>0|$daysd )(if $hours>0|$hoursh )(if $minutes>0|$minutesm )(if $seconds>0|$secondss)"
   },
   "webpanel": {
-    "mainCurrency": "Main currency",
     "display-as": "Display as",
     "set-default": "Set default",
     "add": "Add",
@@ -495,7 +494,6 @@
     "text": "Text",
     "manage": "Manage",
     "registry": "Registry",
-    "ignorelist": "Ignore list",
     "settings": "Settings",
     "permissions": "Permissions",
     "permission": "Permission",

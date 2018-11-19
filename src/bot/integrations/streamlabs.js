@@ -47,13 +47,13 @@ class Streamlabs extends Integration {
     this.socket = io.connect('https://sockets.streamlabs.com?token=' + this.settings.socketToken)
 
     this.socket.off('reconnect_attempt').on('reconnect_attempt', () => {
-      global.log.info(chalk.yellow('STREAMLABS:') + ' socket reconnecting')
+      global.log.info(chalk.yellow('STREAMLABS:') + ' Trying to reconnect to service')
     })
     this.socket.off('connect').on('connect', () => {
       global.log.info(chalk.yellow('STREAMLABS:') + ' Successfully connected socket to service')
     })
     this.socket.off('disconnect').on('disconnect', () => {
-      global.log.info(chalk.yellow('STREAMLABS:') + ' socket disconnected')
+      global.log.info(chalk.yellow('STREAMLABS:') + ' Socket disconnected from service')
       this.socket.open()
     })
 
