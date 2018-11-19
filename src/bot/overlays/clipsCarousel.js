@@ -8,7 +8,8 @@ class ClipsCarousel extends Overlay {
     const settings = {
       clips: {
         customPeriodInDays: 31,
-        numOfClips: 20
+        numOfClips: 20,
+        timeToNextClip: 45
       }
     }
 
@@ -20,6 +21,11 @@ class ClipsCarousel extends Overlay {
           min: '1'
         },
         customPeriodInDays: {
+          type: 'number-input',
+          step: '1',
+          min: '1'
+        },
+        timeToNextClip: {
           type: 'number-input',
           step: '1',
           min: '1'
@@ -44,7 +50,7 @@ class ClipsCarousel extends Overlay {
       .of('/' + this._name + '/' + this.constructor.name.toLowerCase(), (socket) => {
         socket.on('clips', async (cb) => {
           const clips = await global.api.getTopClips({ period: 'custom', days: this.settings.clips.customPeriodInDays, first: this.settings.clips.numOfClips })
-          cb(null, { clips })
+          cb(null, { clips, settings: { timeToNextClip: this.settings.clips.timeToNextClip } })
         })
       })
   }

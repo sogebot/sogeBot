@@ -20,11 +20,13 @@ export default {
       }),
       isPlaying: false,
       clips: [],
-      currentClip: 0
+      currentClip: 0,
+      timeToNextClip: 45,
     }
   },
   created: function () {
     this.socket.emit('clips', (err, data) => {
+      this.timeToNextClip = data.settings.timeToNextClip
       data.clips = data.clips
         .map((a) => ({sort: Math.random(), value: a}))
         .sort((a, b) => a.sort - b.sort)
@@ -36,13 +38,12 @@ export default {
       this.$nextTick(() => {
         // center to first clip
         this.moveToNextClip()
-      })
-      this.volume = data.settings.volume
-    })
 
-    setInterval(() => {
-      this.moveToNextClip()
-    }, 45 * 1000)
+        setInterval(() => {
+          this.moveToNextClip()
+        }, this.timeToNextClip * 1000)
+      })
+    })
   },
   methods: {
     moveToNextClip: function () {
