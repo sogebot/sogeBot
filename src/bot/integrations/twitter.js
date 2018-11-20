@@ -75,10 +75,12 @@ class Twitter extends Integration {
 
   connect () {
     try {
-      if (this.settings.tokens.consumerKey.trim().length === 0) throw new Error('consumerKey missing')
-      if (this.settings.tokens.consumerSecret.trim().length === 0) throw new Error('consumerSecret missing')
-      if (this.settings.tokens.accessToken.trim().length === 0) throw new Error('accessToken missing')
-      if (this.settings.tokens.secretToken.trim().length === 0) throw new Error('secretToken missing')
+      let error = []
+      if (this.settings.tokens.consumerKey.trim().length === 0) error.push('consumerKey')
+      if (this.settings.tokens.consumerSecret.trim().length === 0) error.push('consumerSecret')
+      if (this.settings.tokens.accessToken.trim().length === 0) error.push('accessToken')
+      if (this.settings.tokens.secretToken.trim().length === 0) error.push('secretToken')
+      if (error.length > 0) throw new Error(error.join(', ') + 'missing')
 
       this.client = new Client({
         consumer_key: this.settings.tokens.consumerKey,
@@ -91,7 +93,7 @@ class Twitter extends Integration {
     }
   }
 
-  async fireSendTwitterMessage (operation: object, attributes: object) {
+  async fireSendTwitterMessage (operation: Object, attributes: Object) {
     attributes.username = _.get(attributes, 'username', global.commons.getOwner())
     let message = operation.messageToSend
     _.each(attributes, function (val, name) {
