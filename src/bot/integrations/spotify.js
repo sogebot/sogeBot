@@ -22,7 +22,7 @@ const Integration = require('./_interface')
  */
 
 class Spotify extends Integration {
-  scopes: Array<String> = [ 'user-read-currently-playing', 'user-read-private', 'user-read-email' ]
+  scopes: Array<string> = [ 'user-read-currently-playing', 'user-read-private', 'user-read-email' ]
   client: any = null
 
   constructor () {
