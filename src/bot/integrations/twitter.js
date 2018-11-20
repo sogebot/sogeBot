@@ -71,6 +71,7 @@ class Twitter extends Integration {
 
   disconnect () {
     this.client = null
+    global.log.info(chalk.yellow('TWITTER: ') + 'Client disconnected from service')
   }
 
   connect () {
@@ -88,6 +89,7 @@ class Twitter extends Integration {
         access_token_key: this.settings.tokens.accessToken,
         access_token_secret: this.settings.tokens.secretToken
       })
+      global.log.info(chalk.yellow('TWITTER: ') + 'Client connected to service')
     } catch (e) {
       global.log.info(chalk.yellow('TWITTER: ') + e.message)
     }
