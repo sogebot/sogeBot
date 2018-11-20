@@ -155,10 +155,18 @@
       },
       watch: {
         selectedSystem: function (valueNew, valueOld) {
+          window.location.hash = '#core-' + system
           this.loadSystemSettings(valueNew)
         }
       },
       computed: {
+        systemURI: function () {
+          const hash = window.location.hash.slice(1, window.location.hash.length)
+          if (hash.split('-').length > 1) {
+            let system = hash.split('-').splice(-1, 1).join()
+            return system
+          } return null
+        }
       },
       created: function () {
         this.socket._panel.emit('core', (err, systems) => {
@@ -166,7 +174,7 @@
             this.socket[system.name] = io(`/core/${system.name}`, { query: "token=" + token })
           }
           this.listOfSystems = systems
-          this.selectedSystem = systems[0].name
+          this.selectedSystem = this.systemURI || systems[0].name
         })
       },
       filters: {
