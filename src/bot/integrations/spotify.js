@@ -79,8 +79,10 @@ class Spotify extends Integration {
 
   onStateChange (key: string, value: string) {
     this.currentSong = JSON.stringify({})
-    if (value) this.connect().then(() => this.getMe())
-    else this.disconnect()
+    if (value) {
+      this.connect()
+      this.getMe()
+    } else this.disconnect()
   }
 
   async getMe () {
