@@ -7,6 +7,8 @@ let listeners = 0
 
 class Module {
   timeouts = {}
+  isLoaded = false
+
   constructor (opts) {
     /* Prepare default settings configuration
      * set enabled by default to true
@@ -44,7 +46,14 @@ class Module {
     this._sockets()
     this._cleanEmptySettingsValues()
     this._indexDbs()
-    this.status()
+    this._status()
+  }
+
+  _status (retries) {
+    if (typeof retries === 'undefined') retries = 0
+    if (retries === 1000) throw new Error('Something went wrong')
+    if (!this.isLoaded) setTimeout(() => this._status(++retries), 10)
+    else this.status({ state: this.settings.enabled }) // force status change
   }
 
   prepareParsers () {
@@ -60,6 +69,7 @@ class Module {
       if (_.has(this._opts.settings, variables[i].key) && variables[i].value !== null) _.set(this._settings, variables[i].key, variables[i].value)
       else await global.db.engine.remove(this.collection.settings, { _id: String(variables[i]._id) })
     }
+    this.isLoaded = true
   }
 
   threadListener () {
@@ -356,6 +366,17 @@ class Module {
     else opts.state = await this.settings.enabled
 
     if (!areDependenciesEnabled || isDisabledByEnv) opts.state = false // force disable if dependencies are disabled or disabled by env
+
+    // onChange handler on enabled
+    if (cluster.isMaster && isStatusChanged) {
+      if (this.onChange.enabled) {
+        // run onChange functions only on master
+        for (let fnc of this.onChange.enabled) {
+          if (typeof this[fnc] === 'function') this[fnc]('enabled', opts.state)
+          else global.log.error(`${fnc}() is not function in ${this._name}/${this.constructor.name.toLowerCase()}`)
+        }
+      }
+    }
 
     if ((isMasterAndStatusOnly || isStatusChanged) && !opts.quiet) {
       if (isDisabledByEnv) global.log.info(`${chalk.red('DISABLED BY ENV')}: ${this.constructor.name} (${this._name})`)
