@@ -529,14 +529,14 @@
     let currentPage = null
     page('/', function(p){
       const id = p.hash.length === 0 ? 'dashboard' : p.hash
-      if (currentPage === id) return
-      else currentPage = id
+      if (currentPage === id.split('-')[0]) return
+      else currentPage = id.split('-')[0]
       var visibility = id !== 'dashboard' ? 'none' : 'flex'
       var visibilityBlock = id !== 'dashboard' ? 'none' : 'block'
 
       $("#pages").empty()
 
-      if (id !== 'dashboard') $("#pages").append($('<div id="P' + id + '">').load('pages/' + id + '.html',
+      if (id !== 'dashboard') $("#pages").append($('<div id="P' + id.split('-')[0] + '">').load('pages/' + id.split('-')[0] + '.html',
         function (err) {
           commons.translate()
           $('a[data-toggle="tab"]').off()

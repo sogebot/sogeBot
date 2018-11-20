@@ -163,6 +163,13 @@
         }
       },
       computed: {
+        systemURI: function () {
+          const hash = window.location.hash.slice(1, window.location.hash.length)
+          if (hash.split('-').length > 1) {
+            let system = hash.split('-').splice(-1, 1).join()
+            return system
+          } return null
+        }
       },
       created: function () {
         this.socket._panel.emit('systems', (err, systems) => {
@@ -170,7 +177,7 @@
             this.socket[system.name] = io(`/systems/${system.name}`, { query: "token=" + token })
           }
           this.listOfSystems = systems
-          this.selectedSystem = systems[0].name
+          this.selectedSystem = this.systemURI || systems[0].name
         })
       },
       filters: {
@@ -237,6 +244,7 @@
           this.isDataChanged = false; this.isDataChanged = true
         },
         setSystem: function (system) {
+          window.location.hash = '#systems-' + system
           if (this.state.settings === 0) this.selectedSystem = system
         },
         saveSettings: function () {

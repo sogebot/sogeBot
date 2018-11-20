@@ -175,6 +175,13 @@
         }
       },
       computed: {
+        systemURI: function () {
+          const hash = window.location.hash.slice(1, window.location.hash.length)
+          if (hash.split('-').length > 1) {
+            let system = hash.split('-').splice(-1, 1).join()
+            return system
+          } return null
+        }
       },
       created: function () {
         this.socket._panel.emit('games', (err, games) => {
@@ -182,7 +189,7 @@
             this.socket[system.name] = io(`/games/${system.name}`, { query: "token=" + token })
           }
           this.listOfGames = games
-          this.selectedGames = games[0].name
+          this.selectedGames = this.systemURI || games[0].name
         })
       },
       filters: {
@@ -249,6 +256,7 @@
           this.isDataChanged = false; this.isDataChanged = true
         },
         setGames: function (system) {
+          window.location.hash = '#games-' + system
           if (this.state.settings === 0) this.selectedGames = system
         },
         saveSettings: function () {

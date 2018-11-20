@@ -331,6 +331,13 @@ var social = {
         }
       },
       computed: {
+        systemURI: function () {
+          const hash = window.location.hash.slice(1, window.location.hash.length)
+          if (hash.split('-').length > 1) {
+            let system = hash.split('-').splice(-1, 1).join()
+            return system
+          } return null
+        }
       },
       created: function () {
         this.socket._panel.emit('overlays', (err, overlays) => {
@@ -338,7 +345,7 @@ var social = {
             this.socket[system.name] = io(`/overlays/${system.name}`, { query: "token=" + token })
           }
           this.list = overlays
-          this.selected = overlays[0].name
+          this.selected = this.systemURI || overlays[0].name
         })
       },
       filters: {
@@ -413,6 +420,7 @@ var social = {
           this.isDataChanged = false; this.isDataChanged = true
         },
         setSelected: function (system) {
+          window.location.hash = '#overlays-' + system
           if (this.state.settings === 0) this.selected = system
         },
         removeNulls: function (obj){
