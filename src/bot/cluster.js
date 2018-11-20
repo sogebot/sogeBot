@@ -39,7 +39,7 @@ function cluster () {
       global.games = require('auto-load')('./dest/games/')
       global.integrations = require('auto-load')('./dest/integrations/')
     } catch (e) {
-      global.log.error(e)
+      console.error(e); global.log.error(e)
     }
 
     process.on('message', async (data) => {
