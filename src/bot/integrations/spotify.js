@@ -6,6 +6,10 @@ const chalk = require('chalk')
 const SpotifyWebApi = require('spotify-web-api-node')
 const crypto = require('crypto')
 const urljoin = require('url-join')
+const cluster = require('cluster')
+
+// bot libraries
+const Integration = require('./_interface')
 
 /*
  * How to integrate:
@@ -15,56 +19,86 @@ const urljoin = require('url-join')
  * 3. Authorize your user through UI
  */
 
-class Spotify {
+class Spotify extends Integration {
+  scopes: Array<String> = [ 'user-read-currently-playing', 'user-read-private', 'user-read-email' ]
+  client: any = null
+
   constructor () {
-    this.defaults = {
-      format: '$song - $artist'
+    const settings = {
+      _: {
+        accessToken: '',
+        refreshToken: '',
+        code: '',
+        currentSong: JSON.stringify({})
+      },
+      output: {
+        format: '$song - $artist'
+      },
+      connection: {
+        clientId: '',
+        clientSecret: '',
+        redirectURI: '',
+        username: ''
+      }
+    }
+    const ui = {
+      connection: {
+        clientId: {
+          type: 'text-input',
+          secret: true
+        },
+        clientSecret: {
+          type: 'text-input',
+          secret: true
+        },
+        username: {
+          type: 'text-input',
+          readOnly: true
+        },
+        overlay: {
+          type: 'button-socket',
+          on: '/integrations/spotify',
+          emit: 'revoke',
+          class: 'btn btn-primary btn-block',
+          rawText: 'revoke'
+        }
+      }
+    }
+    const onChange = {
+      enabled: ['onStateChange']
     }
 
-    if (require('cluster').isWorker) return
-    this.collection = 'integrations.spotify'
-    this.timeouts = {}
-    this.scopes = [ 'user-read-currently-playing', 'user-read-private', 'user-read-email' ]
-    this.client = null
+    super({ settings, ui, onChange })
 
-    this.status()
-    this.sockets()
-
-    this.timeouts.IRefreshToken = setTimeout(() => this.IRefreshToken(), 60000)
-    this.timeouts.ICurrentSong = setTimeout(() => this.ICurrentSong(), 10000)
+    if (cluster.isMaster) {
+      this.timeouts.IRefreshToken = setTimeout(() => this.IRefreshToken(), 60000)
+      this.timeouts.ICurrentSong = setTimeout(() => this.ICurrentSong(), 10000)
+      this.timeouts.getMe = setTimeout(() => this.getMe(), 10000)
+    }
   }
 
-  get format () {
-    return new Promise(async (resolve, reject) => resolve(_.get(await global.db.engine.findOne('cache', { key: 'integration_spotify_format' }), 'value', this.defaults.format)))
-  }
-
-  set format (value) {
-    if (_.isNil(value)) value = this.defaults.format
-    global.db.engine.update('cache', { key: 'integration_spotify_format' }, { value })
-  }
-
-  get currentSong () {
-    return new Promise(async (resolve, reject) => resolve(_.get(await global.db.engine.findOne('cache', { key: 'integration_spotify_currentSong' }), 'value', {})))
-  }
-
-  set currentSong (v) {
-    global.db.engine.update('cache', { key: 'integration_spotify_currentSong' }, { value: v })
+  onStateChange (key: string, value: string) {
+    this.currentSong = JSON.stringify({})
+    if (value) this.connect().then(() => this.getMe())
+    else this.disconnect()
   }
 
   async getMe () {
+    clearTimeout(this.timeouts['getMe'])
+
     try {
-      const enabled = await this.status({ log: false })
-      if (enabled && !_.isNil(this.client)) {
+      if (this.settings.enabled && !_.isNil(this.client)) {
         let data = await this.client.getMe()
-        return data.body.display_name ? data.body.display_name : data.body.id
-      } else return null
+        this.settings.connection.username = data.body.display_name ? data.body.display_name : data.body.id
+      }
     } catch (e) {
       if (e.message !== 'Unauthorized') {
-        global.log.error('Spotify user get failed')
-        global.log.error(e.message)
+        global.log.info(chalk.yellow('SPOTIFY: ') + 'Get of user failed, check your credentials')
       }
-      return null
+      this.settings.connection.username = ''
     }
+
+    this.timeouts['getMe'] = setTimeout(() => this.getMe(), 30000)
   }
 
   async ICurrentSong () {
@@ -78,9 +112,9 @@ class Spotify {
         is_playing: data.body.is_playing,
         is_enabled: await this.status({ log: false })
       }
-      this.currentSong = song
+      this.currentSong = JSON.stringify(song)
     } catch (e) {
-      this.currentSong = {}
+      this.currentSong = JSON.stringify({})
     }
     this.timeouts['ICurrentSong'] = setTimeout(() => this.ICurrentSong(), 10000)
   }
@@ -91,94 +125,13 @@ class Spotify {
     try {
       if (!_.isNil(this.client)) {
         let data = await this.client.refreshAccessToken()
-        this.accessToken = data.body['access_token']
+        this.settings._.accessToken = data.body['access_token']
       }
     } catch (e) {
-      global.log.error('Spotify refresh token failed')
-      global.log.error(e)
+      global.log.info(chalk.yellow('SPOTIFY: ') + 'Refreshing access token failed')
     }
     this.timeouts['IRefreshToken'] = setTimeout(() => this.IRefreshToken(), 60000)
   }
-
-  get enabled () {
-    return new Promise(async (resolve, reject) => resolve(_.get(await global.db.engine.findOne(this.collection, { key: 'enabled' }), 'value', false)))
-  }
-  set enabled (v) {
-    (async () => {
-      v = !!v // force boolean
-      await global.db.engine.update(this.collection, { key: 'enabled' }, { value: v })
-      if (v === false) this.currentSong = {}
-      this.status()
-    })()
-  }
-
-  get clientId () {
-    return new Promise(async (resolve, reject) => resolve(_.get(await global.db.engine.findOne(this.collection, { key: 'clientId' }), 'value', null)))
-  }
-  set clientId (v) {
-    this.accessToken = null
-    this.refreshToken = null
-    this.client = null;
-
-    (async () => {
-      await global.db.engine.update(this.collection, { key: 'clientId' }, { value: _.isNil(v) || v.trim().length === 0 ? null : v })
-      await this.status({ log: false })
-    })()
-  }
-
-  get clientSecret () {
-    return new Promise(async (resolve, reject) => resolve(_.get(await global.db.engine.findOne(this.collection, { key: 'clientSecret' }), 'value', null)))
-  }
-  set clientSecret (v) {
-    this.accessToken = null
-    this.refreshToken = null
-    this.client = null;
-
-    (async () => {
-      await global.db.engine.update(this.collection, { key: 'clientSecret' }, { value: _.isNil(v) || v.trim().length === 0 ? null : v })
-      await this.status({ log: false })
-    })()
-  }
-
-  get redirectURI () {
-    return new Promise(async (resolve, reject) => resolve(_.get(await global.db.engine.findOne(this.collection, { key: 'redirectURI' }), 'value', null)))
-  }
-  set redirectURI (v) {
-    this.accessToken = null
-    this.refreshToken = null
-    this.client = null;
-
-    (async () => {
-      await global.db.engine.update(this.collection, { key: 'redirectURI' }, { value: _.isNil(v) || v.trim().length === 0 ? null : v })
-      await this.status({ log: false })
-    })()
-  }
-
-  get code () {
-    return new Promise(async (resolve, reject) => resolve(_.get(await global.db.engine.findOne(this.collection, { key: 'code' }), 'value', null)))
-  }
-  set code (v) { global.db.engine.update(this.collection, { key: 'code' }, { value: _.isNil(v) || v.trim().length === 0 ? null : v }) }
-
-  get refreshToken () {
-    return new Promise(async (resolve, reject) => resolve(_.get(await global.db.engine.findOne(this.collection, { key: 'refreshToken' }), 'value', null)))
-  }
-  set refreshToken (v) {
-    if (!_.isNil(this.client)) this.client.setRefreshToken(v)
-    global.db.engine.update(this.collection, { key: 'refreshToken' }, { value: _.isNil(v) || v.trim().length === 0 ? null : v })
-  }
-
-  get accessToken () {
-    return new Promise(async (resolve, reject) => resolve(_.get(await global.db.engine.findOne(this.collection, { key: 'accessToken' }), 'value', null)))
-  }
-  set accessToken (v) {
-    if (!_.isNil(this.client)) this.client.setAccessToken(v)
-    global.db.engine.update(this.collection, { key: 'accessToken' }, { value: _.isNil(v) || v.trim().length === 0 ? null : v })
-  }
-
-  get state () {
-    return new Promise(async (resolve, reject) => resolve(_.get(await global.db.engine.findOne(this.collection, { key: 'state' }), 'value', null)))
-  }
-  set state (v) { global.db.engine.update(this.collection, { key: 'state' }, { value: _.isNil(v) || v.trim().length === 0 ? null : v }) }
 
   sockets () {
     const io = global.panel.io.of('/integrations/spotify')
@@ -198,72 +151,58 @@ class Spotify {
       socket.on('getCurrentSong', async (callback) => {
         callback(null, await this.getCurrentSong())
       })
-      socket.on('settings', async (callback) => {
-        callback(null, {
-          clientId: await this.clientId,
-          clientSecret: await this.clientSecret,
-          redirectURI: await this.redirectURI,
-          format: await this.format,
-          enabled: await this.status({ log: false })
-        })
-      })
-      socket.on('toggle.enabled', async (cb) => {
-        let enabled = await this.enabled
-        this.enabled = !enabled
-        cb(null, !enabled)
-      })
-      socket.on('set.variable', async (data, cb) => {
-        this[data.key] = data.value
-        cb(null, data.value)
-      })
       socket.on('authorize', async (cb) => {
         cb(null, await this.authorizeURI())
       })
       socket.on('revoke', async (cb) => {
-        this.accessToken = null
-        this.refreshToken = null
-        this.currentSong = null
+        this.settings._.accessToken = null
+        this.settings._.refreshToken = null
+        this.settings._.currentSong = JSON.stringify({})
         cb(null, null)
       })
     })
   }
 
-  async status (options) {
-    options = _.defaults(options, { log: true })
-    let [enabled, clientSecret, clientId, redirectURI, code, accessToken, refreshToken] = await Promise.all([this.enabled, this.clientSecret, this.clientId, this.redirectURI, this.code, this.accessToken, this.refreshToken])
-    enabled = !(_.isNil(clientSecret) || _.isNil(clientId) || _.isNil(redirectURI)) && enabled
+  connect () {
+    try {
+      let error = []
+      if (this.settings.connection.clientId.trim().length === 0) error.push('clientId')
+      if (this.settings.connection.clientSecret.trim().length === 0) error.push('clientSecret')
+      if (this.settings.connection.redirectURI.trim().length === 0) error.push('redirectURI')
+      if (error.length > 0) throw new Error(error.join(', ') + 'missing')
 
-    let color = enabled ? chalk.green : chalk.red
-    if (options.log) global.log.info(`${color(enabled ? 'ENABLED' : 'DISABLED')}: Spotify Integration`)
-
-    if (_.isNil(this.client) && enabled) {
-      let url = urljoin(redirectURI, 'oauth', 'spotify')
+      let url = urljoin(this.settings.connection.redirectURI, 'oauth', 'spotify')
       this.client = new SpotifyWebApi({
-        clientId: clientId,
-        clientSecret: clientSecret,
+        clientId: this.settings.connection.clientId,
+        clientSecret: this.settings.connection.clientSecret,
         redirectUri: url
       })
-    } else if (!enabled) {
-      this.client = null
-    }
 
-    try {
-      if (!_.isNil(code) && !_.isNil(this.client) && enabled) {
-        this.client.authorizationCodeGrant(code)
-          .then((data) => {
-            this.accessToken = data.body['access_token']
-            this.refreshToken = data.body['refresh_token']
-          })
-        this.code = null
-      }
-      if (!_.isNil(this.client) && enabled && !_.isNil(accessToken)) {
-        this.client.setAccessToken(accessToken)
-        this.client.setRefreshToken(refreshToken)
+      try {
+        if (!_.isNil(this.settings._.code) && !_.isNil(this.client)) {
+          this.client.authorizationCodeGrant(this.settings._.code)
+            .then((data) => {
+              this.accessToken = data.body['access_token']
+              this.refreshToken = data.body['refresh_token']
+            })
+          this.settings._.code = null
+        }
+        if (!_.isNil(this.client) && !_.isNil(this.settings._.accessToken)) {
+          this.client.setAccessToken(this.settings._.accessToken)
+          this.client.setRefreshToken(this.settings._.refreshToken)
+        }
+        global.log.info(chalk.yellow('SPOTIFY: ') + 'Client connected to service')
+      } catch (e) {
+        global.log.info(chalk.yellow('SPOTIFY: ') + 'Client connection failed')
       }
     } catch (e) {
-      console.error(e)
+      global.log.info(chalk.yellow('SPOTIFY: ') + e.message)
     }
-    return enabled
+  }
+
+  disconnect () {
+    this.client = null
+    global.log.info(chalk.yellow('SPOTIFY: ') + 'Client disconnected from service')
   }
 
   authorizeURI () {
