@@ -145,7 +145,7 @@ class Webhooks {
     }
 
     // resubscribe after while
-    this.timeouts[`subscribe-${type}`] = setTimeout(() => this.subscriber(type), leaseSeconds * 1000)
+    this.timeouts[`subscribe-${type}`] = setTimeout(() => this.subscribe(type), leaseSeconds * 1000)
   }
 
   async event (aEvent, res) {
@@ -187,39 +187,44 @@ class Webhooks {
   }
   */
   async follower (aEvent) {
-    const cid = global.oauth.channelId
-    const data = aEvent.data[0]
-    if (_.isEmpty(cid)) setTimeout(() => this.follower(aEvent), 10) // wait until channelId is set
-    if (parseInt(data.to_id, 10) !== parseInt(cid, 10)) return
+    try {
+      const cid = global.oauth.channelId
+      const data = aEvent.data[0]
+      if (_.isEmpty(cid)) setTimeout(() => this.follower(aEvent), 10) // wait until channelId is set
+      if (parseInt(data.to_id, 10) !== parseInt(cid, 10)) return
 
-    // is in webhooks cache
-    if (this.existsInCache('follow', data.from_id)) return
+      // is in webhooks cache
+      if (this.existsInCache('follow', data.from_id)) return
 
-    // add to cache
-    this.addIdToCache('follow', data.from_id)
+      // add to cache
+      this.addIdToCache('follow', data.from_id)
 
-    const user = await global.users.getById(data.from_id)
+      const user = await global.users.getById(data.from_id)
 
-    user.username = data.from_name
-    global.db.engine.update('users', { id: data.from_id }, { username: data.from_name })
+      user.username = data.from_name
+      global.db.engine.update('users', { id: data.from_id }, { username: data.from_name })
 
-    if (!_.get(user, 'is.follower', false) && (_.get(user, 'time.follow', 0) === 0 || _.now() - _.get(user, 'time.follow', 0) > 60000 * 60)) {
-      if (!await global.commons.isBot(data.from_name)) {
-        global.overlays.eventlist.add({
-          type: 'follow',
-          username: data.from_name
-        })
-        global.log.follow(data.from_name)
-        global.events.fire('follow', { username: data.from_name, webhooks: true })
+      if (!_.get(user, 'is.follower', false) && (_.get(user, 'time.follow', 0) === 0 || _.now() - _.get(user, 'time.follow', 0) > 60000 * 60)) {
+        if (!await global.commons.isBot(data.from_name)) {
+          global.overlays.eventlist.add({
+            type: 'follow',
+            username: data.from_name
+          })
+          global.log.follow(data.from_name)
+          global.events.fire('follow', { username: data.from_name, webhooks: true })
+        }
       }
-    }
 
-    if (!_.get(user, 'is.follower', false)) {
-      global.db.engine.update('users', { id: data.from_id }, { username: data.from_name, time: { followCheck: new Date().getTime() } })
-    } else {
-      const followedAt = user.lock && user.lock.followed_at ? Number(user.time.follow) : parseInt(_.now(), 10)
-      const isFollower = user.lock && user.lock.follower ? user.is.follower : true
-      global.db.engine.update('users', { id: data.from_id }, { username: data.from_name, is: { follower: isFollower }, time: { followCheck: new Date().getTime(), follow: followedAt } })
+      if (!_.get(user, 'is.follower', false)) {
+        global.db.engine.update('users', { id: data.from_id }, { username: data.from_name, time: { followCheck: new Date().getTime() } })
+      } else {
+        const followedAt = user.lock && user.lock.followed_at ? Number(user.time.follow) : parseInt(_.now(), 10)
+        const isFollower = user.lock && user.lock.follower ? user.is.follower : true
+        global.db.engine.update('users', { id: data.from_id }, { username: data.from_name, is: { follower: isFollower }, time: { followCheck: new Date().getTime(), follow: followedAt } })
+      }
+    } catch (e) {
+      global.log.error(e.stack)
+      global.log.error(aEvent)
     }
   }
 
