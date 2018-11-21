@@ -8,8 +8,8 @@ var eventSpy
 
 module.exports = {
   prepare: function () {
-    if (!eventSpy) eventSpy = sinon.spy(global.events, 'fire')
-    else eventSpy.resetHistory()
+    if (eventSpy) eventSpy.restore()
+    eventSpy = sinon.spy(global.events, 'fire')
 
     global.commons.timeout = function () {}
 
