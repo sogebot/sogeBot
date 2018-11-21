@@ -78,8 +78,9 @@ describe('API - getLatest100Followers()', () => {
   })
 
   after(() => {
-    sinon.restore()
     global.api.timeouts['getLatest100Followers'].isPaused = false
+    global.oauth.channelId = ''
+    global.oauth.settings.bot.accessToken = ''
   })
 
   describe('Example data', () => {
