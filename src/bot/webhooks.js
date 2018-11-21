@@ -224,7 +224,7 @@ class Webhooks {
       }
     } catch (e) {
       global.log.error(e.stack)
-      global.log.error(aEvent)
+      global.log.error(JSON.stringify(aEvent))
     }
   }
 
