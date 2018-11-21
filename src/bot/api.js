@@ -6,6 +6,7 @@ const cluster = require('cluster')
 const stacktrace = require('stacktrace-parser')
 const fs = require('fs')
 const chalk = require('chalk')
+const constants = require('./constants')
 
 const __DEBUG__ = {
   STREAM: (process.env.DEBUG && process.env.DEBUG.includes('api.stream')),
@@ -21,7 +22,7 @@ class API {
           get: function (obj, prop) {
             if (typeof obj[prop] === 'undefined') {
               if (prop === 'limit') return 120
-              if (prop === 'remaining') return 0
+              if (prop === 'remaining') return 800
               if (prop === 'refresh') return (_.now() / 1000) + 90
             } else return obj[prop]
           },
@@ -136,7 +137,9 @@ class API {
       }, 1000)
 
       setInterval(async () => {
-        if (typeof this.timeouts['getLatest100Followers'] === 'undefined') this.timeouts['getLatest100Followers'] = { opts: true, isRunning: false }
+        if (typeof this.timeouts['getLatest100Followers'] === 'undefined') this.timeouts['getLatest100Followers'] = { opts: true, isRunning: false, isPaused: false }
+
+        if (this.timeouts['getLatest100Followers'].isPaused) return
 
         if (!this.timeouts['getLatest100Followers'].isRunning) {
           this.timeouts['getLatest100Followers'].isRunning = true
@@ -727,10 +730,10 @@ class API {
   async getLatest100Followers (quiet) {
     const cid = global.oauth.channelId
     const url = `https://api.twitch.tv/helix/users/follows?to_id=${cid}&first=100`
-
     const token = await global.oauth.settings.bot.accessToken
     const needToWait = _.isNil(cid) || cid === '' || _.isNil(global.overlays) || token === ''
     const notEnoughAPICalls = this.calls.bot.remaining <= 30 && this.calls.bot.refresh > _.now() / 1000
+
     if (needToWait || notEnoughAPICalls) {
       return { state: false, opts: quiet }
     }
@@ -759,15 +762,17 @@ class API {
           global.db.engine.update('users', { id: f.from_id }, { username: f.from_name })
 
           if (!_.get(user, 'is.follower', false)) {
-            if ((_.get(user, 'time.follow', 0) === 0 || new Date().getTime() - _.get(user, 'time.follow', 0) > 60000 * 60) && !global.webhooks.existsInCache('follow', user.id)) {
-              global.webhooks.addIdToCache('follow', user.id)
-              global.overlays.eventlist.add({
-                type: 'follow',
-                username: user.username
-              })
-              if (!quiet && !await global.commons.isBot(user.username)) {
-                global.log.follow(user.username)
-                global.events.fire('follow', { username: user.username })
+            if (new Date().getTime() - new Date(f.followed_at).getTime() < 2 * constants.HOUR) {
+              if ((_.get(user, 'time.follow', 0) === 0 || new Date().getTime() - _.get(user, 'time.follow', 0) > 60000 * 60) && !global.webhooks.existsInCache('follow', user.id)) {
+                global.webhooks.addIdToCache('follow', user.id)
+                global.overlays.eventlist.add({
+                  type: 'follow',
+                  username: user.username
+                })
+                if (!quiet && !await global.commons.isBot(user.username)) {
+                  global.log.follow(user.username)
+                  global.events.fire('follow', { username: user.username })
+                }
               }
             }
           }
@@ -793,6 +798,7 @@ class API {
       quiet = e.errno !== 'ECONNREFUSED' && e.errno !== 'ETIMEDOUT'
       global.log.error(`${url} - ${e.message}`)
       if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getLatest100Followers', api: 'helix', endpoint: url, code: e.stack, remaining: this.calls.bot.remaining })
+      return { state: false, opts: quiet }
     }
     return { state: true, opts: quiet }
   }
