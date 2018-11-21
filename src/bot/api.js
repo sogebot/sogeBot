@@ -101,9 +101,8 @@ class API {
           if (__DEBUG__.INTERVAL) global.log.info(chalk.yellow('getCurrentStreamData() ') + JSON.stringify(value))
 
           if (value.state) { // if is ok, update opts and run unlock after a while
-            value.opts = value.opts || {}
+            if (typeof value.opts !== 'undefined') this.timeouts['getCurrentStreamData'].opts = value.opts
             setTimeout(() => {
-              this.timeouts['getCurrentStreamData'].opts = value.opts
               this.timeouts['getCurrentStreamData'].isRunning = false
             }, 60000)
           } else { // else run next tick
@@ -125,9 +124,8 @@ class API {
           if (__DEBUG__.INTERVAL) global.log.info(chalk.yellow('updateChannelViews() ') + JSON.stringify(value))
 
           if (value.state) { // if is ok, update opts and run unlock after a while
-            value.opts = value.opts || {}
+            if (typeof value.opts !== 'undefined') this.timeouts['updateChannelViews'].opts = value.opts
             setTimeout(() => {
-              this.timeouts['updateChannelViews'].opts = value.opts
               this.timeouts['updateChannelViews'].isRunning = false
             }, 60000)
           } else { // else run next tick
@@ -138,7 +136,6 @@ class API {
 
       setInterval(async () => {
         if (typeof this.timeouts['getLatest100Followers'] === 'undefined') this.timeouts['getLatest100Followers'] = { opts: true, isRunning: false, isPaused: false }
-
         if (this.timeouts['getLatest100Followers'].isPaused) return
 
         if (!this.timeouts['getLatest100Followers'].isRunning) {
@@ -151,9 +148,8 @@ class API {
           if (__DEBUG__.INTERVAL) global.log.info(chalk.yellow('getLatest100Followers() ') + JSON.stringify(value))
 
           if (value.state) { // if is ok, update opts and run unlock after a while
-            value.opts = value.opts || {}
+            if (typeof value.opts !== 'undefined') this.timeouts['getLatest100Followers'].opts = value.opts
             setTimeout(() => {
-              this.timeouts['getLatest100Followers'].opts = value.opts
               this.timeouts['getLatest100Followers'].isRunning = false
             }, 60000)
           } else { // else run next tick
@@ -175,9 +171,8 @@ class API {
           if (__DEBUG__.INTERVAL) global.log.info(chalk.yellow('getChannelHosts() ') + JSON.stringify(value))
 
           if (value.state) { // if is ok, update opts and run unlock after a while
-            value.opts = value.opts || {}
+            if (typeof value.opts !== 'undefined') this.timeouts['getChannelHosts'].opts = value.opts
             setTimeout(() => {
-              this.timeouts['getChannelHosts'].opts = value.opts
               this.timeouts['getChannelHosts'].isRunning = false
             }, 60000)
           } else { // else run next tick
@@ -199,9 +194,8 @@ class API {
           if (__DEBUG__.INTERVAL) global.log.info(chalk.yellow('getChannelChattersUnofficialAPI() ') + JSON.stringify(value))
 
           if (value.state) { // if is ok, update opts and run unlock after a while
-            value.opts = value.opts || {}
+            if (typeof value.opts !== 'undefined') this.timeouts['getChannelChattersUnofficialAPI'].opts = value.opts
             setTimeout(() => {
-              this.timeouts['getChannelChattersUnofficialAPI'].opts = value.opts
               this.timeouts['getChannelChattersUnofficialAPI'].isRunning = false
             }, 60000)
           } else { // else run next tick
@@ -224,9 +218,8 @@ class API {
 
           if (value.disable) return
           if (value.state) { // if is ok, update opts and run unlock after a while
-            value.opts = value.opts || {}
+            if (typeof value.opts !== 'undefined') this.timeouts['getChannelSubscribersOldAPI'].opts = value.opts
             setTimeout(() => {
-              this.timeouts['getChannelSubscribersOldAPI'].opts = value.opts
               this.timeouts['getChannelSubscribersOldAPI'].isRunning = false
             }, 60000)
           } else { // else run next tick
@@ -248,9 +241,8 @@ class API {
           if (__DEBUG__.INTERVAL) global.log.info(chalk.yellow('getChannelDataOldAPI() ') + JSON.stringify(value))
 
           if (value.state) { // if is ok, update opts and run unlock after a while
-            value.opts = value.opts || {}
+            if (typeof value.opts !== 'undefined') this.timeouts['getChannelDataOldAPI'].opts = value.opts
             setTimeout(() => {
-              this.timeouts['getChannelDataOldAPI'].opts = value.opts
               this.timeouts['getChannelDataOldAPI'].isRunning = false
             }, 60000)
           } else { // else run next tick
@@ -272,9 +264,8 @@ class API {
           if (__DEBUG__.INTERVAL) global.log.info(chalk.yellow('intervalFollowerUpdate() ') + JSON.stringify(value))
 
           if (value.state) { // if is ok, update opts and run unlock after a while
-            value.opts = value.opts || {}
+            if (typeof value.opts !== 'undefined') this.timeouts['intervalFollowerUpdate'].opts = value.opts
             setTimeout(() => {
-              this.timeouts['intervalFollowerUpdate'].opts = value.opts
               this.timeouts['intervalFollowerUpdate'].isRunning = false
             }, 60000)
           } else { // else run next tick
@@ -296,9 +287,8 @@ class API {
           if (__DEBUG__.INTERVAL) global.log.info(chalk.yellow('checkClips() ') + JSON.stringify(value))
 
           if (value.state) { // if is ok, update opts and run unlock after a while
-            value.opts = value.opts || {}
+            if (typeof value.opts !== 'undefined') this.timeouts['checkClips'].opts = value.opts
             setTimeout(() => {
-              this.timeouts['checkClips'].opts = value.opts
               this.timeouts['checkClips'].isRunning = false
             }, 60000)
           } else { // else run next tick
