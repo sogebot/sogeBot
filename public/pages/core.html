@@ -31,7 +31,7 @@
                     :value="currentValue"
                     :values="ui[category][defaultValue].values"
                     @update="value[defaultValue] = $event.value; triggerDataChange()"
-                    :title="'systems.' + selected + '.settings.' + defaultValue"
+                    :title="'systems.' + selectedSystem + '.settings.' + defaultValue"
                     :current="value[ui[category][defaultValue].current]"
                     class="pt-1 pb-1"></component>
                 </template>
@@ -64,7 +64,7 @@
                     class="pt-1 pb-1"
                     v-bind:type="typeof currentValue"
                     v-bind:value="currentValue"
-                    v-bind:title="'systems.' + selected + '.settings.' + defaultValue"
+                    v-bind:title="'systems.' + selectedSystem + '.settings.' + defaultValue"
                     :permission="settings._permissions[defaultValue]"
                     v-on:update="value[defaultValue] = $event.value; triggerDataChange()">
                   </number-input>
@@ -155,7 +155,6 @@
       },
       watch: {
         selectedSystem: function (valueNew, valueOld) {
-          window.location.hash = '#core-' + system
           this.loadSystemSettings(valueNew)
         }
       },
@@ -239,6 +238,7 @@
           this.isDataChanged = false; this.isDataChanged = true
         },
         setSystem: function (system) {
+          window.location.hash = '#core-' + system
           if (this.state.settings === 0) this.selectedSystem = system
         },
         saveSettings: function () {
