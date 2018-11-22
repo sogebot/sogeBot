@@ -135,6 +135,7 @@ class INeDB extends Interface {
         })
       } catch (e) {
         global.log.error(e.message)
+        global.log.error(JSON.stringify({ table, where }))
         throw e
       }
     })
@@ -154,6 +155,7 @@ class INeDB extends Interface {
         })
       } catch (e) {
         global.log.error(e.message)
+        global.log.error(JSON.stringify({ table, where }))
         throw e
       }
     })
@@ -175,6 +177,7 @@ class INeDB extends Interface {
         })
       } catch (e) {
         global.log.error(e.message)
+        global.log.error(JSON.stringify({ table, object }))
         throw e
       }
     })
@@ -192,6 +195,7 @@ class INeDB extends Interface {
         })
       } catch (e) {
         global.log.error(e.message)
+        global.log.error(JSON.stringify({ table, where }))
         throw e
       }
     })
@@ -212,6 +216,7 @@ class INeDB extends Interface {
         })
       } catch (e) {
         global.log.error(e.message)
+        global.log.error(JSON.stringify({ table, object, where }))
         throw e
       }
     })
@@ -232,6 +237,7 @@ class INeDB extends Interface {
         })
       } catch (e) {
         global.log.error(e.message)
+        global.log.error(JSON.stringify({ table, object, where }))
         throw e
       }
     })
@@ -252,6 +258,7 @@ class INeDB extends Interface {
         })
       } catch (e) {
         global.log.error(e.message)
+        global.log.error(JSON.stringify({ table, object, where }))
         throw e
       }
     })
@@ -270,6 +277,7 @@ class INeDB extends Interface {
         })
       } catch (e) {
         global.log.error(e.message)
+        global.log.error(JSON.stringify({ table }))
         throw e
       }
     })
