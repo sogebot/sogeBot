@@ -66,7 +66,7 @@ class Webhooks {
 
     switch (type) {
       case 'follows':
-        request.push(`hub.topic=https://api.twitch.tv/helix/users/follows?to_id=${cid}`)
+        request.push(`hub.topic=https://api.twitch.tv/helix/users/follows?first=1&to_id=${cid}`)
         await axios({
           method: 'post',
           url: request.join('&'),
