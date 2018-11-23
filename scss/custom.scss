@@ -1,3 +1,11 @@
+// transitions
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .5s;
+}
+.fade-enter, .fade-leave-to {
+  opacity: 0;
+}
+
 div.CodeMirror span.CodeMirror-matchingbracket {color: black !important; font-weight:bold;}
 
 // remove annoying button glow
@@ -1268,7 +1276,7 @@ blockquote {
   border-bottom-width: 3px;
 }
 
-.btn {
+.btn, .alert {
   font-family: 'PT Sans Narrow', sans-serif;
 }
 

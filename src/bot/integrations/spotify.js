@@ -7,7 +7,6 @@ const _ = require('lodash')
 const chalk = require('chalk')
 const SpotifyWebApi = require('spotify-web-api-node')
 const crypto = require('crypto')
-const urljoin = require('url-join')
 const cluster = require('cluster')
 
 // bot libraries
@@ -30,7 +29,6 @@ class Spotify extends Integration {
       _: {
         accessToken: '',
         refreshToken: '',
-        code: '',
         currentSong: JSON.stringify({})
       },
       output: {
@@ -45,6 +43,10 @@ class Spotify extends Integration {
     }
     const ui = {
       connection: {
+        username: {
+          type: 'text-input',
+          readOnly: true
+        },
         clientId: {
           type: 'text-input',
           secret: true
@@ -53,21 +55,27 @@ class Spotify extends Integration {
           type: 'text-input',
           secret: true
         },
-        username: {
-          type: 'text-input',
-          readOnly: true
-        },
-        overlay: {
+        authorize: {
           type: 'button-socket',
           on: '/integrations/spotify',
+          class: 'btn btn-primary btn-block',
+          text: 'integrations.spotify.settings.authorize',
+          if: '!connection.username',
+          emit: 'authorize'
+        },
+        revoke: {
+          type: 'button-socket',
+          on: '/integrations/spotify',
+          if: 'connection.username',
           emit: 'revoke',
           class: 'btn btn-primary btn-block',
-          rawText: 'revoke'
+          text: 'integrations.spotify.settings.revoke'
         }
       }
     }
     const onChange = {
-      enabled: ['onStateChange']
+      enabled: ['onStateChange'],
+      'connection.username': ['onUsernameChange']
     }
 
     super({ settings, ui, onChange })
@@ -77,6 +85,10 @@ class Spotify extends Integration {
       this.timeouts.ICurrentSong = setTimeout(() => this.ICurrentSong(), 10000)
       this.timeouts.getMe = setTimeout(() => this.getMe(), 10000)
     }
+  }
+
+  onUsernameChange (key: string, value: string) {
+    if (value.length > 0) global.log.info(chalk.yellow('SPOTIFY: ') + `Access to account ${value} granted`)
   }
 
   onStateChange (key: string, value: string) {
@@ -114,11 +126,11 @@ class Spotify extends Integration {
         song: data.body.item.name,
         artist: data.body.item.artists[0].name,
         is_playing: data.body.is_playing,
-        is_enabled: await this.status({ log: false })
+        is_enabled: this.settings.enabled
       }
-      this.currentSong = JSON.stringify(song)
+      this.settings._.currentSong = JSON.stringify(song)
     } catch (e) {
-      this.currentSong = JSON.stringify({})
+      this.settings._.currentSong = JSON.stringify({})
     }
     this.timeouts['ICurrentSong'] = setTimeout(() => this.ICurrentSong(), 10000)
   }
@@ -127,7 +139,7 @@ class Spotify extends Integration {
     clearTimeout(this.timeouts['IRefreshToken'])
 
     try {
-      if (!_.isNil(this.client)) {
+      if (!_.isNil(this.client) && this.settings._.refreshToken) {
         let data = await this.client.refreshAccessToken()
         this.settings._.accessToken = data.body['access_token']
       }
@@ -142,32 +154,72 @@ class Spotify extends Integration {
 
     io.on('connection', (socket) => {
       socket.on('state', async (callback) => {
-        callback(null, await this.state)
+        callback(null, this.state)
       })
       socket.on('code', async (token, callback) => {
-        this.code = token
-        setTimeout(() => this.status(), 5000)
+        const waitForUsername = () => {
+          return new Promise((resolve, reject) => {
+            let check = async (resolve) => {
+              this.client.getMe()
+                .then((data) => {
+                  this.settings.connection.username = data.body.display_name ? data.body.display_name : data.body.id
+                  resolve()
+                }, () => {
+                  setTimeout(() => {
+                    check(resolve)
+                  }, 1000)
+                })
+            }
+            check(resolve)
+          })
+        }
+
+        this.currentSong = JSON.stringify({})
+        await this.connect({ token })
+        await waitForUsername()
         callback(null, true)
       })
-      socket.on('getMe', async (callback) => {
-        callback(null, await this.getMe())
-      })
-      socket.on('getCurrentSong', async (callback) => {
-        callback(null, await this.getCurrentSong())
-      })
-      socket.on('authorize', async (cb) => {
-        cb(null, await this.authorizeURI())
-      })
       socket.on('revoke', async (cb) => {
+        clearTimeout(this.timeouts['IRefreshToken'])
+
+        const username = this.settings.connection.username
+        this.client.resetAccessToken()
+        this.client.resetRefreshToken()
         this.settings._.accessToken = null
         this.settings._.refreshToken = null
+        this.settings.connection.username = ''
         this.settings._.currentSong = JSON.stringify({})
-        cb(null, null)
+
+        global.log.info(chalk.yellow('SPOTIFY: ') + `Access to account ${username} is revoked`)
+
+        this.timeouts['IRefreshToken'] = setTimeout(() => this.IRefreshToken(), 60000)
+        cb(null, { do: 'refresh' })
+      })
+      socket.on('authorize', async (cb) => {
+        if (
+          this.settings.connection.clientId === '' ||
+          this.settings.connection.clientSecret === ''
+        ) {
+          cb('Cannot authorize! Missing clientId or clientSecret.', null)
+        } else {
+          try {
+            const authorizeURI = this.authorizeURI()
+            if (!authorizeURI) cb('Integration must enabled to authorize')
+            else {
+              cb(null, { do: 'redirect', opts: [authorizeURI] })
+            }
+          } catch (e) {
+            global.log.error(e.stack)
+            cb(e.stack, null)
+          }
+        }
       })
     })
   }
 
-  connect () {
+  connect (opts) {
+    opts = opts || {}
+    let isNewConnection = this.client === null
     try {
       let error = []
       if (this.settings.connection.clientId.trim().length === 0) error.push('clientId')
@@ -175,28 +227,34 @@ class Spotify extends Integration {
       if (this.settings.connection.redirectURI.trim().length === 0) error.push('redirectURI')
       if (error.length > 0) throw new Error(error.join(', ') + 'missing')
 
-      let url = urljoin(this.settings.connection.redirectURI, 'oauth', 'spotify')
-      this.client = new SpotifyWebApi({
-        clientId: this.settings.connection.clientId,
-        clientSecret: this.settings.connection.clientSecret,
-        redirectUri: url
-      })
+      if (!this.client) {
+        this.client = new SpotifyWebApi({
+          clientId: this.settings.connection.clientId,
+          clientSecret: this.settings.connection.clientSecret,
+          redirectUri: this.settings.connection.redirectURI
+        })
+      }
 
       try {
-        if (!_.isNil(this.settings._.code) && !_.isNil(this.client)) {
-          this.client.authorizationCodeGrant(this.settings._.code)
+        if (opts.token && !_.isNil(this.client)) {
+          this.client.authorizationCodeGrant(opts.token)
             .then((data) => {
-              this.accessToken = data.body['access_token']
-              this.refreshToken = data.body['refresh_token']
+              this.settings._.accessToken = data.body['access_token']
+              this.settings._.refreshToken = data.body['refresh_token']
+
+              this.client.setAccessToken(this.settings._.accessToken)
+              this.client.setRefreshToken(this.settings._.refreshToken)
+            }, (err) => {
+              if (err) global.log.info(chalk.yellow('SPOTIFY: ') + 'Getting of accessToken and refreshToken failed')
             })
-          this.settings._.code = null
         }
-        if (!_.isNil(this.client) && !_.isNil(this.settings._.accessToken)) {
+        if (!_.isNil(this.client) && this.settings._.accessToken && this.settings._.refreshToken) {
           this.client.setAccessToken(this.settings._.accessToken)
           this.client.setRefreshToken(this.settings._.refreshToken)
         }
-        global.log.info(chalk.yellow('SPOTIFY: ') + 'Client connected to service')
+        if (isNewConnection) global.log.info(chalk.yellow('SPOTIFY: ') + 'Client connected to service')
       } catch (e) {
+        global.log.error(e.stack)
         global.log.info(chalk.yellow('SPOTIFY: ') + 'Client connection failed')
       }
     } catch (e) {

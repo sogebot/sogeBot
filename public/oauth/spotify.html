@@ -52,7 +52,7 @@
         if (urlState === state) {
           $('#stateOk').removeClass('d-none')
           socket.emit('code', urlCode, (err, cb) => {
-            setTimeout(() => window.location.href = window.location.origin + "/#integrations", 5000)
+            window.location.href = window.location.origin + "/#integrations-spotify"
           })
         } else {
           $('#stateError').removeClass('d-none')

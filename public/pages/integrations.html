@@ -25,6 +25,14 @@
                     <template v-else>{{ commons.translate(currentValue.text) }}</template>
                   </a>
                 </template>
+                <component
+                    v-else
+                    :token="token"
+                    :class="ui[category][defaultValue].class"
+                    :is="ui[category][defaultValue].type"
+                    :object="ui[category][defaultValue]"
+                    @error="triggerError($event)"
+                    class="pt-1 pb-1"></component>
               </div>
               <div v-if="typeof value === 'object' && !defaultValue.startsWith('_') && currentValue !== null" class="p-0 pl-2 pr-2 " v-for="(currentValue, defaultValue) of value">
                 <template v-if="typeof ui[category] !== 'undefined' && typeof ui[category][defaultValue] !== 'undefined'">
@@ -94,20 +102,27 @@
       <div class="col-lg-3 col-md-4 col-sm-6">
         <div class="sticky-top" style="top: 80px">
           <div class="widget pt-1 mt-3 border-0 bg-light" style="height: auto">
-
           <div class="pl-2 pr-2 pb-4">
-              <div v-if="isDataChanged" class="btn btn-block alert-warning" style="cursor: initial">
+            <transition name="fade">
+              <div v-show="isDataChanged" class="alert alert-warning" style="cursor: initial">
                 <i class="fas fa-exclamation-circle mr-1"></i>
                 {{commons.translate('dialog.changesPending')}}
               </div>
-              <button class="btn btn-block btn-primary" v-on:click="saveSettings" v-if="state.settings === 0">{{ commons.translate('dialog.buttons.saveChanges.idle') }}</button>
-              <button disabled="disabled" class="btn btn-block btn-primary" v-on:click="saveSettings" v-if="state.settings === 1">
-                <i class="fas fa-circle-notch fa-spin"></i> {{ commons.translate('dialog.buttons.saveChanges.progress') }}</button>
-              <button disabled="disabled" class="btn btn-block btn-success" v-on:click="saveSettings" v-if="state.settings === 2">
-                <i class="fas fa-check"></i> {{ commons.translate('dialog.buttons.saveChanges.done') }}</button>
-              <button disabled="disabled" class="btn btn-block btn-danger" v-on:click="saveSettings" v-if="state.settings === 3">
-                <i class="fas fa-check"></i> {{ commons.translate('dialog.buttons.something-went-wrong') }}</button>
-            </div>
+            </transition>
+            <transition name="fade">
+              <div class="alert alert-danger" v-show="error && showError" style="cursor: initial">
+                <i class="fas fa-exclamation-triangle mr-1"></i>
+                {{ error }}
+              </div>
+            </transition>
+            <button class="btn btn-block btn-primary" v-on:click="saveSettings" v-if="state.settings === 0">{{ commons.translate('dialog.buttons.saveChanges.idle') }}</button>
+            <button disabled="disabled" class="btn btn-block btn-primary" v-on:click="saveSettings" v-if="state.settings === 1">
+              <i class="fas fa-circle-notch fa-spin"></i> {{ commons.translate('dialog.buttons.saveChanges.progress') }}</button>
+            <button disabled="disabled" class="btn btn-block btn-success" v-on:click="saveSettings" v-if="state.settings === 2">
+              <i class="fas fa-check"></i> {{ commons.translate('dialog.buttons.saveChanges.done') }}</button>
+            <button disabled="disabled" class="btn btn-block btn-danger" v-on:click="saveSettings" v-if="state.settings === 3">
+              <i class="fas fa-check"></i> {{ commons.translate('dialog.buttons.something-went-wrong') }}</button>
+          </div>
 
             <div class="pl-2 pr-2" v-for="system of list">
               <button
@@ -149,18 +164,22 @@
         'number-input': numberInput,
         'command-input-with-permission': commandInputWithPermissions,
         'textarea-from-array': textAreaFromArray,
-        'selector': selector
+        'selector': selector,
+        'button-socket': buttonSocket
       },
       data: {
         socket: {
           _panel: io({ query: "token=" + token })
         },
+        token,
         list: [],
         selected: null,
         type: 'integrations',
         settings: { settings: {} },
         ui: { settings: {} },
         isDataChanged: false,
+        error: null,
+        showError: false,
 
         state: {
           loading: 0,
@@ -249,6 +268,11 @@
               'border-left-width': '5px !important',
               'border-color': 'transparent'
             }
+        },
+        triggerError: function (error) {
+          this.error = error
+          this.showError = true
+          setTimeout(() => this.showError = false, 2000)
         },
         triggerDataChange: function () {
           this.isDataChanged = false; this.isDataChanged = true

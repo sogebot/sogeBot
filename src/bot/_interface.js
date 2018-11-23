@@ -134,17 +134,20 @@ class Module {
               // check if types match
               // skip when saving to undefined
               if (typeof target[key] !== 'undefined') {
-                if (typeof target[key] !== typeof value) {
-                  const error = path + '.' + key + ' set failed\n\texpected:\t' + typeof target[key] + '\n\tset:     \t' + typeof value
-                  // try retype if expected is number and we got string (from ui settings e.g.)
-                  if (typeof target[key] === 'number') {
-                    value = Number(value)
-                    if (isNaN(value)) throw new Error(error)
-                  } else throw new Error(error)
-                }
+                // if default value is null or new value is null -> skip checks
+                if (value !== null && target[key] !== null) {
+                  if (typeof target[key] !== typeof value) {
+                    const error = path + '.' + key + ' set failed\n\texpected:\t' + typeof target[key] + '\n\tset:     \t' + typeof value
+                    // try retype if expected is number and we got string (from ui settings e.g.)
+                    if (typeof target[key] === 'number') {
+                      value = Number(value)
+                      if (isNaN(value)) throw new Error(error)
+                    } else throw new Error(error)
+                  }
 
-                target[key] = value
-                this.updateSettings(`${path}.${key}`, value)
+                  target[key] = value
+                  this.updateSettings(`${path}.${key}`, value)
+                }
               }
               return true
             }
