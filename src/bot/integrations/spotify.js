@@ -175,7 +175,7 @@ class Spotify extends Integration {
         }
 
         this.currentSong = JSON.stringify({})
-        await this.connect({ token })
+        this.connect({ token })
         await waitForUsername()
         callback(null, true)
       })
