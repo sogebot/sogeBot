@@ -217,7 +217,7 @@ class Spotify extends Integration {
     })
   }
 
-  connect (opts) {
+  connect (opts: Object) {
     opts = opts || {}
     let isNewConnection = this.client === null
     try {
