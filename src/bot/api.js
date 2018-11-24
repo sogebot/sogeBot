@@ -747,6 +747,7 @@ class API {
       if (request.status === 200 && !_.isNil(request.data.data)) {
         // check if user id is in db, not in db load username from API
         for (let f of request.data.data) {
+          f.from_name = String(f.from_name).toLowerCase()
           let user = await global.users.getById(f.from_id)
           user.username = f.from_name
           global.db.engine.update('users', { id: f.from_id }, { username: f.from_name })
