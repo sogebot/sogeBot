@@ -201,6 +201,7 @@ class Webhooks {
 
       const user = await global.users.getById(data.from_id)
 
+      data.from_name = String(data.from_name).toLowerCase()
       user.username = data.from_name
       global.db.engine.update('users', { id: data.from_id }, { username: data.from_name })
 
