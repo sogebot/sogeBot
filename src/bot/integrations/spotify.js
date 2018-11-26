@@ -60,12 +60,14 @@ class Spotify extends Integration {
           on: '/integrations/spotify',
           class: 'btn btn-primary btn-block',
           text: 'integrations.spotify.settings.authorize',
+          // $FlowFixMe - flow is complaining about 'this', although its used after super
           if: () => this.settings.connection.username.length === 0,
           emit: 'authorize'
         },
         revoke: {
           type: 'button-socket',
           on: '/integrations/spotify',
+          // $FlowFixMe - flow is complaining about 'this', although its used after super
           if: () => this.settings.connection.username.length > 0,
           emit: 'revoke',
           class: 'btn btn-primary btn-block',
