@@ -132,17 +132,20 @@ class Module {
             set: (target, key, value) => {
               if (_.isEqual(target[key], value)) return true
               // check if types match
-              if (typeof target[key] !== typeof value) {
-                const error = path + '.' + key + ' set failed\n\texpected:\t' + typeof target[key] + '\n\tset:     \t' + typeof value
-                // try retype if expected is number and we got string (from ui settings e.g.)
-                if (typeof target[key] === 'number') {
-                  value = Number(value)
-                  if (isNaN(value)) throw new Error(error)
-                } else throw new Error(error)
-              }
+              // skip when saving to undefined
+              if (typeof target[key] !== 'undefined') {
+                if (typeof target[key] !== typeof value) {
+                  const error = path + '.' + key + ' set failed\n\texpected:\t' + typeof target[key] + '\n\tset:     \t' + typeof value
+                  // try retype if expected is number and we got string (from ui settings e.g.)
+                  if (typeof target[key] === 'number') {
+                    value = Number(value)
+                    if (isNaN(value)) throw new Error(error)
+                  } else throw new Error(error)
+                }
 
-              target[key] = value
-              this.updateSettings(`${path}.${key}`, value)
+                target[key] = value
+                this.updateSettings(`${path}.${key}`, value)
+              }
               return true
             }
           })
@@ -153,10 +156,11 @@ class Module {
       set: (target, key, value) => {
         if (_.isEqual(target[key], value)) return true
         // check if types match
-        if (typeof target[key] !== typeof value) throw new Error(key + ' set failed\n\texpected:\t' + typeof target[key] + '\n\tset:     \t' + typeof value)
-
-        target[key] = value
-        this.updateSettings(key, value)
+        if (typeof target[key] !== 'undefined') {
+          if (typeof target[key] !== typeof value) throw new Error(key + ' set failed\n\texpected:\t' + typeof target[key] + '\n\tset:     \t' + typeof value)
+          target[key] = value
+          this.updateSettings(key, value)
+        }
         return true
       }
     })
