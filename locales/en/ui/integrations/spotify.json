@@ -1,0 +1,15 @@
+{
+  "settings": {
+    "enabled": "Status",
+    "clientId": "clientId",
+    "clientSecret": "clientSecret",
+    "redirectURI": "redirectURI",
+    "format": {
+      "title": "Format",
+      "help": "Available variables: $song, $artist"
+    },
+    "username": "Authorized user",
+    "revoke": "Revoke user authorization",
+    "authorize": "Authorize user"
+  }
+}

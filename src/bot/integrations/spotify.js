@@ -60,13 +60,13 @@ class Spotify extends Integration {
           on: '/integrations/spotify',
           class: 'btn btn-primary btn-block',
           text: 'integrations.spotify.settings.authorize',
-          if: '!connection.username',
+          if: () => this.settings.connection.username.length === 0,
           emit: 'authorize'
         },
         revoke: {
           type: 'button-socket',
           on: '/integrations/spotify',
-          if: 'connection.username',
+          if: () => this.settings.connection.username.length > 0,
           emit: 'revoke',
           class: 'btn btn-primary btn-block',
           text: 'integrations.spotify.settings.revoke'
