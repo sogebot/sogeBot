@@ -31,7 +31,7 @@
                     :value="currentValue"
                     :values="ui[category][defaultValue].values"
                     @update="value[defaultValue] = $event.value; triggerDataChange()"
-                    :title="'systems.' + selectedSystem + '.settings.' + defaultValue"
+                    :title="'core.' + selectedSystem + '.settings.' + defaultValue"
                     :current="value[ui[category][defaultValue].current]"
                     class="pt-1 pb-1"></component>
                 </template>
@@ -47,7 +47,7 @@
                   ></command-input-with-permission>
                   <toggle
                     class="pt-1 pb-1"
-                    v-bind:title="commons.translate('systems.' + selectedSystem + '.settings.' + defaultValue)"
+                    v-bind:title="commons.translate('core.' + selectedSystem + '.settings.' + defaultValue)"
                     v-else-if="typeof currentValue === 'boolean'"
                     v-bind:value="currentValue"
                     v-on:update="value[defaultValue] = !value[defaultValue]; triggerDataChange()"
@@ -56,7 +56,7 @@
                     class="pt-1 pb-1"
                     v-else-if="currentValue.constructor === Array"
                     v-bind:value="currentValue"
-                    v-bind:title="commons.translate('systems.' + selectedSystem + '.settings.' + defaultValue)"
+                    v-bind:title="commons.translate('core.' + selectedSystem + '.settings.' + defaultValue)"
                     v-on:update="value[defaultValue] = $event; triggerDataChange()"
                   ></textarea-from-array>
                   <number-input
@@ -64,7 +64,7 @@
                     class="pt-1 pb-1"
                     v-bind:type="typeof currentValue"
                     v-bind:value="currentValue"
-                    v-bind:title="'systems.' + selectedSystem + '.settings.' + defaultValue"
+                    v-bind:title="'core.' + selectedSystem + '.settings.' + defaultValue"
                     :permission="settings._permissions[defaultValue]"
                     v-on:update="value[defaultValue] = $event.value; triggerDataChange()">
                   </number-input>
@@ -73,17 +73,15 @@
                     class="pt-1 pb-1"
                     v-bind:type="typeof currentValue"
                     v-bind:value="currentValue"
-                    v-bind:title="'systems.' + selectedSystem + '.settings.' + defaultValue"
+                    v-bind:title="'core.' + selectedSystem + '.settings.' + defaultValue"
                     :permission="settings._permissions[defaultValue]"
                     v-on:update="value[defaultValue] = $event.value; triggerDataChange()"
                   ></text-input>
                 </template>
               </div>
-              <div v-if="typeof value === 'object'" class="p-0 pl-2 pr-2 " v-for="(currentValue, defaultValue) of ui[category]">
-                <template v-if="typeof value[defaultValue] === 'undefined'">
-                  <template v-if="ui[category][defaultValue].type === 'link'">
-                    <a :href="currentValue.href" class="mt-1 mb-1" :class="currentValue.class" :target="currentValue.target">{{ commons.translate(currentValue.text) }}</a>
-                  </template>
+              <div v-if="typeof value === 'object' && (typeof value[defaultValue] === 'undefined' || value[defaultValue] === null)" class="p-0 pl-2 pr-2 " v-for="(currentValue, defaultValue) of ui[category]">
+                <template v-if="ui[category][defaultValue].type === 'link'">
+                  <a :href="currentValue.href" class="mt-1 mb-1" :class="currentValue.class" :target="currentValue.target">{{ commons.translate(currentValue.text) }}</a>
                 </template>
               </div>
             </div>
@@ -96,10 +94,18 @@
           <div class="widget pt-1 mt-3 border-0 bg-light" style="height: auto">
 
             <div class="pl-2 pr-2 pb-4">
-              <div v-if="isDataChanged" class="btn btn-block alert-warning" style="cursor: initial">
-                <i class="fas fa-exclamation-circle mr-1"></i>
-                {{commons.translate('dialog.changesPending')}}
-              </div>
+              <transition name="fade">
+                <div v-show="isDataChanged" class="alert alert-warning" style="cursor: initial">
+                  <i class="fas fa-exclamation-circle mr-1"></i>
+                  {{commons.translate('dialog.changesPending')}}
+                </div>
+              </transition>
+              <transition name="fade">
+                <div class="alert alert-danger" v-show="error && showError" style="cursor: initial">
+                  <i class="fas fa-exclamation-triangle mr-1"></i>
+                  {{ error }}
+                </div>
+              </transition>
               <button class="btn btn-block btn-primary" v-on:click="saveSettings" v-if="state.settings === 0">{{ commons.translate('dialog.buttons.saveChanges.idle') }}</button>
               <button disabled="disabled" class="btn btn-block btn-primary" v-on:click="saveSettings" v-if="state.settings === 1">
                 <i class="fas fa-circle-notch fa-spin"></i> {{ commons.translate('dialog.buttons.saveChanges.progress') }}</button>
@@ -147,6 +153,8 @@
         settings: { settings: {} },
         ui: { settings: {} },
         isDataChanged: false,
+        error: null,
+        showError: false,
 
         state: {
           loading: 0,
@@ -207,12 +215,12 @@
 
             // ui
             // everything else except commands and enabled and are string|number|bool
-            for (let [name, value] of _(_ui.filter(o => o[0] !== '_' && o[0] !== 'enabled' && o[0] !== 'commands' && typeof o[1] !== 'object')).value()) {
+            for (let [name, value] of _(_ui.filter(o => o[0] !== '_' && o[0] !== 'enabled' && o[0] !== 'commands' && typeof o[1].type !== 'undefined')).value()) {
               if (typeof this.settings.settings[name] === 'undefined') this.settings.settings[name] = null
               this.ui.settings[name] = value
             }
             // everything else except commands and enabled and are objects -> own category
-            for (let [name, value] of _(_ui.filter(o => o[0] !== '_' && o[0] !== 'enabled' && o[0] !== 'commands' && typeof o[1] === 'object')).value()) {
+            for (let [name, value] of _(_ui.filter(o => o[0] !== '_' && o[0] !== 'enabled' && o[0] !== 'commands' && typeof o[1].type === 'undefined')).value()) {
               if (typeof this.settings[name] === 'undefined') this.settings[name] = {}
               for (let [k, v] of Object.entries(value)) {
                 if (typeof this.settings[name][k] === 'undefined') this.settings[name][k] = null
@@ -233,6 +241,11 @@
               'border-left-width': '5px !important',
               'border-color': 'transparent'
             }
+        },
+        triggerError: function (error) {
+          this.error = error
+          this.showError = true
+          setTimeout(() => this.showError = false, 2000)
         },
         triggerDataChange: function () {
           this.isDataChanged = false; this.isDataChanged = true

@@ -1,0 +1,10 @@
+{
+  "settings": {
+    "channel": "Channel",
+    "owners": "Owners",
+    "accessToken": "AccessToken",
+    "refreshToken": "RefreshToken",
+    "username": "Username",
+    "scopes": "Scopes"
+  }
+}

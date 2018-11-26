@@ -1,0 +1,10 @@
+{
+  "settings": {
+    "channel": "Kanál",
+    "owners": "Vlastníci",
+    "accessToken": "AccessToken",
+    "refreshToken": "RefreshToken",
+    "username": "Uživatelské jméno",
+    "scopes": "Scopes"
+  }
+}
