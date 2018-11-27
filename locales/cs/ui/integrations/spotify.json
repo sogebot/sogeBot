@@ -10,6 +10,11 @@
     },
     "username": "Autorizovaný uživatel",
     "revoke": "Zrušit autorizaci uživatele",
-    "authorize": "Autorizovat uživatele"
+    "authorize": "Autorizovat uživatele",
+    "scopes": "Scopes",
+    "playlistToPlay": {
+      "title": "Hlavní playlist",
+      "help": "Pokud bude nastaveno, po requestu bude hrát tento playlist"
+    }
   }
 }

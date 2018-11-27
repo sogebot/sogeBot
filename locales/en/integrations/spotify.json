@@ -1,0 +1,4 @@
+{
+  "song-not-found": "Promin, $sender, skladba nebyla nalezena na spotify",
+  "song-requested": "$sender, pridal si $name od $artist do spotify queue"
+}

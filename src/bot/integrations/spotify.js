@@ -8,8 +8,11 @@ const chalk = require('chalk')
 const SpotifyWebApi = require('spotify-web-api-node')
 const crypto = require('crypto')
 const cluster = require('cluster')
+const axios = require('axios')
 
 // bot libraries
+const constants = require('../constants')
+const Expects = require('../expects.js')
 const Integration = require('./_interface')
 
 /*
@@ -21,24 +24,43 @@ const Integration = require('./_interface')
  */
 
 class Spotify extends Integration {
-  scopes: Array<string> = [ 'user-read-currently-playing', 'user-read-private', 'user-read-email' ]
   client: any = null
+  uris: Array<string> = []
+  currentUris: Array<string> = []
+  originalUri: string | null = null
 
   constructor () {
     const settings = {
+      commands: [
+        { name: '!spotify', permission: constants.VIEWERS }
+      ],
       _: {
         accessToken: '',
         refreshToken: '',
+        userId: null,
+        playlistId: null,
         currentSong: JSON.stringify({})
       },
       output: {
-        format: '$song - $artist'
+        format: '$song - $artist',
+        playlistToPlay: ''
       },
       connection: {
         clientId: '',
         clientSecret: '',
         redirectURI: '',
-        username: ''
+        username: '',
+        scopes: [
+          'user-read-currently-playing',
+          'user-read-private',
+          'user-read-email',
+          'playlist-modify-public',
+          'playlist-modify',
+          'playlist-read-collaborative',
+          'playlist-modify-private',
+          'playlist-read-private',
+          'user-modify-playback-state' ],
+        _authenticatedScopes: []
       }
     }
     const ui = {
@@ -46,6 +68,10 @@ class Spotify extends Integration {
         username: {
           type: 'text-input',
           readOnly: true
+        },
+        scopes: {
+          type: 'check-list',
+          current: '_authenticatedScopes'
         },
         clientId: {
           type: 'text-input',
@@ -86,6 +112,7 @@ class Spotify extends Integration {
       this.timeouts.IRefreshToken = setTimeout(() => this.IRefreshToken(), 60000)
       this.timeouts.ICurrentSong = setTimeout(() => this.ICurrentSong(), 10000)
       this.timeouts.getMe = setTimeout(() => this.getMe(), 10000)
+      setInterval(() => this.sendSongs(), 500)
     }
   }
 
@@ -101,12 +128,89 @@ class Spotify extends Integration {
     } else this.disconnect()
   }
 
+  async sendSongs () {
+    if (!this.settings._.userId || !this.settings.enabled) {
+      return
+    }
+
+    const song = JSON.parse(this.settings._.currentSong)
+
+    // if song is not part of currentUris => save context
+    if (typeof song.uri !== 'undefined' && !this.currentUris.includes(song.uri) && this.uris.length === 0) {
+      this.originalUri = song.uri
+    }
+
+    // if song is part of currentUris and is playing, do nothing
+    if (typeof song.uri !== 'undefined' && this.currentUris.includes(song.uri) && song.is_playing) {
+      return
+    }
+
+    // if song is part of currentUris and is not playing (finished playing), continue from playlist if set
+    if (typeof song.uri !== 'undefined' && this.currentUris.includes(song.uri) && !song.is_playing && this.uris.length === 0) {
+      if (this.settings.output.playlistToPlay.length > 0) {
+        this.currentUris = []
+        try {
+          // play from playlist
+          const offset = this.originalUri ? { uri: this.originalUri } : undefined
+          await axios({
+            method: 'put',
+            url: 'https://api.spotify.com/v1/me/player/play',
+            headers: {
+              'Authorization': 'Bearer ' + this.settings._.accessToken,
+              'Content-Type': 'application/json'
+            },
+            data: {
+              context_uri: this.settings.output.playlistToPlay,
+              offset
+            }
+          })
+          // skip to next song in playlist
+          await axios({
+            method: 'post',
+            url: 'https://api.spotify.com/v1/me/player/next',
+            headers: {
+              'Authorization': 'Bearer ' + this.settings._.accessToken
+            }
+          })
+        } catch (e) {
+          global.log.error(e.stack)
+        }
+      }
+    } else if (this.uris.length > 0) { // or we have requests
+      if (Date.now() - song.finished_at <= 0 || this.originalUri !== song.uri || this.originalUri === null || !song.is_playing) { // song should be finished
+        try {
+          this.currentUris = [...this.uris]
+          this.uris = []
+          await axios({
+            method: 'put',
+            url: 'https://api.spotify.com/v1/me/player/play',
+            headers: {
+              'Authorization': 'Bearer ' + this.settings._.accessToken,
+              'Content-Type': 'application/json'
+            },
+            data: {
+              uris: this.currentUris
+            }
+          })
+
+          // force is_playing and uri just to not skip until track refresh
+          song.uri = this.currentUris[0]
+          song.is_playing = true
+          this.settings._.currentSong = JSON.stringify(song)
+        } catch (e) {
+          global.log.error(e.stack)
+        }
+      }
+    }
+  }
+
   async getMe () {
     clearTimeout(this.timeouts['getMe'])
 
     try {
       if (this.settings.enabled && !_.isNil(this.client)) {
         let data = await this.client.getMe()
+        this.settings._.userId = data.body.id
         this.settings.connection.username = data.body.display_name ? data.body.display_name : data.body.id
       }
     } catch (e) {
@@ -114,6 +218,7 @@ class Spotify extends Integration {
         global.log.info(chalk.yellow('SPOTIFY: ') + 'Get of user failed, check your credentials')
       }
       this.settings.connection.username = ''
+      this.settings._.userId = null
     }
 
     this.timeouts['getMe'] = setTimeout(() => this.getMe(), 30000)
@@ -124,17 +229,23 @@ class Spotify extends Integration {
 
     try {
       let data = await this.client.getMyCurrentPlayingTrack()
-      let song = {
-        song: data.body.item.name,
-        artist: data.body.item.artists[0].name,
-        is_playing: data.body.is_playing,
-        is_enabled: this.settings.enabled
+
+      let currentSong = JSON.parse(this.settings._.currentSong)
+      if (typeof currentSong.song === 'undefined' || currentSong.song !== data.body.item.name) {
+        currentSong = {
+          finished_at: Date.now() - data.body.item.duration_ms, // may be off ~10s, but its important for requests
+          song: data.body.item.name,
+          artist: data.body.item.artists[0].name,
+          uri: data.body.item.uri
+        }
       }
-      this.settings._.currentSong = JSON.stringify(song)
+      currentSong.is_playing = data.body.is_playing
+      currentSong.is_enabled = this.settings.enabled
+      this.settings._.currentSong = JSON.stringify(currentSong)
     } catch (e) {
       this.settings._.currentSong = JSON.stringify({})
     }
-    this.timeouts['ICurrentSong'] = setTimeout(() => this.ICurrentSong(), 10000)
+    this.timeouts['ICurrentSong'] = setTimeout(() => this.ICurrentSong(), 5000)
   }
 
   async IRefreshToken () {
@@ -187,8 +298,10 @@ class Spotify extends Integration {
         const username = this.settings.connection.username
         this.client.resetAccessToken()
         this.client.resetRefreshToken()
+        this.settings._.userId = null
         this.settings._.accessToken = null
         this.settings._.refreshToken = null
+        this.settings.connection._authenticatedScopes = []
         this.settings.connection.username = ''
         this.settings._.currentSong = JSON.stringify({})
 
@@ -240,6 +353,7 @@ class Spotify extends Integration {
         if (opts.token && !_.isNil(this.client)) {
           this.client.authorizationCodeGrant(opts.token)
             .then((data) => {
+              this.settings.connection._authenticatedScopes = data.body.scope.split(' ')
               this.settings._.accessToken = data.body['access_token']
               this.settings._.refreshToken = data.body['refresh_token']
 
@@ -272,7 +386,56 @@ class Spotify extends Integration {
     if (_.isNil(this.client)) return null
     let state = crypto.createHash('md5').update(Math.random().toString()).digest('hex')
     this.state = state
-    return this.client.createAuthorizeURL(this.scopes, state)
+    return this.client.createAuthorizeURL(this.settings.connection.scopes, state)
+  }
+
+  async main (opts) {
+    if (!cluster.isMaster) {
+      // we have client connected on master -> send process to master
+      if (process.send) process.send({ type: 'call', ns: 'integrations.spotify', fnc: 'main', args: [opts] })
+      return
+    }
+
+    try {
+      let [spotifyId] = new Expects(opts.parameters)
+        .everything()
+        .toArray()
+
+      if (spotifyId.startsWith('spotify:')) {
+        let response = await axios({
+          method: 'get',
+          url: 'https://api.spotify.com/v1/tracks/' + spotifyId.replace('spotify:track:', ''),
+          headers: {
+            'Authorization': 'Bearer ' + this.settings._.accessToken
+          }
+        })
+        let track = response.data
+        global.commons.sendMessage(
+          global.commons.prepare('integrations.spotify.song-requested', {
+            name: track.name, artist: track.artists[0].name
+          }), opts.sender)
+        this.uris.push(spotifyId)
+      } else {
+        let response = await axios({
+          method: 'get',
+          url: 'https://api.spotify.com/v1/search?type=track&limit=1&q=' + encodeURI(spotifyId),
+          headers: {
+            'Authorization': 'Bearer ' + this.settings._.accessToken,
+            'Content-Type': 'application/json'
+          }
+        })
+        let track = response.data.tracks.items[0]
+        global.commons.sendMessage(
+          global.commons.prepare('integrations.spotify.song-requested', {
+            name: track.name, artist: track.artists[0].name
+          }), opts.sender)
+        this.uris.push(track.uri)
+      }
+    } catch (e) {
+      global.commons.sendMessage(
+        global.commons.prepare('integrations.spotify.song-not-found'), opts.sender)
+      global.log.error(e.stack)
+    }
   }
 }
 

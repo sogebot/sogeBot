@@ -10,6 +10,11 @@
     },
     "username": "Authorized user",
     "revoke": "Revoke user authorization",
-    "authorize": "Authorize user"
+    "authorize": "Authorize user",
+    "scopes": "Scopes",
+    "playlistToPlay": {
+      "title": "Main playlist",
+      "help": "If set, after request finished this playlist will continue"
+    }
   }
 }
