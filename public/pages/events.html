@@ -99,8 +99,13 @@
         $('#eventlist-cards').empty()
         events.list = cb
         for (let event of cb.events) {
+          let filter = []
           let operationsCount = _.filter(cb.operations, (o) => o.eventId === event._id.toString()).length
-          let filter = _.find(cb.filters, (o) => o.eventId === event._id.toString()).filters
+          try {
+            filter = _.find(cb.filters, (o) => o.eventId === event._id.toString()).filters
+          } catch (e) {
+            console.warn('No filters found in db for ' + event._id.toString())
+          }
 
           let definitionOutput = []
           for (let [key, value] of Object.entries(event.definitions)) {
@@ -455,7 +460,7 @@
         case 'BUTTON':
           if (!_.isNil($(element).data('event-toggle-button'))) {
             if (!_.isNil($(element).data('toggle-definition'))) {
-              eventListener.event.definitions[$(element).data('id')] = String($(element).data('value').toLowerCase()) ===
+              eventListener.event.definitions[$(element).data('id')] = String($(element).data('value')).toLowerCase() ===
                 'true'
             } else {
               let parentId = $(element).parents('.dialog-group').attr('id')
@@ -583,9 +588,15 @@
       : eventToEdit.key)
     modal.find('#event-listener-dlg-events').trigger('change')
 
+    let filters = []
+    try {
+      filters = _.find(events.list.filters, (o) => o.eventId === eventId).filters
+    } catch (e) {
+      console.warn('No filters found in db for ' + eventId)
+    }
     modal.find('#event-listener-filter').val(_.isNil(eventToEdit)
       ? ''
-      : _.find(events.list.filters, (o) => o.eventId === eventId).filters)
+      : filters)
 
     modal.find('#event-listener-save-changes-btn').attr('data-id', eventId)
 
