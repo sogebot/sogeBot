@@ -189,7 +189,7 @@ class Webhooks {
   async follower (aEvent) {
     try {
       const cid = global.oauth.channelId
-      const data = aEvent.data[0]
+      const data = aEvent.data
       if (_.isEmpty(cid)) setTimeout(() => this.follower(aEvent), 10) // wait until channelId is set
       if (parseInt(data.to_id, 10) !== parseInt(cid, 10)) return
 
