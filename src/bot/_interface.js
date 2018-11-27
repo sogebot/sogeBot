@@ -144,10 +144,10 @@ class Module {
                       if (isNaN(value)) throw new Error(error)
                     } else throw new Error(error)
                   }
-
-                  target[key] = value
-                  this.updateSettings(`${path}.${key}`, value)
                 }
+
+                target[key] = value
+                this.updateSettings(`${path}.${key}`, value)
               }
               return true
             }
