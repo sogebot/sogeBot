@@ -236,7 +236,9 @@ class Spotify extends Integration {
           finished_at: Date.now() - data.body.item.duration_ms, // may be off ~10s, but its important for requests
           song: data.body.item.name,
           artist: data.body.item.artists[0].name,
-          uri: data.body.item.uri
+          uri: data.body.item.uri,
+          is_playing: data.body.is_playing,
+          is_enabled: this.settings.enabled
         }
       }
       currentSong.is_playing = data.body.is_playing
@@ -389,7 +391,7 @@ class Spotify extends Integration {
     return this.client.createAuthorizeURL(this.settings.connection.scopes, state)
   }
 
-  async main (opts) {
+  async main (opts: CommandOptions) {
     if (!cluster.isMaster) {
       // we have client connected on master -> send process to master
       if (process.send) process.send({ type: 'call', ns: 'integrations.spotify', fnc: 'main', args: [opts] })
