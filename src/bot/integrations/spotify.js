@@ -32,7 +32,7 @@ class Spotify extends Integration {
   constructor () {
     const settings = {
       commands: [
-        { name: '!spotify', permission: constants.VIEWERS }
+        { name: '!spotify', permission: constants.DISABLED }
       ],
       _: {
         accessToken: '',
