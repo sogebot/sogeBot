@@ -106,7 +106,7 @@ class INeDB extends Interface {
     return new Promise((resolve, reject) => {
       try {
         this.on(table).find(flatten(where), (err, items) => {
-          if (err) throw err
+          if (err) throw Error(err)
 
           // nedb needs to fake sum and group by
           if (sumBy || groupBy) {
@@ -150,7 +150,7 @@ class INeDB extends Interface {
     return new Promise(function (resolve, reject) {
       try {
         self.on(table).findOne(flatten(where), function (err, item) {
-          if (err) throw err
+          if (err) throw Error(err)
           resolve(_.isNil(item) ? {} : item)
         })
       } catch (e) {
@@ -172,7 +172,7 @@ class INeDB extends Interface {
     return new Promise(function (resolve, reject) {
       try {
         self.on(table).insert(flatten.unflatten(object), function (err, item) {
-          if (err) throw err
+          if (err) throw Error(err)
           resolve(item)
         })
       } catch (e) {
@@ -190,7 +190,7 @@ class INeDB extends Interface {
     return new Promise(function (resolve, reject) {
       try {
         self.on(table).remove(flatten(where), { multi: true }, function (err, numRemoved) {
-          if (err) throw err
+          if (err) throw Error(err)
           resolve(numRemoved)
         })
       } catch (e) {
@@ -211,7 +211,7 @@ class INeDB extends Interface {
       // DON'T EVER DELETE flatten ON OBJECT - with flatten object get updated and not replaced
       try {
         self.on(table).update(flatten(where), { $set: flatten(object, { safe: true }) }, { upsert: (_.isNil(where._id) && !_.isEmpty(where)), multi: (_.isEmpty(where)), returnUpdatedDocs: true }, function (err, numReplaced, affectedDocs) {
-          if (err) throw err
+          if (err) throw Error(err)
           resolve(affectedDocs)
         })
       } catch (e) {
@@ -232,7 +232,7 @@ class INeDB extends Interface {
       // DON'T EVER DELETE flatten ON OBJECT - with flatten object get updated and not replaced
       try {
         self.on(table).update(flatten(where), { $inc: flatten(object) }, { upsert: true, multi: false, returnUpdatedDocs: true }, function (err, numReplaced, affectedDocs) {
-          if (err) throw err
+          if (err) throw Error(err)
           resolve(affectedDocs)
         })
       } catch (e) {
@@ -253,7 +253,7 @@ class INeDB extends Interface {
       // DON'T EVER DELETE flatten ON OBJECT - with flatten object get updated and not replaced
       try {
         self.on(table).update(flatten(where), { $inc: flatten(object) }, { upsert: true, multi: true, returnUpdatedDocs: true }, function (err, numReplaced, affectedDocs) {
-          if (err) throw err
+          if (err) throw Error(err)
           resolve(affectedDocs)
         })
       } catch (e) {
@@ -272,7 +272,7 @@ class INeDB extends Interface {
       // DON'T EVER DELETE flatten ON OBJECT - with flatten object get updated and not replaced
       try {
         self.on(table).count({}, function (err, count) {
-          if (err) throw err
+          if (err) throw Error(err)
           resolve(count)
         })
       } catch (e) {
