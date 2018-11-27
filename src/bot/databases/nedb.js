@@ -203,7 +203,11 @@ class INeDB extends Interface {
   async update (table, where, object) {
     this.on(table) // init table
 
-    if (_.isEmpty(object)) throw Error('Object to update cannot be empty')
+    if (_.isEmpty(object)) {
+      global.log.error('Object to update cannot be empty')
+      global.log.error(JSON.stringify({ table, object, where }))
+      return null
+    }
 
     var self = this
     return new Promise(function (resolve, reject) {
@@ -224,7 +228,11 @@ class INeDB extends Interface {
   async incrementOne (table, where, object) {
     this.on(table) // init table
 
-    if (_.isEmpty(object)) throw Error('Object to update cannot be empty')
+    if (_.isEmpty(object)) {
+      global.log.error('Object to update cannot be empty')
+      global.log.error(JSON.stringify({ table, object, where }))
+      return null
+    }
 
     var self = this
     return new Promise(function (resolve, reject) {
@@ -245,7 +253,11 @@ class INeDB extends Interface {
   async increment (table, where, object) {
     this.on(table) // init table
 
-    if (_.isEmpty(object)) throw Error('Object to update cannot be empty')
+    if (_.isEmpty(object)) {
+      global.log.error('Object to update cannot be empty')
+      global.log.error(JSON.stringify({ table, object, where }))
+      return null
+    }
 
     var self = this
     return new Promise(function (resolve, reject) {
