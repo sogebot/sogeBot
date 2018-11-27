@@ -34,12 +34,12 @@ describe('libs/webhooks - follower()', () => {
   it('testuser payload for follower() several times', async () => {
     for (let i = 0; i < 5; i++) {
       await global.webhooks.follower({
-        data: [{
+        data: {
           from_id: id,
           from_name: 'testuser',
           to_id: global.oauth.channelId,
           to_name: 'channeluser'
-        }]
+        }
       })
     }
   })
@@ -55,12 +55,12 @@ describe('libs/webhooks - follower()', () => {
   it('testuser payload for follower() several times for incorrect channel id', async () => {
     for (let i = 0; i < 5; i++) {
       await global.webhooks.follower({
-        data: [{
+        data: {
           from_id: 3,
           from_name: 'testuser',
           to_id: 2,
           to_name: 'channeluser'
-        }]
+        }
       })
     }
   })
