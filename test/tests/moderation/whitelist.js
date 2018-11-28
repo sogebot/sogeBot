@@ -33,7 +33,53 @@ const tests = {
       'Lorem Ipsum http://osu.ppy.sh/asd dolor sit amet',
       'Lorem Ipsum https://osu.ppy.sh/asd dolor sit amet',
       'Lorem Ipsum osu.ppy.sh/p/2131231231 dolor sit amet',
-      'Lorem Ipsum osu.ppy.sh/beatmapsets/59670/#osu/1263997 dolor sit amet'
+      'Lorem Ipsum osu.ppy.sh/beatmapsets/59670/#osu/1263997 dolor sit amet',
+      'https://osu.ppy.sh/beatmapsets/554084#osu/1173113'
+    ],
+    'should.return.same': [
+    ]
+  },
+  '(https?:\\/\\/)?(www\\.)?osu.ppy.sh(*)?': {
+    'should.return.changed': [
+      'Lorem Ipsum osu.ppy.sh dolor sit amet',
+      'Lorem Ipsum http://osu.ppy.sh dolor sit amet',
+      'Lorem Ipsum https://osu.ppy.sh dolor sit amet',
+      'Lorem Ipsum osu.ppy.sh/asd dolor sit amet',
+      'Lorem Ipsum http://osu.ppy.sh/asd dolor sit amet',
+      'Lorem Ipsum https://osu.ppy.sh/asd dolor sit amet',
+      'Lorem Ipsum osu.ppy.sh/p/2131231231 dolor sit amet',
+      'Lorem Ipsum osu.ppy.sh/beatmapsets/59670/#osu/1263997 dolor sit amet',
+      'https://osu.ppy.sh/beatmapsets/554084#osu/1173113'
+    ],
+    'should.return.same': [
+    ]
+  },
+  'domain:osu.ppy.sh': {
+    'should.return.changed': [
+      'Lorem Ipsum osu.ppy.sh dolor sit amet',
+      'Lorem Ipsum http://osu.ppy.sh dolor sit amet',
+      'Lorem Ipsum https://osu.ppy.sh dolor sit amet',
+      'Lorem Ipsum osu.ppy.sh/asd dolor sit amet',
+      'Lorem Ipsum http://osu.ppy.sh/asd dolor sit amet',
+      'Lorem Ipsum https://osu.ppy.sh/asd dolor sit amet',
+      'Lorem Ipsum osu.ppy.sh/p/2131231231 dolor sit amet',
+      'Lorem Ipsum osu.ppy.sh/beatmapsets/59670/#osu/1263997 dolor sit amet',
+      'https://osu.ppy.sh/beatmapsets/554084#osu/1173113'
+    ],
+    'should.return.same': [
+    ]
+  },
+  'domain:ppy.sh': {
+    'should.return.changed': [
+      'Lorem Ipsum osu.ppy.sh dolor sit amet',
+      'Lorem Ipsum http://osu.ppy.sh dolor sit amet',
+      'Lorem Ipsum https://osu.ppy.sh dolor sit amet',
+      'Lorem Ipsum osu.ppy.sh/asd dolor sit amet',
+      'Lorem Ipsum http://osu.ppy.sh/asd dolor sit amet',
+      'Lorem Ipsum https://osu.ppy.sh/asd dolor sit amet',
+      'Lorem Ipsum osu.ppy.sh/p/2131231231 dolor sit amet',
+      'Lorem Ipsum osu.ppy.sh/beatmapsets/59670/#osu/1263997 dolor sit amet',
+      'https://osu.ppy.sh/beatmapsets/554084#osu/1173113'
     ],
     'should.return.same': [
     ]

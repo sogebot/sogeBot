@@ -175,7 +175,12 @@ class Moderation extends System {
 
     for (let value of whitelist.map(o => o.trim().replace(/\*/g, '[\\pL0-9\\S]*').replace(/\+/g, '[\\pL0-9\\S]+'))) {
       if (value.length > 0) {
-        const regexp = XRegExp(` [^\\s\\pL0-9\\w]?${value}[^\\s\\pL0-9\\w]? `, 'gi')
+        let regexp
+        if (value.startsWith('domain:')) {
+          regexp = XRegExp(` [\\S]*${XRegExp.escape(value.replace('domain:', ''))}[\\S]* `, 'gi')
+        } else { // default regexp behavior
+          regexp = XRegExp(` [^\\s\\pL0-9\\w]?${value}[^\\s\\pL0-9\\w]? `, 'gi')
+        }
         // we need to change 'text' to ' text ' for regexp to correctly work
         text = XRegExp.replace(` ${text} `, regexp, '').trim()
       }
