@@ -34,17 +34,17 @@
                 <button class="btn btn-sm border-0" :class="[item.show === 'css' ? 'btn-dark' : 'btn-outline-dark' ]" @click="item.show = 'css'; rerender()">CSS</button>
               </div>
 
-              <div v-if="item.text.length > 0 && item.show === 'html'">
+              <div v-if="typeof item.text !== 'undefined' && item.text.length > 0 && item.show === 'html'">
                 <pre :key="Math.random()" :style="{ display: !showMore.includes(item._id) ? 'none': 'inherit'}"><code class="language-markup">{{ item.text }}</code></pre>
                 <pre :key="Math.random()" :style="{ display: showMore.includes(item._id) ? 'none': 'inherit'}"><code class="language-markup">{{ less(item.text, 'html') }}</code></pre>
               </div>
 
-              <div v-if="item.css.length > 0 && item.show === 'css'">
+              <div v-if="typeof item.css !== 'undefined' && item.css.length > 0 && item.show === 'css'">
                 <pre :key="Math.random()" :style="{ display: !showMore.includes(item._id) ? 'none': 'inherit'}"><code class="language-css">{{ item.css }}</code></pre>
                 <pre :key="Math.random()" :style="{ display: showMore.includes(item._id) ? 'none': 'inherit'}"><code class="language-css">{{ less(item.css, 'css') }}</code></pre>
               </div>
 
-              <div v-if="item.js.length > 0 && item.show === 'js'">
+              <div v-if="typeof item.css !== 'undefined' && item.js.length > 0 && item.show === 'js'">
                 <pre :key="Math.random()" :style="{ display: !showMore.includes(item._id) ? 'none': 'inherit'}"><code class="language-javascript">{{ item.js }}</code></pre>
                 <pre :key="Math.random()" :style="{ display: showMore.includes(item._id) ? 'none': 'inherit'}"><code class="language-javascript">{{ less(item.js, 'js') }}</code></pre>
               </div>
