@@ -22,6 +22,7 @@
         </button>
       </div>
       <div class="col text-right form-inline d-block">
+          <a v-bind:href="'/overlays/text?id='+ id" class="btn btn-dark" target="_blank"><i class="fas fa-link"></i> /overlays/text?id={{ id }}</a>
           <span v-if="pending" style="cursor: auto;" class="alert-danger btn m-0">{{commons.translate('dialog.changesPending')}}</span>
           <button v-if="states.save === 0" type="button" class="btn btn-primary" v-on:click="save()">{{ commons.translate('dialog.buttons.saveChanges.idle') }}</button>
           <button v-if="states.save === 1" disabled="disabled" type="button" class="btn btn-primary"><i class="fas fa-circle-notch fa-spin"></i> {{ commons.translate('dialog.buttons.saveChanges.progress') }}</button>
@@ -42,8 +43,20 @@
         </div>
         <div class="form-row pl-2 pr-2">
           <div class="form-group col">
-            <label style="font-weight: bold; margin: 0px 0px 3px; font-size: 11px; text-transform: uppercase; letter-spacing: 1px;">{{ commons.translate('text') }}</label>
-            <div id="text_overlay-textarea" class="border"></div>
+            <label style="font-weight: bold; margin: 0px 0px 3px; font-size: 11px; text-transform: uppercase; letter-spacing: 1px;">HTML</label>
+            <div id="html_overlay-textarea" class="border"></div>
+          </div>
+        </div>
+        <div class="form-row pl-2 pr-2">
+          <div class="form-group col">
+            <label style="font-weight: bold; margin: 0px 0px 3px; font-size: 11px; text-transform: uppercase; letter-spacing: 1px;">JS</label>
+            <div id="js_overlay-textarea" class="border"></div>
+          </div>
+        </div>
+        <div class="form-row pl-2 pr-2">
+          <div class="form-group col">
+            <label style="font-weight: bold; margin: 0px 0px 3px; font-size: 11px; text-transform: uppercase; letter-spacing: 1px;">CSS</label>
+            <div id="css_overlay-textarea" class="border"></div>
           </div>
         </div>
       </form>
@@ -67,9 +80,13 @@
       data: {
         id: null,
         name: '',
-        text: '',
+        html: '',
+        js: '',
+        css: '',
 
-        textInput: null,
+        htmlInput: null,
+        jsInput: null,
+        cssInput: null,
 
         pending: false,
 
@@ -86,12 +103,36 @@
       },
       methods: {
         initializeTextArea: function () {
-          const textarea = document.getElementById('text_overlay-textarea')
-          if (_.isNil(textarea)) return setTimeout(() => this.initializeTextArea(), 1)
+          const htmltextarea = document.getElementById('html_overlay-textarea')
+          const jstextarea = document.getElementById('js_overlay-textarea')
+          const csstextarea = document.getElementById('css_overlay-textarea')
+          if (_.isNil(htmltextarea) || _.isNil(jstextarea) || _.isNil(csstextarea)) return setTimeout(() => this.initializeTextArea(), 1)
 
-          this.textInput = CodeMirror(textarea, {
-            value: this.text ? this.text : "<!-- you can also use html here, global filters and custom variables are also available -->",
+          this.htmlInput = CodeMirror(htmltextarea, {
+            value: this.html ? this.html : "<!-- you can also use html here, global filters and custom variables are also available -->\n\n",
             mode:  "htmlmixed",
+            lineNumbers: true,
+            matchBrackets: true,
+            lint: {
+              esversion: 6
+            },
+            gutters: ["CodeMirror-lint-markers"]
+          })
+
+          this.jsInput = CodeMirror(jstextarea, {
+            value: this.js ? this.js : "function onLoad() { // triggered on page load\n\n}\n\nfunction onChange() { // triggered on variable change\n\n}",
+            mode:  "javascript",
+            lineNumbers: true,
+            matchBrackets: true,
+            lint: {
+              esversion: 6
+            },
+            gutters: ["CodeMirror-lint-markers"]
+          })
+
+          this.cssInput = CodeMirror(csstextarea, {
+            value: this.css ? this.css : "",
+            mode:  "css",
             lineNumbers: true,
             matchBrackets: true,
             lint: {
@@ -106,7 +147,9 @@
             const data = {
               _id: this.id,
               name: this.name,
-              text: this.textInput.getValue()
+              text: this.htmlInput.getValue(),
+              js: this.jsInput.getValue(),
+              css: this.cssInput.getValue()
             }
             if (!this.states.delete) {
               this.socket.emit('update', {collection: 'data', items: [data]}, (err, data) => {
@@ -144,7 +187,9 @@
           this.id = commons.urlParam('id')
           this.socket.emit('findOne', { collection: 'data', where: { _id: commons.urlParam('id') } }, (err, data) => {
             this.name = data.name
-            this.text = data.text
+            this.html = data.text
+            this.js = data.js
+            this.css = data.css
             this.$nextTick(() => { this.pending = false })
             this.states.load = true
           })
