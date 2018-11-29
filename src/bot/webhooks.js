@@ -117,7 +117,7 @@ class Webhooks {
     var res
     switch (type) {
       case 'follows':
-        request.push(`hub.topic=https://api.twitch.tv/helix/users/follows?to_id=${cid}`)
+        request.push(`hub.topic=https://api.twitch.tv/helix/users/follows?first=1&to_id=${cid}`)
         res = await axios({
           method: 'post',
           url: request.join('&'),
@@ -149,10 +149,8 @@ class Webhooks {
   }
 
   async event (aEvent, res) {
-    const cid = global.oauth.channelId
-
     // somehow stream doesn't have a topic
-    if (_.get(aEvent, 'topic', null) === `https://api.twitch.tv/helix/users/follows?to_id=${cid}`) this.follower(aEvent) // follow
+    if (_.get(aEvent, 'topic', null) === `https://api.twitch.tv/helix/users/follows?first=1&to_id=${global.oauth.channelId}`) this.follower(aEvent) // follow
     else if (_.get(!_.isNil(aEvent.data[0]) ? aEvent.data[0] : {}, 'type', null) === 'live') this.stream(aEvent) // streams
 
     res.sendStatus(200)
