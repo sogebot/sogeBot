@@ -1,5 +1,5 @@
 <template>
-<div v-html="text"></div>
+<div v-html="text" id="main"></div>
 </template>
 
 <script>
@@ -8,12 +8,43 @@
     data: function () {
       return {
         socket: io('/overlays/text', {query: "token="+token}),
-        text: ''
+        text: '',
+        js: null,
+        css: null
       }
     },
-    created: function () {
+    mounted: function () {
       this.refresh()
       setInterval(() => this.refresh(), 5000)
+    },
+    watch: {
+      css: function (css) {
+        const head = document.getElementsByTagName('head')[0]
+        const style = document.createElement('style')
+        style.type = 'text/css';
+        if (style.styleSheet){
+          // This is required for IE8 and below.
+          style.styleSheet.cssText = css;
+        } else {
+          style.appendChild(document.createTextNode(css));
+        }
+
+        head.appendChild(style);
+      },
+      text: function (val, old) {
+        if (this.js) {
+          console.group('onChange()')
+          console.log(this.js)
+          console.groupEnd()
+          eval(val + ';if (typeof onChange === "function") { onChange(); }')
+        }
+      },
+      js: function (val) {
+        console.group('onLoad()')
+        console.log(val)
+        console.groupEnd()
+        eval(val + ';if (typeof onLoad === "function") { onLoad(); }')
+      }
     },
     methods: {
       urlParam: function (name) {
@@ -27,7 +58,12 @@
       refresh: function () {
         if (this.urlParam('id')) {
           this.socket.emit('get', this.urlParam('id'), (cb) => {
-            this.text = cb
+            this.text = cb.html
+
+            this.$nextTick(() => {
+              if (!this.js && cb.js) this.js = cb.js
+              if (!this.css && cb.css) this.css = cb.css
+            })
           })
         } else {
           console.error('Missing id param in url')

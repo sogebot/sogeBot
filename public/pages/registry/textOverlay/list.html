@@ -28,7 +28,7 @@
             </div>
 
             <div style="word-break: break-all; " class="col-sm-6">
-              <div style="margin: 0; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 3px;">{{commons.translate('text')}}</div>
+              <div style="margin: 0; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 3px;">{{commons.translate('html')}}</div>
 
               <template v-show="item.text.length > 0">
                 <pre :style="{ display: !showMore.includes(item._id) ? 'none': 'inherit'}"><code class="language-markup">{{ item.text }}</code></pre>
@@ -100,7 +100,6 @@
           } else {
             this.showMore.push(_id)
           }
-          console.log(this.showMore)
         },
         remove: function (_id) {
           this.socket.emit('delete', { _id }, () => {
