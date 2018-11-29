@@ -96,7 +96,7 @@ window.textInput = {
       <div class="input-group-prepend">
         <span class="input-group-text">
           <template v-if="typeof translatedTitle === 'string'">{{ translatedTitle }}</template>
-          <template v-else>
+          <template v-else-if="typeof translatedTitle === 'object'">
             {{ translatedTitle.title }}
             <small style="cursor: help;" class="textInputTooltip text-info ml-1" data-toggle="tooltip" data-html="true" :title="translatedTitle.help"><i class="fas fa-question"></i></small>
           </template>
