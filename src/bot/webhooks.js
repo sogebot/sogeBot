@@ -193,6 +193,8 @@ class Webhooks {
       if (_.isEmpty(cid)) setTimeout(() => this.follower(aEvent), 10) // wait until channelId is set
       if (parseInt(data.to_id, 10) !== parseInt(cid, 10)) return
 
+      if (typeof data.from_name === 'undefined') throw TypeError('Username is undefined')
+
       // is in webhooks cache
       if (this.existsInCache('follow', data.from_id)) return
 
