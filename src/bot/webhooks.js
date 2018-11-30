@@ -58,30 +58,34 @@ class Webhooks {
     const mode = 'unsubscribe'
     const callback = `http://${domain}/webhooks/hub`
 
-    const request = [
-      'https://api.twitch.tv/helix/webhooks/hub?',
-      `hub.mode=${mode}`,
-      `hub.callback=${callback}/${type}`
-    ]
-
     switch (type) {
       case 'follows':
-        request.push(`hub.topic=https://api.twitch.tv/helix/users/follows?first=1&to_id=${cid}`)
         await axios({
           method: 'post',
-          url: request.join('&'),
+          url: 'https://api.twitch.tv/helix/webhooks/hub',
           headers: {
-            'Client-ID': clientId
+            'Client-ID': clientId,
+            'Content-Type': 'application/json'
+          },
+          data: {
+            'hub.callback': `${callback}/${type}`,
+            'hub.mode': mode,
+            'hub.topic': `https://api.twitch.tv/helix/users/follows?first=1&to_id=${cid}`
           }
         })
         break
       case 'streams':
-        request.push(`hub.topic=https://api.twitch.tv/helix/streams?user_id=${cid}`)
         await axios({
           method: 'post',
-          url: request.join('&'),
+          url: 'https://api.twitch.tv/helix/webhooks/hub',
           headers: {
-            'Client-ID': clientId
+            'Client-ID': clientId,
+            'Content-Type': 'application/json'
+          },
+          data: {
+            'hub.callback': `${callback}/${type}`,
+            'hub.mode': mode,
+            'hub.topic': `https://api.twitch.tv/helix/streams?user_id=${cid}`
           }
         })
         break
@@ -107,34 +111,39 @@ class Webhooks {
     const mode = 'subscribe'
     const callback = `http://${domain}/webhooks/hub`
 
-    const request = [
-      'https://api.twitch.tv/helix/webhooks/hub?',
-      `hub.mode=${mode}`,
-      `hub.callback=${callback}/${type}`,
-      `hub.lease_seconds=${leaseSeconds}`
-    ]
-
     var res
     switch (type) {
       case 'follows':
-        request.push(`hub.topic=https://api.twitch.tv/helix/users/follows?first=1&to_id=${cid}`)
         res = await axios({
           method: 'post',
-          url: request.join('&'),
+          url: 'https://api.twitch.tv/helix/webhooks/hub',
           headers: {
-            'Client-ID': clientId
+            'Client-ID': clientId,
+            'Content-Type': 'application/json'
+          },
+          data: {
+            'hub.callback': `${callback}/${type}`,
+            'hub.mode': mode,
+            'hub.topic': `https://api.twitch.tv/helix/users/follows?first=1&to_id=${cid}`,
+            'hub.lease_seconds': leaseSeconds
           }
         })
         if (res.status === 202 && res.statusText === 'Accepted') global.log.info('WEBHOOK: follows waiting for challenge')
         else global.log.error('WEBHOOK: follows NOT subscribed')
         break
       case 'streams':
-        request.push(`hub.topic=https://api.twitch.tv/helix/streams?user_id=${cid}`)
         res = await axios({
           method: 'post',
-          url: request.join('&'),
+          url: 'https://api.twitch.tv/helix/webhooks/hub',
           headers: {
-            'Client-ID': clientId
+            'Client-ID': clientId,
+            'Content-Type': 'application/json'
+          },
+          data: {
+            'hub.callback': `${callback}/${type}`,
+            'hub.mode': mode,
+            'hub.topic': `https://api.twitch.tv/helix/streams?user_id=${cid}`,
+            'hub.lease_seconds': leaseSeconds
           }
         })
         if (res.status === 202 && res.statusText === 'Accepted') global.log.info('WEBHOOK: streams waiting for challenge')
@@ -160,7 +169,7 @@ class Webhooks {
     const cid = global.oauth.channelId
     // set webhooks enabled
     switch (req.query['hub.topic']) {
-      case `https://api.twitch.tv/helix/users/follows?to_id=${cid}`:
+      case `https://api.twitch.tv/helix/users/follows?first=1&to_id=${cid}`:
         global.log.info('WEBHOOK: follows subscribed')
         this.enabled.follows = true
         break
