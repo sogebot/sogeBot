@@ -21,7 +21,8 @@ const dropFiles = [
   'system.bets', 'system.bets.settings', 'system.bets.users',
   'system.commercial.settings', 'system.cooldown', 'system.cooldown.settings',
   'users_ignorelist', 'overlay.credits.socials', 'overlay.credits.customTexts',
-  'overlay.carousel', 'bannedsong', 'highlights', 'notices'
+  'overlay.carousel', 'bannedsong', 'highlights', 'notices', 'integrations.spotify',
+  'integrations.streamlabs', 'integrations.donationalerts'
 ]
 
 // db
@@ -137,6 +138,77 @@ let migration = {
     }
   }],
   settings: [{
+    version: '8.2.0',
+    do: async () => {
+      let settings = null
+      let processed = 0
+      console.info('Updating integrations settings to 8.2.0')
+
+      settings = await global.db.engine.find('integrations.spotify')
+      for (let i = 0, l = settings.length; i < l; i++) {
+        let [key, value] = [ settings[i].key, settings[i].value ]
+
+        if (value) {
+          let newKey
+          if (key === 'enabled') {
+            await global.db.engine.update('integrations.spotify.settings',
+              { key: 'enabled' }, {
+                key: 'enabled',
+                value
+              })
+            newKey = key
+          } else {
+            newKey = 'connection.' + key
+            await global.db.engine.insert('integrations.spotify.settings',
+              { key: newKey }, {
+                key: newKey,
+                value
+              })
+          }
+          processed++
+          key = key.length < 8 ? key + '\t\t' : key + '\t'
+          console.info('=> Spotify\t\t' + key + ' -> ' + newKey)
+        }
+      }
+
+      settings = await global.db.engine.find('integrations.streamlabs')
+      for (let i = 0, l = settings.length; i < l; i++) {
+        let [key, value] = [ settings[i].key, settings[i].value ]
+
+        if (value) {
+          let newKey
+          await global.db.engine.update('integrations.streamlabs.settings',
+            { key: key }, {
+              key: key,
+              value
+            })
+          newKey = key
+          processed++
+          key = key.length < 8 ? key + '\t\t' : key + '\t'
+          console.info('=> Streamlabs\t' + key + ' -> ' + newKey)
+        }
+      }
+
+      settings = await global.db.engine.find('integrations.donationalerts')
+      for (let i = 0, l = settings.length; i < l; i++) {
+        let [key, value] = [ settings[i].key, settings[i].value ]
+
+        if (value) {
+          let newKey
+          await global.db.engine.update('integrations.donationalerts.settings',
+            { key: key }, {
+              key: key,
+              value
+            })
+          newKey = key
+          processed++
+          key = key.length < 8 ? key + '\t\t' : key + '\t'
+          console.info('=> Donationalerts\t' + key + ' -> ' + newKey)
+        }
+      }
+      console.info(` => ${processed} processed`)
+    }
+  }, {
     version: '8.1.0',
     do: async () => {
       console.info('Updating overlays credits settings')
