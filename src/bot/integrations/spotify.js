@@ -48,7 +48,7 @@ class Spotify extends Integration {
       connection: {
         clientId: '',
         clientSecret: '',
-        redirectURI: '',
+        redirectURI: 'http://localhost:20000/oauth/spotify',
         username: '',
         scopes: [
           'user-read-currently-playing',
@@ -343,13 +343,11 @@ class Spotify extends Integration {
       if (this.settings.connection.redirectURI.trim().length === 0) error.push('redirectURI')
       if (error.length > 0) throw new Error(error.join(', ') + 'missing')
 
-      if (!this.client) {
-        this.client = new SpotifyWebApi({
-          clientId: this.settings.connection.clientId,
-          clientSecret: this.settings.connection.clientSecret,
-          redirectUri: this.settings.connection.redirectURI
-        })
-      }
+      this.client = new SpotifyWebApi({
+        clientId: this.settings.connection.clientId,
+        clientSecret: this.settings.connection.clientSecret,
+        redirectUri: this.settings.connection.redirectURI
+      })
 
       try {
         if (opts.token && !_.isNil(this.client)) {
@@ -392,6 +390,7 @@ class Spotify extends Integration {
   }
 
   async main (opts: CommandOptions) {
+    if (!(await global.cache.isOnline())) return // don't do anything on offline stream
     if (!cluster.isMaster) {
       // we have client connected on master -> send process to master
       if (process.send) process.send({ type: 'call', ns: 'integrations.spotify', fnc: 'main', args: [opts] })

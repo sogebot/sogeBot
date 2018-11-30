@@ -147,7 +147,6 @@ let migration = {
       settings = await global.db.engine.find('integrations.spotify')
       for (let i = 0, l = settings.length; i < l; i++) {
         let [key, value] = [ settings[i].key, settings[i].value ]
-
         if (value) {
           let newKey
           if (key === 'enabled') {
@@ -157,12 +156,19 @@ let migration = {
                 value
               })
             newKey = key
-          } else {
-            newKey = 'connection.' + key
-            await global.db.engine.insert('integrations.spotify.settings',
+          } else if (key === 'format') {
+            newKey = 'output.' + key
+            await global.db.engine.update('integrations.spotify.settings',
               { key: newKey }, {
                 key: newKey,
                 value
+              })
+          } else {
+            newKey = 'connection.' + key
+            await global.db.engine.update('integrations.spotify.settings',
+              { key: newKey }, {
+                key: newKey,
+                value: key === 'redirectURI' ? value + '/oauth/spotify' : value
               })
           }
           processed++
@@ -185,7 +191,7 @@ let migration = {
           newKey = key
           processed++
           key = key.length < 8 ? key + '\t\t' : key + '\t'
-          console.info('=> Streamlabs\t' + key + ' -> ' + newKey)
+          console.info('=> Streamlabs\t\t' + key + ' -> ' + newKey)
         }
       }
 

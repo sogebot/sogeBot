@@ -1,38 +1,52 @@
 Current integration is enabling `$currentSong` from Spotify
 
 ## How to setup
+
 1. Go to https://beta.developer.spotify.com/dashboard/
 2. Log In into your account
 3. Click on create an app green button
-
-![](https://drive.google.com/uc?id=1WbR_RqRETTaie-zZoC2X-AgQYYMM96ly)
-![](https://drive.google.com/uc?id=1mDZQPWRnYsgwy24r28_Co412SCyLBsAL)
-![](https://drive.google.com/uc?id=1sl2gbLEOKAYHO8zr3toQEByrPbGjhtrw)
-
+   ![createApp1](https://drive.google.com/uc?id=1WbR_RqRETTaie-zZoC2X-AgQYYMM96ly)
+   ![createApp2](https://drive.google.com/uc?id=1mDZQPWRnYsgwy24r28_Co412SCyLBsAL)
+   ![createApp3](https://drive.google.com/uc?id=1sl2gbLEOKAYHO8zr3toQEByrPbGjhtrw)
 4. Add Client ID and Client Secret to a bot
-
-![](https://drive.google.com/uc?id=1Ro3zLLn2BuzD7zACllR9EHKQPvkKcbTR)
-![](https://drive.google.com/uc?id=1TUyCFrpwBqX2DtnnVizaUIrlRH0bjfQp)
-
-5. Add Redirect URI to Spotify and a Bot - redirect URI is where you access a bot. By default http://localhost:20000/oauth/spotify | **DON'T FORGET TO SAVE ON SPOTIFY**
-
-![](https://drive.google.com/uc?id=1JZ-z48F1g85hEqWvRZYfg54-QP8tIitl)
-![](https://drive.google.com/uc?id=1-4fzHmhc6Wzc9c0ez8vTEVWe0DcniWWl)
-![](https://drive.google.com/uc?id=1NmBFtnI08bd1P7HkC1Pf2b9XVdN-uF1i)
-
-6. Enable integration
-
-![](https://drive.google.com/uc?id=1bmH5HFwAzeSVZsQgsvH4nzMytD_NxEnQ)
-
-7. Authorize user
-
-![](https://drive.google.com/uc?id=1Ec8V_w_jhPEVleCcDjJ3IvEtbLAgEnbi)
-![](https://drive.google.com/uc?id=1c7O85ZxLfCMdFuUYyn7LzYKtVeA6S_av)
-
+   ![Client ID and Client Secret](https://drive.google.com/uc?id=1Ro3zLLn2BuzD7zACllR9EHKQPvkKcbTR)
+5. Add Redirect URI to Spotify and a Bot - redirect URI is where you access a bot.
+   By default `http://localhost:20000/oauth/spotify` | **DON'T FORGET TO SAVE ON SPOTIFY**
+   ![Redirect URI #1](https://drive.google.com/uc?id=1JZ-z48F1g85hEqWvRZYfg54-QP8tIitl)
+   ![Redirect URI #2](https://drive.google.com/uc?id=1-4fzHmhc6Wzc9c0ez8vTEVWe0DcniWWl)
+6. Enable integration in a bot
+7. Authorize user in a bot
+   ![Authorize User](https://drive.google.com/uc?id=1c7O85ZxLfCMdFuUYyn7LzYKtVeA6S_av)
 8. Done, user is authorized
 
-![](https://drive.google.com/uc?id=12tQTYfiVwW7mwvLsCocrBayRLy-Rld2Q)
+## Song requests - PREMIUM users only
 
+1. Enable song requests by enabling `!spotify` command for viewers
+2. If you want to continue playback, you need to set your `main playlist` in
+   spotify integration config
+3. Song requests works only on online stream
 
+### Request song through !spotify command
 
+`!spotify <spotifyURI>` or `!spotify <string>`
 
+!> Default permission is **DISABLED**
+
+#### Parameters
+
+- `<spotifyURI>` -  spotify URI of a song you want to play
+- `<string>` - song to search on spotify (will pick first found item)
+
+#### Examples
+
+<blockquote>
+  <strong>testuser:</strong> !spotify spotify:track:0GrhBz0am9KFJ20MN9o6Lp <br>
+  <strong>bot:</strong> @testuser, you requested song
+  Circle of Life - 『ライオン・キング』より from Carmen Twillie
+</blockquote>
+
+<blockquote>
+  <strong>testuser:</strong> !spotify lion king circle of life <br>
+  <strong>bot:</strong> @testuser, you requested song
+  Circle of Life - 『ライオン・キング』より from Carmen Twillie
+</blockquote>
