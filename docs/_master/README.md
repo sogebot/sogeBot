@@ -35,7 +35,8 @@ You can also contact me on my email sogehige@gmail.com or get support on our [di
 | Timers             | Post a response every x seconds, x messages                                                                                              |
 | Queue              | Do you lost track of viewers who wants to play with you? Use !queue and be fair!                                                         |
 | Raffles            | Create raffles for you giveaways!                                                                                                        |
-| Songs              | **Songrequest** and **playlist** support for YouTube with **trimming** of videos and **auto volume normalization**                       |
+| Youtube            | **Songrequest** and **playlist** support for YouTube with **trimming** of videos and **auto volume normalization**                       |
+| Spotify            | **Songrequest** for Spotify Premium Users                                                                                                |
 | Cooldowns          | Stop spamming of commands with cooldowns!                                                                                                |
 | Permissions        | Set your custom permissions for your commands! (owner, mods, regular, viewer)                                                            |
 | Moderation         | Automoderate links, colors, symbols, blacklist and more!                                                                                 |

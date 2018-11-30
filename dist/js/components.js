@@ -1,4 +1,4 @@
-/* globals translations, commons, Vue, _ $ */
+/* globals translations, commons, Vue, _ $, io */
 
 /* div with html filters */
 window.textWithTags = {
@@ -96,9 +96,9 @@ window.textInput = {
       <div class="input-group-prepend">
         <span class="input-group-text">
           <template v-if="typeof translatedTitle === 'string'">{{ translatedTitle }}</template>
-          <template v-else>
+          <template v-else-if="typeof translatedTitle === 'object'">
             {{ translatedTitle.title }}
-            <small class="textInputTooltip text-info" data-toggle="tooltip" data-html="true" :title="translatedTitle.help">[?]</small>
+            <small style="cursor: help;" class="textInputTooltip text-info ml-1" data-toggle="tooltip" data-html="true" :title="translatedTitle.help"><i class="fas fa-question"></i></small>
           </template>
         </span>
       </div>
@@ -746,6 +746,47 @@ window.holdButton = {
           {{ holdtitle }}
         </template>
       </span>
+    </button>
+  `
+}
+
+/* button with socket */
+window.buttonSocket = {
+  props: ['object', 'token'],
+  data: function () {
+    return {
+      socket: io(this.object.on, { query: 'token=' + this.token }),
+      state: 0
+    }
+  },
+  methods: {
+    send: function () {
+      this.state = 1
+      console.log(`EMIT => ${this.object.on} [${this.object.emit}]`)
+      io(this.object.on, { query: 'token=' + this.token }).emit(this.object.emit, (err, data) => {
+        if (err) {
+          this.state = 2
+          this.$emit('error', err)
+          setTimeout(() => {
+            this.state = 0
+          }, 2000)
+        } else {
+          // to do eval data
+          if (data.do === 'redirect') {
+            window.location = data.opts[0]
+          } else if (data.do === 'refresh') {
+            window.location.reload()
+          }
+          this.state = 0
+        }
+      })
+    }
+  },
+  template: `
+    <button ref="button" @click="send" :disabled="state !== 0" :class="this.state === 2 ? 'btn-danger' : ''">
+      <i v-if="state === 1" class="fas fa-circle-notch fa-spin"></i>
+      <i v-if="state === 2" class="fas fa-exclamation"></i>
+      {{ commons.translate(object.text) }}
     </button>
   `
 }

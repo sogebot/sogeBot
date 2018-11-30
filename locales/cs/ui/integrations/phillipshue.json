@@ -1,0 +1,12 @@
+{
+  "settings": {
+    "enabled": "Status",
+    "user": "User",
+    "port": "Port",
+    "host": {
+      "title": "Host",
+      "help": "je nutné mít PhillipsHue ve stejné síti jako je bot"
+    },
+    "timeout": "Timeout"
+  }
+}

@@ -52,5 +52,9 @@
   "stats": "Stats",
   "text": "Text",
   "currency": "Currency",
-  "clipscarousel": "Clips carousel"
+  "clipscarousel": "Clips carousel",
+  "streamlabs": "Streamlabs",
+  "donationalerts": "DonationAlerts.ru",
+  "twitter": "Twitter",
+  "phillipshue": "Phillips Hue"
 }

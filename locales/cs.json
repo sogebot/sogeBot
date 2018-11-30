@@ -59,7 +59,6 @@
     }
   },
   "webpanel": {
-    "mainCurrency": "Základní měna",
     "display-as": "Zobrazit jako",
     "set-default": "Výchozí nastavení",
     "add": "Přidat",
@@ -505,7 +504,6 @@
     "manage": "Správa",
     "registry": "Registr",
     "integrations": "Integrace",
-    "ignorelist": "Ignore list",
     "settings": "Nastavení",
     "permissions": "Oprávnění",
     "permission": "Oprávnění",

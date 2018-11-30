@@ -1,0 +1,9 @@
+{
+  "settings": {
+    "enabled": "Status",
+    "socketToken": {
+      "title": "Socket token",
+      "help": "Get socket token from streamlabs dashboard API settings->API tokens->Your Socket API Token"
+    }
+  }
+}

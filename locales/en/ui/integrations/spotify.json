@@ -1,0 +1,20 @@
+{
+  "settings": {
+    "enabled": "Status",
+    "clientId": "clientId",
+    "clientSecret": "clientSecret",
+    "redirectURI": "redirectURI",
+    "format": {
+      "title": "Format",
+      "help": "Available variables: $song, $artist"
+    },
+    "username": "Authorized user",
+    "revoke": "Revoke user authorization",
+    "authorize": "Authorize user",
+    "scopes": "Scopes",
+    "playlistToPlay": {
+      "title": "Main playlist",
+      "help": "If set, after request finished this playlist will continue"
+    }
+  }
+}

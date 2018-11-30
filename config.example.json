@@ -21,23 +21,6 @@
       "url": "mongodb://localhost:27017/your-db-name"
     }
   },
-  "integrations": {
-    "twitter": {
-      "enabled": false,
-      "user": "YourTwitterUserName",
-      "consumerKey": "consumer_key_here",
-      "consumerSecret": "secret_key_here",
-      "accessToken": "access_token_here",
-      "secretToken": "secretToken"
-    },
-    "phillipshue": {
-      "enabled": false,
-      "host": "YourPhillipsHueHost",
-      "port": "YourPhillipsHuePort",
-      "user": "YourPhillipsHueUserName",
-      "timeout": "30000"
-    }
-  },
   "metrics": {
     "translations": true
   },

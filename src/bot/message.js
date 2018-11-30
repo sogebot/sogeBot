@@ -51,14 +51,15 @@ class Message {
     this.message = this.message.replace(/\$latestCheerMessage/g, !_.isNil(latestCheer) ? latestCheer.message : 'n/a')
     this.message = this.message.replace(/\$latestCheer/g, !_.isNil(latestCheer) ? latestCheer.username : 'n/a')
 
-    if (!_.isNil(global.integrations) && !_.isEmpty(await global.integrations.spotify.currentSong) && (await global.integrations.spotify.currentSong).is_playing && (await global.integrations.spotify.currentSong).is_enabled) {
+    const spotifySong = JSON.parse(global.integrations.spotify.settings._.currentSong)
+    if (!_.isNil(global.integrations) && !_.isEmpty(spotifySong) && spotifySong.is_playing && spotifySong.is_enabled) {
       // load spotify format
-      const [format, song] = await Promise.all([global.integrations.spotify.format, global.integrations.spotify.currentSong])
+      const format = global.integrations.spotify.settings.output.format
       if (opts.escape) {
-        song.song = song.song.replace(new RegExp(opts.escape, 'g'), `\\${opts.escape}`)
-        song.artist = song.artist.replace(new RegExp(opts.escape, 'g'), `\\${opts.escape}`)
+        spotifySong.song = spotifySong.song.replace(new RegExp(opts.escape, 'g'), `\\${opts.escape}`)
+        spotifySong.artist = spotifySong.artist.replace(new RegExp(opts.escape, 'g'), `\\${opts.escape}`)
       }
-      this.message = this.message.replace(/\$currentSong/g, format.replace(/\$song/g, song.song).replace(/\$artist/g, song.artist))
+      this.message = this.message.replace(/\$currentSong/g, format.replace(/\$song/g, spotifySong.song).replace(/\$artist/g, spotifySong.artist))
     } else if (await global.systems.songs.isEnabled() && this.message.includes('$currentSong')) {
       let currentSong = _.get(JSON.parse(await global.systems.songs.settings._.currentSong), 'title', global.translate('songs.not-playing'))
       if (opts.escape) {

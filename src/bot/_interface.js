@@ -134,13 +134,16 @@ class Module {
               // check if types match
               // skip when saving to undefined
               if (typeof target[key] !== 'undefined') {
-                if (typeof target[key] !== typeof value) {
-                  const error = path + '.' + key + ' set failed\n\texpected:\t' + typeof target[key] + '\n\tset:     \t' + typeof value
-                  // try retype if expected is number and we got string (from ui settings e.g.)
-                  if (typeof target[key] === 'number') {
-                    value = Number(value)
-                    if (isNaN(value)) throw new Error(error)
-                  } else throw new Error(error)
+                // if default value is null or new value is null -> skip checks
+                if (value !== null && target[key] !== null) {
+                  if (typeof target[key] !== typeof value) {
+                    const error = path + '.' + key + ' set failed\n\texpected:\t' + typeof target[key] + '\n\tset:     \t' + typeof value
+                    // try retype if expected is number and we got string (from ui settings e.g.)
+                    if (typeof target[key] === 'number') {
+                      value = Number(value)
+                      if (isNaN(value)) throw new Error(error)
+                    } else throw new Error(error)
+                  }
                 }
 
                 target[key] = value
@@ -231,7 +234,7 @@ class Module {
       // default socket listeners
       this.socket.on('connection', (socket) => {
         socket.on('settings', async (cb) => {
-          cb(null, await this.getAllSettings(), this._ui)
+          cb(null, await this.getAllSettings(), await this.getUI())
         })
         socket.on('settings.update', async (data, cb) => {
           try {
@@ -554,6 +557,30 @@ class Module {
 
   async isEnabled () {
     return this.status({ quiet: true })
+  }
+
+  async getUI () {
+    // we need to go through all ui and trigger functions and delete attr if false
+    let ui = _.cloneDeep(this._ui)
+    for (let [k, v] of Object.entries(ui)) {
+      if (typeof v.type !== 'undefined') {
+        // final object
+        if (typeof v.if === 'function') {
+          if (!v.if()) {
+            delete ui[k]
+          }
+        }
+      } else {
+        for (let [k2, v2] of Object.entries(v)) {
+          if (typeof v2.if === 'function') {
+            if (!v2.if()) {
+              delete ui[k][k2]
+            }
+          }
+        }
+      }
+    }
+    return ui
   }
 }
 

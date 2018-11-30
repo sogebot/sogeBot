@@ -1,0 +1,20 @@
+{
+  "settings": {
+    "enabled": "Status",
+    "clientId": "clientId",
+    "clientSecret": "clientSecret",
+    "redirectURI": "redirectURI",
+    "format": {
+      "title": "Formát",
+      "help": "Dostupné proměnné: $song, $artist"
+    },
+    "username": "Autorizovaný uživatel",
+    "revoke": "Zrušit autorizaci uživatele",
+    "authorize": "Autorizovat uživatele",
+    "scopes": "Scopes",
+    "playlistToPlay": {
+      "title": "Hlavní playlist",
+      "help": "Pokud bude nastaveno, po requestu bude hrát tento playlist"
+    }
+  }
+}

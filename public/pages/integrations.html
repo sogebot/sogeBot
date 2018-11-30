@@ -1,13 +1,327 @@
-<div class="integrations row">
-  <div class="_load col-sm-6 mt-3" data-id="spotify"></div>
-  <div class="_load col-sm-6 mt-3" data-id="donationalerts"></div>
-  <div class="_load col-sm-6 mt-3" data-id="streamlabs"></div>
-</div>
-<script>
+<div id="settingsOverlaysApp">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-lg-9 col-md-8 col-sm-6">
+        <span class="title text-default mb-2">
+          {{ commons.translate('menu.settings') }}
+          <small><i class="fas fa-angle-right"></i></small>
+          {{ commons.translate('menu.integrations') }}
+          <template v-if="selected">
+            <small><i class="fas fa-angle-right"></i></small>
+            {{ commons.translate('menu.' + selected) }}
+          </template>
+        </span>
+        <template v-if="state.loading === 1">
+          <div class="alert alert-info text-center"><i class="fas fa-circle-notch fa-spin"></i> loading settings from server ...</div>
+        </template>
+        <template v-for="(value, category) of settings" v-if="category !== '_permissions' && state.loading === 0 && !_.isEmpty(value)">
+          <h6>{{ category }}</h6>
+          <div class="card mb-2" >
+            <div class="card-body">
+              <div v-if="typeof value === 'object' && (typeof value[defaultValue] === 'undefined' || value[defaultValue] === null)" class="p-0 pl-2 pr-2 " v-for="(currentValue, defaultValue) of ui[category]">
+                <template v-if="ui[category][defaultValue].type === 'link'">
+                  <a :href="currentValue.href" class="mt-1 mb-1" :class="currentValue.class" :target="currentValue.target">
+                    <template v-if="currentValue.rawText">{{ currentValue.rawText }}</template>
+                    <template v-else>{{ commons.translate(currentValue.text) }}</template>
+                  </a>
+                </template>
+                <component
+                    v-else
+                    :token="token"
+                    :class="ui[category][defaultValue].class"
+                    :is="ui[category][defaultValue].type"
+                    :object="ui[category][defaultValue]"
+                    @error="triggerError($event)"
+                    class="pt-1 pb-1"></component>
+              </div>
+              <div v-if="typeof value === 'object' && !defaultValue.startsWith('_') && currentValue !== null" class="p-0 pl-2 pr-2 " v-for="(currentValue, defaultValue) of value">
+                <template v-if="typeof ui[category] !== 'undefined' && typeof ui[category][defaultValue] !== 'undefined'">
+                  <component
+                    :is="ui[category][defaultValue].type"
+                    :readonly="ui[category][defaultValue].readOnly"
+                    :secret="ui[category][defaultValue].secret"
+                    :step="ui[category][defaultValue].step"
+                    :min="ui[category][defaultValue].min"
+                    :max="ui[category][defaultValue].max"
+                    :value="currentValue"
+                    :values="ui[category][defaultValue].values"
+                    @update="value[defaultValue] = $event.value; triggerDataChange()"
+                    :title="type + '.' + selected + '.settings.' + defaultValue"
+                    :current="value[ui[category][defaultValue].current]"
+                    class="pt-1 pb-1"></component>
+                </template>
+                <template v-else>
+                  <command-input-with-permission
+                    v-if="category === 'commands'"
+                    class="pt-1 pb-1"
+                    v-bind:type="typeof currentValue"
+                    v-bind:value="currentValue"
+                    v-bind:command="defaultValue"
+                    :permissions="settings._permissions[defaultValue]"
+                    v-on:update="value[defaultValue] = $event.value; settings._permissions[defaultValue] = $event.permissions; triggerDataChange()"
+                  ></command-input-with-permission>
+                  <toggle
+                    class="pt-1 pb-1"
+                    v-bind:title="commons.translate(type + '.' + selected + '.settings.' + defaultValue)"
+                    v-else-if="typeof currentValue === 'boolean'"
+                    v-bind:value="currentValue"
+                    v-on:update="value[defaultValue] = !value[defaultValue]; triggerDataChange()"
+                  ></toggle>
+                  <textarea-from-array
+                    class="pt-1 pb-1"
+                    v-else-if="currentValue.constructor === Array"
+                    v-bind:value="currentValue"
+                    v-bind:title="commons.translate(type + '.' + selected + '.settings.' + defaultValue)"
+                    v-on:update="value[defaultValue] = $event; triggerDataChange()"
+                  ></textarea-from-array>
+                  <number-input
+                    v-else-if="typeof currentValue === 'number'"
+                    class="pt-1 pb-1"
+                    v-bind:type="typeof currentValue"
+                    v-bind:value="currentValue"
+                    v-bind:title="type + '.' + selected + '.settings.' + defaultValue"
+                    :permission="settings._permissions[defaultValue]"
+                    v-on:update="value[defaultValue] = $event.value; triggerDataChange()">
+                  </number-input>
+                  <text-input
+                    v-else
+                    class="pt-1 pb-1"
+                    v-bind:type="typeof currentValue"
+                    v-bind:value="currentValue"
+                    v-bind:title="type + '.' + selected + '.settings.' + defaultValue"
+                    :permission="settings._permissions[defaultValue]"
+                    v-on:update="value[defaultValue] = $event.value; triggerDataChange()"
+                  ></text-input>
+                </template>
+              </div>
+            </div>
+          </div>
+        </template>
+      </div>
 
-  // load pages
-  for (let page of $('._load')) {
-    let id = $(page).data('id')
-    $(page).load(`settings/integrations/${id.replace('#', '')}.html`, () => { commons.translate() })
+      <div class="col-lg-3 col-md-4 col-sm-6">
+        <div class="sticky-top" style="top: 80px">
+          <div class="widget pt-1 mt-3 border-0 bg-light" style="height: auto">
+          <div class="pl-2 pr-2 pb-4">
+            <transition name="fade">
+              <div v-show="isDataChanged" class="alert alert-warning" style="cursor: initial">
+                <i class="fas fa-exclamation-circle mr-1"></i>
+                {{commons.translate('dialog.changesPending')}}
+              </div>
+            </transition>
+            <transition name="fade">
+              <div class="alert alert-danger" v-show="error && showError" style="cursor: initial">
+                <i class="fas fa-exclamation-triangle mr-1"></i>
+                {{ error }}
+              </div>
+            </transition>
+            <button class="btn btn-block btn-primary" v-on:click="saveSettings" v-if="state.settings === 0">{{ commons.translate('dialog.buttons.saveChanges.idle') }}</button>
+            <button disabled="disabled" class="btn btn-block btn-primary" v-on:click="saveSettings" v-if="state.settings === 1">
+              <i class="fas fa-circle-notch fa-spin"></i> {{ commons.translate('dialog.buttons.saveChanges.progress') }}</button>
+            <button disabled="disabled" class="btn btn-block btn-success" v-on:click="saveSettings" v-if="state.settings === 2">
+              <i class="fas fa-check"></i> {{ commons.translate('dialog.buttons.saveChanges.done') }}</button>
+            <button disabled="disabled" class="btn btn-block btn-danger" v-on:click="saveSettings" v-if="state.settings === 3">
+              <i class="fas fa-check"></i> {{ commons.translate('dialog.buttons.something-went-wrong') }}</button>
+          </div>
+
+            <div class="pl-2 pr-2" v-for="system of list">
+              <button
+                class="btn btn-block text-left btn-outline-dark"
+                :style="getBorderStyle(system.name)"
+                v-on:click="setSelected(system.name)"
+              >
+                {{ commons.translate('menu.' + system.name) }}
+
+                <small
+                  :class="[ system.enabled && !system.isDisabledByEnv && system.areDependenciesEnabled ? 'text-success' : 'text-danger' ]"
+                  style="margin: 0px 0px 3px; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px;"
+                >
+                <template v-if="system.isDisabledByEnv">DISABLED BY ENV</template>
+                <template v-if="!system.enabled">{{ commons.translate('disabled') }}</template>
+                <template v-else-if="!system.areDependenciesEnabled">DEPENDENCIES DISABLED</template>
+                <template v-else>{{ commons.translate('enabled') }}</template>
+              </small>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  Vue.prototype.commons = commons
+
+  function settingsOverlaysAppInit () {
+    if (_.size(translations) === 0) return setTimeout(() => settingsOverlaysAppInit(), 1)
+
+    var settingsOverlaysApp = new Vue({
+      el: '#settingsOverlaysApp',
+      components: {
+        'toggle': toggleEnable,
+        'text-input': textInput,
+        'number-input': numberInput,
+        'command-input-with-permission': commandInputWithPermissions,
+        'textarea-from-array': textAreaFromArray,
+        'selector': selector,
+        'button-socket': buttonSocket,
+        'check-list': checkList
+      },
+      data: {
+        socket: {
+          _panel: io({ query: "token=" + token })
+        },
+        token,
+        list: [],
+        selected: null,
+        type: 'integrations',
+        settings: {},
+        ui: {},
+        isDataChanged: false,
+        error: null,
+        showError: false,
+
+        state: {
+          loading: 0,
+          settings: 0
+        }
+      },
+      watch: {
+        selected: function (valueNew, valueOld) {
+          this.loadSettings(valueNew)
+        }
+      },
+      computed: {
+        systemURI: function () {
+          const hash = window.location.hash.slice(1, window.location.hash.length)
+          if (hash.split('-').length > 1) {
+            let system = hash.split('-').splice(-1, 1).join()
+            return system
+          } return null
+        }
+      },
+      created: function () {
+        this.socket._panel.emit('integrations', (err, integrations) => {
+          for (let item of integrations) {
+            this.socket[item.name] = io(`/integrations/${item.name}`, { query: "token=" + token })
+          }
+          this.list = integrations
+          this.selected = this.systemURI || integrations[0].name
+        })
+      },
+      filters: {
+      },
+      methods: {
+        loadSettings: function (system) {
+          this.settings = {}
+          this.state.settings = 0
+          this.state.loading = 1
+          this.socket[system].emit('settings', (err, _setting, _ui) => {
+            if (system !== this.selected) return // skip if we quickly changed system
+
+            this.state.loading = 0
+            _settings = _(_setting).toPairs().value()
+            _ui = _(_ui).toPairs().value()
+
+            let settings = { settings: {} }
+            let ui = { settings: {} }
+
+            // sorting
+            // enabled is first
+            settings.settings.enabled = _(_settings.filter(o => o[0] === 'enabled')).flatten().value()[1]
+            // everything else except commands and enabled and are string|number|bool
+            for (let [name, value] of _(_settings.filter(o => o[0] !== '_' && o[0] !== 'enabled' && o[0] !== 'commands' && typeof o[1] !== 'object')).value()) {
+              settings.settings[name] = value
+            }
+            // everything else except commands and enabled and are objects -> own category
+            for (let [name, value] of _(_settings.filter(o => o[0] !== '_' && o[0] !== 'enabled' && o[0] !== 'commands' && typeof o[1] === 'object')).value()) {
+              settings[name] = value
+            }
+            // commands at last
+            for (let [name, value] of _(_settings.filter(o => o[0] === 'commands')).value()) {
+              settings[name] = value
+            }
+
+            // ui
+            // everything else except commands and enabled and are string|number|bool
+            for (let [name, value] of _(_ui.filter(o => o[0] !== '_' && o[0] !== 'enabled' && o[0] !== 'commands' && typeof o[1].type !== 'undefined')).value()) {
+              if (typeof settings.settings[name] === 'undefined') settings.settings[name] = null
+              ui.settings[name] = value
+            }
+            // everything else except commands and enabled and are objects -> own category
+            for (let [name, value] of _(_ui.filter(o => o[0] !== '_' && o[0] !== 'enabled' && o[0] !== 'commands' && typeof o[1].type === 'undefined')).value()) {
+              if (typeof settings[name] === 'undefined') settings[name] = {}
+              for (let [k, v] of Object.entries(value)) {
+                if (typeof settings[name][k] === 'undefined') settings[name][k] = null
+              }
+              ui[name] = value
+            }
+            this.isDataChanged = false
+
+            this.settings = Object.assign({}, settings)
+            this.ui = Object.assign({}, ui)
+          })
+        },
+        getBorderStyle: function (system) {
+          return system === this.selected ?
+            {
+              'border-width': '0px',
+              'border-left-width': '5px !important'
+            } :
+            {
+              'border-width': '0px',
+              'border-left-width': '5px !important',
+              'border-color': 'transparent'
+            }
+        },
+        triggerError: function (error) {
+          this.error = error
+          this.showError = true
+          setTimeout(() => this.showError = false, 2000)
+        },
+        triggerDataChange: function () {
+          this.isDataChanged = false; this.isDataChanged = true
+        },
+        setSelected: function (system) {
+          window.location.hash = '#integrations-' + system
+          if (this.state.settings === 0) this.selected = system
+        },
+        removeNulls: function (obj){
+          var isArray = obj instanceof Array;
+          for (var k in obj){
+            if (obj[k]===null) isArray ? obj.splice(k,1) : delete obj[k];
+            else if (typeof obj[k]=="object") this.removeNulls(obj[k]);
+          }
+        },
+        saveSettings: function () {
+          this.state.settings = 1
+          let settings = _.cloneDeep(this.settings)
+          this.removeNulls(settings)
+
+          for (let [name,value] of Object.entries(settings.settings)) {
+            delete settings.settings[name]
+            settings[name] = value
+          }
+          delete settings.settings
+
+          this.socket[this.selected].emit('settings.update', settings, (err) => {
+            setTimeout(() => this.state.settings = 0, 1000)
+            if (err) {
+              this.state.settings = 3
+            } else {
+              this.state.settings = 2
+              this.isDataChanged = false
+            }
+            setTimeout(() => {
+              this.socket._panel.emit('integrations', (err, data) => {
+                this.list = data
+              })
+            })
+          })
+        }
+      }
+    })
   }
+  settingsOverlaysAppInit()
 </script>

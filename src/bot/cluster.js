@@ -33,10 +33,14 @@ function cluster () {
   global.api = new (require('./api'))()
 
   global.lib.translate._load().then(function () {
-    global.systems = require('auto-load')('./dest/systems/')
-    global.overlays = require('auto-load')('./dest/overlays/')
-    global.games = require('auto-load')('./dest/games/')
-    global.integrations = require('auto-load')('./dest/integrations/')
+    try {
+      global.systems = require('auto-load')('./dest/systems/')
+      global.overlays = require('auto-load')('./dest/overlays/')
+      global.games = require('auto-load')('./dest/games/')
+      global.integrations = require('auto-load')('./dest/integrations/')
+    } catch (e) {
+      console.error(e); global.log.error(e)
+    }
 
     process.on('message', async (data) => {
       switch (data.type) {

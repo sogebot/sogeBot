@@ -150,8 +150,8 @@
         socket: { _panel: io({ query: "token=" + token }) },
         listOfSystems: [],
         selectedSystem: null,
-        settings: { settings: {} },
-        ui: { settings: {} },
+        settings: {},
+        ui: {},
         isDataChanged: false,
         error: null,
         showError: false,
@@ -188,46 +188,51 @@
       },
       methods: {
         loadSystemSettings: function (system) {
-          this.settings = { settings: {} }
+          this.settings = {}
           this.state.settings = 0
           this.state.loading = 1
-          this.socket[system].emit('settings', (err, settings, ui) => {
+          this.socket[system].emit('settings', (err, _setting, _ui) => {
             if (system !== this.selectedSystem) return // skip if we quickly changed system
 
             this.state.loading = 0
-            let _settings = _(settings).toPairs().value()
-            let _ui = _(ui).toPairs().value()
+            _settings = _(_setting).toPairs().value()
+            _ui = _(_ui).toPairs().value()
+
+            let settings = { settings: {} }
+            let ui = { settings: {} }
 
             // sorting
-            this.settings.settings = {}
-            // everything else except commands and are string|number|bool
-            for (let [name, value] of _(_settings.filter(o => o[0] !== '_' && o[0] !== 'commands' && o[0] !== 'enabled' && typeof o[1] !== 'object')).value()) {
-              this.settings.settings[name] = value
+            // everything else except commands and enabled and are string|number|bool
+            for (let [name, value] of _(_settings.filter(o => o[0] !== '_' && o[0] !== 'enabled' && o[0] !== 'commands' && typeof o[1] !== 'object')).value()) {
+              settings.settings[name] = value
             }
-            // everything else except commands and are objects -> own category
-            for (let [name, value] of _(_settings.filter(o => o[0] !== '_' && o[0] !== 'commands' && o[0] !== 'enabled' && typeof o[1] === 'object')).value()) {
-              this.settings[name] = value
+            // everything else except commands and enabled and are objects -> own category
+            for (let [name, value] of _(_settings.filter(o => o[0] !== '_' && o[0] !== 'enabled' && o[0] !== 'commands' && typeof o[1] === 'object')).value()) {
+              settings[name] = value
             }
             // commands at last
             for (let [name, value] of _(_settings.filter(o => o[0] === 'commands')).value()) {
-              this.settings[name] = value
+              settings[name] = value
             }
 
             // ui
             // everything else except commands and enabled and are string|number|bool
             for (let [name, value] of _(_ui.filter(o => o[0] !== '_' && o[0] !== 'enabled' && o[0] !== 'commands' && typeof o[1].type !== 'undefined')).value()) {
-              if (typeof this.settings.settings[name] === 'undefined') this.settings.settings[name] = null
-              this.ui.settings[name] = value
+              if (typeof settings.settings[name] === 'undefined') settings.settings[name] = null
+              ui.settings[name] = value
             }
             // everything else except commands and enabled and are objects -> own category
             for (let [name, value] of _(_ui.filter(o => o[0] !== '_' && o[0] !== 'enabled' && o[0] !== 'commands' && typeof o[1].type === 'undefined')).value()) {
-              if (typeof this.settings[name] === 'undefined') this.settings[name] = {}
+              if (typeof settings[name] === 'undefined') settings[name] = {}
               for (let [k, v] of Object.entries(value)) {
-                if (typeof this.settings[name][k] === 'undefined') this.settings[name][k] = null
+                if (typeof settings[name][k] === 'undefined') settings[name][k] = null
               }
-              this.ui[name] = value
+              ui[name] = value
             }
             this.isDataChanged = false
+
+            this.settings = Object.assign({}, settings)
+            this.ui = Object.assign({}, ui)
           })
         },
         getBorderStyle: function (system) {

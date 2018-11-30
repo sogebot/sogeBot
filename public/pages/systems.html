@@ -90,10 +90,18 @@
           <div class="widget pt-1 mt-3 border-0 bg-light" style="height: auto">
 
             <div class="pl-2 pr-2 pb-4">
-              <div v-if="isDataChanged" class="btn btn-block alert-warning" style="cursor: initial">
-                <i class="fas fa-exclamation-circle mr-1"></i>
-                {{commons.translate('dialog.changesPending')}}
-              </div>
+              <transition name="fade">
+                <div v-show="isDataChanged" class="alert alert-warning" style="cursor: initial">
+                  <i class="fas fa-exclamation-circle mr-1"></i>
+                  {{commons.translate('dialog.changesPending')}}
+                </div>
+              </transition>
+              <transition name="fade">
+                <div class="alert alert-danger" v-show="error && showError" style="cursor: initial">
+                  <i class="fas fa-exclamation-triangle mr-1"></i>
+                  {{ error }}
+                </div>
+              </transition>
               <button class="btn btn-block btn-primary" v-on:click="saveSettings" v-if="state.settings === 0">{{ commons.translate('dialog.buttons.saveChanges.idle') }}</button>
               <button disabled="disabled" class="btn btn-block btn-primary" v-on:click="saveSettings" v-if="state.settings === 1">
                 <i class="fas fa-circle-notch fa-spin"></i> {{ commons.translate('dialog.buttons.saveChanges.progress') }}</button>
@@ -148,9 +156,11 @@
         socket: { _panel: io({ query: "token=" + token }) },
         listOfSystems: [],
         selectedSystem: null,
-        settings: { settings: {} },
-        ui: { settings: {} },
+        settings: {},
+        ui: {},
         isDataChanged: false,
+        error: null,
+        showError: false,
 
         state: {
           loading: 0,
@@ -184,48 +194,53 @@
       },
       methods: {
         loadSystemSettings: function (system) {
-          this.settings = { settings: {} }
+          this.settings = {}
           this.state.settings = 0
           this.state.loading = 1
-          this.socket[system].emit('settings', (err, settings, ui) => {
+          this.socket[system].emit('settings', (err, _setting, _ui) => {
             if (system !== this.selectedSystem) return // skip if we quickly changed system
 
             this.state.loading = 0
-            let _settings = _(settings).toPairs().value()
-            let _ui = _(ui).toPairs().value()
+            _settings = _(_setting).toPairs().value()
+            _ui = _(_ui).toPairs().value()
+
+            let settings = { settings: {} }
+            let ui = { settings: {} }
 
             // sorting
             // enabled is first
-            this.settings.settings = {}
-            this.settings.settings.enabled = _(_settings.filter(o => o[0] === 'enabled')).flatten().value()[1]
+            settings.settings.enabled = _(_settings.filter(o => o[0] === 'enabled')).flatten().value()[1]
             // everything else except commands and enabled and are string|number|bool
             for (let [name, value] of _(_settings.filter(o => o[0] !== '_' && o[0] !== 'enabled' && o[0] !== 'commands' && typeof o[1] !== 'object')).value()) {
-              this.settings.settings[name] = value
+              settings.settings[name] = value
             }
             // everything else except commands and enabled and are objects -> own category
             for (let [name, value] of _(_settings.filter(o => o[0] !== '_' && o[0] !== 'enabled' && o[0] !== 'commands' && typeof o[1] === 'object')).value()) {
-              this.settings[name] = value
+              settings[name] = value
             }
             // commands at last
             for (let [name, value] of _(_settings.filter(o => o[0] === 'commands')).value()) {
-              this.settings[name] = value
+              settings[name] = value
             }
 
             // ui
             // everything else except commands and enabled and are string|number|bool
-            for (let [name, value] of _(_ui.filter(o => o[0] !== '_' && o[0] !== 'enabled' && o[0] !== 'commands' && typeof o[1] !== 'object')).value()) {
-              if (typeof this.settings.settings[name] === 'undefined') this.settings.settings[name] = null
-              this.ui.settings[name] = value
+            for (let [name, value] of _(_ui.filter(o => o[0] !== '_' && o[0] !== 'enabled' && o[0] !== 'commands' && typeof o[1].type !== 'undefined')).value()) {
+              if (typeof settings.settings[name] === 'undefined') settings.settings[name] = null
+              ui.settings[name] = value
             }
             // everything else except commands and enabled and are objects -> own category
-            for (let [name, value] of _(_ui.filter(o => o[0] !== '_' && o[0] !== 'enabled' && o[0] !== 'commands' && typeof o[1] === 'object')).value()) {
-              if (typeof this.settings[name] === 'undefined') this.settings[name] = {}
+            for (let [name, value] of _(_ui.filter(o => o[0] !== '_' && o[0] !== 'enabled' && o[0] !== 'commands' && typeof o[1].type === 'undefined')).value()) {
+              if (typeof settings[name] === 'undefined') settings[name] = {}
               for (let [k, v] of Object.entries(value)) {
-                if (typeof this.settings[name][k] === 'undefined') this.settings[name][k] = null
+                if (typeof settings[name][k] === 'undefined') settings[name][k] = null
               }
-              this.ui[name] = value
+              ui[name] = value
             }
             this.isDataChanged = false
+
+            this.settings = Object.assign({}, settings)
+            this.ui = Object.assign({}, ui)
           })
         },
         getBorderStyle: function (system) {
@@ -239,6 +254,11 @@
               'border-left-width': '5px !important',
               'border-color': 'transparent'
             }
+        },
+        triggerError: function (error) {
+          this.error = error
+          this.showError = true
+          setTimeout(() => this.showError = false, 2000)
         },
         triggerDataChange: function () {
           this.isDataChanged = false; this.isDataChanged = true
