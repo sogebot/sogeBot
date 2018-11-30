@@ -12,6 +12,19 @@ const cluster = require('cluster')
 const constants = require('../constants')
 const Integration = require('./_interface')
 
+declare type State = {
+  rgb: Array<number>,
+  light: number,
+  time: number,
+  loop: number,
+  status: {
+    loop: number,
+    state: number,
+    time: number,
+    blocked: boolean
+  }
+}
+
 /*
  * NOTE: For this integration to be working, you need bot running on same network, as your lights
  *
@@ -20,8 +33,8 @@ const Integration = require('./_interface')
  */
 
 class PhillipsHue extends Integration {
-  api: HueAPI = null
-  states: Array<Object> = null
+  api: any = null
+  states: Array<State> = []
 
   constructor () {
     const settings = {
@@ -44,12 +57,14 @@ class PhillipsHue extends Integration {
 
     cluster.on('message', (worker, message) => {
       if (message.type !== 'phillipshue') return
-      this[message.fnc](this, message.sender, message.text)
+      // $FlowFixMe - An indexer property is missing in PhillipsHue
+      if (typeof this[message.fnc] === 'undefined') this[message.fnc](this, message.sender, message.text)
     })
 
     setInterval(() => {
       if (!this.isEnabled()) return
-      _.each(this.states, (state, index) => {
+      for (let index = 0, length = this.states.length; index < length; index++) {
+        const state = this.states[index]
         if (_.isNil(state) || state.status.blocked) return true
 
         if (new Date().getTime() - state.status.time >= state.time) {
@@ -81,7 +96,7 @@ class PhillipsHue extends Integration {
 
           this.states.splice(index, 1) // remove from list
         }
-      })
+      }
     }, 20)
   }
 
@@ -124,14 +139,14 @@ class PhillipsHue extends Integration {
       if (process.send) process.send({ type: 'phillipshue', fnc: 'hue', sender: opts.sender, text: opts.parameters })
       return
     }
-    var rgb = this.parseText(opts.parameters, 'rgb', '255,255,255').split(',')
+    var rgb = this.parseText(opts.parameters, 'rgb', '255,255,255').split(',').map(o => Number(o))
     if (rgb.length < 3) rgb = [255, 255, 255]
 
     this.states.push({
       'rgb': rgb,
-      'light': this.parseText(opts.parameters, 'light', 1),
-      'time': this.parseText(opts.parameters, 'time', 100),
-      'loop': this.parseText(opts.parameters, 'loop', 3),
+      'light': Number(this.parseText(opts.parameters, 'light', '1')),
+      'time': Number(this.parseText(opts.parameters, 'time', '100')),
+      'loop': Number(this.parseText(opts.parameters, 'loop', '3')),
       'status': {
         'loop': 0,
         'state': 0,
@@ -141,8 +156,8 @@ class PhillipsHue extends Integration {
     })
   }
 
-  parseText (text: string, value: string, defaultValue: string | number) {
-    defaultValue = defaultValue || 0
+  parseText (text: string, value: string, defaultValue: string) {
+    defaultValue = defaultValue || '0'
     for (let part of text.trim().split(' ')) {
       if (part.startsWith(value + '=')) {
         defaultValue = part.replace(value + '=', '')
