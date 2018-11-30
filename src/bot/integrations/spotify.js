@@ -121,7 +121,7 @@ class Spotify extends Integration {
   }
 
   onStateChange (key: string, value: string) {
-    this.currentSong = JSON.stringify({})
+    this.settings._.currentSong = JSON.stringify({})
     if (value) {
       this.connect()
       this.getMe()
@@ -289,7 +289,7 @@ class Spotify extends Integration {
           })
         }
 
-        this.currentSong = JSON.stringify({})
+        this.settings._.currentSong = JSON.stringify({})
         this.connect({ token })
         await waitForUsername()
         callback(null, true)
