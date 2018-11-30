@@ -119,6 +119,7 @@
                 <i class="fas fa-exclamation-triangle mr-1"></i>
                 {{ error }}
               </div>
+            </transition>
             <button class="btn btn-block btn-primary" v-on:click="saveSettings" v-if="state.settings === 0">{{ commons.translate('dialog.buttons.saveChanges.idle') }}</button>
             <button disabled="disabled" class="btn btn-block btn-primary" v-on:click="saveSettings" v-if="state.settings === 1">
               <i class="fas fa-circle-notch fa-spin"></i> {{ commons.translate('dialog.buttons.saveChanges.progress') }}</button>
