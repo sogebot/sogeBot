@@ -228,6 +228,7 @@ class Spotify extends Integration {
     clearTimeout(this.timeouts['ICurrentSong'])
 
     try {
+      if (!(await global.cache.isOnline())) throw Error('Stream is offline')
       let data = await this.client.getMyCurrentPlayingTrack()
 
       let currentSong = JSON.parse(this.settings._.currentSong)
