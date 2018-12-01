@@ -186,6 +186,14 @@ Commons.prototype.getOwners = function () {
   return global.oauth.settings.general.owners
 }
 
+Commons.prototype.getChannel = function () {
+  try {
+    return global.oauth.settings.general.channel.toLowerCase().trim()
+  } catch (e) {
+    return ''
+  }
+}
+
 Commons.prototype.getBroadcaster = function () {
   try {
     return global.oauth.settings.broadcaster.username.toLowerCase().trim()

@@ -477,7 +477,7 @@ class API {
       }
     }
 
-    const url = `https://tmi.twitch.tv/group/user/${global.commons.getBroadcaster().toLowerCase()}/chatters`
+    const url = `https://tmi.twitch.tv/group/user/${global.commons.getChannel()}/chatters`
     const needToWait = _.isNil(global.widgets)
     if (needToWait) {
       return { state: false, opts }
