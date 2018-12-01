@@ -200,13 +200,13 @@ let migration = {
         let [key, value] = [ settings[i].key, settings[i].value ]
 
         if (value) {
-          let newKey
+          let newKey = key
+          if (key === 'clientSecret') newKey = 'secretToken'
           await global.db.engine.update('integrations.donationalerts.settings',
-            { key: key }, {
-              key: key,
+            { key: newKey }, {
+              key: newKey,
               value
             })
-          newKey = key
           processed++
           key = key.length < 8 ? key + '\t\t' : key + '\t'
           console.info('=> Donationalerts\t' + key + ' -> ' + newKey)
