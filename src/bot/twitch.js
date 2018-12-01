@@ -123,7 +123,7 @@ class Twitch {
 
     let lastFollowAgo = ''
     let lastFollowUsername = 'n/a'
-    let onlineFollowersCount = _.size(_.filter(onlineFollowers, (o) => o !== global.oauth.settings.bot.username.toLowerCase() && o !== global.commons.getBroadcaster().toLowerCase())) // except bot and user
+    let onlineFollowersCount = _.size(_.filter(onlineFollowers, (o) => o !== global.oauth.settings.bot.username.toLowerCase() && o !== global.commons.getChannel())) // except bot and user
     if (events.length > 0) {
       lastFollowUsername = events[0].username
       lastFollowAgo = moment(events[0].timestamp).fromNow()
@@ -148,7 +148,7 @@ class Twitch {
 
     let lastSubAgo = ''
     let lastSubUsername = 'n/a'
-    let onlineSubCount = _.size(_.filter(onlineSubscribers, (o) => o !== global.commons.getBroadcaster().toLowerCase() && o !== global.oauth.settings.bot.username.toLowerCase())) // except bot and user
+    let onlineSubCount = _.size(_.filter(onlineSubscribers, (o) => o !== global.commons.getChannel() && o !== global.oauth.settings.bot.username.toLowerCase())) // except bot and user
     if (events.length > 0) {
       lastSubUsername = events[0].username
       lastSubAgo = moment(events[0].timestamp).fromNow()
@@ -334,7 +334,7 @@ class Twitch {
       _.remove(sorted, (o) => _.includes(ignored, o.username))
 
       // remove broadcaster and bot accounts
-      _.remove(sorted, o => _.includes([global.commons.getBroadcaster().toLowerCase(), global.oauth.settings.bot.username.toLowerCase()], o.username))
+      _.remove(sorted, o => _.includes([global.commons.getChannel(), global.oauth.settings.bot.username.toLowerCase()], o.username))
 
       sorted = _.chunk(sorted, 10)[0]
 
