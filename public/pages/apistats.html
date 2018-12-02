@@ -1,378 +1,131 @@
-<ul class="nav nav-tabs" style="position: relative; top: 1px">
-  <li class="nav-item">
-    <span class="title text-default">API stats</span>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link active" data-toggle="tab" href="#helix">HELIX</a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link" data-toggle="tab" href="#kraken">KRAKEN</a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link" data-toggle="tab" href="#tmi">TMI</a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link" data-toggle="tab" href="#unofficial">UNOFFICIAL</a>
-  </li>
-</ul>
+<div id="apiStatsApp" ref="window">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-12">
+        <span class="title text-default">API STATS</span>
 
-<div class="tab-content">
-  <div role="tabpanel" class="tab-pane active" id="helix">
-    <div class="widget">
-      <canvas id="helixChart" width="400" height="100"></canvas>
-      <table class="table">
-        <thead class="thead-dark">
-          <tr>
-            <th scope="col">time</th>
-            <th scope="col">call</th>
-            <th scope="col">endpoint</th>
-            <th scope="col">status</th>
-            <th scope="col">remaining API calls</th>
-            <th scope="col">data</th>
-          </tr>
-        </thead>
-        <tbody class="helixData"></tbody>
-      </table>
-    </div>
-  </div>
-  <div role="tabpanel" class="tab-pane" id="kraken">
-    <div class="widget">
-      <canvas id="krakenChart" width="400" height="100"></canvas>
-      <table class="table table-responsive">
-        <thead class="thead-dark">
-          <tr>
-            <th scope="col">time</th>
-            <th scope="col">call</th>
-            <th scope="col">endpoint</th>
-            <th scope="col">status</th>
-            <th scope="col">remaining API calls</th>
-            <th scope="col">data</th>
-          </tr>
-        </thead>
-        <tbody class="krakenData"></tbody>
-      </table>
-    </div>
-  </div>
-  <div role="tabpanel" class="tab-pane" id="tmi">
-    <div class="widget">
-      <canvas id="tmiChart" width="400" height="100"></canvas>
-      <table class="table table-responsive">
-        <thead class="thead-dark">
-          <tr>
-            <th scope="col">time</th>
-            <th scope="col">call</th>
-            <th scope="col">endpoint</th>
-            <th scope="col">status</th>
-            <th scope="col">remaining API calls</th>
-            <th scope="col">data</th>
-          </tr>
-        </thead>
-        <tbody class="tmiData"></tbody>
-      </table>
-    </div>
-  </div>
-  <div role="tabpanel" class="tab-pane" id="unofficial">
-    <div class="widget">
-      <canvas id="unofficialChart" width="400" height="100"></canvas>
-      <table class="table table-responsive">
-        <thead class="thead-dark">
-          <tr>
-            <th scope="col">time</th>
-            <th scope="col">call</th>
-            <th scope="col">endpoint</th>
-            <th scope="col">status</th>
-            <th scope="col">remaining API calls</th>
-            <th scope="col">data</th>
-          </tr>
-        </thead>
-        <tbody class="unofficialData"></tbody>
-      </table>
+        <div class="pt-3 pb-3 mt-3 mb-3 m-0 border-top border-bottom row">
+          <div class="col-sm-6">
+            <div class="btn-group">
+              <button class="btn border-0"
+                :class="[selected === 'helix' ? 'btn-primary' : 'btn-outline-primary']"
+                @click="selected = 'helix'">HELIX <small>({{ data.filter(o => o.api === 'helix').length }})</small></button>
+              <button class="btn border-0"
+                :class="[selected === 'kraken' ? 'btn-primary' : 'btn-outline-primary']"
+                @click="selected = 'kraken'">KRAKEN <small>({{ data.filter(o => o.api === 'kraken').length }})</small></button>
+              <button class="btn border-0"
+                :class="[selected === 'tmi' ? 'btn-primary' : 'btn-outline-primary']"
+                @click="selected = 'tmi'">TMI <small>({{ data.filter(o => o.api === 'tmi').length }})</small></button>
+              <button class="btn border-0"
+                :class="[selected === 'unofficial' ? 'btn-primary' : 'btn-outline-primary']"
+                @click="selected = 'unofficial'">UNOFFICIAL <small>({{ data.filter(o => o.api === 'unofficial').length }})</small></button>
+            </div>
+          </div>
+        </div>
+
+        <div v-if="selectedData.length === 0" class="alert alert-info">
+          <i class="fas fa-circle-notch fa-spin"></i>
+          Waiting for api requests
+        </div>
+        <template v-else>
+          <area-chart :data="graphData"></area-chart>
+          <table class="table table-hover">
+          <thead class="thead-dark">
+              <tr>
+                <th scope="col">time</th>
+                <th scope="col">call</th>
+                <th scope="col">endpoint</th>
+                <th scope="col">status</th>
+                <th scope="col">remaining API calls</th>
+                <th scope="col">data</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(item, index) of selectedData" :key="index">
+                <th scope="row">{{ moment(item.timestamp).format('LTS') }}</th>
+                <td>{{ item.call }}</td>
+                <td><div style="word-wrap: break-word; font-family: Monospace; width: 200px;">{{ item.endpoint }}</div></td>
+                <td>{{ item.code }}</td>
+                <td>{{ item.remaining }}</td>
+                <td><div style="word-wrap: break-word; font-family: Monospace; width: 100%;">{{ JSON.stringify(JSON.parse(item.data), null, 2) }}</div></td>
+              </tr>
+            </tbody>
+          </table>
+        </template>
+      </div>
     </div>
   </div>
 </div>
 
+
+
 <script>
-  var lastTimestampFetched = 0
+  Vue.prototype.commons = commons
 
-  var helixChart = new Chart(document.getElementById("helixChart").getContext('2d'), { type: 'line', options: { scales: { yAxes: [{ ticks: { beginAtZero:true, stepSize: 1 } }] } } })
-  var krakenChart = new Chart(document.getElementById("krakenChart").getContext('2d'), { type: 'line', options: { scales: { yAxes: [{ ticks: { beginAtZero:true, stepSize: 1 } }] } } })
-  var tmiChart = new Chart(document.getElementById("tmiChart").getContext('2d'), { type: 'line', options: { scales: { yAxes: [{ ticks: { beginAtZero:true, stepSize: 1 } }] } } })
-  var unofficialChart = new Chart(document.getElementById("unofficialChart").getContext('2d'), { type: 'line', options: { scales: { yAxes: [{ ticks: { beginAtZero:true, stepSize: 1 } }] } } })
+  Vue.use(VueChartkick)
 
-  var apiData = []
+  function apiStatsAppInit () {
+    if (_.size(translations) === 0) return setTimeout(() => apiStatsAppInit(), 1)
+    var apiStatsApp = new Vue({
+      el: '#apiStatsApp',
+      data: {
+        selected: 'helix',
+        data: []
+      },
+      computed: {
+        selectedData: function () {
+          return this.data.filter(o => o.api === this.selected).sort((a, b) => b.timestamp - a.timestamp)
+        },
+        graphData: function () {
+          let success = this.data.filter(o => o.api === this.selected && String(o.code).startsWith('2'))
+          let errors = this.data.filter(o => o.api === this.selected && !String(o.code).startsWith('2'))
 
-  $('.helixData').empty()
-  $('.krakenData').empty()
-  $('.tmiData').empty()
-  $('.unofficialChart').empty()
+          let successPerMinute = {}
+          let _successPerMinute  =_.groupBy(success, o => {
+            return (new Date(o.timestamp)).getHours() + ':' + (new Date(o.timestamp)).getMinutes()
+          })
+          for (let minute of Object.keys(_successPerMinute)) {
+            let timestamp = String(new Date(_successPerMinute[minute][0].timestamp))
+            successPerMinute[timestamp] = _successPerMinute[minute].length
+          }
 
-  helixChart.clear()
-  krakenChart.clear()
-  tmiChart.clear()
-  unofficialChart.clear()
+          let errorsPerMinute = {}
+          let _errorsPerMinute  =_.groupBy(errors, o => {
+            return (new Date(o.timestamp)).getMinutes()
+          })
+          for (let minute of Object.keys(_errorsPerMinute)) {
+            let timestamp = String(new Date(_errorsPerMinute[minute][0].timestamp))
+            errorsPerMinute[timestamp] = _errorsPerMinute[minute].length
+          }
 
-  socket.off('api.stats')
-  socket.on('api.stats', (c) => {
-    let tBody = `.${c.api}Data`
-    c.code = _.get(c, 'code', 200) // set default to 200
-    c.data = !_.isNil(c.data) ? JSON.stringify(c.data) : 'n/a'
-    c.remaining = !_.isNil(c.remaining) ? c.remaining : 'n/a'
+          // we need to have same datas for timestamps if errors are 0
+          for (let [timestamp, value] of Object.entries(successPerMinute)) {
+            if (!errorsPerMinute[timestamp]) errorsPerMinute[timestamp] = 0
+          }
 
-    $(tBody).prepend(
-      `
-        <tr class="${c.code.toString().startsWith('2') ? '' : 'font-weight-bold text-danger'}">
-          <th scope="row">${moment(c.timestamp).format('LTS')}</th>
-          <td>${c.call}</td>
-          <td><div style="word-wrap: break-word; font-family: Monospace; width: 200px;">${c.endpoint}</div></td>
-          <td>${c.code}</td>
-          <td>${c.remaining}</td>
-          <td><div style="word-wrap: break-word; font-family: Monospace; width: 100%;">${c.data}</div></td>
-        </tr>
-      `
-    )
-    apiData.push(c)
-    refreshApiGraphs()
-  })
+          return [
+            {name: 'Success', data: successPerMinute},
+            {name: 'Errors', data: errorsPerMinute},
+          ]
+          console.log(successPerMinute)
+          console.log(errorsPerMinute)
+        }
+      },
+      mounted: function () {
+        socket.off('api.stats').on('api.stats', (c) => {
+          c.code = _.get(c, 'code', 200) // set default to 200
+          c.data = !_.isNil(c.data) ? JSON.stringify(c.data) : 'n/a'
+          c.remaining = !_.isNil(c.remaining) ? c.remaining : 'n/a'
 
-  function refreshApiGraphs () {
-    const helixData = _.filter(apiData, (o) => o.api === 'helix')
-    const krakenData = _.filter(apiData, (o) => o.api === 'kraken')
-    const tmiData = _.filter(apiData, (o) => o.api === 'tmi')
-    const unofficialData = _.filter(apiData, (o) => o.api === 'unofficial')
-
-    let helixTimestampsPerMinute = {}
-    let helixTimestampsErrorsPerMinute = {}
-    let krakenTimestampsPerMinute = {}
-    let krakenTimestampsErrorsPerMinute = {}
-    let tmiTimestampsPerMinute = {}
-    let tmiTimestampsErrorsPerMinute = {}
-    let unofficialTimestampsPerMinute = {}
-    let unofficialTimestampsErrorsPerMinute = {}
-
-    let lastTimestampSaved = 0
-    for (let timestamp of _.map(helixData, 'timestamp')) {
-      // timestamps needs to be reversed as we have data from newest to oldest
-      if (timestamp >= lastTimestampSaved + 60000) {
-        lastTimestampSaved = timestamp
-        helixTimestampsPerMinute[lastTimestampSaved] = []
-        helixTimestampsErrorsPerMinute[lastTimestampSaved] = []
+          this.data.push(c)
+        })
+      },
+      methods: {
+        moment: function (args) {
+          return moment(args) // expose moment function
+        }
       }
-
-      if (_.find(helixData, (o) => o.code !== 200 && o.timestamp === timestamp)) {
-        helixTimestampsErrorsPerMinute[lastTimestampSaved].push(timestamp)
-      }
-      helixTimestampsPerMinute[lastTimestampSaved].push(timestamp)
-    }
-
-    for (let index in helixTimestampsPerMinute) {
-      helixTimestampsPerMinute[index] = helixTimestampsPerMinute[index].length
-    }
-
-    for (let index in helixTimestampsErrorsPerMinute) {
-      helixTimestampsErrorsPerMinute[index] = helixTimestampsErrorsPerMinute[index].length
-    }
-
-    lastTimestampSaved = 0
-    for (let timestamp of _.map(krakenData, 'timestamp')) {
-      // timestamps needs to be reversed as we have data from newest to oldest
-      if (timestamp >= lastTimestampSaved + 60000) {
-        lastTimestampSaved = timestamp
-        krakenTimestampsPerMinute[lastTimestampSaved] = []
-        krakenTimestampsErrorsPerMinute[lastTimestampSaved] = []
-      }
-
-      if (_.find(krakenData, (o) => o.code !== 200 && o.timestamp === timestamp)) {
-        krakenTimestampsErrorsPerMinute[lastTimestampSaved].push(timestamp)
-      }
-      krakenTimestampsPerMinute[lastTimestampSaved].push(timestamp)
-    }
-
-    for (let index in krakenTimestampsPerMinute) {
-      krakenTimestampsPerMinute[index] = krakenTimestampsPerMinute[index].length
-    }
-
-    for (let index in krakenTimestampsErrorsPerMinute) {
-      krakenTimestampsErrorsPerMinute[index] = krakenTimestampsErrorsPerMinute[index].length
-    }
-
-    lastTimestampSaved = 0
-    for (let timestamp of _.map(tmiData, 'timestamp')) {
-      // timestamps needs to be reversed as we have data from newest to oldest
-      if (timestamp >= lastTimestampSaved + 60000) {
-        lastTimestampSaved = timestamp
-        tmiTimestampsPerMinute[lastTimestampSaved] = []
-        tmiTimestampsErrorsPerMinute[lastTimestampSaved] = []
-      }
-
-      if (_.find(tmiData, (o) => o.code !== 200 && o.timestamp === timestamp)) {
-        tmiTimestampsErrorsPerMinute[lastTimestampSaved].push(timestamp)
-      }
-      tmiTimestampsPerMinute[lastTimestampSaved].push(timestamp)
-    }
-
-    for (let index in tmiTimestampsPerMinute) {
-      tmiTimestampsPerMinute[index] = tmiTimestampsPerMinute[index].length
-    }
-
-    for (let index in tmiTimestampsErrorsPerMinute) {
-      tmiTimestampsErrorsPerMinute[index] = tmiTimestampsErrorsPerMinute[index].length
-    }
-
-    lastTimestampSaved = 0
-    for (let timestamp of _.map(unofficialData, 'timestamp')) {
-      // timestamps needs to be reversed as we have data from newest to oldest
-      if (timestamp >= lastTimestampSaved + 60000) {
-        lastTimestampSaved = timestamp
-        unofficialTimestampsPerMinute[lastTimestampSaved] = []
-        unofficialTimestampsErrorsPerMinute[lastTimestampSaved] = []
-      }
-
-      if (_.find(unofficialData, (o) => o.code !== 200 && o.timestamp === timestamp)) {
-        unofficialTimestampsErrorsPerMinute[lastTimestampSaved].push(timestamp)
-      }
-      unofficialTimestampsPerMinute[lastTimestampSaved].push(timestamp)
-    }
-
-    for (let index in unofficialTimestampsPerMinute) {
-      unofficialTimestampsPerMinute[index] = unofficialTimestampsPerMinute[index].length
-    }
-
-    for (let index in unofficialTimestampsErrorsPerMinute) {
-      unofficialTimestampsErrorsPerMinute[index] = unofficialTimestampsErrorsPerMinute[index].length
-    }
-
-    /* HELIX CHART DATA*/
-    for (let label of _.map(_.keys(helixTimestampsPerMinute), (o) => moment(parseInt(o, 10)).format('LTS'))) {
-      helixChart.data.labels.push(label)
-    }
-
-    for (let count of _.values(helixTimestampsPerMinute)) {
-      if (_.isNil(helixChart.data.datasets[0])) {
-        helixChart.data.datasets.push({
-          label: 'HELIX API calls',
-          data: [ count ],
-          backgroundColor: 'rgba(0, 0, 255, 0.2)',
-          borderColor: 'rgba(0, 0, 255, 0.5)'
-        })
-      } else helixChart.data.datasets[0].data.push(count)
-    }
-
-    for (let count of _.values(helixTimestampsErrorsPerMinute)) {
-      if (_.isNil(helixChart.data.datasets[1])) {
-        helixChart.data.datasets.push({
-          label: 'ERRORS',
-          data: [ count ],
-          backgroundColor: 'rgba(255, 0, 0, 0.2)',
-          borderColor: 'rgba(255, 0, 0, 0.5)',
-        })
-      } else helixChart.data.datasets[1].data.push(count)
-    }
-    helixChart.update()
-
-    for (let count of _.values(helixTimestampsPerMinute)) {
-      if (_.isNil(helixChart.data.datasets[0])) {
-        helixChart.data.datasets.push({
-          label: 'HELIX API calls',
-          data: [ count ],
-          backgroundColor: 'rgba(0, 0, 255, 0.2)',
-          borderColor: 'rgba(0, 0, 255, 0.5)'
-        })
-      } else helixChart.data.datasets[0].data.push(count)
-    }
-
-    for (let count of _.values(helixTimestampsErrorsPerMinute)) {
-      if (_.isNil(helixChart.data.datasets[1])) {
-        helixChart.data.datasets.push({
-          label: 'ERRORS',
-          data: [ count ],
-          backgroundColor: 'rgba(255, 0, 0, 0.2)',
-          borderColor: 'rgba(255, 0, 0, 0.5)',
-        })
-      } else helixChart.data.datasets[1].data.push(count)
-    }
-    helixChart.update()
-
-    /* KRAKEN CHART DATA */
-    for (let label of _.map(_.keys(krakenTimestampsPerMinute), (o) => moment(parseInt(o, 10)).format('LTS'))) {
-      krakenChart.data.labels.push(label)
-    }
-
-    for (let count of _.values(krakenTimestampsPerMinute)) {
-      if (_.isNil(krakenChart.data.datasets[0])) {
-        krakenChart.data.datasets.push({
-          label: 'KRAKEN API calls',
-          data: [ count ],
-          backgroundColor: 'rgba(0, 0, 255, 0.2)',
-          borderColor: 'rgba(0, 0, 255, 0.5)'
-        })
-      } else krakenChart.data.datasets[0].data.push(count)
-    }
-
-    for (let count of _.values(krakenTimestampsErrorsPerMinute)) {
-      if (_.isNil(krakenChart.data.datasets[1])) {
-        krakenChart.data.datasets.push({
-          label: 'ERRORS',
-          data: [ count ],
-          backgroundColor: 'rgba(255, 0, 0, 0.2)',
-          borderColor: 'rgba(255, 0, 0, 0.5)',
-        })
-      } else krakenChart.data.datasets[1].data.push(count)
-    }
-    krakenChart.update()
-
-    /* TMI CHART DATA */$
-    for (let label of _.map(_.keys(tmiTimestampsPerMinute), (o) => moment(parseInt(o, 10)).format('LTS'))) {
-      tmiChart.data.labels.push(label)
-    }
-    for (let count of _.values(tmiTimestampsPerMinute)) {
-      if (_.isNil(tmiChart.data.datasets[0])) {
-        tmiChart.data.datasets.push({
-          label: 'TMI API calls',
-          data: [ count ],
-          backgroundColor: 'rgba(0, 0, 255, 0.2)',
-          borderColor: 'rgba(0, 0, 255, 0.5)'
-        })
-      } else tmiChart.data.datasets[0].data.push(count)
-    }
-
-    for (let count of _.values(tmiTimestampsErrorsPerMinute)) {
-      if (_.isNil(tmiChart.data.datasets[1])) {
-        tmiChart.data.datasets.push({
-          label: 'ERRORS',
-          data: [ count ],
-          backgroundColor: 'rgba(255, 0, 0, 0.2)',
-          borderColor: 'rgba(255, 0, 0, 0.5)',
-        })
-      } else tmiChart.data.datasets[1].data.push(count)
-    }
-    tmiChart.update()
-
-    /* UNOFFICIAL CHART DATA */$
-    for (let label of _.map(_.keys(unofficialTimestampsPerMinute), (o) => moment(parseInt(o, 10)).format('LTS'))) {
-      unofficialChart.data.labels.push(label)
-    }
-    for (let count of _.values(unofficialTimestampsPerMinute)) {
-      if (_.isNil(unofficialChart.data.datasets[0])) {
-        unofficialChart.data.datasets.push({
-          label: 'unofficial API calls',
-          data: [ count ],
-          backgroundColor: 'rgba(0, 0, 255, 0.2)',
-          borderColor: 'rgba(0, 0, 255, 0.5)'
-        })
-      } else unofficialChart.data.datasets[0].data.push(count)
-    }
-
-    for (let count of _.values(unofficialTimestampsErrorsPerMinute)) {
-      if (_.isNil(unofficialChart.data.datasets[1])) {
-        unofficialChart.data.datasets.push({
-          label: 'ERRORS',
-          data: [ count ],
-          backgroundColor: 'rgba(255, 0, 0, 0.2)',
-          borderColor: 'rgba(255, 0, 0, 0.5)',
-        })
-      } else unofficialChart.data.datasets[1].data.push(count)
-    }
-    unofficialChart.update()
+    })
   }
-
+  apiStatsAppInit()
 </script>
