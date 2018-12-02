@@ -422,8 +422,8 @@ class Spotify extends Integration {
         if (spotifyId.startsWith('spotify:')) id = spotifyId.replace('spotify:track:', '')
         else {
           const regex = new RegExp('\\S+open\\.spotify\\.com\\/track\\/(\\w+)(.*)?', 'gi')
-          id = regex.exec(spotifyId)
-          if (id) id = id[1]
+          const exec = regex.exec(spotifyId)
+          if (exec) id = exec[1]
           else throw Error('ID was not found in ' + spotifyId)
         }
         let response = await axios({
