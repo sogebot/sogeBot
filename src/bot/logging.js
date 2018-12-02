@@ -11,6 +11,7 @@ var moment = require('moment-timezone')
 const glob = require('glob')
 const cluster = require('cluster')
 const config = require('@config')
+const chalk = require('chalk')
 
 config.timezone = config.timezone === 'system' || _.isNil(config.timezone) ? moment.tz.guess() : config.timezone
 
@@ -83,8 +84,12 @@ if (cluster.isWorker) {
         if (info.level === 'start') level = '== STREAM STARTED =>'
         if (info.level === 'stop') level = '== STREAM STOPPED'
 
+        if (typeof info.message === 'object') info.message = JSON.stringify(info.message, null, 4)
         const timestamp = moment().tz(config.timezone).format('YYYY-MM-DD[T]HH:mm:ss.SSS')
-        return `${timestamp} ${level} ${info.message} ${info.username ? `[${info.username}]` : ''}`
+
+        if (info.level === 'debug') {
+          return chalk.yellow(`${timestamp} ${level} ${info.message} ${info.username ? `[${info.username}]` : ''}`)
+        } else return `${timestamp} ${level} ${info.message} ${info.username ? `[${info.username}]` : ''}`
       })
     ),
     exceptionHandlers: [

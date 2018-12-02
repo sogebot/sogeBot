@@ -28,14 +28,17 @@ Current integration is enabling `$currentSong` from Spotify
 
 ### Request song through !spotify command
 
-`!spotify <spotifyURI>` or `!spotify <string>`
+`!spotify <spotifyURI>` or `!spotify <string>` or `!spotify <song link>`
 
 !> Default permission is **DISABLED**
 
 #### Parameters
 
-- `<spotifyURI>` -  spotify URI of a song you want to play
-- `<string>` - song to search on spotify (will pick first found item)
+- `<spotifyURI>` -  spotify URI of a song you want to play, e.g. `spotify:track:14Vp3NpYyRP3cTu8XkubfS`
+- `<string>` - song to search on spotify (will pick first found item), e.g.
+  `lion king`
+- `<song link>` - song link, e.g.
+  `https://open.spotify.com/track/14Vp3NpYyRP3cTu8XkubfS?si=7vJWxZJdRu2VsBdvcVdAuA`
 
 #### Examples
 
