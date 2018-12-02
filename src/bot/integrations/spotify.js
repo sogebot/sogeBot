@@ -15,6 +15,10 @@ const constants = require('../constants')
 const Expects = require('../expects.js')
 const Integration = require('./_interface')
 
+const __DEBUG__ = {
+  REQUEST: (process.env.DEBUG && process.env.DEBUG.includes('spotify.request')) || (process.env.DEBUG && process.env.DEBUG.includes('spotify.*'))
+}
+
 /*
  * How to integrate:
  * 1. Create app in https://beta.developer.spotify.com/dashboard/applications
@@ -26,7 +30,7 @@ const Integration = require('./_interface')
 class Spotify extends Integration {
   client: any = null
   uris: Array<string> = []
-  currentUris: Array<string> = []
+  currentUris: string | null = null
   originalUri: string | null = null
 
   constructor () {
@@ -135,20 +139,28 @@ class Spotify extends Integration {
 
     const song = JSON.parse(this.settings._.currentSong)
 
+    if (__DEBUG__.REQUEST) {
+      global.log.debug({
+        song,
+        originalUri: this.originalUri,
+        cachedRequests: this.currentUris,
+        requests: this.uris
+      })
+    }
+
     // if song is not part of currentUris => save context
-    if (typeof song.uri !== 'undefined' && !this.currentUris.includes(song.uri) && this.uris.length === 0) {
+    if (typeof song.uri !== 'undefined' && this.currentUris !== song.uri && this.uris.length === 0) {
       this.originalUri = song.uri
     }
 
     // if song is part of currentUris and is playing, do nothing
-    if (typeof song.uri !== 'undefined' && this.currentUris.includes(song.uri) && song.is_playing) {
+    if (typeof song.uri !== 'undefined' && this.currentUris === song.uri && song.is_playing) {
       return
     }
 
     // if song is part of currentUris and is not playing (finished playing), continue from playlist if set
-    if (typeof song.uri !== 'undefined' && this.currentUris.includes(song.uri) && !song.is_playing && this.uris.length === 0) {
+    if (typeof song.uri !== 'undefined' && this.currentUris === song.uri && !song.is_playing && this.uris.length === 0) {
       if (this.settings.output.playlistToPlay.length > 0) {
-        this.currentUris = []
         try {
           // play from playlist
           const offset = this.originalUri ? { uri: this.originalUri } : undefined
@@ -172,15 +184,17 @@ class Spotify extends Integration {
               'Authorization': 'Bearer ' + this.settings._.accessToken
             }
           })
+          this.currentUris = null
         } catch (e) {
-          global.log.error(e.stack)
+          global.log.warning('Cannot continue playlist from ' + String(this.originalUri))
+          global.log.warning('Playlist will continue from random track')
+          this.originalUri = null
         }
       }
     } else if (this.uris.length > 0) { // or we have requests
       if (Date.now() - song.finished_at <= 0 || this.originalUri !== song.uri || this.originalUri === null || !song.is_playing) { // song should be finished
         try {
-          this.currentUris = [...this.uris]
-          this.uris = []
+          this.currentUris = this.uris.shift() // FIFO
           await axios({
             method: 'put',
             url: 'https://api.spotify.com/v1/me/player/play',
@@ -189,12 +203,12 @@ class Spotify extends Integration {
               'Content-Type': 'application/json'
             },
             data: {
-              uris: this.currentUris
+              uris: [this.currentUris]
             }
           })
 
           // force is_playing and uri just to not skip until track refresh
-          song.uri = this.currentUris[0]
+          song.uri = this.currentUris
           song.is_playing = true
           this.settings._.currentSong = JSON.stringify(song)
         } catch (e) {
@@ -403,10 +417,18 @@ class Spotify extends Integration {
         .everything()
         .toArray()
 
-      if (spotifyId.startsWith('spotify:')) {
+      if (spotifyId.startsWith('spotify:') || spotifyId.startsWith('https://open.spotify.com/track/')) {
+        let id: string = ''
+        if (spotifyId.startsWith('spotify:')) id = spotifyId.replace('spotify:track:', '')
+        else {
+          const regex = new RegExp('\\S+open\\.spotify\\.com\\/track\\/(\\w+)(.*)?', 'gi')
+          const exec = regex.exec(spotifyId)
+          if (exec) id = exec[1]
+          else throw Error('ID was not found in ' + spotifyId)
+        }
         let response = await axios({
           method: 'get',
-          url: 'https://api.spotify.com/v1/tracks/' + spotifyId.replace('spotify:track:', ''),
+          url: 'https://api.spotify.com/v1/tracks/' + id,
           headers: {
             'Authorization': 'Bearer ' + this.settings._.accessToken
           }
@@ -416,7 +438,7 @@ class Spotify extends Integration {
           global.commons.prepare('integrations.spotify.song-requested', {
             name: track.name, artist: track.artists[0].name
           }), opts.sender)
-        this.uris.push(spotifyId)
+        this.uris.push('spotify:track:' + id)
       } else {
         let response = await axios({
           method: 'get',

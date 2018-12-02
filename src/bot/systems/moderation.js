@@ -150,9 +150,22 @@ class Moderation extends System {
   }
 
   async whitelist (text) {
-    let ytRegex, clipsRegex
+    let ytRegex, clipsRegex, spotifyRegex
 
-    // check if songrequest -or- alias of songrequest contain youtube link -> change it to ID
+    // check if spotify -or- alias of spotify contain open.spotify.com link
+    if (await global.integrations.spotify.isEnabled()) {
+      // we can assume its first command in array (spotify have only one command)
+      const command = (await global.integrations.spotify.commands())[0].command
+      const alias = await global.db.engine.findOne(global.systems.alias.collection.data, { command })
+      if (!_.isEmpty(alias) && alias.enabled && await global.systems.alias.isEnabled()) {
+        spotifyRegex = new RegExp('^(' + command + '|' + alias.alias + ') \\S+open\\.spotify\\.com\\/track\\/(\\w+)(.*)?', 'gi')
+      } else {
+        spotifyRegex = new RegExp('^(' + command + ') \\S+open\\.spotify\\.com\\/track\\/(\\w+)(.*)?', 'gi')
+      }
+      text = text.replace(spotifyRegex, '')
+    }
+
+    // check if songrequest -or- alias of songrequest contain youtube link
     if (await global.systems.songs.isEnabled()) {
       let alias = await global.db.engine.findOne(global.systems.alias.collection.data, { command: '!songrequest' })
       if (!_.isEmpty(alias) && alias.enabled && await global.systems.alias.isEnabled()) {
