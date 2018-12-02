@@ -136,6 +136,10 @@
         remove: function (_id) {
           this.socket.emit('delete', { _id }, () => {
             this.items = this.items.filter(o => o._id != _id)
+
+            this.$nextTick(() => {
+              Prism.highlightAll()
+            })
           })
         },
         rerender: function () {
