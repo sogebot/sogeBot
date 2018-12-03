@@ -271,6 +271,7 @@ class Spotify extends Integration {
     try {
       if (!_.isNil(this.client) && this.settings._.refreshToken) {
         let data = await this.client.refreshAccessToken()
+        this.client.setAccessToken(data.body['access_token'])
         this.settings._.accessToken = data.body['access_token']
       }
     } catch (e) {
@@ -364,6 +365,11 @@ class Spotify extends Integration {
         redirectUri: this.settings.connection.redirectURI
       })
 
+      if (this.settings._.accessToken && this.settings._.refreshToken) {
+        this.client.setAccessToken(this.settings._.accessToken)
+        this.client.setRefreshToken(this.settings._.refreshToken)
+      }
+
       try {
         if (opts.token && !_.isNil(this.client)) {
           this.client.authorizationCodeGrant(opts.token)
@@ -377,10 +383,6 @@ class Spotify extends Integration {
             }, (err) => {
               if (err) global.log.info(chalk.yellow('SPOTIFY: ') + 'Getting of accessToken and refreshToken failed')
             })
-        }
-        if (!_.isNil(this.client) && this.settings._.accessToken && this.settings._.refreshToken) {
-          this.client.setAccessToken(this.settings._.accessToken)
-          this.client.setRefreshToken(this.settings._.refreshToken)
         }
         if (isNewConnection) global.log.info(chalk.yellow('SPOTIFY: ') + 'Client connected to service')
       } catch (e) {
