@@ -39,8 +39,9 @@ class Donationalerts extends Integration {
 
   async disconnect () {
     if (this.socket !== null) {
-      this.socket.close().off()
       this.socket.removeAllListeners()
+      this.socket.off()
+      this.socket.close()
     }
   }
 
@@ -67,8 +68,9 @@ class Donationalerts extends Integration {
       })
       this.socket.on('disconnect', () => {
         global.log.info(chalk.yellow('DONATIONALERTS.RU:') + ' Socket disconnected from service')
-        this.socket.off('donation')
-        this.socket.open()
+        this.socket.removeAllListeners()
+        this.socket.off()
+        this.socket.close()
         this.socket = null
       })
 
