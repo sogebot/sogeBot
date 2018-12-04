@@ -42,7 +42,7 @@ class Text extends Overlay {
           }
           item.text = await new Message(item.text).parse()
         }
-        callback({ html: item.text, css: item.css, js: item.js })
+        callback({ html: item.text, css: item.css, js: item.js, external: item.external })
       })
     })
   }

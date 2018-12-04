@@ -30,7 +30,6 @@
           <button v-if="states.save === 3" disabled="disabled" type="button" class="btn btn-danger"><i class="fas fa-exclamation"></i> {{ commons.translate('dialog.buttons.something-went-wrong') }}</button>
       </div>
     </div>
-
     <div class="pt-3">
       <!-- Editation stuff here -->
       <form>
@@ -39,6 +38,24 @@
             <label style="font-weight: bold; margin: 0px 0px 3px; font-size: 11px; text-transform: uppercase; letter-spacing: 1px;">{{ commons.translate('name') }}</label>
             <input v-bind:class="{ 'is-invalid': hasError.name }" v-model="name" type="text" class="form-control" v-bind:placeholder="commons.translate('registry.textoverlay.name.placeholder')">
             <div class="invalid-feedback">{{ commons.translate('registry.textoverlay.name.error.isEmpty') }}</div>
+          </div>
+        </div>
+        <div class="form-row pl-2 pr-2">
+          <div class="form-group col">
+            <label style="font-weight: bold; margin: 0px 0px 3px; font-size: 11px; text-transform: uppercase; letter-spacing: 1px;">EXTERNAL JS</label>
+
+            <div class="input-group mb-3">
+              <input type="text" class="form-control" placeholder="e.g. https://code.jquery.com/jquery-3.3.1.min.js" v-model="externalJsInput">
+              <div class="input-group-append">
+                <button type="button" class="btn btn-primary" @click="if (externalJsInput) { external.push(externalJsInput); pending = true; } externalJsInput = ''"><i class="fas fa-plus"></i> Add external JS</button>
+              </div>
+            </div>
+            <ul class="list-group">
+              <li style="padding: 0.1rem 0.5rem" class="list-group-item list-group-item-info d-flex justify-content-between align-items-center" v-for="js of external" :key="js" >
+                {{js}}
+                <button type="button" class="btn btn-outline-info border-0" @click="removeExternalJS(js); pending = true"><i class="fas fa-times"></i></button>
+              </li>
+            </ul>
           </div>
         </div>
         <div class="form-row pl-2 pr-2">
@@ -83,10 +100,12 @@
         html: '',
         js: '',
         css: '',
+        external: [],
 
         htmlInput: null,
         jsInput: null,
         cssInput: null,
+        externalJsInput: '',
 
         pending: false,
 
@@ -102,6 +121,9 @@
         }
       },
       methods: {
+        removeExternalJS: function (js) {
+          this.external.splice(this.external.indexOf(js), 1)
+        },
         initializeTextArea: function () {
           const htmltextarea = document.getElementById('html_overlay-textarea')
           const jstextarea = document.getElementById('js_overlay-textarea')
@@ -149,7 +171,8 @@
               name: this.name,
               text: this.htmlInput.getValue(),
               js: this.jsInput.getValue(),
-              css: this.cssInput.getValue()
+              css: this.cssInput.getValue(),
+              external: this.external
             }
             if (!this.states.delete) {
               this.socket.emit('update', {collection: 'data', items: [data]}, (err, data) => {
@@ -190,6 +213,7 @@
             this.html = data.text
             this.js = data.js
             this.css = data.css
+            this.external = data.external || []
             this.$nextTick(() => { this.pending = false })
             this.states.load = true
           })

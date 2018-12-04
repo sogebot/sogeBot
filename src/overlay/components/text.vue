@@ -10,7 +10,8 @@
         socket: io('/overlays/text', {query: "token="+token}),
         text: '',
         js: null,
-        css: null
+        css: null,
+        external: false
       }
     },
     mounted: function () {
@@ -58,12 +59,22 @@
       refresh: function () {
         if (this.urlParam('id')) {
           this.socket.emit('get', this.urlParam('id'), (cb) => {
-            this.text = cb.html
+            if (!this.external) {
+              for (let link of cb.external) {
+                var script = document.createElement('script')
+                script.src = link
+                document.getElementsByTagName('head')[0].appendChild(script)
+              }
+              this.external = true
+            }
 
-            this.$nextTick(() => {
-              if (!this.js && cb.js) this.js = cb.js
-              if (!this.css && cb.css) this.css = cb.css
-            })
+            setTimeout(() => {
+              this.text = cb.html
+              this.$nextTick(() => {
+                if (!this.js && cb.js) this.js = cb.js
+                if (!this.css && cb.css) this.css = cb.css
+              })
+            }, 100)
           })
         } else {
           console.error('Missing id param in url')
