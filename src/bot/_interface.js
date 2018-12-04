@@ -51,7 +51,7 @@ class Module {
 
   _status (retries) {
     if (typeof retries === 'undefined') retries = 0
-    if (retries === 1000) throw new Error('Something went wrong')
+    if (retries === 6000) throw new Error('Something went wrong')
     if (!this.isLoaded) setTimeout(() => this._status(++retries), 10)
     else this.status({ state: this.settings.enabled }) // force status change
   }
