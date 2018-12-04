@@ -67,7 +67,9 @@ class Donationalerts extends Integration {
       })
       this.socket.on('disconnect', () => {
         global.log.info(chalk.yellow('DONATIONALERTS.RU:') + ' Socket disconnected from service')
+        this.socket.off('donation')
         this.socket.open()
+        this.socket = null
       })
 
       this.socket.on('donation', async (data) => {
@@ -87,9 +89,11 @@ class Donationalerts extends Integration {
         global.log.tip(`${data.username.toLowerCase()}, amount: ${data.amount}${data.currency}, message: ${data.message}`)
         global.events.fire('tip', { username: data.username.toLowerCase(), amount: parseFloat(data.amount).toFixed(2), message: data.message, currency: data.currency })
 
-        const id = await global.users.getIdByName(data.username.toLowerCase(), false)
-        if (id) global.db.engine.insert('users.tips', { id, amount: data.amount, message: data.message, currency: data.currency, timestamp: _.now() })
-        if (await global.cache.isOnline()) await global.db.engine.increment('api.current', { key: 'tips' }, { value: parseFloat(global.currency.exchange(data.amount, data.currency, global.currency.settings.currency.mainCurrency)) })
+        if (!data._is_test_alert) {
+          const id = await global.users.getIdByName(data.username.toLowerCase(), false)
+          if (id) global.db.engine.insert('users.tips', { id, amount: data.amount, message: data.message, currency: data.currency, timestamp: _.now() })
+          if (await global.cache.isOnline()) await global.db.engine.increment('api.current', { key: 'tips' }, { value: parseFloat(global.currency.exchange(data.amount, data.currency, global.currency.settings.currency.mainCurrency)) })
+        }
       })
     }
   }
