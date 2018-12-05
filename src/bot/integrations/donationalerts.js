@@ -6,6 +6,7 @@
 const _ = require('lodash')
 const chalk = require('chalk')
 const constants = require('../constants.js')
+const cluster = require('cluster')
 
 // bot libraries
 const Integration = require('./_interface')
@@ -29,7 +30,9 @@ class Donationalerts extends Integration {
     }
     super({ settings, onChange, ui })
 
-    setInterval(() => this.connect(), constants.HOUR) // restart socket each hour
+    if (cluster.isMaster) {
+      setInterval(() => this.connect(), constants.HOUR) // restart socket each hour
+    }
   }
 
   onStateChange (key: String, val: String) {
@@ -74,7 +77,7 @@ class Donationalerts extends Integration {
         this.socket = null
       })
 
-      this.socket.on('donation', async (data) => {
+      this.socket.off('donation').on('donation', async (data) => {
         data = JSON.parse(data)
         if (parseInt(data.alert_type, 10) !== 1) return
         let additionalData = JSON.parse(data.additional_data)
