@@ -6,6 +6,7 @@
 const _ = require('lodash')
 const chalk = require('chalk')
 const constants = require('../constants.js')
+const cluster = require('cluster')
 
 // bot libraries
 const Integration = require('./_interface')
@@ -29,7 +30,9 @@ class Donationalerts extends Integration {
     }
     super({ settings, onChange, ui })
 
-    setInterval(() => this.connect(), constants.HOUR) // restart socket each hour
+    if (cluster.isMaster) {
+      setInterval(() => this.connect(), constants.HOUR) // restart socket each hour
+    }
   }
 
   onStateChange (key: String, val: String) {
@@ -39,8 +42,9 @@ class Donationalerts extends Integration {
 
   async disconnect () {
     if (this.socket !== null) {
-      this.socket.close().off()
       this.socket.removeAllListeners()
+      this.socket.off()
+      this.socket.close()
     }
   }
 
@@ -67,10 +71,13 @@ class Donationalerts extends Integration {
       })
       this.socket.on('disconnect', () => {
         global.log.info(chalk.yellow('DONATIONALERTS.RU:') + ' Socket disconnected from service')
-        this.socket.open()
+        this.socket.removeAllListeners()
+        this.socket.off()
+        this.socket.close()
+        this.socket = null
       })
 
-      this.socket.on('donation', async (data) => {
+      this.socket.off('donation').on('donation', async (data) => {
         data = JSON.parse(data)
         if (parseInt(data.alert_type, 10) !== 1) return
         let additionalData = JSON.parse(data.additional_data)
@@ -87,9 +94,11 @@ class Donationalerts extends Integration {
         global.log.tip(`${data.username.toLowerCase()}, amount: ${data.amount}${data.currency}, message: ${data.message}`)
         global.events.fire('tip', { username: data.username.toLowerCase(), amount: parseFloat(data.amount).toFixed(2), message: data.message, currency: data.currency })
 
-        const id = await global.users.getIdByName(data.username.toLowerCase(), false)
-        if (id) global.db.engine.insert('users.tips', { id, amount: data.amount, message: data.message, currency: data.currency, timestamp: _.now() })
-        if (await global.cache.isOnline()) await global.db.engine.increment('api.current', { key: 'tips' }, { value: parseFloat(global.currency.exchange(data.amount, data.currency, global.currency.settings.currency.mainCurrency)) })
+        if (!data._is_test_alert) {
+          const id = await global.users.getIdByName(data.username.toLowerCase(), false)
+          if (id) global.db.engine.insert('users.tips', { id, amount: data.amount, message: data.message, currency: data.currency, timestamp: _.now() })
+          if (await global.cache.isOnline()) await global.db.engine.increment('api.current', { key: 'tips' }, { value: parseFloat(global.currency.exchange(data.amount, data.currency, global.currency.settings.currency.mainCurrency)) })
+        }
       })
     }
   }
