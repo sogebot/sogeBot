@@ -60,10 +60,12 @@
         if (this.urlParam('id')) {
           this.socket.emit('get', this.urlParam('id'), (cb) => {
             if (!this.external) {
-              for (let link of cb.external) {
-                var script = document.createElement('script')
-                script.src = link
-                document.getElementsByTagName('head')[0].appendChild(script)
+              if (cb.external) {
+                for (let link of cb.external) {
+                  var script = document.createElement('script')
+                  script.src = link
+                  document.getElementsByTagName('head')[0].appendChild(script)
+                }
               }
               this.external = true
             }
