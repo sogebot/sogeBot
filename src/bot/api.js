@@ -951,6 +951,16 @@ class API {
             global.events.fire('stream-stopped')
             global.events.fire('stream-is-running-x-minutes', { reset: true })
             global.events.fire('number-of-viewers-is-at-least-x', { reset: true })
+
+            // go through all systems and trigger onStreamStop
+            for (let [name, system] of Object.entries(global.systems)) {
+              if (name.startsWith('_')) continue
+              if (system.onStreamStop.length > 0) {
+                for (let fnc of system.onStreamStop) {
+                  if (typeof fnc === 'function') fnc()
+                }
+              }
+            }
           }
 
           await global.db.engine.update('api.max', { key: 'viewers' }, { value: 0 })
