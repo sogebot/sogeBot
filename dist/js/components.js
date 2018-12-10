@@ -790,3 +790,54 @@ window.buttonSocket = {
     </button>
   `
 }
+
+/* configurableList */
+window.configurableList = {
+  props: ['current', 'value', 'title'],
+  data: function () {
+    return {
+      show: false,
+      currentValue: this.value,
+      translatedTitle: commons.translate(this.title)
+    }
+  },
+  watch: {
+    currentValue: function () {
+      this.onChange()
+    }
+  },
+  methods: {
+    onChange: function () {
+      this.$emit('update', { value: this.currentValue })
+    },
+    removeItem: function (index) {
+      this.currentValue.splice(index, 1)
+    }
+  },
+  template: `
+    <div class="d-flex">
+      <div class="input-group-prepend">
+        <span class="input-group-text">
+          <template v-if="typeof translatedTitle === 'string'">{{ translatedTitle }}</template>
+          <template v-else>
+            {{ translatedTitle.title }}
+            <small class="textInputTooltip text-info" data-toggle="tooltip" data-html="true" :title="translatedTitle.help">[?]</small>
+          </template>
+        </span>
+      </div>
+      <ul class="list-group list-group-flush w-100 border border-input">
+        <li class="list-group-item border-0 d-flex" v-for='(v, index) of currentValue'>
+          <div class="w-100" :key="index">
+            <input type="text" class="form-control" v-model="currentValue[index]"/>
+          </div>
+          <button class="btn btn-outline-dark border-0" @click="removeItem(index)"><i class="fas fa-times"></i></button>
+        </li>
+        <li class="list-group-item">
+          <button class="btn btn-success" type="button" @click="currentValue.push('')">
+            <i class="fas fa-plus"></i> Add new item
+          </button>
+        </li>
+      </ul>
+    </div>
+  `
+}

@@ -18,6 +18,8 @@ class Module {
     this._settings.enabled = typeof this._settings.enabled !== 'undefined' ? this._settings.enabled : true
 
     this.onChange = opts.onChange || {}
+    this.onStreamStop = opts.onStreamStop || []
+
     this.dependsOn = opts.dependsOn || []
     this.socket = null
 
@@ -275,8 +277,9 @@ class Module {
             for (let item of opts.items) {
               let itemFromDb = Object.assign({}, item)
               const _id = item._id; delete item._id
-              if (_.isNil(_id)) itemFromDb = await global.db.engine.insert(opts.collection, item)
-              else await global.db.engine.update(opts.collection, { _id }, item)
+              if (_.isNil(_id) && _.isNil(opts.key)) itemFromDb = await global.db.engine.insert(opts.collection, item)
+              else if (_id) await global.db.engine.update(opts.collection, { _id }, item)
+              else await global.db.engine.update(opts.collection, { [opts.key]: item[opts.key] }, item)
               if (_.isFunction(cb)) cb(null, Object.assign({ _id }, itemFromDb))
             }
           } else {

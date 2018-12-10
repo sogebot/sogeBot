@@ -27,6 +27,7 @@ You can also contact me on my email sogehige@gmail.com or get support on our [di
 | System             | Description                                                                                                                              |
 |--------------------|------------------------------------------------------------------------------------------------------------------------------------------|
 | Alias              | Don't like default commands? Make an alias!                                                                                              |
+| Checklist          | Pre-stream customizable checklist                                                                                              |
 | Keywords           | Bot will respond on certain keywords                                                                                                     |
 | Points / Loyalty   | Points system for your users                                                                                                             |
 | Price              | Make viewers to spend points on e.g. !songrequest                                                                                        |
