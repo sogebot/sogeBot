@@ -165,4 +165,8 @@ if (cluster.isMaster) {
       worker.disconnect()
     }
   }, 1000 * 60 * 60 * 2) // every 2 hour spin up new worker and kill old
+
+  setTimeout(() => {
+    global.systems.voting.open({ parameters: '-tips -title "aaa" option1 | option 2 | Ananas na pizze', sender: { username: 'soge__' } })
+  }, 10000)
 }

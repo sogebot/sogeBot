@@ -94,6 +94,28 @@ class Expects {
     return this
   }
 
+  switch (opts) {
+    opts = opts || {}
+    _.defaults(opts, { optional: false, default: null })
+
+    if (_.isNil(opts.name)) throw Error('Argument name must be defined')
+    if (_.isNil(opts.values)) throw Error('Values must be defined')
+    if (!opts.optional) this.checkText()
+
+    const pattern = opts.values.join('|')
+
+    const regexp = XRegExp(`-(?<${opts.name}>${pattern})`, 'ix')
+    const match = XRegExp.exec(this.text, regexp)
+    if (!_.isNil(match) && match[opts.name].trim().length !== 0) {
+      this.match.push(match[opts.name])
+      this.text = this.text.replace(match[0], '') // remove from text matched pattern
+    } else {
+      if (!opts.optional) throw Error('Argument not found')
+      else this.match.push(opts.default)
+    }
+    return this
+  }
+
   argument (opts) {
     opts = opts || {}
     _.defaults(opts, { type: String, optional: false, default: null, multi: false, delimiter: '"' })
@@ -119,7 +141,7 @@ class Expects {
       }
       this.text = this.text.replace(match[0], '') // remove from text matched pattern
     } else {
-      if (!opts.optional) throw Error('Argument not found')
+      if (!opts.optional) throw Error(`Argument ${opts.name} not found`)
       else this.match.push(opts.default)
     }
     return this
