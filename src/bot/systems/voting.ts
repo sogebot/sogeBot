@@ -1,12 +1,12 @@
 'use strict';
 
 // 3rdparty libraries
-const _ = require('lodash');
+import _ from 'lodash';
 
 // bot libraries
-const constants = require('../constants');
-const Expects = require('../expects.js');
-const System = require('./_interface');
+import constants from '../constants';
+import Expects from '../expects.js';
+import System from './_interface';
 
 enum ERROR {
   NOT_ENOUGH_OPTIONS,
@@ -17,7 +17,7 @@ enum ERROR {
   ALREADY_CLOSED,
 }
 
-declare interface IVoteType {
+declare interface VoteType {
   _id?: any;
   vid: string;
   votedBy: string;
@@ -25,7 +25,7 @@ declare interface IVoteType {
   option: number;
 }
 
-declare interface IVotingType {
+declare interface VotingType {
   _id?: any;
   type: 'tips' | 'bits' | 'normal';
   title: string;
@@ -41,8 +41,7 @@ declare interface IVotingType {
  */
 
 class Voting extends System {
-  public collection: { [s: string]: string };
-  public settings: any;
+  [x: string]: any; // TODO: remove after interface ported to TS
 
   constructor() {
     const options: InterfaceSettings = {
@@ -54,8 +53,8 @@ class Voting extends System {
         ],
       },
       on: {
-        bit: (bit): Promise<void> => this.parseBit(bit.message),
         tip: (tip): Promise<void> => this.parseTip(tip.message),
+        bit: (bit): Promise<void> => this.parseBit(bit.message),
       },
     };
 
@@ -63,11 +62,11 @@ class Voting extends System {
   }
 
   public async close(opts: CommandOptions): Promise<boolean> {
-    const cVote: IVotingType = await global.db.engine.findOne(this.collection.data, { isOpened: true });
+    const cVote: VotingType = await global.db.engine.findOne(this.collection.data, { isOpened: true });
 
     try {
       if (!_.isEmpty(cVote)) { throw new Error(String(ERROR.ALREADY_CLOSED)); } else {
-        const votes: IVoteType[] = await global.db.engine.find(this.collection.votes, { vid: String(cVote._id) });
+        const votes: VoteType[] = await global.db.engine.find(this.collection.votes, { vid: String(cVote._id) });
         await global.db.engine.update(this.collection.data, { _id: String(cVote._id) }, { isOpened: false });
 
         const count = {};
@@ -103,7 +102,7 @@ class Voting extends System {
   }
 
   public async open(opts: CommandOptions): Promise<boolean> {
-    const cVote: IVotingType = await global.db.engine.findOne(this.collection.data, { isOpened: true });
+    const cVote: VotingType = await global.db.engine.findOne(this.collection.data, { isOpened: true });
 
     try {
       if (!_.isEmpty(cVote)) { throw new Error(String(ERROR.ALREADY_OPENED)); }
@@ -115,7 +114,7 @@ class Voting extends System {
         .toArray();
       if (options.length < 2) { throw new Error(String(ERROR.NOT_ENOUGH_OPTIONS)); }
 
-      const voting: IVotingType = { type, title, isOpened: true, options };
+      const voting: VotingType = { type, title, isOpened: true, options };
       await global.db.engine.insert(this.collection.data, voting);
 
       const translations = `systems.voting.opened_${type}`;
@@ -155,12 +154,12 @@ class Voting extends System {
   }
 
   public async main(opts: CommandOptions): Promise<void> {
-    const cVote: IVotingType = await global.db.engine.findOne(this.collection.data, { isOpened: true });
+    const cVote: VotingType = await global.db.engine.findOne(this.collection.data, { isOpened: true });
     let index: number;
 
     try {
       if (opts.parameters.length === 0 && !_.isEmpty(cVote)) {
-        const votes: IVoteType[] = await global.db.engine.find(this.collection.votes, { vid: String(cVote._id) });
+        const votes: VoteType[] = await global.db.engine.find(this.collection.votes, { vid: String(cVote._id) });
 
         const count = {};
         let _total = 0;
@@ -191,7 +190,7 @@ class Voting extends System {
           .toArray();
         index = index - 1;
         if (cVote.options.length < index || index < 0) { throw new Error(String(ERROR.INVALID_VOTE)); } else {
-          const vote: IVoteType = {
+          const vote: VoteType = {
             vid: String(cVote._id),
             votedBy: opts.sender.username,
             votes: 1,

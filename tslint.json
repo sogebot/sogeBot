@@ -6,8 +6,8 @@
         "object-literal-sort-keys":false,
         "variable-name":false,
         "max-line-length":false,
-        "no-var-requires":false,
-        "quotemark": [true, "single", "jsx-double"]
+        "quotemark": [true, "single", "jsx-double"],
+        "interface-name":false
     },
     "rulesDirectory": []
 }
