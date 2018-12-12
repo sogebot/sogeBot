@@ -3,7 +3,8 @@
   "extends": ["standard", "plugin:flowtype/recommended"],
   "plugins": ["flowtype"],
   "rules": {
-    "standard/no-callback-literal": "off"
+    "standard/no-callback-literal": "off",
+    "flowtype/no-types-missing-file-annotation": "off"
   },
   "settings": {
     "flowtype": {
