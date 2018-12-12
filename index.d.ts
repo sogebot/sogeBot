@@ -3,7 +3,8 @@ declare namespace NodeJS {
     db: any,
     commons: any,
     translate: any,
-    log: any
+    log: any,
+    currency: any
   }
 }
 
