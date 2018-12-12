@@ -13,7 +13,8 @@ enum ERROR {
   NO_VOTING_IN_PROGRESS,
   INVALID_VOTE_TYPE,
   INVALID_VOTE,
-  ALREADY_OPENED
+  ALREADY_OPENED,
+  ALREADY_CLOSED
 }
 
 declare type VoteType = {
@@ -58,8 +59,47 @@ class Voting extends System {
     super(options)
   }
 
+  async close (opts: CommandOptions): Promise<boolean> {
+    const cVote: VotingType = await global.db.engine.findOne(this.collection.data, { isOpened: true })
+
+    try {
+      if (!_.isEmpty(cVote)) { throw new Error(String(ERROR.ALREADY_CLOSED)) }
+      else {
+        const votes: Array<VoteType> = await global.db.engine.find(this.collection.votes, { vid: String(cVote._id) })
+        await global.db.engine.update(this.collection.data, { _id: String(cVote._id) }, { isOpened: false })
+
+        let count = {}
+        let _total = 0
+        for (let i = 0, length = votes.length; i < length; i++) {
+          if (!count[votes[i].option]) count[votes[i].option] = votes[i].votes
+          else count[votes[i].option] = count[votes[i].option] + votes[i].votes
+          _total = _total + votes[i].votes
+        }
+        // get vote status
+        global.commons.sendMessage(global.commons.prepare('systems.voting.status_closed', {
+          title: cVote.title
+        }), opts.sender)
+        for (let index in cVote.options) {
+          setTimeout(() => {
+            const option = cVote.options[index]
+            const votes = count[index] || 0
+            if (cVote.type === "normal") global.commons.sendMessage(this.settings.commands['!vote'] + ` ${Number(index) + 1} - ${option} - ${votes} ${global.commons.getLocalizedName(votes, 'systems.voting.votes')}, ${Number((100 / _total) * votes).toFixed(2)}%`, opts.sender)
+            else global.commons.sendMessage(`#vote${Number(index) + 1} - ${option} - ${votes} ${global.commons.getLocalizedName(votes, 'systems.voting.votes')}, ${Number((100 / _total) * votes).toFixed(2)}`, opts.sender)
+          }, 100 * (Number(index) + 1))
+        }
+      }
+    } catch (e) {
+      switch (e.message) {
+        case String(ERROR.ALREADY_CLOSED):
+          global.commons.sendMessage(global.translate('systems.voting.notInProgress'), opts.sender)
+          break
+      }
+    }
+    return true
+  }
+
   async open (opts: CommandOptions): Promise<boolean> {
-    const cVote = await global.db.engine.findOne(this.collection.data, { isOpened: true })
+    const cVote: VotingType = await global.db.engine.findOne(this.collection.data, { isOpened: true })
 
     try {
       if (!_.isEmpty(cVote)) { throw new Error(String(ERROR.ALREADY_OPENED)) }
@@ -74,7 +114,7 @@ class Voting extends System {
       let voting: VotingType = { type, title, isOpened: true, options }
       await global.db.engine.insert(this.collection.data, voting)
 
-      const translations = 'systems.voting.opened' + (type.length > 0 ? `_${type}` : '')
+      const translations = `systems.voting.opened_${type}`
       global.commons.sendMessage(global.commons.prepare(translations, {
         title: title,
         command: this.settings.commands['!vote']
@@ -128,7 +168,9 @@ class Voting extends System {
           _total = _total + votes[i].votes
         }
         // get vote status
-        global.commons.sendMessage(global.commons.prepare('systems.voting.status'), opts.sender)
+        global.commons.sendMessage(global.commons.prepare('systems.voting.status', {
+          title: cVote.title
+        }), opts.sender)
         for (let index in cVote.options) {
           setTimeout(() => {
             const option = cVote.options[index]

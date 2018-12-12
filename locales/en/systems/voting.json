@@ -4,6 +4,7 @@
   "opened_bits": "Voting by cheering opened for \"$title\"! You can vote by adding hashtag #voteX into bit message",
   "notEnoughOptions": "$sender, new voting must have at least 2 options!",
   "notInProgress": "$sender, there is currently no voting!",
-  "status": "$sender, current status of voting:",
+  "status": "$sender, current status of voting \"$title\":",
+  "status_closed": "$sender, voting \"$title\" closed, status of voting:",
   "votes": "vote|votes"
 }
