@@ -189,8 +189,10 @@ class Voting extends System {
             const percentage = Number((100 / _total) * votesCount || 0).toFixed(2);
             if (cVote.type === 'normal') {
               global.commons.sendMessage(this.settings.commands['!vote'] + ` ${Number(i) + 1} - ${option} - ${votesCount} ${global.commons.getLocalizedName(votesCount, 'systems.voting.votes')}, ${percentage}%`, opts.sender);
+            } else if (cVote.type === 'tips') {
+              global.commons.sendMessage(`#vote${Number(i) + 1} - ${option} - ${Number(votesCount).toFixed(2)} ${global.commons.getLocalizedName(votesCount, 'systems.voting.votes')}, ${percentage}%`, opts.sender);
             } else {
-              global.commons.sendMessage(`#vote${Number(i) + 1} - ${option} - ${votesCount} ${global.commons.getLocalizedName(votesCount, 'systems.voting.votes')}, ${percentage}`, opts.sender);
+              global.commons.sendMessage(`#vote${Number(i) + 1} - ${option} - ${votesCount} ${global.commons.getLocalizedName(votesCount, 'systems.voting.votes')}, ${percentage}%`, opts.sender);
             }
           }, 100 * (Number(i) + 1));
         }
@@ -239,9 +241,10 @@ class Voting extends System {
             vid: String(cVote._id),
             votedBy: opts.username,
             votes: opts.amount,
-            option: i,
+            option: i - 1,
           };
-          global.db.engine.update(this.collection.votes, { vid: vote.vid, votedBy: vote.votedBy }, vote);
+          // no update as we will not switch vote option as in normal vote
+          await global.db.engine.insert(this.collection.votes, vote);
           break;
         }
       }
@@ -259,10 +262,11 @@ class Voting extends System {
           const vote: VoteType = {
             vid: String(cVote._id),
             votedBy: opts.username,
-            votes: parseFloat(global.currency.exchange(opts.amount, opts.currency, global.currency.settings.currency.mainCurrency)),
-            option: i,
+            votes: Number(global.currency.exchange(opts.amount, opts.currency, global.currency.settings.currency.mainCurrency)),
+            option: i - 1,
           };
-          global.db.engine.update(this.collection.votes, { vid: vote.vid, votedBy: vote.votedBy }, vote);
+          // no update as we will not switch vote option as in normal vote
+          await global.db.engine.insert(this.collection.votes, vote);
           break;
         }
       }

@@ -63,39 +63,43 @@ class Streamlabs extends Integration {
     })
 
     this.socket.on('event', async (eventData) => {
-      if (eventData.type === 'donation') {
-        for (let event of eventData.message) {
-          if (!event.isTest) {
-            const id = await global.users.getIdByName(event.from.toLowerCase(), false)
-            if (id) global.db.engine.insert('users.tips', { id, amount: event.amount, message: event.message, currency: event.currency, timestamp: _.now() })
-            if (await global.cache.isOnline()) await global.db.engine.increment('api.current', { key: 'tips' }, { value: parseFloat(global.currency.exchange(event.amount, event.currency, global.currency.settings.currency.mainCurrency)) })
-          }
-          global.overlays.eventlist.add({
-            type: 'tip',
-            amount: event.amount,
-            currency: event.currency,
-            username: event.from.toLowerCase(),
-            message: event.message
-          })
-          global.log.tip(`${event.from.toLowerCase()}, amount: ${event.amount}${event.currency}, message: ${event.message}`)
-          global.events.fire('tip', { username: event.from.toLowerCase(), amount: parseFloat(event.amount).toFixed(2), message: event.message, currency: event.currency })
+      this.parse(eventData)
+    })
+  }
 
-          // go through all systems and trigger on.tip
-          for (let [name, system] of Object.entries(global.systems)) {
-            if (name.startsWith('_')) continue
-            if (typeof system.on.tip === 'function') {
-              system.on.tip({
-                username: event.username.toLowerCase(),
-                amount: event.amount,
-                message: event.message,
-                currency: event.currency,
-                timestamp: _.now()
-              })
-            }
+  async parse(eventData) {
+    if (eventData.type === 'donation') {
+      for (let event of eventData.message) {
+        if (!event.isTest) {
+          const id = await global.users.getIdByName(event.from.toLowerCase(), false)
+          if (id) global.db.engine.insert('users.tips', { id, amount: event.amount, message: event.message, currency: event.currency, timestamp: _.now() })
+          if (await global.cache.isOnline()) await global.db.engine.increment('api.current', { key: 'tips' }, { value: parseFloat(global.currency.exchange(event.amount, event.currency, global.currency.settings.currency.mainCurrency)) })
+        }
+        global.overlays.eventlist.add({
+          type: 'tip',
+          amount: event.amount,
+          currency: event.currency,
+          username: event.from.toLowerCase(),
+          message: event.message
+        })
+        global.log.tip(`${event.from.toLowerCase()}, amount: ${event.amount}${event.currency}, message: ${event.message}`)
+        global.events.fire('tip', { username: event.from.toLowerCase(), amount: parseFloat(event.amount).toFixed(2), message: event.message, currency: event.currency })
+
+        // go through all systems and trigger on.tip
+        for (let [name, system] of Object.entries(global.systems)) {
+          if (name.startsWith('_')) continue
+          if (typeof system.on.tip === 'function') {
+            system.on.tip({
+              username: event.from.toLowerCase(),
+              amount: event.amount,
+              message: event.message,
+              currency: event.currency,
+              timestamp: _.now()
+            })
           }
         }
       }
-    })
+    }
   }
 }
 
