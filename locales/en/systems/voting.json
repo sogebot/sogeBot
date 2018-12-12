@@ -1,0 +1,9 @@
+{
+  "opened_normal": "Voting opened for \"$title\"! You can vote by $command X",
+  "opened_tips": "Voting by tipping opened for \"$title\"! You can vote by adding hashtag #voteX into tip message",
+  "opened_bits": "Voting by cheering opened for \"$title\"! You can vote by adding hashtag #voteX into bit message",
+  "notEnoughOptions": "$sender, new voting must have at least 2 options!",
+  "notInProgress": "$sender, there is currently no voting!",
+  "status": "$sender, current status of voting:",
+  "votes": "vote|votes"
+}
