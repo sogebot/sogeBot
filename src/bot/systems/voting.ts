@@ -210,9 +210,11 @@ class Voting extends System {
             votes: 1,
             option: index,
           };
-          global.db.engine.update(this.collection.votes, { vid: vote.vid, votedBy: vote.votedBy }, vote);
+          await global.db.engine.update(this.collection.votes, { vid: vote.vid, votedBy: vote.votedBy }, vote);
         }
-      } else { throw new Error(String(ERROR.INVALID_VOTE_TYPE)); }
+      } else {
+        throw new Error(String(ERROR.INVALID_VOTE_TYPE));
+      }
     } catch (e) {
       switch (e.message) {
         case String(ERROR.NO_VOTING_IN_PROGRESS):
