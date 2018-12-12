@@ -2,11 +2,9 @@
 
 // 3rdparty libraries
 const _ = require('lodash')
-const cluster = require('cluster')
 
 // bot libraries
 var constants = require('../constants')
-var Points = require('./points')
 const Expects = require('../expects.js')
 const System = require('./_interface')
 
