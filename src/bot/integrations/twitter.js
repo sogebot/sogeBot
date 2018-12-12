@@ -46,11 +46,13 @@ class Twitter extends Integration {
       }
     }
 
-    const onChange = {
-      enabled: ['onStateChange']
+    const on = {
+      change: {
+        enabled: ['onStateChange']
+      }
     }
 
-    super({ settings, ui, onChange })
+    super({ settings, ui, on })
 
     if (cluster.isMaster) this.addEvent()
   }

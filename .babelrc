@@ -2,8 +2,9 @@
   "presets": [
     ["@babel/preset-env", { "targets": { "node": "current" } }],
     "@babel/preset-flow",
+    "@babel/preset-typescript",
     ["minify", { "builtIns": false }]
   ],
   "sourceMaps": "inline",
-  "plugins": ["source-map-support", "@babel/plugin-proposal-class-properties"]
+  "plugins": ["source-map-support", "@babel/plugin-proposal-class-properties", "@babel/proposal-object-rest-spread"]
 }

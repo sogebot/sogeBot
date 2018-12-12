@@ -36,6 +36,7 @@ ui:
 bot:
 	@echo -ne "\n\t ----- Building bot\n"
 	@npx babel src/bot/ -d dest/
+	@npx babel src/bot/ -d dest/ --extensions ".ts,.tsx"
 
 pack:
 	@echo -ne "\n\t ----- Packing into sogeBot-$(VERSION).zip\n"

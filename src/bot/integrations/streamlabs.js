@@ -1,5 +1,3 @@
-// @flow
-
 'use strict'
 
 // 3rdparty libraries
@@ -23,11 +21,13 @@ class Streamlabs extends Integration {
         secret: true
       }
     }
-    const onChange = {
-      enabled: ['onStateChange'],
-      socketToken: ['connect']
+    const on = {
+      change: {
+        enabled: ['onStateChange'],
+        socketToken: ['connect']
+      }
     }
-    super({ settings, onChange, ui })
+    super({ settings, on, ui })
   }
 
   onStateChange (key: String, val: String) {
@@ -79,6 +79,20 @@ class Streamlabs extends Integration {
           })
           global.log.tip(`${event.from.toLowerCase()}, amount: ${event.amount}${event.currency}, message: ${event.message}`)
           global.events.fire('tip', { username: event.from.toLowerCase(), amount: parseFloat(event.amount).toFixed(2), message: event.message, currency: event.currency })
+
+          // go through all systems and trigger on.tip
+          for (let [name, system] of Object.entries(global.systems)) {
+            if (name.startsWith('_')) continue
+            if (typeof system.on.tip === 'function') {
+              system.on.tip({
+                username: event.username.toLowerCase(),
+                amount: event.amount,
+                message: event.message,
+                currency: event.currency,
+                timestamp: _.now()
+              })
+            }
+          }
         }
       }
     })

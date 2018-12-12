@@ -17,13 +17,13 @@ class Checklist extends System {
         }
       }
     }
-    const onStreamStop = [
-      () => {
+    const on = {
+      streamEnd: () => {
         global.db.engine.remove(this.collection.data, {})
       }
-    ]
+    }
 
-    super({ settings, ui, onStreamStop })
+    super({ settings, ui, on })
   }
 }
 

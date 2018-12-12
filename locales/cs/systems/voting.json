@@ -1,6 +1,9 @@
 {
-  "opened": "Hlasovani otevreno! Hlasovani na otazku \"$title\" pomoci $command X",
+  "opened_normal": "Hlasovani otevreno! Hlasovani na otazku \"$title\" pomoci $command X",
   "opened_tips": "Hlasovani pomoci tipu otevreno! Hlasovani na otazku \"$title\" pomoci hashtagu #voteX ve zprave tipu",
   "opened_bits": "Hlasovani pomoci bitu otevreno! Hlasovani na otazku \"$title\" pomoci hashtagu #voteX ve zprave bitu",
-  "notEnoughOptions": "$sender, nove hlasovani musi mit alespon dve moznosti!"
+  "notEnoughOptions": "$sender, nove hlasovani musi mit alespon dve moznosti!",
+  "notInProgress": "$sender, neprobiha prave zadne hlasovani!",
+  "status": "$sender, momentalni stav hlasovani:",
+  "votes": "hlas|4:hlasy|hlasu"
 }

@@ -1,5 +1,3 @@
-// @flow
-
 'use strict'
 
 const moment = require('moment')
@@ -387,6 +385,19 @@ class TMI extends Core {
       global.db.engine.insert('users.bits', { id: userId, amount: userstate.bits, message: messageFromUser, timestamp: _.now() })
       global.events.fire('cheer', { username, bits: userstate.bits, message: messageFromUser })
       if (await global.cache.isOnline()) await global.db.engine.increment('api.current', { key: 'bits' }, { value: parseInt(userstate.bits, 10) })
+
+      // go through all systems and trigger on.bit
+      for (let [name, system] of Object.entries(global.systems)) {
+        if (name.startsWith('_')) continue
+        if (typeof system.on.bit === 'function') {
+          system.on.bit({
+            username: username,
+            amount: userstate.bits,
+            message: messageFromUser,
+            timestamp: _.now()
+          })
+        }
+      }
     } catch (e) {
       global.log.error('Error parsing cheer event')
       global.log.error(JSON.stringify(message))

@@ -1,5 +1,3 @@
-// @flow
-
 'use strict'
 
 // 3rdparty libraries
@@ -24,11 +22,13 @@ class Donationalerts extends Integration {
         secret: true
       }
     }
-    const onChange = {
-      enabled: ['onStateChange'],
-      secretToken: ['connect']
+    const on = {
+      change: {
+        enabled: ['onStateChange'],
+        secretToken: ['connect']
+      }
     }
-    super({ settings, onChange, ui })
+    super({ settings, on, ui })
 
     if (cluster.isMaster) {
       setInterval(() => this.connect(), constants.HOUR) // restart socket each hour
@@ -98,6 +98,20 @@ class Donationalerts extends Integration {
           const id = await global.users.getIdByName(data.username.toLowerCase(), false)
           if (id) global.db.engine.insert('users.tips', { id, amount: data.amount, message: data.message, currency: data.currency, timestamp: _.now() })
           if (await global.cache.isOnline()) await global.db.engine.increment('api.current', { key: 'tips' }, { value: parseFloat(global.currency.exchange(data.amount, data.currency, global.currency.settings.currency.mainCurrency)) })
+        }
+
+        // go through all systems and trigger on.tip
+        for (let [name, system] of Object.entries(global.systems)) {
+          if (name.startsWith('_')) continue
+          if (typeof system.on.tip === 'function') {
+            system.on.tip({
+              username: data.username.toLowerCase(),
+              amount: data.amount,
+              message: data.message,
+              currency: data.currency,
+              timestamp: _.now()
+            })
+          }
         }
       })
     }
