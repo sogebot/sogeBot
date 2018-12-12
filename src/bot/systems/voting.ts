@@ -1,12 +1,12 @@
 "use strict";
 
 // 3rdparty libraries
-import _ = require("lodash");
+import _ from "lodash";
 
 // bot libraries
-import constants = require("../constants");
-import Expects = require("../expects.js");
-import System = require("./_interface");
+import constants from "../constants";
+import Expects from "../expects.js";
+import System from "./_interface";
 
 enum ERROR {
   NOT_ENOUGH_OPTIONS,
