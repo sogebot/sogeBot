@@ -69,7 +69,7 @@ describe('Voting - normal', () => {
       it(`User ${owner.username} will vote for option ${o} - should be saved in db`, async () => {
         await global.systems.voting.main({ sender: owner, parameters: String(o) })
         const vote = await global.db.engine.findOne(global.systems.voting.collection.votes, { votedBy: owner.username, vid });
-        assert.isNotEmpty(vote)
+        assert.isNotEmpty(vote, 'Expected ' + JSON.stringify({ votedBy: user, vid }) + ' to be found in db')
         assert.equal(vote.option, o - 1)
       })
     }
@@ -79,7 +79,7 @@ describe('Voting - normal', () => {
           const user = Math.random()
           await global.systems.voting.main({ sender: { username: user }, parameters: String(o) })
           const vote = await global.db.engine.findOne(global.systems.voting.collection.votes, { votedBy: user, vid });
-          assert.isNotEmpty(vote)
+          assert.isNotEmpty(vote, 'Expected ' + JSON.stringify({ votedBy: user, vid }) + ' to be found in db')
           assert.equal(vote.option, o - 1)
         }
       }
