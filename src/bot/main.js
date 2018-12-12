@@ -165,28 +165,4 @@ if (cluster.isMaster) {
       worker.disconnect()
     }
   }, 1000 * 60 * 60 * 2) // every 2 hour spin up new worker and kill old
-
-  setTimeout(() => {
-    global.systems.voting.main({ parameters: '0', sender: { username: 'soge__' } })
-    global.systems.voting.open({ parameters: '-title "aaa" option1 | option 2 | Ananas na pizze', sender: { username: 'soge__' } })
-    setTimeout(() => {
-      global.systems.voting.main({ parameters: '0', sender: { username: 'soge__' } })
-      global.systems.voting.main({ parameters: '2', sender: { username: 'soge__' } })
-      global.systems.voting.main({ parameters: '1', sender: { username: Math.random() } })
-      global.systems.voting.main({ parameters: '1', sender: { username: Math.random() } })
-      global.systems.voting.main({ parameters: '1', sender: { username: Math.random() } })
-      global.systems.voting.main({ parameters: '2', sender: { username: Math.random() } })
-      global.systems.voting.main({ parameters: '1', sender: { username: Math.random() } })
-      global.systems.voting.main({ parameters: '1', sender: { username: Math.random() } })
-      global.systems.voting.main({ parameters: '2', sender: { username: Math.random() } })
-      global.systems.voting.main({ parameters: '1', sender: { username: Math.random() } })
-      global.systems.voting.main({ parameters: '2', sender: { username: Math.random() } })
-      global.systems.voting.main({ parameters: '1', sender: { username: Math.random() } })
-      global.systems.voting.main({ parameters: '3', sender: { username: Math.random() } })
-
-      setTimeout(() => {
-        global.systems.voting.main({ parameters: '', sender: { username: 'soge__' } })
-      }, 5000)
-    }, 5000)
-  }, 10000)
 }

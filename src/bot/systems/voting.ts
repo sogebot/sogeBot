@@ -1,10 +1,5 @@
 'use strict'
 
-// TODO:
-// - tip voting
-// - bit voting
-// - overlay
-
 // 3rdparty libraries
 const _ = require('lodash')
 const cluster = require('cluster')
