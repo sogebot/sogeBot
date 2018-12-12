@@ -76,7 +76,7 @@ describe('Voting - normal', () => {
     it(`10 users will vote for option 1 and another 10 for option 2`, async () => {
       for (let o of [1,2]) {
         for (let i = 0; i < 10; i++) {
-          const user = Math.random()
+          const user = Number(Math.random() * 1000).toFixed(0)
           await global.systems.voting.main({ sender: { username: user }, parameters: String(o) })
           const vote = await global.db.engine.findOne(global.systems.voting.collection.votes, { votedBy: user, vid });
           assert.isNotEmpty(vote, 'Expected ' + JSON.stringify({ votedBy: user, vid }) + ' to be found in db')
