@@ -1,12 +1,12 @@
-"use strict";
+'use strict';
 
 // 3rdparty libraries
-import _ from "lodash";
+const _ = require('lodash');
 
 // bot libraries
-import constants from "../constants";
-import Expects from "../expects.js";
-import System from "./_interface";
+const constants = require('../constants');
+const Expects = require('../expects.js');
+const System = require('./_interface');
 
 enum ERROR {
   NOT_ENOUGH_OPTIONS,
@@ -27,7 +27,7 @@ declare interface IVoteType {
 
 declare interface IVotingType {
   _id?: any;
-  type: "tips" | "bits" | "normal";
+  type: 'tips' | 'bits' | 'normal';
   title: string;
   isOpened: boolean;
   options: string[];
@@ -41,16 +41,16 @@ declare interface IVotingType {
  */
 
 class Voting extends System {
-  public collection: any;
+  public collection: { [s: string]: string };
   public settings: any;
 
   constructor() {
     const options: InterfaceSettings = {
       settings: {
         commands: [
-          { name: "!vote", isHelper: true },
-          { name: "!vote open", permission: constants.MODS },
-          { name: "!vote close", permission: constants.MODS },
+          { name: '!vote', isHelper: true },
+          { name: '!vote open', permission: constants.MODS },
+          { name: '!vote close', permission: constants.MODS },
         ],
       },
       on: {
@@ -77,17 +77,17 @@ class Voting extends System {
           _total = _total + votes[i].votes;
         }
         // get vote status
-        global.commons.sendMessage(global.commons.prepare("systems.voting.status_closed", {
+        global.commons.sendMessage(global.commons.prepare('systems.voting.status_closed', {
           title: cVote.title,
         }), opts.sender);
         for (const index of Object.keys(cVote.options)) {
           setTimeout(() => {
             const option = cVote.options[index];
             const votesCount = count[index] || 0;
-            if (cVote.type === "normal") {
-              global.commons.sendMessage(this.settings.commands["!vote"] + ` ${Number(index) + 1} - ${option} - ${votesCount} ${global.commons.getLocalizedName(votesCount, "systems.voting.votes")}, ${Number((100 / _total) * votesCount).toFixed(2)}%`, opts.sender);
+            if (cVote.type === 'normal') {
+              global.commons.sendMessage(this.settings.commands['!vote'] + ` ${Number(index) + 1} - ${option} - ${votesCount} ${global.commons.getLocalizedName(votesCount, 'systems.voting.votes')}, ${Number((100 / _total) * votesCount).toFixed(2)}%`, opts.sender);
             } else {
-              global.commons.sendMessage(`#vote${Number(index) + 1} - ${option} - ${votesCount} ${global.commons.getLocalizedName(votesCount, "systems.voting.votes")}, ${Number((100 / _total) * votesCount).toFixed(2)}`, opts.sender);
+              global.commons.sendMessage(`#vote${Number(index) + 1} - ${option} - ${votesCount} ${global.commons.getLocalizedName(votesCount, 'systems.voting.votes')}, ${Number((100 / _total) * votesCount).toFixed(2)}`, opts.sender);
             }
           }, 100 * (Number(index) + 1));
         }
@@ -95,7 +95,7 @@ class Voting extends System {
     } catch (e) {
       switch (e.message) {
         case String(ERROR.ALREADY_CLOSED):
-          global.commons.sendMessage(global.translate("systems.voting.notInProgress"), opts.sender);
+          global.commons.sendMessage(global.translate('systems.voting.notInProgress'), opts.sender);
           break;
       }
     }
@@ -109,9 +109,9 @@ class Voting extends System {
       if (!_.isEmpty(cVote)) { throw new Error(String(ERROR.ALREADY_OPENED)); }
 
       const [type, title, options] = new Expects(opts.parameters)
-        .switch({ name: "type", values: ["tips", "bits"], optional: true, default: "normal" })
-        .argument({ name: "title", optional: false, multi: true })
-        .list({ delimiter: "|" })
+        .switch({ name: 'type', values: ['tips', 'bits'], optional: true, default: 'normal' })
+        .argument({ name: 'title', optional: false, multi: true })
+        .list({ delimiter: '|' })
         .toArray();
       if (options.length < 2) { throw new Error(String(ERROR.NOT_ENOUGH_OPTIONS)); }
 
@@ -121,34 +121,34 @@ class Voting extends System {
       const translations = `systems.voting.opened_${type}`;
       global.commons.sendMessage(global.commons.prepare(translations, {
         title,
-        command: this.settings.commands["!vote"],
+        command: this.settings.commands['!vote'],
       }), opts.sender);
       for (const index of Object.keys(options)) {
         setTimeout(() => {
-          if (type === "normal") { global.commons.sendMessage(this.settings.commands["!vote"] + ` ${(Number(index) + 1)} => ${options[index]}`, opts.sender); } else { global.commons.sendMessage(`#vote${(Number(index) + 1)} => ${options[index]}`, opts.sender); }
+          if (type === 'normal') { global.commons.sendMessage(this.settings.commands['!vote'] + ` ${(Number(index) + 1)} => ${options[index]}`, opts.sender); } else { global.commons.sendMessage(`#vote${(Number(index) + 1)} => ${options[index]}`, opts.sender); }
         }, 100 * (Number(index) + 1));
       }
       return true;
     } catch (e) {
       switch (e.message) {
         case String(ERROR.NOT_ENOUGH_OPTIONS):
-          global.commons.sendMessage(global.translate("voting.notEnoughOptions"), opts.sender);
+          global.commons.sendMessage(global.translate('voting.notEnoughOptions'), opts.sender);
           break;
         case String(ERROR.ALREADY_OPENED):
-          const translations = "systems.voting.opened" + (cVote.type.length > 0 ? `_${cVote.type}` : "");
+          const translations = 'systems.voting.opened' + (cVote.type.length > 0 ? `_${cVote.type}` : '');
           global.commons.sendMessage(global.commons.prepare(translations, {
             title: cVote.title,
-            command: this.settings.commands["!vote"],
+            command: this.settings.commands['!vote'],
           }), opts.sender);
           for (const index of Object.keys(cVote.options)) {
             setTimeout(() => {
-              if (cVote.type === "normal") { global.commons.sendMessage(this.settings.commands["!vote"] + ` ${index} => ${cVote.options[index]}`, opts.sender); } else { global.commons.sendMessage(`#vote${(Number(index) + 1)} => ${cVote.options[index]}`, opts.sender); }
+              if (cVote.type === 'normal') { global.commons.sendMessage(this.settings.commands['!vote'] + ` ${index} => ${cVote.options[index]}`, opts.sender); } else { global.commons.sendMessage(`#vote${(Number(index) + 1)} => ${cVote.options[index]}`, opts.sender); }
             }, 100 * (Number(index) + 1));
           }
           break;
         default:
           global.log.warning(e.stack);
-          global.commons.sendMessage(global.translate("core.error"), opts.sender);
+          global.commons.sendMessage(global.translate('core.error'), opts.sender);
       }
       return false;
     }
@@ -169,22 +169,22 @@ class Voting extends System {
           _total = _total + votes[i].votes;
         }
         // get vote status
-        global.commons.sendMessage(global.commons.prepare("systems.voting.status", {
+        global.commons.sendMessage(global.commons.prepare('systems.voting.status', {
           title: cVote.title,
         }), opts.sender);
         for (const i of Object.keys(cVote.options)) {
           setTimeout(() => {
             const option = cVote.options[i];
             const votesCount = count[i] || 0;
-            if (cVote.type === "normal") {
-              global.commons.sendMessage(this.settings.commands["!vote"] + ` ${Number(i) + 1} - ${option} - ${votesCount} ${global.commons.getLocalizedName(votesCount, "systems.voting.votes")}, ${Number((100 / _total) * votesCount).toFixed(2)}%`, opts.sender);
+            if (cVote.type === 'normal') {
+              global.commons.sendMessage(this.settings.commands['!vote'] + ` ${Number(i) + 1} - ${option} - ${votesCount} ${global.commons.getLocalizedName(votesCount, 'systems.voting.votes')}, ${Number((100 / _total) * votesCount).toFixed(2)}%`, opts.sender);
             } else {
-              global.commons.sendMessage(`#vote${Number(i) + 1} - ${option} - ${votesCount} ${global.commons.getLocalizedName(votesCount, "systems.voting.votes")}, ${Number((100 / _total) * votesCount).toFixed(2)}`, opts.sender);
+              global.commons.sendMessage(`#vote${Number(i) + 1} - ${option} - ${votesCount} ${global.commons.getLocalizedName(votesCount, 'systems.voting.votes')}, ${Number((100 / _total) * votesCount).toFixed(2)}`, opts.sender);
             }
           }, 100 * (Number(i) + 1));
         }
 
-      } else if (_.isEmpty(cVote)) { throw new Error(String(ERROR.NO_VOTING_IN_PROGRESS)); } else if (cVote.type === "normal") {
+      } else if (_.isEmpty(cVote)) { throw new Error(String(ERROR.NO_VOTING_IN_PROGRESS)); } else if (cVote.type === 'normal') {
         // we expects number
         [index] = new Expects(opts.parameters)
           .number()
@@ -203,7 +203,7 @@ class Voting extends System {
     } catch (e) {
       switch (e.message) {
         case String(ERROR.NO_VOTING_IN_PROGRESS):
-          global.commons.sendMessage(global.commons.prepare("systems.voting.notInProgress"), opts.sender);
+          global.commons.sendMessage(global.commons.prepare('systems.voting.notInProgress'), opts.sender);
           break;
         case String(ERROR.INVALID_VOTE):
           // pass, we don't want to have error message
