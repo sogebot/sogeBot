@@ -89,35 +89,35 @@ class Cooldown extends System {
         miliseconds: cooldown.miliseconds,
         type: cooldown.type,
         timestamp: cooldown.timestamp,
-        quiet: cooldown.quiet,
-        enabled: cooldown.enabled,
-        moderator: cooldown.moderator,
-        subscriber: cooldown.subscriber,
-        follower: cooldown.follower,
-        owner: cooldown.owner
+        quiet: typeof cooldown.quiet === 'undefined' ? true : cooldown.quiet,
+        enabled: typeof cooldown.enabled === 'undefined' ? true : cooldown.enabled,
+        moderator: typeof cooldown.moderator === 'undefined' ? true : cooldown.moderator,
+        subscriber: typeof cooldown.subscriber === 'undefined' ? true : cooldown.subscriber,
+        follower: typeof cooldown.follower === 'undefined' ? true : cooldown.follower,
+        owner: typeof cooldown.owner === 'undefined' ? true : cooldown.owner
       }]
     } else { // text
       let [keywords, cooldowns] = await Promise.all([global.db.engine.find(global.systems.keywords.collection.data), global.db.engine.find(this.collection.data)])
 
       keywords = _.filter(keywords, function (o) {
-        return opts.message.search(new RegExp('^(?!\\!)(?:^|\\s).*(' + _.escapeRegExp(o.keyword) + ')(?=\\s|$|\\?|\\!|\\.|\\,)', 'gi')) >= 0
+        return opts.message.toLowerCase().search(new RegExp('^(?!\\!)(?:^|\\s).*(' + _.escapeRegExp(o.keyword.toLowerCase()) + ')(?=\\s|$|\\?|\\!|\\.|\\,)', 'gi')) >= 0
       })
 
       data = []
       _.each(keywords, (keyword) => {
-        let cooldown = _.find(cooldowns, (o) => o.key === keyword.keyword)
+        let cooldown = _.find(cooldowns, (o) => o.key.toLowerCase() === keyword.keyword.toLowerCase())
         if (keyword.enabled && !_.isEmpty(cooldown)) {
           data.push({
-            key: keyword.keyword,
+            key: cooldown.key,
             miliseconds: cooldown.miliseconds,
             type: cooldown.type,
             timestamp: cooldown.timestamp,
-            quiet: cooldown.quiet,
-            enabled: cooldown.enabled,
-            moderator: cooldown.moderator,
-            subscriber: cooldown.subscriber,
-            follower: cooldown.follower,
-            owner: cooldown.owner
+            quiet: typeof cooldown.quiet === 'undefined' ? true : cooldown.quiet,
+            enabled: typeof cooldown.enabled === 'undefined' ? true : cooldown.enabled,
+            moderator: typeof cooldown.moderator === 'undefined' ? true : cooldown.moderator,
+            subscriber: typeof cooldown.subscriber === 'undefined' ? true : cooldown.subscriber,
+            follower: typeof cooldown.follower === 'undefined' ? true : cooldown.follower,
+            owner: typeof cooldown.owner === 'undefined' ? true : cooldown.owner
           })
         }
       })
