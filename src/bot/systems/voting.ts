@@ -18,24 +18,6 @@ enum ERROR {
   ALREADY_CLOSED,
 }
 
-declare interface VoteType {
-  _id?: any;
-  vid: string;
-  votedBy: string;
-  votes: number;
-  option: number;
-}
-
-declare interface VotingType {
-  _id?: any;
-  type: 'tips' | 'bits' | 'normal';
-  title: string;
-  isOpened: boolean;
-  options: string[];
-  openedAt: string;
-  closedAt?: string;
-}
-
 /*
  * !vote
  * !vote [x]

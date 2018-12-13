@@ -4,7 +4,9 @@ declare namespace NodeJS {
     commons: any,
     translate: any,
     log: any,
-    currency: any
+    currency: any,
+    panel: any,
+    systems: any
   }
 }
 
@@ -46,4 +48,22 @@ type CommandOptions = {
   },
   command: string,
   parameters: string
+}
+
+declare interface VoteType {
+  _id?: any;
+  vid: string;
+  votedBy: string;
+  votes: number;
+  option: number;
+}
+
+declare interface VotingType {
+  _id?: any;
+  type: 'tips' | 'bits' | 'normal';
+  title: string;
+  isOpened: boolean;
+  options: string[];
+  openedAt: string;
+  closedAt?: string;
 }
