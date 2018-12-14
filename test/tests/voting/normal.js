@@ -3,6 +3,7 @@ if (require('cluster').isWorker) process.exit()
 
 require('../../general.js')
 
+const until = require('test-until')
 const db = require('../../general.js').db
 const message = require('../../general.js').message
 const time = require('../../general.js').time
@@ -81,10 +82,18 @@ describe('Voting - normal', () => {
         for (let i = 0; i < 10; i++) {
           const user = Number(Math.random() * 1000).toFixed(0)
           await global.systems.voting.main({ sender: { username: user }, parameters: String(o) })
-          await time.waitMs(500) // wait until its propagated
-          const vote = await global.db.engine.findOne(global.systems.voting.collection.votes, { votedBy: user, vid });
-          assert.isNotEmpty(vote, 'Expected ' + JSON.stringify({ votedBy: user, vid }) + ' to be found in db')
-          assert.equal(vote.option, o - 1)
+
+          await until(async (setError) => {
+            try {
+              const vote = await global.db.engine.findOne(global.systems.voting.collection.votes, { votedBy: user, vid })
+              assert.isNotEmpty(vote, 'Expected ' + JSON.stringify({ votedBy: user, vid }) + ' to be found in db')
+              assert.equal(vote.option, o - 1)
+              return true
+            } catch (err) {
+              return setError(
+                '\nExpected ' + JSON.stringify({ votedBy: user, vid }) + ' to be found in db')
+            }
+          }, 5000)
         }
       }
     })
