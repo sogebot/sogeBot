@@ -1,0 +1,10 @@
+{
+  "settings": {
+    "theme": "Theme",
+    "hideAfterInactivity": "Hide on inactivity",
+    "inactivityTime": {
+      "title": "Inactivity after",
+      "help": "in miliseconds"
+    }
+  }
+}

@@ -37,9 +37,8 @@ window.numberInput = {
       }
 
       this.currentValue = Number(Number(this.currentValue).toFixed(step))
-
-      if (this.min && this.min > this.currentValue) this.currentValue = this.min
-      if (this.max && this.max < this.currentValue) this.currentValue = this.max
+      if (typeof this.min !== 'undefined' && this.min > this.currentValue) this.currentValue = this.min
+      if (typeof this.max !== 'undefined' && this.max < this.currentValue) this.currentValue = this.max
 
       this.$emit('update', { value: Number(this.currentValue) })
     }
@@ -61,7 +60,7 @@ window.numberInput = {
           <template v-if="typeof translatedTitle === 'string'">{{ translatedTitle }}</template>
           <template v-else>
             {{ translatedTitle.title }}
-            <small class="textInputTooltip text-info" data-toggle="tooltip" data-html="true" :title="translatedTitle.help">[?]</small>
+            <small class="textInputTooltip text-info pl-1" data-toggle="tooltip" data-html="true" :title="translatedTitle.help">[?]</small>
           </template>
         </span>
       </div>

@@ -1,9 +1,11 @@
 /* global describe it before */
+if (require('cluster').isWorker) process.exit()
 
 require('../../general.js')
 
 const db = require('../../general.js').db
 const message = require('../../general.js').message
+const time = require('../../general.js').time
 const _ = require('lodash')
 
 const assert = require('chai').assert
@@ -18,7 +20,7 @@ describe('Voting - normal', () => {
 
   describe('Close not opened voting', () => {
     it('Close voting should fail', async () => {
-      assert.isNotTrue(await global.systems.voting.close(owner))
+      assert.isNotTrue(await global.systems.voting.close({ sender: owner }))
     })
   })
 
@@ -27,7 +29,7 @@ describe('Voting - normal', () => {
       assert.isTrue(await global.systems.voting.open({ sender: owner, parameters: '-title "Lorem Ipsum test?" Lorem | Ipsum | Dolor Sit' }))
     })
     it('Close voting', async () => {
-      assert.isTrue(await global.systems.voting.close(owner))
+      assert.isTrue(await global.systems.voting.close({ sender: owner }))
     })
   })
 
@@ -79,6 +81,7 @@ describe('Voting - normal', () => {
         for (let i = 0; i < 10; i++) {
           const user = Number(Math.random() * 1000).toFixed(0)
           await global.systems.voting.main({ sender: { username: user }, parameters: String(o) })
+          await time.waitMs(500) // wait until its propagated
           const vote = await global.db.engine.findOne(global.systems.voting.collection.votes, { votedBy: user, vid });
           assert.isNotEmpty(vote, 'Expected ' + JSON.stringify({ votedBy: user, vid }) + ' to be found in db')
           assert.equal(vote.option, o - 1)
@@ -96,7 +99,13 @@ describe('Voting - normal', () => {
     })
 
     it('Close voting', async () => {
-      assert.isTrue(await global.systems.voting.close(owner))
+      await message.prepare()
+
+      assert.isTrue(await global.systems.voting.close({ sender: owner }))
+      await message.isSent('systems.voting.status_closed', owner, { title: 'Lorem Ipsum?' })
+      await message.isSentRaw(global.systems.voting.settings.commands['!vote'] + ` 1 - Lorem - 10 ${global.commons.getLocalizedName(10, 'systems.voting.votes')}, 47.62%`, owner)
+      await message.isSentRaw(global.systems.voting.settings.commands['!vote'] + ` 2 - Ipsum - 10 ${global.commons.getLocalizedName(10, 'systems.voting.votes')}, 47.62%`, owner)
+      await message.isSentRaw(global.systems.voting.settings.commands['!vote'] + ` 3 - Dolor Sit - 1 ${global.commons.getLocalizedName(1, 'systems.voting.votes')}, 4.76%`, owner)
     })
 
     it(`!vote should return not in progress info`, async () => {

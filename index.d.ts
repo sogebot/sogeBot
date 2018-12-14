@@ -17,10 +17,11 @@ type Command = {
 }
 
 type InterfaceSettings = {
-  settings: {
-    commands: Array<Command | string>
+  settings?: {
+    commands?: Array<Command | string>,
+    [s: string]: any
   },
-  on: {
+  on?: {
     tip?: (tip: {
       username: string,
       amount: number,
@@ -39,6 +40,21 @@ type InterfaceSettings = {
     change?: Array<{
       [s: string]: Array<string>
     }>
+  },
+  ui?: {
+    [s: string]: {
+      [s: string]: {
+        type: 'link' | 'selector' | 'number-input',
+        href?: string,
+        class?: string,
+        rawText?: string,
+        target?: string,
+        values?: Array<string>,
+        step?: number,
+        min?: number,
+        max?: number,
+      }
+    }
   }
 }
 

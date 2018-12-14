@@ -3,9 +3,15 @@
       <pre class="debug" :class="[!urlParam('debug') ? 'hide' : '']">
 currentVote: {{ currentVote }}
 votes: {{ votes }}
+settings: {{ settings }}
+shouldShow: {{settings.display.hideAfterInactivity && currentTime - lastUpdatedAt < settings.display.inactivityTime}}
+inactivityTime: {{currentTime - lastUpdatedAt}}
       </pre>
   <transition name="fade">
-    <div id="box" v-if="typeof currentVote.title !== 'undefined'" v-show="currentTime - lastUpdatedAt < 7000">
+    <div id="box"
+      v-if="typeof currentVote.title !== 'undefined'"
+      v-show="!settings.display.hideAfterInactivity || (settings.display.hideAfterInactivity && currentTime - lastUpdatedAt < settings.display.inactivityTime)"
+      :class="[settings.display.theme]">
       <strong class="title">{{currentVote.title}}</strong>
       <div class="helper" v-if="currentVote.type === 'normal'">Type <kbd>!vote 1</kbd>, <kbd>!vote 2</kbd>, ... in chat to vote</div>
       <div class="helper" v-else-if="currentVote.type === 'tips'">Add <kbd>#vote1</kbd>, <kbd>#vote2</kbd>, ... to your <strong>tips</strong> message</div>
@@ -57,6 +63,11 @@ export default {
       lastUpdatedAt: 0,
       currentTime: 0,
       cachedVotes: [],
+      settings: {
+        display: 'light',
+        hideAfterInactivity: true,
+        inativityTime: 5000,
+      },
     }
   },
   created: function () {
@@ -108,11 +119,12 @@ export default {
       return Number((100 / this.totalVotes) * votes || 0).toFixed(toFixed || 0);
     },
     refresh: function () {
-      this.socket.emit('data', (cb, votes) => {
+      this.socket.emit('data', (cb, votes, settings) => {
         // force show if new vote
         if (typeof this.currentVote.title === 'undefined') this.lastUpdatedAt = Date.now()
         this.votes = votes
         this.currentVote = cb
+        this.settings = settings
         setTimeout(() => this.refresh(), 5000)
       })
     }
@@ -140,9 +152,7 @@ export default {
     font-family: 'Barlow';
     padding: 0.5rem 1rem;
     margin: 1.5rem;
-    background-color: #f0f1f4;
-    color: rgb(32, 32, 32);
-    box-shadow: 0px 0px 2rem black;
+
   }
 
   .title {
@@ -186,7 +196,6 @@ export default {
   .background-bar, .bar {
     position: relative;
     top: 0.5rem;
-    background-color: rgb(138, 138, 138);
     height: 0.5rem;
     width: 100%;
   }
@@ -202,5 +211,35 @@ export default {
   }
   .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
     opacity: 0;
+  }
+
+  /* LIGHT THEME */
+  #box.light {
+    background-color: #f0f1f4;
+    color: rgb(32, 32, 32);
+    box-shadow: 0px 0px 2rem black;
+  }
+
+  #box.light .background-bar {
+    background-color: rgb(207, 207, 207);
+  }
+
+  #box.light .bar {
+    background-color: rgb(138, 138, 138);
+  }
+
+  /* DARK THEME */
+  #box.dark {
+    background-color: rgb(32, 32, 32);
+    color: #f0f1f4;
+    box-shadow: 0px 0px 2rem black;
+  }
+
+  #box.dark .background-bar {
+    background-color: rgb(138, 138, 138);
+  }
+
+  #box.dark .bar {
+    background-color: rgb(207, 207, 207);
   }
 </style>

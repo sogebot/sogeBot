@@ -1,0 +1,10 @@
+{
+  "settings": {
+    "theme": "Theme",
+    "hideAfterInactivity": "Skrýt při neaktivitě",
+    "inactivityTime": {
+      "title": "Neaktivita po",
+      "help": "v milisekundách"
+    }
+  }
+}

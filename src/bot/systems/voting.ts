@@ -75,10 +75,13 @@ class Voting extends System {
           setTimeout(() => {
             const option = cVote.options[index];
             const votesCount = count[index] || 0;
+            const percentage = Number((100 / _total) * votesCount || 0).toFixed(2);
             if (cVote.type === 'normal') {
-              global.commons.sendMessage(this.settings.commands['!vote'] + ` ${Number(index) + 1} - ${option} - ${votesCount} ${global.commons.getLocalizedName(votesCount, 'systems.voting.votes')}, ${Number((100 / _total) * votesCount).toFixed(2)}%`, opts.sender);
+              global.commons.sendMessage(this.settings.commands['!vote'] + ` ${Number(index) + 1} - ${option} - ${votesCount} ${global.commons.getLocalizedName(votesCount, 'systems.voting.votes')}, ${percentage}%`, opts.sender);
+            } else if (cVote.type === 'tips') {
+              global.commons.sendMessage(`#vote${Number(index) + 1} - ${option} - ${Number(votesCount).toFixed(2)} ${global.commons.getLocalizedName(votesCount, 'systems.voting.votes')}, ${percentage}%`, opts.sender);
             } else {
-              global.commons.sendMessage(`#vote${Number(index) + 1} - ${option} - ${votesCount} ${global.commons.getLocalizedName(votesCount, 'systems.voting.votes')}, ${Number((100 / _total) * votesCount).toFixed(2)}`, opts.sender);
+              global.commons.sendMessage(`#vote${Number(index) + 1} - ${option} - ${votesCount} ${global.commons.getLocalizedName(votesCount, 'systems.voting.votes')}, ${percentage}%`, opts.sender);
             }
           }, 100 * (Number(index) + 1));
         }
