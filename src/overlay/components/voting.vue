@@ -1,5 +1,5 @@
 <template>
-<div>
+<div style="height: 100%; display: flex;">
       <pre class="debug" :class="[!urlParam('debug') ? 'hide' : '']">
 currentVote: {{ currentVote }}
 votes: {{ votes }}
@@ -11,7 +11,9 @@ inactivityTime: {{currentTime - lastUpdatedAt}}
     <div id="box"
       v-if="typeof currentVote.title !== 'undefined'"
       v-show="!settings.display.hideAfterInactivity || (settings.display.hideAfterInactivity && currentTime - lastUpdatedAt < settings.display.inactivityTime)"
-      :class="[settings.display.theme]">
+      :class="[getTheme(settings.display.theme)]"
+      style="display: inline-block; width: 100%;"
+      :style="{ 'align-self': settings.display.align === 'top' ? 'flex-start' : 'flex-end' }">
       <strong class="title">{{currentVote.title}}</strong>
       <div class="helper" v-if="currentVote.type === 'normal'">Type <kbd>!vote 1</kbd>, <kbd>!vote 2</kbd>, ... in chat to vote</div>
       <div class="helper" v-else-if="currentVote.type === 'tips'">Add <kbd>#vote1</kbd>, <kbd>#vote2</kbd>, ... to your <strong>tips</strong> message</div>
@@ -67,6 +69,7 @@ export default {
         display: 'light',
         hideAfterInactivity: true,
         inativityTime: 5000,
+        align: 'top'
       },
     }
   },
@@ -103,6 +106,9 @@ export default {
     }
   },
   methods: {
+    getTheme: function (theme) {
+      return theme.replace(/ /g, '_').toLowerCase().replace(/\W/g, '')
+    },
     urlParam: function (name) {
       var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
       if (results == null) {
@@ -131,6 +137,12 @@ export default {
   }
 }
 </script>
+
+<style>
+  #overlays {
+    height: 100%;
+  }
+</style>
 
 <style scoped>
   @import url('https://fonts.googleapis.com/css?family=Barlow');
@@ -241,5 +253,28 @@ export default {
 
   #box.dark .bar {
     background-color: rgb(207, 207, 207);
+  }
+
+  /* SOGE'S GREEN THEME */
+  #box.soges_green {
+    background-color: rgba(0, 0, 0, 0.8);
+    color: #f0f1f4;
+    border-top: 5px solid #acd301;
+    border-bottom: 5px solid #acd301;
+  }
+
+  #box.soges_green .bar {
+    background-color: #acd301
+  }
+
+  #box.soges_green .numbers {
+    color: #acd301;
+    font-size: 2rem;
+    font-weight: bold;
+    padding-right: 2rem;
+  }
+
+  #box.soges_green #footer strong {
+    color: #acd301;
   }
 </style>

@@ -2,6 +2,7 @@
   "settings": {
     "theme": "Theme",
     "hideAfterInactivity": "Skrýt při neaktivitě",
+    "align": "Zarovnání",
     "inactivityTime": {
       "title": "Neaktivita po",
       "help": "v milisekundách"

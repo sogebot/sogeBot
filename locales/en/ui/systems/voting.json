@@ -2,6 +2,7 @@
   "settings": {
     "theme": "Theme",
     "hideAfterInactivity": "Hide on inactivity",
+    "align": "Align",
     "inactivityTime": {
       "title": "Inactivity after",
       "help": "in miliseconds"

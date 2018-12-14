@@ -12,13 +12,18 @@ class Voting extends Overlay {
           theme: 'light',
           hideAfterInactivity: true,
           inactivityTime: 5000,
+          align: 'top',
         },
       },
       ui: {
         display: {
+          align: {
+            type: 'selector',
+            values: ['top', 'bottom'],
+          },
           theme: {
             type: 'selector',
-            values: ['light', 'dark'],
+            values: ['light', 'dark', 'Soge\'s green'],
           },
           inactivityTime: {
             type: 'number-input',
@@ -47,6 +52,7 @@ class Voting extends Overlay {
         const votes: VoteType[] = await global.db.engine.find(global.systems.voting.collection.votes, { vid: String(currentVote._id) });
         const settings = {
           display: {
+            align: this.settings.display.align,
             theme: this.settings.display.theme,
             hideAfterInactivity: this.settings.display.hideAfterInactivity,
             inactivityTime: this.settings.display.inactivityTime,
