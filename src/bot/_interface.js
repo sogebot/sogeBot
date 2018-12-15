@@ -241,7 +241,7 @@ class Module {
         socket.on('settings.update', async (data, cb) => {
           try {
             for (let [key, value] of Object.entries(data)) {
-              if (key === 'enabled' && this._name === 'core') continue
+              if (key === 'enabled' && ['core', 'overlays'].includes(this._name)) continue
               else if (key === '_permissions') {
                 for (let [command, currentValue] of Object.entries(value)) {
                   command = this._commands.find(o => o.name === command)
@@ -364,7 +364,7 @@ class Module {
 
   async status (opts) {
     opts = opts || {}
-    if (this._name === 'core') return true
+    if (['core', 'overlays'].includes(this._name)) return true
 
     const areDependenciesEnabled = await this._dependenciesEnabled()
     const isMasterAndStatusOnly = cluster.isMaster && _.isNil(opts.state)
