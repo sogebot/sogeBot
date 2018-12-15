@@ -40,7 +40,7 @@ class Expects {
     const match = XRegExp.exec(this.text, regexp)
 
     if (!_.isNil(match)) {
-      this.match.push(match.command)
+      this.match.push(match.command.trim().toLowerCase())
       this.text = this.text.replace(match.command, '') // remove from text matched pattern
     } else {
       if (!opts.optional) throw Error('Command not found')

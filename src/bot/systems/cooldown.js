@@ -81,8 +81,10 @@ class Cooldown extends System {
 
       let cooldown = await global.db.engine.findOne(this.collection.data, { key })
       if (_.isEmpty(cooldown)) { // command is not on cooldown -> recheck with text only
-        opts.message = opts.message.replace(key, '')
-        return this.check(opts)
+        const replace = new RegExp(`${key}`, 'ig')
+        opts.message = opts.message.replace(replace, '')
+        if (opts.message.length > 0) return this.check(opts)
+        else return true
       }
       data = [{
         key: cooldown.key,
