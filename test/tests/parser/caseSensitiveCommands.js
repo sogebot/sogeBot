@@ -5,8 +5,6 @@ require('../../general.js')
 
 const db = require('../../general.js').db
 const message = require('../../general.js').message
-const assert = require('chai').assert
-const _ = require('lodash')
 
 const Parser = require('../../../dest/parser')
 
@@ -14,11 +12,11 @@ describe('Parser - case sensitive commands', async () => {
   const tests = [
     {
       test: '!uptime',
-      expected: 'Stream is currently offline for',
+      expected: 'Stream is currently offline for'
     },
     {
       test: '!UPTIME',
-      expected: 'Stream is currently offline for',
+      expected: 'Stream is currently offline for'
     }
   ]
 
