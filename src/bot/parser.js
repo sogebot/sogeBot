@@ -154,7 +154,6 @@ class Parser {
 
   async command (sender, message, skip) {
     if (!message.startsWith('!')) return // do nothing, this is not a command or user is ignored
-
     let command = await this.find(message)
     if (_.isNil(command)) return // command not found, do nothing
     if (command.permission === constants.DISABLE) return
