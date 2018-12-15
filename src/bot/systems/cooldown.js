@@ -72,7 +72,6 @@ class Cooldown extends System {
       .string({ optional: true })
       .toArray()
 
-
     if (!_.isNil(command)) { // command
       let key
       const parsed = await (new Parser().find(subcommand ? `${command} ${subcommand}` : command))
