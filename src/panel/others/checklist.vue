@@ -16,6 +16,7 @@
           {{ item.text }}
         </button>
       </div>
+      <div class="list-group list-group-item-info text-info p-2">Add new items in <a href="#systems-checklist">checklist settings</a></div>
     </div>
   </div>
 </template>
