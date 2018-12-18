@@ -1,6 +1,6 @@
 <template>
 <div>
-  <div class="btn-group" role="group">
+  <div class="btn-group" role="group" style="padding-left: 11px;">
     <button
       type="button"
       class="btn btn-sm"
@@ -30,7 +30,7 @@
     </div>
   </div>
 
-  <div class="widgets">
+  <div class="widgets pt-1">
     <div>
       <div class="grid-stack-for-board-0 grid-stack" v-if="show" v-show="currentDashboard === 0">
         <template v-for="item in items">
