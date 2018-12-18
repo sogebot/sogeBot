@@ -543,6 +543,7 @@
     "status": "Status",
     "mute": "mute",
     "add-widget": "Add widget",
+    "remove-dashboard": "Remove dashboard",
     "remove-widget": "Remove widget",
     "for": "for",
     "close-bet-after": "Close bet after",

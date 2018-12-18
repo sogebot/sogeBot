@@ -3,34 +3,24 @@
 </template>
 
 <script>
-import chat from './components/chat.vue'
-import cmdboard from './components/cmdboard.vue'
-import commercial from './components/commercial.vue'
-import customvariables from './components/customvariables.vue'
-import eventlist from './components/eventlist.vue'
-import join from './components/join.vue'
-import part from './components/part.vue'
-import queue from './components/queue.vue'
-import raffles from './components/raffles.vue'
-import soundboard from './components/soundboard.vue'
-import twitch from './components/twitch.vue'
-import twitter from './components/twitter.vue'
-
 export default {
   props: ['items', 'commons', 'socket', 'page'],
   components: {
-    chat,
-    cmdboard,
-    commercial,
-    customvariables,
-    eventlist,
-    join,
-    part,
-    queue,
-    raffles,
-    soundboard,
-    twitch,
-    twitter
+    bets: () => import('./components/bets.vue'),
+    chat: () => import('./components/chat.vue'),
+    cmdboard: () => import('./components/cmdboard.vue'),
+    commercial: () => import('./components/commercial.vue'),
+    customvariables: () => import('./components/customvariables.vue'),
+    eventlist: () => import('./components/eventlist.vue'),
+    join: () => import('./components/join.vue'),
+    part: () => import('./components/part.vue'),
+    queue: () => import('./components/queue.vue'),
+    raffles: () => import('./components/raffles.vue'),
+    soundboard: () => import('./components/soundboard.vue'),
+    twitch: () => import('./components/twitch.vue'),
+    twitter: () => import('./components/twitter.vue'),
+    widgetCreate: () => import('./components/widget_create.vue'),
+    ytplayer: () => import('./components/ytplayer.vue')
   },
   data: function () {
     return {

@@ -230,7 +230,7 @@ a.active {
   display: flex;
 }
 
-.widgetAdd {
+.widgetAdd, .dashboardRemove {
   flex-grow: 1;
   color: $gray-800;
   border: 3px dashed $gray-400;
@@ -240,6 +240,11 @@ a.active {
   font-size: 40px;
   line-height: 100px;
   cursor: pointer;
+}
+
+.dashboardRemove {
+  color: $red;
+  border: 3px dashed $red;
 }
 
 .widget {
@@ -334,7 +339,7 @@ span.title.title-part.text-default + div.widget {
 
 }
 
-#widgets > div, #widgets-close > a {
+#dashboard > div, #widgets-close > a {
   padding: 10px;
   font-family: 'PT Sans', sans-serif !important;
   font-weight: bold;
@@ -346,14 +351,14 @@ span.title.title-part.text-default + div.widget {
   text-decoration: none;
 }
 
-#widgets div span, #widgets-close a span {
+#dashboard div span, #widgets-close a span {
   color: $gray-700;
   padding-top: 5px;
   display: block;
   text-align: center;
 }
 
-#widgets a:hover span {
+#dashboard a:hover span {
   color: theme-color("primary") !important;
   text-decoration: none;
 }
