@@ -81,11 +81,18 @@
           </a>
           <ul class="dropdown-menu" id="menu-registry"></ul>
         </li>
+        <li class="nav-item dropdown">
+          <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+            <span data-lang="menu.logs"></span>
+            <span class="caret"></span>
+          </a>
+          <ul class="dropdown-menu" id="menu-logs"></ul>
+        </li>
       </ul>
 
       <ul class="navbar-nav mr-auto">
         <li class="nav-item page-menu" style="font-size: 0.6rem; position: relative; top: .2rem">
-          <a class="alert alert-warning" style="padding:0; cursor: pointer;" id="APIStatus" data-page="apistats" title="API checking" >API</a>
+          <span class="alert alert-warning" style="padding:0;" id="APIStatus" title="API checking" >API</span>
           <span class="alert alert-warning" style="padding:0;" id="TMIStatus" title="TMI checking">TMI</span>
           <span class="alert alert-warning" style="padding:0;" id="SOCStatus" title="SOC checking">SOC</span>
           <span class="alert alert-warning" style="padding:0;" id="MODStatus" title="MOD checking">MOD</span>
@@ -569,6 +576,7 @@
       var overlays = false // we want only overlays settings once
       var registry = false // we want only registry settings once
       var core = false // we want only core settings once
+      var logs = false // we want only logs settings once
       _.each(menu, function (obj) {
         if (obj.id !== 'dashboard') {
           if ((obj.id === 'systems') && systems) return
@@ -577,6 +585,7 @@
           if ((obj.id === 'registry') && registry) return
           if ((obj.id === 'games') && games) return
           if ((obj.id === 'core') && core) return
+          if ((obj.id === 'logs') && logs) return
           $('#menu-' + obj.category).append('<li class="nav-item"><a class="nav-link" href="#' + obj.id.replace(/\./g, '/') + '" data-page="' +
             obj.id.replace(/\./g, '/') + '" data-lang="menu.' + obj.name +
             '"></a></li>')
@@ -586,6 +595,7 @@
         if (obj.id === 'integrations') integrations = true
         if (obj.id === 'registry') registry = true
         if (obj.id === 'core') core = true
+        if (obj.id === 'logs') logs = true
         if (obj.id === 'games') games = true
       })
       loadedMenu = true

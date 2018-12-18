@@ -17,6 +17,8 @@ const __DEBUG__ = {
 class API {
   constructor () {
     if (cluster.isMaster) {
+      global.panel.addMenu({ category: 'logs', name: 'api', id: 'apistats' })
+
       this.calls = {
         bot: new Proxy({}, {
           get: function (obj, prop) {
