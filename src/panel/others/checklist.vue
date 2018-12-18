@@ -57,7 +57,7 @@ export default {
     update: function () {
       this.socket.emit('findOne', { collection: 'settings', where: { key: 'checklist.itemsArray' }}, (err, data) => {
         if (err) return console.error(err)
-        if (data.value.length > 0) {
+        if (typeof data.value !== 'undefined' && data.value.length > 0) {
           // load complete data
           this.socket.emit('find', {}, (err, data2) => {
             this.items = []
