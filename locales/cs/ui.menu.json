@@ -12,7 +12,7 @@
   "cooldown": "Cooldowny",
   "highlights": "Highlighty",
   "price": "Cena",
-  "logger": "Logy",
+  "logs": "Logy",
   "systems": "Systémy",
   "permissions": "Oprávnění",
   "translations": "Vlastní překlady",
@@ -57,5 +57,7 @@
   "donationalerts": "DonationAlerts.ru",
   "twitter": "Twitter",
   "phillipshue": "Phillips Hue",
-  "checklist": "Checklist"
+  "checklist": "Checklist",
+  "bot": "Bot",
+  "api": "API"
 }
