@@ -40,7 +40,7 @@ import { faTwitch } from '@fortawesome/free-brands-svg-icons';
 library.add(faPlus, faSpinner, faTimes, faTwitch, faGift, faHeadphones, faMoneyBillAlt, faComments, faTh, faDollarSign, faSignInAlt, faSignOutAlt, faUsers, faMusic)
 
 export default {
-  props: ['socket', 'commons'],
+  props: ['socket', 'commons', 'dashboardId'],
   data: function () {
     return {
       widgets: [],
@@ -50,20 +50,17 @@ export default {
   components: {
     'font-awesome-icon': FontAwesomeIcon
   },
-  created: function () {
-    this.socket.on('widgetList', widgets => {
-      this.widgets = widgets
-      this.state = 2
-    })
-  },
   methods: {
     add: function (widgetId) {
-      this.socket.emit('addWidget', widgetId)
+      this.socket.emit('addWidget', widgetId, this.dashboardId)
       this.state = 0
     },
     load: function () {
       this.state = 1
-      this.socket.emit('getWidgetList')
+      this.socket.emit('getWidgetList', (widgets, dashboards) => {
+        this.widgets = widgets
+        this.state = 2
+      })
     }
   }
 }

@@ -234,8 +234,38 @@ function Panel () {
       callback(translate)
     })
 
-    socket.on('getWidgetList', function () { self.sendWidgetList(self, socket) })
-    socket.on('addWidget', function (widget) { self.addWidgetToDb(self, widget, socket) })
+    socket.on('getWidgetList', async (cb) => {
+      let widgets = await global.db.engine.find('widgets')
+      let dashboards = await global.db.engine.find('dashboards')
+      if (_.isEmpty(widgets)) cb(self.widgets)
+      else {
+        var sendWidgets = []
+        _.each(self.widgets, function (widget) {
+          if (!_.includes(_.map(widgets, 'id'), widget.id)) {
+            sendWidgets.push(widget)
+          }
+        })
+        cb(sendWidgets, dashboards)
+      }
+    })
+
+    socket.on('getWidgets', async (cb) => {
+      let widgets = await global.db.engine.find('widgets')
+      let dashboards = await global.db.engine.find('dashboards')
+      cb(widgets, dashboards)
+    })
+
+    socket.on('createDashboard', async (name, cb) => {
+      cb(await global.db.engine.insert('dashboards', { name, createdAt: Date.now() }))
+    })
+
+    socket.on('removeDashboard', async (_id) => {
+      await global.db.engine.remove('dashboards', { _id })
+      await global.db.engine.remove('widgets', { dashboardId: _id })
+      self.sendWidget()
+    })
+
+    socket.on('addWidget', function (widget, dashboardId) { self.addWidgetToDb(self, widget, dashboardId, socket) })
     socket.on('updateWidgets', function (widgets) { self.updateWidgetsInDb(self, widgets, socket) })
     socket.on('getConnectionStatus', function () { socket.emit('connectionStatus', global.status) })
     socket.on('saveConfiguration', function (data) {
@@ -370,35 +400,21 @@ Panel.prototype.sendMenu = function (socket) { socket.emit('menu', this.menu) }
 Panel.prototype.addWidget = function (id, name, icon) { this.widgets.push({ id: id, name: name, icon: icon }) }
 
 Panel.prototype.sendWidget = async function (socket) {
-  global.panel.io.emit('widgets', await global.db.engine.find('widgets'))
-}
-
-Panel.prototype.sendWidgetList = async function (self, socket) {
-  let widgets = await global.db.engine.find('widgets')
-  if (_.isEmpty(widgets)) socket.emit('widgetList', self.widgets)
-  else {
-    var sendWidgets = []
-    _.each(self.widgets, function (widget) {
-      if (!_.includes(_.map(widgets, 'id'), widget.id)) {
-        sendWidgets.push(widget)
-      }
-    })
-    socket.emit('widgetList', sendWidgets)
-  }
+  global.panel.io.emit('dashboard', await global.db.engine.find('widgets'), await global.db.engine.find('dashboards'))
 }
 
 Panel.prototype.updateWidgetsInDb = async function (self, widgets, socket) {
   await global.db.engine.remove('widgets', {}) // remove widgets
   let toAwait = []
   for (let widget of widgets) {
-    toAwait.push(global.db.engine.update('widgets', { id: widget.id }, { id: widget.id, position: { x: widget.position.x, y: widget.position.y }, size: { width: widget.size.width, height: widget.size.height } }))
+    toAwait.push(global.db.engine.update('widgets', { id: widget.id }, { id: widget.id, dashboardId: widget.dashboardId, position: { x: widget.position.x, y: widget.position.y }, size: { width: widget.size.width, height: widget.size.height } }))
   }
   await Promise.all(toAwait)
   self.sendWidget(socket)
 }
 
-Panel.prototype.addWidgetToDb = async function (self, widget, socket) {
-  await global.db.engine.update('widgets', { id: widget }, { id: widget, position: { x: 0, y: 0 }, size: { width: 4, height: 3 } })
+Panel.prototype.addWidgetToDb = async function (self, widget, dashboardId, socket) {
+  await global.db.engine.update('widgets', { id: widget }, { dashboardId, id: widget, position: { x: 0, y: 0 }, size: { width: 4, height: 3 } })
   self.sendWidget(socket)
 }
 
