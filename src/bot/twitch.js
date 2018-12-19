@@ -148,8 +148,7 @@ class Twitch {
 
     let lastSubAgo = ''
     let lastSubUsername = 'n/a'
-    let onlineSubCount = _.size(onlineSubscribers) // except bot and user
-    //let onlineSubCount = _.size(_.filter(onlineSubscribers, (o) => o !== global.commons.getChannel() && o !== global.oauth.settings.bot.username.toLowerCase())) // except bot and user
+    let onlineSubCount = _.size(_.filter(onlineSubscribers, (o) => o !== global.commons.getChannel() && o !== global.oauth.settings.bot.username.toLowerCase())) // except bot and user
     if (events.length > 0) {
       lastSubUsername = events[0].username
       lastSubAgo = moment(events[0].timestamp).fromNow()
