@@ -94,6 +94,8 @@ module.exports = {
     }, 5000)
   },
   isSent: async function (entry, user, opts) {
+    delete user.id
+
     opts = opts || {}
     await until(async setError => {
       let expected = []
@@ -135,6 +137,8 @@ module.exports = {
     }, 5000)
   },
   isSentRaw: async function (expected, user) {
+    delete user.id
+
     await until(setError => {
       try {
         let isOK = false
