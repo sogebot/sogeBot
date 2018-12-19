@@ -115,7 +115,7 @@
     "test-until": "1.1.1",
     "vue-cli": "2.9.6",
     "vue-loader": "15.4.2",
-    "vue-plyr": "5.0.4",
+    "vue-plyr": "4.0.0",
     "vue-style-loader": "4.1.2",
     "vue-template-compiler": "2.5.17",
     "webpack": "4.26.1",
