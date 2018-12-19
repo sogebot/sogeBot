@@ -8,14 +8,20 @@ const message = require('../../general.js').message
 
 const moment = require('moment')
 
-const testuser = { username: 'testuser' }
-const testuser2 = { username: 'testuser2' }
-const testuser3 = { username: 'testuser3' }
+const testuser = { username: 'testuser', id: Math.floor(Math.random() * 1000) }
+const testuser2 = { username: 'testuser2', id: Math.floor(Math.random() * 1000) }
+const testuser3 = { username: 'testuser3', id: Math.floor(Math.random() * 1000) }
 
 describe('lib/twitch - subs()', () => {
   before(async () => {
     await db.cleanup()
     await message.prepare()
+  })
+
+  it('Set testuser, testuser2, testuser3 as subs', async () => {
+    for (let u of [testuser, testuser2, testuser3]) {
+      await global.db.engine.update('users', { id: u.id}, { username: u.username, is: { subscriber: true } })
+    }
   })
 
   it('add testuser to event', async () => {
@@ -59,6 +65,22 @@ describe('lib/twitch - subs()', () => {
       lastSubAgo: moment(fromDb.timestamp).fromNow(),
       lastSubUsername: testuser3.username,
       onlineSubCount: 0
+    })
+  })
+
+  it('Add testuser, testuser2, testuser3 to online users', async () => {
+    for (let u of [testuser, testuser2, testuser3]) {
+      await global.db.engine.insert('users.online', { username: u.username })
+    }
+  })
+
+  it('!subs should return testuser3 and 3 online subs', async () => {
+    let fromDb = await global.db.engine.findOne('widgetsEventList', { 'username': 'testuser3', type: 'sub' })
+    global.twitch.subs({ sender: testuser })
+    await message.isSent('subs', testuser, {
+      lastSubAgo: moment(fromDb.timestamp).fromNow(),
+      lastSubUsername: testuser3.username,
+      onlineSubCount: 3
     })
   })
 })
