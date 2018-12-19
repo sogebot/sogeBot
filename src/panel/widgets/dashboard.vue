@@ -35,7 +35,7 @@
       <div class="grid-stack-for-board-0 grid-stack" v-if="show" v-show="currentDashboard === 0">
         <template v-for="item in items">
           <div :key="item.id"
-            v-if="typeof item.dashboardId === 'undefined' || item.dashboardId === 0"
+            v-if="typeof item.dashboardId === 'undefined' || String(item.dashboardId) === '0'"
             v-bind:id="'widget-' + item.id"
             v-bind:data-dashboardId="item.dashboardId"
             v-bind:data-gs-x="item.position.x"
