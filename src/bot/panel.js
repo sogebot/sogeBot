@@ -1,5 +1,7 @@
 'use strict'
 
+import fs from 'fs'
+
 var express = require('express')
 const bodyParser = require('body-parser')
 var http = require('http')
@@ -99,10 +101,15 @@ function Panel () {
     res.sendFile(path.join(__dirname, '..', 'public', req.params.type, 'registry', req.params.subtype, req.params.page))
   })
   app.get('/:type/:subtype/:page', this.authUser, function (req, res) {
-    res.sendFile(path.join(__dirname, '..', 'public', req.params.type, req.params.subtype, req.params.page))
+    const file = path.join(__dirname, '..', 'public', req.params.type, req.params.subtype, req.params.page)
+    if (fs.existsSync(file)) {
+      res.sendFile(path.join(__dirname, '..', 'public', req.params.type, req.params.subtype, req.params.page))
+    }
   })
   app.get('/:type/:page', this.authUser, function (req, res) {
-    res.sendFile(path.join(__dirname, '..', 'public', req.params.type, req.params.page))
+    try {
+      res.sendFile(path.join(__dirname, '..', 'public', req.params.type, req.params.page))
+    } catch (e) {}
   })
 
   this.io = require('socket.io')(this.server)

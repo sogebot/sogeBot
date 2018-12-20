@@ -331,6 +331,7 @@
   <div class="pages-wrapper pt-2 pb-5">
     <div class="container-fluid">
       <div id="pages"></div>
+      <div id="pages-old"></div>
     </div>
   </div>
 
@@ -538,16 +539,18 @@
     /* ROUTERS */
     let currentPage = null
     page('/', function(p){
-      const id = p.hash.length === 0 ? 'dashboard' : p.hash
+      var id = p.hash.length === 0 ? 'dashboard' : p.hash
+      if (id.startsWith('/')) id = id.replace('/', '')
       if (currentPage === id.split('-')[0]) return
       else currentPage = id.split('-')[0]
       var visibility = id !== 'dashboard' ? 'none' : 'flex'
       var visibilityBlock = id !== 'dashboard' ? 'none' : 'block'
 
-      $("#pages").empty()
+      $("#pages-old").empty()
 
-      if (id !== 'dashboard') $("#pages").append($('<div id="P' + id.split('-')[0] + '">').load('pages/' + id.split('-')[0] + '.html',
+      if (id !== 'dashboard') $("#pages-old").append($('<div id="P' + id.split('-')[0] + '">').load('pages/' + id.split('-')[0] + '.html',
         function (err) {
+          if (err) return
           commons.translate()
           $('a[data-toggle="tab"]').off()
           $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
@@ -586,7 +589,7 @@
           if ((obj.id === 'games') && games) return
           if ((obj.id === 'core') && core) return
           if ((obj.id === 'logs') && logs) return
-          $('#menu-' + obj.category).append('<li class="nav-item"><a class="nav-link" href="#' + obj.id.replace(/\./g, '/') + '" data-page="' +
+          $('#menu-' + obj.category).append('<li class="nav-item"><a class="nav-link" href="#/' + obj.id.replace(/\./g, '/') + '" data-page="' +
             obj.id.replace(/\./g, '/') + '" data-lang="menu.' + obj.name +
             '"></a></li>')
         }

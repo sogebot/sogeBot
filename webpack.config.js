@@ -5,8 +5,9 @@ const VueLoaderPlugin = require('vue-loader/lib/plugin')
 module.exports = [{
   mode: process.env.NODE_ENV,
   performance: { hints: false },
-  entry: './src/panel/index.js',
+  entry: './src/panel/index.ts',
   resolve: {
+    extensions: ['.js', '.vue', '.json', '.ts'],
     alias: {
       'vue$': 'vue/dist/vue.esm.js'
     }
@@ -22,6 +23,13 @@ module.exports = [{
   ],
   module: {
     rules: [
+      {
+        test: /\.ts$/,
+        loader: 'ts-loader',
+        options: {
+          appendTsSuffixTo: [/\.vue$/]
+        }
+      },
       {
         test: /\.vue$/,
         loader: 'vue-loader'
@@ -59,6 +67,7 @@ module.exports = [{
   performance: { hints: false },
   entry: ['./src/overlay/index.js'],
   resolve: {
+    extensions: ['.js', '.vue', '.json', '.ts'],
     alias: {
       'vue$': 'vue/dist/vue.esm.js'
     }

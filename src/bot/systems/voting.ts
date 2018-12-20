@@ -49,6 +49,8 @@ class Voting extends System {
       global.db.engine.index({ table: this.collection.votes, index: 'vid' });
       global.db.engine.index({ table: this.collection.data, index: 'openedAt' });
     }
+
+    this.addMenu({ category: 'manage', name: 'ManagerVotes', id: '/manage/votes' });
   }
 
   public async close(opts: CommandOptions): Promise<boolean> {
