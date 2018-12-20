@@ -13,13 +13,14 @@
     "declaration": false,
     "resolveJsonModule": true,
   },
-
   "include": [
-    "./src/overlay",
-    "./src/panel",
+    "src/**/*.ts",
+    "src/**/*.vue",
+
     "index.d.ts"
   ],
   "exclude": [
+    "src/bot/",
     "node_modules"
-  ]
+  ],
 }
