@@ -1,4 +1,4 @@
-/* globals translations commons socket */
+/* globals translations token*/
 
 import './others/checklist';
 import './widgets/dashboard';
@@ -16,9 +16,15 @@ export interface Global {
 }
 
 declare var global: Global;
+declare var token: string;
+
+declare module 'vue/types/vue' {
+  interface Vue {
+    token: string;
+  }
+}
 
 Vue.use(VueRouter);
-Vue.prototype.translate = (v) => translate(v);
 
 const isAvailableVariable = async (variable) => {
   return new Promise((resolve, reject) => {
@@ -38,15 +44,17 @@ const isAvailableVariable = async (variable) => {
 const main = async () => {
   await Promise.all([
     isAvailableVariable('translations'),
-    isAvailableVariable('socket'),
-    isAvailableVariable('commons'),
   ]);
+
+  // init prototypes
+  Vue.prototype.translate = (v) => translate(v);
+  Vue.prototype.token = token;
 
   const router = new VueRouter({
     mode: 'hash',
     base: __dirname,
     routes: [
-      { path: '/manage/votes', component: () => import('./views/managers/votes.vue') },
+      { path: '/manage/votes', name: 'VotesManager', component: () => import('./views/managers/votes.vue') },
     ],
   });
 
@@ -54,7 +62,7 @@ const main = async () => {
     router,
     template: `
       <div id="app">
-        <router-view class="view" :commons="commons"></router-view>
+        <router-view class="view" :token="token"></router-view>
       </div>
     `,
   }).$mount('#pages');

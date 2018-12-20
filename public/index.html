@@ -58,7 +58,7 @@
     <div class="collapse navbar-collapse" id="navbarsExampleDefault">
       <ul class="navbar-nav mr-auto" id="menu-main">
         <li class="nav-item" id="menuDashboard">
-          <a href="#" data-page="dashboard" class="nav-link active" data-lang="dashboard"></a>
+          <a href="/#/" data-page="dashboard" class="nav-link active" data-lang="dashboard"></a>
         </li>
         <li class="nav-item dropdown">
           <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
@@ -539,7 +539,7 @@
     /* ROUTERS */
     let currentPage = null
     page('/', function(p){
-      var id = p.hash.length === 0 ? 'dashboard' : p.hash
+      var id = p.hash.length === 0 || p.hash === '/' ? 'dashboard' : p.hash
       if (id.startsWith('/')) id = id.replace('/', '')
       if (currentPage === id.split('-')[0]) return
       else currentPage = id.split('-')[0]
@@ -549,8 +549,7 @@
       $("#pages-old").empty()
 
       if (id !== 'dashboard') $("#pages-old").append($('<div id="P' + id.split('-')[0] + '">').load('pages/' + id.split('-')[0] + '.html',
-        function (err) {
-          if (err) return
+        function () {
           commons.translate()
           $('a[data-toggle="tab"]').off()
           $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
@@ -582,6 +581,8 @@
       var logs = false // we want only logs settings once
       _.each(menu, function (obj) {
         if (obj.id !== 'dashboard') {
+          if (obj.id.startsWith('/')) obj.id = obj.id.replace('/', '')
+
           if ((obj.id === 'systems') && systems) return
           if ((obj.id === 'overlays') && overlays) return
           if ((obj.id === 'integrations') && integrations) return
@@ -604,7 +605,6 @@
       loadedMenu = true
 
       $(".page-menu a,#menu-main a").on('click', function (ev) {
-        ev.preventDefault()
         if (!_.isNil(ev.currentTarget.dataset.page)) page('/#' + ev.currentTarget.dataset.page)
         $(".page-menu a,#menu-main a").removeClass('active')
         $(ev.currentTarget).addClass('active')
