@@ -33,16 +33,16 @@
             <div class="background-bar"></div>
             <div class="bar"
               v-bind:style="{
-              'width': getPercentage(index) === 0 ? '5px' : getPercentage(index) + '%'
+              'width': getPercentage(String(vote._id), index, 1) === 0 ? '5px' : getPercentage(String(vote._id), index, 1) + '%'
               }"
             ></div>
           </div>
-          <div class="percentage">{{getPercentage(index, 1)}}%</div>
+          <div class="percentage">{{getPercentage(String(vote._id), index, 1)}}%</div>
         </div>
         <div id="footer">
           <div style="width: 100%">Total votes
-            <strong v-if="vote.type !== 'tips'">{{ totalVotes }}</strong>
-            <strong v-else>{{ Number(totalVotes).toFixed(1) }}</strong>
+            <strong v-if="vote.type !== 'tips'">{{ totalVotes(String(vote._id)) }}</strong>
+            <strong v-else>{{ Number(totalVotes(String(vote._id))).toFixed(1) }}</strong>
           </div>
           <div style="width: 100%">Active <strong>{{ activeTime | duration('humanize') }}</strong></div>
         </div>
@@ -58,6 +58,7 @@
 
 <script lang="ts">
   import Vue from 'vue'
+  import Component from 'vue-class-component'
 
   import * as io from 'socket.io-client';
 
@@ -73,11 +74,17 @@
       'font-awesome-icon': FontAwesomeIcon
     },
     data: function () {
-      return {
+      const object: {
+        socket: any,
+        votes: Array<VotingType>,
+        votings: Array<VoteType>
+
+      } = {
         socket: io('/systems/voting', { query: "token=" + this.token }),
         votes: [],
         votings: []
       }
+      return object
     },
     mounted: function () {
       this.socket.emit('find', {}, (err, data) => {
@@ -92,15 +99,78 @@
       })
     },
     methods: {
-      getPercentage: function (index, toFixed) {
-        let votes = 0
-        /*for (let i = 0, length = this.votes.length; i < length; i++) {
-          if (this.votes[i].option === index) votes += this.votes[i].votes
+      totalVotes: function (vid) {
+        let totalVotes = 0
+        const filtered = this.votings.filter(o => o.vid === vid)
+        for (let i = 0, length = filtered.length; i < length; i++) {
+          totalVotes += filtered[i].votes
         }
-        return Number((100 / this.totalVotes) * votes || 0).toFixed(toFixed || 0);
-        */
-        return 0
+        return totalVotes
+      },
+      getPercentage: function (vid, index, toFixed) {
+        let votes = 0
+        const filtered = this.votings.filter(o => o.vid === vid)
+        for (let i = 0, length = filtered.length; i < length; i++) {
+          if (filtered[i].option === index) votes += filtered[i].votes
+        }
+        return Number((100 / this.totalVotes(vid)) * votes || 0).toFixed(toFixed || 0);
       },
     }
   })
 </script>
+
+<style scoped>
+  .hide {
+    display: none;
+  }
+
+  .title {
+    font-size: 1.2rem;
+  }
+
+  .helper {
+    text-align: center;
+    padding-top: 0.5rem;
+  }
+
+  .options, #footer {
+    width: 100%;
+    display: flex;
+    padding: 0.5rem 0;
+  }
+
+  .options.first {
+    padding-top: 1rem;
+  }
+
+  .options.last {
+    padding-bottom: 1rem;
+  }
+
+  #footer {
+    text-align: center;
+  }
+
+  .numbers {
+    padding: 0 1rem 0 0;
+    width: 1%;
+  }
+
+  .percentage {
+    padding: 0;
+    width: 80px;
+    text-align: right;
+  }
+
+  .background-bar, .bar {
+    position: relative;
+    top: 0.5rem;
+    height: 0.5rem;
+    width: 100%;
+  }
+
+  .bar {
+    position: relative;
+    top: 0rem;
+  }
+</style>

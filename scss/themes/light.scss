@@ -88,3 +88,12 @@ $status-connecting-border: $yellow !default;
 .border-gray, .border-input {
   border-color: $gray-600 !important
 }
+
+// voting bars
+.bar {
+  background-color: rgb(138, 138, 138);
+}
+
+.background-bar {
+  background-color: rgb(207, 207, 207);
+}

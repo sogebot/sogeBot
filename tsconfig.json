@@ -16,7 +16,8 @@
 
   "include": [
     "./src/overlay",
-    "./src/panel"
+    "./src/panel",
+    "index.d.ts"
   ],
   "exclude": [
     "node_modules"
