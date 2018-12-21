@@ -2,7 +2,11 @@
   <div class="container-fluid" ref="window">
     <div class="row">
       <div class="col-12">
-        <span class="title text-default"> {{ translate('menu.voting') }}</span>
+        <span class="title text-default mb-2">
+          {{ translate('menu.manage') }}
+          <small><i class="fas fa-angle-right"></i></small>
+          {{ translate('menu.voting') }}
+        </span>
       </div>
     </div>
 
@@ -89,7 +93,7 @@
                 </button>
               </template>
               <template v-else>
-                <button type="button" class="btn btn-block btn-info" :disabled="isRunning">
+                <button type="button" class="btn btn-block btn-info" style="white-space: normal;" :disabled="isRunning">
                   <font-awesome-icon icon='clone'></font-awesome-icon>
                   <template v-if="isRunning">{{ translate('systems.voting.cannotCopyIfInProgress') }}</template>
                   <template v-else>{{ translate('systems.voting.copy') }}</template>
@@ -121,9 +125,9 @@
 
   import { library } from '@fortawesome/fontawesome-svg-core'
   import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-  import { faTrophy, faClone, faGem, faCoins, faTerminal, faStop, faBan, faSpinner, faCheck } from '@fortawesome/free-solid-svg-icons';
+  import { faTrophy, faClone, faGem, faCoins, faTerminal, faStop, faBan, faSpinner, faCheck, faAngleRight } from '@fortawesome/free-solid-svg-icons';
 
-  library.add(faTrophy, faClone, faGem, faCoins, faTerminal, faStop, faBan, faSpinner, faCheck)
+  library.add(faTrophy, faClone, faGem, faCoins, faTerminal, faStop, faBan, faSpinner, faCheck, faAngleRight)
 
   Vue.use(VueMoment, {
       moment, momentTimezone

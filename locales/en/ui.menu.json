@@ -60,5 +60,6 @@
   "checklist": "Checklist",
   "bot": "Bot",
   "api": "API",
-  "voting": "Voting"
+  "voting": "Voting",
+  "manage": "Manage"
 }

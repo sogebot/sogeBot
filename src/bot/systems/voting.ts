@@ -2,7 +2,7 @@
 
 // 3rdparty libraries
 import * as cluster from 'cluster';
-import _ from 'lodash';
+import * as _ from 'lodash';
 
 // bot libraries
 import constants from '../constants';
@@ -50,7 +50,7 @@ class Voting extends System {
       global.db.engine.index({ table: this.collection.data, index: 'openedAt' });
     }
 
-    this.addMenu({ category: 'manage', name: 'ManagerVotes', id: '/manage/votes' });
+    this.addMenu({ category: 'manage', name: 'voting', id: '/manage/votes' });
   }
 
   public async close(opts: CommandOptions): Promise<boolean> {
