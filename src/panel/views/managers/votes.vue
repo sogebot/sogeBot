@@ -112,7 +112,6 @@
 
 <script lang="ts">
   import Vue from 'vue'
-  import Component from 'vue-class-component'
 
   import * as moment from 'moment'
   import VueMoment from 'vue-moment'
