@@ -104,7 +104,9 @@
         </template>
 
         <!-- add empty cards -->
-        <div class="card" style="visibility: hidden" v-if="chunkVotes.length !== itemsPerPage" v-for="i in itemsPerPage - (chunkVotes.length % itemsPerPage)" v-bind:key="i"></div>
+        <template v-if="chunkVotes.length !== itemsPerPage">
+          <div class="card" style="visibility: hidden" v-for="i in itemsPerPage - (chunkVotes.length % itemsPerPage)" v-bind:key="i"></div>
+        </template>
       </div>
     </template>
   </div>
