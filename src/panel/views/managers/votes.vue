@@ -67,7 +67,7 @@
                 </div>
                 <div style="width:100%; position:relative; top:-1rem;">
                   <div class="background-bar"></div>
-                  <div class="bar"
+                  <div class="bar bg-primary"
                     v-bind:style="{
                     'width': getPercentage(String(vote._id), index, 1) === 0 ? '5px' : getPercentage(String(vote._id), index, 1) + '%'
                     }"
