@@ -13,6 +13,7 @@ import translate from './helpers/translate';
 
 export interface Global {
   translations: any;
+  configuration: any;
 }
 
 declare var global: Global;
@@ -21,6 +22,8 @@ declare var token: string;
 declare module 'vue/types/vue' {
   interface Vue {
     token: string;
+    configuration: any;
+    $moment?: any;
   }
 }
 
@@ -44,11 +47,14 @@ const isAvailableVariable = async (variable) => {
 const main = async () => {
   await Promise.all([
     isAvailableVariable('translations'),
+    isAvailableVariable('configuration'),
   ]);
 
   // init prototypes
   Vue.prototype.translate = (v) => translate(v);
   Vue.prototype.token = token;
+  Vue.prototype.configuration = global.configuration;
+  Vue.prototype._ = _;
 
   const router = new VueRouter({
     mode: 'hash',
@@ -62,7 +68,7 @@ const main = async () => {
     router,
     template: `
       <div id="app">
-        <router-view class="view" :token="token"></router-view>
+        <router-view class="view"></router-view>
       </div>
     `,
   }).$mount('#pages');

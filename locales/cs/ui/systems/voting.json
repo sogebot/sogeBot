@@ -7,5 +7,18 @@
       "title": "Neaktivita po",
       "help": "v milisekundách"
     }
-  }
+  },
+  "done": "HOTOVO",
+  "running": "PROBÍHÁ",
+  "stop": "Zastavit",
+  "copy": "Kopírovat",
+  "totalVotes": "Celkem hlasů",
+  "cannotCopyIfInProgress": "Nelze kopírovat, pokud již probíhá jiné hlasování",
+  "closedAt": "Uzavřeno v",
+  "activeFor": "Aktivní po",
+  "votingByTips": "Hlasování pomocí tipů",
+  "votingByBits": "Hlasování pomocí bitů",
+  "votingByCommand": "Hlasování pomocí !vote",
+  "clickToCreateNewVote": "Klikněte pro vytvoření hlasování",
+  "cannotCreateNewVoteIfInProgress": "Nelze vytvořit nové hlasování, pokud již probíhá jiné hlasování"
 }

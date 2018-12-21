@@ -7,5 +7,18 @@
       "title": "Inactivity after",
       "help": "in miliseconds"
     }
-  }
+  },
+  "done": "DONE",
+  "running": "RUNNING",
+  "stop": "Stop",
+  "copy": "Copy",
+  "totalVotes": "Total votes",
+  "cannotCopyIfInProgress": "Cannot copy, if another voting in in progress",
+  "closedAt": "Closed at",
+  "activeFor": "Active for",
+  "votingByTips": "Voting by tips",
+  "votingByBits": "Voting by bits",
+  "votingByCommand": "Voting by command !vote",
+  "clickToCreateNewVote": "Click to create new voting",
+  "cannotCreateNewVoteIfInProgress": "Cannot create new voting, if another voting in in progress"
 }
