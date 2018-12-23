@@ -59,7 +59,7 @@ export default {
   props: ['token'],
   data: function () {
     return {
-      socket: io('/overlays/voting', {query: "token="+token}),
+      socket: io('/overlays/polls', {query: "token="+token}),
       currentVote: {},
       votes: [],
       lastUpdatedAt: 0,

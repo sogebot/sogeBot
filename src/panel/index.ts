@@ -61,7 +61,7 @@ const main = async () => {
     mode: 'hash',
     base: __dirname,
     routes: [
-      { path: '/manage/votes', name: 'VotesManager', component: () => import('./views/managers/votes.vue') },
+      { path: '/manage/polls', name: 'PollsManager', component: () => import('./views/managers/polls.vue') },
     ],
   });
 

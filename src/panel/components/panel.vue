@@ -25,6 +25,7 @@
     },
     data: function () {
       return {
+        search: '',
         showAs: 'cards',
         opts: {
           hideNewButton: false,
@@ -37,6 +38,9 @@
       }
     },
     watch: {
+      search: function (value) {
+        this.$emit('search', value)
+      },
       showAs: function (value) {
         this.$emit('event', { type: 'showAs', value })
       }

@@ -2,7 +2,7 @@
 
 import Overlay from './_interface';
 
-class Voting extends Overlay {
+class Polls extends Overlay {
   [x: string]: any; // TODO: remove after interface ported to TS
 
   constructor() {
@@ -33,9 +33,9 @@ class Voting extends Overlay {
         links: {
           overlay: {
             type: 'link',
-            href: '/overlays/voting',
+            href: '/overlays/polls',
             class: 'btn btn-primary btn-block',
-            rawText: '/overlays/voting',
+            rawText: '/overlays/polls',
             target: '_blank',
           },
         },
@@ -46,10 +46,10 @@ class Voting extends Overlay {
   }
 
   public sockets() {
-    global.panel.io.of('/overlays/voting').on('connection', (socket) => {
+    global.panel.io.of('/overlays/polls').on('connection', (socket) => {
       socket.on('data', async (callback) => {
-        const currentVote: VotingType = await global.db.engine.findOne(global.systems.voting.collection.data, { isOpened: true });
-        const votes: VoteType[] = await global.db.engine.find(global.systems.voting.collection.votes, { vid: String(currentVote._id) });
+        const currentVote: Poll = await global.db.engine.findOne(global.systems.polls.collection.data, { isOpened: true });
+        const votes: Vote[] = await global.db.engine.find(global.systems.polls.collection.votes, { vid: String(currentVote._id) });
         const settings = {
           display: {
             align: this.settings.display.align,
@@ -64,4 +64,4 @@ class Voting extends Overlay {
   }
 }
 
-module.exports = new Voting();
+module.exports = new Polls();

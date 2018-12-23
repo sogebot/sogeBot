@@ -22,14 +22,15 @@
   "stop": "Stop",
   "copy": "Copy",
   "totalVotes": "Total votes",
-  "cannotCopyIfInProgress": "Cannot copy, if another voting in in progress",
+  "cannotCopyIfInProgress": "Cannot copy, if another poll is in progress",
   "closedAt": "Closed at",
   "activeFor": "Active for",
   "votingBy": "Voting by",
   "tips": "tips",
   "bits": "bits",
   "command": "!vote",
-  "create": "Click to create new voting",
-  "cannotCreateIfEmpty": "Cannot create new voting without options",
-  "cannotCreateNewVoteIfInProgress": "Cannot create new voting, if another voting in in progress"
+  "create": "Click to create new poll",
+  "cannotCreateIfEmpty": "Cannot create new poll without at least 2 options",
+  "cannotCreateWithoutTitle": "Cannot create new poll without title",
+  "cannotCreateNewVoteIfInProgress": "Cannot create new poll, if another poll in in progress"
 }

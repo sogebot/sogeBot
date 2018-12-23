@@ -5,22 +5,23 @@
         <span class="title text-default mb-2">
           {{ translate('menu.manage') }}
           <small><i class="fas fa-angle-right"></i></small>
-          {{ translate('menu.voting') }}
+          {{ translate('menu.polls') }}
         </span>
       </div>
     </div>
 
     <panel ref="panel" class="pt-3 pb-3 mt-3 mb-3 m-0 border-top border-bottom row"
-      :options="{ hideNewButton: true, hideTableButton: true }"></panel>
+      :options="{ hideNewButton: true, hideTableButton: true }"
+      @search="search = $event"></panel>
 
-    <template v-for="(chunkVotes, index) of _.chunk(votes, itemsPerPage)">
+    <template v-for="(chunkVotes, index) of _.chunk(filteredVotes, itemsPerPage)">
       <div class="card-deck" v-bind:key="index">
         <template v-for="vote of chunkVotes">
           <template v-if="vote === 'new'">
             <div v-if="isRunning" class="card mb-3 p-0 text-dark" style="flex-direction: inherit;" v-bind:key="String(vote)">
               <h6 style="margin: auto; line-height: initial; text-align: center;" class="text-dark p-3">
                 <font-awesome-icon icon='ban' size="10x" class="text-danger pb-2"></font-awesome-icon> <br>
-                {{ translate('systems.voting.cannotCreateNewVoteIfInProgress') }}
+                {{ translate('systems.polls.cannotCreateNewVoteIfInProgress') }}
               </h6>
             </div>
             <div v-else class="card mb-3 p-0" v-bind:key="String(vote)">
@@ -28,18 +29,18 @@
                 <input type="text" style="background-color: transparent; text-transform: inherit; font-size: 1.25rem; position: relative; top: -0.48rem;" class="border-left-0 border-right-0 border-top-0 form-control card-title mb-0" placeholder="Title" v-model="newVote.title">
                 <h6 class="card-subtitle mb-2 text-muted">
                   <template v-if="newVote.type === 'normal'">
-                    <font-awesome-icon icon='exclamation'></font-awesome-icon> {{ translate('systems.voting.votingBy') }}
+                    <font-awesome-icon icon='exclamation'></font-awesome-icon> {{ translate('systems.polls.votingBy') }}
                   </template>
                   <template v-if="newVote.type === 'tips'">
-                    <font-awesome-icon icon='coins'></font-awesome-icon> {{ translate('systems.voting.votingBy') }}
+                    <font-awesome-icon icon='coins'></font-awesome-icon> {{ translate('systems.polls.votingBy') }}
                   </template>
                   <template v-if="newVote.type === 'bits'">
-                    <font-awesome-icon icon='gem'></font-awesome-icon> {{ translate('systems.voting.votingBy') }}
+                    <font-awesome-icon icon='gem'></font-awesome-icon> {{ translate('systems.polls.votingBy') }}
                   </template>
                   <select v-model="newVote.type" class="text-muted border-0" style="background-color: transparent;font-size: .9rem; text-transform: uppercase; font-weight: bold;">
-                    <option value="normal">{{ translate('systems.voting.command') }}</option>
-                    <option value="tips">{{ translate('systems.voting.tips') }}</option>
-                    <option value="bits">{{ translate('systems.voting.bits') }}</option>
+                    <option value="normal">{{ translate('systems.polls.command') }}</option>
+                    <option value="tips">{{ translate('systems.polls.tips') }}</option>
+                    <option value="bits">{{ translate('systems.polls.bits') }}</option>
                   </select>
                 </h6>
 
@@ -55,13 +56,16 @@
               </div>
 
               <div class="card-footer">
-                <button type="button" class="btn btn-block btn-success" style="white-space: normal;" :disabled="isNewVoteOptsEmpty" @click="create()">
+                <button type="button" class="btn btn-block btn-success" style="white-space: normal;" :disabled="!atLeastTwoOptions || newVote.title.trim().length === 0" @click="create()">
                   <font-awesome-icon icon='plus'></font-awesome-icon>
-                  <template v-if="isNewVoteOptsEmpty">
-                    {{ translate('systems.voting.cannotCreateIfEmpty')}}
+                  <template v-if="newVote.title.trim().length === 0">
+                    {{ translate('systems.polls.cannotCreateWithoutTitle')}}
+                  </template>
+                  <template v-else-if="!atLeastTwoOptions">
+                    {{ translate('systems.polls.cannotCreateIfEmpty')}}
                   </template>
                   <template v-else>
-                    {{ translate('systems.voting.create') }}
+                    {{ translate('systems.polls.create') }}
                   </template>
                 </button>
               </div>
@@ -70,23 +74,23 @@
           <div class="card mb-3 p-0 border" v-else v-bind:key="String(vote._id)" :class="[vote.isOpened ? 'border-info' : '']">
             <div class="text-info current" v-if="vote.isOpened">
               <font-awesome-icon icon="spinner" spin />
-                {{ translate('systems.voting.running') }}
+                {{ translate('systems.polls.running') }}
             </div>
             <div class="text-success current" v-else>
               <font-awesome-icon icon="check" />
-                {{ translate('systems.voting.done') }}
+                {{ translate('systems.polls.done') }}
             </div>
             <div class="card-body">
               <h5 class="card-title" style="text-transform: inherit;">{{ vote.title }}</h5>
               <h6 class="card-subtitle mb-2 text-muted">
                 <template v-if="vote.type === 'normal'">
-                  <font-awesome-icon icon='exclamation'></font-awesome-icon> {{ translate('systems.voting.votingBy') }} {{ translate('systems.voting.command') }}
+                  <font-awesome-icon icon='exclamation'></font-awesome-icon> {{ translate('systems.polls.votingBy') }} {{ translate('systems.polls.command') }}
                 </template>
                 <template v-if="vote.type === 'tips'">
-                  <font-awesome-icon icon='coins'></font-awesome-icon> {{ translate('systems.voting.votingBy') }} {{ translate('systems.voting.tips') }}
+                  <font-awesome-icon icon='coins'></font-awesome-icon> {{ translate('systems.polls.votingBy') }} {{ translate('systems.polls.tips') }}
                 </template>
                 <template v-if="vote.type === 'bits'">
-                  <font-awesome-icon icon='gem'></font-awesome-icon> {{ translate('systems.voting.votingBy') }} {{ translate('systems.voting.bits') }}
+                  <font-awesome-icon icon='gem'></font-awesome-icon> {{ translate('systems.polls.votingBy') }} {{ translate('systems.polls.bits') }}
                 </template>
               </h6>
 
@@ -114,25 +118,25 @@
             <div class="card-footer">
               <div class="d-flex">
                 <div style="width: 100%">
-                  {{ translate('systems.voting.totalVotes') }}
+                  {{ translate('systems.polls.totalVotes') }}
                   <strong v-if="vote.type !== 'tips'">{{ totalVotes(String(vote._id)) }}</strong>
                   <strong v-else>{{ Number(totalVotes(String(vote._id))).toFixed(1) }}</strong>
                 </div>
-                <div style="width: 100%" v-if="vote.isOpened">{{ translate('systems.voting.activeFor') }} <strong>{{ activeTime(String(vote._id)) | duration('humanize') }}</strong></div>
-                <div style="width: 100%" v-else>{{ translate('systems.voting.closedAt') }} <strong>{{ vote.closedAt | moment('LLL') }}</strong></div>
+                <div style="width: 100%" v-if="vote.isOpened">{{ translate('systems.polls.activeFor') }} <strong>{{ activeTime(String(vote._id)) | duration('humanize') }}</strong></div>
+                <div style="width: 100%" v-else>{{ translate('systems.polls.closedAt') }} <strong>{{ vote.closedAt | moment('LLL') }}</strong></div>
               </div>
             </div>
             <div class="card-footer">
               <template v-if="vote.isOpened">
                 <button type="button" class="btn btn-block btn-danger" @click="stop(String(vote._id))">
-                  <font-awesome-icon icon='stop'></font-awesome-icon> {{ translate('systems.voting.stop') }}
+                  <font-awesome-icon icon='stop'></font-awesome-icon> {{ translate('systems.polls.stop') }}
                 </button>
               </template>
               <template v-else>
                 <button type="button" class="btn btn-block btn-info" style="white-space: normal;" :disabled="isRunning" @click="copy(String(vote._id))">
                   <font-awesome-icon icon='clone'></font-awesome-icon>
-                  <template v-if="isRunning">{{ translate('systems.voting.cannotCopyIfInProgress') }}</template>
-                  <template v-else>{{ translate('systems.voting.copy') }}</template>
+                  <template v-if="isRunning">{{ translate('systems.polls.cannotCopyIfInProgress') }}</template>
+                  <template v-else>{{ translate('systems.polls.copy') }}</template>
                 </button>
               </template>
             </div>
@@ -178,15 +182,16 @@
     data: function () {
       const object: {
         socket: any,
-        votes: Array<VotingType | 'new'>,
-        votings: Array<VoteType>,
-        newVote: VotingType
+        votes: Array<Poll | 'new'>,
+        votings: Array<Vote>,
+        newVote: Poll
         currentTime: any,
         isMounted: Boolean,
         domWidth: number,
         interval: number,
+        search: string
       } = {
-        socket: io('/systems/voting', { query: "token=" + this.token }),
+        socket: io('/systems/polls', { query: "token=" + this.token }),
         votes: [],
         votings: [],
         currentTime: 0,
@@ -200,6 +205,7 @@
           openedAt: String(new Date())
         },
         interval: 0,
+        search: '',
       }
       return object
     },
@@ -221,6 +227,16 @@
       this.isMounted = true
     },
     computed: {
+      filteredVotes: function () {
+        if (this.search.trim().length === 0) return this.votes;
+          return this.votes.filter((o) => {
+            if (typeof o !== 'string') {
+            const isSearchInKeyword = !this._.isNil(o.title.match(new RegExp(this.search, 'ig')))
+            const isOpened = o.isOpened === true
+            return isSearchInKeyword || isOpened
+            } else return true // is new -> must return
+          })
+      },
       itemsPerPage: function () {
         if(!this.isMounted) return 4
         else {
@@ -233,11 +249,12 @@
         const running = this.votes.find(o => typeof o !== 'string' && o.isOpened);
         return typeof running !== 'undefined';
       },
-      isNewVoteOptsEmpty: function (): Boolean {
+      atLeastTwoOptions: function (): Boolean {
+        let options = 0
         for (let i = 0; i < this.newVote.options.length; i++) {
-          if (this.newVote.options[i].trim().length > 0) return false
+          if (this.newVote.options[i].trim().length > 0) options++
         }
-        return true
+        return options >= 2
       }
     },
     methods: {

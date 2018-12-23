@@ -25,29 +25,29 @@ describe('Voting - tips', () => {
 
   describe('Close not opened voting', () => {
     it('Close voting should fail', async () => {
-      assert.isNotTrue(await global.systems.voting.close({ sender: owner }))
+      assert.isNotTrue(await global.systems.polls.close({ sender: owner }))
     })
   })
 
   describe('Close opened voting', () => {
     it('Open new voting', async () => {
-      assert.isTrue(await global.systems.voting.open({ sender: owner, parameters: '-tips -title "Lorem Ipsum test?" Lorem | Ipsum | Dolor Sit' }))
+      assert.isTrue(await global.systems.polls.open({ sender: owner, parameters: '-tips -title "Lorem Ipsum test?" Lorem | Ipsum | Dolor Sit' }))
     })
     it('Close voting', async () => {
-      assert.isTrue(await global.systems.voting.close({ sender: owner }))
+      assert.isTrue(await global.systems.polls.close({ sender: owner }))
     })
   })
 
   describe('Voting full workflow', () => {
     var vid = null
     it('Open new voting', async () => {
-      assert.isTrue(await global.systems.voting.open({ sender: owner, parameters: '-tips -title "Lorem Ipsum?" Lorem | Ipsum | Dolor Sit' }))
+      assert.isTrue(await global.systems.polls.open({ sender: owner, parameters: '-tips -title "Lorem Ipsum?" Lorem | Ipsum | Dolor Sit' }))
     })
     it('Open another voting should fail', async () => {
-      assert.isFalse(await global.systems.voting.open({ sender: owner, parameters: '-tips -title "Lorem Ipsum2?" Lorem2 | Ipsum2 | Dolor Sit2' }))
+      assert.isFalse(await global.systems.polls.open({ sender: owner, parameters: '-tips -title "Lorem Ipsum2?" Lorem2 | Ipsum2 | Dolor Sit2' }))
     })
     it('Voting should be correctly in db', async () => {
-      const cVote = await global.db.engine.findOne(global.systems.voting.collection.data, { isOpened: true });
+      const cVote = await global.db.engine.findOne(global.systems.polls.collection.data, { isOpened: true });
       assert.isNotEmpty(cVote)
       assert.deepEqual(cVote.options, ['Lorem', 'Ipsum', 'Dolor Sit'])
       assert.deepEqual(cVote.type, 'tips')
@@ -57,16 +57,16 @@ describe('Voting - tips', () => {
     it(`!vote should return correct vote status`, async () => {
       await message.prepare()
 
-      await global.systems.voting.main({ sender: owner, parameters: ''  })
-      await message.isSent('systems.voting.status', owner, { title: 'Lorem Ipsum?' })
-      await message.isSentRaw(`#vote1 - Lorem - 0.00 ${global.commons.getLocalizedName(0, 'systems.voting.votes')}, 0.00%`, owner)
-      await message.isSentRaw(`#vote2 - Ipsum - 0.00 ${global.commons.getLocalizedName(0, 'systems.voting.votes')}, 0.00%`, owner)
-      await message.isSentRaw(`#vote3 - Dolor Sit - 0.00 ${global.commons.getLocalizedName(0, 'systems.voting.votes')}, 0.00%`, owner)
+      await global.systems.polls.main({ sender: owner, parameters: ''  })
+      await message.isSent('systems.polls.status', owner, { title: 'Lorem Ipsum?' })
+      await message.isSentRaw(`#vote1 - Lorem - 0.00 ${global.commons.getLocalizedName(0, 'systems.polls.votes')}, 0.00%`, owner)
+      await message.isSentRaw(`#vote2 - Ipsum - 0.00 ${global.commons.getLocalizedName(0, 'systems.polls.votes')}, 0.00%`, owner)
+      await message.isSentRaw(`#vote3 - Dolor Sit - 0.00 ${global.commons.getLocalizedName(0, 'systems.polls.votes')}, 0.00%`, owner)
     })
     for (let o of [0,1,2,3,4]) {
       it(`User ${owner.username} will vote for option ${o} - should fail`, async () => {
-        await global.systems.voting.main({ sender: owner, parameters: String(o) })
-        const vote = await global.db.engine.findOne(global.systems.voting.collection.votes, { votedBy: owner.username, vid });
+        await global.systems.polls.main({ sender: owner, parameters: String(o) })
+        const vote = await global.db.engine.findOne(global.systems.polls.collection.votes, { votedBy: owner.username, vid });
         assert.isEmpty(vote, 'Expected ' + JSON.stringify({ votedBy: owner.username, vid }) + ' to not be found in db')
       })
     }
@@ -87,7 +87,7 @@ describe('Voting - tips', () => {
 
           await until(async (setError) => {
             try {
-              const vote = await global.db.engine.findOne(global.systems.voting.collection.votes, { votedBy: user, vid })
+              const vote = await global.db.engine.findOne(global.systems.polls.collection.votes, { votedBy: user, vid })
               assert.isNotEmpty(vote, 'Expected ' + JSON.stringify({ votedBy: user, vid }) + ' to be found in db')
               assert.equal(vote.option, o - 1)
               return true
@@ -102,36 +102,36 @@ describe('Voting - tips', () => {
     it(`!vote should return correct vote status`, async () => {
       await message.prepare()
 
-      await global.systems.voting.main({ sender: owner, parameters: ''  })
-      await message.isSent('systems.voting.status', owner, { title: 'Lorem Ipsum?' })
-      await message.isSentRaw(`#vote1 - Lorem - 100.00 ${global.commons.getLocalizedName(100, 'systems.voting.votes')}, 50.00%`, owner)
-      await message.isSentRaw(`#vote2 - Ipsum - 100.00 ${global.commons.getLocalizedName(100, 'systems.voting.votes')}, 50.00%`, owner)
-      await message.isSentRaw(`#vote3 - Dolor Sit - 0.00 ${global.commons.getLocalizedName(0, 'systems.voting.votes')}, 0.00%`, owner)
+      await global.systems.polls.main({ sender: owner, parameters: ''  })
+      await message.isSent('systems.polls.status', owner, { title: 'Lorem Ipsum?' })
+      await message.isSentRaw(`#vote1 - Lorem - 100.00 ${global.commons.getLocalizedName(100, 'systems.polls.votes')}, 50.00%`, owner)
+      await message.isSentRaw(`#vote2 - Ipsum - 100.00 ${global.commons.getLocalizedName(100, 'systems.polls.votes')}, 50.00%`, owner)
+      await message.isSentRaw(`#vote3 - Dolor Sit - 0.00 ${global.commons.getLocalizedName(0, 'systems.polls.votes')}, 0.00%`, owner)
     })
 
     it('Close voting', async () => {
       await message.prepare()
 
-      assert.isTrue(await global.systems.voting.close({ sender: owner }))
-      await message.isSent('systems.voting.status_closed', owner, { title: 'Lorem Ipsum?' })
-      await message.isSentRaw(`#vote1 - Lorem - 100.00 ${global.commons.getLocalizedName(100, 'systems.voting.votes')}, 50.00%`, owner)
-      await message.isSentRaw(`#vote2 - Ipsum - 100.00 ${global.commons.getLocalizedName(100, 'systems.voting.votes')}, 50.00%`, owner)
-      await message.isSentRaw(`#vote3 - Dolor Sit - 0.00 ${global.commons.getLocalizedName(0, 'systems.voting.votes')}, 0.00%`, owner)
+      assert.isTrue(await global.systems.polls.close({ sender: owner }))
+      await message.isSent('systems.polls.status_closed', owner, { title: 'Lorem Ipsum?' })
+      await message.isSentRaw(`#vote1 - Lorem - 100.00 ${global.commons.getLocalizedName(100, 'systems.polls.votes')}, 50.00%`, owner)
+      await message.isSentRaw(`#vote2 - Ipsum - 100.00 ${global.commons.getLocalizedName(100, 'systems.polls.votes')}, 50.00%`, owner)
+      await message.isSentRaw(`#vote3 - Dolor Sit - 0.00 ${global.commons.getLocalizedName(0, 'systems.polls.votes')}, 0.00%`, owner)
     })
 
     it(`!vote should return not in progress info`, async () => {
       await message.prepare()
 
-      await global.systems.voting.main({ sender: owner, parameters: ''  })
-      await message.isSent('systems.voting.notInProgress', owner)
+      await global.systems.polls.main({ sender: owner, parameters: ''  })
+      await message.isSent('systems.polls.notInProgress', owner)
     })
 
     it(`!vote 1 should return not in progress info`, async () => {
       await message.prepare()
 
       const user = Math.random()
-      await global.systems.voting.main({ sender: { username: user }, parameters: '1' })
-      await message.isSent('systems.voting.notInProgress', { username: user })
+      await global.systems.polls.main({ sender: { username: user }, parameters: '1' })
+      await message.isSent('systems.polls.notInProgress', { username: user })
     })
   })
 })

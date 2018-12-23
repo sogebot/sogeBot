@@ -21,11 +21,11 @@ enum ERROR {
 /*
  * !vote
  * !vote [x]
- * !vote open [-tips/-bits/-points] -title "your vote title" option | option | option
- * !vote close
+ * !poll open [-tips/-bits/-points] -title "your vote title" option | option | option
+ * !poll close
  */
 
-class Voting extends System {
+class Polls extends System {
   [x: string]: any; // TODO: remove after interface ported to TS
 
   constructor() {
@@ -42,8 +42,8 @@ class Voting extends System {
         },
         commands: [
           { name: '!vote', isHelper: true },
-          { name: '!vote open', permission: constants.MODS },
-          { name: '!vote close', permission: constants.MODS },
+          { name: '!poll open', permission: constants.MODS },
+          { name: '!poll close', permission: constants.MODS },
         ],
       },
       on: {
@@ -62,12 +62,12 @@ class Voting extends System {
       setInterval(() => this.reminder(), 1000);
     }
 
-    this.addMenu({ category: 'manage', name: 'voting', id: '/manage/votes' });
+    this.addMenu({ category: 'manage', name: 'polls', id: '/manage/polls' });
   }
 
   public async sockets() {
     this.socket.on('connection', (socket) => {
-      socket.on('create', async (vote: VotingType, cb) => {
+      socket.on('create', async (vote: Poll, cb) => {
         try {
           const parameters = `-${vote.type} -title "${vote.title}" ${vote.options.filter((o) => o.trim().length > 0).join(' | ')}`;
           this.open({
@@ -86,13 +86,13 @@ class Voting extends System {
   }
 
   public async close(opts: CommandOptions): Promise<boolean> {
-    const cVote: VotingType = await global.db.engine.findOne(this.collection.data, { isOpened: true });
+    const cVote: Poll = await global.db.engine.findOne(this.collection.data, { isOpened: true });
 
     try {
       if (_.isEmpty(cVote)) {
         throw new Error(String(ERROR.ALREADY_CLOSED));
       } else {
-        const votes: VoteType[] = await global.db.engine.find(this.collection.votes, { vid: String(cVote._id) });
+        const votes: Vote[] = await global.db.engine.find(this.collection.votes, { vid: String(cVote._id) });
         await global.db.engine.update(this.collection.data, { _id: String(cVote._id) }, { isOpened: false, closedAt: String(new Date()) });
 
         const count = {};
@@ -102,7 +102,7 @@ class Voting extends System {
           _total = _total + votes[i].votes;
         }
         // get vote status
-        global.commons.sendMessage(global.commons.prepare('systems.voting.status_closed', {
+        global.commons.sendMessage(global.commons.prepare('systems.polls.status_closed', {
           title: cVote.title,
         }), opts.sender);
         for (const index of Object.keys(cVote.options)) {
@@ -111,11 +111,11 @@ class Voting extends System {
             const votesCount = count[index] || 0;
             const percentage = Number((100 / _total) * votesCount || 0).toFixed(2);
             if (cVote.type === 'normal') {
-              global.commons.sendMessage(this.settings.commands['!vote'] + ` ${Number(index) + 1} - ${option} - ${votesCount} ${global.commons.getLocalizedName(votesCount, 'systems.voting.votes')}, ${percentage}%`, opts.sender);
+              global.commons.sendMessage(this.settings.commands['!vote'] + ` ${Number(index) + 1} - ${option} - ${votesCount} ${global.commons.getLocalizedName(votesCount, 'systems.polls.votes')}, ${percentage}%`, opts.sender);
             } else if (cVote.type === 'tips') {
-              global.commons.sendMessage(`#vote${Number(index) + 1} - ${option} - ${Number(votesCount).toFixed(2)} ${global.commons.getLocalizedName(votesCount, 'systems.voting.votes')}, ${percentage}%`, opts.sender);
+              global.commons.sendMessage(`#vote${Number(index) + 1} - ${option} - ${Number(votesCount).toFixed(2)} ${global.commons.getLocalizedName(votesCount, 'systems.polls.votes')}, ${percentage}%`, opts.sender);
             } else {
-              global.commons.sendMessage(`#vote${Number(index) + 1} - ${option} - ${votesCount} ${global.commons.getLocalizedName(votesCount, 'systems.voting.votes')}, ${percentage}%`, opts.sender);
+              global.commons.sendMessage(`#vote${Number(index) + 1} - ${option} - ${votesCount} ${global.commons.getLocalizedName(votesCount, 'systems.polls.votes')}, ${percentage}%`, opts.sender);
             }
           }, 100 * (Number(index) + 1));
         }
@@ -123,7 +123,7 @@ class Voting extends System {
     } catch (e) {
       switch (e.message) {
         case String(ERROR.ALREADY_CLOSED):
-          global.commons.sendMessage(global.translate('systems.voting.notInProgress'), opts.sender);
+          global.commons.sendMessage(global.translate('systems.polls.notInProgress'), opts.sender);
           break;
       }
       return false;
@@ -132,7 +132,7 @@ class Voting extends System {
   }
 
   public async open(opts: CommandOptions): Promise<boolean> {
-    const cVote: VotingType = await global.db.engine.findOne(this.collection.data, { isOpened: true });
+    const cVote: Poll = await global.db.engine.findOne(this.collection.data, { isOpened: true });
 
     try {
       if (!_.isEmpty(cVote)) { throw new Error(String(ERROR.ALREADY_OPENED)); }
@@ -144,10 +144,10 @@ class Voting extends System {
         .toArray();
       if (options.length < 2) { throw new Error(String(ERROR.NOT_ENOUGH_OPTIONS)); }
 
-      const voting: VotingType = { type, title, isOpened: true, options, openedAt: String(new Date()) };
+      const voting: Poll = { type, title, isOpened: true, options, openedAt: String(new Date()) };
       await global.db.engine.insert(this.collection.data, voting);
 
-      const translations = `systems.voting.opened_${type}`;
+      const translations = `systems.polls.opened_${type}`;
       global.commons.sendMessage(global.commons.prepare(translations, {
         title,
         command: this.settings.commands['!vote'],
@@ -164,14 +164,14 @@ class Voting extends System {
           global.commons.sendMessage(global.translate('voting.notEnoughOptions'), opts.sender);
           break;
         case String(ERROR.ALREADY_OPENED):
-          const translations = 'systems.voting.opened' + (cVote.type.length > 0 ? `_${cVote.type}` : '');
+          const translations = 'systems.polls.opened' + (cVote.type.length > 0 ? `_${cVote.type}` : '');
           global.commons.sendMessage(global.commons.prepare(translations, {
             title: cVote.title,
             command: this.settings.commands['!vote'],
           }), opts.sender);
           for (const index of Object.keys(cVote.options)) {
             setTimeout(() => {
-              if (cVote.type === 'normal') { global.commons.sendMessage(this.settings.commands['!vote open'] + ` ${index} => ${cVote.options[index]}`, opts.sender); } else { global.commons.sendMessage(`#vote${(Number(index) + 1)} => ${cVote.options[index]}`, opts.sender); }
+              if (cVote.type === 'normal') { global.commons.sendMessage(this.settings.commands['!poll open'] + ` ${index} => ${cVote.options[index]}`, opts.sender); } else { global.commons.sendMessage(`#vote${(Number(index) + 1)} => ${cVote.options[index]}`, opts.sender); }
             }, 100 * (Number(index) + 1));
           }
           break;
@@ -184,12 +184,12 @@ class Voting extends System {
   }
 
   public async main(opts: CommandOptions): Promise<void> {
-    const cVote: VotingType = await global.db.engine.findOne(this.collection.data, { isOpened: true });
+    const cVote: Poll = await global.db.engine.findOne(this.collection.data, { isOpened: true });
     let index: number;
 
     try {
       if (opts.parameters.length === 0 && !_.isEmpty(cVote)) {
-        const votes: VoteType[] = await global.db.engine.find(this.collection.votes, { vid: String(cVote._id) });
+        const votes: Vote[] = await global.db.engine.find(this.collection.votes, { vid: String(cVote._id) });
 
         const count = {};
         let _total = 0;
@@ -198,7 +198,7 @@ class Voting extends System {
           _total = _total + votes[i].votes;
         }
         // get vote status
-        global.commons.sendMessage(global.commons.prepare('systems.voting.status', {
+        global.commons.sendMessage(global.commons.prepare('systems.polls.status', {
           title: cVote.title,
         }), opts.sender);
         for (const i of Object.keys(cVote.options)) {
@@ -207,11 +207,11 @@ class Voting extends System {
             const votesCount = count[i] || 0;
             const percentage = Number((100 / _total) * votesCount || 0).toFixed(2);
             if (cVote.type === 'normal') {
-              global.commons.sendMessage(this.settings.commands['!vote'] + ` ${Number(i) + 1} - ${option} - ${votesCount} ${global.commons.getLocalizedName(votesCount, 'systems.voting.votes')}, ${percentage}%`, opts.sender);
+              global.commons.sendMessage(this.settings.commands['!vote'] + ` ${Number(i) + 1} - ${option} - ${votesCount} ${global.commons.getLocalizedName(votesCount, 'systems.polls.votes')}, ${percentage}%`, opts.sender);
             } else if (cVote.type === 'tips') {
-              global.commons.sendMessage(`#vote${Number(i) + 1} - ${option} - ${Number(votesCount).toFixed(2)} ${global.commons.getLocalizedName(votesCount, 'systems.voting.votes')}, ${percentage}%`, opts.sender);
+              global.commons.sendMessage(`#vote${Number(i) + 1} - ${option} - ${Number(votesCount).toFixed(2)} ${global.commons.getLocalizedName(votesCount, 'systems.polls.votes')}, ${percentage}%`, opts.sender);
             } else {
-              global.commons.sendMessage(`#vote${Number(i) + 1} - ${option} - ${votesCount} ${global.commons.getLocalizedName(votesCount, 'systems.voting.votes')}, ${percentage}%`, opts.sender);
+              global.commons.sendMessage(`#vote${Number(i) + 1} - ${option} - ${votesCount} ${global.commons.getLocalizedName(votesCount, 'systems.polls.votes')}, ${percentage}%`, opts.sender);
             }
           }, 100 * (Number(i) + 1));
         }
@@ -225,7 +225,7 @@ class Voting extends System {
         if (cVote.options.length < index + 1 || index < 0) {
           throw new Error(String(ERROR.INVALID_VOTE));
         } else {
-          const vote: VoteType = {
+          const vote: Vote = {
             vid: String(cVote._id),
             votedBy: opts.sender ? opts.sender.username : 'n/a',
             votes: 1,
@@ -239,7 +239,7 @@ class Voting extends System {
     } catch (e) {
       switch (e.message) {
         case String(ERROR.NO_VOTING_IN_PROGRESS):
-          global.commons.sendMessage(global.commons.prepare('systems.voting.notInProgress'), opts.sender);
+          global.commons.sendMessage(global.commons.prepare('systems.polls.notInProgress'), opts.sender);
           break;
         case String(ERROR.INVALID_VOTE):
           // pass, we don't want to have error message
@@ -249,14 +249,14 @@ class Voting extends System {
   }
 
   private async parseBit(opts: { username: string, amount: number, message: string }): Promise<void> {
-    const cVote: VotingType = await global.db.engine.findOne(this.collection.data, { isOpened: true });
+    const cVote: Poll = await global.db.engine.findOne(this.collection.data, { isOpened: true });
 
     if (!_.isEmpty(cVote) && cVote.type === 'bits') {
       for (let i = cVote.options.length; i > 0; i--) {
         // we are going downwards because we are checking include and 1 === 10
         if (opts.message.includes('#vote' + i)) {
           // vote found
-          const vote: VoteType = {
+          const vote: Vote = {
             vid: String(cVote._id),
             votedBy: opts.username,
             votes: opts.amount,
@@ -271,14 +271,14 @@ class Voting extends System {
   }
 
   private async parseTip(opts: { username: string, amount: number, message: string, currency: string }): Promise<void> {
-    const cVote: VotingType = await global.db.engine.findOne(this.collection.data, { isOpened: true });
+    const cVote: Poll = await global.db.engine.findOne(this.collection.data, { isOpened: true });
 
     if (!_.isEmpty(cVote) && cVote.type === 'tips') {
       for (let i = cVote.options.length; i > 0; i--) {
         // we are going downwards because we are checking include and 1 === 10
         if (opts.message.includes('#vote' + i)) {
           // vote found
-          const vote: VoteType = {
+          const vote: Vote = {
             vid: String(cVote._id),
             votedBy: opts.username,
             votes: Number(global.currency.exchange(opts.amount, opts.currency, global.currency.settings.currency.mainCurrency)),
@@ -297,7 +297,7 @@ class Voting extends System {
   }
 
   private async reminder() {
-    const vote: VotingType = await global.db.engine.findOne(this.collection.data, { isOpened: true });
+    const vote: Poll = await global.db.engine.findOne(this.collection.data, { isOpened: true });
     const shouldRemind = { messages: false, time: false };
 
     if (this.settings.reminder.everyXMessages === 0 && this.settings.reminder.everyXSeconds === 0 || _.isEmpty(vote)) {
@@ -331,7 +331,7 @@ class Voting extends System {
       this.settings._.lastMessageRemind = this.settings._.currentMessages;
       this.settings._.lastTimeRemind = String(new Date());
 
-      const translations = `systems.voting.opened_${vote.type}`;
+      const translations = `systems.polls.opened_${vote.type}`;
       global.commons.sendMessage(global.commons.prepare(translations, {
         title: vote.title,
         command: this.settings.commands['!vote'],
@@ -345,4 +345,4 @@ class Voting extends System {
   }
 }
 
-module.exports = new Voting();
+module.exports = new Polls();

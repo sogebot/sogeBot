@@ -78,7 +78,7 @@ type CommandOptions = {
   parameters: string
 }
 
-declare interface VoteType {
+declare interface Vote {
   _id?: any;
   vid: string;
   votedBy: string;
@@ -86,7 +86,7 @@ declare interface VoteType {
   option: number;
 }
 
-declare interface VotingType {
+declare interface Poll {
   _id?: any;
   type: 'tips' | 'bits' | 'normal';
   title: string;
