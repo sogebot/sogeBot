@@ -31,6 +31,15 @@ class Voting extends System {
   constructor() {
     const options: InterfaceSettings = {
       settings: {
+        _: {
+          currentMessages: 0,
+          lastMessageRemind: 0,
+          lastTimeRemind: String(new Date()),
+        },
+        reminder: {
+          everyXMessages: 0,
+          everyXSeconds: 0,
+        },
         commands: [
           { name: '!vote', isHelper: true },
           { name: '!vote open', permission: constants.MODS },
@@ -38,6 +47,7 @@ class Voting extends System {
         ],
       },
       on: {
+        message: (message): Promise<void> => this.countMessage(),
         tip: (tip): Promise<void> => this.parseTip(tip),
         bit: (bit): Promise<void> => this.parseBit(bit),
       },
@@ -48,9 +58,31 @@ class Voting extends System {
     if (cluster.isMaster) {
       global.db.engine.index({ table: this.collection.votes, index: 'vid' });
       global.db.engine.index({ table: this.collection.data, index: 'openedAt' });
+
+      setInterval(() => this.reminder(), 1000);
     }
 
     this.addMenu({ category: 'manage', name: 'voting', id: '/manage/votes' });
+  }
+
+  public async sockets() {
+    this.socket.on('connection', (socket) => {
+      socket.on('create', async (vote: VotingType, cb) => {
+        try {
+          const parameters = `-${vote.type} -title "${vote.title}" ${vote.options.filter((o) => o.trim().length > 0).join(' | ')}`;
+          this.open({
+            command: this.settings.commands['!vote'],
+            parameters,
+            sender: {
+              username: global.commons.getOwner(),
+            },
+          });
+          cb(null, null);
+        } catch (e) {
+          cb(e.stack, null);
+        }
+      });
+    });
   }
 
   public async close(opts: CommandOptions): Promise<boolean> {
@@ -106,7 +138,7 @@ class Voting extends System {
       if (!_.isEmpty(cVote)) { throw new Error(String(ERROR.ALREADY_OPENED)); }
 
       const [type, title, options] = new Expects(opts.parameters)
-        .switch({ name: 'type', values: ['tips', 'bits'], optional: true, default: 'normal' })
+        .switch({ name: 'type', values: ['tips', 'bits', 'normal'], optional: true, default: 'normal' })
         .argument({ name: 'title', optional: false, multi: true })
         .list({ delimiter: '|' })
         .toArray();
@@ -139,7 +171,7 @@ class Voting extends System {
           }), opts.sender);
           for (const index of Object.keys(cVote.options)) {
             setTimeout(() => {
-              if (cVote.type === 'normal') { global.commons.sendMessage(this.settings.commands['!vote'] + ` ${index} => ${cVote.options[index]}`, opts.sender); } else { global.commons.sendMessage(`#vote${(Number(index) + 1)} => ${cVote.options[index]}`, opts.sender); }
+              if (cVote.type === 'normal') { global.commons.sendMessage(this.settings.commands['!vote open'] + ` ${index} => ${cVote.options[index]}`, opts.sender); } else { global.commons.sendMessage(`#vote${(Number(index) + 1)} => ${cVote.options[index]}`, opts.sender); }
             }, 100 * (Number(index) + 1));
           }
           break;
@@ -195,7 +227,7 @@ class Voting extends System {
         } else {
           const vote: VoteType = {
             vid: String(cVote._id),
-            votedBy: opts.sender.username,
+            votedBy: opts.sender ? opts.sender.username : 'n/a',
             votes: 1,
             option: index,
           };
@@ -256,6 +288,58 @@ class Voting extends System {
           await global.db.engine.insert(this.collection.votes, vote);
           break;
         }
+      }
+    }
+  }
+
+  private async countMessage() {
+    this.settings._.currentMessages = this.settings._.currentMessages + 1;
+  }
+
+  private async reminder() {
+    const vote: VotingType = await global.db.engine.findOne(this.collection.data, { isOpened: true });
+    const shouldRemind = { messages: false, time: false };
+
+    if (this.settings.reminder.everyXMessages === 0 && this.settings.reminder.everyXSeconds === 0 || _.isEmpty(vote)) {
+      this.settings._.lastMessageRemind = this.settings._.currentMessages;
+      this.settings._.lastTimeRemind = String(new Date());
+      return; // reminder is disabled
+    }
+
+    if (this.settings.reminder.everyXMessages === 0) {
+      shouldRemind.messages = true;
+    } else {
+      if (this.settings._.currentMessages - this.settings._.lastMessageRemind >= this.settings.reminder.everyXMessages) {
+        shouldRemind.messages = true;
+      } else {
+        shouldRemind.messages = false;
+      }
+    }
+
+    if (this.settings.reminder.everyXSeconds === 0) {
+      shouldRemind.time = true;
+    } else {
+      if (new Date().getTime() - new Date(this.settings._.lastTimeRemind).getTime() > this.settings.reminder.everyXSeconds * 1000) {
+        shouldRemind.time = true;
+      } else {
+        shouldRemind.time = false;
+      }
+    }
+
+    if (_.every(shouldRemind)) {
+      // update last remind data
+      this.settings._.lastMessageRemind = this.settings._.currentMessages;
+      this.settings._.lastTimeRemind = String(new Date());
+
+      const translations = `systems.voting.opened_${vote.type}`;
+      global.commons.sendMessage(global.commons.prepare(translations, {
+        title: vote.title,
+        command: this.settings.commands['!vote'],
+      }), global.commons.getOwner());
+      for (const index of Object.keys(vote.options)) {
+        setTimeout(() => {
+          if (vote.type === 'normal') { global.commons.sendMessage(this.settings.commands['!vote'] + ` ${(Number(index) + 1)} => ${vote.options[index]}`, global.commons.getOwner()); } else { global.commons.sendMessage(`#vote${(Number(index) + 1)} => ${vote.options[index]}`, global.commons.getOwner()); }
+        }, 100 * (Number(index) + 1));
       }
     }
   }

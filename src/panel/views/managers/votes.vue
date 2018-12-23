@@ -17,20 +17,53 @@
       <div class="card-deck" v-bind:key="index">
         <template v-for="vote of chunkVotes">
           <template v-if="vote === 'new'">
-            <div v-if="isRunning" class="card mb-3 p-0 text-dark" style="flex-direction: inherit;" v-bind:key="String(vote._id)">
+            <div v-if="isRunning" class="card mb-3 p-0 text-dark" style="flex-direction: inherit;" v-bind:key="String(vote)">
               <h6 style="margin: auto; line-height: initial; text-align: center;" class="text-dark p-3">
                 <font-awesome-icon icon='ban' size="10x" class="text-danger pb-2"></font-awesome-icon> <br>
                 {{ translate('systems.voting.cannotCreateNewVoteIfInProgress') }}
               </h6>
             </div>
-            <button v-else-if="!isCreating" class="card mb-3 p-0 border border-primary text-primary" style="flex-direction: inherit;" @click="isCreating = true" v-bind:key="String(vote._id)">
-              <h6 style="margin: auto;">
-                {{ translate('systems.voting.clickToCreateNewVote') }}
-              </h6>
-            </button>
-            <div v-else class="card mb-3 p-0 border border-primary text-primary" v-bind:key="String(vote._id)">
+            <div v-else class="card mb-3 p-0" v-bind:key="String(vote)">
               <div class="card-body">
-                <h5 class="card-title">Novy vote</h5>
+                <input type="text" style="text-transform: inherit; font-size: 1.25rem; position: relative; top: -0.48rem;" class="border-left-0 border-right-0 border-top-0 form-control card-title mb-0" placeholder="Title" v-model="newVote.title">
+                <h6 class="card-subtitle mb-2 text-muted">
+                  <template v-if="newVote.type === 'normal'">
+                    <font-awesome-icon icon='exclamation'></font-awesome-icon> {{ translate('systems.voting.votingBy') }}
+                  </template>
+                  <template v-if="newVote.type === 'tips'">
+                    <font-awesome-icon icon='coins'></font-awesome-icon> {{ translate('systems.voting.votingBy') }}
+                  </template>
+                  <template v-if="newVote.type === 'bits'">
+                    <font-awesome-icon icon='gem'></font-awesome-icon> {{ translate('systems.voting.votingBy') }}
+                  </template>
+                  <select v-model="newVote.type" class="text-muted border-0" style="font-size: .9rem; text-transform: uppercase; font-weight: bold;">
+                    <option value="normal">{{ translate('systems.voting.command') }}</option>
+                    <option value="tips">{{ translate('systems.voting.tips') }}</option>
+                    <option value="bits">{{ translate('systems.voting.bits') }}</option>
+                  </select>
+                </h6>
+
+                <template v-for="index in newVote.options.length">
+                  <input
+                    :style="{'margin-top': index === 1 ? '2rem !important' : '0' }"
+                    :key="index"
+                    :placeholder="'Option ' + index"
+                    v-model="newVote.options[index - 1]"
+                    type="text"
+                    class="form-control mb-2">
+                </template>
+              </div>
+
+              <div class="card-footer">
+                <button type="button" class="btn btn-block btn-success" style="white-space: normal;" :disabled="isNewVoteOptsEmpty" @click="create()">
+                  <font-awesome-icon icon='plus'></font-awesome-icon>
+                  <template v-if="isNewVoteOptsEmpty">
+                    {{ translate('systems.voting.cannotCreateIfEmpty')}}
+                  </template>
+                  <template v-else>
+                    {{ translate('systems.voting.create') }}
+                  </template>
+                </button>
               </div>
             </div>
           </template>
@@ -44,16 +77,16 @@
                 {{ translate('systems.voting.done') }}
             </div>
             <div class="card-body">
-              <h5 class="card-title">{{ vote.title }}</h5>
+              <h5 class="card-title" style="text-transform: inherit;">{{ vote.title }}</h5>
               <h6 class="card-subtitle mb-2 text-muted">
                 <template v-if="vote.type === 'normal'">
-                  <font-awesome-icon icon='terminal'></font-awesome-icon> {{ translate('systems.voting.votingByCommand') }}
+                  <font-awesome-icon icon='exclamation'></font-awesome-icon> {{ translate('systems.voting.votingBy') }} {{ translate('systems.voting.command') }}
                 </template>
                 <template v-if="vote.type === 'tips'">
-                  <font-awesome-icon icon='coins'></font-awesome-icon> {{ translate('systems.voting.votingByTips') }}
+                  <font-awesome-icon icon='coins'></font-awesome-icon> {{ translate('systems.voting.votingBy') }} {{ translate('systems.voting.tips') }}
                 </template>
                 <template v-if="vote.type === 'bits'">
-                  <font-awesome-icon icon='gem'></font-awesome-icon> {{ translate('systems.voting.votingByBits') }}
+                  <font-awesome-icon icon='gem'></font-awesome-icon> {{ translate('systems.voting.votingBy') }} {{ translate('systems.voting.bits') }}
                 </template>
               </h6>
 
@@ -65,13 +98,16 @@
                   <div class="w-100">{{option}}</div>
                   <div class="text-right w-100 percentage">{{getPercentage(String(vote._id), index, 1)}}%</div>
                 </div>
-                <div style="width:100%; position:relative; top:-1rem;">
-                  <div class="background-bar"></div>
-                  <div class="bar bg-primary"
-                    v-bind:style="{
-                    'width': getPercentage(String(vote._id), index, 1) === 0 ? '5px' : getPercentage(String(vote._id), index, 1) + '%'
-                    }"
-                  ></div>
+                <div class="pb-2" style="width:100%;">
+                  <div class="progress">
+                    <div class="progress-bar progress-bar-striped" role="progressbar"
+                      :class="[
+                        vote.isOpened ? 'progress-bar-animated' : ''
+                      ]"
+                      :style="{
+                        'width': getPercentage(String(vote._id), index, 1) === 0 ? '5px' : getPercentage(String(vote._id), index, 1) + '%'
+                      }"></div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -88,12 +124,12 @@
             </div>
             <div class="card-footer">
               <template v-if="vote.isOpened">
-                <button type="button" class="btn btn-block btn-danger">
+                <button type="button" class="btn btn-block btn-danger" @click="stop(String(vote._id))">
                   <font-awesome-icon icon='stop'></font-awesome-icon> {{ translate('systems.voting.stop') }}
                 </button>
               </template>
               <template v-else>
-                <button type="button" class="btn btn-block btn-info" style="white-space: normal;" :disabled="isRunning">
+                <button type="button" class="btn btn-block btn-info" style="white-space: normal;" :disabled="isRunning" @click="copy(String(vote._id))">
                   <font-awesome-icon icon='clone'></font-awesome-icon>
                   <template v-if="isRunning">{{ translate('systems.voting.cannotCopyIfInProgress') }}</template>
                   <template v-else>{{ translate('systems.voting.copy') }}</template>
@@ -126,9 +162,9 @@
 
   import { library } from '@fortawesome/fontawesome-svg-core'
   import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-  import { faTrophy, faClone, faGem, faCoins, faTerminal, faStop, faBan, faSpinner, faCheck, faAngleRight } from '@fortawesome/free-solid-svg-icons';
+  import { faTrophy, faClone, faGem, faCoins, faExclamation, faStop, faBan, faSpinner, faCheck, faAngleRight, faPlus } from '@fortawesome/free-solid-svg-icons';
 
-  library.add(faTrophy, faClone, faGem, faCoins, faTerminal, faStop, faBan, faSpinner, faCheck, faAngleRight)
+  library.add(faTrophy, faClone, faGem, faCoins, faExclamation, faStop, faBan, faSpinner, faCheck, faAngleRight, faPlus)
 
   Vue.use(VueMoment, {
       moment, momentTimezone
@@ -144,40 +180,43 @@
         socket: any,
         votes: Array<VotingType | 'new'>,
         votings: Array<VoteType>,
+        newVote: VotingType
         currentTime: any,
-        isCreating: Boolean,
         isMounted: Boolean,
-        domWidth: Number,
+        domWidth: number,
+        interval: number,
       } = {
-        socket: io('/systems/voting', { query: "token=" + this.token}),
+        socket: io('/systems/voting', { query: "token=" + this.token }),
         votes: [],
         votings: [],
         currentTime: 0,
-        isCreating: false,
         isMounted: false,
         domWidth: 0,
+        newVote: {
+          type: 'normal',
+          title: '',
+          isOpened: true,
+          options: ['', '', '', '', ''],
+          openedAt: String(new Date())
+        },
+        interval: 0,
       }
       return object
+    },
+    beforeDestroy: function () {
+      clearInterval(this.interval)
     },
     mounted: function () {
       this.$moment.locale(this.configuration.lang)
       this.currentTime = Date.now()
       this.domWidth = (this.$refs['window'] as HTMLElement).clientWidth
+      this.refresh();
 
-      setInterval(() => {
+      this.interval = window.setInterval(() => {
         this.domWidth = (this.$refs['window'] as HTMLElement).clientWidth
         this.currentTime = Date.now()
+        this.refresh();
       }, 1000)
-
-      this.socket.emit('find', {}, (err, data) => {
-        if (err) return console.error(err)
-        this.votes = data
-        this.votes.unshift('new')
-      })
-      this.socket.emit('find', { collection: 'votes' }, (err, data) => {
-        if (err) return console.error(err)
-        this.votings = data
-      })
 
       this.isMounted = true
     },
@@ -193,9 +232,68 @@
       isRunning: function (): Boolean {
         const running = this.votes.find(o => typeof o !== 'string' && o.isOpened);
         return typeof running !== 'undefined';
+      },
+      isNewVoteOptsEmpty: function (): Boolean {
+        for (let i = 0; i < this.newVote.options.length; i++) {
+          if (this.newVote.options[i].trim().length > 0) return false
+        }
+        return true
       }
     },
     methods: {
+      refresh: function () {
+        this.socket.emit('find', {}, (err, data) => {
+          if (err) return console.error(err)
+          this.votes = this._.orderBy(data, 'openedAt', 'desc')
+          this.votes.unshift('new')
+        })
+        this.socket.emit('find', { collection: 'votes' }, (err, data) => {
+          if (err) return console.error(err)
+          this.votings = data
+        })
+      },
+      create: function () {
+        this.newVote.openedAt = String(new Date())
+        this.newVote.isOpened = true
+        delete this.newVote.closedAt
+
+        this.socket.emit('create', this.newVote, (err, data) => {
+            if (err) return console.error(err)
+            else {
+              this.refresh();
+              this.newVote = {
+                type: 'normal',
+                title: '',
+                isOpened: true,
+                options: ['', '', '', '', ''],
+                openedAt: String(new Date())
+              }
+            }
+          })
+      },
+      copy: function (vid) {
+        const vote = this.votes.find(o => typeof o !== 'string' && String(o._id) === vid);
+        if (typeof vote === 'object') {
+          let newVote = this._.cloneDeep(vote)
+          delete newVote._id;
+
+          for (let i = 0, length = newVote.options.length; i < 5 - length; i++) {
+            newVote.options.push('')
+          };
+
+          this.newVote = newVote;
+        }
+      },
+      stop: function (vid) {
+        let vote = this.votes.find(o => typeof o !== 'string' && String(o._id) === vid)
+        if (typeof vote === 'object') {
+          vote.isOpened = false;
+          vote.closedAt = String(new Date());
+          this.socket.emit('update', { items: [vote] }, (err, data) => {
+            if (err) console.error(err)
+          })
+        }
+      },
       totalVotes: function (vid) {
         let totalVotes = 0
         const filtered = this.votings.filter(o => o.vid === vid)

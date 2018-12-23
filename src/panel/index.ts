@@ -24,6 +24,7 @@ declare module 'vue/types/vue' {
     token: string;
     configuration: any;
     $moment?: any;
+    _: _.LoDashStatic;
   }
 }
 

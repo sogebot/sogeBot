@@ -136,6 +136,18 @@ class TMI extends Core {
             this.sendMessageToWorker(message.tags, message.message)
             global.linesParsed++
 
+            // go through all systems and trigger on.message
+            for (let [name, system] of Object.entries(global.systems)) {
+              if (name.startsWith('_')) continue
+              if (typeof system.on.message === 'function') {
+                system.on.message({
+                  sender: message.tags,
+                  message: message.message,
+                  timestamp: _.now()
+                })
+              }
+            }
+
             if (message.tags['message-type'] === 'action') global.events.fire('action', { username: message.tags.username.toLowerCase() })
           }
         }

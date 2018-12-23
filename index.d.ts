@@ -27,6 +27,13 @@ type InterfaceSettings = {
     [s: string]: any
   },
   on?: {
+    message?: (message: {
+      sender: {
+        username: string,
+      } | null,
+      message: string,
+      timestamp: string
+    }) => void,
     tip?: (tip: {
       username: string,
       amount: number,
@@ -66,7 +73,7 @@ type InterfaceSettings = {
 type CommandOptions = {
   sender: {
     username: string
-  },
+  } | null,
   command: string,
   parameters: string
 }

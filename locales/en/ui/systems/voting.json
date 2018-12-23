@@ -1,11 +1,20 @@
 {
   "settings": {
+    "status": "Status",
     "theme": "Theme",
     "hideAfterInactivity": "Hide on inactivity",
     "align": "Align",
     "inactivityTime": {
       "title": "Inactivity after",
       "help": "in miliseconds"
+    },
+    "everyXMessages": {
+      "title": "Remind every X messages",
+      "help": "0 = disabled; both remind conditions must be true to bot print remind"
+    },
+    "everyXSeconds": {
+      "title": "Remind every X seconds",
+      "help": "0 = disabled; both remind conditions must be true to bot print remind"
     }
   },
   "done": "DONE",
@@ -16,9 +25,11 @@
   "cannotCopyIfInProgress": "Cannot copy, if another voting in in progress",
   "closedAt": "Closed at",
   "activeFor": "Active for",
-  "votingByTips": "Voting by tips",
-  "votingByBits": "Voting by bits",
-  "votingByCommand": "Voting by command !vote",
-  "clickToCreateNewVote": "Click to create new voting",
+  "votingBy": "Voting by",
+  "tips": "tips",
+  "bits": "bits",
+  "command": "!vote",
+  "create": "Click to create new voting",
+  "cannotCreateIfEmpty": "Cannot create new voting without options",
   "cannotCreateNewVoteIfInProgress": "Cannot create new voting, if another voting in in progress"
 }
