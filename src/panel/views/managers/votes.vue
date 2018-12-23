@@ -25,7 +25,7 @@
             </div>
             <div v-else class="card mb-3 p-0" v-bind:key="String(vote)">
               <div class="card-body">
-                <input type="text" style="text-transform: inherit; font-size: 1.25rem; position: relative; top: -0.48rem;" class="border-left-0 border-right-0 border-top-0 form-control card-title mb-0" placeholder="Title" v-model="newVote.title">
+                <input type="text" style="background-color: transparent; text-transform: inherit; font-size: 1.25rem; position: relative; top: -0.48rem;" class="border-left-0 border-right-0 border-top-0 form-control card-title mb-0" placeholder="Title" v-model="newVote.title">
                 <h6 class="card-subtitle mb-2 text-muted">
                   <template v-if="newVote.type === 'normal'">
                     <font-awesome-icon icon='exclamation'></font-awesome-icon> {{ translate('systems.voting.votingBy') }}
@@ -36,7 +36,7 @@
                   <template v-if="newVote.type === 'bits'">
                     <font-awesome-icon icon='gem'></font-awesome-icon> {{ translate('systems.voting.votingBy') }}
                   </template>
-                  <select v-model="newVote.type" class="text-muted border-0" style="font-size: .9rem; text-transform: uppercase; font-weight: bold;">
+                  <select v-model="newVote.type" class="text-muted border-0" style="background-color: transparent;font-size: .9rem; text-transform: uppercase; font-weight: bold;">
                     <option value="normal">{{ translate('systems.voting.command') }}</option>
                     <option value="tips">{{ translate('systems.voting.tips') }}</option>
                     <option value="bits">{{ translate('systems.voting.bits') }}</option>
