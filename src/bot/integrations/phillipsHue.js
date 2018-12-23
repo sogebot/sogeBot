@@ -49,11 +49,13 @@ class PhillipsHue extends Integration {
         timeout: 30000
       }
     }
-    const onChange = {
-      enabled: ['onStateChange']
+    const on = {
+      change: {
+        enabled: ['onStateChange']
+      }
     }
 
-    super({ settings, onChange })
+    super({ settings, on })
 
     cluster.on('message', (worker, message) => {
       if (message.type !== 'phillipshue') return

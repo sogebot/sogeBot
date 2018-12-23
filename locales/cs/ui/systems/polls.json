@@ -1,0 +1,36 @@
+{
+  "settings": {
+    "status": "Status",
+    "theme": "Theme",
+    "hideAfterInactivity": "Skrýt při neaktivitě",
+    "align": "Zarovnání",
+    "inactivityTime": {
+      "title": "Neaktivita po",
+      "help": "v milisekundách"
+    },
+    "everyXMessages": {
+      "title": "Připomenout každých X zpráv",
+      "help": "0 = vypnuto; obě podmínky musí být splněny, aby bot vypsal připomenutí do chatu"
+    },
+    "everyXSeconds": {
+      "title": "Připomenout každých X vteřin",
+      "help": "0 = vypnuto; obě podmínky musí být splněny, aby bot vypsal připomenutí do chatu"
+    }
+  },
+  "done": "HOTOVO",
+  "running": "PROBÍHÁ",
+  "stop": "Zastavit",
+  "copy": "Kopírovat",
+  "totalVotes": "Celkem hlasů",
+  "cannotCopyIfInProgress": "Nelze kopírovat, pokud již probíhá jiné hlasování",
+  "closedAt": "Uzavřeno v",
+  "activeFor": "Aktivní po",
+  "votingBy": "Hlasování pomocí",
+  "tips": "tipů",
+  "bits": "bitů",
+  "command": "!vote",
+  "create": "Klikni k vytvoření hlasování",
+  "cannotCreateIfEmpty": "Nelze vytvořit nové hlasování bez 2 možností",
+  "cannotCreateWithoutTitle": "Nelze vytvořit nové hlasování bez nadpisu",
+  "cannotCreateNewVoteIfInProgress": "Nelze vytvořit nové hlasování, pokud již probíhá jiné hlasování"
+}

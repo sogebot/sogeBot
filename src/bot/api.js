@@ -894,6 +894,14 @@ class API {
             global.events.fire('keyword-send-x-times', { reset: true })
             global.events.fire('every-x-minutes-of-stream', { reset: true })
             justStarted = true
+
+            // go through all systems and trigger on.streamEnd
+            for (let [name, system] of Object.entries(global.systems)) {
+              if (name.startsWith('_')) continue
+              if (typeof system.on.streamStart === 'function') {
+                system.on.streamStart()
+              }
+            }
           }
         }
 
@@ -954,13 +962,11 @@ class API {
             global.events.fire('stream-is-running-x-minutes', { reset: true })
             global.events.fire('number-of-viewers-is-at-least-x', { reset: true })
 
-            // go through all systems and trigger onStreamStop
+            // go through all systems and trigger on.streamEnd
             for (let [name, system] of Object.entries(global.systems)) {
               if (name.startsWith('_')) continue
-              if (system.onStreamStop.length > 0) {
-                for (let fnc of system.onStreamStop) {
-                  if (typeof fnc === 'function') fnc()
-                }
+              if (typeof system.on.streamEnd === 'function') {
+                system.on.streamEnd()
               }
             }
           }

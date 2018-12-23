@@ -1,5 +1,3 @@
-// @flow
-
 'use strict'
 
 // 3rdparty libraries
@@ -105,12 +103,14 @@ class Spotify extends Integration {
         }
       }
     }
-    const onChange = {
-      enabled: ['onStateChange'],
-      'connection.username': ['onUsernameChange']
+    const on = {
+      change: {
+        enabled: ['onStateChange'],
+        'connection.username': ['onUsernameChange']
+      }
     }
 
-    super({ settings, ui, onChange })
+    super({ settings, ui, on })
 
     if (cluster.isMaster) {
       this.timeouts.IRefreshToken = setTimeout(() => this.IRefreshToken(), 60000)

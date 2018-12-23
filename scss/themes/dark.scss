@@ -111,3 +111,8 @@ $status-connecting-border: #fd7e14 !default;
 .border-gray, .border-input {
   border-color: #868e96 !important
 }
+
+.form-control::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+  color: #444;
+  opacity: 1; /* Firefox */
+}

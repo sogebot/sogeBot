@@ -17,8 +17,11 @@ class Module {
     this._settings = opts.settings || {}
     this._settings.enabled = typeof this._settings.enabled !== 'undefined' ? this._settings.enabled : true
 
-    this.onChange = opts.onChange || {}
-    this.onStreamStop = opts.onStreamStop || []
+    this.on = Object.assign({
+      change: {
+        enabled: null
+      }
+    }, opts.on)
 
     this.dependsOn = opts.dependsOn || []
     this.socket = null
@@ -103,9 +106,9 @@ class Module {
         if (w[1].isConnected()) w[1].send(proc)
       }
 
-      if (this.onChange[key]) {
-        // run onChange functions only on master
-        for (let fnc of this.onChange[key]) {
+      if (this.on.change[key]) {
+        // run on.change functions only on master
+        for (let fnc of this.on.change[key]) {
           if (typeof this[fnc] === 'function') this[fnc](key, value)
           else global.log.error(`${fnc}() is not function in ${this._name}/${this.constructor.name.toLowerCase()}`)
         }
@@ -377,11 +380,11 @@ class Module {
 
     if (!areDependenciesEnabled || isDisabledByEnv) opts.state = false // force disable if dependencies are disabled or disabled by env
 
-    // onChange handler on enabled
+    // on.change handler on enabled
     if (cluster.isMaster && isStatusChanged) {
-      if (this.onChange.enabled) {
-        // run onChange functions only on master
-        for (let fnc of this.onChange.enabled) {
+      if (this.on.change.enabled) {
+        // run on.change functions only on master
+        for (let fnc of this.on.change.enabled) {
           if (typeof this[fnc] === 'function') this[fnc]('enabled', opts.state)
           else global.log.error(`${fnc}() is not function in ${this._name}/${this.constructor.name.toLowerCase()}`)
         }

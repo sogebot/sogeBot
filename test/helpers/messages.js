@@ -14,6 +14,7 @@ module.exports = {
     global.commons.timeout = function () {}
 
     global.tmi = {
+      cheer: global.tmi.cheer,
       client: {
         bot: {
           chat: {

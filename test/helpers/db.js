@@ -60,6 +60,10 @@ module.exports = {
       // remove bets
       await global.db.engine.remove(global.systems.bets.collection.data, {})
 
+      // remove voting
+      await global.db.engine.remove(global.systems.polls.collection.data, {})
+      await global.db.engine.remove(global.systems.polls.collection.votes, {})
+
       // remove events
       await global.db.engine.remove('events', {})
       await global.db.engine.remove('events.filters', {})

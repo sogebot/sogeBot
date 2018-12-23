@@ -19,6 +19,7 @@
   * [Moderation](_master/commands/moderation.md)
   * [Timers](_master/commands/timers.md)
   * [Points](_master/commands/points.md)
+  * [Polls](_master/commands/polls.md)
   * [Price](_master/commands/price.md)
   * [Songs](_master/commands/songs.md)
   * [Overlays](_master/commands/overlays.md)

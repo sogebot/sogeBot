@@ -112,13 +112,15 @@ class OAuth extends Core {
       }
     }
 
-    const onChange = {
-      'broadcaster.accessToken': [ 'onChangeAccessToken' ],
-      'bot.accessToken': [ 'onChangeAccessToken' ],
-      'broadcaster.username': [ 'onChangeBroadcasterUsername' ]
+    const on = {
+      change: {
+        'broadcaster.accessToken': [ 'onChangeAccessToken' ],
+        'bot.accessToken': [ 'onChangeAccessToken' ],
+        'broadcaster.username': [ 'onChangeBroadcasterUsername' ]
+      }
     }
 
-    super({ settings, ui, onChange })
+    super({ settings, ui, on })
 
     this.addMenu({ category: 'settings', name: 'core', id: 'core' })
     this.validateOAuth('bot')

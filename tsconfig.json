@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    // this aligns with Vue's browser support
+    "target": "es6",
+    // this enables stricter inference for data properties on `this`
+    "strict": true,
+    // if using webpack 2+ or rollup, to leverage tree shaking:
+    "module": "commonjs",
+    "removeComments": true,
+    "noImplicitAny": false,
+    "moduleResolution": "node",
+    "lib": ["es2018", "dom"],
+    "declaration": false,
+    "resolveJsonModule": true,
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.vue",
+    "index.d.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ],
+}
