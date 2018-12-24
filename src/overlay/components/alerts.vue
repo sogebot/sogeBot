@@ -32,7 +32,7 @@ finished: {{ (getCurrentAlertList() || []).filter(o => o.finished) }}
             :data-index="index"
             :data-src="alert.url"
             :class="[ alert.class ? alert.class : '']"
-            :style="{ top: alert['y-offset'] ? alert['y-offset'] + 'px' : 'inherit', left: alert['x-offset'] ? alert['x-offset'] + 'px' : 'inherit' }"
+            :style="{ width: alert['size'], top: alert['y-offset'] ? alert['y-offset'] + 'px' : 'inherit', left: alert['x-offset'] ? alert['x-offset'] + 'px' : 'inherit' }"
             v-show="alert.run && !alert.finished && !alert.leaveAnimation"
             v-if="alert.type === 'video' || alert.type === 'clip'">
             <source :src="alert.url" type="video/mp4">
@@ -127,6 +127,7 @@ export default {
             if (video) {
               for (let el of video) {
                 if (el.dataset.src === a.url) {
+                  if (typeof a.size === 'undefined') a.size = '100%'
                   if (a.volume) el.volume = Number(a.volume) / 100
                   if (!el.error) {
                     el.onended = () => {

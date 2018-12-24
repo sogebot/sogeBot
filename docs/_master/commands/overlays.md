@@ -117,6 +117,10 @@
 
 ### Optional parameters
 
+- **size**
+  - Set size of your video in px or %
+  - **Default value**: 100%
+  - **EXAMPLE:** `!alert type=video url=http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4 size=100px`
 - **duration**
   - How long will be fadeIn and fadeOut animation
   - **Default value**: 1000
