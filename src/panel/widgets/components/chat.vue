@@ -12,6 +12,12 @@
           <font-awesome-icon icon="users" />
         </a>
       </li>
+      <li role="presentation" class="nav-item">
+        <a href="#" class="nav-link" title="Refresh" @click="refresh">
+          <font-awesome-icon icon="sync-alt" v-if="!isRefreshing"/>
+          <font-awesome-icon icon="sync-alt" spin v-else/>
+        </a>
+      </li>
       <li role="presentation" class="nav-item widget-popout" v-if="!popout">
         <a class="nav-link" title="Popout" target="_blank" href="/popout/#chat">
           <font-awesome-icon icon="external-link-alt" />
@@ -57,10 +63,10 @@
 
 <script>
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faCommentAlt, faUsers, faExternalLinkAlt } from '@fortawesome/free-solid-svg-icons'
+import { faCommentAlt, faUsers, faExternalLinkAlt, faSyncAlt } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
-library.add(faCommentAlt, faUsers, faExternalLinkAlt)
+library.add(faCommentAlt, faUsers, faExternalLinkAlt, faSyncAlt)
 
 export default {
   props: ['socket', 'commons', 'popout', 'configuration'],
@@ -70,13 +76,24 @@ export default {
   data: function () {
     return {
       chatMessage: '',
-      chatters: []
+      chatters: [],
+      isRefreshing: false,
+      room: ''
     }
   },
   mounted: function () {
     this.$emit('mounted')
   },
   methods: {
+    refresh: function (event) {
+      console.log(event)
+      if (event) event.preventDefault()
+      this.isRefreshing = true
+      setTimeout(() => (this.isRefreshing = false), 2000)
+      $("#chat-room").empty()
+      $("#chat-room").html('<iframe frameborder="0" scrolling="no" id="chat_embed" src="' + window.location.protocol +
+        '//twitch.tv/embed/' + this.room + '/chat' + (configuration.theme.includes('dark') ? '?darkpopout' : '') +'" width="100%"></iframe>')
+    },
     sendChatMessage: function () {
       if (this.chatMessage.length > 0) this.socket.emit('chat.message.send', this.chatMessage)
       this.chatMessage = ''
@@ -92,7 +109,8 @@ export default {
     })
 
     this.socket.emit('getChatRoom');
-    this.socket.once('chatRoom', function (room) {
+    this.socket.once('chatRoom', (room) => {
+      this.room = room
       $("#chat-room").html('<iframe frameborder="0" scrolling="no" id="chat_embed" src="' + window.location.protocol +
         '//twitch.tv/embed/' + room + '/chat' + (configuration.theme.includes('dark') ? '?darkpopout' : '') +'" width="100%"></iframe>')
     })
