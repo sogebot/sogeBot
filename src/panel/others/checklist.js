@@ -13,7 +13,11 @@ function initChecklist () {
       items: []
     },
     render: function (createElement) {
-      return createElement(Checklist, { props: { commons, token, systems } })
+      if (typeof systems !== 'undefined') {
+        return createElement(Checklist, { props: { commons, token, systems } })
+      } else {
+        return false
+      }
     }
   })
 }
