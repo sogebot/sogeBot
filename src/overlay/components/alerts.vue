@@ -27,15 +27,16 @@ finished: {{ (getCurrentAlertList() || []).filter(o => o.finished) }}
             :src="alert.url"></audio>
 
           <video
+            preload="metadata"
             playsinline
             ref="video"
             :data-index="index"
             :data-src="alert.url"
             :class="[ alert.class ? alert.class : '']"
             :style="{ width: alert['size'], top: alert['y-offset'] ? alert['y-offset'] + 'px' : 'inherit', left: alert['x-offset'] ? alert['x-offset'] + 'px' : 'inherit' }"
-            v-show="alert.run && !alert.finished && !alert.leaveAnimation"
+            v-show="alert.run && alert.isLoaded && !alert.finished && !alert.leaveAnimation"
             v-if="alert.type === 'video' || alert.type === 'clip'">
-            <source :src="alert.url" type="video/mp4">
+            <source :src="alert.url + '#t=0.1'" type="video/mp4">
           </video>
 
           <div
@@ -75,6 +76,7 @@ export default {
     this.socket.on('alert', data => {
       for (let d of data) {
         d.run = false
+        d.isLoaded = false
         d.finished = false
         d.leaveAnimation = false
         d.receivedAt = Date.now()
@@ -128,13 +130,27 @@ export default {
               for (let el of video) {
                 if (el.dataset.src === a.url) {
                   if (typeof a.size === 'undefined') a.size = '100%'
-                  if (a.volume) el.volume = Number(a.volume) / 100
                   if (!el.error) {
                     el.onended = () => {
                       a.leaveAnimation = true // trigger leave animation
                       setTimeout(() => a.finished = true, Number(a.duration || 1000)) // trigger finished
                     }
-                    el.play()
+                    el.oncanplaythrough = () => {
+                      if (!a.thumbnail) {
+                        a.thumbnail = true
+                        el.volume = 0
+                        el.play()
+                        setTimeout(() => {
+                          el.pause()
+                          //el.currentTime = 0
+                          setTimeout(() => {
+                            if (a.volume) el.volume = Number(a.volume) / 100
+                            a.isLoaded = true
+                            el.play()
+                          }, 1000)
+                        }, 100)
+                      }
+                    }
                   } else {
                     a.leaveAnimation = true // trigger leave animation
                     a.finished = true
@@ -238,6 +254,10 @@ export default {
   iframe, audio, video, .text, img {
     opacity: 0;
     position: relative;
+  }
+
+  video {
+    background: transparent;
   }
 
   iframe, video {
