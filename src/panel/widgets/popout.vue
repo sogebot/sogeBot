@@ -29,7 +29,9 @@ export default {
   },
   mounted: function () {
     this.page('/popout/', p => {
-      this.widget = p.hash.length === 0 ? 'dashboard' : p.hash
+      let hash = p.hash.length === 0 || p.hash === '/' ? 'dashboard' : p.hash
+      if (hash.startsWith('/')) hash = hash.replace('/', '')
+      this.widget = hash
       $('title').text(`${name.toUpperCase()} POPOUT - ${this.widget}`)
     })
     this.page({ popstate:true })
