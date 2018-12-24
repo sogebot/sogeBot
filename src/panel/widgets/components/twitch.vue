@@ -61,7 +61,6 @@ export default {
   },
   methods: {
     refresh: function () {
-      console.log()
       this.isRefreshing = true
       setTimeout(() => (this.isRefreshing = false), 2000)
       $("#twitch-main").empty()
