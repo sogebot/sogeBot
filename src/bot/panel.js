@@ -412,12 +412,9 @@ Panel.prototype.sendWidget = async function (socket) {
 
 Panel.prototype.updateWidgetsInDb = async function (self, widgets, socket) {
   await global.db.engine.remove('widgets', {}) // remove widgets
-  let toAwait = []
   for (let widget of widgets) {
-    toAwait.push(global.db.engine.update('widgets', { id: widget.id }, { id: widget.id, dashboardId: widget.dashboardId, position: { x: widget.position.x, y: widget.position.y }, size: { width: widget.size.width, height: widget.size.height } }))
+    global.db.engine.update('widgets', { id: widget.id }, { id: widget.id, dashboardId: widget.dashboardId, position: { x: widget.position.x, y: widget.position.y }, size: { width: widget.size.width, height: widget.size.height } })
   }
-  await Promise.all(toAwait)
-  self.sendWidget(socket)
 }
 
 Panel.prototype.addWidgetToDb = async function (self, widget, dashboardId, socket) {
