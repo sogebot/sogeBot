@@ -27,7 +27,6 @@ You can also contact me on my email sogehige@gmail.com or get support on our [di
 | System             | Description                                                                                                                              |
 |--------------------|------------------------------------------------------------------------------------------------------------------------------------------|
 | Alias              | Don't like default commands? Make an alias!                                                                                              |
-| Checklist          | Pre-stream customizable checklist                                                                                              |
 | Keywords           | Bot will respond on certain keywords                                                                                                     |
 | Points / Loyalty   | Points system for your users                                                                                                             |
 | Price              | Make viewers to spend points on e.g. !songrequest                                                                                        |
@@ -36,8 +35,7 @@ You can also contact me on my email sogehige@gmail.com or get support on our [di
 | Timers             | Post a response every x seconds, x messages                                                                                              |
 | Queue              | Do you lost track of viewers who wants to play with you? Use !queue and be fair!                                                         |
 | Raffles            | Create raffles for you giveaways!                                                                                                        |
-| Youtube            | **Songrequest** and **playlist** support for YouTube with **trimming** of videos and **auto volume normalization**                       |
-| Spotify            | **Songrequest** for Spotify Premium Users                                                                                                |
+| Songs              | **Songrequest** and **playlist** support for YouTube with **trimming** of videos and **auto volume normalization**                       |
 | Cooldowns          | Stop spamming of commands with cooldowns!                                                                                                |
 | Permissions        | Set your custom permissions for your commands! (owner, mods, regular, viewer)                                                            |
 | Moderation         | Automoderate links, colors, symbols, blacklist and more!                                                                                 |
@@ -49,6 +47,7 @@ You can also contact me on my email sogehige@gmail.com or get support on our [di
 | PhillipsHue        | Blink your lights on follower or any other event                                                                                         |
 | Events             | On numerous events run commands, send messages, do whatever!                                                                             |
 | Chat Games         | bets, heists, duels, wheel of fortune                                                                                                    |
+| Polls              |                                                                                                                                          |
 | Integrations       | **Streamlabs**, DonationAlerts.ru, Twitter                                                                                               |
 
 | Game             | Description                                    |
