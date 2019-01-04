@@ -137,7 +137,7 @@ function cluster () {
         global.events.fire('keyword-send-x-times', { username: sender.username, message: message })
         if (message.startsWith('!')) {
           global.events.fire('command-send-x-times', { username: sender.username, message: message })
-        } else if (!message.startsWith('!')) global.db.engine.insert('users.messages', { id: sender.userId, messages: 1 })
+        } else if (!message.startsWith('!')) global.db.engine.increment('users.messages', { id: sender.userId }, { messages: 1 })
       }
       await parse.process()
     }

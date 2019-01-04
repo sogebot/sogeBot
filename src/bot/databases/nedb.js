@@ -74,7 +74,7 @@ class INeDB extends Interface {
           case 'users.points':
           case 'users.messages':
           case 'users.watched':
-            this.table[table].ensureIndex({ fieldName: 'id' })
+            this.table[table].ensureIndex({ fieldName: 'id', unique: true })
             break
           case 'cache':
           case 'customTranslations':

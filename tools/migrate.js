@@ -29,6 +29,45 @@ const dropFiles = [
 const Database = require('../dest/databases/database')
 global.db = new Database(false, true)
 
+/*
+  Moved from commons, should be deleted after next release
+  Compact db based on index and value (must be a number like)
+  table: table to compact
+  index: compact into this index
+  values: values to compact
+*/
+async function compactDb (opts) {
+  opts = opts || {}
+  if (_.size(opts) === 0) throw Error('No options specified')
+
+  let idsToUpdate = {}
+  let itemsFromDb = await global.db.engine.find(opts.table)
+  for (let item of itemsFromDb) {
+    if (!item[opts.index] || item[opts.index] === 'undefined') {
+      await global.db.engine.remove(opts.table, { _id: String(item._id) })
+    }
+    if (_.isNil(idsToUpdate[item[opts.index]])) {
+      // if first id => we have pointer to that id and do nothing
+      idsToUpdate[item[opts.index]] = String(item._id)
+    } else {
+      const value = isNaN(Number(item[opts.values])) ? 0 : Number(item[opts.values])
+
+      if (isNaN(Number(item[opts.values]))) {
+        global.log.warning(`compactDb - ${opts.table} | NaN value found | ${item.__COMMENT__}`)
+      }
+
+      if (value !== 0) {
+        await Promise.all([
+          global.db.engine.increment(opts.table, { _id: idsToUpdate[item[opts.index]] }, { [opts.values]: value }),
+          global.db.engine.remove(opts.table, { _id: String(item._id) })
+        ])
+      } else {
+        await global.db.engine.remove(opts.table, { _id: String(item._id) })
+      }
+    }
+  }
+}
+
 const runDeletion = async function () {
   if (!global.db.engine.connected) {
     setTimeout(() => runDeletion(), 1000)
@@ -121,6 +160,35 @@ let updates = async (from, to) => {
 }
 
 let migration = {
+  compact: [{
+    version: '8.3.0',
+    do: async () => {
+      console.info('Compacting users.watched')
+      await compactDb({ table: 'users.watched', index: 'id', values: 'watched' })
+      console.info(' => done')
+    }
+  }, {
+    version: '8.3.0',
+    do: async () => {
+      console.info('Compacting users.messages')
+      await compactDb({ table: 'users.messages', index: 'id', values: 'messages' })
+      console.info(' => done')
+    }
+  }, {
+    version: '8.3.0',
+    do: async () => {
+      console.info('Compacting users.points')
+      await compactDb({ table: 'users.points', index: 'id', values: 'points' })
+      console.info(' => done')
+    }
+  }, {
+    version: '8.3.0',
+    do: async () => {
+      console.info('Compacting systems.customcommands.count')
+      await compactDb({ table: 'systems.customcommands.count', index: 'command', values: 'count' })
+      console.info(' => done')
+    }
+  }],
   permission: [{
     version: '8.0.0',
     do: async () => {

@@ -51,7 +51,7 @@ class Roulette extends Game {
 
     setTimeout(async () => {
       if (!isAlive) global.commons.timeout(opts.sender.username, null, await this.settings.timeout)
-      await global.db.engine.insert('users.points', { id: opts.sender.userId, points: isAlive ? Math.abs(Number(this.settings.rewards.winnerWillGet)) : -Math.abs(Number(this.settings.rewards.loserWillLose)), __COMMENT__: (new Error()).stack })
+      await global.db.engine.increment('users.points', { id: opts.sender.userId }, { points: isAlive ? Math.abs(Number(this.settings.rewards.winnerWillGet)) : -Math.abs(Number(this.settings.rewards.loserWillLose)) })
       global.commons.sendMessage(isAlive ? global.translate('gambling.roulette.alive') : global.translate('gambling.roulette.dead'), opts.sender)
     }, 2000)
   }

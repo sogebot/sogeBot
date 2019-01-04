@@ -45,9 +45,9 @@ class Gamble extends Game {
       if (pointsOfUser < points) throw Error(ERROR_NOT_ENOUGH_POINTS)
       if (points < (await this.settings.minimalBet)) throw Error(ERROR_MINIMAL_BET)
 
-      await global.db.engine.insert('users.points', { id: opts.sender.userId, points: parseInt(points, 10) * -1, __COMMENT__: (new Error()).stack })
+      await global.db.engine.increment('users.points', { id: opts.sender.userId }, { points: parseInt(points, 10) * -1 })
       if (_.random(0, 100, false) <= await this.settings.chanceToWin) {
-        await global.db.engine.insert('users.points', { id: opts.sender.userId, points: parseInt(points, 10) * 2, __COMMENT__: (new Error()).stack })
+        await global.db.engine.increment('users.points', { id: opts.sender.userId }, { points: parseInt(points, 10) * 2 })
         let updatedPoints = await global.systems.points.getPointsOf(opts.sender.userId)
         message = await global.commons.prepare('gambling.gamble.win', {
           pointsName: await global.systems.points.getPointsName(updatedPoints),
