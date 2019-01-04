@@ -238,13 +238,13 @@ class Events {
       // we are testing => straight to parser
       const Parser = require('./parser')
       const parse = new Parser({
-        sender: (_.get(operation, 'isCommandQuiet', false) ? null : { username: global.commons.getOwner() }),
+        sender: (_.get(operation, 'isCommandQuiet', false) ? {} : { username: global.commons.getOwner() }),
         message: command,
         skip: true
       })
       await parse.process()
     } else {
-      _.sample(cluster.workers).send({ type: 'message', sender: (_.get(operation, 'isCommandQuiet', false) ? null : { username: global.commons.getOwner() }), message: command, skip: true })
+      _.sample(cluster.workers).send({ type: 'message', sender: (_.get(operation, 'isCommandQuiet', false) ? {} : { username: global.commons.getOwner() }), message: command, skip: true })
     }
   }
 

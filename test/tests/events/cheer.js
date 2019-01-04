@@ -62,7 +62,7 @@ describe('Events - cheer event', () => {
         })
 
         it('we are not expecting any messages to be sent - quiet mode', async () => {
-          assert.strict.equal(global.log.chatOut.called, false)
+          assert.strict.equal(global.log.chatOut.callCount, 0)
         })
 
         it('user should have 10 points', async () => {
