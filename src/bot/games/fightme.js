@@ -96,8 +96,8 @@ class FightMe extends Game {
       }
 
       const [winnerWillGet, loserWillLose] = await Promise.all([this.settings.winnerWillGet, this.settings.loserWillLose])
-      global.db.engine.insert('users.points', { id: winner ? opts.sender.userId : userId, points: Math.abs(Number(winnerWillGet)), __COMMENT__: (new Error()).stack })
-      global.db.engine.insert('users.points', { id: !winner ? opts.sender.userId : userId, points: -Math.abs(Number(loserWillLose)), __COMMENT__: (new Error()).stack })
+      global.db.engine.increment('users.points', { id: winner ? opts.sender.userId : userId }, { points: Math.abs(Number(winnerWillGet)) })
+      global.db.engine.increment('users.points', { id: !winner ? opts.sender.userId : userId }, { points: -Math.abs(Number(loserWillLose)) })
 
       global.commons.timeout(winner ? opts.sender.username : username, null, await this.settings.timeout)
       global.commons.sendMessage(global.commons.prepare('gambling.fightme.winner', {

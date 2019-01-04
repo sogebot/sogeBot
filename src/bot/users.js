@@ -36,8 +36,6 @@ class Users extends Core {
     this.addMenu({ category: 'settings', name: 'core', id: 'core' })
 
     if (cluster.isMaster) {
-      this.compactMessagesDb()
-      this.compactWatchedDb()
       this.updateWatchTime()
 
       // set all users offline on start
@@ -184,7 +182,7 @@ class Users extends Core {
   async updateWatchTime () {
     clearTimeout(this.timeouts['updateWatchTime'])
 
-    let timeout = 60000
+    let timeout = constants.MINUTE * 15
     try {
       // count watching time when stream is online
       if (await global.cache.isOnline()) {
@@ -196,7 +194,7 @@ class Users extends Core {
           const watched = isNewUser ? timeout : new Date().getTime() - new Date(this.watchedList[onlineUser.username]).getTime()
           const id = await global.users.getIdByName(onlineUser.username)
           if (isNewUser) this.checkNewChatter(id, onlineUser.username)
-          await global.db.engine.insert('users.watched', { id, watched })
+          await global.db.engine.increment('users.watched', { id }, { watched })
           this.watchedList[onlineUser.username] = new Date()
         }
 
@@ -215,18 +213,6 @@ class Users extends Core {
     this.timeouts['updateWatchTime'] = setTimeout(() => this.updateWatchTime(), timeout)
   }
 
-  async compactWatchedDb () {
-    clearTimeout(this.timeouts['compactWatchedDb'])
-    try {
-      await global.commons.compactDb({ table: 'users.watched', index: 'id', values: 'watched' })
-    } catch (e) {
-      global.log.error(e)
-      global.log.error(e.stack)
-    } finally {
-      this.timeouts['compactWatchedDb'] = setTimeout(() => this.compactWatchedDb(), 10000)
-    }
-  }
-
   async getWatchedOf (id: string) {
     let watched = 0
     for (let item of await global.db.engine.find('users.watched', { id })) {
@@ -239,19 +225,6 @@ class Users extends Core {
       Number(watched) <= Number.MAX_SAFE_INTEGER / 1000000
         ? watched
         : Number.MAX_SAFE_INTEGER / 1000000, 10)
-  }
-
-  async compactMessagesDb () {
-    clearTimeout(this.timeouts['compactMessagesDb'])
-
-    try {
-      await global.commons.compactDb({ table: 'users.messages', index: 'id', values: 'messages' })
-    } catch (e) {
-      global.log.error(e)
-      global.log.error(e.stack)
-    } finally {
-      this.timeouts['compactMessagesDb'] = setTimeout(() => this.compactMessagesDb(), 10000)
-    }
   }
 
   async getMessagesOf (id: string) {
@@ -503,18 +476,15 @@ class Users extends Core {
         const viewer = opts.items[0].viewer; delete viewer._id
 
         // update user points
-        await global.db.engine.remove('users.points', { id })
-        await global.db.engine.insert('users.points', { id, points: isNaN(Number(viewer.points)) ? 0 : Number(viewer.points), __COMMENT__: (new Error()).stack })
+        await global.db.engine.update('users.points', { id }, { points: isNaN(Number(viewer.points)) ? 0 : Number(viewer.points) })
         delete viewer.points
 
         // update messages
-        await global.db.engine.remove('users.messages', { id })
-        await global.db.engine.insert('users.messages', { id, messages: isNaN(Number(viewer.stats.messages)) ? 0 : Number(viewer.stats.messages) })
+        await global.db.engine.update('users.messages', { id }, { messages: isNaN(Number(viewer.stats.messages)) ? 0 : Number(viewer.stats.messages) })
         delete viewer.stats.messages
 
         // update watch time
-        await global.db.engine.remove('users.watched', { id })
-        await global.db.engine.insert('users.watched', { id, watched: isNaN(Number(viewer.time.watched)) ? 0 : Number(viewer.time.watched) })
+        await global.db.engine.update('users.watched', { id }, { watched: isNaN(Number(viewer.time.watched)) ? 0 : Number(viewer.time.watched) })
         delete viewer.time.watched
 
         const bits = viewer.stats.bits; delete viewer.stats.bits

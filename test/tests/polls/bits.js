@@ -13,10 +13,11 @@ const assert = require('chai').assert
 
 const owner = { username: 'soge__' }
 
-describe('Voting - bits', () => {
+describe('Polls - bits', () => {
   before(async () => {
     await db.cleanup()
-    await message.prepare()
+    await time.waitMs(200)
+      await message.prepare()
   })
 
   describe('Close not opened voting', () => {
@@ -51,6 +52,7 @@ describe('Voting - bits', () => {
       vid = String(cVote._id)
     })
     it(`!vote should return correct vote status`, async () => {
+      await time.waitMs(200)
       await message.prepare()
 
       await global.systems.polls.main({ sender: owner, parameters: ''  })
@@ -94,6 +96,7 @@ describe('Voting - bits', () => {
       }
     })
     it(`!vote should return correct vote status`, async () => {
+      await time.waitMs(200)
       await message.prepare()
 
       await global.systems.polls.main({ sender: owner, parameters: ''  })
@@ -104,6 +107,7 @@ describe('Voting - bits', () => {
     })
 
     it('Close voting', async () => {
+      await time.waitMs(200)
       await message.prepare()
 
       assert.isTrue(await global.systems.polls.close({ sender: owner }))
@@ -114,6 +118,7 @@ describe('Voting - bits', () => {
     })
 
     it(`!vote should return not in progress info`, async () => {
+      await time.waitMs(200)
       await message.prepare()
 
       await global.systems.polls.main({ sender: owner, parameters: ''  })
@@ -121,6 +126,7 @@ describe('Voting - bits', () => {
     })
 
     it(`!vote 1 should return not in progress info`, async () => {
+      await time.waitMs(200)
       await message.prepare()
 
       const user = Math.random()

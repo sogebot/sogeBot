@@ -80,8 +80,8 @@ describe('Raffles - pick()', () => {
     })
 
     it('Create testuser/testuser2 with max points', async () => {
-      await global.db.engine.insert('users.points', { id: testuser.userId, points: max })
-      await global.db.engine.insert('users.points', { id: testuser2.userId, points: max })
+      await global.db.engine.update('users.points', { id: testuser.userId }, { points: max })
+      await global.db.engine.update('users.points', { id: testuser2.userId }, { points: max })
     })
 
     it('testuser bets max', async () => {
@@ -121,8 +121,8 @@ describe('Raffles - pick()', () => {
     })
 
     it('Create testuser/testuser2 with max points', async () => {
-      await global.db.engine.insert('users.points', { id: testuser.userId, points: max })
-      await global.db.engine.insert('users.points', { id: testuser2.userId, points: max })
+      await global.db.engine.update('users.points', { id: testuser.userId }, { points: max })
+      await global.db.engine.update('users.points', { id: testuser2.userId }, { points: max })
     })
 
     it('Set testuser as follower', async () => {
@@ -166,8 +166,8 @@ describe('Raffles - pick()', () => {
     })
 
     it('Create testuser/testuser2 with max points', async () => {
-      await global.db.engine.insert('users.points', { id: testuser.userId, points: max })
-      await global.db.engine.insert('users.points', { id: testuser2.userId, points: max })
+      await global.db.engine.update('users.points', { id: testuser.userId }, { points: max })
+      await global.db.engine.update('users.points', { id: testuser2.userId }, { points: max })
     })
 
     it('Set testuser as subscriber', async () => {
@@ -211,8 +211,8 @@ describe('Raffles - pick()', () => {
     })
 
     it('Create testuser/testuser2 with max points', async () => {
-      await global.db.engine.insert('users.points', { username: testuser.username, points: max })
-      await global.db.engine.insert('users.points', { username: testuser2.username, points: max })
+      await global.db.engine.update('users.points', { username: testuser.username }, { points: max })
+      await global.db.engine.update('users.points', { username: testuser2.username }, { points: max })
     })
 
     it('Set testuser as subscriber', async () => {

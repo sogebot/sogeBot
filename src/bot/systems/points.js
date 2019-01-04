@@ -40,7 +40,6 @@ class Points extends System {
 
     if (require('cluster').isMaster) {
       this.updatePoints()
-      this.compactPointsDb()
     }
   }
 
@@ -73,7 +72,7 @@ class Points extends System {
             _.set(user, 'time.points', _.get(user, 'time.points', 0))
             let shouldUpdate = new Date().getTime() - new Date(user.time.points).getTime() >= interval
             if (shouldUpdate) {
-              await global.db.engine.insert('users.points', { id: user.id, points: parseInt(ptsPerInterval, 10), __COMMENT__: (new Error()).stack })
+              await global.db.engine.increment('users.points', { id: user.id }, { points: parseInt(ptsPerInterval, 10) })
               await global.db.engine.update('users', { id: user.id }, { id: user.id, username, time: { points: String(new Date()) } })
             }
           } else {
@@ -87,18 +86,6 @@ class Points extends System {
       global.log.error(e.stack)
     } finally {
       this.timeouts['updatePoints'] = setTimeout(() => this.updatePoints(), interval === 0 ? 60000 : interval)
-    }
-  }
-
-  async compactPointsDb () {
-    clearTimeout(this.timeouts['compactPointsDb'])
-    try {
-      await global.commons.compactDb({ table: 'users.points', index: 'id', values: 'points' })
-    } catch (e) {
-      global.log.error(e)
-      global.log.error(e.stack)
-    } finally {
-      this.timeouts['compactPointsDb'] = setTimeout(() => this.compactPointsDb(), 10000)
     }
   }
 
@@ -125,7 +112,7 @@ class Points extends System {
     let lastMessageCount = _.isNil(user.custom.lastMessagePoints) ? 0 : user.custom.lastMessagePoints
 
     if (lastMessageCount + interval <= userMessages) {
-      await global.db.engine.insert('users.points', { id: opts.sender.userId, points: parseInt(ptsPerInterval, 10), __COMMENT__: (new Error()).stack })
+      await global.db.engine.increment('users.points', { id: opts.sender.userId }, { points: parseInt(ptsPerInterval, 10) })
       await global.db.engine.update('users', { id: opts.sender.userId }, { custom: { lastMessagePoints: userMessages } })
     }
     return true
@@ -161,8 +148,7 @@ class Points extends System {
       if (!user.id) user.id = await global.api.getIdFromTwitch(username)
 
       if (user.id) {
-        await global.db.engine.remove('users.points', { id: user.id })
-        await global.db.engine.insert('users.points', { id: user.id, points, __COMMENT__: (new Error()).stack })
+        await global.db.engine.increment('users.points', { id: user.id }, { points })
 
         let message = await global.commons.prepare('points.success.set', {
           amount: points,
@@ -196,8 +182,8 @@ class Points extends System {
         })
         global.commons.sendMessage(message, opts.sender)
       } else if (points === 'all') {
-        await global.db.engine.insert('users.points', { id: opts.sender.userId, points: (parseInt(availablePoints, 10) * -1), __COMMENT__: (new Error()).stack })
-        await global.db.engine.insert('users.points', { id: guser.id, points: parseInt(availablePoints, 10), __COMMENT__: (new Error()).stack })
+        await global.db.engine.update('users.points', { id: opts.sender.userId }, { points: 0 })
+        await global.db.engine.increment('users.points', { id: guser.id }, { points: parseInt(availablePoints, 10) })
         let message = await global.commons.prepare('points.success.give', {
           amount: availablePoints,
           username,
@@ -205,8 +191,8 @@ class Points extends System {
         })
         global.commons.sendMessage(message, opts.sender)
       } else {
-        await global.db.engine.insert('users.points', { id: opts.sender.userId, points: (parseInt(points, 10) * -1), __COMMENT__: (new Error()).stack })
-        await global.db.engine.insert('users.points', { id: guser.id, points: parseInt(points, 10), __COMMENT__: (new Error()).stack })
+        await global.db.engine.increment('users.points', { id: opts.sender.userId }, { points: (parseInt(points, 10) * -1) })
+        await global.db.engine.increment('users.points', { id: guser.id }, { points: parseInt(points, 10) })
         let message = await global.commons.prepare('points.success.give', {
           amount: points,
           username,
@@ -297,7 +283,7 @@ class Points extends System {
         let user = await global.db.engine.findOne('users', { username })
 
         if (user.id) {
-          await global.db.engine.insert('users.points', { id: user.id, points, __COMMENT__: (new Error()).stack })
+          await global.db.engine.increment('users.points', { id: user.id }, { points })
         }
       }
       let message = await global.commons.prepare('points.success.all', {
@@ -320,7 +306,7 @@ class Points extends System {
         let user = await global.db.engine.findOne('users', { username })
 
         if (user.id) {
-          await global.db.engine.insert('users.points', { id: user.id, points: parseInt(Math.floor(Math.random() * points), 10), __COMMENT__: (new Error()).stack })
+          await global.db.engine.increment('users.points', { id: user.id }, { points: parseInt(Math.floor(Math.random() * points), 10) })
         }
       }
       let message = await global.commons.prepare('points.success.rain', {
@@ -338,7 +324,7 @@ class Points extends System {
       const [username, points] = new Expects(opts.parameters).username().points({ all: false }).toArray()
       let user = await global.db.engine.findOne('users', { username })
       if (user.id) {
-        await global.db.engine.insert('users.points', { id: user.id, points: points, __COMMENT__: (new Error()).stack })
+        await global.db.engine.increment('users.points', { id: user.id }, { points: points })
       } else {
         throw new Error('User doesn\'t have ID')
       }
@@ -366,7 +352,7 @@ class Points extends System {
           await global.db.engine.remove('users.points', { id: user.id })
         } else {
           let availablePoints = await this.getPointsOf(user.id)
-          await global.db.engine.insert('users.points', { id: user.id, points: -Math.min(points, availablePoints), __COMMENT__: (new Error()).stack })
+          await global.db.engine.increment('users.points', { id: user.id }, { points: -Math.min(points, availablePoints) })
         }
 
         let message = await global.commons.prepare('points.success.remove', {

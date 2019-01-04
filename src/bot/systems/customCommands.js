@@ -5,7 +5,6 @@
 // 3rdparty libraries
 const _ = require('lodash')
 const XRegExp = require('xregexp')
-const cluster = require('cluster')
 const safeEval = require('safe-eval')
 
 // bot libraries
@@ -62,7 +61,6 @@ class CustomCommands extends System {
     super({ settings })
 
     this.addMenu({ category: 'manage', name: 'customcommands', id: 'customcommands/list' })
-    if (cluster.isMaster) this.compactCountDb()
   }
 
   sockets () {
@@ -237,7 +235,7 @@ class CustomCommands extends System {
 
     // remove found command from message to get param
     const param = opts.message.replace(new RegExp('^(' + cmdArray.join(' ') + ')', 'i'), '').trim()
-    global.db.engine.insert(this.collection.count, { command: command.command, count: 1 })
+    global.db.engine.increment(this.collection.count, { command: command.command }, { count: 1 })
 
     const responses: Array<Response> = await global.db.engine.find(this.collection.responses, { cid: String(command._id) })
     for (let r of _.orderBy(responses, 'order', 'asc')) {
@@ -376,19 +374,6 @@ class CustomCommands extends System {
       }
     } catch (e) {
       return global.commons.sendMessage(global.commons.prepare('customcmds.commands-parse-failed'), opts.sender)
-    }
-  }
-
-  async compactCountDb () {
-    clearTimeout(this.timeouts[this.collection.count + '.compactCountDb'])
-
-    try {
-      await global.commons.compactDb({ table: this.collection.count, index: 'command', values: 'count' })
-    } catch (e) {
-      global.log.error(e)
-      global.log.error(e.stack)
-    } finally {
-      this.timeouts[this.collection.count + '.compactCountDb'] = setTimeout(() => this.compactCountDb(), 60000)
     }
   }
 
