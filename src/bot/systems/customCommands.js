@@ -5,7 +5,6 @@
 // 3rdparty libraries
 const _ = require('lodash')
 const XRegExp = require('xregexp')
-const cluster = require('cluster')
 const safeEval = require('safe-eval')
 
 // bot libraries
