@@ -184,7 +184,7 @@ class Users extends Core {
   async updateWatchTime () {
     clearTimeout(this.timeouts['updateWatchTime'])
 
-    let timeout = 60000
+    let timeout = constants.MINUTE * 15
     try {
       // count watching time when stream is online
       if (await global.cache.isOnline()) {
@@ -223,7 +223,7 @@ class Users extends Core {
       global.log.error(e)
       global.log.error(e.stack)
     } finally {
-      this.timeouts['compactWatchedDb'] = setTimeout(() => this.compactWatchedDb(), 10000)
+      this.timeouts['compactWatchedDb'] = setTimeout(() => this.compactWatchedDb(), 2 * constants.HOUR)
     }
   }
 
@@ -250,7 +250,7 @@ class Users extends Core {
       global.log.error(e)
       global.log.error(e.stack)
     } finally {
-      this.timeouts['compactMessagesDb'] = setTimeout(() => this.compactMessagesDb(), 10000)
+      this.timeouts['compactMessagesDb'] = setTimeout(() => this.compactMessagesDb(), 2 * constants.HOUR)
     }
   }
 

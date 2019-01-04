@@ -388,7 +388,7 @@ class CustomCommands extends System {
       global.log.error(e)
       global.log.error(e.stack)
     } finally {
-      this.timeouts[this.collection.count + '.compactCountDb'] = setTimeout(() => this.compactCountDb(), 60000)
+      this.timeouts[this.collection.count + '.compactCountDb'] = setTimeout(() => this.compactCountDb(), 2 * constants.HOUR)
     }
   }
 

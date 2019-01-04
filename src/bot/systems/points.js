@@ -98,7 +98,7 @@ class Points extends System {
       global.log.error(e)
       global.log.error(e.stack)
     } finally {
-      this.timeouts['compactPointsDb'] = setTimeout(() => this.compactPointsDb(), 10000)
+      this.timeouts['compactPointsDb'] = setTimeout(() => this.compactPointsDb(), 2 * constants.HOUR)
     }
   }
 
