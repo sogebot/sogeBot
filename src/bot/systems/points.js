@@ -350,7 +350,6 @@ class Points extends System {
       })
       global.commons.sendMessage(message, opts.sender)
     } catch (err) {
-      console.log(err)
       global.commons.sendMessage(global.translate('points.failed.add').replace('$command', opts.command), opts.sender)
     }
   }
