@@ -123,7 +123,7 @@ Commons.prototype.sendMessage = async function (message, sender, attr) {
   sender = sender || {}
 
   if (_.isString(sender)) sender = { username: sender }
-  if (_.isNil(sender) || _.isNil(sender.username)) sender.username = undefined
+  if (_.isNil(sender) || _.isNil(sender.username) || sender.username.trim().length === 0) sender.username = undefined
   else attr.sender = sender.username
   if (!_.isNil(sender.quiet)) attr.quiet = sender.quiet
   if (!_.isNil(sender.skip)) attr.skip = sender.skip

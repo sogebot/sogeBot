@@ -392,6 +392,9 @@ class TMI extends Core {
 
       if (await global.commons.isIgnored(userstate.username)) return
 
+      // update users ID
+      await global.db.engine.update('users', { id: userId }, { username })
+
       global.overlays.eventlist.add({ type: 'cheer', username, bits: userstate.bits, message: messageFromUser })
       global.log.cheer(`${username}, bits: ${userstate.bits}, message: ${messageFromUser}`)
       global.db.engine.insert('users.bits', { id: userId, amount: userstate.bits, message: messageFromUser, timestamp: _.now() })
