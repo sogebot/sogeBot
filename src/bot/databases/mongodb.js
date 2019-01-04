@@ -73,9 +73,9 @@ class IMongoDB extends Interface {
           { partialFilterExpression: { id: { $exists: true } }, unique: true }
         )
         await db.collection('users.online').createIndex('username')
-        await db.collection('users.points').createIndex('username')
-        await db.collection('users.messages').createIndex('username')
-        await db.collection('users.watched').createIndex('username')
+        await db.collection('users.points').createIndex('id')
+        await db.collection('users.messages').createIndex('id')
+        await db.collection('users.watched').createIndex('id')
         await db.collection('cache').createIndex('key', { unique: true })
         await db.collection('customTranslations').createIndex('key')
         await db.collection('stats').createIndex('whenOnline')
