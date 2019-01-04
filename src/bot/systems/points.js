@@ -182,7 +182,7 @@ class Points extends System {
         })
         global.commons.sendMessage(message, opts.sender)
       } else if (points === 'all') {
-        await global.db.engine.increment('users.points', { id: opts.sender.userId }, { points: 0 })
+        await global.db.engine.update('users.points', { id: opts.sender.userId }, { points: 0 })
         await global.db.engine.increment('users.points', { id: guser.id }, { points: parseInt(availablePoints, 10) })
         let message = await global.commons.prepare('points.success.give', {
           amount: availablePoints,
