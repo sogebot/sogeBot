@@ -122,9 +122,11 @@ Commons.prototype.sendMessage = async function (message, sender, attr) {
   attr = attr || {}
   sender = sender || {}
 
-  if (_.isString(sender)) sender = { username: sender }
+  if (_.isString(sender)) sender = { username: String(sender) }
+
   if (_.isNil(sender) || _.isNil(sender.username)) sender.username = undefined
   else attr.sender = sender.username
+
   if (!_.isNil(sender.quiet)) attr.quiet = sender.quiet
   if (!_.isNil(sender.skip)) attr.skip = sender.skip
   if (!attr.skip) message = await new Message(message).parse(attr)
@@ -212,19 +214,23 @@ Commons.prototype.isBroadcaster = function (user) {
 }
 
 Commons.prototype.isMod = async function (user) {
-  if (_.isNil(user)) return false
-
-  if (_.isString(user)) user = await global.users.getByName(user)
-  else if (_.isNil(user.isModerator)) user = await global.users.getByName(user.username)
-  else user = { is: { mod: user.isModerator } }
-  return !_.isNil(user.is.mod) ? user.is.mod : false
+  try {
+    if (_.isString(user)) user = await global.users.getByName(user)
+    else if (_.isNil(user.isModerator)) user = await global.users.getByName(user.username)
+    else user = { is: { mod: user.isModerator } }
+    return !_.isNil(user.is.mod) ? user.is.mod : false
+  } catch (e) {
+    return false
+  }
 }
 
 Commons.prototype.isRegular = async function (user) {
-  if (_.isNil(user)) return false
-
-  global.db.engine.find('users', { username: _.isString(user) ? user : user.username })
-  return _.get(user, 'is.regular', false)
+  try {
+    if (_.isString(user)) user = await global.users.getByName(user)
+    return !_.isNil(user.is.regular) ? user.is.regular : false
+  } catch (e) {
+    return false
+  }
 }
 
 Commons.prototype.isBot = function (user) {

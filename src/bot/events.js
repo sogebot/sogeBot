@@ -233,7 +233,19 @@ class Events {
       command = command.replace(replace, val)
     })
     command = await new Message(command).parse({ username: global.commons.getOwner() })
-    _.sample(cluster.workers).send({ type: 'message', sender: (_.get(operation, 'isCommandQuiet', false) ? null : { username: global.commons.getOwner() }), message: command, skip: true })
+
+    if (global.mocha) {
+      // we are testing => straight to parser
+      const Parser = require('./parser')
+      const parse = new Parser({
+        sender: (_.get(operation, 'isCommandQuiet', false) ? {} : { username: global.commons.getOwner() }),
+        message: command,
+        skip: true
+      })
+      await parse.process()
+    } else {
+      _.sample(cluster.workers).send({ type: 'message', sender: (_.get(operation, 'isCommandQuiet', false) ? {} : { username: global.commons.getOwner() }), message: command, skip: true })
+    }
   }
 
   async fireSendChatMessageOrWhisper (operation, attributes, whisper) {
