@@ -214,19 +214,23 @@ Commons.prototype.isBroadcaster = function (user) {
 }
 
 Commons.prototype.isMod = async function (user) {
-  if (_.isNil(user) || _.isNil(user.username)) return false
-
-  if (_.isString(user)) user = await global.users.getByName(user)
-  else if (_.isNil(user.isModerator)) user = await global.users.getByName(user.username)
-  else user = { is: { mod: user.isModerator } }
-  return !_.isNil(user.is.mod) ? user.is.mod : false
+  try {
+    if (_.isString(user)) user = await global.users.getByName(user)
+    else if (_.isNil(user.isModerator)) user = await global.users.getByName(user.username)
+    else user = { is: { mod: user.isModerator } }
+    return !_.isNil(user.is.mod) ? user.is.mod : false
+  } catch (e) {
+    return false
+  }
 }
 
 Commons.prototype.isRegular = async function (user) {
-  if (_.isNil(user) || _.isNil(user.username)) return false
-
-  global.db.engine.find('users', { username: _.isString(user) ? user : user.username })
-  return _.get(user, 'is.regular', false)
+  try {
+    if (_.isString(user)) user = await global.users.getByName(user)
+    return !_.isNil(user.is.regular) ? user.is.regular : false
+  } catch (e) {
+    return false
+  }
 }
 
 Commons.prototype.isBot = function (user) {
