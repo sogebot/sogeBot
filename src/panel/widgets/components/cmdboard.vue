@@ -117,7 +117,7 @@ export default {
     }
   },
   watch: {
-    displayAs: function () {
+    displayAs: function (val) {
       this.socket.emit('saveConfiguration', { widgetCmdBoardDisplayAs: this.displayAs })
     }
   },
@@ -141,7 +141,7 @@ export default {
   },
   created: function () {
       this.socket.emit('cmdboard.widget.fetch')
-      this.socket.on('configuration', (data) => {
+      this.socket.emit('getConfiguration', (data) => {
         this.displayAs = data.widgetCmdBoardDisplayAs
       })
       this.socket.off('cmdboard.widget.data').on('cmdboard.widget.data', (cb) => this.items = cb)
