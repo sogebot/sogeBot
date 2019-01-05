@@ -7,6 +7,7 @@ const axios = require('axios')
 const _ = require('lodash')
 const chalk = require('chalk')
 const constants = require('./constants')
+const cluster = require('cluster')
 
 const Core = require('./_interface')
 
@@ -30,7 +31,9 @@ class Currency extends Core {
     }
     super({ settings, ui })
 
-    setTimeout(() => this.updateRates(), 5 * constants.SECOND)
+    if (cluster.isMaster) {
+      setTimeout(() => this.updateRates(), 5 * constants.SECOND)
+    }
   }
 
   isCodeSupported (code: string) {
