@@ -55,19 +55,29 @@ type InterfaceSettings = {
   },
   ui?: {
     [s: string]: {
-      [s: string]: {
-        type: 'link' | 'selector' | 'number-input',
-        href?: string,
-        class?: string,
-        rawText?: string,
-        target?: string,
-        values?: Array<string>,
-        step?: number,
-        min?: number,
-        max?: number,
-      }
+      [s: string]: UISelector | UILink | UINumberInput
     }
   }
+}
+
+type UISelector = {
+  type: 'selector',
+  values: Array<string>,
+}
+
+type UILink = {
+  type: 'link',
+  href: string,
+  class: string,
+  rawText: string,
+  target: string
+}
+
+type UINumberInput = {
+  type: 'number-input',
+  step?: number,
+  min?: number,
+  max?: number,
 }
 
 type CommandOptions = {
