@@ -59,7 +59,7 @@ class Polls extends System {
       global.db.engine.index({ table: this.collection.votes, index: 'vid' });
       global.db.engine.index({ table: this.collection.data, index: 'openedAt' });
 
-      setInterval(() => this.reminder(), 1000);
+      setInterval(() => this.reminder(), constants.MINUTE / 2);
     }
 
     this.addMenu({ category: 'manage', name: 'polls', id: '/manage/polls' });
