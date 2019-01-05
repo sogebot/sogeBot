@@ -58,7 +58,7 @@ class Module {
     if (typeof retries === 'undefined') retries = 0
     if (retries === 6000) throw new Error('Something went wrong')
     if (!this.isLoaded) setTimeout(() => this._status(++retries), 10)
-    else this.status({ state: this.settings.enabled }) // force status change
+    else this.status({ state: this.settings.enabled, quiet: cluster.isWorker }) // force status change and quiet on workers
   }
 
   prepareParsers () {
@@ -396,6 +396,7 @@ class Module {
       else if (areDependenciesEnabled) global.log.info(`${opts.state ? chalk.green('ENABLED') : chalk.red('DISABLED')}: ${this.constructor.name} (${this._name})`)
       else global.log.info(`${chalk.red('DISABLED BY DEP')}: ${this.constructor.name} (${this._name})`)
     }
+
     return opts.state
   }
 
