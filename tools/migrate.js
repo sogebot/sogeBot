@@ -161,28 +161,28 @@ let updates = async (from, to) => {
 
 let migration = {
   compact: [{
-    version: '8.3.0',
+    version: '8.2.1',
     do: async () => {
       console.info('Compacting users.watched')
       await compactDb({ table: 'users.watched', index: 'id', values: 'watched' })
       console.info(' => done')
     }
   }, {
-    version: '8.3.0',
+    version: '8.2.1',
     do: async () => {
       console.info('Compacting users.messages')
       await compactDb({ table: 'users.messages', index: 'id', values: 'messages' })
       console.info(' => done')
     }
   }, {
-    version: '8.3.0',
+    version: '8.2.1',
     do: async () => {
       console.info('Compacting users.points')
       await compactDb({ table: 'users.points', index: 'id', values: 'points' })
       console.info(' => done')
     }
   }, {
-    version: '8.3.0',
+    version: '8.2.1',
     do: async () => {
       console.info('Compacting systems.customcommands.count')
       await compactDb({ table: 'systems.customcommands.count', index: 'command', values: 'count' })
