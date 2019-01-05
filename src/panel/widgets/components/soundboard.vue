@@ -96,7 +96,8 @@ export default {
   methods: {
     setVolume: function (ev) {
       // steps by 5
-      this.volume = Math.round(Number(ev.offsetX / ev.path[1].clientWidth * 100).toFixed(0) / 5) * 5
+      const path = ev.path || (ev.composedPath && ev.composedPath());
+      this.volume = Math.round(Number(ev.offsetX / path[0].clientWidth * 100).toFixed(0) / 5) * 5
     },
     play: function (sound) {
       if (!_.isNil(this.audio)) this.audio.pause()
