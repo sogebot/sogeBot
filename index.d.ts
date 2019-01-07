@@ -11,7 +11,8 @@ declare namespace NodeJS {
     log: any,
     currency: any,
     panel: any,
-    systems: any
+    systems: any,
+    users: any
   }
 }
 

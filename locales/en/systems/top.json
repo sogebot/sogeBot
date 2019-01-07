@@ -1,0 +1,9 @@
+{
+  "time": "Top $amount (watch time): ",
+  "tips": "Top $amount (tips): ",
+  "points": "Top $amount (points): ",
+  "messages": "Top $amount (messages): ",
+  "followage": "Top $amount (followage): ",
+  "bits": "Top $amount (bits): ",
+  "gifts": "Top $amount (subgifts): "
+}

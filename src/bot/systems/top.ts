@@ -90,6 +90,7 @@ class Top extends System {
 
   private async showTop(opts) {
     let sorted;
+    let message;
     let i = 0;
     const type = opts.parameters;
 
@@ -98,6 +99,11 @@ class Top extends System {
 
     switch (type) {
       case TYPE.TIME:
+        sorted = [];
+        for (const user of (await global.db.engine.find('users.watched', { _sort: 'watched', _sum: 'watched', _total, _group: 'id' }))) {
+          sorted.push({ username: await global.users.getNameById(user._id), watched: user.watched });
+        }
+        message = global.translate('systems.top.time').replace(/\$amount/g, 10);
       case TYPE.TIPS:
       case TYPE.POINTS:
       case TYPE.MESSAGES:
@@ -114,11 +120,7 @@ class Top extends System {
       }
       message = global.translate('top.listPoints').replace(/\$amount/g, 10);
     } else if (type === TYPE.TIME) {
-      sorted = [];
-      for (let user of (await global.db.engine.find('users.watched', { _sort: 'watched', _sum: 'watched', _total, _group: 'id' }))) {
-        sorted.push({ username: await global.users.getNameById(user._id), watched: user.watched });
-      }
-      message = global.translate('top.listWatched').replace(/\$amount/g, 10);
+
     } else if (type === 'tips') {
       let users = {};
       message = global.translate('top.listTips').replace(/\$amount/g, 10);

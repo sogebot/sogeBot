@@ -1,0 +1,9 @@
+{
+  "time": "Top $amount (cas sledovani): ",
+  "tips": "Top $amount (spropitne): ",
+  "points": "Top $amount (body): ",
+  "messages": "Top $amount (zpravy): ",
+  "followage": "Top $amount (followage): ",
+  "bits": "Top $amount (bits): ",
+  "gifts": "Top $amount (subgifts): "
+}
