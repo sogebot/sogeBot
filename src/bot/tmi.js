@@ -347,7 +347,6 @@ class TMI extends Core {
       const months = Number(message.parameters.months)
       const recipient = message.parameters.recipientUserName.toLowerCase()
       const recipientId = message.parameters.recipientId
-      const senderCount = message.parameters.senderCount
 
       // update recipient ID
       await global.db.engine.update('users', { id: recipientId }, { username: recipient })
