@@ -346,6 +346,9 @@ class TMI extends Core {
       const recipientId = message.parameters.recipientId
       const senderCount = message.parameters.senderCount
 
+      // update recipient ID
+      await global.db.engine.update('users', { id: recipientId }, { username: recipient })
+
       for (let [u, o] of Object.entries(this.ignoreGiftsFromUser)) {
         // $FlowFixMe Incorrect mixed type from value of Object.entries https://github.com/facebook/flow/issues/5838
         if (o.count === 0 || new Date().getTime() - new Date(o.time).getTime() >= 1000 * 60 * 10) {
