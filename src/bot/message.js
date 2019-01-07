@@ -59,14 +59,17 @@ class Message {
         spotifySong.song = spotifySong.song.replace(new RegExp(opts.escape, 'g'), `\\${opts.escape}`)
         spotifySong.artist = spotifySong.artist.replace(new RegExp(opts.escape, 'g'), `\\${opts.escape}`)
       }
-      this.message = this.message.replace(/\$currentSong/g, format.replace(/\$song/g, spotifySong.song).replace(/\$artist/g, spotifySong.artist))
-    } else if (await global.systems.songs.isEnabled() && this.message.includes('$currentSong')) {
+      this.message = this.message.replace(/\$spotifySong/g, format.replace(/\$song/g, spotifySong.song).replace(/\$artist/g, spotifySong.artist))
+    } else this.message = this.message.replace(/\$spotifySong/g, global.translate('songs.not-playing'))
+
+
+    if (await global.systems.songs.isEnabled() && this.message.includes('$ytSong')) {
       let currentSong = _.get(JSON.parse(await global.systems.songs.settings._.currentSong), 'title', global.translate('songs.not-playing'))
       if (opts.escape) {
         currentSong = currentSong.replace(new RegExp(opts.escape, 'g'), `\\${opts.escape}`)
       }
-      this.message = this.message.replace(/\$currentSong/g, currentSong)
-    } else this.message = this.message.replace(/\$currentSong/g, global.translate('songs.not-playing'))
+      this.message = this.message.replace(/\$ytSong/g, currentSong)
+    } else this.message = this.message.replace(/\$ytSong/g, global.translate('songs.not-playing'))
 
     return Entities.decode(this.message)
   }

@@ -26,7 +26,9 @@
 
 `$bits` - return current bits count received during current stream
 
-`$currentSong` - return current song playing in YTplayer widget
+`$ytSong` - return current song playing in YTplayer widget
+
+`$spotifySong` - return current song playing in Spotify
 
 `$latestFollower` - Latest Follower
 
