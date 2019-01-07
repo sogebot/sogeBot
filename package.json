@@ -93,6 +93,7 @@
     "@fortawesome/vue-fontawesome": "0.1.4",
     "@types/jquery": "3.3.29",
     "@types/lodash": "4.14.119",
+    "@types/moment-timezone": "0.5.10",
     "@types/node": "10.12.18",
     "@types/vue": "2.0.0",
     "babel-preset-minify": "0.5.0",

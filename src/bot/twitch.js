@@ -33,11 +33,6 @@ class Twitch {
       { this: this, id: '!followers', command: '!followers', fnc: this.followers, permission: constants.VIEWERS },
       { this: this, id: '!subs', command: '!subs', fnc: this.subs, permission: constants.VIEWERS },
       { this: this, id: '!age', command: '!age', fnc: this.age, permission: constants.VIEWERS },
-      { this: this, id: '!top time', command: '!top time', fnc: this.showTopTime, permission: constants.OWNER_ONLY },
-      { this: this, id: '!top tips', command: '!top tips', fnc: this.showTopTips, permission: constants.OWNER_ONLY },
-      { this: this, id: '!top points', command: '!top points', fnc: this.showTopPoints, permission: constants.OWNER_ONLY },
-      { this: this, id: '!top messages', command: '!top messages', fnc: this.showTopMessages, permission: constants.OWNER_ONLY },
-      { this: this, id: '!top followage', command: '!top followage', fnc: this.showTopFollowAge, permission: constants.OWNER_ONLY },
       { this: this, id: '!title', command: '!title', fnc: this.getTitle, permission: constants.VIEWERS },
       { this: this, id: '!title set', command: '!title set', fnc: this.setTitle, permission: constants.OWNER_ONLY },
       { this: this, id: '!game', command: '!game', fnc: this.getGame, permission: constants.VIEWERS },
@@ -252,111 +247,6 @@ class Twitch {
     } catch (e) {
       global.commons.sendMessage(global.translate('watched.failed.parse'), opts.sender)
     }
-  }
-
-  showTopFollowAge (opts) {
-    opts.parameters = 'followage'
-    this.showTop(opts)
-  }
-
-  showTopMessages (opts) {
-    opts.parameters = 'messages'
-    this.showTop(opts)
-  }
-
-  showTopTips (opts) {
-    opts.parameters = 'tips'
-    this.showTop(opts)
-  }
-
-  showTopPoints (opts) {
-    opts.parameters = 'points'
-    this.showTop(opts)
-  }
-
-  showTopTime (opts) {
-    opts.parameters = 'time'
-    this.showTop(opts)
-  }
-
-  async showTop (opts) {
-    let sorted, message
-    let type = opts.parameters.match(/^(time|points|messages|tips|followage)$/)
-    let i = 0
-
-    if (_.isNil(type)) type = 'time'
-    else type = type[1]
-
-    // count ignored users
-    let _total = 10 + global.commons.getIgnoreList().length + 2 // 2 for bot and broadcaster
-    if (type === 'points' && await global.systems.points.isEnabled()) {
-      sorted = []
-      for (let user of (await global.db.engine.find('users.points', { _sort: 'points', _sum: 'points', _total, _group: 'id' }))) {
-        sorted.push({ username: await global.users.getNameById(user._id), points: user.points })
-      }
-      message = global.translate('top.listPoints').replace(/\$amount/g, 10)
-    } else if (type === 'time') {
-      sorted = []
-      for (let user of (await global.db.engine.find('users.watched', { _sort: 'watched', _sum: 'watched', _total, _group: 'id' }))) {
-        sorted.push({ username: await global.users.getNameById(user._id), watched: user.watched })
-      }
-      message = global.translate('top.listWatched').replace(/\$amount/g, 10)
-    } else if (type === 'tips') {
-      let users = {}
-      message = global.translate('top.listTips').replace(/\$amount/g, 10)
-      let tips = await global.db.engine.find('users.tips')
-      for (let tip of tips) {
-        const username = await global.users.getNameById(tip.id)
-        if (_.isNil(users[username])) users[username] = { username: username, amount: 0 }
-        users[username].amount += global.currency.exchange(tip.amount, tip.currency, global.currency.settings.currency.mainCurrency)
-      }
-      sorted = _.orderBy(users, 'amount', 'desc')
-    } else if (type === 'messages') {
-      sorted = []
-      for (let user of (await global.db.engine.find('users.messages', { _sort: 'messages', _sum: 'messages', _total, _group: 'id' }))) {
-        sorted.push({ username: await global.users.getNameById(user._id), messages: user.messages })
-      }
-      message = global.translate('top.listMessages').replace(/\$amount/g, 10)
-    } else if (type === 'followage') {
-      sorted = []
-      for (let user of (await global.db.engine.find('users', { _sort: '-time.follow', _total }))) {
-        sorted.push({ username: user.username, followage: user.time.follow })
-      }
-      message = global.translate('top.listFollowage').replace(/\$amount/g, 10)
-    }
-
-    if (sorted.length > 0) {
-      // remove ignored users
-      let ignored = []
-      for (let user of sorted) {
-        if (await global.commons.isIgnored(user.username)) ignored.push(user.username)
-      }
-      _.remove(sorted, (o) => _.includes(ignored, o.username))
-
-      // remove broadcaster and bot accounts
-      _.remove(sorted, o => _.includes([global.commons.getChannel(), global.oauth.settings.bot.username.toLowerCase()], o.username))
-
-      sorted = _.chunk(sorted, 10)[0]
-
-      moment.locale(global.lib.translate.lang)
-      for (let user of sorted) {
-        message += (i + 1) + '. ' + (await global.configuration.getValue('atUsername') ? '@' : '') + (user.username || 'unknown') + ' - '
-        if (type === 'time') message += (user.watched / 1000 / 60 / 60).toFixed(1) + 'h'
-        else if (type === 'tips') message += user.amount.toFixed(2) + global.currency.symbol(global.currency.settings.currency.mainCurrency)
-        else if (type === 'points') {
-          let points = user.points
-          message += points + ' ' + await global.systems.points.getPointsName(user.points)
-        } else if (type === 'messages') message += user.messages
-        else if (type === 'followage') {
-          message += `${moment(user.followage).format('L')} (${moment(user.followage).fromNow()})`
-        }
-        if (i + 1 < 10 && !_.isNil(sorted[i + 1])) message += ', '
-        i++
-      }
-    } else {
-      message += 'no data available'
-    }
-    global.commons.sendMessage(message, opts.sender)
   }
 
   async getTitle (opts) {
