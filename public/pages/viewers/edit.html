@@ -93,6 +93,10 @@
             <label style="font-weight: bold; margin: 0px 0px 3px; font-size: 11px; text-transform: uppercase; letter-spacing: 1px;">{{ commons.translate('watched-time') }} <small>{{ commons.translate('hours') }}</small></label>
             <input v-model="watchedTime" type="text" class="form-control">
           </div>
+          <div class="form-group col">
+            <label style="font-weight: bold; margin: 0px 0px 3px; font-size: 11px; text-transform: uppercase; letter-spacing: 1px;">{{ commons.translate('subgifts') }}</label>
+            <input v-model="viewer.custom.subgiftsCount" type="text" class="form-control" readonly="true">
+          </div>
         </div>
 
         <div class="row">
@@ -369,6 +373,9 @@
             data.time.follow = data.time.follow === 0 ? null : data.time.follow
             this.viewer = data
             this.watchedTime = !data.time.watched ? '0.0' : Number(data.time.watched / (60 * 60 * 1000)).toFixed(1)
+
+            if (typeof this.viewer.custom === 'undefined') this.viewer.custom = {}
+            this.viewer.custom.subgiftsCount = !this.viewer.custom.subgiftsCount ? 0 : this.viewer.custom.subgiftsCount
             this.$nextTick(() => { this.pending = false })
           })
         }

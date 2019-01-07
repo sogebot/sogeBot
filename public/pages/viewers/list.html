@@ -22,6 +22,7 @@
                       <template v-if="sort === 'stats.messages'">{{ commons.translate('messages') }}</template>
                       <template v-if="sort === 'stats.tips'">{{ commons.translate('tips') }}</template>
                       <template v-if="sort === 'stats.bits'">{{ commons.translate('bits') }}</template>
+                      <template v-if="sort === 'custom.subgiftCount'">{{ commons.translate('subgifts') }}</template>
                       <i class="fas fa-sort-down"></i>
                     </span>
                   </button>
@@ -35,6 +36,7 @@
                     <a class="dropdown-item" @click="sort = 'stats.messages'; sortOrder = 'desc'">{{ commons.translate('messages') }}</a>
                     <a class="dropdown-item" @click="sort = 'stats.tips'; sortOrder = 'desc'">{{ commons.translate('tips') }}</a>
                     <a class="dropdown-item" @click="sort = 'stats.bits'; sortOrder = 'desc'">{{ commons.translate('bits') }}</a>
+                    <a class="dropdown-item" @click="sort = 'custom.subgiftCount'; sortOrder = 'desc'">{{ commons.translate('subgifts') }}</a>
                   </div>
                   <button class="btn border-0 btn-outline-dark" @click="sortOrder = sortOrder === 'asc' ? 'desc': 'asc'">
                       <i v-if="sortOrder === 'asc'" class="fas fa-sort-alpha-down"></i>
@@ -201,6 +203,12 @@
                     {{ commons.translate('watched-time') }}:
                   </strong>
                   {{ (item.time.watched / 1000 / 60 / 60).toFixed(1) }}h
+                </div>
+                <div>
+                  <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
+                    {{ commons.translate('subgifts') }}:
+                  </strong>
+                  {{ item.custom.subgitsCount || 0 }}
                 </div>
               </div>
             </div>

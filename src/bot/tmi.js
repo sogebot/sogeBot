@@ -321,8 +321,11 @@ class TMI extends Core {
   async subscriptionGiftCommunity (message: Object) {
     try {
       const username = message.tags.login
-      const count = Number(message.parameters.senderCount)
-      // const plan = message.parameters.subPlan
+      const userId = message.tags.userId
+      const count = Number(message.parameters.massGiftCount)
+
+      // save total count, userId
+      await global.db.engine.update('users', { id: userId }, { username, custom: { subgiftCount: Number(message.parameters.senderCount) } })
 
       this.ignoreGiftsFromUser[username] = { count, time: new Date() }
 
@@ -344,7 +347,11 @@ class TMI extends Core {
       const months = Number(message.parameters.months)
       const recipient = message.parameters.recipientUserName.toLowerCase()
       const recipientId = message.parameters.recipientId
-      const senderCount = message.parameters.senderCount
+
+      // update recipient ID
+      await global.db.engine.update('users', { id: recipientId }, { username: recipient })
+      // update gifter ID
+      await global.db.engine.update('users', { id: message.tags.userId }, { username })
 
       for (let [u, o] of Object.entries(this.ignoreGiftsFromUser)) {
         // $FlowFixMe Incorrect mixed type from value of Object.entries https://github.com/facebook/flow/issues/5838
@@ -374,7 +381,9 @@ class TMI extends Core {
       global.log.subgift(`${recipient}, from: ${username}, months: ${months}`)
 
       // also set subgift count to gifter
-      if (!global.commons.isIgnored(username)) global.users.setById(message.tags.userId, { custom: { subgiftCount: senderCount } })
+      if (!global.commons.isIgnored(username)) {
+        await global.db.engine.increment('users', { id: message.tags.userId }, { custom: { subgiftCount: 1 } })
+      }
     } catch (e) {
       global.log.error('Error parsing subgift event')
       global.log.error(JSON.stringify(message))
