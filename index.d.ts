@@ -12,7 +12,8 @@ declare namespace NodeJS {
     currency: any,
     panel: any,
     systems: any,
-    users: any
+    users: any,
+    lib: any,
   }
 }
 

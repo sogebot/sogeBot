@@ -89,7 +89,7 @@ class Top extends System {
   }
 
   private async showTop(opts) {
-    let sorted;
+    let sorted: Array<{username: string, value: string}> = [];
     let message;
     let i = 0;
     const type = opts.parameters;
@@ -97,69 +97,76 @@ class Top extends System {
     // count ignored users
     const _total = 10 + global.commons.getIgnoreList().length + 2; // 2 for bot and broadcaster
 
+    moment.locale(global.lib.translate.lang);
+
     switch (type) {
       case TYPE.TIME:
         sorted = [];
         for (const user of (await global.db.engine.find('users.watched', { _sort: 'watched', _sum: 'watched', _total, _group: 'id' }))) {
-          sorted.push({ username: await global.users.getNameById(user._id), watched: user.watched });
+          sorted.push({ username: await global.users.getNameById(user._id), value: user.watched });
         }
         message = global.translate('systems.top.time').replace(/\$amount/g, 10);
+        break;
       case TYPE.TIPS:
+        const users = {};
+        const tips = await global.db.engine.find('users.tips');
+
+        message = global.translate('systems.top.tips').replace(/\$amount/g, 10);
+        for (const tip of tips) {
+          const username = await global.users.getNameById(tip.id);
+          if (_.isNil(users[username])) {
+            users[username] = { username, amount: 0 };
+          }
+          users[username].value += global.currency.exchange(tip.amount, tip.currency, global.currency.settings.currency.mainCurrency);
+        }
+        sorted = _.orderBy(users, 'value', 'desc');
+        break;
       case TYPE.POINTS:
+        if (!global.systems.points.isEnabled()) {
+          return;
+        }
+
+        sorted = [];
+        for (const user of (await global.db.engine.find('users.points', { _sort: 'points', _sum: 'points', _total, _group: 'id' }))) {
+          sorted.push({ username: await global.users.getNameById(user._id), value: user.points });
+        }
+        message = global.translate('systems.top.points').replace(/\$amount/g, 10);
+        break;
       case TYPE.MESSAGES:
+        sorted = [];
+        for (const user of (await global.db.engine.find('users.messages', { _sort: 'messages', _sum: 'messages', _total, _group: 'id' }))) {
+          sorted.push({ username: await global.users.getNameById(user._id), value: user.messages });
+        }
+        message = global.translate('systems.top.messages').replace(/\$amount/g, 10);
+        break;
       case TYPE.FOLLOWAGE:
+        sorted = [];
+        for (const user of (await global.db.engine.find('users', { _sort: '-time.follow', _total }))) {
+          sorted.push({ username: user.username, value: user.time.follow });
+        }
+        message = global.translate('systems.top.followage').replace(/\$amount/g, 10);
+        break;
       case TYPE.BITS:
       case TYPE.GIFTS:
         break;
     }
-/*
-    if (type === TYPE.POINTS && await global.systems.points.isEnabled()) {
-      sorted = [];
-      for (let user of (await global.db.engine.find('users.points', { _sort: 'points', _sum: 'points', _total, _group: 'id' }))) {
-        sorted.push({ username: await global.users.getNameById(user._id), points: user.points });
-      }
-      message = global.translate('top.listPoints').replace(/\$amount/g, 10);
-    } else if (type === TYPE.TIME) {
-
-    } else if (type === 'tips') {
-      let users = {};
-      message = global.translate('top.listTips').replace(/\$amount/g, 10);
-      let tips = await global.db.engine.find('users.tips');
-      for (let tip of tips) {
-        const username = await global.users.getNameById(tip.id);
-        if (_.isNil(users[username])) users[username] = { username: username, amount: 0 };
-        users[username].amount += global.currency.exchange(tip.amount, tip.currency, global.currency.settings.currency.mainCurrency);
-      }
-      sorted = _.orderBy(users, 'amount', 'desc');
-    } else if (type === 'messages') {
-      sorted = [];
-      for (let user of (await global.db.engine.find('users.messages', { _sort: 'messages', _sum: 'messages', _total, _group: 'id' }))) {
-        sorted.push({ username: await global.users.getNameById(user._id), messages: user.messages });
-      }
-      message = global.translate('top.listMessages').replace(/\$amount/g, 10);
-    } else if (type === 'followage') {
-      sorted = [];
-      for (let user of (await global.db.engine.find('users', { _sort: '-time.follow', _total }))) {
-        sorted.push({ username: user.username, followage: user.time.follow });
-      }
-      message = global.translate('top.listFollowage').replace(/\$amount/g, 10);
-    }
 
     if (sorted.length > 0) {
       // remove ignored users
-      let ignored = [];
-      for (let user of sorted) {
-        if (await global.commons.isIgnored(user.username)) ignored.push(user.username);
+      const ignored: string[] = [];
+      for (const user of sorted) {
+        if (await global.commons.isIgnored(user.username)) {
+          ignored.push(user.username);
+        }
       }
+
       _.remove(sorted, (o) => _.includes(ignored, o.username));
-
       // remove broadcaster and bot accounts
-      _.remove(sorted, o => _.includes([global.commons.getChannel(), global.oauth.settings.bot.username.toLowerCase()], o.username));
-
+      _.remove(sorted, (o) => _.includes([global.commons.getChannel(), global.oauth.settings.bot.username.toLowerCase()], o.username));
       sorted = _.chunk(sorted, 10)[0];
 
-      moment.locale(global.lib.translate.lang);
-      for (let user of sorted) {
+      /* TODO: formatting
+      for (const user of sorted) {
         message += (i + 1) + '. ' + (await global.configuration.getValue('atUsername') ? '@' : '') + (user.username || 'unknown') + ' - ';
         if (type === 'time') message += (user.watched / 1000 / 60 / 60).toFixed(1) + 'h';
         else if (type === 'tips') message += user.amount.toFixed(2) + global.currency.symbol(global.currency.settings.currency.mainCurrency);
