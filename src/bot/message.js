@@ -52,7 +52,7 @@ class Message {
     this.message = this.message.replace(/\$latestCheer/g, !_.isNil(latestCheer) ? latestCheer.username : 'n/a')
 
     const spotifySong = JSON.parse(global.integrations.spotify.settings._.currentSong)
-    if (!_.isNil(global.integrations) && !_.isEmpty(spotifySong) && spotifySong.is_playing && spotifySong.is_enabled && this.message.includes('$spotifySong')) {
+    if (!_.isNil(global.integrations) && !_.isEmpty(spotifySong) && spotifySong.is_playing && spotifySong.is_enabled) {
       // load spotify format
       const format = global.integrations.spotify.settings.output.format
       if (opts.escape) {
@@ -60,7 +60,8 @@ class Message {
         spotifySong.artist = spotifySong.artist.replace(new RegExp(opts.escape, 'g'), `\\${opts.escape}`)
       }
       this.message = this.message.replace(/\$spotifySong/g, format.replace(/\$song/g, spotifySong.song).replace(/\$artist/g, spotifySong.artist))
-    }
+    } else this.message = this.message.replace(/\$spotifySong/g, global.translate('songs.not-playing'))
+
 
     if (await global.systems.songs.isEnabled() && this.message.includes('$ytSong')) {
       let currentSong = _.get(JSON.parse(await global.systems.songs.settings._.currentSong), 'title', global.translate('songs.not-playing'))
