@@ -352,7 +352,7 @@ class TMI extends Core {
       // update recipient ID
       await global.db.engine.update('users', { id: recipientId }, { username: recipient })
       // update gifter ID
-      await global.db.engine.update('users', { id: message.tags.userId }, { username } })
+      await global.db.engine.update('users', { id: message.tags.userId }, { username })
 
       for (let [u, o] of Object.entries(this.ignoreGiftsFromUser)) {
         // $FlowFixMe Incorrect mixed type from value of Object.entries https://github.com/facebook/flow/issues/5838
