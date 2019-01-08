@@ -18,8 +18,6 @@ module.exports = {
       await global.db.engine.remove('settings', {})
       await global.db.engine.remove('timers', {})
       await global.db.engine.remove('timers.responses', {})
-      await global.db.engine.remove('users.points', {})
-      await global.db.engine.remove('users.online', {})
       await global.db.engine.remove('users_ignorelist', {})
       await global.db.engine.remove('cache', {})
       await global.db.engine.remove('cache.when', {})
@@ -29,6 +27,11 @@ module.exports = {
       await global.db.engine.remove('systems.quotes', {})
 
       await global.db.engine.remove('users', {})
+      await global.db.engine.remove('users.points', {})
+      await global.db.engine.remove('users.messages', {})
+      await global.db.engine.remove('users.online', {})
+      await global.db.engine.remove('users.bits', {})
+      await global.db.engine.remove('users.tips', {})
 
       // game fightme
       await global.db.engine.remove('games.fightme.settings', {})

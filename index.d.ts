@@ -5,6 +5,7 @@ declare module "*.vue" {
 
 declare namespace NodeJS {
   export interface Global {
+    configuration: any,
     db: any,
     commons: any,
     translate: any,
@@ -14,6 +15,13 @@ declare namespace NodeJS {
     systems: any,
     users: any,
     lib: any,
+    oauth: {
+      settings: {
+        bot: {
+          username: string
+        }
+      }
+    }
   }
 }
 

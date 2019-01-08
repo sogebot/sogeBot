@@ -6,7 +6,6 @@ import * as moment from 'moment-timezone';
 
 // bot libraries
 import constants from '../constants';
-import Expects from '../expects.js';
 import System from './_interface';
 
 enum TYPE {
@@ -18,6 +17,11 @@ enum TYPE {
   BITS,
   GIFTS,
 }
+
+const __DEBUG__ =
+  (process.env.DEBUG && process.env.DEBUG.includes('systems.*')) ||
+  (process.env.DEBUG && process.env.DEBUG.includes('systems.top')) ||
+  (process.env.DEBUG && process.env.DEBUG.includes('systems.top.*'))
 
 enum ERROR {
 }
@@ -89,7 +93,7 @@ class Top extends System {
   }
 
   private async showTop(opts) {
-    let sorted: Array<{username: string, value: string}> = [];
+    let sorted: Array<{username: string, value: number}> = [];
     let message;
     let i = 0;
     const type = opts.parameters;
@@ -147,7 +151,18 @@ class Top extends System {
         message = global.translate('systems.top.followage').replace(/\$amount/g, 10);
         break;
       case TYPE.BITS:
+        sorted = [];
+        for (const user of (await global.db.engine.find('users.bits', { _sort: 'amount', _sum: 'amount', _total, _group: 'id' }))) {
+          sorted.push({ username: await global.users.getNameById(user._id), value: user.amount });
+        }
+        message = global.translate('systems.top.bits').replace(/\$amount/g, 10);
+        break;
       case TYPE.GIFTS:
+        sorted = [];
+        for (const user of (await global.db.engine.find('users', { _sort: 'custom.subgiftCount', _total }))) {
+          sorted.push({ username: user.username, value: user.custom.subgiftCount });
+        }
+        message = global.translate('systems.top.subgifts').replace(/\$amount/g, 10);
         break;
     }
 
@@ -165,17 +180,26 @@ class Top extends System {
       _.remove(sorted, (o) => _.includes([global.commons.getChannel(), global.oauth.settings.bot.username.toLowerCase()], o.username));
       sorted = _.chunk(sorted, 10)[0];
 
-      /* TODO: formatting
       for (const user of sorted) {
         message += (i + 1) + '. ' + (await global.configuration.getValue('atUsername') ? '@' : '') + (user.username || 'unknown') + ' - ';
-        if (type === 'time') message += (user.watched / 1000 / 60 / 60).toFixed(1) + 'h';
-        else if (type === 'tips') message += user.amount.toFixed(2) + global.currency.symbol(global.currency.settings.currency.mainCurrency);
-        else if (type === 'points') {
-          let points = user.points;
-          message += points + ' ' + await global.systems.points.getPointsName(user.points);
-        } else if (type === 'messages') message += user.messages;
-        else if (type === 'followage') {
-          message += `${moment(user.followage).format('L')} (${moment(user.followage).fromNow()})`;
+        switch (type) {
+          case TYPE.TIME:
+            message += (user.value / 1000 / 60 / 60).toFixed(1) + 'h';
+            break;
+          case TYPE.TIPS:
+            message += user.value.toFixed(2) + global.currency.symbol(global.currency.settings.currency.mainCurrency);
+            break;
+          case TYPE.POINTS:
+            message += user.value + ' ' + await global.systems.points.getPointsName(user.value);
+            break;
+          case TYPE.MESSAGES:
+          case TYPE.BITS:
+          case TYPE.GIFTS:
+            message += String(user.value)
+            break;
+          case TYPE.FOLLOWAGE:
+            message += `${moment(user.value).format('L')} (${moment(user.value).fromNow()})`;
+            break;
         }
         if (i + 1 < 10 && !_.isNil(sorted[i + 1])) message += ', ';
         i++;
@@ -183,8 +207,8 @@ class Top extends System {
     } else {
       message += 'no data available';
     }
+    if (__DEBUG__) global.log.debug(message)
     global.commons.sendMessage(message, opts.sender);
-    */
   }
 }
 
