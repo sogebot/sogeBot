@@ -1,6 +1,6 @@
 <span id="customVariables-edit">
   <span class="title text-default" style="padding: 0 !important;">
-    <a class="btn btn-outline-info" style="border: 0 !important;" href="/#registry/customVariables"><i class="fas fa-chevron-circle-left"></i></a>
+    <a class="btn btn-outline-info" style="border: 0 !important;" href="/#/registry/customVariables/list"><i class="fas fa-chevron-circle-left"></i></a>
     <span style="position: relative; top: 2px;">{{ title }} </span>
     <span style="position: relative; top: 2px;" v-if="isEditation">{{ variableName }}</span>
   </span>
@@ -108,16 +108,32 @@
 
           </div>
         </div>
+
+        <div class="form-group row pl-3 pr-3" v-if="selectedType !== 'eval'">
+          <div class="col">
+              <label for="variable_name_input">{{ commons.translate('registry.customvariables.history') }}</label>
+              <div class="alert alert-danger" v-if="history.length === 0">{{ commons.translate('registry.customvariables.historyIsEmpty') }}</div>
+              <div v-for="h of history" v-else class="alert alert-light p-0 m-0">
+                <div class="row">
+                  <div class="col-4">{{moment(h.timestamp).format('LL')}} {{ moment(h.timestamp).format('LTS') }}</div>
+                  <div class="col-2"><strong>{{ h.sender ? h.sender : 'Dashboard'}}</strong></div>
+                  <div class="col">
+                    {{ h.oldValue }} => {{ h.currentValue}}
+                  </div>
+                </div>
+              </div>
+            </div>
+        </div>
       </form>
 
       <div class="form-group col-md-12" v-if="isEditation">
-          <button type="button" class="btn btn-danger" key="deleting" data-lang="dialog.buttons.delete" v-if="deleteState === 'waiting'" v-on:click="deleteState='deleting'">{{ commons.translate('dialog.buttons.delete') }}</button>
-          <div class="btn-group" role="group" v-if="deleteState === 'deleting'">
-            <button type="button" class="btn btn-danger" key="deleted" data-lang="dialog.buttons.yes" v-on:click="deleteState='deleted'">{{ commons.translate('dialog.buttons.yes') }}</button>
-            <button type="button" class="btn btn-success" key="waiting" data-lang="dialog.buttons.no" v-on:click="deleteState='waiting'">{{ commons.translate('dialog.buttons.no') }}</button>
-          </div>
-          <small class="form-text text-danger" v-html="commons.translate('registry.customvariables.warning')"></small>
+        <button type="button" class="btn btn-danger" key="deleting" data-lang="dialog.buttons.delete" v-if="deleteState === 'waiting'" v-on:click="deleteState='deleting'">{{ commons.translate('dialog.buttons.delete') }}</button>
+        <div class="btn-group" role="group" v-if="deleteState === 'deleting'">
+          <button type="button" class="btn btn-danger" key="deleted" data-lang="dialog.buttons.yes" v-on:click="deleteState='deleted'">{{ commons.translate('dialog.buttons.yes') }}</button>
+          <button type="button" class="btn btn-success" key="waiting" data-lang="dialog.buttons.no" v-on:click="deleteState='waiting'">{{ commons.translate('dialog.buttons.no') }}</button>
         </div>
+        <small class="form-text text-danger" v-html="commons.translate('registry.customvariables.warning')"></small>
+      </div>
     <!-- -->
   </div>
 </span>
@@ -189,6 +205,8 @@
         responseType: 0,
         responseText: '',
 
+        history: [],
+
         hasError: {
           variableName: false,
           selectedType: false,
@@ -201,6 +219,9 @@
         saveState: 0
       },
       methods: {
+        moment: function (args) {
+          return moment(args) // expose moment function
+        },
         toggleReadOnly: function (event) {
           if (event) event.preventDefault()
           this.readOnly = !this.readOnly
@@ -355,17 +376,18 @@
     if (commons.urlParam('id')) {
       customVariablesEdit.socket.emit('load', commons.urlParam('id'), (data) => {
         customVariablesEdit.id = commons.urlParam('id')
-        customVariablesEdit.variableNameInitial = data.variableName
-        customVariablesEdit.variableName = data.variableName
-        customVariablesEdit.description = data.description
-        customVariablesEdit.currentValue = data.currentValue
-        customVariablesEdit.usableOptions = data.usableOptions
-        customVariablesEdit.evalValueInit = data.evalValue
-        customVariablesEdit.selectedRunEvery = data.runEvery
-        customVariablesEdit.selectedType = data.type
-        customVariablesEdit.responseType = data.responseType
-        customVariablesEdit.responseText = data.responseText
-        customVariablesEdit.readOnly = data.readOnly || false
+        customVariablesEdit.variableNameInitial = data.variable.variableName
+        customVariablesEdit.variableName = data.variable.variableName
+        customVariablesEdit.description = data.variable.description
+        customVariablesEdit.currentValue = data.variable.currentValue
+        customVariablesEdit.usableOptions = data.variable.usableOptions
+        customVariablesEdit.evalValueInit = data.variable.evalValue
+        customVariablesEdit.selectedRunEvery = data.variable.runEvery
+        customVariablesEdit.selectedType = data.variable.type
+        customVariablesEdit.responseType = data.variable.responseType
+        customVariablesEdit.responseText = data.variable.responseText
+        customVariablesEdit.readOnly = data.variable.readOnly || false
+        customVariablesEdit.history = _.chunk(_.orderBy(data.history, 'timestamp', 'desc'), 15)[0]
       })
     }
   }

@@ -17,6 +17,7 @@ class CustomVariables {
     if (cluster.isMaster) {
       this.addMenuAndListenersToPanel()
       this.checkIfCacheOrRefresh()
+      global.db.engine.index({ table: 'custom.variables.history', index: 'cvarId' })
     }
   }
 
@@ -68,8 +69,9 @@ class CustomVariables {
         cb()
       })
       socket.on('load', async (id, cb) => {
-        let variable = await global.db.engine.findOne('custom.variables', { _id: String(id) })
-        cb(variable)
+        const variable = await global.db.engine.findOne('custom.variables', { _id: String(id) })
+        const history = await global.db.engine.find('custom.variables.history', { cvarId: String(id) })
+        cb({variable, history})
       })
       socket.on('save', async (data, cb) => {
         var _id
@@ -213,6 +215,7 @@ class CustomVariables {
     let item = await global.db.engine.findOne('custom.variables', { variableName })
     let isOk = true
     let isEval = false
+    let oldValue = null
 
     opts.sender = _.isNil(opts.sender) ? null : opts.sender
     opts.readOnlyBypass = _.isNil(opts.readOnlyBypass) ? false : opts.readOnlyBypass
@@ -224,6 +227,7 @@ class CustomVariables {
       if (item.readOnly && !opts.readOnlyBypass) {
         isOk = false
       } else {
+        oldValue = item.currentValue
         if (item.type === 'number') {
           if (['+', '-'].includes(currentValue)) {
             currentValue = mathjs.eval(`${item.currentValue} ${currentValue} 1`)
@@ -247,8 +251,17 @@ class CustomVariables {
       }
     }
 
-    if (isOk) this.updateWidgetAndTitle(variableName)
+    if (isOk) {
+      this.updateWidgetAndTitle(variableName)
+      if (!isEval) {
+        this.addChangeToHistory({ sender: opts.sender, item, oldValue })
+      }
+    }
     return { updated: item, isOk, isEval }
+  }
+
+  async addChangeToHistory(opts) {
+    await global.db.engine.insert('custom.variables.history', { cvarId: String(opts.item._id), sender: opts.sender, oldValue: opts.oldValue, currentValue: opts.item.currentValue, timestamp: String(new Date())})
   }
 
   async checkIfCacheOrRefresh () {
