@@ -23,9 +23,6 @@ const __DEBUG__ =
   (process.env.DEBUG && process.env.DEBUG.includes('systems.top')) ||
   (process.env.DEBUG && process.env.DEBUG.includes('systems.top.*'));
 
-enum ERROR {
-}
-
 /*
  * !top time
  * !top tips
