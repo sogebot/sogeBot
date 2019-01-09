@@ -4,6 +4,7 @@
   "points": "Top $amount (body): ",
   "messages": "Top $amount (zpravy): ",
   "followage": "Top $amount (followage): ",
+  "subage": "Top $amount (subage): ",
   "bits": "Top $amount (bits): ",
   "gifts": "Top $amount (subgifts): "
 }

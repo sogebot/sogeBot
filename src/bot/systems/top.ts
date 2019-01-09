@@ -14,6 +14,7 @@ enum TYPE {
   POINTS,
   MESSAGES,
   FOLLOWAGE,
+  SUBAGE,
   BITS,
   GIFTS,
 }
@@ -29,6 +30,7 @@ const __DEBUG__ =
  * !top points
  * !top messages
  * !top followage
+ * !top subage
  * !top bits
  * !top gifts
  */
@@ -45,6 +47,7 @@ class Top extends System {
           { name: '!top points', permission: constants.OWNER_ONLY },
           { name: '!top messages', permission: constants.OWNER_ONLY },
           { name: '!top followage', permission: constants.OWNER_ONLY },
+          { name: '!top subage', permission: constants.OWNER_ONLY },
           { name: '!top bits', permission: constants.OWNER_ONLY },
           { name: '!top gifts', permission: constants.OWNER_ONLY },
         ],
@@ -76,6 +79,11 @@ class Top extends System {
 
   public topFollowage(opts) {
     opts.parameters = TYPE.FOLLOWAGE;
+    this.showTop(opts);
+  }
+
+  public topSubage(opts) {
+    opts.parameters = TYPE.SUBAGE;
     this.showTop(opts);
   }
 
@@ -147,6 +155,13 @@ class Top extends System {
         }
         message = global.translate('systems.top.followage').replace(/\$amount/g, 10);
         break;
+      case TYPE.SUBAGE:
+        sorted = [];
+        for (const user of (await global.db.engine.find('users', { _sort: '-time.subscribed_at', _total }))) {
+          sorted.push({ username: user.username, value: user.time.subscribed_at });
+        }
+        message = global.translate('systems.top.subage').replace(/\$amount/g, 10);
+        break;
       case TYPE.BITS:
         sorted = [];
         for (const user of (await global.db.engine.find('users.bits', { _sort: 'amount', _sum: 'amount', _total, _group: 'id' }))) {
@@ -195,6 +210,7 @@ class Top extends System {
             message += String(user.value);
             break;
           case TYPE.FOLLOWAGE:
+          case TYPE.SUBAGE:
             message += `${moment.utc(user.value).format('L')} (${moment.utc(user.value).fromNow()})`;
             break;
         }

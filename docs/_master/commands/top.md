@@ -28,6 +28,12 @@
 
 !> Default permission is **OWNER**
 
+## Top 10 by subage
+
+`!top subage`
+
+!> Default permission is **OWNER**
+
 ## Top 10 by bits
 
 `!top bits`
