@@ -32,6 +32,7 @@ module.exports = {
       await global.db.engine.remove('users.online', {})
       await global.db.engine.remove('users.bits', {})
       await global.db.engine.remove('users.tips', {})
+      await global.db.engine.remove('users.watched', {})
 
       // game fightme
       await global.db.engine.remove('games.fightme.settings', {})

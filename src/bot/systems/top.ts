@@ -21,7 +21,7 @@ enum TYPE {
 const __DEBUG__ =
   (process.env.DEBUG && process.env.DEBUG.includes('systems.*')) ||
   (process.env.DEBUG && process.env.DEBUG.includes('systems.top')) ||
-  (process.env.DEBUG && process.env.DEBUG.includes('systems.top.*'))
+  (process.env.DEBUG && process.env.DEBUG.includes('systems.top.*'));
 
 enum ERROR {
 }
@@ -162,7 +162,7 @@ class Top extends System {
         for (const user of (await global.db.engine.find('users', { _sort: 'custom.subgiftCount', _total }))) {
           sorted.push({ username: user.username, value: user.custom.subgiftCount });
         }
-        message = global.translate('systems.top.subgifts').replace(/\$amount/g, 10);
+        message = global.translate('systems.top.gifts').replace(/\$amount/g, 10);
         break;
     }
 
@@ -195,19 +195,23 @@ class Top extends System {
           case TYPE.MESSAGES:
           case TYPE.BITS:
           case TYPE.GIFTS:
-            message += String(user.value)
+            message += String(user.value);
             break;
           case TYPE.FOLLOWAGE:
-            message += `${moment(user.value).format('L')} (${moment(user.value).fromNow()})`;
+            message += `${moment.utc(user.value).format('L')} (${moment.utc(user.value).fromNow()})`;
             break;
         }
-        if (i + 1 < 10 && !_.isNil(sorted[i + 1])) message += ', ';
+        if (i + 1 < 10 && !_.isNil(sorted[i + 1])) {
+          message += ', ';
+        }
         i++;
       }
     } else {
       message += 'no data available';
     }
-    if (__DEBUG__) global.log.debug(message)
+    if (__DEBUG__) {
+      global.log.debug(message);
+    }
     global.commons.sendMessage(message, opts.sender);
   }
 }

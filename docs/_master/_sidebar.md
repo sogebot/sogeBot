@@ -22,6 +22,7 @@
   * [Polls](_master/commands/polls.md)
   * [Price](_master/commands/price.md)
   * [Songs](_master/commands/songs.md)
+  * [Top](/commands/top.md)
   * [Overlays](_master/commands/overlays.md)
   * [Ranks](_master/commands/ranks.md)
   * [Raffles](_master/commands/raffles.md)
