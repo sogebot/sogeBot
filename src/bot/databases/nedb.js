@@ -125,7 +125,7 @@ class INeDB extends Interface {
           // nedb needs to fake sort
           if (sortBy !== '_id') {
             // remove undefined values in sortBy
-            items = items.filter(o => _.get(o, sortBy, false))
+            items = items.filter(o => _.has(o, sortBy))
           }
           items = _.orderBy(items, sortBy, order)
 

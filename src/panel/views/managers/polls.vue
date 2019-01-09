@@ -157,7 +157,7 @@
 
   import * as moment from 'moment'
   import VueMoment from 'vue-moment'
-  import momentTimezone from 'moment-timezone'
+  import * as momentTimezone from 'moment-timezone'
 
   require('moment/locale/cs')
   require('moment/locale/ru')
