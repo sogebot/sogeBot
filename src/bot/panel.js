@@ -85,11 +85,17 @@ function Panel () {
   app.get('/overlays/:overlay', function (req, res) {
     res.sendFile(path.join(__dirname, '..', 'public', 'overlays.html'))
   })
+  app.get('/overlays/:overlay/:id', function (req, res) {
+    res.sendFile(path.join(__dirname, '..', 'public', 'overlays.html'))
+  })
   app.get('/custom/:custom', function (req, res) {
     res.sendFile(path.join(__dirname, '..', 'public', 'custom', req.params.custom + '.html'))
   })
   app.get('/public/:public', function (req, res) {
     res.sendFile(path.join(__dirname, '..', 'public', 'public', req.params.public + '.html'))
+  })
+  app.get('/fonts', function (req, res) {
+    res.sendFile(path.join(__dirname, '..', 'fonts.json'))
   })
   app.get('/favicon.ico', function (req, res) {
     res.sendFile(path.join(__dirname, '..', 'public', 'favicon.ico'))
@@ -98,12 +104,15 @@ function Panel () {
     res.sendFile(path.join(__dirname, '..', 'public', 'index.html'))
   })
   app.get('/:type/registry/:subtype/:page', this.authUser, function (req, res) {
-    res.sendFile(path.join(__dirname, '..', 'public', req.params.type, 'registry', req.params.subtype, req.params.page))
+    const file = path.join(__dirname, '..', 'public', req.params.type, 'registry', req.params.subtype, req.params.page)
+    if (fs.existsSync(file)) {
+      res.sendFile(file)
+    }
   })
   app.get('/:type/:subtype/:page', this.authUser, function (req, res) {
     const file = path.join(__dirname, '..', 'public', req.params.type, req.params.subtype, req.params.page)
     if (fs.existsSync(file)) {
-      res.sendFile(path.join(__dirname, '..', 'public', req.params.type, req.params.subtype, req.params.page))
+      res.sendFile(file)
     }
   })
   app.get('/:type/:page', this.authUser, function (req, res) {
@@ -284,6 +293,11 @@ function Panel () {
     socket.on('getConfiguration', async function (cb) {
       var data = {}
       for (let key of global.configuration.sets(global.configuration)) data[key] = await global.configuration.getValue(key)
+
+      // currencies
+      data.currency = global.currency.settings.currency.mainCurrency
+      data.currencySymbol = global.currency.symbol(global.currency.settings.currency.mainCurrency)
+
       if (_.isFunction(cb)) cb(data)
       else socket.emit('configuration', data)
     })

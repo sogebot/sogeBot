@@ -4,7 +4,7 @@ export default async function(variable) {
   return new Promise((resolve, reject) => {
     const check = async (r, retry) => {
       if (typeof global[variable] === 'undefined' || _.size(global[variable]) === 0) {
-        if (retry > 100) {
+        if (retry > 500) {
           reject(variable + ' variable was not loaded');
         } else {
           setTimeout(() => {

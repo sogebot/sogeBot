@@ -222,6 +222,25 @@ class Webhooks {
           })
           global.log.follow(data.from_name)
           global.events.fire('follow', { username: data.from_name, webhooks: true })
+
+          // go through all systems and trigger on.follow
+          for (let [type, systems] of Object.entries({
+            systems: global.systems,
+            games: global.games,
+            overlays: global.overlays,
+            widgets: global.widgets,
+            integrations: global.integrations
+          })) {
+            for (let [name, system] of Object.entries(systems)) {
+              if (name.startsWith('_') || typeof system.on === 'undefined') continue
+              if (typeof system.on.follow === 'function') {
+                system.on.follow({
+                  username: data.from_name,
+                  userId: data.from_id,
+                })
+              }
+            }
+          }
         }
       }
 

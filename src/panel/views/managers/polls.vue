@@ -11,7 +11,7 @@
     </div>
 
     <panel ref="panel" class="pt-3 pb-3 mt-3 mb-3 m-0 border-top border-bottom row"
-      :options="{ hideNewButton: true, hideTableButton: true }"
+      :options="{ hideTableButton: true }"
       @search="search = $event"></panel>
 
     <template v-for="(chunkVotes, index) of _.chunk(filteredVotes, itemsPerPage)">

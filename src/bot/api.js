@@ -806,6 +806,25 @@ class API {
                 if (!quiet && !await global.commons.isBot(user.username)) {
                   global.log.follow(user.username)
                   global.events.fire('follow', { username: user.username })
+
+                  // go through all systems and trigger on.follow
+                  for (let [type, systems] of Object.entries({
+                    systems: global.systems,
+                    games: global.games,
+                    overlays: global.overlays,
+                    widgets: global.widgets,
+                    integrations: global.integrations
+                  })) {
+                    for (let [name, system] of Object.entries(systems)) {
+                      if (name.startsWith('_') || typeof system.on === 'undefined') continue
+                      if (typeof system.on.follow === 'function') {
+                        system.on.follow({
+                          username: user.username,
+                          userId: f.from_id,
+                        })
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -937,10 +956,18 @@ class API {
             justStarted = true
 
             // go through all systems and trigger on.streamEnd
-            for (let [name, system] of Object.entries(global.systems)) {
-              if (name.startsWith('_')) continue
-              if (typeof system.on.streamStart === 'function') {
-                system.on.streamStart()
+            for (let [type, systems] of Object.entries({
+              systems: global.systems,
+              games: global.games,
+              overlays: global.overlays,
+              widgets: global.widgets,
+              integrations: global.integrations
+            })) {
+              for (let [name, system] of Object.entries(systems)) {
+                if (name.startsWith('_') || typeof system.on === 'undefined') continue
+                if (typeof system.on.streamStart === 'function') {
+                  system.on.streamStart()
+                }
               }
             }
           }
@@ -1004,10 +1031,18 @@ class API {
             global.events.fire('number-of-viewers-is-at-least-x', { reset: true })
 
             // go through all systems and trigger on.streamEnd
-            for (let [name, system] of Object.entries(global.systems)) {
-              if (name.startsWith('_')) continue
-              if (typeof system.on.streamEnd === 'function') {
-                system.on.streamEnd()
+            for (let [type, systems] of Object.entries({
+              systems: global.systems,
+              games: global.games,
+              overlays: global.overlays,
+              widgets: global.widgets,
+              integrations: global.integrations
+            })) {
+              for (let [name, system] of Object.entries(systems)) {
+                if (name.startsWith('_') || typeof system.on === 'undefined') continue
+                if (typeof system.on.streamEnd === 'function') {
+                  system.on.streamEnd()
+                }
               }
             }
           }
@@ -1424,6 +1459,25 @@ class API {
         })
         global.log.follow(user.username)
         global.events.fire('follow', { username: user.username })
+
+        // go through all systems and trigger on.follow
+        for (let [type, systems] of Object.entries({
+          systems: global.systems,
+          games: global.games,
+          overlays: global.overlays,
+          widgets: global.widgets,
+          integrations: global.integrations
+        })) {
+          for (let [name, system] of Object.entries(systems)) {
+            if (name.startsWith('_') || typeof system.on === 'undefined') continue
+            if (typeof system.on.follow === 'function') {
+              system.on.follow({
+                username: user.username,
+                userId: user.id,
+              })
+            }
+          }
+        }
       }
       const followedAt = user.lock && user.lock.followed_at ? Number(user.time.follow) : parseInt(moment(request.data.data[0].followed_at).format('x'), 10)
       const isFollower = user.lock && user.lock.follower ? user.is.follower : true

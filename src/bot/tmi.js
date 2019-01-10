@@ -137,14 +137,22 @@ class TMI extends Core {
             global.linesParsed++
 
             // go through all systems and trigger on.message
-            for (let [name, system] of Object.entries(global.systems)) {
-              if (name.startsWith('_')) continue
-              if (typeof system.on.message === 'function') {
-                system.on.message({
-                  sender: message.tags,
-                  message: message.message,
-                  timestamp: _.now()
-                })
+            for (let [type, systems] of Object.entries({
+              systems: global.systems,
+              games: global.games,
+              overlays: global.overlays,
+              widgets: global.widgets,
+              integrations: global.integrations
+            })) {
+              for (let [name, system] of Object.entries(systems)) {
+                if (name.startsWith('_') || typeof system.on === 'undefined') continue
+                if (typeof system.on.message === 'function') {
+                  system.on.message({
+                    sender: message.tags,
+                    message: message.message,
+                    timestamp: _.now()
+                  })
+                }
               }
             }
 
@@ -283,6 +291,24 @@ class TMI extends Core {
       global.overlays.eventlist.add({ type: 'sub', tier: (method.prime ? 'Prime' : method.plan / 1000), username, method: (!_.isNil(method.prime) && method.prime) ? 'Twitch Prime' : '' })
       global.log.sub(`${username}, tier: ${method.prime ? 'Prime' : method.plan / 1000}`)
       global.events.fire('subscription', { username: username, method: (!_.isNil(method.prime) && method.prime) ? 'Twitch Prime' : '' })
+      // go through all systems and trigger on.sub
+      for (let [type, systems] of Object.entries({
+        systems: global.systems,
+        games: global.games,
+        overlays: global.overlays,
+        widgets: global.widgets,
+        integrations: global.integrations
+      })) {
+        for (let [name, system] of Object.entries(systems)) {
+          if (name.startsWith('_') || typeof system.on === 'undefined') continue
+          if (typeof system.on.sub === 'function') {
+            system.on.sub({
+              username: username,
+              userId: userstate.userId,
+            })
+          }
+        }
+      }
     } catch (e) {
       global.log.error('Error parsing subscription event')
       global.log.error(JSON.stringify(message))
@@ -364,6 +390,24 @@ class TMI extends Core {
         this.ignoreGiftsFromUser[username].count--
       } else {
         global.events.fire('subgift', { username: username, recipient: recipient })
+        // go through all systems and trigger on.sub
+        for (let [type, systems] of Object.entries({
+          systems: global.systems,
+          games: global.games,
+          overlays: global.overlays,
+          widgets: global.widgets,
+          integrations: global.integrations
+        })) {
+          for (let [name, system] of Object.entries(systems)) {
+            if (name.startsWith('_') || typeof system.on === 'undefined') continue
+            if (typeof system.on.sub === 'function') {
+              system.on.sub({
+                username: recipient,
+                userId: recipientId,
+              })
+            }
+          }
+        }
       }
       if (await global.commons.isIgnored(username)) return
 
@@ -411,15 +455,23 @@ class TMI extends Core {
       if (await global.cache.isOnline()) await global.db.engine.increment('api.current', { key: 'bits' }, { value: parseInt(userstate.bits, 10) })
 
       // go through all systems and trigger on.bit
-      for (let [name, system] of Object.entries(global.systems)) {
-        if (name.startsWith('_')) continue
-        if (typeof system.on.bit === 'function') {
-          system.on.bit({
-            username: username,
-            amount: userstate.bits,
-            message: messageFromUser,
-            timestamp: _.now()
-          })
+      for (let [type, systems] of Object.entries({
+        systems: global.systems,
+        games: global.games,
+        overlays: global.overlays,
+        widgets: global.widgets,
+        integrations: global.integrations
+      })) {
+        for (let [name, system] of Object.entries(systems)) {
+          if (name.startsWith('_') || typeof system.on === 'undefined') continue
+          if (typeof system.on.bit === 'function') {
+            system.on.bit({
+              username: username,
+              amount: userstate.bits,
+              message: messageFromUser,
+              timestamp: _.now()
+            })
+          }
         }
       }
     } catch (e) {
