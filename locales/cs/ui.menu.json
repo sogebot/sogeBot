@@ -61,5 +61,6 @@
   "bot": "Bot",
   "api": "API",
   "polls": "Hlasování",
-  "manage": "Správa"
+  "manage": "Správa",
+  "top": "Top"
 }
