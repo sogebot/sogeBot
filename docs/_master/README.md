@@ -71,6 +71,7 @@ You can also contact me on my email sogehige@gmail.com or get support on our [di
 | Eventlist        | Show last events                                                      |
 | Wheel Of Fortune | Show wheel of fortune spin                                            |
 | Bets             | Show current bet                                                      |
+| Goals            | Show your goals!                                                      |
 
 #### Languages
 

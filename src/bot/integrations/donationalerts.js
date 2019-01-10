@@ -101,16 +101,24 @@ class Donationalerts extends Integration {
         }
 
         // go through all systems and trigger on.tip
-        for (let [name, system] of Object.entries(global.systems)) {
-          if (name.startsWith('_')) continue
-          if (typeof system.on.tip === 'function') {
-            system.on.tip({
-              username: data.username.toLowerCase(),
-              amount: data.amount,
-              message: data.message,
-              currency: data.currency,
-              timestamp: _.now()
-            })
+        for (let [type, systems] of Object.entries({
+          systems: global.systems,
+          games: global.games,
+          overlays: global.overlays,
+          widgets: global.widgets,
+          integrations: global.integrations
+        })) {
+          for (let [name, system] of Object.entries(systems)) {
+            if (name.startsWith('_') || typeof system.on === 'undefined') continue
+            if (typeof system.on.tip === 'function') {
+              system.on.tip({
+                username: data.username.toLowerCase(),
+                amount: data.amount,
+                message: data.message,
+                currency: data.currency,
+                timestamp: _.now()
+              })
+            }
           }
         }
       })

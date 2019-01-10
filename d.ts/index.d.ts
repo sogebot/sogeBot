@@ -31,6 +31,31 @@ type Command = {
   permission?: number
 }
 
+type onEventSub = {
+  username: string,
+  userId: string
+}
+
+type onEventFollow = {
+  username: string,
+  userId: string
+}
+
+type onEventTip = {
+  username: string,
+  amount: number,
+  message: string,
+  currency: string,
+  timestamp: string
+}
+
+type onEventBit = {
+  username: string,
+  amount: number,
+  message: string,
+  timestamp: string
+}
+
 type InterfaceSettings = {
   settings?: {
     commands?: Array<Command | string>,
@@ -44,19 +69,10 @@ type InterfaceSettings = {
       message: string,
       timestamp: string
     }) => void,
-    tip?: (tip: {
-      username: string,
-      amount: number,
-      message: string,
-      currency: string,
-      timestamp: string
-    }) => void,
-    bit?: (bit: {
-      username: string,
-      amount: number,
-      message: string,
-      timestamp: string
-    }) => void,
+    sub?: (syb: onEventSub) => void,
+    follow?: (follow: onEventFollow) => void,
+    tip?: (tip: onEventTip) => void,
+    bit?: (bit: onEventBit) => void,
     streamStart?: () => void,
     streamEnd?: () => void,
     change?: Array<{
@@ -64,9 +80,10 @@ type InterfaceSettings = {
     }>
   },
   ui?: {
+    _hidden?: Boolean,
     [s: string]: {
       [s: string]: UISelector | UILink | UINumberInput
-    }
+    } | Boolean | undefined
   }
 }
 
@@ -98,7 +115,7 @@ type CommandOptions = {
   parameters: string
 }
 
-declare interface Vote {
+type Vote = {
   _id?: any;
   vid: string;
   votedBy: string;
@@ -106,7 +123,7 @@ declare interface Vote {
   option: number;
 }
 
-declare interface Poll {
+type Poll = {
   _id?: any;
   type: 'tips' | 'bits' | 'normal';
   title: string;

@@ -270,6 +270,28 @@ class Module {
           }
           setTimeout(() => cb(null), 1000)
         })
+        // difference between set and update is that set will set exact 1:1 values of opts.items
+        // so it will also DELETE additional data
+        socket.on('set', async (opts, cb) => {
+          opts.collection = opts.collection || 'data'
+          opts.items = opts.items || []
+          if (opts.collection.startsWith('_')) {
+            opts.collection = opts.collection.replace('_', '')
+          } else opts.collection = this.collection[opts.collection]
+
+          // get all items by where
+          if (opts.where === null || typeof opts.where === 'undefined') {
+            return cb(new Error('Where cannot be empty!'))
+          }
+
+          // remove all data
+          await global.db.engine.remove(opts.collection, opts.where)
+          for (const item of opts.items) {
+            delete item._id;
+            await global.db.engine.insert(opts.collection, item)
+          }
+          cb(null, true)
+        })
         socket.on('update', async (opts, cb) => {
           opts.collection = opts.collection || 'data'
           if (opts.collection.startsWith('_')) {

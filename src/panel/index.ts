@@ -11,6 +11,7 @@ import * as _ from 'lodash';
 
 import isAvailableVariable from './helpers/isAvailableVariable';
 import translate from './helpers/translate';
+import urlParam from './helpers/urlParam';
 
 export interface Global {
   translations: any;
@@ -26,6 +27,8 @@ declare module 'vue/types/vue' {
     configuration: any;
     $moment?: any;
     _: _.LoDashStatic;
+    urlParam(key: string): string | null;
+    translate(id: string): string;
   }
 }
 
@@ -39,6 +42,7 @@ const main = async () => {
 
   // init prototypes
   Vue.prototype.translate = (v) => translate(v);
+  Vue.prototype.urlParam = (v) => urlParam(v);
   Vue.prototype.token = token;
   Vue.prototype.configuration = global.configuration;
   Vue.prototype._ = _;
@@ -48,6 +52,8 @@ const main = async () => {
     base: __dirname,
     routes: [
       { path: '/manage/polls', name: 'PollsManager', component: () => import('./views/managers/polls.vue') },
+      { path: '/registry/goals/list', name: 'GoalsRegistryList', component: () => import('./views/registries/goalsList.vue') },
+      { path: '/registry/goals/edit/:id?', name: 'GoalsRegistryEdit', component: () => import('./views/registries/goalsEdit.vue') },
     ],
   });
 

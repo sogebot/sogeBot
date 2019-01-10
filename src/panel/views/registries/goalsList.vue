@@ -1,0 +1,218 @@
+<template>
+  <div class="container-fluid" ref="window">
+    <div class="row">
+      <div class="col-12">
+        <span class="title text-default mb-2">
+          {{ translate('menu.registry') }}
+          <small><i class="fas fa-angle-right"></i></small>
+          {{ translate('menu.goals') }}
+        </span>
+      </div>
+    </div>
+
+    <panel ref="panel" class="pt-3 pb-3 mt-3 mb-3 m-0 border-top border-bottom row"
+      :options="{
+        leftButtons: [
+          {
+            href: '#/registry/goals/edit',
+            text: translate('registry.goals.addGoalGroup'),
+            class: 'btn-primary',
+            icon: 'plus'
+          }
+        ],
+        hideTableButton: true
+      }"
+      @search="search = $event"></panel>
+
+    <div class="card-deck" v-for="(chunk, index) of _.chunk(_.orderBy(groupsFiltered, 'createdAt', 'desc'), itemsPerPage)" :key="index">
+      <div class="card mb-2 p-0" :class="['col-' + (12 / itemsPerPage)]" v-for="group of chunk" :key="group.uid">
+        <div class="card-header">
+          <strong>{{group.name}}</strong> <small class="text-muted">{{group.uid}}</small>
+        </div>
+        <div class="card-body">
+          <dl class="row">
+            <dt class="col-6">{{translate('registry.goals.input.displayAs.title')}}</dt>
+            <dd class="col-6">{{group.display.type}}</dd>
+            <template v-if="group.display.type === 'fade'">
+              <dt class="col-6">{{translate('registry.goals.input.durationMs.title')}}</dt>
+              <dd class="col-6">{{group.display.durationMs}}ms</dd>
+              <dt class="col-6">{{translate('registry.goals.input.animationInMs.title')}}</dt>
+              <dd class="col-6">{{group.display.animationInMs}}ms</dd>
+              <dt class="col-6">{{translate('registry.goals.input.animationOutMs.title')}}</dt>
+              <dd class="col-6">{{group.display.animationOutMs}}ms</dd>
+            </template>
+          </dl>
+          <ul class="list-group list-group-flush border-top-0">
+            <li v-for="goal of _.filter(goals, (o) => o.groupId === group.uid)" :key="goal.uid" class="list-group-item">
+              <dl class="row">
+                <h5 class="col-12">{{goal.name}}</h5>
+                <dt class="col-6">{{translate('registry.goals.input.type.title')}}</dt>
+                <dd class="col-6">{{goal.type}}</dd>
+
+                <dt class="col-6">{{translate('registry.goals.input.goalAmount.title')}}</dt>
+                <dd class="col-6">{{goal.goalAmount}}</dd>
+
+                <dt class="col-6">{{translate('registry.goals.input.endAfter.title')}}</dt>
+                <dd class="col-6">{{goal.endAfter}}</dd>
+              </dl>
+            </li>
+          </ul>
+        </div>
+        <div class="card-footer text-right">
+          <hold-button class="btn-danger btn-shrink" @trigger="removeGoal(group.uid)" :holdtitle="translate('dialog.buttons.hold-to-delete')" :title="translate('dialog.buttons.delete')" icon="trash"></hold-button>
+          <button-with-icon
+            :text="'/overlays/goals/' + group.uid"
+            :href="'/overlays/goals/' + group.uid"
+            class="btn-dark btn-reverse btn-shrink"
+            icon="link"
+            target="_blank"
+            />
+          <button-with-icon
+            :text="translate('dialog.buttons.edit')"
+            :href="'#/registry/goals/edit/' + group.uid"
+            class="btn-primary btn-reverse btn-shrink"
+            icon="edit"
+            />
+        </div>
+      </div>
+
+      <!-- add empty cards -->
+      <template v-if="chunk.length !== itemsPerPage">
+        <div class="card col-4" style="visibility: hidden" v-for="i in itemsPerPage - (chunk.length % itemsPerPage)" v-bind:key="i"></div>
+      </template>
+    </div>
+  </div>
+</template>
+
+<script lang="ts">
+  import Vue from 'vue'
+
+  import * as io from 'socket.io-client';
+
+  import { library } from '@fortawesome/fontawesome-svg-core'
+  import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+
+  library.add()
+
+  export default Vue.extend({
+    components: {
+      panel: () => import('../../components/panel.vue'),
+      holdButton: () => import('../../components/holdButton.vue'),
+      'font-awesome-icon': FontAwesomeIcon,
+      'button-with-icon': () => import('../../components/button.vue'),
+    },
+    data: function () {
+      const object: {
+        groups: Goals.Group[],
+        goals: Goals.Goal[],
+        socket: any,
+        search: string,
+        currentTime: any,
+        domWidth: number,
+        interval: number,
+        isMounted: boolean,
+      } = {
+        socket: io('/overlays/goals', { query: "token=" + this.token }),
+        search: '',
+        groups: [],
+        goals: [],
+        currentTime: 0,
+        domWidth: 0,
+        interval: 0,
+        isMounted: false,
+      }
+      return object
+    },
+    computed: {
+      groupsFiltered: function () {
+        return this.groups.filter((o: Goals.Group) => {
+          return o.name.includes(this.search)
+        })
+      },
+      itemsPerPage: function () {
+        if(!this.isMounted) return 3
+        else {
+          if (this.domWidth > 1400) return 3
+          else if (this.domWidth > 850) return 2
+          else return 1
+        }
+      },
+    },
+    mounted: function() {
+      this.domWidth = (this.$refs['window'] as HTMLElement).clientWidth
+      this.currentTime = Date.now()
+      this.isMounted = true
+      this.interval = window.setInterval(() => {
+        this.domWidth = (this.$refs['window'] as HTMLElement).clientWidth
+        this.currentTime = Date.now()
+      }, 1000)
+
+      this.socket.emit('find', { collection: 'groups' }, (err: Error, groups: Goals.Group[]) => {
+        this.groups = groups
+      });
+      this.socket.emit('find', { collection: 'goals' }, (err: Error, goals: Goals.Goal[]) => {
+        this.goals = goals
+      });
+    },
+    beforeDestroy: function () {
+      clearInterval(this.interval)
+    },
+    methods: {
+      removeGoal: function (uid) {
+        console.debug(' => Removing', uid)
+
+        this.socket.emit('delete', { collection: 'groups', where: { uid }}, (err, d) => {
+          this.socket.emit('delete', { collection: 'goals', where: { groupId: uid } }, (err, d) => {
+            this.groups = this.groups.filter(o => o.uid != uid)
+          })
+        })
+      }
+    }
+  })
+</script>
+
+<style scoped>
+  .current {
+    font-weight: bold;
+    position: absolute;
+    font-family: 'PT Sans Narrow', sans-serif;
+    right: .4rem;
+    font-size: 0.7rem;
+    top: 0.2rem;
+  }
+
+  .options.first {
+    padding-top: 1rem;
+  }
+
+  .options.last {
+    padding-bottom: 1rem;
+  }
+
+  #footer {
+    text-align: center;
+  }
+
+  .numbers {
+    padding: 0 1rem 0 0;
+    width: 1%;
+  }
+
+  .percentage {
+    padding: 0;
+    width: 80px;
+    text-align: right;
+  }
+
+  .background-bar, .bar {
+    position: relative;
+    top: 1rem;
+    height: 1rem;
+    width: 100%;
+  }
+
+  .bar {
+    position: relative;
+    top: 0rem;
+  }
+</style>
