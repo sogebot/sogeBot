@@ -3,4 +3,5 @@
 
 - [ ] tests are included
 - [ ] documentation is changed or added
+- [ ] locales are changed or added
 - [ ] commit message follows [commit guidelines](https://github.com/sogehige/sogeBot/blob/master/CONTRIBUTING.md#commit-guidelines)

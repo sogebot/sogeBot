@@ -1,6 +1,6 @@
 {
   "settings": {
-    "status": "Status",
+    "enabled": "Status",
     "theme": "Theme",
     "hideAfterInactivity": "Skrýt při neaktivitě",
     "align": "Zarovnání",

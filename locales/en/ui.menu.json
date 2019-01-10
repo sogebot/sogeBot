@@ -61,5 +61,6 @@
   "bot": "Bot",
   "api": "API",
   "polls": "Polls",
-  "manage": "Manage"
+  "manage": "Manage",
+  "top": "Top"
 }
