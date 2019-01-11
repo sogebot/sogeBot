@@ -57,42 +57,42 @@ class Top extends System {
     super(options);
   }
 
-  public topTime(opts) {
+  public time(opts) {
     opts.parameters = TYPE.TIME;
     this.showTop(opts);
   }
 
-  public topTips(opts) {
+  public tips(opts) {
     opts.parameters = TYPE.TIPS;
     this.showTop(opts);
   }
 
-  public topPoints(opts) {
+  public points(opts) {
     opts.parameters = TYPE.POINTS;
     this.showTop(opts);
   }
 
-  public topMessages(opts) {
+  public messages(opts) {
     opts.parameters = TYPE.MESSAGES;
     this.showTop(opts);
   }
 
-  public topFollowage(opts) {
+  public followage(opts) {
     opts.parameters = TYPE.FOLLOWAGE;
     this.showTop(opts);
   }
 
-  public topSubage(opts) {
+  public subage(opts) {
     opts.parameters = TYPE.SUBAGE;
     this.showTop(opts);
   }
 
-  public topBits(opts) {
+  public bits(opts) {
     opts.parameters = TYPE.BITS;
     this.showTop(opts);
   }
 
-  public topGifts(opts) {
+  public gifts(opts) {
     opts.parameters = TYPE.GIFTS;
     this.showTop(opts);
   }

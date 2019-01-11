@@ -516,6 +516,7 @@ class Module {
             id: command,
             command: await this.settings.commands[command],
             fnc: this[fnc],
+            _fncName: fnc,
             permission: constants.VIEWERS,
             isHelper: false
           })
@@ -553,6 +554,7 @@ class Module {
             id: command.name,
             command: command.command,
             fnc: this[command.fnc],
+            _fncName: command.fnc,
             permission: command.permission,
             isHelper: command.isHelper ? command.isHelper : false
           })
