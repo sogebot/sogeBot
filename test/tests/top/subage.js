@@ -32,7 +32,7 @@ describe('Top - !top subage', () => {
   })
 
   it('run !top subage and expect correct output', async () => {
-    global.systems.top.topSubage({ sender: { username: global.commons.getOwner() } })
+    global.systems.top.subage({ sender: { username: global.commons.getOwner() } })
     const dates = []
     for (let i = 0; i < 10; i++) {
       dates.push(`${moment.utc(Date.now() - (constants.HOUR * i)).format('L')} (${moment.utc(Date.now() - (constants.HOUR * i)).fromNow()})`)

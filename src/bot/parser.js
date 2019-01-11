@@ -180,7 +180,7 @@ class Parser {
 
       if (typeof command.fnc === 'function' && !_.isNil(command.id)) {
         command['fnc'].apply(command.this, [opts])
-      } else global.log.error(command.command + ' have wrong null function registered!', { fnc: 'Parser.prototype.parseCommands' })
+      } else global.log.error(command.command + ' have wrong undefined function ' + command._fncName + '() registered!', { fnc: 'Parser.prototype.parseCommands' })
     } else {
       // user doesn't have permissions for command
       sender['message-type'] = 'whisper'
