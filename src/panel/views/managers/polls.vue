@@ -306,7 +306,7 @@
         if (typeof vote === 'object') {
           vote.isOpened = false;
           vote.closedAt = String(new Date());
-          this.socket.emit('update', { items: [vote] }, (err, data) => {
+          this.socket.emit('close', vote, (err) => {
             if (err) console.error(err)
           })
         }

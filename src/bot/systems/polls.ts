@@ -71,7 +71,7 @@ class Polls extends System {
         try {
           const parameters = `-${vote.type} -title "${vote.title}" ${vote.options.filter((o) => o.trim().length > 0).join(' | ')}`;
           this.open({
-            command: this.settings.commands['!vote'],
+            command: this.settings.commands['!poll open'],
             parameters,
             sender: {
               username: global.commons.getOwner(),
@@ -80,6 +80,20 @@ class Polls extends System {
           cb(null, null);
         } catch (e) {
           cb(e.stack, null);
+        }
+      });
+      socket.on('close', async (vote: Poll, cb) => {
+        try {
+          this.close({
+            command: this.settings.commands['!poll close'],
+            parameters: '',
+            sender: {
+              username: global.commons.getOwner(),
+            },
+          });
+          cb(null);
+        } catch (e) {
+          cb(e.stack);
         }
       });
     });

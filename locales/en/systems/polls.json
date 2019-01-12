@@ -5,6 +5,6 @@
   "notEnoughOptions": "$sender, new poll must have at least 2 options!",
   "notInProgress": "$sender, there is currently no poll in progress!",
   "status": "$sender, current status of poll \"$title\":",
-  "status_closed": "$sender, poll \"$title\" closed, status of voting:",
+  "status_closed": "Poll \"$title\" closed, status of voting:",
   "votes": "vote|votes"
 }
