@@ -150,14 +150,14 @@ class Top extends System {
         break;
       case TYPE.FOLLOWAGE:
         sorted = [];
-        for (const user of (await global.db.engine.find('users', { _sort: '-time.follow', _total }))) {
+        for (const user of (await global.db.engine.find('users', { is: { follower: true }, _sort: '-time.follow', _total }))) {
           sorted.push({ username: user.username, value: user.time.follow });
         }
         message = global.translate('systems.top.followage').replace(/\$amount/g, 10);
         break;
       case TYPE.SUBAGE:
         sorted = [];
-        for (const user of (await global.db.engine.find('users', { _sort: '-time.subscribed_at', _total }))) {
+        for (const user of (await global.db.engine.find('users', { is: { subscriber: true }, _sort: '-time.subscribed_at', _total }))) {
           sorted.push({ username: user.username, value: user.time.subscribed_at });
         }
         message = global.translate('systems.top.subage').replace(/\$amount/g, 10);
