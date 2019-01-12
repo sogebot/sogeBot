@@ -5,6 +5,6 @@
   "notEnoughOptions": "$sender, nove hlasovani musi mit alespon dve moznosti!",
   "notInProgress": "$sender, neprobiha prave zadne hlasovani!",
   "status": "$sender, momentalni stav hlasovani \"$title\":",
-  "status_closed": "$sender, hlasovani \"$title\" uzavreno, finalni stav hlasovani:",
+  "status_closed": "Hlasovani \"$title\" uzavreno, finalni stav hlasovani:",
   "votes": "hlas|4:hlasy|hlasu"
 }
