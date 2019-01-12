@@ -24,11 +24,28 @@ describe('Top - !top followage', () => {
       await global.db.engine.insert('users', {
         id,
         username: 'user' + i,
+        is: {
+          follower: true
+        },
         time: {
           follow: Date.now() - (constants.HOUR * i)
         }
       })
     }
+  })
+
+  it ('Add user with long followage but not follower', async () => {
+    const id = String(Math.floor(Math.random() * 100000))
+    await global.db.engine.insert('users', {
+      id,
+      username: 'user11',
+      is: {
+        follower: false
+      },
+      time: {
+        follow: Date.now() - (constants.HOUR * 24 * 30)
+      }
+    })
   })
 
   it('run !top followage and expect correct output', async () => {

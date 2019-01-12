@@ -24,11 +24,28 @@ describe('Top - !top subage', () => {
       await global.db.engine.insert('users', {
         id,
         username: 'user' + i,
+        is: {
+          subscriber: true
+        },
         time: {
           subscribed_at: Date.now() - (constants.HOUR * i)
         }
       })
     }
+  })
+
+  it ('Add user with long subage but not subscriber', async () => {
+    const id = String(Math.floor(Math.random() * 100000))
+    await global.db.engine.insert('users', {
+      id,
+      username: 'user11',
+      is: {
+        subscriber: false
+      },
+      time: {
+        subscribed_at: Date.now() - (constants.HOUR * 24 * 30)
+      }
+    })
   })
 
   it('run !top subage and expect correct output', async () => {
