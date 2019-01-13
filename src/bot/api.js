@@ -625,6 +625,14 @@ class API {
     for (let id of subscribers) {
       await global.db.engine.update('users', { id }, { is: { subscriber: true }})
     }
+
+    // update all subscribed_at
+    const subscribersAfter = await global.db.engine.find('users', { is: { subscriber: true } })
+    for (let user of subscribersAfter) {
+      if (typeof user.time !== 'undefined' && typeof user.time.subscribed_at !== 'undefined') {
+        await global.db.engine.update('users', { _id: String(user._id) }, { time: { subscribed_at: new Date(user.time.subscribed_at).getTime() }})
+      }
+    }
   }
 
   async getChannelDataOldAPI (opts) {
