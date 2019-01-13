@@ -223,7 +223,7 @@ class API {
             if (typeof value.opts !== 'undefined') this.timeouts['getChannelSubscribersOldAPI'].opts = value.opts
             setTimeout(() => {
               this.timeouts['getChannelSubscribersOldAPI'].isRunning = false
-            }, 60000)
+            }, constants.MINUTE * 2)
           } else { // else run next tick
             this.timeouts['getChannelSubscribersOldAPI'].isRunning = false
           }
@@ -537,11 +537,17 @@ class API {
     return { state: true, opts }
   }
 
-  async getChannelSubscribersOldAPI () {
+  async getChannelSubscribersOldAPI (opts) {
     if (cluster.isWorker) throw new Error('API can run only on master')
 
+    opts = opts || {}
+    opts.subscribers = opts.subscribers || []
+    opts.offset = opts.offset || 0
+    const subscribers = Array.from(opts.subscribers)
+    const limit = 100
+
     const cid = global.oauth.channelId
-    const url = `https://api.twitch.tv/kraken/channels/${cid}/subscriptions?limit=100`
+    const url = `https://api.twitch.tv/kraken/channels/${cid}/subscriptions?limit=${limit}&offset=${opts.offset}`
 
     const token = await global.oauth.settings.broadcaster.accessToken
     const needToWait = _.isNil(cid) || cid === '' || _.isNil(global.overlays) || token === ''
@@ -562,15 +568,21 @@ class API {
 
       this.retries.getChannelSubscribersOldAPI = 0 // reset retry
 
-      await global.db.engine.update('api.current', { key: 'subscribers' }, { value: request.data._total - 1 })
-
-      const subscribers = _.map(request.data.subscriptions, 'user')
-
       // set subscribers
-      for (let subscriber of subscribers) {
-        if (subscriber.name === global.commons.getBroadcaster || subscriber.name === global.oauth.settings.bot.username) continue
-        await global.db.engine.update('users', { id: subscriber._id }, { username: subscriber.name, is: { subscriber: true } })
+      for (let subscriber of _.map(request.data.subscriptions, 'user')) {
+        if (subscriber.name === global.commons.getBroadcaster() || subscriber.name === global.oauth.settings.bot.username) continue
+        console.log(subscriber)
+        opts.subscribers.push(subscriber._id)
       }
+
+      if (subscribers.length === opts.subscribers.length) {
+        await global.db.engine.update('api.current', { key: 'subscribers' }, { value: request.data._total - 1 })
+        this.setSubscribers(subscribers)
+      } else {
+        opts.offset = opts.offset + limit
+        this.getChannelSubscribersOldAPI(opts)
+      }
+
     } catch (e) {
       const isChannelPartnerOrAffiliate =
         !(e.message !== '422 Unprocessable Entity' ||
@@ -592,6 +604,26 @@ class API {
       }
     }
     return { state: true, disable }
+  }
+
+  async setSubscribers (subscribers) {
+    const currentSubscribers = await global.db.engine.find('users', { is: { subscriber: true } })
+
+    // check if current subscribers are still subs
+    for (let user of currentSubscribers) {
+      await global.db.engine.update('users', { id: user.id }, { is: { subscriber: subscribers.includes(user.id) } })
+
+      // remove id if parsed
+      const idx = subscribers.indexOf(user.id);
+      if (idx > -1) {
+        subscribers.splice(idx, 1);
+      }
+    }
+
+    // set rest users as subs
+    for (let id of subscribers) {
+      await global.db.engine.update('users', { id }, { is: { subscriber: true }})
+    }
   }
 
   async getChannelDataOldAPI (opts) {
