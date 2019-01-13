@@ -571,7 +571,6 @@ class API {
       // set subscribers
       for (let subscriber of _.map(request.data.subscriptions, 'user')) {
         if (subscriber.name === global.commons.getBroadcaster() || subscriber.name === global.oauth.settings.bot.username) continue
-        console.log(subscriber)
         opts.subscribers.push(subscriber._id)
       }
 
@@ -611,7 +610,9 @@ class API {
 
     // check if current subscribers are still subs
     for (let user of currentSubscribers) {
-      await global.db.engine.update('users', { id: user.id }, { is: { subscriber: subscribers.includes(user.id) } })
+      if (typeof user.lock === 'undefined' || (typeof user.lock !== 'undefined' && !user.lock.subscriber)) {
+        await global.db.engine.update('users', { id: user.id }, { is: { subscriber: subscribers.includes(user.id) } })
+      }
 
       // remove id if parsed
       const idx = subscribers.indexOf(user.id);
