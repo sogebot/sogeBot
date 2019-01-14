@@ -11,6 +11,7 @@
 
 <script>
 import Winwheel from 'winwheel'
+import * as io from 'socket.io-client';
 
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faSortDown } from '@fortawesome/free-solid-svg-icons'
@@ -93,7 +94,7 @@ export default {
   }
 }
 </script>
-    
+
 <style scoped>
     #pointer {
     position: absolute;

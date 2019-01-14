@@ -17,6 +17,15 @@
       "help": "0 = disabled; both remind conditions must be true to bot print remind"
     }
   },
+  "overlay": {
+    "type": "Type",
+    "add": "Add",
+    "inChatToVote": "... in the chat to vote",
+    "tips": "tip",
+    "bits": "cheer",
+    "toYourMessage": "... in your <strong>$type</strong> message"
+  },
+  "title": "Title",
   "done": "DONE",
   "running": "RUNNING",
   "stop": "Stop",

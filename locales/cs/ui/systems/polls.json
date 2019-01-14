@@ -17,6 +17,15 @@
       "help": "0 = vypnuto; obě podmínky musí být splněny, aby bot vypsal připomenutí do chatu"
     }
   },
+  "overlay": {
+    "type": "Napiš",
+    "add": "Přidej",
+    "inChatToVote": "... do chatu pro hlasování",
+    "tips": "tipu",
+    "bits": "cheeru",
+    "toYourMessage": "... do tvé <strong>$type</strong> zprávy"
+  },
+  "title": "Název",
   "done": "HOTOVO",
   "running": "PROBÍHÁ",
   "stop": "Zastavit",
