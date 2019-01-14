@@ -14,6 +14,7 @@
 
 <script>
 import { TweenMax } from 'gsap/TweenMax'
+import * as io from 'socket.io-client';
 
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faCircle } from '@fortawesome/free-solid-svg-icons'

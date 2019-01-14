@@ -15,9 +15,9 @@ inactivityTime: {{currentTime - lastUpdatedAt}}
       style="display: inline-block; width: 100%;"
       :style="{ 'align-self': settings.display.align === 'top' ? 'flex-start' : 'flex-end' }">
       <strong class="title">{{currentVote.title}}</strong>
-      <div class="helper" v-if="currentVote.type === 'normal'">Type <kbd>!vote 1</kbd>, <kbd>!vote 2</kbd>, ... in chat to vote</div>
-      <div class="helper" v-else-if="currentVote.type === 'tips'">Add <kbd>#vote1</kbd>, <kbd>#vote2</kbd>, ... to your <strong>tips</strong> message</div>
-      <div class="helper" v-else>Add <kbd>#vote1</kbd>, <kbd>#vote2</kbd>, ... to your <strong>bits</strong> message</div>
+      <div class="helper" v-if="currentVote.type === 'normal'">{{ translate('systems.polls.overlay.type') }} <kbd>{{ voteCommand }} 1</kbd>, <kbd>{{ voteCommand }} 2</kbd>, {{ translate('systems.polls.overlay.inChatToVote') }}</div>
+      <div class="helper" v-else-if="currentVote.type === 'tips'">{{ translate('systems.polls.overlay.add') }} <kbd>#vote1</kbd>, <kbd>#vote2</kbd>, <template v-html="translate('systems.polls.overlay.toYourMessage').replace('$type', translate('systems.polls.overlay.tips'))"></template></div>
+      <div class="helper" v-else>{{ translate('systems.polls.overlay.add') }} <kbd>#vote1</kbd>, <kbd>#vote2</kbd>, <template v-html="translate('systems.polls.overlay.toYourMessage').replace('$type', translate('systems.polls.overlay.bits'))"></template></div>
       <div class="options"
         v-for="(option, index) in currentVote.options"
         :key="option"
@@ -35,11 +35,11 @@ inactivityTime: {{currentTime - lastUpdatedAt}}
         <div class="percentage">{{getPercentage(index, 1)}}%</div>
       </div>
       <div id="footer">
-        <div style="width: 100%">Total votes
+        <div style="width: 100%">{{translate('systems.polls.totalVotes')}}
           <strong v-if="currentVote.type !== 'tips'">{{ totalVotes }}</strong>
           <strong v-else>{{ Number(totalVotes).toFixed(1) }}</strong>
         </div>
-        <div style="width: 100%">Active <strong>{{ activeTime | duration('humanize') }}</strong></div>
+        <div style="width: 100%">{{translate('systems.polls.activeFor')}} <strong>{{ activeTime | duration('humanize') }}</strong></div>
       </div>
     </div>
   </transition>
@@ -48,11 +48,16 @@ inactivityTime: {{currentTime - lastUpdatedAt}}
 
 <script>
 import Vue from 'vue'
-import VueMoment from 'vue-moment'
-import moment from 'moment-timezone'
+  import * as moment from 'moment'
+  import VueMoment from 'vue-moment'
+  import * as momentTimezone from 'moment-timezone'
+import * as io from 'socket.io-client';
+
+require('moment/locale/cs')
+require('moment/locale/ru')
 
 Vue.use(VueMoment, {
-    moment,
+    moment, momentTimezone
 })
 
 export default {
@@ -65,6 +70,7 @@ export default {
       lastUpdatedAt: 0,
       currentTime: 0,
       cachedVotes: [],
+      voteCommand: '!vote',
       settings: {
         display: 'light',
         hideAfterInactivity: true,
@@ -73,9 +79,13 @@ export default {
       },
     }
   },
+  mounted: function () {
+    this.$moment.locale(this.configuration.lang)
+  },
   created: function () {
     this.refresh()
     setInterval(() => this.currentTime = Date.now(), 100)
+    this.socket.emit('getVoteCommand', (cmd) => this.voteCommand = cmd)
   },
   computed: {
     activeTime: function () {

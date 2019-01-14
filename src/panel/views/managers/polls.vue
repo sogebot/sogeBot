@@ -26,7 +26,7 @@
             </div>
             <div v-else class="card mb-3 p-0" v-bind:key="String(vote)">
               <div class="card-body">
-                <input type="text" style="background-color: transparent; text-transform: inherit; font-size: 1.25rem; position: relative; top: -0.48rem;" class="border-left-0 border-right-0 border-top-0 form-control card-title mb-0" placeholder="Title" v-model="newVote.title">
+                <input type="text" style="background-color: transparent; text-transform: inherit; font-size: 1.25rem; position: relative; top: -0.48rem;" class="border-left-0 border-right-0 border-top-0 form-control card-title mb-0" :placeholder="translate('systems.polls.title')" v-model="newVote.title">
                 <h6 class="card-subtitle mb-2 text-muted">
                   <template v-if="newVote.type === 'normal'">
                     <font-awesome-icon icon='exclamation'></font-awesome-icon> {{ translate('systems.polls.votingBy') }}
@@ -189,7 +189,7 @@
         isMounted: Boolean,
         domWidth: number,
         interval: number,
-        search: string
+        search: string,
       } = {
         socket: io('/systems/polls', { query: "token=" + this.token }),
         votes: [],

@@ -25,6 +25,7 @@
 </template>
 
 <script>
+import * as io from 'socket.io-client';
 export default {
   props: ['token'],
   data: function () {

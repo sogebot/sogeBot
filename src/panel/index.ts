@@ -1,4 +1,4 @@
-/* globals translations token*/
+/* globals translations token */
 
 import './others/checklist';
 import './widgets/dashboard';
@@ -10,6 +10,7 @@ import VueRouter from 'vue-router';
 import * as _ from 'lodash';
 
 import translate from './helpers/translate';
+import isAvailableVariable from './helpers/isAvailableVariable'
 
 export interface Global {
   translations: any;
@@ -29,21 +30,6 @@ declare module 'vue/types/vue' {
 }
 
 Vue.use(VueRouter);
-
-const isAvailableVariable = async (variable) => {
-  return new Promise((resolve, reject) => {
-    const check = async (r) => {
-      if (typeof global[variable] === 'undefined' || _.size(global[variable]) === 0) {
-        setTimeout(() => {
-          check(r);
-        }, 10);
-      } else {
-        r();
-      }
-    };
-    check(resolve);
-  });
-};
 
 const main = async () => {
   await Promise.all([

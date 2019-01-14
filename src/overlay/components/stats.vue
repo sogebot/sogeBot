@@ -36,6 +36,7 @@
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faStar, faGem, faUsers, faClock, faEye } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import * as io from 'socket.io-client';
 
 library.add(faStar, faGem, faUsers, faClock, faEye)
 
