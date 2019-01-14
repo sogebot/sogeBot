@@ -17,6 +17,14 @@ function initDashboard () {
     created: function () {
       this.socket.emit('getWidgets', (items, dashboards) => {
         this.items = _.orderBy(items, 'id', 'asc')
+        for (const item of this.items) {
+          if (typeof item.dashboardId === 'undefined') item.dashboardId = "0"
+        }
+        dashboards.push({
+          createdAt: 0,
+          name: 'Main',
+          _id: "0"
+        })
         this.dashboards = _.orderBy(dashboards, 'createdAt', 'asc')
       })
     },

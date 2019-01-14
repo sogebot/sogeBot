@@ -52,7 +52,9 @@ export default {
   },
   methods: {
     add: function (widgetId) {
-      this.socket.emit('addWidget', widgetId, this.dashboardId)
+      this.socket.emit('addWidget', widgetId, this.dashboardId, (widget) => {
+        this.$emit('addWidget', { widget, dashboardId: this.dashboardId })
+      })
       this.state = 0
     },
     load: function () {
