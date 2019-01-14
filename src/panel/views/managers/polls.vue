@@ -37,7 +37,7 @@
                   <template v-if="newVote.type === 'bits'">
                     <font-awesome-icon icon='gem'></font-awesome-icon> {{ translate('systems.polls.votingBy') }}
                   </template>
-                  <select v-model="newVote.type" class="text-muted border-0" style="background-color: transparent;font-size: .9rem; text-transform: uppercase; font-weight: bold;">
+                  <select v-model="newVote.type" class="text-muted border-left-0 border-right-0 border-top-0" style="background-color: transparent;font-size: .9rem; text-transform: uppercase; font-weight: bold;">
                     <option value="normal">{{ translate('systems.polls.command') }}</option>
                     <option value="tips">{{ translate('systems.polls.tips') }}</option>
                     <option value="bits">{{ translate('systems.polls.bits') }}</option>
