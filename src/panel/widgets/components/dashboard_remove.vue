@@ -21,7 +21,7 @@ export default {
   methods: {
     remove: function () {
       this.socket.emit('removeDashboard', this.dashboardId)
-      this.$emit('update')
+      this.$emit('removeDashboard', this.dashboardId)
     }
   }
 }
