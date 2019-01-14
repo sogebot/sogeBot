@@ -202,7 +202,7 @@
           title: '',
           isOpened: true,
           options: ['', '', '', '', ''],
-          openedAt: String(new Date())
+          openedAt: Date.now()
         },
         interval: 0,
         search: '',
@@ -270,7 +270,7 @@
         })
       },
       create: function () {
-        this.newVote.openedAt = String(new Date())
+        this.newVote.openedAt = Date.now()
         this.newVote.isOpened = true
         delete this.newVote.closedAt
 
@@ -283,7 +283,7 @@
                 title: '',
                 isOpened: true,
                 options: ['', '', '', '', ''],
-                openedAt: String(new Date())
+                openedAt: Date.now()
               }
             }
           })
@@ -305,7 +305,7 @@
         let vote = this.votes.find(o => typeof o !== 'string' && String(o._id) === vid)
         if (typeof vote === 'object') {
           vote.isOpened = false;
-          vote.closedAt = String(new Date());
+          vote.closedAt = Date.now();
           this.socket.emit('close', vote, (err) => {
             if (err) console.error(err)
           })

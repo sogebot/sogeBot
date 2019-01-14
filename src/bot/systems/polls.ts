@@ -34,7 +34,7 @@ class Polls extends System {
         _: {
           currentMessages: 0,
           lastMessageRemind: 0,
-          lastTimeRemind: String(new Date()),
+          lastTimeRemind: Date.now(),
         },
         reminder: {
           everyXMessages: 0,
@@ -107,7 +107,7 @@ class Polls extends System {
         throw new Error(String(ERROR.ALREADY_CLOSED));
       } else {
         const votes: Vote[] = await global.db.engine.find(this.collection.votes, { vid: String(cVote._id) });
-        await global.db.engine.update(this.collection.data, { _id: String(cVote._id) }, { isOpened: false, closedAt: String(new Date()) });
+        await global.db.engine.update(this.collection.data, { _id: String(cVote._id) }, { isOpened: false, closedAt: Date.now() });
 
         const count = {};
         let _total = 0;
@@ -158,7 +158,7 @@ class Polls extends System {
         .toArray();
       if (options.length < 2) { throw new Error(String(ERROR.NOT_ENOUGH_OPTIONS)); }
 
-      const voting: Poll = { type, title, isOpened: true, options, openedAt: String(new Date()) };
+      const voting: Poll = { type, title, isOpened: true, options, openedAt: Date.now() };
       await global.db.engine.insert(this.collection.data, voting);
 
       const translations = `systems.polls.opened_${type}`;
@@ -316,7 +316,7 @@ class Polls extends System {
 
     if (this.settings.reminder.everyXMessages === 0 && this.settings.reminder.everyXSeconds === 0 || _.isEmpty(vote)) {
       this.settings._.lastMessageRemind = this.settings._.currentMessages;
-      this.settings._.lastTimeRemind = String(new Date());
+      this.settings._.lastTimeRemind = Date.now();
       return; // reminder is disabled
     }
 
@@ -343,7 +343,7 @@ class Polls extends System {
     if (_.every(shouldRemind)) {
       // update last remind data
       this.settings._.lastMessageRemind = this.settings._.currentMessages;
-      this.settings._.lastTimeRemind = String(new Date());
+      this.settings._.lastTimeRemind = Date.now();
 
       const translations = `systems.polls.opened_${vote.type}`;
       global.commons.sendMessage(global.commons.prepare(translations, {
