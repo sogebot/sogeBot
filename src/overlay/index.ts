@@ -1,10 +1,10 @@
 /* globals translations token */
-import Vue from 'vue'
-import Overlays from './index.vue'
-import * as _ from 'lodash'
+import * as _ from 'lodash';
+import Vue from 'vue';
+import Overlays from './index.vue';
 
-import translate from '../panel/helpers/translate';
 import isAvailableVariable from '../panel/helpers/isAvailableVariable';
+import translate from '../panel/helpers/translate';
 
 export interface Global {
   translations: any;
@@ -35,12 +35,10 @@ const overlays = async () => {
   Vue.prototype._ = _;
 
   new Vue({ // eslint-disable-line no-new
-    el: '#overlays',
-    render: function (createElement) {
-      return createElement(Overlays, { props: { token } })
-    }
-  })
-}
+    render(createElement) {
+      return createElement(Overlays, { props: { token } });
+    },
+  }).$mount('#overlays');
+};
 
 overlays();
-

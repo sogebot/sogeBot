@@ -9,8 +9,8 @@ import VueRouter from 'vue-router';
 
 import * as _ from 'lodash';
 
+import isAvailableVariable from './helpers/isAvailableVariable';
 import translate from './helpers/translate';
-import isAvailableVariable from './helpers/isAvailableVariable'
 
 export interface Global {
   translations: any;
