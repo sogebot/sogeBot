@@ -112,6 +112,6 @@ declare interface Poll {
   title: string;
   isOpened: boolean;
   options: string[];
-  openedAt: string;
-  closedAt?: string;
+  openedAt: number;
+  closedAt?: number;
 }
