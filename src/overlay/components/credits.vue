@@ -28,6 +28,7 @@ current: {{ current }}
 
 <script>
 import { TweenLite, Power0, Sine } from 'gsap/TweenMax'
+import * as io from 'socket.io-client';
 
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faDeviantart, faDiscord, faFacebook, faGithub, faGoogle, faInstagram, faLinkedin, faPaypal, faPinterest, faPlaystation, faReddit, faSkype, faSnapchat, faSpotify, faSteam, faStrava, faTelegram, faTwitter, faVk, faWindows, faXbox, faYoutube } from '@fortawesome/free-brands-svg-icons'

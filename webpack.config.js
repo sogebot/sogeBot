@@ -65,7 +65,7 @@ module.exports = [{
 }, {
   mode: process.env.NODE_ENV,
   performance: { hints: false },
-  entry: ['./src/overlay/index.js'],
+  entry: ['./src/overlay/index.ts'],
   resolve: {
     extensions: ['.js', '.vue', '.json', '.ts'],
     alias: {
@@ -83,6 +83,13 @@ module.exports = [{
   ],
   module: {
     rules: [
+      {
+        test: /\.ts$/,
+        loader: 'ts-loader',
+        options: {
+          appendTsSuffixTo: [/\.vue$/]
+        }
+      },
       {
         test: /\.vue$/,
         loader: 'vue-loader'
