@@ -74,11 +74,11 @@ async function main() {
   if (!from.engine.connected || !to.engine.connected) return setTimeout(() => main(), 10)
 
   console.log('Info: Databases connections established')
+  const key = '_id'
   const collections = await from.engine.collections()
 
   // # go through main relationship -> create new ids
   for (let table of Object.keys(relationships)) {
-    const key = '_id'
 
     await to.engine.remove(table, {})
     console.log('Process: ' + table)
@@ -89,7 +89,7 @@ async function main() {
 
     const items = await from.engine.find(table, {})
     for (let item of items) {
-      const _id = String(item._id); delete item._id
+      const _id = String(item[key]); delete item[key]
       const newItem = await to.engine.insert(table, item)
 
       if (typeof mappings[table] === 'undefined') mappings[table] = []
@@ -118,16 +118,16 @@ async function main() {
       console.log('RemappingTable: ' + table)
       const items = await to.engine.find(table, {})
       for (let item of items) {
-        const _id = String(item._id); delete item._id
+        const _id = String(item[key]); delete item._id
         const oldId = item[key]
         const mapping = mappings[k].find(o => o.oldId === oldId)
         if (mapping) {
           console.log('     Remapping: ' + oldId + ' => ' + mapping.newId)
           item[key] = mapping.newId
-          await to.engine.update(table, { _id }, item)
+          await to.engine.update(table, { [key]: _id }, item)
         } else {
           console.log('     NotFound[' + key + ']: ' + oldId)
-          await to.engine.update(table, { _id }, item)
+          await to.engine.update(table, { [key]: _id }, item)
         }
       }
     }
