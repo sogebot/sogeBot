@@ -298,7 +298,7 @@ class INeDB extends Interface {
 
   async collections () {
     try {
-      return fs.readdir('db/nedb')
+      return fs.readdirSync('./db/nedb').map(o => o.replace('.db', ''))
     } catch (e) {
       global.log.error(e.message)
       throw e

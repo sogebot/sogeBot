@@ -46,4 +46,4 @@
   * [Spotify](_master/integrations/spotify.md)
 * Tools
   * [Users cleanup](_master/tools/users-cleanup.md)
-  * [Migration NeDB->MongoDB](_master/tools/migration-nedb-mongodb.md)
+  * [Database migration](_master/tools/database.md)
