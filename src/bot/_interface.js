@@ -87,7 +87,7 @@ class Module {
       })
     } else {
       cluster.setMaxListeners(++listeners + 10)
-      cluster.on('message', (worker, data) => {
+      cluster.on('message', async (worker, data) => {
         if (data.type === '/' + this._name + '/' + this.constructor.name.toLowerCase()) {
           _.set(this.settings, data.path, data.value)
         }
