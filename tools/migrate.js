@@ -173,14 +173,6 @@ let migration = {
         await global.db.engine.update('systems.polls', { _id }, item)
         processed++
       }
-
-      let item = await global.db.engine.findOne('systems.polls.settings', { key: "_.lastTimeRemind" })
-      if (item) {
-        item.value = (new Date(item.value)).getTime()
-        const _id = String(item._id); delete item._id
-        await global.db.engine.update('systems.polls.settings', { _id }, item)
-        processed++
-      }
       console.info(` => ${processed} processed`)
     }
   }],
