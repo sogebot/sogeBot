@@ -120,14 +120,16 @@ async function main() {
       for (let item of items) {
         const _id = String(item[key]); delete item._id
         const oldId = item[key]
-        const mapping = mappings[k].find(o => o.oldId === oldId)
-        if (mapping) {
-          console.log('     Remapping: ' + oldId + ' => ' + mapping.newId)
-          item[key] = mapping.newId
-          await to.engine.update(table, { [key]: _id }, item)
-        } else {
-          console.log('     NotFound[' + key + ']: ' + oldId)
-          await to.engine.update(table, { [key]: _id }, item)
+        if (typeof mappings[k] !== 'undefined') {
+          const mapping = mappings[k].find(o => o.oldId === oldId)
+          if (mapping) {
+            console.log('     Remapping: ' + oldId + ' => ' + mapping.newId)
+            item[key] = mapping.newId
+            await to.engine.update(table, { [key]: _id }, item)
+          } else {
+            console.log('     NotFound[' + key + ']: ' + oldId)
+            await to.engine.update(table, { [key]: _id }, item)
+          }
         }
       }
     }
