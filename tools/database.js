@@ -1,5 +1,6 @@
 'use strict'
 require('module-alias/register')
+global.migration = true
 
 const fs = require('fs')
 
@@ -67,8 +68,19 @@ if (argv.to === 'nedb') {
   }
 }
 
-const from = new (require('../dest/databases/database'))(false, false, argv.from)
-const to = new (require('../dest/databases/database'))(false, false, argv.to)
+const dbName = {
+  from: function() {
+    if (argv.from === 'mongodb') return argv.mongoUri
+    else return null
+  },
+  to: function() {
+    if (argv.to === 'mongodb') return argv.mongoUri
+    else return null
+  }
+}
+
+const from = new (require('../dest/databases/database'))(false, false, argv.from, dbName.from())
+const to = new (require('../dest/databases/database'))(false, false, argv.to, dbName.to())
 
 async function main() {
   if (!from.engine.connected || !to.engine.connected) return setTimeout(() => main(), 10)
@@ -119,16 +131,21 @@ async function main() {
       const items = await to.engine.find(table, {})
       for (let item of items) {
         const _id = String(item[key]); delete item._id
-        const oldId = item[key]
+        let oldId = item[key]
+        if (typeof item[key] === 'undefined') continue
+
         if (typeof mappings[k] !== 'undefined') {
           const mapping = mappings[k].find(o => o.oldId === oldId)
-          if (mapping) {
+          if (typeof oldId === 'object') {
+            console.log('     IncorrectKeyFormat[' + key + ']: ' + typeof oldId)
+            await to.engine.remove(table, { _id: String(item._id) }, item)
+          } else if (mapping) {
             console.log('     Remapping: ' + oldId + ' => ' + mapping.newId)
             item[key] = mapping.newId
             await to.engine.update(table, { [key]: _id }, item)
           } else {
             console.log('     NotFound[' + key + ']: ' + oldId)
-            await to.engine.update(table, { [key]: _id }, item)
+            await to.engine.remove(table, { [key]: _id }, item)
           }
         }
       }

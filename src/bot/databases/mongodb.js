@@ -3,14 +3,16 @@ const ObjectID = require('mongodb').ObjectID
 const mongodbUri = require('mongodb-uri')
 
 const Interface = require('./interface')
-const config = require('@config')
+const config = global.migration ? {
+  database: {}
+} : require('@config')
 const flatten = require('flat')
 const cluster = require('cluster')
 
 const _ = require('lodash')
 
 class IMongoDB extends Interface {
-  constructor (forceIndexes, forceRemoveIndexes) {
+  constructor (forceIndexes, forceRemoveIndexes, forceDb) {
     super('mongodb')
 
     this.createIndexes = (forceIndexes && cluster.isMaster)
@@ -18,7 +20,9 @@ class IMongoDB extends Interface {
 
     this.connected = false
     this.client = null
-    this.dbName = mongodbUri.parse(config.database.mongodb.url).database
+
+    this.mongoUri = forceDb || config.database.mongodb.url
+    this.dbName = mongodbUri.parse(this.mongoUri).database
 
     this.connect()
   }
@@ -42,7 +46,7 @@ class IMongoDB extends Interface {
   }
 
   async connect () {
-    this.client = await client.connect(config.database.mongodb.url,
+    this.client = await client.connect(this.mongoUri,
       {
         poolSize: _.get(config, 'database.mongodb.poolSize', 5),
         useNewUrlParser: true,
