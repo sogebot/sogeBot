@@ -28,14 +28,13 @@ enum ERROR {
 class Polls extends System {
   [x: string]: any; // TODO: remove after interface ported to TS
 
+  private currentMessages: number;
+  private lastMessageRemind: number;
+  private lastTimeRemind: number;
+
   constructor() {
     const options: InterfaceSettings = {
       settings: {
-        _: {
-          currentMessages: 0,
-          lastMessageRemind: 0,
-          lastTimeRemind: Date.now(),
-        },
         reminder: {
           everyXMessages: 0,
           everyXSeconds: 0,
@@ -54,6 +53,10 @@ class Polls extends System {
     };
 
     super(options);
+
+    this.currentMessages = 0;
+    this.lastMessageRemind = 0;
+    this.lastTimeRemind = 0;
 
     if (cluster.isMaster) {
       global.db.engine.index({ table: this.collection.votes, index: 'vid' });
@@ -171,6 +174,8 @@ class Polls extends System {
           if (type === 'normal') { global.commons.sendMessage(this.settings.commands['!vote'] + ` ${(Number(index) + 1)} => ${options[index]}`, opts.sender); } else { global.commons.sendMessage(`#vote${(Number(index) + 1)} => ${options[index]}`, opts.sender); }
         }, 100 * (Number(index) + 1));
       }
+
+      this.lastTimeRemind = Date.now();
       return true;
     } catch (e) {
       switch (e.message) {
@@ -307,7 +312,7 @@ class Polls extends System {
   }
 
   private async countMessage() {
-    this.settings._.currentMessages = this.settings._.currentMessages + 1;
+    this.currentMessages = this.currentMessages + 1;
   }
 
   private async reminder() {
@@ -315,15 +320,15 @@ class Polls extends System {
     const shouldRemind = { messages: false, time: false };
 
     if (this.settings.reminder.everyXMessages === 0 && this.settings.reminder.everyXSeconds === 0 || _.isEmpty(vote)) {
-      this.settings._.lastMessageRemind = this.settings._.currentMessages;
-      this.settings._.lastTimeRemind = Date.now();
+      this.lastMessageRemind = this.currentMessages;
+      this.lastTimeRemind = 0;
       return; // reminder is disabled
     }
 
     if (this.settings.reminder.everyXMessages === 0) {
       shouldRemind.messages = true;
     } else {
-      if (this.settings._.currentMessages - this.settings._.lastMessageRemind >= this.settings.reminder.everyXMessages) {
+      if (this.currentMessages - this.lastMessageRemind >= this.settings.reminder.everyXMessages) {
         shouldRemind.messages = true;
       } else {
         shouldRemind.messages = false;
@@ -333,7 +338,7 @@ class Polls extends System {
     if (this.settings.reminder.everyXSeconds === 0) {
       shouldRemind.time = true;
     } else {
-      if (new Date().getTime() - new Date(this.settings._.lastTimeRemind).getTime() > this.settings.reminder.everyXSeconds * 1000) {
+      if (new Date().getTime() - new Date(this.lastTimeRemind).getTime() > this.settings.reminder.everyXSeconds * 1000) {
         shouldRemind.time = true;
       } else {
         shouldRemind.time = false;
@@ -342,8 +347,8 @@ class Polls extends System {
 
     if (_.every(shouldRemind)) {
       // update last remind data
-      this.settings._.lastMessageRemind = this.settings._.currentMessages;
-      this.settings._.lastTimeRemind = Date.now();
+      this.lastMessageRemind = this.currentMessages;
+      this.lastTimeRemind = Date.now();
 
       const translations = `systems.polls.opened_${vote.type}`;
       global.commons.sendMessage(global.commons.prepare(translations, {
