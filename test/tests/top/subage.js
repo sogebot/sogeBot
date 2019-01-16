@@ -25,7 +25,9 @@ describe('Top - !top subage', () => {
         id,
         username: 'user' + i,
         is: {
-          subscriber: true
+          subscriber: true,
+          mod: Math.floor(Math.random()) === 1,
+          follower: Math.floor(Math.random()) === 1
         },
         time: {
           subscribed_at: Date.now() - (constants.HOUR * i)
