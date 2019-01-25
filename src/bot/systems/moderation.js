@@ -458,7 +458,7 @@ class Moderation extends System {
       if (value.length > 0) {
         const regexp = XRegExp(` [^\\s\\pL0-9\\w]?${value}[^\\s\\pL0-9\\w]? `, 'gi')
         // we need to change 'text' to ' text ' for regexp to correctly work
-        if (XRegExp.exec(` ${opts.message} `, regexp) && value.length > 0) {
+        if (XRegExp.exec(` ${opts.message} `, regexp)) {
           isOK = false
           this.timeoutUser(opts.sender, opts.message,
             global.translate('moderation.user-is-warned-about-blacklist'),
