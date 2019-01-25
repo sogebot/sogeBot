@@ -387,7 +387,7 @@
         customVariablesEdit.responseType = data.variable.responseType
         customVariablesEdit.responseText = data.variable.responseText
         customVariablesEdit.readOnly = data.variable.readOnly || false
-        customVariablesEdit.history = _.chunk(_.orderBy(data.history, 'timestamp', 'desc'), 15)[0]
+        customVariablesEdit.history = _.chunk(_.orderBy(data.history, 'timestamp', 'desc'), 15)[0] || []
       })
     }
   }
