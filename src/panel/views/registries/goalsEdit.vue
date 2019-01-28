@@ -172,7 +172,7 @@
                       <div class="invalid-feedback"></div>
                     </div>
 
-                    <div class="form-group col-md-12">
+                    <div class="form-group col-md-12" v-if="!currentGoal.type.includes('current')">
                       <label for="currentAmount-input">{{ translate('registry.goals.input.currentAmount.title') }}</label>
                       <input v-model="currentGoal.currentAmount" type="number" min="0" class="form-control" id="currentAmount-input">
                       <div class="invalid-feedback"></div>
@@ -357,7 +357,7 @@ export default Vue.extend({
       goals: Goals.Goal[],
       fonts: string[],
       uiShowGoal: string,
-      typeOpts: ['followers', 'subscribers', 'tips', 'bits'],
+      typeOpts: ['followers', 'currentFollowers', 'currentSubscribers', 'subscribers', 'tips', 'bits'],
       displayOpts: ['simple', 'full', 'custom'],
       groupDisplayOpts: ['fade', 'multi'],
 
@@ -382,7 +382,7 @@ export default Vue.extend({
       },
       fonts: [],
       uiShowGoal: '',
-      typeOpts: ['followers', 'subscribers', 'tips', 'bits'],
+      typeOpts: ['followers', 'currentFollowers', 'currentSubscribers', 'subscribers', 'tips', 'bits'],
       displayOpts: ['simple', 'full', 'custom'],
       groupDisplayOpts: ['fade', 'multi'],
 

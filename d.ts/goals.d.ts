@@ -38,7 +38,7 @@ declare namespace Goals {
     groupId: string,
 
     name: string,
-    type: 'followers' | 'subscribers' | 'tips' | 'bits',
+    type: 'followers' | 'currentFollowers' | 'currentSubscribers' | 'subscribers' | 'tips' | 'bits',
 
     display: 'simple' | 'full' | 'custom'
 

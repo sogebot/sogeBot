@@ -164,6 +164,7 @@ export default Vue.extend({
       lastSwapTime: number,
       triggerUpdate: string[],
       cssLoaded: string[],
+      current: { subscribers: number, followers: number }
     } = {
       show: -1,
       group: null,
@@ -172,7 +173,8 @@ export default Vue.extend({
       lastSwapTime: Date.now(),
       loadedFonts: [],
       triggerUpdate: [],
-      cssLoaded: []
+      cssLoaded: [],
+      current: { subscribers: 0, followers: 0 }
     };
     return object
   },
@@ -252,6 +254,10 @@ export default Vue.extend({
     refresh: function () {
       const uid = window.location.href.split('/')[window.location.href.split('/').length - 1]
       if (uid) {
+        this.socket.emit('current', (err, current: { subscribers: number, followers: number }) => {
+          if (err) return console.error(err)
+          this.current = current
+        })
         this.socket.emit('findOne', { collection: 'groups', where: { uid }}, (err, cb: Goals.Group | null) => {
           if (err) return console.error(err)
           this.group = cb
@@ -274,6 +280,16 @@ export default Vue.extend({
         }
 
         this.goals = goals
+
+        // update currentAmount for current types
+        for (const goal of this.goals) {
+          if (goal.type === 'currentFollowers') {
+            goal.currentAmount = this.current.followers
+          }
+          if (goal.type === 'currentSubscribers') {
+            goal.currentAmount = this.current.subscribers
+          }
+        }
 
         // add css import
         for (const goal of this.goals) {

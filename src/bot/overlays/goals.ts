@@ -2,6 +2,8 @@
 
 import Overlay from './_interface';
 
+import * as _ from 'lodash';
+
 class Goals extends Overlay {
   [x: string]: any; // TODO: remove after interface ported to TS
 
@@ -24,6 +26,17 @@ class Goals extends Overlay {
       global.db.engine.index({ table: this.collection.groups, index: 'uid', unique: true });
       global.db.engine.index({ table: this.collection.goals, index: 'uid', unique: true });
     }
+  }
+
+  public async sockets() {
+    this.socket.on('connection', (socket) => {
+      socket.on('current', async (cb) => {
+        cb(null, {
+          subscribers: _.get(await global.db.engine.findOne('api.current', { key: 'subscribers' }), 'value', 0),
+          followers: _.get(await global.db.engine.findOne('api.current', { key: 'followers' }), 'value', 0),
+        });
+      });
+    });
   }
 
   private async onBit(bit: onEventBit) {
