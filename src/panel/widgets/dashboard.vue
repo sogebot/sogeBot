@@ -109,14 +109,14 @@ export default {
   methods: {
     removeDashboard: function (dashboardId) {
       const grid = $('.grid-stack-for-board-' + dashboardId).data('gridstack')
-      grid.destroy()
+      if (grid) grid.destroy(true)
       this.dashboards = this.dashboards.filter(o => String(o._id) !== dashboardId)
       this.currentDashboard = 0
     },
     addWidget: function (event) {
       event.dashboardId = String(event.dashboardId)
       const grid = $('.grid-stack-for-board-' + event.dashboardId).data('gridstack')
-      grid.destroy(true)
+      if (grid) grid.destroy(true)
 
       const dashboard = _.cloneDeep(this.dashboards.find(o => String(o._id) === event.dashboardId))
       this.dashboards = this.dashboards.filter(o => String(o._id) !== event.dashboardId)
@@ -145,8 +145,6 @@ export default {
       this.addDashboard = false
     },
     initGridStack: function () {
-      console.log('init')
-      console.log(this.dashboards)
       const options = { cellHeight: 42, verticalMargin: 10, removable: true, removeTimeout: 100, handleClass: 'card-header' }
       if ($('.grid-stack').length !== this.dashboards.length) return setTimeout(() => this.initGridStack(), 1000)
       this.$nextTick(function () {
