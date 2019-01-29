@@ -170,6 +170,7 @@
             <span class="input-group-text">px</span>
           </div>
         </div>
+        <hold-button class="mt-2 btn btn-danger w-100" title="Cleanup" holdtitle="Hold to cleanup" icon="eraser" @trigger="cleanup()" ></hold-button>
       </div>
       <!-- /SETTINGS -->
     </div>
@@ -189,7 +190,8 @@ export default {
   props: ['commons', 'socket', 'popout'],
   components: {
     'font-awesome-layers': FontAwesomeLayers,
-    'font-awesome-icon': FontAwesomeIcon
+    'font-awesome-icon': FontAwesomeIcon,
+    holdButton: () => import('../../components/holdButton.vue'),
   },
   data: function () {
     return {
@@ -223,7 +225,7 @@ export default {
     })
   },
   created: function () {
-    socket.emit('getConfiguration', data => {
+    this.socket.emit('getConfiguration', data => {
       this.settings = {
         widgetEventlistFollows: _.isNil(data.widgetEventlistFollows) ? true : data.widgetEventlistFollows,
         widgetEventlistHosts: _.isNil(data.widgetEventlistHosts) ? true : data.widgetEventlistHosts,
@@ -291,6 +293,11 @@ export default {
     }
   },
   methods: {
+    cleanup: function () {
+      console.log('Cleanup => eventlist')
+      this.socket.emit('widget.eventlist.cleanup')
+      this.events = []
+    },
     prepareMessage: function (event) {
       let t = commons.translate(`eventlist-events.${event.event}`)
       t = t.replace('$formatted_amount', '<strong style="font-size: 1rem">' + _.get(event, 'currency', '$') + parseFloat(_.get(event, 'amount', '0')).toFixed(2) + '</strong>')

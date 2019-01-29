@@ -6,6 +6,7 @@ var _ = require('lodash')
 function EventList () {
   global.panel.addWidget('eventlist', 'eventlist', 'far fa-calendar')
   global.panel.socketListening(this, 'widget.eventlist.get', this._get)
+  global.panel.socketListening(this, 'widget.eventlist.cleanup', this._cleanup)
 
   global.configuration.register('widgetEventlistFollows', 'core.no-response-bool', 'bool', true)
   global.configuration.register('widgetEventlistHosts', 'core.no-response-bool', 'bool', true)
@@ -23,10 +24,19 @@ function EventList () {
 
 EventList.prototype._get = async function (self) {
   try {
-    let events = await global.db.engine.find('widgetsEventList')
-    global.panel.io.emit('widget.eventlist', _.orderBy(_.filter(events, (o) => o.timestamp >= _.now() - (1000 * 60 * 60 * 24 * 7)), 'timestamp', 'desc'))
+    const limit = await global.configuration.getValue('widgetEventlistShow');
+    let events = await global.db.engine.find('widgetsEventList', {
+      _sort: 'timestamp',
+      _total: limit,
+    });
+    global.panel.io.emit('widget.eventlist', events);
   } catch (e) {
     global.panel.io.emit('widget.eventlist', [])
   }
 }
+
+EventList.prototype._cleanup = function (self) {
+  global.db.engine.remove('widgetsEventList', {});
+}
+
 module.exports = new EventList()
