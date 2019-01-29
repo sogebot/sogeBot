@@ -1,8 +1,5 @@
 'use strict'
 
-// 3rdparty libraries
-var _ = require('lodash')
-
 function EventList () {
   global.panel.addWidget('eventlist', 'eventlist', 'far fa-calendar')
   global.panel.socketListening(this, 'widget.eventlist.get', this._get)
