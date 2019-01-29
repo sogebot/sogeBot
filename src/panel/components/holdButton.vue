@@ -1,11 +1,11 @@
 <template>
   <button type="button" ref="button" class="btn btn-with-icon" @mouseup="onMouseUp" @mousedown="onMouseDown" @mouseenter="isMouseOver = true" @mouseleave="isMouseOver = false">
     <div style="display: flex; flex-direction: inherit;">
-      <div class="text" :style="{opacity: 1 - this.percentage / 100 }">
+      <div class="text" :style="{opacity: 1 - this.percentage / 100 }" v-if="title">
         <template v-if="onMouseDownStarted === 0">
           {{ title }}
         </template>
-        <template v-else>
+        <template v-else-if="onMouseDownStarted === 1 && holdtitle">
           {{ holdtitle }}
         </template>
       </div>

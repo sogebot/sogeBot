@@ -37,9 +37,10 @@
       <div role="tabpanel" class="tab-pane" id="yt-song-requests">
         <table class="table table-sm">
           <tr v-for="(request, index) of requests" :key="index">
+            <td><hold-button @trigger="removeSongRequest(String(request._id))" :icon="'times'" class="btn-outline-danger border-0"></hold-button></td>
             <td>{{request.title}}</td>
             <td>{{request.username}}</td>
-            <td>{{request.length_seconds | formatTime}}</td>
+            <td class="pr-4">{{request.length_seconds | formatTime}}</td>
           </tr>
         </table>
       </div>
@@ -69,7 +70,8 @@ Vue.use(VuePlyr)
 export default {
   props: ['token', 'commons'],
   components: {
-    'font-awesome-icon': FontAwesomeIcon
+    'font-awesome-icon': FontAwesomeIcon,
+    holdButton: () => import('../../components/holdButton.vue'),
   },
   data: function () {
     return {
@@ -89,6 +91,11 @@ export default {
     }
   },
   methods: {
+    removeSongRequest(_id) {
+      console.log('Removing => ' + _id)
+      this.requests = this.requests.filter((o) => String(o._id) !== _id)
+      this.socket.emit('delete', { collection: 'request', where: { _id } })
+    },
     videoTimeUpdated: function (event) {
       if (this.autoplay && this.currentSong) {
         if (this.currentSong.endTime && event.detail.plyr.currentTime > this.currentSong.endTime) {
