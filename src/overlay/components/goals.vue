@@ -284,9 +284,11 @@ export default Vue.extend({
         // update currentAmount for current types
         for (const goal of this.goals) {
           if (goal.type === 'currentFollowers') {
+            if (goal.currentAmount !== this.current.followers) this.triggerUpdate.push(goal.uid)
             goal.currentAmount = this.current.followers
           }
           if (goal.type === 'currentSubscribers') {
+            if (goal.currentAmount !== this.current.subscribers) this.triggerUpdate.push(goal.uid)
             goal.currentAmount = this.current.subscribers
           }
         }
