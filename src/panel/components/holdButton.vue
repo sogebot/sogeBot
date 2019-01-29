@@ -1,11 +1,11 @@
 <template>
   <button type="button" ref="button" class="btn btn-with-icon" @mouseup="onMouseUp" @mousedown="onMouseDown" @mouseenter="isMouseOver = true" @mouseleave="isMouseOver = false">
     <div style="display: flex; flex-direction: inherit;">
-      <div class="text" :style="{opacity: 1 - this.percentage / 100 }" v-if="title">
+      <div class="text w-100" :style="{opacity: 1 - this.percentage / 100 }" v-if="title">
         <template v-if="onMouseDownStarted === 0">
           {{ title }}
         </template>
-        <template v-else-if="onMouseDownStarted === 1 && holdtitle">
+        <template v-else-if="holdtitle">
           {{ holdtitle }}
         </template>
       </div>
@@ -21,9 +21,9 @@ import Vue from 'vue';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faTrash, faEraser } from '@fortawesome/free-solid-svg-icons';
 
-library.add(faTrash)
+library.add(faTrash, faEraser)
 
 export default Vue.extend({
 props: ['holdtitle', 'title', 'ttc', 'icon'],
