@@ -27,9 +27,16 @@ class UserInfo extends System {
 
   constructor() {
     const options: InterfaceSettings = {
+      ui: {
+        me: {
+          format: {
+            type: 'configurable-list',
+          },
+        },
+      },
       settings: {
         me: {
-          format: '$sender $rank $watched $points $messages $tips',
+          format: ['$sender', '$rank', '$watched', '$points', '$messages', '$tips'],
           formatSeparator: '|',
         },
         commands: [
