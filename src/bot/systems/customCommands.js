@@ -262,7 +262,7 @@ class CustomCommands extends System {
 
     if (!command) {
       // print commands
-      let commands = await global.db.engine.find(this.collection.data, { visible: true })
+      let commands = await global.db.engine.find(this.collection.data, { visible: true, enabled: true })
       var output = (commands.length === 0 ? global.translate('customcmds.list-is-empty') : global.translate('customcmds.list-is-not-empty').replace(/\$list/g, _.map(_.orderBy(commands, 'command'), 'command').join(', ')))
       global.commons.sendMessage(output, opts.sender)
     } else {
