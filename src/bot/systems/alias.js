@@ -168,7 +168,7 @@ class Alias extends System {
   }
 
   async list (opts) {
-    let alias = await global.db.engine.find(this.collection.data, { visible: true })
+    let alias = await global.db.engine.find(this.collection.data, { visible: true, enabled: true })
     var output = (alias.length === 0 ? global.translate('alias.list-is-empty') : global.translate('alias.list-is-not-empty').replace(/\$list/g, (_.map(_.orderBy(alias, 'alias'), 'alias')).join(', ')))
     global.commons.sendMessage(output, opts.sender)
   }
