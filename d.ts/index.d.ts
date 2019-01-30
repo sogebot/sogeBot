@@ -27,6 +27,7 @@ declare namespace NodeJS {
 
 type Command = {
   name: string,
+  fnc?: string,
   isHelper?: boolean,
   permission?: number
 }
@@ -56,19 +57,24 @@ type onEventBit = {
   timestamp: string
 }
 
+type onEventMessage = {
+  sender: {
+    username: string,
+    userId: string,
+    isSubscriber: boolean,
+    isTurboSubscriber: boolean
+  } | null,
+  message: string,
+  timestamp: string
+}
+
 type InterfaceSettings = {
   settings?: {
     commands?: Array<Command | string>,
     [s: string]: any
   },
   on?: {
-    message?: (message: {
-      sender: {
-        username: string,
-      } | null,
-      message: string,
-      timestamp: string
-    }) => void,
+    message?: (message: onEventMessage) => void,
     sub?: (syb: onEventSub) => void,
     follow?: (follow: onEventFollow) => void,
     tip?: (tip: onEventTip) => void,
@@ -109,7 +115,10 @@ type UINumberInput = {
 
 type CommandOptions = {
   sender: {
-    username: string
+    username: string,
+    userId: string,
+    isSubscriber: boolean,
+    isTurboSubscriber: boolean
   } | null,
   command: string,
   parameters: string
