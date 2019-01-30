@@ -119,7 +119,7 @@ type CommandOptions = {
     userId: string,
     isSubscriber: boolean,
     isTurboSubscriber: boolean
-  } | null,
+  },
   command: string,
   parameters: string
 }

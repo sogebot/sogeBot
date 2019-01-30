@@ -915,12 +915,20 @@
     "success": {
       "never": "$sender, $username neni followerem kanalu",
       "time": "$sender, $username sleduje tento kanal jiz $diff"
+    },
+    "successSameUsername": {
+      "never": "$sender, nejsi followerem kanalu",
+      "time": "$sender, sledujes tento kanal jiz $diff"
     }
   },
   "subage": {
     "success": {
       "never": "$sender, $username neni subscriberem kanalu",
       "time": "$sender, $username je subscriberem tohoto kanalu jiz $diff"
+    },
+    "successSameUsername": {
+      "never": "$sender, nejsi subscriberem kanalu",
+      "time": "$sender, je subscriberem tohoto kanalu jiz $diff"
     }
   },
   "age": {

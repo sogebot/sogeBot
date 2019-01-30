@@ -78,6 +78,9 @@ class Polls extends System {
             parameters,
             sender: {
               username: global.commons.getOwner(),
+              userId: '0',
+              isSubscriber: true,
+              isTurboSubscriber: true,
             },
           });
           cb(null, null);
@@ -92,6 +95,9 @@ class Polls extends System {
             parameters: '',
             sender: {
               username: global.commons.getOwner(),
+              userId: '0',
+              isSubscriber: true,
+              isTurboSubscriber: true,
             },
           });
           cb(null);

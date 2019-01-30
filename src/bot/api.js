@@ -1390,7 +1390,7 @@ class API {
       }
       return
     }
-    await global.db.engine.update('users', { id }, { username: username, time: { created_at: request.data.created_at } })
+    await global.db.engine.update('users', { id }, { username: username, time: { created_at: new Date(request.data.created_at).getTime() } })
   }
 
   async isFollower (username) {

@@ -900,12 +900,20 @@
     "success": {
       "never": "$sender, $username is not a channel follower",
       "time": "$sender, $username is following channel $diff"
+    },
+    "successSameUsername": {
+      "never": "$sender, you are not follower of this channel",
+      "time": "$sender, you are following this channel for $diff"
     }
   },
   "subage": {
     "success": {
       "never": "$sender, $username is not a channel subscriber",
       "time": "$sender, $username is subscriber of channel for $diff"
+    },
+    "successSameUsername": {
+      "never": "$sender, you are not not a channel subscriber",
+      "time": "$sender, you are subscriber of channel for $diff"
     }
   },
   "age": {
