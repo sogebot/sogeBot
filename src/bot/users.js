@@ -189,10 +189,14 @@ class Users extends Core {
         let updated = []
         for (let onlineUser of users) {
 <<<<<<< HEAD
+<<<<<<< HEAD
           if (await global.commons.isIgnored(onlineUser)) continue
 =======
           if (await global.commons.isIgnored(onlineUser)) return
 >>>>>>> users: add ignore check to watchedTime update
+=======
+          if (await global.commons.isIgnored(onlineUser)) continue
+>>>>>>> fix isIgnored check
           const isNewUser = typeof this.watchedList[onlineUser.username] === 'undefined'
           updated.push(onlineUser.username)
           const watched = isNewUser ? timeout : new Date().getTime() - new Date(this.watchedList[onlineUser.username]).getTime()
