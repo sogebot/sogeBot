@@ -88,7 +88,7 @@ type InterfaceSettings = {
   ui?: {
     _hidden?: Boolean,
     [s: string]: {
-      [s: string]: UISelector | UILink | UINumberInput | UIConfigurableList
+      [s: string]: UISelector | UILink | UINumberInput | UIConfigurableList | UISortableList
     } | Boolean | undefined
   }
 }
@@ -115,6 +115,14 @@ type UINumberInput = {
   step?: number,
   min?: number,
   max?: number,
+}
+
+type UISortableList = {
+  type: 'sortable-list',
+  values: string,
+  toggle: string,
+  toggleOnIcon: string,
+  toggleOffIcon: string,
 }
 
 type CommandOptions = {

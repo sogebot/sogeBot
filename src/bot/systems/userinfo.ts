@@ -30,13 +30,18 @@ class UserInfo extends System {
       ui: {
         me: {
           format: {
-            type: 'configurable-list',
+            type: 'sortable-list',
+            values: '_order',
+            toggle: '_formatDisabled',
+            toggleOnIcon: 'fa-eye',
+            toggleOffIcon: 'fa-eye-slash',
           },
         },
       },
       settings: {
         me: {
-          format: ['$sender', '$rank', '$watched', '$points', '$messages', '$tips'],
+          _order: ['$sender', '$rank', '$watched', '$points', '$messages', '$tips'],
+          _formatDisabled: [],
           formatSeparator: '|',
         },
         commands: [
