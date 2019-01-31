@@ -298,7 +298,15 @@
       <div class="col-sm stream-info">
         <h2 data-lang="tips"></h2>
         <span class="data">{{ Number(currentTips).toFixed(2) }}</span><span class="data ml-0 pl-0">{{ currency }}</span>
-        <span class="stats" v-html="difference(averageStats.currentTips, currentTips)"></span>
+        <span class="stats" v-html="difference(averageStats.currentTips, currentTips, false, currency)"></span>
+      </div>
+
+      <div class="col-sm stream-info">
+        <h2>
+          <i data-lang="watched-time"></i>
+        </h2>
+        <span class="data">{{ Number(currentWatched / 1000 / 60 / 60).toFixed(1) }}h</span>
+        <span class="stats" v-html="difference(Number(averageStats.currentWatched / 1000 / 60 / 60).toFixed(1), Number(currentWatched / 1000 / 60 / 60, false, 'h').toFixed(1), false, 'h')"></span>
       </div>
     </div>
 
@@ -642,6 +650,7 @@
         currentHosts: 0,
         currentViews: 0,
         currentBits: 0,
+        currentWatched: 0,
         currentSubscribers: 0,
         currentFollowers: 0,
         currentTips: 0,
@@ -672,14 +681,42 @@
         }
       },
       methods: {
-        difference: function (number, current) {
+        differenceHours: function (number, current) {
+          console.log({number, current})
           number = number || 0
           if (_.isNaN(Number(current)) || this.uptime === '00:00:00' || !this.b_showAvgDiff) return '' // return nothing if current is not number (hidden, etc)
           else if (number === 0) return ''
           else {
             let isPositive = current - number >= 0
             let f_difference =  Math.abs(this.b_percentage ? (Math.round((current - number) / number * 1000) / 10) : current - number)
-            f_difference = this.b_percentage ? `${f_difference}%` : this.$options.filters.shortenNumber(f_difference, this.b_shortenNumber)
+            f_difference = this.b_percentage ? `${f_difference}%` : f_difference
+
+            if (current - number === 0) {
+              return ''
+            } else if (isPositive) {
+              return `<small class="stats-up text-success"><i class="fas fa-caret-up"></i>${f_difference}h</small>`
+            } else {
+              return `<small class="stats-down text-danger"><i class="fas fa-caret-down"></i>${f_difference}h</small>`
+            }
+          }
+        },
+        difference: function (number, current, shorten, postfix) {
+          postfix = postfix || ''
+          shorten = typeof shorten === 'undefined' ? true : shorten
+          number = number || 0
+          if (_.isNaN(Number(current)) || this.uptime === '00:00:00' || !this.b_showAvgDiff) return '' // return nothing if current is not number (hidden, etc)
+          else if (number === 0) return ''
+          else {
+            let isPositive = current - number >= 0
+            let f_difference =  Math.abs(this.b_percentage ? (Math.round((current - number) / number * 1000) / 10) : current - number)
+            if (this.b_percentage) {
+              f_difference = `${f_difference}%`
+            } else {
+              if (shorten) {
+                f_difference = this.$options.filters.shortenNumber(f_difference, this.b_shortenNumber)
+              }
+              f_difference = f_difference + postfix
+            }
 
             if (current - number === 0) {
               return ''

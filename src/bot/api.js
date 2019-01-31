@@ -15,6 +15,10 @@ const __DEBUG__ = {
 }
 
 class API {
+  _stream = {
+    watchedTime: 0
+  }
+
   constructor () {
     if (cluster.isMaster) {
       global.panel.addMenu({ category: 'logs', name: 'api', id: 'apistats' })
@@ -1029,6 +1033,7 @@ class API {
           let when = await global.cache.when()
           if (_.isNil(when.offline)) {
             if (!_.isNil(when.online)) global.log.stop('')
+            this._stream.watchedTime = 0
             global.cache.when({ offline: moment().format() })
             global.events.fire('stream-stopped')
             global.events.fire('stream-is-running-x-minutes', { reset: true })
@@ -1097,6 +1102,7 @@ class API {
       maxViewers: _.get(await global.db.engine.findOne('api.max', { key: 'viewers' }), 'value', 0),
       newChatters: _.get(await global.db.engine.findOne('api.new', { key: 'chatters' }), 'value', 0),
       currentHosts: _.get(await global.db.engine.findOne('api.current', { key: 'hosts' }), 'value', 0),
+      currentWatched: this._stream.watchedTime,
       game_id: stream.game_id,
       user_id: stream.user_id,
       type: stream.type,
