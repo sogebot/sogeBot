@@ -290,6 +290,18 @@ class Message {
             }
             return _.size(commands) === 0 ? ' ' : (_.map(commands, (o) => o.command.replace('!', ''))).join(', ')
           case '!command':
+            if (permission) {
+              const responses = await global.db.engine.find(global.systems.customCommands.collection.responses)
+
+              let permNo = constants.VIEWERS
+              if (permission === 'mods') permNo = constants.MODS
+              if (permission === 'regular') permNo = constants.REGULAR
+              if (permission === 'viewers') permNo = constants.VIEWERS
+              if (permission === 'owner') permNo = constants.OWNER_ONLY
+
+              const commandIds = responses.filter((o) => o.permission === permNo).map((o) => o.cid)
+              commands = commands.filter((o) => commandIds.includes(String(o._id)))
+            }
             return _.size(commands) === 0 ? ' ' : (_.map(commands, 'command')).join(', ')
           case 'cooldown':
             list = _.map(cooldowns, function (o, k) {
