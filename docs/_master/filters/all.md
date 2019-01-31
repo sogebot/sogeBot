@@ -188,7 +188,23 @@
 
 `(list.commands)` - will return list of your visible custom commands
 
+`(list.commands.mods)` - will return list of your visible custom commands with mods responses
+
+`(list.commands.regular)` - will return list of your visible custom commands with regular responses
+
+`(list.commands.viewers)` - will return list of your visible custom commands with viewers responses
+
+`(list.commands.owner)` - will return list of your visible custom commands with owner responses
+
 `(list.!commands)` - will return list of your visible custom !commands
+
+`(list.!commands.mods)` - will return list of your visible custom commands with mods responses
+
+`(list.!commands.regular)` - will return list of your visible custom commands with regular responses
+
+`(list.!commands.viewers)` - will return list of your visible custom commands with viewers responses
+
+`(list.!commands.owner)` - will return list of your visible custom commands with owner responses
 
 `(list.cooldown)` - will return list of your cooldowns (keywords and !commands)
 
