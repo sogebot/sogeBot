@@ -27,6 +27,7 @@ declare namespace NodeJS {
 
 type Command = {
   name: string,
+  fnc?: string,
   isHelper?: boolean,
   permission?: number
 }
@@ -56,19 +57,24 @@ type onEventBit = {
   timestamp: string
 }
 
+type onEventMessage = {
+  sender: {
+    username: string,
+    userId: string,
+    isSubscriber: boolean,
+    isTurboSubscriber: boolean
+  } | null,
+  message: string,
+  timestamp: string
+}
+
 type InterfaceSettings = {
   settings?: {
     commands?: Array<Command | string>,
     [s: string]: any
   },
   on?: {
-    message?: (message: {
-      sender: {
-        username: string,
-      } | null,
-      message: string,
-      timestamp: string
-    }) => void,
+    message?: (message: onEventMessage) => void,
     sub?: (syb: onEventSub) => void,
     follow?: (follow: onEventFollow) => void,
     tip?: (tip: onEventTip) => void,
@@ -82,7 +88,7 @@ type InterfaceSettings = {
   ui?: {
     _hidden?: Boolean,
     [s: string]: {
-      [s: string]: UISelector | UILink | UINumberInput
+      [s: string]: UISelector | UILink | UINumberInput | UIConfigurableList | UISortableList
     } | Boolean | undefined
   }
 }
@@ -90,6 +96,10 @@ type InterfaceSettings = {
 type UISelector = {
   type: 'selector',
   values: Array<string>,
+}
+
+type UIConfigurableList = {
+  type: 'configurable-list',
 }
 
 type UILink = {
@@ -107,10 +117,21 @@ type UINumberInput = {
   max?: number,
 }
 
+type UISortableList = {
+  type: 'sortable-list',
+  values: string,
+  toggle: string,
+  toggleOnIcon: string,
+  toggleOffIcon: string,
+}
+
 type CommandOptions = {
   sender: {
-    username: string
-  } | null,
+    username: string,
+    userId: string,
+    isSubscriber: boolean,
+    isTurboSubscriber: boolean
+  },
   command: string,
   parameters: string
 }

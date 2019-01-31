@@ -19,9 +19,19 @@
           <h6>{{ category }}</h6>
           <div class="card mb-2" >
             <div class="card-body">
-              <div v-if="typeof value === 'object'" class="p-0 pl-2 pr-2 " v-for="(currentValue, defaultValue) of value">
+              <div v-if="typeof value === 'object' && !defaultValue.startsWith('_')" class="p-0 pl-2 pr-2 " v-for="(currentValue, defaultValue) of value">
                 <template v-if="typeof ui[category] !== 'undefined' && typeof ui[category][defaultValue] !== 'undefined'">
+                  <sortable-list
+                    v-if="ui[category][defaultValue].type === 'sortable-list'"
+                    :values="value[ui[category][defaultValue].values]"
+                    :toggle="value[ui[category][defaultValue].toggle]"
+                    :toggleonicon="ui[category][defaultValue].toggleOnIcon"
+                    :toggleofficon="ui[category][defaultValue].toggleOffIcon"
+                    :title="'systems.' + selectedSystem + '.settings.' + defaultValue"
+                    @update="value[ui[category][defaultValue].toggle] = $event.toggle; value[defaultValue] = $event.value; triggerDataChange()"
+                    class="pt-1 pb-1"></sortable-list>
                   <component
+                    v-else
                     :is="ui[category][defaultValue].type"
                     :readonly="ui[category][defaultValue].readOnly"
                     :secret="ui[category][defaultValue].secret"
@@ -151,7 +161,8 @@
         'number-input': numberInput,
         'command-input-with-permission': commandInputWithPermissions,
         'textarea-from-array': textAreaFromArray,
-        'configurable-list': configurableList
+        'configurable-list': configurableList,
+        'sortable-list': sortableList
       },
       data: {
         socket: { _panel: io({ query: "token=" + token }) },

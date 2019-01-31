@@ -26,25 +26,14 @@ class Twitch {
     const commands = [
       { this: this, id: '!uptime', command: '!uptime', fnc: this.uptime, permission: constants.VIEWERS },
       { this: this, id: '!time', command: '!time', fnc: this.time, permission: constants.VIEWERS },
-      { this: this, id: '!lastseen', command: '!lastseen', fnc: this.lastseen, permission: constants.VIEWERS },
-      { this: this, id: '!watched', command: '!watched', fnc: this.watched, permission: constants.VIEWERS },
-      { this: this, id: '!followage', command: '!followage', fnc: this.followage, permission: constants.VIEWERS },
-      { this: this, id: '!subage', command: '!subage', fnc: this.subage, permission: constants.VIEWERS },
       { this: this, id: '!followers', command: '!followers', fnc: this.followers, permission: constants.VIEWERS },
       { this: this, id: '!subs', command: '!subs', fnc: this.subs, permission: constants.VIEWERS },
-      { this: this, id: '!age', command: '!age', fnc: this.age, permission: constants.VIEWERS },
       { this: this, id: '!title', command: '!title', fnc: this.getTitle, permission: constants.VIEWERS },
       { this: this, id: '!title set', command: '!title set', fnc: this.setTitle, permission: constants.OWNER_ONLY },
       { this: this, id: '!game', command: '!game', fnc: this.getGame, permission: constants.VIEWERS },
       { this: this, id: '!game set', command: '!game set', fnc: this.setGame, permission: constants.OWNER_ONLY }
     ]
     return commands
-  }
-
-  parsers () {
-    return [
-      { this: this, name: 'lastseen', fnc: this.lastseenUpdate, permission: constants.VIEWERS, priority: constants.LOWEST }
-    ]
   }
 
   async sendTwitchVideo (self, socket) {
@@ -64,47 +53,6 @@ class Twitch {
   async time (opts) {
     let message = await global.commons.prepare('time', { time: moment().tz(config.timezone).format('LTS') })
     global.commons.sendMessage(message, opts.sender)
-  }
-
-  async lastseenUpdate (opts) {
-    if (!_.isNil(opts.sender) && !_.isNil(opts.sender.userId) && !_.isNil(opts.sender.username)) {
-      global.users.setById(opts.sender.userId, {
-        username: opts.sender.username,
-        time: { message: new Date().getTime() },
-        is: { subscriber: opts.sender.isSubscriber || opts.sender.isTurboSubscriber }
-      }, true)
-      global.db.engine.update('users.online', { username: opts.sender.username }, { username: opts.sender.username })
-    }
-    return true
-  }
-
-  async followage (opts) {
-    let username
-    let parsed = opts.parameters.match(/([^@]\S*)/g)
-
-    if (_.isNil(parsed)) username = opts.sender.username
-    else username = parsed[0].toLowerCase()
-
-    const user = await global.users.getByName(username)
-    if (_.isNil(user) || _.isNil(user.time) || _.isNil(user.time.follow) || _.isNil(user.is.follower) || !user.is.follower) {
-      let message = await global.commons.prepare('followage.success.never', { username: username })
-      global.commons.sendMessage(message, opts.sender)
-    } else {
-      let diff = moment.preciseDiff(moment(user.time.follow).valueOf(), moment().valueOf(), true)
-      let output = []
-      if (diff.years) output.push(diff.years + ' ' + global.commons.getLocalizedName(diff.years, 'core.years'))
-      if (diff.months) output.push(diff.months + ' ' + global.commons.getLocalizedName(diff.months, 'core.months'))
-      if (diff.days) output.push(diff.days + ' ' + global.commons.getLocalizedName(diff.days, 'core.days'))
-      if (diff.hours) output.push(diff.hours + ' ' + global.commons.getLocalizedName(diff.hours, 'core.hours'))
-      if (diff.minutes) output.push(diff.minutes + ' ' + global.commons.getLocalizedName(diff.minutes, 'core.minutes'))
-      if (output.length === 0) output.push(0 + ' ' + global.commons.getLocalizedName(0, 'core.minutes'))
-
-      let message = await global.commons.prepare('followage.success.time', {
-        username: username,
-        diff: output.join(', ')
-      })
-      global.commons.sendMessage(message, opts.sender)
-    }
   }
 
   async followers (opts) {
@@ -155,98 +103,6 @@ class Twitch {
       onlineSubCount: onlineSubCount
     })
     global.commons.sendMessage(message, opts.sender)
-  }
-
-  async subage (opts) {
-    let username
-    let parsed = opts.parameters.match(/([^@]\S*)/g)
-
-    if (_.isNil(parsed)) username = opts.sender.username
-    else username = parsed[0].toLowerCase()
-
-    const user = await global.users.getByName(username)
-    if (_.isNil(user) || _.isNil(user.time) || _.isNil(user.time.subscribed_at) || _.isNil(user.is.subscriber) || !user.is.subscriber) {
-      let message = await global.commons.prepare('subage.success.never', { username: username })
-      global.commons.sendMessage(message, opts.sender)
-    } else {
-      let diff = moment.preciseDiff(moment(user.time.subscribed_at).valueOf(), moment().valueOf(), true)
-      let output = []
-      if (diff.years) output.push(diff.years + ' ' + global.commons.getLocalizedName(diff.years, 'core.years'))
-      if (diff.months) output.push(diff.months + ' ' + global.commons.getLocalizedName(diff.months, 'core.months'))
-      if (diff.days) output.push(diff.days + ' ' + global.commons.getLocalizedName(diff.days, 'core.days'))
-      if (diff.hours) output.push(diff.hours + ' ' + global.commons.getLocalizedName(diff.hours, 'core.hours'))
-      if (diff.minutes) output.push(diff.minutes + ' ' + global.commons.getLocalizedName(diff.minutes, 'core.minutes'))
-      if (output.length === 0) output.push(0 + ' ' + global.commons.getLocalizedName(0, 'core.minutes'))
-
-      let message = await global.commons.prepare('subage.success.time', {
-        username: username,
-        diff: output.join(', ')
-      })
-      global.commons.sendMessage(message, opts.sender)
-    }
-  }
-
-  async age (opts) {
-    let username
-    let parsed = opts.parameters.match(/([^@]\S*)/g)
-
-    if (_.isNil(parsed)) username = opts.sender.username
-    else username = parsed[0].toLowerCase()
-
-    const user = await global.users.getByName(username)
-    if (_.isNil(user) || _.isNil(user.time) || _.isNil(user.time.created_at)) {
-      let message = await global.commons.prepare('age.failed', { username: username })
-      global.commons.sendMessage(message, opts.sender)
-    } else {
-      let diff = moment.preciseDiff(moment(user.time.created_at).valueOf(), moment().valueOf(), true)
-      let output = []
-      if (diff.years) output.push(diff.years + ' ' + global.commons.getLocalizedName(diff.years, 'core.years'))
-      if (diff.months) output.push(diff.months + ' ' + global.commons.getLocalizedName(diff.months, 'core.months'))
-      if (diff.days) output.push(diff.days + ' ' + global.commons.getLocalizedName(diff.days, 'core.days'))
-      if (diff.hours) output.push(diff.hours + ' ' + global.commons.getLocalizedName(diff.hours, 'core.hours'))
-      let message = await global.commons.prepare(!_.isNil(parsed) ? 'age.success.withUsername' : 'age.success.withoutUsername', {
-        username: username,
-        diff: output.join(', ')
-      })
-      global.commons.sendMessage(message, opts.sender)
-    }
-  }
-
-  async lastseen (opts) {
-    try {
-      var parsed = opts.parameters.match(/^([\S]+)$/)
-      const user = await global.users.getByName(parsed[0])
-      if (_.isNil(user) || _.isNil(user.time) || _.isNil(user.time.message)) {
-        global.commons.sendMessage(global.translate('lastseen.success.never').replace(/\$username/g, parsed[0]), opts.sender)
-      } else {
-        global.commons.sendMessage(global.translate('lastseen.success.time')
-          .replace(/\$username/g, parsed[0])
-          .replace(/\$when/g, moment.unix(user.time.message / 1000).format('DD-MM-YYYY HH:mm:ss')), opts.sender)
-      }
-    } catch (e) {
-      global.commons.sendMessage(global.translate('lastseen.failed.parse'), opts.sender)
-    }
-  }
-
-  async watched (opts) {
-    try {
-      const parsed = opts.parameters.match(/^([\S]+)$/)
-
-      let id = opts.sender.userId
-      let username = opts.sender.username
-
-      if (parsed) {
-        username = parsed[0].toLowerCase()
-        id = await global.users.getIdByName(username)
-      }
-
-      const time = id ? Number((await global.users.getWatchedOf(id) / (60 * 60 * 1000))).toFixed(1) : 0
-
-      let m = await global.commons.prepare('watched.success.time', { time, username })
-      global.commons.sendMessage(m, opts.sender)
-    } catch (e) {
-      global.commons.sendMessage(global.translate('watched.failed.parse'), opts.sender)
-    }
   }
 
   async getTitle (opts) {

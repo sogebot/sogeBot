@@ -26,7 +26,6 @@ class Users extends Core {
         { name: '!ignore add', fnc: 'ignoreAdd', permission: constants.OWNER_ONLY },
         { name: '!ignore rm', fnc: 'ignoreRm', permission: constants.OWNER_ONLY },
         { name: '!ignore check', fnc: 'ignoreCheck', permission: constants.OWNER_ONLY },
-        { name: '!me', fnc: 'showMe', permission: constants.VIEWERS }
       ]
     }
 
@@ -269,43 +268,6 @@ class Users extends Core {
       await global.db.engine.update('users', { id }, { username })
     }
     return id
-  }
-
-  async showMe (opts: Object) {
-    try {
-      var message = ['$sender']
-
-      // rank
-      var rank = await global.systems.ranks.get(opts.sender.username)
-      if (await global.systems.ranks.isEnabled() && !_.isNull(rank)) message.push(rank)
-
-      // watchTime
-      var watched = await global.users.getWatchedOf(opts.sender.userId)
-      message.push((watched / 1000 / 60 / 60).toFixed(1) + 'h')
-
-      // points
-      if (await global.systems.points.isEnabled()) {
-        let userPoints = await global.systems.points.getPointsOf(opts.sender.userId)
-        message.push(userPoints + ' ' + await global.systems.points.getPointsName(userPoints))
-      }
-
-      // message count
-      var messages = await global.users.getMessagesOf(opts.sender.userId)
-      message.push(messages + ' ' + global.commons.getLocalizedName(messages, 'core.messages'))
-
-      // tips
-      const tips = await global.db.engine.find('users.tips', { id: opts.sender.userId })
-      const currency = global.currency.settings.currency.mainCurrency
-      let tipAmount = 0
-      for (let t of tips) {
-        tipAmount += global.currency.exchange(t.amount, t.currency, currency)
-      }
-      message.push(`${Number(tipAmount).toFixed(2)}${global.currency.symbol(currency)}`)
-
-      global.commons.sendMessage(message.join(' | '), opts.sender)
-    } catch (e) {
-      global.log.error(e.stack)
-    }
   }
 
   async sockets () {
