@@ -188,6 +188,7 @@ class Users extends Core {
         let users = await global.db.engine.find('users.online')
         let updated = []
         for (let onlineUser of users) {
+          if (await global.commons.isIgnored(onlineUser)) continue
           const isNewUser = typeof this.watchedList[onlineUser.username] === 'undefined'
           updated.push(onlineUser.username)
           const watched = isNewUser ? timeout : new Date().getTime() - new Date(this.watchedList[onlineUser.username]).getTime()
