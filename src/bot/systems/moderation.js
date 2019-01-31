@@ -417,7 +417,7 @@ class Moderation extends System {
   }
 
   async emotes (opts) {
-    if (!(Symbol.iterator in Object(opts.sender.emotes))) return
+    if (!(Symbol.iterator in Object(opts.sender.emotes))) return true
     let [isEnabled, isEnabledForSubs, isOwner, isMod, timeout, maxCount] = await Promise.all([
       this.settings.emotes.enabled,
       this.settings.emotes.moderateSubscribers,

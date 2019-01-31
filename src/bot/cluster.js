@@ -111,15 +111,13 @@ function cluster () {
 
     const parse = new Parser({ sender: sender, message: message, skip: skip, quiet: quiet })
 
-    let isModerated
     if (!skip && sender['message-type'] === 'whisper' && (!(await global.configuration.getValue('disableWhisperListener')) || global.commons.isOwner(sender))) {
       global.log.whisperIn(message, { username: sender.username })
-      isModerated = false
     } else if (!skip && !await global.commons.isBot(sender.username)) {
       global.log.chatIn(message, { username: sender.username })
-      isModerated = await parse.isModerated()
     }
 
+    const isModerated = await parse.isModerated()
     const isIgnored = await global.commons.isIgnored(sender)
     if (!isModerated && !isIgnored) {
       if (!skip && !_.isNil(sender.username)) {
@@ -142,9 +140,7 @@ function cluster () {
           global.events.fire('command-send-x-times', { username: sender.username, message: message })
         } else if (!message.startsWith('!')) global.db.engine.increment('users.messages', { id: sender.userId }, { messages: 1 })
       }
-      console.log('process')
       await parse.process()
-      console.log('end process')
     }
     if (process.send) process.send({ type: 'stats', of: 'parser', value: parse.time(), message: message })
   }
