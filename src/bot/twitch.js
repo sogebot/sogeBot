@@ -131,8 +131,11 @@ class Twitch {
         .replace(/\$game/g, _.get(await global.db.engine.findOne('api.current', { key: 'game' }), 'value', 'n/a')), opts.sender)
       return
     }
-    if (cluster.isMaster) global.api.setTitleAndGame(opts.sender, { game: opts.parameters })
-    else if (process.send) process.send({ type: 'call', ns: 'api', fnc: 'setTitleAndGame', args: [opts.sender, { game: opts.parameters }] })
+    if (cluster.isMaster) {
+      const games = await global.api.sendGameFromTwitch (global.api, null, opts.parameters)
+      global.api.setTitleAndGame(opts.sender, { game: games[0] })
+    }
+    else if (process.send) process.send({ type: 'call', ns: 'twitch', fnc: 'setGame', args: [opts] })
   }
 }
 
