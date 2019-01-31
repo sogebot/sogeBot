@@ -1232,9 +1232,11 @@ class API {
     }
 
     if (_.isNull(request.data.games)) {
-      socket.emit('sendGameFromTwitch', false)
+      if (socket) socket.emit('sendGameFromTwitch', false)
+      return false
     } else {
-      socket.emit('sendGameFromTwitch', _.map(request.data.games, 'name'))
+      if (socket) socket.emit('sendGameFromTwitch', _.map(request.data.games, 'name'))
+      return _.map(request.data.games, 'name')
     }
   }
 
