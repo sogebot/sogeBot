@@ -113,11 +113,12 @@ function cluster () {
 
     if (!skip && sender['message-type'] === 'whisper' && (!(await global.configuration.getValue('disableWhisperListener')) || global.commons.isOwner(sender))) {
       global.log.whisperIn(message, { username: sender.username })
-    } else if (!skip && !await global.commons.isBot(sender.username)) global.log.chatIn(message, { username: sender.username })
+    } else if (!skip && !await global.commons.isBot(sender.username)) {
+      global.log.chatIn(message, { username: sender.username })
+    }
 
     const isModerated = await parse.isModerated()
     const isIgnored = await global.commons.isIgnored(sender)
-
     if (!isModerated && !isIgnored) {
       if (!skip && !_.isNil(sender.username)) {
         let user = await global.db.engine.findOne('users', { id: sender.userId })

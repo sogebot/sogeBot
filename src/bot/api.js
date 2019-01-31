@@ -933,7 +933,11 @@ class API {
       if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'getCurrentStreamData', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining })
 
       let justStarted = false
-      global.log.debug('API: ' + JSON.stringify(request.data))
+
+      if (__DEBUG__.STREAM) {
+        global.log.debug('API: ' + JSON.stringify(request.data))
+      }
+
       if (request.status === 200 && !_.isNil(request.data.data[0])) {
         // correct status and we've got a data - stream online
         let stream = request.data.data[0]

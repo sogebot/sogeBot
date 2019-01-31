@@ -41,7 +41,7 @@ const levels = {
   info: 12,
   start: 12,
   stop: 12,
-  debug: 13,
+  debug: 12,
   process: 99999
 }
 
@@ -62,7 +62,7 @@ if (cluster.isWorker) {
       format.printf(info => {
         let level
         if (info.level === 'error') level = '!!! ERROR !!!'
-        if (info.level === 'debug') level = 'DEBUG:'
+        if (info.level === 'debug') level = chalk.bgRed.bold('DEBUG:')
         if (info.level === 'chatIn') level = '<<<'
         if (info.level === 'chatOut') level = '>>>'
         if (info.level === 'whisperIn') level = '<w<'

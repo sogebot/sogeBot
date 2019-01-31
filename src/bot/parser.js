@@ -4,6 +4,9 @@ const _ = require('lodash')
 
 const constants = require('./constants')
 
+const __DEBUG__ =
+  (process.env.DEBUG && process.env.DEBUG.includes('parser'));
+
 class Parser {
   constructor (opts) {
     opts = opts || {}
@@ -36,6 +39,9 @@ class Parser {
       }
       const isOk = await parser['fnc'].apply(parser.this, [opts])
       if (!isOk) {
+        if (__DEBUG__) {
+          global.log.debug(parser['fnc']);
+        }
         return true
       }
     }
