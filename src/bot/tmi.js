@@ -425,7 +425,7 @@ class TMI extends Core {
       global.log.subgift(`${recipient}, from: ${username}, months: ${months}`)
 
       // also set subgift count to gifter
-      if (!global.commons.isIgnored(username)) {
+      if (!(await global.commons.isIgnored(username))) {
         await global.db.engine.increment('users', { id: message.tags.userId }, { custom: { subgiftCount: 1 } })
       }
     } catch (e) {
