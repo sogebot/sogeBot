@@ -42,7 +42,7 @@ class UserInfo extends System {
         me: {
           _order: ['$sender', '$rank', '$watched', '$points', '$messages', '$tips'],
           _formatDisabled: [],
-          formatSeparator: '|',
+          formatSeparator: ' | ',
         },
         commands: [
           { name: '!me', fnc: 'showMe', permission: constants.VIEWERS },
@@ -200,6 +200,66 @@ class UserInfo extends System {
     }
   }
 
+  protected async showMe(opts: CommandOptions) {
+    try {
+      let message: string[] = [];
+
+      // build message
+      for (const i of this.settings.me._order) {
+        if (!this.settings.me._formatDisabled.includes(i)) {
+          message.push(i);
+        }
+      }
+
+      if (message.includes('$rank')) {
+        const idx = message.indexOf('$rank');
+        const rank = await global.systems.ranks.get(opts.sender.username);
+        if (await global.systems.ranks.isEnabled() && !_.isNull(rank)) {
+          message[idx] = rank;
+        } else {
+          message = message.splice(idx, 1);
+        }
+      }
+
+      if (message.includes('$watched')) {
+        const watched = await global.users.getWatchedOf(opts.sender.userId);
+        const idx = message.indexOf('$watched');
+        message[idx] = (watched / 1000 / 60 / 60).toFixed(1) + 'h';
+      }
+
+      if (message.includes('$points')) {
+        const idx = message.indexOf('$points');
+        if (await global.systems.points.isEnabled()) {
+          const userPoints = await global.systems.points.getPointsOf(opts.sender.userId);
+          message[idx] = userPoints + ' ' + await global.systems.points.getPointsName(userPoints);
+        } else {
+          message = message.splice(idx, 1);
+        }
+      }
+
+      if (message.includes('$messages')) {
+        const messages = await global.users.getMessagesOf(opts.sender.userId);
+        const idx = message.indexOf('$messages');
+        message[idx] = messages + ' ' + global.commons.getLocalizedName(messages, 'core.messages');
+      }
+
+      if (message.includes('$tips')) {
+        const idx = message.indexOf('$tips');
+        const tips = await global.db.engine.find('users.tips', { id: opts.sender.userId });
+        const currency = global.currency.settings.currency.mainCurrency;
+        let tipAmount = 0;
+        for (const t of tips) {
+          tipAmount += global.currency.exchange(t.amount, t.currency, currency);
+        }
+        message[idx] = `${Number(tipAmount).toFixed(2)}${global.currency.symbol(currency)}`;
+      }
+
+      global.commons.sendMessage(message.join(this.settings.me.formatSeparator.trim()), opts.sender);
+    } catch (e) {
+      global.log.error(e.stack);
+    }
+  }
+
   private onMessage(opts: onEventMessage) {
     if (!_.isNil(opts.sender) && !_.isNil(opts.sender.userId) && !_.isNil(opts.sender.username)) {
       global.users.setById(opts.sender.userId, {
@@ -208,43 +268,6 @@ class UserInfo extends System {
         is: { subscriber: opts.sender.isSubscriber || opts.sender.isTurboSubscriber },
       }, true);
       global.db.engine.update('users.online', { username: opts.sender.username }, { username: opts.sender.username });
-    }
-  }
-
-  private async showMe(opts: CommandOptions) {
-    try {
-      const message = ['$sender'];
-
-      // rank
-      const rank = await global.systems.ranks.get(opts.sender.username);
-      if (await global.systems.ranks.isEnabled() && !_.isNull(rank)) { message.push(rank); }
-
-      // watchTime
-      const watched = await global.users.getWatchedOf(opts.sender.userId);
-      message.push((watched / 1000 / 60 / 60).toFixed(1) + 'h');
-
-      // points
-      if (await global.systems.points.isEnabled()) {
-        const userPoints = await global.systems.points.getPointsOf(opts.sender.userId);
-        message.push(userPoints + ' ' + await global.systems.points.getPointsName(userPoints));
-      }
-
-      // message count
-      const messages = await global.users.getMessagesOf(opts.sender.userId);
-      message.push(messages + ' ' + global.commons.getLocalizedName(messages, 'core.messages'));
-
-      // tips
-      const tips = await global.db.engine.find('users.tips', { id: opts.sender.userId });
-      const currency = global.currency.settings.currency.mainCurrency;
-      let tipAmount = 0;
-      for (const t of tips) {
-        tipAmount += global.currency.exchange(t.amount, t.currency, currency);
-      }
-      message.push(`${Number(tipAmount).toFixed(2)}${global.currency.symbol(currency)}`);
-
-      global.commons.sendMessage(message.join(' | '), opts.sender);
-    } catch (e) {
-      global.log.error(e.stack);
     }
   }
 }
