@@ -6,6 +6,7 @@ const querystring = require('querystring')
 const _ = require('lodash')
 const cluster = require('cluster')
 const crypto = require('crypto')
+const constants = require('./constants')
 
 const Entities = require('html-entities').AllHtmlEntities
 
@@ -261,7 +262,7 @@ class Message {
     }
     let list = {
       '(list.#)': async function (filter) {
-        let system = filter.replace('(list.', '').replace(')', '')
+        let [system, permission] = filter.replace('(list.', '').replace(')', '').split('.')
 
         let [alias, commands, cooldowns, ranks] = await Promise.all([
           global.db.engine.find(global.systems.alias.collection.data, { visible: true, enabled: true }),
@@ -275,8 +276,32 @@ class Message {
           case '!alias':
             return _.size(alias) === 0 ? ' ' : (_.map(alias, 'alias')).join(', ')
           case 'command':
+            if (permission) {
+              const responses = await global.db.engine.find(global.systems.customCommands.collection.responses)
+
+              let permNo = constants.VIEWERS
+              if (permission === 'mods') permNo = constants.MODS
+              if (permission === 'regular') permNo = constants.REGULAR
+              if (permission === 'viewers') permNo = constants.VIEWERS
+              if (permission === 'owner') permNo = constants.OWNER_ONLY
+
+              const commandIds = responses.filter((o) => o.permission === permNo).map((o) => o.cid)
+              commands = commands.filter((o) => commandIds.includes(String(o._id)))
+            }
             return _.size(commands) === 0 ? ' ' : (_.map(commands, (o) => o.command.replace('!', ''))).join(', ')
           case '!command':
+            if (permission) {
+              const responses = await global.db.engine.find(global.systems.customCommands.collection.responses)
+
+              let permNo = constants.VIEWERS
+              if (permission === 'mods') permNo = constants.MODS
+              if (permission === 'regular') permNo = constants.REGULAR
+              if (permission === 'viewers') permNo = constants.VIEWERS
+              if (permission === 'owner') permNo = constants.OWNER_ONLY
+
+              const commandIds = responses.filter((o) => o.permission === permNo).map((o) => o.cid)
+              commands = commands.filter((o) => commandIds.includes(String(o._id)))
+            }
             return _.size(commands) === 0 ? ' ' : (_.map(commands, 'command')).join(', ')
           case 'cooldown':
             list = _.map(cooldowns, function (o, k) {
@@ -290,6 +315,7 @@ class Message {
             }).join(', ')
             return list.length > 0 ? list : ' '
           default:
+            global.log.warning('unknown list system ' + system)
             return ''
         }
       }
