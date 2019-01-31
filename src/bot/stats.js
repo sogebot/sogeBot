@@ -36,7 +36,8 @@ Stats.prototype.getLatestStats = async function (self, socket) {
     currentViews: 0,
     maxViewers: 0,
     currentHosts: 0,
-    newChatters: 0
+    newChatters: 0,
+    currentWatched: 0
   }
   if (statsFromDb.length > 1) {
     // get second stream (first is current stream)
@@ -52,6 +53,7 @@ Stats.prototype.getLatestStats = async function (self, socket) {
       stats.maxViewers += parseFloat(_.isNil(stat.maxViewers) ? 0 : stat.maxViewers)
       stats.newChatters += parseFloat(_.isNil(stat.newChatters) ? 0 : stat.newChatters)
       stats.currentHosts += parseFloat(_.isNil(stat.currentHosts) ? 0 : stat.currentHosts)
+      stats.currentWatched += parseFloat(_.isNil(stat.currentWatched) ? 0 : stat.currentWatched)
       if (i === 0) {
         // get only latest
         stats.currentFollowers = stat.currentFollowers
@@ -67,6 +69,8 @@ Stats.prototype.getLatestStats = async function (self, socket) {
     stats.maxViewers = parseFloat(stats.maxViewers / statsFromDb.length).toFixed(0)
     stats.newChatters = parseFloat(stats.newChatters / statsFromDb.length).toFixed(0)
     stats.currentHosts = parseFloat(stats.currentHosts / statsFromDb.length).toFixed(0)
+    console.log(stats.currentWatched)
+    stats.currentWatched = parseFloat(stats.currentWatched / statsFromDb.length).toFixed(0)
   } else stats = {}
   socket.emit('latestStats', stats)
 }

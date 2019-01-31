@@ -194,6 +194,7 @@ class Users extends Core {
           const id = await global.users.getIdByName(onlineUser.username)
           if (isNewUser) this.checkNewChatter(id, onlineUser.username)
           await global.db.engine.increment('users.watched', { id }, { watched })
+          global.api._stream.watchedTime += watched
           this.watchedList[onlineUser.username] = new Date()
         }
 
