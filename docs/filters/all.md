@@ -184,9 +184,9 @@
 
 `(list.!alias)` - will return list of your visible !aliases
 
-`(list.commands)` - will return list of your visible custom commands
+`(list.command)` - will return list of your visible custom commands
 
-`(list.!commands)` - will return list of your visible custom !commands
+`(list.!command)` - will return list of your visible custom !commands
 
 `(list.cooldown)` - will return list of your cooldowns (keywords and !commands)
 
