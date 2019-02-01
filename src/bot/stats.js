@@ -69,7 +69,6 @@ Stats.prototype.getLatestStats = async function (self, socket) {
     stats.maxViewers = parseFloat(stats.maxViewers / statsFromDb.length).toFixed(0)
     stats.newChatters = parseFloat(stats.newChatters / statsFromDb.length).toFixed(0)
     stats.currentHosts = parseFloat(stats.currentHosts / statsFromDb.length).toFixed(0)
-    console.log(stats.currentWatched)
     stats.currentWatched = parseFloat(stats.currentWatched / statsFromDb.length).toFixed(0)
   } else stats = {}
   socket.emit('latestStats', stats)
