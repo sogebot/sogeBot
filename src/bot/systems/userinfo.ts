@@ -202,7 +202,7 @@ class UserInfo extends System {
 
   protected async showMe(opts: CommandOptions) {
     try {
-      let message: string[] = [];
+      const message: string[] = [];
 
       // build message
       for (const i of this.settings.me._order) {
