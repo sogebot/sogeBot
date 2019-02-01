@@ -202,7 +202,7 @@ class UserInfo extends System {
 
   protected async showMe(opts: CommandOptions) {
     try {
-      let message: string[] = [];
+      const message: string[] = [];
 
       // build message
       for (const i of this.settings.me._order) {
@@ -217,7 +217,7 @@ class UserInfo extends System {
         if (await global.systems.ranks.isEnabled() && !_.isNull(rank)) {
           message[idx] = rank;
         } else {
-          message = message.splice(idx, 1);
+          message.splice(idx, 1);
         }
       }
 
@@ -233,7 +233,7 @@ class UserInfo extends System {
           const userPoints = await global.systems.points.getPointsOf(opts.sender.userId);
           message[idx] = userPoints + ' ' + await global.systems.points.getPointsName(userPoints);
         } else {
-          message = message.splice(idx, 1);
+          message.splice(idx, 1);
         }
       }
 
@@ -253,7 +253,6 @@ class UserInfo extends System {
         }
         message[idx] = `${Number(tipAmount).toFixed(2)}${global.currency.symbol(currency)}`;
       }
-
       global.commons.sendMessage(message.join(this.settings.me.formatSeparator), opts.sender);
     } catch (e) {
       global.log.error(e.stack);
