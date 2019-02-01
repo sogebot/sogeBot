@@ -864,6 +864,7 @@
     "song-is-banned": "Sorry, $sender, but this song is banned",
     "song-was-not-found": "Sorry, $sender, but this song was not found",
     "song-is-too-long": "Sorry, $sender, but this song is too long",
+    "incorrect-category": "Sorry, $sender, but this song must be music category",
     "song-was-added-to-queue": "$sender, song $name was added to queue",
     "song-was-added-to-playlist": "$sender, song $name was added to playlist",
     "song-is-already-in-playlist": "$sender, song $name is already in playlist",

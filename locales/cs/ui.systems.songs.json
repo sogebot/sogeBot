@@ -9,6 +9,7 @@
     "shuffle": "Zamíchat",
     "songrequest": "Přehrávání ze song requestu",
     "playlist": "Přehrávání z playlistu",
+    "onlyMusicCategory": "Přehrávání pouze z kategorie Hudba",
     "notify": "Odeslat zprávu při změně skladby"
   },
   "error": {

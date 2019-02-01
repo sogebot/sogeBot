@@ -9,6 +9,7 @@
     "shuffle": "Shuffle",
     "songrequest": "Play from song request",
     "playlist": "Play from playlist",
+    "onlyMusicCategory": "Allow only category music",
     "notify": "Send message on song change"
   },
   "error": {

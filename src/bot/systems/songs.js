@@ -5,12 +5,15 @@ const _ = require('lodash')
 const ytdl = require('ytdl-core')
 const ytpl = require('ytpl')
 const ytsearch = require('youtube-search')
+const { YouTube } = require('better-youtube-api')
 // bot libraries
 const constants = require('../constants')
 const cluster = require('cluster')
 const System = require('./_interface')
 
 class Songs extends System {
+  youtubeApi = new YouTube('AIzaSyDYevtuLOxbyqBjh17JNZNvSQO854sngK0');
+
   constructor () {
     const settings = {
       _: {
@@ -23,6 +26,7 @@ class Songs extends System {
       songrequest: true,
       playlist: true,
       notify: false,
+      onlyMusicCategory: false,
       commands: [
         { name: '!songrequest', fnc: 'addSongToQueue' },
         { name: '!wrongsong', fnc: 'removeSongFromQueue' },
@@ -357,12 +361,23 @@ class Songs extends System {
       return
     }
 
+    // is correct category?
+    if (this.settings.onlyMusicCategory) {
+      try {
+        const video = await this.youtubeApi.getVideo(videoID)
+        if (video.data.snippet.categoryId !== '10') {
+          return global.commons.sendMessage(global.translate('songs.incorrect-category'), opts.sender)
+        }
+      } catch (e) {}
+    }
+
     ytdl.getInfo('https://www.youtube.com/watch?v=' + videoID, async (err, videoInfo) => {
       if (err) return global.log.error(err, { fnc: 'Songs.prototype.addSongToQueue#1' })
       if (_.isUndefined(videoInfo) || _.isUndefined(videoInfo.title) || _.isNull(videoInfo.title)) {
         global.commons.sendMessage(global.translate('songs.song-was-not-found'), opts.sender)
-      } else if (videoInfo.length_seconds / 60 > await this.settings.duration) global.commons.sendMessage(global.translate('songs.song-is-too-long'), opts.sender)
-      else {
+      } else if (videoInfo.length_seconds / 60 > await this.settings.duration) {
+        global.commons.sendMessage(global.translate('songs.song-is-too-long'), opts.sender)
+      } else {
         global.db.engine.update(this.collection.request, { addedAt: new Date().getTime() }, { videoID: videoID, title: videoInfo.title, addedAt: new Date().getTime(), loudness: videoInfo.loudness, length_seconds: videoInfo.length_seconds, username: opts.sender.username })
         let message = await global.commons.prepare('songs.song-was-added-to-queue', { name: videoInfo.title })
         global.commons.sendMessage(message, opts.sender)
