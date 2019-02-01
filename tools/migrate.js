@@ -222,6 +222,33 @@ let migration = {
     }
   }],
   settings: [{
+    version: '8.3.0',
+    do: async () => {
+      console.info('Merging settings to 8.3.0')
+      for (let collection of (await global.db.engine.collections())) {
+        const [name, system, type] = collection.split('.')
+        if (type === 'settings') {
+          const items = await global.db.engine.find(collection)
+          for (let item of items) {
+            delete item._id
+            await global.db.engine.insert(name + '.settings', {
+              system,
+              ...item
+            })
+          }
+          if (config.database.type === 'nedb') {
+            if (fs.existsSync(`db/nedb/${collection}.db`)) {
+              console.info(`- Removing db/nedb/${collection}.db`)
+              fs.unlinkSync(`db/nedb/${collection}.db`)
+            }
+          } else if (config.database.type === 'mongodb') {
+            console.info(`- Removing ${collection}`)
+            await global.db.engine.drop(collection)
+          }
+        }
+      }
+    }
+  }, {
     version: '8.2.0',
     do: async () => {
       let settings = null

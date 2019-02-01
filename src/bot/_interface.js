@@ -49,7 +49,6 @@ class Module {
     this.prepareParsers()
     this.loadVariableValues()
     this._sockets()
-    this._cleanEmptySettingsValues()
     this._indexDbs()
     this._status()
   }
@@ -69,10 +68,10 @@ class Module {
   }
 
   async loadVariableValues () {
-    const variables = await global.db.engine.find(this.collection.settings)
+    const variables = await global.db.engine.find(this._name + '.settings', { system: this.constructor.name.toLowerCase() })
     for (let i = 0, length = variables.length; i < length; i++) {
       if (_.has(this._opts.settings, variables[i].key) && variables[i].value !== null) _.set(this._settings, variables[i].key, variables[i].value)
-      else await global.db.engine.remove(this.collection.settings, { _id: String(variables[i]._id) })
+      else await global.db.engine.remove(this._name + '.settings', { _id: String(variables[i]._id) })
     }
     this.isLoaded = true
   }
@@ -99,7 +98,7 @@ class Module {
     const proc = { type: '/' + this._name + '/' + this.constructor.name.toLowerCase(), path: key, value }
 
     if (cluster.isMaster) {
-      global.db.engine.update(this.collection.settings, { key }, { value })
+      global.db.engine.update(this._name + '.settings', { system: this.constructor.name.toLowerCase(), key }, { value })
       // send to all cluster
       // eslint-disable-next-line
       for (let w of Object.entries(cluster.workers)) {
@@ -206,20 +205,9 @@ class Module {
         this.timeouts[`${this.constructor.name}._indexDbs`] = setTimeout(() => this._indexDbs(), 1000)
       } else {
         // add indexing to settings
-        global.db.engine.index({ table: this.collection.settings, index: 'key' })
+        global.db.engine.index({ table: this._name + '.settings', index: 'key' })
       }
     }
-  }
-
-  async _cleanEmptySettingsValues () {
-    clearTimeout(this.timeouts[`${this.constructor.name}._cleanEmptySettingsValues`])
-    let settings = await global.db.engine.find(this.collection.settings)
-    for (let setting of settings) {
-      if (typeof setting.value === 'undefined') {
-        await global.db.engine.remove(this.collection.settings, { _id: String(setting._id) })
-      }
-    }
-    this.timeouts[`${this.constructor.name}._cleanEmptySettingsValues`] = setTimeout(() => this._cleanEmptySettingsValues(), 30000)
   }
 
   _sockets () {
