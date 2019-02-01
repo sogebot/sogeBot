@@ -879,6 +879,7 @@
     "song-is-banned": "Promin, $sender, ale tahle pisen je zabanovana",
     "song-was-not-found": "Promin, $sender, ale tahle pisen nebyla nalezena",
     "song-is-too-long": "Promin, $sender, ale tahle pisen je moc dlouha",
+    "incorrect-category": "Promin, $sender, ale pisen musi byt pouze z kategorie hudba",
     "song-was-added-to-queue": "$sender, pisen $name byla pridana do queue",
     "song-was-added-to-playlist": "$sender, pisen $name byla pridana do playlistu",
     "song-is-already-in-playlist": "$sender, pisen $name je jiz v playlistu",
