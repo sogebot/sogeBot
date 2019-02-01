@@ -254,7 +254,7 @@ class UserInfo extends System {
         message[idx] = `${Number(tipAmount).toFixed(2)}${global.currency.symbol(currency)}`;
       }
 
-      global.commons.sendMessage(message.join(this.settings.me.formatSeparator.trim()), opts.sender);
+      global.commons.sendMessage(message.join(this.settings.me.formatSeparator), opts.sender);
     } catch (e) {
       global.log.error(e.stack);
     }
