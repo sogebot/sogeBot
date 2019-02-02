@@ -124,7 +124,7 @@ class Top extends System {
         for (const tip of tips) {
           const username = await global.users.getNameById(tip.id);
           if (_.isNil(users[username])) {
-            users[username] = { username, amount: 0 };
+            users[username] = { username, value: 0 };
           }
           users[username].value += global.currency.exchange(tip.amount, tip.currency, global.currency.settings.currency.mainCurrency);
         }
