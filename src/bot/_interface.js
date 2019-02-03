@@ -265,7 +265,17 @@ class Module {
           opts.items = opts.items || []
           if (opts.collection.startsWith('_')) {
             opts.collection = opts.collection.replace('_', '')
-          } else opts.collection = this.collection[opts.collection]
+          } else {
+            if (opts.collection === 'settings') {
+              opts.collection = this._name + '.settings'
+              opts.where = {
+                system: this.constructor.name.toLowerCase(),
+                ...opts.where,
+              }
+            } else {
+              opts.collection = this.collection[opts.collection]
+            }
+          }
 
           // get all items by where
           if (opts.where === null || typeof opts.where === 'undefined') {
@@ -284,7 +294,17 @@ class Module {
           opts.collection = opts.collection || 'data'
           if (opts.collection.startsWith('_')) {
             opts.collection = opts.collection.replace('_', '')
-          } else opts.collection = this.collection[opts.collection]
+          } else {
+            if (opts.collection === 'settings') {
+              opts.collection = this._name + '.settings'
+              opts.where = {
+                system: this.constructor.name.toLowerCase(),
+                ...opts.where,
+              }
+            } else {
+              opts.collection = this.collection[opts.collection]
+            }
+          }
 
           if (opts.items) {
             for (let item of opts.items) {
@@ -303,7 +323,17 @@ class Module {
           opts.collection = opts.collection || 'data'
           if (opts.collection.startsWith('_')) {
             opts.collection = opts.collection.replace('_', '')
-          } else opts.collection = this.collection[opts.collection]
+          } else {
+            if (opts.collection === 'settings') {
+              opts.collection = this._name + '.settings'
+              opts.where = {
+                system: this.constructor.name.toLowerCase(),
+                ...opts.where,
+              }
+            } else {
+              opts.collection = this.collection[opts.collection]
+            }
+          }
 
           if (opts._id) {
             await global.db.engine.remove(opts.collection, { _id: opts._id })
@@ -318,7 +348,17 @@ class Module {
           opts.omit = opts.omit || []
           if (opts.collection.startsWith('_')) {
             opts.collection = opts.collection.replace('_', '')
-          } else opts.collection = this.collection[opts.collection]
+          } else {
+            if (opts.collection === 'settings') {
+              opts.collection = this._name + '.settings'
+              opts.where = {
+                system: this.constructor.name.toLowerCase(),
+                ...opts.where,
+              }
+            } else {
+              opts.collection = this.collection[opts.collection]
+            }
+          }
 
           opts.where = opts.where || {}
           if (_.isFunction(cb)) {
@@ -337,7 +377,17 @@ class Module {
           opts.omit = opts.omit || []
           if (opts.collection.startsWith('_')) {
             opts.collection = opts.collection.replace('_', '')
-          } else opts.collection = this.collection[opts.collection]
+          } else {
+            if (opts.collection === 'settings') {
+              opts.collection = this._name + '.settings'
+              opts.where = {
+                system: this.constructor.name.toLowerCase(),
+                ...opts.where,
+              }
+            } else {
+              opts.collection = this.collection[opts.collection]
+            }
+          }
 
           opts.where = opts.where || {}
           if (_.isFunction(cb)) {
