@@ -59,7 +59,7 @@
           </ul>
         </div>
         <div class="card-footer text-right">
-          <hold-button class="btn-danger btn-shrink" @trigger="removeGoal(group.uid)" icon="trash">
+          <hold-button class="btn-danger btn-reverse btn-shrink" @trigger="removeGoal(group.uid)" icon="trash">
             <template slot="title">{{translate('dialog.buttons.delete')}}</template>
             <template slot="onHoldTitle">{{translate('dialog.buttons.hold-to-delete')}}</template>
           </hold-button>
