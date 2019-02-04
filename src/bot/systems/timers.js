@@ -7,7 +7,7 @@ const cluster = require('cluster')
 
 // bot libraries
 var constants = require('../constants')
-const System = require('./_interface')
+import System from './_interface'
 
 /*
  * !timers                                                                                                                      - gets an info about timers usage

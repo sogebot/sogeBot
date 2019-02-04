@@ -5,7 +5,7 @@ const _ = require('lodash')
 const cluster = require('cluster')
 
 // bot libraries
-const Game = require('./_interface')
+import Game from './_interface'
 
 const ERROR_NOT_ENOUGH_OPTIONS = '0'
 const ERROR_ZERO_BET = '1'

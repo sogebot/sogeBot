@@ -6,7 +6,7 @@ const io = require('socket.io-client')
 const chalk = require('chalk')
 
 // bot libraries
-const Integration = require('./_interface')
+import Integration from './_interface'
 
 class Streamlabs extends Integration {
   socket: Socket = null

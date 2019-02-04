@@ -1,7 +1,7 @@
 'use strict'
 
 // bot libraries
-const System = require('./_interface')
+import System from './_interface'
 
 class Checklist extends System {
   constructor () {

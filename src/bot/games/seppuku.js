@@ -1,4 +1,4 @@
-const Game = require('./_interface')
+import Game from './_interface'
 
 /*
  * !seppuku         - timeout yourself

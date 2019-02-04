@@ -4,7 +4,7 @@
 const _ = require('lodash')
 
 // bot libraries
-const Game = require('./_interface')
+import Game from './_interface'
 
 /*
  * !roulette - 50/50 chance to timeout yourself

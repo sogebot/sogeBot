@@ -3,7 +3,7 @@
 const _ = require('lodash')
 
 // bot libraries
-const System = require('./_interface')
+import System from './_interface'
 const constants = require('../constants')
 
 /*

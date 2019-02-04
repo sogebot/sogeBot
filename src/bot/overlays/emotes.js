@@ -8,7 +8,7 @@ const cluster = require('cluster')
 const axios = require('axios')
 const XRegExp = require('xregexp')
 
-const Overlay = require('./_interface')
+import Overlay from './_interface'
 
 class Emotes extends Overlay {
   simpleEmotes = {

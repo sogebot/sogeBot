@@ -3,7 +3,7 @@
 
 const _ = require('lodash')
 
-const Overlay = require('./_interface')
+import Overlay from './_interface'
 
 class Credits extends Overlay {
   constructor () {

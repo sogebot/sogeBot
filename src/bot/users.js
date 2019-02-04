@@ -8,7 +8,7 @@ const cluster = require('cluster')
 const axios = require('axios')
 
 const Expects = require('./expects')
-const Core = require('./_interface')
+import Core from './_interface'
 
 class Users extends Core {
   uiSortCache: String | null = null

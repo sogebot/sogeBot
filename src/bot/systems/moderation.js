@@ -6,7 +6,7 @@ const XRegExp = require('xregexp')
 // bot libraries
 var constants = require('../constants')
 const Message = require('../message')
-const System = require('./_interface')
+import System from './_interface'
 var log = global.log
 
 class Moderation extends System {

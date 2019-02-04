@@ -5,7 +5,7 @@ const _ = require('lodash')
 const cluster = require('cluster')
 
 const Expects = require('../expects.js')
-const Game = require('./_interface')
+import Game from './_interface'
 
 class Heist extends Game {
   constructor () {

@@ -7,7 +7,7 @@ const XRegExp = require('xregexp')
 // bot libraries
 var constants = require('../constants')
 const Message = require('../message')
-const System = require('./_interface')
+import System from './_interface'
 
 /*
  * !keyword                      - gets an info about keyword usage

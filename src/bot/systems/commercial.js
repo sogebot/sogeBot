@@ -6,7 +6,7 @@ const axios = require('axios')
 
 // bot libraries
 const constants = require('../constants')
-const System = require('./_interface')
+import System from './_interface'
 
 /*
  * !commercial                        - gets an info about alias usage

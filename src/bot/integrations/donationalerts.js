@@ -7,7 +7,7 @@ const constants = require('../constants.js')
 const cluster = require('cluster')
 
 // bot libraries
-const Integration = require('./_interface')
+import Integration from './_interface'
 
 class Donationalerts extends Integration {
   socket: Socket = null

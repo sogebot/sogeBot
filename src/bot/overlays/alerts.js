@@ -8,7 +8,7 @@ const constants = require('../constants.js')
 const cluster = require('cluster')
 const Message = require('../message')
 
-const Overlay = require('./_interface')
+import Overlay from './_interface'
 
 class Alerts extends Overlay {
   constructor () {

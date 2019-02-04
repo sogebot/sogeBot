@@ -9,7 +9,7 @@ const { YouTube } = require('better-youtube-api')
 // bot libraries
 const constants = require('../constants')
 const cluster = require('cluster')
-const System = require('./_interface')
+import System from './_interface'
 
 class Songs extends System {
   youtubeApi = new YouTube('AIzaSyDYevtuLOxbyqBjh17JNZNvSQO854sngK0');

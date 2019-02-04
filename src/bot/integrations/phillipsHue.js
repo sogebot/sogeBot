@@ -10,7 +10,7 @@ const cluster = require('cluster')
 
 // bot libraries
 const constants = require('../constants')
-const Integration = require('./_interface')
+import Integration from './_interface'
 
 declare type State = {
   rgb: Array<number>,

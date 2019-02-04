@@ -1,7 +1,7 @@
 // @flow
 'use strict'
 
-const Overlay = require('./_interface')
+import Overlay from './_interface'
 
 class Bets extends Overlay {
   timeouts: TimeoutsObject = {}
