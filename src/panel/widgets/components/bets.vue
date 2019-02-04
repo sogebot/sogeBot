@@ -82,7 +82,7 @@ export default {
   },
   data: function () {
     return {
-      socket: io('/widgets/bets', {query: "token=" + this.token}),
+      socket: io('/systems/bets', {query: "token=" + this.token}),
       betPercentGain: 0,
 
       locked: false,
@@ -100,21 +100,25 @@ export default {
     }
   },
   created: function () {
-    setInterval(() => this.socket.emit('data', (_current, _bets) => {
-      if (!_.isEmpty(_current)) {
-        this.locked = _current.locked
-        this.options = _current.options
-        this.timer = Number((Number(_current.end) - new Date().getTime()) / 1000).toFixed(0)
-        if (this.timer <= 0) this.timer = 0
-        this.title = _current.title
-      } else {
-        this.title = ''
-        this.timer = null,
-        this.options = []
-      }
-      this.bets = _bets
+    setInterval(() => this.socket.emit('findOne', { where: { key: 'bets' } }, (err, _current) => {
+      if (err) return console.error(err)
+      this.socket.emit('find', { collection: 'users' }, (err, _bets) => {
+        if (err) return console.error(err)
+        if (!_.isEmpty(_current)) {
+          this.locked = _current.locked
+          this.options = _current.options
+          this.timer = Number((Number(_current.end) - new Date().getTime()) / 1000).toFixed(0)
+          if (this.timer <= 0) this.timer = 0
+          this.title = _current.title
+        } else {
+          this.title = ''
+          this.timer = null,
+          this.options = []
+        }
+        this.bets = _bets
+      })
     }), 1000)
-    this.socket.emit('settings', (err, data) => { this.betPercentGain = data.betPercentGain })
+    this.socket.emit('settings', (err, settings) => { this.betPercentGain = settings.betPercentGain })
   },
   methods: {
     close: function (index) {
