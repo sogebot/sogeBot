@@ -59,7 +59,10 @@
           </ul>
         </div>
         <div class="card-footer text-right">
-          <hold-button class="btn-danger btn-shrink" @trigger="removeGoal(group.uid)" :holdtitle="translate('dialog.buttons.hold-to-delete')" :title="translate('dialog.buttons.delete')" icon="trash"></hold-button>
+          <hold-button class="btn-danger btn-shrink" @trigger="removeGoal(group.uid)" icon="trash">
+            <template slot="title">{{translate('dialog.buttons.delete')}}</template>
+            <template slot="onHoldTitle">{{translate('dialog.buttons.hold-to-delete')}}</template>
+          </hold-button>
           <button-with-icon
             :text="'/overlays/goals/' + group.uid"
             :href="'/overlays/goals/' + group.uid"

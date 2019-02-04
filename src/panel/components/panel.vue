@@ -3,7 +3,10 @@
     <div class="col-auto mr-auto" v-if="opts.leftButtons.length > 0">
       <template v-for="button of opts.leftButtons">
         <div v-if="(button.if || typeof button.if === 'undefined')" class="mr-2 d-inline-block" v-bind:key="button">
-          <hold-button @trigger="$emit(button.event)" :class="typeof button.state !== 'undefined' && state[button.state] === 2 ? 'btn-success' : button.class" v-if="button.hold" :holdtitle="button.textWhenHold" :title="button.text" :icon="button.icon" style="position:relative; top: -2px;"></hold-button>
+          <hold-button @trigger="$emit(button.event)" :class="typeof button.state !== 'undefined' && state[button.state] === 2 ? 'btn-success' : button.class" v-if="button.hold" :icon="button.icon" style="position:relative; top: -2px;">
+            <template slot="title">{{button.text}}</template>
+            <template slot="onHoldTitle">{{button.textWhenHold}}</template>
+          </hold-button>
           <a v-else class="btn btn-shrink btn-with-icon" :href="button.href" :class="typeof button.state !== 'undefined' && state[button.state] === 2 ? 'btn-success' : button.class">
             <div class="text">
               <template v-if="typeof button.state !== 'undefined' &&  typeof state[button.state] !== 'undefined'">

@@ -150,7 +150,10 @@
                 <div class="card col-12 p-0 m-0" style="max-height: fit-content;">
                   <div class="card-header">
                     <span style="position: relative; top: 0.3rem">{{translate('registry.goals.general')}}</span>
-                    <hold-button class="btn-danger float-right" @trigger="removeGoal(uiShowGoal)" :holdtitle="translate('dialog.buttons.hold-to-delete')" :title="translate('dialog.buttons.delete')" icon="trash"></hold-button>
+                    <hold-button class="btn-danger float-right" @trigger="removeGoal(uiShowGoal)" icon="trash">
+                      <template slot="title">{{translate('dialog.buttons.delete')}}</template>
+                      <template slot="onHoldTitle">{{translate('dialog.buttons.hold-to-delete')}}</template>
+                    </hold-button>
                   </div>
                   <div class="card-body">
                     <div class="form-group col-md-12">
