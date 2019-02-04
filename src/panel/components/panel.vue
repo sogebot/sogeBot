@@ -134,7 +134,7 @@
   })
 </script>
 
-<style>
+<style scoped>
 @media only screen and (max-width: 1000px) {
   .btn-shrink {
     padding: 0!important;
