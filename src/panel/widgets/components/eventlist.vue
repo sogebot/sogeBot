@@ -170,7 +170,10 @@
             <span class="input-group-text">px</span>
           </div>
         </div>
-        <hold-button class="mt-2 btn btn-danger w-100" title="Cleanup" holdtitle="Hold to cleanup" icon="eraser" @trigger="cleanup()" ></hold-button>
+        <hold-button class="mt-2 btn btn-danger w-100" icon="eraser" @trigger="cleanup()">
+          <template slot="title">Cleanup</template>
+          <template slot="onHoldTitle">Hold to cleanup</template>
+        </hold-button>
       </div>
       <!-- /SETTINGS -->
     </div>

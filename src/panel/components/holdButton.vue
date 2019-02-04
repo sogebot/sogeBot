@@ -1,12 +1,12 @@
 <template>
   <button type="button" ref="button" class="btn btn-with-icon" @mouseup="onMouseUp" @mousedown="onMouseDown" @mouseenter="isMouseOver = true" @mouseleave="isMouseOver = false">
     <div style="display: flex; flex-direction: inherit;">
-      <div class="text w-100" :style="{opacity: 1 - this.percentage / 100 }" v-if="title">
+      <div class="text w-100" :style="{opacity: 1 - this.percentage / 100 }">
         <template v-if="onMouseDownStarted === 0">
-          {{ title }}
+          <slot name="title">Action</slot>
         </template>
-        <template v-else-if="holdtitle">
-          {{ holdtitle }}
+        <template v-else>
+          <slot name="onHoldTitle">Hold to perform</slot>
         </template>
       </div>
       <div class="btn-icon" :style="{opacity: 1 - this.percentage / 100 }">
@@ -26,7 +26,7 @@ import { faTrash, faEraser } from '@fortawesome/free-solid-svg-icons';
 library.add(faTrash, faEraser)
 
 export default Vue.extend({
-props: ['holdtitle', 'title', 'ttc', 'icon'],
+props: ['ttc', 'icon'],
   components: {
     'font-awesome-icon': FontAwesomeIcon
   },
