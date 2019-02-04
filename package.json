@@ -118,7 +118,6 @@
     "mocha": "5.2.0",
     "node-sass": "4.11.0",
     "sinon": "7.2.3",
-    "terser": "3.14.1",
     "test-until": "1.1.1",
     "ts-loader": "5.3.3",
     "tslint": "5.12.1",
