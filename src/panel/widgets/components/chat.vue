@@ -69,12 +69,13 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 library.add(faCommentAlt, faUsers, faExternalLinkAlt, faSyncAlt)
 
 export default {
-  props: ['socket', 'commons', 'popout', 'configuration'],
+  props: ['commons', 'popout', 'configuration'],
   components: {
     'font-awesome-icon': FontAwesomeIcon
   },
   data: function () {
     return {
+      socket: io('/widgets/chat', { query: "token=" + this.token }),
       chatMessage: '',
       chatters: [],
       isRefreshing: false,
@@ -86,7 +87,6 @@ export default {
   },
   methods: {
     refresh: function (event) {
-      console.log(event)
       if (event) event.preventDefault()
       this.isRefreshing = true
       setTimeout(() => (this.isRefreshing = false), 2000)
@@ -97,19 +97,25 @@ export default {
     sendChatMessage: function () {
       if (this.chatMessage.length > 0) this.socket.emit('chat.message.send', this.chatMessage)
       this.chatMessage = ''
+    },
+    _chatters() {
+      this.socket.emit('viewers', (err, data) => {
+        if (err) return console.error(err)
+
+        let chatters = []
+        for (let chatter of Object.entries(data.chatters).map(o => o[1])) {
+          chatters.push(chatter)
+        }
+        this.chatters = _.sortedUniq(_.flatten(chatters))
+      })
     }
   },
   created: function () {
-    this.socket.on('chatChatters', (data) => {
-      let chatters = []
-      for (let chatter of Object.entries(data.chatters).map(o => o[1])) {
-        chatters.push(chatter)
-      }
-      this.chatters = _.sortedUniq(_.flatten(chatters))
-    })
+    this._chatters();
+    setInterval(() => this._chatters(), 60000);
 
-    this.socket.emit('getChatRoom');
-    this.socket.once('chatRoom', (room) => {
+    this.socket.emit('room', (err, room) => {
+      if (err) return console.error(err)
       this.room = room
       $("#chat-room").html('<iframe frameborder="0" scrolling="no" id="chat_embed" src="' + window.location.protocol +
         '//twitch.tv/embed/' + room + '/chat' + (configuration.theme.includes('dark') ? '?darkpopout' : '') +'" width="100%"></iframe>')

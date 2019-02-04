@@ -1,0 +1,43 @@
+'use strict';
+
+import axios from 'axios';
+
+import Widget from './_interface';
+
+class Chat extends Widget {
+  [x: string]: any; // TODO: remove after interface ported to TS
+
+  constructor() {
+    super({});
+    this.addWidget('chat', 'widget-title-chat', 'far fa-comments');
+  }
+
+  public sockets() {
+    this.socket.on('connection', (socket) => {
+      socket.on('chat.message.send', (message) => {
+        global.commons.sendMessage(message, { username: global.oauth.settings.bot.username }, { force: true });
+      });
+
+      socket.on('room', (cb) => {
+        cb(null, global.oauth.settings.general.channel.toLowerCase());
+      });
+
+      socket.on('viewers', async (cb) => {
+        try {
+          const url = `https://tmi.twitch.tv/group/user/${(await global.oauth.settings.general.channel).toLowerCase()}/chatters`;
+          const response = await axios.get(url);
+
+          if (response.status === 200) {
+            const chatters = response.data.chatters;
+            chatters.viewers = chatters.viewers.filter((o) => !global.commons.getIgnoreList().includes(o));
+            cb(null, {chatters});
+          }
+        } catch (e) {
+          cb(e);
+        }
+      });
+    });
+  }
+}
+
+module.exports = new Chat();

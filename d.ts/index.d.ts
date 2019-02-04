@@ -18,7 +18,10 @@ declare namespace NodeJS {
     oauth: {
       settings: {
         bot: {
-          username: string
+          username: string,
+        },
+        general: {
+          channel: string,
         }
       }
     }
