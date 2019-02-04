@@ -9,7 +9,7 @@ const safeEval = require('safe-eval')
 
 // bot libraries
 const constants = require('../constants')
-const System = require('./_interface')
+import System from './_interface'
 const Expects = require('../expects')
 
 /*

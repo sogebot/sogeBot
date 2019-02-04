@@ -5,7 +5,7 @@ const _ = require('lodash')
 // bot libraries
 const constants = require('../constants')
 const Parser = require('../parser')
-const System = require('./_interface')
+import System from './_interface'
 
 /*
  * !price                     - gets an info about price usage

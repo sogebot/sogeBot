@@ -5,7 +5,7 @@
 const axios = require('axios')
 const cluster = require('cluster')
 
-const Core = require('./_interface')
+import Core from './_interface'
 const constants = require('./constants')
 
 class OAuth extends Core {

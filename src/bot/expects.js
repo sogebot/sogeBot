@@ -217,3 +217,4 @@ class Expects {
 }
 
 module.exports = Expects
+export default Expects

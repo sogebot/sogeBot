@@ -9,7 +9,7 @@ const axios = require('axios')
 
 // bot libraries
 const constants = require('../constants')
-const System = require('./_interface')
+import System from './_interface'
 
 const ERROR_STREAM_NOT_ONLINE = '1'
 const ERROR_MISSING_TOKEN = '2'

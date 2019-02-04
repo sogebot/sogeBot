@@ -5,7 +5,7 @@ const _ = require('lodash')
 
 // bot libraries
 const constants = require('../constants')
-const System = require('./_interface')
+import System from './_interface'
 
 /*
  * !rank                       - show user rank

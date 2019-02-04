@@ -4,7 +4,7 @@
 const _ = require('lodash')
 const Message = require('../message')
 
-const Overlay = require('./_interface')
+import Overlay from './_interface'
 
 class Text extends Overlay {
   constructor () {

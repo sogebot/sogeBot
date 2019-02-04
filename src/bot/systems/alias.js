@@ -7,7 +7,7 @@ const XRegExp = require('xregexp')
 // bot libraries
 const Parser = require('../parser')
 const constants = require('../constants')
-const System = require('./_interface')
+import System from './_interface'
 
 /*
  * !alias                                               - gets an info about alias usage

@@ -8,7 +8,7 @@ const XRegExp = require('xregexp')
 
 // bot libraries
 var constants = require('../constants')
-const System = require('./_interface')
+import System from './_interface'
 const Expects = require('../expects.js')
 const Parser = require('../parser')
 

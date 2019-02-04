@@ -2,7 +2,7 @@
 
 // 3rdparty libraries
 const cluster = require('cluster')
-const Game = require('./_interface')
+import Game from './_interface'
 
 class WheelOfFortune extends Game {
   constructor () {

@@ -5,7 +5,7 @@ const _ = require('lodash')
 const cluster = require('cluster')
 // bot libraries
 var constants = require('../constants')
-const System = require('./_interface')
+import System from './_interface'
 
 const TYPE_NORMAL = 0
 const TYPE_TICKETS = 1

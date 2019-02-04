@@ -5,7 +5,7 @@ const cluster = require('cluster')
 const _ = require('lodash')
 const TwitchJs = require('twitch-js').default
 
-const Core = require('./_interface')
+import Core from './_interface'
 const constants = require('./constants')
 
 class TMI extends Core {

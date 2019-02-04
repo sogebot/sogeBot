@@ -1,4 +1,4 @@
-const Module = require('../_interface')
+import Module from '../_interface';
 
 class Game extends Module {
   constructor (opts) {
@@ -10,4 +10,4 @@ class Game extends Module {
   }
 }
 
-module.exports = Game
+export default Game;

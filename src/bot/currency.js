@@ -9,7 +9,7 @@ const chalk = require('chalk')
 const constants = require('./constants')
 const cluster = require('cluster')
 
-const Core = require('./_interface')
+import Core from './_interface'
 
 class Currency extends Core {
   rates: RatesObject = {}

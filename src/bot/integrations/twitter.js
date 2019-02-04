@@ -11,7 +11,7 @@ const cluster = require('cluster')
 const Message = require('../message')
 
 // bot libraries
-const Integration = require('./_interface')
+import Integration from './_interface'
 
 class Twitter extends Integration {
   client: any = null

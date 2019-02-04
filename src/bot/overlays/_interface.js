@@ -1,6 +1,6 @@
-const Module = require('../_interface')
+import Module from '../_interface';
 
-class Game extends Module {
+class Overlay extends Module {
   constructor (opts) {
     opts = opts || {}
     opts.name = 'overlays'
@@ -10,4 +10,4 @@ class Game extends Module {
   }
 }
 
-module.exports = Game
+export default Overlay;

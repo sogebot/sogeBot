@@ -11,7 +11,7 @@ const axios = require('axios')
 // bot libraries
 const constants = require('../constants')
 const Expects = require('../expects.js')
-const Integration = require('./_interface')
+import Integration from './_interface'
 
 const __DEBUG__ = {
   REQUEST: (process.env.DEBUG && process.env.DEBUG.includes('spotify.request')) || (process.env.DEBUG && process.env.DEBUG.includes('spotify.*'))

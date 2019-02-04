@@ -89,8 +89,9 @@ type InterfaceSettings = {
     _hidden?: Boolean,
     [s: string]: {
       [s: string]: UISelector | UILink | UINumberInput | UIConfigurableList | UISortableList
-    } | Boolean | undefined
-  }
+    } | Boolean | undefined | UISelector | UILink | UINumberInput | UIConfigurableList | UISortableList
+  },
+  dependsOn?: string[],
 }
 
 type UISelector = {

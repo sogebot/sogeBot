@@ -2,7 +2,7 @@
 
 // 3rdparty libraries
 const _ = require('lodash')
-const System = require('./_interface')
+import System from './_interface'
 const Expects = require('../expects')
 
 const constants = require('../constants.js')

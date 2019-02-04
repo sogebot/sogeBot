@@ -5,7 +5,7 @@
 const _ = require('lodash')
 const crypto = require('crypto')
 
-const Overlay = require('./_interface')
+import Overlay from './_interface'
 
 class EventList extends Overlay {
   socket: any = null
