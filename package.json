@@ -69,7 +69,11 @@
     "ytdl-core": "0.29.1",
     "ytpl": "0.1.14"
   },
-  "precommit": ["tslint"],
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run tslint"
+    }
+  },
   "scripts": {
     "build": "make bot ui",
     "tslint": "tslint -p tslint.json",
@@ -114,11 +118,11 @@
     "empty": "0.10.1",
     "escope": "3.6.0",
     "gsap": "2.0.2",
+    "husky": "1.3.1",
     "locate-path": "3.0.0",
     "minimist": "1.2.0",
     "mocha": "5.2.0",
     "node-sass": "4.11.0",
-    "pre-commit": "1.2.2",
     "sinon": "7.2.3",
     "test-until": "1.1.1",
     "ts-loader": "5.3.3",
