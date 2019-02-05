@@ -95,8 +95,6 @@ module.exports = {
     }, 5000)
   },
   isSent: async function (entry, user, opts) {
-    delete user.id
-
     opts = opts || {}
     await until(async setError => {
       let expected = []
@@ -122,7 +120,7 @@ module.exports = {
           */
           delete user['message-type'] // remove unnecessary message-type
           delete user['userId'] // remove unnecessary message-type
-          if (global.log.chatOut.calledWith(e, sinon.match(user))) {
+          if (global.log.chatOut.calledWith(e, sinon.match.has('username', user.username))) {
             isCorrectlyCalled = true
             break
           }
@@ -138,20 +136,18 @@ module.exports = {
     }, 5000)
   },
   isSentRaw: async function (expected, user) {
-    delete user.id
-
     await until(setError => {
       try {
         let isOK = false
         if (_.isArray(expected)) {
           for (let e of expected) {
-            if (global.log.chatOut.calledWith(e, sinon.match(user))) {
+            if (global.log.chatOut.calledWith(e, sinon.match.has('username', user.username))) {
               isOK = true
               break
             }
           }
         } else {
-          isOK = global.log.chatOut.calledWith(expected, sinon.match(user))
+          isOK = global.log.chatOut.calledWith(expected, sinon.match.has('username', user.username))
         }
         assert.isTrue(isOK)
         return true

@@ -9,15 +9,15 @@ const assert = require('chai').assert
 
 const tests = {
   'timeout': [
-    { message: 'AAAAAAAAAAAAAAAAAAAAAA', sender: { username: 'testuser', emotes: [] } },
-    { message: 'ЙЦУЦЙУЙЦУЙЦУЙЦУЙЦУЙЦ', sender: { username: 'testuser', emotes: [] } },
-    { message: 'AAAAAAAAAAAAAaaaaaaaaaaaa', sender: { username: 'testuser', emotes: [] } },
-    { message: 'SomeMSG SomeMSG', sender: { username: 'testuser', emotes: [] } }
+    { message: 'AAAAAAAAAAAAAAAAAAAAAA', sender: { username: 'testuser', badges: {}, emotes: [] } },
+    { message: 'ЙЦУЦЙУЙЦУЙЦУЙЦУЙЦУЙЦ', sender: { username: 'testuser', badges: {}, emotes: [] } },
+    { message: 'AAAAAAAAAAAAAaaaaaaaaaaaa', sender: { username: 'testuser', badges: {}, emotes: [] } },
+    { message: 'SomeMSG SomeMSG', sender: { username: 'testuser', badges: {}, emotes: [] } }
   ],
   'ok': [
-    { message: 'SomeMSG SomeMSg', sender: { username: 'testuser', emotes: [] } },
-    { message: '123123123213123123123123213123', sender: { username: 'testuser', emotes: [] } },
-    { message: 'zdarec KAPOW KAPOW', sender: { username: 'testuser', emotes: [{ id: '133537', start: 7, end: 11 }, { id: '133537', start: 13, end: 17 }] } }
+    { message: 'SomeMSG SomeMSg', sender: { username: 'testuser', badges: {}, emotes: [] } },
+    { message: '123123123213123123123123213123', sender: { username: 'testuser', badges: {}, emotes: [] } },
+    { message: 'zdarec KAPOW KAPOW', sender: { username: 'testuser', badges: {}, emotes: [{ id: '133537', start: 7, end: 11 }, { id: '133537', start: 13, end: 17 }] } }
   ]
 }
 
