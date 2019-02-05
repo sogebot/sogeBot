@@ -140,7 +140,7 @@ class Bets extends System {
             global.commons.prepare('bets.running', {
               command: await this.settings.commands['!bet'],
               maxIndex: currentBet.options.length - 1,
-              options: currentBet.options.map((v, i) => `${i}. '${v.name}'`).join(', ')
+              options: currentBet.options.map((v, i) => `${i}. '${v.name}'`).join(', '),
             }), opts.sender);
           break;
         default:
