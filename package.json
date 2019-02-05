@@ -70,6 +70,7 @@
     "ytpl": "0.1.14"
   },
   "scripts": {
+    "precommit": "npm run tslint",
     "build": "make bot ui",
     "tslint": "tslint -p tslint.json",
     "test": "mocha --retries 10 --recursive --timeout 20000 --exit --require source-map-support/register",
