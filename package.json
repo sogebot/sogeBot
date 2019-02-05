@@ -69,8 +69,8 @@
     "ytdl-core": "0.29.1",
     "ytpl": "0.1.14"
   },
+  "precommit": ["tslint"],
   "scripts": {
-    "precommit": "npm run tslint",
     "build": "make bot ui",
     "tslint": "tslint -p tslint.json",
     "test": "mocha --retries 10 --recursive --timeout 20000 --exit --require source-map-support/register",
@@ -118,6 +118,7 @@
     "minimist": "1.2.0",
     "mocha": "5.2.0",
     "node-sass": "4.11.0",
+    "pre-commit": "1.2.2",
     "sinon": "7.2.3",
     "test-until": "1.1.1",
     "ts-loader": "5.3.3",
