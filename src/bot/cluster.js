@@ -127,7 +127,7 @@ function cluster () {
         // mark user as online
         await global.db.engine.update('users.online', { username: sender.username }, { username: sender.username })
 
-        if (!_.get(sender, 'badges.subscriber', 0) === 1) _.set(data, 'stats.tier', 0) // unset tier if sender is not subscriber
+        if (_.get(sender, 'badges.subscriber', 0)) _.set(data, 'stats.tier', 0) // unset tier if sender is not subscriber
 
         // update user based on id not username
         if (_.isEmpty(user)) await global.db.engine.insert('users', data)
