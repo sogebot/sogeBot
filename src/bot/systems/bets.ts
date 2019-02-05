@@ -136,10 +136,12 @@ class Bets extends System {
           global.commons.sendMessage(global.translate('bets.notEnoughOptions'), opts.sender);
           break;
         case ERROR_ALREADY_OPENED:
-          global.commons.sendMessage(await global.commons.prepare('bets.running', {
-            command: await this.settings.commands['!bet'],
-            $maxIndex: currentBet.options.length - 1,
-            $options: currentBet.options.map((v, i) => `${i}. '${v.name}'`).join(', ') }), opts.sender);
+          global.commons.sendMessage(
+            global.commons.prepare('bets.running', {
+              command: await this.settings.commands['!bet'],
+              maxIndex: currentBet.options.length - 1,
+              options: currentBet.options.map((v, i) => `${i}. '${v.name}'`).join(', '),
+            }), opts.sender);
           break;
         default:
           global.log.warning(e.stack);
@@ -153,10 +155,10 @@ class Bets extends System {
     if (_.isEmpty(currentBet)) { global.commons.sendMessage(global.translate('bets.notRunning'), opts.sender); } else {
       global.commons.sendMessage(await global.commons.prepare(currentBet.locked ? 'bets.lockedInfo' : 'bets.info', {
         command: opts.command,
-        $title: currentBet.title,
-        $maxIndex: currentBet.options.length - 1,
-        $options: currentBet.options.map((v, i) => `${i}. '${v.name}'`).join(', '),
-        $minutes: Number((currentBet.end - new Date().getTime()) / 1000 / 60).toFixed(1) }), opts.sender);
+        title: currentBet.title,
+        maxIndex: currentBet.options.length - 1,
+        options: currentBet.options.map((v, i) => `${i}. '${v.name}'`).join(', '),
+        minutes: Number((currentBet.end - new Date().getTime()) / 1000 / 60).toFixed(1) }), opts.sender);
     }
   }
 
