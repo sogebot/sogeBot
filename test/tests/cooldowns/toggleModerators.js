@@ -9,8 +9,8 @@ const db = require('../../general.js').db
 const message = require('../../general.js').message
 
 // users
-const owner = { username: 'soge__' }
-const mod = { username: 'mod', isModerator: true }
+const owner = { badges: {}, username: 'soge__' }
+const mod = { badges: {}, username: 'mod' }
 
 describe('Cooldowns - toggleModerators()', () => {
   beforeEach(async () => {

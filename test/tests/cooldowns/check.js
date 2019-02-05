@@ -10,11 +10,11 @@ const message = require('../../general.js').message
 const variable = require('../../general.js').variable
 
 // users
-const owner = { username: 'soge__' }
-const usermod1 = { username: 'usermod1', isModerator: true }
-const subuser1 = { username: 'subuser1', isSubscriber: true }
-const testUser = { username: 'test' }
-const testUser2 = { username: 'test2' }
+const owner = { username: 'soge__', badges: {} }
+const usermod1 = { username: 'usermod1', badges: { moderator: 1 } }
+const subuser1 = { username: 'subuser1', badges: { subscriber: 1 } }
+const testUser = { username: 'test', badges: {} }
+const testUser2 = { username: 'test2', badges: {} }
 
 describe('Cooldowns - check()', () => {
   describe('#1658 - cooldown not working on not full cooldown object KonCha', async () => {

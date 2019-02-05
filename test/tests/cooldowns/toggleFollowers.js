@@ -10,10 +10,10 @@ const db = require('../../general.js').db
 const message = require('../../general.js').message
 
 // users
-const owner = { username: 'soge__' }
-const follower = { username: 'follower', userId: String(_.random(999999, false)), is: { follower: true } }
-const commonUser = { username: 'user1', userId: String(_.random(999999, false)) }
-const commonUser2 = { username: 'user2', userId: String(_.random(999999, false)), is: { follower: false } }
+const owner = { badges: {}, username: 'soge__' }
+const follower = { badges: {}, username: 'follower', userId: String(_.random(999999, false)), is: { follower: true } }
+const commonUser = { badges: {}, username: 'user1', userId: String(_.random(999999, false)) }
+const commonUser2 = { badges: {}, username: 'user2', userId: String(_.random(999999, false)), is: { follower: false } }
 
 describe('Cooldowns - toggleFollowers()', () => {
   beforeEach(async () => {

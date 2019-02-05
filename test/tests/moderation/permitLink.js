@@ -7,7 +7,7 @@ const db = require('../../general.js').db
 const message = require('../../general.js').message
 const assert = require('chai').assert
 
-const owner = { username: 'soge__' }
+const owner = { username: 'soge__', badges: {} }
 
 describe('systems/moderation - permitLink()', () => {
   before(async () => {

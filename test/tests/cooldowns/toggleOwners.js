@@ -9,7 +9,7 @@ const db = require('../../general.js').db
 const message = require('../../general.js').message
 
 // users
-const owner = { username: 'soge__' }
+const owner = { username: 'soge__', badges: {} }
 
 describe('Cooldowns - toggleOwners()', () => {
   beforeEach(async () => {
@@ -33,7 +33,6 @@ describe('Cooldowns - toggleOwners()', () => {
 
     global.systems.cooldown.toggleOwners({ sender: owner, parameters: `${command} ${type}` })
     await message.isSent('cooldowns.cooldown-was-enabled-for-owners', owner, { command: command, sender: owner.username })
-
     let isOk = await global.systems.cooldown.check({ sender: owner, message: '!me' })
     assert.isTrue(isOk)
     isOk = await global.systems.cooldown.check({ sender: owner, message: '!me' })
