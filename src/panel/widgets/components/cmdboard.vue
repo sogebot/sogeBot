@@ -75,15 +75,17 @@
             <span class="input-group-text">{{commons.translate('display-as')}}</span>
           </div>
           <div class="btn-group btn-group-toggle d-flex" data-toggle="buttons" style="flex: 1 auto;">
-            <label class="btn btn-secondary" :class="[ displayAs === 'list' ? 'active' : '']" style="flex: 1 auto;" v-on:click="displayAs = 'list'">
-              <input type="radio" name="options" autocomplete="off" :checked="displayAs === 'list'"> List
-            </label>
-            <label class="btn btn-secondary" :class="[ displayAs === 'grid' ? 'active' : '']" style="flex: 1 auto;" v-on:click="displayAs = 'grid'">
-              <input type="radio" name="options" autocomplete="off" :checked="displayAs === 'grid'"> Grid
+            <label
+              v-for="o of displayAsOpts"
+              :key="o"
+              class="btn btn-secondary text-capitalize"
+              :class="[ displayAs === o ? 'active' : '']"
+              style="flex: 1 auto;"
+              v-on:click="displayAs = o">
+              <input type="radio" name="options" autocomplete="off" :checked="displayAs === o"> {{o}}
             </label>
           </div>
         </div>
-
       </div>
       <!-- /SETTINGS -->
     </div>
@@ -99,13 +101,15 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 library.add(faTerminal, faCog)
 
 export default {
-  props: ['socket', 'commons'],
+  props: ['commons'],
   components: {
     'font-awesome-icon': FontAwesomeIcon
   },
   data: function () {
     return {
+      socket: io('/widgets/cmdboard', { query: "token=" + this.token }),
       displayAs: 'list',
+      displayAsOpts: [],
       name: '',
       command: '',
       items: []
@@ -118,7 +122,7 @@ export default {
   },
   watch: {
     displayAs: function (val) {
-      this.socket.emit('saveConfiguration', { widgetCmdBoardDisplayAs: this.displayAs })
+      this.socket.emit('settings.update', { displayAs: this.displayAs })
     }
   },
   mounted: function () {
@@ -134,17 +138,22 @@ export default {
         classNames: ['action-danger'],
         iconClass: 'fa-trash-alt',
         onClick: (data) => {
-          this.socket.emit('cmdboard.widget.remove', data)
+          this.socket.emit('cmdboard.widget.remove', data, (items) => {
+            this.items = items
+          })
         }
       }]
     })
   },
   created: function () {
-      this.socket.emit('cmdboard.widget.fetch')
-      this.socket.emit('getConfiguration', (data) => {
-        this.displayAs = data.widgetCmdBoardDisplayAs
+      this.socket.emit('cmdboard.widget.fetch', (items) => {
+        this.items = items
       })
-      this.socket.off('cmdboard.widget.data').on('cmdboard.widget.data', (cb) => this.items = cb)
+      this.socket.emit('settings', (err, data) => {
+        if (err) return console.error(err)
+        this.displayAs = data.displayAs
+        this.displayAsOpts = data._.displayAsOpts
+      })
   },
   methods: {
     emit: function (item) {
@@ -155,6 +164,8 @@ export default {
       this.socket.emit('cmdboard.widget.add', {
         name: this.name,
         command: this.command
+      }, (items) => {
+        this.items = items
       })
       this.name = ''
       this.command = ''

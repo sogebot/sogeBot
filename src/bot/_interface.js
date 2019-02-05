@@ -9,11 +9,14 @@ class Module {
   timeouts = {}
   isLoaded = false
 
-  constructor (opts) {
+  options: InterfaceSettings = {};
+  name: string = 'core';
+
+  constructor (opts = null) {
     /* Prepare default settings configuration
      * set enabled by default to true
      */
-    opts = opts || {}
+    opts = opts || this.options
     this._settings = opts.settings || {}
     this._settings.enabled = typeof this._settings.enabled !== 'undefined' ? this._settings.enabled : true
 
@@ -28,7 +31,7 @@ class Module {
 
     this._commands = []
     this._parsers = []
-    this._name = opts.name || 'core'
+    this._name = opts.name || this.name
     this._ui = opts.ui || {}
     this._opts = opts
 
@@ -211,11 +214,12 @@ class Module {
   }
 
   _sockets () {
-    clearTimeout(this.timeouts[`${this.constructor.name}.sockets`])
+    if (cluster.isWorker) return;
 
+    clearTimeout(this.timeouts[`${this.constructor.name}.sockets`])
     if (_.isNil(global.panel)) {
       this.timeouts[`${this.constructor.name}._sockets`] = setTimeout(() => this._sockets(), 1000)
-    } else if (cluster.isMaster) {
+    } else {
       this.socket = global.panel.io.of('/' + this._name + '/' + this.constructor.name.toLowerCase())
       if (!_.isNil(this.sockets)) {
         this.sockets()
@@ -254,9 +258,14 @@ class Module {
             }
           } catch (e) {
             global.log.error(e.stack)
-            setTimeout(() => cb(e.stack), 1000)
+            if (typeof cb === 'function') {
+              setTimeout(() => cb(e.stack), 1000)
+            }
           }
-          setTimeout(() => cb(null), 1000)
+
+          if (typeof cb === 'function') {
+            setTimeout(() => cb(null), 1000)
+          }
         })
         // difference between set and update is that set will set exact 1:1 values of opts.items
         // so it will also DELETE additional data
