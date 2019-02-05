@@ -44,12 +44,13 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 library.add(faDollarSign, faClock)
 
 export default {
-  props: ['commons', 'socket'],
+  props: ['commons'],
   components: {
     'font-awesome-icon': FontAwesomeIcon
   },
   data: function () {
     return {
+      socket: io('/systems/commercial', { query: "token=" + this.token }),
       seconds: [30, 60, 90, 120, 150, 180],
       countdown: 0
     }
