@@ -8,6 +8,9 @@ const TwitchJs = require('twitch-js').default
 import Core from './_interface'
 const constants = require('./constants')
 
+const __DEBUG__ =
+  (process.env.DEBUG && process.env.DEBUG.includes('tmi'));
+
 class TMI extends Core {
   channel: string = ''
   timeouts: Object = {}
@@ -35,9 +38,11 @@ class TMI extends Core {
 
     try {
       if (token === '' || username === '' || channel === '') throw Error(`${type} - token, username or channel expected`)
+      const log = __DEBUG__ ? null : { level: 0 };
       this.client[type] = new TwitchJs({
         token,
         username,
+        log,
         onAuthenticationFailure: () => global.oauth.refreshAccessToken(type).then(token => token)
       })
       this.loadListeners(type)
