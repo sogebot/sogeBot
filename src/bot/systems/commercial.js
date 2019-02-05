@@ -25,7 +25,7 @@ class Commercial extends System {
     this.addWidget('commercial', 'widget-title-commercial', 'fas fa-dollar-sign');
   }
 
-  public sockets() {
+  sockets() {
     this.socket.on('connection', (socket) => {
       socket.on('commercial.run', (message) => {
         _.sample(require('cluster').workers).send({ type: 'message', sender: { username: global.commons.getOwner() }, message: '!commercial ' + data.seconds, skip: true });
