@@ -43,7 +43,7 @@ Commit Guidelines
 - Commit title should be entirely in lowercase with the exception of proper
   nouns, acronyms, and the words that refer to code, like function/variable names
 
-- If fixing issue,u se `Closes` or `Fixes` keywords in commit description to
+- If fixing issue, use `Closes` or `Fixes` keywords in commit description to
   link with issue or idea
 
     `alias: fix bug with parsing`
