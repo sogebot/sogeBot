@@ -28,6 +28,18 @@ declare namespace NodeJS {
   }
 }
 
+type Sender = {
+  username: string,
+  userId: string,
+  badges: {
+    subscriber?: 0 | 1,
+    premium?: 0 | 1,
+    globalMod? : 0 | 1,
+    moderator? : 0 | 1,
+
+  }
+}
+
 type Command = {
   name: string,
   fnc?: string,
@@ -61,12 +73,7 @@ type onEventBit = {
 }
 
 type onEventMessage = {
-  sender: {
-    username: string,
-    userId: string,
-    isSubscriber: boolean,
-    isTurboSubscriber: boolean
-  } | null,
+  sender: Sender | null,
   message: string,
   timestamp: string
 }
@@ -130,12 +137,7 @@ type UISortableList = {
 }
 
 type CommandOptions = {
-  sender: {
-    username: string,
-    userId: string,
-    isSubscriber: boolean,
-    isTurboSubscriber: boolean
-  },
+  sender: Sender,
   command: string,
   parameters: string
 }

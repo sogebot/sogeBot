@@ -131,7 +131,7 @@ class Cooldown extends System {
     const user = await global.users.getById(opts.sender.userId)
     let result = false
     const isMod = opts.sender.isModerator
-    const isSubscriber = opts.sender.isSubscriber
+    const isSubscriber = opts.sender.badges.subscriber === 1
     const isFollower = user.is && user.is.follower ? user.is.follower : false
 
     for (let cooldown of data) {

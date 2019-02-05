@@ -227,7 +227,7 @@ class Moderation extends System {
       this.whitelist(opts.message)
     ])
 
-    if (isOwner || isMod || !isEnabled || (opts.sender.isSubscriber && !isEnabledForSubs)) {
+    if (isOwner || isMod || !isEnabled || (opts.sender.badges.subscriber === 1 && !isEnabledForSubs)) {
       return true
     }
 
@@ -267,7 +267,7 @@ class Moderation extends System {
     var msgLength = whitelisted.trim().length
     var symbolsLength = 0
 
-    if (isOwner || isMod || msgLength < triggerLength || !isEnabled || (opts.sender.isSubscriber && !isEnabledForSubs)) {
+    if (isOwner || isMod || msgLength < triggerLength || !isEnabled || (opts.sender.badges.subscriber === 1 && !isEnabledForSubs)) {
       return true
     }
 
@@ -304,7 +304,7 @@ class Moderation extends System {
     ])
 
     var msgLength = whitelisted.trim().length
-    if (isOwner || isMod || msgLength < triggerLength || !isEnabled || (opts.sender.isSubscriber && !isEnabledForSubs)) {
+    if (isOwner || isMod || msgLength < triggerLength || !isEnabled || (opts.sender.badges.subscriber === 1 && !isEnabledForSubs)) {
       return true
     } else {
       this.timeoutUser(opts.sender, opts.message,
@@ -351,7 +351,7 @@ class Moderation extends System {
       }
     }
 
-    if (isOwner || isMod || msgLength < triggerLength || !isEnabled || (opts.sender.isSubscriber && !isEnabledForSubs)) {
+    if (isOwner || isMod || msgLength < triggerLength || !isEnabled || (opts.sender.badges.subscriber === 1 && !isEnabledForSubs)) {
       return true
     }
     if (Math.ceil(capsLength / (msgLength / 100)) >= maxCapsPercent) {
@@ -378,7 +378,7 @@ class Moderation extends System {
 
     var msgLength = whitelisted.trim().length
 
-    if (isOwner || isMod || msgLength < triggerLength || !isEnabled || (opts.sender.isSubscriber && !isEnabledForSubs)) {
+    if (isOwner || isMod || msgLength < triggerLength || !isEnabled || (opts.sender.badges.subscriber === 1 && !isEnabledForSubs)) {
       return true
     }
     var out = whitelisted.match(/(.+)(\1+)/g)
@@ -403,7 +403,7 @@ class Moderation extends System {
       this.settings.color.timeout
     ])
 
-    if (isOwner || isMod || !isEnabled || (opts.sender.isSubscriber && !isEnabledForSubs)) {
+    if (isOwner || isMod || !isEnabled || (opts.sender.badges.subscriber === 1 && !isEnabledForSubs)) {
       return true
     }
 
@@ -428,7 +428,7 @@ class Moderation extends System {
     ])
 
     var count = opts.sender.emotes.length
-    if (isOwner || isMod || !isEnabled || (opts.sender.isSubscriber && !isEnabledForSubs)) {
+    if (isOwner || isMod || !isEnabled || (opts.sender.badges.subscriber === 1 && !isEnabledForSubs)) {
       return true
     }
 
@@ -449,7 +449,7 @@ class Moderation extends System {
       this.settings.lists.timeout,
       this.settings.lists.blacklist
     ])
-    if (isOwner || isMod || (opts.sender.isSubscriber && !isEnabledForSubs)) {
+    if (isOwner || isMod || (opts.sender.badges.subscriber === 1 && !isEnabledForSubs)) {
       return true
     }
 
