@@ -224,6 +224,54 @@ let migration = {
   settings: [{
     version: '8.3.0',
     do: async () => {
+      let processed = 0
+
+      const mappings = {
+        'widgetEventlistFollows': 'widgets.eventlist.settings.widgetEventlistFollows',
+        'widgetEventlistHosts': 'widgets.eventlist.settings.widgetEventlistHosts',
+        'widgetEventlistRaids': 'widgets.eventlist.settings.widgetEventlistRaids',
+        'widgetEventlistCheers': 'widgets.eventlist.settings.widgetEventlistCheers',
+        'widgetEventlistSubs': 'widgets.eventlist.settings.widgetEventlistSubs',
+        'widgetEventlistSubgifts': 'widgets.eventlist.settings.widgetEventlistSubgifts',
+        'widgetEventlistSubcommunitygifts': 'widgets.eventlist.settings.widgetEventlistSubcommunitygifts',
+        'widgetEventlistResubs': 'widgets.eventlist.settings.widgetEventlistResubs',
+        'widgetEventlistTips': 'widgets.eventlist.settings.widgetEventlistTips',
+        'widgetEventlistShow': 'widgets.eventlist.settings.widgetEventlistShow',
+        'widgetEventlistSize': 'widgets.eventlist.settings.widgetEventlistSize',
+        'widgetEventlistMessageSize': 'widgets.eventlist.settings.widgetEventlistMessageSize',
+      }
+
+      console.info('Updating eventlist settings')
+      console.info(' -> entries')
+      for (let [o, n] of Object.entries(mappings)) {
+        if (n !== null) {
+          let item = await global.db.engine.findOne('settings', { key: o })
+          if (!_.isEmpty(item)) {
+            let regexp = XRegExp(`
+              (?<type> [a-zA-Z]*)
+              .
+              (?<system> [a-zA-Z]*)
+              .settings.
+              (?<key> [a-zA-Z]*)`, 'ix')
+            const match = XRegExp.exec(n, regexp)
+            if (match.key.trim().length === 0) match.key = undefined
+            if (!_.isNil(item.value)) {
+              await global.db.engine.update(match.type + '.settings', { system: match.system, key: match.key }, { system: match.system, key: match.key, value: item.value })
+              await global.db.engine.remove('settings', { key: o })
+              processed++
+            } else {
+              console.warn(`Settings ${match.type}.${match.system} ${match.key} is missing value`)
+            }
+          }
+          await global.db.engine.remove('settings', { key: o })
+        }
+      }
+      console.info(` => ${processed} processed`)
+    }
+  },
+    {
+    version: '8.3.0',
+    do: async () => {
       console.info('Merging settings to 8.3.0')
       for (let collection of (await global.db.engine.collections())) {
         const [name, system, type] = collection.split('.')
