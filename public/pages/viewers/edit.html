@@ -384,8 +384,8 @@
 
             if (typeof this.viewer.custom === 'undefined') this.viewer.custom = {}
             this.viewer.custom.subgiftsCount = !this.viewer.custom.subgiftsCount ? 0 : this.viewer.custom.subgiftsCount
-            this.viewer.stats.subStreak = !this.viewer.custom.subStreak ? 0 : this.viewer.custom.subStreak
-            this.viewer.stats.subCumulativeMonths = !this.viewer.custom.subCumulativeMonths ? 0 : this.viewer.custom.subCumulativeMonths
+            this.viewer.stats.subStreak = !this.viewer.stats.subStreak ? 0 : this.viewer.stats.subStreak
+            this.viewer.stats.subCumulativeMonths = !this.viewer.stats.subCumulativeMonths ? 0 : this.viewer.stats.subCumulativeMonths
             this.$nextTick(() => { this.pending = false })
           })
         }
