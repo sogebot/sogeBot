@@ -719,7 +719,7 @@ class API {
     } catch (e) {
       global.log.error(`${url} - ${e.message}`)
       if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getChannelHosts', api: 'tmi', endpoint: url, code: e.stack })
-      return { state: false }
+      return { state: e.response.status === 500 }
     }
     return { state: true }
   }
