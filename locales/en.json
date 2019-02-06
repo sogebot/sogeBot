@@ -346,6 +346,7 @@
         "items": "Items",
         "bits": "Bits",
         "subgifts": "Subgifts",
+        "subStreakShareEnabled" : "Is substreak share enabled (true/false)",
         "subStreak": "Current sub streak",
         "subStreakName": "localized name of month (1 month, 2 months) for current sub strek",
         "subCumulativeMonths": "Cumulative subscribe months",
