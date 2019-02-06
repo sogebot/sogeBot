@@ -216,8 +216,7 @@ Commons.prototype.isBroadcaster = function (user) {
 Commons.prototype.isMod = async function (user) {
   try {
     if (_.isString(user)) user = await global.users.getByName(user)
-    else if (_.isNil(user.isModerator)) user = await global.users.getByName(user.username)
-    else user = { is: { mod: user.isModerator } }
+    else user = { is: { mod: typeof user.badges.moderator !== 'undefined' } }
     return !_.isNil(user.is.mod) ? user.is.mod : false
   } catch (e) {
     return false
