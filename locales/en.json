@@ -347,6 +347,7 @@
         "bits": "Bits",
         "subgifts": "Subgifts",
         "subStreak": "Current sub streak",
+        "subStreakName": "localized name of month (1 month, 2 months) for current sub strek",
         "subCumulativeMonths": "Cumulative subscribe months",
         "subCumulativeMonthsName": "localized name of month (1 month, 2 months) for cumulative subscribe months",
         "message": "Message",
