@@ -290,7 +290,7 @@ class TMI extends Core {
       let subscribedAt = _.now()
       let isSubscriber = true
 
-      if (user.lock && user.lock.subcribed_at) subscribedAt = undefined
+      if (user.lock && user.lock.subscribed_at) subscribedAt = undefined
       if (user.lock && user.lock.subscriber) isSubscriber = undefined
 
       await global.users.setById(userstate.userId, { username, is: { subscriber: isSubscriber }, time: { subscribed_at: subscribedAt }, stats: { subStreak: 1, subCumulativeMonths, tier: method.prime ? 'Prime' : method.plan / 1000 } })
@@ -337,11 +337,11 @@ class TMI extends Core {
 
       const user = await global.db.engine.findOne('users', { id: userstate.userId })
 
-      let subcribed_at = subStreakShareEnabled ? Number(moment().subtract(subStreak, 'months').format('X')) * 1000 : user.time.subcribed_at;
+      let subscribed_at = subStreakShareEnabled ? Number(moment().subtract(streakMonth, 'months').format('X')) * 1000 : user.time.subscribed_at;
       let subStreak = subStreakShareEnabled ? streakMonth : user.stats.subStreak + 1
       let isSubscriber = true
 
-      if (user.lock && user.lock.subcribed_at) subscribed_at = undefined
+      if (user.lock && user.lock.subscribed_at) subscribed_at = undefined
       if (user.lock && user.lock.subscriber) isSubscriber = undefined
 
       await global.users.setById(userstate.userId, { username, id: userstate.userId, is: { subscriber: isSubscriber }, time: { subscribed_at }, stats: { subStreak, subCumulativeMonths, tier: method.prime ? 'Prime' : method.plan / 1000 } })
@@ -447,7 +447,7 @@ class TMI extends Core {
       let subscribedAt = _.now()
       let isSubscriber = true
 
-      if (user.lock && user.lock.subcribed_at) subscribedAt = undefined
+      if (user.lock && user.lock.subscribed_at) subscribedAt = undefined
       if (user.lock && user.lock.subscriber) isSubscriber = undefined
 
       await global.users.setById(user.id, { username: recipient, is: { subscriber: isSubscriber }, time: { subscribed_at: subscribedAt }, stats: { subCumulativeMonths } })
