@@ -50,18 +50,7 @@ class EventList extends Overlay {
     const newEvent = {
       event: data.type,
       timestamp: _.now(),
-      username: data.username,
-      autohost: _.isNil(data.autohost) ? undefined : data.autohost,
-      message: _.isNil(data.message) ? undefined : data.message,
-      amount: _.isNil(data.amount) ? undefined : data.amount,
-      currency: _.isNil(data.currency) ? undefined : data.currency,
-      months: _.isNil(data.months) ? undefined : data.months,
-      bits: _.isNil(data.bits) ? undefined : data.bits,
-      viewers: _.isNil(data.viewers) ? undefined : data.viewers,
-      from: _.isNil(data.from) ? undefined : data.from,
-      tier: _.isNil(data.tier) ? undefined : data.tier,
-      song_title: _.isNil(data.song_title) ? undefined : data.song_title,
-      song_url: _.isNil(data.song_url) ? undefined : data.song_url
+      ...data
     }
     await global.db.engine.insert('widgetsEventList', newEvent)
     global.overlays.eventlist.sendDataToOverlay(global.overlays.eventlist)
