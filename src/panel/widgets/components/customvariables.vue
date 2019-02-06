@@ -169,7 +169,7 @@ export default {
       variables: [],
       watched: [],
       selectedVariable: null,
-      socket: io('/widgets/customVariables', { query: "token=" + token })
+      socket: io('/widgets/customvariables', { query: "token=" + token })
       }
   },
   mounted: function () {

@@ -15,6 +15,7 @@ declare namespace NodeJS {
     systems: any,
     users: any,
     lib: any,
+    customvariables: any,
     oauth: {
       settings: {
         bot: {
