@@ -60,12 +60,13 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 library.add(faMusic, faVolumeUp, faVolumeDown, faVolumeOff)
 
 export default {
-  props: ['socket', 'commons'],
+  props: ['commons'],
   components: {
     'font-awesome-icon': FontAwesomeIcon
   },
   data: function () {
     return {
+      socket: io('/widgets/soundboard', { query: "token=" + this.token }),
       volume: 50,
       audio: null,
       sounds: []
@@ -88,9 +89,7 @@ export default {
     }
   },
   created: function () {
-    this.socket.emit('getSoundBoardSounds')
-    this.socket.off('soundBoardSounds').on('soundBoardSounds', sounds => this.sounds = sounds)
-
+    this.socket.emit('getSoundBoardSounds', (sounds) => this.sounds = sounds)
     if (localStorage.getItem('/widget/soundboard/volume')) this.volume = JSON.parse(localStorage.getItem('/widget/soundboard/volume'))
   },
   methods: {
