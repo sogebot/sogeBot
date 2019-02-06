@@ -356,6 +356,7 @@
         "items": "Položky",
         "bits": "Bity",
         "subgifts": "Darované suby",
+        "subStreakShareEnabled" : "Je substreak share zapnut (true/false)",
         "subStreak": "Subscribů v řadě",
         "subStreakName": "Název měsíce (1 měsíc, 2 měsíce) pro subscribů v řadě",
         "subCumulativeMonths": "Celkový počet subscribů",
