@@ -33,12 +33,13 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 library.add(faSignInAlt)
 
 export default {
-  props: ['socket', 'commons'],
+  props: [, 'commons'],
   components: {
     'font-awesome-icon': FontAwesomeIcon,
   },
   data: function () {
     return {
+      socket: io('/widgets/joinpart', { query: "token=" + this.token }),
       list: []
     }
   },
