@@ -21,10 +21,10 @@ class Events {
       { id: 'user-parted-channel', variables: [ 'username', 'userObject' ] },
       { id: 'follow', variables: [ 'username', 'userObject' ] },
       { id: 'unfollow', variables: [ 'username', 'userObject' ] },
-      { id: 'subscription', variables: [ 'username', 'userObject', 'method' ] },
+      { id: 'subscription', variables: [ 'username', 'userObject', 'method', 'subCumulativeMonths' ] },
       { id: 'subgift', variables: [ 'username', 'userObject', 'recipient', 'recipientObject' ] },
       { id: 'subcommunitygift', variables: [ 'username', 'count' ] },
-      { id: 'resub', variables: [ 'username', 'userObject', 'months', 'monthsName', 'message' ] },
+      { id: 'resub', variables: [ 'username', 'userObject', 'subStreakShareEnabled', 'subStreak', 'subStreakName', 'subCumulativeMonths', 'subCumulativeMonthsName' ] },
       { id: 'tip', variables: [ 'username', 'amount', 'currency', 'message' ] },
       { id: 'command-send-x-times', variables: [ 'username', 'userObject', 'command', 'count' ], definitions: { fadeOutXCommands: 0, fadeOutInterval: 0, runEveryXCommands: 10, commandToWatch: '', runInterval: 0 }, check: this.checkCommandSendXTimes }, // runInterval 0 or null - disabled; > 0 every x seconds
       { id: 'keyword-send-x-times', variables: [ 'username', 'userObject', 'command', 'count' ], definitions: { fadeOutXKeywords: 0, fadeOutInterval: 0, runEveryXKeywords: 10, keywordToWatch: '', runInterval: 0, resetCountEachMessage: false }, check: this.checkKeywordSendXTimes }, // runInterval 0 or null - disabled; > 0 every x seconds
