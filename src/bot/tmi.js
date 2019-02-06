@@ -193,11 +193,11 @@ class TMI extends Core {
 
       this.client[type].chat.on('MODE', async (message) => {
         const user = await global.users.getByName(message.username)
-        if (!user.is.mod && message.isModerator) global.events.fire('mod', { username: message.username })
+        if (!user.is.mod && typeof message.badges.moderator !== 'undefined') global.events.fire('mod', { username: message.username })
         if (!user.id) { user.id = await global.api.getIdFromTwitch(message.username) }
-        global.users.set(message.username, { id: user.id, is: { mod: message.isModerator } })
+        global.users.set(message.username, { id: user.id, is: { mod: typeof message.badges.moderator !== 'undefined' } })
 
-        if (message.username === global.oauth.settings.bot.username) global.status.MOD = message.isModerator
+        if (message.username === global.oauth.settings.bot.username) global.status.MOD = typeof message.badges.moderator !== 'undefined'
       })
 
       this.client[type].chat.on('USERNOTICE', message => {
