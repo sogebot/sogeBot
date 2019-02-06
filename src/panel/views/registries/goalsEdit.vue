@@ -441,6 +441,9 @@ export default Vue.extend({
       }
 
       this.socket.emit('update', { collection: 'groups', items: [this.group], key: 'uid' }, (err, d) => {
+        for (let goal of this.goals) {
+          goal.currentAmount = Number(goal.currentAmount)
+        }
         this.socket.emit('set', { collection: 'goals', items: this.goals, where: { groupId: this.groupId } }, (err) => {
           this.state.save = 2
           this.$router.push({ name: 'GoalsRegistryEdit', params: { id: String(d.uid) } })
