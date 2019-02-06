@@ -357,7 +357,7 @@ class TMI extends Core {
         subCumulativeMonthsName: global.commons.getLocalizedName(subCumulativeMonths, 'core.months'),
         message: messageFromUser
       })
-      global.log.resub(`${username}, streak share: ${subStreakShareEnabled}, streak: ${subStreak} ${global.commons.getLocalizedName(subStreak, 'core.months')}, months: ${subCumulativeMonths} ${global.commons.getLocalizedName(subCumulativeMonths, 'core.months')}, message: ${messageFromUser}, tier: ${method.prime ? 'Prime' : method.plan / 1000}`)
+      global.log.resub(`${username}, streak share: ${subStreakShareEnabled}, streak: ${subStreak}, months: ${subCumulativeMonths}, message: ${messageFromUser}, tier: ${method.prime ? 'Prime' : method.plan / 1000}`)
       global.events.fire('resub', {
         username,
         subStreakShareEnabled,
