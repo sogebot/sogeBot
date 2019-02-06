@@ -8,13 +8,6 @@ notifications:
   email: false
 node_js:
   - "11"
-os:
-  - linux
-  - osx
-env:
-  - DB=nedb
-  - DB=mongodb
-services: mongodb
 before_script:
   - npm run test:config:$DB
   - cat config.json
@@ -31,8 +24,15 @@ stages:
 jobs:
   include:
     - stage: skip
+      if: commit_message =~ /(\[skip-travis\])/
       script: npm run tslint # run just tslint
-matrix:
-  exclude:
-    - os: osx
+    - stage: test
+      env: DB=nedb
+      os: linux
+    - stage: test
       env: DB=mongodb
+      services: mongodb
+      os: linux
+    - stage: test
+      env: DB=nedb
+      os: osx
