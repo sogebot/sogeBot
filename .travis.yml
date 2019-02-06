@@ -22,7 +22,7 @@ script:
   - npm run tslint
   - travis_retry npm run test
 
-stage:
+stages:
   - name: test
     if: commit_message !~ /(\[skip-travis\])/
 
