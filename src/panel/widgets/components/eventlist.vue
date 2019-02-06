@@ -118,20 +118,26 @@
             style="border-left: 0; border-right: 0; padding: 0.2rem 1.25rem 0.4rem 1.25rem">
             <i :title="moment(event.timestamp).format('LLLL')" class="eventlist-text">{{moment(event.timestamp).fromNow()}}</i>
             <div class="eventlist-username" :style="{'font-size': eventlistSize + 'px'}">
-              <span :title="event.username" style="z-index: 9">{{event.username}}</span>
-              <span v-html="prepareMessage(event)"></span>
-              <font-awesome-icon v-if="event.event === 'follow'" icon="heart" :class="[`icon-${event.event}`, 'icon']" />
-              <font-awesome-icon v-if="event.event === 'host'" icon="bullhorn" :class="[`icon-${event.event}`, 'icon']" />
-              <font-awesome-icon v-if="event.event === 'raid'" icon="random" :class="[`icon-${event.event}`, 'icon']" />
-              <font-awesome-icon v-if="event.event === 'sub'" icon="star" :class="[`icon-${event.event}`, 'icon']" />
-              <font-awesome-icon v-if="event.event === 'subgift'" icon="gift" :class="[`icon-${event.event}`, 'icon']" />
-              <font-awesome-icon v-if="event.event === 'subcommunitygift'" icon="box-open" :class="[`icon-${event.event}`, 'icon']" />
-              <font-awesome-layers v-if="event.event === 'resub'" :class="[`icon-${event.event}`, 'icon']">
-                <font-awesome-icon icon="star-half"></font-awesome-icon>
-                <font-awesome-icon icon="long-arrow-alt-right"></font-awesome-icon>
-              </font-awesome-layers>
-              <font-awesome-icon v-if="event.event === 'cheer'" icon="gem" :class="[`icon-${event.event}`, 'icon']" />
-              <font-awesome-icon v-if="event.event === 'tip'" icon="dollar-sign" :class="[`icon-${event.event}`, 'icon']" />
+              <div class="d-flex">
+                <div class="w-100">
+                  <span :title="event.username" style="z-index: 9">{{event.username}}</span>
+                  <span v-html="prepareMessage(event)"></span>
+                </div>
+                <div style="flex-shrink: 15;">
+                  <font-awesome-icon v-if="event.event === 'follow'" icon="heart" :class="[`icon-${event.event}`, 'icon']" />
+                  <font-awesome-icon v-if="event.event === 'host'" icon="bullhorn" :class="[`icon-${event.event}`, 'icon']" />
+                  <font-awesome-icon v-if="event.event === 'raid'" icon="random" :class="[`icon-${event.event}`, 'icon']" />
+                  <font-awesome-icon v-if="event.event === 'sub'" icon="star" :class="[`icon-${event.event}`, 'icon']" />
+                  <font-awesome-icon v-if="event.event === 'subgift'" icon="gift" :class="[`icon-${event.event}`, 'icon']" />
+                  <font-awesome-icon v-if="event.event === 'subcommunitygift'" icon="box-open" :class="[`icon-${event.event}`, 'icon']" />
+                  <font-awesome-layers v-if="event.event === 'resub'" :class="[`icon-${event.event}`, 'icon']">
+                    <font-awesome-icon icon="star-half"></font-awesome-icon>
+                    <font-awesome-icon icon="long-arrow-alt-right"></font-awesome-icon>
+                  </font-awesome-layers>
+                  <font-awesome-icon v-if="event.event === 'cheer'" icon="gem" :class="[`icon-${event.event}`, 'icon']" />
+                  <font-awesome-icon v-if="event.event === 'tip'" icon="dollar-sign" :class="[`icon-${event.event}`, 'icon']" />
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -190,7 +196,7 @@ import { faCalendar } from '@fortawesome/free-regular-svg-icons';
 library.add(faBoxOpen, faCalendar, faEye, faCog, faExternalLinkAlt, faHeart, faBullhorn, faRandom, faGem, faStar, faGift, faDollarSign, faStarHalf, faLongArrowAltRight, faCircleNotch)
 
 export default {
-  props: ['commons', 'socket', 'popout'],
+  props: ['commons', 'popout'],
   components: {
     'font-awesome-layers': FontAwesomeLayers,
     'font-awesome-icon': FontAwesomeIcon,
@@ -198,6 +204,7 @@ export default {
   },
   data: function () {
     return {
+      socket: io('/widgets/eventlist', { query: "token=" + this.token }),
       settings: {
         widgetEventlistFollows: true,
         widgetEventlistHosts: true,
@@ -228,7 +235,7 @@ export default {
     })
   },
   created: function () {
-    this.socket.emit('getConfiguration', data => {
+    this.socket.emit('settings', (e, data) => {
       this.settings = {
         widgetEventlistFollows: _.isNil(data.widgetEventlistFollows) ? true : data.widgetEventlistFollows,
         widgetEventlistHosts: _.isNil(data.widgetEventlistHosts) ? true : data.widgetEventlistHosts,
@@ -248,11 +255,11 @@ export default {
       console.debug(this.settings)
       console.groupEnd()
     })
-    this.socket.emit('widget.eventlist.get') // get initial widget state
-    this.socket.on('widget.eventlist', events => this.events = events)
+    this.socket.emit('get') // get initial widget state
+    this.socket.on('update', events => this.events = events)
 
     // refresh timestamps
-    setInterval(() => this.socket.emit('widget.eventlist.get'), 60000)
+    setInterval(() => this.socket.emit('get'), 60000)
   },
   computed: {
     fEvents: function () {
@@ -292,7 +299,7 @@ export default {
       }
     }, 500),
     update: function () {
-      this.socket.emit('saveConfiguration', this.settings)
+      this.socket.emit('settings.update', this.settings)
     }
   },
   methods: {

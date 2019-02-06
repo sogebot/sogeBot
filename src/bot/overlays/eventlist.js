@@ -65,7 +65,7 @@ class EventList extends Overlay {
     }
     await global.db.engine.insert('widgetsEventList', newEvent)
     global.overlays.eventlist.sendDataToOverlay(global.overlays.eventlist)
-    global.widgets.eventlist._get(global.widgets.eventlist)
+    global.widgets.eventlist.update()
   }
 }
 
