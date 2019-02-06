@@ -615,7 +615,10 @@ class API {
     // check if current subscribers are still subs
     for (let user of currentSubscribers) {
       if (typeof user.lock === 'undefined' || (typeof user.lock !== 'undefined' && !user.lock.subscriber)) {
-        await global.db.engine.update('users', { id: user.id }, { is: { subscriber: subscribers.includes(user.id) } })
+        if (!subscribers.includes(user.id)) {
+          // subscriber is not sub anymore -> unsub and set subStreak to 0
+          await global.db.engine.update('users', { id: user.id }, { is: { subscriber: false }, stats: { subStreak: 0 } })
+        }
       }
 
       // remove id if parsed
