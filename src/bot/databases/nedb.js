@@ -108,7 +108,7 @@ class INeDB extends Interface {
       this.on(table).find(flatten(where), (err, items) => {
         if (err) {
           global.log.error(err.message)
-          global.log.error(JSON.stringify({ table, object, where }))
+          global.log.error(JSON.stringify({ type: 'find', table, where }))
         }
 
         // nedb needs to fake sum and group by
@@ -149,7 +149,7 @@ class INeDB extends Interface {
       self.on(table).findOne(flatten(where), function (err, item) {
         if (err) {
           global.log.error(err.message)
-          global.log.error(JSON.stringify({ table, object, where }))
+          global.log.error(JSON.stringify({ type: 'findOne', table, where }))
         }
         resolve(_.isNil(item) ? {} : item)
       })
@@ -168,7 +168,7 @@ class INeDB extends Interface {
       self.on(table).insert(flatten.unflatten(object), function (err, item) {
         if (err) {
           global.log.error(err.message)
-          global.log.error(JSON.stringify({ table, object, where }))
+          global.log.error(JSON.stringify({ type: 'insert', table, object }))
         }
         resolve(item)
       })
@@ -183,7 +183,7 @@ class INeDB extends Interface {
       self.on(table).remove(flatten(where), { multi: true }, function (err, numRemoved) {
         if (err) {
           global.log.error(err.message)
-          global.log.error(JSON.stringify({ table, object, where }))
+          global.log.error(JSON.stringify({ type: 'remove', table, where }))
         }
         resolve(numRemoved)
       })
@@ -195,7 +195,7 @@ class INeDB extends Interface {
 
     if (_.isEmpty(object)) {
       global.log.error('Object to update cannot be empty')
-      global.log.error(JSON.stringify({ table, object, where }))
+      global.log.error(JSON.stringify({ type: 'update', table, object, where }))
       return null
     }
 
@@ -205,7 +205,7 @@ class INeDB extends Interface {
       self.on(table).update(flatten(where), { $set: flatten(object, { safe: true }) }, { upsert: (_.isNil(where._id) && !_.isEmpty(where)), multi: (_.isEmpty(where)), returnUpdatedDocs: true }, function (err, numReplaced, affectedDocs) {
         if (err) {
           global.log.error(err.message)
-          global.log.error(JSON.stringify({ table, object, where }))
+          global.log.error(JSON.stringify({ type: 'update', table, object, where }))
         }
         resolve(affectedDocs)
       })
@@ -217,7 +217,7 @@ class INeDB extends Interface {
 
     if (_.isEmpty(object)) {
       global.log.error('Object to update cannot be empty')
-      global.log.error(JSON.stringify({ table, object, where }))
+      global.log.error(JSON.stringify({ type: 'incrementOne', table, object, where }))
       return null
     }
 
@@ -227,7 +227,7 @@ class INeDB extends Interface {
       self.on(table).update(flatten(where), { $inc: flatten(object) }, { upsert: true, multi: false, returnUpdatedDocs: true }, function (err, numReplaced, affectedDocs) {
         if (err) {
           global.log.error(err.message)
-          global.log.error(JSON.stringify({ table, object, where }))
+          global.log.error(JSON.stringify({ type: 'incrementOne', table, object, where }))
         }
         resolve(affectedDocs)
       })
@@ -239,7 +239,7 @@ class INeDB extends Interface {
 
     if (_.isEmpty(object)) {
       global.log.error('Object to update cannot be empty')
-      global.log.error(JSON.stringify({ table, object, where }))
+      global.log.error(JSON.stringify({ type: 'increment', table, object, where }))
       return null
     }
 
@@ -249,7 +249,7 @@ class INeDB extends Interface {
       self.on(table).update(flatten(where), { $inc: flatten(object) }, { upsert: true, multi: true, returnUpdatedDocs: true }, function (err, numReplaced, affectedDocs) {
         if (err) {
           global.log.error(err.message)
-          global.log.error(JSON.stringify({ table, object, where }))
+          global.log.error(JSON.stringify({ type: 'increment', table, object, where }))
         }
         resolve(affectedDocs)
       })
@@ -265,7 +265,7 @@ class INeDB extends Interface {
       self.on(table).count({}, function (err, count) {
         if (err) {
           global.log.error(err.message)
-          global.log.error(JSON.stringify({ table, object, where }))
+          global.log.error(JSON.stringify({ type: 'count', table }))
         }
         resolve(count)
       })
