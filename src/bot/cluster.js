@@ -130,8 +130,7 @@ function cluster () {
         if (_.get(sender, 'badges.subscriber', 0)) _.set(data, 'stats.tier', 0) // unset tier if sender is not subscriber
 
         // update user based on id not username
-        if (_.isEmpty(user)) await global.db.engine.insert('users', data)
-        else await global.db.engine.update('users', { _id: String(user._id) }, data)
+        await global.db.engine.update('users', { id: String(sender.userId) }, data)
 
         if (process.send) process.send({ type: 'api', fnc: 'isFollower', username: sender.username })
 
