@@ -39,7 +39,7 @@
         data = _.orderBy(data, 'timestamp', order) // re-order as set in order
 
         for (let event of data) {
-          if (event.event === 'resub') event.event = event.months + 'x ' + translations['overlays-eventlist-resub']
+          if (event.event === 'resub') event.event = event.subStreak + 'x ' + translations['overlays-eventlist-resub']
           else if (event.event === 'cheer') event.event = event.bits + ' ' + translations['overlays-eventlist-cheer']
           else if (event.event === 'tip') event.event = event.currency + parseFloat(event.amount).toFixed(2)
           else event.event = translations['overlays-eventlist-' + event.event]

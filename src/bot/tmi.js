@@ -280,6 +280,7 @@ class TMI extends Core {
   async subscription (message: Object) {
     try {
       const username = message.tags.login
+      const subCumulativeMonths = Number(message.parameters.cumulativeMonths)
       const method = this.getMethod(message)
       const userstate = message.tags
 
@@ -292,10 +293,10 @@ class TMI extends Core {
       if (user.lock && user.lock.subcribed_at) subscribedAt = undefined
       if (user.lock && user.lock.subscriber) isSubscriber = undefined
 
-      global.users.setById(userstate.userId, { username, is: { subscriber: isSubscriber }, time: { subscribed_at: subscribedAt }, stats: { tier: method.prime ? 'Prime' : method.plan / 1000 } })
+      await global.users.setById(userstate.userId, { username, is: { subscriber: isSubscriber }, time: { subscribed_at: subscribedAt }, stats: { subStreak: 1, subCumulativeMonths, tier: method.prime ? 'Prime' : method.plan / 1000 } })
       global.overlays.eventlist.add({ type: 'sub', tier: (method.prime ? 'Prime' : method.plan / 1000), username, method: (!_.isNil(method.prime) && method.prime) ? 'Twitch Prime' : '' })
       global.log.sub(`${username}, tier: ${method.prime ? 'Prime' : method.plan / 1000}`)
-      global.events.fire('subscription', { username: username, method: (!_.isNil(method.prime) && method.prime) ? 'Twitch Prime' : '' })
+      global.events.fire('subscription', { username: username, method: (!_.isNil(method.prime) && method.prime) ? 'Twitch Prime' : '', subCumulativeMonths })
       // go through all systems and trigger on.sub
       for (let [type, systems] of Object.entries({
         systems: global.systems,
@@ -310,6 +311,7 @@ class TMI extends Core {
             system.on.sub({
               username: username,
               userId: userstate.userId,
+              subCumulativeMonths
             })
           }
         }
@@ -325,23 +327,46 @@ class TMI extends Core {
     try {
       const username = message.tags.login
       const method = this.getMethod(message)
-      const months = Number(message.parameters.months)
+      const subCumulativeMonths = Number(message.parameters.cumulativeMonths)
+      const subStreakShareEnabled = Number(message.parameters.shouldShareStreak) !== 0
+      const streakMonth = Number(message.parameters.streakMonth)
       const userstate = message.tags
       const messageFromUser = message.message
 
       if (await global.commons.isIgnored(username)) return
 
       const user = await global.db.engine.findOne('users', { id: userstate.userId })
-      let subscribedAt = Number(moment().subtract(months, 'months').format('X')) * 1000
+
+      let subcribed_at = subStreakShareEnabled ? Number(moment().subtract(subStreak, 'months').format('X')) * 1000 : user.time.subcribed_at;
+      let subStreak = subStreakShareEnabled ? streakMonth : user.stats.subStreak + 1
       let isSubscriber = true
 
-      if (user.lock && user.lock.subcribed_at) subscribedAt = undefined
+      if (user.lock && user.lock.subcribed_at) subscribed_at = undefined
       if (user.lock && user.lock.subscriber) isSubscriber = undefined
 
-      global.users.setById(userstate.userId, { username, id: userstate.userId, is: { subscriber: isSubscriber }, time: { subscribed_at: subscribedAt }, stats: { tier: method.prime ? 'Prime' : method.plan / 1000 } })
-      global.overlays.eventlist.add({ type: 'resub', tier: (method.prime ? 'Prime' : method.plan / 1000), username: username, monthsName: global.commons.getLocalizedName(months, 'core.months'), months: months, message: messageFromUser })
-      global.log.resub(`${username}, months: ${months}, message: ${messageFromUser}, tier: ${method.prime ? 'Prime' : method.plan / 1000}`)
-      global.events.fire('resub', { username: username, monthsName: global.commons.getLocalizedName(months, 'core.months'), months: months, message: messageFromUser })
+      await global.users.setById(userstate.userId, { username, id: userstate.userId, is: { subscriber: isSubscriber }, time: { subscribed_at }, stats: { subStreak, subCumulativeMonths, tier: method.prime ? 'Prime' : method.plan / 1000 } })
+
+      global.overlays.eventlist.add({
+        type: 'resub',
+        tier: (method.prime ? 'Prime' : method.plan / 1000),
+        username: username,
+        subStreakShareEnabled,
+        subStreak,
+        subStreakName: global.commons.getLocalizedName(subStreak, 'core.months'),
+        subCumulativeMonths,
+        subCumulativeMonthsName: global.commons.getLocalizedName(subCumulativeMonths, 'core.months'),
+        message: messageFromUser
+      })
+      global.log.resub(`${username}, streak share: ${subStreakShareEnabled}, streak: ${subStreak} ${global.commons.getLocalizedName(subStreak, 'core.months')}, months: ${subCumulativeMonths} ${global.commons.getLocalizedName(subCumulativeMonths, 'core.months')}, message: ${messageFromUser}, tier: ${method.prime ? 'Prime' : method.plan / 1000}`)
+      global.events.fire('resub', {
+        username,
+        subStreakShareEnabled,
+        subStreak,
+        subStreakName: global.commons.getLocalizedName(subStreak, 'core.months'),
+        subCumulativeMonths,
+        subCumulativeMonthsName: global.commons.getLocalizedName(subCumulativeMonths, 'core.months'),
+        message: messageFromUser
+      })
     } catch (e) {
       global.log.error('Error parsing resub event')
       global.log.error(JSON.stringify(message))
@@ -375,7 +400,7 @@ class TMI extends Core {
   async subgift (message: Object) {
     try {
       const username = message.tags.login
-      const months = Number(message.parameters.months)
+      const subCumulativeMonths = Number(message.parameters.months)
       const recipient = message.parameters.recipientUserName.toLowerCase()
       const recipientId = message.parameters.recipientId
 
@@ -425,7 +450,8 @@ class TMI extends Core {
       if (user.lock && user.lock.subcribed_at) subscribedAt = undefined
       if (user.lock && user.lock.subscriber) isSubscriber = undefined
 
-      global.users.setById(user.id, { username: recipient, is: { subscriber: isSubscriber }, time: { subscribed_at: subscribedAt } })
+      await global.users.setById(user.id, { username: recipient, is: { subscriber: isSubscriber }, time: { subscribed_at: subscribedAt }, stats: { subCumulativeMonths } })
+      await global.db.engine.increment('users', { id: user.id }, { stats: { subStreak: 1 }})
       global.overlays.eventlist.add({ type: 'subgift', username: recipient, from: username, monthsName: global.commons.getLocalizedName(months, 'core.months'), months })
       global.log.subgift(`${recipient}, from: ${username}, months: ${months}`)
 

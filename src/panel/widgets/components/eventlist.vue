@@ -307,7 +307,8 @@ export default {
       t = t.replace('$viewers', '<strong style="font-size: 1rem">' + _.get(event, 'viewers', '0') + '</strong>')
       t = t.replace('$tier', `${commons.translate('tier')} <strong style="font-size: 1rem">${_.get(event, 'tier', 'n/a')}</strong>`)
       t = t.replace('$username', _.get(event, 'from', 'n/a'))
-      t = t.replace('$months', '<strong style`="`font-size: 1rem">' + _.get(event, 'months', '0') + '</strong>')
+      t = t.replace('$subStreakName', _.get(event, 'subStreakName', 'months'))
+      t = t.replace('$subStreak', '<strong style`="`font-size: 1rem">' + _.get(event, 'subStreak', '0') + '</strong>')
       t = t.replace('$bits', '<strong style="font-size: 1rem">' + _.get(event, 'bits', '0') + '</strong>')
 
       let output = `<span style="font-size:0.7rem; font-weight: normal">${t}</span>`

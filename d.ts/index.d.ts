@@ -49,7 +49,8 @@ type Command = {
 
 type onEventSub = {
   username: string,
-  userId: string
+  userId: string,
+  subCumulativeMonths: number,
 }
 
 type onEventFollow = {

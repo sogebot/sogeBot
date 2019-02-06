@@ -23,6 +23,8 @@
                       <template v-if="sort === 'stats.tips'">{{ commons.translate('tips') }}</template>
                       <template v-if="sort === 'stats.bits'">{{ commons.translate('bits') }}</template>
                       <template v-if="sort === 'custom.subgiftCount'">{{ commons.translate('subgifts') }}</template>
+                      <template v-if="sort === 'stats.subCumulativeMonths'">{{ commons.translate('subCumulativeMonths') }}</template>
+                      <template v-if="sort === 'stats.subStreak'">{{ commons.translate('subStreak') }}</template>
                       <i class="fas fa-sort-down"></i>
                     </span>
                   </button>
@@ -37,6 +39,8 @@
                     <a class="dropdown-item" @click="sort = 'stats.tips'; sortOrder = 'desc'">{{ commons.translate('tips') }}</a>
                     <a class="dropdown-item" @click="sort = 'stats.bits'; sortOrder = 'desc'">{{ commons.translate('bits') }}</a>
                     <a class="dropdown-item" @click="sort = 'custom.subgiftCount'; sortOrder = 'desc'">{{ commons.translate('subgifts') }}</a>
+                    <a class="dropdown-item" @click="sort = 'stats.subCumulativeMonths'; sortOrder = 'desc'">{{ commons.translate('subCumulativeMonths') }}</a>
+                    <a class="dropdown-item" @click="sort = 'stats.subStreak'; sortOrder = 'desc'">{{ commons.translate('subStreak') }}</a>
                   </div>
                   <button class="btn border-0 btn-outline-dark" @click="sortOrder = sortOrder === 'asc' ? 'desc': 'asc'">
                       <i v-if="sortOrder === 'asc'" class="fas fa-sort-alpha-down"></i>
@@ -174,6 +178,12 @@
                   </strong>
                   {{ item.points }}
                 </div>
+                <div>
+                  <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
+                    {{ commons.translate('watched-time') }}:
+                  </strong>
+                  {{ (item.time.watched / 1000 / 60 / 60).toFixed(1) }}h
+                </div>
               </div>
               <div class="col-2 pl-4 pr-4 pt-2 pb-2">
                 <div style="margin: 0; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 3px;">&nbsp;</div>
@@ -200,15 +210,21 @@
                 </div>
                 <div>
                   <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
-                    {{ commons.translate('watched-time') }}:
-                  </strong>
-                  {{ (item.time.watched / 1000 / 60 / 60).toFixed(1) }}h
-                </div>
-                <div>
-                  <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
                     {{ commons.translate('subgifts') }}:
                   </strong>
                   {{ item.custom.subgitsCount || 0 }}
+                </div>
+                <div>
+                  <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
+                    {{ commons.translate('subStreak') }}:
+                  </strong>
+                  {{ item.custom.subStreak || 0 }}
+                </div>
+                <div>
+                  <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
+                    {{ commons.translate('subCumulativeMonths') }}:
+                  </strong>
+                  {{ item.custom.subCumulativeMonths || 0 }}
                 </div>
               </div>
             </div>

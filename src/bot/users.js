@@ -319,6 +319,11 @@ class Users extends Core {
             _.set(viewer, 'stats.messages', await global.users.getMessagesOf(viewer.id))
           } else _.set(viewer, 'stats.messages', 0)
 
+          // MESSAGES
+          if (!_.isEmpty(_.filter(messages, (o) => o.id === viewer.id))) {
+            _.set(viewer, 'stats.messages', await global.users.getMessagesOf(viewer.id))
+          } else _.set(viewer, 'stats.messages', 0)
+
           // WATCHED
           if (!_.isEmpty(_.filter(messages, (o) => o.id === viewer.id))) {
             _.set(viewer, 'time.watched', await global.users.getWatchedOf(viewer.id))
