@@ -281,7 +281,7 @@ class Bets extends System {
   }
 
   public main(opts) {
-    if (opts.parameters.length === 0) { this.info(opts); } else { this.participate(opts); }
+    if (opts.parasmeters.length === 0) { this.info(opts); } else { this.participate(opts); }
   }
 }
 
