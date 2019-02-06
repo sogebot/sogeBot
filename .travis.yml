@@ -1,6 +1,6 @@
 language: node_js
 before_install:
-  - npm install -g typescript mocha tslint
+  - npm install -g mocha
   - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then choco install make; fi
 install:
   - travis_wait make ENV=development
@@ -17,16 +17,18 @@ script:
 
 stages:
   - name: skip
-    if: commit_message =~ /(\[skip\-travis\])/
+    if: commit_message =~ /(\[skip\-travis|no\-tests|skip\-tests\])/
   - name: test
-    if: commit_message !~ /(\[skip\-travis\])/
+    if: commit_message !~ /(\[skip\-travis|no\-tests|skip\-tests\])/
 
 jobs:
   include:
     - stage: skip
+      before_install: skip
       install: skip
+      os: linux
       before_script: skip
-      script: npm run tslint # run just tslint
+      script: echo 'Found skip tag. Skipping tests.'
     - stage: test
       env: DB=nedb
       os: linux
