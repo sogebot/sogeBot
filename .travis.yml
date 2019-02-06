@@ -17,14 +17,14 @@ script:
 
 stages:
   - name: skip
-    if: commit_message =~ /(\[skip-travis\])/
+    if: commit_message =~ /(\[skip\])/
   - name: test
-    if: commit_message !~ /(\[skip-travis\])/
+    if: commit_message !~ /(\[skip\])/
 
 jobs:
   include:
     - stage: skip
-      if: commit_message =~ /(\[skip-travis\])/
+      if: commit_message =~ /(\[skip\])/
       script: npm run tslint # run just tslint
     - stage: test
       env: DB=nedb
