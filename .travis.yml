@@ -8,13 +8,6 @@ notifications:
   email: false
 node_js:
   - "11"
-os:
-  - linux
-  - osx
-env:
-  - DB=nedb
-  - DB=mongodb
-services: mongodb
 before_script:
   - npm run test:config:$DB
   - cat config.json
@@ -22,7 +15,27 @@ script:
   - npm run tslint
   - travis_retry npm run test
 
-matrix:
-  exclude:
-    - os: osx
+stages:
+  - name: skip
+    if: commit_message =~ /(\[skip\-travis|no\-tests|skip\-tests\])/
+  - name: test
+    if: commit_message !~ /(\[skip\-travis|no\-tests|skip\-tests\])/
+
+jobs:
+  include:
+    - stage: skip
+      before_install: skip
+      install: skip
+      os: linux
+      before_script: skip
+      script: echo 'Found skip tag. Skipping tests.'
+    - stage: test
+      env: DB=nedb
+      os: linux
+    - stage: test
       env: DB=mongodb
+      services: mongodb
+      os: linux
+    - stage: test
+      env: DB=nedb
+      os: osx
