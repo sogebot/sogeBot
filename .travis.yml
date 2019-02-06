@@ -23,10 +23,15 @@ script:
   - travis_retry npm run test
 
 stages:
+  - name: skip
+    if: commit_message =~ /(\[skip-travis\])/
   - name: test
     if: commit_message !~ /(\[skip-travis\])/
 
-
+jobs:
+  include:
+    - stage: skip
+      script: npm run tslint # run just tslint
 matrix:
   exclude:
     - os: osx
