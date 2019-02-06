@@ -23,7 +23,7 @@ script:
   - travis_retry npm run test
 
 matrix:
-  if: commit_message ~= /(\[skip-travis\])/
+  if: commit_message !~ /(\[skip-travis\])/
   exclude:
     - os: osx
       env: DB=mongodb
