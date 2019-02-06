@@ -73,6 +73,9 @@ Commit Guidelines
     Fixes: https://github.com/sogehige/sogeBot/issues/1406
     ```
 
+- If you are updating locales, docs and doesn't fix bugs or add feature, you can
+  add [skip-tests], [no-tests], [skip-travis] to skip functional tests of bot
+
 - If you still need examples, please view the commit history.
 
 ## Additional Notes
