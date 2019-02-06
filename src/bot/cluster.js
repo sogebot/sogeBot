@@ -122,7 +122,7 @@ function cluster () {
     if (!isModerated && !isIgnored) {
       if (!skip && !_.isNil(sender.username)) {
         let user = await global.db.engine.findOne('users', { id: sender.userId })
-        let data = { id: sender.userId, is: { subscriber: (user.lock && user.lock.subscriber ? undefined : sender.badges.subscriber === 1), mod: sender.badges.moderator === 1 }, username: sender.username }
+        let data = { id: sender.userId, is: { subscriber: (user.lock && user.lock.subscriber ? undefined : typeof sender.badges.subscriber !== 'undefined'), mod: typeof sender.badges.moderator !== 'undefined' }, username: sender.username }
 
         // mark user as online
         await global.db.engine.update('users.online', { username: sender.username }, { username: sender.username })
