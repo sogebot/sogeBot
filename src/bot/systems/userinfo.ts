@@ -264,7 +264,7 @@ class UserInfo extends System {
       global.users.setById(opts.sender.userId, {
         username: opts.sender.username,
         time: { message: new Date().getTime() },
-        is: { subscriber: opts.sender.badges.subscriber === 1 },
+        is: { subscriber: typeof opts.sender.badges.subscriber !== 'undefined' },
       }, true);
       global.db.engine.update('users.online', { username: opts.sender.username }, { username: opts.sender.username });
     }

@@ -32,10 +32,10 @@ type Sender = {
   username: string,
   userId: string,
   badges: {
-    subscriber?: 0 | 1,
-    premium?: 0 | 1,
-    globalMod? : 0 | 1,
-    moderator? : 0 | 1,
+    subscriber?: undefined | number,
+    premium?: undefined | number,
+    globalMod? : undefined | number,
+    moderator? : undefined | number,
 
   }
 }
