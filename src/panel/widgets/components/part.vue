@@ -39,6 +39,7 @@ export default {
   },
   data: function () {
     return {
+      socket: io('/widgets/joinpart', { query: "token=" + this.token }),
       list: []
     }
   },
