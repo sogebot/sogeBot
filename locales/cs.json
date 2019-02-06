@@ -357,6 +357,7 @@
         "bits": "Bity",
         "subgifts": "Darované suby",
         "subStreak": "Subscribů v řadě",
+        "subStreakName": "Název měsíce (1 měsíc, 2 měsíce) pro subscribů v řadě",
         "subCumulativeMonths": "Celkový počet subscribů",
         "subCumulativeMonthsName": "Název měsíce (1 měsíc, 2 měsíce) pro celkový počet subscribů",
         "message": "Zpráva",
