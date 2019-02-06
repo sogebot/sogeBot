@@ -329,7 +329,7 @@ class TMI extends Core {
       const method = this.getMethod(message)
       const subCumulativeMonths = Number(message.parameters.cumulativeMonths)
       const subStreakShareEnabled = Number(message.parameters.shouldShareStreak) !== 0
-      const streakMonth = Number(message.parameters.streakMonth)
+      const streakMonths = Number(message.parameters.streakMonths)
       const userstate = message.tags
       const messageFromUser = message.message
 
@@ -337,8 +337,8 @@ class TMI extends Core {
 
       const user = await global.db.engine.findOne('users', { id: userstate.userId })
 
-      let subscribed_at = subStreakShareEnabled ? Number(moment().subtract(streakMonth, 'months').format('X')) * 1000 : user.time.subscribed_at;
-      let subStreak = subStreakShareEnabled ? streakMonth : user.stats.subStreak + 1
+      let subscribed_at = subStreakShareEnabled ? Number(moment().subtract(streakMonths, 'months').format('X')) * 1000 : user.time.subscribed_at;
+      let subStreak = subStreakShareEnabled ? streakMonths : user.stats.subStreak + 1
       let isSubscriber = true
 
       if (user.lock && user.lock.subscribed_at) subscribed_at = undefined
