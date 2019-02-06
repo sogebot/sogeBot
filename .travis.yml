@@ -22,8 +22,12 @@ script:
   - npm run tslint
   - travis_retry npm run test
 
+stage:
+  - name: test
+    if: commit_message !~ /(\[skip-travis\])/
+
+
 matrix:
-  if: commit_message !~ /(\[skip-travis\])/
   exclude:
     - os: osx
       env: DB=mongodb
