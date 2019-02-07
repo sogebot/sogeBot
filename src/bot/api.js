@@ -94,214 +94,15 @@ class API {
 
       this._loadCachedStatusAndGame()
 
-      setInterval(async () => {
-        if (typeof this.timeouts['getCurrentStreamData'] === 'undefined') this.timeouts['getCurrentStreamData'] = { opts: { interval: true }, isRunning: false }
-
-        if (!this.timeouts['getCurrentStreamData'].isRunning) {
-          this.timeouts['getCurrentStreamData'].isRunning = true
-          if (__DEBUG__.INTERVAL) global.log.info(chalk.yellow('getCurrentStreamData() ') + 'start')
-          const value = await Promise.race([
-            this.getCurrentStreamData(this.timeouts['getCurrentStreamData'].opts),
-            this.timeoutAfterMs(10000)
-          ])
-          if (__DEBUG__.INTERVAL) global.log.info(chalk.yellow('getCurrentStreamData() ') + JSON.stringify(value))
-
-          if (value.state) { // if is ok, update opts and run unlock after a while
-            if (typeof value.opts !== 'undefined') this.timeouts['getCurrentStreamData'].opts = value.opts
-            setTimeout(() => {
-              this.timeouts['getCurrentStreamData'].isRunning = false
-            }, 60000)
-          } else { // else run next tick
-            this.timeouts['getCurrentStreamData'].isRunning = false
-          }
-        }
-      }, 1000)
-
-      setInterval(async () => {
-        if (typeof this.timeouts['updateChannelViews'] === 'undefined') this.timeouts['updateChannelViews'] = { opts: true, isRunning: false }
-
-        if (!this.timeouts['updateChannelViews'].isRunning) {
-          this.timeouts['updateChannelViews'].isRunning = true
-          if (__DEBUG__.INTERVAL) global.log.info(chalk.yellow('updateChannelViews() ') + 'start')
-          const value = await Promise.race([
-            this.updateChannelViews(this.timeouts['updateChannelViews'].opts),
-            this.timeoutAfterMs(10000)
-          ])
-          if (__DEBUG__.INTERVAL) global.log.info(chalk.yellow('updateChannelViews() ') + JSON.stringify(value))
-
-          if (value.state) { // if is ok, update opts and run unlock after a while
-            if (typeof value.opts !== 'undefined') this.timeouts['updateChannelViews'].opts = value.opts
-            setTimeout(() => {
-              this.timeouts['updateChannelViews'].isRunning = false
-            }, 60000)
-          } else { // else run next tick
-            this.timeouts['updateChannelViews'].isRunning = false
-          }
-        }
-      }, 1000)
-
-      setInterval(async () => {
-        if (typeof this.timeouts['getLatest100Followers'] === 'undefined') this.timeouts['getLatest100Followers'] = { opts: true, isRunning: false, isPaused: false }
-        if (this.timeouts['getLatest100Followers'].isPaused) return
-
-        if (!this.timeouts['getLatest100Followers'].isRunning) {
-          this.timeouts['getLatest100Followers'].isRunning = true
-          if (__DEBUG__.INTERVAL) global.log.info(chalk.yellow('getLatest100Followers() ') + 'start')
-          const value = await Promise.race([
-            this.getLatest100Followers(this.timeouts['getLatest100Followers'].opts),
-            this.timeoutAfterMs(10000)
-          ])
-          if (__DEBUG__.INTERVAL) global.log.info(chalk.yellow('getLatest100Followers() ') + JSON.stringify(value))
-
-          if (value.state) { // if is ok, update opts and run unlock after a while
-            if (typeof value.opts !== 'undefined') this.timeouts['getLatest100Followers'].opts = value.opts
-            setTimeout(() => {
-              this.timeouts['getLatest100Followers'].isRunning = false
-            }, 60000)
-          } else { // else run next tick
-            this.timeouts['getLatest100Followers'].isRunning = false
-          }
-        }
-      }, 1000)
-
-      setInterval(async () => {
-        if (typeof this.timeouts['getChannelHosts'] === 'undefined') this.timeouts['getChannelHosts'] = { opts: {}, isRunning: false }
-
-        if (!this.timeouts['getChannelHosts'].isRunning) {
-          this.timeouts['getChannelHosts'].isRunning = true
-          if (__DEBUG__.INTERVAL) global.log.info(chalk.yellow('getChannelHosts() ') + 'start')
-          const value = await Promise.race([
-            this.getChannelHosts(this.timeouts['getChannelHosts'].opts),
-            this.timeoutAfterMs(10000)
-          ])
-          if (__DEBUG__.INTERVAL) global.log.info(chalk.yellow('getChannelHosts() ') + JSON.stringify(value))
-
-          if (value.state) { // if is ok, update opts and run unlock after a while
-            if (typeof value.opts !== 'undefined') this.timeouts['getChannelHosts'].opts = value.opts
-            setTimeout(() => {
-              this.timeouts['getChannelHosts'].isRunning = false
-            }, 60000)
-          } else { // else run next tick
-            this.timeouts['getChannelHosts'].isRunning = false
-          }
-        }
-      }, 1000)
-
-      setInterval(async () => {
-        if (typeof this.timeouts['getChannelChattersUnofficialAPI'] === 'undefined') this.timeouts['getChannelChattersUnofficialAPI'] = { opts: { saveToWidget: false }, isRunning: false }
-
-        if (!this.timeouts['getChannelChattersUnofficialAPI'].isRunning) {
-          this.timeouts['getChannelChattersUnofficialAPI'].isRunning = true
-          if (__DEBUG__.INTERVAL) global.log.info(chalk.yellow('getChannelChattersUnofficialAPI() ') + 'start')
-          const value = await Promise.race([
-            this.getChannelChattersUnofficialAPI(this.timeouts['getChannelChattersUnofficialAPI'].opts),
-            this.timeoutAfterMs(10000)
-          ])
-          if (__DEBUG__.INTERVAL) global.log.info(chalk.yellow('getChannelChattersUnofficialAPI() ') + JSON.stringify(value))
-
-          if (value.state) { // if is ok, update opts and run unlock after a while
-            if (typeof value.opts !== 'undefined') this.timeouts['getChannelChattersUnofficialAPI'].opts = value.opts
-            setTimeout(() => {
-              this.timeouts['getChannelChattersUnofficialAPI'].isRunning = false
-            }, 60000)
-          } else { // else run next tick
-            this.timeouts['getChannelChattersUnofficialAPI'].isRunning = false
-          }
-        }
-      }, 1000)
-
-      setInterval(async () => {
-        if (typeof this.timeouts['getChannelSubscribersOldAPI'] === 'undefined') this.timeouts['getChannelSubscribersOldAPI'] = { opts: {}, isRunning: false }
-
-        if (!this.timeouts['getChannelSubscribersOldAPI'].isRunning) {
-          this.timeouts['getChannelSubscribersOldAPI'].isRunning = true
-          if (__DEBUG__.INTERVAL) global.log.info(chalk.yellow('getChannelSubscribersOldAPI() ') + 'start')
-          const value = await Promise.race([
-            this.getChannelSubscribersOldAPI(this.timeouts['getChannelSubscribersOldAPI'].opts),
-            this.timeoutAfterMs(10000)
-          ])
-          if (__DEBUG__.INTERVAL) global.log.info(chalk.yellow('getChannelSubscribersOldAPI() ') + JSON.stringify(value))
-
-          if (value.disable) return
-          if (value.state) { // if is ok, update opts and run unlock after a while
-            if (typeof value.opts !== 'undefined') this.timeouts['getChannelSubscribersOldAPI'].opts = value.opts
-            setTimeout(() => {
-              this.timeouts['getChannelSubscribersOldAPI'].isRunning = false
-            }, constants.MINUTE * 2)
-          } else { // else run next tick
-            this.timeouts['getChannelSubscribersOldAPI'].isRunning = false
-          }
-        }
-      }, 1000)
-
-      setInterval(async () => {
-        if (typeof this.timeouts['getChannelDataOldAPI'] === 'undefined') this.timeouts['getChannelDataOldAPI'] = { opts: { forceUpdate: true }, isRunning: false }
-
-        if (!this.timeouts['getChannelDataOldAPI'].isRunning) {
-          this.timeouts['getChannelDataOldAPI'].isRunning = true
-          if (__DEBUG__.INTERVAL) global.log.info(chalk.yellow('getChannelDataOldAPI() ') + 'start')
-          const value = await Promise.race([
-            this.getChannelDataOldAPI(this.timeouts['getChannelDataOldAPI'].opts),
-            this.timeoutAfterMs(10000)
-          ])
-          if (__DEBUG__.INTERVAL) global.log.info(chalk.yellow('getChannelDataOldAPI() ') + JSON.stringify(value))
-
-          if (value.state) { // if is ok, update opts and run unlock after a while
-            if (typeof value.opts !== 'undefined') this.timeouts['getChannelDataOldAPI'].opts = value.opts
-            setTimeout(() => {
-              this.timeouts['getChannelDataOldAPI'].isRunning = false
-            }, 60000)
-          } else { // else run next tick
-            this.timeouts['getChannelDataOldAPI'].isRunning = false
-          }
-        }
-      }, 1000)
-
-      setInterval(async () => {
-        if (typeof this.timeouts['intervalFollowerUpdate'] === 'undefined') this.timeouts['intervalFollowerUpdate'] = { opts: {}, isRunning: false }
-
-        if (!this.timeouts['intervalFollowerUpdate'].isRunning) {
-          this.timeouts['intervalFollowerUpdate'].isRunning = true
-          if (__DEBUG__.INTERVAL) global.log.info(chalk.yellow('intervalFollowerUpdate() ') + 'start')
-          const value = await Promise.race([
-            this.intervalFollowerUpdate(this.timeouts['intervalFollowerUpdate'].opts),
-            this.timeoutAfterMs(10000)
-          ])
-          if (__DEBUG__.INTERVAL) global.log.info(chalk.yellow('intervalFollowerUpdate() ') + JSON.stringify(value))
-
-          if (value.state) { // if is ok, update opts and run unlock after a while
-            if (typeof value.opts !== 'undefined') this.timeouts['intervalFollowerUpdate'].opts = value.opts
-            setTimeout(() => {
-              this.timeouts['intervalFollowerUpdate'].isRunning = false
-            }, 60000)
-          } else { // else run next tick
-            this.timeouts['intervalFollowerUpdate'].isRunning = false
-          }
-        }
-      }, 1000)
-
-      setInterval(async () => {
-        if (typeof this.timeouts['checkClips'] === 'undefined') this.timeouts['checkClips'] = { opts: {}, isRunning: false }
-
-        if (!this.timeouts['checkClips'].isRunning) {
-          this.timeouts['checkClips'].isRunning = true
-          if (__DEBUG__.INTERVAL) global.log.info(chalk.yellow('checkClips() ') + 'start')
-          const value = await Promise.race([
-            this.checkClips(this.timeouts['checkClips'].opts),
-            this.timeoutAfterMs(10000)
-          ])
-          if (__DEBUG__.INTERVAL) global.log.info(chalk.yellow('checkClips() ') + JSON.stringify(value))
-
-          if (value.state) { // if is ok, update opts and run unlock after a while
-            if (typeof value.opts !== 'undefined') this.timeouts['checkClips'].opts = value.opts
-            setTimeout(() => {
-              this.timeouts['checkClips'].isRunning = false
-            }, 60000)
-          } else { // else run next tick
-            this.timeouts['checkClips'].isRunning = false
-          }
-        }
-      }, 1000)
+      this.interval('getCurrentStreamData', constants.MINUTE)
+      this.interval('updateChannelViews', constants.MINUTE)
+      this.interval('getLatest100Followers', constants.MINUTE)
+      this.interval('getChannelHosts', constants.MINUTE)
+      this.interval('getChannelChattersUnofficialAPI', constants.MINUTE)
+      this.interval('getChannelSubscribersOldAPI', 2 * constants.MINUTE)
+      this.interval('getChannelDataOldAPI', constants.MINUTE)
+      this.interval('intervalFollowerUpdate', constants.MINUTE)
+      this.interval('checkClips', constants.MINUTE)
     } else {
       this.calls = {
         bot: {
@@ -328,6 +129,32 @@ class API {
     this.calls[type].limit = limit
     this.calls[type].remaining = remaining
     this.calls[type].reset = reset
+  }
+
+  async interval (fnc, interval) {
+    setInterval(async () => {
+      if (typeof this.timeouts[fnc] === 'undefined') this.timeouts[fnc] = { opts: {}, isRunning: false }
+
+      if (!this.timeouts[fnc].isRunning) {
+        this.timeouts[fnc].isRunning = true
+        if (__DEBUG__.INTERVAL) global.log.info(chalk.yellow(fnc + '() ') + 'start')
+        const value = await Promise.race([
+          this[fnc](this.timeouts[fnc].opts),
+          this.timeoutAfterMs(10000)
+        ])
+        if (__DEBUG__.INTERVAL) global.log.info(chalk.yellow(fnc + '() ') + JSON.stringify(value))
+
+        if (value.disable) return
+        if (value.state) { // if is ok, update opts and run unlock after a while
+          if (typeof value.opts !== 'undefined') this.timeouts[fnc].opts = value.opts
+          setTimeout(() => {
+            this.timeouts[fnc].isRunning = false
+          }, interval)
+        } else { // else run next tick
+          this.timeouts[fnc].isRunning = false
+        }
+      }
+    }, 1000)
   }
 
   async intervalFollowerUpdate () {
@@ -631,7 +458,7 @@ class API {
     // set rest users as mods
     for (let username of mods) {
       if (global.commons.isBot(username)) { global.status.MOD = true; }
-      await global.db.engine.update('users', { username }, { is: { moderator: true }})
+      else { await global.db.engine.update('users', { username }, { is: { moderator: true }}) }
     }
   }
 
@@ -702,7 +529,7 @@ class API {
             await global.cache.rawStatus(request.data.status)
           } else {
             this.retries.getChannelDataOldAPI++
-            return
+            return { state: false, opts }
           }
         } else {
           this.retries.getChannelDataOldAPI = 0
