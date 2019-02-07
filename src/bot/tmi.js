@@ -129,7 +129,7 @@ class TMI extends Core {
       this.client[type].chat.on('PRIVMSG', async (message) => {
         message.tags.username = this.getUsernameFromRaw(message._raw)
 
-        if (!await global.commons.isBot(message.tags.username) || !message.isSelf) {
+        if (!global.commons.isBot(message.tags.username) || !message.isSelf) {
           message.tags['message-type'] = message.message.startsWith('\u0001ACTION') ? 'action' : 'say' // backward compatibility for /me moderation
 
           if (message.event === 'CHEER') {
@@ -163,6 +163,8 @@ class TMI extends Core {
 
             if (message.tags['message-type'] === 'action') global.events.fire('action', { username: message.tags.username.toLowerCase() })
           }
+        } else {
+          global.status.MOD = typeof message.tags.badges.moderator !== 'undefined'
         }
       })
 
@@ -189,15 +191,6 @@ class TMI extends Core {
             global.events.fire('hosting', { target: message.username, viewers: message.numberOfViewers })
           }
         }
-      })
-
-      this.client[type].chat.on('MODE', async (message) => {
-        const user = await global.users.getByName(message.username)
-        if (!user.is.mod && typeof message.badges.moderator !== 'undefined') global.events.fire('mod', { username: message.username })
-        if (!user.id) { user.id = await global.api.getIdFromTwitch(message.username) }
-        global.users.set(message.username, { id: user.id, is: { mod: typeof message.badges.moderator !== 'undefined' } })
-
-        if (message.username === global.oauth.settings.bot.username) global.status.MOD = typeof message.badges.moderator !== 'undefined'
       })
 
       this.client[type].chat.on('USERNOTICE', message => {
