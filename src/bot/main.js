@@ -9,6 +9,8 @@ const os = require('os')
 const util = require('util')
 const _ = require('lodash')
 const chalk = require('chalk')
+const gitCommitInfo = require('git-commit-info');
+
 
 const constants = require('./constants')
 const config = require('@config')
@@ -69,7 +71,8 @@ async function main () {
   // panel
   global.logger._panel()
 
-  console.log(figlet.textSync('sogeBot ' + _.get(process, 'env.npm_package_version', 'x.y.z'), {
+  const version = _.get(process, 'env.npm_package_version', 'x.y.z')
+  console.log(figlet.textSync('sogeBot ' + version.replace('SNAPSHOT', gitCommitInfo().shortHash || 'SNAPSHOT'), {
     font: 'ANSI Shadow',
     horizontalLayout: 'default',
     verticalLayout: 'default'

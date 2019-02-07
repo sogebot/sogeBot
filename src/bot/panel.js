@@ -10,6 +10,7 @@ var basicAuth = require('basic-auth')
 const flatten = require('flat')
 var _ = require('lodash')
 const util = require('util')
+const gitCommitInfo = require('git-commit-info');
 
 const Parser = require('./parser')
 
@@ -365,7 +366,10 @@ function Panel () {
       }
       cb(null, toEmit)
     })
-    socket.on('getVersion', function () { socket.emit('version', process.env.npm_package_version) })
+    socket.on('getVersion', function () {
+      const version = _.get(process, 'env.npm_package_version', 'x.y.z')
+      socket.emit('version', version.replace('SNAPSHOT', gitCommitInfo().shortHash || 'SNAPSHOT'))
+    })
 
     socket.on('parser.isRegistered', function (data) {
       socket.emit(data.emit, { isRegistered: new Parser().find(data.command) })
