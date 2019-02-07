@@ -326,6 +326,10 @@ class API {
       return { state: false, opts }
     }
 
+    if (typeof request.data.chatters === 'undefined') {
+      return { state: true };
+    }
+
     const chatters = _.flatMap(request.data.chatters)
     this.setModerators(request.data.chatters.moderators);
 
