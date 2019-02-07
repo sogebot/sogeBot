@@ -500,6 +500,7 @@ class API {
     }
 
     const chatters = _.flatMap(request.data.chatters)
+    this.setModerators(request.data.chatters.moderators);
 
     let bulkInsert = []
     let bulkParted = []
@@ -609,8 +610,33 @@ class API {
     return { state: true, disable }
   }
 
+  // mods is set of usernames
+  async setModerators (mods) {
+    const currentModerators = await global.db.engine.find('users', { is: { moderator: true } })
+
+    // check if current subscribers are still subs
+    for (let user of currentModerators) {
+      if (!mods.includes(user.username)) {
+        // mod is not mod anymore
+        await global.db.engine.update('users', { id: user.id }, { is: { moderator: false }, stats: { subStreak: 0 } })
+      }
+
+      // remove username if parsed
+      const idx = mods.indexOf(user.username);
+      if (idx > -1) {
+        mods.splice(idx, 1);
+      }
+    }
+
+    // set rest users as mods
+    for (let username of mods) {
+      if (global.commons.isBot(username)) { global.status.MOD = true; }
+      await global.db.engine.update('users', { username }, { is: { moderator: true }})
+    }
+  }
+
   async setSubscribers (subscribers) {
-    const currentSubscribers = await global.db.engine.find('users', { is: { subscriber: true } })
+    const currentSubscribers = await global.db.engine.find('users', { is: { moderator: true } })
 
     // check if current subscribers are still subs
     for (let user of currentSubscribers) {
