@@ -369,12 +369,8 @@ class API {
     return { state: true, opts }
   }
 
-  async getChannelSubscribers (opts) {
+  async getChannelSubscribers () {
     if (cluster.isWorker) throw new Error('API can run only on master')
-
-    opts = opts || {}
-    opts.subscribers = opts.subscribers || []
-    const subscribers = Array.from(opts.subscribers)
 
     const cid = global.oauth.channelId
     const url = `https://api.twitch.tv/helix/subscriptions?broadcaster_id=${cid}`
