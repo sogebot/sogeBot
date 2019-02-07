@@ -372,8 +372,6 @@ class API {
   async getChannelSubscribers (opts) {
     if (cluster.isWorker) throw new Error('API can run only on master')
 
-    console.log('getChannelSubscribers')
-
     opts = opts || {}
     opts.subscribers = opts.subscribers || []
     const subscribers = Array.from(opts.subscribers)
@@ -381,9 +379,11 @@ class API {
     const cid = global.oauth.channelId
     const url = `https://api.twitch.tv/helix/subscriptions?broadcaster_id=${cid}`
 
-    const token = await global.oauth.settings.broadcaster.accessToken
+    const token = global.oauth.settings.broadcaster.accessToken
     const needToWait = _.isNil(cid) || cid === '' || _.isNil(global.overlays) || token === ''
-    if (needToWait) {
+    const notEnoughAPICalls = this.calls.bot.remaining <= 30 && this.calls.bot.refresh > _.now() / 1000
+
+    if (needToWait || notEnoughAPICalls) {
       return { state: false }
     }
 
@@ -395,17 +395,21 @@ class API {
           'Authorization': 'Bearer ' + token
         }
       })
-      if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'getChannelSubscribers', api: 'helix', endpoint: url, code: request.status })
-
       this.retries.getChannelSubscribers = 0 // reset retry
-
       const subscribers = request.data.data
+
+      if (global.panel && global.panel.io) global.panel.io.emit('api.stats', global.panel.io.emit('api.stats', { data: subscribers, timestamp: _.now(), call: 'getChannelSubscribers', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining }))
+
+      // save remaining api calls
+      this.calls.bot.remaining = request.headers['ratelimit-remaining']
+      this.calls.bot.refresh = request.headers['ratelimit-reset']
+      this.calls.bot.limit = request.headers['ratelimit-limit']
+      global.commons.processAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', request.headers['ratelimit-limit'], request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] })
 
       await global.db.engine.update('api.current', { key: 'subscribers' }, { value: subscribers.length - 1 })
       this.setSubscribers(subscribers.filter(o => {
         return !global.commons.isOwner(o.user_name)  && !global.commons.isBot(o.user_name)
       }))
-
     } catch (e) {
       const isChannelPartnerOrAffiliate =
         !(e.message !== '422 Unprocessable Entity' ||
@@ -423,7 +427,7 @@ class API {
         global.db.engine.update('api.current', { key: 'subscribers' }, { value: 0 })
       } else {
         global.log.error(`${url} - ${e.message}`)
-        if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getChannelSubscribers', api: 'kraken', endpoint: url, code: e.stack })
+        if (global.panel && global.panel.io) global.panel.io.emit('api.stats', global.panel.io.emit('api.stats', { data: {}, timestamp: _.now(), call: 'getChannelSubscribers', api: 'helix', endpoint: url, code: e.stack, remaining: this.calls.bot.remaining }))
       }
     }
     return { state: true, disable }
