@@ -3,6 +3,7 @@
 const constants = require('./constants')
 const _ = require('lodash')
 const config = require('@config')
+const gitCommitInfo = require('git-commit-info');
 
 class Configuration {
   constructor () {
@@ -51,8 +52,9 @@ class Configuration {
       }
     }
 
+    const version = _.get(process, 'env.npm_package_version', 'x.y.z')
     global.log.debug('======= COPY DEBUG MESSAGE FROM HERE =======')
-    global.log.debug(`GENERAL | OS: ${process.env.npm_config_user_agent} | DB: ${config.database.type} | Bot version: ${process.env.npm_package_version} | Bot uptime: ${process.uptime()} | Bot lang: ${lang} | Bot mute: ${mute}`)
+    global.log.debug(`GENERAL | OS: ${process.env.npm_config_user_agent} | DB: ${config.database.type} | Bot version: ${version.replace('SNAPSHOT', gitCommitInfo().shortHash || 'SNAPSHOT')} | Bot uptime: ${process.uptime()} | Bot lang: ${lang} | Bot mute: ${mute}`)
     global.log.debug(`SYSTEMS | ${enabledSystems.systems.join(', ')}`)
     global.log.debug(`GAMES   | ${enabledSystems.games.join(', ')}`)
     global.log.debug(`WIDGETS | ${_.map(widgets, 'id').join(', ')}`)

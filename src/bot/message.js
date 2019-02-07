@@ -7,6 +7,7 @@ const _ = require('lodash')
 const cluster = require('cluster')
 const crypto = require('crypto')
 const constants = require('./constants')
+const gitCommitInfo = require('git-commit-info');
 
 const Entities = require('html-entities').AllHtmlEntities
 
@@ -28,7 +29,8 @@ class Message {
       this.message = this.message.replace(regexp, value)
     }
 
-    this.message = this.message.replace(/\$version/g, process.env.npm_package_version)
+    const version = _.get(process, 'env.npm_package_version', 'x.y.z')
+    this.message = this.message.replace(/\$version/g, version.replace('SNAPSHOT', gitCommitInfo().shortHash || 'SNAPSHOT'))
 
     let events = _.orderBy(await global.db.engine.find('widgetsEventList'), 'timestamp', 'desc')
     // latestFollower
