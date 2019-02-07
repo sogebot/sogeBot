@@ -40,12 +40,6 @@ Commit Guidelines
 - Prefix commit titles with the `name`, followed by a colon and a
   space. So for example, if you are modifying the alias system:
 
-- Commit title should be entirely in lowercase with the exception of proper
-  nouns, acronyms, and the words that refer to code, like function/variable names
-
-- If fixing issue, use `Closes` or `Fixes` keywords in commit description to
-  link with issue or idea
-
     `alias: fix bug with parsing`
 
   Or for donationalerts.ru integration:
@@ -55,6 +49,12 @@ Commit Guidelines
   If you are updating non project files like CONTRIBUTING.md, travis.yml, use `chore`
 
     `chore: update CONTRIBUTING.md`
+
+- Commit title should be entirely in lowercase with the exception of proper
+  nouns, acronyms, and the words that refer to code, like function/variable names
+
+- If fixing issue, use `Closes` or `Fixes` keywords in commit description to
+  link with issue or idea
 
   Example of full commit message:
 
