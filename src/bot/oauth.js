@@ -31,9 +31,10 @@ class OAuth extends Core {
         refreshToken: '',
         username: '',
         scopes: [
-          'chat_login',
-          'channel_subscriptions',
-          'channel_check_subscription'
+          'chat:read',
+          'chat:edit',
+          'channel:moderate',
+          'channel:read:subscriptions',
         ],
         _authenticatedScopes: []
       },
@@ -79,7 +80,7 @@ class OAuth extends Core {
         },
         generate: {
           type: 'link',
-          href: 'https://twitchtokengenerator.com/quick/Wwv9XnaPVM',
+          href: 'https://twitchtokengenerator.com/quick/RkshHUnw16',
           class: 'btn btn-primary btn-block',
           text: 'commons.generate',
           target: '_blank'

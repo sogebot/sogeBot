@@ -89,7 +89,7 @@ class API {
       this.retries = {
         getCurrentStreamData: 0,
         getChannelDataOldAPI: 0,
-        getChannelSubscribersOldAPI: 0
+        getChannelSubscribers: 0
       }
 
       this._loadCachedStatusAndGame()
@@ -98,8 +98,8 @@ class API {
       this.interval('updateChannelViews', constants.MINUTE)
       this.interval('getLatest100Followers', constants.MINUTE)
       this.interval('getChannelHosts', constants.MINUTE)
+      this.interval('getChannelSubscribers', 2 * constants.MINUTE)
       this.interval('getChannelChattersUnofficialAPI', constants.MINUTE)
-      this.interval('getChannelSubscribersOldAPI', 2 * constants.MINUTE)
       this.interval('getChannelDataOldAPI', constants.MINUTE)
       this.interval('intervalFollowerUpdate', constants.MINUTE)
       this.interval('checkClips', constants.MINUTE)
@@ -369,17 +369,17 @@ class API {
     return { state: true, opts }
   }
 
-  async getChannelSubscribersOldAPI (opts) {
+  async getChannelSubscribers (opts) {
     if (cluster.isWorker) throw new Error('API can run only on master')
+
+    console.log('getChannelSubscribers')
 
     opts = opts || {}
     opts.subscribers = opts.subscribers || []
-    opts.offset = opts.offset || 0
     const subscribers = Array.from(opts.subscribers)
-    const limit = 100
 
     const cid = global.oauth.channelId
-    const url = `https://api.twitch.tv/kraken/channels/${cid}/subscriptions?limit=${limit}&offset=${opts.offset}`
+    const url = `https://api.twitch.tv/helix/subscriptions?broadcaster_id=${cid}`
 
     const token = await global.oauth.settings.broadcaster.accessToken
     const needToWait = _.isNil(cid) || cid === '' || _.isNil(global.overlays) || token === ''
@@ -392,34 +392,26 @@ class API {
     try {
       request = await axios.get(url, {
         headers: {
-          'Accept': 'application/vnd.twitchtv.v5+json',
-          'Authorization': 'OAuth ' + token
+          'Authorization': 'Bearer ' + token
         }
       })
-      if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'getChannelSubscribersOldAPI', api: 'kraken', endpoint: url, code: request.status })
+      if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'getChannelSubscribers', api: 'helix', endpoint: url, code: request.status })
 
-      this.retries.getChannelSubscribersOldAPI = 0 // reset retry
+      this.retries.getChannelSubscribers = 0 // reset retry
 
-      // set subscribers
-      for (let subscriber of _.map(request.data.subscriptions, 'user')) {
-        if (subscriber.name === global.commons.getBroadcaster() || subscriber.name === global.oauth.settings.bot.username) continue
-        opts.subscribers.push(subscriber._id)
-      }
+      const subscribers = request.data.data
 
-      if (subscribers.length === opts.subscribers.length) {
-        await global.db.engine.update('api.current', { key: 'subscribers' }, { value: request.data._total - 1 })
-        this.setSubscribers(subscribers)
-      } else {
-        opts.offset = opts.offset + limit
-        this.getChannelSubscribersOldAPI(opts)
-      }
+      await global.db.engine.update('api.current', { key: 'subscribers' }, { value: subscribers.length - 1 })
+      this.setSubscribers(subscribers.filter(o => {
+        return !global.commons.isOwner(o.user_name)  && !global.commons.isBot(o.user_name)
+      }))
 
     } catch (e) {
       const isChannelPartnerOrAffiliate =
         !(e.message !== '422 Unprocessable Entity' ||
          (e.response.data.status === 400 && e.response.data.message === `${global.commons.getBroadcaster} does not have a subscription program`))
       if (!isChannelPartnerOrAffiliate) {
-        if (this.retries.getChannelSubscribersOldAPI >= 15) {
+        if (this.retries.getChannelSubscribers >= 15) {
           disable = true
           global.log.warning('Broadcaster is not affiliate/partner, will not check subs')
           global.db.engine.update('api.current', { key: 'subscribers' }, { value: 0 })
@@ -431,7 +423,7 @@ class API {
         global.db.engine.update('api.current', { key: 'subscribers' }, { value: 0 })
       } else {
         global.log.error(`${url} - ${e.message}`)
-        if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getChannelSubscribersOldAPI', api: 'kraken', endpoint: url, code: e.stack })
+        if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getChannelSubscribers', api: 'kraken', endpoint: url, code: e.stack })
       }
     }
     return { state: true, disable }
@@ -463,27 +455,26 @@ class API {
   }
 
   async setSubscribers (subscribers) {
-    const currentSubscribers = await global.db.engine.find('users', { is: { moderator: true } })
+    const currentSubscribers = await global.db.engine.find('users', { is: { subscriber: true } })
 
     // check if current subscribers are still subs
     for (let user of currentSubscribers) {
       if (typeof user.lock === 'undefined' || (typeof user.lock !== 'undefined' && !user.lock.subscriber)) {
-        if (!subscribers.includes(user.id)) {
+        if (!subscribers.map((o) => o.user_id).includes(user.id)) {
           // subscriber is not sub anymore -> unsub and set subStreak to 0
-          await global.db.engine.update('users', { id: user.id }, { is: { subscriber: false }, stats: { subStreak: 0 } })
+          await global.db.engine.update('users', { id: user.id }, {  is: { subscriber: false }, stats: { subStreak: 0 } })
         }
       }
 
       // remove id if parsed
-      const idx = subscribers.indexOf(user.id);
-      if (idx > -1) {
-        subscribers.splice(idx, 1);
-      }
+      subscribers = subscribers.filter((o) => {
+        return o.user_id !== user.id
+      })
     }
 
     // set rest users as subs
-    for (let id of subscribers) {
-      await global.db.engine.update('users', { id }, { is: { subscriber: true }})
+    for (let user of subscribers) {
+      await global.db.engine.update('users', { id: user.user_id }, { username: user.user_name, is: { subscriber: true }, stats: { tier: user.tier / 1000 } })
     }
 
     // update all subscribed_at
