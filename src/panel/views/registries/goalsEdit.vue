@@ -517,9 +517,7 @@ export default Vue.extend({
         endAfter: (new Date(Date.now() + 24 * 60 * 60 * 1000)).toISOString()
       })
 
-      if (this.uiShowGoal === '') {
-        this.uiShowGoal = uid
-      }
+      this.uiShowGoal = uid
     }
   },
   mounted: function () {
@@ -531,6 +529,9 @@ export default Vue.extend({
       })
       this.socket.emit('find', { collection: 'goals', where: { groupId: this.$route.params.id }}, (err, d: Goals.Goal[]) => {
         this.goals = d
+        if (this.uiShowGoal === '' && this.goals.length > 0) {
+          this.uiShowGoal = this.goals[0].uid;
+        }
       })
     }
     axios.get('/fonts')
