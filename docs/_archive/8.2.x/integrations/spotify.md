@@ -1,4 +1,4 @@
-Current integration is enabling `$spotifySong` and song requests(PREMIUM) from Spotify
+Current integration is enabling `$currentSong` from Spotify
 
 ## How to setup
 

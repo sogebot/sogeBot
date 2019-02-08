@@ -67,11 +67,10 @@ You can also contact me on my email sogehige@gmail.com or get support on our [di
 | Alerts           | Show images, play audio/video |
 | Clips            | Show clips created through events as replays |
 | Credits          | End credits like in a movie                                           |
-| Text             | Show text and variables ($ytSong etc.) |
+| Text             | Show text and variables ($currentSong etc.)                           |
 | Eventlist        | Show last events                                                      |
 | Wheel Of Fortune | Show wheel of fortune spin                                            |
 | Bets             | Show current bet                                                      |
-| Goals            | Show your goals!                                                      |
 
 #### Languages
 
