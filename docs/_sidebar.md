@@ -22,6 +22,7 @@
   * [Polls](/commands/polls.md)
   * [Price](/commands/price.md)
   * [Songs](/commands/songs.md)
+  * [Top](/commands/top.md)
   * [Overlays](/commands/overlays.md)
   * [Ranks](/commands/ranks.md)
   * [Raffles](/commands/raffles.md)
@@ -45,4 +46,4 @@
   * [Spotify](/integrations/spotify.md)
 * Tools
   * [Users cleanup](/tools/users-cleanup.md)
-  * [Migration NeDB->MongoDB](/tools/migration-nedb-mongodb.md)
+  * [Database migration](/tools/database.md)

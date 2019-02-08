@@ -6,25 +6,21 @@
 
 ## System template
 
-``` typescript
+``` javascript
+'use strict'
+
 // bot libraries
-import * as constants from '../constants';
-import System from './_interface';
+const constants = require('../constants')
+const System = require('./_interface')
 
 class Yoursystem extends System {
-  [x: string]: any;
-
   constructor () {
-    const options: InterfaceSettings = {
-      settings: {
-        commands: [],
-        parsers: [],
-      },
-      ui: {},
-      dependsOn: [],
-      on: {},
-    };
-    super(options)
+    const dependsOn = []
+    const settings = {
+      commands: [],
+      parsers: []
+    }
+    super({settings, dependsOn})
   }
 }
 
@@ -34,12 +30,10 @@ module.exports = new Yoursystem()
 ### Depends on different system
 Some systems have dependencies, e.g. bet system cannot work without points system
 
-``` typescript
-const options: InterfaceSettings = {
-  // ...
-  dependsOn: ['systems.points'],
-  // ...
-}
+``` javascript
+const dependsOn = [
+  'systems.points'
+]
 ```
 
 ### Settings variable
@@ -54,18 +48,14 @@ Settings variable may contain settings for `yoursystem`
 - `fnc`: created from second part of command name, if there is no second part `main` is default function
 - `isHelper`: mark this command as helper function (e.g. price check is skipped for this command). `false`
 
-``` typescript
-const options: InterfaceSettings = {
+``` javascript
+const settings = {
   // ...
-  settings: {
-    // ...
-    commands: [
-      '!command1', // creates !command1 with default values
-      { name: '!command2' }, // same as !command1
-      { name: `!command3`, fnc: 'command3', permission: constants.OWNER_ONLY } // with custom values
-    ],
-    // ...
-  },
+  commands: [
+    '!command1', // creates !command1 with default values
+    { name: '!command2' }, // same as !command1
+    { name: `!command3`, fnc: 'command3', permission: constants.OWNER_ONLY } // with custom values
+  ],
   // ...
 }
 ```
@@ -79,17 +69,13 @@ const options: InterfaceSettings = {
 - `priority`: what priority should be given to parser, higher priority, sooner it will run. `constants.LOW`
 - `permission`: sets default permission for parser. `constants.VIEWERS`
 
-``` typescript
-const options: InterfaceSettings = {
+``` javascript
+const settings = {
   // ...
-  settings: {
-    // ...
-    parsers: [
-      { name: 'run' },
-      { name: 'stop', fireAndForget: true } // with custom values
-    ],
-    // ...
-  },
+  parsers: [
+    { name: 'run' },
+    { name: 'stop', fireAndForget: true } // with custom values
+  ],
   // ...
 }
 ```

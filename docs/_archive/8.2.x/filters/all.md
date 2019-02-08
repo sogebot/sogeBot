@@ -26,9 +26,7 @@
 
 `$bits` - return current bits count received during current stream
 
-`$ytSong` - return current song playing in YTplayer widget
-
-`$spotifySong` - return current song playing in Spotify
+`$currentSong` - return current song playing in YTplayer widget
 
 `$latestFollower` - Latest Follower
 
@@ -188,23 +186,7 @@
 
 `(list.command)` - will return list of your visible custom commands
 
-`(list.command.mods)` - will return list of your visible custom commands with mods responses
-
-`(list.command.regular)` - will return list of your visible custom commands with regular responses
-
-`(list.command.viewers)` - will return list of your visible custom commands with viewers responses
-
-`(list.command.owner)` - will return list of your visible custom commands with owner responses
-
 `(list.!command)` - will return list of your visible custom !commands
-
-`(list.!command.mods)` - will return list of your visible custom commands with mods responses
-
-`(list.!command.regular)` - will return list of your visible custom commands with regular responses
-
-`(list.!command.viewers)` - will return list of your visible custom commands with viewers responses
-
-`(list.!command.owner)` - will return list of your visible custom commands with owner responses
 
 `(list.cooldown)` - will return list of your cooldowns (keywords and !commands)
 
