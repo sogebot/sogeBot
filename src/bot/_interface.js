@@ -258,7 +258,10 @@ class Module {
               } else {
                 if (_.isObjectLike(value)) {
                   for (let [defaultValue, currentValue] of Object.entries(value)) {
-                    this.settings[key][defaultValue] = currentValue
+                    if (typeof this.settings[key] !== 'undefined' && typeof this.settings[key][defaultValue] !== 'undefined') {
+                      // save only defined values
+                      this.settings[key][defaultValue] = currentValue
+                    }
                   }
                 } else this.settings[key] = value
               }
