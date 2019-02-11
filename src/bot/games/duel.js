@@ -31,8 +31,11 @@ class Duel extends Game {
         '!duel'
       ]
     }
+    const dependsOn = [
+      'systems.points',
+    ]
 
-    super({ settings })
+    super({ settings, dependsOn })
 
     if (cluster.isMaster) this.pickDuelWinner()
   }
