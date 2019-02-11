@@ -28,7 +28,7 @@ Commit Guidelines
 -----------------
 
 - sogeBot uses the 50/72 standard for commits.  50 characters max
-  for the title (excluding module prefix), an empty line, and then a
+  for the title (excluding type), an empty line, and then a
   full description of the commit, wrapped to 72 columns max.  See this
   link for more information: http://chris.beams.io/posts/git-commit/
 
@@ -37,18 +37,20 @@ Commit Guidelines
 
 - Keep second line blank.
 
-- Prefix commit titles with the `name`, followed by a colon and a
+- Prefix commit titles with the `type(scope?)`, followed by a colon and a
   space. So for example, if you are modifying the alias system:
 
-    `alias: fix bug with parsing`
+    `fix(alias): fix bug with parsing`
 
   Or for donationalerts.ru integration:
 
-    `donationalerts: fix source not displaying`
+    `feat(donationalerts): fix source not displaying`
 
   If you are updating non project files like CONTRIBUTING.md, travis.yml, use `chore`
 
     `chore: update CONTRIBUTING.md`
+
+- The **header** is mandatory and the **scope** of the header is optional.
 
 - Commit title should be entirely in lowercase with the exception of proper
   nouns, acronyms, and the words that refer to code, like function/variable names
@@ -59,7 +61,7 @@ Commit Guidelines
   Example of full commit message:
 
     ```text
-    subsystem: explain the commit in one line
+    fix: explain the commit in one line
 
     Body of commit message is a few lines of text, explaining things
     in more detail, possibly giving some background about the issue
@@ -78,9 +80,24 @@ Commit Guidelines
 
 - If you still need examples, please view the commit history.
 
-## Additional Notes
+Commit types
+------------
 
-### Commit Squashing
+Must be one of the following:
+
+- **feat**: A new feature
+- **fix**: A bug fix
+- **docs**: Documentation only changes
+- **style**: Changes that do not affect the meaning of the code (white-space,
+  formatting, missing semi-colons, etc)
+- **refactor**: A code change that neither fixes a bug nor adds a feature
+- **perf**: A code change that improves performance
+- **test**: Adding missing or correcting existing tests
+- **chore**: Changes to the build process or auxiliary tools and libraries such
+  as documentation generation
+
+Commit Squashing
+----------------
 
 In most cases, do not squash commits that you add to your Pull Request during
 the review process. When the commits in your Pull Request land, they may be
