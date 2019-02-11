@@ -37,6 +37,7 @@
   * [Gamble](_master/games/gamble.md)
   * [Heist](_master/games/heist.md)
   * [Roulette](_master/games/roulette.md)
+  * [Seppuku](_master/games/seppuku.md)
 * [Response Filters](_master/filters/all.md)
 * Overlays
   * [Themes](_master/overlays/themes.md)
