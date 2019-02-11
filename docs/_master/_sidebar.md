@@ -35,6 +35,7 @@
   * [Duel](_master/games/duel.md)
   * [FightMe](_master/games/fightme.md)
   * [Gamble](_master/games/gamble.md)
+  * [Heist](_master/games/heist.md)
 * [Response Filters](_master/filters/all.md)
 * Overlays
   * [Themes](_master/overlays/themes.md)
