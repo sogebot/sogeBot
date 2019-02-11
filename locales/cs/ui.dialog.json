@@ -27,5 +27,6 @@
     "yes": "Ano",
     "no": "Ne"
   },
-  "changesPending": "Vaše změny nebyly uloženy."
+  "changesPending": "Vaše změny nebyly uloženy.",
+  "formNotValid": "Opravte chyby ve formuláři."
 }
