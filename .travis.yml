@@ -26,7 +26,7 @@ jobs:
   include:
     - stage: skip
       before_install:
-        - npm install @commitlint/travis-cli tslint
+        - npm install -g @commitlint/travis-cli tslint
       install: skip
       os: linux
       before_script: skip
