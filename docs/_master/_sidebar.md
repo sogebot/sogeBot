@@ -46,6 +46,7 @@
 * How To
   * [Phillips Hue](_master/howto/phillipshue.md)
   * [Eval snippets](_master/howto/eval.md)
+  * [Run random command](_master/howto/run-random-command.md)
   * [Write own system](_master/howto/write-own-system.md)
 * Integrations
   * [Twitter](_master/integrations/twitter.md)
