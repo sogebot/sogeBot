@@ -33,6 +33,7 @@
 * Games
   * [Bets](/games/bets.md)
   * [Duel](/games/duel.md)
+  * [FightMe](/games/fightme.md)
 * [Response Filters](/filters/all.md)
 * Overlays
   * [Themes](/overlays/themes.md)
