@@ -28,11 +28,11 @@
   * [Raffles](/commands/raffles.md)
   * [Queue](/commands/queue.md)
   * [Highlights](/commands/highlights.md)
-  * [Gambling](/commands/gambling.md)
   * [Quotes](/commands/quotes.md)
   * [Miscellaneous](/commands/miscellaneous.md)
 * Games
   * [Bets](/games/bets.md)
+  * [Duel](/games/duel.md)
 * [Response Filters](/filters/all.md)
 * Overlays
   * [Themes](/overlays/themes.md)
