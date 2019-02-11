@@ -80,7 +80,10 @@ class Heist extends Game {
         '!bankheist'
       ]
     }
-    super({ settings })
+    const dependsOn = [
+      'systems.points'
+    ]
+    super({ settings, dependsOn })
 
     if (cluster.isMaster) this.timeouts['iCheckFinished'] = setTimeout(() => this.iCheckFinished(), 10000) // wait for proper config startup
   }
