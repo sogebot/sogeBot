@@ -142,7 +142,7 @@ class Polls extends System {
             } else {
               global.commons.sendMessage(`#vote${Number(index) + 1} - ${option} - ${votesCount} ${global.commons.getLocalizedName(votesCount, 'systems.polls.votes')}, ${percentage}%`, opts.sender);
             }
-          }, 100 * (Number(index) + 1));
+          }, 300 * (Number(index) + 1));
         }
       }
     } catch (e) {
@@ -180,7 +180,7 @@ class Polls extends System {
       for (const index of Object.keys(options)) {
         setTimeout(() => {
           if (type === 'normal') { global.commons.sendMessage(this.settings.commands['!vote'] + ` ${(Number(index) + 1)} => ${options[index]}`, opts.sender); } else { global.commons.sendMessage(`#vote${(Number(index) + 1)} => ${options[index]}`, opts.sender); }
-        }, 100 * (Number(index) + 1));
+        }, 300 * (Number(index) + 1));
       }
 
       this.lastTimeRemind = Date.now();
@@ -199,7 +199,7 @@ class Polls extends System {
           for (const index of Object.keys(cVote.options)) {
             setTimeout(() => {
               if (cVote.type === 'normal') { global.commons.sendMessage(this.settings.commands['!poll open'] + ` ${index} => ${cVote.options[index]}`, opts.sender); } else { global.commons.sendMessage(`#vote${(Number(index) + 1)} => ${cVote.options[index]}`, opts.sender); }
-            }, 100 * (Number(index) + 1));
+            }, 300 * (Number(index) + 1));
           }
           break;
         default:
@@ -366,7 +366,7 @@ class Polls extends System {
       for (const index of Object.keys(vote.options)) {
         setTimeout(() => {
           if (vote.type === 'normal') { global.commons.sendMessage(this.settings.commands['!vote'] + ` ${(Number(index) + 1)} => ${vote.options[index]}`, global.commons.getOwner()); } else { global.commons.sendMessage(`#vote${(Number(index) + 1)} => ${vote.options[index]}`, global.commons.getOwner()); }
-        }, 100 * (Number(index) + 1));
+        }, 300 * (Number(index) + 1));
       }
     }
   }
