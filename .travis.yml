@@ -26,12 +26,12 @@ jobs:
   include:
     - stage: skip
       before_install:
-        - npm install -g @commitlint/travis-cli tslint
+        - npm install @commitlint/travis-cli @commitlint/config-conventional tslint typescript
       install: skip
       os: linux
       before_script: skip
       script:
-        - commitlint-travis
+        - npx commitlint-travis
         - npm run tslint
         - echo 'Found skip tag. Skipping tests.'
     - stage: test
