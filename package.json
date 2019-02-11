@@ -72,7 +72,8 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "npm run tslint"
+      "pre-commit": "npm run tslint",
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
     }
   },
   "scripts": {
@@ -95,6 +96,9 @@
     "@babel/preset-env": "7.3.1",
     "@babel/preset-flow": "7.0.0",
     "@babel/preset-typescript": "7.1.0",
+    "@commitlint/cli": "7.5.1",
+    "@commitlint/config-conventional": "7.5.0",
+    "@commitlint/travis-cli": "7.5.1",
     "@fortawesome/fontawesome-svg-core": "1.2.14",
     "@fortawesome/free-brands-svg-icons": "5.7.1",
     "@fortawesome/free-regular-svg-icons": "5.7.1",
