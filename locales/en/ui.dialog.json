@@ -27,5 +27,6 @@
     "yes": "Yes",
     "no": "No"
   },
-  "changesPending": "Your changes was not saved."
+  "changesPending": "Your changes was not saved.",
+  "formNotValid": "Form is invalid."
 }
