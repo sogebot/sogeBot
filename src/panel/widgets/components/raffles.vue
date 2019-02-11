@@ -93,9 +93,9 @@
           <div class="w-100"></div>
           <div class="col text-center">
             <div class="d-flex">
-            <button type="button" class="btn btn-default btn-label" disabled="disabled">{{commons.translate('eligible-to-enter')}}</button>
+            <button type="button" class="btn btn-default btn-label w-100 text-left" disabled="disabled">{{commons.translate('eligible-to-enter')}}</button>
             <button
-              class="btn d-block border-0" style="width:100%"
+              class="btn d-block border-0 w-100" style="flex-shrink: 2;"
               :class="[ eligibility.all ? 'btn-outline-success' : 'btn-outline-danger' ]"
               @click="toggle('all')"
               :title="commons.translate('everyone')"
@@ -103,7 +103,7 @@
               <font-awesome-icon icon="users" />
             </button>
             <button
-              class="btn d-block border-0" style="width:100%"
+              class="btn d-block border-0 w-100" style="flex-shrink: 2;"
               :class="[ eligibility.followers ? 'btn-outline-success' : 'btn-outline-danger' ]"
               @click="toggle('followers')"
               :title="commons.translate('followers')"
@@ -111,7 +111,7 @@
               <font-awesome-icon icon="heart" />
             </button>
             <button
-              class="btn d-block border-0" style="width:100%"
+              class="btn d-block border-0 w-100" style="flex-shrink: 2;"
               :class="[ eligibility.subscribers ? 'btn-outline-success' : 'btn-outline-danger' ]"
               @click="toggle('subscribers')"
               :title="commons.translate('subscribers')"
@@ -125,14 +125,14 @@
         <div class="row pb-1">
           <div class="col">
             <div class="d-flex">
-              <button type="button" class="btn btn-default btn-label" disabled="disabled">{{commons.translate('raffle-type')}}</button>
-              <button class="btn d-block" style="width:100%"
+              <button type="button" class="btn btn-default btn-label w-100 text-left" disabled="disabled">{{commons.translate('raffle-type')}}</button>
+              <button class="btn d-block w-100"
                 :class="[isTypeKeywords ? 'btn-primary' : 'btn-outline-primary border-0']"
                 @click="isTypeKeywords = true"
                 :disabled="running">
                 {{commons.translate('raffle-type-keywords')}}
               </button>
-              <button class="btn d-block" style="width:100%"
+              <button class="btn d-block w-100"
                 :class="[isTypeKeywords ? 'btn-outline-primary border-0' : 'btn-primary']"
                 @click="isTypeKeywords = false"
                 :disabled="running">
@@ -145,7 +145,7 @@
         <div class="row" v-if="!isTypeKeywords">
           <div class="col">
             <div class="d-flex">
-              <button type="button" class="btn btn-default btn-label" disabled>{{commons.translate('raffle-tickets-range')}}</button>
+              <button type="button" class="btn btn-default btn-label w-50 text-left" disabled>{{commons.translate('raffle-tickets-range')}}</button>
               <div class="w-100">
                 <div class="input-group">
                   <div class="input-group-prepend">
