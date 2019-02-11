@@ -102,15 +102,12 @@
 
       <div id="checklist"></div> <!-- vue.js others/checklist -->
 
-      <ul class="navbar-nav mr-auto">
-        <li class="nav-item">
-          <a class="btn btn-outline-danger" href="#" id="new-version-notice" style="display: none; font-weight: bold; cursor: pointer;"
-            data-toggle="modal" data-target="#new_version_dlg">
-            <i class="fas fa-code-fork" aria-hidden="true"></i> Version <span id="version"></span> available
-          </a>
-        </li>
-      </ul>
-      <div>
+      <button class="ml-4 btn btn-success" href="#" id="new-version-notice" style="display: none; font-weight: bold; cursor: pointer;"
+        data-toggle="modal" data-target="#new_version_dlg">
+        <i class="fas fa-code-fork" aria-hidden="true"></i> Version <span id="version"></span> available
+      </button>
+
+      <div class="ml-4">
         <button class="btn btn-xs btn-light dropdown-toggle" type="button" id="settingsButton" data-toggle="dropdown" aria-haspopup="true"
           aria-expanded="false">
           <i class="fas fa-bars" aria-hidden="true"></i>
