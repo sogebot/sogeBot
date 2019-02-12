@@ -513,8 +513,4 @@ class TMI extends Core {
   }
 }
 
-setTimeout(() => {
-  if (cluster.isMaster) global.tmi.subgift();
-}, 10000)
-
 module.exports = TMI
