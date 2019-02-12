@@ -44,16 +44,16 @@ class CustomVariables {
         let item
         try {
           item = await global.db.engine.findOne('custom.variables', { _id: String(_id) })
-          item = await global.db.engine.update('custom.variables', { _id: String(_id) }, { currentValue: await this.runScript(item.evalValue, {}), runAt: new Date() })
+          item = await global.db.engine.update('custom.variables', { _id: String(_id) }, { currentValue: await this.runScript(item.evalValue, { _current: item.currentValue }), runAt: new Date() })
         } catch (e) {
           cb(e.stack, null)
         }
         cb(null, item)
       })
-      socket.on('test.script', async (script, cb) => {
+      socket.on('test.script', async (opts, cb) => {
         let returnedValue
         try {
-          returnedValue = await this.runScript(script, { sender: 'TestUser' })
+          returnedValue = await this.runScript(opts.evalValue, { _current: opts.currentValue, sender: 'TestUser' })
         } catch (e) {
           cb(e.stack, null)
         }
@@ -100,7 +100,7 @@ class CustomVariables {
 
     // we need to check +1 variables, as they are part of commentary
     const containUsers = !_.isNil(script.match(/users/g)) && script.match(/users/g).length > 1
-    const containRandom = !_.isNil(script.replace(/Math\.random|_\.random/g, '').match(/random/g)) && script.match(/users/g).length > 1
+    const containRandom = !_.isNil(script.replace(/Math\.random|_\.random/g, '').match(/random/g)) && !_.isNil(script.match(/users/g)) && script.match(/users/g).length > 1
     const containOnline = !_.isNil(script.match(/online/g))
     const containUrl = !_.isNil(script.match(/url\(['"](.*?)['"]\)/g))
 
@@ -171,7 +171,8 @@ class CustomVariables {
       users: users,
       random: randomVar,
       sender: await global.configuration.getValue('atUsername') ? `@${sender}` : `${sender}`,
-      param: param
+      param: param,
+      _current: opts._current
     }
 
     if (containUrl) {
@@ -199,7 +200,10 @@ class CustomVariables {
     if (_.isEmpty(item)) return '' // return empty if variable doesn't exist
 
     if (item.type === 'eval' && Number(item.runEvery) === 0) {
-      item.currentValue = await this.runScript(item.evalValue, opts)
+      item.currentValue = await this.runScript(item.evalValue, {
+        _current: item.currentValue,
+        ...opts
+      })
       await global.db.engine.update('custom.variables', { variableName }, { currentValue: item.currentValue, runAt: new Date() })
     }
 
@@ -273,7 +277,7 @@ class CustomVariables {
         item.runAt = _.isNil(item.runAt) ? 0 : item.runAt
         const shouldRun = item.runEvery > 0 && new Date().getTime() - new Date(item.runAt).getTime() >= item.runEvery
         if (shouldRun) {
-          let newValue = await this.runScript(item.evalValue, {})
+          let newValue = await this.runScript(item.evalValue, { _current: item.currentValue })
           await global.db.engine.update('custom.variables', { _id: String(item._id) }, { runAt: new Date(), currentValue: newValue })
           await this.updateWidgetAndTitle(item.variableName)
         }

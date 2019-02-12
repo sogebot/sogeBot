@@ -227,7 +227,7 @@
           this.readOnly = !this.readOnly
         },
         testScript: function () {
-          this.socket.emit('test.script', this.evalValue, (err, response) => {
+          this.socket.emit('test.script', { evalValue: this.evalValue, currentValue: this.currentValue }, (err, response) => {
             if (err) {
               this.evalError = err
               this.evalOk = false
@@ -298,7 +298,7 @@
           if (_.isNil(textarea)) return setTimeout(() => this.initializeEvalTextArea(), 1)
 
           this.evalInput = CodeMirror(textarea, {
-            value: this.evalValueInit ? this.evalValueInit : "/* Available functions\n * url(link) - load data from API\n *\n * Available variables: _, users, random, sender (only in custom commands, keyword), param (only in custom command)\n *\n * IMPORTANT: Must contain return statement!\n */\n\nreturn '';",
+            value: this.evalValueInit ? this.evalValueInit : "/* Available functions\n * url(link) - load data from API\n *\n * Available variables: _, _current, users, random, sender (only in custom commands, keyword), param (only in custom command)\n *\n * IMPORTANT: Must contain return statement!\n */\n\nreturn '';",
             mode:  "javascript",
             lineNumbers: true,
             matchBrackets: true,
