@@ -434,7 +434,7 @@ class Users extends Core {
         cb(null, viewer)
       })
       socket.on('delete.viewer', async (opts, cb) => {
-        const id = cb._id
+        const id = opts._id
         await global.db.engine.remove('users.points', { id })
         await global.db.engine.remove('users.messages', { id })
         await global.db.engine.remove('users.watched', { id })
