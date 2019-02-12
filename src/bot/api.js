@@ -398,7 +398,7 @@ class API {
       this.retries.getChannelSubscribers = 0 // reset retry
       const subscribers = request.data.data
 
-      if (global.panel && global.panel.io) global.panel.io.emit('api.stats', global.panel.io.emit('api.stats', { data: subscribers, timestamp: _.now(), call: 'getChannelSubscribers', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining }))
+      if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { data: subscribers, timestamp: _.now(), call: 'getChannelSubscribers', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining })
 
       // save remaining api calls
       this.calls.bot.remaining = request.headers['ratelimit-remaining']
@@ -427,7 +427,7 @@ class API {
         global.db.engine.update('api.current', { key: 'subscribers' }, { value: 0 })
       } else {
         global.log.error(`${url} - ${e.message}`)
-        if (global.panel && global.panel.io) global.panel.io.emit('api.stats', global.panel.io.emit('api.stats', { data: {}, timestamp: _.now(), call: 'getChannelSubscribers', api: 'helix', endpoint: url, code: e.stack, remaining: this.calls.bot.remaining }))
+        if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { data: {}, timestamp: _.now(), call: 'getChannelSubscribers', api: 'helix', endpoint: url, code: e.stack, remaining: this.calls.bot.remaining })
       }
     }
     return { state: true, disable }
