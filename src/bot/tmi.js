@@ -445,8 +445,8 @@ class TMI extends Core {
 
       await global.users.setById(user.id, { username: recipient, is: { subscriber: isSubscriber }, time: { subscribed_at: subscribedAt }, stats: { subCumulativeMonths } })
       await global.db.engine.increment('users', { id: user.id }, { stats: { subStreak: 1 }})
-      global.overlays.eventlist.add({ type: 'subgift', username: recipient, from: username, monthsName: global.commons.getLocalizedName(months, 'core.months'), months })
-      global.log.subgift(`${recipient}, from: ${username}, months: ${months}`)
+      global.overlays.eventlist.add({ type: 'subgift', username: recipient, from: username, monthsName: global.commons.getLocalizedName(subCumulativeMonths, 'core.months'), months: subCumulativeMonths })
+      global.log.subgift(`${recipient}, from: ${username}, months: ${subCumulativeMonths}`)
 
       // also set subgift count to gifter
       if (!(await global.commons.isIgnored(username))) {
@@ -512,5 +512,9 @@ class TMI extends Core {
     }
   }
 }
+
+setTimeout(() => {
+  if (cluster.isMaster) global.tmi.subgift();
+}, 10000)
 
 module.exports = TMI
