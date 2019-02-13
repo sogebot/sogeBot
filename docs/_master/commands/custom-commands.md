@@ -197,7 +197,8 @@ be ignored.
 
 ## Command filters
 
-You can add filter for commands through UI
+You can add filter for commands through UI. All filters are checked by **javascript**
+engine.
 
 ### Available filters
 
@@ -227,6 +228,13 @@ only for soge__ **or** when game is set to PUBG
 
 `$subscribers >= 10` - run command when current subscribers count is equal or
 greater than 10
+
+#### Examples (advanced)
+
+`$game.toLowerCase() == 'playerunknown's battlegrounds'` - run command only when
+PUBG is set as game
+
+`['soge__', 'otheruser'].includes($sender)` - check if sender is soge__ or otheruser
 
 ## Other settings
 
