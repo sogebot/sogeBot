@@ -303,7 +303,7 @@
           <i data-lang="watched-time"></i>
         </h2>
         <span class="data">{{ Number(currentWatched / 1000 / 60 / 60).toFixed(1) }}h</span>
-        <span class="stats" v-html="difference(averageStats.currentWatched / 1000 / 60 / 60, currentWatched / 1000 / 60 / 60, false, 'h', false, 'h', 1)"></span>
+        <span class="stats" v-html="difference(averageStats.currentWatched / 1000 / 60 / 60, currentWatched / 1000 / 60 / 60, false, 'h', 1)"></span>
       </div>
     </div>
 
