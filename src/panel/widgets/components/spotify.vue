@@ -64,7 +64,6 @@ import { library } from '@fortawesome/fontawesome-svg-core'
 import { faList, faCheck, faMusic } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
-import Vue from 'vue'
 import MarqueeText from 'vue-marquee-text-component'
 
 library.add(faList, faCheck, faMusic)
