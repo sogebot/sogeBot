@@ -82,6 +82,7 @@ export default {
     queue: () => import('./components/queue.vue'),
     raffles: () => import('./components/raffles.vue'),
     soundboard: () => import('./components/soundboard.vue'),
+    spotify: () => import('./components/spotify.vue'),
     twitch: () => import('./components/twitch.vue'),
     twitter: () => import('./components/twitter.vue'),
     widgetCreate: () => import('./components/widget_create.vue'),

@@ -1,6 +1,11 @@
 {
   "settings": {
     "enabled": "Status",
+    "songRequests": "Požadavky na skladbu",
+    "fetchCurrentSongWhenOffline": {
+      "title": "Načíst aktuální skladbu, i když je stream offline",
+      "help": "Doporučuje se, aby byla tato funkce vypnuta, aby nedošlo k dosažení limitů API"
+    },
     "clientId": "clientId",
     "clientSecret": "clientSecret",
     "redirectURI": "redirectURI",
@@ -15,6 +20,7 @@
     "playlistToPlay": {
       "title": "Hlavní playlist",
       "help": "Pokud bude nastaveno, po requestu bude hrát tento playlist"
-    }
+    },
+    "continueOnPlaylistAfterRequest": "Pokračovat v přehrávání playlistu po požadavku na skladbu"
   }
 }
