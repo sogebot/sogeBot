@@ -32,12 +32,13 @@
 <script>
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { faPlus, faSpinner, faTimes, faGift, faHeadphones, faTh, faDollarSign, faSignInAlt, faSignOutAlt, faUsers, faMusic } from '@fortawesome/free-solid-svg-icons';
+
+import { faPlus, faSpinner, faTimes, faGift, faHeadphones, faTh, faDollarSign, faSignInAlt, faSignOutAlt, faUsers, faMusic, faCalendar } from '@fortawesome/free-solid-svg-icons';
 import { faMoneyBillAlt, faComments } from '@fortawesome/free-regular-svg-icons';
+import { faTwitch, faSpotify } from '@fortawesome/free-brands-svg-icons';
 
-import { faTwitch } from '@fortawesome/free-brands-svg-icons';
 
-library.add(faPlus, faSpinner, faTimes, faTwitch, faGift, faHeadphones, faMoneyBillAlt, faComments, faTh, faDollarSign, faSignInAlt, faSignOutAlt, faUsers, faMusic)
+library.add(faPlus, faSpinner, faTimes, faTwitch, faGift, faHeadphones, faMoneyBillAlt, faComments, faTh, faDollarSign, faSignInAlt, faSignOutAlt, faUsers, faMusic, faSpotify, faCalendar)
 
 export default {
   props: ['socket', 'commons', 'dashboardId'],

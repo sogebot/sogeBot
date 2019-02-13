@@ -97,7 +97,7 @@ window.textInput = {
           <template v-if="typeof translatedTitle === 'string'">{{ translatedTitle }}</template>
           <template v-else-if="typeof translatedTitle === 'object'">
             {{ translatedTitle.title }}
-            <small style="cursor: help;" class="textInputTooltip text-info ml-1" data-toggle="tooltip" data-html="true" :title="translatedTitle.help"><i class="fas fa-question"></i></small>
+            <small style="cursor: help;" class="textInputTooltip text-info ml-1" data-toggle="tooltip" data-html="true" :title="translatedTitle.help">[?]</small>
           </template>
         </span>
       </div>
@@ -230,7 +230,13 @@ window.toggleEnable = {
   template: `
     <div class="input-group">
       <div v-if="title" class="input-group-prepend">
-        <span class="input-group-text">{{ title }}</span>
+        <span class="input-group-text">
+          <template v-if="typeof title === 'string'">{{ title }}</template>
+          <template v-else>
+            {{ title.title }}
+            <small class="textInputTooltip text-info pl-1" data-toggle="tooltip" data-html="true" :title="title.help">[?]</small>
+          </template>
+        </span>
       </div>
       <button
         class="btn form-control"

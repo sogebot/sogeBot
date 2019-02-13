@@ -240,6 +240,13 @@ class Module {
         socket.on('settings', async (cb) => {
           cb(null, await this.getAllSettings(), await this.getUI())
         })
+        socket.on('set.value', async (variable, value, cb) => {
+          this[variable] = value
+          if (typeof cb === 'function') cb(null, {variable, value})
+        })
+        socket.on('get.value', async (variable, cb) => {
+          cb(null, await this[variable])
+        })
         socket.on('settings.update', async (data, cb) => {
           try {
             for (let [key, value] of Object.entries(data)) {

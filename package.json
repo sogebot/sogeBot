@@ -139,6 +139,7 @@
     "vue-datetime": "1.0.0-beta.10",
     "vue-datetime-picker": "0.2.1",
     "vue-loader": "15.6.2",
+    "vue-marquee-text-component": "1.1.1",
     "vue-moment": "4.0.0",
     "vue-plyr": "4.0.0",
     "vue-router": "3.0.2",

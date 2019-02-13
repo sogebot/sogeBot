@@ -3,10 +3,10 @@
     <div style="display: flex; flex-direction: inherit;">
       <div class="text w-100" :style="{opacity: 1 - this.percentage / 100 }">
         <template v-if="onMouseDownStarted === 0">
-          <slot name="title">Action</slot>
+          <slot name="title"></slot>
         </template>
         <template v-else>
-          <slot name="onHoldTitle">Hold to perform</slot>
+          <slot name="onHoldTitle"></slot>
         </template>
       </div>
       <div class="btn-icon" :style="{opacity: 1 - this.percentage / 100 }">
@@ -101,6 +101,13 @@ props: ['ttc', 'icon'],
   .btn-shrink .btn-icon {
     background: transparent !important;
   }
+}
+
+.btn-only-icon .text {
+  display: none !important;
+}
+.btn-only-icon .btn-icon {
+  background: transparent !important;
 }
 
 .btn-with-icon {
