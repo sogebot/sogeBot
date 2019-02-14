@@ -340,9 +340,11 @@
         }
       },
       created: function () {
+        console.time('find.viewers');
         this.socket.emit('find.viewers', {}, (items) => {
           this.items = items
           this.loaded = true
+          console.timeEnd('find.viewers');
         })
         if (localStorage.getItem('/core/users/showAs')) this.showAs = JSON.parse(localStorage.getItem('/core/users/showAs'));
       },
