@@ -4,8 +4,14 @@ class Interface {
    * @param {string} table table to search
    * @param {object} where object to find in format {'toFind': 'value', _sort, _total, _sum, _group} - example {'id': 'soge__'}
    * @returns {object} results
+   * @param {array|object} lookup to other tables
+    [
+      { from: 'referenced table', localField: 'refIdAttr', foreignField: '_id', as: 'joinedAttr' }
+    ] | {
+      from: 'referenced table', localField: 'refIdAttr', foreignField: '_id', as: 'joinedAttr' }
+    }
    */
-  async find (table, where) {
+  async find (table, where, lookup) {
     throw Error('function find() is not implemented in ' + this.constructor.name)
   }
 
@@ -14,8 +20,14 @@ class Interface {
    * @param {string} table table to search
    * @param {object} where object to find in format {'toFind': 'value'} - example {'id': 'soge__'}
    * @returns {object} exactly one result
+   * @param {array|object} lookup to other tables
+    [
+      { from: 'referenced table', localField: 'refIdAttr', foreignField: '_id', as: 'joinedAttr' }
+    ] | {
+      from: 'referenced table', localField: 'refIdAttr', foreignField: '_id', as: 'joinedAttr' }
+    }
    */
-  async findOne (table, where) {
+  async findOne (table, where, lookup) {
     throw Error('function findOne() is not implemented in ' + this.constructor.name)
   }
 
