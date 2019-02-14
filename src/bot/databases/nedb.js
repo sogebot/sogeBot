@@ -89,7 +89,7 @@ class INeDB extends Interface {
     return this.table[table]
   }
 
-  async find (table, where) {
+  async find (table, where, lookup) {
     this.on(table) // init table
 
     where = where || {}
@@ -105,52 +105,71 @@ class INeDB extends Interface {
     where = flatten(where)
 
     return new Promise((resolve, reject) => {
-      this.on(table).find(flatten(where), (err, items) => {
+      this.on(table).find(flatten(where), async (err, items) => {
         if (err) {
           global.log.error(err.message)
           global.log.error(JSON.stringify({ type: 'find', table, where }))
         }
 
+        if (lookup) {
+          // cast to array
+          if (lookup.constructor !== Array) lookup = [lookup]
+          for (const item of items) {
+            for (const l of lookup) {
+              item[l.as] = await global.db.engine.find(l.from, { [l.foreignField]: item[l.localField]})
+            }
+          }
+        }
+
         // nedb needs to fake sum and group by
-          if (sumBy || groupBy) {
-            let _items = {}
-            for (let item of items) {
-              if (isNaN(_items[item[groupBy]])) _items[item[groupBy]] = 0
-              _items[item[groupBy]] += Number(item[sumBy])
-            }
-            items = []
-            for (let [_id, sum] of Object.entries(_items)) {
-              items.push({ _id, [sumBy]: sum })
-            }
+        if (sumBy || groupBy) {
+          let _items = {}
+          for (let item of items) {
+            if (isNaN(_items[item[groupBy]])) _items[item[groupBy]] = 0
+            _items[item[groupBy]] += Number(item[sumBy])
           }
-
-          // nedb needs to fake sort
-          if (sortBy !== '_id') {
-            // remove undefined values in sortBy
-            items = items.filter(o => _.has(o, sortBy))
+          items = []
+          for (let [_id, sum] of Object.entries(_items)) {
+            items.push({ _id, [sumBy]: sum })
           }
-          items = _.orderBy(items, sortBy, order)
+        }
 
-          // nedb needs to fake total
-          if (total) items = _.chunk(items, total)[0]
+        // nedb needs to fake sort
+        if (sortBy !== '_id') {
+          // remove undefined values in sortBy
+          items = items.filter(o => _.has(o, sortBy))
+        }
+        items = _.orderBy(items, sortBy, order)
 
-          resolve(items || [])
-        })
+        // nedb needs to fake total
+        if (total) items = _.chunk(items, total)[0]
+
+        resolve(items || [])
+      })
     })
   }
 
-  async findOne (table, where) {
+  async findOne (table, where, lookup) {
     this.on(table) // init table
 
     where = where || {}
 
     var self = this
     return new Promise(function (resolve, reject) {
-      self.on(table).findOne(flatten(where), function (err, item) {
+      self.on(table).findOne(flatten(where), async (err, item) => {
         if (err) {
           global.log.error(err.message)
           global.log.error(JSON.stringify({ type: 'findOne', table, where }))
         }
+
+        if (lookup && item !== null) {
+          // cast to array
+          if (lookup.constructor !== Array) lookup = [lookup]
+          for (const l of lookup) {
+            item[l.as] = await global.db.engine.find(l.from, { [l.foreignField]: item[l.localField]})
+          }
+        }
+
         resolve(_.isNil(item) ? {} : item)
       })
     })
