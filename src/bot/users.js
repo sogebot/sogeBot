@@ -281,7 +281,7 @@ class Users extends Core {
         opts = _.defaults(opts, { page: 1, sortBy: 'username', order: '', filter: null, show: { subscribers: null, followers: null, active: null, regulars: null } })
         opts.page-- // we are counting index from 0
 
-        const viewers = await global.db.engine.find('users', { }, [
+        let viewers = await global.db.engine.find('users', { }, [
           { from: 'users.tips', as: 'tips', foreignField: 'id', localField: 'id' },
           { from: 'users.bits', as: 'bits', foreignField: 'id', localField: 'id' },
           { from: 'users.points', as: 'points', foreignField: 'id', localField: 'id' },
