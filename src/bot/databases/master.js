@@ -76,18 +76,18 @@ class IMasterController extends Interface {
     } else setTimeout(() => this.returnData(resolve, reject, id), 10)
   }
 
-  async find (table, where) {
+  async find (table, where, lookup) {
     const id = crypto.randomBytes(64).toString('hex')
-    const data = { type: 'db', fnc: 'find', table: table, where: where, id: id }
+    const data = { type: 'db', fnc: 'find', table, where, id, lookup }
 
     return new Promise((resolve, reject) => {
       this.sendRequest(resolve, reject, id, data)
     })
   }
 
-  async findOne (table, where) {
+  async findOne (table, where, lookup) {
     const id = crypto.randomBytes(64).toString('hex')
-    const data = { type: 'db', fnc: 'findOne', table: table, where: where, id: id }
+    const data = { type: 'db', fnc: 'findOne', table, where, id, lookup }
 
     return new Promise((resolve, reject) => {
       this.sendRequest(resolve, reject, id, data)

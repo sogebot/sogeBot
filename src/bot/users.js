@@ -281,87 +281,28 @@ class Users extends Core {
         opts = _.defaults(opts, { page: 1, sortBy: 'username', order: '', filter: null, show: { subscribers: null, followers: null, active: null, regulars: null } })
         opts.page-- // we are counting index from 0
 
-        const processUser = async (viewer) => {
-          if (!viewer.lock) viewer.lock = {}
-
-          // TIPS
-          let tipsOfViewer = _.filter(tips, (o) => o.id === viewer.id)
-          if (!_.isEmpty(tipsOfViewer)) {
-            let tipsAmount = 0
-            for (let tip of tipsOfViewer) tipsAmount += global.currency.exchange(tip.amount, tip.currency, global.currency.settings.currency.mainCurrency)
-            _.set(viewer, 'stats.tips', tipsAmount)
-          } else {
-            _.set(viewer, 'stats.tips', 0)
-          }
-          _.set(viewer, 'custom.currency', global.currency.symbol(global.currency.settings.currency.mainCurrency))
-
-          // BITS
-          let bitsOfViewer = _.filter(bits, (o) => o.id === viewer.id)
-          if (!_.isEmpty(bitsOfViewer)) {
-            let bitsAmount = 0
-            for (let bit of bitsOfViewer) bitsAmount += parseInt(bit.amount, 10)
-            _.set(viewer, 'stats.bits', bitsAmount)
-          } else {
-            _.set(viewer, 'stats.bits', 0)
-          }
-
-          // ONLINE
-          let isOnline = !_.isEmpty(_.filter(online, (o) => o.username === viewer.username))
-          _.set(viewer, 'is.online', isOnline)
-
-          // POINTS
-          if (!_.isEmpty(_.filter(points, (o) => o.id === viewer.id))) {
-            _.set(viewer, 'points', await global.systems.points.getPointsOf(viewer.id))
-          } else _.set(viewer, 'points', 0)
-
-          // MESSAGES
-          if (!_.isEmpty(_.filter(messages, (o) => o.id === viewer.id))) {
-            _.set(viewer, 'stats.messages', await global.users.getMessagesOf(viewer.id))
-          } else _.set(viewer, 'stats.messages', 0)
-
-          // MESSAGES
-          if (!_.isEmpty(_.filter(messages, (o) => o.id === viewer.id))) {
-            _.set(viewer, 'stats.messages', await global.users.getMessagesOf(viewer.id))
-          } else _.set(viewer, 'stats.messages', 0)
-
-          // WATCHED
-          if (!_.isEmpty(_.filter(messages, (o) => o.id === viewer.id))) {
-            _.set(viewer, 'time.watched', await global.users.getWatchedOf(viewer.id))
-          } else _.set(viewer, 'time.watched', 0)
-          return viewer
-        }
-
-        let [viewers, tips, bits, online, points, messages] = await Promise.all([
-          global.users.getAll(),
-          global.db.engine.find('users.tips'),
-          global.db.engine.find('users.bits'),
-          global.db.engine.find('users.online'),
-          global.db.engine.find('users.points'),
-          global.db.engine.find('users.messages')
+        const viewers = await global.db.engine.find('users', { }, [
+          { from: 'users.tips', as: 'tips', foreignField: 'id', localField: 'id' },
+          { from: 'users.bits', as: 'bits', foreignField: 'id', localField: 'id' },
+          { from: 'users.points', as: 'points', foreignField: 'id', localField: 'id' },
+          { from: 'users.messages', as: 'messages', foreignField: 'id', localField: 'id' },
+          { from: 'users.online', as: 'online', foreignField: 'username', localField: 'username' },
         ])
+
+        for (const v of viewers) {
+          _.set(v, 'stats.tips', v.tips.map((o) => global.currency.exchange(o.amount, o.currency, global.currency.settings.currency.mainCurrency)).reduce((a, b) => a + b, 0));
+          _.set(v, 'stats.bits', v.bits.map((o) => o.amount).reduce((a, b) => a + b, 0));
+          _.set(v, 'custom.currency', global.currency.settings.currency.mainCurrency);
+          _.set(v, 'points', (v.points[0] || { points: 0 }).points);
+          _.set(v, 'messages', (v.messages[0] || { messages: 0 }).messages);
+        }
 
         // filter users
         if (!_.isNil(opts.filter)) viewers = _.filter(viewers, (o) => o.username && o.username.toLowerCase().startsWith(opts.filter.toLowerCase().trim()))
         if (!_.isNil(opts.show.subscribers)) viewers = _.filter(viewers, (o) => _.get(o, 'is.subscriber', false) === opts.show.subscribers)
         if (!_.isNil(opts.show.followers)) viewers = _.filter(viewers, (o) => _.get(o, 'is.follower', false) === opts.show.followers)
         if (!_.isNil(opts.show.regulars)) viewers = _.filter(viewers, (o) => _.get(o, 'is.regular', false) === opts.show.regulars)
-        if (!_.isNil(opts.show.active)) {
-          viewers = _.filter(viewers, (o) => {
-            return _.intersection(online.map((v) => v.username), viewers.map((v) => v.username)).includes(o.username) === opts.show.active
-          })
-        }
-        // we need to fetch all viewers and then sort
-        let toAwait = []
-        let i = 0
-        for (let viewer of viewers) {
-          if (i > 100) {
-            await Promise.all(toAwait)
-            i = 0
-          }
-          i++
-          toAwait.push(processUser(viewer))
-        }
-        await Promise.all(toAwait)
+        if (!_.isNil(opts.show.active)) viewers = _.filter(viewers, (o) => o.online.length > 0)
         cb(viewers)
       })
       socket.on('followedAt.viewer', async (id, cb) => {
