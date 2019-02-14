@@ -13,6 +13,9 @@ const _ = require('lodash')
 
 describe('Database - lookup', () => {
   before(async () => {
+    await db.cleanup()
+    await message.prepare()
+
     await global.db.engine.remove('lookup', {})
     await global.db.engine.remove('lookup2', {})
 
