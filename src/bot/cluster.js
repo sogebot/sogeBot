@@ -63,10 +63,10 @@ function cluster () {
           workerIsFree.db = false
           switch (data.fnc) {
             case 'find':
-              data.items = await global.db.engine.find(data.table, data.where)
+              data.items = await global.db.engine.find(data.table, data.where, data.lookup)
               break
             case 'findOne':
-              data.items = await global.db.engine.findOne(data.table, data.where)
+              data.items = await global.db.engine.findOne(data.table, data.where, data.lookup)
               break
             case 'increment':
               data.items = await global.db.engine.increment(data.table, data.where, data.object)

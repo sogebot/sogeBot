@@ -133,33 +133,33 @@
                 <div style="margin: 0; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 3px;">{{commons.translate('username')}}</div>
                 <div class="font-weight-bold  text-primary" style="font-size: 1.5rem">{{ item.username }}</div>
 
-                <strong class="badge" :class="[ item.is.online ? 'badge-success' : 'badge-danger' ]" style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
+                <strong class="badge" :class="[ item.online.length > 0 ? 'badge-success' : 'badge-danger' ]" style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
                   active
                 </strong>
-                <strong class="badge" :class="[ item.is.regular ? 'badge-success' : 'badge-danger' ]" style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
+                <strong class="badge" :class="[ typeof item.is === 'object' && item.is.regular ? 'badge-success' : 'badge-danger' ]" style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
                   regular
                 </strong>
-                <strong class="badge" :class="[ item.is.follower ? 'badge-success' : 'badge-danger' ]" style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
-                  <i v-if="item.lock.follower" class="fas fa-lock"></i>
+                <strong class="badge" :class="[ typeof item.is === 'object' && item.is.follower ? 'badge-success' : 'badge-danger' ]" style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
+                  <i v-if="typeof item.lock === 'object' && item.lock.follower" class="fas fa-lock"></i>
                   follower
                 </strong>
-                <strong class="badge" :class="[ item.is.subscriber ? 'badge-success' : 'badge-danger' ]" style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
-                  <i v-if="item.lock.subscriber" class="fas fa-lock"></i>
+                <strong class="badge" :class="[ typeof item.is === 'object' && item.is.subscriber ? 'badge-success' : 'badge-danger' ]" style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
+                  <i v-if="typeof item.lock === 'object' && item.lock.subscriber" class="fas fa-lock"></i>
                   subscriber
                 </strong>
               </div>
               <div class="col-3 pl-4 pr-4 pt-2 pb-2">
                 <div style="margin: 0; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 3px;">{{commons.translate('date')}}</div>
-                <div v-if="item.time.message"><strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">{{ commons.translate('last-seen') }}:</strong> {{ moment(_.get(item, 'time.message', 0)).format('LLL') }}</div>
-                <div v-if="item.time.follow && item.is.follower">
+                <div v-if="typeof item.time === 'object' && item.time.message"><strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">{{ commons.translate('last-seen') }}:</strong> {{ moment(_.get(item, 'time.message', 0)).format('LLL') }}</div>
+                <div v-if="typeof item.time === 'object' && item.time.follow && typeof item.is === 'object' && item.is.follower">
                   <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
-                    <i v-if="item.lock.followed_at" class="fas fa-lock"></i>
+                    <i v-if="_.get(item, 'lock.followed_at')" class="fas fa-lock"></i>
                     {{ commons.translate('followed-since') }}:
                   </strong>
                   {{ moment(_.get(item, 'time.follow', 0)).format('LLL') }}</div>
-                <div v-if="item.time.subscribed_at && item.is.subscriber">
+                <div v-if="typeof item.time === 'object' && item.time.subscribed_at && typeof item.is === 'object' && item.is.subscriber">
                   <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
-                      <i v-if="item.lock.subscribed_at" class="fas fa-lock"></i>
+                      <i v-if="_.get(item, 'lock.subscribed_at')" class="fas fa-lock"></i>
                     {{ commons.translate('subscribed-since') }}:
                   </strong>
                   {{ moment(_.get(item, 'time.subscribed_at', 0)).format('LLL') }}</div>
@@ -170,7 +170,7 @@
                   <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
                     {{ commons.translate('messages') }}:
                   </strong>
-                  {{ item.stats.messages }}
+                  {{ _.get(item, 'stats.messages', 0) }}
                 </div>
                 <div>
                   <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
@@ -182,7 +182,7 @@
                   <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
                     {{ commons.translate('watched-time') }}:
                   </strong>
-                  {{ (item.time.watched / 1000 / 60 / 60).toFixed(1) }}h
+                  {{ (_.get(item, 'time.watched', 0) / 1000 / 60 / 60).toFixed(1) }}h
                 </div>
               </div>
               <div class="col-2 pl-4 pr-4 pt-2 pb-2">
@@ -202,7 +202,7 @@
               </div>
               <div class="col-2 pl-4 pr-4 pt-2 pb-2">
                 <div style="margin: 0; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 3px;">&nbsp;</div>
-                <div v-if="item.is.subscriber && item.stats.tier">
+                <div v-if="typeof item.is === 'object' && item.is.subscriber && item.stats.tier">
                   <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
                     {{ commons.translate('tier') }}:
                   </strong>
@@ -212,19 +212,19 @@
                   <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
                     {{ commons.translate('subgifts') }}:
                   </strong>
-                  {{ item.custom.subgitsCount || 0 }}
+                  {{ _.get(item, 'custom.subgitsCount', 0) }}
                 </div>
                 <div>
                   <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
                     {{ commons.translate('subStreak') }}:
                   </strong>
-                  {{ item.stats.subStreak || 0 }}
+                  {{ _.get(item, 'stats.subStreak', 0) }}
                 </div>
                 <div>
                   <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
                     {{ commons.translate('subCumulativeMonths') }}:
                   </strong>
-                  {{ item.stats.subCumulativeMonths || 0 }}
+                  {{ _.get(item, 'stats.subCumulativeMonths', 0) }}
                 </div>
               </div>
             </div>
@@ -272,19 +272,19 @@
           if (this.page < 1) this.page = 1
 
           return _.chunk(_.orderBy(this.itemsFiltered.map(o => {
-            o.sort = {}
+            o.sort = {
+              message: new Date(0).getTime(),
+              watched: new Date(0).getTime(),
+              follow: new Date(0).getTime(),
+              subscribed_at: new Date(0).getTime(),
+             }
             // remap times to timestamps to sort
-            if (o.time.message) o.sort.message = new Date(o.time.message).getTime()
-            else o.sort.message = new Date(0).getTime()
-
-            if (o.time.watched) o.sort.watched = new Date(o.time.watched).getTime()
-            else o.sort.watched = new Date(0).getTime()
-
-            if (o.time.follow) o.sort.follow = new Date(o.time.follow).getTime()
-            else o.sort.follow = new Date(0).getTime()
-
-            if (o.time.subscribed_at) o.sort.subscribed_at = new Date(o.time.subscribed_at).getTime()
-            else o.sort.subscribed_at = new Date(0).getTime()
+            if (typeof o.time === 'object') {
+              if (o.time.message) o.sort.message = new Date(o.time.message).getTime()
+              if (o.time.watched) o.sort.watched = new Date(o.time.watched).getTime()
+              if (o.time.follow) o.sort.follow = new Date(o.time.follow).getTime()
+              if (o.time.subscribed_at) o.sort.subscribed_at = new Date(o.time.subscribed_at).getTime()
+            }
 
             return o
           }), this.sort, this.sortOrder), this.itemsPerPage)[this.page - 1]
@@ -297,36 +297,36 @@
             let isActive = true
             if (!_.isNil(this.filter.active)) {
               if (this.filter.active) {
-                isActive = o.is.online === true
+                isActive = o.online.length > 0
               } else {
-                isActive = o.is.online === false
+                isActive = o.online.length === 0
               }
             }
 
             let isRegular = true
             if (!_.isNil(this.filter.regulars)) {
               if (this.filter.regulars) {
-                isRegular = o.is.regular === true
+                isRegular = typeof o.is === 'object' && o.is.regular === true
               } else {
-                isRegular = o.is.regular === false
+                isRegular = typeof o.is !== 'object' || o.is.regular === false
               }
             }
 
             let isFollower = true
             if (!_.isNil(this.filter.followers)) {
               if (this.filter.followers) {
-                isFollower = o.is.follower === true
+                isFollower = typeof o.is === 'object' && o.is.follower === true
               } else {
-                isFollower = o.is.follower === false
+                isFollower = typeof o.is !== 'object' || o.is.follower === false
               }
             }
 
             let isSubscriber = true
             if (!_.isNil(this.filter.subscribers)) {
               if (this.filter.subscribers) {
-                isSubscriber = o.is.subscriber === true
+                isSubscriber = typeof o.is === 'object' && o.is.subscriber === true
               } else {
-                isSubscriber = o.is.subscriber === false
+                isSubscriber = typeof o.is !== 'object' || o.is.subscriber === false
               }
             }
             return isSearchInUsername && isActive && isRegular && isFollower && isSubscriber
@@ -340,9 +340,11 @@
         }
       },
       created: function () {
+        console.time('find.viewers');
         this.socket.emit('find.viewers', {}, (items) => {
           this.items = items
           this.loaded = true
+          console.timeEnd('find.viewers');
         })
         if (localStorage.getItem('/core/users/showAs')) this.showAs = JSON.parse(localStorage.getItem('/core/users/showAs'));
       },
