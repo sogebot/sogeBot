@@ -278,7 +278,7 @@ class Users extends Core {
   async sockets () {
     this.socket.on('connection', (socket) => {
       socket.on('find.viewers', async (opts, cb) => {
-        opts = _.defaults(opts, { page: 1, sortBy: 'username', order: '', filter: null, show: { subscribers: null, followers: null, active: null, regulars: null } })
+        opts = _.defaults(opts, { filter: null, show: { subscribers: null, followers: null, active: null, regulars: null } })
         opts.page-- // we are counting index from 0
 
         let viewers = await global.db.engine.find('users', { }, [
