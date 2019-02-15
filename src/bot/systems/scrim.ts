@@ -2,7 +2,6 @@
 
 // 3rdparty libraries
 import * as cluster from 'cluster';
-import * as _ from 'lodash';
 import { DateTime } from 'luxon';
 
 // bot libraries
