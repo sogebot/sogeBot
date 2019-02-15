@@ -17,6 +17,7 @@ enum ERROR {
 /*
  * !scrim <type> <minutes> - open scrim countdown
  * !scrim match <matchId>  - add matchId to scrim
+ * !scrim stop             - stop scrim countdown
  */
 
 class Scrim extends System {
@@ -38,6 +39,7 @@ class Scrim extends System {
         commands: [
           { name: '!snipe', permission: constants.OWNER_ONLY },
           { name: '!snipe match', permission: constants.VIEWERS },
+          { name: '!snipe stop', permission: constants.VIEWERS },
         ],
       },
     };
@@ -95,6 +97,15 @@ class Scrim extends System {
     }
   }
 
+  public async stop(): Promise<void> {
+    this.settings._.closingAt = 0;
+    this.settings._lastRemindAt = Date.now();
+
+    global.commons.sendMessage(
+      global.commons.prepare('systems.scrim.stopped'), { username: global.commons.getOwner() },
+    );
+  }
+
   private async reminder() {
     if (!this.cleanedUpOnStart) {
       this.cleanedUpOnStart = true;
@@ -112,8 +123,8 @@ class Scrim extends System {
           global.commons.sendMessage(
             global.commons.prepare('systems.scrim.countdown', {
               type: this.settings._.type,
-              time: minutesToGo,
-              unit: global.commons.getLocalizedName(minutesToGo, 'core.minutes'),
+              time: minutesToGo.toFixed(),
+              unit: global.commons.getLocalizedName(minutesToGo.toFixed(), 'core.minutes'),
             }),
             { username: global.commons.getOwner() },
           );
