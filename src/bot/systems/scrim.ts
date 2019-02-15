@@ -88,8 +88,12 @@ class Scrim extends System {
 
   public async match(opts: CommandOptions): Promise<void> {
     try {
-      const [matchId] = new Expects(opts.parameters).everything({name: 'matchId'}).toArray();
-      this.settings._.matchIdsByUser[opts.sender.username] = matchId;
+      if (opts.parameters.length === 0) {
+        this.currentMatches();
+      } else {
+        const [matchId] = new Expects(opts.parameters).everything({name: 'matchId'}).toArray();
+        this.settings._.matchIdsByUser[opts.sender.username] = matchId;
+      }
     } catch (e) {
       if (isNaN(Number(e.message))) {
         global.commons.sendMessage('$sender, cmd_error [' + opts.command + ']: ' + e.message, opts.sender);
@@ -150,6 +154,30 @@ class Scrim extends System {
     }
   }
 
+  private async currentMatches() {
+    const atUsername = await global.configuration.getValue('atUsername');
+    const matches: {
+      [x: string]: string[],
+    } = {};
+    for (const user of Object.keys(this.settings._.matchIdsByUser)) {
+      const id = this.settings._.matchIdsByUser[user];
+      if (typeof matches[id] === 'undefined') {
+        matches[id] = [];
+      }
+      matches[id].push((atUsername ? '@' : '') + user);
+    }
+    const output: string[] = [];
+    for (const id of Object.keys(matches)) {
+      output.push(id + ' - ' + matches[id].join(', '));
+    }
+    global.commons.sendMessage(
+      global.commons.prepare('systems.scrim.currentMatches', {
+        matches: output.length === 0 ? '<' + global.translate('core.empty') + '>' : output.join(' | '),
+      }),
+      { username: global.commons.getOwner() },
+    );
+  }
+
   private countdown() {
     for (let i = 0; i < 4; i++) {
       setTimeout(() => {
@@ -179,27 +207,7 @@ class Scrim extends System {
               if (this.settings._.closingAt !== 0) {
                 return; // user restarted !snipe
               }
-              const atUsername = await global.configuration.getValue('atUsername');
-              const matches: {
-                [x: string]: string[],
-              } = {};
-              for (const user of Object.keys(this.settings._.matchIdsByUser)) {
-                const id = this.settings._.matchIdsByUser[user];
-                if (typeof matches[id] === 'undefined') {
-                  matches[id] = [];
-                }
-                matches[id].push((atUsername ? '@' : '') + user);
-              }
-              const output: string[] = [];
-              for (const id of Object.keys(matches)) {
-                output.push(id + ' - ' + matches[id].join(', '));
-              }
-              global.commons.sendMessage(
-                global.commons.prepare('systems.scrim.currentMatches', {
-                  matches: output.length === 0 ? '<' + global.translate('core.empty') + '>' : output.join(' | '),
-                }),
-                { username: global.commons.getOwner() },
-              );
+              this.currentMatches();
             }, this.settings.time.waitForMatchIdsInSeconds * constants.SECOND);
           }, 15 * constants.SECOND);
         }
