@@ -21,7 +21,11 @@ class Expects {
     if (_.isNil(this.text)) throw Error('Text cannot be null')
     if (this.text.trim().length === 0) {
       if (opts.expects) {
-        throw Error('Expected parameter <' + opts.expects + '> at position ' + this.match.length)
+        if (opts.name) {
+          throw Error('Expected parameter <' + _.get(opts, 'name', '') + ':' + opts.expects + '> at position ' + this.match.length)
+        } else {
+          throw Error('Expected parameter <' + opts.expects + '> at position ' + this.match.length)
+        }
       } else {
         throw Error('Expected parameter at position ' + this.match.length)
       }
@@ -90,7 +94,8 @@ class Expects {
     opts = opts || {}
     _.defaults(opts, { optional: false })
     if (!opts.optional) this.checkText({
-      expects: 'number'
+      expects: 'number',
+      ...opts,
     })
 
     const regexp = XRegExp('(?<number> [0-9]+ )', 'ix')
@@ -179,7 +184,10 @@ class Expects {
   everything (opts) {
     opts = opts || {}
     _.defaults(opts, { optional: false })
-    if (!opts.optional) this.checkText()
+    if (!opts.optional) this.checkText({
+      expects: 'any',
+      ...opts,
+    })
 
     const regexp = XRegExp(`(?<everything> .* )`, 'ix')
     const match = XRegExp.exec(` ${this.text} `, regexp)
@@ -198,6 +206,7 @@ class Expects {
     _.defaults(opts, { optional: false })
     if (!opts.optional) this.checkText({
       expects: 'string',
+      ...opts,
     })
 
     const regexp = XRegExp(`(?<string> \\S* )`, 'igx')

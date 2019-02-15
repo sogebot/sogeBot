@@ -16,9 +16,7 @@ enum ERROR {
 
 /*
  * !scrim <type> <minutes> - open scrim countdown
- * !vote [x]
- * !poll open [-tips/-bits/-points] -title "your vote title" option | option | option
- * !poll close
+ * !scrim match <matchId>  - add matchId to scrim
  */
 
 class Scrim extends System {
@@ -32,7 +30,7 @@ class Scrim extends System {
           closingAt: 0,
           type: '',
           matchIdsByUser: {},
-          lastRemindAt: null,
+          lastRemindAt: Date.now(),
         },
         time: {
           waitForMatchIdsInSeconds: 60,
@@ -55,7 +53,7 @@ class Scrim extends System {
 
   public async main(opts: CommandOptions): Promise<void> {
     try {
-      const [type, minutes] = new Expects(opts.parameters).string().number().toArray();
+      const [type, minutes] = new Expects(opts.parameters).string({name: 'type'}).number({name: 'minutes'}).toArray();
       if (this.settings._.closingAt !== 0) {
         throw Error(String(ERROR.ALREADY_OPENED));
       }  // ignore if its already opened
@@ -68,7 +66,7 @@ class Scrim extends System {
       this.settings._.closingAt = now + (minutes * constants.MINUTE);
       this.settings._.type = type;
 
-      this.settings._.lastRemindAt = DateTime.fromMillis(Date.now());
+      this.settings._.lastRemindAt = now;
       this.settings._.matchIdsByUser = {};
 
       global.commons.sendMessage(
@@ -81,17 +79,19 @@ class Scrim extends System {
       );
     } catch (e) {
       if (isNaN(Number(e.message))) {
-        global.commons.sendMessage('$sender, cmd_error [' + opts.command + ']: ' + e.message, { username: global.commons.getOwner() });
+        global.commons.sendMessage('$sender, cmd_error [' + opts.command + ']: ' + e.message, opts.sender);
       }
     }
   }
 
   public async match(opts: CommandOptions): Promise<void> {
     try {
-      const [matchId] = new Expects(opts.parameters).everything().toArray();
+      const [matchId] = new Expects(opts.parameters).everything({name: 'matchId'}).toArray();
       this.settings._.matchIdsByUser[opts.sender.username] = matchId;
     } catch (e) {
-      return; // ignore errors
+      if (isNaN(Number(e.message))) {
+        global.commons.sendMessage('$sender, cmd_error [' + opts.command + ']: ' + e.message, opts.sender);
+      }
     }
   }
 
@@ -99,10 +99,9 @@ class Scrim extends System {
     if (!this.cleanedUpOnStart) {
       this.cleanedUpOnStart = true;
       this.settings._.closingAt = 0;
-      this.settings._.lastRemindAt = DateTime.fromMillis(Date.now());
     } else if (this.settings._.closingAt !== 0) {
       const when = DateTime.fromMillis(this.settings._.closingAt, { locale: await global.configuration.getValue('lang')});
-      const lastRemindAtDiffMs = -(this.settings._.lastRemindAt.diffNow().toObject().milliseconds || 0);
+      const lastRemindAtDiffMs = -(DateTime.fromMillis(this.settings._.lastRemindAt).diffNow().toObject().milliseconds || 0);
 
       const minutesToGo = when.diffNow(['minutes']).toObject().minutes || 0;
       const secondsToGo = global.commons.round5(when.diffNow(['seconds']).toObject().seconds || 0);
@@ -118,7 +117,7 @@ class Scrim extends System {
             }),
             { username: global.commons.getOwner() },
           );
-          this.settings._.lastRemindAt = DateTime.fromMillis(Date.now());
+          this.settings._.lastRemindAt = Date.now();
         }
       } else if (secondsToGo <= 60 && secondsToGo > 0) {
         // countdown every 15s
@@ -131,7 +130,7 @@ class Scrim extends System {
             }),
             { username: global.commons.getOwner() },
           );
-          this.settings._.lastRemindAt = DateTime.fromMillis(Date.now());
+          this.settings._.lastRemindAt = Date.now();
         }
       } else {
         this.settings._.closingAt = 0;
