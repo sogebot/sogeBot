@@ -197,32 +197,6 @@ class Scrim extends System {
       }, (i + 1) * 1000);
     }
   }
-
-}
-
-if (cluster.isMaster) {
-  setTimeout(() => {
-    global.systems.scrim.main({
-      parameters: '2',
-      command: '!snipe',
-      sender: { username: 'test' },
-    });
-    global.systems.scrim.main({
-      parameters: 'duo',
-      command: '!snipe',
-      sender: { username: 'test' },
-    });
-    global.systems.scrim.main({
-      parameters: 'duo 0',
-      command: '!snipe',
-      sender: { username: 'test' },
-    });
-    global.systems.scrim.main({
-      parameters: 'apex 1',
-      command: '!snipe',
-      sender: { username: 'test' },
-    });
-  }, 10000);
 }
 
 module.exports = new Scrim();
