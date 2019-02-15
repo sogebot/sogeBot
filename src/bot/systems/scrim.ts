@@ -23,8 +23,6 @@ enum ERROR {
 
 class Scrim extends System {
   [x: string]: any; // TODO: remove after interface ported to TS
-
-  private lastRemindAt: DateTime;
   private cleanedUpOnStart: boolean;
 
   constructor() {
@@ -34,6 +32,7 @@ class Scrim extends System {
           closingAt: 0,
           type: '',
           matchIdsByUser: {},
+          lastRemindAt: null,
         },
         time: {
           waitForMatchIdsInSeconds: 60,
@@ -47,7 +46,6 @@ class Scrim extends System {
 
     super(options);
 
-    this.lastRemindAt = DateTime.fromMillis(Date.now());
     this.cleanedUpOnStart = false;
 
     if (cluster.isMaster) {
@@ -70,7 +68,7 @@ class Scrim extends System {
       this.settings._.closingAt = now + (minutes * constants.MINUTE);
       this.settings._.type = type;
 
-      this.lastRemindAt = DateTime.fromMillis(Date.now());
+      this.settings._.lastRemindAt = DateTime.fromMillis(Date.now());
       this.settings._.matchIdsByUser = {};
 
       global.commons.sendMessage(
@@ -101,9 +99,10 @@ class Scrim extends System {
     if (!this.cleanedUpOnStart) {
       this.cleanedUpOnStart = true;
       this.settings._.closingAt = 0;
+      this.settings._.lastRemindAt = DateTime.fromMillis(Date.now());
     } else if (this.settings._.closingAt !== 0) {
       const when = DateTime.fromMillis(this.settings._.closingAt, { locale: await global.configuration.getValue('lang')});
-      const lastRemindAtDiffMs = -(this.lastRemindAt.diffNow().toObject().milliseconds || 0);
+      const lastRemindAtDiffMs = -(this.settings._.lastRemindAt.diffNow().toObject().milliseconds || 0);
 
       const minutesToGo = when.diffNow(['minutes']).toObject().minutes || 0;
       const secondsToGo = global.commons.round5(when.diffNow(['seconds']).toObject().seconds || 0);
@@ -119,7 +118,7 @@ class Scrim extends System {
             }),
             { username: global.commons.getOwner() },
           );
-          this.lastRemindAt = DateTime.fromMillis(Date.now());
+          this.settings._.lastRemindAt = DateTime.fromMillis(Date.now());
         }
       } else if (secondsToGo <= 60 && secondsToGo > 0) {
         // countdown every 15s
@@ -132,7 +131,7 @@ class Scrim extends System {
             }),
             { username: global.commons.getOwner() },
           );
-          this.lastRemindAt = DateTime.fromMillis(Date.now());
+          this.settings._.lastRemindAt = DateTime.fromMillis(Date.now());
         }
       } else {
         this.settings._.closingAt = 0;
