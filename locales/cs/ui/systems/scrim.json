@@ -1,0 +1,9 @@
+{
+  "settings": {
+    "enabled": "Status",
+    "waitForMatchIdsInSeconds": {
+      "title": "Interval k zadání ID zápasu",
+      "help": "Zadejte v sekundách"
+    }
+  }
+}

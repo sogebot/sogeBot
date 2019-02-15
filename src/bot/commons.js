@@ -300,4 +300,11 @@ Commons.prototype.getLocalizedName = function (number, translation) {
   return name
 }
 
+/*
+ * returns nearest 5
+ */
+Commons.prototype.round5 = function (x) {
+  return (x % 5) >= 2.5 ? parseInt(x / 5) * 5 + 5 : parseInt(x / 5) * 5;
+}
+
 module.exports = Commons

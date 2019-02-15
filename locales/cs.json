@@ -40,7 +40,9 @@
     "days": "den|4:dny|dnu",
     "hours": "hodina|4:hodiny|hodin",
     "minutes": "minuta|4:minuty|minut",
+    "seconds": "sekunda|4:sekundy|sekund",
     "messages": "zprava|4:zpravy|zprav",
+    "empty": "prázdné",
     "links": "odkaz|4:odkazy|odkazu",
     "isRegistered": "$sender, nelze pouzit $keyword, protoze je uz prirazena k jine akci!"
   },

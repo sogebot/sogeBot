@@ -32,6 +32,7 @@ You can also contact me on my email sogehige@gmail.com or get support on our [di
 | Points / Loyalty   | Points system for your users                                                                                                             |
 | Price              | Make viewers to spend points on e.g. !songrequest                                                                                        |
 | Ranks              | Create ranks for your viewers                                                                                                            |
+| Scrim              | Scrim system to play againts your viewers in Fortnite etc.                                                                                                            |
 | Custom commands    | Create custom commands, call custom APIs, set custom variables                                                                           |
 | Timers             | Post a response every x seconds, x messages                                                                                              |
 | Queue              | Do you lost track of viewers who wants to play with you? Use !queue and be fair!                                                         |

@@ -1,0 +1,229 @@
+'use strict';
+
+// 3rdparty libraries
+import * as cluster from 'cluster';
+import * as _ from 'lodash';
+import { DateTime } from 'luxon';
+
+// bot libraries
+import constants from '../constants';
+import Expects from '../expects.js';
+import System from './_interface';
+
+enum ERROR {
+  ALREADY_OPENED,
+  CANNOT_BE_ZERO,
+}
+
+/*
+ * !scrim <type> <minutes> - open scrim countdown
+ * !vote [x]
+ * !poll open [-tips/-bits/-points] -title "your vote title" option | option | option
+ * !poll close
+ */
+
+class Scrim extends System {
+  [x: string]: any; // TODO: remove after interface ported to TS
+
+  private lastRemindAt: DateTime;
+  private cleanedUpOnStart: boolean;
+
+  constructor() {
+    const options: InterfaceSettings = {
+      settings: {
+        _: {
+          closingAt: 0,
+          type: '',
+          matchIdsByUser: {},
+        },
+        time: {
+          waitForMatchIdsInSeconds: 60,
+        },
+        commands: [
+          { name: '!snipe', permission: constants.OWNER_ONLY },
+          { name: '!snipe match', permission: constants.VIEWERS },
+        ],
+      },
+    };
+
+    super(options);
+
+    this.lastRemindAt = DateTime.fromMillis(Date.now());
+    this.cleanedUpOnStart = false;
+
+    if (cluster.isMaster) {
+      setInterval(() => this.reminder(), 1000);
+    }
+  }
+
+  public async main(opts: CommandOptions): Promise<void> {
+    try {
+      const [type, minutes] = new Expects(opts.parameters).string().number().toArray();
+      if (this.settings._.closingAt !== 0) {
+        throw Error(String(ERROR.ALREADY_OPENED));
+      }  // ignore if its already opened
+      if (minutes === 0) {
+        throw Error(String(ERROR.CANNOT_BE_ZERO));
+      }
+
+      const now = Date.now();
+
+      this.settings._.closingAt = now + (minutes * constants.MINUTE);
+      this.settings._.type = type;
+
+      this.lastRemindAt = DateTime.fromMillis(Date.now());
+      this.settings._.matchIdsByUser = {};
+
+      global.commons.sendMessage(
+        global.commons.prepare('systems.scrim.countdown', {
+          type,
+          time: minutes,
+          unit: global.commons.getLocalizedName(minutes, 'core.minutes'),
+        }),
+        opts.sender,
+      );
+    } catch (e) {
+      if (isNaN(Number(e.message))) {
+        global.commons.sendMessage('$sender, cmd_error [' + opts.command + ']: ' + e.message, { username: global.commons.getOwner() });
+      }
+    }
+  }
+
+  public async match(opts: CommandOptions): Promise<void> {
+    try {
+      const [matchId] = new Expects(opts.parameters).everything().toArray();
+      this.settings._.matchIdsByUser[opts.sender.username] = matchId;
+    } catch (e) {
+      return; // ignore errors
+    }
+  }
+
+  private async reminder() {
+    if (!this.cleanedUpOnStart) {
+      this.cleanedUpOnStart = true;
+      this.settings._.closingAt = 0;
+    } else if (this.settings._.closingAt !== 0) {
+      const when = DateTime.fromMillis(this.settings._.closingAt, { locale: await global.configuration.getValue('lang')});
+      const lastRemindAtDiffMs = -(this.lastRemindAt.diffNow().toObject().milliseconds || 0);
+
+      const minutesToGo = when.diffNow(['minutes']).toObject().minutes || 0;
+      const secondsToGo = global.commons.round5(when.diffNow(['seconds']).toObject().seconds || 0);
+
+      if (minutesToGo > 1) {
+        // countdown every minute
+        if (lastRemindAtDiffMs >= constants.MINUTE) {
+          global.commons.sendMessage(
+            global.commons.prepare('systems.scrim.countdown', {
+              type: this.settings._.type,
+              time: minutesToGo,
+              unit: global.commons.getLocalizedName(minutesToGo, 'core.minutes'),
+            }),
+            { username: global.commons.getOwner() },
+          );
+          this.lastRemindAt = DateTime.fromMillis(Date.now());
+        }
+      } else if (secondsToGo <= 60 && secondsToGo > 0) {
+        // countdown every 15s
+        if (lastRemindAtDiffMs >= 15 * constants.SECOND) {
+          global.commons.sendMessage(
+            global.commons.prepare('systems.scrim.countdown', {
+              type: this.settings._.type,
+              time: secondsToGo === 60 ? 1 : secondsToGo,
+              unit: secondsToGo === 60 ? global.commons.getLocalizedName(1, 'core.minutes') : global.commons.getLocalizedName(secondsToGo, 'core.seconds'),
+            }),
+            { username: global.commons.getOwner() },
+          );
+          this.lastRemindAt = DateTime.fromMillis(Date.now());
+        }
+      } else {
+        this.settings._.closingAt = 0;
+        this.countdown();
+      }
+    }
+  }
+
+  private countdown() {
+    for (let i = 0; i < 4; i++) {
+      setTimeout(() => {
+        if (i < 3) {
+          global.commons.sendMessage(
+            global.commons.prepare('systems.scrim.countdown', {
+              type: this.settings._.type,
+              time: (3 - i) + '.',
+              unit: '',
+            }),
+            { username: global.commons.getOwner() },
+          );
+        } else {
+          this.settings._.closingAt = 0;
+          global.commons.sendMessage(global.commons.prepare('systems.scrim.go'), { username: global.commons.getOwner() });
+          setTimeout(() => {
+            if (this.settings._.closingAt !== 0) {
+              return; // user restarted !snipe
+            }
+            global.commons.sendMessage(
+              global.commons.prepare('systems.scrim.putMatchIdInChat', {
+                command: this.settings.commands['!snipe match'],
+              }),
+              { username: global.commons.getOwner() },
+            );
+            setTimeout(async () => {
+              if (this.settings._.closingAt !== 0) {
+                return; // user restarted !snipe
+              }
+              const atUsername = await global.configuration.getValue('atUsername');
+              const matches: {
+                [x: string]: string[],
+              } = {};
+              for (const user of Object.keys(this.settings._.matchIdsByUser)) {
+                const id = this.settings._.matchIdsByUser[user];
+                if (typeof matches[id] === 'undefined') {
+                  matches[id] = [];
+                }
+                matches[id].push((atUsername ? '@' : '') + user);
+              }
+              const output: string[] = [];
+              for (const id of Object.keys(matches)) {
+                output.push(id + ' - ' + matches[id].join(', '));
+              }
+              global.commons.sendMessage(
+                global.commons.prepare('systems.scrim.currentMatches', {
+                  matches: output.length === 0 ? '<' + global.translate('core.empty') + '>' : output.join(' | '),
+                }),
+                { username: global.commons.getOwner() },
+              );
+            }, this.settings.time.waitForMatchIdsInSeconds * constants.SECOND);
+          }, 15 * constants.SECOND);
+        }
+      }, (i + 1) * 1000);
+    }
+  }
+
+}
+
+if (cluster.isMaster) {
+  setTimeout(() => {
+    global.systems.scrim.main({
+      parameters: '2',
+      command: '!snipe',
+      sender: { username: 'test' },
+    });
+    global.systems.scrim.main({
+      parameters: 'duo',
+      command: '!snipe',
+      sender: { username: 'test' },
+    });
+    global.systems.scrim.main({
+      parameters: 'duo 0',
+      command: '!snipe',
+      sender: { username: 'test' },
+    });
+    global.systems.scrim.main({
+      parameters: 'apex 1',
+      command: '!snipe',
+      sender: { username: 'test' },
+    });
+  }, 10000);
+}
+
+module.exports = new Scrim();

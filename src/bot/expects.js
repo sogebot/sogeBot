@@ -1,6 +1,9 @@
 const XRegExp = require('xregexp')
 const _ = require('lodash')
 
+const __DEBUG__ =
+  process.env.DEBUG && process.env.DEBUG.includes('expects')
+
 class Expects {
   constructor (text) {
     if (text) {
@@ -13,9 +16,16 @@ class Expects {
     this.match = []
   }
 
-  checkText () {
+  checkText (opts) {
+    opts = opts || {}
     if (_.isNil(this.text)) throw Error('Text cannot be null')
-    if (this.text.trim().length === 0) throw Error('Expected more parameters')
+    if (this.text.trim().length === 0) {
+      if (opts.expects) {
+        throw Error('Expected parameter <' + opts.expects + '> at position ' + this.match.length)
+      } else {
+        throw Error('Expected parameter at position ' + this.match.length)
+      }
+    }
     this.text = this.text.replace(/\s\s+/g, ' ').trim()
   }
 
@@ -79,13 +89,15 @@ class Expects {
   number (opts) {
     opts = opts || {}
     _.defaults(opts, { optional: false })
-    if (!opts.optional) this.checkText()
+    if (!opts.optional) this.checkText({
+      expects: 'number'
+    })
 
     const regexp = XRegExp('(?<number> [0-9]+ )', 'ix')
     const match = XRegExp.exec(this.text, regexp)
 
     if (!_.isNil(match)) {
-      this.match.push(match.number)
+      this.match.push(Number(match.number))
       this.text = this.text.replace(match.number, '') // remove from text matched pattern
     } else {
       if (!opts.optional) throw Error('Number not found')
@@ -184,7 +196,9 @@ class Expects {
   string (opts) {
     opts = opts || {}
     _.defaults(opts, { optional: false })
-    if (!opts.optional) this.checkText()
+    if (!opts.optional) this.checkText({
+      expects: 'string',
+    })
 
     const regexp = XRegExp(`(?<string> \\S* )`, 'igx')
     const match = XRegExp.exec(`${this.text.trim()}`, regexp)
