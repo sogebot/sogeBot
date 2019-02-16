@@ -21,6 +21,7 @@
   * [Points](_master/commands/points.md)
   * [Polls](_master/commands/polls.md)
   * [Price](_master/commands/price.md)
+  * [Scrim](_master/commands/scrim.md)
   * [Songs](_master/commands/songs.md)
   * [Top](/commands/top.md)
   * [Overlays](_master/commands/overlays.md)
