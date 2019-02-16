@@ -16,7 +16,7 @@ enum ERROR {
 
 /*
  * !scrim <type> <minutes> - open scrim countdown
- * !scrim match <matchId>  - add matchId to scrim
+ * !scrim match <matchId?> - if matchId add matchId to scrim, else list matches
  * !scrim stop             - stop scrim countdown
  */
 
@@ -30,7 +30,6 @@ class Scrim extends System {
         _: {
           closingAt: 0,
           type: '',
-          matchIdsByUser: {},
           lastRemindAt: Date.now(),
         },
         time: {
@@ -69,7 +68,7 @@ class Scrim extends System {
       this.settings._.type = type;
 
       this.settings._.lastRemindAt = now;
-      this.settings._.matchIdsByUser = {};
+      await global.db.engine.remove(this.collection.matchIds, {});
 
       global.commons.sendMessage(
         global.commons.prepare('systems.scrim.countdown', {
@@ -92,7 +91,7 @@ class Scrim extends System {
         this.currentMatches();
       } else {
         const [matchId] = new Expects(opts.parameters).everything({name: 'matchId'}).toArray();
-        this.settings._.matchIdsByUser[opts.sender.username] = matchId;
+        await global.db.engine.update(this.collection.matchIds, { username: opts.sender.username }, { matchId });
       }
     } catch (e) {
       if (isNaN(Number(e.message))) {
@@ -159,12 +158,13 @@ class Scrim extends System {
     const matches: {
       [x: string]: string[],
     } = {};
-    for (const user of Object.keys(this.settings._.matchIdsByUser)) {
-      const id = this.settings._.matchIdsByUser[user];
+    const matchIdsFromDb = await global.db.engine.find(this.collection.matchIds);
+    for (const d of matchIdsFromDb) {
+      const id = d.matchId;
       if (typeof matches[id] === 'undefined') {
         matches[id] = [];
       }
-      matches[id].push((atUsername ? '@' : '') + user);
+      matches[id].push((atUsername ? '@' : '') + d.username);
     }
     const output: string[] = [];
     for (const id of Object.keys(matches)) {

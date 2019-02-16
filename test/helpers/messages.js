@@ -1,5 +1,6 @@
 const assert = require('chai').assert
 const until = require('test-until')
+const chalk = require('chalk')
 const sinon = require('sinon')
 const _ = require('lodash')
 const util = require('util')
@@ -8,6 +9,7 @@ var eventSpy
 
 module.exports = {
   prepare: function () {
+    console.log(chalk.bgRed('*** Restoring all spies ***'))
     if (eventSpy) eventSpy.restore()
     eventSpy = sinon.spy(global.events, 'fire')
 
@@ -94,7 +96,7 @@ module.exports = {
       }
     }, 5000)
   },
-  isSent: async function (entry, user, opts) {
+  isSent: async function (entry, user, opts, wait) {
     opts = opts || {}
     await until(async setError => {
       let expected = []
@@ -133,7 +135,7 @@ module.exports = {
           '\nExpected message: "' + JSON.stringify(expected) + '"\nActual message:   "' + (!_.isNil(global.log.chatOut.args) ? util.inspect(global.log.chatOut.args) : '') + '"' +
           '\n\nExpected user: "' + JSON.stringify(user) + '"\nActual user:   "' + (!_.isNil(global.log.chatOut.lastCall) ? JSON.stringify(global.log.chatOut.lastCall.args[1]) : '') + '"')
       }
-    }, 5000)
+    }, wait || 5000)
   },
   isSentRaw: async function (expected, user) {
     await until(setError => {
