@@ -97,7 +97,7 @@ describe('Scrim - full workflow', () => {
     })
 
     it('Check match list by command', async () => {
-      global.systems.scrim.match({ sender: owner, parameters: '' })
+      global.systems.scrim.match({ sender: { username: 'test' }, parameters: '' })
       await message.isSent('systems.scrim.currentMatches', owner, {
         matches: '<' + global.translate('core.empty') + '>',
       }, 19000)
@@ -218,7 +218,7 @@ describe('Scrim - full workflow', () => {
     })
 
     it('Check match list by command', async () => {
-      global.systems.scrim.match({ sender: owner, parameters: '' })
+      global.systems.scrim.match({ sender: { username: 'test' }, parameters: '' })
       await message.isSent('systems.scrim.currentMatches', owner, [
         { matches: 'ABC - @user1, @user2, @user3 | ABD - @user4' },
         { matches: 'ABC - @user1, @user3, @user2 | ABD - @user4' },
