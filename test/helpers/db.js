@@ -1,4 +1,5 @@
 const _ = require('lodash')
+const chalk = require('chalk')
 const variable = require('./variable')
 
 const startup = _.now()
@@ -9,6 +10,8 @@ module.exports = {
       if (_.isNil(global.db) || !global.db.engine.connected || _.isNil(global.systems) || _.now() - startup < 10000) {
         return setTimeout(() => waitForIt(resolve, reject), 10)
       }
+
+      console.log(chalk.bgRed('*** Cleaning up collections ***'))
 
       await global.db.engine.remove('systems.alias', {})
       await global.db.engine.remove('systems.keywords', {})
@@ -34,12 +37,13 @@ module.exports = {
       await global.db.engine.remove('users.tips', {})
       await global.db.engine.remove('users.watched', {})
 
+      await global.db.engine.remove('games.settings', {})
+      await global.db.engine.remove('systems.settings', {})
+
       // game fightme
-      await global.db.engine.remove('games.fightme.settings', {})
       await global.db.engine.remove('games.fightme.users', {})
 
       // game duel
-      await global.db.engine.remove('games.duel.settings', {})
       await global.db.engine.remove('games.duel.users', {})
 
       // remove moderation

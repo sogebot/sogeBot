@@ -1,0 +1,7 @@
+{
+  "countdown": "Snipe hra ($type) začíná za $time $unit",
+  "go": "Začínáme teď! Go!",
+  "putMatchIdInChat": "Prosím, zadejte ID zápasu v chatu => $command xxx",
+  "currentMatches": "Aktuální zápasy: $matches",
+  "stopped": "Snipe hra byla zrušena."
+}

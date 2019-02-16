@@ -9,8 +9,15 @@ const config = require('@config')
 const cluster = require('cluster')
 const Message = require('./message')
 
+const __DEBUG__ = {
+  sendMessage: process.env.DEBUG &&
+              (
+                process.env.DEBUG.includes('commons.*') ||
+                process.env.DEBUG.includes('commons.sendMessage')
+              )
+}
+
 function Commons () {
-  this.compact = {}
   this.registerConfiguration()
 }
 
@@ -121,6 +128,10 @@ Commons.prototype.sendMessage = async function (message, sender, attr) {
   message = await message // await if message is promise (like prepare)
   attr = attr || {}
   sender = sender || {}
+
+  if (__DEBUG__.sendMessage) {
+    global.log.debug({message, sender, attr})
+  }
 
   if (_.isString(sender)) sender = { username: String(sender) }
 
@@ -298,6 +309,13 @@ Commons.prototype.getLocalizedName = function (number, translation) {
     }
   }
   return name
+}
+
+/*
+ * returns nearest 5
+ */
+Commons.prototype.round5 = function (x) {
+  return (x % 5) >= 2.5 ? parseInt(x / 5) * 5 + 5 : parseInt(x / 5) * 5;
 }
 
 module.exports = Commons
