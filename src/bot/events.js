@@ -66,11 +66,6 @@ class Events {
 
     this.panel()
     this.fadeOut()
-
-    cluster.on('message', (worker, data) => {
-      if (data !== 'event') return // throw away another events
-      this.fire(data.eventId, data.attributes)
-    })
   }
 
   async panel () {
@@ -116,7 +111,9 @@ class Events {
     attributes = _.clone(attributes) || {}
 
     if (!isMainThread) { // emit process to master
-      if (parentPort && parentPort.postMessage) parentPort.postMessage({ type: 'event', eventId: eventId, attributes: attributes })
+      if (parentPort && parentPort.postMessage) {
+        parentPort.postMessage({ type: 'call', ns: 'events', fnc: 'fire', args: [eventId, attributes] })
+      }
       return
     }
 

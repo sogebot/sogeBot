@@ -59,12 +59,6 @@ class PhillipsHue extends Integration {
 
     super({ settings, on })
 
-    cluster.on('message', (worker, message) => {
-      if (message.type !== 'phillipshue') return
-      // $FlowFixMe - An indexer property is missing in PhillipsHue
-      if (typeof this[message.fnc] === 'undefined') this[message.fnc](this, message.sender, message.text)
-    })
-
     setInterval(() => {
       if (!this.isEnabled()) return
       for (let index = 0, length = this.states.length; index < length; index++) {
@@ -140,7 +134,9 @@ class PhillipsHue extends Integration {
 
   hue (opts: CommandOptions) {
     if (!isMainThread) {
-      if (parentPort && parentPort.postMessage) parentPort.postMessage({ type: 'phillipshue', fnc: 'hue', sender: opts.sender, text: opts.parameters })
+      if (parentPort && parentPort.postMessage) {
+        parentPort.postMessage({ type: 'call', ns: 'systems.phillipshue', fnc: 'hue', args: [{sender: opts.sender, text: opts.parameters }])
+      }
       return
     }
     var rgb = this.parseText(opts.parameters, 'rgb', '255,255,255').split(',').map(o => Number(o))

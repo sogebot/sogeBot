@@ -33,11 +33,6 @@ class Highlights extends System {
 
     if (isMainThread) {
       global.panel.addMenu({ category: 'manage', name: 'highlights', id: 'highlights/list' })
-
-      cluster.on('message', (worker, message) => {
-        if (message.type !== 'highlight') return
-        this.main(message.opts)
-      })
     }
   }
 

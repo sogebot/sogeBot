@@ -10,15 +10,6 @@ class IMasterController extends Interface {
 
     this.timeouts = {}
 
-    cluster.on('message', (worker, message) => {
-      if (message.type !== 'db') return
-      this.data.push({
-        id: message.id,
-        items: message.items,
-        timestamp: _.now()
-      })
-    })
-
     this.connected = false
     this.data = []
 

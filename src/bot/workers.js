@@ -73,7 +73,14 @@ class Workers {
       } else if (msg.type === 'parse') {
         _.sample(cluster.workers).send({ type: 'message', sender: msg.sender, message: msg.message, skip: true, quiet: msg.quiet }) // resend to random worker
       } else if (msg.type === 'db') {
-        // do nothing on db
+          // add data to master controller
+          if (typeof global.db.engine.data !== 'undefined') {
+            global.db.engine.data.push({
+              id: msg.id,
+              items: msg.items,
+              timestamp: _.now()
+            })
+          }
       } else if (msg.type === 'timeout') {
         global.commons.timeout(msg.username, msg.reason, msg.timeout)
       } else if (msg.type === 'api') {

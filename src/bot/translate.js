@@ -8,7 +8,7 @@ var _ = require('lodash')
 const flatten = require('flat')
 
 const {
-  isMainThread
+  isMainThread, parentPort,
 } = require('worker_threads');
 const config = require('@config')
 const axios = require('axios')

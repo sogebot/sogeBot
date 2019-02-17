@@ -50,11 +50,6 @@ class Raffles extends System {
 
     if (isMainThread) {
       this.announce()
-
-      cluster.on('message', (worker, message) => {
-        if (message.type !== 'raffles') return
-        this[message.fnc](this)
-      })
     }
   }
 

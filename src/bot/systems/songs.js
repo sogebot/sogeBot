@@ -54,11 +54,6 @@ class Songs extends System {
     super({ settings, ui })
 
     if (isMainThread) {
-      cluster.on('message', (worker, d) => {
-        if (d.type !== 'songs') return
-        this[d.fnc](this, global.panel.io)
-      })
-
       this.getMeanLoudness()
 
       this.addMenu({ category: 'manage', name: 'playlist', id: 'songs/playlist' })
@@ -237,7 +232,9 @@ class Songs extends System {
 
   async sendNextSongID () {
     if (!isMainThread) {
-      if (parentPort && parentPort.postMessage) parentPort.postMessage({ type: 'songs', fnc: 'sendNextSongID' })
+      if (parentPort && parentPort.postMessage) {
+        parentPort.postMessage({ type: 'call', ns: 'systems.songs', fnc: 'sendNextSongID' })
+      }
       return
     }
 

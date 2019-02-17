@@ -14,8 +14,6 @@ const {
   Worker, MessageChannel, MessagePort, isMainThread, parentPort
 } = require('worker_threads');
 
-console.log({isMainThread})
-
 const constants = require('./constants')
 const config = require('@config')
 

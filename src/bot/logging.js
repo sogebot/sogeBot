@@ -10,7 +10,7 @@ var logDir = './logs'
 var moment = require('moment-timezone')
 const glob = require('glob')
 const {
-  isMainThread
+  isMainThread, parentPort,
 } = require('worker_threads');
 const config = require('@config')
 const chalk = require('chalk')
