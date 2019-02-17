@@ -16,7 +16,7 @@ class Workers {
       // although its possible to create thread in thread we don't want to
       global.log.error('Cannot create new worker in thread');
     }
-    const worker = new Worker(path.join(__dirname, '..', '..', 'worker_threads_testing', 'index.js'))
+    const worker = new Worker(this.path)
     this.setListeners(worker)
     worker.on('exit', () => {
       this.onlineCount--;
@@ -87,7 +87,7 @@ class Workers {
   }
 
   setListenersWorker() {
-    parentPort.on('message', , async (data) => {
+    parentPort.on('message', async (data) => {
       switch (data.type) {
         case 'interface':
           _.set(global, data.path, data.value);
