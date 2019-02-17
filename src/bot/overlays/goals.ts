@@ -3,6 +3,10 @@
 import Overlay from './_interface';
 
 import * as _ from 'lodash';
+const {
+  isMainThread,
+  // tslint:disable-next-line:no-var-requires
+} = require('worker_threads');
 
 class Goals extends Overlay {
   [x: string]: any; // TODO: remove after interface ported to TS
@@ -22,7 +26,7 @@ class Goals extends Overlay {
     super(options);
     this.addMenu({ category: 'registry', name: 'goals', id: '/registry/goals/list' });
 
-    if (require('cluster').isMaster) {
+    if (isMainThread) {
       global.db.engine.index({ table: this.collection.groups, index: 'uid', unique: true });
       global.db.engine.index({ table: this.collection.goals, index: 'uid', unique: true });
     }

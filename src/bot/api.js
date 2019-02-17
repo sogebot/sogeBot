@@ -2,7 +2,9 @@ const _ = require('lodash')
 const axios = require('axios')
 const querystring = require('querystring')
 const moment = require('moment')
-const cluster = require('cluster')
+const {
+  isMainThread
+} = require('worker_threads');
 const stacktrace = require('stacktrace-parser')
 const fs = require('fs')
 const chalk = require('chalk')
@@ -20,7 +22,7 @@ class API {
   }
 
   constructor () {
-    if (cluster.isMaster) {
+    if (isMainThread) {
       global.panel.addMenu({ category: 'logs', name: 'api', id: 'apistats' })
 
       this.calls = {
@@ -158,7 +160,7 @@ class API {
   }
 
   async intervalFollowerUpdate () {
-    if (cluster.isWorker) throw new Error('API can run only on master')
+    if (!isMainThread) throw new Error('API can run only on master')
 
     for (let username of this.rate_limit_follower_check) {
       const user = await global.users.getByName(username)
@@ -294,7 +296,7 @@ class API {
   }
 
   async getChannelChattersUnofficialAPI (opts) {
-    if (cluster.isWorker) throw new Error('API can run only on master')
+    if (!isMainThread) throw new Error('API can run only on master')
 
     const sendJoinEvent = async function (bulk) {
       for (let user of bulk) {
@@ -374,7 +376,7 @@ class API {
   }
 
   async getChannelSubscribers () {
-    if (cluster.isWorker) throw new Error('API can run only on master')
+    if (!isMainThread) throw new Error('API can run only on master')
 
     const cid = global.oauth.channelId
     const url = `https://api.twitch.tv/helix/subscriptions?broadcaster_id=${cid}`
@@ -494,7 +496,7 @@ class API {
   }
 
   async getChannelDataOldAPI (opts) {
-    if (cluster.isWorker) throw new Error('API can run only on master')
+    if (!isMainThread) throw new Error('API can run only on master')
 
     const cid = global.oauth.channelId
     const url = `https://api.twitch.tv/kraken/channels/${cid}`
@@ -550,7 +552,7 @@ class API {
   }
 
   async getChannelHosts () {
-    if (cluster.isWorker) throw new Error('API can run only on master')
+    if (!isMainThread) throw new Error('API can run only on master')
 
     const cid = global.oauth.channelId
 
@@ -740,7 +742,7 @@ class API {
       this.calls.bot.limit = request.headers['ratelimit-limit']
       global.commons.processAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', request.headers['ratelimit-limit'], request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] })
 
-      if (cluster.isMaster) if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'getGameFromId', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining })
+      if (isMainThread) if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'getGameFromId', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining })
 
       // add id->game to cache
       const name = request.data.data[0].name
@@ -756,13 +758,13 @@ class API {
       const game = await global.db.engine.findOne('api.current', { key: 'game' })
       global.log.warning(`Couldn't find name of game for gid ${id} - fallback to ${game.value}`)
       global.log.error(`API: ${url} - ${e.stack}`)
-      if (cluster.isMaster) if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getGameFromId', api: 'helix', endpoint: url, code: e.stack, remaining: this.calls.bot.remaining })
+      if (isMainThread) if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getGameFromId', api: 'helix', endpoint: url, code: e.stack, remaining: this.calls.bot.remaining })
       return game.value
     }
   }
 
   async getCurrentStreamData (opts) {
-    if (cluster.isWorker) throw new Error('API can run only on master')
+    if (!isMainThread) throw new Error('API can run only on master')
 
     const cid = global.oauth.channelId
     const url = `https://api.twitch.tv/helix/streams?user_id=${cid}`
@@ -937,7 +939,7 @@ class API {
   }
 
   async saveStreamData (stream) {
-    if (cluster.isWorker) throw new Error('API can run only on master')
+    if (!isMainThread) throw new Error('API can run only on master')
     await global.db.engine.update('api.current', { key: 'viewers' }, { value: stream.viewer_count })
 
     let maxViewers = await global.db.engine.findOne('api.max', { key: 'viewers' })
@@ -989,7 +991,7 @@ class API {
   }
 
   async setTitleAndGame (sender, args) {
-    if (cluster.isWorker) throw new Error('API can run only on master')
+    if (!isMainThread) throw new Error('API can run only on master')
 
     args = _.defaults(args, { title: null }, { game: null })
     const cid = global.oauth.channelId
@@ -1070,7 +1072,7 @@ class API {
   }
 
   async sendGameFromTwitch (self, socket, game) {
-    if (cluster.isWorker) throw new Error('API can run only on master')
+    if (!isMainThread) throw new Error('API can run only on master')
     const url = `https://api.twitch.tv/kraken/search/games?query=${encodeURIComponent(game)}&type=suggest`
 
     const token = await global.oauth.settings.bot.accessToken
@@ -1101,7 +1103,7 @@ class API {
   }
 
   async checkClips () {
-    if (cluster.isWorker) throw new Error('API can run only on master')
+    if (!isMainThread) throw new Error('API can run only on master')
 
     const token = global.oauth.settings.bot.accessToken
     if (token === '') {
@@ -1160,7 +1162,7 @@ class API {
   }
 
   async createClip (opts) {
-    if (cluster.isWorker) throw new Error('API can run only on master')
+    if (!isMainThread) throw new Error('API can run only on master')
 
     if (!(await global.cache.isOnline())) return // do nothing if stream is offline
 
@@ -1225,7 +1227,7 @@ class API {
   }
 
   async fetchAccountAge (username, id) {
-    if (cluster.isWorker) throw new Error('API can run only on master')
+    if (!isMainThread) throw new Error('API can run only on master')
     const url = `https://api.twitch.tv/kraken/users/${id}`
 
     const token = await global.oauth.settings.bot.accessToken
@@ -1264,7 +1266,7 @@ class API {
   }
 
   async isFollowerUpdate (user) {
-    if (cluster.isWorker) throw new Error('API can run only on master')
+    if (!isMainThread) throw new Error('API can run only on master')
     if (!user.id) return
     clearTimeout(this.timeouts['isFollowerUpdate-' + user.id])
 

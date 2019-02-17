@@ -7,7 +7,9 @@ const axios = require('axios')
 const _ = require('lodash')
 const chalk = require('chalk')
 const constants = require('./constants')
-const cluster = require('cluster')
+const {
+  isMainThread
+} = require('worker_threads');
 
 import Core from './_interface'
 
@@ -31,7 +33,7 @@ class Currency extends Core {
     }
     super({ settings, ui })
 
-    if (cluster.isMaster) {
+    if (isMainThread) {
       setTimeout(() => this.updateRates(), 5 * constants.SECOND)
     }
   }

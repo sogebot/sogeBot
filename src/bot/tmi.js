@@ -1,7 +1,9 @@
 'use strict'
 
 const moment = require('moment')
-const cluster = require('cluster')
+const {
+  isMainThread
+} = require('worker_threads');
 const _ = require('lodash')
 const TwitchJs = require('twitch-js').default
 
@@ -23,7 +25,7 @@ class TMI extends Core {
   constructor () {
     super()
 
-    if (cluster.isMaster) {
+    if (isMainThread) {
       global.status.TMI = constants.DISCONNECTED
     }
   }

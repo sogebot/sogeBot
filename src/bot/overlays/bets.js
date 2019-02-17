@@ -2,6 +2,9 @@
 'use strict'
 
 import Overlay from './_interface'
+const {
+  isMainThread
+} = require('worker_threads');
 
 class Bets extends Overlay {
   timeouts: TimeoutsObject = {}
@@ -25,7 +28,7 @@ class Bets extends Overlay {
 
     super({ ui })
 
-    if (require('cluster').isMaster) {
+    if (isMainThread) {
       this.interval()
     }
   }

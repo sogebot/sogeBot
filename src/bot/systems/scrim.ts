@@ -1,7 +1,10 @@
 'use strict';
 
 // 3rdparty libraries
-import * as cluster from 'cluster';
+const {
+  isMainThread,
+  // tslint:disable-next-line:no-var-requires
+} = require('worker_threads');
 import { DateTime } from 'luxon';
 
 // bot libraries
@@ -47,7 +50,7 @@ class Scrim extends System {
 
     this.cleanedUpOnStart = false;
 
-    if (cluster.isMaster) {
+    if (isMainThread) {
       setInterval(() => this.reminder(), 1000);
     }
   }

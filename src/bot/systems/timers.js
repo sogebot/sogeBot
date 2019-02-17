@@ -3,7 +3,9 @@
 // 3rdparty libraries
 const _ = require('lodash')
 const crypto = require('crypto')
-const cluster = require('cluster')
+const {
+  isMainThread
+} = require('worker_threads');
 
 // bot libraries
 var constants = require('../constants')
@@ -38,7 +40,7 @@ class Timers extends System {
     super({ settings })
 
     this.addMenu({ category: 'manage', name: 'timers', id: 'timers/list' })
-    if (cluster.isMaster) this.init()
+    if (isMainThread) this.init()
   }
 
   sockets () {

@@ -2,7 +2,9 @@
 
 // 3rdparty libraries
 const _ = require('lodash')
-const cluster = require('cluster')
+const {
+  isMainThread
+} = require('worker_threads');
 
 const Expects = require('../expects.js')
 import Game from './_interface'
@@ -85,7 +87,7 @@ class Heist extends Game {
     ]
     super({ settings, dependsOn })
 
-    if (cluster.isMaster) this.timeouts['iCheckFinished'] = setTimeout(() => this.iCheckFinished(), 10000) // wait for proper config startup
+    if (isMainThread) this.timeouts['iCheckFinished'] = setTimeout(() => this.iCheckFinished(), 10000) // wait for proper config startup
   }
 
   async iCheckFinished () {

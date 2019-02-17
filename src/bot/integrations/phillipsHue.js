@@ -6,7 +6,9 @@ const chalk = require('chalk')
 const _ = require('lodash')
 const HueApi = require('node-hue-api').HueApi
 const lightState = require('node-hue-api').lightState
-const cluster = require('cluster')
+const {
+  isMainThread
+} = require('worker_threads');
 
 // bot libraries
 const constants = require('../constants')
@@ -121,7 +123,7 @@ class PhillipsHue extends Integration {
   }
 
   getLights (opts: CommandOptions) {
-    if (cluster.isWorker) {
+    if (!isMainThread) {
       if (process.send) process.send({ type: 'phillipshue', fnc: 'getLights', sender: opts.sender, text: opts.parameters })
       return
     }
@@ -137,7 +139,7 @@ class PhillipsHue extends Integration {
   }
 
   hue (opts: CommandOptions) {
-    if (cluster.isWorker) {
+    if (!isMainThread) {
       if (process.send) process.send({ type: 'phillipshue', fnc: 'hue', sender: opts.sender, text: opts.parameters })
       return
     }

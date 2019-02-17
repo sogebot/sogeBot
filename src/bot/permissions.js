@@ -4,12 +4,15 @@ var constants = require('./constants')
 var _ = require('lodash')
 const XRegExp = require('xregexp')
 const Parser = require('./parser')
+const {
+  isMainThread
+} = require('worker_threads');
 
 class Permissions {
   constructor () {
     global.configuration.register('disablePermissionWhispers', 'whisper.settings.disablePermissionWhispers', 'bool', true)
 
-    if (require('cluster').isMaster) {
+    if (isMainThread) {
       this.webPanel()
     }
   }

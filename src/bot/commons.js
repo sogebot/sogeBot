@@ -6,7 +6,9 @@ const moment = require('moment')
 
 const config = require('@config')
 
-const cluster = require('cluster')
+const {
+  isMainThread
+} = require('worker_threads');
 const Message = require('./message')
 
 const __DEBUG__ = {
@@ -29,7 +31,7 @@ Commons.prototype.registerConfiguration = function () {
 }
 
 Commons.prototype.processAll = function (proc) {
-  if (cluster.isMaster) {
+  if (isMainThread) {
     // run on master
     const namespace = _.get(global, proc.ns, null)
     namespace[proc.fnc].apply(namespace, proc.args)
@@ -61,7 +63,7 @@ Commons.prototype.isIgnored = async function (sender) {
 Commons.prototype.isSystemEnabled = function (fn) {
   var name = (typeof fn === 'object') ? fn.constructor.name : fn
   var enabled = !_.isNil(config.systems) && !_.isNil(config.systems[name.toLowerCase()]) ? (_.isBoolean(config.systems[name.toLowerCase()] ? config.systems[name.toLowerCase()] : config.systems[name.toLowerCase()].enabled)) : false
-  if (typeof fn === 'object' && cluster.isMaster) global.log.info(name + ' system ' + global.translate('core.loaded') + ' ' + (enabled ? chalk.green(global.translate('core.enabled')) : chalk.red(global.translate('core.disabled'))))
+  if (typeof fn === 'object' && isMainThread) global.log.info(name + ' system ' + global.translate('core.loaded') + ' ' + (enabled ? chalk.green(global.translate('core.enabled')) : chalk.red(global.translate('core.disabled'))))
   return enabled
 }
 Commons.prototype.isIntegrationEnabled = function (fn) {
@@ -165,8 +167,8 @@ Commons.prototype.sendMessage = async function (message, sender, attr) {
 
 Commons.prototype.message = async function (type, username, message, retry) {
   if (config.debug.console) return
-  if (cluster.isWorker && process.send) process.send({ type: type, sender: username, message: message })
-  else if (cluster.isMaster) {
+  if (!isMainThread && process.send) process.send({ type: type, sender: username, message: message })
+  else if (isMainThread) {
     try {
       if (username === null) username = await global.oauth.settings.general.channel
       if (username === '') {
@@ -182,7 +184,7 @@ Commons.prototype.message = async function (type, username, message, retry) {
 }
 
 Commons.prototype.timeout = async function (username, reason, timeout) {
-  if (cluster.isMaster) {
+  if (isMainThread) {
     reason = reason.replace(/\$sender/g, username)
     global.tmi.client.bot.chat.timeout(global.oauth.settings.general.channel, username, timeout, reason)
   } else if (process.send) process.send({ type: 'timeout', username: username, timeout: timeout, reason: reason })

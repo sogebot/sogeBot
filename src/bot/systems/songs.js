@@ -8,7 +8,9 @@ const ytsearch = require('youtube-search')
 const { YouTube } = require('better-youtube-api')
 // bot libraries
 const constants = require('../constants')
-const cluster = require('cluster')
+const {
+  isMainThread
+} = require('worker_threads');
 import System from './_interface'
 
 class Songs extends System {
@@ -51,7 +53,7 @@ class Songs extends System {
     }
     super({ settings, ui })
 
-    if (cluster.isMaster) {
+    if (isMainThread) {
       cluster.on('message', (worker, d) => {
         if (d.type !== 'songs') return
         this[d.fnc](this, global.panel.io)
@@ -234,7 +236,7 @@ class Songs extends System {
   }
 
   async sendNextSongID () {
-    if (cluster.isWorker) {
+    if (!isMainThread) {
       if (process.send) process.send({ type: 'songs', fnc: 'sendNextSongID' })
       return
     }

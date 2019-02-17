@@ -1,7 +1,10 @@
 'use strict';
 
 // 3rdparty libraries
-import * as cluster from 'cluster';
+const {
+  isMainThread,
+// tslint:disable-next-line:no-var-requires
+} = require('worker_threads');
 import * as _ from 'lodash';
 
 // bot libraries
@@ -58,7 +61,7 @@ class Bets extends System {
     };
     super(options);
 
-    if (cluster.isMaster) {
+    if (isMainThread) {
       this.checkIfBetExpired();
     }
 

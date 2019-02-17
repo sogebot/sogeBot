@@ -9,6 +9,8 @@ var workerIsFree = {
   db: true
 }
 
+console.log('Spawning worker')
+
 cluster()
 
 function cluster () {

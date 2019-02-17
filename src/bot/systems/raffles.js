@@ -2,7 +2,9 @@
 
 // 3rdparty libraries
 const _ = require('lodash')
-const cluster = require('cluster')
+const {
+  isMainThread
+} = require('worker_threads');
 // bot libraries
 var constants = require('../constants')
 import System from './_interface'
@@ -46,7 +48,7 @@ class Raffles extends System {
     super({ settings })
     this.addWidget('raffles', 'widget-title-raffles', 'fas fa-gift')
 
-    if (cluster.isMaster) {
+    if (isMainThread) {
       this.announce()
 
       cluster.on('message', (worker, message) => {

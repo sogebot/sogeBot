@@ -3,7 +3,9 @@
 'use strict'
 
 const axios = require('axios')
-const cluster = require('cluster')
+const {
+  isMainThread
+} = require('worker_threads');
 
 import Core from './_interface'
 const constants = require('./constants')
@@ -131,7 +133,7 @@ class OAuth extends Core {
 
   async getChannelId () {
     if (typeof global.api === 'undefined' || typeof global.tmi === 'undefined') return setTimeout(() => this.getChannelId(), 1000)
-    if (cluster.isWorker || global.mocha) return
+    if (!isMainThread || global.mocha) return
     clearTimeout(this.timeouts['getChannelId'])
 
     let timeout = 1000
@@ -188,7 +190,7 @@ class OAuth extends Core {
       }
     */
   async validateOAuth (type: string) {
-    if (cluster.isWorker || global.mocha) return
+    if (!isMainThread || global.mocha) return
     clearTimeout(this.timeouts[`validateOAuth-${type}`])
 
     const url = 'https://id.twitch.tv/oauth2/validate'
@@ -244,7 +246,7 @@ class OAuth extends Core {
       }
     */
   async refreshAccessToken (type: string) {
-    if (cluster.isWorker) return
+    if (!isMainThread) return
     global.log.warning('Refreshing access token of ' + type)
     const url = 'https://twitchtokengenerator.com/api/refresh/'
     try {

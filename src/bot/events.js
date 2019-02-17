@@ -5,7 +5,9 @@ const crypto = require('crypto')
 const safeEval = require('safe-eval')
 const flatten = require('flat')
 const moment = require('moment')
-const cluster = require('cluster')
+const {
+  isMainThread
+} = require('worker_threads');
 const axios = require('axios')
 
 const Message = require('./message')
@@ -14,7 +16,7 @@ class Events {
   constructor () {
     this.timeouts = {}
 
-    if (cluster.isWorker) return // dont do anything on worker
+    if (!isMainThread) return // dont do anything on worker
 
     this.supportedEventsList = [
       { id: 'user-joined-channel', variables: [ 'username', 'userObject' ] },
@@ -113,7 +115,7 @@ class Events {
   async fire (eventId, attributes) {
     attributes = _.clone(attributes) || {}
 
-    if (cluster.isWorker) { // emit process to master
+    if (!isMainThread) { // emit process to master
       if (process.send) process.send({ type: 'event', eventId: eventId, attributes: attributes })
       return
     }

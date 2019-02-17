@@ -4,13 +4,17 @@
 require('module-alias/register')
 
 const figlet = require('figlet')
-const cluster = require('cluster')
 const os = require('os')
 const util = require('util')
 const _ = require('lodash')
 const chalk = require('chalk')
 const gitCommitInfo = require('git-commit-info');
 
+const {
+  Worker, MessageChannel, MessagePort, isMainThread, parentPort
+} = require('worker_threads');
+
+console.log({isMainThread})
 
 const constants = require('./constants')
 const config = require('@config')
@@ -32,16 +36,15 @@ global.status = { // TODO: move it?
 require('./logging') // logger is on master / worker have own global.log sending data through process
 
 const isNeDB = config.database.type === 'nedb'
-if (cluster.isWorker) {
+if (!isMainThread) {
   global.db = new (require('./databases/database'))(isNeDB, isNeDB)
   require('./cluster.js')
-} else if (cluster.isMaster) {
+} else {
   global.db = new (require('./databases/database'))(!isNeDB, !isNeDB)
   // spin up forks first
   global.cpu = config.cpu === 'auto' ? os.cpus().length : parseInt(_.get(config, 'cpu', 1), 10)
   if (config.database.type === 'nedb') global.cpu = 1 // nedb can have only one fork
   for (let i = 0; i < global.cpu; i++) fork()
-  cluster.on('disconnect', (worker) => fork())
 }
 
 async function main () {
@@ -97,7 +100,9 @@ async function main () {
 }
 
 function fork () {
-  const worker = cluster.fork()
+  const worker = new Worker(__filename);
+
+  worker.on('exit', () => fork())
   worker.on('online', () => {
     if (++global.startedClusters === global.cpu) main()
   })
@@ -143,7 +148,7 @@ function forkOn (worker) {
   })
 }
 
-if (cluster.isMaster) {
+if (isMainThread) {
   process.on('unhandledRejection', function (reason, p) {
     global.log.error(`Possibly Unhandled Rejection at: ${util.inspect(p)} reason: ${reason}`)
   })
@@ -158,14 +163,4 @@ if (cluster.isMaster) {
     global.log.error('+------------------------------------------------------------------------------+')
     process.exit(1)
   })
-}
-
-if (cluster.isMaster) {
-  setInterval(() => {
-    if (global.cpu > 1) { // refresh if there is more than one worker
-      let worker = _.sample(cluster.workers)
-      worker.send({ type: 'shutdown' })
-      worker.disconnect()
-    }
-  }, 1000 * 60 * 60 * 2) // every 2 hour spin up new worker and kill old
 }

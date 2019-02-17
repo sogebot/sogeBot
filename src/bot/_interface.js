@@ -1,6 +1,10 @@
 const _ = require('lodash')
 const chalk = require('chalk')
-const cluster = require('cluster')
+
+const {
+  isMainThread, parentPort
+} = require('worker_threads');
+
 const constants = require('./constants')
 
 let listeners = 0
@@ -60,7 +64,7 @@ class Module {
     if (typeof retries === 'undefined') retries = 0
     if (retries === 6000) throw new Error('Something went wrong')
     if (!this.isLoaded) setTimeout(() => this._status(++retries), 10)
-    else this.status({ state: this.settings.enabled, quiet: cluster.isWorker }) // force status change and quiet on workers
+    else this.status({ state: this.settings.enabled, quiet: !isMainThread }) // force status change and quiet on workers
   }
 
   prepareParsers () {
@@ -80,7 +84,7 @@ class Module {
   }
 
   threadListener () {
-    if (cluster.isWorker) {
+    if (!isMainThread) {
       process.setMaxListeners(++listeners + 10)
       process.on('message', async (data) => {
         if (data.type === '/' + this._name + '/' + this.constructor.name.toLowerCase()) {
@@ -100,7 +104,7 @@ class Module {
   updateSettings (key, value) {
     const proc = { type: '/' + this._name + '/' + this.constructor.name.toLowerCase(), path: key, value }
 
-    if (cluster.isMaster) {
+    if (isMainThread) {
       global.db.engine.update(this._name + '.settings', { system: this.constructor.name.toLowerCase(), key }, { value })
       // send to all cluster
       // eslint-disable-next-line
@@ -117,7 +121,7 @@ class Module {
       }
     } else {
       // send to master to update
-      if (process.send) process.send(proc)
+      if (parentPort.postMessage) parentPort.postMessage(proc)
     }
   }
 
@@ -209,7 +213,7 @@ class Module {
   }
 
   async _indexDbs () {
-    if (cluster.isMaster) {
+    if (isMainThread) {
       clearTimeout(this.timeouts[`${this.constructor.name}._indexDbs`])
       if (!global.db.engine.connected) {
         this.timeouts[`${this.constructor.name}._indexDbs`] = setTimeout(() => this._indexDbs(), 1000)
@@ -221,7 +225,7 @@ class Module {
   }
 
   _sockets () {
-    if (cluster.isWorker) return;
+    if (!isMainThread) return;
 
     clearTimeout(this.timeouts[`${this.constructor.name}.sockets`])
     if (_.isNil(global.panel)) {
@@ -456,7 +460,7 @@ class Module {
     if (['core', 'overlays', 'widgets'].includes(this._name)) return true
 
     const areDependenciesEnabled = await this._dependenciesEnabled()
-    const isMasterAndStatusOnly = cluster.isMaster && _.isNil(opts.state)
+    const isMasterAndStatusOnly = isMainThread && _.isNil(opts.state)
     const isStatusChanged = !_.isNil(opts.state)
     const isDisabledByEnv = !_.isNil(process.env.DISABLE) &&
       (process.env.DISABLE.toLowerCase().split(',').includes(this.constructor.name.toLowerCase()) || process.env.DISABLE === '*')
@@ -467,7 +471,7 @@ class Module {
     if (!areDependenciesEnabled || isDisabledByEnv) opts.state = false // force disable if dependencies are disabled or disabled by env
 
     // on.change handler on enabled
-    if (cluster.isMaster && isStatusChanged) {
+    if (isMainThread && isStatusChanged) {
       if (this.on.change.enabled) {
         // run on.change functions only on master
         for (let fnc of this.on.change.enabled) {
@@ -487,7 +491,7 @@ class Module {
   }
 
   addMenu (opts) {
-    if (cluster.isMaster) {
+    if (isMainThread) {
       clearTimeout(this.timeouts[`${this.constructor.name}.${opts.id}.addMenu`])
 
       if (_.isNil(global.panel)) {
@@ -499,7 +503,7 @@ class Module {
   }
 
   addWidget (...opts) {
-    if (cluster.isMaster) {
+    if (isMainThread) {
       clearTimeout(this.timeouts[`${this.constructor.name}.${opts[0]}.addWidget`])
 
       if (_.isNil(global.panel)) {

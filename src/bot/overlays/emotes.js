@@ -4,7 +4,9 @@
 // 3rdparty libraries
 const _ = require('lodash')
 const constants = require('../constants')
-const cluster = require('cluster')
+const {
+  isMainThread
+} = require('worker_threads');
 const axios = require('axios')
 const XRegExp = require('xregexp')
 
@@ -135,7 +137,7 @@ class Emotes extends Overlay {
       }
     }
     super({ settings, ui })
-    if (cluster.isMaster) {
+    if (isMainThread) {
       global.db.engine.index({ table: this.collection.cache, index: 'code' })
       setTimeout(() => {
         if (!this.fetch.global) this.fetchEmotesGlobal()
@@ -368,7 +370,7 @@ class Emotes extends Overlay {
 
   async containsEmotes (opts: ParserOptions) {
     if (_.isNil(opts.sender)) return true
-    if (cluster.isWorker) {
+    if (!isMainThread) {
       if (process.send) process.send({ type: 'call', ns: 'overlays.emotes', fnc: 'containsEmotes', args: [opts] })
       return
     }

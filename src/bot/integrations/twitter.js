@@ -6,7 +6,9 @@
 const Client = require('twitter')
 const _ = require('lodash')
 const chalk = require('chalk')
-const cluster = require('cluster')
+const {
+  isMainThread
+} = require('worker_threads');
 
 const Message = require('../message')
 
@@ -54,7 +56,7 @@ class Twitter extends Integration {
 
     super({ settings, ui, on })
 
-    if (cluster.isMaster) this.addEvent()
+    if (isMainThread) this.addEvent()
   }
 
   addEvent () {
@@ -110,7 +112,7 @@ class Twitter extends Integration {
   }
 
   send (text: string) {
-    if (cluster.isWorker) {
+    if (!isMainThread) {
       if (process.send) process.send({ type: 'call', ns: 'integrations.twitter', fnc: 'send', args: [text] })
       return
     }
