@@ -33,7 +33,7 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 library.add(faSignOutAlt)
 
 export default {
-  props: ['socket', 'commons'],
+  props: ['commons'],
   components: {
     'font-awesome-icon': FontAwesomeIcon,
   },
