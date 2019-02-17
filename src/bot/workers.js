@@ -80,6 +80,8 @@ class Workers {
         global.api[msg.fnc](msg.username, msg.id)
       } else if (msg.type === 'event') {
         global.events.fire(msg.eventId, msg.attributes)
+      } else if ( msg.type === 'interface') {
+        _.set(global, msg.path, msg.value);
       }
     });
   }
@@ -87,6 +89,9 @@ class Workers {
   setListenersWorker() {
     parentPort.on('message', , async (data) => {
       switch (data.type) {
+        case 'interface':
+          _.set(global, data.path, data.value);
+          break;
         case 'call':
           const namespace = _.get(global, data.ns, null)
           namespace[data.fnc].apply(namespace, data.args)

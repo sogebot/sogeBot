@@ -7,8 +7,6 @@ const {
 
 const constants = require('./constants')
 
-let listeners = 0
-
 class Module {
   timeouts = {}
   isLoaded = false
@@ -50,7 +48,6 @@ class Module {
     })
 
     // prepare proxies for variables
-    this.threadListener()
     this.prepareCommandProxies()
     this.prepareVariableProxies()
     this.prepareParsers()
@@ -83,33 +80,18 @@ class Module {
     this.isLoaded = true
   }
 
-  threadListener () {
-    if (!isMainThread) {
-      process.setMaxListeners(++listeners + 10)
-      process.on('message', async (data) => {
-        if (data.type === '/' + this._name + '/' + this.constructor.name.toLowerCase()) {
-          _.set(this.settings, data.path, data.value)
-        }
-      })
-    } else {
-      cluster.setMaxListeners(++listeners + 10)
-      cluster.on('message', async (worker, data) => {
-        if (data.type === '/' + this._name + '/' + this.constructor.name.toLowerCase()) {
-          _.set(this.settings, data.path, data.value)
-        }
-      })
-    }
-  }
-
   updateSettings (key, value) {
-    const proc = { type: '/' + this._name + '/' + this.constructor.name.toLowerCase(), path: key, value }
+    const proc = {
+      type: 'interface',
+      path: `${this._name}.${this.constructor.name.toLowerCase()}.settings.${key}`,
+      value
+    }
 
     if (isMainThread) {
       global.db.engine.update(this._name + '.settings', { system: this.constructor.name.toLowerCase(), key }, { value })
-      // send to all cluster
-      // eslint-disable-next-line
-      for (let w of Object.entries(cluster.workers)) {
-        if (w[1].isConnected()) w[1].send(proc)
+      // send to all threads
+      for (let w of Object.entries(global.workers.list)) {
+        w.postMessage(proc);
       }
 
       if (this.on.change[key]) {
