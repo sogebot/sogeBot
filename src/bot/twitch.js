@@ -120,7 +120,7 @@ class Twitch {
       return
     }
     if (isMainThread) global.api.setTitleAndGame(opts.sender, { title: opts.parameters })
-    else if (process.send) process.send({ type: 'call', ns: 'api', fnc: 'setTitleAndGame', args: [opts.sender, { title: opts.parameters }] })
+    else if (parentPort && parentPort.postMessage) parentPort.postMessage({ type: 'call', ns: 'api', fnc: 'setTitleAndGame', args: [opts.sender, { title: opts.parameters }] })
   }
 
   async getGame (opts) {
@@ -138,7 +138,7 @@ class Twitch {
       const games = await global.api.sendGameFromTwitch (global.api, null, opts.parameters)
       global.api.setTitleAndGame(opts.sender, { game: games[0] })
     }
-    else if (process.send) process.send({ type: 'call', ns: 'twitch', fnc: 'setGame', args: [opts] })
+    else if (parentPort && parentPort.postMessage) parentPort.postMessage({ type: 'call', ns: 'twitch', fnc: 'setGame', args: [opts] })
   }
 }
 

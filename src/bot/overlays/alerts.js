@@ -38,7 +38,7 @@ class Alerts extends Overlay {
 
   async overlay (opts: CommandOptions) {
     if (!isMainThread) {
-      if (process.send) process.send({ type: 'call', ns: 'overlays.alerts', fnc: 'overlay', args: [opts] })
+      if (parentPort && parentPort.postMessage) parentPort.postMessage({ type: 'call', ns: 'overlays.alerts', fnc: 'overlay', args: [opts] })
       return
     }
     opts.parameters = await new Message(opts.parameters).parse()

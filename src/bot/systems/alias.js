@@ -93,7 +93,7 @@ class Alias extends System {
           sender: opts.sender
         });
         global.log.process({ type: 'parse', sender: opts.sender, message })
-        if (process.send) process.send({ type: 'parse', sender: opts.sender, message })
+        if (parentPort && parentPort.postMessage) parentPort.postMessage({ type: 'parse', sender: opts.sender, message })
       }
     }
     return true

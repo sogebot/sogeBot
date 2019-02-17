@@ -116,7 +116,7 @@ class Events {
     attributes = _.clone(attributes) || {}
 
     if (!isMainThread) { // emit process to master
-      if (process.send) process.send({ type: 'event', eventId: eventId, attributes: attributes })
+      if (parentPort && parentPort.postMessage) parentPort.postMessage({ type: 'event', eventId: eventId, attributes: attributes })
       return
     }
 

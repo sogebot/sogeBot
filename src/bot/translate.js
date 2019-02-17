@@ -99,7 +99,7 @@ class Translate {
     if (typeof key === 'object' || version === 'n/a') return // skip objects (returning more than one key)
     if (!isMainThread) {
       // we want to have translations aggregated on master
-      if (process.send) return process.send({ type: 'call', ns: 'lib.translate', fnc: 'addMetrics', args: [key] })
+      if (parentPort && parentPort.postMessage) return parentPort.postMessage({ type: 'call', ns: 'lib.translate', fnc: 'addMetrics', args: [key] })
       return false
     }
 

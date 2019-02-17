@@ -43,7 +43,7 @@ Commons.prototype.processAll = function (proc) {
     }
   } else {
     // need to be sent to master
-    if (process.send) process.send(proc)
+    if (parentPort && parentPort.postMessage) parentPort.postMessage(proc)
   }
 }
 
@@ -167,7 +167,7 @@ Commons.prototype.sendMessage = async function (message, sender, attr) {
 
 Commons.prototype.message = async function (type, username, message, retry) {
   if (config.debug.console) return
-  if (!isMainThread && process.send) process.send({ type: type, sender: username, message: message })
+  if (!isMainThread && parentPort.postMessage) parentPort.postMessage({ type: type, sender: username, message: message })
   else if (isMainThread) {
     try {
       if (username === null) username = await global.oauth.settings.general.channel
@@ -187,7 +187,7 @@ Commons.prototype.timeout = async function (username, reason, timeout) {
   if (isMainThread) {
     reason = reason.replace(/\$sender/g, username)
     global.tmi.client.bot.chat.timeout(global.oauth.settings.general.channel, username, timeout, reason)
-  } else if (process.send) process.send({ type: 'timeout', username: username, timeout: timeout, reason: reason })
+  } else if (parentPort && parentPort.postMessage) parentPort.postMessage({ type: 'timeout', username: username, timeout: timeout, reason: reason })
 }
 
 Commons.prototype.getOwner = function () {

@@ -21,6 +21,7 @@ const config = require('@config')
 
 global.commons = new (require('./commons'))()
 global.cache = new (require('./cache'))()
+global.workers = new (require('./workers'))
 
 global.startedClusters = 0
 global.linesParsed = 0
@@ -44,7 +45,10 @@ if (!isMainThread) {
   // spin up forks first
   global.cpu = config.cpu === 'auto' ? os.cpus().length : parseInt(_.get(config, 'cpu', 1), 10)
   if (config.database.type === 'nedb') global.cpu = 1 // nedb can have only one fork
-  for (let i = 0; i < global.cpu; i++) fork()
+  for (let i = 0; i < global.cpu; i++) {
+    global.workers.newWorker();
+  }
+  main()
 }
 
 async function main () {
@@ -96,55 +100,6 @@ async function main () {
     }
 
     global.tmi = new (require('./tmi'))()
-  })
-}
-
-function fork () {
-  const worker = new Worker(__filename);
-
-  worker.on('exit', () => fork())
-  worker.on('online', () => {
-    if (++global.startedClusters === global.cpu) main()
-  })
-  forkOn(worker)
-}
-
-function forkOn (worker) {
-  if (!global.db.engine.connected || !(global.lib && global.lib.translate)) return setTimeout(() => forkOn(worker), 1000)
-  // processing messages from workers
-  worker.on('message', async (msg) => {
-    if (msg.type === 'lang') {
-      for (let worker in cluster.workers) cluster.workers[worker].send({ type: 'lang' })
-      await global.lib.translate._load()
-    } else if (msg.type === 'call') {
-      const namespace = _.get(global, msg.ns, null)
-      namespace[msg.fnc].apply(namespace, msg.args)
-    } else if (msg.type === 'log') {
-      return global.log[msg.level](msg.message, msg.params)
-    } else if (msg.type === 'stats') {
-      let avgTime = 0
-      global.avgResponse.push(msg.value)
-      if (msg.value > 1000) global.log.warning(`Took ${msg.value}ms to process: ${msg.message}`)
-      if (global.avgResponse.length > 100) global.avgResponse.shift()
-      for (let time of global.avgResponse) avgTime += parseInt(time, 10)
-      global.status['RES'] = (avgTime / global.avgResponse.length).toFixed(0)
-    } else if (msg.type === 'say') {
-      global.commons.message('say', null, msg.message)
-    } else if (msg.type === 'me') {
-      global.commons.message('me', null, msg.message)
-    } else if (msg.type === 'whisper') {
-      global.commons.message('whisper', msg.sender, msg.message)
-    } else if (msg.type === 'parse') {
-      _.sample(cluster.workers).send({ type: 'message', sender: msg.sender, message: msg.message, skip: true, quiet: msg.quiet }) // resend to random worker
-    } else if (msg.type === 'db') {
-      // do nothing on db
-    } else if (msg.type === 'timeout') {
-      global.commons.timeout(msg.username, msg.reason, msg.timeout)
-    } else if (msg.type === 'api') {
-      global.api[msg.fnc](msg.username, msg.id)
-    } else if (msg.type === 'event') {
-      global.events.fire(msg.eventId, msg.attributes)
-    }
   })
 }
 

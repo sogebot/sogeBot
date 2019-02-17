@@ -237,7 +237,7 @@ class Songs extends System {
 
   async sendNextSongID () {
     if (!isMainThread) {
-      if (process.send) process.send({ type: 'songs', fnc: 'sendNextSongID' })
+      if (parentPort && parentPort.postMessage) parentPort.postMessage({ type: 'songs', fnc: 'sendNextSongID' })
       return
     }
 

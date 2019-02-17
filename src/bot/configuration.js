@@ -132,7 +132,7 @@ class Configuration {
         this.cfgL[cmd].value = value
         await global.db.engine.update('settings', { key: cmd }, { key: cmd, value: value })
         if (cmd === 'lang') {
-          if (process.send) process.send({ type: 'lang' })
+          if (parentPort && parentPort.postMessage) parentPort.postMessage({ type: 'lang' })
           await global.lib.translate._load()
           if (!opts.quiet) global.commons.sendToOwners(global.translate('core.lang-selected'))
         }

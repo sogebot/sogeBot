@@ -289,7 +289,7 @@ class CustomVariables {
   }
 
   async updateWidgetAndTitle (variable) {
-    if (!isMainThread && process.send) process.send({ type: 'widget_custom_variables', emit: 'refresh' })
+    if (!isMainThread && parentPort.postMessage) parentPort.postMessage({ type: 'widget_custom_variables', emit: 'refresh' })
     else if (!_.isNil(global.widgets.custom_variables.socket)) global.widgets.custom_variables.socket.emit('refresh') // send update to widget
 
     if (!_.isNil(variable)) {
@@ -297,7 +297,7 @@ class CustomVariables {
       let title = await global.cache.rawStatus()
 
       if (title.match(regexp)) {
-        if (!isMainThread && process.send) process.send({ type: 'call', ns: 'api', fnc: 'setTitleAndGame', args: [null] })
+        if (!isMainThread && parentPort.postMessage) parentPort.postMessage({ type: 'call', ns: 'api', fnc: 'setTitleAndGame', args: [null] })
         else global.api.setTitleAndGame(null)
       }
     }

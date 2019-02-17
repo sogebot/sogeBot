@@ -4,13 +4,6 @@ const util = require('util')
 const _ = require('lodash')
 const Parser = require('./parser')
 
-var workerIsFree = {
-  message: true,
-  db: true
-}
-
-console.log('Spawning worker')
-
 cluster()
 
 function cluster () {
@@ -43,6 +36,8 @@ function cluster () {
     } catch (e) {
       console.error(e); global.log.error(e)
     }
+
+    global.workers.setListeners()
 
     process.on('message', async (data) => {
       switch (data.type) {
@@ -95,7 +90,7 @@ function cluster () {
               global.log.error('This db call is not correct')
               global.log.error(data)
           }
-          if (process.send) process.send(data)
+          if (parentPort && parentPort.postMessage) parentPort.postMessage(data)
           workerIsFree.db = true
       }
     })
@@ -105,46 +100,7 @@ function cluster () {
     }
   })
 
-  async function message (data) {
-    let sender = data.sender
-    let message = data.message
-    let skip = data.skip
-    let quiet = data.quiet
 
-    const parse = new Parser({ sender: sender, message: message, skip: skip, quiet: quiet })
-
-    if (!skip && sender['message-type'] === 'whisper' && (!(await global.configuration.getValue('disableWhisperListener')) || global.commons.isOwner(sender))) {
-      global.log.whisperIn(message, { username: sender.username })
-    } else if (!skip && !await global.commons.isBot(sender.username)) {
-      global.log.chatIn(message, { username: sender.username })
-    }
-
-    const isModerated = await parse.isModerated()
-    const isIgnored = await global.commons.isIgnored(sender)
-    if (!isModerated && !isIgnored) {
-      if (!skip && !_.isNil(sender.username)) {
-        let user = await global.db.engine.findOne('users', { id: sender.userId })
-        let data = { id: sender.userId, is: { subscriber: (user.lock && user.lock.subscriber ? undefined : typeof sender.badges.subscriber !== 'undefined'), mod: typeof sender.badges.moderator !== 'undefined' }, username: sender.username }
-
-        // mark user as online
-        await global.db.engine.update('users.online', { username: sender.username }, { username: sender.username })
-
-        if (_.get(sender, 'badges.subscriber', 0)) _.set(data, 'stats.tier', 0) // unset tier if sender is not subscriber
-
-        // update user based on id not username
-        await global.db.engine.update('users', { id: String(sender.userId) }, data)
-
-        if (process.send) process.send({ type: 'api', fnc: 'isFollower', username: sender.username })
-
-        global.events.fire('keyword-send-x-times', { username: sender.username, message: message })
-        if (message.startsWith('!')) {
-          global.events.fire('command-send-x-times', { username: sender.username, message: message })
-        } else if (!message.startsWith('!')) global.db.engine.increment('users.messages', { id: sender.userId }, { messages: 1 })
-      }
-      await parse.process()
-    }
-    if (process.send) process.send({ type: 'stats', of: 'parser', value: parse.time(), message: message })
-  }
 }
 
 process.on('unhandledRejection', function (reason, p) {
@@ -162,9 +118,3 @@ process.on('uncaughtException', (error) => {
   global.log.error('+------------------------------------------------------------------------------+')
   process.exit(1)
 })
-
-function gracefullyExit () {
-  if (_.every(workerIsFree)) {
-    process.exit()
-  } else setTimeout(() => gracefullyExit(), 10)
-}

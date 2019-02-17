@@ -124,7 +124,7 @@ class PhillipsHue extends Integration {
 
   getLights (opts: CommandOptions) {
     if (!isMainThread) {
-      if (process.send) process.send({ type: 'phillipshue', fnc: 'getLights', sender: opts.sender, text: opts.parameters })
+      if (parentPort && parentPort.postMessage) parentPort.postMessage({ type: 'phillipshue', fnc: 'getLights', sender: opts.sender, text: opts.parameters })
       return
     }
     this.api.lights()
@@ -140,7 +140,7 @@ class PhillipsHue extends Integration {
 
   hue (opts: CommandOptions) {
     if (!isMainThread) {
-      if (process.send) process.send({ type: 'phillipshue', fnc: 'hue', sender: opts.sender, text: opts.parameters })
+      if (parentPort && parentPort.postMessage) parentPort.postMessage({ type: 'phillipshue', fnc: 'hue', sender: opts.sender, text: opts.parameters })
       return
     }
     var rgb = this.parseText(opts.parameters, 'rgb', '255,255,255').split(',').map(o => Number(o))

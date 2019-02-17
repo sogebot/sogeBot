@@ -121,7 +121,7 @@ class Module {
       }
     } else {
       // send to master to update
-      if (parentPort.postMessage) parentPort.postMessage(proc)
+      if (parentPort && parentPort.postMessage) parentPort.postMessage(proc)
     }
   }
 
