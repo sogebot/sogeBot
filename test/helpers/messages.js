@@ -6,9 +6,14 @@ const _ = require('lodash')
 
 var eventSpy
 
+const __DEBUG__ = (process.env.DEBUG && process.env.DEBUG.includes('test'))
+
 module.exports = {
   prepare: function () {
-    console.log(chalk.bgRed('*** Restoring all spies ***'))
+    if (__DEBUG__) {
+      console.log(chalk.bgRed('*** Restoring all spies ***'))
+    }
+
     if (eventSpy) eventSpy.restore()
     eventSpy = sinon.spy(global.events, 'fire')
 
