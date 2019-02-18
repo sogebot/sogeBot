@@ -95,19 +95,32 @@ const options: InterfaceSettings = {
 ```
 
 #### Others
-You can set your own settings variables. Only `number`, `boolean` and `string` is supported.
+
+You can set your own settings variables. Only `number`, `boolean` and `string`
+is supported. You can also add category for your settings. Use **null** value
+if you dont want to have type check.
 
 ##### Configurable in UI
+
 ``` javascript
 const settings = {
   // ...
   mySettingValueNum: 1,
   mySettingValueBool: true,
   mySettingValueString: 'Lorem Ipsum',
+  mySettingWithoutTypeCheck: null,
+  mySettingsCategory: {
+    valueNum: 1,
+    valueBool: false,
+    valueString: 'Lorem Ipsum',
+    WithoutTypeCheck: null,
+  }
   // ...
 }
 ```
+
 ##### Not configurable
+
 ``` javascript
 const settings = {
   // ...
