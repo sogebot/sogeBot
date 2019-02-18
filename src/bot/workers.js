@@ -20,7 +20,8 @@ class Workers {
       return global.log.error('Cannot create new worker in thread');
     }
     if (global.mocha) {
-      return global.log.error('Testing, not creating any workers');
+      this.onlineCount = global.cpu;
+      return global.log.warning('Testing, not creating any workers');
     }
 
     const worker = new Worker(this.path)
