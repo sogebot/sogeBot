@@ -82,7 +82,7 @@ class Workers {
 
   setListeners(worker) {
     if (isMainThread) {
-      if (typeof worker === undefined || worker === null) throw Error('Cannot create empty listeners in main thread!')
+      if (typeof worker === 'undefined' || worker === null) throw Error('Cannot create empty listeners in main thread!')
       this.setListenersMain(worker)
     } else {
       this.setListenersWorker()
