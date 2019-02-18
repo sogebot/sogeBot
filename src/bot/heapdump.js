@@ -7,7 +7,6 @@
  */
 
 const chalk = require('chalk')
-const cluster = require('cluster')
 const fs = require('fs')
 const {
   isMainThread

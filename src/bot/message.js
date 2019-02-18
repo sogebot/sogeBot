@@ -4,9 +4,6 @@ const safeEval = require('safe-eval')
 const decode = require('decode-html')
 const querystring = require('querystring')
 const _ = require('lodash')
-const {
-  isMainThread
-} = require('worker_threads');
 const crypto = require('crypto')
 const constants = require('./constants')
 const gitCommitInfo = require('git-commit-info');
