@@ -513,6 +513,10 @@ class TMI extends Core {
       sender.userId = await global.users.getIdByName(sender.username);
     }
 
+    if (typeof sender.badges === 'undefined') {
+      sender.badges = {}
+    }
+
     const parse = new Parser({ sender: sender, message: message, skip: skip, quiet: quiet })
 
     if (!skip && sender['message-type'] === 'whisper' && (!(await global.configuration.getValue('disableWhisperListener')) || global.commons.isOwner(sender))) {
