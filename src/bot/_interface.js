@@ -116,6 +116,10 @@ class Module {
           const path = key
           return new Proxy(target[key], {
             get: (target, key, receiver) => {
+              const isUnsupportedObject = typeof target[key] === 'object' && !Array.isArray(target[key]) && target[key] !== null
+              if (isUnsupportedObject) {
+                global.log.warning(`!!! ${this.constructor.name.toLowerCase()}.settings.${path}.${key} object is not retroactive, for advanced object types use database directly.`)
+              }
               if (key === 'then' || key === 'toJSON') return Reflect.get(target, key, receiver) // promisify
               if (_.isSymbol(key)) return undefined // handle iterator
               return target[key]
