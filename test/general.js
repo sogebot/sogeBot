@@ -3,6 +3,8 @@ const {
   isMainThread
 } = require('worker_threads');
 
+if (!isMainThread) { process.exit() }
+
 // setup config
 const config = require('../config.json')
 

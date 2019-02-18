@@ -47,7 +47,7 @@ class Workers {
   }
 
   send(opts) {
-    if (isMainThread) {
+    if (!isMainThread) {
       this.sendToMaster(opts);
     } else {
       this.sendToWorker(opts);
