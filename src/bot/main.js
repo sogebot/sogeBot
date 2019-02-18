@@ -41,7 +41,7 @@ if (!isMainThread) {
 } else {
   global.db = new (require('./databases/database'))(!isNeDB, !isNeDB)
   // spin up forks first
-  global.cpu = config.cpu === 'auto' ? os.cpus().length : parseInt(_.get(config, 'cpu', 1), 10)
+  global.cpu = config.threads === 'auto' ? os.cpus().length : parseInt(_.get(config, 'cpu', 1), 10)
   if (config.database.type === 'nedb') global.cpu = 1 // nedb can have only one fork
   for (let i = 0; i < global.cpu; i++) {
     global.workers.newWorker();

@@ -1,7 +1,7 @@
 {
   "__README__": "https://github.com/sogehige/SogeBot/wiki/Install-and-Upgrade",
   "timezone": "system",
-  "cpu": 1,
+  "threads": 1,
   "settings": {
     "bot_color": "OrangeRed"
   },
