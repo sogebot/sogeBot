@@ -46,6 +46,14 @@ class Workers {
     }
   }
 
+  send(opts) {
+    if (isMainThread) {
+      this.sendToMaster(opts);
+    } else {
+      this.sendToWorker(opts);
+    }
+  }
+
   sendToMaster(opts) {
     if (isMainThread) {
       throw Error('Cannot send to master from master!');
@@ -120,8 +128,6 @@ class Workers {
         global.commons.message('me', null, data.message)
       } else if (data.type === 'whisper') {
         global.commons.message('whisper', data.sender, data.message)
-      } else if (data.type === 'parse') {
-        _.sample(global.workers.list).postMessage({ type: 'message', sender: data.sender, message: data.message, skip: true, quiet: data.quiet })
       } else if (data.type === 'timeout') {
         global.commons.timeout(data.username, data.reason, data.timeout)
       } else if (data.type === 'api') {
