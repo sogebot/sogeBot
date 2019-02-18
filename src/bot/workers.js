@@ -102,6 +102,10 @@ class Workers {
       // we need to be able to always handle db
       if (data.type === 'db') {
         // add data to master controller
+        if (typeof global.db === 'undefined') {
+          return setTimeout(() => { this.process(data) }, 100)
+        }
+
         if (typeof global.db.engine.data !== 'undefined') {
           global.db.engine.data.push({
             id: data.id,
