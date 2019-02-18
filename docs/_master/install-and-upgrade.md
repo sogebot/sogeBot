@@ -1,7 +1,8 @@
 ## Prerequisites
 
 - **Browsers**: only latest Chrome/Chromium stable are supported
-- **[Node.js](https://nodejs.org/en/)**: latest **current** or **LTS** version
+- **[Node.js](https://nodejs.org/en/)**: latest **current** (**LTS** version is
+  currently **unsupported**, as it doesn't have worker_threads)
 - **RAM**: Minimum 512MB, Recommended 1024MB
 - **HDD**: Minimum 500MB
 
