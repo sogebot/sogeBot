@@ -50,7 +50,7 @@ if (!isMainThread) {
 }
 
 async function main () {
-  if (!global.db.engine.connected) return setTimeout(() => main(), 10)
+  if (!global.db.engine.connected || global.cpu !== global.workers.onlineCount) return setTimeout(() => main(), 10)
 
   global.configuration = new (require('./configuration.js'))()
   global.currency = new (require('./currency.js'))()
