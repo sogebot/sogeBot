@@ -1,7 +1,9 @@
 'use strict'
 
 // 3rdparty libraries
-const cluster = require('cluster')
+const {
+  isMainThread
+} = require('worker_threads');
 import Game from './_interface'
 
 class WheelOfFortune extends Game {
@@ -44,11 +46,11 @@ class WheelOfFortune extends Game {
   }
 
   async main (opts) {
-    if (cluster.isMaster) {
+    if (isMainThread) {
       const options = JSON.parse(await this.settings.options.data)
       global.panel.io.of('/games/wheeloffortune').emit('spin', { options, username: opts.sender.username })
     } else {
-      if (process.send) process.send({ type: 'call', ns: 'games.wheelOfFortune', fnc: 'main', args: [opts] })
+      global.workers.sendToMaster({ type: 'call', ns: 'games.wheelOfFortune', fnc: 'main', args: [opts] })
     }
   }
 }

@@ -7,8 +7,10 @@
  */
 
 const chalk = require('chalk')
-const cluster = require('cluster')
 const fs = require('fs')
+const {
+  isMainThread
+} = require('worker_threads');
 var profiler = require('v8-profiler-node8')
 var _datadir = null
 var nextMBThreshold = 100
@@ -23,7 +25,7 @@ var csvfilePath = null
  */
 module.exports.init = function (datadir) {
   _datadir = datadir
-  csvfilePath = datadir + '/heap-' + (cluster.isMaster ? 'master' : 'cluster') + '.csv'
+  csvfilePath = datadir + '/heap-' + (isMainThread ? 'master' : 'cluster') + '.csv'
   fs.writeFileSync(csvfilePath, 'memory, timestamp\n')
   setInterval(tickHeapDump, 1000)
 }
@@ -48,7 +50,7 @@ function heapDump () {
 
   fs.appendFileSync(csvfilePath, `${memMB}, ${Date.now()}\n`)
 
-  console.log(chalk.bgRed((cluster.isMaster ? 'Master' : 'Cluster') +
+  console.log(chalk.bgRed((isMainThread ? 'Master' : 'Cluster') +
     ' # Current mem usage: ' + memMB +
     ', last mem usage: ' + memMBlast +
     ', change: ' + (memMB - memMBlast) +
@@ -57,7 +59,7 @@ function heapDump () {
   if (memMB > nextMBThreshold) {
     heapTaken = 2 * 60 // wait more before next heap (making heap may cause enxt heap to be too high)
     nextMBThreshold = memMB + 25
-    console.log('Taking snapshot - ' + (cluster.isMaster ? 'Master' : 'Cluster'))
+    console.log('Taking snapshot - ' + (isMainThread ? 'Master' : 'Cluster'))
     var snap = profiler.takeSnapshot('profile')
     saveHeapSnapshot(snap, _datadir)
   }
@@ -72,7 +74,7 @@ function heapDump () {
 function saveHeapSnapshot (snapshot, datadir) {
   snapshot.export(function (error, result) {
     if (error) return console.log(error)
-    let name = datadir + (cluster.isMaster ? 'master' : 'cluster') + '-' + Date.now() + '.heapsnapshot'
+    let name = datadir + (isMainThread ? 'master' : 'cluster') + '-' + Date.now() + '.heapsnapshot'
     fs.writeFileSync(name, result)
     console.log('Heap snapshot written to ' + name)
     snapshot.delete()

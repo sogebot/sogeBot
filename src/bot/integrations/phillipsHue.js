@@ -6,7 +6,9 @@ const chalk = require('chalk')
 const _ = require('lodash')
 const HueApi = require('node-hue-api').HueApi
 const lightState = require('node-hue-api').lightState
-const cluster = require('cluster')
+const {
+  isMainThread
+} = require('worker_threads');
 
 // bot libraries
 const constants = require('../constants')
@@ -56,12 +58,6 @@ class PhillipsHue extends Integration {
     }
 
     super({ settings, on })
-
-    cluster.on('message', (worker, message) => {
-      if (message.type !== 'phillipshue') return
-      // $FlowFixMe - An indexer property is missing in PhillipsHue
-      if (typeof this[message.fnc] === 'undefined') this[message.fnc](this, message.sender, message.text)
-    })
 
     setInterval(() => {
       if (!this.isEnabled()) return
@@ -121,8 +117,8 @@ class PhillipsHue extends Integration {
   }
 
   getLights (opts: CommandOptions) {
-    if (cluster.isWorker) {
-      if (process.send) process.send({ type: 'phillipshue', fnc: 'getLights', sender: opts.sender, text: opts.parameters })
+    if (!isMainThread) {
+      global.workers.sendToMaster({ type: 'phillipshue', fnc: 'getLights', sender: opts.sender, text: opts.parameters })
       return
     }
     this.api.lights()
@@ -137,9 +133,8 @@ class PhillipsHue extends Integration {
   }
 
   hue (opts: CommandOptions) {
-    if (cluster.isWorker) {
-      if (process.send) process.send({ type: 'phillipshue', fnc: 'hue', sender: opts.sender, text: opts.parameters })
-      return
+    if (!isMainThread) {
+      return global.workers.sendToMaster({ type: 'call', ns: 'systems.phillipshue', fnc: 'hue', args: [{sender: opts.sender, text: opts.parameters }]})
     }
     var rgb = this.parseText(opts.parameters, 'rgb', '255,255,255').split(',').map(o => Number(o))
     if (rgb.length < 3) rgb = [255, 255, 255]

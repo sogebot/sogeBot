@@ -4,7 +4,9 @@
 const _ = require('lodash')
 const chalk = require('chalk')
 const constants = require('../constants.js')
-const cluster = require('cluster')
+const {
+  isMainThread
+} = require('worker_threads');
 
 // bot libraries
 import Integration from './_interface'
@@ -30,7 +32,7 @@ class Donationalerts extends Integration {
     }
     super({ settings, on, ui })
 
-    if (cluster.isMaster) {
+    if (isMainThread) {
       setInterval(() => this.connect(), constants.HOUR) // restart socket each hour
     }
   }

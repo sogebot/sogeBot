@@ -1,7 +1,10 @@
 'use strict';
 
 // 3rdparty libraries
-import * as cluster from 'cluster';
+const {
+  isMainThread,
+// tslint:disable-next-line:no-var-requires
+} = require('worker_threads');
 import * as _ from 'lodash';
 
 // bot libraries
@@ -58,7 +61,7 @@ class Bets extends System {
     };
     super(options);
 
-    if (cluster.isMaster) {
+    if (isMainThread) {
       this.checkIfBetExpired();
     }
 
@@ -70,7 +73,7 @@ class Bets extends System {
       socket.on('close', async (option) => {
         const message = '!bet ' + (option === 'refund' ? option : 'close ' + option);
         global.log.process({ type: 'parse', sender: { username: global.commons.getOwner() }, message });
-        _.sample(require('cluster').workers).send({ type: 'message', sender: { username: global.commons.getOwner() }, message, skip: true });
+        global.workers.sendToWorker({ type: 'message', sender: { username: global.commons.getOwner() }, message, skip: true });
       });
     });
   }

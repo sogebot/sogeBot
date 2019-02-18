@@ -1,7 +1,10 @@
 'use strict';
 
 // 3rdparty libraries
-import * as cluster from 'cluster';
+const {
+  isMainThread,
+  // tslint:disable-next-line:no-var-requires
+} = require('worker_threads');
 import * as _ from 'lodash';
 
 // bot libraries
@@ -58,7 +61,7 @@ class Polls extends System {
     this.lastMessageRemind = 0;
     this.lastTimeRemind = 0;
 
-    if (cluster.isMaster) {
+    if (isMainThread) {
       global.db.engine.index({ table: this.collection.votes, index: 'vid' });
       global.db.engine.index({ table: this.collection.data, index: 'openedAt' });
 

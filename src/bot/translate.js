@@ -7,7 +7,9 @@ var fs = require('fs')
 var _ = require('lodash')
 const flatten = require('flat')
 
-const cluster = require('cluster')
+const {
+  isMainThread,
+} = require('worker_threads');
 const config = require('@config')
 const axios = require('axios')
 const chalk = require('chalk')
@@ -24,7 +26,7 @@ class Translate {
 
   constructor () {
     global.configuration.register('lang', '', 'string', this.lang)
-    if (cluster.isMaster) global.panel.addMenu({ category: 'settings', name: 'translations', id: 'translations' })
+    if (isMainThread) global.panel.addMenu({ category: 'settings', name: 'translations', id: 'translations' })
   }
 
   async _load () {
@@ -39,7 +41,7 @@ class Translate {
           _.set(this.translations, withoutLocales.split('/').join('.'), JSON.parse(fs.readFileSync(f, 'utf8')))
         }
         if (_.isNil(this.translations[this.lang])) {
-          if (cluster.isMaster) global.log.warning(`Language ${this.lang} not found - fallback to en`)
+          if (isMainThread) global.log.warning(`Language ${this.lang} not found - fallback to en`)
           this.lang = 'en'
         }
 
@@ -52,7 +54,7 @@ class Translate {
         }
 
         const version = _.get(process, 'env.npm_package_version', 'n/a')
-        if (config.metrics.translations && !this.initialMetricsSent && cluster.isMaster && version !== 'n/a') {
+        if (config.metrics.translations && !this.initialMetricsSent && isMainThread && version !== 'n/a') {
           const bulk = 1000
           let data = { version, items: [] }
           for (let key of [...new Set(Object.keys(flatten(this.translations)).map(o => o.split('.').slice(1).join('.')))]) {
@@ -74,7 +76,7 @@ class Translate {
           }
         }
 
-        if (!this.initialMetricsSent && cluster.isMaster) {
+        if (!this.initialMetricsSent && isMainThread) {
           this.initialMetricsSent = true
           global.log.info(`${config.metrics.translations ? chalk.green('ENABLED') : chalk.red('DISABLED')}: Translations (metrics)`)
         }
@@ -87,7 +89,7 @@ class Translate {
     const self = global.lib.translate
     for (let c of self.custom) {
       await global.db.engine.update('customTranslations', { key: c.key }, { key: c.key, value: c.value })
-      for (let worker in cluster.workers) cluster.workers[worker].send({ type: 'lang' })
+      global.workers.sendToAllWorkers({ type: 'lang' });
       await global.lib.translate._load()
     }
   }
@@ -95,10 +97,9 @@ class Translate {
   addMetrics (key: String | Object, ui: Boolean) {
     const version = _.get(process, 'env.npm_package_version', 'n/a')
     if (typeof key === 'object' || version === 'n/a') return // skip objects (returning more than one key)
-    if (cluster.isWorker) {
+    if (!isMainThread) {
       // we want to have translations aggregated on master
-      if (process.send) return process.send({ type: 'call', ns: 'lib.translate', fnc: 'addMetrics', args: [key] })
-      return false
+      return global.workers.sendToMaster({ type: 'call', ns: 'lib.translate', fnc: 'addMetrics', args: [key] })
     }
 
     if (ui) {

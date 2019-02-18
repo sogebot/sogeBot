@@ -10,15 +10,6 @@ class IMasterController extends Interface {
 
     this.timeouts = {}
 
-    cluster.on('message', (worker, message) => {
-      if (message.type !== 'db') return
-      this.data.push({
-        id: message.id,
-        items: message.items,
-        timestamp: _.now()
-      })
-    })
-
     this.connected = false
     this.data = []
 
@@ -55,9 +46,7 @@ class IMasterController extends Interface {
     delete this.timeouts[`sendRequest-${id}`]
 
     try {
-      const worker = _.sample(cluster.workers)
-      if (!worker.isConnected()) throw new Error('Worker is not connected')
-      worker.send(data)
+      global.workers.sendToWorker(data)
       this.returnData(resolve, reject, id)
     } catch (e) {
       setTimeout(() => this.sendRequest(resolve, reject, id, data), 10)

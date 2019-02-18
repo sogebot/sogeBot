@@ -4,7 +4,9 @@
 
 var _ = require('lodash')
 var constants = require('./constants')
-const cluster = require('cluster')
+const {
+  isMainThread
+} = require('worker_threads');
 const axios = require('axios')
 
 const Expects = require('./expects')
@@ -34,7 +36,7 @@ class Users extends Core {
     this.addMenu({ category: 'manage', name: 'viewers', id: 'viewers/list' })
     this.addMenu({ category: 'settings', name: 'core', id: 'core' })
 
-    if (cluster.isMaster) {
+    if (isMainThread) {
       this.updateWatchTime()
 
       // set all users offline on start
@@ -89,8 +91,8 @@ class Users extends Core {
     try {
       if (!_.isNil(user._id)) user._id = user._id.toString() // force retype _id
       if (_.isNil(user.time.created_at) && !_.isNil(user.id)) { // this is accessing master (in points) and worker
-        if (cluster.isMaster) global.api.fetchAccountAge(username, user.id)
-        else if (process.send) process.send({ type: 'api', fnc: 'fetchAccountAge', username: username, id: user.id })
+        if (isMainThread) global.api.fetchAccountAge(username, user.id)
+        else global.workers.sendToMaster({ type: 'api', fnc: 'fetchAccountAge', username: username, id: user.id })
       }
     } catch (e) {
       global.log.error(e.stack)
@@ -109,8 +111,8 @@ class Users extends Core {
     try {
       if (!_.isNil(user._id)) user._id = user._id.toString() // force retype _id
       if (_.isNil(user.time.created_at) && !_.isNil(user.username)) { // this is accessing master (in points) and worker
-        if (cluster.isMaster) global.api.fetchAccountAge(user.username, user.id)
-        else if (process.send) process.send({ type: 'api', fnc: 'fetchAccountAge', username: user.username, id: user.id })
+        if (isMainThread) global.api.fetchAccountAge(user.username, user.id)
+        else global.workers.sendToMaster({ type: 'api', fnc: 'fetchAccountAge', username: user.username, id: user.id })
       }
     } catch (e) {
       global.log.error(e.stack)

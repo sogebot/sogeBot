@@ -4,7 +4,9 @@
 var _ = require('lodash')
 var moment = require('moment')
 require('moment-precise-range-plugin')
-const cluster = require('cluster')
+const {
+  isMainThread
+} = require('worker_threads');
 const axios = require('axios')
 
 // bot libraries
@@ -29,13 +31,8 @@ class Highlights extends System {
     }
     super({ settings })
 
-    if (cluster.isMaster) {
+    if (isMainThread) {
       global.panel.addMenu({ category: 'manage', name: 'highlights', id: 'highlights/list' })
-
-      cluster.on('message', (worker, message) => {
-        if (message.type !== 'highlight') return
-        this.main(message.opts)
-      })
     }
   }
 

@@ -1,7 +1,9 @@
 const _ = require('lodash')
 const flatten = require('flat')
 const fs = require('fs')
-const cluster = require('cluster')
+const {
+  isMainThread
+} = require('worker_threads');
 
 const Interface = require('./interface')
 const Datastore = require('nedb')
@@ -9,7 +11,7 @@ const Datastore = require('nedb')
 class INeDB extends Interface {
   constructor (forceIndexes) {
     super('nedb')
-    this.createIndexes = forceIndexes || cluster.isWorker // create indexes on worker (cpu is always 1)
+    this.createIndexes = forceIndexes || !isMainThread // create indexes on worker (cpu is always 1)
     this.connected = true
 
     if (!fs.existsSync('./db')) fs.mkdirSync('./db')

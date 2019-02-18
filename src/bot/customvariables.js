@@ -4,7 +4,9 @@ const _ = require('lodash')
 const crypto = require('crypto')
 const safeEval = require('safe-eval')
 const axios = require('axios')
-const cluster = require('cluster')
+const {
+  isMainThread
+} = require('worker_threads');
 const mathjs = require('mathjs')
 const XRegExp = require('xregexp')
 
@@ -14,7 +16,7 @@ class CustomVariables {
   constructor () {
     this.timeouts = {}
 
-    if (cluster.isMaster) {
+    if (isMainThread) {
       this.addMenuAndListenersToPanel()
       this.checkIfCacheOrRefresh()
       global.db.engine.index({ table: 'custom.variables.history', index: 'cvarId' })
@@ -287,16 +289,20 @@ class CustomVariables {
   }
 
   async updateWidgetAndTitle (variable) {
-    if (cluster.isWorker && process.send) process.send({ type: 'widget_custom_variables', emit: 'refresh' })
-    else if (!_.isNil(global.widgets.custom_variables.socket)) global.widgets.custom_variables.socket.emit('refresh') // send update to widget
+    if (!isMainThread) {
+      global.workers.sendToMaster({ type: 'widget_custom_variables', emit: 'refresh' })
+    } else if (!_.isNil(global.widgets.custom_variables.socket)) global.widgets.custom_variables.socket.emit('refresh') // send update to widget
 
     if (!_.isNil(variable)) {
       const regexp = new RegExp(`\\${variable}`, 'ig')
       let title = await global.cache.rawStatus()
 
       if (title.match(regexp)) {
-        if (cluster.isWorker && process.send) process.send({ type: 'call', ns: 'api', fnc: 'setTitleAndGame', args: [null] })
-        else global.api.setTitleAndGame(null)
+        if (!isMainThread) {
+          global.workers.sendToMaster({ type: 'call', ns: 'api', fnc: 'setTitleAndGame', args: [null] })
+        } else {
+          global.api.setTitleAndGame(null)
+        }
       }
     }
   }

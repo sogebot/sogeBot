@@ -7,7 +7,9 @@ const config = global.migration ? {
   database: {}
 } : require('@config')
 const flatten = require('flat')
-const cluster = require('cluster')
+const {
+  isMainThread
+} = require('worker_threads');
 
 const _ = require('lodash')
 
@@ -15,7 +17,7 @@ class IMongoDB extends Interface {
   constructor (forceIndexes, forceRemoveIndexes, forceDb) {
     super('mongodb')
 
-    this.createIndexes = (forceIndexes && cluster.isMaster)
+    this.createIndexes = (forceIndexes && isMainThread)
     this.forceRemoveIndexes = forceRemoveIndexes || false
 
     this.connected = false

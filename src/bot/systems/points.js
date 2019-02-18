@@ -2,6 +2,9 @@
 
 // 3rdparty libraries
 const _ = require('lodash')
+const {
+  isMainThread
+} = require('worker_threads');
 
 // bot libraries
 const constants = require('../constants')
@@ -38,7 +41,7 @@ class Points extends System {
     }
     super({ settings })
 
-    if (require('cluster').isMaster) {
+    if (isMainThread) {
       this.updatePoints()
     }
   }
@@ -201,7 +204,6 @@ class Points extends System {
         global.commons.sendMessage(message, opts.sender)
       }
     } catch (err) {
-      console.log(err)
       global.commons.sendMessage(global.translate('points.failed.give').replace('$command', opts.command), opts.sender)
     }
   }

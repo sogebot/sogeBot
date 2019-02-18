@@ -15,6 +15,7 @@ declare namespace NodeJS {
     systems: any,
     users: any,
     lib: any,
+    workers: Workers.main,
     customvariables: any,
     oauth: {
       settings: {

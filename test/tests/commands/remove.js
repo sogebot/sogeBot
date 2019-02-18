@@ -1,6 +1,4 @@
 /* global describe it beforeEach */
-if (require('cluster').isWorker) process.exit()
-
 require('../../general.js')
 
 const db = require('../../general.js').db

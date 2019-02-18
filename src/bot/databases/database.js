@@ -5,6 +5,9 @@ const config = global.migration ? {
 const INeDB = require('./nedb')
 const IMongoDB = require('./mongodb')
 const IMasterController = require('./master')
+const {
+  isMainThread
+} = require('worker_threads');
 
 class Database {
   constructor (forceIndexes, forceRemoveIndexes, forceType, forceDb) {
@@ -12,7 +15,7 @@ class Database {
 
     if (forceType) config.database.type = forceType
 
-    if (!forceType && !global.mocha && require('cluster').isMaster && (!forceIndexes && !forceRemoveIndexes) && config.database.type === 'nedb') this.engine = new IMasterController()
+    if (!forceType && !global.mocha && isMainThread && (!forceIndexes && !forceRemoveIndexes) && config.database.type === 'nedb') this.engine = new IMasterController()
     else if (config.database.type === 'nedb') this.engine = new INeDB(forceIndexes, forceDb)
     else if (config.database.type === 'mongodb') this.engine = new IMongoDB(forceIndexes, forceRemoveIndexes, forceDb)
     else {

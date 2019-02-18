@@ -5,7 +5,9 @@ const _ = require('lodash')
 const chalk = require('chalk')
 const SpotifyWebApi = require('spotify-web-api-node')
 const crypto = require('crypto')
-const cluster = require('cluster')
+const {
+  isMainThread
+} = require('worker_threads');
 const axios = require('axios')
 
 // bot libraries
@@ -122,7 +124,7 @@ class Spotify extends Integration {
 
     this.addWidget('spotify', 'widget-title-spotify', 'fab fa-spotify');
 
-    if (cluster.isMaster) {
+    if (isMainThread) {
       this.timeouts.IRefreshToken = setTimeout(() => this.IRefreshToken(), 60000)
       this.timeouts.ICurrentSong = setTimeout(() => this.ICurrentSong(), 10000)
       this.timeouts.getMe = setTimeout(() => this.getMe(), 10000)
@@ -422,9 +424,9 @@ class Spotify extends Integration {
 
   async main (opts: CommandOptions) {
     if (!(await global.cache.isOnline())) return // don't do anything on offline stream
-    if (!cluster.isMaster) {
+    if (!isMainThread) {
       // we have client connected on master -> send process to master
-      if (process.send) process.send({ type: 'call', ns: 'integrations.spotify', fnc: 'main', args: [opts] })
+      global.workers.sendToMaster({ type: 'call', ns: 'integrations.spotify', fnc: 'main', args: [opts] })
       return
     }
     if (!this.settings.songRequests) return

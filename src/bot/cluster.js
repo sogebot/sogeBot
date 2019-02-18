@@ -2,12 +2,6 @@
 
 const util = require('util')
 const _ = require('lodash')
-const Parser = require('./parser')
-
-var workerIsFree = {
-  message: true,
-  db: true
-}
 
 cluster()
 
@@ -31,6 +25,7 @@ function cluster () {
 
   global.oauth = new (require('./oauth.js'))()
   global.api = new (require('./api'))()
+  global.tmi = new (require('./tmi'))()
 
   global.lib.translate._load().then(function () {
     try {
@@ -42,107 +37,14 @@ function cluster () {
       console.error(e); global.log.error(e)
     }
 
-    process.on('message', async (data) => {
-      switch (data.type) {
-        case 'call':
-          const namespace = _.get(global, data.ns, null)
-          namespace[data.fnc].apply(namespace, data.args)
-          break
-        case 'lang':
-          await global.lib.translate._load()
-          break
-        case 'shutdown':
-          gracefullyExit()
-          break
-        case 'message':
-          workerIsFree.message = false
-          await message(data)
-          workerIsFree.message = true
-          break
-        case 'db':
-          workerIsFree.db = false
-          switch (data.fnc) {
-            case 'find':
-              data.items = await global.db.engine.find(data.table, data.where, data.lookup)
-              break
-            case 'findOne':
-              data.items = await global.db.engine.findOne(data.table, data.where, data.lookup)
-              break
-            case 'increment':
-              data.items = await global.db.engine.increment(data.table, data.where, data.object)
-              break
-            case 'incrementOne':
-              data.items = await global.db.engine.incrementOne(data.table, data.where, data.object)
-              break
-            case 'insert':
-              data.items = await global.db.engine.insert(data.table, data.object)
-              break
-            case 'remove':
-              data.items = await global.db.engine.remove(data.table, data.where)
-              break
-            case 'update':
-              data.items = await global.db.engine.update(data.table, data.where, data.object)
-              break
-            case 'index':
-              data.items = await global.db.engine.index(data.opts)
-              break
-            case 'count':
-              data.items = await global.db.engine.count(data.table, data.where, data.object)
-              break
-            default:
-              global.log.error('This db call is not correct')
-              global.log.error(data)
-          }
-          if (process.send) process.send(data)
-          workerIsFree.db = true
-      }
-    })
+    global.workers.setListeners()
 
     if (process.env.HEAP && process.env.HEAP.toLowerCase() === 'true') {
       setTimeout(() => require('./heapdump.js').init('heap/'), 120000)
     }
   })
 
-  async function message (data) {
-    let sender = data.sender
-    let message = data.message
-    let skip = data.skip
-    let quiet = data.quiet
 
-    const parse = new Parser({ sender: sender, message: message, skip: skip, quiet: quiet })
-
-    if (!skip && sender['message-type'] === 'whisper' && (!(await global.configuration.getValue('disableWhisperListener')) || global.commons.isOwner(sender))) {
-      global.log.whisperIn(message, { username: sender.username })
-    } else if (!skip && !await global.commons.isBot(sender.username)) {
-      global.log.chatIn(message, { username: sender.username })
-    }
-
-    const isModerated = await parse.isModerated()
-    const isIgnored = await global.commons.isIgnored(sender)
-    if (!isModerated && !isIgnored) {
-      if (!skip && !_.isNil(sender.username)) {
-        let user = await global.db.engine.findOne('users', { id: sender.userId })
-        let data = { id: sender.userId, is: { subscriber: (user.lock && user.lock.subscriber ? undefined : typeof sender.badges.subscriber !== 'undefined'), mod: typeof sender.badges.moderator !== 'undefined' }, username: sender.username }
-
-        // mark user as online
-        await global.db.engine.update('users.online', { username: sender.username }, { username: sender.username })
-
-        if (_.get(sender, 'badges.subscriber', 0)) _.set(data, 'stats.tier', 0) // unset tier if sender is not subscriber
-
-        // update user based on id not username
-        await global.db.engine.update('users', { id: String(sender.userId) }, data)
-
-        if (process.send) process.send({ type: 'api', fnc: 'isFollower', username: sender.username })
-
-        global.events.fire('keyword-send-x-times', { username: sender.username, message: message })
-        if (message.startsWith('!')) {
-          global.events.fire('command-send-x-times', { username: sender.username, message: message })
-        } else if (!message.startsWith('!')) global.db.engine.increment('users.messages', { id: sender.userId }, { messages: 1 })
-      }
-      await parse.process()
-    }
-    if (process.send) process.send({ type: 'stats', of: 'parser', value: parse.time(), message: message })
-  }
 }
 
 process.on('unhandledRejection', function (reason, p) {
@@ -160,9 +62,3 @@ process.on('uncaughtException', (error) => {
   global.log.error('+------------------------------------------------------------------------------+')
   process.exit(1)
 })
-
-function gracefullyExit () {
-  if (_.every(workerIsFree)) {
-    process.exit()
-  } else setTimeout(() => gracefullyExit(), 10)
-}

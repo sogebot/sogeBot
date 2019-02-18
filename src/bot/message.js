@@ -4,7 +4,6 @@ const safeEval = require('safe-eval')
 const decode = require('decode-html')
 const querystring = require('querystring')
 const _ = require('lodash')
-const cluster = require('cluster')
 const crypto = require('crypto')
 const constants = require('./constants')
 const gitCommitInfo = require('git-commit-info');
@@ -229,8 +228,7 @@ class Message {
           .replace(/\(|\)/g, '')
           .replace(/\$sender/g, (global.configuration.getValue('atUsername') ? '@' : '') + attr.sender)
           .replace(/\$param/g, attr.param)
-        if (cluster.isMaster) _.sample(cluster.workers).send({ type: 'message', sender: { username: attr.sender }, message: cmd, skip: true, quiet: true }) // resend to random worker
-        else if (process.send) process.send({ type: 'parse', sender: { username: attr.sender }, message: cmd, skip: true, quiet: true })
+        global.workers.send({ type: 'message', sender: { username: attr.sender }, message: cmd, skip: true, quiet: true })
         return ''
       },
       '(!#)': async function (filter) {
@@ -239,8 +237,7 @@ class Message {
           .replace(/\(|\)/g, '')
           .replace(/\$sender/g, (global.configuration.getValue('atUsername') ? '@' : '') + attr.sender)
           .replace(/\$param/g, attr.param)
-        if (cluster.isMaster) _.sample(cluster.workers).send({ type: 'message', sender: { username: attr.sender }, message: cmd, skip: true, quiet: false }) // resend to random worker
-        else if (process.send) process.send({ type: 'parse', sender: { username: attr.sender }, message: cmd, skip: true, quiet: false })
+        global.workers.send({ type: 'message', sender: { username: attr.sender }, message: cmd, skip: true, quiet: false }) // resend to random worker
         return ''
       }
     }

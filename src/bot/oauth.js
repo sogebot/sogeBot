@@ -3,7 +3,9 @@
 'use strict'
 
 const axios = require('axios')
-const cluster = require('cluster')
+const {
+  isMainThread
+} = require('worker_threads');
 
 import Core from './_interface'
 const constants = require('./constants')
@@ -130,23 +132,23 @@ class OAuth extends Core {
   }
 
   async getChannelId () {
+    if (!isMainThread || global.mocha) return
     if (typeof global.api === 'undefined' || typeof global.tmi === 'undefined') return setTimeout(() => this.getChannelId(), 1000)
-    if (cluster.isWorker || global.mocha) return
     clearTimeout(this.timeouts['getChannelId'])
 
     let timeout = 1000
-    const channel = await this.settings.general.channel
-    if (this.currentChannel !== channel && channel !== '') {
-      this.currentChannel = channel
-      const cid = await global.api.getIdFromTwitch(channel, true)
+    if (this.currentChannel !== this.settings.general.channel && this.settings.general.channel !== '') {
+      this.currentChannel = this.settings.general.channel
+      const cid = await global.api.getIdFromTwitch(this.settings.general.channel, true)
       if (typeof cid !== 'undefined' && cid !== null) {
         this.channelId = cid
         global.log.info('Channel ID set to ' + cid)
         global.tmi.reconnect('bot')
         global.tmi.reconnect('broadcaster')
       } else {
-        global.log.error(`Cannot get channel ID of ${channel} - waiting ${Number(global.api.calls.bot.refresh - (Date.now() / 1000)).toFixed(2)}s`)
-        timeout = (global.api.calls.bot.refresh - (Date.now() / 1000)) * 1000
+        const toWait = Math.max(Number(global.api.calls.bot.refresh - (Date.now() / 1000)), 30);
+        global.log.error(`Cannot get channel ID of ${this.settings.general.channel} - waiting ${toWait.toFixed()}s`)
+        timeout = toWait * 1000
       }
     }
 
@@ -188,7 +190,7 @@ class OAuth extends Core {
       }
     */
   async validateOAuth (type: string) {
-    if (cluster.isWorker || global.mocha) return
+    if (!isMainThread || global.mocha) return
     clearTimeout(this.timeouts[`validateOAuth-${type}`])
 
     const url = 'https://id.twitch.tv/oauth2/validate'
@@ -244,7 +246,7 @@ class OAuth extends Core {
       }
     */
   async refreshAccessToken (type: string) {
-    if (cluster.isWorker) return
+    if (!isMainThread) return
     global.log.warning('Refreshing access token of ' + type)
     const url = 'https://twitchtokengenerator.com/api/refresh/'
     try {

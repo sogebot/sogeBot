@@ -2,7 +2,9 @@
 
 // 3rdparty libraries
 const _ = require('lodash')
-const cluster = require('cluster')
+const {
+  isMainThread
+} = require('worker_threads');
 
 // bot libraries
 import Game from './_interface'
@@ -37,7 +39,7 @@ class Duel extends Game {
 
     super({ settings, dependsOn })
 
-    if (cluster.isMaster) this.pickDuelWinner()
+    if (isMainThread) this.pickDuelWinner()
   }
 
   async pickDuelWinner () {

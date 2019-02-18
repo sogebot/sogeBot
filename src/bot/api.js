@@ -2,7 +2,9 @@ const _ = require('lodash')
 const axios = require('axios')
 const querystring = require('querystring')
 const moment = require('moment')
-const cluster = require('cluster')
+const {
+  isMainThread
+} = require('worker_threads');
 const stacktrace = require('stacktrace-parser')
 const fs = require('fs')
 const chalk = require('chalk')
@@ -20,7 +22,7 @@ class API {
   }
 
   constructor () {
-    if (cluster.isMaster) {
+    if (isMainThread) {
       global.panel.addMenu({ category: 'logs', name: 'api', id: 'apistats' })
 
       this.calls = {
@@ -158,7 +160,7 @@ class API {
   }
 
   async intervalFollowerUpdate () {
-    if (cluster.isWorker) throw new Error('API can run only on master')
+    if (!isMainThread) throw new Error('API can run only on master')
 
     for (let username of this.rate_limit_follower_check) {
       const user = await global.users.getByName(username)
@@ -221,13 +223,13 @@ class API {
       this.calls.bot.remaining = request.headers['ratelimit-remaining']
       // $FlowFixMe error with flow on request.headers
       this.calls.bot.refresh = request.headers['ratelimit-reset']
-      global.commons.processAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', request.headers['ratelimit-limit'], request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] })
+      global.workers.sendToAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', request.headers['ratelimit-limit'], request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] })
 
       if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'getUsernameFromTwitch', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining })
       return request.data.data[0].login
     } catch (e) {
       if (typeof e.response !== 'undefined' && e.response.status === 429) {
-        global.commons.processAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', 120, 0, e.response.headers['ratelimit-reset'] ] })
+        global.workers.sendToAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', 120, 0, e.response.headers['ratelimit-reset'] ] })
         this.calls.bot.remaining = 0
         this.calls.bot.refresh = e.response.headers['ratelimit-reset']
       }
@@ -256,7 +258,7 @@ class API {
       }
     */
 
-    const token = await global.oauth.settings.bot.accessToken
+    const token = global.oauth.settings.bot.accessToken
     const needToWait = token === ''
     const notEnoughAPICalls = global.api.calls.bot.remaining <= 30 && global.api.calls.bot.refresh > _.now() / 1000
     if ((needToWait || notEnoughAPICalls) && !isChannelId) {
@@ -277,14 +279,14 @@ class API {
       this.calls.bot.remaining = request.headers['ratelimit-remaining']
       // $FlowFixMe error with flow on request.headers
       this.calls.bot.refresh = request.headers['ratelimit-reset']
-      global.commons.processAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', request.headers['ratelimit-limit'], request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] })
+      global.workers.sendToAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', request.headers['ratelimit-limit'], request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] })
 
       if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'getIdFromTwitch', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining })
 
       return request.data.data[0].id
     } catch (e) {
       if (typeof e.response !== 'undefined' && e.response.status === 429) {
-        global.commons.processAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', 120, 0, e.response.headers['ratelimit-reset'] ] })
+        global.workers.sendToAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', 120, 0, e.response.headers['ratelimit-reset'] ] })
         this.calls.bot.remaining = 0
         this.calls.bot.refresh = e.response.headers['ratelimit-reset']
       }
@@ -294,7 +296,7 @@ class API {
   }
 
   async getChannelChattersUnofficialAPI (opts) {
-    if (cluster.isWorker) throw new Error('API can run only on master')
+    if (!isMainThread) throw new Error('API can run only on master')
 
     const sendJoinEvent = async function (bulk) {
       for (let user of bulk) {
@@ -374,7 +376,7 @@ class API {
   }
 
   async getChannelSubscribers () {
-    if (cluster.isWorker) throw new Error('API can run only on master')
+    if (!isMainThread) throw new Error('API can run only on master')
 
     const cid = global.oauth.channelId
     const url = `https://api.twitch.tv/helix/subscriptions?broadcaster_id=${cid}`
@@ -404,7 +406,7 @@ class API {
       this.calls.bot.remaining = request.headers['ratelimit-remaining']
       this.calls.bot.refresh = request.headers['ratelimit-reset']
       this.calls.bot.limit = request.headers['ratelimit-limit']
-      global.commons.processAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', request.headers['ratelimit-limit'], request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] })
+      global.workers.sendToAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', request.headers['ratelimit-limit'], request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] })
 
       await global.db.engine.update('api.current', { key: 'subscribers' }, { value: subscribers.length - 1 })
       this.setSubscribers(subscribers.filter(o => {
@@ -494,7 +496,7 @@ class API {
   }
 
   async getChannelDataOldAPI (opts) {
-    if (cluster.isWorker) throw new Error('API can run only on master')
+    if (!isMainThread) throw new Error('API can run only on master')
 
     const cid = global.oauth.channelId
     const url = `https://api.twitch.tv/kraken/channels/${cid}`
@@ -550,7 +552,7 @@ class API {
   }
 
   async getChannelHosts () {
-    if (cluster.isWorker) throw new Error('API can run only on master')
+    if (!isMainThread) throw new Error('API can run only on master')
 
     const cid = global.oauth.channelId
 
@@ -602,12 +604,12 @@ class API {
       this.calls.bot.remaining = request.headers['ratelimit-remaining']
       this.calls.bot.refresh = request.headers['ratelimit-reset']
       this.calls.bot.limit = request.headers['ratelimit-limit']
-      global.commons.processAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', request.headers['ratelimit-limit'], request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] })
+      global.workers.sendToAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', request.headers['ratelimit-limit'], request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] })
 
       if (request.data.data.length > 0) await global.db.engine.update('api.current', { key: 'views' }, { value: request.data.data[0].view_count })
     } catch (e) {
       if (typeof e.response !== 'undefined' && e.response.status === 429) {
-        global.commons.processAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', 120, 0, e.response.headers['ratelimit-reset'] ] })
+        global.workers.sendToAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', 120, 0, e.response.headers['ratelimit-reset'] ] })
         this.calls.bot.remaining = 0
         this.calls.bot.refresh = e.response.headers['ratelimit-reset']
       }
@@ -641,7 +643,7 @@ class API {
       this.calls.bot.remaining = request.headers['ratelimit-remaining']
       this.calls.bot.refresh = request.headers['ratelimit-reset']
       this.calls.bot.limit = request.headers['ratelimit-limit']
-      global.commons.processAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', request.headers['ratelimit-limit'], request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] })
+      global.workers.sendToAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', request.headers['ratelimit-limit'], request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] })
 
       if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'getLatest100Followers', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining })
 
@@ -701,7 +703,7 @@ class API {
       quiet = false
     } catch (e) {
       if (typeof e.response !== 'undefined' && e.response.status === 429) {
-        global.commons.processAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', 120, 0, e.response.headers['ratelimit-reset'] ] })
+        global.workers.sendToAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', 120, 0, e.response.headers['ratelimit-reset'] ] })
         this.calls.bot.remaining = 0
         this.calls.bot.refresh = e.response.headers['ratelimit-reset']
       }
@@ -738,9 +740,9 @@ class API {
       this.calls.bot.remaining = request.headers['ratelimit-remaining']
       this.calls.bot.refresh = request.headers['ratelimit-reset']
       this.calls.bot.limit = request.headers['ratelimit-limit']
-      global.commons.processAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', request.headers['ratelimit-limit'], request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] })
+      global.workers.sendToAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', request.headers['ratelimit-limit'], request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] })
 
-      if (cluster.isMaster) if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'getGameFromId', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining })
+      if (isMainThread) if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'getGameFromId', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining })
 
       // add id->game to cache
       const name = request.data.data[0].name
@@ -748,7 +750,7 @@ class API {
       return name
     } catch (e) {
       if (typeof e.response !== 'undefined' && e.response.status === 429) {
-        global.commons.processAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', 120, 0, e.response.headers['ratelimit-reset'] ] })
+        global.workers.sendToAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', 120, 0, e.response.headers['ratelimit-reset'] ] })
         this.calls.bot.remaining = 0
         this.calls.bot.refresh = e.response.headers['ratelimit-reset']
       }
@@ -756,13 +758,13 @@ class API {
       const game = await global.db.engine.findOne('api.current', { key: 'game' })
       global.log.warning(`Couldn't find name of game for gid ${id} - fallback to ${game.value}`)
       global.log.error(`API: ${url} - ${e.stack}`)
-      if (cluster.isMaster) if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getGameFromId', api: 'helix', endpoint: url, code: e.stack, remaining: this.calls.bot.remaining })
+      if (isMainThread) if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getGameFromId', api: 'helix', endpoint: url, code: e.stack, remaining: this.calls.bot.remaining })
       return game.value
     }
   }
 
   async getCurrentStreamData (opts) {
-    if (cluster.isWorker) throw new Error('API can run only on master')
+    if (!isMainThread) throw new Error('API can run only on master')
 
     const cid = global.oauth.channelId
     const url = `https://api.twitch.tv/helix/streams?user_id=${cid}`
@@ -786,7 +788,7 @@ class API {
       this.calls.bot.remaining = request.headers['ratelimit-remaining']
       this.calls.bot.refresh = request.headers['ratelimit-reset']
       this.calls.bot.limit = request.headers['ratelimit-limit']
-      global.commons.processAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', request.headers['ratelimit-limit'], request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] })
+      global.workers.sendToAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', request.headers['ratelimit-limit'], request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] })
 
       if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'getCurrentStreamData', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining })
 
@@ -924,7 +926,7 @@ class API {
       }
     } catch (e) {
       if (typeof e.response !== 'undefined' && e.response.status === 429) {
-        global.commons.processAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', 120, 0, e.response.headers['ratelimit-reset'] ] })
+        global.workers.sendToAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', 120, 0, e.response.headers['ratelimit-reset'] ] })
         this.calls.bot.remaining = 0
         this.calls.bot.refresh = e.response.headers['ratelimit-reset']
       }
@@ -937,7 +939,7 @@ class API {
   }
 
   async saveStreamData (stream) {
-    if (cluster.isWorker) throw new Error('API can run only on master')
+    if (!isMainThread) throw new Error('API can run only on master')
     await global.db.engine.update('api.current', { key: 'viewers' }, { value: stream.viewer_count })
 
     let maxViewers = await global.db.engine.findOne('api.max', { key: 'viewers' })
@@ -989,7 +991,7 @@ class API {
   }
 
   async setTitleAndGame (sender, args) {
-    if (cluster.isWorker) throw new Error('API can run only on master')
+    if (!isMainThread) throw new Error('API can run only on master')
 
     args = _.defaults(args, { title: null }, { game: null })
     const cid = global.oauth.channelId
@@ -1070,7 +1072,7 @@ class API {
   }
 
   async sendGameFromTwitch (self, socket, game) {
-    if (cluster.isWorker) throw new Error('API can run only on master')
+    if (!isMainThread) throw new Error('API can run only on master')
     const url = `https://api.twitch.tv/kraken/search/games?query=${encodeURIComponent(game)}&type=suggest`
 
     const token = await global.oauth.settings.bot.accessToken
@@ -1101,7 +1103,7 @@ class API {
   }
 
   async checkClips () {
-    if (cluster.isWorker) throw new Error('API can run only on master')
+    if (!isMainThread) throw new Error('API can run only on master')
 
     const token = global.oauth.settings.bot.accessToken
     if (token === '') {
@@ -1138,7 +1140,7 @@ class API {
       this.calls.bot.remaining = request.headers['ratelimit-remaining']
       this.calls.bot.refresh = request.headers['ratelimit-reset']
       this.calls.bot.limit = request.headers['ratelimit-limit']
-      global.commons.processAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', request.headers['ratelimit-limit'], request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] })
+      global.workers.sendToAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', request.headers['ratelimit-limit'], request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] })
 
       if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'checkClips', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining })
 
@@ -1148,7 +1150,7 @@ class API {
       }
     } catch (e) {
       if (typeof e.response !== 'undefined' && e.response.status === 429) {
-        global.commons.processAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', 120, 0, e.response.headers['ratelimit-reset'] ] })
+        global.workers.sendToAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', 120, 0, e.response.headers['ratelimit-reset'] ] })
         this.calls.bot.remaining = 0
         this.calls.bot.refresh = e.response.headers['ratelimit-reset']
       }
@@ -1160,7 +1162,7 @@ class API {
   }
 
   async createClip (opts) {
-    if (cluster.isWorker) throw new Error('API can run only on master')
+    if (!isMainThread) throw new Error('API can run only on master')
 
     if (!(await global.cache.isOnline())) return // do nothing if stream is offline
 
@@ -1204,12 +1206,12 @@ class API {
       this.calls.bot.remaining = request.headers['ratelimit-remaining']
       this.calls.bot.refresh = request.headers['ratelimit-reset']
       this.calls.bot.limit = request.headers['ratelimit-limit']
-      global.commons.processAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', request.headers['ratelimit-limit'], request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] })
+      global.workers.sendToAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', request.headers['ratelimit-limit'], request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] })
 
       if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'createClip', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining })
     } catch (e) {
       if (typeof e.response !== 'undefined' && e.response.status === 429) {
-        global.commons.processAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', 120, 0, e.response.headers['ratelimit-reset'] ] })
+        global.workers.sendToAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', 120, 0, e.response.headers['ratelimit-reset'] ] })
         this.calls.bot.remaining = 0
         this.calls.bot.refresh = e.response.headers['ratelimit-reset']
       }
@@ -1225,7 +1227,7 @@ class API {
   }
 
   async fetchAccountAge (username, id) {
-    if (cluster.isWorker) throw new Error('API can run only on master')
+    if (!isMainThread) throw new Error('API can run only on master')
     const url = `https://api.twitch.tv/kraken/users/${id}`
 
     const token = await global.oauth.settings.bot.accessToken
@@ -1264,7 +1266,7 @@ class API {
   }
 
   async isFollowerUpdate (user) {
-    if (cluster.isWorker) throw new Error('API can run only on master')
+    if (!isMainThread) throw new Error('API can run only on master')
     if (!user.id) return
     clearTimeout(this.timeouts['isFollowerUpdate-' + user.id])
 
@@ -1291,12 +1293,12 @@ class API {
       this.calls.bot.remaining = request.headers['ratelimit-remaining']
       this.calls.bot.refresh = request.headers['ratelimit-reset']
       this.calls.bot.limit = request.headers['ratelimit-limit']
-      global.commons.processAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', request.headers['ratelimit-limit'], request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] })
+      global.workers.sendToAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', request.headers['ratelimit-limit'], request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] })
 
       if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'isFollowerUpdate', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining })
     } catch (e) {
       if (typeof e.response !== 'undefined' && e.response.status === 429) {
-        global.commons.processAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', 120, 0, e.response.headers['ratelimit-reset'] ] })
+        global.workers.sendToAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', 120, 0, e.response.headers['ratelimit-reset'] ] })
         this.calls.bot.remaining = 0
         this.calls.bot.refresh = e.response.headers['ratelimit-reset']
       }
@@ -1377,7 +1379,7 @@ class API {
       this.calls.bot.remaining = request.headers['ratelimit-remaining']
       this.calls.bot.refresh = request.headers['ratelimit-reset']
       this.calls.bot.limit = request.headers['ratelimit-limit']
-      global.commons.processAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', request.headers['ratelimit-limit'], request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] })
+      global.workers.sendToAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', request.headers['ratelimit-limit'], request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] })
 
       if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'createMarker', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining, data: request.data })
     } catch (e) {
@@ -1444,7 +1446,7 @@ class API {
       this.calls.bot.remaining = request.headers['ratelimit-remaining']
       this.calls.bot.refresh = request.headers['ratelimit-reset']
       this.calls.bot.limit = request.headers['ratelimit-limit']
-      global.commons.processAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', request.headers['ratelimit-limit'], request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] })
+      global.workers.sendToAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', request.headers['ratelimit-limit'], request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] })
 
       global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'getClipById', api: 'kraken', endpoint: url, code: request.status, remaining: this.remainingAPICalls })
       // get mp4 from thumbnail

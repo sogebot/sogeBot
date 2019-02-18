@@ -5,7 +5,9 @@
 // 3rdparty libraries
 const _ = require('lodash')
 const constants = require('../constants.js')
-const cluster = require('cluster')
+const {
+  isMainThread
+} = require('worker_threads');
 const Message = require('../message')
 
 import Overlay from './_interface'
@@ -35,8 +37,8 @@ class Alerts extends Overlay {
   }
 
   async overlay (opts: CommandOptions) {
-    if (cluster.isWorker) {
-      if (process.send) process.send({ type: 'call', ns: 'overlays.alerts', fnc: 'overlay', args: [opts] })
+    if (!isMainThread) {
+      global.workers.sendToMaster({ type: 'call', ns: 'overlays.alerts', fnc: 'overlay', args: [opts] })
       return
     }
     opts.parameters = await new Message(opts.parameters).parse()

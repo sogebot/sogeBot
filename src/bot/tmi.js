@@ -1,9 +1,12 @@
 'use strict'
 
 const moment = require('moment')
-const cluster = require('cluster')
+const {
+  isMainThread
+} = require('worker_threads');
 const _ = require('lodash')
 const TwitchJs = require('twitch-js').default
+const Parser = require('./parser')
 
 import Core from './_interface'
 const constants = require('./constants')
@@ -23,7 +26,7 @@ class TMI extends Core {
   constructor () {
     super()
 
-    if (cluster.isMaster) {
+    if (isMainThread) {
       global.status.TMI = constants.DISCONNECTED
     }
   }
@@ -121,7 +124,7 @@ class TMI extends Core {
 
         if (!await global.commons.isBot(message.tags.username) || !message.isSelf) {
           message.tags['message-type'] = 'whisper'
-          this.sendMessageToWorker(message.tags, message.message)
+          global.workers.sendToWorker({ type: 'message', sender: message.tags, message: message.message })
           global.linesParsed++
         }
       })
@@ -138,7 +141,7 @@ class TMI extends Core {
             // strip message from ACTION
             message.message = message.message.replace('\u0001ACTION ', '').replace('\u0001', '')
 
-            this.sendMessageToWorker(message.tags, message.message)
+            global.workers.sendToWorker({ type: 'message', sender: message.tags, message: message.message })
             global.linesParsed++
 
             // go through all systems and trigger on.message
@@ -255,19 +258,6 @@ class TMI extends Core {
     } else {
       throw Error(`This ${type} is not supported`)
     }
-  }
-
-  sendMessageToWorker (sender: Object, message: string) {
-    clearTimeout(this.timeouts['sendMessageToWorker'])
-    let worker = _.sample(cluster.workers)
-
-    if (worker.id === this.lastWorker && global.cpu > 1) {
-      this.timeouts['sendMessageToWorker'] = setTimeout(() => this.sendMessageToWorker(sender, message), 100)
-      return
-    } else this.lastWorker = worker.id
-
-    if (worker.isConnected()) worker.send({ type: 'message', sender: sender, message: message })
-    else this.timeouts['sendMessageToWorker'] = setTimeout(() => this.sendMessageToWorker(sender, message), 100)
   }
 
   async subscription (message: Object) {
@@ -510,6 +500,56 @@ class TMI extends Core {
       plan: message.parameters.subPlan === 'Prime' ? 1000 : message.parameters.subPlan,
       prime: message.parameters.subPlan === 'Prime' ? 'Prime' : false
     }
+  }
+
+  async message (data) {
+    let sender = data.sender
+    let message = data.message
+    let skip = data.skip
+    let quiet = data.quiet
+
+    if (!sender.userId && sender.username) {
+      // this can happen if we are sending commands from dashboards etc.
+      sender.userId = await global.users.getIdByName(sender.username);
+    }
+
+    if (typeof sender.badges === 'undefined') {
+      sender.badges = {}
+    }
+
+    const parse = new Parser({ sender: sender, message: message, skip: skip, quiet: quiet })
+
+    if (!skip && sender['message-type'] === 'whisper' && (!(await global.configuration.getValue('disableWhisperListener')) || global.commons.isOwner(sender))) {
+      global.log.whisperIn(message, { username: sender.username })
+    } else if (!skip && !await global.commons.isBot(sender.username)) {
+      global.log.chatIn(message, { username: sender.username })
+    }
+
+    const isModerated = await parse.isModerated()
+    const isIgnored = await global.commons.isIgnored(sender)
+    if (!isModerated && !isIgnored) {
+      if (!skip && !_.isNil(sender.username)) {
+        let user = await global.db.engine.findOne('users', { id: sender.userId })
+        let data = { id: sender.userId, is: { subscriber: (user.lock && user.lock.subscriber ? undefined : typeof sender.badges.subscriber !== 'undefined'), mod: typeof sender.badges.moderator !== 'undefined' }, username: sender.username }
+
+        // mark user as online
+        await global.db.engine.update('users.online', { username: sender.username }, { username: sender.username })
+
+        if (_.get(sender, 'badges.subscriber', 0)) _.set(data, 'stats.tier', 0) // unset tier if sender is not subscriber
+
+        // update user based on id not username
+        await global.db.engine.update('users', { id: String(sender.userId) }, data)
+
+        global.workers.sendToMaster({ type: 'api', fnc: 'isFollower', username: sender.username })
+
+        global.events.fire('keyword-send-x-times', { username: sender.username, message: message })
+        if (message.startsWith('!')) {
+          global.events.fire('command-send-x-times', { username: sender.username, message: message })
+        } else if (!message.startsWith('!')) global.db.engine.increment('users.messages', { id: sender.userId }, { messages: 1 })
+      }
+      await parse.process()
+    }
+    global.workers.sendToMaster({ type: 'stats', of: 'parser', value: parse.time(), message: message })
   }
 }
 

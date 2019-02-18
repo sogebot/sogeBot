@@ -2,13 +2,13 @@
 * [Install and upgrade](_master/install-and-upgrade.md)
 * [FAQ](_master/faq.md)
 * Configuration
-  * [Timezone](_master/configuration/timezone.md)
-  * [CPU](_master/configuration/cpu.md)
-  * [Panel](_master/configuration/panel.md)
-  * [Database](_master/configuration/database.md)
   * [Color](_master/configuration/color.md)
-  * [Metrics](_master/configuration/metrics.md)
+  * [Database](_master/configuration/database.md)
   * [Environment variables](_master/configuration/env.md)
+  * [Metrics](_master/configuration/metrics.md)
+  * [Threads](_master/configuration/threads.md)
+  * [Panel](_master/configuration/panel.md)
+  * [Timezone](_master/configuration/timezone.md)
 * Systems
   * [Alias](_master/commands/alias.md)
   * [Commercial](_master/commands/commercial.md)

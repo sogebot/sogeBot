@@ -1,5 +1,9 @@
 /* global describe it beforeEach */
-if (require('cluster').isWorker) process.exit()
+const {
+  isMainThread
+} = require('worker_threads');
+if (!isMainThread) process.exit()
+
 
 const assert = require('chai').assert
 const _ = require('lodash')

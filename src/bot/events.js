@@ -5,7 +5,9 @@ const crypto = require('crypto')
 const safeEval = require('safe-eval')
 const flatten = require('flat')
 const moment = require('moment')
-const cluster = require('cluster')
+const {
+  isMainThread
+} = require('worker_threads');
 const axios = require('axios')
 
 const Message = require('./message')
@@ -14,7 +16,7 @@ class Events {
   constructor () {
     this.timeouts = {}
 
-    if (cluster.isWorker) return // dont do anything on worker
+    if (!isMainThread) return // dont do anything on worker
 
     this.supportedEventsList = [
       { id: 'user-joined-channel', variables: [ 'username', 'userObject' ] },
@@ -64,11 +66,6 @@ class Events {
 
     this.panel()
     this.fadeOut()
-
-    cluster.on('message', (worker, data) => {
-      if (data !== 'event') return // throw away another events
-      this.fire(data.eventId, data.attributes)
-    })
   }
 
   async panel () {
@@ -113,9 +110,8 @@ class Events {
   async fire (eventId, attributes) {
     attributes = _.clone(attributes) || {}
 
-    if (cluster.isWorker) { // emit process to master
-      if (process.send) process.send({ type: 'event', eventId: eventId, attributes: attributes })
-      return
+    if (!isMainThread) { // emit process to master
+      return global.workers.sendToMaster({ type: 'call', ns: 'events', fnc: 'fire', args: [eventId, attributes] })
     }
 
     if (!_.isNil(_.get(attributes, 'username', null))) attributes.userObject = await global.users.getByName(attributes.username)
@@ -244,7 +240,7 @@ class Events {
       })
       await parse.process()
     } else {
-      _.sample(cluster.workers).send({ type: 'message', sender: (_.get(operation, 'isCommandQuiet', false) ? {} : { username: global.commons.getOwner() }), message: command, skip: true })
+      global.workers.sendToWorker({ type: 'message', sender: (_.get(operation, 'isCommandQuiet', false) ? {} : { username: global.commons.getOwner() }), message: command, skip: true })
     }
   }
 

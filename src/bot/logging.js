@@ -9,7 +9,9 @@ var _ = require('lodash')
 var logDir = './logs'
 var moment = require('moment-timezone')
 const glob = require('glob')
-const cluster = require('cluster')
+const {
+  isMainThread,
+} = require('worker_threads');
 const config = require('@config')
 const chalk = require('chalk')
 
@@ -45,11 +47,11 @@ const levels = {
   process: 99999
 }
 
-if (cluster.isWorker) {
+if (!isMainThread) {
   global.log = {}
   for (let level of Object.entries(levels)) {
     global.log[level[0]] = function (message, params) {
-      if (process.send) process.send({ type: 'log', level: level[0], message: message, params: params })
+      global.workers.sendToMaster({ type: 'log', level: level[0], message: message, params: params })
     }
   }
 } else {
