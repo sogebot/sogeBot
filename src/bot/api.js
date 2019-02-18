@@ -457,7 +457,7 @@ class API {
     for (let username of mods) {
       if (global.commons.isBot(username)) { global.status.MOD = true; }
       else {
-        const id = await global.users.getIdByName(data.username.toLowerCase(), true)
+        const id = await global.users.getIdByName(username.toLowerCase(), true)
         await global.db.engine.update('users', { id }, { is: { moderator: true }, username })
       }
     }
