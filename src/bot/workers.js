@@ -76,12 +76,7 @@ class Workers {
     if (!isMainThread) {
       throw Error('Cannot send to worker from worker!');
     } else {
-      if (this.list.length === 0) {
-        // if there is no worker, process
-        this.process(opts)
-      } else {
-        _.sample(this.list).postMessage(opts);
-      }
+      _.sample(this.list).postMessage(opts);
     }
   }
 
