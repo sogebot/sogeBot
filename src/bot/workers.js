@@ -17,8 +17,12 @@ class Workers {
   newWorker() {
     if (!isMainThread) {
       // although its possible to create thread in thread we don't want to
-      global.log.error('Cannot create new worker in thread');
+      return global.log.error('Cannot create new worker in thread');
     }
+    if (global.mocha) {
+      return global.log.error('Testing, not creating any workers');
+    }
+
     const worker = new Worker(this.path)
     this.setListeners(worker)
     worker.on('exit', () => {
@@ -76,7 +80,11 @@ class Workers {
     if (!isMainThread) {
       throw Error('Cannot send to worker from worker!');
     } else {
-      _.sample(this.list).postMessage(opts);
+      if (this.list.length === 0) {
+        this.process(opts);
+      } else {
+        _.sample(this.list).postMessage(opts);
+      }
     }
   }
 
