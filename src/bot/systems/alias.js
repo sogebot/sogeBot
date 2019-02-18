@@ -92,6 +92,7 @@ class Alias extends System {
         const message = await new Message(opts.message.replace(replace, `${alias.command}`)).parse({
           sender: opts.sender
         });
+        global.log.process({ type: 'parse', sender: opts.sender, message })
         global.workers.send({ type: 'message', sender: opts.sender, message })
       }
     }
