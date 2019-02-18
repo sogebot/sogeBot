@@ -1,10 +1,4 @@
 /* global describe it beforeEach */
-const {
-  isMainThread
-} = require('worker_threads');
-if (!isMainThread) process.exit()
-
-
 require('../../general.js')
 
 const assert = require('chai').assert
