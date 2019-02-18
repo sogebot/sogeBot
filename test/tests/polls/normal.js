@@ -16,7 +16,7 @@ const owner = { username: 'soge__' }
 describe('Polls - normal', () => {
   before(async () => {
     await db.cleanup()
-    await time.waitMs(200)
+    await time.waitMs(1000)
       await message.prepare()
   })
 
@@ -52,7 +52,7 @@ describe('Polls - normal', () => {
       vid = String(cVote._id)
     })
     it(`!vote should return correct vote status`, async () => {
-      await time.waitMs(200)
+      await time.waitMs(1000)
       await message.prepare()
 
       await global.systems.polls.main({ sender: owner, parameters: ''  })
@@ -101,7 +101,7 @@ describe('Polls - normal', () => {
     })
 
     it(`!vote should return correct vote status`, async () => {
-      await time.waitMs(200)
+      await time.waitMs(1000)
       await message.prepare()
 
       await global.systems.polls.main({ sender: owner, parameters: ''  })
@@ -112,7 +112,7 @@ describe('Polls - normal', () => {
     })
 
     it('Close voting', async () => {
-      await time.waitMs(200)
+      await time.waitMs(1000)
       await message.prepare()
 
       assert.isTrue(await global.systems.polls.close({ sender: owner }))
@@ -123,7 +123,7 @@ describe('Polls - normal', () => {
     })
 
     it(`!vote should return not in progress info`, async () => {
-      await time.waitMs(200)
+      await time.waitMs(1000)
       await message.prepare()
 
       await global.systems.polls.main({ sender: owner, parameters: ''  })
@@ -131,7 +131,7 @@ describe('Polls - normal', () => {
     })
 
     it(`!vote 1 should return not in progress info`, async () => {
-      await time.waitMs(200)
+      await time.waitMs(1000)
       await message.prepare()
 
       const user = Math.random()

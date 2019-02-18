@@ -4,6 +4,8 @@ const variable = require('./variable')
 
 const startup = _.now()
 
+const __DEBUG__ = (process.env.DEBUG && process.env.DEBUG.includes('test'))
+
 module.exports = {
   cleanup: async function () {
     let waitForIt = async (resolve, reject) => {
@@ -11,7 +13,9 @@ module.exports = {
         return setTimeout(() => waitForIt(resolve, reject), 10)
       }
 
-      console.log(chalk.bgRed('*** Cleaning up collections ***'))
+      if (__DEBUG__) {
+        console.log(chalk.bgRed('*** Cleaning up collections ***'))
+      }
 
       await global.db.engine.remove('systems.alias', {})
       await global.db.engine.remove('systems.keywords', {})

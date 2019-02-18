@@ -3,13 +3,17 @@ const until = require('test-until')
 const chalk = require('chalk')
 const sinon = require('sinon')
 const _ = require('lodash')
-const util = require('util')
 
 var eventSpy
 
+const __DEBUG__ = (process.env.DEBUG && process.env.DEBUG.includes('test'))
+
 module.exports = {
   prepare: function () {
-    console.log(chalk.bgRed('*** Restoring all spies ***'))
+    if (__DEBUG__) {
+      console.log(chalk.bgRed('*** Restoring all spies ***'))
+    }
+
     if (eventSpy) eventSpy.restore()
     eventSpy = sinon.spy(global.events, 'fire')
 
@@ -132,8 +136,9 @@ module.exports = {
         return true
       } catch (err) {
         return setError(
-          '\nExpected message: "' + JSON.stringify(expected) + '"\nActual message:   "' + (!_.isNil(global.log.chatOut.args) ? util.inspect(global.log.chatOut.args) : '') + '"' +
-          '\n\nExpected user: "' + JSON.stringify(user) + '"\nActual user:   "' + (!_.isNil(global.log.chatOut.lastCall) ? JSON.stringify(global.log.chatOut.lastCall.args[1]) : '') + '"')
+          '\nExpected message: "' + expected + '"\n\nExpected user: "' + JSON.stringify(user) +
+          '\n\n\nActual message:   "' + global.log.chatOut.args + '"'
+        )
       }
     }, wait || 5000)
   },
@@ -155,8 +160,9 @@ module.exports = {
         return true
       } catch (err) {
         return setError(
-          '\nExpected message: "' + expected + '"\nActual message:   "' + (!_.isNil(global.log.chatOut.lastCall) ? global.log.chatOut.lastCall.args[0] : '') + '"' +
-          '\n\nExpected user: "' + JSON.stringify(user) + '"\nActual user:   "' + (!_.isNil(global.log.chatOut.lastCall) ? JSON.stringify(global.log.chatOut.lastCall.args[1]) : '') + '"')
+          '\nExpected message: "' + expected + '"\n\nExpected user: "' + JSON.stringify(user) +
+          '\n\n\nActual message:   "' + global.log.chatOut.args + '"'
+        )
       }
     }, 5000)
   }
