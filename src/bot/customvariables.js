@@ -289,16 +289,20 @@ class CustomVariables {
   }
 
   async updateWidgetAndTitle (variable) {
-    if (!isMainThread && parentPort.postMessage) parentPort.postMessage({ type: 'widget_custom_variables', emit: 'refresh' })
-    else if (!_.isNil(global.widgets.custom_variables.socket)) global.widgets.custom_variables.socket.emit('refresh') // send update to widget
+    if (!isMainThread) {
+      global.workers.sendToMaster({ type: 'widget_custom_variables', emit: 'refresh' })
+    } else if (!_.isNil(global.widgets.custom_variables.socket)) global.widgets.custom_variables.socket.emit('refresh') // send update to widget
 
     if (!_.isNil(variable)) {
       const regexp = new RegExp(`\\${variable}`, 'ig')
       let title = await global.cache.rawStatus()
 
       if (title.match(regexp)) {
-        if (!isMainThread && parentPort.postMessage) parentPort.postMessage({ type: 'call', ns: 'api', fnc: 'setTitleAndGame', args: [null] })
-        else global.api.setTitleAndGame(null)
+        if (!isMainThread) {
+          global.workers.sendToMaster({ type: 'call', ns: 'api', fnc: 'setTitleAndGame', args: [null] })
+        } else {
+          global.api.setTitleAndGame(null)
+        }
       }
     }
   }

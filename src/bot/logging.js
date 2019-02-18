@@ -10,7 +10,7 @@ var logDir = './logs'
 var moment = require('moment-timezone')
 const glob = require('glob')
 const {
-  isMainThread, parentPort,
+  isMainThread,
 } = require('worker_threads');
 const config = require('@config')
 const chalk = require('chalk')
@@ -51,7 +51,7 @@ if (!isMainThread) {
   global.log = {}
   for (let level of Object.entries(levels)) {
     global.log[level[0]] = function (message, params) {
-      if (parentPort && parentPort.postMessage) parentPort.postMessage({ type: 'log', level: level[0], message: message, params: params })
+      global.workers.sendToMaster({ type: 'log', level: level[0], message: message, params: params })
     }
   }
 } else {

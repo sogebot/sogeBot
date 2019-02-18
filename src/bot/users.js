@@ -92,7 +92,7 @@ class Users extends Core {
       if (!_.isNil(user._id)) user._id = user._id.toString() // force retype _id
       if (_.isNil(user.time.created_at) && !_.isNil(user.id)) { // this is accessing master (in points) and worker
         if (isMainThread) global.api.fetchAccountAge(username, user.id)
-        else if (parentPort && parentPort.postMessage) parentPort.postMessage({ type: 'api', fnc: 'fetchAccountAge', username: username, id: user.id })
+        else global.workers.sendToMaster({ type: 'api', fnc: 'fetchAccountAge', username: username, id: user.id })
       }
     } catch (e) {
       global.log.error(e.stack)
@@ -112,7 +112,7 @@ class Users extends Core {
       if (!_.isNil(user._id)) user._id = user._id.toString() // force retype _id
       if (_.isNil(user.time.created_at) && !_.isNil(user.username)) { // this is accessing master (in points) and worker
         if (isMainThread) global.api.fetchAccountAge(user.username, user.id)
-        else if (parentPort && parentPort.postMessage) parentPort.postMessage({ type: 'api', fnc: 'fetchAccountAge', username: user.username, id: user.id })
+        else global.workers.sendToMaster({ type: 'api', fnc: 'fetchAccountAge', username: user.username, id: user.id })
       }
     } catch (e) {
       global.log.error(e.stack)

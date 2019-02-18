@@ -46,9 +46,7 @@ class IMasterController extends Interface {
     delete this.timeouts[`sendRequest-${id}`]
 
     try {
-      const worker = _.sample(cluster.workers)
-      if (!worker.isConnected()) throw new Error('Worker is not connected')
-      worker.send(data)
+      global.workers.sendToWorker(data)
       this.returnData(resolve, reject, id)
     } catch (e) {
       setTimeout(() => this.sendRequest(resolve, reject, id, data), 10)

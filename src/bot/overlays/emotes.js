@@ -371,7 +371,7 @@ class Emotes extends Overlay {
   async containsEmotes (opts: ParserOptions) {
     if (_.isNil(opts.sender)) return true
     if (!isMainThread) {
-      if (parentPort && parentPort.postMessage) parentPort.postMessage({ type: 'call', ns: 'overlays.emotes', fnc: 'containsEmotes', args: [opts] })
+      global.workers.sendToMaster({ type: 'call', ns: 'overlays.emotes', fnc: 'containsEmotes', args: [opts] })
       return
     }
 

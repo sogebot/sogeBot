@@ -232,10 +232,7 @@ class Songs extends System {
 
   async sendNextSongID () {
     if (!isMainThread) {
-      if (parentPort && parentPort.postMessage) {
-        parentPort.postMessage({ type: 'call', ns: 'systems.songs', fnc: 'sendNextSongID' })
-      }
-      return
+      return global.workers.sendToMaster({ type: 'call', ns: 'systems.songs', fnc: 'sendNextSongID' })
     }
 
     // check if there are any requests

@@ -1,8 +1,11 @@
 const path = require('path');
 const _ = require('lodash');
 const {
-  Worker, isMainThread, parentPort,
+  Worker, isMainThread, parentPort, threadId
 } = require('worker_threads');
+
+const __DEBUG__ =
+  (process.env.DEBUG && process.env.DEBUG.includes('workers'))
 
 class Workers {
   constructor() {
@@ -19,13 +22,46 @@ class Workers {
     const worker = new Worker(this.path)
     this.setListeners(worker)
     worker.on('exit', () => {
+      if (__DEBUG__) { global.log.debug('Worker is dead'); }
       this.onlineCount--;
       this.newWorker();
     });
     worker.on('online', () => {
+      if (__DEBUG__) { global.log.debug('Worker is online'); }
       this.onlineCount++;
     });
     this.list.push(worker);
+  }
+
+  sendToAll(opts) {
+    if (isMainThread) {
+      // run on master
+      const namespace = _.get(global, opts.ns, null)
+      namespace[opts.fnc].apply(namespace, opts.args)
+      opts.type = 'call'
+      this.sendToAllWorkers(opts);
+    } else {
+      // need to be sent to master
+      this.sendToMaster(opts);
+    }
+  }
+
+  sendToMaster(opts) {
+    if (isMainThread) {
+      throw Error('Cannot send to master from master!');
+    } else {
+      parentPort.postMessage(opts)
+    }
+  }
+
+  sendToAllWorkers(opts) {
+    if (!isMainThread) {
+      throw Error('Cannot send to worker from worker!');
+    } else {
+      for (const w of this.list) {
+        w.postMessage(opts);
+      }
+    }
   }
 
   sendToWorker(opts) {
@@ -37,8 +73,6 @@ class Workers {
   }
 
   setListeners(worker) {
-    if (!global.db.engine.connected || !(global.lib && global.lib.translate)) return setTimeout(() => this.setListeners(worker), 100)
-
     if (isMainThread) {
       if (typeof worker === undefined || worker === null) throw Error('Cannot create empty listeners in main thread!')
       this.setListenersMain(worker)
@@ -47,54 +81,58 @@ class Workers {
     }
   }
 
-  setListenersMain(worker) {
-    worker.on('message', async (msg) => {
-      if (msg.type === 'lang') {
+  async process(data) {
+    if (isMainThread) {
+      // we need to be able to always handle db
+      if (data.type === 'db') {
+        // add data to master controller
+        if (typeof global.db.engine.data !== 'undefined') {
+          global.db.engine.data.push({
+            id: data.id,
+            items: data.items,
+            timestamp: _.now()
+          })
+        }
+        return;
+      }
+
+      if (!global.db.engine.connected || !(global.lib && global.lib.translate)) return setTimeout(() => this.process(data), 1000)
+      if (__DEBUG__) { global.log.debug('MAIN: ' + JSON.stringify(data)); }
+
+      if (data.type === 'lang') {
         for (let worker in cluster.workers) cluster.workers[worker].send({ type: 'lang' })
         await global.lib.translate._load()
-      } else if (msg.type === 'call') {
-        const namespace = _.get(global, msg.ns, null)
-        namespace[msg.fnc].apply(namespace, msg.args)
-      } else if (msg.type === 'log') {
-        return global.log[msg.level](msg.message, msg.params)
-      } else if (msg.type === 'stats') {
+      } else if (data.type === 'call') {
+        const namespace = _.get(global, data.ns, null)
+        namespace[data.fnc].apply(namespace, data.args)
+      } else if (data.type === 'log') {
+        return global.log[data.level](data.message, data.params)
+      } else if (data.type === 'stats') {
         let avgTime = 0
-        global.avgResponse.push(msg.value)
-        if (msg.value > 1000) global.log.warning(`Took ${msg.value}ms to process: ${msg.message}`)
+        global.avgResponse.push(data.value)
+        if (data.value > 1000) global.log.warning(`Took ${data.value}ms to process: ${data.message}`)
         if (global.avgResponse.length > 100) global.avgResponse.shift()
         for (let time of global.avgResponse) avgTime += parseInt(time, 10)
         global.status['RES'] = (avgTime / global.avgResponse.length).toFixed(0)
-      } else if (msg.type === 'say') {
-        global.commons.message('say', null, msg.message)
-      } else if (msg.type === 'me') {
-        global.commons.message('me', null, msg.message)
-      } else if (msg.type === 'whisper') {
-        global.commons.message('whisper', msg.sender, msg.message)
-      } else if (msg.type === 'parse') {
-        _.sample(cluster.workers).send({ type: 'message', sender: msg.sender, message: msg.message, skip: true, quiet: msg.quiet }) // resend to random worker
-      } else if (msg.type === 'db') {
-          // add data to master controller
-          if (typeof global.db.engine.data !== 'undefined') {
-            global.db.engine.data.push({
-              id: msg.id,
-              items: msg.items,
-              timestamp: _.now()
-            })
-          }
-      } else if (msg.type === 'timeout') {
-        global.commons.timeout(msg.username, msg.reason, msg.timeout)
-      } else if (msg.type === 'api') {
-        global.api[msg.fnc](msg.username, msg.id)
-      } else if (msg.type === 'event') {
-        global.events.fire(msg.eventId, msg.attributes)
-      } else if ( msg.type === 'interface') {
-        _.set(global, msg.path, msg.value);
+      } else if (data.type === 'say') {
+        global.commons.message('say', null, data.message)
+      } else if (data.type === 'me') {
+        global.commons.message('me', null, data.message)
+      } else if (data.type === 'whisper') {
+        global.commons.message('whisper', data.sender, data.message)
+      } else if (data.type === 'parse') {
+        _.sample(global.workers.list).postMessage({ type: 'message', sender: data.sender, message: data.message, skip: true, quiet: data.quiet })
+      } else if (data.type === 'timeout') {
+        global.commons.timeout(data.username, data.reason, data.timeout)
+      } else if (data.type === 'api') {
+        global.api[data.fnc](data.username, data.id)
+      } else if (data.type === 'event') {
+        global.events.fire(data.eventId, data.attributes)
+      } else if ( data.type === 'interface') {
+        _.set(global, data.path, data.value);
       }
-    });
-  }
-
-  setListenersWorker() {
-    parentPort.on('message', async (data) => {
+    } else {
+      if (__DEBUG__) { global.log.debug('THREAD(' + threadId + '): ' + JSON.stringify(data)); }
       switch (data.type) {
         case 'interface':
           _.set(global, data.path, data.value);
@@ -113,7 +151,6 @@ class Workers {
           global.tmi.message(data)
           break
         case 'db':
-          workerIsFree.db = false
           switch (data.fnc) {
             case 'find':
               data.items = await global.db.engine.find(data.table, data.where, data.lookup)
@@ -146,10 +183,21 @@ class Workers {
               global.log.error('This db call is not correct')
               global.log.error(data)
           }
-          if (parentPort && parentPort.postMessage) parentPort.postMessage(data)
-          workerIsFree.db = true
+
+          global.workers.sendToMaster(data)
       }
-    })
+    }
+  }
+
+  setListenersMain(worker) {
+    if (__DEBUG__) { global.log.debug('MAIN: loading listeners'); }
+    worker.on('message', (msg) => { this.process(msg) });
+  }
+
+  setListenersWorker() {
+    if (__DEBUG__) { global.log.debug('THREAD(' + threadId + '): loading listeners'); }
+
+    parentPort.on('message', (msg) => { this.process(msg) });
   }
 }
 

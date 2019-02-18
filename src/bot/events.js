@@ -111,10 +111,7 @@ class Events {
     attributes = _.clone(attributes) || {}
 
     if (!isMainThread) { // emit process to master
-      if (parentPort && parentPort.postMessage) {
-        parentPort.postMessage({ type: 'call', ns: 'events', fnc: 'fire', args: [eventId, attributes] })
-      }
-      return
+      return global.workers.sendToMaster({ type: 'call', ns: 'events', fnc: 'fire', args: [eventId, attributes] })
     }
 
     if (!_.isNil(_.get(attributes, 'username', null))) attributes.userObject = await global.users.getByName(attributes.username)
@@ -243,7 +240,7 @@ class Events {
       })
       await parse.process()
     } else {
-      _.sample(cluster.workers).send({ type: 'message', sender: (_.get(operation, 'isCommandQuiet', false) ? {} : { username: global.commons.getOwner() }), message: command, skip: true })
+      global.workers.sendToWorker({ type: 'message', sender: (_.get(operation, 'isCommandQuiet', false) ? {} : { username: global.commons.getOwner() }), message: command, skip: true })
     }
   }
 

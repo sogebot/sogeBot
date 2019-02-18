@@ -231,8 +231,8 @@ class Message {
           .replace(/\(|\)/g, '')
           .replace(/\$sender/g, (global.configuration.getValue('atUsername') ? '@' : '') + attr.sender)
           .replace(/\$param/g, attr.param)
-        if (isMainThread) _.sample(cluster.workers).send({ type: 'message', sender: { username: attr.sender }, message: cmd, skip: true, quiet: true }) // resend to random worker
-        else if (parentPort && parentPort.postMessage) parentPort.postMessage({ type: 'parse', sender: { username: attr.sender }, message: cmd, skip: true, quiet: true })
+        if (isMainThread) global.workers.sendToWorker({ type: 'message', sender: { username: attr.sender }, message: cmd, skip: true, quiet: true }) // resend to random worker
+        else global.workers.sendToMaster({ type: 'parse', sender: { username: attr.sender }, message: cmd, skip: true, quiet: true })
         return ''
       },
       '(!#)': async function (filter) {
@@ -241,8 +241,8 @@ class Message {
           .replace(/\(|\)/g, '')
           .replace(/\$sender/g, (global.configuration.getValue('atUsername') ? '@' : '') + attr.sender)
           .replace(/\$param/g, attr.param)
-        if (isMainThread) _.sample(cluster.workers).send({ type: 'message', sender: { username: attr.sender }, message: cmd, skip: true, quiet: false }) // resend to random worker
-        else if (parentPort && parentPort.postMessage) parentPort.postMessage({ type: 'parse', sender: { username: attr.sender }, message: cmd, skip: true, quiet: false })
+        if (isMainThread) global.workers.sendToWorker({ type: 'message', sender: { username: attr.sender }, message: cmd, skip: true, quiet: false }) // resend to random worker
+        else global.workers.sendToMaster({ type: 'parse', sender: { username: attr.sender }, message: cmd, skip: true, quiet: false })
         return ''
       }
     }

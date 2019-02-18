@@ -426,7 +426,7 @@ class Spotify extends Integration {
     if (!(await global.cache.isOnline())) return // don't do anything on offline stream
     if (!isMainThread) {
       // we have client connected on master -> send process to master
-      if (parentPort && parentPort.postMessage) parentPort.postMessage({ type: 'call', ns: 'integrations.spotify', fnc: 'main', args: [opts] })
+      global.workers.sendToMaster({ type: 'call', ns: 'integrations.spotify', fnc: 'main', args: [opts] })
       return
     }
     if (!this.settings.songRequests) return

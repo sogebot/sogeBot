@@ -8,7 +8,7 @@ var _ = require('lodash')
 const flatten = require('flat')
 
 const {
-  isMainThread, parentPort,
+  isMainThread,
 } = require('worker_threads');
 const config = require('@config')
 const axios = require('axios')
@@ -89,7 +89,7 @@ class Translate {
     const self = global.lib.translate
     for (let c of self.custom) {
       await global.db.engine.update('customTranslations', { key: c.key }, { key: c.key, value: c.value })
-      for (let worker in cluster.workers) cluster.workers[worker].send({ type: 'lang' })
+      global.workers.sendToAllWorkers({ type: 'lang' });
       await global.lib.translate._load()
     }
   }
@@ -99,8 +99,7 @@ class Translate {
     if (typeof key === 'object' || version === 'n/a') return // skip objects (returning more than one key)
     if (!isMainThread) {
       // we want to have translations aggregated on master
-      if (parentPort && parentPort.postMessage) return parentPort.postMessage({ type: 'call', ns: 'lib.translate', fnc: 'addMetrics', args: [key] })
-      return false
+      return global.workers.sendToMaster({ type: 'call', ns: 'lib.translate', fnc: 'addMetrics', args: [key] })
     }
 
     if (ui) {

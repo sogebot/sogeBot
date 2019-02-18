@@ -132,23 +132,23 @@ class OAuth extends Core {
   }
 
   async getChannelId () {
-    if (typeof global.api === 'undefined' || typeof global.tmi === 'undefined') return setTimeout(() => this.getChannelId(), 1000)
     if (!isMainThread || global.mocha) return
+    if (typeof global.api === 'undefined' || typeof global.tmi === 'undefined') return setTimeout(() => this.getChannelId(), 1000)
     clearTimeout(this.timeouts['getChannelId'])
 
     let timeout = 1000
-    const channel = await this.settings.general.channel
-    if (this.currentChannel !== channel && channel !== '') {
-      this.currentChannel = channel
-      const cid = await global.api.getIdFromTwitch(channel, true)
+    if (this.currentChannel !== this.settings.general.channel && this.settings.general.channel !== '') {
+      this.currentChannel = this.settings.general.channel
+      const cid = await global.api.getIdFromTwitch(this.settings.general.channel, true)
       if (typeof cid !== 'undefined' && cid !== null) {
         this.channelId = cid
         global.log.info('Channel ID set to ' + cid)
         global.tmi.reconnect('bot')
         global.tmi.reconnect('broadcaster')
       } else {
-        global.log.error(`Cannot get channel ID of ${channel} - waiting ${Number(global.api.calls.bot.refresh - (Date.now() / 1000)).toFixed(2)}s`)
-        timeout = (global.api.calls.bot.refresh - (Date.now() / 1000)) * 1000
+        const toWait = Math.max(Number(global.api.calls.bot.refresh - (Date.now() / 1000)), 30);
+        global.log.error(`Cannot get channel ID of ${this.settings.general.channel} - waiting ${toWait.toFixed()}s`)
+        timeout = toWait * 1000
       }
     }
 

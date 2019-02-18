@@ -11,7 +11,7 @@ const chalk = require('chalk')
 const gitCommitInfo = require('git-commit-info');
 
 const {
-  Worker, MessageChannel, MessagePort, isMainThread, parentPort
+  Worker, MessageChannel, MessagePort, isMainThread,
 } = require('worker_threads');
 
 const constants = require('./constants')

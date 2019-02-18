@@ -6,6 +6,7 @@ const {
 } = require('worker_threads');
 const _ = require('lodash')
 const TwitchJs = require('twitch-js').default
+const Parser = require('./parser')
 
 import Core from './_interface'
 const constants = require('./constants')
@@ -507,6 +508,11 @@ class TMI extends Core {
     let skip = data.skip
     let quiet = data.quiet
 
+    if (!sender.userId && sender.username) {
+      // this can happen if we are sending commands from dashboards etc.
+      sender.userId = await global.users.getIdByName(sender.username);
+    }
+
     const parse = new Parser({ sender: sender, message: message, skip: skip, quiet: quiet })
 
     if (!skip && sender['message-type'] === 'whisper' && (!(await global.configuration.getValue('disableWhisperListener')) || global.commons.isOwner(sender))) {
@@ -530,7 +536,7 @@ class TMI extends Core {
         // update user based on id not username
         await global.db.engine.update('users', { id: String(sender.userId) }, data)
 
-        if (parentPort && parentPort.postMessage) parentPort.postMessage({ type: 'api', fnc: 'isFollower', username: sender.username })
+        global.workers.sendToMaster({ type: 'api', fnc: 'isFollower', username: sender.username })
 
         global.events.fire('keyword-send-x-times', { username: sender.username, message: message })
         if (message.startsWith('!')) {
@@ -539,7 +545,7 @@ class TMI extends Core {
       }
       await parse.process()
     }
-    if (parentPort && parentPort.postMessage) parentPort.postMessage({ type: 'stats', of: 'parser', value: parse.time(), message: message })
+    global.workers.sendToMaster({ type: 'stats', of: 'parser', value: parse.time(), message: message })
   }
 }
 

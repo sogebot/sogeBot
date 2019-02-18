@@ -24,7 +24,7 @@ class Cmdboard extends Widget {
         cb(await global.db.engine.find('widgetsCmdBoard'));
       });
       socket.on('cmdboard.widget.run', (command) => {
-        _.sample(require('cluster').workers).send({ type: 'message', sender: { username: global.commons.getOwner() }, message: command, skip: true });
+        global.workers.sendToWorker({ type: 'message', sender: { username: global.commons.getOwner() }, message: command, skip: true });
       });
       socket.on('cmdboard.widget.add', async (data, cb) => {
         await global.db.engine.insert('widgetsCmdBoard', { text: data.name, command: data.command });

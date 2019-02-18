@@ -50,7 +50,7 @@ class WheelOfFortune extends Game {
       const options = JSON.parse(await this.settings.options.data)
       global.panel.io.of('/games/wheeloffortune').emit('spin', { options, username: opts.sender.username })
     } else {
-      if (parentPort && parentPort.postMessage) parentPort.postMessage({ type: 'call', ns: 'games.wheelOfFortune', fnc: 'main', args: [opts] })
+      global.workers.sendToMaster({ type: 'call', ns: 'games.wheelOfFortune', fnc: 'main', args: [opts] })
     }
   }
 }

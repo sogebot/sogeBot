@@ -30,23 +30,6 @@ Commons.prototype.registerConfiguration = function () {
   global.configuration.register('sendWithMe', 'core.settings.sendWithMe', 'bool', false)
 }
 
-Commons.prototype.processAll = function (proc) {
-  if (isMainThread) {
-    // run on master
-    const namespace = _.get(global, proc.ns, null)
-    namespace[proc.fnc].apply(namespace, proc.args)
-    proc.type = 'call'
-    // send to all clusters
-    // eslint-disable-next-line
-    for (let w of Object.entries(cluster.workers)) {
-      if (w[1].isConnected()) w[1].send(proc)
-    }
-  } else {
-    // need to be sent to master
-    if (parentPort && parentPort.postMessage) parentPort.postMessage(proc)
-  }
-}
-
 Commons.prototype.getIgnoreList = function () {
   return global.users.settings.users.ignorelist
 }
@@ -167,8 +150,9 @@ Commons.prototype.sendMessage = async function (message, sender, attr) {
 
 Commons.prototype.message = async function (type, username, message, retry) {
   if (config.debug.console) return
-  if (!isMainThread && parentPort.postMessage) parentPort.postMessage({ type: type, sender: username, message: message })
-  else if (isMainThread) {
+  if (!isMainThread) {
+    global.workers.sendToMaster({ type: type, sender: username, message: message })
+  } else if (isMainThread) {
     try {
       if (username === null) username = await global.oauth.settings.general.channel
       if (username === '') {
@@ -187,7 +171,7 @@ Commons.prototype.timeout = async function (username, reason, timeout) {
   if (isMainThread) {
     reason = reason.replace(/\$sender/g, username)
     global.tmi.client.bot.chat.timeout(global.oauth.settings.general.channel, username, timeout, reason)
-  } else if (parentPort && parentPort.postMessage) parentPort.postMessage({ type: 'timeout', username: username, timeout: timeout, reason: reason })
+  } else global.workers.sendToMaster({ type: 'timeout', username: username, timeout: timeout, reason: reason })
 }
 
 Commons.prototype.getOwner = function () {

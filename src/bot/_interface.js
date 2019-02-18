@@ -2,7 +2,7 @@ const _ = require('lodash')
 const chalk = require('chalk')
 
 const {
-  isMainThread, parentPort
+  isMainThread
 } = require('worker_threads');
 
 const constants = require('./constants')
@@ -90,9 +90,7 @@ class Module {
     if (isMainThread) {
       global.db.engine.update(this._name + '.settings', { system: this.constructor.name.toLowerCase(), key }, { value })
       // send to all threads
-      for (let w of Object.entries(global.workers.list)) {
-        w.postMessage(proc);
-      }
+      global.workers.sendToAllWorkers(proc);
 
       if (this.on.change[key]) {
         // run on.change functions only on master
@@ -103,7 +101,7 @@ class Module {
       }
     } else {
       // send to master to update
-      if (parentPort && parentPort.postMessage) parentPort.postMessage(proc)
+      global.workers.sendToMaster(proc);
     }
   }
 
