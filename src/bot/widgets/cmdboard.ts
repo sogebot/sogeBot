@@ -1,5 +1,3 @@
-import * as _ from 'lodash';
-
 import Widget from './_interface';
 
 class Cmdboard extends Widget {
