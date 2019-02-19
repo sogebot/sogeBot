@@ -1,4 +1,6 @@
 const chalk = require('chalk');
+const fs = require('fs')
+const path = require('path');
 const { spawnSync } = require('child_process');
 
 const version = process.env.version;
@@ -22,6 +24,12 @@ function getCurrentBranch() {
   return branch;
 }
 
+function getLastMajorVersion() {
+  // bump down major version
+  const [x, y, z] = version.split('.');
+  return `${x}.${Number(y) - 1}.x`;
+}
+
 function doRelease() {
   console.log(chalk.inverse('RELEASE TOOL'));
   console.log('\t' + chalk.yellow('Release type:    ') + (isMajorRelease ? 'major' : 'minor'));
@@ -33,8 +41,20 @@ function doRelease() {
   spawnSync('git', ['checkout', '-b', 'release-' + releaseVersion]);
 
   if (isMajorRelease) {
+    const archiveDir = path.join(__dirname, '..', 'docs', '_archive', getLastMajorVersion())
+
     console.log('\n' + chalk.inverse('DOCS RELEASE'));
-    console.log(chalk.yellow('1.') + ' Backup of current docs');
+    console.log(chalk.yellow('1.') + ' Creating ' + archiveDir);
+    if (fs.existsSync(archiveDir)) fs.rmdirSync(archiveDir)
+    fs.mkdirSync(archiveDir)
+
+    console.log(chalk.yellow('2.') + ' Backup of current docs');
+
+    // exclude _navbar
+    // exclude index.html
+    // exclude _archive
+    // exclude _master
+
   }
 
   console.log('Push changes to release branch')
