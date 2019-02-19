@@ -35,6 +35,9 @@ bot:
 	@npx babel src/bot/ -d dest/
 	@npx babel src/bot/ -d dest/ --extensions ".ts,.tsx"
 
+release:
+	ENV version=${VERSION} node tools/release.js
+
 pack:
 	@echo -ne "\n\t ----- Packing into sogeBot-$(VERSION).zip\n"
 	@npx bestzip sogeBot-$(VERSION).zip .npmrc npm-shrinkwrap.json config.example.json dest/ locales/ public/ LICENSE package.json docs/ AUTHORS tools/ bin/ bat/ dist/
