@@ -21,7 +21,7 @@ describe('Gambling - duel', () => {
     await message.prepare()
   })
 
-  describe.only('!duel bank', () => {
+  describe('!duel bank', () => {
     it('Bank should be empty at start', async () => {
       global.games.duel.bank({ sender: user1 })
       await message.isSent('gambling.duel.bank', user1, {
