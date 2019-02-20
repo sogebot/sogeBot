@@ -1052,6 +1052,7 @@
   },
   "gambling": {
     "duel": {
+      "bank": "$sender, current bank for $command is $points $pointsName",
       "lowerThanMinimalBet": "$sender, minimal bet for $command is $points $pointsName",
       "cooldown": "$sender, you cannot use $command for $cooldown $minutesName.",
       "joined": "$sender, good luck with your dueling skills. You bet on yourself $points $pointsName!",

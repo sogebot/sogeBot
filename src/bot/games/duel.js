@@ -30,7 +30,7 @@ class Duel extends Game {
       minimalBet: 0,
       bypassCooldownByOwnerAndMods: false,
       commands: [
-        '!duel'
+        '!duel', '!duel bank'
       ]
     }
     const dependsOn = [
@@ -89,6 +89,18 @@ class Duel extends Game {
     this.settings._.timestamp = 0
 
     this.timeouts['pickDuelWinner'] = setTimeout(() => this.pickDuelWinner(), 30000)
+  }
+
+  async bank (opts) {
+    const users = await global.db.engine.find(this.collection.users);
+    const bank = users.map((o) => o.tickets).reduce((a, b) => a + b, 0);
+
+    global.commons.sendMessage(
+      global.commons.prepare('gambling.duel.bank', {
+        command: this.settings.commands['!duel'],
+        points: bank,
+        pointsName: await global.systems.points.getPointsName(bank),
+      }), opts.sender);
   }
 
   async main (opts) {
