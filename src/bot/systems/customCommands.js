@@ -244,17 +244,25 @@ class CustomCommands extends System {
         (r.permission === constants.MODS && (isMod || isOwner)) ||
         (r.permission === constants.OWNER_ONLY && isOwner)) &&
         await this.checkFilter(opts, r.filter)) {
-        _responses.push(r.response)
-        if (responses.length > 1) {
-          // slow down command send message to have proper order (every 100ms)
-          setTimeout(() => global.commons.sendMessage(r.response, opts.sender, { 'param': param, 'cmd': command.command }), r.order * 100)
-          if (r.stopIfExecuted) break
-        } else {
-          global.commons.sendMessage(r.response, opts.sender, { 'param': param, 'cmd': command.command })
-        }
+          _responses.push(r)
       }
     }
-    return _responses
+    this.sendResponse(_.cloneDeep(_responses), { param, sender: opts.sender, command: command.command });
+    return _responses.map((o) => {
+      return o.response
+    })
+  }
+
+  async sendResponse(responses, opts) {
+    if (responses.length === 0) return;
+    const response = responses.shift()
+    await global.commons.sendMessage(response.response, opts.sender, {
+      param: opts.param,
+      cmd: opts.command
+    })
+    setTimeout(() => {
+      this.sendResponse(responses, opts);
+    }, 300)
   }
 
   async list (opts: Object) {
