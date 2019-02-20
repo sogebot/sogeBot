@@ -45,6 +45,9 @@
     "borderColor": {
       "title": "Border Color"
     },
+    "backgroundColor": {
+      "title": "Background Color"
+    },
     "type": {
       "title": "Type"
     },

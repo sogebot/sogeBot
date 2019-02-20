@@ -20,6 +20,7 @@ declare namespace Goals {
 
   type BarOpts = {
     color: string,
+    backgroundColor: string,
     borderColor: string,
     borderPx: number,
     height: number

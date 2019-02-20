@@ -45,6 +45,9 @@
     "borderColor": {
       "title": "Barva ohraničení"
     },
+    "backgroundColor": {
+      "title": "Barva pozadí"
+    },
     "type": {
       "title": "Typ"
     },
