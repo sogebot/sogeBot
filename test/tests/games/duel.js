@@ -5,8 +5,10 @@ require('../../general.js')
 const db = require('../../general.js').db
 const message = require('../../general.js').message
 const variable = require('../../general.js').variable
+const time = require('../../general.js').time
 
 const _ = require('lodash')
+const assert = require('assert')
 
 const owner = { username: 'soge__' }
 const user1 = { username: 'user1', userId: String(_.random(999999, false)) }
@@ -17,6 +19,34 @@ describe('Gambling - duel', () => {
   before(async () => {
     await db.cleanup()
     await message.prepare()
+  })
+
+  describe.only('!duel bank', () => {
+    it('Bank should be empty at start', async () => {
+      global.games.duel.bank({ sender: user1 })
+      await message.isSent('gambling.duel.bank', user1, {
+        pointsName: await global.systems.points.getPointsName(0),
+        points: 0,
+        command: '!duel',
+      })
+    })
+
+    it('Add 200 points to duel bank', async () => {
+      for (let i = 0; i < 200; i++) {
+        await global.db.engine.insert(global.games.duel.collection.users, { tickets: 1, user: 'user' + i, userId: i });
+      }
+      const items = await global.db.engine.find(global.games.duel.collection.users);
+      assert.equal(items.length, 200);
+    })
+
+    it('Bank should have 200 tickets', async () => {
+      global.games.duel.bank({ sender: user1 })
+      await message.isSent('gambling.duel.bank', user1, {
+        pointsName: await global.systems.points.getPointsName(200),
+        points: 200,
+        command: '!duel',
+      })
+    })
   })
 
   describe('#914 - user1 is not correctly added to duel, if he is challenger', () => {

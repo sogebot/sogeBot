@@ -1067,6 +1067,7 @@
   },
   "gambling": {
     "duel": {
+      "bank": "$sender, soucasny bank pro $command je $points $pointsName",
       "lowerThanMinimalBet": "$sender, minimalni sazka pro $command je $points $pointsName",
       "cooldown": "$sender, nemuzes pouzit $command jeste $cooldown $minutesName.",
       "joined": "$sender, hodne stesti behem duelu. Vsadil sis na sebe $points $pointsName!",

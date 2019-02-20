@@ -136,8 +136,8 @@ module.exports = {
         return true
       } catch (err) {
         return setError(
-          '\nExpected message: "' + expected + '"\n\nExpected user: "' + JSON.stringify(user) +
-          '\n\n\nActual message:   "' + global.log.chatOut.args + '"'
+          '\nExpected message: "' + expected + '"\nExpected user: "' + JSON.stringify(user) +
+          '\n\nActual message:   "' + JSON.stringify(global.log.chatOut.args) + '"'
         )
       }
     }, wait || 5000)
