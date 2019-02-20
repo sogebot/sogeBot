@@ -122,7 +122,7 @@ class TMI extends Core {
       this.client[type].chat.on('WHISPER', async (message) => {
         message.tags.username = this.getUsernameFromRaw(message._raw)
 
-        if (!await global.commons.isBot(message.tags.username) || !message.isSelf) {
+        if (!(await global.commons.isBot(message.tags.username)) || !message.isSelf) {
           message.tags['message-type'] = 'whisper'
           global.workers.sendToWorker({ type: 'message', sender: message.tags, message: message.message })
           global.linesParsed++
@@ -521,7 +521,7 @@ class TMI extends Core {
 
     if (!skip && sender['message-type'] === 'whisper' && (!(await global.configuration.getValue('disableWhisperListener')) || global.commons.isOwner(sender))) {
       global.log.whisperIn(message, { username: sender.username })
-    } else if (!skip && !await global.commons.isBot(sender.username)) {
+    } else if (!skip && !(await global.commons.isBot(sender.username))) {
       global.log.chatIn(message, { username: sender.username })
     }
 

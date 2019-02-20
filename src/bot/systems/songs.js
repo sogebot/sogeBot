@@ -327,7 +327,7 @@ class Songs extends System {
   }
 
   async addSongToQueue (opts) {
-    if (opts.parameters.length < 1 || !await this.settings.songrequest) {
+    if (opts.parameters.length < 1 || !this.settings.songrequest) {
       if (await this.settings.songrequest) {
         global.commons.sendMessage(global.translate('core.usage') + ': !songrequest <video-id|video-url|search-string>', opts.sender)
       } else {
