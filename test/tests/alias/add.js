@@ -15,7 +15,7 @@ describe('Alias - add()', () => {
 
   it('', async () => {
     global.systems.alias.add({ sender: owner, parameters: '' })
-    await message.isSent('alias.alas-parse-failed', owner, { sender: owner.username })
+    await message.isSent('alias.alias-parse-failed', owner, { sender: owner.username })
   })
 
   it('!alias', async () => {
