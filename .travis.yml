@@ -14,7 +14,7 @@ before_script:
 script:
   - commitlint-travis
   - npm run tslint
-  - travis_retry npm run test
+  - npm run test
 
 stages:
   - name: skip
