@@ -8,8 +8,9 @@ const match = file.match(regexp)
 let status = 0
 
 if (match) {
-  for (let m of match) {
-    const suite = m.trim().split(/\d\) /)[1]
+  for (let suite of new Set(match.map((o) => {
+    return o.trim().split(/\d\) /)[1]
+  }))) {
     console.log('\n\t => Re-Running ' + suite + ' tests')
     const p = child_process.spawnSync('npx', [
       'mocha',
