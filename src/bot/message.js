@@ -615,7 +615,7 @@ class Message {
       let rMessage = this.message.match((new RegExp('(' + regexp + ')', 'g')))
       if (!_.isNull(rMessage)) {
         for (var bkey in rMessage) {
-          if (!await fnc(rMessage[bkey])) this.message = ''
+          if (!(await fnc(rMessage[bkey]))) this.message = ''
           else {
             this.message = this.message.replace(rMessage[bkey], '').trim()
           }

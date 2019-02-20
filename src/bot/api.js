@@ -663,7 +663,7 @@ class API {
                   type: 'follow',
                   username: user.username
                 })
-                if (!quiet && !await global.commons.isBot(user.username)) {
+                if (!quiet && !(await global.commons.isBot(user.username))) {
                   global.log.follow(user.username)
                   global.events.fire('follow', { username: user.username })
 
@@ -803,7 +803,7 @@ class API {
         let stream = request.data.data[0]
 
         if (!moment.preciseDiff(moment(stream.started_at), moment((await global.cache.when()).online), true).firstDateWasLater) await global.cache.when({ online: stream.started_at })
-        if (!await global.cache.isOnline() || this.streamType !== stream.type) {
+        if (!(await global.cache.isOnline()) || this.streamType !== stream.type) {
           this.chatMessagesAtStart = global.linesParsed
 
           if (!global.webhooks.enabled.streams && Number(this.streamId) !== Number(stream.id)) {
@@ -819,7 +819,7 @@ class API {
             global.events.fire('every-x-minutes-of-stream', { reset: true })
             justStarted = true
 
-            // go through all systems and trigger on.streamEnd
+            // go through all systems and trigger on.streamStart
             for (let [type, systems] of Object.entries({
               systems: global.systems,
               games: global.games,

@@ -215,7 +215,7 @@ class Webhooks {
       global.db.engine.update('users', { id: data.from_id }, { username: data.from_name })
 
       if (!_.get(user, 'is.follower', false) && (_.get(user, 'time.follow', 0) === 0 || _.now() - _.get(user, 'time.follow', 0) > 60000 * 60)) {
-        if (!await global.commons.isBot(data.from_name)) {
+        if (!(await global.commons.isBot(data.from_name))) {
           global.overlays.eventlist.add({
             type: 'follow',
             username: data.from_name
@@ -286,14 +286,14 @@ class Webhooks {
       if (parseInt(stream.user_id, 10) !== parseInt(cid, 10) || Number(stream.id) === Number(global.api.streamId)) return
 
       // Always keep this updated
-      global.api.streamStartedAt = stream.started_at
+      global.api.streamStartedAt = stream.started_atx
       global.api.streamId = stream.id
       global.api.streamType = stream.type
 
       await global.db.engine.update('api.current', { key: 'title' }, { value: stream.title })
       await global.db.engine.update('api.current', { key: 'game' }, { value: await global.api.getGameFromId(stream.game_id) })
 
-      if (!await global.cache.isOnline() || global.twitch.streamType !== stream.type) {
+      if (!(await global.cache.isOnline()) || global.twitch.streamType !== stream.type) {
         if (__DEBUG__.STREAM) {
           global.log.debug('WEBHOOKS: ' + JSON.stringify(aEvent))
         }
