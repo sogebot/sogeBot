@@ -10,7 +10,7 @@ let status = 0
 if (match) {
   for (let m of match) {
     const suite = m.trim().split(/\d\) /)[1]
-    console.log('\n\t Re-Running ' + suite + ' tests')
+    console.log('\n\t => Re-Running ' + suite + ' tests')
     const p = child_process.spawnSync('npx', [
       'mocha',
       '--timeout', '20000',
@@ -29,8 +29,9 @@ if (match) {
       console.log('\t   !!! Tests OK! :)')
     }
   }
+  console.log('\n\n')
 } else {
-  console.log('\n\t No tests to rerun')
+  console.log('\n\t No tests to rerun :)\n\n')
 }
 
 process.exit(status)
