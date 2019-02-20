@@ -967,13 +967,14 @@ li a.active .deleteTab {
   font-family: monospace;
   color: $bot-response-text-color;
   border: 1px solid $bot-response-border-color;
-  border-radius: 5px !important;
   padding: 0 4px;
   background-color: $bot-response-bg-color;
 }
 
 .editable-variable.block {
   display: block;
+  padding:2px;
+  margin: 2px
 }
 
 #helper {

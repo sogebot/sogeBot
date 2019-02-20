@@ -30,11 +30,13 @@
               v-bind:error="hasError.responses && response.response.trim().length === 0"
               v-bind:value="response.response"
               v-bind:placeholder="commons.translate('systems.customcommands.response.placeholder')"
+              v-bind:filters="['global', 'sender', 'param', '!param']"
               v-on:update="response.response = $event"></textarea-with-tags>
             <textarea-with-tags
               v-bind:value="response.filter"
               v-bind:placeholder="commons.translate('systems.customcommands.filter.placeholder')"
-              v-on:update="response.filter = $event"></textarea-with-tags>
+              v-on:update="response.filter = $event"
+              v-bind:filters="['global', 'sender', 'param', '!param']"></textarea-with-tags>
 
             <div class="h-auto w-auto" style="flex-shrink: 0;">
               <button data-toggle="dropdown" class="btn btn-outline-dark border-0 h-100 w-100" style="margin: 0; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px;"><i class="fas fa-key mr-1" aria-hidden="true"></i> {{ response.permission | permissionToString }}</button>
@@ -45,7 +47,6 @@
                 <a class="dropdown-item" style="cursor: pointer" v-on:click="response.permission = 0; pending = true">{{ commons.translate('systems.customcommands.forOwners') | capitalize }}</a>
               </div>
             </div>
-
             <div class="h-auto w-auto" style="flex-shrink: 0;">
               <button data-toggle="dropdown" class="btn btn-outline-dark border-0 h-100 w-100" style="margin: 0; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px;">
                 <i class="fas mr-1" :class="[response.stopIfExecuted ? 'fa-stop' : 'fa-play']" aria-hidden="true"></i>
