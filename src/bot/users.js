@@ -47,10 +47,17 @@ class Users extends Core {
   async ignoreAdd (opts: Object) {
     try {
       const username = new Expects(opts.parameters).username().toArray()[0].toLowerCase()
-      global.users.settings.users.ignorelist.push(username)
+      global.users.settings.users.ignorelist = [
+        ...new Set([
+          ...global.users.settings.users.ignorelist,
+          username,
+        ]
+      )];
       // update ignore list
       global.commons.sendMessage(global.commons.prepare('ignore.user.is.added', { username }), opts.sender)
-    } catch (e) {}
+    } catch (e) {
+      global.log.error(e.message)
+    }
   }
 
   async ignoreRm (opts: Object) {
@@ -59,7 +66,9 @@ class Users extends Core {
       global.users.settings.users.ignorelist = global.users.settings.users.ignorelist.filter(o => o !== username)
       // update ignore list
       global.commons.sendMessage(global.commons.prepare('ignore.user.is.removed', { username }), opts.sender)
-    } catch (e) {}
+    } catch (e) {
+      global.log.error(e.message)
+    }
   }
 
   async ignoreCheck (opts: Object) {
