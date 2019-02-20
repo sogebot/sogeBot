@@ -325,7 +325,7 @@ window.textAreaWithTags = {
             client = this.$refs.div.getBoundingClientRect()
           }
         }
-        this.btnPosX = client.x + client.width - 35;
+        this.btnPosX = client.x + client.width - 50;
       })
     },
     updateFilterBtnPosY() {
@@ -341,7 +341,7 @@ window.textAreaWithTags = {
             client = this.$refs.div.getBoundingClientRect()
           }
         }
-        this.btnPosY = client.y + client.height - 32;
+        this.btnPosY = client.y + client.height - 47;
       })
     },
     onEnter (e) {
@@ -364,7 +364,7 @@ window.textAreaWithTags = {
       Vue.nextTick(() => {
         this.$refs.textarea.focus()
       })
-    }
+    },
   },
   data: function () {
     return {
@@ -402,13 +402,14 @@ window.textAreaWithTags = {
 
       <div v-if="filters && filters.length > 0"
            style="position: fixed; z-index: 9999"
-           :style="{ left: btnPosX + 'px', top: btnPosY + 'px' }">
+           :style="{ left: btnPosX + 'px', top: btnPosY + 'px' }"
+           @mouseleave="isFiltersVisible=false">
         <button type="button"
-                class="btn btn-sm border-0"
+                class="btn btn-sm border-0 ml-3 mt-3 mr-3"
                 :class="[ isFiltersVisible ? 'btn-secondary' : 'btn-outline-secondary' ]"
                 @click="toggleFilters()">$</button>
 
-        <div class="border bg-light" v-show="isFiltersVisible">
+        <div class="border bg-light ml-3 mb-3 mr-3" v-show="isFiltersVisible">
           <template v-for="filter of filters">
             <div v-if="filter === 'global'">
               <span class="editable-variable block" @click="addVariable('title')"> {{ commons.translate('responses.variable.title') }} </span>
