@@ -25,10 +25,12 @@ if (match) {
     if (p.status === 1) {
       status = 1;
       console.log('\t   !!! Failed again :(')
+    } else {
+      console.log('\t   !!! Tests OK! :)')
     }
   }
 } else {
-  console.log('No tests to rerun')
+  console.log('\n\t No tests to rerun')
 }
 
 process.exit(status)
