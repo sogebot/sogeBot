@@ -302,6 +302,12 @@
                           <input type="text" class="form-control col-10" id="bar_borderColor_input" v-model="currentGoal.customization.bar.borderColor">
                           <input type="color" class="form-control col-2" v-model="currentGoal.customization.bar.borderColor">
                         </div>
+
+                        <div class="row pl-3 pr-3 pt-2">
+                          <label class="w-100" for="bar_color_input">{{ translate('registry.goals.input.backgroundColor.title') }}</label>
+                          <input type="text" class="form-control col-10" id="bar_backgroundColor_input" v-model="currentGoal.customization.bar.backgroundColor">
+                          <input type="color" class="form-control col-2" v-model="currentGoal.customization.bar.backgroundColor">
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -471,6 +477,7 @@ export default Vue.extend({
         customization: {
           bar: {
             color: '#00aa00',
+            backgroundColor: '#e9ecef',
             borderColor: '#000000',
             borderPx: 0,
             height: 50,

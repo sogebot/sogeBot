@@ -16,6 +16,7 @@
         :class="{ disabled: isDisabled(index), 'position-absolute': group.display.type !== 'multi' }"
         :style="{
           border: goal.customization.bar.borderPx + 'px solid ' + goal.customization.bar.borderColor,
+          'background-color': goal.customization.bar.backgroundColor ,
           'font-family': getFontFamilyCSS(goal.customization.font.family),
           'margin-top': index !== 0 && goals.length > 0 && group.display.type === 'multi' ? group.display.spaceBetweenGoalsInPx + 'px' : '0px',
         }">
@@ -71,6 +72,7 @@
           :class="{ disabled: isDisabled(index) }"
           :style="{
             border: goal.customization.bar.borderPx + 'px solid ' + goal.customization.bar.borderColor,
+            'background-color': goal.customization.bar.backgroundColor,
             'font-family': getFontFamilyCSS(goal.customization.font.family)
           }">
           <b-progress-bar
