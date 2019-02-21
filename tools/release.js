@@ -39,7 +39,7 @@ function doRelease() {
   console.log('\t' + chalk.yellow('Release version: ') + releaseVersion);
   console.log('\t' + chalk.yellow('Current branch:  ') + currentBranch);
 
-  console.log('\n' + chalk.inverse('Creating release branch'));
+  console.log('\n' + chalk.inverse('CREATE RELEASE BRANCH'));
   spawnSync('git', ['branch', '-D', 'release-' + releaseVersion]);
   spawnSync('git', ['checkout', '-b', 'release-' + releaseVersion]);
 
