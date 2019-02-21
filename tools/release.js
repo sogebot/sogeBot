@@ -1,20 +1,23 @@
 const chalk = require('chalk');
 const fs = require('fs')
 const path = require('path');
+const glob = require('glob')
 const { spawnSync } = require('child_process');
 
-const version = process.env.version;
+
+const argv = require('yargs') // eslint-disable-line
+  .usage('Usage: node tool/$0 -v [version]')
+  .version('false')
+  .describe('v', 'version to release')
+  .demandOption(['v'])
+  .help('help')
+  .alias('h', 'help')
+  .argv
 const currentBranch = getCurrentBranch();
-const isMajorRelease = version.toLowerCase().includes('snapshot');
-const releaseVersion = isMajorRelease ? version.split('-')[0] : minorVersion();
+const releaseVersion = argv.v
+const isMajorRelease = releaseVersion.endsWith('.0');
 
 doRelease();
-
-function minorVersion() {
-  // bump up minor version
-  const [x, y, z] = version.split('.');
-  return `${x}.${y}.${Number(z) + 1}`;
-}
 
 function getCurrentBranch() {
   const branches = spawnSync('git', ['branch']);
@@ -26,7 +29,7 @@ function getCurrentBranch() {
 
 function getLastMajorVersion() {
   // bump down major version
-  const [x, y, z] = version.split('.');
+  const [x, y, z] = releaseVersion.split('.');
   return `${x}.${Number(y) - 1}.x`;
 }
 
@@ -45,19 +48,44 @@ function doRelease() {
 
     console.log('\n' + chalk.inverse('DOCS RELEASE'));
     console.log(chalk.yellow('1.') + ' Creating ' + archiveDir);
-    if (fs.existsSync(archiveDir)) fs.rmdirSync(archiveDir)
+    if (fs.existsSync(archiveDir)) {
+      spawnSync('rm', ['-r', archiveDir]);
+    }
     fs.mkdirSync(archiveDir)
 
     console.log(chalk.yellow('2.') + ' Backup of current docs');
+    const archiveDocsFiles = glob.sync('docs/*', {
+      ignore: [
+        'docs/_archive', 'docs/_master', 'docs/_navbar.md'
+      ]
+    });
+    for (const f of archiveDocsFiles) {
+      spawnSync('cp', ['-r', f, archiveDir]);
+    }
 
-    // exclude _navbar
-    // exclude index.html
-    // exclude _archive
-    // exclude _master
+    const sidebar = path.join(archiveDir, '_sidebar.md');
+    console.log(chalk.yellow('3.') + ' Update ' + sidebar + ' paths');
+    let sidebarFile = fs.readFileSync(sidebar).toString();
+    sidebarFile = sidebarFile.replace(/(\*\s\[.*\]\(\/)(.*\))/g, '$1_archive/' + getLastMajorVersion() + '/$2');
+    fs.writeFileSync(sidebar, sidebarFile)
 
+    console.log(chalk.yellow('4.') + ' Replace current docs with _master');
+    const masterDocsFiles = glob.sync('./docs/_master/*');
+    for (const f of masterDocsFiles) {
+      spawnSync('cp', ['-r', f, 'docs']);
+    }
+
+    console.log(chalk.yellow('5.') + ' Update ' + path.join('docs', '_sidebar.md') + ' paths');
+    sidebarFile = fs.readFileSync(path.join('docs', '_sidebar.md')).toString();
+    sidebarFile = sidebarFile.replace(/_master/g, '');
+    fs.writeFileSync(path.join('docs', '_sidebar.md'), sidebarFile)
   }
+  console.log('Push doc changes to release branch')
 
-  console.log('Push changes to release branch')
+  console.log('update package json')
+  console.log('push package changes to release branch')
+
+
 
   console.log('\n' + chalk.inverse('Back to ' + currentBranch + ' branch'));
   spawnSync('git', ['checkout', currentBranch]);
