@@ -56,6 +56,13 @@
   }
 }
 
+.btn-only-icon .text {
+  display: none !important;
+}
+.btn-only-icon .btn-icon {
+  background: transparent !important;
+}
+
 .btn-with-icon {
   padding: 0;
   display: inline-block;
