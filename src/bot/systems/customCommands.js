@@ -402,10 +402,18 @@ class CustomCommands extends System {
   async checkFilter (opts: Object, filter: string) {
     if (typeof filter === 'undefined' || filter.trim().length === 0) return true
     let toEval = `(function evaluation () { return ${filter} })()`
+
+    let $userObject = await global.users.getByName(opts.sender.username)
+    let $rank = null
+    if (global.systems.ranks.isEnabled()) {
+      $rank = await global.systems.ranks.get($userObject)
+    }
+
     const context = {
       _: _,
       $sender: opts.sender.username,
-      $userObject: await global.users.getByName(opts.sender.username),
+      $userObject,
+      $rank,
       // add global variables
       $game: _.get(await global.db.engine.findOne('api.current', { key: 'game' }), 'value', 'n/a'),
       $title: _.get(await global.db.engine.findOne('api.current', { key: 'title' }), 'value', 'n/a'),

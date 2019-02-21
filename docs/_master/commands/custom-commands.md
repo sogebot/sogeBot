@@ -206,6 +206,7 @@ engine.
 | ----------------|:-----------------------------------|
 | `$sender`       | username of user triggered command |
 | `$userObject`   | full database row of sender        |
+| `$rank`         | current rank of user               |
 | `$game`         | current game                       |
 | `$title`        | current title                      |
 | `$views`        | current views count                |
