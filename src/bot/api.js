@@ -233,7 +233,7 @@ class API {
         this.calls.bot.remaining = 0
         this.calls.bot.refresh = e.response.headers['ratelimit-reset']
       }
-      if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { data: {}, timestamp: _.now(), call: 'getUsernameFromTwitch', api: 'helix', endpoint: url, code: e.response.status, data: e.stack, remaining: this.calls.bot.remaining })
+      if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getUsernameFromTwitch', api: 'helix', endpoint: url, code: e.response.status, data: e.stack, remaining: this.calls.bot.remaining })
     }
     return null
   }
@@ -290,7 +290,7 @@ class API {
         this.calls.bot.remaining = 0
         this.calls.bot.refresh = e.response.headers['ratelimit-reset']
       }
-      if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { data: {}, timestamp: _.now(), call: 'getIdFromTwitch', api: 'helix', endpoint: url, code: e.response.status, data: e.stack, remaining: this.calls.bot.remaining })
+      if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getIdFromTwitch', api: 'helix', endpoint: url, code: e.response.status, data: e.stack, remaining: this.calls.bot.remaining })
     }
     return null
   }
@@ -429,7 +429,7 @@ class API {
         global.db.engine.update('api.current', { key: 'subscribers' }, { value: 0 })
       } else {
         global.log.error(`${url} - ${e.message}`)
-        if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { data: {}, timestamp: _.now(), call: 'getChannelSubscribers', api: 'helix', endpoint: url, code: e.response.status, data: e.stack, remaining: this.calls.bot.remaining })
+        if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getChannelSubscribers', api: 'helix', endpoint: url, code: e.response.status, data: e.stack, remaining: this.calls.bot.remaining })
       }
     }
     return { state: true, disable }
