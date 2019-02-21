@@ -23,7 +23,7 @@
   * [Price](_master/commands/price.md)
   * [Scrim](_master/commands/scrim.md)
   * [Songs](_master/commands/songs.md)
-  * [Top](/commands/top.md)
+  * [Top](_master/commands/top.md)
   * [Overlays](_master/commands/overlays.md)
   * [Ranks](_master/commands/ranks.md)
   * [Raffles](_master/commands/raffles.md)
