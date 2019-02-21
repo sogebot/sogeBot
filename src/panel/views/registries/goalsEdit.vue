@@ -259,7 +259,7 @@
                       <div class="form-group col-md-3">
                         <label for="fonts_borderPx_input">{{ translate('registry.goals.input.borderPx.title') }}</label>
                         <input v-model="currentGoal.customization.font.borderPx" type="number" min="0" class="form-control" id="fonts_borderPx_input">
-                        <small class="form-text text-muted">{{ translate('registry.goals.input.fontBorder.help') }}</small>
+                        <small class="form-text text-muted">{{ translate('registry.goals.input.borderPx.help') }}</small>
                         <div class="invalid-feedback"></div>
                       </div>
 
@@ -293,7 +293,7 @@
                       <div class="form-group col-md-3">
                         <label class="w-100" for="bar_height_input">{{ translate('registry.goals.input.barHeight.title') }}</label>
                         <input v-model="currentGoal.customization.bar.height" type="number" min="1" class="form-control" id="bar_height_input">
-                        <small class="form-text text-muted">{{ translate('registry.goals.barHeight.help') }}</small>
+                        <small class="form-text text-muted">{{ translate('registry.goals.input.barHeight.help') }}</small>
                         <div class="invalid-feedback"></div>
                       </div>
 
