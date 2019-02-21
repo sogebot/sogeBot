@@ -111,7 +111,7 @@
             </template>
             <template v-else>0</template>
           </div>
-          <div class="col-auto text-truncate text-center text-uppercase pl-2 pr-2">
+          <div class="col-auto text-truncate text-center text-uppercase pl-2 pr-2" v-if="!goal.endAfterIgnore">
             {{ $moment().to(goal.endAfter) }}
           </div>
           <div class="col text-right pr-2">
@@ -228,7 +228,7 @@ export default Vue.extend({
       if (this.group === null) return false;
 
       const goal = this.goals[idx]
-      return new Date(goal.endAfter).getTime() <= new Date().getTime()
+      return new Date(goal.endAfter).getTime() <= new Date().getTime() && !goal.endAfterIgnore
     },
     textStrokeGenerator(radius, color) {
       if (radius === 0) return ''

@@ -182,6 +182,13 @@
                     </div>
 
                     <div class="form-group col-md-12">
+                      <label for="endAfterIgnore-input">{{ translate('registry.goals.input.endAfterIgnore.title') }}</label>
+                      <button type="button" class="btn btn-block" :class="[currentGoal.endAfterIgnore ? 'btn-success' : 'btn-danger']" @click="currentGoal.endAfterIgnore = !currentGoal.endAfterIgnore">
+                        {{ translate((currentGoal.endAfterIgnore ? 'enabled' : 'disabled')) }}
+                      </button>
+                    </div>
+
+                    <div class="form-group col-md-12" v-if="!currentGoal.endAfterIgnore">
                       <label for="endAfter-input">{{ translate('registry.goals.input.endAfter.title') }}</label>
                       <datetime v-model="currentGoal.endAfter" input-class="form-control" type="datetime"></datetime>
                     </div>
@@ -521,7 +528,8 @@ export default Vue.extend({
         timestamp: Date.now(),
         goalAmount: 1000,
         currentAmount: 0,
-        endAfter: (new Date(Date.now() + 24 * 60 * 60 * 1000)).toISOString()
+        endAfter: (new Date(Date.now() + 24 * 60 * 60 * 1000)).toISOString(),
+        endAfterIgnore: true,
       })
 
       this.uiShowGoal = uid

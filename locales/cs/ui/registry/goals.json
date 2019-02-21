@@ -23,6 +23,9 @@
     "endAfter": {
       "title": "Konec po"
     },
+    "endAfterIgnore": {
+      "title": "Tento cíl nevyprší"
+    },
     "fonts": {
       "title": "Písmo",
       "help": "Fonty Google se používají pro písmo. <a href='https://fonts.google.com/' target='_blank'>Zkontrolujte seznam písem.</a>"

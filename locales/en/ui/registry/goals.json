@@ -23,6 +23,9 @@
     "endAfter": {
       "title": "End After"
     },
+    "endAfterIgnore": {
+      "title": "Goal will not expire"
+    },
     "fonts": {
       "title": "Font Family",
       "help": "Google fonts are used for font families. <a href='https://fonts.google.com/' target='_blank'>Check font list.</a>"
