@@ -53,7 +53,10 @@
                 <dd class="col-6">{{goal.goalAmount}}</dd>
 
                 <dt class="col-6">{{translate('registry.goals.input.endAfter.title')}}</dt>
-                <dd class="col-6">{{goal.endAfter}}</dd>
+                <dd class="col-6">
+                  <font-awesome-icon icon="infinity" fixed-width v-if="goal.endAfterIgnore"></font-awesome-icon>
+                  <template v-else>{{goal.endAfter}}</template>
+                </dd>
               </dl>
             </li>
           </ul>
@@ -94,8 +97,9 @@
 
   import { library } from '@fortawesome/fontawesome-svg-core'
   import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+  import { faInfinity } from '@fortawesome/free-solid-svg-icons';
 
-  library.add()
+  library.add(faInfinity)
 
   export default Vue.extend({
     components: {

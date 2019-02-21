@@ -54,6 +54,7 @@ declare namespace Goals {
     timestamp: number,
     goalAmount: number,
     currentAmount: number,
+    endAfterIgnore: boolean,
     endAfter: string,
   }
 }

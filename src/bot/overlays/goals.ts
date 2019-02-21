@@ -47,7 +47,7 @@ class Goals extends Overlay {
     const goals: Goals.Goal[] = await global.db.engine.find(this.collection.goals, { type: 'bits' });
     for (const goal of goals) {
       const uid = String(goal.uid);
-      if (new Date(goal.endAfter).getTime() >= new Date().getTime()) {
+      if (new Date(goal.endAfter).getTime() >= new Date().getTime() || goal.endAfterIgnore) {
         await global.db.engine.incrementOne(this.collection.goals, { uid }, { currentAmount: bit.amount });
       }
     }
@@ -58,7 +58,7 @@ class Goals extends Overlay {
     for (const goal of goals) {
       const uid = String(goal.uid);
       const currentAmount = Number(global.currency.exchange(tip.amount, tip.currency, global.currency.settings.currency.mainCurrency));
-      if (new Date(goal.endAfter).getTime() >= new Date().getTime()) {
+      if (new Date(goal.endAfter).getTime() >= new Date().getTime() || goal.endAfterIgnore) {
         await global.db.engine.incrementOne(this.collection.goals, { uid }, { currentAmount });
       }
     }
@@ -68,7 +68,7 @@ class Goals extends Overlay {
     const goals: Goals.Goal[] = await global.db.engine.find(this.collection.goals, { type: 'followers' });
     for (const goal of goals) {
       const uid = String(goal.uid);
-      if (new Date(goal.endAfter).getTime() >= new Date().getTime()) {
+      if (new Date(goal.endAfter).getTime() >= new Date().getTime() || goal.endAfterIgnore) {
         await global.db.engine.incrementOne(this.collection.goals, { uid }, { currentAmount: 1 });
       }
     }
@@ -78,7 +78,7 @@ class Goals extends Overlay {
     const goals: Goals.Goal[] = await global.db.engine.find(this.collection.goals, { type: 'subscribers' });
     for (const goal of goals) {
       const uid = String(goal.uid);
-      if (new Date(goal.endAfter).getTime() >= new Date().getTime()) {
+      if (new Date(goal.endAfter).getTime() >= new Date().getTime() || goal.endAfterIgnore) {
         await global.db.engine.incrementOne(this.collection.goals, { uid }, { currentAmount: 1 });
       }
     }
