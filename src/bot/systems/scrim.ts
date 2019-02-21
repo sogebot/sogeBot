@@ -157,7 +157,7 @@ class Scrim extends System {
   }
 
   private async currentMatches() {
-    const atUsername = await global.configuration.getValue('atUsername');
+    const atUsername = global.users.settings.users.showWithAt;
     const matches: {
       [x: string]: string[],
     } = {};

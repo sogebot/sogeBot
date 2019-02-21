@@ -172,7 +172,7 @@ class CustomVariables {
       _: _,
       users: users,
       random: randomVar,
-      sender: await global.configuration.getValue('atUsername') ? `@${sender}` : `${sender}`,
+      sender: global.users.settings.users.showWithAt ? `@${sender}` : `${sender}`,
       param: param,
       _current: opts._current
     }

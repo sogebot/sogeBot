@@ -20,7 +20,8 @@ class Users extends Core {
   constructor () {
     const settings = {
       users: {
-        ignorelist: []
+        ignorelist: [],
+        showWithAt: true,
       },
       commands: [
         { name: '!regular add', fnc: 'addRegular', permission: constants.OWNER_ONLY },

@@ -1,5 +1,6 @@
 {
   "settings": {
-    "ignorelist": "Seznam ignorovaných"
+    "ignorelist": "Seznam ignorovaných",
+    "showWithAt": "Zobraz uzivatele s @"
   }
 }

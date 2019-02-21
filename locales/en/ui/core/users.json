@@ -1,5 +1,6 @@
 {
   "settings": {
-    "ignorelist": "Ignore list"
+    "ignorelist": "Ignore list",
+    "showWithAt": "Show users with @"
   }
 }
