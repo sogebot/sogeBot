@@ -82,7 +82,7 @@ function doRelease() {
 
     console.log(chalk.yellow('6.') + ' Create doc commit');
     spawnSync('git', ['add', '-A']);
-    spawnSync('git', ['commit', '-m', '"docs: release docs ' + releaseVersion + '"']);
+    spawnSync('git', ['commit', '-m', '"docs: release docs ' + releaseVersion + '"', '--no-verify']);
   }
   console.log('Push doc changes to release branch')
 
