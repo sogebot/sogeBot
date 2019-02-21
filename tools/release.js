@@ -93,7 +93,7 @@ function doRelease() {
 
   console.log(chalk.yellow('2.') + ' Create release commit');
   spawnSync('git', ['add', '-A']);
-  spawnSync('git', ['commit', '-m', 'release: ' + releaseVersion + '']);
+  spawnSync('git', ['commit', '-m', 'build: ' + releaseVersion + '']);
 
   console.log('\n' + chalk.inverse('PUSHING COMMITS'));
   spawnSync('git', ['push', '-fu', 'origin', 'release-' + releaseVersion]);
