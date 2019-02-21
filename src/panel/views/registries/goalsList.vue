@@ -62,21 +62,21 @@
           </ul>
         </div>
         <div class="card-footer text-right">
-          <hold-button class="btn-danger btn-reverse btn-shrink" @trigger="removeGoal(group.uid)" icon="trash">
+          <hold-button class="btn-danger btn-only-icon" @trigger="removeGoal(group.uid)" icon="trash">
             <template slot="title">{{translate('dialog.buttons.delete')}}</template>
             <template slot="onHoldTitle">{{translate('dialog.buttons.hold-to-delete')}}</template>
           </hold-button>
           <button-with-icon
             :text="'/overlays/goals/' + group.uid"
             :href="'/overlays/goals/' + group.uid"
-            class="btn-dark btn-reverse btn-shrink"
+            class="btn-dark btn-only-icon"
             icon="link"
             target="_blank"
             />
           <button-with-icon
             :text="translate('dialog.buttons.edit')"
             :href="'#/registry/goals/edit/' + group.uid"
-            class="btn-primary btn-reverse btn-shrink"
+            class="btn-primary btn-only-icon"
             icon="edit"
             />
         </div>
