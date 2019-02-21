@@ -45,13 +45,18 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="(item, index) of selectedData" :key="index">
+              <tr v-for="(item, index) of selectedData" :key="index"
+                  :class="{'bg-danger': !String(item.code).startsWith('2'), 'text-light': !String(item.code).startsWith('2') }">
                 <th scope="row">{{ moment(item.timestamp).format('LTS') }}</th>
                 <td>{{ item.call }}</td>
                 <td><div style="word-wrap: break-word; font-family: Monospace; width: 200px;">{{ item.endpoint }}</div></td>
                 <td>{{ item.code }}</td>
                 <td>{{ item.remaining }}</td>
-                <td><div style="word-wrap: break-word; font-family: Monospace; width: 100%;">{{ JSON.stringify(JSON.parse(item.data), null, 2) }}</div></td>
+                <td>
+                  <div style="word-wrap: break-word; font-family: Monospace; width: 100%;">
+                    {{ parseJSON(item.data) }}
+                  </div>
+                </td>
               </tr>
             </tbody>
           </table>
@@ -125,6 +130,13 @@
         })
       },
       methods: {
+        parseJSON(data) {
+          try {
+            return JSON.stringify(JSON.parse(data), null, 2)
+          } catch (e) {
+            return data
+          }
+        },
         moment: function (args) {
           return moment(args) // expose moment function
         }
