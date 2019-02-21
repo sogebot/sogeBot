@@ -79,6 +79,10 @@ function doRelease() {
     sidebarFile = fs.readFileSync(path.join('docs', '_sidebar.md')).toString();
     sidebarFile = sidebarFile.replace(/_master/g, '');
     fs.writeFileSync(path.join('docs', '_sidebar.md'), sidebarFile)
+
+    console.log(chalk.yellow('6.') + ' Create doc commit');
+    spawnSync('git', ['add', '-A']);
+    spawnSync('git', ['commit', '-m', '"docs: release docs ' + releaseVersion + '"']);
   }
   console.log('Push doc changes to release branch')
 
