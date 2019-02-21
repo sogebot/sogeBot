@@ -96,30 +96,42 @@ const options: InterfaceSettings = {
 
 #### Others
 
-You can set your own settings variables. Only `number`, `boolean` and `string`
+You can set your own settings variables. Only `array`, `number`, `boolean` and `string`
 is supported. You can also add category for your settings. Use **null** value
 if you dont want to have type check.
+Arrays are **not recommended** as autosync is supported only for array functions,
+not direct index access! Change of full array will trigger autosync between threads.
+
+!> To be sure **arrays** are properly saved and synced use
+   `this.updateSettings(pathToYourVariable, this.settings.pathToYourVariable);`
+   after working with variable.
 
 ##### Configurable in UI
 
 ``` javascript
 const settings = {
   // ...
+  mySettingValueArr: [], // not recommended
   mySettingValueNum: 1,
   mySettingValueBool: true,
   mySettingValueString: 'Lorem Ipsum',
   mySettingWithoutTypeCheck: null,
   mySettingsCategory: {
+    valueArr: [], // not recommended
     valueNum: 1,
     valueBool: false,
     valueString: 'Lorem Ipsum',
     WithoutTypeCheck: null,
   }
   // ...
+  // example of array change
+  //            v-------------------------v path of your variable
+  this.settings.mySettingsCategory.valueArr.push('someValue');
+  this.updateSettings('mySettingsCategory.valueArr', this.settings.mySettingsCategory.valueArr);
 }
 ```
 
-##### Not configurable
+##### Not configurable starts with _
 
 ``` javascript
 const settings = {

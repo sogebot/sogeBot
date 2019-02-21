@@ -81,6 +81,9 @@ class Module {
   }
 
   updateSettings (key, value) {
+    if (Array.isArray(value)) {
+      value = [...value] // we need to retype otherwise we have worker clone error
+    }
     const proc = {
       type: 'interface',
       path: `${this._name}.${this.constructor.name.toLowerCase()}.settings.${key}`,
@@ -108,18 +111,26 @@ class Module {
   prepareVariableProxies () {
     // add main level proxy
     this.settings = new Proxy(this._settings, {
-      get: (target, key, receiver) => {
+      get: (target, key) => {
+        if (Array.isArray(target[key])) {
+          return this.arrayHandler(target, key)
+        }
         if (key === 'then' || key === 'toJSON') return Reflect.get(target, key, receiver) // promisify
         if (_.isSymbol(key)) return undefined // handle iterator
 
         if (typeof target[key] === 'object' && target[key] !== null) {
           const path = key
           return new Proxy(target[key], {
-            get: (target, key, receiver) => {
+            get: (target, key) => {
+              if (Array.isArray(target[key])) {
+                return this.arrayHandler(target, key, path)
+              }
+
               const isUnsupportedObject = typeof target[key] === 'object' && !Array.isArray(target[key]) && target[key] !== null
               if (isUnsupportedObject) {
                 global.log.warning(`!!! ${this.constructor.name.toLowerCase()}.settings.${path}.${key} object is not retroactive, for advanced object types use database directly.`)
               }
+
               if (key === 'then' || key === 'toJSON') return Reflect.get(target, key, receiver) // promisify
               if (_.isSymbol(key)) return undefined // handle iterator
               return target[key]
@@ -167,6 +178,42 @@ class Module {
           this.updateSettings(key, value)
         }
         return true
+      }
+    })
+  }
+
+  arrayHandler(target, key, path) {
+    // we want to catch array functions
+    const path2 = key
+    return new Proxy(target[key], {
+      get: (target, prop) => {
+        const val = target[prop];
+        if (typeof val === 'function') {
+          if (['push', 'unshift'].includes(prop)) {
+            return (function (el) {
+              const modification = Array.prototype[prop].apply(target, arguments)
+              if (path) {
+                this.updateSettings(`${path}.${path2}`, this.settings[path][path2])
+              } else {
+                this.updateSettings(`${path2}`, this.settings[path2])
+              }
+              return modification;
+            }).bind(this)
+          }
+          if (['pop'].includes(prop)) {
+            return () => {
+              const el = Array.prototype[prop].apply(target, arguments);
+              if (path) {
+                this.updateSettings(`${path}.${path2}`, this.settings[path][path2])
+              } else {
+                this.updateSettings(`${path2}`, this.settings[path2])
+              }
+              return el;
+            }
+          }
+          return val.bind(target);
+        }
+        return val;
       }
     })
   }
