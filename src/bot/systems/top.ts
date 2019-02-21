@@ -193,7 +193,7 @@ class Top extends System {
       sorted = _.chunk(sorted, 10)[0];
 
       for (const user of sorted) {
-        message += (i + 1) + '. ' + (await global.configuration.getValue('atUsername') ? '@' : '') + (user.username || 'unknown') + ' - ';
+        message += (i + 1) + '. ' + (global.users.settings.users.showWithAt ? '@' : '') + (user.username || 'unknown') + ' - ';
         switch (type) {
           case TYPE.TIME:
             message += (user.value / 1000 / 60 / 60).toFixed(1) + 'h';

@@ -26,10 +26,6 @@
     },
     "settings": {
       "uptime-format": "Uptime format set to $value",
-      "atUsername": {
-        "true": "Usernames will be shown with @ like @foo",
-        "false": "Usernames will be shown without @ like foo"
-      },
       "sendWithMe": {
         "true": "Bot will send messages using /me",
         "false": "Bot won't send messages using /me"

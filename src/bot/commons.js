@@ -26,7 +26,6 @@ function Commons () {
 Commons.prototype.registerConfiguration = function () {
   if (_.isNil(global.configuration)) return setTimeout(() => this.registerConfiguration(), 1)
 
-  global.configuration.register('atUsername', 'core.settings.atUsername', 'bool', true)
   global.configuration.register('sendWithMe', 'core.settings.sendWithMe', 'bool', false)
 }
 
@@ -82,7 +81,7 @@ Commons.prototype.prepare = async function (translate, attr) {
   let msg = global.translate(translate)
   attr = _(attr).toPairs().sortBy((o) => -o[0].length).fromPairs().value() // reorder attributes by key length
   for (let [key, value] of Object.entries(attr)) {
-    if (_.includes(['username', 'who', 'winner', 'sender', 'loser'], key)) value = await global.configuration.getValue('atUsername') ? `@${value}` : value
+    if (_.includes(['username', 'who', 'winner', 'sender', 'loser'], key)) value = global.users.settings.users.showWithAt ? `@${value}` : value
     msg = msg.replace(new RegExp('[$]' + key, 'g'), value)
   }
   return msg
@@ -130,7 +129,7 @@ Commons.prototype.sendMessage = async function (message, sender, attr) {
 
   // if sender is null/undefined, we can assume, that username is from dashboard -> bot
   if ((typeof sender.username === 'undefined' || sender.username === null) && !attr.force) return false // we don't want to reply on bot commands
-  message = !_.isNil(sender.username) ? message.replace(/\$sender/g, (global.configuration.getValue('atUsername') ? '@' : '') + sender.username) : message
+  message = !_.isNil(sender.username) ? message.replace(/\$sender/g, (global.users.settings.users.showWithAt ? '@' : '') + sender.username) : message
   if (!(await global.configuration.getValue('mute')) || attr.force) {
     if ((!_.isNil(attr.quiet) && attr.quiet)) return true
     if (sender['message-type'] === 'whisper') {
