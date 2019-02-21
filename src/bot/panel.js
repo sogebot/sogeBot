@@ -194,7 +194,7 @@ function Panel () {
     socket.on('updateGameAndTitle', async (data, cb) => {
       const status = await global.api.setTitleAndGame(null, data)
 
-      if (status === 2 || status === false) { // twitch refused update
+      if (!status) { // twitch refused update
         cb(true)
       }
 

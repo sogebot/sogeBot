@@ -1034,11 +1034,6 @@ class API {
       })
       if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'setTitleAndGame', api: 'kraken', endpoint: url, code: request.status })
     } catch (e) {
-      // handle 403 error - twitch actively refused this
-      if (e.response.status === 403) {
-      if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'setTitleAndGame', api: 'kraken', endpoint: url, code: e.response.status, data: 'Your title may be inappropriate, it is actively refused by Twitch API.' })
-        return 2
-      }
       global.log.error(`API: ${url} - ${e.message}`)
       if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'setTitleAndGame', api: 'kraken', endpoint: url, code: e.response.status, data: e.stack })
       return false
