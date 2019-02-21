@@ -209,7 +209,7 @@
           <button type="button" class="btn btn-danger" data-dismiss="modal">
             <i data-lang="close"></i>
           </button>
-          <button type="button" class="btn btn-primary" onclick="changeGT.save()">
+          <button type="button" class="btn btn-primary" id="dlgSetTitleAndGame" onclick="changeGT.save()">
             <i data-lang="save-changes"></i>
           </button>
         </div>
@@ -1113,11 +1113,23 @@
           game: this.selectedGame,
           title: this.selectedTitle
         })
+
+        const button = document.getElementById("dlgSetTitleAndGame")
+        button.textContent = commons.translate('dialog.buttons.saveChanges.progress');
         socket.emit('updateGameAndTitle', {
           game: this.selectedGame,
           title: this.selectedTitle
+        }, (err) => {
+          if (err) {
+            button.textContent = commons.translate('dialog.buttons.something-went-wrong')
+          } else {
+            button.textContent = commons.translate('dialog.buttons.saveChanges.done')
+            $('#game_and_title_dlg').modal('hide')
+          }
+          setTimeout(() => {
+            button.textContent = commons.translate('dialog.buttons.saveChanges.idle')
+          }, 1000)
         })
-        $('#game_and_title_dlg').modal('hide')
       }
     }
 

@@ -191,8 +191,12 @@ function Panel () {
         await global.db.engine.update('cache.titles', { _id: String(item._id) }, { game: data.game, title: data.new })
       }
     })
-    socket.on('updateGameAndTitle', async (data) => {
-      global.api.setTitleAndGame(null, data)
+    socket.on('updateGameAndTitle', async (data, cb) => {
+      const status = await global.api.setTitleAndGame(null, data)
+
+      if (status === 2 || status === false) { // twitch refused update
+        cb(true)
+      }
 
       data.title = data.title.trim()
       data.game = data.game.trim()
@@ -203,6 +207,7 @@ function Panel () {
       }
 
       self.sendStreamData(self, global.panel.io) // force dashboard update
+      cb(null)
     })
     socket.on('joinBot', async () => {
       global.tmi.join('bot', global.tmi.channel)
