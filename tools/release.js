@@ -84,12 +84,19 @@ function doRelease() {
     spawnSync('git', ['add', '-A']);
     spawnSync('git', ['commit', '-m', 'docs: release docs ' + releaseVersion + '']);
   }
-  console.log('Push doc changes to release branch')
 
-  console.log('update package json')
-  console.log('push package changes to release branch')
+  console.log('\n' + chalk.inverse('PACKAGE RELEASE'));
+  console.log(chalk.yellow('1.') + ' Updating package.json version to ' + releaseVersion);
+  let packageFile = fs.readFileSync('package.json').toString();
+  packageFile = packageFile.replace(/("version": ").*(",)/g, '$1' + releaseVersion + '$2');
+  fs.writeFileSync('package.json', packageFile)
 
+  console.log(chalk.yellow('2.') + ' Create release commit');
+  spawnSync('git', ['add', '-A']);
+  spawnSync('git', ['commit', '-m', 'release: ' + releaseVersion + '']);
 
+  console.log('\n' + chalk.inverse('PUSHING COMMITS'));
+  spawnSync('git', ['push', '-fu', 'origin', 'release-' + releaseVersion]);
 
   console.log('\n' + chalk.inverse('Back to ' + currentBranch + ' branch'));
   spawnSync('git', ['checkout', currentBranch]);
