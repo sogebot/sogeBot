@@ -159,7 +159,7 @@ function doRelease() {
     });
 
     console.log(chalk.yellow('5.') + ' Copy release package to /');
-    spawnSync('cp', ['sogeBot-release-' + releaseVersion + '*.zip', '.']);
+    spawnSync('cp', ['sogeBot-release-' + releaseVersion + '/*.zip', '.']);
 
     console.log(chalk.yellow('6.') + ' Cleanup directory');
     spawnSync('rm', ['-rf', 'sogeBot-release-' + releaseVersion]);
