@@ -49,7 +49,7 @@ function doRelease() {
   console.log('\t' + chalk.yellow('Release type:    ') + (isMajorRelease ? 'major' : 'minor'));
   console.log('\t' + chalk.yellow('Release version: ') + releaseVersion);
   console.log('\t' + chalk.yellow('Current branch:  ') + currentBranch);
-
+/*
   console.log('\n' + chalk.inverse('CREATE RELEASE BRANCH') + ' release-' + releaseVersion);
   spawnSync('git', ['branch', '-D', 'release-' + releaseVersion]);
   spawnSync('git', ['checkout', '-b', 'release-' + releaseVersion]);
@@ -135,18 +135,24 @@ function doRelease() {
     spawnSync('git', ['push', '-fu', 'origin', 'release-' + releaseVersion]);
   } else {
     console.log('\n' + chalk.inverse('PUSHING COMMITS - SKIPPED'));
-  }
+  }*/
 
   if (shouldBuildZip && shouldPushToGit) {
     console.log('\n' + chalk.inverse('ZIP BUILD'));
 
     console.log(chalk.yellow('1.') + ' Download release package');
-    spawnSync('curl ', ['https://github.com/sogehige/sogeBot/archive/release-' + releaseVersion + '.zip', '--output', 'release-' + releaseVersion + '.zip']);
+    var process = spawnSync('curl ', ['https://github.com/sogehige/sogeBot/archive/release-' + releaseVersion + '.zip', '--output', 'release-' + releaseVersion + '.zip']);
+    console.log(process.stdout.toString())
+    console.log(process.stderr.toString())
+
 
     console.log(chalk.yellow('2.') + ' Unzip downloaded package');
-    spawnSync('unzip', ['release-' + releaseVersion + '.zip', '-d', 'release-' + releaseVersion]);
+    var process = spawnSync('unzip', ['release-' + releaseVersion + '.zip', '-d', 'release-' + releaseVersion]);
+    console.log(process.stdout.toString())
+    console.log(process.stderr.toString())
 
-    console.log(chalk.yellow('3.') + ' Running make');
+
+    /*console.log(chalk.yellow('3.') + ' Running make');
     spawnSync('cd', ['release-' + releaseVersion]);
     spawnSync('make');
 
@@ -154,7 +160,7 @@ function doRelease() {
     spawnSync('make', ['pack']);
 
     console.log(chalk.yellow('5.') + ' Copy release package to /');
-    spawnSync('cp', ['*.zip', '../']);
+    spawnSync('cp', ['*.zip', '../']);*/
   } else {
     console.log('\n' + chalk.inverse('ZIP BUILD - SKIPPED'));
   }
