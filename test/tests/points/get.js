@@ -24,9 +24,9 @@ describe('Points - get()', () => {
     it('points should be returned in safe points bounds', async () => {
       await global.systems.points.get({ sender: hugePointsUser, parameters: '' })
       await message.isSent('points.defaults.pointsResponse', { username: hugePointsUser.username }, {
-        amount: Math.floor(Number.MAX_SAFE_INTEGER / 1000000),
+        amount: Math.floor(Number.MAX_SAFE_INTEGER),
         username: hugePointsUser.username,
-        pointsName: await global.systems.points.getPointsName(Math.floor(Number.MAX_SAFE_INTEGER / 1000000))
+        pointsName: await global.systems.points.getPointsName(Math.floor(Number.MAX_SAFE_INTEGER))
       })
     })
   })

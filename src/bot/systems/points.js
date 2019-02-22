@@ -138,9 +138,9 @@ class Points extends System {
     if (Number(points) < 0) points = 0
 
     return parseInt(
-      Number(points) <= Number.MAX_SAFE_INTEGER / 1000000
+      Number(points) <= Number.MAX_SAFE_INTEGER
         ? points
-        : Number.MAX_SAFE_INTEGER / 1000000, 10)
+        : Number.MAX_SAFE_INTEGER, 10)
   }
 
   async set (opts) {

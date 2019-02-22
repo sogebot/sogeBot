@@ -238,9 +238,9 @@ class Users extends Core {
     if (Number(watched) < 0) watched = 0
 
     return parseInt(
-      Number(watched) <= Number.MAX_SAFE_INTEGER / 1000000
+      Number(watched) <= Number.MAX_SAFE_INTEGER
         ? watched
-        : Number.MAX_SAFE_INTEGER / 1000000, 10)
+        : Number.MAX_SAFE_INTEGER, 10)
   }
 
   async getMessagesOf (id: string) {
@@ -252,9 +252,9 @@ class Users extends Core {
     if (Number(messages) < 0) messages = 0
 
     return parseInt(
-      Number(messages) <= Number.MAX_SAFE_INTEGER / 1000000
+      Number(messages) <= Number.MAX_SAFE_INTEGER
         ? messages
-        : Number.MAX_SAFE_INTEGER / 1000000, 10)
+        : Number.MAX_SAFE_INTEGER, 10)
   }
 
   async getUsernamesFromIds (IdsList: Array<string>) {

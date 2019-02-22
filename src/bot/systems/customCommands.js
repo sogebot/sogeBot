@@ -394,9 +394,9 @@ class CustomCommands extends System {
     if (Number(count) < 0) count = 0
 
     return parseInt(
-      Number(count) <= Number.MAX_SAFE_INTEGER / 1000000
+      Number(count) <= Number.MAX_SAFE_INTEGER
         ? count
-        : Number.MAX_SAFE_INTEGER / 1000000, 10)
+        : Number.MAX_SAFE_INTEGER, 10)
   }
 
   async checkFilter (opts: Object, filter: string) {
