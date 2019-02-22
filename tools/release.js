@@ -10,12 +10,15 @@ const argv = require('yargs') // eslint-disable-line
   .version('false')
   .describe('v', 'version to release')
   .demandOption(['v'])
+  .describe('nopush', 'disable push')
+  .boolean('nopush')
   .help('help')
   .alias('h', 'help')
   .argv
 const currentBranch = getCurrentBranch();
 const releaseVersion = argv.v
 const isMajorRelease = releaseVersion.endsWith('.0');
+const shouldPushToGit = argv.nopush
 
 doRelease();
 
@@ -95,8 +98,12 @@ function doRelease() {
   spawnSync('git', ['add', '-A']);
   spawnSync('git', ['commit', '-m', 'build: ' + releaseVersion + '']);
 
-  console.log('\n' + chalk.inverse('PUSHING COMMITS'));
-  spawnSync('git', ['push', '-fu', 'origin', 'release-' + releaseVersion]);
+  if (!shouldPushToGit) {
+    console.log('\n' + chalk.inverse('PUSHING COMMITS'));
+    spawnSync('git', ['push', '-fu', 'origin', 'release-' + releaseVersion]);
+  } else {
+    console.log('\n' + chalk.inverse('PUSHING COMMITS - SKIPPED'));
+  }
 
   console.log('\n' + chalk.inverse('Back to ' + currentBranch + ' branch'));
   spawnSync('git', ['checkout', currentBranch]);
