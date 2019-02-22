@@ -83,7 +83,19 @@ function doRelease() {
     sidebarFile = sidebarFile.replace(/_master/g, '');
     fs.writeFileSync(path.join('docs', '_sidebar.md'), sidebarFile)
 
-    console.log(chalk.yellow('6.') + ' Create doc commit');
+    const navbar = path.join('docs', '_navbar.md');
+    console.log(chalk.yellow('6.') + ' Add archive link to ' + navbar);
+    let navbarFile = fs.readFileSync(navbar).toString().split('\n');
+    let newNavbarFile = []
+    for (let line of navbarFile) {
+      newNavbarFile.push(line)
+      if (line.toLowerCase().includes('archive') && !line.toLowerCase().includes('_archive/')) {
+        newNavbarFile.push(`  * [${getLastMajorVersion()}](/_archive/${getLastMajorVersion()}/)`)
+      }
+    }
+    fs.writeFileSync(navbar, newNavbarFile.join('\n'))
+
+    console.log(chalk.yellow('7.') + ' Create doc commit');
     spawnSync('git', ['add', '-A']);
     spawnSync('git', ['commit', '-m', 'docs: release docs ' + releaseVersion + '']);
   }
