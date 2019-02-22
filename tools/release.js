@@ -49,7 +49,7 @@ function doRelease() {
   console.log('\t' + chalk.yellow('Release type:    ') + (isMajorRelease ? 'major' : 'minor'));
   console.log('\t' + chalk.yellow('Release version: ') + releaseVersion);
   console.log('\t' + chalk.yellow('Current branch:  ') + currentBranch);
-/*
+
   console.log('\n' + chalk.inverse('CREATE RELEASE BRANCH') + ' release-' + releaseVersion);
   spawnSync('git', ['branch', '-D', 'release-' + releaseVersion]);
   spawnSync('git', ['checkout', '-b', 'release-' + releaseVersion]);
@@ -135,7 +135,7 @@ function doRelease() {
     spawnSync('git', ['push', '-fu', 'origin', 'release-' + releaseVersion]);
   } else {
     console.log('\n' + chalk.inverse('PUSHING COMMITS - SKIPPED'));
-  }*/
+  }
 
   if (shouldBuildZip && shouldPushToGit) {
     console.log('\n' + chalk.inverse('ZIP BUILD'));
