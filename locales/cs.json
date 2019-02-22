@@ -368,8 +368,6 @@
         "months": "Počet měsíců",
         "monthsName": "Název měsíce (1 měsíc, 2 měsíce)",
         "oldGame": "Hra před změnou",
-        "userObject": "Úplný uživatelský objekt",
-        "recipientObject": "Úplný objekt příjemce",
         "recipient": "Příjemce",
         "ytSong": "Aktuální píseň na YouTube",
         "spotifySong": "Aktuální píseň na Spotify",
@@ -382,7 +380,25 @@
         "latestCheerAmount": "Poslední Cheer (počet)",
         "latestCheerMessage": "Poslední Cheer (zpráva)",
         "latestCheer": "Poslední Cheer (uživatel)",
-        "version": "Bot version"
+        "version": "Bot version",
+        "is": {
+          "moderator": "Je uživatel mod? (bool)",
+          "subscriber": "Je uživatel sub? (bool)",
+          "regular": "Je uživatel regular? (bool)",
+          "follower": "Je uživatel follower? (bool)",
+          "broadcaster": "Je uživatel broadcaster? (bool)",
+          "bot": "Je uživatel bot? (bool)",
+          "owner": "Je uživatel vlastník bota? (bool)"
+        },
+        "recipientis": {
+          "moderator": "Je příjemce mod? (bool)",
+          "subscriber": "Je příjemce sub? (bool)",
+          "regular": "Je příjemce regular? (bool)",
+          "follower": "Je příjemce follower? (bool)",
+          "broadcaster": "Je příjemce broadcaster? (bool)",
+          "bot": "Je příjemce bot? (bool)",
+          "owner": "Je příjemce vlastník bota? (bool)"
+        }
       }
     },
     "page-settings": {

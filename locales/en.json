@@ -358,7 +358,6 @@
         "months": "Months",
         "monthsName": "localized name of month (1 month, 2 months)",
         "oldGame": "Game before change",
-        "userObject": "Full user object",
         "recipientObject": "Full recipient object",
         "recipient": "Recipient",
         "ytSong": "Current song on YouTube",
@@ -372,7 +371,25 @@
         "latestCheerAmount": "Latest Cheer (amount)",
         "latestCheerMessage": "Latest Cheer (message)",
         "latestCheer": "Latest Cheer (username)",
-        "version": "Bot version"
+        "version": "Bot version",
+        "is": {
+          "moderator": "Is user mod? (bool)",
+          "subscriber": "Is user sub? (bool)",
+          "regular": "Is user regular? (bool)",
+          "follower": "Is user follower? (bool)",
+          "broadcaster": "Is user broadcaster? (bool)",
+          "bot": "Is user bot? (bool)",
+          "owner": "Is user bot owner? (bool)"
+        },
+        "recipientis": {
+          "moderator": "Is recipient mod? (bool)",
+          "subscriber": "Is recipient sub? (bool)",
+          "regular": "Is recipient regular? (bool)",
+          "follower": "Is recipient follower? (bool)",
+          "broadcaster": "Is recipient broadcaster? (bool)",
+          "bot": "Is recipient bot? (bool)",
+          "owner": "Is recipient bot owner? (bool)"
+        }
       }
     },
     "page-settings": {

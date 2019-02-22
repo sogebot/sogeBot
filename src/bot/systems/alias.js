@@ -77,7 +77,7 @@ class Alias extends System {
     if (!tryingToBypass) {
       let [isRegular, isMod, isOwner] = await Promise.all([
         global.commons.isRegular(opts.sender),
-        global.commons.isMod(opts.sender),
+        global.commons.isModerator(opts.sender),
         global.commons.isOwner(opts.sender)
       ])
 

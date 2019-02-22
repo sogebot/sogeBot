@@ -209,11 +209,11 @@ Commons.prototype.isBroadcaster = function (user) {
   }
 }
 
-Commons.prototype.isMod = async function (user) {
+Commons.prototype.isModerator = async function (user) {
   try {
     if (_.isString(user)) user = await global.users.getByName(user)
-    else user = { is: { mod: typeof user.badges.moderator !== 'undefined' } }
-    return !_.isNil(user.is.mod) ? user.is.mod : false
+    else user = { is: { moderator: typeof user.badges.moderator !== 'undefined' } }
+    return !_.isNil(user.is.moderator) ? user.is.moderator : false
   } catch (e) {
     return false
   }
@@ -223,6 +223,24 @@ Commons.prototype.isRegular = async function (user) {
   try {
     if (_.isString(user)) user = await global.users.getByName(user)
     return !_.isNil(user.is.regular) ? user.is.regular : false
+  } catch (e) {
+    return false
+  }
+}
+
+Commons.prototype.isFollower = async function (user) {
+  try {
+    if (_.isString(user)) user = await global.users.getByName(user)
+    return !_.isNil(user.is.follower) ? user.is.follower : false
+  } catch (e) {
+    return false
+  }
+}
+
+Commons.prototype.isSubscriber = async function (user) {
+  try {
+    if (_.isString(user)) user = await global.users.getByName(user)
+    return !_.isNil(user.is.subscriber) ? user.is.subscriber : false
   } catch (e) {
     return false
   }

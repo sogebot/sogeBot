@@ -31,7 +31,7 @@ describe('Cooldowns - check()', () => {
     })
 
     it('Add usermod1 as moderator', async () => {
-      await global.db.engine.insert('users', { id: '2', username: 'usermod1', is: { mod: true } })
+      await global.db.engine.insert('users', { id: '2', username: 'usermod1', is: { moderator: true } })
     })
 
     it('Add global KonCha to cooldown', async () => {
@@ -78,7 +78,7 @@ describe('Cooldowns - check()', () => {
     })
 
     it('Add usermod1 as moderator', async () => {
-      await global.db.engine.insert('users', { id: '2', username: 'usermod1', is: { mod: true } })
+      await global.db.engine.insert('users', { id: '2', username: 'usermod1', is: { moderator: true } })
     })
 
     it('Add global !followage to cooldown', async () => {

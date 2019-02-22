@@ -54,7 +54,7 @@ class Parser {
       if (parser.priority === constants.MODERATION) continue // skip moderation parsers
       let [isRegular, isMod, isOwner] = await Promise.all([
         global.commons.isRegular(this.sender),
-        global.commons.isMod(this.sender),
+        global.commons.isModerator(this.sender),
         global.commons.isOwner(this.sender)
       ])
 
@@ -166,7 +166,7 @@ class Parser {
 
     let [isRegular, isMod, isOwner] = await Promise.all([
       global.commons.isRegular(sender),
-      global.commons.isMod(sender),
+      global.commons.isModerator(sender),
       global.commons.isOwner(sender)
     ])
 

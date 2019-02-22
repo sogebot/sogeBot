@@ -211,28 +211,11 @@
     if (variables.length > 0) {
       $('[data-event-variables]').css('display', 'block')
       $('[data-event-variables] small').empty()
-
-      const whatsthis =
-        `<a data-events-whats-this class="badge badge-pill badge-light" data-html="true"
-                                data-content="<em>${translations.events.popovers.example_of_user_object_data}</em>
-                                              <br> <b>userObject.username</b>: 'exampleuser'
-                                              <br> <b>userObject.id</b>: '123456'
-                                              <br> <b>userObject.is.online</b>: true
-                                              <br> <b>userObject.is.follower</b>: true <br> <b>userObject.is.regular</b>: true
-                                              <br> <b>userObject.is.subscriber</b>: true">
-                          ${translations.events.whatsthis}
-                        </a>`
       for (let variable of variables) {
         $('[data-event-variables] small').append(
           `
           <div>
-            <strong>$${variable}</strong> - ${translations.responses.variable[variable]}
-            ${variable === 'userObject'
-              ? whatsthis
-              : ``}
-            ${variable === 'recipientObject'
-              ? whatsthis.replace(/userObject/g, 'recipientObject')
-              : ``}
+            <strong>$${variable}</strong> - ${commons.translate('responses.variable.' + variable) }
           </div>
         `
         )

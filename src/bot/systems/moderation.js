@@ -223,7 +223,7 @@ class Moderation extends System {
       this.settings.links.includeSpaces,
       this.settings.links.timeout,
       global.commons.isOwner(opts.sender),
-      global.commons.isMod(opts.sender),
+      global.commons.isModerator(opts.sender),
       this.whitelist(opts.message)
     ])
 
@@ -257,7 +257,7 @@ class Moderation extends System {
       this.settings.symbols.moderateSubscribers,
       this.whitelist(opts.message),
       global.commons.isOwner(opts.sender),
-      global.commons.isMod(opts.sender),
+      global.commons.isModerator(opts.sender),
       this.settings.symbols.timeout,
       this.settings.symbols.triggerLength,
       this.settings.symbols.maxSymbolsConsecutively,
@@ -297,7 +297,7 @@ class Moderation extends System {
       this.settings.longMessage.enabled,
       this.settings.longMessage.moderateSubscribers,
       global.commons.isOwner(opts.sender),
-      global.commons.isMod(opts.sender),
+      global.commons.isModerator(opts.sender),
       this.whitelist(opts.message),
       this.settings.longMessage.timeout,
       this.settings.longMessage.triggerLength
@@ -320,7 +320,7 @@ class Moderation extends System {
       this.settings.caps.enabled,
       this.settings.caps.moderateSubscribers,
       global.commons.isOwner(opts.sender),
-      global.commons.isMod(opts.sender),
+      global.commons.isModerator(opts.sender),
       this.whitelist(opts.message),
       this.settings.caps.timeout,
       this.settings.caps.triggerLength,
@@ -369,7 +369,7 @@ class Moderation extends System {
       this.settings.spam.enabled,
       this.settings.spam.moderateSubscribers,
       global.commons.isOwner(opts.sender),
-      global.commons.isMod(opts.sender),
+      global.commons.isModerator(opts.sender),
       this.whitelist(opts.message),
       this.settings.spam.timeout,
       this.settings.spam.triggerLength,
@@ -399,7 +399,7 @@ class Moderation extends System {
       this.settings.color.enabled,
       this.settings.color.moderateSubscribers,
       global.commons.isOwner(opts.sender),
-      global.commons.isMod(opts.sender),
+      global.commons.isModerator(opts.sender),
       this.settings.color.timeout
     ])
 
@@ -422,7 +422,7 @@ class Moderation extends System {
       this.settings.emotes.enabled,
       this.settings.emotes.moderateSubscribers,
       global.commons.isOwner(opts.sender),
-      global.commons.isMod(opts.sender),
+      global.commons.isModerator(opts.sender),
       this.settings.emotes.timeout,
       this.settings.emotes.maxCount
     ])
@@ -445,7 +445,7 @@ class Moderation extends System {
     let [isEnabledForSubs, isOwner, isMod, timeout, blacklist] = await Promise.all([
       this.settings.lists.moderateSubscribers,
       global.commons.isOwner(opts.sender),
-      global.commons.isMod(opts.sender),
+      global.commons.isModerator(opts.sender),
       this.settings.lists.timeout,
       this.settings.lists.blacklist
     ])

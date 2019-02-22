@@ -21,7 +21,7 @@ class Seppuku extends Game {
       return
     }
 
-    const isMod = await global.commons.isMod(opts.sender)
+    const isMod = await global.commons.isModerator(opts.sender)
     if (isMod) {
       global.commons.sendMessage(global.translate('gambling.seppuku.mod'), opts.sender)
       return
