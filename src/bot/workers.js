@@ -148,6 +148,10 @@ class Workers {
       } else if (data.type === 'event') {
         global.events.fire(data.eventId, data.attributes)
       } else if ( data.type === 'interface') {
+        // remove core from path
+        if (data.path.startsWith('core.')) {
+          data.path = data.path.replace('core.', '')
+        }
         _.set(global, data.path, data.value);
       }
     } else {
