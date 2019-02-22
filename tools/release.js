@@ -141,24 +141,33 @@ function doRelease() {
     console.log('\n' + chalk.inverse('ZIP BUILD'));
 
     console.log(chalk.yellow('1.') + ' Download release package');
-    var process = spawnSync('curl ', ['https://github.com/sogehige/sogeBot/archive/release-' + releaseVersion + '.zip', '--output', 'release-' + releaseVersion + '.zip']);
-    console.log(process.stderr.toString())
-
+    spawnSync('curl', ['https://codeload.github.com/sogehige/sogeBot/zip/release-' + releaseVersion, '--output', 'release-' + releaseVersion + '.zip']);
 
     console.log(chalk.yellow('2.') + ' Unzip downloaded package');
-    var process = spawnSync('unzip', ['release-' + releaseVersion + '.zip', '-d', 'release-' + releaseVersion]);
-    console.log(process.stderr.toString())
+    spawnSync('unzip', ['release-' + releaseVersion + '.zip']);
+
+    var p = spawnSync('ls', {
+      cwd: 'sogeBot-release-' + releaseVersion
+    });
+    console.log(p.stdout.toString())
 
 
-    /*console.log(chalk.yellow('3.') + ' Running make');
+    console.log(chalk.yellow('3.') + ' Running make');
     spawnSync('cd', ['release-' + releaseVersion]);
-    spawnSync('make');
+    spawnSync('make', {
+      cwd: 'sogeBot-release-' + releaseVersion
+    });
 
     console.log(chalk.yellow('4.') + ' Creating release package');
-    spawnSync('make', ['pack']);
+    spawnSync('make', ['pack'], {
+      cwd: 'sogeBot-release-' + releaseVersion
+    });
 
     console.log(chalk.yellow('5.') + ' Copy release package to /');
-    spawnSync('cp', ['*.zip', '../']);*/
+    spawnSync('cp', ['sogeBot-release-' + releaseVersion + '*.zip', '.']);
+
+    console.log(chalk.yellow('6.') + ' Cleanup directory');
+    spawnSync('rm', ['-rf', 'sogeBot-release-' + releaseVersion]);
   } else {
     console.log('\n' + chalk.inverse('ZIP BUILD - SKIPPED'));
   }
