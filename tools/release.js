@@ -12,6 +12,8 @@ const argv = require('yargs') // eslint-disable-line
   .demandOption(['v'])
   .describe('nopush', 'disable push')
   .boolean('nopush')
+  .describe('build', 'build a zip')
+  .boolean('build')
   .help('help')
   .alias('h', 'help')
   .argv
@@ -19,6 +21,7 @@ const currentBranch = getCurrentBranch();
 const releaseVersion = argv.v
 const isMajorRelease = releaseVersion.endsWith('.0');
 const shouldPushToGit = argv.nopush
+const shouldBuildZip = argv.build
 
 doRelease();
 
@@ -132,6 +135,28 @@ function doRelease() {
     spawnSync('git', ['push', '-fu', 'origin', 'release-' + releaseVersion]);
   } else {
     console.log('\n' + chalk.inverse('PUSHING COMMITS - SKIPPED'));
+  }
+
+  if (shouldBuildZip && shouldPushToGit) {
+    console.log('\n' + chalk.inverse('ZIP BUILD'));
+
+    console.log(chalk.yellow('1.') + ' Download release package');
+    spawnSync('wget', ['https://github.com/sogehige/sogeBot/archive/release-' + releaseVersion + '.zip']);
+
+    console.log(chalk.yellow('2.') + ' Unzip downloaded package');
+    spawnSync('unzip', ['release-' + releaseVersion + '.zip', '-d', 'release-' + releaseVersion]);
+
+    console.log(chalk.yellow('3.') + ' Running make');
+    spawnSync('cd', ['release-' + releaseVersion]);
+    spawnSync('make');
+
+    console.log(chalk.yellow('4.') + ' Creating release package');
+    spawnSync('make', ['pack']);
+
+    console.log(chalk.yellow('5.') + ' Copy release package to /');
+    spawnSync('cp', ['*.zip', '../']);
+  } else {
+    console.log('\n' + chalk.inverse('ZIP BUILD - SKIPPED'));
   }
 
   console.log('\n' + chalk.inverse('Back to ' + currentBranch + ' branch'));
