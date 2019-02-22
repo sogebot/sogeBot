@@ -36,6 +36,11 @@ function getLastMajorVersion() {
   return `${x}.${Number(y) - 1}.x`;
 }
 
+function getCurrentMajorVersion() {
+  const [x, y, z] = releaseVersion.split('.');
+  return `${x}.${y}.x`;
+}
+
 function doRelease() {
   console.log(chalk.inverse('RELEASE TOOL'));
   console.log('\t' + chalk.yellow('Release type:    ') + (isMajorRelease ? 'major' : 'minor'));
@@ -95,7 +100,19 @@ function doRelease() {
     }
     fs.writeFileSync(navbar, newNavbarFile.join('\n'))
 
-    console.log(chalk.yellow('7.') + ' Create doc commit');
+    console.log(chalk.yellow('7.') + ' Update current version ' + navbar);
+    navbarFile = fs.readFileSync(navbar).toString().split('\n');
+    newNavbarFile = []
+    for (let line of navbarFile) {
+      if (line.toLowerCase().includes('current')) {
+        newNavbarFile.push(`* **Current:** [${getCurrentMajorVersion()}](/)`)
+      } else {
+        newNavbarFile.push(line)
+      }
+    }
+    fs.writeFileSync(navbar, newNavbarFile.join('\n'))
+
+    console.log(chalk.yellow('8.') + ' Create doc commit');
     spawnSync('git', ['add', '-A']);
     spawnSync('git', ['commit', '-m', 'docs: release docs ' + releaseVersion + '']);
   }
