@@ -146,11 +146,6 @@ function doRelease() {
     console.log(chalk.yellow('2.') + ' Unzip downloaded package');
     spawnSync('unzip', ['release-' + releaseVersion + '.zip']);
 
-    var p = spawnSync('ls', {
-      cwd: 'sogeBot-release-' + releaseVersion
-    });
-    console.log(p.stdout.toString())
-
 
     console.log(chalk.yellow('3.') + ' Running make');
     spawnSync('cd', ['release-' + releaseVersion]);
