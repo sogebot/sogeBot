@@ -142,13 +142,11 @@ function doRelease() {
 
     console.log(chalk.yellow('1.') + ' Download release package');
     var process = spawnSync('curl ', ['https://github.com/sogehige/sogeBot/archive/release-' + releaseVersion + '.zip', '--output', 'release-' + releaseVersion + '.zip']);
-    console.log(process.stdout.toString())
     console.log(process.stderr.toString())
 
 
     console.log(chalk.yellow('2.') + ' Unzip downloaded package');
     var process = spawnSync('unzip', ['release-' + releaseVersion + '.zip', '-d', 'release-' + releaseVersion]);
-    console.log(process.stdout.toString())
     console.log(process.stderr.toString())
 
 
