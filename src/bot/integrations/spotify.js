@@ -487,7 +487,6 @@ class Spotify extends Integration {
     } catch (e) {
       global.commons.sendMessage(
         global.commons.prepare('integrations.spotify.song-not-found'), opts.sender)
-      global.log.error(e.stack)
     }
   }
 }
