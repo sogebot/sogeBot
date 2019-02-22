@@ -229,7 +229,7 @@ class CustomCommands extends System {
 
     let [isRegular, isMod, isOwner] = await Promise.all([
       global.commons.isRegular(opts.sender),
-      global.commons.isMod(opts.sender),
+      global.commons.isModerator(opts.sender),
       global.commons.isOwner(opts.sender)
     ])
 
@@ -409,10 +409,19 @@ class CustomCommands extends System {
       $rank = await global.systems.ranks.get($userObject)
     }
 
+    const $is = {
+      moderator: await global.commons.isModerator(opts.sender.username),
+      subscriber: await global.commons.isSubscriber(opts.sender.username),
+      regular: await global.commons.isRegular(opts.sender.username),
+      broadcaster: global.commons.isBroadcaster(opts.sender.username),
+      bot: global.commons.isBot(opts.sender.username),
+      owner: global.commons.isOwner(opts.sender.username),
+    }
+
     const context = {
       _: _,
       $sender: opts.sender.username,
-      $userObject,
+      $is,
       $rank,
       // add global variables
       $game: _.get(await global.db.engine.findOne('api.current', { key: 'game' }), 'value', 'n/a'),

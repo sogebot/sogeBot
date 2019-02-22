@@ -55,8 +55,8 @@ class FightMe extends Game {
     if (isChallenged) {
       let winner = _.random(0, 1, false)
       let isMod = {
-        user: await global.commons.isMod(username),
-        sender: await global.commons.isMod(opts.sender.username)
+        user: await global.commons.isModerator(username),
+        sender: await global.commons.isModerator(opts.sender.username)
       }
 
       // vs broadcaster
@@ -109,7 +109,7 @@ class FightMe extends Game {
     } else {
       // check if under gambling cooldown
       const cooldown = await this.settings.cooldown
-      const isMod = await global.commons.isMod(opts.sender)
+      const isMod = await global.commons.isModerator(opts.sender)
       if (new Date().getTime() - new Date(await this.settings._.cooldown).getTime() < cooldown * 1000 &&
         !(await this.settings.bypassCooldownByOwnerAndMods && (isMod || await global.commons.isBroadcaster(opts.sender)))) {
         global.commons.sendMessage(global.commons.prepare('gambling.fightme.cooldown', {

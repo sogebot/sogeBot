@@ -1,11 +1,16 @@
 /* globals translations, commons, Vue, _ $, io */
 
+const flattenKeys = (obj, path = []) =>
+    !_.isObject(obj)
+        ? { [path.join('.')]: obj }
+        : _.reduce(obj, (cum, next, key) => _.merge(cum, flattenKeys(next, [...path, key])), {});
+
 /* div with html filters */
 window.textWithTags = {
   props: ['value'],
   filters: {
     filterize: function (val) {
-      const filtersRegExp = new RegExp('\\$(' + _.sortBy(_.keys(translations.responses.variable), (o) => -o.length).join('|') + ')', 'g')
+      const filtersRegExp = new RegExp('\\$(' + _.sortBy(_.keys(flattenKeys(translations.responses.variable)), (o) => -o.length).join('|') + ')', 'g')
       val = val.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
       let matches = val.match(filtersRegExp)
       let output = val
@@ -296,7 +301,7 @@ window.textAreaWithTags = {
   },
   filters: {
     filterize: function (val) {
-      const filtersRegExp = new RegExp('\\$(' + _.sortBy(_.keys(translations.responses.variable), (o) => -o.length).join('|') + ')', 'g')
+      const filtersRegExp = new RegExp('\\$(' + _.sortBy(_.keys(flattenKeys(translations.responses.variable)), (o) => -o.length).join('|') + ')', 'g')
       val = val.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
       let matches = val.match(filtersRegExp)
       let output = val
@@ -405,7 +410,7 @@ window.textAreaWithTags = {
            :style="{ left: btnPosX + 'px', top: btnPosY + 'px' }"
            @mouseleave="isFiltersVisible=false">
         <button type="button"
-                class="btn btn-sm border-0 ml-3 mt-3 mr-3"
+                class="btn btn-sm border-0 ml-3 mt-3"
                 :class="[ isFiltersVisible ? 'btn-secondary' : 'btn-outline-secondary' ]"
                 @click="toggleFilters()">$</button>
 

@@ -150,7 +150,7 @@ class Message {
     }
     let custom = {
       '$_#': async (variable) => {
-        let isMod = await global.commons.isMod(attr.sender)
+        let isMod = await global.commons.isModerator(attr.sender)
         if ((global.commons.isOwner(attr.sender) || isMod) &&
           (!_.isNil(attr.param) && attr.param.length !== 0)) {
           let state = await global.customvariables.setValueOf(variable, attr.param, { sender: attr.sender })
@@ -176,7 +176,7 @@ class Message {
       // force quiet variable set
       '$!_#': async (variable) => {
         variable = variable.replace('$!_', '$_')
-        let isMod = await global.commons.isMod(attr.sender)
+        let isMod = await global.commons.isModerator(attr.sender)
         if ((global.commons.isOwner(attr.sender) || isMod) &&
           (!_.isNil(attr.param) && attr.param.length !== 0)) {
           let state = await global.customvariables.setValueOf(variable, attr.param, { sender: attr.sender })
