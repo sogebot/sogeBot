@@ -20,7 +20,7 @@ const argv = require('yargs') // eslint-disable-line
 const currentBranch = getCurrentBranch();
 const releaseVersion = argv.v
 const isMajorRelease = releaseVersion.endsWith('.0');
-const shouldPushToGit = argv.nopush
+const shouldPushToGit = !argv.nopush
 const shouldBuildZip = argv.build
 
 doRelease();
@@ -130,7 +130,7 @@ function doRelease() {
   spawnSync('git', ['add', '-A']);
   spawnSync('git', ['commit', '-m', 'build: ' + releaseVersion + '']);
 
-  if (!shouldPushToGit) {
+  if (shouldPushToGit) {
     console.log('\n' + chalk.inverse('PUSHING COMMITS'));
     spawnSync('git', ['push', '-fu', 'origin', 'release-' + releaseVersion]);
   } else {
@@ -141,7 +141,7 @@ function doRelease() {
     console.log('\n' + chalk.inverse('ZIP BUILD'));
 
     console.log(chalk.yellow('1.') + ' Download release package');
-    spawnSync('wget', ['https://github.com/sogehige/sogeBot/archive/release-' + releaseVersion + '.zip']);
+    spawnSync('curl ', ['https://github.com/sogehige/sogeBot/archive/release-' + releaseVersion + '.zip', '--output', 'release-' + releaseVersion + '.zip']);
 
     console.log(chalk.yellow('2.') + ' Unzip downloaded package');
     spawnSync('unzip', ['release-' + releaseVersion + '.zip', '-d', 'release-' + releaseVersion]);
