@@ -8,7 +8,7 @@ const _ = require('lodash')
 
 const assert = require('chai').assert
 
-const max = Math.floor(Number.MAX_SAFE_INTEGER / 1000000)
+const max = Math.floor(Number.MAX_SAFE_INTEGER)
 
 const owner = { username: 'soge__', userId: String(_.random(999999, false)) }
 const testuser = { username: 'testuser', userId: String(_.random(999999, false)) }

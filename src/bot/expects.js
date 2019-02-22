@@ -78,9 +78,9 @@ class Expects {
         this.match.push(match.points)
       } else {
         this.match.push(parseInt(
-          Number(match.points) <= Number.MAX_SAFE_INTEGER / 1000000
+          Number(match.points) <= Number.MAX_SAFE_INTEGER
             ? match.points
-            : Number.MAX_SAFE_INTEGER / 1000000, 10)) // return only max safe
+            : Number.MAX_SAFE_INTEGER, 10)) // return only max safe
       }
       this.text = this.text.replace(match.points, '') // remove from text matched pattern
     } else {
