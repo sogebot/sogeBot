@@ -317,15 +317,15 @@
             viewer: this.viewer
           }
           if (!this.states.delete) {
-            this.socket.emit('update.viewer', {items: [data]}, (err, data) => {
+            this.socket.emit('update.viewer', {items: [data]}, (err, id) => {
               if (err) {
                 console.error(err)
                 return this.states.save = 3
               }
               this.states.save = 2
               this.pending = false
-              this.id = String(data._id)
-              page('?id=' + this.id + '/#viewers/edit')
+              this.id = String(id)
+              page('?id=' + this.id + '#/viewers/edit')
               setTimeout(() => this.states.save = 0, 1000)
             })
           } else {
@@ -336,12 +336,9 @@
         },
       },
       watch: {
-        watchedTime: _.debounce(function (val, old) {
-          if (val === old) return
-          this.watchedTime = Number(val).toFixed(1)
-
-          if (!isNaN(this.watchedTime)) this.viewer.time.watched = this.watchedTime * 60 * 60 * 1000
-        }, 1000),
+        watchedTime: function (val, old) {
+          this.viewer.time.watched = val * 60 * 60 * 1000
+        },
         'viewer.time.follow': function (val, old) {
           if (val === null || this.viewer.time.follow === new Date(val).getTime()) return
           this.pending = true
