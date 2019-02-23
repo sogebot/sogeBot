@@ -8,7 +8,7 @@ const assert = require('assert')
 
 const owner = { username: 'soge__' }
 
-describe.only('Message - random filter', () => {
+describe('Message - random filter', () => {
   describe('(random.online.viewer) should exclude ignored user', () => {
     before(async () => {
       await db.cleanup()
