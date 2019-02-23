@@ -81,47 +81,78 @@ class Message {
 
     let random = {
       '(random.online.viewer)': async function () {
-        const onlineViewers = _.filter(
-          (await global.db.engine.find('users.online')).map((o) => o.username),
-          (o) => o.username !== attr.sender && o.username !== global.oauth.settings.bot.username.toLowerCase())
+        const usernames = (await global.db.engine.find('users.online')).map((o) => o.username)
+        const onlineViewers = usernames.filter((username) => {
+          const isSender = username === attr.sender;
+          const isBot = global.commons.isBot(username);
+          const isIgnored = global.commons.isIgnored(username);
+          return !isSender && !isBot && !isIgnored;
+        })
         if (onlineViewers.length === 0) return 'unknown'
         return _.sample(onlineViewers)
       },
       '(random.online.follower)': async function () {
-        const onlineViewers = (await global.db.engine.find('users.online')).map((o) => o.username)
+        const usernames = (await global.db.engine.find('users.online')).map((o) => o.username)
+        const onlineViewers = usernames.filter((username) => {
+          const isSender = username === attr.sender;
+          const isBot = global.commons.isBot(username);
+          const isIgnored = global.commons.isIgnored(username);
+          return !isSender && !isBot && !isIgnored;
+        })
         const followers = _.filter(
           (await global.db.engine.find('users', { is: { follower: true } })).map((o) => o.username),
-          (o) => o.username !== attr.sender && o.username !== global.oauth.settings.bot.username.toLowerCase())
+          (o) => o !== attr.sender && o !== global.oauth.settings.bot.username.toLowerCase())
         let onlineFollowers = _.intersection(onlineViewers, followers)
         if (onlineFollowers.length === 0) return 'unknown'
         return _.sample(onlineFollowers)
       },
       '(random.online.subscriber)': async function () {
-        const onlineViewers = (await global.db.engine.find('users.online')).map((o) => o.username)
+        const usernames = (await global.db.engine.find('users.online')).map((o) => o.username)
+        const onlineViewers = usernames.filter((username) => {
+          const isSender = username === attr.sender;
+          const isBot = global.commons.isBot(username);
+          const isIgnored = global.commons.isIgnored(username);
+          return !isSender && !isBot && !isIgnored;
+        })
         const subscribers = _.filter(
           (await global.db.engine.find('users', { is: { subscriber: true } })).map((o) => o.username),
-          (o) => o.username !== attr.sender && o.username !== global.oauth.settings.bot.username.toLowerCase())
+          (o) => o !== attr.sender && o !== global.oauth.settings.bot.username.toLowerCase())
         let onlineSubscribers = _.intersection(onlineViewers, subscribers)
         if (onlineSubscribers.length === 0) return 'unknown'
         return _.sample(onlineSubscribers)
       },
       '(random.viewer)': async function () {
-        let viewer = await global.users.getAll()
-        viewer = _.filter(viewer, function (o) { return o.username !== attr.sender && o.username !== global.oauth.settings.bot.username.toLowerCase() })
+        let viewer = (await global.users.getAll()).map((o) => o.username)
+        viewer = viewer.filter((username) => {
+          const isSender = username === attr.sender;
+          const isBot = global.commons.isBot(username);
+          const isIgnored = global.commons.isIgnored(username);
+          return !isSender && !isBot && !isIgnored;
+        })
         if (viewer.length === 0) return 'unknown'
-        return _.sample(viewer).username
+        return _.sample(viewer)
       },
       '(random.follower)': async function () {
-        let follower = await global.users.getAll({ is: { follower: true } })
-        follower = _.filter(follower, function (o) { return o.username !== attr.sender && o.username !== global.oauth.settings.bot.username.toLowerCase() })
+        let follower = (await global.db.engine.find('users', { is: { follower: true } })).map((o) => o.username)
+        follower = follower.filter((username) => {
+          const isSender = username === attr.sender;
+          const isBot = global.commons.isBot(username);
+          const isIgnored = global.commons.isIgnored(username);
+          return !isSender && !isBot && !isIgnored;
+        })
         if (follower.length === 0) return 'unknown'
-        return _.sample(follower).username
+        return _.sample(follower)
       },
       '(random.subscriber)': async function () {
-        let subscriber = await global.users.getAll({ is: { subscriber: true } })
-        subscriber = _.filter(subscriber, function (o) { return o.username !== attr.sender && o.username !== global.oauth.settings.bot.username.toLowerCase() })
+        let subscriber = (await global.db.engine.find('users', { is: { subscriber: true } })).map((o) => o.username)
+        subscriber = subscriber.filter((username) => {
+          const isSender = username === attr.sender;
+          const isBot = global.commons.isBot(username);
+          const isIgnored = global.commons.isIgnored(username);
+          return !isSender && !isBot && !isIgnored;
+        })
         if (subscriber.length === 0) return 'unknown'
-        return _.sample(subscriber).username
+        return _.sample(subscriber)
       },
       '(random.number-#-to-#)': async function (filter) {
         let numbers = filter.replace('(random.number-', '')

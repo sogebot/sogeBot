@@ -33,11 +33,11 @@ Commons.prototype.getIgnoreList = function () {
   return global.users.settings.users.ignorelist
 }
 
-Commons.prototype.isIgnored = async function (sender) {
+Commons.prototype.isIgnored = function (sender) {
   if (sender !== null) { // null can be bot from dashboard or event
     if (typeof sender === 'string') sender = { username: sender }
     const isIgnored = this.getIgnoreList().includes(sender.username)
-    const isBroadcaster = await this.isBroadcaster(sender)
+    const isBroadcaster = this.isBroadcaster(sender)
     return isIgnored && !isBroadcaster
   } else return false
 }
