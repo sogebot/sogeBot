@@ -3,10 +3,9 @@ const child_process = require('child_process')
 
 const file = fs.readFileSync('report').toString();
 const regexp = /^  \d\)(.*)$/gm
-const match = file.match(regexp)
+let match = file.match(regexp)
 
 let status = 0
-
 if (match) {
   for (let suite of new Set(match.map((o) => {
     return o.trim().split(/\d\) /)[1]
@@ -23,8 +22,8 @@ if (match) {
       shell: true,
     });
 
-    if (p.status === 1) {
-      status = 1;
+    if (p.status !== 0) {
+      status = p.status;
       console.log('\t   !!! Failed again :(')
     } else {
       console.log('\t   !!! Tests OK! :)')
