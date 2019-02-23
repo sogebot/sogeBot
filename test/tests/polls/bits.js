@@ -75,11 +75,11 @@ describe('Polls - bits', () => {
     it(`10 users will vote through bits for option 1 and another 10 for option 2`, async () => {
       for (let o of [1,2]) {
         for (let i = 0; i < 10; i++) {
-          const user = Number(Math.random() * 1000).toFixed(0)
+          const user = 'user' + [o, i].join('')
           await global.tmi.cheer({
             tags: {
               username: user,
-              userId: Number(Math.random() * 1000).toFixed(0),
+              userId: Number(user),
               bits: 10,
             },
             message: 'Cool I am voting for #vote' + o + ' enjoy!',
