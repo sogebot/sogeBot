@@ -21,6 +21,41 @@ const testUser = { username: 'test', badges: {} }
 const testUser2 = { username: 'test2', badges: {} }
 
 describe('Cooldowns - check()', () => {
+  describe('#1938 - !cmd with param (*)', () => {
+    before(async () => {
+      await db.cleanup()
+      await message.prepare()
+    })
+
+    it('create command', async () => {
+      let cmd = await global.db.engine.insert('systems.customcommands', { command: '!cmd', enabled: true, visible: true })
+      await global.db.engine.insert('systems.customcommands.responses', { cid: String(cmd._id), filter: '', response: '$param', permission: 1 })
+    })
+
+    it('Add !cmd to cooldown', async () => {
+      await global.db.engine.insert(global.systems.cooldown.collection.data, {
+        'key': '!cmd',
+        'type': 'global',
+        'quiet': true,
+        'owner': true,
+        'enabled': true,
+        'timestamp': 0,
+        'moderator': true,
+        'miliseconds': 60000
+      })
+    })
+
+    it('First user should PASS', async () => {
+      let isOk = await global.systems.cooldown.check({ sender: testUser, message: '!cmd (*)' })
+      assert.isTrue(isOk)
+    })
+
+    it('Second user should FAIL', async () => {
+      let isOk = await global.systems.cooldown.check({ sender: testUser2, message: '!cmd (*)' })
+      assert.isFalse(isOk)
+    })
+  })
+
   describe('#1658 - cooldown not working on not full cooldown object KonCha', async () => {
     before(async () => {
       await db.cleanup()

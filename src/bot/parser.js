@@ -130,12 +130,17 @@ class Parser {
    * Find first command called by message
    * @constructor
    * @param {string} message - Message from chat
+   * @param {string} cmdlist - Set of commands to check, if null all registered commands are checked
    * @returns object or null if empty
    */
-  async find (message) {
-    for (let item of (await this.getCommandsList())) {
+  async find (message, cmdlist) {
+    if (!cmdlist) {
+      cmdlist = await this.getCommandsList();
+    }
+    for (let item of cmdlist) {
       let onlyParams = message.trim().toLowerCase().replace(item.command, '')
       let isStartingWith = message.trim().toLowerCase().startsWith(item.command)
+
       if (isStartingWith && (onlyParams.length === 0 || (onlyParams.length > 0 && onlyParams[0] === ' '))) {
         return item
       }
