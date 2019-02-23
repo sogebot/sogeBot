@@ -71,6 +71,7 @@ module.exports = {
     }, 5000)
   },
   isWarned: async function (entry, user, opts) {
+    user = _.cloneDeep(user)
     opts = opts || {}
     await until(async setError => {
       let expected = []
@@ -101,6 +102,7 @@ module.exports = {
     }, 5000)
   },
   isSent: async function (entry, user, opts, wait) {
+    user = _.cloneDeep(user)
     opts = opts || {}
     await until(async setError => {
       let expected = []
@@ -143,6 +145,7 @@ module.exports = {
     }, wait || 5000)
   },
   isSentRaw: async function (expected, user) {
+    user = _.cloneDeep(user)
     await until(setError => {
       try {
         let isOK = false
