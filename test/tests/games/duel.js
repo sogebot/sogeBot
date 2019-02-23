@@ -16,12 +16,12 @@ const user2 = { username: 'user2', userId: String(_.random(999999, false)) }
 const command = '!duel'
 
 describe('Gambling - duel', () => {
-  before(async () => {
-    await db.cleanup()
-    await message.prepare()
-  })
-
   describe('!duel bank', () => {
+    before(async () => {
+      await db.cleanup()
+      await message.prepare()
+    })
+
     it('Bank should be empty at start', async () => {
       global.games.duel.bank({ sender: user1 })
       await message.isSent('gambling.duel.bank', user1, {
@@ -50,6 +50,11 @@ describe('Gambling - duel', () => {
   })
 
   describe('#914 - user1 is not correctly added to duel, if he is challenger', () => {
+    before(async () => {
+      await db.cleanup()
+      await message.prepare()
+    })
+
     it('set duel timestamp to 0 to force new duel', async () => {
       global.games.duel.settings._.timestamp = 0
       await variable.isEqual('global.games.duel.settings._.timestamp', 0)
@@ -112,6 +117,11 @@ describe('Gambling - duel', () => {
   })
 
   describe('Pick winner from huge tickets', () => {
+    before(async () => {
+      await db.cleanup()
+      await message.prepare()
+    })
+
     it('create duel', async () => {
       global.games.duel.settings._.timestamp = Number(new Date())
 
