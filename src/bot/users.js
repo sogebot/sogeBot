@@ -193,25 +193,29 @@ class Users extends Core {
   async updateWatchTime () {
     clearTimeout(this.timeouts['updateWatchTime'])
 
-    let timeout = constants.MINUTE * 15
+    let timeout = constants.MINUTE * 5
     try {
       // count watching time when stream is online
       if (await global.cache.isOnline()) {
         let users = await global.db.engine.find('users.online')
         let updated = []
         for (let onlineUser of users) {
-          const isIgnored = await global.commons.isIgnored(onlineUser)
-          const isBot = await global.commons.isBot(onlineUser.username)
-          const isOwner = await global.commons.isOwner(onlineUser)
-          if (isIgnored || isBot) continue
+          const isIgnored = global.commons.isIgnored(onlineUser)
+          const isBot = global.commons.isBot(onlineUser.username)
+          const isOwner = global.commons.isOwner(onlineUser)
           const isNewUser = typeof this.watchedList[onlineUser.username] === 'undefined'
-          updated.push(onlineUser.username)
-          const watched = isNewUser ? timeout : new Date().getTime() - new Date(this.watchedList[onlineUser.username]).getTime()
+
+          if (isIgnored || isBot) continue
+
+          const watched = isNewUser ? timeout : Date.now() - this.watchedList[onlineUser.username]
           const id = await global.users.getIdByName(onlineUser.username)
+
           if (isNewUser) this.checkNewChatter(id, onlineUser.username)
-          await global.db.engine.increment('users.watched', { id }, { watched })
           if (!isOwner) global.api._stream.watchedTime += watched
-          this.watchedList[onlineUser.username] = new Date()
+          await global.db.engine.increment('users.watched', { id }, { watched })
+
+          updated.push(onlineUser.username)
+          this.watchedList[onlineUser.username] = Date.now()
         }
 
         // remove offline users from watched list
@@ -219,6 +223,7 @@ class Users extends Core {
           if (!updated.includes(u[0])) delete this.watchedList[u[0]]
         }
       } else {
+        this.watchedList = {}
         global.users.newChattersList = []
         throw Error('stream offline')
       }
