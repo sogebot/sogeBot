@@ -299,6 +299,7 @@ class Users extends Core {
           { from: 'users.points', as: 'points', foreignField: 'id', localField: 'id' },
           { from: 'users.messages', as: 'messages', foreignField: 'id', localField: 'id' },
           { from: 'users.online', as: 'online', foreignField: 'username', localField: 'username' },
+          { from: 'users.watched', as: 'watched', foreignField: 'id', localField: 'id' },
         ])
 
         for (const v of viewers) {
@@ -307,6 +308,7 @@ class Users extends Core {
           _.set(v, 'custom.currency', global.currency.settings.currency.mainCurrency);
           _.set(v, 'points', (v.points[0] || { points: 0 }).points);
           _.set(v, 'messages', (v.messages[0] || { messages: 0 }).messages);
+          _.set(v, 'time.watched', (v.watched[0] || { watched: 0 }).watched);
         }
 
         // filter users
