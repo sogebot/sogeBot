@@ -219,6 +219,7 @@ class Users extends Core {
           if (!updated.includes(u[0])) delete this.watchedList[u[0]]
         }
       } else {
+        this.watchedList = {}
         global.users.newChattersList = []
         throw Error('stream offline')
       }
