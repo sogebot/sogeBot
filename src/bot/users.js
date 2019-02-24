@@ -193,7 +193,7 @@ class Users extends Core {
   async updateWatchTime () {
     clearTimeout(this.timeouts['updateWatchTime'])
 
-    let timeout = constants.MINUTE * 1
+    let timeout = constants.MINUTE * 5
     try {
       // count watching time when stream is online
       if (await global.cache.isOnline()) {
