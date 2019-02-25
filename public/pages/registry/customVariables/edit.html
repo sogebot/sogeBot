@@ -32,19 +32,32 @@
           <small class="form-text text-muted">{{ commons.translate('registry.customvariables.description.help') }}</small>
         </div>
 
-        <div class="form-group col-md-12">
+        <div class="form-group row col-12 pr-0">
+          <div class="col-4">
+            <div class="row ml-0 mr-0">
+              <label for="description_input">{{ commons.translate('registry.customvariables.response.name') }}</label>
+            </div>
 
-          <div class="row ml-0 mr-0">
-            <label for="description_input">{{ commons.translate('registry.customvariables.response.name') }}</label>
+            <button :class="[responseType === 0 ? 'btn-primary' : 'btn-outline-primary']" type="button" class="btn" @click="responseType = 0; responseText = ''">{{ commons.translate('registry.customvariables.response.default') }}</button>
+            <button :class="[responseType === 1 ? 'btn-primary' : 'btn-outline-primary']" type="button" class="btn" @click="responseType = 1; responseText = ''">{{ commons.translate('registry.customvariables.response.custom') }}</button>
+            <button :class="[responseType === 2 ? 'btn-primary' : 'btn-outline-primary']" type="button" class="btn" @click="responseType = 2; responseText = ''">{{ commons.translate('registry.customvariables.response.command') }}
+              <strong style="border-bottom: 1px dotted gray" data-toggle="tooltip" data-placement="bottom" title="Use if you use variable in command. Will return only updated variable.">?</strong>
+            </button>
           </div>
 
-          <button :class="[responseType === 0 ? 'btn-primary' : 'btn-outline-primary']" type="button" class="btn" @click="responseType = 0; responseText = ''">{{ commons.translate('registry.customvariables.response.default') }}</button>
-          <button :class="[responseType === 1 ? 'btn-primary' : 'btn-outline-primary']" type="button" class="btn" @click="responseType = 1; responseText = ''">{{ commons.translate('registry.customvariables.response.custom') }}</button>
-          <button :class="[responseType === 2 ? 'btn-primary' : 'btn-outline-primary']" type="button" class="btn" @click="responseType = 2; responseText = ''">{{ commons.translate('registry.customvariables.response.command') }}</button>
+          <div class="col-4">
+            <label style="margin: 0px 0px 3px; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px;">{{ commons.translate('permission') }}</label>
+            <select class="form-control" v-model="permission">
+              <option v-for="permission in [0,1,2,3]" v-bind:value="permission">
+                {{ permission | permissionToString }}
+              </option>
+            </select>
+          </div>
 
-          <input v-if="responseType === 1" v-model="responseText" type="text" class="form-control mt-2" v-bind:placeholder="commons.translate('registry.customvariables.response.default-placeholder')">
-          <small class="form-text text-muted">{{ commons.translate('registry.customvariables.response.default-help') }}</small>
-
+          <div class="col-12 pr-0">
+            <input v-if="responseType === 1" v-model="responseText" type="text" class="form-control mt-2" v-bind:placeholder="commons.translate('registry.customvariables.response.default-placeholder')">
+            <small v-if="responseType === 1" class="form-text text-muted">{{ commons.translate('registry.customvariables.response.default-help') }}</small>
+          </div>
         </div>
 
         <div class="form-group row pl-3 pr-3">
@@ -198,6 +211,7 @@
         currentValue: '',
         usableOptions: '',
         readOnly: false,
+        permission: 0,
 
         evalValueInit: '',
         evalInput: null,
@@ -218,6 +232,14 @@
         socket: io('/registry/customVariables', { query: "token=" + token }),
 
         saveState: 0
+      },
+      filters: {
+        permissionToString: function (val) {
+          if (val === 0) return commons.translate('systems.alias.forOwners')
+          else if (val === 1) return commons.translate('systems.alias.forViewers')
+          else if (val === 2) return commons.translate('systems.alias.forMods')
+          else if (val === 3) return commons.translate('systems.alias.forRegulars')
+        }
       },
       methods: {
         moment: function (args) {
@@ -392,6 +414,7 @@
         customVariablesEdit.selectedType = data.variable.type
         customVariablesEdit.responseType = data.variable.responseType
         customVariablesEdit.responseText = data.variable.responseText
+        customVariablesEdit.permission = data.variable.permission || 0
         customVariablesEdit.readOnly = data.variable.readOnly || false
         customVariablesEdit.history = _.chunk(_.orderBy(data.history, 'timestamp', 'desc'), 15)[0] || []
       })
