@@ -145,6 +145,8 @@ class Workers {
         global.commons.timeout(data.username, data.reason, data.timeout)
       } else if (data.type === 'api') {
         global.api[data.fnc](data.username, data.id)
+      } else if (data.type === 'message') {
+        this.sendToWorker(data); // resend to worker
       } else if (data.type === 'event') {
         global.events.fire(data.eventId, data.attributes)
       } else if ( data.type === 'interface') {
