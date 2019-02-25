@@ -24,6 +24,10 @@ Stats.prototype.save = async function (data) {
   }
 }
 
+Stats.prototype.parseStat = function (value) {
+  return parseFloat(_.isNil(value) || isNaN(parseFloat(value)) ? 0 : value)
+}
+
 Stats.prototype.getLatestStats = async function (self, socket) {
   let statsFromDb = await global.db.engine.find('stats')
   let stats = {
@@ -46,14 +50,14 @@ Stats.prototype.getLatestStats = async function (self, socket) {
 
     let i = 0
     for (let stat of statsFromDb) {
-      stats.currentViewers += parseFloat(_.isNil(stat.currentViewers) ? 0 : stat.currentViewers)
-      stats.currentBits += parseFloat(_.isNil(stat.currentBits) ? 0 : stat.currentBits)
-      stats.currentTips += parseFloat(_.isNil(stat.currentTips) ? 0 : stat.currentTips)
-      stats.chatMessages += parseFloat(_.isNil(stat.chatMessages) ? 0 : stat.chatMessages)
-      stats.maxViewers += parseFloat(_.isNil(stat.maxViewers) ? 0 : stat.maxViewers)
-      stats.newChatters += parseFloat(_.isNil(stat.newChatters) ? 0 : stat.newChatters)
-      stats.currentHosts += parseFloat(_.isNil(stat.currentHosts) ? 0 : stat.currentHosts)
-      stats.currentWatched += parseFloat(_.isNil(stat.currentWatched) ? 0 : stat.currentWatched)
+      stats.currentViewers += parseStat(stat.currentViewers)
+      stats.currentBits += parseStat(stat.currentBits)
+      stats.currentTips += parseStat(stat.currentTips)
+      stats.chatMessages += parseStat(stat.chatMessages)
+      stats.maxViewers += parseStat(stat.maxViewers)
+      stats.newChatters += parseStat(stat.newChatters)
+      stats.currentHosts += parseStat(stat.currentHosts)
+      stats.currentWatched += parseStat(stat.currentWatched)
       if (i === 0) {
         // get only latest
         stats.currentFollowers = stat.currentFollowers
