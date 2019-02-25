@@ -128,13 +128,6 @@ class Workers {
         namespace[data.fnc].apply(namespace, data.args)
       } else if (data.type === 'log') {
         return global.log[data.level](data.message, data.params)
-      } else if (data.type === 'stats') {
-        let avgTime = 0
-        global.avgResponse.push(data.value)
-        if (data.value > 1000) global.log.warning(`Took ${data.value}ms to process: ${data.message}`)
-        if (global.avgResponse.length > 100) global.avgResponse.shift()
-        for (let time of global.avgResponse) avgTime += parseInt(time, 10)
-        global.status['RES'] = (avgTime / global.avgResponse.length).toFixed(0)
       } else if (data.type === 'say') {
         global.commons.message('say', null, data.message)
       } else if (data.type === 'me') {
@@ -145,8 +138,6 @@ class Workers {
         global.commons.timeout(data.username, data.reason, data.timeout)
       } else if (data.type === 'api') {
         global.api[data.fnc](data.username, data.id)
-      } else if (data.type === 'message') {
-        this.sendToWorker(data); // resend to worker
       } else if (data.type === 'event') {
         global.events.fire(data.eventId, data.attributes)
       } else if ( data.type === 'interface') {
@@ -171,9 +162,6 @@ class Workers {
           break
         case 'shutdown':
           gracefullyExit()
-          break
-        case 'message':
-          global.tmi.message(data)
           break
         case 'db':
           switch (data.fnc) {

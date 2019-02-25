@@ -93,7 +93,7 @@ class Alias extends System {
           sender: opts.sender
         });
         global.log.process({ type: 'parse', sender: opts.sender, message })
-        global.workers.send({ type: 'message', sender: opts.sender, message })
+        global.tmi.message({ sender: opts.sender, message })
       }
     }
     return true

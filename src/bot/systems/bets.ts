@@ -73,7 +73,11 @@ class Bets extends System {
       socket.on('close', async (option) => {
         const message = '!bet ' + (option === 'refund' ? option : 'close ' + option);
         global.log.process({ type: 'parse', sender: { username: global.commons.getOwner() }, message });
-        global.workers.sendToWorker({ type: 'message', sender: { username: global.commons.getOwner() }, message, skip: true });
+        global.tmi.message({
+          sender: { username: global.commons.getOwner() },
+          message,
+          skip: true,
+        });
       });
     });
   }

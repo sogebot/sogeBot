@@ -124,7 +124,10 @@ class TMI extends Core {
 
         if (!(await global.commons.isBot(message.tags.username)) || !message.isSelf) {
           message.tags['message-type'] = 'whisper'
-          global.workers.sendToWorker({ type: 'message', sender: message.tags, message: message.message })
+          global.tmi.message({
+            sender: message.tags,
+            message: message.message
+          })
           global.linesParsed++
         }
       })
@@ -141,7 +144,10 @@ class TMI extends Core {
             // strip message from ACTION
             message.message = message.message.replace('\u0001ACTION ', '').replace('\u0001', '')
 
-            global.workers.sendToWorker({ type: 'message', sender: message.tags, message: message.message })
+            global.tmi.message({
+              sender: message.tags,
+              message: message.message
+            })
             global.linesParsed++
 
             // go through all systems and trigger on.message
@@ -503,6 +509,15 @@ class TMI extends Core {
   }
 
   async message (data) {
+    if (isMainThread && !global.mocha) {
+      return global.workers.sendToWorker({
+        type: 'call',
+        ns: 'tmi',
+        fnc: 'message',
+        args: [data],
+      })
+    }
+
     let sender = data.sender
     let message = data.message
     let skip = data.skip
@@ -540,7 +555,11 @@ class TMI extends Core {
         // update user based on id not username
         await global.db.engine.update('users', { id: String(sender.userId) }, data)
 
-        global.workers.sendToMaster({ type: 'api', fnc: 'isFollower', username: sender.username })
+        if (isMainThread) {
+          global.api.isFollower(sender.username)
+        } else {
+          global.workers.sendToMaster({ type: 'api', fnc: 'isFollower', username: sender.username })
+        }
 
         global.events.fire('keyword-send-x-times', { username: sender.username, message: message })
         if (message.startsWith('!')) {
@@ -549,7 +568,24 @@ class TMI extends Core {
       }
       await parse.process()
     }
-    global.workers.sendToMaster({ type: 'stats', of: 'parser', value: parse.time(), message: message })
+    this.avgResponse({ value: parse.time(), message })
+  }
+
+  avgResponse(opts) {
+    if (!isMainThread) {
+      return global.workers.sendToMaster({
+        type: 'call',
+        ns: 'tmi',
+        fnc: 'avgResponse',
+        args: [opts],
+      })
+    }
+    let avgTime = 0
+    global.avgResponse.push(opts.value)
+    if (opts.value > 1000) global.log.warning(`Took ${opts.value}ms to process: ${opts.message}`)
+    if (global.avgResponse.length > 100) global.avgResponse.shift()
+    for (let time of global.avgResponse) avgTime += parseInt(time, 10)
+    global.status['RES'] = (avgTime / global.avgResponse.length).toFixed(0)
   }
 }
 

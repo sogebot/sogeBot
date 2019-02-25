@@ -17,6 +17,7 @@ declare namespace NodeJS {
     lib: any,
     workers: Workers.main,
     customvariables: any,
+    tmi: any,
     oauth: {
       settings: {
         bot: {

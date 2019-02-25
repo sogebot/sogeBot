@@ -250,7 +250,11 @@ class Events {
       })
       await parse.process()
     } else {
-      global.workers.sendToWorker({ type: 'message', sender: (_.get(operation, 'isCommandQuiet', false) ? {} : { username: global.commons.getOwner() }), message: command, skip: true })
+      global.tmi.message({
+        sender: _.get(operation, 'isCommandQuiet', false) ? {} : { username: global.commons.getOwner() },
+        message: command,
+        skip: true
+      })
     }
   }
 
