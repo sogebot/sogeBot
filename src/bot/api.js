@@ -419,7 +419,7 @@ class API {
         // move to next page
         this.getChannelSubscribers({ cursor: request.data.pagination.cursor, count: subscribers.length + opts.count })
       } else {
-        await global.db.engine.update('api.current', { key: 'subscribers' }, { value: opts.count })
+        await global.db.engine.update('api.current', { key: 'subscribers' }, { value: subscribers.length + opts.count })
       }
     } catch (e) {
       const isChannelPartnerOrAffiliate =
