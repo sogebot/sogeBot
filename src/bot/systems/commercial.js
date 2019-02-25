@@ -28,7 +28,11 @@ class Commercial extends System {
   sockets() {
     this.socket.on('connection', (socket) => {
       socket.on('commercial.run', (message) => {
-        global.workers.sendToWorker({ type: 'message', sender: { username: global.commons.getOwner() }, message: '!commercial ' + data.seconds, skip: true });
+        global.tmi.message({
+          sender: { username: global.commons.getOwner() },
+          message: '!commercial ' + data.seconds,
+          skip: true,
+        })
       });
     })
   }

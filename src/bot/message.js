@@ -259,7 +259,12 @@ class Message {
           .replace(/\(|\)/g, '')
           .replace(/\$sender/g, (global.users.settings.users.showWithAt ? '@' : '') + attr.sender)
           .replace(/\$param/g, attr.param)
-        global.workers.send({ type: 'message', sender: { username: attr.sender }, message: cmd, skip: true, quiet: true })
+        global.tmi.message({
+          sender: { username: attr.sender },
+          message: cmd,
+          skip: true,
+          quiet: true
+        })
         return ''
       },
       '(!#)': async function (filter) {
@@ -268,7 +273,12 @@ class Message {
           .replace(/\(|\)/g, '')
           .replace(/\$sender/g, (global.users.settings.users.showWithAt ? '@' : '') + attr.sender)
           .replace(/\$param/g, attr.param)
-        global.workers.send({ type: 'message', sender: { username: attr.sender }, message: cmd, skip: true, quiet: false }) // resend to random worker
+        global.tmi.message({
+          sender: { username: attr.sender },
+          message: cmd,
+          skip: true,
+          quiet: false
+        })
         return ''
       }
     }

@@ -21,6 +21,8 @@ module.exports = {
 
     global.tmi = {
       cheer: global.tmi.cheer,
+      message: global.tmi.message,
+      avgResponse: global.tmi.avgResponse,
       client: {
         bot: {
           chat: {
