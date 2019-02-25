@@ -11,6 +11,7 @@ const mathjs = require('mathjs')
 const XRegExp = require('xregexp')
 
 const Message = require('./message')
+const constants = require('./constants')
 
 class CustomVariables {
   constructor () {
@@ -228,9 +229,21 @@ class CustomVariables {
 
     // add simple text variable, if not existing
     if (_.isEmpty(item)) {
-      item = await global.db.engine.insert('custom.variables', { variableName, currentValue, type: 'text', responseType: 0 })
+      item = await global.db.engine.insert('custom.variables', { variableName, currentValue, type: 'text', responseType: 0, permission: constants.MODS })
     } else {
-      if (item.readOnly && !opts.readOnlyBypass) {
+      // set item permission to owner if missing
+      item.permission = typeof item.permission === 'undefined' ? constants.OWNER_ONLY : item.permission;
+      let [isRegular, isMod, isOwner] = await Promise.all([
+        global.commons.isRegular(this.sender),
+        global.commons.isModerator(this.sender),
+        global.commons.isOwner(this.sender)
+      ])
+      permissionsAreValid = _.isNil(this.sender) ||
+                            (item.permission === constants.VIEWERS) ||
+                            (item.permission === constants.REGULAR && (isRegular || isMod || isOwner)) ||
+                            (item.permission === constants.MODS && (isMod || isOwner)) ||
+                            (item.permission === constants.OWNER_ONLY && isOwner))
+      if ((item.readOnly && !opts.readOnlyBypass) || !permissionsAreValid) {
         isOk = false
       } else {
         oldValue = item.currentValue
