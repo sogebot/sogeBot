@@ -375,11 +375,15 @@ class API {
     return { state: true, opts }
   }
 
-  async getChannelSubscribers () {
+  async getChannelSubscribers (opts) {
     if (!isMainThread) throw new Error('API can run only on master')
+    opts = opts || {}
 
     const cid = global.oauth.channelId
-    const url = `https://api.twitch.tv/helix/subscriptions?broadcaster_id=${cid}`
+    let url = `https://api.twitch.tv/helix/subscriptions?broadcaster_id=${cid}&first=100`
+    if (opts.cursor) url += '&after=' + opts.cursor
+    if (typeof opts.count === 'undefined') opts.count = -1 // start at -1 because owner is subbed as well
+
 
     const token = global.oauth.settings.broadcaster.accessToken
     const needToWait = _.isNil(cid) || cid === '' || _.isNil(global.overlays) || token === ''
@@ -408,10 +412,15 @@ class API {
       this.calls.bot.limit = request.headers['ratelimit-limit']
       global.workers.sendToAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', request.headers['ratelimit-limit'], request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] })
 
-      await global.db.engine.update('api.current', { key: 'subscribers' }, { value: subscribers.length - 1 })
       this.setSubscribers(subscribers.filter(o => {
         return !global.commons.isOwner(o.user_name)  && !global.commons.isBot(o.user_name)
       }))
+      if (subscribers.length === 100) {
+        // move to next page
+        this.getChannelSubscribers({ cursor: request.data.pagination.cursor, count: subscribers.length + opts.count })
+      } else {
+        await global.db.engine.update('api.current', { key: 'subscribers' }, { value: subscribers.length + opts.count })
+      }
     } catch (e) {
       const isChannelPartnerOrAffiliate =
         !(e.message !== '422 Unprocessable Entity' ||
