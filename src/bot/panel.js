@@ -386,7 +386,9 @@ function Panel () {
           throw new Error('Function for this listener is undefined' +
             ' widget=' + listener.self.constructor.name + ' on=' + listener.on)
         }
-        try { await listener.fnc(listener.self, self.io, data) } catch (e) { global.log.error(e, listener.fnc) }
+        try { await listener.fnc(listener.self, self.io, data) } catch (e) {
+          global.log.error('Error on ' + listener.on + ' listener')
+        }
         if (listener.finally && listener.finally !== listener.fnc) listener.finally(listener.self, self.io)
       })
     })
