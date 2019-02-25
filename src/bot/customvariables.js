@@ -242,7 +242,7 @@ class CustomVariables {
                             (item.permission === constants.VIEWERS) ||
                             (item.permission === constants.REGULAR && (isRegular || isMod || isOwner)) ||
                             (item.permission === constants.MODS && (isMod || isOwner)) ||
-                            (item.permission === constants.OWNER_ONLY && isOwner))
+                            (item.permission === constants.OWNER_ONLY && isOwner);
       if ((item.readOnly && !opts.readOnlyBypass) || !permissionsAreValid) {
         isOk = false
       } else {
