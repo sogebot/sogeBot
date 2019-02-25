@@ -7,6 +7,7 @@
     "custom": "Custom",
     "command": "Command"
   },
+  "permissionToChange": "Permission to change",
   "isReadOnly": "read-only in chat",
   "isNotReadOnly": "can be changed through chat",
   "no-variables-found": "No variables found",

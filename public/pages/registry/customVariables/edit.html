@@ -46,7 +46,7 @@
           </div>
 
           <div class="col-4">
-            <label style="margin: 0px 0px 3px; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px;">{{ commons.translate('permission') }}</label>
+            <label style="margin: 0px 0px 3px; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px;">{{ commons.translate('registry.customvariables.permissionToChange') }}</label>
             <select class="form-control" v-model="permission">
               <option v-for="permission in [0,1,2,3]" v-bind:value="permission">
                 {{ permission | permissionToString }}
@@ -306,7 +306,8 @@
               type: this.selectedType,
               readOnly: this.readOnly,
               responseType: this.responseType,
-              responseText: this.responseText
+              responseText: this.responseText,
+              permission: this.permission
             }
             this.socket.emit('save', data, (err, _id) => {
               if (err) {

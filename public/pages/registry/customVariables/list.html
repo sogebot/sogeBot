@@ -47,6 +47,10 @@
             <span v-if="variable.responseType === 2">{{ commons.translate('registry.customvariables.response.command') }}</span>
             <i v-if="variable.responseType === 1">{{ variable.responseText }}</i>
           </div>
+          <div>
+            <strong> {{ commons.translate('registry.customvariables.permissionToChange') }}:</strong>
+            <span>{{ typeof variable.permission === 'undefined' ? 0 : variable.permission | permissionToString }}</span>
+          </div>
         </td>
         <td>
           <a v-bind:href="'?id='+ variable._id + '#registry/customVariables/edit'" class="btn btn-primary btn-block"><i class="far fa-edit"></i> {{ commons.translate('dialog.buttons.edit') }}</a>
@@ -90,6 +94,12 @@
         this.debouncedRunScript =_.debounce(this.runScript, 1000)
       },
       filters: {
+        permissionToString: function (val) {
+          if (val === 0) return commons.translate('systems.alias.forOwners')
+          else if (val === 1) return commons.translate('systems.alias.forViewers')
+          else if (val === 2) return commons.translate('systems.alias.forMods')
+          else if (val === 3) return commons.translate('systems.alias.forRegulars')
+        },
         capitalize: function (value) {
           if (!value) return ''
           value = value.toString()
