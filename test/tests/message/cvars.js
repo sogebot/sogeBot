@@ -157,13 +157,13 @@ describe('Message - cvars filter', async () => {
               if (test.params.param) {
                 if (test.expectedSent && user.permission <= permission) {
                   it('expecting set message', async () => {
-                    await msg.isSent('filters.setVariable', { username: user.username }, { sender: global.commons.getOwner(), variable: '$_test', value: test.afterValue })
+                    await msg.isSent('filters.setVariable', { username: user.username }, { sender: global.commons.getOwner(), variable: '$_test', value: test.afterValue }, 1000)
                   })
                 } else {
                   it('not expecting set message', async () => {
                     let notSent = false
                     try {
-                      await msg.isSent('filters.setVariable', { username: user.username }, { sender: global.commons.getOwner(), variable: '$_test', value: test.afterValue })
+                      await msg.isSent('filters.setVariable', { username: user.username }, { sender: global.commons.getOwner(), variable: '$_test', value: test.afterValue }, 1000)
                     } catch (e) {
                       notSent = true
                     }
@@ -222,7 +222,7 @@ describe('Message - cvars filter', async () => {
                 it('not expecting set message', async () => {
                   let notSent = false
                   try {
-                    await msg.isSent('filters.setVariable', { username: user.username }, { sender: global.commons.getOwner(), variable: '$_test', value: test.afterValue })
+                    await msg.isSent('filters.setVariable', { username: user.username }, { sender: global.commons.getOwner(), variable: '$_test', value: test.afterValue }, 1000)
                   } catch (e) {
                     notSent = true
                   }
