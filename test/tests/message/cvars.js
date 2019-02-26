@@ -17,6 +17,12 @@ const _ = require('lodash')
 _.set(global, 'widgets.custom_variables.io.emit', function () {})
 
 describe('Message - cvars filter', async () => {
+  const users = [
+    { username: '__owner__', userId: Math.random(), permission: 0 },
+    { username: 'moduser', is: { mod: true }, userId: Math.random(), permission: 1},
+    { username: 'regularuser', is: { regular: true }, userId: Math.random(), permission: 2},
+    { username: 'vieweriuser', userId: Math.random(), permission: 3},
+  ]
   const tests = [
     {
       test: '$_test',
@@ -26,7 +32,7 @@ describe('Message - cvars filter', async () => {
       type: 'number',
       command: 'This is $_test',
       expectedSent: true,
-      params: { sender: '__owner__', param: 5 }
+      params: { param: 5 }
     },
     {
       test: '$_test',
@@ -36,7 +42,7 @@ describe('Message - cvars filter', async () => {
       type: 'number',
       command: 'This is $_test',
       expectedSent: true,
-      params: { sender: '__owner__', param: '+' }
+      params: { param: '+' }
     },
     {
       test: '$_test',
@@ -46,7 +52,7 @@ describe('Message - cvars filter', async () => {
       type: 'number',
       command: 'This is $_test',
       expectedSent: true,
-      params: { sender: '__owner__', param: '+' }
+      params: { param: '+' }
     },
     {
       test: '$!_test',
@@ -56,7 +62,7 @@ describe('Message - cvars filter', async () => {
       type: 'number',
       command: 'This is $!_test',
       expectedSent: false,
-      params: { sender: '__owner__', param: '-' }
+      params: { param: '-' }
     },
     {
       test: '$!_test',
@@ -66,7 +72,7 @@ describe('Message - cvars filter', async () => {
       type: 'number',
       command: 'This is $!_test',
       expectedSent: false,
-      params: { sender: '__owner__', param: '-' }
+      params: { param: '-' }
     },
     {
       test: '$!_test',
@@ -76,7 +82,7 @@ describe('Message - cvars filter', async () => {
       type: 'number',
       command: 'This is $!_test',
       expectedSent: false,
-      params: { sender: '__owner__', param: '+' }
+      params: { param: '+' }
     },
     {
       test: '$_test',
@@ -86,7 +92,7 @@ describe('Message - cvars filter', async () => {
       type: 'number',
       command: 'This is $_test',
       expectedSent: true,
-      params: { sender: '__owner__', param: '-' }
+      params: { param: '-' }
     },
     {
       test: '$!_test',
@@ -96,102 +102,153 @@ describe('Message - cvars filter', async () => {
       type: 'number',
       command: 'This is $!_test',
       expectedSent: false,
-      params: { sender: '__owner__', param: 5 }
+      params: { param: 5 }
     }
   ]
+  const permissions = [
+    'owner',
+    'viewers',
+    'mods',
+    'regular'
+  ]
 
-  before(async () => {
-    await db.cleanup()
-    await msg.prepare()
-  })
+  for (let permission of [0]) {
+    describe('Custom variable with ' + permissions[permission] + ' permission', async () => {
+      before(async () => {
+        await db.cleanup()
+        await msg.prepare()
 
-  for (let test of tests) {
-    let message = null
-    describe(`'${test.test}' expect '${test.command.replace(/\$_test|\$!_test/g, test.afterValue)}' with value after ${test.afterValue}`, async () => {
-      it(`create initial value '${test.initialValue}' of ${test.variable}`, async () => {
-        await global.db.engine.update('custom.variables', { variableName: test.variable }, { readOnly: false, currentValue: test.initialValue, type: test.type, responseType: 0 })
-      })
-      it(`add proper user to params => ${test.params.sender}`, () => {
-        if (test.params.sender === '__owner__') test.params.sender = global.commons.getOwner()
-      })
-      it(`parse '${test.command}' with params`, async () => {
-        message = await new Message(test.command).parse(test.params)
-      })
-      it('message parsed correctly', async () => {
-        assert.equal(message, '')
-      })
-
-      if (test.params.param) {
-        if (test.expectedSent) {
-          it('expecting set message', async () => {
-            await msg.isSent('filters.setVariable', { username: global.commons.getOwner() }, { sender: global.commons.getOwner(), variable: '$_test', value: test.afterValue })
-          })
-        } else {
-          it('not expecting set message', async () => {
-            let notSent = false
-            try {
-              await msg.isSent('filters.setVariable', { username: global.commons.getOwner() }, { sender: global.commons.getOwner(), variable: '$_test', value: test.afterValue })
-            } catch (e) {
-              notSent = true
-            }
-            assert.isTrue(notSent)
-          })
+        for (let user of users) {
+          await global.db.engine.insert('users', user)
         }
-      }
-
-      it(`check if after value is ${test.afterValue}`, async () => {
-        let cvar = await global.db.engine.findOne('custom.variables', { variableName: test.variable })
-        assert.equal(cvar.currentValue, test.afterValue)
       })
 
-      it(`parse '${test.command}' without params`, async () => {
-        delete test.params.param
-        message = await new Message(test.command).parse(test.params)
-      })
-      it('message parsed correctly', async () => {
-        assert.equal(message, test.command.replace(/\$_test|\$!_test/g, test.afterValue))
-      })
-    })
-  }
+      for (let user of users) {
+        describe('Testing with ' + user.username, () => {
+          for (let test of tests) {
+            let message = null
+            let testName = null
+            if (user.permission <= permission) {
+              testName =`'${test.test}' expect '${test.command.replace(/\$_test|\$!_test/g, test.afterValue)}' with value after ${test.afterValue}`
+            } else {
+              testName =`'${test.test}' expect '${test.command.replace(/\$_test|\$!_test/g, test.initialValue)}' with value after ${test.afterValue} because insufficient permissions`
+            }
 
-  // read only tests
-  for (let test of tests) {
-    let message = null
-    describe(`'${test.test}' expect '${test.command.replace(/\$_test|\$!_test/g, test.initialValue)}' with value after ${test.initialValue} because readOnly`, async () => {
-      it(`create initial value '${test.initialValue}' of ${test.variable}`, async () => {
-        await global.db.engine.update('custom.variables', { variableName: test.variable }, { readOnly: true, currentValue: test.initialValue, type: test.type, responseType: 0 })
-      })
-      it(`parse '${test.command}' with params`, async () => {
-        message = await new Message(test.command).parse(test.params)
-      })
-      it('message parsed correctly', async () => {
-        assert.equal(message, test.command.replace(/\$_test|\$!_test/g, test.initialValue))
-      })
+            describe(testName, async () => {
+              it(`create initial value '${test.initialValue}' of ${test.variable}`, async () => {
+                await global.db.engine.update('custom.variables', { permission, variableName: test.variable }, { readOnly: false, currentValue: test.initialValue, type: test.type, responseType: 0 })
+              })
+              it(`parse '${test.command}' with params`, async () => {
+                message = await new Message(test.command).parse({
+                  ...test.params,
+                  sender: user.username
+                })
+              })
 
-      if (test.params.param) {
-        it('not expecting set message', async () => {
-          let notSent = false
-          try {
-            await msg.isSent('filters.setVariable', { username: global.commons.getOwner() }, { sender: global.commons.getOwner(), variable: '$_test', value: test.afterValue })
-          } catch (e) {
-            notSent = true
+
+              it('message parsed correctly', async () => {
+                if (user.permission <= permission) {
+                  assert.equal(message, '')
+                } else {
+                  assert.equal(message, test.command.replace(/\$_test|\$!_test/g, test.initialValue))
+                }
+              })
+
+              if (test.params.param) {
+                if (test.expectedSent && user.permission <= permission) {
+                  it('expecting set message', async () => {
+                    await msg.isSent('filters.setVariable', { username: user.username }, { sender: global.commons.getOwner(), variable: '$_test', value: test.afterValue })
+                  })
+                } else {
+                  it('not expecting set message', async () => {
+                    let notSent = false
+                    try {
+                      await msg.isSent('filters.setVariable', { username: user.username }, { sender: global.commons.getOwner(), variable: '$_test', value: test.afterValue })
+                    } catch (e) {
+                      notSent = true
+                    }
+                    assert.isTrue(notSent)
+                  })
+                }
+              }
+
+              if (user.permission <= permission) {
+                it(`check if after value is ${test.afterValue}`, async () => {
+                  let cvar = await global.db.engine.findOne('custom.variables', { variableName: test.variable })
+                  assert.equal(cvar.currentValue, test.afterValue)
+                })
+              } else {
+                it(`check if after value is ${test.initialValue}`, async () => {
+                  let cvar = await global.db.engine.findOne('custom.variables', { variableName: test.variable })
+                  assert.equal(cvar.currentValue, test.initialValue)
+                })
+              }
+
+              it(`parse '${test.command}' without params`, async () => {
+                delete test.params.param
+                message = await new Message(test.command).parse({
+                  ...test.params,
+                  sender: user.username
+                })
+              })
+              it('message parsed correctly', async () => {
+                if (user.permission <= permission) {
+                  assert.equal(message, test.command.replace(/\$_test|\$!_test/g, test.afterValue))
+                } else {
+                  assert.equal(message, test.command.replace(/\$_test|\$!_test/g, test.initialValue))
+                }
+              })
+            })
           }
-          assert.isTrue(notSent)
+
+          // read only tests
+          for (let test of tests) {
+            let message = null
+            describe(`'${test.test}' expect '${test.command.replace(/\$_test|\$!_test/g, test.initialValue)}' with value after ${test.initialValue} because readOnly`, async () => {
+              it(`create initial value '${test.initialValue}' of ${test.variable}`, async () => {
+                await global.db.engine.update('custom.variables', { permission, variableName: test.variable }, { readOnly: true, currentValue: test.initialValue, type: test.type, responseType: 0 })
+              })
+              it(`parse '${test.command}' with params`, async () => {
+                message = await new Message(test.command).parse({
+                  ...test.params,
+                  sender: user.username
+                })
+              })
+              it('message parsed correctly', async () => {
+                assert.equal(message, test.command.replace(/\$_test|\$!_test/g, test.initialValue))
+              })
+
+              if (test.params.param) {
+                it('not expecting set message', async () => {
+                  let notSent = false
+                  try {
+                    await msg.isSent('filters.setVariable', { username: user.username }, { sender: global.commons.getOwner(), variable: '$_test', value: test.afterValue })
+                  } catch (e) {
+                    notSent = true
+                  }
+                  assert.isTrue(notSent)
+                })
+              }
+
+              it(`check if after value is ${test.initialValue}`, async () => {
+                let cvar = await global.db.engine.findOne('custom.variables', { variableName: test.variable })
+                assert.equal(cvar.currentValue, test.initialValue)
+              })
+
+              it(`parse '${test.command}' without params`, async () => {
+                delete test.params.param
+                message = await new Message(test.command).parse({
+                  ...test.params,
+                  sender: user.username
+                })
+              })
+              it('message parsed correctly', async () => {
+                assert.equal(message, test.command.replace(/\$_test|\$!_test/g, test.initialValue))
+              })
+            })
+          }
         })
       }
-
-      it(`check if after value is ${test.initialValue}`, async () => {
-        let cvar = await global.db.engine.findOne('custom.variables', { variableName: test.variable })
-        assert.equal(cvar.currentValue, test.initialValue)
-      })
-
-      it(`parse '${test.command}' without params`, async () => {
-        delete test.params.param
-        message = await new Message(test.command).parse(test.params)
-      })
-      it('message parsed correctly', async () => {
-        assert.equal(message, test.command.replace(/\$_test|\$!_test/g, test.initialValue))
-      })
     })
   }
 })

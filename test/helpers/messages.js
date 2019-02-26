@@ -3,6 +3,7 @@ const until = require('test-until')
 const chalk = require('chalk')
 const sinon = require('sinon')
 const _ = require('lodash')
+const util = require('util')
 
 var eventSpy
 

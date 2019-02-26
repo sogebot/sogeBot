@@ -234,11 +234,11 @@ class CustomVariables {
       // set item permission to owner if missing
       item.permission = typeof item.permission === 'undefined' ? constants.OWNER_ONLY : item.permission;
       let [isRegular, isMod, isOwner] = await Promise.all([
-        global.commons.isRegular(this.sender),
-        global.commons.isModerator(this.sender),
-        global.commons.isOwner(this.sender)
+        global.commons.isRegular(opts.sender),
+        global.commons.isModerator(opts.sender),
+        global.commons.isOwner(opts.sender)
       ])
-      permissionsAreValid = _.isNil(this.sender) ||
+      const permissionsAreValid = _.isNil(opts.sender) ||
                             (item.permission === constants.VIEWERS) ||
                             (item.permission === constants.REGULAR && (isRegular || isMod || isOwner)) ||
                             (item.permission === constants.MODS && (isMod || isOwner)) ||
