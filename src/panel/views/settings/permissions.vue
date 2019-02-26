@@ -27,7 +27,7 @@
 
     <div class="row">
       <div class="col-auto">
-        <treeview :data="permissions"></treeview>
+        <permissiontreeview :data="permissions"></permissiontreeview>
         <em>Higher permission have access to lower permissions.</em>
       </div>
       <div class="col-auto">
@@ -52,7 +52,7 @@
   export default Vue.extend({
     components: {
       panel: () => import('../../components/panel.vue'),
-      treeview: () => import('../../components/treeview.vue'),
+      permissiontreeview: () => import('../../components/permissiontreeview.vue'),
       'font-awesome-icon': FontAwesomeIcon
     },
     data: function () {
@@ -61,20 +61,13 @@
         permissions: any,
       } = {
         socket: io('/systems/polls', { query: "token=" + this.token }),
-        permissions: {
-          owners: [
-            { 'name': '_all', preserve: true }
-          ],
-          mods: [
-            { 'name': '_all', preserve: true }
-          ],
-          subscribers: [
-            { 'name': '_all', preserve: true }
-          ],
-          viewers: [
-            { 'name': '_all', preserve: true }
-          ]
-        }
+        permissions: [
+          { name: 'Casters', preserve: true, automation: 'casters' },
+          { name: 'Administrators', preserve: true, automation: null },
+          { name: 'Moderators', preserve: true, automation: 'moderators' },
+          { name: 'Subscribers', preserve: true, automation: 'subscribers' },
+          { name: 'Viewers', preserve: true, automation: 'viewers' },
+        ]
       }
       return object
     },
