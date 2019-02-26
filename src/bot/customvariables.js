@@ -226,7 +226,6 @@ class CustomVariables {
 
     opts.sender = _.isNil(opts.sender) ? null : opts.sender
     opts.readOnlyBypass = _.isNil(opts.readOnlyBypass) ? false : opts.readOnlyBypass
-
     // add simple text variable, if not existing
     if (_.isEmpty(item)) {
       item = await global.db.engine.insert('custom.variables', { variableName, currentValue, type: 'text', responseType: 0, permission: constants.MODS })
@@ -270,10 +269,12 @@ class CustomVariables {
       }
     }
 
+    item.setValue = item.currentValue
     if (isOk) {
       this.updateWidgetAndTitle(variableName)
       if (!isEval) {
         this.addChangeToHistory({ sender: opts.sender, item, oldValue })
+        item.currentValue = '' // be silent if parsed correctly
       }
     }
     return { updated: item, isOk, isEval }

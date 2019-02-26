@@ -10,6 +10,7 @@ require('../../general.js')
 const db = require('../../general.js').db
 const msg = require('../../general.js').message
 const Message = require('../../../dest/message')
+const constants = require('../../../dest/constants')
 const assert = require('chai').assert
 const _ = require('lodash')
 
@@ -19,7 +20,7 @@ _.set(global, 'widgets.custom_variables.io.emit', function () {})
 describe('Message - cvars filter', async () => {
   const users = [
     { username: '__owner__', userId: Math.random(), permission: 0 },
-    { username: 'moduser', is: { mod: true }, userId: Math.random(), permission: 1},
+    { username: 'moduser', is: { moderator: true }, userId: Math.random(), permission: 1},
     { username: 'regularuser', is: { regular: true }, userId: Math.random(), permission: 2},
     { username: 'vieweriuser', userId: Math.random(), permission: 3},
   ]
@@ -106,25 +107,25 @@ describe('Message - cvars filter', async () => {
     }
   ]
   const permissions = [
-    'owner',
-    'viewers',
-    'mods',
-    'regular'
+    'OWNER_ONLY',
+    'MODS',
+    'REGULAR',
+    'VIEWERS',
   ]
 
-  for (let permission of [0, 1, 2, 3]) {
+  for (let permission of [0, 1]) {
     describe('Custom variable with ' + permissions[permission] + ' permission', async () => {
-      before(async () => {
-        await db.cleanup()
-        await msg.prepare()
-
-        for (let user of users) {
-          await global.db.engine.insert('users', user)
-        }
-      })
-
       for (let user of users) {
         describe('Testing with ' + user.username, () => {
+          before(async () => {
+            await db.cleanup()
+            await msg.prepare()
+
+            for (let user of users) {
+              await global.db.engine.insert('users', user)
+            }
+          })
+
           for (let test of tests) {
             let message = null
             let testName = null
@@ -136,7 +137,7 @@ describe('Message - cvars filter', async () => {
 
             describe(testName, async () => {
               it(`create initial value '${test.initialValue}' of ${test.variable}`, async () => {
-                await global.db.engine.update('custom.variables', { permission, variableName: test.variable }, { readOnly: false, currentValue: test.initialValue, type: test.type, responseType: 0 })
+                await global.db.engine.update('custom.variables', { variableName: test.variable }, { readOnly: false, currentValue: test.initialValue, type: test.type, responseType: 0, permission: constants[permissions[permission]] })
               })
               it(`parse '${test.command}' with params`, async () => {
                 message = await new Message(test.command).parse({
@@ -185,9 +186,10 @@ describe('Message - cvars filter', async () => {
               }
 
               it(`parse '${test.command}' without params`, async () => {
-                delete test.params.param
+                let params = _.cloneDeep(test.params)
+                delete params.param
                 message = await new Message(test.command).parse({
-                  ...test.params,
+                  ...params,
                   sender: user.username
                 })
               })
@@ -206,7 +208,7 @@ describe('Message - cvars filter', async () => {
             let message = null
             describe(`'${test.test}' expect '${test.command.replace(/\$_test|\$!_test/g, test.initialValue)}' with value after ${test.initialValue} because readOnly`, async () => {
               it(`create initial value '${test.initialValue}' of ${test.variable}`, async () => {
-                await global.db.engine.update('custom.variables', { permission, variableName: test.variable }, { readOnly: true, currentValue: test.initialValue, type: test.type, responseType: 0 })
+                await global.db.engine.update('custom.variables', { variableName: test.variable }, { readOnly: true, currentValue: test.initialValue, type: test.type, responseType: 0, permission: constants[permissions[permission]] })
               })
               it(`parse '${test.command}' with params`, async () => {
                 message = await new Message(test.command).parse({
@@ -236,9 +238,10 @@ describe('Message - cvars filter', async () => {
               })
 
               it(`parse '${test.command}' without params`, async () => {
-                delete test.params.param
+                let params = _.cloneDeep(test.params)
+                delete params.param
                 message = await new Message(test.command).parse({
-                  ...test.params,
+                  ...params,
                   sender: user.username
                 })
               })
