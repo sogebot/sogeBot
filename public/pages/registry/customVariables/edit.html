@@ -41,7 +41,7 @@
             <button :class="[responseType === 0 ? 'btn-primary' : 'btn-outline-primary']" type="button" class="btn" @click="responseType = 0; responseText = ''">{{ commons.translate('registry.customvariables.response.default') }}</button>
             <button :class="[responseType === 1 ? 'btn-primary' : 'btn-outline-primary']" type="button" class="btn" @click="responseType = 1; responseText = ''">{{ commons.translate('registry.customvariables.response.custom') }}</button>
             <button :class="[responseType === 2 ? 'btn-primary' : 'btn-outline-primary']" type="button" class="btn" @click="responseType = 2; responseText = ''">{{ commons.translate('registry.customvariables.response.command') }}
-              <strong style="border-bottom: 1px dotted gray" data-toggle="tooltip" data-placement="bottom" title="Use if you use variable in command. Will return only updated variable.">?</strong>
+              <strong style="border-bottom: 1px dotted gray" data-toggle="tooltip" data-placement="bottom" :title="commons.translate('registry.customvariables.useIfInCommand')">?</strong>
             </button>
           </div>
 
