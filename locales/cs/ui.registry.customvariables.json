@@ -7,6 +7,8 @@
     "custom": "Vlastní",
     "command": "Příkaz"
   },
+  "useIfInCommand": "Použijte, pokud používáte proměnnou v příkazu. Vrátí pouze aktualizovanou proměnnou bez odpovědi.",
+  "permissionToChange": "Oprávnění ke změně",
   "isReadOnly": "v chatu pouze pro čtení",
   "isNotReadOnly": "lze měnit prostřednictvím chatu",
   "no-variables-found": "Nebyly nalezeny žádné proměnné",

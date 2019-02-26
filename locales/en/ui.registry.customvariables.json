@@ -7,6 +7,8 @@
     "custom": "Custom",
     "command": "Command"
   },
+  "useIfInCommand": "Use if you use variable in command. Will return only updated variable without response.",
+  "permissionToChange": "Permission to change",
   "isReadOnly": "read-only in chat",
   "isNotReadOnly": "can be changed through chat",
   "no-variables-found": "No variables found",

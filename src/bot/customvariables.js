@@ -11,6 +11,7 @@ const mathjs = require('mathjs')
 const XRegExp = require('xregexp')
 
 const Message = require('./message')
+const constants = require('./constants')
 
 class CustomVariables {
   constructor () {
@@ -225,12 +226,23 @@ class CustomVariables {
 
     opts.sender = _.isNil(opts.sender) ? null : opts.sender
     opts.readOnlyBypass = _.isNil(opts.readOnlyBypass) ? false : opts.readOnlyBypass
-
     // add simple text variable, if not existing
     if (_.isEmpty(item)) {
-      item = await global.db.engine.insert('custom.variables', { variableName, currentValue, type: 'text', responseType: 0 })
+      item = await global.db.engine.insert('custom.variables', { variableName, currentValue, type: 'text', responseType: 0, permission: constants.MODS })
     } else {
-      if (item.readOnly && !opts.readOnlyBypass) {
+      // set item permission to owner if missing
+      item.permission = typeof item.permission === 'undefined' ? constants.OWNER_ONLY : item.permission;
+      let [isRegular, isMod, isOwner] = await Promise.all([
+        global.commons.isRegular(opts.sender),
+        global.commons.isModerator(opts.sender),
+        global.commons.isOwner(opts.sender)
+      ])
+      const permissionsAreValid = _.isNil(opts.sender) ||
+                            (item.permission === constants.VIEWERS) ||
+                            (item.permission === constants.REGULAR && (isRegular || isMod || isOwner)) ||
+                            (item.permission === constants.MODS && (isMod || isOwner)) ||
+                            (item.permission === constants.OWNER_ONLY && isOwner);
+      if ((item.readOnly && !opts.readOnlyBypass) || !permissionsAreValid) {
         isOk = false
       } else {
         oldValue = item.currentValue
@@ -257,10 +269,12 @@ class CustomVariables {
       }
     }
 
+    item.setValue = item.currentValue
     if (isOk) {
       this.updateWidgetAndTitle(variableName)
       if (!isEval) {
         this.addChangeToHistory({ sender: opts.sender, item, oldValue })
+        item.currentValue = '' // be silent if parsed correctly
       }
     }
     return { updated: item, isOk, isEval }

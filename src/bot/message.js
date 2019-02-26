@@ -181,21 +181,18 @@ class Message {
     }
     let custom = {
       '$_#': async (variable) => {
-        let isMod = await global.commons.isModerator(attr.sender)
-        if ((global.commons.isOwner(attr.sender) || isMod) &&
-          (!_.isNil(attr.param) && attr.param.length !== 0)) {
+        if (!_.isNil(attr.param) && attr.param.length !== 0) {
           let state = await global.customvariables.setValueOf(variable, attr.param, { sender: attr.sender })
-
           if (state.updated.responseType === 0) {
             // default
             if (state.isOk && !state.isEval) {
-              let msg = await global.commons.prepare('filters.setVariable', { value: state.updated.currentValue, variable: variable })
+              let msg = await global.commons.prepare('filters.setVariable', { value: state.updated.setValue, variable: variable })
               global.commons.sendMessage(msg, { username: attr.sender, skip: true, quiet: _.get(attr, 'quiet', false) })
             }
-            return state.isEval ? state.updated.currentValue : ''
+            return state.updated.currentValue
           } else if (state.updated.responseType === 1) {
             // custom
-            global.commons.sendMessage(state.updated.responseText.replace('$value', state.updated.currentValue), { username: attr.sender, skip: true, quiet: _.get(attr, 'quiet', false) })
+            global.commons.sendMessage(state.updated.responseText.replace('$value', state.updated.setValue), { username: attr.sender, skip: true, quiet: _.get(attr, 'quiet', false) })
             return ''
           } else {
             // command
@@ -207,11 +204,9 @@ class Message {
       // force quiet variable set
       '$!_#': async (variable) => {
         variable = variable.replace('$!_', '$_')
-        let isMod = await global.commons.isModerator(attr.sender)
-        if ((global.commons.isOwner(attr.sender) || isMod) &&
-          (!_.isNil(attr.param) && attr.param.length !== 0)) {
+        if (!_.isNil(attr.param) && attr.param.length !== 0) {
           let state = await global.customvariables.setValueOf(variable, attr.param, { sender: attr.sender })
-          return state.isEval ? state.updated.currentValue : ''
+          return state.updated.currentValue
         }
         return global.customvariables.getValueOf(variable, { sender: attr.sender, param: attr.param })
       }
