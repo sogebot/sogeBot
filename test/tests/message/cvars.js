@@ -112,7 +112,7 @@ describe('Message - cvars filter', async () => {
     'regular'
   ]
 
-  for (let permission of [0]) {
+  for (let permission of [0, 1, 2, 3]) {
     describe('Custom variable with ' + permissions[permission] + ' permission', async () => {
       before(async () => {
         await db.cleanup()
