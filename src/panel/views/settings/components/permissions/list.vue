@@ -17,6 +17,7 @@
                 @click="setPermission(p.id)"
                 v-on:dragstart="dragstart(p.id, $event)"
                 v-on:dragenter="dragenter(p.id, $event)"
+                v-on:dragend="dragend()"
                 draggable="true"
                 v-else
                 >
@@ -71,8 +72,8 @@
       })
     },
     methods: {
-      onChange: function () {
-        this.$emit('update', { value: this.currentData })
+      dragend() {
+        this.socket.emit('permissions.order', this.currentData);
       },
       setPermission(pid) {
         this.currentPID = pid
@@ -95,7 +96,6 @@
         }
 
         this.$forceUpdate()
-        this.onChange()
       },
     }
   })
