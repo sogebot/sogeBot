@@ -5,6 +5,7 @@ declare namespace Permissions {
     name: string,
     order: number,
     preserve: boolean,
-    automation: null | 'caster' | 'moderators' | 'subscribers' | 'viewers',
+    automation: null | 'caster' | 'moderators' | 'subscribers' | 'viewers' | 'followers',
+    userIds: string[],
   }
 }

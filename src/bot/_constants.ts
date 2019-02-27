@@ -5,4 +5,5 @@ export enum permissions {
   MODERATORS,
   SUBSCRIBERS,
   VIEWERS,
+  FOLLOWERS,
 }

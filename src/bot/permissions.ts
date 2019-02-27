@@ -25,6 +25,51 @@ class Permissions extends Core {
     this.addMenu({ category: 'settings', name: 'permissions', id: '/settings/permissions' });
   }
 
+  public async check(userId: string, permId: string) {
+    const user = await global.db.engine.findOne('users', { id: userId });
+    const permission: Permissions.Item = await global.db.engine.findOne(this.collection.data, { id: permId });
+
+    try {
+      if (typeof user.id === 'undefined') {
+        throw Error(`User ${userId} doesn't exist`);
+      }
+      if (typeof permission.id === 'undefined') {
+        throw Error(`Permissions ${permId} doesn't exist`);
+      }
+
+      let shouldProceed = false;
+      switch (permission.automation) {
+        case 'viewers':
+          shouldProceed = true;
+          break;
+        case 'caster':
+          shouldProceed = global.commons.isBot(user) || global.commons.isBroadcaster(user);
+          return;
+        case 'moderators':
+          shouldProceed = global.commons.isModerator(user);
+          break;
+        case 'subscribers':
+          shouldProceed = global.commons.isSubscriber(user);
+          break;
+        case 'followers':
+          shouldProceed = global.commons.isFollower(user);
+          break;
+        case null:
+          // check first if extended permission passes
+          shouldProceed = await this.check(userId, permission.extendsPID);
+          if (shouldProceed) {
+            // todo filters
+          }
+          break;
+
+      }
+      return shouldProceed;
+    } catch (e) {
+      global.log.error(e);
+      return false;
+    }
+  }
+
   protected sockets() {
     this.socket.on('connection', (socket) => {
       socket.on('permissions', async (cb) => {
@@ -37,6 +82,9 @@ class Permissions extends Core {
         for (const d of data) {
           await global.db.engine.update(this.collection.data, { id: String(d.id) }, { order: d.order });
         }
+      });
+      socket.on('permissions.extendsList', async (cb) => {
+        cb(await this.getExtendablePermissions());
       });
     });
   }
@@ -91,6 +139,18 @@ class Permissions extends Core {
         name: 'Subscribers',
         preserve: true,
         automation: 'subscribers',
+        extendsPID: null,
+        order: p.length + addedCount,
+      });
+      addedCount++;
+    }
+
+    if (!p.find((o) => o.id === String(permissions.FOLLOWERS))) {
+      await global.db.engine.insert(this.collection.data, {
+        id: String(permissions.FOLLOWERS),
+        name: 'Followers',
+        preserve: true,
+        automation: 'followers',
         extendsPID: null,
         order: p.length + addedCount,
       });
