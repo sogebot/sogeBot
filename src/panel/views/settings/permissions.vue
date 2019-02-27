@@ -26,12 +26,16 @@
             }"></panel>
 
     <div class="row">
-      <div class="col-auto">
-        <permissiontreeview :data="permissions"></permissiontreeview>
-        <em>Higher permission have access to lower permissions.</em>
+      <div class="col-3">
+        <list :data="permissions" @change="selectedPermission = $event"></list>
+        <em class="alert-danger p-3 mt-1 d-block">
+          <font-awesome-icon icon="exclamation-triangle" size="lg"></font-awesome-icon>
+          Higher permission have access to lower permissions.
+        </em>
       </div>
       <div class="col-auto">
-        Permission edit
+        {{ selectedPermission }}
+        <edit :selected="selectedPermission"></edit>
       </div>
     </div>
 
@@ -45,28 +49,33 @@
 
   import { library } from '@fortawesome/fontawesome-svg-core'
   import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-  import {  } from '@fortawesome/free-solid-svg-icons';
+  import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
 
-  library.add()
+  import { permissions } from '../../../constants'
+
+  library.add(faExclamationTriangle)
 
   export default Vue.extend({
     components: {
       panel: () => import('../../components/panel.vue'),
-      permissiontreeview: () => import('../../components/permissiontreeview.vue'),
+      list: () => import('./components/permissions/list.vue'),
+      edit: () => import('./components/permissions/edit.vue'),
       'font-awesome-icon': FontAwesomeIcon
     },
     data: function () {
       const object: {
         socket: any,
         permissions: any,
+        selectedPermission: string | null,
       } = {
-        socket: io('/systems/polls', { query: "token=" + this.token }),
+        selectedPermission: null,
+        socket: io('/core/permissions', { query: "token=" + this.token }),
         permissions: [
-          { name: 'Casters', preserve: true, automation: 'casters' },
-          { name: 'Administrators', preserve: true, automation: null },
-          { name: 'Moderators', preserve: true, automation: 'moderators' },
-          { name: 'Subscribers', preserve: true, automation: 'subscribers' },
-          { name: 'Viewers', preserve: true, automation: 'viewers' },
+          { id: permissions.CASTERS, name: 'Casters', preserve: true, automation: 'casters' },
+          { id: permissions.ADMINISTRATORS, name: 'Administrators', preserve: true, automation: null },
+          { id: permissions.MODERATORS, name: 'Moderators', preserve: true, automation: 'moderators' },
+          { id: permissions.SUBSCRIBERS, name: 'Subscribers', preserve: true, automation: 'subscribers' },
+          { id: permissions.VIEWERS, name: 'Viewers', preserve: true, automation: 'viewers' },
         ]
       }
       return object

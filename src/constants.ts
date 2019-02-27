@@ -1,0 +1,8 @@
+export enum permissions {
+  DISABLED = -1,
+  CASTERS,
+  ADMINISTRATORS,
+  MODERATORS,
+  SUBSCRIBERS,
+  VIEWERS,
+}

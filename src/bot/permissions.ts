@@ -1,0 +1,119 @@
+'use strict';
+
+import * as _ from 'lodash';
+import XRegExp from 'xregexp';
+import * as constants from './constants';
+import * as Parser from './parser';
+
+class Permissions {
+  constructor() {
+    global.configuration.register('disablePermissionWhispers', 'whisper.settings.disablePermissionWhispers', 'bool', true);
+
+    if (require('worker_threads').isMainThread) {
+      this.webPanel();
+    }
+  }
+
+  public commands() {
+    return [
+      { this: this, id: '!permission', command: '!permission', fnc: this.override, permission: constants.OWNER_ONLY },
+    ];
+  }
+
+  public webPanel() {
+    global.panel.addMenu({ category: 'settings', name: 'permissions', id: 'permissions' });
+    global.panel.socketListening(this, 'getPermissions', this.sendSocket);
+    global.panel.socketListening(this, 'changePermission', this.changeSocket);
+  }
+
+  public async sendSocket(self, socket) {
+    const parser = new Parser();
+    const commands = await parser.getCommandsList();
+
+    const toEmit: any[] = [];
+    for (const command of commands) {
+      toEmit.push({
+        id: command.id,
+        command: command.command,
+        permission: command.permission,
+      });
+    }
+    socket.emit('Permissions', _.orderBy(toEmit, (o) => o.command));
+  }
+
+  public async changeSocket(self, socket, data) {
+    switch (data.permission) {
+      case 'owner':
+        data.permission = constants.OWNER_ONLY;
+        break;
+      case 'mods':
+        data.permission = constants.MODS;
+        break;
+      case 'disable':
+        data.permission = constants.DISABLE;
+        break;
+      case 'regular':
+        data.permission = constants.REGULAR;
+        break;
+      default:
+        data.permission = constants.VIEWERS;
+    }
+    await global.db.engine.update('permissions', { key: data.id }, { key: data.id, permission: data.permission });
+  }
+
+  public removePermission(self, command) {
+    global.db.engine.remove('permissions', { key: command });
+  }
+
+  public async override(opts) {
+    try {
+      const match = XRegExp.exec(opts.parameters, constants.PERMISSION_REGEXP);
+      let permission;
+      switch (match.type) {
+        case 'viewer':
+          permission = constants.VIEWERS;
+          break;
+        case 'mods':
+          permission = constants.MODS;
+          break;
+        case 'disable':
+          permission = constants.DISABLE;
+          break;
+        case 'regular':
+          permission = constants.REGULAR;
+          break;
+        default:
+          permission = constants.OWNER_ONLY;
+      }
+
+      const parser = new Parser();
+      const command = await parser.find('!' + match.command);
+
+      if (command) {
+        if (!_.isNil(command.id)) { await global.db.engine.update('permissions', { key: command.id }, { key: command.id, permission }); } else { await global.db.engine.update('permissions', { key: command.command }, { key: command.command, permission }); }
+        global.commons.sendMessage(global.translate('permissions.success.change').replace(/\$command/g, command.command), opts.sender);
+      } else {
+        global.commons.sendMessage(global.translate('permissions.failed.noCmd'), opts.sender);
+      }
+    } catch (e) {
+      global.commons.sendMessage(global.translate('permissions.failed.parse'), opts.sender);
+    }
+  }
+
+  public stringToNumber(level) {
+    switch (level) {
+      case 'viewer':
+        return constants.VIEWERS;
+      case 'mods':
+        return constants.MODS;
+      case 'disable':
+        return constants.DISABLE;
+      case 'regular':
+        return constants.REGULAR;
+      default:
+        return constants.OWNER_ONLY;
+    }
+  }
+}
+
+module.exports = Permissions;
