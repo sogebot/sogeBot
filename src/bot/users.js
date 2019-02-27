@@ -191,6 +191,14 @@ class Users extends Core {
     }
   }
 
+  async getAllOnlineUsernames() {
+    return [
+      ...new Set([
+        ...((await global.db.engine.find('users.online')).map(o => o.username))
+      ])
+    ]
+  }
+
   async updateWatchTime (isInit) {
     if (isInit) {
       // set all users offline on start
@@ -210,37 +218,37 @@ class Users extends Core {
     try {
       // count watching time when stream is online
       if (await global.cache.isOnline()) {
-        let users = await global.db.engine.find('users.online')
+        let users = await this.getAllOnlineUsernames()
         if (users.length === 0) {
           throw Error('No online users.')
         }
         let updated = []
-        for (let onlineUser of users) {
-          const isIgnored = global.commons.isIgnored(onlineUser)
-          const isBot = global.commons.isBot(onlineUser.username)
-          const isOwner = global.commons.isOwner(onlineUser)
-          const isNewUser = typeof this.watchedList[onlineUser.username] === 'undefined'
+        for (let username of users) {
+          const isIgnored = global.commons.isIgnored(username)
+          const isBot = global.commons.isBot(username)
+          const isOwner = global.commons.isOwner(username)
+          const isNewUser = typeof this.watchedList[username] === 'undefined'
 
           if (isIgnored || isBot) continue
 
-          const watched = isNewUser ? 0 : Date.now() - this.watchedList[onlineUser.username]
-          const id = await global.users.getIdByName(onlineUser.username)
+          const watched = isNewUser ? 0 : Date.now() - this.watchedList[username]
+          const id = await global.users.getIdByName(username)
           if (!id) {
             if (__DEBUG__.WATCHED) {
-              global.log.debug('error: cannot get id of ' + onlineUser.username)
+              global.log.debug('error: cannot get id of ' + username)
             }
             continue
           }
 
-          if (isNewUser) this.checkNewChatter(id, onlineUser.username)
+          if (isNewUser) this.checkNewChatter(id, username)
           if (!isOwner) global.api._stream.watchedTime += watched
           await global.db.engine.increment('users.watched', { id }, { watched })
 
           if (__DEBUG__.WATCHED) {
-            global.log.debug(onlineUser.username + ': ' + (watched / 1000 / 60) + ' minutes added')
+            global.log.debug(username + ': ' + (watched / 1000 / 60) + ' minutes added')
           }
-          updated.push(onlineUser.username)
-          this.watchedList[onlineUser.username] = Date.now()
+          updated.push(username)
+          this.watchedList[username] = Date.now()
         }
 
         // remove offline users from watched list
