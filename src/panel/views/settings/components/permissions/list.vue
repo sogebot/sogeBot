@@ -3,12 +3,23 @@
     <div class="card-header">Permissions Groups</div>
     <div class="card-body p-0 m-0">
       <div class="list-group list-group-flush">
-        <button v-for="p of data"
+        <div v-if="isLoading"
+             class="text-uppercase list-group-item list-group-item-info"
+             style="letter-spacing: -1px;">
+          <font-awesome-icon icon="spinner" spin/>
+          Loading in progress
+        </div>
+        <button v-for="p of _.orderBy(currentData, 'order')"
                 class="list-group-item list-group-item-action"
                 :class="{ active: currentPID === p.id }"
-                style="font-size:1.2em; font-family: 'PT Sans Narrow', sans-serif;"
+                style="cursor: grab; font-size:1.2em; font-family: 'PT Sans Narrow', sans-serif;"
                 :key="p.name"
-                @click="setPermission(p.id)">
+                @click="setPermission(p.id)"
+                v-on:dragstart="dragstart(p.id, $event)"
+                v-on:dragenter="dragenter(p.id, $event)"
+                draggable="true"
+                v-else
+                >
           {{ p.name }}
           <small v-if="p.automation"
                  class="text-uppercase"
@@ -27,25 +38,65 @@
 
   import { library } from '@fortawesome/fontawesome-svg-core'
   import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-  import { faCog } from '@fortawesome/free-solid-svg-icons';
+  import { faCog, faSpinner } from '@fortawesome/free-solid-svg-icons';
 
-  library.add(faCog)
+  import * as io from 'socket.io-client';
+
+  library.add(faCog, faSpinner)
 
   export default Vue.extend({
-    props: ['data'],
     components: {
       'font-awesome-icon': FontAwesomeIcon,
     },
     data() {
-      return {
+      const data: {
+        currentPID: null | string,
+        draggingPID: null | string,
+        currentData: Permissions.Item[],
+        socket: any,
+        isLoading: boolean,
+      } = {
         currentPID: null,
+        draggingPID: null,
+        currentData: [],
+        socket: io('/core/permissions', { query: "token=" + this.token }),
+        isLoading: true,
       }
+      return data
+    },
+    mounted() {
+      this.socket.emit('permissions', (p) => {
+        this.currentData = p;
+        this.isLoading = false;
+      })
     },
     methods: {
+      onChange: function () {
+        this.$emit('update', { value: this.currentData })
+      },
       setPermission(pid) {
         this.currentPID = pid
         this.$emit('change', pid);
-      }
+      },
+      dragstart: function(pid, e) {
+        this.setPermission(pid);
+        this.draggingPID = pid;
+        e.dataTransfer.setData('text/plain', 'dummy');
+      },
+      dragenter: function(pid, e) {
+        if (this.draggingPID === null) return
+        const dragged = this.currentData.find((o) => o.id === this.draggingPID)
+        const drop = this.currentData.find((o) => o.id === pid)
+
+        if (dragged && drop) {
+          const order = dragged.order;
+          dragged.order = drop.order;
+          drop.order = order;
+        }
+
+        this.$forceUpdate()
+        this.onChange()
+      },
     }
   })
 </script>

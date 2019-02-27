@@ -51,8 +51,6 @@
   import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
   import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
 
-  import { permissions } from '../../../constants'
-
   library.add(faExclamationTriangle)
 
   export default Vue.extend({
@@ -65,18 +63,10 @@
     data: function () {
       const object: {
         socket: any,
-        permissions: any,
         selectedPermission: string | null,
       } = {
         selectedPermission: null,
         socket: io('/core/permissions', { query: "token=" + this.token }),
-        permissions: [
-          { id: permissions.CASTERS, name: 'Casters', preserve: true, automation: 'casters' },
-          { id: permissions.ADMINISTRATORS, name: 'Administrators', preserve: true, automation: null },
-          { id: permissions.MODERATORS, name: 'Moderators', preserve: true, automation: 'moderators' },
-          { id: permissions.SUBSCRIBERS, name: 'Subscribers', preserve: true, automation: 'subscribers' },
-          { id: permissions.VIEWERS, name: 'Viewers', preserve: true, automation: 'viewers' },
-        ]
       }
       return object
     },
