@@ -1,6 +1,6 @@
 <template>
   <div class="input-group">
-    <div class="border"
+    <div class="border d-flex w-100"
          :class="{'focus-border': isFocused }">
       <div class="input-group-prepend">
         <div class="input-group-text bg-transparent border-0">
