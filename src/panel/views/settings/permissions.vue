@@ -33,9 +33,8 @@
           Higher permission have access to lower permissions.
         </em>
       </div>
-      <div class="col-auto">
-        {{ selectedPermission }}
-        <edit :selected="selectedPermission"></edit>
+      <div class="col-9">
+        <edit :pid="selectedPermission"></edit>
       </div>
     </div>
 
