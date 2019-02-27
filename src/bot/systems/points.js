@@ -65,7 +65,7 @@ class Points extends System {
     var ptsPerInterval = isOnline ? perInterval : perOfflineInterval
 
     try {
-      for (let username of await global.users.getAllOnlineUsernames()) {
+      for (let username of (await global.users.getAllOnlineUsernames())) {
         if (await global.commons.isBot(username)) continue
 
         let user = await global.db.engine.findOne('users', { username })
@@ -279,7 +279,7 @@ class Points extends System {
     try {
       const points = new Expects(opts.parameters).points({ all: false }).toArray()
 
-      for (let username of await global.users.getAllOnlineUsernames()) {
+      for (let username of (await global.users.getAllOnlineUsernames())) {
         if (await global.commons.isBot(username)) continue
 
         let user = await global.db.engine.findOne('users', { username })
@@ -302,7 +302,7 @@ class Points extends System {
     try {
       const points = new Expects(opts.parameters).points({ all: false }).toArray()
 
-      for (let username of await global.users.getAllOnlineUsernames()) {
+      for (let username of (await global.users.getAllOnlineUsernames())) {
         if (await global.commons.isBot(username)) continue
 
         let user = await global.db.engine.findOne('users', { username })
