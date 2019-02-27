@@ -1,18 +1,20 @@
 <template>
-  <div class="input-group"
-       :class="{'focus-border': isFocused }">
-    <div class="input-group-prepend">
-      <div class="input-group-text bg-transparent border-right-0">
-        <font-awesome-icon icon="search"></font-awesome-icon>
+  <div class="input-group">
+    <div class="border-1"
+         :class="{'focus-border': isFocused }">
+      <div class="input-group-prepend">
+        <div class="input-group-text bg-transparent border-0">
+          <font-awesome-icon icon="search"></font-awesome-icon>
+        </div>
       </div>
-    </div>
-    <input
-      @focus="isFocused = true"
-      @blur="isFocused = false"
-      v-model="inputUsername"
-      type="text"
-      class="form-control border-left-0"
-      placeholder="Type username -or- id to search...">
+      <input
+        @focus="isFocused = true"
+        @blur="isFocused = false"
+        v-model="inputUsername"
+        type="text"
+        class="form-control border-left-0"
+        placeholder="Type username -or- id to search...">
+      </div>
     <div class="input-group-append">
       <button class="btn btn-primary" type="button" @click="addUser">Add</button>
     </div>
