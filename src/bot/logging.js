@@ -22,6 +22,7 @@ if (!fs.existsSync(logDir)) fs.mkdirSync(logDir)
 const logLevel = !_.isNil(process.env.LOGLEVEL) ? process.env.LOGLEVEL.toLowerCase().trim() : 'info'
 
 const levels = {
+  debug: 0,
   error: 1,
   chatIn: 2,
   chatOut: 2,
@@ -43,7 +44,6 @@ const levels = {
   info: 12,
   start: 12,
   stop: 12,
-  debug: 12,
   process: 99999
 }
 
@@ -99,7 +99,8 @@ if (!isMainThread) {
       new winston.transports.Console()
     ],
     transports: [
-      new winston.transports.File({ filename: logDir + '/sogebot.log', colorize: false, maxsize: 5242880, maxFiles: 5 }),
+      new winston.transports.File({ filename: logDir + '/sogebot.log', colorize: false, maxsize: 5242880, maxFiles: 5, tailable: true }),
+      new winston.transports.File({ filename: logDir + '/debug.log', colorize: true, maxsize: 5242880, maxFiles: 5, level: 'debug', tailable: true }),
       new winston.transports.Console()
     ]
   })

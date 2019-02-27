@@ -12,6 +12,10 @@ const axios = require('axios')
 const Expects = require('./expects')
 import Core from './_interface'
 
+const __DEBUG__ = {
+  WATCHED: (process.env.DEBUG && process.env.DEBUG.includes('users.watched')),
+}
+
 class Users extends Core {
   uiSortCache: String | null = null
   uiSortCacheViewers: Array<Object> = []
@@ -38,10 +42,7 @@ class Users extends Core {
     this.addMenu({ category: 'settings', name: 'core', id: 'core' })
 
     if (isMainThread) {
-      this.updateWatchTime()
-
-      // set all users offline on start
-      global.db.engine.remove('users.online', {})
+      this.updateWatchTime(true);
     }
   }
 
@@ -190,14 +191,29 @@ class Users extends Core {
     }
   }
 
-  async updateWatchTime () {
-    clearTimeout(this.timeouts['updateWatchTime'])
+  async updateWatchTime (isInit) {
+    if (isInit) {
+      // set all users offline on start
+      await global.db.engine.remove('users.online', {})
+    }
 
+    if (__DEBUG__.WATCHED) {
+      const message = 'Watched time update ' + new Date()
+      global.log.debug(Array(message.length + 1).join('='))
+      global.log.debug(message)
+      global.log.debug(Array(message.length + 1).join('='))
+
+    }
+
+    clearTimeout(this.timeouts['updateWatchTime'])
     let timeout = constants.MINUTE * 5
     try {
       // count watching time when stream is online
       if (await global.cache.isOnline()) {
         let users = await global.db.engine.find('users.online')
+        if (users.length === 0) {
+          throw Error('No online users.')
+        }
         let updated = []
         for (let onlineUser of users) {
           const isIgnored = global.commons.isIgnored(onlineUser)
@@ -207,28 +223,44 @@ class Users extends Core {
 
           if (isIgnored || isBot) continue
 
-          const watched = isNewUser ? timeout : Date.now() - this.watchedList[onlineUser.username]
+          const watched = isNewUser ? 0 : Date.now() - this.watchedList[onlineUser.username]
           const id = await global.users.getIdByName(onlineUser.username)
+          if (!id) {
+            if (__DEBUG__.WATCHED) {
+              global.log.debug('error: cannot get id of ' + onlineUser.username)
+            }
+            continue
+          }
 
           if (isNewUser) this.checkNewChatter(id, onlineUser.username)
           if (!isOwner) global.api._stream.watchedTime += watched
           await global.db.engine.increment('users.watched', { id }, { watched })
 
+          if (__DEBUG__.WATCHED) {
+            global.log.debug(onlineUser.username + ': ' + (watched / 1000 / 60) + ' minutes added')
+          }
           updated.push(onlineUser.username)
           this.watchedList[onlineUser.username] = Date.now()
         }
 
         // remove offline users from watched list
         for (let u of Object.entries(this.watchedList)) {
-          if (!updated.includes(u[0])) delete this.watchedList[u[0]]
+          if (!updated.includes(u[0])) {
+            if (__DEBUG__.WATCHED) {
+              global.log.debug(u[0] + ': removed from online list')
+            }
+            delete this.watchedList[u[0]]
+          }
         }
       } else {
-        this.watchedList = {}
-        global.users.newChattersList = []
-        throw Error('stream offline')
+        throw Error('Stream offline, watch time is not counting, retrying')
       }
     } catch (e) {
+      if (__DEBUG__.WATCHED) {
+        global.log.debug(e.message)
+      }
       this.watchedList = {}
+      global.users.newChattersList = []
       timeout = 1000
     }
     this.timeouts['updateWatchTime'] = setTimeout(() => this.updateWatchTime(), timeout)
@@ -287,7 +319,7 @@ class Users extends Core {
     let id = (await global.db.engine.findOne('users', { username })).id
     if ((typeof id === 'undefined' || id === 'null') && fetch) {
       id = await global.api.getIdFromTwitch(username)
-      await global.db.engine.update('users', { id }, { username })
+      if (id !== null) await global.db.engine.update('users', { id }, { username })
     }
     return id
   }
