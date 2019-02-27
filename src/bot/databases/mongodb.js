@@ -110,7 +110,13 @@ class IMongoDB extends Interface {
       let items
       const order = sortBy.startsWith('-') ? 1 : -1
 
-      where = flatten(where)
+      if (_.some(Object.keys(flatten(where)).map(o => o.includes('$regex')))) {
+        if (Object.keys(flatten(where)).length > 1) {
+          throw Error('Don\'t use $regex with other search attributes');
+        }
+      } else {
+        where = flatten(where)
+      }
       if (!sumBy || !groupBy) {
         if (sortBy !== '_id') {
           where[sortBy.replace('-', '')] = { $exists: true, $ne: order === 1 ? 0 : null }

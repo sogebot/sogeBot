@@ -27,7 +27,7 @@
 
     <div class="row">
       <div class="col-3">
-        <list :data="permissions" @change="selectedPermission = $event"></list>
+        <list @change="selectedPermission = $event"></list>
         <em class="alert-danger p-3 mt-1 d-block">
           <font-awesome-icon icon="exclamation-triangle" size="lg"></font-awesome-icon>
           Higher permission have access to lower permissions.

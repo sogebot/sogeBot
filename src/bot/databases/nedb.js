@@ -104,10 +104,16 @@ class INeDB extends Interface {
     const total = where._total || undefined
 
     delete where._sort; delete where._sum; delete where._total; delete where._group
-    where = flatten(where)
+    if (_.some(Object.keys(flatten(where)).map(o => o.includes('$regex')))) {
+      if (Object.keys(flatten(where)).length > 1) {
+        throw Error('Don\'t use $regex with other search attributes');
+      }
+    } else {
+      where = flatten(where)
+    }
 
     return new Promise((resolve, reject) => {
-      this.on(table).find(flatten(where), async (err, items) => {
+      this.on(table).find(where, async (err, items) => {
         if (err) {
           global.log.error(err.message)
           global.log.error(JSON.stringify({ type: 'find', table, where }))

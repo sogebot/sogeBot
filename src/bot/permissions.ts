@@ -105,6 +105,7 @@ class Permissions extends Core {
         automation: 'casters',
         extendsPID: null,
         order: p.length + addedCount,
+        userIds: [],
       });
       addedCount++;
     }
@@ -117,6 +118,7 @@ class Permissions extends Core {
         automation: null,
         extendsPID: null,
         order: p.length + addedCount,
+        userIds: [],
       });
       addedCount++;
     }
@@ -129,6 +131,7 @@ class Permissions extends Core {
         automation: 'moderators',
         extendsPID: null,
         order: p.length + addedCount,
+        userIds: [],
       });
       addedCount++;
     }
@@ -141,6 +144,7 @@ class Permissions extends Core {
         automation: 'subscribers',
         extendsPID: null,
         order: p.length + addedCount,
+        userIds: [],
       });
       addedCount++;
     }
@@ -153,6 +157,7 @@ class Permissions extends Core {
         automation: 'followers',
         extendsPID: null,
         order: p.length + addedCount,
+        userIds: [],
       });
       addedCount++;
     }
@@ -165,6 +170,7 @@ class Permissions extends Core {
         automation: 'viewers',
         extendsPID: null,
         order: p.length + addedCount,
+        userIds: [],
       });
       addedCount++;
     }

@@ -334,6 +334,18 @@ class Users extends Core {
 
   async sockets () {
     this.socket.on('connection', (socket) => {
+      socket.on('search', async(opts, cb) => {
+        const regexp = new RegExp(opts.search, 'i')
+        const usersById = await global.db.engine.find('users', { id: { $regex: regexp } })
+        const usersByName = await global.db.engine.find('users', { username: { $regex: regexp } })
+        cb({
+          results: [
+          ...usersById,
+          ...usersByName,
+          ],
+          state: opts.state,
+        })
+      })
       socket.on('find.viewers', async (opts, cb) => {
         opts = _.defaults(opts, { filter: null, show: { subscribers: null, followers: null, active: null, regulars: null } })
         opts.page-- // we are counting index from 0
