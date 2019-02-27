@@ -1,6 +1,6 @@
 <template>
   <div class="input-group">
-    <div class="border-1"
+    <div class="border"
          :class="{'focus-border': isFocused }">
       <div class="input-group-prepend">
         <div class="input-group-text bg-transparent border-0">
@@ -12,7 +12,7 @@
         @blur="isFocused = false"
         v-model="inputUsername"
         type="text"
-        class="form-control border-left-0"
+        class="form-control border-0"
         placeholder="Type username -or- id to search...">
       </div>
     <div class="input-group-append">
