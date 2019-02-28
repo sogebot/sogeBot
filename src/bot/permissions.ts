@@ -25,7 +25,7 @@ class Permissions extends Core {
     this.addMenu({ category: 'settings', name: 'permissions', id: '/settings/permissions' });
   }
 
-  public async check(userId: string, permId: string) {
+  public async check(userId: string, permId: string, isPartialCheck: boolean = false): Promise<boolean> {
     const user = await global.db.engine.findOne('users', { id: userId });
     const permission: Permissions.Item = await global.db.engine.findOne(this.collection.data, { id: permId });
 
@@ -37,7 +37,18 @@ class Permissions extends Core {
         throw Error(`Permissions ${permId} doesn't exist`);
       }
 
-      // @TODO: waterfall check caster can proceed on moderators etc. etc.
+      // get all higher permissions to check
+      if (!isPartialCheck) {
+        const partialPermission: Permissions.Item[] = (await global.db.engine.find(this.collection.data)).filter((o) => {
+          return o.order < permission.order;
+        });
+        for (const p of partialPermission) {
+          const userHaveAccess = await this.check(userId, p.id, true);
+          if (userHaveAccess) {
+            return true; // we don't need to continue, user have already access with higher permission
+          }
+        }
+      }
 
       let shouldProceed = false;
       switch (permission.automation) {
@@ -46,7 +57,7 @@ class Permissions extends Core {
           break;
         case 'caster':
           shouldProceed = global.commons.isBot(user) || global.commons.isBroadcaster(user);
-          return;
+          break;
         case 'moderators':
           shouldProceed = global.commons.isModerator(user);
           break;
@@ -57,8 +68,8 @@ class Permissions extends Core {
           shouldProceed = global.commons.isFollower(user);
           break;
         case null:
-          // check first if extended permission passes
-          shouldProceed = await this.check(userId, permission.extendsPID);
+          // check first if extended permission passes (only partial check)
+          shouldProceed = await this.check(userId, permission.extendsPID, true);
           if (shouldProceed) {
             // todo filters
           }
@@ -95,7 +106,7 @@ class Permissions extends Core {
     return (await global.db.engine.find(this.collection.data, { preserve: true }));
   }
 
-  private async ensurePreservedPermissionsInDb() {
+  private async ensurePreservedPermissionsInDb(): Promise<void> {
     const p = await global.db.engine.find(this.collection.data);
     let addedCount = 0;
 
