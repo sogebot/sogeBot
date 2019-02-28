@@ -4,8 +4,10 @@ const {
   Worker, isMainThread, parentPort, threadId
 } = require('worker_threads');
 
-const __DEBUG__ =
-  (process.env.DEBUG && process.env.DEBUG.includes('workers'))
+const __DEBUG__ = {
+  STATUS: (process.env.DEBUG && process.env.DEBUG.includes('workers.status')),
+  MESSAGES: (process.env.DEBUG && process.env.DEBUG.includes('workers.messages')),
+}
 
 class Workers {
   constructor() {
@@ -26,13 +28,18 @@ class Workers {
 
     const worker = new Worker(this.path)
     this.setListeners(worker)
+    worker.on('error', () => {
+      if (__DEBUG__.STATUS) { global.log.debug('Worker is unexpectedly dead'); }
+      this.onlineCount--;
+      this.newWorker();
+    });
     worker.on('exit', () => {
-      if (__DEBUG__) { global.log.debug('Worker is dead'); }
+      if (__DEBUG__.STATUS) { global.log.debug('Worker was exited'); }
       this.onlineCount--;
       this.newWorker();
     });
     worker.on('online', () => {
-      if (__DEBUG__) { global.log.debug('Worker is online'); }
+      if (__DEBUG__.STATUS) { global.log.debug('Worker is online'); }
       this.onlineCount++;
     });
     this.list.push(worker);
@@ -118,7 +125,7 @@ class Workers {
       }
 
       if (!global.db.engine.connected || !(global.lib && global.lib.translate)) return setTimeout(() => this.process(data), 1000)
-      if (__DEBUG__) { global.log.debug('MAIN: ' + JSON.stringify(data)); }
+      if (__DEBUG__.MESSAGES) { global.log.debug('MAIN: ' + JSON.stringify(data)); }
 
       if (data.type === 'lang') {
         for (let worker in cluster.workers) cluster.workers[worker].send({ type: 'lang' })
@@ -148,7 +155,7 @@ class Workers {
         _.set(global, data.path, data.value);
       }
     } else {
-      if (__DEBUG__) { global.log.debug('THREAD(' + threadId + '): ' + JSON.stringify(data)); }
+      if (__DEBUG__.MESSAGES) { global.log.debug('THREAD(' + threadId + '): ' + JSON.stringify(data)); }
       switch (data.type) {
         case 'interface':
           _.set(global, data.path, data.value);
@@ -203,12 +210,12 @@ class Workers {
   }
 
   setListenersMain(worker) {
-    if (__DEBUG__) { global.log.debug('MAIN: loading listeners'); }
+    if (__DEBUG__.MESSAGES) { global.log.debug('MAIN: loading listeners'); }
     worker.on('message', (msg) => { this.process(msg) });
   }
 
   setListenersWorker() {
-    if (__DEBUG__) { global.log.debug('THREAD(' + threadId + '): loading listeners'); }
+    if (__DEBUG__.MESSAGES) { global.log.debug('THREAD(' + threadId + '): loading listeners'); }
 
     parentPort.on('message', (msg) => { this.process(msg) });
   }
