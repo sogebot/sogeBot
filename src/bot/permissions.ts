@@ -37,6 +37,8 @@ class Permissions extends Core {
         throw Error(`Permissions ${permId} doesn't exist`);
       }
 
+      // @TODO: waterfall check caster can proceed on moderators etc. etc.
+
       let shouldProceed = false;
       switch (permission.automation) {
         case 'viewers':
