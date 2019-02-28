@@ -60,7 +60,7 @@ class Twitch {
 
   async followers (opts) {
     let events = await global.db.engine.find('widgetsEventList')
-    const onlineViewers = (await global.db.engine.find('users.online')).map((o) => o.username)
+    const onlineViewers = await global.users.getAllOnlineUsernames()
     const followers = (await global.db.engine.find('users', { is: { follower: true } })).map((o) => o.username)
 
     let onlineFollowers = _.intersection(onlineViewers, followers)
@@ -85,7 +85,7 @@ class Twitch {
 
   async subs (opts) {
     let events = await global.db.engine.find('widgetsEventList')
-    const onlineViewers = (await global.db.engine.find('users.online')).map((o) => o.username)
+    const onlineViewers = await global.users.getAllOnlineUsernames()
     const subscribers = (await global.db.engine.find('users', { is: { subscriber: true } })).map((o) => o.username)
 
     let onlineSubscribers = _.intersection(onlineViewers, subscribers)

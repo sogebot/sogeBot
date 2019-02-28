@@ -81,7 +81,7 @@ class Message {
 
     let random = {
       '(random.online.viewer)': async function () {
-        const usernames = (await global.db.engine.find('users.online')).map((o) => o.username)
+        const usernames = await global.users.getAllOnlineUsernames()
         const onlineViewers = usernames.filter((username) => {
           const isSender = username === attr.sender;
           const isBot = global.commons.isBot(username);
@@ -92,7 +92,7 @@ class Message {
         return _.sample(onlineViewers)
       },
       '(random.online.follower)': async function () {
-        const usernames = (await global.db.engine.find('users.online')).map((o) => o.username)
+        const usernames = await global.users.getAllOnlineUsernames()
         const onlineViewers = usernames.filter((username) => {
           const isSender = username === attr.sender;
           const isBot = global.commons.isBot(username);
@@ -107,7 +107,7 @@ class Message {
         return _.sample(onlineFollowers)
       },
       '(random.online.subscriber)': async function () {
-        const usernames = (await global.db.engine.find('users.online')).map((o) => o.username)
+        const usernames = await global.users.getAllOnlineUsernames()
         const onlineViewers = usernames.filter((username) => {
           const isSender = username === attr.sender;
           const isBot = global.commons.isBot(username);
