@@ -169,6 +169,14 @@
                       </select>
                     </div>
 
+                    <div class="form-group col-md-12" v-if="currentGoal.type === 'tips'">
+                      <label for="countBitsAsTips-input">{{ translate('registry.goals.input.countBitsAsTips.title') }}</label>
+                      <button type="button" class="btn btn-block" :class="[currentGoal.countBitsAsTips ? 'btn-success' : 'btn-danger']" @click="$set(currentGoal, 'countBitsAsTips', !currentGoal.countBitsAsTips)">
+                        {{ translate((currentGoal.countBitsAsTips ? 'enabled' : 'disabled')) }}
+                      </button>
+                    </div>
+
+
                     <div class="form-group col-md-12">
                       <label for="goalAmount-input">{{ translate('registry.goals.input.goalAmount.title') }}</label>
                       <input v-model="currentGoal.goalAmount" type="number" min="1" class="form-control" id="goalAmount-input">
@@ -183,7 +191,7 @@
 
                     <div class="form-group col-md-12">
                       <label for="endAfterIgnore-input">{{ translate('registry.goals.input.endAfterIgnore.title') }}</label>
-                      <button type="button" class="btn btn-block" :class="[currentGoal.endAfterIgnore ? 'btn-success' : 'btn-danger']" @click="currentGoal.endAfterIgnore = !currentGoal.endAfterIgnore">
+                      <button type="button" class="btn btn-block" :class="[currentGoal.endAfterIgnore ? 'btn-success' : 'btn-danger']" @click="$set(currentGoal, 'endAfterIgnore', !currentGoal.endAfterIgnore)">
                         {{ translate((currentGoal.endAfterIgnore ? 'enabled' : 'disabled')) }}
                       </button>
                     </div>
@@ -530,6 +538,7 @@ export default Vue.extend({
         currentAmount: 0,
         endAfter: (new Date(Date.now() + 24 * 60 * 60 * 1000)).toISOString(),
         endAfterIgnore: true,
+        countBitsAsTips: false,
       })
 
       this.uiShowGoal = uid

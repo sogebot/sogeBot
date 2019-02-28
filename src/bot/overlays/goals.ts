@@ -51,6 +51,16 @@ class Goals extends Overlay {
         await global.db.engine.incrementOne(this.collection.goals, { uid }, { currentAmount: bit.amount });
       }
     }
+
+    // tips with tracking bits
+    const tipsGoals: Goals.Goal[] = await global.db.engine.find(this.collection.goals, { type: 'tips', countBitsAsTips: true });
+    for (const goal of tipsGoals) {
+      const uid = String(goal.uid);
+      if (new Date(goal.endAfter).getTime() >= new Date().getTime() || goal.endAfterIgnore) {
+        const amount = parseFloat(global.currency.exchange(bit.amount / 100, 'USD', global.currency.settings.currency.mainCurrency));
+        await global.db.engine.incrementOne(this.collection.goals, { uid }, { currentAmount: amount });
+      }
+    }
   }
 
   private async onTip(tip: onEventTip) {

@@ -17,6 +17,9 @@
     "goalAmount": {
       "title": "Částka cíle"
     },
+    "countBitsAsTips": {
+      "title": "Počítat Bity s Tipy"
+    },
     "currentAmount": {
       "title": "Aktuální částka"
     },
