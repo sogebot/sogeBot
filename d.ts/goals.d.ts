@@ -40,6 +40,7 @@ declare namespace Goals {
 
     name: string,
     type: 'followers' | 'currentFollowers' | 'currentSubscribers' | 'subscribers' | 'tips' | 'bits',
+    countBitsAsTips: boolean,
 
     display: 'simple' | 'full' | 'custom'
 

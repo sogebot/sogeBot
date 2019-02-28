@@ -17,6 +17,9 @@
     "goalAmount": {
       "title": "Goal Amount"
     },
+    "countBitsAsTips": {
+      "title": "Count Bits as Tips"
+    },
     "currentAmount": {
       "title": "Current Amount"
     },

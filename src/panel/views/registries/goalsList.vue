@@ -49,6 +49,9 @@
                 <dt class="col-6">{{translate('registry.goals.input.type.title')}}</dt>
                 <dd class="col-6">{{goal.type}}</dd>
 
+                <dt class="col-6" v-if="goal.type === 'tips'">{{translate('registry.goals.input.countBitsAsTips.title')}}</dt>
+                <dd class="col-6" v-if="goal.type === 'tips'">{{!!goal.countBitsAsTips}}</dd>
+
                 <dt class="col-6">{{translate('registry.goals.input.goalAmount.title')}}</dt>
                 <dd class="col-6">{{goal.goalAmount}}</dd>
 
