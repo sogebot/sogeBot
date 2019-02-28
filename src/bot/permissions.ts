@@ -106,6 +106,7 @@ class Permissions extends Core {
         extendsPID: null,
         order: p.length + addedCount,
         userIds: [],
+        filters: [],
       });
       addedCount++;
     }
@@ -119,6 +120,7 @@ class Permissions extends Core {
         extendsPID: null,
         order: p.length + addedCount,
         userIds: [],
+        filters: [],
       });
       addedCount++;
     }
@@ -132,6 +134,7 @@ class Permissions extends Core {
         extendsPID: null,
         order: p.length + addedCount,
         userIds: [],
+        filters: [],
       });
       addedCount++;
     }
@@ -145,6 +148,7 @@ class Permissions extends Core {
         extendsPID: null,
         order: p.length + addedCount,
         userIds: [],
+        filters: [],
       });
       addedCount++;
     }
@@ -158,6 +162,7 @@ class Permissions extends Core {
         extendsPID: null,
         order: p.length + addedCount,
         userIds: [],
+        filters: [],
       });
       addedCount++;
     }
@@ -171,6 +176,7 @@ class Permissions extends Core {
         extendsPID: null,
         order: p.length + addedCount,
         userIds: [],
+        filters: [],
       });
       addedCount++;
     }

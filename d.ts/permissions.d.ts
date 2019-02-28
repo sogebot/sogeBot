@@ -7,5 +7,11 @@ declare namespace Permissions {
     preserve: boolean,
     automation: null | 'caster' | 'moderators' | 'subscribers' | 'viewers' | 'followers',
     userIds: string[],
+    filters: Permissions.Filter[],
+  }
+
+  type Filter = {
+    comparator: '<' | '>' | '==' | '<=' | '>=',
+    type: 'watched' | 'tips' | 'bits' | 'messages'
   }
 }

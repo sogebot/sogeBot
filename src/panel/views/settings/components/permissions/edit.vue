@@ -35,8 +35,13 @@
           </div>
 
           <div class="form-group col-md-12" v-if="!item.automation">
-            <label for="extends_input">{{ translate('core.permissions.input.users.title') }}</label>
+            <label>{{ translate('core.permissions.input.users.title') }}</label>
             <userslist :ids="item.userIds" @update="item.userIds = $event"></userslist>
+          </div>
+
+          <div class="form-group col-md-12" v-if="!item.automation && !item.preserve">
+            <label>{{ translate('core.permissions.input.filters.title') }}</label>
+            <filters :filters="item.filters" @update="item.filters = $event"></filters>
           </div>
 
           <div class="p-3 text-right">
@@ -76,6 +81,7 @@
       holdButton: () => import('../../../../components/holdButton.vue'),
       buttonWithIcon: () => import('../../../../components/button.vue'),
       userslist: () => import('./userslist.vue'),
+      filters: () => import('./filters.vue'),
     },
     data() {
       const data: {
