@@ -1,10 +1,8 @@
 'use strict';
 
 import * as _ from 'lodash';
-import XRegExp from 'xregexp';
-import { permissions } from './_constants';
+import { v4 as uuid } from 'uuid';
 import Core from './_interface';
-import * as Parser from './parser';
 
 class Permissions extends Core {
   [x: string]: any; // TODO: remove after interface ported to TS
@@ -110,9 +108,9 @@ class Permissions extends Core {
     const p = await global.db.engine.find(this.collection.data);
     let addedCount = 0;
 
-    if (!p.find((o) => o.id === String(permissions.CASTERS))) {
+    if (!p.find((o) => o.automation === 'casters')) {
       await global.db.engine.insert(this.collection.data, {
-        id: String(permissions.CASTERS),
+        id: uuid(),
         name: 'Casters',
         preserve: true,
         automation: 'casters',
@@ -124,23 +122,9 @@ class Permissions extends Core {
       addedCount++;
     }
 
-    if (!p.find((o) => o.id === String(permissions.ADMINISTRATORS))) {
+    if (!p.find((o) => o.automation === 'moderators')) {
       await global.db.engine.insert(this.collection.data, {
-        id: String(permissions.ADMINISTRATORS),
-        name: 'Administrators',
-        preserve: true,
-        automation: null,
-        extendsPID: null,
-        order: p.length + addedCount,
-        userIds: [],
-        filters: [],
-      });
-      addedCount++;
-    }
-
-    if (!p.find((o) => o.id === String(permissions.MODERATORS))) {
-      await global.db.engine.insert(this.collection.data, {
-        id: String(permissions.MODERATORS),
+        id: uuid(),
         name: 'Moderators',
         preserve: true,
         automation: 'moderators',
@@ -152,9 +136,9 @@ class Permissions extends Core {
       addedCount++;
     }
 
-    if (!p.find((o) => o.id === String(permissions.SUBSCRIBERS))) {
+    if (!p.find((o) => o.automation === 'subscribers')) {
       await global.db.engine.insert(this.collection.data, {
-        id: String(permissions.SUBSCRIBERS),
+        id: uuid(),
         name: 'Subscribers',
         preserve: true,
         automation: 'subscribers',
@@ -166,9 +150,9 @@ class Permissions extends Core {
       addedCount++;
     }
 
-    if (!p.find((o) => o.id === String(permissions.FOLLOWERS))) {
+    if (!p.find((o) => o.automation === 'followers')) {
       await global.db.engine.insert(this.collection.data, {
-        id: String(permissions.FOLLOWERS),
+        id: uuid(),
         name: 'Followers',
         preserve: true,
         automation: 'followers',
@@ -180,9 +164,9 @@ class Permissions extends Core {
       addedCount++;
     }
 
-    if (!p.find((o) => o.id === String(permissions.VIEWERS))) {
+    if (!p.find((o) => o.automation === 'viewers')) {
       await global.db.engine.insert(this.collection.data, {
-        id: String(permissions.VIEWERS),
+        id: uuid(),
         name: 'Viewers',
         preserve: true,
         automation: 'viewers',

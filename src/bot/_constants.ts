@@ -1,9 +1,8 @@
 export enum permissions {
-  DISABLED = -1,
-  CASTERS,
-  ADMINISTRATORS,
-  MODERATORS,
-  SUBSCRIBERS,
-  VIEWERS,
-  FOLLOWERS,
+  DISABLED = 'disabled',
+  CASTERS = 'casters',
+  MODERATORS = 'moderators',
+  SUBSCRIBERS = 'subscribers',
+  VIEWERS = 'viewers',
+  FOLLOWERS = 'followers',
 }
