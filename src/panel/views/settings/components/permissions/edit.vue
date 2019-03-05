@@ -25,20 +25,25 @@
             <div class="invalid-feedback"></div>
           </div>
 
-          <div class="form-group col-md-12" v-if="!item.preserve">
-            <label for="extends_input">{{ translate('core.permissions.input.extends.title') }}</label>
-            <select v-model="item.extendsPID" class="form-control">
-              <option v-for="e of extendsList" v-bind:key="e.id" :value="e.id">{{e.name}}</option>
+          <div class="form-group col-md-12" v-if="!item.isCorePermission">
+            <label for="extends_input">{{ translate('core.permissions.input.automation.title') }}</label>
+            <select v-model="item.automation" class="form-control">
+              <option value='none'>None</option>
+              <option value='caster'>Caster</option>
+              <option value='moderators'>Moderators</option>
+              <option value='subscribers'>Subscribers</option>
+              <option value='viewers'>Viewers</option>
+              <option value='followers'>Followers</option>
             </select>
             <div class="invalid-feedback"></div>
           </div>
 
-          <div class="form-group col-md-12" v-if="!item.automation">
+          <div class="form-group col-md-12" v-if="!item.isCorePermission">
             <label>{{ translate('core.permissions.input.users.title') }}</label>
             <userslist :ids="item.userIds" @update="item.userIds = $event"></userslist>
           </div>
 
-          <div class="form-group col-md-12" v-if="!item.automation && !item.preserve">
+          <div class="form-group col-md-12" v-if="!item.isCorePermission">
             <label>{{ translate('core.permissions.input.filters.title') }}</label>
             <filters :filters="item.filters" @update="item.filters = $event"></filters>
           </div>
@@ -47,7 +52,7 @@
             <hold-button class="btn-danger"
                         @trigger="removePermission(pid)"
                         icon="trash"
-                        v-if="!item.preserve">
+                        v-if="!item.isCorePermission">
               <template slot="title">{{translate('dialog.buttons.delete')}}</template>
               <template slot="onHoldTitle">{{translate('dialog.buttons.hold-to-delete')}}</template>
             </hold-button>
@@ -94,7 +99,6 @@
         isSaving: 0,
         isLoading: {
           permission: false,
-          extendsList: false,
         },
       }
       return data;
@@ -112,15 +116,10 @@
     methods: {
       refresh() {
         this.isLoading.permission = true
-        this.isLoading.extendsList = true
 
         this.socket.emit('permission', this.$route.params.id, (p) => {
           this.item = p;
           this.isLoading.permission = false;
-        })
-        this.socket.emit('permissions.extendsList', (p) => {
-          this.extendsList = p;
-          this.isLoading.extendsList = false;
         })
       },
       save() {

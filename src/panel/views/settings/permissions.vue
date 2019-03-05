@@ -81,9 +81,8 @@
           this.socket.emit('insert', {items: [{
             id,
             name: '',
-            preserve: false,
-            automation: null,
-            extendsPID: String(permissions.VIEWERS),
+            isCorePermission: false,
+            automation: 'none',
             order,
             userIds: [],
             filters: [],

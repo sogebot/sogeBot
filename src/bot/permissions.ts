@@ -68,7 +68,7 @@ class Permissions extends Core {
         case 'followers':
           shouldProceed = global.commons.isFollower(user);
           break;
-        case null:
+        default:
           shouldProceed = false; // we don't have any automation
           break;
       }
@@ -97,27 +97,19 @@ class Permissions extends Core {
           await global.db.engine.update(this.collection.data, { id: String(d.id) }, { order: d.order });
         }
       });
-      socket.on('permissions.extendsList', async (cb) => {
-        cb(await this.getExtendablePermissions());
-      });
     });
-  }
-
-  private async getExtendablePermissions() {
-    return (await global.db.engine.find(this.collection.data, { preserve: true }));
   }
 
   private async ensurePreservedPermissionsInDb(): Promise<void> {
     const p = await global.db.engine.find(this.collection.data);
     let addedCount = 0;
 
-    if (!p.find((o) => o.automation === 'casters')) {
+    if (!p.find((o) => o.isCorePermission && o.automation === 'casters')) {
       await global.db.engine.insert(this.collection.data, {
         id: uuid(),
         name: 'Casters',
-        preserve: true,
         automation: 'casters',
-        extendsPID: null,
+        isCorePermission: true,
         order: p.length + addedCount,
         userIds: [],
         filters: [],
@@ -125,13 +117,12 @@ class Permissions extends Core {
       addedCount++;
     }
 
-    if (!p.find((o) => o.automation === 'moderators')) {
+    if (!p.find((o) => o.isCorePermission && o.automation === 'moderators')) {
       await global.db.engine.insert(this.collection.data, {
         id: uuid(),
         name: 'Moderators',
-        preserve: true,
         automation: 'moderators',
-        extendsPID: null,
+        isCorePermission: true,
         order: p.length + addedCount,
         userIds: [],
         filters: [],
@@ -139,13 +130,12 @@ class Permissions extends Core {
       addedCount++;
     }
 
-    if (!p.find((o) => o.automation === 'subscribers')) {
+    if (!p.find((o) => o.isCorePermission && o.automation === 'subscribers')) {
       await global.db.engine.insert(this.collection.data, {
         id: uuid(),
         name: 'Subscribers',
-        preserve: true,
         automation: 'subscribers',
-        extendsPID: null,
+        isCorePermission: true,
         order: p.length + addedCount,
         userIds: [],
         filters: [],
@@ -153,13 +143,12 @@ class Permissions extends Core {
       addedCount++;
     }
 
-    if (!p.find((o) => o.automation === 'followers')) {
+    if (!p.find((o) => o.isCorePermission && o.automation === 'followers')) {
       await global.db.engine.insert(this.collection.data, {
         id: uuid(),
         name: 'Followers',
-        preserve: true,
         automation: 'followers',
-        extendsPID: null,
+        isCorePermission: true,
         order: p.length + addedCount,
         userIds: [],
         filters: [],
@@ -167,13 +156,12 @@ class Permissions extends Core {
       addedCount++;
     }
 
-    if (!p.find((o) => o.automation === 'viewers')) {
+    if (!p.find((o) => o.isCorePermission && o.automation === 'viewers')) {
       await global.db.engine.insert(this.collection.data, {
         id: uuid(),
         name: 'Viewers',
-        preserve: true,
         automation: 'viewers',
-        extendsPID: null,
+        isCorePermission: true,
         order: p.length + addedCount,
         userIds: [],
         filters: [],
