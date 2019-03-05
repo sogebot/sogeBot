@@ -50,7 +50,7 @@
 
           <div class="p-3 text-right">
             <hold-button class="btn-danger"
-                        @trigger="removePermission(pid)"
+                        @trigger="removePermission()"
                         icon="trash"
                         v-if="!item.isCorePermission">
               <template slot="title">{{translate('dialog.buttons.delete')}}</template>
@@ -134,7 +134,7 @@
           setTimeout(() => (this.isSaving = 0), 1000)
         })
       },
-      removePermission(pid) {
+      removePermission() {
         this.socket.emit('delete', { where: { id: this.$route.params.id }}, (err, deleted) => {
           if (err) console.error(err)
           else {
