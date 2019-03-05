@@ -17,24 +17,25 @@
               hideSearchInput: true,
               leftButtons: [
                 {
-                  href: '#/settings/permissions/add',
                   text: translate('settings.permissions.addNewPermissionGroup'),
                   class: 'btn-primary',
-                  icon: 'plus'
+                  icon: 'plus',
+                  event: 'addNewPermissionGroup'
                 }
               ],
-            }"></panel>
+            }"
+            @addNewPermissionGroup="addNewPermissionGroup()"></panel>
 
     <div class="row">
       <div class="col-3">
-        <list @change="selectedPermission = $event"></list>
+        <list @change="selectedPermission = $event" :update="update" :selected="selectedPermission"></list>
         <em class="alert-danger p-3 mt-1 d-block">
           <font-awesome-icon icon="exclamation-triangle" size="lg"></font-awesome-icon>
           Higher permission have access to lower permissions.
         </em>
       </div>
       <div class="col-9">
-        <edit :pid="selectedPermission"></edit>
+        <edit :pid="selectedPermission" @delete="update = Date.now()" @update="update = Date.now()"></edit>
       </div>
     </div>
 
@@ -45,10 +46,13 @@
   import Vue from 'vue'
 
   import * as io from 'socket.io-client';
+  import * as uuid from 'uuid/v4';
 
   import { library } from '@fortawesome/fontawesome-svg-core'
   import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
   import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
+
+  import { permissions } from '../../../bot/_constants'
 
   library.add(faExclamationTriangle)
 
@@ -61,13 +65,36 @@
     },
     data: function () {
       const object: {
+        update: number,
         socket: any,
         selectedPermission: string | null,
       } = {
+        update: Date.now(),
         selectedPermission: null,
         socket: io('/core/permissions', { query: "token=" + this.token }),
       }
       return object
+    },
+    methods: {
+      addNewPermissionGroup() {
+        this.socket.emit('find', {}, (err, p) => {
+          const order = p.length + 1
+          const id = uuid()
+          this.socket.emit('insert', {items: [{
+            id,
+            name: '',
+            preserve: false,
+            automation: null,
+            extendsPID: String(permissions.VIEWERS),
+            order,
+            userIds: [],
+            filters: [],
+          }]}, (err, created) => {
+            this.update = Date.now();
+            this.selectedPermission = id;
+          })
+        })
+      }
     },
   })
 </script>

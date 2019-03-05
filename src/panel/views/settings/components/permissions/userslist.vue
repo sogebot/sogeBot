@@ -154,7 +154,6 @@
         } else {
           this.currentIds.push(id);
         }
-        console.log('Adding', username, id)
       }
     }
   })

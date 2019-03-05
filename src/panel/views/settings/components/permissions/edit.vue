@@ -3,7 +3,7 @@
     <div class="card p-0 m-0">
       <div class="card-header alert-warning text-uppercase"
            style="letter-spacing: -1px;"
-           v-if="!pid">
+           v-if="!pid || isRemoved">
         <font-awesome-icon icon="long-arrow-alt-left"/>
         Select permission group
       </div>
@@ -17,8 +17,7 @@
            class="card-header">
         <span>Settings</span>
       </div>
-
-      <div class="card-body p-0 m-0" v-if="!_.some(isLoading) && pid">
+      <div class="card-body p-0 m-0" v-if="!_.some(isLoading) && pid && !isRemoved">
         <div class="pt-3">
           <div class="form-group col-md-12">
             <label for="name_input">{{ translate('core.permissions.input.name.title') }}</label>
@@ -52,10 +51,29 @@
               <template slot="title">{{translate('dialog.buttons.delete')}}</template>
               <template slot="onHoldTitle">{{translate('dialog.buttons.hold-to-delete')}}</template>
             </hold-button>
+
             <buttonWithIcon icon="save"
                             class="btn-primary"
-                            :text="translate('dialog.buttons.saveChanges.idle')">
-            </buttonWithIcon>
+                            event="save"
+                            @save="save"
+                            :text="translate('dialog.buttons.saveChanges.idle')"
+                            v-if="isSaving === 0"/>
+            <buttonWithIcon icon="spinner"
+                            spin="true"
+                            class="btn-primary"
+                            disabled="true"
+                            :text="translate('dialog.buttons.saveChanges.progress')"
+                            v-else-if="isSaving === 1"/>
+            <buttonWithIcon icon="check"
+                            class="btn-success"
+                            disabled="true"
+                            :text="translate('dialog.buttons.saveChanges.done')"
+                            v-else-if="isSaving === 2"/>
+            <buttonWithIcon icon="times"
+                            class="btn-danger"
+                            disabled="true"
+                            :text="translate('dialog.buttons.something-went-wrong')"
+                            v-else-if="isSaving === 3"/>
           </div>
         </div>
       </div>
@@ -88,6 +106,8 @@
         item: Permissions.Item | null,
         extendsList: Permissions.Item[],
         socket: any,
+        isRemoved: boolean,
+        isSaving: number,
         isLoading: {
           [x:string]: boolean,
         },
@@ -95,6 +115,8 @@
         item: null,
         extendsList: [],
         socket: io('/core/permissions', { query: "token=" + this.token }),
+        isRemoved: false,
+        isSaving: 0,
         isLoading: {
           permission: false,
           extendsList: false,
@@ -106,6 +128,7 @@
       pid(val) {
         this.isLoading.permission = true
         this.isLoading.extendsList = true
+        this.isRemoved = false
 
         this.socket.emit('permission', val, (p) => {
           this.item = p;
@@ -118,8 +141,27 @@
       }
     },
     methods: {
+      save() {
+        console.log('saving')
+        this.isSaving = 1
+        this.socket.emit('update', { items: [this.item]}, (err, data) => {
+          if (err) {
+            this.isSaving = 3
+          } else {
+            this.isSaving = 2
+          }
+          this.$emit('update');
+          setTimeout(() => (this.isSaving = 0), 1000)
+        })
+      },
       removePermission(pid) {
-        console.log(pid);
+        this.socket.emit('delete', { where: { id: pid }}, (err, deleted) => {
+          if (err) console.error(err)
+          else {
+            this.$emit('delete');
+            this.isRemoved = true;
+          }
+        })
       }
     }
   })

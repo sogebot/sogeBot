@@ -9,18 +9,20 @@
         {{ text }}
       </div>
       <div class="btn-icon" v-if="icon">
-        <fa :icon="icon" fixed-width></fa>
+        <fa :icon="icon" fixed-width v-if="spin" spin></fa>
+        <fa :icon="icon" fixed-width v-else></fa>
       </div>
     </div>
   </a>
   <button v-else type="button" class="btn btn-with-icon" style="flex-direction: row;"
-    @click="$emit(event)">
+    @click="$emit(event)" :disabled="disabled">
     <div style="display: flex">
       <div class="text">
         {{ text }}
       </div>
       <div class="btn-icon" v-if="icon">
-        <fa :icon="icon" fixed-width></fa>
+        <fa :icon="icon" fixed-width v-if="spin" spin></fa>
+        <fa :icon="icon" fixed-width v-else></fa>
       </div>
     </div>
   </button>
@@ -30,7 +32,7 @@
   import Vue from 'vue'
 
   export default Vue.extend({
-    props: ['text', 'href', 'icon', 'target'],
+    props: ['text', 'href', 'icon', 'target', 'spin', 'disabled'],
   })
 </script>
 

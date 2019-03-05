@@ -21,7 +21,12 @@
                 draggable="true"
                 v-else
                 >
-          {{ p.name }}
+          <template v-if="p.name.length > 0">
+            {{ p.name }}
+          </template>
+          <small v-else
+                 class="font-weight-lighter"
+                 :class="{ 'text-dark': currentPID !== p.id, 'text-light': currentPID === p.id }">{{p.id}}</small>
           <small v-if="p.automation"
                  class="text-uppercase"
                  :class="{ 'text-dark': currentPID !== p.id, 'text-light': currentPID === p.id }"
@@ -46,6 +51,7 @@
   library.add(faCog, faSpinner)
 
   export default Vue.extend({
+    props: ['update', 'selected'],
     components: {
       'font-awesome-icon': FontAwesomeIcon,
     },
@@ -66,12 +72,25 @@
       return data
     },
     mounted() {
-      this.socket.emit('permissions', (p) => {
-        this.currentData = p;
-        this.isLoading = false;
-      })
+      this.refresh();
+    },
+    watch: {
+      update() {
+        this.refresh()
+      },
+      selected(val) {
+        if (this.currentPID !== val) {
+          this.currentPID = val
+        }
+      }
     },
     methods: {
+      refresh() {
+        this.socket.emit('permissions', (p) => {
+          this.currentData = p;
+          this.isLoading = false;
+        })
+      },
       dragend() {
         this.socket.emit('permissions.order', this.currentData);
       },

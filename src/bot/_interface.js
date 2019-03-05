@@ -391,6 +391,28 @@ class Module {
             if (_.isFunction(cb)) cb(null, [])
           }
         })
+        socket.on('insert', async (opts, cb) => {
+          opts.collection = opts.collection || 'data'
+          if (opts.collection.startsWith('_')) {
+            opts.collection = opts.collection.replace('_', '')
+          } else {
+            if (opts.collection === 'settings') {
+              throw Error('You cannot use insert socket with settings collection')
+            } else {
+              opts.collection = this.collection[opts.collection]
+            }
+          }
+
+          if (opts.items) {
+            let created = []
+            for (let item of opts.items) {
+              created.push(await global.db.engine.insert(opts.collection, item))
+            }
+            if (_.isFunction(cb)) cb(null, created)
+          } else {
+            if (_.isFunction(cb)) cb(null, [])
+          }
+        })
         socket.on('delete', async (opts, cb) => {
           opts.collection = opts.collection || 'data'
           if (opts.collection.startsWith('_')) {
