@@ -22,7 +22,7 @@
                 v-else
                 >
           <template v-if="p.name.length > 0">
-             <strong v-if="item.isCorePermission">{{ p.name }}</strong>
+             <strong v-if="p.isCorePermission">{{ p.name }}</strong>
              <span v-else>{{ p.name }}</span>
           </template>
           <small v-else

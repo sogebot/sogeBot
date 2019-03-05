@@ -21,6 +21,9 @@
             <option value="tips">Tips</option>
             <option value="bits">Bits</option>
             <option value="messages">Messages</option>
+            <option value="subtier">Sub Tier (1, 2 or 3)</option>
+            <option value="subcumulativemonths">Sub Cumulative Months</option>
+            <option value="substreakmonths">Sub Streak Months</option>
           </select>
         </div>
         <div class="form-group col-md-4">
