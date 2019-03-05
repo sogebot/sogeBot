@@ -28,14 +28,14 @@
 
     <div class="row">
       <div class="col-3">
-        <list @change="selectedPermission = $event" :update="update" :selected="selectedPermission"></list>
+        <list :update="update"></list>
         <em class="alert-danger p-3 mt-1 d-block">
           <font-awesome-icon icon="exclamation-triangle" size="lg"></font-awesome-icon>
           Higher permission have access to lower permissions.
         </em>
       </div>
       <div class="col-9">
-        <edit :pid="selectedPermission" @delete="update = Date.now()" @update="update = Date.now()"></edit>
+        <edit @delete="update = Date.now()" @update="update = Date.now()"></edit>
       </div>
     </div>
 
@@ -67,10 +67,8 @@
       const object: {
         update: number,
         socket: any,
-        selectedPermission: string | null,
       } = {
         update: Date.now(),
-        selectedPermission: null,
         socket: io('/core/permissions', { query: "token=" + this.token }),
       }
       return object
@@ -91,7 +89,7 @@
             filters: [],
           }]}, (err, created) => {
             this.update = Date.now();
-            this.selectedPermission = id;
+            this.$router.push({ name: 'PermissionsSettings', params: { id } })
           })
         })
       }

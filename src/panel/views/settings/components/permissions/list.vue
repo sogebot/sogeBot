@@ -11,7 +11,7 @@
         </div>
         <button v-for="p of _.orderBy(currentData, 'order')"
                 class="list-group-item list-group-item-action"
-                :class="{ active: currentPID === p.id }"
+                :class="{ active: $route.params.id === p.id }"
                 style="cursor: grab; font-size:1.2em; font-family: 'PT Sans Narrow', sans-serif;"
                 :key="p.name"
                 @click="setPermission(p.id)"
@@ -26,10 +26,11 @@
           </template>
           <small v-else
                  class="font-weight-lighter"
-                 :class="{ 'text-dark': currentPID !== p.id, 'text-light': currentPID === p.id }">{{p.id}}</small>
+                 style="font-size: 0.7rem !important; letter-spacing: 1px;"
+                 :class="{ 'text-dark': $route.params.id !== p.id, 'text-light': $route.params.id === p.id }">{{p.id}}</small>
           <small v-if="p.automation"
                  class="text-uppercase"
-                 :class="{ 'text-dark': currentPID !== p.id, 'text-light': currentPID === p.id }"
+                 :class="{ 'text-dark': $route.params.id !== p.id, 'text-light': $route.params.id === p.id }"
                  style="font-size: 0.7rem !important; letter-spacing: 1px;">
             <font-awesome-icon icon="cog"></font-awesome-icon> {{ p.automation }}
           </small>
@@ -51,19 +52,17 @@
   library.add(faCog, faSpinner)
 
   export default Vue.extend({
-    props: ['update', 'selected'],
+    props: ['update'],
     components: {
       'font-awesome-icon': FontAwesomeIcon,
     },
     data() {
       const data: {
-        currentPID: null | string,
         draggingPID: null | string,
         currentData: Permissions.Item[],
         socket: any,
         isLoading: boolean,
       } = {
-        currentPID: null,
         draggingPID: null,
         currentData: [],
         socket: io('/core/permissions', { query: "token=" + this.token }),
@@ -78,11 +77,6 @@
       update() {
         this.refresh()
       },
-      selected(val) {
-        if (this.currentPID !== val) {
-          this.currentPID = val
-        }
-      }
     },
     methods: {
       refresh() {
@@ -95,8 +89,7 @@
         this.socket.emit('permissions.order', this.currentData);
       },
       setPermission(pid) {
-        this.currentPID = pid
-        this.$emit('change', pid);
+        this.$router.push({ name: 'PermissionsSettings', params: { id: pid } })
       },
       dragstart: function(pid, e) {
         this.setPermission(pid);

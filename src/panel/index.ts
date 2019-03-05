@@ -70,7 +70,7 @@ const main = async () => {
     base: __dirname,
     routes: [
       { path: '/manage/polls', name: 'PollsManager', component: () => import('./views/managers/polls.vue') },
-      { path: '/settings/permissions', name: 'PermissionsSettings', component: () => import('./views/settings/permissions.vue') },
+      { path: '/settings/permissions/:id?', name: 'PermissionsSettings', component: () => import('./views/settings/permissions.vue') },
       { path: '/registry/goals/list', name: 'GoalsRegistryList', component: () => import('./views/registries/goalsList.vue') },
       { path: '/registry/goals/edit/:id?', name: 'GoalsRegistryEdit', component: () => import('./views/registries/goalsEdit.vue') },
     ],

@@ -3,7 +3,7 @@
     <div class="card p-0 m-0">
       <div class="card-header alert-warning text-uppercase"
            style="letter-spacing: -1px;"
-           v-if="!pid || isRemoved">
+           v-if="!$route.params.id">
         <font-awesome-icon icon="long-arrow-alt-left"/>
         Select permission group
       </div>
@@ -17,7 +17,7 @@
            class="card-header">
         <span>Settings</span>
       </div>
-      <div class="card-body p-0 m-0" v-if="!_.some(isLoading) && pid && !isRemoved">
+      <div class="card-body p-0 m-0" v-if="!_.some(isLoading) && $route.params.id && item">
         <div class="pt-3">
           <div class="form-group col-md-12">
             <label for="name_input">{{ translate('core.permissions.input.name.title') }}</label>
@@ -93,7 +93,6 @@
   library.add(faLongArrowAltLeft, faSpinner);
 
   export default Vue.extend({
-    props: ['pid'],
     components: {
       'font-awesome-icon': FontAwesomeIcon,
       holdButton: () => import('../../../../components/holdButton.vue'),
@@ -106,7 +105,6 @@
         item: Permissions.Item | null,
         extendsList: Permissions.Item[],
         socket: any,
-        isRemoved: boolean,
         isSaving: number,
         isLoading: {
           [x:string]: boolean,
@@ -115,7 +113,6 @@
         item: null,
         extendsList: [],
         socket: io('/core/permissions', { query: "token=" + this.token }),
-        isRemoved: false,
         isSaving: 0,
         isLoading: {
           permission: false,
@@ -125,12 +122,21 @@
       return data;
     },
     watch: {
-      pid(val) {
+      '$route.params.id'(val) {
+        this.refresh();
+      }
+    },
+    mounted() {
+      if(this.$route.params.id) {
+        this.refresh();
+      }
+    },
+    methods: {
+      refresh() {
         this.isLoading.permission = true
         this.isLoading.extendsList = true
-        this.isRemoved = false
 
-        this.socket.emit('permission', val, (p) => {
+        this.socket.emit('permission', this.$route.params.id, (p) => {
           this.item = p;
           this.isLoading.permission = false;
         })
@@ -138,9 +144,7 @@
           this.extendsList = p;
           this.isLoading.extendsList = false;
         })
-      }
-    },
-    methods: {
+      },
       save() {
         console.log('saving')
         this.isSaving = 1
@@ -155,11 +159,11 @@
         })
       },
       removePermission(pid) {
-        this.socket.emit('delete', { where: { id: pid }}, (err, deleted) => {
+        this.socket.emit('delete', { where: { id: this.$route.params.id }}, (err, deleted) => {
           if (err) console.error(err)
           else {
             this.$emit('delete');
-            this.isRemoved = true;
+            this.$router.push({ name: 'PermissionsSettings' })
           }
         })
       }
