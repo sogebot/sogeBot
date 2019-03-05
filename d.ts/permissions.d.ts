@@ -4,7 +4,7 @@ declare namespace Permissions {
     extendsPID: string,
     name: string,
     order: number,
-    preserve: boolean,
+    isCorePermission: boolean,
     automation: null | 'caster' | 'moderators' | 'subscribers' | 'viewers' | 'followers',
     userIds: string[],
     filters: Permissions.Filter[],
