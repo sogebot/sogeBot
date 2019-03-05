@@ -23,7 +23,7 @@ class Permissions extends Core {
     this.addMenu({ category: 'settings', name: 'permissions', id: '/settings/permissions' });
   }
 
-  public async check(userId: string, permId: string, isPartialCheck: boolean = false): Promise<boolean> {
+  public async check(userId: string, permId: string): Promise<boolean> {
     const user = await global.db.engine.findOne('users', { id: userId });
     const permission: Permissions.Item = await global.db.engine.findOne(this.collection.data, { id: permId });
 
@@ -35,16 +35,19 @@ class Permissions extends Core {
         throw Error(`Permissions ${permId} doesn't exist`);
       }
 
+      // if userId is part of userIds => true
+      if (permission.userIds.includes(userId)) {
+        return true;
+      }
+
       // get all higher permissions to check
-      if (!isPartialCheck) {
-        const partialPermission: Permissions.Item[] = (await global.db.engine.find(this.collection.data)).filter((o) => {
-          return o.order < permission.order;
-        });
-        for (const p of partialPermission) {
-          const userHaveAccess = await this.check(userId, p.id, true);
-          if (userHaveAccess) {
-            return true; // we don't need to continue, user have already access with higher permission
-          }
+      const partialPermission: Permissions.Item[] = (await global.db.engine.find(this.collection.data)).filter((o) => {
+        return o.order < permission.order;
+      });
+      for (const p of partialPermission) {
+        const userHaveAccess = await this.check(userId, p.id);
+        if (userHaveAccess) {
+          return true; // we don't need to continue, user have already access with higher permission
         }
       }
 
@@ -66,14 +69,14 @@ class Permissions extends Core {
           shouldProceed = global.commons.isFollower(user);
           break;
         case null:
-          // check first if extended permission passes (only partial check)
-          shouldProceed = await this.check(userId, permission.extendsPID, true);
-          if (shouldProceed) {
-            // todo filters
-          }
+          shouldProceed = false; // we don't have any automation
           break;
-
       }
+
+      if (shouldProceed) {
+        // todo: filters
+      }
+
       return shouldProceed;
     } catch (e) {
       global.log.error(e);
