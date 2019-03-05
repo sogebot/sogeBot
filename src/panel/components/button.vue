@@ -32,7 +32,7 @@
   import Vue from 'vue'
 
   export default Vue.extend({
-    props: ['text', 'href', 'icon', 'target', 'spin', 'disabled'],
+    props: ['text', 'href', 'icon', 'target', 'spin', 'disabled', 'event'],
   })
 </script>
 

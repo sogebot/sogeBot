@@ -51,29 +51,7 @@
               <template slot="title">{{translate('dialog.buttons.delete')}}</template>
               <template slot="onHoldTitle">{{translate('dialog.buttons.hold-to-delete')}}</template>
             </hold-button>
-
-            <buttonWithIcon icon="save"
-                            class="btn-primary"
-                            event="save"
-                            @save="save"
-                            :text="translate('dialog.buttons.saveChanges.idle')"
-                            v-if="isSaving === 0"/>
-            <buttonWithIcon icon="spinner"
-                            spin="true"
-                            class="btn-primary"
-                            disabled="true"
-                            :text="translate('dialog.buttons.saveChanges.progress')"
-                            v-else-if="isSaving === 1"/>
-            <buttonWithIcon icon="check"
-                            class="btn-success"
-                            disabled="true"
-                            :text="translate('dialog.buttons.saveChanges.done')"
-                            v-else-if="isSaving === 2"/>
-            <buttonWithIcon icon="times"
-                            class="btn-danger"
-                            disabled="true"
-                            :text="translate('dialog.buttons.something-went-wrong')"
-                            v-else-if="isSaving === 3"/>
+            <stateButton :state="isSaving" text="saveChanges" @click="save()"/>
           </div>
         </div>
       </div>
@@ -96,7 +74,7 @@
     components: {
       'font-awesome-icon': FontAwesomeIcon,
       holdButton: () => import('../../../../components/holdButton.vue'),
-      buttonWithIcon: () => import('../../../../components/button.vue'),
+      stateButton: () => import('../../../../components/stateButton.vue'),
       userslist: () => import('./userslist.vue'),
       filters: () => import('./filters.vue'),
     },
@@ -146,7 +124,6 @@
         })
       },
       save() {
-        console.log('saving')
         this.isSaving = 1
         this.socket.emit('update', { items: [this.item]}, (err, data) => {
           if (err) {
