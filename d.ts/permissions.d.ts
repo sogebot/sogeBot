@@ -12,6 +12,7 @@ declare namespace Permissions {
 
   type Filter = {
     comparator: '<' | '>' | '==' | '<=' | '>=',
-    type: 'watched' | 'tips' | 'bits' | 'messages'
+    type: 'watched' | 'tips' | 'bits' | 'messages',
+    value: number,
   }
 }
