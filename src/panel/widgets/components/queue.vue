@@ -200,7 +200,7 @@ export default {
   },
   methods: {
     clear: function () {
-      this.socket.emit('remove', {})
+      this.socket.emit('delete', { where: {}})
     },
     pick: function (username) {
       const data = {
