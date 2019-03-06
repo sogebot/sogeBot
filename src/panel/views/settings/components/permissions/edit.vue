@@ -5,51 +5,51 @@
            style="letter-spacing: -1px;"
            v-if="!$route.params.id">
         <font-awesome-icon icon="long-arrow-alt-left"/>
-        Select permission group
+        {{ translate('core.permissions.selectPermissionGroup') }}
       </div>
       <div v-else-if="_.some(isLoading)"
            class="card-header alert-info text-uppercase"
            style="letter-spacing: -1px;">
         <font-awesome-icon icon="spinner" spin/>
-        Loading in progress
+        {{ translate('core.permissions.loadingInProgress') }}
       </div>
       <div v-else-if="item"
            class="card-header">
-        <span>Settings</span>
+        {{ translate('core.permissions.settings') }}
       </div>
       <div class="card-body p-0 m-0" v-if="!_.some(isLoading) && $route.params.id && item">
         <div class="pt-3">
           <div class="form-group col-md-12">
-            <label for="name_input">{{ translate('core.permissions.input.name.title') }}</label>
-            <input v-model="item.name" type="text" class="form-control" id="name_input" :placeholder="translate('core.permissions.input.name.placeholder')">
+            <label for="name_input">{{ translate('core.permissions.name') }}</label>
+            <input v-model="item.name" type="text" class="form-control" id="name_input">
             <div class="invalid-feedback"></div>
           </div>
 
           <div class="form-group col-md-12" v-if="!item.isCorePermission">
-            <label for="extends_input">{{ translate('core.permissions.input.automation.title') }}</label>
+            <label for="extends_input">{{ translate('core.permissions.baseUsersSet') }}</label>
             <select v-model="item.automation" class="form-control">
-              <option value='none'>None</option>
-              <option value='casters'>Casters</option>
-              <option value='moderators'>Moderators</option>
-              <option value='subscribers'>Subscribers</option>
-              <option value='viewers'>Viewers</option>
-              <option value='followers'>Followers</option>
+              <option value='none'>{{ translate('core.permissions.none') }}</option>
+              <option value='casters'>{{ translate('core.permissions.casters') }}</option>
+              <option value='moderators'>{{ translate('core.permissions.moderators') }}</option>
+              <option value='subscribers'>{{ translate('core.permissions.subscribers') }}</option>
+              <option value='viewers'>{{ translate('core.permissions.viewers') }}</option>
+              <option value='followers'>{{ translate('core.permissions.followers') }}</option>
             </select>
             <div class="invalid-feedback"></div>
           </div>
 
           <div class="form-group col-md-12" v-if="!item.isCorePermission">
-            <label>{{ translate('core.permissions.input.users.title') }}</label>
+            <label>{{ translate('core.permissions.manuallyAddedUsers') }}</label>
             <userslist :ids="item.userIds" @update="item.userIds = $event"></userslist>
           </div>
 
           <div class="form-group col-md-12" v-if="!item.isCorePermission">
-            <label>{{ translate('core.permissions.input.filters.title') }}</label>
+            <label>{{ translate('core.permissions.filters') }}</label>
             <filters :filters="item.filters" @update="item.filters = $event"></filters>
           </div>
 
           <div class="form-group col-md-12">
-            <label>{{ translate('core.permissions.input.test.title') }}</label>
+            <label>{{ translate('core.permissions.testUser') }}</label>
             <test></test>
           </div>
 

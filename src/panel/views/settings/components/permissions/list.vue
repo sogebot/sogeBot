@@ -1,13 +1,15 @@
 <template>
   <div class="card p-0 m-0">
-    <div class="card-header">Permissions Groups</div>
+    <div class="card-header">
+      {{translate('core.permissions.permissionsGroups')}}
+    </div>
     <div class="card-body p-0 m-0">
       <div class="list-group list-group-flush">
         <div v-if="isLoading"
              class="text-uppercase list-group-item list-group-item-info"
              style="letter-spacing: -1px;">
           <font-awesome-icon icon="spinner" spin/>
-          Loading in progress
+          {{translate('core.permissions.loadingInProgress')}}
         </div>
         <button v-for="p of _.orderBy(currentData, 'order')"
                 class="list-group-item list-group-item-action"
@@ -33,7 +35,7 @@
                  class="text-uppercase"
                  :class="{ 'text-dark': $route.params.id !== p.id, 'text-light': $route.params.id === p.id }"
                  style="font-size: 0.7rem !important; letter-spacing: 1px;">
-            <font-awesome-icon icon="cog"></font-awesome-icon> {{ p.automation }}
+            <font-awesome-icon icon="cog"></font-awesome-icon> {{ translate('core.permissions.' + p.automation) }}
           </small>
         </button>
       </div>

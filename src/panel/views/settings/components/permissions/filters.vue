@@ -3,13 +3,11 @@
     <div class="col-12" v-if="cFilters.length > 0">
       <div class="row">
         <div class="form-group col-md-4 pb-0 mb-0">
-          <label for="name_input" class="text-muted text-uppercase font-weight-light">{{ translate('registry.goals.input.filterType.title') }}</label>
+          <label for="name_input" class="text-muted text-uppercase font-weight-light">{{ translate('core.permissions.type') }}</label>
         </div>
+        <div class="form-group col-md-4 pb-0 mb-0"></div>
         <div class="form-group col-md-4 pb-0 mb-0">
-          <label for="name_input" class="text-muted text-uppercase font-weight-light">{{ translate('registry.goals.input.filterComparator.title') }}</label>
-        </div>
-        <div class="form-group col-md-4 pb-0 mb-0">
-          <label for="name_input" class="text-muted text-uppercase font-weight-light">{{ translate('registry.goals.input.filterValue.title') }}</label>
+          <label for="name_input" class="text-muted text-uppercase font-weight-light">{{ translate('core.permissions.value') }}</label>
         </div>
       </div>
     </div>
@@ -17,22 +15,22 @@
       <div class="row">
         <div class="form-group col-md-4">
           <select v-model="filter.type" class="form-control">
-            <option value="watched">Watched Time</option>
-            <option value="tips">Tips</option>
-            <option value="bits">Bits</option>
-            <option value="messages">Messages</option>
-            <option value="subtier">Sub Tier (1, 2 or 3)</option>
-            <option value="subcumulativemonths">Sub Cumulative Months</option>
-            <option value="substreakmonths">Sub Streak Months</option>
+            <option value="watched">{{ translate('core.permissions.watchedTime') }}</option>
+            <option value="tips">{{ translate('core.permissions.tips') }}</option>
+            <option value="bits">{{ translate('core.permissions.bits') }}</option>
+            <option value="messages">{{ translate('core.permissions.messages') }}</option>
+            <option value="subtier">{{ translate('core.permissions.subtier') }}</option>
+            <option value="subcumulativemonths">{{ translate('core.permissions.subcumulativemonths') }}</option>
+            <option value="substreakmonths">{{ translate('core.permissions.substreakmonth') }}</option>
           </select>
         </div>
         <div class="form-group col-md-4">
           <select v-model="filter.comparator" class="form-control">
-            <option value="<">is lower than</option>
-            <option value="<=">is lower than or equals</option>
-            <option value="==">equals</option>
-            <option value=">=">is higher than or equals</option>
-            <option value=">">is higher than</option>
+            <option value="<">{{ translate('core.permissions.isLowerThan') }}</option>
+            <option value="<=">{{ translate('core.permissions.isLowerThanOrEquals') }}</option>
+            <option value="==">{{ translate('core.permissions.equals') }}</option>
+            <option value=">=">{{ translate('core.permissions.isHigherThanOrEquals') }}</option>
+            <option value=">">{{ translate('core.permissions.isHigherThan') }}</option>
           </select>
         </div>
         <div class="form-group col-md-4">
@@ -40,7 +38,7 @@
         </div>
       </div>
     </div>
-    <button type="button" class="btn btn-outline-primary pt-2 ml-2" @click="add">Add filter</button>
+    <button type="button" class="btn btn-outline-primary pt-2 ml-2" @click="add">{{ translate('core.permissions.addFilter') }}</button>
   </div>
 </template>
 

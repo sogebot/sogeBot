@@ -14,7 +14,7 @@
         v-model="inputUsername"
         type="text"
         class="form-control border-0"
-        placeholder="Type username or id to test..."/>
+        :placeholder="translate('core.permissions.typeUsernameOrIdToTest')"/>
     </div>
 
     <div class="p-3"
@@ -26,22 +26,24 @@
       <font-awesome-icon :icon="Number(status.access) === 1 || Number(partialStatus.access) === 1 ? 'check' : 'times'"
                         fixed-width
                         v-else />
-      <span v-if="Number(status.access) === 0 && Number(partialStatus.access) === 0">
-        User have <strong>NO ACCESS</strong> to this permission group.
+      <span v-if="Number(status.access) === 0 && Number(partialStatus.access) === 0"
+            v-html="translate('core.permissions.userHaveNoAccessToThisPermissionGroup')">
       </span>
       <span v-else-if="Number(status.access) === 1 || Number(partialStatus.access) === 1">
-        User have <strong>ACCESS</strong> to this permission group.
+        <span v-html="translate('core.permissions.userHaveAccessToThisPermissionGroup')"></span>
         <ul class="mb-0">
           <li v-if="Number(partialStatus.access) === 1">
-            Access <strong>directly</strong> through <a :href="'/#/settings/permissions/' + partialStatus.permission.id">{{ partialStatus.permission.name }} <small>{{ partialStatus.permission.id }}</small></a>.
+            <span v-html="translate('core.permissions.accessDirectlyThrough')"></span>
+            <a :href="'/#/settings/permissions/' + partialStatus.permission.id">{{ partialStatus.permission.name }} <small>{{ partialStatus.permission.id }}</small></a>.
           </li>
           <li v-if="Number(status.access) === 1 && status.permission.id !== partialStatus.permission.id">
-            Access through higher permission <a :href="'/#/settings/permissions/' + status.permission.id">{{ status.permission.name }} <small>{{ status.permission.id }}</small></a>.
+            <span v-html="translate('core.permissions.accessThroughHigherPermission')"></span>
+            <a :href="'/#/settings/permissions/' + status.permission.id">{{ status.permission.name }} <small>{{ status.permission.id }}</small></a>.
           </li>
         </ul>
       </span>
       <span v-else>
-        Something went wrong, user was not found in bot database
+        {{translate('core.permissions.somethingWentWrongUserWasNotFoundInBotDatabase')}}
       </span>
     </div>
   </div>

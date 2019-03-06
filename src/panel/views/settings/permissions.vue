@@ -17,7 +17,7 @@
               hideSearchInput: true,
               leftButtons: [
                 {
-                  text: translate('settings.permissions.addNewPermissionGroup'),
+                  text: translate('core.permissions.addNewPermissionGroup'),
                   class: 'btn-primary',
                   icon: 'plus',
                   event: 'addNewPermissionGroup'
@@ -31,7 +31,7 @@
         <list :update="update"></list>
         <em class="alert-danger p-3 mt-1 d-block">
           <font-awesome-icon icon="exclamation-triangle" size="lg"></font-awesome-icon>
-          Higher permission have access to lower permissions.
+          {{translate('core.permissions.higherPermissionHaveAccessToLowerPermissions')}}
         </em>
       </div>
       <div class="col-9">

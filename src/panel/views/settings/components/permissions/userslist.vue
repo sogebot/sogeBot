@@ -14,11 +14,11 @@
         v-model="inputUsername"
         type="text"
         class="form-control border-0"
-        placeholder="Type username or id to search..."/>
+        :placeholder="translate('core.permissions.typeUsernameOrIdToSearch')"/>
     </div>
 
     <div class="p-3 alert-warning" v-if="searchData.length === 0 && inputUsername.length != 0 && !isSearching">
-      No users were found.
+      {{translate('core.permissions.noUsersWereFound')}}
     </div>
     <div class="border" v-else-if="searchData.length > 0">
       <div>
@@ -33,13 +33,13 @@
         </button>
       </div>
       <div class="d-flex">
-        <button class="btn btn-success col-4" type="button" @click="inputUsername = ''; searchData = []">Done</button>
-        <button class="btn btn-primary col-4" type="button" :disabled="typeof _.chunk(searchData, 15)[searchPage-1] === 'undefined'" @click="searchPage--">Previous</button>
-        <button class="btn btn-primary col-4" type="button" :disabled="typeof _.chunk(searchData, 15)[searchPage+1] === 'undefined'" @click="searchPage++">Next</button>
+        <button class="btn btn-success col-4" type="button" @click="inputUsername = ''; searchData = []">{{translate('core.permissions.done')}}</button>
+        <button class="btn btn-primary col-4" type="button" :disabled="typeof _.chunk(searchData, 15)[searchPage-1] === 'undefined'" @click="searchPage--">{{translate('core.permissions.previous')}}</button>
+        <button class="btn btn-primary col-4" type="button" :disabled="typeof _.chunk(searchData, 15)[searchPage+1] === 'undefined'" @click="searchPage++">{{translate('core.permissions.next')}}</button>
       </div>
     </div>
     <div class='p-3 alert-warning' v-else-if="currentIds.length === 0">
-      No users added to permission yet.
+      {{translate('core.permissions.noUsersManuallyAddedToPermissionYet')}}
     </div>
     <div class="border" v-else>
       <div>
@@ -48,7 +48,7 @@
                 v-for="id of currentIds"
                 :key="id"
                 @click="currentIds = currentIds.filter((o) => o !== id)">
-          <span>{{(currentUsers.find(o => o.id === id) || { username: 'loading...'}).username}}</span>
+          <span>{{(currentUsers.find(o => o.id === id) || { username: translate('core.permissions.loading')}).username}}</span>
           <small class="text-muted">{{id}}</small>
           <font-awesome-icon class="text-muted" icon="times"></font-awesome-icon>
         </button>
