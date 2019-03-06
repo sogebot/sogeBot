@@ -14,8 +14,10 @@
                 "debug",
                 "start-no-migration"
             ],
+            "console": "integratedTerminal",
             "env": {
-                "NODE_ENV": "development"
+                "NODE_ENV": "development",
+                "DISABLE":"moderation"
             },
             "preLaunchTask": "npm: build",
             "skipFiles": [
