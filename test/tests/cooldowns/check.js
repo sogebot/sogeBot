@@ -21,6 +21,43 @@ const testUser = { username: 'test', badges: {} }
 const testUser2 = { username: 'test2', badges: {} }
 
 describe('Cooldowns - check()', () => {
+  describe('#1969 - commands with special chars should not threadlock check', () => {
+    before(async () => {
+      await db.cleanup()
+      await message.prepare()
+    })
+
+    it('Command !_debug should pass', async () => {
+      let isOk = await global.systems.cooldown.check({ sender: testUser, message: '!_debug' })
+      assert.isTrue(isOk)
+    })
+
+    it('Command !$debug should pass', async () => {
+      let isOk = await global.systems.cooldown.check({ sender: testUser, message: '!$debug' })
+      assert.isTrue(isOk)
+    })
+
+    it('Command `!_debug test` should pass', async () => {
+      let isOk = await global.systems.cooldown.check({ sender: testUser, message: '!_debug test' })
+      assert.isTrue(isOk)
+    })
+
+    it('Command `!$debug test` should pass', async () => {
+      let isOk = await global.systems.cooldown.check({ sender: testUser, message: '!$debug test' })
+      assert.isTrue(isOk)
+    })
+
+    it('Command `!_debug te$st` should pass', async () => {
+      let isOk = await global.systems.cooldown.check({ sender: testUser, message: '!_debug te$st' })
+      assert.isTrue(isOk)
+    })
+
+    it('Command `!$debug te$st` should pass', async () => {
+      let isOk = await global.systems.cooldown.check({ sender: testUser, message: '!$debug te$st' })
+      assert.isTrue(isOk)
+    })
+  })
+
   describe('#1938 - !cmd with param (*)', () => {
     before(async () => {
       await db.cleanup()

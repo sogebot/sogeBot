@@ -50,7 +50,7 @@ class Expects {
     _.defaults(opts, { optional: false })
     if (!opts.optional) this.checkText()
 
-    const regexp = XRegExp('(?<command> ^![\\pL0-9_]* )', 'ix')
+    const regexp = XRegExp('(?<command> ^!\\S* )', 'ix')
     const match = XRegExp.exec(this.text, regexp)
 
     if (!_.isNil(match)) {
