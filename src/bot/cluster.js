@@ -43,8 +43,6 @@ function cluster () {
       setTimeout(() => require('./heapdump.js').init('heap/'), 120000)
     }
   })
-
-
 }
 
 process.on('unhandledRejection', function (reason, p) {
