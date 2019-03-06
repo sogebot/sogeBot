@@ -23,7 +23,7 @@ class Permissions extends Core {
     this.addMenu({ category: 'settings', name: 'permissions', id: '/settings/permissions' });
   }
 
-  public async check(userId: string, permId: string): Promise<boolean> {
+  public async check(userId: string, permId: string, partial: boolean = false): Promise<{access: boolean, permission: Permissions.Item}> {
     const user = await global.db.engine.findOne('users', { id: userId });
     const permission: Permissions.Item = await global.db.engine.findOne(this.collection.data, { id: permId });
 
@@ -37,17 +37,19 @@ class Permissions extends Core {
 
       // if userId is part of userIds => true
       if (permission.userIds.includes(userId)) {
-        return true;
+        return { access: true, permission };
       }
 
-      // get all higher permissions to check
-      const partialPermission: Permissions.Item[] = (await global.db.engine.find(this.collection.data)).filter((o) => {
-        return o.order < permission.order;
-      });
-      for (const p of partialPermission) {
-        const userHaveAccess = await this.check(userId, p.id);
-        if (userHaveAccess) {
-          return true; // we don't need to continue, user have already access with higher permission
+      // get all higher permissions to check if not partial check only
+      if (!partial) {
+        const partialPermission: Permissions.Item[] = (await global.db.engine.find(this.collection.data)).filter((o) => {
+          return o.order < permission.order;
+        });
+        for (const p of _.orderBy(partialPermission, 'order', 'asc')) {
+          const partialCheck = await this.check(userId, p.id, true);
+          if (partialCheck.access) {
+            return { access: true, permission: p}; // we don't need to continue, user have already access with higher permission
+          }
         }
       }
 
@@ -56,17 +58,17 @@ class Permissions extends Core {
         case 'viewers':
           shouldProceed = true;
           break;
-        case 'caster':
+        case 'casters':
           shouldProceed = global.commons.isBot(user) || global.commons.isBroadcaster(user);
           break;
         case 'moderators':
-          shouldProceed = global.commons.isModerator(user);
+          shouldProceed = await global.commons.isModerator(user);
           break;
         case 'subscribers':
           shouldProceed = global.commons.isSubscriber(user);
           break;
         case 'followers':
-          shouldProceed = global.commons.isFollower(user);
+          shouldProceed = await global.commons.isFollower(user);
           break;
         default:
           shouldProceed = false; // we don't have any automation
@@ -76,11 +78,10 @@ class Permissions extends Core {
       if (shouldProceed) {
         // todo: filters
       }
-
-      return shouldProceed;
+      return { access: shouldProceed, permission };
     } catch (e) {
       global.log.error(e);
-      return false;
+      return { access: false, permission };
     }
   }
 
@@ -95,6 +96,33 @@ class Permissions extends Core {
       socket.on('permissions.order', async (data) => {
         for (const d of data) {
           await global.db.engine.update(this.collection.data, { id: String(d.id) }, { order: d.order });
+        }
+      });
+      socket.on('test.user', async (opts, cb) => {
+        const userByName = await global.db.engine.findOne('users', { username: opts.value });
+        const userById = await global.db.engine.findOne('users', { id: opts.value });
+        if (typeof userByName.id !== 'undefined') {
+          const status = await this.check(userByName.id, opts.pid);
+          const partial = await this.check(userByName.id, opts.pid, true);
+          cb({
+            status,
+            partial,
+            state: opts.state,
+          });
+        } else if (typeof userById.id !== 'undefined') {
+          const status = await this.check(userById.id, opts.pid);
+          const partial = await this.check(userById.id, opts.pid, true);
+          cb({
+            status,
+            partial,
+            state: opts.state,
+          });
+        } else {
+          cb({
+            status: { access: 2 },
+            partial: { access: 2 },
+            state: opts.state,
+          });
         }
       });
     });

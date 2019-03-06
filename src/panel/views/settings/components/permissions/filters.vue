@@ -40,7 +40,7 @@
         </div>
       </div>
     </div>
-    <button type="button" class="btn btn-outline-primary pt-2" @click="add">Add filter</button>
+    <button type="button" class="btn btn-outline-primary pt-2 ml-2" @click="add">Add filter</button>
   </div>
 </template>
 

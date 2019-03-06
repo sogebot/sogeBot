@@ -29,7 +29,7 @@
             <label for="extends_input">{{ translate('core.permissions.input.automation.title') }}</label>
             <select v-model="item.automation" class="form-control">
               <option value='none'>None</option>
-              <option value='caster'>Caster</option>
+              <option value='casters'>Casters</option>
               <option value='moderators'>Moderators</option>
               <option value='subscribers'>Subscribers</option>
               <option value='viewers'>Viewers</option>
@@ -46,6 +46,11 @@
           <div class="form-group col-md-12" v-if="!item.isCorePermission">
             <label>{{ translate('core.permissions.input.filters.title') }}</label>
             <filters :filters="item.filters" @update="item.filters = $event"></filters>
+          </div>
+
+          <div class="form-group col-md-12">
+            <label>{{ translate('core.permissions.input.test.title') }}</label>
+            <test></test>
           </div>
 
           <div class="p-3 text-right">
@@ -82,6 +87,7 @@
       stateButton: () => import('../../../../components/stateButton.vue'),
       userslist: () => import('./userslist.vue'),
       filters: () => import('./filters.vue'),
+      test: () => import('./test.vue'),
     },
     data() {
       const data: {
