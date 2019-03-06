@@ -38,7 +38,7 @@ class Configuration {
     const mute = await global.configuration.getValue('mute')
 
     let enabledSystems = {}
-    for (let category of ['systems', 'games']) {
+    for (let category of ['systems', 'games', 'integrations']) {
       if (_.isNil(enabledSystems[category])) enabledSystems[category] = []
       for (let system of Object.keys(global[category]).filter(o => !o.startsWith('_'))) {
         if (!global[category][system].settings) continue
@@ -51,14 +51,21 @@ class Configuration {
         enabledSystems[category].push(system)
       }
     }
-
     const version = _.get(process, 'env.npm_package_version', 'x.y.z')
     global.log.debug('======= COPY DEBUG MESSAGE FROM HERE =======')
-    global.log.debug(`GENERAL | OS: ${process.env.npm_config_user_agent} | DB: ${config.database.type} | Bot version: ${version.replace('SNAPSHOT', gitCommitInfo().shortHash || 'SNAPSHOT')} | Bot uptime: ${process.uptime()} | Bot lang: ${lang} | Bot mute: ${mute}`)
-    global.log.debug(`SYSTEMS | ${enabledSystems.systems.join(', ')}`)
-    global.log.debug(`GAMES   | ${enabledSystems.games.join(', ')}`)
-    global.log.debug(`WIDGETS | ${_.map(widgets, 'id').join(', ')}`)
-    global.log.debug(`OAUTH   | BOT ${!oauth.bot} | BROADCASTER ${!oauth.broadcaster}`)
+    global.log.debug(`GENERAL      | OS: ${process.env.npm_config_user_agent}`)
+    global.log.debug(`             | Bot version: ${version.replace('SNAPSHOT', gitCommitInfo().shortHash || 'SNAPSHOT')}`);
+    global.log.debug(`             | DB: ${config.database.type}`);
+    global.log.debug(`             | Threads: ${global.cpu}`);
+    global.log.debug(`             | HEAP: ${Number(process.memoryUsage().heapUsed / 1048576).toFixed(2)} MB`);
+    global.log.debug(`             | Uptime: ${process.uptime()} seconds`);
+    global.log.debug(`             | Language: ${lang}`);
+    global.log.debug(`             | Mute: ${mute}`);
+    global.log.debug(`SYSTEMS      | ${enabledSystems.systems.join(', ')}`)
+    global.log.debug(`GAMES        | ${enabledSystems.games.join(', ')}`)
+    global.log.debug(`INTEGRATIONS | ${enabledSystems.integrations.join(', ')}`)
+    global.log.debug(`WIDGETS      | ${_.map(widgets, 'id').join(', ')}`)
+    global.log.debug(`OAUTH        | BOT ${oauth.bot} | BROADCASTER ${oauth.broadcaster}`)
     global.log.debug('======= END OF DEBUG MESSAGE =======')
   }
 

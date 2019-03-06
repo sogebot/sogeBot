@@ -35,14 +35,16 @@ global.status = { // TODO: move it?
 require('./logging') // logger is on master / worker have own global.log sending data through process
 
 const isNeDB = config.database.type === 'nedb'
+global.cpu = config.threads === 'auto' ? os.cpus().length : parseInt(_.get(config, 'cpu', 1), 10)
+if (config.database.type === 'nedb') global.cpu = 1 // nedb can have only one fork
+
 if (!isMainThread) {
   global.db = new (require('./databases/database'))(isNeDB, isNeDB)
   require('./cluster.js')
 } else {
   global.db = new (require('./databases/database'))(!isNeDB, !isNeDB)
   // spin up forks first
-  global.cpu = config.threads === 'auto' ? os.cpus().length : parseInt(_.get(config, 'cpu', 1), 10)
-  if (config.database.type === 'nedb') global.cpu = 1 // nedb can have only one fork
+
   for (let i = 0; i < global.cpu; i++) {
     global.workers.newWorker();
   }

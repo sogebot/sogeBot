@@ -80,7 +80,6 @@ class Parser {
         }
       }
     }
-
     if (this.isCommand) {
       this.command(this.sender, this.message.trim(), this.skip)
     }
