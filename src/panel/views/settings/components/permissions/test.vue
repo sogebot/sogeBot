@@ -19,7 +19,10 @@
 
     <div class="p-3"
          :class="{ 'alert-danger': Number(status.access) === 0 && Number(partialStatus.access) === 0, 'alert-success': Number(status.access) === 1 || Number(partialStatus.access) === 1, 'alert-warning': Number(status.access) === 2 || Number(partialStatus.access) === 2 }"
-         v-if="status.access !== null && inputUsername.length != 0 && !isTesting">
+         v-if="typeof status.access !== 'undefined'
+               && this.inputUsername.trim().length !== 0
+               && typeof partialStatus.access !== 'undefined'
+               && !isTesting">
       <font-awesome-icon icon="question"
                         fixed-width
                         v-if="Number(status.access) === 2 || Number(partialStatus.access) === 2" />
