@@ -39,6 +39,12 @@ function getLastMajorVersion() {
   return `${x}.${Number(y) - 1}.x`;
 }
 
+function getNextMajorVersion() {
+  // bump down major version
+  const [x, y, z] = releaseVersion.split('.');
+  return `${x}.${Number(y) + 1}.x`;
+}
+
 function getCurrentMajorVersion() {
   const [x, y, z] = releaseVersion.split('.');
   return `${x}.${y}.x`;
@@ -185,6 +191,23 @@ function doRelease() {
   } else {
     console.log('\n' + chalk.inverse('ZIP BUILD - SKIPPED'));
   }
+
+
+  console.log('\n' + chalk.inverse('Back to ' + currentBranch + ' branch'));
+
+  console.log('\n' + chalk.inverse('CREATE NEXT BUILD BRANCH') + ' build-' + getNextMajorVersion() + '-SNAPSHOT');
+  spawnSync('git', ['branch', '-D', 'build-' + getNextMajorVersion() + '-SNAPSHOT']);
+  spawnSync('git', ['checkout', '-b', 'build-' + getNextMajorVersion() + '-SNAPSHOT']);
+
+  console.log('\n' + chalk.inverse('PACKAGE RELEASE'));
+  console.log(chalk.yellow('1.') + ' Updating package.json version to ' + getNextMajorVersion() + '-SNAPSHOT');
+  packageFile = fs.readFileSync('package.json').toString();
+  packageFile = packageFile.replace(/("version": ").*(",)/g, '$1' + getNextMajorVersion() + '-SNAPSHOT$2');
+  fs.writeFileSync('package.json', packageFile)
+
+  console.log(chalk.yellow('2.') + ' Create release commit');
+  spawnSync('git', ['add', '-A']);
+  spawnSync('git', ['commit', '-m', 'build: ' + getNextMajorVersion() + '-SNAPSHOT']);
 
   console.log('\n' + chalk.inverse('Back to ' + currentBranch + ' branch'));
   spawnSync('git', ['checkout', currentBranch]);
