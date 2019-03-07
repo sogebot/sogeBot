@@ -25,7 +25,7 @@ class Permissions extends Core {
 
   public async check(userId: string, permId: string, partial: boolean = false): Promise<{access: boolean, permission: Permissions.Item}> {
     const user: User & {
-      tips: User.Tips, bits: User.Bits, points: User.Points, watched: User.Watched, messages: User.Messages,
+      tips: User.Tips[], bits: User.Bits[], points: User.Points[], watched: User.Watched[], messages: User.Messages[],
     } = await global.db.engine.findOne('users', { id: userId }, [
       { from: 'users.tips', as: 'tips', foreignField: 'id', localField: 'id' },
       { from: 'users.bits', as: 'bits', foreignField: 'id', localField: 'id' },
@@ -82,24 +82,74 @@ class Permissions extends Core {
           shouldProceed = false; // we don't have any automation
           break;
       }
-
-      shouldProceed = shouldProceed || (await this.filters(user, permission.filters));
-
-      return { access: shouldProceed, permission };
+      return { access: shouldProceed || this.filters(user, permission.filters), permission };
     } catch (e) {
       global.log.error(e);
       return { access: false, permission };
     }
   }
 
-  protected async filters(
+  protected filters(
     user: User & {
-      tips: User.Tips, bits: User.Bits, points: User.Points, watched: User.Watched, messages: User.Messages,
+      tips: User.Tips[], bits: User.Bits[], points: User.Points[], watched: User.Watched[], messages: User.Messages[],
     },
     filters: Permissions.Filter[] = [],
-  ): Promise<boolean> {
+  ): boolean {
     for (const f of filters) {
-      global.log.error(f);
+      let amount: number = 0;
+      switch (f.type) {
+        case 'bits':
+          amount = user.bits.reduce((a, b) => (a + b.amount), 0);
+          break;
+        case 'messages':
+          amount = user.messages.reduce((a, b) => (a + b.messages), 0);
+          break;
+        case 'points':
+          amount = user.points.reduce((a, b) => (a + b.points), 0);
+          break;
+        case 'subcumulativemonths':
+          amount = user.stats.subCumulativeMonths || 0;
+          break;
+        case 'substreakmonths':
+          amount = user.stats.subStreak || 0;
+          break;
+        case 'subtier':
+          amount = user.stats.tier || 0;
+          break;
+        case 'tips':
+          amount = user.tips.reduce((a, b) => (a + global.currency.exchange(b.amount, b.currency, global.currency.settings.currency.mainCurrency)), 0);
+          break;
+        case 'watched':
+          amount = user.watched.reduce((a, b) => (a + b.value), 0);
+      }
+
+      switch (f.comparator) {
+        case '<':
+          if (!(amount < f.value)) {
+            return false;
+          }
+          break;
+        case '<=':
+          if (!(amount <= f.value)) {
+            return false;
+          }
+          break;
+        case '==':
+          if (!(Number(amount) === Number(f.value))) {
+            return false;
+          }
+          break;
+        case '>':
+          if (!(amount > f.value)) {
+            return false;
+          }
+          break;
+        case '>=':
+          if (!(amount >= f.value)) {
+            return false;
+          }
+          break;
+      }
     }
     return true;
   }
