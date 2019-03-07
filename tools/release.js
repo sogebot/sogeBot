@@ -57,6 +57,10 @@ function doRelease() {
   if (isMajorRelease) {
     const archiveDir = path.join(__dirname, '..', 'docs', '_archive', getLastMajorVersion())
 
+    console.log('\n' + chalk.inverse('CREATE DOCS BRANCH') + ' docs-' + releaseVersion);
+    spawnSync('git', ['branch', '-D', 'docs-' + releaseVersion]);
+    spawnSync('git', ['checkout', '-b', 'docs-' + releaseVersion]);
+
     console.log('\n' + chalk.inverse('DOCS RELEASE'));
     console.log(chalk.yellow('1.') + ' Creating ' + archiveDir);
     if (fs.existsSync(archiveDir)) {
@@ -118,7 +122,14 @@ function doRelease() {
     console.log(chalk.yellow('8.') + ' Create doc commit');
     spawnSync('git', ['add', '-A']);
     spawnSync('git', ['commit', '-m', 'docs: release docs ' + releaseVersion + '']);
+
+    console.log('\n' + chalk.inverse('Back to ' + currentBranch + ' branch'));
+    spawnSync('git', ['checkout', currentBranch]);
   }
+
+  console.log('\n' + chalk.inverse('CREATE BUILD BRANCH') + ' build-' + releaseVersion);
+  spawnSync('git', ['branch', '-D', 'build-' + releaseVersion]);
+  spawnSync('git', ['checkout', '-b', 'build-' + releaseVersion]);
 
   console.log('\n' + chalk.inverse('PACKAGE RELEASE'));
   console.log(chalk.yellow('1.') + ' Updating package.json version to ' + releaseVersion);
