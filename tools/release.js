@@ -123,6 +123,13 @@ function doRelease() {
     spawnSync('git', ['add', '-A']);
     spawnSync('git', ['commit', '-m', 'docs: release docs ' + releaseVersion + '']);
 
+    if (shouldPushToGit) {
+      console.log('\n' + chalk.inverse('PUSHING COMMITS'));
+      spawnSync('git', ['push', '-fu', 'origin', 'docs-' + releaseVersion]);
+    } else {
+      console.log('\n' + chalk.inverse('PUSHING COMMITS - SKIPPED'));
+    }
+
     console.log('\n' + chalk.inverse('Back to ' + currentBranch + ' branch'));
     spawnSync('git', ['checkout', currentBranch]);
   }
@@ -143,7 +150,7 @@ function doRelease() {
 
   if (shouldPushToGit) {
     console.log('\n' + chalk.inverse('PUSHING COMMITS'));
-    spawnSync('git', ['push', '-fu', 'origin', 'release-' + releaseVersion]);
+    spawnSync('git', ['push', '-fu', 'origin', 'build-' + releaseVersion]);
   } else {
     console.log('\n' + chalk.inverse('PUSHING COMMITS - SKIPPED'));
   }
@@ -152,28 +159,29 @@ function doRelease() {
     console.log('\n' + chalk.inverse('ZIP BUILD'));
 
     console.log(chalk.yellow('1.') + ' Download release package');
-    spawnSync('curl', ['https://codeload.github.com/sogehige/sogeBot/zip/release-' + releaseVersion, '--output', 'release-' + releaseVersion + '.zip']);
+    spawnSync('curl', ['https://codeload.github.com/sogehige/sogeBot/zip/build-' + releaseVersion, '--output', 'build-' + releaseVersion + '.zip']);
 
     console.log(chalk.yellow('2.') + ' Unzip downloaded package');
-    spawnSync('unzip', ['release-' + releaseVersion + '.zip']);
+    spawnSync('unzip', ['build-' + releaseVersion + '.zip']);
 
 
     console.log(chalk.yellow('3.') + ' Running make');
-    spawnSync('cd', ['release-' + releaseVersion]);
+    spawnSync('cd', ['build-' + releaseVersion]);
     spawnSync('make', {
-      cwd: 'sogeBot-release-' + releaseVersion
+      cwd: 'sogeBot-build-' + releaseVersion
     });
 
     console.log(chalk.yellow('4.') + ' Creating release package');
     spawnSync('make', ['pack'], {
-      cwd: 'sogeBot-release-' + releaseVersion
+      cwd: 'sogeBot-build-' + releaseVersion
     });
 
     console.log(chalk.yellow('5.') + ' Copy release package to /');
-    spawnSync('cp', ['sogeBot-release-' + releaseVersion + '/*.zip', '.']);
+    spawnSync('cp', ['sogeBot-build-' + releaseVersion + '/*.zip', '.']);
 
     console.log(chalk.yellow('6.') + ' Cleanup directory');
-    spawnSync('rm', ['-rf', 'sogeBot-release-' + releaseVersion]);
+    spawnSync('rm', ['-rf', 'sogeBot-build-' + releaseVersion]);
+    spawnSync('rm', ['-rf', 'build-' + releaseVersion + '.zip']);
   } else {
     console.log('\n' + chalk.inverse('ZIP BUILD - SKIPPED'));
   }
