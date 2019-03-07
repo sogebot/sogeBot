@@ -197,28 +197,20 @@ be ignored.
 
 ## Command filters
 
-You can add filter for commands through UI. All filters are checked by **javascript**
-engine.
+You can add filter for commands through UI
 
 ### Available filters
 
-| Filter variable   | Description                        |
-| ------------------|:-----------------------------------|
-| `$sender`         | username of user triggered command |
-| `$is.moderator`   | is current user moderator          |
-| `$is.subscriber`  | is current user subscriber         |
-| `$is.regular`     | is current user regular            |
-| `$is.follower`    | is current user follower           |
-| `$is.broadcaster` | is current user broadcaster        |
-| `$is.bot`         | is current user bot                |
-| `$is.owner`       | is current user owner              |
-| `$rank`           | current rank of user               |
-| `$game`           | current game                       |
-| `$title`          | current title                      |
-| `$views`          | current views count                |
-| `$followers`      | current followers count            |
-| `$hosts`          | current hosts count                |
-| `$subscribers`    | current subscribers count          |
+| Filter variable | Description                        |
+| ----------------|:-----------------------------------|
+| `$sender`       | username of user triggered command |
+| `$userObject`   | full database row of sender        |
+| `$game`         | current game                       |
+| `$title`        | current title                      |
+| `$views`        | current views count                |
+| `$followers`    | current followers count            |
+| `$hosts`        | current hosts count                |
+| `$subscribers`  | current subscribers count          |
 
 #### Examples
 
@@ -235,13 +227,6 @@ only for soge__ **or** when game is set to PUBG
 
 `$subscribers >= 10` - run command when current subscribers count is equal or
 greater than 10
-
-#### Examples (advanced)
-
-`$game.toLowerCase() == 'playerunknown's battlegrounds'` - run command only when
-PUBG is set as game
-
-`['soge__', 'otheruser'].includes($sender)` - check if sender is soge__ or otheruser
 
 ## Other settings
 

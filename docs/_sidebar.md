@@ -2,13 +2,13 @@
 * [Install and upgrade](/install-and-upgrade.md)
 * [FAQ](/faq.md)
 * Configuration
-  * [Timezone](/configuration/timezone.md)
-  * [CPU](/configuration/cpu.md)
-  * [Panel](/configuration/panel.md)
-  * [Database](/configuration/database.md)
   * [Color](/configuration/color.md)
-  * [Metrics](/configuration/metrics.md)
+  * [Database](/configuration/database.md)
   * [Environment variables](/configuration/env.md)
+  * [Metrics](/configuration/metrics.md)
+  * [Threads](/configuration/threads.md)
+  * [Panel](/configuration/panel.md)
+  * [Timezone](/configuration/timezone.md)
 * Systems
   * [Alias](/commands/alias.md)
   * [Commercial](/commands/commercial.md)
@@ -21,6 +21,7 @@
   * [Points](/commands/points.md)
   * [Polls](/commands/polls.md)
   * [Price](/commands/price.md)
+  * [Scrim](/commands/scrim.md)
   * [Songs](/commands/songs.md)
   * [Top](/commands/top.md)
   * [Overlays](/commands/overlays.md)
@@ -46,6 +47,7 @@
 * How To
   * [Phillips Hue](/howto/phillipshue.md)
   * [Eval snippets](/howto/eval.md)
+  * [Run random command](/howto/run-random-command.md)
   * [Write own system](/howto/write-own-system.md)
 * Integrations
   * [Twitter](/integrations/twitter.md)

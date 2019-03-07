@@ -95,44 +95,19 @@ const options: InterfaceSettings = {
 ```
 
 #### Others
-
-You can set your own settings variables. Only `array`, `number`, `boolean` and `string`
-is supported. You can also add category for your settings. Use **null** value
-if you dont want to have type check.
-Arrays are **not recommended** as autosync is supported only for array functions,
-not direct index access! Change of full array will trigger autosync between threads.
-
-!> To be sure **arrays** are properly saved and synced use
-   `this.updateSettings(pathToYourVariable, this.settings.pathToYourVariable);`
-   after working with variable.
+You can set your own settings variables. Only `number`, `boolean` and `string` is supported.
 
 ##### Configurable in UI
-
 ``` javascript
 const settings = {
   // ...
-  mySettingValueArr: [], // not recommended
   mySettingValueNum: 1,
   mySettingValueBool: true,
   mySettingValueString: 'Lorem Ipsum',
-  mySettingWithoutTypeCheck: null,
-  mySettingsCategory: {
-    valueArr: [], // not recommended
-    valueNum: 1,
-    valueBool: false,
-    valueString: 'Lorem Ipsum',
-    WithoutTypeCheck: null,
-  }
   // ...
-  // example of array change
-  //            v-------------------------v path of your variable
-  this.settings.mySettingsCategory.valueArr.push('someValue');
-  this.updateSettings('mySettingsCategory.valueArr', this.settings.mySettingsCategory.valueArr);
 }
 ```
-
-##### Not configurable starts with _
-
+##### Not configurable
 ``` javascript
 const settings = {
   // ...
@@ -146,14 +121,11 @@ const settings = {
 ```
 
 ## Database collections
-
-In systems, you can use `this.collection` object variable to be consistent
-in collection names.
+In systems, you can use `this.collection` object variable to be consistent in collection names.
 
 !> You cannot use `this.collection`, but you need to specify category `this.collection.category`
 
 ### Examples with `yoursystem`
-
 `this.collection.data` -> `systems.yoursystem`
 
 `this.collection.users` -> `systems.yoursystem.users`
@@ -161,9 +133,7 @@ in collection names.
 `this.collection.settings` -> `systems.yoursystem.settings`
 
 ## Command function
-
 Command function have `opts` object parameter
-
 ``` javascript
 function commandFunction(opts) {
   /*
@@ -177,9 +147,7 @@ function commandFunction(opts) {
 ```
 
 ## Parser function
-
-Parser function have `opts` object parameter. Must return **true** or **false**.
-Return **false** will halt all next parser and commands.
+Parser function have `opts` object parameter. Must return **true** or **false**. Return **false** will halt all next parser and commands.
 
 ``` javascript
 function parserFunction(opts) {
@@ -193,27 +161,5 @@ function parserFunction(opts) {
 
   return true
   // return false
-}
-```
-
-## Locales
-
-Bot is supporting custom locales (by default **english** and **čeština** are supported).
-To create new locale file add **json** file into `/locales/<lang>` folder.
-
-``` javascript
-function someCommandFunctionExample(opts) {
-  // given we have defined path.to.your.locale with value
-  // Lorem Ipsum $dolor sit amet
-
-  // default locale translations
-  const defaultTranslation = global.translate('path.to.your.locale')
-  // => Lorem Ipsum $dolor sit amet
-
-  // locale translation with attributes
-  const translation = global.commons.prepare('path.to.your.locale', {
-    dolor: 'something'
-  })
-  // => Lorem Ipsum something sit amet
 }
 ```
