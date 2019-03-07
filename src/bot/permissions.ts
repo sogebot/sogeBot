@@ -82,7 +82,7 @@ class Permissions extends Core {
           shouldProceed = false; // we don't have any automation
           break;
       }
-      return { access: shouldProceed || this.filters(user, permission.filters), permission };
+      return { access: shouldProceed && this.filters(user, permission.filters), permission };
     } catch (e) {
       global.log.error(e);
       return { access: false, permission };
@@ -120,7 +120,7 @@ class Permissions extends Core {
           amount = user.tips.reduce((a, b) => (a + global.currency.exchange(b.amount, b.currency, global.currency.settings.currency.mainCurrency)), 0);
           break;
         case 'watched':
-          amount = user.watched.reduce((a, b) => (a + b.value), 0);
+          amount = user.watched.reduce((a, b) => (a + b.watched), 0) / (60 * 60 * 1000 /*hours*/);
       }
 
       switch (f.comparator) {

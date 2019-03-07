@@ -42,7 +42,7 @@ declare namespace User {
 
   type Watched = {
     id: string,
-    value: number,
+    watched: number,
   }
 
   type Messages = {

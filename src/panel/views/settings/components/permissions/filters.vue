@@ -5,13 +5,13 @@
         <div class="form-group col-md-4 pb-0 mb-0">
           <label for="name_input" class="text-muted text-uppercase font-weight-light">{{ translate('core.permissions.type') }}</label>
         </div>
-        <div class="form-group col-md-4 pb-0 mb-0"></div>
+        <div class="form-group col-md-3 pb-0 mb-0"></div>
         <div class="form-group col-md-4 pb-0 mb-0">
           <label for="name_input" class="text-muted text-uppercase font-weight-light">{{ translate('core.permissions.value') }}</label>
         </div>
       </div>
     </div>
-    <div class="col-12" v-for="filter of cFilters" :key="filter.comparator + filter.type + filter.value">
+    <div class="col-12" v-for="(filter, index) of cFilters" :key="filter.comparator + filter.type + filter.value">
       <div class="row">
         <div class="form-group col-md-4">
           <select v-model="filter.type" class="form-control">
@@ -25,7 +25,7 @@
             <option value="substreakmonths">{{ translate('core.permissions.substreakmonth') }}</option>
           </select>
         </div>
-        <div class="form-group col-md-4">
+        <div class="form-group col-md-3">
           <select v-model="filter.comparator" class="form-control">
             <option value="<">{{ translate('core.permissions.isLowerThan') }}</option>
             <option value="<=">{{ translate('core.permissions.isLowerThanOrEquals') }}</option>
@@ -36,6 +36,11 @@
         </div>
         <div class="form-group col-md-4">
           <input v-model.lazy.number="filter.value" type="number" class="form-control"/>
+        </div>
+        <div class="form-group col-md-1">
+          <button class="btn btn-outline-dark border-0" @click="remove(index)">
+            <font-awesome-icon icon="times" fixed-width></font-awesome-icon>
+          </button>
         </div>
       </div>
     </div>
@@ -48,11 +53,11 @@
 
   import { library } from '@fortawesome/fontawesome-svg-core'
   import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-  import {  } from '@fortawesome/free-solid-svg-icons';
+  import { faTimes } from '@fortawesome/free-solid-svg-icons';
 
   import * as io from 'socket.io-client';
 
-  library.add();
+  library.add(faTimes);
 
   export default Vue.extend({
     props: ['filters'],
@@ -68,6 +73,9 @@
       return data;
     },
     methods: {
+      remove(index) {
+        this.cFilters.splice(index, 1);
+      },
       add() {
         this.cFilters.push({
           comparator: '>=',
@@ -78,6 +86,3 @@
     }
   })
 </script>
-
-<style scoped>
-</style>

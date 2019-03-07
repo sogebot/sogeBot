@@ -24,6 +24,7 @@
                 "${workspaceFolder}/node_modules/**/*.js",
                 "<node_internals>/**/*.js"
             ],
+            "sourceMaps": true,
             "port": 9229
         }
     ]

@@ -83,8 +83,8 @@
     "test:config:nedb": "cp config.example.json config.json",
     "migrate": "node ./tools/migrate && node ./tools/migrate --delete",
     "start": "npm run migrate && cross-env NODE_ENV=production node --experimental-worker --icu-data-dir=node_modules/full-icu -r source-map-support/register  ./dest/main || true",
-    "start-no-migration": "cross-env NODE_ENV=production node --icu-data-dir=node_modules/full-icu -r source-map-support/register --experimental-worker ./dest/main || true",
-    "debug": "cross-env NODE_ENV=development node --icu-data-dir=node_modules/full-icu --inspect  --experimental-worker ./dest/main || true",
+    "start-no-migration": "cross-env NODE_ENV=production node --icu-data-dir=node_modules/full-icu --require source-map-support/register --experimental-worker ./dest/main || true",
+    "debug": "cross-env NODE_ENV=development node --require source-map-support/register --icu-data-dir=node_modules/full-icu --inspect  --experimental-worker ./dest/main || true",
     "cleanup": "node ./tools/cleanup.js || true"
   },
   "devDependencies": {
