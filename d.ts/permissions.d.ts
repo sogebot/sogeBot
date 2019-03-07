@@ -11,7 +11,7 @@ declare namespace Permissions {
 
   type Filter = {
     comparator: '<' | '>' | '==' | '<=' | '>=',
-    type: 'watched' | 'tips' | 'bits' | 'messages' | 'subtier' | 'subcumulativemonths' | 'substreakmonths',
+    type: 'points' | 'watched' | 'tips' | 'bits' | 'messages' | 'subtier' | 'subcumulativemonths' | 'substreakmonths',
     value: number,
   }
 }

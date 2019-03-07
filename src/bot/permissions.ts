@@ -24,7 +24,15 @@ class Permissions extends Core {
   }
 
   public async check(userId: string, permId: string, partial: boolean = false): Promise<{access: boolean, permission: Permissions.Item}> {
-    const user = await global.db.engine.findOne('users', { id: userId });
+    const user: User & {
+      tips: User.Tips, bits: User.Bits, points: User.Points, watched: User.Watched, messages: User.Messages,
+    } = await global.db.engine.findOne('users', { id: userId }, [
+      { from: 'users.tips', as: 'tips', foreignField: 'id', localField: 'id' },
+      { from: 'users.bits', as: 'bits', foreignField: 'id', localField: 'id' },
+      { from: 'users.points', as: 'points', foreignField: 'id', localField: 'id' },
+      { from: 'users.messages', as: 'messages', foreignField: 'id', localField: 'id' },
+      { from: 'users.watched', as: 'watched', foreignField: 'id', localField: 'id' },
+    ]);
     const permission: Permissions.Item = await global.db.engine.findOne(this.collection.data, { id: permId });
 
     try {
@@ -75,14 +83,25 @@ class Permissions extends Core {
           break;
       }
 
-      if (shouldProceed) {
-        // todo: filters
-      }
+      shouldProceed = shouldProceed || (await this.filters(user, permission.filters));
+
       return { access: shouldProceed, permission };
     } catch (e) {
       global.log.error(e);
       return { access: false, permission };
     }
+  }
+
+  protected async filters(
+    user: User & {
+      tips: User.Tips, bits: User.Bits, points: User.Points, watched: User.Watched, messages: User.Messages,
+    },
+    filters: Permissions.Filter[] = [],
+  ): Promise<boolean> {
+    for (const f of filters) {
+      global.log.error(f);
+    }
+    return true;
   }
 
   protected sockets() {

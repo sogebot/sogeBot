@@ -19,6 +19,7 @@
   "type": "Type",
   "value": "Value",
   "watchedTime": "Watched time in hours",
+  "points": "Points",
   "tips": "Tips",
   "bits": "Bits",
   "messages": "Messages",

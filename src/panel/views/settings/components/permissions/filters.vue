@@ -15,6 +15,7 @@
       <div class="row">
         <div class="form-group col-md-4">
           <select v-model="filter.type" class="form-control">
+            <option value="points">{{ translate('core.permissions.points') }}</option>
             <option value="watched">{{ translate('core.permissions.watchedTime') }}</option>
             <option value="tips">{{ translate('core.permissions.tips') }}</option>
             <option value="bits">{{ translate('core.permissions.bits') }}</option>
