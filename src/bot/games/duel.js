@@ -50,14 +50,18 @@ class Duel extends Game {
       this.settings._.timestamp,
       this.settings.duration
     ])
+    const total = users.reduce((total, v) => total + v.tickets, 0)
 
     if (timestamp === 0 || new Date().getTime() - timestamp < 1000 * 60 * duelDuration) {
       this.timeouts['pickDuelWinner'] = setTimeout(() => this.pickDuelWinner(), 30000)
       return
     }
 
-    let total = 0
-    for (let user of users) total += parseInt(user.tickets, 10)
+    if (total === 0 && new Date().getTime() - timestamp >= 1000 * 60 * duelDuration) {
+      await global.db.engine.remove(this.collection.users, {})
+      this.settings._.timestamp = 0;
+      return;
+    }
 
     let winner = _.random(0, total, false)
     let winnerUser
