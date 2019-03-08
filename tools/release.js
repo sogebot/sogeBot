@@ -122,10 +122,10 @@ function buildDocs() {
 
   console.log(chalk.yellow('8.') + ' Create doc commit');
   spawnSync('git', ['add', '-A']);
-  spawnSync('git', ['commit', '-m', 'docs: release docs ' + releaseVersion + '']);
+  spawnSync('git', ['commit', '-m', 'docs: release docs ' + getReleaseVersion() + '']);
 
   console.log('\n' + chalk.inverse('PUSHING COMMITS'));
-  spawnSync('git', ['push', '-fu', 'origin', 'docs-' + releaseVersion]);
+  spawnSync('git', ['push', '-fu', 'origin', 'docs-' + getReleaseVersion()]);
 
   console.log('\n' + chalk.inverse('Back to ' + getCurrentBranch() + ' branch'));
   spawnSync('git', ['checkout', getCurrentBranch()]);
@@ -133,18 +133,18 @@ function buildDocs() {
 
 function getLastMajorVersion() {
   // bump down major version
-  const [x, y, z] = releaseVersion.split('.');
+  const [x, y, z] = getReleaseVersion().split('.');
   return `${x}.${Number(y) - 1}.x`;
 }
 
 function getNextMajorVersion() {
   // bump down major version
-  const [x, y, z] = releaseVersion.split('.');
+  const [x, y, z] = getReleaseVersion().split('.');
   return `${x}.${Number(y) + 1}.x`;
 }
 
 function getCurrentMajorVersion() {
-  const [x, y, z] = releaseVersion.split('.');
+  const [x, y, z] = getReleaseVersion().split('.');
   return `${x}.${y}.x`;
 }
 
@@ -154,4 +154,11 @@ function getCurrentBranch() {
     return o.trim().startsWith('*');
   })[0].slice(2);
   return branch;
+}
+getReleaseVersion()
+function getReleaseVersion() {
+  const regex = /"version": "(.*-SNAPSHOT)",/g
+  let packageFile = fs.readFileSync('package.json').toString();
+  version = regex.exec(packageFile)[1];
+  return version.replace('-SNAPSHOT', '')
 }
