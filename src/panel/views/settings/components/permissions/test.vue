@@ -12,6 +12,7 @@
         @focus="isFocused = true"
         @blur="isFocused = false"
         v-model="inputUsername"
+        v-on:keyup.enter="testUser(inputUsername)"
         type="text"
         class="form-control border-0"
         :placeholder="translate('core.permissions.typeUsernameOrIdToTest')"/>
@@ -30,10 +31,10 @@
                         fixed-width
                         v-else />
       <span v-if="Number(status.access) === 0 && Number(partialStatus.access) === 0"
-            v-html="translate('core.permissions.userHaveNoAccessToThisPermissionGroup')">
+            v-html="translate('core.permissions.userHaveNoAccessToThisPermissionGroup').replace('$username', this.testUsername)">
       </span>
       <span v-else-if="Number(status.access) === 1 || Number(partialStatus.access) === 1">
-        <span v-html="translate('core.permissions.userHaveAccessToThisPermissionGroup')"></span>
+        <span v-html="translate('core.permissions.userHaveAccessToThisPermissionGroup').replace('$username', this.testUsername)"></span>
         <ul class="mb-0">
           <li v-if="Number(partialStatus.access) === 1">
             <span v-html="translate('core.permissions.accessDirectlyThrough')"></span>
@@ -45,9 +46,7 @@
           </li>
         </ul>
       </span>
-      <span v-else>
-        {{translate('core.permissions.somethingWentWrongUserWasNotFoundInBotDatabase')}}
-      </span>
+      <span v-else v-html="translate('core.permissions.somethingWentWrongUserWasNotFoundInBotDatabase').replace('$username', this.testUsername)"></span>
     </div>
   </div>
 </template>
@@ -74,6 +73,7 @@
       const data: {
         socket: any,
         inputUsername: string,
+        testUsername: string,
         isFocused: boolean,
         isTesting: boolean,
         state: string,
@@ -82,6 +82,7 @@
       } = {
         socket: io('/core/permissions', { query: "token=" + this.token }),
         inputUsername: '',
+        testUsername: '',
         isFocused: false,
         isTesting: false,
         state: '',
@@ -91,17 +92,21 @@
       return data;
     },
     watch: {
-      inputUsername: function (val) {
-        this.testUser(val);
-      },
+      inputUsername(val) {
+        // on change reset status
+        this.status = {}
+        this.partialStatus = {}
+        this.testUsername = ''
+      }
     },
     methods: {
-      testUser: _.debounce(function (this: any, val) {
+      testUser(val) {
         this.isTesting = true
         const state = uuid()
         this.state = state
         this.status = {}
         this.partialStatus = {}
+        this.testUsername = val;
 
         if (val.trim().length === 0) {
            this.isTesting = false;
@@ -115,7 +120,7 @@
             }
           })
         }
-      }, 300),
+      }
     }
   })
 </script>

@@ -12,12 +12,13 @@
         @focus="isFocused = true"
         @blur="isFocused = false"
         v-model="inputUsername"
+        v-on:keyup.enter="search(inputUsername)"
         type="text"
         class="form-control border-0"
         :placeholder="translate('core.permissions.typeUsernameOrIdToSearch')"/>
     </div>
 
-    <div class="p-3 alert-warning" v-if="searchData.length === 0 && inputUsername.length != 0 && !isSearching">
+    <div class="p-3 alert-warning" v-if="searchData.length === 0 && testUsername.length != 0 && !isSearching">
       {{translate('core.permissions.noUsersWereFound')}}
     </div>
     <div class="border" v-else-if="searchData.length > 0">
@@ -28,8 +29,8 @@
                 :class="[!currentIds.includes(user.id) ? 'btn-light' : 'btn-dark']"
                 :key="user.username"
                 @click="toggleUser(user.username, user.id)">
-          <span v-html="user.username.replace(inputUsername, '<strong>' + inputUsername + '</strong>')"></span>
-          <small class="text-muted" v-html="user.id.replace(inputUsername, '<strong>' + inputUsername + '</strong>')"></small>
+          <span v-html="user.username.replace(testUsername, '<strong>' + testUsername + '</strong>')"></span>
+          <small class="text-muted" v-html="user.id.replace(testUsername, '<strong>' + testUsername + '</strong>')"></small>
         </button>
       </div>
       <div class="d-flex">
@@ -84,6 +85,7 @@
           id: string,
         }[],
         users: any[],
+        testUsername: string,
         inputUsername: string,
         isFocused: boolean,
         isSearching: boolean,
@@ -95,6 +97,7 @@
         currentIds: this.ids,
         currentUsers: [],
         users: [],
+        testUsername: '',
         inputUsername: '',
         isFocused: false,
         isSearching: false,
@@ -117,15 +120,20 @@
       }
     },
     watch: {
-      inputUsername: function (val) {
-        this.searchFor(val);
+      inputUsername(val) {
+        // on change reset status
+        this.isSearching = false;
+        this.searchPage = 0;
+        this.searchData = [];
+        this.testUsername = ''
+        this.stateSearch = uuid();
       },
       currentIds: function (val) {
         this.$emit('update', val)
       }
     },
     methods: {
-      searchFor: _.debounce(function (this: any, val) {
+      search(val) {
         this.isSearching = true
         const state = uuid()
         this.stateSearch = state
@@ -135,6 +143,7 @@
            this.searchPage = 0;
            this.searchData = [];
         } else {
+          this.testUsername = val;
           this.usersSocket.emit('search', { search: val, state }, (r) => {
             if (r.state === this.stateSearch) {
               // expecting this data
@@ -144,7 +153,7 @@
             }
           })
         }
-      }, 300),
+      },
       toggleUser(username, id) {
         this.currentUsers.push({
           username, id
