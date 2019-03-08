@@ -31,12 +31,6 @@ module.exports = {
       global.oauth.settings.broadcaster.username = 'broadcaster'
       await variable.isEqual('global.oauth.settings.broadcaster.username', 'broadcaster')
 
-      // remove compact db - compactDb tests
-      await global.db.engine.remove('compact', {})
-
-      // remove user settings
-      await global.db.engine.remove(global.users.collection.settings, {})
-
       resolve()
     }
     return new Promise((resolve, reject) => {
