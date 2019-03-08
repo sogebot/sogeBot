@@ -6,31 +6,129 @@ const { spawnSync } = require('child_process');
 
 
 const argv = require('yargs') // eslint-disable-line
-  .usage('Usage: node tool/$0 -v [version]')
-  .version('false')
-  .describe('v', 'version to release')
-  .demandOption(['v'])
-  .describe('nopush', 'disable push')
-  .boolean('nopush')
-  .describe('build', 'build a zip')
-  .boolean('build')
-  .help('help')
-  .alias('h', 'help')
+  .usage('node tools/release.js <cmd> [args]')
+  .command('build [branch]', 'make a zip file from branch', (yargs) => {
+    yargs.demandOption(['branch'], 'Please provide branch argument to work with this tool')
+    yargs.positional('branch', {
+      type: 'string',
+      describe: 'github origin branch'
+    })
+  })
+  .command('docs', 'move master docs to main docs', (yargs) => {
+  })
+  .demandCommand()
+  .help()
   .argv
-const currentBranch = getCurrentBranch();
-const releaseVersion = argv.v
-const isMajorRelease = releaseVersion.endsWith('.0');
-const shouldPushToGit = !argv.nopush
-const shouldBuildZip = argv.build
 
-doRelease();
+if (argv._[0] === 'build') {
+  buildZipFile()
+else if (argv._[0] === 'docs') {
+  buildDocs()
+}
 
-function getCurrentBranch() {
-  const branches = spawnSync('git', ['branch']);
-  const branch = branches.stdout.toString().split('\n').filter((o) => {
-    return o.trim().startsWith('*');
-  })[0].slice(2);
-  return branch;
+function buildZipFile() {
+  console.log(chalk.inverse('Creating a zip file from ' + argv.branch + ' branch'));
+
+  console.log(chalk.yellow('1.') + ' Download branch zip file');
+  spawnSync('curl', ['https://codeload.github.com/sogehige/sogeBot/zip/' + argv.branch, '--output', argv.branch + '.zip']);
+
+  console.log(chalk.yellow('2.') + ' Unzip downloaded zip file');
+  spawnSync('unzip', [argv.branch + '.zip']);
+
+
+  console.log(chalk.yellow('3.') + ' Running make');
+  spawnSync('cd', [argv.branch]);
+  spawnSync('make', {
+    cwd: 'sogeBot-' + argv.branch
+  });
+
+  console.log(chalk.yellow('4.') + ' Creating release package');
+  spawnSync('make', ['pack'], {
+    cwd: 'sogeBot-' + argv.branch
+  });
+
+  console.log(chalk.yellow('5.') + ' Copy release package to /');
+  spawnSync('cp', ['sogeBot-' + argv.branch + '/*.zip', '.']);
+
+  console.log(chalk.yellow('6.') + ' Cleanup directory');
+  spawnSync('rm', ['-rf', 'sogeBot-' + argv.branch]);
+  spawnSync('rm', ['-rf', argv.branch + '.zip']);
+}
+
+function buildDocs() {
+  const archiveDir = path.join(__dirname, '..', 'docs', '_archive', getLastMajorVersion())
+
+  console.log(chalk.inverse('Create docs branch'));
+  spawnSync('git', ['branch', '-D', 'docs-release']);
+  spawnSync('git', ['checkout', '-b', 'docs-release']);
+
+  console.log('\n' + chalk.inverse('Releasing docs'));
+  console.log(chalk.yellow('1.') + ' Creating ' + archiveDir);
+  if (fs.existsSync(archiveDir)) {
+    spawnSync('rm', ['-r', archiveDir]);
+  }
+  fs.mkdirSync(archiveDir)
+
+  console.log(chalk.yellow('2.') + ' Backup of current docs');
+  const archiveDocsFiles = glob.sync('docs/*', {
+    ignore: [
+      'docs/_archive', 'docs/_master', 'docs/_navbar.md'
+    ]
+  });
+  for (const f of archiveDocsFiles) {
+    spawnSync('cp', ['-r', f, archiveDir]);
+  }
+
+  const sidebar = path.join(archiveDir, '_sidebar.md');
+  console.log(chalk.yellow('3.') + ' Update ' + sidebar + ' paths');
+  let sidebarFile = fs.readFileSync(sidebar).toString();
+  sidebarFile = sidebarFile.replace(/(\*\s\[.*\]\(\/)(.*\))/g, '$1_archive/' + getLastMajorVersion() + '/$2');
+  fs.writeFileSync(sidebar, sidebarFile)
+
+  console.log(chalk.yellow('4.') + ' Replace current docs with _master');
+  const masterDocsFiles = glob.sync('./docs/_master/*');
+  for (const f of masterDocsFiles) {
+    spawnSync('cp', ['-r', f, 'docs']);
+  }
+
+  console.log(chalk.yellow('5.') + ' Update ' + path.join('docs', '_sidebar.md') + ' paths');
+  sidebarFile = fs.readFileSync(path.join('docs', '_sidebar.md')).toString();
+  sidebarFile = sidebarFile.replace(/_master/g, '');
+  fs.writeFileSync(path.join('docs', '_sidebar.md'), sidebarFile)
+
+  const navbar = path.join('docs', '_navbar.md');
+  console.log(chalk.yellow('6.') + ' Add archive link to ' + navbar);
+  let navbarFile = fs.readFileSync(navbar).toString().split('\n');
+  let newNavbarFile = []
+  for (let line of navbarFile) {
+    newNavbarFile.push(line)
+    if (line.toLowerCase().includes('archive') && !line.toLowerCase().includes('_archive/')) {
+      newNavbarFile.push(`  * [${getLastMajorVersion()}](/_archive/${getLastMajorVersion()}/)`)
+    }
+  }
+  fs.writeFileSync(navbar, newNavbarFile.join('\n'))
+
+  console.log(chalk.yellow('7.') + ' Update current version ' + navbar);
+  navbarFile = fs.readFileSync(navbar).toString().split('\n');
+  newNavbarFile = []
+  for (let line of navbarFile) {
+    if (line.toLowerCase().includes('current')) {
+      newNavbarFile.push(`* **Current:** [${getCurrentMajorVersion()}](/)`)
+    } else {
+      newNavbarFile.push(line)
+    }
+  }
+  fs.writeFileSync(navbar, newNavbarFile.join('\n'))
+
+  console.log(chalk.yellow('8.') + ' Create doc commit');
+  spawnSync('git', ['add', '-A']);
+  spawnSync('git', ['commit', '-m', 'docs: release docs ' + releaseVersion + '']);
+
+  console.log('\n' + chalk.inverse('PUSHING COMMITS'));
+  spawnSync('git', ['push', '-fu', 'origin', 'docs-' + releaseVersion]);
+
+  console.log('\n' + chalk.inverse('Back to ' + getCurrentBranch() + ' branch'));
+  spawnSync('git', ['checkout', getCurrentBranch()]);
 }
 
 function getLastMajorVersion() {
@@ -50,165 +148,10 @@ function getCurrentMajorVersion() {
   return `${x}.${y}.x`;
 }
 
-function doRelease() {
-  console.log(chalk.inverse('RELEASE TOOL'));
-  console.log('\t' + chalk.yellow('Release type:    ') + (isMajorRelease ? 'major' : 'minor'));
-  console.log('\t' + chalk.yellow('Release version: ') + releaseVersion);
-  console.log('\t' + chalk.yellow('Current branch:  ') + currentBranch);
-
-  console.log('\n' + chalk.inverse('CREATE RELEASE BRANCH') + ' release-' + releaseVersion);
-  spawnSync('git', ['branch', '-D', 'release-' + releaseVersion]);
-  spawnSync('git', ['checkout', '-b', 'release-' + releaseVersion]);
-
-  if (isMajorRelease) {
-    const archiveDir = path.join(__dirname, '..', 'docs', '_archive', getLastMajorVersion())
-
-    console.log('\n' + chalk.inverse('CREATE DOCS BRANCH') + ' docs-' + releaseVersion);
-    spawnSync('git', ['branch', '-D', 'docs-' + releaseVersion]);
-    spawnSync('git', ['checkout', '-b', 'docs-' + releaseVersion]);
-
-    console.log('\n' + chalk.inverse('DOCS RELEASE'));
-    console.log(chalk.yellow('1.') + ' Creating ' + archiveDir);
-    if (fs.existsSync(archiveDir)) {
-      spawnSync('rm', ['-r', archiveDir]);
-    }
-    fs.mkdirSync(archiveDir)
-
-    console.log(chalk.yellow('2.') + ' Backup of current docs');
-    const archiveDocsFiles = glob.sync('docs/*', {
-      ignore: [
-        'docs/_archive', 'docs/_master', 'docs/_navbar.md'
-      ]
-    });
-    for (const f of archiveDocsFiles) {
-      spawnSync('cp', ['-r', f, archiveDir]);
-    }
-
-    const sidebar = path.join(archiveDir, '_sidebar.md');
-    console.log(chalk.yellow('3.') + ' Update ' + sidebar + ' paths');
-    let sidebarFile = fs.readFileSync(sidebar).toString();
-    sidebarFile = sidebarFile.replace(/(\*\s\[.*\]\(\/)(.*\))/g, '$1_archive/' + getLastMajorVersion() + '/$2');
-    fs.writeFileSync(sidebar, sidebarFile)
-
-    console.log(chalk.yellow('4.') + ' Replace current docs with _master');
-    const masterDocsFiles = glob.sync('./docs/_master/*');
-    for (const f of masterDocsFiles) {
-      spawnSync('cp', ['-r', f, 'docs']);
-    }
-
-    console.log(chalk.yellow('5.') + ' Update ' + path.join('docs', '_sidebar.md') + ' paths');
-    sidebarFile = fs.readFileSync(path.join('docs', '_sidebar.md')).toString();
-    sidebarFile = sidebarFile.replace(/_master/g, '');
-    fs.writeFileSync(path.join('docs', '_sidebar.md'), sidebarFile)
-
-    const navbar = path.join('docs', '_navbar.md');
-    console.log(chalk.yellow('6.') + ' Add archive link to ' + navbar);
-    let navbarFile = fs.readFileSync(navbar).toString().split('\n');
-    let newNavbarFile = []
-    for (let line of navbarFile) {
-      newNavbarFile.push(line)
-      if (line.toLowerCase().includes('archive') && !line.toLowerCase().includes('_archive/')) {
-        newNavbarFile.push(`  * [${getLastMajorVersion()}](/_archive/${getLastMajorVersion()}/)`)
-      }
-    }
-    fs.writeFileSync(navbar, newNavbarFile.join('\n'))
-
-    console.log(chalk.yellow('7.') + ' Update current version ' + navbar);
-    navbarFile = fs.readFileSync(navbar).toString().split('\n');
-    newNavbarFile = []
-    for (let line of navbarFile) {
-      if (line.toLowerCase().includes('current')) {
-        newNavbarFile.push(`* **Current:** [${getCurrentMajorVersion()}](/)`)
-      } else {
-        newNavbarFile.push(line)
-      }
-    }
-    fs.writeFileSync(navbar, newNavbarFile.join('\n'))
-
-    console.log(chalk.yellow('8.') + ' Create doc commit');
-    spawnSync('git', ['add', '-A']);
-    spawnSync('git', ['commit', '-m', 'docs: release docs ' + releaseVersion + '']);
-
-    if (shouldPushToGit) {
-      console.log('\n' + chalk.inverse('PUSHING COMMITS'));
-      spawnSync('git', ['push', '-fu', 'origin', 'docs-' + releaseVersion]);
-    } else {
-      console.log('\n' + chalk.inverse('PUSHING COMMITS - SKIPPED'));
-    }
-
-    console.log('\n' + chalk.inverse('Back to ' + currentBranch + ' branch'));
-    spawnSync('git', ['checkout', currentBranch]);
-  }
-
-  console.log('\n' + chalk.inverse('CREATE BUILD BRANCH') + ' build-' + releaseVersion);
-  spawnSync('git', ['branch', '-D', 'build-' + releaseVersion]);
-  spawnSync('git', ['checkout', '-b', 'build-' + releaseVersion]);
-
-  console.log('\n' + chalk.inverse('PACKAGE RELEASE'));
-  console.log(chalk.yellow('1.') + ' Updating package.json version to ' + releaseVersion);
-  let packageFile = fs.readFileSync('package.json').toString();
-  packageFile = packageFile.replace(/("version": ").*(",)/g, '$1' + releaseVersion + '$2');
-  fs.writeFileSync('package.json', packageFile)
-
-  console.log(chalk.yellow('2.') + ' Create release commit');
-  spawnSync('git', ['add', '-A']);
-  spawnSync('git', ['commit', '-m', 'build: ' + releaseVersion + '']);
-
-  if (shouldPushToGit) {
-    console.log('\n' + chalk.inverse('PUSHING COMMITS'));
-    spawnSync('git', ['push', '-fu', 'origin', 'build-' + releaseVersion]);
-  } else {
-    console.log('\n' + chalk.inverse('PUSHING COMMITS - SKIPPED'));
-  }
-
-  if (shouldBuildZip && shouldPushToGit) {
-    console.log('\n' + chalk.inverse('ZIP BUILD'));
-
-    console.log(chalk.yellow('1.') + ' Download release package');
-    spawnSync('curl', ['https://codeload.github.com/sogehige/sogeBot/zip/build-' + releaseVersion, '--output', 'build-' + releaseVersion + '.zip']);
-
-    console.log(chalk.yellow('2.') + ' Unzip downloaded package');
-    spawnSync('unzip', ['build-' + releaseVersion + '.zip']);
-
-
-    console.log(chalk.yellow('3.') + ' Running make');
-    spawnSync('cd', ['build-' + releaseVersion]);
-    spawnSync('make', {
-      cwd: 'sogeBot-build-' + releaseVersion
-    });
-
-    console.log(chalk.yellow('4.') + ' Creating release package');
-    spawnSync('make', ['pack'], {
-      cwd: 'sogeBot-build-' + releaseVersion
-    });
-
-    console.log(chalk.yellow('5.') + ' Copy release package to /');
-    spawnSync('cp', ['sogeBot-build-' + releaseVersion + '/*.zip', '.']);
-
-    console.log(chalk.yellow('6.') + ' Cleanup directory');
-    spawnSync('rm', ['-rf', 'sogeBot-build-' + releaseVersion]);
-    spawnSync('rm', ['-rf', 'build-' + releaseVersion + '.zip']);
-  } else {
-    console.log('\n' + chalk.inverse('ZIP BUILD - SKIPPED'));
-  }
-
-
-  console.log('\n' + chalk.inverse('Back to ' + currentBranch + ' branch'));
-
-  console.log('\n' + chalk.inverse('CREATE NEXT BUILD BRANCH') + ' build-' + getNextMajorVersion() + '-SNAPSHOT');
-  spawnSync('git', ['branch', '-D', 'build-' + getNextMajorVersion() + '-SNAPSHOT']);
-  spawnSync('git', ['checkout', '-b', 'build-' + getNextMajorVersion() + '-SNAPSHOT']);
-
-  console.log('\n' + chalk.inverse('PACKAGE RELEASE'));
-  console.log(chalk.yellow('1.') + ' Updating package.json version to ' + getNextMajorVersion() + '-SNAPSHOT');
-  packageFile = fs.readFileSync('package.json').toString();
-  packageFile = packageFile.replace(/("version": ").*(",)/g, '$1' + getNextMajorVersion() + '-SNAPSHOT$2');
-  fs.writeFileSync('package.json', packageFile)
-
-  console.log(chalk.yellow('2.') + ' Create release commit');
-  spawnSync('git', ['add', '-A']);
-  spawnSync('git', ['commit', '-m', 'build: ' + getNextMajorVersion() + '-SNAPSHOT']);
-
-  console.log('\n' + chalk.inverse('Back to ' + currentBranch + ' branch'));
-  spawnSync('git', ['checkout', currentBranch]);
+function getCurrentBranch() {
+  const branches = spawnSync('git', ['branch']);
+  const branch = branches.stdout.toString().split('\n').filter((o) => {
+    return o.trim().startsWith('*');
+  })[0].slice(2);
+  return branch;
 }
