@@ -1,4 +1,4 @@
-import glob from 'glob';
+import * as glob from 'glob';
 
 import Widget from './_interface';
 
@@ -18,7 +18,10 @@ class SoundBoard extends Widget {
 
           const sounds: string[] = [];
           for (const file of files) {
-            sounds.push(file.split('/').pop().replace('.mp3', ''));
+            const filename = file.split('/').pop();
+            if (filename) {
+              sounds.push(filename.replace('.mp3', ''));
+            }
           }
           cb(sounds);
         });
