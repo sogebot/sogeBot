@@ -126,7 +126,7 @@ function buildDocs() {
   spawnSync('git', ['commit', '-m', 'docs: release docs ' + getReleaseVersion() + '']);
 
   console.log('\n' + chalk.inverse('PUSHING COMMITS'));
-  spawnSync('git', ['push', '-fu', 'origin', 'docs-' + getReleaseVersion()]);
+  spawnSync('git', ['push', '-fu', 'origin', 'docs-release']);
 
   console.log('\n' + chalk.inverse('Back to ' + currentBranch + ' branch'));
   spawnSync('git', ['checkout', currentBranch]);
