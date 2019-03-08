@@ -57,6 +57,7 @@ function buildZipFile() {
 
 function buildDocs() {
   const archiveDir = path.join(__dirname, '..', 'docs', '_archive', getLastMajorVersion())
+  const currentBranch = getCurrentBranch()
 
   console.log(chalk.inverse('Create docs branch'));
   spawnSync('git', ['branch', '-D', 'docs-release']);
@@ -127,8 +128,8 @@ function buildDocs() {
   console.log('\n' + chalk.inverse('PUSHING COMMITS'));
   spawnSync('git', ['push', '-fu', 'origin', 'docs-' + getReleaseVersion()]);
 
-  console.log('\n' + chalk.inverse('Back to ' + getCurrentBranch() + ' branch'));
-  spawnSync('git', ['checkout', getCurrentBranch()]);
+  console.log('\n' + chalk.inverse('Back to ' + currentBranch + ' branch'));
+  spawnSync('git', ['checkout', currentBranch]);
 }
 
 function getLastMajorVersion() {
