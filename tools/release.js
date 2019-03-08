@@ -22,7 +22,7 @@ const argv = require('yargs') // eslint-disable-line
 
 if (argv._[0] === 'build') {
   buildZipFile()
-else if (argv._[0] === 'docs') {
+} else if (argv._[0] === 'docs') {
   buildDocs()
 }
 
