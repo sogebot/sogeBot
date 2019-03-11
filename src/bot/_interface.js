@@ -7,6 +7,8 @@ const {
 
 const constants = require('./constants')
 
+import { debug } from './debug';
+
 class Module {
   timeouts = {}
   isLoaded = false
@@ -81,12 +83,15 @@ class Module {
   }
 
   updateSettings (key, value) {
+    debug('interface.update', `Updating ${key} = ${value}, ${isMainThread}`)
     if (Array.isArray(value)) {
       value = [...value] // we need to retype otherwise we have worker clone error
     }
     const proc = {
       type: 'interface',
-      path: `${this._name}.${this.constructor.name.toLowerCase()}.settings.${key}`,
+      system: this._name,
+      class: this.constructor.name,
+      path: `settings.${key}`,
       value
     }
 

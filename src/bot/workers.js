@@ -146,16 +146,34 @@ class Workers {
         global.events.fire(data.eventId, data.attributes)
       } else if ( data.type === 'interface') {
         // remove core from path
-        if (data.path.startsWith('core.')) {
-          data.path = data.path.replace('core.', '')
+        if (data.system === 'core') {
+          const o = Object.values(global).find((o) => {
+            return o.constructor.name === data.class
+          })
+          if (o) _.set(o, data.path, data.value);
+        } else {
+          const o = Object.values(global[data.system]).find((o) => {
+            return o.constructor.name === data.class
+          })
+          if (o) _.set(o, data.path, data.value);
         }
-        _.set(global, data.path, data.value);
       }
     } else {
       debug('workers.messages', 'THREAD(' + threadId + '): ' + JSON.stringify(data));
       switch (data.type) {
         case 'interface':
-          _.set(global, data.path, data.value);
+          // remove core from path
+          if (data.system === 'core') {
+            const o = Object.values(global).find((o) => {
+              return o.constructor.name === data.class
+            })
+            if (o) _.set(o, data.path, data.value);
+          } else {
+            const o = Object.values(global[data.system]).find((o) => {
+              return o.constructor.name === data.class
+            })
+            if (o) _.set(o, data.path, data.value);
+          }
           break;
         case 'call':
           const namespace = _.get(global, data.ns, null)
