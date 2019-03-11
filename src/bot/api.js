@@ -454,7 +454,11 @@ class API {
     for (let user of currentModerators) {
       if (!mods.includes(user.username)) {
         // mod is not mod anymore
-        await global.db.engine.update('users', { id: user.id }, { is: { moderator: false }, stats: { subStreak: 0 } })
+        if (!user.id) {
+          global.log.warning('users collection data _id ' + user._id + ' might be corrupted - missing id?')
+        } else {
+          await global.db.engine.update('users', { id: user.id }, { username: user.username, is: { moderator: false } })
+        }
       }
 
       // remove username if parsed
@@ -469,7 +473,9 @@ class API {
       if (global.commons.isBot(username)) { global.status.MOD = true; }
       else {
         const id = await global.users.getIdByName(username.toLowerCase(), true)
-        await global.db.engine.update('users', { id }, { is: { moderator: true }, username })
+        if (id) {
+          await global.db.engine.update('users', { id }, { is: { moderator: true }, username })
+        }
       }
     }
   }
