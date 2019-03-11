@@ -92,8 +92,8 @@ class Moderation extends System {
     this.socket.on('connection', (socket) => {
       socket.on('lists.get', async (cb) => {
         cb(null, {
-          blacklist: await this.settings.lists.blacklist,
-          whitelist: await this.settings.lists.whitelist
+          blacklist: this.settings.lists.blacklist,
+          whitelist: this.settings.lists.whitelist
         })
       })
       socket.on('lists.set', async (data) => {
@@ -176,7 +176,7 @@ class Moderation extends System {
       text = text.replace(ytRegex, '')
     }
 
-    const includeClips = await this.settings.links.includeClips
+    const includeClips = this.settings.links.includeClips
 
     if (!includeClips) {
       clipsRegex = /.*(clips.twitch.tv\/)(\w+)/
@@ -184,7 +184,7 @@ class Moderation extends System {
     }
 
     text = ` ${text} `
-    let whitelist = await this.settings.lists.whitelist
+    let whitelist = this.settings.lists.whitelist
 
     for (let value of whitelist.map(o => o.trim().replace(/\*/g, '[\\pL0-9\\S]*').replace(/\+/g, '[\\pL0-9\\S]+'))) {
       if (value.length > 0) {

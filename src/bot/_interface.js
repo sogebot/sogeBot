@@ -497,7 +497,7 @@ class Module {
       (process.env.DISABLE.toLowerCase().split(',').includes(this.constructor.name.toLowerCase()) || process.env.DISABLE === '*')
 
     if (isStatusChanged) this.settings.enabled = opts.state
-    else opts.state = await this.settings.enabled
+    else opts.state = this.settings.enabled
 
     if (!areDependenciesEnabled || isDisabledByEnv) opts.state = false // force disable if dependencies are disabled or disabled by env
 
@@ -555,11 +555,11 @@ class Module {
 
       if (!_.isObject(values)) {
         // we are expecting bool, string, number
-        promisedSettings[category] = await this.settings[category]
+        promisedSettings[category] = this.settings[category]
       } else {
         // we are expecting one more layer
         for (let o of Object.entries(values)) {
-          promisedSettings[category][o[0]] = await this.settings[category][o[0]]
+          promisedSettings[category][o[0]] = this.settings[category][o[0]]
         }
       }
     }
@@ -635,7 +635,7 @@ class Module {
           commands.push({
             this: this,
             id: command,
-            command: await this.settings.commands[command],
+            command: this.settings.commands[command],
             fnc: this[fnc],
             _fncName: fnc,
             permission: constants.VIEWERS,
@@ -669,7 +669,7 @@ class Module {
           }
 
           command.permission = _.isNil(command.permission) ? constants.VIEWERS : command.permission
-          command.command = _.isNil(command.command) ? await this.settings.commands[command.name] : command.command
+          command.command = _.isNil(command.command) ? this.settings.commands[command.name] : command.command
           commands.push({
             this: this,
             id: command.name,

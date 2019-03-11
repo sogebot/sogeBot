@@ -120,7 +120,7 @@ class Duel extends Game {
 
       if (parseInt(points, 10) === 0) throw Error(ERROR_ZERO_BET)
       if (points < bet) throw Error(ERROR_NOT_ENOUGH_POINTS)
-      if (bet < (await this.settings.minimalBet)) throw Error(ERROR_MINIMAL_BET)
+      if (bet < (this.settings.minimalBet)) throw Error(ERROR_MINIMAL_BET)
 
       // check if user is already in duel and add points
       let userFromDB = await global.db.engine.findOne(this.collection.users, { id: opts.sender.userId })
@@ -130,18 +130,18 @@ class Duel extends Game {
         await global.db.engine.increment('users.points', { id: opts.sender.userId }, { points: parseInt(bet, 10) * -1 })
       } else {
         // check if under gambling cooldown
-        const cooldown = await this.settings.cooldown
+        const cooldown = this.settings.cooldown
         const isMod = await global.commons.isModerator(opts.sender)
-        if (new Date().getTime() - new Date(await this.settings._.cooldown).getTime() > cooldown * 1000 ||
-          (await this.settings.bypassCooldownByOwnerAndMods && (isMod || global.commons.isBroadcaster(opts.sender)))) {
+        if (new Date().getTime() - new Date(this.settings._.cooldown).getTime() > cooldown * 1000 ||
+          (this.settings.bypassCooldownByOwnerAndMods && (isMod || global.commons.isBroadcaster(opts.sender)))) {
           // save new cooldown if not bypassed
-          if (!(await this.settings.bypassCooldownByOwnerAndMods && (isMod || global.commons.isBroadcaster(opts.sender)))) this.settings._.cooldown = String(new Date())
+          if (!(this.settings.bypassCooldownByOwnerAndMods && (isMod || global.commons.isBroadcaster(opts.sender)))) this.settings._.cooldown = String(new Date())
           await global.db.engine.insert(this.collection.users, { id: opts.sender.userId, username: opts.sender.username, tickets: Number(bet) })
           await global.db.engine.increment('users.points', { id: opts.sender.userId }, { points: parseInt(bet, 10) * -1 })
         } else {
           message = await global.commons.prepare('gambling.fightme.cooldown', {
-            minutesName: global.commons.getLocalizedName(Math.round(((cooldown * 1000) - (new Date().getTime() - new Date(await this.settings._.cooldown).getTime())) / 1000 / 60), 'core.minutes'),
-            cooldown: Math.round(((cooldown * 1000) - (new Date().getTime() - new Date(await this.settings._.cooldown).getTime())) / 1000 / 60),
+            minutesName: global.commons.getLocalizedName(Math.round(((cooldown * 1000) - (new Date().getTime() - new Date(this.settings._.cooldown).getTime())) / 1000 / 60), 'core.minutes'),
+            cooldown: Math.round(((cooldown * 1000) - (new Date().getTime() - new Date(this.settings._.cooldown).getTime())) / 1000 / 60),
             command: opts.command })
           global.commons.sendMessage(message, opts.sender)
           return true
@@ -149,12 +149,12 @@ class Duel extends Game {
       }
 
       // if new duel, we want to save timestamp
-      const isNewDuel = (await this.settings._.timestamp) === 0
+      const isNewDuel = (this.settings._.timestamp) === 0
       if (isNewDuel) {
         this.settings._.timestamp = Number(new Date())
         message = await global.commons.prepare('gambling.duel.new', {
           minutesName: global.commons.getLocalizedName(5, 'core.minutes'),
-          minutes: await this.settings.duration,
+          minutes: this.settings.duration,
           command: opts.command })
         global.commons.sendMessage(message, opts.sender)
       }
@@ -187,7 +187,7 @@ class Duel extends Game {
           global.commons.sendMessage(message, opts.sender)
           break
         case ERROR_MINIMAL_BET:
-          bet = await this.settings.minimalBet
+          bet = this.settings.minimalBet
           message = await global.commons.prepare('gambling.duel.lowerThanMinimalBet', {
             pointsName: await global.systems.points.getPointsName(bet),
             points: bet,

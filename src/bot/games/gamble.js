@@ -43,10 +43,10 @@ class Gamble extends Game {
 
       if (parseInt(points, 10) === 0) throw Error(ERROR_ZERO_BET)
       if (pointsOfUser < points) throw Error(ERROR_NOT_ENOUGH_POINTS)
-      if (points < (await this.settings.minimalBet)) throw Error(ERROR_MINIMAL_BET)
+      if (points < (this.settings.minimalBet)) throw Error(ERROR_MINIMAL_BET)
 
       await global.db.engine.increment('users.points', { id: opts.sender.userId }, { points: parseInt(points, 10) * -1 })
-      if (_.random(0, 100, false) <= await this.settings.chanceToWin) {
+      if (_.random(0, 100, false) <= this.settings.chanceToWin) {
         await global.db.engine.increment('users.points', { id: opts.sender.userId }, { points: parseInt(points, 10) * 2 })
         let updatedPoints = await global.systems.points.getPointsOf(opts.sender.userId)
         message = await global.commons.prepare('gambling.gamble.win', {
@@ -80,7 +80,7 @@ class Gamble extends Game {
           global.commons.sendMessage(message, opts.sender)
           break
         case ERROR_MINIMAL_BET:
-          points = await this.settings.minimalBet
+          points = this.settings.minimalBet
           message = await global.commons.prepare('gambling.gamble.lowerThanMinimalBet', {
             pointsName: await global.systems.points.getPointsName(points),
             points: points

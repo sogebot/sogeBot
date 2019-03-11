@@ -34,7 +34,7 @@ class WheelOfFortune extends Game {
   sockets () {
     this.socket.on('connection', (socket) => {
       socket.on('win', async (index, username) => {
-        let options = JSON.parse(await this.settings.options.data)
+        let options = JSON.parse(this.settings.options.data)
         // compensate for slight delay
         setTimeout(() => {
           for (let response of options[index].responses) {
@@ -47,7 +47,7 @@ class WheelOfFortune extends Game {
 
   async main (opts) {
     if (isMainThread) {
-      const options = JSON.parse(await this.settings.options.data)
+      const options = JSON.parse(this.settings.options.data)
       global.panel.io.of('/games/wheeloffortune').emit('spin', { options, username: opts.sender.username })
     } else {
       global.workers.sendToMaster({ type: 'call', ns: 'games.wheelOfFortune', fnc: 'main', args: [opts] })

@@ -167,7 +167,7 @@ class Cooldown extends System {
         result = true
         continue
       } else {
-        if (!cooldown.quiet && !(await this.settings['cooldownNotifyAsWhisper'])) {
+        if (!cooldown.quiet && !(this.settings['cooldownNotifyAsWhisper'])) {
           opts.sender['message-type'] = 'whisper' // we want to whisp cooldown message
           let message = await global.commons.prepare('cooldowns.cooldown-triggered', { command: cooldown.key, seconds: Math.ceil((cooldown.miliseconds - now + timestamp) / 1000) })
           global.commons.sendMessage(message, opts.sender)
