@@ -145,6 +145,13 @@
     - _chat_: `!api`
     - _bot response_: `UserId: 1, id: 5, title: nesciunt quas odio, body: repudiandae veniam quaerat sunt sedalias aut fugiat sit autem sed estvoluptatem omnis possimus esse voluptatibus quisest aut tenetur dolor neque`
 
+### GET parameters
+
+You can add parameters to your urls, *note* you must escape your parameters where
+needed.
+
+e.g. `(api|https://httpbin.org/get?test=a\\nb) Lorem (api.args.test)`
+
 ## Command filters
 `(count)` - return how many times command was used
 
