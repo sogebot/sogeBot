@@ -87,7 +87,7 @@ class Quotes extends System {
   }
 
   async list (opts) {
-    const urlBase = await this.settings.urlBase
+    const urlBase = this.settings.urlBase
     const message = await global.commons.prepare(
       (['localhost', '127.0.0.1'].includes(urlBase) ? 'systems.quotes.list.is-localhost' : 'systems.quotes.list.ok'),
       { urlBase })

@@ -196,12 +196,12 @@ class OAuth extends Core {
     const url = 'https://id.twitch.tv/oauth2/validate'
     let status = true
     try {
-      if (['bot', 'broadcaster'].includes(type) && (await this.settings[type].accessToken) === '') throw new Error('no accessfresh token for ' + type)
+      if (['bot', 'broadcaster'].includes(type) && (this.settings[type].accessToken) === '') throw new Error('no accessfresh token for ' + type)
       else if (!['bot', 'broadcaster'].includes(type)) throw new Error(`Type ${type} is not supported`)
 
       const request = await axios.get(url, {
         headers: {
-          'Authorization': 'OAuth ' + await this.settings[type].accessToken
+          'Authorization': 'OAuth ' + this.settings[type].accessToken
         }
       })
       this.settings._.clientId = request.data.client_id
@@ -212,7 +212,7 @@ class OAuth extends Core {
       this.settings[type]._authenticatedScopes = request.data.scopes
       this.settings[type].username = request.data.login
 
-      const cache = await this.settings._[type]
+      const cache = this.settings._[type]
       if (cache !== '' && cache !== request.data.login + request.data.scopes.join(',')) {
         this.settings._[type] = request.data.login + request.data.scopes.join(',')
         global.tmi.reconnect(type) // force TMI reconnect
@@ -221,7 +221,7 @@ class OAuth extends Core {
       global.status.API = request.status === 200 ? constants.CONNECTED : constants.DISCONNECTED
     } catch (e) {
       status = false
-      if ((await this.settings[type].refreshToken) !== '') this.refreshAccessToken(type)
+      if ((this.settings[type].refreshToken) !== '') this.refreshAccessToken(type)
       else {
         this.settings[type].username = ''
         this.settings[type]._authenticatedScopes = []
@@ -250,10 +250,10 @@ class OAuth extends Core {
     global.log.warning('Refreshing access token of ' + type)
     const url = 'https://twitchtokengenerator.com/api/refresh/'
     try {
-      if (['bot', 'broadcaster'].includes(type) && (await this.settings[type].refreshToken) === '') throw new Error('no refresh token for ' + type)
+      if (['bot', 'broadcaster'].includes(type) && (this.settings[type].refreshToken) === '') throw new Error('no refresh token for ' + type)
       else if (!['bot', 'broadcaster'].includes(type)) throw new Error(`Type ${type} is not supported`)
 
-      const request = await axios.post(url + encodeURIComponent(await this.settings[type].refreshToken))
+      const request = await axios.post(url + encodeURIComponent(this.settings[type].refreshToken))
       this.settings[type].accessToken = request.data.token
       this.settings[type].refreshToken = request.data.refresh
 

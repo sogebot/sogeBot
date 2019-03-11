@@ -133,9 +133,9 @@ class Songs extends System {
   async getVolume (item) {
     if (!item.forceVolume) {
       item.loudness = !_.isNil(item.loudness) ? item.loudness : -15
-      const volume = await this.settings.volume
+      const volume = this.settings.volume
       var correction = Math.ceil((volume / 100) * 3)
-      var loudnessDiff = parseFloat(parseFloat(await this.settings._.meanLoudness) - item.loudness)
+      var loudnessDiff = parseFloat(parseFloat(this.settings._.meanLoudness) - item.loudness)
       return Math.round(volume + (correction * loudnessDiff))
     } else {
       return item.volume
@@ -143,7 +143,7 @@ class Songs extends System {
   }
 
   async getCurrentVolume (socket) {
-    socket.emit('newVolume', await this.getVolume(JSON.parse(await this.settings._.currentSong)))
+    socket.emit('newVolume', await this.getVolume(JSON.parse(this.settings._.currentSong)))
   }
 
   setTrim (socket, data) {
@@ -155,7 +155,7 @@ class Songs extends System {
   }
 
   async banCurrentSong (opts) {
-    let currentSong = JSON.parse(await this.settings._.currentSong)
+    let currentSong = JSON.parse(this.settings._.currentSong)
     if (_.isNil(currentSong.videoID)) return
 
     let update = await global.db.engine.update(this.collection.ban, { videoId: currentSong.videoID }, { videoId: currentSong.videoID, title: currentSong.title })
@@ -199,7 +199,7 @@ class Songs extends System {
 
               // send timeouts to all users who requested song
               const request = (await global.db.engine.find(this.collection.request, { videoID: opts.parameters })).map(o => o.username)
-              const currentSong = JSON.parse(await this.settings._.currentSong)
+              const currentSong = JSON.parse(this.settings._.currentSong)
               if (currentSong.videoID === opts.parameters) request.push(currentSong.username)
               for (let user of request) global.commons.timeout(user, global.translate('songs.bannedSongTimeout'), 300)
 
@@ -219,7 +219,7 @@ class Songs extends System {
     this.getMeanLoudness()
     this.refreshPlaylistVolume()
 
-    const currentSong = JSON.parse(await this.settings._.currentSong)
+    const currentSong = JSON.parse(this.settings._.currentSong)
     if (currentSong.videoID === opts.parameters) this.sendNextSongID() // skip song if its currently playing
     return { banned }
   }
@@ -236,7 +236,7 @@ class Songs extends System {
     }
 
     // check if there are any requests
-    if (await this.settings.songrequest) {
+    if (this.settings.songrequest) {
       let sr = await global.db.engine.find(this.collection.request)
       sr = _.head(_.orderBy(sr, ['addedAt'], ['asc']))
       if (!_.isNil(sr)) {
@@ -245,7 +245,7 @@ class Songs extends System {
         currentSong.type = 'songrequests'
         this.settings._.currentSong = JSON.stringify(currentSong)
 
-        if (await this.settings.notify) this.notifySong()
+        if (this.settings.notify) this.notifySong()
         this.socket.emit('videoID', currentSong)
         await global.db.engine.remove(this.collection.request, { videoID: sr.videoID })
         return
@@ -253,16 +253,16 @@ class Songs extends System {
     }
 
     // get song from playlist
-    if (await this.settings.playlist) {
+    if (this.settings.playlist) {
       let pl = await global.db.engine.find(this.collection.playlist)
       if (_.isEmpty(pl)) {
         this.socket.emit('videoID', null) // send null and skip to next empty song
         return // don't do anything if no songs in playlist
       }
-      pl = _.head(_.orderBy(pl, [(await this.settings.shuffle ? 'seed' : 'lastPlayedAt')], ['asc']))
+      pl = _.head(_.orderBy(pl, [(this.settings.shuffle ? 'seed' : 'lastPlayedAt')], ['asc']))
 
       // shuffled song is played again
-      if (await this.settings.shuffle && pl.seed === 1) {
+      if (this.settings.shuffle && pl.seed === 1) {
         await this.createRandomSeeds()
         this.sendNextSongID(this.socket) // retry with new seeds
         return
@@ -274,7 +274,7 @@ class Songs extends System {
       currentSong.type = 'playlist'
       this.settings._.currentSong = JSON.stringify(currentSong)
 
-      if (await this.settings.notify) this.notifySong()
+      if (this.settings.notify) this.notifySong()
 
       this.socket.emit('videoID', currentSong)
       return
@@ -286,7 +286,7 @@ class Songs extends System {
 
   async getCurrentSong () {
     let translation = 'songs.no-song-is-currently-playing'
-    const currentSong = JSON.parse(await this.settings._.currentSong)
+    const currentSong = JSON.parse(this.settings._.currentSong)
     if (!_.isNil(currentSong.title)) {
       if (currentSong.type === 'playlist') translation = 'songs.current-song-from-playlist'
       else translation = 'songs.current-song-from-songrequest'
@@ -297,7 +297,7 @@ class Songs extends System {
 
   async notifySong () {
     var translation
-    const currentSong = JSON.parse(await this.settings._.currentSong)
+    const currentSong = JSON.parse(this.settings._.currentSong)
     if (!_.isNil(currentSong.title)) {
       if (currentSong.type === 'playlist') translation = 'songs.current-song-from-playlist'
       else translation = 'songs.current-song-from-songrequest'
@@ -308,7 +308,7 @@ class Songs extends System {
 
   async stealSong () {
     try {
-      const currentSong = JSON.parse(await this.settings._.currentSong)
+      const currentSong = JSON.parse(this.settings._.currentSong)
       this.addSongToPlaylist({ sender: null, parameters: currentSong.videoID })
     } catch (err) {
       global.commons.sendMessage(global.translate('songs.noCurrentSong'), { username: await global.oauth.settings.broadcaster.username })
@@ -328,7 +328,7 @@ class Songs extends System {
 
   async addSongToQueue (opts) {
     if (opts.parameters.length < 1 || !this.settings.songrequest) {
-      if (await this.settings.songrequest) {
+      if (this.settings.songrequest) {
         global.commons.sendMessage(global.translate('core.usage') + ': !songrequest <video-id|video-url|search-string>', opts.sender)
       } else {
         global.commons.sendMessage('$sender, ' + global.translate('core.settings.songs.songrequest.false'), opts.sender)
@@ -371,7 +371,7 @@ class Songs extends System {
       if (err) return global.log.error(err, { fnc: 'Songs.prototype.addSongToQueue#1' })
       if (_.isUndefined(videoInfo) || _.isUndefined(videoInfo.title) || _.isNull(videoInfo.title)) {
         global.commons.sendMessage(global.translate('songs.song-was-not-found'), opts.sender)
-      } else if (videoInfo.length_seconds / 60 > await this.settings.duration) {
+      } else if (videoInfo.length_seconds / 60 > this.settings.duration) {
         global.commons.sendMessage(global.translate('songs.song-is-too-long'), opts.sender)
       } else {
         global.db.engine.update(this.collection.request, { addedAt: new Date().getTime() }, { videoID: videoID, title: videoInfo.title, addedAt: new Date().getTime(), loudness: videoInfo.loudness, length_seconds: videoInfo.length_seconds, username: opts.sender.username })

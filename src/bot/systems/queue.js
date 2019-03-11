@@ -73,8 +73,8 @@ class Queue extends System {
     let toReturn = []
     let i = 0
     for (let user of users) {
-      const isNotFollowerEligible = !user.is.follower && (await this.settings.eligibility.followers)
-      const isNotSubscriberEligible = !user.is.subscriber && (await this.settings.eligibility.subscribers)
+      const isNotFollowerEligible = !user.is.follower && (this.settings.eligibility.followers)
+      const isNotSubscriberEligible = !user.is.subscriber && (this.settings.eligibility.subscribers)
       if (isNotFollowerEligible && isNotSubscriberEligible) continue
 
       if (i < opts.amount) {
@@ -102,7 +102,7 @@ class Queue extends System {
   }
 
   async join (opts) {
-    if (!(await this.settings._.locked)) {
+    if (!(this.settings._.locked)) {
       let user = await global.db.engine.findOne('users', { username: opts.sender.username })
 
       const [all, followers, subscribers] = await Promise.all([this.settings.eligibility.all, this.settings.eligibility.followers, this.settings.eligibility.subscribers])

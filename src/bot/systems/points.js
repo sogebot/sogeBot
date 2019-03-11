@@ -209,10 +209,10 @@ class Points extends System {
   }
 
   async getPointsName (points) {
-    var pointsNames = (await this.settings.points.name).split('|').map(Function.prototype.call, String.prototype.trim)
+    var pointsNames = (this.settings.points.name).split('|').map(Function.prototype.call, String.prototype.trim)
     var single, multi, xmulti
     // get single|x:multi|multi from pointsName
-    if ((await this.settings.points.name).length === 0) {
+    if ((this.settings.points.name).length === 0) {
       return ''
     } else {
       switch (pointsNames.length) {

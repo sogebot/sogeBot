@@ -68,7 +68,7 @@ class FightMe extends Game {
           }),
           opts.sender)
         isMod = await global.commons.isBroadcaster(opts.sender) ? isMod.user : isMod.sender
-        if (!isMod) global.commons.timeout(await global.commons.isBroadcaster(opts.sender) ? username : opts.sender.username, null, await this.settings.timeout)
+        if (!isMod) global.commons.timeout(await global.commons.isBroadcaster(opts.sender) ? username : opts.sender.username, null, this.settings.timeout)
         global.db.engine.remove(this.collection.users, { _id: challenge._id.toString() })
         return
       }
@@ -90,7 +90,7 @@ class FightMe extends Game {
             loser: isMod.sender ? username : opts.sender.username
           }),
           opts.sender)
-        global.commons.timeout(isMod.sender ? username : opts.sender.username, null, await this.settings.timeout)
+        global.commons.timeout(isMod.sender ? username : opts.sender.username, null, this.settings.timeout)
         global.db.engine.remove(this.collection.users, { _id: challenge._id.toString() })
         return
       }
@@ -99,7 +99,7 @@ class FightMe extends Game {
       global.db.engine.increment('users.points', { id: winner ? opts.sender.userId : userId }, { points: Math.abs(Number(winnerWillGet)) })
       global.db.engine.increment('users.points', { id: !winner ? opts.sender.userId : userId }, { points: -Math.abs(Number(loserWillLose)) })
 
-      global.commons.timeout(winner ? opts.sender.username : username, null, await this.settings.timeout)
+      global.commons.timeout(winner ? opts.sender.username : username, null, this.settings.timeout)
       global.commons.sendMessage(global.commons.prepare('gambling.fightme.winner', {
         username,
         winner: winner ? username : opts.sender.username,
@@ -108,20 +108,20 @@ class FightMe extends Game {
       global.db.engine.remove(this.collection.users, { _id: challenge._id.toString() })
     } else {
       // check if under gambling cooldown
-      const cooldown = await this.settings.cooldown
+      const cooldown = this.settings.cooldown
       const isMod = await global.commons.isModerator(opts.sender)
-      if (new Date().getTime() - new Date(await this.settings._.cooldown).getTime() < cooldown * 1000 &&
-        !(await this.settings.bypassCooldownByOwnerAndMods && (isMod || await global.commons.isBroadcaster(opts.sender)))) {
+      if (new Date().getTime() - new Date(this.settings._.cooldown).getTime() < cooldown * 1000 &&
+        !(this.settings.bypassCooldownByOwnerAndMods && (isMod || await global.commons.isBroadcaster(opts.sender)))) {
         global.commons.sendMessage(global.commons.prepare('gambling.fightme.cooldown', {
           command: opts.command,
-          cooldown: Math.round(((cooldown * 1000) - (new Date().getTime() - new Date(await this.settings._.cooldown).getTime())) / 1000 / 60),
-          minutesName: global.commons.getLocalizedName(Math.round(((cooldown * 1000) - (new Date().getTime() - new Date(await this.settings._.cooldown).getTime())) / 1000 / 60), 'core.minutes')
+          cooldown: Math.round(((cooldown * 1000) - (new Date().getTime() - new Date(this.settings._.cooldown).getTime())) / 1000 / 60),
+          minutesName: global.commons.getLocalizedName(Math.round(((cooldown * 1000) - (new Date().getTime() - new Date(this.settings._.cooldown).getTime())) / 1000 / 60), 'core.minutes')
         }), opts.sender)
         return
       }
 
       // save new timestamp if not bypassed
-      if (!(await this.settings.bypassCooldownByOwnerAndMods && (isMod || await global.commons.isBroadcaster(opts.sender)))) this.settings._.cooldown = String(new Date())
+      if (!(this.settings.bypassCooldownByOwnerAndMods && (isMod || await global.commons.isBroadcaster(opts.sender)))) this.settings._.cooldown = String(new Date())
 
       const isAlreadyChallenged = !_.isEmpty(await global.db.engine.findOne(this.collection.users, { key: '_users', user: opts.sender.username, challenging: username }))
       if (!isAlreadyChallenged) await global.db.engine.insert(this.collection.users, { key: '_users', user: opts.sender.username, challenging: username })
