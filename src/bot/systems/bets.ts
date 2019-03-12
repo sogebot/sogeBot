@@ -9,7 +9,7 @@ import * as _ from 'lodash';
 
 // bot libraries
 import Expects from '../expects';
-import { permission, Permissions } from '../permissions';
+import { permission } from '../permissions';
 import System from './_interface';
 import * as Points from './points';
 
