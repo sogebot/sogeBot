@@ -301,8 +301,8 @@ class Module {
               else if (key === '_permissions') {
                 for (let [command, currentValue] of Object.entries(value)) {
                   command = this._commands.find(o => o.name === command)
-                  if (currentValue === command.permission) await global.db.engine.remove('permissions', { key: command.name })
-                  else await global.db.engine.update('permissions', { key: command.name }, { permission: currentValue })
+                  if (currentValue === command.permission) await global.db.engine.remove(global.permissions.collection.commands, { key: command.name })
+                  else await global.db.engine.update(global.permissions.collection.commands, { key: command.name }, { permission: currentValue })
                 }
               } else if (key === 'enabled') this.status({ state: value })
               else if (key === 'commands') {
@@ -602,8 +602,8 @@ class Module {
     promisedSettings._permissions = {}
     for (let command of this._commands) {
       const key = _.isNil(command.name) ? command : command.name
-      let pItem = await global.db.engine.findOne('permissions', { key })
-      if (!_.isEmpty(permission)) promisedSettings._permissions[key] = pItem.permission // change to custom permission
+      let pItem = await global.db.engine.findOne(global.permissions.collection.commands, { key })
+      if (!_.isEmpty(pItem)) promisedSettings._permissions[key] = pItem.permission // change to custom permission
       else promisedSettings._permissions[key] = _.isNil(command.permission) ? permission.VIEWERS : command.permission
     }
 
