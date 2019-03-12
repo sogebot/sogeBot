@@ -21,7 +21,7 @@ describe('Alias - run()', () => {
     await message.prepare()
   })
 
-  it.only('!a should show correctly command with link (skip is true)', async () => {
+  it('!a should show correctly command with link (skip is true)', async () => {
     global.systems.alias.add({ sender: owner, parameters: 'viewer !a !test http://google.com' })
     await message.isSent('alias.alias-was-added', owner, { alias: '!a', command: '!test http://google.com', sender: owner.username })
 
