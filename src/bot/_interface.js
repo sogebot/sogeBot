@@ -8,6 +8,7 @@ const {
 const constants = require('./constants')
 
 import { debug } from './debug';
+import { permission } from './permissions';
 
 class Module {
   timeouts = {}
@@ -234,19 +235,19 @@ class Module {
     if (this._settings.commands) {
       for (let i = 0, length = this._settings.commands.length; i < length; i++) {
         let key = this._settings.commands[i]
-        let permission = constants.VIEWERS
+        let pUuid = permission.VIEWERS;
         let fnc = null
         let isHelper = false
 
         if (_.isObjectLike(key)) {
-          permission = key.permission
+          pUuid = key.permission
           fnc = key.fnc || fnc
           isHelper = key.isHelper || false
           key = _.isObjectLike(key) ? key.name : key
         }
 
         // basic loadup of commands
-        this._commands.push({ name: key, permission, fnc, isHelper })
+        this._commands.push({ name: key, permission: pUuid, fnc, isHelper })
 
         commands[key] = key // remap to default value
       }
@@ -601,9 +602,9 @@ class Module {
     promisedSettings._permissions = {}
     for (let command of this._commands) {
       const key = _.isNil(command.name) ? command : command.name
-      let permission = await global.db.engine.findOne('permissions', { key })
-      if (!_.isEmpty(permission)) promisedSettings._permissions[key] = permission.permission // change to custom permission
-      else promisedSettings._permissions[key] = _.isNil(command.permission) ? constants.VIEWERS : command.permission
+      let pItem = await global.db.engine.findOne('permissions', { key })
+      if (!_.isEmpty(permission)) promisedSettings._permissions[key] = pItem.permission // change to custom permission
+      else promisedSettings._permissions[key] = _.isNil(command.permission) ? permission.VIEWERS : command.permission
     }
 
     return promisedSettings
@@ -615,7 +616,7 @@ class Module {
     let parsers = []
     for (let parser of this._parsers) {
       const defaults = {
-        permission: constants.VIEWERS,
+        permission: permission.VIEWERS,
         priority: constants.LOW
       }
 
@@ -671,7 +672,7 @@ class Module {
             command: this.settings.commands[command],
             fnc: this[fnc],
             _fncName: fnc,
-            permission: constants.VIEWERS,
+            permission: permission.VIEWERS,
             isHelper: false
           })
         } else if (typeof command === 'object') {

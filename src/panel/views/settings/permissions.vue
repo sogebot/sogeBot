@@ -52,8 +52,6 @@
   import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
   import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
 
-  import { permissions } from '../../../bot/_constants'
-
   library.add(faExclamationTriangle)
 
   export default Vue.extend({

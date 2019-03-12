@@ -9,6 +9,7 @@ const Parser = require('../parser')
 const constants = require('../constants')
 const Message = require('../message')
 import System from './_interface'
+import { permission } from '../permissions'
 
 /*
  * !alias                                               - gets an info about alias usage
@@ -24,13 +25,13 @@ class Alias extends System {
   constructor () {
     const settings = {
       commands: [
-        { name: '!alias add', permission: constants.OWNER_ONLY },
-        { name: '!alias edit', permission: constants.OWNER_ONLY },
-        { name: '!alias list', permission: constants.OWNER_ONLY },
-        { name: '!alias remove', permission: constants.OWNER_ONLY },
-        { name: '!alias toggle-visibility', permission: constants.OWNER_ONLY },
-        { name: '!alias toggle', permission: constants.OWNER_ONLY },
-        { name: '!alias', permission: constants.OWNER_ONLY }
+        { name: '!alias add', permission: permission.CASTERS },
+        { name: '!alias edit', permission: permission.CASTERS },
+        { name: '!alias list', permission: permission.CASTERS },
+        { name: '!alias remove', permission: permission.CASTERS },
+        { name: '!alias toggle-visibility', permission: permission.CASTERS },
+        { name: '!alias toggle', permission: permission.CASTERS },
+        { name: '!alias', permission: permission.CASTERS }
       ],
       parsers: [
         { name: 'run', fireAndForget: true }

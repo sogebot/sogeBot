@@ -3,6 +3,8 @@
 const util = require('util')
 const _ = require('lodash')
 
+import { Permissions } from './permissions'
+
 cluster()
 
 function cluster () {
@@ -17,7 +19,7 @@ function cluster () {
   global.events = new (require('./events.js'))()
   global.customvariables = new (require('./customvariables.js'))()
   global.twitch = new (require('./twitch'))()
-  global.permissions = new (require('./permissions'))()
+  global.permissions = new Permissions()
 
   global.lib = {}
   global.lib.translate = new (require('./translate'))()

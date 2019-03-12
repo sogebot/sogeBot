@@ -3,9 +3,7 @@
 const _ = require('lodash')
 
 const constants = require('./constants')
-
-const __DEBUG__ =
-  (process.env.DEBUG && process.env.DEBUG.includes('parser'));
+import { debug } from './debug';
 
 class Parser {
   constructor (opts) {
@@ -39,9 +37,7 @@ class Parser {
       }
       const isOk = await parser['fnc'].apply(parser.this, [opts])
       if (!isOk) {
-        if (__DEBUG__) {
-          global.log.debug(parser['fnc']);
-        }
+        debug('parser.isModerated', 'Moderation failed ' + JSON.stringify(parser['fnc']))
         return true
       }
     }
@@ -58,11 +54,12 @@ class Parser {
         global.commons.isOwner(this.sender)
       ])
 
-      if (_.isNil(this.sender) || // if user is null -> we are running command through a bot
-        this.skip || (parser.permission === constants.VIEWERS) ||
-        (parser.permission === constants.REGULAR && (isRegular || isMod || isOwner)) ||
-        (parser.permission === constants.MODS && (isMod || isOwner)) ||
-        (parser.permission === constants.OWNER_ONLY && isOwner)) {
+      debug('parser.process', 'Processing ' + JSON.stringify(parser.fnc))
+      if (
+        _.isNil(this.sender) // if user is null -> we are running command through a bot
+        || this.skip
+        || (await global.permissions.check(this.sender.userId, parser.permission, false)).access
+      ) {
         const opts = {
           sender: this.sender,
           message: this.message.trim(),
@@ -174,11 +171,11 @@ class Parser {
       global.commons.isOwner(sender)
     ])
 
-    if (_.isNil(sender) || // if user is null -> we are running command through a bot
-      this.skip || (command.permission === constants.VIEWERS) ||
-      (command.permission === constants.REGULAR && (isRegular || isMod || isOwner)) ||
-      (command.permission === constants.MODS && (isMod || isOwner)) ||
-      (command.permission === constants.OWNER_ONLY && isOwner)) {
+    if (
+      _.isNil(this.sender) // if user is null -> we are running command through a bot
+      || this.skip
+      || (await global.permissions.check(this.sender.userId, command.permission, false)).access
+    ) {
       var text = message.trim().replace(new RegExp('^(' + command.command + ')', 'i'), '').trim()
       let opts = {
         sender: _.isNil(sender) ? { username: global.oauth.settings.bot.username.toLowerCase() } : sender,

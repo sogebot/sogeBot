@@ -1,8 +1,16 @@
 'use strict';
 
 import * as _ from 'lodash';
-import { v4 as uuid } from 'uuid';
 import Core from './_interface';
+import { debug } from './debug';
+
+const permission = Object.freeze({
+  CASTERS: '4300ed23-dca0-4ed9-8014-f5f2f7af55a9',
+  MODERATORS: 'b38c5adb-e912-47e3-937a-89fabd12393a',
+  SUBSCRIBERS: 'e3b557e7-c26a-433c-a183-e56c11003ab7',
+  VIEWERS: '0efd7b1c-e460-4167-8e06-8aaf2c170311',
+  FOLLOWERS: 'c168a63b-aded-4a90-978f-ed357e95b0d2',
+});
 
 class Permissions extends Core {
   [x: string]: any; // TODO: remove after interface ported to TS
@@ -33,25 +41,25 @@ class Permissions extends Core {
       { from: 'users.messages', as: 'messages', foreignField: 'id', localField: 'id' },
       { from: 'users.watched', as: 'watched', foreignField: 'id', localField: 'id' },
     ]);
-    const permission: Permissions.Item = await global.db.engine.findOne(this.collection.data, { id: permId });
+    const pItem: Permissions.Item = await global.db.engine.findOne(this.collection.data, { id: permId });
 
     try {
       if (typeof user.id === 'undefined') {
         throw Error(`User ${userId} doesn't exist`);
       }
-      if (typeof permission.id === 'undefined') {
+      if (typeof pItem.id === 'undefined') {
         throw Error(`Permissions ${permId} doesn't exist`);
       }
 
       // if userId is part of userIds => true
-      if (permission.userIds.includes(userId)) {
-        return { access: true, permission };
+      if (pItem.userIds.includes(userId)) {
+        return { access: true, permission: pItem };
       }
 
       // get all higher permissions to check if not partial check only
       if (!partial) {
         const partialPermission: Permissions.Item[] = (await global.db.engine.find(this.collection.data)).filter((o) => {
-          return o.order < permission.order;
+          return o.order < pItem.order;
         });
         for (const p of _.orderBy(partialPermission, 'order', 'asc')) {
           const partialCheck = await this.check(userId, p.id, true);
@@ -62,7 +70,7 @@ class Permissions extends Core {
       }
 
       let shouldProceed = false;
-      switch (permission.automation) {
+      switch (pItem.automation) {
         case 'viewers':
           shouldProceed = true;
           break;
@@ -82,10 +90,11 @@ class Permissions extends Core {
           shouldProceed = false; // we don't have any automation
           break;
       }
-      return { access: shouldProceed && this.filters(user, permission.filters), permission };
+      debug('permissions.check', JSON.stringify({ access: shouldProceed && this.filters(user, pItem.filters), permission: pItem }));
+      return { access: shouldProceed && this.filters(user, pItem.filters), permission: pItem };
     } catch (e) {
-      global.log.error(e);
-      return { access: false, permission };
+      global.log.error(e.stack);
+      return { access: false, permission: pItem };
     }
   }
 
@@ -203,7 +212,7 @@ class Permissions extends Core {
 
     if (!p.find((o) => o.isCorePermission && o.automation === 'casters')) {
       await global.db.engine.insert(this.collection.data, {
-        id: uuid(),
+        id: permission.CASTERS,
         name: 'Casters',
         automation: 'casters',
         isCorePermission: true,
@@ -216,7 +225,7 @@ class Permissions extends Core {
 
     if (!p.find((o) => o.isCorePermission && o.automation === 'moderators')) {
       await global.db.engine.insert(this.collection.data, {
-        id: uuid(),
+        id: permission.MODERATORS,
         name: 'Moderators',
         automation: 'moderators',
         isCorePermission: true,
@@ -229,7 +238,7 @@ class Permissions extends Core {
 
     if (!p.find((o) => o.isCorePermission && o.automation === 'subscribers')) {
       await global.db.engine.insert(this.collection.data, {
-        id: uuid(),
+        id: permission.SUBSCRIBERS,
         name: 'Subscribers',
         automation: 'subscribers',
         isCorePermission: true,
@@ -242,7 +251,7 @@ class Permissions extends Core {
 
     if (!p.find((o) => o.isCorePermission && o.automation === 'followers')) {
       await global.db.engine.insert(this.collection.data, {
-        id: uuid(),
+        id: permission.FOLLOWERS,
         name: 'Followers',
         automation: 'followers',
         isCorePermission: true,
@@ -255,7 +264,7 @@ class Permissions extends Core {
 
     if (!p.find((o) => o.isCorePermission && o.automation === 'viewers')) {
       await global.db.engine.insert(this.collection.data, {
-        id: uuid(),
+        id: permission.VIEWERS,
         name: 'Viewers',
         automation: 'viewers',
         isCorePermission: true,
@@ -268,4 +277,4 @@ class Permissions extends Core {
   }
 }
 
-module.exports = Permissions;
+export { permission, Permissions };
