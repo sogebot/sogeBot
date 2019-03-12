@@ -9,7 +9,7 @@
 ``` typescript
 // bot libraries
 import System from './_interface';
-import { permissions } from '../permission';
+import { permissions } from '../permission'; // set of core permissions
 
 class Yoursystem extends System {
   [x: string]: any;
@@ -54,7 +54,7 @@ Settings variable may contain settings for `yoursystem`
 
 ##### Default values
 
-* `permission`: sets default permission for command. `constants.VIEWERS`
+* `permission`: sets default permission for command. `permissions.VIEWERS`
 * `fnc`: created from second part of command name, if there is no second part
   `main` is default function
 * `isHelper`: mark this command as helper function (e.g. price check is skipped
