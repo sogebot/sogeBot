@@ -10,6 +10,7 @@ const safeEval = require('safe-eval')
 // bot libraries
 import { permission } from '../permissions';
 import System from './_interface'
+import * as constants from '../constants'
 const Expects = require('../expects')
 
 /*

@@ -4,6 +4,7 @@
 const _ = require('lodash')
 const XRegExp = require('xregexp')
 // bot libraries
+import * as constants from '../constants'
 import { permission } from '../permissions';
 const Message = require('../message')
 import System from './_interface'
