@@ -8,8 +8,9 @@ const {
 import { DateTime } from 'luxon';
 
 // bot libraries
-import constants from '../constants';
+import * as constants from '../constants';
 import Expects from '../expects.js';
+import { permission } from '../permissions';
 import System from './_interface';
 
 import { debug } from '../debug';
@@ -42,9 +43,9 @@ class Scrim extends System {
           waitForMatchIdsInSeconds: 60,
         },
         commands: [
-          { name: '!snipe', permission: constants.OWNER_ONLY },
-          { name: '!snipe match', permission: constants.VIEWERS },
-          { name: '!snipe stop', permission: constants.VIEWERS },
+          { name: '!snipe', permission: permission.CASTERS },
+          '!snipe match',
+          '!snipe stop',
         ],
       },
     };

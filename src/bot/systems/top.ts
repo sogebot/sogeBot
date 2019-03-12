@@ -5,7 +5,7 @@ import * as _ from 'lodash';
 import * as moment from 'moment-timezone';
 
 // bot libraries
-import constants from '../constants';
+import { permission } from '../permissions';
 import System from './_interface';
 
 enum TYPE {
@@ -42,14 +42,14 @@ class Top extends System {
     const options: InterfaceSettings = {
       settings: {
         commands: [
-          { name: '!top time', permission: constants.OWNER_ONLY },
-          { name: '!top tips', permission: constants.OWNER_ONLY },
-          { name: '!top points', permission: constants.OWNER_ONLY },
-          { name: '!top messages', permission: constants.OWNER_ONLY },
-          { name: '!top followage', permission: constants.OWNER_ONLY },
-          { name: '!top subage', permission: constants.OWNER_ONLY },
-          { name: '!top bits', permission: constants.OWNER_ONLY },
-          { name: '!top gifts', permission: constants.OWNER_ONLY },
+          { name: '!top time', permission: permission.CASTERS },
+          { name: '!top tips', permission: permission.CASTERS },
+          { name: '!top points', permission: permission.CASTERS },
+          { name: '!top messages', permission: permission.CASTERS },
+          { name: '!top followage', permission: permission.CASTERS },
+          { name: '!top subage', permission: permission.CASTERS },
+          { name: '!top bits', permission: permission.CASTERS },
+          { name: '!top gifts', permission: permission.CASTERS },
         ],
       },
     };

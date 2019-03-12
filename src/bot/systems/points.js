@@ -7,7 +7,7 @@ const {
 } = require('worker_threads');
 
 // bot libraries
-const constants = require('../constants')
+import { permission } from '../permissions';
 import System from './_interface'
 const Expects = require('../expects')
 
@@ -29,12 +29,12 @@ class Points extends System {
         { name: 'messagePoints', fireAndForget: true }
       ],
       commands: [
-        { name: '!points add', permission: constants.OWNER_ONLY },
-        { name: '!points remove', permission: constants.OWNER_ONLY },
-        { name: '!points all', permission: constants.OWNER_ONLY },
-        { name: '!points set', permission: constants.OWNER_ONLY },
-        { name: '!points get', permission: constants.OWNER_ONLY },
-        { name: '!makeitrain', fnc: 'rain', permission: constants.OWNER_ONLY },
+        { name: '!points add', permission: permission.CASTERS },
+        { name: '!points remove', permission: permission.CASTERS },
+        { name: '!points all', permission: permission.CASTERS },
+        { name: '!points set', permission: permission.CASTERS },
+        { name: '!points get', permission: permission.CASTERS },
+        { name: '!makeitrain', fnc: 'rain', permission: permission.CASTERS },
         '!points give',
         '!points'
       ]

@@ -9,7 +9,7 @@ const Parser = require('../parser')
 const constants = require('../constants')
 const Message = require('../message')
 import System from './_interface'
-import { permission } from '../permissions'
+import { permission } from '../permissions';
 
 /*
  * !alias                                               - gets an info about alias usage
@@ -85,10 +85,7 @@ class Alias extends System {
       // Don't run alias if its same as command e.g. alias !me -> command !me
       if (alias.command === alias.alias) {
         global.log.warning(`Cannot run alias ${alias.alias}, because it exec ${alias.command}`)
-      } else if (alias.permission === constants.VIEWERS ||
-        (alias.permission === constants.REGULAR && (isRegular || isMod || isOwner)) ||
-        (alias.permission === constants.MODS && (isMod || isOwner)) ||
-        (alias.permission === constants.OWNER_ONLY && isOwner)) {
+      } else if (await global.permission.check(opts.sender.userId, alias.permission)) {
         // parse variables
         const message = await new Message(opts.message.replace(replace, `${alias.command}`)).parse({
           sender: opts.sender
@@ -120,20 +117,17 @@ class Alias extends System {
       return false
     }
 
-    let permission = constants.VIEWERS
+    let pUuid = permission.VIEWERS
     switch (match.permission) {
       case 'owner':
-        permission = constants.OWNER_ONLY
+        pUuid = permission.CASTERS
         break
       case 'mod':
-        permission = constants.MODS
-        break
-      case 'regular':
-        permission = constants.REGULAR
+        pUuid = permission.MODERATORS
         break
     }
 
-    await global.db.engine.update(this.collection.data, { alias: match.alias }, { command: match.command, permission: permission })
+    await global.db.engine.update(this.collection.data, { alias: match.alias }, { command: match.command, permission: pUuid })
 
     let message = await global.commons.prepare('alias.alias-was-edited', { alias: match.alias, command: match.command })
     global.commons.sendMessage(message, opts.sender)
@@ -148,16 +142,13 @@ class Alias extends System {
       return false
     }
 
-    let permission = constants.VIEWERS
+    let pUuid = permission.VIEWERS
     switch (match.permission) {
       case 'owner':
-        permission = constants.OWNER_ONLY
+        pUuid = permission.CASTERS
         break
       case 'mod':
-        permission = constants.MODS
-        break
-      case 'regular':
-        permission = constants.REGULAR
+        pUuid = permission.MODERATORS
         break
     }
 
@@ -166,7 +157,7 @@ class Alias extends System {
       command: match.command,
       enabled: true,
       visible: true,
-      permission: permission
+      permission: pUuid
     }
     await global.db.engine.insert(this.collection.data, alias)
     let message = await global.commons.prepare('alias.alias-was-added', alias)

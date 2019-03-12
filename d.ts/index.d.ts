@@ -47,7 +47,7 @@ type Command = {
   name: string,
   fnc?: string,
   isHelper?: boolean,
-  permission?: number
+  permission?: string
 }
 
 type onEventSub = {

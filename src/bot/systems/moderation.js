@@ -4,7 +4,7 @@
 const _ = require('lodash')
 const XRegExp = require('xregexp')
 // bot libraries
-var constants = require('../constants')
+import { permission } from '../permissions';
 const Message = require('../message')
 import System from './_interface'
 var log = global.log
@@ -70,7 +70,7 @@ class Moderation extends System {
         shouldClearChat: true
       },
       commands: [
-        { name: '!permit', fnc: 'permitLink', permission: constants.OWNER_ONLY }
+        { name: '!permit', fnc: 'permitLink', permission: permission.CASTERS }
       ],
       parsers: [
         { name: 'containsLink', priority: constants.MODERATION },

@@ -4,7 +4,7 @@
 
 // 3rdparty libraries
 const _ = require('lodash')
-const constants = require('../constants.js')
+import { permission } from '../permissions';
 const {
   isMainThread
 } = require('worker_threads');
@@ -16,7 +16,7 @@ class Alerts extends Overlay {
   constructor () {
     const settings = {
       commands: [
-        { name: '!alert', fnc: 'overlay', permission: constants.OWNER_ONLY }
+        { name: '!alert', fnc: 'overlay', permission: permission.CASTERS }
       ]
     }
     // define special property name as readonly

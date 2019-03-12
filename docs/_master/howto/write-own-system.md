@@ -8,6 +8,7 @@
 
 ``` typescript
 // bot libraries
+const constants = require('../constants')
 import System from './_interface';
 import { permissions } from '../permission'; // set of core permissions
 

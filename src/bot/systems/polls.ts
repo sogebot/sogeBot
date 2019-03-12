@@ -8,8 +8,8 @@ const {
 import * as _ from 'lodash';
 
 // bot libraries
-import constants from '../constants';
 import Expects from '../expects.js';
+import { permission } from '../permissions';
 import System from './_interface';
 
 enum ERROR {
@@ -44,8 +44,8 @@ class Polls extends System {
         },
         commands: [
           { name: '!vote', isHelper: true },
-          { name: '!poll open', permission: constants.MODS },
-          { name: '!poll close', permission: constants.MODS },
+          { name: '!poll open', permission: permission.MODERATORS },
+          { name: '!poll close', permission: permission.MODERATORS },
         ],
       },
       on: {

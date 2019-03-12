@@ -4,7 +4,7 @@ const _ = require('lodash')
 
 // bot libraries
 import System from './_interface'
-const constants = require('../constants')
+import { permission } from '../permissions';
 
 /*
  * !queue                            - gets an info whether queue is opened or closed
@@ -28,12 +28,12 @@ class Queue extends System {
         subscribers: true
       },
       commands: [
-        { name: '!queue random', permission: constants.OWNER_ONLY },
-        { name: '!queue pick', permission: constants.OWNER_ONLY },
-        { name: '!queue clear', permission: constants.OWNER_ONLY },
-        { name: '!queue close', permission: constants.OWNER_ONLY },
-        { name: '!queue open', permission: constants.OWNER_ONLY },
-        { name: '!queue list', permission: constants.OWNER_ONLY },
+        { name: '!queue random', permission: permission.CASTERS },
+        { name: '!queue pick', permission: permission.CASTERS },
+        { name: '!queue clear', permission: permission.CASTERS },
+        { name: '!queue close', permission: permission.CASTERS },
+        { name: '!queue open', permission: permission.CASTERS },
+        { name: '!queue list', permission: permission.CASTERS },
         '!queue join',
         '!queue'
       ]

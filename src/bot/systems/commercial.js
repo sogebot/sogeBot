@@ -5,7 +5,7 @@ const _ = require('lodash')
 const axios = require('axios')
 
 // bot libraries
-const constants = require('../constants')
+import { permission } from '../permissions';
 import System from './_interface'
 
 /*
@@ -17,7 +17,7 @@ class Commercial extends System {
   constructor () {
     const settings = {
       commands: [
-        { name: '!commercial', permission: constants.OWNER_ONLY, isHelper: true }
+        { name: '!commercial', permission: permission.CASTERS, isHelper: true }
       ]
     }
 
