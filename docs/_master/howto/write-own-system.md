@@ -8,8 +8,8 @@
 
 ``` typescript
 // bot libraries
-import * as constants from '../constants';
 import System from './_interface';
+import { permissions } from '../permission';
 
 class Yoursystem extends System {
   [x: string]: any;
@@ -32,6 +32,7 @@ module.exports = new Yoursystem()
 ```
 
 ### Depends on different system
+
 Some systems have dependencies, e.g. bet system cannot work without points system
 
 ``` typescript
@@ -46,13 +47,18 @@ const options: InterfaceSettings = {
 Settings variable may contain settings for `yoursystem`
 
 #### Commands
+
 ##### Required values
-- `name`: name of command started with `!`, this is how you will trigger command, e.g. `!command`, `!command help`
+
+ `name`: name of command started with `!`, this is how you will trigger command, e.g. `!command`, `!command help`
 
 ##### Default values
-- `permission`: sets default permission for command. `constants.VIEWERS`
-- `fnc`: created from second part of command name, if there is no second part `main` is default function
-- `isHelper`: mark this command as helper function (e.g. price check is skipped for this command). `false`
+
+* `permission`: sets default permission for command. `constants.VIEWERS`
+* `fnc`: created from second part of command name, if there is no second part
+  `main` is default function
+* `isHelper`: mark this command as helper function (e.g. price check is skipped
+  for this command). `false`
 
 ``` typescript
 const options: InterfaceSettings = {
@@ -62,7 +68,7 @@ const options: InterfaceSettings = {
     commands: [
       '!command1', // creates !command1 with default values
       { name: '!command2' }, // same as !command1
-      { name: `!command3`, fnc: 'command3', permission: constants.OWNER_ONLY } // with custom values
+      { name: `!command3`, fnc: 'command3', permission: permissions.CASTERS } // with custom values
     ],
     // ...
   },
@@ -71,13 +77,18 @@ const options: InterfaceSettings = {
 ```
 
 #### Parsers
+
 ##### Required values
-- `name`: name of parser, this will also set function which will run in system
+
+* `name`: name of parser, this will also set function which will run in system
 
 ##### Default values
-- `fireAndForget`: if parser should run in background and we don't care about result, e.g. stats counting. `false`
-- `priority`: what priority should be given to parser, higher priority, sooner it will run. `constants.LOW`
-- `permission`: sets default permission for parser. `constants.VIEWERS`
+
+* `fireAndForget`: if parser should run in background and we don't care about
+  result, e.g. stats counting. `false`
+* `priority`: what priority should be given to parser, higher priority, sooner
+  it will run. `constants.LOW`
+* `permission`: sets default permission for parser. `permission.VIEWERS`
 
 ``` typescript
 const options: InterfaceSettings = {
