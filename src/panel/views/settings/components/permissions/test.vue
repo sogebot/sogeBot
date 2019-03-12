@@ -59,7 +59,6 @@
   import { faVial, faSpinner, faTimes, faQuestion } from '@fortawesome/free-solid-svg-icons';
 
   import * as io from 'socket.io-client';
-  import * as _ from 'lodash';
   import * as uuid from 'uuid/v4';
 
   library.add(faVial, faSpinner, faTimes, faQuestion);

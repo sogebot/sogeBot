@@ -12,9 +12,7 @@ const _ = require('lodash')
 const chalk = require('chalk')
 const gitCommitInfo = require('git-commit-info');
 
-const {
-  Worker, MessageChannel, MessagePort, isMainThread,
-} = require('worker_threads');
+const { isMainThread, } = require('worker_threads');
 
 const constants = require('./constants')
 const config = require('@config')

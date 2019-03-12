@@ -55,8 +55,6 @@
   import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
   import { faTimes } from '@fortawesome/free-solid-svg-icons';
 
-  import * as io from 'socket.io-client';
-
   library.add(faTimes);
 
   export default Vue.extend({
