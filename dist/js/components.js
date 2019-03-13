@@ -155,8 +155,12 @@ window.commandInputWithPermissions = {
       const permission = this.permissionsList.find((o) => {
         return o.id === id
       })
-        if (typeof permission !== 'undefined') {
-        return permission.name
+      if (typeof permission !== 'undefined') {
+        if (permission.name.trim() === '') {
+          return permission.id
+        } else {
+          return permission.name
+        }
       } else {
         return null
       }
@@ -203,18 +207,18 @@ window.commandInputWithPermissions = {
               <span class="sr-only">Loading...</span>
             </div>
           </button>
-          <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-          <button
-            v-if="permissionsLoaded"
-            v-for="p of permissionsList"
-            class="dropdown-item"
-            @click="currentPermissions = p.id"
-          >{{p.name}}</button>
-          <button
-            v-if="permissionsLoaded"
-            class="dropdown-item"
-            @click="currentPermissions = null"
-          >Disabled</button>
+          <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="z-index: 9999;">
+            <button
+              v-if="permissionsLoaded"
+              v-for="p of permissionsList"
+              class="dropdown-item"
+              @click="currentPermissions = p.id"
+            >{{getPermissionName(p.id)}}</button>
+            <button
+              v-if="permissionsLoaded"
+              class="dropdown-item"
+              @click="currentPermissions = null"
+            >Disabled</button>
           </div>
         </div>
       </div>
