@@ -22,19 +22,19 @@
 ### Examples
 
 <blockquote>
-  <strong>testuser:</strong> !command add !test me<br>
+  <strong>testuser:</strong> !command add -c !test -r me<br>
   <strong>bot:</strong> @testuser, command !test was added.
 </blockquote>
 
 <blockquote>
   <em>/ create command only for mods /</em><br>
-  <strong>testuser:</strong> !command add -ul mods !test me<br>
+  <strong>testuser:</strong> !command add -p mods -c !test -r me<br>
   <strong>bot:</strong> @testuser, command !test was added.
 </blockquote>
 
 <blockquote>
   <em>/ create command only for mods and stop if executed /</em><br>
-  <strong>testuser:</strong> !command add -ul mods -s true !test me<br>
+  <strong>testuser:</strong> !command add -p mods -s true -c !test -r me<br>
   <strong>bot:</strong> @testuser, command !test was added.
 </blockquote>
 
@@ -64,19 +64,19 @@
 ### Examples
 
 <blockquote>
-  <strong>testuser:</strong> !command edit !test 1 me<br>
+  <strong>testuser:</strong> !command edit -c !test -rid 1 -r me<br>
   <strong>bot:</strong> @testuser, command !test is changed to 'me'
 </blockquote>
 
 <blockquote>
   <em>/ set command only for mods /</em><br>
-  <strong>testuser:</strong> !command edit -ul mods !test 1 me<br>
+  <strong>testuser:</strong> !command edit -p mods -c !test -rid 1 -r me<br>
   <strong>bot:</strong> @testuser, command !test is changed to 'me'
 </blockquote>
 
 <blockquote>
   <em>/ set command only for mods and stop if executed /</em><br>
-  <strong>testuser:</strong> !command edit -ul mods -s true !test 1 me<br>
+  <strong>testuser:</strong> !command edit -p mods -s true -c !test -rid 1 -r me<br>
   <strong>bot:</strong> @testuser, command !test is changed to 'me'
 </blockquote>
 
