@@ -160,7 +160,7 @@ class CustomCommands extends System {
   async edit (opts: Object) {
     try {
       const [userlevel, stopIfExecuted, command, rId, response] = new Expects(opts.parameters)
-        .argument({ optional: true, name: 'ul', default: null })
+        .permission({ optional: true, default: permission.VIEWERS })
         .argument({ optional: true, name: 's', default: null, type: Boolean })
         .command()
         .number()
@@ -173,9 +173,15 @@ class CustomCommands extends System {
       let rDb = await global.db.engine.findOne(this.collection.responses, { cid: String(cDb._id), order: rId - 1 })
       if (!rDb._id) return global.commons.sendMessage(global.commons.prepare('customcmds.response-was-not-found', { command, response: rId }), opts.sender)
 
+
+      const pItem: Permissions.Item | null = await global.permissions.get(userlevel);
+      if (!pItem) {
+        throw Error('Permission ' + perm + ' not found.');
+      }
+
       const _id = rDb._id; delete rDb._id
       rDb.response = response
-      if (userlevel) rDb.permission = userlevel
+      rDb.permission = pItem.id
       if (stopIfExecuted) rDb.stopIfExecuted = stopIfExecuted
 
       await global.db.engine.update(this.collection.responses, { _id }, rDb)
@@ -200,7 +206,6 @@ class CustomCommands extends System {
           command, enabled: true, visible: true
         })
       }
-
 
       const pItem: Permissions.Item | null = await global.permissions.get(userlevel);
       if (!pItem) {

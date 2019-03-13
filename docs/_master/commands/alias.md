@@ -7,11 +7,14 @@
 ### Parameters
 
 - `-p <uuid|name>`
-  - optional: default value viewers
-  - can be used names of permissions or theirs exact uuid
-  - core values: casters, moderators, subscribers, viewers, followers
-- `-a <!alias>` - alias to be added
-- `-c <!command>` - command to be aliased
+  - *optional string / uuid* - can be used names of permissions or theirs exact uuid
+  - *default value:* viewers
+  - *available values:* list of permission can be obtained by `!permissions list`
+    or in UI
+- `-a <!alias>`
+  - alias to be added
+- `-c <!command>`
+  - command to be aliased
 
 ### Examples
 
@@ -29,11 +32,14 @@
 ### Parameters
 
 - `-p <uuid|name>`
-  - optional: default value viewers
-  - can be used names of permissions or theirs exact uuid
-  - core values: casters, moderators, subscribers, viewers, followers
-- `-a <!alias>` - alias to be added
-- `-c <!command>` - command to be aliased
+  - *optional string / uuid* - can be used names of permissions or theirs exact uuid
+  - *default value:* viewers
+  - *available values:* list of permission can be obtained by `!permissions list`
+    or in UI
+- `-a <!alias>`
+  - alias to be added
+- `-c <!command>`
+  - command to be aliased
 
 ### Examples
 

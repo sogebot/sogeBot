@@ -1,16 +1,23 @@
 ## Add a new command
 
-`!command add <!command> <response>`
+`!command add (-p <uuid|name>) (-s) -c <!command> -r <response>`
 
-!> Default permission is **OWNER**
+!> Default permission is **CASTERS**
 
 ### Parameters
 
-- `-ul` - *optional string* - required userlevel of user
-  - *default value:* viewer
-  - *available values:* viewer, mods, regular, owner
-- `-s` - *optional boolean* - stop execution after response is sent
+- `-p <uuid|name>`
+  - *optional string / uuid* - can be used names of permissions or theirs exact uuid
+  - *default value:* viewers
+  - *available values:* list of permission can be obtained by `!permissions list`
+    or in UI
+- `-s`
+  - *optional boolean* - stop execution after response is sent
   - *default value:* false
+- `-c <!command>`
+  - command to be added
+- `-r <response>`
+  - response to be set
 
 ### Examples
 
@@ -33,17 +40,26 @@
 
 ## Edit a response of command
 
-`!command edit <!command> <responseId> <response>`
+`!command edit (-p <uuid|name>) (-s) -c <!command> -rid <responseId> -r <response>`
 
-!> Default permission is **OWNER**
+!> Default permission is **CASTERS**
 
 ### Parameters
 
-- `-ul` - *optional string* - required userlevel of user
-  - *default value:* viewer
-  - *available values:* viewer, mods, regular, owner
-- `-s` - *optional boolean* - stop execution after response is sent
+- `-p <uuid|name>`
+  - *optional string / uuid* - can be used names of permissions or theirs exact uuid
+  - *default value:* viewers
+  - *available values:* list of permission can be obtained by `!permissions list`
+    or in UI
+- `-s`
+  - *optional boolean* - stop execution after response is sent
   - *default value:* false
+- `-c <!command>`
+  - command to be edited
+- `-rid <responseId>`
+  - response id to be updated
+- `-r <response>`
+  - response to be set
 
 ### Examples
 
@@ -64,39 +80,39 @@
   <strong>bot:</strong> @testuser, command !test is changed to 'me'
 </blockquote>
 
-## Remove a command
+## Remove a command or a response
 
-`!command remove <!command>`
+`!command remove -c <!command> (-rid <responseId>)`
 
-!> Default permission is **OWNER**
+!> Default permission is **CASTERS**
+
+### Parameters
+
+- `-c <!command>`
+  - command to be removed
+- `-rid <responseId>`
+  - *optional*
+  - response id to be updatedremoved
 
 ### Examples
 
 <blockquote>
-  <strong>testuser:</strong> !command remove !test <br>
+  <strong>testuser:</strong> !command remove -c !test <br>
   <strong>bot:</strong> @testuser, command !test was removed
 </blockquote>
 
 <blockquote style="border-left-color: #f66">
-  <strong>testuser:</strong> !command remove !nonexisting <br>
+  <strong>testuser:</strong> !command remove -c !nonexisting <br>
   <strong>bot:</strong> @testuser, command !test was not found
 </blockquote>
 
-## Remove a response of command
-
-`!command remove <!command> <responseId>`
-
-!> Default permission is **OWNER**
-
-### Examples
-
 <blockquote>
-  <strong>testuser:</strong> !command remove !test 1<br>
+  <strong>testuser:</strong> !command remove -c !test -rid 1<br>
   <strong>bot:</strong> @testuser, command !test was removed
 </blockquote>
 
 <blockquote style="border-left-color: #f66">
-  <strong>testuser:</strong> !command remove !test 2 <br>
+  <strong>testuser:</strong> !command remove -c !test -rid 2 <br>
   <strong>bot:</strong> @testuser, response #2 of command !test
   was not found in database
 </blockquote>
@@ -105,7 +121,7 @@
 
 `!command list`
 
-!> Default permission is **OWNER**
+!> Default permission is **CASTERS**
 
 ### Examples
 
@@ -118,11 +134,11 @@
 
 `!command list !command`
 
-!> Default permission is **OWNER**
+!> Default permission is **CASTERS**
 
 ### Output
 
-!`command`#`responseId` (for `userlevel`) `stop`| `response`
+!`command`#`responseId` (for `permission`) `stop`| `response`
 
 ### Examples
 
@@ -134,14 +150,10 @@
 
 ## What is stop execution after response
 
-In certain situations, you may have several responses based on userlevel.
-Some users have higher userlevel then others. If response with
+In certain situations, you may have several responses based on permission.
+Some users have higher permission then others. If response with
 this settings is executed, all responses below this response will
 be ignored.
-
-### Userlevel hierarchy
-
-`owner` > `mods` > `regular` > `viewer`
 
 ### Example without stop
 
@@ -250,4 +262,4 @@ PUBG is set as game
 `!enable system customCommands` |
 `!disable system customCommands`
 
-!> Default permission is **OWNER**
+!> Default permission is **CASTERS**
