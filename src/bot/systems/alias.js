@@ -5,7 +5,6 @@ const _ = require('lodash')
 
 // bot libraries
 const Parser = require('../parser')
-const constants = require('../constants')
 const Message = require('../message')
 import Expects from '../expects';
 import System from './_interface'
