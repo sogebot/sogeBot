@@ -188,7 +188,7 @@ class CustomCommands extends System {
   async add (opts: Object) {
     try {
       const [userlevel, stopIfExecuted, command, response] = new Expects(opts.parameters)
-        .argument({ optional: true, name: 'ul', default: 'viewer' })
+        .argument({ name: 'p', optional: true, default: permission.VIEWERS, uuid: true, type: String })
         .argument({ optional: true, name: 's', default: false, type: Boolean })
         .command()
         .everything()
@@ -201,16 +201,23 @@ class CustomCommands extends System {
         })
       }
 
+
+      const pItem: Permissions.Item | null = await global.permissions.get(userlevel);
+      if (!pItem) {
+        throw Error('Permission ' + perm + ' not found.');
+      }
+
       let rDb = await global.db.engine.find(this.collection.responses, { cid: String(cDb._id) })
       await global.db.engine.insert(this.collection.responses, {
         cid: String(cDb._id),
         order: rDb.length,
-        permission: global.permissions.stringToNumber(userlevel),
+        permission: pItem.id,
         stopIfExecuted,
         response
       })
       global.commons.sendMessage(global.commons.prepare('customcmds.command-was-added', { command }), opts.sender)
     } catch (e) {
+      console.log(e)
       global.commons.sendMessage(global.commons.prepare('customcmds.commands-parse-failed'), opts.sender)
     }
   }
@@ -240,7 +247,7 @@ class CustomCommands extends System {
 
     const responses: Array<Response> = await global.db.engine.find(this.collection.responses, { cid: String(command._id) })
     for (let r of _.orderBy(responses, 'order', 'asc')) {
-      if (await global.permission.check(opts.sender.userId, r.permission)
+      if ((await global.permissions.check(opts.sender.userId, r.permission)).access
           && await this.checkFilter(opts, r.filter)) {
         _responses.push(r)
       }

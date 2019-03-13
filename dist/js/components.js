@@ -172,7 +172,6 @@ window.commandInputWithPermissions = {
     }
   },
   mounted() {
-    console.log(this.currentPermissions)
     this.socket.emit('find', {}, (err, data) => {
       if (err) return console.error(err)
       this.permissionsList = data

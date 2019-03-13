@@ -1,8 +1,6 @@
 const XRegExp = require('xregexp')
 const _ = require('lodash')
-
-const __DEBUG__ =
-  process.env.DEBUG && process.env.DEBUG.includes('expects')
+import { debug } from './debug';
 
 class Expects {
   constructor (text) {
@@ -47,12 +45,13 @@ class Expects {
 
   command (opts) {
     opts = opts || {}
-    _.defaults(opts, { optional: false })
+    _.defaults(opts, { optional: false, spaces: false })
     if (!opts.optional) this.checkText()
 
     const regexp = XRegExp('(?<command> ^!\\S* )', 'ix')
     const match = XRegExp.exec(this.text, regexp)
 
+    debug('expects', JSON.stringify({text: this.text, opts, match}));
     if (!_.isNil(match)) {
       this.match.push(match.command.trim().toLowerCase())
       this.text = this.text.replace(match.command, '') // remove from text matched pattern
@@ -155,7 +154,14 @@ class Expects {
 
   argument (opts) {
     opts = opts || {}
-    _.defaults(opts, { type: String, optional: false, default: null, multi: false, delimiter: '"' })
+    _.defaults(opts, {
+      type: String,
+      optional: false,
+      uuid: false,
+      default: null,
+      multi: false,
+      delimiter: '"',
+    })
     if (!opts.multi) opts.delimiter = ''
     opts.delimiter = XRegExp.escape(opts.delimiter)
 
@@ -165,11 +171,21 @@ class Expects {
     let pattern
     if (opts.type.name === 'Number') pattern = '[0-9]*'
     else if (opts.type.name === 'Boolean') pattern = 'true|false'
-    else if (!opts.multi) pattern = '\\w+'
-    else pattern = `(?:(?!-[a-zA-Z]).)+${opts.delimiter !== '' ? '?' : ''}` // capture until -something or [^-]*
+    else if (!opts.multi && !opts.uuid) pattern = '\\S+'
+    else if (!opts.multi && opts.uuid) {
+      // pattern will match uuid or single string
+      pattern = `([0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12})|\\S+`
+    }
+    else {
+      // pattern will match uuid or multi string
+      pattern = `([0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12})|(?:(?!-[a-zA-Z]).)+${opts.delimiter !== '' ? '?' : ''}` // capture until -something or [^-]*
+    }
 
-    const regexp = XRegExp(`-${opts.name}\\s${opts.delimiter}(?<${opts.name}>${pattern})${opts.delimiter}`, 'ix')
+    const fullPattern = `-${opts.name}\\s${opts.delimiter}(?<${opts.name}>${pattern})${opts.delimiter}`
+    const regexp = XRegExp(fullPattern, 'ix')
     const match = XRegExp.exec(this.text, regexp)
+
+    debug('expects', JSON.stringify({fullPattern, text: this.text, opts, match}));
     if (!_.isNil(match) && match[opts.name].trim().length !== 0) {
       if (opts.type.name === 'Boolean') {
         this.match.push(opts.type(match[opts.name].trim().toLowerCase() === 'true'))

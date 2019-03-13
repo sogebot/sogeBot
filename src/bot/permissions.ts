@@ -31,6 +31,24 @@ class Permissions extends Core {
     this.addMenu({ category: 'settings', name: 'permissions', id: '/settings/permissions' });
   }
 
+  public async get(identifier: string): Promise<Permissions.Item | null> {
+    const uuidRegex = /([0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12})/;
+    let pItem: Permissions.Item | null = null;
+    if (identifier.search(uuidRegex) >= 0) {
+      pItem = await global.db.engine.findOne(this.collection.data, { id: identifier });
+      if (_.isEmpty(pItem)) {
+        pItem = null;
+      }
+    } else {
+      const pItems: Permissions.Item[] = await global.db.engine.find(this.collection.data);
+      // get first name-like
+      pItem = pItems.find((o) => {
+        return o.name.toLowerCase() === identifier.toLowerCase();
+      }) || null;
+    }
+    return pItem;
+  }
+
   public async check(userId: string, permId: string, partial: boolean = false): Promise<{access: boolean, permission: Permissions.Item}> {
     const user: User & {
       tips: User.Tips[], bits: User.Bits[], points: User.Points[], watched: User.Watched[], messages: User.Messages[],
