@@ -188,7 +188,7 @@ class CustomCommands extends System {
   async add (opts: Object) {
     try {
       const [userlevel, stopIfExecuted, command, response] = new Expects(opts.parameters)
-        .argument({ name: 'p', optional: true, default: permission.VIEWERS, uuid: true, type: String })
+        .permission({ optional: true, default: permission.VIEWERS })
         .argument({ optional: true, name: 's', default: false, type: Boolean })
         .command()
         .everything()

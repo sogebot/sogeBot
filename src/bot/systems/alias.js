@@ -104,10 +104,10 @@ class Alias extends System {
   async edit (opts) {
     try {
       const [perm, alias, command] = new Expects(opts.parameters)
-          .argument({ name: 'p', optional: true, default: permission.VIEWERS, uuid: true, type: String })
-          .argument({ name: 'a', type: String, multi: true, delimiter: '' }) // set as multi as alias can contain spaces
-          .argument({ name: 'c', type: String, multi: true, delimiter: '' }) // set as multi as command can contain spaces
-          .toArray();
+        .permission({ optional: true, default: permission.VIEWERS })
+        .argument({ name: 'a', type: String, multi: true, delimiter: '' }) // set as multi as alias can contain spaces
+        .argument({ name: 'c', type: String, multi: true, delimiter: '' }) // set as multi as command can contain spaces
+        .toArray();
 
       if (!alias.startsWith('!') || !command.startsWith('!')) {
         throw Error('Alias or Command doesn\'t start with !')
@@ -136,10 +136,10 @@ class Alias extends System {
   async add (opts) {
     try {
       const [perm, alias, command] = new Expects(opts.parameters)
-          .argument({ name: 'p', optional: true, default: permission.VIEWERS, uuid: true, type: String })
-          .argument({ name: 'a', type: String, multi: true, delimiter: '' }) // set as multi as alias can contain spaces
-          .argument({ name: 'c', type: String, multi: true, delimiter: '' }) // set as multi as command can contain spaces
-          .toArray();
+        .permission({ optional: true, default: permission.VIEWERS })
+        .argument({ name: 'a', type: String, multi: true, delimiter: '' }) // set as multi as alias can contain spaces
+        .argument({ name: 'c', type: String, multi: true, delimiter: '' }) // set as multi as command can contain spaces
+        .toArray();
 
       if (!alias.startsWith('!') || !command.startsWith('!')) {
         throw Error('Alias or Command doesn\'t start with !')
@@ -161,6 +161,7 @@ class Alias extends System {
       let message = await global.commons.prepare('alias.alias-was-added', aliasObj)
       global.commons.sendMessage(message, opts.sender)
     } catch (e) {
+      console.log(e)
       global.commons.sendMessage(global.commons.prepare('alias.alias-parse-failed'), opts.sender)
     }
   }

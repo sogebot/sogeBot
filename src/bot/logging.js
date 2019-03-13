@@ -90,7 +90,7 @@ if (!isMainThread) {
         const timestamp = moment().tz(config.timezone).format('YYYY-MM-DD[T]HH:mm:ss.SSS')
 
         if (info.level === 'debug') {
-          return `${timestamp} ${level} ${chalk.red(info.category)} ${info.message} ${info.username ? `[${info.username}]` : ''}`
+          return `${timestamp} ${level} ${chalk.yellow(info.category)} ${info.message} ${info.username ? `[${info.username}]` : ''}`
         } else return `${timestamp} ${level} ${info.message} ${info.username ? `[${info.username}]` : ''}`
       })
     ),
