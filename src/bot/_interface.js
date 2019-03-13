@@ -61,7 +61,13 @@ class Module {
 
   _status (retries) {
     if (typeof retries === 'undefined') retries = 0
-    if (retries === 6000) throw new Error('Something went wrong')
+    if (retries === 6000) {
+      global.log.error(`${this._name}.${this.constructor.name.toLowerCase()} is taking too long to load, waiting additional time`)
+    }
+    if (retries === 60000) {
+      global.log.error(`${this._name}.${this.constructor.name.toLowerCase()} didn't start. Exiting.`)
+      process.exit(1)
+    }
     if (!this.isLoaded) setTimeout(() => this._status(++retries), 10)
     else this.status({ state: this.settings.enabled, quiet: !isMainThread }) // force status change and quiet on workers
   }
