@@ -10,5 +10,7 @@
   "yes": "Yes",
   "no": "No",
   "show-more": "Show more",
-  "show-less": "Show less"
+  "show-less": "Show less",
+  "allowed": "Allowed",
+  "disallowed": "Disallowed"
 }

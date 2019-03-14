@@ -16,6 +16,7 @@
   "somethingWentWrongUserWasNotFoundInBotDatabase": "Něco se pokazilo, uživatel <strong>$username</strong> nebyl nalezen v databázi",
   "permissionsGroups": "Skupiny oprávnění",
   "loadingInProgress": "Probíhá načítání",
+  "allowHigherPermissions": "Povolit přístup přes vyšší oprávnění",
   "type": "Typ",
   "value": "Hodnota",
   "watchedTime": "Čas sledování v hodinách",

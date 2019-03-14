@@ -75,7 +75,7 @@ class Permissions extends Core {
       }
 
       // get all higher permissions to check if not partial check only
-      if (!partial) {
+      if (!partial && pItem.isWaterfallAllowed) {
         const partialPermission: Permissions.Item[] = (await global.db.engine.find(this.collection.data)).filter((o) => {
           return o.order < pItem.order;
         });
@@ -234,6 +234,7 @@ class Permissions extends Core {
         name: 'Casters',
         automation: 'casters',
         isCorePermission: true,
+        isWaterfallAllowed: true,
         order: p.length + addedCount,
         userIds: [],
         filters: [],
@@ -247,6 +248,7 @@ class Permissions extends Core {
         name: 'Moderators',
         automation: 'moderators',
         isCorePermission: true,
+        isWaterfallAllowed: true,
         order: p.length + addedCount,
         userIds: [],
         filters: [],
@@ -260,6 +262,7 @@ class Permissions extends Core {
         name: 'Subscribers',
         automation: 'subscribers',
         isCorePermission: true,
+        isWaterfallAllowed: true,
         order: p.length + addedCount,
         userIds: [],
         filters: [],
@@ -273,6 +276,7 @@ class Permissions extends Core {
         name: 'Followers',
         automation: 'followers',
         isCorePermission: true,
+        isWaterfallAllowed: true,
         order: p.length + addedCount,
         userIds: [],
         filters: [],
@@ -286,6 +290,7 @@ class Permissions extends Core {
         name: 'Viewers',
         automation: 'viewers',
         isCorePermission: true,
+        isWaterfallAllowed: true,
         order: p.length + addedCount,
         userIds: [],
         filters: [],

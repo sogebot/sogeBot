@@ -39,6 +39,17 @@
           </div>
 
           <div class="form-group col-md-12" v-if="!item.isCorePermission">
+            <label>{{ translate('core.permissions.allowHigherPermissions') }}</label>
+            <button
+              type="button"
+              @click="item.isWaterfallAllowed = !item.isWaterfallAllowed"
+              class="btn btn-block"
+              :class="{'btn-success': item.isWaterfallAllowed, 'btn-danger': !item.isWaterfallAllowed }">
+              {{ item.isWaterfallAllowed ? translate('commons.allowed') : translate('commons.disallowed') }}
+            </button>
+          </div>
+
+          <div class="form-group col-md-12" v-if="!item.isCorePermission">
             <label>{{ translate('core.permissions.manuallyAddedUsers') }}</label>
             <userslist :ids="item.userIds" @update="item.userIds = $event"></userslist>
           </div>

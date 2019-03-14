@@ -80,6 +80,7 @@
             id,
             name: '',
             isCorePermission: false,
+            isWaterfallAllowed: true,
             automation: 'none',
             order,
             userIds: [],

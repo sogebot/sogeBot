@@ -16,6 +16,7 @@
   "somethingWentWrongUserWasNotFoundInBotDatabase": "Something went wrong, user <strong>$username</strong> was not found in bot database.",
   "permissionsGroups": "Permissions Groups",
   "loadingInProgress": "Loading in progress",
+  "allowHigherPermissions": "Allow access through higher permission",
   "type": "Type",
   "value": "Value",
   "watchedTime": "Watched time in hours",

@@ -4,6 +4,7 @@ declare namespace Permissions {
     name: string,
     order: number,
     isCorePermission: boolean,
+    isWaterfallAllowed: boolean,
     automation: 'none' | 'casters' | 'moderators' | 'subscribers' | 'viewers' | 'followers',
     userIds: string[],
     filters: Permissions.Filter[],

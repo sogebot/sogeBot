@@ -23,9 +23,12 @@
                 draggable="true"
                 v-else
                 >
+
+          <font-awesome-icon icon="greater-than-equal" fixed-width v-if="p.isWaterfallAllowed" size="xs" transform="shrink-8"/>
+          <font-awesome-icon icon="equals" fixed-width v-else size="xs" transform="shrink-8"/>
           <template v-if="p.name.length > 0">
-             <strong v-if="p.isCorePermission">{{ p.name }}</strong>
-             <span v-else>{{ p.name }}</span>
+            <strong v-if="p.isCorePermission">{{ p.name }}</strong>
+            <span v-else>{{ p.name }}</span>
           </template>
           <small v-else
                  class="font-weight-lighter"
@@ -48,11 +51,11 @@
 
   import { library } from '@fortawesome/fontawesome-svg-core'
   import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-  import { faCog, faSpinner } from '@fortawesome/free-solid-svg-icons';
+  import { faCog, faSpinner, faEquals, faGreaterThanEqual } from '@fortawesome/free-solid-svg-icons';
 
   import * as io from 'socket.io-client';
 
-  library.add(faCog, faSpinner)
+  library.add(faCog, faSpinner, faEquals, faGreaterThanEqual)
 
   export default Vue.extend({
     props: ['update'],
