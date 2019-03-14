@@ -22,8 +22,10 @@ class Permissions extends Core {
           sendWarning: false,
           sendByWhisper: true,
         },
+        commands: [
+          { name: '!permission list', permission: permission.CASTERS },
+        ],
       },
-      // TBD permissions commands
     };
     super(options);
 
@@ -222,6 +224,19 @@ class Permissions extends Core {
         }
       });
     });
+  }
+
+  private async list(opts: CommandOptions): Promise<void> {
+    const permissions = await global.db.engine.find(this.collection.data);
+
+    if (permissions.length === 0) {
+      global.commons.sendMessage(global.commons.prepare('core.permissions.listIsEmpty'));
+    } else {
+      global.commons.sendMessage(global.commons.prepare('core.permissions.list'));
+      for (const [p, index] of permissions) {
+        global.log.info('WIP');
+      }
+    }
   }
 
   private async ensurePreservedPermissionsInDb(): Promise<void> {
