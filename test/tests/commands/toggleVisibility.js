@@ -19,12 +19,12 @@ describe('Custom Commands - toggleVisibility()', () => {
   })
 
   it('!unknown', async () => {
-    global.systems.customCommands.toggleVisibility({ sender: owner, parameters: '!unknown' })
+    global.systems.customCommands.toggleVisibility({ sender: owner, parameters: '-c !unknown' })
     await message.isSent('customcmds.command-was-not-found', owner, { command: '!unknown', sender: owner.username })
   })
 
   it('!한글', async () => {
-    global.systems.customCommands.add({ sender: owner, parameters: '!한글 !uptime' })
+    global.systems.customCommands.add({ sender: owner, parameters: '-c !한글 -r !uptime' })
     await message.isSent('customcmds.command-was-added', owner, { command: '!한글', sender: owner.username })
 
     global.systems.customCommands.toggleVisibility({ sender: owner, parameters: '!한글' })
@@ -35,7 +35,7 @@ describe('Custom Commands - toggleVisibility()', () => {
   })
 
   it('!русский', async () => {
-    global.systems.customCommands.add({ sender: owner, parameters: '!русский !uptime' })
+    global.systems.customCommands.add({ sender: owner, parameters: '-c !русский -r !uptime' })
     await message.isSent('customcmds.command-was-added', owner, { command: '!русский', sender: owner.username })
 
     global.systems.customCommands.toggleVisibility({ sender: owner, parameters: '!русский' })

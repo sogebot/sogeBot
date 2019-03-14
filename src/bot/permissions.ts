@@ -93,7 +93,7 @@ class Permissions extends Core {
           shouldProceed = true;
           break;
         case 'casters':
-          shouldProceed = global.commons.isBot(user) || global.commons.isBroadcaster(user);
+          shouldProceed = global.commons.isBot(user) || global.commons.isBroadcaster(user) || global.commons.isOwner(user);
           break;
         case 'moderators':
           shouldProceed = await global.commons.isModerator(user);

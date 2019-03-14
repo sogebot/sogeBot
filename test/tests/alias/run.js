@@ -28,7 +28,7 @@ describe('Alias - run()', () => {
     global.systems.alias.add({ sender: owner, parameters: '-a !a -c !test http://google.com' })
     await message.isSent('alias.alias-was-added', owner, { alias: '!a', command: '!test http://google.com', sender: owner.username })
 
-    global.systems.customCommands.add({ sender: owner, parameters: '!test $param' })
+    global.systems.customCommands.add({ sender: owner, parameters: '-c !test -r $param' })
     await message.isSent('customcmds.command-was-added', owner, { response: '$param', command: '!test', sender: owner.username })
 
     global.systems.alias.run({ sender: user, message: '!a' })

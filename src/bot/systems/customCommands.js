@@ -162,10 +162,14 @@ class CustomCommands extends System {
       const [userlevel, stopIfExecuted, command, rId, response] = new Expects(opts.parameters)
         .permission({ optional: true, default: permission.VIEWERS })
         .argument({ optional: true, name: 's', default: null, type: Boolean })
-        .command()
-        .number()
-        .everything()
+        .argument({ name: 'c', type: String, multi: true, delimiter: '' })
+        .argument({ name: 'rid', type: Number })
+        .argument({ name: 'r', type: String, multi: true, delimiter: '' })
         .toArray()
+
+      if (!command.startsWith('!')) {
+        throw Error('Command should start with !')
+      }
 
       let cDb = await global.db.engine.findOne(this.collection.data, { command })
       if (!cDb._id) return global.commons.sendMessage(global.commons.prepare('customcmds.command-was-not-found', { command }), opts.sender)
@@ -196,9 +200,13 @@ class CustomCommands extends System {
       const [userlevel, stopIfExecuted, command, response] = new Expects(opts.parameters)
         .permission({ optional: true, default: permission.VIEWERS })
         .argument({ optional: true, name: 's', default: false, type: Boolean })
-        .command()
-        .everything()
+        .argument({ name: 'c', type: String, multi: true, delimiter: '' })
+        .argument({ name: 'r', type: String, multi: true, delimiter: '' })
         .toArray()
+
+      if (!command.startsWith('!')) {
+        throw Error('Command should start with !')
+      }
 
       let cDb = await global.db.engine.findOne(this.collection.data, { command })
       if (!cDb._id) {
@@ -222,7 +230,6 @@ class CustomCommands extends System {
       })
       global.commons.sendMessage(global.commons.prepare('customcmds.command-was-added', { command }), opts.sender)
     } catch (e) {
-      console.log(e)
       global.commons.sendMessage(global.commons.prepare('customcmds.commands-parse-failed'), opts.sender)
     }
   }
@@ -257,6 +264,7 @@ class CustomCommands extends System {
         _responses.push(r)
       }
     }
+
     this.sendResponse(_.cloneDeep(_responses), { param, sender: opts.sender, command: command.command });
     return _responses.map((o) => {
       return o.response

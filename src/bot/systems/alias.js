@@ -160,7 +160,6 @@ class Alias extends System {
       let message = await global.commons.prepare('alias.alias-was-added', aliasObj)
       global.commons.sendMessage(message, opts.sender)
     } catch (e) {
-      console.log(e)
       global.commons.sendMessage(global.commons.prepare('alias.alias-parse-failed'), opts.sender)
     }
   }
