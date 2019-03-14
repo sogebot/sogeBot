@@ -30,7 +30,7 @@
 
         <div class="form-group row pl-3 pr-3">
           <div class="col-md-4">
-              <label style="margin: 0px 0px 3px; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px;">{{ commons.translate('permission') }}</label>
+            <label style="margin: 0px 0px 3px; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px;">{{ commons.translate('permission') }}</label>
             <select class="form-control" v-model="permission">
               <option v-for="p of permissions" v-bind:value="p.id" :key="p.id">
                   {{ getPermissionName(p.id) | capitalize }}

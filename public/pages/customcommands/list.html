@@ -38,12 +38,16 @@
                   </span>
 
                   <span style="display: inline-block">
-                    <button data-toggle="dropdown" class="btn btn-outline-dark border-0" style="margin: 0; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px;"><i class="fas fa-key mr-1" aria-hidden="true"></i> {{ r.permission | permissionToString }}</button>
-                    <div class="dropdown-menu">
-                      <a class="dropdown-item" style="cursor: pointer" v-on:click="updatePermission(command._id, r._id, 1)">{{ commons.translate('systems.customcommands.forViewers') | capitalize }}</a>
-                      <a class="dropdown-item" style="cursor: pointer" v-on:click="updatePermission(command._id, r._id, 2)">{{ commons.translate('systems.customcommands.forRegulars') | capitalize }}</a>
-                      <a class="dropdown-item" style="cursor: pointer" v-on:click="updatePermission(command._id, r._id, 3)">{{ commons.translate('systems.customcommands.forMods') | capitalize }}</a>
-                      <a class="dropdown-item" style="cursor: pointer" v-on:click="updatePermission(command._id, r._id, 0)">{{ commons.translate('systems.customcommands.forOwners') | capitalize }}</a>
+                    <button data-toggle="dropdown" class="btn btn-outline-dark border-0" style="margin: 0; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px;"><i class="fas fa-key mr-1" aria-hidden="true"></i>
+                      <span v-if="getPermissionName(r.permission)">{{ getPermissionName(r.permission) }}</span>
+                      <span v-else class="text-danger"><i class="fas fa-exclamation-triangle"></i> Permission not found</span>
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="permissionsMenuButton">
+                      <a class="dropdown-item"
+                          style="cursor: pointer"
+                          v-for="p of permissions"
+                          :key="p.id"
+                          @click="updatePermission(command._id, r._id, p.id)">{{ getPermissionName(p.id) | capitalize }}</a>
                     </div>
                   </span>
 
@@ -83,7 +87,7 @@
           </div>
         </div>
 
-        <div class="widget h-auto" v-if="showAs === 'table' && commandsFiltered.length > 0">
+        <div class="widget h-auto" v-if="showAs === 'table' && commandsFiltered.length > 0" style="overflow-x:initial;">
           <div class="row p-2 m-0 border-bottom">
             <div class="col-md-1"><strong>{{ commons.translate('command') }}</strong></div>
             <div class="col-md-1 text-center"><strong>{{ commons.translate('count') | capitalize }}</strong></div>
@@ -104,12 +108,16 @@
                   </span>
 
                   <span style="display: inline-block">
-                    <button data-toggle="dropdown" class="btn btn-outline-dark border-0" style="margin: 0; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px;"><i class="fas fa-key mr-1" aria-hidden="true"></i> {{ r.permission | permissionToString }}</button>
-                    <div class="dropdown-menu">
-                      <a class="dropdown-item" style="cursor: pointer" v-on:click="updatePermission(command._id, r._id, 1)">{{ commons.translate('systems.customcommands.forViewers') | capitalize }}</a>
-                      <a class="dropdown-item" style="cursor: pointer" v-on:click="updatePermission(command._id, r._id, 2)">{{ commons.translate('systems.customcommands.forRegulars') | capitalize }}</a>
-                      <a class="dropdown-item" style="cursor: pointer" v-on:click="updatePermission(command._id, r._id, 3)">{{ commons.translate('systems.customcommands.forMods') | capitalize }}</a>
-                      <a class="dropdown-item" style="cursor: pointer" v-on:click="updatePermission(command._id, r._id, 0)">{{ commons.translate('systems.customcommands.forOwners') | capitalize }}</a>
+                    <button data-toggle="dropdown" class="btn btn-outline-dark border-0" style="margin: 0; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px;"><i class="fas fa-key mr-1" aria-hidden="true"></i>
+                      <span v-if="getPermissionName(r.permission)">{{ getPermissionName(r.permission) }}</span>
+                      <span v-else class="text-danger"><i class="fas fa-exclamation-triangle"></i> Permission not found</span>
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="permissionsMenuButton">
+                      <a class="dropdown-item"
+                          style="cursor: pointer"
+                          v-for="p of permissions"
+                          :key="p.id"
+                          @click="updatePermission(command._id, r._id, p.id)">{{ getPermissionName(p.id) | capitalize }}</a>
                     </div>
                   </span>
 
@@ -160,6 +168,7 @@
         search: '',
 
         commands: [],
+        permissions: [],
 
         changed: [],
         isDataChanged: false,
@@ -167,6 +176,7 @@
         state: {
           settings: 0
         },
+        psocket: io('/core/permissions', { query: "token=" + token }),
         socket: io('/systems/customcommands', { query: "token=" + token }),
       },
       computed: {
@@ -180,6 +190,10 @@
         }
       },
       created: function () {
+        this.psocket.emit('find', {}, (err, data) => {
+          if (err) return console.error(err)
+          this.permissions = _.orderBy(data, 'order', 'asc')
+        })
         this.socket.emit('find.commands', {}, (err, items) => {
           this.commands = _.orderBy(items, 'command', 'asc')
         })
@@ -200,14 +214,23 @@
         onlyCommand: function (val) {
           return val.split(' ')[0]
         },
-        permissionToString: function (val) {
-          if (val === 0) return commons.translate('systems.customcommands.forOwners')
-          else if (val === 1) return commons.translate('systems.customcommands.forViewers')
-          else if (val === 2) return commons.translate('systems.customcommands.forMods')
-          else if (val === 3) return commons.translate('systems.customcommands.forRegulars')
-        }
       },
       methods: {
+        getPermissionName: function (id) {
+          if (!id) return 'Disabled'
+          const permission = this.permissions.find((o) => {
+            return o.id === id
+          })
+          if (typeof permission !== 'undefined') {
+            if (permission.name.trim() === '') {
+              return permission.id
+            } else {
+              return permission.name
+            }
+          } else {
+            return null
+          }
+        },
         updatePermission: function (cid, rid, permission) {
           let command = this.commands.filter((o) => o._id === cid)[0]
           let response = command.responses.filter((o) => o._id === rid)[0]
