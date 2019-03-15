@@ -4,6 +4,7 @@ const {
 } = require('worker_threads');
 if (!isMainThread) process.exit()
 
+const { permission } = require('../../../dest/permissions')
 
 require('../../general.js')
 
@@ -19,10 +20,8 @@ _.set(global, 'widgets.custom_variables.io.emit', function () {})
 
 describe('Message - cvars filter', async () => {
   const users = [
-    { username: '__owner__', userId: Math.random(), permission: 0 },
-    { username: 'moduser', is: { moderator: true }, userId: Math.random(), permission: 1},
-    { username: 'regularuser', is: { regular: true }, userId: Math.random(), permission: 2},
-    { username: 'vieweriuser', userId: Math.random(), permission: 3},
+    { username: '__owner__', userId: Math.random(), permission: permission.CASTERS },
+    { username: '__viewer__', userId: Math.random(), permission: permission.VIEWERS },
   ]
   const tests = [
     {
@@ -106,22 +105,17 @@ describe('Message - cvars filter', async () => {
       params: { param: 5 }
     }
   ]
-  const permissions = [
-    'OWNER_ONLY',
-    'MODS',
-    'REGULAR',
-    'VIEWERS',
-  ]
 
-  for (let permission of [0, 1]) {
-    describe('Custom variable with ' + permissions[permission] + ' permission', async () => {
+  for (let p of Object.keys(permission)) {
+    describe('Custom variable with ' + p + ' permission', async () => {
       for (let user of users) {
-        describe('Testing with ' + user.username, () => {
+        describe('Custom variable with ' + p + ' permission => Testing with ' + user.username, async () => {
           before(async () => {
             await db.cleanup()
             await msg.prepare()
 
             for (let user of users) {
+              user.id = user.userId;
               await global.db.engine.insert('users', user)
             }
           })
@@ -129,7 +123,7 @@ describe('Message - cvars filter', async () => {
           for (let test of tests) {
             let message = null
             let testName = null
-            if (user.permission <= permission) {
+            if (user.username === '__owner__' || (user.username === '__viewer__' && p === 'VIEWERS')) {
               testName =`'${test.test}' expect '${test.command.replace(/\$_test|\$!_test/g, test.afterValue)}' with value after ${test.afterValue}`
             } else {
               testName =`'${test.test}' expect '${test.command.replace(/\$_test|\$!_test/g, test.initialValue)}' with value after ${test.afterValue} because insufficient permissions`
@@ -137,18 +131,18 @@ describe('Message - cvars filter', async () => {
 
             describe(testName, async () => {
               it(`create initial value '${test.initialValue}' of ${test.variable}`, async () => {
-                await global.db.engine.update('custom.variables', { variableName: test.variable }, { readOnly: false, currentValue: test.initialValue, type: test.type, responseType: 0, permission: constants[permissions[permission]] })
+                await global.db.engine.update('custom.variables', { variableName: test.variable }, { readOnly: false, currentValue: test.initialValue, type: test.type, responseType: 0, permission: permission[p] })
               })
               it(`parse '${test.command}' with params`, async () => {
                 message = await new Message(test.command).parse({
                   ...test.params,
-                  sender: user.username
+                  sender: user
                 })
               })
 
 
               it('message parsed correctly', async () => {
-                if (user.permission <= permission) {
+                if (user.username === '__owner__' || (user.username === '__viewer__' && p === 'VIEWERS')) {
                   assert.equal(message, '')
                 } else {
                   assert.equal(message, test.command.replace(/\$_test|\$!_test/g, test.initialValue))
@@ -156,7 +150,7 @@ describe('Message - cvars filter', async () => {
               })
 
               if (test.params.param) {
-                if (test.expectedSent && user.permission <= permission) {
+                if (test.expectedSent && (user.username === '__owner__' || (user.username === '__viewer__' && p === 'VIEWERS'))) {
                   it('expecting set message', async () => {
                     await msg.isSent('filters.setVariable', { username: user.username }, { sender: global.commons.getOwner(), variable: '$_test', value: test.afterValue }, 1000)
                   })
@@ -173,7 +167,7 @@ describe('Message - cvars filter', async () => {
                 }
               }
 
-              if (user.permission <= permission) {
+              if (user.username === '__owner__' || (user.username === '__viewer__' && p === 'VIEWERS')) {
                 it(`check if after value is ${test.afterValue}`, async () => {
                   let cvar = await global.db.engine.findOne('custom.variables', { variableName: test.variable })
                   assert.equal(cvar.currentValue, test.afterValue)
@@ -190,11 +184,11 @@ describe('Message - cvars filter', async () => {
                 delete params.param
                 message = await new Message(test.command).parse({
                   ...params,
-                  sender: user.username
+                  sender: user
                 })
               })
               it('message parsed correctly', async () => {
-                if (user.permission <= permission) {
+                if (user.username === '__owner__' || (user.username === '__viewer__' && p === 'VIEWERS')) {
                   assert.equal(message, test.command.replace(/\$_test|\$!_test/g, test.afterValue))
                 } else {
                   assert.equal(message, test.command.replace(/\$_test|\$!_test/g, test.initialValue))
@@ -213,7 +207,7 @@ describe('Message - cvars filter', async () => {
               it(`parse '${test.command}' with params`, async () => {
                 message = await new Message(test.command).parse({
                   ...test.params,
-                  sender: user.username
+                  sender: user
                 })
               })
               it('message parsed correctly', async () => {
@@ -242,7 +236,7 @@ describe('Message - cvars filter', async () => {
                 delete params.param
                 message = await new Message(test.command).parse({
                   ...params,
-                  sender: user.username
+                  sender: user
                 })
               })
               it('message parsed correctly', async () => {

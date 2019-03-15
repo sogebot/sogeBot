@@ -101,7 +101,7 @@ class Permissions extends Core {
           shouldProceed = await global.commons.isModerator(user);
           break;
         case 'subscribers':
-          shouldProceed = global.commons.isSubscriber(user);
+          shouldProceed = await global.commons.isSubscriber(user);
           break;
         case 'followers':
           shouldProceed = await global.commons.isFollower(user);

@@ -231,6 +231,7 @@ Commons.prototype.isFollower = async function (user) {
 Commons.prototype.isSubscriber = async function (user) {
   try {
     if (_.isString(user)) user = await global.users.getByName(user)
+    debug('commons.isSubscriber', JSON.stringify(user))
     return !_.isNil(user.is.subscriber) ? user.is.subscriber : false
   } catch (e) {
     return false
