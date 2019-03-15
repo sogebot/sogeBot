@@ -170,5 +170,14 @@ module.exports = {
         )
       }
     }, 5000)
+  },
+  isNotSent: async function (expected, user) {
+    let notSent = false
+    try {
+      await msg.isSent(expected, user)
+    } catch (e) {
+      notSent = true
+    }
+    assert.isTrue(notSent)
   }
 }

@@ -133,6 +133,26 @@ class Expects {
     return this
   }
 
+  /* Toggler is used for toggle true/false with argument
+   *    !command -c => -c is true
+   *    !command => -c is false
+   */
+  toggler (opts) {
+    opts = opts || {}
+
+    if (_.isNil(opts.name)) throw Error('Toggler name must be defined')
+
+    const regexp = XRegExp(`-${opts.name}\\b`, 'ix')
+    const match = XRegExp.exec(this.text, regexp)
+    if (!_.isNil(match)) {
+      this.match.push(true)
+      this.text = this.text.replace(match[0], '') // remove from text matched pattern
+    } else {
+      this.match.push(false)
+    }
+    return this
+  }
+
   argument (opts) {
     opts = opts || {}
     _.defaults(opts, { type: String, optional: false, default: null, multi: false, delimiter: '"' })

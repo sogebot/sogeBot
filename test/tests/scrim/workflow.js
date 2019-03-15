@@ -15,6 +15,99 @@ const message = require('../../general.js').message
 const owner = { username: 'soge__' }
 
 describe('Scrim - full workflow', () => {
+  describe('cooldown only', () => {
+    before(async () => {
+      await db.cleanup()
+      await message.prepare()
+
+      global.systems.scrim.settings.time.waitForMatchIdsInSeconds = 10
+      await variable.isEqual('global.systems.scrim.settings.time.waitForMatchIdsInSeconds', 10)
+    })
+
+    it('Create cooldown only scrim for 1 minute', async () => {
+      global.systems.scrim.main({ sender: owner, parameters: '-c duo 1' })
+    })
+
+    it('Expecting 1 minute message cooldown', async () => {
+      await message.isSent('systems.scrim.countdown', owner, {
+        time: 1,
+        type: 'duo',
+        unit: global.commons.getLocalizedName(1, 'core.minutes'),
+      })
+    })
+
+    it('Expecting 45 seconds message cooldown', async () => {
+      await message.isSent('systems.scrim.countdown', owner, {
+        time: 45,
+        type: 'duo',
+        unit: global.commons.getLocalizedName(45, 'core.seconds'),
+      }, 19000)
+    })
+
+    it('Expecting 30 seconds message cooldown', async () => {
+      await message.isSent('systems.scrim.countdown', owner, {
+        time: 30,
+        type: 'duo',
+        unit: global.commons.getLocalizedName(30, 'core.seconds'),
+      }, 19000)
+    })
+
+    it('Expecting 15 seconds message cooldown', async () => {
+      await message.isSent('systems.scrim.countdown', owner, {
+        time: 15,
+        type: 'duo',
+        unit: global.commons.getLocalizedName(15, 'core.seconds'),
+      }, 19000)
+    })
+
+    it('Expecting 3 seconds message cooldown', async () => {
+      await message.isSent('systems.scrim.countdown', owner, {
+        time: '3.',
+        type: 'duo',
+        unit: '',
+      }, 19000) // still need high wait time, because its after 15s
+    })
+
+    it('Expecting 2 seconds message cooldown', async () => {
+      await message.isSent('systems.scrim.countdown', owner, {
+        time: '2.',
+        type: 'duo',
+        unit: '',
+      }, 3000)
+    })
+
+    it('Expecting 1 seconds message cooldown', async () => {
+      await message.isSent('systems.scrim.countdown', owner, {
+        time: '1.',
+        type: 'duo',
+        unit: '',
+      }, 3000)
+    })
+
+    it('Expecting go! message', async () => {
+      await message.isSent('systems.scrim.go', owner, {}, 3000)
+    })
+
+    it('NOT expecting put match id in chat message', async () => {
+      await message.isNotSent('systems.scrim.putMatchIdInChat', owner, {
+        command: '!snipe match',
+      }, 19000)
+    })
+
+    it('NOT expecting empty message list', async () => {
+      await message.isNotSent('systems.scrim.currentMatches', owner, {
+        matches: '<' + global.translate('core.empty') + '>',
+      }, 19000)
+    })
+
+    it('Check match list by command', async () => {
+      global.systems.scrim.match({ sender: { username: 'test' }, parameters: '' })
+      await message.isSent('systems.scrim.currentMatches', owner, {
+        matches: '<' + global.translate('core.empty') + '>',
+      }, 19000)
+    })
+  })
+
   describe('without matches', () => {
     before(async () => {
       await db.cleanup()
