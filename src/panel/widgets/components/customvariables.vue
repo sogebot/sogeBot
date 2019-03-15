@@ -151,7 +151,6 @@ var numberOrTextComponent = {
 export default {
   props: ['commons'],
   components: {
-    'font-awesome-icon': FontAwesomeIcon,
     'number-or-text': numberOrTextComponent
   },
   data: function () {
