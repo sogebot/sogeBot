@@ -4,12 +4,12 @@
     <ul class="nav nav-pills" role="tablist">
       <li role="presentation" class="nav-item">
         <a class="nav-link active" href="#customvariables-main" aria-controls="home" role="tab" data-toggle="tab" title="Custom Variables">
-          <font-awesome-icon icon="dollar-sign" />
+          <fa icon="dollar-sign" />
         </a>
       </li>
       <li role="presentation">
         <a class="nav-link" href="#customvariables-settings" aria-controls="home" role="tab" data-toggle="tab" title="Settings">
-          <font-awesome-icon icon="cog" />
+          <fa icon="cog" />
         </a>
       </li>
       <li class="nav-item ml-auto">
@@ -37,7 +37,7 @@
             </template>
             <template v-else-if="variable.type ==='eval'">
               <input type="text" class="form-control" readonly v-bind:value="variable.currentValue">
-              <span class="input-group-text border-left-0"><font-awesome-icon icon="code" /></span>
+              <span class="input-group-text border-left-0"><fa icon="code" /></span>
             </template>
             <template v-else-if="variable.type ==='number'">
               <number-or-text
@@ -78,14 +78,14 @@
             <li class="list-group-item" v-for="(watch, index) of watchedVariables" :key="index">
               <span class="row">
                 <div class="col-md-2 pt-2" style="line-height: 2rem;">
-                  <button v-if="index !== 0" class="btn btn-block btn-link col-md-2" v-on:click="moveUp(String(watch._id))"><font-awesome-icon icon="angle-up" /></button>
+                  <button v-if="index !== 0" class="btn btn-block btn-link col-md-2" v-on:click="moveUp(String(watch._id))"><fa icon="angle-up" /></button>
                 </div>
                 <div class="col-md p-2" style="overflow:hidden; line-height: 2rem;">
                   {{ watch.variableName }}
-                  <button class="btn float-right btn-outline-danger border-0" v-on:click="unWatch(String(watch._id))"><font-awesome-icon icon="trash-alt" /></button>
+                  <button class="btn float-right btn-outline-danger border-0" v-on:click="unWatch(String(watch._id))"><fa icon="trash-alt" /></button>
                 </div>
                 <div class="col-md-2 pt-2" style="line-height: 2rem;">
-                  <button v-if="index !== watchedVariables.length - 1" class="btn btn-block btn-link col-md-2" v-on:click="moveDown(String(watch._id))"><font-awesome-icon icon="angle-down" /></button>
+                  <button v-if="index !== watchedVariables.length - 1" class="btn btn-block btn-link col-md-2" v-on:click="moveDown(String(watch._id))"><fa icon="angle-down" /></button>
                 </div>
               </span>
             </li>
@@ -99,18 +99,8 @@
 </template>
 
 <script>
-
-import { library } from '@fortawesome/fontawesome-svg-core'
-import { faDollarSign, faCog, faCode, faAngleUp, faTrashAlt, faAngleDown, faFont, faPlus, faMinus, faDownload } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-
-library.add(faDollarSign, faCog, faCode, faAngleUp, faTrashAlt, faAngleDown, faFont, faPlus, faMinus, faDownload)
-
 var numberOrTextComponent = {
   props: ['id', 'value', 'type'],
-  components: {
-    'font-awesome-icon': FontAwesomeIcon
-  },
   watch: {
     value: function (val) {
       this.currentValue = this.value
@@ -147,12 +137,12 @@ var numberOrTextComponent = {
     <div class="form-control p-0 d-flex border-0">
       <input type="text" class="form-control" v-model="currentValue" style="z-index:99" v-on:keyup="onKeyUp">
       <div class="input-group-append">
-        <button class="btn btn-primary" v-bind:class="{'d-none' : type !== 'number'}" type="button" v-on:click="update(1)"><font-awesome-icon icon="plus" /></button>
-        <button class="btn btn-danger" v-bind:class="{'d-none' : type !== 'number'}" type="button" v-on:click="update(-1)"><font-awesome-icon icon="minus" /></button>
-        <button class="btn btn-secondary" v-bind:class="{'d-none' : !showSaveButton}" type="button" v-on:click="update()"><font-awesome-icon icon="download" /></button>
+        <button class="btn btn-primary" v-bind:class="{'d-none' : type !== 'number'}" type="button" v-on:click="update(1)"><fa icon="plus" /></button>
+        <button class="btn btn-danger" v-bind:class="{'d-none' : type !== 'number'}" type="button" v-on:click="update(-1)"><fa icon="minus" /></button>
+        <button class="btn btn-secondary" v-bind:class="{'d-none' : !showSaveButton}" type="button" v-on:click="update()"><fa icon="download" /></button>
         <span class="input-group-text">
           <strong v-if="this.type === 'number'">0-9</strong>
-          <font-awesome-icon icon="font" v-else />
+          <fa icon="font" v-else />
         </span>
       </div>
     </div>

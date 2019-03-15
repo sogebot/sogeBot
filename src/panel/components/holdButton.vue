@@ -10,7 +10,7 @@
         </template>
       </div>
       <div class="btn-icon" :style="{opacity: 1 - this.percentage / 100 }">
-        <font-awesome-icon :icon="icon" fixed-width></font-awesome-icon>
+        <fa :icon="icon" fixed-width></fa>
       </div>
     </div>
   </button>
@@ -19,17 +19,8 @@
 <script lang="ts">
 import Vue from 'vue';
 
-import { library } from '@fortawesome/fontawesome-svg-core';
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faTrash, faEraser } from '@fortawesome/free-solid-svg-icons';
-
-library.add(faTrash, faEraser)
-
 export default Vue.extend({
-props: ['ttc', 'icon'],
-  components: {
-    'font-awesome-icon': FontAwesomeIcon
-  },
+  props: ['ttc', 'icon'],
   data: function () {
     const data: {
       onMouseDownStarted: number,

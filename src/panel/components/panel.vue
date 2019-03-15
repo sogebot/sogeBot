@@ -16,12 +16,12 @@
             </div>
             <div class="btn-icon" v-if="button.icon">
               <template v-if="typeof button.state !== 'undefined' && state[button.state] === 1">
-                <font-awesome-icon icon="circle-notch" spin fixed-width></font-awesome-icon>
+                <fa icon="circle-notch" spin fixed-width></fa>
               </template>
               <template v-else-if="typeof button.state !== 'undefined' && state[button.state] === 2">
-                <font-awesome-icon icon="check" fixed-width></font-awesome-icon>
+                <fa icon="check" fixed-width></fa>
               </template>
-              <font-awesome-icon v-else :icon="button.icon" fixed-width></font-awesome-icon>
+              <fa v-else :icon="button.icon" fixed-width></fa>
             </div>
           </a>
         </div>
@@ -36,12 +36,12 @@
             </div>
             <div class="btn-icon" v-if="button.icon">
               <template v-if="typeof button.state !== 'undefined' && state[button.state] === 1">
-                <font-awesome-icon icon="circle-notch" spin fixed-width></font-awesome-icon>
+                <fa icon="circle-notch" spin fixed-width></fa>
               </template>
               <template v-else-if="typeof button.state !== 'undefined' && state[button.state] === 2">
-                <font-awesome-icon icon="check" fixed-width></font-awesome-icon>
+                <fa icon="check" fixed-width></fa>
               </template>
-              <font-awesome-icon v-else :icon="button.icon" fixed-width></font-awesome-icon>
+              <fa v-else :icon="button.icon" fixed-width></fa>
             </div>
           </a>
           <button type="button" class="btn btn-shrink btn-with-icon" style="flex-direction: row;"
@@ -57,12 +57,12 @@
             </div>
             <div class="btn-icon" v-if="button.icon">
               <template v-if="typeof button.state !== 'undefined' && state[button.state] === 1">
-                <font-awesome-icon icon="circle-notch" spin fixed-width></font-awesome-icon>
+                <fa icon="circle-notch" spin fixed-width></fa>
               </template>
               <template v-else-if="typeof button.state !== 'undefined' && state[button.state] === 2">
-                <font-awesome-icon icon="check" fixed-width></font-awesome-icon>
+                <fa icon="check" fixed-width></fa>
               </template>
-              <font-awesome-icon v-else :icon="button.icon" fixed-width></font-awesome-icon>
+              <fa v-else :icon="button.icon" fixed-width></fa>
             </div>
           </button>
         </div>
@@ -70,19 +70,19 @@
       <div class="ml-2 d-inline-block" v-if="!opts.hideCardsButton" >
         <button class="btn btn-shrink btn-with-icon p-0" style="flex-direction: row;" v-on:click="showAs='cards'" v-bind:class="[ showAs === 'cards' ? 'btn-dark' : 'btn-outline-dark' ]">
           <div class="btn-icon">
-            <font-awesome-icon icon="th-large" fixed-width></font-awesome-icon>
+            <fa icon="th-large" fixed-width></fa>
           </div>
         </button>
       </div>
       <div class="ml-2 d-inline-block" v-if="!opts.hideTableButton" >
         <button class="btn btn-shrink btn-with-icon p-0" style="flex-direction: row;" v-on:click="showAs='table'" v-bind:class="[ showAs === 'table' ? 'btn-dark' : 'btn-outline-dark' ]">
           <div class="btn-icon">
-            <font-awesome-icon icon="th-list" fixed-width></font-awesome-icon>
+            <fa icon="th-list" fixed-width></fa>
           </div>
         </button>
       </div>
       <div class="ml-2 d-inline-block" v-if="!opts.hideSearchInput">
-        <font-awesome-icon icon="search" class="text-muted" style="position: relative; left: 2.2rem;" fixed-width></font-awesome-icon>
+        <fa icon="search" class="text-muted" style="position: relative; left: 2.2rem;" fixed-width></fa>
         <input type="search" class="form-control w-auto pl-5" v-model="search" placeholder="Search...">
       </div>
     </div>
@@ -92,16 +92,9 @@
 <script lang="ts">
   import Vue from 'vue'
 
-  import { library } from '@fortawesome/fontawesome-svg-core'
-  import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-  import { faPlus, faCaretLeft, faExternalLinkAlt, faLink, faSave, faThLarge, faThList, faSearch, faCircleNotch, faCheck } from '@fortawesome/free-solid-svg-icons';
-
-  library.add(faPlus, faCaretLeft, faExternalLinkAlt, faLink, faSave, faThLarge, faThList, faSearch, faCircleNotch, faCheck)
-
   export default Vue.extend({
     props: ['commons', 'options', 'state'],
     components: {
-      'font-awesome-icon': FontAwesomeIcon,
       holdButton: () => import('./holdButton.vue'),
     },
     data: function () {

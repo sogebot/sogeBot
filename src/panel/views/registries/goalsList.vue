@@ -57,7 +57,7 @@
 
                 <dt class="col-6">{{translate('registry.goals.input.endAfter.title')}}</dt>
                 <dd class="col-6">
-                  <font-awesome-icon icon="infinity" fixed-width v-if="goal.endAfterIgnore"></font-awesome-icon>
+                  <fa icon="infinity" fixed-width v-if="goal.endAfterIgnore"></fa>
                   <template v-else>{{goal.endAfter}}</template>
                 </dd>
               </dl>
@@ -98,17 +98,10 @@
 
   import * as io from 'socket.io-client';
 
-  import { library } from '@fortawesome/fontawesome-svg-core'
-  import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-  import { faInfinity } from '@fortawesome/free-solid-svg-icons';
-
-  library.add(faInfinity)
-
   export default Vue.extend({
     components: {
       panel: () => import('../../components/panel.vue'),
       holdButton: () => import('../../components/holdButton.vue'),
-      'font-awesome-icon': FontAwesomeIcon,
       'button-with-icon': () => import('../../components/button.vue'),
     },
     data: function () {

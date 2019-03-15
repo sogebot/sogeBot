@@ -20,7 +20,7 @@
           <template v-if="vote === 'new'">
             <div v-if="isRunning" class="card mb-3 p-0 text-dark" style="flex-direction: inherit;" v-bind:key="String(vote)">
               <h6 style="margin: auto; line-height: initial; text-align: center;" class="text-dark p-3">
-                <font-awesome-icon icon='ban' size="10x" class="text-danger pb-2"></font-awesome-icon> <br>
+                <fa icon='ban' size="10x" class="text-danger pb-2"></fa> <br>
                 {{ translate('systems.polls.cannotCreateNewVoteIfInProgress') }}
               </h6>
             </div>
@@ -29,13 +29,13 @@
                 <input type="text" style="background-color: transparent; text-transform: inherit; font-size: 1.25rem; position: relative; top: -0.48rem;" class="border-left-0 border-right-0 border-top-0 form-control card-title mb-0" :placeholder="translate('systems.polls.title')" v-model="newVote.title">
                 <h6 class="card-subtitle mb-2 text-muted">
                   <template v-if="newVote.type === 'normal'">
-                    <font-awesome-icon icon='exclamation'></font-awesome-icon> {{ translate('systems.polls.votingBy') }}
+                    <fa icon='exclamation'></fa> {{ translate('systems.polls.votingBy') }}
                   </template>
                   <template v-if="newVote.type === 'tips'">
-                    <font-awesome-icon icon='coins'></font-awesome-icon> {{ translate('systems.polls.votingBy') }}
+                    <fa icon='coins'></fa> {{ translate('systems.polls.votingBy') }}
                   </template>
                   <template v-if="newVote.type === 'bits'">
-                    <font-awesome-icon icon='gem'></font-awesome-icon> {{ translate('systems.polls.votingBy') }}
+                    <fa icon='gem'></fa> {{ translate('systems.polls.votingBy') }}
                   </template>
                   <select v-model="newVote.type" class="text-muted border-left-0 border-right-0 border-top-0" style="background-color: transparent;font-size: .9rem; text-transform: uppercase; font-weight: bold;">
                     <option value="normal">{{ translate('systems.polls.command') }}</option>
@@ -57,7 +57,7 @@
 
               <div class="card-footer">
                 <button type="button" class="btn btn-block btn-success" style="white-space: normal;" :disabled="!atLeastTwoOptions || newVote.title.trim().length === 0" @click="create()">
-                  <font-awesome-icon icon='plus'></font-awesome-icon>
+                  <fa icon='plus'></fa>
                   <template v-if="newVote.title.trim().length === 0">
                     {{ translate('systems.polls.cannotCreateWithoutTitle')}}
                   </template>
@@ -73,24 +73,24 @@
           </template>
           <div class="card mb-3 p-0 border" v-else v-bind:key="String(vote._id)" :class="[vote.isOpened ? 'border-info' : '']">
             <div class="text-info current" v-if="vote.isOpened">
-              <font-awesome-icon icon="spinner" spin />
+              <fa icon="spinner" spin />
                 {{ translate('systems.polls.running') }}
             </div>
             <div class="text-success current" v-else>
-              <font-awesome-icon icon="check" />
+              <fa icon="check" />
                 {{ translate('systems.polls.done') }}
             </div>
             <div class="card-body">
               <h5 class="card-title" style="text-transform: inherit;">{{ vote.title }}</h5>
               <h6 class="card-subtitle mb-2 text-muted">
                 <template v-if="vote.type === 'normal'">
-                  <font-awesome-icon icon='exclamation'></font-awesome-icon> {{ translate('systems.polls.votingBy') }} {{ translate('systems.polls.command') }}
+                  <fa icon='exclamation'></fa> {{ translate('systems.polls.votingBy') }} {{ translate('systems.polls.command') }}
                 </template>
                 <template v-if="vote.type === 'tips'">
-                  <font-awesome-icon icon='coins'></font-awesome-icon> {{ translate('systems.polls.votingBy') }} {{ translate('systems.polls.tips') }}
+                  <fa icon='coins'></fa> {{ translate('systems.polls.votingBy') }} {{ translate('systems.polls.tips') }}
                 </template>
                 <template v-if="vote.type === 'bits'">
-                  <font-awesome-icon icon='gem'></font-awesome-icon> {{ translate('systems.polls.votingBy') }} {{ translate('systems.polls.bits') }}
+                  <fa icon='gem'></fa> {{ translate('systems.polls.votingBy') }} {{ translate('systems.polls.bits') }}
                 </template>
               </h6>
 
@@ -129,12 +129,12 @@
             <div class="card-footer">
               <template v-if="vote.isOpened">
                 <button type="button" class="btn btn-block btn-danger" @click="stop(String(vote._id))">
-                  <font-awesome-icon icon='stop'></font-awesome-icon> {{ translate('systems.polls.stop') }}
+                  <fa icon='stop'></fa> {{ translate('systems.polls.stop') }}
                 </button>
               </template>
               <template v-else>
                 <button type="button" class="btn btn-block btn-info" style="white-space: normal;" :disabled="isRunning" @click="copy(String(vote._id))">
-                  <font-awesome-icon icon='clone'></font-awesome-icon>
+                  <fa icon='clone'></fa>
                   <template v-if="isRunning">{{ translate('systems.polls.cannotCopyIfInProgress') }}</template>
                   <template v-else>{{ translate('systems.polls.copy') }}</template>
                 </button>
@@ -164,12 +164,6 @@
 
   import * as io from 'socket.io-client';
 
-  import { library } from '@fortawesome/fontawesome-svg-core'
-  import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-  import { faTrophy, faClone, faGem, faCoins, faExclamation, faStop, faBan, faSpinner, faCheck, faAngleRight, faPlus } from '@fortawesome/free-solid-svg-icons';
-
-  library.add(faTrophy, faClone, faGem, faCoins, faExclamation, faStop, faBan, faSpinner, faCheck, faAngleRight, faPlus)
-
   Vue.use(VueMoment, {
       moment, momentTimezone
   })
@@ -177,7 +171,6 @@
   export default Vue.extend({
     components: {
       panel: () => import('../../components/panel.vue'),
-      'font-awesome-icon': FontAwesomeIcon
     },
     data: function () {
       const object: {

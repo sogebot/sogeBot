@@ -4,12 +4,12 @@
     <ul class="nav nav-pills" role="tablist">
       <li role="presentation" class="nav-item">
         <a class="nav-link active" href="#commercial-main" aria-controls="home" role="tab" data-toggle="tab" title="Commercials">
-          <font-awesome-icon icon="dollar-sign" />
+          <fa icon="dollar-sign" />
         </a>
       </li>
       <li role="presentation" class="nav-item">
         <strong class="text-info nav-link" style="margin-top: 5px;" v-if="countdown > 0">
-          <font-awesome-icon :icon="['far', 'clock']" />
+          <fa :icon="['far', 'clock']" />
           {{ countdown }}s
         </strong>
       </li>
@@ -36,18 +36,8 @@
 </template>
 
 <script>
-import { library } from '@fortawesome/fontawesome-svg-core'
-import { faDollarSign } from '@fortawesome/free-solid-svg-icons'
-import { faClock } from '@fortawesome/free-regular-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-
-library.add(faDollarSign, faClock)
-
 export default {
   props: ['commons'],
-  components: {
-    'font-awesome-icon': FontAwesomeIcon
-  },
   data: function () {
     return {
       socket: io('/systems/commercial', { query: "token=" + this.token }),

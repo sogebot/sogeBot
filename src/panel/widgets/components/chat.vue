@@ -4,23 +4,23 @@
     <ul class="nav nav-pills" role="tablist">
       <li role="presentation" class="nav-item">
         <a class="nav-link active" href="#chat-room-panel" aria-controls="home" role="tab" data-toggle="tab" title="Chat room">
-          <font-awesome-icon icon="comment-alt" />
+          <fa icon="comment-alt" />
         </a>
       </li>
       <li role="presentation" class="nav-item">
         <a class="nav-link" href="#chat-viewers-panel" aria-controls="home" role="tab" data-toggle="tab" title="Viewer list">
-          <font-awesome-icon icon="users" />
+          <fa icon="users" />
         </a>
       </li>
       <li role="presentation" class="nav-item">
         <a href="#" class="nav-link" title="Refresh" @click="refresh">
-          <font-awesome-icon icon="sync-alt" v-if="!isRefreshing"/>
-          <font-awesome-icon icon="sync-alt" spin v-else/>
+          <fa icon="sync-alt" v-if="!isRefreshing"/>
+          <fa icon="sync-alt" spin v-else/>
         </a>
       </li>
       <li role="presentation" class="nav-item widget-popout" v-if="!popout">
         <a class="nav-link" title="Popout" target="_blank" href="/popout/#chat">
-          <font-awesome-icon icon="external-link-alt" />
+          <fa icon="external-link-alt" />
         </a>
       </li>
       <li class="nav-item ml-auto">
@@ -62,17 +62,8 @@
 </template>
 
 <script>
-import { library } from '@fortawesome/fontawesome-svg-core'
-import { faCommentAlt, faUsers, faExternalLinkAlt, faSyncAlt } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-
-library.add(faCommentAlt, faUsers, faExternalLinkAlt, faSyncAlt)
-
 export default {
   props: ['commons', 'popout', 'configuration'],
-  components: {
-    'font-awesome-icon': FontAwesomeIcon
-  },
   data: function () {
     return {
       socket: io('/widgets/chat', { query: "token=" + this.token }),

@@ -5,28 +5,28 @@
       <li role="presentation" class="nav-item">
         <a class="nav-link" href="#raffles-participants" aria-controls="home" role="tab" data-toggle="tab" title="Participants">
           <small>{{ participants.length }}</small>
-          <font-awesome-icon icon="users"></font-awesome-icon>
+          <fa icon="users"></fa>
         </a>
       </li>
       <li role="presentation" class="nav-item">
         <a class="nav-link active" href="#raffles-giveaway" aria-controls="home" role="tab" data-toggle="tab" title="Giveaway">
-          <font-awesome-icon icon="gift"></font-awesome-icon>
+          <fa icon="gift"></fa>
         </a>
       </li>
       <li role="presentation" class="nav-item">
         <a class="nav-link" href="#raffles-winner" aria-controls="home" role="tab" data-toggle="tab" title="Last winner" v-if="winner">
-          <font-awesome-icon icon="trophy"></font-awesome-icon>
+          <fa icon="trophy"></fa>
           {{ winner.username }}
         </a>
       </li>
       <li role="presentation" class="nav-item">
         <a class="nav-link" href="#raffles-settings" aria-controls="home" role="tab" data-toggle="tab" title="Settings">
-          <font-awesome-icon icon="cog"></font-awesome-icon>
+          <fa icon="cog"></fa>
         </a>
       </li>
       <li role="presentation" class="nav-item widget-popout">
         <a class="nav-link" title="Popout" target="_blank" href="/popout/#raffles">
-          <font-awesome-icon icon="external-link-alt"></font-awesome-icon>
+          <fa icon="external-link-alt"></fa>
         </a>
       </li>
       <li class="nav-item ml-auto">
@@ -43,19 +43,19 @@
           <input type="text" class="form-control" :placeholder="commons.translate('placeholder-search')" v-model="search">
           <span class="input-group-btn">
             <button class="btn btn-danger" type="button" title="Cancel search" @click="search = ''">
-              <font-awesome-icon icon="trash"></font-awesome-icon>
+              <fa icon="trash"></fa>
             </button>
           </span>
         </div>
         <ul class="list-unstyled p-2">
           <li v-for="participant of fParticipants" :key="participant._id" style="cursor: pointer" @click="toggleEligibility(participant)">
-            <font-awesome-icon
+            <fa
               :class="[participant.eligible ? 'text-success': '']"
-              :icon="['far', participant.eligible ? 'check-circle' : 'circle']"></font-awesome-icon>
+              :icon="['far', participant.eligible ? 'check-circle' : 'circle']"></fa>
             {{ participant.username }}
           </li>
           <li class="text-danger">
-            <font-awesome-icon icon="eye-slash"></font-awesome-icon>
+            <fa icon="eye-slash"></fa>
             {{Math.abs(fParticipants.length - participants.length)}} {{commons.translate('hidden')}}
           </li>
         </ul>
@@ -68,12 +68,12 @@
             <button class="btn btn-success" type="button"
               :disabled="keyword.trim().length <= 1 || running"
               @click="open()">
-                <font-awesome-icon icon="plus" fixed-width></font-awesome-icon>
+                <fa icon="plus" fixed-width></fa>
             </button>
             <button class="btn btn-danger" type="button"
               :disabled="!running"
               @click="close()">
-                <font-awesome-icon icon="trash" fixed-width></font-awesome-icon>
+                <fa icon="trash" fixed-width></fa>
             </button>
           </span>
           <div class="input-group-prepend">
@@ -82,7 +82,7 @@
           <input type="text" class="form-control" :placeholder="commons.translate('placeholder-enter-keyword')" v-model="keyword" :disabled="running">
           <span class="input-group-btn btn-group">
             <button type="button" class="btn btn-success" :disabled="!running" @click="socket.emit('pick')">
-              <font-awesome-icon icon="trophy" fixed-width></font-awesome-icon>
+              <fa icon="trophy" fixed-width></fa>
             </button>
           </span>
         </div>
@@ -100,7 +100,7 @@
               @click="toggle('all')"
               :title="commons.translate('everyone')"
               :disabled="running">
-              <font-awesome-icon icon="users" />
+              <fa icon="users" />
             </button>
             <button
               class="btn d-block border-0 w-100" style="flex-shrink: 2;"
@@ -108,7 +108,7 @@
               @click="toggle('followers')"
               :title="commons.translate('followers')"
               :disabled="running">
-              <font-awesome-icon icon="heart" />
+              <fa icon="heart" />
             </button>
             <button
               class="btn d-block border-0 w-100" style="flex-shrink: 2;"
@@ -116,7 +116,7 @@
               @click="toggle('subscribers')"
               :title="commons.translate('subscribers')"
               :disabled="running">
-              <font-awesome-icon icon="star" />
+              <fa icon="star" />
             </button>
             </div>
           </div>
@@ -170,7 +170,7 @@
         <template v-if="winner">
           <div style="text-align: center">
             <strong style="font-size: 30px">
-            <font-awesome-icon :icon="['fab', 'twitch']"></font-awesome-icon>
+            <fa :icon="['fab', 'twitch']"></fa>
               {{winner.username}}
             </strong>
           </div>
@@ -180,7 +180,7 @@
               <div class="w-100 btn" style="cursor: initial" :class="[winner.is.follower ? 'text-success' : 'text-danger']">{{commons.translate('follower')}}</div>
               <div class="w-100 btn" style="cursor: initial" :class="[winner.is.subscriber ? 'text-success' : 'text-danger']">{{commons.translate('subscriber')}}</div>
               <button type="button" class="btn btn-outline-secondary border-0 btn-block" @click="socket.emit('pick')">
-                <font-awesome-icon icon="sync"></font-awesome-icon>
+                <fa icon="sync"></fa>
                 {{commons.translate('roll-again')}}
               </button>
             </div>
@@ -191,7 +191,7 @@
               <thead>
                 <tr>
                   <td colspan="2" style="vertical-align: bottom; font-size: 18px;">
-                  <font-awesome-icon icon="comments"></font-awesome-icon>
+                  <fa icon="comments"></fa>
                   {{commons.translate('messages')}}
                   </td>
                 </tr>
@@ -247,19 +247,8 @@
 </template>
 
 <script>
-import { library } from '@fortawesome/fontawesome-svg-core'
-import { faUsers, faGift, faTrophy, faCog, faExternalLinkAlt, faTrash, faPlus, faTimes, faSync, faComments, faEyeSlash } from '@fortawesome/free-solid-svg-icons'
-import { faTwitch } from '@fortawesome/free-brands-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { faCircle, faCheckCircle } from '@fortawesome/free-regular-svg-icons';
-
-library.add(faUsers, faGift, faTrophy, faCog, faExternalLinkAlt, faTrash, faPlus, faTimes, faTwitch, faSync, faComments, faCircle, faCheckCircle, faEyeSlash)
-
 export default {
   props: ['commons', 'token'],
-  components: {
-    'font-awesome-icon': FontAwesomeIcon,
-  },
   mounted: function () {
     this.$emit('mounted')
   },
