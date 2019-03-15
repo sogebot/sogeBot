@@ -8,7 +8,7 @@
         <div v-if="isLoading"
              class="text-uppercase list-group-item list-group-item-info"
              style="letter-spacing: -1px;">
-          <font-awesome-icon icon="spinner" spin/>
+          <fa icon="spinner" spin/>
           {{translate('core.permissions.loadingInProgress')}}
         </div>
         <button v-for="p of _.orderBy(currentData, 'order')"
@@ -21,11 +21,10 @@
                 v-on:dragenter="dragenter(p.id, $event)"
                 v-on:dragend="dragend()"
                 draggable="true"
-                v-else
-                >
+                v-else>
 
-          <font-awesome-icon icon="greater-than-equal" fixed-width v-if="p.isWaterfallAllowed" size="xs" transform="shrink-8"/>
-          <font-awesome-icon icon="equals" fixed-width v-else size="xs" transform="shrink-8"/>
+          <fa icon="greater-than-equal" fixed-width v-if="p.isWaterfallAllowed" size="xs" transform="shrink-8"/>
+          <fa icon="equals" fixed-width v-else size="xs" transform="shrink-8"/>
           <template v-if="p.name.length > 0">
             <strong v-if="p.isCorePermission">{{ p.name }}</strong>
             <span v-else>{{ p.name }}</span>
@@ -38,7 +37,7 @@
                  class="text-uppercase"
                  :class="{ 'text-dark': $route.params.id !== p.id, 'text-light': $route.params.id === p.id }"
                  style="font-size: 0.7rem !important; letter-spacing: 1px;">
-            <font-awesome-icon icon="cog"></font-awesome-icon> {{ translate('core.permissions.' + p.automation) }}
+            <fa icon="cog"></fa> {{ translate('core.permissions.' + p.automation) }}
           </small>
         </button>
       </div>
@@ -48,20 +47,10 @@
 
 <script lang="ts">
   import Vue from 'vue'
-
-  import { library } from '@fortawesome/fontawesome-svg-core'
-  import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-  import { faCog, faSpinner, faEquals, faGreaterThanEqual } from '@fortawesome/free-solid-svg-icons';
-
   import * as io from 'socket.io-client';
-
-  library.add(faCog, faSpinner, faEquals, faGreaterThanEqual)
 
   export default Vue.extend({
     props: ['update'],
-    components: {
-      'font-awesome-icon': FontAwesomeIcon,
-    },
     data() {
       const data: {
         draggingPID: null | string,

@@ -1,16 +1,17 @@
 <template>
   <div>
+    {{ item }}
     <div class="card p-0 m-0">
       <div class="card-header alert-warning text-uppercase"
            style="letter-spacing: -1px;"
            v-if="!$route.params.id">
-        <font-awesome-icon icon="long-arrow-alt-left"/>
+        <fa icon="long-arrow-alt-left"/>
         {{ translate('core.permissions.selectPermissionGroup') }}
       </div>
       <div v-else-if="_.some(isLoading)"
            class="card-header alert-info text-uppercase"
            style="letter-spacing: -1px;">
-        <font-awesome-icon icon="spinner" spin/>
+        <fa icon="spinner" spin/>
         {{ translate('core.permissions.loadingInProgress') }}
       </div>
       <div v-else-if="item"
@@ -82,18 +83,10 @@
 
 <script lang="ts">
   import Vue from 'vue'
-
-  import { library } from '@fortawesome/fontawesome-svg-core'
-  import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-  import { faLongArrowAltLeft, faSpinner } from '@fortawesome/free-solid-svg-icons';
-
   import * as io from 'socket.io-client';
-
-  library.add(faLongArrowAltLeft, faSpinner);
 
   export default Vue.extend({
     components: {
-      'font-awesome-icon': FontAwesomeIcon,
       holdButton: () => import('../../../../components/holdButton.vue'),
       stateButton: () => import('../../../../components/stateButton.vue'),
       userslist: () => import('./userslist.vue'),
@@ -103,7 +96,6 @@
     data() {
       const data: {
         item: Permissions.Item | null,
-        extendsList: Permissions.Item[],
         socket: any,
         isSaving: number,
         isLoading: {
@@ -111,7 +103,6 @@
         },
       } = {
         item: null,
-        extendsList: [],
         socket: io('/core/permissions', { query: "token=" + this.token }),
         isSaving: 0,
         isLoading: {

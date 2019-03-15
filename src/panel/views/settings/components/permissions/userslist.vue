@@ -4,8 +4,8 @@
          :class="{'focus-border': isFocused }">
       <div class="input-group-prepend">
         <div class="input-group-text bg-transparent border-0">
-          <font-awesome-icon icon="search" v-if="!isSearching"></font-awesome-icon>
-          <font-awesome-icon icon="spinner" spin v-else></font-awesome-icon>
+          <fa icon="search" v-if="!isSearching"></fa>
+          <fa icon="spinner" spin v-else></fa>
         </div>
       </div>
       <input
@@ -51,7 +51,7 @@
                 @click="currentIds = currentIds.filter((o) => o !== id)">
           <span>{{(currentUsers.find(o => o.id === id) || { username: translate('core.permissions.loading')}).username}}</span>
           <small class="text-muted">{{id}}</small>
-          <font-awesome-icon class="text-muted" icon="times"></font-awesome-icon>
+          <fa class="text-muted" icon="times"></fa>
         </button>
       </div>
     </div>
@@ -60,21 +60,11 @@
 
 <script lang="ts">
   import Vue from 'vue'
-
-  import { library } from '@fortawesome/fontawesome-svg-core'
-  import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-  import { faSearch, faSpinner, faTimes } from '@fortawesome/free-solid-svg-icons';
-
   import * as io from 'socket.io-client';
   import * as uuid from 'uuid/v4';
 
-  library.add(faSearch, faSpinner, faTimes);
-
   export default Vue.extend({
     props: ['ids'],
-    components: {
-      'font-awesome-icon': FontAwesomeIcon,
-    },
     data() {
       const data: {
         usersSocket: any,

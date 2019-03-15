@@ -39,7 +39,7 @@
         </div>
         <div class="form-group col-md-1">
           <button class="btn btn-outline-dark border-0" @click="remove(index)">
-            <font-awesome-icon icon="times" fixed-width></font-awesome-icon>
+            <fa icon="times" fixed-width></fa>
           </button>
         </div>
       </div>
@@ -51,17 +51,8 @@
 <script lang="ts">
   import Vue from 'vue'
 
-  import { library } from '@fortawesome/fontawesome-svg-core'
-  import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-  import { faTimes } from '@fortawesome/free-solid-svg-icons';
-
-  library.add(faTimes);
-
   export default Vue.extend({
     props: ['filters'],
-    components: {
-      'font-awesome-icon': FontAwesomeIcon,
-    },
     data() {
       const data: {
         cFilters: Permissions.Filter[],

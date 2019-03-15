@@ -4,8 +4,8 @@
          :class="{'focus-border': isFocused }">
       <div class="input-group-prepend">
         <div class="input-group-text bg-transparent border-0">
-          <font-awesome-icon icon="vial" v-if="!isTesting"></font-awesome-icon>
-          <font-awesome-icon icon="spinner" spin v-else></font-awesome-icon>
+          <fa icon="vial" v-if="!isTesting"></fa>
+          <fa icon="spinner" spin v-else></fa>
         </div>
       </div>
       <input
@@ -24,10 +24,10 @@
                && this.inputUsername.trim().length !== 0
                && typeof partialStatus.access !== 'undefined'
                && !isTesting">
-      <font-awesome-icon icon="question"
+      <fa icon="question"
                         fixed-width
                         v-if="Number(status.access) === 2 || Number(partialStatus.access) === 2" />
-      <font-awesome-icon :icon="Number(status.access) === 1 || Number(partialStatus.access) === 1 ? 'check' : 'times'"
+      <fa :icon="Number(status.access) === 1 || Number(partialStatus.access) === 1 ? 'check' : 'times'"
                         fixed-width
                         v-else />
       <span v-if="Number(status.access) === 0 && Number(partialStatus.access) === 0"
@@ -53,21 +53,11 @@
 
 <script lang="ts">
   import Vue from 'vue'
-
-  import { library } from '@fortawesome/fontawesome-svg-core'
-  import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-  import { faVial, faSpinner, faTimes, faQuestion } from '@fortawesome/free-solid-svg-icons';
-
   import * as io from 'socket.io-client';
   import * as uuid from 'uuid/v4';
 
-  library.add(faVial, faSpinner, faTimes, faQuestion);
-
   export default Vue.extend({
     props: ['ids'],
-    components: {
-      'font-awesome-icon': FontAwesomeIcon,
-    },
     data() {
       const data: {
         socket: any,
