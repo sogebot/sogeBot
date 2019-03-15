@@ -11,13 +11,7 @@ const {
 } = require('worker_threads');
 const Message = require('./message')
 
-const __DEBUG__ = {
-  sendMessage: process.env.DEBUG &&
-              (
-                process.env.DEBUG.includes('commons.*') ||
-                process.env.DEBUG.includes('commons.sendMessage')
-              )
-}
+import { debug } from './debug';
 
 function Commons () {
   this.registerConfiguration()
@@ -113,10 +107,7 @@ Commons.prototype.sendMessage = async function (message, sender, attr) {
   attr = attr || {}
   sender = sender || {}
 
-  if (__DEBUG__.sendMessage) {
-    global.log.debug({message, sender, attr})
-  }
-
+  debug('commons.sendMessage', JSON.stringify({message, sender, attr}))
   if (_.isString(sender)) sender = { username: String(sender) }
 
   if (_.isNil(sender) || _.isNil(sender.username)) sender.username = undefined

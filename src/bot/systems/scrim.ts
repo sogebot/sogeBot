@@ -12,6 +12,8 @@ import constants from '../constants';
 import Expects from '../expects.js';
 import System from './_interface';
 
+import { debug } from '../debug';
+
 enum ERROR {
   ALREADY_OPENED,
   CANNOT_BE_ZERO,
@@ -34,6 +36,7 @@ class Scrim extends System {
           closingAt: 0,
           type: '',
           lastRemindAt: Date.now(),
+          isCooldownOnly: false,
         },
         time: {
           waitForMatchIdsInSeconds: 60,
@@ -57,7 +60,11 @@ class Scrim extends System {
 
   public async main(opts: CommandOptions): Promise<void> {
     try {
-      const [type, minutes] = new Expects(opts.parameters).string({name: 'type'}).number({name: 'minutes'}).toArray();
+      const [isCooldownOnly, type, minutes] = new Expects(opts.parameters)
+        .toggler({name: 'c'})
+        .string({name: 'type'})
+        .number({name: 'minutes'})
+        .toArray();
       if (this.settings._.closingAt !== 0) {
         throw Error(String(ERROR.ALREADY_OPENED));
       }  // ignore if its already opened
@@ -65,10 +72,13 @@ class Scrim extends System {
         throw Error(String(ERROR.CANNOT_BE_ZERO));
       }
 
+      debug('scrim.main', `Opening new scrim cooldownOnly:${isCooldownOnly}, type:${type}, minutes:${minutes}`);
+
       const now = Date.now();
 
       this.settings._.closingAt = now + (minutes * constants.MINUTE);
       this.settings._.type = type;
+      this.settings._.isCooldownOnly = isCooldownOnly;
 
       this.settings._.lastRemindAt = now;
       await global.db.engine.remove(this.collection.matchIds, {});
@@ -196,23 +206,25 @@ class Scrim extends System {
         } else {
           this.settings._.closingAt = 0;
           global.commons.sendMessage(global.commons.prepare('systems.scrim.go'), { username: global.commons.getOwner() });
-          setTimeout(() => {
-            if (this.settings._.closingAt !== 0) {
-              return; // user restarted !snipe
-            }
-            global.commons.sendMessage(
-              global.commons.prepare('systems.scrim.putMatchIdInChat', {
-                command: this.settings.commands['!snipe match'],
-              }),
-              { username: global.commons.getOwner() },
-            );
-            setTimeout(async () => {
+          if (!this.settings._.isCooldownOnly) {
+            setTimeout(() => {
               if (this.settings._.closingAt !== 0) {
                 return; // user restarted !snipe
               }
-              this.currentMatches();
-            }, this.settings.time.waitForMatchIdsInSeconds * constants.SECOND);
-          }, 15 * constants.SECOND);
+              global.commons.sendMessage(
+                global.commons.prepare('systems.scrim.putMatchIdInChat', {
+                  command: this.settings.commands['!snipe match'],
+                }),
+                { username: global.commons.getOwner() },
+              );
+              setTimeout(async () => {
+                if (this.settings._.closingAt !== 0) {
+                  return; // user restarted !snipe
+                }
+                this.currentMatches();
+              }, this.settings.time.waitForMatchIdsInSeconds * constants.SECOND);
+            }, 15 * constants.SECOND);
+          }
         }
       }, (i + 1) * 1000);
     }

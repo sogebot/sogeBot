@@ -1,11 +1,14 @@
 ## Start new scrim countdown
 
-`!snipe <type:string> <minutes:number>`
+`!snipe (-c) <type:string> <minutes:number>`
 
 !> Default permission is **OWNER**
 
 ### Parameters
 
+- `-c`
+  - *optional*
+  - disables adding match IDs and Current Matches output
 - `<type:string>`
   - set type of your scrim, e.g. duo, single, apex, etc. It's
     not enforced to specific values.
