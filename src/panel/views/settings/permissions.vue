@@ -35,10 +35,9 @@
         </em>
       </div>
       <div class="col-9">
-        <edit :update="update" @delete="update = Date.now()" @update="update = Date.now()"></edit>
+        <edit :update="update" @delete="update = Date.now()" @update="update = Date.now()" @pending="pending = $event"></edit>
       </div>
     </div>
-
   </div>
 </template>
 
@@ -65,11 +64,42 @@
       const object: {
         update: number,
         socket: any,
+        pending: boolean,
       } = {
         update: Date.now(),
         socket: io('/core/permissions', { query: "token=" + this.token }),
+        pending: false,
       }
       return object
+    },
+    beforeRouteUpdate(to, from, next) {
+      if (this.pending) {
+        const isOK = confirm('You will lose your pending changes. Do you want to continue?')
+        if (!isOK) {
+          next(false);
+        } else {
+          next();
+        }
+      } else {
+        next();
+      }
+    },
+    beforeRouteLeave(to, from, next) {
+      if (this.pending) {
+        const isOK = confirm('You will lose your pending changes. Do you want to continue?')
+        if (!isOK) {
+          next(false);
+        } else {
+          next();
+        }
+      } else {
+        next();
+      }
+    },
+    watch: {
+      $route(to, from) {
+        this.pending = false;
+      }
     },
     methods: {
       addNewPermissionGroup() {

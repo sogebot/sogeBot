@@ -33,12 +33,12 @@
             </div>
             <div class="btn-icon" v-if="button.icon">
               <template v-if="typeof button.state !== 'undefined' && state[button.state] === 1">
-                <font-awesome-icon icon="circle-notch" spin fixed-width></font-awesome-icon>
+                <fa icon="circle-notch" spin fixed-width></fa>
               </template>
               <template v-else-if="typeof button.state !== 'undefined' && state[button.state] === 2">
-                <font-awesome-icon icon="check" fixed-width></font-awesome-icon>
+                <fa icon="check" fixed-width></fa>
               </template>
-              <font-awesome-icon v-else :icon="button.icon" fixed-width></font-awesome-icon>
+              <fa v-else :icon="button.icon" fixed-width></fa>
             </div>
           </button>
         </div>
