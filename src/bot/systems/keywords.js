@@ -7,6 +7,7 @@ const XRegExp = require('xregexp')
 // bot libraries
 import { permission } from '../permissions';
 const Message = require('../message')
+const constants = require('../constants')
 import System from './_interface'
 
 /*
