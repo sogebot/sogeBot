@@ -5,7 +5,6 @@ const decode = require('decode-html')
 const querystring = require('querystring')
 const _ = require('lodash')
 const crypto = require('crypto')
-import { Permissions } from './permissions';
 const gitCommitInfo = require('git-commit-info');
 
 const Entities = require('html-entities').AllHtmlEntities
