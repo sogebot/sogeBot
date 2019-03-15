@@ -28,14 +28,14 @@
 
     <div class="row">
       <div class="col-3">
-        <list :update="update"></list>
+        <list :update="update" @update="update = Date.now()"></list>
         <em class="alert-danger p-3 mt-1 d-block">
           <font-awesome-icon icon="exclamation-triangle" size="lg"></font-awesome-icon>
           {{translate('core.permissions.higherPermissionHaveAccessToLowerPermissions')}}
         </em>
       </div>
       <div class="col-9">
-        <edit @delete="update = Date.now()" @update="update = Date.now()"></edit>
+        <edit :update="update" @delete="update = Date.now()" @update="update = Date.now()"></edit>
       </div>
     </div>
 

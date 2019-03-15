@@ -1,6 +1,5 @@
 <template>
   <div>
-    {{ item }}
     <div class="card p-0 m-0">
       <div class="card-header alert-warning text-uppercase"
            style="letter-spacing: -1px;"
@@ -86,6 +85,7 @@
   import * as io from 'socket.io-client';
 
   export default Vue.extend({
+    props: ['update'],
     components: {
       holdButton: () => import('../../../../components/holdButton.vue'),
       stateButton: () => import('../../../../components/stateButton.vue'),
@@ -114,7 +114,10 @@
     watch: {
       '$route.params.id'(val) {
         this.refresh();
-      }
+      },
+      update() {
+        this.refreshOrder()
+      },
     },
     mounted() {
       if(this.$route.params.id) {
@@ -122,6 +125,13 @@
       }
     },
     methods: {
+      refreshOrder() {
+        this.socket.emit('permission', this.$route.params.id, (p) => {
+          if (this.item) {
+            this.$set(this.item, 'order', p.order);
+          }
+        })
+      },
       refresh() {
         this.isLoading.permission = true
 

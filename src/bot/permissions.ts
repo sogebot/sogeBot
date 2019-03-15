@@ -191,10 +191,11 @@ class Permissions extends Core {
       socket.on('permission', async (id, cb) => {
         cb(await global.db.engine.findOne(this.collection.data, { id }));
       });
-      socket.on('permissions.order', async (data) => {
+      socket.on('permissions.order', async (data, cb) => {
         for (const d of data) {
           await global.db.engine.update(this.collection.data, { id: String(d.id) }, { order: d.order });
         }
+        cb();
       });
       socket.on('test.user', async (opts, cb) => {
         const userByName = await global.db.engine.findOne('users', { username: opts.value });

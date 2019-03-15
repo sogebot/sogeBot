@@ -81,7 +81,9 @@
         })
       },
       dragend() {
-        this.socket.emit('permissions.order', this.currentData);
+        this.socket.emit('permissions.order', this.currentData, () => {
+          this.$emit('update');
+        });
       },
       setPermission(pid) {
         this.$router.push({ name: 'PermissionsSettings', params: { id: pid } })
