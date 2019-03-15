@@ -70,9 +70,6 @@ export default {
   mounted: function () {
     this.$emit('mounted')
   },
-  components: {
-    'font-awesome-icon': FontAwesomeIcon
-  },
   data: function () {
     return {
       socket: io('/systems/bets', {query: "token=" + this.token}),
