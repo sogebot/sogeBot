@@ -11,7 +11,7 @@ const mathjs = require('mathjs')
 const XRegExp = require('xregexp')
 
 const Message = require('./message')
-const constants = require('./constants')
+import { permission } from './permissions';
 
 class CustomVariables {
   constructor () {
@@ -228,20 +228,16 @@ class CustomVariables {
     opts.readOnlyBypass = _.isNil(opts.readOnlyBypass) ? false : opts.readOnlyBypass
     // add simple text variable, if not existing
     if (_.isEmpty(item)) {
-      item = await global.db.engine.insert('custom.variables', { variableName, currentValue, type: 'text', responseType: 0, permission: constants.MODS })
+      item = await global.db.engine.insert('custom.variables', { variableName, currentValue, type: 'text', responseType: 0, permission: permission.MODERATORS })
     } else {
       // set item permission to owner if missing
-      item.permission = typeof item.permission === 'undefined' ? constants.OWNER_ONLY : item.permission;
+      item.permission = typeof item.permission === 'undefined' ? permission.CASTERS : item.permission;
       let [isRegular, isMod, isOwner] = await Promise.all([
         global.commons.isRegular(opts.sender),
         global.commons.isModerator(opts.sender),
         global.commons.isOwner(opts.sender)
       ])
-      const permissionsAreValid = _.isNil(opts.sender) ||
-                            (item.permission === constants.VIEWERS) ||
-                            (item.permission === constants.REGULAR && (isRegular || isMod || isOwner)) ||
-                            (item.permission === constants.MODS && (isMod || isOwner)) ||
-                            (item.permission === constants.OWNER_ONLY && isOwner);
+      const permissionsAreValid = _.isNil(opts.sender) || (await global.permissions.check(opts.sender.userId, item.permission)).access;
       if ((item.readOnly && !opts.readOnlyBypass) || !permissionsAreValid) {
         isOk = false
       } else {

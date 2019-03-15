@@ -702,7 +702,7 @@ class Module {
             }
           }
 
-          command.permission = _.isNil(command.permission) ? constants.VIEWERS : command.permission
+          command.permission = _.isNil(command.permission) ? permission.VIEWERS : command.permission
           command.command = _.isNil(command.command) ? this.settings.commands[command.name] : command.command
           commands.push({
             this: this,

@@ -12,6 +12,8 @@ const message = require('../../general.js').message
 
 const Parser = require('../../../dest/parser')
 
+const owner = { username: 'soge__', userId: Math.random() }
+
 describe('Parser - case sensitive commands', async () => {
   const tests = [
     {
@@ -29,15 +31,17 @@ describe('Parser - case sensitive commands', async () => {
       before(async () => {
         await db.cleanup()
         await message.prepare()
+
+        await global.db.engine.insert('users', { username: owner.username, id: owner.userId })
       })
 
       it(`Run command '${test.test}'`, async () => {
-        const parse = new Parser({ sender: { username: 'soge__' }, message: test.test, skip: false, quiet: false })
+        const parse = new Parser({ sender: owner, message: test.test, skip: false, quiet: false })
         await parse.process()
       })
 
       it(`Expect message '${test.expected}`, async () => {
-        await message.isSentRaw(test.expected, { username: 'soge__' })
+        await message.isSentRaw(test.expected, owner)
       })
     })
   }

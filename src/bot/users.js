@@ -9,6 +9,7 @@ const {
 } = require('worker_threads');
 const axios = require('axios')
 
+import { permission } from './permissions';
 const Expects = require('./expects')
 import Core from './_interface'
 
@@ -28,11 +29,9 @@ class Users extends Core {
         showWithAt: true,
       },
       commands: [
-        { name: '!regular add', fnc: 'addRegular', permission: constants.OWNER_ONLY },
-        { name: '!regular remove', fnc: 'rmRegular', permission: constants.OWNER_ONLY },
-        { name: '!ignore add', fnc: 'ignoreAdd', permission: constants.OWNER_ONLY },
-        { name: '!ignore rm', fnc: 'ignoreRm', permission: constants.OWNER_ONLY },
-        { name: '!ignore check', fnc: 'ignoreCheck', permission: constants.OWNER_ONLY },
+        { name: '!ignore add', fnc: 'ignoreAdd', permission: permission.CASTERS },
+        { name: '!ignore rm', fnc: 'ignoreRm', permission: permission.CASTERS },
+        { name: '!ignore check', fnc: 'ignoreCheck', permission: permission.CASTERS },
       ]
     }
 
