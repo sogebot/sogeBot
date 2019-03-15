@@ -4,7 +4,7 @@
     <ul class="nav nav-pills" role="tablist">
       <li role="presentation" class="nav-item">
         <a class="nav-link active" href="#join-part-list-panel" aria-controls="home" role="tab" data-toggle="tab" title="Join/Part list">
-          <font-awesome-icon icon="sign-out-alt"></font-awesome-icon>
+          <fa icon="sign-out-alt"></fa>
         </a>
       </li>
       <li class="nav-item ml-auto">
@@ -26,17 +26,8 @@
 </template>
 
 <script>
-import { library } from '@fortawesome/fontawesome-svg-core'
-import { faSignOutAlt } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-
-library.add(faSignOutAlt)
-
 export default {
   props: ['commons'],
-  components: {
-    'font-awesome-icon': FontAwesomeIcon,
-  },
   data: function () {
     return {
       socket: io('/widgets/joinpart', { query: "token=" + this.token }),

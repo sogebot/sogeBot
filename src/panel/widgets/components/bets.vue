@@ -5,13 +5,13 @@
       <li role="presentation" class="nav-item">
         <a class="nav-link active" href="#bets-running" aria-controls="home" role="tab" data-toggle="tab" title="Betting">
           {{ title }}
-          <font-awesome-icon :icon='["far", "clock"]'></font-awesome-icon>
+          <fa :icon='["far", "clock"]'></fa>
           <template v-if="timer !== null">{{ timer | formatTime }}</template>
         </a>
       </li>
       <li role="presentation" class="nav-item">
         <a class="nav-link" href="#bets-settings" aria-controls="home" role="tab" data-toggle="tab" title="Settings">
-          <font-awesome-icon icon='cog'></font-awesome-icon>
+          <fa icon='cog'></fa>
         </a>
       </li>
       <li class="nav-item ml-auto">
@@ -65,20 +65,10 @@
 </template>
 
 <script>
-import { library } from '@fortawesome/fontawesome-svg-core'
-import { faClock } from '@fortawesome/free-regular-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { faCog } from '@fortawesome/free-solid-svg-icons';
-
-library.add(faClock, faCog)
-
 export default {
   props: ['commons', 'token'],
   mounted: function () {
     this.$emit('mounted')
-  },
-  components: {
-    'font-awesome-icon': FontAwesomeIcon
   },
   data: function () {
     return {

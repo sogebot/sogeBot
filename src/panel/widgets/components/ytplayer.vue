@@ -5,26 +5,26 @@
       <li role="presentation" class="nav-item"  style="flex-shrink: 0">
         <a class="nav-link" href="#yt-song-requests" aria-controls="home" role="tab" data-toggle="tab" title="Song Requests">
           <small>{{ requests.length }}</small>
-          <font-awesome-icon icon="list" />
+          <fa icon="list" />
         </a>
       </li>
       <li role="presentation" class="nav-item" style="flex-shrink: 0">
         <button class="btn nav-btn btn-success" @click="play" v-if="!autoplay">
-          <font-awesome-icon icon="play" />
+          <fa icon="play" />
         </button>
         <button class="btn nav-btn btn-danger" @click="pause" v-else>
-          <font-awesome-icon icon="pause" />
+          <fa icon="pause" />
         </button>
       </li>
       <li role="presentation" class="nav-item" style="flex-shrink: 0">
         <button class="btn nav-btn btn-secondary" @click="next">
-          <font-awesome-icon icon="forward" />
+          <fa icon="forward" />
         </button>
       </li>
       <li role="presentation" class="nav-item w-100">
         <a class="nav-link active" href="#yt-main" aria-controls="home" role="tab" data-toggle="tab" title="Song Requests">
-          <font-awesome-icon icon="play" v-if="autoplay"/>
-          <font-awesome-icon icon="pause" v-else/>
+          <fa icon="play" v-if="autoplay"/>
+          <fa icon="pause" v-else/>
           <template v-if="currentSong">{{ currentSong.title }}</template>
         </a>
       </li>
@@ -57,20 +57,13 @@
 </template>
 
 <script>
-import { library } from '@fortawesome/fontawesome-svg-core'
-import { faMusic, faList, faPlay, faPause, faForward } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-
 import Vue from 'vue'
 import VuePlyr from 'vue-plyr'
-
-library.add(faMusic, faList, faPlay, faPause, faForward)
 Vue.use(VuePlyr)
 
 export default {
   props: ['token', 'commons'],
   components: {
-    'font-awesome-icon': FontAwesomeIcon,
     holdButton: () => import('../../components/holdButton.vue'),
   },
   data: function () {

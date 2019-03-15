@@ -9,7 +9,7 @@
         {{ text }}
       </div>
       <div class="btn-icon" v-if="icon">
-        <font-awesome-icon :icon="icon" fixed-width></font-awesome-icon>
+        <fa :icon="icon" fixed-width></fa>
       </div>
     </div>
   </a>
@@ -20,7 +20,7 @@
         {{ text }}
       </div>
       <div class="btn-icon" v-if="icon">
-        <font-awesome-icon :icon="icon" fixed-width></font-awesome-icon>
+        <fa :icon="icon" fixed-width></fa>
       </div>
     </div>
   </button>
@@ -29,17 +29,8 @@
 <script lang="ts">
   import Vue from 'vue'
 
-  import { library } from '@fortawesome/fontawesome-svg-core'
-  import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-  import { faLink, faEdit } from '@fortawesome/free-solid-svg-icons';
-
-  library.add(faLink, faEdit)
-
   export default Vue.extend({
     props: ['text', 'href', 'icon', 'target'],
-    components: {
-      'font-awesome-icon': FontAwesomeIcon,
-    }
   })
 </script>
 

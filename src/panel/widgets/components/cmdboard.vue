@@ -4,12 +4,12 @@
     <ul class="nav nav-pills" role="tablist">
       <li role="presentation" class="nav-item">
         <a class="nav-link active" href="#cmdboard-main" aria-controls="home" role="tab" data-toggle="tab" title="CommandBoard">
-          <font-awesome-icon icon="terminal" />
+          <fa icon="terminal" />
         </a>
       </li>
       <li role="presentation" class="nav-item">
         <a class="nav-link" href="#cmdboard-settings" aria-controls="home" role="tab" data-toggle="tab" title="Settings">
-          <font-awesome-icon icon="cog" />
+          <fa icon="cog" />
         </a>
       </li>
       <li class="nav-item ml-auto">
@@ -94,17 +94,8 @@
 </template>
 
 <script>
-import { library } from '@fortawesome/fontawesome-svg-core'
-import { faTerminal, faCog } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-
-library.add(faTerminal, faCog)
-
 export default {
   props: ['commons'],
-  components: {
-    'font-awesome-icon': FontAwesomeIcon
-  },
   data: function () {
     return {
       socket: io('/widgets/cmdboard', { query: "token=" + this.token }),

@@ -8,18 +8,18 @@
       :class="[currentDashboard === String(board._id) ? 'btn-primary' : 'btn-outline-primary border-0']"
       @click="currentDashboard = String(board._id)">{{board.name}}</button>
     <button type="button" class="btn btn-sm btn-outline-primary border-0" v-if="!addDashboard" @click="addDashboard = true">
-      <font-awesome-icon icon='plus-square'></font-awesome-icon>
+      <fa icon='plus-square'></fa>
     </button>
     <div class="input-group input-group-sm" v-if="addDashboard" >
       <div class="input-group-prepend">
         <button class="btn btn-outline-danger border-0" type="button" @click="dashboardName = ''; addDashboard = false">
-          <font-awesome-icon icon='ban'></font-awesome-icon>
+          <fa icon='ban'></fa>
         </button>
       </div>
       <input type="text" class="form-control" placeholder="" aria-label="" v-model="dashboardName">
       <div class="input-group-append">
         <button class="btn btn-outline-success border-0" type="button" @click="createDashboard()">
-          <font-awesome-icon icon='plus-square'></font-awesome-icon>
+          <fa icon='plus-square'></fa>
         </button>
       </div>
     </div>
@@ -61,16 +61,9 @@
 </template>
 
 <script>
-import { library } from '@fortawesome/fontawesome-svg-core'
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { faBan, faPlusSquare } from '@fortawesome/free-solid-svg-icons';
-
-library.add(faBan, faPlusSquare)
-
 export default {
   props: ['items', 'commons', 'socket', 'token', 'dashboards'],
   components: {
-    'font-awesome-icon': FontAwesomeIcon,
     bets: () => import('./components/bets.vue'),
     chat: () => import('./components/chat.vue'),
     cmdboard: () => import('./components/cmdboard.vue'),

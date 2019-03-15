@@ -4,13 +4,13 @@
     <ul class="nav nav-pills" role="tablist">
       <li role="presentation" class="nav-item">
         <a class="nav-link active" href="#twitch-main" aria-controls="home" role="tab" data-toggle="tab" title="Twitch Stream Monitor">
-          <font-awesome-icon :icon="['fab', 'twitch']" />
+          <fa :icon="['fab', 'twitch']" />
         </a>
       </li>
       <li role="presentation" class="nav-item">
         <a href="#" class="nav-link" title="Refresh" @click="refresh">
-          <font-awesome-icon icon="sync-alt" v-if="!isRefreshing"/>
-          <font-awesome-icon icon="sync-alt" spin v-else/>
+          <fa icon="sync-alt" v-if="!isRefreshing"/>
+          <fa icon="sync-alt" spin v-else/>
         </a>
       </li>
       <li class="nav-item ml-auto">
@@ -31,13 +31,6 @@
 </template>
 
 <script>
-import { library } from '@fortawesome/fontawesome-svg-core'
-import { faTwitch } from '@fortawesome/free-brands-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { faSyncAlt } from '@fortawesome/free-solid-svg-icons';
-
-library.add(faTwitch, faSyncAlt)
-
 export default {
   data: function () {
     return {
@@ -46,9 +39,6 @@ export default {
     }
   },
   props: ['socket', 'commons'],
-  components: {
-    'font-awesome-icon': FontAwesomeIcon
-  },
   created: function () {
     this.socket.emit('twitch.sendTwitchVideo')
     this.socket.once('twitchVideo', (room) => {

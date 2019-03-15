@@ -140,7 +140,7 @@
                     </template>
                   </button>
                   <button type="button" @click="addGoal" class="border-0 list-group-item list-group-item-dark" tabindex="-1" aria-disabled="true">
-                    <font-awesome-icon icon="plus" fixed-width></font-awesome-icon> {{translate('registry.goals.addGoal')}}
+                    <fa icon="plus" fixed-width></fa> {{translate('registry.goals.addGoal')}}
                   </button>
                 </div>
               </div>
@@ -357,17 +357,10 @@ import * as io from 'socket.io-client';
 import * as uuid from 'uuid/v4';
 import axios from 'axios';
 
-import { library } from '@fortawesome/fontawesome-svg-core';
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faPlus } from '@fortawesome/free-solid-svg-icons';
-
-library.add(faPlus)
-
 export default Vue.extend({
   components: {
     panel: () => import('../../components/panel.vue'),
     holdButton: () => import('../../components/holdButton.vue'),
-    'font-awesome-icon': FontAwesomeIcon,
     datetime: Datetime,
     codemirror
   },

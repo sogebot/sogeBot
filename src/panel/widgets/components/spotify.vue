@@ -5,15 +5,15 @@
       <li role="presentation" class="nav-item" style="flex-shrink: 0">
         <a class="nav-link active" href="#spotify-song-requests" aria-controls="home" role="tab" data-toggle="tab" title="Song Requests">
           <small>{{ requests.length }}</small>
-          <font-awesome-icon icon="list" />
+          <fa icon="list" />
         </a>
       </li>
       <li role="presentation" class="nav-item" style="flex-shrink: 0">
         <button :class="[songRequestsEnabled ? 'btn-outline-success' : 'btn-outline-danger']"
                 class="nav-link btn btn-outline-success border-0 h-100 pl-1 pr-1"
                 @click="songRequestsEnabled = !songRequestsEnabled">
-          <font-awesome-icon icon="check" fixed-width v-if="songRequestsEnabled"/>
-          <font-awesome-icon icon="times" fixed-width v-else />
+          <fa icon="check" fixed-width v-if="songRequestsEnabled"/>
+          <fa icon="times" fixed-width v-else />
           {{ command }}
         </button>
       </li>
@@ -21,14 +21,14 @@
         <button :class="[continueOnPlaylistAfterRequest ? 'btn-outline-success' : 'btn-outline-danger']"
                 class="nav-link btn btn-outline-success border-0 h-100 pl-1 pr-1"
                 @click="continueOnPlaylistAfterRequest = !continueOnPlaylistAfterRequest">
-          <font-awesome-icon icon="check" fixed-width v-if="continueOnPlaylistAfterRequest"/>
-          <font-awesome-icon icon="times" fixed-width v-else />
+          <fa icon="check" fixed-width v-if="continueOnPlaylistAfterRequest"/>
+          <fa icon="times" fixed-width v-else />
           PLAYLIST
         </button>
       </li>
       <li role="presentation" class="w-100 pl-1 pr-1" style="line-height: 2.55rem;">
         <marquee-text :repeat="10" v-if="currentSong.is_playing">
-          <font-awesome-icon icon="music" class="pl-1 pr-1" fixed-width />
+          <fa icon="music" class="pl-1 pr-1" fixed-width />
           {{ currentSong.song }} - {{ currentSong.artist }}
         </marquee-text>
         <template v-else>
@@ -60,18 +60,11 @@
 </template>
 
 <script>
-import { library } from '@fortawesome/fontawesome-svg-core'
-import { faList, faCheck, faMusic } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-
 import MarqueeText from 'vue-marquee-text-component'
-
-library.add(faList, faCheck, faMusic)
 
 export default {
   props: ['token', 'commons'],
   components: {
-    'font-awesome-icon': FontAwesomeIcon,
     holdButton: () => import('../../components/holdButton.vue'),
     MarqueeText,
   },

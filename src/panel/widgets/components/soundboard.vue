@@ -4,15 +4,15 @@
     <ul class="nav nav-pills" role="tablist">
       <li role="presentation" class="nav-item">
         <a class="nav-link active" href="#soundboard-main" aria-controls="home" role="tab" data-toggle="tab" title="SoundBoard">
-          <font-awesome-icon icon="music" />
+          <fa icon="music" />
         </a>
       </li>
       <li role="presentation" class="nav-item">
         <span class="dropdown">
           <a class="nav-link nav-dropdown" id="dropdownMenuButton" data-boundary="viewPort" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="cursor: pointer; padding: 10px">
-            <font-awesome-icon icon="volume-up" v-if="volume >= 65"></font-awesome-icon>
-            <font-awesome-icon icon="volume-down" v-else-if="volume >= 35"></font-awesome-icon>
-            <font-awesome-icon icon="volume-off" v-else></font-awesome-icon>
+            <fa icon="volume-up" v-if="volume >= 65"></fa>
+            <fa icon="volume-down" v-else-if="volume >= 35"></fa>
+            <fa icon="volume-off" v-else></fa>
             <small>{{ volume }}%</small>
           </a>
           <span class="dropdown-volume-handler">
@@ -53,17 +53,8 @@
 </template>
 
 <script>
-import { library } from '@fortawesome/fontawesome-svg-core'
-import { faMusic, faVolumeUp, faVolumeDown, faVolumeOff } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-
-library.add(faMusic, faVolumeUp, faVolumeDown, faVolumeOff)
-
 export default {
   props: ['commons'],
-  components: {
-    'font-awesome-icon': FontAwesomeIcon
-  },
   data: function () {
     return {
       socket: io('/widgets/soundboard', { query: "token=" + this.token }),
