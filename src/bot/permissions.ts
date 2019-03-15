@@ -226,16 +226,14 @@ class Permissions extends Core {
     });
   }
 
-  private async list(opts: CommandOptions): Promise<void> {
-    const permissions = await global.db.engine.find(this.collection.data);
-
-    if (permissions.length === 0) {
-      global.commons.sendMessage(global.commons.prepare('core.permissions.listIsEmpty'));
-    } else {
-      global.commons.sendMessage(global.commons.prepare('core.permissions.list'));
-      for (const [p, index] of permissions) {
-        global.log.info('WIP');
-      }
+  protected async list(opts: CommandOptions): Promise<void> {
+    const permissions: Permissions.Item[] = _.orderBy(await global.db.engine.find(this.collection.data), 'order', 'asc');
+    global.commons.sendMessage(global.commons.prepare('core.permissions.list'), opts.sender);
+    for (let i = 0; i < permissions.length; i++) {
+      setTimeout(() => {
+        const symbol = permissions[i].isWaterfallAllowed ? '≥' : '=';
+        global.commons.sendMessage(`${symbol} | ${permissions[i].name} | ${permissions[i].id}`, opts.sender);
+      }, 500 * i);
     }
   }
 
