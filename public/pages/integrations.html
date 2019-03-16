@@ -58,6 +58,7 @@
                     v-bind:value="currentValue"
                     v-bind:command="defaultValue"
                     :permissions="settings._permissions[defaultValue]"
+                    :token="token"
                     v-on:update="value[defaultValue] = $event.value; settings._permissions[defaultValue] = $event.permissions; triggerDataChange()"
                   ></command-input-with-permission>
                   <toggle

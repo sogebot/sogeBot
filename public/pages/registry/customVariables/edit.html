@@ -48,8 +48,8 @@
           <div class="col-4">
             <label style="margin: 0px 0px 3px; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px;">{{ commons.translate('registry.customvariables.permissionToChange') }}</label>
             <select class="form-control" v-model="permission">
-              <option v-for="permission in [0,1,2,3]" v-bind:value="permission">
-                {{ permission | permissionToString }}
+              <option v-for="p of permissions" v-bind:value="p.id" :key="p.id">
+                  {{ getPermissionName(p.id) | capitalize }}
               </option>
             </select>
           </div>
@@ -211,7 +211,7 @@
         currentValue: '',
         usableOptions: '',
         readOnly: false,
-        permission: 0,
+        permission: null,
 
         evalValueInit: '',
         evalInput: null,
@@ -229,19 +229,29 @@
           isNotUnique: false
         },
 
+        psocket: io('/core/permissions', { query: "token=" + token }),
+        permissions: [],
+
         socket: io('/registry/customVariables', { query: "token=" + token }),
 
         saveState: 0
       },
-      filters: {
-        permissionToString: function (val) {
-          if (val === 0) return commons.translate('systems.alias.forOwners')
-          else if (val === 1) return commons.translate('systems.alias.forViewers')
-          else if (val === 2) return commons.translate('systems.alias.forMods')
-          else if (val === 3) return commons.translate('systems.alias.forRegulars')
-        }
-      },
       methods: {
+        getPermissionName: function (id) {
+          if (!id) return 'Disabled'
+          const permission = this.permissions.find((o) => {
+            return o.id === id
+          })
+          if (typeof permission !== 'undefined') {
+            if (permission.name.trim() === '') {
+              return permission.id
+            } else {
+              return permission.name
+            }
+          } else {
+            return null
+          }
+        },
         moment: function (args) {
           return moment(args) // expose moment function
         },
@@ -300,7 +310,7 @@
               variableName: this.variableName,
               description: this.description,
               currentValue: this.currentValue,
-              usableOptions: this.usableOptions,
+              usableOptions: this.usableOptions || '',
               evalValue: this.evalValue,
               runEvery: this.selectedRunEvery,
               type: this.selectedType,
@@ -354,6 +364,16 @@
         // more about the _.debounce function (and its cousin
         // _.throttle), visit: https://lodash.com/docs#debounce
         this.debouncedIsUnique =_.debounce(this.isUnique, 500)
+        this.psocket.emit('find', {}, (err, data) => {
+          if (err) return console.error(err)
+          this.permissions = _.orderBy(data, 'order', 'asc')
+
+          if (!commons.urlParam('id')) {
+            if (!this.permission) {
+              this.permission = _.orderBy(this.permissions, 'order', 'asc').pop().id
+            }
+          }
+        })
       },
       watch: {
         deleteState: function (cur, old) {
@@ -390,7 +410,11 @@
           return !_.isNil(this.evalInput) ? this.evalInput.getValue() : ''
         },
         usableOptionsArray: function () {
-          return this.usableOptions.split(',').map((o) => o.trim()).filter((o) => o.length > 0)
+          if (typeof this.usableOptions === String) {
+            return this.usableOptions.split(',').map((o) => o.trim()).filter((o) => o.length > 0)
+          } else {
+            return []
+          }
         },
         isEditation: function () {
           return !_.isNil(commons.urlParam('id'))

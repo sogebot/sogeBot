@@ -8,6 +8,7 @@ const {
 const constants = require('./constants')
 
 import { debug } from './debug';
+import { permission } from './permissions';
 
 class Module {
   timeouts = {}
@@ -234,19 +235,19 @@ class Module {
     if (this._settings.commands) {
       for (let i = 0, length = this._settings.commands.length; i < length; i++) {
         let key = this._settings.commands[i]
-        let permission = constants.VIEWERS
+        let pUuid = permission.VIEWERS;
         let fnc = null
         let isHelper = false
 
         if (_.isObjectLike(key)) {
-          permission = key.permission
+          pUuid = key.permission
           fnc = key.fnc || fnc
           isHelper = key.isHelper || false
           key = _.isObjectLike(key) ? key.name : key
         }
 
         // basic loadup of commands
-        this._commands.push({ name: key, permission, fnc, isHelper })
+        this._commands.push({ name: key, permission: pUuid, fnc, isHelper })
 
         commands[key] = key // remap to default value
       }
@@ -300,8 +301,8 @@ class Module {
               else if (key === '_permissions') {
                 for (let [command, currentValue] of Object.entries(value)) {
                   command = this._commands.find(o => o.name === command)
-                  if (currentValue === command.permission) await global.db.engine.remove('permissions', { key: command.name })
-                  else await global.db.engine.update('permissions', { key: command.name }, { permission: currentValue })
+                  if (currentValue === command.permission) await global.db.engine.remove(global.permissions.collection.commands, { key: command.name })
+                  else await global.db.engine.update(global.permissions.collection.commands, { key: command.name }, { permission: currentValue })
                 }
               } else if (key === 'enabled') this.status({ state: value })
               else if (key === 'commands') {
@@ -387,6 +388,28 @@ class Module {
               else await global.db.engine.update(opts.collection, { [opts.key]: item[opts.key] }, item)
               if (_.isFunction(cb)) cb(null, Object.assign({ _id }, itemFromDb))
             }
+          } else {
+            if (_.isFunction(cb)) cb(null, [])
+          }
+        })
+        socket.on('insert', async (opts, cb) => {
+          opts.collection = opts.collection || 'data'
+          if (opts.collection.startsWith('_')) {
+            opts.collection = opts.collection.replace('_', '')
+          } else {
+            if (opts.collection === 'settings') {
+              throw Error('You cannot use insert socket with settings collection')
+            } else {
+              opts.collection = this.collection[opts.collection]
+            }
+          }
+
+          if (opts.items) {
+            let created = []
+            for (let item of opts.items) {
+              created.push(await global.db.engine.insert(opts.collection, item))
+            }
+            if (_.isFunction(cb)) cb(null, created)
           } else {
             if (_.isFunction(cb)) cb(null, [])
           }
@@ -579,9 +602,9 @@ class Module {
     promisedSettings._permissions = {}
     for (let command of this._commands) {
       const key = _.isNil(command.name) ? command : command.name
-      let permission = await global.db.engine.findOne('permissions', { key })
-      if (!_.isEmpty(permission)) promisedSettings._permissions[key] = permission.permission // change to custom permission
-      else promisedSettings._permissions[key] = _.isNil(command.permission) ? constants.VIEWERS : command.permission
+      let pItem = await global.db.engine.findOne(global.permissions.collection.commands, { key })
+      if (!_.isEmpty(pItem)) promisedSettings._permissions[key] = pItem.permission // change to custom permission
+      else promisedSettings._permissions[key] = _.isNil(command.permission) ? permission.VIEWERS : command.permission
     }
 
     return promisedSettings
@@ -593,7 +616,7 @@ class Module {
     let parsers = []
     for (let parser of this._parsers) {
       const defaults = {
-        permission: constants.VIEWERS,
+        permission: permission.VIEWERS,
         priority: constants.LOW
       }
 
@@ -649,7 +672,7 @@ class Module {
             command: this.settings.commands[command],
             fnc: this[fnc],
             _fncName: fnc,
-            permission: constants.VIEWERS,
+            permission: permission.VIEWERS,
             isHelper: false
           })
         } else if (typeof command === 'object') {
@@ -679,7 +702,7 @@ class Module {
             }
           }
 
-          command.permission = _.isNil(command.permission) ? constants.VIEWERS : command.permission
+          command.permission = _.isNil(command.permission) ? permission.VIEWERS : command.permission
           command.command = _.isNil(command.command) ? this.settings.commands[command.name] : command.command
           commands.push({
             this: this,

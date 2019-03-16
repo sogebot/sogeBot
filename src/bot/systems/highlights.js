@@ -10,7 +10,7 @@ const {
 const axios = require('axios')
 
 // bot libraries
-const constants = require('../constants')
+import { permission } from '../permissions';
 import System from './_interface'
 
 const ERROR_STREAM_NOT_ONLINE = '1'
@@ -25,8 +25,8 @@ class Highlights extends System {
   constructor () {
     const settings = {
       commands: [
-        { name: '!highlight list', permission: constants.OWNER_ONLY },
-        { name: '!highlight', permission: constants.OWNER_ONLY }
+        { name: '!highlight list', permission: permission.CASTERS },
+        { name: '!highlight', permission: permission.CASTERS }
       ]
     }
     super({ settings })

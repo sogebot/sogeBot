@@ -1,8 +1,6 @@
 const XRegExp = require('xregexp')
 const _ = require('lodash')
-
-const __DEBUG__ =
-  process.env.DEBUG && process.env.DEBUG.includes('expects')
+import { debug } from './debug';
 
 class Expects {
   constructor (text) {
@@ -47,12 +45,13 @@ class Expects {
 
   command (opts) {
     opts = opts || {}
-    _.defaults(opts, { optional: false })
+    _.defaults(opts, { optional: false, spaces: false })
     if (!opts.optional) this.checkText()
 
     const regexp = XRegExp('(?<command> ^!\\S* )', 'ix')
     const match = XRegExp.exec(this.text, regexp)
 
+    debug('expects.command', JSON.stringify({text: this.text, opts, match}));
     if (!_.isNil(match)) {
       this.match.push(match.command.trim().toLowerCase())
       this.text = this.text.replace(match.command, '') // remove from text matched pattern
@@ -153,9 +152,45 @@ class Expects {
     return this
   }
 
+  permission(opts) {
+    opts = {
+      optional: false,
+      default: null,
+      name: 'p', // default use -p
+      ...opts
+    }
+    if (_.isNil(opts.name)) {
+      throw Error('Permission name must be defined')
+    }
+    if (opts.optional && opts.default === null) {
+      throw Error('Permission cannot be optional without default value')
+    }
+
+    const pattern = `([0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12})|(?:(?!-[a-zA-Z]).)+` // capture until -something or [^-]*
+    const fullPattern = `-${opts.name}\\s(?<${opts.name}>${pattern})`
+    const regexp = XRegExp(fullPattern, 'ix')
+    const match = XRegExp.exec(this.text, regexp)
+
+    debug('expects.permission', JSON.stringify({fullPattern, text: this.text, opts, match}));
+    if (!_.isNil(match) && match[opts.name].trim().length !== 0) {
+      this.match.push(String(match[opts.name].trim()))
+      this.text = this.text.replace(match[0], '') // remove from text matched pattern
+    } else {
+      if (!opts.optional) throw Error(`Permission ${opts.name} not found`)
+      else this.match.push(opts.default)
+    }
+    return this
+  }
+
   argument (opts) {
     opts = opts || {}
-    _.defaults(opts, { type: String, optional: false, default: null, multi: false, delimiter: '"' })
+    _.defaults(opts, {
+      type: String,
+      optional: false,
+      default: null,
+      multi: false,
+      delimiter: '"',
+    })
     if (!opts.multi) opts.delimiter = ''
     opts.delimiter = XRegExp.escape(opts.delimiter)
 
@@ -165,11 +200,14 @@ class Expects {
     let pattern
     if (opts.type.name === 'Number') pattern = '[0-9]*'
     else if (opts.type.name === 'Boolean') pattern = 'true|false'
-    else if (!opts.multi) pattern = '\\w+'
+    else if (!opts.multi) pattern = '\\S+'
     else pattern = `(?:(?!-[a-zA-Z]).)+${opts.delimiter !== '' ? '?' : ''}` // capture until -something or [^-]*
 
-    const regexp = XRegExp(`-${opts.name}\\s${opts.delimiter}(?<${opts.name}>${pattern})${opts.delimiter}`, 'ix')
+    const fullPattern = `-${opts.name}\\s${opts.delimiter}(?<${opts.name}>${pattern})${opts.delimiter}`
+    const regexp = XRegExp(fullPattern, 'ix')
     const match = XRegExp.exec(this.text, regexp)
+
+    debug('expects.argument', JSON.stringify({fullPattern, text: this.text, opts, match}));
     if (!_.isNil(match) && match[opts.name].trim().length !== 0) {
       if (opts.type.name === 'Boolean') {
         this.match.push(opts.type(match[opts.name].trim().toLowerCase() === 'true'))

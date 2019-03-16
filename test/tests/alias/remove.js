@@ -29,7 +29,7 @@ describe('Alias - remove()', () => {
   })
 
   it('!a', async () => {
-    global.systems.alias.add({ sender: owner, parameters: 'viewer !a !me' })
+    global.systems.alias.add({ sender: owner, parameters: '-a !a -c !me' })
     await message.isSent('alias.alias-was-added', owner, { alias: '!a', command: '!me', sender: owner.username })
 
     global.systems.alias.remove({ sender: owner, parameters: '!a' })
@@ -37,7 +37,7 @@ describe('Alias - remove()', () => {
   })
 
   it('!a with spaces', async () => {
-    global.systems.alias.add({ sender: owner, parameters: 'viewer !a with spaces !me' })
+    global.systems.alias.add({ sender: owner, parameters: '-a !a with spaces -c !me' })
     await message.isSent('alias.alias-was-added', owner, { alias: '!a with spaces', command: '!me', sender: owner.username })
 
     global.systems.alias.remove({ sender: owner, parameters: '!a with spaces' })
@@ -45,7 +45,7 @@ describe('Alias - remove()', () => {
   })
 
   it('!한국어', async () => {
-    global.systems.alias.add({ sender: owner, parameters: 'viewer !한국어 !me' })
+    global.systems.alias.add({ sender: owner, parameters: '-a !한국어 -c !me' })
     await message.isSent('alias.alias-was-added', owner, { alias: '!한국어', command: '!me', sender: owner.username })
 
     global.systems.alias.remove({ sender: owner, parameters: '!한국어' })
@@ -53,7 +53,7 @@ describe('Alias - remove()', () => {
   })
 
   it('!русский', async () => {
-    global.systems.alias.add({ sender: owner, parameters: 'viewer !русский !me' })
+    global.systems.alias.add({ sender: owner, parameters: '-a !русский -c !me' })
     await message.isSent('alias.alias-was-added', owner, { alias: '!русский', command: '!me', sender: owner.username })
 
     global.systems.alias.remove({ sender: owner, parameters: '!русский' })
@@ -61,7 +61,7 @@ describe('Alias - remove()', () => {
   })
 
   it('2x - !a !me', async () => {
-    global.systems.alias.add({ sender: owner, parameters: 'viewer !a !me' })
+    global.systems.alias.add({ sender: owner, parameters: '-a !a -c !me' })
     await message.isSent('alias.alias-was-added', owner, { alias: '!a', command: '!me', sender: owner.username })
 
     global.systems.alias.remove({ sender: owner, parameters: '!a' })

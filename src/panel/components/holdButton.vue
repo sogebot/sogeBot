@@ -1,5 +1,5 @@
 <template>
-  <button type="button" ref="button" class="btn btn-with-icon" @mouseup="onMouseUp" @mousedown="onMouseDown" @mouseenter="isMouseOver = true" @mouseleave="isMouseOver = false">
+  <button type="button" ref="button" class="btn btn-with-icon" @mouseup="onMouseUp" @mousedown="onMouseDown" @mouseenter="isMouseOver = true" @mouseleave="isMouseOver = false" :disabled="disabled">
     <div style="display: flex; flex-direction: inherit;">
       <div class="text w-100" :style="{opacity: 1 - this.percentage / 100 }">
         <template v-if="onMouseDownStarted === 0">
@@ -20,7 +20,7 @@
 import Vue from 'vue';
 
 export default Vue.extend({
-  props: ['ttc', 'icon'],
+  props: ['ttc', 'icon', 'disabled'],
   data: function () {
     const data: {
       onMouseDownStarted: number,

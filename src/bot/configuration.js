@@ -1,9 +1,9 @@
 'use strict'
 
-const constants = require('./constants')
 const _ = require('lodash')
 const config = require('@config')
 const gitCommitInfo = require('git-commit-info');
+import { permission } from './permissions';
 
 class Configuration {
   constructor () {
@@ -18,11 +18,11 @@ class Configuration {
 
   commands () {
     return [
-      { this: this, id: '!set list', command: '!set list', fnc: this.listSets, permission: constants.OWNER_ONLY },
-      { this: this, id: '!set', command: '!set', fnc: this.setValue, permission: constants.OWNER_ONLY },
-      { this: this, id: '!_debug', command: '!_debug', fnc: this.debug, permission: constants.OWNER_ONLY },
-      { this: this, id: '!enable', command: '!enable', fnc: this.enable, permission: constants.OWNER_ONLY },
-      { this: this, id: '!disable', command: '!disable', fnc: this.disable, permission: constants.OWNER_ONLY }
+      { this: this, id: '!set list', command: '!set list', fnc: this.listSets, permission: permission.CASTERS },
+      { this: this, id: '!set', command: '!set', fnc: this.setValue, permission: permission.CASTERS },
+      { this: this, id: '!_debug', command: '!_debug', fnc: this.debug, permission: permission.CASTERS },
+      { this: this, id: '!enable', command: '!enable', fnc: this.enable, permission: permission.CASTERS },
+      { this: this, id: '!disable', command: '!disable', fnc: this.disable, permission: permission.CASTERS }
     ]
   }
 

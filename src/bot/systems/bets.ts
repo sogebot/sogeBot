@@ -8,8 +8,8 @@ const {
 import * as _ from 'lodash';
 
 // bot libraries
-import * as constants from '../constants';
 import Expects from '../expects';
+import { permission } from '../permissions';
 import System from './_interface';
 import * as Points from './points';
 
@@ -49,9 +49,9 @@ class Bets extends System {
       settings: {
         betPercentGain: 20,
         commands: [
-          { name: '!bet open', permission: constants.MODS },
-          { name: '!bet close', permission: constants.MODS },
-          { name: '!bet refund', permission: constants.MODS },
+          { name: '!bet open', permission: permission.MODERATORS },
+          { name: '!bet close', permission: permission.MODERATORS },
+          { name: '!bet refund', permission: permission.MODERATORS },
           { name: '!bet', isHelper: true },
         ],
       },

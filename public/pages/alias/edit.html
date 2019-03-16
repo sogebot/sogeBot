@@ -30,10 +30,10 @@
 
         <div class="form-group row pl-3 pr-3">
           <div class="col-md-4">
-              <label style="margin: 0px 0px 3px; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px;">{{ commons.translate('permission') }}</label>
+            <label style="margin: 0px 0px 3px; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px;">{{ commons.translate('permission') }}</label>
             <select class="form-control" v-model="permission">
-              <option v-for="permission in [0,1,2,3]" v-bind:value="permission">
-                {{ permission | permissionToString }}
+              <option v-for="p of permissions" v-bind:value="p.id" :key="p.id">
+                  {{ getPermissionName(p.id) | capitalize }}
               </option>
             </select>
           </div>
@@ -72,7 +72,7 @@
           id: null,
           alias: '',
           command: '',
-          permission: 1,
+          permission: null,
           visible: true,
           enabled: true,
 
@@ -83,14 +83,42 @@
             command: false
           },
 
+          psocket: io('/core/permissions', { query: "token=" + token }),
           socket: io('/systems/alias', { query: "token=" + token }),
+
+          permissions: [],
 
           states: {
             save: 0,
             delete: 0
           }
         },
+        mounted() {
+          this.psocket.emit('find', {}, (err, data) => {
+            if (err) return console.error(err)
+            this.permissions = _.orderBy(data, 'order', 'asc')
+
+            if (!commons.urlParam('id')) {
+              this.permission = _.orderBy(this.permissions, 'order', 'asc').pop().id
+            }
+          })
+        },
         methods: {
+          getPermissionName: function (id) {
+            if (!id) return 'Disabled'
+            const permission = this.permissions.find((o) => {
+              return o.id === id
+            })
+            if (typeof permission !== 'undefined') {
+              if (permission.name.trim() === '') {
+                return permission.id
+              } else {
+                return permission.name
+              }
+            } else {
+              return null
+            }
+          },
           validateForm: function () {
             // reset errors
             for (let [key, value] of Object.entries(this.hasError)) {
@@ -162,12 +190,6 @@
             value = value.toString()
             return value.charAt(0).toUpperCase() + value.slice(1)
           },
-          permissionToString: function (val) {
-            if (val === 0) return commons.translate('systems.alias.forOwners')
-            else if (val === 1) return commons.translate('systems.alias.forViewers')
-            else if (val === 2) return commons.translate('systems.alias.forMods')
-            else if (val === 3) return commons.translate('systems.alias.forRegulars')
-          }
         }
       })
 

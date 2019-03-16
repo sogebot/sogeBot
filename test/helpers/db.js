@@ -21,6 +21,8 @@ module.exports = {
       for (let c of collections) {
         await global.db.engine.remove(c, {})
       }
+      await global.permissions.ensurePreservedPermissionsInDb() // re-do core permissions
+
 
       global.oauth.settings.general.channel = 'soge__'
       await variable.isEqual('global.oauth.settings.general.channel', 'soge__')

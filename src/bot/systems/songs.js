@@ -7,7 +7,7 @@ const ytpl = require('ytpl')
 const ytsearch = require('youtube-search')
 const { YouTube } = require('better-youtube-api')
 // bot libraries
-const constants = require('../constants')
+import { permission } from '../permissions';
 const {
   isMainThread
 } = require('worker_threads');
@@ -33,14 +33,14 @@ class Songs extends System {
         { name: '!songrequest', fnc: 'addSongToQueue' },
         { name: '!wrongsong', fnc: 'removeSongFromQueue' },
         { name: '!currentsong', fnc: 'getCurrentSong' },
-        { name: '!skipsong', fnc: 'sendNextSongID', permission: constants.OWNER_ONLY },
-        { name: '!bansong', fnc: 'banSong', permission: constants.OWNER_ONLY },
-        { name: '!unbansong', fnc: 'unbanSong', permission: constants.OWNER_ONLY },
-        { name: '!playlist import', fnc: 'importPlaylist', permission: constants.OWNER_ONLY },
-        { name: '!playlist add', fnc: 'addSongToPlaylist', permission: constants.OWNER_ONLY },
-        { name: '!playlist remove', fnc: 'removeSongFromPlaylist', permission: constants.OWNER_ONLY },
-        { name: '!playlist steal', fnc: 'stealSong', permission: constants.OWNER_ONLY },
-        { name: '!playlist', fnc: 'help', permission: constants.OWNER_ONLY }
+        { name: '!skipsong', fnc: 'sendNextSongID', permission: permission.CASTERS },
+        { name: '!bansong', fnc: 'banSong', permission: permission.CASTERS },
+        { name: '!unbansong', fnc: 'unbanSong', permission: permission.CASTERS },
+        { name: '!playlist import', fnc: 'importPlaylist', permission: permission.CASTERS },
+        { name: '!playlist add', fnc: 'addSongToPlaylist', permission: permission.CASTERS },
+        { name: '!playlist remove', fnc: 'removeSongFromPlaylist', permission: permission.CASTERS },
+        { name: '!playlist steal', fnc: 'stealSong', permission: permission.CASTERS },
+        { name: '!playlist', fnc: 'help', permission: permission.CASTERS }
       ]
     }
     const ui = {

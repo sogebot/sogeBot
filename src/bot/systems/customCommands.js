@@ -8,8 +8,9 @@ const XRegExp = require('xregexp')
 const safeEval = require('safe-eval')
 
 // bot libraries
-const constants = require('../constants')
+import { permission } from '../permissions';
 import System from './_interface'
+import * as constants from '../constants'
 const Expects = require('../expects')
 
 /*
@@ -46,13 +47,13 @@ class CustomCommands extends System {
   constructor () {
     const settings = {
       commands: [
-        { name: '!command add', permission: constants.OWNER_ONLY },
-        { name: '!command edit', permission: constants.OWNER_ONLY },
-        { name: '!command list', permission: constants.OWNER_ONLY },
-        { name: '!command remove', permission: constants.OWNER_ONLY },
-        { name: '!command toggle-visibility', permission: constants.OWNER_ONLY },
-        { name: '!command toggle', permission: constants.OWNER_ONLY },
-        { name: '!command', permission: constants.OWNER_ONLY, isHelper: true }
+        { name: '!command add', permission: permission.CASTERS },
+        { name: '!command edit', permission: permission.CASTERS },
+        { name: '!command list', permission: permission.CASTERS },
+        { name: '!command remove', permission: permission.CASTERS },
+        { name: '!command toggle-visibility', permission: permission.CASTERS },
+        { name: '!command toggle', permission: permission.CASTERS },
+        { name: '!command', permission: permission.CASTERS, isHelper: true }
       ],
       parsers: [
         { name: 'run', priority: constants.LOW, fireAndForget: true }
@@ -159,12 +160,16 @@ class CustomCommands extends System {
   async edit (opts: Object) {
     try {
       const [userlevel, stopIfExecuted, command, rId, response] = new Expects(opts.parameters)
-        .argument({ optional: true, name: 'ul', default: null })
+        .permission({ optional: true, default: permission.VIEWERS })
         .argument({ optional: true, name: 's', default: null, type: Boolean })
-        .command()
-        .number()
-        .everything()
+        .argument({ name: 'c', type: String, multi: true, delimiter: '' })
+        .argument({ name: 'rid', type: Number })
+        .argument({ name: 'r', type: String, multi: true, delimiter: '' })
         .toArray()
+
+      if (!command.startsWith('!')) {
+        throw Error('Command should start with !')
+      }
 
       let cDb = await global.db.engine.findOne(this.collection.data, { command })
       if (!cDb._id) return global.commons.sendMessage(global.commons.prepare('customcmds.command-was-not-found', { command }), opts.sender)
@@ -172,9 +177,15 @@ class CustomCommands extends System {
       let rDb = await global.db.engine.findOne(this.collection.responses, { cid: String(cDb._id), order: rId - 1 })
       if (!rDb._id) return global.commons.sendMessage(global.commons.prepare('customcmds.response-was-not-found', { command, response: rId }), opts.sender)
 
+
+      const pItem: Permissions.Item | null = await global.permissions.get(userlevel);
+      if (!pItem) {
+        throw Error('Permission ' + perm + ' not found.');
+      }
+
       const _id = rDb._id; delete rDb._id
       rDb.response = response
-      if (userlevel) rDb.permission = userlevel
+      rDb.permission = pItem.id
       if (stopIfExecuted) rDb.stopIfExecuted = stopIfExecuted
 
       await global.db.engine.update(this.collection.responses, { _id }, rDb)
@@ -187,11 +198,15 @@ class CustomCommands extends System {
   async add (opts: Object) {
     try {
       const [userlevel, stopIfExecuted, command, response] = new Expects(opts.parameters)
-        .argument({ optional: true, name: 'ul', default: 'viewer' })
+        .permission({ optional: true, default: permission.VIEWERS })
         .argument({ optional: true, name: 's', default: false, type: Boolean })
-        .command()
-        .everything()
+        .argument({ name: 'c', type: String, multi: true, delimiter: '' })
+        .argument({ name: 'r', type: String, multi: true, delimiter: '' })
         .toArray()
+
+      if (!command.startsWith('!')) {
+        throw Error('Command should start with !')
+      }
 
       let cDb = await global.db.engine.findOne(this.collection.data, { command })
       if (!cDb._id) {
@@ -200,11 +215,16 @@ class CustomCommands extends System {
         })
       }
 
+      const pItem: Permissions.Item | null = await global.permissions.get(userlevel);
+      if (!pItem) {
+        throw Error('Permission ' + perm + ' not found.');
+      }
+
       let rDb = await global.db.engine.find(this.collection.responses, { cid: String(cDb._id) })
       await global.db.engine.insert(this.collection.responses, {
         cid: String(cDb._id),
         order: rDb.length,
-        permission: global.permissions.stringToNumber(userlevel),
+        permission: pItem.id,
         stopIfExecuted,
         response
       })
@@ -239,14 +259,12 @@ class CustomCommands extends System {
 
     const responses: Array<Response> = await global.db.engine.find(this.collection.responses, { cid: String(command._id) })
     for (let r of _.orderBy(responses, 'order', 'asc')) {
-      if ((r.permission === constants.VIEWERS ||
-        (r.permission === constants.REGULAR && (isRegular || isMod || isOwner)) ||
-        (r.permission === constants.MODS && (isMod || isOwner)) ||
-        (r.permission === constants.OWNER_ONLY && isOwner)) &&
-        await this.checkFilter(opts, r.filter)) {
-          _responses.push(r)
+      if ((await global.permissions.check(opts.sender.userId, r.permission)).access
+          && await this.checkFilter(opts, r.filter)) {
+        _responses.push(r)
       }
     }
+
     this.sendResponse(_.cloneDeep(_responses), { param, sender: opts.sender, command: command.command });
     return _responses.map((o) => {
       return o.response
@@ -279,14 +297,13 @@ class CustomCommands extends System {
       const responses = _.orderBy((await global.db.engine.find(this.collection.responses, { cid })), 'order', 'asc')
 
       if (responses.length === 0) global.commons.sendMessage(global.commons.prepare('customcmdustomcmds.list-of-responses-is-empty', { command }), opts.sender)
-      const permission = [
-        { v: constants.VIEWERS, string: await global.commons.prepare('ui.systems.customcommands.forViewers') },
-        { v: constants.REGULAR, string: await global.commons.prepare('ui.systems.customcommands.forRegulars') },
-        { v: constants.MODS, string: await global.commons.prepare('ui.systems.customcommands.forMods') },
-        { v: constants.OWNER_ONLY, string: await global.commons.prepare('ui.systems.customcommands.forOwners') }
-      ]
+      let permissions = (await global.db.engine.find(global.permissions.collection.data)).map((o) => {
+        return {
+          v: o.id, string: o.name
+        }
+      })
       for (let r of responses) {
-        let rPrmsn: any = permission.find(o => o.v === r.permission)
+        let rPrmsn: any = permissions.find(o => o.v === r.permission)
         const response = await global.commons.prepare('customcmds.response', { command, index: ++r.order, response: r.response, after: r.stopIfExecuted ? '_' : 'v', permission: rPrmsn.string })
         global.log.chatOut(response, { username: opts.sender.username })
         if ((await global.configuration.getValue('sendWithMe'))) {

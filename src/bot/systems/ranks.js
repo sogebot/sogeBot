@@ -4,7 +4,7 @@
 const _ = require('lodash')
 
 // bot libraries
-const constants = require('../constants')
+import { permission } from '../permissions';
 import System from './_interface'
 
 /*
@@ -20,13 +20,13 @@ class Ranks extends System {
   constructor () {
     const settings = {
       commands: [
-        { name: '!rank add', permission: constants.OWNER_ONLY },
-        { name: '!rank edit', permission: constants.OWNER_ONLY },
-        { name: '!rank set', permission: constants.OWNER_ONLY },
-        { name: '!rank unset', permission: constants.OWNER_ONLY },
-        { name: '!rank list', permission: constants.OWNER_ONLY },
-        { name: '!rank remove', permission: constants.OWNER_ONLY },
-        { name: '!rank help', permission: constants.OWNER_ONLY },
+        { name: '!rank add', permission: permission.CASTERS },
+        { name: '!rank edit', permission: permission.CASTERS },
+        { name: '!rank set', permission: permission.CASTERS },
+        { name: '!rank unset', permission: permission.CASTERS },
+        { name: '!rank list', permission: permission.CASTERS },
+        { name: '!rank remove', permission: permission.CASTERS },
+        { name: '!rank help', permission: permission.CASTERS },
         '!rank'
       ]
     }

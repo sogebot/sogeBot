@@ -3,6 +3,8 @@
 'use strict'
 require('module-alias/register')
 
+import { Permissions } from './permissions'
+
 const figlet = require('figlet')
 const os = require('os')
 const util = require('util')
@@ -10,9 +12,7 @@ const _ = require('lodash')
 const chalk = require('chalk')
 const gitCommitInfo = require('git-commit-info');
 
-const {
-  Worker, MessageChannel, MessagePort, isMainThread,
-} = require('worker_threads');
+const { isMainThread, } = require('worker_threads');
 
 const constants = require('./constants')
 const config = require('@config')
@@ -65,7 +65,7 @@ async function main () {
 
   global.panel = new (require('./panel'))()
   global.twitch = new (require('./twitch'))()
-  global.permissions = new (require('./permissions'))()
+  global.permissions = new Permissions()
 
   global.lib = {}
   global.lib.translate = new (require('./translate'))()

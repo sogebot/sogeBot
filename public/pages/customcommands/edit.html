@@ -39,12 +39,16 @@
               v-bind:filters="['sender', 'is.moderator', 'is.subscriber', 'is.regular', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'rank', 'game', 'title', 'views', 'followers', 'hosts', 'subscribers']"></textarea-with-tags>
 
             <div class="h-auto w-auto" style="flex-shrink: 0;">
-              <button data-toggle="dropdown" class="btn btn-outline-dark border-0 h-100 w-100" style="margin: 0; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px;"><i class="fas fa-key mr-1" aria-hidden="true"></i> {{ response.permission | permissionToString }}</button>
-              <div class="dropdown-menu">
-                <a class="dropdown-item" style="cursor: pointer" v-on:click="response.permission = 1; pending = true">{{ commons.translate('systems.customcommands.forViewers') | capitalize }}</a>
-                <a class="dropdown-item" style="cursor: pointer" v-on:click="response.permission = 3; pending = true">{{ commons.translate('systems.customcommands.forRegulars') | capitalize }}</a>
-                <a class="dropdown-item" style="cursor: pointer" v-on:click="response.permission = 2; pending = true">{{ commons.translate('systems.customcommands.forMods') | capitalize }}</a>
-                <a class="dropdown-item" style="cursor: pointer" v-on:click="response.permission = 0; pending = true">{{ commons.translate('systems.customcommands.forOwners') | capitalize }}</a>
+              <button data-toggle="dropdown" class="btn btn-outline-dark border-0 h-100 w-100" style="margin: 0; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px;"><i class="fas fa-key mr-1" aria-hidden="true"></i>
+                <span v-if="getPermissionName(response.permission)">{{ getPermissionName(response.permission) }}</span>
+                <span v-else class="text-danger"><i class="fas fa-exclamation-triangle"></i> Permission not found</span>
+              </button>
+              <div class="dropdown-menu" aria-labelledby="permissionsMenuButton">
+                <a class="dropdown-item"
+                    style="cursor: pointer"
+                    v-for="p of permissions"
+                    :key="p.id"
+                    @click="response.permission = p.id; pending = true;">{{ getPermissionName(p.id) | capitalize }}</a>
               </div>
             </div>
             <div class="h-auto w-auto" style="flex-shrink: 0;">
@@ -112,11 +116,12 @@
         },
         data: {
           id: null,
-          responses: [{filter: '', response: '', order: 0, permission: 1, stopIfExecuted: false}],
+          responses: [{filter: '', response: '', order: 0, permission: null, stopIfExecuted: false}],
           command: '',
           visible: true,
           enabled: true,
           count: 0,
+          permissions: [],
 
           pending: false,
 
@@ -125,6 +130,7 @@
             command: false
           },
 
+          psocket: io('/core/permissions', { query: "token=" + token }),
           socket: io('/systems/customcommands', { query: "token=" + token }),
 
           states: {
@@ -132,7 +138,36 @@
             delete: 0
           }
         },
+        created() {
+          this.psocket.emit('find', {}, (err, data) => {
+            if (err) return console.error(err)
+            this.permissions = _.orderBy(data, 'order', 'asc')
+
+            if (!commons.urlParam('id')) {
+              for (let r of this.responses) {
+                if (!r.permission) {
+                  r.permission = _.orderBy(this.permissions, 'order', 'asc').pop().id
+                }
+              }
+            }
+          });
+        },
         methods: {
+          getPermissionName: function (id) {
+            if (!id) return 'Disabled'
+            const permission = this.permissions.find((o) => {
+              return o.id === id
+            })
+            if (typeof permission !== 'undefined') {
+              if (permission.name.trim() === '') {
+                return permission.id
+              } else {
+                return permission.name
+              }
+            } else {
+              return null
+            }
+          },
           moveUpResponse: function (order) {
             this.responses.filter((o) => o.order === order - 1 || o.order === order).map(o => {
               if (o.order === order - 1) o.order++

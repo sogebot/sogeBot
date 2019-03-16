@@ -2,35 +2,35 @@
 
 // 3rdparty libraries
 const _ = require('lodash')
-const XRegExp = require('xregexp')
 
 // bot libraries
 const Parser = require('../parser')
-const constants = require('../constants')
 const Message = require('../message')
+import Expects from '../expects';
 import System from './_interface'
+import { permission } from '../permissions';
 
 /*
- * !alias                                               - gets an info about alias usage
- * !alias add owner|mod|regular|viewer ![alias] ![cmd]  - add alias for specified command
- * !alias edit owner|mod|regular|viewer ![alias] ![cmd] - add alias for specified command
- * !alias remove ![alias]                               - remove specified alias
- * !alias toggle ![alias]                               - enable/disable specified alias
- * !alias toggle-visibility ![alias]                    - enable/disable specified alias
- * !alias list                                          - get alias list
+ * !alias                                            - gets an info about alias usage
+ * !alias add -p [uuid|name] -a ![alias] -c ![cmd]   - add alias for specified command
+ * !alias edit -p [uuid|name] -a ![alias] -c ![cmd]  - add alias for specified command
+ * !alias remove ![alias]                            - remove specified alias
+ * !alias toggle ![alias]                            - enable/disable specified alias
+ * !alias toggle-visibility ![alias]                 - enable/disable specified alias
+ * !alias list                                       - get alias list
  */
 
 class Alias extends System {
   constructor () {
     const settings = {
       commands: [
-        { name: '!alias add', permission: constants.OWNER_ONLY },
-        { name: '!alias edit', permission: constants.OWNER_ONLY },
-        { name: '!alias list', permission: constants.OWNER_ONLY },
-        { name: '!alias remove', permission: constants.OWNER_ONLY },
-        { name: '!alias toggle-visibility', permission: constants.OWNER_ONLY },
-        { name: '!alias toggle', permission: constants.OWNER_ONLY },
-        { name: '!alias', permission: constants.OWNER_ONLY }
+        { name: '!alias add', permission: permission.CASTERS },
+        { name: '!alias edit', permission: permission.CASTERS },
+        { name: '!alias list', permission: permission.CASTERS },
+        { name: '!alias remove', permission: permission.CASTERS },
+        { name: '!alias toggle-visibility', permission: permission.CASTERS },
+        { name: '!alias toggle', permission: permission.CASTERS },
+        { name: '!alias', permission: permission.CASTERS }
       ],
       parsers: [
         { name: 'run', fireAndForget: true }
@@ -84,10 +84,7 @@ class Alias extends System {
       // Don't run alias if its same as command e.g. alias !me -> command !me
       if (alias.command === alias.alias) {
         global.log.warning(`Cannot run alias ${alias.alias}, because it exec ${alias.command}`)
-      } else if (alias.permission === constants.VIEWERS ||
-        (alias.permission === constants.REGULAR && (isRegular || isMod || isOwner)) ||
-        (alias.permission === constants.MODS && (isMod || isOwner)) ||
-        (alias.permission === constants.OWNER_ONLY && isOwner)) {
+      } else if ((await global.permissions.check(opts.sender.userId, alias.permission)).access) {
         // parse variables
         const message = await new Message(opts.message.replace(replace, `${alias.command}`)).parse({
           sender: opts.sender
@@ -100,76 +97,71 @@ class Alias extends System {
   }
 
   main (opts) {
-    global.commons.sendMessage(global.translate('core.usage') + ': !alias add owner|mod|regular|viewer <!alias> <!command> | !alias edit owner|mod|regular|viewer <!alias> <!command> | !alias remove <!alias> | !alias list | !alias toggle <!alias> | !alias toggle-visibility <!alias>', opts.sender)
+    global.commons.sendMessage(global.translate('core.usage') + ': !alias add -p [uuid|name] <!alias> <!command> | !alias edit -p [uuid|name] <!alias> <!command> | !alias remove <!alias> | !alias list | !alias toggle <!alias> | !alias toggle-visibility <!alias>', opts.sender)
   }
 
   async edit (opts) {
-    const match = XRegExp.exec(opts.parameters, constants.ALIAS_REGEXP)
+    try {
+      const [perm, alias, command] = new Expects(opts.parameters)
+        .permission({ optional: true, default: permission.VIEWERS })
+        .argument({ name: 'a', type: String, multi: true, delimiter: '' }) // set as multi as alias can contain spaces
+        .argument({ name: 'c', type: String, multi: true, delimiter: '' }) // set as multi as command can contain spaces
+        .toArray();
 
-    if (_.isNil(match)) {
-      let message = await global.commons.prepare('alias.alias-parse-failed')
+      if (!alias.startsWith('!') || !command.startsWith('!')) {
+        throw Error('Alias or Command doesn\'t start with !')
+      }
+
+      const pItem: Permissions.Item | null = await global.permissions.get(perm);
+      if (!pItem) {
+        throw Error('Permission ' + perm + ' not found.');
+      }
+
+      const item = await global.db.engine.findOne(this.collection.data, { alias })
+      if (_.isEmpty(item)) {
+        let message = await global.commons.prepare('alias.alias-was-not-found', { alias })
+        global.commons.sendMessage(message, opts.sender)
+        return false
+      }
+      await global.db.engine.update(this.collection.data, { alias }, { command, permission: pItem.id })
+
+      let message = await global.commons.prepare('alias.alias-was-edited', { alias, command })
       global.commons.sendMessage(message, opts.sender)
-      return false
+    } catch (e) {
+      global.commons.sendMessage(global.commons.prepare('alias.alias-parse-failed'), opts.sender)
     }
-
-    let item = await global.db.engine.findOne(this.collection.data, { alias: match.alias })
-    if (_.isEmpty(item)) {
-      let message = await global.commons.prepare('alias.alias-was-not-found', { alias: match.alias })
-      global.commons.sendMessage(message, opts.sender)
-      return false
-    }
-
-    let permission = constants.VIEWERS
-    switch (match.permission) {
-      case 'owner':
-        permission = constants.OWNER_ONLY
-        break
-      case 'mod':
-        permission = constants.MODS
-        break
-      case 'regular':
-        permission = constants.REGULAR
-        break
-    }
-
-    await global.db.engine.update(this.collection.data, { alias: match.alias }, { command: match.command, permission: permission })
-
-    let message = await global.commons.prepare('alias.alias-was-edited', { alias: match.alias, command: match.command })
-    global.commons.sendMessage(message, opts.sender)
   }
 
   async add (opts) {
-    const match = XRegExp.exec(opts.parameters, constants.ALIAS_REGEXP)
+    try {
+      const [perm, alias, command] = new Expects(opts.parameters)
+        .permission({ optional: true, default: permission.VIEWERS })
+        .argument({ name: 'a', type: String, multi: true, delimiter: '' }) // set as multi as alias can contain spaces
+        .argument({ name: 'c', type: String, multi: true, delimiter: '' }) // set as multi as command can contain spaces
+        .toArray();
 
-    if (_.isNil(match)) {
-      let message = await global.commons.prepare('alias.alias-parse-failed')
+      if (!alias.startsWith('!') || !command.startsWith('!')) {
+        throw Error('Alias or Command doesn\'t start with !')
+      }
+
+      const pItem: Permissions.Item | null = await global.permissions.get(perm);
+      if (!pItem) {
+        throw Error('Permission ' + perm + ' not found.');
+      }
+
+      const aliasObj = {
+        alias,
+        command,
+        enabled: true,
+        visible: true,
+        permission: pItem.id
+      }
+      await global.db.engine.insert(this.collection.data, aliasObj)
+      let message = await global.commons.prepare('alias.alias-was-added', aliasObj)
       global.commons.sendMessage(message, opts.sender)
-      return false
+    } catch (e) {
+      global.commons.sendMessage(global.commons.prepare('alias.alias-parse-failed'), opts.sender)
     }
-
-    let permission = constants.VIEWERS
-    switch (match.permission) {
-      case 'owner':
-        permission = constants.OWNER_ONLY
-        break
-      case 'mod':
-        permission = constants.MODS
-        break
-      case 'regular':
-        permission = constants.REGULAR
-        break
-    }
-
-    let alias = {
-      alias: match.alias,
-      command: match.command,
-      enabled: true,
-      visible: true,
-      permission: permission
-    }
-    await global.db.engine.insert(this.collection.data, alias)
-    let message = await global.commons.prepare('alias.alias-was-added', alias)
-    global.commons.sendMessage(message, opts.sender)
   }
 
   async list (opts) {
@@ -179,64 +171,80 @@ class Alias extends System {
   }
 
   async toggle (opts) {
-    const match = XRegExp.exec(opts.parameters, constants.COMMAND_REGEXP_WITH_SPACES)
+    try {
+      const [alias] = new Expects(opts.parameters)
+        .everything()
+        .toArray()
 
-    if (_.isNil(match)) {
+      if (!alias.startsWith('!')) {
+        throw Error('Not starting with !')
+      }
+
+      const item = await global.db.engine.findOne(this.collection.data, { alias })
+      if (_.isEmpty(item)) {
+        let message = await global.commons.prepare('alias.alias-was-not-found', { alias })
+        global.commons.sendMessage(message, opts.sender)
+        return
+      }
+
+      await global.db.engine.update(this.collection.data, { alias }, { enabled: !item.enabled })
+      let message = await global.commons.prepare(!item.enabled ? 'alias.alias-was-enabled' : 'alias.alias-was-disabled', item)
+      global.commons.sendMessage(message, opts.sender)
+    } catch (e) {
       let message = await global.commons.prepare('alias.alias-parse-failed')
       global.commons.sendMessage(message, opts.sender)
-      return false
     }
-    const alias = await global.db.engine.findOne(this.collection.data, { alias: match.command })
-    if (_.isEmpty(alias)) {
-      let message = await global.commons.prepare('alias.alias-was-not-found', { alias: match.command })
-      global.commons.sendMessage(message, opts.sender)
-      return
-    }
-
-    await global.db.engine.update(this.collection.data, { alias: match.command }, { enabled: !alias.enabled })
-    let message = await global.commons.prepare(!alias.enabled ? 'alias.alias-was-enabled' : 'alias.alias-was-disabled', { alias: match.command })
-    global.commons.sendMessage(message, opts.sender)
   }
 
   async toggleVisibility (opts) {
-    const match = XRegExp.exec(opts.parameters, constants.COMMAND_REGEXP_WITH_SPACES)
+    try {
+      const [alias] = new Expects(opts.parameters)
+        .everything()
+        .toArray()
 
-    if (_.isNil(match)) {
+      if (!alias.startsWith('!')) {
+        throw Error('Not starting with !')
+      }
+
+      const item = await global.db.engine.findOne(this.collection.data, { alias })
+      if (_.isEmpty(item)) {
+        let message = await global.commons.prepare('alias.alias-was-not-found', { alias })
+        global.commons.sendMessage(message, opts.sender)
+        return false
+      }
+
+      await global.db.engine.update(this.collection.data, { alias }, { visible: !item.visible })
+      let message = await global.commons.prepare(!item.visible ? 'alias.alias-was-exposed' : 'alias.alias-was-concealed', item)
+      global.commons.sendMessage(message, opts.sender)
+    } catch (e) {
       let message = await global.commons.prepare('alias.alias-parse-failed')
       global.commons.sendMessage(message, opts.sender)
-      return false
     }
-
-    const alias = await global.db.engine.findOne(this.collection.data, { alias: match.command })
-    if (_.isEmpty(alias)) {
-      let message = await global.commons.prepare('alias.alias-was-not-found', { alias: match.command })
-      global.commons.sendMessage(message, opts.sender)
-      return false
-    }
-
-    await global.db.engine.update(this.collection.data, { alias: match.command }, { visible: !alias.visible })
-
-    let message = await global.commons.prepare(!alias.visible ? 'alias.alias-was-exposed' : 'alias.alias-was-concealed', alias)
-    global.commons.sendMessage(message, opts.sender)
   }
 
   async remove (opts) {
-    const match = XRegExp.exec(opts.parameters, constants.COMMAND_REGEXP_WITH_SPACES)
-    if (_.isNil(match)) {
+    try {
+      const [alias] = new Expects(opts.parameters)
+        .everything()
+        .toArray()
+
+      if (!alias.startsWith('!')) {
+        throw Error('Not starting with !')
+      }
+
+      let removed = await global.db.engine.remove(this.collection.data, { alias })
+      if (!removed) {
+        let message = await global.commons.prepare('alias.alias-was-not-found', { alias })
+        global.commons.sendMessage(message, opts.sender)
+        return false
+      }
+
+      let message = await global.commons.prepare('alias.alias-was-removed', { alias })
+      global.commons.sendMessage(message, opts.sender)
+    } catch (e) {
       let message = await global.commons.prepare('alias.alias-parse-failed')
       global.commons.sendMessage(message, opts.sender)
-      return false
     }
-
-    let removed = await global.db.engine.remove(this.collection.data, { alias: match.command })
-    if (!removed) {
-      let message = await global.commons.prepare('alias.alias-was-not-found', { alias: match.command })
-      global.commons.sendMessage(message, opts.sender)
-      return false
-    }
-
-    let message = await global.commons.prepare('alias.alias-was-removed', { alias: match.command })
-    global.commons.sendMessage(message, opts.sender)
   }
 }
 

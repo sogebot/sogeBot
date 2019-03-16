@@ -1,40 +1,50 @@
-##### Changelog
-| Version | Description                           |
-| --------|:--------------------------------------|
-| 8.0.0   | Updated docs                          |
-
-
 ## Add a new alias
-`!alias add <permission> <!alias> <!command>`
 
-!> Default permission is **OWNER**
+`!alias add (-p <uuid|name>) -a <!alias> -c <!command>`
+
+!> Default permission is **CASTERS**
 
 ### Parameters
-- `<permission>` -  possible values: owner, mod, regular, viewer
-- `<!alias>` - alias to be added
-- `<!command>` - command to be aliased
+
+- `-p <uuid|name>`
+  - *optional string / uuid* - can be used names of permissions or theirs exact uuid
+  - *default value:* viewers
+  - *available values:* list of permission can be obtained by `!permissions list`
+    or in UI
+- `-a <!alias>`
+  - alias to be added
+- `-c <!command>`
+  - command to be aliased
 
 ### Examples
 
 <blockquote>
-  <strong>testuser:</strong> !alias add viewer !uec !points <br>
+  <strong>testuser:</strong> !alias add -p viewers -a !uec -c !points <br>
   <strong>bot:</strong> @testuser, alias !uec for !points was added
 </blockquote>
 
 ## Edit an alias
-`!alias edit <permission> <!alias> <!command>`
 
-!> Default permission is **OWNER**
+`!alias edit (-p <uuid|name>) -a <!alias> -c <!command>`
+
+!> Default permission is **CASTERS**
 
 ### Parameters
-- `<permission>` -  possible values: owner, mod, regular, viewer
-- `<!alias>` - alias to be edited
-- `<!command>` - command to be aliased
+
+- `-p <uuid|name>`
+  - *optional string / uuid* - can be used names of permissions or theirs exact uuid
+  - *default value:* viewers
+  - *available values:* list of permission can be obtained by `!permissions list`
+    or in UI
+- `-a <!alias>`
+  - alias to be added
+- `-c <!command>`
+  - command to be aliased
 
 ### Examples
 
 <blockquote>
-  <strong>testuser:</strong> !alias edit viewer !uec !me <br>
+  <strong>testuser:</strong> !alias edit -p viewers -a !uec -c !me <br>
   <strong>bot:</strong> @testuser, alias !uec is changed to !me
 </blockquote>
 
@@ -44,11 +54,13 @@
 </blockquote>
 
 ## Remove an alias
+
 `!alias remove <!alias>`
 
-!> Default permission is **OWNER**
+!> Default permission is **CASTERS**
 
 ### Parameters
+
 - `<!alias>` - alias to be removed
 
 ### Examples
@@ -64,9 +76,10 @@
 </blockquote>
 
 ## List of aliases
+
 `!alias list`
 
-!> Default permission is **OWNER**
+!> Default permission is **CASTERS**
 
 ### Examples
 
@@ -76,11 +89,13 @@
 </blockquote>
 
 ## Enable or disable alias
+
 `!alias toggle <!alias>`
 
-!> Default permission is **OWNER**
+!> Default permission is **CASTERS**
 
 ### Parameters
+
 - `<!alias>` - alias to be enabled or disabled
 
 ### Examples
@@ -96,11 +111,13 @@
 </blockquote>
 
 ## Toggle visibility of alias in lists
+
 `!alias toggle-visibility <!alias>`
 
 !> Default permission is **OWNER**
 
 ### Parameters
+
 - `<!alias>` - alias to be exposed or concealed
 
 ### Examples
@@ -115,11 +132,10 @@
   <strong>bot:</strong> @testuser, alias !uec was exposed
 </blockquote>
 
-
-
-
 ## Other settings
+
 ### Enable or disable alias system
+
 `!enable system alias` |
 `!disable system alias`
 

@@ -5,8 +5,9 @@ const _ = require('lodash')
 const XRegExp = require('xregexp')
 
 // bot libraries
-var constants = require('../constants')
+import { permission } from '../permissions';
 const Message = require('../message')
+const constants = require('../constants')
 import System from './_interface'
 
 /*
@@ -22,12 +23,12 @@ class Keywords extends System {
   constructor () {
     const settings = {
       commands: [
-        { name: '!keyword add', permission: constants.OWNER_ONLY },
-        { name: '!keyword edit', permission: constants.OWNER_ONLY },
-        { name: '!keyword list', permission: constants.OWNER_ONLY },
-        { name: '!keyword remove', permission: constants.OWNER_ONLY },
-        { name: '!keyword toggle', permission: constants.OWNER_ONLY },
-        { name: '!keyword', permission: constants.OWNER_ONLY }
+        { name: '!keyword add', permission: permission.CASTERS },
+        { name: '!keyword edit', permission: permission.CASTERS },
+        { name: '!keyword list', permission: permission.CASTERS },
+        { name: '!keyword remove', permission: permission.CASTERS },
+        { name: '!keyword toggle', permission: permission.CASTERS },
+        { name: '!keyword', permission: permission.CASTERS }
       ],
       parsers: [
         { name: 'run' }

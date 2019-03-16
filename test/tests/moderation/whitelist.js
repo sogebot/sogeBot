@@ -173,7 +173,7 @@ describe('systems/moderation - whitelist()', () => {
     await db.cleanup()
     await message.prepare()
 
-    global.systems.alias.add({ sender: owner, parameters: 'viewer !sr !songrequest' })
+    global.systems.alias.add({ sender: owner, parameters: '-a !sr -c !songrequest' })
     await message.isSent('alias.alias-was-added', owner, { alias: '!sr', command: '!songrequest', sender: owner.username })
   })
 

@@ -1,11 +1,11 @@
 'use strict'
 
-const constants = require('./constants')
 const moment = require('moment-timezone')
 const _ = require('lodash')
 const {
   isMainThread
 } = require('worker_threads');
+import { permission } from './permissions';
 
 require('moment-precise-range-plugin')
 
@@ -27,14 +27,14 @@ class Twitch {
 
   commands () {
     const commands = [
-      { this: this, id: '!uptime', command: '!uptime', fnc: this.uptime, permission: constants.VIEWERS },
-      { this: this, id: '!time', command: '!time', fnc: this.time, permission: constants.VIEWERS },
-      { this: this, id: '!followers', command: '!followers', fnc: this.followers, permission: constants.VIEWERS },
-      { this: this, id: '!subs', command: '!subs', fnc: this.subs, permission: constants.VIEWERS },
-      { this: this, id: '!title', command: '!title', fnc: this.getTitle, permission: constants.VIEWERS },
-      { this: this, id: '!title set', command: '!title set', fnc: this.setTitle, permission: constants.OWNER_ONLY },
-      { this: this, id: '!game', command: '!game', fnc: this.getGame, permission: constants.VIEWERS },
-      { this: this, id: '!game set', command: '!game set', fnc: this.setGame, permission: constants.OWNER_ONLY }
+      { this: this, id: '!uptime', command: '!uptime', fnc: this.uptime, permission: permission.VIEWERS },
+      { this: this, id: '!time', command: '!time', fnc: this.time, permission: permission.VIEWERS },
+      { this: this, id: '!followers', command: '!followers', fnc: this.followers, permission: permission.VIEWERS },
+      { this: this, id: '!subs', command: '!subs', fnc: this.subs, permission: permission.VIEWERS },
+      { this: this, id: '!title', command: '!title', fnc: this.getTitle, permission: permission.VIEWERS },
+      { this: this, id: '!title set', command: '!title set', fnc: this.setTitle, permission: permission.CASTERS },
+      { this: this, id: '!game', command: '!game', fnc: this.getGame, permission: permission.VIEWERS },
+      { this: this, id: '!game set', command: '!game set', fnc: this.setGame, permission: permission.CASTERS }
     ]
     return commands
   }

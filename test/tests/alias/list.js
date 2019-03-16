@@ -19,10 +19,10 @@ describe('Alias - list()', () => {
   })
 
   it('populated list', async () => {
-    global.systems.alias.add({ sender: owner, parameters: 'viewer !a !me' })
+    global.systems.alias.add({ sender: owner, parameters: '-a !a -c !me' })
     await message.isSent('alias.alias-was-added', owner, { alias: '!a', command: '!me', sender: owner.username })
 
-    global.systems.alias.add({ sender: owner, parameters: 'viewer !b !me' })
+    global.systems.alias.add({ sender: owner, parameters: '-a !b -c !me' })
     await message.isSent('alias.alias-was-added', owner, { alias: '!b', command: '!me', sender: owner.username })
 
     global.systems.alias.list({ sender: owner, parameters: '' })

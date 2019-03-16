@@ -49,7 +49,8 @@
           </div>
           <div>
             <strong> {{ commons.translate('registry.customvariables.permissionToChange') }}:</strong>
-            <span>{{ typeof variable.permission === 'undefined' ? 0 : variable.permission | permissionToString }}</span>
+            <span v-if="getPermissionName(variable.permission)">{{ getPermissionName(variable.permission) }}</span>
+            <span v-else class="text-danger"><i class="fas fa-exclamation-triangle"></i> Permission not found</span>
           </div>
         </td>
         <td>
@@ -70,10 +71,27 @@
       el: '#customVariables-table',
       data: {
         variables: {},
+        permissions: [],
 
+        psocket: io('/core/permissions', { query: "token=" + token }),
         socket: io('/registry/customVariables', { query: "token=" + token }),
       },
       methods: {
+        getPermissionName: function (id) {
+          if (!id) return null
+          const permission = this.permissions.find((o) => {
+            return o.id === id
+          })
+          if (typeof permission !== 'undefined') {
+            if (permission.name.trim() === '') {
+              return permission.id
+            } else {
+              return permission.name
+            }
+          } else {
+            return null
+          }
+        },
         runScript: function (id) {
           this.socket.emit('run.script', id, (err, item) => {
             // update variable data
@@ -92,14 +110,13 @@
         // more about the _.debounce function (and its cousin
         // _.throttle), visit: https://lodash.com/docs#debounce
         this.debouncedRunScript =_.debounce(this.runScript, 1000)
+
+        this.psocket.emit('find', {}, (err, data) => {
+          if (err) return console.error(err)
+          this.permissions = _.orderBy(data, 'order', 'asc')
+        })
       },
       filters: {
-        permissionToString: function (val) {
-          if (val === 0) return commons.translate('systems.alias.forOwners')
-          else if (val === 1) return commons.translate('systems.alias.forViewers')
-          else if (val === 2) return commons.translate('systems.alias.forMods')
-          else if (val === 3) return commons.translate('systems.alias.forRegulars')
-        },
         capitalize: function (value) {
           if (!value) return ''
           value = value.toString()

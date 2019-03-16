@@ -3,9 +3,10 @@
 // 3rdparty libraries
 const _ = require('lodash')
 // bot libraries
-const constants = require('../constants')
 const Parser = require('../parser')
 import System from './_interface'
+import * as constants from '../constants'
+import { permission } from '../permissions';
 
 /*
  * !price                     - gets an info about price usage
@@ -22,11 +23,11 @@ class Price extends System {
     ]
     const settings = {
       commands: [
-        { name: '!price set', permission: constants.OWNER_ONLY },
-        { name: '!price list', permission: constants.OWNER_ONLY },
-        { name: '!price unset', permission: constants.OWNER_ONLY },
-        { name: '!price toggle', permission: constants.OWNER_ONLY },
-        { name: '!price', permission: constants.OWNER_ONLY }
+        { name: '!price set', permission: permission.CASTERS },
+        { name: '!price list', permission: permission.CASTERS },
+        { name: '!price unset', permission: permission.CASTERS },
+        { name: '!price toggle', permission: permission.CASTERS },
+        { name: '!price', permission: permission.CASTERS }
       ],
       parsers: [
         { name: 'check', priority: constants.HIGH }

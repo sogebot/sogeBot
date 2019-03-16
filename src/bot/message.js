@@ -5,7 +5,6 @@ const decode = require('decode-html')
 const querystring = require('querystring')
 const _ = require('lodash')
 const crypto = require('crypto')
-const constants = require('./constants')
 const gitCommitInfo = require('git-commit-info');
 
 const Entities = require('html-entities').AllHtmlEntities
@@ -187,12 +186,12 @@ class Message {
             // default
             if (state.isOk && !state.isEval) {
               let msg = await global.commons.prepare('filters.setVariable', { value: state.updated.setValue, variable: variable })
-              global.commons.sendMessage(msg, { username: attr.sender, skip: true, quiet: _.get(attr, 'quiet', false) })
+              global.commons.sendMessage(msg, { username: attr.sender.username, skip: true, quiet: _.get(attr, 'quiet', false) })
             }
             return state.updated.currentValue
           } else if (state.updated.responseType === 1) {
             // custom
-            global.commons.sendMessage(state.updated.responseText.replace('$value', state.updated.setValue), { username: attr.sender, skip: true, quiet: _.get(attr, 'quiet', false) })
+            global.commons.sendMessage(state.updated.responseText.replace('$value', state.updated.setValue), { username: attr.sender.username, skip: true, quiet: _.get(attr, 'quiet', false) })
             return ''
           } else {
             // command
@@ -313,29 +312,25 @@ class Message {
           case 'command':
             if (permission) {
               const responses = await global.db.engine.find(global.systems.customCommands.collection.responses)
-
-              let permNo = constants.VIEWERS
-              if (permission === 'mods') permNo = constants.MODS
-              if (permission === 'regular') permNo = constants.REGULAR
-              if (permission === 'viewers') permNo = constants.VIEWERS
-              if (permission === 'owner') permNo = constants.OWNER_ONLY
-
-              const commandIds = responses.filter((o) => o.permission === permNo).map((o) => o.cid)
-              commands = commands.filter((o) => commandIds.includes(String(o._id)))
+              const _permission = await global.permissions.get(permission)
+              if (_permission) {
+                const commandIds = responses.filter((o) => o.permission === _permission.id).map((o) => o.cid)
+                commands = commands.filter((o) => commandIds.includes(String(o._id)))
+              } else {
+                commands = []
+              }
             }
             return _.size(commands) === 0 ? ' ' : (_.map(commands, (o) => o.command.replace('!', ''))).join(', ')
           case '!command':
             if (permission) {
               const responses = await global.db.engine.find(global.systems.customCommands.collection.responses)
-
-              let permNo = constants.VIEWERS
-              if (permission === 'mods') permNo = constants.MODS
-              if (permission === 'regular') permNo = constants.REGULAR
-              if (permission === 'viewers') permNo = constants.VIEWERS
-              if (permission === 'owner') permNo = constants.OWNER_ONLY
-
-              const commandIds = responses.filter((o) => o.permission === permNo).map((o) => o.cid)
-              commands = commands.filter((o) => commandIds.includes(String(o._id)))
+              const _permission = await global.permissions.get(permission)
+              if (_permission) {
+                const commandIds = responses.filter((o) => o.permission === _permission.id).map((o) => o.cid)
+                commands = commands.filter((o) => commandIds.includes(String(o._id)))
+              } else {
+                commands = []
+              }
             }
             return _.size(commands) === 0 ? ' ' : (_.map(commands, 'command')).join(', ')
           case 'cooldown':

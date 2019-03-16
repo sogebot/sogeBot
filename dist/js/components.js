@@ -1,4 +1,4 @@
-/* globals translations, commons, Vue, _ $, io */
+/* globals translations, commons, Vue, _ $, io  */
 
 const flattenKeys = (obj, path = []) =>
     !_.isObject(obj)
@@ -138,7 +138,7 @@ window.commandInput = {
 
 /* command input for settings with permissions  */
 window.commandInputWithPermissions = {
-  props: ['value', 'command', 'type', 'permissions'],
+  props: ['value', 'command', 'type', 'permissions', 'token'],
   watch: {
     currentPermissions: function () { this.update() }
   },
@@ -149,29 +149,38 @@ window.commandInputWithPermissions = {
         else this.currentValue = this.value
       }
       this.$emit('update', { value: this.currentValue, permissions: this.currentPermissions })
+    },
+    getPermissionName: function (id) {
+      if (!id) return 'Disabled'
+      const permission = this.permissionsList.find((o) => {
+        return o.id === id
+      })
+      if (typeof permission !== 'undefined') {
+        if (permission.name.trim() === '') {
+          return permission.id
+        } else {
+          return permission.name
+        }
+      } else {
+        return null
+      }
     }
   },
   data: function () {
     return {
+      socket: io('/core/permissions', { query: "token=" + this.token }),
       currentValue: this.value,
-      currentPermissions: this.permissions
+      currentPermissions: this.permissions,
+      permissionsList: [],
+      permissionsLoaded: false,
     }
   },
-  filters: {
-    toPermission: function (val) {
-      switch (val) {
-        case -1:
-          return 'DISABLED'
-        case 0:
-          return 'OWNER ONLY'
-        case 1:
-          return 'VIEWERS'
-        case 2:
-          return 'MODS'
-        case 3:
-          return 'REGULAR'
-      }
-    }
+  mounted() {
+    this.socket.emit('find', {}, (err, data) => {
+      if (err) return console.error(err)
+      this.permissionsList = data
+      this.permissionsLoaded = true
+    })
   },
   template: `
     <div class="input-group">
@@ -179,18 +188,37 @@ window.commandInputWithPermissions = {
         <span class="input-group-text">{{ command }}</span>
       </div>
       <input v-on:keyup="update" v-model="currentValue" class="form-control" type="text" />
-      <div class="input-group-append">
+      <div v-if="!permissionsLoaded" class="input-group-append">
+        <div class="spinner-grow spinner-grow-sm" role="status">
+          <span class="sr-only">Loading...</span>
+        </div>
+      </div>
+      <div class="input-group-append" v-else>
         <div class="dropdown">
           <button class="btn dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown"
-            :class='{"btn-primary": currentPermissions === 0, "btn-success": currentPermissions === 1, "btn-info": currentPermissions === 2, "btn-warning": currentPermissions === 3, "btn-dark": currentPermissions === -1}'>
-            {{ currentPermissions | toPermission }}
+                  :class="{'btn-light': currentPermissions === null, 'btn-dark': currentPermissions !== null && getPermissionName(currentPermissions) !== null, 'btn-danger': currentPermissions !== null && getPermissionName(currentPermissions) === null}">
+            <template v-if="permissionsLoaded">
+              <span v-if="getPermissionName(currentPermissions) !== null">{{ getPermissionName(currentPermissions) }}</span>
+              <span v-else>
+                <i class="fas fa-exclamation-triangle"></i> Permission not found
+              </span>
+            </template>
+            <div v-else class="spinner-grow spinner-grow-sm" role="status">
+              <span class="sr-only">Loading...</span>
+            </div>
           </button>
-          <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+          <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="z-index: 9999;">
             <button
-              v-for="n in 5"
+              v-if="permissionsLoaded"
+              v-for="p of permissionsList"
               class="dropdown-item"
-              @click="currentPermissions = (n - 2)"
-            >{{(n - 2)|toPermission}}</button>
+              @click="currentPermissions = p.id"
+            >{{getPermissionName(p.id)}}</button>
+            <button
+              v-if="permissionsLoaded"
+              class="dropdown-item"
+              @click="currentPermissions = null"
+            >Disabled</button>
           </div>
         </div>
       </div>

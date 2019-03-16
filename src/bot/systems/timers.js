@@ -8,7 +8,7 @@ const {
 } = require('worker_threads');
 
 // bot libraries
-var constants = require('../constants')
+import { permission } from '../permissions';
 import System from './_interface'
 
 /*
@@ -27,13 +27,13 @@ class Timers extends System {
   constructor () {
     const settings = {
       commands: [
-        { name: '!timers set', permission: constants.OWNER_ONLY },
-        { name: '!timers unset', permission: constants.OWNER_ONLY },
-        { name: '!timers add', permission: constants.OWNER_ONLY },
-        { name: '!timers rm', permission: constants.OWNER_ONLY },
-        { name: '!timers list', permission: constants.OWNER_ONLY },
-        { name: '!timers toggle', permission: constants.OWNER_ONLY },
-        { name: '!timers', permission: constants.OWNER_ONLY }
+        { name: '!timers set', permission: permission.CASTERS },
+        { name: '!timers unset', permission: permission.CASTERS },
+        { name: '!timers add', permission: permission.CASTERS },
+        { name: '!timers rm', permission: permission.CASTERS },
+        { name: '!timers list', permission: permission.CASTERS },
+        { name: '!timers toggle', permission: permission.CASTERS },
+        { name: '!timers', permission: permission.CASTERS }
       ]
     }
 

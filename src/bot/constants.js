@@ -53,26 +53,10 @@ define(
 )
 
 define(
-  'ALIAS_REGEXP',
-  XRegExp(`(?<premission> owner|mod|regular|viewer) # permission
-           \\s                                      # empty space
-           (?<alias> ![\\pL0-9 ]*                 ) # alias
-           \\s                                      # empty space
-           (?<command> !.*                        ) # command`, 'ix')
-)
-
-define(
   'COOLDOWN_REGEXP',
   XRegExp(`(?<command> !?[\\pL0-9 ]* ) # command
            \\s                         # empty space
            (?<type> global|user      ) # type`, 'ix')
-)
-
-define(
-  'PERMISSION_REGEXP',
-  XRegExp(`(?<type> viewer|mods|owner|regular|disable  ) # type
-           \\s                                           # empty space
-           !?(?<command> [\\pL0-9_ ]*                  ) # command`, 'ix')
 )
 
 define('KEYWORD_REGEXP', XRegExp('(?<keyword> !?[\\pL0-9]*)\\s(?<response> .*)', 'ix'))

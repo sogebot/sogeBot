@@ -5,7 +5,6 @@ import * as _ from 'lodash';
 import { DateTime } from 'luxon';
 
 // bot libraries
-import constants from '../constants';
 import System from './_interface';
 
 const __DEBUG__ =
@@ -45,12 +44,12 @@ class UserInfo extends System {
           formatSeparator: ' | ',
         },
         commands: [
-          { name: '!me', fnc: 'showMe', permission: constants.VIEWERS },
-          { name: '!lastseen', fnc: 'lastseen', permission: constants.VIEWERS },
-          { name: '!watched', fnc: 'watched', permission: constants.VIEWERS },
-          { name: '!followage', fnc: 'followage', permission: constants.VIEWERS },
-          { name: '!subage', fnc: 'subage', permission: constants.VIEWERS },
-          { name: '!age', fnc: 'age', permission: constants.VIEWERS },
+          { name: '!me', fnc: 'showMe' },
+          { name: '!lastseen', fnc: 'lastseen' },
+          { name: '!watched', fnc: 'watched' },
+          { name: '!followage', fnc: 'followage' },
+          { name: '!subage', fnc: 'subage' },
+          { name: '!age', fnc: 'age' },
         ],
       },
       on: {

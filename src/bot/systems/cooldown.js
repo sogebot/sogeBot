@@ -7,8 +7,9 @@ const _ = require('lodash')
 const XRegExp = require('xregexp')
 
 // bot libraries
-var constants = require('../constants')
+import { permission } from '../permissions';
 import System from './_interface'
+import * as constants from '../constants'
 const Expects = require('../expects.js')
 const Parser = require('../parser')
 
@@ -26,11 +27,11 @@ class Cooldown extends System {
     const settings = {
       cooldownNotifyAsWhisper: false,
       commands: [
-        { name: '!cooldown toggle moderators', permission: constants.OWNER_ONLY },
-        { name: '!cooldown toggle owners', permission: constants.OWNER_ONLY },
-        { name: '!cooldown toggle subscribers', permission: constants.OWNER_ONLY },
-        { name: '!cooldown toggle enabled', permission: constants.OWNER_ONLY },
-        { name: '!cooldown', permission: constants.OWNER_ONLY }
+        { name: '!cooldown toggle moderators', permission: permission.CASTERS },
+        { name: '!cooldown toggle owners', permission: permission.CASTERS },
+        { name: '!cooldown toggle subscribers', permission: permission.CASTERS },
+        { name: '!cooldown toggle enabled', permission: permission.CASTERS },
+        { name: '!cooldown', permission: permission.CASTERS }
       ],
       parsers: [
         { name: 'check', priority: constants.HIGH }

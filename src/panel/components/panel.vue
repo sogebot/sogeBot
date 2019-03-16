@@ -7,7 +7,7 @@
             <template slot="title">{{button.text}}</template>
             <template slot="onHoldTitle">{{button.textWhenHold}}</template>
           </hold-button>
-          <a v-else class="btn btn-shrink btn-with-icon" :href="button.href" :class="typeof button.state !== 'undefined' && state[button.state] === 2 ? 'btn-success' : button.class">
+          <a v-else-if="button.href" class="btn btn-shrink btn-with-icon" :href="button.href" :class="typeof button.state !== 'undefined' && state[button.state] === 2 ? 'btn-success' : button.class">
             <div class="text">
               <template v-if="typeof button.state !== 'undefined' &&  typeof state[button.state] !== 'undefined'">
                 {{button.text[state[button.state]]}}
@@ -24,6 +24,23 @@
               <fa v-else :icon="button.icon" fixed-width></fa>
             </div>
           </a>
+          <button @click="$emit(button.event)" type="button" class="btn btn-shrink btn-with-icon" :class="button.class" :icon="button.icon">
+            <div class="text">
+              <template v-if="typeof button.state !== 'undefined' && typeof state[button.state] !== 'undefined'">
+                {{button.text[state[button.state]]}}
+              </template>
+              <template v-else>{{ button.text }}</template>
+            </div>
+            <div class="btn-icon" v-if="button.icon">
+              <template v-if="typeof button.state !== 'undefined' && state[button.state] === 1">
+                <fa icon="circle-notch" spin fixed-width></fa>
+              </template>
+              <template v-else-if="typeof button.state !== 'undefined' && state[button.state] === 2">
+                <fa icon="check" fixed-width></fa>
+              </template>
+              <fa v-else :icon="button.icon" fixed-width></fa>
+            </div>
+          </button>
         </div>
       </template>
     </div>

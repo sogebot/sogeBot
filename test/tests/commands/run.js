@@ -11,20 +11,25 @@ const db = require('../../general.js').db
 const message = require('../../general.js').message
 const assert = require('assert')
 
+const { permission } = require('../../../dest/permissions')
+
 // users
-const owner = { username: 'soge__' }
-const user1 = { username: 'user1' }
+const owner = { username: 'soge__', userId: Math.random() }
+const user1 = { username: 'user1', userId: Math.random() }
 
 describe('Custom Commands - run()', () => {
   before(async () => {
     await db.cleanup()
     await message.prepare()
+
+    await global.db.engine.insert('users', { username: owner.username, id: owner.userId })
+    await global.db.engine.insert('users', { username: user1.username, id: user1.userId })
   })
 
   describe('!cmd with username filter', () => {
     it('create command and response with filter', async () => {
       let cmd = await global.db.engine.insert('systems.customcommands', { command: '!cmd', enabled: true, visible: true })
-      await global.db.engine.insert('systems.customcommands.responses', { cid: String(cmd._id), filter: '$sender == "user1"', response: 'Lorem Ipsum', permission: 1 })
+      await global.db.engine.insert('systems.customcommands.responses', { cid: String(cmd._id), filter: '$sender == "user1"', response: 'Lorem Ipsum', permission: permission.VIEWERS })
     })
 
     it('run command as user not defined in filter', async () => {
@@ -45,7 +50,7 @@ describe('Custom Commands - run()', () => {
   })
 
   it('!a will show Lorem Ipsum', async () => {
-    global.systems.customCommands.add({ sender: owner, parameters: '!a Lorem Ipsum' })
+    global.systems.customCommands.add({ sender: owner, parameters: '-c !a -r Lorem Ipsum' })
     await message.isSent('customcmds.command-was-added', owner, { command: '!a', response: 'Lorem Ipsum', sender: owner.username })
 
     global.systems.customCommands.run({ sender: owner, message: '!a' })
@@ -56,7 +61,7 @@ describe('Custom Commands - run()', () => {
   })
 
   it('!한글 will show Lorem Ipsum', async () => {
-    global.systems.customCommands.add({ sender: owner, parameters: '!한글 Lorem Ipsum' })
+    global.systems.customCommands.add({ sender: owner, parameters: '-c !한글 -r Lorem Ipsum' })
     await message.isSent('customcmds.command-was-added', owner, { command: '!한글', response: 'Lorem Ipsum', sender: owner.username })
 
     global.systems.customCommands.run({ sender: owner, message: '!한글' })
@@ -67,7 +72,7 @@ describe('Custom Commands - run()', () => {
   })
 
   it('!русский will show Lorem Ipsum', async () => {
-    global.systems.customCommands.add({ sender: owner, parameters: '!русский Lorem Ipsum' })
+    global.systems.customCommands.add({ sender: owner, parameters: '-c !русский -r Lorem Ipsum' })
     await message.isSent('customcmds.command-was-added', owner, { command: '!русский', response: 'Lorem Ipsum', sender: owner.username })
 
     global.systems.customCommands.run({ sender: owner, message: '!русский' })

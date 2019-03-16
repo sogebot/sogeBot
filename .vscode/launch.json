@@ -14,16 +14,18 @@
                 "debug",
                 "start-no-migration"
             ],
-            "console": "integratedTerminal",
+            "console": "internalConsole",
             "env": {
                 "NODE_ENV": "development",
                 "DISABLE":"moderation"
             },
             "preLaunchTask": "npm: build",
+            "outputCapture": "std",
             "skipFiles": [
                 "${workspaceFolder}/node_modules/**/*.js",
                 "<node_internals>/**/*.js"
             ],
+            "sourceMaps": true,
             "port": 9229
         }
     ]

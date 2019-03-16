@@ -3,9 +3,8 @@
 // 3rdparty libraries
 const _ = require('lodash')
 import System from './_interface'
+import { permission } from '../permissions';
 const Expects = require('../expects')
-
-const constants = require('../constants.js')
 const config = require('@config')
 
 class Quotes extends System {
@@ -13,9 +12,9 @@ class Quotes extends System {
     const settings = {
       urlBase: config.panel.domain.split(',').map((o) => o.trim())[0],
       commands: [
-        { name: '!quote add', permission: constants.OWNER_ONLY },
-        { name: '!quote remove', permission: constants.OWNER_ONLY },
-        { name: '!quote set', permission: constants.OWNER_ONLY },
+        { name: '!quote add', permission: permission.CASTERS },
+        { name: '!quote remove', permission: permission.CASTERS },
+        { name: '!quote set', permission: permission.CASTERS },
         '!quote list',
         '!quote'
       ]

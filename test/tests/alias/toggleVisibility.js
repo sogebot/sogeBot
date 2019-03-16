@@ -24,7 +24,7 @@ describe('Alias - toggleVisibility()', () => {
   })
 
   it('!a', async () => {
-    global.systems.alias.add({ sender: owner, parameters: 'viewer !a !uptime' })
+    global.systems.alias.add({ sender: owner, parameters: '-a !a -c !uptime' })
     await message.isSent('alias.alias-was-added', owner, { alias: '!a', command: '!uptime', sender: owner.username })
 
     global.systems.alias.toggleVisibility({ sender: owner, parameters: '!a' })
@@ -35,7 +35,7 @@ describe('Alias - toggleVisibility()', () => {
   })
 
   it('!a with spaces', async () => {
-    global.systems.alias.add({ sender: owner, parameters: 'viewer !a with spaces !uptime' })
+    global.systems.alias.add({ sender: owner, parameters: '-a !a with spaces -c !uptime' })
     await message.isSent('alias.alias-was-added', owner, { alias: '!a with spaces', command: '!uptime', sender: owner.username })
 
     global.systems.alias.toggleVisibility({ sender: owner, parameters: '!a with spaces' })
@@ -46,7 +46,7 @@ describe('Alias - toggleVisibility()', () => {
   })
 
   it('!한국어', async () => {
-    global.systems.alias.add({ sender: owner, parameters: 'viewer !한국어 !uptime' })
+    global.systems.alias.add({ sender: owner, parameters: '-a !한국어 -c !uptime' })
     await message.isSent('alias.alias-was-added', owner, { alias: '!한국어', command: '!uptime', sender: owner.username })
 
     global.systems.alias.toggleVisibility({ sender: owner, parameters: '!한국어' })
@@ -57,7 +57,7 @@ describe('Alias - toggleVisibility()', () => {
   })
 
   it('!русский', async () => {
-    global.systems.alias.add({ sender: owner, parameters: 'viewer !русский !uptime' })
+    global.systems.alias.add({ sender: owner, parameters: '-a !русский -c !uptime' })
     await message.isSent('alias.alias-was-added', owner, { alias: '!русский', command: '!uptime', sender: owner.username })
 
     global.systems.alias.toggleVisibility({ sender: owner, parameters: '!русский' })

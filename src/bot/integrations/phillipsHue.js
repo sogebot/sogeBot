@@ -11,7 +11,7 @@ const {
 } = require('worker_threads');
 
 // bot libraries
-const constants = require('../constants')
+import { permission } from '../permissions';
 import Integration from './_interface'
 
 declare type State = {
@@ -41,8 +41,8 @@ class PhillipsHue extends Integration {
   constructor () {
     const settings = {
       commands: [
-        { name: '!hue list', fnc: 'getLights', permission: constants.OWNER_ONLY },
-        { name: '!hue', fnc: 'hue', permission: constants.OWNER_ONLY }
+        { name: '!hue list', fnc: 'getLights', permission: permission.CASTERS },
+        { name: '!hue', fnc: 'hue', permission: permission.CASTERS }
       ],
       connection: {
         host: '',
