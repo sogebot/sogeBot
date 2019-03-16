@@ -11,7 +11,6 @@ const {
 const axios = require('axios')
 
 // bot libraries
-const constants = require('../constants')
 const Expects = require('../expects.js')
 import Integration from './_interface'
 
@@ -41,7 +40,7 @@ class Spotify extends Integration {
   constructor () {
     const settings = {
       commands: [
-        { name: '!spotify', permission: constants.DISABLE }
+        { name: '!spotify', permission: null }
       ],
       _: {
         accessToken: '',
