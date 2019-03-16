@@ -77,7 +77,7 @@
             <div class="input-group">
               <input v-if="selectedType !== 'options'" v-model="currentValue" type="text" class="form-control" id="current_value_input" :readonly="(['', 'eval'].includes(selectedType)) ? true : false">
               <select v-if="selectedType === 'options'" v-model="currentValue" class="form-control">
-                  <option v-for="option in usableOptionsArray">{{ option }}</option>
+                  <option v-for="option in usableOptionsArray" :value="option">{{ option }}</option>
               </select>
 
               <div class="input-group-append" v-if="selectedType !== 'eval'">
@@ -298,8 +298,6 @@
             }
           }
 
-          console.debug('form is not valid', this.hasError)
-
           return _.filter(this.hasError, (o) => o === true).length === 0
         },
         saveChanges: function () {
@@ -402,7 +400,7 @@
           }
         },
         usableOptionsArray: function (cur, old) {
-          this.currentValue = this.usableOptionsArray[0]
+          if (!cur.includes(this.currentValue)) this.currentValue = cur[0] // set initial value only if value doesn't exist
         }
       },
       computed: {
@@ -410,7 +408,7 @@
           return !_.isNil(this.evalInput) ? this.evalInput.getValue() : ''
         },
         usableOptionsArray: function () {
-          if (typeof this.usableOptions === String) {
+          if (typeof this.usableOptions === 'string') {
             return this.usableOptions.split(',').map((o) => o.trim()).filter((o) => o.length > 0)
           } else {
             return []
