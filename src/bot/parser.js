@@ -163,7 +163,7 @@ class Parser {
     if (!message.startsWith('!')) return // do nothing, this is not a command or user is ignored
     let command = await this.find(message)
     if (_.isNil(command)) return // command not found, do nothing
-    if (command.permission === constants.DISABLE) return
+    if (command.permission === null) return // command is disabled
 
     let [isRegular, isMod, isOwner] = await Promise.all([
       global.commons.isRegular(sender),
