@@ -172,6 +172,10 @@
         "operations": "Operace"
       },
       "definitions": {
+        "hashtag": {
+          "label": "Hashtag nebo klíčové slovo",
+          "placeholder": "#yourHashtagHere nebo klíčoveSlovo"
+        },
         "fadeOutXCommands": {
           "label": "Odečíst X příkazů",
           "placeholder": "Počet příkazů, odečtených během fade out intervalu"
@@ -398,6 +402,10 @@
           "broadcaster": "Je příjemce broadcaster? (bool)",
           "bot": "Je příjemce bot? (bool)",
           "owner": "Je příjemce vlastník bota? (bool)"
+        },
+        "tweet": {
+          "message": "Zpráva na twitteru",
+          "username": "Uživatelské jméno na twitteru"
         }
       }
     },
@@ -633,6 +641,7 @@
     "watched-time": "Čas sledování",
     "followed-since": "Follower od",
     "subscribed-since": "Subscriber od",
+    "hashtag": "Hashtag",
     "username": "Uživatelské jméno",
     "accessToken": "AccessToken",
     "refreshToken": "RefreshToken",
@@ -711,6 +720,7 @@
     "widget-title-part": "PART LIST",
     "event": "událost",
     "operation": "operace",
+    "tweet-post-with-hashtag": "Post na twitteru obsahuje  nebo klíčové slovo",
     "user-joined-channel": "uživatel se připojil do chatu",
     "user-parted-channel": "uživatel se odešel z chatu",
     "follow": "nový follower",

@@ -18,6 +18,8 @@ declare namespace NodeJS {
     workers: Workers.main,
     customvariables: any,
     tmi: any,
+    integrations: any,
+    events: any,
     oauth: {
       settings: {
         bot: {
@@ -95,15 +97,15 @@ type InterfaceSettings = {
     bit?: (bit: onEventBit) => void,
     streamStart?: () => void,
     streamEnd?: () => void,
-    change?: Array<{
-      [s: string]: Array<string>
-    }>
+    change?: {
+      [x: string]: Array<string>
+    }
   },
   ui?: {
     _hidden?: Boolean,
     [s: string]: {
-      [s: string]: UISelector | UILink | UINumberInput | UIConfigurableList | UISortableList
-    } | Boolean | undefined | UISelector | UILink | UINumberInput | UIConfigurableList | UISortableList
+      [s: string]: UISelector | UILink | UINumberInput | UIConfigurableList | UISortableList | UITextInput
+    } | Boolean | undefined | UISelector | UILink | UINumberInput | UIConfigurableList | UISortableList | UITextInput
   },
   dependsOn?: string[],
 }
@@ -123,6 +125,11 @@ type UILink = {
   class: string,
   rawText: string,
   target: string
+}
+
+type UITextInput = {
+  type: 'text-input',
+  secret: boolean,
 }
 
 type UINumberInput = {
