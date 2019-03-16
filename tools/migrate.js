@@ -22,7 +22,7 @@ const dropFiles = [
   'system.commercial.settings', 'system.cooldown', 'system.cooldown.settings',
   'users_ignorelist', 'overlay.credits.socials', 'overlay.credits.customTexts',
   'overlay.carousel', 'bannedsong', 'highlights', 'notices', 'integrations.spotify',
-  'integrations.streamlabs', 'integrations.donationalerts'
+  'integrations.streamlabs', 'integrations.donationalerts', 'permissions'
 ]
 
 // db
