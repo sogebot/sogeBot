@@ -178,7 +178,7 @@ window.commandInputWithPermissions = {
   mounted() {
     this.socket.emit('find', {}, (err, data) => {
       if (err) return console.error(err)
-      this.permissionsList = data
+      this.permissionsList = _.orderBy(data, 'order', 'asc');
       this.permissionsLoaded = true
     })
   },
