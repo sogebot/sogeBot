@@ -153,8 +153,8 @@ class Parser {
     }
     commands = _(await Promise.all(commands)).flatMap().sortBy(o => -o.command.length).value()
     for (let command of commands) {
-      let permission = await global.db.engine.findOne('permissions', { key: command.id })
-      if (!_.isEmpty(permission)) command.permission = permission.permission // change to custom permission
+      let permission = await global.db.engine.findOne(global.permissions.collection.data, { key: command.id })
+      if (!_.isEmpty(permission)) command.permission = permission.id // change to custom permission
     }
     return commands
   }
