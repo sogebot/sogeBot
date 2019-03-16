@@ -441,6 +441,10 @@
         customVariablesEdit.responseText = data.variable.responseText
         customVariablesEdit.permission = data.variable.permission || 0
         customVariablesEdit.readOnly = data.variable.readOnly || false
+        for (let h of data.history) {
+          // change timestamp to milliseconds
+          h.timestamp = new Date(h.timestamp).getTime()
+        }
         customVariablesEdit.history = _.chunk(_.orderBy(data.history, 'timestamp', 'desc'), 15)[0] || []
       })
     }
