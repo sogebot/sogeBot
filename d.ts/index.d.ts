@@ -20,6 +20,7 @@ declare namespace NodeJS {
     tmi: any,
     integrations: any,
     events: any,
+    widgets: any,
     oauth: {
       settings: {
         bot: {

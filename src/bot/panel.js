@@ -16,6 +16,8 @@ const Parser = require('./parser')
 
 const config = require('@config')
 
+const moment = require('moment-timezone')
+
 const NOT_AUTHORIZED = '0'
 
 function Panel () {
@@ -303,6 +305,9 @@ function Panel () {
       // currencies
       data.currency = global.currency.settings.currency.mainCurrency
       data.currencySymbol = global.currency.symbol(global.currency.settings.currency.mainCurrency)
+
+      // timezone
+      data.timezone = config.timezone === 'system' || _.isNil(config.timezone) ? moment.tz.guess() : config.timezone
 
       if (_.isFunction(cb)) cb(data)
       else socket.emit('configuration', data)

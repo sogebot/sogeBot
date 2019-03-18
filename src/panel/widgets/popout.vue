@@ -21,7 +21,8 @@ export default {
     twitch: () => import('./components/twitch.vue'),
     twitter: () => import('./components/twitter.vue'),
     widgetCreate: () => import('./components/widget_create.vue'),
-    ytplayer: () => import('./components/ytplayer.vue')
+    ytplayer: () => import('./components/ytplayer.vue'),
+    social: () => import('./components/social.vue'),
   },
   data: function () {
     return {

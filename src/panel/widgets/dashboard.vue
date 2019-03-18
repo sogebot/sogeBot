@@ -80,7 +80,8 @@ export default {
     twitter: () => import('./components/twitter.vue'),
     widgetCreate: () => import('./components/widget_create.vue'),
     dashboardRemove: () => import('./components/dashboard_remove.vue'),
-    ytplayer: () => import('./components/ytplayer.vue')
+    ytplayer: () => import('./components/ytplayer.vue'),
+    social: () => import('./components/social.vue'),
   },
   data: function () {
     return {

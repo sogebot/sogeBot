@@ -115,12 +115,16 @@ class Twitter extends Integration {
         this.watchedStreams.push({ hash, stream });
         stream.on('data', (tweet) => {
           const data = {
+            id: tweet.id_str,
+            type: 'twitter',
+            timestamp: Date.now(),
             hashtag: hash,
             text: tweet.text,
             username: tweet.user.screen_name,
             displayname: tweet.user.name,
             url: `https://twitter.com/${tweet.user.screen_name}/status/${tweet.id_str}`,
           };
+          global.db.engine.insert(global.widgets.social.collection.data, data);
           global.events.fire('tweet-post-with-hashtag', { tweet: data });
         });
 
