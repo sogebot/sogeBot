@@ -263,6 +263,7 @@ class Events {
     let message = operation.messageToSend
     const atUsername = global.users.settings.users.showWithAt
 
+    attributes = global.commons.flatten(attributes);
     attributes = _(attributes).toPairs().sortBy((o) => -o[0].length).fromPairs().value() // reorder attributes by key length
     for (let [name, val] of Object.entries(attributes)) {
       if (_.isObject(val) && _.size(val) === 0) continue // skip empty object
@@ -514,7 +515,7 @@ class Events {
           for (let [key, value] of Object.entries(event.definitions)) {
             if (value.length === 0) _.set(errors, `definitions.${key}`, global.translate('webpanel.events.errors.value_cannot_be_empty'))
             else if (['commandToWatch'].includes(key) && !value.startsWith('!')) _.set(errors, 'definitions.commandToWatch', global.translate('webpanel.events.errors.command_must_start_with_!'))
-            else if (!['commandToWatch', 'keywordToWatch'].includes(key) && !_.isBoolean(value) && !value.match(/^\d+$/g)) _.set(errors, `definitions.${key}`, global.translate('webpanel.events.errors.this_value_must_be_a_positive_number_or_0'))
+            else if (!['commandToWatch', 'keywordToWatch', 'hashtag'].includes(key) && !_.isBoolean(value) && !value.match(/^\d+$/g)) _.set(errors, `definitions.${key}`, global.translate('webpanel.events.errors.this_value_must_be_a_positive_number_or_0'))
           }
 
           // check all operations definitions are correctly set -> no empty values

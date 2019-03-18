@@ -7,5 +7,6 @@ declare namespace Workers {
     list: Workers.worker[],
 
     sendToWorker: (opts: {}) => any,
+    sendToMaster: (opts: {}) => any,
   }
 }

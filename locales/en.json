@@ -162,6 +162,10 @@
         "operations": "Operations"
       },
       "definitions": {
+        "hashtag": {
+          "label": "Hashtag or Keyword",
+          "placeholder": "#yourHashtagHere or Keyword"
+        },
         "fadeOutXCommands": {
           "label": "Fade Out X Commands",
           "placeholder": "Number of commands subtracted every fade out interval"
@@ -389,6 +393,12 @@
           "broadcaster": "Is recipient broadcaster? (bool)",
           "bot": "Is recipient bot? (bool)",
           "owner": "Is recipient bot owner? (bool)"
+        },
+        "tweet": {
+          "text": "Text of tweet",
+          "username": "Username on Twitter",
+          "displayname": "Screen name on twitter",
+          "url": "Tweet link"
         }
       }
     },
@@ -620,6 +630,7 @@
     "followed-since": "Followed since",
     "subscribed-since": "Subscribed since",
     "username": "Username",
+    "hashtag": "Hashtag",
     "accessToken": "AccessToken",
     "refreshToken": "RefreshToken",
     "scopes": "Scopes",
@@ -694,8 +705,10 @@
     "widget-title-spotify": "SPOTIFY",
     "widget-title-join": "JOIN LIST",
     "widget-title-part": "PART LIST",
+    "widget-title-social": "SOCIAL",
     "event": "event",
     "operation": "operation",
+    "tweet-post-with-hashtag": "Tweet posted with hashtag",
     "user-joined-channel": "user joined a channel",
     "user-parted-channel": "user parted a channel",
     "follow": "new follow",
