@@ -3,7 +3,6 @@
 const _ = require('lodash')
 const crypto = require('crypto')
 const safeEval = require('safe-eval')
-const flatten = require('flat')
 const moment = require('moment')
 const {
   isMainThread
@@ -641,7 +640,7 @@ class Events {
           if (!_.isNil(attributes.userObject)) {
             // flatten userObject
             let userObject = attributes.userObject
-            _.merge(attributes, flatten({ userObject: userObject }))
+            _.merge(attributes, global.commons.flatten({ userObject: userObject }))
           }
           const isOperationSupported = !_.isNil(_.find(this.supportedOperationsList, (o) => o.id === operation.key))
           if (isOperationSupported) _.find(this.supportedOperationsList, (o) => o.id === operation.key).fire(operation.definitions, attributes)

@@ -7,7 +7,6 @@ const bodyParser = require('body-parser')
 var http = require('http')
 var path = require('path')
 var basicAuth = require('basic-auth')
-const flatten = require('flat')
 var _ = require('lodash')
 const util = require('util')
 const gitCommitInfo = require('git-commit-info');
@@ -228,7 +227,7 @@ function Panel () {
     })
 
     socket.on('responses.get', async function (at, callback) {
-      const responses = flatten(!_.isNil(at) ? global.lib.translate.translations[await global.configuration.getValue('lang')][at] : global.lib.translate.translations[await global.configuration.getValue('lang')])
+      const responses = global.commons.flatten(!_.isNil(at) ? global.lib.translate.translations[await global.configuration.getValue('lang')][at] : global.lib.translate.translations[await global.configuration.getValue('lang')])
       _.each(responses, function (value, key) {
         let _at = !_.isNil(at) ? at + '.' + key : key
         responses[key] = {} // remap to obj
