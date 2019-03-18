@@ -191,7 +191,7 @@ class INeDB extends Interface {
 
     var self = this
     return new Promise(function (resolve, reject) {
-      self.on(table).insert(flatten.unglobal.commons.flatten(object), function (err, item) {
+      self.on(table).insert(global.commons.unflatten(object), function (err, item) {
         if (err) {
           global.log.error(err.message)
           global.log.error(JSON.stringify({ type: 'insert', table, object }))

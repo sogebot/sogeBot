@@ -10,6 +10,7 @@ const fs = require('fs')
 // logger
 const Logger = require('../dest/logging')
 global.logger = new Logger()
+global.commons = new (require('../dest/commons'))()
 
 const dropFiles = [
   'playlist', 'songrequest', 'ranks', 'prices',
