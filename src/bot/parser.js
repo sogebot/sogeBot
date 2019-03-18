@@ -145,7 +145,6 @@ class Parser {
         if (typeof customPermission !== 'undefined') {
           item.permission = customPermission
         }
-        debug('parser.find', JSON.stringify(item))
         return item
       }
     }
