@@ -17,6 +17,10 @@ function Commons () {
   this.registerConfiguration()
 }
 
+/*
+ * Flatten object keys
+ * { a: { b: 'c' }} => { 'a.b': 'c' }
+ */
 Commons.prototype.flatten = function (data) {
   var result = {};
   function recurse (cur, prop) {

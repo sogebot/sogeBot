@@ -5,7 +5,6 @@
 var glob = require('glob')
 var fs = require('fs')
 var _ = require('lodash')
-const flatten = require('flat')
 
 const {
   isMainThread,
@@ -46,7 +45,7 @@ class Translate {
         }
 
         for (let c of this.custom) {
-          if (_.isNil(flatten(this.translations[this.lang])[c.key])) {
+          if (_.isNil(global.commons.flatten(this.translations[this.lang])[c.key])) {
             // remove if lang doesn't exist anymore
             global.db.engine.remove('customTranslations', { key: c.key })
             this.custom = _.remove(this.custom, (i) => i.key === c.key)
@@ -57,7 +56,7 @@ class Translate {
         if (config.metrics.translations && !this.initialMetricsSent && isMainThread && version !== 'n/a') {
           const bulk = 1000
           let data = { version, items: [] }
-          for (let key of [...new Set(Object.keys(flatten(this.translations)).map(o => o.split('.').slice(1).join('.')))]) {
+          for (let key of [...new Set(Object.keys(global.commons.flatten(this.translations)).map(o => o.split('.').slice(1).join('.')))]) {
             data.items.push({ key, count: 0, missing: false })
             if (data.items.length === bulk) {
               axios.post('http://stats.sogebot.xyz/add', {
