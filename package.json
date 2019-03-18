@@ -151,6 +151,7 @@
     "@types/xregexp": "3.0.29",
     "@types/yargs": "12.0.9",
     "acorn": "^6.0.5",
+    "axios-mock-adapter": "1.16.0",
     "bestzip": "2.1.2",
     "bootstrap-vue": "2.0.0-rc.13",
     "chai": "4.2.0",
