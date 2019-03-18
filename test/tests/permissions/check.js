@@ -367,7 +367,7 @@ describe('Permissions - check()', () => {
     }
   })
 
-  describe.only(`Disabled !uptime command should not work`, () => {
+  describe(`Disabled !uptime command should not work`, () => {
     beforeEach(async () => {
       await global.db.engine.insert(global.permissions.collection.commands, {
         key: '!uptime',
