@@ -281,6 +281,7 @@
       "subgift": "have <strong>gifted</strong> sub from $username",
       "subcommunitygift": "have <strong>gifted</strong> subs for $count viewers",
       "resub": "<strong>resubbed</strong> you for $subStreak $subStreakName | $tier",
+      "resubWithoutStreak": "<strong>resubbed</strong> | $tier | in total of $subCumulativeMonths $subCumulativeMonthsName",
       "cheer": "<strong>cheered</strong> you for $bits bits",
       "tip": "<strong>tipped</strong> you for $formatted_amount"
     },

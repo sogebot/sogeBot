@@ -31,15 +31,15 @@
         "false": "Bot nebude posilat zpravy pomoci /me"
       }
     },
-    "years": "rok|4:roky|roku",
-    "months": "mesic|4:mesice|mesicu",
-    "days": "den|4:dny|dnu",
+    "years": "rok|4:roky|roků",
+    "months": "měsíc|4:měsíce|měsíců",
+    "days": "den|4:dny|dnů",
     "hours": "hodina|4:hodiny|hodin",
     "minutes": "minuta|4:minuty|minut",
     "seconds": "sekunda|4:sekundy|sekund",
-    "messages": "zprava|4:zpravy|zprav",
+    "messages": "zprava|4:zprávy|zpráv",
     "empty": "prázdné",
-    "links": "odkaz|4:odkazy|odkazu",
+    "links": "odkaz|4:odkazy|odkazů",
     "isRegistered": "$sender, nelze pouzit $keyword, protoze je uz prirazena k jine akci!"
   },
   "uptime": {
@@ -290,7 +290,8 @@
       "sub": "ti dal <strong>sub</strong> | $tier",
       "subgift": "byl <strong>darován</strong> sub od $username",
       "subcommunitygift": "<strong>daroval</strong> suby pro $count diváků",
-      "resub": "ti dal <strong>resub</strong> $subStreak $subStreakName | $tier",
+      "resub": "ti dal <strong>resub</strong> $subStreak $subStreakName | $tier | celkově $subCumulativeMonths $subCumulativeMonthsName",
+      "resubWithoutStreak": "ti dal <strong>resub</strong> | $tier | celkově $subCumulativeMonths $subCumulativeMonthsName",
       "cheer": "ti dal <strong>cheer</strong> $bits bitů",
       "tip": "ti dal <strong>tip</strong> $formatted_amount"
     },
