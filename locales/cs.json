@@ -404,8 +404,10 @@
           "owner": "Je příjemce vlastník bota? (bool)"
         },
         "tweet": {
-          "message": "Zpráva na twitteru",
-          "username": "Uživatelské jméno na twitteru"
+          "text": "Zpráva na twitteru",
+          "username": "Uživatelské jméno na twitteru",
+          "displayname": "Zobrazené jméno na twitteru",
+          "url": "Link na tweet"
         }
       }
     },

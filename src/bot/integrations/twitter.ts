@@ -59,6 +59,9 @@ class Twitter extends Integration {
 
     if (isMainThread) {
       this.addEvent();
+      setInterval(() => {
+        this.updateStreams();
+      }, 10000);
     }
   }
 
@@ -67,7 +70,7 @@ class Twitter extends Integration {
       setTimeout(() => this.addEvent(), 1000);
     } else {
       global.events.supportedEventsList.push(
-        { id: 'tweet-post-with-hashtag', variables: [ 'tweet.message', 'tweet.username' ], definitions: { hashtag: '' } },
+        { id: 'tweet-post-with-hashtag', variables: [ 'tweet.text', 'tweet.username', 'tweet.displayname', 'tweet.url' ], definitions: { hashtag: '' }, check: this.eventHaveCorrectHashtag },
       );
       global.events.supportedOperationsList.push(
         { id: 'send-twitter-message', definitions: { messageToSend: '' }, fire: this.fireSendTwitterMessage },
@@ -108,13 +111,21 @@ class Twitter extends Integration {
   public async enableStreamForHash(hash: string): Promise<void> {
     if (!this.watchedStreams.find((o) => o.hash === hash)) {
       this.client.stream('statuses/filter', {track: hash}, (stream) => {
+        global.log.info(chalk.yellow('TWITTER: ') + 'Stream for ' + hash + ' was started.');
         this.watchedStreams.push({ hash, stream });
         stream.on('data', (tweet) => {
-          console.log({tweet});
+          const data = {
+            hashtag: hash,
+            text: tweet.text,
+            username: tweet.user.screen_name,
+            displayname: tweet.user.name,
+            url: `https://twitter.com/${tweet.user.screen_name}/status/${tweet.id_str}`,
+          };
+          global.events.fire('tweet-post-with-hashtag', { tweet: data });
         });
 
         stream.on('error', (error) => {
-          console.log(error);
+          global.log.error(chalk.yellow('TWITTER: ') + error);
         });
       });
     }
@@ -126,6 +137,38 @@ class Twitter extends Integration {
       stream.stream.destroy();
     }
     this.watchedStreams = this.watchedStreams.filter((o) => o.hash !== hash);
+    global.log.info(chalk.yellow('TWITTER: ') + 'Stream for ' + hash + ' was ended.');
+  }
+
+  protected async eventHaveCorrectHashtag(event: any, attributes: Events.Attributes): Promise<boolean> {
+    const shouldTrigger = event.definitions.hashtag === attributes.tweet.hashtag;
+    return shouldTrigger;
+  }
+
+  protected async updateStreams() {
+    if (this.client === null) {
+      // do nothing if client is not defined
+      return;
+    }
+    const events = await global.db.engine.find('events', { key: 'tweet-post-with-hashtag' });
+    const hashtagsToWatch = events.map((o) => {
+      return o.definitions.hashtag;
+    });
+
+    for (const s of this.watchedStreams) {
+      if (hashtagsToWatch.includes(s.hash)) {
+        // hash already added
+        continue;
+      } else {
+        // hash is not in watchlist
+        this.disableStreamForHash(s.hash);
+      }
+    }
+
+    for (const hash of hashtagsToWatch) {
+      // enable rest of hashed
+      this.enableStreamForHash(hash);
+    }
   }
 
   private onStateChange(key: string, value: string) {

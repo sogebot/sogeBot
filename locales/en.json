@@ -395,8 +395,10 @@
           "owner": "Is recipient bot owner? (bool)"
         },
         "tweet": {
-          "message": "Message on Twitteru",
-          "username": "Username on Twitteru"
+          "text": "Text of tweet",
+          "username": "Username on Twitter",
+          "displayname": "Screen name on twitter",
+          "url": "Tweet link"
         }
       }
     },
