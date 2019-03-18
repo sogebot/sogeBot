@@ -33,6 +33,15 @@ class Permissions extends Core {
     this.addMenu({ category: 'settings', name: 'permissions', id: '/settings/permissions' });
   }
 
+  public async getCommandPermission(command: string): Promise<string | null | undefined> {
+    const cItem = await global.db.engine.findOne(this.collection.commands, { key: command });
+    if (cItem.permission) {
+      return cItem.permission;
+    } else {
+      return undefined;
+    }
+  }
+
   public async get(identifier: string): Promise<Permissions.Item | null> {
     const uuidRegex = /([0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12})/;
     let pItem: Permissions.Item | null = null;
@@ -51,7 +60,7 @@ class Permissions extends Core {
     return pItem;
   }
 
-  public async check(userId: string, permId: string, partial: boolean = false): Promise<{access: boolean, permission: Permissions.Item}> {
+  public async check(userId: string, permId: string, partial: boolean = false): Promise<{access: boolean, permission: Permissions.Item | null}> {
     const user: User & {
       tips: User.Tips[], bits: User.Bits[], points: User.Points[], watched: User.Watched[], messages: User.Messages[],
     } = await global.db.engine.findOne('users', { id: userId }, [

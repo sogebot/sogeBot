@@ -106,7 +106,7 @@ module.exports = {
   isSent: async function (entry, user, opts, wait) {
     user = _.cloneDeep(user)
     opts = opts || {}
-    await until(async setError => {
+    return until(async setError => {
       let expected = []
       if (_.isArray(opts)) {
         for (let o of opts) {
@@ -146,9 +146,9 @@ module.exports = {
       }
     }, wait || 5000)
   },
-  isSentRaw: async function (expected, user) {
+  isSentRaw: async function (expected, user, wait) {
     user = _.cloneDeep(user)
-    await until(setError => {
+    return until(setError => {
       try {
         let isOK = false
         if (_.isArray(expected)) {
@@ -169,15 +169,26 @@ module.exports = {
           '\n\n\nActual message:   "' + global.log.chatOut.args + '"'
         )
       }
-    }, 5000)
+    }, wait || 5000)
   },
-  isNotSent: async function (expected, user) {
-    let notSent = false
-    try {
-      await msg.isSent(expected, user)
-    } catch (e) {
-      notSent = true
-    }
-    assert.isTrue(notSent)
+  isNotSent: async function (expected, user, wait) {
+    user = _.cloneDeep(user)
+    const race = await Promise.race([
+      this.isSent(expected, user, wait * 2),
+      new Promise((resolve) => {
+        setTimeout(() => resolve(false), wait)
+      })
+    ])
+    assert.isTrue(!race, 'Message was unexpectedly sent ' + expected);
+  },
+  isNotSentRaw: async function (expected, user, wait) {
+    user = _.cloneDeep(user)
+    const race = await Promise.race([
+      this.isSentRaw(expected, user, wait * 2),
+      new Promise((resolve) => {
+        setTimeout(() => resolve(false), wait)
+      })
+    ])
+    assert.isTrue(!race, 'Message was unexpectedly sent ' + expected);
   }
 }
