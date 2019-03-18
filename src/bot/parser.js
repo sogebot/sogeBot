@@ -45,6 +45,8 @@ class Parser {
   }
 
   async process () {
+    debug('parser.process', 'PROCESS START of "' + this.message + '"')
+
     const parsers = await this.parsers()
     for (let parser of parsers) {
       if (parser.priority === constants.MODERATION) continue // skip moderation parsers
@@ -54,7 +56,6 @@ class Parser {
         global.commons.isOwner(this.sender)
       ])
 
-      debug('parser.process', 'Processing ' + JSON.stringify(parser.fnc))
       if (
         _.isNil(this.sender) // if user is null -> we are running command through a bot
         || this.skip
@@ -66,6 +67,7 @@ class Parser {
           skip: this.skip
         }
 
+        debug('parser.process', 'Processing ' + parser.name)
         if (parser.fireAndForget) {
           parser['fnc'].apply(parser.this, [opts])
         } else {
@@ -130,6 +132,7 @@ class Parser {
    * @returns object or null if empty
    */
   async find (message, cmdlist) {
+    debug('parser.find', JSON.stringify({message, cmdlist}))
     if (!cmdlist) {
       cmdlist = await this.getCommandsList();
     }
@@ -138,6 +141,10 @@ class Parser {
       let isStartingWith = message.trim().toLowerCase().startsWith(item.command)
 
       if (isStartingWith && (onlyParams.length === 0 || (onlyParams.length > 0 && onlyParams[0] === ' '))) {
+        const customPermission = await global.permissions.getCommandPermission(item.id)
+        if (typeof customPermission !== 'undefined') {
+          item.permission = customPermission
+        }
         return item
       }
     }
@@ -153,8 +160,8 @@ class Parser {
     }
     commands = _(await Promise.all(commands)).flatMap().sortBy(o => -o.command.length).value()
     for (let command of commands) {
-      let permission = await global.db.engine.findOne(global.permissions.collection.data, { key: command.id })
-      if (!_.isEmpty(permission)) command.permission = permission.id // change to custom permission
+      let permission = await global.db.engine.findOne(global.permissions.collection.commands, { key: command.id })
+      if (!_.isEmpty(permission)) command.permission = permission.permission // change to custom permission
     }
     return commands
   }

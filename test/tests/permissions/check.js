@@ -4,9 +4,11 @@ require('../../general.js')
 
 const db = require('../../general.js').db
 const message = require('../../general.js').message
+const time = require('../../general.js').time
 const assert = require('assert')
 
 const { permission } = require('../../../dest/permissions')
+const Parser = require('../../../dest/parser')
 
 const users = [
   { username: '__owner__', userId: 1, id: 1, stats: { subStreak: 0, subCumulativeMonths: 0 } },
@@ -362,6 +364,22 @@ describe('Permissions - check()', () => {
           assert.strictEqual(check.access, false)
         })
       }
+    }
+  })
+
+  describe(`Disabled !uptime command should not work`, () => {
+    beforeEach(async () => {
+      await global.db.engine.insert(global.permissions.collection.commands, {
+        key: '!uptime',
+        permission: null,
+      })
+    })
+    for (let j = 0; j < users.length; j++) {
+      it (`--- ${users[j].username} should NOT trigger disabled command !uptime`, async () => {
+        const parse = new Parser({ sender: users[j], message: '!uptime', skip: false, quiet: false })
+        await parse.process()
+        await message.isNotSentRaw('Stream is currently offline for', users[j], 1000)
+      })
     }
   })
 })
