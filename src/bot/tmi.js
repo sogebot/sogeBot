@@ -326,8 +326,8 @@ class TMI extends Core {
 
       const user = await global.db.engine.findOne('users', { id: userstate.userId })
 
-      let subscribed_at = subStreakShareEnabled ? Number(moment().subtract(streakMonths, 'months').format('X')) * 1000 : _.get(user, 'time.subscribed_at', undefined);
-      let subStreak = subStreakShareEnabled ? streakMonths : Number(_.get(user, 'stats.subStreak', 0)) + 1
+      let subscribed_at = subStreakShareEnabled ? Number(moment().subtract(streakMonths, 'months').format('X')) * 1000 : undefined;
+      let subStreak = subStreakShareEnabled ? streakMonths : 0;
       let isSubscriber = true
 
       if (user.lock && user.lock.subscribed_at) subscribed_at = undefined

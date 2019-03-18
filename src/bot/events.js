@@ -604,7 +604,6 @@ class Events {
           is: {
             moderator: _.random(0, 1, false) === 0,
             subscriber: _.random(0, 1, false) === 0,
-            regular: _.random(0, 1, false) === 0,
             broadcaster: _.random(0, 1, false) === 0,
             bot: _.random(0, 1, false) === 0,
             owner: _.random(0, 1, false) === 0,
@@ -613,11 +612,11 @@ class Events {
           recipientis: {
             moderator: _.random(0, 1, false) === 0,
             subscriber: _.random(0, 1, false) === 0,
-            regular: _.random(0, 1, false) === 0,
             broadcaster: _.random(0, 1, false) === 0,
             bot: _.random(0, 1, false) === 0,
             owner: _.random(0, 1, false) === 0,
           },
+          subStreakShareEnabled: _.random(0, 1, false) === 0,
           subStreak: _.random(10, 99, false),
           subStreakName: global.commons.getLocalizedName(_.random(10, 99, false), 'core.months'),
           subCumulativeMonths: _.random(10, 99, false),

@@ -303,12 +303,19 @@ export default {
     },
     prepareMessage: function (event) {
       let t = commons.translate(`eventlist-events.${event.event}`)
+
+      // change resub translate if not shared substreak
+      if (event.event === 'resub' && !event.subStreakShareEnabled) {
+        t = commons.translate(`eventlist-events.resubWithoutStreak`);
+      }
       t = t.replace('$formatted_amount', '<strong style="font-size: 1rem">' + _.get(event, 'currency', '$') + parseFloat(_.get(event, 'amount', '0')).toFixed(2) + '</strong>')
       t = t.replace('$viewers', '<strong style="font-size: 1rem">' + _.get(event, 'viewers', '0') + '</strong>')
       t = t.replace('$tier', `${commons.translate('tier')} <strong style="font-size: 1rem">${_.get(event, 'tier', 'n/a')}</strong>`)
       t = t.replace('$username', _.get(event, 'from', 'n/a'))
+      t = t.replace('$subCumulativeMonthsName', _.get(event, 'subCumulativeMonthsName', 'months'))
+      t = t.replace('$subCumulativeMonths', '<strong style="font-size: 1rem">' + _.get(event, 'subCumulativeMonths', '0') + '</strong>')
       t = t.replace('$subStreakName', _.get(event, 'subStreakName', 'months'))
-      t = t.replace('$subStreak', '<strong style`="`font-size: 1rem">' + _.get(event, 'subStreak', '0') + '</strong>')
+      t = t.replace('$subStreak', '<strong style="font-size: 1rem">' + _.get(event, 'subStreak', '0') + '</strong>')
       t = t.replace('$bits', '<strong style="font-size: 1rem">' + _.get(event, 'bits', '0') + '</strong>')
 
       let output = `<span style="font-size:0.7rem; font-weight: normal">${t}</span>`
