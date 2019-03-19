@@ -30,4 +30,13 @@ describe('lib/commons - unflatten()', () => {
     const object = { a: { b: { c: { d: { e: { f: ['lorem', 'ipsum']}}}}}}
     assert.deepEqual(global.commons.unflatten({ 'a.b.c.d.e.f': ['lorem', 'ipsum'] }), object)
   })
+
+  it.only('Array of object should be correctly unflatten', async () => {
+    const object = [ { username: 'test' }, { username: 'test2' }, { 'user.name': 'test3' } ]
+    assert.deepEqual(global.commons.unflatten(object), [
+      { username: 'test' },
+      { username: 'test2' },
+      { user: { name: 'test3' } }
+    ])
+  })
 })
