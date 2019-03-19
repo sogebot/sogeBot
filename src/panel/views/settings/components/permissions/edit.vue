@@ -32,6 +32,7 @@
               <option value='casters'>{{ translate('core.permissions.casters') }}</option>
               <option value='moderators'>{{ translate('core.permissions.moderators') }}</option>
               <option value='subscribers'>{{ translate('core.permissions.subscribers') }}</option>
+              <option value='vip'>{{ translate('core.permissions.vip') }}</option>
               <option value='viewers'>{{ translate('core.permissions.viewers') }}</option>
               <option value='followers'>{{ translate('core.permissions.followers') }}</option>
             </select>

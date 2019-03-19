@@ -232,8 +232,8 @@ class CustomVariables {
     } else {
       // set item permission to owner if missing
       item.permission = typeof item.permission === 'undefined' ? permission.CASTERS : item.permission;
-      let [isRegular, isMod, isOwner] = await Promise.all([
-        global.commons.isRegular(opts.sender),
+      let [isVIP, isMod, isOwner] = await Promise.all([
+        global.commons.isVIP(opts.sender),
         global.commons.isModerator(opts.sender),
         global.commons.isOwner(opts.sender)
       ])

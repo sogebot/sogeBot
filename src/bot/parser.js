@@ -50,12 +50,6 @@ class Parser {
     const parsers = await this.parsers()
     for (let parser of parsers) {
       if (parser.priority === constants.MODERATION) continue // skip moderation parsers
-      let [isRegular, isMod, isOwner] = await Promise.all([
-        global.commons.isRegular(this.sender),
-        global.commons.isModerator(this.sender),
-        global.commons.isOwner(this.sender)
-      ])
-
       if (
         _.isNil(this.sender) // if user is null -> we are running command through a bot
         || this.skip
@@ -171,13 +165,6 @@ class Parser {
     let command = await this.find(message)
     if (_.isNil(command)) return // command not found, do nothing
     if (command.permission === null) return // command is disabled
-
-    let [isRegular, isMod, isOwner] = await Promise.all([
-      global.commons.isRegular(sender),
-      global.commons.isModerator(sender),
-      global.commons.isOwner(sender)
-    ])
-
     if (
       _.isNil(this.sender) // if user is null -> we are running command through a bot
       || this.skip

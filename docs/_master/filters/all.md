@@ -195,23 +195,11 @@ e.g. `(api|https://httpbin.org/get?test=a\\nb) Lorem (api.args.test)`
 
 `(list.command)` - will return list of your visible custom commands
 
-`(list.command.mods)` - will return list of your visible custom commands with mods responses
-
-`(list.command.regular)` - will return list of your visible custom commands with regular responses
-
-`(list.command.viewers)` - will return list of your visible custom commands with viewers responses
-
-`(list.command.owner)` - will return list of your visible custom commands with owner responses
+`(list.command.<permissionName>)` - will return list of your visible custom commands for permission
 
 `(list.!command)` - will return list of your visible custom !commands
 
-`(list.!command.mods)` - will return list of your visible custom commands with mods responses
-
-`(list.!command.regular)` - will return list of your visible custom commands with regular responses
-
-`(list.!command.viewers)` - will return list of your visible custom commands with viewers responses
-
-`(list.!command.owner)` - will return list of your visible custom commands with owner responses
+`(list.!command.<permissionName>)` - will return list of your visible custom !commands for permission
 
 `(list.cooldown)` - will return list of your cooldowns (keywords and !commands)
 

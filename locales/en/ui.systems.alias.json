@@ -8,10 +8,6 @@
     "name": "command",
     "placeholder": "Set your !command for alias"
   },
-  "forViewers": "for viewers",
-  "forRegulars": "for regular viewers",
-  "forOwners": "for owners",
-  "forMods": "for mods",
   "error": {
     "isEmpty": "This value cannot be empty"
   },

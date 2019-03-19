@@ -36,7 +36,7 @@
               v-bind:value="response.filter"
               v-bind:placeholder="commons.translate('systems.customcommands.filter.placeholder')"
               v-on:update="response.filter = $event"
-              v-bind:filters="['sender', 'is.moderator', 'is.subscriber', 'is.regular', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'rank', 'game', 'title', 'views', 'followers', 'hosts', 'subscribers']"></textarea-with-tags>
+              v-bind:filters="['sender', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'rank', 'game', 'title', 'views', 'followers', 'hosts', 'subscribers']"></textarea-with-tags>
 
             <div class="h-auto w-auto" style="flex-shrink: 0;">
               <button data-toggle="dropdown" class="btn btn-outline-dark border-0 h-100 w-100" style="margin: 0; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px;"><i class="fas fa-key mr-1" aria-hidden="true"></i>
@@ -264,12 +264,6 @@
             value = value.toString()
             return value.charAt(0).toUpperCase() + value.slice(1)
           },
-          permissionToString: function (val) {
-            if (val === 0) return commons.translate('systems.customcommands.forOwners')
-            else if (val === 1) return commons.translate('systems.customcommands.forViewers')
-            else if (val === 2) return commons.translate('systems.customcommands.forMods')
-            else if (val === 3) return commons.translate('systems.customcommands.forRegulars')
-          }
         }
       })
 

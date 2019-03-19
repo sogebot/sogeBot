@@ -13,10 +13,6 @@
     "name": "filter",
     "placeholder": "Přidat filtr k této odpovědi"
   },
-  "forViewers": "pro diváky",
-  "forRegulars": "pro pravidelné diváky",
-  "forOwners": "pro vlastníka",
-  "forMods": "pro mody",
   "error": {
     "isEmpty": "Tato hodnota nesmí být prázdná"
   },
