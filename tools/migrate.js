@@ -12,8 +12,7 @@ const Logger = require('../dest/logging')
 global.logger = new Logger()
 global.commons = new (require('../dest/commons'))()
 
-const dropFiles = [
-]
+const dropFiles = [ 'settings' ]
 
 // db
 const Database = require('../dest/databases/database')
@@ -127,7 +126,60 @@ let migration = {
         let item = await global.db.engine.findOne('core.settings', { key: before, system: 'users' })
         if (typeof item.key !== 'undefined') {
           console.info(` -> users.${before} => tmi.${after}`)
-          await global.db.engine.update('core.settings', { key: before, system: 'users' }, { key: after, system: 'tmi' })
+          await global.db.engine.update('core.settings', { _id: String(item._id) }, { key: after, system: 'tmi' })
+          processed++
+        }
+      }
+      console.info(` => ${processed} processed`)
+    }
+  },
+  {
+    version: '9.0.0',
+    do: async () => {
+      let processed = 0
+
+      console.info('Updating settings | legacy => interface')
+
+      const uiMappings = {
+        'theme': 'theme',
+        'percentage': 'percentage',
+        'shortennumbers': 'shortennumbers',
+        'stickystats': 'stickystats',
+        'showdiff': 'showWithAt',
+      }
+
+      const generalMappings = {
+        'lang': 'lang',
+      }
+
+      const tmiMappings = {
+        'sendWithMe': 'chat.sendWithMe',
+        'disableWhisperListener': 'chat.whisperListener'
+      }
+
+      for (let [before, after] of Object.entries(uiMappings)) {
+        let item = await global.db.engine.findOne('settings', { key: before })
+        if (typeof item.key !== 'undefined') {
+          console.info(` -> ${before} => ui.${after}`)
+          await global.db.engine.insert('core.settings', { value: item.value, key: after, system: 'ui' })
+          processed++
+        }
+      }
+
+      for (let [before, after] of Object.entries(generalMappings)) {
+        let item = await global.db.engine.findOne('settings', { key: before })
+        if (typeof item.key !== 'undefined') {
+          console.info(` -> ${before} => general.${after}`)
+          await global.db.engine.insert('core.settings', { value: item.value, key: after, system: 'general' })
+          processed++
+        }
+      }
+
+      for (let [before, after] of Object.entries(tmiMappings)) {
+        let item = await global.db.engine.findOne('settings', { key: before })
+        if (typeof item.key !== 'undefined') {
+          console.info(` -> ${before} => tmi.${after}`)
+          await global.db.engine.insert('core.settings', { value: item.value, key: after, system: 'tmi' })
           processed++
         }
       }
