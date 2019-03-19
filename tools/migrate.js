@@ -118,7 +118,6 @@ let migration = {
 
       console.info('Updating settings | users => tmi')
 
-      const s = await global.db.engine.find('core.settings', { system: 'users' });
       const mappings = {
         'users.showWithAt': 'chat.showWithAt',
         'users.ignorelist': 'chat.ignorelist',

@@ -1,7 +1,6 @@
 'use strict'
 
 const _ = require('lodash')
-import { permission } from './permissions';
 import Core from './_interface';
 
 class Configuration extends Core {
