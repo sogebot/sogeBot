@@ -35,7 +35,7 @@ describe('TMI - ignore', () => {
 
     it('testuser should be in ignore list', async () => {
       global.tmi.ignoreCheck({ sender: owner, parameters: 'testuser' })
-      const item = await global.db.engine.findOne('core.settings', { key: 'users.ignorelist' })
+      const item = await global.db.engine.findOne('core.settings', { system: 'tmi', key: 'chat.ignorelist' })
 
       await message.isSent('ignore.user.is.ignored', owner, testuser)
       assert.isTrue(await global.commons.isIgnored(testuser))
@@ -45,7 +45,7 @@ describe('TMI - ignore', () => {
 
     it('@testuser2 should be in ignore list', async () => {
       global.tmi.ignoreCheck({ sender: owner, parameters: '@testuser2' })
-      const item = await global.db.engine.findOne('core.settings', { key: 'users.ignorelist' })
+      const item = await global.db.engine.findOne('core.settings', { system: 'tmi', key: 'chat.ignorelist' })
 
       await message.isSent('ignore.user.is.ignored', owner, testuser2)
       assert.isTrue(await global.commons.isIgnored(testuser2))
@@ -55,7 +55,7 @@ describe('TMI - ignore', () => {
 
     it('testuser3 should not be in ignore list', async () => {
       global.tmi.ignoreCheck({ sender: owner, parameters: 'testuser3' })
-      const item = await global.db.engine.findOne('core.settings', { key: 'users.ignorelist' })
+      const item = await global.db.engine.findOne('core.settings', { system: 'tmi', key: 'chat.ignorelist' })
 
       await message.isSent('ignore.user.is.not.ignored', owner, testuser3)
       assert.isFalse(await global.commons.isIgnored(testuser3))
