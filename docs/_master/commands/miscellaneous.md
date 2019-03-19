@@ -7,7 +7,7 @@
 
 `!set list` - bot will print out list of all configuration
 
-`!set lang <language>` - will set language of your bot responses, currently available en, cs
+`!set core.general.lang <language>` - will set language of your bot responses, currently available en, cs
 
 `!uptime` - how long your stream is online
 
@@ -22,9 +22,3 @@
 `!me` - shows points, rank, watched time of user and message count
 
 `!top <time|points|messages>` - shows top 10 users ordered by [time|points|messages]
-
-`!set disableSettingsWhispers true/false` - disable whisper notification on settings change
-
-`!set disableWhisperListener true/false` - disable whisper command listening
-
-`!set sendWitMe true/false` - use /me for bot responses

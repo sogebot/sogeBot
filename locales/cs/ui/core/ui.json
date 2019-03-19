@@ -1,0 +1,9 @@
+{
+  "settings": {
+    "theme": "Theme",
+    "percentage": "Rozdíl v procentech",
+    "shortennumbers": "Zkrácený formát čísel",
+    "stickystats": "Přilepit statistiky na horní část stránek",
+    "showdiff": "Zobrazit rozdíl"
+  }
+}

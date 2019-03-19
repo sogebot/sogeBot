@@ -260,7 +260,7 @@ class Events {
   async fireSendChatMessageOrWhisper (operation, attributes, whisper) {
     let username = _.isNil(attributes.username) ? global.commons.getOwner() : attributes.username
     let message = operation.messageToSend
-    const atUsername = global.users.settings.users.showWithAt
+    const atUsername = global.tmi.settings.chat.showWithAt
 
     attributes = global.commons.flatten(attributes);
     attributes = _(attributes).toPairs().sortBy((o) => -o[0].length).fromPairs().value() // reorder attributes by key length

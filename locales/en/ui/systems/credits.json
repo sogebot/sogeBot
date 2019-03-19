@@ -27,6 +27,7 @@
     "customPeriodInDays": "Custom time interval (days)",
     "numOfClips": "Number of clips",
     "shouldPlay": "Clips should be played",
-    "volume": "Volume"
+    "volume": "Volume",
+    "aggregate": "Aggregated credits"
   }
 }

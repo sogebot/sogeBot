@@ -13,21 +13,28 @@ function cluster () {
     return
   }
 
-  global.configuration = new (require('./configuration.js'))()
-  global.currency = new (require('./currency.js'))()
-  global.users = new (require('./users.js'))()
-  global.events = new (require('./events.js'))()
-  global.customvariables = new (require('./customvariables.js'))()
-  global.twitch = new (require('./twitch'))()
-  global.permissions = new Permissions()
+  try {
+    global.configuration = new (require('./configuration'))()
+    global.general = new (require('./general'))()
+    global.ui = new (require('./ui'))()
+    global.currency = new (require('./currency'))()
+    global.users = new (require('./users'))()
+    global.events = new (require('./events'))()
+    global.customvariables = new (require('./customvariables'))()
+    global.twitch = new (require('./twitch'))()
+    global.permissions = new Permissions()
 
-  global.lib = {}
-  global.lib.translate = new (require('./translate'))()
-  global.translate = global.lib.translate.translate
+    global.lib = {}
+    global.lib.translate = new (require('./translate'))()
+    global.translate = global.lib.translate.translate
 
-  global.oauth = new (require('./oauth.js'))()
-  global.api = new (require('./api'))()
-  global.tmi = new (require('./tmi'))()
+    global.oauth = new (require('./oauth.js'))()
+    global.api = new (require('./api'))()
+    global.tmi = new (require('./tmi'))()
+  } catch (e) {
+    console.error(e); global.log.error(e)
+    return global.workers.sendToMaster({ type: 'crash' })
+  }
 
   global.lib.translate._load().then(function () {
     try {

@@ -128,7 +128,7 @@ class Scrim extends System {
       this.cleanedUpOnStart = true;
       this.settings._.closingAt = 0;
     } else if (this.settings._.closingAt !== 0) {
-      const when = DateTime.fromMillis(this.settings._.closingAt, { locale: await global.configuration.getValue('lang')});
+      const when = DateTime.fromMillis(this.settings._.closingAt, { locale: global.general.settings.lang });
       const lastRemindAtDiffMs = -(DateTime.fromMillis(this.settings._.lastRemindAt).diffNow().toObject().milliseconds || 0);
 
       const minutesToGo = when.diffNow(['minutes']).toObject().minutes || 0;
@@ -168,7 +168,7 @@ class Scrim extends System {
   }
 
   private async currentMatches() {
-    const atUsername = global.users.settings.users.showWithAt;
+    const atUsername = global.tmi.settings.chat.showWithAt;
     const matches: {
       [x: string]: string[],
     } = {};

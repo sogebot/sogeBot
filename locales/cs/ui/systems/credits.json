@@ -27,6 +27,7 @@
     "customPeriodInDays": "Vlastní časové období (dny)",
     "numOfClips": "Počet klipů",
     "shouldPlay": "Bude klipy přehrávány",
-    "volume": "Hlasitost"
+    "volume": "Hlasitost",
+    "aggregate": "Souhrnné titulky"
   }
 }

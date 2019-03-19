@@ -28,7 +28,8 @@ class Module {
     this.on = Object.assign({
       change: {
         enabled: null
-      }
+      },
+      load: {}
     }, opts.on)
 
     this.dependsOn = opts.dependsOn || []
@@ -85,6 +86,12 @@ class Module {
     for (let i = 0, length = variables.length; i < length; i++) {
       if (_.has(this._opts.settings, variables[i].key) && variables[i].value !== null) _.set(this._settings, variables[i].key, variables[i].value)
       else await global.db.engine.remove(this._name + '.settings', { _id: String(variables[i]._id) })
+      if (this.on.load[variables[i].key]) {
+        for (let fnc of this.on.load[variables[i].key]) {
+          if (typeof this[fnc] === 'function') this[fnc](variables[i].key, _.get(this._settings, variables[i].key))
+          else global.log.error(`${fnc}() is not function in ${this._name}/${this.constructor.name.toLowerCase()}`)
+        }
+      }
     }
     this.isLoaded = true
   }

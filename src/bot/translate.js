@@ -21,17 +21,15 @@ class Translate {
   translations: Object = {};
   initialMetricsSent: boolean = false;
   mSentMetrics: Array<String> = [];
-  lang: string = 'en';
 
   constructor () {
-    global.configuration.register('lang', '', 'string', this.lang)
     if (isMainThread) global.panel.addMenu({ category: 'settings', name: 'translations', id: 'translations' })
   }
 
   async _load () {
     this.custom = await global.db.engine.find('customTranslations')
     return new Promise(async (resolve, reject) => {
-      this.lang = await global.configuration.getValue('lang')
+      this.lang = global.general.settings.lang
       glob('./locales/**', (err, files) => {
         if (err) reject(err)
         for (let f of files) {

@@ -16,7 +16,7 @@ describe('Message - random filter', () => {
     })
 
     it('add user ignoreduser to ignore list', async () => {
-      global.users.ignoreAdd({ sender: owner, parameters: 'ignoreduser' })
+      global.tmi.ignoreAdd({ sender: owner, parameters: 'ignoreduser' })
       await msg.isSent('ignore.user.is.added', owner, { username: 'ignoreduser' })
     })
 
@@ -41,7 +41,7 @@ describe('Message - random filter', () => {
       await msg.prepare()
     })
     it('add user ignoreduser to ignore list', async () => {
-      global.users.ignoreAdd({ sender: owner, parameters: 'ignoreduser' })
+      global.tmi.ignoreAdd({ sender: owner, parameters: 'ignoreduser' })
       await msg.isSent('ignore.user.is.added', owner, { username: 'ignoreduser' })
     })
 
@@ -69,7 +69,7 @@ describe('Message - random filter', () => {
       await msg.prepare()
     })
     it('add user ignoreduser to ignore list', async () => {
-      global.users.ignoreAdd({ sender: owner, parameters: 'ignoreduser' })
+      global.tmi.ignoreAdd({ sender: owner, parameters: 'ignoreduser' })
       await msg.isSent('ignore.user.is.added', owner, { username: 'ignoreduser' })
     })
 
@@ -98,7 +98,7 @@ describe('Message - random filter', () => {
     })
 
     it('add user ignoreduser to ignore list', async () => {
-      global.users.ignoreAdd({ sender: owner, parameters: 'ignoreduser' })
+      global.tmi.ignoreAdd({ sender: owner, parameters: 'ignoreduser' })
       await msg.isSent('ignore.user.is.added', owner, { username: 'ignoreduser' })
     })
 
@@ -123,7 +123,7 @@ describe('Message - random filter', () => {
       await msg.prepare()
     })
     it('add user ignoreduser to ignore list', async () => {
-      global.users.ignoreAdd({ sender: owner, parameters: 'ignoreduser' })
+      global.tmi.ignoreAdd({ sender: owner, parameters: 'ignoreduser' })
       await msg.isSent('ignore.user.is.added', owner, { username: 'ignoreduser' })
     })
 
@@ -148,7 +148,7 @@ describe('Message - random filter', () => {
       await msg.prepare()
     })
     it('add user ignoreduser to ignore list', async () => {
-      global.users.ignoreAdd({ sender: owner, parameters: 'ignoreduser' })
+      global.tmi.ignoreAdd({ sender: owner, parameters: 'ignoreduser' })
       await msg.isSent('ignore.user.is.added', owner, { username: 'ignoreduser' })
     })
 

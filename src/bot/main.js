@@ -55,6 +55,8 @@ async function main () {
   if (!global.db.engine.connected || global.cpu !== global.workers.onlineCount) return setTimeout(() => main(), 10)
 
   global.configuration = new (require('./configuration.js'))()
+  global.general = new (require('./general.js'))()
+  global.ui = new (require('./ui.js'))()
   global.currency = new (require('./currency.js'))()
   global.stats = new (require('./stats.js'))()
   global.users = new (require('./users.js'))()

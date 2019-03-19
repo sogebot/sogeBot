@@ -6,14 +6,31 @@ const {
   isMainThread
 } = require('worker_threads');
 import { permission } from './permissions';
+import Core from './_interface';
 
 require('moment-precise-range-plugin')
 
 const config = require('@config')
 config.timezone = config.timezone === 'system' || _.isNil(config.timezone) ? moment.tz.guess() : config.timezone
 
-class Twitch {
+class Twitch extends Core {
   constructor () {
+    const options = {
+      settings: {
+        commands: [
+          { name: '!uptime', fnc: 'uptime', permission: permission.VIEWERS },
+          { name: '!time', fnc: 'time', permission: permission.VIEWERS },
+          { name: '!followers', fnc: 'followers', permission: permission.VIEWERS },
+          { name: '!subs', fnc: 'subs', permission: permission.VIEWERS },
+          { name: '!title', fnc: 'getTitle', permission: permission.VIEWERS },
+          { name: '!title set', fnc: 'setTitle', permission: permission.CASTERS },
+          { name: '!game', fnc: 'getGame', permission: permission.VIEWERS },
+          { name: '!game set', fnc: 'setGame', permission: permission.CASTERS }
+        ]
+      }
+    }
+    super(options)
+
     if (isMainThread) {
       global.panel.addWidget('twitch', 'widget-title-monitor', 'fab fa-twitch')
 
@@ -23,20 +40,6 @@ class Twitch {
         finally: null
       })
     }
-  }
-
-  commands () {
-    const commands = [
-      { this: this, id: '!uptime', command: '!uptime', fnc: this.uptime, permission: permission.VIEWERS },
-      { this: this, id: '!time', command: '!time', fnc: this.time, permission: permission.VIEWERS },
-      { this: this, id: '!followers', command: '!followers', fnc: this.followers, permission: permission.VIEWERS },
-      { this: this, id: '!subs', command: '!subs', fnc: this.subs, permission: permission.VIEWERS },
-      { this: this, id: '!title', command: '!title', fnc: this.getTitle, permission: permission.VIEWERS },
-      { this: this, id: '!title set', command: '!title set', fnc: this.setTitle, permission: permission.CASTERS },
-      { this: this, id: '!game', command: '!game', fnc: this.getGame, permission: permission.VIEWERS },
-      { this: this, id: '!game set', command: '!game set', fnc: this.setGame, permission: permission.CASTERS }
-    ]
-    return commands
   }
 
   async sendTwitchVideo (self, socket) {
@@ -65,7 +68,7 @@ class Twitch {
 
     let onlineFollowers = _.intersection(onlineViewers, followers)
     events = _.filter(_.orderBy(events, 'timestamp', 'desc'), (o) => { return o.event === 'follow' })
-    moment.locale(await global.configuration.getValue('lang'))
+    moment.locale(global.general.settings.lang)
 
     let lastFollowAgo = ''
     let lastFollowUsername = 'n/a'
@@ -90,7 +93,7 @@ class Twitch {
 
     let onlineSubscribers = _.intersection(onlineViewers, subscribers)
     events = _.filter(_.orderBy(events, 'timestamp', 'desc'), (o) => { return o.event === 'sub' || o.event === 'resub' || o.event === 'subgift' })
-    moment.locale(await global.configuration.getValue('lang'))
+    moment.locale(global.general.settings.lang)
 
     let lastSubAgo = ''
     let lastSubUsername = 'n/a'

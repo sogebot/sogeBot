@@ -121,42 +121,6 @@
             <i class="fas fa-sign-out-alt"></i>
             leave from channel
           </button>
-          <br/>
-
-          <h6 class="dropdown-header">UI</h6>
-          <button class="dropdown-item" id="percentage-btn" data-show-percentage="true" onclick="switchPercentageShow()">
-            <i class="far fa-check-square" aria-hidden="true"></i>
-            Percentage in stats
-          </button>
-          <button class="dropdown-item" id="showdiff-btn" data-shortennumber="true" onclick="switchShowDiff()">
-            <i class="far fa-check-square" aria-hidden="true"></i>
-            Show average difference
-          </button>
-          <button class="dropdown-item" id="shortennumber-btn" data-shortennumber="true" onclick="switchShortenNumbers()">
-            <i class="far fa-check-square" aria-hidden="true"></i>
-            Shorten long numbers: 10000 => 10k
-          </button>
-          <button class="dropdown-item" id="sticky-btn" data-sticky="true" onclick="switchSticky()">
-            <i class="far fa-check-square" aria-hidden="true"></i>
-            Keep stats sticky on scroll
-          </button>
-          <button class="dropdown-item" id="stats-btn" data-show-stats="true" onclick="switchStats()">
-            <i class="far fa-check-square" aria-hidden="true"></i>
-            <span data-lang="stats-panel.show">Quick stats</span>
-          </button>
-
-          <h6 class="dropdown-header">BOT</h6>
-          <button class="dropdown-item" id="mute-btn" data-muted="false" onclick="switchMute()">
-            <i class="far fa-square" aria-hidden="true"></i>
-            <span data-lang="mute"></span>
-          </button>
-          <button class="dropdown-item" id="me-btn" onclick="switchMe()">
-            <i class="far fa-square" aria-hidden="true"></i>
-            use /me
-          </button>
-
-          <h6 class="dropdown-header">THEMES</h6>
-          <button class="dropdown-item" id="theme-btn" onclick="switchTheme()" data-lang="dark"></button>
         </div>
       </div>
     </div>
@@ -489,43 +453,20 @@
     socket.emit('getConfiguration')
     socket.on('configuration', function (data) {
       configuration = data
-      moment.locale(data.lang) // set moment locale
-      /* THEME */
-      if (data.theme === 'dark') {
+      moment.locale(data.core.general.lang) // set moment locale
+      // THEME
+      if (data.core.ui.theme === 'dark') {
         $('head').append('<link rel="stylesheet" href="./dist/css/dark.css">')
-        var btn = $('#theme-btn')
-        btn.text(translations['light'])
       }
 
-      /* MUTE BUTTON */
-      var btn = $('#mute-btn')
-      btn.data('muted', !data.mute)
-      switchMute(false)
+      quickStatsApp.b_percentage = data.core.ui.percentage
+      quickStatsApp.b_showAvgDiff = data.core.ui.showdiff
+      quickStatsApp.b_shortenNumber = data.core.ui.shortennumbers
 
-      /* PERCENTAGE BUTTON */
-      var btn = $('#percentage-btn')
-      btn.data('showPercentage', !data.percentage)
-      switchPercentageShow(false)
-
-      /* SHORTEN NUMBER BUTTON */
-      var btn = $('#shortennumber-btn')
-      btn.data('switchShortenNumbers', !data.shortennumbers)
-      switchShortenNumbers(false)
-
-      /* SHOW DIFF BUTTON */
-      var btn = $('#showdiff-btn')
-      btn.data('switchShowDiff', !data.showdiff)
-      switchShowDiff(false)
-
-      /* STICKY BUTTON */
-      var btn = $('#sticky-btn')
-      btn.data('switchSticky', !data.stickystats)
-      switchSticky(false)
-
-      /* ME BUTTON */
-      var btn = $('#me-btn')
-      btn.data('sendWithMe', !data.sendWithMe)
-      switchMe(false)
+      if (data.core.ui.stickystats) {
+        $('#quickStatsApp').addClass('sticky-top')
+        $('#quickStatsApp').css('top', '50px')
+      }
     })
 
     setInterval(function () {
@@ -1138,185 +1079,6 @@
       console.debug('EMIT [highlight]')
       highlightsSocket.emit('highlight')
 
-    }
-    var switchTheme = function () {
-      var btn = $('#theme-btn')
-      if (btn.text() === translations['dark']) {
-        btn.text(translations['light'])
-        $('head').append('<link rel="stylesheet" href="./dist/css/dark.css">')
-        console.debug('EMIT [saveConfiguration]', {
-          'theme': 'dark'
-        })
-        socket.emit('saveConfiguration', {
-          'theme': 'dark'
-        })
-      } else {
-        btn.text(translations['dark'])
-        $("LINK[href='./dist/css/dark.css']").remove();
-        console.debug('EMIT [saveConfiguration]', {
-          'theme': 'light'
-        })
-        socket.emit('saveConfiguration', {
-          'theme': 'light'
-        })
-      }
-    }
-
-    var switchStats = function () {
-      var btn = $('#stats-btn')
-      var container = $('.stream-info-container')
-
-      btn.data('show-stats', _.isString(btn.data('show-stats')) ? true : btn.data('show-stats'))
-
-      if (btn.data('show-stats')) {
-        container.css('display', 'none')
-        btn.children('i').removeClass().addClass('far fa-square')
-      } else {
-        container.css('display', 'block')
-        btn.children('i').removeClass().addClass('far fa-check-square')
-      }
-
-      btn.data('show-stats', !btn.data('show-stats'))
-    }
-
-    var switchMute = function (update = true) {
-      var btn = $('#mute-btn')
-      btn.data('muted', _.isString(btn.data('muted')) ? true : btn.data('muted'))
-
-      if (btn.data('muted')) {
-        btn.children('i').removeClass().addClass('far fa-square')
-      } else {
-        btn.children('i').removeClass().addClass('far fa-check-square')
-      }
-
-      btn.data('muted', !btn.data('muted'))
-
-      if (update) {
-        console.debug('EMIT [saveConfiguration]', {
-          'mute': btn.data('muted')
-        })
-        socket.emit('saveConfiguration', {
-          'mute': btn.data('muted')
-        })
-      }
-    }
-
-    var switchPercentageShow = function (update = true) {
-      var btn = $('#percentage-btn')
-      btn.data('showPercentage', _.isString(btn.data('showPercentage')) ? true : btn.data('showPercentage'))
-
-      if (btn.data('showPercentage')) {
-        btn.children('i').removeClass().addClass('far fa-square')
-      } else {
-        btn.children('i').removeClass().addClass('far fa-check-square')
-      }
-
-      btn.data('showPercentage', !btn.data('showPercentage'))
-      quickStatsApp.b_percentage = btn.data('showPercentage')
-
-      if (update) {
-        console.debug('EMIT [saveConfiguration]', {
-          'percentage': btn.data('showPercentage')
-        })
-        socket.emit('saveConfiguration', {
-          'percentage': btn.data('showPercentage')
-        })
-      }
-    }
-
-    var switchShowDiff = function (update = true) {
-      var btn = $('#showdiff-btn')
-      btn.data('switchShowDiff', _.isString(btn.data('switchShowDiff')) ? true : btn.data('switchShowDiff'))
-
-      if (btn.data('switchShowDiff')) {
-        btn.children('i').removeClass().addClass('far fa-square')
-      } else {
-        btn.children('i').removeClass().addClass('far fa-check-square')
-      }
-
-      btn.data('switchShowDiff', !btn.data('switchShowDiff'))
-      quickStatsApp.b_showAvgDiff = btn.data('switchShowDiff')
-
-      if (update) {
-        console.debug('EMIT [saveConfiguration]', {
-          'showdiff': btn.data('switchShowDiff')
-        })
-        socket.emit('saveConfiguration', {
-          'showdiff': btn.data('switchShowDiff')
-        })
-      }
-    }
-
-    var switchShortenNumbers = function (update = true) {
-      var btn = $('#shortennumber-btn')
-      btn.data('switchShortenNumbers', _.isString(btn.data('switchShortenNumbers')) ? true : btn.data('switchShortenNumbers'))
-
-      if (btn.data('switchShortenNumbers')) {
-        btn.children('i').removeClass().addClass('far fa-square')
-      } else {
-        btn.children('i').removeClass().addClass('far fa-check-square')
-      }
-
-      btn.data('switchShortenNumbers', !btn.data('switchShortenNumbers'))
-      quickStatsApp.b_shortenNumber = btn.data('switchShortenNumbers')
-
-      if (update) {
-        console.debug('EMIT [saveConfiguration]', {
-          'shortennumbers': btn.data('switchShortenNumbers')
-        })
-        socket.emit('saveConfiguration', {
-          'shortennumbers': btn.data('switchShortenNumbers')
-        })
-      }
-    }
-
-    var switchSticky = function (update = true) {
-      var btn = $('#sticky-btn')
-      btn.data('switchSticky', _.isString(btn.data('switchSticky')) ? true : btn.data('switchSticky'))
-
-      if (btn.data('switchSticky')) {
-        btn.children('i').removeClass().addClass('far fa-square')
-      } else {
-        btn.children('i').removeClass().addClass('far fa-check-square')
-      }
-
-      btn.data('switchSticky', !btn.data('switchSticky'))
-
-      if (btn.data('switchSticky')) {
-        $('#quickStatsApp').addClass('sticky-top')
-        $('#quickStatsApp').css('top', '50px')
-      } else $('#quickStatsApp').removeClass('sticky-top')
-
-      if (update) {
-        console.debug('EMIT [saveConfiguration]', {
-          'stickystats': btn.data('switchSticky')
-        })
-        socket.emit('saveConfiguration', {
-          'stickystats': btn.data('switchSticky')
-        })
-      }
-    }
-
-    var switchMe = function (update = true) {
-      var btn = $('#me-btn')
-      btn.data('sendWithMe', _.isString(btn.data('sendWithMe')) ? true : btn.data('sendWithMe'))
-
-      if (btn.data('sendWithMe')) {
-        btn.children('i').removeClass().addClass('far fa-square')
-      } else {
-        btn.children('i').removeClass().addClass('far fa-check-square')
-      }
-
-      btn.data('sendWithMe', !btn.data('sendWithMe'))
-
-      if (update) {
-        console.debug('EMIT [saveConfiguration]', {
-          'sendWithMe': btn.data('sendWithMe')
-        })
-        socket.emit('saveConfiguration', {
-          'sendWithMe': btn.data('sendWithMe')
-        })
-      }
     }
 
     var useRaw = false

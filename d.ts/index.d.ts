@@ -6,8 +6,11 @@ declare module "*.vue" {
 declare namespace NodeJS {
   export interface Global {
     configuration: any,
+    cpu: any,
     db: any,
     commons: any,
+    general: any,
+    bot: any,
     translate: any,
     log: any,
     currency: any,
@@ -23,6 +26,9 @@ declare namespace NodeJS {
     widgets: any,
     oauth: {
       settings: {
+        broadcaster: {
+          username: string,
+        },
         bot: {
           username: string,
         },
@@ -42,7 +48,6 @@ type Sender = {
     premium?: undefined | number,
     globalMod? : undefined | number,
     moderator? : undefined | number,
-
   }
 }
 
@@ -99,6 +104,9 @@ type InterfaceSettings = {
     streamStart?: () => void,
     streamEnd?: () => void,
     change?: {
+      [x: string]: Array<string>
+    },
+    load?: {
       [x: string]: Array<string>
     }
   },

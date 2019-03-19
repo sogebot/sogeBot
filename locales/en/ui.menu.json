@@ -1,6 +1,10 @@
 {
-  "core": "General",
+  "core": "Bot",
   "users": "Users",
+  "tmi": "TMI",
+  "ui": "UI",
+  "twitch": "Twitch",
+  "general": "General",
   "timers": "Timers",
   "keywords": "Keywords",
   "customcommands": "Custom commands",

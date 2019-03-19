@@ -8,6 +8,9 @@ const _ = require('lodash')
 const TwitchJs = require('twitch-js').default
 const Parser = require('./parser')
 
+
+import { permission } from './permissions';
+const Expects = require('./expects')
 import Core from './_interface'
 const constants = require('./constants')
 
@@ -24,11 +27,63 @@ class TMI extends Core {
   ignoreGiftsFromUser: { [string]: { count: number, time: Date }} = {}
 
   constructor () {
-    super()
+    const settings = {
+      chat: {
+        sendWithMe: false,
+        ignorelist: [],
+        showWithAt: true,
+        mute: false,
+        whisperListener: false,
+      },
+      commands: [
+        { name: '!ignore add', fnc: 'ignoreAdd', permission: permission.CASTERS },
+        { name: '!ignore rm', fnc: 'ignoreRm', permission: permission.CASTERS },
+        { name: '!ignore check', fnc: 'ignoreCheck', permission: permission.CASTERS },
+      ]
+    }
+    super({ settings })
+
+    this.addMenu({ category: 'settings', name: 'core', id: 'core' })
 
     if (isMainThread) {
       global.status.TMI = constants.DISCONNECTED
     }
+  }
+
+  async ignoreAdd (opts: Object) {
+    try {
+      const username = new Expects(opts.parameters).username().toArray()[0].toLowerCase()
+      global.tmi.settings.chat.ignorelist = [
+        ...new Set([
+          ...global.tmi.settings.chat.ignorelist,
+          username,
+        ]
+      )];
+      // update ignore list
+      global.commons.sendMessage(global.commons.prepare('ignore.user.is.added', { username }), opts.sender)
+    } catch (e) {
+      global.log.error(e.message)
+    }
+  }
+
+  async ignoreRm (opts: Object) {
+    try {
+      const username = new Expects(opts.parameters).username().toArray()[0].toLowerCase()
+      global.tmi.settings.chat.ignorelist = global.tmi.settings.chat.ignorelist.filter(o => o !== username)
+      // update ignore list
+      global.commons.sendMessage(global.commons.prepare('ignore.user.is.removed', { username }), opts.sender)
+    } catch (e) {
+      global.log.error(e.message)
+    }
+  }
+
+  async ignoreCheck (opts: Object) {
+    try {
+      const username = new Expects(opts.parameters).username().toArray()[0].toLowerCase()
+      const isIgnored = await global.commons.isIgnored(username)
+      global.commons.sendMessage(global.commons.prepare(isIgnored ? 'ignore.user.is.ignored' : 'ignore.user.is.not.ignored', { username }), opts.sender)
+      return isIgnored
+    } catch (e) {}
   }
 
   async initClient (type: string) {
@@ -534,7 +589,9 @@ class TMI extends Core {
 
     const parse = new Parser({ sender: sender, message: message, skip: skip, quiet: quiet })
 
-    if (!skip && sender['message-type'] === 'whisper' && (!(await global.configuration.getValue('disableWhisperListener')) || global.commons.isOwner(sender))) {
+    if (!skip
+        && sender['message-type'] === 'whisper'
+        && (global.tmi.settings.chat.whisperListener || global.commons.isOwner(sender))) {
       global.log.whisperIn(message, { username: sender.username })
     } else if (!skip && !(await global.commons.isBot(sender.username))) {
       global.log.chatIn(message, { username: sender.username })

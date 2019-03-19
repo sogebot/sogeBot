@@ -12,6 +12,10 @@
     "lib": ["es2018", "dom"],
     "declaration": false,
     "resolveJsonModule": true,
+    "baseUrl": "./",
+    "paths": {
+      "@config": ["config.json", "config.example.json"],
+    }
   },
   "include": [
     "src/**/*.ts",

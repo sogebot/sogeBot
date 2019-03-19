@@ -251,7 +251,7 @@ class Message {
         let cmd = filter
           .replace('!', '') // replace first !
           .replace(/\(|\)/g, '')
-          .replace(/\$sender/g, (global.users.settings.users.showWithAt ? '@' : '') + attr.sender)
+          .replace(/\$sender/g, (global.tmi.settings.chat.showWithAt ? '@' : '') + attr.sender)
           .replace(/\$param/g, attr.param)
         global.tmi.message({
           sender: { username: attr.sender },
@@ -265,7 +265,7 @@ class Message {
         if (!_.isString(attr.sender)) attr.sender = _.get(attr, 'sender.username', null)
         let cmd = filter
           .replace(/\(|\)/g, '')
-          .replace(/\$sender/g, (global.users.settings.users.showWithAt ? '@' : '') + attr.sender)
+          .replace(/\$sender/g, (global.tmi.settings.chat.showWithAt ? '@' : '') + attr.sender)
           .replace(/\$param/g, attr.param)
         global.tmi.message({
           sender: { username: attr.sender },
@@ -439,7 +439,7 @@ class Message {
           users: users,
           is: is,
           random: randomVar,
-          sender: global.users.settings.users.showWithAt ? `@${attr.sender}` : `${attr.sender}`,
+          sender: global.tmi.settings.chat.showWithAt ? `@${attr.sender}` : `${attr.sender}`,
           param: _.isNil(attr.param) ? null : attr.param
         }
 
@@ -558,7 +558,7 @@ class Message {
     await this.parseMessageEach(param, true)
     // local replaces
     if (!_.isNil(attr)) {
-      const isWithAt = global.users.settings.users.showWithAt
+      const isWithAt = global.tmi.settings.chat.showWithAt
       for (let [key, value] of Object.entries(attr)) {
         if (_.includes(['sender'], key)) value = isWithAt ? `@${value}` : value
         this.message = this.message.replace(new RegExp('[$]' + key, 'g'), value)
