@@ -328,7 +328,7 @@ function Panel () {
     })
     socket.on('core', async (cb) => {
       let toEmit = []
-      for (let system of ['oauth', 'users', 'currency']) {
+      for (let system of ['oauth', 'tmi', 'currency']) {
         if (!global[system].settings) continue
         toEmit.push({
           name: system.toLowerCase()
