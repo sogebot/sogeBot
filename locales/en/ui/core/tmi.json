@@ -2,6 +2,8 @@
   "settings": {
     "ignorelist": "Ignore list",
     "showWithAt": "Show users with @",
-    "sendWithMe": "Send messages with /me"
+    "sendWithMe": "Send messages with /me",
+    "mute": "Bot is muted",
+    "whisperListener": "Listen on commands on whispers"
   }
 }

@@ -14,7 +14,6 @@ const Message = require('./message')
 import { debug } from './debug';
 
 function Commons () {
-  this.registerConfiguration()
 }
 
 /*
@@ -56,10 +55,6 @@ Commons.prototype.unflatten = function (data) {
   return result
 }
 
-Commons.prototype.registerConfiguration = function () {
-  if (_.isNil(global.configuration)) return setTimeout(() => this.registerConfiguration(), 1)
-}
-
 Commons.prototype.getIgnoreList = function () {
   return global.tmi.settings.chat.ignorelist
 }
@@ -94,17 +89,6 @@ Commons.prototype.isIntegrationEnabled = function (fn) {
   }
   if (typeof fn === 'object') global.log.info(name + ' integration ' + global.translate('core.loaded') + ' ' + (enabled ? chalk.green(global.translate('core.enabled')) : chalk.red(global.translate('core.disabled'))))
   return enabled
-}
-
-Commons.prototype.sendToOwners = async function (text) {
-  if (global.configuration.getValue('disableSettingsWhispers')) return text.length > 0 ? global.log.warning(text) : ''
-  for (let owner of global.oauth.settings.general.owners) {
-    owner = {
-      username: owner,
-      'message-type': 'whisper'
-    }
-    global.commons.sendMessage(text, owner)
-  }
 }
 
 Commons.prototype.prepare = async function (translate, attr) {

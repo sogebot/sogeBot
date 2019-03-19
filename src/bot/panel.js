@@ -128,12 +128,6 @@ function Panel () {
   this.widgets = []
   this.socketListeners = []
 
-  global.configuration.register('theme', 'core.theme', 'string', 'light')
-  global.configuration.register('percentage', 'core.percentage', 'bool', true)
-  global.configuration.register('shortennumbers', 'core.no-response-bool', 'bool', true)
-  global.configuration.register('stickystats', 'core.no-response-bool', 'bool', false)
-  global.configuration.register('showdiff', 'core.no-response-bool', 'bool', true)
-
   this.addMenu({ category: 'settings', name: 'systems', id: 'systems' })
 
   this.registerSockets({
@@ -299,7 +293,38 @@ function Panel () {
     })
     socket.on('getConfiguration', async function (cb) {
       var data = {}
-      for (let key of global.configuration.sets(global.configuration)) data[key] = await global.configuration.getValue(key)
+
+      for (let system of ['oauth', 'tmi', 'currency', 'ui', 'general', 'twitch']) {
+        if (!global[system].settings) continue
+        if (typeof data.core === 'undefined') {
+          data.core = {}
+        }
+        data.core[system] = await global[system].getAllSettings()
+      }
+
+      for (let system of Object.keys(global.systems).filter(o => !o.startsWith('_'))) {
+        if (!global.systems[system].settings) continue
+        if (typeof data.systems === 'undefined') {
+          data.systems = {}
+        }
+        data.systems[system] = await global.systems[system].getAllSettings()
+      }
+
+      for (let system of Object.keys(global.integrations).filter(o => !o.startsWith('_'))) {
+        if (!global.integrations[system].settings) continue
+        if (typeof data.integrations === 'undefined') {
+          data.integrations = {}
+        }
+        data.integrations[system] = await global.integrations[system].getAllSettings()
+      }
+
+      for (let system of Object.keys(global.games).filter(o => !o.startsWith('_'))) {
+        if (!global.games[system].settings) continue
+        if (typeof data.games === 'undefined') {
+          data.games = {}
+        }
+        data.games[system] = await global.games[system].getAllSettings()
+      }
 
       // currencies
       data.currency = global.currency.settings.currency.mainCurrency
@@ -328,7 +353,7 @@ function Panel () {
     })
     socket.on('core', async (cb) => {
       let toEmit = []
-      for (let system of ['oauth', 'tmi', 'currency']) {
+      for (let system of ['oauth', 'tmi', 'currency', 'ui', 'general', 'twitch']) {
         if (!global[system].settings) continue
         toEmit.push({
           name: system.toLowerCase()

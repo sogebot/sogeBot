@@ -89,7 +89,7 @@ const main = async () => {
   new Vue({
     router,
     created() {
-      this.$moment.locale(global.configuration.lang); // set proper moment locale
+      this.$moment.locale(global.configuration.core.general.lang); // set proper moment locale
     },
     template: `
       <div id="app">

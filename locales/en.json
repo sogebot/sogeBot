@@ -16,10 +16,6 @@
       "error": "$sender, API is not responding correctly!",
       "not-available": "not available"
     },
-    "mute": {
-      "true": "Mute enabled. Bot will not send messages.",
-      "false": "Mute disabled. Bot will send messages."
-    },
     "theme": "",
     "percentage": {
       "true": "", "false": ""
@@ -569,7 +565,6 @@
     "tips": "Tips",
     "tier": "Tier",
     "status": "Status",
-    "mute": "mute",
     "add-widget": "Add widget",
     "remove-dashboard": "Remove dashboard",
     "remove-widget": "Remove widget",
@@ -666,7 +661,6 @@
     "one-record-per-line": "one record per line",
     "on": "on",
     "off": "off",
-    "muted": "muted",
     "search-by-username": "Search by username",
     "create-and-use-a-new-game": "Create and use a new game",
     "create-and-use-a-new-title": "Create and use a new title",
@@ -1147,14 +1141,6 @@
   },
   "whisper" : {
     "settings": {
-      "disableWhisperListener": {
-        "true": "Bot won't listen to commands on whisper",
-        "false": "Bot will listen to commands on whisper"
-      },
-      "disableSettingsWhispers": {
-        "true": "Bot won't send settings notifications",
-        "false": "Bot will send settings notifications through whispers"
-      },
       "disablePermissionWhispers": {
         "true": "Bot won't send permissions insufficient errors",
         "false": "Bot will send permissions insufficient errors through whispers"

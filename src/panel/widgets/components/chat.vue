@@ -83,7 +83,7 @@ export default {
       setTimeout(() => (this.isRefreshing = false), 2000)
       $("#chat-room").empty()
       $("#chat-room").html('<iframe frameborder="0" scrolling="no" id="chat_embed" src="' + window.location.protocol +
-        '//twitch.tv/embed/' + this.room + '/chat' + (configuration.theme.includes('dark') ? '?darkpopout' : '') +'" width="100%"></iframe>')
+        '//twitch.tv/embed/' + this.room + '/chat' + (configuration.core.ui.theme.includes('dark') ? '?darkpopout' : '') +'" width="100%"></iframe>')
     },
     sendChatMessage: function () {
       if (this.chatMessage.length > 0) this.socket.emit('chat.message.send', this.chatMessage)
@@ -109,7 +109,7 @@ export default {
       if (err) return console.error(err)
       this.room = room
       $("#chat-room").html('<iframe frameborder="0" scrolling="no" id="chat_embed" src="' + window.location.protocol +
-        '//twitch.tv/embed/' + room + '/chat' + (configuration.theme.includes('dark') ? '?darkpopout' : '') +'" width="100%"></iframe>')
+        '//twitch.tv/embed/' + room + '/chat' + (configuration.core.ui.theme.includes('dark') ? '?darkpopout' : '') +'" width="100%"></iframe>')
     })
   }
 }

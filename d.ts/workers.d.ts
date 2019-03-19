@@ -8,5 +8,6 @@ declare namespace Workers {
 
     sendToWorker: (opts: {}) => any,
     sendToMaster: (opts: {}) => any,
+    sendToAll: (opts: {}) => any,
   }
 }

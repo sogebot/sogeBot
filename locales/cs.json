@@ -16,14 +16,6 @@
       "error": "$sender, neco se pokazilo v API!",
       "not-available": "nedostupne"
     },
-    "mute": {
-      "true": "Mute zapnut. Bot nebude posilat zpravy.",
-      "false": "Mute vypnut. Bot bude posilat zpravy."
-    },
-    "theme": "",
-    "percentage": {
-      "true": "", "false": ""
-    },
     "years": "rok|4:roky|roků",
     "months": "měsíc|4:měsíce|měsíců",
     "days": "den|4:dny|dnů",
@@ -583,7 +575,6 @@
     "tips": "Spropitné",
     "tier": "Tier",
     "status": "status",
-    "mute": "ztišit",
     "add-widget": "Přidat widget",
     "remove-dashboard": "Smazat dashboard",
     "remove-widget": "Smazat widget",
@@ -680,7 +671,6 @@
     "one-record-per-line": "jeden záznam na řádek",
     "on": "zapnuto",
     "off": "vypnuto",
-    "muted": "neoznámit",
     "search-by-username": "Vyhledat podle uživ. jm.",
     "create-and-use-a-new-game": "Vytvoř a použij novou hru",
     "create-and-use-a-new-title": "Vytvoř a použij nový název",
@@ -1162,14 +1152,6 @@
   },
   "whisper" : {
     "settings": {
-      "disableWhisperListener": {
-        "true": "Bot nebude naslouchat prikazum pres whisper",
-        "false": "Bot bude naslouchat prikazum pres whisper"
-      },
-      "disableSettingsWhispers": {
-        "true": "Bot nebude posilat oznameni o zmene nastaveni",
-        "false": "Bot bude posilat oznameni o zmene nastaveni pres whisper"
-      },
       "disablePermissionWhispers": {
         "true": "Bot nebude posilat chyby opravneni",
         "false": "Bot bude posilat chyby opravneni pres whisper"

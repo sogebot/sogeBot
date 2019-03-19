@@ -7,8 +7,6 @@ import { Permissions } from './permissions'
 
 cluster()
 
-console.log('a')
-
 function cluster () {
   if (!global.db.engine.connected) {
     setTimeout(() => cluster(), 10)
@@ -16,11 +14,13 @@ function cluster () {
   }
 
   try {
-    global.configuration = new (require('./configuration.js'))()
-    global.currency = new (require('./currency.js'))()
-    global.users = new (require('./users.js'))()
-    global.events = new (require('./events.js'))()
-    global.customvariables = new (require('./customvariables.js'))()
+    global.configuration = new (require('./configuration'))()
+    global.general = new (require('./general'))()
+    global.ui = new (require('./ui'))()
+    global.currency = new (require('./currency'))()
+    global.users = new (require('./users'))()
+    global.events = new (require('./events'))()
+    global.customvariables = new (require('./customvariables'))()
     global.twitch = new (require('./twitch'))()
     global.permissions = new Permissions()
 

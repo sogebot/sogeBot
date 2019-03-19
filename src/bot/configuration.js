@@ -1,84 +1,11 @@
 'use strict'
 
 const _ = require('lodash')
-const config = require('@config')
-const gitCommitInfo = require('git-commit-info');
 import { permission } from './permissions';
+import Core from './_interface';
 
-class Configuration {
-  constructor () {
-    this.config = null
-    this.cfgL = {}
-    this.default = {}
-
-    this.register('mute', 'core.mute', 'bool', false)
-    this.register('disableWhisperListener', 'whisper.settings.disableWhisperListener', 'bool', true)
-    this.register('disableSettingsWhispers', 'whisper.settings.disableSettingsWhispers', 'bool', false)
-  }
-
-  commands () {
-    return [
-      { this: this, id: '!set list', command: '!set list', fnc: this.listSets, permission: permission.CASTERS },
-      { this: this, id: '!set', command: '!set', fnc: this.setValue, permission: permission.CASTERS },
-      { this: this, id: '!_debug', command: '!_debug', fnc: this.debug, permission: permission.CASTERS },
-      { this: this, id: '!enable', command: '!enable', fnc: this.enable, permission: permission.CASTERS },
-      { this: this, id: '!disable', command: '!disable', fnc: this.disable, permission: permission.CASTERS }
-    ]
-  }
-
-  async debug () {
-    let widgets = await global.db.engine.find('widgets')
-
-    let oauth = {
-      broadcaster: global.oauth.settings.broadcaster.username !== '',
-      bot: global.oauth.settings.bot.username !== ''
-    }
-
-    const lang = await global.configuration.getValue('lang')
-    const mute = await global.configuration.getValue('mute')
-
-    let enabledSystems = {}
-    for (let category of ['systems', 'games', 'integrations']) {
-      if (_.isNil(enabledSystems[category])) enabledSystems[category] = []
-      for (let system of Object.keys(global[category]).filter(o => !o.startsWith('_'))) {
-        if (!global[category][system].settings) continue
-        let [enabled, areDependenciesEnabled, isDisabledByEnv] = await Promise.all([
-          global[category][system].settings.enabled,
-          global[category][system]._dependenciesEnabled(),
-          !_.isNil(process.env.DISABLE) && (process.env.DISABLE.toLowerCase().split(',').includes(system.toLowerCase()) || process.env.DISABLE === '*')
-        ])
-        if (!enabled || !areDependenciesEnabled || isDisabledByEnv) continue
-        enabledSystems[category].push(system)
-      }
-    }
-    const version = _.get(process, 'env.npm_package_version', 'x.y.z')
-    global.log.debug('======= COPY DEBUG MESSAGE FROM HERE =======')
-    global.log.debug(`GENERAL      | OS: ${process.env.npm_config_user_agent}`)
-    global.log.debug(`             | Bot version: ${version.replace('SNAPSHOT', gitCommitInfo().shortHash || 'SNAPSHOT')}`);
-    global.log.debug(`             | DB: ${config.database.type}`);
-    global.log.debug(`             | Threads: ${global.cpu}`);
-    global.log.debug(`             | HEAP: ${Number(process.memoryUsage().heapUsed / 1048576).toFixed(2)} MB`);
-    global.log.debug(`             | Uptime: ${process.uptime()} seconds`);
-    global.log.debug(`             | Language: ${lang}`);
-    global.log.debug(`             | Mute: ${mute}`);
-    global.log.debug(`SYSTEMS      | ${enabledSystems.systems.join(', ')}`)
-    global.log.debug(`GAMES        | ${enabledSystems.games.join(', ')}`)
-    global.log.debug(`INTEGRATIONS | ${enabledSystems.integrations.join(', ')}`)
-    global.log.debug(`WIDGETS      | ${_.map(widgets, 'id').join(', ')}`)
-    global.log.debug(`OAUTH        | BOT ${oauth.bot} | BROADCASTER ${oauth.broadcaster}`)
-    global.log.debug('======= END OF DEBUG MESSAGE =======')
-  }
-
-  get () {
-    return this.config
-  }
-
-  register (cfgName, success, filter, defaultValue) {
-    this.cfgL[cfgName] = { success: success, value: defaultValue, filter: filter }
-    this.default[cfgName] = { value: defaultValue }
-  }
-
-  async setValue2 (opts) {
+class Configuration extends Core {
+  async setValue (opts) {
     // get value so we have a type
     let splitted = opts.parameters.split(' ')
     const pointer = splitted.shift()
@@ -109,61 +36,6 @@ class Configuration {
     } else global.commons.sendMessage(`$sender, ${pointer} settings not exists`, opts.sender)
   }
 
-  async setValue (opts) {
-    try {
-      if (opts.parameters.includes('.')) return this.setValue2(opts)
-
-      var cmd = opts.parameters.split(' ')[0]
-      var value = opts.parameters.replace(opts.parameters.split(' ')[0], '').trim()
-      var filter = this.cfgL[cmd].filter
-      opts.quiet = _.isBoolean(opts.quiet) ? opts.quiet : false
-
-      if (value.length === 0) value = this.default[cmd].value
-
-      if (_.isString(value)) value = value.trim()
-      if (filter === 'number' && Number.isInteger(parseInt(value, 10))) {
-        value = parseInt(value, 10)
-
-        await global.db.engine.update('settings', { key: cmd }, { key: cmd, value: value })
-        if (!opts.quiet) global.commons.sendToOwners(global.translate(this.cfgL[cmd].success).replace(/\$value/g, value))
-
-        this.cfgL[cmd].value = value
-      } else if (filter === 'bool' && (value === 'true' || value === 'false' || _.isBoolean(value))) {
-        value = !_.isBoolean(value) ? (value.toLowerCase() === 'true') : value
-
-        await global.db.engine.update('settings', { key: cmd }, { key: cmd, value: value })
-        if (!opts.quiet) global.commons.sendToOwners(global.translate(this.cfgL[cmd].success + '.' + value).replace(/\$value/g, value))
-
-        this.cfgL[cmd].value = value
-      } else if (filter === 'string' && !(value === 'true' || value === 'false' || _.isBoolean(value)) && !Number.isInteger(parseInt(value, 10))) {
-        this.cfgL[cmd].value = value
-        await global.db.engine.update('settings', { key: cmd }, { key: cmd, value: value })
-        if (cmd === 'lang') {
-          global.workers.sendToMaster({ type: 'lang' })
-          await global.lib.translate._load()
-          if (!opts.quiet) global.commons.sendToOwners(global.translate('core.lang-selected'))
-        }
-        if (cmd !== 'lang' && !opts.quiet) global.commons.sendToOwners(global.translate(this.cfgL[cmd].success).replace(/\$value/g, value))
-      } else global.commons.sendMessage('Sorry, $sender, cannot parse !set command.', opts.sender)
-
-      let emit = {}
-      _.each(this.sets(), async (key) => {
-        emit[key] = await this.getValue(key)
-      })
-    } catch (err) {
-      global.commons.sendMessage('Sorry, $sender, cannot parse !set command.', opts.sender)
-    }
-  }
-
-  sets () {
-    return Object.keys(this.cfgL).map(function (item) { return item })
-  }
-
-  listSets (opts) {
-    var setL = this.sets(this).join(', ')
-    global.commons.sendMessage(setL.length === 0 ? 'Sorry, $sender, you cannot configure anything' : 'List of possible settings: ' + setL, opts.sender)
-  }
-
   async getValue (cfgName) {
     let item = await global.db.engine.findOne('settings', { key: cfgName })
     try {
@@ -175,33 +47,6 @@ class Configuration {
       global.log.error(e.stack)
       return null
     }
-  }
-
-  async setStatus (opts) {
-    if (opts.parameters.trim().length === 0) return
-    try {
-      let [type, name] = opts.parameters.split(' ')
-
-      if (type === 'system') type = 'systems'
-      else if (type === 'game') type = 'games'
-      else throw new Error('Not supported')
-
-      if (_.isNil(global[type][name])) throw new Error(`Not found - ${type} - ${name}`)
-
-      global[type][name].status({ state: opts.enable })
-    } catch (e) {
-      global.log.error(e.message)
-    }
-  }
-
-  async enable (opts) {
-    opts.enable = true
-    this.setStatus(opts)
-  }
-
-  async disable (opts) {
-    opts.enable = false
-    this.setStatus(opts)
   }
 }
 

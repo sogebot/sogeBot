@@ -2,6 +2,8 @@
   "settings": {
     "ignorelist": "Seznam ignorovaných",
     "showWithAt": "Zobraz uzivatele s @",
-    "sendWithMe": "Posílat zprávy s /me"
+    "sendWithMe": "Posílat zprávy s /me",
+    "mute": "Bot je ztišen",
+    "whisperListener": "Provádět příkazy pres whisper"
   }
 }

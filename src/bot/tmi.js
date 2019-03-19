@@ -32,6 +32,8 @@ class TMI extends Core {
         sendWithMe: false,
         ignorelist: [],
         showWithAt: true,
+        mute: false,
+        whisperListener: false,
       },
       commands: [
         { name: '!ignore add', fnc: 'ignoreAdd', permission: permission.CASTERS },
@@ -587,7 +589,9 @@ class TMI extends Core {
 
     const parse = new Parser({ sender: sender, message: message, skip: skip, quiet: quiet })
 
-    if (!skip && sender['message-type'] === 'whisper' && (!(await global.configuration.getValue('disableWhisperListener')) || global.commons.isOwner(sender))) {
+    if (!skip
+        && sender['message-type'] === 'whisper'
+        && (global.tmi.settings.chat.whisperListener || global.commons.isOwner(sender))) {
       global.log.whisperIn(message, { username: sender.username })
     } else if (!skip && !(await global.commons.isBot(sender.username))) {
       global.log.chatIn(message, { username: sender.username })
