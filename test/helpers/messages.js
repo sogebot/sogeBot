@@ -19,31 +19,25 @@ module.exports = {
 
     global.commons.timeout = function () {}
 
-    global.tmi = {
-      ...global.tmi, // add original object
-      cheer: global.tmi.cheer,
-      message: global.tmi.message,
-      avgResponse: global.tmi.avgResponse,
-      client: {
-        bot: {
-          chat: {
-            say: function () { },
-            color: function () {},
-            timeout: function () {},
-            on: function () {},
-            connect: function () {},
-            join: function () {}
-          }
-        },
-        broadcaster: {
-          chat: {
-            say: function () { },
-            color: function () {},
-            timeout: function () {},
-            on: function () {},
-            connect: function () {},
-            join: function () {}
-          }
+    global.tmi.client = {
+      bot: {
+        chat: {
+          say: function () { },
+          color: function () {},
+          timeout: function () {},
+          on: function () {},
+          connect: function () {},
+          join: function () {}
+        }
+      },
+      broadcaster: {
+        chat: {
+          say: function () { },
+          color: function () {},
+          timeout: function () {},
+          on: function () {},
+          connect: function () {},
+          join: function () {}
         }
       }
     }
