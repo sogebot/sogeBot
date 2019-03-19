@@ -1,5 +1,4 @@
 const _ = require('lodash')
-const cluster = require('cluster')
 const crypto = require('crypto')
 
 const Interface = require('./interface')
@@ -12,20 +11,6 @@ class IMasterController extends Interface {
 
     this.connected = false
     this.data = []
-
-    this.connect()
-  }
-
-  async connect () {
-    let allOnline = true
-    for (let worker in cluster.workers) {
-      if (!cluster.workers[worker].isConnected()) {
-        allOnline = false
-        break
-      }
-    }
-    if (!(await this.checkConnection()) || !allOnline) return setTimeout(() => this.connect(), 1000) // re-do on first error
-    else this.connected = allOnline
   }
 
   async checkConnection () {
