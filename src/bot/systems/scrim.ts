@@ -128,7 +128,7 @@ class Scrim extends System {
       this.cleanedUpOnStart = true;
       this.settings._.closingAt = 0;
     } else if (this.settings._.closingAt !== 0) {
-      const when = DateTime.fromMillis(this.settings._.closingAt, { locale: global.bot.settings.lang});
+      const when = DateTime.fromMillis(this.settings._.closingAt, { locale: global.general.settings.lang });
       const lastRemindAtDiffMs = -(DateTime.fromMillis(this.settings._.lastRemindAt).diffNow().toObject().milliseconds || 0);
 
       const minutesToGo = when.diffNow(['minutes']).toObject().minutes || 0;

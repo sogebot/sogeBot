@@ -68,7 +68,7 @@ class Twitch extends Core {
 
     let onlineFollowers = _.intersection(onlineViewers, followers)
     events = _.filter(_.orderBy(events, 'timestamp', 'desc'), (o) => { return o.event === 'follow' })
-    moment.locale(global.bot.settings.lang)
+    moment.locale(global.general.settings.lang)
 
     let lastFollowAgo = ''
     let lastFollowUsername = 'n/a'
@@ -93,7 +93,7 @@ class Twitch extends Core {
 
     let onlineSubscribers = _.intersection(onlineViewers, subscribers)
     events = _.filter(_.orderBy(events, 'timestamp', 'desc'), (o) => { return o.event === 'sub' || o.event === 'resub' || o.event === 'subgift' })
-    moment.locale(global.bot.settings.lang)
+    moment.locale(global.general.settings.lang)
 
     let lastSubAgo = ''
     let lastSubUsername = 'n/a'
