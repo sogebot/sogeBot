@@ -29,6 +29,7 @@ class Twitch extends Core {
         ]
       }
     }
+    super(options)
 
     if (isMainThread) {
       global.panel.addWidget('twitch', 'widget-title-monitor', 'fab fa-twitch')
