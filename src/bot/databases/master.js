@@ -1,4 +1,5 @@
 const _ = require('lodash')
+const cluster = require('cluster')
 const crypto = require('crypto')
 
 const Interface = require('./interface')
@@ -11,6 +12,17 @@ class IMasterController extends Interface {
 
     this.connected = false
     this.data = []
+
+    this.connect()
+  }
+
+  async connect() {
+    const connection = await this.checkConnection()
+    if (!connection) {
+      return setTimeout(() => this.connect(), 1000)
+    } else {
+      this.connected = true
+    }
   }
 
   async checkConnection () {
