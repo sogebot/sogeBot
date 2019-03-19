@@ -125,7 +125,7 @@ class Workers {
       debug('workers.messages', 'MAIN: ' + JSON.stringify(data));
 
       if (data.type === 'lang') {
-        for (let worker in cluster.workers) cluster.workers[worker].send({ type: 'lang' })
+        this.sendToAllWorkers({ type: 'lang' })
         await global.lib.translate._load()
       } else if (data.type === 'call') {
         const namespace = _.get(global, data.ns, null)
