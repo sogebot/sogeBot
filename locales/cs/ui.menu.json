@@ -1,8 +1,9 @@
 {
-  "core": "Obecné",
+  "core": "Bot",
   "users": "Uživatelé",
   "tmi": "TMI",
   "ui": "UI",
+  "twitch": "Twitch",
   "general": "Obecné",
   "timers": "Časovače",
   "keywords": "Klíčová slova",
