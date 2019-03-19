@@ -45,12 +45,21 @@ Commons.prototype.flatten = function (data) {
  * { 'a.b': 'c' } => { a: { b: 'c' }}
  */
 Commons.prototype.unflatten = function (data) {
-  var result = {}
-  for (var i in data) {
-    var keys = i.split('.')
-    keys.reduce(function(r, e, j) {
-      return r[e] || (r[e] = isNaN(Number(keys[j + 1])) ? (keys.length - 1 == j ? data[i] : {}) : [])
-    }, result)
+  var result
+  if (Array.isArray(data)) {
+    result = []
+    // create unflatten each item
+    for (let o of data) {
+      result.push(global.commons.unflatten(o))
+    }
+  } else {
+    result = {}
+    for (var i in data) {
+      var keys = i.split('.')
+      keys.reduce(function(r, e, j) {
+        return r[e] || (r[e] = isNaN(Number(keys[j + 1])) ? (keys.length - 1 == j ? data[i] : {}) : [])
+      }, result)
+    }
   }
   return result
 }
