@@ -1,10 +1,6 @@
 {
   "presets": [
-    ["@babel/preset-env", {
-      "targets": { "node": "current" },
-      "useBuiltIns": "usage", // or "entry"
-      "corejs": 3,
-    }],
+    ["@babel/preset-env", { "targets": { "node": "current" } }],
     "@babel/preset-flow",
     "@babel/preset-typescript",
   ],

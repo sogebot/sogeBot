@@ -153,7 +153,6 @@
     "bootstrap-vue": "2.0.0-rc.15",
     "chai": "4.2.0",
     "clean-webpack-plugin": "2.0.1",
-    "core-js": "3.0.0",
     "cross-var": "1.1.0",
     "css-loader": "2.1.1",
     "docsify-cli": "4.3.0",
