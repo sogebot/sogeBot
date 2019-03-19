@@ -1,5 +1,4 @@
 const _ = require('lodash')
-const cluster = require('cluster')
 const crypto = require('crypto')
 
 const Interface = require('./interface')
