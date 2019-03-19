@@ -219,7 +219,7 @@ engine.
 | `$sender`         | username of user triggered command |
 | `$is.moderator`   | is current user moderator          |
 | `$is.subscriber`  | is current user subscriber         |
-| `$is.regular`     | is current user regular            |
+| `$is.vip`         | is current user vip                |
 | `$is.follower`    | is current user follower           |
 | `$is.broadcaster` | is current user broadcaster        |
 | `$is.bot`         | is current user bot                |

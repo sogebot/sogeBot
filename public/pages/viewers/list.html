@@ -79,14 +79,14 @@
             </div>
 
             <div class="btn-group" role="group">
-              <button v-if="filter.regulars === null" class="btn border-0 btn-outline-dark" @click="filter.regulars = true">
-                <i class="fas fa-question fa-fw"></i> <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">regular</strong>
+              <button v-if="filter.vips === null" class="btn border-0 btn-outline-dark" @click="filter.vips = true">
+                <i class="fas fa-question fa-fw"></i> <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">vip</strong>
               </button>
-              <button v-else-if="filter.regulars" class="btn border-0 btn-outline-success" @click="filter.regulars = false">
-                <i class="fas fa-check fa-fw"></i> <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">regular</strong>
+              <button v-else-if="filter.vips" class="btn border-0 btn-outline-success" @click="filter.vips = false">
+                <i class="fas fa-check fa-fw"></i> <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">vip</strong>
               </button>
-              <button v-else class="btn border-0 btn-outline-danger" @click="filter.regulars = null">
-                <i class="fas fa-exclamation fa-fw"></i> <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">regular</strong>
+              <button v-else class="btn border-0 btn-outline-danger" @click="filter.vips = null">
+                <i class="fas fa-exclamation fa-fw"></i> <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">vip</strong>
               </button>
 
               <button v-if="filter.active === null" class="btn border-0 btn-outline-dark" @click="filter.active = true">
@@ -136,8 +136,8 @@
                 <strong class="badge" :class="[ item.online.length > 0 ? 'badge-success' : 'badge-danger' ]" style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
                   active
                 </strong>
-                <strong class="badge" :class="[ typeof item.is === 'object' && item.is.regular ? 'badge-success' : 'badge-danger' ]" style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
-                  regular
+                <strong class="badge" :class="[ typeof item.is === 'object' && item.is.vip ? 'badge-success' : 'badge-danger' ]" style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
+                  vip
                 </strong>
                 <strong class="badge" :class="[ typeof item.is === 'object' && item.is.follower ? 'badge-success' : 'badge-danger' ]" style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
                   <i v-if="typeof item.lock === 'object' && item.lock.follower" class="fas fa-lock"></i>
@@ -255,7 +255,7 @@
         filter: {
           followers: null,
           subscribers: null,
-          regulars: null,
+          vips: null,
           active: null
         },
 
@@ -303,12 +303,12 @@
               }
             }
 
-            let isRegular = true
-            if (!_.isNil(this.filter.regulars)) {
-              if (this.filter.regulars) {
-                isRegular = typeof o.is === 'object' && o.is.regular === true
+            let isVIP = true
+            if (!_.isNil(this.filter.vips)) {
+              if (this.filter.vips) {
+                isVIP = typeof o.is === 'object' && o.is.vip === true
               } else {
-                isRegular = typeof o.is !== 'object' || o.is.regular === false
+                isVIP = typeof o.is !== 'object' || o.is.vip === false
               }
             }
 
@@ -329,7 +329,7 @@
                 isSubscriber = typeof o.is !== 'object' || o.is.subscriber === false
               }
             }
-            return isSearchInUsername && isActive && isRegular && isFollower && isSubscriber
+            return isSearchInUsername && isActive && isVIP && isFollower && isSubscriber
           })
         },
         totalPages: function () {

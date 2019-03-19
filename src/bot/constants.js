@@ -17,13 +17,6 @@ define('MEDIUM', 2)
 define('LOW', 3)
 define('LOWEST', 4)
 
-// Permissions
-define('OWNER_ONLY', 0)
-define('VIEWERS', 1)
-define('MODS', 2)
-define('REGULAR', 3)
-define('DISABLE', -1)
-
 // Connection status
 define('DISCONNECTED', 0)
 define('CONNECTING', 1)

@@ -11,13 +11,13 @@ import System from './_interface'
 import { permission } from '../permissions';
 
 /*
- * !alias                                            - gets an info about alias usage
- * !alias add -p [uuid|name] -a ![alias] -c ![cmd]   - add alias for specified command
- * !alias edit -p [uuid|name] -a ![alias] -c ![cmd]  - add alias for specified command
- * !alias remove ![alias]                            - remove specified alias
- * !alias toggle ![alias]                            - enable/disable specified alias
- * !alias toggle-visibility ![alias]                 - enable/disable specified alias
- * !alias list                                       - get alias list
+ * !alias                                              - gets an info about alias usage
+ * !alias add (-p [uuid|name]) -a ![alias] -c ![cmd]   - add alias for specified command
+ * !alias edit (-p [uuid|name]) -a ![alias] -c ![cmd]  - add alias for specified command
+ * !alias remove ![alias]                              - remove specified alias
+ * !alias toggle ![alias]                              - enable/disable specified alias
+ * !alias toggle-visibility ![alias]                   - enable/disable specified alias
+ * !alias list                                         - get alias list
  */
 
 class Alias extends System {
@@ -75,12 +75,6 @@ class Alias extends System {
       cmdArray.pop() // remove last array item if not found
     }
     if (!tryingToBypass) {
-      let [isRegular, isMod, isOwner] = await Promise.all([
-        global.commons.isRegular(opts.sender),
-        global.commons.isModerator(opts.sender),
-        global.commons.isOwner(opts.sender)
-      ])
-
       // Don't run alias if its same as command e.g. alias !me -> command !me
       if (alias.command === alias.alias) {
         global.log.warning(`Cannot run alias ${alias.alias}, because it exec ${alias.command}`)

@@ -264,7 +264,7 @@ class Users extends Core {
         })
       })
       socket.on('find.viewers', async (opts, cb) => {
-        opts = _.defaults(opts, { filter: null, show: { subscribers: null, followers: null, active: null, regulars: null } })
+        opts = _.defaults(opts, { filter: null, show: { subscribers: null, followers: null, active: null, vips: null } })
         opts.page-- // we are counting index from 0
 
         let viewers = await global.db.engine.find('users', { }, [
@@ -289,7 +289,7 @@ class Users extends Core {
         if (!_.isNil(opts.filter)) viewers = _.filter(viewers, (o) => o.username && o.username.toLowerCase().startsWith(opts.filter.toLowerCase().trim()))
         if (!_.isNil(opts.show.subscribers)) viewers = _.filter(viewers, (o) => _.get(o, 'is.subscriber', false) === opts.show.subscribers)
         if (!_.isNil(opts.show.followers)) viewers = _.filter(viewers, (o) => _.get(o, 'is.follower', false) === opts.show.followers)
-        if (!_.isNil(opts.show.regulars)) viewers = _.filter(viewers, (o) => _.get(o, 'is.regular', false) === opts.show.regulars)
+        if (!_.isNil(opts.show.vips)) viewers = _.filter(viewers, (o) => _.get(o, 'is.vip', false) === opts.show.vips)
         if (!_.isNil(opts.show.active)) viewers = _.filter(viewers, (o) => o.online.length > 0)
         cb(viewers)
       })
@@ -348,12 +348,12 @@ class Users extends Core {
           viewer.is = {
             follower: false,
             subscriber: false,
-            regular: false
+            vip: false
           }
         } else {
           if (typeof viewer.is.follower === 'undefined' || viewer.is.follower === null) viewer.is.follower = false
           if (typeof viewer.is.subscriber === 'undefined' || viewer.is.subscriber === null) viewer.is.subscriber = false
-          if (typeof viewer.is.regular === 'undefined' || viewer.is.regular === null) viewer.is.regular = false
+          if (typeof viewer.is.vip === 'undefined' || viewer.is.vip === null) viewer.is.vip = false
         }
 
         // ONLINE

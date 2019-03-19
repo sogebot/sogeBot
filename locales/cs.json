@@ -374,7 +374,7 @@
         "is": {
           "moderator": "Je uživatel mod? (bool)",
           "subscriber": "Je uživatel sub? (bool)",
-          "regular": "Je uživatel regular? (bool)",
+          "vip": "Je uživatel vip? (bool)",
           "follower": "Je uživatel follower? (bool)",
           "broadcaster": "Je uživatel broadcaster? (bool)",
           "bot": "Je uživatel bot? (bool)",
@@ -383,7 +383,7 @@
         "recipientis": {
           "moderator": "Je příjemce mod? (bool)",
           "subscriber": "Je příjemce sub? (bool)",
-          "regular": "Je příjemce regular? (bool)",
+          "vip": "Je příjemce vip? (bool)",
           "follower": "Je příjemce follower? (bool)",
           "broadcaster": "Je příjemce broadcaster? (bool)",
           "bot": "Je příjemce bot? (bool)",
@@ -447,12 +447,6 @@
     "stats-panel": {
       "show": "Ukázat statistiky",
       "hide": "Skrýt statistiky"
-    },
-    "permissions_list": {
-      "0": "owner",
-      "1": "viewer",
-      "2": "mod",
-      "3": "regular"
     },
     "translations": "Vlastní překlad",
     "bot-responses": "Odpovědi bota",
@@ -977,13 +971,6 @@
     }
   },
   "permissions": {
-    "success": {
-      "change": "Prava pro pouziti '$command' byla zmenena"
-    },
-    "failed": {
-      "parse": "Pouziti: !permission viewer|mods|owner|regular|disable [command]",
-      "noCmd": "Promin, $sender, ale tento prikaz neni v botovi evidovan"
-    },
     "without-permission": "Nemas dostatecne opravneni pro '$command'"
   },
   "moderation": {
@@ -1122,18 +1109,6 @@
       "notEnoughPoints": "$sender, nemas $points $pointsName abys o ne hral",
       "win": "$sender, VYHRALS! Aktualne mas $points $pointsName",
       "lose": "$sender, PROHRALS! Aktualne mas $points $pointsName"
-    }
-  },
-  "regulars": {
-    "add": {
-      "success": "@$username je od ted pravidelnym navstevnikem kanalu",
-      "undefined": "@$username neexistuje v databazi bota",
-      "empty": "Pouziti: !regular add <username>"
-    },
-    "rm": {
-      "success": "@$username uz neni pravidelnym navstevnikem kanalu",
-      "undefined": "@$username neexistuje v databazi bota",
-      "empty": "Pouziti: !regular remove <username>"
     }
   },
   "merge": {

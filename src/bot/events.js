@@ -18,31 +18,31 @@ class Events {
     if (!isMainThread) return // dont do anything on worker
 
     this.supportedEventsList = [
-      { id: 'user-joined-channel', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.regular', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner' ] },
-      { id: 'user-parted-channel', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.regular', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner' ] },
-      { id: 'follow', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.regular', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner' ] },
-      { id: 'unfollow', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.regular', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner' ] },
-      { id: 'subscription', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.regular', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'method', 'subCumulativeMonths' ] },
-      { id: 'subgift', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.regular', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'recipient', 'recipientis.moderator', 'recipientis.subscriber', 'recipientis.regular', 'recipientis.follower', 'recipientis.broadcaster', 'recipientis.bot', 'recipientis.owner' ] },
+      { id: 'user-joined-channel', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner' ] },
+      { id: 'user-parted-channel', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner' ] },
+      { id: 'follow', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner' ] },
+      { id: 'unfollow', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner' ] },
+      { id: 'subscription', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'method', 'subCumulativeMonths' ] },
+      { id: 'subgift', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'recipient', 'recipientis.moderator', 'recipientis.subscriber', 'recipientis.vip', 'recipientis.follower', 'recipientis.broadcaster', 'recipientis.bot', 'recipientis.owner' ] },
       { id: 'subcommunitygift', variables: [ 'username', 'count' ] },
-      { id: 'resub', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.regular', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'subStreakShareEnabled', 'subStreak', 'subStreakName', 'subCumulativeMonths', 'subCumulativeMonthsName' ] },
+      { id: 'resub', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'subStreakShareEnabled', 'subStreak', 'subStreakName', 'subCumulativeMonths', 'subCumulativeMonthsName' ] },
       { id: 'tip', variables: [ 'username', 'amount', 'currency', 'message' ] },
-      { id: 'command-send-x-times', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.regular', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'command', 'count' ], definitions: { fadeOutXCommands: 0, fadeOutInterval: 0, runEveryXCommands: 10, commandToWatch: '', runInterval: 0 }, check: this.checkCommandSendXTimes }, // runInterval 0 or null - disabled; > 0 every x seconds
-      { id: 'keyword-send-x-times', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.regular', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'command', 'count' ], definitions: { fadeOutXKeywords: 0, fadeOutInterval: 0, runEveryXKeywords: 10, keywordToWatch: '', runInterval: 0, resetCountEachMessage: false }, check: this.checkKeywordSendXTimes }, // runInterval 0 or null - disabled; > 0 every x seconds
+      { id: 'command-send-x-times', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'command', 'count' ], definitions: { fadeOutXCommands: 0, fadeOutInterval: 0, runEveryXCommands: 10, commandToWatch: '', runInterval: 0 }, check: this.checkCommandSendXTimes }, // runInterval 0 or null - disabled; > 0 every x seconds
+      { id: 'keyword-send-x-times', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'command', 'count' ], definitions: { fadeOutXKeywords: 0, fadeOutInterval: 0, runEveryXKeywords: 10, keywordToWatch: '', runInterval: 0, resetCountEachMessage: false }, check: this.checkKeywordSendXTimes }, // runInterval 0 or null - disabled; > 0 every x seconds
       { id: 'number-of-viewers-is-at-least-x', variables: [ 'count' ], definitions: { viewersAtLeast: 100, runInterval: 0 }, check: this.checkNumberOfViewersIsAtLeast }, // runInterval 0 or null - disabled; > 0 every x seconds
       { id: 'stream-started' },
       { id: 'stream-stopped' },
       { id: 'stream-is-running-x-minutes', definitions: { runAfterXMinutes: 100 }, check: this.checkStreamIsRunningXMinutes },
-      { id: 'cheer', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.regular', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'bits', 'message' ] },
+      { id: 'cheer', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'bits', 'message' ] },
       { id: 'clearchat' },
-      { id: 'action', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.regular', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner' ] },
-      { id: 'ban', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.regular', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'reason' ] },
+      { id: 'action', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner' ] },
+      { id: 'ban', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'reason' ] },
       { id: 'hosting', variables: [ 'target', 'viewers' ] },
-      { id: 'hosted', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.regular', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'viewers', 'autohost' ], definitions: { viewersAtLeast: 1, ignoreAutohost: false }, check: this.checkHosted },
-      { id: 'raid', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.regular', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'viewers' ], definitions: { viewersAtLeast: 1 }, check: this.checkRaid },
-      { id: 'mod', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.regular', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner' ] },
+      { id: 'hosted', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'viewers', 'autohost' ], definitions: { viewersAtLeast: 1, ignoreAutohost: false }, check: this.checkHosted },
+      { id: 'raid', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'viewers' ], definitions: { viewersAtLeast: 1 }, check: this.checkRaid },
+      { id: 'mod', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner' ] },
       { id: 'commercial', variables: [ 'duration' ] },
-      { id: 'timeout', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.regular', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'reason', 'duration' ] },
+      { id: 'timeout', variables: [ 'username', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'reason', 'duration' ] },
       { id: 'every-x-minutes-of-stream', definitions: { runEveryXMinutes: 100 }, check: this.everyXMinutesOfStream },
       { id: 'game-changed', variables: [ 'oldGame', 'game' ] }
     ]
@@ -118,7 +118,7 @@ class Events {
       attributes.is = {
         moderator: await global.commons.isModerator(attributes.username),
         subscriber: await global.commons.isSubscriber(attributes.username),
-        regular: await global.commons.isRegular(attributes.username),
+        vip: await global.commons.isVIP(attributes.username),
         broadcaster: global.commons.isBroadcaster(attributes.username),
         bot: global.commons.isBot(attributes.username),
         owner: global.commons.isOwner(attributes.username),
@@ -129,7 +129,7 @@ class Events {
       attributes.recipientis = {
         moderator: await global.commons.isModerator(attributes.recipient),
         subscriber: await global.commons.isSubscriber(attributes.recipient),
-        regular: await global.commons.isRegular(attributes.recipient),
+        vip: await global.commons.isVIP(attributes.recipient),
         broadcaster: global.commons.isBroadcaster(attributes.recipient),
         bot: global.commons.isBot(attributes.recipient),
         owner: global.commons.isOwner(attributes.recipient),
@@ -454,7 +454,7 @@ class Events {
     const context = {
       _: _,
       $username: _.get(attributes, 'username', null),
-      $userObject: _.get(attributes, 'is.moderator', 'is.subscriber', 'is.regular', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', null),
+      $userObject: _.get(attributes, 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', null),
       $method: _.get(attributes, 'method', null),
       $months: _.get(attributes, 'months', null),
       $monthsName: _.get(attributes, 'monthsName', null),

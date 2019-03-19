@@ -14,15 +14,15 @@ import * as constants from '../constants'
 const Expects = require('../expects')
 
 /*
- * !command                                                                              - gets an info about command usage
- * !command add ?-ul owner|mod|regular|viewer ?-s true|false ![cmd] [response]           - add command with specified response
- * !command edit ?-ul owner|mod|regular|viewer ?-s true|false ![cmd] [number] [response] - edit command with specified response
- * !command remove ![cmd]                                                                - remove specified command
- * !command remove ![cmd] [number]                                                       - remove specified response of command
- * !command toggle ![cmd]                                                                - enable/disable specified command
- * !command toggle-visibility ![cmd]                                                     - enable/disable specified command
- * !command list                                                                         - get commands list
- * !command list ![cmd]                                                                  - get responses of command
+ * !command                                                                 - gets an info about command usage
+ * !command add (-p [uuid|name]) ?-s true|false ![cmd] [response]           - add command with specified response
+ * !command edit (-p [uuid|name]) ?-s true|false ![cmd] [number] [response] - edit command with specified response
+ * !command remove ![cmd]                                                   - remove specified command
+ * !command remove ![cmd] [number]                                          - remove specified response of command
+ * !command toggle ![cmd]                                                   - enable/disable specified command
+ * !command toggle-visibility ![cmd]                                        - enable/disable specified command
+ * !command list                                                            - get commands list
+ * !command list ![cmd]                                                     - get responses of command
  */
 
 type Response = {
@@ -154,7 +154,7 @@ class CustomCommands extends System {
   }
 
   main (opts: Object) {
-    global.commons.sendMessage(global.translate('core.usage') + ': !command add ?-ul=owner|mod|regular|viewer ?-s=true|false <!cmd> <response> | !command edit ?-ul=owner|mod|regular|viewer ?-s=true|false <!cmd> <number> <response> | !command remove <!command> | !command remove <!command> <number> | !command list | !command list <!command>', opts.sender)
+    global.commons.sendMessage(global.translate('core.usage') + ': !command add (-p [uuid|name]) (-s=true|false) <!cmd> <response> | !command edit (-p [uuid|name]) (-s=true|false) <!cmd> <number> <response> | !command remove <!command> | !command remove <!command> <number> | !command list | !command list <!command>', opts.sender)
   }
 
   async edit (opts: Object) {
@@ -246,12 +246,6 @@ class CustomCommands extends System {
       cmdArray.pop() // remove last array item if not found
     }
     if (Object.keys(command).length === 0) return true // no command was found - return
-
-    let [isRegular, isMod, isOwner] = await Promise.all([
-      global.commons.isRegular(opts.sender),
-      global.commons.isModerator(opts.sender),
-      global.commons.isOwner(opts.sender)
-    ])
 
     // remove found command from message to get param
     const param = opts.message.replace(new RegExp('^(' + cmdArray.join(' ') + ')', 'i'), '').trim()
@@ -425,7 +419,7 @@ class CustomCommands extends System {
     const $is = {
       moderator: await global.commons.isModerator(opts.sender.username),
       subscriber: await global.commons.isSubscriber(opts.sender.username),
-      regular: await global.commons.isRegular(opts.sender.username),
+      vip: await global.commons.isVIP(opts.sender.username),
       broadcaster: global.commons.isBroadcaster(opts.sender.username),
       bot: global.commons.isBot(opts.sender.username),
       owner: global.commons.isOwner(opts.sender.username),

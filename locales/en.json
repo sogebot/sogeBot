@@ -369,7 +369,7 @@
         "is": {
           "moderator": "Is user mod? (bool)",
           "subscriber": "Is user sub? (bool)",
-          "regular": "Is user regular? (bool)",
+          "vip": "Is user vip? (bool)",
           "follower": "Is user follower? (bool)",
           "broadcaster": "Is user broadcaster? (bool)",
           "bot": "Is user bot? (bool)",
@@ -378,7 +378,7 @@
         "recipientis": {
           "moderator": "Is recipient mod? (bool)",
           "subscriber": "Is recipient sub? (bool)",
-          "regular": "Is recipient regular? (bool)",
+          "vip": "Is recipient vip? (bool)",
           "follower": "Is recipient follower? (bool)",
           "broadcaster": "Is recipient broadcaster? (bool)",
           "bot": "Is recipient bot? (bool)",
@@ -442,12 +442,6 @@
     "stats-panel": {
       "show": "Show stats",
       "hide": "Hide stats"
-    },
-    "permissions_list": {
-      "0": "owner",
-      "1": "viewer",
-      "2": "mod",
-      "3": "regular"
     },
     "translations": "Custom translations",
     "bot-responses": "Bot responses",
@@ -966,13 +960,6 @@
     }
   },
   "permissions": {
-    "success": {
-      "change": "Permission for '$command' was succesfully changed"
-    },
-    "failed": {
-      "parse": "Usage: !permission viewer|mods|owner|regular|disable [command]",
-      "noCmd": "Sorry, $sender, but this command is not registered in a bot"
-    },
     "without-permission": "You don't have enough permissions for '$command'"
   },
   "moderation": {
@@ -1111,18 +1098,6 @@
       "notEnoughPoints": "$sender, you don't have $points $pointsName to gamble",
       "win": "$sender, you WON! You now have $points $pointsName",
       "lose": "$sender, you LOST! You now have $points $pointsName"
-    }
-  },
-  "regulars": {
-    "add": {
-      "success": "@$username was set as channel regular",
-      "undefined": "@$username doesn't exist in bot database",
-      "empty": "Correct usage: !regular add <username>"
-    },
-    "rm": {
-      "success": "@$username is not channel regular anymore",
-      "undefined": "@$username doesn't exist in bot database",
-      "empty": "Correct usage: !regular remove <username>"
     }
   },
   "merge": {

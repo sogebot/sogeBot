@@ -231,10 +231,10 @@ Commons.prototype.isModerator = async function (user) {
   }
 }
 
-Commons.prototype.isRegular = async function (user) {
+Commons.prototype.isVIP = async function (user) {
   try {
     if (_.isString(user)) user = await global.users.getByName(user)
-    return !_.isNil(user.is.regular) ? user.is.regular : false
+    return !_.isNil(user.is.vip) ? user.is.vip : false
   } catch (e) {
     return false
   }
