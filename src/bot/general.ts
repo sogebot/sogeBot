@@ -1,10 +1,13 @@
 import * as config from '@config';
+import { readdir } from 'fs';
 import * as gitCommitInfo from 'git-commit-info';
 import { get, isNil, map } from 'lodash';
 import Core from './_interface';
 import { permission } from './permissions';
 
 class General extends Core {
+  [x: string]: any; // TODO: remove after interface ported to TS
+
   constructor() {
     const options: InterfaceSettings = {
       settings: {
@@ -19,7 +22,7 @@ class General extends Core {
       ui: {
         lang: {
           type: 'selector',
-          values: ['en', 'cs'],
+          values: [],
         },
       },
       on: {
@@ -33,6 +36,11 @@ class General extends Core {
     };
 
     super(options);
+
+    // update lang values
+    readdir('./locales/', (err, f) => {
+      this._ui.lang.values = [...new Set(f.map((o) => o.split('.')[0]))];
+    });
   }
 
   public async enable(opts: CommandOptions) {
