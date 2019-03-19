@@ -150,10 +150,6 @@
             <i class="far fa-square" aria-hidden="true"></i>
             <span data-lang="mute"></span>
           </button>
-          <button class="dropdown-item" id="me-btn" onclick="switchMe()">
-            <i class="far fa-square" aria-hidden="true"></i>
-            use /me
-          </button>
 
           <h6 class="dropdown-header">THEMES</h6>
           <button class="dropdown-item" id="theme-btn" onclick="switchTheme()" data-lang="dark"></button>
@@ -521,11 +517,6 @@
       var btn = $('#sticky-btn')
       btn.data('switchSticky', !data.stickystats)
       switchSticky(false)
-
-      /* ME BUTTON */
-      var btn = $('#me-btn')
-      btn.data('sendWithMe', !data.sendWithMe)
-      switchMe(false)
     })
 
     setInterval(function () {
@@ -1293,28 +1284,6 @@
         })
         socket.emit('saveConfiguration', {
           'stickystats': btn.data('switchSticky')
-        })
-      }
-    }
-
-    var switchMe = function (update = true) {
-      var btn = $('#me-btn')
-      btn.data('sendWithMe', _.isString(btn.data('sendWithMe')) ? true : btn.data('sendWithMe'))
-
-      if (btn.data('sendWithMe')) {
-        btn.children('i').removeClass().addClass('far fa-square')
-      } else {
-        btn.children('i').removeClass().addClass('far fa-check-square')
-      }
-
-      btn.data('sendWithMe', !btn.data('sendWithMe'))
-
-      if (update) {
-        console.debug('EMIT [saveConfiguration]', {
-          'sendWithMe': btn.data('sendWithMe')
-        })
-        socket.emit('saveConfiguration', {
-          'sendWithMe': btn.data('sendWithMe')
         })
       }
     }

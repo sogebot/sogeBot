@@ -157,6 +157,8 @@ class Workers {
           })
           if (o) _.set(o, data.path, data.value);
         }
+      } else if ( data.type === 'crash') {
+        process.exit(1); // kill main thread
       }
     } else {
       debug('workers.messages', 'THREAD(' + threadId + '): ' + JSON.stringify(data));

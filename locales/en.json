@@ -24,13 +24,6 @@
     "percentage": {
       "true": "", "false": ""
     },
-    "settings": {
-      "uptime-format": "Uptime format set to $value",
-      "sendWithMe": {
-        "true": "Bot will send messages using /me",
-        "false": "Bot won't send messages using /me"
-      }
-    },
     "years": "year|years",
     "months": "month|months",
     "days": "day|days",

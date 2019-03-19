@@ -153,7 +153,7 @@ class Queue extends System {
     await global.db.engine.remove(this.collection.picked, {})
     for (let user of users) await global.db.engine.update(this.collection.picked, { username: user.username }, user)
 
-    const atUsername = global.users.settings.users.showWithAt
+    const atUsername = global.tmi.settings.chat.showWithAt
 
     var msg
     switch (users.length) {
@@ -173,7 +173,7 @@ class Queue extends System {
 
   async list (opts) {
     let [atUsername, users] = await Promise.all([
-      global.users.settings.users.showWithAt,
+      global.tmi.settings.chat.showWithAt,
       global.db.engine.find(this.collection.data)
     ])
     users = users.map(o => atUsername ? `@${o.username}` : o).join(', ')

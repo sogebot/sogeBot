@@ -173,7 +173,7 @@ class CustomVariables {
       _: _,
       users: users,
       random: randomVar,
-      sender: global.users.settings.users.showWithAt ? `@${sender}` : `${sender}`,
+      sender: global.tmi.settings.chat.showWithAt ? `@${sender}` : `${sender}`,
       param: param,
       _current: opts._current
     }

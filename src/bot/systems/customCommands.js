@@ -306,11 +306,7 @@ class CustomCommands extends System {
         let rPrmsn: any = permissions.find(o => o.v === r.permission)
         const response = await global.commons.prepare('customcmds.response', { command, index: ++r.order, response: r.response, after: r.stopIfExecuted ? '_' : 'v', permission: rPrmsn.string })
         global.log.chatOut(response, { username: opts.sender.username })
-        if ((await global.configuration.getValue('sendWithMe'))) {
-          global.commons.message('me', global.commons.getOwner(), response)
-        } else {
-          global.commons.message('say', global.commons.getOwner(), response)
-        }
+        global.commons.message(global.tmi.settings.chat.sendWithMe ? 'me' : 'say', global.commons.getOwner(), response)
       }
     }
   }

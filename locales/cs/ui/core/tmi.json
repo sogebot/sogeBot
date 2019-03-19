@@ -1,0 +1,7 @@
+{
+  "settings": {
+    "ignorelist": "Seznam ignorovaných",
+    "showWithAt": "Zobraz uzivatele s @",
+    "sendWithMe": "Posílat zprávy s /me"
+  }
+}

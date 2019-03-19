@@ -12,7 +12,7 @@ const testuser = { username: 'testuser' }
 const testuser2 = { username: 'testuser2' }
 const testuser3 = { username: 'testuser3' }
 
-describe('Users - ignore', () => {
+describe('TMI - ignore', () => {
   before(async () => {
     await db.cleanup()
     await message.prepare()
@@ -24,17 +24,17 @@ describe('Users - ignore', () => {
     })
 
     it('add testuser to ignore list', async () => {
-      global.users.ignoreAdd({ sender: owner, parameters: 'testuser' })
+      global.tmi.ignoreAdd({ sender: owner, parameters: 'testuser' })
       await message.isSent('ignore.user.is.added', owner, testuser)
     })
 
     it('add @testuser2 to ignore list', async () => {
-      global.users.ignoreAdd({ sender: owner, parameters: '@testuser2' })
+      global.tmi.ignoreAdd({ sender: owner, parameters: '@testuser2' })
       await message.isSent('ignore.user.is.added', owner, testuser2)
     })
 
     it('testuser should be in ignore list', async () => {
-      global.users.ignoreCheck({ sender: owner, parameters: 'testuser' })
+      global.tmi.ignoreCheck({ sender: owner, parameters: 'testuser' })
       const item = await global.db.engine.findOne('core.settings', { key: 'users.ignorelist' })
 
       await message.isSent('ignore.user.is.ignored', owner, testuser)
@@ -44,7 +44,7 @@ describe('Users - ignore', () => {
     })
 
     it('@testuser2 should be in ignore list', async () => {
-      global.users.ignoreCheck({ sender: owner, parameters: '@testuser2' })
+      global.tmi.ignoreCheck({ sender: owner, parameters: '@testuser2' })
       const item = await global.db.engine.findOne('core.settings', { key: 'users.ignorelist' })
 
       await message.isSent('ignore.user.is.ignored', owner, testuser2)
@@ -54,7 +54,7 @@ describe('Users - ignore', () => {
     })
 
     it('testuser3 should not be in ignore list', async () => {
-      global.users.ignoreCheck({ sender: owner, parameters: 'testuser3' })
+      global.tmi.ignoreCheck({ sender: owner, parameters: 'testuser3' })
       const item = await global.db.engine.findOne('core.settings', { key: 'users.ignorelist' })
 
       await message.isSent('ignore.user.is.not.ignored', owner, testuser3)
@@ -65,12 +65,12 @@ describe('Users - ignore', () => {
     })
 
     it('remove testuser from ignore list', async () => {
-      global.users.ignoreRm({ sender: owner, parameters: 'testuser' })
+      global.tmi.ignoreRm({ sender: owner, parameters: 'testuser' })
       await message.isSent('ignore.user.is.removed', owner, testuser)
     })
 
     it('testuser should not be in ignore list', async () => {
-      global.users.ignoreCheck({ sender: owner, parameters: 'testuser' })
+      global.tmi.ignoreCheck({ sender: owner, parameters: 'testuser' })
       await message.isSent('ignore.user.is.not.ignored', owner, testuser)
       assert.isFalse(await global.commons.isIgnored(testuser))
     })

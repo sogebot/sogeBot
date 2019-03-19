@@ -8,9 +8,6 @@ const {
   isMainThread
 } = require('worker_threads');
 const axios = require('axios')
-
-import { permission } from './permissions';
-const Expects = require('./expects')
 import Core from './_interface'
 
 const __DEBUG__ = {
@@ -23,62 +20,13 @@ class Users extends Core {
   newChattersList: Array<string> = []
 
   constructor () {
-    const settings = {
-      users: {
-        ignorelist: [],
-        showWithAt: true,
-      },
-      commands: [
-        { name: '!ignore add', fnc: 'ignoreAdd', permission: permission.CASTERS },
-        { name: '!ignore rm', fnc: 'ignoreRm', permission: permission.CASTERS },
-        { name: '!ignore check', fnc: 'ignoreCheck', permission: permission.CASTERS },
-      ]
-    }
-
-    super({ settings })
+    super()
 
     this.addMenu({ category: 'manage', name: 'viewers', id: 'viewers/list' })
-    this.addMenu({ category: 'settings', name: 'core', id: 'core' })
 
     if (isMainThread) {
       this.updateWatchTime(true);
     }
-  }
-
-  async ignoreAdd (opts: Object) {
-    try {
-      const username = new Expects(opts.parameters).username().toArray()[0].toLowerCase()
-      global.users.settings.users.ignorelist = [
-        ...new Set([
-          ...global.users.settings.users.ignorelist,
-          username,
-        ]
-      )];
-      // update ignore list
-      global.commons.sendMessage(global.commons.prepare('ignore.user.is.added', { username }), opts.sender)
-    } catch (e) {
-      global.log.error(e.message)
-    }
-  }
-
-  async ignoreRm (opts: Object) {
-    try {
-      const username = new Expects(opts.parameters).username().toArray()[0].toLowerCase()
-      global.users.settings.users.ignorelist = global.users.settings.users.ignorelist.filter(o => o !== username)
-      // update ignore list
-      global.commons.sendMessage(global.commons.prepare('ignore.user.is.removed', { username }), opts.sender)
-    } catch (e) {
-      global.log.error(e.message)
-    }
-  }
-
-  async ignoreCheck (opts: Object) {
-    try {
-      const username = new Expects(opts.parameters).username().toArray()[0].toLowerCase()
-      const isIgnored = await global.commons.isIgnored(username)
-      global.commons.sendMessage(global.commons.prepare(isIgnored ? 'ignore.user.is.ignored' : 'ignore.user.is.not.ignored', { username }), opts.sender)
-      return isIgnored
-    } catch (e) {}
   }
 
   async get (username: string) {
@@ -133,36 +81,6 @@ class Users extends Core {
   async getAll (where: Object) {
     where = where || {}
     return global.db.engine.find('users', where)
-  }
-
-  async addRegular (opts: Object) {
-    try {
-      const username = new Expects(opts.parameters).username().toArray()[0].toLowerCase()
-
-      const udb = await global.db.engine.findOne('users', { username })
-      if (_.isEmpty(udb)) global.commons.sendMessage(global.commons.prepare('regulars.add.undefined', { username }), opts.sender)
-      else {
-        global.commons.sendMessage(global.commons.prepare('regulars.add.success', { username }), opts.sender)
-        await global.db.engine.update('users', { _id: String(udb._id) }, { is: { regular: true } })
-      }
-    } catch (e) {
-      global.commons.sendMessage(global.commons.prepare('regulars.add.empty'), opts.sender)
-    }
-  }
-
-  async rmRegular (opts: Object) {
-    try {
-      const username = new Expects(opts.parameters).username().toArray()[0].toLowerCase()
-
-      const udb = await global.db.engine.findOne('users', { username })
-      if (_.isEmpty(udb)) global.commons.sendMessage(global.commons.prepare('regulars.rm.undefined', { username }), opts.sender)
-      else {
-        global.commons.sendMessage(global.commons.prepare('regulars.rm.success', { username }), opts.sender)
-        await global.db.engine.update('users', { _id: String(udb._id) }, { is: { regular: false } })
-      }
-    } catch (e) {
-      global.commons.sendMessage(global.commons.prepare('regulars.rm.empty'), opts.sender)
-    }
   }
 
   async set (username: string, object: Object) {

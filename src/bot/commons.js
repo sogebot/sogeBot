@@ -58,12 +58,10 @@ Commons.prototype.unflatten = function (data) {
 
 Commons.prototype.registerConfiguration = function () {
   if (_.isNil(global.configuration)) return setTimeout(() => this.registerConfiguration(), 1)
-
-  global.configuration.register('sendWithMe', 'core.settings.sendWithMe', 'bool', false)
 }
 
 Commons.prototype.getIgnoreList = function () {
-  return global.users.settings.users.ignorelist
+  return global.tmi.settings.chat.ignorelist
 }
 
 Commons.prototype.isIgnored = function (sender) {
@@ -114,7 +112,7 @@ Commons.prototype.prepare = async function (translate, attr) {
   let msg = global.translate(translate)
   attr = _(attr).toPairs().sortBy((o) => -o[0].length).fromPairs().value() // reorder attributes by key length
   for (let [key, value] of Object.entries(attr)) {
-    if (_.includes(['username', 'who', 'winner', 'sender', 'loser'], key)) value = global.users.settings.users.showWithAt ? `@${value}` : value
+    if (_.includes(['username', 'who', 'winner', 'sender', 'loser'], key)) value = global.tmi.settings.chat.showWithAt ? `@${value}` : value
     msg = msg.replace(new RegExp('[$]' + key, 'g'), value)
   }
   return msg
@@ -159,7 +157,7 @@ Commons.prototype.sendMessage = async function (message, sender, attr) {
 
   // if sender is null/undefined, we can assume, that username is from dashboard -> bot
   if ((typeof sender.username === 'undefined' || sender.username === null) && !attr.force) return false // we don't want to reply on bot commands
-  message = !_.isNil(sender.username) ? message.replace(/\$sender/g, (global.users.settings.users.showWithAt ? '@' : '') + sender.username) : message
+  message = !_.isNil(sender.username) ? message.replace(/\$sender/g, (global.tmi.settings.chat.showWithAt ? '@' : '') + sender.username) : message
   if (!(await global.configuration.getValue('mute')) || attr.force) {
     if ((!_.isNil(attr.quiet) && attr.quiet)) return true
     if (sender['message-type'] === 'whisper') {
@@ -167,7 +165,7 @@ Commons.prototype.sendMessage = async function (message, sender, attr) {
       global.commons.message('whisper', sender.username, message)
     } else {
       global.log.chatOut(message, { username: sender.username })
-      if ((await global.configuration.getValue('sendWithMe')) && !message.startsWith('/')) {
+      if (global.tmi.settings.chat.sendWithMe && !message.startsWith('/')) {
         global.commons.message('me', null, message)
       } else {
         global.commons.message('say', null, message)

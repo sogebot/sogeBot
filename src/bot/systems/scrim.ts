@@ -168,7 +168,7 @@ class Scrim extends System {
   }
 
   private async currentMatches() {
-    const atUsername = global.users.settings.users.showWithAt;
+    const atUsername = global.tmi.settings.chat.showWithAt;
     const matches: {
       [x: string]: string[],
     } = {};

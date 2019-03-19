@@ -24,13 +24,6 @@
     "percentage": {
       "true": "", "false": ""
     },
-    "settings": {
-      "uptime-format": "Format pro uptime nastaven na $value",
-      "sendWithMe": {
-        "true": "Bot bude posilat zpravy pomoci /me",
-        "false": "Bot nebude posilat zpravy pomoci /me"
-      }
-    },
     "years": "rok|4:roky|roků",
     "months": "měsíc|4:měsíce|měsíců",
     "days": "den|4:dny|dnů",
