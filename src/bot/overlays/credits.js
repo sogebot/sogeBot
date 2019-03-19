@@ -9,7 +9,8 @@ class Credits extends Overlay {
   constructor () {
     const settings = {
       credits: {
-        speed: 'medium'
+        speed: 'medium',
+        aggregated: false,
       },
       show: {
         followers: true,
@@ -118,10 +119,10 @@ class Credits extends Overlay {
         events = events.filter((o) => o.timestamp >= timestamp)
         for (let event of events) {
           if (!_.isNil(event.amount) && !_.isNil(event.currency)) {
-            event.amount = await global.configuration.getValue('creditsAggregate')
+            event.amount = this.settings.credits.aggregated
               ? global.currency.exchange(event.amount, event.currency, global.currency.settings.currency.mainCurrency)
               : event.amount
-            event.currency = global.currency.symbol(await global.configuration.getValue('creditsAggregate') ? global.currency.settings.currency.mainCurrency : event.currency)
+            event.currency = global.currency.symbol(this.settings.credits.aggregated ? global.currency.settings.currency.mainCurrency : event.currency)
           }
         }
 

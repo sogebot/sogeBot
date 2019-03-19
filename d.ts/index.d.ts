@@ -10,6 +10,7 @@ declare namespace NodeJS {
     db: any,
     commons: any,
     general: any,
+    bot: any,
     translate: any,
     log: any,
     currency: any,

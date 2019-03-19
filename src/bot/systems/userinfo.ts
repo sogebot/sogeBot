@@ -171,7 +171,7 @@ class UserInfo extends System {
       if (_.isNil(user) || _.isNil(user.time) || _.isNil(user.time.message)) {
         global.commons.sendMessage(global.translate('lastseen.success.never').replace(/\$username/g, parsed[0]), opts.sender);
       } else {
-        const when = DateTime.fromMillis(user.time.message, { locale: await global.configuration.getValue('lang')});
+        const when = DateTime.fromMillis(user.time.message, { locale: global.bot.settings.lang});
         global.commons.sendMessage(global.translate('lastseen.success.time')
           .replace(/\$username/g, parsed[0])
           .replace(/\$when/g, when.toLocaleString(DateTime.DATETIME_MED_WITH_SECONDS)), opts.sender);

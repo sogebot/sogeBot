@@ -20,6 +20,7 @@ module.exports = {
     global.commons.timeout = function () {}
 
     global.tmi = {
+      ...global.tmi, // add original object
       cheer: global.tmi.cheer,
       message: global.tmi.message,
       avgResponse: global.tmi.avgResponse,

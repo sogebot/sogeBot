@@ -34,19 +34,6 @@ class Configuration extends Core {
       }
     } else global.commons.sendMessage(`$sender, ${pointer} settings not exists`, opts.sender)
   }
-
-  async getValue (cfgName) {
-    let item = await global.db.engine.findOne('settings', { key: cfgName })
-    try {
-      if (_.isEmpty(item)) return this.cfgL[cfgName].value // return default value if not saved
-      if (_.includes(['true', 'false'], item.value.toString().toLowerCase())) return item.value.toString().toLowerCase() === 'true'
-      else return item.value
-    } catch (e) {
-      global.log.error(`Error when loading ${cfgName} value`)
-      global.log.error(e.stack)
-      return null
-    }
-  }
 }
 
 module.exports = Configuration

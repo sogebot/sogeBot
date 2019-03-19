@@ -221,7 +221,7 @@ function Panel () {
     })
 
     socket.on('responses.get', async function (at, callback) {
-      const responses = global.commons.flatten(!_.isNil(at) ? global.lib.translate.translations[await global.configuration.getValue('lang')][at] : global.lib.translate.translations[await global.configuration.getValue('lang')])
+      const responses = global.commons.flatten(!_.isNil(at) ? global.lib.translate.translations[global.bot.settings.lang][at] : global.lib.translate.translations[global.bot.settings.lang])
       _.each(responses, function (value, key) {
         let _at = !_.isNil(at) ? at + '.' + key : key
         responses[key] = {} // remap to obj
