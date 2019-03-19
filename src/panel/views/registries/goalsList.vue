@@ -127,7 +127,7 @@
       return object
     },
     computed: {
-      groupsFiltered: function () {
+      groupsFiltered: function (): Goals.Group[] {
         return this.groups.filter((o: Goals.Group) => {
           return o.name.includes(this.search)
         })

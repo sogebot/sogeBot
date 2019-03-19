@@ -411,8 +411,8 @@ export default Vue.extend({
     return object
   },
   computed: {
-    isEditation: function () { return this.$route.params.id !== null },
-    currentGoal: function () {
+    isEditation: function (): boolean { return this.$route.params.id !== null },
+    currentGoal: function (): Goals.Goal | null {
       if (this.uiShowGoal === '') return null
       else return this.goals.find((o) => o.uid === this.uiShowGoal) || null
     }

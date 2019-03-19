@@ -220,17 +220,19 @@
       this.isMounted = true
     },
     computed: {
-      filteredVotes: function () {
+      filteredVotes: function (): Array<Poll | 'new'> {
         if (this.search.trim().length === 0) return this.votes;
           return this.votes.filter((o) => {
             if (typeof o !== 'string') {
             const isSearchInKeyword = !this._.isNil(o.title.match(new RegExp(this.search, 'ig')))
             const isOpened = o.isOpened === true
             return isSearchInKeyword || isOpened
-            } else return true // is new -> must return
+            } else {
+              return true // is new -> must return
+            }
           })
       },
-      itemsPerPage: function () {
+      itemsPerPage: function (): number {
         if(!this.isMounted) return 4
         else {
           if (this.domWidth > 1200) return 4
