@@ -1,6 +1,7 @@
 import chalk from 'chalk';
 import * as _ from 'lodash';
 import { setTimeout } from 'timers'; // tslint workaround
+import * as util from 'util';
 import { isMainThread } from 'worker_threads';
 
 import { debug } from './debug';
@@ -118,7 +119,7 @@ class Module {
   }
 
   public updateSettings(key, value) {
-    debug('interface.update', `Updating ${key} = ${value}, ${isMainThread}`);
+    debug('interface.update', `Updating ${key} = ${util.inspect(value)}, ${isMainThread}`);
     if (Array.isArray(value)) {
       value = [...value]; // we need to retype otherwise we have worker clone error
     }
@@ -164,33 +165,32 @@ class Module {
         if (key === 'then' || key === 'toJSON') { return Reflect.get(target, key); } // promisify
 
         if (typeof target[key] === 'object' && target[key] !== null) {
-          const path = String(key);
+          const path = key;
           return new Proxy(target[key], {
             get: (t, k) => {
-              k = String(k);
               if (Array.isArray(t[k])) {
                 return this.arrayHandler(t, k, path);
               }
 
               const isUnsupportedObject = typeof t[k] === 'object' && !Array.isArray(t[k]) && t[k] !== null;
               if (isUnsupportedObject) {
-                global.log.warning(`!!! ${this.constructor.name.toLowerCase()}.settings.${path}.${k} object is not retroactive, for advanced object types use database directly.`);
+                global.log.warning(`!!! ${this.constructor.name.toLowerCase()}.settings.${path}.${String(k)} object is not retroactive, for advanced object types use database directly.`);
               }
 
               if (k === 'then' || k === 'toJSON') { return Reflect.get(t, k); } // promisify
               if (_.isSymbol(k)) { return undefined; } // handle iterator
+
               return t[k];
             },
             set: (t, k, value) => {
               if (_.isEqual(t[k], value)) { return true; }
-              k = String(k);
               // check if types match
               // skip when saving to undefined
               if (typeof t[k] !== 'undefined') {
                 // if default value is null or new value is null -> skip checks
                 if (value !== null && t[k] !== null) {
                   if (typeof t[k] !== typeof value) {
-                    const error = path + '.' + k + ' set failed\n\texpected:\t' + typeof t[k] + '\n\tset:     \t' + typeof value;
+                    const error = path + '.' + String(k) + ' set failed\n\texpected:\t' + typeof t[k] + '\n\tset:     \t' + typeof value;
                     // try retype if expected is number and we got string (from ui settings e.g.)
                     if (typeof t[k] === 'number') {
                       value = Number(value);
@@ -200,7 +200,7 @@ class Module {
                 }
 
                 t[k] = value;
-                this.updateSettings(`${path}.${k}`, value);
+                this.updateSettings(`${path}.${String(k)}`, value);
               }
               return true;
             },
@@ -230,7 +230,7 @@ class Module {
     }) as ExposedSettings;
   }
 
-  public arrayHandler(target, key, path: string | null = null) {
+  public arrayHandler(target, key, path: any = null) {
     // we want to catch array functions
     const path2 = key;
     return new Proxy(target[key], {
@@ -238,15 +238,15 @@ class Module {
         const val = t[prop];
         if (typeof val === 'function') {
           if (['push', 'unshift'].includes(String(prop))) {
-            return (() => {
-              const modification = Array.prototype[prop].apply(t, arguments);
+            return () => {
+              const modification = Array.prototype[prop].apply(target, arguments);
               if (path) {
                 this.updateSettings(`${path}.${path2}`, this.settings[path][path2]);
               } else {
                 this.updateSettings(`${path2}`, this.settings[path2]);
               }
               return modification;
-            });
+            };
           }
           if (['pop'].includes(String(prop))) {
             return () => {

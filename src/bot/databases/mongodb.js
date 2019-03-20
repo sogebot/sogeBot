@@ -52,7 +52,7 @@ class IMongoDB extends Interface {
         poolSize: _.get(config, 'database.mongodb.poolSize', 5),
         useNewUrlParser: true,
         reconnectTries: Number.MAX_VALUE,
-        connectTimeoutMS: 60000
+        connectTimeoutMS: 60000,
       })
 
     // create indexes
