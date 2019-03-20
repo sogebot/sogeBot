@@ -1,5 +1,6 @@
 import chalk from 'chalk';
 import * as _ from 'lodash';
+import { setTimeout } from 'timers'; // tslint workaround
 import { isMainThread } from 'worker_threads';
 
 import * as constants from './constants';

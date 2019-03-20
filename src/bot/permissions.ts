@@ -34,6 +34,55 @@ class Permissions extends Core {
     this.addMenu({ category: 'settings', name: 'permissions', id: '/settings/permissions' });
   }
 
+  public sockets() {
+    if (this.socket === null) {
+      setTimeout(() => this.sockets(), 100);
+      return;
+    }
+
+    this.socket.on('connection', (socket) => {
+      socket.on('permissions', async (cb) => {
+        cb(await global.db.engine.find(this.collection.data));
+      });
+      socket.on('permission', async (id, cb) => {
+        cb(await global.db.engine.findOne(this.collection.data, { id }));
+      });
+      socket.on('permissions.order', async (data, cb) => {
+        for (const d of data) {
+          await global.db.engine.update(this.collection.data, { id: String(d.id) }, { order: d.order });
+        }
+        cb();
+      });
+      socket.on('test.user', async (opts, cb) => {
+        const userByName = await global.db.engine.findOne('users', { username: opts.value });
+        const userById = await global.db.engine.findOne('users', { id: opts.value });
+        if (typeof userByName.id !== 'undefined') {
+          const status = await this.check(userByName.id, opts.pid);
+          const partial = await this.check(userByName.id, opts.pid, true);
+          cb({
+            status,
+            partial,
+            state: opts.state,
+          });
+        } else if (typeof userById.id !== 'undefined') {
+          const status = await this.check(userById.id, opts.pid);
+          const partial = await this.check(userById.id, opts.pid, true);
+          cb({
+            status,
+            partial,
+            state: opts.state,
+          });
+        } else {
+          cb({
+            status: { access: 2 },
+            partial: { access: 2 },
+            state: opts.state,
+          });
+        }
+      });
+    });
+  }
+
   public async getCommandPermission(command: string): Promise<string | null | undefined> {
     const cItem = await global.db.engine.findOne(this.collection.commands, { key: command });
     if (cItem.permission) {
@@ -194,55 +243,6 @@ class Permissions extends Core {
       }
     }
     return true;
-  }
-
-  protected sockets() {
-    if (this.socket === null) {
-      setTimeout(() => this.sockets(), 100);
-      return;
-    }
-
-    this.socket.on('connection', (socket) => {
-      socket.on('permissions', async (cb) => {
-        cb(await global.db.engine.find(this.collection.data));
-      });
-      socket.on('permission', async (id, cb) => {
-        cb(await global.db.engine.findOne(this.collection.data, { id }));
-      });
-      socket.on('permissions.order', async (data, cb) => {
-        for (const d of data) {
-          await global.db.engine.update(this.collection.data, { id: String(d.id) }, { order: d.order });
-        }
-        cb();
-      });
-      socket.on('test.user', async (opts, cb) => {
-        const userByName = await global.db.engine.findOne('users', { username: opts.value });
-        const userById = await global.db.engine.findOne('users', { id: opts.value });
-        if (typeof userByName.id !== 'undefined') {
-          const status = await this.check(userByName.id, opts.pid);
-          const partial = await this.check(userByName.id, opts.pid, true);
-          cb({
-            status,
-            partial,
-            state: opts.state,
-          });
-        } else if (typeof userById.id !== 'undefined') {
-          const status = await this.check(userById.id, opts.pid);
-          const partial = await this.check(userById.id, opts.pid, true);
-          cb({
-            status,
-            partial,
-            state: opts.state,
-          });
-        } else {
-          cb({
-            status: { access: 2 },
-            partial: { access: 2 },
-            state: opts.state,
-          });
-        }
-      });
-    });
   }
 
   protected async list(opts: CommandOptions): Promise<void> {

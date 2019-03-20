@@ -214,7 +214,7 @@ class Scrim extends System {
               }
               global.commons.sendMessage(
                 global.commons.prepare('systems.scrim.putMatchIdInChat', {
-                  command: this.settings.commands['!snipe match'],
+                  command: this.getCommand('!snipe match'),
                 }),
                 { username: global.commons.getOwner() },
               );
