@@ -128,7 +128,6 @@ declare namespace InterfaceSettings {
   }
 
   type UI = {
-    _hidden: boolean,
     [x: string]: {
       [s: string]: UISelector | UILink | UINumberInput | UIConfigurableList | UISortableList | UITextInput
     } | boolean | UISelector | UILink | UINumberInput | UIConfigurableList | UISortableList | UITextInput,

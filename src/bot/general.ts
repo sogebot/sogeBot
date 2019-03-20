@@ -39,7 +39,9 @@ class General extends Core {
 
     // update lang values
     readdir('./locales/', (err, f) => {
-      this._ui.lang.values = [...new Set(f.map((o) => o.split('.')[0]))];
+      if (typeof this._ui.lang === 'object' && this._ui.lang.type === 'selector') {
+        this._ui.lang.values = [...new Set(f.map((o) => o.split('.')[0]))];
+      }
     });
   }
 
