@@ -27,7 +27,6 @@ enum ERROR {
  */
 
 class Scrim extends System {
-  [x: string]: any; // TODO: remove after interface ported to TS
   private cleanedUpOnStart: boolean;
 
   constructor() {
@@ -214,7 +213,7 @@ class Scrim extends System {
               }
               global.commons.sendMessage(
                 global.commons.prepare('systems.scrim.putMatchIdInChat', {
-                  command: this.settings.commands['!snipe match'],
+                  command: this.getCommand('!snipe match'),
                 }),
                 { username: global.commons.getOwner() },
               );

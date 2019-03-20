@@ -9,11 +9,11 @@ import * as Message from '../message';
 import Integration from './_interface';
 
 class Twitter extends Integration {
-  [x: string]: any; // TODO: remove after interface ported to TS
   public watchedStreams: Array<{
     hash: string,
     stream: any,
   }>;
+  public client: any;
 
   constructor() {
     const options: InterfaceSettings = {

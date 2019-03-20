@@ -1,6 +1,6 @@
 'use strict';
 
-import Overlay from './_interface';
+import Overlay from '../overlays/_interface';
 
 import * as _ from 'lodash';
 const {
@@ -9,8 +9,6 @@ const {
 } = require('worker_threads');
 
 class Goals extends Overlay {
-  [x: string]: any; // TODO: remove after interface ported to TS
-
   constructor() {
     const options: InterfaceSettings = {
       ui: {
@@ -33,6 +31,10 @@ class Goals extends Overlay {
   }
 
   public async sockets() {
+    if (this.socket === null) {
+      setTimeout(() => this.sockets(), 100);
+      return;
+    }
     this.socket.on('connection', (socket) => {
       socket.on('current', async (cb) => {
         cb(null, {

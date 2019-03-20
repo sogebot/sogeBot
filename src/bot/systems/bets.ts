@@ -34,8 +34,6 @@ const ERROR_NOT_OPTION = '7';
  */
 
 class Bets extends System {
-  [x: string]: any; // TODO: remove after interface ported to TS
-
   constructor() {
     const options: InterfaceSettings = {
       ui: {
@@ -69,6 +67,9 @@ class Bets extends System {
   }
 
   public sockets() {
+    if (this.socket === null) {
+      return setTimeout(() => this.sockets(), 100);
+    }
     this.socket.on('connection', (socket) => {
       socket.on('close', async (option) => {
         const message = '!bet ' + (option === 'refund' ? option : 'close ' + option);
@@ -137,7 +138,7 @@ class Bets extends System {
         maxIndex: options.length - 1,
         minutes: timeout,
         options: options.map((v, i) => `${i}. '${v}'`).join(', '),
-        command: this.settings.commands['!bet'],
+        command: this.getCommand('!bet'),
       }), opts.sender);
     } catch (e) {
       switch (e.message) {
@@ -147,7 +148,7 @@ class Bets extends System {
         case ERROR_ALREADY_OPENED:
           global.commons.sendMessage(
             global.commons.prepare('bets.running', {
-              command: this.settings.commands['!bet'],
+              command: this.getCommand('!bet'),
               maxIndex: currentBet.options.length - 1,
               options: currentBet.options.map((v, i) => `${i}. '${v.name}'`).join(', '),
             }), opts.sender);

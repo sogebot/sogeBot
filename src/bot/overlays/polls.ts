@@ -3,8 +3,6 @@
 import Overlay from './_interface';
 
 class Polls extends Overlay {
-  [x: string]: any; // TODO: remove after interface ported to TS
-
   constructor() {
     const options: InterfaceSettings = {
       settings: {

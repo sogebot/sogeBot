@@ -7,6 +7,7 @@ const {
 const _ = require('lodash')
 const TwitchJs = require('twitch-js').default
 const Parser = require('./parser')
+const util = require('util');
 
 
 import { permission } from './permissions';
@@ -355,7 +356,7 @@ class TMI extends Core {
       }
     } catch (e) {
       global.log.error('Error parsing subscription event')
-      global.log.error(JSON.stringify(message))
+      global.log.error(util.inspect(message))
       global.log.error(e.stack)
     }
   }
@@ -406,7 +407,7 @@ class TMI extends Core {
       })
     } catch (e) {
       global.log.error('Error parsing resub event')
-      global.log.error(JSON.stringify(message))
+      global.log.error(util.inspect(message))
       global.log.error(e.stack)
     }
   }
@@ -429,7 +430,7 @@ class TMI extends Core {
       global.log.subcommunitygift(`${username}, to ${count} viewers`)
     } catch (e) {
       global.log.error('Error parsing subscriptionGiftCommunity event')
-      global.log.error(JSON.stringify(message))
+      global.log.error(util.inspect(message))
       global.log.error(e.stack)
     }
   }
@@ -498,7 +499,7 @@ class TMI extends Core {
       }
     } catch (e) {
       global.log.error('Error parsing subgift event')
-      global.log.error(JSON.stringify(message))
+      global.log.error(util.inspect(message))
       global.log.error(e.stack)
     }
   }
@@ -544,7 +545,7 @@ class TMI extends Core {
       }
     } catch (e) {
       global.log.error('Error parsing cheer event')
-      global.log.error(JSON.stringify(message))
+      global.log.error(util.inspect(message))
       global.log.error(e.stack)
     }
   }

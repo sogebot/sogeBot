@@ -1,8 +1,6 @@
 import Widget from './_interface';
 
 class EventList extends Widget {
-  [x: string]: any; // TODO: remove after interface ported to TS
-
   constructor() {
     const options: InterfaceSettings = {
       settings: {
@@ -25,6 +23,9 @@ class EventList extends Widget {
   }
 
   public sockets() {
+    if (this.socket === null) {
+      return setTimeout(() => this.sockets(), 100);
+    }
     this.socket.on('connection', (socket) => {
       socket.on('get', async () => {
         this.update();
@@ -43,9 +44,9 @@ class EventList extends Widget {
         _sort: 'timestamp',
         _total: limit,
       });
-      this.socket.emit('update', events);
+      this.emit('update', events);
     } catch (e) {
-      this.socket.emit('update', []);
+      this.emit('update', []);
     }
   }
 }

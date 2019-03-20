@@ -21,6 +21,7 @@ declare namespace NodeJS {
     users: any,
     lib: any,
     workers: import("../src/bot/workers").Workers,
+    permissions: import("../src/bot/permissions").Permissions,
     customvariables: any,
     tmi: any,
     integrations: any,
@@ -55,9 +56,20 @@ type Sender = {
 
 type Command = {
   name: string,
+  command?: string,
   fnc?: string,
   isHelper?: boolean,
-  permission?: string
+  permission?: string,
+  dependsOn?: string[],
+}
+
+type Parser = {
+  name: string,
+  fnc?: string,
+  permission?: string,
+  priority?: number,
+  fireAndForget?: boolean,
+  dependsOn?: string[],
 }
 
 type onEventSub = {
@@ -92,12 +104,14 @@ type onEventMessage = {
   timestamp: string
 }
 
-type InterfaceSettings = {
-  settings?: {
-    commands?: Array<Command | string>,
+declare namespace InterfaceSettings {
+  type Settings<C> = {
+    commands?: C,
+    parsers?: Array<Parser>,
     [s: string]: any
-  },
-  on?: {
+  }
+
+  type On = {
     message?: (message: onEventMessage) => void,
     sub?: (syb: onEventSub) => void,
     follow?: (follow: onEventFollow) => void,
@@ -111,23 +125,31 @@ type InterfaceSettings = {
     load?: {
       [x: string]: Array<string>
     }
-  },
-  ui?: {
-    _hidden?: Boolean,
-    [s: string]: {
+  }
+
+  type UI = {
+    [x: string]: {
       [s: string]: UISelector | UILink | UINumberInput | UIConfigurableList | UISortableList | UITextInput
-    } | Boolean | undefined | UISelector | UILink | UINumberInput | UIConfigurableList | UISortableList | UITextInput
-  },
+    } | boolean | UISelector | UILink | UINumberInput | UIConfigurableList | UISortableList | UITextInput,
+  };
+}
+
+type InterfaceSettings = {
+  settings?: InterfaceSettings.Settings<Array<Command | string>>,
+  on?: InterfaceSettings.On,
+  ui?: InterfaceSettings.UI,
   dependsOn?: string[],
 }
 
 type UISelector = {
   type: 'selector',
   values: Array<string>,
+  if?: () => boolean,
 }
 
 type UIConfigurableList = {
   type: 'configurable-list',
+  if?: () => boolean,
 }
 
 type UILink = {
@@ -135,12 +157,14 @@ type UILink = {
   href: string,
   class: string,
   rawText: string,
-  target: string
+  target: string,
+  if?: () => boolean,
 }
 
 type UITextInput = {
   type: 'text-input',
   secret: boolean,
+  if?: () => boolean,
 }
 
 type UINumberInput = {
@@ -148,6 +172,7 @@ type UINumberInput = {
   step?: number,
   min?: number,
   max?: number,
+  if?: () => boolean,
 }
 
 type UISortableList = {
@@ -156,12 +181,19 @@ type UISortableList = {
   toggle: string,
   toggleOnIcon: string,
   toggleOffIcon: string,
+  if?: () => boolean,
 }
 
 type CommandOptions = {
   sender: Sender,
   command: string,
-  parameters: string
+  parameters: string,
+}
+
+type ParserOptions = {
+  sender: Sender,
+  message: string,
+  skip: boolean
 }
 
 type Vote = {

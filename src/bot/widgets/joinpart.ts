@@ -1,8 +1,6 @@
 import Widget from './_interface';
 
 class JoinPart extends Widget {
-  [x: string]: any; // TODO: remove after interface ported to TS
-
   constructor() {
     super({});
     this.addWidget('join', 'widget-title-join', 'fas fa-sign-in-alt');
@@ -10,7 +8,7 @@ class JoinPart extends Widget {
   }
 
   public send(event) {
-    this.socket.emit('joinpart', { username: event.username, type: event.type });
+    this.emit('joinpart', { username: event.username, type: event.type });
   }
 }
 

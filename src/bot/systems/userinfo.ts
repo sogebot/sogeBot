@@ -22,8 +22,6 @@ const __DEBUG__ =
  */
 
 class UserInfo extends System {
-  [x: string]: any; // TODO: remove after interface ported to TS
-
   constructor() {
     const options: InterfaceSettings = {
       ui: {

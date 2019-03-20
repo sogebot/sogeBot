@@ -36,8 +36,6 @@ const __DEBUG__ =
  */
 
 class Top extends System {
-  [x: string]: any; // TODO: remove after interface ported to TS
-
   constructor() {
     const options: InterfaceSettings = {
       settings: {

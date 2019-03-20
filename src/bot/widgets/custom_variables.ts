@@ -4,19 +4,20 @@ import * as _ from 'lodash';
 import Widget from './_interface';
 
 class CustomVariables extends Widget {
-  [x: string]: any; // TODO: remove after interface ported to TS
-
   constructor() {
     super({});
     this.addWidget('customvariables', 'widget-title-customvariables', 'fas fa-dollar-sign');
 
     require('cluster').on('message', (worker, message) => {
       if (message.type !== 'widget_custom_variables') { return; }
-      this.socket.emit(message.emit); // send update to widget
+      this.emit(message.emit); // send update to widget
     });
   }
 
   public sockets() {
+    if (this.socket === null) {
+      return setTimeout(() => this.sockets(), 100);
+    }
     this.socket.on('connection', (socket) => {
       socket.on('list.variables', async (cb) => {
         const variables = await global.db.engine.find('custom.variables');
