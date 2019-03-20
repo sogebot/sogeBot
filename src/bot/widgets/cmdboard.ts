@@ -23,8 +23,10 @@ class Cmdboard extends Widget {
       });
       socket.on('cmdboard.widget.run', (command) => {
         global.tmi.message({
-          sender: { username: global.commons.getOwner() },
-          message: command,
+          message: {
+            tags: { username: global.commons.getOwner() },
+            message: command,
+          },
           skip: true,
         });
       });

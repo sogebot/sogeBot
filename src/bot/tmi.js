@@ -179,10 +179,7 @@ class TMI extends Core {
 
         if (!(await global.commons.isBot(message.tags.username)) || !message.isSelf) {
           message.tags['message-type'] = 'whisper'
-          global.tmi.message({
-            sender: message.tags,
-            message: message.message
-          })
+          global.tmi.message({message})
           global.linesParsed++
         }
       })
@@ -198,11 +195,7 @@ class TMI extends Core {
           } else {
             // strip message from ACTION
             message.message = message.message.replace('\u0001ACTION ', '').replace('\u0001', '')
-
-            global.tmi.message({
-              sender: message.tags,
-              message: message.message
-            })
+            global.tmi.message({message})
             global.linesParsed++
 
             // go through all systems and trigger on.message
@@ -563,6 +556,19 @@ class TMI extends Core {
     }
   }
 
+  delete (client: 'broadcaster' | 'bot', msgId: string): void {
+    if (!isMainThread) {
+      global.workers.sendToMaster({
+        type: 'call',
+        ns: 'tmi',
+        fnc: 'delete',
+        args: [client, msgId],
+      })
+    } else {
+      this.client[client].chat.say(global.commons.getOwner(), '/delete ' + msgId)
+    }
+  }
+
   async message (data) {
     if (isMainThread && !global.mocha) {
       return global.workers.sendToWorker({
@@ -573,8 +579,8 @@ class TMI extends Core {
       })
     }
 
-    let sender = data.sender
-    let message = data.message
+    let sender = data.message.tags
+    let message = data.message.message
     let skip = data.skip
     let quiet = data.quiet
 

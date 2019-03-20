@@ -254,8 +254,10 @@ class Message {
           .replace(/\$sender/g, (global.tmi.settings.chat.showWithAt ? '@' : '') + attr.sender)
           .replace(/\$param/g, attr.param)
         global.tmi.message({
-          sender: { username: attr.sender },
-          message: cmd,
+          message: {
+            tags: { username: attr.sender },
+            message: cmd,
+          },
           skip: true,
           quiet: true
         })
@@ -268,8 +270,10 @@ class Message {
           .replace(/\$sender/g, (global.tmi.settings.chat.showWithAt ? '@' : '') + attr.sender)
           .replace(/\$param/g, attr.param)
         global.tmi.message({
-          sender: { username: attr.sender },
-          message: cmd,
+          message: {
+            tags: { username: attr.sender },
+            message: cmd,
+          },
           skip: true,
           quiet: false
         })

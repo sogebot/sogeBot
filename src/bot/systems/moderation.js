@@ -140,8 +140,7 @@ class Moderation extends System {
       const warningsLeft = parseInt(warningsAllowed, 10) - warnings.length
       warning = await new Message(warning.replace(/\$count/g, warningsLeft < 0 ? 0 : warningsLeft)).parse()
       if (warningsTimeout) {
-        log.timeout(`${sender.username} [${type}] 1s timeout, warnings left ${warningsLeft < 0 ? 0 : warningsLeft} | ${text}`)
-        global.commons.timeout(sender.username, warning, 1)
+        global.tmi.delete('bot', sender.id)
       }
 
       if (announceTimeouts && !silent) {
