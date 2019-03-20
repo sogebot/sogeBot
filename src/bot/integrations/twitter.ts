@@ -13,6 +13,7 @@ class Twitter extends Integration {
     hash: string,
     stream: any,
   }>;
+  public client: any;
 
   constructor() {
     const options: InterfaceSettings = {
