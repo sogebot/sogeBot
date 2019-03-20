@@ -5,7 +5,7 @@
     "blacklist": "Blacklist",
     "moderateSubscribers": "Moderatovat subscribery",
     "timeout": "Čas trvání timeoutu",
-    "shouldClearChat": "Smaže zprávu",
+    "shouldClearChat": "Promaže chat (dostane timeout 1s)",
     "includeSpaces": "Zahrnout mezery",
     "includeClips": "Zahrnout klipy",
     "triggerLength": "Kontrolovat od této délky zprávy",
