@@ -156,7 +156,7 @@ class Workers {
           if (obj) { set(obj, data.path, data.value); }
         } else {
           const obj = Object.values(global[data.system]).find((o) => {
-            return obj.constructor.name === data.class;
+            return o.constructor.name === data.class;
           });
           if (obj) { set(obj, data.path, data.value); }
         }
