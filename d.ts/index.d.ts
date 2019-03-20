@@ -5,6 +5,8 @@ declare module "*.vue" {
 
 declare namespace NodeJS {
   export interface Global {
+    api: any,
+    mocha: boolean,
     configuration: any,
     cpu: any,
     db: any,
@@ -18,7 +20,7 @@ declare namespace NodeJS {
     systems: any,
     users: any,
     lib: any,
-    workers: Workers.main,
+    workers: import("../src/bot/workers").Workers,
     customvariables: any,
     tmi: any,
     integrations: any,
