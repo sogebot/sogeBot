@@ -13,6 +13,9 @@ class Chat extends Widget {
   }
 
   public sockets() {
+    if (this.socket === null) {
+      return setTimeout(() => this.sockets(), 100);
+    }
     this.socket.on('connection', (socket) => {
       socket.on('chat.message.send', (message) => {
         global.commons.sendMessage(message, { username: global.oauth.settings.bot.username }, { force: true });

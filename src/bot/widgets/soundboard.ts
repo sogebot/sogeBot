@@ -11,6 +11,9 @@ class SoundBoard extends Widget {
   }
 
   public sockets() {
+    if (this.socket === null) {
+      return setTimeout(() => this.sockets(), 100);
+    }
     this.socket.on('connection', (socket) => {
       socket.on('getSoundBoardSounds', (cb) => {
         glob('public/dist/soundboard/*.mp3', (err, files) => {

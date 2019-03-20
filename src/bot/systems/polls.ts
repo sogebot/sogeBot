@@ -72,12 +72,15 @@ class Polls extends System {
   }
 
   public async sockets() {
+    if (this.socket === null) {
+      return setTimeout(() => this.sockets(), 100);
+    }
     this.socket.on('connection', (socket) => {
       socket.on('create', async (vote: Poll, cb) => {
         try {
           const parameters = `-${vote.type} -title "${vote.title}" ${vote.options.filter((o) => o.trim().length > 0).join(' | ')}`;
           this.open({
-            command: this.settings.commands['!poll open'],
+            command: this.getCommand('!poll open'),
             parameters,
             sender: {
               username: global.commons.getOwner(),
@@ -95,7 +98,7 @@ class Polls extends System {
       socket.on('close', async (vote: Poll, cb) => {
         try {
           this.close({
-            command: this.settings.commands['!poll close'],
+            command: this.getCommand('!poll close'),
             parameters: '',
             sender: {
               username: global.commons.getOwner(),
@@ -139,7 +142,7 @@ class Polls extends System {
             const votesCount = count[index] || 0;
             const percentage = Number((100 / _total) * votesCount || 0).toFixed(2);
             if (cVote.type === 'normal') {
-              global.commons.sendMessage(this.settings.commands['!vote'] + ` ${Number(index) + 1} - ${option} - ${votesCount} ${global.commons.getLocalizedName(votesCount, 'systems.polls.votes')}, ${percentage}%`, opts.sender);
+              global.commons.sendMessage(this.getCommand('!vote') + ` ${Number(index) + 1} - ${option} - ${votesCount} ${global.commons.getLocalizedName(votesCount, 'systems.polls.votes')}, ${percentage}%`, opts.sender);
             } else if (cVote.type === 'tips') {
               global.commons.sendMessage(`#vote${Number(index) + 1} - ${option} - ${Number(votesCount).toFixed(2)} ${global.commons.getLocalizedName(votesCount, 'systems.polls.votes')}, ${percentage}%`, opts.sender);
             } else {
@@ -178,11 +181,11 @@ class Polls extends System {
       const translations = `systems.polls.opened_${type}`;
       global.commons.sendMessage(global.commons.prepare(translations, {
         title,
-        command: this.settings.commands['!vote'],
+        command: this.getCommand('!vote'),
       }), opts.sender);
       for (const index of Object.keys(options)) {
         setTimeout(() => {
-          if (type === 'normal') { global.commons.sendMessage(this.settings.commands['!vote'] + ` ${(Number(index) + 1)} => ${options[index]}`, opts.sender); } else { global.commons.sendMessage(`#vote${(Number(index) + 1)} => ${options[index]}`, opts.sender); }
+          if (type === 'normal') { global.commons.sendMessage(this.getCommand('!vote') + ` ${(Number(index) + 1)} => ${options[index]}`, opts.sender); } else { global.commons.sendMessage(`#vote${(Number(index) + 1)} => ${options[index]}`, opts.sender); }
         }, 300 * (Number(index) + 1));
       }
 
@@ -197,11 +200,11 @@ class Polls extends System {
           const translations = 'systems.polls.opened' + (cVote.type.length > 0 ? `_${cVote.type}` : '');
           global.commons.sendMessage(global.commons.prepare(translations, {
             title: cVote.title,
-            command: this.settings.commands['!vote'],
+            command: this.getCommand('!vote'),
           }), opts.sender);
           for (const index of Object.keys(cVote.options)) {
             setTimeout(() => {
-              if (cVote.type === 'normal') { global.commons.sendMessage(this.settings.commands['!poll open'] + ` ${index} => ${cVote.options[index]}`, opts.sender); } else { global.commons.sendMessage(`#vote${(Number(index) + 1)} => ${cVote.options[index]}`, opts.sender); }
+              if (cVote.type === 'normal') { global.commons.sendMessage(this.getCommand('!poll open') + ` ${index} => ${cVote.options[index]}`, opts.sender); } else { global.commons.sendMessage(`#vote${(Number(index) + 1)} => ${cVote.options[index]}`, opts.sender); }
             }, 300 * (Number(index) + 1));
           }
           break;
@@ -237,7 +240,7 @@ class Polls extends System {
             const votesCount = count[i] || 0;
             const percentage = Number((100 / _total) * votesCount || 0).toFixed(2);
             if (cVote.type === 'normal') {
-              global.commons.sendMessage(this.settings.commands['!vote'] + ` ${Number(i) + 1} - ${option} - ${votesCount} ${global.commons.getLocalizedName(votesCount, 'systems.polls.votes')}, ${percentage}%`, opts.sender);
+              global.commons.sendMessage(this.getCommand('!vote') + ` ${Number(i) + 1} - ${option} - ${votesCount} ${global.commons.getLocalizedName(votesCount, 'systems.polls.votes')}, ${percentage}%`, opts.sender);
             } else if (cVote.type === 'tips') {
               global.commons.sendMessage(`#vote${Number(i) + 1} - ${option} - ${Number(votesCount).toFixed(2)} ${global.commons.getLocalizedName(votesCount, 'systems.polls.votes')}, ${percentage}%`, opts.sender);
             } else {
@@ -364,11 +367,11 @@ class Polls extends System {
       const translations = `systems.polls.opened_${vote.type}`;
       global.commons.sendMessage(global.commons.prepare(translations, {
         title: vote.title,
-        command: this.settings.commands['!vote'],
+        command: this.getCommand('!vote'),
       }), global.commons.getOwner());
       for (const index of Object.keys(vote.options)) {
         setTimeout(() => {
-          if (vote.type === 'normal') { global.commons.sendMessage(this.settings.commands['!vote'] + ` ${(Number(index) + 1)} => ${vote.options[index]}`, global.commons.getOwner()); } else { global.commons.sendMessage(`#vote${(Number(index) + 1)} => ${vote.options[index]}`, global.commons.getOwner()); }
+          if (vote.type === 'normal') { global.commons.sendMessage(this.getCommand('!vote') + ` ${(Number(index) + 1)} => ${vote.options[index]}`, global.commons.getOwner()); } else { global.commons.sendMessage(`#vote${(Number(index) + 1)} => ${vote.options[index]}`, global.commons.getOwner()); }
         }, 300 * (Number(index) + 1));
       }
     }

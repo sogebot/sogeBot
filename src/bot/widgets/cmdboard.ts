@@ -17,6 +17,9 @@ class Cmdboard extends Widget {
   }
 
   public sockets() {
+    if (this.socket === null) {
+      return setTimeout(() => this.sockets(), 100);
+    }
     this.socket.on('connection', (socket) => {
       socket.on('cmdboard.widget.fetch', async (cb) => {
         cb(await global.db.engine.find('widgetsCmdBoard'));

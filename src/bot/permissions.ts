@@ -197,6 +197,11 @@ class Permissions extends Core {
   }
 
   protected sockets() {
+    if (this.socket === null) {
+      setTimeout(() => this.sockets(), 100);
+      return;
+    }
+
     this.socket.on('connection', (socket) => {
       socket.on('permissions', async (cb) => {
         cb(await global.db.engine.find(this.collection.data));
