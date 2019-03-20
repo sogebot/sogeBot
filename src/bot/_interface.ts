@@ -16,6 +16,7 @@ class Module {
   public options: InterfaceSettings = {};
   public collection: { [x: string]: string };
   public settings: ExposedSettings = {};
+  public timeouts: { [x: string]: NodeJS.Timeout } = {};
 
   protected _settings: InterfaceSettings.Settings<Array<Command | string> | ExposedSettings>;
   protected _name: string;
@@ -27,7 +28,6 @@ class Module {
   protected dependsOn: string[];
   protected socket: SocketIO.Socket | null;
 
-  private timeouts: { [x: string]: NodeJS.Timeout } = {};
   private isLoaded: boolean = false;
 
   constructor(opts: InterfaceSettings | null = null, name: string = 'core') {
