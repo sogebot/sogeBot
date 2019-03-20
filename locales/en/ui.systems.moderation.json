@@ -5,7 +5,7 @@
     "blacklist": "Blacklist",
     "moderateSubscribers": "Moderate subscribers",
     "timeout": "Timeout duration",
-    "shouldClearChat": "Should clear chat (will timeout for 1s)",
+    "shouldClearChat": "Should delete message",
     "includeSpaces": "Include spaces",
     "includeClips": "Include clips",
     "triggerLength": "Trigger length of message",
