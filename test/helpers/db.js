@@ -10,7 +10,7 @@ module.exports = {
   cleanup: async function () {
     let waitForIt = async (resolve, reject) => {
       if (_.isNil(global.db) || !global.db.engine.connected || _.isNil(global.systems) || _.now() - startup < 10000) {
-        return setTimeout(() => waitForIt(resolve, reject), 10)
+        return setTimeout(() => waitForIt(resolve, reject), 1000)
       }
 
       if (__DEBUG__) {

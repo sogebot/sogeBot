@@ -140,7 +140,11 @@ class Module {
           && this.on.change[key]) {
         // run on.change functions only on master
         for (const fnc of this.on.change[key]) {
-          if (typeof this[fnc] === 'function') { this[fnc](key, value); } else { global.log.error(`${fnc}() is not function in ${this._name}/${this.constructor.name.toLowerCase()}`); }
+          if (typeof this[fnc] === 'function') {
+            this[fnc](key, value);
+          } else {
+            global.log.error(`${fnc}() is not function in ${this._name}/${this.constructor.name.toLowerCase()}`);
+          }
         }
       }
     } else {
