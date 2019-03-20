@@ -3,6 +3,7 @@
 'use strict'
 require('module-alias/register')
 
+import { Workers } from './workers';
 import { Permissions } from './permissions'
 
 const figlet = require('figlet')
@@ -19,7 +20,7 @@ const config = require('@config')
 
 global.commons = new (require('./commons'))()
 global.cache = new (require('./cache'))()
-global.workers = new (require('./workers'))
+global.workers = new Workers()
 
 global.startedClusters = 0
 global.linesParsed = 0
