@@ -3,7 +3,6 @@ import * as _ from 'lodash';
 import { setTimeout } from 'timers'; // tslint workaround
 import { isMainThread } from 'worker_threads';
 
-import * as constants from './constants';
 import { debug } from './debug';
 import { permission } from './permissions';
 
@@ -235,7 +234,7 @@ class Module {
         const val = t[prop];
         if (typeof val === 'function') {
           if (['push', 'unshift'].includes(String(prop))) {
-            return ((el) => {
+            return (() => {
               const modification = Array.prototype[prop].apply(t, arguments);
               if (path) {
                 this.updateSettings(`${path}.${path2}`, this.settings[path][path2]);
@@ -243,7 +242,7 @@ class Module {
                 this.updateSettings(`${path2}`, this.settings[path2]);
               }
               return modification;
-            }).bind(this);
+            });
           }
           if (['pop'].includes(String(prop))) {
             return () => {
