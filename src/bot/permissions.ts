@@ -14,8 +14,6 @@ const permission = Object.freeze({
 });
 
 class Permissions extends Core {
-  [x: string]: any; // TODO: remove after interface ported to TS
-
   constructor() {
     const options: InterfaceSettings = {
       settings: {

@@ -1,8 +1,6 @@
 import Widget from './_interface';
 
 class EventList extends Widget {
-  [x: string]: any; // TODO: remove after interface ported to TS
-
   constructor() {
     const options: InterfaceSettings = {
       settings: {

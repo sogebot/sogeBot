@@ -5,8 +5,6 @@ import axios from 'axios';
 import Widget from './_interface';
 
 class Chat extends Widget {
-  [x: string]: any; // TODO: remove after interface ported to TS
-
   constructor() {
     super({});
     this.addWidget('chat', 'widget-title-chat', 'far fa-comments');

@@ -3,8 +3,6 @@ import * as glob from 'glob';
 import Widget from './_interface';
 
 class SoundBoard extends Widget {
-  [x: string]: any; // TODO: remove after interface ported to TS
-
   constructor() {
     super({});
     this.addWidget('soundboard', 'widget-title-soundboard', 'fas fa-music');

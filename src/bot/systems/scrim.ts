@@ -27,7 +27,6 @@ enum ERROR {
  */
 
 class Scrim extends System {
-  [x: string]: any; // TODO: remove after interface ported to TS
   private cleanedUpOnStart: boolean;
 
   constructor() {

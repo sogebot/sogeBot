@@ -9,8 +9,6 @@ const {
 } = require('worker_threads');
 
 class Goals extends Overlay {
-  [x: string]: any; // TODO: remove after interface ported to TS
-
   constructor() {
     const options: InterfaceSettings = {
       ui: {

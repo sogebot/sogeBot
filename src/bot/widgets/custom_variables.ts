@@ -4,8 +4,6 @@ import * as _ from 'lodash';
 import Widget from './_interface';
 
 class CustomVariables extends Widget {
-  [x: string]: any; // TODO: remove after interface ported to TS
-
   constructor() {
     super({});
     this.addWidget('customvariables', 'widget-title-customvariables', 'fas fa-dollar-sign');

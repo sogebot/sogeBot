@@ -29,8 +29,6 @@ enum ERROR {
  */
 
 class Polls extends System {
-  [x: string]: any; // TODO: remove after interface ported to TS
-
   private currentMessages: number;
   private lastMessageRemind: number;
   private lastTimeRemind: number;

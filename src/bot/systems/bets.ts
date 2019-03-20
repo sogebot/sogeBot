@@ -34,8 +34,6 @@ const ERROR_NOT_OPTION = '7';
  */
 
 class Bets extends System {
-  [x: string]: any; // TODO: remove after interface ported to TS
-
   constructor() {
     const options: InterfaceSettings = {
       ui: {
