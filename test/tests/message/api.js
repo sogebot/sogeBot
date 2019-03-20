@@ -8,10 +8,12 @@ const assert = require('chai').assert
 const sinon = require('sinon')
 const axios = require('axios')
 const MockAdapter = require('axios-mock-adapter');
-const mock = new MockAdapter(axios);
+
+let mock = null;
 
 describe('Message - api filter', () => {
   before(() => {
+    mock = new MockAdapter(axios);
     // add axios mock
     mock
       .onGet('http://localhost/get?test=a\\nb').reply(200, {
