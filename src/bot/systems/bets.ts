@@ -74,8 +74,10 @@ class Bets extends System {
         const message = '!bet ' + (option === 'refund' ? option : 'close ' + option);
         global.log.process({ type: 'parse', sender: { username: global.commons.getOwner() }, message });
         global.tmi.message({
-          sender: { username: global.commons.getOwner() },
-          message,
+          message: {
+            tags: { username: global.commons.getOwner() },
+            message,
+          },
           skip: true,
         });
       });

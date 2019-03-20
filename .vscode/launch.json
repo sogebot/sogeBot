@@ -7,7 +7,7 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Launch via NPM",
+            "name": "without moderation",
             "runtimeExecutable": "npm",
             "runtimeArgs": [
                 "run-script",
@@ -18,6 +18,29 @@
             "env": {
                 "NODE_ENV": "development",
                 "DISABLE":"moderation"
+            },
+            "preLaunchTask": "npm: build",
+            "outputCapture": "std",
+            "skipFiles": [
+                "${workspaceFolder}/node_modules/**/*.js",
+                "<node_internals>/**/*.js"
+            ],
+            "sourceMaps": true,
+            "port": 9229
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "WITH moderation",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": [
+                "run-script",
+                "debug",
+                "start-no-migration"
+            ],
+            "console": "internalConsole",
+            "env": {
+                "NODE_ENV": "development",
             },
             "preLaunchTask": "npm: build",
             "outputCapture": "std",

@@ -145,6 +145,7 @@ class Moderation extends System {
       }
 
       if (announceTimeouts && !silent) {
+        global.tmi.delete('bot', sender.id)
         global.commons.sendMessage('$sender, ' + warning, sender)
       }
     }
