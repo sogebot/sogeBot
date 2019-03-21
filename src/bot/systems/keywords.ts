@@ -1,148 +1,144 @@
-import * as _ from 'lodash';
-import XRegExp from 'xregexp';
-
-import { permission } from '../permissions';
-import Message from '../message';
-import * as constants from '../constants';
+import { get, isEmpty, isNil } from 'lodash';
+import uuidv4 from 'uuid/v4';
+import Expects from '../expects';
 import { command, default_permission, parser } from '../decorators';
+import { permission } from '../permissions';
 import System from './_interface';
 import { sendMessage, prepare } from '../commons';
 
 /*
- * !keyword                      - gets an info about keyword usage
- * !keyword add [kwd] [response] - add keyword with specified response
- * !keyword edit [kwd] [response] - add keyword with specified response
- * !keyword remove [kwd]         - remove specified keyword
- * !keyword toggle [kwd]         - enable/disable specified keyword
- * !keyword list                 - get keywords list
+ * !keyword                                     - gets an info about keyword usage
+ * !keyword add -k [regexp] -r [response]       - add keyword with specified response
+ * !keyword edit -k [uuid|regexp] -r [response] - edit keyword with specified response
+ * !keyword remove -k [uuid|regexp]             - remove specified keyword
+ * !keyword toggle -k [uuid|regexp]             - enable/disable specified keyword
+ * !keyword list                                - get keywords list
  */
 
 class Keywords extends System {
-  constructor () {
+  constructor() {
     super();
-
     this.addMenu({ category: 'manage', name: 'keywords', id: 'keywords/list' });
-  }
-
-  @command('!keyword edit')
-  @default_permission(permission.CASTERS)
-  async edit (opts) {
-    const match = (XRegExp.exec(opts.parameters, constants.KEYWORD_REGEXP)) as unknown as { [x: string]: string } | null;
-
-    if (_.isNil(match)) {
-      let message = await prepare('keywords.keyword-parse-failed');
-      sendMessage(message, opts.sender, opts.attr);
-      return false;
-    }
-
-    let item = await global.db.engine.findOne(this.collection.data, { keyword: match.keyword });
-    if (_.isEmpty(item)) {
-      let message = await prepare('keywords.keyword-was-not-found', { keyword: match.keyword });
-      sendMessage(message, opts.sender, opts.attr);
-      return false;
-    }
-
-    await global.db.engine.update(this.collection.data, { keyword: match.keyword }, { response: match.response });
-    let message = await prepare('keywords.keyword-was-edited', { keyword: match.keyword, response: match.response });
-    sendMessage(message, opts.sender, opts.attr);
   }
 
   @command('!keyword')
   @default_permission(permission.CASTERS)
-  main (opts) {
-    sendMessage(global.translate('core.usage') + ': !keyword add <keyword> <response> | !keyword edit <keyword> <response> | !keyword remove <keyword> | !keyword list', opts.sender, opts.attr);
+  public main(opts) {
+    let url = 'http://sogehige.github.io/sogeBot/#/commands/keywords';
+    if (get(process, 'env.npm_package_version', 'x.y.z-SNAPSHOT').includes('SNAPSHOT')) {
+      url = 'http://sogehige.github.io/sogeBot/#/_master/commands/keywords';
+    }
+    sendMessage(global.translate('core.usage') + ' => ' + url, opts.sender);
   }
+
+  /**
+   * Add new keyword
+   *
+   * format: !keyword add -k [regexp] -r [response]
+   * @param {CommandOptions} opts - options
+   */
 
   @command('!keyword add')
   @default_permission(permission.CASTERS)
-  async add (opts) {
-    const match = XRegExp.exec(opts.parameters, constants.KEYWORD_REGEXP) as unknown as { [x: string]: string } | null;
+  public async add(opts: CommandOptions) {
+    try {
+      const [keywordRegex, response] =
+        new Expects(opts.parameters)
+          .argument({ name: 'k', optional: false, multi: true, delimiter: '' })
+          .argument({ name: 'r', optional: false, multi: true, delimiter: '' })
+          .toArray();
+      const data: Keyword = {
+        id: uuidv4(),
+        keyword: keywordRegex,
+        response,
+        enabled: true,
+      };
+      await global.db.engine.insert(this.collection.data, data);
+      sendMessage(prepare('keywords.keyword-was-added', data), opts.sender);
+    } catch (e) {
+      sendMessage(prepare('keywords.keyword-parse-failed'), opts.sender);
+    }
+  }
+/*
+  async edit(opts) {
+    const match = XRegExp.exec(opts.parameters, constants.KEYWORD_REGEXP)
 
-    if (_.isNil(match)) {
-      let message = await prepare('keywords.keyword-parse-failed');
-      sendMessage(message, opts.sender, opts.attr);
-      return false;
+    if (isNil(match)) {
+      let message = await prepare('keywords.keyword-parse-failed')
+      sendMessage(message, opts.sender)
+      return false
     }
 
-    if (match.keyword.startsWith('!')) {match.keyword = match.keyword.replace('!', '');}
-    let keyword = { keyword: match.keyword, response: match.response, enabled: true };
-
-    if (!_.isEmpty(await global.db.engine.findOne(this.collection.data, { keyword: match.keyword }))) {
-      let message = await prepare('keywords.keyword-already-exist', { keyword: match.keyword });
-      sendMessage(message, opts.sender, opts.attr);
-      return false;
+    let item = await global.db.engine.findOne(this.collection.data, { keyword: match.keyword })
+    if (isEmpty(item)) {
+      let message = await prepare('keywords.keyword-was-not-found', { keyword: match.keyword })
+      sendMessage(message, opts.sender)
+      return false
     }
 
-    await global.db.engine.update(this.collection.data, { keyword: match.keyword }, keyword);
-    let message = await prepare('keywords.keyword-was-added', { keyword: match.keyword });
-    sendMessage(message, opts.sender, opts.attr);
+    await global.db.engine.update(this.collection.data, { keyword: match.keyword }, { response: match.response })
+    let message = await commons.prepare('keywords.keyword-was-edited', { keyword: match.keyword, response: match.response })
+    commons.sendMessage(message, opts.sender)
   }
 
-  @parser()
-  async run (opts) {
-    let keywords = await global.db.engine.find(this.collection.data);
+  async run(opts) {
+    let keywords = await global.db.engine.find(this.collection.data)
     keywords = _.filter(keywords, function (o) {
-      return opts.message.search(new RegExp('^(?!\\!)(?:^|\\s).*(' + _.escapeRegExp(o.keyword) + ')(?=\\s|$|\\?|\\!|\\.|\\,)', 'gi')) >= 0;
-    });
+      return opts.message.search(new RegExp('^(?!\\!)(?:^|\\s).*(' + _.escapeRegExp(o.keyword) + ')(?=\\s|$|\\?|\\!|\\.|\\,)', 'gi')) >= 0
+    })
     for (let keyword of keywords) {
-      if (!keyword.enabled) {continue;}
-      let message = await new Message(keyword.response).parse({ sender: opts.sender });
-      sendMessage(message, opts.sender, opts.attr);
+      if (!keyword.enabled) continue
+      let message = await new Message(keyword.response).parse({ sender: opts.sender.username })
+      commons.sendMessage(message, opts.sender)
     }
-    return true;
+    return true
   }
 
-  @command('!keyword list')
-  @default_permission(permission.CASTERS)
-  async list (opts) {
-    let keywords = await global.db.engine.find(this.collection.data);
-    var output = (keywords.length === 0 ? global.translate('keywords.list-is-empty') : global.translate('keywords.list-is-not-empty').replace(/\$list/g, _.map(_.orderBy(keywords, 'keyword'), 'keyword').join(', ')));
-    sendMessage(output, opts.sender, opts.attr);
+  async list(opts) {
+    let keywords = await global.db.engine.find(this.collection.data)
+    var output = (keywords.length === 0 ? global.translate('keywords.list-is-empty') : global.translate('keywords.list-is-not-empty').replace(/\$list/g, _.map(_.orderBy(keywords, 'keyword'), 'keyword').join(', ')))
+    commons.sendMessage(output, opts.sender)
   }
 
-  @command('!keyword toggle')
-  @default_permission(permission.CASTERS)
-  async toggle (opts) {
+  async toggle(opts) {
     if (opts.parameters.trim().length === 0) {
-      let message = await prepare('keywords.keyword-parse-failed');
-      sendMessage(message, opts.sender, opts.attr);
-      return false;
+      let message = await commons.prepare('keywords.keyword-parse-failed')
+      commons.sendMessage(message, opts.sender)
+      return false
     }
-    let id = opts.parameters.trim();
+    let id = opts.parameters.trim()
 
-    const keyword = await global.db.engine.findOne(this.collection.data, { keyword: id });
-    if (_.isEmpty(keyword)) {
-      let message = await prepare('keywords.keyword-was-not-found', { keyword: id });
-      sendMessage(message, opts.sender, opts.attr);
-      return;
+    const keyword = await global.db.engine.findOne(this.collection.data, { keyword: id })
+    if (isEmpty(keyword)) {
+      let message = await prepare('keywords.keyword-was-not-found', { keyword: id })
+      sendMessage(message, opts.sender)
+      return
     }
 
-    await global.db.engine.update(this.collection.data, { keyword: id }, { enabled: !keyword.enabled });
+    await global.db.engine.update(this.collection.data, { keyword: id }, { enabled: !keyword.enabled })
 
-    let message = await prepare(!keyword.enabled ? 'keywords.keyword-was-enabled' : 'keywords.keyword-was-disabled', { keyword: keyword.keyword });
-    sendMessage(message, opts.sender, opts.attr);
+    let message = await commons.prepare(!keyword.enabled ? 'keywords.keyword-was-enabled' : 'keywords.keyword-was-disabled', { keyword: keyword.keyword })
+    commons.sendMessage(message, opts.sender)
   }
 
-  @command('!keyword remove')
-  @default_permission(permission.CASTERS)
-  async remove (opts) {
+  async remove(opts) {
     if (opts.parameters.trim().length === 0) {
-      let message = await prepare('keywords.keyword-parse-failed');
-      sendMessage(message, opts.sender, opts.attr);
-      return false;
+      let message = await commons.prepare('keywords.keyword-parse-failed')
+      commons.sendMessage(message, opts.sender)
+      return false
     }
-    let id = opts.parameters.trim();
+    let id = opts.parameters.trim()
 
-    let removed = await global.db.engine.remove(this.collection.data, { keyword: id });
+    let removed = await global.db.engine.remove(this.collection.data, { keyword: id })
     if (!removed) {
-      let message = await prepare('keywords.keyword-was-not-found', { keyword: id });
-      sendMessage(message, opts.sender, opts.attr);
-      return false;
+      let message = await commons.prepare('keywords.keyword-was-not-found', { keyword: id })
+      commons.sendMessage(message, opts.sender)
+      return false
     }
-    let message = await prepare('keywords.keyword-was-removed', { keyword: id });
-    sendMessage(message, opts.sender, opts.attr);
+    let message = await commons.prepare('keywords.keyword-was-removed', { keyword: id })
+    commons.sendMessage(message, opts.sender)
   }
+  */
 }
 
-export default Keywords;
-export { Keywords };
+export default new Keywords();
