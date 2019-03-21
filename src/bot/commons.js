@@ -232,10 +232,21 @@ Commons.prototype.isBroadcaster = function (user) {
 
 Commons.prototype.isModerator = async function (user) {
   try {
-    if (_.isString(user)) user = await global.users.getByName(user)
-    else user = { is: { moderator: typeof user.badges.moderator !== 'undefined' } }
-    return !_.isNil(user.is.moderator) ? user.is.moderator : false
+    if (_.isString(user)) {
+      user = await global.users.getByName(user)
+    }
+
+    if (_.has(user, 'is.moderator')) {
+      // from db
+      return user.is.moderator
+    } else if (_.has(user, 'badges')) {
+      // from message
+      return typeof user.badges.moderator !== 'undefined'
+    } else {
+      return false
+    }
   } catch (e) {
+    global.log.error(e.stack)
     return false
   }
 }
