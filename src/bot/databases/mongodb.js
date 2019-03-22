@@ -31,17 +31,22 @@ class IMongoDB extends Interface {
     this.connect()
   }
 
-  async index (opts) {
-    opts.unique = opts.unique || false
-    if (!opts.index) throw new Error('Missing index option')
-    if (!opts.table) throw new Error('Missing table option')
+  async index (table, opts) {
+    if (!table) throw new Error('Missing table option')
 
     try {
       if (!this.connected) throw new Error('Not connected yet')
       let db = await this.client.db(this.dbName)
-      await db.createCollection(opts.table)
-      await db.collection(opts.table).dropIndexes()
-      await db.collection(opts.table).createIndex(opts.index, { unique: opts.unique })
+      await db.createCollection(table)
+      await db.collection(table).dropIndexes()
+
+      if (!Array.isArray(opts)) opts = [opts]
+      for (const o of opts) {
+        o.unique = o.unique || false
+        if (!o.index) throw new Error('Missing index option')
+        await db.collection(table).createIndex(o.index, { unique: o.unique })
+      }
+
       return
     } catch (e) {
       // indexes will be created when collection is available

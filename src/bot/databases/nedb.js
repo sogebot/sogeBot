@@ -22,13 +22,16 @@ class INeDB extends Interface {
     this.table = {}
   }
 
-  async index (opts) {
-    opts.unique = opts.unique || false
-    if (!opts.index) throw new Error('Missing index option')
-    if (!opts.table) throw new Error('Missing table option')
+  async index (table, opts) {
+    if (!table) throw new Error('Missing table option')
 
-    await this.on(opts.table).removeIndex(opts.index)
-    await this.on(opts.table).ensureIndex({ fieldName: opts.index, unique: opts.unique })
+    await this.on(table).removeIndex()
+    if (!Array.isArray(opts)) opts = [opts]
+    for (const o of opts) {
+      o.unique = o.unique || false
+      if (!o.index) throw new Error('Missing index option')
+      await this.on(table).ensureIndex({ fieldName: o.index, unique: o.unique })
+    }
   }
 
   on (table) {

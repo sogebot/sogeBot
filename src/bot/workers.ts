@@ -215,7 +215,7 @@ class Workers {
               data.items = await global.db.engine.update(data.table, data.where, data.object);
               break;
             case 'index':
-              data.items = await global.db.engine.index(data.opts);
+              data.items = await global.db.engine.index(...data.opts);
               break;
             case 'count':
               data.items = await global.db.engine.count(data.table, data.where, data.object);

@@ -87,12 +87,12 @@ class Interface {
   /**
    * Sets up index of table
    * note: Indexes should be set only at start on master
+   * @param {string} table table for indexing
    * @param {object} opts options for indexing
-   * @param {string} opts.table table for indexing
    * @param {string} opts.index index column
    * @param {boolean} opts.unique index should be unique
    */
-  async index (opts) {
+  async index (table, opts) {
     throw Error('function index() is not implemented in ' + this.constructor.name)
   }
 
