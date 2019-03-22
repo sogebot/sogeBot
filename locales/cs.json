@@ -866,11 +866,12 @@
     "response": "$command#$index ($permission) $after| $response"
   },
   "keywords": {
-    "keywords-parse-failed": "{core.command-parse} !commands",
+    "keyword-parse-failed": "{core.command-parse} !keyword",
+    "keyword-is-ambiguous": "$sender, keyword $keyword není jednoznačný, použijte ID klíčového slova",
     "keyword-was-not-found": "$sender, keyword $keyword nebyl nalezen",
     "keyword-was-edited": "$sender, keyword $keyword is changed to '$response'",
     "keyword-was-added": "$sender, keyword $keyword ($id) byl pridan",
-    "list-is-not-empty": "$sender, seznam prikazu: $list",
+    "list-is-not-empty": "$sender, seznam klíčových slov:",
     "list-is-empty": "$sender, seznam prikazu je prazdny",
     "keyword-was-enabled": "$sender, keyword $keyword byl zapnut",
     "keyword-was-disabled": "$sender, keyword $keyword byl vypnut",
