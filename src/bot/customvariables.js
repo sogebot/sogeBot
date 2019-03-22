@@ -21,7 +21,7 @@ class CustomVariables {
     if (isMainThread) {
       this.addMenuAndListenersToPanel()
       this.checkIfCacheOrRefresh()
-      global.db.engine.index({ table: 'custom.variables.history', index: 'cvarId' })
+      global.db.engine.index('custom.variables.history', [{ index: 'cvarId' }])
     }
   }
 

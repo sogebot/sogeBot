@@ -25,8 +25,8 @@ class Goals extends Overlay {
     this.addMenu({ category: 'registry', name: 'goals', id: '/registry/goals/list' });
 
     if (isMainThread) {
-      global.db.engine.index({ table: this.collection.groups, index: 'uid', unique: true });
-      global.db.engine.index({ table: this.collection.goals, index: 'uid', unique: true });
+      global.db.engine.index(this.collection.groups, { index: 'uid', unique: true });
+      global.db.engine.index(this.collection.goals, { index: 'uid', unique: true });
     }
   }
 

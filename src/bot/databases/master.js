@@ -132,9 +132,9 @@ class IMasterController extends Interface {
     })
   }
 
-  async index (opts) {
+  async index (table, opts) {
     const id = crypto.randomBytes(64).toString('hex')
-    const data = { type: 'db', fnc: 'index', opts, id }
+    const data = { type: 'db', fnc: 'index', opts: [table, opts], id }
 
     return new Promise((resolve, reject) => {
       this.sendRequest(resolve, reject, id, data)

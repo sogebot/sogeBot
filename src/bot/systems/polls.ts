@@ -54,8 +54,8 @@ class Polls extends System {
     this.lastTimeRemind = 0;
 
     if (isMainThread) {
-      global.db.engine.index({ table: this.collection.votes, index: 'vid' });
-      global.db.engine.index({ table: this.collection.data, index: 'openedAt' });
+      global.db.engine.index(this.collection.votes, { index: 'vid' });
+      global.db.engine.index(this.collection.data, { index: 'openedAt' });
 
       setInterval(() => this.reminder(), 1000);
     }
