@@ -1,14 +1,11 @@
 import axios from 'axios';
-import * as crypto from 'crypto';
 import * as _ from 'lodash';
 import * as moment from 'moment';
 import safeEval from 'safe-eval';
 import { setTimeout } from 'timers'; // tslint workaround
 import { isMainThread } from 'worker_threads';
-import {
-  isModerator, isSubscriber, isVIP, isBroadcaster, isBot, isOwner, prepare, sendMessage, getOwner, flatten, getLocalizedName
-} from './commons';
 import Core from './_interface';
+import { flatten, getOwner, isBot, isBroadcaster, isModerator, isOwner, isSubscriber, isVIP, prepare, sendMessage } from './commons';
 import Message from './message';
 
 class Events extends Core {
@@ -100,7 +97,7 @@ class Events extends Core {
         broadcaster: isBroadcaster(attributes.username),
         bot: isBot(attributes.username),
         owner: isOwner(attributes.username),
-      }
+      };
     }
     if (!_.isNil(_.get(attributes, 'recipient', null))) {
       // add is object
@@ -111,7 +108,7 @@ class Events extends Core {
         broadcaster: isBroadcaster(attributes.recipient),
         bot: isBot(attributes.recipient),
         owner: isOwner(attributes.recipient),
-      }
+      };
     }
     if (_.get(attributes, 'reset', false)) { return this.reset(eventId); }
 
@@ -126,7 +123,12 @@ class Events extends Core {
 
       for (const operation of (await global.db.engine.find('events.operations', { eventIdDb }))) {
         const isOperationSupported = !_.isNil(_.find(this.supportedOperationsList, (o) => o.id === operation.key));
-        if (isOperationSupported) { _.find(this.supportedOperationsList, (o) => o.id === operation.key).fire(operation.definitions, attributes); }
+        if (isOperationSupported) {
+          const foundOp = this.supportedOperationsList.find((o) =>  o.id === operation.key);
+          if (foundOp) {
+            foundOp.fire(operation.definitions, attributes);
+          }
+        }
       }
     }
   }
@@ -267,7 +269,7 @@ class Events extends Core {
 
     // check if value is number
     const cvFromDb = await global.db.engine.findOne('customvars', { key: customVariableName });
-    let value = null;
+    let value = 0;
     if (_.isEmpty(cvFromDb)) {
       await global.db.engine.insert('customvars', { key: customVariableName, value: numberToIncrement });
     } else {
@@ -288,7 +290,7 @@ class Events extends Core {
 
     // check if value is number
     const cvFromDb = await global.db.engine.findOne('customvars', { key: customVariableName });
-    let value = null;
+    let value = 0;
     if (_.isEmpty(cvFromDb)) {
       await global.db.engine.insert('customvars', { key: customVariableName, value: numberToDecrement });
     } else {
@@ -332,8 +334,8 @@ class Events extends Core {
   public async checkStreamIsRunningXMinutes(event, attributes) {
     const when = await global.cache.when();
     event.triggered.runAfterXMinutes = _.get(event, 'triggered.runAfterXMinutes', 0);
-    const shouldTrigger = event.triggered.runAfterXMinutes === 0 &&
-                        moment().format('X') - moment(when.online).format('X') > event.definitions.runAfterXMinutes * 60;
+    const shouldTrigger = event.triggered.runAfterXMinutes === 0
+                          && Number(moment().format('X')) - Number(moment(when.online).format('X')) > event.definitions.runAfterXMinutes * 60;
     if (shouldTrigger) {
       event.triggered.runAfterXMinutes = event.definitions.runAfterXMinutes;
       await global.db.engine.update('events', { _id: event._id.toString() }, event);
@@ -419,10 +421,11 @@ class Events extends Core {
   }
 
   public async checkDefinition(event, attributes) {
-    const check = (_.find(this.supportedEventsList, (o) => o.id === event.key)).check;
-    if (_.isNil(check)) { return true; }
-
-    return check(event, attributes);
+    const foundEvent = this.supportedEventsList.find((o) => o.id === event.key);
+    if (!foundEvent || !foundEvent.check) {
+      return true;
+    }
+    return foundEvent.check(event, attributes);
   }
 
   public async checkFilter(eventId, attributes) {
@@ -432,7 +435,15 @@ class Events extends Core {
     const context = {
       _,
       $username: _.get(attributes, 'username', null),
-      $userObject: _.get(attributes, 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', null),
+      $is: {
+        moderator: _.get(attributes, 'is.moderator', false),
+        subscriber: _.get(attributes, 'is.subscriber', false),
+        vip: _.get(attributes, 'is.vip', false),
+        follower: _.get(attributes, 'is.follower', false),
+        broadcaster: _.get(attributes, 'is.broadcaster', false),
+        bot: _.get(attributes, 'is.bot', false),
+        owner: _.get(attributes, 'is.owner', false),
+      },
       $method: _.get(attributes, 'method', null),
       $months: _.get(attributes, 'months', null),
       $monthsName: _.get(attributes, 'monthsName', null),
@@ -462,7 +473,7 @@ class Events extends Core {
     delete context._;
     return !!result; // force boolean
   }
-
+/*
   public sockets() {
     const io = global.panel.io.of('/events');
 
@@ -567,7 +578,7 @@ class Events extends Core {
         const generateUsername = () => {
           const adject = ['Encouraging', 'Plucky', 'Glamorous', 'Endearing', 'Fast', 'Agitated', 'Mushy', 'Muddy', 'Sarcastic', 'Real', 'Boring'];
           const subject = ['Sloth', 'Beef', 'Fail', 'Fish', 'Fast', 'Raccoon', 'Dog', 'Man', 'Pepperonis', 'RuleFive', 'Slug', 'Cat', 'SogeBot'];
-          return _.sample(adject) + _.sample(subject);
+          return _.sample(adject) || adject[0] + _.sample(subject) || subject[0];
         };
 
         const username = _.sample(['short', 'someFreakingLongUsername', generateUsername()]);
@@ -610,17 +621,28 @@ class Events extends Core {
           currency: _.sample(['CZK', 'USD', 'EUR']),
         };
         for (const operation of (await global.db.engine.find('events.operations', { eventId }))) {
-          if (!_.isNil(attributes.userObject)) {
-            // flatten userObject
-            const userObject = attributes.userObject;
-            _.merge(attributes, flatten({ userObject }));
+          if (!_.isNil(attributes.is)) {
+            // flatten is
+            const is = attributes.is;
+            _.merge(attributes, global.commons.flatten({ is }));
+          }
+          if (!_.isNil(attributes.recipientis)) {
+            // flatten recipientis
+            const recipientis = attributes.recipientis;
+            _.merge(attributes, global.commons.flatten({ recipientis }));
           }
           const isOperationSupported = !_.isNil(_.find(this.supportedOperationsList, (o) => o.id === operation.key));
-          if (isOperationSupported) { _.find(this.supportedOperationsList, (o) => o.id === operation.key).fire(operation.definitions, attributes); }
+          if (isOperationSupported) {
+            const foundOp = this.supportedOperationsList.find((o) =>  o.id === operation.key);
+            if (foundOp) {
+              foundOp.fire(operation.definitions, attributes);
+            }
+          }
         }
       });
     });
   }
+*/
 
   protected async fadeOut() {
     try {
