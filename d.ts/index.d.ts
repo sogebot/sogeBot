@@ -5,6 +5,19 @@ declare module "*.vue" {
 
 declare namespace NodeJS {
   export interface Global {
+    overlays: {
+      alerts: import("../src/bot/overlays/alerts").Alerts,
+      bets: import("../src/bot/overlays/bets").Bets,
+      goals: import("../src/bot/overlays/goals").Goals,
+      polls: import("../src/bot/overlays/polls").Polls,
+      [x: string]: any, // remove after all overlays are ported to TS
+    },
+    integrations: {
+      twitter: import("../src/bot/integrations/twitter").Twitter,
+      [x: string]: any, // remove after all integrations are ported to TS
+    },
+    cache: any,
+    client: any,
     api: any,
     mocha: boolean,
     configuration: any,
@@ -16,23 +29,31 @@ declare namespace NodeJS {
     log: any,
     currency: any,
     panel: any,
-    systems: any,
+    systems: {
+      bets: import("../src/bot/systems/bets").Bets,
+      polls: import("../src/bot/systems/polls").Polls,
+      scrim: import("../src/bot/systems/scrim").Scrim,
+      top: import("../src/bot/systems/top").Top,
+      userinfo: import("../src/bot/systems/userinfo").UserInfo,
+      [x: string]: any, // remove after all systems are ported to TS
+    },
     users: any,
     lib: any,
     workers: import("../src/bot/workers").Workers,
     permissions: import("../src/bot/permissions").Permissions,
     customvariables: any,
     tmi: any,
-    integrations: any,
     events: any,
     widgets: any,
     oauth: {
+      channelId: string,
       settings: {
         broadcaster: {
           username: string,
         },
         bot: {
           username: string,
+          accessToken: string,
         },
         general: {
           owners: string[],

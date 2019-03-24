@@ -65,4 +65,5 @@ class Polls extends Overlay {
   }
 }
 
-module.exports = new Polls();
+export default Polls;
+export { Polls };

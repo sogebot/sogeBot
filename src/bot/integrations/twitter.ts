@@ -211,4 +211,5 @@ class Twitter extends Integration {
   }
 }
 
-module.exports = new Twitter();
+export default Twitter;
+export { Twitter };

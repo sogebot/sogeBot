@@ -224,4 +224,5 @@ class Top extends System {
   }
 }
 
-module.exports = new Top();
+export default Top;
+export { Top };
