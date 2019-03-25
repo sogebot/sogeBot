@@ -79,19 +79,18 @@ class Twitter extends Integration {
     }
   }
 
-  public async fireSendTwitterMessage(operation: Events.OperationDefinitions, attributes: Events.Attributes): Promise<boolean> {
+  public async fireSendTwitterMessage(operation: Events.OperationDefinitions, attributes: Events.Attributes): Promise<void> {
     attributes.username = _.get(attributes, 'username', getOwner());
     let message = String(operation.messageToSend);
     for (const [val, name] of Object.entries(attributes)) {
       if (_.isObject(val) && _.size(val) === 0) {
-        return true; // skip empty object
+        return; // skip empty object
       }
       const replace = new RegExp(`\\$${name}`, 'g');
       message = message.replace(replace, val);
     }
     message = await new Message(message).parse();
     global.integrations.twitter.send(message);
-    return true;
   }
 
   public send(text: string): void {

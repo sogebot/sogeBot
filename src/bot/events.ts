@@ -23,7 +23,7 @@ class Events extends Core {
     definitions?: {
       [x: string]: any;
     },
-    fire: (operation: any, attributes: any) => Promise<void>,
+    fire: (operation: Events.OperationDefinitions, attributes: Events.Attributes) => Promise<void>,
   }>;
 
   constructor() {

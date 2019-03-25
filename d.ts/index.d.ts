@@ -43,7 +43,7 @@ declare namespace NodeJS {
     permissions: import("../src/bot/permissions").Permissions,
     customvariables: any,
     tmi: any,
-    events: any,
+    events: import("../src/bot/events").Events,
     widgets: any,
     oauth: {
       channelId: string,
