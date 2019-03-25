@@ -605,7 +605,7 @@ class TMI extends Core {
     }
 
     const isModerated = await parse.isModerated()
-    const isIgnored = await isIgnored(sender)
+    const isIgnored = await commons.isIgnored(sender)
     if (!isModerated && !isIgnored) {
       if (!skip && !_.isNil(sender.username)) {
         let user = await global.db.engine.findOne('users', { id: sender.userId })

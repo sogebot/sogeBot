@@ -5,7 +5,6 @@ const _ = require('lodash')
 
 // bot libraries
 const Parser = require('../parser')
-const commons = require('../commons')
 const Message = require('../message')
 import { prepare, sendMessage } from '../commons';
 import Expects from '../expects';
