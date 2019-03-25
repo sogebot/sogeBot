@@ -188,7 +188,9 @@ export async function message(type, username, messageToSend, retry = true) {
 /* TODO: move to tmi */
 export async function timeout(username, reason, timeMs) {
   if (isMainThread) {
-    reason = reason.replace(/\$sender/g, username);
+    if (reason) {
+      reason = reason.replace(/\$sender/g, username);
+    }
     global.tmi.client.bot.chat.timeout(global.oauth.settings.general.channel, username, timeMs, reason);
   } else { global.workers.sendToMaster({ type: 'timeout', username, timeout: timeMs, reason }); }
 }

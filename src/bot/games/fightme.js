@@ -6,7 +6,7 @@ const _ = require('lodash')
 // bot libraries
 import Game from './_interface'
 const {
-  prepare, sendMessage, isModerator, isBroadcaster, getLocalizedName
+  prepare, sendMessage, isModerator, isBroadcaster, getLocalizedName, timeout
 } = require('../commons');
 
 /*
