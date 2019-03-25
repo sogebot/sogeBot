@@ -7,6 +7,7 @@ const _ = require('lodash')
 const Parser = require('../parser')
 const commons = require('../commons')
 const Message = require('../message')
+import { getOwner, prepare, sendMessage } from '../commons';
 import Expects from '../expects';
 import System from './_interface'
 import { permission } from '../permissions';

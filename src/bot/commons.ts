@@ -84,9 +84,11 @@ export function isIgnored(sender) {
 export async function prepare(translate, attr = {}): Promise<string> {
   attr = attr || {};
   let msg = global.translate(translate);
-  attr = _(attr).toPairs().sortBy((o) => -o[0].length).fromPairs().value(); // reorder attributes by key length
-  for (let [key, value] of Object.entries(attr)) {
-    if (_.includes(['username', 'who', 'winner', 'sender', 'loser'], key)) { value = global.tmi.settings.chat.showWithAt ? `@${value}` : value; }
+  for (const key of Object.keys(attr).sort((a, b) => a.length - b.length)) {
+    let value = attr[key];
+    if (['username', 'who', 'winner', 'sender', 'loser'].includes(key)) {
+      value = global.tmi.settings.chat.showWithAt ? `@${value}` : value;
+    }
     msg = msg.replace(new RegExp('[$]' + key, 'g'), value);
   }
   return msg;
