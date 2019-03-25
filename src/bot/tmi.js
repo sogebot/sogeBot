@@ -61,7 +61,7 @@ class TMI extends Core {
         ]
       )];
       // update ignore list
-      sendMessage(prepare('ignore.user.is.added', { username }), opts.sender)
+      commons.sendMessage(commons.prepare('ignore.user.is.added', { username }), opts.sender)
     } catch (e) {
       global.log.error(e.message)
     }
@@ -72,7 +72,7 @@ class TMI extends Core {
       const username = new Expects(opts.parameters).username().toArray()[0].toLowerCase()
       global.tmi.settings.chat.ignorelist = global.tmi.settings.chat.ignorelist.filter(o => o !== username)
       // update ignore list
-      sendMessage(prepare('ignore.user.is.removed', { username }), opts.sender)
+      commons.sendMessage(commons.prepare('ignore.user.is.removed', { username }), opts.sender)
     } catch (e) {
       global.log.error(e.message)
     }
@@ -82,7 +82,7 @@ class TMI extends Core {
     try {
       const username = new Expects(opts.parameters).username().toArray()[0].toLowerCase()
       const isUserIgnored = await commons.isIgnored(username)
-      sendMessage(prepare(isUserIgnored ? 'ignore.user.is.ignored' : 'ignore.user.is.not.ignored', { username }), opts.sender)
+      commons.sendMessage(commons.prepare(isUserIgnored ? 'ignore.user.is.ignored' : 'ignore.user.is.not.ignored', { username }), opts.sender)
       return isUserIgnored
     } catch (e) {}
   }

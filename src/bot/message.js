@@ -7,7 +7,6 @@ const _ = require('lodash')
 const crypto = require('crypto')
 const commons = require('./commons')
 const gitCommitInfo = require('git-commit-info');
-
 const Entities = require('html-entities').AllHtmlEntities
 
 class Message {
