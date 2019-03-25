@@ -6,7 +6,7 @@ const db = require('../../general.js').db
 const message = require('../../general.js').message
 const variable = require('../../general.js').variable
 
-const { flatten, unflatten } = require('../../dest/commons');
+const { flatten, unflatten } = require('../../../dest/commons');
 
 const assert = require('assert');
 
