@@ -10,7 +10,6 @@ declare namespace NodeJS {
     configuration: any,
     cpu: any,
     db: any,
-    commons: any,
     general: any,
     bot: any,
     translate: any,
