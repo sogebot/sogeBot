@@ -145,7 +145,7 @@ class Scrim extends System {
           sendMessage(
             prepare('systems.scrim.countdown', {
               type: this.settings._.type,
-              time: secondsToGo === 60 ? 1 : secondsToGo,
+              time: String(secondsToGo === 60 ? 1 : secondsToGo),
               unit: secondsToGo === 60 ? getLocalizedName(1, 'core.minutes') : getLocalizedName(secondsToGo, 'core.seconds'),
             }),
             { username: getOwner() },

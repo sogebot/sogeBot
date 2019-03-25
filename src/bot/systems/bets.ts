@@ -129,7 +129,7 @@ class Bets extends System {
       sendMessage(await prepare('bets.opened', {
         username: getOwner(),
         title,
-        maxIndex: options.length - 1,
+        maxIndex: String(options.length - 1),
         minutes: timeout,
         options: options.map((v, i) => `${i}. '${v}'`).join(', '),
         command: this.getCommand('!bet'),
@@ -143,7 +143,7 @@ class Bets extends System {
           sendMessage(
             prepare('bets.running', {
               command: this.getCommand('!bet'),
-              maxIndex: currentBet.options.length - 1,
+              maxIndex: String(currentBet.options.length - 1),
               options: currentBet.options.map((v, i) => `${i}. '${v.name}'`).join(', '),
             }), opts.sender);
           break;
@@ -160,7 +160,7 @@ class Bets extends System {
       sendMessage(await prepare(currentBet.locked ? 'bets.lockedInfo' : 'bets.info', {
         command: opts.command,
         title: currentBet.title,
-        maxIndex: currentBet.options.length - 1,
+        maxIndex: String(currentBet.options.length - 1),
         options: currentBet.options.map((v, i) => `${i}. '${v.name}'`).join(', '),
         minutes: Number((currentBet.end - new Date().getTime()) / 1000 / 60).toFixed(1) }), opts.sender);
     }
