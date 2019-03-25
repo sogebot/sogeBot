@@ -46,7 +46,7 @@ class Polls extends Overlay {
   public sockets() {
     global.panel.io.of('/overlays/polls').on('connection', (socket) => {
       socket.on('getVoteCommand', async (cb) => {
-        cb(global.systems.polls.settings.commands['!vote']);
+        cb(this.getCommand['!vote']);
       });
       socket.on('data', async (callback) => {
         const currentVote: Poll = await global.db.engine.findOne(global.systems.polls.collection.data, { isOpened: true });

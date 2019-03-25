@@ -6,6 +6,7 @@ const config = require('../config.json')
 const compareVersions = require('compare-versions')
 const XRegExp = require('xregexp')
 const fs = require('fs')
+const uuidv4 = require('uuid/v4')
 
 // logger
 const Logger = require('../dest/logging')
@@ -109,6 +110,48 @@ let updates = async (from, to) => {
 }
 
 let migration = {
+  events: [{
+    version: '9.0.0',
+    do: async () => {
+      let processed = 0
+
+      console.info('Redoing event ids to uuid/v4')
+      const mappings = {};
+      const events = await global.db.engine.find('events');
+      for (const e of events) {
+        const id = uuidv4();
+        mappings[String(e._id)] = id;
+        await global.db.engine.update('events', { _id: String(e._id) }, { id })
+        processed++;
+        console.info(` -> event ${String(e._id)} => ${id}`)
+      }
+
+      const ops = await global.db.engine.find('events.operations');
+      for (const o of ops) {
+        if (!mappings[String(o.eventId)]) {
+          await global.db.engine.remove('events.operations', { _id: String(o._id) })
+          console.info(` -> operation ${String(o._id)} removed`)
+        } else {
+          await global.db.engine.update('events.operations', { _id: String(ops._id) }, { eventId: mappings[String(o.eventId)] })
+          console.info(` -> operation ${String(o.eventId)} => ${mappings[String(o.eventId)]}`)
+        }
+        processed++;
+      }
+
+      const filters = await global.db.engine.find('events.filters');
+      for (const f of filters) {
+        if (!mappings[String(f.eventId)]) {
+          await global.db.engine.remove('events.filters', { _id: String(f._id) })
+          console.info(` -> filter ${String(f._id)} removed`)
+        } else {
+          await global.db.engine.update('events.filters', { _id: String(f._id) }, { eventId: mappings[String(f.eventId)] })
+          console.info(` -> filter ${String(f.eventId)} => ${mappings[String(f.eventId)]}`)
+        }
+        processed++;
+      }
+      console.info(` => ${processed} processed`)
+    }
+  }],
   settings: [{
     version: '9.0.0',
     do: async () => {

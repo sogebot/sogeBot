@@ -76,7 +76,7 @@ class Events extends Core {
     ];
 
     if (isMainThread) {
-      this.addMenu({ category: 'manage', name: 'event-listeners', id: '/manage/events' });
+      this.addMenu({ category: 'manage', name: 'event-listeners', id: '/manage/events/list' });
       this.fadeOut();
     }
   }
@@ -114,14 +114,14 @@ class Events extends Core {
 
     const events = await global.db.engine.find('events', { key: eventId, enabled: true });
     for (const event of events) {
-      const eventIdDb = event._id.toString();
+      const id = event.id;
       const [shouldRunByFilter, shouldRunByDefinition] = await Promise.all([
-        this.checkFilter(eventIdDb, attributes),
+        this.checkFilter(id, attributes),
         this.checkDefinition(_.clone(event), attributes),
       ]);
       if ((!shouldRunByFilter || !shouldRunByDefinition)) { continue; }
 
-      for (const operation of (await global.db.engine.find('events.operations', { eventIdDb }))) {
+      for (const operation of (await global.db.engine.find('events.operations', { eventId: id }))) {
         const isOperationSupported = !_.isNil(_.find(this.supportedOperationsList, (o) => o.id === operation.key));
         if (isOperationSupported) {
           const foundOp = this.supportedOperationsList.find((o) =>  o.id === operation.key);
