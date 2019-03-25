@@ -30,7 +30,7 @@ describe('systems/moderation - permitLink()', () => {
     describe('parsing \'!permit [username] 1000\'', function () {
       it('should send success message', async function () {
         global.systems.moderation.permitLink({ sender: owner, parameters: 'test 1000' })
-        await message.isSent('moderation.user-have-link-permit', owner, { username: 'test', count: 1000, link: commons..getLocalizedName(1000, 'core.links') })
+        await message.isSent('moderation.user-have-link-permit', owner, { username: 'test', count: 1000, link: commons.getLocalizedName(1000, 'core.links') })
       })
       it('should not timeout user 1000 messages', async () => {
         for (let i = 0; i < 1000; i++) {
