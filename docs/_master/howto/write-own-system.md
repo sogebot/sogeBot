@@ -29,7 +29,7 @@ class Yoursystem extends System {
   }
 }
 
-module.exports = new Yoursystem()
+export default YourSystem;
 ```
 
 ### Depends on different system
@@ -45,13 +45,15 @@ const options: InterfaceSettings = {
 ```
 
 ### Settings variable
+
 Settings variable may contain settings for `yoursystem`
 
 #### Commands
 
 ##### Required values
 
- `name`: name of command started with `!`, this is how you will trigger command, e.g. `!command`, `!command help`
+ `name`: name of command started with `!`, this is how you will trigger command,
+ e.g. `!command`, `!command help`
 
 ##### Default values
 
@@ -214,6 +216,8 @@ Bot is supporting custom locales (by default **english** and **čeština** are s
 To create new locale file add **json** file into `/locales/<lang>` folder.
 
 ``` javascript
+import { prepare } from '../commons';
+
 function someCommandFunctionExample(opts) {
   // given we have defined path.to.your.locale with value
   // Lorem Ipsum $dolor sit amet
@@ -223,7 +227,7 @@ function someCommandFunctionExample(opts) {
   // => Lorem Ipsum $dolor sit amet
 
   // locale translation with attributes
-  const translation = global.commons.prepare('path.to.your.locale', {
+  const translation = prepare('path.to.your.locale', {
     dolor: 'something'
   })
   // => Lorem Ipsum something sit amet

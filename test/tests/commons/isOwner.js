@@ -6,6 +6,8 @@ const db = require('../../general.js').db
 const message = require('../../general.js').message
 const variable = require('../../general.js').variable
 
+const { isOwner } = require('../../../dest/commons');
+
 const assert = require('chai').assert
 
 const owner = { username: 'soge__' }
@@ -21,10 +23,10 @@ describe('lib/commons - isOwner()', () => {
   })
 
   it('should be returned as owner', async () => {
-    assert.isTrue(await global.commons.isOwner(owner))
+    assert.isTrue(isOwner(owner))
   })
 
   it('should not be returned as owner', async () => {
-    assert.isFalse(await global.commons.isOwner(notOwner))
+    assert.isFalse(isOwner(notOwner))
   })
 })

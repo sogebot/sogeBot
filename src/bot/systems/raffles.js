@@ -8,6 +8,7 @@ const {
 // bot libraries
 import { permission } from '../permissions';
 import System from './_interface'
+const commons = require('../commons');
 
 const TYPE_NORMAL = 0
 const TYPE_TICKETS = 1
@@ -57,7 +58,7 @@ class Raffles extends System {
         this.pick()
       })
       socket.on('open', async (message) => {
-        this.open({ username: global.commons.getOwner(), parameters: message })
+        this.open({ username: commons.getOwner(), parameters: message })
       })
       socket.on('close', async () => {
         global.db.engine.remove(this.collection.data, {})
@@ -104,17 +105,17 @@ class Raffles extends System {
     if (raffle.type === TYPE_TICKETS) locale = 'raffles.announce-ticket-raffle'
 
     let eligibility = []
-    if (raffle.followers === true) eligibility.push(await global.commons.prepare('raffles.eligibility-followers-item'))
-    if (raffle.subscribers === true) eligibility.push(await global.commons.prepare('raffles.eligibility-subscribers-item'))
-    if (_.isEmpty(eligibility)) eligibility.push(await global.commons.prepare('raffles.eligibility-everyone-item'))
+    if (raffle.followers === true) eligibility.push(await commons.prepare('raffles.eligibility-followers-item'))
+    if (raffle.subscribers === true) eligibility.push(await commons.prepare('raffles.eligibility-subscribers-item'))
+    if (_.isEmpty(eligibility)) eligibility.push(await commons.prepare('raffles.eligibility-everyone-item'))
 
-    let message = await global.commons.prepare(locale, {
+    let message = await commons.prepare(locale, {
       keyword: raffle.keyword,
       min: raffle.min,
       max: raffle.max,
       eligibility: eligibility.join(', ')
     })
-    global.commons.sendMessage(message, global.commons.getOwner())
+    commons.sendMessage(message, commons.getOwner())
 
     this.timeouts['raffleAnnounce'] = setTimeout(() => this.announce(), 60000)
   }
@@ -150,8 +151,8 @@ class Raffles extends System {
 
     let keyword = opts.parameters.match(/(![\S]+)/)
     if (_.isNil(keyword)) {
-      let message = await global.commons.prepare('raffles.cannot-create-raffle-without-keyword')
-      global.commons.sendMessage(message, opts.sender)
+      let message = await commons.prepare('raffles.cannot-create-raffle-without-keyword')
+      commons.sendMessage(message, opts.sender)
       return
     }
     keyword = keyword[1]
@@ -159,8 +160,8 @@ class Raffles extends System {
     // check if raffle running
     let raffle = await global.db.engine.findOne(this.collection.data, { winner: null })
     if (!_.isEmpty(raffle)) {
-      let message = await global.commons.prepare('raffles.raffle-is-already-running', { keyword: raffle.keyword })
-      global.commons.sendMessage(message, opts.sender)
+      let message = await commons.prepare('raffles.raffle-is-already-running', { keyword: raffle.keyword })
+      commons.sendMessage(message, opts.sender)
       return
     }
 
@@ -179,17 +180,17 @@ class Raffles extends System {
     ])
 
     let eligibility = []
-    if (followers) eligibility.push(await global.commons.prepare('raffles.eligibility-followers-item'))
-    if (subscribers) eligibility.push(await global.commons.prepare('raffles.eligibility-subscribers-item'))
-    if (_.isEmpty(eligibility)) eligibility.push(await global.commons.prepare('raffles.eligibility-everyone-item'))
+    if (followers) eligibility.push(await commons.prepare('raffles.eligibility-followers-item'))
+    if (subscribers) eligibility.push(await commons.prepare('raffles.eligibility-subscribers-item'))
+    if (_.isEmpty(eligibility)) eligibility.push(await commons.prepare('raffles.eligibility-everyone-item'))
 
-    let message = await global.commons.prepare(type === TYPE_NORMAL ? 'raffles.announce-raffle' : 'raffles.announce-ticket-raffle', {
+    let message = await commons.prepare(type === TYPE_NORMAL ? 'raffles.announce-raffle' : 'raffles.announce-ticket-raffle', {
       keyword: keyword,
       eligibility: eligibility.join(', '),
       min: minTickets,
       max: maxTickets
     })
-    global.commons.sendMessage(message, global.commons.getOwner())
+    commons.sendMessage(message, commons.getOwner())
 
     this.lastAnnounce = _.now()
   }
@@ -198,8 +199,8 @@ class Raffles extends System {
     let raffle = await global.db.engine.findOne(this.collection.data, { winner: null })
 
     if (_.isEmpty(raffle)) {
-      let message = await global.commons.prepare('raffles.no-raffle-is-currently-running')
-      global.commons.sendMessage(message, opts.sender)
+      let message = await commons.prepare('raffles.no-raffle-is-currently-running')
+      commons.sendMessage(message, opts.sender)
       return
     }
 
@@ -207,17 +208,17 @@ class Raffles extends System {
     if (raffle.type === TYPE_TICKETS) locale = 'raffles.announce-ticket-raffle'
 
     let eligibility = []
-    if (raffle.followers === true) eligibility.push(await global.commons.prepare('raffles.eligibility-followers-item'))
-    if (raffle.subscribers === true) eligibility.push(await global.commons.prepare('raffles.eligibility-subscribers-item'))
-    if (_.isEmpty(eligibility)) eligibility.push(await global.commons.prepare('raffles.eligibility-everyone-item'))
+    if (raffle.followers === true) eligibility.push(await commons.prepare('raffles.eligibility-followers-item'))
+    if (raffle.subscribers === true) eligibility.push(await commons.prepare('raffles.eligibility-subscribers-item'))
+    if (_.isEmpty(eligibility)) eligibility.push(await commons.prepare('raffles.eligibility-everyone-item'))
 
-    let message = await global.commons.prepare(locale, {
+    let message = await commons.prepare(locale, {
       keyword: raffle.keyword,
       min: raffle.min,
       max: raffle.max,
       eligibility: eligibility.join(', ')
     })
-    global.commons.sendMessage(message, global.commons.getOwner())
+    commons.sendMessage(message, commons.getOwner())
   }
 
   async participate (opts) {
@@ -233,8 +234,8 @@ class Raffles extends System {
     let tickets = opts.message.trim() === 'all' && !_.isNil(await global.systems.points.getPointsOf(opts.sender.userId)) ? await global.systems.points.getPointsOf(opts.sender.userId) : parseInt(opts.message.trim(), 10)
 
     if (_.isEmpty(raffle)) { // shouldn't happen, but just to be sure (user can join when closing raffle)
-      let message = await global.commons.prepare('no-raffle-is-currently-running')
-      global.commons.sendMessage(message, opts.sender)
+      let message = await commons.prepare('no-raffle-is-currently-running')
+      commons.sendMessage(message, opts.sender)
       return false
     }
 
@@ -287,8 +288,8 @@ class Raffles extends System {
 
     let participants = await global.db.engine.find(this.collection.participants, { raffle_id: raffle._id.toString(), eligible: true })
     if (participants.length === 0) {
-      let message = await global.commons.prepare('raffles.no-participants-to-pick-winner')
-      global.commons.sendMessage(message, global.commons.getOwner())
+      let message = await commons.prepare('raffles.no-participants-to-pick-winner')
+      commons.sendMessage(message, commons.getOwner())
       return true
     }
 
@@ -344,12 +345,12 @@ class Raffles extends System {
       global.db.engine.update(this.collection.data, { _id: raffle._id.toString() }, { winner: winner.username, timestamp: new Date().getTime() })
     ])
 
-    let message = await global.commons.prepare('raffles.raffle-winner-is', {
+    let message = await commons.prepare('raffles.raffle-winner-is', {
       username: winner.username,
       keyword: raffle.keyword,
       probability: _.round(probability, 2)
     })
-    global.commons.sendMessage(message, global.commons.getOwner())
+    commons.sendMessage(message, commons.getOwner())
   }
 }
 

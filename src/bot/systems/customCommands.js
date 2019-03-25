@@ -6,6 +6,7 @@
 const _ = require('lodash')
 const XRegExp = require('xregexp')
 const safeEval = require('safe-eval')
+const commons = require('../commons');
 
 // bot libraries
 import { permission } from '../permissions';
@@ -154,7 +155,7 @@ class CustomCommands extends System {
   }
 
   main (opts: Object) {
-    global.commons.sendMessage(global.translate('core.usage') + ': !command add (-p [uuid|name]) (-s=true|false) <!cmd> <response> | !command edit (-p [uuid|name]) (-s=true|false) <!cmd> <number> <response> | !command remove <!command> | !command remove <!command> <number> | !command list | !command list <!command>', opts.sender)
+    commons.sendMessage(global.translate('core.usage') + ': !command add (-p [uuid|name]) (-s=true|false) <!cmd> <response> | !command edit (-p [uuid|name]) (-s=true|false) <!cmd> <number> <response> | !command remove <!command> | !command remove <!command> <number> | !command list | !command list <!command>', opts.sender)
   }
 
   async edit (opts: Object) {
@@ -172,10 +173,10 @@ class CustomCommands extends System {
       }
 
       let cDb = await global.db.engine.findOne(this.collection.data, { command })
-      if (!cDb._id) return global.commons.sendMessage(global.commons.prepare('customcmds.command-was-not-found', { command }), opts.sender)
+      if (!cDb._id) return commons.sendMessage(commons.prepare('customcmds.command-was-not-found', { command }), opts.sender)
 
       let rDb = await global.db.engine.findOne(this.collection.responses, { cid: String(cDb._id), order: rId - 1 })
-      if (!rDb._id) return global.commons.sendMessage(global.commons.prepare('customcmds.response-was-not-found', { command, response: rId }), opts.sender)
+      if (!rDb._id) return commons.sendMessage(commons.prepare('customcmds.response-was-not-found', { command, response: rId }), opts.sender)
 
 
       const pItem: Permissions.Item | null = await global.permissions.get(userlevel);
@@ -189,9 +190,9 @@ class CustomCommands extends System {
       if (stopIfExecuted) rDb.stopIfExecuted = stopIfExecuted
 
       await global.db.engine.update(this.collection.responses, { _id }, rDb)
-      global.commons.sendMessage(global.commons.prepare('customcmds.command-was-edited', { command, response }), opts.sender)
+      commons.sendMessage(commons.prepare('customcmds.command-was-edited', { command, response }), opts.sender)
     } catch (e) {
-      global.commons.sendMessage(global.commons.prepare('customcmds.commands-parse-failed'), opts.sender)
+      commons.sendMessage(commons.prepare('customcmds.commands-parse-failed'), opts.sender)
     }
   }
 
@@ -228,9 +229,9 @@ class CustomCommands extends System {
         stopIfExecuted,
         response
       })
-      global.commons.sendMessage(global.commons.prepare('customcmds.command-was-added', { command }), opts.sender)
+      commons.sendMessage(commons.prepare('customcmds.command-was-added', { command }), opts.sender)
     } catch (e) {
-      global.commons.sendMessage(global.commons.prepare('customcmds.commands-parse-failed'), opts.sender)
+      commons.sendMessage(commons.prepare('customcmds.commands-parse-failed'), opts.sender)
     }
   }
 
@@ -268,7 +269,7 @@ class CustomCommands extends System {
   async sendResponse(responses, opts) {
     if (responses.length === 0) return;
     const response = responses.shift()
-    await global.commons.sendMessage(response.response, opts.sender, {
+    await commons.sendMessage(response.response, opts.sender, {
       param: opts.param,
       cmd: opts.command
     })
@@ -284,13 +285,13 @@ class CustomCommands extends System {
       // print commands
       let commands = await global.db.engine.find(this.collection.data, { visible: true, enabled: true })
       var output = (commands.length === 0 ? global.translate('customcmds.list-is-empty') : global.translate('customcmds.list-is-not-empty').replace(/\$list/g, _.map(_.orderBy(commands, 'command'), 'command').join(', ')))
-      global.commons.sendMessage(output, opts.sender)
+      commons.sendMessage(output, opts.sender)
     } else {
       // print responses
       const cid = String((await global.db.engine.findOne(this.collection.data, { command }))._id)
       const responses = _.orderBy((await global.db.engine.find(this.collection.responses, { cid })), 'order', 'asc')
 
-      if (responses.length === 0) global.commons.sendMessage(global.commons.prepare('customcmdustomcmds.list-of-responses-is-empty', { command }), opts.sender)
+      if (responses.length === 0) commons.sendMessage(commons.prepare('customcmdustomcmds.list-of-responses-is-empty', { command }), opts.sender)
       let permissions = (await global.db.engine.find(global.permissions.collection.data)).map((o) => {
         return {
           v: o.id, string: o.name
@@ -298,9 +299,9 @@ class CustomCommands extends System {
       })
       for (let r of responses) {
         let rPrmsn: any = permissions.find(o => o.v === r.permission)
-        const response = await global.commons.prepare('customcmds.response', { command, index: ++r.order, response: r.response, after: r.stopIfExecuted ? '_' : 'v', permission: rPrmsn.string })
+        const response = await commons.prepare('customcmds.response', { command, index: ++r.order, response: r.response, after: r.stopIfExecuted ? '_' : 'v', permission: rPrmsn.string })
         global.log.chatOut(response, { username: opts.sender.username })
-        global.commons.message(global.tmi.settings.chat.sendWithMe ? 'me' : 'say', global.commons.getOwner(), response)
+        commons.message(global.tmi.settings.chat.sendWithMe ? 'me' : 'say', commons.getOwner(), response)
       }
     }
   }
@@ -315,42 +316,42 @@ class CustomCommands extends System {
   async toggle (opts: Object) {
     const match = XRegExp.exec(opts.parameters, constants.COMMAND_REGEXP)
     if (_.isNil(match)) {
-      let message = await global.commons.prepare('customcmds.commands-parse-failed')
-      global.commons.sendMessage(message, opts.sender)
+      let message = await commons.prepare('customcmds.commands-parse-failed')
+      commons.sendMessage(message, opts.sender)
       return false
     }
 
     const command = await global.db.engine.findOne(this.collection.data, { command: match.command })
     if (_.isEmpty(command)) {
-      let message = await global.commons.prepare('customcmds.command-was-not-found', { command: match.command })
-      global.commons.sendMessage(message, opts.sender)
+      let message = await commons.prepare('customcmds.command-was-not-found', { command: match.command })
+      commons.sendMessage(message, opts.sender)
       return false
     }
 
     await global.db.engine.update(this.collection.data, { command: match.command }, { enabled: !command.enabled })
 
-    let message = await global.commons.prepare(!command.enabled ? 'customcmds.command-was-enabled' : 'customcmds.command-was-disabled', { command: command.command })
-    global.commons.sendMessage(message, opts.sender)
+    let message = await commons.prepare(!command.enabled ? 'customcmds.command-was-enabled' : 'customcmds.command-was-disabled', { command: command.command })
+    commons.sendMessage(message, opts.sender)
   }
 
   async toggleVisibility (opts: Object) {
     const match = XRegExp.exec(opts.parameters, constants.COMMAND_REGEXP)
     if (_.isNil(match)) {
-      let message = await global.commons.prepare('customcmds.commands-parse-failed')
-      global.commons.sendMessage(message, opts.sender)
+      let message = await commons.prepare('customcmds.commands-parse-failed')
+      commons.sendMessage(message, opts.sender)
       return false
     }
 
     const command = await global.db.engine.findOne(this.collection.data, { command: match.command })
     if (_.isEmpty(command)) {
-      let message = await global.commons.prepare('customcmds.command-was-not-found', { command: match.command })
-      global.commons.sendMessage(message, opts.sender)
+      let message = await commons.prepare('customcmds.command-was-not-found', { command: match.command })
+      commons.sendMessage(message, opts.sender)
       return false
     }
 
     await global.db.engine.update(this.collection.data, { command: match.command }, { visible: !command.visible })
-    let message = await global.commons.prepare(!command.visible ? 'customcmds.command-was-exposed' : 'customcmds.command-was-concealed', { command: command.command })
-    global.commons.sendMessage(message, opts.sender)
+    let message = await commons.prepare(!command.visible ? 'customcmds.command-was-exposed' : 'customcmds.command-was-concealed', { command: command.command })
+    commons.sendMessage(message, opts.sender)
   }
 
   async remove (opts: Object) {
@@ -358,14 +359,14 @@ class CustomCommands extends System {
       const [command, response] = new Expects(opts.parameters).command().number({ optional: true }).toArray()
       let cid = (await global.db.engine.findOne(this.collection.data, { command }))._id
       if (!cid) {
-        global.commons.sendMessage(global.commons.prepare('customcmds.command-was-not-found', { command }), opts.sender)
+        commons.sendMessage(commons.prepare('customcmds.command-was-not-found', { command }), opts.sender)
       } else {
         cid = String(cid)
         if (response) {
           const order = Number(response) - 1
           let removed = await global.db.engine.remove(this.collection.responses, { cid, order })
           if (removed > 0) {
-            global.commons.sendMessage(global.commons.prepare('customcmds.response-was-removed', { command, response }), opts.sender)
+            commons.sendMessage(commons.prepare('customcmds.response-was-removed', { command, response }), opts.sender)
 
             // update order
             const responses = _.orderBy(await global.db.engine.find(this.collection.responses, { cid }), 'order', 'asc')
@@ -381,14 +382,14 @@ class CustomCommands extends System {
               await global.db.engine.update(this.collection.responses, { _id }, r)
               order++
             }
-          } else global.commons.sendMessage(global.commons.prepare('customcmds.response-was-not-found', { command, response }), opts.sender)
+          } else commons.sendMessage(commons.prepare('customcmds.response-was-not-found', { command, response }), opts.sender)
         } else {
           await global.db.engine.remove(this.collection.data, { command })
-          global.commons.sendMessage(global.commons.prepare('customcmds.command-was-removed', { command }), opts.sender)
+          commons.sendMessage(commons.prepare('customcmds.command-was-removed', { command }), opts.sender)
         }
       }
     } catch (e) {
-      return global.commons.sendMessage(global.commons.prepare('customcmds.commands-parse-failed'), opts.sender)
+      return commons.sendMessage(commons.prepare('customcmds.commands-parse-failed'), opts.sender)
     }
   }
 
@@ -417,12 +418,12 @@ class CustomCommands extends System {
     }
 
     const $is = {
-      moderator: await global.commons.isModerator(opts.sender.username),
-      subscriber: await global.commons.isSubscriber(opts.sender.username),
-      vip: await global.commons.isVIP(opts.sender.username),
-      broadcaster: global.commons.isBroadcaster(opts.sender.username),
-      bot: global.commons.isBot(opts.sender.username),
-      owner: global.commons.isOwner(opts.sender.username),
+      moderator: await commons.isModerator(opts.sender.username),
+      subscriber: await commons.isSubscriber(opts.sender.username),
+      vip: await commons.isVIP(opts.sender.username),
+      broadcaster: commons.isBroadcaster(opts.sender.username),
+      bot: commons.isBot(opts.sender.username),
+      owner: commons.isOwner(opts.sender.username),
     }
 
     const context = {

@@ -10,7 +10,6 @@ declare namespace NodeJS {
     configuration: any,
     cpu: any,
     db: any,
-    commons: any,
     general: any,
     bot: any,
     translate: any,
@@ -36,6 +35,7 @@ declare namespace NodeJS {
           username: string,
         },
         general: {
+          owners: string[],
           channel: string,
         }
       }

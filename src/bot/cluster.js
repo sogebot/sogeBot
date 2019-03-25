@@ -4,6 +4,7 @@ const util = require('util')
 const _ = require('lodash')
 
 import { Permissions } from './permissions'
+const { autoLoad } = require('./commons');
 
 cluster()
 
@@ -36,12 +37,12 @@ function cluster () {
     return global.workers.sendToMaster({ type: 'crash' })
   }
 
-  global.lib.translate._load().then(function () {
+  global.lib.translate._load().then(async () => {
     try {
-      global.systems = require('auto-load')('./dest/systems/')
-      global.overlays = require('auto-load')('./dest/overlays/')
-      global.games = require('auto-load')('./dest/games/')
-      global.integrations = require('auto-load')('./dest/integrations/')
+      global.systems = await autoLoad('./dest/systems/')
+      global.overlays = await autoLoad('./dest/overlays/')
+      global.games = await autoLoad('./dest/games/')
+      global.integrations = await autoLoad('./dest/integrations/')
     } catch (e) {
       console.error(e); global.log.error(e)
     }

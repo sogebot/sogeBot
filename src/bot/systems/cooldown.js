@@ -5,6 +5,7 @@
 // 3rdparty libraries
 const _ = require('lodash')
 const XRegExp = require('xregexp')
+const commons = require('../commons');
 
 // bot libraries
 import { permission } from '../permissions';
@@ -46,15 +47,15 @@ class Cooldown extends System {
     const match = XRegExp.exec(opts.parameters, constants.COOLDOWN_REGEXP_SET)
 
     if (_.isNil(match)) {
-      let message = await global.commons.prepare('cooldowns.cooldown-parse-failed')
-      global.commons.sendMessage(message, opts.sender)
+      let message = await commons.prepare('cooldowns.cooldown-parse-failed')
+      commons.sendMessage(message, opts.sender)
       return false
     }
 
     if (parseInt(match.seconds, 10) === 0) {
       await global.db.engine.remove(this.collection.data, { key: match.command, type: match.type })
-      let message = await global.commons.prepare('cooldowns.cooldown-was-unset', { type: match.type, command: match.command })
-      global.commons.sendMessage(message, opts.sender)
+      let message = await commons.prepare('cooldowns.cooldown-was-unset', { type: match.type, command: match.command })
+      commons.sendMessage(message, opts.sender)
       return
     }
 
@@ -62,8 +63,8 @@ class Cooldown extends System {
     if (_.isEmpty(cooldown)) await global.db.engine.update(this.collection.data, { key: match.command, type: match.type }, { miliseconds: parseInt(match.seconds, 10) * 1000, type: match.type, timestamp: 0, quiet: _.isNil(match.quiet) ? false : match.quiet, enabled: true, owner: false, moderator: false, subscriber: true, follower: true })
     else await global.db.engine.update(this.collection.data, { key: match.command, type: match.type }, { miliseconds: parseInt(match.seconds, 10) * 1000 })
 
-    let message = await global.commons.prepare('cooldowns.cooldown-was-set', { seconds: match.seconds, type: match.type, command: match.command })
-    global.commons.sendMessage(message, opts.sender)
+    let message = await commons.prepare('cooldowns.cooldown-was-set', { seconds: match.seconds, type: match.type, command: match.command })
+    commons.sendMessage(message, opts.sender)
   }
 
   async check (opts: Object) {
@@ -146,7 +147,7 @@ class Cooldown extends System {
     const isFollower = user.is && user.is.follower ? user.is.follower : false
 
     for (let cooldown of data) {
-      if ((global.commons.isOwner(opts.sender) && !cooldown.owner) || (isMod && !cooldown.moderator) || (isSubscriber && !cooldown.subscriber) || (isFollower && !cooldown.follower)) {
+      if ((commons.isOwner(opts.sender) && !cooldown.owner) || (isMod && !cooldown.moderator) || (isSubscriber && !cooldown.subscriber) || (isFollower && !cooldown.follower)) {
         result = true
         continue
       }
@@ -170,8 +171,8 @@ class Cooldown extends System {
       } else {
         if (!cooldown.quiet && !(this.settings['cooldownNotifyAsWhisper'])) {
           opts.sender['message-type'] = 'whisper' // we want to whisp cooldown message
-          let message = await global.commons.prepare('cooldowns.cooldown-triggered', { command: cooldown.key, seconds: Math.ceil((cooldown.miliseconds - now + timestamp) / 1000) })
-          global.commons.sendMessage(message, opts.sender)
+          let message = await commons.prepare('cooldowns.cooldown-triggered', { command: cooldown.key, seconds: Math.ceil((cooldown.miliseconds - now + timestamp) / 1000) })
+          commons.sendMessage(message, opts.sender)
         }
         result = false
         break // disable _.each and updateQueue with false
@@ -184,15 +185,15 @@ class Cooldown extends System {
     const match = XRegExp.exec(opts.parameters, constants.COOLDOWN_REGEXP)
 
     if (_.isNil(match)) {
-      let message = await global.commons.prepare('cooldowns.cooldown-parse-failed')
-      global.commons.sendMessage(message, opts.sender)
+      let message = await commons.prepare('cooldowns.cooldown-parse-failed')
+      commons.sendMessage(message, opts.sender)
       return false
     }
 
     const cooldown = await global.db.engine.findOne(this.collection.data, { key: match.command, type: match.type })
     if (_.isEmpty(cooldown)) {
-      let message = await global.commons.prepare('cooldowns.cooldown-not-found', { command: match.command })
-      global.commons.sendMessage(message, opts.sender)
+      let message = await commons.prepare('cooldowns.cooldown-not-found', { command: match.command })
+      commons.sendMessage(message, opts.sender)
       return false
     }
 
@@ -212,8 +213,8 @@ class Cooldown extends System {
     if (type === 'follower') path = '-for-followers'
     if (type === 'quiet' || type === 'type') return // those two are setable only from dashboard
 
-    let message = await global.commons.prepare(`cooldowns.cooldown-was-${status}${path}`, { command: cooldown.key })
-    global.commons.sendMessage(message, opts.sender)
+    let message = await commons.prepare(`cooldowns.cooldown-was-${status}${path}`, { command: cooldown.key })
+    commons.sendMessage(message, opts.sender)
   }
 
   async toggleEnabled (opts: Object) { await this.toggle(opts, 'enabled') }

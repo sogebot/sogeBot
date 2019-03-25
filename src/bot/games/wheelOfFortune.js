@@ -4,6 +4,7 @@
 const {
   isMainThread
 } = require('worker_threads');
+const commons = require('../commons')
 import Game from './_interface'
 
 class WheelOfFortune extends Game {
@@ -38,7 +39,7 @@ class WheelOfFortune extends Game {
         // compensate for slight delay
         setTimeout(() => {
           for (let response of options[index].responses) {
-            if (response.trim().length > 0) global.commons.sendMessage(response, { username })
+            if (response.trim().length > 0) commons.sendMessage(response, { username })
           }
         }, 2000)
       })

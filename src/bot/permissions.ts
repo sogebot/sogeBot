@@ -1,7 +1,10 @@
-'use strict';
-
 import * as _ from 'lodash';
+
 import Core from './_interface';
+import {
+    isBot, isBroadcaster, isFollower, isModerator, isOwner, isSubscriber, isVIP, prepare,
+    sendMessage,
+} from './commons';
 import { debug } from './debug';
 
 const permission = Object.freeze({
@@ -152,19 +155,19 @@ class Permissions extends Core {
           shouldProceed = true;
           break;
         case 'casters':
-          shouldProceed = global.commons.isBot(user) || global.commons.isBroadcaster(user) || global.commons.isOwner(user);
+          shouldProceed = isBot(user) || isBroadcaster(user) || isOwner(user);
           break;
         case 'moderators':
-          shouldProceed = await global.commons.isModerator(user);
+          shouldProceed = await isModerator(user);
           break;
         case 'subscribers':
-          shouldProceed = await global.commons.isSubscriber(user);
+          shouldProceed = await isSubscriber(user);
           break;
         case 'vip':
-          shouldProceed = await global.commons.isVIP(user);
+          shouldProceed = await isVIP(user);
           break;
         case 'followers':
-          shouldProceed = await global.commons.isFollower(user);
+          shouldProceed = await isFollower(user);
           break;
         default:
           shouldProceed = false; // we don't have any automation
@@ -245,11 +248,11 @@ class Permissions extends Core {
 
   protected async list(opts: CommandOptions): Promise<void> {
     const permissions: Permissions.Item[] = _.orderBy(await global.db.engine.find(this.collection.data), 'order', 'asc');
-    global.commons.sendMessage(global.commons.prepare('core.permissions.list'), opts.sender);
+    sendMessage(prepare('core.permissions.list'), opts.sender);
     for (let i = 0; i < permissions.length; i++) {
       setTimeout(() => {
         const symbol = permissions[i].isWaterfallAllowed ? '≥' : '=';
-        global.commons.sendMessage(`${symbol} | ${permissions[i].name} | ${permissions[i].id}`, opts.sender);
+        sendMessage(`${symbol} | ${permissions[i].name} | ${permissions[i].id}`, opts.sender);
       }, 500 * i);
     }
   }

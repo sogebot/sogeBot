@@ -5,6 +5,7 @@ const _ = require('lodash')
 // bot libraries
 import System from './_interface'
 import { permission } from '../permissions';
+const commons = require('../commons');
 
 /*
  * !queue                            - gets an info whether queue is opened or closed
@@ -54,8 +55,8 @@ class Queue extends System {
             delete user._id
             users.push(user)
           }
-          cb(null, await this.pickUsers({ sender: global.commons.getOwner(), users }))
-        } else cb(null, await this.pickUsers({ sender: global.commons.getOwner(), parameters: String(data.count) }, data.random))
+          cb(null, await this.pickUsers({ sender: commons.getOwner(), users }))
+        } else cb(null, await this.pickUsers({ sender: commons.getOwner(), parameters: String(data.count) }, data.random))
       })
     })
   }
@@ -88,17 +89,17 @@ class Queue extends System {
   }
 
   main (opts) {
-    global.commons.sendMessage(global.translate(this.settings._.locked ? 'queue.info.closed' : 'queue.info.opened'), opts.sender)
+    commons.sendMessage(global.translate(this.settings._.locked ? 'queue.info.closed' : 'queue.info.opened'), opts.sender)
   }
 
   open (opts) {
     this.settings._.locked = false
-    global.commons.sendMessage(global.translate('queue.open'), opts.sender)
+    commons.sendMessage(global.translate('queue.open'), opts.sender)
   }
 
   close (opts) {
     this.settings._.locked = true
-    global.commons.sendMessage(global.translate('queue.close'), opts.sender)
+    commons.sendMessage(global.translate('queue.close'), opts.sender)
   }
 
   async join (opts) {
@@ -118,17 +119,17 @@ class Queue extends System {
 
       if (eligible) {
         await global.db.engine.update(this.collection.data, { username: opts.sender.username }, { username: opts.sender.username, is: user.is, created_at: String(new Date()) })
-        global.commons.sendMessage(global.translate('queue.join.opened'), opts.sender)
+        commons.sendMessage(global.translate('queue.join.opened'), opts.sender)
       }
     } else {
-      global.commons.sendMessage(global.translate('queue.join.closed'), opts.sender)
+      commons.sendMessage(global.translate('queue.join.closed'), opts.sender)
     }
   }
 
   clear (opts) {
     global.db.engine.remove(this.collection.data, {})
     global.db.engine.remove(this.collection.picked, {})
-    global.commons.sendMessage(global.translate('queue.clear'), opts.sender)
+    commons.sendMessage(global.translate('queue.clear'), opts.sender)
   }
 
   async random (opts) {
@@ -167,7 +168,7 @@ class Queue extends System {
         msg = global.translate('queue.picked.multi')
     }
 
-    global.commons.sendMessage(msg.replace(/\$users/g, users.map(o => atUsername ? `@${o.username}` : o.username).join(', ')), opts.sender)
+    commons.sendMessage(msg.replace(/\$users/g, users.map(o => atUsername ? `@${o.username}` : o.username).join(', ')), opts.sender)
     return users
   }
 
@@ -177,8 +178,8 @@ class Queue extends System {
       global.db.engine.find(this.collection.data)
     ])
     users = users.map(o => atUsername ? `@${o.username}` : o).join(', ')
-    global.commons.sendMessage(
-      await global.commons.prepare('queue.list', { users }), opts.sender
+    commons.sendMessage(
+      await commons.prepare('queue.list', { users }), opts.sender
     )
   }
 }

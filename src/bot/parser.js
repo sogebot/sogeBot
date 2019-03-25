@@ -185,7 +185,7 @@ class Parser {
     } else {
       // user doesn't have permissions for command
       sender['message-type'] = 'whisper'
-      global.commons.sendMessage(global.translate('permissions.without-permission').replace(/\$command/g, message), sender)
+      commons.sendMessage(global.translate('permissions.without-permission').replace(/\$command/g, message), sender)
     }
   }
 }

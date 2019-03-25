@@ -5,6 +5,7 @@ require('../../general.js')
 const db = require('../../general.js').db
 const message = require('../../general.js').message
 const variable = require('../../general.js').variable
+const { getLocalizedName } = require('../../../dest/commons');
 const time = require('../../general.js').time
 
 const _ = require('lodash')
@@ -68,7 +69,7 @@ describe('Gambling - duel', () => {
     it('user 1 is challenging', async () => {
       await global.games.duel.main({ sender: user1, parameters: 'all', command })
       await message.isSent('gambling.duel.new', user1, {
-        minutesName: global.commons.getLocalizedName(await global.games.duel.settings.duration, 'core.minutes'),
+        minutesName: getLocalizedName(await global.games.duel.settings.duration, 'core.minutes'),
         minutes: await global.games.duel.settings.duration,
         command
       })

@@ -6,6 +6,7 @@ import System from './_interface'
 import { permission } from '../permissions';
 const Expects = require('../expects')
 const config = require('@config')
+const commons = require('../commons');
 
 class Quotes extends System {
   constructor () {
@@ -37,11 +38,11 @@ class Quotes extends System {
 
       await global.db.engine.insert(this.collection.data, { id, tags, quote, quotedBy: opts.sender['userId'], createdAt: new Date() })
 
-      const message = await global.commons.prepare('systems.quotes.add.ok', { id, quote, tags: tags.join(', ') })
-      global.commons.sendMessage(message, opts.sender)
+      const message = await commons.prepare('systems.quotes.add.ok', { id, quote, tags: tags.join(', ') })
+      commons.sendMessage(message, opts.sender)
     } catch (e) {
-      const message = await global.commons.prepare('systems.quotes.add.error', { command: opts.command })
-      global.commons.sendMessage(message, opts.sender)
+      const message = await commons.prepare('systems.quotes.add.error', { command: opts.command })
+      commons.sendMessage(message, opts.sender)
     }
   }
 
@@ -53,15 +54,15 @@ class Quotes extends System {
 
       let item = await global.db.engine.remove(this.collection.data, { id })
       if (item > 0) {
-        const message = await global.commons.prepare('systems.quotes.remove.ok', { id })
-        global.commons.sendMessage(message, opts.sender)
+        const message = await commons.prepare('systems.quotes.remove.ok', { id })
+        commons.sendMessage(message, opts.sender)
       } else {
-        const message = await global.commons.prepare('systems.quotes.remove.not-found', { id })
-        global.commons.sendMessage(message, opts.sender)
+        const message = await commons.prepare('systems.quotes.remove.not-found', { id })
+        commons.sendMessage(message, opts.sender)
       }
     } catch (e) {
-      const message = await global.commons.prepare('systems.quotes.remove.error')
-      global.commons.sendMessage(message, opts.sender)
+      const message = await commons.prepare('systems.quotes.remove.error')
+      commons.sendMessage(message, opts.sender)
     }
   }
 
@@ -73,42 +74,42 @@ class Quotes extends System {
       if (!_.isEmpty(quote)) {
         const tags = tag.split(',').map((o) => o.trim())
         await global.db.engine.update(this.collection.data, { id }, { tags })
-        const message = await global.commons.prepare('systems.quotes.set.ok', { id, tags: tags.join(', ') })
-        global.commons.sendMessage(message, opts.sender)
+        const message = await commons.prepare('systems.quotes.set.ok', { id, tags: tags.join(', ') })
+        commons.sendMessage(message, opts.sender)
       } else {
-        const message = await global.commons.prepare('systems.quotes.set.error.not-found-by-id', { id })
-        global.commons.sendMessage(message, opts.sender)
+        const message = await commons.prepare('systems.quotes.set.error.not-found-by-id', { id })
+        commons.sendMessage(message, opts.sender)
       }
     } catch (e) {
-      const message = await global.commons.prepare('systems.quotes.set.error.no-parameters', { command: opts.command })
-      global.commons.sendMessage(message, opts.sender)
+      const message = await commons.prepare('systems.quotes.set.error.no-parameters', { command: opts.command })
+      commons.sendMessage(message, opts.sender)
     }
   }
 
   async list (opts) {
     const urlBase = this.settings.urlBase
-    const message = await global.commons.prepare(
+    const message = await commons.prepare(
       (['localhost', '127.0.0.1'].includes(urlBase) ? 'systems.quotes.list.is-localhost' : 'systems.quotes.list.ok'),
       { urlBase })
-    return global.commons.sendMessage(message, opts.sender)
+    return commons.sendMessage(message, opts.sender)
   }
 
   async main (opts) {
     let [id, tag] = new Expects(opts.parameters).argument({ type: Number, name: 'id', optional: true }).argument({ name: 'tag', optional: true, multi: true, delimiter: '' }).toArray()
     if (_.isNil(id) && _.isNil(tag)) {
-      const message = await global.commons.prepare('systems.quotes.show.error.no-parameters', { command: opts.command })
-      return global.commons.sendMessage(message, opts.sender)
+      const message = await commons.prepare('systems.quotes.show.error.no-parameters', { command: opts.command })
+      return commons.sendMessage(message, opts.sender)
     }
 
     if (!_.isNil(id)) {
       let quote = await global.db.engine.findOne(this.collection.data, { id })
       if (!_.isEmpty(quote)) {
         const quotedBy = (await global.users.getUsernamesFromIds([quote.quotedBy]))[quote.quotedBy]
-        const message = await global.commons.prepare('systems.quotes.show.ok', { quote: quote.quote, id: quote.id, quotedBy })
-        global.commons.sendMessage(message, opts.sender)
+        const message = await commons.prepare('systems.quotes.show.ok', { quote: quote.quote, id: quote.id, quotedBy })
+        commons.sendMessage(message, opts.sender)
       } else {
-        const message = await global.commons.prepare('systems.quotes.show.error.not-found-by-id', { id })
-        global.commons.sendMessage(message, opts.sender)
+        const message = await commons.prepare('systems.quotes.show.error.not-found-by-id', { id })
+        commons.sendMessage(message, opts.sender)
       }
     } else {
       let quotes = await global.db.engine.find(this.collection.data)
@@ -121,11 +122,11 @@ class Quotes extends System {
       if (quotesWithTags.length > 0) {
         let quote = _.sample(quotesWithTags)
         const quotedBy = (await global.users.getUsernamesFromIds([quote.quotedBy]))[quote.quotedBy]
-        const message = await global.commons.prepare('systems.quotes.show.ok', { quote: quote.quote, id: quote.id, quotedBy })
-        global.commons.sendMessage(message, opts.sender)
+        const message = await commons.prepare('systems.quotes.show.ok', { quote: quote.quote, id: quote.id, quotedBy })
+        commons.sendMessage(message, opts.sender)
       } else {
-        const message = await global.commons.prepare('systems.quotes.show.error.not-found-by-tag', { tag })
-        global.commons.sendMessage(message, opts.sender)
+        const message = await commons.prepare('systems.quotes.show.error.not-found-by-tag', { tag })
+        commons.sendMessage(message, opts.sender)
       }
     }
   }

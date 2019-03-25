@@ -9,6 +9,7 @@ var path = require('path')
 var basicAuth = require('basic-auth')
 var _ = require('lodash')
 const util = require('util')
+const commons = require('./commons')
 const gitCommitInfo = require('git-commit-info');
 
 const Parser = require('./parser')
@@ -221,7 +222,7 @@ function Panel () {
     })
 
     socket.on('responses.get', async function (at, callback) {
-      const responses = global.commons.flatten(!_.isNil(at) ? global.lib.translate.translations[global.general.settings.lang][at] : global.lib.translate.translations[global.general.settings.lang])
+      const responses = commons.flatten(!_.isNil(at) ? global.lib.translate.translations[global.general.settings.lang][at] : global.lib.translate.translations[global.general.settings.lang])
       _.each(responses, function (value, key) {
         let _at = !_.isNil(at) ? at + '.' + key : key
         responses[key] = {} // remap to obj
@@ -288,7 +289,7 @@ function Panel () {
     socket.on('saveConfiguration', function (data) {
       _.each(data, async function (index, value) {
         if (value.startsWith('_')) return true
-        global.configuration.setValue({ sender: { username: global.commons.getOwner() }, parameters: value + ' ' + index, quiet: data._quiet })
+        global.configuration.setValue({ sender: { username: commons.getOwner() }, parameters: value + ' ' + index, quiet: data._quiet })
       })
     })
     socket.on('getConfiguration', async function (cb) {
@@ -486,7 +487,7 @@ Panel.prototype.registerSockets = util.deprecate(function (options) {
 Panel.prototype.sendStreamData = async function (self, socket) {
   const whenOnline = (await global.cache.when()).online
   var data = {
-    uptime: global.commons.getTime(whenOnline, false),
+    uptime: commons.getTime(whenOnline, false),
     currentViewers: _.get(await global.db.engine.findOne('api.current', { key: 'viewers' }), 'value', 0),
     currentSubscribers: _.get(await global.db.engine.findOne('api.current', { key: 'subscribers' }), 'value', 0),
     currentBits: _.get(await global.db.engine.findOne('api.current', { key: 'bits' }), 'value', 0),

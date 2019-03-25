@@ -3,6 +3,7 @@ const until = require('test-until')
 const chalk = require('chalk')
 const sinon = require('sinon')
 const _ = require('lodash')
+const { prepare } = require('../../dest/commons')
 
 var eventSpy
 
@@ -16,8 +17,6 @@ module.exports = {
 
     if (eventSpy) eventSpy.restore()
     eventSpy = sinon.spy(global.events, 'fire')
-
-    global.commons.timeout = function () {}
 
     global.tmi.client = {
       bot: {
@@ -75,11 +74,11 @@ module.exports = {
       if (_.isArray(opts)) {
         for (let o of opts) {
           o.sender = _.isNil(user.username) ? '' : user.username
-          expected.push(await global.commons.prepare(entry, o))
+          expected.push(await prepare(entry, o))
         }
       } else {
         opts.sender = _.isNil(user.username) ? '' : user.username
-        expected = [await global.commons.prepare(entry, opts)]
+        expected = [await prepare(entry, opts)]
       }
       try {
         let isCorrectlyCalled = false
@@ -107,14 +106,14 @@ module.exports = {
         for (let o of opts) {
           o.sender = _.isNil(user.username) ? '' : user.username
           if (_.isArray(entry)) {
-            for (let e of entry) expected.push(await global.commons.prepare(e, o))
-          } else expected.push(await global.commons.prepare(entry, o))
+            for (let e of entry) expected.push(await prepare(e, o))
+          } else expected.push(await prepare(entry, o))
         }
       } else {
         opts.sender = _.isNil(user.username) ? '' : user.username
         if (_.isArray(entry)) {
-          for (let e of entry) expected.push(await global.commons.prepare(e, opts))
-        } else expected.push(await global.commons.prepare(entry, opts))
+          for (let e of entry) expected.push(await prepare(e, opts))
+        } else expected.push(await prepare(entry, opts))
       }
       try {
         let isCorrectlyCalled = false

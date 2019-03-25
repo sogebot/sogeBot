@@ -1,6 +1,7 @@
 // @flow
 'use strict'
 
+const commons = require('../commons')
 const _ = require('lodash')
 
 import Overlay from './_interface'
@@ -28,7 +29,7 @@ class Stats extends Overlay {
       socket.on('get', async (cb) => {
         const when = await global.cache.when()
         const stats = {
-          uptime: global.commons.getTime(await global.cache.isOnline() ? when.online : 0, false),
+          uptime: commons.getTime(await global.cache.isOnline() ? when.online : 0, false),
           viewers: _.get(await global.db.engine.findOne('api.current', { key: 'viewers' }), 'value', 0),
           followers: _.get(await global.db.engine.findOne('api.current', { key: 'followers' }), 'value', 0),
           subscribers: _.get(await global.db.engine.findOne('api.current', { key: 'subscribers' }), 'value', 0),

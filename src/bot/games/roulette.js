@@ -4,6 +4,7 @@
 const _ = require('lodash')
 
 // bot libraries
+const commons = require('../commons')
 import Game from './_interface'
 
 /*
@@ -35,24 +36,24 @@ class Roulette extends Game {
     let isAlive = _.random(0, 1, false)
 
     const [isMod] = await Promise.all([
-      global.commons.isModerator(opts.sender)
+      commons.isModerator(opts.sender)
     ])
 
-    global.commons.sendMessage(global.translate('gambling.roulette.trigger'), opts.sender)
-    if (global.commons.isBroadcaster(opts.sender)) {
-      setTimeout(() => global.commons.sendMessage(global.translate('gambling.roulette.broadcaster'), opts.sender), 2000)
+    commons.sendMessage(global.translate('gambling.roulette.trigger'), opts.sender)
+    if (commons.isBroadcaster(opts.sender)) {
+      setTimeout(() => commons.sendMessage(global.translate('gambling.roulette.broadcaster'), opts.sender), 2000)
       return
     }
 
     if (isMod) {
-      setTimeout(() => global.commons.sendMessage(global.translate('gambling.roulette.mod'), opts.sender), 2000)
+      setTimeout(() => commons.sendMessage(global.translate('gambling.roulette.mod'), opts.sender), 2000)
       return
     }
 
     setTimeout(async () => {
-      if (!isAlive) global.commons.timeout(opts.sender.username, null, this.settings.timeout)
+      if (!isAlive) commons.timeout(opts.sender.username, null, this.settings.timeout)
       await global.db.engine.increment('users.points', { id: opts.sender.userId }, { points: isAlive ? Math.abs(Number(this.settings.rewards.winnerWillGet)) : -Math.abs(Number(this.settings.rewards.loserWillLose)) })
-      global.commons.sendMessage(isAlive ? global.translate('gambling.roulette.alive') : global.translate('gambling.roulette.dead'), opts.sender)
+      commons.sendMessage(isAlive ? global.translate('gambling.roulette.alive') : global.translate('gambling.roulette.dead'), opts.sender)
     }, 2000)
   }
 }

@@ -8,6 +8,7 @@ const {
   isMainThread
 } = require('worker_threads');
 const axios = require('axios')
+const commons = require('../commons');
 
 // bot libraries
 import { permission } from '../permissions';
@@ -88,7 +89,7 @@ class Highlights extends System {
       switch (e.message) {
         case ERROR_STREAM_NOT_ONLINE:
           global.log.error('Cannot highlight - stream offline')
-          global.commons.sendMessage(global.translate('highlights.offline'), opts.sender)
+          commons.sendMessage(global.translate('highlights.offline'), opts.sender)
           break
         case ERROR_MISSING_TOKEN:
           global.log.error('Cannot highlight - missing token')
@@ -101,7 +102,7 @@ class Highlights extends System {
 
   async add (highlight, timestamp, sender) {
     global.api.createMarker()
-    global.commons.sendMessage(global.translate('highlights.saved')
+    commons.sendMessage(global.translate('highlights.saved')
       .replace(/\$hours/g, (timestamp.hours < 10) ? '0' + timestamp.hours : timestamp.hours)
       .replace(/\$minutes/g, (timestamp.minutes < 10) ? '0' + timestamp.minutes : timestamp.minutes)
       .replace(/\$seconds/g, (timestamp.seconds < 10) ? '0' + timestamp.seconds : timestamp.seconds), sender)
@@ -115,7 +116,7 @@ class Highlights extends System {
     const latestStreamId = sortedHighlights.length > 0 ? sortedHighlights[0].id : null
 
     if (_.isNull(latestStreamId)) {
-      global.commons.sendMessage(global.translate('highlights.list.empty'), opts.sender)
+      commons.sendMessage(global.translate('highlights.list.empty'), opts.sender)
       return
     }
     highlights = _.filter(highlights, function (o) { return o.id === latestStreamId })
@@ -126,7 +127,7 @@ class Highlights extends System {
         highlight.timestamp.minutes + 'm' +
         highlight.timestamp.seconds + 's')
     }
-    global.commons.sendMessage(global.translate(list.length > 0 ? 'highlights.list.items' : 'highlights.list.empty')
+    commons.sendMessage(global.translate(list.length > 0 ? 'highlights.list.items' : 'highlights.list.empty')
       .replace(/\$items/g, list.join(', ')), opts.sender)
   }
 }

@@ -1,3 +1,4 @@
+import { getOwner } from '../commons';
 import Widget from './_interface';
 
 class Cmdboard extends Widget {
@@ -25,7 +26,7 @@ class Cmdboard extends Widget {
       socket.on('cmdboard.widget.run', (command) => {
         global.tmi.message({
           message: {
-            tags: { username: global.commons.getOwner() },
+            tags: { username: getOwner() },
             message: command,
           },
           skip: true,

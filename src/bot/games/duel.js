@@ -5,6 +5,9 @@ const _ = require('lodash')
 const {
   isMainThread
 } = require('worker_threads');
+const {
+  prepare, sendMessage, getOwner, isModerator, isBroadcaster, getLocalizedName
+} = require('../commons');
 
 // bot libraries
 import Game from './_interface'
@@ -75,7 +78,7 @@ class Duel extends Game {
 
     const probability = winnerUser.tickets / (total / 100)
 
-    let m = await global.commons.prepare(_.size(users) === 1 ? 'gambling.duel.noContestant' : 'gambling.duel.winner', {
+    let m = await prepare(_.size(users) === 1 ? 'gambling.duel.noContestant' : 'gambling.duel.winner', {
       pointsName: await global.systems.points.getPointsName(total),
       points: total,
       probability: _.round(probability, 2),
@@ -83,7 +86,7 @@ class Duel extends Game {
       tickets: winnerUser.tickets,
       winner: winnerUser.username
     })
-    global.commons.sendMessage(m, { username: global.commons.getOwner() }, { force: true })
+    sendMessage(m, { username: getOwner() }, { force: true })
 
     // give user his points
     await global.db.engine.increment('users.points', { id: winnerUser.id }, { points: parseInt(total, 10) })
@@ -99,8 +102,8 @@ class Duel extends Game {
     const users = await global.db.engine.find(this.collection.users);
     const bank = users.map((o) => o.tickets).reduce((a, b) => a + b, 0);
 
-    global.commons.sendMessage(
-      global.commons.prepare('gambling.duel.bank', {
+    sendMessage(
+      prepare('gambling.duel.bank', {
         command: this.settings.commands['!duel'],
         points: bank,
         pointsName: await global.systems.points.getPointsName(bank),
@@ -131,19 +134,19 @@ class Duel extends Game {
       } else {
         // check if under gambling cooldown
         const cooldown = this.settings.cooldown
-        const isMod = await global.commons.isModerator(opts.sender)
+        const isMod = await isModerator(opts.sender)
         if (new Date().getTime() - new Date(this.settings._.cooldown).getTime() > cooldown * 1000 ||
-          (this.settings.bypassCooldownByOwnerAndMods && (isMod || global.commons.isBroadcaster(opts.sender)))) {
+          (this.settings.bypassCooldownByOwnerAndMods && (isMod || isBroadcaster(opts.sender)))) {
           // save new cooldown if not bypassed
-          if (!(this.settings.bypassCooldownByOwnerAndMods && (isMod || global.commons.isBroadcaster(opts.sender)))) this.settings._.cooldown = String(new Date())
+          if (!(this.settings.bypassCooldownByOwnerAndMods && (isMod || isBroadcaster(opts.sender)))) this.settings._.cooldown = String(new Date())
           await global.db.engine.insert(this.collection.users, { id: opts.sender.userId, username: opts.sender.username, tickets: Number(bet) })
           await global.db.engine.increment('users.points', { id: opts.sender.userId }, { points: parseInt(bet, 10) * -1 })
         } else {
-          message = await global.commons.prepare('gambling.fightme.cooldown', {
-            minutesName: global.commons.getLocalizedName(Math.round(((cooldown * 1000) - (new Date().getTime() - new Date(this.settings._.cooldown).getTime())) / 1000 / 60), 'core.minutes'),
+          message = await prepare('gambling.fightme.cooldown', {
+            minutesName: getLocalizedName(Math.round(((cooldown * 1000) - (new Date().getTime() - new Date(this.settings._.cooldown).getTime())) / 1000 / 60), 'core.minutes'),
             cooldown: Math.round(((cooldown * 1000) - (new Date().getTime() - new Date(this.settings._.cooldown).getTime())) / 1000 / 60),
             command: opts.command })
-          global.commons.sendMessage(message, opts.sender)
+          sendMessage(message, opts.sender)
           return true
         }
       }
@@ -152,52 +155,52 @@ class Duel extends Game {
       const isNewDuel = (this.settings._.timestamp) === 0
       if (isNewDuel) {
         this.settings._.timestamp = Number(new Date())
-        message = await global.commons.prepare('gambling.duel.new', {
-          minutesName: global.commons.getLocalizedName(5, 'core.minutes'),
+        message = await prepare('gambling.duel.new', {
+          minutesName: getLocalizedName(5, 'core.minutes'),
           minutes: this.settings.duration,
           command: opts.command })
-        global.commons.sendMessage(message, opts.sender)
+        sendMessage(message, opts.sender)
       }
 
       const tickets = (await global.db.engine.findOne(this.collection.users, { id: opts.sender.userId })).tickets
       setTimeout(async () => {
-        message = await global.commons.prepare(isNewDuelist ? 'gambling.duel.joined' : 'gambling.duel.added', {
+        message = await prepare(isNewDuelist ? 'gambling.duel.joined' : 'gambling.duel.added', {
           pointsName: await global.systems.points.getPointsName(tickets),
           points: tickets
         })
-        global.commons.sendMessage(message, opts.sender)
+        sendMessage(message, opts.sender)
       }, isNewDuel ? 500 : 0)
       return true
     } catch (e) {
       switch (e.message) {
         case ERROR_NOT_ENOUGH_OPTIONS:
-          global.commons.sendMessage(global.translate('gambling.duel.notEnoughOptions'), opts.sender)
+          sendMessage(global.translate('gambling.duel.notEnoughOptions'), opts.sender)
           break
         case ERROR_ZERO_BET:
-          message = await global.commons.prepare('gambling.duel.zeroBet', {
+          message = await prepare('gambling.duel.zeroBet', {
             pointsName: await global.systems.points.getPointsName(0)
           })
-          global.commons.sendMessage(message, opts.sender)
+          sendMessage(message, opts.sender)
           break
         case ERROR_NOT_ENOUGH_POINTS:
-          message = await global.commons.prepare('gambling.duel.notEnoughPoints', {
+          message = await prepare('gambling.duel.notEnoughPoints', {
             pointsName: await global.systems.points.getPointsName(bet),
             points: bet
           })
-          global.commons.sendMessage(message, opts.sender)
+          sendMessage(message, opts.sender)
           break
         case ERROR_MINIMAL_BET:
           bet = this.settings.minimalBet
-          message = await global.commons.prepare('gambling.duel.lowerThanMinimalBet', {
+          message = await prepare('gambling.duel.lowerThanMinimalBet', {
             pointsName: await global.systems.points.getPointsName(bet),
             points: bet,
             command: opts.command
           })
-          global.commons.sendMessage(message, opts.sender)
+          sendMessage(message, opts.sender)
           break
         default:
           global.log.error(e.stack)
-          global.commons.sendMessage(global.translate('core.error'), opts.sender)
+          sendMessage(global.translate('core.error'), opts.sender)
       }
     }
   }

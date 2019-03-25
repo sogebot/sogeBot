@@ -4,6 +4,9 @@ const util = require('util')
 const {
   isMainThread
 } = require('worker_threads');
+const {
+  flatten, unflatten
+} = require('../commons');
 
 const Interface = require('./interface')
 const Datastore = require('nedb')
@@ -104,12 +107,12 @@ class INeDB extends Interface {
     const total = where._total || undefined
 
     delete where._sort; delete where._sum; delete where._total; delete where._group
-    if (_.some(Object.keys(global.commons.flatten(where)).map(o => o.includes('$regex')))) {
-      if (Object.keys(global.commons.flatten(where)).length > 1) {
+    if (_.some(Object.keys(flatten(where)).map(o => o.includes('$regex')))) {
+      if (Object.keys(flatten(where)).length > 1) {
         throw Error('Don\'t use $regex with other search attributes');
       }
     } else {
-      where = global.commons.flatten(where)
+      where = flatten(where)
     }
 
     return new Promise((resolve, reject) => {
@@ -164,7 +167,7 @@ class INeDB extends Interface {
 
     var self = this
     return new Promise(function (resolve, reject) {
-      self.on(table).findOne(global.commons.flatten(where), async (err, item) => {
+      self.on(table).findOne(flatten(where), async (err, item) => {
         if (err) {
           global.log.error(err.message)
           global.log.error(util.inspect({ type: 'findOne', table, where }))
@@ -192,7 +195,7 @@ class INeDB extends Interface {
 
     var self = this
     return new Promise(function (resolve, reject) {
-      self.on(table).insert(global.commons.unflatten(object), function (err, item) {
+      self.on(table).insert(unflatten(object), function (err, item) {
         if (err) {
           global.log.error(err.message)
           global.log.error(util.inspect({ type: 'insert', table, object }))
@@ -207,7 +210,7 @@ class INeDB extends Interface {
 
     var self = this
     return new Promise(function (resolve, reject) {
-      self.on(table).remove(global.commons.flatten(where), { multi: true }, function (err, numRemoved) {
+      self.on(table).remove(flatten(where), { multi: true }, function (err, numRemoved) {
         if (err) {
           global.log.error(err.message)
           global.log.error(util.inspect({ type: 'remove', table, where }))
@@ -229,7 +232,7 @@ class INeDB extends Interface {
     var self = this
     return new Promise(function (resolve, reject) {
       // DON'T EVER DELETE flatten ON OBJECT - with flatten object get updated and not replaced
-      self.on(table).update(global.commons.flatten(where), { $set: global.commons.flatten(object, { safe: true }) }, { upsert: (_.isNil(where._id) && !_.isEmpty(where)), multi: (_.isEmpty(where)), returnUpdatedDocs: true }, function (err, numReplaced, affectedDocs) {
+      self.on(table).update(flatten(where), { $set: flatten(object, { safe: true }) }, { upsert: (_.isNil(where._id) && !_.isEmpty(where)), multi: (_.isEmpty(where)), returnUpdatedDocs: true }, function (err, numReplaced, affectedDocs) {
         if (err) {
           global.log.error(err.message)
           global.log.error(util.inspect({ type: 'update', table, object, where }))
@@ -251,7 +254,7 @@ class INeDB extends Interface {
     var self = this
     return new Promise(function (resolve, reject) {
       // DON'T EVER DELETE flatten ON OBJECT - with flatten object get updated and not replaced
-      self.on(table).update(global.commons.flatten(where), { $inc: global.commons.flatten(object) }, { upsert: true, multi: false, returnUpdatedDocs: true }, function (err, numReplaced, affectedDocs) {
+      self.on(table).update(flatten(where), { $inc: flatten(object) }, { upsert: true, multi: false, returnUpdatedDocs: true }, function (err, numReplaced, affectedDocs) {
         if (err) {
           global.log.error(err.message)
           global.log.error(util.inspect({ type: 'incrementOne', table, object, where }))
@@ -273,7 +276,7 @@ class INeDB extends Interface {
     var self = this
     return new Promise(function (resolve, reject) {
       // DON'T EVER DELETE flatten ON OBJECT - with flatten object get updated and not replaced
-      self.on(table).update(global.commons.flatten(where), { $inc: global.commons.flatten(object) }, { upsert: true, multi: true, returnUpdatedDocs: true }, function (err, numReplaced, affectedDocs) {
+      self.on(table).update(flatten(where), { $inc: flatten(object) }, { upsert: true, multi: true, returnUpdatedDocs: true }, function (err, numReplaced, affectedDocs) {
         if (err) {
           global.log.error(err.message)
           global.log.error(util.inspect({ type: 'increment', table, object, where }))

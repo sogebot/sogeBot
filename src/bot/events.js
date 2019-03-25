@@ -7,6 +7,9 @@ const moment = require('moment')
 const {
   isMainThread
 } = require('worker_threads');
+const {
+  isModerator, isSubscriber, isVIP, isBroadcaster, isBot, isOwner, prepare, sendMessage, getOwner, flatten, getLocalizedName
+} = require('./commons');
 const axios = require('axios')
 
 const Message = require('./message')
@@ -116,23 +119,23 @@ class Events {
     if (!_.isNil(_.get(attributes, 'username', null))) {
       // add is object
       attributes.is = {
-        moderator: await global.commons.isModerator(attributes.username),
-        subscriber: await global.commons.isSubscriber(attributes.username),
-        vip: await global.commons.isVIP(attributes.username),
-        broadcaster: global.commons.isBroadcaster(attributes.username),
-        bot: global.commons.isBot(attributes.username),
-        owner: global.commons.isOwner(attributes.username),
+        moderator: await isModerator(attributes.username),
+        subscriber: await isSubscriber(attributes.username),
+        vip: await isVIP(attributes.username),
+        broadcaster: isBroadcaster(attributes.username),
+        bot: isBot(attributes.username),
+        owner: isOwner(attributes.username),
       }
     }
     if (!_.isNil(_.get(attributes, 'recipient', null))) {
       // add is object
       attributes.recipientis = {
-        moderator: await global.commons.isModerator(attributes.recipient),
-        subscriber: await global.commons.isSubscriber(attributes.recipient),
-        vip: await global.commons.isVIP(attributes.recipient),
-        broadcaster: global.commons.isBroadcaster(attributes.recipient),
-        bot: global.commons.isBot(attributes.recipient),
-        owner: global.commons.isOwner(attributes.recipient),
+        moderator: await isModerator(attributes.recipient),
+        subscriber: await isSubscriber(attributes.recipient),
+        vip: await isVIP(attributes.recipient),
+        broadcaster: isBroadcaster(attributes.recipient),
+        bot: isBot(attributes.recipient),
+        owner: isOwner(attributes.recipient),
       }
     }
     if (_.get(attributes, 'reset', false)) return this.reset(eventId)
@@ -166,8 +169,8 @@ class Events {
     let cid = await global.api.createClip({ hasDelay: operation.hasDelay })
     if (cid) { // OK
       if (Boolean(operation.announce) === true) {
-        let message = await global.commons.prepare('api.clips.created', { link: `https://clips.twitch.tv/${cid}` })
-        global.commons.sendMessage(message, { username: global.commons.getOwner() })
+        let message = await prepare('api.clips.created', { link: `https://clips.twitch.tv/${cid}` })
+        sendMessage(message, { username: getOwner() })
       }
       global.log.info('Clip was created successfully')
       return cid
@@ -237,13 +240,13 @@ class Events {
       let replace = new RegExp(`\\$${name}`, 'g')
       command = command.replace(replace, val)
     })
-    command = await new Message(command).parse({ username: global.commons.getOwner() })
+    command = await new Message(command).parse({ username: getOwner() })
 
     if (global.mocha) {
       // we are testing => straight to parser
       const Parser = require('./parser')
       const parse = new Parser({
-        sender: (_.get(operation, 'isCommandQuiet', false) ? {} : { username: global.commons.getOwner() }),
+        sender: (_.get(operation, 'isCommandQuiet', false) ? {} : { username: getOwner() }),
         message: command,
         skip: true
       })
@@ -251,7 +254,7 @@ class Events {
     } else {
       global.tmi.message({
         message: {
-          tags: _.get(operation, 'isCommandQuiet', false) ? {} : { username: global.commons.getOwner() },
+          tags: _.get(operation, 'isCommandQuiet', false) ? {} : { username: getOwner() },
           message: command,
         },
         skip: true
@@ -260,11 +263,11 @@ class Events {
   }
 
   async fireSendChatMessageOrWhisper (operation, attributes, whisper) {
-    let username = _.isNil(attributes.username) ? global.commons.getOwner() : attributes.username
+    let username = _.isNil(attributes.username) ? getOwner() : attributes.username
     let message = operation.messageToSend
     const atUsername = global.tmi.settings.chat.showWithAt
 
-    attributes = global.commons.flatten(attributes);
+    attributes = flatten(attributes);
     attributes = _(attributes).toPairs().sortBy((o) => -o[0].length).fromPairs().value() // reorder attributes by key length
     for (let [name, val] of Object.entries(attributes)) {
       if (_.isObject(val) && _.size(val) === 0) continue // skip empty object
@@ -272,7 +275,7 @@ class Events {
       let replace = new RegExp(`\\$${name}`, 'g')
       message = message.replace(replace, val)
     }
-    global.commons.sendMessage(message, { username: username, 'message-type': (whisper ? 'whisper' : 'chat') })
+    sendMessage(message, { username: username, 'message-type': (whisper ? 'whisper' : 'chat') })
   }
 
   async fireSendWhisper (operation, attributes) {
@@ -620,11 +623,11 @@ class Events {
           },
           subStreakShareEnabled: _.random(0, 1, false) === 0,
           subStreak: _.random(10, 99, false),
-          subStreakName: global.commons.getLocalizedName(_.random(10, 99, false), 'core.months'),
+          subStreakName: getLocalizedName(_.random(10, 99, false), 'core.months'),
           subCumulativeMonths: _.random(10, 99, false),
-          subCumulativeMonthsName: global.commons.getLocalizedName(_.random(10, 99, false), 'core.months'),
+          subCumulativeMonthsName: getLocalizedName(_.random(10, 99, false), 'core.months'),
           months: months,
-          monthsName: global.commons.getLocalizedName(months, 'core.months'),
+          monthsName: getLocalizedName(months, 'core.months'),
           message: _.sample(['', 'Lorem Ipsum Dolor Sit Amet']),
           viewers: _.random(0, 9999, false),
           autohost: _.random(0, 1, false) === 0,
@@ -641,7 +644,7 @@ class Events {
           if (!_.isNil(attributes.userObject)) {
             // flatten userObject
             let userObject = attributes.userObject
-            _.merge(attributes, global.commons.flatten({ userObject: userObject }))
+            _.merge(attributes, flatten({ userObject: userObject }))
           }
           const isOperationSupported = !_.isNil(_.find(this.supportedOperationsList, (o) => o.id === operation.key))
           if (isOperationSupported) _.find(this.supportedOperationsList, (o) => o.id === operation.key).fire(operation.definitions, attributes)

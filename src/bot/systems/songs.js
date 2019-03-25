@@ -12,6 +12,7 @@ const {
   isMainThread
 } = require('worker_threads');
 import System from './_interface'
+const commons = require('../commons');
 
 class Songs extends System {
   youtubeApi = new YouTube('AIzaSyDYevtuLOxbyqBjh17JNZNvSQO854sngK0');
@@ -160,13 +161,13 @@ class Songs extends System {
 
     let update = await global.db.engine.update(this.collection.ban, { videoId: currentSong.videoID }, { videoId: currentSong.videoID, title: currentSong.title })
     if (update.length > 0) {
-      let message = await global.commons.prepare('songs.song-was-banned', { name: currentSong.title })
-      global.commons.sendMessage(message, opts.sender)
+      let message = await commons.prepare('songs.song-was-banned', { name: currentSong.title })
+      commons.sendMessage(message, opts.sender)
 
       // send timeouts to all users who requested song
       const request = (await global.db.engine.find(this.collection.request, { videoID: opts.parameters })).map(o => o.username)
       if (currentSong.videoID === opts.parameters) request.push(currentSong.username)
-      for (let user of request) global.commons.timeout(user, global.translate('songs.song-was-banned-timeout-message'), 300)
+      for (let user of request) commons.timeout(user, global.translate('songs.song-was-banned-timeout-message'), 300)
 
       await Promise.all([global.db.engine.remove(this.collection.playlist, { videoID: currentSong.videoID }), global.db.engine.remove(this.collection.request, { videoID: currentSong.videoID })])
 
@@ -195,13 +196,13 @@ class Songs extends System {
             if (err) global.log.error(err, { fnc: 'Songs.prototype.banSongById#1' })
             else if (!_.isNil(videoInfo) && !_.isNil(videoInfo.title)) {
               banned++
-              global.commons.sendMessage(global.translate('songs.bannedSong').replace(/\$title/g, videoInfo.title), opts.sender)
+              commons.sendMessage(global.translate('songs.bannedSong').replace(/\$title/g, videoInfo.title), opts.sender)
 
               // send timeouts to all users who requested song
               const request = (await global.db.engine.find(this.collection.request, { videoID: opts.parameters })).map(o => o.username)
               const currentSong = JSON.parse(this.settings._.currentSong)
               if (currentSong.videoID === opts.parameters) request.push(currentSong.username)
-              for (let user of request) global.commons.timeout(user, global.translate('songs.bannedSongTimeout'), 300)
+              for (let user of request) commons.timeout(user, global.translate('songs.bannedSongTimeout'), 300)
 
               await Promise.all([
                 global.db.engine.update(this.collection.ban, { videoId: opts.parameters }, { videoId: opts.parameters, title: videoInfo.title }),
@@ -226,8 +227,8 @@ class Songs extends System {
 
   async unbanSong (opts) {
     let removed = await global.db.engine.remove(this.collection.ban, { videoId: opts.parameters })
-    if (removed > 0) global.commons.sendMessage(global.translate('songs.song-was-unbanned'), opts.sender)
-    else global.commons.sendMessage(global.translate('songs.song-was-not-banned'), opts.sender)
+    if (removed > 0) commons.sendMessage(global.translate('songs.song-was-unbanned'), opts.sender)
+    else commons.sendMessage(global.translate('songs.song-was-not-banned'), opts.sender)
   }
 
   async sendNextSongID () {
@@ -291,8 +292,8 @@ class Songs extends System {
       if (currentSong.type === 'playlist') translation = 'songs.current-song-from-playlist'
       else translation = 'songs.current-song-from-songrequest'
     }
-    let message = await global.commons.prepare(translation, { name: currentSong.title, username: currentSong.username })
-    global.commons.sendMessage(message, { username: await global.oauth.settings.broadcaster.username })
+    let message = await commons.prepare(translation, { name: currentSong.title, username: currentSong.username })
+    commons.sendMessage(message, { username: await global.oauth.settings.broadcaster.username })
   }
 
   async notifySong () {
@@ -302,8 +303,8 @@ class Songs extends System {
       if (currentSong.type === 'playlist') translation = 'songs.current-song-from-playlist'
       else translation = 'songs.current-song-from-songrequest'
     } else return
-    let message = await global.commons.prepare(translation, { name: currentSong.title, username: currentSong.username })
-    global.commons.sendMessage(message, { username: await global.oauth.settings.broadcaster.username })
+    let message = await commons.prepare(translation, { name: currentSong.title, username: currentSong.username })
+    commons.sendMessage(message, { username: await global.oauth.settings.broadcaster.username })
   }
 
   async stealSong () {
@@ -311,7 +312,7 @@ class Songs extends System {
       const currentSong = JSON.parse(this.settings._.currentSong)
       this.addSongToPlaylist({ sender: null, parameters: currentSong.videoID })
     } catch (err) {
-      global.commons.sendMessage(global.translate('songs.noCurrentSong'), { username: await global.oauth.settings.broadcaster.username })
+      commons.sendMessage(global.translate('songs.noCurrentSong'), { username: await global.oauth.settings.broadcaster.username })
     }
   }
 
@@ -323,15 +324,15 @@ class Songs extends System {
   }
 
   async help () {
-    global.commons.sendMessage(global.translate('core.usage') + ': !playlist add <youtubeid> | !playlist remove <youtubeid> | !playlist ban <youtubeid> | !playlist random on/off | !playlist steal', { username: await global.oauth.settings.broadcaster.username })
+    commons.sendMessage(global.translate('core.usage') + ': !playlist add <youtubeid> | !playlist remove <youtubeid> | !playlist ban <youtubeid> | !playlist random on/off | !playlist steal', { username: await global.oauth.settings.broadcaster.username })
   }
 
   async addSongToQueue (opts) {
     if (opts.parameters.length < 1 || !this.settings.songrequest) {
       if (this.settings.songrequest) {
-        global.commons.sendMessage(global.translate('core.usage') + ': !songrequest <video-id|video-url|search-string>', opts.sender)
+        commons.sendMessage(global.translate('core.usage') + ': !songrequest <video-id|video-url|search-string>', opts.sender)
       } else {
-        global.commons.sendMessage('$sender, ' + global.translate('core.settings.songs.songrequest.false'), opts.sender)
+        commons.sendMessage('$sender, ' + global.translate('core.settings.songs.songrequest.false'), opts.sender)
       }
       return
     }
@@ -353,7 +354,7 @@ class Songs extends System {
     // is song banned?
     let ban = await global.db.engine.findOne(this.collection.ban, { videoID: videoID })
     if (!_.isEmpty(ban)) {
-      global.commons.sendMessage(global.translate('songs.song-is-banned'), opts.sender)
+      commons.sendMessage(global.translate('songs.song-is-banned'), opts.sender)
       return
     }
 
@@ -362,7 +363,7 @@ class Songs extends System {
       try {
         const video = await this.youtubeApi.getVideo(videoID)
         if (video.data.snippet.categoryId !== '10') {
-          return global.commons.sendMessage(global.translate('songs.incorrect-category'), opts.sender)
+          return commons.sendMessage(global.translate('songs.incorrect-category'), opts.sender)
         }
       } catch (e) {}
     }
@@ -370,13 +371,13 @@ class Songs extends System {
     ytdl.getInfo('https://www.youtube.com/watch?v=' + videoID, async (err, videoInfo) => {
       if (err) return global.log.error(err, { fnc: 'Songs.prototype.addSongToQueue#1' })
       if (_.isUndefined(videoInfo) || _.isUndefined(videoInfo.title) || _.isNull(videoInfo.title)) {
-        global.commons.sendMessage(global.translate('songs.song-was-not-found'), opts.sender)
+        commons.sendMessage(global.translate('songs.song-was-not-found'), opts.sender)
       } else if (videoInfo.length_seconds / 60 > this.settings.duration) {
-        global.commons.sendMessage(global.translate('songs.song-is-too-long'), opts.sender)
+        commons.sendMessage(global.translate('songs.song-is-too-long'), opts.sender)
       } else {
         global.db.engine.update(this.collection.request, { addedAt: new Date().getTime() }, { videoID: videoID, title: videoInfo.title, addedAt: new Date().getTime(), loudness: videoInfo.loudness, length_seconds: videoInfo.length_seconds, username: opts.sender.username })
-        let message = await global.commons.prepare('songs.song-was-added-to-queue', { name: videoInfo.title })
-        global.commons.sendMessage(message, opts.sender)
+        let message = await commons.prepare('songs.song-was-added-to-queue', { name: videoInfo.title })
+        commons.sendMessage(message, opts.sender)
         this.getMeanLoudness()
       }
     })
@@ -387,8 +388,8 @@ class Songs extends System {
     sr = _.head(_.orderBy(sr, ['addedAt'], ['desc']))
     if (!_.isNil(sr)) {
       await global.db.engine.remove(this.collection.request, { username: opts.sender.username, _id: sr._id.toString() })
-      let m = await global.commons.prepare('songs.song-was-removed-from-queue', { name: sr.title })
-      global.commons.sendMessage(m, opts.sender)
+      let m = await commons.prepare('songs.song-was-removed-from-queue', { name: sr.title })
+      commons.sendMessage(m, opts.sender)
       this.getMeanLoudness()
     }
   }
@@ -438,7 +439,7 @@ class Songs extends System {
 
     this.refreshPlaylistVolume()
     this.getMeanLoudness()
-    global.commons.sendMessage(await global.commons.prepare('songs.playlist-imported', { imported, skipped: done - imported }), opts.sender)
+    commons.sendMessage(await commons.prepare('songs.playlist-imported', { imported, skipped: done - imported }), opts.sender)
     return { imported, skipped: done - imported }
   }
 
@@ -449,10 +450,10 @@ class Songs extends System {
     let song = await global.db.engine.findOne(this.collection.playlist, { videoID: videoID })
     if (!_.isEmpty(song)) {
       await global.db.engine.remove(this.collection.playlist, { videoID: videoID })
-      let message = await global.commons.prepare('songs.song-was-removed-from-playlist', { name: song.title })
-      global.commons.sendMessage(message, opts.sender)
+      let message = await commons.prepare('songs.song-was-removed-from-playlist', { name: song.title })
+      commons.sendMessage(message, opts.sender)
     } else {
-      global.commons.sendMessage(global.translate('songs.song-was-not-found'), opts.sender)
+      commons.sendMessage(global.translate('songs.song-was-not-found'), opts.sender)
     }
   }
 
@@ -474,7 +475,7 @@ class Songs extends System {
     const ids = await global.systems.songs.getSongsIdsFromPlaylist(opts.parameters)
 
     if (ids.length === 0) {
-      global.commons.sendMessage(await global.commons.prepare('songs.playlist-is-empty'), opts.sender)
+      commons.sendMessage(await commons.prepare('songs.playlist-is-empty'), opts.sender)
     } else {
       let imported = 0
       let done = 0
@@ -516,7 +517,7 @@ class Songs extends System {
 
       await this.refreshPlaylistVolume()
       await this.getMeanLoudness()
-      global.commons.sendMessage(await global.commons.prepare('songs.playlist-imported', { imported, skipped: done - imported }), opts.sender)
+      commons.sendMessage(await commons.prepare('songs.playlist-imported', { imported, skipped: done - imported }), opts.sender)
       return { imported, skipped: done - imported }
     }
   }

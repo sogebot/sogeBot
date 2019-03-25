@@ -12,6 +12,8 @@ const testuser = { username: 'testuser' }
 const testuser2 = { username: 'testuser2' }
 const testuser3 = { username: 'testuser3' }
 
+const commons = require('../../../dest/commons');
+
 describe('TMI - ignore', () => {
   before(async () => {
     await db.cleanup()
@@ -20,7 +22,7 @@ describe('TMI - ignore', () => {
 
   describe('Ignore workflow', () => {
     it('testuser is not ignored by default', async () => {
-      assert.isFalse(await global.commons.isIgnored(testuser))
+      assert.isFalse(await commons.isIgnored(testuser))
     })
 
     it('add testuser to ignore list', async () => {
@@ -38,7 +40,7 @@ describe('TMI - ignore', () => {
       const item = await global.db.engine.findOne('core.settings', { system: 'tmi', key: 'chat.ignorelist' })
 
       await message.isSent('ignore.user.is.ignored', owner, testuser)
-      assert.isTrue(await global.commons.isIgnored(testuser))
+      assert.isTrue(await commons.isIgnored(testuser))
       assert.isNotEmpty(item)
       assert.include(item.value, 'testuser')
     })
@@ -48,7 +50,7 @@ describe('TMI - ignore', () => {
       const item = await global.db.engine.findOne('core.settings', { system: 'tmi', key: 'chat.ignorelist' })
 
       await message.isSent('ignore.user.is.ignored', owner, testuser2)
-      assert.isTrue(await global.commons.isIgnored(testuser2))
+      assert.isTrue(await commons.isIgnored(testuser2))
       assert.isNotEmpty(item)
       assert.include(item.value, 'testuser2')
     })
@@ -58,7 +60,7 @@ describe('TMI - ignore', () => {
       const item = await global.db.engine.findOne('core.settings', { system: 'tmi', key: 'chat.ignorelist' })
 
       await message.isSent('ignore.user.is.not.ignored', owner, testuser3)
-      assert.isFalse(await global.commons.isIgnored(testuser3))
+      assert.isFalse(await commons.isIgnored(testuser3))
       assert.isNotEmpty(item)
       assert.notInclude(item.value, 'testuser3')
 
@@ -72,7 +74,7 @@ describe('TMI - ignore', () => {
     it('testuser should not be in ignore list', async () => {
       global.tmi.ignoreCheck({ sender: owner, parameters: 'testuser' })
       await message.isSent('ignore.user.is.not.ignored', owner, testuser)
-      assert.isFalse(await global.commons.isIgnored(testuser))
+      assert.isFalse(await commons.isIgnored(testuser))
     })
   })
 })
