@@ -16,7 +16,7 @@ const message = require('../../general.js').message
 const owner = { username: 'soge__' }
 
 describe('Scrim - full workflow', () => {
-  describe.only('cooldown only', () => {
+  describe('cooldown only', () => {
     before(async () => {
       await db.cleanup()
       await message.prepare()
