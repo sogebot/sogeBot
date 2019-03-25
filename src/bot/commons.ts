@@ -354,5 +354,5 @@ export function getLocalizedName(number, translation) {
  * returns nearest 5
  */
 export function round5(x: number) {
-  return (x % 5) >= 2.5 ? Number(Number(x / 5).toFixed(0)) * 5 + 5 : Number(Number(x / 5).toFixed(0)) * 5;
+  return Math.round(x / 5 ) * 5;
 }
