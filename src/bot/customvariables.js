@@ -12,7 +12,7 @@ const XRegExp = require('xregexp')
 
 const Message = require('./message')
 import { permission } from './permissions';
-import { isVIP, isModerator, isOwner } from './commons';
+const commons = require('./commons');
 
 class CustomVariables {
   constructor () {
@@ -234,9 +234,9 @@ class CustomVariables {
       // set item permission to owner if missing
       item.permission = typeof item.permission === 'undefined' ? permission.CASTERS : item.permission;
       let [isVIP, isMod, isOwner] = await Promise.all([
-        isVIP(opts.sender),
-        isModerator(opts.sender),
-        isOwner(opts.sender)
+        commons.isVIP(opts.sender),
+        commons.isModerator(opts.sender),
+        commons.isOwner(opts.sender)
       ])
       const permissionsAreValid = _.isNil(opts.sender) || (await global.permissions.check(opts.sender.userId, item.permission)).access;
       if ((item.readOnly && !opts.readOnlyBypass) || !permissionsAreValid) {

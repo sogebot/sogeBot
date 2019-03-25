@@ -100,12 +100,11 @@ export async function prepare(translate: string, attr?: {[x: string]: string }):
 }
 
 export function getTime(time, isChat) {
-  let now = { days: 0, hours: 0, minutes: 0, seconds: 0 };
   let days: string | number = 0;
   let hours: string | number = 0;
   let minutes: string | number = 0;
   let seconds: string | number = 0;
-  now = _.isNull(time) || !time
+  const now = _.isNull(time) || !time
     ? { days: 0, hours: 0, minutes: 0, seconds: 0 }
     : moment.preciseDiff(moment(), moment(time), true);
   if (isChat) {

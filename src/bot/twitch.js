@@ -7,7 +7,6 @@ const {
 } = require('worker_threads');
 import { permission } from './permissions';
 import Core from './_interface';
-const commons = require('./commons');
 
 require('moment-precise-range-plugin')
 

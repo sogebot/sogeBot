@@ -9,7 +9,6 @@ const {
 } = require('worker_threads');
 const axios = require('axios')
 import Core from './_interface'
-const commons = require('./commons');
 
 const __DEBUG__ = {
   WATCHED: (process.env.DEBUG && process.env.DEBUG.includes('users.watched')),

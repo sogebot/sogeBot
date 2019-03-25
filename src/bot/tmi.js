@@ -10,7 +10,6 @@ const Parser = require('./parser')
 const util = require('util');
 const commons = require('./commons');
 
-
 import { permission } from './permissions';
 const Expects = require('./expects')
 import Core from './_interface'
@@ -82,9 +81,9 @@ class TMI extends Core {
   async ignoreCheck (opts: Object) {
     try {
       const username = new Expects(opts.parameters).username().toArray()[0].toLowerCase()
-      const isIgnored = await isIgnored(username)
-      sendMessage(prepare(isIgnored ? 'ignore.user.is.ignored' : 'ignore.user.is.not.ignored', { username }), opts.sender)
-      return isIgnored
+      const isUserIgnored = await commons.isIgnored(username)
+      sendMessage(prepare(isUserIgnored ? 'ignore.user.is.ignored' : 'ignore.user.is.not.ignored', { username }), opts.sender)
+      return isUserIgnored
     } catch (e) {}
   }
 
@@ -323,7 +322,7 @@ class TMI extends Core {
       const method = this.getMethod(message)
       const userstate = message.tags
 
-      if (await isIgnored(username)) return
+      if (await commons.isIgnored(username)) return
 
       const user = await global.db.engine.findOne('users', { id: userstate.userId })
       let subscribedAt = _.now()
@@ -372,7 +371,7 @@ class TMI extends Core {
       const userstate = message.tags
       const messageFromUser = message.message
 
-      if (await isIgnored(username)) return
+      if (await commons.isIgnored(username)) return
 
       const user = await global.db.engine.findOne('users', { id: userstate.userId })
 
@@ -424,7 +423,7 @@ class TMI extends Core {
 
       this.ignoreGiftsFromUser[username] = { count, time: new Date() }
 
-      if (await isIgnored(username)) return
+      if (await commons.isIgnored(username)) return
 
       global.overlays.eventlist.add({ type: 'subcommunitygift', username, count })
       global.events.fire('subcommunitygift', { username, count })
@@ -478,7 +477,7 @@ class TMI extends Core {
           }
         }
       }
-      if (await isIgnored(username)) return
+      if (await commons.isIgnored(username)) return
 
       let user = await global.db.engine.findOne('users', { id: recipientId })
       if (!user.id) user.id = recipientId
@@ -495,7 +494,7 @@ class TMI extends Core {
       global.log.subgift(`${recipient}, from: ${username}, months: ${subCumulativeMonths}`)
 
       // also set subgift count to gifter
-      if (!(await isIgnored(username))) {
+      if (!(await commons.isIgnored(username))) {
         await global.db.engine.increment('users', { id: message.tags.userId }, { custom: { subgiftCount: 1 } })
       }
     } catch (e) {
@@ -513,7 +512,7 @@ class TMI extends Core {
       // remove cheerX or channelCheerX from message
       const messageFromUser = message.message.replace(/(.*?[cC]heer[\d]+)/g, '').trim()
 
-      if (await isIgnored(userstate.username)) return
+      if (await commons.isIgnored(userstate.username)) return
 
       // update users ID
       await global.db.engine.update('users', { id: userId }, { username })
