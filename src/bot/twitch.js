@@ -5,6 +5,9 @@ const _ = require('lodash')
 const {
   isMainThread
 } = require('worker_threads');
+const {
+  getTime, sendMessage
+} = require('./commons');
 import { permission } from './permissions';
 import Core from './_interface';
 
