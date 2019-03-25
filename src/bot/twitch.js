@@ -6,7 +6,7 @@ const {
   isMainThread
 } = require('worker_threads');
 const {
-  getTime, sendMessage
+  getTime, sendMessage, prepare
 } = require('./commons');
 import { permission } from './permissions';
 import Core from './_interface';
