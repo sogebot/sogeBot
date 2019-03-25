@@ -3,6 +3,7 @@
 // 3rdparty libraries
 const _ = require('lodash')
 const axios = require('axios')
+const commons = require('../commons');
 
 // bot libraries
 import { permission } from '../permissions';
@@ -30,7 +31,7 @@ class Commercial extends System {
       socket.on('commercial.run', (message) => {
         global.tmi.message({
           message: {
-            tags: { username: global.commons.getOwner() },
+            tags: { username: commons.getOwner() },
             message: '!commercial ' + data.seconds,
           },
           skip: true,
@@ -43,7 +44,7 @@ class Commercial extends System {
     let parsed = opts.parameters.match(/^([\d]+)? ?(.*)?$/)
 
     if (_.isNil(parsed)) {
-      global.commons.sendMessage('$sender, something went wrong with !commercial', opts.sender)
+      commons.sendMessage('$sender, something went wrong with !commercial', opts.sender)
     }
 
     let commercial = {
@@ -52,7 +53,7 @@ class Commercial extends System {
     }
 
     if (_.isNil(commercial.duration)) {
-      global.commons.sendMessage('Usage: !commercial [duration] [optional-message]', opts.sender)
+      commons.sendMessage('Usage: !commercial [duration] [optional-message]', opts.sender)
       return
     }
 
@@ -78,13 +79,13 @@ class Commercial extends System {
 
         global.events.fire('commercial', { duration: commercial.duration })
         global.client.commercial(await global.oauth.settings.broadcaster.username, commercial.duration)
-        if (!_.isNil(commercial.message)) global.commons.sendMessage(commercial.message, opts.sender)
+        if (!_.isNil(commercial.message)) commons.sendMessage(commercial.message, opts.sender)
       } catch (e) {
         global.log.error(`API: ${url} - ${e.status} ${_.get(e, 'body.message', e.statusText)}`)
         global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'commercial', api: 'kraken', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.statusText)}` })
       }
     } else {
-      global.commons.sendMessage('$sender, available commercial duration are: 30, 60, 90, 120, 150 and 180', opts.sender)
+      commons.sendMessage('$sender, available commercial duration are: 30, 60, 90, 120, 150 and 180', opts.sender)
     }
   }
 }

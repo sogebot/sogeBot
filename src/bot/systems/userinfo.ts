@@ -6,6 +6,7 @@ import { DateTime } from 'luxon';
 
 // bot libraries
 import System from './_interface';
+import { sendMessage, prepare, getLocalizedName } from '../commons';
 
 const __DEBUG__ =
   (process.env.DEBUG && process.env.DEBUG.includes('systems.*')) ||
@@ -69,7 +70,7 @@ class UserInfo extends System {
 
     const user = await global.users.getByName(username);
     if (_.isNil(user) || _.isNil(user.time) || _.isNil(user.time.follow) || _.isNil(user.is.follower) || !user.is.follower) {
-      global.commons.sendMessage(global.commons.prepare('followage.' + (opts.sender.username === username.toLowerCase() ? 'successSameUsername' : 'success') + '.never', { username }), opts.sender);
+      sendMessage(prepare('followage.' + (opts.sender.username === username.toLowerCase() ? 'successSameUsername' : 'success') + '.never', { username }), opts.sender);
     } else {
       const units: string[] = ['years', 'months', 'days', 'hours', 'minutes'];
       const diff = DateTime.fromMillis(user.time.follow).diffNow(['years', 'months', 'days', 'hours', 'minutes']);
@@ -77,14 +78,14 @@ class UserInfo extends System {
       for (const unit of units) {
         if (diff[unit]) {
           const v = -Number(diff[unit]).toFixed();
-          output.push(v + ' ' + global.commons.getLocalizedName(v, 'core.' + unit));
+          output.push(v + ' ' + getLocalizedName(v, 'core.' + unit));
         }
       }
       if (output.length === 0) {
-        output.push(0 + ' ' + global.commons.getLocalizedName(0, 'core.minutes'));
+        output.push(0 + ' ' + getLocalizedName(0, 'core.minutes'));
       }
 
-      global.commons.sendMessage(global.commons.prepare('followage.' + (opts.sender.username === username.toLowerCase() ? 'successSameUsername' : 'success') + '.time', {
+      sendMessage(prepare('followage.' + (opts.sender.username === username.toLowerCase() ? 'successSameUsername' : 'success') + '.time', {
           username,
           diff: output.join(', '),
         }), opts.sender);
@@ -103,7 +104,7 @@ class UserInfo extends System {
 
     const user = await global.users.getByName(username);
     if (_.isNil(user) || _.isNil(user.time) || _.isNil(user.time.subscribed_at) || _.isNil(user.is.subscriber) || !user.is.subscriber) {
-      global.commons.sendMessage(global.commons.prepare('subage.' + (opts.sender.username === username.toLowerCase() ? 'successSameUsername' : 'success') + '.never', { username }), opts.sender);
+      sendMessage(prepare('subage.' + (opts.sender.username === username.toLowerCase() ? 'successSameUsername' : 'success') + '.never', { username }), opts.sender);
     } else {
       const units: string[] = ['years', 'months', 'days', 'hours', 'minutes'];
       const diff = DateTime.fromMillis(user.time.subscribed_at).diffNow(['years', 'months', 'days', 'hours', 'minutes']);
@@ -111,14 +112,14 @@ class UserInfo extends System {
       for (const unit of units) {
         if (diff[unit]) {
           const v = -Number(diff[unit]).toFixed();
-          output.push(v + ' ' + global.commons.getLocalizedName(v, 'core.' + unit));
+          output.push(v + ' ' + getLocalizedName(v, 'core.' + unit));
         }
       }
       if (output.length === 0) {
-        output.push(0 + ' ' + global.commons.getLocalizedName(0, 'core.minutes'));
+        output.push(0 + ' ' + getLocalizedName(0, 'core.minutes'));
       }
 
-      global.commons.sendMessage(global.commons.prepare('subage.' + (opts.sender.username === username.toLowerCase() ? 'successSameUsername' : 'success') + '.time', {
+      sendMessage(prepare('subage.' + (opts.sender.username === username.toLowerCase() ? 'successSameUsername' : 'success') + '.time', {
           username,
           diff: output.join(', '),
         }), opts.sender);
@@ -137,7 +138,7 @@ class UserInfo extends System {
 
     const user = await global.users.getByName(username);
     if (_.isNil(user) || _.isNil(user.time) || _.isNil(user.time.created_at)) {
-      global.commons.sendMessage(global.commons.prepare('age.failed', { username }), opts.sender);
+      sendMessage(prepare('age.failed', { username }), opts.sender);
     } else {
       const units: string[] = ['years', 'months', 'days', 'hours', 'minutes'];
       const diff = DateTime.fromMillis(new Date(user.time.created_at).getTime()).diffNow(['years', 'months', 'days', 'hours', 'minutes']);
@@ -145,13 +146,13 @@ class UserInfo extends System {
       for (const unit of units) {
         if (diff[unit]) {
           const v = -Number(diff[unit]).toFixed();
-          output.push(v + ' ' + global.commons.getLocalizedName(v, 'core.' + unit));
+          output.push(v + ' ' + getLocalizedName(v, 'core.' + unit));
         }
       }
       if (output.length === 0) {
-        output.push(0 + ' ' + global.commons.getLocalizedName(0, 'core.minutes'));
+        output.push(0 + ' ' + getLocalizedName(0, 'core.minutes'));
       }
-      global.commons.sendMessage(global.commons.prepare('age.success.' + (opts.sender.username === username.toLowerCase() ? 'withoutUsername' : 'withUsername'), {
+      sendMessage(prepare('age.success.' + (opts.sender.username === username.toLowerCase() ? 'withoutUsername' : 'withUsername'), {
           username,
           diff: output.join(', '),
         }), opts.sender);
@@ -167,15 +168,15 @@ class UserInfo extends System {
 
       const user = await global.users.getByName(parsed[0]);
       if (_.isNil(user) || _.isNil(user.time) || _.isNil(user.time.message)) {
-        global.commons.sendMessage(global.translate('lastseen.success.never').replace(/\$username/g, parsed[0]), opts.sender);
+        sendMessage(global.translate('lastseen.success.never').replace(/\$username/g, parsed[0]), opts.sender);
       } else {
         const when = DateTime.fromMillis(user.time.message, { locale: global.general.settings.lang});
-        global.commons.sendMessage(global.translate('lastseen.success.time')
+        sendMessage(global.translate('lastseen.success.time')
           .replace(/\$username/g, parsed[0])
           .replace(/\$when/g, when.toLocaleString(DateTime.DATETIME_MED_WITH_SECONDS)), opts.sender);
       }
     } catch (e) {
-      global.commons.sendMessage(global.translate('lastseen.failed.parse'), opts.sender);
+      sendMessage(global.translate('lastseen.failed.parse'), opts.sender);
     }
   }
 
@@ -191,9 +192,9 @@ class UserInfo extends System {
         id = await global.users.getIdByName(username);
       }
       const time = id ? Number((await global.users.getWatchedOf(id) / (60 * 60 * 1000))).toFixed(1) : 0;
-      global.commons.sendMessage(global.commons.prepare('watched.success.time', { time, username }), opts.sender);
+      sendMessage(prepare('watched.success.time', { time, username }), opts.sender);
     } catch (e) {
-      global.commons.sendMessage(global.translate('watched.failed.parse'), opts.sender);
+      sendMessage(global.translate('watched.failed.parse'), opts.sender);
     }
   }
 
@@ -237,7 +238,7 @@ class UserInfo extends System {
       if (message.includes('$messages')) {
         const messages = await global.users.getMessagesOf(opts.sender.userId);
         const idx = message.indexOf('$messages');
-        message[idx] = messages + ' ' + global.commons.getLocalizedName(messages, 'core.messages');
+        message[idx] = messages + ' ' + getLocalizedName(messages, 'core.messages');
       }
 
       if (message.includes('$tips')) {
@@ -250,7 +251,7 @@ class UserInfo extends System {
         }
         message[idx] = `${Number(tipAmount).toFixed(2)}${global.currency.symbol(currency)}`;
       }
-      global.commons.sendMessage(message.join(this.settings.me.formatSeparator), opts.sender);
+      sendMessage(message.join(this.settings.me.formatSeparator), opts.sender);
     } catch (e) {
       global.log.error(e.stack);
     }

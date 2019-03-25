@@ -5,6 +5,9 @@ const _ = require('lodash')
 
 // bot libraries
 import Game from './_interface'
+const {
+  prepare, sendMessage, isModerator, isBroadcaster, getLocalizedName
+} = require('../commons');
 
 /*
  * !fightme [user] - challenge [user] to fight
@@ -40,12 +43,12 @@ class FightMe extends Game {
       userId = (await global.users.getByName(username)).id
       opts.sender.username = opts.sender.username.toLowerCase()
     } catch (e) {
-      global.commons.sendMessage(global.translate('gambling.fightme.notEnoughOptions'), opts.sender)
+      sendMessage(global.translate('gambling.fightme.notEnoughOptions'), opts.sender)
       return
     }
 
     if (opts.sender.username === username) {
-      global.commons.sendMessage(global.translate('gambling.fightme.cannotFightWithYourself'), opts.sender)
+      sendMessage(global.translate('gambling.fightme.cannotFightWithYourself'), opts.sender)
       return
     }
 
@@ -55,28 +58,28 @@ class FightMe extends Game {
     if (isChallenged) {
       let winner = _.random(0, 1, false)
       let isMod = {
-        user: await global.commons.isModerator(username),
-        sender: await global.commons.isModerator(opts.sender.username)
+        user: await isModerator(username),
+        sender: await isModerator(opts.sender.username)
       }
 
       // vs broadcaster
-      if (await global.commons.isBroadcaster(opts.sender) || await global.commons.isBroadcaster(username)) {
-        global.commons.sendMessage(
-          global.commons.prepare('gambling.fightme.broadcaster', {
-            winner: await global.commons.isBroadcaster(opts.sender) ? opts.sender.username : username,
-            loser: await global.commons.isBroadcaster(opts.sender) ? username : opts.sender.username
+      if (await isBroadcaster(opts.sender) || await isBroadcaster(username)) {
+        sendMessage(
+          prepare('gambling.fightme.broadcaster', {
+            winner: await isBroadcaster(opts.sender) ? opts.sender.username : username,
+            loser: await isBroadcaster(opts.sender) ? username : opts.sender.username
           }),
           opts.sender)
-        isMod = await global.commons.isBroadcaster(opts.sender) ? isMod.user : isMod.sender
-        if (!isMod) global.commons.timeout(await global.commons.isBroadcaster(opts.sender) ? username : opts.sender.username, null, this.settings.timeout)
+        isMod = await isBroadcaster(opts.sender) ? isMod.user : isMod.sender
+        if (!isMod) timeout(await isBroadcaster(opts.sender) ? username : opts.sender.username, null, this.settings.timeout)
         global.db.engine.remove(this.collection.users, { _id: challenge._id.toString() })
         return
       }
 
       // mod vs mod
       if (isMod.user && isMod.sender) {
-        global.commons.sendMessage(
-          global.commons.prepare('gambling.fightme.bothModerators', { challenger: username }),
+        sendMessage(
+          prepare('gambling.fightme.bothModerators', { challenger: username }),
           opts.sender)
         global.db.engine.remove(this.collection.users, { _id: challenge._id.toString() })
         return
@@ -84,13 +87,13 @@ class FightMe extends Game {
 
       // vs mod
       if (isMod.user || isMod.sender) {
-        global.commons.sendMessage(
-          global.commons.prepare('gambling.fightme.oneModerator', {
+        sendMessage(
+          prepare('gambling.fightme.oneModerator', {
             winner: isMod.sender ? opts.sender.username : username,
             loser: isMod.sender ? username : opts.sender.username
           }),
           opts.sender)
-        global.commons.timeout(isMod.sender ? username : opts.sender.username, null, this.settings.timeout)
+        timeout(isMod.sender ? username : opts.sender.username, null, this.settings.timeout)
         global.db.engine.remove(this.collection.users, { _id: challenge._id.toString() })
         return
       }
@@ -99,8 +102,8 @@ class FightMe extends Game {
       global.db.engine.increment('users.points', { id: winner ? opts.sender.userId : userId }, { points: Math.abs(Number(winnerWillGet)) })
       global.db.engine.increment('users.points', { id: !winner ? opts.sender.userId : userId }, { points: -Math.abs(Number(loserWillLose)) })
 
-      global.commons.timeout(winner ? opts.sender.username : username, null, this.settings.timeout)
-      global.commons.sendMessage(global.commons.prepare('gambling.fightme.winner', {
+      timeout(winner ? opts.sender.username : username, null, this.settings.timeout)
+      sendMessage(prepare('gambling.fightme.winner', {
         username,
         winner: winner ? username : opts.sender.username,
         loser: winner ? opts.sender.username : username
@@ -109,24 +112,24 @@ class FightMe extends Game {
     } else {
       // check if under gambling cooldown
       const cooldown = this.settings.cooldown
-      const isMod = await global.commons.isModerator(opts.sender)
+      const isMod = await isModerator(opts.sender)
       if (new Date().getTime() - new Date(this.settings._.cooldown).getTime() < cooldown * 1000 &&
-        !(this.settings.bypassCooldownByOwnerAndMods && (isMod || await global.commons.isBroadcaster(opts.sender)))) {
-        global.commons.sendMessage(global.commons.prepare('gambling.fightme.cooldown', {
+        !(this.settings.bypassCooldownByOwnerAndMods && (isMod || await isBroadcaster(opts.sender)))) {
+        sendMessage(prepare('gambling.fightme.cooldown', {
           command: opts.command,
           cooldown: Math.round(((cooldown * 1000) - (new Date().getTime() - new Date(this.settings._.cooldown).getTime())) / 1000 / 60),
-          minutesName: global.commons.getLocalizedName(Math.round(((cooldown * 1000) - (new Date().getTime() - new Date(this.settings._.cooldown).getTime())) / 1000 / 60), 'core.minutes')
+          minutesName: getLocalizedName(Math.round(((cooldown * 1000) - (new Date().getTime() - new Date(this.settings._.cooldown).getTime())) / 1000 / 60), 'core.minutes')
         }), opts.sender)
         return
       }
 
       // save new timestamp if not bypassed
-      if (!(this.settings.bypassCooldownByOwnerAndMods && (isMod || await global.commons.isBroadcaster(opts.sender)))) this.settings._.cooldown = String(new Date())
+      if (!(this.settings.bypassCooldownByOwnerAndMods && (isMod || await isBroadcaster(opts.sender)))) this.settings._.cooldown = String(new Date())
 
       const isAlreadyChallenged = !_.isEmpty(await global.db.engine.findOne(this.collection.users, { key: '_users', user: opts.sender.username, challenging: username }))
       if (!isAlreadyChallenged) await global.db.engine.insert(this.collection.users, { key: '_users', user: opts.sender.username, challenging: username })
-      let message = global.commons.prepare('gambling.fightme.challenge', { username: username, sender: opts.sender.username, command: opts.command })
-      global.commons.sendMessage(message, opts.sender)
+      let message = prepare('gambling.fightme.challenge', { username: username, sender: opts.sender.username, command: opts.command })
+      sendMessage(message, opts.sender)
     }
   }
 }

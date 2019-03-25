@@ -4,6 +4,7 @@ import * as _ from 'lodash';
 import Client from 'twitter';
 import { isMainThread } from 'worker_threads';
 import * as Message from '../message';
+import { getOwner } from '../commons';
 
 // bot libraries
 import Integration from './_interface';
@@ -79,7 +80,7 @@ class Twitter extends Integration {
   }
 
   public async fireSendTwitterMessage(operation: Events.OperationDefinitions, attributes: Events.Attributes): Promise<boolean> {
-    attributes.username = _.get(attributes, 'username', global.commons.getOwner());
+    attributes.username = _.get(attributes, 'username', getOwner());
     let message = String(operation.messageToSend);
     for (const [val, name] of Object.entries(attributes)) {
       if (_.isObject(val) && _.size(val) === 0) {

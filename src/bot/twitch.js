@@ -7,6 +7,7 @@ const {
 } = require('worker_threads');
 import { permission } from './permissions';
 import Core from './_interface';
+const commons = require('./commons');
 
 require('moment-precise-range-plugin')
 
@@ -48,8 +49,8 @@ class Twitch extends Core {
 
   async uptime (opts) {
     const when = await global.cache.when()
-    const time = global.commons.getTime(await global.cache.isOnline() ? when.online : when.offline, true)
-    global.commons.sendMessage(global.translate(await global.cache.isOnline() ? 'uptime.online' : 'uptime.offline')
+    const time = getTime(await global.cache.isOnline() ? when.online : when.offline, true)
+    sendMessage(global.translate(await global.cache.isOnline() ? 'uptime.online' : 'uptime.offline')
       .replace(/\$days/g, time.days)
       .replace(/\$hours/g, time.hours)
       .replace(/\$minutes/g, time.minutes)
@@ -57,8 +58,8 @@ class Twitch extends Core {
   }
 
   async time (opts) {
-    let message = await global.commons.prepare('time', { time: moment().tz(config.timezone).format('LTS') })
-    global.commons.sendMessage(message, opts.sender)
+    let message = await prepare('time', { time: moment().tz(config.timezone).format('LTS') })
+    sendMessage(message, opts.sender)
   }
 
   async followers (opts) {
@@ -72,18 +73,18 @@ class Twitch extends Core {
 
     let lastFollowAgo = ''
     let lastFollowUsername = 'n/a'
-    let onlineFollowersCount = _.size(_.filter(onlineFollowers, (o) => o !== global.oauth.settings.bot.username.toLowerCase() && o !== global.commons.getChannel())) // except bot and user
+    let onlineFollowersCount = _.size(_.filter(onlineFollowers, (o) => o !== global.oauth.settings.bot.username.toLowerCase() && o !== getChannel())) // except bot and user
     if (events.length > 0) {
       lastFollowUsername = events[0].username
       lastFollowAgo = moment(events[0].timestamp).fromNow()
     }
 
-    let message = await global.commons.prepare('followers', {
+    let message = await prepare('followers', {
       lastFollowAgo: lastFollowAgo,
       lastFollowUsername: lastFollowUsername,
       onlineFollowersCount: onlineFollowersCount
     })
-    global.commons.sendMessage(message, opts.sender)
+    sendMessage(message, opts.sender)
   }
 
   async subs (opts) {
@@ -97,28 +98,28 @@ class Twitch extends Core {
 
     let lastSubAgo = ''
     let lastSubUsername = 'n/a'
-    let onlineSubCount = _.size(_.filter(onlineSubscribers, (o) => o !== global.commons.getChannel() && o !== global.oauth.settings.bot.username.toLowerCase())) // except bot and user
+    let onlineSubCount = _.size(_.filter(onlineSubscribers, (o) => o !== getChannel() && o !== global.oauth.settings.bot.username.toLowerCase())) // except bot and user
     if (events.length > 0) {
       lastSubUsername = events[0].username
       lastSubAgo = moment(events[0].timestamp).fromNow()
     }
 
-    let message = await global.commons.prepare('subs', {
+    let message = await prepare('subs', {
       lastSubAgo: lastSubAgo,
       lastSubUsername: lastSubUsername,
       onlineSubCount: onlineSubCount
     })
-    global.commons.sendMessage(message, opts.sender)
+    sendMessage(message, opts.sender)
   }
 
   async getTitle (opts) {
-    global.commons.sendMessage(global.translate('title.current')
+    sendMessage(global.translate('title.current')
       .replace(/\$title/g, _.get(await global.db.engine.findOne('api.current', { key: 'title' }), 'value', 'n/a')), opts.sender)
   }
 
   async setTitle (opts) {
     if (opts.parameters.length === 0) {
-      global.commons.sendMessage(global.translate('title.current')
+      sendMessage(global.translate('title.current')
         .replace(/\$title/g, _.get(await global.db.engine.findOne('api.current', { key: 'title' }), 'value', 'n/a')), opts.sender)
       return
     }
@@ -127,13 +128,13 @@ class Twitch extends Core {
   }
 
   async getGame (opts) {
-    global.commons.sendMessage(global.translate('game.current')
+    sendMessage(global.translate('game.current')
       .replace(/\$game/g, _.get(await global.db.engine.findOne('api.current', { key: 'game' }), 'value', 'n/a')), opts.sender)
   }
 
   async setGame (opts) {
     if (opts.parameters.length === 0) {
-      global.commons.sendMessage(global.translate('game.current')
+      sendMessage(global.translate('game.current')
         .replace(/\$game/g, _.get(await global.db.engine.findOne('api.current', { key: 'game' }), 'value', 'n/a')), opts.sender)
       return
     }

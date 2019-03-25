@@ -8,6 +8,7 @@ import * as constants from '../constants'
 import { permission } from '../permissions';
 const Message = require('../message')
 import System from './_interface'
+const commons = require('../commons');
 var log = global.log
 
 class Moderation extends System {
@@ -125,7 +126,7 @@ class Moderation extends System {
     if (warningsAllowed === 0) {
       msg = await new Message(msg.replace(/\$count/g, -1)).parse()
       log.timeout(`${sender.username} [${type}] ${time}s timeout | ${text}`)
-      global.commons.timeout(sender.username, msg, time)
+      commons.timeout(sender.username, msg, time)
       return
     }
 
@@ -133,7 +134,7 @@ class Moderation extends System {
     if (isWarningCountAboveThreshold) {
       msg = await new Message(warning.replace(/\$count/g, parseInt(warningsAllowed, 10) - warnings.length)).parse()
       log.timeout(`${sender.username} [${type}] ${time}s timeout | ${text}`)
-      global.commons.timeout(sender.username, msg, time)
+      commons.timeout(sender.username, msg, time)
       await global.db.engine.remove(global.systems.moderation.collection.warnings, { username: sender.username })
     } else {
       await global.db.engine.insert(global.systems.moderation.collection.warnings, { username: sender.username, timestamp: _.now() })
@@ -141,12 +142,12 @@ class Moderation extends System {
       warning = await new Message(warning.replace(/\$count/g, warningsLeft < 0 ? 0 : warningsLeft)).parse()
       if (warningsTimeout) {
         log.timeout(`${sender.username} [${type}] 1s timeout, warnings left ${warningsLeft < 0 ? 0 : warningsLeft} | ${text}`)
-        global.commons.timeout(sender.username, warning, 1)
+        commons.timeout(sender.username, warning, 1)
       }
 
       if (announceTimeouts && !silent) {
         global.tmi.delete('bot', sender.id)
-        global.commons.sendMessage('$sender, ' + warning, sender)
+        commons.sendMessage('$sender, ' + warning, sender)
       }
     }
   }
@@ -211,10 +212,10 @@ class Moderation extends System {
 
       for (let i = 0; i < count; i++) await global.db.engine.insert(this.collection.permits, { username: parsed[1].toLowerCase() })
 
-      let m = await global.commons.prepare('moderation.user-have-link-permit', { username: parsed[1].toLowerCase(), link: global.commons.getLocalizedName(count, 'core.links'), count: count })
-      global.commons.sendMessage(m, opts.sender)
+      let m = await commons.prepare('moderation.user-have-link-permit', { username: parsed[1].toLowerCase(), link: commons.getLocalizedName(count, 'core.links'), count: count })
+      commons.sendMessage(m, opts.sender)
     } catch (e) {
-      global.commons.sendMessage(global.translate('moderation.permit-parse-failed'), opts.sender)
+      commons.sendMessage(global.translate('moderation.permit-parse-failed'), opts.sender)
     }
   }
 
@@ -224,8 +225,8 @@ class Moderation extends System {
       this.settings.links.moderateSubscribers,
       this.settings.links.includeSpaces,
       this.settings.links.timeout,
-      global.commons.isOwner(opts.sender),
-      global.commons.isModerator(opts.sender),
+      commons.isOwner(opts.sender),
+      commons.isModerator(opts.sender),
       this.whitelist(opts.message)
     ])
 
@@ -258,8 +259,8 @@ class Moderation extends System {
       this.settings.symbols.enabled,
       this.settings.symbols.moderateSubscribers,
       this.whitelist(opts.message),
-      global.commons.isOwner(opts.sender),
-      global.commons.isModerator(opts.sender),
+      commons.isOwner(opts.sender),
+      commons.isModerator(opts.sender),
       this.settings.symbols.timeout,
       this.settings.symbols.triggerLength,
       this.settings.symbols.maxSymbolsConsecutively,
@@ -298,8 +299,8 @@ class Moderation extends System {
     let [isEnabled, isEnabledForSubs, isOwner, isMod, whitelisted, timeout, triggerLength] = await Promise.all([
       this.settings.longMessage.enabled,
       this.settings.longMessage.moderateSubscribers,
-      global.commons.isOwner(opts.sender),
-      global.commons.isModerator(opts.sender),
+      commons.isOwner(opts.sender),
+      commons.isModerator(opts.sender),
       this.whitelist(opts.message),
       this.settings.longMessage.timeout,
       this.settings.longMessage.triggerLength
@@ -321,8 +322,8 @@ class Moderation extends System {
     let [isEnabled, isEnabledForSubs, isOwner, isMod, whitelisted, timeout, triggerLength, maxCapsPercent] = await Promise.all([
       this.settings.caps.enabled,
       this.settings.caps.moderateSubscribers,
-      global.commons.isOwner(opts.sender),
-      global.commons.isModerator(opts.sender),
+      commons.isOwner(opts.sender),
+      commons.isModerator(opts.sender),
       this.whitelist(opts.message),
       this.settings.caps.timeout,
       this.settings.caps.triggerLength,
@@ -370,8 +371,8 @@ class Moderation extends System {
     let [isEnabled, isEnabledForSubs, isOwner, isMod, whitelisted, timeout, triggerLength, maxLength] = await Promise.all([
       this.settings.spam.enabled,
       this.settings.spam.moderateSubscribers,
-      global.commons.isOwner(opts.sender),
-      global.commons.isModerator(opts.sender),
+      commons.isOwner(opts.sender),
+      commons.isModerator(opts.sender),
       this.whitelist(opts.message),
       this.settings.spam.timeout,
       this.settings.spam.triggerLength,
@@ -400,8 +401,8 @@ class Moderation extends System {
     let [isEnabled, isEnabledForSubs, isOwner, isMod, timeout] = await Promise.all([
       this.settings.color.enabled,
       this.settings.color.moderateSubscribers,
-      global.commons.isOwner(opts.sender),
-      global.commons.isModerator(opts.sender),
+      commons.isOwner(opts.sender),
+      commons.isModerator(opts.sender),
       this.settings.color.timeout
     ])
 
@@ -423,8 +424,8 @@ class Moderation extends System {
     let [isEnabled, isEnabledForSubs, isOwner, isMod, timeout, maxCount] = await Promise.all([
       this.settings.emotes.enabled,
       this.settings.emotes.moderateSubscribers,
-      global.commons.isOwner(opts.sender),
-      global.commons.isModerator(opts.sender),
+      commons.isOwner(opts.sender),
+      commons.isModerator(opts.sender),
       this.settings.emotes.timeout,
       this.settings.emotes.maxCount
     ])
@@ -446,8 +447,8 @@ class Moderation extends System {
   async blacklist (opts) {
     let [isEnabledForSubs, isOwner, isMod, timeout, blacklist] = await Promise.all([
       this.settings.lists.moderateSubscribers,
-      global.commons.isOwner(opts.sender),
-      global.commons.isModerator(opts.sender),
+      commons.isOwner(opts.sender),
+      commons.isModerator(opts.sender),
       this.settings.lists.timeout,
       this.settings.lists.blacklist
     ])

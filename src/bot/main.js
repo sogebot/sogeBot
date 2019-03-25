@@ -14,11 +14,11 @@ const chalk = require('chalk')
 const gitCommitInfo = require('git-commit-info');
 
 const { isMainThread, } = require('worker_threads');
+const { autoLoad } = require('./commons');
 
 const constants = require('./constants')
 const config = require('@config')
 
-global.commons = new (require('./commons'))()
 global.cache = new (require('./cache'))()
 global.workers = new Workers()
 
@@ -88,12 +88,12 @@ async function main () {
     verticalLayout: 'default'
   }))
 
-  global.lib.translate._load().then(function () {
-    global.systems = require('auto-load')('./dest/systems/')
-    global.widgets = require('auto-load')('./dest/widgets/')
-    global.overlays = require('auto-load')('./dest/overlays/')
-    global.games = require('auto-load')('./dest/games/')
-    global.integrations = require('auto-load')('./dest/integrations/')
+  global.lib.translate._load().then(async () => {
+    global.systems = await autoLoad('./dest/systems/');
+    global.widgets = await autoLoad('./dest/widgets/')
+    global.overlays = await autoLoad('./dest/overlays/')
+    global.games = await autoLoad('./dest/games/')
+    global.integrations = await autoLoad('./dest/integrations/')
 
     global.panel.expose()
 

@@ -36,6 +36,7 @@ declare namespace NodeJS {
           username: string,
         },
         general: {
+          owners: string[],
           channel: string,
         }
       }

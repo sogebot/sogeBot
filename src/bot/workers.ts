@@ -3,6 +3,7 @@ import { join } from 'path';
 import { isMainThread, parentPort, threadId, Worker } from 'worker_threads';
 
 import { debug } from './debug';
+import { message, timeout } from './commons';
 
 class Workers {
   public onlineCount: number = 0;
@@ -136,13 +137,13 @@ class Workers {
       } else if (data.type === 'log') {
         return global.log[data.level](data.message, data.params);
       } else if (data.type === 'say') {
-        global.commons.message('say', null, data.message);
+        message('say', null, data.message);
       } else if (data.type === 'me') {
-        global.commons.message('me', null, data.message);
+        message('me', null, data.message);
       } else if (data.type === 'whisper') {
-        global.commons.message('whisper', data.sender, data.message);
+        message('whisper', data.sender, data.message);
       } else if (data.type === 'timeout') {
-        global.commons.timeout(data.username, data.reason, data.timeout);
+        timeout(data.username, data.reason, data.timeout);
       } else if (data.type === 'api') {
         global.api[data.fnc](data.username, data.id);
       } else if (data.type === 'event') {

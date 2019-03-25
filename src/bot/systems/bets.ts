@@ -12,6 +12,7 @@ import Expects from '../expects';
 import { permission } from '../permissions';
 import System from './_interface';
 import * as Points from './points';
+import { getOwner, sendMessage, prepare } from '../commons';
 
 const ERROR_NOT_ENOUGH_OPTIONS = 'Expected more parameters';
 const ERROR_ALREADY_OPENED = '1';
@@ -73,10 +74,10 @@ class Bets extends System {
     this.socket.on('connection', (socket) => {
       socket.on('close', async (option) => {
         const message = '!bet ' + (option === 'refund' ? option : 'close ' + option);
-        global.log.process({ type: 'parse', sender: { username: global.commons.getOwner() }, message });
+        global.log.process({ type: 'parse', sender: { username: getOwner() }, message });
         global.tmi.message({
           message: {
-            tags: { username: global.commons.getOwner() },
+            tags: { username: getOwner() },
             message,
           },
           skip: true,
@@ -96,11 +97,11 @@ class Bets extends System {
 
         const _bets = await global.db.engine.find(this.collection.users);
         if (_bets.length > 0) {
-          global.commons.sendMessage(global.translate('bets.locked'), { username: global.commons.getOwner() });
+          sendMessage(global.translate('bets.locked'), { username: getOwner() });
           const _id = currentBet._id.toString(); delete currentBet._id;
           await global.db.engine.update(this.collection.data, { _id }, currentBet);
         } else {
-          global.commons.sendMessage(global.translate('bets.removed'), global.commons.getOwner());
+          sendMessage(global.translate('bets.removed'), getOwner());
           await global.db.engine.remove(this.collection.data, { key: 'bets' });
         }
       }
@@ -132,8 +133,8 @@ class Bets extends System {
       for (const i of Object.keys(options)) { bet.options[i] = { name: options[i] }; }
 
       await global.db.engine.insert(this.collection.data, bet);
-      global.commons.sendMessage(await global.commons.prepare('bets.opened', {
-        username: global.commons.getOwner(),
+      sendMessage(await prepare('bets.opened', {
+        username: getOwner(),
         title,
         maxIndex: options.length - 1,
         minutes: timeout,
@@ -143,11 +144,11 @@ class Bets extends System {
     } catch (e) {
       switch (e.message) {
         case ERROR_NOT_ENOUGH_OPTIONS:
-          global.commons.sendMessage(global.translate('bets.notEnoughOptions'), opts.sender);
+          sendMessage(global.translate('bets.notEnoughOptions'), opts.sender);
           break;
         case ERROR_ALREADY_OPENED:
-          global.commons.sendMessage(
-            global.commons.prepare('bets.running', {
+          sendMessage(
+            prepare('bets.running', {
               command: this.getCommand('!bet'),
               maxIndex: currentBet.options.length - 1,
               options: currentBet.options.map((v, i) => `${i}. '${v.name}'`).join(', '),
@@ -155,15 +156,15 @@ class Bets extends System {
           break;
         default:
           global.log.warning(e.stack);
-          global.commons.sendMessage(global.translate('core.error'), opts.sender);
+          sendMessage(global.translate('core.error'), opts.sender);
       }
     }
   }
 
   public async info(opts) {
     const currentBet = await global.db.engine.findOne(this.collection.data, { key: 'bets' });
-    if (_.isEmpty(currentBet)) { global.commons.sendMessage(global.translate('bets.notRunning'), opts.sender); } else {
-      global.commons.sendMessage(await global.commons.prepare(currentBet.locked ? 'bets.lockedInfo' : 'bets.info', {
+    if (_.isEmpty(currentBet)) { sendMessage(global.translate('bets.notRunning'), opts.sender); } else {
+      sendMessage(await prepare(currentBet.locked ? 'bets.lockedInfo' : 'bets.info', {
         command: opts.command,
         title: currentBet.title,
         maxIndex: currentBet.options.length - 1,
@@ -201,25 +202,25 @@ class Bets extends System {
     } catch (e) {
       switch (e.message) {
         case ERROR_ZERO_BET:
-          global.commons.sendMessage(global.translate('bets.zeroBet')
+          sendMessage(global.translate('bets.zeroBet')
             .replace(/\$pointsName/g, await Points.getPointsName(0)), opts.sender);
           break;
         case ERROR_NOT_RUNNING:
-          global.commons.sendMessage(global.translate('bets.notRunning'), opts.sender);
+          sendMessage(global.translate('bets.notRunning'), opts.sender);
           break;
         case ERROR_UNDEFINED_BET:
-          global.commons.sendMessage(await global.commons.prepare('bets.undefinedBet', { command: opts.command }), opts.sender);
+          sendMessage(await prepare('bets.undefinedBet', { command: opts.command }), opts.sender);
           break;
         case ERROR_IS_LOCKED:
-          global.commons.sendMessage(global.translate('bets.timeUpBet'), opts.sender);
+          sendMessage(global.translate('bets.timeUpBet'), opts.sender);
           break;
         case ERROR_DIFF_BET:
           const result = _.pickBy(currentBet.bets, (v, k) => Object.keys(v).includes(opts.sender.username));
-          global.commons.sendMessage(global.translate('bets.diffBet').replace(/\$option/g, Object.keys(result)[0]), opts.sender);
+          sendMessage(global.translate('bets.diffBet').replace(/\$option/g, Object.keys(result)[0]), opts.sender);
           break;
         default:
           global.log.warning(e.stack);
-          global.commons.sendMessage(await global.commons.prepare('bets.error', { command: opts.command }).replace(/\$maxIndex/g, currentBet.options.length - 1), opts.sender);
+          sendMessage((await prepare('bets.error', { command: opts.command })).replace(/\$maxIndex/g, String(currentBet.options.length - 1)), opts.sender);
       }
     }
   }
@@ -231,15 +232,15 @@ class Bets extends System {
         await global.db.engine.increment('users.points', { id: user.id }, { points: parseInt(user.points, 10) });
       }
       await global.db.engine.remove(this.collection.users, {});
-      global.commons.sendMessage(global.translate('bets.refund'), opts.sender);
+      sendMessage(global.translate('bets.refund'), opts.sender);
     } catch (e) {
       switch (e.message) {
         case ERROR_NOT_RUNNING:
-          global.commons.sendMessage(global.translate('bets.notRunning'), opts.sender);
+          sendMessage(global.translate('bets.notRunning'), opts.sender);
           break;
         default:
           global.log.warning(e.stack);
-          global.commons.sendMessage(global.translate('core.error'), opts.sender);
+          sendMessage(global.translate('core.error'), opts.sender);
       }
     } finally {
       await global.db.engine.remove(this.collection.data, { key: 'bets' });
@@ -266,7 +267,7 @@ class Bets extends System {
         }
       }
 
-      global.commons.sendMessage(global.translate('bets.closed')
+      sendMessage(global.translate('bets.closed')
         .replace(/\$option/g, currentBet.options[index].name)
         .replace(/\$amount/g, _.filter(users, (o) => o.option === index).length)
         .replace(/\$pointsName/g, await Points.getPointsName(total))
@@ -275,17 +276,17 @@ class Bets extends System {
     } catch (e) {
       switch (e.message) {
         case ERROR_NOT_ENOUGH_OPTIONS:
-          global.commons.sendMessage(global.translate('bets.closeNotEnoughOptions'), opts.sender);
+          sendMessage(global.translate('bets.closeNotEnoughOptions'), opts.sender);
           break;
         case ERROR_NOT_RUNNING:
-          global.commons.sendMessage(global.translate('bets.notRunning'), opts.sender);
+          sendMessage(global.translate('bets.notRunning'), opts.sender);
           break;
         case ERROR_NOT_OPTION:
-          global.commons.sendMessage(await global.commons.prepare('bets.notOption', { command: opts.command }), opts.sender);
+          sendMessage(await prepare('bets.notOption', { command: opts.command }), opts.sender);
           break;
         default:
           global.log.warning(e.stack);
-          global.commons.sendMessage(global.translate('core.error'), opts.sender);
+          sendMessage(global.translate('core.error'), opts.sender);
       }
     }
   }

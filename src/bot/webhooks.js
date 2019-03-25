@@ -1,6 +1,7 @@
 const _ = require('lodash')
 const axios = require('axios')
 const config = require('@config')
+const commons = require('./commons');
 
 const __DEBUG__ = {
   STREAM: (process.env.DEBUG && process.env.DEBUG.includes('webhooks.stream'))
@@ -215,7 +216,7 @@ class Webhooks {
       global.db.engine.update('users', { id: data.from_id }, { username: data.from_name })
 
       if (!_.get(user, 'is.follower', false) && (_.get(user, 'time.follow', 0) === 0 || _.now() - _.get(user, 'time.follow', 0) > 60000 * 60)) {
-        if (!(await global.commons.isBot(data.from_name))) {
+        if (!(await isBot(data.from_name))) {
           global.overlays.eventlist.add({
             type: 'follow',
             username: data.from_name

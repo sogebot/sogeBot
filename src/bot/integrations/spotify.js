@@ -8,6 +8,7 @@ const crypto = require('crypto')
 const {
   isMainThread
 } = require('worker_threads');
+const commons = require('../commons')
 const axios = require('axios')
 
 // bot libraries
@@ -452,8 +453,8 @@ class Spotify extends Integration {
           }
         })
         let track = response.data
-        global.commons.sendMessage(
-          global.commons.prepare('integrations.spotify.song-requested', {
+        commons.sendMessage(
+          commons.prepare('integrations.spotify.song-requested', {
             name: track.name, artist: track.artists[0].name
           }), opts.sender)
         this.uris.push({
@@ -472,8 +473,8 @@ class Spotify extends Integration {
           }
         })
         let track = response.data.tracks.items[0]
-        global.commons.sendMessage(
-          global.commons.prepare('integrations.spotify.song-requested', {
+        commons.sendMessage(
+          commons.prepare('integrations.spotify.song-requested', {
             name: track.name, artist: track.artists[0].name
           }), opts.sender)
         this.uris.push({
@@ -484,8 +485,8 @@ class Spotify extends Integration {
         })
       }
     } catch (e) {
-      global.commons.sendMessage(
-        global.commons.prepare('integrations.spotify.song-not-found'), opts.sender)
+      commons.sendMessage(
+        commons.prepare('integrations.spotify.song-not-found'), opts.sender)
     }
   }
 }

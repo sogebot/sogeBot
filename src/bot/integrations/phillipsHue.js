@@ -9,6 +9,7 @@ const lightState = require('node-hue-api').lightState
 const {
   isMainThread
 } = require('worker_threads');
+const commons = require('../commons')
 
 // bot libraries
 import { permission } from '../permissions';
@@ -127,7 +128,7 @@ class PhillipsHue extends Integration {
         _.each(lights.lights, function (light) {
           output.push('id: ' + light.id + ', name: \'' + light.name + '\'')
         })
-        global.commons.sendMessage(global.translate('phillipsHue.list') + output.join(' | '), opts.sender)
+        commons.sendMessage(global.translate('phillipsHue.list') + output.join(' | '), opts.sender)
       })
       .fail(function (err) { global.log.error(err, 'PhillipsHue.prototype.getLights#1') })
   }

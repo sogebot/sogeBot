@@ -7,6 +7,7 @@ import * as moment from 'moment-timezone';
 // bot libraries
 import { permission } from '../permissions';
 import System from './_interface';
+import { getIgnoreList, isIgnored, getChannel, sendMessage } from '../commons';
 
 enum TYPE {
   TIME,
@@ -102,7 +103,7 @@ class Top extends System {
     const type = opts.parameters;
 
     // count ignored users
-    const _total = 10 + global.commons.getIgnoreList().length + 2; // 2 for bot and broadcaster
+    const _total = 10 + getIgnoreList().length + 2; // 2 for bot and broadcaster
 
     moment.locale(global.lib.translate.lang);
 
@@ -180,14 +181,14 @@ class Top extends System {
       // remove ignored users
       const ignored: string[] = [];
       for (const user of sorted) {
-        if (await global.commons.isIgnored(user.username)) {
+        if (await isIgnored(user.username)) {
           ignored.push(user.username);
         }
       }
 
       _.remove(sorted, (o) => _.includes(ignored, o.username));
       // remove broadcaster and bot accounts
-      _.remove(sorted, (o) => _.includes([global.commons.getChannel(), global.oauth.settings.bot.username.toLowerCase()], o.username));
+      _.remove(sorted, (o) => _.includes([getChannel(), global.oauth.settings.bot.username.toLowerCase()], o.username));
       sorted = _.chunk(sorted, 10)[0];
 
       for (const user of sorted) {
@@ -223,7 +224,7 @@ class Top extends System {
     if (__DEBUG__) {
       global.log.debug(message);
     }
-    global.commons.sendMessage(message, opts.sender);
+    sendMessage(message, opts.sender);
   }
 }
 

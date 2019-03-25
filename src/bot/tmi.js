@@ -8,6 +8,7 @@ const _ = require('lodash')
 const TwitchJs = require('twitch-js').default
 const Parser = require('./parser')
 const util = require('util');
+const commons = require('./commons');
 
 
 import { permission } from './permissions';
@@ -61,7 +62,7 @@ class TMI extends Core {
         ]
       )];
       // update ignore list
-      global.commons.sendMessage(global.commons.prepare('ignore.user.is.added', { username }), opts.sender)
+      sendMessage(prepare('ignore.user.is.added', { username }), opts.sender)
     } catch (e) {
       global.log.error(e.message)
     }
@@ -72,7 +73,7 @@ class TMI extends Core {
       const username = new Expects(opts.parameters).username().toArray()[0].toLowerCase()
       global.tmi.settings.chat.ignorelist = global.tmi.settings.chat.ignorelist.filter(o => o !== username)
       // update ignore list
-      global.commons.sendMessage(global.commons.prepare('ignore.user.is.removed', { username }), opts.sender)
+      sendMessage(prepare('ignore.user.is.removed', { username }), opts.sender)
     } catch (e) {
       global.log.error(e.message)
     }
@@ -81,8 +82,8 @@ class TMI extends Core {
   async ignoreCheck (opts: Object) {
     try {
       const username = new Expects(opts.parameters).username().toArray()[0].toLowerCase()
-      const isIgnored = await global.commons.isIgnored(username)
-      global.commons.sendMessage(global.commons.prepare(isIgnored ? 'ignore.user.is.ignored' : 'ignore.user.is.not.ignored', { username }), opts.sender)
+      const isIgnored = await isIgnored(username)
+      sendMessage(prepare(isIgnored ? 'ignore.user.is.ignored' : 'ignore.user.is.not.ignored', { username }), opts.sender)
       return isIgnored
     } catch (e) {}
   }
@@ -178,7 +179,7 @@ class TMI extends Core {
       this.client[type].chat.on('WHISPER', async (message) => {
         message.tags.username = this.getUsernameFromRaw(message._raw)
 
-        if (!(await global.commons.isBot(message.tags.username)) || !message.isSelf) {
+        if (!(await isBot(message.tags.username)) || !message.isSelf) {
           message.tags['message-type'] = 'whisper'
           global.tmi.message({message})
           global.linesParsed++
@@ -188,7 +189,7 @@ class TMI extends Core {
       this.client[type].chat.on('PRIVMSG', async (message) => {
         message.tags.username = this.getUsernameFromRaw(message._raw)
 
-        if (!global.commons.isBot(message.tags.username) || !message.isSelf) {
+        if (!isBot(message.tags.username) || !message.isSelf) {
           message.tags['message-type'] = message.message.startsWith('\u0001ACTION') ? 'action' : 'say' // backward compatibility for /me moderation
 
           if (message.event === 'CHEER') {
@@ -322,7 +323,7 @@ class TMI extends Core {
       const method = this.getMethod(message)
       const userstate = message.tags
 
-      if (await global.commons.isIgnored(username)) return
+      if (await isIgnored(username)) return
 
       const user = await global.db.engine.findOne('users', { id: userstate.userId })
       let subscribedAt = _.now()
@@ -371,7 +372,7 @@ class TMI extends Core {
       const userstate = message.tags
       const messageFromUser = message.message
 
-      if (await global.commons.isIgnored(username)) return
+      if (await isIgnored(username)) return
 
       const user = await global.db.engine.findOne('users', { id: userstate.userId })
 
@@ -390,9 +391,9 @@ class TMI extends Core {
         username: username,
         subStreakShareEnabled,
         subStreak,
-        subStreakName: global.commons.getLocalizedName(subStreak, 'core.months'),
+        subStreakName: getLocalizedName(subStreak, 'core.months'),
         subCumulativeMonths,
-        subCumulativeMonthsName: global.commons.getLocalizedName(subCumulativeMonths, 'core.months'),
+        subCumulativeMonthsName: getLocalizedName(subCumulativeMonths, 'core.months'),
         message: messageFromUser
       })
       global.log.resub(`${username}, streak share: ${subStreakShareEnabled}, streak: ${subStreak}, months: ${subCumulativeMonths}, message: ${messageFromUser}, tier: ${method.prime ? 'Prime' : method.plan / 1000}`)
@@ -400,9 +401,9 @@ class TMI extends Core {
         username,
         subStreakShareEnabled,
         subStreak,
-        subStreakName: global.commons.getLocalizedName(subStreak, 'core.months'),
+        subStreakName: getLocalizedName(subStreak, 'core.months'),
         subCumulativeMonths,
-        subCumulativeMonthsName: global.commons.getLocalizedName(subCumulativeMonths, 'core.months'),
+        subCumulativeMonthsName: getLocalizedName(subCumulativeMonths, 'core.months'),
         message: messageFromUser
       })
     } catch (e) {
@@ -423,7 +424,7 @@ class TMI extends Core {
 
       this.ignoreGiftsFromUser[username] = { count, time: new Date() }
 
-      if (await global.commons.isIgnored(username)) return
+      if (await isIgnored(username)) return
 
       global.overlays.eventlist.add({ type: 'subcommunitygift', username, count })
       global.events.fire('subcommunitygift', { username, count })
@@ -477,7 +478,7 @@ class TMI extends Core {
           }
         }
       }
-      if (await global.commons.isIgnored(username)) return
+      if (await isIgnored(username)) return
 
       let user = await global.db.engine.findOne('users', { id: recipientId })
       if (!user.id) user.id = recipientId
@@ -490,11 +491,11 @@ class TMI extends Core {
 
       await global.users.setById(user.id, { username: recipient, is: { subscriber: isSubscriber }, time: { subscribed_at: subscribedAt }, stats: { subCumulativeMonths } })
       await global.db.engine.increment('users', { id: user.id }, { stats: { subStreak: 1 }})
-      global.overlays.eventlist.add({ type: 'subgift', username: recipient, from: username, monthsName: global.commons.getLocalizedName(subCumulativeMonths, 'core.months'), months: subCumulativeMonths })
+      global.overlays.eventlist.add({ type: 'subgift', username: recipient, from: username, monthsName: getLocalizedName(subCumulativeMonths, 'core.months'), months: subCumulativeMonths })
       global.log.subgift(`${recipient}, from: ${username}, months: ${subCumulativeMonths}`)
 
       // also set subgift count to gifter
-      if (!(await global.commons.isIgnored(username))) {
+      if (!(await isIgnored(username))) {
         await global.db.engine.increment('users', { id: message.tags.userId }, { custom: { subgiftCount: 1 } })
       }
     } catch (e) {
@@ -512,7 +513,7 @@ class TMI extends Core {
       // remove cheerX or channelCheerX from message
       const messageFromUser = message.message.replace(/(.*?[cC]heer[\d]+)/g, '').trim()
 
-      if (await global.commons.isIgnored(userstate.username)) return
+      if (await isIgnored(userstate.username)) return
 
       // update users ID
       await global.db.engine.update('users', { id: userId }, { username })
@@ -566,7 +567,7 @@ class TMI extends Core {
         args: [client, msgId],
       })
     } else {
-      this.client[client].chat.say(global.commons.getOwner(), '/delete ' + msgId)
+      this.client[client].chat.say(getOwner(), '/delete ' + msgId)
     }
   }
 
@@ -598,14 +599,14 @@ class TMI extends Core {
 
     if (!skip
         && sender['message-type'] === 'whisper'
-        && (global.tmi.settings.chat.whisperListener || global.commons.isOwner(sender))) {
+        && (global.tmi.settings.chat.whisperListener || isOwner(sender))) {
       global.log.whisperIn(message, { username: sender.username })
-    } else if (!skip && !(await global.commons.isBot(sender.username))) {
+    } else if (!skip && !(await isBot(sender.username))) {
       global.log.chatIn(message, { username: sender.username })
     }
 
     const isModerated = await parse.isModerated()
-    const isIgnored = await global.commons.isIgnored(sender)
+    const isIgnored = await isIgnored(sender)
     if (!isModerated && !isIgnored) {
       if (!skip && !_.isNil(sender.username)) {
         let user = await global.db.engine.findOne('users', { id: sender.userId })

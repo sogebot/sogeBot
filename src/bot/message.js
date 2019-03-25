@@ -5,6 +5,7 @@ const decode = require('decode-html')
 const querystring = require('querystring')
 const _ = require('lodash')
 const crypto = require('crypto')
+const commons = require('./commons')
 const gitCommitInfo = require('git-commit-info');
 
 const Entities = require('html-entities').AllHtmlEntities
@@ -83,8 +84,8 @@ class Message {
         const usernames = await global.users.getAllOnlineUsernames()
         const onlineViewers = usernames.filter((username) => {
           const isSender = username === attr.sender;
-          const isBot = global.commons.isBot(username);
-          const isIgnored = global.commons.isIgnored(username);
+          const isBot = commons.isBot(username);
+          const isIgnored = commons.isIgnored(username);
           return !isSender && !isBot && !isIgnored;
         })
         if (onlineViewers.length === 0) return 'unknown'
@@ -94,8 +95,8 @@ class Message {
         const usernames = await global.users.getAllOnlineUsernames()
         const onlineViewers = usernames.filter((username) => {
           const isSender = username === attr.sender;
-          const isBot = global.commons.isBot(username);
-          const isIgnored = global.commons.isIgnored(username);
+          const isBot = commons.isBot(username);
+          const isIgnored = commons.isIgnored(username);
           return !isSender && !isBot && !isIgnored;
         })
         const followers = _.filter(
@@ -109,8 +110,8 @@ class Message {
         const usernames = await global.users.getAllOnlineUsernames()
         const onlineViewers = usernames.filter((username) => {
           const isSender = username === attr.sender;
-          const isBot = global.commons.isBot(username);
-          const isIgnored = global.commons.isIgnored(username);
+          const isBot = commons.isBot(username);
+          const isIgnored = commons.isIgnored(username);
           return !isSender && !isBot && !isIgnored;
         })
         const subscribers = _.filter(
@@ -124,8 +125,8 @@ class Message {
         let viewer = (await global.users.getAll()).map((o) => o.username)
         viewer = viewer.filter((username) => {
           const isSender = username === attr.sender;
-          const isBot = global.commons.isBot(username);
-          const isIgnored = global.commons.isIgnored(username);
+          const isBot = commons.isBot(username);
+          const isIgnored = commons.isIgnored(username);
           return !isSender && !isBot && !isIgnored;
         })
         if (viewer.length === 0) return 'unknown'
@@ -135,8 +136,8 @@ class Message {
         let follower = (await global.db.engine.find('users', { is: { follower: true } })).map((o) => o.username)
         follower = follower.filter((username) => {
           const isSender = username === attr.sender;
-          const isBot = global.commons.isBot(username);
-          const isIgnored = global.commons.isIgnored(username);
+          const isBot = commons.isBot(username);
+          const isIgnored = commons.isIgnored(username);
           return !isSender && !isBot && !isIgnored;
         })
         if (follower.length === 0) return 'unknown'
@@ -146,8 +147,8 @@ class Message {
         let subscriber = (await global.db.engine.find('users', { is: { subscriber: true } })).map((o) => o.username)
         subscriber = subscriber.filter((username) => {
           const isSender = username === attr.sender;
-          const isBot = global.commons.isBot(username);
-          const isIgnored = global.commons.isIgnored(username);
+          const isBot = commons.isBot(username);
+          const isIgnored = commons.isIgnored(username);
           return !isSender && !isBot && !isIgnored;
         })
         if (subscriber.length === 0) return 'unknown'
@@ -185,13 +186,13 @@ class Message {
           if (state.updated.responseType === 0) {
             // default
             if (state.isOk && !state.isEval) {
-              let msg = await global.commons.prepare('filters.setVariable', { value: state.updated.setValue, variable: variable })
-              global.commons.sendMessage(msg, { username: attr.sender.username, skip: true, quiet: _.get(attr, 'quiet', false) })
+              let msg = await commons.prepare('filters.setVariable', { value: state.updated.setValue, variable: variable })
+              commons.sendMessage(msg, { username: attr.sender.username, skip: true, quiet: _.get(attr, 'quiet', false) })
             }
             return state.updated.currentValue
           } else if (state.updated.responseType === 1) {
             // custom
-            global.commons.sendMessage(state.updated.responseText.replace('$value', state.updated.setValue), { username: attr.sender.username, skip: true, quiet: _.get(attr, 'quiet', false) })
+            commons.sendMessage(state.updated.responseText.replace('$value', state.updated.setValue), { username: attr.sender.username, skip: true, quiet: _.get(attr, 'quiet', false) })
             return ''
           } else {
             // command

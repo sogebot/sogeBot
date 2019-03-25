@@ -5,6 +5,7 @@ const _ = require('lodash')
 
 // bot libraries
 import Game from './_interface'
+const commons = require('../commons')
 
 const ERROR_NOT_ENOUGH_OPTIONS = '0'
 const ERROR_ZERO_BET = '1'
@@ -49,47 +50,47 @@ class Gamble extends Game {
       if (_.random(0, 100, false) <= this.settings.chanceToWin) {
         await global.db.engine.increment('users.points', { id: opts.sender.userId }, { points: parseInt(points, 10) * 2 })
         let updatedPoints = await global.systems.points.getPointsOf(opts.sender.userId)
-        message = await global.commons.prepare('gambling.gamble.win', {
+        message = await commons.prepare('gambling.gamble.win', {
           pointsName: await global.systems.points.getPointsName(updatedPoints),
           points: updatedPoints
         })
-        global.commons.sendMessage(message, opts.sender)
+        commons.sendMessage(message, opts.sender)
       } else {
-        message = await global.commons.prepare('gambling.gamble.lose', {
+        message = await commons.prepare('gambling.gamble.lose', {
           pointsName: await global.systems.points.getPointsName(await global.systems.points.getPointsOf(opts.sender.userId)),
           points: await global.systems.points.getPointsOf(opts.sender.userId)
         })
-        global.commons.sendMessage(message, opts.sender)
+        commons.sendMessage(message, opts.sender)
       }
     } catch (e) {
       switch (e.message) {
         case ERROR_ZERO_BET:
-          message = await global.commons.prepare('gambling.gamble.zeroBet', {
+          message = await commons.prepare('gambling.gamble.zeroBet', {
             pointsName: await global.systems.points.getPointsName(0)
           })
-          global.commons.sendMessage(message, opts.sender)
+          commons.sendMessage(message, opts.sender)
           break
         case ERROR_NOT_ENOUGH_OPTIONS:
-          global.commons.sendMessage(global.translate('gambling.gamble.notEnoughOptions'), opts.sender)
+          commons.sendMessage(global.translate('gambling.gamble.notEnoughOptions'), opts.sender)
           break
         case ERROR_NOT_ENOUGH_POINTS:
-          message = await global.commons.prepare('gambling.gamble.notEnoughPoints', {
+          message = await commons.prepare('gambling.gamble.notEnoughPoints', {
             pointsName: await global.systems.points.getPointsName(points),
             points: points
           })
-          global.commons.sendMessage(message, opts.sender)
+          commons.sendMessage(message, opts.sender)
           break
         case ERROR_MINIMAL_BET:
           points = this.settings.minimalBet
-          message = await global.commons.prepare('gambling.gamble.lowerThanMinimalBet', {
+          message = await commons.prepare('gambling.gamble.lowerThanMinimalBet', {
             pointsName: await global.systems.points.getPointsName(points),
             points: points
           })
-          global.commons.sendMessage(message, opts.sender)
+          commons.sendMessage(message, opts.sender)
           break
         default:
           global.log.error(e.stack)
-          global.commons.sendMessage(global.translate('core.error'), opts.sender)
+          commons.sendMessage(global.translate('core.error'), opts.sender)
       }
     }
   }

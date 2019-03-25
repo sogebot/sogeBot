@@ -11,6 +11,7 @@ import * as _ from 'lodash';
 import Expects from '../expects.js';
 import { permission } from '../permissions';
 import System from './_interface';
+import { getOwner, sendMessage, prepare, getLocalizedName } from '../commons.js';
 
 enum ERROR {
   NOT_ENOUGH_OPTIONS,
@@ -81,7 +82,7 @@ class Polls extends System {
             command: this.getCommand('!poll open'),
             parameters,
             sender: {
-              username: global.commons.getOwner(),
+              username: getOwner(),
               userId: '0',
               badges: {
                 subscriber: 1,
@@ -99,7 +100,7 @@ class Polls extends System {
             command: this.getCommand('!poll close'),
             parameters: '',
             sender: {
-              username: global.commons.getOwner(),
+              username: getOwner(),
               userId: '0',
               badges: {
                 subscriber: 1,
@@ -131,7 +132,7 @@ class Polls extends System {
           _total = _total + votes[i].votes;
         }
         // get vote status
-        global.commons.sendMessage(global.commons.prepare('systems.polls.status_closed', {
+        sendMessage(prepare('systems.polls.status_closed', {
           title: cVote.title,
         }), opts.sender);
         for (const index of Object.keys(cVote.options)) {
@@ -140,11 +141,11 @@ class Polls extends System {
             const votesCount = count[index] || 0;
             const percentage = Number((100 / _total) * votesCount || 0).toFixed(2);
             if (cVote.type === 'normal') {
-              global.commons.sendMessage(this.getCommand('!vote') + ` ${Number(index) + 1} - ${option} - ${votesCount} ${global.commons.getLocalizedName(votesCount, 'systems.polls.votes')}, ${percentage}%`, opts.sender);
+              sendMessage(this.getCommand('!vote') + ` ${Number(index) + 1} - ${option} - ${votesCount} ${getLocalizedName(votesCount, 'systems.polls.votes')}, ${percentage}%`, opts.sender);
             } else if (cVote.type === 'tips') {
-              global.commons.sendMessage(`#vote${Number(index) + 1} - ${option} - ${Number(votesCount).toFixed(2)} ${global.commons.getLocalizedName(votesCount, 'systems.polls.votes')}, ${percentage}%`, opts.sender);
+              sendMessage(`#vote${Number(index) + 1} - ${option} - ${Number(votesCount).toFixed(2)} ${getLocalizedName(votesCount, 'systems.polls.votes')}, ${percentage}%`, opts.sender);
             } else {
-              global.commons.sendMessage(`#vote${Number(index) + 1} - ${option} - ${votesCount} ${global.commons.getLocalizedName(votesCount, 'systems.polls.votes')}, ${percentage}%`, opts.sender);
+              sendMessage(`#vote${Number(index) + 1} - ${option} - ${votesCount} ${getLocalizedName(votesCount, 'systems.polls.votes')}, ${percentage}%`, opts.sender);
             }
           }, 300 * (Number(index) + 1));
         }
@@ -152,7 +153,7 @@ class Polls extends System {
     } catch (e) {
       switch (e.message) {
         case String(ERROR.ALREADY_CLOSED):
-          global.commons.sendMessage(global.translate('systems.polls.notInProgress'), opts.sender);
+          sendMessage(global.translate('systems.polls.notInProgress'), opts.sender);
           break;
       }
       return false;
@@ -177,13 +178,13 @@ class Polls extends System {
       await global.db.engine.insert(this.collection.data, voting);
 
       const translations = `systems.polls.opened_${type}`;
-      global.commons.sendMessage(global.commons.prepare(translations, {
+      sendMessage(prepare(translations, {
         title,
         command: this.getCommand('!vote'),
       }), opts.sender);
       for (const index of Object.keys(options)) {
         setTimeout(() => {
-          if (type === 'normal') { global.commons.sendMessage(this.getCommand('!vote') + ` ${(Number(index) + 1)} => ${options[index]}`, opts.sender); } else { global.commons.sendMessage(`#vote${(Number(index) + 1)} => ${options[index]}`, opts.sender); }
+          if (type === 'normal') { sendMessage(this.getCommand('!vote') + ` ${(Number(index) + 1)} => ${options[index]}`, opts.sender); } else { sendMessage(`#vote${(Number(index) + 1)} => ${options[index]}`, opts.sender); }
         }, 300 * (Number(index) + 1));
       }
 
@@ -192,23 +193,23 @@ class Polls extends System {
     } catch (e) {
       switch (e.message) {
         case String(ERROR.NOT_ENOUGH_OPTIONS):
-          global.commons.sendMessage(global.translate('voting.notEnoughOptions'), opts.sender);
+          sendMessage(global.translate('voting.notEnoughOptions'), opts.sender);
           break;
         case String(ERROR.ALREADY_OPENED):
           const translations = 'systems.polls.opened' + (cVote.type.length > 0 ? `_${cVote.type}` : '');
-          global.commons.sendMessage(global.commons.prepare(translations, {
+          sendMessage(prepare(translations, {
             title: cVote.title,
             command: this.getCommand('!vote'),
           }), opts.sender);
           for (const index of Object.keys(cVote.options)) {
             setTimeout(() => {
-              if (cVote.type === 'normal') { global.commons.sendMessage(this.getCommand('!poll open') + ` ${index} => ${cVote.options[index]}`, opts.sender); } else { global.commons.sendMessage(`#vote${(Number(index) + 1)} => ${cVote.options[index]}`, opts.sender); }
+              if (cVote.type === 'normal') { sendMessage(this.getCommand('!poll open') + ` ${index} => ${cVote.options[index]}`, opts.sender); } else { sendMessage(`#vote${(Number(index) + 1)} => ${cVote.options[index]}`, opts.sender); }
             }, 300 * (Number(index) + 1));
           }
           break;
         default:
           global.log.warning(e.stack);
-          global.commons.sendMessage(global.translate('core.error'), opts.sender);
+          sendMessage(global.translate('core.error'), opts.sender);
       }
       return false;
     }
@@ -229,7 +230,7 @@ class Polls extends System {
           _total = _total + votes[i].votes;
         }
         // get vote status
-        global.commons.sendMessage(global.commons.prepare('systems.polls.status', {
+        sendMessage(prepare('systems.polls.status', {
           title: cVote.title,
         }), opts.sender);
         for (const i of Object.keys(cVote.options)) {
@@ -238,11 +239,11 @@ class Polls extends System {
             const votesCount = count[i] || 0;
             const percentage = Number((100 / _total) * votesCount || 0).toFixed(2);
             if (cVote.type === 'normal') {
-              global.commons.sendMessage(this.getCommand('!vote') + ` ${Number(i) + 1} - ${option} - ${votesCount} ${global.commons.getLocalizedName(votesCount, 'systems.polls.votes')}, ${percentage}%`, opts.sender);
+              sendMessage(this.getCommand('!vote') + ` ${Number(i) + 1} - ${option} - ${votesCount} ${getLocalizedName(votesCount, 'systems.polls.votes')}, ${percentage}%`, opts.sender);
             } else if (cVote.type === 'tips') {
-              global.commons.sendMessage(`#vote${Number(i) + 1} - ${option} - ${Number(votesCount).toFixed(2)} ${global.commons.getLocalizedName(votesCount, 'systems.polls.votes')}, ${percentage}%`, opts.sender);
+              sendMessage(`#vote${Number(i) + 1} - ${option} - ${Number(votesCount).toFixed(2)} ${getLocalizedName(votesCount, 'systems.polls.votes')}, ${percentage}%`, opts.sender);
             } else {
-              global.commons.sendMessage(`#vote${Number(i) + 1} - ${option} - ${votesCount} ${global.commons.getLocalizedName(votesCount, 'systems.polls.votes')}, ${percentage}%`, opts.sender);
+              sendMessage(`#vote${Number(i) + 1} - ${option} - ${votesCount} ${getLocalizedName(votesCount, 'systems.polls.votes')}, ${percentage}%`, opts.sender);
             }
           }, 100 * (Number(i) + 1));
         }
@@ -270,7 +271,7 @@ class Polls extends System {
     } catch (e) {
       switch (e.message) {
         case String(ERROR.NO_VOTING_IN_PROGRESS):
-          global.commons.sendMessage(global.commons.prepare('systems.polls.notInProgress'), opts.sender);
+          sendMessage(prepare('systems.polls.notInProgress'), opts.sender);
           break;
         case String(ERROR.INVALID_VOTE):
           // pass, we don't want to have error message
@@ -363,13 +364,13 @@ class Polls extends System {
       this.lastTimeRemind = Date.now();
 
       const translations = `systems.polls.opened_${vote.type}`;
-      global.commons.sendMessage(global.commons.prepare(translations, {
+      sendMessage(prepare(translations, {
         title: vote.title,
         command: this.getCommand('!vote'),
-      }), global.commons.getOwner());
+      }), getOwner());
       for (const index of Object.keys(vote.options)) {
         setTimeout(() => {
-          if (vote.type === 'normal') { global.commons.sendMessage(this.getCommand('!vote') + ` ${(Number(index) + 1)} => ${vote.options[index]}`, global.commons.getOwner()); } else { global.commons.sendMessage(`#vote${(Number(index) + 1)} => ${vote.options[index]}`, global.commons.getOwner()); }
+          if (vote.type === 'normal') { sendMessage(this.getCommand('!vote') + ` ${(Number(index) + 1)} => ${vote.options[index]}`, getOwner()); } else { sendMessage(`#vote${(Number(index) + 1)} => ${vote.options[index]}`, getOwner()); }
         }, 300 * (Number(index) + 1));
       }
     }

@@ -3,6 +3,7 @@
 import axios from 'axios';
 
 import Widget from './_interface';
+import { sendMessage, getIgnoreList } from '../commons';
 
 class Chat extends Widget {
   constructor() {
@@ -16,7 +17,7 @@ class Chat extends Widget {
     }
     this.socket.on('connection', (socket) => {
       socket.on('chat.message.send', (message) => {
-        global.commons.sendMessage(message, { username: global.oauth.settings.bot.username }, { force: true });
+        sendMessage(message, { username: global.oauth.settings.bot.username }, { force: true });
       });
 
       socket.on('room', (cb) => {
@@ -30,7 +31,7 @@ class Chat extends Widget {
 
           if (response.status === 200) {
             const chatters = response.data.chatters;
-            chatters.viewers = chatters.viewers.filter((o) => !global.commons.getIgnoreList().includes(o));
+            chatters.viewers = chatters.viewers.filter((o) => !getIgnoreList().includes(o));
             cb(null, {chatters});
           }
         } catch (e) {

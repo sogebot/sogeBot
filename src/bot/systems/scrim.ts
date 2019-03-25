@@ -14,6 +14,7 @@ import { permission } from '../permissions';
 import System from './_interface';
 
 import { debug } from '../debug';
+import { sendMessage, prepare, getLocalizedName, getOwner, round5 } from '../commons';
 
 enum ERROR {
   ALREADY_OPENED,
@@ -83,17 +84,17 @@ class Scrim extends System {
       this.settings._.lastRemindAt = now;
       await global.db.engine.remove(this.collection.matchIds, {});
 
-      global.commons.sendMessage(
-        global.commons.prepare('systems.scrim.countdown', {
+      sendMessage(
+        prepare('systems.scrim.countdown', {
           type,
           time: minutes,
-          unit: global.commons.getLocalizedName(minutes, 'core.minutes'),
+          unit: getLocalizedName(minutes, 'core.minutes'),
         }),
         opts.sender,
       );
     } catch (e) {
       if (isNaN(Number(e.message))) {
-        global.commons.sendMessage('$sender, cmd_error [' + opts.command + ']: ' + e.message, opts.sender);
+        sendMessage('$sender, cmd_error [' + opts.command + ']: ' + e.message, opts.sender);
       }
     }
   }
@@ -108,7 +109,7 @@ class Scrim extends System {
       }
     } catch (e) {
       if (isNaN(Number(e.message))) {
-        global.commons.sendMessage('$sender, cmd_error [' + opts.command + ']: ' + e.message, opts.sender);
+        sendMessage('$sender, cmd_error [' + opts.command + ']: ' + e.message, opts.sender);
       }
     }
   }
@@ -117,8 +118,8 @@ class Scrim extends System {
     this.settings._.closingAt = 0;
     this.settings._lastRemindAt = Date.now();
 
-    global.commons.sendMessage(
-      global.commons.prepare('systems.scrim.stopped'), { username: global.commons.getOwner() },
+    sendMessage(
+      prepare('systems.scrim.stopped'), { username: getOwner() },
     );
   }
 
@@ -131,31 +132,31 @@ class Scrim extends System {
       const lastRemindAtDiffMs = -(DateTime.fromMillis(this.settings._.lastRemindAt).diffNow().toObject().milliseconds || 0);
 
       const minutesToGo = when.diffNow(['minutes']).toObject().minutes || 0;
-      const secondsToGo = global.commons.round5(when.diffNow(['seconds']).toObject().seconds || 0);
+      const secondsToGo = round5(when.diffNow(['seconds']).toObject().seconds || 0);
 
       if (minutesToGo > 1) {
         // countdown every minute
         if (lastRemindAtDiffMs >= constants.MINUTE) {
-          global.commons.sendMessage(
-            global.commons.prepare('systems.scrim.countdown', {
+          sendMessage(
+            prepare('systems.scrim.countdown', {
               type: this.settings._.type,
               time: minutesToGo.toFixed(),
-              unit: global.commons.getLocalizedName(minutesToGo.toFixed(), 'core.minutes'),
+              unit: getLocalizedName(minutesToGo.toFixed(), 'core.minutes'),
             }),
-            { username: global.commons.getOwner() },
+            { username: getOwner() },
           );
           this.settings._.lastRemindAt = Date.now();
         }
       } else if (secondsToGo <= 60 && secondsToGo > 0) {
         // countdown every 15s
         if (lastRemindAtDiffMs >= 15 * constants.SECOND) {
-          global.commons.sendMessage(
-            global.commons.prepare('systems.scrim.countdown', {
+          sendMessage(
+            prepare('systems.scrim.countdown', {
               type: this.settings._.type,
               time: secondsToGo === 60 ? 1 : secondsToGo,
-              unit: secondsToGo === 60 ? global.commons.getLocalizedName(1, 'core.minutes') : global.commons.getLocalizedName(secondsToGo, 'core.seconds'),
+              unit: secondsToGo === 60 ? getLocalizedName(1, 'core.minutes') : getLocalizedName(secondsToGo, 'core.seconds'),
             }),
-            { username: global.commons.getOwner() },
+            { username: getOwner() },
           );
           this.settings._.lastRemindAt = Date.now();
         }
@@ -183,11 +184,11 @@ class Scrim extends System {
     for (const id of Object.keys(matches)) {
       output.push(id + ' - ' + matches[id].join(', '));
     }
-    global.commons.sendMessage(
-      global.commons.prepare('systems.scrim.currentMatches', {
+    sendMessage(
+      prepare('systems.scrim.currentMatches', {
         matches: output.length === 0 ? '<' + global.translate('core.empty') + '>' : output.join(' | '),
       }),
-      { username: global.commons.getOwner() },
+      { username: getOwner() },
     );
   }
 
@@ -195,27 +196,27 @@ class Scrim extends System {
     for (let i = 0; i < 4; i++) {
       setTimeout(() => {
         if (i < 3) {
-          global.commons.sendMessage(
-            global.commons.prepare('systems.scrim.countdown', {
+          sendMessage(
+            prepare('systems.scrim.countdown', {
               type: this.settings._.type,
               time: (3 - i) + '.',
               unit: '',
             }),
-            { username: global.commons.getOwner() },
+            { username: getOwner() },
           );
         } else {
           this.settings._.closingAt = 0;
-          global.commons.sendMessage(global.commons.prepare('systems.scrim.go'), { username: global.commons.getOwner() });
+          sendMessage(prepare('systems.scrim.go'), { username: getOwner() });
           if (!this.settings._.isCooldownOnly) {
             setTimeout(() => {
               if (this.settings._.closingAt !== 0) {
                 return; // user restarted !snipe
               }
-              global.commons.sendMessage(
-                global.commons.prepare('systems.scrim.putMatchIdInChat', {
+              sendMessage(
+                prepare('systems.scrim.putMatchIdInChat', {
                   command: this.getCommand('!snipe match'),
                 }),
-                { username: global.commons.getOwner() },
+                { username: getOwner() },
               );
               setTimeout(async () => {
                 if (this.settings._.closingAt !== 0) {

@@ -10,6 +10,7 @@ const {
 import { permission } from '../permissions';
 import System from './_interface'
 const Expects = require('../expects')
+const commons = require('../commons');
 
 class Points extends System {
   constructor () {
@@ -66,7 +67,7 @@ class Points extends System {
 
     try {
       for (let username of (await global.users.getAllOnlineUsernames())) {
-        if (await global.commons.isBot(username)) continue
+        if (await commons.isBot(username)) continue
 
         let user = await global.db.engine.findOne('users', { username })
         if (_.isEmpty(user)) user.id = await global.api.getIdFromTwitch(username)
@@ -153,17 +154,17 @@ class Points extends System {
       if (user.id) {
         await global.db.engine.increment('users.points', { id: user.id }, { points })
 
-        let message = await global.commons.prepare('points.success.set', {
+        let message = await commons.prepare('points.success.set', {
           amount: points,
           username,
           pointsName: await this.getPointsName(points)
         })
-        global.commons.sendMessage(message, opts.sender)
+        commons.sendMessage(message, opts.sender)
       } else {
         throw new Error('User doesn\'t have ID')
       }
     } catch (err) {
-      global.commons.sendMessage(global.translate('points.failed.set').replace('$command', opts.command), opts.sender)
+      commons.sendMessage(global.translate('points.failed.set').replace('$command', opts.command), opts.sender)
     }
   }
 
@@ -178,33 +179,33 @@ class Points extends System {
       if (!guser.id) guser.id = await global.api.getIdFromTwitch(username)
 
       if (points !== 'all' && availablePoints < points) {
-        let message = await global.commons.prepare('points.failed.giveNotEnough'.replace('$command', opts.command), {
+        let message = await commons.prepare('points.failed.giveNotEnough'.replace('$command', opts.command), {
           amount: points,
           username,
           pointsName: await this.getPointsName(points)
         })
-        global.commons.sendMessage(message, opts.sender)
+        commons.sendMessage(message, opts.sender)
       } else if (points === 'all') {
         await global.db.engine.update('users.points', { id: opts.sender.userId }, { points: 0 })
         await global.db.engine.increment('users.points', { id: guser.id }, { points: parseInt(availablePoints, 10) })
-        let message = await global.commons.prepare('points.success.give', {
+        let message = await commons.prepare('points.success.give', {
           amount: availablePoints,
           username,
           pointsName: await this.getPointsName(availablePoints)
         })
-        global.commons.sendMessage(message, opts.sender)
+        commons.sendMessage(message, opts.sender)
       } else {
         await global.db.engine.increment('users.points', { id: opts.sender.userId }, { points: (parseInt(points, 10) * -1) })
         await global.db.engine.increment('users.points', { id: guser.id }, { points: parseInt(points, 10) })
-        let message = await global.commons.prepare('points.success.give', {
+        let message = await commons.prepare('points.success.give', {
           amount: points,
           username,
           pointsName: await this.getPointsName(points)
         })
-        global.commons.sendMessage(message, opts.sender)
+        commons.sendMessage(message, opts.sender)
       }
     } catch (err) {
-      global.commons.sendMessage(global.translate('points.failed.give').replace('$command', opts.command), opts.sender)
+      commons.sendMessage(global.translate('points.failed.give').replace('$command', opts.command), opts.sender)
     }
   }
 
@@ -264,14 +265,14 @@ class Points extends System {
       if (!user.id) user.id = await global.api.getIdFromTwitch(username)
 
       let points = await this.getPointsOf(user.id)
-      let message = await global.commons.prepare('points.defaults.pointsResponse', {
+      let message = await commons.prepare('points.defaults.pointsResponse', {
         amount: points,
         username: username,
         pointsName: await this.getPointsName(points)
       })
-      global.commons.sendMessage(message, opts.sender)
+      commons.sendMessage(message, opts.sender)
     } catch (err) {
-      global.commons.sendMessage(global.translate('points.failed.get').replace('$command', opts.command), opts.sender)
+      commons.sendMessage(global.translate('points.failed.get').replace('$command', opts.command), opts.sender)
     }
   }
 
@@ -280,7 +281,7 @@ class Points extends System {
       const points = new Expects(opts.parameters).points({ all: false }).toArray()
 
       for (let username of (await global.users.getAllOnlineUsernames())) {
-        if (await global.commons.isBot(username)) continue
+        if (await commons.isBot(username)) continue
 
         let user = await global.db.engine.findOne('users', { username })
 
@@ -288,13 +289,13 @@ class Points extends System {
           await global.db.engine.increment('users.points', { id: user.id }, { points })
         }
       }
-      let message = await global.commons.prepare('points.success.all', {
+      let message = await commons.prepare('points.success.all', {
         amount: points,
         pointsName: await this.getPointsName(points)
       })
-      global.commons.sendMessage(message, opts.sender)
+      commons.sendMessage(message, opts.sender)
     } catch (err) {
-      global.commons.sendMessage(global.translate('points.failed.all').replace('$command', opts.command), opts.sender)
+      commons.sendMessage(global.translate('points.failed.all').replace('$command', opts.command), opts.sender)
     }
   }
 
@@ -303,7 +304,7 @@ class Points extends System {
       const points = new Expects(opts.parameters).points({ all: false }).toArray()
 
       for (let username of (await global.users.getAllOnlineUsernames())) {
-        if (await global.commons.isBot(username)) continue
+        if (await commons.isBot(username)) continue
 
         let user = await global.db.engine.findOne('users', { username })
 
@@ -311,13 +312,13 @@ class Points extends System {
           await global.db.engine.increment('users.points', { id: user.id }, { points: parseInt(Math.floor(Math.random() * points), 10) })
         }
       }
-      let message = await global.commons.prepare('points.success.rain', {
+      let message = await commons.prepare('points.success.rain', {
         amount: points,
         pointsName: await this.getPointsName(points)
       })
-      global.commons.sendMessage(message, opts.sender)
+      commons.sendMessage(message, opts.sender)
     } catch (err) {
-      global.commons.sendMessage(global.translate('points.failed.rain').replace('$command', opts.command), opts.sender)
+      commons.sendMessage(global.translate('points.failed.rain').replace('$command', opts.command), opts.sender)
     }
   }
 
@@ -331,14 +332,14 @@ class Points extends System {
         throw new Error('User doesn\'t have ID')
       }
 
-      let message = await global.commons.prepare('points.success.add', {
+      let message = await commons.prepare('points.success.add', {
         amount: points,
         username: username,
         pointsName: await this.getPointsName(points)
       })
-      global.commons.sendMessage(message, opts.sender)
+      commons.sendMessage(message, opts.sender)
     } catch (err) {
-      global.commons.sendMessage(global.translate('points.failed.add').replace('$command', opts.command), opts.sender)
+      commons.sendMessage(global.translate('points.failed.add').replace('$command', opts.command), opts.sender)
     }
   }
 
@@ -357,17 +358,17 @@ class Points extends System {
           await global.db.engine.increment('users.points', { id: user.id }, { points: -Math.min(points, availablePoints) })
         }
 
-        let message = await global.commons.prepare('points.success.remove', {
+        let message = await commons.prepare('points.success.remove', {
           amount: points,
           username: username,
           pointsName: await this.getPointsName(points === 'all' ? 0 : points)
         })
-        global.commons.sendMessage(message, opts.sender)
+        commons.sendMessage(message, opts.sender)
       } else {
         throw new Error('User doesn\'t have ID')
       }
     } catch (err) {
-      global.commons.sendMessage(global.translate('points.failed.remove').replace('$command', opts.command), opts.sender)
+      commons.sendMessage(global.translate('points.failed.remove').replace('$command', opts.command), opts.sender)
     }
   }
 

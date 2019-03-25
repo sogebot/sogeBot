@@ -9,6 +9,9 @@ const config = global.migration ? {
 const {
   isMainThread
 } = require('worker_threads');
+const {
+  flatten, unflatten
+} = require('../commons');
 
 const _ = require('lodash')
 
@@ -109,12 +112,12 @@ class IMongoDB extends Interface {
       let items
       const order = sortBy.startsWith('-') ? 1 : -1
 
-      if (_.some(Object.keys(global.commons.flatten(where)).map(o => o.includes('$regex')))) {
-        if (Object.keys(global.commons.flatten(where)).length > 1) {
+      if (_.some(Object.keys(flatten(where)).map(o => o.includes('$regex')))) {
+        if (Object.keys(flatten(where)).length > 1) {
           throw Error('Don\'t use $regex with other search attributes');
         }
       } else {
-        where = global.commons.flatten(where)
+        where = flatten(where)
       }
       if (!sumBy || !groupBy) {
         if (sortBy !== '_id') {
@@ -158,7 +161,7 @@ class IMongoDB extends Interface {
       let regexp = new RegExp('^[0-9a-fA-F]{24}$')
       if (regexp.test(where._id)) where._id = new ObjectID(where._id)
       else return {}
-    } else where = global.commons.flatten(where)
+    } else where = flatten(where)
 
     try {
       if (lookup) {
@@ -191,7 +194,7 @@ class IMongoDB extends Interface {
     try {
       let db = this.client.db(this.dbName)
       if (_.isArray(object)) await db.collection(table).insertMany(object)
-      let item = await db.collection(table).insertOne(global.commons.unflatten(object))
+      let item = await db.collection(table).insertOne(unflatten(object))
       return item.ops[0]
     } catch (e) {
       if (e.message.match(/EPIPE/g)) {
@@ -204,7 +207,7 @@ class IMongoDB extends Interface {
   async incrementOne (table, where, object) {
     where = where || {}
     if (!_.isNil(where._id)) where._id = new ObjectID(where._id)
-    else where = global.commons.flatten(where)
+    else where = flatten(where)
 
     if (_.isEmpty(object)) throw Error('Object to update cannot be empty')
     delete object._id
@@ -215,7 +218,7 @@ class IMongoDB extends Interface {
         where,
         { _id: 1 },
         // DON'T EVER DELETE flatten ON OBJECT - with flatten object get updated and not replaced
-        { $inc: global.commons.flatten(object) },
+        { $inc: flatten(object) },
         { new: true } // will return updated item
       )
       return item.value
@@ -231,7 +234,7 @@ class IMongoDB extends Interface {
   async increment (table, where, object) {
     where = where || {}
     if (!_.isNil(where._id)) where._id = new ObjectID(where._id)
-    else where = global.commons.flatten(where)
+    else where = flatten(where)
 
     if (_.isEmpty(object)) throw Error('Object to update cannot be empty')
     delete object._id
@@ -242,7 +245,7 @@ class IMongoDB extends Interface {
       await db.collection(table).updateOne(
         where,
         // DON'T EVER DELETE flatten ON OBJECT - with flatten object get updated and not replaced
-        { $inc: global.commons.flatten(object) }, {
+        { $inc: flatten(object) }, {
           upsert: true,
           multi: _.isEmpty(where)
         }
@@ -262,7 +265,7 @@ class IMongoDB extends Interface {
 
   async remove (table, where) {
     if (!_.isNil(where._id)) where._id = new ObjectID(where._id)
-    else where = global.commons.flatten(where)
+    else where = flatten(where)
 
     try {
       let db = this.client.db(this.dbName)
@@ -281,7 +284,7 @@ class IMongoDB extends Interface {
     if (_.isEmpty(object)) throw Error('Object to update cannot be empty')
 
     if (!_.isNil(where._id)) where._id = new ObjectID(where._id)
-    else where = global.commons.flatten(where)
+    else where = flatten(where)
 
     // remove _id from object
     delete object._id
@@ -290,12 +293,12 @@ class IMongoDB extends Interface {
 
       if (_.size(where) === 0) {
         // DON'T EVER DELETE flatten ON OBJECT - with flatten object get updated and not replaced
-        await db.collection(table).updateMany({}, { $set: global.commons.flatten(object, { safe: true }) })
+        await db.collection(table).updateMany({}, { $set: flatten(object, { safe: true }) })
       } else {
         await db.collection(table).updateOne(
           where,
           // DON'T EVER DELETE flatten ON OBJECT - with flatten object get updated and not replaced
-          { $set: global.commons.flatten(object, { safe: true }) }, {
+          { $set: flatten(object, { safe: true }) }, {
             upsert: _.isNil(where._id)
           }
         )

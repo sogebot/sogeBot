@@ -3,6 +3,7 @@
 
 // 3rdparty libraries
 const _ = require('lodash')
+const commons = require('../commons')
 const crypto = require('crypto')
 
 import Overlay from './_interface'
@@ -45,7 +46,7 @@ class EventList extends Overlay {
   }
 
   async add (data: EventType) {
-    if (await global.commons.isBot(data.username)) return // don't save event from a bot
+    if (await commons.isBot(data.username)) return // don't save event from a bot
 
     const newEvent = {
       event: data.type,

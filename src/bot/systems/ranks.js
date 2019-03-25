@@ -6,6 +6,7 @@ const _ = require('lodash')
 // bot libraries
 import { permission } from '../permissions';
 import System from './_interface'
+const commons = require('../commons');
 
 /*
  * !rank                       - show user rank
@@ -39,8 +40,8 @@ class Ranks extends System {
     const parsed = opts.parameters.match(/^(\d+) ([\S].+)$/)
 
     if (_.isNil(parsed)) {
-      let message = await global.commons.prepare('ranks.rank-parse-failed')
-      global.commons.sendMessage(message, opts.sender)
+      let message = await commons.prepare('ranks.rank-parse-failed')
+      commons.sendMessage(message, opts.sender)
       return false
     }
 
@@ -52,16 +53,16 @@ class Ranks extends System {
     var ranks = await global.db.engine.find(this.collection.data, { hours: values.hours })
     if (ranks.length === 0) { global.db.engine.insert(this.collection.data, values) }
 
-    let message = await global.commons.prepare(ranks.length === 0 ? 'ranks.rank-was-added' : 'ranks.ranks-already-exist', { rank: values.value, hours: values.hours })
-    global.commons.sendMessage(message, opts.sender)
+    let message = await commons.prepare(ranks.length === 0 ? 'ranks.rank-was-added' : 'ranks.ranks-already-exist', { rank: values.value, hours: values.hours })
+    commons.sendMessage(message, opts.sender)
   }
 
   async edit (opts) {
     let parsed = opts.parameters.match(/^(\d+) ([\S].+)$/)
 
     if (_.isNil(parsed)) {
-      let message = await global.commons.prepare('ranks.rank-parse-failed')
-      global.commons.sendMessage(message, opts.sender)
+      let message = await commons.prepare('ranks.rank-parse-failed')
+      commons.sendMessage(message, opts.sender)
       return false
     }
 
@@ -70,68 +71,68 @@ class Ranks extends System {
 
     let item = await global.db.engine.findOne(this.collection.data, { hours: parseInt(hours, 10) })
     if (_.isEmpty(item)) {
-      let message = await global.commons.prepare('ranks.rank-was-not-found', { hours: hours })
-      global.commons.sendMessage(message, opts.sender)
+      let message = await commons.prepare('ranks.rank-was-not-found', { hours: hours })
+      commons.sendMessage(message, opts.sender)
       return false
     }
 
     await global.db.engine.update(this.collection.data, { hours: parseInt(hours, 10) }, { value: rank })
-    let message = await global.commons.prepare('ranks.rank-was-edited', { hours: parseInt(hours, 10), rank: rank })
-    global.commons.sendMessage(message, opts.sender)
+    let message = await commons.prepare('ranks.rank-was-edited', { hours: parseInt(hours, 10), rank: rank })
+    commons.sendMessage(message, opts.sender)
   }
 
   async set (opts) {
     var parsed = opts.parameters.match(/^([\S]+) ([\S ]+)$/)
 
     if (_.isNil(parsed)) {
-      let message = await global.commons.prepare('ranks.rank-parse-failed')
-      global.commons.sendMessage(message, opts.sender)
+      let message = await commons.prepare('ranks.rank-parse-failed')
+      commons.sendMessage(message, opts.sender)
       return false
     }
 
     global.users.set(parsed[1], { custom: { rank: parsed[2].trim() } })
 
-    let message = await global.commons.prepare('ranks.custom-rank-was-set-to-user', { rank: parsed[2].trim(), username: parsed[1] })
-    global.commons.sendMessage(message, opts.sender)
+    let message = await commons.prepare('ranks.custom-rank-was-set-to-user', { rank: parsed[2].trim(), username: parsed[1] })
+    commons.sendMessage(message, opts.sender)
   }
 
   async unset (opts) {
     var parsed = opts.parameters.match(/^([\S]+)$/)
 
     if (_.isNil(parsed)) {
-      let message = await global.commons.prepare('ranks.rank-parse-failed')
-      global.commons.sendMessage(message, opts.sender)
+      let message = await commons.prepare('ranks.rank-parse-failed')
+      commons.sendMessage(message, opts.sender)
       return false
     }
 
     global.users.set(parsed[1], { custom: { rank: null } })
-    let message = await global.commons.prepare('ranks.custom-rank-was-unset-for-user', { username: parsed[1] })
-    global.commons.sendMessage(message, opts.sender)
+    let message = await commons.prepare('ranks.custom-rank-was-unset-for-user', { username: parsed[1] })
+    commons.sendMessage(message, opts.sender)
   }
 
   help (opts) {
-    global.commons.sendMessage(global.translate('core.usage') + ': !rank add <hours> <rank> | !rank edit <hours> <rank> | !rank remove <hour> | !rank list | !rank set <username> <rank> | !rank unset <username>', opts.sender)
+    commons.sendMessage(global.translate('core.usage') + ': !rank add <hours> <rank> | !rank edit <hours> <rank> | !rank remove <hour> | !rank list | !rank set <username> <rank> | !rank unset <username>', opts.sender)
   }
 
   async list (opts) {
     let ranks = await global.db.engine.find(this.collection.data)
-    var output = await global.commons.prepare(ranks.length === 0 ? 'ranks.list-is-empty' : 'ranks.list-is-not-empty', { list: _.map(_.orderBy(ranks, 'hours', 'asc'), function (l) { return l.hours + 'h - ' + l.value }).join(', ') })
-    global.commons.sendMessage(output, opts.sender)
+    var output = await commons.prepare(ranks.length === 0 ? 'ranks.list-is-empty' : 'ranks.list-is-not-empty', { list: _.map(_.orderBy(ranks, 'hours', 'asc'), function (l) { return l.hours + 'h - ' + l.value }).join(', ') })
+    commons.sendMessage(output, opts.sender)
   }
 
   async remove (opts) {
     const parsed = opts.parameters.match(/^(\d+)$/)
     if (_.isNil(parsed)) {
-      let message = await global.commons.prepare('ranks.rank-parse-failed')
-      global.commons.sendMessage(message, opts.sender)
+      let message = await commons.prepare('ranks.rank-parse-failed')
+      commons.sendMessage(message, opts.sender)
       return false
     }
 
     const hours = parseInt(parsed[1], 10)
     const removed = await global.db.engine.remove(this.collection.data, { hours: hours })
 
-    let message = await global.commons.prepare(removed ? 'ranks.rank-was-removed' : 'ranks.rank-was-not-found', { hours: hours })
-    global.commons.sendMessage(message, opts.sender)
+    let message = await commons.prepare(removed ? 'ranks.rank-was-removed' : 'ranks.rank-was-not-found', { hours: hours })
+    commons.sendMessage(message, opts.sender)
   }
 
   async main (opts) {
@@ -150,8 +151,8 @@ class Ranks extends System {
     }
 
     if (_.isNil(rank)) {
-      let message = await global.commons.prepare('ranks.user-dont-have-rank')
-      global.commons.sendMessage(message, opts.sender)
+      let message = await commons.prepare('ranks.user-dont-have-rank')
+      commons.sendMessage(message, opts.sender)
       return true
     }
 
@@ -160,13 +161,13 @@ class Ranks extends System {
       let toNextRankWatched = watched / 1000 / 60 / 60 - current.hours
       let toWatch = (toNextRank - toNextRankWatched)
       let percentage = 100 - (((toWatch) / toNextRank) * 100)
-      let message = await global.commons.prepare('ranks.show-rank-with-next-rank', { rank: rank, nextrank: `${nextRank.value} ${percentage.toFixed(1)}% (${toWatch.toFixed(1)}h)` })
-      global.commons.sendMessage(message, opts.sender)
+      let message = await commons.prepare('ranks.show-rank-with-next-rank', { rank: rank, nextrank: `${nextRank.value} ${percentage.toFixed(1)}% (${toWatch.toFixed(1)}h)` })
+      commons.sendMessage(message, opts.sender)
       return true
     }
 
-    let message = await global.commons.prepare('ranks.show-rank-without-next-rank', { rank: rank })
-    global.commons.sendMessage(message, opts.sender)
+    let message = await commons.prepare('ranks.show-rank-without-next-rank', { rank: rank })
+    commons.sendMessage(message, opts.sender)
   }
 
   async get (user) {

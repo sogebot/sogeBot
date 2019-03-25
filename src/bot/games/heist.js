@@ -5,6 +5,7 @@ const _ = require('lodash')
 const {
   isMainThread
 } = require('worker_threads');
+const commons = require('../commons')
 
 const Expects = require('../expects.js')
 import Game from './_interface'
@@ -108,7 +109,7 @@ class Heist extends Game {
       let level = _.find(levels, (o) => o.maxUsers >= users.length || _.isNil(o.maxUsers)) // find appropriate level or max level
 
       if (users.length === 0) {
-        global.commons.sendMessage(this.settings.results.noUser, global.commons.getOwner())
+        commons.sendMessage(this.settings.results.noUser, commons.getOwner())
         // cleanup
         this.settings._.startedAt = null
         await global.db.engine.remove(this.collection.users, {})
@@ -116,14 +117,14 @@ class Heist extends Game {
         return
       }
 
-      global.commons.sendMessage(started.replace('$bank', level.name), global.commons.getOwner())
+      commons.sendMessage(started.replace('$bank', level.name), commons.getOwner())
 
       if (users.length === 1) {
         // only one user
         let isSurvivor = _.random(0, 100, false) <= level['winPercentage']
         let user = users[0]
         let outcome = isSurvivor ? this.settings.results.singleUserSuccess : this.settings.results.singleUserFailed
-        setTimeout(async () => { global.commons.sendMessage(outcome.replace('$user', (global.tmi.settings.chat.showWithAt ? '@' : '') + user.username), global.commons.getOwner()) }, 5000)
+        setTimeout(async () => { commons.sendMessage(outcome.replace('$user', (global.tmi.settings.chat.showWithAt ? '@' : '') + user.username), commons.getOwner()) }, 5000)
 
         if (isSurvivor) {
           // add points to user
@@ -145,7 +146,7 @@ class Heist extends Game {
         let percentage = (100 / users.length) * winners.length
         let ordered = _.orderBy(this.settings.results.data, [(o) => parseInt(o.percentage)], 'asc')
         let result = _.find(ordered, (o) => o.percentage >= percentage)
-        setTimeout(async () => { global.commons.sendMessage(_.isNil(result) ? '' : result.message, global.commons.getOwner()) }, 5000)
+        setTimeout(async () => { commons.sendMessage(_.isNil(result) ? '' : result.message, commons.getOwner()) }, 5000)
         if (winners.length > 0) {
           setTimeout(async () => {
             winners = _.chunk(winners, this.settings.options.showMaxUsers)
@@ -155,7 +156,7 @@ class Heist extends Game {
             let message = await global.translate('games.heist.results')
             message = message.replace('$users', winnersList.map((o) => (global.tmi.settings.chat.showWithAt ? '@' : '') + o).join(', '))
             if (andXMore > 0) message = message + ' ' + (await global.translate('games.heist.andXMore')).replace('$count', andXMore)
-            global.commons.sendMessage(message, global.commons.getOwner())
+            commons.sendMessage(message, commons.getOwner())
           }, 5500)
         }
       }
@@ -169,7 +170,7 @@ class Heist extends Game {
     // check if cops done patrolling
     if (!_.isNil(lastHeistTimestamp) && _.now() - lastHeistTimestamp >= copsCooldown * 60000) {
       this.settings._.lastHeistTimestamp = null
-      global.commons.sendMessage((this.settings.notifications.copsCooldown), global.commons.getOwner())
+      commons.sendMessage((this.settings.notifications.copsCooldown), commons.getOwner())
     }
     this.timeouts['iCheckFinished'] = setTimeout(() => this.iCheckFinished(), 10000)
   }
@@ -190,9 +191,9 @@ class Heist extends Game {
       let minutesLeft = Number.parseFloat(copsCooldown - (_.now() - lastHeistTimestamp) / 60000).toFixed(1)
       if (_.now() - (this.settings._.lastAnnouncedCops) >= 60000) {
         this.settings._.lastAnnouncedCops = _.now()
-        global.commons.sendMessage(
+        commons.sendMessage(
           (this.settings.notifications.copsOnPatrol)
-            .replace('$cooldown', minutesLeft + ' ' + global.commons.getLocalizedName(minutesLeft, 'core.minutes')), opts.sender)
+            .replace('$cooldown', minutesLeft + ' ' + commons.getLocalizedName(minutesLeft, 'core.minutes')), opts.sender)
       }
       return
     }
@@ -204,14 +205,14 @@ class Heist extends Game {
       await global.db.engine.update(this.collection.data, { key: 'startedAt' }, { value: startedAt })
       if (_.now() - (this.settings._.lastAnnouncedStart) >= 60000) {
         this.settings._.lastAnnouncedStart = _.now()
-        global.commons.sendMessage((await global.translate('games.heist.entryMessage')).replace('$command', opts.command), opts.sender)
+        commons.sendMessage((await global.translate('games.heist.entryMessage')).replace('$command', opts.command), opts.sender)
       }
     }
 
     // is heist in progress?
     if (!newHeist && _.now() - startedAt > entryCooldown * 1000 && _.now() - (this.settings._.lastAnnouncedHeistInProgress) >= 60000) {
       this.settings._.lastAnnouncedHeistInProgress = _.now()
-      global.commons.sendMessage(
+      commons.sendMessage(
         (await global.translate('games.heist.lateEntryMessage')).replace('$command', opts.command), opts.sender)
       return
     }
@@ -221,7 +222,7 @@ class Heist extends Game {
       points = expects.check(opts.parameters).points().toArray()[0]
     } catch (e) {
       if (!newHeist) {
-        global.commons.sendMessage(
+        commons.sendMessage(
           (await global.translate('games.heist.entryInstruction')).replace('$command', opts.command), opts.sender)
         global.log.warning(`${opts.command} ${e.message}`)
       }
@@ -232,7 +233,7 @@ class Heist extends Game {
     points = points > await global.systems.points.getPointsOf(opts.sender.userId) ? await global.systems.points.getPointsOf(opts.sender.userId) : points // bet only user points
 
     if (points === 0 || _.isNil(points) || _.isNaN(points)) {
-      global.commons.sendMessage(
+      commons.sendMessage(
         (await global.translate('games.heist.entryInstruction')).replace('$command', opts.command), opts.sender)
       return
     } // send entryInstruction if command is not ok
@@ -250,11 +251,11 @@ class Heist extends Game {
     if (this.settings._.lastAnnouncedLevel !== level.name) {
       this.settings._.lastAnnouncedLevel = level.name
       if (nextLevel) {
-        global.commons.sendMessage(this.settings.notifications.nextLevelMessage
+        commons.sendMessage(this.settings.notifications.nextLevelMessage
           .replace('$bank', level.name)
           .replace('$nextBank', nextLevel.name, opts.sender))
       } else {
-        global.commons.sendMessage(this.settings.notifications.maxLevelMessage
+        commons.sendMessage(this.settings.notifications.maxLevelMessage
           .replace('$bank', level.name), opts.sender)
       }
     }

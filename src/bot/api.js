@@ -10,6 +10,10 @@ const fs = require('fs')
 const chalk = require('chalk')
 const constants = require('./constants')
 
+const {
+  getBroadcaster, getChannel, getIgnoreList, isOwner, isBot, sendMessage
+} = require('./commons')
+
 const __DEBUG__ = {
   STREAM: (process.env.DEBUG && process.env.DEBUG.includes('api.stream')),
   CALLS: (process.env.DEBUG && process.env.DEBUG.includes('api.calls')),
@@ -164,7 +168,7 @@ class API {
 
     for (let username of this.rate_limit_follower_check) {
       const user = await global.users.getByName(username)
-      const isSkipped = user.username === global.commons.getBroadcaster || user.username === global.oauth.settings.bot.username
+      const isSkipped = user.username === getBroadcaster() || user.username === global.oauth.settings.bot.username
       const userHaveId = !_.isNil(user.id)
       if (new Date().getTime() - _.get(user, 'time.followCheck', 0) <= 1000 * 60 * 60 * 24 || isSkipped || !userHaveId) {
         this.rate_limit_follower_check.delete(user.username)
@@ -314,7 +318,7 @@ class API {
       }
     }
 
-    const url = `https://tmi.twitch.tv/group/user/${global.commons.getChannel()}/chatters`
+    const url = `https://tmi.twitch.tv/group/user/${getChannel()}/chatters`
     const needToWait = _.isNil(global.widgets)
     if (needToWait) {
       return { state: false, opts }
@@ -339,7 +343,7 @@ class API {
     let bulkInsert = []
     let bulkParted = []
     let allOnlineUsers = await global.users.getAllOnlineUsernames()
-    let ignoredUsers = global.commons.getIgnoreList()
+    let ignoredUsers = getIgnoreList()
 
     for (let user of allOnlineUsers) {
       if (!_.includes(chatters, user)) {
@@ -414,7 +418,7 @@ class API {
       global.workers.sendToAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', request.headers['ratelimit-limit'], request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] })
 
       this.setSubscribers(subscribers.filter(o => {
-        return !global.commons.isOwner(o.user_name)  && !global.commons.isBot(o.user_name)
+        return !isOwner(o.user_name)  && !isBot(o.user_name)
       }))
       if (subscribers.length === 100) {
         // move to next page
@@ -425,7 +429,7 @@ class API {
     } catch (e) {
       const isChannelPartnerOrAffiliate =
         !(e.message !== '422 Unprocessable Entity' ||
-         (e.response.data.status === 400 && e.response.data.message === `${global.commons.getBroadcaster} does not have a subscription program`))
+         (e.response.data.status === 400 && e.response.data.message === `${getBroadcaster()} does not have a subscription program`))
       if (!isChannelPartnerOrAffiliate) {
         if (this.retries.getChannelSubscribers >= 15) {
           disable = true
@@ -645,7 +649,7 @@ class API {
                   type: 'follow',
                   username: user.username
                 })
-                if (!quiet && !(await global.commons.isBot(user.username))) {
+                if (!quiet && !isBot(user.username)) {
                   global.log.follow(user.username)
                   global.events.fire('follow', { username: user.username })
 
@@ -1026,26 +1030,26 @@ class API {
       if (!_.isNil(args.game)) {
         response.game = _.isNil(response.game) ? '' : response.game
         if (response.game.trim() === args.game.trim()) {
-          global.commons.sendMessage(global.translate('game.change.success')
+          sendMessage(global.translate('game.change.success')
             .replace(/\$game/g, response.game), sender)
           global.events.fire('game-changed', { oldGame: (await global.db.engine.findOne('api.current', { key: 'game' })).value, game: response.game })
           await global.db.engine.update('api.current', { key: 'game' }, { value: response.game })
         } else {
-          global.commons.sendMessage(global.translate('game.change.failed')
+          sendMessage(global.translate('game.change.failed')
             .replace(/\$game/g, (await global.db.engine.findOne('api.current', { key: 'game' })).value), sender)
         }
       }
 
       if (!_.isNull(args.title)) {
         if (response.status.trim() === status.trim()) {
-          global.commons.sendMessage(global.translate('title.change.success')
+          sendMessage(global.translate('title.change.success')
             .replace(/\$title/g, response.status), sender)
 
           // we changed title outside of bot
           if (response.status !== status) await global.cache.rawStatus(response.status)
           await global.db.engine.update('api.current', { key: 'title' }, { value: response.status })
         } else {
-          global.commons.sendMessage(global.translate('title.change.failed')
+          sendMessage(global.translate('title.change.failed')
             .replace(/\$title/g, (await global.db.engine.findOne('api.current', { key: 'title' })).value), sender)
         }
       }
