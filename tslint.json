@@ -7,7 +7,7 @@
         "variable-name":false,
         "max-line-length":false,
         "quotemark": [true, "single", "jsx-double"],
-        "interface-name":false,
+        "interface-name":false
     },
     "rulesDirectory": []
 }

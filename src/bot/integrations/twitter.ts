@@ -3,10 +3,10 @@ import chalk from 'chalk';
 import * as _ from 'lodash';
 import Client from 'twitter';
 import { isMainThread } from 'worker_threads';
-import * as Message from '../message';
-import { getOwner } from '../commons';
 
 // bot libraries
+import { getOwner } from '../commons';
+import * as Message from '../message';
 import Integration from './_interface';
 
 class Twitter extends Integration {

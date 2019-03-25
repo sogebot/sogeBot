@@ -2,8 +2,8 @@ import { get, now, sample, set } from 'lodash';
 import { join } from 'path';
 import { isMainThread, parentPort, threadId, Worker } from 'worker_threads';
 
-import { debug } from './debug';
 import { message, timeout } from './commons';
+import { debug } from './debug';
 
 class Workers {
   public onlineCount: number = 0;

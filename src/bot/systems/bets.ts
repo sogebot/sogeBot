@@ -1,18 +1,11 @@
-'use strict';
-
-// 3rdparty libraries
-const {
-  isMainThread,
-// tslint:disable-next-line:no-var-requires
-} = require('worker_threads');
 import * as _ from 'lodash';
+import { isMainThread } from 'worker_threads';
 
-// bot libraries
+import { getOwner, prepare, sendMessage } from '../commons';
 import Expects from '../expects';
 import { permission } from '../permissions';
 import System from './_interface';
 import * as Points from './points';
-import { getOwner, sendMessage, prepare } from '../commons';
 
 const ERROR_NOT_ENOUGH_OPTIONS = 'Expected more parameters';
 const ERROR_ALREADY_OPENED = '1';

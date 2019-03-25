@@ -1,13 +1,9 @@
-'use strict';
-
-// 3rdparty libraries
 import * as _ from 'lodash';
 import * as moment from 'moment-timezone';
 
-// bot libraries
+import { getChannel, getIgnoreList, isIgnored, sendMessage } from '../commons';
 import { permission } from '../permissions';
 import System from './_interface';
-import { getIgnoreList, isIgnored, getChannel, sendMessage } from '../commons';
 
 enum TYPE {
   TIME,

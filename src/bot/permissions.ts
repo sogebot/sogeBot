@@ -1,9 +1,11 @@
-'use strict';
-
 import * as _ from 'lodash';
+
 import Core from './_interface';
+import {
+    isBot, isBroadcaster, isFollower, isModerator, isOwner, isSubscriber, isVIP, prepare,
+    sendMessage,
+} from './commons';
 import { debug } from './debug';
-import { isBot, isBroadcaster, isOwner, isModerator, isSubscriber, isVIP, isFollower, sendMessage, prepare } from './commons';
 
 const permission = Object.freeze({
   CASTERS: '4300ed23-dca0-4ed9-8014-f5f2f7af55a9',

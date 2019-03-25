@@ -9,16 +9,16 @@ import Message from './message';
 
 export async function autoLoad(directory) {
   const directoryListing = readdirSync(directory);
-  let loaded = {}
+  const loaded = {};
   for (const file of directoryListing) {
     const imported = require(normalize(join(process.cwd(), directory, file)));
     if (typeof imported.default !== 'undefined') {
       loaded[file.split('.')[0]] = imported.default; // remap default to root object
     } else {
-      loaded[file.split('.')[0]] = imported
+      loaded[file.split('.')[0]] = imported;
     }
   }
-  return loaded
+  return loaded;
 }
 
 /*

@@ -1,17 +1,8 @@
-'use strict';
-
-// 3rdparty libraries
 import * as _ from 'lodash';
 import { DateTime } from 'luxon';
 
-// bot libraries
+import { getLocalizedName, prepare, sendMessage } from '../commons';
 import System from './_interface';
-import { sendMessage, prepare, getLocalizedName } from '../commons';
-
-const __DEBUG__ =
-  (process.env.DEBUG && process.env.DEBUG.includes('systems.*')) ||
-  (process.env.DEBUG && process.env.DEBUG.includes('systems.userinfo')) ||
-  (process.env.DEBUG && process.env.DEBUG.includes('systems.userinfo.*'));
 
 /*
  * !me

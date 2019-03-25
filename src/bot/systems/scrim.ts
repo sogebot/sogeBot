@@ -1,20 +1,12 @@
-'use strict';
-
-// 3rdparty libraries
-const {
-  isMainThread,
-  // tslint:disable-next-line:no-var-requires
-} = require('worker_threads');
 import { DateTime } from 'luxon';
+import { isMainThread } from 'worker_threads';
 
-// bot libraries
+import { getLocalizedName, getOwner, prepare, round5, sendMessage } from '../commons';
 import * as constants from '../constants';
+import { debug } from '../debug';
 import Expects from '../expects.js';
 import { permission } from '../permissions';
 import System from './_interface';
-
-import { debug } from '../debug';
-import { sendMessage, prepare, getLocalizedName, getOwner, round5 } from '../commons';
 
 enum ERROR {
   ALREADY_OPENED,

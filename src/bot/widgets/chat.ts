@@ -1,9 +1,7 @@
-'use strict';
-
 import axios from 'axios';
 
+import { getIgnoreList, sendMessage } from '../commons';
 import Widget from './_interface';
-import { sendMessage, getIgnoreList } from '../commons';
 
 class Chat extends Widget {
   constructor() {

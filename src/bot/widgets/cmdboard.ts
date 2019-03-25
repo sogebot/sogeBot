@@ -1,5 +1,5 @@
-import Widget from './_interface';
 import { getOwner } from '../commons';
+import Widget from './_interface';
 
 class Cmdboard extends Widget {
   constructor() {
