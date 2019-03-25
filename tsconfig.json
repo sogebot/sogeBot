@@ -8,6 +8,7 @@
     "module": "esnext",
     "incremental": true,
     "removeComments": true,
+    "noImplicitAny": false,
     "noImplicitThis": true,
     "moduleResolution": "node",
     "lib": ["es2018", "dom"],
