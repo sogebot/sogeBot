@@ -3,6 +3,7 @@ const {
   isMainThread
 } = require('worker_threads');
 if (!isMainThread) process.exit()
+const commons = require('../../../dest/commons');
 
 
 require('../../general.js')
@@ -32,7 +33,7 @@ describe('Scrim - full workflow', () => {
       await message.isSent('systems.scrim.countdown', owner, {
         time: 1,
         type: 'duo',
-        unit: global.commons.getLocalizedName(1, 'core.minutes'),
+        unit: commons.getLocalizedName(1, 'core.minutes'),
       })
     })
 
@@ -40,7 +41,7 @@ describe('Scrim - full workflow', () => {
       await message.isSent('systems.scrim.countdown', owner, {
         time: 45,
         type: 'duo',
-        unit: global.commons.getLocalizedName(45, 'core.seconds'),
+        unit: commons.getLocalizedName(45, 'core.seconds'),
       }, 19000)
     })
 
@@ -48,7 +49,7 @@ describe('Scrim - full workflow', () => {
       await message.isSent('systems.scrim.countdown', owner, {
         time: 30,
         type: 'duo',
-        unit: global.commons.getLocalizedName(30, 'core.seconds'),
+        unit: commons.getLocalizedName(30, 'core.seconds'),
       }, 19000)
     })
 
@@ -56,7 +57,7 @@ describe('Scrim - full workflow', () => {
       await message.isSent('systems.scrim.countdown', owner, {
         time: 15,
         type: 'duo',
-        unit: global.commons.getLocalizedName(15, 'core.seconds'),
+        unit: commons.getLocalizedName(15, 'core.seconds'),
       }, 19000)
     })
 
@@ -125,7 +126,7 @@ describe('Scrim - full workflow', () => {
       await message.isSent('systems.scrim.countdown', owner, {
         time: 1,
         type: 'duo',
-        unit: global.commons.getLocalizedName(1, 'core.minutes'),
+        unit: commons.getLocalizedName(1, 'core.minutes'),
       })
     })
 
@@ -133,7 +134,7 @@ describe('Scrim - full workflow', () => {
       await message.isSent('systems.scrim.countdown', owner, {
         time: 45,
         type: 'duo',
-        unit: global.commons.getLocalizedName(45, 'core.seconds'),
+        unit: commons.getLocalizedName(45, 'core.seconds'),
       }, 19000)
     })
 
@@ -141,7 +142,7 @@ describe('Scrim - full workflow', () => {
       await message.isSent('systems.scrim.countdown', owner, {
         time: 30,
         type: 'duo',
-        unit: global.commons.getLocalizedName(30, 'core.seconds'),
+        unit: commons.getLocalizedName(30, 'core.seconds'),
       }, 19000)
     })
 
@@ -149,7 +150,7 @@ describe('Scrim - full workflow', () => {
       await message.isSent('systems.scrim.countdown', owner, {
         time: 15,
         type: 'duo',
-        unit: global.commons.getLocalizedName(15, 'core.seconds'),
+        unit: commons.getLocalizedName(15, 'core.seconds'),
       }, 19000)
     })
 
@@ -218,7 +219,7 @@ describe('Scrim - full workflow', () => {
       await message.isSent('systems.scrim.countdown', owner, {
         time: 1,
         type: 'duo',
-        unit: global.commons.getLocalizedName(1, 'core.minutes'),
+        unit: commons.getLocalizedName(1, 'core.minutes'),
       })
     })
 
@@ -226,7 +227,7 @@ describe('Scrim - full workflow', () => {
       await message.isSent('systems.scrim.countdown', owner, {
         time: 45,
         type: 'duo',
-        unit: global.commons.getLocalizedName(45, 'core.seconds'),
+        unit: commons.getLocalizedName(45, 'core.seconds'),
       }, 19000)
     })
 
@@ -234,7 +235,7 @@ describe('Scrim - full workflow', () => {
       await message.isSent('systems.scrim.countdown', owner, {
         time: 30,
         type: 'duo',
-        unit: global.commons.getLocalizedName(30, 'core.seconds'),
+        unit: commons.getLocalizedName(30, 'core.seconds'),
       }, 19000)
     })
 
@@ -242,7 +243,7 @@ describe('Scrim - full workflow', () => {
       await message.isSent('systems.scrim.countdown', owner, {
         time: 15,
         type: 'duo',
-        unit: global.commons.getLocalizedName(15, 'core.seconds'),
+        unit: commons.getLocalizedName(15, 'core.seconds'),
       }, 19000)
     })
 

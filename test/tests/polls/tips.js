@@ -3,6 +3,7 @@ const {
   isMainThread
 } = require('worker_threads');
 if (!isMainThread) process.exit()
+const commons = require('../../../dest/commons');
 
 
 require('../../general.js')
@@ -65,9 +66,9 @@ describe('Polls - tips', () => {
 
       await global.systems.polls.main({ sender: owner, parameters: ''  })
       await message.isSent('systems.polls.status', owner, { title: 'Lorem Ipsum?' })
-      await message.isSentRaw(`#vote1 - Lorem - 0.00 ${global.commons.getLocalizedName(0, 'systems.polls.votes')}, 0.00%`, owner)
-      await message.isSentRaw(`#vote2 - Ipsum - 0.00 ${global.commons.getLocalizedName(0, 'systems.polls.votes')}, 0.00%`, owner)
-      await message.isSentRaw(`#vote3 - Dolor Sit - 0.00 ${global.commons.getLocalizedName(0, 'systems.polls.votes')}, 0.00%`, owner)
+      await message.isSentRaw(`#vote1 - Lorem - 0.00 ${commons.getLocalizedName(0, 'systems.polls.votes')}, 0.00%`, owner)
+      await message.isSentRaw(`#vote2 - Ipsum - 0.00 ${commons.getLocalizedName(0, 'systems.polls.votes')}, 0.00%`, owner)
+      await message.isSentRaw(`#vote3 - Dolor Sit - 0.00 ${commons.getLocalizedName(0, 'systems.polls.votes')}, 0.00%`, owner)
     })
     for (let o of [0,1,2,3,4]) {
       it(`User ${owner.username} will vote for option ${o} - should fail`, async () => {
@@ -111,9 +112,9 @@ describe('Polls - tips', () => {
 
       await global.systems.polls.main({ sender: owner, parameters: ''  })
       await message.isSent('systems.polls.status', owner, { title: 'Lorem Ipsum?' })
-      await message.isSentRaw(`#vote1 - Lorem - 100.00 ${global.commons.getLocalizedName(100, 'systems.polls.votes')}, 50.00%`, owner)
-      await message.isSentRaw(`#vote2 - Ipsum - 100.00 ${global.commons.getLocalizedName(100, 'systems.polls.votes')}, 50.00%`, owner)
-      await message.isSentRaw(`#vote3 - Dolor Sit - 0.00 ${global.commons.getLocalizedName(0, 'systems.polls.votes')}, 0.00%`, owner)
+      await message.isSentRaw(`#vote1 - Lorem - 100.00 ${commons.getLocalizedName(100, 'systems.polls.votes')}, 50.00%`, owner)
+      await message.isSentRaw(`#vote2 - Ipsum - 100.00 ${commons.getLocalizedName(100, 'systems.polls.votes')}, 50.00%`, owner)
+      await message.isSentRaw(`#vote3 - Dolor Sit - 0.00 ${commons.getLocalizedName(0, 'systems.polls.votes')}, 0.00%`, owner)
     })
 
     it('Close voting', async () => {
@@ -122,9 +123,9 @@ describe('Polls - tips', () => {
 
       assert.isTrue(await global.systems.polls.close({ sender: owner }))
       await message.isSent('systems.polls.status_closed', owner, { title: 'Lorem Ipsum?' })
-      await message.isSentRaw(`#vote1 - Lorem - 100.00 ${global.commons.getLocalizedName(100, 'systems.polls.votes')}, 50.00%`, owner)
-      await message.isSentRaw(`#vote2 - Ipsum - 100.00 ${global.commons.getLocalizedName(100, 'systems.polls.votes')}, 50.00%`, owner)
-      await message.isSentRaw(`#vote3 - Dolor Sit - 0.00 ${global.commons.getLocalizedName(0, 'systems.polls.votes')}, 0.00%`, owner)
+      await message.isSentRaw(`#vote1 - Lorem - 100.00 ${commons.getLocalizedName(100, 'systems.polls.votes')}, 50.00%`, owner)
+      await message.isSentRaw(`#vote2 - Ipsum - 100.00 ${commons.getLocalizedName(100, 'systems.polls.votes')}, 50.00%`, owner)
+      await message.isSentRaw(`#vote3 - Dolor Sit - 0.00 ${commons.getLocalizedName(0, 'systems.polls.votes')}, 0.00%`, owner)
     })
 
     it(`!vote should return not in progress info`, async () => {

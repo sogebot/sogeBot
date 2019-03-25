@@ -3,6 +3,7 @@ const {
   isMainThread
 } = require('worker_threads');
 if (!isMainThread) process.exit()
+const commons = require('../../../dest/commons');
 
 
 require('../../general.js')
@@ -36,7 +37,7 @@ describe('Top - !top time', () => {
   })
 
   it('run !top time and expect correct output', async () => {
-    global.systems.top.time({ sender: { username: global.commons.getOwner() } })
+    global.systems.top.time({ sender: { username: commons.getOwner() } })
     await message.isSentRaw('Top 10 (watch time): 1. @user9 - 9.0h, 2. @user8 - 8.0h, 3. @user7 - 7.0h, 4. @user6 - 6.0h, 5. @user5 - 5.0h, 6. @user4 - 4.0h, 7. @user3 - 3.0h, 8. @user2 - 2.0h, 9. @user1 - 1.0h', owner)
   })
 })

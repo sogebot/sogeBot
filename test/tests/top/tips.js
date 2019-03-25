@@ -3,6 +3,7 @@ const {
   isMainThread
 } = require('worker_threads');
 if (!isMainThread) process.exit()
+const commons = require('../../../dest/commons');
 
 
 require('../../general.js')
@@ -35,7 +36,7 @@ describe('Top - !top tips', () => {
   })
 
   it('run !top tips and expect correct output', async () => {
-    global.systems.top.tips({ sender: { username: global.commons.getOwner() } })
+    global.systems.top.tips({ sender: { username: commons.getOwner() } })
     await message.isSentRaw('Top 10 (tips): 1. @user9 - 9.00€, 2. @user8 - 8.00€, 3. @user7 - 7.00€, 4. @user6 - 6.00€, 5. @user5 - 5.00€, 6. @user4 - 4.00€, 7. @user3 - 3.00€, 8. @user2 - 2.00€, 9. @user1 - 1.00€', owner)
   })
 })
