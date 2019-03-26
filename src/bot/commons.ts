@@ -11,9 +11,12 @@ export async function autoLoad(directory) {
   const directoryListing = readdirSync(directory);
   const loaded = {};
   for (const file of directoryListing) {
+    if (file.startsWith('_')) {
+      continue;
+    }
     const imported = require(normalize(join(process.cwd(), directory, file)));
     if (typeof imported.default !== 'undefined') {
-      loaded[file.split('.')[0]] = imported.default; // remap default to root object
+      loaded[file.split('.')[0]] = new imported.default(); // remap default to root object
     } else {
       loaded[file.split('.')[0]] = imported;
     }
