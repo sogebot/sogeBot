@@ -24,7 +24,7 @@
               <fa v-else :icon="button.icon" fixed-width></fa>
             </div>
           </a>
-          <button @click="$emit(button.event)" type="button" class="btn btn-shrink btn-with-icon" :class="button.class" :icon="button.icon">
+          <button @click="$emit(button.event)" type="button" class="btn btn-shrink btn-with-icon" :class="button.class" :icon="button.icon" v-else>
             <div class="text">
               <template v-if="typeof button.state !== 'undefined' && typeof state[button.state] !== 'undefined'">
                 {{button.text[state[button.state]]}}
