@@ -80,7 +80,7 @@ const main = async () => {
     base: __dirname,
     routes: [
       { path: '/manage/polls', name: 'PollsManager', component: () => import('./views/managers/polls.vue') },
-      // { path: '/manage/events/list', name: 'EventsManagerList', component: () => import('./views/managers/eventsList.vue') },
+      { path: '/manage/events/list', name: 'EventsManagerList', component: () => import('./views/managers/eventsList.vue') },
       // { path: '/manage/events/edit/:id?', name: 'EventsManagerEdit', component: () => import('./views/managers/eventsEdit.vue') },
       { path: '/settings/permissions/:id?', name: 'PermissionsSettings', component: () => import('./views/settings/permissions.vue') },
       { path: '/registry/goals/list', name: 'GoalsRegistryList', component: () => import('./views/registries/goalsList.vue') },
