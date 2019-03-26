@@ -4,6 +4,7 @@ const {
 } = require('worker_threads');
 if (!isMainThread) process.exit()
 
+const uuidv4 = require('uuid/v4')
 
 require('../../general.js')
 
@@ -20,29 +21,30 @@ describe('Events - follow event', () => {
 
   describe('#1370 - Second follow event didn\'t trigger event ', function () {
     before(async function () {
-      const event = await global.db.engine.insert('events', {
-        key: 'follow',
-        name: 'Follow alert',
-        enabled: true,
-        triggered: {},
-        definitions: {}
-      })
-
+      const id = uuidv4()
       await Promise.all([
+        global.db.engine.insert('events', {
+          id,
+          key: 'follow',
+          name: 'Follow alert',
+          enabled: true,
+          triggered: {},
+          definitions: {}
+        }),
         global.db.engine.insert('events.filters', {
           filters: '',
-          eventId: String(event._id)
+          eventId: id
         }),
         global.db.engine.insert('events.operations', {
           key: 'emote-explosion',
-          eventId: String(event._id),
+          eventId: id,
           definitions: {
             emotesToExplode: 'purpleHeart <3'
           }
         }),
         global.db.engine.insert('events.operations', {
           key: 'run-command',
-          eventId: String(event._id),
+          eventId: id,
           definitions: {
             commandToRun: '!duel',
             isCommandQuiet: true
@@ -50,7 +52,7 @@ describe('Events - follow event', () => {
         }),
         global.db.engine.insert('events.operations', {
           key: 'send-chat-message',
-          eventId: String(event._id),
+          eventId: id,
           definitions: {
             messageToSend: 'Diky za follow, $username!'
           }

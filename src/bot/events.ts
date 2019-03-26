@@ -78,6 +78,9 @@ class Events extends Core {
     if (isMainThread) {
       this.addMenu({ category: 'manage', name: 'event-listeners', id: '/manage/events/list' });
       this.fadeOut();
+      global.db.engine.index('events', [{ index: 'id', unique: true }]);
+      global.db.engine.index('events.operations', [{ index: 'eventId' }]);
+      global.db.engine.index('events.filters', [{ index: 'eventId' }]);
     }
   }
 
@@ -214,7 +217,7 @@ class Events extends Core {
     for (const key of Object.keys(attributes).sort((a, b) => a.length - b.length)) {
       const val = attributes[key];
       if (_.isObject(val) && _.size(val) === 0) { return; } // skip empty object
-      const replace = new RegExp(`\\$${name}`, 'g');
+      const replace = new RegExp(`\\$${key}`, 'g');
       command = command.replace(replace, val);
     }
     command = await new Message(command).parse({ username: getOwner() });
@@ -249,7 +252,7 @@ class Events extends Core {
       let val = attributes[key];
       if (_.isObject(val) && _.size(val) === 0) { continue; } // skip empty object
       if (key.includes('username') || key.includes('recipient')) { val = atUsername ? `@${val}` : val; }
-      const replace = new RegExp(`\\$${name}`, 'g');
+      const replace = new RegExp(`\\$${key}`, 'g');
       message = message.replace(replace, val);
     }
     sendMessage(message, { 'username': username, 'message-type': (whisper ? 'whisper' : 'chat') });
