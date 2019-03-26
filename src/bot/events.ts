@@ -211,8 +211,8 @@ class Events extends Core {
 
   public async fireRunCommand(operation, attributes) {
     let command = operation.commandToRun;
-    attributes = _(attributes).toPairs().sortBy((o) => -o[0].length).fromPairs().value(); // reorder attributes by key length
-    for (const [val, name] of Object.entries(attributes)) {
+    for (const key of Object.keys(attributes).sort((a, b) => a.length - b.length)) {
+      const val = attributes[key];
       if (_.isObject(val) && _.size(val) === 0) { return; } // skip empty object
       const replace = new RegExp(`\\$${name}`, 'g');
       command = command.replace(replace, val);
@@ -245,10 +245,10 @@ class Events extends Core {
     const atUsername = global.tmi.settings.chat.showWithAt;
 
     attributes = flatten(attributes);
-    attributes = _(attributes).toPairs().sortBy((o) => -o[0].length).fromPairs().value(); // reorder attributes by key length
-    for (let [name, val] of Object.entries(attributes)) {
+    for (const key of Object.keys(attributes).sort((a, b) => a.length - b.length)) {
+      let val = attributes[key];
       if (_.isObject(val) && _.size(val) === 0) { continue; } // skip empty object
-      if (name.includes('username') || name.includes('recipient')) { val = atUsername ? `@${val}` : val; }
+      if (key.includes('username') || key.includes('recipient')) { val = atUsername ? `@${val}` : val; }
       const replace = new RegExp(`\\$${name}`, 'g');
       message = message.replace(replace, val);
     }
