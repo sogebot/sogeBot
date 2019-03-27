@@ -135,13 +135,23 @@
     },
     computed: {
       filteredEvents(): Events.Event[] {
+        let events = this.events
         if (this.search.trim() !== '') {
-          return this.events.filter((o) => {
+          events = this.events.filter((o) => {
             return o.name.trim().toLowerCase().includes(this.search.trim().toLowerCase())
           })
-        } else {
-          return this.events;
         }
+        return events.sort((a, b) => {
+          const A = a.name.toLowerCase();
+          const B = b.name.toLowerCase();
+          if (A < B)  { //sort string ascending
+            return -1;
+          }
+          if (A > B) {
+            return 1;
+          }
+          return 0; //default return value (no sorting)
+          })
       },
     },
     mounted() {
