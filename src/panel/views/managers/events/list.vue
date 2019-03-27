@@ -17,7 +17,6 @@
     </div>
 
     <panel ref="panel" class="pt-3 pb-3 mt-3 mb-3 m-0 border-top border-bottom row"
-      v-if="!forceUpdate"
       :options="{
         leftButtons: [
           {
@@ -27,10 +26,6 @@
             icon: 'plus'
           }
         ],
-        filters: [{
-          icon: 'filter',
-          options: events.map((o) => o.key)
-        }],
         hideTableButton: true
       }"
       @filter="toggleFilter"
@@ -59,7 +54,6 @@
             </div>
           </div>
         </div>
-
         <button-with-icon
           v-if="isOperationShown(event.id)"
           :text="translate('manage.events.operations') + ' (' + getOperationsOfEvent(event.id).length + ')'"
@@ -95,12 +89,11 @@
           icon="toggle-off"
           />
 
-        <button-with-icon
-          :text="translate('dialog.buttons.test')"
-          @click="console.log('click')"
-          class="btn-secondary btn-shrink"
-          :icon="['far', 'bell']"
-          />
+        <state-button text="test"
+                      :icon="['far', 'bell']"
+                      cl="btn-secondary btn-shrink"
+                      @click="triggerTest(event.id)"
+                      :state="typeof testingInProgress[event.id] !== 'undefined' ? testingInProgress[event.id] : 0"/>
 
         <button-with-icon
           :text="translate('dialog.buttons.edit')"
@@ -136,7 +129,7 @@
         operations: Events.Operation[],
         search: string,
         showOperationsOfEvent: string[],
-        forceUpdate: boolean,
+        testingInProgress: {[x:string]: number},
       } = {
         socket: io('/core/events', { query: "token=" + this.token }),
         events: [],
@@ -144,14 +137,9 @@
         operations: [],
         search: '',
         showOperationsOfEvent: [],
-        forceUpdate: false,
+        testingInProgress: {},
       }
       return object
-    },
-    watch: {
-      forceUpdate() {
-        this.$nextTick(() => { this.forceUpdate = false });
-      }
     },
     computed: {
       filteredEvents(): Events.Event[] {
@@ -178,7 +166,6 @@
       this.socket.emit('find', { collection: '_events' }, (err, data: Events.Event[]) => {
         if (err) return console.error(err);
         this.events = data;
-        this.forceUpdate = true;
       })
       this.socket.emit('find', { collection: '_events.operations' }, (err, data: Events.Operation[]) => {
         if (err) return console.error(err);
@@ -190,8 +177,16 @@
       })
     },
     methods: {
-      toggleFilter(event) {
-        console.log(event)
+      triggerTest(id) {
+        this.$set(this.testingInProgress, id, 1);
+        setTimeout(() => {
+        this.$set(this.testingInProgress, id, 2);
+          setTimeout(() => {
+            this.$set(this.testingInProgress, id, 0);
+          }, 1000)
+        }, 1000)
+        /*this.socket.emit('test', id, () => {
+        });*/
       },
       sendUpdate(event) {
         this.socket.emit('update', { collection: '_events', items: [event] })

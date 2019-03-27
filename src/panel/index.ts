@@ -47,6 +47,7 @@ Vue.use(VueMoment, {
 Vue.component('panel', () => import('./components/panel.vue'));
 Vue.component('hold-button', () => import('./components/holdButton.vue'));
 Vue.component('button-with-icon', () => import('./components/button.vue'));
+Vue.component('state-button', () => import('./components/stateButton.vue'));
 
 export interface Global {
   translations: any;
