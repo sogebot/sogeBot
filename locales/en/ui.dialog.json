@@ -4,6 +4,7 @@
     "add": "Add"
   },
   "buttons": {
+    "test": "Test",
     "reorder": "Reorder",
     "upload": {
       "idle": "Upload",
@@ -21,6 +22,8 @@
     "mark-to-delete": "Mark to delete",
     "disable": "Disable",
     "enable": "Enable",
+    "disabled": "Disabled",
+    "enabled": "Enabled",
     "edit": "Edit",
     "delete": "Delete",
     "hold-to-delete": "Hold to delete",

@@ -1,4 +1,5 @@
 /* globals translations token */
+import 'moment/min/locales.min';
 import './others/checklist';
 import './widgets/dashboard';
 import './widgets/popout';
@@ -10,18 +11,19 @@ import VueRouter from 'vue-router';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faSpotify, faTwitch, faTwitter } from '@fortawesome/free-brands-svg-icons';
 import {
-    faCalendar, faCheckCircle, faCircle, faClock, faComments, faEyeSlash, faMoneyBillAlt,
+    faBell, faCalendar, faCheckCircle, faCircle, faClock, faComments, faEyeSlash, faMoneyBillAlt,
 } from '@fortawesome/free-regular-svg-icons';
 import {
     faAngleDown, faAngleRight, faAngleUp, faBan, faBoxOpen, faBullhorn, faCaretLeft, faCheck,
     faCircleNotch, faClone, faCode, faCog, faCoins, faCommentAlt, faDollarSign, faDownload, faEdit,
-    faEquals, faEraser, faExclamation, faExclamationCircle, faExternalLinkAlt, faEye, faFont,
-    faForward, faGem, faGift, faGreaterThanEqual, faHandPointer, faHeadphones, faHeart, faInfinity,
-    faLink, faList, faLock, faLockOpen, faLongArrowAltLeft, faLongArrowAltRight, faMinus, faMusic,
-    faPause, faPlay, faPlus, faPlusSquare, faQuestion, faRandom, faSave, faSearch, faShareSquare,
-    faSignInAlt, faSignOutAlt, faSpinner, faStar, faStarHalf, faStop, faSync, faSyncAlt, faTerminal,
-    faTh, faThLarge, faThList, faTimes, faTrash, faTrashAlt, faTrophy, faUser, faUsers, faVial,
-    faVolumeDown, faVolumeUp,
+    faEllipsisH, faEllipsisV, faEquals, faEraser, faExclamation, faExclamationCircle,
+    faExternalLinkAlt, faEye, faFilter, faFont, faForward, faGem, faGift, faGreaterThanEqual,
+    faHandPointer, faHeadphones, faHeart, faInfinity, faLink, faList, faLock, faLockOpen,
+    faLongArrowAltLeft, faLongArrowAltRight, faMinus, faMusic, faPause, faPlay, faPlus,
+    faPlusSquare, faQuestion, faRandom, faSave, faSearch, faShareSquare, faSignInAlt, faSignOutAlt,
+    faSlash, faSpinner, faStar, faStarHalf, faStop, faSync, faSyncAlt, faTerminal, faTh, faThLarge,
+    faThList, faTimes, faToggleOff, faToggleOn, faTrash, faTrashAlt, faTrophy, faUser, faUsers,
+    faVial, faVolumeDown, faVolumeUp,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
@@ -29,7 +31,7 @@ import isAvailableVariable from './helpers/isAvailableVariable';
 import translate from './helpers/translate';
 import urlParam from './helpers/urlParam';
 
-library.add(faShareSquare, faExclamationCircle, faQuestion, faVial, faEquals, faGreaterThanEqual, faLongArrowAltLeft, faBan, faPlusSquare, faMusic, faList, faPlay, faPause, faForward, faSpotify, faMoneyBillAlt, faComments, faPlus, faSpinner, faTimes, faGift, faHeadphones, faTh, faDollarSign, faSignInAlt, faSignOutAlt, faUsers, faMusic, faCalendar, faTwitter, faList, faCheck, faMusic, faMusic, faVolumeUp, faVolumeDown, faUsers, faGift, faTrophy, faCog, faExternalLinkAlt, faTrash, faPlus, faTimes, faSync, faComments, faEyeSlash, faTwitch, faCircle, faCheckCircle, faLock, faUsers, faUser, faCheck, faTimes, faHeart, faStar, faLockOpen, faHandPointer, faRandom, faEyeSlash, faSignOutAlt, faSignInAlt, faBoxOpen, faEye, faCog, faExternalLinkAlt, faHeart, faBullhorn, faRandom, faGem, faStar, faGift, faDollarSign, faStarHalf, faLongArrowAltRight, faCircleNotch, faCalendar, faDollarSign, faCog, faCode, faAngleUp, faTrashAlt, faAngleDown, faFont, faPlus, faMinus, faDownload, faDollarSign, faTerminal, faCog, faCommentAlt, faUsers, faExternalLinkAlt, faSyncAlt, faClock, faCog, faInfinity, faTrophy, faClone, faGem, faCoins, faExclamation, faStop, faBan, faSpinner, faCheck, faAngleRight, faPlus, faEdit, faEraser, faLink, faTrash, faPlus, faCaretLeft, faExternalLinkAlt, faLink, faSave, faThLarge, faThList, faSearch, faCircleNotch, faCheck);
+library.add(faSlash, faFilter, faToggleOn, faToggleOff, faBell, faShareSquare, faExclamationCircle, faQuestion, faVial, faEquals, faGreaterThanEqual, faLongArrowAltLeft, faBan, faPlusSquare, faMusic, faList, faPlay, faPause, faForward, faSpotify, faMoneyBillAlt, faComments, faPlus, faSpinner, faTimes, faGift, faHeadphones, faTh, faDollarSign, faSignInAlt, faSignOutAlt, faUsers, faMusic, faCalendar, faTwitter, faList, faCheck, faMusic, faMusic, faVolumeUp, faVolumeDown, faUsers, faGift, faTrophy, faCog, faExternalLinkAlt, faTrash, faPlus, faTimes, faSync, faComments, faEyeSlash, faTwitch, faCircle, faCheckCircle, faLock, faUsers, faUser, faCheck, faTimes, faHeart, faStar, faLockOpen, faHandPointer, faRandom, faEyeSlash, faSignOutAlt, faSignInAlt, faBoxOpen, faEye, faCog, faExternalLinkAlt, faHeart, faBullhorn, faRandom, faGem, faStar, faGift, faDollarSign, faStarHalf, faLongArrowAltRight, faCircleNotch, faCalendar, faDollarSign, faCog, faCode, faAngleUp, faTrashAlt, faAngleDown, faFont, faPlus, faMinus, faDownload, faDollarSign, faTerminal, faCog, faCommentAlt, faUsers, faExternalLinkAlt, faSyncAlt, faClock, faCog, faInfinity, faTrophy, faClone, faGem, faCoins, faExclamation, faStop, faBan, faSpinner, faCheck, faAngleRight, faPlus, faEdit, faEraser, faLink, faTrash, faPlus, faCaretLeft, faExternalLinkAlt, faLink, faSave, faThLarge, faThList, faSearch, faCircleNotch, faCheck, faEllipsisH, faEllipsisV);
 Vue.component('fa', FontAwesomeIcon);
 
 import moment from 'moment';

@@ -44,7 +44,7 @@
         </div>
       </template>
     </div>
-    <div class="col-auto ml-auto text-right form-inline d-block pull-right">
+    <div class="col-auto ml-auto text-right form-inline">
       <template v-for="button of opts.rightButtons">
         <div class="ml-2 d-inline-block" v-bind:key="button">
           <a class="btn btn-shrink btn-with-icon" style="flex-direction: row;" v-if="button.href && (button.if || typeof button.if === 'undefined')" :target="button.target || '_self'" :href="button.href" :class="typeof button.state !== 'undefined' && state[button.state] === 2 ? 'btn-success' : button.class">
@@ -99,8 +99,23 @@
         </button>
       </div>
       <div class="ml-2 d-inline-block" v-if="!opts.hideSearchInput">
-        <fa icon="search" class="text-muted" style="position: relative; left: 2.2rem;" fixed-width></fa>
-        <input type="search" class="form-control w-auto pl-5" v-model="search" placeholder="Search...">
+        <div class="input-group border w-100"
+            :class="{'focus-border': isFocused }">
+          <div class="input-group-prepend" @click="resetSearch()">
+            <div class="input-group-text bg-white border-0">
+              <fa icon="search" v-if="!isSearching"></fa>
+              <fa icon="times" v-else></fa>
+            </div>
+          </div>
+          <input
+            @focus="isFocused = true"
+            @blur="isFocused = false"
+            v-model="search"
+            v-on:keyup.enter="$emit('search', search); isSearching = search.trim().length > 0"
+            type="text"
+            class="form-control border-0 bg-white"
+            placeholder="Search..."/>
+        </div>
       </div>
     </div>
   </div>
@@ -118,6 +133,8 @@
       return {
         search: '',
         showAs: 'cards',
+        isFocused: false,
+        isSearching: false,
         opts: {
           leftButtons: [],
           rightButtons: [],
@@ -130,9 +147,6 @@
       }
     },
     watch: {
-      search: function (value) {
-        this.$emit('search', value)
-      },
       showAs: function (value) {
         this.$emit('event', { type: 'showAs', value })
       }
@@ -140,6 +154,15 @@
     mounted: function () {
       // set showAs if cards are hidden
       if (this.opts.hideCardsButton) this.showAs = 'table'
+    },
+    methods: {
+      resetSearch() {
+        if (this.isSearching) {
+          this.search = ''
+          this.isSearching = false
+          this.$emit('search', '')
+        }
+      }
     }
   })
 </script>

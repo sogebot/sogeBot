@@ -119,6 +119,10 @@ let migration = {
       const mappings = {};
       const events = await global.db.engine.find('events');
       for (const e of events) {
+        if (typeof e.id !== 'undefined') {
+          console.info(` -> skipping, id found in events`)
+          return
+        }
         const id = uuidv4();
         mappings[String(e._id)] = id;
         await global.db.engine.update('events', { _id: String(e._id) }, { id })
@@ -132,7 +136,7 @@ let migration = {
           await global.db.engine.remove('events.operations', { _id: String(o._id) })
           console.info(` -> operation ${String(o._id)} removed`)
         } else {
-          await global.db.engine.update('events.operations', { _id: String(ops._id) }, { eventId: mappings[String(o.eventId)] })
+          await global.db.engine.update('events.operations', { _id: String(o._id) }, { eventId: mappings[String(o.eventId)] })
           console.info(` -> operation ${String(o.eventId)} => ${mappings[String(o.eventId)]}`)
         }
         processed++;

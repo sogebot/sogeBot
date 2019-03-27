@@ -15,7 +15,7 @@
     </div>
   </a>
   <button v-else type="button" class="btn btn-with-icon" style="flex-direction: row;"
-    @click="$emit(event)" :disabled="disabled">
+    @click="$emit(event || 'click')" :disabled="disabled">
     <div style="display: flex">
       <div class="text">
         {{ text }}

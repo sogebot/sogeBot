@@ -4,6 +4,7 @@
     "add": "Přidat"
   },
   "buttons": {
+    "test": "Otestovat",
     "reorder": "Uspořádat",
     "upload": {
       "idle": "Nahrát",
@@ -21,6 +22,8 @@
     "mark-to-delete": "Označit ke smazání",
     "disable": "Vypnout",
     "enable": "Zapnout",
+    "disabled": "Vypnuto",
+    "enabled": "Zapnuto",
     "edit": "Upravit",
     "delete": "Smazat",
     "hold-to-delete": "Podržte pro smazání",
