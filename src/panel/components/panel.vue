@@ -84,6 +84,22 @@
           </button>
         </div>
       </template>
+
+      <div class="ml-2 d-inline-block" v-for="(filter, index) of opts.filters" :key="index" >
+        <button class="btn btn-shrink btn-with-icon p-0 btn-dark" data-toggle="dropdown"  style="flex-direction: row;">
+          <div class="btn-icon">
+            <font-awesome-layers>
+              <fa :icon="filter.icon" fixed-width></fa>
+            </font-awesome-layers>
+              <fa icon="caret-down"/>
+          </div>
+        </button>
+
+          <div class="dropdown-menu">
+            <a class="dropdown-item" v-for="option of filter.options" :key="option">{{ option}}</a>
+          </div>
+      </div>
+
       <div class="ml-2 d-inline-block" v-if="!opts.hideCardsButton" >
         <button class="btn btn-shrink btn-with-icon p-0" style="flex-direction: row;" v-on:click="showAs='cards'" v-bind:class="[ showAs === 'cards' ? 'btn-dark' : 'btn-outline-dark' ]">
           <div class="btn-icon">
@@ -123,10 +139,12 @@
 
 <script lang="ts">
   import Vue from 'vue'
+  import { FontAwesomeLayers } from '@fortawesome/vue-fontawesome'
 
   export default Vue.extend({
     props: ['commons', 'options', 'state'],
     components: {
+      'font-awesome-layers': FontAwesomeLayers,
       holdButton: () => import('./holdButton.vue'),
     },
     data: function () {
@@ -138,6 +156,7 @@
         opts: {
           leftButtons: [],
           rightButtons: [],
+          filters: [],
 
           hideCardsButton: false,
           hideTableButton: false,
