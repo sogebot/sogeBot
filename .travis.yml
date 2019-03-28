@@ -12,7 +12,6 @@ before_script:
   - npm run test:config:$DB
   - cat config.json
 script:
-  - commitlint-travis
   - npm run tslint
   - npm run test
 
@@ -26,7 +25,7 @@ jobs:
   include:
     - stage: skip
       before_install:
-        - npm install -g @commitlint/travis-cli @commitlint/config-conventional typescript tslint
+        - npm install -g typescript tslint
       install: skip
       os: linux
       before_script: skip
