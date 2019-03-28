@@ -234,3 +234,10 @@ type Poll = {
   openedAt: number;
   closedAt?: number;
 }
+
+declare const enum ButtonStates {
+  idle,
+  progress,
+  success,
+  fail
+}
