@@ -6,23 +6,63 @@
           {{ translate('menu.manage') }}
           <small><i class="fas fa-angle-right"></i></small>
           {{ translate('menu.events') }}
+          <small><i class="fas fa-angle-right"></i></small>
+          <template v-if="$route.params.id">
+            {{event.name}}
+            <small>{{$route.params.id}}</small>
+          </template>
         </span>
       </div>
     </div>
 
-    <panel ref="panel" class="pt-3 pb-3 mt-3 mb-3 m-0 border-top border-bottom row"
+    <panel v-if="!refresh" ref="panel" class="pt-3 pb-3 mt-3 mb-3 m-0 border-top border-bottom row"
+      :state="state"
       :options="{
         leftButtons: [
           {
-            href: '#/registry/events/edit',
-            text: translate('managers.events.addNewEvent'),
-            class: 'btn-primary',
-            icon: 'plus'
+            href: '#/manage/events/list',
+            text: translate('manage.events.back'),
+            class: 'btn-secondary',
+            icon: 'caret-left'
+          },
+          {
+            event: 'delete',
+            hold: true,
+            textWhenHold: translate('dialog.buttons.hold-to-delete'),
+            text: translate('dialog.buttons.delete'),
+            class: 'btn-danger btn-shrink',
+            icon: 'trash',
+            if: $route.params.id || null,
           }
         ],
-        hideTableButton: true
+        rightButtons: [
+          {
+            event: 'save',
+            state: 'save',
+            text: {
+              0: translate('dialog.buttons.saveChanges.idle'),
+              1: translate('dialog.buttons.saveChanges.progress'),
+              2: translate('dialog.buttons.saveChanges.done')
+            },
+            class: 'btn-primary',
+            icon: 'save'
+          }
+        ],
+        hideTableButton: true,
+        hideCardsButton: true,
+        hideSearchInput: true,
       }"
+      @save="save()"
+      @delete="del()"
       @search="search = $event"></panel>
+
+
+
+  {{ event }}
+  <br>
+  {{ filters }}
+  <br>
+  {{ operations }}
   </div>
 </template>
 
@@ -39,113 +79,68 @@
     data: function () {
       const object: {
         socket: any,
-        events: Events.Event[],
+        event: Events.Event,
         filters: Events.Filter[],
         operations: Events.Operation[],
-        search: string,
-        showOperationsOfEvent: string[],
+
+        refresh: boolean,
+        state: {
+          save: number
+        }
       } = {
         socket: io('/core/events', { query: "token=" + this.token }),
-        events: [],
+        event: {
+          id: this.$route.params.id,
+          key: '',
+          name: '',
+          enabled: true,
+          triggered: {},
+          definitions: {}
+        },
         filters: [],
         operations: [],
-        search: '',
-        showOperationsOfEvent: [],
+
+        refresh: false,
+        state: {
+          save: 0
+        }
       }
       return object
     },
-    computed: {
-      filteredEvents(): Events.Event[] {
-        if (this.search.trim() !== '') {
-          return this.events.filter((o) => {
-            return o.name.trim().toLowerCase().includes(this.search.trim().toLowerCase())
-          })
-        } else {
-          return this.events;
+    watch: {
+      refresh: function (val) {
+        if (val) {
+          this.$nextTick(() => (this.refresh = false))
         }
       },
     },
     mounted() {
-      this.socket.emit('find', { collection: '_events' }, (err, data: Events.Event[]) => {
-        if (err) return console.error(err);
-        this.events = data;
-      })
-      this.socket.emit('find', { collection: '_events.operations' }, (err, data: Events.Operation[]) => {
-        if (err) return console.error(err);
-        this.operations = data;
-      })
-      this.socket.emit('find', { collection: '_events.filters' }, (err, data: Events.Filter[]) => {
-        if (err) return console.error(err);
-        this.filters = data;
-      })
+      if (this.$route.params.id) {
+        this.socket.emit('findOne', { collection: '_events', where: { id: this.$route.params.id } }, (err, data: Events.Event) => {
+          if (err) return console.error(err);
+          this.event = data;
+        })
+        this.socket.emit('find', { collection: '_events.operations', where: { eventId: this.$route.params.id } }, (err, data: Events.Operation[]) => {
+          if (err) return console.error(err);
+          this.operations = data;
+        })
+        this.socket.emit('find', { collection: '_events.filters', where: { eventId: this.$route.params.id } }, (err, data: Events.Filter[]) => {
+          if (err) return console.error(err);
+          this.filters = data;
+        })
+      }
     },
     methods: {
-      sendUpdate(event) {
-        this.socket.emit('update', { collection: '_events', items: [event] })
+      del() {
+        console.log('deleting')
       },
-      getOperationsOfEvent(id) {
-        return this.operations.filter((o) => o.eventId === id)
-      },
-      getFiltersOfEvent(id) {
-        return this.filters.filter((o) => o.eventId === id).map((o => {
-          return o.filters
-        })).join(' ');
-      },
-      isOperationShown(id) {
-        return this.showOperationsOfEvent.includes(id)
-      },
-      toggleOperationShow(id) {
-        if (this.showOperationsOfEvent.includes(id)) {
-          this.showOperationsOfEvent = this.showOperationsOfEvent.filter((o) => o !== id);
-        } else {
-          this.showOperationsOfEvent.push(id);
-        }
+      save() {
+        console.log('saving')
       }
     }
   })
 </script>
 
 <style scoped>
-@media only screen and (max-width: 1000px) {
-  .btn-shrink {
-    padding: 0!important;
-  }
-  .btn-shrink .text {
-    display: none !important;
-  }
-  .btn-shrink .btn-icon {
-    background: transparent !important;
-  }
-}
 
-.btn-only-icon .text {
-  display: none !important;
-}
-.btn-only-icon .btn-icon {
-  background: transparent !important;
-}
-
-.btn-with-icon {
-  padding: 0;
-  display: inline-block;
-  width: fit-content;
-}
-
-.btn-reverse > div {
-  flex-direction: row-reverse !important;
-}
-
-.btn-with-icon .text + .btn-icon {
-  background: rgba(0,0,0,0.15);
-}
-
-.btn-with-icon .btn-icon {
-  display: inline-block;
-  padding: 0.375rem 0.4rem;
-  flex-shrink: 10;
-}
-
-.btn-with-icon .text {
-  padding: 0.375rem 0.4rem;
-}
 </style>
