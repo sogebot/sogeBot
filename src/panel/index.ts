@@ -88,18 +88,11 @@ const main = async () => {
     base: __dirname,
     routes: [
       { path: '/manage/polls', name: 'PollsManager', component: () => import('./views/managers/polls.vue') },
+
+      { path: '/manage/events/', redirect: '/manage/events/list' },
       { path: '/manage/events/list', name: 'EventsManagerList', component: () => import('./views/managers/events/list.vue') },
       { path: '/manage/events/edit/:id?', name: 'EventsManagerEdit', component: () => import('./views/managers/events/edit.vue') },
-      /*
-      {
-        path: '/manage/events',
-        children: [
-          { path: '/', redirect: 'list' },
-          { path: 'list', component: () => import('./views/managers/events/list.vue') },
-          { path: 'edit/:id', component: () => import('./views/managers/events/edit.vue') },
-        ],
-      },
-      */
+
       { path: '/settings/permissions/:id?', name: 'PermissionsSettings', component: () => import('./views/settings/permissions.vue') },
       { path: '/registry/goals/list', name: 'GoalsRegistryList', component: () => import('./views/registries/goalsList.vue') },
       { path: '/registry/goals/edit/:id?', name: 'GoalsRegistryEdit', component: () => import('./views/registries/goalsEdit.vue') },
