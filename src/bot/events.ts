@@ -5,7 +5,7 @@ import safeEval from 'safe-eval';
 import { setTimeout } from 'timers'; // tslint workaround
 import { isMainThread } from 'worker_threads';
 import Core from './_interface';
-import { flatten, getOwner, isBot, isBroadcaster, isModerator, isOwner, isSubscriber, isVIP, prepare, sendMessage } from './commons';
+import { flatten, getLocalizedName, getOwner, isBot, isBroadcaster, isModerator, isOwner, isSubscriber, isVIP, prepare, sendMessage } from './commons';
 import Message from './message';
 
 class Events extends Core {
@@ -476,6 +476,89 @@ class Events extends Core {
     delete context._;
     return !!result; // force boolean
   }
+
+  public sockets() {
+    global.panel.io.of('/core/events').on('connection', (socket) => {
+      socket.on('test.event', async (eventId, cb) => {
+        const generateUsername = () => {
+          const adject = ['Encouraging', 'Plucky', 'Glamorous', 'Endearing', 'Fast', 'Agitated', 'Mushy', 'Muddy', 'Sarcastic', 'Real', 'Boring'];
+          const subject = ['Sloth', 'Beef', 'Fail', 'Fish', 'Fast', 'Raccoon', 'Dog', 'Man', 'Pepperonis', 'RuleFive', 'Slug', 'Cat', 'SogeBot'];
+          return _.sample(adject) || adject[0] + _.sample(subject) || subject[0];
+        };
+
+        const username = _.sample(['short', 'someFreakingLongUsername', generateUsername()]) || 'short';
+        const recipient = _.sample(['short', 'someFreakingLongUsername', generateUsername()]) || 'short';
+        const months = _.random(0, 99, false);
+        const attributes = {
+          username,
+          is: {
+            moderator: _.random(0, 1, false) === 0,
+            subscriber: _.random(0, 1, false) === 0,
+            broadcaster: _.random(0, 1, false) === 0,
+            bot: _.random(0, 1, false) === 0,
+            owner: _.random(0, 1, false) === 0,
+          },
+          recipient,
+          recipientis: {
+            moderator: _.random(0, 1, false) === 0,
+            subscriber: _.random(0, 1, false) === 0,
+            broadcaster: _.random(0, 1, false) === 0,
+            bot: _.random(0, 1, false) === 0,
+            owner: _.random(0, 1, false) === 0,
+          },
+          subStreakShareEnabled: _.random(0, 1, false) === 0,
+          subStreak: _.random(10, 99, false),
+          subStreakName: getLocalizedName(_.random(10, 99, false), 'core.months'),
+          subCumulativeMonths: _.random(10, 99, false),
+          subCumulativeMonthsName: getLocalizedName(_.random(10, 99, false), 'core.months'),
+          months,
+          monthsName: getLocalizedName(months, 'core.months'),
+          message: _.sample(['', 'Lorem Ipsum Dolor Sit Amet']),
+          viewers: _.random(0, 9999, false),
+          autohost: _.random(0, 1, false) === 0,
+          bits: _.random(1, 1000000, false),
+          duration: _.sample([30, 60, 90, 120, 150, 180]),
+          reason: _.sample(['', 'Lorem Ipsum Dolor Sit Amet']),
+          command: '!testcommand',
+          count: _.random(0, 9999, false),
+          method: _.random(0, 1, false) === 0 ? 'Twitch Prime' : '',
+          amount: _.random(0, 9999, true).toFixed(2),
+          currency: _.sample(['CZK', 'USD', 'EUR']),
+        };
+        for (const operation of (await global.db.engine.find('events.operations', { eventId }))) {
+          if (!_.isNil(attributes.is)) {
+            // flatten is
+            const is = attributes.is;
+            _.merge(attributes, flatten({ is }));
+          }
+          if (!_.isNil(attributes.recipientis)) {
+            // flatten recipientis
+            const recipientis = attributes.recipientis;
+            _.merge(attributes, flatten({ recipientis }));
+          }
+          const isOperationSupported = !_.isNil(_.find(this.supportedOperationsList, (o) => o.id === operation.key));
+          if (isOperationSupported) {
+            const foundOp = this.supportedOperationsList.find((o) =>  o.id === operation.key);
+            if (foundOp) {
+              foundOp.fire(operation.definitions, attributes);
+            }
+          }
+        }
+
+        cb();
+      });
+
+      socket.on('delete.event', async (eventId, cb) => {
+        await Promise.all([
+          global.db.engine.remove('events', { id: eventId }),
+          global.db.engine.remove('events.filters', { eventId }),
+          global.db.engine.remove('events.operations', { eventId }),
+        ]);
+        cb(null, eventId);
+      });
+    });
+  }
+
 /*
   public sockets() {
     const io = global.panel.io.of('/events');
@@ -576,72 +659,6 @@ class Events extends Core {
           global.db.engine.remove('events.operations', { eventId }),
         ]);
         callback(null, eventId);
-      });
-      socket.on('test.event', async (eventId) => {
-        const generateUsername = () => {
-          const adject = ['Encouraging', 'Plucky', 'Glamorous', 'Endearing', 'Fast', 'Agitated', 'Mushy', 'Muddy', 'Sarcastic', 'Real', 'Boring'];
-          const subject = ['Sloth', 'Beef', 'Fail', 'Fish', 'Fast', 'Raccoon', 'Dog', 'Man', 'Pepperonis', 'RuleFive', 'Slug', 'Cat', 'SogeBot'];
-          return _.sample(adject) || adject[0] + _.sample(subject) || subject[0];
-        };
-
-        const username = _.sample(['short', 'someFreakingLongUsername', generateUsername()]);
-        const recipient = _.sample(['short', 'someFreakingLongUsername', generateUsername()]);
-        const months = _.random(0, 99, false);
-        const attributes = {
-          username,
-          is: {
-            moderator: _.random(0, 1, false) === 0,
-            subscriber: _.random(0, 1, false) === 0,
-            broadcaster: _.random(0, 1, false) === 0,
-            bot: _.random(0, 1, false) === 0,
-            owner: _.random(0, 1, false) === 0,
-          },
-          recipient,
-          recipientis: {
-            moderator: _.random(0, 1, false) === 0,
-            subscriber: _.random(0, 1, false) === 0,
-            broadcaster: _.random(0, 1, false) === 0,
-            bot: _.random(0, 1, false) === 0,
-            owner: _.random(0, 1, false) === 0,
-          },
-          subStreakShareEnabled: _.random(0, 1, false) === 0,
-          subStreak: _.random(10, 99, false),
-          subStreakName: getLocalizedName(_.random(10, 99, false), 'core.months'),
-          subCumulativeMonths: _.random(10, 99, false),
-          subCumulativeMonthsName: getLocalizedName(_.random(10, 99, false), 'core.months'),
-          months,
-          monthsName: getLocalizedName(months, 'core.months'),
-          message: _.sample(['', 'Lorem Ipsum Dolor Sit Amet']),
-          viewers: _.random(0, 9999, false),
-          autohost: _.random(0, 1, false) === 0,
-          bits: _.random(1, 1000000, false),
-          duration: _.sample([30, 60, 90, 120, 150, 180]),
-          reason: _.sample(['', 'Lorem Ipsum Dolor Sit Amet']),
-          command: '!testcommand',
-          count: _.random(0, 9999, false),
-          method: _.random(0, 1, false) === 0 ? 'Twitch Prime' : '',
-          amount: _.random(0, 9999, true).toFixed(2),
-          currency: _.sample(['CZK', 'USD', 'EUR']),
-        };
-        for (const operation of (await global.db.engine.find('events.operations', { eventId }))) {
-          if (!_.isNil(attributes.is)) {
-            // flatten is
-            const is = attributes.is;
-            _.merge(attributes, global.commons.flatten({ is }));
-          }
-          if (!_.isNil(attributes.recipientis)) {
-            // flatten recipientis
-            const recipientis = attributes.recipientis;
-            _.merge(attributes, global.commons.flatten({ recipientis }));
-          }
-          const isOperationSupported = !_.isNil(_.find(this.supportedOperationsList, (o) => o.id === operation.key));
-          if (isOperationSupported) {
-            const foundOp = this.supportedOperationsList.find((o) =>  o.id === operation.key);
-            if (foundOp) {
-              foundOp.fire(operation.definitions, attributes);
-            }
-          }
-        }
       });
     });
   }

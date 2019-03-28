@@ -54,23 +54,58 @@
             </div>
           </div>
         </div>
+
+        <template v-if="Object.keys(event.definitions).length > 0">
+          <button-with-icon
+            v-if="isSettingsShown(event.id)"
+            :text="translate('manage.events.settings')"
+            @click="toggleSettingsShow(event.id)"
+            class="btn-dark btn-shrink btn-reverse"
+            icon="cog"/>
+          <button-with-icon
+            v-else
+            :text="translate('manage.events.settings')"
+            @click="toggleSettingsShow(event.id)"
+            class="btn-light btn-shrink btn-reverse"
+            icon="cog"/>
+        </template>
+
         <button-with-icon
           v-if="isOperationShown(event.id)"
           :text="translate('manage.events.operations') + ' (' + getOperationsOfEvent(event.id).length + ')'"
           @click="toggleOperationShow(event.id)"
           class="btn-dark btn-shrink btn-reverse"
-          icon="eye"
+          icon="tasks"
           />
         <button-with-icon
           v-else
           :text="translate('manage.events.operations') + ' (' + getOperationsOfEvent(event.id).length + ')'"
           @click="toggleOperationShow(event.id)"
           class="btn-light btn-shrink btn-reverse"
-          icon="eye"
+          icon="tasks"
           />
 
+        <div v-if="isSettingsShown(event.id)" class="pt-2">
+          <h6 class="text-muted">{{translate('manage.events.settings')}}</h6>
+          <dl class="row" style="font-size:0.8rem;">
+            <template v-for="key of Object.keys(event.definitions)">
+              <dt class="col-sm-6" :key="key">{{translate('events.definitions.' + key + '.label')}}</dt>
+              <dd class="col-sm-6" :key="key">{{event.definitions[key]}}</dd>
+            </template>
+          </dl>
+        </div>
+
         <div v-if="isOperationShown(event.id)">
-          {{ getOperationsOfEvent(event.id) }}
+          <h6 class="text-muted">{{translate('manage.events.operations')}}</h6>
+          <template v-for="operation of getOperationsOfEvent(event.id)">
+            <strong :key="operation.key" class="text-uppercase">{{translate(operation.key)}}</strong>
+            <dl class="row" :key="operation.key" style="font-size:0.8rem;">
+            <template v-for="key of Object.keys(operation.definitions)">
+              <dt class="col-sm-6" :key="key">{{translate('events.definitions.' + key + '.label')}}</dt>
+              <dd class="col-sm-6" :key="key">{{operation.definitions[key]}}</dd>
+            </template>
+            </dl>
+          </template>
         </div>
       </div>
       <div class="card-footer text-right">
@@ -102,7 +137,7 @@
           icon="edit"
           />
 
-        <hold-button class="btn-danger btn-shrink" @trigger="console.log('trigger')" icon="trash">
+        <hold-button class="btn-danger btn-shrink" @trigger="deleteEvent(event.id)" icon="trash">
           <template slot="title">{{translate('dialog.buttons.delete')}}</template>
           <template slot="onHoldTitle">{{translate('dialog.buttons.hold-to-delete')}}</template>
         </hold-button>
@@ -129,7 +164,9 @@
         operations: Events.Operation[],
         search: string,
         showOperationsOfEvent: string[],
+        showSettingsOfEvent: string[],
         testingInProgress: {[x:string]: number},
+        deletionInProgress: {[x:string]: number},
       } = {
         socket: io('/core/events', { query: "token=" + this.token }),
         events: [],
@@ -137,7 +174,9 @@
         operations: [],
         search: '',
         showOperationsOfEvent: [],
+        showSettingsOfEvent: [],
         testingInProgress: {},
+        deletionInProgress: {}
       }
       return object
     },
@@ -177,16 +216,22 @@
       })
     },
     methods: {
+      deleteEvent(id) {
+        this.socket.emit('delete.event', id, (err, eventId) => {
+          if (err) {
+            return console.error(err);
+          }
+          this.events = this.events.filter((o) => o.id !== eventId)
+        })
+      },
       triggerTest(id) {
         this.$set(this.testingInProgress, id, 1);
-        setTimeout(() => {
-        this.$set(this.testingInProgress, id, 2);
+        this.socket.emit('test.event', id, () => {
+          this.$set(this.testingInProgress, id, 2);
           setTimeout(() => {
             this.$set(this.testingInProgress, id, 0);
           }, 1000)
-        }, 1000)
-        /*this.socket.emit('test', id, () => {
-        });*/
+        });
       },
       sendUpdate(event) {
         this.socket.emit('update', { collection: '_events', items: [event] })
@@ -199,8 +244,18 @@
           return o.filters
         })).join(' ');
       },
+      isSettingsShown(id) {
+        return this.showSettingsOfEvent.includes(id)
+      },
       isOperationShown(id) {
         return this.showOperationsOfEvent.includes(id)
+      },
+      toggleSettingsShow(id) {
+        if (this.showSettingsOfEvent.includes(id)) {
+          this.showSettingsOfEvent = this.showSettingsOfEvent.filter((o) => o !== id);
+        } else {
+          this.showSettingsOfEvent.push(id);
+        }
       },
       toggleOperationShow(id) {
         if (this.showOperationsOfEvent.includes(id)) {
