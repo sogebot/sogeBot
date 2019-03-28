@@ -53,10 +53,6 @@ function buildZipFile() {
   console.log(chalk.yellow('6.') + ' Cleanup directory');
   spawnSync('rm', ['-rf', 'sogeBot-' + argv.branch]);
   spawnSync('rm', ['-rf', argv.branch + '.zip']);
-
-  console.log(chalk.yellow('7.') + ' Refreshing Husky hook');
-  spawnSync('rm', ['-rf', '.git/hooks/']);
-  spawnSync('npm', ['i', '-D husky']);
 }
 
 function buildDocs() {
