@@ -600,7 +600,7 @@ class TMI extends Core {
         && sender['message-type'] === 'whisper'
         && (global.tmi.settings.chat.whisperListener || isOwner(sender))) {
       global.log.whisperIn(message, { username: sender.username })
-    } else if (!skip && !(commons.isBot(sender.username))) {
+    } else if (!skip && !commons.isBot(sender.username)) {
       global.log.chatIn(message, { username: sender.username })
     }
 
