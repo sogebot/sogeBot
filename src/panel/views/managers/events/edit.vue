@@ -69,7 +69,7 @@
           <div class="card mb-3 p-0"
                :class="{
                   'col-md-6': (supported.events.find((o) => o.id === event.key) || { variables: []}).variables.length > 0,
-                  'col-md-12': !(supported.events.find((o) => o.id === event.key) || { variables: []}).variables.length > 0
+                  'col-md-12': !((supported.events.find((o) => o.id === event.key) || { variables: []}).variables.length > 0)
                }"
           >
             <div class="card-header">{{translate('events.dialog.settings')}}</div>
