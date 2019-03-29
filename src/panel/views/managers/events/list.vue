@@ -8,7 +8,7 @@
           {{ translate('menu.event-listeners') }}
           <template v-if="search.length > 0">
             <small>
-              <fa icon="search">
+              <fa icon="search"/>
             </small>
             {{ search }}
           </template>
@@ -166,6 +166,7 @@
         </div>
       </transition-group>
     </div>
+  </div>
 </template>
 
 <script lang="ts">
