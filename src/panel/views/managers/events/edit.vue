@@ -66,7 +66,12 @@
         </div>
 
         <div class="row no-gutters pl-3 pr-3">
-          <div class="card col-md-6 mb-3 p-0">
+          <div class="card mb-3 p-0"
+               :class="{
+                  'col-md-6': (supported.events.find((o) => o.id === event.key) || { variables: []}).variables.length > 0,
+                  'col-md-12': !(supported.events.find((o) => o.id === event.key) || { variables: []}).variables.length > 0
+               }"
+          >
             <div class="card-header">{{translate('events.dialog.settings')}}</div>
             <div class="card-body">
               <div class="form-group col-md-12">
@@ -85,10 +90,10 @@
               </div>
             </div>
           </div>
-          <div class="card col-md-6 mb-3 p-0">
+          <div class="card col-md-6 mb-3 p-0" v-if="(supported.events.find((o) => o.id === event.key) || { variables: []}).variables.length > 0">
             <div class="card-header">{{translate('events.dialog.usable-events-variables')}}</div>
             <div class="card-body">
-              <div class="form-group col-md-12 m-0" v-if="(supported.events.find((o) => o.id === event.key) || { variables: []}).variables.length > 0">
+              <div class="form-group col-md-12 m-0">
                 <dl class="row m-0" style="font-size:0.7rem;">
                   <template v-for="variables of (supported.events.find((o) => o.id === event.key) || { variables: []}).variables">
                     <dt class="col-4" :key="variables">${{variables}}</dt>
