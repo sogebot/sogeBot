@@ -195,6 +195,23 @@
 
       this.socket.emit('list.supported.events', (err, data: Events.SupportedEvent[]) => {
         if (err) return console.error(err);
+
+        for (const d of data) {
+          // sort variables
+          if (d.variables) {
+            d.variables = d.variables.sort((A, B) => {
+              if (A < B)  { //sort string ascending
+                return -1;
+              }
+              if (A > B) {
+                return 1;
+              }
+              return 0; //default return value (no sorting)
+            });
+          } else {
+            d.variables = []
+          }
+        }
         this.$set(
           this.supported,
           'events',
