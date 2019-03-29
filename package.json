@@ -67,7 +67,7 @@
     "ytpl": "0.1.14"
   },
   "scripts": {
-    "build": "make tslint bot ui",
+    "build": "cross-env ENV=development make info tslint bot ui",
     "tslint": "tslint -p tslint.json",
     "test": "mocha --recursive --timeout 20000 --exit --require source-map-support/register 2>&1 | tee report && node tools/rerunTests.js",
     "test:config:mongodb": "cp config.example.json config.json && sed -i -- 's/nedb/mongodb/g' config.json",
