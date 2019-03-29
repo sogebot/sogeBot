@@ -5,7 +5,7 @@
         <span class="title text-default mb-2">
           {{ translate('menu.manage') }}
           <small><i class="fas fa-angle-right"></i></small>
-          {{ translate('menu.events') }}
+          {{ translate('menu.event-listeners') }}
           <small><i class="fas fa-angle-right"></i></small>
           <template v-if="$route.params.id">
             {{event.name}}
@@ -58,11 +58,49 @@
 
 
 
-  {{ event }}
-  <br>
-  {{ filters }}
-  <br>
-  {{ operations }}
+    <div class="pt-3">
+      <form>
+        <div class="form-group col-md-12">
+          <label for="name_input">{{ translate('events.dialog.name') }}</label>
+          <input v-model="event.name" type="text" class="form-control" id="name_input">
+        </div>
+
+        <div class="row no-gutters pl-3 pr-3">
+          <div class="card col-md-6 mb-3 p-0">
+            <div class="card-header">{{translate('events.dialog.settings')}}</div>
+            <div class="card-body">
+              <div class="form-group col-md-12">
+                <label for="type_selector">{{ translate('events.dialog.event') }}</label>
+                <select class="form-control text-capitalize" v-model="event.key">
+                  <option v-for="key of supported.events.map((o) => o.id)" :value="key" :key="key">{{translate(key)}}</option>
+                </select>
+              </div>
+              <div class="form-group col-md-12" v-for="defKey of Object.keys(event.definitions)" :key="defKey">
+                <label for="type_selector">{{ translate("events.definitions." + defKey + ".label") }}</label>
+                <input v-model="event.definitions[defKey]" type="text" class="form-control" :id="defKey + '_input'" :placeholder="translate('events.definitions.' + defKey + '.placeholder')">
+              </div>
+              <div class="form-group col-md-12">
+                <label for="type_selector">{{ translate("events.dialog.filters") }}</label>
+                <textarea v-model="event.filters" class="form-control"/>
+              </div>
+            </div>
+          </div>
+          <div class="card col-md-6 mb-3 p-0">
+            <div class="card-header">{{translate('events.dialog.usable-events-variables')}}</div>
+            <div class="card-body">
+              <div class="form-group col-md-12 m-0" v-if="(supported.events.find((o) => o.id === event.key) || { variables: []}).variables.length > 0">
+                <dl class="row m-0" style="font-size:0.7rem;">
+                  <template v-for="variables of (supported.events.find((o) => o.id === event.key) || { variables: []}).variables">
+                    <dt class="col-4" :key="variables">${{variables}}</dt>
+                    <dd class="col-8" :key="variables">{{translate('responses.variable.' + variables) }}</dd>
+                  </template>
+                </dl>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
   </div>
 </template>
 
@@ -83,6 +121,11 @@
         filters: Events.Filter[],
         operations: Events.Operation[],
 
+        supported: {
+          operations: Events.Operation[],
+          events: Events.Event[]
+        },
+
         refresh: boolean,
         state: {
           save: number
@@ -100,6 +143,11 @@
         filters: [],
         operations: [],
 
+        supported: {
+          operations: [],
+          events: [],
+        },
+
         refresh: false,
         state: {
           save: 0
@@ -108,6 +156,16 @@
       return object
     },
     watch: {
+      'event.key': function (val) {
+        this.$set(this.event, 'definitions', {}) // reload definitions
+
+        const defaultEvent = this.supported.events.find((o) => o.id === val)
+        if (defaultEvent) {
+          if (defaultEvent.definitions) {
+            this.$set(this.event, 'definitions', defaultEvent.definitions)
+          }
+        }
+      },
       refresh: function (val) {
         if (val) {
           this.$nextTick(() => (this.refresh = false))
@@ -129,6 +187,30 @@
           this.filters = data;
         })
       }
+
+      this.socket.emit('list.supported.operations', (err, data: Events.Operation[]) => {
+        if (err) return console.error(err);
+        this.$set(this.supported, 'operations', data);
+      })
+
+      this.socket.emit('list.supported.events', (err, data: Events.SupportedEvent[]) => {
+        if (err) return console.error(err);
+        this.$set(
+          this.supported,
+          'events',
+          data.sort((a, b) => {
+            const A = this.translate(a.id).toLowerCase();
+            const B = this.translate(b.id).toLowerCase();
+            if (A < B)  { //sort string ascending
+              return -1;
+            }
+            if (A > B) {
+              return 1;
+            }
+            return 0; //default return value (no sorting)
+          })
+        );
+      })
     },
     methods: {
       del() {

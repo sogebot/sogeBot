@@ -5,7 +5,7 @@
         <span class="title text-default mb-2">
           {{ translate('menu.manage') }}
           <small><i class="fas fa-angle-right"></i></small>
-          {{ translate('menu.events') }}
+          {{ translate('menu.event-listeners') }}
           <template v-if="search.length > 0">
             <small>
               <fa icon="search">

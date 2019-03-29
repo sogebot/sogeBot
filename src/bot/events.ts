@@ -479,6 +479,13 @@ class Events extends Core {
 
   public sockets() {
     global.panel.io.of('/core/events').on('connection', (socket) => {
+      socket.on('list.supported.events', (callback) => {
+        callback(null, this.supportedEventsList);
+      });
+      socket.on('list.supported.operations', (callback) => {
+        callback(null, this.supportedOperationsList);
+      });
+
       socket.on('test.event', async (eventId, cb) => {
         const generateUsername = () => {
           const adject = ['Encouraging', 'Plucky', 'Glamorous', 'Endearing', 'Fast', 'Agitated', 'Mushy', 'Muddy', 'Sarcastic', 'Real', 'Boring'];
