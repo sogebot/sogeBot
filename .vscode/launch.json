@@ -17,7 +17,8 @@
             "console": "internalConsole",
             "env": {
                 "NODE_ENV": "development",
-                "DISABLE":"moderation"
+                "DISABLE":"moderation",
+                "DEBUG": "tmi",
             },
             "preLaunchTask": "npm: build",
             "outputCapture": "std",
@@ -41,6 +42,7 @@
             "console": "internalConsole",
             "env": {
                 "NODE_ENV": "development",
+                "DEBUG": "tmi",
             },
             "preLaunchTask": "npm: build",
             "outputCapture": "std",
