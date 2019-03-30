@@ -1,5 +1,5 @@
-import * as _ from 'lodash';
-import * as moment from 'moment-timezone';
+import _ from 'lodash';
+import moment from 'moment-timezone';
 
 import { getChannel, getIgnoreList, isIgnored, sendMessage } from '../commons';
 import { permission } from '../permissions';

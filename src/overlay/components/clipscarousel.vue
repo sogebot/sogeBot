@@ -25,7 +25,7 @@ nextOffset: {{ nextOffset }}
 
 <script>
 import { TweenMax } from 'gsap/TweenMax'
-import * as io from 'socket.io-client';
+import io from 'socket.io-client';
 
 export default {
   props: ['token'],

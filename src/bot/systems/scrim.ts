@@ -2,7 +2,7 @@ import { DateTime } from 'luxon';
 import { isMainThread } from 'worker_threads';
 
 import { getLocalizedName, getOwner, prepare, round5, sendMessage } from '../commons';
-import * as constants from '../constants';
+import constants from '../constants';
 import { debug } from '../debug';
 import Expects from '../expects.js';
 import { permission } from '../permissions';

@@ -48,10 +48,10 @@ inactivityTime: {{currentTime - lastUpdatedAt}}
 
 <script>
 import Vue from 'vue'
-  import * as moment from 'moment'
+  import moment from 'moment'
   import VueMoment from 'vue-moment'
-  import * as momentTimezone from 'moment-timezone'
-import * as io from 'socket.io-client';
+  import momentTimezone from 'moment-timezone'
+import io from 'socket.io-client';
 
 require('moment/locale/cs')
 require('moment/locale/ru')

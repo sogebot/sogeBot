@@ -1,6 +1,6 @@
 /* globals translations */
 
-import * as _ from 'lodash';
+import _ from 'lodash';
 
 export interface Global {
   translations: any;

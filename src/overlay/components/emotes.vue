@@ -24,7 +24,7 @@
 <script>
 import { TweenLite } from 'gsap/TweenMax'
 import _ from 'lodash'
-import * as io from 'socket.io-client';
+import io from 'socket.io-client';
 
 export default {
   props: ['token'],

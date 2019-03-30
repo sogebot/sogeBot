@@ -1,6 +1,6 @@
-import * as config from '@config';
+import config from '@config';
 import { readdir } from 'fs';
-import * as gitCommitInfo from 'git-commit-info';
+import gitCommitInfo from 'git-commit-info';
 import { get, isNil, map } from 'lodash';
 import Core from './_interface';
 import { permission } from './permissions';

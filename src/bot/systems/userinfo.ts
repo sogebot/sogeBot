@@ -1,4 +1,4 @@
-import * as _ from 'lodash';
+import _ from 'lodash';
 import { DateTime } from 'luxon';
 
 import { getLocalizedName, prepare, sendMessage } from '../commons';

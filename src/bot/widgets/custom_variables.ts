@@ -1,6 +1,6 @@
 'use strict';
 
-import * as _ from 'lodash';
+import _ from 'lodash';
 import Widget from './_interface';
 
 class CustomVariables extends Widget {

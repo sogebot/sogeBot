@@ -353,8 +353,8 @@ import 'codemirror/lib/codemirror.css'
 import { Datetime } from 'vue-datetime';
 import 'vue-datetime/dist/vue-datetime.css'
 
-import * as io from 'socket.io-client';
-import * as uuid from 'uuid/v4';
+import io from 'socket.io-client';
+import uuid from 'uuid/v4';
 import axios from 'axios';
 
 export default Vue.extend({

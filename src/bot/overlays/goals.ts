@@ -2,7 +2,7 @@
 
 import Overlay from '../overlays/_interface';
 
-import * as _ from 'lodash';
+import _ from 'lodash';
 const {
   isMainThread,
   // tslint:disable-next-line:no-var-requires

@@ -96,7 +96,7 @@
 <script lang="ts">
   import Vue from 'vue'
 
-  import * as io from 'socket.io-client';
+  import io from 'socket.io-client';
 
   export default Vue.extend({
     components: {

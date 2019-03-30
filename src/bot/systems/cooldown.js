@@ -10,7 +10,7 @@ const commons = require('../commons');
 // bot libraries
 import { permission } from '../permissions';
 import System from './_interface'
-import * as constants from '../constants'
+import constants from '../constants'
 const Expects = require('../expects.js')
 const Parser = require('../parser')
 

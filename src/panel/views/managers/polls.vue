@@ -155,14 +155,14 @@
 <script lang="ts">
   import Vue from 'vue'
 
-  import * as moment from 'moment'
+  import moment from 'moment'
   import VueMoment from 'vue-moment'
-  import * as momentTimezone from 'moment-timezone'
+  import momentTimezone from 'moment-timezone'
 
   require('moment/locale/cs')
   require('moment/locale/ru')
 
-  import * as io from 'socket.io-client';
+  import io from 'socket.io-client';
 
   Vue.use(VueMoment, {
       moment, momentTimezone
