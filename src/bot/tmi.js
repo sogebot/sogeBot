@@ -16,7 +16,7 @@ import Core from './_interface'
 const constants = require('./constants')
 
 const __DEBUG__ =
-  (process.env.DEBUG && process.env.DEBUG.includes('tmi'));
+  (process.env.DEBUG && process.env.DEBUG.includes('tmi.client'));
 
 class TMI extends Core {
   channel: string = ''
