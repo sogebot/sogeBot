@@ -2,10 +2,6 @@ import { readdirSync } from 'fs';
 import _ from 'lodash';
 import moment from 'moment';
 import 'moment-precise-range-plugin';
-/* tslint:disable */
-//const moment = require('moment');
-//require('moment-precise-range-plugin');
-/* tslint:enable */
 import { join, normalize } from 'path';
 import { isMainThread } from 'worker_threads';
 
