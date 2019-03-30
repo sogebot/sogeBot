@@ -30,7 +30,6 @@ jobs:
       os: linux
       before_script: skip
       script:
-        - commitlint-travis
         - npm run tslint
         - echo 'Found skip tag. Skipping tests.'
     - stage: test
