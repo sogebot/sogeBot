@@ -50,7 +50,7 @@ class IMongoDB extends Interface {
       return
     } catch (e) {
       // indexes will be created when collection is available
-      setTimeout(() => this.index(opts), 5000)
+      setTimeout(() => this.index(table, opts), 5000)
     }
   }
 
