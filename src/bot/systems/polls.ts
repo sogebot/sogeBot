@@ -1,4 +1,4 @@
-import * as _ from 'lodash';
+import _ from 'lodash';
 import { isMainThread } from 'worker_threads';
 
 import { getLocalizedName, getOwner, prepare, sendMessage } from '../commons.js';

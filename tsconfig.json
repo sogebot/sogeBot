@@ -5,7 +5,7 @@
     // this enables stricter inference for data properties on `this`
     "strict": true,
     // if using webpack 2+ or rollup, to leverage tree shaking:
-    "module": "esnext",
+    "module": "commonjs",
     "incremental": true,
     "removeComments": true,
     "noImplicitAny": false,
@@ -13,6 +13,7 @@
     "moduleResolution": "node",
     "lib": ["es2018", "dom"],
     "declaration": false,
+    "esModuleInterop": true,
     "resolveJsonModule": true,
     "baseUrl": "./",
     "paths": {

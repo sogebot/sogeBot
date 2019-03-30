@@ -1,6 +1,7 @@
 import { readdirSync } from 'fs';
-import * as _ from 'lodash';
-import * as moment from 'moment';
+import _ from 'lodash';
+import moment from 'moment';
+import 'moment-precise-range-plugin';
 import { join, normalize } from 'path';
 import { isMainThread } from 'worker_threads';
 
@@ -109,7 +110,7 @@ export function getTime(time, isChat) {
   let seconds: string | number = 0;
   const now = _.isNull(time) || !time
     ? { days: 0, hours: 0, minutes: 0, seconds: 0 }
-    : moment.preciseDiff(moment(), moment(time), true);
+    : moment.preciseDiff(moment.utc(), moment.utc(time), true);
   if (isChat) {
     days = now.days > 0 ? now.days : '';
     hours = now.hours > 0 ? now.hours : '';

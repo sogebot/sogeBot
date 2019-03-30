@@ -5,7 +5,7 @@ const _ = require('lodash')
 // bot libraries
 const Parser = require('../parser')
 import System from './_interface'
-import * as constants from '../constants'
+import constants from '../constants'
 import { permission } from '../permissions';
 const commons = require('../commons');
 

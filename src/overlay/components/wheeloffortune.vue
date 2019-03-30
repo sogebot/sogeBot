@@ -11,7 +11,7 @@
 
 <script>
 import Winwheel from 'winwheel'
-import * as io from 'socket.io-client';
+import io from 'socket.io-client';
 
 import { TweenLite } from 'gsap/TweenMax'
 

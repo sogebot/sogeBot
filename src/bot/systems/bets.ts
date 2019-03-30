@@ -1,11 +1,11 @@
-import * as _ from 'lodash';
+import _ from 'lodash';
 import { isMainThread } from 'worker_threads';
 
 import { getOwner, prepare, sendMessage } from '../commons';
 import Expects from '../expects';
 import { permission } from '../permissions';
 import System from './_interface';
-import * as Points from './points';
+import Points from './points';
 
 const ERROR_NOT_ENOUGH_OPTIONS = 'Expected more parameters';
 const ERROR_ALREADY_OPENED = '1';

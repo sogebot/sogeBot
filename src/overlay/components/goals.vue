@@ -133,8 +133,8 @@
 </template>
 
 <script lang="ts">
-import * as io from 'socket.io-client';
-import * as safeEval from 'safe-eval'
+import io from 'socket.io-client';
+import safeEval from 'safe-eval'
 
 import Vue from 'vue';
 
@@ -143,9 +143,9 @@ import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 Vue.use(BootstrapVue);
 
-import * as moment from 'moment'
+import moment from 'moment'
 import VueMoment from 'vue-moment'
-import * as momentTimezone from 'moment-timezone'
+import momentTimezone from 'moment-timezone'
 require('moment/locale/cs')
 require('moment/locale/ru')
 Vue.use(VueMoment, {

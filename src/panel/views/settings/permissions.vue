@@ -44,8 +44,8 @@
 <script lang="ts">
   import Vue from 'vue'
 
-  import * as io from 'socket.io-client';
-  import * as uuid from 'uuid/v4';
+  import io from 'socket.io-client';
+  import uuid from 'uuid/v4';
 
   import { library } from '@fortawesome/fontawesome-svg-core'
   import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'

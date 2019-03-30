@@ -1,5 +1,5 @@
 /* globals translations token */
-import * as _ from 'lodash';
+import _ from 'lodash';
 import Vue from 'vue';
 import Overlays from './index.vue';
 

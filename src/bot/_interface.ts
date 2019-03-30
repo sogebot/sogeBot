@@ -1,7 +1,7 @@
 import chalk from 'chalk';
-import * as _ from 'lodash';
+import _ from 'lodash';
 import { setTimeout } from 'timers'; // tslint workaround
-import * as util from 'util';
+import util from 'util';
 import { isMainThread } from 'worker_threads';
 
 import { debug } from './debug';
