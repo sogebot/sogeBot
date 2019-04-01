@@ -9,10 +9,8 @@ const {
 } = require('worker_threads');
 const axios = require('axios')
 import Core from './_interface'
-
-const __DEBUG__ = {
-  WATCHED: (process.env.DEBUG && process.env.DEBUG.includes('users.watched')),
-}
+import { debug, isEnabled as isDebugEnabled } from './debug';
+const commons = require('./commons');
 
 class Users extends Core {
   uiSortCache: String | null = null
@@ -122,12 +120,11 @@ class Users extends Core {
       await global.db.engine.remove('users.online', {})
     }
 
-    if (__DEBUG__.WATCHED) {
+    if (isDebugEnabled('users.watched')) {
       const message = 'Watched time update ' + new Date()
-      global.log.debug(Array(message.length + 1).join('='))
-      global.log.debug(message)
-      global.log.debug(Array(message.length + 1).join('='))
-
+      debug('users.watched', Array(message.length + 1).join('='))
+      debug('users.watched', message)
+      debug('users.watched', Array(message.length + 1).join('='))
     }
 
     clearTimeout(this.timeouts['updateWatchTime'])
@@ -141,9 +138,9 @@ class Users extends Core {
         }
         let updated = []
         for (let username of users) {
-          const isIgnored = isIgnored(username)
-          const isBot = isBot(username)
-          const isOwner = isOwner(username)
+          const isIgnored = commons.isIgnored(username)
+          const isBot = commons.isBot(username)
+          const isOwner = commons.isOwner(username)
           const isNewUser = typeof this.watchedList[username] === 'undefined'
 
           if (isIgnored || isBot) continue
@@ -151,19 +148,14 @@ class Users extends Core {
           const watched = isNewUser ? 0 : Date.now() - this.watchedList[username]
           const id = await global.users.getIdByName(username)
           if (!id) {
-            if (__DEBUG__.WATCHED) {
-              global.log.debug('error: cannot get id of ' + username)
-            }
+            debug('users.watched', 'error: cannot get id of ' + username)
             continue
           }
 
           if (isNewUser) this.checkNewChatter(id, username)
           if (!isOwner) global.api._stream.watchedTime += watched
           await global.db.engine.increment('users.watched', { id }, { watched })
-
-          if (__DEBUG__.WATCHED) {
-            global.log.debug(username + ': ' + (watched / 1000 / 60) + ' minutes added')
-          }
+          debug('users.watched', username + ': ' + (watched / 1000 / 60) + ' minutes added')
           updated.push(username)
           this.watchedList[username] = Date.now()
         }
@@ -171,9 +163,7 @@ class Users extends Core {
         // remove offline users from watched list
         for (let u of Object.entries(this.watchedList)) {
           if (!updated.includes(u[0])) {
-            if (__DEBUG__.WATCHED) {
-              global.log.debug(u[0] + ': removed from online list')
-            }
+            debug('users.watched', u[0] + ': removed from online list')
             delete this.watchedList[u[0]]
           }
         }
@@ -181,9 +171,7 @@ class Users extends Core {
         throw Error('Stream offline, watch time is not counting, retrying')
       }
     } catch (e) {
-      if (__DEBUG__.WATCHED) {
-        global.log.debug(e.message)
-      }
+      debug('users.watched', e.message)
       this.watchedList = {}
       global.users.newChattersList = []
       timeout = 1000
