@@ -413,7 +413,7 @@ window.textAreaWithTags = {
   template: `
     <div style="flex: 1 1 auto;"
       class="form-control border-0 p-0 m-0"
-      style="height: fit-content"
+      style="height: fit-content; height: -moz-fit-content;"
       v-bind:class="{ 'is-invalid': error }">
 
       <textarea style="min-height: 5em;" v-show="editation" v-on:keydown.enter="onEnter" v-on:blur="editation = false" ref="textarea" v-model="currentValue" v-bind:placeholder="placeholder" class="form-control" v-bind:style="heightStyle"></textarea>
