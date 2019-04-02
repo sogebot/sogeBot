@@ -233,14 +233,14 @@
         })
       }
 
-      this.socket.emit('list.supported.operations', (err, data: Events.Operation[]) => {
+      this.socket.emit('list.supported.operations', (err, data: Events.SupportedOperation[]) => {
         if (err) return console.error(err);
         this.$set(
           this.supported,
           'operations',
           data.sort((a, b) => {
-            const A = this.translate(a.key).toLowerCase();
-            const B = this.translate(b.key).toLowerCase();
+            const A = this.translate(a.id).toLowerCase();
+            const B = this.translate(b.id).toLowerCase();
             if (A < B)  { //sort string ascending
               return -1;
             }

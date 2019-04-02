@@ -8,6 +8,12 @@ declare namespace Events {
     definitions: Events.OperationDefinitions,
   }
 
+  export type SupportedOperation = {
+    id: string,
+    definitions: Events.OperationDefinitions,
+    fire: () => void,
+  }
+
   export type SupportedEvent = {
     id: string,
     definitions: Events.OperationDefinitions,
