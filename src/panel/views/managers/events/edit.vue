@@ -113,7 +113,7 @@
   import Vue from 'vue'
   import { FontAwesomeLayers } from '@fortawesome/vue-fontawesome'
 
-  import * as io from 'socket.io-client';
+  import io from 'socket.io-client';
 
   export default Vue.extend({
     components: {

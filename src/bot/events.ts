@@ -1,6 +1,6 @@
 import axios from 'axios';
-import * as _ from 'lodash';
-import * as moment from 'moment';
+import _ from 'lodash';
+import moment from 'moment';
 import safeEval from 'safe-eval';
 import { setTimeout } from 'timers'; // tslint workaround
 import { isMainThread } from 'worker_threads';
@@ -338,7 +338,7 @@ class Events extends Core {
     const when = await global.cache.when();
     event.triggered.runAfterXMinutes = _.get(event, 'triggered.runAfterXMinutes', 0);
     const shouldTrigger = event.triggered.runAfterXMinutes === 0
-                          && Number(moment().format('X')) - Number(moment(when.online).format('X')) > event.definitions.runAfterXMinutes * 60;
+                          && Number(moment.utc().format('X')) - Number(moment.utc(when.online).format('X')) > event.definitions.runAfterXMinutes * 60;
     if (shouldTrigger) {
       event.triggered.runAfterXMinutes = event.definitions.runAfterXMinutes;
       await global.db.engine.update('events', { _id: event._id.toString() }, event);
