@@ -104,6 +104,26 @@
             </div>
           </div>
         </div>
+
+        <div class="row no-gutters pl-3 pr-3">
+          <div class="card col-12">
+            <div class="card-header p-1 pl-3">
+              <span style="position: relative; top: 0.3rem">{{translate('events.dialog.operations')}}</span>
+              <button-with-icon
+                class="btn-primary btn-shrink float-right"
+                icon="plus"
+                @click="addOperation"
+                :text="translate('manage.events.addOperation')"
+              />
+            </div>
+            <div class="card-body">
+              <div class="alert alert-info m-0" v-if="operations.length === 0">{{translate('manage.events.noOperationsFound')}}</div>
+              <template v-else>
+                {{ operations }}
+              </template>
+            </div>
+          </div>
+        </div>
       </form>
     </div>
   </div>
@@ -235,6 +255,9 @@
       })
     },
     methods: {
+      addOperation() {
+        console.log('adding operations')
+      },
       del() {
         console.log('deleting')
       },
