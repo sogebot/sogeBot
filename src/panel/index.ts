@@ -48,6 +48,7 @@ Vue.component('panel', () => import('./components/panel.vue'));
 Vue.component('hold-button', () => import('./components/holdButton.vue'));
 Vue.component('button-with-icon', () => import('./components/button.vue'));
 Vue.component('state-button', () => import('./components/stateButton.vue'));
+Vue.component('textarea-with-tags', () => import('./components/textareaWithTags.vue'));
 
 export interface Global {
   translations: any;

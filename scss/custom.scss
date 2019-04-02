@@ -640,114 +640,14 @@ span.queue-list-group-item {
   width: auto;
 }
 
-.form-chainops {
-  padding: 10px;
-  font-weight: lighter;
-  font-family: 'PT Sans', sans-serif;
-}
-
-.form-chainops .has-error label {
-  border: 0;
-  text-shadow: 0 0 2px #a94442, 0 0 4px #a94442, 0 0 8px #a94442;
-}
-
-.form-chainops .has-error * {
-  border-bottom: 1px dotted #a94442;
-}
-
-
-.form-chainops .form-group {
-  padding-top: 5px;
-}
-
-.form-chainops br + .form-group {
-  padding-left: 20px;
-}
-
-.form-chainops .form-group:first-child {
-  padding-top: 0;
-}
-
-.form-chainops label {
+label {
   font-size: 20px;
-  color:$white;
+  color:$gray-800;
   font-variant: small-caps;
   text-transform: lowercase;
-  text-shadow: 0 0 2px $black, 0 0 4px $gray-800, 0 0 8px $gray-800;
-}
-
-.form-chainops small {
-  display: block;
-}
-
-.form-chainops small div {
-  display: none;
-}
-
-.form-chainops * {
-  border: 0;
-  -webkit-box-shadow: none;
-  box-shadow: none;
-}
-
-.form-chainops .form-group {
-    vertical-align: top;
-}
-
-#events-current label {
-    font-size: 20px;
-    color:$white;
-    font-variant: small-caps;
-    text-transform: lowercase;
-    text-shadow: 0 0 2px $black, 0 0 4px $gray-800, 0 0 8px $gray-800;
-    padding-left: 10px;
-}
-
-#events-current div {
-  padding-bottom: 10px;
-  vertical-align: top;
-
-}
-#events-current div > div {
-  display: inline-block;
-  clear: both;
-}
-
-#events-current div > div > div {
-  display: block;
-  padding-left: 20px;
-  padding-top: 5px;
-  padding-bottom: 0;
-}
-
-#events-current div > div > div > div {
-  display: inline-block;
-}
-
-#events-current div > div > div > div > div {
-  display: block;
-}
-
-#events-current .operation {
-  width: 100%;
-  display: inline-block;
-
-}
-
-.operation + .operation {
-  border-top: 1px dotted rgb(200,200,200)
-}
-
-#events-current > div:nth-child(2n) {
-  background-color: $gray-100;
-}
-
-.action-danger > a {
-  color: $red !important;
-}
-
-th:first-letter {
-  text-transform: uppercase;
+  font-weight: bold;
+  text-indent: 1rem;
+  letter-spacing: 1px;
 }
 
 /* VOLUME SLIDER */

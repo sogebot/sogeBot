@@ -119,7 +119,27 @@
             <div class="card-body">
               <div class="alert alert-info m-0" v-if="operations.length === 0">{{translate('manage.events.noOperationsFound')}}</div>
               <template v-else>
-                {{ operations }}
+                <span v-for="(operation, index) of operations" :key="index">
+                  <div class="form-group col-md-12">
+                    <select class="form-control text-capitalize" v-model="operation.key">
+                      <option v-for="key of supported.operations.map((o) => o.id)" :value="key" :key="key">{{translate(key)}}</option>
+                    </select>
+
+                    <div v-for="(defKey, indexDef) of Object.keys(operation.definitions)" :key="defKey"
+                      :class="{'pt-2': indexDef === 0}">
+                      <label for="type_selector">{{ translate("events.definitions." + defKey + ".label") }}</label>
+                      <textarea-with-tags
+                        v-if="typeof operation.definitions[defKey] === 'string'"
+                        :value="operation.definitions[defKey]"
+                        :placeholder="translate('events.definitions.' + defKey + '.placeholder')"
+                        :error="false"
+                        :filters="['global']"
+                        @change="operation.definitions[defKey] = $event"
+                      />
+                    </div>
+                  </div>
+                  <hr v-if="index !== operations.length - 1"/>
+                </span>
               </template>
             </div>
           </div>
@@ -215,7 +235,21 @@
 
       this.socket.emit('list.supported.operations', (err, data: Events.Operation[]) => {
         if (err) return console.error(err);
-        this.$set(this.supported, 'operations', data);
+        this.$set(
+          this.supported,
+          'operations',
+          data.sort((a, b) => {
+            const A = this.translate(a.key).toLowerCase();
+            const B = this.translate(b.key).toLowerCase();
+            if (A < B)  { //sort string ascending
+              return -1;
+            }
+            if (A > B) {
+              return 1;
+            }
+            return 0; //default return value (no sorting)
+          })
+        );
       })
 
       this.socket.emit('list.supported.events', (err, data: Events.SupportedEvent[]) => {
@@ -267,7 +301,3 @@
     }
   })
 </script>
-
-<style scoped>
-
-</style>
