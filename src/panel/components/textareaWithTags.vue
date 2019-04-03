@@ -1,6 +1,6 @@
 <template>
   <div style="flex: 1 1 auto; height: fit-content; height: -moz-fit-content;"
-    class="border-0 p-0 m-0"
+    class="border-0 p-0 m-0 d-flex"
     v-bind:class="{ 'is-invalid': error }">
 
     <textarea style="min-height: 6em;" v-show="editation" v-on:keydown.enter="onEnter" v-on:blur="editation = false" ref="textarea" v-model="currentValue" v-bind:placeholder="placeholder" class="form-control" v-bind:style="heightStyle"></textarea>
@@ -21,13 +21,13 @@
     </div>
 
     <div v-if="filters && filters.length > 0"
-          style="position: fixed; z-index: 9999"
-          :style="{ left: btnPosX + 'px', top: btnPosY + 'px' }"
-          @mouseleave="isFiltersVisible=false">
+         @mouseleave="isFiltersVisible=false">
       <button type="button"
-              class="btn btn-sm border-0 ml-3 mt-3"
+              class="btn btn-dark pl-3 pt-3 h-100"
               :class="[ isFiltersVisible ? 'btn-secondary' : 'btn-outline-secondary' ]"
-              @click="toggleFilters()">$</button>
+              @click="toggleFilters()">
+        <fa icon="dollar-sign" size="lg"/>
+      </button>
 
       <div class="border bg-light ml-3 mb-3 mr-3" v-show="isFiltersVisible">
         <template v-for="filter of filters">

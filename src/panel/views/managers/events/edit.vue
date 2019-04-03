@@ -126,6 +126,7 @@
                     </select>
 
                     <div v-for="(defKey, indexDef) of Object.keys(operation.definitions)" :key="defKey"
+                      class="mt-2"
                       :class="{'pt-2': indexDef === 0}">
                       <label for="type_selector">{{ translate("events.definitions." + defKey + ".label") }}</label>
                       <textarea-with-tags
@@ -136,6 +137,10 @@
                         :filters="['global']"
                         @change="operation.definitions[defKey] = $event"
                       />
+                      <template v-if="typeof operation.definitions[defKey] === 'boolean'">
+                        <button type="button" class="btn btn-success" v-if="operation.definitions[defKey]" @click="operation.definitions[defKey] = false">{{translate("dialog.buttons.yes")}}</button>
+                        <button type="button" class="btn btn-danger" v-else @click="operation.definitions[defKey] = true">{{translate("dialog.buttons.no")}}</button>
+                      </template>
                     </div>
                   </div>
                   <hr v-if="index !== operations.length - 1"/>
