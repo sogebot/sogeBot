@@ -20,42 +20,37 @@
       v-html="$options.filters.filterize(value)">
     </div>
 
-    <div v-if="filters && filters.length > 0"
-         @mouseleave="isFiltersVisible=false">
-      <button type="button"
-              class="btn btn-dark pl-3 pt-3 h-100"
-              :class="[ isFiltersVisible ? 'btn-secondary' : 'btn-outline-secondary' ]"
-              @click="toggleFilters()">
-        <fa icon="dollar-sign" size="lg"/>
-      </button>
-
-      <div class="border bg-light ml-3 mb-3 mr-3" v-show="isFiltersVisible">
+    <div v-if="filters && filters.length > 0">
+      <b-dropdown id="dropdown-1" variant="dark" class="h-100" :dropleft="true">
         <template v-for="filter of filters">
-          <div v-if="filter === 'global'" :key="filter">
-            <span class="editable-variable block" @click="addVariable('title')"> {{ translate('responses.variable.title') }} </span>
-            <span class="editable-variable block" @click="addVariable('game')"> {{ translate('responses.variable.game') }} </span>
-            <span class="editable-variable block" @click="addVariable('viewers')"> {{ translate('responses.variable.viewers') }} </span>
-            <span class="editable-variable block" @click="addVariable('views')"> {{ translate('responses.variable.views') }} </span>
-            <span class="editable-variable block" @click="addVariable('hosts')"> {{ translate('responses.variable.hosts') }} </span>
-            <span class="editable-variable block" @click="addVariable('followers')"> {{ translate('responses.variable.followers') }} </span>
-            <span class="editable-variable block" @click="addVariable('subscribers')"> {{ translate('responses.variable.subscribers') }} </span>
-            <span class="editable-variable block" @click="addVariable('spotifySong')"> {{ translate('responses.variable.spotifySong') }} </span>
-            <span class="editable-variable block" @click="addVariable('ytSong')"> {{ translate('responses.variable.ytSong') }} </span>
-            <span class="editable-variable block" @click="addVariable('latestFollower')"> {{ translate('responses.variable.latestFollower') }} </span>
-            <span class="editable-variable block" @click="addVariable('latestSubscriber')"> {{ translate('responses.variable.latestSubscriber') }} </span>
-            <span class="editable-variable block" @click="addVariable('latestTipAmount')"> {{ translate('responses.variable.latestTipAmount') }} </span>
-            <span class="editable-variable block" @click="addVariable('latestTipCurrency')"> {{ translate('responses.variable.latestTipCurrency') }} </span>
-            <span class="editable-variable block" @click="addVariable('latestTipMessage')"> {{ translate('responses.variable.latestTipMessage') }} </span>
-            <span class="editable-variable block" @click="addVariable('latestTip')"> {{ translate('responses.variable.latestTip') }} </span>
-            <span class="editable-variable block" @click="addVariable('latestCheerAmount')"> {{ translate('responses.variable.latestCheerAmount') }} </span>
-            <span class="editable-variable block" @click="addVariable('latestCheerMessage')"> {{ translate('responses.variable.latestCheerMessage') }} </span>
-            <span class="editable-variable block" @click="addVariable('latestCheer')"> {{ translate('responses.variable.latestCheer') }} </span>
-          </div>
-          <div v-else :key="filter">
-            <span class="editable-variable block" @click="addVariable(filter)"> {{ translate('responses.variable.' + filter) }} </span>
-          </div>
+          <template v-if="filter === 'global'">
+            <b-dropdown-item class="dropdown-item" style="cursor: pointer" :key="filter + 'title'" @click="addVariable('title')"> {{ translate('responses.variable.title') }} </b-dropdown-item>
+            <b-dropdown-item class="dropdown-item" style="cursor: pointer" :key="filter + 'game'" @click="addVariable('game')"> {{ translate('responses.variable.game') }} </b-dropdown-item>
+            <b-dropdown-item class="dropdown-item" style="cursor: pointer" :key="filter + 'viewers'" @click="addVariable('viewers')"> {{ translate('responses.variable.viewers') }} </b-dropdown-item>
+            <b-dropdown-item class="dropdown-item" style="cursor: pointer" :key="filter + 'views'" @click="addVariable('views')"> {{ translate('responses.variable.views') }} </b-dropdown-item>
+            <b-dropdown-item class="dropdown-item" style="cursor: pointer" :key="filter + 'hosts'" @click="addVariable('hosts')"> {{ translate('responses.variable.hosts') }} </b-dropdown-item>
+            <b-dropdown-item class="dropdown-item" style="cursor: pointer" :key="filter + 'followers'" @click="addVariable('followers')"> {{ translate('responses.variable.followers') }} </b-dropdown-item>
+            <b-dropdown-item class="dropdown-item" style="cursor: pointer" :key="filter + 'subscribers'" @click="addVariable('subscribers')"> {{ translate('responses.variable.subscribers') }} </b-dropdown-item>
+            <b-dropdown-item class="dropdown-item" style="cursor: pointer" :key="filter + 'spotifySong'" @click="addVariable('spotifySong')"> {{ translate('responses.variable.spotifySong') }} </b-dropdown-item>
+            <b-dropdown-item class="dropdown-item" style="cursor: pointer" :key="filter + 'ytSong'" @click="addVariable('ytSong')"> {{ translate('responses.variable.ytSong') }} </b-dropdown-item>
+            <b-dropdown-item class="dropdown-item" style="cursor: pointer" :key="filter + 'latestFollower'" @click="addVariable('latestFollower')"> {{ translate('responses.variable.latestFollower') }} </b-dropdown-item>
+            <b-dropdown-item class="dropdown-item" style="cursor: pointer" :key="filter + 'latestSubscriber'" @click="addVariable('latestSubscriber')"> {{ translate('responses.variable.latestSubscriber') }} </b-dropdown-item>
+            <b-dropdown-item class="dropdown-item" style="cursor: pointer" :key="filter + 'latestTipAmount'" @click="addVariable('latestTipAmount')"> {{ translate('responses.variable.latestTipAmount') }} </b-dropdown-item>
+            <b-dropdown-item class="dropdown-item" style="cursor: pointer" :key="filter + 'latestTipCurrency'" @click="addVariable('latestTipCurrency')"> {{ translate('responses.variable.latestTipCurrency') }} </b-dropdown-item>
+            <b-dropdown-item class="dropdown-item" style="cursor: pointer" :key="filter + 'latestTipMessage'" @click="addVariable('latestTipMessage')"> {{ translate('responses.variable.latestTipMessage') }} </b-dropdown-item>
+            <b-dropdown-item class="dropdown-item" style="cursor: pointer" :key="filter + 'latestTip'" @click="addVariable('latestTip')"> {{ translate('responses.variable.latestTip') }} </b-dropdown-item>
+            <b-dropdown-item class="dropdown-item" style="cursor: pointer" :key="filter + 'latestCheerAmount'" @click="addVariable('latestCheerAmount')"> {{ translate('responses.variable.latestCheerAmount') }} </b-dropdown-item>
+            <b-dropdown-item class="dropdown-item" style="cursor: pointer" :key="filter + 'latestCheerMessage'" @click="addVariable('latestCheerMessage')"> {{ translate('responses.variable.latestCheerMessage') }} </b-dropdown-item>
+            <b-dropdown-item class="dropdown-item" style="cursor: pointer" :key="filter + 'latestCheer'" @click="addVariable('latestCheer')"> {{ translate('responses.variable.latestCheer') }} </b-dropdown-item>
+          </template>
+          <template v-else>
+            <b-dropdown-item class="dropdown-item" style="cursor: pointer" :key="filter" @click="addVariable(filter)"> {{ translate('responses.variable.' + filter) }} </b-dropdown-item>
+          </template>
         </template>
-      </div>
+        <template slot="button-content">
+          <fa icon="dollar-sign" size="lg"/>
+        </template>
+      </b-dropdown>
     </div>
   </div>
 </template>
@@ -67,7 +62,7 @@ import translate from '../helpers/translate';
 
 const props = Vue.extend({
   props: {
-    filters: [],
+    filters: Array as () => Array<any>,
     value: String,
     error: Boolean,
     placeholder: String,
@@ -94,13 +89,9 @@ const props = Vue.extend({
   }
 })
 export default class textareaWithTags extends props {
-  timeout = 0;
   height = 0;
-  isFiltersVisible = false;
   editation = false;
   isMounted = false;
-  btnPosX = 0;
-  btnPosY = 0;
   currentValue = '';
   d_placeholder = !this.placeholder || this.placeholder.trim().length === 0 ? '&nbsp;' : this.placeholder
 
@@ -111,50 +102,6 @@ export default class textareaWithTags extends props {
 
   mounted() {
     this.currentValue = this.value;
-    this.timeout = window.setInterval(() => {
-      this.updateFilterBtnPosX();
-      this.updateFilterBtnPosY();
-    }, 100)
-  }
-
-  destroyed() {
-    clearInterval(this.timeout)
-  }
-
-  updateFilterBtnPosX() {
-    Vue.nextTick(() => {
-      let client: null | DOMRect | ClientRect = null
-      if (typeof this.$refs.textarea === 'undefined') return
-
-      if (this.editation) {
-        client = (<HTMLElement>this.$refs.textarea).getBoundingClientRect()
-      } else {
-        if (this.currentValue.trim().length === 0) {
-          client = (<HTMLElement>this.$refs.placeholder).getBoundingClientRect()
-        } else {
-          client = (<HTMLElement>this.$refs.div).getBoundingClientRect()
-        }
-      }
-      this.btnPosX = (<DOMRect>client).x + client.width - 50;
-    })
-  }
-
-  updateFilterBtnPosY() {
-    Vue.nextTick(() => {
-      let client: null | DOMRect | ClientRect = null
-      if (typeof this.$refs.textarea === 'undefined') return
-
-      if (this.editation) {
-        client = (<HTMLElement>this.$refs.textarea).getBoundingClientRect()
-      } else {
-        if (this.currentValue.trim().length === 0) {
-          client = (<HTMLElement>this.$refs.placeholder).getBoundingClientRect()
-        } else {
-          client = (<HTMLElement>this.$refs.div).getBoundingClientRect()
-        }
-      }
-      this.btnPosY = (<DOMRect>client).y + client.height - 47;
-    })
   }
 
   onEnter (e) {
@@ -166,15 +113,7 @@ export default class textareaWithTags extends props {
   }
 
   addVariable(variable) {
-    this.currentValue += '$' + variable
-    this.editation = true;
-    Vue.nextTick(() => {
-      (<HTMLElement>this.$refs.textarea).focus()
-    })
-  }
-
-  toggleFilters() {
-    this.isFiltersVisible = !this.isFiltersVisible;
+    this.currentValue += ' $' + variable
     this.editation = true;
     Vue.nextTick(() => {
       (<HTMLElement>this.$refs.textarea).focus()
@@ -188,18 +127,18 @@ export default class textareaWithTags extends props {
 
   @Watch('editation')
   onEditationChanged(val, old) {
-      if (val) {
-        // focus textarea and set height
-        if (this.currentValue.trim().length === 0) {
-          this.height = (<HTMLElement>this.$refs.placeholder).clientHeight
-        } else this.height = (<HTMLElement>this.$refs.div).clientHeight
-        Vue.nextTick(() => {
-          (<HTMLElement>this.$refs.textarea).focus()
-        })
-      } else {
-        // texteare unfocused, set height of div
-        this.height = (<HTMLElement>this.$refs.textarea).clientHeight
-      }
+    if (val) {
+      // focus textarea and set height
+      if (this.currentValue.trim().length === 0) {
+        this.height = (<HTMLElement>this.$refs.placeholder).clientHeight
+      } else this.height = (<HTMLElement>this.$refs.div).clientHeight
+      Vue.nextTick(() => {
+        (<HTMLElement>this.$refs.textarea).focus()
+      })
+    } else {
+      // texteare unfocused, set height of div
+      this.height = (<HTMLElement>this.$refs.textarea).clientHeight
     }
+  }
 }
 </script>

@@ -1,8 +1,8 @@
 <template>
   <div ref="window">
     <div class="col-auto mr-auto d-flex" v-if="opts.leftButtons.length > 0">
-      <template v-for="button of opts.leftButtons">
-        <div v-if="(button.if || typeof button.if === 'undefined')" class="mr-2" v-bind:key="button">
+      <template v-for="(button, lbIndex) of opts.leftButtons">
+        <div v-if="(button.if || typeof button.if === 'undefined')" class="mr-2" v-bind:key="lbIndex">
           <hold-button @trigger="$emit(button.event)" :class="typeof button.state !== 'undefined' && state[button.state] === 2 ? 'btn-success' : button.class" v-if="button.hold" :icon="button.icon">
             <template slot="title">{{button.text}}</template>
             <template slot="onHoldTitle">{{button.textWhenHold}}</template>
@@ -45,8 +45,8 @@
       </template>
     </div>
     <div class="col-auto ml-auto text-right form-inline">
-      <template v-for="button of opts.rightButtons">
-        <div class="ml-2 d-inline-block" v-bind:key="button">
+      <template v-for="(button, rbIndex) of opts.rightButtons">
+        <div class="ml-2 d-inline-block" v-bind:key="rbIndex">
           <a class="btn btn-shrink btn-with-icon" style="flex-direction: row;" v-if="button.href && (button.if || typeof button.if === 'undefined')" :target="button.target || '_self'" :href="button.href" :class="typeof button.state !== 'undefined' && state[button.state] === 2 ? 'btn-success' : button.class">
             <div class="text">
               {{ button.text }}

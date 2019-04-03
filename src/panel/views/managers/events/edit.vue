@@ -96,8 +96,8 @@
               <div class="form-group col-md-12 m-0">
                 <dl class="row m-0" style="font-size:0.7rem;">
                   <template v-for="variables of (supported.events.find((o) => o.id === event.key) || { variables: []}).variables">
-                    <dt class="col-4" :key="variables">${{variables}}</dt>
-                    <dd class="col-8" :key="variables">{{translate('responses.variable.' + variables) }}</dd>
+                    <dt class="col-4" :key="variables + '1'">${{variables}}</dt>
+                    <dd class="col-8" :key="variables + '2'">{{translate('responses.variable.' + variables) }}</dd>
                   </template>
                 </dl>
               </div>
@@ -134,7 +134,7 @@
                         :value="operation.definitions[defKey]"
                         :placeholder="translate('events.definitions.' + defKey + '.placeholder')"
                         :error="false"
-                        :filters="['global']"
+                        :filters="['global', ...(supported.events.find((o) => o.id === event.key) || { variables: []}).variables]"
                         @change="operation.definitions[defKey] = $event"
                       />
                       <template v-if="typeof operation.definitions[defKey] === 'boolean'">
@@ -143,6 +143,10 @@
                       </template>
                     </div>
                   </div>
+                  <hold-button @trigger="deleteOperation(operation)" icon="trash" class="btn-danger">
+                    <template slot="title">{{translate('dialog.buttons.delete')}}</template>
+                    <template slot="onHoldTitle">{{translate('dialog.buttons.hold-to-delete')}}</template>
+                  </hold-button>
                   <hr v-if="index !== operations.length - 1"/>
                 </span>
               </template>
@@ -294,6 +298,9 @@
       })
     },
     methods: {
+      deleteOperation(op) {
+        console.log('deleting ' + op)
+      },
       addOperation() {
         console.log('adding operations')
       },

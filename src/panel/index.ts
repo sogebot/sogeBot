@@ -43,6 +43,10 @@ Vue.use(VueMoment, {
   moment, momentTimezone,
 });
 
+import BootstrapVue from 'bootstrap-vue';
+
+Vue.use(BootstrapVue);
+
 /* import widely used components */
 Vue.component('panel', () => import('./components/panel.vue'));
 Vue.component('hold-button', () => import('./components/holdButton.vue'));
