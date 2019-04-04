@@ -733,6 +733,7 @@
     "send-chat-message": "poslat chat zprávu",
     "send-whisper": "poslat whisper",
     "run-command": "spusť příkaz",
+    "do-nothing": "--- nedělat nic ---",
     "play-sound": "přehrát zvuk",
     "count": "počet",
     "timestamp": "timestamp",

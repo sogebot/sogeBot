@@ -87,9 +87,13 @@ $status-connecting-border: #fd7e14 !default;
 @import "../custom.scss";
 @import "../colors.scss";
 
-// Force text color on secondary button to be more readable (yiq is somehow too dark)
+// Force text color on buttons to be more readable (yiq is somehow too dark)
+.btn-primary {
+  color: $black !important;
+}
+
 .btn-secondary {
-  color: #b1c6db !important;
+  color: $black !important;
 }
 
 .btn-dark {
@@ -101,7 +105,11 @@ $status-connecting-border: #fd7e14 !default;
 }
 
 .btn-danger {
-  color: white !important;
+  color: $black !important;
+}
+
+.btn-success {
+  color: $black !important;
 }
 
 .progress-bar {
@@ -113,6 +121,6 @@ $status-connecting-border: #fd7e14 !default;
 }
 
 .form-control::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
-  color: #444;
+  color: lighten(#606b77, 50);
   opacity: 1; /* Firefox */
 }

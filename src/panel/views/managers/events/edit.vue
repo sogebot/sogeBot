@@ -59,6 +59,7 @@
 
 
     <div class="pt-3">
+      <h3>{{translate('events.dialog.events')}}</h3>
       <form>
         <div class="form-group col-md-12">
           <label for="name_input">{{ translate('events.dialog.name') }}</label>
@@ -105,51 +106,40 @@
           </div>
         </div>
 
-        <div class="row no-gutters pl-3 pr-3">
+        <h3>{{translate('events.dialog.operations')}}</h3>
+        <div class="row no-gutters pl-3 pr-3" v-for="(operation, index) of operations" :key="index"
+             :class="{'pt-2': index !== 0}">
           <div class="card col-12">
-            <div class="card-header p-1 pl-3">
-              <span style="position: relative; top: 0.3rem">{{translate('events.dialog.operations')}}</span>
-              <button-with-icon
-                class="btn-primary btn-shrink float-right"
-                icon="plus"
-                @click="addOperation"
-                :text="translate('manage.events.addOperation')"
-              />
-            </div>
             <div class="card-body">
-              <div class="alert alert-info m-0" v-if="operations.length === 0">{{translate('manage.events.noOperationsFound')}}</div>
-              <template v-else>
-                <span v-for="(operation, index) of operations" :key="index">
-                  <div class="form-group col-md-12">
-                    <select class="form-control text-capitalize" v-model="operation.key">
-                      <option v-for="key of supported.operations.map((o) => o.id)" :value="key" :key="key">{{translate(key)}}</option>
-                    </select>
+              <div class="form-group col-md-12">
+                <select class="form-control text-capitalize" v-model="operation.key">
+                  <option v-for="key of supported.operations.map((o) => o.id)" :value="key" :key="key">{{translate(key)}}</option>
+                </select>
 
-                    <div v-for="(defKey, indexDef) of Object.keys(operation.definitions)" :key="defKey"
-                      class="mt-2"
-                      :class="{'pt-2': indexDef === 0}">
-                      <label for="type_selector">{{ translate("events.definitions." + defKey + ".label") }}</label>
-                      <textarea-with-tags
-                        v-if="typeof operation.definitions[defKey] === 'string'"
-                        :value="operation.definitions[defKey]"
-                        :placeholder="translate('events.definitions.' + defKey + '.placeholder')"
-                        :error="false"
-                        :filters="['global', ...(supported.events.find((o) => o.id === event.key) || { variables: []}).variables]"
-                        @change="operation.definitions[defKey] = $event"
-                      />
-                      <template v-if="typeof operation.definitions[defKey] === 'boolean'">
-                        <button type="button" class="btn btn-success" v-if="operation.definitions[defKey]" @click="operation.definitions[defKey] = false">{{translate("dialog.buttons.yes")}}</button>
-                        <button type="button" class="btn btn-danger" v-else @click="operation.definitions[defKey] = true">{{translate("dialog.buttons.no")}}</button>
-                      </template>
-                    </div>
-                  </div>
-                  <hold-button @trigger="deleteOperation(operation)" icon="trash" class="btn-danger">
-                    <template slot="title">{{translate('dialog.buttons.delete')}}</template>
-                    <template slot="onHoldTitle">{{translate('dialog.buttons.hold-to-delete')}}</template>
-                  </hold-button>
-                  <hr v-if="index !== operations.length - 1"/>
-                </span>
-              </template>
+                <div v-for="(defKey, indexDef) of Object.keys(operation.definitions)" :key="defKey"
+                  class="mt-2"
+                  :class="{'pt-2': indexDef === 0}">
+
+                  <label for="type_selector">{{ translate("events.definitions." + defKey + ".label") }}</label>
+                  <textarea-with-tags
+                    v-if="['messageToSend', 'commandToRun'].includes(defKey)"
+                    :value="operation.definitions[defKey]"
+                    :placeholder="translate('events.definitions.' + defKey + '.placeholder')"
+                    :error="false"
+                    :filters="['global', ...(supported.events.find((o) => o.id === event.key) || { variables: []}).variables]"
+                    @change="operation.definitions[defKey] = $event"
+                  />
+                  <select class="form-control"
+                          v-else-if="Array.isArray(supported.operations.find(o => o.id === operation.key).definitions[defKey])" v-model="operation.definitions[defKey]">
+                    <option v-for="value of supported.operations.find(o => o.id === operation.key).definitions[defKey]" :key="value">{{value}}</option>
+                  </select>
+                  <input v-else-if="typeof operation.definitions[defKey] === 'string'" type="text" class="form-control" v-model="operation.definitions[defKey]" :placeholder="translate('events.definitions.' + defKey + '.placeholder')"/>
+                  <template v-else-if="typeof operation.definitions[defKey] === 'boolean'">
+                    <button type="button" class="btn btn-success" v-if="operation.definitions[defKey]" @click="operation.definitions[defKey] = false">{{translate("dialog.buttons.yes")}}</button>
+                    <button type="button" class="btn btn-danger" v-else @click="operation.definitions[defKey] = true">{{translate("dialog.buttons.no")}}</button>
+                  </template>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -161,6 +151,7 @@
 <script lang="ts">
   import Vue from 'vue'
   import { FontAwesomeLayers } from '@fortawesome/vue-fontawesome'
+  import { cloneDeep } from 'lodash';
 
   import io from 'socket.io-client';
 
@@ -174,10 +165,12 @@
         event: Events.Event,
         filters: Events.Filter[],
         operations: Events.Operation[],
+        operationsClone: Events.Operation[], // used as oldVal to check what actually ichanged
+        watchOperationChange: boolean,
 
         supported: {
-          operations: Events.Operation[],
-          events: Events.Event[]
+          operations: Events.SupportedOperation[],
+          events: Events.SupportedEvent[]
         },
 
         refresh: boolean,
@@ -196,6 +189,8 @@
         },
         filters: [],
         operations: [],
+        operationsClone: [],
+        watchOperationChange: true,
 
         supported: {
           operations: [],
@@ -210,6 +205,45 @@
       return object
     },
     watch: {
+      'operations': {
+        handler: function (val) {
+          if (!this.watchOperationChange) return;
+
+          // remove all do-nothing
+          val = val.filter((o) => o.key !== 'do-nothing');
+
+          // add do-nothing at the end
+          val.push({
+            key: 'do-nothing',
+            eventId: this.$route.params.id,
+            definitions: {}
+          });
+
+          for (let i = 0; i < val.length; i++) {
+            if (typeof this.operationsClone[i] !== 'undefined' && val[i].key === this.operationsClone[i].key) continue
+
+            val[i].definitions = {}
+            const defaultOperation = this.supported.operations.find((o) => o.id === val[i].key)
+            if (defaultOperation) {
+              if (defaultOperation.definitions) {
+                val[i].definitions = cloneDeep(defaultOperation.definitions);
+                for (const key of Object.keys(val[i].definitions)) {
+                  if (Array.isArray(val[i].definitions[key])) {
+                    val[i].definitions[key] = val[i].definitions[key][0] // select first option by default
+                  }
+                }
+                this.$forceUpdate()
+              }
+            }
+          }
+          // update clone
+          this.watchOperationChange = false // remove watch
+          this.operations = val
+          this.$nextTick(() => (this.watchOperationChange = true)) // re-enable watch
+          this.operationsClone = cloneDeep(val)
+        },
+        deep: true
+      },
       'event.key': function (val) {
         this.$set(this.event, 'definitions', {}) // reload definitions
 
@@ -235,6 +269,15 @@
         this.socket.emit('find', { collection: '_events.operations', where: { eventId: this.$route.params.id } }, (err, data: Events.Operation[]) => {
           if (err) return console.error(err);
           this.operations = data;
+          if (this.operations[this.operations.length - 1].key !== 'do-nothing') {
+            this.operations.push({
+              key: 'do-nothing',
+              eventId: this.$route.params.id,
+              definitions: {}
+            });
+
+            this.operationsClone = cloneDeep(this.operations)
+          }
         })
         this.socket.emit('find', { collection: '_events.filters', where: { eventId: this.$route.params.id } }, (err, data: Events.Filter[]) => {
           if (err) return console.error(err);
@@ -244,16 +287,21 @@
 
       this.socket.emit('list.supported.operations', (err, data: Events.SupportedOperation[]) => {
         if (err) return console.error(err);
+        data.push({ // add do nothing - its basicaly delete of operation
+          id: 'do-nothing',
+          definitions: {},
+          fire: () => {},
+        })
         this.$set(
           this.supported,
           'operations',
           data.sort((a, b) => {
             const A = this.translate(a.id).toLowerCase();
             const B = this.translate(b.id).toLowerCase();
-            if (A < B)  { //sort string ascending
+            if (A < B || a.id === 'do-nothing')  { //sort string ascending
               return -1;
             }
-            if (A > B) {
+            if (A > B || b.id === 'do-nothing') {
               return 1;
             }
             return 0; //default return value (no sorting)
@@ -308,7 +356,8 @@
         console.log('deleting')
       },
       save() {
-        console.log('saving')
+        console.log(this.event)
+        console.log(this.operations.filter((o) => o.key !== 'do-nothing'))
       }
     }
   })

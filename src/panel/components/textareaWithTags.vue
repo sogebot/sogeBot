@@ -114,6 +114,7 @@ export default class textareaWithTags extends props {
 
   addVariable(variable) {
     this.currentValue += ' $' + variable
+    this.currentValue = this.currentValue.trim()
     this.editation = true;
     Vue.nextTick(() => {
       (<HTMLElement>this.$refs.textarea).focus()
