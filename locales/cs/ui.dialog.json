@@ -4,8 +4,7 @@
     "add": "Přidat"
   },
   "buttons": {
-    "test": "Otestovat",
-    "reorder": "Uspořádat",
+     "reorder": "Uspořádat",
     "upload": {
       "idle": "Nahrát",
       "progress": "Nahrávání",
@@ -13,6 +12,11 @@
     },
     "cancel": "Zrušit",
     "close": "Zavřít",
+    "test": {
+      "idle": "Otestovat",
+      "progress": "Testování probíhá",
+      "done": "Testování dokončeno"
+    },
     "saveChanges": {
       "idle": "Uložit změny",
       "progress": "Ukládání změn",

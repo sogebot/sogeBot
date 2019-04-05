@@ -120,7 +120,7 @@ $status-connecting-border: #fd7e14 !default;
   border-color: #868e96 !important
 }
 
-.form-control::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
-  color: lighten(#606b77, 50);
+.form-control::placeholder, div.form-control span.text-muted { /* Chrome, Firefox, Opera, Safari 10.1+ */
+  color: lighten(#606b77, 20) !important;
   opacity: 1; /* Firefox */
 }

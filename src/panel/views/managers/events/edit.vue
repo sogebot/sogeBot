@@ -21,7 +21,7 @@
         leftButtons: [
           {
             href: '#/manage/events/list',
-            text: translate('manage.events.back'),
+            text: translate('commons.back'),
             class: 'btn-secondary',
             icon: 'caret-left'
           },
@@ -59,7 +59,7 @@
 
 
     <div class="pt-3">
-      <h3>{{translate('events.dialog.events')}}</h3>
+      <h3>{{translate('events.dialog.event')}}</h3>
       <form>
         <div class="form-group col-md-12">
           <label for="name_input">{{ translate('events.dialog.name') }}</label>
@@ -87,7 +87,7 @@
               </div>
               <div class="form-group col-md-12">
                 <label for="type_selector">{{ translate("events.dialog.filters") }}</label>
-                <textarea v-model="event.filters" class="form-control"/>
+                <textarea v-model="filters" class="form-control"/>
               </div>
             </div>
           </div>
@@ -107,42 +107,44 @@
         </div>
 
         <h3>{{translate('events.dialog.operations')}}</h3>
-        <div class="row no-gutters pl-3 pr-3" v-for="(operation, index) of operations" :key="index"
-             :class="{'pt-2': index !== 0}">
-          <div class="card col-12">
-            <div class="card-body">
-              <div class="form-group col-md-12">
-                <select class="form-control text-capitalize" v-model="operation.key">
-                  <option v-for="key of supported.operations.map((o) => o.id)" :value="key" :key="key">{{translate(key)}}</option>
-                </select>
-
-                <div v-for="(defKey, indexDef) of Object.keys(operation.definitions)" :key="defKey"
-                  class="mt-2"
-                  :class="{'pt-2': indexDef === 0}">
-
-                  <label for="type_selector">{{ translate("events.definitions." + defKey + ".label") }}</label>
-                  <textarea-with-tags
-                    v-if="['messageToSend', 'commandToRun'].includes(defKey)"
-                    :value="operation.definitions[defKey]"
-                    :placeholder="translate('events.definitions.' + defKey + '.placeholder')"
-                    :error="false"
-                    :filters="['global', ...(supported.events.find((o) => o.id === event.key) || { variables: []}).variables]"
-                    @change="operation.definitions[defKey] = $event"
-                  />
-                  <select class="form-control"
-                          v-else-if="Array.isArray(supported.operations.find(o => o.id === operation.key).definitions[defKey])" v-model="operation.definitions[defKey]">
-                    <option v-for="value of supported.operations.find(o => o.id === operation.key).definitions[defKey]" :key="value">{{value}}</option>
+        <transition-group name="fade">
+          <div class="row no-gutters pl-3 pr-3" v-for="(operation, index) of operations" :key="operation.key + index"
+              :class="{'pt-2': index !== 0}">
+            <div class="card col-12">
+              <div class="card-body">
+                <div class="form-group col-md-12">
+                  <select class="form-control text-capitalize" v-model="operation.key">
+                    <option v-for="key of supported.operations.map((o) => o.id)" :value="key" :key="key">{{translate(key)}}</option>
                   </select>
-                  <input v-else-if="typeof operation.definitions[defKey] === 'string'" type="text" class="form-control" v-model="operation.definitions[defKey]" :placeholder="translate('events.definitions.' + defKey + '.placeholder')"/>
-                  <template v-else-if="typeof operation.definitions[defKey] === 'boolean'">
-                    <button type="button" class="btn btn-success" v-if="operation.definitions[defKey]" @click="operation.definitions[defKey] = false">{{translate("dialog.buttons.yes")}}</button>
-                    <button type="button" class="btn btn-danger" v-else @click="operation.definitions[defKey] = true">{{translate("dialog.buttons.no")}}</button>
-                  </template>
+
+                  <div v-for="(defKey, indexDef) of Object.keys(operation.definitions)" :key="defKey"
+                    class="mt-2"
+                    :class="{'pt-2': indexDef === 0}">
+
+                    <label for="type_selector">{{ translate("events.definitions." + defKey + ".label") }}</label>
+                    <textarea-with-tags
+                      v-if="['messageToSend', 'commandToRun'].includes(defKey)"
+                      :value="operation.definitions[defKey]"
+                      :placeholder="translate('events.definitions.' + defKey + '.placeholder')"
+                      :error="false"
+                      :filters="['global', ...(supported.events.find((o) => o.id === event.key) || { variables: []}).variables]"
+                      @change="operation.definitions[defKey] = $event"
+                    />
+                    <select class="form-control"
+                            v-else-if="Array.isArray(supported.operations.find(o => o.id === operation.key).definitions[defKey])" v-model="operation.definitions[defKey]">
+                      <option v-for="value of supported.operations.find(o => o.id === operation.key).definitions[defKey]" :key="value">{{value}}</option>
+                    </select>
+                    <input v-else-if="typeof operation.definitions[defKey] === 'string'" type="text" class="form-control" v-model="operation.definitions[defKey]" :placeholder="translate('events.definitions.' + defKey + '.placeholder')"/>
+                    <template v-else-if="typeof operation.definitions[defKey] === 'boolean'">
+                      <button type="button" class="btn btn-success" v-if="operation.definitions[defKey]" @click="operation.definitions[defKey] = false">{{translate("dialog.buttons.yes")}}</button>
+                      <button type="button" class="btn btn-danger" v-else @click="operation.definitions[defKey] = true">{{translate("dialog.buttons.no")}}</button>
+                    </template>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
+        </transition-group>
       </form>
     </div>
   </div>
@@ -151,6 +153,7 @@
 <script lang="ts">
   import Vue from 'vue'
   import { FontAwesomeLayers } from '@fortawesome/vue-fontawesome'
+  import uuid from 'uuid/v4';
   import { cloneDeep } from 'lodash';
 
   import io from 'socket.io-client';
@@ -160,10 +163,12 @@
       'font-awesome-layers': FontAwesomeLayers,
     },
     data: function () {
+      const eventId = uuid();
       const object: {
+        eventId: string,
         socket: any,
         event: Events.Event,
-        filters: Events.Filter[],
+        filters: string,
         operations: Events.Operation[],
         operationsClone: Events.Operation[], // used as oldVal to check what actually ichanged
         watchOperationChange: boolean,
@@ -178,16 +183,17 @@
           save: number
         }
       } = {
+        eventId: this.$route.params.id || eventId,
         socket: io('/core/events', { query: "token=" + this.token }),
         event: {
-          id: this.$route.params.id,
+          id: eventId,
           key: '',
           name: '',
           enabled: true,
           triggered: {},
           definitions: {}
         },
-        filters: [],
+        filters: '',
         operations: [],
         operationsClone: [],
         watchOperationChange: true,
@@ -215,7 +221,7 @@
           // add do-nothing at the end
           val.push({
             key: 'do-nothing',
-            eventId: this.$route.params.id,
+            eventId: this.eventId,
             definitions: {}
           });
 
@@ -281,7 +287,9 @@
         })
         this.socket.emit('find', { collection: '_events.filters', where: { eventId: this.$route.params.id } }, (err, data: Events.Filter[]) => {
           if (err) return console.error(err);
-          this.filters = data;
+          this.filters = data.filter((o) => o.eventId === this.$route.params.id).map((o => {
+            return o.filters
+          })).join(' ');;
         })
       }
 
@@ -307,6 +315,16 @@
             return 0; //default return value (no sorting)
           })
         );
+
+        if (!this.$route.params.id) {
+          // set first operation if we are in create mode
+          this.operations.push({
+            eventId: this.eventId,
+            key: 'do-nothing',
+            definitions: {},
+          });
+        }
+
       })
 
       this.socket.emit('list.supported.events', (err, data: Events.SupportedEvent[]) => {
@@ -343,22 +361,51 @@
             return 0; //default return value (no sorting)
           })
         );
+
+        if (!this.$route.params.id) {
+          // set first event if we are in create mode
+          this.event.key = this.supported.events[0].id
+        }
       })
     },
     methods: {
-      deleteOperation(op) {
-        console.log('deleting ' + op)
-      },
-      addOperation() {
-        console.log('adding operations')
-      },
-      del() {
-        console.log('deleting')
+      del: function () {
+        this.socket.emit('delete.event', this.event.id, (err, eventId) => {
+          if (err) {
+            return console.error(err);
+          }
+          this.$router.push({ name: 'EventsManagerList' })
+        })
       },
       save() {
-        console.log(this.event)
-        console.log(this.operations.filter((o) => o.key !== 'do-nothing'))
+        this.state.save = 1;
+        this.socket.emit('save.event', {
+          event: this.event,
+          operations: this.operations.filter((o) => o.key !== 'do-nothing'),
+          filters: this.filters
+        }, (err, eventId) => {
+          if (err) {
+            this.state.save = 3
+          } else {
+            this.state.save = 2
+            this.$router.push({ name: 'EventsManagerEdit', params: { id: String(eventId) } })
+            this.$forceUpdate();
+            this.refresh = true;
+          }
+          setTimeout(() => {
+            this.state.save = 0
+          }, 1000)
+        })
       }
     }
   })
 </script>
+
+<style scoped>
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 1s;
+}
+.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  opacity: 0;
+}
+</style>

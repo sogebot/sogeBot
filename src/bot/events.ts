@@ -555,6 +555,34 @@ class Events extends Core {
         cb();
       });
 
+      socket.on('save.event', async (opts, cb) => {
+        const { event, operations, filters } = opts;
+        global.log.info(require('util').inspect({ event, operations, filters }, false, null));
+
+        // first, remove all event related items
+        await Promise.all([
+          global.db.engine.remove('events', { id: event.id }),
+          global.db.engine.remove('events.filters', { eventId: event.id }),
+          global.db.engine.remove('events.operations', { eventId: event.id }),
+        ]);
+
+        // save event
+        delete event._id;
+        await global.db.engine.insert('events', event);
+
+        // save operations
+        for (const op of operations) {
+          delete op._id;
+          await global.db.engine.insert('events.operations', op);
+        }
+
+        // save filters
+        await global.db.engine.insert('events.filters', {
+          filters, eventId: event.id,
+        });
+        cb(null, event.id);
+      });
+
       socket.on('delete.event', async (eventId, cb) => {
         await Promise.all([
           global.db.engine.remove('events', { id: eventId }),
@@ -565,111 +593,6 @@ class Events extends Core {
       });
     });
   }
-
-/*
-  public sockets() {
-    const io = global.panel.io.of('/events');
-
-    io.on('connection', (socket) => {
-      socket.on('list.supported.events', (callback) => {
-        callback(this.supportedEventsList);
-      });
-      socket.on('list.supported.operations', (callback) => {
-        callback(this.supportedOperationsList);
-      });
-      socket.on('save-changes', async (data, callback) => {
-        let eventId = data._id;
-        const errors = {
-          definitions: {},
-          operations: {},
-        };
-        try {
-          const event = {
-            name: data.name.trim().length ? data.name : 'events#' + crypto.createHash('md5').update(new Date().getTime().toString()).digest('hex').slice(0, 5),
-            key: data.event.key,
-            enabled: true,
-            definitions: data.event.definitions,
-            triggered: {},
-          };
-
-          // check all definitions are correctly set -> no empty values
-          for (const [key, value] of Object.entries(event.definitions)) {
-            if (value.length === 0) { _.set(errors, `definitions.${key}`, global.translate('webpanel.events.errors.value_cannot_be_empty')); } else if (['commandToWatch'].includes(key) && !value.startsWith('!')) { _.set(errors, 'definitions.commandToWatch', global.translate('webpanel.events.errors.command_must_start_with_!')); } else if (!['commandToWatch', 'keywordToWatch', 'hashtag'].includes(key) && !_.isBoolean(value) && !value.match(/^\d+$/g)) { _.set(errors, `definitions.${key}`, global.translate('webpanel.events.errors.this_value_must_be_a_positive_number_or_0')); }
-          }
-
-          // check all operations definitions are correctly set -> no empty values
-          for (const [timestamp, operation] of Object.entries(data.operations)) {
-            for (const [key, value] of Object.entries(operation.definitions)) {
-              if (value.length === 0) { _.set(errors, `operations.${timestamp}.${key}`, global.translate('webpanel.events.errors.value_cannot_be_empty')); } else if (key === 'commandToRun' && !value.startsWith('!')) { _.set(errors, `operations.${timestamp}.${key}`, global.translate('webpanel.events.errors.command_must_start_with_!')); }
-            }
-          }
-
-          if (_.size(errors.definitions) > 0 || _.size(errors.operations) > 0) { throw Error(JSON.stringify(errors)); }
-
-          if (_.isNil(eventId)) { eventId = (await global.db.engine.insert('events', event))._id.toString(); } else {
-            await Promise.all([
-              global.db.engine.remove('events', { _id: eventId }),
-              global.db.engine.remove('events.filters', { eventId }),
-              global.db.engine.remove('events.operations', { eventId }),
-            ]);
-            eventId = (await global.db.engine.insert('events', event))._id.toString();
-          }
-
-          const insertArray = [];
-          insertArray.push(global.db.engine.insert('events.filters', {
-            eventId,
-            filters: data.filters,
-          }));
-          for (let operation of Object.entries(data.operations)) {
-            operation = operation[1];
-            insertArray.push(global.db.engine.insert('events.operations', {
-              eventId,
-              key: operation.key,
-              definitions: operation.definitions,
-            }));
-          }
-          await Promise.all(insertArray);
-
-          callback(null, true);
-        } catch (e) {
-          global.log.warning(e.message);
-
-          if (!_.isNil(eventId) && _.isNil(data._id)) { // eventId is __newly__ created, rollback all changes
-            await Promise.all([
-              global.db.engine.remove('events', { _id: eventId }),
-              global.db.engine.remove('events.filters', { eventId }),
-              global.db.engine.remove('events.operations', { eventId }),
-            ]);
-          }
-          callback(e, e.message);
-        }
-      });
-      socket.on('list.events', async (callback) => {
-        const [events, operations, filters] = await Promise.all([
-          global.db.engine.find('events'),
-          global.db.engine.find('events.operations'),
-          global.db.engine.find('events.filters'),
-        ]);
-        callback(null, { events, operations, filters });
-      });
-      socket.on('toggle.event', async (eventId, callback) => {
-        const eventFromDb = await global.db.engine.findOne('events', { _id: eventId });
-        if (_.isEmpty(eventFromDb)) { return callback(new Error('Event not found'), null); }
-
-        const updatedEvent = await global.db.engine.update('events', { _id: eventId }, { enabled: !eventFromDb.enabled });
-        callback(null, updatedEvent);
-      });
-      socket.on('delete.event', async (eventId, callback) => {
-        await Promise.all([
-          global.db.engine.remove('events', { _id: eventId }),
-          global.db.engine.remove('events.filters', { eventId }),
-          global.db.engine.remove('events.operations', { eventId }),
-        ]);
-        callback(null, eventId);
-      });
-    });
-  }
-*/
 
   protected async fadeOut() {
     try {

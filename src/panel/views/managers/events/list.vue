@@ -20,15 +20,14 @@
       :options="{
         leftButtons: [
           {
-            href: '#/registry/events/edit',
-            text: translate('managers.events.addNewEvent'),
+            href: '#/manage/events/edit',
+            text: translate('events.dialog.title.new'),
             class: 'btn-primary',
             icon: 'plus'
           }
         ],
         hideTableButton: true
       }"
-      @filter="toggleFilter"
       @search="search = $event"></panel>
 
     <div class="text-center" v-if="state.loading === 1">
@@ -79,13 +78,13 @@
             <template v-if="Object.keys(event.definitions).length > 0">
               <button-with-icon
                 v-if="isSettingsShown(event.id)"
-                :text="translate('manage.events.settings')"
+                :text="translate('events.dialog.settings')"
                 @click="toggleSettingsShow(event.id)"
                 class="btn-dark btn-shrink btn-reverse"
                 icon="cog"/>
               <button-with-icon
                 v-else
-                :text="translate('manage.events.settings')"
+                :text="translate('events.dialog.settings')"
                 @click="toggleSettingsShow(event.id)"
                 class="btn-light btn-shrink btn-reverse"
                 icon="cog"/>
@@ -93,37 +92,37 @@
 
             <button-with-icon
               v-if="isOperationShown(event.id)"
-              :text="translate('manage.events.operations') + ' (' + getOperationsOfEvent(event.id).length + ')'"
+              :text="translate('events.dialog.operations') + ' (' + getOperationsOfEvent(event.id).length + ')'"
               @click="toggleOperationShow(event.id)"
               class="btn-dark btn-shrink btn-reverse"
               icon="tasks"
               />
             <button-with-icon
               v-else
-              :text="translate('manage.events.operations') + ' (' + getOperationsOfEvent(event.id).length + ')'"
+              :text="translate('events.dialog.operations') + ' (' + getOperationsOfEvent(event.id).length + ')'"
               @click="toggleOperationShow(event.id)"
               class="btn-light btn-shrink btn-reverse"
               icon="tasks"
               />
 
             <div v-if="isSettingsShown(event.id)" class="pt-2">
-              <h6 class="text-muted">{{translate('manage.events.settings')}}</h6>
+              <h6 class="text-muted">{{translate('events.dialog.settings')}}</h6>
               <dl class="row" style="font-size:0.8rem;">
                 <template v-for="key of Object.keys(event.definitions)">
-                  <dt class="col-sm-6" :key="key">{{translate('events.definitions.' + key + '.label')}}</dt>
-                  <dd class="col-sm-6" :key="key">{{event.definitions[key]}}</dd>
+                  <dt class="col-sm-6" :key="event.id + key + '0'">{{translate('events.definitions.' + key + '.label')}}</dt>
+                  <dd class="col-sm-6" :key="event.id + key + '1'">{{event.definitions[key]}}</dd>
                 </template>
               </dl>
             </div>
 
             <div v-if="isOperationShown(event.id)">
-              <h6 class="text-muted">{{translate('manage.events.operations')}}</h6>
+              <h6 class="text-muted">{{translate('events.dialog.operations')}}</h6>
               <template v-for="operation of getOperationsOfEvent(event.id)">
-                <strong :key="operation.key" class="text-uppercase">{{translate(operation.key)}}</strong>
-                <dl class="row" :key="operation.key" style="font-size:0.8rem;">
+                <strong :key="event.id + operation.key + '4'" class="text-uppercase text-narrow">{{translate(operation.key)}}</strong>
+                <dl class="row" :key="event.id + operation.key + '5'" style="font-size:0.8rem;">
                 <template v-for="key of Object.keys(operation.definitions)">
-                  <dt class="col-sm-6" :key="key">{{translate('events.definitions.' + key + '.label')}}</dt>
-                  <dd class="col-sm-6" :key="key">{{operation.definitions[key]}}</dd>
+                  <dt class="col-sm-6" :key="event.id + key + '2'">{{translate('events.definitions.' + key + '.label')}}</dt>
+                  <dd class="col-sm-6" :key="event.id + key + '3'">{{operation.definitions[key]}}</dd>
                 </template>
                 </dl>
               </template>

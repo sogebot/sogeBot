@@ -4,7 +4,6 @@
     "add": "Add"
   },
   "buttons": {
-    "test": "Test",
     "reorder": "Reorder",
     "upload": {
       "idle": "Upload",
@@ -13,6 +12,11 @@
     },
     "cancel": "Cancel",
     "close": "Close",
+    "test": {
+      "idle": "Test",
+      "progress": "Testing in progress",
+      "done": "Testing done"
+    },
     "saveChanges": {
       "idle": "Save changes",
       "progress": "Saving changes",
