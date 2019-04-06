@@ -390,9 +390,9 @@ class TMI extends Core {
         username: username,
         subStreakShareEnabled,
         subStreak,
-        subStreakName: getLocalizedName(subStreak, 'core.months'),
+        subStreakName: commons.getLocalizedName(subStreak, 'core.months'),
         subCumulativeMonths,
-        subCumulativeMonthsName: getLocalizedName(subCumulativeMonths, 'core.months'),
+        subCumulativeMonthsName: commons.getLocalizedName(subCumulativeMonths, 'core.months'),
         message: messageFromUser
       })
       global.log.resub(`${username}, streak share: ${subStreakShareEnabled}, streak: ${subStreak}, months: ${subCumulativeMonths}, message: ${messageFromUser}, tier: ${method.prime ? 'Prime' : method.plan / 1000}`)
@@ -400,9 +400,9 @@ class TMI extends Core {
         username,
         subStreakShareEnabled,
         subStreak,
-        subStreakName: getLocalizedName(subStreak, 'core.months'),
+        subStreakName: commons.getLocalizedName(subStreak, 'core.months'),
         subCumulativeMonths,
-        subCumulativeMonthsName: getLocalizedName(subCumulativeMonths, 'core.months'),
+        subCumulativeMonthsName: commons.getLocalizedName(subCumulativeMonths, 'core.months'),
         message: messageFromUser
       })
     } catch (e) {
@@ -490,7 +490,7 @@ class TMI extends Core {
 
       await global.users.setById(user.id, { username: recipient, is: { subscriber: isSubscriber }, time: { subscribed_at: subscribedAt }, stats: { subCumulativeMonths } })
       await global.db.engine.increment('users', { id: user.id }, { stats: { subStreak: 1 }})
-      global.overlays.eventlist.add({ type: 'subgift', username: recipient, from: username, monthsName: getLocalizedName(subCumulativeMonths, 'core.months'), months: subCumulativeMonths })
+      global.overlays.eventlist.add({ type: 'subgift', username: recipient, from: username, monthsName: commons.getLocalizedName(subCumulativeMonths, 'core.months'), months: subCumulativeMonths })
       global.log.subgift(`${recipient}, from: ${username}, months: ${subCumulativeMonths}`)
 
       // also set subgift count to gifter
