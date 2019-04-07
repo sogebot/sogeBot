@@ -28,10 +28,6 @@ const relationships = {
   'dashboards': [
     'widgets|dashboardId'
   ],
-  'events': [
-    'events.filters|eventId',
-    'events.operations|eventId',
-  ],
   'systems.customcommands': [
     'systems.customcommands.responses|cid'
   ],

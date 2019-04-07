@@ -22,7 +22,7 @@
         leftButtons: [
           {
             href: '#/registry/goals/list',
-            text: translate('registry.goals.back'),
+            text: translate('commons.back'),
             class: 'btn-secondary',
             icon: 'caret-left'
           },

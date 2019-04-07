@@ -260,4 +260,5 @@ class UserInfo extends System {
   }
 }
 
-module.exports = new UserInfo();
+export default UserInfo;
+export { UserInfo };

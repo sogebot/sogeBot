@@ -722,6 +722,7 @@
     "send-chat-message": "send a chat message",
     "send-whisper": "send a whisper",
     "run-command": "run a command",
+    "do-nothing": "--- do nothing ---",
     "play-sound": "play a sound",
     "count": "count",
     "timestamp": "timestamp",

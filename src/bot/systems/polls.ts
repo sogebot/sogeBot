@@ -370,4 +370,5 @@ class Polls extends System {
   }
 }
 
-module.exports = new Polls();
+export default Polls;
+export { Polls };

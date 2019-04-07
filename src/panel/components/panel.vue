@@ -1,8 +1,8 @@
 <template>
   <div ref="window">
     <div class="col-auto mr-auto d-flex" v-if="opts.leftButtons.length > 0">
-      <template v-for="button of opts.leftButtons">
-        <div v-if="(button.if || typeof button.if === 'undefined')" class="mr-2" v-bind:key="button">
+      <template v-for="(button, lbIndex) of opts.leftButtons">
+        <div v-if="(button.if || typeof button.if === 'undefined')" class="mr-2" v-bind:key="lbIndex">
           <hold-button @trigger="$emit(button.event)" :class="typeof button.state !== 'undefined' && state[button.state] === 2 ? 'btn-success' : button.class" v-if="button.hold" :icon="button.icon">
             <template slot="title">{{button.text}}</template>
             <template slot="onHoldTitle">{{button.textWhenHold}}</template>
@@ -44,9 +44,9 @@
         </div>
       </template>
     </div>
-    <div class="col-auto ml-auto text-right form-inline d-block pull-right">
-      <template v-for="button of opts.rightButtons">
-        <div class="ml-2 d-inline-block" v-bind:key="button">
+    <div class="col-auto ml-auto text-right form-inline">
+      <template v-for="(button, rbIndex) of opts.rightButtons">
+        <div class="ml-2 d-inline-block" v-bind:key="rbIndex">
           <a class="btn btn-shrink btn-with-icon" style="flex-direction: row;" v-if="button.href && (button.if || typeof button.if === 'undefined')" :target="button.target || '_self'" :href="button.href" :class="typeof button.state !== 'undefined' && state[button.state] === 2 ? 'btn-success' : button.class">
             <div class="text">
               {{ button.text }}
@@ -84,6 +84,7 @@
           </button>
         </div>
       </template>
+
       <div class="ml-2 d-inline-block" v-if="!opts.hideCardsButton" >
         <button class="btn btn-shrink btn-with-icon p-0" style="flex-direction: row;" v-on:click="showAs='cards'" v-bind:class="[ showAs === 'cards' ? 'btn-dark' : 'btn-outline-dark' ]">
           <div class="btn-icon">
@@ -99,8 +100,23 @@
         </button>
       </div>
       <div class="ml-2 d-inline-block" v-if="!opts.hideSearchInput">
-        <fa icon="search" class="text-muted" style="position: relative; left: 2.2rem;" fixed-width></fa>
-        <input type="search" class="form-control w-auto pl-5" v-model="search" placeholder="Search...">
+        <div class="input-group border w-100"
+            :class="{'focus-border': isFocused }">
+          <div class="input-group-prepend" @click="resetSearch()">
+            <div class="input-group-text bg-white border-0">
+              <fa icon="search" v-if="!isSearching"></fa>
+              <fa icon="times" v-else></fa>
+            </div>
+          </div>
+          <input
+            @focus="isFocused = true"
+            @blur="isFocused = false"
+            v-model="search"
+            v-on:keyup.enter="$emit('search', search); isSearching = search.trim().length > 0"
+            type="text"
+            class="form-control border-0 bg-white"
+            placeholder="Search..."/>
+        </div>
       </div>
     </div>
   </div>
@@ -108,19 +124,24 @@
 
 <script lang="ts">
   import Vue from 'vue'
+  import { FontAwesomeLayers } from '@fortawesome/vue-fontawesome'
 
   export default Vue.extend({
     props: ['commons', 'options', 'state'],
     components: {
+      'font-awesome-layers': FontAwesomeLayers,
       holdButton: () => import('./holdButton.vue'),
     },
     data: function () {
       return {
         search: '',
         showAs: 'cards',
+        isFocused: false,
+        isSearching: false,
         opts: {
           leftButtons: [],
           rightButtons: [],
+          filters: [],
 
           hideCardsButton: false,
           hideTableButton: false,
@@ -130,9 +151,6 @@
       }
     },
     watch: {
-      search: function (value) {
-        this.$emit('search', value)
-      },
       showAs: function (value) {
         this.$emit('event', { type: 'showAs', value })
       }
@@ -140,6 +158,15 @@
     mounted: function () {
       // set showAs if cards are hidden
       if (this.opts.hideCardsButton) this.showAs = 'table'
+    },
+    methods: {
+      resetSearch() {
+        if (this.isSearching) {
+          this.search = ''
+          this.isSearching = false
+          this.$emit('search', '')
+        }
+      }
     }
   })
 </script>

@@ -1,23 +1,25 @@
 <template>
-  <buttonWithIcon icon="save"
-                  class="btn-primary"
+  <buttonWithIcon :icon="icon || 'save'"
+                  :class="cl || 'btn-primary'"
                   event="save"
                   @save="save()"
                   :text="translate('dialog.buttons.' + this.text + '.idle')"
                   v-if="state === 0"/>
   <buttonWithIcon icon="spinner"
                   spin="true"
-                  class="btn-primary"
+                  :class="cl || 'btn-primary'"
                   disabled="true"
                   :text="translate('dialog.buttons.' + this.text + '.progress')"
                   v-else-if="state === 1"/>
   <buttonWithIcon icon="check"
                   class="btn-success"
+                  :class="{ 'btn-shrink': cl.includes('shrink') }"
                   disabled="true"
                   :text="translate('dialog.buttons.' + this.text + '.done')"
                   v-else-if="state === 2"/>
   <buttonWithIcon icon="times"
                   class="btn-danger"
+                  :class="{ 'btn-shrink': cl.includes('shrink') }"
                   disabled="true"
                   :text="translate('dialog.buttons.something-went-wrong')"
                   v-else-if="state === 3"/>
@@ -26,7 +28,7 @@
 <script lang="ts">
 import Vue from 'vue'
 export default Vue.extend({
-  props: ['state', 'text'],
+  props: ['state', 'text', 'icon', 'cl', 'shrink'],
   components: {
     buttonWithIcon: () => import('./button.vue'),
   },

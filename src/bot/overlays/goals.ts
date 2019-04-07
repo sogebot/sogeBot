@@ -97,4 +97,5 @@ class Goals extends Overlay {
   }
 }
 
-module.exports = new Goals();
+export default Goals;
+export { Goals };
