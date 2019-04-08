@@ -340,6 +340,7 @@ class API {
     }
 
     const chatters = _.flatMap(request.data.chatters)
+    this.checkBotModeratorStatus(request.data.chatters.moderators);
 
     let bulkInsert = []
     let bulkParted = []
@@ -379,6 +380,14 @@ class API {
     if (opts.saveToWidget) sendJoinEvent(bulkInsert)
 
     return { state: true, opts }
+  }
+
+  /**
+   * Checks if bot is moderator and set proper status
+   * @param {string[]} mods
+   */
+  async checkBotModeratorStatus (mods) {
+    global.status.MOD = mods.map(o => o.toLowerCase()).includes(global.oauth.settings.bot.username);
   }
 
   async getChannelSubscribers (opts) {
