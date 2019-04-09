@@ -1,5 +1,6 @@
 import { get, now, sample, set } from 'lodash';
 import { join } from 'path';
+import { inspect } from 'util';
 import { isMainThread, parentPort, threadId, Worker } from 'worker_threads';
 
 import { message, timeout } from './commons';
@@ -175,10 +176,16 @@ class Workers {
             });
             if (obj) { set(obj, data.path, data.value); }
           } else {
-            const obj = Object.values(global[data.system]).find((o) => {
-              return o.constructor.name === data.class;
-            });
-            if (obj) { set(obj, data.path, data.value); }
+            try {
+              const obj = Object.values(global[data.system]).find((o) => {
+                return o.constructor.name === data.class;
+              });
+              if (obj) { set(obj, data.path, data.value); }
+            } catch (e) {
+              global.log.error(e.stack);
+              global.log.error('Something went wrong when updating interface variable');
+              global.log.error(inspect(data, undefined, 5));
+            }
           }
           break;
         case 'call':

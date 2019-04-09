@@ -3,6 +3,7 @@
 const util = require('util')
 const _ = require('lodash')
 
+import { Events } from './events'
 import { Permissions } from './permissions'
 const { autoLoad } = require('./commons');
 
@@ -20,7 +21,7 @@ function cluster () {
     global.ui = new (require('./ui'))()
     global.currency = new (require('./currency'))()
     global.users = new (require('./users'))()
-    global.events = new (require('./events'))()
+    global.events = new Events();
     global.customvariables = new (require('./customvariables'))()
     global.twitch = new (require('./twitch'))()
     global.permissions = new Permissions()

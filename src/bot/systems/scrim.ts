@@ -224,4 +224,5 @@ class Scrim extends System {
   }
 }
 
-module.exports = new Scrim();
+export default Scrim;
+export { Scrim };

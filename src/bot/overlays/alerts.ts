@@ -73,4 +73,5 @@ class Alerts extends Overlay {
   }
 }
 
-module.exports = new Alerts();
+export default Alerts;
+export { Alerts };

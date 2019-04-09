@@ -5,6 +5,7 @@ require('module-alias/register')
 
 import { Workers } from './workers';
 import { Permissions } from './permissions'
+import { Events } from './events'
 
 const figlet = require('figlet')
 const os = require('os')
@@ -63,7 +64,7 @@ async function main () {
   global.users = new (require('./users.js'))()
   global.logger = new (require('./logging.js'))()
 
-  global.events = new (require('./events.js'))()
+  global.events = new Events();
   global.customvariables = new (require('./customvariables.js'))()
 
   global.panel = new (require('./panel'))()

@@ -289,4 +289,5 @@ class Bets extends System {
   }
 }
 
-module.exports = new Bets();
+export default Bets;
+export { Bets };

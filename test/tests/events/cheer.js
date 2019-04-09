@@ -5,7 +5,7 @@ const {
 } = require('worker_threads');
 if (!isMainThread) process.exit()
 
-
+const uuidv4 = require('uuid/v4')
 
 require('../../general.js')
 
@@ -23,28 +23,29 @@ describe('Events - cheer event', () => {
 
   describe('#1699 - Cheer event is not waiting for user to save id', function () {
     before(async function () {
-      const event = await global.db.engine.insert('events', {
-        key: 'cheer',
-        name: 'Cheer alert',
-        enabled: true,
-        triggered: {},
-        definitions: {}
-      })
-
+      const id = uuidv4()
       await Promise.all([
+        global.db.engine.insert('events', {
+          id,
+          key: 'cheer',
+          name: 'Cheer alert',
+          enabled: true,
+          triggered: {},
+          definitions: {}
+        }),
         global.db.engine.insert('events.filters', {
           filters: '',
-          eventId: String(event._id)
+          eventId: id
         }),
         global.db.engine.insert('events.operations', {
           key: 'run-command',
-          eventId: String(event._id),
+          eventId: id,
           definitions: {
             isCommandQuiet: true,
             commandToRun: '!points add $username (math.$bits*10)'
           }
-        })
-      ])
+        }),
+      ]);
     })
 
     for (let username of ['losslezos', 'rigneir', 'mikasa_hraje', 'foufhs']) {

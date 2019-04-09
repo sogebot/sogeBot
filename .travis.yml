@@ -1,6 +1,6 @@
 language: node_js
 before_install:
-  - npm install -g mocha
+  - npm install -g mocha typescript tslint
   - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then choco install make; fi
 install:
   - travis_wait make ENV=development

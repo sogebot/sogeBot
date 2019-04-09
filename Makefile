@@ -3,7 +3,7 @@ SHELL   := /bin/bash
 VERSION := `node -pe "require('./package.json').version"`
 ENV     ?= production
 
-all : clean prepare dependencies shrinkwrap ui bot info
+all : clean tslint prepare dependencies shrinkwrap ui bot info
 .PHONY : all
 
 info:
@@ -20,6 +20,10 @@ dependencies:
 shrinkwrap:
 	@echo -ne "\n\t ----- Generating shrinkwrap\n"
 	@npm shrinkwrap
+
+tslint:
+	@echo -ne "\n\t ----- Checking tslint\n"
+	@npx tslint -p tslint.json
 
 ui:
 	@echo -ne "\n\t ----- Generating CSS themes\n"
