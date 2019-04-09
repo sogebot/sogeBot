@@ -107,10 +107,6 @@ export default Vue.extend({
   width: fit-content;
 }
 
-.btn-reverse > div {
-  flex-direction: row-reverse !important;
-}
-
 .btn-with-icon .btn-icon {
   display: inline-block;
   padding: 0.375rem 0.4rem;

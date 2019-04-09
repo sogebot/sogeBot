@@ -13,13 +13,13 @@
                   v-else-if="state === 1"/>
   <buttonWithIcon icon="check"
                   class="btn-success"
-                  :class="{ 'btn-shrink': cl.includes('shrink') }"
+                  :class="{ 'btn-shrink': (cl || '').includes('shrink') }"
                   disabled="true"
                   :text="translate('dialog.buttons.' + this.text + '.done')"
                   v-else-if="state === 2"/>
   <buttonWithIcon icon="times"
                   class="btn-danger"
-                  :class="{ 'btn-shrink': cl.includes('shrink') }"
+                  :class="{ 'btn-shrink': (cl || '').includes('shrink') }"
                   disabled="true"
                   :text="translate('dialog.buttons.something-went-wrong')"
                   v-else-if="state === 3"/>

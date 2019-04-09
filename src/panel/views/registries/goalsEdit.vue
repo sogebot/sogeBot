@@ -16,54 +16,18 @@
       </div>
     </div>
 
-    <panel v-if="!refresh" ref="panel" class="pt-3 pb-3 mt-3 mb-3 m-0 border-top border-bottom row"
-      :state="state"
-      :options="{
-        leftButtons: [
-          {
-            href: '#/registry/goals/list',
-            text: translate('commons.back'),
-            class: 'btn-secondary',
-            icon: 'caret-left'
-          },
-          {
-            event: 'delete',
-            hold: true,
-            textWhenHold: translate('dialog.buttons.hold-to-delete'),
-            text: translate('dialog.buttons.delete'),
-            class: 'btn-danger btn-shrink',
-            icon: 'trash',
-            if: $route.params.id || null,
-          }
-        ],
-        rightButtons: [
-          {
-            href: '/overlays/goals/' + $route.params.id,
-            text: '/overlays/goals/' + $route.params.id,
-            class: 'btn-dark',
-            icon: 'link',
-            if: $route.params.id || null,
-            target: '_blank'
-          },
-          {
-            event: 'save',
-            state: 'save',
-            text: {
-              0: translate('dialog.buttons.saveChanges.idle'),
-              1: translate('dialog.buttons.saveChanges.progress'),
-              2: translate('dialog.buttons.saveChanges.done')
-            },
-            class: 'btn-primary',
-            icon: 'save'
-          }
-        ],
-        hideTableButton: true,
-        hideCardsButton: true,
-        hideSearchInput: true,
-      }"
-      @save="save"
-      @delete="del"
-      @search="search = $event"></panel>
+    <panel>
+      <template v-slot:left>
+        <button-with-icon class="btn-secondary btn-reverse" icon="caret-left" href="#/registry/goals/list">{{translate('commons.back')}}</button-with-icon>
+        <hold-button :if="$route.params.id || null" @trigger="del()" icon="trash" class="btn-danger">
+          <template slot="title">{{translate('dialog.buttons.delete')}}</template>
+          <template slot="onHoldTitle">{{translate('dialog.buttons.hold-to-delete')}}</template>
+        </hold-button>
+      </template>
+      <template v-slot:right>
+        <state-button @click="save()" text="saveChanges" :state="state.save"/>
+      </template>
+    </panel>
 
     <div class="pt-3">
       <form>
@@ -367,7 +331,6 @@ export default Vue.extend({
   data: function () {
     const object: {
       socket: any,
-      refresh: boolean,
       search: string,
       groupId: string,
       group: Goals.Group,
@@ -385,7 +348,6 @@ export default Vue.extend({
     } = {
       socket: io('/overlays/goals', { query: "token=" + this.token }),
       search: '',
-      refresh: false,
       groupId: uuid(),
       goals: [],
       group: {
@@ -418,9 +380,6 @@ export default Vue.extend({
     }
   },
   watch: {
-    refresh: function (val) {
-      if (val) this.$nextTick(() => (this.refresh = false))
-    },
     'group.display.type': function (val) {
       if (val === 'fade') {
         this.$set(this.group, 'display', {
@@ -461,8 +420,6 @@ export default Vue.extend({
         this.socket.emit('set', { collection: 'goals', items: this.goals, where: { groupId: this.groupId } }, (err) => {
           this.state.save = 2
           this.$router.push({ name: 'GoalsRegistryEdit', params: { id: String(d.uid) } })
-          this.$forceUpdate();
-          this.refresh = true;
           setTimeout(() => {
             this.state.save = 0;
           }, 1000)

@@ -16,19 +16,11 @@
       </div>
     </div>
 
-    <panel ref="panel" class="pt-3 pb-3 mt-3 mb-3 m-0 border-top border-bottom row"
-      :options="{
-        leftButtons: [
-          {
-            href: '#/manage/events/edit',
-            text: translate('events.dialog.title.new'),
-            class: 'btn-primary',
-            icon: 'plus'
-          }
-        ],
-        hideTableButton: true
-      }"
-      @search="search = $event"></panel>
+    <panel cards search @search="search = $event">
+      <template v-slot:left>
+        <button-with-icon class="btn-primary btn-reverse" icon="plus" href="#/manage/events/edit">{{translate('events.dialog.title.new')}}</button-with-icon>
+      </template>
+    </panel>
 
     <div class="text-center" v-if="state.loading === 1">
       <fa icon="circle-notch" spin class="text-primary" size="3x" />
@@ -349,10 +341,6 @@
   padding: 0;
   display: inline-block;
   width: fit-content;
-}
-
-.btn-reverse > div {
-  flex-direction: row-reverse !important;
 }
 
 .btn-with-icon .text + .btn-icon {

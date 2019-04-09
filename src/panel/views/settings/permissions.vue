@@ -10,21 +10,11 @@
       </div>
     </div>
 
-    <panel ref="panel" class="pt-3 pb-3 mt-3 mb-3 m-0 border-top border-bottom row"
-           :options="{
-              hideCardsButton: true,
-              hideTableButton: true,
-              hideSearchInput: true,
-              leftButtons: [
-                {
-                  text: translate('core.permissions.addNewPermissionGroup'),
-                  class: 'btn-primary',
-                  icon: 'plus',
-                  event: 'addNewPermissionGroup'
-                }
-              ],
-            }"
-            @addNewPermissionGroup="addNewPermissionGroup()"></panel>
+    <panel>
+      <template v-slot:left>
+        <button-with-icon @click="addNewPermissionGroup" class="btn-primary btn-reverse" icon="plus">{{translate('core.permissions.addNewPermissionGroup')}}</button-with-icon>
+      </template>
+    </panel>
 
     <div class="row">
       <div class="col-3">
