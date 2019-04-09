@@ -2,6 +2,7 @@ import _ from 'lodash';
 import { DateTime } from 'luxon';
 
 import { getLocalizedName, prepare, sendMessage } from '../commons';
+import { debug } from '../debug';
 import System from './_interface';
 
 /*
@@ -58,6 +59,11 @@ class UserInfo extends System {
     } else {
       username = parsed[0].toLowerCase();
     }
+
+    const isFollowerUpdate = await global.api.isFollowerUpdate({
+      id: opts.sender.userId,
+    });
+    debug('userinfo.followage', JSON.stringify(isFollowerUpdate));
 
     const user = await global.users.getByName(username);
     if (_.isNil(user) || _.isNil(user.time) || _.isNil(user.time.follow) || _.isNil(user.is.follower) || !user.is.follower) {

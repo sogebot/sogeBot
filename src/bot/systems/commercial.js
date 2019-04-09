@@ -57,7 +57,7 @@ class Commercial extends System {
       return
     }
 
-    const cid = global.oauth.channelId
+    const cid = global.oauth.settings._.channelId
     // check if duration is correct (30, 60, 90, 120, 150, 180)
     if (_.includes([30, 60, 90, 120, 150, 180], commercial.duration)) {
       const url = `https://api.twitch.tv/kraken/channels/${cid}/commercial`
