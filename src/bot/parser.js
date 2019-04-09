@@ -4,6 +4,7 @@ const _ = require('lodash')
 
 const constants = require('./constants')
 import { debug } from './debug';
+import { sendMessage } from './commons';
 
 class Parser {
   constructor (opts) {
@@ -185,7 +186,7 @@ class Parser {
     } else {
       // user doesn't have permissions for command
       sender['message-type'] = 'whisper'
-      commons.sendMessage(global.translate('permissions.without-permission').replace(/\$command/g, message), sender)
+      sendMessage(global.translate('permissions.without-permission').replace(/\$command/g, message), sender)
     }
   }
 }
