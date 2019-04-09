@@ -1263,21 +1263,22 @@ class API {
   }
 
   async isFollowerUpdate (user) {
-    if (!user.id) return
+    if (!user.id && !user.userId) return
+    const id = user.id || user.userId
 
     // reload user from db
-    user = await global.users.getById(user.id);
+    user = await global.users.getById(id);
 
-    clearTimeout(this.timeouts['isFollowerUpdate-' + user.id])
+    clearTimeout(this.timeouts['isFollowerUpdate-' + id])
 
     const cid = global.oauth.settings._.channelId
-    const url = `https://api.twitch.tv/helix/users/follows?from_id=${user.id}&to_id=${cid}`
+    const url = `https://api.twitch.tv/helix/users/follows?from_id=${id}&to_id=${cid}`
 
     const token = await global.oauth.settings.bot.accessToken
     const needToWait = _.isNil(cid) || cid === '' || (_.isNil(global.overlays) && isMainThread) || token === ''
     const notEnoughAPICalls = this.calls.bot.remaining <= 40 && this.calls.bot.refresh > _.now() / 1000
     if (needToWait || notEnoughAPICalls) {
-      this.timeouts['isFollowerUpdate-' + user.id] = setTimeout(() => this.isFollowerUpdate(user), 1000)
+      this.timeouts['isFollowerUpdate-' + id] = setTimeout(() => this.isFollowerUpdate(user), 1000)
       return null
     }
 
@@ -1317,7 +1318,7 @@ class API {
       }
       const followedAt = user.lock && user.lock.followed_at ? Number(user.time.follow) : 0
       const isFollower = user.lock && user.lock.follower ? user.is.follower : false
-      global.users.setById(user.id, { username: user.username, is: { follower: isFollower }, time: { followCheck: new Date().getTime(), follow: followedAt } }, user.is.follower)
+      global.users.setById(id, { username: user.username, is: { follower: isFollower }, time: { followCheck: new Date().getTime(), follow: followedAt } }, user.is.follower)
       return { isFollower: false, followedAt: null }
     } else {
       // is follower
@@ -1342,7 +1343,7 @@ class API {
             if (typeof system.on.follow === 'function') {
               system.on.follow({
                 username: user.username,
-                userId: user.id,
+                userId: id,
               })
             }
           }
@@ -1350,7 +1351,7 @@ class API {
       }
       const followedAt = user.lock && user.lock.followed_at ? Number(user.time.follow) : parseInt(moment(request.data.data[0].followed_at).format('x'), 10)
       const isFollower = user.lock && user.lock.follower ? user.is.follower : true
-      global.users.set(user.username, { id: user.id, is: { follower: isFollower }, time: { followCheck: new Date().getTime(), follow: followedAt } }, !user.is.follower)
+      global.users.set(user.username, { id, is: { follower: isFollower }, time: { followCheck: new Date().getTime(), follow: followedAt } }, !user.is.follower)
       return { isFollower, followedAt }
     }
   }
