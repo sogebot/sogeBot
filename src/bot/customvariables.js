@@ -48,7 +48,7 @@ class CustomVariables {
         let item
         try {
           item = await global.db.engine.findOne('custom.variables', { _id: String(_id) })
-          item = await global.db.engine.update('custom.variables', { _id: String(_id) }, { currentValue: await this.runScript(item.evalValue, { _current: item.currentValue }), runAt: new Date() })
+          item = await global.db.engine.update('custom.variables', { _id: String(_id) }, { currentValue: await this.runScript(item.evalValue, { _current: item.currentValue }), runAt: Date.now() })
         } catch (e) {
           cb(e.stack, null)
         }
@@ -208,7 +208,7 @@ class CustomVariables {
         _current: item.currentValue,
         ...opts
       })
-      await global.db.engine.update('custom.variables', { variableName }, { currentValue: item.currentValue, runAt: new Date() })
+      await global.db.engine.update('custom.variables', { variableName }, { currentValue: item.currentValue, runAt: Date.now() })
     }
 
     return item.currentValue
@@ -288,10 +288,10 @@ class CustomVariables {
     for (let item of items) {
       try {
         item.runAt = _.isNil(item.runAt) ? 0 : item.runAt
-        const shouldRun = item.runEvery > 0 && new Date().getTime() - new Date(item.runAt).getTime() >= item.runEvery
+        const shouldRun = item.runEvery > 0 && Date.now() - new Date(item.runAt).getTime() >= item.runEvery
         if (shouldRun) {
           let newValue = await this.runScript(item.evalValue, { _current: item.currentValue })
-          await global.db.engine.update('custom.variables', { _id: String(item._id) }, { runAt: new Date(), currentValue: newValue })
+          await global.db.engine.update('custom.variables', { _id: String(item._id) }, { runAt: Date.now(), currentValue: newValue })
           await this.updateWidgetAndTitle(item.variableName)
         }
       } catch (e) {} // silence errors

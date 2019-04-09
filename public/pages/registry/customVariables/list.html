@@ -29,7 +29,7 @@
               {{ commons.translate('registry.customvariables.runEvery.everyXMinutes').replace('$minutes', variable.runEvery / 60 / 1000) }}
             </div>
             <div>
-                {{ commons.translate('registry.customvariables.last-run') }} <strong>{{ variable.runAt ? new Date(variable.runAt).toLocaleString() : commons.translate('commons.never') }}</strong>
+              {{ commons.translate('registry.customvariables.last-run') }} <strong>{{ variable.runAt ? new Date(variable.runAt).toLocaleString() : commons.translate('commons.never') }}</strong>
             </div>
           </span>
           <span v-if="variable.type === 'options'">
