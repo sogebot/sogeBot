@@ -73,8 +73,8 @@ describe('API - getLatest100Followers()', () => {
 
     global.api.timeouts['getLatest100Followers'].isPaused = true
 
-    global.oauth.channelId = '12345'
-    await variable.isEqual('global.oauth.channelId', '12345')
+    global.oauth.settings._.channelId = '12345'
+    await variable.isEqual('global.oauth.settings._.channelId', '12345')
     global.oauth.settings.bot.accessToken = 'foobar'
     await variable.isEqual('global.oauth.settings.bot.accessToken', 'foobar')
     global.oauth.settings.bot.username = '__bot_username__'
@@ -83,7 +83,7 @@ describe('API - getLatest100Followers()', () => {
 
   after(() => {
     global.api.timeouts['getLatest100Followers'].isPaused = false
-    global.oauth.channelId = ''
+    global.oauth.settings._.channelId = ''
     global.oauth.settings.bot.accessToken = ''
   })
 

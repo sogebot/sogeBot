@@ -286,7 +286,7 @@ class Users extends Core {
       })
       socket.on('followedAt.viewer', async (id, cb) => {
         try {
-          const cid = global.oauth.channelId
+          const cid = global.oauth.settings._.channelId
           const url = `https://api.twitch.tv/helix/users/follows?from_id=${id}&to_id=${cid}`
 
           const token = global.oauth.settings.bot.accessToken

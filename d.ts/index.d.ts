@@ -46,8 +46,10 @@ declare namespace NodeJS {
     events: import("../src/bot/events").Events,
     widgets: any,
     oauth: {
-      channelId: string,
       settings: {
+        _: {
+          channelId: string,
+        },
         broadcaster: {
           username: string,
         },
