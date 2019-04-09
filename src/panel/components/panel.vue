@@ -1,105 +1,26 @@
 <template>
-  <div ref="window">
-    <div class="col-auto mr-auto d-flex" v-if="opts.leftButtons.length > 0">
-      <template v-for="(button, lbIndex) of opts.leftButtons">
-        <div v-if="(button.if || typeof button.if === 'undefined')" class="mr-2" v-bind:key="lbIndex">
-          <hold-button @trigger="$emit(button.event)" :class="typeof button.state !== 'undefined' && state[button.state] === 2 ? 'btn-success' : button.class" v-if="button.hold" :icon="button.icon">
-            <template slot="title">{{button.text}}</template>
-            <template slot="onHoldTitle">{{button.textWhenHold}}</template>
-          </hold-button>
-          <a v-else-if="button.href" class="btn btn-shrink btn-with-icon" :href="button.href" :class="typeof button.state !== 'undefined' && state[button.state] === 2 ? 'btn-success' : button.class">
-            <div class="text">
-              <template v-if="typeof button.state !== 'undefined' &&  typeof state[button.state] !== 'undefined'">
-                {{button.text[state[button.state]]}}
-              </template>
-              <template v-else>{{ button.text }}</template>
-            </div>
-            <div class="btn-icon" v-if="button.icon">
-              <template v-if="typeof button.state !== 'undefined' && state[button.state] === 1">
-                <fa icon="circle-notch" spin fixed-width></fa>
-              </template>
-              <template v-else-if="typeof button.state !== 'undefined' && state[button.state] === 2">
-                <fa icon="check" fixed-width></fa>
-              </template>
-              <fa v-else :icon="button.icon" fixed-width></fa>
-            </div>
-          </a>
-          <button @click="$emit(button.event)" type="button" class="btn btn-shrink btn-with-icon" :class="button.class" :icon="button.icon" v-else>
-            <div class="text">
-              <template v-if="typeof button.state !== 'undefined' && typeof state[button.state] !== 'undefined'">
-                {{button.text[state[button.state]]}}
-              </template>
-              <template v-else>{{ button.text }}</template>
-            </div>
-            <div class="btn-icon" v-if="button.icon">
-              <template v-if="typeof button.state !== 'undefined' && state[button.state] === 1">
-                <fa icon="circle-notch" spin fixed-width></fa>
-              </template>
-              <template v-else-if="typeof button.state !== 'undefined' && state[button.state] === 2">
-                <fa icon="check" fixed-width></fa>
-              </template>
-              <fa v-else :icon="button.icon" fixed-width></fa>
-            </div>
-          </button>
-        </div>
-      </template>
+  <div class="pt-3 pb-3 mt-3 mb-3 m-0 border-top border-bottom row">
+    <div class="slot-left col-auto mr-auto d-flex" v-if="!!this.$slots.left" style="height: max-content;">
+      <slot name="left"></slot>
     </div>
-    <div class="col-auto ml-auto text-right form-inline">
-      <template v-for="(button, rbIndex) of opts.rightButtons">
-        <div class="ml-2 d-inline-block" v-bind:key="rbIndex">
-          <a class="btn btn-shrink btn-with-icon" style="flex-direction: row;" v-if="button.href && (button.if || typeof button.if === 'undefined')" :target="button.target || '_self'" :href="button.href" :class="typeof button.state !== 'undefined' && state[button.state] === 2 ? 'btn-success' : button.class">
-            <div class="text">
-              {{ button.text }}
-            </div>
-            <div class="btn-icon" v-if="button.icon">
-              <template v-if="typeof button.state !== 'undefined' && state[button.state] === 1">
-                <fa icon="circle-notch" spin fixed-width></fa>
-              </template>
-              <template v-else-if="typeof button.state !== 'undefined' && state[button.state] === 2">
-                <fa icon="check" fixed-width></fa>
-              </template>
-              <fa v-else :icon="button.icon" fixed-width></fa>
-            </div>
-          </a>
-          <button type="button" class="btn btn-shrink btn-with-icon" style="flex-direction: row;"
-            v-else-if="button.if || typeof button.if === 'undefined'"
-            :class="typeof button.state !== 'undefined' && state[button.state] === 2 ? 'btn-success' : button.class"
-            :disabled="button.state !== 'undefined' && state[button.state] === 1"
-            @click="$emit(button.event)">
-            <div class="text">
-              <template v-if="typeof button.state !== 'undefined' && typeof state[button.state] !== 'undefined'">
-                {{button.text[state[button.state]]}}
-              </template>
-              <template v-else>{{ button.text }}</template>
-            </div>
-            <div class="btn-icon" v-if="button.icon">
-              <template v-if="typeof button.state !== 'undefined' && state[button.state] === 1">
-                <fa icon="circle-notch" spin fixed-width></fa>
-              </template>
-              <template v-else-if="typeof button.state !== 'undefined' && state[button.state] === 2">
-                <fa icon="check" fixed-width></fa>
-              </template>
-              <fa v-else :icon="button.icon" fixed-width></fa>
-            </div>
-          </button>
-        </div>
-      </template>
+    <div class="slot-right col-auto ml-auto text-right form-inline" v-if="!!this.$slots.right || typeof cards === 'string' || typeof table === 'string' || typeof search === 'string'">
+      <slot name="right"></slot>
 
-      <div class="ml-2 d-inline-block" v-if="!opts.hideCardsButton" >
+      <div class="ml-2 d-inline-block" v-if="typeof cards === 'string'" >
         <button class="btn btn-shrink btn-with-icon p-0" style="flex-direction: row;" v-on:click="showAs='cards'" v-bind:class="[ showAs === 'cards' ? 'btn-dark' : 'btn-outline-dark' ]">
           <div class="btn-icon">
             <fa icon="th-large" fixed-width></fa>
           </div>
         </button>
       </div>
-      <div class="ml-2 d-inline-block" v-if="!opts.hideTableButton" >
+      <div class="ml-2 d-inline-block" v-if="typeof table === 'string'" >
         <button class="btn btn-shrink btn-with-icon p-0" style="flex-direction: row;" v-on:click="showAs='table'" v-bind:class="[ showAs === 'table' ? 'btn-dark' : 'btn-outline-dark' ]">
           <div class="btn-icon">
             <fa icon="th-list" fixed-width></fa>
           </div>
         </button>
       </div>
-      <div class="ml-2 d-inline-block" v-if="!opts.hideSearchInput">
+      <div class="ml-2 d-inline-block" v-if="typeof search === 'string'">
         <div class="input-group border w-100"
             :class="{'focus-border': isFocused }">
           <div class="input-group-prepend" @click="resetSearch()">
@@ -111,8 +32,8 @@
           <input
             @focus="isFocused = true"
             @blur="isFocused = false"
-            v-model="search"
-            v-on:keyup.enter="$emit('search', search); isSearching = search.trim().length > 0"
+            v-model="searchString"
+            v-on:keyup.enter="$emit('search', searchString); isSearching = searchString.trim().length > 0"
             type="text"
             class="form-control border-0 bg-white"
             placeholder="Search..."/>
@@ -127,27 +48,17 @@
   import { FontAwesomeLayers } from '@fortawesome/vue-fontawesome'
 
   export default Vue.extend({
-    props: ['commons', 'options', 'state'],
+    props: ['cards', 'table', 'search'],
     components: {
       'font-awesome-layers': FontAwesomeLayers,
       holdButton: () => import('./holdButton.vue'),
     },
     data: function () {
       return {
-        search: '',
+        searchString: '',
         showAs: 'cards',
         isFocused: false,
         isSearching: false,
-        opts: {
-          leftButtons: [],
-          rightButtons: [],
-          filters: [],
-
-          hideCardsButton: false,
-          hideTableButton: false,
-          hideSearchInput: false,
-          ...this.options
-        }
       }
     },
     watch: {
@@ -157,12 +68,12 @@
     },
     mounted: function () {
       // set showAs if cards are hidden
-      if (this.opts.hideCardsButton) this.showAs = 'table'
+      if (!!this.cards) this.showAs = 'table'
     },
     methods: {
       resetSearch() {
         if (this.isSearching) {
-          this.search = ''
+          this.searchString = ''
           this.isSearching = false
           this.$emit('search', '')
         }
@@ -202,5 +113,13 @@
 
 .btn-with-icon .text {
   padding: 0.375rem 0.4rem;
+}
+
+.slot-left > * {
+  margin-right: .5rem;
+}
+
+.slot-right > * {
+  margin-left: .5rem;
 }
 </style>

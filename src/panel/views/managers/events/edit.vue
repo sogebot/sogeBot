@@ -15,48 +15,18 @@
       </div>
     </div>
 
-    <panel v-if="!refresh" ref="panel" class="pt-3 pb-3 mt-3 mb-3 m-0 border-top border-bottom row"
-      :state="state"
-      :options="{
-        leftButtons: [
-          {
-            href: '#/manage/events/list',
-            text: translate('commons.back'),
-            class: 'btn-secondary',
-            icon: 'caret-left'
-          },
-          {
-            event: 'delete',
-            hold: true,
-            textWhenHold: translate('dialog.buttons.hold-to-delete'),
-            text: translate('dialog.buttons.delete'),
-            class: 'btn-danger btn-shrink',
-            icon: 'trash',
-            if: $route.params.id || null,
-          }
-        ],
-        rightButtons: [
-          {
-            event: 'save',
-            state: 'save',
-            text: {
-              0: translate('dialog.buttons.saveChanges.idle'),
-              1: translate('dialog.buttons.saveChanges.progress'),
-              2: translate('dialog.buttons.saveChanges.done')
-            },
-            class: 'btn-primary',
-            icon: 'save'
-          }
-        ],
-        hideTableButton: true,
-        hideCardsButton: true,
-        hideSearchInput: true,
-      }"
-      @save="save()"
-      @delete="del()"
-      @search="search = $event"></panel>
-
-
+    <panel>
+      <template v-slot:left>
+        <button-with-icon class="btn-secondary btn-reverse" icon="caret-left" href="#/manage/events/list">{{translate('commons.back')}}</button-with-icon>
+        <hold-button :if="$route.params.id || null" @trigger="del()" icon="trash" class="btn-danger">
+          <template slot="title">{{translate('dialog.buttons.delete')}}</template>
+          <template slot="onHoldTitle">{{translate('dialog.buttons.hold-to-delete')}}</template>
+        </hold-button>
+      </template>
+      <template v-slot:right>
+        <state-button @click="save()" text="saveChanges" :state="state.save"/>
+      </template>
+    </panel>
 
     <div class="pt-3">
       <h3>{{translate('events.dialog.event')}}</h3>
@@ -178,7 +148,6 @@
           events: Events.SupportedEvent[]
         },
 
-        refresh: boolean,
         state: {
           save: number
         }
@@ -203,7 +172,6 @@
           events: [],
         },
 
-        refresh: false,
         state: {
           save: 0
         }
@@ -259,12 +227,7 @@
             this.$set(this.event, 'definitions', defaultEvent.definitions)
           }
         }
-      },
-      refresh: function (val) {
-        if (val) {
-          this.$nextTick(() => (this.refresh = false))
-        }
-      },
+      }
     },
     mounted() {
       if (this.$route.params.id) {
@@ -388,9 +351,8 @@
             this.state.save = 3
           } else {
             this.state.save = 2
+            console.log(this.state.save)
             this.$router.push({ name: 'EventsManagerEdit', params: { id: String(eventId) } })
-            this.$forceUpdate();
-            this.refresh = true;
           }
           setTimeout(() => {
             this.state.save = 0

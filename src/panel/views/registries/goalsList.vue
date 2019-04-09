@@ -10,19 +10,11 @@
       </div>
     </div>
 
-    <panel ref="panel" class="pt-3 pb-3 mt-3 mb-3 m-0 border-top border-bottom row"
-      :options="{
-        leftButtons: [
-          {
-            href: '#/registry/goals/edit',
-            text: translate('registry.goals.addGoalGroup'),
-            class: 'btn-primary',
-            icon: 'plus'
-          }
-        ],
-        hideTableButton: true
-      }"
-      @search="search = $event"></panel>
+    <panel cards search @search="search = $event">
+      <template v-slot:left>
+        <button-with-icon class="btn-primary btn-reverse" icon="plus" href="#/registry/goals/edit">{{translate('registry.goals.addGoalGroup')}}</button-with-icon>
+      </template>
+    </panel>
 
     <div class="card-deck" v-for="(chunk, index) of _.chunk(_.orderBy(groupsFiltered, 'createdAt', 'desc'), itemsPerPage)" :key="index">
       <div class="card mb-2 p-0" :class="['col-' + (12 / itemsPerPage)]" v-for="group of chunk" :key="group.uid">

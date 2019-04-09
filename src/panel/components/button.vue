@@ -6,7 +6,7 @@
     :target="target">
     <div style="display: flex">
       <div class="text">
-        {{ text }}
+        <slot>{{text}}</slot>
       </div>
       <div class="btn-icon" v-if="icon">
         <fa :icon="icon" fixed-width v-if="spin" spin></fa>
@@ -18,7 +18,7 @@
     @click="$emit(event || 'click')" :disabled="disabled">
     <div style="display: flex">
       <div class="text">
-        {{ text }}
+        <slot>{{text}}</slot>
       </div>
       <div class="btn-icon" v-if="icon">
         <fa :icon="icon" fixed-width v-if="spin" spin></fa>
@@ -60,10 +60,6 @@
   padding: 0;
   display: inline-block;
   width: fit-content;
-}
-
-.btn-reverse > div {
-  flex-direction: row-reverse !important;
 }
 
 .btn-with-icon .text + .btn-icon {

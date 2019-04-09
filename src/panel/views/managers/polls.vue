@@ -10,9 +10,7 @@
       </div>
     </div>
 
-    <panel ref="panel" class="pt-3 pb-3 mt-3 mb-3 m-0 border-top border-bottom row"
-      :options="{ hideTableButton: true }"
-      @search="search = $event"></panel>
+    <panel search cards @search="search = $event"></panel>
 
     <template v-for="(chunkVotes, index) of _.chunk(filteredVotes, itemsPerPage)">
       <div class="card-deck" v-bind:key="index">
