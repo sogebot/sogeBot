@@ -9,14 +9,14 @@ const message = require('../../general.js').message
 
 // users
 const id = _.random(99999, false)
-const channelId = _.random(9999999, false)
+const channelId = String(_.random(9999999, false))
 const testuser = { username: 'testuser', id }
 
 describe('libs/webhooks - follower()', () => {
   before(async () => {
     await db.cleanup()
     await message.prepare()
-    global.oauth.channelId = channelId
+    global.oauth.settings._.channelId = channelId
   })
 
   it('testuser should not be in webhooks cache', async () => {
@@ -37,7 +37,7 @@ describe('libs/webhooks - follower()', () => {
         data: {
           from_id: id,
           from_name: 'testuser',
-          to_id: global.oauth.channelId,
+          to_id: global.oauth.settings._.channelId,
           to_name: 'channeluser'
         }
       })
