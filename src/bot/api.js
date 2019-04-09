@@ -1305,7 +1305,6 @@ class API {
 
       global.log.error(`API: ${url} - ${e.stack}`)
       if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'isFollowerUpdate', api: 'helix', endpoint: url, code: e.response.status, data: e.stack, remaining: this.calls.bot.remaining })
-      else {}
       return null
     }
 
