@@ -69,7 +69,6 @@
                     {{translate('dialog.errors.required')}}
                   </template>
                 </div>
-                {{ getDefinitionValidation(defKey) }}
               </div>
               <div class="form-group col-md-12">
                 <label for="type_selector">{{ translate("events.dialog.filters") }}</label>
