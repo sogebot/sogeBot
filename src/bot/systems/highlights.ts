@@ -2,7 +2,6 @@ import axios from 'axios';
 import { get, isNil, orderBy } from 'lodash';
 import moment from 'moment';
 import 'moment-precise-range-plugin';
-import { isMainThread } from 'worker_threads';
 import { sendMessage } from '../commons';
 import { permission } from '../permissions';
 import System from './_interface';
