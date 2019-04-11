@@ -1,10 +1,15 @@
 <template>
+  <buttonWithIcon icon="exclamation"
+                  :class="'btn-danger'"
+                  disabled="true"
+                  :text="translate('dialog.buttons.' + this.text + '.invalid')"
+                  v-if="invalid"/>
   <buttonWithIcon :icon="icon || 'save'"
                   :class="cl || 'btn-primary'"
                   event="save"
                   @save="save()"
                   :text="translate('dialog.buttons.' + this.text + '.idle')"
-                  v-if="state === 0"/>
+                  v-else-if="state === 0"/>
   <buttonWithIcon icon="spinner"
                   spin="true"
                   :class="cl || 'btn-primary'"
@@ -28,7 +33,7 @@
 <script lang="ts">
 import Vue from 'vue'
 export default Vue.extend({
-  props: ['state', 'text', 'icon', 'cl', 'shrink'],
+  props: ['state', 'text', 'icon', 'cl', 'shrink', 'invalid'],
   components: {
     buttonWithIcon: () => import('./button.vue'),
   },
