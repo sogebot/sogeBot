@@ -24,7 +24,7 @@
         </hold-button>
       </template>
       <template v-slot:right>
-        <state-button @click="save()" text="saveChanges" :state="state.save" :invalid="$v[event.key] && !!$v[event.key].$invalid"/>
+        <state-button @click="save()" text="saveChanges" :state="state.save" :invalid="!!$v.$invalid"/>
       </template>
     </panel>
 
@@ -69,6 +69,7 @@
                     {{translate('dialog.errors.required')}}
                   </template>
                 </div>
+                {{ getDefinitionValidation(defKey) }}
               </div>
               <div class="form-group col-md-12">
                 <label for="type_selector">{{ translate("events.dialog.filters") }}</label>
@@ -140,7 +141,7 @@
   import { FontAwesomeLayers } from '@fortawesome/vue-fontawesome'
   import uuid from 'uuid/v4';
   import { cloneDeep } from 'lodash';
-  import { required, minValue } from "vuelidate/lib/validators";
+  import { required, requiredIf, minValue } from "vuelidate/lib/validators";
 
   import io from 'socket.io-client';
 
@@ -203,45 +204,67 @@
         },
         definitions: {
           fadeOutXCommands: {
-            required,
+            required: requiredIf(function (model) {
+              return typeof model.fadeOutXCommands !== 'undefined'
+            }),
             minValue: minValue(0)
           },
           fadeOutInterval: {
-            required,
+            required: requiredIf(function (model) {
+              return typeof model.fadeOutInterval !== 'undefined'
+            }),
             minValue: minValue(0)
           },
           runEveryXCommands: {
-            required,
+            required: requiredIf(function (model) {
+              return typeof model.runEveryXCommands !== 'undefined'
+            }),
             minValue: minValue(0)
           },
           runEveryXKeywords: {
-            required,
+            required: requiredIf(function (model) {
+              return typeof model.runEveryXKeywords !== 'undefined'
+            }),
             minValue: minValue(0)
           },
           fadeOutXKeywords: {
-            required,
+            required: requiredIf(function (model) {
+              return typeof model.fadeOutXKeywords !== 'undefined'
+            }),
             minValue: minValue(0)
           },
           runInterval: {
-            required,
+            required: requiredIf(function (model) {
+              return typeof model.runInterval !== 'undefined'
+            }),
             minValue: minValue(0)
           },
           commandToWatch: {
-            required
+            required: requiredIf(function (model) {
+              return typeof model.commandToWatch !== 'undefined'
+            }),
           },
           keywordToWatch: {
-            required
+            required: requiredIf(function (model) {
+              return typeof model.keywordToWatch !== 'undefined'
+            }),
           },
           runAfterXMinutes: {
-            required,
+            required: requiredIf(function (model) {
+              return typeof model.runAfterXMinutes !== 'undefined'
+            }),
             minValue: minValue(1)
           },
           runEveryXMinutes: {
-            required,
+            required: requiredIf(function (model) {
+              return typeof model.runEveryXMinutes !== 'undefined'
+            }),
             minValue: minValue(1)
           },
           viewersAtLeast: {
-            required,
+            required: requiredIf(function (model) {
+              return typeof model.viewersAtLeast !== 'undefined'
+            }),
             minValue: minValue(0)
           }
         }
