@@ -44,8 +44,10 @@ Vue.use(VueMoment, {
 });
 
 import BootstrapVue from 'bootstrap-vue';
-
 Vue.use(BootstrapVue);
+
+import Vuelidate from 'vuelidate';
+Vue.use(Vuelidate);
 
 /* import widely used components */
 Vue.component('panel', () => import('./components/panel.vue'));

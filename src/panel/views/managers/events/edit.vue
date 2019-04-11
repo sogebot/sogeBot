@@ -24,7 +24,7 @@
         </hold-button>
       </template>
       <template v-slot:right>
-        <state-button @click="save()" text="saveChanges" :state="state.save"/>
+        <state-button @click="save()" text="saveChanges" :state="state.save" :invalid="!!$v.$invalid"/>
       </template>
     </panel>
 
@@ -33,7 +33,10 @@
       <form>
         <div class="form-group col-md-12">
           <label for="name_input">{{ translate('events.dialog.name') }}</label>
-          <input v-model="event.name" type="text" class="form-control" id="name_input">
+          <input v-model="event.name" type="text" class="form-control" :class="{ 'is-invalid': $v.event.name.$invalid }" id="name_input">
+          <div class="invalid-feedback">
+            {{translate('dialog.errors.required')}}
+          </div>
         </div>
 
         <div class="row no-gutters pl-3 pr-3">
@@ -53,7 +56,19 @@
               </div>
               <div class="form-group col-md-12" v-for="defKey of Object.keys(event.definitions)" :key="defKey">
                 <label for="type_selector">{{ translate("events.definitions." + defKey + ".label") }}</label>
-                <input v-model="event.definitions[defKey]" type="text" class="form-control" :id="defKey + '_input'" :placeholder="translate('events.definitions.' + defKey + '.placeholder')">
+                <template v-if="typeof event.definitions[defKey] === 'boolean'">
+                  <button type="button" class="btn btn-success" v-if="event.definitions[defKey]" @click="event.definitions[defKey] = false">{{translate("dialog.buttons.yes")}}</button>
+                  <button type="button" class="btn btn-danger" v-else @click="event.definitions[defKey] = true">{{translate("dialog.buttons.no")}}</button>
+                </template>
+                <input v-else v-model="event.definitions[defKey]" :class="{ 'is-invalid': getDefinitionValidation(defKey).$invalid }" type="text" class="form-control" :id="defKey + '_input'" :placeholder="translate('events.definitions.' + defKey + '.placeholder')">
+                <div class="invalid-feedback" v-if="getDefinitionValidation(defKey)">
+                  <template v-if="!_.get(getDefinitionValidation(defKey), 'minValue', true)">
+                    {{translate('dialog.errors.minValue').replace('$value', _.get(getDefinitionValidation(defKey), '$params.minValue.min', 0)) }}
+                  </template>
+                  <template v-else>
+                    {{translate('dialog.errors.required')}}
+                  </template>
+                </div>
               </div>
               <div class="form-group col-md-12">
                 <label for="type_selector">{{ translate("events.dialog.filters") }}</label>
@@ -125,6 +140,7 @@
   import { FontAwesomeLayers } from '@fortawesome/vue-fontawesome'
   import uuid from 'uuid/v4';
   import { cloneDeep } from 'lodash';
+  import { required, requiredIf, minValue } from "vuelidate/lib/validators";
 
   import io from 'socket.io-client';
 
@@ -142,6 +158,7 @@
         operations: Events.Operation[],
         operationsClone: Events.Operation[], // used as oldVal to check what actually ichanged
         watchOperationChange: boolean,
+        watchEventChange: boolean,
 
         supported: {
           operations: Events.SupportedOperation[],
@@ -166,6 +183,7 @@
         operations: [],
         operationsClone: [],
         watchOperationChange: true,
+        watchEventChange: true,
 
         supported: {
           operations: [],
@@ -177,6 +195,79 @@
         }
       }
       return object
+    },
+    validations: {
+      event: {
+        name: {
+          required,
+        },
+        definitions: {
+          fadeOutXCommands: {
+            required: requiredIf(function (model) {
+              return typeof model.fadeOutXCommands !== 'undefined'
+            }),
+            minValue: minValue(0)
+          },
+          fadeOutInterval: {
+            required: requiredIf(function (model) {
+              return typeof model.fadeOutInterval !== 'undefined'
+            }),
+            minValue: minValue(0)
+          },
+          runEveryXCommands: {
+            required: requiredIf(function (model) {
+              return typeof model.runEveryXCommands !== 'undefined'
+            }),
+            minValue: minValue(0)
+          },
+          runEveryXKeywords: {
+            required: requiredIf(function (model) {
+              return typeof model.runEveryXKeywords !== 'undefined'
+            }),
+            minValue: minValue(0)
+          },
+          fadeOutXKeywords: {
+            required: requiredIf(function (model) {
+              return typeof model.fadeOutXKeywords !== 'undefined'
+            }),
+            minValue: minValue(0)
+          },
+          runInterval: {
+            required: requiredIf(function (model) {
+              return typeof model.runInterval !== 'undefined'
+            }),
+            minValue: minValue(0)
+          },
+          commandToWatch: {
+            required: requiredIf(function (model) {
+              return typeof model.commandToWatch !== 'undefined'
+            }),
+          },
+          keywordToWatch: {
+            required: requiredIf(function (model) {
+              return typeof model.keywordToWatch !== 'undefined'
+            }),
+          },
+          runAfterXMinutes: {
+            required: requiredIf(function (model) {
+              return typeof model.runAfterXMinutes !== 'undefined'
+            }),
+            minValue: minValue(1)
+          },
+          runEveryXMinutes: {
+            required: requiredIf(function (model) {
+              return typeof model.runEveryXMinutes !== 'undefined'
+            }),
+            minValue: minValue(1)
+          },
+          viewersAtLeast: {
+            required: requiredIf(function (model) {
+              return typeof model.viewersAtLeast !== 'undefined'
+            }),
+            minValue: minValue(0)
+          }
+        }
+      },
     },
     watch: {
       'operations': {
@@ -219,6 +310,8 @@
         deep: true
       },
       'event.key': function (val) {
+        if (!this.watchEventChange) return;
+
         this.$set(this.event, 'definitions', {}) // reload definitions
 
         const defaultEvent = this.supported.events.find((o) => o.id === val)
@@ -233,7 +326,13 @@
       if (this.$route.params.id) {
         this.socket.emit('findOne', { collection: '_events', where: { id: this.$route.params.id } }, (err, data: Events.Event) => {
           if (err) return console.error(err);
-          this.event = data;
+          this.watchEventChange = false;
+          this.$set(this.event, 'id', data.id);
+          this.$set(this.event, 'key', data.key);
+          this.$set(this.event, 'name', data.name);
+          this.$set(this.event, 'enabled', data.enabled);
+          this.$set(this.event, 'definitions', data.definitions);
+          this.$nextTick(() => (this.watchEventChange = true));
         })
         this.socket.emit('find', { collection: '_events.operations', where: { eventId: this.$route.params.id } }, (err, data: Events.Operation[]) => {
           if (err) return console.error(err);
@@ -332,6 +431,9 @@
       })
     },
     methods: {
+      getDefinitionValidation(key) {
+        return this._.get(this, '$v.event.definitions.' + key, { $invalid: false });
+      },
       del: function () {
         this.socket.emit('delete.event', this.event.id, (err, eventId) => {
           if (err) {

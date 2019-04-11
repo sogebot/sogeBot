@@ -3,6 +3,10 @@
     "edit": "Upravit",
     "add": "Přidat"
   },
+  "errors": {
+    "required": "Toto pole nesmí být prázdné.",
+    "minValue": "Nejnižší hodnota tohoto pole je $value."
+  },
   "buttons": {
      "reorder": "Uspořádat",
     "upload": {
@@ -19,6 +23,7 @@
     },
     "saveChanges": {
       "idle": "Uložit změny",
+      "invalid": "Nelze uložit změny",
       "progress": "Ukládání změn",
       "done": "Změny uloženy"
     },

@@ -3,6 +3,10 @@
     "edit": "Edit",
     "add": "Add"
   },
+  "errors": {
+    "required": "This input cannot be empty.",
+    "minValue": "Lowest value of this input is $value."
+  },
   "buttons": {
     "reorder": "Reorder",
     "upload": {
@@ -19,6 +23,7 @@
     },
     "saveChanges": {
       "idle": "Save changes",
+      "invalid": "Cannot save changes",
       "progress": "Saving changes",
       "done": "Changes saved"
     },
