@@ -193,6 +193,8 @@ e.g. `(api|https://httpbin.org/get?test=a\\nb) Lorem (api.args.test)`
 
 `(list.!alias)` - will return list of your visible !aliases
 
+`(list.price)` - will return list of your set prices
+
 `(list.command)` - will return list of your visible custom commands
 
 `(list.command.<permissionName>)` - will return list of your visible custom commands for permission

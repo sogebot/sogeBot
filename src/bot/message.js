@@ -302,11 +302,13 @@ class Message {
       '(list.#)': async function (filter) {
         let [system, permission] = filter.replace('(list.', '').replace(')', '').split('.')
 
-        let [alias, commands, cooldowns, ranks] = await Promise.all([
+        let [alias, commands, cooldowns, ranks, prices] = await Promise.all([
           global.db.engine.find(global.systems.alias.collection.data, { visible: true, enabled: true }),
           global.db.engine.find(global.systems.customCommands.collection.data, { visible: true, enabled: true }),
           global.db.engine.find(global.systems.cooldown.collection.data, { enabled: true }),
-          global.db.engine.find(global.systems.ranks.collection.data)])
+          global.db.engine.find(global.systems.ranks.collection.data),
+          global.db.engine.find(global.systems.price.collection.data, { enabled: true })
+        ])
 
         switch (system) {
           case 'alias':
@@ -342,6 +344,13 @@ class Message {
               const time = o.miliseconds
               return o.key + ': ' + (parseInt(time, 10) / 1000) + 's'
             }).join(', ')
+            return list.length > 0 ? list : ' '
+          case 'price':
+            list = (await Promise.all(
+                _.map(prices, async (o) => {
+                  return `${o.command} (${o.price}${await global.systems.points.getPointsName(o.price)})`
+                })
+              )).join(', ')
             return list.length > 0 ? list : ' '
           case 'ranks':
             list = _.map(_.orderBy(ranks, 'hours', 'asc'), (o) => {
