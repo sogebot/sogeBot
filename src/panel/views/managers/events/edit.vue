@@ -269,12 +269,6 @@
           }
         }
       },
-      'command-send-x-times': ['event.name', 'event.definitions.fadeOutXCommands', 'event.definitions.fadeOutInterval', 'event.definitions.runEveryXCommands', 'event.definitions.commandToWatch', 'event.definitions.runInterval'],
-      'keyword-send-x-times': ['event.name', 'event.definitions.fadeOutXKeywords', 'event.definitions.fadeOutInterval', 'event.definitions.runEveryXKeywords', 'event.definitions.keywordToWatch', 'event.definitions.runInterval'],
-      'stream-is-running-x-minutes': ['event.name', 'event.definitions.runAfterXMinutes'],
-      'every-x-minutes-of-stream': ['event.name', 'event.definitions.runAfterXMinutes'],
-      'hosted': ['event.name', 'event.definitions.viewersAtLeast'],
-      'raid': ['event.name', 'event.definitions.viewersAtLeast'],
     },
     watch: {
       'operations': {
