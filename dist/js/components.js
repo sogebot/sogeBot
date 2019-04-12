@@ -981,6 +981,18 @@ window.configurableList = {
   `
 }
 
+window.highlightsUrlGenerator = {
+  props: ['values'],
+  data() {
+    return {
+      currentValues: this.values,
+    }
+  },
+  template: `
+    <div>asdsadsadsa{{ currentValues }}</div>
+  `
+}
+
 /* sortableList */
 window.sortableList = {
   props: ['values', 'toggle', 'toggleonicon', 'toggleofficon', 'title'],

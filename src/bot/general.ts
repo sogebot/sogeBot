@@ -51,41 +51,22 @@ class General extends Core {
     this.setStatus({...opts, enable: false});
   }
 
-  private async onLangUpdate() {
+  public async onLangUpdate() {
     global.workers.sendToAll({ type: 'call', ns: 'lib.translate', fnc: '_load' });
     await global.lib.translate._load();
     global.log.warning(global.translate('core.lang-selected'));
   }
 
-  private async onLangLoad() {
+  public async onLangLoad() {
     await global.lib.translate._load();
   }
 
-  private setValue(opts: CommandOptions) {
+  public setValue(opts: CommandOptions) {
     // => alias of global.configuration.setValue
     global.configuration.setValue(opts);
   }
 
-  private async setStatus(opts: CommandOptions & { enable: boolean }) {
-    if (opts.parameters.trim().length === 0) { return; }
-    try {
-      const [type, name] = opts.parameters.split(' ');
-
-      if (type !== 'system' && type !== 'game') {
-        throw new Error('Not supported');
-      }
-
-      if (isNil(global[type + 's'][name])) {
-        throw new Error(`Not found - ${type}s - ${name}`);
-      }
-
-      global[type][name].status({ state: opts.enable });
-    } catch (e) {
-      global.log.error(e.message);
-    }
-  }
-
-  private async debug() {
+  public async debug() {
     const widgets = await global.db.engine.find('widgets');
 
     const oauth = {
@@ -126,6 +107,25 @@ class General extends Core {
     global.log.debug(`WIDGETS      | ${map(widgets, 'id').join(', ')}`);
     global.log.debug(`OAUTH        | BOT ${oauth.bot} | BROADCASTER ${oauth.broadcaster}`);
     global.log.debug('======= END OF DEBUG MESSAGE =======');
+  }
+
+  private async setStatus(opts: CommandOptions & { enable: boolean }) {
+    if (opts.parameters.trim().length === 0) { return; }
+    try {
+      const [type, name] = opts.parameters.split(' ');
+
+      if (type !== 'system' && type !== 'game') {
+        throw new Error('Not supported');
+      }
+
+      if (isNil(global[type + 's'][name])) {
+        throw new Error(`Not found - ${type}s - ${name}`);
+      }
+
+      global[type][name].status({ state: opts.enable });
+    } catch (e) {
+      global.log.error(e.message);
+    }
   }
 }
 

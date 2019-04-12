@@ -18,10 +18,20 @@ class Highlights extends System {
   constructor() {
     const options: InterfaceSettings = {
       settings: {
+        generator: {
+          urls: [],
+        },
         commands: [
           { name: '!highlight list', permission: permission.CASTERS },
           { name: '!highlight', permission: permission.CASTERS },
         ],
+      },
+      ui: {
+        generator: {
+          urls: {
+            type: 'highlights-url-generator',
+          },
+        },
       },
     };
     super(options);

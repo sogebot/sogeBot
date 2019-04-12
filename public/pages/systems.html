@@ -21,6 +21,7 @@
             <div class="card-body">
               <div v-if="typeof value === 'object' && !defaultValue.startsWith('_')" class="p-0 pl-2 pr-2 " v-for="(currentValue, defaultValue) of value">
                 <template v-if="typeof ui[category] !== 'undefined' && typeof ui[category][defaultValue] !== 'undefined'">
+                    {{ui[category][defaultValue].type}}
                   <sortable-list
                     v-if="ui[category][defaultValue].type === 'sortable-list'"
                     :values="value[ui[category][defaultValue].values]"
@@ -30,6 +31,11 @@
                     :title="'systems.' + selectedSystem + '.settings.' + defaultValue"
                     @update="value[ui[category][defaultValue].toggle] = $event.toggle; value[defaultValue] = $event.value; triggerDataChange()"
                     class="pt-1 pb-1"></sortable-list>
+                  <highlights-url-generator
+                    v-else-if="ui[category][defaultValue].type === 'highlights-url-generator'"
+                    :values="currentValue"
+                    v-on:update="value[defaultValue] = $event; triggerDataChange()"
+                  />
                   <component
                     v-else
                     :is="ui[category][defaultValue].type"
@@ -163,7 +169,8 @@
         'command-input-with-permission': commandInputWithPermissions,
         'textarea-from-array': textAreaFromArray,
         'configurable-list': configurableList,
-        'sortable-list': sortableList
+        'sortable-list': sortableList,
+        'highlights-url-generator': highlightsUrlGenerator
       },
       data: {
         socket: { _panel: io({ query: "token=" + token }) },
