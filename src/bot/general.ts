@@ -70,7 +70,7 @@ class General extends Core {
       bot: global.oauth.settings.bot.username !== '',
     };
 
-    const lang = this.settings.configuration.lang;
+    const lang = this.settings.lang;
     const mute = global.tmi.settings.chat.mute;
 
     const enabledSystems: any = {};
