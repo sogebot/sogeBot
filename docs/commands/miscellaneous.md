@@ -5,9 +5,7 @@
 
 `!age <optional-username>` - how old is users account
 
-`!set list` - bot will print out list of all configuration
-
-`!set lang <language>` - will set language of your bot responses, currently available en, cs
+`!set general.settings.lang <language>` - will set language of your bot responses, currently available en, cs
 
 `!uptime` - how long your stream is online
 
