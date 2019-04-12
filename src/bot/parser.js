@@ -86,7 +86,8 @@ class Parser {
       global.users,
       global.permissions,
       global.twitch,
-      global.general
+      global.general,
+      global.tmi,
     ]
     for (let system of Object.entries(global.systems)) {
       list.push(system[1])
