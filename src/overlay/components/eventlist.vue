@@ -4,9 +4,9 @@
     v-for="event of events"
     :key="event._id"
     class="event"
-    :class="[event.event]">
+    :class="[event.type]">
     <strong class="username">{{ event.username }}</strong>
-    <span class="event">{{ event.event }}</span>
+    <span class="event">{{ event.summary }}</span>
   </li>
 </ul>
 </template>
@@ -31,6 +31,8 @@
         var ignore = this.urlParam('ignore') || ''; ignore = ignore.split(',')
         var count = this.urlParam('count') || 5
 
+        console.debug({order, display, ignore, count})
+
         data = _.chunk(
           _.orderBy(
             // filter out ignored events
@@ -39,10 +41,10 @@
         data = _.orderBy(data, 'timestamp', order) // re-order as set in order
 
         for (let event of data) {
-          if (event.event === 'resub') event.event = event.subStreak + 'x ' + translations['overlays-eventlist-resub']
-          else if (event.event === 'cheer') event.event = event.bits + ' ' + translations['overlays-eventlist-cheer']
-          else if (event.event === 'tip') event.event = event.currency + parseFloat(event.amount).toFixed(2)
-          else event.event = translations['overlays-eventlist-' + event.event]
+          if (event.event === 'resub') event.summary = event.subStreak + 'x ' + translations['overlays-eventlist-resub']
+          else if (event.event === 'cheer') event.summary = event.bits + ' ' + translations['overlays-eventlist-cheer']
+          else if (event.event === 'tip') event.summary = event.currency + parseFloat(event.amount).toFixed(2)
+          else event.summary = translations['overlays-eventlist-' + event.event]
 
           let generatedOutput = ''
           for (let toShow of display) {
