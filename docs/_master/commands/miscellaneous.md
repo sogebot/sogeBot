@@ -7,7 +7,7 @@
 
 `!set list` - bot will print out list of all configuration
 
-`!set core.general.lang <language>` - will set language of your bot responses, currently available en, cs
+`!set general.settings.lang <language>` - will set language of your bot responses, currently available en, cs
 
 `!uptime` - how long your stream is online
 
