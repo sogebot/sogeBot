@@ -21,7 +21,6 @@
             <div class="card-body">
               <div v-if="typeof value === 'object' && !defaultValue.startsWith('_')" class="p-0 pl-2 pr-2 " v-for="(currentValue, defaultValue) of value">
                 <template v-if="typeof ui[category] !== 'undefined' && typeof ui[category][defaultValue] !== 'undefined'">
-                    {{ui[category][defaultValue].type}}
                   <sortable-list
                     v-if="ui[category][defaultValue].type === 'sortable-list'"
                     :values="value[ui[category][defaultValue].values]"
@@ -34,6 +33,7 @@
                   <highlights-url-generator
                     v-else-if="ui[category][defaultValue].type === 'highlights-url-generator'"
                     :values="currentValue"
+                    :title="'systems.' + selectedSystem + '.settings.' + defaultValue"
                     v-on:update="value[defaultValue] = $event; triggerDataChange()"
                   />
                   <component

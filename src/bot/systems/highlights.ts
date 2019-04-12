@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { Request, Response } from 'express';
 import { get, isNil, orderBy } from 'lodash';
 import moment from 'moment';
 import 'moment-precise-range-plugin';
@@ -56,6 +57,33 @@ class Highlights extends System {
         cb(null);
       });
     });
+  }
+
+  public async url(req: Request, res: Response) {
+    const url = req.get('host') + req.originalUrl;
+    const settings = this.settings.generator.urls.find((o) => o.url.endsWith(url));
+    if (settings) {
+      if (!(await this.isEnabled())) {
+        return res.status(412).send({ error: 'Highlights system is disabled' });
+      } else {
+        if (!(await global.cache.isOnline())) {
+          return res.status(412).send({ error: 'Stream is offline' });
+        } else {
+          if (settings.clip) {
+            const cid = await global.api.createClip({ hasDelay: false });
+            if (!cid) { // Something went wrong
+              return res.status(403).send({ error: 'Clip was not created!'});
+            }
+          }
+          if (settings.highlight) {
+            this.main({ parameters: '', sender: null });
+          }
+          return res.status(200).send({ ok: true });
+        }
+      }
+    } else {
+      return res.status(404).send({ error: 'Unknown highlights link' });
+    }
   }
 
   public async main(opts) {

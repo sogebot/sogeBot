@@ -982,14 +982,53 @@ window.configurableList = {
 }
 
 window.highlightsUrlGenerator = {
-  props: ['values'],
+  props: ['values', 'title'],
   data() {
     return {
       currentValues: this.values,
+      translatedTitle: commons.translate(this.title)
+    }
+  },
+  methods: {
+    onChange: function () {
+      this.$emit('update', this.currentValues)
+    },
+    removeItem: function (index) {
+      this.currentValues.splice(index, 1)
     }
   },
   template: `
-    <div>asdsadsadsa{{ currentValues }}</div>
+  <div class="d-flex">
+    <div class="input-group-prepend">
+      <span class="input-group-text">
+        <template v-if="typeof translatedTitle === 'string'">{{ translatedTitle }}</template>
+        <template v-else>
+          {{ translatedTitle.title }}
+          <small class="textInputTooltip text-info" data-toggle="tooltip" data-html="true" :title="translatedTitle.help">[?]</small>
+        </template>
+      </span>
+    </div>
+    <ul class="list-group list-group-flush w-100 border border-input">
+      <li class="list-group-item border-0 d-flex" v-for='(v, index) of currentValues'>
+        <div class="w-100" :key="index">
+          <input type="text" class="form-control" v-model="v.url" readonly="true"/>
+        </div>
+        <button class="btn" :class="{ 'btn-success': v.clip, 'btn-danger': !v.clip }" @click="v.clip = !v.clip; onChange();">CLIP</button>
+        <button class="btn" :class="{ 'btn-success': v.highlight, 'btn-danger': !v.highlight }" @click="v.highlight = !v.highlight; onChange();">HIGHLIGHT</button>
+
+        <button class="btn btn-outline-dark border-0" @click="removeItem(index); onChange()"><i class="fas fa-times"></i></button>
+      </li>
+      <li class="list-group-item">
+        <button class="btn btn-success" type="button" @click="currentValues.push({
+          url: window.location.origin + '/highlights/' + UUID(),
+          clip: false,
+          highlight: false,
+        }); onChange();">
+          <i class="fas fa-plus"></i> Generate new url
+        </button>
+      </li>
+    </ul>
+  </div>
   `
 }
 
