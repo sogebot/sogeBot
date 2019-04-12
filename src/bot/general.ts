@@ -1,8 +1,9 @@
 import config from '@config';
 import { readdir } from 'fs';
 import gitCommitInfo from 'git-commit-info';
-import { get, isNil, map } from 'lodash';
+import { get, isBoolean, isFinite, isNil, isNumber, isString, map, set } from 'lodash';
 import Core from './_interface';
+import { sendMessage } from './commons';
 import { permission } from './permissions';
 
 class General extends Core {
@@ -61,11 +62,6 @@ class General extends Core {
     await global.lib.translate._load();
   }
 
-  public setValue(opts: CommandOptions) {
-    // => alias of global.configuration.setValue
-    global.configuration.setValue(opts);
-  }
-
   public async debug() {
     const widgets = await global.db.engine.find('widgets');
 
@@ -74,7 +70,7 @@ class General extends Core {
       bot: global.oauth.settings.bot.username !== '',
     };
 
-    const lang = global.general.settings.configuration.lang;
+    const lang = this.settings.configuration.lang;
     const mute = global.tmi.settings.chat.mute;
 
     const enabledSystems: any = {};
@@ -107,6 +103,42 @@ class General extends Core {
     global.log.debug(`WIDGETS      | ${map(widgets, 'id').join(', ')}`);
     global.log.debug(`OAUTH        | BOT ${oauth.bot} | BROADCASTER ${oauth.broadcaster}`);
     global.log.debug('======= END OF DEBUG MESSAGE =======');
+  }
+
+  public async setValue(opts: CommandOptions) {
+    // get value so we have a type
+    const splitted = opts.parameters.split(' ');
+    const pointer = splitted.shift();
+    let newValue = splitted.join(' ');
+    if (!pointer) {
+      return sendMessage(`$sender, settings does not exists`, opts.sender);
+    }
+    const currentValue = await get(global, pointer, undefined);
+    if (typeof currentValue !== 'undefined') {
+      if (isBoolean(currentValue)) {
+        newValue = newValue.toLowerCase().trim();
+        if (['true', 'false'].includes(newValue)) {
+          set(global, pointer, newValue === 'true');
+          sendMessage(`$sender, ${pointer} set to ${newValue}`, opts.sender);
+        } else {
+          sendMessage('$sender, !set error: bool is expected', opts.sender);
+        }
+      } else if (isNumber(currentValue)) {
+        if (isFinite(Number(newValue))) {
+          set(global, pointer, Number(newValue));
+          sendMessage(`$sender, ${pointer} set to ${newValue}`, opts.sender);
+        } else {
+          sendMessage('$sender, !set error: number is expected', opts.sender);
+        }
+      } else if (isString(currentValue)) {
+        set(global, pointer, newValue);
+        sendMessage(`$sender, ${pointer} set to '${newValue}'`, opts.sender);
+      } else {
+        sendMessage(`$sender, ${pointer} is not supported settings to change`, opts.sender);
+      }
+    } else {
+      sendMessage(`$sender, ${pointer} settings not exists`, opts.sender);
+    }
   }
 
   private async setStatus(opts: CommandOptions & { enable: boolean }) {

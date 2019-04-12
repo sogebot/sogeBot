@@ -16,7 +16,6 @@ function cluster () {
   }
 
   try {
-    global.configuration = new (require('./configuration'))()
     global.general = new (require('./general'))()
     global.ui = new (require('./ui'))()
     global.currency = new (require('./currency'))()
