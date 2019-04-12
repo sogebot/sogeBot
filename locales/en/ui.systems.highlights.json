@@ -1,5 +1,6 @@
 {
   "settings": {
-    "enabled": "Status"
+    "enabled": "Status",
+    "urls": "Generated URLs"
   }
 }

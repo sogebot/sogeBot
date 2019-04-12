@@ -1,5 +1,6 @@
 {
   "settings": {
-    "enabled": "Status"
+    "enabled": "Status",
+    "urls": "Vygenerované URL"
   }
 }
