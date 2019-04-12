@@ -1,6 +1,5 @@
 <template>
 <ul>
-  {{ event }}
   <li
     v-for="event of events"
     :key="event._id"
