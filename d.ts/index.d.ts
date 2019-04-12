@@ -152,8 +152,8 @@ declare namespace InterfaceSettings {
 
   type UI = {
     [x: string]: {
-      [s: string]: UISelector | UILink | UINumberInput | UIConfigurableList | UISortableList | UITextInput
-    } | boolean | UISelector | UILink | UINumberInput | UIConfigurableList | UISortableList | UITextInput,
+      [s: string]: UISelector | UILink | UINumberInput | UIConfigurableList | UISortableList | UITextInput | UIHighlightsUrlGenerator
+    } | boolean | UISelector | UILink | UINumberInput | UIConfigurableList | UISortableList | UITextInput | UIHighlightsUrlGenerator,
   };
 }
 
@@ -204,6 +204,11 @@ type UISortableList = {
   toggle: string,
   toggleOnIcon: string,
   toggleOffIcon: string,
+  if?: () => boolean,
+}
+
+type UIHighlightsUrlGenerator = {
+  type: 'highlights-url-generator',
   if?: () => boolean,
 }
 

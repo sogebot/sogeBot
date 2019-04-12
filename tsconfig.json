@@ -10,6 +10,7 @@
     "removeComments": true,
     "noImplicitAny": false,
     "noImplicitThis": true,
+    "noUnusedLocals": true,
     "moduleResolution": "node",
     "lib": ["es2018", "dom"],
     "declaration": false,

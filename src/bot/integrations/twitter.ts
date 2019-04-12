@@ -144,6 +144,14 @@ class Twitter extends Integration {
     global.log.info(chalk.yellow('TWITTER: ') + 'Stream for ' + hash + ' was ended.');
   }
 
+  public onStateChange(key: string, value: string) {
+    if (value) {
+      this.connect();
+    } else {
+      this.disconnect();
+    }
+  }
+
   protected async eventHaveCorrectHashtag(event: any, attributes: Events.Attributes): Promise<boolean> {
     const shouldTrigger = event.definitions.hashtag === attributes.tweet.hashtag;
     return shouldTrigger;
@@ -172,14 +180,6 @@ class Twitter extends Integration {
     for (const hash of hashtagsToWatch) {
       // enable rest of hashed
       this.enableStreamForHash(hash);
-    }
-  }
-
-  private onStateChange(key: string, value: string) {
-    if (value) {
-      this.connect();
-    } else {
-      this.disconnect();
     }
   }
 

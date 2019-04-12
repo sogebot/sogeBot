@@ -46,6 +46,11 @@ function Panel () {
     global.webhooks.challenge(req, res)
   })
 
+  // highlights system
+  app.get('/highlights/:id', (req, res) => {
+    global.systems.highlights.url(req, res)
+  })
+
   // static routing
   app.use('/dist', express.static(path.join(__dirname, '..', 'public', 'dist')))
   app.get('/popout/', this.authUser, function (req, res) {
