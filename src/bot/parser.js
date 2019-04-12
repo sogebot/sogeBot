@@ -81,7 +81,6 @@ class Parser {
 
   populateList () {
     const list = [
-      global.configuration,
       global.currency,
       global.events,
       global.users,
