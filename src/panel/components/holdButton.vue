@@ -1,16 +1,18 @@
 <template>
-  <button type="button" ref="button" class="btn btn-with-icon" @mouseup="onMouseUp" @mousedown="onMouseDown" @mouseenter="isMouseOver = true" @mouseleave="isMouseOver = false" :disabled="disabled">
+  <button type="button" ref="button" class="btn btn-with-icon"
+          @mouseup="onMouseUp" @mousedown="onMouseDown" @mouseenter="isMouseOver = true" @mouseleave="isMouseOver = false" :disabled="disabled"
+          :class="{'btn-only-icon': !this.$slots.title && !this.$slots.onHoldTitle}">
     <div style="display: flex; flex-direction: inherit;">
-      <div class="text w-100" :style="{opacity: 1 - this.percentage / 100 }">
-        <template v-if="onMouseDownStarted === 0">
+      <div class="text w-100" :style="{opacity: 1 - this.percentage / 100 }" v-if="!!this.$slots.title || !!this.$slots.onHoldTitle">
+        <template v-if="onMouseDownStarted === 0 && !!this.$slots.title">
           <slot name="title"></slot>
         </template>
-        <template v-else>
+        <template v-else-if="!!this.$slots.onHoldTitle">
           <slot name="onHoldTitle"></slot>
         </template>
       </div>
       <div class="btn-icon" :style="{opacity: 1 - this.percentage / 100 }">
-        <fa :icon="icon" fixed-width></fa>
+        <slot name="icon"><fa :icon="icon" fixed-width></fa></slot>
       </div>
     </div>
   </button>
