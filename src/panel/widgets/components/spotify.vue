@@ -3,6 +3,16 @@
   <div class="card-header">
     <ul class="nav nav-pills" role="tablist">
       <li role="presentation" class="nav-item" style="flex-shrink: 0">
+        <hold-button class="nav-link btn btn-outline-danger border-0 h-100 pl-1 pr-1" @trigger="cleanupSongRequestList()">
+          <template v-slot:icon>
+            <font-awesome-layers>
+              <fa icon="list" transform="left-3"/>
+              <fa icon="times" transform="shrink-8 down-9 right-9"/>
+            </font-awesome-layers>
+          </template>
+        </hold-button>
+      </li>
+      <li role="presentation" class="nav-item" style="flex-shrink: 0">
         <a class="nav-link active" href="#spotify-song-requests" aria-controls="home" role="tab" data-toggle="tab" title="Song Requests">
           <small>{{ requests.length }}</small>
           <fa icon="list" />
@@ -61,11 +71,13 @@
 
 <script>
 import MarqueeText from 'vue-marquee-text-component'
+import { FontAwesomeLayers } from '@fortawesome/vue-fontawesome'
 
 export default {
   props: ['token', 'commons'],
   components: {
     holdButton: () => import('../../components/holdButton.vue'),
+    'font-awesome-layers': FontAwesomeLayers,
     MarqueeText,
   },
   data: function () {
@@ -88,6 +100,10 @@ export default {
     }, 500)
   },
   methods: {
+    cleanupSongRequestList() {
+      this.requests = [];
+      this.socket.emit('set.value', 'uris', this.requests)
+    },
     removeSongRequest(index) {
       this.requests.splice(index, 1)
       this.socket.emit('set.value', 'uris', this.requests)
