@@ -409,14 +409,12 @@ class API {
     }
 
     var request
-    let disable = false
     try {
       request = await axios.get(url, {
         headers: {
           'Authorization': 'Bearer ' + token
         }
       })
-      this.retries.getChannelSubscribers = 0 // reset retry
       const subscribers = request.data.data
 
       if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { data: subscribers, timestamp: _.now(), call: 'getChannelSubscribers', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining })
@@ -436,19 +434,22 @@ class API {
       } else {
         await global.db.engine.update('api.current', { key: 'subscribers' }, { value: subscribers.length + opts.count })
       }
+
+      // reset warning after correct calls (user may have affiliate or have correct oauth)
+      opts.noAffiliateOrPartnerWarningSent = false;
+      opts.notCorrectOauthWarningSent = false;
     } catch (e) {
       const isChannelPartnerOrAffiliate =
         !(e.message !== '422 Unprocessable Entity' ||
          (e.response.data.status === 400 && e.response.data.message === `${getBroadcaster()} does not have a subscription program`))
       if (!isChannelPartnerOrAffiliate) {
-        if (this.retries.getChannelSubscribers >= 15) {
-          disable = true
+        if (!opts.noAffiliateOrPartnerWarningSent) {
+          opts.noAffiliateOrPartnerWarningSent = true
           global.log.warning('Broadcaster is not affiliate/partner, will not check subs')
           global.db.engine.update('api.current', { key: 'subscribers' }, { value: 0 })
-          // caster is not affiliate or partner, don't do calls again
         }
-      } else if (e.message === '403 Forbidden') {
-        disable = true
+      } else if (e.message === '403 Forbidden' && !opts.notCorrectOauthWarningSent) {
+        opts.notCorrectOauthWarningSent = true
         global.log.warning('Broadcaster have not correct oauth, will not check subs')
         global.db.engine.update('api.current', { key: 'subscribers' }, { value: 0 })
       } else {
@@ -456,7 +457,7 @@ class API {
         if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getChannelSubscribers', api: 'helix', endpoint: url, code: e.response.status, data: e.stack, remaining: this.calls.bot.remaining })
       }
     }
-    return { state: true, disable }
+    return { state: true, noAffiliateOrPartnerWarningSent: opts.noAffiliateOrPartnerWarningSent, notCorrectOauthWarningSent: opts.notCorrectOauthWarningSent }
   }
 
   async setSubscribers (subscribers) {
