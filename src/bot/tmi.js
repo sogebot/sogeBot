@@ -608,14 +608,28 @@ class TMI extends Core {
     const isIgnored = await commons.isIgnored(sender)
     if (!isModerated && !isIgnored) {
       if (!skip && !_.isNil(sender.username)) {
+        const subCumulativeMonths = function(senderObj) {
+          if (typeof senderObj.badgeInfo === 'string' && senderObj.badgeInfo.includes('subscriber')) {
+            const match = senderObj.badgeInfo.match(/subscriber\/(\d+)/)
+            if (match) {
+              return Number(match[1]);
+            }
+          }
+          return undefined; // undefined will not change any values
+        }
         let user = await global.db.engine.findOne('users', { id: sender.userId })
         let data = {
           id: sender.userId,
           is: {
             subscriber: (user.lock && user.lock.subscriber ? undefined : typeof sender.badges.subscriber !== 'undefined'),
             moderator: typeof sender.badges.moderator !== 'undefined',
-            vip: typeof sender.badges.vip !== 'undefined'
-          }, username: sender.username }
+            vip: typeof sender.badges.vip !== 'undefined',
+          },
+          stats: {
+            subCumulativeMonths: subCumulativeMonths(sender),
+          },
+          username: sender.username
+        }
 
         // mark user as online
         await global.db.engine.update('users.online', { username: sender.username }, { username: sender.username })
