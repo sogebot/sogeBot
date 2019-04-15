@@ -212,7 +212,6 @@ class Message {
     }
     let param = {
       '$touser': async function (filter) {
-        const sender = (global.tmi.settings.chat.showWithAt ? '@' : '') + attr.sender;
         if (typeof attr.param !== 'undefined') {
           attr.param = attr.param.replace('@', '')
           if (attr.param.length > 0) {
