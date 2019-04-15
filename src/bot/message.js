@@ -211,6 +211,18 @@ class Message {
       }
     }
     let param = {
+      '$touser': async function (filter) {
+        if (typeof attr.param !== 'undefined') {
+          attr.param = attr.param.replace('@', '')
+          if (attr.param.length > 0) {
+            if (global.tmi.settings.chat.showWithAt) {
+              attr.param = '@' + attr.param;
+            }
+            return attr.param;
+          }
+        }
+        return (global.tmi.settings.chat.showWithAt ? '@' : '') + attr.sender;
+      },
       '$param': async function (filter) {
         if (!_.isUndefined(attr.param) && attr.param.length !== 0) return attr.param
         return ''

@@ -106,6 +106,25 @@
 
 `$!_#` - same as variable above, except set message is always silent
 
+`$touser` - is user param variable, if empty, current user is used. This
+param accepts `@user` and `user`
+
+- **example:**
+  - _command:_ `!point`
+  - _response:_ `$sender point to $touser`
+  - _chat:_ `!point @soge__`
+  - _bot response_: `@foobar points to @soge__`
+- **example:**
+  - _command:_ `!point`
+  - _response:_ `$sender point to $touser`
+  - _chat:_ `!point soge__`
+  - _bot response_: `@foobar points to @soge__`
+- **example:**
+  - _command:_ `!point`
+  - _response:_ `$sender point to $touser`
+  - _chat:_ `!point`
+  - _bot response_: `@foobar points to @foobar`
+
 `$param` - is required temporary variable (command without param will not show)
   - **example:**
     - _command:_ `!say`
