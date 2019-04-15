@@ -928,12 +928,16 @@
   },
   "subage": {
     "success": {
-      "never": "$sender, $username is not a channel subscriber",
-      "time": "$sender, $username is subscriber of channel for $diff"
+      "never": "$sender, $username is not a channel subscriber.",
+      "notNow": "$sender, $username is currently not a channel subscriber. In total of $subCumulativeMonths $subCumulativeMonthsName.",
+      "timeWithSubStreak": "$sender, $username is subscriber of channel. Current sub streak for $diff ($subStreak $subStreakMonth) and in total of $subCumulativeMonths $subCumulativeMonthsName.",
+      "time": "$sender, $username is subscriber of channel. In total of $subCumulativeMonths $subCumulativeMonthsName."
     },
     "successSameUsername": {
-      "never": "$sender, you are not not a channel subscriber",
-      "time": "$sender, you are subscriber of channel for $diff"
+      "never": "$sender, you are not a channel subscriber.",
+      "notNow": "$sender, you are currently not a channel subscriber. In total of $subCumulativeMonths $subCumulativeMonthsName.",
+      "timeWithSubStreak": "$sender, you are subscriber of channel. Current sub streak for $diff ($subStreak $subStreakMonth) and in total of $subCumulativeMonths $subCumulativeMonthsName.",
+      "time": "$sender, you are subscriber of channel. In total of $subCumulativeMonths $subCumulativeMonthsName."
     }
   },
   "age": {

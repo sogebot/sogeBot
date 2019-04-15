@@ -100,8 +100,16 @@ class UserInfo extends System {
     }
 
     const user = await global.users.getByName(username);
+    const subCumulativeMonths = _.get(user, 'stats.subCumulativeMonths', undefined);
+    const subStreak = _.get(user, 'stats.subStreak', undefined);
+    const localePath = 'subage.' + (opts.sender.username === username.toLowerCase() ? 'successSameUsername' : 'success') + '.';
+
     if (_.isNil(user) || _.isNil(user.time) || _.isNil(user.time.subscribed_at) || _.isNil(user.is.subscriber) || !user.is.subscriber) {
-      sendMessage(prepare('subage.' + (opts.sender.username === username.toLowerCase() ? 'successSameUsername' : 'success') + '.never', { username }), opts.sender);
+      sendMessage(prepare(localePath + (subCumulativeMonths ? 'notNow' : 'never'), {
+        username,
+        subCumulativeMonths,
+        subCumulativeMonthsName: getLocalizedName(subCumulativeMonths || 0, 'core.months'),
+      }), opts.sender);
     } else {
       const units: string[] = ['years', 'months', 'days', 'hours', 'minutes'];
       const diff = DateTime.fromMillis(user.time.subscribed_at).diffNow(['years', 'months', 'days', 'hours', 'minutes']);
@@ -116,10 +124,14 @@ class UserInfo extends System {
         output.push(0 + ' ' + getLocalizedName(0, 'core.minutes'));
       }
 
-      sendMessage(prepare('subage.' + (opts.sender.username === username.toLowerCase() ? 'successSameUsername' : 'success') + '.time', {
-          username,
-          diff: output.join(', '),
-        }), opts.sender);
+      sendMessage(prepare(localePath + (subStreak ? 'timeWithSubStreak' : 'time'), {
+        username,
+        subCumulativeMonths,
+        subCumulativeMonthsName: getLocalizedName(subCumulativeMonths || 0, 'core.months'),
+        subStreak,
+        subStreakName: getLocalizedName(subStreak || 0, 'core.months'),
+        diff: output.join(', '),
+      }), opts.sender);
     }
   }
 
