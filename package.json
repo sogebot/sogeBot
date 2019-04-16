@@ -67,6 +67,7 @@
     "ytpl": "0.1.14"
   },
   "scripts": {
+    "changelog": "npx conventional-changelog -p angular",
     "build": "cross-env ENV=development make info tslint bot ui",
     "tslint": "tslint -p tslint.json",
     "test": "mocha --recursive --timeout 20000 --exit --require source-map-support/register 2>&1 | tee report && node tools/rerunTests.js",
@@ -145,6 +146,7 @@
     "bootstrap-vue": "2.0.0-rc.16",
     "chai": "4.2.0",
     "clean-webpack-plugin": "2.0.1",
+    "conventional-changelog-cli": "2.0.12",
     "cross-var": "1.1.0",
     "css-loader": "2.1.1",
     "docsify-cli": "4.3.0",
