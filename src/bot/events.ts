@@ -116,6 +116,7 @@ class Events extends Core {
     if (_.get(attributes, 'reset', false)) { return this.reset(eventId); }
 
     const events = await global.db.engine.find('events', { key: eventId, enabled: true });
+
     for (const event of events) {
       const id = event.id;
       const [shouldRunByFilter, shouldRunByDefinition] = await Promise.all([
@@ -141,7 +142,7 @@ class Events extends Core {
     const events = await global.db.engine.find('events', { key: eventId });
     for (const event of events) {
       event.triggered = {};
-      await global.db.engine.update('events', { _id: event._id.toString() }, event);
+      await global.db.engine.update('events', { id: event.id }, event);
     }
   }
 
@@ -309,14 +310,14 @@ class Events extends Core {
   }
 
   public async everyXMinutesOfStream(event, attributes) {
-    // set to new Date() because 0 will trigger event immediatelly after stream start
-    const shouldSave = _.get(event, 'triggered.runEveryXMinutes', 0) === 0;
-    event.triggered.runEveryXMinutes = _.get(event, 'triggered.runEveryXMinutes', new Date());
+    // set to Date.now() because 0 will trigger event immediatelly after stream start
+    const shouldSave = _.get(event, 'triggered.runEveryXMinutes', 0) === 0 || typeof _.get(event, 'triggered.runEveryXMinutes', 0) !== 'number';
+    event.triggered.runEveryXMinutes = _.get(event, 'triggered.runEveryXMinutes', Date.now());
 
     const shouldTrigger = _.now() - new Date(event.triggered.runEveryXMinutes).getTime() >= event.definitions.runEveryXMinutes * 60 * 1000;
     if (shouldTrigger || shouldSave) {
-      event.triggered.runEveryXMinutes = new Date();
-      await global.db.engine.update('events', { _id: event._id.toString() }, event);
+      event.triggered.runEveryXMinutes = Date.now();
+      await global.db.engine.update('events', { id: event.id }, event);
     }
     return shouldTrigger;
   }
@@ -341,7 +342,7 @@ class Events extends Core {
                           && Number(moment.utc().format('X')) - Number(moment.utc(when.online).format('X')) > event.definitions.runAfterXMinutes * 60;
     if (shouldTrigger) {
       event.triggered.runAfterXMinutes = event.definitions.runAfterXMinutes;
-      await global.db.engine.update('events', { _id: event._id.toString() }, event);
+      await global.db.engine.update('events', { id: event.id }, event);
     }
     return shouldTrigger;
   }
@@ -359,7 +360,7 @@ class Events extends Core {
                         (event.definitions.runInterval === 0 && event.triggered.runInterval === 0));
     if (shouldTrigger) {
       event.triggered.runInterval = _.now();
-      await global.db.engine.update('events', { _id: event._id.toString() }, event);
+      await global.db.engine.update('events', { id: event.id }, event);
     }
     return shouldTrigger;
   }
@@ -385,7 +386,7 @@ class Events extends Core {
         event.triggered.runInterval = _.now();
         event.triggered.runEveryXCommands = 0;
       }
-      await global.db.engine.update('events', { _id: event._id.toString() }, event);
+      await global.db.engine.update('events', { id: event.id }, event);
     }
     return shouldTrigger;
   }
@@ -418,7 +419,7 @@ class Events extends Core {
         event.triggered.runInterval = _.now();
         event.triggered.runEveryXKeywords = 0;
       }
-      await global.db.engine.update('events', { _id: event._id.toString() }, event);
+      await global.db.engine.update('events', { id: event.id }, event);
     }
     return shouldTrigger;
   }
@@ -600,19 +601,19 @@ class Events extends Core {
       for (const event of _.merge(commands, keywords)) {
         if (_.isNil(_.get(event, 'triggered.fadeOutInterval', null))) {
           // fadeOutInterval init
-          await global.db.engine.update('events', { _id: event._id.toString() }, { triggered: { fadeOutInterval: _.now() } });
+          await global.db.engine.update('events', { id: event.id }, { triggered: { fadeOutInterval: _.now() } });
         } else {
           if (_.now() - event.triggered.fadeOutInterval >= event.definitions.fadeOutInterval * 1000) {
             // fade out commands
             if (event.key === 'command-send-x-times') {
               if (!_.isNil(_.get(event, 'triggered.runEveryXCommands', null))) {
                 if (event.triggered.runEveryXCommands <= 0) { continue; }
-                await global.db.engine.update('events', { _id: event._id.toString() }, { triggered: { fadeOutInterval: _.now(), runEveryXCommands: event.triggered.runEveryXCommands - event.definitions.fadeOutXCommands } });
+                await global.db.engine.update('events', { id: event.id }, { triggered: { fadeOutInterval: _.now(), runEveryXCommands: event.triggered.runEveryXCommands - event.definitions.fadeOutXCommands } });
               }
             } else if (event.key === 'keyword-send-x-times') {
               if (!_.isNil(_.get(event, 'triggered.runEveryXKeywords', null))) {
                 if (event.triggered.runEveryXKeywords <= 0) { continue; }
-                await global.db.engine.update('events', { _id: event._id.toString() }, { triggered: { fadeOutInterval: _.now(), runEveryXKeywords: event.triggered.runEveryXKeywords - event.definitions.fadeOutXKeywords } });
+                await global.db.engine.update('events', { id: event.id }, { triggered: { fadeOutInterval: _.now(), runEveryXKeywords: event.triggered.runEveryXKeywords - event.definitions.fadeOutXKeywords } });
               }
             }
           }
