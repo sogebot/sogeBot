@@ -248,7 +248,6 @@ class Message {
     let info = {
       '$toptip.#.#': async function (filter) {
         const match = filter.match(/\$toptip\.(?<type>overall|stream)\.(?<value>username|amount|message|currency)/)
-        console.log({filter, match})
         if (!match) {
           return '';
         }
