@@ -26,11 +26,11 @@
       <fa icon="circle-notch" spin class="text-primary" size="3x" />
     </div>
     <div class="alert alert-info" v-else-if="state.loading === 0 && events.length === 0">
-      {{translate('managers.events.noEvents')}}
+      {{translate('events.noEvents')}}
     </div>
     <div class="alert alert-danger" v-else-if="state.loading === 0 && filteredEvents.length === 0 && search.length > 0">
       <fa icon="search" />
-      {{translate('managers.events.noEventsAfterSearch')}}
+      {{translate('events.noEventsAfterSearch')}}
     </div>
     <div v-else>
       <transition-group

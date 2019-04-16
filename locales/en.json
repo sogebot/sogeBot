@@ -106,6 +106,8 @@
     },
     "events": {
       "event": "Event",
+      "noEvents": "No events found in database.",
+      "noEventsAfterSearch": "No events found for this search.",
       "whatsthis": "what's this?",
       "badges": {
         "enabled": "Enabled",

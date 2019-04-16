@@ -112,6 +112,8 @@
     },
     "events": {
       "event": "Událost",
+      "noEvents": "Žádné události nebyly nalezeny v databázi.",
+      "noEventsAfterSearch": "Žádné události pro toto hledání nebyly nalezeny v databázi.",
       "whatsthis": "Co je to?",
       "badges": {
         "enabled": "Zapnuto",
