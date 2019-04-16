@@ -246,9 +246,35 @@ class Message {
       }
     }
     let info = {
-      '(count)': async function (filter) {
-        const count = await global.systems.customCommands.getCountOf(attr.cmd)
-        return String(count)
+      '$toptip.#.#': async function (filter) {
+        const match = filter.match(/\$toptip\.(?<type>overall|stream)\.(?<value>username|amount|message|currency)/)
+        if (!match) {
+          return '';
+        }
+
+        let tips = (await global.db.engine.find('widgetsEventList', { event: 'tip' })).sort((a, b) => {
+          const aTip = global.currency.exchange(a.amount, a.currency, global.currency.settings.currency.mainCurrency);
+          const bTip = global.currency.exchange(b.amount, b.currency, global.currency.settings.currency.mainCurrency)
+          return bTip - aTip;
+        }, 0);
+
+        if (match.groups.type === 'stream') {
+          const whenOnline = (await global.cache.when()).online
+          if (whenOnline) {
+            tips = tips.filter((o) => o.timestamp >= (new Date(whenOnline)).getTime());
+          } else {
+            return '';
+          }
+        }
+
+        if (tips.length > 0) {
+          if (match.groups.value === 'amount') {
+            return Number(tips[0][match.groups.value]).toFixed(2);
+          } else {
+            return tips[0][match.groups.value];
+          }
+        }
+        return '';
       },
       '(game)': async function (filter) {
         return _.get(await global.db.engine.findOne('api.current', { key: 'game' }), 'value', 'n/a')
@@ -733,8 +759,11 @@ class Message {
       let fnc = filters[key]
       let regexp = _.escapeRegExp(key)
 
-      // we want to handle # as \w - number in regexp
-      regexp = regexp.replace(/#/g, '([\\S ]+?)')
+      if (key.startsWith('$')) {
+        regexp = regexp.replace(/#/g, '(\\b.+?\\b)')
+      } else {
+        regexp = regexp.replace(/#/g, '([\\S ]+?)') // default behavior for if
+      }
       let rMessage = this.message.match((new RegExp('(' + regexp + ')', 'g')))
       if (!_.isNull(rMessage)) {
         for (var bkey in rMessage) {

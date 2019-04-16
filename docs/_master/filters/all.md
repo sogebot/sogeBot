@@ -1,11 +1,7 @@
-##### Changelog
-| Version | Description                  |
-| --------|:-----------------------------|
-| 8.1.0   | Add `(count)` command filter |
-
 !> Response filters are usable in notices, custom commands, keywords and text overlay
 
 ## Global variables
+
 `$sender` - returns username of viewer, who triggered this message
 
 `$price` - returns command price
@@ -47,6 +43,22 @@
 `$latestCheerMessage` - Latest Cheer (message)
 
 `$latestCheer` - Latest Cheer (username)
+
+`$toptip.overall.username` - Overall top tip (username)
+
+`$toptip.overall.amount` - Overall top tip (amount)
+
+`$toptip.overall.currency` - Overall top tip (currency)
+
+`$toptip.overall.message` - Overall top tip (message)
+
+`$toptip.stream.username` - Current stream top tip (username)
+
+`$toptip.stream.amount` - Current stream top tip (amount)
+
+`$toptip.stream.currency` - Current stream top tip (currency)
+
+`$toptip.stream.message` - Current stream top tip (message)
 
 `$version` - return current bot version
 

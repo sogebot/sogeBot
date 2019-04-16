@@ -370,6 +370,20 @@
         "latestTipCurrency": "Poslední Tip (měna)",
         "latestTipMessage": "Poslední Tip (zpráva)",
         "latestTip": "Poslední Tip (uživatel)",
+        "toptip": {
+          "overall": {
+            "username": "Top Tip - celkově (uživatel)",
+            "amount": "Top Tip - celkově (počet)",
+            "currency": "Top Tip - celkově (měna)",
+            "message": "Top Tip - celkově (zpráva)"
+          },
+          "stream": {
+            "username": "Top Tip - během streamu (uživatel)",
+            "amount": "Top Tip - během streamu (počet)",
+            "currency": "Top Tip - během streamu (měna)",
+            "message": "Top Tip - během streamu (zpráva)"
+          }
+        },
         "latestCheerAmount": "Poslední Cheer (počet)",
         "latestCheerMessage": "Poslední Cheer (zpráva)",
         "latestCheer": "Poslední Cheer (uživatel)",
