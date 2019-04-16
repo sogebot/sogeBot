@@ -557,7 +557,6 @@ class Events extends Core {
 
       socket.on('save.event', async (opts, cb) => {
         const { event, operations, filters } = opts;
-        global.log.info(require('util').inspect({ event, operations, filters }, false, null));
 
         // first, remove all event related items
         await Promise.all([
