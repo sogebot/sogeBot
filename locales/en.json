@@ -286,6 +286,7 @@
         "subscribers": "Current subscribers count",
         "arg": "Argument",
         "param": "Parameter (required)",
+        "touser": "Username parameter",
         "!param": "Parameter (not required)",
         "alias": "Alias",
         "command": "Command",
