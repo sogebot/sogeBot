@@ -30,7 +30,7 @@
               v-bind:error="hasError.responses && response.response.trim().length === 0"
               v-bind:value="response.response"
               v-bind:placeholder="commons.translate('systems.customcommands.response.placeholder')"
-              v-bind:filters="['global', 'sender', 'param', '!param']"
+              v-bind:filters="['global', 'sender', 'param', '!param', 'touser']"
               v-on:update="response.response = $event"></textarea-with-tags>
             <textarea-with-tags
               v-bind:value="response.filter"

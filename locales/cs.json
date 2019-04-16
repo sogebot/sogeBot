@@ -292,6 +292,7 @@
         "subscribers": "Aktuální počet subscriberů",
         "arg": "Argument",
         "param": "Parametr (nutny)",
+        "touser": "Parametr uživatelské jméno",
         "!param": "Parametr (neni nutny)",
         "alias": "Alias",
         "command": "Příkazy",
