@@ -147,6 +147,14 @@ var commons = {
                 <span class="editable-variable block" data-var="latestCheerAmount" data-lang="responses.variable.latestCheerAmount"></span>
                 <span class="editable-variable block" data-var="latestCheerMessage" data-lang="responses.variable.latestCheerMessage"></span>
                 <span class="editable-variable block" data-var="latestCheer" data-lang="responses.variable.latestCheer"></span>
+                <span class="editable-variable block" data-var="toptip.overall.username" data-lang="responses.variable.toptip.overall.username"></span>
+                <span class="editable-variable block" data-var="toptip.overall.amount" data-lang="responses.variable.toptip.overall.amount"></span>
+                <span class="editable-variable block" data-var="toptip.overall.currency" data-lang="responses.variable.toptip.overall.currency"></span>
+                <span class="editable-variable block" data-var="toptip.overall.message" data-lang="responses.variable.toptip.overall.messge"></span>
+                <span class="editable-variable block" data-var="toptip.stream.username" data-lang="responses.variable.toptip.stream.username"></span>
+                <span class="editable-variable block" data-var="toptip.stream.amount" data-lang="responses.variable.toptip.stream.amount"></span>
+                <span class="editable-variable block" data-var="toptip.stream.currency" data-lang="responses.variable.toptip.stream.currency"></span>
+                <span class="editable-variable block" data-var="toptip.stream.message" data-lang="responses.variable.toptip.stream.message"></span>
                 </div>`)
               div.css('display', 'block')
             }

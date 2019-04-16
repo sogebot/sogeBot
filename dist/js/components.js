@@ -460,6 +460,14 @@ window.textAreaWithTags = {
               <span class="editable-variable block" @click="addVariable('latestTipCurrency')"> {{ commons.translate('responses.variable.latestTipCurrency') }} </span>
               <span class="editable-variable block" @click="addVariable('latestTipMessage')"> {{ commons.translate('responses.variable.latestTipMessage') }} </span>
               <span class="editable-variable block" @click="addVariable('latestTip')"> {{ commons.translate('responses.variable.latestTip') }} </span>
+              <span class="editable-variable block" @click="addVariable('toptip.overall.username')"> {{ commons.translate('responses.variable.toptip.overall.username') }}</span>
+              <span class="editable-variable block" @click="addVariable('toptip.overall.amount')"> {{ commons.translate('responses.variable.toptip.overall.amount') }}</span>
+              <span class="editable-variable block" @click="addVariable('toptip.overall.currency')"> {{ commons.translate('responses.variable.toptip.overall.currency') }}</span>
+              <span class="editable-variable block" @click="addVariable('toptip.overall.message')"> {{ commons.translate('responses.variable.toptip.overall.message') }}</span>
+              <span class="editable-variable block" @click="addVariable('toptip.stream.username')"> {{ commons.translate('responses.variable.toptip.stream.username') }}</span>
+              <span class="editable-variable block" @click="addVariable('toptip.stream.amount')"> {{ commons.translate('responses.variable.toptip.stream.amount') }}</span>
+              <span class="editable-variable block" @click="addVariable('toptip.stream.currency')"> {{ commons.translate('responses.variable.toptip.stream.currency') }}</span>
+              <span class="editable-variable block" @click="addVariable('toptip.stream.message')"> {{ commons.translate('responses.variable.toptip.stream.message') }}</span>
               <span class="editable-variable block" @click="addVariable('latestCheerAmount')"> {{ commons.translate('responses.variable.latestCheerAmount') }} </span>
               <span class="editable-variable block" @click="addVariable('latestCheerMessage')"> {{ commons.translate('responses.variable.latestCheerMessage') }} </span>
               <span class="editable-variable block" @click="addVariable('latestCheer')"> {{ commons.translate('responses.variable.latestCheer') }} </span>

@@ -365,6 +365,20 @@
         "latestTipCurrency": "Latest Tip (currency)",
         "latestTipMessage": "Latest Tip (message)",
         "latestTip": "Latest Tip (username)",
+        "toptip": {
+          "overall": {
+            "username": "Top Tip - overall (username)",
+            "amount": "Top Tip - overall (amount)",
+            "currency": "Top Tip - overall (currency)",
+            "message": "Top Tip - overall (message)"
+          },
+          "stream": {
+            "username": "Top Tip - during stream (username)",
+            "amount": "Top Tip - during stream (amount)",
+            "currency": "Top Tip - during stream (currency)",
+            "message": "Top Tip - during stream (message)"
+          }
+        },
         "latestCheerAmount": "Latest Cheer (amount)",
         "latestCheerMessage": "Latest Cheer (message)",
         "latestCheer": "Latest Cheer (username)",
