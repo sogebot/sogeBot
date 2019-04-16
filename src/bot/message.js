@@ -760,8 +760,11 @@ class Message {
       let fnc = filters[key]
       let regexp = _.escapeRegExp(key)
 
-      // we want to handle # as \w - number in regexp
-      regexp = regexp.replace(/#/g, '([\\S]+)')
+      if (key.startsWith('$')) {
+        regexp = regexp.replace(/#/g, '(\\b.+?\\b)')
+      } else {
+        regexp = regexp.replace(/#/g, '([\\S ]+?)') // default behavior for if
+      }
       let rMessage = this.message.match((new RegExp('(' + regexp + ')', 'g')))
       if (!_.isNull(rMessage)) {
         for (var bkey in rMessage) {
