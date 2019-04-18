@@ -335,7 +335,7 @@
           if (_.isNil(textarea)) return setTimeout(() => this.initializeEvalTextArea(), 1)
 
           this.evalInput = CodeMirror(textarea, {
-            value: this.evalValueInit ? this.evalValueInit : "/* Available functions\n * url(link) - load data from API\n *\n * Available variables: _, _current, users, random, sender (only in custom commands, keyword), param (only in custom command)\n *\n * IMPORTANT: Must contain return statement!\n */\n\nreturn '';",
+            value: this.evalValueInit ? this.evalValueInit : "/* Available functions\n * url(link) - load data from API\n *\n * Available async functions (need to use await): \n\t user() - returns sender user object if used in custom commands, keywords\n\t user('this_is_username') - returns this_is_username user object, random and param variables can be used, no other variables are available \n *\n * Available variables: _, _current, users, random, sender (only in custom commands, keyword), param (only in custom command)\n *\n * IMPORTANT: Must contain return statement!\n */\n\nreturn '';",
             mode:  "javascript",
             lineNumbers: true,
             matchBrackets: true,
