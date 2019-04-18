@@ -104,7 +104,7 @@ class CustomVariables {
 
     // we need to check +1 variables, as they are part of commentary
     const containUsers = !_.isNil(script.match(/users/g)) && script.match(/users/g).length > 1
-    const containRandom = !_.isNil(script.replace(/Math\.random|_\.random/g, '').match(/random/g)) && !_.isNil(script.match(/users/g)) && script.match(/users/g).length > 1
+    const containRandom = !_.isNil(script.replace(/Math\.random|_\.random/g, '').match(/random/g));
     const containOnline = !_.isNil(script.match(/online/g))
     const containUrl = !_.isNil(script.match(/url\(['"](.*?)['"]\)/g))
 
@@ -169,14 +169,29 @@ class CustomVariables {
     // update globals and replace theirs values
     script = (await new Message(script).global({ escape: "'" }))
 
-    let toEval = `(function evaluation () {  ${script} })()`
+    let toEval = `(async function evaluation () {  ${script} })()`
     let context = {
       _: _,
       users: users,
       random: randomVar,
-      sender: global.tmi.settings.chat.showWithAt ? `@${sender}` : `${sender}`,
+      sender,
       param: param,
-      _current: opts._current
+      _current: opts._current,
+      user: async (username) => {
+        const _user = await global.users.getByName(username);
+        const userObj = {
+          username,
+          id: await global.users.getIdByName(username, false),
+          is: {
+            online: await global.db.engine.find('users.online', { username }).length > 0,
+            follower: _.get(_user, 'is.follower', false),
+            vip: _.get(_user, 'is.vip', false),
+            subscriber: _.get(_user, 'is.subscriber', false),
+            mod: await commons.isModerator(username)
+          }
+        }
+        return userObj;
+      }
     }
 
     if (containUrl) {
