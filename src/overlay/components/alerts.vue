@@ -136,14 +136,32 @@ export default {
                       a.leaveAnimation = true // trigger leave animation
                       setTimeout(() => a.finished = true, Number(a.duration || 1000)) // trigger finished
                     }
+                    setTimeout(() => {
+                      // run even if oncanplaythrough wasn't triggered
+                      if (!a.canBePlayed) {
+                        if (!a.thumbnail) {
+                          a.thumbnail = true
+                          el.volume = 0
+                          el.play()
+                          setTimeout(() => {
+                            el.pause()
+                            setTimeout(() => {
+                              if (a.volume) el.volume = Number(a.volume) / 100
+                              a.isLoaded = true
+                              el.play()
+                            }, 1000)
+                          }, 100)
+                        }
+                      }
+                    }, 5000)
                     el.oncanplaythrough = () => {
+                      a.canBePlayed = true
                       if (!a.thumbnail) {
                         a.thumbnail = true
                         el.volume = 0
                         el.play()
                         setTimeout(() => {
                           el.pause()
-                          //el.currentTime = 0
                           setTimeout(() => {
                             if (a.volume) el.volume = Number(a.volume) / 100
                             a.isLoaded = true
