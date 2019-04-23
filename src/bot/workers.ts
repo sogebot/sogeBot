@@ -175,6 +175,9 @@ class Workers {
               return o.constructor.name === data.class;
             });
             if (obj) { set(obj, data.path, data.value); }
+          } else if (data.system === 'widgets') {
+            // widgets are only on master
+            break;
           } else {
             try {
               const obj = Object.values(global[data.system]).find((o) => {
