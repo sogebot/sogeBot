@@ -177,7 +177,7 @@ class Top extends System {
       // remove ignored users
       const ignored: string[] = [];
       for (const user of sorted) {
-        if (await isIgnored(user.username)) {
+        if (isIgnored(user.username)) {
           ignored.push(user.username);
         }
       }
