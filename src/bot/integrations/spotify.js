@@ -163,7 +163,7 @@ class Spotify extends Integration {
     }
 
     // if song is not part of currentUris => save context
-    if (await typeof song.uri !== 'undefined' && this.currentUris !== song.uri && this.uris.length === 0) {
+    if (typeof song.uri !== 'undefined' && this.currentUris !== song.uri && this.uris.length === 0) {
       this.originalUri = song.uri
     }
 
