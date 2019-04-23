@@ -113,7 +113,7 @@ export default {
   },
   watch: {
     displayAs: function (val) {
-      this.socket.emit('settings.update', { displayAs: this.displayAs })
+      this.socket.emit('settings.update', { displayAs: val })
     }
   },
   mounted: function () {
