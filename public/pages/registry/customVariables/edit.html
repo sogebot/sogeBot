@@ -335,7 +335,44 @@
           if (_.isNil(textarea)) return setTimeout(() => this.initializeEvalTextArea(), 1)
 
           this.evalInput = CodeMirror(textarea, {
-            value: this.evalValueInit ? this.evalValueInit : "/* Available functions\n\turl(link) - load data from API\n\tuser(username?: string): Promise<{ username: string, id: string, is: { follower: boolean, mod: boolean, online: boolean, subscriber: boolean, vip: boolean }}> - returns user object (if null -> sender) \n *\n * Available variables: _, _current, users, random, sender (only in custom commands, keyword), param (only in custom command)\n *\n * IMPORTANT: Must contain return statement!\n */\n\nreturn '';",
+            value: this.evalValueInit ||
+`/* Available functions
+    url(link) - load data from API
+    user(username?: string): Promise<{ username: string, id: string, is: { follower: boolean, mod: boolean, online: boolean, subscriber: boolean, vip: boolean }}> - returns user object (if null -> sender)
+ *
+ * Available variables
+    _, _current, users, sender (only in custom commands, keyword), param (only in custom command)
+    random: {
+      online: {
+        viewer: string,
+        follower: string,
+        subscriber: string
+      },
+      viewer: string,
+      follower: string,
+      subscriber: string
+    }
+    stream: {
+      uptime: string,
+      chatMessages: number,
+      currentViewers: number,
+      currentBits: number,
+      currentFollowers: number,
+      currentHosts: number,
+      currentViews: number,
+      currentTips: number,
+      currentWatched: number,
+      currency: string,
+      maxViewers: number,
+      newChatters: number,
+      game: string,
+      status: string
+    }
+ *
+ * IMPORTANT: Must contain return statement!
+ */
+
+return '';`,
             mode:  "javascript",
             lineNumbers: true,
             matchBrackets: true,
@@ -344,6 +381,7 @@
             },
             gutters: ["CodeMirror-lint-markers"]
           })
+          this.evalInput.setSize(null, 1000);
         },
         isUnique: function () {
           if (this.variableName !== this.variableNameInitial) {
