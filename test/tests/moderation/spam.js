@@ -26,7 +26,7 @@ describe('systems/moderation - Spam()', () => {
   describe('moderationSpam=false', async () => {
     before(async () => {
       await db.cleanup()
-      await (global.systems.moderation.settings.spam.enabled = false)
+      global.systems.moderation.settings.spam.enabled = false
       await variable.isEqual('systems.moderation.settings.spam.enabled', false)
     })
 
@@ -45,7 +45,7 @@ describe('systems/moderation - Spam()', () => {
   describe('moderationSpam=true', async () => {
     before(async () => {
       await db.cleanup()
-      await (global.systems.moderation.settings.spam.enabled = true)
+      global.systems.moderation.settings.spam.enabled = true
       await variable.isEqual('systems.moderation.settings.spam.enabled', true)
     })
 
