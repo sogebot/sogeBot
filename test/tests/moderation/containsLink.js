@@ -65,9 +65,9 @@ describe('systems/moderation - containsLink()', () => {
     before(async () => {
       await db.cleanup()
 
-      await (global.systems.moderation.settings.links.includeSpaces = true)
+      global.systems.moderation.settings.links.includeSpaces = true
       await variable.isEqual('systems.moderation.settings.links.includeSpaces', true)
-      await (global.systems.moderation.settings.links.includeClips = true)
+      global.systems.moderation.settings.links.includeClips = true
       await variable.isEqual('systems.moderation.settings.links.includeClips', true)
     })
 
@@ -107,9 +107,9 @@ describe('systems/moderation - containsLink()', () => {
     before(async () => {
       await db.cleanup()
 
-      await (global.systems.moderation.settings.links.includeSpaces = true)
+      global.systems.moderation.settings.links.includeSpaces = true
       await variable.isEqual('systems.moderation.settings.links.includeSpaces', true)
-      await (global.systems.moderation.settings.links.includeClips = false)
+      global.systems.moderation.settings.links.includeClips = false
       await variable.isEqual('systems.moderation.settings.links.includeClips', false)
     })
 
@@ -149,9 +149,9 @@ describe('systems/moderation - containsLink()', () => {
     before(async () => {
       await db.cleanup()
 
-      await (global.systems.moderation.settings.links.includeSpaces = false)
+      global.systems.moderation.settings.links.includeSpaces = false
       await variable.isEqual('systems.moderation.settings.links.includeSpaces', false)
-      await (global.systems.moderation.settings.links.includeClips = true)
+      global.systems.moderation.settings.links.includeClips = true
       await variable.isEqual('systems.moderation.settings.links.includeClips', true)
     })
 
