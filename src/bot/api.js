@@ -102,7 +102,7 @@ class API {
       this._loadCachedStatusAndGame()
 
       this.interval('getCurrentStreamData', constants.MINUTE)
-      this.interval('updateChannelViews', constants.MINUTE)
+      this.interval('updateChannelViewsAndBroadcasterType', constants.MINUTE)
       this.interval('getLatest100Followers', constants.MINUTE)
       this.interval('getChannelHosts', constants.MINUTE)
       this.interval('getChannelSubscribers', 2 * constants.MINUTE)
@@ -404,8 +404,12 @@ class API {
     const needToWait = _.isNil(cid) || cid === '' || _.isNil(global.overlays) || token === ''
     const notEnoughAPICalls = this.calls.bot.remaining <= 30 && this.calls.bot.refresh > _.now() / 1000
 
-    if (needToWait || notEnoughAPICalls) {
-      return { state: false }
+    if (needToWait || notEnoughAPICalls || global.oauth._.settings.broadcasterType === '') {
+      if (!opts.noAffiliateOrPartnerWarningSent) {
+        global.log.warning('Broadcaster is not affiliate/partner, will not check subs')
+        global.db.engine.update('api.current', { key: 'subscribers' }, { value: 0 })
+      }
+      return { state: false, noAffiliateOrPartnerWarningSent: true }
     }
 
     var request
@@ -439,16 +443,7 @@ class API {
       opts.noAffiliateOrPartnerWarningSent = false;
       opts.notCorrectOauthWarningSent = false;
     } catch (e) {
-      const isChannelPartnerOrAffiliate =
-        !(e.message !== '422 Unprocessable Entity' ||
-         (e.response.data.status === 400 && e.response.data.message === `${getBroadcaster()} does not have a subscription program`))
-      if (!isChannelPartnerOrAffiliate) {
-        if (!opts.noAffiliateOrPartnerWarningSent) {
-          opts.noAffiliateOrPartnerWarningSent = true
-          global.log.warning('Broadcaster is not affiliate/partner, will not check subs')
-          global.db.engine.update('api.current', { key: 'subscribers' }, { value: 0 })
-        }
-      } else if (e.message === '403 Forbidden' && !opts.notCorrectOauthWarningSent) {
+      if (e.message === '403 Forbidden' && !opts.notCorrectOauthWarningSent) {
         opts.notCorrectOauthWarningSent = true
         global.log.warning('Broadcaster have not correct oauth, will not check subs')
         global.db.engine.update('api.current', { key: 'subscribers' }, { value: 0 })
@@ -577,7 +572,7 @@ class API {
     return { state: true }
   }
 
-  async updateChannelViews () {
+  async updateChannelViewsAndBroadcasterType () {
     const cid = global.oauth.settings._.channelId
     const url = `https://api.twitch.tv/helix/users/?id=${cid}`
 
@@ -595,7 +590,7 @@ class API {
           'Authorization': 'Bearer ' + token
         }
       })
-      if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'updateChannelViews', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining })
+      if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'updateChannelViewsAndBroadcasterType', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining })
 
       // save remaining api calls
       this.calls.bot.remaining = request.headers['ratelimit-remaining']
@@ -603,7 +598,10 @@ class API {
       this.calls.bot.limit = request.headers['ratelimit-limit']
       global.workers.sendToAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', request.headers['ratelimit-limit'], request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] })
 
-      if (request.data.data.length > 0) await global.db.engine.update('api.current', { key: 'views' }, { value: request.data.data[0].view_count })
+      if (request.data.data.length > 0) {
+        global.oauth.settings._.broadcasterType = request.data.data[0].broadcaster_type
+        await global.db.engine.update('api.current', { key: 'views' }, { value: request.data.data[0].view_count })
+      }
     } catch (e) {
       if (typeof e.response !== 'undefined' && e.response.status === 429) {
         global.workers.sendToAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', 120, 0, e.response.headers['ratelimit-reset'] ] })
@@ -612,7 +610,7 @@ class API {
       }
 
       global.log.error(`${url} - ${e.message}`)
-      if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'updateChannelViews', api: 'helix', endpoint: url, code: e.response.status, data: e.stack, remaining: this.calls.bot.remaining })
+      if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'updateChannelViewsAndBroadcasterType', api: 'helix', endpoint: url, code: e.response.status, data: e.stack, remaining: this.calls.bot.remaining })
     }
     return { state: true }
   }

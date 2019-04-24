@@ -492,6 +492,7 @@ Panel.prototype.registerSockets = util.deprecate(function (options) {
 Panel.prototype.sendStreamData = async function (self, socket) {
   const whenOnline = (await global.cache.when()).online
   var data = {
+    broadcasterType: global.oauth.settings._.broadcasterType,
     uptime: commons.getTime(whenOnline, false),
     currentViewers: _.get(await global.db.engine.findOne('api.current', { key: 'viewers' }), 'value', 0),
     currentSubscribers: _.get(await global.db.engine.findOne('api.current', { key: 'subscribers' }), 'value', 0),

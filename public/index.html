@@ -183,111 +183,126 @@
 
   <!-- SNIPPETS -->
   <div class="stream-info-container container-fluid" id="quickStatsApp">
-    <div class="row">
-      <div class="col-sm stream-info" onclick="saveHighlight()">
-        <h2>
-          <i data-lang="uptime"></i>
-          <small data-lang="click-to-highlight"></small>
-        </h2>
-        <span class="data" id="uptime">{{ uptime }}</span>
-        <span class="stats">&nbsp;</span>
+    <template v-if="!isLoaded">
+      <div class="mx-auto text-center p-3 pt-4">
+        <div class="spinner-grow" role="status"></div>
+      </div>
+    </template>
+    <template v-else>
+      <div class="row">
+        <div class="col-sm stream-info" onclick="saveHighlight()">
+          <h2>
+            <i>{{ commons.translate('uptime') }}</i>
+            <small>{{ commons.translate('click-to-highlight') }}</small>
+          </h2>
+          <span class="data" id="uptime">{{ uptime }}</span>
+          <span class="stats">&nbsp;</span>
+        </div>
+
+        <div class="col-sm stream-info" v-on:click="toggleViewerShow">
+          <h2>
+            <i>{{ commons.translate('viewers') }}</i>
+            <small>{{ commons.translate('click-to-toggle-display') }}</small>
+          </h2>
+          <span class="data" v-html="currentViewersComputed"></span>
+          <span class="stats">&nbsp;</span>
+        </div>
+
+        <div class="col-sm stream-info" v-on:click="toggleViewerShow">
+          <h2>
+            <i>{{ commons.translate('max-viewers') }}</i>
+            <small>{{ commons.translate('click-to-toggle-display') }}</small>
+          </h2>
+          <span class="data" v-html="maxViewersComputed"></span>
+          <span class="stats" v-html="difference(averageStats.maxViewers, maxViewersComputed)"></span>
+        </div>
+
+        <div class="col-sm stream-info" v-on:click="toggleViewerShow">
+          <h2>
+            <i>{{ commons.translate('new-chatters') }}</i>
+            <small>{{ commons.translate('click-to-toggle-display') }}</small>
+          </h2>
+          <span class="data" v-html="newChattersComputed"></span>
+          <span class="stats" v-html="difference(averageStats.newChatters, newChattersComputed)"></span>
+        </div>
+
+        <div class="col-sm stream-info">
+          <h2>{{ commons.translate('chat-messages') }}</h2>
+          <span class="data" v-bind:title="chatMessages">{{ chatMessages | shortenNumber(b_shortenNumber) }}</span>
+          <span class="stats" v-html="difference(averageStats.chatMessages, chatMessages)"></span>
+        </div>
+
+        <div class="col-sm stream-info">
+          <h2>{{ commons.translate('views') }}</h2>
+          <span class="data" v-bind:title="currentViews">{{ currentViews | shortenNumber(b_shortenNumber) }}</span>
+          <span class="stats" v-html="difference(averageStats.currentViews, currentViews)"></span>
+        </div>
+
+        <div class="col-sm stream-info">
+          <h2>{{ commons.translate('hosts') }}</h2>
+          <span class="data">{{ currentHosts }}</span>
+          <span class="stats" id="curHostsChange">&nbsp;</span>
+        </div>
+
+        <div class="col-sm stream-info">
+          <h2>{{ commons.translate('followers') }}</h2>
+          <span class="data" v-bind:title="currentFollowers">{{ currentFollowers | shortenNumber(b_shortenNumber) }}</span>
+          <span class="stats" v-html="difference(averageStats.currentFollowers, currentFollowers)"></span>
+        </div>
+
+        <div class="col-sm stream-info">
+          <h2>{{ commons.translate('subscribers') }}</h2>
+          <template v-if="broadcasterType !== ''">
+            <span class="data">{{ currentSubscribers }}</span>
+            <span class="stats" v-html="difference(averageStats.currentSubscribers, currentSubscribers)"></span>
+          </template>
+          <template v-else>
+            <span class="data text-muted" style="font-size:0.7rem;">{{ commons.translate('not-affiliate-or-partner') }}</span>
+          </template>
+        </div>
+
+        <div class="col-sm stream-info">
+          <h2>{{ commons.translate('bits') }}</h2>
+          <template v-if="broadcasterType !== ''">
+            <span class="data" v-bind:title="currentBits">{{ currentBits | shortenNumber(b_shortenNumber) }}</span>
+            <span class="stats" v-html="difference(averageStats.currentBits, currentBits)"></span>
+          </template>
+          <template v-else>
+            <span class="data text-muted" style="font-size:0.7rem;">{{ commons.translate('not-affiliate-or-partner') }}</span>
+          </template>
+        </div>
+
+        <div class="col-sm stream-info">
+          <h2>{{ commons.translate('tips') }}</h2>
+          <span class="data">{{ Number(currentTips).toFixed(2) }}</span><span class="data ml-0 pl-0">{{ currency }}</span>
+          <span class="stats" v-html="difference(averageStats.currentTips, currentTips, false, currency)"></span>
+        </div>
+
+        <div class="col-sm stream-info">
+          <h2>{{ commons.translate('watched-time') }}</h2>
+          <span class="data">{{ Number(currentWatched / 1000 / 60 / 60).toFixed(1) }}h</span>
+          <span class="stats" v-html="difference(averageStats.currentWatched / 1000 / 60 / 60, currentWatched / 1000 / 60 / 60, false, 'h', 1)"></span>
+        </div>
       </div>
 
-      <div class="col-sm stream-info" v-on:click="toggleViewerShow">
-        <h2>
-          <i data-lang="viewers"></i>
-          <small data-lang="click-to-toggle-display"></small>
-        </h2>
-        <span class="data" v-html="currentViewersComputed"></span>
-        <span class="stats">&nbsp;</span>
-      </div>
+      <div class="row">
+        <div class="col-md stream-info" onclick="changeGT.showDlg()">
+          <h2>
+            <i>{{ commons.translate('game') }}</i>
+            <small>{{ commons.translate('click-to-change') }}</small>
+          </h2>
+          <span class="data" id="game">{{ commons.translate('not-available') }}</span>
+        </div>
 
-      <div class="col-sm stream-info" v-on:click="toggleViewerShow">
-        <h2>
-          <i data-lang="max-viewers"></i>
-          <small data-lang="click-to-toggle-display"></small>
-        </h2>
-        <span class="data" v-html="maxViewersComputed"></span>
-        <span class="stats" v-html="difference(averageStats.maxViewers, maxViewersComputed)"></span>
+        <div class="col stream-info" onclick="changeGT.showDlg()">
+          <h2>
+            <i>{{ commons.translate('title') }}</i>
+            <small>{{ commons.translate('click-to-change') }}</small>
+          </h2>
+          <span class="data" id="title">{{ commons.translate('not-available') }}</span>
+        </div>
       </div>
-
-      <div class="col-sm stream-info" v-on:click="toggleViewerShow">
-        <h2>
-          <i data-lang="new-chatters"></i>
-          <small data-lang="click-to-toggle-display"></small>
-        </h2>
-        <span class="data" v-html="newChattersComputed"></span>
-        <span class="stats" v-html="difference(averageStats.newChatters, newChattersComputed)"></span>
-      </div>
-
-      <div class="col-sm stream-info">
-        <h2 data-lang="chat-messages"></h2>
-        <span class="data" v-bind:title="chatMessages">{{ chatMessages | shortenNumber(b_shortenNumber) }}</span>
-        <span class="stats" v-html="difference(averageStats.chatMessages, chatMessages)"></span>
-      </div>
-
-      <div class="col-sm stream-info">
-        <h2 data-lang="views"></h2>
-        <span class="data" v-bind:title="currentViews">{{ currentViews | shortenNumber(b_shortenNumber) }}</span>
-        <span class="stats" v-html="difference(averageStats.currentViews, currentViews)"></span>
-      </div>
-
-      <div class="col-sm stream-info">
-        <h2 data-lang="hosts"></h2>
-        <span class="data">{{ currentHosts }}</span>
-        <span class="stats" id="curHostsChange">&nbsp;</span>
-      </div>
-
-      <div class="col-sm stream-info">
-        <h2 data-lang="followers"></h2>
-        <span class="data" v-bind:title="currentFollowers">{{ currentFollowers | shortenNumber(b_shortenNumber) }}</span>
-        <span class="stats" v-html="difference(averageStats.currentFollowers, currentFollowers)"></span>
-      </div>
-
-      <div class="col-sm stream-info">
-        <h2 data-lang="subscribers"></h2>
-        <span class="data">{{ currentSubscribers }}</span>
-        <span class="stats" v-html="difference(averageStats.currentSubscribers, currentSubscribers)"></span>
-      </div>
-
-      <div class="col-sm stream-info">
-        <h2 data-lang="bits"></h2>
-        <span class="data" v-bind:title="currentBits">{{ currentBits | shortenNumber(b_shortenNumber) }}</span>
-        <span class="stats" v-html="difference(averageStats.currentBits, currentBits)"></span>
-      </div>
-
-      <div class="col-sm stream-info">
-        <h2 data-lang="tips"></h2>
-        <span class="data">{{ Number(currentTips).toFixed(2) }}</span><span class="data ml-0 pl-0">{{ currency }}</span>
-        <span class="stats" v-html="difference(averageStats.currentTips, currentTips, false, currency)"></span>
-      </div>
-
-      <div class="col-sm stream-info">
-        <h2>
-          <i data-lang="watched-time"></i>
-        </h2>
-        <span class="data">{{ Number(currentWatched / 1000 / 60 / 60).toFixed(1) }}h</span>
-        <span class="stats" v-html="difference(averageStats.currentWatched / 1000 / 60 / 60, currentWatched / 1000 / 60 / 60, false, 'h', 1)"></span>
-      </div>
-    </div>
-
-    <div class="row">
-      <div class="col-md stream-info" onclick="changeGT.showDlg()">
-        <h2>
-          <i data-lang="game"></i>
-          <small data-lang="click-to-change"></small>
-        </h2>
-        <span class="data" id="game" data-lang="not-available"></span>
-      </div>
-
-      <div class="col stream-info" onclick="changeGT.showDlg()">
-        <h2>
-          <i data-lang="title"></i>
-          <small data-lang="click-to-change"></small>
-        </h2>
-        <span class="data" id="title" data-lang="not-available"></span>
-      </div>
-    </div>
+    </template>
   </div>
 
   <div class="container-fluid" style="overflow-x: hidden;">
@@ -593,8 +608,10 @@
         currentSubscribers: 0,
         currentFollowers: 0,
         currentTips: 0,
-        currency: 'n/a'
+        currency: 'n/a',
+        broadcasterType: '',
 
+        isLoaded: false,
       },
       watched: {
         timestamp: function () {
@@ -670,6 +687,7 @@
             this[key] = value // populate data
           }
           this.timestamp = new Date()
+          this.isLoaded = true
         })
       },
       filters: {
