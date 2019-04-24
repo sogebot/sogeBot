@@ -17,6 +17,7 @@ class OAuth extends Core {
   constructor () {
     const settings = {
       _: {
+        broadcasterType: '',
         broadcaster: '',
         bot: '',
         clientId: '',
@@ -145,6 +146,7 @@ class OAuth extends Core {
         global.log.info('Channel ID set to ' + cid)
         global.tmi.reconnect('bot')
         global.tmi.reconnect('broadcaster')
+        global.api.updateChannelViewsAndBroadcasterType();
       } else {
         const toWait = Math.max(Number(global.api.calls.bot.refresh - (Date.now() / 1000)), 30);
         global.log.error(`Cannot get channel ID of ${this.settings.general.channel} - waiting ${toWait.toFixed()}s`)
