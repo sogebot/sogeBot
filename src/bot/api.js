@@ -158,6 +158,7 @@ class API {
             this.timeouts[fnc].isRunning = false
           }, interval)
         } else { // else run next tick
+          if (typeof value.opts !== 'undefined') this.timeouts[fnc].opts = value.opts
           this.timeouts[fnc].isRunning = false
         }
       }
@@ -409,7 +410,8 @@ class API {
         global.log.warning('Broadcaster is not affiliate/partner, will not check subs')
         global.db.engine.update('api.current', { key: 'subscribers' }, { value: 0 })
       }
-      return { state: false, noAffiliateOrPartnerWarningSent: true }
+      delete opts.count;
+      return { state: false, opts: { noAffiliateOrPartnerWarningSent: true, ...opts } }
     }
 
     var request
@@ -452,7 +454,8 @@ class API {
         if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getChannelSubscribers', api: 'helix', endpoint: url, code: e.response.status, data: e.stack, remaining: this.calls.bot.remaining })
       }
     }
-    return { state: true, noAffiliateOrPartnerWarningSent: opts.noAffiliateOrPartnerWarningSent, notCorrectOauthWarningSent: opts.notCorrectOauthWarningSent }
+    delete opts.count;
+    return { state: true, opts }
   }
 
   async setSubscribers (subscribers) {
