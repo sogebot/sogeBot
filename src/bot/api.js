@@ -404,7 +404,7 @@ class API {
     const needToWait = _.isNil(cid) || cid === '' || _.isNil(global.overlays) || token === ''
     const notEnoughAPICalls = this.calls.bot.remaining <= 30 && this.calls.bot.refresh > _.now() / 1000
 
-    if (needToWait || notEnoughAPICalls || global.oauth._.settings.broadcasterType === '') {
+    if (needToWait || notEnoughAPICalls || global.oauth.settings._.broadcasterType === '') {
       if (!opts.noAffiliateOrPartnerWarningSent) {
         global.log.warning('Broadcaster is not affiliate/partner, will not check subs')
         global.db.engine.update('api.current', { key: 'subscribers' }, { value: 0 })
