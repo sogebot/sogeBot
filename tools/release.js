@@ -156,7 +156,7 @@ function getCurrentBranch() {
   })[0].slice(2);
   return branch;
 }
-getReleaseVersion()
+
 function getReleaseVersion() {
   const regex = /"version": "(.*-SNAPSHOT)",/g
   let packageFile = fs.readFileSync('package.json').toString();
