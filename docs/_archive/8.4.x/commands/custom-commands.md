@@ -1,118 +1,102 @@
 ## Add a new command
 
-`!command add (-p <uuid|name>) (-s) -c <!command> -r <response>`
+`!command add <!command> <response>`
 
-!> Default permission is **CASTERS**
+!> Default permission is **OWNER**
 
 ### Parameters
 
-- `-p <uuid|name>`
-  - *optional string / uuid* - can be used names of permissions or theirs exact uuid
-  - *default value:* viewers
-  - *available values:* list of permission can be obtained by `!permissions list`
-    or in UI
-- `-s`
-  - *optional boolean* - stop execution after response is sent
+- `-ul` - *optional string* - required userlevel of user
+  - *default value:* viewer
+  - *available values:* viewer, mods, regular, owner
+- `-s` - *optional boolean* - stop execution after response is sent
   - *default value:* false
-- `-c <!command>`
-  - command to be added
-- `-r <response>`
-  - response to be set
 
 ### Examples
 
 <blockquote>
-  <strong>testuser:</strong> !command add -c !test -r me<br>
+  <strong>testuser:</strong> !command add !test me<br>
   <strong>bot:</strong> @testuser, command !test was added.
 </blockquote>
 
 <blockquote>
   <em>/ create command only for mods /</em><br>
-  <strong>testuser:</strong> !command add -p mods -c !test -r me<br>
+  <strong>testuser:</strong> !command add -ul mods !test me<br>
   <strong>bot:</strong> @testuser, command !test was added.
 </blockquote>
 
 <blockquote>
   <em>/ create command only for mods and stop if executed /</em><br>
-  <strong>testuser:</strong> !command add -p mods -s true -c !test -r me<br>
+  <strong>testuser:</strong> !command add -ul mods -s true !test me<br>
   <strong>bot:</strong> @testuser, command !test was added.
 </blockquote>
 
 ## Edit a response of command
 
-`!command edit (-p <uuid|name>) (-s) -c <!command> -rid <responseId> -r <response>`
+`!command edit <!command> <responseId> <response>`
 
-!> Default permission is **CASTERS**
+!> Default permission is **OWNER**
 
 ### Parameters
 
-- `-p <uuid|name>`
-  - *optional string / uuid* - can be used names of permissions or theirs exact uuid
-  - *default value:* viewers
-  - *available values:* list of permission can be obtained by `!permissions list`
-    or in UI
-- `-s`
-  - *optional boolean* - stop execution after response is sent
+- `-ul` - *optional string* - required userlevel of user
+  - *default value:* viewer
+  - *available values:* viewer, mods, regular, owner
+- `-s` - *optional boolean* - stop execution after response is sent
   - *default value:* false
-- `-c <!command>`
-  - command to be edited
-- `-rid <responseId>`
-  - response id to be updated
-- `-r <response>`
-  - response to be set
 
 ### Examples
 
 <blockquote>
-  <strong>testuser:</strong> !command edit -c !test -rid 1 -r me<br>
+  <strong>testuser:</strong> !command edit !test 1 me<br>
   <strong>bot:</strong> @testuser, command !test is changed to 'me'
 </blockquote>
 
 <blockquote>
   <em>/ set command only for mods /</em><br>
-  <strong>testuser:</strong> !command edit -p mods -c !test -rid 1 -r me<br>
+  <strong>testuser:</strong> !command edit -ul mods !test 1 me<br>
   <strong>bot:</strong> @testuser, command !test is changed to 'me'
 </blockquote>
 
 <blockquote>
   <em>/ set command only for mods and stop if executed /</em><br>
-  <strong>testuser:</strong> !command edit -p mods -s true -c !test -rid 1 -r me<br>
+  <strong>testuser:</strong> !command edit -ul mods -s true !test 1 me<br>
   <strong>bot:</strong> @testuser, command !test is changed to 'me'
 </blockquote>
 
-## Remove a command or a response
+## Remove a command
 
-`!command remove -c <!command> (-rid <responseId>)`
+`!command remove <!command>`
 
-!> Default permission is **CASTERS**
-
-### Parameters
-
-- `-c <!command>`
-  - command to be removed
-- `-rid <responseId>`
-  - *optional*
-  - response id to be updatedremoved
+!> Default permission is **OWNER**
 
 ### Examples
 
 <blockquote>
-  <strong>testuser:</strong> !command remove -c !test <br>
+  <strong>testuser:</strong> !command remove !test <br>
   <strong>bot:</strong> @testuser, command !test was removed
 </blockquote>
 
 <blockquote style="border-left-color: #f66">
-  <strong>testuser:</strong> !command remove -c !nonexisting <br>
+  <strong>testuser:</strong> !command remove !nonexisting <br>
   <strong>bot:</strong> @testuser, command !test was not found
 </blockquote>
 
+## Remove a response of command
+
+`!command remove <!command> <responseId>`
+
+!> Default permission is **OWNER**
+
+### Examples
+
 <blockquote>
-  <strong>testuser:</strong> !command remove -c !test -rid 1<br>
+  <strong>testuser:</strong> !command remove !test 1<br>
   <strong>bot:</strong> @testuser, command !test was removed
 </blockquote>
 
 <blockquote style="border-left-color: #f66">
-  <strong>testuser:</strong> !command remove -c !test -rid 2 <br>
+  <strong>testuser:</strong> !command remove !test 2 <br>
   <strong>bot:</strong> @testuser, response #2 of command !test
   was not found in database
 </blockquote>
@@ -121,7 +105,7 @@
 
 `!command list`
 
-!> Default permission is **CASTERS**
+!> Default permission is **OWNER**
 
 ### Examples
 
@@ -134,11 +118,11 @@
 
 `!command list !command`
 
-!> Default permission is **CASTERS**
+!> Default permission is **OWNER**
 
 ### Output
 
-!`command`#`responseId` (for `permission`) `stop`| `response`
+!`command`#`responseId` (for `userlevel`) `stop`| `response`
 
 ### Examples
 
@@ -150,10 +134,14 @@
 
 ## What is stop execution after response
 
-In certain situations, you may have several responses based on permission.
-Some users have higher permission then others. If response with
+In certain situations, you may have several responses based on userlevel.
+Some users have higher userlevel then others. If response with
 this settings is executed, all responses below this response will
 be ignored.
+
+### Userlevel hierarchy
+
+`owner` > `mods` > `regular` > `viewer`
 
 ### Example without stop
 
@@ -219,7 +207,7 @@ engine.
 | `$sender`         | username of user triggered command |
 | `$is.moderator`   | is current user moderator          |
 | `$is.subscriber`  | is current user subscriber         |
-| `$is.vip`         | is current user vip                |
+| `$is.regular`     | is current user regular            |
 | `$is.follower`    | is current user follower           |
 | `$is.broadcaster` | is current user broadcaster        |
 | `$is.bot`         | is current user bot                |
@@ -262,4 +250,4 @@ PUBG is set as game
 `!enable system customCommands` |
 `!disable system customCommands`
 
-!> Default permission is **CASTERS**
+!> Default permission is **OWNER**

@@ -1,7 +1,11 @@
+##### Changelog
+| Version | Description                  |
+| --------|:-----------------------------|
+| 8.1.0   | Add `(count)` command filter |
+
 !> Response filters are usable in notices, custom commands, keywords and text overlay
 
 ## Global variables
-
 `$sender` - returns username of viewer, who triggered this message
 
 `$price` - returns command price
@@ -43,22 +47,6 @@
 `$latestCheerMessage` - Latest Cheer (message)
 
 `$latestCheer` - Latest Cheer (username)
-
-`$toptip.overall.username` - Overall top tip (username)
-
-`$toptip.overall.amount` - Overall top tip (amount)
-
-`$toptip.overall.currency` - Overall top tip (currency)
-
-`$toptip.overall.message` - Overall top tip (message)
-
-`$toptip.stream.username` - Current stream top tip (username)
-
-`$toptip.stream.amount` - Current stream top tip (amount)
-
-`$toptip.stream.currency` - Current stream top tip (currency)
-
-`$toptip.stream.message` - Current stream top tip (message)
 
 `$version` - return current bot version
 
@@ -118,25 +106,6 @@
 
 `$!_#` - same as variable above, except set message is always silent
 
-`$touser` - is user param variable, if empty, current user is used. This
-param accepts `@user` and `user`
-
-- **example:**
-  - _command:_ `!point`
-  - _response:_ `$sender point to $touser`
-  - _chat:_ `!point @soge__`
-  - _bot response_: `@foobar points to @soge__`
-- **example:**
-  - _command:_ `!point`
-  - _response:_ `$sender point to $touser`
-  - _chat:_ `!point soge__`
-  - _bot response_: `@foobar points to @soge__`
-- **example:**
-  - _command:_ `!point`
-  - _response:_ `$sender point to $touser`
-  - _chat:_ `!point`
-  - _bot response_: `@foobar points to @foobar`
-
 `$param` - is required temporary variable (command without param will not show)
   - **example:**
     - _command:_ `!say`
@@ -175,13 +144,6 @@ param accepts `@user` and `user`
     - _response:_ `(api|https://jsonplaceholder.typicode.com/posts/5) UserId: (api.userId), id: (api.id), title: (api.title), body: (api.body)`
     - _chat_: `!api`
     - _bot response_: `UserId: 1, id: 5, title: nesciunt quas odio, body: repudiandae veniam quaerat sunt sedalias aut fugiat sit autem sed estvoluptatem omnis possimus esse voluptatibus quisest aut tenetur dolor neque`
-
-### GET parameters
-
-You can add parameters to your urls, *note* you must escape your parameters where
-needed.
-
-e.g. `(api|https://httpbin.org/get?test=a\\nb) Lorem (api.args.test)`
 
 ## Command filters
 `(count)` - return how many times command was used
@@ -224,15 +186,25 @@ e.g. `(api|https://httpbin.org/get?test=a\\nb) Lorem (api.args.test)`
 
 `(list.!alias)` - will return list of your visible !aliases
 
-`(list.price)` - will return list of your set prices
-
 `(list.command)` - will return list of your visible custom commands
 
-`(list.command.<permissionName>)` - will return list of your visible custom commands for permission
+`(list.command.mods)` - will return list of your visible custom commands with mods responses
+
+`(list.command.regular)` - will return list of your visible custom commands with regular responses
+
+`(list.command.viewers)` - will return list of your visible custom commands with viewers responses
+
+`(list.command.owner)` - will return list of your visible custom commands with owner responses
 
 `(list.!command)` - will return list of your visible custom !commands
 
-`(list.!command.<permissionName>)` - will return list of your visible custom !commands for permission
+`(list.!command.mods)` - will return list of your visible custom commands with mods responses
+
+`(list.!command.regular)` - will return list of your visible custom commands with regular responses
+
+`(list.!command.viewers)` - will return list of your visible custom commands with viewers responses
+
+`(list.!command.owner)` - will return list of your visible custom commands with owner responses
 
 `(list.cooldown)` - will return list of your cooldowns (keywords and !commands)
 
