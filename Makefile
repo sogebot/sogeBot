@@ -1,5 +1,3 @@
-
-
 PATH    := node_modules/.bin:$(PATH)
 SHELL   := /bin/bash
 VERSION := `node -pe "require('./package.json').version"`
