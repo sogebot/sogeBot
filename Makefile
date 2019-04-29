@@ -1,3 +1,5 @@
+
+
 PATH    := node_modules/.bin:$(PATH)
 SHELL   := /bin/bash
 VERSION := `node -pe "require('./package.json').version"`
@@ -6,16 +8,31 @@ ENV     ?= production
 all : clean prepare dependencies shrinkwrap ui bot info
 .PHONY : all
 
+# detect what shell is used
+ifeq ($(findstring cmd.exe,$(SHELL)),cmd.exe)
+DEVNUL := NUL
+WHICH := where
+else
+DEVNUL := /dev/null
+WHICH := which
+endif
+
 info:
 	@echo -ne "\n\t ----- Build ENV: $(ENV)"
 	@echo -ne "\n\t ----- Build commit\n\n"
 	@git log --oneline -3 | cat
 
 dependencies:
+ifeq ($(shell ${WHICH} yarn 2>${DEVNUL}),)
+	@echo -ne "\n\t ----- Using npm for dependencies install (if you want to use yarn 'npm install yarn --global'\n"
 	@echo -ne "\n\t ----- Installation of production dependencies\n"
 	@npm install --production
 	@echo -ne "\n\t ----- Installation of development dependencies\n"
 	@npm install --only=dev
+else
+	@echo -ne "\n\t ----- Using yarn for dependencies install\n"
+	@yarn install
+endif
 
 shrinkwrap:
 	@echo -ne "\n\t ----- Generating shrinkwrap\n"
