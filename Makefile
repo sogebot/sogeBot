@@ -32,7 +32,7 @@ endif
 
 dependencies:
 	@echo -ne "\n\t ----- Using yarn for dependencies install\n"
-	@yarn install
+	@yarn install --ignore-engines
 
 tslint:
 	@echo -ne "\n\t ----- Checking tslint\n"
