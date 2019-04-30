@@ -6,6 +6,8 @@ install:
   - travis_wait make ENV=development
 notifications:
   email: false
+node_js:
+  - "12"
 before_script:
   - npm run test:config:$DB
   - cat config.json
@@ -30,24 +32,13 @@ jobs:
       script:
         - npm run tslint
         - echo 'Found skip tag. Skipping tests.'
-      node_js:
-        - "11"
     - stage: test
       env: DB=nedb
       os: linux
-      node_js:
-        - "11"
-        - "12"
     - stage: test
       env: DB=mongodb
       services: mongodb
       os: linux
-      node_js:
-        - "11"
-        - "12"
     - stage: test
       env: DB=nedb
       os: osx
-      node_js:
-        - "11"
-        - "12"
