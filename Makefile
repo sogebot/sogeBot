@@ -3,7 +3,7 @@ SHELL   := /bin/bash
 VERSION := `node -pe "require('./package.json').version"`
 ENV     ?= production
 
-all : clean prepare yarn dependencies ui bot info
+all : clean prepare yarn dependencies shrinkwrap ui bot info
 .PHONY : all
 
 # detect what shell is used
@@ -29,6 +29,9 @@ else
 	@echo -ne "\n\t ----- OK \n"
 endif
 
+shrinkwrap:
+	@echo -ne "\n\t ----- Generating shrinkwrap\n"
+	@npm shrinkwrap
 
 dependencies:
 	@echo -ne "\n\t ----- Using yarn for dependencies install\n"
@@ -57,11 +60,15 @@ release:
 
 pack:
 	@echo -ne "\n\t ----- Packing into sogeBot-$(VERSION).zip\n"
-	@npx bestzip sogeBot-$(VERSION).zip .npmrc yarn.lock.json config.example.json dest/ locales/ public/ LICENSE package.json docs/ AUTHORS tools/ bin/ bat/ dist/
+	@npx bestzip sogeBot-$(VERSION).zip .npmrc npm-shrinkwrap.json config.example.json dest/ locales/ public/ LICENSE package.json docs/ AUTHORS tools/ bin/ bat/ dist/
 
 prepare:
 	@echo -ne "\n\t ----- Cleaning up node_modules\n"
 	@rm -rf node_modules
+	@echo -ne "\n\t ----- Cleaning up npm shrinkwrap\n"
+	@rm -rf npm-shrinkwrap.json
+	@echo -ne "\n\t ----- Cleaning up yarn.lock\n"
+	@rm -rf yarn.lock
 
 clean:
 	@echo -ne "\n\t ----- Cleaning up compiled files\n"
