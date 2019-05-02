@@ -8,6 +8,7 @@ const {
 
 // bot libraries
 import { permission } from '../permissions';
+import { parser } from '../decorators';
 import System from './_interface'
 const Expects = require('../expects')
 const commons = require('../commons');
@@ -26,9 +27,6 @@ class Points extends System {
         messageOfflineInterval: 5,
         perMessageOfflineInterval: 0
       },
-      parsers: [
-        { name: 'messagePoints', fireAndForget: true }
-      ],
       commands: [
         { name: '!points add', permission: permission.CASTERS },
         { name: '!points remove', permission: permission.CASTERS },
@@ -93,6 +91,7 @@ class Points extends System {
     }
   }
 
+  @parser({ fireAndForget: true })
   async messagePoints (opts) {
     if (opts.skip || opts.message.startsWith('!')) return true
 

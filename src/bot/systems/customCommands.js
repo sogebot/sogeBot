@@ -12,6 +12,7 @@ const commons = require('../commons');
 import { permission } from '../permissions';
 import System from './_interface'
 import constants from '../constants'
+import { parser } from '../decorators';
 const Expects = require('../expects')
 
 /*
@@ -56,9 +57,6 @@ class CustomCommands extends System {
         { name: '!command toggle', permission: permission.CASTERS },
         { name: '!command', permission: permission.CASTERS, isHelper: true }
       ],
-      parsers: [
-        { name: 'run', priority: constants.LOW, fireAndForget: true }
-      ]
     }
     super({ settings })
 
@@ -235,6 +233,7 @@ class CustomCommands extends System {
     }
   }
 
+  @parser({ priority: constants.LOW, fireAndForget: true })
   async run (opts: Object) {
     if (!opts.message.startsWith('!')) return true // do nothing if it is not a command
 

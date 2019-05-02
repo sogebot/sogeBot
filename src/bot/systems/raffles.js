@@ -7,6 +7,7 @@ const {
 } = require('worker_threads');
 // bot libraries
 import { permission } from '../permissions';
+import { parser } from '../decorators';
 import System from './_interface'
 const commons = require('../commons');
 
@@ -38,10 +39,6 @@ class Raffles extends System {
         { name: '!raffle remove', permission: permission.CASTERS },
         { name: '!raffle open', permission: permission.CASTERS },
         '!raffle'
-      ],
-      parsers: [
-        { name: 'messages', fireAndForget: true },
-        { name: 'participate' }
       ]
     }
     super({ settings })
@@ -67,6 +64,7 @@ class Raffles extends System {
     })
   }
 
+  @parser({ fireAndForget: true })
   async messages (opts) {
     if (opts.skip) return true
 
@@ -221,6 +219,7 @@ class Raffles extends System {
     commons.sendMessage(message, commons.getOwner())
   }
 
+  @parser()
   async participate (opts) {
     if (_.isNil(opts.sender) || _.isNil(opts.sender.username)) return true
 

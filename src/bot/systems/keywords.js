@@ -9,6 +9,7 @@ const commons = require('../commons');
 import { permission } from '../permissions';
 const Message = require('../message')
 const constants = require('../constants')
+import { parser } from '../decorators';
 import System from './_interface'
 
 /*
@@ -31,9 +32,6 @@ class Keywords extends System {
         { name: '!keyword toggle', permission: permission.CASTERS },
         { name: '!keyword', permission: permission.CASTERS }
       ],
-      parsers: [
-        { name: 'run' }
-      ]
     }
     super({ settings })
 
@@ -88,6 +86,7 @@ class Keywords extends System {
     commons.sendMessage(message, opts.sender)
   }
 
+  @parser()
   async run (opts) {
     let keywords = await global.db.engine.find(this.collection.data)
     keywords = _.filter(keywords, function (o) {

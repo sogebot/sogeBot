@@ -7,6 +7,7 @@ const Parser = require('../parser')
 import System from './_interface'
 import constants from '../constants'
 import { permission } from '../permissions';
+import { parser } from '../decorators';
 const commons = require('../commons');
 
 /*
@@ -30,9 +31,6 @@ class Price extends System {
         { name: '!price toggle', permission: permission.CASTERS },
         { name: '!price', permission: permission.CASTERS }
       ],
-      parsers: [
-        { name: 'check', priority: constants.HIGH }
-      ]
     }
     super({ settings, dependsOn })
 
@@ -106,6 +104,7 @@ class Price extends System {
     commons.sendMessage(output, opts.sender)
   }
 
+  @parser({ priority: constants.HIGH })
   async check (opts) {
     const parsed = opts.message.match(/^(![\S]+)/)
     const helpers = (await (new Parser()).getCommandsList()).filter(o => o.isHelper).map(o => o.command)

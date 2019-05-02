@@ -6,6 +6,7 @@ const XRegExp = require('xregexp')
 // bot libraries
 import constants from '../constants'
 import { permission } from '../permissions';
+import { parser } from '../decorators';
 const Message = require('../message')
 import System from './_interface'
 const commons = require('../commons');
@@ -74,16 +75,6 @@ class Moderation extends System {
       commands: [
         { name: '!permit', fnc: 'permitLink', permission: permission.CASTERS }
       ],
-      parsers: [
-        { name: 'containsLink', priority: constants.MODERATION },
-        { name: 'symbols', priority: constants.MODERATION },
-        { name: 'longMessage', priority: constants.MODERATION },
-        { name: 'caps', priority: constants.MODERATION },
-        { name: 'spam', priority: constants.MODERATION },
-        { name: 'color', priority: constants.MODERATION },
-        { name: 'emotes', priority: constants.MODERATION },
-        { name: 'blacklist', priority: constants.MODERATION }
-      ]
     }
 
     super({ settings })
@@ -219,6 +210,7 @@ class Moderation extends System {
     }
   }
 
+  @parser({ priority: constants.MODERATION })
   async containsLink (opts) {
     let [isEnabled, isEnabledForSubs, isEnabledForSpaces, timeout, isOwner, isMod, whitelisted] = await Promise.all([
       this.settings.links.enabled,
@@ -254,6 +246,7 @@ class Moderation extends System {
     }
   }
 
+  @parser({ priority: constants.MODERATION })
   async symbols (opts) {
     let [isEnabled, isEnabledForSubs, whitelisted, isOwner, isMod, timeout, triggerLength, maxSymbolsConsecutively, maxSymbolsPercent] = await Promise.all([
       this.settings.symbols.enabled,
@@ -295,6 +288,7 @@ class Moderation extends System {
     return true
   }
 
+  @parser({ priority: constants.MODERATION })
   async longMessage (opts) {
     let [isEnabled, isEnabledForSubs, isOwner, isMod, whitelisted, timeout, triggerLength] = await Promise.all([
       this.settings.longMessage.enabled,
@@ -318,6 +312,7 @@ class Moderation extends System {
     }
   }
 
+  @parser({ priority: constants.MODERATION })
   async caps (opts) {
     let [isEnabled, isEnabledForSubs, isOwner, isMod, whitelisted, timeout, triggerLength, maxCapsPercent] = await Promise.all([
       this.settings.caps.enabled,
@@ -367,6 +362,7 @@ class Moderation extends System {
     return true
   }
 
+  @parser({ priority: constants.MODERATION })
   async spam (opts) {
     let [isEnabled, isEnabledForSubs, isOwner, isMod, whitelisted, timeout, triggerLength, maxLength] = await Promise.all([
       this.settings.spam.enabled,
@@ -397,6 +393,7 @@ class Moderation extends System {
     return true
   }
 
+  @parser({ priority: constants.MODERATION })
   async color (opts) {
     let [isEnabled, isEnabledForSubs, isOwner, isMod, timeout] = await Promise.all([
       this.settings.color.enabled,
@@ -419,6 +416,7 @@ class Moderation extends System {
     } else return true
   }
 
+  @parser({ priority: constants.MODERATION })
   async emotes (opts) {
     if (!(Symbol.iterator in Object(opts.sender.emotes))) return true
     let [isEnabled, isEnabledForSubs, isOwner, isMod, timeout, maxCount] = await Promise.all([
@@ -444,6 +442,7 @@ class Moderation extends System {
     } else return true
   }
 
+  @parser({ priority: constants.MODERATION })
   async blacklist (opts) {
     let [isEnabledForSubs, isOwner, isMod, timeout, blacklist] = await Promise.all([
       this.settings.lists.moderateSubscribers,

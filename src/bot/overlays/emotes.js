@@ -10,7 +10,8 @@ const {
 const axios = require('axios')
 const XRegExp = require('xregexp')
 
-import Overlay from './_interface'
+import Overlay from './_interface';
+import { parser } from '../decorators';
 
 class Emotes extends Overlay {
   simpleEmotes = {
@@ -58,10 +59,7 @@ class Emotes extends Overlay {
       fireworks: {
         numOfEmotesPerExplosion: 10,
         numOfExplosions: 5
-      },
-      parsers: [
-        { name: 'containsEmotes', priority: constants.LOW, fireAndForget: true }
-      ]
+      }
     }
 
     const ui = {
@@ -368,6 +366,7 @@ class Emotes extends Overlay {
     })
   }
 
+  @parser({ priority: constants.LOW, fireAndForget: true })
   async containsEmotes (opts: ParserOptions) {
     if (_.isNil(opts.sender) || !opts.sender.emotes) return true
     if (!isMainThread) {
