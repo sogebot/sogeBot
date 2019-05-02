@@ -13,6 +13,7 @@ export function parser(opts: {
   Error.prepareStackTrace = _prepareStackTrace;
 
   const path = parse(stack[1].getFileName() || '');
+  console.log({path});
   const name = path.name;
   const _type = path.dir.split('\\')[path.dir.split('\\').length - 1];
   const type = _type === 'dest' ? 'core' : _type;
