@@ -13,10 +13,9 @@ export function parser(opts: {
   Error.prepareStackTrace = _prepareStackTrace;
 
   const path = parse(stack[1].getFileName() || '');
-  console.log({path});
   const name = path.name;
-  const _type = path.dir.split('\\')[path.dir.split('\\').length - 1];
-  const type = _type === 'dest' ? 'core' : _type;
+  const _type = path.dir.match(/(?<type>\w+\$)/);
+  const type = _type && _type.groups && _type.groups.type === 'dest' ? 'core' : _type;
 
   return (target: object, key: string, descriptor: PropertyDescriptor) => {
     registerParser(opts, { type, name, fnc: key });
@@ -32,8 +31,8 @@ export function command(opts: string) {
 
   const path = parse(stack[1].getFileName() || '');
   const name = path.name;
-  const _type = path.dir.split('\\')[path.dir.split('\\').length - 1];
-  const type = _type === 'dest' ? 'core' : _type;
+  const _type = path.dir.match(/(?<type>\w+\$)/);
+  const type = _type && _type.groups && _type.groups.type === 'dest' ? 'core' : _type;
 
   return (target: object, key: string, descriptor: PropertyDescriptor) => {
     registerCommand(opts, { type, name, fnc: key });
@@ -49,8 +48,8 @@ export function default_permission(uuid: string) {
 
   const path = parse(stack[1].getFileName() || '');
   const name = path.name;
-  const _type = path.dir.split('\\')[path.dir.split('\\').length - 1];
-  const type = _type === 'dest' ? 'core' : _type;
+  const _type = path.dir.match(/(?<type>\w+\$)/);
+  const type = _type && _type.groups && _type.groups.type === 'dest' ? 'core' : _type;
 
   return (target: object, key: string | symbol, descriptor: PropertyDescriptor) => {
     registerPermission(uuid, { type, name, fnc: key });
@@ -66,8 +65,8 @@ export function helper() {
 
   const path = parse(stack[1].getFileName() || '');
   const name = path.name;
-  const _type = path.dir.split('\\')[path.dir.split('\\').length - 1];
-  const type = _type === 'dest' ? 'core' : _type;
+  const _type = path.dir.match(/(?<type>\w+\$)/);
+  const type = _type && _type.groups && _type.groups.type === 'dest' ? 'core' : _type;
 
   return (target: object, key: string | symbol, descriptor: PropertyDescriptor) => {
     registerHelper({ type, name, fnc: key });
