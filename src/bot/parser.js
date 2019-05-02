@@ -38,7 +38,7 @@ class Parser {
       }
       const isOk = await parser['fnc'].apply(parser.this, [opts])
       if (!isOk) {
-        console.log('parser.isModerated', 'Moderation failed ' + JSON.stringify(parser['fnc']))
+        debug('parser.isModerated', 'Moderation failed ' + JSON.stringify(parser['fnc']))
         return true
       }
     }
@@ -46,7 +46,7 @@ class Parser {
   }
 
   async process () {
-    console.log('parser.process', 'PROCESS START of "' + this.message + '"')
+    debug('parser.process', 'PROCESS START of "' + this.message + '"')
 
     const parsers = await this.parsers()
     for (let parser of parsers) {
@@ -62,7 +62,7 @@ class Parser {
           skip: this.skip
         }
 
-        console.log('parser.process', 'Processing ' + parser.name)
+        debug('parser.process', 'Processing ' + parser.name)
         if (parser.fireAndForget) {
           parser['fnc'].apply(parser.this, [opts])
         } else {
@@ -128,7 +128,7 @@ class Parser {
    * @returns object or null if empty
    */
   async find (message, cmdlist) {
-    console.log('parser.find', JSON.stringify({message, cmdlist}))
+    debug('parser.find', JSON.stringify({message, cmdlist}))
     if (!cmdlist) {
       cmdlist = await this.getCommandsList();
     }

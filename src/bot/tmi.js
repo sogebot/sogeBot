@@ -572,7 +572,6 @@ class TMI extends Core {
 
   async message (data) {
     if (isMainThread && !global.mocha) {
-      console.log('sending to worker')
       return global.workers.sendToWorker({
         type: 'call',
         ns: 'tmi',
@@ -651,7 +650,6 @@ class TMI extends Core {
           global.events.fire('command-send-x-times', { username: sender.username, message: message })
         } else if (!message.startsWith('!')) global.db.engine.increment('users.messages', { id: sender.userId }, { messages: 1 })
       }
-      console.log({message})
       await parse.process()
     }
     this.avgResponse({ value: parse.time(), message })

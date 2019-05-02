@@ -236,7 +236,6 @@ class CustomCommands extends System {
   @parser({ priority: constants.LOW, fireAndForget: true })
   async run (opts: Object) {
     if (!opts.message.startsWith('!')) return true // do nothing if it is not a command
-    console.log({opts})
     let _responses = []
     var command: $Shape<Command> = {} // eslint-disable-line no-undef
     let cmdArray = opts.message.toLowerCase().split(' ')
