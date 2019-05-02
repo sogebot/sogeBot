@@ -133,6 +133,8 @@ function registerParser(opts, m) {
     return setTimeout(() => registerParser(opts, m), 10);
   }
   try {
+    // tslint:disable-next-line:no-console
+    console.log('registered', m.type, m.name, m.fnc);
     const self = global[m.type][m.name];
     self._parsers.push({
       name: m.fnc,

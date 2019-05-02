@@ -9,7 +9,7 @@ const __DEBUG__ = (process.env.DEBUG && process.env.DEBUG.includes('test'))
 module.exports = {
   cleanup: async function () {
     let waitForIt = async (resolve, reject) => {
-      if (_.isNil(global.db) || !global.db.engine.connected || _.isNil(global.systems) || _.now() - startup < 10000) {
+      if (_.isNil(global.db) || !global.db.engine.connected || _.isNil(global.systems) || _.now() - startup < 20000) {
         return setTimeout(() => waitForIt(resolve, reject), 1000)
       }
 
