@@ -2,6 +2,7 @@ import _ from 'lodash';
 import moment from 'moment-timezone';
 
 import { getChannel, getIgnoreList, isIgnored, sendMessage } from '../commons';
+import { command, default_permission } from '../decorators';
 import { permission } from '../permissions';
 import System from './_interface';
 
@@ -33,60 +34,57 @@ const __DEBUG__ =
  */
 
 class Top extends System {
-  constructor() {
-    const options: InterfaceSettings = {
-      settings: {
-        commands: [
-          { name: '!top time', permission: permission.CASTERS },
-          { name: '!top tips', permission: permission.CASTERS },
-          { name: '!top points', permission: permission.CASTERS },
-          { name: '!top messages', permission: permission.CASTERS },
-          { name: '!top followage', permission: permission.CASTERS },
-          { name: '!top subage', permission: permission.CASTERS },
-          { name: '!top bits', permission: permission.CASTERS },
-          { name: '!top gifts', permission: permission.CASTERS },
-        ],
-      },
-    };
-
-    super(options);
-  }
-
+  @command('!top time')
+  @default_permission(permission.CASTERS)
   public time(opts) {
     opts.parameters = TYPE.TIME;
     this.showTop(opts);
   }
 
+  @command('!top tips')
+  @default_permission(permission.CASTERS)
   public tips(opts) {
     opts.parameters = TYPE.TIPS;
     this.showTop(opts);
   }
 
+  @command('!top points')
+  @default_permission(permission.CASTERS)
   public points(opts) {
     opts.parameters = TYPE.POINTS;
     this.showTop(opts);
   }
 
+  @command('!top messages')
+  @default_permission(permission.CASTERS)
   public messages(opts) {
     opts.parameters = TYPE.MESSAGES;
     this.showTop(opts);
   }
 
+  @command('!top followage')
+  @default_permission(permission.CASTERS)
   public followage(opts) {
     opts.parameters = TYPE.FOLLOWAGE;
     this.showTop(opts);
   }
 
+  @command('!top subage')
+  @default_permission(permission.CASTERS)
   public subage(opts) {
     opts.parameters = TYPE.SUBAGE;
     this.showTop(opts);
   }
 
+  @command('!top bits')
+  @default_permission(permission.CASTERS)
   public bits(opts) {
     opts.parameters = TYPE.BITS;
     this.showTop(opts);
   }
 
+  @command('!top gifts')
+  @default_permission(permission.CASTERS)
   public gifts(opts) {
     opts.parameters = TYPE.GIFTS;
     this.showTop(opts);
