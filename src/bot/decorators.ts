@@ -39,7 +39,7 @@ export function command(opts: string) {
   };
 }
 
-export function default_permission(puuid: string) {
+export function default_permission(uuid: string) {
   const _prepareStackTrace = Error.prepareStackTrace;
   Error.prepareStackTrace = (_, s) => s;
   const stack = (new Error().stack as unknown as NodeJS.CallSite[]);
@@ -51,7 +51,7 @@ export function default_permission(puuid: string) {
   const type = _type === 'dest' ? 'core' : _type;
 
   return (target: object, key: string | symbol, descriptor: PropertyDescriptor) => {
-    registerPermission(puuid, { type, name, fnc: key });
+    registerPermission(uuid, { type, name, fnc: key });
     return descriptor;
   };
 }
@@ -83,9 +83,9 @@ function registerCommand(opts, m) {
   self._settings.commands[c.name] = c.name; // remap to default value
 }
 
-function registerPermission(puuid, m, retry = 0) {
+function registerPermission(uuid, m, retry = 0) {
   if (!global[m.type] || !global[m.type][m.name]) {
-    return setTimeout(() => registerPermission(puuid, m), 10);
+    return setTimeout(() => registerPermission(uuid, m), 10);
   }
   try {
     const self = global[m.type][m.name];
@@ -94,11 +94,11 @@ function registerPermission(puuid, m, retry = 0) {
     if (!c) {
       throw Error();
     } else {
-      c.permission = puuid;
+      c.permission = uuid;
     }
   } catch (e) {
     if (retry < 100) {
-      return setTimeout(() => registerPermission(puuid, m, retry++), 10);
+      return setTimeout(() => registerPermission(uuid, m, retry++), 10);
     } else {
       global.log.error('Command with function ' + m.fnc + ' not found!');
     }
