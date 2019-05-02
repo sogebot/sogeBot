@@ -566,7 +566,7 @@ class TMI extends Core {
         args: [client, msgId],
       })
     } else {
-      this.client[client].chat.say(getOwner(), '/delete ' + msgId)
+      this.client[client].chat.say(commons.getOwner(), '/delete ' + msgId)
     }
   }
 
