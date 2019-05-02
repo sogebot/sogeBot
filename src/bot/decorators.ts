@@ -2,7 +2,6 @@ import { parse } from 'path';
 
 export function command(opts: string) {
   const _prepareStackTrace = Error.prepareStackTrace;
-  Error.prepareStackTrace = _prepareStackTrace;
   Error.prepareStackTrace = (_, s) => s;
   const stack = (new Error().stack as unknown as NodeJS.CallSite[]);
   Error.prepareStackTrace = _prepareStackTrace;
@@ -20,7 +19,6 @@ export function command(opts: string) {
 
 export function default_permission(uuid: string) {
   const _prepareStackTrace = Error.prepareStackTrace;
-  Error.prepareStackTrace = _prepareStackTrace;
   Error.prepareStackTrace = (_, s) => s;
   const stack = (new Error().stack as unknown as NodeJS.CallSite[]);
   Error.prepareStackTrace = _prepareStackTrace;
@@ -38,7 +36,6 @@ export function default_permission(uuid: string) {
 
 export function helper() {
   const _prepareStackTrace = Error.prepareStackTrace;
-  Error.prepareStackTrace = _prepareStackTrace;
   Error.prepareStackTrace = (_, s) => s;
   const stack = (new Error().stack as unknown as NodeJS.CallSite[]);
   Error.prepareStackTrace = _prepareStackTrace;
