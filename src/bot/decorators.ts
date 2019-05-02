@@ -130,6 +130,8 @@ function registerHelper(m, retry = 0) {
 
 function registerParser(opts, m) {
   if (!global[m.type] || !global[m.type][m.name]) {
+    // tslint:disable-next-line:no-console
+    console.log('waiting', m.type, m.name, m.fnc);
     return setTimeout(() => registerParser(opts, m), 10);
   }
   try {
