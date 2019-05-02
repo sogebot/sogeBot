@@ -266,26 +266,37 @@ class Module {
     });
   }
 
+  public prepareCommand(opts: string | Command) {
+    let key = opts;
+    let pUuid = permission.VIEWERS;
+    let fnc;
+    let isHelper = false;
+
+    if (typeof key === 'object') {
+      pUuid = key.permission || permission.VIEWERS;
+      fnc = key.fnc || fnc;
+      isHelper = key.isHelper || false;
+    }
+    key = typeof key === 'object' ? key.name : key;
+    return {
+      name: key,
+      permission: pUuid,
+      fnc,
+      isHelper,
+    };
+  }
+
   public prepareCommandProxies() {
     const commands: { [x: string]: string } = {};
+
     if (this._settings.commands) {
       for (let i = 0, length = this._settings.commands.length; i < length; i++) {
-        let key = this._settings.commands[i];
-        let pUuid = permission.VIEWERS;
-        let fnc;
-        let isHelper = false;
-
-        if (typeof key === 'object') {
-          pUuid = key.permission || permission.VIEWERS;
-          fnc = key.fnc || fnc;
-          isHelper = key.isHelper || false;
-        }
-        key = typeof key === 'object' ? key.name : key;
 
         // basic loadup of commands
-        this._commands.push({ name: key, permission: pUuid, fnc, isHelper });
+        const command = this.prepareCommand(this._settings.commands[i]);
+        this._commands.push(command);
 
-        commands[key] = key; // remap to default value
+        commands[command.name] = command.name; // remap to default value
       }
     }
     this._settings.commands = commands;

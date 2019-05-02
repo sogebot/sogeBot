@@ -10,6 +10,7 @@
 // bot libraries
 const constants = require('../constants')
 import System from './_interface';
+import { command, default_permission } from '../decorators';
 import { permissions } from '../permission'; // set of core permissions
 
 class Yoursystem extends System {
@@ -17,10 +18,7 @@ class Yoursystem extends System {
 
   constructor () {
     const options: InterfaceSettings = {
-      settings: {
-        commands: [],
-        parsers: [],
-      },
+      settings: {},
       ui: {},
       dependsOn: [],
       on: {},
@@ -50,32 +48,16 @@ Settings variable may contain settings for `yoursystem`
 
 #### Commands
 
-##### Required values
+To define function, which should be command, you must use decorator **@command**.
+To override default permission for viewers, use **@default_permission**.
+For setting helper function (e.g. price check is skipped for this command) use **@helper**.
 
- `name`: name of command started with `!`, this is how you will trigger command,
- e.g. `!command`, `!command help`
-
-##### Default values
-
-* `permission`: sets default permission for command. `permissions.VIEWERS`
-* `fnc`: created from second part of command name, if there is no second part
-  `main` is default function
-* `isHelper`: mark this command as helper function (e.g. price check is skipped
-  for this command). `false`
-
-``` typescript
-const options: InterfaceSettings = {
-  // ...
-  settings: {
-    // ...
-    commands: [
-      '!command1', // creates !command1 with default values
-      { name: '!command2' }, // same as !command1
-      { name: `!command3`, fnc: 'command3', permission: permissions.CASTERS } // with custom values
-    ],
-    // ...
-  },
-  // ...
+``` javascript
+@command('!yourcommand')
+@default_permission(permission.CASTERS)
+@helper()
+public foobar(opts: CommandOptions) {
+  // ... command logic ...
 }
 ```
 
