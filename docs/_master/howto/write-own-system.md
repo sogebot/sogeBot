@@ -54,7 +54,7 @@ For setting helper function (e.g. price check is skipped for this command) use *
 
 ``` javascript
 @command('!yourcommand')
-@default_permission(permission.CASTER)
+@default_permission(permission.CASTERS)
 @helper()
 public foobar(opts: CommandOptions) {
   // ... command logic ...
