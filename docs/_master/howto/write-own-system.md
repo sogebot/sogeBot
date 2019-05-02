@@ -80,7 +80,7 @@ public someParser(opts: ParserOptions) {
 }
 
 @parser({ fireAndForget: true })
-public someParser(opts: ParserOptions) {
+public anotherParser(opts: ParserOptions) {
   // ... parser logic ...
 }
 ```
