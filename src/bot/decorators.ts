@@ -1,4 +1,4 @@
-import { parse } from 'path';
+import { parse, sep as separator } from 'path';
 
 export function parser(opts: {
   fireAndForget?: boolean,
@@ -14,8 +14,8 @@ export function parser(opts: {
 
   const path = parse(stack[1].getFileName() || '');
   const name = path.name;
-  const _type = path.dir.match(/(?<type>\w+\$)/);
-  const type = _type && _type.groups && _type.groups.type === 'dest' ? 'core' : _type;
+  const _type = path.dir.split(separator)[path.dir.split(separator).length - 1];
+  const type = _type === 'dest' ? 'core' : _type;
 
   return (target: object, key: string, descriptor: PropertyDescriptor) => {
     registerParser(opts, { type, name, fnc: key });
@@ -31,8 +31,8 @@ export function command(opts: string) {
 
   const path = parse(stack[1].getFileName() || '');
   const name = path.name;
-  const _type = path.dir.match(/(?<type>\w+\$)/);
-  const type = _type && _type.groups && _type.groups.type === 'dest' ? 'core' : _type;
+  const _type = path.dir.split(separator)[path.dir.split(separator).length - 1];
+  const type = _type === 'dest' ? 'core' : _type;
 
   return (target: object, key: string, descriptor: PropertyDescriptor) => {
     registerCommand(opts, { type, name, fnc: key });
@@ -48,8 +48,8 @@ export function default_permission(uuid: string) {
 
   const path = parse(stack[1].getFileName() || '');
   const name = path.name;
-  const _type = path.dir.match(/(?<type>\w+\$)/);
-  const type = _type && _type.groups && _type.groups.type === 'dest' ? 'core' : _type;
+  const _type = path.dir.split(separator)[path.dir.split(separator).length - 1];
+  const type = _type === 'dest' ? 'core' : _type;
 
   return (target: object, key: string | symbol, descriptor: PropertyDescriptor) => {
     registerPermission(uuid, { type, name, fnc: key });
@@ -65,8 +65,8 @@ export function helper() {
 
   const path = parse(stack[1].getFileName() || '');
   const name = path.name;
-  const _type = path.dir.match(/(?<type>\w+\$)/);
-  const type = _type && _type.groups && _type.groups.type === 'dest' ? 'core' : _type;
+  const _type = path.dir.split(separator)[path.dir.split(separator).length - 1];
+  const type = _type === 'dest' ? 'core' : _type;
 
   return (target: object, key: string | symbol, descriptor: PropertyDescriptor) => {
     registerHelper({ type, name, fnc: key });
