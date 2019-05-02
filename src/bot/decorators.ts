@@ -6,6 +6,7 @@ export function parser(opts: {
   priority?: number,
   dependsOn?: string[],
 }) {
+  opts = opts || {};
   const _prepareStackTrace = Error.prepareStackTrace;
   Error.prepareStackTrace = (_, s) => s;
   const stack = (new Error().stack as unknown as NodeJS.CallSite[]);
@@ -131,13 +132,16 @@ function registerParser(opts, m) {
   if (!global[m.type] || !global[m.type][m.name]) {
     return setTimeout(() => registerParser(opts, m), 10);
   }
-
-  const self = global[m.type][m.name];
-  self._parsers.push({
-    name: m.fnc,
-    permission: opts.permission,
-    priority: opts.priority,
-    dependsOn: opts.dependsOn,
-    fireAndForget: opts.fireAndForget,
-  });
+  try {
+    const self = global[m.type][m.name];
+    self._parsers.push({
+      name: m.fnc,
+      permission: opts.permission,
+      priority: opts.priority,
+      dependsOn: opts.dependsOn,
+      fireAndForget: opts.fireAndForget,
+    });
+  } catch (e) {
+    global.log.error(e.stack);
+  }
 }
