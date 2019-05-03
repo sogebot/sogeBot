@@ -412,6 +412,7 @@
     console.debug('EMIT [getVersion]')
     socket.emit('getVersion')
     socket.once('version', function (version) {
+      version = '7.0.0'
       $('#current_version').text(version)
       $.get('https://api.github.com/repos/sogehige/sogebot/releases/latest', function (response) {
         var md = new markdownit()
@@ -420,8 +421,7 @@
         if (!_.isNil(commits_match)) {
           for (let commit of commits_match) {
             commit_short = commit.substring(0, 6)
-            response.body = response.body.replace(commit, '[' + commit_short +
-              '](https://github.com/sogehige/sogeBot/commit/' + commit_short + ')')
+            response.body = response.body.replace(commit, commit_short)
           }
         }
 
