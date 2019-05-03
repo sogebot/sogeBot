@@ -66,7 +66,6 @@ class Module {
     // prepare proxies for variables
     this.prepareCommandProxies();
     this.prepareVariableProxies();
-    this.prepareParsers();
     this.loadVariableValues();
     this._sockets();
     this._indexDbs();
@@ -87,13 +86,6 @@ class Module {
       process.exit(1);
     }
     if (!this.isLoaded) { setTimeout(() => this._status(++retries), 10); } else { this.status({ state: this.settings.enabled, quiet: !isMainThread }); } // force status change and quiet on workers
-  }
-
-  public prepareParsers() {
-    this.settings = this.settings || {};
-    if (this._settings.parsers) {
-      this._parsers = this._settings.parsers;
-    }
   }
 
   public emit(event: string, ...args: any[]) {

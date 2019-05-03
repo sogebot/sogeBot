@@ -63,11 +63,9 @@ public foobar(opts: CommandOptions) {
 
 #### Parsers
 
-##### Required values
+To define function, which should be command, you must use decorator **@parser**.
 
-* `name`: name of parser, this will also set function which will run in system
-
-##### Default values
+##### Parser options
 
 * `fireAndForget`: if parser should run in background and we don't care about
   result, e.g. stats counting. `false`
@@ -76,17 +74,14 @@ public foobar(opts: CommandOptions) {
 * `permission`: sets default permission for parser. `permission.VIEWERS`
 
 ``` typescript
-const options: InterfaceSettings = {
-  // ...
-  settings: {
-    // ...
-    parsers: [
-      { name: 'run' },
-      { name: 'stop', fireAndForget: true } // with custom values
-    ],
-    // ...
-  },
-  // ...
+@parser()
+public someParser(opts: ParserOptions) {
+  // ... parser logic ...
+}
+
+@parser({ fireAndForget: true })
+public anotherParser(opts: ParserOptions) {
+  // ... parser logic ...
 }
 ```
 

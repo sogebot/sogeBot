@@ -9,6 +9,7 @@ const Message = require('../message')
 import { prepare, sendMessage } from '../commons';
 import Expects from '../expects';
 import System from './_interface'
+import { parser } from '../decorators';
 import { permission } from '../permissions';
 
 /*
@@ -32,9 +33,6 @@ class Alias extends System {
         { name: '!alias toggle-visibility', permission: permission.CASTERS },
         { name: '!alias toggle', permission: permission.CASTERS },
         { name: '!alias', permission: permission.CASTERS }
-      ],
-      parsers: [
-        { name: 'run', fireAndForget: true }
       ]
     }
     super({ settings })
@@ -43,6 +41,7 @@ class Alias extends System {
     this.addMenu({ category: 'settings', name: 'systems', id: 'systems' })
   }
 
+  @parser({ fireAndForget: true })
   async run (opts) {
     const parser = new Parser()
     let alias

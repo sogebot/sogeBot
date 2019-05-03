@@ -1,4 +1,27 @@
-import { parse } from 'path';
+import { parse, sep as separator } from 'path';
+
+export function parser(opts: {
+  fireAndForget?: boolean,
+  permission?: string,
+  priority?: number,
+  dependsOn?: string[],
+}) {
+  opts = opts || {};
+  const _prepareStackTrace = Error.prepareStackTrace;
+  Error.prepareStackTrace = (_, s) => s;
+  const stack = (new Error().stack as unknown as NodeJS.CallSite[]);
+  Error.prepareStackTrace = _prepareStackTrace;
+
+  const path = parse(stack[1].getFileName() || '');
+  const name = path.name;
+  const _type = path.dir.split(separator)[path.dir.split(separator).length - 1];
+  const type = _type === 'dest' ? 'core' : _type;
+
+  return (target: object, key: string, descriptor: PropertyDescriptor) => {
+    registerParser(opts, { type, name, fnc: key });
+    return descriptor;
+  };
+}
 
 export function command(opts: string) {
   const _prepareStackTrace = Error.prepareStackTrace;
@@ -8,7 +31,7 @@ export function command(opts: string) {
 
   const path = parse(stack[1].getFileName() || '');
   const name = path.name;
-  const _type = path.dir.split('\\')[path.dir.split('\\').length - 1];
+  const _type = path.dir.split(separator)[path.dir.split(separator).length - 1];
   const type = _type === 'dest' ? 'core' : _type;
 
   return (target: object, key: string, descriptor: PropertyDescriptor) => {
@@ -25,7 +48,7 @@ export function default_permission(uuid: string) {
 
   const path = parse(stack[1].getFileName() || '');
   const name = path.name;
-  const _type = path.dir.split('\\')[path.dir.split('\\').length - 1];
+  const _type = path.dir.split(separator)[path.dir.split(separator).length - 1];
   const type = _type === 'dest' ? 'core' : _type;
 
   return (target: object, key: string | symbol, descriptor: PropertyDescriptor) => {
@@ -42,7 +65,7 @@ export function helper() {
 
   const path = parse(stack[1].getFileName() || '');
   const name = path.name;
-  const _type = path.dir.split('\\')[path.dir.split('\\').length - 1];
+  const _type = path.dir.split(separator)[path.dir.split(separator).length - 1];
   const type = _type === 'dest' ? 'core' : _type;
 
   return (target: object, key: string | symbol, descriptor: PropertyDescriptor) => {
@@ -102,5 +125,23 @@ function registerHelper(m, retry = 0) {
     } else {
       global.log.error('Command with function ' + m.fnc + ' not found!');
     }
+  }
+}
+
+function registerParser(opts, m) {
+  if (!global[m.type] || !global[m.type][m.name]) {
+    return setTimeout(() => registerParser(opts, m), 10);
+  }
+  try {
+    const self = global[m.type][m.name];
+    self._parsers.push({
+      name: m.fnc,
+      permission: opts.permission,
+      priority: opts.priority,
+      dependsOn: opts.dependsOn,
+      fireAndForget: opts.fireAndForget,
+    });
+  } catch (e) {
+    global.log.error(e.stack);
   }
 }

@@ -12,6 +12,7 @@ import { permission } from '../permissions';
 import System from './_interface'
 import constants from '../constants'
 const Expects = require('../expects.js')
+import { parser } from '../decorators';
 const Parser = require('../parser')
 
 /*
@@ -34,9 +35,6 @@ class Cooldown extends System {
         { name: '!cooldown toggle enabled', permission: permission.CASTERS },
         { name: '!cooldown', permission: permission.CASTERS }
       ],
-      parsers: [
-        { name: 'check', priority: constants.HIGH }
-      ]
     }
     super({ settings })
 
@@ -67,6 +65,7 @@ class Cooldown extends System {
     commons.sendMessage(message, opts.sender)
   }
 
+  @parser({ priority: constants.HIGH })
   async check (opts: Object) {
     var data, viewer, timestamp, now
     const [command, subcommand] = new Expects(opts.message)
