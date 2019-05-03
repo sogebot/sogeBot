@@ -248,6 +248,7 @@ class CustomCommands extends System {
 
     // remove found command from message to get param
     const param = opts.message.replace(new RegExp('^(' + cmdArray.join(' ') + ')', 'i'), '').trim()
+    const count = _.get(await global.db.engine.findOne(this.collection.count, { command: command.command }), 'count', 0)
     global.db.engine.increment(this.collection.count, { command: command.command }, { count: 1 })
 
     const responses: Array<Response> = await global.db.engine.find(this.collection.responses, { cid: String(command._id) })
@@ -258,7 +259,7 @@ class CustomCommands extends System {
       }
     }
 
-    this.sendResponse(_.cloneDeep(_responses), { param, sender: opts.sender, command: command.command });
+    this.sendResponse(_.cloneDeep(_responses), { param, sender: opts.sender, command: command.command, count });
     return _responses.map((o) => {
       return o.response
     })
@@ -269,7 +270,8 @@ class CustomCommands extends System {
     const response = responses.shift()
     await commons.sendMessage(response.response, opts.sender, {
       param: opts.param,
-      cmd: opts.command
+      cmd: opts.command,
+      count: opts.count,
     })
     setTimeout(() => {
       this.sendResponse(responses, opts);
