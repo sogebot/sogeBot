@@ -143,14 +143,26 @@ class TMI extends Core {
   }
 
   async join (type: string, channel: string) {
-    await this.client[type].chat.join(channel)
-    global.log.info(`TMI: ${type} joined channel ${channel}`)
-    this.channel = channel
+    if (typeof this.client[type] === 'undefined') {
+      global.log.info(`TMI: ${type} oauth is not properly set, cannot join`)
+    } else {
+      if (channel === '') {
+        global.log.info(`TMI: ${type} is not properly set, cannot join empty channel`)
+      } else {
+        await this.client[type].chat.join(channel)
+        global.log.info(`TMI: ${type} joined channel ${channel}`)
+        this.channel = channel;
+      }
+    }
   }
 
   async part (type: string) {
-    await this.client[type].chat.part(this.channel)
-    global.log.info(`TMI: ${type} parted channel ${this.channel}`)
+    if (typeof this.client[type] === 'undefined') {
+      global.log.info(`TMI: ${type} is not connected in any channel`)
+    } else {
+      await this.client[type].chat.part(this.channel)
+      global.log.info(`TMI: ${type} parted channel ${this.channel}`)
+    }
   }
 
   getUsernameFromRaw (raw: string) {
