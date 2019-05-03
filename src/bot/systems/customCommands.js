@@ -268,6 +268,16 @@ class CustomCommands extends System {
   async sendResponse(responses, opts) {
     if (responses.length === 0) return;
     const response = responses.shift()
+
+    // search for $count('!another') functions
+    const countRegex = new RegExp('\\$count\\(\\\'(?<command>\\!\\S*)\\\'\\)', 'gm');
+    let match
+    while(match = countRegex.exec(response.response)) {
+      const stringToReplace = match[0];
+      const count = _.get(await global.db.engine.findOne(this.collection.count, { command: match.groups.command }), 'count', 0);
+      response.response = response.response.replace(stringToReplace, count);
+    }
+
     await commons.sendMessage(response.response, opts.sender, {
       param: opts.param,
       cmd: opts.command,
