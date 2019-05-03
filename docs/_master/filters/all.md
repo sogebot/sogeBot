@@ -184,7 +184,10 @@ needed.
 e.g. `(api|https://httpbin.org/get?test=a\\nb) Lorem (api.args.test)`
 
 ## Command filters
-`$count` - return how many times command was used
+
+`$count` - return how many times current command was used
+
+`$count('!another')` - return how many times `!another` command was used
 
 `(!<command> <argument>)` - run `!<command> argument`
 
