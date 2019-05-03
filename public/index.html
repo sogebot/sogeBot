@@ -420,8 +420,7 @@
         if (!_.isNil(commits_match)) {
           for (let commit of commits_match) {
             commit_short = commit.substring(0, 6)
-            response.body = response.body.replace(commit, '[' + commit_short +
-              '](https://github.com/sogehige/sogeBot/commit/' + commit_short + ')')
+            response.body = response.body.replace(commit, commit_short)
           }
         }
 
@@ -433,6 +432,8 @@
               '](https://github.com/sogehige/sogeBot/issues/' + issue.replace('#', '') + ')')
           }
         }
+
+        response.body = response.body.replace(/### /g, '##### '); // change h3 => h5
 
         $('#new_version_dlg .modal-body').html(md.render(response.body.replace('**Changelog**', '').trim()))
         $('#new_version_dlg .modal-header small').text(response.tag_name)
