@@ -192,7 +192,7 @@
       <div class="row">
         <div class="col-sm stream-info" onclick="saveHighlight()">
           <h2>
-            <i>{{ commons.translate('uptime') }}</i>
+            <span>{{ commons.translate('uptime') }}</span>
             <small>{{ commons.translate('click-to-highlight') }}</small>
           </h2>
           <span class="data" id="uptime">{{ uptime }}</span>
@@ -201,7 +201,7 @@
 
         <div class="col-sm stream-info" v-on:click="toggleViewerShow">
           <h2>
-            <i>{{ commons.translate('viewers') }}</i>
+            <span>{{ commons.translate('viewers') }}</span>
             <small>{{ commons.translate('click-to-toggle-display') }}</small>
           </h2>
           <span class="data" v-html="currentViewersComputed"></span>
@@ -210,7 +210,7 @@
 
         <div class="col-sm stream-info" v-on:click="toggleViewerShow">
           <h2>
-            <i>{{ commons.translate('max-viewers') }}</i>
+            <span>{{ commons.translate('max-viewers') }}</span>
             <small>{{ commons.translate('click-to-toggle-display') }}</small>
           </h2>
           <span class="data" v-html="maxViewersComputed"></span>
@@ -219,7 +219,7 @@
 
         <div class="col-sm stream-info" v-on:click="toggleViewerShow">
           <h2>
-            <i>{{ commons.translate('new-chatters') }}</i>
+            <span>{{ commons.translate('new-chatters') }}</span>
             <small>{{ commons.translate('click-to-toggle-display') }}</small>
           </h2>
           <span class="data" v-html="newChattersComputed"></span>
@@ -288,7 +288,7 @@
       <div class="row">
         <div class="col-md stream-info" onclick="changeGT.showDlg()">
           <h2>
-            <i>{{ commons.translate('game') }}</i>
+            <span>{{ commons.translate('game') }}</span>
             <small>{{ commons.translate('click-to-change') }}</small>
           </h2>
           <span class="data" id="game">{{ commons.translate('not-available') }}</span>
@@ -296,7 +296,7 @@
 
         <div class="col stream-info" onclick="changeGT.showDlg()">
           <h2>
-            <i>{{ commons.translate('title') }}</i>
+            <span>{{ commons.translate('title') }}</span>
             <small>{{ commons.translate('click-to-change') }}</small>
           </h2>
           <span class="data" id="title">{{ commons.translate('not-available') }}</span>
