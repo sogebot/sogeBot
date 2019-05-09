@@ -5072,6 +5072,10 @@
         }
       }
     },
+    "flatpickr": {
+      "version": "4.5.7",
+      "dev": true
+    },
     "flush-write-stream": {
       "version": "1.1.1",
       "dev": true,
@@ -9776,13 +9780,12 @@
         "diff-match-patch": "^1.0.0"
       }
     },
-    "vue-datetime": {
-      "version": "1.0.0-beta.10",
-      "dev": true
-    },
-    "vue-datetime-picker": {
-      "version": "0.2.1",
-      "dev": true
+    "vue-flatpickr-component": {
+      "version": "8.1.2",
+      "dev": true,
+      "requires": {
+        "flatpickr": "^4.5.1"
+      }
     },
     "vue-functional-data-merge": {
       "version": "2.0.7",

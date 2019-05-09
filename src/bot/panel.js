@@ -339,6 +339,9 @@ function Panel () {
       // timezone
       data.timezone = config.timezone === 'system' || _.isNil(config.timezone) ? moment.tz.guess() : config.timezone
 
+      // lang
+      data.lang = global.general.settings.lang;
+
       if (_.isFunction(cb)) cb(data)
       else socket.emit('configuration', data)
     })
