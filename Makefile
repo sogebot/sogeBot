@@ -65,10 +65,6 @@ pack:
 prepare:
 	@echo -ne "\n\t ----- Cleaning up node_modules\n"
 	@rm -rf node_modules
-	@echo -ne "\n\t ----- Cleaning up npm shrinkwrap\n"
-	@rm -rf npm-shrinkwrap.json
-	@echo -ne "\n\t ----- Cleaning up yarn.lock\n"
-	@rm -rf yarn.lock
 
 clean:
 	@echo -ne "\n\t ----- Cleaning up compiled files\n"
