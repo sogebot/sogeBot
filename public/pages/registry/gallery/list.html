@@ -42,7 +42,7 @@
         <div class="card-deck mb-3" v-else-if="filtered.length > 0" v-for="(chunk, index) of _.chunk(filtered, itemCountPerRow)">
           <div class="card" v-for="item of chunk">
             <div class="card-body border-top p-0 text-right" style="flex: 0 1 auto;">
-              <a v-bind:href="'/gallery/'+ item._id" class="btn btn-outline-dark p-3 border-0 w-100" target="_blank"><i class="fas fa-link"></i> /gallery/{{ item._id }}</a>
+              <a v-bind:href="'/gallery/'+ item._id" class="btn btn-outline-dark p-3 border-0 w-100" target="_blank"><i class="fas fa-link"></i> {{ item.name | item._id }}</a>
             </div>
             <div class="card-body border-top p-0 text-right" style="flex: 1 1 auto;">
               <img class="w-100" :src="'/gallery/'+ item._id" v-if="item.type.includes('png') || item.type.includes('jpg') || item.type.includes('jpeg') || item.type.includes('gif')">
@@ -162,7 +162,7 @@
           for (let i = 0, l = files.length; i < l; i++) {
             const reader = new FileReader()
             reader.onload = (e => {
-              this.socket.emit('upload', e.target.result, (item) => {
+              this.socket.emit('upload', [files[i].name, e.target.result], (item) => {
                 this.uploadedFiles++
                 this.items.push(item)
               })
