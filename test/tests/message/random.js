@@ -8,6 +8,12 @@ const assert = require('assert')
 
 const owner = { username: 'soge__' }
 
+async function setUsersOnline(users) {
+  for (let username of users) {
+    await global.db.engine.update('users.online', { username }, { username })
+  }
+}
+
 describe('Message - random filter', () => {
   describe('(random.online.viewer) should exclude ignored user', () => {
     before(async () => {
@@ -20,15 +26,9 @@ describe('Message - random filter', () => {
       await msg.isSent('ignore.user.is.added', owner, { username: 'ignoreduser' })
     })
 
-    const users = ['ignoreduser', 'user1']
-    for (let username of users) {
-      it('add user ' + username + ' to online list', async () => {
-        await global.db.engine.insert('users.online', { username })
-      })
-    }
-
     it('From 100 randoms ignoreduser shouldn\'t be picked', async () => {
       for (var i = 0; i < 100; i++) {
+        await setUsersOnline(['ignoreduser', 'user1'])
         let message = await new Message('(random.online.viewer)').parse({})
         assert.equal(message, 'user1')
       }
@@ -47,9 +47,6 @@ describe('Message - random filter', () => {
 
     const users = ['ignoreduser', 'user1']
     for (let username of users) {
-      it('add user ' + username + ' to online list', async () => {
-        await global.db.engine.insert('users.online', { username })
-      })
       it('add user ' + username + ' to users list', async () => {
         await global.db.engine.insert('users', { id: Math.random(), username, is: { follower: true } })
       })
@@ -57,6 +54,7 @@ describe('Message - random filter', () => {
 
     it('From 100 randoms ignoreduser shouldn\'t be picked', async () => {
       for (var i = 0; i < 100; i++) {
+        await setUsersOnline(['ignoreduser', 'user1'])
         let message = await new Message('(random.online.follower)').parse({})
         assert.equal(message, 'user1')
       }
@@ -75,9 +73,6 @@ describe('Message - random filter', () => {
 
     const users = ['ignoreduser', 'user1']
     for (let username of users) {
-      it('add user ' + username + ' to online list', async () => {
-        await global.db.engine.insert('users.online', { username })
-      })
       it('add user ' + username + ' to users list', async () => {
         await global.db.engine.insert('users', { id: Math.random(), username, is: { subscriber: true } })
       })
@@ -85,6 +80,7 @@ describe('Message - random filter', () => {
 
     it('From 100 randoms ignoreduser shouldn\'t be picked', async () => {
       for (var i = 0; i < 100; i++) {
+        await setUsersOnline(['ignoreduser', 'user1'])
         let message = await new Message('(random.online.subscriber)').parse({})
         assert.equal(message, 'user1')
       }
