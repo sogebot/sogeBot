@@ -5189,17 +5189,6 @@
         "rimraf": "2"
       }
     },
-    "full-icu": {
-      "version": "1.2.1",
-      "requires": {
-        "icu4c-data": "0.64.2"
-      },
-      "dependencies": {
-        "icu4c-data": {
-          "version": "0.64.2"
-        }
-      }
-    },
     "function-bind": {
       "version": "1.1.1",
       "dev": true
@@ -6402,9 +6391,6 @@
           "version": "2.1.2"
         }
       }
-    },
-    "luxon": {
-      "version": "1.12.1"
     },
     "m3u8stream": {
       "version": "0.6.2",
