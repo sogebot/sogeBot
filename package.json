@@ -147,7 +147,7 @@
     "bootstrap-vue": "2.0.0-rc.19",
     "chai": "4.2.0",
     "clean-webpack-plugin": "2.0.1",
-    "conventional-changelog-cli": "2.0.17",
+    "conventional-changelog-cli": "2.0.21",
     "cross-var": "1.1.0",
     "css-loader": "2.1.1",
     "docsify-cli": "4.3.0",
