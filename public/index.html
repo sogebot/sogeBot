@@ -532,6 +532,12 @@
     /* MENU */
     socket.on('menu', function (menu) {
       if (loadedMenu) return
+      loadMenu(menu)
+    })
+
+    function loadMenu(menu) {
+      if (_.size(translations) === 0) return setTimeout(() => loadMenu(menu), 10)
+
       /* at first, clear all menu */
       $('#menu-*').empty()
       var games = false // we want only games settings once
@@ -541,7 +547,10 @@
       var registry = false // we want only registry settings once
       var core = false // we want only core settings once
       var logs = false // we want only logs settings once
-      _.each(menu, function (obj) {
+
+      menu.sort((a, b) => {
+        return commons.translate('menu.' + a.name).localeCompare(commons.translate('menu.' + b.name))
+      }).forEach(obj => {
         if (obj.id !== 'dashboard') {
           if (obj.id.startsWith('/')) obj.id = obj.id.replace('/', '')
 
@@ -553,8 +562,7 @@
           if ((obj.id === 'core') && core) return
           if ((obj.id === 'logs') && logs) return
           $('#menu-' + obj.category).append('<li class="nav-item"><a class="nav-link" href="#/' + obj.id.replace(/\./g, '/') + '" data-page="' +
-            obj.id.replace(/\./g, '/') + '" data-lang="menu.' + obj.name +
-            '"></a></li>')
+            obj.id.replace(/\./g, '/') + '">' + commons.translate('menu.' + obj.name) + '</a></li>')
         }
         if (obj.id === 'systems') systems = true
         if (obj.id === 'overlays') overlays = true
@@ -571,7 +579,7 @@
         $(".page-menu a,#menu-main a").removeClass('active')
         $(ev.currentTarget).addClass('active')
       })
-    })
+    }
 
     // addWidget
     $("#addWidget").on('click', function (ev) {
