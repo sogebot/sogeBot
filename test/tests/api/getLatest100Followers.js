@@ -15,9 +15,6 @@ const sinon = require('sinon')
 const axios = require('axios')
 const assert = require('assert')
 
-const MockAdapter = require('axios-mock-adapter');
-let mock = null;
-
 describe('API - getLatest100Followers()', () => {
   before(async () => {
     await db.cleanup()
@@ -40,62 +37,7 @@ describe('API - getLatest100Followers()', () => {
   })
 
   describe('Example data', () => {
-    before(() => {
-      mock = new MockAdapter(axios);
-      // add axios mock
-      mock.onGet('https://api.twitch.tv/helix/users/follows?to_id=12345&first=100').reply(200, {
-        'total': 12345,
-        'data': [
-          {
-            'from_id': '171003792',
-            'from_name': 'IIIsutha067III',
-            'to_id': '23161357',
-            'to_name': 'LIRIK',
-            'followed_at': '2017-08-22T22:55:24Z'
-          },
-          {
-            'from_id': '113627897',
-            'from_name': 'Birdman616',
-            'to_id': '23161357',
-            'to_name': 'LIRIK',
-            'followed_at': '2017-08-22T22:55:04Z'
-          },
-          {
-            'from_id': '111',
-            'from_name': 'testfollow',
-            'to_id': '23161357',
-            'to_name': 'LIRIK',
-            'followed_at': String(new Date())
-          },
-          {
-            'from_id': '222',
-            'from_name': 'testfollow2',
-            'to_id': '23161357',
-            'to_name': 'LIRIK',
-            'followed_at': String(new Date())
-          },
-          {
-            'from_id': '333',
-            'from_name': '__bot_username__',
-            'to_id': '23161357',
-            'to_name': 'LIRIK',
-            'followed_at': String(new Date())
-          }
-        ],
-        'pagination': {
-          'cursor': 'eyJiIjpudWxsLCJhIjoiMTUwMzQ0MTc3NjQyNDQyMjAwMCJ9'
-        }
-      }, {
-        'ratelimit-remaining': 800,
-        'ratelimit-reset': 0,
-        'ratelimit-limit': 800
-      })
-      .onAny().passThrough(); // pass through others
-    })
-
-    after(() => {
-      mock.restore();
-    })
+    // we are using mock https://api.twitch.tv/helix/users/follows?to_id=12345&first=100
 
     it('should be properly parsed', async () => {
       const status = await global.api.getLatest100Followers(false)
