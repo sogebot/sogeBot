@@ -1,4 +1,3 @@
-import { DateTime } from 'luxon';
 import { isMainThread } from 'worker_threads';
 
 import { getLocalizedName, getOwner, prepare, round5, sendMessage } from '../commons';
@@ -120,11 +119,10 @@ class Scrim extends System {
       this.cleanedUpOnStart = true;
       this.settings._.closingAt = 0;
     } else if (this.settings._.closingAt !== 0) {
-      const when = DateTime.fromMillis(this.settings._.closingAt, { locale: global.general.settings.lang });
-      const lastRemindAtDiffMs = -(DateTime.fromMillis(this.settings._.lastRemindAt).diffNow().toObject().milliseconds || 0);
+      const lastRemindAtDiffMs = -(this.settings._.lastRemindAt - Date.now());
 
-      const minutesToGo = when.diffNow(['minutes']).toObject().minutes || 0;
-      const secondsToGo = round5(when.diffNow(['seconds']).toObject().seconds || 0);
+      const minutesToGo = (this.settings._.closingAt - Date.now()) / constants.MINUTE;
+      const secondsToGo = round5((this.settings._.closingAt - Date.now()) / constants.SECOND);
 
       if (minutesToGo > 1) {
         // countdown every minute

@@ -360,3 +360,40 @@ export function getLocalizedName(number, translation) {
 export function round5(x: number) {
   return Math.round(x / 5 ) * 5;
 }
+
+/**
+ * Return diff object
+ * @param x timestamp ms
+ * @param y timestamp ms
+ */
+export function dateDiff(x: number, y: number) {
+  let diff;
+
+  if (x > y) {
+    diff = x - y;
+  } else {
+    diff = y - x;
+  }
+
+  const years = Math.floor(diff / (1000 * 60 * 60 * 24 * 365));
+  diff = diff - (years * 1000 * 60 * 60 * 24 * 365);
+
+  const months = Math.floor(diff / (1000 * 60 * 60 * 24 * 30));
+  diff = diff - (months * 1000 * 60 * 60 * 24 * 30);
+
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  diff = diff - (days * 1000 * 60 * 60 * 24);
+
+  const hours = Math.floor(diff / (1000 * 60 * 60));
+  diff = diff - (hours * 1000 * 60 * 60);
+
+  const minutes = Math.floor(diff / (1000 * 60));
+
+  return {
+    years,
+    months,
+    days,
+    hours,
+    minutes,
+  };
+}

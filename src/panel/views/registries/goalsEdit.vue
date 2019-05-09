@@ -162,7 +162,7 @@
 
                     <div class="form-group col-md-12" v-if="!currentGoal.endAfterIgnore">
                       <label for="endAfter-input">{{ translate('registry.goals.input.endAfter.title') }}</label>
-                      <datetime v-model="currentGoal.endAfter" input-class="form-control" type="datetime"></datetime>
+                      <datetime v-model="currentGoal.endAfter" class="form-control" :config="dateTimePicker"></datetime>
                     </div>
                   </div>
                 </div>
@@ -314,8 +314,8 @@ import 'codemirror/theme/base16-dark.css'
 import 'codemirror/theme/base16-light.css'
 import 'codemirror/lib/codemirror.css'
 
-import { Datetime } from 'vue-datetime';
-import 'vue-datetime/dist/vue-datetime.css'
+import VueFlatPickr from 'vue-flatpickr-component';
+import 'flatpickr/dist/flatpickr.css';
 
 import io from 'socket.io-client';
 import uuid from 'uuid/v4';
@@ -325,7 +325,7 @@ export default Vue.extend({
   components: {
     panel: () => import('../../components/panel.vue'),
     holdButton: () => import('../../components/holdButton.vue'),
-    datetime: Datetime,
+    datetime: VueFlatPickr,
     codemirror
   },
   data: function () {
@@ -344,7 +344,8 @@ export default Vue.extend({
       customShow: string,
       state: {
         save: number
-      }
+      },
+      dateTimePicker: any,
     } = {
       socket: io('/overlays/goals', { query: "token=" + this.token }),
       search: '',
@@ -368,7 +369,13 @@ export default Vue.extend({
       customShow: 'html',
       state: {
         save: 0
-      }
+      },
+      dateTimePicker: {
+        enableTime: true,
+        altFormat: 'M	j, Y H:i',
+        altInput: true,
+        dateFormat: 'Z'
+      },
     }
     return object
   },

@@ -1,7 +1,7 @@
 import _ from 'lodash';
-import { DateTime } from 'luxon';
+import moment from 'moment';
 
-import { getLocalizedName, prepare, sendMessage } from '../commons';
+import { dateDiff, getLocalizedName, prepare, sendMessage } from '../commons';
 import { debug } from '../debug';
 import System from './_interface';
 
@@ -70,11 +70,12 @@ class UserInfo extends System {
       sendMessage(prepare('followage.' + (opts.sender.username === username.toLowerCase() ? 'successSameUsername' : 'success') + '.never', { username }), opts.sender);
     } else {
       const units: string[] = ['years', 'months', 'days', 'hours', 'minutes'];
-      const diff = DateTime.fromMillis(user.time.follow).diffNow(['years', 'months', 'days', 'hours', 'minutes']);
+      const diff = dateDiff(new Date(user.time.follow).getTime(), Date.now());
+
       const output: string[] = [];
       for (const unit of units) {
         if (diff[unit]) {
-          const v = -Number(diff[unit]).toFixed();
+          const v = Number(diff[unit]).toFixed();
           output.push(v + ' ' + getLocalizedName(v, 'core.' + unit));
         }
       }
@@ -112,11 +113,11 @@ class UserInfo extends System {
       }), opts.sender);
     } else {
       const units: string[] = ['years', 'months', 'days', 'hours', 'minutes'];
-      const diff = DateTime.fromMillis(user.time.subscribed_at).diffNow(['years', 'months', 'days', 'hours', 'minutes']);
+      const diff = dateDiff(new Date(user.time.subscribed_at).getTime(), Date.now());
       const output: string[] = [];
       for (const unit of units) {
         if (diff[unit]) {
-          const v = -Number(diff[unit]).toFixed();
+          const v = Number(diff[unit]).toFixed();
           output.push(v + ' ' + getLocalizedName(v, 'core.' + unit));
         }
       }
@@ -150,11 +151,11 @@ class UserInfo extends System {
       sendMessage(prepare('age.failed', { username }), opts.sender);
     } else {
       const units: string[] = ['years', 'months', 'days', 'hours', 'minutes'];
-      const diff = DateTime.fromMillis(new Date(user.time.created_at).getTime()).diffNow(['years', 'months', 'days', 'hours', 'minutes']);
+      const diff = dateDiff(new Date(user.time.created_at).getTime(), Date.now());
       const output: string[] = [];
       for (const unit of units) {
         if (diff[unit]) {
-          const v = -Number(diff[unit]).toFixed();
+          const v = Number(diff[unit]).toFixed();
           output.push(v + ' ' + getLocalizedName(v, 'core.' + unit));
         }
       }
@@ -179,10 +180,10 @@ class UserInfo extends System {
       if (_.isNil(user) || _.isNil(user.time) || _.isNil(user.time.message)) {
         sendMessage(global.translate('lastseen.success.never').replace(/\$username/g, parsed[0]), opts.sender);
       } else {
-        const when = DateTime.fromMillis(user.time.message, { locale: global.general.settings.lang});
+        moment.locale(global.lib.translate.lang);
         sendMessage(global.translate('lastseen.success.time')
           .replace(/\$username/g, parsed[0])
-          .replace(/\$when/g, when.toLocaleString(DateTime.DATETIME_MED_WITH_SECONDS)), opts.sender);
+          .replace(/\$when/g, moment(user.time.message).format('L') + ' ' + moment(user.time.message).format('LTS')), opts.sender);
       }
     } catch (e) {
       sendMessage(global.translate('lastseen.failed.parse'), opts.sender);

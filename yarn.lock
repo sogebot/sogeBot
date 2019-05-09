@@ -4835,6 +4835,11 @@ flat@^4.1.0:
   dependencies:
     is-buffer "~2.0.3"
 
+flatpickr@^4.5.1:
+  version "4.5.7"
+  resolved "https://registry.yarnpkg.com/flatpickr/-/flatpickr-4.5.7.tgz#6efc0d93c65547aa77294205c67830ebabe3565c"
+  integrity sha512-JqPfihUc9A/j9QAsh6otoARmMyUauPE17vRBEG+ThJwbl8zAq4ssGpxlPK3wWM/i8EFxkHg9UuVo0ds7XluKxw==
+
 flush-write-stream@^1.0.0:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/flush-write-stream/-/flush-write-stream-1.1.1.tgz#8dd7d873a1babc207d94ead0c2e0e44276ebf2e8"
@@ -4994,11 +4999,6 @@ fstream@^1.0.0, fstream@^1.0.2:
     inherits "~2.0.0"
     mkdirp ">=0.5 0"
     rimraf "2"
-
-full-icu@1.2.1:
-  version "1.2.1"
-  resolved "https://registry.yarnpkg.com/full-icu/-/full-icu-1.2.1.tgz#28d7f1caafb14cac262364ca584fe7f2044a4ab2"
-  integrity sha512-E2s1b4GVbt8PyG+iaRN6ks8N0Oy2LOJz7SIMUwWWWx7Mr5Z08hKkfpkKQbOtOGqzkFpckDJHjjZ8qfigN2W86A==
 
 function-bind@^1.1.1:
   version "1.1.1"
@@ -6451,11 +6451,6 @@ lru-cache@^5.1.1:
   integrity sha512-KpNARQA3Iwv+jTA0utUVVbrh+Jlrr1Fv0e56GGzAFOXN7dk/FviaDW8LHmK52DlcH4WP2n6gI8vN1aesBFgo9w==
   dependencies:
     yallist "^3.0.2"
-
-luxon@1.12.1:
-  version "1.12.1"
-  resolved "https://registry.yarnpkg.com/luxon/-/luxon-1.12.1.tgz#924bd61404f70b0cc5168918cb0ac108e52aacc4"
-  integrity sha512-Zv/qJb2X1ESTrlniAViWx2aqGwi2cVpeoZFTbPdPiCu4EsadKsmb/QCH8HQjMUpDZKKJIHKHsJxV5Rwpq47HKQ==
 
 m3u8stream@^0.6.2:
   version "0.6.2"
@@ -9838,15 +9833,12 @@ vue-codemirror@4.0.6:
     codemirror "^5.41.0"
     diff-match-patch "^1.0.0"
 
-vue-datetime-picker@0.2.1:
-  version "0.2.1"
-  resolved "https://registry.yarnpkg.com/vue-datetime-picker/-/vue-datetime-picker-0.2.1.tgz#7b724dde3b72d531645a27d6597589d6d882ad3b"
-  integrity sha1-e3JN3jty1TFkWifWWXWJ1tiCrTs=
-
-vue-datetime@1.0.0-beta.10:
-  version "1.0.0-beta.10"
-  resolved "https://registry.yarnpkg.com/vue-datetime/-/vue-datetime-1.0.0-beta.10.tgz#788a1c2deefa3e14fbf549373ec00ebde707596a"
-  integrity sha512-/wJkj95JSzWqH0Ja4JpXX6I+fXo2A34GCtsx00vR5RjNxk3++93rg7G4ZlI3MFo807zH9bIxXfIohbAZgnAWbQ==
+vue-flatpickr-component@8.1.2:
+  version "8.1.2"
+  resolved "https://registry.yarnpkg.com/vue-flatpickr-component/-/vue-flatpickr-component-8.1.2.tgz#c8bcfa95a4da4e528f4850141cb0ad7b628a1d6d"
+  integrity sha512-z3FPLrkQgrTXWU3YZ8pcVQ9Gu4CLKUoBQWqK2i3HIhNFcXnwbfY/btf+Uk8zr9Csotrbzw1NWl/WglbW8Zn/Hg==
+  dependencies:
+    flatpickr "^4.5.1"
 
 vue-functional-data-merge@^2.0.7:
   version "2.0.7"

@@ -5072,6 +5072,10 @@
         }
       }
     },
+    "flatpickr": {
+      "version": "4.5.7",
+      "dev": true
+    },
     "flush-write-stream": {
       "version": "1.1.1",
       "dev": true,
@@ -5187,17 +5191,6 @@
         "inherits": "~2.0.0",
         "mkdirp": ">=0.5 0",
         "rimraf": "2"
-      }
-    },
-    "full-icu": {
-      "version": "1.2.1",
-      "requires": {
-        "icu4c-data": "0.64.2"
-      },
-      "dependencies": {
-        "icu4c-data": {
-          "version": "0.64.2"
-        }
       }
     },
     "function-bind": {
@@ -6402,9 +6395,6 @@
           "version": "2.1.2"
         }
       }
-    },
-    "luxon": {
-      "version": "1.12.1"
     },
     "m3u8stream": {
       "version": "0.6.2",
@@ -9790,13 +9780,12 @@
         "diff-match-patch": "^1.0.0"
       }
     },
-    "vue-datetime": {
-      "version": "1.0.0-beta.10",
-      "dev": true
-    },
-    "vue-datetime-picker": {
-      "version": "0.2.1",
-      "dev": true
+    "vue-flatpickr-component": {
+      "version": "8.1.2",
+      "dev": true,
+      "requires": {
+        "flatpickr": "^4.5.1"
+      }
     },
     "vue-functional-data-merge": {
       "version": "2.0.7",
