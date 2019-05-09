@@ -9,6 +9,7 @@ const assert = require('assert')
 const owner = { username: 'soge__' }
 
 async function setUsersOnline(users) {
+  await global.db.engine.remove('users.online', {})
   for (let username of users) {
     await global.db.engine.update('users.online', { username }, { username })
   }
