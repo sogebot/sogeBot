@@ -5,6 +5,7 @@ const {
 
 // setup config
 const config = require('../config.json')
+require('./mocks');
 
 config.metrics = config.metrics || {}
 config.metrics.translations = false
