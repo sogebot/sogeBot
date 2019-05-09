@@ -549,13 +549,7 @@
       var logs = false // we want only logs settings once
 
       menu.sort((a, b) => {
-        const name1 = commons.translate('menu.' + a.name)
-        const name2 = commons.translate('menu.' + b.name)
-        if (name1 < name2) //sort string ascending
-          return -1;
-        if (name1 > name2)
-          return 1;
-        return 0; //default return value (no sorting)
+        return commons.translate('menu.' + a.name).localeCompare(commons.translate('menu.' + b.name))
       }).forEach(obj => {
         if (obj.id !== 'dashboard') {
           if (obj.id.startsWith('/')) obj.id = obj.id.replace('/', '')
