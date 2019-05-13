@@ -19,6 +19,11 @@
         </a>
       </li>
       <li role="presentation" class="nav-item" style="flex-shrink: 0">
+        <button class="btn nav-btn btn-secondary" @click="next">
+          <fa icon="forward" />
+        </button>
+      </li>
+      <li role="presentation" class="nav-item" style="flex-shrink: 0">
         <button :class="[songRequestsEnabled ? 'btn-outline-success' : 'btn-outline-danger']"
                 class="nav-link btn btn-outline-success border-0 h-100 pl-1 pr-1"
                 @click="songRequestsEnabled = !songRequestsEnabled">
@@ -100,6 +105,10 @@ export default {
     }, 500)
   },
   methods: {
+    next(index) {
+      this.requests.splice(index, 1);
+      this.socket.emit('next', () => {});
+    },
     cleanupSongRequestList() {
       this.requests = [];
       this.socket.emit('set.value', 'uris', this.requests)

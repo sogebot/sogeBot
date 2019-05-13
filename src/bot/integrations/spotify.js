@@ -38,6 +38,7 @@ class Spotify extends Integration {
   }> = []
   currentUris: string | null = null
   originalUri: string | null = null
+  skipToNextSong: boolean = false
 
   constructor () {
     const settings = {
@@ -130,8 +131,6 @@ class Spotify extends Integration {
     }
   }
 
-
-
   onUsernameChange (key: string, value: string) {
     if (value.length > 0) global.log.info(chalk.yellow('SPOTIFY: ') + `Access to account ${value} granted`)
   }
@@ -142,6 +141,12 @@ class Spotify extends Integration {
       this.connect()
       this.getMe()
     } else this.disconnect()
+  }
+
+  @command('!spotify skip')
+  @default_permission(null)
+  cSkipSong(opts) {
+    this.skipToNextSong = true
   }
 
   async sendSongs () {
@@ -165,6 +170,13 @@ class Spotify extends Integration {
       this.originalUri = song.uri
     }
 
+    if (this.skipToNextSong) {
+      song.is_playing = false; // force is_playing false to change song
+      song.force_skip = true;
+      this.originalUri = null;
+      this.skipToNextSong = false; // reset skip
+    }
+
     // if song is part of currentUris and is playing, do nothing
     if (typeof song.uri !== 'undefined' && this.currentUris === song.uri && song.is_playing) {
       return
@@ -173,7 +185,7 @@ class Spotify extends Integration {
     if (!(await global.cache.isOnline())) return // don't do anything on offline stream
 
     // if song is part of currentUris and is not playing (finished playing), continue from playlist if set
-    if (typeof song.uri !== 'undefined' && this.currentUris === song.uri && !song.is_playing && this.uris.length === 0) {
+    if (typeof song.uri !== 'undefined' && this.currentUris === song.uri && (!song.is_playing || song.force_skip) && this.uris.length === 0) {
       if (this.settings.output.playlistToPlay.length > 0 && this.settings.output.continueOnPlaylistAfterRequest) {
         try {
           // play from playlist
@@ -206,7 +218,7 @@ class Spotify extends Integration {
         }
       }
     } else if (this.uris.length > 0) { // or we have requests
-      if (Date.now() - song.finished_at <= 0 || this.originalUri !== song.uri || this.originalUri === null || !song.is_playing) { // song should be finished
+      if (Date.now() - song.finished_at <= 0 || this.originalUri !== song.uri || this.originalUri === null || (!song.is_playing || song.force_skip)) { // song should be finished
         try {
           this.currentUris = this.uris.shift().uri // FIFO
           await axios({
@@ -300,6 +312,10 @@ class Spotify extends Integration {
     io.on('connection', (socket) => {
       socket.on('state', async (callback) => {
         callback(null, this.state)
+      })
+      socket.on('skip', async (callback) => {
+        this.skipToNextSong = true;
+        callback(null)
       })
       socket.on('code', async (token, callback) => {
         const waitForUsername = () => {
