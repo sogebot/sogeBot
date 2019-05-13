@@ -59,7 +59,6 @@ class OAuth extends Core {
         ],
         _authenticatedScopes: []
       },
-      commands: []
     }
 
     // define special property name as readonly

@@ -3,6 +3,7 @@ import moment from 'moment';
 
 import { dateDiff, getLocalizedName, prepare, sendMessage } from '../commons';
 import { debug } from '../debug';
+import { command } from '../decorators';
 import System from './_interface';
 
 /*
@@ -34,14 +35,6 @@ class UserInfo extends System {
           _formatDisabled: [],
           formatSeparator: ' | ',
         },
-        commands: [
-          { name: '!me', fnc: 'showMe' },
-          { name: '!lastseen', fnc: 'lastseen' },
-          { name: '!watched', fnc: 'watched' },
-          { name: '!followage', fnc: 'followage' },
-          { name: '!subage', fnc: 'subage' },
-          { name: '!age', fnc: 'age' },
-        ],
       },
       on: {
         message: (e) => this.onMessage(e),
@@ -50,6 +43,7 @@ class UserInfo extends System {
     super(options);
   }
 
+  @command('!followage')
   protected async followage(opts: CommandOptions) {
     let username;
     const parsed = opts.parameters.match(/([^@]\S*)/g);
@@ -90,6 +84,7 @@ class UserInfo extends System {
     }
   }
 
+  @command('!subage')
   protected async subage(opts: CommandOptions) {
     let username;
     const parsed = opts.parameters.match(/([^@]\S*)/g);
@@ -136,6 +131,7 @@ class UserInfo extends System {
     }
   }
 
+  @command('!age')
   protected async age(opts: CommandOptions) {
     let username;
     const parsed = opts.parameters.match(/([^@]\S*)/g);
@@ -169,6 +165,7 @@ class UserInfo extends System {
     }
   }
 
+  @command('!lastseen')
   protected async lastseen(opts: CommandOptions) {
     try {
       const parsed = opts.parameters.match(/^([\S]+)$/);
@@ -190,6 +187,7 @@ class UserInfo extends System {
     }
   }
 
+  @command('!watched')
   protected async watched(opts: CommandOptions) {
     try {
       const parsed = opts.parameters.match(/^([\S]+)$/);
@@ -208,6 +206,7 @@ class UserInfo extends System {
     }
   }
 
+  @command('!me')
   protected async showMe(opts: CommandOptions) {
     try {
       const message: string[] = [];

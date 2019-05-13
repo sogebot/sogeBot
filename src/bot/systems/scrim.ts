@@ -3,6 +3,7 @@ import { isMainThread } from 'worker_threads';
 import { getLocalizedName, getOwner, prepare, round5, sendMessage } from '../commons';
 import constants from '../constants';
 import { debug } from '../debug';
+import { command, default_permission } from '../decorators';
 import Expects from '../expects.js';
 import { permission } from '../permissions';
 import System from './_interface';
@@ -33,11 +34,6 @@ class Scrim extends System {
         time: {
           waitForMatchIdsInSeconds: 60,
         },
-        commands: [
-          { name: '!snipe', permission: permission.CASTERS },
-          '!snipe match',
-          '!snipe stop',
-        ],
       },
     };
 
@@ -50,6 +46,8 @@ class Scrim extends System {
     }
   }
 
+  @command('!snipe')
+  @default_permission(permission.CASTERS)
   public async main(opts: CommandOptions): Promise<void> {
     try {
       const [isCooldownOnly, type, minutes] = new Expects(opts.parameters)
@@ -90,6 +88,7 @@ class Scrim extends System {
     }
   }
 
+  @command('!snipe match')
   public async match(opts: CommandOptions): Promise<void> {
     try {
       if (opts.parameters.length === 0) {
@@ -105,6 +104,8 @@ class Scrim extends System {
     }
   }
 
+  @command('!scrim stop')
+  @default_permission(permission.CASTERS)
   public async stop(): Promise<void> {
     this.settings._.closingAt = 0;
     this.settings._lastRemindAt = Date.now();

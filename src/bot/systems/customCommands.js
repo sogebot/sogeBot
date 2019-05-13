@@ -9,6 +9,7 @@ const safeEval = require('safe-eval')
 const commons = require('../commons');
 
 // bot libraries
+import { command, default_permission, helper } from '../decorators';
 import { permission } from '../permissions';
 import System from './_interface'
 import constants from '../constants'
@@ -47,18 +48,7 @@ type Command = {
 
 class CustomCommands extends System {
   constructor () {
-    const settings = {
-      commands: [
-        { name: '!command add', permission: permission.CASTERS },
-        { name: '!command edit', permission: permission.CASTERS },
-        { name: '!command list', permission: permission.CASTERS },
-        { name: '!command remove', permission: permission.CASTERS },
-        { name: '!command toggle-visibility', permission: permission.CASTERS },
-        { name: '!command toggle', permission: permission.CASTERS },
-        { name: '!command', permission: permission.CASTERS, isHelper: true }
-      ],
-    }
-    super({ settings })
+    super()
 
     this.addMenu({ category: 'manage', name: 'customcommands', id: 'customcommands/list' })
   }
@@ -152,10 +142,15 @@ class CustomCommands extends System {
     })
   }
 
+  @command('!command')
+  @default_permission(permission.CASTERS)
+  @helper()
   main (opts: Object) {
     commons.sendMessage(global.translate('core.usage') + ': !command add (-p [uuid|name]) (-s=true|false) <!cmd> <response> | !command edit (-p [uuid|name]) (-s=true|false) <!cmd> <number> <response> | !command remove <!command> | !command remove <!command> <number> | !command list | !command list <!command>', opts.sender)
   }
 
+  @command('!command edit')
+  @default_permission(permission.CASTERS)
   async edit (opts: Object) {
     try {
       const [userlevel, stopIfExecuted, command, rId, response] = new Expects(opts.parameters)
@@ -194,6 +189,8 @@ class CustomCommands extends System {
     }
   }
 
+  @command('!command add')
+  @default_permission(permission.CASTERS)
   async add (opts: Object) {
     try {
       const [userlevel, stopIfExecuted, command, response] = new Expects(opts.parameters)
@@ -288,6 +285,8 @@ class CustomCommands extends System {
     }, 300)
   }
 
+  @command('!command list')
+  @default_permission(permission.CASTERS)
   async list (opts: Object) {
     const command = new Expects(opts.parameters).command({ optional: true }).toArray()[0]
 
@@ -323,6 +322,8 @@ class CustomCommands extends System {
     }
   }
 
+  @command('!command toggle')
+  @default_permission(permission.CASTERS)
   async toggle (opts: Object) {
     const match = XRegExp.exec(opts.parameters, constants.COMMAND_REGEXP)
     if (_.isNil(match)) {
@@ -344,6 +345,8 @@ class CustomCommands extends System {
     commons.sendMessage(message, opts.sender)
   }
 
+  @command('!command toggle-visibility')
+  @default_permission(permission.CASTERS)
   async toggleVisibility (opts: Object) {
     const match = XRegExp.exec(opts.parameters, constants.COMMAND_REGEXP)
     if (_.isNil(match)) {
@@ -364,6 +367,8 @@ class CustomCommands extends System {
     commons.sendMessage(message, opts.sender)
   }
 
+  @command('!command remove')
+  @default_permission(permission.CASTERS)
   async remove (opts: Object) {
     try {
       const [command, response] = new Expects(opts.parameters).command().number({ optional: true }).toArray()

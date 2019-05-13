@@ -2,6 +2,7 @@ import _ from 'lodash';
 import { isMainThread } from 'worker_threads';
 
 import { getOwner, prepare, sendMessage } from '../commons';
+import { command, default_permission, helper } from '../decorators';
 import Expects from '../expects';
 import { permission } from '../permissions';
 import System from './_interface';
@@ -40,12 +41,6 @@ class Bets extends System {
       },
       settings: {
         betPercentGain: 20,
-        commands: [
-          { name: '!bet open', permission: permission.MODERATORS },
-          { name: '!bet close', permission: permission.MODERATORS },
-          { name: '!bet refund', permission: permission.MODERATORS },
-          { name: '!bet', isHelper: true },
-        ],
       },
       dependsOn: [
         'systems.points',
@@ -110,6 +105,8 @@ class Bets extends System {
     setTimeout(() => this.checkIfBetExpired(), 10000);
   }
 
+  @command('!bet open')
+  @default_permission(permission.MODERATORS)
   public async open(opts) {
     const currentBet = await global.db.engine.findOne(this.collection.data, { key: 'bets' });
     try {
@@ -218,6 +215,8 @@ class Bets extends System {
     }
   }
 
+  @command('!bet refund')
+  @default_permission(permission.MODERATORS)
   public async refund(opts) {
     try {
       if (_.isEmpty(await global.db.engine.findOne(this.collection.data, { key: 'bets' }))) { throw Error(ERROR_NOT_RUNNING); }
@@ -240,6 +239,8 @@ class Bets extends System {
     }
   }
 
+  @command('!bet close')
+  @default_permission(permission.MODERATORS)
   public async close(opts) {
     const currentBet = await global.db.engine.findOne(this.collection.data, { key: 'bets' });
     try {
@@ -284,6 +285,9 @@ class Bets extends System {
     }
   }
 
+  @command('!bet')
+  @default_permission(permission.MODERATORS)
+  @helper()
   public main(opts) {
     if (opts.parameters.length === 0) { this.info(opts); } else { this.participate(opts); }
   }

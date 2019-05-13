@@ -4,6 +4,7 @@ import gitCommitInfo from 'git-commit-info';
 import { get, isBoolean, isFinite, isNil, isNumber, isString, map, set } from 'lodash';
 import Core from './_interface';
 import { sendMessage } from './commons';
+import { command, default_permission } from './decorators';
 import { permission } from './permissions';
 
 class General extends Core {
@@ -11,12 +12,6 @@ class General extends Core {
     const options: InterfaceSettings = {
       settings: {
         lang: 'en',
-        commands: [
-          { name: '!set', fnc: 'setValue', permission: permission.CASTERS },
-          { name: '!_debug', fnc: 'debug', permission: permission.CASTERS },
-          { name: '!enable', fnc: 'enable', permission: permission.CASTERS },
-          { name: '!disable', fnc: 'disable', permission: permission.CASTERS },
-        ],
       },
       ui: {
         lang: {
@@ -44,10 +39,14 @@ class General extends Core {
     });
   }
 
+  @command('!enable')
+  @default_permission(permission.CASTERS)
   public async enable(opts: CommandOptions) {
     this.setStatus({...opts, enable: true});
   }
 
+  @command('!disable')
+  @default_permission(permission.CASTERS)
   public async disable(opts: CommandOptions) {
     this.setStatus({...opts, enable: false});
   }
@@ -62,6 +61,8 @@ class General extends Core {
     await global.lib.translate._load();
   }
 
+  @command('!_debug')
+  @default_permission(permission.CASTERS)
   public async debug() {
     const widgets = await global.db.engine.find('widgets');
 
@@ -105,6 +106,8 @@ class General extends Core {
     global.log.debug('======= END OF DEBUG MESSAGE =======');
   }
 
+  @command('!set')
+  @default_permission(permission.CASTERS)
   public async setValue(opts: CommandOptions) {
     // get value so we have a type
     const splitted = opts.parameters.split(' ');

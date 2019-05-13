@@ -9,6 +9,7 @@ const commons = require('../commons')
 
 const Expects = require('../expects.js')
 import Game from './_interface'
+import { command } from '../decorators';
 
 class Heist extends Game {
   constructor () {
@@ -79,9 +80,6 @@ class Heist extends Game {
           }
         ]
       },
-      commands: [
-        '!bankheist'
-      ]
     }
     const dependsOn = [
       'systems.points'
@@ -175,6 +173,7 @@ class Heist extends Game {
     this.timeouts['iCheckFinished'] = setTimeout(() => this.iCheckFinished(), 10000)
   }
 
+  @command('!bankheist')
   async main (opts) {
     const expects = new Expects()
 

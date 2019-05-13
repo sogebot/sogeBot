@@ -64,12 +64,12 @@ class Module {
     });
 
     // prepare proxies for variables
-    this.prepareCommandProxies();
     this.prepareVariableProxies();
     this.loadVariableValues();
     this._sockets();
     this._indexDbs();
     this._status(0);
+
   }
 
   public sockets() {
@@ -276,22 +276,6 @@ class Module {
       fnc,
       isHelper,
     };
-  }
-
-  public prepareCommandProxies() {
-    const commands: { [x: string]: string } = {};
-
-    if (this._settings.commands) {
-      for (let i = 0, length = this._settings.commands.length; i < length; i++) {
-
-        // basic loadup of commands
-        const command = this.prepareCommand(this._settings.commands[i]);
-        this._commands.push(command);
-
-        commands[command.name] = command.name; // remap to default value
-      }
-    }
-    this._settings.commands = commands;
   }
 
   public async _indexDbs() {

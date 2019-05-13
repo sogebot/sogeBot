@@ -6,7 +6,7 @@ const XRegExp = require('xregexp')
 // bot libraries
 import constants from '../constants'
 import { permission } from '../permissions';
-import { parser } from '../decorators';
+import { command, default_permission, parser } from '../decorators';
 const Message = require('../message')
 import System from './_interface'
 const commons = require('../commons');
@@ -72,9 +72,6 @@ class Moderation extends System {
         announce: true,
         shouldClearChat: true
       },
-      commands: [
-        { name: '!permit', fnc: 'permitLink', permission: permission.CASTERS }
-      ],
     }
 
     super({ settings })
@@ -195,6 +192,8 @@ class Moderation extends System {
     return text
   }
 
+  @command('!permit')
+  @default_permission(permission.CASTERS)
   async permitLink (opts) {
     try {
       var parsed = opts.parameters.match(/^@?([\S]+) ?(\d+)?$/)

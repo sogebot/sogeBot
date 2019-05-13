@@ -4,6 +4,7 @@
 const _ = require('lodash')
 import System from './_interface'
 import { permission } from '../permissions';
+import { command, default_permission } from '../decorators';
 const Expects = require('../expects')
 const config = require('@config')
 const commons = require('../commons');
@@ -12,19 +13,14 @@ class Quotes extends System {
   constructor () {
     const settings = {
       urlBase: config.panel.domain.split(',').map((o) => o.trim())[0],
-      commands: [
-        { name: '!quote add', permission: permission.CASTERS },
-        { name: '!quote remove', permission: permission.CASTERS },
-        { name: '!quote set', permission: permission.CASTERS },
-        '!quote list',
-        '!quote'
-      ]
     }
     super({ settings })
 
     this.addMenu({ category: 'manage', name: 'quotes', id: 'quotes/list' })
   }
 
+  @command('!quote add')
+  @default_permission(permission.CASTERS)
   async add (opts) {
     try {
       if (opts.parameters.length === 0) throw new Error()
@@ -46,6 +42,8 @@ class Quotes extends System {
     }
   }
 
+  @command('!quote remove')
+  @default_permission(permission.CASTERS)
   async remove (opts) {
     try {
       if (opts.parameters.length === 0) throw new Error()
@@ -66,6 +64,8 @@ class Quotes extends System {
     }
   }
 
+  @command('!quote set')
+  @default_permission(permission.CASTERS)
   async set (opts) {
     try {
       if (opts.parameters.length === 0) throw new Error()
@@ -86,6 +86,7 @@ class Quotes extends System {
     }
   }
 
+  @command('!quote list')
   async list (opts) {
     const urlBase = this.settings.urlBase
     const message = await commons.prepare(
@@ -94,6 +95,7 @@ class Quotes extends System {
     return commons.sendMessage(message, opts.sender)
   }
 
+  @command('!quote')
   async main (opts) {
     let [id, tag] = new Expects(opts.parameters).argument({ type: Number, name: 'id', optional: true }).argument({ name: 'tag', optional: true, multi: true, delimiter: '' }).toArray()
     if (_.isNil(id) && _.isNil(tag)) {

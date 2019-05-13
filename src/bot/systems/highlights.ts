@@ -3,7 +3,9 @@ import { Request, Response } from 'express';
 import { get, isNil, orderBy } from 'lodash';
 import moment from 'moment';
 import 'moment-precise-range-plugin';
+
 import { sendMessage } from '../commons';
+import { command, default_permission } from '../decorators';
 import { permission } from '../permissions';
 import System from './_interface';
 
@@ -22,10 +24,6 @@ class Highlights extends System {
         generator: {
           urls: [],
         },
-        commands: [
-          { name: '!highlight list', permission: permission.CASTERS },
-          { name: '!highlight', permission: permission.CASTERS },
-        ],
       },
       ui: {
         generator: {
@@ -86,6 +84,8 @@ class Highlights extends System {
     }
   }
 
+  @command('!highlight')
+  @default_permission(permission.CASTERS)
   public async main(opts) {
     const when = await global.cache.when();
     const token = global.oauth.settings.bot.accessToken;
@@ -144,6 +144,8 @@ class Highlights extends System {
     global.db.engine.insert(this.collection.data, highlight);
   }
 
+  @command('!highlight list')
+  @default_permission(permission.CASTERS)
   public async list(opts) {
     let highlights: any[] = await global.db.engine.find(this.collection.data);
     const sortedHighlights = orderBy(highlights, 'id', 'desc');

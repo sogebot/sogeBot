@@ -1,4 +1,5 @@
 import Game from './_interface'
+import { command } from '../decorators';
 const commons = require('../commons')
 
 /*
@@ -9,13 +10,11 @@ class Seppuku extends Game {
   constructor () {
     const settings = {
       timeout: 10,
-      commands: [
-        '!seppuku'
-      ]
     }
     super({ settings })
   }
 
+  @command('!seppuku')
   async main (opts) {
     if (commons.isBroadcaster(opts.sender)) {
       commons.sendMessage(global.translate('gambling.seppuku.broadcaster'), opts.sender)

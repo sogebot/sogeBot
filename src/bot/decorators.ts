@@ -73,15 +73,31 @@ export function helper() {
     return descriptor;
   };
 }
+
 function registerCommand(opts, m) {
-  if (!global[m.type] || !global[m.type][m.name]) {
-    return setTimeout(() => registerCommand(opts, m), 10);
+  const isAvailableModule = m.type !== 'core' && typeof global[m.type] !== 'undefined' && typeof global[m.type][m.name] !== 'undefined';
+  const isAvailableLibrary = m.type === 'core' && typeof global[m.name] !== 'undefined';
+  if (!isAvailableLibrary && !isAvailableModule) {
+    return setTimeout(() => registerCommand(opts, m), 1000);
   }
-  const self = global[m.type][m.name];
-  const c = self.prepareCommand(opts);
-  c.fnc = m.fnc; // force function to decorated function
-  self._commands.push(c);
-  self._settings.commands[c.name] = c.name; // remap to default value
+  try {
+    const self = m.type === 'core' ? global[m.name] : global[m.type][m.name];
+    const c = self.prepareCommand(opts);
+    c.fnc = m.fnc; // force function to decorated function
+
+    if (typeof self._commands === 'undefined') {
+      self._commands = [];
+    }
+
+    if (typeof self._settings.commands === 'undefined') {
+      self._settings.commands = {};
+    }
+
+    self._commands.push(c);
+    self._settings.commands[c.name] = c.name; // remap to default value
+  } catch (e) {
+    global.log.error(e);
+  }
 }
 
 function registerPermission(uuid, m, retry = 0) {

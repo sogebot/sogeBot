@@ -1,6 +1,7 @@
 // 3rdparty libraries
 import { isNil } from 'lodash';
 import { isMainThread } from 'worker_threads';
+import { command, default_permission } from '../decorators';
 import Message from '../message';
 import { permission } from '../permissions';
 import Overlay from './_interface';
@@ -8,11 +9,6 @@ import Overlay from './_interface';
 class Alerts extends Overlay {
   constructor() {
     const options: InterfaceSettings = {
-      settings: {
-        commands: [
-          { name: '!alert', fnc: 'overlay', permission: permission.CASTERS },
-        ],
-      },
       ui: {
         links: {
           overlay: {
@@ -30,6 +26,8 @@ class Alerts extends Overlay {
     this.addMenu({ category: 'settings', name: 'overlays', id: 'overlays' });
   }
 
+  @command('!disalertable')
+  @default_permission(permission.CASTERS)
   public async overlay(opts: CommandOptions) {
     if (!isMainThread) {
       global.workers.sendToMaster({ type: 'call', ns: 'overlays.alerts', fnc: 'overlay', args: [opts] });

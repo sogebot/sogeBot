@@ -7,6 +7,7 @@ const Parser = require('../parser')
 import System from './_interface'
 import constants from '../constants'
 import { permission } from '../permissions';
+import { command, default_permission } from '../decorators';
 import { parser } from '../decorators';
 const commons = require('../commons');
 
@@ -23,24 +24,19 @@ class Price extends System {
     const dependsOn = [
       'systems.points'
     ]
-    const settings = {
-      commands: [
-        { name: '!price set', permission: permission.CASTERS },
-        { name: '!price list', permission: permission.CASTERS },
-        { name: '!price unset', permission: permission.CASTERS },
-        { name: '!price toggle', permission: permission.CASTERS },
-        { name: '!price', permission: permission.CASTERS }
-      ],
-    }
-    super({ settings, dependsOn })
+    super({ dependsOn })
 
     this.addMenu({ category: 'manage', name: 'price', id: 'price/list' })
   }
 
+  @command('!price')
+  @default_permission(permission.CASTERS)
   main (opts) {
     commons.sendMessage(global.translate('core.usage') + ': !price set <cmd> <price> | !price unset <cmd> | !price list | !price toggle <cmd>', opts.sender)
   }
 
+  @command('!price set')
+  @default_permission(permission.CASTERS)
   async set (opts) {
     const parsed = opts.parameters.match(/^(![\S]+) ([0-9]+)$/)
 
@@ -61,6 +57,8 @@ class Price extends System {
     commons.sendMessage(message, opts.sender)
   }
 
+  @command('!price unset')
+  @default_permission(permission.CASTERS)
   async unset (opts) {
     const parsed = opts.parameters.match(/^(![\S]+)$/)
 
@@ -76,6 +74,8 @@ class Price extends System {
     commons.sendMessage(message, opts.sender)
   }
 
+  @command('!price toggle')
+  @default_permission(permission.CASTERS)
   async toggle (opts) {
     const parsed = opts.parameters.match(/^(![\S]+)$/)
 
@@ -98,6 +98,8 @@ class Price extends System {
     commons.sendMessage(message, opts.sender)
   }
 
+  @command('!price list')
+  @default_permission(permission.CASTERS)
   async list (opts) {
     let prices = await global.db.engine.find(this.collection.data)
     var output = (prices.length === 0 ? global.translate('price.list-is-empty') : global.translate('price.list-is-not-empty').replace(/\$list/g, (_.map(_.orderBy(prices, 'command'), (o) => { return `${o.command} - ${o.price}` })).join(', ')))

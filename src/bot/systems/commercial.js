@@ -7,6 +7,7 @@ const commons = require('../commons');
 
 // bot libraries
 import { permission } from '../permissions';
+import { command, default_permission, helper } from '../decorators';
 import System from './_interface'
 
 /*
@@ -16,13 +17,7 @@ import System from './_interface'
 
 class Commercial extends System {
   constructor () {
-    const settings = {
-      commands: [
-        { name: '!commercial', permission: permission.CASTERS, isHelper: true }
-      ]
-    }
-
-    super({ settings })
+    super()
     this.addWidget('commercial', 'widget-title-commercial', 'fas fa-dollar-sign');
   }
 
@@ -40,6 +35,9 @@ class Commercial extends System {
     })
   }
 
+  @command('!commercial')
+  @default_permission(permission.CASTERS)
+  @helper()
   async main (opts) {
     let parsed = opts.parameters.match(/^([\d]+)? ?(.*)?$/)
 

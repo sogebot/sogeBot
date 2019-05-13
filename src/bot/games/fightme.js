@@ -4,6 +4,7 @@
 const _ = require('lodash')
 
 // bot libraries
+import { command } from '../decorators';
 import Game from './_interface'
 const {
   prepare, sendMessage, isModerator, isBroadcaster, getLocalizedName, timeout
@@ -26,13 +27,11 @@ class FightMe extends Game {
       timeout: 10,
       cooldown: 0,
       bypassCooldownByOwnerAndMods: false,
-      commands: [
-        '!fightme'
-      ]
     }
     super({ settings })
   }
 
+  @command('!fightme')
   async main (opts) {
     opts.sender['message-type'] = 'chat' // force responses to chat
     var username

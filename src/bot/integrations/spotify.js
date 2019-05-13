@@ -13,6 +13,7 @@ const axios = require('axios')
 
 // bot libraries
 const Expects = require('../expects.js')
+import { command, default_permission } from '../decorators';
 import Integration from './_interface'
 
 const __DEBUG__ = {
@@ -40,9 +41,6 @@ class Spotify extends Integration {
 
   constructor () {
     const settings = {
-      commands: [
-        { name: '!spotify', permission: null }
-      ],
       _: {
         accessToken: '',
         refreshToken: '',
@@ -422,6 +420,8 @@ class Spotify extends Integration {
     return this.client.createAuthorizeURL(this.settings.connection.scopes, state)
   }
 
+  @command('!spotify')
+  @default_permission(null)
   async main (opts: CommandOptions) {
     if (!(await global.cache.isOnline())) return // don't do anything on offline stream
     if (!isMainThread) {

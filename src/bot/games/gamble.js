@@ -5,6 +5,7 @@ const _ = require('lodash')
 
 // bot libraries
 import Game from './_interface'
+import { command } from '../decorators';
 const commons = require('../commons')
 
 const ERROR_NOT_ENOUGH_OPTIONS = '0'
@@ -24,13 +25,11 @@ class Gamble extends Game {
     const settings = {
       minimalBet: 0,
       chanceToWin: 50,
-      commands: [
-        '!gamble'
-      ]
     }
     super({ settings, dependsOn })
   }
 
+  @command('!gamble')
   async main (opts) {
     let points, message
 

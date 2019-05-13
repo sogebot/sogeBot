@@ -8,6 +8,7 @@ const XRegExp = require('xregexp')
 const commons = require('../commons');
 
 // bot libraries
+import { command, default_permission } from '../decorators';
 import { permission } from '../permissions';
 import System from './_interface'
 import constants from '../constants'
@@ -28,19 +29,14 @@ class Cooldown extends System {
   constructor () {
     const settings = {
       cooldownNotifyAsWhisper: false,
-      commands: [
-        { name: '!cooldown toggle moderators', permission: permission.CASTERS },
-        { name: '!cooldown toggle owners', permission: permission.CASTERS },
-        { name: '!cooldown toggle subscribers', permission: permission.CASTERS },
-        { name: '!cooldown toggle enabled', permission: permission.CASTERS },
-        { name: '!cooldown', permission: permission.CASTERS }
-      ],
     }
     super({ settings })
 
     this.addMenu({ category: 'manage', name: 'cooldown', id: 'cooldown/list' })
   }
 
+  @command('!cooldown')
+  @default_permission(permission.CASTERS)
   async main (opts: Object) {
     const match = XRegExp.exec(opts.parameters, constants.COOLDOWN_REGEXP_SET)
 
@@ -216,11 +212,26 @@ class Cooldown extends System {
     commons.sendMessage(message, opts.sender)
   }
 
+  @command('!cooldown toggle enabled')
+  @default_permission(permission.CASTERS)
   async toggleEnabled (opts: Object) { await this.toggle(opts, 'enabled') }
+
+  @command('!cooldown toggle moderators')
+  @default_permission(permission.CASTERS)
   async toggleModerators (opts: Object) { await this.toggle(opts, 'moderator') }
+
+  @command('!cooldown toggle owners')
+  @default_permission(permission.CASTERS)
   async toggleOwners (opts: Object) { await this.toggle(opts, 'owner') }
+
+  @command('!cooldown toggle subscribers')
+  @default_permission(permission.CASTERS)
   async toggleSubscribers (opts: Object) { await this.toggle(opts, 'subscriber') }
+
+  @command('!cooldown toggle followers')
+  @default_permission(permission.CASTERS)
   async toggleFollowers (opts: Object) { await this.toggle(opts, 'follower') }
+
   async toggleNotify (opts: Object) { await this.toggle(opts, 'quiet') }
   async toggleType (opts: Object) { await this.toggle(opts, 'type') }
 }

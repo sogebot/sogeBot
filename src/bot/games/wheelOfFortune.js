@@ -5,6 +5,7 @@ const {
   isMainThread
 } = require('worker_threads');
 const commons = require('../commons')
+import { command } from '../decorators';
 import Game from './_interface'
 
 class WheelOfFortune extends Game {
@@ -23,9 +24,6 @@ class WheelOfFortune extends Game {
     }
 
     const settings = {
-      commands: [
-        '!wof'
-      ],
       options: {
         data: JSON.stringify([])
       }
@@ -46,6 +44,7 @@ class WheelOfFortune extends Game {
     })
   }
 
+  @command('!wof')
   async main (opts) {
     if (isMainThread) {
       const options = JSON.parse(this.settings.options.data)

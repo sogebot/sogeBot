@@ -11,6 +11,7 @@ import { permission } from '../permissions';
 const {
   isMainThread
 } = require('worker_threads');
+import { command, default_permission } from '../decorators';
 import System from './_interface'
 const commons = require('../commons');
 
@@ -30,19 +31,6 @@ class Songs extends System {
       playlist: true,
       notify: false,
       onlyMusicCategory: false,
-      commands: [
-        { name: '!songrequest', fnc: 'addSongToQueue' },
-        { name: '!wrongsong', fnc: 'removeSongFromQueue' },
-        { name: '!currentsong', fnc: 'getCurrentSong' },
-        { name: '!skipsong', fnc: 'sendNextSongID', permission: permission.CASTERS },
-        { name: '!bansong', fnc: 'banSong', permission: permission.CASTERS },
-        { name: '!unbansong', fnc: 'unbanSong', permission: permission.CASTERS },
-        { name: '!playlist import', fnc: 'importPlaylist', permission: permission.CASTERS },
-        { name: '!playlist add', fnc: 'addSongToPlaylist', permission: permission.CASTERS },
-        { name: '!playlist remove', fnc: 'removeSongFromPlaylist', permission: permission.CASTERS },
-        { name: '!playlist steal', fnc: 'stealSong', permission: permission.CASTERS },
-        { name: '!playlist', fnc: 'help', permission: permission.CASTERS }
-      ]
     }
     const ui = {
       volume: {
@@ -151,6 +139,8 @@ class Songs extends System {
     global.db.engine.update(this.collection.playlist, { videoID: data.id }, { startTime: data.lowValue, endTime: data.highValue })
   }
 
+  @command('!bansong')
+  @default_permission(permission.CASTERS)
   banSong (opts) {
     opts.parameters.trim().length === 0 ? this.banCurrentSong(opts) : this.banSongById(opts)
   }
@@ -225,12 +215,16 @@ class Songs extends System {
     return { banned }
   }
 
+  @command('!unbansong')
+  @default_permission(permission.CASTERS)
   async unbanSong (opts) {
     let removed = await global.db.engine.remove(this.collection.ban, { videoId: opts.parameters })
     if (removed > 0) commons.sendMessage(global.translate('songs.song-was-unbanned'), opts.sender)
     else commons.sendMessage(global.translate('songs.song-was-not-banned'), opts.sender)
   }
 
+  @command('!skipsong')
+  @default_permission(permission.CASTERS)
   async sendNextSongID () {
     if (!isMainThread) {
       return global.workers.sendToMaster({ type: 'call', ns: 'systems.songs', fnc: 'sendNextSongID' })
@@ -285,6 +279,7 @@ class Songs extends System {
     this.socket.emit('videoID', null)
   }
 
+  @command('!currentsong')
   async getCurrentSong () {
     let translation = 'songs.no-song-is-currently-playing'
     const currentSong = JSON.parse(this.settings._.currentSong)
@@ -307,6 +302,8 @@ class Songs extends System {
     commons.sendMessage(message, { username: await global.oauth.settings.broadcaster.username })
   }
 
+  @command('!playlist steal')
+  @default_permission(permission.CASTERS)
   async stealSong () {
     try {
       const currentSong = JSON.parse(this.settings._.currentSong)
@@ -323,10 +320,13 @@ class Songs extends System {
     }
   }
 
+  @command('!playlist')
+  @default_permission(permission.CASTERS)
   async help () {
     commons.sendMessage(global.translate('core.usage') + ': !playlist add <youtubeid> | !playlist remove <youtubeid> | !playlist ban <youtubeid> | !playlist random on/off | !playlist steal', { username: await global.oauth.settings.broadcaster.username })
   }
 
+  @command('!songrequest')
   async addSongToQueue (opts) {
     if (opts.parameters.length < 1 || !this.settings.songrequest) {
       if (this.settings.songrequest) {
@@ -383,6 +383,7 @@ class Songs extends System {
     })
   }
 
+  @command('!wrongsong')
   async removeSongFromQueue (opts) {
     let sr = await global.db.engine.find(this.collection.request, { username: opts.sender.username })
     sr = _.head(_.orderBy(sr, ['addedAt'], ['desc']))
@@ -394,6 +395,8 @@ class Songs extends System {
     }
   }
 
+  @command('!playlist add')
+  @default_permission(permission.CASTERS)
   async addSongToPlaylist (opts) {
     if (_.isNil(opts.parameters)) return
 
@@ -443,6 +446,8 @@ class Songs extends System {
     return { imported, skipped: done - imported }
   }
 
+  @command('!playlist remove')
+  @default_permission(permission.CASTERS)
   async removeSongFromPlaylist (opts) {
     if (opts.parameters.length < 1) return
     var videoID = opts.parameters
@@ -470,6 +475,8 @@ class Songs extends System {
     return data.items.map(o => o.id)
   }
 
+  @command('!playlist import')
+  @default_permission(permission.CASTERS)
   async importPlaylist (opts) {
     if (opts.parameters.length < 1) return
     const ids = await global.systems.songs.getSongsIdsFromPlaylist(opts.parameters)

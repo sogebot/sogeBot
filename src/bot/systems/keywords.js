@@ -9,7 +9,7 @@ const commons = require('../commons');
 import { permission } from '../permissions';
 const Message = require('../message')
 const constants = require('../constants')
-import { parser } from '../decorators';
+import { command, default_permission, parser } from '../decorators';
 import System from './_interface'
 
 /*
@@ -23,21 +23,13 @@ import System from './_interface'
 
 class Keywords extends System {
   constructor () {
-    const settings = {
-      commands: [
-        { name: '!keyword add', permission: permission.CASTERS },
-        { name: '!keyword edit', permission: permission.CASTERS },
-        { name: '!keyword list', permission: permission.CASTERS },
-        { name: '!keyword remove', permission: permission.CASTERS },
-        { name: '!keyword toggle', permission: permission.CASTERS },
-        { name: '!keyword', permission: permission.CASTERS }
-      ],
-    }
-    super({ settings })
+    super()
 
     this.addMenu({ category: 'manage', name: 'keywords', id: 'keywords/list' })
   }
 
+  @command('!keyword edit')
+  @default_permission(permission.CASTERS)
   async edit (opts) {
     const match = XRegExp.exec(opts.parameters, constants.KEYWORD_REGEXP)
 
@@ -59,10 +51,14 @@ class Keywords extends System {
     commons.sendMessage(message, opts.sender)
   }
 
+  @command('!keyword')
+  @default_permission(permission.CASTERS)
   main (opts) {
     commons.sendMessage(global.translate('core.usage') + ': !keyword add <keyword> <response> | !keyword edit <keyword> <response> | !keyword remove <keyword> | !keyword list', opts.sender)
   }
 
+  @command('!keyword add')
+  @default_permission(permission.CASTERS)
   async add (opts) {
     const match = XRegExp.exec(opts.parameters, constants.KEYWORD_REGEXP)
 
@@ -100,12 +96,16 @@ class Keywords extends System {
     return true
   }
 
+  @command('!keyword list')
+  @default_permission(permission.CASTERS)
   async list (opts) {
     let keywords = await global.db.engine.find(this.collection.data)
     var output = (keywords.length === 0 ? global.translate('keywords.list-is-empty') : global.translate('keywords.list-is-not-empty').replace(/\$list/g, _.map(_.orderBy(keywords, 'keyword'), 'keyword').join(', ')))
     commons.sendMessage(output, opts.sender)
   }
 
+  @command('!keyword toggle')
+  @default_permission(permission.CASTERS)
   async toggle (opts) {
     if (opts.parameters.trim().length === 0) {
       let message = await commons.prepare('keywords.keyword-parse-failed')
@@ -127,6 +127,8 @@ class Keywords extends System {
     commons.sendMessage(message, opts.sender)
   }
 
+  @command('!keyword remove')
+  @default_permission(permission.CASTERS)
   async remove (opts) {
     if (opts.parameters.trim().length === 0) {
       let message = await commons.prepare('keywords.keyword-parse-failed')
