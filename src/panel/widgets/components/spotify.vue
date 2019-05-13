@@ -19,7 +19,7 @@
         </a>
       </li>
       <li role="presentation" class="nav-item" style="flex-shrink: 0">
-        <button class="btn nav-btn btn-secondary" @click="next">
+        <button class="btn nav-btn btn-link" @click="next">
           <fa icon="forward" />
         </button>
       </li>
@@ -107,7 +107,7 @@ export default {
   methods: {
     next(index) {
       this.requests.splice(index, 1);
-      this.socket.emit('next', () => {});
+      this.socket.emit('skip', () => {});
     },
     cleanupSongRequestList() {
       this.requests = [];
