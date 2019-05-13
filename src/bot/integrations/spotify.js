@@ -38,6 +38,7 @@ class Spotify extends Integration {
   }> = []
   currentUris: string | null = null
   originalUri: string | null = null
+  skipToNextSong: boolean = false
 
   constructor () {
     const settings = {
@@ -130,8 +131,6 @@ class Spotify extends Integration {
     }
   }
 
-
-
   onUsernameChange (key: string, value: string) {
     if (value.length > 0) global.log.info(chalk.yellow('SPOTIFY: ') + `Access to account ${value} granted`)
   }
@@ -142,6 +141,70 @@ class Spotify extends Integration {
       this.connect()
       this.getMe()
     } else this.disconnect()
+  }
+
+  @command('!spotify skip')
+  @default_permission(null)
+  cSkipSong(opts) {
+    this.skipToNextSong = true
+  }
+
+  async playNextSongFromRequest() {
+    try {
+      this.currentUris = this.uris.shift().uri // FIFO
+      await axios({
+        method: 'put',
+        url: 'https://api.spotify.com/v1/me/player/play',
+        headers: {
+          'Authorization': 'Bearer ' + this.settings._.accessToken,
+          'Content-Type': 'application/json'
+        },
+        data: {
+          uris: [this.currentUris]
+        }
+      })
+
+      // force is_playing and uri just to not skip until track refresh
+      song.uri = this.currentUris
+      song.is_playing = true
+      this.settings._.currentSong = JSON.stringify(song)
+    } catch (e) {
+      global.log.error(e.stack)
+    }
+  }
+
+  async playNextSongFromPlaylist() {
+    try {
+      // play from playlist
+      const offset = this.originalUri ? { uri: this.originalUri } : undefined
+      await axios({
+        method: 'put',
+        url: 'https://api.spotify.com/v1/me/player/play',
+        headers: {
+          'Authorization': 'Bearer ' + this.settings._.accessToken,
+          'Content-Type': 'application/json'
+        },
+        data: {
+          context_uri: this.settings.output.playlistToPlay,
+          offset
+        }
+      })
+      // skip to next song in playlist
+      await axios({
+        method: 'post',
+        url: 'https://api.spotify.com/v1/me/player/next',
+        headers: {
+          'Authorization': 'Bearer ' + this.settings._.accessToken
+        }
+      })
+      this.currentUris = null
+    } catch (e) {
+      global.log.warning('Cannot continue playlist from ' + String(this.originalUri))
+      global.log.warning('Playlist will continue from random track')
+      this.originalUri = null
+    } finally {
+
+    }
   }
 
   async sendSongs () {
@@ -165,69 +228,33 @@ class Spotify extends Integration {
       this.originalUri = song.uri
     }
 
+    //if (!(await global.cache.isOnline())) return // don't do anything on offline stream
+
+    if (this.skipToNextSong) {
+      if (song.is_playing) {
+        if (this.uris.length > 0) {
+          this.playNextSongFromRequest();
+        } else {
+          this.playNextSongFromPlaylist();
+        }
+      }
+      this.skipToNextSong = false; // reset skip
+      return;
+    }
+
     // if song is part of currentUris and is playing, do nothing
     if (typeof song.uri !== 'undefined' && this.currentUris === song.uri && song.is_playing) {
       return
     }
 
-    if (!(await global.cache.isOnline())) return // don't do anything on offline stream
-
     // if song is part of currentUris and is not playing (finished playing), continue from playlist if set
-    if (typeof song.uri !== 'undefined' && this.currentUris === song.uri && !song.is_playing && this.uris.length === 0) {
+    if (typeof song.uri !== 'undefined' && this.currentUris === song.uri && (!song.is_playing || song.force_skip) && this.uris.length === 0) {
       if (this.settings.output.playlistToPlay.length > 0 && this.settings.output.continueOnPlaylistAfterRequest) {
-        try {
-          // play from playlist
-          const offset = this.originalUri ? { uri: this.originalUri } : undefined
-          await axios({
-            method: 'put',
-            url: 'https://api.spotify.com/v1/me/player/play',
-            headers: {
-              'Authorization': 'Bearer ' + this.settings._.accessToken,
-              'Content-Type': 'application/json'
-            },
-            data: {
-              context_uri: this.settings.output.playlistToPlay,
-              offset
-            }
-          })
-          // skip to next song in playlist
-          await axios({
-            method: 'post',
-            url: 'https://api.spotify.com/v1/me/player/next',
-            headers: {
-              'Authorization': 'Bearer ' + this.settings._.accessToken
-            }
-          })
-          this.currentUris = null
-        } catch (e) {
-          global.log.warning('Cannot continue playlist from ' + String(this.originalUri))
-          global.log.warning('Playlist will continue from random track')
-          this.originalUri = null
-        }
+        this.playNextSongFromPlaylist();
       }
     } else if (this.uris.length > 0) { // or we have requests
-      if (Date.now() - song.finished_at <= 0 || this.originalUri !== song.uri || this.originalUri === null || !song.is_playing) { // song should be finished
-        try {
-          this.currentUris = this.uris.shift().uri // FIFO
-          await axios({
-            method: 'put',
-            url: 'https://api.spotify.com/v1/me/player/play',
-            headers: {
-              'Authorization': 'Bearer ' + this.settings._.accessToken,
-              'Content-Type': 'application/json'
-            },
-            data: {
-              uris: [this.currentUris]
-            }
-          })
-
-          // force is_playing and uri just to not skip until track refresh
-          song.uri = this.currentUris
-          song.is_playing = true
-          this.settings._.currentSong = JSON.stringify(song)
-        } catch (e) {
-          global.log.error(e.stack)
-        }
+      if (Date.now() - song.finished_at <= 0 || this.originalUri !== song.uri || this.originalUri === null || (!song.is_playing || song.force_skip)) { // song should be finished
+        this.playNextSongFromRequest()
       }
     }
   }
@@ -300,6 +327,10 @@ class Spotify extends Integration {
     io.on('connection', (socket) => {
       socket.on('state', async (callback) => {
         callback(null, this.state)
+      })
+      socket.on('skip', async (callback) => {
+        this.skipToNextSong = true;
+        callback(null)
       })
       socket.on('code', async (token, callback) => {
         const waitForUsername = () => {
