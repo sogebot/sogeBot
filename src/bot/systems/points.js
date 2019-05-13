@@ -8,7 +8,7 @@ const {
 
 // bot libraries
 import { permission } from '../permissions';
-import { parser } from '../decorators';
+import { command, default_permission, parser } from '../decorators';
 import System from './_interface'
 const Expects = require('../expects')
 const commons = require('../commons');
@@ -27,16 +27,6 @@ class Points extends System {
         messageOfflineInterval: 5,
         perMessageOfflineInterval: 0
       },
-      commands: [
-        { name: '!points add', permission: permission.CASTERS },
-        { name: '!points remove', permission: permission.CASTERS },
-        { name: '!points all', permission: permission.CASTERS },
-        { name: '!points set', permission: permission.CASTERS },
-        { name: '!points get', permission: permission.CASTERS },
-        { name: '!makeitrain', fnc: 'rain', permission: permission.CASTERS },
-        '!points give',
-        '!points'
-      ]
     }
     super({ settings })
 
@@ -143,6 +133,8 @@ class Points extends System {
         : Number.MAX_SAFE_INTEGER, 10)
   }
 
+  @command('!points set')
+  @default_permission(permission.CASTERS)
   async set (opts) {
     try {
       const [username, points] = new Expects(opts.parameters).username().points({ all: false }).toArray()
@@ -167,6 +159,7 @@ class Points extends System {
     }
   }
 
+  @command('!points give')
   async give (opts) {
     try {
       const [username, points] = new Expects(opts.parameters).username().points({ all: true }).toArray()
@@ -255,6 +248,8 @@ class Points extends System {
     return pointsName
   }
 
+  @command('!points get')
+  @default_permission(permission.CASTERS)
   async get (opts) {
     try {
       const match = opts.parameters.match(/^@?([\S]+)$/)
@@ -275,6 +270,8 @@ class Points extends System {
     }
   }
 
+  @command('!points all')
+  @default_permission(permission.CASTERS)
   async all (opts) {
     try {
       const points = new Expects(opts.parameters).points({ all: false }).toArray()
@@ -298,6 +295,8 @@ class Points extends System {
     }
   }
 
+  @command('!makeitrain')
+  @default_permission(permission.CASTERS)
   async rain (opts) {
     try {
       const points = new Expects(opts.parameters).points({ all: false }).toArray()
@@ -321,6 +320,8 @@ class Points extends System {
     }
   }
 
+  @command('!points add')
+  @default_permission(permission.CASTERS)
   async add (opts) {
     try {
       const [username, points] = new Expects(opts.parameters).username().points({ all: false }).toArray()
@@ -342,6 +343,8 @@ class Points extends System {
     }
   }
 
+  @command('!points remove')
+  @default_permission(permission.CASTERS)
   async remove (opts) {
     try {
       const [username, points] = new Expects(opts.parameters).username().points({ all: true }).toArray()
@@ -371,6 +374,7 @@ class Points extends System {
     }
   }
 
+  @command('!points')
   main (opts) {
     this.get(opts)
   }

@@ -2,6 +2,7 @@ import _ from 'lodash';
 import { isMainThread } from 'worker_threads';
 
 import { getLocalizedName, getOwner, prepare, sendMessage } from '../commons.js';
+import { command, default_permission, helper } from '../decorators';
 import Expects from '../expects.js';
 import { permission } from '../permissions';
 import System from './_interface';
@@ -34,11 +35,6 @@ class Polls extends System {
           everyXMessages: 0,
           everyXSeconds: 0,
         },
-        commands: [
-          { name: '!vote', isHelper: true },
-          { name: '!poll open', permission: permission.MODERATORS },
-          { name: '!poll close', permission: permission.MODERATORS },
-        ],
       },
       on: {
         message: (message): Promise<void> => this.countMessage(),
@@ -108,6 +104,8 @@ class Polls extends System {
     });
   }
 
+  @command('!poll close')
+  @default_permission(permission.MODERATORS)
   public async close(opts: CommandOptions): Promise<boolean> {
     const cVote: Poll = await global.db.engine.findOne(this.collection.data, { isOpened: true });
 
@@ -154,6 +152,8 @@ class Polls extends System {
     return true;
   }
 
+  @command('!poll open')
+  @default_permission(permission.MODERATORS)
   public async open(opts: CommandOptions): Promise<boolean> {
     const cVote: Poll = await global.db.engine.findOne(this.collection.data, { isOpened: true });
 
@@ -208,6 +208,8 @@ class Polls extends System {
     }
   }
 
+  @command('!vote')
+  @helper()
   public async main(opts: CommandOptions): Promise<void> {
     const cVote: Poll = await global.db.engine.findOne(this.collection.data, { isOpened: true });
     let index: number;

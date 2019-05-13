@@ -4,6 +4,7 @@ const _ = require('lodash')
 
 // bot libraries
 import System from './_interface'
+import { command, default_permission } from '../decorators';
 import { permission } from '../permissions';
 const commons = require('../commons');
 
@@ -28,16 +29,6 @@ class Queue extends System {
         followers: true,
         subscribers: true
       },
-      commands: [
-        { name: '!queue random', permission: permission.CASTERS },
-        { name: '!queue pick', permission: permission.CASTERS },
-        { name: '!queue clear', permission: permission.CASTERS },
-        { name: '!queue close', permission: permission.CASTERS },
-        { name: '!queue open', permission: permission.CASTERS },
-        { name: '!queue list', permission: permission.CASTERS },
-        '!queue join',
-        '!queue'
-      ]
     }
     super({ settings })
 
@@ -88,20 +79,26 @@ class Queue extends System {
     return toReturn
   }
 
+  @command('!queue')
   main (opts) {
     commons.sendMessage(global.translate(this.settings._.locked ? 'queue.info.closed' : 'queue.info.opened'), opts.sender)
   }
 
+  @command('!queue open')
+  @default_permission(permission.CASTERS)
   open (opts) {
     this.settings._.locked = false
     commons.sendMessage(global.translate('queue.open'), opts.sender)
   }
 
+  @command('!queue close')
+  @default_permission(permission.CASTERS)
   close (opts) {
     this.settings._.locked = true
     commons.sendMessage(global.translate('queue.close'), opts.sender)
   }
 
+  @command('!queue join')
   async join (opts) {
     if (!(this.settings._.locked)) {
       let user = await global.db.engine.findOne('users', { username: opts.sender.username })
@@ -126,16 +123,22 @@ class Queue extends System {
     }
   }
 
+  @command('!queue clear')
+  @default_permission(permission.CASTERS)
   clear (opts) {
     global.db.engine.remove(this.collection.data, {})
     global.db.engine.remove(this.collection.picked, {})
     commons.sendMessage(global.translate('queue.clear'), opts.sender)
   }
 
+  @command('!queue random')
+  @default_permission(permission.CASTERS)
   async random (opts) {
     this.pickUsers(opts, true)
   }
 
+  @command('!queue pick')
+  @default_permission(permission.CASTERS)
   async pick (opts) {
     this.pickUsers(opts, false)
   }
@@ -172,6 +175,8 @@ class Queue extends System {
     return users
   }
 
+  @command('!queue list')
+  @default_permission(permission.CASTERS)
   async list (opts) {
     let [atUsername, users] = await Promise.all([
       global.tmi.settings.chat.showWithAt,

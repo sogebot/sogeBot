@@ -4,8 +4,9 @@ import Core from './_interface';
 import {
     isBot, isBroadcaster, isFollower, isModerator, isOwner, isSubscriber, isVIP, prepare,
     sendMessage,
-} from './commons';
+  } from './commons';
 import { debug } from './debug';
+import { command, default_permission } from './decorators';
 
 const permission = Object.freeze({
   CASTERS: '4300ed23-dca0-4ed9-8014-f5f2f7af55a9',
@@ -24,9 +25,6 @@ class Permissions extends Core {
           sendWarning: false,
           sendByWhisper: true,
         },
-        commands: [
-          { name: '!permission list', permission: permission.CASTERS },
-        ],
       },
     };
     super(options);
@@ -84,8 +82,8 @@ class Permissions extends Core {
     });
   }
 
-  public async getCommandPermission(command: string): Promise<string | null | undefined> {
-    const cItem = await global.db.engine.findOne(this.collection.commands, { key: command });
+  public async getCommandPermission(commandArg: string): Promise<string | null | undefined> {
+    const cItem = await global.db.engine.findOne(this.collection.commands, { key: commandArg });
     if (cItem.permission) {
       return cItem.permission;
     } else {
@@ -246,6 +244,8 @@ class Permissions extends Core {
     return true;
   }
 
+  @command('!permission list')
+  @default_permission(permission.CASTERS)
   protected async list(opts: CommandOptions): Promise<void> {
     const permissions: Permissions.Item[] = _.orderBy(await global.db.engine.find(this.collection.data), 'order', 'asc');
     sendMessage(prepare('core.permissions.list'), opts.sender);

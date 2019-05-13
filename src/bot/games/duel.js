@@ -10,6 +10,7 @@ const {
 } = require('../commons');
 
 // bot libraries
+import { command } from '../decorators';
 import Game from './_interface'
 
 const ERROR_NOT_ENOUGH_OPTIONS = '0'
@@ -32,9 +33,6 @@ class Duel extends Game {
       duration: 5,
       minimalBet: 0,
       bypassCooldownByOwnerAndMods: false,
-      commands: [
-        '!duel', '!duel bank'
-      ]
     }
     const dependsOn = [
       'systems.points',
@@ -98,6 +96,7 @@ class Duel extends Game {
     this.timeouts['pickDuelWinner'] = setTimeout(() => this.pickDuelWinner(), 30000)
   }
 
+  @command('!duel bank')
   async bank (opts) {
     const users = await global.db.engine.find(this.collection.users);
     const bank = users.map((o) => o.tickets).reduce((a, b) => a + b, 0);
@@ -110,6 +109,7 @@ class Duel extends Game {
       }), opts.sender);
   }
 
+  @command('!duel')
   async main (opts) {
     let message, bet
 

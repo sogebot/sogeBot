@@ -8,6 +8,7 @@ const {
 // bot libraries
 import { permission } from '../permissions';
 import { parser } from '../decorators';
+import { command, default_permission } from '../decorators';
 import System from './_interface'
 const commons = require('../commons');
 
@@ -34,12 +35,6 @@ class Raffles extends System {
         followersPercent: 120
       },
       raffleAnnounceInterval: 10,
-      commands: [
-        { name: '!raffle pick', permission: permission.CASTERS },
-        { name: '!raffle remove', permission: permission.CASTERS },
-        { name: '!raffle open', permission: permission.CASTERS },
-        '!raffle'
-      ]
     }
     super({ settings })
     this.addWidget('raffles', 'widget-title-raffles', 'fas fa-gift')
@@ -118,6 +113,8 @@ class Raffles extends System {
     this.timeouts['raffleAnnounce'] = setTimeout(() => this.announce(), 60000)
   }
 
+  @command('!raffle remove')
+  @default_permission(permission.CASTERS)
   async remove (self) {
     let raffle = await global.db.engine.findOne(this.collection.data, { winner: null })
     if (_.isEmpty(raffle)) return
@@ -130,6 +127,8 @@ class Raffles extends System {
     self.refresh()
   }
 
+  @command('!raffle open')
+  @default_permission(permission.CASTERS)
   async open (opts) {
     let [followers, subscribers] = [opts.parameters.indexOf('followers') >= 0, opts.parameters.indexOf('subscribers') >= 0]
     let type = (opts.parameters.indexOf('-min') >= 0 || opts.parameters.indexOf('-max') >= 0) ? TYPE_TICKETS : TYPE_NORMAL
@@ -193,6 +192,7 @@ class Raffles extends System {
     this.lastAnnounce = _.now()
   }
 
+  @command('!raffle')
   async main (opts) {
     let raffle = await global.db.engine.findOne(this.collection.data, { winner: null })
 
@@ -278,6 +278,8 @@ class Raffles extends System {
     return true
   }
 
+  @command('!raffle pick')
+  @default_permission(permission.CASTERS)
   async pick () {
     let raffles = await global.db.engine.find(this.collection.data)
     if (_.size(raffles) === 0) return true // no raffle ever

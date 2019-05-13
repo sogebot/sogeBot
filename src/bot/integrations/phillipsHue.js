@@ -9,6 +9,7 @@ const lightState = require('node-hue-api').lightState
 const {
   isMainThread
 } = require('worker_threads');
+import { command, default_permission } from '../decorators';
 const commons = require('../commons')
 
 // bot libraries
@@ -41,10 +42,6 @@ class PhillipsHue extends Integration {
 
   constructor () {
     const settings = {
-      commands: [
-        { name: '!hue list', fnc: 'getLights', permission: permission.CASTERS },
-        { name: '!hue', fnc: 'hue', permission: permission.CASTERS }
-      ],
       connection: {
         host: '',
         user: '',
@@ -117,6 +114,11 @@ class PhillipsHue extends Integration {
     }
   }
 
+
+  @command('!disable')
+  @default_permission(permission.CASTERS)
+  @command('!hue list')
+  @default_permission(permission.CASTERS)
   getLights (opts: CommandOptions) {
     if (!isMainThread) {
       global.workers.sendToMaster({ type: 'phillipshue', fnc: 'getLights', sender: opts.sender, text: opts.parameters })
@@ -133,6 +135,9 @@ class PhillipsHue extends Integration {
       .fail(function (err) { global.log.error(err, 'PhillipsHue.prototype.getLights#1') })
   }
 
+
+  @command('!hue')
+  @default_permission(permission.CASTERS)
   hue (opts: CommandOptions) {
     if (!isMainThread) {
       return global.workers.sendToMaster({ type: 'call', ns: 'systems.phillipshue', fnc: 'hue', args: [{sender: opts.sender, text: opts.parameters }]})

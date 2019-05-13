@@ -10,6 +10,7 @@ const Parser = require('./parser')
 const util = require('util');
 const commons = require('./commons');
 
+import { command, default_permission } from './decorators';
 import { permission } from './permissions';
 const Expects = require('./expects')
 import Core from './_interface'
@@ -36,11 +37,6 @@ class TMI extends Core {
         mute: false,
         whisperListener: false,
       },
-      commands: [
-        { name: '!ignore add', fnc: 'ignoreAdd', permission: permission.CASTERS },
-        { name: '!ignore rm', fnc: 'ignoreRm', permission: permission.CASTERS },
-        { name: '!ignore check', fnc: 'ignoreCheck', permission: permission.CASTERS },
-      ]
     }
     super({ settings })
 
@@ -51,6 +47,8 @@ class TMI extends Core {
     }
   }
 
+  @command('!ignore add')
+  @default_permission(permission.CASTERS)
   async ignoreAdd (opts: Object) {
     try {
       const username = new Expects(opts.parameters).username().toArray()[0].toLowerCase()
@@ -67,6 +65,8 @@ class TMI extends Core {
     }
   }
 
+  @command('!ignore remove')
+  @default_permission(permission.CASTERS)
   async ignoreRm (opts: Object) {
     try {
       const username = new Expects(opts.parameters).username().toArray()[0].toLowerCase()
@@ -78,6 +78,8 @@ class TMI extends Core {
     }
   }
 
+  @command('!ignore check')
+  @default_permission(permission.CASTERS)
   async ignoreCheck (opts: Object) {
     try {
       const username = new Expects(opts.parameters).username().toArray()[0].toLowerCase()

@@ -10,6 +10,7 @@ const {
 // bot libraries
 import { permission } from '../permissions';
 import System from './_interface'
+import { command, default_permission } from '../decorators';
 const commons = require('../commons');
 
 /*
@@ -26,19 +27,7 @@ const commons = require('../commons');
 
 class Timers extends System {
   constructor () {
-    const settings = {
-      commands: [
-        { name: '!timers set', permission: permission.CASTERS },
-        { name: '!timers unset', permission: permission.CASTERS },
-        { name: '!timers add', permission: permission.CASTERS },
-        { name: '!timers rm', permission: permission.CASTERS },
-        { name: '!timers list', permission: permission.CASTERS },
-        { name: '!timers toggle', permission: permission.CASTERS },
-        { name: '!timers', permission: permission.CASTERS }
-      ]
-    }
-
-    super({ settings })
+    super()
 
     this.addMenu({ category: 'manage', name: 'timers', id: 'timers/list' })
     if (isMainThread) this.init()
@@ -112,6 +101,8 @@ class Timers extends System {
     socket.emit(this.collection.data, { timers: await global.db.engine.find(this.collection.data), responses: await global.db.engine.find(this.collection.responses) })
   }
 
+  @command('!timers')
+  @default_permission(permission.CASTERS)
   async main (opts) {
     const [main, set, unset, add, rm, toggle, list] = await Promise.all([
       this.settings.commands['!timers'],
@@ -174,6 +165,8 @@ class Timers extends System {
     else global.db.engine.update(this.collection.responses, { _id: data.id }, { response: data.value })
   }
 
+  @command('!timers set')
+  @default_permission(permission.CASTERS)
   async set (opts) {
     // -name [name-of-timer] -messages [num-of-msgs-to-trigger|default:0] -seconds [trigger-every-x-seconds|default:60]
     let name = opts.parameters.match(/-name ([a-zA-Z0-9_]+)/)
@@ -201,6 +194,8 @@ class Timers extends System {
       .replace(/\$seconds/g, seconds), opts.sender)
   }
 
+  @command('!timers unset')
+  @default_permission(permission.CASTERS)
   async unset (opts) {
     // -name [name-of-timer]
     let name = opts.parameters.match(/-name ([\S]+)/)
@@ -224,6 +219,8 @@ class Timers extends System {
       .replace(/\$name/g, name), opts.sender)
   }
 
+  @command('!timers rm')
+  @default_permission(permission.CASTERS)
   async rm (opts) {
     // -id [id-of-response]
     let id = opts.parameters.match(/-id ([a-zA-Z0-9]+)/)
@@ -240,6 +237,8 @@ class Timers extends System {
       .replace(/\$id/g, id), opts.sender)
   }
 
+  @command('!timers add')
+  @default_permission(permission.CASTERS)
   async add (opts) {
     // -name [name-of-timer] -response '[response]'
     let name = opts.parameters.match(/-name ([\S]+)/)
@@ -272,6 +271,8 @@ class Timers extends System {
       .replace(/\$response/g, response), opts.sender)
   }
 
+  @command('!timers list')
+  @default_permission(permission.CASTERS)
   async list (opts) {
     // !timers list -name [name-of-timer]
     let name = opts.parameters.match(/-name ([\S]+)/)
@@ -295,6 +296,8 @@ class Timers extends System {
     return true
   }
 
+  @command('!timers toggle')
+  @default_permission(permission.CASTERS)
   async toggle (opts) {
     // -name [name-of-timer] or -id [id-of-response]
     let id = opts.parameters.match(/-id ([a-zA-Z0-9]+)/)

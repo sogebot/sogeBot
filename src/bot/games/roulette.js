@@ -5,6 +5,7 @@ const _ = require('lodash')
 
 // bot libraries
 const commons = require('../commons')
+import { command } from '../decorators';
 import Game from './_interface'
 
 /*
@@ -18,9 +19,6 @@ class Roulette extends Game {
     ]
     const settings = {
       timeout: 10,
-      commands: [
-        '!roulette'
-      ],
       rewards: {
         winnerWillGet: 0,
         loserWillLose: 0
@@ -30,6 +28,7 @@ class Roulette extends Game {
     super({ settings, dependsOn })
   }
 
+  @command('!roulette')
   async main (opts) {
     opts.sender['message-type'] = 'chat' // force responses to chat
 

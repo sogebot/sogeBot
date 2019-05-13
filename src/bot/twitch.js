@@ -9,6 +9,7 @@ const {
   getTime, sendMessage, prepare, getChannel
 } = require('./commons');
 import { permission } from './permissions';
+import { command } from './decorators';
 import Core from './_interface';
 
 require('moment-precise-range-plugin')
@@ -18,21 +19,7 @@ config.timezone = config.timezone === 'system' || _.isNil(config.timezone) ? mom
 
 class Twitch extends Core {
   constructor () {
-    const options = {
-      settings: {
-        commands: [
-          { name: '!uptime', fnc: 'uptime', permission: permission.VIEWERS },
-          { name: '!time', fnc: 'time', permission: permission.VIEWERS },
-          { name: '!followers', fnc: 'followers', permission: permission.VIEWERS },
-          { name: '!subs', fnc: 'subs', permission: permission.VIEWERS },
-          { name: '!title', fnc: 'getTitle', permission: permission.VIEWERS },
-          { name: '!title set', fnc: 'setTitle', permission: permission.CASTERS },
-          { name: '!game', fnc: 'getGame', permission: permission.VIEWERS },
-          { name: '!game set', fnc: 'setGame', permission: permission.CASTERS }
-        ]
-      }
-    }
-    super(options)
+    super()
 
     if (isMainThread) {
       global.panel.addWidget('twitch', 'widget-title-monitor', 'fab fa-twitch')
@@ -49,6 +36,7 @@ class Twitch extends Core {
     socket.emit('twitchVideo', (await global.oauth.settings.broadcaster.username).toLowerCase())
   }
 
+  @command('!uptime')
   async uptime (opts) {
     const when = await global.cache.when()
     const time = getTime(await global.cache.isOnline() ? when.online : when.offline, true)
@@ -59,11 +47,13 @@ class Twitch extends Core {
       .replace(/\$seconds/g, time.seconds), opts.sender)
   }
 
+  @command('!time')
   async time (opts) {
     let message = await prepare('time', { time: moment().tz(config.timezone).format('LTS') })
     sendMessage(message, opts.sender)
   }
 
+  @command('!followers')
   async followers (opts) {
     let events = await global.db.engine.find('widgetsEventList')
     const onlineViewers = await global.users.getAllOnlineUsernames()
@@ -89,6 +79,7 @@ class Twitch extends Core {
     sendMessage(message, opts.sender)
   }
 
+  @command('!subs')
   async subs (opts) {
     let events = await global.db.engine.find('widgetsEventList')
     const onlineViewers = await global.users.getAllOnlineUsernames()
@@ -114,11 +105,13 @@ class Twitch extends Core {
     sendMessage(message, opts.sender)
   }
 
+  @command('!title')
   async getTitle (opts) {
     sendMessage(global.translate('title.current')
       .replace(/\$title/g, _.get(await global.db.engine.findOne('api.current', { key: 'title' }), 'value', 'n/a')), opts.sender)
   }
 
+  @command('!title set')
   async setTitle (opts) {
     if (opts.parameters.length === 0) {
       sendMessage(global.translate('title.current')
@@ -129,11 +122,13 @@ class Twitch extends Core {
     else global.workers.sendToMaster({ type: 'call', ns: 'api', fnc: 'setTitleAndGame', args: [opts.sender, { title: opts.parameters }] })
   }
 
+  @command('!game')
   async getGame (opts) {
     sendMessage(global.translate('game.current')
       .replace(/\$game/g, _.get(await global.db.engine.findOne('api.current', { key: 'game' }), 'value', 'n/a')), opts.sender)
   }
 
+  @command('!game set')
   async setGame (opts) {
     if (opts.parameters.length === 0) {
       sendMessage(global.translate('game.current')

@@ -7,6 +7,7 @@ const _ = require('lodash')
 const Parser = require('../parser')
 const Message = require('../message')
 import { prepare, sendMessage } from '../commons';
+import { command, default_permission } from '../decorators';
 import Expects from '../expects';
 import System from './_interface'
 import { parser } from '../decorators';
@@ -24,18 +25,7 @@ import { permission } from '../permissions';
 
 class Alias extends System {
   constructor () {
-    const settings = {
-      commands: [
-        { name: '!alias add', permission: permission.CASTERS },
-        { name: '!alias edit', permission: permission.CASTERS },
-        { name: '!alias list', permission: permission.CASTERS },
-        { name: '!alias remove', permission: permission.CASTERS },
-        { name: '!alias toggle-visibility', permission: permission.CASTERS },
-        { name: '!alias toggle', permission: permission.CASTERS },
-        { name: '!alias', permission: permission.CASTERS }
-      ]
-    }
-    super({ settings })
+    super()
 
     this.addMenu({ category: 'manage', name: 'alias', id: 'alias/list' })
     this.addMenu({ category: 'settings', name: 'systems', id: 'systems' })
@@ -94,10 +84,14 @@ class Alias extends System {
     return true
   }
 
+  @command('!alias')
+  @default_permission(permission.CASTERS)
   main (opts) {
     sendMessage(global.translate('core.usage') + ': !alias add -p [uuid|name] <!alias> <!command> | !alias edit -p [uuid|name] <!alias> <!command> | !alias remove <!alias> | !alias list | !alias toggle <!alias> | !alias toggle-visibility <!alias>', opts.sender)
   }
 
+  @command('!alias edit')
+  @default_permission(permission.CASTERS)
   async edit (opts) {
     try {
       const [perm, alias, command] = new Expects(opts.parameters)
@@ -130,6 +124,8 @@ class Alias extends System {
     }
   }
 
+  @command('!alias add')
+  @default_permission(permission.CASTERS)
   async add (opts) {
     try {
       const [perm, alias, command] = new Expects(opts.parameters)
@@ -162,12 +158,16 @@ class Alias extends System {
     }
   }
 
+  @command('!alias list')
+  @default_permission(permission.CASTERS)
   async list (opts) {
     let alias = await global.db.engine.find(this.collection.data, { visible: true, enabled: true })
     var output = (alias.length === 0 ? global.translate('alias.list-is-empty') : global.translate('alias.list-is-not-empty').replace(/\$list/g, (_.map(_.orderBy(alias, 'alias'), 'alias')).join(', ')))
     sendMessage(output, opts.sender)
   }
 
+  @command('!alias toggle')
+  @default_permission(permission.CASTERS)
   async toggle (opts) {
     try {
       const [alias] = new Expects(opts.parameters)
@@ -194,6 +194,8 @@ class Alias extends System {
     }
   }
 
+  @command('!alias toggle-visibility')
+  @default_permission(permission.CASTERS)
   async toggleVisibility (opts) {
     try {
       const [alias] = new Expects(opts.parameters)
@@ -220,6 +222,8 @@ class Alias extends System {
     }
   }
 
+  @command('!alias remove')
+  @default_permission(permission.CASTERS)
   async remove (opts) {
     try {
       const [alias] = new Expects(opts.parameters)

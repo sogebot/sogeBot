@@ -5,6 +5,7 @@ const _ = require('lodash')
 
 // bot libraries
 import { permission } from '../permissions';
+import { command, default_permission } from '../decorators';
 import System from './_interface'
 const commons = require('../commons');
 
@@ -19,23 +20,13 @@ const commons = require('../commons');
 
 class Ranks extends System {
   constructor () {
-    const settings = {
-      commands: [
-        { name: '!rank add', permission: permission.CASTERS },
-        { name: '!rank edit', permission: permission.CASTERS },
-        { name: '!rank set', permission: permission.CASTERS },
-        { name: '!rank unset', permission: permission.CASTERS },
-        { name: '!rank list', permission: permission.CASTERS },
-        { name: '!rank remove', permission: permission.CASTERS },
-        { name: '!rank help', permission: permission.CASTERS },
-        '!rank'
-      ]
-    }
-    super({ settings })
+    super()
 
     this.addMenu({ category: 'manage', name: 'ranks', id: 'ranks/list' })
   }
 
+  @command('!rank add')
+  @default_permission(permission.CASTERS)
   async add (opts) {
     const parsed = opts.parameters.match(/^(\d+) ([\S].+)$/)
 
@@ -57,6 +48,8 @@ class Ranks extends System {
     commons.sendMessage(message, opts.sender)
   }
 
+  @command('!rank edit')
+  @default_permission(permission.CASTERS)
   async edit (opts) {
     let parsed = opts.parameters.match(/^(\d+) ([\S].+)$/)
 
@@ -81,6 +74,8 @@ class Ranks extends System {
     commons.sendMessage(message, opts.sender)
   }
 
+  @command('!rank set')
+  @default_permission(permission.CASTERS)
   async set (opts) {
     var parsed = opts.parameters.match(/^([\S]+) ([\S ]+)$/)
 
@@ -96,6 +91,8 @@ class Ranks extends System {
     commons.sendMessage(message, opts.sender)
   }
 
+  @command('!rank unset')
+  @default_permission(permission.CASTERS)
   async unset (opts) {
     var parsed = opts.parameters.match(/^([\S]+)$/)
 
@@ -110,16 +107,22 @@ class Ranks extends System {
     commons.sendMessage(message, opts.sender)
   }
 
+  @command('!rank help')
+  @default_permission(permission.CASTERS)
   help (opts) {
     commons.sendMessage(global.translate('core.usage') + ': !rank add <hours> <rank> | !rank edit <hours> <rank> | !rank remove <hour> | !rank list | !rank set <username> <rank> | !rank unset <username>', opts.sender)
   }
 
+  @command('!rank list')
+  @default_permission(permission.CASTERS)
   async list (opts) {
     let ranks = await global.db.engine.find(this.collection.data)
     var output = await commons.prepare(ranks.length === 0 ? 'ranks.list-is-empty' : 'ranks.list-is-not-empty', { list: _.map(_.orderBy(ranks, 'hours', 'asc'), function (l) { return l.hours + 'h - ' + l.value }).join(', ') })
     commons.sendMessage(output, opts.sender)
   }
 
+  @command('!rank remove')
+  @default_permission(permission.CASTERS)
   async remove (opts) {
     const parsed = opts.parameters.match(/^(\d+)$/)
     if (_.isNil(parsed)) {
@@ -135,6 +138,7 @@ class Ranks extends System {
     commons.sendMessage(message, opts.sender)
   }
 
+  @command('!rank')
   async main (opts) {
     let watched = await global.users.getWatchedOf(opts.sender.userId)
     let rank = await this.get(opts.sender.username)
