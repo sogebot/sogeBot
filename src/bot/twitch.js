@@ -8,7 +8,6 @@ const {
 const {
   getTime, sendMessage, prepare, getChannel
 } = require('./commons');
-import { permission } from './permissions';
 import { command } from './decorators';
 import Core from './_interface';
 

@@ -30,7 +30,7 @@ class Cooldown extends System {
     const settings = {
       cooldownNotifyAsWhisper: false,
     }
-    super()
+    super({ settings })
 
     this.addMenu({ category: 'manage', name: 'cooldown', id: 'cooldown/list' })
   }
