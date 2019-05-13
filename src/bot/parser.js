@@ -136,6 +136,8 @@ class Parser {
       let onlyParams = message.trim().toLowerCase().replace(item.command, '')
       let isStartingWith = message.trim().toLowerCase().startsWith(item.command)
 
+      debug('parser.find', JSON.stringify({command: item.command, isStartingWith}))
+
       if (isStartingWith && (onlyParams.length === 0 || (onlyParams.length > 0 && onlyParams[0] === ' '))) {
         const customPermission = await global.permissions.getCommandPermission(item.id)
         if (typeof customPermission !== 'undefined') {
