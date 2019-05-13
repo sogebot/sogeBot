@@ -211,6 +211,10 @@ class OAuth extends Core {
       if (type === 'bot') this.settings._.botId = request.data.user_id
       else this.settings._.broadcasterId = request.data.user_id
 
+      if (type === 'bot' && this.settings._.botId === this.settings._.broadcasterId) {
+        global.log.warning('You shouldn\'t use same account for bot and broadcaster!');
+      }
+
       this.settings[type]._authenticatedScopes = request.data.scopes
       this.settings[type].username = request.data.login
 
