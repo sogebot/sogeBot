@@ -3,6 +3,10 @@
 'use strict'
 require('module-alias/register')
 
+if (Number(process.versions.node.split('.')[0]) < 11) {
+  console.log('Upgrade your version of NodeJs! You need at least NodeJs 11.0.0, https://nodejs.org/en/. Current version is ' + process.versions.node)
+  process.exit(1)
+}
 import { Workers } from './workers';
 import { Permissions } from './permissions'
 import { Events } from './events'
