@@ -108,13 +108,14 @@
           </div>
           <div class="col-md-4">
             <label for="runEvery">{{ commons.translate('registry.customvariables.runScript.name') }}</label>
-            <select v-bind:class="{ 'is-invalid': hasError.selectedRunEvery }" id="runEvery" class="form-control" v-model="selectedRunEvery">
-              <option value="" selected>{{ commons.translate('registry.customvariables.choose') }}</option>
-              <option v-for="option in runEveryOptions" v-bind:value="option.value">
-                {{ option.text }}
-              </option>
-            </select>
-            <div class="invalid-feedback">{{ commons.translate('registry.customvariables.runScript.error.isNotSelected') }}</div>
+            <div class="d-flex">
+              <select id="runEvery" class="form-control" v-model="selectedRunEvery">
+                <option v-for="option in runEveryOptions" v-bind:value="option.type">
+                  {{ commons.translate('registry.customvariables.runEvery.' + option.type) }}
+                </option>
+              </select>
+              <input type="text" v-model="runEveryX" class="form-control ml-2" v-if="selectedRunEvery !== 'isUsed'" />
+            </div>
 
             <button type="button" class="btn btn-block btn-info mt-4" v-on:click="testScript()">{{ commons.translate('registry.customvariables.testCurrentScript.name') }}</button>
             <small class="form-text text-muted" v-html="commons.translate('registry.customvariables.testCurrentScript.help')"></small>
@@ -163,8 +164,8 @@
       data: {
         types: [
           {
-              value: 'number',
-              text: commons.translate('registry.customvariables.types.number')
+            value: 'number',
+            text: commons.translate('registry.customvariables.types.number')
           },
           {
             value: 'text',
@@ -182,27 +183,28 @@
         runEveryOptions: [
           {
             value: 0,
-            text: commons.translate('registry.customvariables.runEvery.isUsed')
+            type: 'isUsed',
           },
           {
-            value: 1000 * 60 * 5,
-            text: commons.translate('registry.customvariables.runEvery.everyXMinutes').replace('$minutes', 5)
+            value: 1000,
+            type: 'seconds',
           },
           {
-            value: 1000 * 60 * 15,
-            text: commons.translate('registry.customvariables.runEvery.everyXMinutes').replace('$minutes', 15)
-          },
-          {
-            value: 1000 * 60 * 30,
-            text: commons.translate('registry.customvariables.runEvery.everyXMinutes').replace('$minutes', 30)
+            value: 1000 * 60,
+            type: 'minutes',
           },
           {
             value: 1000 * 60 * 60,
-            text: commons.translate('registry.customvariables.runEvery.everyXMinutes').replace('$minutes', 60)
-          }
+            type: 'hours',
+          },
+          {
+            value: 1000 * 60 * 60 * 24,
+            type: 'days',
+          },
         ],
         selectedType: '',
-        selectedRunEvery: '',
+        selectedRunEvery: 0,
+        runEveryX: 1,
         deleteState: 'waiting',
 
         variableNameInitial: '',
@@ -293,8 +295,8 @@
             // if current value is not set or is not set as option -> force first item
             if (String(this.currentValue).trim().length === 0 || !this.usableOptionsArray.includes(String(this.currentValue).trim())) this.currentValue = this.usableOptionsArray[0]
           } else if (this.selectedType === 'eval') {
-            if (this.selectedRunEvery === '') {
-              this.$set(this.hasError, 'selectedRunEvery', true)
+            if (this.runEveryX < 1) {
+              this.runEveryX = 0
             }
           }
 
@@ -310,7 +312,9 @@
               currentValue: this.currentValue,
               usableOptions: this.usableOptions || '',
               evalValue: this.evalValue,
-              runEvery: this.selectedRunEvery,
+              runEvery: this.runEveryOptions.find((o) => o.type === this.selectedRunEvery).value * this.runEveryX,
+              runEveryType: this.selectedRunEvery,
+              runEveryTypeValue: this.runEveryOptions.find((o) => o.type === this.selectedRunEvery).value,
               type: this.selectedType,
               readOnly: this.readOnly,
               responseType: this.responseType,
@@ -471,7 +475,8 @@ return '';`,
         customVariablesEdit.currentValue = data.variable.currentValue
         customVariablesEdit.usableOptions = data.variable.usableOptions
         customVariablesEdit.evalValueInit = data.variable.evalValue
-        customVariablesEdit.selectedRunEvery = data.variable.runEvery
+        customVariablesEdit.selectedRunEvery = data.variable.runEveryType
+        customVariablesEdit.runEveryX = data.variable.runEvery / data.variable.runEveryTypeValue
         customVariablesEdit.selectedType = data.variable.type
         customVariablesEdit.responseType = data.variable.responseType
         customVariablesEdit.responseText = data.variable.responseText
