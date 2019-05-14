@@ -114,9 +114,6 @@ class PhillipsHue extends Integration {
     }
   }
 
-
-  @command('!disable')
-  @default_permission(permission.CASTERS)
   @command('!hue list')
   @default_permission(permission.CASTERS)
   getLights (opts: CommandOptions) {
