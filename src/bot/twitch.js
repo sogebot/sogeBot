@@ -8,7 +8,8 @@ const {
 const {
   getTime, sendMessage, prepare, getChannel
 } = require('./commons');
-import { command } from './decorators';
+import { command, default_permission } from './decorators';
+import { permission } from './permissions'
 import Core from './_interface';
 
 require('moment-precise-range-plugin')
@@ -111,6 +112,7 @@ class Twitch extends Core {
   }
 
   @command('!title set')
+  @default_permission(permission.CASTERS)
   async setTitle (opts) {
     if (opts.parameters.length === 0) {
       sendMessage(global.translate('title.current')
@@ -128,6 +130,7 @@ class Twitch extends Core {
   }
 
   @command('!game set')
+  @default_permission(permission.CASTERS)
   async setGame (opts) {
     if (opts.parameters.length === 0) {
       sendMessage(global.translate('game.current')
