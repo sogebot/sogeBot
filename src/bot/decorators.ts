@@ -40,7 +40,7 @@ export function command(opts: string) {
   };
 }
 
-export function default_permission(uuid: string) {
+export function default_permission(uuid: string | null) {
   const _prepareStackTrace = Error.prepareStackTrace;
   Error.prepareStackTrace = (_, s) => s;
   const stack = (new Error().stack as unknown as NodeJS.CallSite[]);
