@@ -337,8 +337,8 @@
           this.evalInput = CodeMirror(textarea, {
             value: this.evalValueInit ||
 `/* Available functions
-    url(link) - load data from API
     user(username?: string): Promise<{ username: string, id: string, is: { follower: boolean, mod: boolean, online: boolean, subscriber: boolean, vip: boolean }}> - returns user object (if null -> sender)
+    url(url: string, opts?: { method: 'POST' | 'GET', headers: object, data: object}): Promise<{ data: object, status: number, statusText: string}>
  *
  * Available variables
     _, _current, users, sender (only in custom commands, keyword), param (only in custom command)

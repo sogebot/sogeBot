@@ -106,22 +106,10 @@ class CustomVariables {
     const containUsers = !_.isNil(script.match(/users/g)) && script.match(/users/g).length > 1
     const containRandom = !_.isNil(script.replace(/Math\.random|_\.random/g, '').match(/random/g));
     const containOnline = !_.isNil(script.match(/online/g))
-    const containUrl = !_.isNil(script.match(/url\(['"](.*?)['"]\)/g))
 
     if (!_.isNil(script.match(/(\$_[a-zA-Z_]+)/g))) {
       for (let match of script.match(/(\$_[a-zA-Z_]+)/g)) {
         script = script.replace(match, await this.getValueOf(match))
-      }
-    }
-
-    let urls = []
-    if (containUrl) {
-      for (let match of script.match(/url\(['"](.*?)['"]\)/g)) {
-        const id = 'url' + crypto.randomBytes(64).toString('hex').slice(0, 5)
-        const url = match.replace(/url\(['"]|["']\)/g, '')
-        let response = await axios.get(url)
-        urls.push({ id, response })
-        script = script.replace(match, id)
       }
     }
 
@@ -171,6 +159,29 @@ class CustomVariables {
 
     let toEval = `(async function evaluation () {  ${script} })()`
     let context = {
+      url: async (url, opts) => {
+        if (typeof opts === 'undefined') {
+          opts = {
+            url,
+            method: 'GET',
+            headers: undefined,
+            data: undefined,
+          }
+        } else {
+          opts.url = url
+        }
+
+        if (!['GET', 'POST', 'PUT', 'DELETE'].includes(opts.method.toUpperCase())) {
+          throw Error('only GET, POST, PUT, DELETE methods are supported')
+        }
+
+        if (opts.url.trim().length === 0) {
+          throw Error('url was not properly specified')
+        }
+
+        const request = await axios(opts)
+        return { data: request.data, status: request.status, statusText: request.statusText };
+      },
       _: _,
       users: users,
       random: randomVar,
@@ -230,13 +241,6 @@ class CustomVariables {
           }
         }
         return userObj;
-      }
-    }
-
-    if (containUrl) {
-      // add urls to context
-      for (let url of urls) {
-        context[url.id] = url.response
       }
     }
     return (safeEval(toEval, context))
