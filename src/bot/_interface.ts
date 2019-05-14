@@ -622,7 +622,11 @@ class Module {
     for (const command of this._commands) {
       const key = typeof command === 'string' ? command : command.name;
       const pItem = await global.db.engine.findOne(global.permissions.collection.commands, { key });
-      if (!_.isEmpty(pItem)) { promisedSettings._permissions[key] = pItem.permission; } else { promisedSettings._permissions[key] = _.isNil(command.permission) ? permission.VIEWERS : command.permission; }
+      if (!_.isEmpty(pItem)) {
+        promisedSettings._permissions[key] = pItem.permission;
+      } else {
+        promisedSettings._permissions[key] = command.permission;
+      }
     }
 
     return promisedSettings;
