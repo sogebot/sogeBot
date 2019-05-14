@@ -70,7 +70,10 @@
   },
   "runEvery": {
     "isUsed": "When variable is used",
-    "everyXMinutes": "Every $minutes minutes"
+    "seconds": "Seconds",
+    "minutes": "Minutes",
+    "hours": "Hours",
+    "days": "Days"
   }
 }
 

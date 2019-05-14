@@ -24,10 +24,13 @@
         <td v-bind:class="{ 'text-muted': !variable.currentValue || variable.currentValue.length === 0 }">{{ variable.currentValue && variable.currentValue.length !== 0 ? variable.currentValue : commons.translate('not-available') }}</td>
         <td>
           <span v-if="variable.type === 'eval'">
-            <div v-if="variable.runEvery">
-              <strong>{{ commons.translate('registry.customvariables.run-script') }}:</strong>
-              {{ commons.translate('registry.customvariables.runEvery.everyXMinutes').replace('$minutes', variable.runEvery / 60 / 1000) }}
-            </div>
+            <strong>{{ commons.translate('registry.customvariables.run-script') }}:</strong>
+            <template v-if="variable.runEveryTypeValue > 0">
+              {{ variable.runEvery / variable.runEveryTypeValue }} {{ commons.translate('registry.customvariables.runEvery.' + variable.runEveryType) }}
+            </template>
+            <template v-else>
+              {{ commons.translate('registry.customvariables.runEvery.' + variable.runEveryType) }}
+            </template>
             <div>
               {{ commons.translate('registry.customvariables.last-run') }} <strong>{{ variable.runAt ? new Date(variable.runAt).toLocaleString() : commons.translate('commons.never') }}</strong>
             </div>
