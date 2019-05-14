@@ -37,7 +37,6 @@ class Twitch extends Core {
   }
 
   @command('!uptime')
-  @default_permission(permission.VIEWERS)
   async uptime (opts) {
     const when = await global.cache.when()
     const time = getTime(await global.cache.isOnline() ? when.online : when.offline, true)
@@ -49,14 +48,12 @@ class Twitch extends Core {
   }
 
   @command('!time')
-  @default_permission(permission.VIEWERS)
   async time (opts) {
     let message = await prepare('time', { time: moment().tz(config.timezone).format('LTS') })
     sendMessage(message, opts.sender)
   }
 
   @command('!followers')
-  @default_permission(permission.VIEWERS)
   async followers (opts) {
     let events = await global.db.engine.find('widgetsEventList')
     const onlineViewers = await global.users.getAllOnlineUsernames()
@@ -83,7 +80,6 @@ class Twitch extends Core {
   }
 
   @command('!subs')
-  @default_permission(permission.VIEWERS)
   async subs (opts) {
     let events = await global.db.engine.find('widgetsEventList')
     const onlineViewers = await global.users.getAllOnlineUsernames()
@@ -110,7 +106,6 @@ class Twitch extends Core {
   }
 
   @command('!title')
-  @default_permission(permission.VIEWERS)
   async getTitle (opts) {
     sendMessage(global.translate('title.current')
       .replace(/\$title/g, _.get(await global.db.engine.findOne('api.current', { key: 'title' }), 'value', 'n/a')), opts.sender)
@@ -129,7 +124,6 @@ class Twitch extends Core {
   }
 
   @command('!game')
-  @default_permission(permission.VIEWERS)
   async getGame (opts) {
     sendMessage(global.translate('game.current')
       .replace(/\$game/g, _.get(await global.db.engine.findOne('api.current', { key: 'game' }), 'value', 'n/a')), opts.sender)
