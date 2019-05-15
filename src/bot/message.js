@@ -208,6 +208,14 @@ class Message {
           return state.updated.currentValue
         }
         return global.customvariables.getValueOf(variable, { sender: attr.sender, param: attr.param })
+      },
+      // force full quiet variable
+      '$!!_#': async (variable) => {
+        variable = variable.replace('$!!_', '$_')
+        if (!_.isNil(attr.param) && attr.param.length !== 0) {
+          await global.customvariables.setValueOf(variable, attr.param, { sender: attr.sender })
+        }
+        return ''
       }
     }
     let param = {
