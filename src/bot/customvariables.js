@@ -296,6 +296,13 @@ class CustomVariables {
         commons.isModerator(opts.sender),
         commons.isOwner(opts.sender)
       ])
+
+      if (typeof opts.sender === 'string') {
+        opts.sender = {
+          username: opts.sender,
+          userId: await global.users.getIdByName(opts.sender)
+        }
+      }
       const permissionsAreValid = _.isNil(opts.sender) || (await global.permissions.check(opts.sender.userId, item.permission)).access;
       if ((item.readOnly && !opts.readOnlyBypass) || !permissionsAreValid) {
         isOk = false
