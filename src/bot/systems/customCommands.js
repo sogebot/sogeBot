@@ -441,6 +441,13 @@ class CustomCommands extends System {
       owner: commons.isOwner(opts.sender.username),
     }
 
+    // get custom variables
+    const customVariablesDb = await global.db.engine.find('custom.variables');
+    const customVariables = {}
+    for (const cvar of customVariablesDb) {
+      customVariables[cvar.variableName] = cvar.currentValue
+    }
+
     const context = {
       _: _,
       $sender: opts.sender.username,
@@ -452,7 +459,8 @@ class CustomCommands extends System {
       $views: _.get(await global.db.engine.findOne('api.current', { key: 'views' }), 'value', 0),
       $followers: _.get(await global.db.engine.findOne('api.current', { key: 'followers' }), 'value', 0),
       $hosts: _.get(await global.db.engine.findOne('api.current', { key: 'hosts' }), 'value', 0),
-      $subscribers: _.get(await global.db.engine.findOne('api.current', { key: 'subscribers' }), 'value', 0)
+      $subscribers: _.get(await global.db.engine.findOne('api.current', { key: 'subscribers' }), 'value', 0),
+      ...customVariables
     }
     var result = false
     try {
