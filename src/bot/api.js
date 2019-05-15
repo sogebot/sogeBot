@@ -102,6 +102,7 @@ class API {
       this._loadCachedStatusAndGame()
 
       this.interval('getCurrentStreamData', constants.MINUTE)
+      this.interval('getCurrentStreamTags', constants.MINUTE)
       this.interval('updateChannelViewsAndBroadcasterType', constants.MINUTE)
       this.interval('getLatest100Followers', constants.MINUTE)
       this.interval('getChannelHosts', constants.MINUTE)
@@ -110,6 +111,9 @@ class API {
       this.interval('getChannelDataOldAPI', constants.MINUTE)
       this.interval('intervalFollowerUpdate', constants.MINUTE)
       this.interval('checkClips', constants.MINUTE)
+      this.interval('getAllStreamTags', constants.HOUR * 12)
+
+      global.db.engine.index('core.api.tags', [{ index: 'tag_id', unique: true }]);
     } else {
       this.calls = {
         bot: {
@@ -390,6 +394,54 @@ class API {
     global.status.MOD = mods.map(o => o.toLowerCase()).includes(global.oauth.botUsername);
   }
 
+  async getAllStreamTags(opts) {
+    if (!isMainThread) throw new Error('API can run only on master')
+    let url = `https://api.twitch.tv/helix/tags/streams?first=100`
+    if (opts.cursor) url += '&after=' + opts.cursor
+
+    const token = global.oauth.settings.bot.accessToken
+    const needToWait = _.isNil(global.overlays) || token === ''
+    const notEnoughAPICalls = this.calls.bot.remaining <= 30 && this.calls.bot.refresh > _.now() / 1000
+
+    if (needToWait || notEnoughAPICalls) {
+      delete opts.count;
+      return { state: false, opts }
+    }
+
+    var request
+    try {
+      request = await axios.get(url, {
+        headers: {
+          'Authorization': 'Bearer ' + token
+        }
+      })
+      const tags = request.data.data
+
+      for(const tag of tags) {
+        await global.db.engine.update('core.api.tags', { tag_id: tag.tag_id }, tag)
+      }
+
+      if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { data: tags, timestamp: _.now(), call: 'getAllStreamTags', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining })
+
+      // save remaining api calls
+      this.calls.bot.remaining = request.headers['ratelimit-remaining']
+      this.calls.bot.refresh = request.headers['ratelimit-reset']
+      this.calls.bot.limit = request.headers['ratelimit-limit']
+      global.workers.sendToAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', request.headers['ratelimit-limit'], request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] })
+
+      if (tags.length === 100) {
+        // move to next page
+        this.getAllStreamTags({ cursor: request.data.pagination.cursor })
+      }
+    } catch (e) {
+      global.log.error(`${url} - ${e.message}`)
+      if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getChannelSubscribers', api: 'helix', endpoint: url, code: e.response.status || 200, data: e.stack, remaining: this.calls.bot.remaining })
+    }
+    delete opts.count;
+    return { state: true, opts }
+
+  }
+
   async getChannelSubscribers (opts) {
     if (!isMainThread) throw new Error('API can run only on master')
     opts = opts || {}
@@ -398,7 +450,6 @@ class API {
     let url = `https://api.twitch.tv/helix/subscriptions?broadcaster_id=${cid}&first=100`
     if (opts.cursor) url += '&after=' + opts.cursor
     if (typeof opts.count === 'undefined') opts.count = -1 // start at -1 because owner is subbed as well
-
 
     const token = global.oauth.broadcasterAccessToken
     const needToWait = _.isNil(cid) || cid === '' || _.isNil(global.overlays) || token === ''
@@ -762,6 +813,50 @@ class API {
       if (isMainThread) if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getGameFromId', api: 'helix', endpoint: url, code: e.response.status, data: e.stack, remaining: this.calls.bot.remaining })
       return game.value
     }
+  }
+
+  async getCurrentStreamTags (opts) {
+    if (!isMainThread) throw new Error('API can run only on master')
+
+    const cid = global.oauth.settings._.channelId
+    const url = `https://api.twitch.tv/helix/streams/tags?broadcaster_id=${cid}`
+
+    const token = await global.oauth.settings.bot.accessToken
+    const needToWait = _.isNil(cid) || cid === '' || _.isNil(global.overlays) || token === ''
+    const notEnoughAPICalls = this.calls.bot.remaining <= 30 && this.calls.bot.refresh > _.now() / 1000
+    if (needToWait || notEnoughAPICalls) {
+      return { state: false, opts }
+    }
+
+    var request
+    try {
+      request = await axios.get(url, {
+        headers: {
+          'Authorization': 'Bearer ' + token
+        }
+      })
+
+      // save remaining api calls
+      this.calls.bot.remaining = request.headers['ratelimit-remaining']
+      this.calls.bot.refresh = request.headers['ratelimit-reset']
+      this.calls.bot.limit = request.headers['ratelimit-limit']
+      global.workers.sendToAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', request.headers['ratelimit-limit'], request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] })
+
+      if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'getCurrentStreamTags', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining })
+
+      if (request.status === 200 && !_.isNil(request.data.data[0])) {
+        let tags = request.data.data
+        await global.db.engine.remove('core.api.currentTags', {})
+        for (const tag of tags) {
+          await global.db.engine.update('core.api.currentTags', { tag_id: tag.tag_id }, tag)
+        }
+      }
+    } catch (e) {
+      global.log.error(`${url} - ${e.message}`)
+      if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getCurrentStreamData', api: 'getCurrentStreamTags', endpoint: url, code: e.response.status, data: e.stack, remaining: this.calls.bot.remaining })
+      return { state: false, opts }
+    }
+    return { state: true, opts }
   }
 
   async getCurrentStreamData (opts) {
