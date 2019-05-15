@@ -435,6 +435,14 @@ class Events extends Core {
   public async checkFilter(eventId, attributes) {
     const filter = (await global.db.engine.findOne('events.filters', { eventId })).filters;
     if (typeof filter === 'undefined' || filter.trim().length === 0) { return true; }
+
+    // get custom variables
+    const customVariablesDb = await global.db.engine.find('custom.variables');
+    const customVariables = {};
+    for (const cvar of customVariablesDb) {
+      customVariables[cvar.variableName] = cvar.currentValue;
+    }
+
     const toEval = `(function evaluation () { return ${filter} })()`;
     const context = {
       _,
@@ -467,6 +475,7 @@ class Events extends Core {
       $followers: _.get(await global.db.engine.findOne('api.current', { key: 'followers' }), 'value', 0),
       $hosts: _.get(await global.db.engine.findOne('api.current', { key: 'hosts' }), 'value', 0),
       $subscribers: _.get(await global.db.engine.findOne('api.current', { key: 'subscribers' }), 'value', 0),
+      ...customVariables,
     };
     let result = false;
     try {
