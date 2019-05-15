@@ -118,6 +118,9 @@
 
 `$!_#` - same as variable above, except set message is always silent
 
+`$!!_#` - full silent variable, useful in multi responses where first response
+          might be just setting of variable
+
 `$touser` - is user param variable, if empty, current user is used. This
 param accepts `@user` and `user`
 
