@@ -8,7 +8,6 @@ const {
   isMainThread
 } = require('worker_threads');
 const mathjs = require('mathjs')
-const XRegExp = require('xregexp')
 
 const Message = require('./message')
 import { permission } from './permissions';
@@ -107,12 +106,6 @@ class CustomVariables {
     const containRandom = !_.isNil(script.replace(/Math\.random|_\.random/g, '').match(/random/g));
     const containOnline = !_.isNil(script.match(/online/g))
 
-    if (!_.isNil(script.match(/(\$_[a-zA-Z_]+)/g))) {
-      for (let match of script.match(/(\$_[a-zA-Z_]+)/g)) {
-        script = script.replace(match, await this.getValueOf(match))
-      }
-    }
-
     let users = []
     if (containUsers || containRandom) {
       users = await global.users.getAll()
@@ -147,13 +140,13 @@ class CustomVariables {
       subscriber: _.sample(_.map(_.filter(users, (o) => _.get(o, 'is.subscriber', false)), 'username'))
     }
 
-    // get custom variables replace theirs values
-    let match = script.match(new RegExp('\\$!?_([a-zA-Z0-9_]+)', 'g'))
-    if (match) {
-      for (let variable of match.sort((a, b) => b.length - a.length)) {
-        script = script.replace(new RegExp(XRegExp.escape(variable), 'g'), await this.getValueOf(variable.replace('$!_', ''), opts))
-      }
+    // get custom variables
+    const customVariablesDb = await global.db.engine.find('custom.variables');
+    const customVariables = {}
+    for (const cvar of customVariablesDb) {
+      customVariables[cvar.variableName] = cvar.currentValue
     }
+
     // update globals and replace theirs values
     script = (await new Message(script).global({ escape: "'" }))
 
@@ -241,7 +234,8 @@ class CustomVariables {
           }
         }
         return userObj;
-      }
+      },
+      ...customVariables,
     }
     return (safeEval(toEval, context))
   }
