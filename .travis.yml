@@ -16,19 +16,11 @@ script:
 
 stages:
   - name: tslint
-  - name: skip
-    if: commit_message =~ /(\[skip\-travis|no\-tests|skip\-tests\])/
   - name: test
     if: commit_message !~ /(\[skip\-travis|no\-tests|skip\-tests\])/
 
 jobs:
   include:
-    - stage: skip
-      install: skip
-      os: linux
-      before_script: skip
-      script:
-        - echo 'Found skip tag. Skipping tests.'
     - stage: tslint
       before_install:
         - npm install -g typescript tslint
