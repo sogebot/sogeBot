@@ -38,6 +38,10 @@ class Module {
     this._settings = opts.settings || {};
     this._settings.enabled = typeof this._settings.enabled !== 'undefined' ? this._settings.enabled : true;
 
+    if (this._settings.commands || this._settings.parsers) {
+      throw new Error('You cannot have commands and parsers keys in settings!');
+    }
+
     this.on = Object.assign({
       change: {
         enabled: null,
@@ -58,7 +62,13 @@ class Module {
       get: (t, n, r) => {
         if (_.isSymbol(n)) { return undefined; }
         let collection = '';
-        if (n === 'data') { collection = `${this._name}.${this.constructor.name.toLowerCase()}`; } else { collection = `${this._name}.${this.constructor.name.toLowerCase()}.${String(n)}`; }
+        if (n === 'data') {
+          collection = `${this._name}.${this.constructor.name.toLowerCase()}`;
+        } else if (n === 'settings') {
+          collection = `${this._name}.settings`;
+        } else {
+          collection = `${this._name}.${this.constructor.name.toLowerCase()}.${String(n)}`;
+        }
         return collection;
       },
     });
@@ -95,9 +105,16 @@ class Module {
   }
 
   public async loadVariableValues() {
-    const variables = await global.db.engine.find(this._name + '.settings', { system: this.constructor.name.toLowerCase() });
+    const variables = await global.db.engine.find(this.collection.settings, { system: this.constructor.name.toLowerCase() });
     for (let i = 0, length = variables.length; i < length; i++) {
-      if (_.has(this._opts.settings, variables[i].key) && variables[i].value !== null) { _.set(this._settings, variables[i].key, variables[i].value); } else { await global.db.engine.remove(this._name + '.settings', { _id: String(variables[i]._id) }); }
+      if (variables[i].key.startsWith('commands.')) {
+        continue; // commands are handled in decorators
+      } else if (_.has(this._opts.settings, variables[i].key) && variables[i].value !== null) {
+        _.set(this._settings, variables[i].key, variables[i].value);
+      } else {
+        await global.db.engine.remove(this.collection.settings, { _id: String(variables[i]._id) });
+      }
+
       if (typeof this.on === 'undefined' || typeof this.on.load === 'undefined') {
         continue;
       }
@@ -124,7 +141,7 @@ class Module {
     };
 
     if (isMainThread) {
-      global.db.engine.update(this._name + '.settings', { system: this.constructor.name.toLowerCase(), key }, { value });
+      global.db.engine.update(this.collection.settings, { system: this.constructor.name.toLowerCase(), key }, { value });
       // send to all threads
       global.workers.sendToAllWorkers(proc);
 
@@ -143,6 +160,17 @@ class Module {
     } else {
       // send to master to update
       global.workers.sendToMaster(proc);
+    }
+
+    // manually update commands as they are not part of settings anymore
+    if (proc.path.startsWith('settings.commands.')) {
+      const c = this._commands.find((o) => o.name === key.replace('commands.', ''));
+      if (c) {
+        c.command = value;
+        if (c.command === c.name && isMainThread) { // remove if default value
+          global.db.engine.remove(this.collection.settings, { system: this.constructor.name.toLowerCase(), key });
+        }
+      }
     }
   }
 
@@ -285,7 +313,7 @@ class Module {
         this.timeouts[`${this.constructor.name}._indexDbs`] = setTimeout(() => this._indexDbs(), 1000);
       } else {
         // add indexing to settings
-        global.db.engine.index(this._name + '.settings', [{ index: 'key' }]);
+        global.db.engine.index(this.collection.settings, [{ index: 'key' }]);
       }
     }
   }
@@ -326,7 +354,9 @@ class Module {
                       if (currentValue === c.permission) { await global.db.engine.remove(global.permissions.collection.commands, { key: c.name }); } else { await global.db.engine.update(global.permissions.collection.commands, { key: c.name }, { permission: currentValue }); }
                     }
                   }
-                } else if (key === 'enabled') { this.status({ state: value }); } else if (key === 'commands') {
+                } else if (key === 'enabled') {
+                  this.status({ state: value });
+                } else if (key === 'commands') {
                   for (const [defaultValue, currentValue] of Object.entries(value)) {
                     if (this.settings.commands) {
                       this.settings.commands[defaultValue] = currentValue;
@@ -363,7 +393,7 @@ class Module {
               opts.collection = opts.collection.replace('_', '');
             } else {
               if (opts.collection === 'settings') {
-                opts.collection = this._name + '.settings';
+                opts.collection = this.collection.settings;
                 opts.where = {
                   system: this.constructor.name.toLowerCase(),
                   ...opts.where,
@@ -392,7 +422,7 @@ class Module {
               opts.collection = opts.collection.replace('_', '');
             } else {
               if (opts.collection === 'settings') {
-                opts.collection = this._name + '.settings';
+                opts.collection = this.collection.settings;
                 opts.where = {
                   system: this.constructor.name.toLowerCase(),
                   ...opts.where,
@@ -441,7 +471,7 @@ class Module {
               opts.collection = opts.collection.replace('_', '');
             } else {
               if (opts.collection === 'settings') {
-                opts.collection = this._name + '.settings';
+                opts.collection = this.collection.settings;
                 opts.where = {
                   system: this.constructor.name.toLowerCase(),
                   ...opts.where,
@@ -466,7 +496,7 @@ class Module {
               opts.collection = opts.collection.replace('_', '');
             } else {
               if (opts.collection === 'settings') {
-                opts.collection = this._name + '.settings';
+                opts.collection = this.collection.settings;
                 opts.where = {
                   system: this.constructor.name.toLowerCase(),
                   ...opts.where,
@@ -495,7 +525,7 @@ class Module {
               opts.collection = opts.collection.replace('_', '');
             } else {
               if (opts.collection === 'settings') {
-                opts.collection = this._name + '.settings';
+                opts.collection = this.collection.settings;
                 opts.where = {
                   system: this.constructor.name.toLowerCase(),
                   ...opts.where,
@@ -606,7 +636,11 @@ class Module {
       if (category === 'parsers') { continue; }
       promisedSettings[category] = {};
 
-      if (!_.isObject(values)) {
+      if (category === 'commands') {
+        for (const k of Object.keys(values)) {
+          promisedSettings[category][k] = this.getCommand(k);
+        }
+      } else if (!_.isObject(values)) {
         // we are expecting bool, string, number
         promisedSettings[category] = this.settings[category];
       } else {
@@ -682,7 +716,7 @@ class Module {
         isHelper: boolean,
       }> = [];
       for (const command of this._commands) {
-        if (typeof this.settings.commands === 'undefined') { throw Error ('Something went wrong'); }
+        if (typeof this._settings.commands === 'undefined') { throw Error ('Something went wrong'); }
         if (_.isNil(command.name)) { throw Error('Command name must be defined'); }
 
         // if fnc is not set
@@ -709,7 +743,7 @@ class Module {
         }
 
         command.permission = _.isNil(command.permission) ? permission.VIEWERS : command.permission;
-        command.command = _.isNil(command.command) ? this.settings.commands[command.name] : command.command;
+        command.command = _.isNil(command.command) ? this._settings.commands[command.name] as string : command.command;
         commands.push({
           this: this,
           id: command.name,
@@ -720,6 +754,7 @@ class Module {
           isHelper: command.isHelper ? command.isHelper : false,
         });
       }
+
       return commands;
     } else { return []; }
   }
@@ -761,8 +796,9 @@ class Module {
    * @param command - default command to serach
   */
   protected getCommand(command: string): string {
-    if (this.settings.commands) {
-      return this.settings.commands[command];
+    const c = this._commands.find((o) => o.name === command);
+    if (c && c.command) {
+      return c.command;
      } else {
        return command;
      }

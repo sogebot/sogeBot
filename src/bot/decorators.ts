@@ -74,7 +74,7 @@ export function helper() {
   };
 }
 
-function registerCommand(opts, m) {
+async function registerCommand(opts, m) {
   const isAvailableModule = m.type !== 'core' && typeof global[m.type] !== 'undefined' && typeof global[m.type][m.name] !== 'undefined';
   const isAvailableLibrary = m.type === 'core' && typeof global[m.name] !== 'undefined';
   if (!isAvailableLibrary && !isAvailableModule) {
@@ -93,8 +93,18 @@ function registerCommand(opts, m) {
       self._settings.commands = {};
     }
 
-    self._commands.push(c);
     self._settings.commands[c.name] = c.name; // remap to default value
+
+    // load command from db
+    const dbc = await global.db.engine.findOne(self.collection.settings, { system: m.name, key: 'commands.' + c.name });
+    if (dbc.value) {
+      if (c.name === dbc.value) {
+        // remove if default value
+        await global.db.engine.remove(self.collection.settings, { system: m.name, key: 'commands.' + c.name });
+      }
+      c.command = dbc.value;
+    }
+    self._commands.push(c);
   } catch (e) {
     global.log.error(e);
   }
