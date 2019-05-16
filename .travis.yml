@@ -15,6 +15,7 @@ script:
   - npm run test
 
 stages:
+  - name: tslint
   - name: skip
     if: commit_message =~ /(\[skip\-travis|no\-tests|skip\-tests\])/
   - name: test
@@ -35,7 +36,7 @@ jobs:
       os: linux
       before_script: skip
       script:
-        - npm run tslint
+        - npm run tslint || travis_terminate 1
     - stage: test
       env: DB=nedb
       os: linux
