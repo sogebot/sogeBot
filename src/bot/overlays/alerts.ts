@@ -26,7 +26,7 @@ class Alerts extends Overlay {
     this.addMenu({ category: 'settings', name: 'overlays', id: 'overlays' });
   }
 
-  @command('!disalertable')
+  @command('!alert')
   @default_permission(permission.CASTERS)
   public async overlay(opts: CommandOptions) {
     if (!isMainThread) {
