@@ -74,6 +74,23 @@ export function helper() {
   };
 }
 
+export function rollback() {
+  const _prepareStackTrace = Error.prepareStackTrace;
+  Error.prepareStackTrace = (_, s) => s;
+  const stack = (new Error().stack as unknown as NodeJS.CallSite[]);
+  Error.prepareStackTrace = _prepareStackTrace;
+
+  const path = parse(stack[1].getFileName() || '');
+  const name = path.name;
+  const _type = path.dir.split(separator)[path.dir.split(separator).length - 1];
+  const type = _type === 'dest' ? 'core' : _type;
+
+  return (target: object, key: string, descriptor: PropertyDescriptor) => {
+    registerRollback({ type, name, fnc: key });
+    return descriptor;
+  };
+}
+
 async function registerCommand(opts, m) {
   const isAvailableModule = m.type !== 'core' && typeof global[m.type] !== 'undefined' && typeof global[m.type][m.name] !== 'undefined';
   const isAvailableLibrary = m.type === 'core' && typeof global[m.name] !== 'undefined';
@@ -151,6 +168,20 @@ function registerHelper(m, retry = 0) {
     } else {
       global.log.error('Command with function ' + m.fnc + ' not found!');
     }
+  }
+}
+
+function registerRollback(m) {
+  if (!global[m.type] || !global[m.type][m.name]) {
+    return setTimeout(() => registerRollback(m), 10);
+  }
+  try {
+    const self = global[m.type][m.name];
+    self._rollback.push({
+      name: m.fnc,
+    });
+  } catch (e) {
+    global.log.error(e.stack);
   }
 }
 

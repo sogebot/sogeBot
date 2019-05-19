@@ -7,7 +7,7 @@ const Parser = require('../parser')
 import System from './_interface'
 import constants from '../constants'
 import { permission } from '../permissions';
-import { command, default_permission } from '../decorators';
+import { command, default_permission, rollback } from '../decorators';
 import { parser } from '../decorators';
 const commons = require('../commons');
 
@@ -130,6 +130,25 @@ class Price extends System {
       await global.db.engine.increment('users.points', { id: opts.sender.userId }, { points: (removePts * -1) })
     }
     return haveEnoughPoints
+  }
+
+  @rollback()
+  async restorePointsRollback (opts) {
+    const parsed = opts.message.match(/^(![\S]+)/)
+    const helpers = (await (new Parser()).getCommandsList()).filter(o => o.isHelper).map(o => o.command)
+    if (
+      _.isNil(parsed) ||
+      commons.isOwner(opts.sender) ||
+      helpers.includes(opts.message)
+    ) return true
+    const price = await global.db.engine.findOne(this.collection.data, { command: parsed[1], enabled: true })
+
+    if (_.isEmpty(price)) { // no price set
+      return true
+    }
+
+    const removePts = parseInt(price.price, 10)
+    await global.db.engine.increment('users.points', { id: opts.sender.userId }, { points: removePts })
   }
 }
 
