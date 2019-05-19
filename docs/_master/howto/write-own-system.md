@@ -10,7 +10,7 @@
 // bot libraries
 const constants = require('../constants')
 import System from './_interface';
-import { command, default_permission } from '../decorators';
+import { command, default_permission, parser } from '../decorators';
 import { permissions } from '../permission'; // set of core permissions
 
 class Yoursystem extends System {
