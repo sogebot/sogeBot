@@ -180,7 +180,7 @@ class Cooldown extends System {
   @rollback()
   async cooldownRollback (opts: Object) {
     // TODO: redundant duplicated code (search of cooldown), should be unified for check and cooldownRollback
-    var data, viewer, timestamp, now
+    var data, viewer
     const [command, subcommand] = new Expects(opts.message)
       .command({ optional: true })
       .string({ optional: true })
