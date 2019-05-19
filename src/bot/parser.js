@@ -49,6 +49,7 @@ class Parser {
     debug('parser.process', 'PROCESS START of "' + this.message + '"')
 
     const parsers = await this.parsers()
+    const successfullParserRuns = [];
     for (let parser of parsers) {
       if (parser.priority === constants.MODERATION) continue // skip moderation parsers
       if (
@@ -62,14 +63,29 @@ class Parser {
           skip: this.skip
         }
 
-        debug('parser.process', 'Processing ' + parser.name)
+        debug('parser.process', 'Processing ' + parser.name + ' (fireAndForget: ' + parser.fireAndForget + ')');
         if (parser.fireAndForget) {
           parser['fnc'].apply(parser.this, [opts])
         } else {
           const status = await parser['fnc'].apply(parser.this, [opts])
           if (!status) {
-            // TODO: call revert on parser with revert (price can have revert)
+            const rollbacks = await this.rollbacks()
+            for (const r of rollbacks) {
+              // rollback is needed (parser ran successfully)
+              if (successfullParserRuns.find((o) => {
+                const parserSystem = o.split('.')[0];
+                const rollbackSystem = r.name.split('.')[0]
+                return parserSystem === rollbackSystem;
+              })) {
+                debug('parser.process', 'Rollbacking ' + r.name);
+                await r['fnc'].apply(r.this, [opts]);
+              } else {
+                debug('parser.process', 'Rollback skipped for ' + r.name);
+              }
+            }
             return false
+          } else {
+            successfullParserRuns.push(parser.name);
           }
         }
       }
@@ -118,6 +134,21 @@ class Parser {
     }
     parsers = _.orderBy(_.flatMap(await Promise.all(parsers)), 'priority', 'asc')
     return parsers
+  }
+
+  /**
+   * Return all rollbacks
+   * @constructor
+   * @returns object or empty list
+   */
+  async rollbacks () {
+    let rollbacks = []
+    for (let i = 0, length = this.list.length; i < length; i++) {
+      if (_.isFunction(this.list[i].rollbacks)) {
+        rollbacks.push(this.list[i].rollbacks())
+      }
+    }
+    return _.flatMap(await Promise.all(rollbacks));
   }
 
   /**

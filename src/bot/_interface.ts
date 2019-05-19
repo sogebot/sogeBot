@@ -24,6 +24,7 @@ class Module {
   protected _ui: InterfaceSettings.UI;
   protected _commands: Command[];
   protected _parsers: Parser[];
+  protected _rollback: Array<{ name: string }>;
   protected on: InterfaceSettings.On;
   protected dependsOn: string[];
   protected socket: SocketIO.Socket | null;
@@ -54,6 +55,7 @@ class Module {
 
     this._commands = [];
     this._parsers = [];
+    this._rollback = [];
     this._name = name;
     this._ui = opts.ui || { _hidden: false };
     this._opts = opts;
@@ -702,6 +704,26 @@ class Module {
       });
     }
     return parsers;
+  }
+
+  public async rollbacks() {
+    if (!(await this.isEnabled())) { return []; }
+
+    const rollbacks: Array<{
+      this: any,
+      name: string,
+      fnc: (opts: ParserOptions) => any,
+    }> = [];
+    for (const rollback of this._rollback) {
+      if (_.isNil(rollback.name)) { throw Error('Rollback name must be defined'); }
+
+      rollbacks.push({
+        this: this,
+        name: `${this.constructor.name}.${rollback.name}`,
+        fnc: this[rollback.name],
+      });
+    }
+    return rollbacks;
   }
 
   public async commands() {

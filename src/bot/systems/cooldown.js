@@ -8,12 +8,11 @@ const XRegExp = require('xregexp')
 const commons = require('../commons');
 
 // bot libraries
-import { command, default_permission } from '../decorators';
+import { command, default_permission, rollback, parser } from '../decorators';
 import { permission } from '../permissions';
 import System from './_interface'
 import constants from '../constants'
 const Expects = require('../expects.js')
-import { parser } from '../decorators';
 const Parser = require('../parser')
 
 /*
@@ -97,6 +96,7 @@ class Cooldown extends System {
         key: cooldown.key,
         miliseconds: cooldown.miliseconds,
         type: cooldown.type,
+        lastTimestamp: cooldown.lastTimestamp,
         timestamp: cooldown.timestamp,
         quiet: typeof cooldown.quiet === 'undefined' ? true : cooldown.quiet,
         enabled: typeof cooldown.enabled === 'undefined' ? true : cooldown.enabled,
@@ -120,6 +120,7 @@ class Cooldown extends System {
             key: cooldown.key,
             miliseconds: cooldown.miliseconds,
             type: cooldown.type,
+            lastTimestamp: cooldown.lastTimestamp,
             timestamp: cooldown.timestamp,
             quiet: typeof cooldown.quiet === 'undefined' ? true : cooldown.quiet,
             enabled: typeof cooldown.enabled === 'undefined' ? true : cooldown.enabled,
@@ -157,9 +158,9 @@ class Cooldown extends System {
 
       if (now - timestamp >= cooldown.miliseconds) {
         if (cooldown.type === 'global') {
-          await global.db.engine.update(this.collection.data, { key: cooldown.key, type: 'global' }, { timestamp: now, key: cooldown.key, type: 'global' })
+          await global.db.engine.update(this.collection.data, { key: cooldown.key, type: 'global' }, { lastTimestamp: timestamp, timestamp: now, key: cooldown.key, type: 'global' })
         } else {
-          await global.db.engine.update(this.collection.viewers, { username: opts.sender.username, key: cooldown.key }, { timestamp: now })
+          await global.db.engine.update(this.collection.viewers, { username: opts.sender.username, key: cooldown.key }, { lastTimestamp: timestamp, timestamp: now })
         }
         result = true
         continue
@@ -174,6 +175,104 @@ class Cooldown extends System {
       }
     }
     return result
+  }
+
+  @rollback()
+  async cooldownRollback (opts: Object) {
+    // TODO: redundant duplicated code (search of cooldown), should be unified for check and cooldownRollback
+    var data, viewer
+    const [command, subcommand] = new Expects(opts.message)
+      .command({ optional: true })
+      .string({ optional: true })
+      .toArray()
+
+    if (!_.isNil(command)) { // command
+      let key = subcommand ? `${command} ${subcommand}` : command
+      const parsed = await (new Parser().find(subcommand ? `${command} ${subcommand}` : command))
+      if (parsed) {
+        key = parsed.command
+      } else {
+        // search in custom commands as well
+        if (global.systems.customCommands.isEnabled()) {
+          let commands = await global.db.engine.find(global.systems.customCommands.collection.data)
+          commands = _(commands).flatMap().sortBy(o => -o.command.length).value()
+          const customparsed = await (new Parser().find(subcommand ? `${command} ${subcommand}` : command, commands))
+          if (customparsed) {
+            key = customparsed.command
+          }
+        }
+      }
+
+      let cooldown = await global.db.engine.findOne(this.collection.data, { key })
+      if (_.isEmpty(cooldown)) { // command is not on cooldown -> recheck with text only
+        const replace = new RegExp(`${XRegExp.escape(key)}`, 'ig')
+        opts.message = opts.message.replace(replace, '')
+        if (opts.message.length > 0) return this.cooldownRollback(opts)
+        else return true
+      }
+      data = [{
+        key: cooldown.key,
+        miliseconds: cooldown.miliseconds,
+        type: cooldown.type,
+        lastTimestamp: cooldown.lastTimestamp,
+        timestamp: cooldown.timestamp,
+        quiet: typeof cooldown.quiet === 'undefined' ? true : cooldown.quiet,
+        enabled: typeof cooldown.enabled === 'undefined' ? true : cooldown.enabled,
+        moderator: typeof cooldown.moderator === 'undefined' ? true : cooldown.moderator,
+        subscriber: typeof cooldown.subscriber === 'undefined' ? true : cooldown.subscriber,
+        follower: typeof cooldown.follower === 'undefined' ? true : cooldown.follower,
+        owner: typeof cooldown.owner === 'undefined' ? true : cooldown.owner
+      }]
+    } else { // text
+      let [keywords, cooldowns] = await Promise.all([global.db.engine.find(global.systems.keywords.collection.data), global.db.engine.find(this.collection.data)])
+
+      keywords = _.filter(keywords, function (o) {
+        return opts.message.toLowerCase().search(new RegExp('^(?!\\!)(?:^|\\s).*(' + _.escapeRegExp(o.keyword.toLowerCase()) + ')(?=\\s|$|\\?|\\!|\\.|\\,)', 'gi')) >= 0
+      })
+
+      data = []
+      _.each(keywords, (keyword) => {
+        let cooldown = _.find(cooldowns, (o) => o.key.toLowerCase() === keyword.keyword.toLowerCase())
+        if (keyword.enabled && !_.isEmpty(cooldown)) {
+          data.push({
+            key: cooldown.key,
+            miliseconds: cooldown.miliseconds,
+            type: cooldown.type,
+            lastTimestamp: cooldown.lastTimestamp,
+            timestamp: cooldown.timestamp,
+            quiet: typeof cooldown.quiet === 'undefined' ? true : cooldown.quiet,
+            enabled: typeof cooldown.enabled === 'undefined' ? true : cooldown.enabled,
+            moderator: typeof cooldown.moderator === 'undefined' ? true : cooldown.moderator,
+            subscriber: typeof cooldown.subscriber === 'undefined' ? true : cooldown.subscriber,
+            follower: typeof cooldown.follower === 'undefined' ? true : cooldown.follower,
+            owner: typeof cooldown.owner === 'undefined' ? true : cooldown.owner
+          })
+        }
+      })
+    }
+    if (!_.some(data, { enabled: true })) { // parse ok if all cooldowns are disabled
+      return true
+    }
+
+    const user = await global.users.getById(opts.sender.userId)
+    const isMod = typeof opts.sender.badges.moderator !== 'undefined'
+    const isSubscriber = typeof opts.sender.badges.subscriber !== 'undefined'
+    const isFollower = user.is && user.is.follower ? user.is.follower : false
+
+    for (let cooldown of data) {
+      if ((commons.isOwner(opts.sender) && !cooldown.owner) || (isMod && !cooldown.moderator) || (isSubscriber && !cooldown.subscriber) || (isFollower && !cooldown.follower)) {
+        continue
+      }
+
+      viewer = await global.db.engine.findOne(this.collection.viewers, { username: opts.sender.username, key: cooldown.key })
+
+      // rollback to lastTimestamp
+      if (cooldown.type === 'global') {
+        await global.db.engine.update(this.collection.data, { key: cooldown.key, type: 'global' }, { lastTimestamp: cooldown.lastTimestamp, timestamp: cooldown.lastTimestamp, key: cooldown.key, type: 'global' })
+      } else {
+        await global.db.engine.update(this.collection.viewers, { username: opts.sender.username, key: cooldown.key }, { lastTimestamp: viewer.lastTimestamp, timestamp: viewer.lastTimestamp })
+      }
+    }
   }
 
   async toggle (opts: Object, type: string) {
