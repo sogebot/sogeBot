@@ -6,6 +6,7 @@
   },
   "settings": {
     "enabled": "Status",
-    "cooldownNotifyAsWhisper": "Šeptat cooldown informace"
+    "cooldownNotifyAsWhisper": "Šeptat cooldown informace",
+    "cooldownNotifyAsChat": "Šeptat cooldown informace"
   }
 }

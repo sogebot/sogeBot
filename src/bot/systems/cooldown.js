@@ -28,6 +28,7 @@ class Cooldown extends System {
   constructor () {
     const settings = {
       cooldownNotifyAsWhisper: false,
+      cooldownNotifyAsChat: true
     }
     super({ settings })
 
@@ -165,10 +166,15 @@ class Cooldown extends System {
         result = true
         continue
       } else {
-        if (!cooldown.quiet && !(this.settings['cooldownNotifyAsWhisper'])) {
+        if (!cooldown.quiet && this.settings['cooldownNotifyAsWhisper']) {
           opts.sender['message-type'] = 'whisper' // we want to whisp cooldown message
           let message = await commons.prepare('cooldowns.cooldown-triggered', { command: cooldown.key, seconds: Math.ceil((cooldown.miliseconds - now + timestamp) / 1000) })
-          commons.sendMessage(message, opts.sender)
+          await commons.sendMessage(message, opts.sender)
+        } 
+        if (!cooldown.quiet && this.settings['cooldownNotifyAsChat']) {
+          opts.sender['message-type'] = 'chat'
+          let message = await commons.prepare('cooldowns.cooldown-triggered', { command: cooldown.key, seconds: Math.ceil((cooldown.miliseconds - now + timestamp) / 1000) })
+          await commons.sendMessage(message, opts.sender)
         }
         result = false
         break // disable _.each and updateQueue with false
