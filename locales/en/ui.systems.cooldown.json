@@ -6,6 +6,7 @@
   },
   "settings": {
     "enabled": "Status",
-    "cooldownNotifyAsWhisper": "Whisper cooldown informations"
+    "cooldownNotifyAsWhisper": "Whisper cooldown informations",
+    "cooldownNotifyAsChat": "Chat message cooldown informations"
   }
 }
