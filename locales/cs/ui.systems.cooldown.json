@@ -7,6 +7,6 @@
   "settings": {
     "enabled": "Status",
     "cooldownNotifyAsWhisper": "Šeptat cooldown informace",
-    "cooldownNotifyAsChat": "Šeptat cooldown informace"
+    "cooldownNotifyAsChat": "Oznámit informace o cooldown přes chat"
   }
 }
