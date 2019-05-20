@@ -308,6 +308,26 @@
           </h2>
           <span class="data" id="title">{{ commons.translate('not-available') }}</span>
         </div>
+
+        <div class="col stream-info" onclick="changeGT.showDlg()">
+          <h2>
+            <span>{{ commons.translate('tags') }}</span>
+            <small>{{ commons.translate('click-to-change') }}</small>
+          </h2>
+          <span class="data">
+            <span v-if="tags.length === 0">commons.translate('not-available')</span>
+            <span v-else>
+              <small v-for="tag of filterTags(true)"
+                :class="{ 'text-muted': tag.is_auto }" :title="tag.is_auto ? 'Automatically added tag' : 'Manual tag'">
+                {{ tag.name }}
+              </small>
+              <span v-for="tag of filterTags(false)"
+                :class="{ 'text-muted': tag.is_auto }" :title="tag.is_auto ? 'Automatically added tag' : 'Manual tag'">
+                {{ tag.name }}
+              </span>
+            </span>
+          </span>
+        </div>
       </div>
     </template>
   </div>
@@ -628,6 +648,7 @@
         currentTips: 0,
         currency: 'n/a',
         broadcasterType: '',
+        tags: [],
 
         isLoaded: false,
       },
@@ -655,6 +676,23 @@
         }
       },
       methods: {
+        filterTags (is_auto) {
+          return this.tags.filter(o => o.is_auto === is_auto).map((o) => {
+            const lang = _.get(configuration, 'core.general.lang', 'en')
+            const localekey  = Object.keys(o.localization_names).find((l) => l.startsWith(lang))
+            if (localekey) {
+              return { name: o.localization_names[localekey], is_auto: o.is_auto }
+            }
+          }).sort((a, b) => {
+            if (a.name < b.name)  { //sort string ascending
+              return -1;
+            }
+            if (a.name > b.name) {
+              return 1;
+            }
+            return 0; //default return value (no sorting)
+          });
+        },
         difference: function (number, current, shorten, postfix, toFixed) {
           postfix = postfix || ''
           shorten = typeof shorten === 'undefined' ? true : shorten
