@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import moment from 'moment-timezone';
 
-import { getChannel, getIgnoreList, isIgnored, sendMessage } from '../commons';
+import { getChannel, getIgnoreList, getLocalizedName, isIgnored, sendMessage } from '../commons';
 import { command, default_permission } from '../decorators';
 import { permission } from '../permissions';
 import System from './_interface';
@@ -15,6 +15,7 @@ enum TYPE {
   SUBAGE,
   BITS,
   GIFTS,
+  SUBMONTHS,
 }
 
 const __DEBUG__ =
@@ -29,6 +30,7 @@ const __DEBUG__ =
  * !top messages
  * !top followage
  * !top subage
+ * !top submonths
  * !top bits
  * !top gifts
  */
@@ -73,6 +75,13 @@ class Top extends System {
   @default_permission(permission.CASTERS)
   public subage(opts) {
     opts.parameters = TYPE.SUBAGE;
+    this.showTop(opts);
+  }
+
+  @command('!top submonths')
+  @default_permission(permission.CASTERS)
+  public submonths(opts) {
+    opts.parameters = TYPE.SUBMONTHS;
     this.showTop(opts);
   }
 
@@ -169,6 +178,13 @@ class Top extends System {
         }
         message = global.translate('systems.top.gifts').replace(/\$amount/g, 10);
         break;
+      case TYPE.SUBMONTHS:
+          sorted = [];
+          for (const user of (await global.db.engine.find('users', { _sort: 'stats.subCumulativeMonths', _total }))) {
+            sorted.push({ username: user.username, value: user.stats.subCumulativeMonths });
+          }
+          message = global.translate('systems.top.submonths').replace(/\$amount/g, 10);
+          break;
     }
 
     if (sorted.length > 0) {
@@ -190,6 +206,9 @@ class Top extends System {
         switch (type) {
           case TYPE.TIME:
             message += (user.value / 1000 / 60 / 60).toFixed(1) + 'h';
+            break;
+          case TYPE.SUBMONTHS:
+            message += [user.value, getLocalizedName(user.value, 'core.months')].join(' ');
             break;
           case TYPE.TIPS:
             message += user.value.toFixed(2) + global.currency.symbol(global.currency.settings.currency.mainCurrency);
