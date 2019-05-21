@@ -68,6 +68,8 @@ import { flattenKeys } from '../../bot/helpers';
 import { sortBy, keys, isNil } from 'lodash';
 import translate from '../helpers/translate';
 
+import { BDropdown, BDropdownItem } from 'bootstrap-vue/es/components';
+
 const props = Vue.extend({
   props: {
     filters: Array as () => Array<any>,
@@ -78,6 +80,7 @@ const props = Vue.extend({
 })
 
 @Component({
+  components: { 'b-dropdown': BDropdown, 'b-dropdown-item': BDropdownItem },
   filters: {
     filterize: function (val) {
       const filtersRegExp = new RegExp('\\$(' + sortBy(keys(flattenKeys(translate('responses.variable'))), (o) => -o.length).join('|') + ')', 'g')
