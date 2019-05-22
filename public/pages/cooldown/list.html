@@ -54,8 +54,8 @@
                 <button v-on:click="item.follower = !item.follower; sendUpdate(item._id)"  class="btn btn-outline-dark p-3 border-0">
                   <span v-bind:style="{ 'color': !item.follower ? 'tomato' : 'inherit', 'text-decoration': !item.follower ? 'line-through': 'inherit'}" style="margin: 0; font-size: 14px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">{{commons.translate('cooldown-followers').toUpperCase()}}</span>
                 </button>
-                <button v-on:click="item.quiet = item.quiet === true ? false : true; sendUpdate(item._id)"  class="btn btn-outline-dark p-3 border-0">
-                    <span v-bind:style="{ 'color': !item.quiet ? 'tomato' : 'inherit', 'text-decoration': !item.quiet ? 'line-through': 'inherit'}" style="margin: 0; font-size: 14px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">{{commons.translate('quiet').toUpperCase()}}</span>
+                <button v-on:click="item.quiet = item.quiet === true ? false : true; sendUpdate(item._id)" class="btn btn-outline-dark p-3 border-0"> 
+                  <span v-bind:style="{ 'color': !item.quiet ? 'tomato' : 'inherit', 'text-decoration': !item.quiet ? 'line-through': 'inherit'}" style="margin: 0; font-size: 14px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">{{commons.translate('quiet').toUpperCase()}}</span> 
                 </button>
                 <button v-on:click="item.enabled = !item.enabled; sendUpdate(item._id)"  class="btn btn-outline-dark p-3 border-0"><i class="fas mr-1"  v-bind:class="[ item.enabled ? 'fa-toggle-on' : 'fa-toggle-off' ]" aria-hidden="true"></i> {{ item.enabled ? commons.translate('enabled') : commons.translate('disabled') }}</button>
                 <hold-button class="btn-outline-dark p-3 border-0" @trigger="deleteItem(item._id)" :holdtitle="commons.translate('dialog.buttons.hold-to-delete')" :title="commons.translate('dialog.buttons.delete')" icon="fa-trash"></hold-button>
@@ -89,8 +89,8 @@
                   <button v-on:click="item.follower = !item.follower; sendUpdate(item._id)"  class="btn btn-outline-dark p-3 border-0">
                     <span v-bind:style="{ 'color': !item.follower ? 'tomato' : 'inherit', 'text-decoration': !item.follower ? 'line-through': 'inherit'}" style="margin: 0; font-size: 14px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">{{commons.translate('cooldown-followers').toUpperCase()}}</span>
                   </button>
-                  <button v-on:click="item.quiet = item.quiet === true ? false : true; sendUpdate(item._id)"  class="btn btn-outline-dark p-3 border-0">
-                      <span v-bind:style="{ 'color': !item.quiet ? 'tomato' : 'inherit', 'text-decoration': !item.quiet ? 'line-through': 'inherit'}" style="margin: 0; font-size: 14px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">{{commons.translate('quiet').toUpperCase()}}</span>
+                  <button v-on:click="item.quiet = item.quiet === true ? false : true; sendUpdate(item._id)" class="btn btn-outline-dark p-3 border-0"> 
+                    <span v-bind:style="{ 'color': !item.quiet ? 'tomato' : 'inherit', 'text-decoration': !item.quiet ? 'line-through': 'inherit'}" style="margin: 0; font-size: 14px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">{{commons.translate('quiet').toUpperCase()}}</span> 
                   </button>
                   <button v-bind:title="item.enabled ? commons.translate('enabled') : commons.translate('disabled')" v-on:click="item.enabled = !item.enabled; sendUpdate(item._id)"  class="btn btn-outline-dark p-1 border-0"><i class="fas m-1"  v-bind:class="[ item.enabled ? 'fa-toggle-on' : 'fa-toggle-off' ]" aria-hidden="true"></i></button>
                   <hold-button class="btn-outline-dark p-1 border-0" @trigger="deleteItem(item._id)" holdtitle="" title="" icon="fa-trash m-1"></hold-button>
@@ -174,4 +174,3 @@
     }
     cooldownInit()
   </script>
-  
