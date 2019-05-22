@@ -4,7 +4,7 @@ import { setTimeout } from 'timers'; // tslint workaround
 import util from 'util';
 import { isMainThread } from 'worker_threads';
 
-import { debug } from './debug';
+import { debug, isEnabled as isDebugEnabled } from './debug';
 import { permission } from './permissions';
 
 type ExposedSettings = InterfaceSettings.Settings<{
@@ -197,6 +197,9 @@ class Module {
               const isUnsupportedObject = typeof t[k] === 'object' && !Array.isArray(t[k]) && t[k] !== null;
               if (isUnsupportedObject) {
                 global.log.warning(`!!! ${this.constructor.name.toLowerCase()}.settings.${path}.${String(k)} object is not retroactive, for advanced object types use database directly.`);
+                if (isDebugEnabled('interface.retroactive')) {
+                  debug('interface.retroactive', (new Error()).stack || '');
+                }
               }
 
               if (k === 'then' || k === 'toJSON') { return Reflect.get(t, k); } // promisify
