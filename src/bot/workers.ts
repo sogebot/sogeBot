@@ -151,6 +151,8 @@ class Workers {
         global.events.fire(data.eventId, data.attributes);
       } else if ( data.type === 'interface') {
         // remove core from path
+        console.log(data.path);
+
         if (data.system === 'core') {
           const obj = Object.values(global).find((o) => {
             return o.constructor.name === data.class;

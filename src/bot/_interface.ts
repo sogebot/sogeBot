@@ -76,8 +76,6 @@ class Module {
     });
 
     // prepare proxies for variables
-    this.prepareVariableProxies();
-    this.loadVariableValues();
     this._sockets();
     this._indexDbs();
     this._status(0);
@@ -106,27 +104,18 @@ class Module {
     }
   }
 
-  public async loadVariableValues() {
-    const variables = await global.db.engine.find(this.collection.settings, { system: this.constructor.name.toLowerCase() });
-    for (let i = 0, length = variables.length; i < length; i++) {
-      if (variables[i].key.startsWith('commands.')) {
-        continue; // commands are handled in decorators
-      } else if (_.has(this._opts.settings, variables[i].key) && variables[i].value !== null) {
-        _.set(this._settings, variables[i].key, variables[i].value);
-      } else {
-        await global.db.engine.remove(this.collection.settings, { _id: String(variables[i]._id) });
-      }
+  public async loadVariableValue(key) {
+    const variable = await global.db.engine.findOne(this.collection.settings, { system: this.constructor.name.toLowerCase(), key });
 
-      if (typeof this.on === 'undefined' || typeof this.on.load === 'undefined') {
-        continue;
-      }
-      if (this.on.load[variables[i].key]) {
-        for (const fnc of this.on.load[variables[i].key]) {
-          if (typeof this[fnc] === 'function') { this[fnc](variables[i].key, _.get(this._settings, variables[i].key)); } else { global.log.error(`${fnc}() is not function in ${this._name}/${this.constructor.name.toLowerCase()}`); }
+    if (typeof this.on !== 'undefined' && typeof this.on.load !== 'undefined') {
+      if (this.on.load[key]) {
+        for (const fnc of this.on.load[key]) {
+          if (typeof this[fnc] === 'function') { this[fnc](key, _.get(this._settings, key)); } else { global.log.error(`${fnc}() is not function in ${this._name}/${this.constructor.name.toLowerCase()}`); }
         }
       }
     }
-    this.isLoaded = true;
+
+    return variable.value;
   }
 
   public updateSettings(key, value) {
@@ -138,7 +127,7 @@ class Module {
       type: 'interface',
       system: this._name,
       class: this.constructor.name,
-      path: `settings.${key}`,
+      path: `_data.${key}`,
       value,
     };
 
@@ -174,83 +163,6 @@ class Module {
         }
       }
     }
-  }
-
-  public prepareVariableProxies() {
-    // add main level proxy
-    this.settings = new Proxy(this._settings, {
-      get: (target, key) => {
-        if (typeof key === 'symbol') { return undefined; } // handle iterator
-        if (Array.isArray(target[key])) {
-          return this.arrayHandler(target, key);
-        }
-        if (key === 'then' || key === 'toJSON') { return Reflect.get(target, key); } // promisify
-
-        if (typeof target[key] === 'object' && target[key] !== null) {
-          const path = key;
-          return new Proxy(target[key], {
-            get: (t, k) => {
-              if (Array.isArray(t[k])) {
-                return this.arrayHandler(t, k, path);
-              }
-
-              const isUnsupportedObject = typeof t[k] === 'object' && !Array.isArray(t[k]) && t[k] !== null;
-              if (isUnsupportedObject) {
-                global.log.warning(`!!! ${this.constructor.name.toLowerCase()}.settings.${path}.${String(k)} object is not retroactive, for advanced object types use database directly.`);
-                global.log.error((new Error()).stack || '');
-              }
-
-              if (k === 'then' || k === 'toJSON') { return Reflect.get(t, k); } // promisify
-              if (_.isSymbol(k)) { return undefined; } // handle iterator
-
-              return t[k];
-            },
-            set: (t, k, value) => {
-              if (_.isEqual(t[k], value)) { return true; }
-              // check if types match
-              // skip when saving to undefined
-              if (typeof t[k] !== 'undefined') {
-                // if default value is null or new value is null -> skip checks
-                if (value !== null && t[k] !== null) {
-                  if (typeof t[k] !== typeof value) {
-                    const error = path + '.' + String(k) + ' set failed\n\texpected:\t' + typeof t[k] + '\n\tset:     \t' + typeof value;
-                    // try retype if expected is number and we got string (from ui settings e.g.)
-                    if (typeof t[k] === 'number') {
-                      value = Number(value);
-                      if (isNaN(value)) { throw new Error(error); }
-                    } else { throw new Error(error); }
-                  }
-                }
-
-                t[k] = value;
-                this.updateSettings(`${path}.${String(k)}`, value);
-              }
-              return true;
-            },
-          });
-        }
-
-        return target[key];
-      },
-      set: (target, key, value) => {
-        key = String(key);
-        if (_.isEqual(target[key], value)) { return true; }
-        // check if types match
-        if (typeof target[key] !== 'undefined') {
-          if (typeof target[key] !== typeof value) {
-            const error = key + ' set failed\n\texpected:\t' + typeof target[key] + '\n\tset:     \t' + typeof value;
-            // try retype if expected is number and we got string (from ui settings e.g.)
-            if (typeof target[key] === 'number') {
-              value = Number(value);
-              if (isNaN(value)) { throw new Error(error); }
-            } else { throw new Error(error); }
-          }
-          target[key] = value;
-          this.updateSettings(key, value);
-        }
-        return true;
-      },
-    }) as ExposedSettings;
   }
 
   public arrayHandler(target, key, path: any = null) {

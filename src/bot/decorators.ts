@@ -1,21 +1,68 @@
+import * as _ from 'lodash';
 import { parse, sep as separator } from 'path';
 
-export function parser(opts: {
-  fireAndForget?: boolean;
-  permission?: string;
-  priority?: number;
-  dependsOn?: string[];
-}) {
-  opts = opts || {};
+function getNameAndTypeFromStackTrace() {
   const _prepareStackTrace = Error.prepareStackTrace;
   Error.prepareStackTrace = (_, s) => s;
   const stack = (new Error().stack as unknown as NodeJS.CallSite[]);
   Error.prepareStackTrace = _prepareStackTrace;
 
-  const path = parse(stack[1].getFileName() || '');
+  const path = parse(stack[2].getFileName() || '');
   const name = path.name;
   const _type = path.dir.split(separator)[path.dir.split(separator).length - 1];
   const type = _type === 'dest' ? 'core' : _type;
+
+  return { name, type };
+}
+
+export function settings(opts: {
+  category: string,
+}) {
+  opts = opts || {};
+  const { name, type } = getNameAndTypeFromStackTrace();
+
+  return (target: object, key: string) => {
+    const registerSettings = () => {
+      const isAvailableModule = type !== 'core' && typeof global[type] !== 'undefined' && typeof global[type][name] !== 'undefined';
+      const isAvailableLibrary = type === 'core' && typeof global[name] !== 'undefined';
+      if (!isAvailableLibrary && !isAvailableModule) {
+        return setTimeout(() => registerSettings(), 1000);
+      }
+      try {
+        const self = type === 'core' ? global[name] : global[type][name];
+        const defaultValue = self[key];
+
+        Object.defineProperty(self, key, {
+          get: () => {
+            return _.get(self, '_data.' + key, defaultValue);
+          },
+          set: (value: any) => {
+            _.set(self, '_data.' + key, value);
+            // update variable in db and send to all workers
+            self.updateSettings(`${opts.category}.${key}`, value);
+          },
+        });
+        self.loadVariableValue(`${opts.category}.${key}`)
+        // load variable from db
+        setTimeout(() => {
+          console.log({defaultValue, [key]: self[key]});
+        }, 10000);
+      } catch (e) {
+        console.log(e);
+      }
+    };
+    registerSettings();
+  };
+}
+
+export function parser(opts: {
+  fireAndForget?: boolean,
+  permission?: string,
+  priority?: number,
+  dependsOn?: string[],
+}) {
+  opts = opts || {};
+  const { name, type } = getNameAndTypeFromStackTrace();
 
   return (target: object, key: string, descriptor: PropertyDescriptor) => {
     registerParser(opts, { type, name, fnc: key });
@@ -24,15 +71,7 @@ export function parser(opts: {
 }
 
 export function command(opts: string) {
-  const _prepareStackTrace = Error.prepareStackTrace;
-  Error.prepareStackTrace = (_, s) => s;
-  const stack = (new Error().stack as unknown as NodeJS.CallSite[]);
-  Error.prepareStackTrace = _prepareStackTrace;
-
-  const path = parse(stack[1].getFileName() || '');
-  const name = path.name;
-  const _type = path.dir.split(separator)[path.dir.split(separator).length - 1];
-  const type = _type === 'dest' ? 'core' : _type;
+  const { name, type } = getNameAndTypeFromStackTrace();
 
   return (target: object, key: string, descriptor: PropertyDescriptor) => {
     registerCommand(opts, { type, name, fnc: key });
@@ -41,15 +80,7 @@ export function command(opts: string) {
 }
 
 export function default_permission(uuid: string | null) {
-  const _prepareStackTrace = Error.prepareStackTrace;
-  Error.prepareStackTrace = (_, s) => s;
-  const stack = (new Error().stack as unknown as NodeJS.CallSite[]);
-  Error.prepareStackTrace = _prepareStackTrace;
-
-  const path = parse(stack[1].getFileName() || '');
-  const name = path.name;
-  const _type = path.dir.split(separator)[path.dir.split(separator).length - 1];
-  const type = _type === 'dest' ? 'core' : _type;
+  const { name, type } = getNameAndTypeFromStackTrace();
 
   return (target: object, key: string | symbol, descriptor: PropertyDescriptor) => {
     registerPermission(uuid, { type, name, fnc: key });
@@ -58,15 +89,7 @@ export function default_permission(uuid: string | null) {
 }
 
 export function helper() {
-  const _prepareStackTrace = Error.prepareStackTrace;
-  Error.prepareStackTrace = (_, s) => s;
-  const stack = (new Error().stack as unknown as NodeJS.CallSite[]);
-  Error.prepareStackTrace = _prepareStackTrace;
-
-  const path = parse(stack[1].getFileName() || '');
-  const name = path.name;
-  const _type = path.dir.split(separator)[path.dir.split(separator).length - 1];
-  const type = _type === 'dest' ? 'core' : _type;
+  const { name, type } = getNameAndTypeFromStackTrace();
 
   return (target: object, key: string | symbol, descriptor: PropertyDescriptor) => {
     registerHelper({ type, name, fnc: key });
@@ -75,15 +98,7 @@ export function helper() {
 }
 
 export function rollback() {
-  const _prepareStackTrace = Error.prepareStackTrace;
-  Error.prepareStackTrace = (_, s) => s;
-  const stack = (new Error().stack as unknown as NodeJS.CallSite[]);
-  Error.prepareStackTrace = _prepareStackTrace;
-
-  const path = parse(stack[1].getFileName() || '');
-  const name = path.name;
-  const _type = path.dir.split(separator)[path.dir.split(separator).length - 1];
-  const type = _type === 'dest' ? 'core' : _type;
+  const { name, type } = getNameAndTypeFromStackTrace();
 
   return (target: object, key: string, descriptor: PropertyDescriptor) => {
     registerRollback({ type, name, fnc: key });
