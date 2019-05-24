@@ -181,6 +181,7 @@ class Emotes extends Overlay {
         const request = await axios.get('https://api.twitchemotes.com/api/v4/channels/0')
         const emotes = request.data.emotes
         for (let i = 0, length = emotes.length; i < length; i++) {
+          if (emotes[i].id < 15) continue // skip simple emotes
           await global.db.engine.update(this.collection.cache,
             {
               code: emotes[i].code,
