@@ -209,31 +209,39 @@ class Emotes extends Overlay {
     const cid = global.oauth.settings._.channelId
     this.fetch.channel = true
 
-    if (cid && (Date.now() - this.settings._.lastSubscriberEmoteChk > 1000 * 60 * 60 * 24 * 7 || this.settings._.lastChannelChk !== cid)) {
-      global.log.info(`EMOTES: Fetching channel ${cid} emotes`)
-      this.settings._.lastSubscriberEmoteChk = Date.now()
-      this.settings._.lastChannelChk = cid
-      try {
-        const request = await axios.get('https://api.twitchemotes.com/api/v4/channels/' + cid)
-        const emotes = request.data.emotes
-        for (let j = 0, length2 = emotes.length; j < length2; j++) {
-          await global.db.engine.update(this.collection.cache,
-            {
-              code: emotes[j].code,
-              type: 'twitch'
-            },
-            {
-              urls: {
-                '1': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emotes[j].id + '/1.0',
-                '2': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emotes[j].id + '/2.0',
-                '3': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emotes[j].id + '/3.0'
-              }
-            })
+    if (cid && global.oauth.settings._.broadcasterType !== null && (Date.now() - this.settings._.lastSubscriberEmoteChk > 1000 * 60 * 60 * 24 * 7 || this.settings._.lastChannelChk !== cid)) {
+      if (global.oauth.settings._.broadcasterType === '') {
+        global.log.info(`EMOTES: Skipping fetching of ${cid} emotes - not subscriber/affiliate`)
+      } else {
+        global.log.info(`EMOTES: Fetching channel ${cid} emotes`)
+        this.settings._.lastSubscriberEmoteChk = Date.now()
+        this.settings._.lastChannelChk = cid
+        try {
+          const request = await axios.get('https://api.twitchemotes.com/api/v4/channels/43310896')
+          const emotes = request.data.emotes
+          for (let j = 0, length2 = emotes.length; j < length2; j++) {
+            await global.db.engine.update(this.collection.cache,
+              {
+                code: emotes[j].code,
+                type: 'twitch'
+              },
+              {
+                urls: {
+                  '1': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emotes[j].id + '/1.0',
+                  '2': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emotes[j].id + '/2.0',
+                  '3': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emotes[j].id + '/3.0'
+                }
+              })
+          }
+          global.log.info(`EMOTES: Fetched channel ${cid} emotes`)
+        } catch (e) {
+          if (String(e).includes('404')) {
+            global.log.error(`EMOTES: Error fetching channel ${cid} emotes. Your channel was not found on twitchemotes.com. Add your channel at https://twitchemotes.com/contact/tip`)
+          } else {
+            global.log.error(e)
+            global.log.error(e.stack)
+          }
         }
-        global.log.info(`EMOTES: Fetched channel ${cid} emotes`)
-      } catch (e) {
-        global.log.error(e)
-        global.log.error(e.stack)
       }
 
       this.fetch.channel = false
