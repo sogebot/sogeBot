@@ -10,6 +10,7 @@ if (Number(process.versions.node.split('.')[0]) < 11) {
 import { Workers } from './workers';
 import { Permissions } from './permissions'
 import { Events } from './events'
+import { OAuth } from './oauth'
 
 const figlet = require('figlet')
 const os = require('os')
@@ -78,7 +79,7 @@ async function main () {
   global.lib.translate = new (require('./translate'))()
   global.translate = global.lib.translate.translate
 
-  global.oauth = new (require('./oauth.js'))()
+  global.oauth = new OAuth();
   global.webhooks = new (require('./webhooks'))()
   global.api = new (require('./api'))()
 

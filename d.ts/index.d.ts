@@ -5,6 +5,9 @@ declare module '*.vue' {
 
 declare namespace NodeJS {
   export interface Global {
+    status: {
+      API: 0 | 1 | 2,
+    }
     overlays: {
       alerts: import('../src/bot/overlays/alerts').Alerts;
       bets: import('../src/bot/overlays/bets').Bets;
@@ -35,6 +38,7 @@ declare namespace NodeJS {
       scrim: import('../src/bot/systems/scrim').Scrim;
       top: import('../src/bot/systems/top').Top;
       userinfo: import('../src/bot/systems/userinfo').UserInfo;
+      oauth: import("../src/bot/oauth").OAuth;
       [x: string]: any; // remove after all systems are ported to TS
     };
     users: any;

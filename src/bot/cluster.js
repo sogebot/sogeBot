@@ -5,6 +5,7 @@ const _ = require('lodash')
 
 import { Events } from './events'
 import { Permissions } from './permissions'
+import { OAuth } from './oauth';
 const { autoLoad } = require('./commons');
 
 cluster()
@@ -29,7 +30,7 @@ function cluster () {
     global.lib.translate = new (require('./translate'))()
     global.translate = global.lib.translate.translate
 
-    global.oauth = new (require('./oauth.js'))()
+    global.oauth = new OAuth()
     global.api = new (require('./api'))()
     global.tmi = new (require('./tmi'))()
   } catch (e) {

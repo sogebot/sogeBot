@@ -170,7 +170,7 @@ class API {
 
     for (let username of this.rate_limit_follower_check) {
       const user = await global.users.getByName(username)
-      const isSkipped = user.username === getBroadcaster() || user.username === global.oauth.settings.bot.username
+      const isSkipped = user.username === getBroadcaster() || user.username === global.oauth.botUsername
       const userHaveId = !_.isNil(user.id)
       if (new Date().getTime() - _.get(user, 'time.followCheck', 0) <= 1000 * 60 * 60 * 24 || isSkipped || !userHaveId) {
         this.rate_limit_follower_check.delete(user.username)
@@ -208,7 +208,7 @@ class API {
       }
     */
 
-    const token = await global.oauth.settings.bot.accessToken
+    const token = await global.oauth.botAccessToken
     const needToWait = token === ''
     const notEnoughAPICalls = global.api.calls.bot.remaining <= 30 && global.api.calls.bot.refresh > _.now() / 1000
     if ((needToWait || notEnoughAPICalls)) {
@@ -264,7 +264,7 @@ class API {
       }
     */
 
-    const token = global.oauth.settings.bot.accessToken
+    const token = global.oauth.botAccessToken
     const needToWait = token === ''
     const notEnoughAPICalls = global.api.calls.bot.remaining <= 30 && global.api.calls.bot.refresh > _.now() / 1000
     if ((needToWait || notEnoughAPICalls) && !isChannelId) {
@@ -368,7 +368,7 @@ class API {
       }
     }
     // always remove bot from online users
-    global.db.engine.remove('users.online', { username: global.oauth.settings.bot.username })
+    global.db.engine.remove('users.online', { username: global.oauth.botUsername })
 
     if (bulkInsert.length > 0) {
       for (let chunk of _.chunk(bulkInsert, 100)) {
@@ -387,25 +387,25 @@ class API {
    * @param {string[]} mods
    */
   async checkBotModeratorStatus (mods) {
-    global.status.MOD = mods.map(o => o.toLowerCase()).includes(global.oauth.settings.bot.username);
+    global.status.MOD = mods.map(o => o.toLowerCase()).includes(global.oauth.botUsername);
   }
 
   async getChannelSubscribers (opts) {
     if (!isMainThread) throw new Error('API can run only on master')
     opts = opts || {}
 
-    const cid = global.oauth.settings._.channelId
+    const cid = global.oauth.channelId
     let url = `https://api.twitch.tv/helix/subscriptions?broadcaster_id=${cid}&first=100`
     if (opts.cursor) url += '&after=' + opts.cursor
     if (typeof opts.count === 'undefined') opts.count = -1 // start at -1 because owner is subbed as well
 
 
-    const token = global.oauth.settings.broadcaster.accessToken
+    const token = global.oauth.broadcasterAccessToken
     const needToWait = _.isNil(cid) || cid === '' || _.isNil(global.overlays) || token === ''
     const notEnoughAPICalls = this.calls.bot.remaining <= 30 && this.calls.bot.refresh > _.now() / 1000
 
-    if (needToWait || notEnoughAPICalls || global.oauth.settings._.broadcasterType === '') {
-      if (global.oauth.settings._.broadcasterType === '') {
+    if (needToWait || notEnoughAPICalls || global.oauth.broadcasterType === '') {
+      if (global.oauth.broadcasterType === '') {
         if (!opts.noAffiliateOrPartnerWarningSent) {
           global.log.warning('Broadcaster is not affiliate/partner, will not check subs')
           global.db.engine.update('api.current', { key: 'subscribers' }, { value: 0 })
@@ -496,10 +496,10 @@ class API {
   async getChannelDataOldAPI (opts) {
     if (!isMainThread) throw new Error('API can run only on master')
 
-    const cid = global.oauth.settings._.channelId
+    const cid = global.oauth.channelId
     const url = `https://api.twitch.tv/kraken/channels/${cid}`
 
-    const token = await global.oauth.settings.bot.accessToken
+    const token = await global.oauth.botAccessToken
     const needToWait = _.isNil(cid) || cid === '' || _.isNil(global.overlays) || token === ''
     if (needToWait) {
       return { state: false, opts }
@@ -552,7 +552,7 @@ class API {
   async getChannelHosts () {
     if (!isMainThread) throw new Error('API can run only on master')
 
-    const cid = global.oauth.settings._.channelId
+    const cid = global.oauth.channelId
 
     if (_.isNil(cid) || cid === '') {
       return { state: false }
@@ -579,10 +579,10 @@ class API {
   }
 
   async updateChannelViewsAndBroadcasterType () {
-    const cid = global.oauth.settings._.channelId
+    const cid = global.oauth.channelId
     const url = `https://api.twitch.tv/helix/users/?id=${cid}`
 
-    const token = await global.oauth.settings.bot.accessToken
+    const token = await global.oauth.botAccessToken
     const needToWait = _.isNil(cid) || cid === '' || _.isNil(global.overlays) || token === ''
     const notEnoughAPICalls = this.calls.bot.remaining <= 30 && this.calls.bot.refresh > _.now() / 1000
     if (needToWait || notEnoughAPICalls) {
@@ -605,7 +605,7 @@ class API {
       global.workers.sendToAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', request.headers['ratelimit-limit'], request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] })
 
       if (request.data.data.length > 0) {
-        global.oauth.settings._.broadcasterType = request.data.data[0].broadcaster_type
+        global.oauth.broadcasterType = request.data.data[0].broadcaster_type
         await global.db.engine.update('api.current', { key: 'views' }, { value: request.data.data[0].view_count })
       }
     } catch (e) {
@@ -622,9 +622,9 @@ class API {
   }
 
   async getLatest100Followers (quiet) {
-    const cid = global.oauth.settings._.channelId
+    const cid = global.oauth.channelId
     const url = `https://api.twitch.tv/helix/users/follows?to_id=${cid}&first=100`
-    const token = await global.oauth.settings.bot.accessToken
+    const token = await global.oauth.botAccessToken
     const needToWait = _.isNil(cid) || cid === '' || _.isNil(global.overlays) || token === ''
     const notEnoughAPICalls = this.calls.bot.remaining <= 30 && this.calls.bot.refresh > _.now() / 1000
 
@@ -729,7 +729,7 @@ class API {
     if (!_.isEmpty(gameFromDb)) return gameFromDb.name
 
     try {
-      const token = await global.oauth.settings.bot.accessToken
+      const token = await global.oauth.botAccessToken
       if (token === '') throw new Error('token not available')
       request = await axios.get(url, {
         headers: {
@@ -767,10 +767,10 @@ class API {
   async getCurrentStreamData (opts) {
     if (!isMainThread) throw new Error('API can run only on master')
 
-    const cid = global.oauth.settings._.channelId
+    const cid = global.oauth.channelId
     const url = `https://api.twitch.tv/helix/streams?user_id=${cid}`
 
-    const token = await global.oauth.settings.bot.accessToken
+    const token = await global.oauth.botAccessToken
     const needToWait = _.isNil(cid) || cid === '' || _.isNil(global.overlays) || token === ''
     const notEnoughAPICalls = this.calls.bot.remaining <= 30 && this.calls.bot.refresh > _.now() / 1000
     if (needToWait || notEnoughAPICalls) {
@@ -995,10 +995,10 @@ class API {
     if (!isMainThread) throw new Error('API can run only on master')
 
     args = _.defaults(args, { title: null }, { game: null })
-    const cid = global.oauth.settings._.channelId
+    const cid = global.oauth.channelId
     const url = `https://api.twitch.tv/kraken/channels/${cid}`
 
-    const token = await global.oauth.settings.bot.accessToken
+    const token = await global.oauth.botAccessToken
     const needToWait = _.isNil(cid) || cid === '' || _.isNil(global.overlays) || token === ''
     if (needToWait) {
       setTimeout(() => this.setTitleAndGame(sender, args), 1000)
@@ -1077,7 +1077,7 @@ class API {
     if (!isMainThread) throw new Error('API can run only on master')
     const url = `https://api.twitch.tv/kraken/search/games?query=${encodeURIComponent(game)}&type=suggest`
 
-    const token = await global.oauth.settings.bot.accessToken
+    const token = await global.oauth.botAccessToken
     if (token === '') return
 
     var request
@@ -1107,7 +1107,7 @@ class API {
   async checkClips () {
     if (!isMainThread) throw new Error('API can run only on master')
 
-    const token = global.oauth.settings.bot.accessToken
+    const token = global.oauth.botAccessToken
     if (token === '') {
       return { state: false }
     }
@@ -1183,10 +1183,10 @@ class API {
 
     _.defaults(opts, { hasDelay: true })
 
-    const cid = global.oauth.settings._.channelId
+    const cid = global.oauth.channelId
     const url = `https://api.twitch.tv/helix/clips?broadcaster_id=${cid}`
 
-    const token = await global.oauth.settings.bot.accessToken
+    const token = await global.oauth.botAccessToken
     const needToWait = _.isNil(cid) || cid === '' || _.isNil(global.overlays) || token === ''
     const notEnoughAPICalls = this.calls.bot.remaining <= 30 && this.calls.bot.refresh > _.now() / 1000
     if (needToWait || notEnoughAPICalls) {
@@ -1232,7 +1232,7 @@ class API {
     if (!isMainThread) throw new Error('API can run only on master')
     const url = `https://api.twitch.tv/kraken/users/${id}`
 
-    const token = await global.oauth.settings.bot.accessToken
+    const token = await global.oauth.botAccessToken
     if (token === '') return
 
     var request
@@ -1276,10 +1276,10 @@ class API {
 
     clearTimeout(this.timeouts['isFollowerUpdate-' + id])
 
-    const cid = global.oauth.settings._.channelId
+    const cid = global.oauth.channelId
     const url = `https://api.twitch.tv/helix/users/follows?from_id=${id}&to_id=${cid}`
 
-    const token = await global.oauth.settings.bot.accessToken
+    const token = await global.oauth.botAccessToken
     const needToWait = _.isNil(cid) || cid === '' || (_.isNil(global.overlays) && isMainThread) || token === ''
     const notEnoughAPICalls = this.calls.bot.remaining <= 40 && this.calls.bot.refresh > _.now() / 1000
     if (needToWait || notEnoughAPICalls) {
@@ -1362,8 +1362,8 @@ class API {
   }
 
   async createMarker () {
-    const token = global.oauth.settings.bot.accessToken
-    const cid = global.oauth.settings._.channelId
+    const token = global.oauth.botAccessToken
+    const cid = global.oauth.channelId
 
     const url = 'https://api.twitch.tv/helix/streams/markers'
     try {
@@ -1400,7 +1400,7 @@ class API {
   async getClipById (id) {
     const url = `https://api.twitch.tv/helix/clips/?id=${id}`
 
-    const token = await global.oauth.settings.bot.accessToken
+    const token = await global.oauth.botAccessToken
     if (token === '') return null
 
     var request
@@ -1421,8 +1421,8 @@ class API {
   }
 
   async getTopClips (opts) {
-    let url = 'https://api.twitch.tv/helix/clips?broadcaster_id=' + global.oauth.settings._.channelId
-    const token = global.oauth.settings.bot.accessToken
+    let url = 'https://api.twitch.tv/helix/clips?broadcaster_id=' + global.oauth.channelId
+    const token = global.oauth.botAccessToken
     try {
       if (token === '') throw Error('No broadcaster access token')
       if (typeof opts === 'undefined' || !opts) throw Error('Missing opts')

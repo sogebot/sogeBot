@@ -85,7 +85,7 @@ class Users extends Core {
     if (_.isNil(username)) return global.log.error('username is NULL!\n' + new Error().stack)
 
     username = username.toLowerCase()
-    if (username === global.oauth.settings.bot.username.toLowerCase() || _.isNil(username)) return // it shouldn't happen, but there can be more than one instance of a bot
+    if (username === global.oauth.botUsername.toLowerCase() || _.isNil(username)) return // it shouldn't happen, but there can be more than one instance of a bot
 
     const user = await global.db.engine.findOne('users', { username })
     object.username = username
@@ -286,10 +286,10 @@ class Users extends Core {
       })
       socket.on('followedAt.viewer', async (id, cb) => {
         try {
-          const cid = global.oauth.settings._.channelId
+          const cid = global.oauth.channelId
           const url = `https://api.twitch.tv/helix/users/follows?from_id=${id}&to_id=${cid}`
 
-          const token = global.oauth.settings.bot.accessToken
+          const token = global.oauth.botAccessToken
           if (token === '') cb(new Error('no token available'), null)
 
           const request = await axios.get(url, {

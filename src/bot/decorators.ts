@@ -3,7 +3,7 @@ import { parse, sep as separator } from 'path';
 
 function getNameAndTypeFromStackTrace() {
   const _prepareStackTrace = Error.prepareStackTrace;
-  Error.prepareStackTrace = (_, s) => s;
+  Error.prepareStackTrace = (_s, s) => s;
   const stack = (new Error().stack as unknown as NodeJS.CallSite[]);
   Error.prepareStackTrace = _prepareStackTrace;
 
@@ -13,6 +13,12 @@ function getNameAndTypeFromStackTrace() {
   const type = _type === 'dest' ? 'core' : _type;
 
   return { name, type };
+}
+
+export function ui(opts) {
+  return (target: object, key: string) => {
+    return;
+  };
 }
 
 export function settings(opts: {
@@ -37,21 +43,61 @@ export function settings(opts: {
             return _.get(self, '_data.' + key, defaultValue);
           },
           set: (value: any) => {
-            _.set(self, '_data.' + key, value);
-            // update variable in db and send to all workers
-            self.updateSettings(`${opts.category}.${key}`, value);
+            if (!_.isEqual(_.get(self, '_data.' + key, defaultValue), value)) {
+              _.set(self, '_data.' + key, value);
+              // update variable in db and send to all workers
+              self.updateSettings(`${opts.category}.${key}`, value);
+            }
           },
         });
-        self.loadVariableValue(`${opts.category}.${key}`)
         // load variable from db
-        setTimeout(() => {
-          console.log({defaultValue, [key]: self[key]});
-        }, 10000);
+        self.loadVariableValue(`${opts.category}.${key}`);
       } catch (e) {
         console.log(e);
       }
     };
     registerSettings();
+  };
+}
+
+export function shared() {
+  const { name, type } = getNameAndTypeFromStackTrace();
+
+  return (target: object, key: string) => {
+    const register = () => {
+      const isAvailableModule = type !== 'core' && typeof global[type] !== 'undefined' && typeof global[type][name] !== 'undefined';
+      const isAvailableLibrary = type === 'core' && typeof global[name] !== 'undefined';
+      if (!isAvailableLibrary && !isAvailableModule) {
+        return setTimeout(() => register(), 1000);
+      }
+      try {
+        const self = type === 'core' ? global[name] : global[type][name];
+        const defaultValue = self[key];
+
+        Object.defineProperty(self, key, {
+          get: () => {
+            return _.get(self, '_shared.' + key, defaultValue);
+          },
+          set: (value: any) => {
+            if (!_.isEqual(_.get(self, '_shared.' + key, defaultValue), value)) {
+              _.set(self, '_shared.' + key, value);
+              // update variable in all workers (only RAM)
+              const proc = {
+                type: 'interface',
+                system: type,
+                class: name,
+                path: '_shared.' + key,
+                value,
+              };
+              global.workers.sendToAll(proc);
+            }
+          },
+        });
+      } catch (e) {
+        console.log(e);
+      }
+    };
+    register();
   };
 }
 

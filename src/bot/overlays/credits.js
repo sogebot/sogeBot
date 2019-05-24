@@ -160,7 +160,7 @@ class Credits extends Overlay {
               tip: this.settings.show.tips
             }
           },
-          streamer: global.oauth.settings.broadcaster.username,
+          streamer: global.oauth.broadcasterUsername,
           game: await global.db.engine.findOne('api.current', { key: 'game' }),
           title: await global.db.engine.findOne('api.current', { key: 'title' }),
           clips: this.settings.show.clips ? await global.api.getTopClips({ period: this.settings.clips.period, days: this.settings.clips.customPeriodInDays, first: this.settings.clips.numOfClips }) : [],

@@ -198,7 +198,7 @@ class Top extends System {
 
       _.remove(sorted, (o) => _.includes(ignored, o.username));
       // remove broadcaster and bot accounts
-      _.remove(sorted, (o) => _.includes([getChannel(), global.oauth.settings.bot.username.toLowerCase()], o.username));
+      _.remove(sorted, (o) => _.includes([getChannel(), global.oauth.botUsername.toLowerCase()], o.username));
       sorted = _.chunk(sorted, 10)[0];
 
       for (const user of sorted) {

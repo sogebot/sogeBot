@@ -170,7 +170,7 @@ class Events extends Core {
   }
 
   public async fireBotWillJoinChannel(operation, attributes) {
-    global.client.join('#' + await global.oauth.settings.broadcaster.username);
+    global.client.join('#' + await global.oauth.broadcasterUsername);
   }
 
   public async fireBotWillLeaveChannel(operation, attributes) {
@@ -179,10 +179,10 @@ class Events extends Core {
   }
 
   public async fireStartCommercial(operation, attributes) {
-    const cid = global.oauth.settings._.channelId;
+    const cid = global.oauth.channelId;
     const url = `https://api.twitch.tv/kraken/channels/${cid}/commercial`;
 
-    const token = await global.oauth.settings.bot.accessToken;
+    const token = await global.oauth.botAccessToken;
     if (token === '') { return; }
 
     await axios({

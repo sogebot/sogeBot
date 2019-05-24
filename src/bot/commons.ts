@@ -180,7 +180,7 @@ export async function message(type, username, messageToSend, retry = true) {
     global.workers.sendToMaster({ type, sender: username, message: messageToSend });
   } else if (isMainThread) {
     try {
-      if (username === null) { username = await global.oauth.settings.general.channel; }
+      if (username === null) { username = await global.oauth.generalChannel; }
       if (username === '') {
         global.log.error('TMI: channel is not defined, message cannot be sent');
       } else {
@@ -198,24 +198,24 @@ export async function timeout(username, reason, timeMs) {
     if (reason) {
       reason = reason.replace(/\$sender/g, username);
     }
-    global.tmi.client.bot.chat.timeout(global.oauth.settings.general.channel, username, timeMs, reason);
+    global.tmi.client.bot.chat.timeout(global.oauth.generalChannel, username, timeMs, reason);
   } else { global.workers.sendToMaster({ type: 'timeout', username, timeout: timeMs, reason }); }
 }
 
 export function getOwner() {
   try {
-    return global.oauth.settings.general.owners[0].trim();
+    return global.oauth.generalOwners[0].trim();
   } catch (e) {
     return '';
   }
 }
 export function getOwners() {
-  return global.oauth.settings.general.owners;
+  return global.oauth.generalOwners;
 }
 
 export function getChannel() {
   try {
-    return global.oauth.settings.general.channel.toLowerCase().trim();
+    return global.oauth.generalChannel.toLowerCase().trim();
   } catch (e) {
     return '';
   }
@@ -223,7 +223,7 @@ export function getChannel() {
 
 export function getBroadcaster() {
   try {
-    return global.oauth.settings.broadcaster.username.toLowerCase().trim();
+    return global.oauth.broadcasterUsername.toLowerCase().trim();
   } catch (e) {
     return '';
   }
@@ -232,7 +232,7 @@ export function getBroadcaster() {
 export function isBroadcaster(user) {
   try {
     if (_.isString(user)) { user = { username: user }; }
-    return global.oauth.settings.broadcaster.username.toLowerCase().trim() === user.username.toLowerCase().trim();
+    return global.oauth.broadcasterUsername.toLowerCase().trim() === user.username.toLowerCase().trim();
   } catch (e) {
     return false;
   }
@@ -290,8 +290,8 @@ export async function isSubscriber(user) {
 export function isBot(user) {
   try {
     if (_.isString(user)) { user = { username: user }; }
-    if (global.oauth.settings.bot.username) {
-      return global.oauth.settings.bot.username.toLowerCase().trim() === user.username.toLowerCase().trim();
+    if (global.oauth.botUsername) {
+      return global.oauth.botUsername.toLowerCase().trim() === user.username.toLowerCase().trim();
     } else { return false; }
   } catch (e) {
     return true; // we can expect, if user is null -> bot or admin
@@ -301,8 +301,8 @@ export function isBot(user) {
 export function isOwner(user) {
   try {
     if (_.isString(user)) { user = { username: user }; }
-    if (global.oauth.settings.general.owners) {
-      const owners = _.map(_.filter(global.oauth.settings.general.owners, _.isString), (owner) => {
+    if (global.oauth.generalOwners) {
+      const owners = _.map(_.filter(global.oauth.generalOwners, _.isString), (owner) => {
         return _.trim(owner.toLowerCase());
       });
       return _.includes(owners, user.username.toLowerCase().trim());

@@ -67,8 +67,8 @@ class General extends Core {
     const widgets = await global.db.engine.find('widgets');
 
     const oauth = {
-      broadcaster: global.oauth.settings.broadcaster.username !== '',
-      bot: global.oauth.settings.bot.username !== '',
+      broadcaster: global.oauth.broadcasterUsername !== '',
+      bot: global.oauth.botUsername !== '',
     };
 
     const lang = this.settings.lang;

@@ -55,12 +55,12 @@ class Commercial extends System {
       return
     }
 
-    const cid = global.oauth.settings._.channelId
+    const cid = global.oauth.channelId
     // check if duration is correct (30, 60, 90, 120, 150, 180)
     if (_.includes([30, 60, 90, 120, 150, 180], commercial.duration)) {
       const url = `https://api.twitch.tv/kraken/channels/${cid}/commercial`
 
-      const token = await global.oauth.settings.bot.accessToken
+      const token = await global.oauth.botAccessToken
       if (token === '') return
 
       try {
@@ -76,7 +76,7 @@ class Commercial extends System {
         })
 
         global.events.fire('commercial', { duration: commercial.duration })
-        global.client.commercial(await global.oauth.settings.broadcaster.username, commercial.duration)
+        global.client.commercial(await global.oauth.broadcasterUsername, commercial.duration)
         if (!_.isNil(commercial.message)) commons.sendMessage(commercial.message, opts.sender)
       } catch (e) {
         global.log.error(`API: ${url} - ${e.status} ${_.get(e, 'body.message', e.statusText)}`)

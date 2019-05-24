@@ -288,7 +288,7 @@ class Songs extends System {
       else translation = 'songs.current-song-from-songrequest'
     }
     let message = await commons.prepare(translation, { name: currentSong.title, username: currentSong.username })
-    commons.sendMessage(message, { username: await global.oauth.settings.broadcaster.username })
+    commons.sendMessage(message, { username: await global.oauth.broadcasterUsername })
   }
 
   async notifySong () {
@@ -299,7 +299,7 @@ class Songs extends System {
       else translation = 'songs.current-song-from-songrequest'
     } else return
     let message = await commons.prepare(translation, { name: currentSong.title, username: currentSong.username })
-    commons.sendMessage(message, { username: await global.oauth.settings.broadcaster.username })
+    commons.sendMessage(message, { username: await global.oauth.broadcasterUsername })
   }
 
   @command('!playlist steal')
@@ -309,7 +309,7 @@ class Songs extends System {
       const currentSong = JSON.parse(this.settings._.currentSong)
       this.addSongToPlaylist({ sender: null, parameters: currentSong.videoID })
     } catch (err) {
-      commons.sendMessage(global.translate('songs.noCurrentSong'), { username: await global.oauth.settings.broadcaster.username })
+      commons.sendMessage(global.translate('songs.noCurrentSong'), { username: await global.oauth.broadcasterUsername })
     }
   }
 
@@ -323,7 +323,7 @@ class Songs extends System {
   @command('!playlist')
   @default_permission(permission.CASTERS)
   async help () {
-    commons.sendMessage(global.translate('core.usage') + ': !playlist add <youtubeid> | !playlist remove <youtubeid> | !playlist ban <youtubeid> | !playlist random on/off | !playlist steal', { username: await global.oauth.settings.broadcaster.username })
+    commons.sendMessage(global.translate('core.usage') + ': !playlist add <youtubeid> | !playlist remove <youtubeid> | !playlist ban <youtubeid> | !playlist random on/off | !playlist steal', { username: await global.oauth.broadcasterUsername })
   }
 
   @command('!songrequest')

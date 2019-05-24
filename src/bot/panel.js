@@ -81,7 +81,7 @@ function Panel () {
 
     if (origin.match(new RegExp('^((http|https)\\:\\/\\/|)([\\w|-]+\\.)?' + domain))) {
       res.set('Content-Type', 'application/javascript')
-      res.send(`const token="${config.panel.token.trim()}"; const name="${global.oauth.settings.bot.username}"`)
+      res.send(`const token="${config.panel.token.trim()}"; const name="${global.oauth.botUsername}"`)
     } else {
       // file CANNOT be accessed from different domain
       res.status(403).send('403 Forbidden - You are looking at wrong castle.')
@@ -458,7 +458,7 @@ Panel.prototype.authUser = async function (req, res, next) {
       throw new Error(NOT_AUTHORIZED)
     }
   } catch (e) {
-    res.set('WWW-Authenticate', `Basic realm="Authorize to '${(await global.oauth.settings.broadcaster.username).toUpperCase()}' WebPanel`)
+    res.set('WWW-Authenticate', `Basic realm="Authorize to '${(await global.oauth.broadcasterUsername).toUpperCase()}' WebPanel`)
     return res.sendStatus(401)
   }
 }
@@ -495,7 +495,7 @@ Panel.prototype.registerSockets = util.deprecate(function (options) {
 Panel.prototype.sendStreamData = async function (self, socket) {
   const whenOnline = (await global.cache.when()).online
   var data = {
-    broadcasterType: global.oauth.settings._.broadcasterType,
+    broadcasterType: global.oauth.broadcasterType,
     uptime: commons.getTime(whenOnline, false),
     currentViewers: _.get(await global.db.engine.findOne('api.current', { key: 'viewers' }), 'value', 0),
     currentSubscribers: _.get(await global.db.engine.findOne('api.current', { key: 'subscribers' }), 'value', 0),

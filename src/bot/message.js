@@ -100,7 +100,7 @@ class Message {
         })
         const followers = _.filter(
           (await global.db.engine.find('users', { is: { follower: true } })).map((o) => o.username),
-          (o) => o !== attr.sender && o !== global.oauth.settings.bot.username.toLowerCase())
+          (o) => o !== attr.sender && o !== global.oauth.botUsername.toLowerCase())
         let onlineFollowers = _.intersection(onlineViewers, followers)
         if (onlineFollowers.length === 0) return 'unknown'
         return _.sample(onlineFollowers)
@@ -115,7 +115,7 @@ class Message {
         })
         const subscribers = _.filter(
           (await global.db.engine.find('users', { is: { subscriber: true } })).map((o) => o.username),
-          (o) => o !== attr.sender && o !== global.oauth.settings.bot.username.toLowerCase())
+          (o) => o !== attr.sender && o !== global.oauth.botUsername.toLowerCase())
         let onlineSubscribers = _.intersection(onlineViewers, subscribers)
         if (onlineSubscribers.length === 0) return 'unknown'
         return _.sample(onlineSubscribers)
@@ -534,7 +534,7 @@ class Message {
       '(stream|#|game)': async function (filter) {
         const channel = filter.replace('(stream|', '').replace('|game)', '')
 
-        const token = await global.oauth.settings.bot.accessToken
+        const token = await global.oauth.botAccessToken
         if (token === '') return 'n/a'
 
         try {
@@ -556,7 +556,7 @@ class Message {
       '(stream|#|title)': async function (filter) {
         const channel = filter.replace('(stream|', '').replace('|title)', '')
 
-        const token = await global.oauth.settings.bot.accessToken
+        const token = await global.oauth.botAccessToken
         if (token === '') return 'n/a'
 
         try {
@@ -582,7 +582,7 @@ class Message {
       '(stream|#|viewers)': async function (filter) {
         const channel = filter.replace('(stream|', '').replace('|viewers)', '')
 
-        const token = await global.oauth.settings.bot.accessToken
+        const token = await global.oauth.botAccessToken
         if (token === '') return '0'
 
         try {

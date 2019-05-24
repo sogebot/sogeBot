@@ -92,9 +92,9 @@ class TMI extends Core {
   async initClient (type: string) {
     clearTimeout(this.timeouts[`initClient.${type}`])
     const [token, username, channel] = await Promise.all([
-      global.oauth.settings[type].accessToken,
-      global.oauth.settings[type].username,
-      global.oauth.settings.general.channel
+      global.oauth[type + 'AccessToken'],
+      global.oauth[type + 'Username'],
+      global.oauth.generalChannel
     ])
 
     try {
@@ -126,9 +126,9 @@ class TMI extends Core {
     try {
       if (typeof this.client[type] === 'undefined') throw Error('TMI: cannot reconnect, connection is not established')
       const [token, username, channel] = await Promise.all([
-        global.oauth.settings[type].accessToken,
-        global.oauth.settings[type].username,
-        global.oauth.settings.general.channel
+        global.oauth[type + 'AccessToken'],
+        global.oauth[type + 'Username'],
+        global.oauth.generalChannel
       ])
 
       if (this.channel !== channel) {

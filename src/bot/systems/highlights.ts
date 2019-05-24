@@ -88,8 +88,8 @@ class Highlights extends System {
   @default_permission(permission.CASTERS)
   public async main(opts) {
     const when = await global.cache.when();
-    const token = global.oauth.settings.bot.accessToken;
-    const cid = global.oauth.settings._.channelId;
+    const token = global.oauth.botAccessToken;
+    const cid = global.oauth.channelId;
     const url = `https://api.twitch.tv/helix/videos?user_id=${cid}&type=archive&first=1`;
 
     try {
