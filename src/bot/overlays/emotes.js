@@ -396,8 +396,9 @@ class Emotes extends Overlay {
     for (const emote of opts.sender.emotes) {
       // don't include simple emoted (id 1-14)
       if (emote.id < 15) continue
-
-      cache.push({
+      // if emote is already in cache, continue
+      if (cache.find((o) => o.code === opts.message.slice(emote.start, emote.end+1))) continue;
+      const data = {
         type: 'twitch',
         code: opts.message.slice(emote.start, emote.end+1),
         urls: {
@@ -405,7 +406,19 @@ class Emotes extends Overlay {
           '2': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emote.id + '/2.0',
           '3': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emote.id + '/3.0',
         }
-      })
+      }
+
+      cache.push(data)
+
+      // update emotes in cache
+      global.db.engine.update(this.collection.cache,
+        {
+          code: data.code,
+          type: 'twitch'
+        },
+        {
+          urls: data.urls
+        })
     }
 
     for (let j = 0, jl = cache.length; j < jl; j++) {
