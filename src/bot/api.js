@@ -406,12 +406,16 @@ class API {
     const notEnoughAPICalls = this.calls.bot.remaining <= 30 && this.calls.bot.refresh > _.now() / 1000
 
     if (needToWait || notEnoughAPICalls || global.oauth.settings._.broadcasterType === '') {
-      if (!opts.noAffiliateOrPartnerWarningSent) {
-        global.log.warning('Broadcaster is not affiliate/partner, will not check subs')
-        global.db.engine.update('api.current', { key: 'subscribers' }, { value: 0 })
+      if (global.oauth.settings._.broadcasterType === '') {
+        if (!opts.noAffiliateOrPartnerWarningSent) {
+          global.log.warning('Broadcaster is not affiliate/partner, will not check subs')
+          global.db.engine.update('api.current', { key: 'subscribers' }, { value: 0 })
+        }
+        delete opts.count;
+        return { state: false, opts: { noAffiliateOrPartnerWarningSent: true, ...opts } }
+      } else {
+        return { state: false, opts: { noAffiliateOrPartnerWarningSent: false, ...opts } }
       }
-      delete opts.count;
-      return { state: false, opts: { noAffiliateOrPartnerWarningSent: true, ...opts } }
     }
 
     var request
