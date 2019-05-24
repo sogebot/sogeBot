@@ -33,7 +33,7 @@ class Emotes extends Overlay {
 
   fetch = {
     global: false,
-    subscribers: false,
+    channel: false,
     ffz: false,
     bttv: false
   }
@@ -139,7 +139,7 @@ class Emotes extends Overlay {
       global.db.engine.index(this.collection.cache, { index: 'code' })
       setTimeout(() => {
         if (!this.fetch.global) this.fetchEmotesGlobal()
-        if (!this.fetch.subscribers) this.fetchEmotesSubsribers()
+        if (!this.fetch.channel) this.fetchEmotesChannel()
         if (!this.fetch.ffz) this.fetchEmotesFFZ()
         if (!this.fetch.bttv) this.fetchEmotesBTTV()
       }, 10000)
@@ -165,7 +165,7 @@ class Emotes extends Overlay {
     await global.db.engine.remove(this.collection.cache, {})
 
     if (!this.fetch.global) this.fetchEmotesGlobal()
-    if (!this.fetch.subscribers) this.fetchEmotesSubsribers()
+    if (!this.fetch.channel) this.fetchEmotesChannel()
     if (!this.fetch.ffz) this.fetchEmotesFFZ()
     if (!this.fetch.bttv) this.fetchEmotesBTTV()
   }
@@ -178,67 +178,65 @@ class Emotes extends Overlay {
       global.log.info('EMOTES: Fetching global emotes')
       this.settings._.lastGlobalEmoteChk = Date.now()
       try {
-        const request = await axios.get('https://twitchemotes.com/api_cache/v3/global.json')
-        const codes = Object.keys(request.data)
-        for (let i = 0, length = codes.length; i < length; i++) {
+        const request = await axios.get('https://api.twitchemotes.com/api/v4/channels/0')
+        const emotes = request.data.emotes
+        for (let i = 0, length = emotes.length; i < length; i++) {
+          if (emotes[i].id < 15) continue // skip simple emotes
           await global.db.engine.update(this.collection.cache,
             {
-              code: codes[i],
+              code: emotes[i].code,
               type: 'twitch'
             },
             {
               urls: {
-                '1': 'https://static-cdn.jtvnw.net/emoticons/v1/' + request.data[codes[i]].id + '/1.0',
-                '2': 'https://static-cdn.jtvnw.net/emoticons/v1/' + request.data[codes[i]].id + '/2.0',
-                '3': 'https://static-cdn.jtvnw.net/emoticons/v1/' + request.data[codes[i]].id + '/3.0'
+                '1': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emotes[i].id + '/1.0',
+                '2': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emotes[i].id + '/2.0',
+                '3': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emotes[i].id + '/3.0'
               }
             })
         }
         global.log.info('EMOTES: Fetched global emotes')
       } catch (e) {
         global.log.error(e)
+        global.log.error(e.stack)
       }
     }
 
     this.fetch.global = false
   }
 
-  async fetchEmotesSubsribers () {
+  async fetchEmotesChannel () {
     const cid = global.oauth.settings._.channelId
-    this.fetch.subscribers = true
+    this.fetch.channel = true
 
     if (cid && (Date.now() - this.settings._.lastSubscriberEmoteChk > 1000 * 60 * 60 * 24 * 7 || this.settings._.lastChannelChk !== cid)) {
-      global.log.info('EMOTES: Fetching subscriber emotes')
+      global.log.info(`EMOTES: Fetching channel ${cid} emotes`)
       this.settings._.lastSubscriberEmoteChk = Date.now()
       this.settings._.lastChannelChk = cid
       try {
-        const request = await axios.get('https://twitchemotes.com/api_cache/v3/subscriber.json')
-        const emoteId = Object.keys(request.data)
-        for (let i = 0, length = emoteId.length; i < length; i++) {
-          if (request.data[emoteId[i]].channel_id === cid) {
-            const emotes = request.data[emoteId[i]].emotes
-            for (let j = 0, length2 = emotes.length; j < length2; j++) {
-              await global.db.engine.update(this.collection.cache,
-                {
-                  code: emotes[j].code,
-                  type: 'twitch'
-                },
-                {
-                  urls: {
-                    '1': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emotes[j].id + '/1.0',
-                    '2': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emotes[j].id + '/2.0',
-                    '3': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emotes[j].id + '/3.0'
-                  }
-                })
-            }
-          }
+        const request = await axios.get('https://api.twitchemotes.com/api/v4/channels/' + cid)
+        const emotes = request.data.emotes
+        for (let j = 0, length2 = emotes.length; j < length2; j++) {
+          await global.db.engine.update(this.collection.cache,
+            {
+              code: emotes[j].code,
+              type: 'twitch'
+            },
+            {
+              urls: {
+                '1': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emotes[j].id + '/1.0',
+                '2': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emotes[j].id + '/2.0',
+                '3': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emotes[j].id + '/3.0'
+              }
+            })
         }
-        global.log.info('EMOTES: Fetched subscriber emotes')
+        global.log.info(`EMOTES: Fetched channel ${cid} emotes`)
       } catch (e) {
         global.log.error(e)
+        global.log.error(e.stack)
       }
 
-      this.fetch.subscribers = false
+      this.fetch.channel = false
     }
   }
 
