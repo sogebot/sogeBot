@@ -17,7 +17,7 @@ class OAuth extends Core {
   constructor () {
     const settings = {
       _: {
-        broadcasterType: '',
+        broadcasterType: null,
         broadcaster: '',
         bot: '',
         clientId: '',
