@@ -217,7 +217,7 @@ class Emotes extends Overlay {
         this.settings._.lastSubscriberEmoteChk = Date.now()
         this.settings._.lastChannelChk = cid
         try {
-          const request = await axios.get('https://api.twitchemotes.com/api/v4/channels/43310896')
+          const request = await axios.get('https://api.twitchemotes.com/api/v4/channels/' + cid)
           const emotes = request.data.emotes
           for (let j = 0, length2 = emotes.length; j < length2; j++) {
             await global.db.engine.update(this.collection.cache,
