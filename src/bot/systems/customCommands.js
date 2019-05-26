@@ -245,9 +245,10 @@ class CustomCommands extends System {
 
     // remove found command from message to get param
     const param = opts.message.replace(new RegExp('^(' + cmdArray.join(' ') + ')', 'i'), '').trim()
-    const count = this.getCountOf(command.command)
+    const count = await this.getCountOf(command.command)
+
     await global.db.engine.remove(this.collection.count, { command: command.command })
-    await global.db.engine.insert(this.collection.count, { command: command.command }, { count: count + 1 })
+    await global.db.engine.insert(this.collection.count, { command: command.command, count: count + 1 })
 
     const responses: Array<Response> = await global.db.engine.find(this.collection.responses, { cid: String(command._id) })
     for (let r of _.orderBy(responses, 'order', 'asc')) {
