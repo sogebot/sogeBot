@@ -68,7 +68,7 @@ To define function, which should be command, you must use decorator **@parser**.
 ##### Parser options
 
 * `fireAndForget`: if parser should run in background and we don't care about
-  result, e.g. stats counting. `false`
+  result and will not rollback, e.g. stats counting. `false`
 * `priority`: what priority should be given to parser, higher priority, sooner
   it will run. `constants.LOW`
 * `permission`: sets default permission for parser. `permission.VIEWERS`
