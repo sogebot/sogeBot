@@ -21,11 +21,11 @@ const failedTests = [
 ]
 
 const successTests = [
-  { permission: null, command: '!cmd', response: 'Lorem Ipsum Dolor Sit Amet' },
-  { permission: null, command: '!한국어', response: 'Lorem Ipsum Dolor Sit Amet' },
-  { permission: null, command: '!русский', response: 'Lorem Ipsum Dolor Sit Amet' },
-  { permission: permission.VIEWERS, command: '!cmd', response: 'Lorem Ipsum Dolor Sit Amet' },
-  { permission: 'casters', command: '!cmd', response: 'Lorem Ipsum Dolor Sit Amet' },
+  { permission: null, command: '!cmd', response: 'Lorem Ipsum Dolor Sit Amet 1' },
+  { permission: null, command: '!한국어', response: 'Lorem Ipsum Dolor Sit Amet 2' },
+  { permission: null, command: '!русский', response: 'Lorem Ipsum Dolor Sit Amet 3' },
+  { permission: permission.VIEWERS, command: '!cmd', response: 'Lorem Ipsum Dolor Sit Amet 4' },
+  { permission: 'casters', command: '!cmd', response: 'Lorem Ipsum Dolor Sit Amet 5' },
 ]
 
 function generateCommand(opts) {
@@ -58,8 +58,8 @@ describe('Custom Commands - add()', () => {
         global.systems.customCommands.add({ sender: owner, parameters: generateCommand(t) })
         await message.isSent('customcmds.command-was-added', owner, { response: t.response, command: t.command, sender: owner.username })
 
-        let responses = global.systems.customCommands.run({ sender: owner, message: t.command })
-        assert.deepEqual(await responses, [t.response])
+        global.systems.customCommands.run({ sender: owner, message: t.command })
+        await message.isSentRaw(t.response, owner)
       })
     }
 

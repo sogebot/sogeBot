@@ -230,7 +230,7 @@ class CustomCommands extends System {
     }
   }
 
-  @parser({ priority: constants.LOW, fireAndForget: true })
+  @parser({ priority: constants.LOW })
   async run (opts: Object) {
     if (!opts.message.startsWith('!')) return true // do nothing if it is not a command
     let _responses = []
@@ -249,17 +249,17 @@ class CustomCommands extends System {
     global.db.engine.increment(this.collection.count, { command: command.command }, { count: 1 })
 
     const responses: Array<Response> = await global.db.engine.find(this.collection.responses, { cid: String(command._id) })
+    let atLeastOnePermissionOk = false
     for (let r of _.orderBy(responses, 'order', 'asc')) {
       if ((await global.permissions.check(opts.sender.userId, r.permission)).access
           && await this.checkFilter(opts, r.filter)) {
         _responses.push(r)
+        atLeastOnePermissionOk = true
       }
     }
 
     this.sendResponse(_.cloneDeep(_responses), { param, sender: opts.sender, command: command.command, count });
-    return _responses.map((o) => {
-      return o.response
-    })
+    return atLeastOnePermissionOk;
   }
 
   async sendResponse(responses, opts) {

@@ -14,6 +14,7 @@ class Parser {
     this.message = opts.message || ''
     this.sender = opts.sender || null
     this.skip = opts.skip || false
+    this.successfullParserRuns = [];
 
     if (!_.isNil(this.sender) && opts.quiet) this.sender.quiet = opts.quiet
 
@@ -49,7 +50,6 @@ class Parser {
     debug('parser.process', 'PROCESS START of "' + this.message + '"')
 
     const parsers = await this.parsers()
-    const successfullParserRuns = [];
     for (let parser of parsers) {
       if (parser.priority === constants.MODERATION) continue // skip moderation parsers
       if (
@@ -72,8 +72,8 @@ class Parser {
             const rollbacks = await this.rollbacks()
             for (const r of rollbacks) {
               // rollback is needed (parser ran successfully)
-              if (successfullParserRuns.find((o) => {
-                const parserSystem = o.split('.')[0];
+              if (this.successfullParserRuns.find((o) => {
+                const parserSystem = o.name.split('.')[0];
                 const rollbackSystem = r.name.split('.')[0]
                 return parserSystem === rollbackSystem;
               })) {
@@ -85,7 +85,7 @@ class Parser {
             }
             return false
           } else {
-            successfullParserRuns.push(parser.name);
+            this.successfullParserRuns.push({name: parser.name, opts }); // need to save opts for permission rollback
           }
         }
       }
@@ -221,6 +221,22 @@ class Parser {
       // user doesn't have permissions for command
       sender['message-type'] = 'whisper'
       sendMessage(global.translate('permissions.without-permission').replace(/\$command/g, message), sender)
+
+      // do all rollbacks when permission failed
+      const rollbacks = await this.rollbacks()
+      for (const r of rollbacks) {
+        const runnedRollback = this.successfullParserRuns.find((o) => {
+          const parserSystem = o.name.split('.')[0];
+          const rollbackSystem = r.name.split('.')[0]
+          return parserSystem === rollbackSystem;
+        })
+        if (runnedRollback) {
+          debug('parser.process', 'Rollbacking ' + r.name);
+          await r['fnc'].apply(r.this, [runnedRollback.opts]);
+        } else {
+          debug('parser.process', 'Rollback skipped for ' + r.name);
+        }
+      }
     }
   }
 }
