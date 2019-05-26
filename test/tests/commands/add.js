@@ -58,7 +58,7 @@ describe('Custom Commands - add()', () => {
         global.systems.customCommands.add({ sender: owner, parameters: generateCommand(t) })
         await message.isSent('customcmds.command-was-added', owner, { response: t.response, command: t.command, sender: owner.username })
 
-        let responses = global.systems.customCommands.run({ sender: owner, message: t.command })
+        global.systems.customCommands.run({ sender: owner, message: t.command })
         await message.isSentRaw(t.response, owner)
       })
     }
