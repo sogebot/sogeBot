@@ -50,7 +50,6 @@ class Parser {
     debug('parser.process', 'PROCESS START of "' + this.message + '"')
 
     const parsers = await this.parsers()
-    const successfullParserRuns = [];
     for (let parser of parsers) {
       if (parser.priority === constants.MODERATION) continue // skip moderation parsers
       if (
