@@ -103,7 +103,7 @@ class CustomCommands extends System {
             const cCount = await this.getCountOf(itemFromDb.command)
             if (count !== cCount && count === 0) {
               // we assume its always reset (set to 0)
-              await global.db.engine.insert(this.collection.count, { command: itemFromDb.command, count: -cCount })
+              await global.db.engine.remove(this.collection.count, { command: itemFromDb.command })
             }
 
             // update responses
@@ -245,8 +245,10 @@ class CustomCommands extends System {
 
     // remove found command from message to get param
     const param = opts.message.replace(new RegExp('^(' + cmdArray.join(' ') + ')', 'i'), '').trim()
-    const count = _.get(await global.db.engine.findOne(this.collection.count, { command: command.command }), 'count', 0)
-    global.db.engine.increment(this.collection.count, { command: command.command }, { count: 1 })
+    const count = await this.getCountOf(command.command)
+
+    await global.db.engine.remove(this.collection.count, { command: command.command })
+    await global.db.engine.insert(this.collection.count, { command: command.command, count: count + 1 })
 
     const responses: Array<Response> = await global.db.engine.find(this.collection.responses, { cid: String(command._id) })
     let atLeastOnePermissionOk = false
@@ -271,7 +273,7 @@ class CustomCommands extends System {
     let match
     while(match = countRegex.exec(response.response)) {
       const stringToReplace = match[0];
-      const count = _.get(await global.db.engine.findOne(this.collection.count, { command: match.groups.command }), 'count', 0);
+      const count = await this.getCountOf(match.groups.command);
       response.response = response.response.replace(stringToReplace, count);
     }
 
