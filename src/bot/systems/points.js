@@ -329,7 +329,10 @@ class Points extends System {
       if (user.id) {
         await global.db.engine.increment('users.points', { id: user.id }, { points: points })
       } else {
-        throw new Error('User doesn\'t have ID')
+        user.id = await global.users.getIdByName(username, true)
+        if (!user.id) {
+          throw new Error('User doesn\'t have ID')
+        }
       }
 
       let message = await commons.prepare('points.success.add', {
