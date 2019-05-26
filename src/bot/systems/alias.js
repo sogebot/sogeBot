@@ -12,6 +12,7 @@ import Expects from '../expects';
 import System from './_interface'
 import { parser } from '../decorators';
 import { permission } from '../permissions';
+import { debug } from '../debug';
 
 /*
  * !alias                                              - gets an info about alias usage
@@ -31,7 +32,7 @@ class Alias extends System {
     this.addMenu({ category: 'settings', name: 'systems', id: 'systems' })
   }
 
-  @parser({ fireAndForget: true })
+  @parser()
   async run (opts) {
     const parser = new Parser()
     let alias
@@ -68,6 +69,7 @@ class Alias extends System {
       // Don't run alias if its same as command e.g. alias !me -> command !me
       if (alias.command === alias.alias) {
         global.log.warning(`Cannot run alias ${alias.alias}, because it exec ${alias.command}`)
+        return false
       } else if ((await global.permissions.check(opts.sender.userId, alias.permission)).access) {
         // parse variables
         const message = await new Message(opts.message.replace(replace, `${alias.command}`)).parse({
@@ -79,6 +81,8 @@ class Alias extends System {
             tags: opts.sender,
             message,
           }, skip: true })
+      } else {
+        return false;
       }
     }
     return true
