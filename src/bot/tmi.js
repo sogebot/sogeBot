@@ -523,8 +523,8 @@ class TMI extends Core {
       const username = message.tags.username
       const userId = message.tags.userId
       const userstate = message.tags
-      // remove cheerX or channelCheerX from message
-      const messageFromUser = message.message.replace(/(.*?[cC]heer[\d]+)/g, '').trim()
+      // remove <string>X or <string>X from message
+      const messageFromUser = message.message.replace(/(\b\w+[\d]+\b)/g, '').trim()
 
       if (await commons.isIgnored(userstate.username)) return
 
