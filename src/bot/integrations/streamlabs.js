@@ -83,7 +83,14 @@ class Streamlabs extends Integration {
           message: event.message
         })
         global.log.tip(`${event.from.toLowerCase()}, amount: ${event.amount}${event.currency}, message: ${event.message}`)
-        global.events.fire('tip', { username: event.from.toLowerCase(), amount: parseFloat(event.amount).toFixed(2), message: event.message, currency: event.currency })
+        global.events.fire('tip', {
+          username: event.from.toLowerCase(),
+          amount: parseFloat(event.amount).toFixed(2),
+          currency: event.currency,
+          amountInBotCurrency: parseFloat(global.currency.exchange(event.amount, event.currency, global.currency.settings.currency.mainCurrency)).toFixed(2),
+          currencyInBot: global.currency.settings.currency.mainCurrency,
+          message: event.message,
+        })
 
         // go through all systems and trigger on.tip
         for (let [type, systems] of Object.entries({
