@@ -94,7 +94,14 @@ class Donationalerts extends Integration {
         })
 
         global.log.tip(`${data.username.toLowerCase()}, amount: ${data.amount}${data.currency}, message: ${data.message}`)
-        global.events.fire('tip', { username: data.username.toLowerCase(), amount: parseFloat(data.amount).toFixed(2), message: data.message, currency: data.currency })
+        global.events.fire('tip', {
+          username: data.username.toLowerCase(),
+          amount: parseFloat(data.amount).toFixed(2),
+          currency: data.currency,
+          amountInBotCurrency: parseFloat(global.currency.exchange(data.amount, data.currency, global.currency.settings.currency.mainCurrency)).toFixed(2),
+          currencyInBot: global.currency.settings.currency.mainCurrency,
+          message: data.message,
+        })
 
         if (!data._is_test_alert) {
           const id = await global.users.getIdByName(data.username.toLowerCase(), false)
