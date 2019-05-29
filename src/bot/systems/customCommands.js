@@ -257,6 +257,9 @@ class CustomCommands extends System {
           && await this.checkFilter(opts, r.filter)) {
         _responses.push(r)
         atLeastOnePermissionOk = true
+        if (r.stopIfExecuted) {
+          break;
+        }
       }
     }
 
