@@ -218,30 +218,38 @@ class Module {
             /*
             try {
               for (const [key, value] of Object.entries(data)) {
-                if (key === 'enabled' && ['core', 'overlays', 'widgets'].includes(this._name)) { continue; } else if (key === '_permissions') {
+                if (key === 'enabled' && ['core', 'overlays', 'widgets'].includes(this._name)) {
+                  continue;
+                } else if (key === '_permissions') {
                   for (const [command, currentValue] of Object.entries(value)) {
                     const c = this._commands.find((o) => o.name === command);
                     if (c) {
-                      if (currentValue === c.permission) { await global.db.engine.remove(global.permissions.collection.commands, { key: c.name }); } else { await global.db.engine.update(global.permissions.collection.commands, { key: c.name }, { permission: currentValue }); }
+                      if (currentValue === c.permission) {
+                        await global.db.engine.remove(global.permissions.collection.commands, { key: c.name });
+                      } else {
+                        await global.db.engine.update(global.permissions.collection.commands, { key: c.name }, { permission: currentValue });
+                      }
                     }
                   }
                 } else if (key === 'enabled') {
                   this.status({ state: value });
                 } else if (key === 'commands') {
+                  /* TODO: commands
                   for (const [defaultValue, currentValue] of Object.entries(value)) {
                     if (this.settings.commands) {
                       this.settings.commands[defaultValue] = currentValue;
                     }
                   }
+                   *
                 } else {
                   if (_.isObjectLike(value)) {
                     for (const [defaultValue, currentValue] of Object.entries(value)) {
-                      if (typeof this.settings[key] !== 'undefined' && typeof this.settings[key][defaultValue] !== 'undefined') {
+                      if (typeof this[key] !== 'undefined' && typeof this[key][defaultValue] !== 'undefined') {
                         // save only defined values
-                        this.settings[key][defaultValue] = currentValue;
+                        this[key][defaultValue] = currentValue;
                       }
                     }
-                  } else { this.settings[key] = value; }
+                  } else { this[key] = value; }
                 }
               }
             } catch (e) {

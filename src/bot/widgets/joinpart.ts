@@ -2,7 +2,7 @@ import Widget from './_interface';
 
 class JoinPart extends Widget {
   constructor() {
-    super({});
+    super();
     this.addWidget('join', 'widget-title-join', 'fas fa-sign-in-alt');
     this.addWidget('part', 'widget-title-part', 'fas fa-sign-out-alt');
   }
