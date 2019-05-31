@@ -75,9 +75,13 @@ export function unflatten(data) {
 }
 
 export function getIgnoreList() {
+<<<<<<< HEAD
   return global.tmi.settings.chat.ignorelist.map((o) => {
     return o.trim().toLowerCase();
   });
+=======
+  return global.tmi.ignorelist;
+>>>>>>> fix ignorelist
 }
 
 export function isIgnored(sender) {
