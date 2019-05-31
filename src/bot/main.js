@@ -11,6 +11,7 @@ import { Workers } from './workers';
 import { Permissions } from './permissions'
 import { Events } from './events'
 import { OAuth } from './oauth'
+import { Currency } from './currency'
 
 const figlet = require('figlet')
 const os = require('os')
@@ -60,31 +61,35 @@ if (!isMainThread) {
 
 async function main () {
   if (!global.db.engine.connected || global.cpu !== global.workers.onlineCount) return setTimeout(() => main(), 10)
+  try {
+    global.general = new (require('./general.js'))()
+    global.ui = new (require('./ui.js'))()
+    global.currency = new Currency()
+    global.stats = new (require('./stats.js'))()
+    global.users = new (require('./users.js'))()
+    global.logger = new (require('./logging.js'))()
 
-  global.general = new (require('./general.js'))()
-  global.ui = new (require('./ui.js'))()
-  global.currency = new (require('./currency.js'))()
-  global.stats = new (require('./stats.js'))()
-  global.users = new (require('./users.js'))()
-  global.logger = new (require('./logging.js'))()
+    global.events = new Events();
+    global.customvariables = new (require('./customvariables.js'))()
 
-  global.events = new Events();
-  global.customvariables = new (require('./customvariables.js'))()
+    global.panel = new (require('./panel'))()
+    global.twitch = new (require('./twitch'))()
+    global.permissions = new Permissions()
 
-  global.panel = new (require('./panel'))()
-  global.twitch = new (require('./twitch'))()
-  global.permissions = new Permissions()
+    global.lib = {}
+    global.lib.translate = new (require('./translate'))()
+    global.translate = global.lib.translate.translate
 
-  global.lib = {}
-  global.lib.translate = new (require('./translate'))()
-  global.translate = global.lib.translate.translate
+    global.oauth = new OAuth();
+    global.webhooks = new (require('./webhooks'))()
+    global.api = new (require('./api'))()
 
-  global.oauth = new OAuth();
-  global.webhooks = new (require('./webhooks'))()
-  global.api = new (require('./api'))()
-
-  // panel
-  global.logger._panel()
+    // panel
+    global.logger._panel()
+  } catch (e) {
+    console.error(e); global.log.error(e)
+    process.exit()
+  }
 
   const version = _.get(process, 'env.npm_package_version', 'x.y.z')
   console.log(figlet.textSync('sogeBot ' + version.replace('SNAPSHOT', gitCommitInfo().shortHash || 'SNAPSHOT'), {

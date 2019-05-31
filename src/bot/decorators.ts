@@ -22,12 +22,13 @@ export function ui(opts) {
 }
 
 export function settings(opts: {
-  category: string,
-}) {
-  opts = opts || {};
+  category?: string,
+} = {}) {
   const { name, type } = getNameAndTypeFromStackTrace();
 
   return (target: object, key: string) => {
+    const path = opts.category ? `${opts.category}.${key}` : key;
+
     const registerSettings = () => {
       const isAvailableModule = type !== 'core' && typeof global[type] !== 'undefined' && typeof global[type][name] !== 'undefined';
       const isAvailableLibrary = type === 'core' && typeof global[name] !== 'undefined';
@@ -42,16 +43,21 @@ export function settings(opts: {
           get: () => {
             return _.get(self, '_data.' + key, defaultValue);
           },
-          set: (value: any) => {
-            if (!_.isEqual(_.get(self, '_data.' + key, defaultValue), value)) {
-              _.set(self, '_data.' + key, value);
+          set: (valueSetArg: any) => {
+            if (!_.isEqual(_.get(self, '_data.' + key, defaultValue), valueSetArg)) {
+              _.set(self, '_data.' + key, valueSetArg);
               // update variable in db and send to all workers
-              self.updateSettings(`${opts.category}.${key}`, value);
+              self.updateSettings(path, valueSetArg);
             }
           },
         });
         // load variable from db
-        self.loadVariableValue(`${opts.category}.${key}`);
+        /*const value =*/
+        self.loadVariableValue(path);
+        // TODO: set value
+
+        // add variable to settingsList
+        self.settingsList.push({ category: opts.category, key });
       } catch (e) {
         console.log(e);
       }
@@ -167,11 +173,7 @@ async function registerCommand(opts, m) {
       self._commands = [];
     }
 
-    if (typeof self._settings.commands === 'undefined') {
-      self._settings.commands = {};
-    }
-
-    self._settings.commands[c.name] = c.name; // remap to default value
+    self.settingsList.push({ category: 'commands', key: c.name });
 
     // load command from db
     const dbc = await global.db.engine.findOne(self.collection.settings, { system: m.name, key: 'commands.' + c.name });

@@ -261,8 +261,8 @@ class Message {
         }
 
         let tips = (await global.db.engine.find('widgetsEventList', { event: 'tip' })).sort((a, b) => {
-          const aTip = global.currency.exchange(a.amount, a.currency, global.currency.settings.currency.mainCurrency);
-          const bTip = global.currency.exchange(b.amount, b.currency, global.currency.settings.currency.mainCurrency)
+          const aTip = global.currency.exchange(a.amount, a.currency, global.currency.mainCurrency);
+          const bTip = global.currency.exchange(b.amount, b.currency, global.currency.mainCurrency)
           return bTip - aTip;
         }, 0);
 

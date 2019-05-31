@@ -30,7 +30,7 @@ class Translate {
   async _load () {
     this.custom = await global.db.engine.find('customTranslations')
     return new Promise(async (resolve, reject) => {
-      this.lang = global.general.settings.lang
+      this.lang = global.general.lang
       glob('./locales/**', (err, files) => {
         if (err) reject(err)
         for (let f of files) {

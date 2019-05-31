@@ -15,11 +15,27 @@ import { permission } from './permissions';
 const Expects = require('./expects')
 import Core from './_interface'
 const constants = require('./constants')
+import { settings, ui } from './decorators';
 
 const __DEBUG__ =
   (process.env.DEBUG && process.env.DEBUG.includes('tmi.client'));
 
 class TMI extends Core {
+  @settings({ category: 'chat' })
+  sendWithMe = false;
+
+  @settings({ category: 'chat' })
+  ignorelist = [];
+
+  @settings({ category: 'chat' })
+  showWithAt = true;
+
+  @settings({ category: 'chat' })
+  mute = false;
+
+  @settings({ category: 'chat' })
+  whisperListener = false;
+
   channel: string = ''
   timeouts: Object = {}
   client: Object = {}
@@ -29,16 +45,7 @@ class TMI extends Core {
   ignoreGiftsFromUser: { [string]: { count: number, time: Date }} = {}
 
   constructor () {
-    const settings = {
-      chat: {
-        sendWithMe: false,
-        ignorelist: [],
-        showWithAt: true,
-        mute: false,
-        whisperListener: false,
-      },
-    }
-    super({ settings })
+    super()
 
     this.addMenu({ category: 'settings', name: 'core', id: 'core' })
 

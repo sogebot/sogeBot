@@ -192,7 +192,7 @@ class CustomVariables {
         currentTips: _.get((await global.db.engine.findOne('api.current', {
           key: 'tips'
         })), 'value', 0),
-        currency: global.currency.symbol(global.currency.settings.currency.mainCurrency),
+        currency: global.currency.symbol(global.currency.mainCurrency),
         chatMessages: (await global.cache.isOnline()) ? global.linesParsed - global.api.chatMessagesAtStart : 0,
         currentFollowers: _.get((await global.db.engine.findOne('api.current', {
           key: 'followers'

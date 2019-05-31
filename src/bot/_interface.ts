@@ -7,58 +7,58 @@ import { isMainThread } from 'worker_threads';
 import { debug } from './debug';
 import { permission } from './permissions';
 
-type ExposedSettings = InterfaceSettings.Settings<{
-  [x: string]: string; // commands are simple key: string values
-}>;
-
 class Module {
   public name: string = 'core';
-  public options: InterfaceSettings = {};
   public collection: { [x: string]: string };
-  public settings: ExposedSettings = {};
   public timeouts: { [x: string]: NodeJS.Timeout } = {};
+  public settingsList: Array<{ category: string, key: string }> = [];
 
-  protected _settings: InterfaceSettings.Settings<(Command | string)[] | ExposedSettings>;
+  get enabled(): boolean {
+    return _.get(this, '_enabled', true);
+  }
+
+  set enabled(v: boolean) {
+    if (!_.isEqual(_.get(this, '_enabled', true), v)) {
+      _.set(this, '_enabled', v);
+      // update variable in all workers (only RAM)
+      const proc = {
+        type: 'interface',
+        system: this.name,
+        class: this.constructor.name.toLowerCase(),
+        path: '_enabled',
+        value: v,
+      };
+      global.workers.sendToAll(proc);
+    }
+  }
+
   protected _name: string;
-  protected _opts: InterfaceSettings;
   protected _ui: InterfaceSettings.UI;
   protected _commands: Command[];
   protected _parsers: Parser[];
-  protected _rollback: { name: string }[];
+  protected _rollback: Array<{ name: string }>;
+  protected _enabled: boolean = true;
   protected on: InterfaceSettings.On;
   protected dependsOn: string[];
   protected socket: SocketIO.Socket | null;
 
-  private isLoaded: boolean = false;
-
-  constructor(opts: InterfaceSettings | null = null, name: string = 'core') {
-    /* Prepare default settings configuration
-     * set enabled by default to true
-     */
-    opts = opts || this.options;
-    this._settings = opts.settings || {};
-    this._settings.enabled = typeof this._settings.enabled !== 'undefined' ? this._settings.enabled : true;
-
-    if (this._settings.commands || this._settings.parsers) {
-      throw new Error('You cannot have commands and parsers keys in settings!');
-    }
-
-    this.on = Object.assign({
+  constructor(name: string = 'core') {
+    this.on = {
       change: {
-        enabled: null,
+        enabled: [],
       },
       load: {},
-    }, opts.on);
+    };
 
-    this.dependsOn = opts.dependsOn || [];
+    // TODO: dependsOn
+    this.dependsOn = [];
     this.socket = null;
 
     this._commands = [];
     this._parsers = [];
     this._rollback = [];
+    this._ui = {};
     this._name = name;
-    this._ui = opts.ui || { _hidden: false };
-    this._opts = opts;
 
     this.collection = new Proxy({}, {
       get: (t, n, r) => {
@@ -78,24 +78,15 @@ class Module {
     // prepare proxies for variables
     this._sockets();
     this._indexDbs();
-    this._status(0);
-
+    this._status();
   }
 
   public sockets() {
     return;
   }
 
-  public _status(retries) {
-    if (typeof retries === 'undefined') { retries = 0; }
-    if (retries === 6000) {
-      global.log.error(`${this._name}.${this.constructor.name.toLowerCase()} is taking too long to load, waiting additional time`);
-    }
-    if (retries === 60000) {
-      global.log.error(`${this._name}.${this.constructor.name.toLowerCase()} didn't start. Exiting.`);
-      process.exit(1);
-    }
-    if (!this.isLoaded) { setTimeout(() => this._status(++retries), 10); } else { this.status({ state: this.settings.enabled, quiet: !isMainThread }); } // force status change and quiet on workers
+  public _status() {
+    this.status({ state: this.enabled, quiet: !isMainThread }); // force status change and quiet on workers
   }
 
   public emit(event: string, ...args: any[]) {
@@ -110,7 +101,7 @@ class Module {
     if (typeof this.on !== 'undefined' && typeof this.on.load !== 'undefined') {
       if (this.on.load[key]) {
         for (const fnc of this.on.load[key]) {
-          if (typeof this[fnc] === 'function') { this[fnc](key, _.get(this._settings, key)); } else { global.log.error(`${fnc}() is not function in ${this._name}/${this.constructor.name.toLowerCase()}`); }
+          if (typeof this[fnc] === 'function') { this[fnc](key, _.get(this, key)); } else { global.log.error(`${fnc}() is not function in ${this._name}/${this.constructor.name.toLowerCase()}`); }
         }
       }
     }
@@ -163,42 +154,6 @@ class Module {
         }
       }
     }
-  }
-
-  public arrayHandler(target, key, path: any = null) {
-    // we want to catch array functions
-    const path2 = key;
-    return new Proxy(target[key], {
-      get: (t, prop) => {
-        const val = t[prop];
-        if (typeof val === 'function') {
-          if (['push', 'unshift'].includes(String(prop))) {
-            return () => {
-              const modification = Array.prototype[prop].apply(target, arguments);
-              if (path) {
-                this.updateSettings(`${path}.${path2}`, this.settings[path][path2]);
-              } else {
-                this.updateSettings(`${path2}`, this.settings[path2]);
-              }
-              return modification;
-            };
-          }
-          if (['pop'].includes(String(prop))) {
-            return () => {
-              const el = Array.prototype[prop].apply(t, arguments);
-              if (path) {
-                this.updateSettings(`${path}.${path2}`, this.settings[path][path2]);
-              } else {
-                this.updateSettings(`${path2}`, this.settings[path2]);
-              }
-              return el;
-            };
-          }
-          return val.bind(t);
-        }
-        return val;
-      },
-    });
   }
 
   public prepareCommand(opts: string | Command) {
@@ -260,6 +215,7 @@ class Module {
             cb(null, await this[variable]);
           });
           socket.on('settings.update', async (data: { [x: string]: { [y: string]: any } }, cb) => {
+            /*
             try {
               for (const [key, value] of Object.entries(data)) {
                 if (key === 'enabled' && ['core', 'overlays', 'widgets'].includes(this._name)) { continue; } else if (key === '_permissions') {
@@ -298,6 +254,7 @@ class Module {
             if (typeof cb === 'function') {
               setTimeout(() => cb(null), 1000);
             }
+            */
           });
           // difference between set and update is that set will set exact 1:1 values of opts.items
           // so it will also DELETE additional data
@@ -496,7 +453,7 @@ class Module {
     const isDisabledByEnv = !_.isNil(process.env.DISABLE) &&
       (process.env.DISABLE.toLowerCase().split(',').includes(this.constructor.name.toLowerCase()) || process.env.DISABLE === '*');
 
-    if (isStatusChanged) { this.settings.enabled = opts.state; } else { opts.state = this.settings.enabled; }
+    if (isStatusChanged) { this.enabled = opts.state; } else { opts.state = this.enabled; }
 
     if (!areDependenciesEnabled || isDisabledByEnv) { opts.state = false; } // force disable if dependencies are disabled or disabled by env
 
@@ -547,34 +504,31 @@ class Module {
     } = {};
 
     // go through expected settings
-    for (const [category, values] of Object.entries(this._settings)) {
-      if (category === 'parsers') { continue; }
-      promisedSettings[category] = {};
+    for (const { category, key } of this.settingsList) {
+      if (category) {
+        promisedSettings[category] = {};
 
-      if (category === 'commands') {
-        for (const k of Object.keys(values)) {
-          promisedSettings[category][k] = this.getCommand(k);
+        if (category === 'commands') {
+          _.set(promisedSettings, `${category}.${key}`, this.getCommand(key));
+        } else {
+          _.set(promisedSettings, `${category}.${key}`, this[key]);
         }
-      } else if (!_.isObject(values)) {
-        // we are expecting bool, string, number
-        promisedSettings[category] = this.settings[category];
       } else {
-        // we are expecting one more layer
-        for (const o of Object.entries(values)) {
-          promisedSettings[category][o[0]] = this.settings[category][o[0]];
-        }
+        _.set(promisedSettings, key, this[key]);
       }
     }
 
     // add command permissions
-    promisedSettings._permissions = {};
-    for (const command of this._commands) {
-      const key = typeof command === 'string' ? command : command.name;
-      const pItem = await global.db.engine.findOne(global.permissions.collection.commands, { key });
-      if (!_.isEmpty(pItem)) {
-        promisedSettings._permissions[key] = pItem.permission;
-      } else {
-        promisedSettings._permissions[key] = command.permission;
+    if (this._commands.length > 0) {
+      promisedSettings._permissions = {};
+      for (const command of this._commands) {
+        const key = typeof command === 'string' ? command : command.name;
+        const pItem = await global.db.engine.findOne(global.permissions.collection.commands, { key });
+        if (!_.isEmpty(pItem)) {
+          promisedSettings._permissions[key] = pItem.permission;
+        } else {
+          promisedSettings._permissions[key] = command.permission;
+        }
       }
     }
 
@@ -651,7 +605,6 @@ class Module {
         isHelper: boolean;
       }[] = [];
       for (const command of this._commands) {
-        if (typeof this._settings.commands === 'undefined') { throw Error ('Something went wrong'); }
         if (_.isNil(command.name)) { throw Error('Command name must be defined'); }
 
         // if fnc is not set
@@ -678,7 +631,7 @@ class Module {
         }
 
         command.permission = _.isNil(command.permission) ? permission.VIEWERS : command.permission;
-        command.command = _.isNil(command.command) ? this._settings.commands[command.name] as string : command.command;
+        command.command = _.isNil(command.command) ? command.name : command.command;
         commands.push({
           this: this,
           id: command.name,

@@ -140,7 +140,7 @@ class OAuth extends Core {
       }
     }
 
-    this.timeouts.getChannelId = setTimeout(() => this.getChannelId(), timeout);
+    this.timeouts.getChannelId = global.setTimeout(() => this.getChannelId(), timeout);
   }
 
   public async onChangeBroadcasterUsername(key: string, value: any) {
@@ -162,8 +162,8 @@ class OAuth extends Core {
 
   /*
    * Validates OAuth access tokens
-   * and sets this.settings.<bot|broadcaster>.username
-   * and sets this.settings.<bot|broadcaster>._scopes
+   * and sets this[type + 'Username']
+   * and sets this[type + 'CurrentScopes']
    * if invalid refreshAccessToken()
    * @param {string} type - bot or broadcaster
    *
@@ -199,12 +199,11 @@ class OAuth extends Core {
         global.log.warning('You shouldn\'t use same account for bot and broadcaster!');
       }
 
-      this[type + 'ExpectedScopes'] = request.data.scopes;
+      this[type + 'CurrentScopes'] = request.data.scopes;
       this[type + 'Username'] = request.data.login;
 
-      const cache = this.settings._[type];
+      const cache = this[type + 'Username'] + this[type + 'CurrentScopes'].join(',');
       if (cache !== '' && cache !== request.data.login + request.data.scopes.join(',')) {
-        this.settings._[type] = request.data.login + request.data.scopes.join(',');
         global.tmi.reconnect(type); // force TMI reconnect
       }
 
@@ -213,12 +212,12 @@ class OAuth extends Core {
       status = false;
       if ((this[type + 'RefreshToken']) !== '') { this.refreshAccessToken(type); } else {
         this[type + 'Username'] = '';
-        this[type + 'ExpectedScopes'] = [];
+        this[type + 'CurrentScopes'] = [];
 
         if (type === 'bot') { this.botId = ''; } else { this.broadcasterId = ''; }
       }
     }
-    this.timeouts[`validateOAuth-${type}`] = setTimeout(() => this.validateOAuth(type), 60000);
+    this.timeouts[`validateOAuth-${type}`] = global.setTimeout(() => this.validateOAuth(type), 60000);
     return status;
   }
 

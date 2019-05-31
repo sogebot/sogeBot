@@ -301,7 +301,6 @@ function Panel () {
       var data = {}
 
       for (let system of ['oauth', 'tmi', 'currency', 'ui', 'general', 'twitch']) {
-        if (!global[system].settings) continue
         if (typeof data.core === 'undefined') {
           data.core = {}
         }
@@ -333,14 +332,14 @@ function Panel () {
       }
 
       // currencies
-      data.currency = global.currency.settings.currency.mainCurrency
-      data.currencySymbol = global.currency.symbol(global.currency.settings.currency.mainCurrency)
+      data.currency = global.currency.mainCurrency
+      data.currencySymbol = global.currency.symbol(global.currency.mainCurrency)
 
       // timezone
       data.timezone = config.timezone === 'system' || _.isNil(config.timezone) ? moment.tz.guess() : config.timezone
 
       // lang
-      data.lang = global.general.settings.lang;
+      data.lang = global.general.lang;
 
       if (_.isFunction(cb)) cb(data)
       else socket.emit('configuration', data)
@@ -353,7 +352,7 @@ function Panel () {
         if (!global.systems[system].settings) continue
         toEmit.push({
           name: system.toLowerCase(),
-          enabled: await global.systems[system].settings.enabled,
+          enabled: global.systems[system].enabled,
           areDependenciesEnabled: await global.systems[system]._dependenciesEnabled(),
           isDisabledByEnv: !_.isNil(process.env.DISABLE) && (process.env.DISABLE.toLowerCase().split(',').includes(system.toLowerCase()) || process.env.DISABLE === '*')
         })
@@ -376,7 +375,7 @@ function Panel () {
         if (!global.integrations[system].settings || global.integrations[system]._ui._hidden) continue
         toEmit.push({
           name: system.toLowerCase(),
-          enabled: await global.integrations[system].settings.enabled,
+          enabled: global.integrations[system].enabled,
           areDependenciesEnabled: await global.integrations[system]._dependenciesEnabled(),
           isDisabledByEnv: !_.isNil(process.env.DISABLE) && (process.env.DISABLE.toLowerCase().split(',').includes(system.toLowerCase()) || process.env.DISABLE === '*')
         })
@@ -389,7 +388,7 @@ function Panel () {
         if (!global.overlays[system].settings || global.overlays[system]._ui._hidden) continue
         toEmit.push({
           name: system.toLowerCase(),
-          enabled: await global.overlays[system].settings.enabled,
+          enabled: global.overlays[system].enabled,
           areDependenciesEnabled: await global.overlays[system]._dependenciesEnabled(),
           isDisabledByEnv: !_.isNil(process.env.DISABLE) && (process.env.DISABLE.toLowerCase().split(',').includes(system.toLowerCase()) || process.env.DISABLE === '*')
         })
@@ -402,7 +401,7 @@ function Panel () {
         if (!global.games[system].settings) continue
         toEmit.push({
           name: system.toLowerCase(),
-          enabled: await global.games[system].settings.enabled,
+          enabled: global.games[system].enabled,
           areDependenciesEnabled: await global.games[system]._dependenciesEnabled(),
           isDisabledByEnv: !_.isNil(process.env.DISABLE) && (process.env.DISABLE.toLowerCase().split(',').includes(system.toLowerCase()) || process.env.DISABLE === '*')
         })
@@ -501,7 +500,7 @@ Panel.prototype.sendStreamData = async function (self, socket) {
     currentSubscribers: _.get(await global.db.engine.findOne('api.current', { key: 'subscribers' }), 'value', 0),
     currentBits: _.get(await global.db.engine.findOne('api.current', { key: 'bits' }), 'value', 0),
     currentTips: _.get(await global.db.engine.findOne('api.current', { key: 'tips' }), 'value', 0),
-    currency: global.currency.symbol(global.currency.settings.currency.mainCurrency),
+    currency: global.currency.symbol(global.currency.mainCurrency),
     chatMessages: await global.cache.isOnline() ? global.linesParsed - global.api.chatMessagesAtStart : 0,
     currentFollowers: _.get(await global.db.engine.findOne('api.current', { key: 'followers' }), 'value', 0),
     currentViews: _.get(await global.db.engine.findOne('api.current', { key: 'views' }), 'value', 0),

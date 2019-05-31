@@ -207,7 +207,7 @@ class Permissions extends Core {
           amount = user.stats.tier || 0;
           break;
         case 'tips':
-          amount = user.tips.reduce((a, b) => (a + global.currency.exchange(b.amount, b.currency, global.currency.settings.currency.mainCurrency)), 0);
+          amount = user.tips.reduce((a, b) => (a + global.currency.exchange(b.amount, b.currency, global.currency.mainCurrency)), 0);
           break;
         case 'watched':
           amount = user.watched.reduce((a, b) => (a + b.watched), 0) / (60 * 60 * 1000 /*hours*/);

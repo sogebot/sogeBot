@@ -540,7 +540,7 @@ class Events extends Core {
           method: _.random(0, 1, false) === 0 ? 'Twitch Prime' : '',
           amount: _.random(0, 9999, true).toFixed(2),
           currency: _.sample(['CZK', 'USD', 'EUR']),
-          currencyInBot: global.currency.settings.currency.mainCurrency,
+          currencyInBot: global.currency.mainCurrency,
           amountInBotCurrency: _.random(0, 9999, true).toFixed(2),
         };
         for (const operation of (await global.db.engine.find('events.operations', { eventId }))) {
