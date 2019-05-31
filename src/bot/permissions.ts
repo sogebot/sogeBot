@@ -6,7 +6,7 @@ import {
   sendMessage,
 } from './commons';
 import { debug } from './debug';
-import { command, default_permission } from './decorators';
+import { command, default_permission, settings } from './decorators';
 
 const permission = Object.freeze({
   CASTERS: '4300ed23-dca0-4ed9-8014-f5f2f7af55a9',
@@ -18,16 +18,14 @@ const permission = Object.freeze({
 });
 
 class Permissions extends Core {
+  @settings({ category: 'warnings' })
+  public sendWarning = false;
+
+  @settings({ category: 'warnings' })
+  public sendByWhisper = false;
+
   constructor() {
-    const options: InterfaceSettings = {
-      settings: {
-        warnings: {
-          sendWarning: false,
-          sendByWhisper: true,
-        },
-      },
-    };
-    super(options);
+    super();
 
     this.ensurePreservedPermissionsInDb();
     this.addMenu({ category: 'settings', name: 'permissions', id: '/settings/permissions' });

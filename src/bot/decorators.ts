@@ -51,10 +51,19 @@ export function settings(opts: {
             }
           },
         });
+
         // load variable from db
-        /*const value =*/
-        self.loadVariableValue(path);
-        // TODO: set value
+        const loadVariableValue = () => {
+          if (!global.db.engine.connected) {
+            return setTimeout(() => loadVariableValue(), 1000);
+          }
+          self.loadVariableValue(path).then((value) => {
+            if (value) {
+              _.set(self, key, value);
+            }
+          });
+        };
+        setTimeout(() => loadVariableValue(), 5000);
 
         // add variable to settingsList
         self.settingsList.push({ category: opts.category, key });
@@ -95,7 +104,7 @@ export function shared() {
                 path: '_shared.' + key,
                 value,
               };
-              global.workers.sendToAll(proc);
+              global.workers.setOnAll(proc);
             }
           },
         });

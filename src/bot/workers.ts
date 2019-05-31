@@ -24,6 +24,15 @@ class Workers {
     }
   }
 
+  public setOnAll(opts) {
+    if (isMainThread) {
+      this.sendToAllWorkers(opts);
+    } else {
+      this.sendToMaster(opts);
+    }
+
+  }
+
   public send(opts) {
     if (!isMainThread) {
       this.sendToMaster(opts);

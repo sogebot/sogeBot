@@ -8,6 +8,8 @@ import { onchange } from './decorators/on';
 
 class OAuth extends Core {
   @shared()
+  public cache: { bot: string, broadcaster: string } = { bot: '', broadcaster: '' };
+  @shared()
   public currentChannel: string = '';
   @shared()
   public broadcasterType: string = '';
@@ -113,9 +115,11 @@ class OAuth extends Core {
     super();
 
     this.addMenu({ category: 'settings', name: 'core', id: 'core' });
-    this.validateOAuth('bot');
-    this.validateOAuth('broadcaster');
-    this.getChannelId();
+    setTimeout(() => {
+      this.validateOAuth('bot');
+      this.validateOAuth('broadcaster');
+      this.getChannelId();
+    }, 10000);
   }
 
   public async getChannelId() {
@@ -124,6 +128,7 @@ class OAuth extends Core {
     clearTimeout(this.timeouts.getChannelId);
 
     let timeout = 1000;
+
     if (this.currentChannel !== this.generalChannel && this.generalChannel !== '') {
       this.currentChannel = this.generalChannel;
       const cid = await global.api.getIdFromTwitch(this.generalChannel, true);
@@ -184,7 +189,11 @@ class OAuth extends Core {
     const url = 'https://id.twitch.tv/oauth2/validate';
     let status = true;
     try {
-      if (['bot', 'broadcaster'].includes(type) && (this[type + 'AccessToken']) === '') { throw new Error('no accessfresh token for ' + type); } else if (!['bot', 'broadcaster'].includes(type)) { throw new Error(`Type ${type} is not supported`); }
+      if (['bot', 'broadcaster'].includes(type) && (this[type + 'AccessToken']) === '') {
+        throw new Error('no access token for ' + type);
+      } else if (!['bot', 'broadcaster'].includes(type)) {
+        throw new Error(`Type ${type} is not supported`);
+      }
 
       const request = await axios.get(url, {
         headers: {
@@ -193,7 +202,11 @@ class OAuth extends Core {
       });
       this.clientId = request.data.client_id;
 
-      if (type === 'bot') { this.botId = request.data.user_id; } else { this.broadcasterId = request.data.user_id; }
+      if (type === 'bot') {
+        this.botId = request.data.user_id;
+      } else {
+        this.broadcasterId = request.data.user_id;
+      }
 
       if (type === 'bot' && this.botId === this.broadcasterId) {
         global.log.warning('You shouldn\'t use same account for bot and broadcaster!');
@@ -202,13 +215,15 @@ class OAuth extends Core {
       this[type + 'CurrentScopes'] = request.data.scopes;
       this[type + 'Username'] = request.data.login;
 
-      const cache = this[type + 'Username'] + this[type + 'CurrentScopes'].join(',');
+      const cache = this.cache[type];
       if (cache !== '' && cache !== request.data.login + request.data.scopes.join(',')) {
         global.tmi.reconnect(type); // force TMI reconnect
+        this.cache[type] = request.data.login + request.data.scopes.join(',');
       }
 
       global.status.API = request.status === 200 ? constants.CONNECTED : constants.DISCONNECTED;
     } catch (e) {
+      console.error(e);
       status = false;
       if ((this[type + 'RefreshToken']) !== '') { this.refreshAccessToken(type); } else {
         this[type + 'Username'] = '';
