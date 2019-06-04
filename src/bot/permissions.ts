@@ -2,9 +2,9 @@ import _ from 'lodash';
 
 import Core from './_interface';
 import {
-    isBot, isBroadcaster, isFollower, isModerator, isOwner, isSubscriber, isVIP, prepare,
-    sendMessage,
-  } from './commons';
+  isBot, isBroadcaster, isFollower, isModerator, isOwner, isSubscriber, isVIP, prepare,
+  sendMessage,
+} from './commons';
 import { debug } from './debug';
 import { command, default_permission } from './decorators';
 
@@ -109,9 +109,9 @@ class Permissions extends Core {
     return pItem;
   }
 
-  public async check(userId: string, permId: string, partial: boolean = false): Promise<{access: boolean, permission: Permissions.Item | null}> {
+  public async check(userId: string, permId: string, partial: boolean = false): Promise<{access: boolean; permission: Permissions.Item | null}> {
     const user: User & {
-      tips: User.Tips[], bits: User.Bits[], points: User.Points[], watched: User.Watched[], messages: User.Messages[],
+      tips: User.Tips[]; bits: User.Bits[]; points: User.Points[]; watched: User.Watched[]; messages: User.Messages[];
     } = await global.db.engine.findOne('users', { id: userId }, [
       { from: 'users.tips', as: 'tips', foreignField: 'id', localField: 'id' },
       { from: 'users.bits', as: 'bits', foreignField: 'id', localField: 'id' },
@@ -181,12 +181,12 @@ class Permissions extends Core {
 
   protected filters(
     user: User & {
-      tips: User.Tips[], bits: User.Bits[], points: User.Points[], watched: User.Watched[], messages: User.Messages[],
+      tips: User.Tips[]; bits: User.Bits[]; points: User.Points[]; watched: User.Watched[]; messages: User.Messages[];
     },
     filters: Permissions.Filter[] = [],
   ): boolean {
     for (const f of filters) {
-      let amount: number = 0;
+      let amount = 0;
       switch (f.type) {
         case 'bits':
           amount = user.bits.reduce((a, b) => (a + b.amount), 0);

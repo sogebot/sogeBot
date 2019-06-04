@@ -3,10 +3,7 @@
 import Overlay from '../overlays/_interface';
 
 import _ from 'lodash';
-const {
-  isMainThread,
-  // tslint:disable-next-line:no-var-requires
-} = require('worker_threads');
+import { isMainThread } from 'worker_threads';
 
 class Goals extends Overlay {
   constructor() {

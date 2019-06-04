@@ -1,0 +1,24 @@
+{
+    "parser": "@typescript-eslint/parser",
+    "plugins": ["@typescript-eslint"],
+    "extends": ["plugin:@typescript-eslint/recommended"],
+    "rules": {
+        "indent": "off",
+        "@typescript-eslint/indent": ["error", 2],
+        "@typescript-eslint/explicit-member-accessibility": "off",
+        "quotes": ["error", "single", { "allowTemplateLiterals": true }],
+        "@typescript-eslint/camelcase": "off",
+        "@typescript-eslint/no-explicit-any": "off",
+        "@typescript-eslint/explicit-function-return-type": 1,
+        "@typescript-eslint/no-use-before-define": 0
+    },
+    "parserOptions": {
+      "ecmaFeatures": {
+        "jsx": true
+      },
+      "useJSXTextNode": true,
+      "project": "./tsconfig.json",
+      "tsconfigRootDir": "./",
+      "extraFileExtensions": [".vue"]
+    }
+  }

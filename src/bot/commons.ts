@@ -8,13 +8,14 @@ import { isMainThread } from 'worker_threads';
 import { debug, isEnabled as debugIsEnabled } from './debug';
 import Message from './message';
 
-export async function autoLoad(directory) {
+export async function autoLoad(directory): Promise<{ [x: string]: any }> {
   const directoryListing = readdirSync(directory);
   const loaded = {};
   for (const file of directoryListing) {
     if (file.startsWith('_')) {
       continue;
     }
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const imported = require(normalize(join(process.cwd(), directory, file)));
     if (typeof imported.default !== 'undefined') {
       loaded[file.split('.')[0]] = new imported.default(); // remap default to root object
@@ -130,11 +131,11 @@ export function getTime(time, isChat) {
 }
 
 export async function sendMessage(messageToSend, sender, attr?: {
-  sender?: any,
-  quiet?: boolean,
-  skip?: boolean,
-  force?: boolean,
-  [x: string]: any,
+  sender?: any;
+  quiet?: boolean;
+  skip?: boolean;
+  force?: boolean;
+  [x: string]: any;
 }) {
   messageToSend = await messageToSend; // await if messageToSend is promise (like prepare)
   attr = attr || {};
