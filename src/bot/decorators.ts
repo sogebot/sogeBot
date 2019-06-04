@@ -1,10 +1,10 @@
 import { parse, sep as separator } from 'path';
 
 export function parser(opts: {
-  fireAndForget?: boolean,
-  permission?: string,
-  priority?: number,
-  dependsOn?: string[],
+  fireAndForget?: boolean;
+  permission?: string;
+  priority?: number;
+  dependsOn?: string[];
 }) {
   opts = opts || {};
   const _prepareStackTrace = Error.prepareStackTrace;

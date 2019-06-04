@@ -37,9 +37,9 @@ dependencies:
 	@echo -ne "\n\t ----- Using yarn for dependencies install\n"
 	@yarn install --ignore-engines
 
-tslint:
-	@echo -ne "\n\t ----- Checking tslint\n"
-	@npx tslint -p tslint.json
+eslint:
+	@echo -ne "\n\t ----- Checking eslint\n"
+	@npx eslint --ext .ts src --quiet
 
 ui:
 	@echo -ne "\n\t ----- Generating CSS themes\n"

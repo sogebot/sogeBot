@@ -11,19 +11,19 @@ import VueRouter from 'vue-router';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faSpotify, faTwitch, faTwitter } from '@fortawesome/free-brands-svg-icons';
 import {
-    faBell, faCalendar, faCheckCircle, faCircle, faClock, faMoneyBillAlt,
+  faBell, faCalendar, faCheckCircle, faCircle, faClock, faMoneyBillAlt,
 } from '@fortawesome/free-regular-svg-icons';
 import {
-    faAngleDown, faAngleRight, faAngleUp, faBan, faBoxOpen, faBullhorn, faCaretDown, faCaretLeft,
-    faCheck, faCircleNotch, faClone, faCode, faCog, faCoins, faCommentAlt, faComments, faDollarSign, faDownload,
-    faEdit, faEllipsisH, faEllipsisV, faEquals, faEraser, faExclamation, faExclamationCircle,
-    faExternalLinkAlt, faEye, faEyeSlash, faFilter, faFont, faForward, faGem, faGift, faGreaterThanEqual,
-    faHandPointer, faHeadphones, faHeart, faInfinity, faLink, faList, faLock, faLockOpen,
-    faLongArrowAltLeft, faLongArrowAltRight, faMinus, faMusic, faPause, faPlay, faPlus,
-    faPlusSquare, faQuestion, faRandom, faSave, faSearch, faShareSquare, faSignInAlt, faSignOutAlt,
-    faSlash, faSpinner, faStar, faStarHalf, faStop, faSync, faSyncAlt, faTasks, faTerminal, faTh, faThLarge,
-    faThList, faTimes, faToggleOff, faToggleOn, faTrash, faTrashAlt, faTrophy, faUser, faUsers,
-    faVial, faVolumeDown, faVolumeUp,
+  faAngleDown, faAngleRight, faAngleUp, faBan, faBoxOpen, faBullhorn, faCaretDown, faCaretLeft,
+  faCheck, faCircleNotch, faClone, faCode, faCog, faCoins, faCommentAlt, faComments, faDollarSign, faDownload,
+  faEdit, faEllipsisH, faEllipsisV, faEquals, faEraser, faExclamation, faExclamationCircle,
+  faExternalLinkAlt, faEye, faEyeSlash, faFilter, faFont, faForward, faGem, faGift, faGreaterThanEqual,
+  faHandPointer, faHeadphones, faHeart, faInfinity, faLink, faList, faLock, faLockOpen,
+  faLongArrowAltLeft, faLongArrowAltRight, faMinus, faMusic, faPause, faPlay, faPlus,
+  faPlusSquare, faQuestion, faRandom, faSave, faSearch, faShareSquare, faSignInAlt, faSignOutAlt,
+  faSlash, faSpinner, faStar, faStarHalf, faStop, faSync, faSyncAlt, faTasks, faTerminal, faTh, faThLarge,
+  faThList, faTimes, faToggleOff, faToggleOn, faTrash, faTrashAlt, faTrophy, faUser, faUsers,
+  faVial, faVolumeDown, faVolumeUp,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 

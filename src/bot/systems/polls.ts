@@ -275,7 +275,7 @@ class Polls extends System {
     }
   }
 
-  private async parseBit(opts: { username: string, amount: number, message: string }): Promise<void> {
+  private async parseBit(opts: { username: string; amount: number; message: string }): Promise<void> {
     const cVote: Poll = await global.db.engine.findOne(this.collection.data, { isOpened: true });
 
     if (!_.isEmpty(cVote) && cVote.type === 'bits') {
@@ -297,7 +297,7 @@ class Polls extends System {
     }
   }
 
-  private async parseTip(opts: { username: string, amount: number, message: string, currency: string }): Promise<void> {
+  private async parseTip(opts: { username: string; amount: number; message: string; currency: string }): Promise<void> {
     const cVote: Poll = await global.db.engine.findOne(this.collection.data, { isOpened: true });
 
     if (!_.isEmpty(cVote) && cVote.type === 'tips') {

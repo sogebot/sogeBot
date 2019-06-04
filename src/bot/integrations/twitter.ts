@@ -10,10 +10,10 @@ import Message from '../message';
 import Integration from './_interface';
 
 class Twitter extends Integration {
-  public watchedStreams: Array<{
-    hash: string,
-    stream: any,
-  }>;
+  public watchedStreams: {
+    hash: string;
+    stream: any;
+  }[];
   public client: any;
 
   constructor() {

@@ -100,7 +100,7 @@ class Top extends System {
   }
 
   private async showTop(opts) {
-    let sorted: Array<{username: string, value: number}> = [];
+    let sorted: {username: string; value: number}[] = [];
     let message;
     let i = 0;
     const type = opts.parameters;
@@ -179,12 +179,12 @@ class Top extends System {
         message = global.translate('systems.top.gifts').replace(/\$amount/g, 10);
         break;
       case TYPE.SUBMONTHS:
-          sorted = [];
-          for (const user of (await global.db.engine.find('users', { _sort: 'stats.subCumulativeMonths', _total }))) {
-            sorted.push({ username: user.username, value: user.stats.subCumulativeMonths });
-          }
-          message = global.translate('systems.top.submonths').replace(/\$amount/g, 10);
-          break;
+        sorted = [];
+        for (const user of (await global.db.engine.find('users', { _sort: 'stats.subCumulativeMonths', _total }))) {
+          sorted.push({ username: user.username, value: user.stats.subCumulativeMonths });
+        }
+        message = global.translate('systems.top.submonths').replace(/\$amount/g, 10);
+        break;
     }
 
     if (sorted.length > 0) {

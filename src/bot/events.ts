@@ -7,24 +7,25 @@ import { isMainThread } from 'worker_threads';
 import Core from './_interface';
 import { flatten, getLocalizedName, getOwner, isBot, isBroadcaster, isModerator, isOwner, isSubscriber, isVIP, prepare, sendMessage } from './commons';
 import Message from './message';
+import * as Parser from './parser';
 
 class Events extends Core {
   public timeouts: { [x: string]: NodeJS.Timeout } = {};
-  public supportedEventsList: Array<{
-    id: string,
-    variables?: string[],
-    check?: (event: any, attributes: any) => Promise<boolean>,
+  public supportedEventsList: {
+    id: string;
+    variables?: string[];
+    check?: (event: any, attributes: any) => Promise<boolean>;
     definitions?: {
       [x: string]: any;
-    },
-  }>;
-  public supportedOperationsList: Array<{
-    id: string,
+    };
+  }[];
+  public supportedOperationsList: {
+    id: string;
     definitions?: {
       [x: string]: any;
-    },
-    fire: (operation: Events.OperationDefinitions, attributes: Events.Attributes) => Promise<void>,
-  }>;
+    };
+    fire: (operation: Events.OperationDefinitions, attributes: Events.Attributes) => Promise<void>;
+  }[];
 
   constructor() {
     super();
@@ -224,9 +225,7 @@ class Events extends Core {
     command = await new Message(command).parse({ username: getOwner() });
 
     if (global.mocha) {
-      // we are testing => straight to parser
-      const Parser = require('./parser');
-      const parse = new Parser({
+      const parse = new Parser.default({
         sender: (_.get(operation, 'isCommandQuiet', false) ? {} : { username: getOwner() }),
         message: command,
         skip: true,

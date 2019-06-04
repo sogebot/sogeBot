@@ -8,7 +8,7 @@ import { debug, isEnabled as isDebugEnabled } from './debug';
 import { permission } from './permissions';
 
 type ExposedSettings = InterfaceSettings.Settings<{
-  [x: string]: string, // commands are simple key: string values
+  [x: string]: string; // commands are simple key: string values
 }>;
 
 class Module {
@@ -18,13 +18,13 @@ class Module {
   public settings: ExposedSettings = {};
   public timeouts: { [x: string]: NodeJS.Timeout } = {};
 
-  protected _settings: InterfaceSettings.Settings<Array<Command | string> | ExposedSettings>;
+  protected _settings: InterfaceSettings.Settings<(Command | string)[] | ExposedSettings>;
   protected _name: string;
   protected _opts: InterfaceSettings;
   protected _ui: InterfaceSettings.UI;
   protected _commands: Command[];
   protected _parsers: Parser[];
-  protected _rollback: Array<{ name: string }>;
+  protected _rollback: { name: string }[];
   protected on: InterfaceSettings.On;
   protected dependsOn: string[];
   protected socket: SocketIO.Socket | null;
@@ -633,7 +633,7 @@ class Module {
 
   public async getAllSettings() {
     const promisedSettings: {
-      [x: string]: any,
+      [x: string]: any;
     } = {};
 
     // go through expected settings
@@ -674,14 +674,14 @@ class Module {
   public async parsers() {
     if (!(await this.isEnabled())) { return []; }
 
-    const parsers: Array<{
-      this: any,
-      name: string,
-      fnc: (opts: ParserOptions) => any,
-      permission: string,
-      priority: number,
-      fireAndForget: boolean,
-    }> = [];
+    const parsers: {
+      this: any;
+      name: string;
+      fnc: (opts: ParserOptions) => any;
+      permission: string;
+      priority: number;
+      fireAndForget: boolean;
+    }[] = [];
     for (const parser of this._parsers) {
       parser.permission = typeof parser.permission !== 'undefined' ? parser.permission : permission.VIEWERS;
       parser.priority = typeof parser.priority !== 'undefined' ? parser.priority : 3 /* constants.LOW */;
@@ -712,11 +712,11 @@ class Module {
   public async rollbacks() {
     if (!(await this.isEnabled())) { return []; }
 
-    const rollbacks: Array<{
-      this: any,
-      name: string,
-      fnc: (opts: ParserOptions) => any,
-    }> = [];
+    const rollbacks: {
+      this: any;
+      name: string;
+      fnc: (opts: ParserOptions) => any;
+    }[] = [];
     for (const rollback of this._rollback) {
       if (_.isNil(rollback.name)) { throw Error('Rollback name must be defined'); }
 
@@ -731,15 +731,15 @@ class Module {
 
   public async commands() {
     if (await this.isEnabled()) {
-      const commands: Array<{
-        this: any,
-        id: string,
-        command: string,
-        fnc: (opts: CommandOptions) => void,
-        _fncName: string,
-        permission: string,
-        isHelper: boolean,
-      }> = [];
+      const commands: {
+        this: any;
+        id: string;
+        command: string;
+        fnc: (opts: CommandOptions) => void;
+        _fncName: string;
+        permission: string;
+        isHelper: boolean;
+      }[] = [];
       for (const command of this._commands) {
         if (typeof this._settings.commands === 'undefined') { throw Error ('Something went wrong'); }
         if (_.isNil(command.name)) { throw Error('Command name must be defined'); }
@@ -824,9 +824,9 @@ class Module {
     const c = this._commands.find((o) => o.name === command);
     if (c && c.command) {
       return c.command;
-     } else {
-       return command;
-     }
+    } else {
+      return command;
+    }
   }
 }
 

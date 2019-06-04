@@ -35,7 +35,7 @@ class Alerts extends Overlay {
     }
     opts.parameters = await new Message(opts.parameters).parse();
 
-    let send: Array<{[x: string]: string}> = [];
+    let send: {[x: string]: string}[] = [];
     for (const string of opts.parameters.trim().split(' | ')) {
       const object = {};
       for (const setting of string.match(/([\w-]+)=([\w-://.%?=$_|@&]+|'[\S ]+')/g) || []) {

@@ -78,9 +78,9 @@ class UserInfo extends System {
       }
 
       sendMessage(prepare('followage.' + (opts.sender.username === username.toLowerCase() ? 'successSameUsername' : 'success') + '.time', {
-          username,
-          diff: output.join(', '),
-        }), opts.sender);
+        username,
+        diff: output.join(', '),
+      }), opts.sender);
     }
   }
 
@@ -159,9 +159,9 @@ class UserInfo extends System {
         output.push(0 + ' ' + getLocalizedName(0, 'core.minutes'));
       }
       sendMessage(prepare('age.success.' + (opts.sender.username === username.toLowerCase() ? 'withoutUsername' : 'withUsername'), {
-          username,
-          diff: output.join(', '),
-        }), opts.sender);
+        username,
+        diff: output.join(', '),
+      }), opts.sender);
     }
   }
 
