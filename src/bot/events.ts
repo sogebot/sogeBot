@@ -7,7 +7,7 @@ import { isMainThread } from 'worker_threads';
 import Core from './_interface';
 import { flatten, getLocalizedName, getOwner, isBot, isBroadcaster, isModerator, isOwner, isSubscriber, isVIP, prepare, sendMessage } from './commons';
 import Message from './message';
-import { Parser } from './parser';
+import * as Parser from './parser';
 
 class Events extends Core {
   public timeouts: { [x: string]: NodeJS.Timeout } = {};
@@ -225,7 +225,7 @@ class Events extends Core {
     command = await new Message(command).parse({ username: getOwner() });
 
     if (global.mocha) {
-      const parse = new Parser({
+      const parse = new Parser.default({
         sender: (_.get(operation, 'isCommandQuiet', false) ? {} : { username: getOwner() }),
         message: command,
         skip: true,
