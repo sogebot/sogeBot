@@ -157,9 +157,9 @@ class Workers {
           });
           if (obj) { set(obj, data.path, data.value); }
         } else {
-          const obj = Object.values(global[data.system]).find((o) => {
+          const obj = Object.values(global[data.system]).find((o: any) => {
             return o.constructor.name === data.class;
-          });
+          }) as any;
           if (obj) { set(obj, data.path, data.value); }
         }
       } else if ( data.type === 'crash') {
@@ -180,9 +180,9 @@ class Workers {
             break;
           } else {
             try {
-              const obj = Object.values(global[data.system]).find((o) => {
+              const obj = Object.values(global[data.system]).find((o: any) => {
                 return o.constructor.name === data.class;
-              });
+              }) as any;
               if (obj) { set(obj, data.path, data.value); }
             } catch (e) {
               global.log.error(e.stack);
