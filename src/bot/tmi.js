@@ -15,7 +15,7 @@ import { permission } from './permissions';
 const Expects = require('./expects')
 import Core from './_interface'
 const constants = require('./constants')
-import { settings, ui } from './decorators';
+import { settings } from './decorators';
 
 const __DEBUG__ =
   (process.env.DEBUG && process.env.DEBUG.includes('tmi.client'));
