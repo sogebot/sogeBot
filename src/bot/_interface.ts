@@ -9,9 +9,10 @@ import { permission } from './permissions';
 
 class Module {
   public name: string = 'core';
+  public dependsOn: string[] = [];
   public collection: { [x: string]: string };
   public timeouts: { [x: string]: NodeJS.Timeout } = {};
-  public settingsList: Array<{ category: string, key: string }> = [];
+  public settingsList: { category: string; key: string }[] = [];
 
   get enabled(): boolean {
     return _.get(this, '_enabled', true);
@@ -36,10 +37,9 @@ class Module {
   protected _ui: InterfaceSettings.UI;
   protected _commands: Command[];
   protected _parsers: Parser[];
-  protected _rollback: Array<{ name: string }>;
+  protected _rollback: { name: string }[];
   protected _enabled: boolean = true;
   protected on: InterfaceSettings.On;
-  protected dependsOn: string[];
   protected socket: SocketIO.Socket | null;
 
   constructor(name: string = 'core') {
@@ -50,8 +50,6 @@ class Module {
       load: {},
     };
 
-    // TODO: dependsOn
-    this.dependsOn = [];
     this.socket = null;
 
     this._commands = [];
@@ -78,7 +76,9 @@ class Module {
     // prepare proxies for variables
     this._sockets();
     this._indexDbs();
-    this._status();
+    setTimeout(() => {
+      this._status();
+    }, 1000)
   }
 
   public sockets() {

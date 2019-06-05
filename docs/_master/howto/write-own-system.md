@@ -14,7 +14,7 @@ import { command, default_permission, parser } from '../decorators';
 import { permissions } from '../permission'; // set of core permissions
 
 class Yoursystem extends System {
-  [x: string]: any;
+  public dependsOn: string[] = []
 
   constructor () {
     const options: InterfaceSettings = {
@@ -35,9 +35,10 @@ export default YourSystem;
 Some systems have dependencies, e.g. bet system cannot work without points system
 
 ``` typescript
-const options: InterfaceSettings = {
-  // ...
-  dependsOn: ['systems.points'],
+class Yoursystem extends System {
+  public dependsOn: string[] = ['systems.points']
+
+  constructor () {
   // ...
 }
 ```

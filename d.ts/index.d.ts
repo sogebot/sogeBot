@@ -6,8 +6,8 @@ declare module '*.vue' {
 declare namespace NodeJS {
   export interface Global {
     status: {
-      API: 0 | 1 | 2,
-    }
+      API: 0 | 1 | 2;
+    };
     overlays: {
       alerts: import('../src/bot/overlays/alerts').Alerts;
       bets: import('../src/bot/overlays/bets').Bets;

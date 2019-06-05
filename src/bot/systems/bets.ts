@@ -2,7 +2,7 @@ import _ from 'lodash';
 import { isMainThread } from 'worker_threads';
 
 import { getOwner, prepare, sendMessage } from '../commons';
-import { command, default_permission, helper } from '../decorators';
+import { command, default_permission, helper, settings, ui } from '../decorators';
 import Expects from '../expects';
 import { permission } from '../permissions';
 import System from './_interface';
@@ -29,24 +29,14 @@ const ERROR_NOT_OPTION = '7';
  */
 
 class Bets extends System {
+  public dependsOn: string[] = ['systems.points'];
+
+  @settings()
+  @ui({ type: 'number-input', step: 1, min: 0, max: 100 })
+  public betPercentGain: number = 20
+
   constructor() {
-    const options: InterfaceSettings = {
-      ui: {
-        betPercentGain: {
-          type: 'number-input',
-          step: 1,
-          min: 0,
-          max: 100,
-        },
-      },
-      settings: {
-        betPercentGain: 20,
-      },
-      dependsOn: [
-        'systems.points',
-      ],
-    };
-    super(options);
+    super();
 
     if (isMainThread) {
       this.checkIfBetExpired();
@@ -249,7 +239,7 @@ class Bets extends System {
       if (_.isEmpty(currentBet)) { throw Error(ERROR_NOT_RUNNING); }
       if (_.isNil(currentBet.options[index])) { throw Error(ERROR_NOT_OPTION); }
 
-      const percentGain = (currentBet.options.length * parseInt(this.settings.betPercentGain, 10)) / 100;
+      const percentGain = (currentBet.options.length * this.betPercentGain) / 100;
 
       const users = await global.db.engine.find(this.collection.users);
       let total = 0;
