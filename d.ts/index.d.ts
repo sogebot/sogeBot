@@ -38,7 +38,6 @@ declare namespace NodeJS {
       scrim: import('../src/bot/systems/scrim').Scrim;
       top: import('../src/bot/systems/top').Top;
       userinfo: import('../src/bot/systems/userinfo').UserInfo;
-      oauth: import("../src/bot/oauth").OAuth;
       [x: string]: any; // remove after all systems are ported to TS
     };
     users: any;
@@ -49,24 +48,7 @@ declare namespace NodeJS {
     tmi: any;
     events: import('../src/bot/events').Events;
     widgets: any;
-    oauth: {
-      settings: {
-        _: {
-          channelId: string;
-        };
-        broadcaster: {
-          username: string;
-        };
-        bot: {
-          username: string;
-          accessToken: string;
-        };
-        general: {
-          owners: string[];
-          channel: string;
-        };
-      };
-    };
+    oauth: import("../src/bot/oauth").OAuth;
   }
 }
 
