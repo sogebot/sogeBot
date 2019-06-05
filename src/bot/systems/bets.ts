@@ -6,7 +6,6 @@ import { command, default_permission, helper, settings, ui } from '../decorators
 import Expects from '../expects';
 import { permission } from '../permissions';
 import System from './_interface';
-import Points from './points';
 
 const ERROR_NOT_ENOUGH_OPTIONS = 'Expected more parameters';
 const ERROR_ALREADY_OPENED = '1';
@@ -183,7 +182,7 @@ class Bets extends System {
       switch (e.message) {
         case ERROR_ZERO_BET:
           sendMessage(global.translate('bets.zeroBet')
-            .replace(/\$pointsName/g, await Points.getPointsName(0)), opts.sender);
+            .replace(/\$pointsName/g, await global.systems.points.getPointsName(0)), opts.sender);
           break;
         case ERROR_NOT_RUNNING:
           sendMessage(global.translate('bets.notRunning'), opts.sender);
@@ -254,7 +253,7 @@ class Bets extends System {
       sendMessage(global.translate('bets.closed')
         .replace(/\$option/g, currentBet.options[index].name)
         .replace(/\$amount/g, _.filter(users, (o) => o.option === index).length)
-        .replace(/\$pointsName/g, await Points.getPointsName(total))
+        .replace(/\$pointsName/g, await global.systems.points.getPointsName(total))
         .replace(/\$points/g, total), opts.sender);
       await global.db.engine.remove(this.collection.data, { _id: currentBet._id.toString() });
     } catch (e) {

@@ -34,6 +34,7 @@ declare namespace NodeJS {
     panel: any;
     systems: {
       bets: import('../src/bot/systems/bets').Bets;
+      points: import('../src/bot/systems/points').Points;
       polls: import('../src/bot/systems/polls').Polls;
       scrim: import('../src/bot/systems/scrim').Scrim;
       top: import('../src/bot/systems/top').Top;

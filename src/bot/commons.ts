@@ -97,7 +97,7 @@ export function isIgnored(sender) {
  * @param translate Translation key
  * @param attr Attributes to replace { 'replaceKey': 'value' }
  */
-export async function prepare(translate: string, attr?: {[x: string]: string }): Promise<string> {
+export async function prepare(translate: string, attr?: {[x: string]: any }): Promise<string> {
   attr = attr || {};
   let msg = global.translate(translate);
   for (const key of Object.keys(attr).sort((a, b) => b.length - a.length)) {
