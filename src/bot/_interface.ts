@@ -349,7 +349,7 @@ class Module {
           socket.on('get.value', async (variable, cb) => {
             cb(null, await this[variable]);
           });
-          socket.on('settings.update', async (data, cb) => {
+          socket.on('settings.update', async (data: { [x: string]: { [y: string]: any } }, cb) => {
             try {
               for (const [key, value] of Object.entries(data)) {
                 if (key === 'enabled' && ['core', 'overlays', 'widgets'].includes(this._name)) { continue; } else if (key === '_permissions') {

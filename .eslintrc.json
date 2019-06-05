@@ -9,8 +9,9 @@
         "quotes": ["error", "single", { "allowTemplateLiterals": true }],
         "@typescript-eslint/camelcase": "off",
         "@typescript-eslint/no-explicit-any": "off",
-        "@typescript-eslint/explicit-function-return-type": 1,
-        "@typescript-eslint/no-use-before-define": 0
+        "@typescript-eslint/explicit-function-return-type": 0,
+        "@typescript-eslint/no-use-before-define": 0,
+        "@typescript-eslint/class-name-casing": 0
     },
     "parserOptions": {
       "ecmaFeatures": {
