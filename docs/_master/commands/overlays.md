@@ -101,6 +101,10 @@
   - How long will alert wait to be played
   - **Default value**: 0
   - **EXAMPLE:** `!alert type=audio url=https://www.myinstants.com/media/sounds/the-simpsons-nelsons-haha.mp3 delay=5000`
+- **volume**
+  - Set volume of video in percent
+  - **Default value**: *not set*
+  - **EXAMPLE:** `!alert type=audio url=https://www.myinstants.com/media/sounds/the-simpsons-nelsons-haha.mp3 volume=50`
 
 ## Video
 
@@ -141,6 +145,10 @@
   - Set Y offset of video in pixels
   - **Default value**: *not set*
   - **EXAMPLE:** `!alert type=video url=http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4 y-offset=100`
+- **volume**
+  - Set volume of video in percent
+  - **Default value**: *not set*
+  - **EXAMPLE:** `!alert type=video url=http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4 volume=50`
 
 ## Clip
 
@@ -178,6 +186,10 @@
   - Set Y offset of clip in pixels
   - **Default value**: *not set*
   - **EXAMPLE:** `!alert type=clip id=JollyDeliciousLyrebirdYee y-offset=100`
+- **volume**
+  - Set volume of video in percent
+  - **Default value**: *not set*
+  - **EXAMPLE:** `!alert type=clip id=JollyDeliciousLyrebirdYee volume=50`
 
 ## Iframe
 
