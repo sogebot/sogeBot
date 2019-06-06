@@ -3,7 +3,8 @@ import moment from 'moment';
 
 import { dateDiff, getLocalizedName, prepare, sendMessage } from '../commons';
 import { debug } from '../debug';
-import { command } from '../decorators';
+import { command, settings, ui } from '../decorators';
+import { onmessage } from '../decorators/on';
 import System from './_interface';
 
 /*
@@ -16,32 +17,21 @@ import System from './_interface';
  */
 
 class UserInfo extends System {
-  constructor() {
-    const options: InterfaceSettings = {
-      ui: {
-        me: {
-          format: {
-            type: 'sortable-list',
-            values: '_order',
-            toggle: '_formatDisabled',
-            toggleOnIcon: 'fa-eye',
-            toggleOffIcon: 'fa-eye-slash',
-          },
-        },
-      },
-      settings: {
-        me: {
-          _order: ['$sender', '$rank', '$watched', '$points', '$messages', '$tips'],
-          _formatDisabled: [],
-          formatSeparator: ' | ',
-        },
-      },
-      on: {
-        message: (e) => this.onMessage(e),
-      },
-    };
-    super(options);
-  }
+  @settings({ category: 'me' })
+  @ui({
+    type: 'sortable-list',
+    values: '_order',
+    toggle: '_formatDisabled',
+    toggleOnIcon: 'fa-eye',
+    toggleOffIcon: 'fa-eye-slash',
+  })
+  _order: string[] = ['$sender', '$rank', '$watched', '$points', '$messages', '$tips'];
+
+  @settings({ category: 'me' })
+  _formatDisabled: string[] = [];
+
+  @settings({ category: 'me' })
+  formatSeparator: string = ' | ';
 
   @command('!followage')
   protected async followage(opts: CommandOptions) {
@@ -212,8 +202,8 @@ class UserInfo extends System {
       const message: string[] = [];
 
       // build message
-      for (const i of this.settings.me._order) {
-        if (!this.settings.me._formatDisabled.includes(i)) {
+      for (const i of this._order) {
+        if (!this._formatDisabled.includes(i)) {
           message.push(i);
         }
       }
@@ -260,13 +250,14 @@ class UserInfo extends System {
         }
         message[idx] = `${Number(tipAmount).toFixed(2)}${global.currency.symbol(currency)}`;
       }
-      sendMessage(message.join(this.settings.me.formatSeparator), opts.sender);
+      sendMessage(message.join(this.formatSeparator), opts.sender);
     } catch (e) {
       global.log.error(e.stack);
     }
   }
 
-  private onMessage(opts: onEventMessage) {
+  @onmessage()
+  public onMessage(opts: onEventMessage) {
     if (!_.isNil(opts.sender) && !_.isNil(opts.sender.userId) && !_.isNil(opts.sender.username)) {
       global.users.setById(opts.sender.userId, {
         username: opts.sender.username,

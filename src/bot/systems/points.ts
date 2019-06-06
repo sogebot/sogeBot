@@ -51,7 +51,7 @@ class Points extends System {
   async updatePoints () {
     clearTimeout(this.timeouts['updatePoints'])
     if (!(await this.isEnabled())) {
-      this.timeouts['updatePoints'] = setTimeout(() => this.updatePoints(), 5000)
+      this.timeouts['updatePoints'] = global.setTimeout(() => this.updatePoints(), 5000)
       return
     }
 
@@ -90,7 +90,7 @@ class Points extends System {
       global.log.error(e)
       global.log.error(e.stack)
     } finally {
-      this.timeouts['updatePoints'] = setTimeout(() => this.updatePoints(), interval === 0 ? 60000 : interval)
+      this.timeouts['updatePoints'] = global.setTimeout(() => this.updatePoints(), interval === 0 ? 60000 : interval)
     }
   }
 

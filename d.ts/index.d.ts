@@ -49,7 +49,7 @@ declare namespace NodeJS {
     tmi: any;
     events: import('../src/bot/events').Events;
     widgets: any;
-    oauth: import("../src/bot/oauth").OAuth;
+    oauth: import('../src/bot/oauth').OAuth;
   }
 }
 
