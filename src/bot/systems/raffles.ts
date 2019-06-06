@@ -1,14 +1,12 @@
 'use strict';
 
-// 3rdparty libraries
 import * as _ from 'lodash';
 import { isMainThread } from 'worker_threads';
-// bot libraries
-import { permission } from '../permissions';
-import { parser, settings } from '../decorators';
-import { command, default_permission } from '../decorators';
-import System from './_interface';
+
 import { getOwner, prepare, sendMessage } from '../commons';
+import { command, default_permission, parser, settings } from '../decorators';
+import { permission } from '../permissions';
+import System from './_interface';
 
 const TYPE_NORMAL = 0;
 const TYPE_TICKETS = 1;

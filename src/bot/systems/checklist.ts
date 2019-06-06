@@ -1,7 +1,6 @@
-// bot libraries
-import System from './_interface';
 import { settings, ui } from '../decorators';
 import { onStreamEnd } from '../decorators/on';
+import System from './_interface';
 
 class Checklist extends System {
   @settings({ category: 'checklist' })

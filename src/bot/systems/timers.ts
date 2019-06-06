@@ -1,15 +1,13 @@
 'use strict';
 
-// 3rdparty libraries
-import * as _ from 'lodash';
 import crypto from 'crypto';
+import * as _ from 'lodash';
 import { isMainThread } from 'worker_threads';
 
-// bot libraries
+import { getOwner, sendMessage } from '../commons';
+import { command, default_permission } from '../decorators';
 import { permission } from '../permissions';
 import System from './_interface';
-import { command, default_permission } from '../decorators';
-import { sendMessage, getOwner } from '../commons';
 
 /*
  * !timers                                                                                                                      - gets an info about timers usage

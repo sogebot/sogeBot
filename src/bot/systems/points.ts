@@ -1,15 +1,13 @@
 'use strict';
 
-// 3rdparty libraries
 import * as _ from 'lodash';
 import { isMainThread } from 'worker_threads';
 
-// bot libraries
-import { permission } from '../permissions';
+import { isBot, prepare, sendMessage } from '../commons';
 import { command, default_permission, parser, settings } from '../decorators';
-import { isBot, sendMessage, prepare } from '../commons';
-import System from './_interface';
 import Expects from '../expects';
+import { permission } from '../permissions';
+import System from './_interface';
 
 class Points extends System {
   @settings({ category: 'points' })

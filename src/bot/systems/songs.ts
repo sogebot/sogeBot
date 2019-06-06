@@ -1,15 +1,14 @@
-// 3rdparty libraries
+import { YouTube } from 'better-youtube-api';
 import * as _ from 'lodash';
+import { isMainThread } from 'worker_threads';
+import ytsearch from 'youtube-search';
 import ytdl from 'ytdl-core';
 import ytpl from 'ytpl';
-import ytsearch from 'youtube-search';
-import { YouTube } from 'better-youtube-api';
-import { isMainThread } from 'worker_threads';
-// bot libraries
+
+import { prepare, sendMessage, timeout } from '../commons';
+import { command, default_permission, settings, shared, ui } from '../decorators';
 import { permission } from '../permissions';
-import { command, default_permission, settings, ui, shared } from '../decorators';
 import System from './_interface';
-import { sendMessage, prepare, timeout } from '../commons';
 
 class Songs extends System {
   youtubeApi = new YouTube('AIzaSyDYevtuLOxbyqBjh17JNZNvSQO854sngK0');

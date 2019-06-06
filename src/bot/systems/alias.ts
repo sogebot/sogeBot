@@ -1,17 +1,14 @@
 'use strict';
 
-// 3rdparty libraries
 import * as _ from 'lodash';
 
-// bot libraries
-import * as Parser from '../parser';
-import Message from '../message';
 import { prepare, sendMessage } from '../commons';
-import { command, default_permission } from '../decorators';
+import { command, default_permission, parser } from '../decorators';
 import Expects from '../expects';
-import System from './_interface';
-import { parser } from '../decorators';
+import Message from '../message';
+import * as Parser from '../parser';
 import { permission } from '../permissions';
+import System from './_interface';
 
 /*
  * !alias                                              - gets an info about alias usage

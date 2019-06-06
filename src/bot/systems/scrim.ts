@@ -3,7 +3,7 @@ import { isMainThread } from 'worker_threads';
 import { getLocalizedName, getOwner, prepare, round5, sendMessage } from '../commons';
 import constants from '../constants';
 import { debug } from '../debug';
-import { command, default_permission, shared, settings } from '../decorators';
+import { command, default_permission, settings, shared } from '../decorators';
 import Expects from '../expects.js';
 import { permission } from '../permissions';
 import System from './_interface';

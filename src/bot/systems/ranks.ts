@@ -1,13 +1,11 @@
 'use strict';
 
-// 3rdparty libraries
 import * as _ from 'lodash';
 
-// bot libraries
-import { permission } from '../permissions';
+import { prepare, sendMessage } from '../commons';
 import { command, default_permission } from '../decorators';
+import { permission } from '../permissions';
 import System from './_interface';
-import { sendMessage, prepare } from '../commons';
 
 /*
  * !rank                       - show user rank

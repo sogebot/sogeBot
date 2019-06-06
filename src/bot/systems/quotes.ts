@@ -1,12 +1,12 @@
-// 3rdparty libraries
 import * as _ from 'lodash';
-import System from './_interface';
-import { permission } from '../permissions';
-import { default_permission, settings, command } from '../decorators';
 
-import Expects from '../expects';
 import config from '@config';
-import { sendMessage, prepare } from '../commons';
+
+import { prepare, sendMessage } from '../commons';
+import { command, default_permission, settings } from '../decorators';
+import Expects from '../expects';
+import { permission } from '../permissions';
+import System from './_interface';
 
 interface Quote {
   quotedBy: string; id: string; quote: string; tags: string;
