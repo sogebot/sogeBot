@@ -39,6 +39,7 @@ declare namespace NodeJS {
       checklist: import('../src/bot/systems/checklist').Checklist;
       points: import('../src/bot/systems/points').Points;
       polls: import('../src/bot/systems/polls').Polls;
+      raffles: import('../src/bot/systems/raffles').Raffles;
       ranks: import('../src/bot/systems/ranks').Ranks;
       scrim: import('../src/bot/systems/scrim').Scrim;
       songs: import('../src/bot/systems/songs').Songs;
