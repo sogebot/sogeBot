@@ -144,4 +144,5 @@ class Keywords extends System {
   }
 }
 
-module.exports = new Keywords();
+export default Keywords;
+export { Keywords };
