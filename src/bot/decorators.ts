@@ -22,7 +22,7 @@ export function ui(opts) {
 }
 
 export function settings(opts: {
-  category?: string,
+  category?: string;
 } = {}) {
   const { name, type } = getNameAndTypeFromStackTrace();
 
@@ -117,10 +117,10 @@ export function shared() {
 }
 
 export function parser(opts: {
-  fireAndForget?: boolean,
-  permission?: string,
-  priority?: number,
-  dependsOn?: string[],
+  fireAndForget?: boolean;
+  permission?: string;
+  priority?: number;
+  dependsOn?: string[];
 }) {
   opts = opts || {};
   const { name, type } = getNameAndTypeFromStackTrace();

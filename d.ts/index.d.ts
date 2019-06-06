@@ -1,6 +1,6 @@
 declare module '*.vue' {
-  import Vue from 'vue'
-  export default Vue
+  import Vue from 'vue';
+  export default Vue;
 }
 
 declare namespace NodeJS {
@@ -34,10 +34,12 @@ declare namespace NodeJS {
     currency: any;
     panel: any;
     systems: {
+      alias: import('../src/bot/systems/alias').Alias;
       bets: import('../src/bot/systems/bets').Bets;
       points: import('../src/bot/systems/points').Points;
       polls: import('../src/bot/systems/polls').Polls;
       scrim: import('../src/bot/systems/scrim').Scrim;
+      songs: import('../src/bot/systems/songs').Songs;
       top: import('../src/bot/systems/top').Top;
       timers: import('../src/bot/systems/timers').Timers;
       userinfo: import('../src/bot/systems/userinfo').UserInfo;

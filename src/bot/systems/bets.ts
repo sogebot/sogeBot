@@ -32,7 +32,7 @@ class Bets extends System {
 
   @settings()
   @ui({ type: 'number-input', step: 1, min: 0, max: 100 })
-  public betPercentGain: number = 20
+  public betPercentGain: number = 20;
 
   constructor() {
     super();

@@ -78,7 +78,7 @@ class Module {
     this._indexDbs();
     setTimeout(() => {
       this._status();
-    }, 1000)
+    }, 1000);
   }
 
   public sockets() {

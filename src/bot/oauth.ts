@@ -8,7 +8,7 @@ import { onchange } from './decorators/on';
 
 class OAuth extends Core {
   @shared()
-  public cache: { bot: string, broadcaster: string } = { bot: '', broadcaster: '' };
+  public cache: { bot: string; broadcaster: string } = { bot: '', broadcaster: '' };
   @shared()
   public currentChannel: string = '';
   @shared()

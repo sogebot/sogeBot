@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 
 // 3rdparty libraries
 import * as _ from 'lodash';
@@ -7,7 +7,7 @@ import { isMainThread } from 'worker_threads';
 
 // bot libraries
 import { permission } from '../permissions';
-import System from './_interface'
+import System from './_interface';
 import { command, default_permission } from '../decorators';
 import { sendMessage, getOwner } from '../commons';
 
@@ -25,10 +25,10 @@ import { sendMessage, getOwner } from '../commons';
 
 class Timers extends System {
   constructor () {
-    super()
+    super();
 
-    this.addMenu({ category: 'manage', name: 'timers', id: 'timers/list' })
-    if (isMainThread) this.init()
+    this.addMenu({ category: 'manage', name: 'timers', id: 'timers/list' });
+    if (isMainThread) {this.init();}
   }
 
   sockets () {
@@ -41,26 +41,26 @@ class Timers extends System {
         let [timers, responses] = await Promise.all([
           global.db.engine.find(this.collection.data),
           global.db.engine.find(this.collection.responses)
-        ])
-        callback(null, { timers: timers, responses: responses })
-      })
+        ]);
+        callback(null, { timers: timers, responses: responses });
+      });
       socket.on('findOne.timer', async (opts, callback) => {
         let [timer, responses] = await Promise.all([
           global.db.engine.findOne(this.collection.data, { _id: opts._id }),
           global.db.engine.find(this.collection.responses, { timerId: opts._id })
-        ])
-        callback(null, { timer: timer, responses: responses })
-      })
+        ]);
+        callback(null, { timer: timer, responses: responses });
+      });
       socket.on('delete.timer', async (_id, callback) => {
         await Promise.all([
           global.db.engine.remove(this.collection.data, { _id }),
           global.db.engine.remove(this.collection.responses, { timerId: _id })
-        ])
-        callback(null)
-      })
+        ]);
+        callback(null);
+      });
       socket.on('update.timer', async (data, callback) => {
-        const name = data.timer.name && data.timer.name.trim().length ? data.timer.name.replace(/ /g, '_') : crypto.createHash('md5').update(new Date().getTime().toString()).digest('hex').slice(0, 5)
-        _.remove(data.responses, (o: any) => o.response.trim().length === 0)
+        const name = data.timer.name && data.timer.name.trim().length ? data.timer.name.replace(/ /g, '_') : crypto.createHash('md5').update(new Date().getTime().toString()).digest('hex').slice(0, 5);
+        _.remove(data.responses, (o: any) => o.response.trim().length === 0);
 
         const timer = {
           _id: data.timer._id,
@@ -72,35 +72,35 @@ class Timers extends System {
             messages: 0,
             timestamp: new Date().getTime()
           }
-        }
-        if (_.isNil(data.timer._id)) data.timer._id = String((await global.db.engine.insert(this.collection.data, timer))._id)
+        };
+        if (_.isNil(data.timer._id)) {data.timer._id = String((await global.db.engine.insert(this.collection.data, timer))._id);}
         else {
           await Promise.all([
             global.db.engine.update(this.collection.data, { _id: data.timer._id }, timer),
             global.db.engine.remove(this.collection.responses, { timerId: data.timer._id })
-          ])
+          ]);
         }
 
-        var insertArray: any[] = []
+        var insertArray: any[] = [];
         for (let response of data.responses) {
           insertArray.push(global.db.engine.insert(this.collection.responses, {
             timerId: data.timer._id,
             response: response.response,
             enabled: response.enabled,
             timestamp: 0
-          }))
+          }));
         }
-        await Promise.all(insertArray)
+        await Promise.all(insertArray);
         callback(null, {
           timer: await global.db.engine.findOne(this.collection.data, { _id: data.timer._id }),
           responses: await global.db.engine.find(this.collection.responses, { timerId: data.timer._id })
-        })
-      })
-    })
+        });
+      });
+    });
   }
 
   async send (self, socket) {
-    socket.emit(this.collection.data, { timers: await global.db.engine.find(this.collection.data), responses: await global.db.engine.find(this.collection.responses) })
+    socket.emit(this.collection.data, { timers: await global.db.engine.find(this.collection.data), responses: await global.db.engine.find(this.collection.responses) });
   }
 
   @command('!timers')
@@ -114,228 +114,228 @@ class Timers extends System {
       this.getCommand('!timers rm'),
       this.getCommand('!timers toggle'),
       this.getCommand('!timers list')
-    ]
-    sendMessage('╔ ' + global.translate('core.usage'), opts.sender)
-    sendMessage(`║ ${main} - gets an info about timers usage`, opts.sender)
-    sendMessage(`║ ${set} -name [name-of-timer] -messages [num-of-msgs-to-trigger|default:0] -seconds [trigger-every-x-seconds|default:60] - add new timer`, opts.sender)
-    sendMessage(`║ ${unset} -name [name-of-timer] - remove timer`, opts.sender)
-    sendMessage(`║ ${add} -name [name-of-timer] -response '[response]' - add new response to timer`, opts.sender)
-    sendMessage(`║ ${rm} -id [response-id] - remove response by id`, opts.sender)
-    sendMessage(`║ ${toggle} -name [name-of-timer] - enable/disable timer by name`, opts.sender)
-    sendMessage(`║ ${toggle} -id [id-of-response] - enable/disable response by id`, opts.sender)
-    sendMessage(`║ ${list} - get timers list`, opts.sender)
-    sendMessage(`╚ ${list} -name [name-of-timer] - get list of responses on timer`, opts.sender)
+    ];
+    sendMessage('╔ ' + global.translate('core.usage'), opts.sender);
+    sendMessage(`║ ${main} - gets an info about timers usage`, opts.sender);
+    sendMessage(`║ ${set} -name [name-of-timer] -messages [num-of-msgs-to-trigger|default:0] -seconds [trigger-every-x-seconds|default:60] - add new timer`, opts.sender);
+    sendMessage(`║ ${unset} -name [name-of-timer] - remove timer`, opts.sender);
+    sendMessage(`║ ${add} -name [name-of-timer] -response '[response]' - add new response to timer`, opts.sender);
+    sendMessage(`║ ${rm} -id [response-id] - remove response by id`, opts.sender);
+    sendMessage(`║ ${toggle} -name [name-of-timer] - enable/disable timer by name`, opts.sender);
+    sendMessage(`║ ${toggle} -id [id-of-response] - enable/disable response by id`, opts.sender);
+    sendMessage(`║ ${list} - get timers list`, opts.sender);
+    sendMessage(`╚ ${list} -name [name-of-timer] - get list of responses on timer`, opts.sender);
   }
 
   async init () {
-    let timers = await global.db.engine.find(this.collection.data)
-    for (let timer of timers) await global.db.engine.update(this.collection.data, { _id: timer._id.toString() }, { trigger: { messages: 0, timestamp: new Date().getTime() } })
-    this.check()
+    let timers = await global.db.engine.find(this.collection.data);
+    for (let timer of timers) {await global.db.engine.update(this.collection.data, { _id: timer._id.toString() }, { trigger: { messages: 0, timestamp: new Date().getTime() } });}
+    this.check();
   }
 
   async check () {
-    clearTimeout(this.timeouts['timersCheck'])
+    clearTimeout(this.timeouts['timersCheck']);
 
-    let timers = await global.db.engine.find(this.collection.data, { enabled: true })
+    let timers = await global.db.engine.find(this.collection.data, { enabled: true });
     for (let timer of timers) {
-      if (timer.messages > 0 && timer.trigger.messages - global.linesParsed + timer.messages > 0) continue // not ready to trigger with messages
-      if (timer.seconds > 0 && new Date().getTime() - timer.trigger.timestamp < timer.seconds * 1000) continue // not ready to trigger with seconds
+      if (timer.messages > 0 && timer.trigger.messages - global.linesParsed + timer.messages > 0) {continue;} // not ready to trigger with messages
+      if (timer.seconds > 0 && new Date().getTime() - timer.trigger.timestamp < timer.seconds * 1000) {continue;} // not ready to trigger with seconds
 
-      let responses = await global.db.engine.find(this.collection.responses, { timerId: timer._id.toString(), enabled: true })
-      let response = _.orderBy(responses, 'timestamp', 'asc')[0]
+      let responses = await global.db.engine.find(this.collection.responses, { timerId: timer._id.toString(), enabled: true });
+      let response = _.orderBy(responses, 'timestamp', 'asc')[0];
 
       if (!_.isNil(response)) {
-        sendMessage(response.response, getOwner())
-        await global.db.engine.update(this.collection.responses, { _id: response._id }, { timestamp: new Date().getTime() })
+        sendMessage(response.response, getOwner());
+        await global.db.engine.update(this.collection.responses, { _id: response._id }, { timestamp: new Date().getTime() });
       }
-      await global.db.engine.update(this.collection.data, { _id: timer._id.toString() }, { trigger: { messages: global.linesParsed, timestamp: new Date().getTime() } })
+      await global.db.engine.update(this.collection.data, { _id: timer._id.toString() }, { trigger: { messages: global.linesParsed, timestamp: new Date().getTime() } });
     }
-    this.timeouts['timersCheck'] = setTimeout(() => this.check(), 1000) // this will run check 1s after full check is correctly done
+    this.timeouts['timersCheck'] = setTimeout(() => this.check(), 1000); // this will run check 1s after full check is correctly done
   }
 
   async editName (self, socket, data) {
-    if (data.value.length === 0) await self.unset(self, null, `-name ${data.id}`)
+    if (data.value.length === 0) {await self.unset(self, null, `-name ${data.id}`);}
     else {
-      let name = data.value.match(/([a-zA-Z0-9_]+)/)
-      if (_.isNil(name)) return
-      await global.db.engine.update(this.collection.data, { name: data.id.toString() }, { name: name[0] })
+      let name = data.value.match(/([a-zA-Z0-9_]+)/);
+      if (_.isNil(name)) {return;}
+      await global.db.engine.update(this.collection.data, { name: data.id.toString() }, { name: name[0] });
     }
   }
 
   async editResponse (self, socket, data) {
-    if (data.value.length === 0) await self.rm(self, null, `-id ${data.id}`)
-    else global.db.engine.update(this.collection.responses, { _id: data.id }, { response: data.value })
+    if (data.value.length === 0) {await self.rm(self, null, `-id ${data.id}`);}
+    else {global.db.engine.update(this.collection.responses, { _id: data.id }, { response: data.value });}
   }
 
   @command('!timers set')
   @default_permission(permission.CASTERS)
   async set (opts) {
     // -name [name-of-timer] -messages [num-of-msgs-to-trigger|default:0] -seconds [trigger-every-x-seconds|default:60]
-    let name = opts.parameters.match(/-name ([a-zA-Z0-9_]+)/)
-    let messages = opts.parameters.match(/-messages ([0-9]+)/)
-    let seconds = opts.parameters.match(/-seconds ([0-9]+)/)
+    let name = opts.parameters.match(/-name ([a-zA-Z0-9_]+)/);
+    let messages = opts.parameters.match(/-messages ([0-9]+)/);
+    let seconds = opts.parameters.match(/-seconds ([0-9]+)/);
 
     if (_.isNil(name)) {
-      sendMessage(global.translate('timers.name-must-be-defined'), opts.sender)
-      return false
+      sendMessage(global.translate('timers.name-must-be-defined'), opts.sender);
+      return false;
     } else {
-      name = name[1]
+      name = name[1];
     }
 
-    messages = _.isNil(messages) ? 0 : parseInt(messages[1], 10)
-    seconds = _.isNil(seconds) ? 60 : parseInt(seconds[1], 10)
+    messages = _.isNil(messages) ? 0 : parseInt(messages[1], 10);
+    seconds = _.isNil(seconds) ? 60 : parseInt(seconds[1], 10);
 
     if (messages === 0 && seconds === 0) {
-      sendMessage(global.translate('timers.cannot-set-messages-and-seconds-0'), opts.sender)
-      return false
+      sendMessage(global.translate('timers.cannot-set-messages-and-seconds-0'), opts.sender);
+      return false;
     }
-    await global.db.engine.update(this.collection.data, { name: name }, { name: name, messages: messages, seconds: seconds, enabled: true, trigger: { messages: global.linesParsed, timestamp: new Date().getTime() } })
+    await global.db.engine.update(this.collection.data, { name: name }, { name: name, messages: messages, seconds: seconds, enabled: true, trigger: { messages: global.linesParsed, timestamp: new Date().getTime() } });
     sendMessage(global.translate('timers.timer-was-set')
       .replace(/\$name/g, name)
       .replace(/\$messages/g, messages)
-      .replace(/\$seconds/g, seconds), opts.sender)
+      .replace(/\$seconds/g, seconds), opts.sender);
   }
 
   @command('!timers unset')
   @default_permission(permission.CASTERS)
   async unset (opts) {
     // -name [name-of-timer]
-    let name = opts.parameters.match(/-name ([\S]+)/)
+    let name = opts.parameters.match(/-name ([\S]+)/);
 
     if (_.isNil(name)) {
-      sendMessage(global.translate('timers.name-must-be-defined'), opts.sender)
-      return false
+      sendMessage(global.translate('timers.name-must-be-defined'), opts.sender);
+      return false;
     } else {
-      name = name[1]
+      name = name[1];
     }
 
-    let timer = await global.db.engine.findOne(this.collection.data, { name: name })
+    let timer = await global.db.engine.findOne(this.collection.data, { name: name });
     if (_.isEmpty(timer)) {
-      sendMessage(global.translate('timers.timer-not-found').replace(/\$name/g, name), opts.sender)
-      return false
+      sendMessage(global.translate('timers.timer-not-found').replace(/\$name/g, name), opts.sender);
+      return false;
     }
 
-    await global.db.engine.remove(this.collection.data, { name: name })
-    await global.db.engine.remove(this.collection.responses, { timerId: timer._id.toString() })
+    await global.db.engine.remove(this.collection.data, { name: name });
+    await global.db.engine.remove(this.collection.responses, { timerId: timer._id.toString() });
     sendMessage(global.translate('timers.timer-deleted')
-      .replace(/\$name/g, name), opts.sender)
+      .replace(/\$name/g, name), opts.sender);
   }
 
   @command('!timers rm')
   @default_permission(permission.CASTERS)
   async rm (opts) {
     // -id [id-of-response]
-    let id = opts.parameters.match(/-id ([a-zA-Z0-9]+)/)
+    let id = opts.parameters.match(/-id ([a-zA-Z0-9]+)/);
 
     if (_.isNil(id)) {
-      sendMessage(global.translate('timers.id-must-be-defined'), opts.sender)
-      return false
+      sendMessage(global.translate('timers.id-must-be-defined'), opts.sender);
+      return false;
     } else {
-      id = id[1]
+      id = id[1];
     }
 
-    await global.db.engine.remove(this.collection.responses, { _id: id })
+    await global.db.engine.remove(this.collection.responses, { _id: id });
     sendMessage(global.translate('timers.response-deleted')
-      .replace(/\$id/g, id), opts.sender)
+      .replace(/\$id/g, id), opts.sender);
   }
 
   @command('!timers add')
   @default_permission(permission.CASTERS)
   async add (opts) {
     // -name [name-of-timer] -response '[response]'
-    let name = opts.parameters.match(/-name ([\S]+)/)
-    let response = opts.parameters.match(/-response ['"](.+)['"]/)
+    let name = opts.parameters.match(/-name ([\S]+)/);
+    let response = opts.parameters.match(/-response ['"](.+)['"]/);
 
     if (_.isNil(name)) {
-      sendMessage(global.translate('timers.name-must-be-defined'), opts.sender)
-      return false
+      sendMessage(global.translate('timers.name-must-be-defined'), opts.sender);
+      return false;
     } else {
-      name = name[1]
+      name = name[1];
     }
 
     if (_.isNil(response)) {
-      sendMessage(global.translate('timers.response-must-be-defined'), opts.sender)
-      return false
+      sendMessage(global.translate('timers.response-must-be-defined'), opts.sender);
+      return false;
     } else {
-      response = response[1]
+      response = response[1];
     }
-    let timer = await global.db.engine.findOne(this.collection.data, { name: name })
+    let timer = await global.db.engine.findOne(this.collection.data, { name: name });
     if (_.isEmpty(timer)) {
       sendMessage(global.translate('timers.timer-not-found')
-        .replace(/\$name/g, name), opts.sender)
-      return false
+        .replace(/\$name/g, name), opts.sender);
+      return false;
     }
 
-    let item = await global.db.engine.insert(this.collection.responses, { response: response, timestamp: new Date().getTime(), enabled: true, timerId: timer._id.toString() })
+    let item = await global.db.engine.insert(this.collection.responses, { response: response, timestamp: new Date().getTime(), enabled: true, timerId: timer._id.toString() });
     sendMessage(global.translate('timers.response-was-added')
       .replace(/\$id/g, item._id)
       .replace(/\$name/g, name)
-      .replace(/\$response/g, response), opts.sender)
+      .replace(/\$response/g, response), opts.sender);
   }
 
   @command('!timers list')
   @default_permission(permission.CASTERS)
   async list (opts) {
     // !timers list -name [name-of-timer]
-    let name = opts.parameters.match(/-name ([\S]+)/)
+    let name = opts.parameters.match(/-name ([\S]+)/);
 
     if (_.isNil(name)) {
-      let timers = await global.db.engine.find(this.collection.data)
-      sendMessage(global.translate('timers.timers-list').replace(/\$list/g, _.map(_.orderBy(timers, 'name'), (o) => (o.enabled ? '⚫' : '⚪') + ' ' + o.name).join(', ')), opts.sender)
-      return true
-    } else { name = name[1] }
+      let timers = await global.db.engine.find(this.collection.data);
+      sendMessage(global.translate('timers.timers-list').replace(/\$list/g, _.map(_.orderBy(timers, 'name'), (o) => (o.enabled ? '⚫' : '⚪') + ' ' + o.name).join(', ')), opts.sender);
+      return true;
+    } else { name = name[1]; }
 
-    let timer = await global.db.engine.findOne(this.collection.data, { name: name })
+    let timer = await global.db.engine.findOne(this.collection.data, { name: name });
     if (_.isEmpty(timer)) {
       sendMessage(global.translate('timers.timer-not-found')
-        .replace(/\$name/g, name), opts.sender)
-      return false
+        .replace(/\$name/g, name), opts.sender);
+      return false;
     }
 
-    let responses = await global.db.engine.find(this.collection.responses, { timerId: timer._id.toString() })
-    await sendMessage(global.translate('timers.responses-list').replace(/\$name/g, name), opts.sender)
-    for (let response of responses) await sendMessage((response.enabled ? '⚫ ' : '⚪ ') + `${response._id} - ${response.response}`, opts.sender)
-    return true
+    let responses = await global.db.engine.find(this.collection.responses, { timerId: timer._id.toString() });
+    await sendMessage(global.translate('timers.responses-list').replace(/\$name/g, name), opts.sender);
+    for (let response of responses) {await sendMessage((response.enabled ? '⚫ ' : '⚪ ') + `${response._id} - ${response.response}`, opts.sender);}
+    return true;
   }
 
   @command('!timers toggle')
   @default_permission(permission.CASTERS)
   async toggle (opts) {
     // -name [name-of-timer] or -id [id-of-response]
-    let id = opts.parameters.match(/-id ([a-zA-Z0-9]+)/)
-    let name = opts.parameters.match(/-name ([\S]+)/)
+    let id = opts.parameters.match(/-id ([a-zA-Z0-9]+)/);
+    let name = opts.parameters.match(/-name ([\S]+)/);
 
     if ((_.isNil(id) && _.isNil(name)) || (!_.isNil(id) && !_.isNil(name))) {
-      sendMessage(global.translate('timers.id-or-name-must-be-defined'), opts.sender)
-      return false
+      sendMessage(global.translate('timers.id-or-name-must-be-defined'), opts.sender);
+      return false;
     }
 
     if (!_.isNil(id)) {
-      id = id[1]
-      let response = await global.db.engine.findOne(this.collection.responses, { _id: id })
+      id = id[1];
+      let response = await global.db.engine.findOne(this.collection.responses, { _id: id });
       if (_.isEmpty(response)) {
-        sendMessage(global.translate('timers.response-not-found').replace(/\$id/g, id), opts.sender)
-        return false
+        sendMessage(global.translate('timers.response-not-found').replace(/\$id/g, id), opts.sender);
+        return false;
       }
 
-      await global.db.engine.update(this.collection.responses, { _id: id }, { enabled: !response.enabled })
+      await global.db.engine.update(this.collection.responses, { _id: id }, { enabled: !response.enabled });
       sendMessage(global.translate(!response.enabled ? 'timers.response-enabled' : 'timers.response-disabled')
-        .replace(/\$id/g, id), opts.sender)
-      return true
+        .replace(/\$id/g, id), opts.sender);
+      return true;
     }
 
     if (!_.isNil(name)) {
-      name = name[1]
-      let timer = await global.db.engine.findOne(this.collection.data, { name: name })
+      name = name[1];
+      let timer = await global.db.engine.findOne(this.collection.data, { name: name });
       if (_.isEmpty(timer)) {
-        sendMessage(global.translate('timers.timer-not-found').replace(/\$name/g, name), opts.sender)
-        return false
+        sendMessage(global.translate('timers.timer-not-found').replace(/\$name/g, name), opts.sender);
+        return false;
       }
 
-      await global.db.engine.update(this.collection.data, { name: name }, { enabled: !timer.enabled })
+      await global.db.engine.update(this.collection.data, { name: name }, { enabled: !timer.enabled });
       sendMessage(global.translate(!timer.enabled ? 'timers.timer-enabled' : 'timers.timer-disabled')
-        .replace(/\$name/g, name), opts.sender)
-      return true
+        .replace(/\$name/g, name), opts.sender);
+      return true;
     }
   }
 }
