@@ -5,7 +5,7 @@ import { get, isBoolean, isFinite, isNil, isNumber, isString, map, set } from 'l
 import Core from './_interface';
 import { sendMessage } from './commons';
 import { command, default_permission, settings, ui } from './decorators';
-import { onchange, onLoad } from './decorators/on';
+import { onChange, onLoad } from './decorators/on';
 import { permission } from './permissions';
 
 class General extends Core {

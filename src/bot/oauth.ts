@@ -4,7 +4,7 @@ import { isMainThread } from 'worker_threads';
 import Core from './_interface';
 import constants from './constants';
 import { settings, shared, ui } from './decorators';
-import { onchange } from './decorators/on';
+import { onChange } from './decorators/on';
 
 class OAuth extends Core {
   @shared()
