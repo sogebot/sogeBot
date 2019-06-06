@@ -3,7 +3,7 @@ import { isMainThread } from 'worker_threads';
 import { getLocalizedName, getOwner, prepare, round5, sendMessage } from '../commons';
 import constants from '../constants';
 import { debug } from '../debug';
-import { command, default_permission } from '../decorators';
+import { command, default_permission, shared, settings } from '../decorators';
 import Expects from '../expects.js';
 import { permission } from '../permissions';
 import System from './_interface';
@@ -20,26 +20,23 @@ enum ERROR {
  */
 
 class Scrim extends System {
-  private cleanedUpOnStart: boolean;
+  private cleanedUpOnStart: boolean = false;
+
+  @shared()
+  closingAt: number = 0;
+  @shared()
+  type: string = '';
+  @shared()
+  lastRemindAt: number = Date.now();
+  @shared()
+  isCooldownOnly: boolean = false;
+
+  @settings({ category: 'time' })
+  waitForMatchIdsInSeconds: number = 60;
+
 
   constructor() {
-    const options: InterfaceSettings = {
-      settings: {
-        _: {
-          closingAt: 0,
-          type: '',
-          lastRemindAt: Date.now(),
-          isCooldownOnly: false,
-        },
-        time: {
-          waitForMatchIdsInSeconds: 60,
-        },
-      },
-    };
-
-    super(options);
-
-    this.cleanedUpOnStart = false;
+    super();
 
     if (isMainThread) {
       setInterval(() => this.reminder(), 1000);
@@ -55,7 +52,7 @@ class Scrim extends System {
         .string({name: 'type'})
         .number({name: 'minutes'})
         .toArray();
-      if (this.settings._.closingAt !== 0) {
+      if (this.closingAt !== 0) {
         throw Error(String(ERROR.ALREADY_OPENED));
       }  // ignore if its already opened
       if (minutes === 0) {
@@ -66,11 +63,11 @@ class Scrim extends System {
 
       const now = Date.now();
 
-      this.settings._.closingAt = now + (minutes * constants.MINUTE);
-      this.settings._.type = type;
-      this.settings._.isCooldownOnly = isCooldownOnly;
+      this.closingAt = now + (minutes * constants.MINUTE);
+      this.type = type;
+      this.isCooldownOnly = isCooldownOnly;
 
-      this.settings._.lastRemindAt = now;
+      this.lastRemindAt = now;
       await global.db.engine.remove(this.collection.matchIds, {});
 
       sendMessage(
@@ -107,8 +104,8 @@ class Scrim extends System {
   @command('!scrim stop')
   @default_permission(permission.CASTERS)
   public async stop(): Promise<void> {
-    this.settings._.closingAt = 0;
-    this.settings._lastRemindAt = Date.now();
+    this.closingAt = 0;
+    this.lastRemindAt = Date.now();
 
     sendMessage(
       prepare('systems.scrim.stopped'), { username: getOwner() },
@@ -118,41 +115,41 @@ class Scrim extends System {
   private async reminder() {
     if (!this.cleanedUpOnStart) {
       this.cleanedUpOnStart = true;
-      this.settings._.closingAt = 0;
-    } else if (this.settings._.closingAt !== 0) {
-      const lastRemindAtDiffMs = -(this.settings._.lastRemindAt - Date.now());
+      this.closingAt = 0;
+    } else if (this.closingAt !== 0) {
+      const lastRemindAtDiffMs = -(this.lastRemindAt - Date.now());
 
-      const minutesToGo = (this.settings._.closingAt - Date.now()) / constants.MINUTE;
-      const secondsToGo = round5((this.settings._.closingAt - Date.now()) / constants.SECOND);
+      const minutesToGo = (this.closingAt - Date.now()) / constants.MINUTE;
+      const secondsToGo = round5((this.closingAt - Date.now()) / constants.SECOND);
 
       if (minutesToGo > 1) {
         // countdown every minute
         if (lastRemindAtDiffMs >= constants.MINUTE) {
           sendMessage(
             prepare('systems.scrim.countdown', {
-              type: this.settings._.type,
+              type: this.type,
               time: minutesToGo.toFixed(),
               unit: getLocalizedName(minutesToGo.toFixed(), 'core.minutes'),
             }),
             { username: getOwner() },
           );
-          this.settings._.lastRemindAt = Date.now();
+          this.lastRemindAt = Date.now();
         }
       } else if (secondsToGo <= 60 && secondsToGo > 0) {
         // countdown every 15s
         if (lastRemindAtDiffMs >= 15 * constants.SECOND) {
           sendMessage(
             prepare('systems.scrim.countdown', {
-              type: this.settings._.type,
+              type: this.type,
               time: String(secondsToGo === 60 ? 1 : secondsToGo),
               unit: secondsToGo === 60 ? getLocalizedName(1, 'core.minutes') : getLocalizedName(secondsToGo, 'core.seconds'),
             }),
             { username: getOwner() },
           );
-          this.settings._.lastRemindAt = Date.now();
+          this.lastRemindAt = Date.now();
         }
       } else {
-        this.settings._.closingAt = 0;
+        this.closingAt = 0;
         this.countdown();
       }
     }
@@ -189,18 +186,18 @@ class Scrim extends System {
         if (i < 3) {
           sendMessage(
             prepare('systems.scrim.countdown', {
-              type: this.settings._.type,
+              type: this.type,
               time: (3 - i) + '.',
               unit: '',
             }),
             { username: getOwner() },
           );
         } else {
-          this.settings._.closingAt = 0;
+          this.closingAt = 0;
           sendMessage(prepare('systems.scrim.go'), { username: getOwner() });
-          if (!this.settings._.isCooldownOnly) {
+          if (!this.isCooldownOnly) {
             setTimeout(() => {
-              if (this.settings._.closingAt !== 0) {
+              if (this.closingAt !== 0) {
                 return; // user restarted !snipe
               }
               sendMessage(
@@ -210,11 +207,11 @@ class Scrim extends System {
                 { username: getOwner() },
               );
               setTimeout(async () => {
-                if (this.settings._.closingAt !== 0) {
+                if (this.closingAt !== 0) {
                   return; // user restarted !snipe
                 }
                 this.currentMatches();
-              }, this.settings.time.waitForMatchIdsInSeconds * constants.SECOND);
+              }, this.waitForMatchIdsInSeconds * constants.SECOND);
             }, 15 * constants.SECOND);
           }
         }
