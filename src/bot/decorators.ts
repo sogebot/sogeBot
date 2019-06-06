@@ -116,7 +116,7 @@ export function shared() {
   };
 }
 
-export function parser(opts: {
+export function parser(opts?: {
   fireAndForget?: boolean;
   permission?: string;
   priority?: number;
