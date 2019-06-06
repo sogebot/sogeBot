@@ -36,6 +36,7 @@ declare namespace NodeJS {
     systems: {
       alias: import('../src/bot/systems/alias').Alias;
       bets: import('../src/bot/systems/bets').Bets;
+      checklist: import('../src/bot/systems/checklist').Checklist;
       points: import('../src/bot/systems/points').Points;
       polls: import('../src/bot/systems/polls').Polls;
       ranks: import('../src/bot/systems/ranks').Ranks;
@@ -44,7 +45,6 @@ declare namespace NodeJS {
       top: import('../src/bot/systems/top').Top;
       timers: import('../src/bot/systems/timers').Timers;
       userinfo: import('../src/bot/systems/userinfo').UserInfo;
-      [x: string]: any; // remove after all systems are ported to TS
     };
     users: any;
     lib: any;
