@@ -38,6 +38,7 @@ declare namespace NodeJS {
       bets: import('../src/bot/systems/bets').Bets;
       points: import('../src/bot/systems/points').Points;
       polls: import('../src/bot/systems/polls').Polls;
+      ranks: import('../src/bot/systems/ranks').Ranks;
       scrim: import('../src/bot/systems/scrim').Scrim;
       songs: import('../src/bot/systems/songs').Songs;
       top: import('../src/bot/systems/top').Top;
