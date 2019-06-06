@@ -34,7 +34,6 @@ class Scrim extends System {
   @settings({ category: 'time' })
   waitForMatchIdsInSeconds: number = 60;
 
-
   constructor() {
     super();
 
