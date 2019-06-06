@@ -5,6 +5,7 @@ declare module '*.vue' {
 
 declare namespace NodeJS {
   export interface Global {
+    linesParsed: number;
     status: {
       API: 0 | 1 | 2;
     };
@@ -38,6 +39,7 @@ declare namespace NodeJS {
       polls: import('../src/bot/systems/polls').Polls;
       scrim: import('../src/bot/systems/scrim').Scrim;
       top: import('../src/bot/systems/top').Top;
+      timers: import('../src/bot/systems/timers').Timers;
       userinfo: import('../src/bot/systems/userinfo').UserInfo;
       [x: string]: any; // remove after all systems are ported to TS
     };
