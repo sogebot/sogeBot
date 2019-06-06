@@ -1,7 +1,7 @@
 import { set } from 'lodash';
 import { parse, sep as separator } from 'path';
 
-export function onchange(fncNameArg: string) {
+export function onChange(fncNameArg: string) {
   const { name, type } = getNameAndTypeFromStackTrace();
 
   return (target: object, key: string) => {
@@ -23,7 +23,7 @@ export function onchange(fncNameArg: string) {
   };
 }
 
-export function onload(fncNameArg: string) {
+export function onLoad(fncNameArg: string) {
   const { name, type } = getNameAndTypeFromStackTrace();
 
   return (target: object, key: string) => {
@@ -45,7 +45,7 @@ export function onload(fncNameArg: string) {
   };
 }
 
-export function onmessage() {
+export function onMessage() {
   const { name, type } = getNameAndTypeFromStackTrace();
 
   return (target: object, key: string) => {
@@ -81,6 +81,50 @@ export function onStreamEnd() {
       try {
         const self = type === 'core' ? global[name] : global[type][name];
         set(self, `on.streamEnd.${key}`, key);
+      } catch (e) {
+        console.error(e);
+      }
+    };
+    register();
+  };
+}
+
+export function onTip() {
+  const { name, type } = getNameAndTypeFromStackTrace();
+
+  return (target: object, key: string) => {
+    const register = () => {
+      const isAvailableModule = type !== 'core' && typeof global[type] !== 'undefined' && typeof global[type][name] !== 'undefined';
+      const isAvailableLibrary = type === 'core' && typeof global[name] !== 'undefined';
+      if (!isAvailableLibrary && !isAvailableModule) {
+        return setTimeout(() => register(), 1000);
+      }
+
+      try {
+        const self = type === 'core' ? global[name] : global[type][name];
+        set(self, `on.tip.${key}`, key);
+      } catch (e) {
+        console.error(e);
+      }
+    };
+    register();
+  };
+}
+
+export function onBit() {
+  const { name, type } = getNameAndTypeFromStackTrace();
+
+  return (target: object, key: string) => {
+    const register = () => {
+      const isAvailableModule = type !== 'core' && typeof global[type] !== 'undefined' && typeof global[type][name] !== 'undefined';
+      const isAvailableLibrary = type === 'core' && typeof global[name] !== 'undefined';
+      if (!isAvailableLibrary && !isAvailableModule) {
+        return setTimeout(() => register(), 1000);
+      }
+
+      try {
+        const self = type === 'core' ? global[name] : global[type][name];
+        set(self, `on.bit.${key}`, key);
       } catch (e) {
         console.error(e);
       }

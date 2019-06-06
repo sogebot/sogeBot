@@ -265,8 +265,7 @@ class Points extends System {
   @default_permission(permission.CASTERS)
   async get (opts) {
     try {
-      const match = opts.parameters.match(/^@?([\S]+)$/);
-      const username = !_.isNil(match) ? match[1] : opts.sender.username;
+      const [username] = new Expects(opts.parameters).username({ optional: true, default: opts.sender.username }).toArray();
       const user = await global.users.getByName(username);
 
       if (!user.id) {user.id = await global.api.getIdFromTwitch(username);}

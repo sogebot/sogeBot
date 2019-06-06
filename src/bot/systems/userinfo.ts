@@ -4,7 +4,7 @@ import moment from 'moment';
 import { dateDiff, getLocalizedName, prepare, sendMessage } from '../commons';
 import { debug } from '../debug';
 import { command, settings, ui } from '../decorators';
-import { onmessage } from '../decorators/on';
+import { onMessage } from '../decorators/on';
 import System from './_interface';
 
 /*
@@ -256,7 +256,7 @@ class UserInfo extends System {
     }
   }
 
-  @onmessage()
+  @onMessage()
   public onMessage(opts: onEventMessage) {
     if (!_.isNil(opts.sender) && !_.isNil(opts.sender.userId) && !_.isNil(opts.sender.username)) {
       global.users.setById(opts.sender.userId, {

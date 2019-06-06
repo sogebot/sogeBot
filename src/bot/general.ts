@@ -5,7 +5,7 @@ import { get, isBoolean, isFinite, isNil, isNumber, isString, map, set } from 'l
 import Core from './_interface';
 import { sendMessage } from './commons';
 import { command, default_permission, settings, ui } from './decorators';
-import { onchange, onload } from './decorators/on';
+import { onchange, onLoad } from './decorators/on';
 import { permission } from './permissions';
 
 class General extends Core {
@@ -14,8 +14,8 @@ class General extends Core {
     const f = readdirSync('./locales/');
     return [...new Set(f.map((o) => o.split('.')[0]))];
   }})
-  @onchange('onLangUpdate')
-  @onload('onLangLoad')
+  @onChange('onLangUpdate')
+  @onLoad('onLangLoad')
   public lang: string = 'en';
 
   @command('!enable')

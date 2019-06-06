@@ -34,7 +34,7 @@ class OAuth extends Core {
 
   @settings({ category: 'broadcaster' })
   @ui({ type: 'text-input', secret: true })
-  @onchange('onChangeAccessToken')
+  @onChange('onChangeAccessToken')
   public broadcasterAccessToken: string = '';
 
   @settings({ category: 'broadcaster' })
@@ -43,7 +43,7 @@ class OAuth extends Core {
 
   @settings({ category: 'broadcaster' })
   @ui({ readOnly: true, type: 'text-input' })
-  @onchange('onChangeBroadcasterUsername')
+  @onChange('onChangeBroadcasterUsername')
   public broadcasterUsername: string = '';
 
   @settings({ category: 'broadcaster' })
@@ -71,7 +71,7 @@ class OAuth extends Core {
 
   @settings({ category: 'bot' })
   @ui({ type: 'text-input', secret: true })
-  @onchange('onChangeAccessToken')
+  @onChange('onChangeAccessToken')
   public botAccessToken: string = '';
 
   @settings({ category: 'bot' })
