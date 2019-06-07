@@ -37,6 +37,8 @@ declare namespace NodeJS {
       alias: import('../src/bot/systems/alias').Alias;
       bets: import('../src/bot/systems/bets').Bets;
       checklist: import('../src/bot/systems/checklist').Checklist;
+      cooldown: import('../src/bot/systems/cooldown').Cooldown;
+      customCommands: any;
       keywords: import('../src/bot/systems/keywords').Keywords;
       points: import('../src/bot/systems/points').Points;
       polls: import('../src/bot/systems/polls').Polls;
