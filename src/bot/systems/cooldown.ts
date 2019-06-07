@@ -278,7 +278,7 @@ class Cooldown extends System {
   }
 
   async toggle (opts: Record<string, any>, type: string) {
-    const match = XRegExp.exec(opts.parameters, constants.COOLDOWN_REGEXP) as unknown as { [x: string]: string } | null;;
+    const match = XRegExp.exec(opts.parameters, constants.COOLDOWN_REGEXP) as unknown as { [x: string]: string } | null;
 
     if (_.isNil(match)) {
       let message = await prepare('cooldowns.cooldown-parse-failed');
