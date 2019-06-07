@@ -37,8 +37,10 @@ declare namespace NodeJS {
       alias: import('../src/bot/systems/alias').Alias;
       bets: import('../src/bot/systems/bets').Bets;
       checklist: import('../src/bot/systems/checklist').Checklist;
+      commercial: import('../src/bot/systems/commercial').Commercial;
       cooldown: import('../src/bot/systems/cooldown').Cooldown;
       customCommands: import('../src/bot/systems/customCommands').CustomCommands;
+      highlights: import('../src/bot/systems/highlights').Highlights;
       keywords: import('../src/bot/systems/keywords').Keywords;
       points: import('../src/bot/systems/points').Points;
       polls: import('../src/bot/systems/polls').Polls;
@@ -49,8 +51,8 @@ declare namespace NodeJS {
       ranks: import('../src/bot/systems/ranks').Ranks;
       scrim: import('../src/bot/systems/scrim').Scrim;
       songs: import('../src/bot/systems/songs').Songs;
-      top: import('../src/bot/systems/top').Top;
       timers: import('../src/bot/systems/timers').Timers;
+      top: import('../src/bot/systems/top').Top;
       userinfo: import('../src/bot/systems/userinfo').UserInfo;
     };
     users: any;

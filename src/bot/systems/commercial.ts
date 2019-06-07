@@ -90,4 +90,5 @@ class Commercial extends System {
   }
 }
 
-module.exports = new Commercial();
+export default Commercial;
+export { Commercial };
