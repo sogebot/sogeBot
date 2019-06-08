@@ -12,7 +12,7 @@ const chalk = require('chalk')
 const constants = require('./constants')
 
 const {
-  getBroadcaster, getChannel, getIgnoreList, isOwner, isBot, sendMessage
+  getBroadcaster, getChannel, getIgnoreList, isOwner, isBot, sendMessage, isIgnored
 } = require('./commons')
 
 const __DEBUG__ = {
@@ -308,6 +308,7 @@ class API {
 
     const sendJoinEvent = async function (bulk) {
       for (let user of bulk) {
+        if (commons.isIgnored(user.username)) continue
         await new Promise((resolve) => setTimeout(() => resolve(), 1000))
         global.api.isFollower(user.username)
         global.events.fire('user-joined-channel', { username: user.username })
@@ -315,6 +316,7 @@ class API {
     }
     const sendPartEvent = async function (bulk) {
       for (let user of bulk) {
+        if (commons.isIgnored(user.username)) continue
         await new Promise((resolve) => setTimeout(() => resolve(), 1000))
         global.events.fire('user-parted-channel', { username: user.username })
       }
