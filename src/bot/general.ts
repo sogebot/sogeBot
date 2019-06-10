@@ -9,7 +9,7 @@ import { onChange, onLoad } from './decorators/on';
 import { permission } from './permissions';
 
 class General extends Core {
-  @settings({ category: 'general' })
+  @settings('general')
   @ui({ type: 'selector', values: () => {
     const f = readdirSync('./locales/');
     return [...new Set(f.map((o) => o.split('.')[0]))];

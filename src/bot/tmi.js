@@ -21,19 +21,19 @@ const __DEBUG__ =
   (process.env.DEBUG && process.env.DEBUG.includes('tmi.client'));
 
 class TMI extends Core {
-  @settings({ category: 'chat' })
+  @settings('chat')
   sendWithMe = false;
 
-  @settings({ category: 'chat' })
+  @settings('chat')
   ignorelist = [];
 
-  @settings({ category: 'chat' })
+  @settings('chat')
   showWithAt = true;
 
-  @settings({ category: 'chat' })
+  @settings('chat')
   mute = false;
 
-  @settings({ category: 'chat' })
+  @settings('chat')
   whisperListener = false;
 
   channel: string = ''

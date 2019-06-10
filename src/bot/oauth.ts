@@ -26,27 +26,27 @@ class OAuth extends Core {
   @shared()
   public broadcasterId: string = '';
 
-  @settings({ category: 'general' })
+  @settings('general')
   public generalChannel: string = '';
 
-  @settings({ category: 'general' })
+  @settings('general')
   public generalOwners: string[] = [];
 
-  @settings({ category: 'broadcaster' })
+  @settings('broadcaster')
   @ui({ type: 'text-input', secret: true })
   @onChange('onChangeAccessToken')
   public broadcasterAccessToken: string = '';
 
-  @settings({ category: 'broadcaster' })
+  @settings('broadcaster')
   @ui({ type: 'text-input', secret: true })
   public broadcasterRefreshToken: string = '';
 
-  @settings({ category: 'broadcaster' })
+  @settings('broadcaster')
   @ui({ readOnly: true, type: 'text-input' })
   @onChange('onChangeBroadcasterUsername')
   public broadcasterUsername: string = '';
 
-  @settings({ category: 'broadcaster' })
+  @settings('broadcaster')
   @ui({ type: 'check-list', current: 'broadcasterCurrentScopes' })
   public broadcasterExpectedScopes: string[] = [
     'chat:read',
@@ -55,11 +55,11 @@ class OAuth extends Core {
     'channel:read:subscriptions',
   ];
 
-  @settings({ category: 'broadcaster' })
+  @settings('broadcaster')
   @ui({ ignore: true })
   public broadcasterCurrentScopes: string[] = [];
 
-  @settings({ category: 'broadcaster' })
+  @settings('broadcaster')
   @ui({
     type: 'link',
     href: 'https://twitchtokengenerator.com/quick/RkshHUnw16',
@@ -69,20 +69,20 @@ class OAuth extends Core {
   })
   public broadcasterGenerateLink: null = null;
 
-  @settings({ category: 'bot' })
+  @settings('bot')
   @ui({ type: 'text-input', secret: true })
   @onChange('onChangeAccessToken')
   public botAccessToken: string = '';
 
-  @settings({ category: 'bot' })
+  @settings('bot')
   @ui({ type: 'text-input', secret: true })
   public botRefreshToken: string = '';
 
-  @settings({ category: 'bot' })
+  @settings('bot')
   @ui({ readOnly: true, type: 'text-input' })
   public botUsername: string = '';
 
-  @settings({ category: 'bot' })
+  @settings('bot')
   @ui({ type: 'check-list', current: 'botCurrentScopes' })
   public botExpectedScopes: string[] = [
     'channel:moderate',
@@ -97,11 +97,11 @@ class OAuth extends Core {
     'user:read:broadcast',
   ];
 
-  @settings({ category: 'bot' })
+  @settings('bot')
   @ui({ ignore: true })
   public botCurrentScopes: string[] = [];
 
-  @settings({ category: 'bot' })
+  @settings('bot')
   @ui({
     type: 'link',
     href: 'https://twitchtokengenerator.com/quick/UQ6SHl81nt',

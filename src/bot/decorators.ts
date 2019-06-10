@@ -21,13 +21,11 @@ export function ui(opts) {
   };
 }
 
-export function settings(opts: {
-  category?: string;
-} = {}) {
+export function settings(category?: string) {
   const { name, type } = getNameAndTypeFromStackTrace();
 
   return (target: object, key: string) => {
-    const path = opts.category ? `${opts.category}.${key}` : key;
+    const path = category ? `${category}.${key}` : key;
 
     const registerSettings = () => {
       const isAvailableModule = type !== 'core' && typeof global[type] !== 'undefined' && typeof global[type][name] !== 'undefined';
@@ -66,7 +64,7 @@ export function settings(opts: {
         setTimeout(() => loadVariableValue(), 5000);
 
         // add variable to settingsList
-        self.settingsList.push({ category: opts.category, key });
+        self.settingsList.push({ category, key });
       } catch (e) {
         console.log(e);
       }

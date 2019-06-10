@@ -10,31 +10,31 @@ import { permission } from '../permissions';
 import System from './_interface';
 
 class Points extends System {
-  @settings({ category: 'points' })
+  @settings('points')
   name: string = 'point|points'; // default is <singular>|<plural> | in some languages can be set with custom <singular>|<x:multi>|<plural> where x <= 10
 
-  @settings({ category: 'points' })
+  @settings('points')
   interval: number = 10;
 
-  @settings({ category: 'points' })
+  @settings('points')
   perInterval: number = 1;
 
-  @settings({ category: 'points' })
+  @settings('points')
   offlineInterval: number = 30;
 
-  @settings({ category: 'points' })
+  @settings('points')
   perOfflineInterval: number = 1;
 
-  @settings({ category: 'points' })
+  @settings('points')
   messageInterval: number = 5;
 
-  @settings({ category: 'points' })
+  @settings('points')
   perMessageInterval: number = 1;
 
-  @settings({ category: 'points' })
+  @settings('points')
   messageOfflineInterval: number = 5;
 
-  @settings({ category: 'points' })
+  @settings('points')
   perMessageOfflineInterval: number = 0;
 
 

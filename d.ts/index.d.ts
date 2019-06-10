@@ -42,6 +42,7 @@ declare namespace NodeJS {
       customCommands: import('../src/bot/systems/customCommands').CustomCommands;
       highlights: import('../src/bot/systems/highlights').Highlights;
       keywords: import('../src/bot/systems/keywords').Keywords;
+      moderation: import('../src/bot/systems/moderation').Moderation;
       points: import('../src/bot/systems/points').Points;
       polls: import('../src/bot/systems/polls').Polls;
       price: import('../src/bot/systems/price').Price;

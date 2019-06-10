@@ -17,7 +17,7 @@ import System from './_interface';
  */
 
 class UserInfo extends System {
-  @settings({ category: 'me' })
+  @settings('me')
   @ui({
     type: 'sortable-list',
     values: '_order',
@@ -27,10 +27,10 @@ class UserInfo extends System {
   })
   _order: string[] = ['$sender', '$rank', '$watched', '$points', '$messages', '$tips'];
 
-  @settings({ category: 'me' })
+  @settings('me')
   _formatDisabled: string[] = [];
 
-  @settings({ category: 'me' })
+  @settings('me')
   formatSeparator: string = ' | ';
 
   @command('!followage')

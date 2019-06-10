@@ -29,9 +29,9 @@ class Polls extends System {
   private lastMessageRemind: number = 0;
   private lastTimeRemind: number = 0;
 
-  @settings({ category: 'reminder' })
+  @settings('reminder')
   everyXMessages: number = 0;
-  @settings({ category: 'reminder' })
+  @settings('reminder')
   everyXSeconds: number = 0;
 
   constructor() {

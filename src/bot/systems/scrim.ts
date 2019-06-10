@@ -31,7 +31,7 @@ class Scrim extends System {
   @shared()
   isCooldownOnly: boolean = false;
 
-  @settings({ category: 'time' })
+  @settings('time')
   waitForMatchIdsInSeconds: number = 60;
 
   constructor() {

@@ -25,9 +25,9 @@ const TYPE_TICKETS = 1;
 class Raffles extends System {
   lastAnnounce: number = _.now();
 
-  @settings({ category: 'luck' })
+  @settings('luck')
   subscribersPercent: number = 150;
-  @settings({ category: 'luck' })
+  @settings('luck')
   followersPercent: number = 120;
 
   @settings()

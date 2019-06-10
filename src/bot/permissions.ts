@@ -18,10 +18,10 @@ const permission = Object.freeze({
 });
 
 class Permissions extends Core {
-  @settings({ category: 'warnings' })
+  @settings('warnings')
   public sendWarning = false;
 
-  @settings({ category: 'warnings' })
+  @settings('warnings')
   public sendByWhisper = false;
 
   constructor() {

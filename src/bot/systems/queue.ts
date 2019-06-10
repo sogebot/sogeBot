@@ -19,11 +19,11 @@ class Queue extends System {
   @shared()
   locked: boolean = false;
 
-  @settings({ category: 'eligibility' })
+  @settings('eligibility')
   eligibilityAll: boolean = true;
-  @settings({ category: 'eligibility' })
+  @settings('eligibility')
   eligibilityFollowers: boolean = true;
-  @settings({ category: 'eligibility' })
+  @settings('eligibility')
   eligibilitySubscribers: boolean = true;
 
   constructor () {

@@ -3,7 +3,7 @@ import { onStreamEnd } from '../decorators/on';
 import System from './_interface';
 
 class Checklist extends System {
-  @settings({ category: 'checklist' })
+  @settings('checklist')
   @ui({ type: 'configurable-list' })
   itemsArray: any[] = [];
 
