@@ -15,7 +15,7 @@ function getNameAndTypeFromStackTrace() {
   return { name, type };
 }
 
-export function ui(opts) {
+export function ui(opts, category?: string) {
   return (target: object, key: string) => {
     return;
   };

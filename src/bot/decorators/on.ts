@@ -111,6 +111,50 @@ export function onTip() {
   };
 }
 
+export function onFollow() {
+  const { name, type } = getNameAndTypeFromStackTrace();
+
+  return (target: object, key: string) => {
+    const register = () => {
+      const isAvailableModule = type !== 'core' && typeof global[type] !== 'undefined' && typeof global[type][name] !== 'undefined';
+      const isAvailableLibrary = type === 'core' && typeof global[name] !== 'undefined';
+      if (!isAvailableLibrary && !isAvailableModule) {
+        return setTimeout(() => register(), 1000);
+      }
+
+      try {
+        const self = type === 'core' ? global[name] : global[type][name];
+        set(self, `on.follow.${key}`, key);
+      } catch (e) {
+        console.error(e);
+      }
+    };
+    register();
+  };
+}
+
+export function onSub() {
+  const { name, type } = getNameAndTypeFromStackTrace();
+
+  return (target: object, key: string) => {
+    const register = () => {
+      const isAvailableModule = type !== 'core' && typeof global[type] !== 'undefined' && typeof global[type][name] !== 'undefined';
+      const isAvailableLibrary = type === 'core' && typeof global[name] !== 'undefined';
+      if (!isAvailableLibrary && !isAvailableModule) {
+        return setTimeout(() => register(), 1000);
+      }
+
+      try {
+        const self = type === 'core' ? global[name] : global[type][name];
+        set(self, `on.sub.${key}`, key);
+      } catch (e) {
+        console.error(e);
+      }
+    };
+    register();
+  };
+}
+
 export function onBit() {
   const { name, type } = getNameAndTypeFromStackTrace();
 

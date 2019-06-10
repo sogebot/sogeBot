@@ -4,21 +4,11 @@ import Overlay from '../overlays/_interface';
 
 import _ from 'lodash';
 import { isMainThread } from 'worker_threads';
+import { onSub, onFollow, onTip, onBit } from '../decorators/on';
 
 class Goals extends Overlay {
   constructor() {
-    const options: InterfaceSettings = {
-      ui: {
-        _hidden: true,
-      },
-      on: {
-        bit: (e) => { this.onBit(e); },
-        tip: (e) => { this.onTip(e); },
-        follow: (e) => { this.onFollow(); },
-        sub: (e) => { this.onSub(); },
-      },
-    };
-    super(options);
+    super();
     this.addMenu({ category: 'registry', name: 'goals', id: '/registry/goals/list' });
 
     if (isMainThread) {
@@ -42,7 +32,8 @@ class Goals extends Overlay {
     });
   }
 
-  private async onBit(bit: onEventBit) {
+  @onBit()
+  public async onBit(bit: onEventBit) {
     const goals: Goals.Goal[] = await global.db.engine.find(this.collection.goals, { type: 'bits' });
     for (const goal of goals) {
       const uid = String(goal.uid);
@@ -62,7 +53,8 @@ class Goals extends Overlay {
     }
   }
 
-  private async onTip(tip: onEventTip) {
+  @onTip()
+  public async onTip(tip: onEventTip) {
     const goals: Goals.Goal[] = await global.db.engine.find(this.collection.goals, { type: 'tips' });
     for (const goal of goals) {
       const uid = String(goal.uid);
@@ -73,7 +65,8 @@ class Goals extends Overlay {
     }
   }
 
-  private async onFollow() {
+  @onFollow()
+  public async onFollow() {
     const goals: Goals.Goal[] = await global.db.engine.find(this.collection.goals, { type: 'followers' });
     for (const goal of goals) {
       const uid = String(goal.uid);
@@ -83,7 +76,8 @@ class Goals extends Overlay {
     }
   }
 
-  private async onSub() {
+  @onSub()
+  public async onSub() {
     const goals: Goals.Goal[] = await global.db.engine.find(this.collection.goals, { type: 'subscribers' });
     for (const goal of goals) {
       const uid = String(goal.uid);

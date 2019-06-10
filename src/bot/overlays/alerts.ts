@@ -13,7 +13,7 @@ class Alerts extends Overlay {
     class: 'btn btn-primary btn-block',
     rawText: '/overlays/alerts',
     target: '_blank',
-  })
+  }, 'links')
   linkBtn: null = null;
 
   constructor() {

@@ -8,7 +8,7 @@ class Clips extends Overlay {
     class: 'btn btn-primary btn-block',
     rawText: '/overlays/clips (640x360)',
     target: '_blank'
-  })
+  }, 'links')
   linkBtn: null = null;
 
   @settings('clips')

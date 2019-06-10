@@ -18,7 +18,7 @@ class ClipsCarousel extends Overlay {
     class: 'btn btn-primary btn-block',
     rawText: '/overlays/clipscarousel (1920x1080)',
     target: '_blank'
-  })
+  }, 'links')
   btnLink: null = null;
 
   sockets () {

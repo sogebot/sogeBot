@@ -15,8 +15,14 @@ declare namespace NodeJS {
       carousel: import('../src/bot/overlays/carousel').Carousel;
       clips: import('../src/bot/overlays/clips').Clips;
       clipsCarousel: import('../src/bot/overlays/clipsCarousel').ClipsCarousel;
+      credits: import('../src/bot/overlays/credits').Credits;
+      emotes: import('../src/bot/overlays/emotes').Emotes;
+      eventlist: import('../src/bot/overlays/eventlist').EventList;
+      gallery: import('../src/bot/overlays/gallery').Gallery;
       goals: import('../src/bot/overlays/goals').Goals;
       polls: import('../src/bot/overlays/polls').Polls;
+      stats: import('../src/bot/overlays/stats').Stats;
+      text: import('../src/bot/overlays/text').Text;
     };
     integrations: {
       twitter: import('../src/bot/integrations/twitter').Twitter;
@@ -73,6 +79,7 @@ declare namespace NodeJS {
 interface Sender {
   username: string;
   userId: string;
+  emotes: { id: number; start: number; end: number }[];
   badges: {
     subscriber?: undefined | number;
     premium?: undefined | number;
