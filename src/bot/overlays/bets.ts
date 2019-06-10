@@ -1,6 +1,6 @@
-import { setTimeout } from 'timers'; // tslint workaround
 import { isMainThread } from 'worker_threads';
 
+import { ui } from '../decorators';
 import Overlay from './_interface';
 
 class Bets extends Overlay {
@@ -8,21 +8,17 @@ class Bets extends Overlay {
   public currentBet: any;
   public bets: any[];
 
+  @ui({
+    type: 'link',
+    href: '/overlays/bets',
+    class: 'btn btn-primary btn-block',
+    rawText: '/overlays/bets',
+    target: '_blank',
+  })
+  linkBtn: null = null;
+
   constructor() {
-    const options: InterfaceSettings = {
-      ui: {
-        links: {
-          overlay: {
-            type: 'link',
-            href: '/overlays/bets',
-            class: 'btn btn-primary btn-block',
-            rawText: '/overlays/bets',
-            target: '_blank',
-          },
-        },
-      },
-    };
-    super(options);
+    super();
 
     this.modifiedAt = 0;
     this.currentBet = {};

@@ -12,9 +12,11 @@ declare namespace NodeJS {
     overlays: {
       alerts: import('../src/bot/overlays/alerts').Alerts;
       bets: import('../src/bot/overlays/bets').Bets;
+      carousel: import('../src/bot/overlays/carousel').Carousel;
+      clips: import('../src/bot/overlays/clips').Clips;
+      clipsCarousel: import('../src/bot/overlays/clipsCarousel').ClipsCarousel;
       goals: import('../src/bot/overlays/goals').Goals;
       polls: import('../src/bot/overlays/polls').Polls;
-      [x: string]: any; // remove after all overlays are ported to TS
     };
     integrations: {
       twitter: import('../src/bot/integrations/twitter').Twitter;

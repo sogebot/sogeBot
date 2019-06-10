@@ -1,28 +1,23 @@
-// 3rdparty libraries
 import { isNil } from 'lodash';
 import { isMainThread } from 'worker_threads';
-import { command, default_permission } from '../decorators';
+
+import { command, default_permission, ui } from '../decorators';
 import Message from '../message';
 import { permission } from '../permissions';
 import Overlay from './_interface';
 
 class Alerts extends Overlay {
-  constructor() {
-    const options: InterfaceSettings = {
-      ui: {
-        links: {
-          overlay: {
-            type: 'link',
-            href: '/overlays/alerts',
-            class: 'btn btn-primary btn-block',
-            rawText: '/overlays/alerts',
-            target: '_blank',
-          },
-        },
-      },
-    };
+  @ui({
+    type: 'link',
+    href: '/overlays/alerts',
+    class: 'btn btn-primary btn-block',
+    rawText: '/overlays/alerts',
+    target: '_blank',
+  })
+  linkBtn: null = null;
 
-    super(options);
+  constructor() {
+    super();
     this.addMenu({ category: 'settings', name: 'overlays', id: 'overlays' });
   }
 
