@@ -66,7 +66,7 @@ class Points extends System {
 
     try {
       for (let username of (await global.users.getAllOnlineUsernames())) {
-        if (await isBot(username)) {continue;}
+        if (isBot(username)) {continue;}
 
         let user = await global.db.engine.findOne('users', { username });
         if (_.isEmpty(user)) {user.id = await global.api.getIdFromTwitch(username);}
@@ -289,7 +289,7 @@ class Points extends System {
       const points = new Expects(opts.parameters).points({ all: false }).toArray();
 
       for (let username of (await global.users.getAllOnlineUsernames())) {
-        if (await isBot(username)) {continue;}
+        if (isBot(username)) {continue;}
 
         let user = await global.db.engine.findOne('users', { username });
 
@@ -314,7 +314,7 @@ class Points extends System {
       const points = new Expects(opts.parameters).points({ all: false }).toArray();
 
       for (let username of (await global.users.getAllOnlineUsernames())) {
-        if (await isBot(username)) {continue;}
+        if (isBot(username)) {continue;}
 
         let user = await global.db.engine.findOne('users', { username });
 

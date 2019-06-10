@@ -233,7 +233,7 @@ class Moderation extends System {
 
   @parser({ priority: constants.MODERATION })
   async containsLink (opts) {
-    if (isOwner(opts.sender) || isModerator(opts.sender) || !this.cLinksEnabled || (typeof opts.sender.badges.subscriber !== 'undefined' && !this.cLinksModerateSubscribers)) {
+    if (isOwner(opts.sender) || (await isModerator(opts.sender)) || !this.cLinksEnabled || (typeof opts.sender.badges.subscriber !== 'undefined' && !this.cLinksModerateSubscribers)) {
       return true;
     }
 
@@ -265,7 +265,7 @@ class Moderation extends System {
     var msgLength = whitelisted.trim().length;
     var symbolsLength = 0;
 
-    if (isOwner(opts.sender) || isModerator(opts.sender) || msgLength < this.cSymbolsTriggerLength || !this.cSymbolsEnabled || (typeof opts.sender.badges.subscriber !== 'undefined' && !this.cSymbolsEnabled)) {
+    if (isOwner(opts.sender) || (await isModerator(opts.sender)) || msgLength < this.cSymbolsTriggerLength || !this.cSymbolsEnabled || (typeof opts.sender.badges.subscriber !== 'undefined' && !this.cSymbolsEnabled)) {
       return true;
     }
 
@@ -295,7 +295,7 @@ class Moderation extends System {
     const whitelisted = await this.whitelist(opts.message);
 
     var msgLength = whitelisted.trim().length;
-    if (isOwner(opts.sender) || isModerator(opts.sender) || msgLength < this.cLongMessageTriggerLength || !this.cLongMessageEnabled || (typeof opts.sender.badges.subscriber !== 'undefined' && !this.cLongMessageModerateSubscribers)) {
+    if (isOwner(opts.sender) || (await isModerator(opts.sender)) || msgLength < this.cLongMessageTriggerLength || !this.cLongMessageEnabled || (typeof opts.sender.badges.subscriber !== 'undefined' && !this.cLongMessageModerateSubscribers)) {
       return true;
     } else {
       this.timeoutUser(opts.sender, opts.message,
@@ -333,7 +333,7 @@ class Moderation extends System {
       }
     }
 
-    if (isOwner(opts.sender) || isModerator(opts.sender) || msgLength < this.cCapsTriggerLength || !this.cCapsEnabled || (typeof opts.sender.badges.subscriber !== 'undefined' && !this.cCapsModerateSubscribers)) {
+    if (isOwner(opts.sender) || (await isModerator(opts.sender)) || msgLength < this.cCapsTriggerLength || !this.cCapsEnabled || (typeof opts.sender.badges.subscriber !== 'undefined' && !this.cCapsModerateSubscribers)) {
       return true;
     }
     if (Math.ceil(capsLength / (msgLength / 100)) >= this.cCapsMaxCapsPercent) {
@@ -352,7 +352,7 @@ class Moderation extends System {
 
     var msgLength = whitelisted.trim().length;
 
-    if (isOwner(opts.sender) || isModerator(opts.sender) || msgLength < this.cSpamTriggerLength || !this.cSpamEnabled || (typeof opts.sender.badges.subscriber !== 'undefined' && !this.cSpamModerateSubscribers)) {
+    if (isOwner(opts.sender) || (await isModerator(opts.sender)) || msgLength < this.cSpamTriggerLength || !this.cSpamEnabled || (typeof opts.sender.badges.subscriber !== 'undefined' && !this.cSpamModerateSubscribers)) {
       return true;
     }
     var out = whitelisted.match(/(.+)(\1+)/g);
@@ -370,7 +370,7 @@ class Moderation extends System {
 
   @parser({ priority: constants.MODERATION })
   async color (opts) {
-    if (isOwner(opts.sender) || isModerator(opts.sender) || !this.cColorEnabled || (typeof opts.sender.badges.subscriber !== 'undefined' && !this.cColorModerateSubscribers)) {
+    if (isOwner(opts.sender) || (await isModerator(opts.sender)) || !this.cColorEnabled || (typeof opts.sender.badges.subscriber !== 'undefined' && !this.cColorModerateSubscribers)) {
       return true;
     }
 
@@ -388,7 +388,7 @@ class Moderation extends System {
     if (!(Symbol.iterator in Object(opts.sender.emotes))) {return true;}
 
     var count = opts.sender.emotes.length;
-    if (isOwner(opts.sender) || isModerator(opts.sender) || !this.cEmotesEnabled || (typeof opts.sender.badges.subscriber !== 'undefined' && !this.cEmotesModerateSubscribers)) {
+    if (isOwner(opts.sender) || (await isModerator(opts.sender)) || !this.cEmotesEnabled || (typeof opts.sender.badges.subscriber !== 'undefined' && !this.cEmotesModerateSubscribers)) {
       return true;
     }
 
@@ -403,7 +403,7 @@ class Moderation extends System {
 
   @parser({ priority: constants.MODERATION })
   async blacklist (opts) {
-    if (isOwner(opts.sender) || isModerator(opts.sender) || (typeof opts.sender.badges.subscriber !== 'undefined' && !this.cListsModerateSubscribers)) {
+    if (isOwner(opts.sender) || (await isModerator(opts.sender)) || (typeof opts.sender.badges.subscriber !== 'undefined' && !this.cListsModerateSubscribers)) {
       return true;
     }
 
