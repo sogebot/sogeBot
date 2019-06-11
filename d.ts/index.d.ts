@@ -25,8 +25,8 @@ declare namespace NodeJS {
       text: import('../src/bot/overlays/text').Text;
     };
     integrations: {
+      streamlabs: import('../src/bot/integrations/streamlabs').Streamlabs;
       twitter: import('../src/bot/integrations/twitter').Twitter;
-      [x: string]: any; // remove after all integrations are ported to TS
     };
     cache: any;
     client: any;
