@@ -1,35 +1,19 @@
-'use strict'
+import * as _ from 'lodash';
+import io from 'socket.io-client';
+import chalk from 'chalk';
 
-// 3rdparty libraries
-const _ = require('lodash')
-const io = require('socket.io-client')
-const chalk = require('chalk')
-
-// bot libraries
 import Integration from './_interface'
+import { settings, ui } from '../decorators';
+import { onChange } from '../decorators/on';
 
 class Streamlabs extends Integration {
-  socket: Socket = null
+  socket: SocketIOClient.Socket | null = null
 
-  constructor () {
-    const settings = {
-      socketToken: ''
-    }
-    const ui = {
-      socketToken: {
-        type: 'text-input',
-        secret: true
-      }
-    }
-    const on = {
-      change: {
-        enabled: ['onStateChange'],
-        socketToken: ['connect']
-      }
-    }
-    super({ settings, on, ui })
-  }
+  @settings()
+  @ui({ type: 'text-input', secret: true })
+  socketToken: string = '';
 
+  @onChange('enabled')
   onStateChange (key: String, val: String) {
     if (val) this.connect()
     else this.disconnect()
@@ -37,17 +21,18 @@ class Streamlabs extends Integration {
 
   async disconnect () {
     if (this.socket !== null) {
-      this.socket.close().off()
       this.socket.removeAllListeners()
+      this.socket.disconnect();
     }
   }
 
+  @onChange('socketToken')
   async connect () {
     this.disconnect()
 
-    if (this.settings.socketToken.trim() === '' || !this.settings.enabled) return
+    if (this.socketToken.trim() === '' || !this.enabled) return
 
-    this.socket = io.connect('https://sockets.streamlabs.com?token=' + this.settings.socketToken)
+    this.socket = io.connect('https://sockets.streamlabs.com?token=' + this.socketToken)
 
     this.socket.on('reconnect_attempt', () => {
       global.log.info(chalk.yellow('STREAMLABS:') + ' Trying to reconnect to service')
@@ -59,7 +44,9 @@ class Streamlabs extends Integration {
 
     this.socket.on('disconnect', () => {
       global.log.info(chalk.yellow('STREAMLABS:') + ' Socket disconnected from service')
-      this.socket.open()
+      if (this.socket) {
+        this.socket.open()
+      }
     })
 
     this.socket.on('event', async (eventData) => {
@@ -80,7 +67,8 @@ class Streamlabs extends Integration {
           amount: event.amount,
           currency: event.currency,
           username: event.from.toLowerCase(),
-          message: event.message
+          message: event.message,
+          timestamp: Date.now(),
         })
         global.log.tip(`${event.from.toLowerCase()}, amount: ${event.amount}${event.currency}, message: ${event.message}`)
         global.events.fire('tip', {
@@ -93,14 +81,14 @@ class Streamlabs extends Integration {
         })
 
         // go through all systems and trigger on.tip
-        for (let [type, systems] of Object.entries({
+        for (let [, systems] of Object.entries({
           systems: global.systems,
           games: global.games,
           overlays: global.overlays,
           widgets: global.widgets,
           integrations: global.integrations
         })) {
-          for (let [name, system] of Object.entries(systems)) {
+          for (let [name, system] of Object.entries(systems as any[])) {
             if (name.startsWith('_') || typeof system.on === 'undefined') continue
             if (typeof system.on.tip === 'function') {
               system.on.tip({
@@ -118,4 +106,5 @@ class Streamlabs extends Integration {
   }
 }
 
-module.exports = new Streamlabs()
+export default Streamlabs;
+export { Streamlabs };

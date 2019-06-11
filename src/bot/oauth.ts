@@ -34,7 +34,6 @@ class OAuth extends Core {
 
   @settings('broadcaster')
   @ui({ type: 'text-input', secret: true })
-  @onChange('onChangeAccessToken')
   public broadcasterAccessToken: string = '';
 
   @settings('broadcaster')
@@ -43,7 +42,6 @@ class OAuth extends Core {
 
   @settings('broadcaster')
   @ui({ readOnly: true, type: 'text-input' })
-  @onChange('onChangeBroadcasterUsername')
   public broadcasterUsername: string = '';
 
   @settings('broadcaster')
@@ -71,7 +69,6 @@ class OAuth extends Core {
 
   @settings('bot')
   @ui({ type: 'text-input', secret: true })
-  @onChange('onChangeAccessToken')
   public botAccessToken: string = '';
 
   @settings('bot')
@@ -148,12 +145,15 @@ class OAuth extends Core {
     this.timeouts.getChannelId = global.setTimeout(() => this.getChannelId(), timeout);
   }
 
+  @onChange('broadcasterUsername')
   public async onChangeBroadcasterUsername(key: string, value: any) {
     if (!this.generalOwners.includes(value)) {
       this.generalOwners.push(value);
     }
   }
 
+  @onChange('botAccessToken')
+  @onChange('broadcasterAccessToken')
   public async onChangeAccessToken(key: string, value: any) {
     switch (key) {
       case 'broadcaster.accessToken':

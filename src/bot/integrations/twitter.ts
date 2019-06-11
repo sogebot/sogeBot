@@ -8,55 +8,31 @@ import { isMainThread } from 'worker_threads';
 import { getOwner } from '../commons';
 import Message from '../message';
 import Integration from './_interface';
+import { settings, ui } from '../decorators';
+import { onChange } from '../decorators/on';
 
 class Twitter extends Integration {
   public watchedStreams: {
     hash: string;
     stream: any;
-  }[];
-  public client: any;
+  }[] = [];
+  public client: any = null;
+
+  @settings('token')
+  @ui({ type: 'text-input', secret: true })
+  consumerKey: string = '';
+  @settings('token')
+  @ui({ type: 'text-input', secret: true })
+  consumerSecret: string = '';
+  @settings('token')
+  @ui({ type: 'text-input', secret: true })
+  accessToken: string = '';
+  @settings('token')
+  @ui({ type: 'text-input', secret: true })
+  secretToken: string = '';
 
   constructor() {
-    const options: InterfaceSettings = {
-      settings: {
-        tokens: {
-          consumerKey: '',
-          consumerSecret: '',
-          accessToken: '',
-          secretToken: '',
-        },
-      },
-      ui: {
-        tokens: {
-          consumerKey: {
-            type: 'text-input',
-            secret: true,
-          },
-          consumerSecret: {
-            type: 'text-input',
-            secret: true,
-          },
-          accessToken: {
-            type: 'text-input',
-            secret: true,
-          },
-          secretToken: {
-            type: 'text-input',
-            secret: true,
-          },
-        },
-      },
-      on: {
-        change: {
-          enabled: ['onStateChange'],
-        },
-      },
-    };
-
-    super(options);
-
-    this.client = null;
-    this.watchedStreams = [];
+    super();
 
     if (isMainThread) {
       this.addEvent();
@@ -144,6 +120,7 @@ class Twitter extends Integration {
     global.log.info(chalk.yellow('TWITTER: ') + 'Stream for ' + hash + ' was ended.');
   }
 
+  @onChange('enabled')
   public onStateChange(key: string, value: string) {
     if (value) {
       this.connect();
@@ -191,17 +168,17 @@ class Twitter extends Integration {
   private connect() {
     try {
       const error: string[] = [];
-      if (this.settings.tokens.consumerKey.trim().length === 0) { error.push('consumerKey'); }
-      if (this.settings.tokens.consumerSecret.trim().length === 0) { error.push('consumerSecret'); }
-      if (this.settings.tokens.accessToken.trim().length === 0) { error.push('accessToken'); }
-      if (this.settings.tokens.secretToken.trim().length === 0) { error.push('secretToken'); }
+      if (this.consumerKey.trim().length === 0) { error.push('consumerKey'); }
+      if (this.consumerSecret.trim().length === 0) { error.push('consumerSecret'); }
+      if (this.accessToken.trim().length === 0) { error.push('accessToken'); }
+      if (this.secretToken.trim().length === 0) { error.push('secretToken'); }
       if (error.length > 0) { throw new Error(error.join(', ') + 'missing'); }
 
       this.client = new Client({
-        consumer_key: this.settings.tokens.consumerKey.trim(),
-        consumer_secret: this.settings.tokens.consumerSecret.trim(),
-        access_token_key: this.settings.tokens.accessToken.trim(),
-        access_token_secret: this.settings.tokens.secretToken.trim(),
+        consumer_key: this.consumerKey.trim(),
+        consumer_secret: this.consumerSecret.trim(),
+        access_token_key: this.accessToken.trim(),
+        access_token_secret: this.secretToken.trim(),
       });
       global.log.info(chalk.yellow('TWITTER: ') + 'Client connected to service');
     } catch (e) {

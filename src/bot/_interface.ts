@@ -40,9 +40,9 @@ class Module {
   protected _rollback: { name: string }[];
   protected _enabled: boolean = true;
   protected on: InterfaceSettings.On;
-  protected socket: SocketIO.Socket | null;
+  protected socket: SocketIOClient.Socket | null;
 
-  constructor(name: string = 'core') {
+  constructor(name: string = 'core', enabled: boolean = true) {
     this.on = {
       change: {
         enabled: [],
@@ -57,6 +57,7 @@ class Module {
     this._rollback = [];
     this._ui = {};
     this._name = name;
+    this._enabled = enabled;
 
     this.collection = new Proxy({}, {
       get: (t, n, r) => {

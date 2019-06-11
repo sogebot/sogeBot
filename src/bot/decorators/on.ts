@@ -1,7 +1,7 @@
 import { set } from 'lodash';
 import { parse, sep as separator } from 'path';
 
-export function onChange(fncNameArg: string) {
+export function onChange(variableArg: string) {
   const { name, type } = getNameAndTypeFromStackTrace();
 
   return (target: object, key: string) => {
@@ -14,7 +14,7 @@ export function onChange(fncNameArg: string) {
 
       try {
         const self = type === 'core' ? global[name] : global[type][name];
-        set(self, `on.change.${key}`, fncNameArg);
+        set(self, `on.change.${variableArg}`, key);
       } catch (e) {
         console.error(e);
       }
