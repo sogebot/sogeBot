@@ -12,7 +12,7 @@ const chalk = require('chalk')
 const constants = require('./constants')
 
 const {
-  getBroadcaster, getChannel, getIgnoreList, isOwner, isBot, sendMessage
+  getBroadcaster, getChannel, isIgnored, isOwner, isBot, sendMessage
 } = require('./commons')
 
 const __DEBUG__ = {
@@ -346,13 +346,12 @@ class API {
     let bulkInsert = []
     let bulkParted = []
     let allOnlineUsers = await global.users.getAllOnlineUsernames()
-    let ignoredUsers = getIgnoreList()
 
     for (let user of allOnlineUsers) {
       if (!_.includes(chatters, user)) {
         // user is no longer in channel
         await global.db.engine.remove('users.online', { username: user })
-        if (!_.includes(ignoredUsers, user)) {
+        if (!isIgnored(user)) {
           bulkParted.push({ username: user })
           global.widgets.joinpart.send({ username: user, type: 'part' })
         }
@@ -360,7 +359,7 @@ class API {
     }
 
     for (let chatter of chatters) {
-      if (_.includes(ignoredUsers, chatter) || global.oauth.settings.bot.username === chatter) {
+      if (isIgnored(chatter) || global.oauth.settings.bot.username === chatter) {
         // even if online, remove ignored user from collection
         await global.db.engine.remove('users.online', { username: chatter })
       } else if (!_.includes(allOnlineUsers, chatter)) {
