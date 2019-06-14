@@ -33,7 +33,7 @@ class Alerts extends Overlay {
     let send: {[x: string]: string}[] = [];
     for (const string of opts.parameters.trim().split(' | ')) {
       const object = {};
-      for (const setting of string.match(/([\w-]+)=([\w-://.%?=$_|@&]+|'[\S ]+')/g) || []) {
+      for (const setting of string.match(/([\w-]+)=([\w-:/.%?=$_|@&]+|'[\S ]+')/g) || []) {
         const data = { key: setting.split(/=(.+)/)[0], value: setting.split(/=(.+)/)[1] };
         if (data.key === 'text') {
           data.value = data.value.replace(/\$sender/g, opts.sender.username);

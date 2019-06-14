@@ -223,7 +223,7 @@ class Permissions extends Core {
           }
           break;
         case '==':
-          if (!(Number(amount) === Number(f.value))) {
+          if (Number(amount) !== Number(f.value)) {
             return false;
           }
           break;

@@ -90,7 +90,7 @@ class Spotify extends Integration {
     on: '/integrations/spotify',
     class: 'btn btn-primary btn-block',
     text: 'integrations.spotify.settings.authorize',
-    if: function () { this.username.length === 0; },
+    if: function () { return this.username.length === 0; },
     emit: 'authorize'
   })
   authorizeBtn: null = null;
@@ -98,7 +98,7 @@ class Spotify extends Integration {
   @ui({
     type: 'button-socket',
     on: '/integrations/spotify',
-    if: function () { this.username.length > 0; },
+    if: function () { return this.username.length > 0; },
     emit: 'revoke',
     class: 'btn btn-primary btn-block',
     text: 'integrations.spotify.settings.revoke'
