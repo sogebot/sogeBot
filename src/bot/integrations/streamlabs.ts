@@ -2,65 +2,65 @@ import * as _ from 'lodash';
 import io from 'socket.io-client';
 import chalk from 'chalk';
 
-import Integration from './_interface'
+import Integration from './_interface';
 import { settings, ui } from '../decorators';
 import { onChange } from '../decorators/on';
 
 class Streamlabs extends Integration {
-  socket: SocketIOClient.Socket | null = null
+  socket: SocketIOClient.Socket | null = null;
 
   @settings()
   @ui({ type: 'text-input', secret: true })
   socketToken: string = '';
 
   @onChange('enabled')
-  onStateChange (key: String, val: String) {
-    if (val) this.connect()
-    else this.disconnect()
+  onStateChange (key: string, val: string) {
+    if (val) {this.connect();}
+    else {this.disconnect();}
   }
 
   async disconnect () {
     if (this.socket !== null) {
-      this.socket.removeAllListeners()
+      this.socket.removeAllListeners();
       this.socket.disconnect();
     }
   }
 
   @onChange('socketToken')
   async connect () {
-    this.disconnect()
+    this.disconnect();
 
-    if (this.socketToken.trim() === '' || !this.enabled) return
+    if (this.socketToken.trim() === '' || !this.enabled) {return;}
 
-    this.socket = io.connect('https://sockets.streamlabs.com?token=' + this.socketToken)
+    this.socket = io.connect('https://sockets.streamlabs.com?token=' + this.socketToken);
 
     this.socket.on('reconnect_attempt', () => {
-      global.log.info(chalk.yellow('STREAMLABS:') + ' Trying to reconnect to service')
-    })
+      global.log.info(chalk.yellow('STREAMLABS:') + ' Trying to reconnect to service');
+    });
 
     this.socket.on('connect', () => {
-      global.log.info(chalk.yellow('STREAMLABS:') + ' Successfully connected socket to service')
-    })
+      global.log.info(chalk.yellow('STREAMLABS:') + ' Successfully connected socket to service');
+    });
 
     this.socket.on('disconnect', () => {
-      global.log.info(chalk.yellow('STREAMLABS:') + ' Socket disconnected from service')
+      global.log.info(chalk.yellow('STREAMLABS:') + ' Socket disconnected from service');
       if (this.socket) {
-        this.socket.open()
+        this.socket.open();
       }
-    })
+    });
 
     this.socket.on('event', async (eventData) => {
-      this.parse(eventData)
-    })
+      this.parse(eventData);
+    });
   }
 
   async parse(eventData) {
     if (eventData.type === 'donation') {
       for (let event of eventData.message) {
         if (!event.isTest) {
-          const id = await global.users.getIdByName(event.from.toLowerCase(), false)
-          if (id) global.db.engine.insert('users.tips', { id, amount: event.amount, message: event.message, currency: event.currency, timestamp: _.now() })
-          if (await global.cache.isOnline()) await global.db.engine.increment('api.current', { key: 'tips' }, { value: parseFloat(global.currency.exchange(event.amount, event.currency, global.currency.settings.currency.mainCurrency)) })
+          const id = await global.users.getIdByName(event.from.toLowerCase(), false);
+          if (id) {global.db.engine.insert('users.tips', { id, amount: event.amount, message: event.message, currency: event.currency, timestamp: _.now() });}
+          if (await global.cache.isOnline()) {await global.db.engine.increment('api.current', { key: 'tips' }, { value: parseFloat(global.currency.exchange(event.amount, event.currency, global.currency.settings.currency.mainCurrency)) });}
         }
         global.overlays.eventlist.add({
           type: 'tip',
@@ -69,8 +69,8 @@ class Streamlabs extends Integration {
           username: event.from.toLowerCase(),
           message: event.message,
           timestamp: Date.now(),
-        })
-        global.log.tip(`${event.from.toLowerCase()}, amount: ${event.amount}${event.currency}, message: ${event.message}`)
+        });
+        global.log.tip(`${event.from.toLowerCase()}, amount: ${event.amount}${event.currency}, message: ${event.message}`);
         global.events.fire('tip', {
           username: event.from.toLowerCase(),
           amount: parseFloat(event.amount).toFixed(2),
@@ -78,7 +78,7 @@ class Streamlabs extends Integration {
           amountInBotCurrency: parseFloat(global.currency.exchange(event.amount, event.currency, global.currency.settings.currency.mainCurrency)).toFixed(2),
           currencyInBot: global.currency.settings.currency.mainCurrency,
           message: event.message,
-        })
+        });
 
         // go through all systems and trigger on.tip
         for (let [, systems] of Object.entries({
@@ -89,7 +89,7 @@ class Streamlabs extends Integration {
           integrations: global.integrations
         })) {
           for (let [name, system] of Object.entries(systems as any[])) {
-            if (name.startsWith('_') || typeof system.on === 'undefined') continue
+            if (name.startsWith('_') || typeof system.on === 'undefined') {continue;}
             if (typeof system.on.tip === 'function') {
               system.on.tip({
                 username: event.from.toLowerCase(),
@@ -97,7 +97,7 @@ class Streamlabs extends Integration {
                 message: event.message,
                 currency: event.currency,
                 timestamp: _.now()
-              })
+              });
             }
           }
         }
