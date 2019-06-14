@@ -25,6 +25,9 @@ declare namespace NodeJS {
       text: import('../src/bot/overlays/text').Text;
     };
     integrations: {
+      donationalerts: import('../src/bot/integrations/donationalerts').Donationalerts;
+      phillipshue: import('../src/bot/integrations/phillipshue').PhillipsHue;
+      spotify: import('../src/bot/integrations/spotify').Spotify;
       streamlabs: import('../src/bot/integrations/streamlabs').Streamlabs;
       twitter: import('../src/bot/integrations/twitter').Twitter;
     };

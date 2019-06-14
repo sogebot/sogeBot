@@ -112,9 +112,9 @@ class Spotify extends Integration {
     this.addWidget('spotify', 'widget-title-spotify', 'fab fa-spotify');
 
     if (isMainThread) {
-      this.timeouts.IRefreshToken = setTimeout(() => this.IRefreshToken(), 60000);
-      this.timeouts.ICurrentSong = setTimeout(() => this.ICurrentSong(), 10000);
-      this.timeouts.getMe = setTimeout(() => this.getMe(), 10000);
+      this.timeouts.IRefreshToken = global.setTimeout(() => this.IRefreshToken(), 60000);
+      this.timeouts.ICurrentSong = global.setTimeout(() => this.ICurrentSong(), 10000);
+      this.timeouts.getMe = global.setTimeout(() => this.getMe(), 10000);
       setInterval(() => this.sendSongs(), 500);
     }
   }
@@ -271,7 +271,7 @@ class Spotify extends Integration {
       this.userId = null;
     }
 
-    this.timeouts['getMe'] = setTimeout(() => this.getMe(), 30000);
+    this.timeouts['getMe'] = global.setTimeout(() => this.getMe(), 30000);
   }
 
   async ICurrentSong () {
@@ -298,7 +298,7 @@ class Spotify extends Integration {
     } catch (e) {
       this.currentSong = JSON.stringify({});
     }
-    this.timeouts['ICurrentSong'] = setTimeout(() => this.ICurrentSong(), 5000);
+    this.timeouts['ICurrentSong'] = global.setTimeout(() => this.ICurrentSong(), 5000);
   }
 
   async IRefreshToken () {
@@ -313,7 +313,7 @@ class Spotify extends Integration {
     } catch (e) {
       global.log.info(chalk.yellow('SPOTIFY: ') + 'Refreshing access token failed');
     }
-    this.timeouts['IRefreshToken'] = setTimeout(() => this.IRefreshToken(), 60000);
+    this.timeouts['IRefreshToken'] = global.setTimeout(() => this.IRefreshToken(), 60000);
   }
 
   sockets () {
@@ -336,7 +336,7 @@ class Spotify extends Integration {
                   this.username = data.body.display_name ? data.body.display_name : data.body.id;
                   resolve();
                 }, () => {
-                  setTimeout(() => {
+                  global.setTimeout(() => {
                     check(resolve);
                   }, 1000);
                 });
@@ -365,7 +365,7 @@ class Spotify extends Integration {
 
         global.log.info(chalk.yellow('SPOTIFY: ') + `Access to account ${username} is revoked`);
 
-        this.timeouts['IRefreshToken'] = setTimeout(() => this.IRefreshToken(), 60000);
+        this.timeouts['IRefreshToken'] = global.setTimeout(() => this.IRefreshToken(), 60000);
         cb(null, { do: 'refresh' });
       });
       socket.on('authorize', async (cb) => {
@@ -517,4 +517,5 @@ class Spotify extends Integration {
   }
 }
 
-module.exports = new Spotify();
+export default Spotify;
+export { Spotify };

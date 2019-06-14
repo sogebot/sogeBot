@@ -50,7 +50,7 @@ class Bets extends Overlay {
     } catch (e) {
       global.log.error(e.stack);
     } finally {
-      this.timeouts.betsInterval = setTimeout(() => this.interval(), 1000);
+      this.timeouts.betsInterval = global.setTimeout(() => this.interval(), 1000);
     }
   }
 }

@@ -148,7 +148,7 @@ class Timers extends System {
       }
       await global.db.engine.update(this.collection.data, { _id: timer._id.toString() }, { trigger: { messages: global.linesParsed, timestamp: new Date().getTime() } });
     }
-    this.timeouts['timersCheck'] = setTimeout(() => this.check(), 1000); // this will run check 1s after full check is correctly done
+    this.timeouts['timersCheck'] = global.setTimeout(() => this.check(), 1000); // this will run check 1s after full check is correctly done
   }
 
   async editName (self, socket, data) {

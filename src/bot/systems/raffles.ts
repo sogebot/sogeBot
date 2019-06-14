@@ -44,7 +44,7 @@ class Raffles extends System {
 
   sockets () {
     if (this.socket === null) {
-      return setTimeout(() => this.sockets(), 100);
+      return global.setTimeout(() => this.sockets(), 100);
     }
     this.socket.on('connection', (socket) => {
       socket.on('pick', async (cb) => {
@@ -89,7 +89,7 @@ class Raffles extends System {
     clearTimeout(this.timeouts['raffleAnnounce']);
     let raffle = await global.db.engine.findOne(this.collection.data, { winner: null });
     if (!(await global.cache.isOnline()) || _.isEmpty(raffle) || new Date().getTime() - new Date(this.lastAnnounce).getTime() < (this.raffleAnnounceInterval * 60 * 1000)) {
-      this.timeouts['raffleAnnounce'] = setTimeout(() => this.announce(), 60000);
+      this.timeouts['raffleAnnounce'] = global.setTimeout(() => this.announce(), 60000);
       return;
     }
 
@@ -117,7 +117,7 @@ class Raffles extends System {
     });
     sendMessage(message, getOwner());
 
-    this.timeouts['raffleAnnounce'] = setTimeout(() => this.announce(), 60000);
+    this.timeouts['raffleAnnounce'] = global.setTimeout(() => this.announce(), 60000);
   }
 
   @command('!raffle remove')

@@ -158,4 +158,5 @@ class PhillipsHue extends Integration {
   }
 }
 
-module.exports = new PhillipsHue();
+export default PhillipsHue;
+export { PhillipsHue };
