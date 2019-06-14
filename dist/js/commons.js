@@ -32,7 +32,9 @@ var commons = {
       if (!metrics.translations.includes(key)) {
         // we need only first usage on page load to not unnecessary overload socket
         metrics.translations.push(key)
-        socket.emit('metrics.translations', key)
+        if (socket) {
+          socket.emit('metrics.translations', key)
+        }
       }
       // return translation of a key
       return _.isNil(_.at(translations, key)[0]) ? `{${key}}` : _.at(translations, key)[0]

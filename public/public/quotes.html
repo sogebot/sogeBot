@@ -10,8 +10,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <!-- Latest compiled and minified CSS -->
-    <link rel="stylesheet" href="/dist/css/light.css" crossorigin="anonymous" id="light-theme">
-    <link rel="stylesheet" href="/dist/css/dark.css" crossorigin="anonymous" id="dark-theme" disabled="disabled">
+    <link rel="stylesheet" href="/dist/css/light.css" crossorigin="anonymous">
 
     <link href="https://fonts.googleapis.com/css?family=Open+Sans|Poppins|PT+Sans|PT+Sans+Narrow|PT+Mono" rel="stylesheet">
 
@@ -22,15 +21,15 @@
     <div id="quotesApp" class="container-fluid">
       <span data-lang="menu.quotes" class="title text-default mb-4" style="font-size: 40px !important">Quotes</span>
       <div class="widget">
-        <div class="alert alert-danger mb-0 m-2" role="alert" v-if="quotes.length === 0">{{ commons.translate('systems.quotes.no-quotes-found') }}</div>
+        <div class="alert alert-danger mb-0 m-2" role="alert" v-if="quotes.length === 0" data-lang="systems.quotes.no-quotes-found"></div>
         <table class="table table-striped" v-if="quotes.length > 0">
           <thead>
             <tr>
               <th scope="col" class="p-3">#</th>
-              <th scope="col" class="p-3">{{ commons.translate('systems.quotes.quote.name') }}</th>
-              <th scope="col" class="p-3">{{ commons.translate('systems.quotes.by.name') }}</th>
-              <th scope="col" class="p-3">{{ commons.translate('systems.quotes.tags.name') }}</th>
-              <th scope="col" class="p-3">{{ commons.translate('systems.quotes.date.name') }}</th>
+              <th scope="col" class="p-3" data-lang="systems.quotes.quote.name"></th>
+              <th scope="col" class="p-3" data-lang="systems.quotes.by.name"></th>
+              <th scope="col" class="p-3" data-lang="systems.quotes.tags.name"></th>
+              <th scope="col" class="p-3" data-lang="systems.quotes.date.name"></th>
             </tr>
           </thead>
           <tbody>
@@ -79,10 +78,11 @@
       var socket = io({ query: "token=" + token })
       socket.emit('getConfiguration')
       socket.on('configuration', function (data) {
-        moment.locale(data.lang) // set moment locale
-        /* THEME */
-        $("[id$='theme']").attr('disabled', 'disabled')
-        $(`#${data.theme}-theme`).removeAttr('disabled')
+        moment.locale(data.core.general.lang) // set moment locale
+        // THEME
+        if (data.core.ui.theme === 'dark') {
+          $('head').append('<link rel="stylesheet" href="./dist/css/dark.css">')
+        }
       })
 
       socket.on('lang', function (data) {
