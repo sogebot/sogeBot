@@ -13,8 +13,9 @@ const axios = require('axios')
 
 // bot libraries
 const Expects = require('../expects.js')
-import { command, default_permission } from '../decorators';
+import { command, default_permission, shared, settings, ui } from '../decorators';
 import Integration from './_interface'
+import { onChange } from '../decorators/on';
 
 const __DEBUG__ = {
   REQUEST: (process.env.DEBUG && process.env.DEBUG.includes('spotify.request')) || (process.env.DEBUG && process.env.DEBUG.includes('spotify.*'))
@@ -29,97 +30,90 @@ const __DEBUG__ = {
  */
 
 class Spotify extends Integration {
-  client: any = null
+  client: any = null;
   uris: Array<{
     uri: string,
     requestBy: string,
     artist: string,
     song: string,
-  }> = []
-  currentUris: string | null = null
-  originalUri: string | null = null
-  skipToNextSong: boolean = false
+  }> = [];
+  currentUris: string | null = null;
+  originalUri: string | null = null;
+  skipToNextSong: boolean = false;
+  state: any = null;
+
+  @shared()
+  accessToken: string | null = null;
+  @shared()
+  refreshToken: string | null = null;
+  @shared()
+  userId: string | null = null;
+  @shared()
+  playlistId: string | null = null;
+  @shared()
+  currentSong: string = JSON.stringify({});
+
+  @settings()
+  songRequests: boolean = true;
+  @settings()
+  fetchCurrentSongWhenOffline: boolean = false;
+
+  @settings('output')
+  format: string = '$song - $artist';
+  @settings('output')
+  playlistToPlay: string = '';
+  @settings('output')
+  continueOnPlaylistAfterRequest: boolean = true;
+
+  @settings('connection')
+  @ui({ type: 'text-input', secret: true })
+  clientId: string = '';
+  @settings('connection')
+  @ui({ type: 'text-input', secret: true })
+  clientSecret: string = '';
+  @settings('connection')
+  redirectURI: string = 'http://localhost:20000/oauth/spotify';
+  @settings('connection')
+  @ui({ type: 'text-input', readOnly: true })
+  username: string = '';
+  @settings('connection')
+  @ui({ type: 'check-list', current: '_authenticatedScopes' })
+  scopes: string[] = [
+    'user-read-currently-playing',
+    'user-read-private',
+    'user-read-email',
+    'playlist-modify-public',
+    'playlist-modify',
+    'playlist-read-collaborative',
+    'playlist-modify-private',
+    'playlist-read-private',
+    'user-modify-playback-state' ];
+  @settings('connection')
+  _authenticatedScopes: string[] = [];
+
+  @ui({
+    type: 'button-socket',
+    on: '/integrations/spotify',
+    class: 'btn btn-primary btn-block',
+    text: 'integrations.spotify.settings.authorize',
+    if: function () { this.username.length === 0 },
+    emit: 'authorize'
+  })
+  authorizeBtn: null = null;
+
+  @ui({
+    type: 'button-socket',
+    on: '/integrations/spotify',
+    if: function () { this.username.length > 0 },
+    emit: 'revoke',
+    class: 'btn btn-primary btn-block',
+    text: 'integrations.spotify.settings.revoke'
+  })
+  revokeBtn: null = null;
+
 
   constructor () {
-    const settings = {
-      _: {
-        accessToken: '',
-        refreshToken: '',
-        userId: null,
-        playlistId: null,
-        currentSong: JSON.stringify({})
-      },
-      output: {
-        format: '$song - $artist',
-        playlistToPlay: '',
-        continueOnPlaylistAfterRequest: true,
-      },
-      songRequests: true,
-      fetchCurrentSongWhenOffline: false,
-      connection: {
-        clientId: '',
-        clientSecret: '',
-        redirectURI: 'http://localhost:20000/oauth/spotify',
-        username: '',
-        scopes: [
-          'user-read-currently-playing',
-          'user-read-private',
-          'user-read-email',
-          'playlist-modify-public',
-          'playlist-modify',
-          'playlist-read-collaborative',
-          'playlist-modify-private',
-          'playlist-read-private',
-          'user-modify-playback-state' ],
-        _authenticatedScopes: []
-      }
-    }
-    const ui = {
-      connection: {
-        username: {
-          type: 'text-input',
-          readOnly: true
-        },
-        scopes: {
-          type: 'check-list',
-          current: '_authenticatedScopes'
-        },
-        clientId: {
-          type: 'text-input',
-          secret: true
-        },
-        clientSecret: {
-          type: 'text-input',
-          secret: true
-        },
-        authorize: {
-          type: 'button-socket',
-          on: '/integrations/spotify',
-          class: 'btn btn-primary btn-block',
-          text: 'integrations.spotify.settings.authorize',
-          // $FlowFixMe - flow is complaining about 'this', although its used after super
-          if: () => this.settings.connection.username.length === 0,
-          emit: 'authorize'
-        },
-        revoke: {
-          type: 'button-socket',
-          on: '/integrations/spotify',
-          // $FlowFixMe - flow is complaining about 'this', although its used after super
-          if: () => this.settings.connection.username.length > 0,
-          emit: 'revoke',
-          class: 'btn btn-primary btn-block',
-          text: 'integrations.spotify.settings.revoke'
-        }
-      }
-    }
-    const on = {
-      change: {
-        enabled: ['onStateChange'],
-        'connection.username': ['onUsernameChange']
-      }
-    }
-
-    super({ settings, ui, on })
+    super()
 
     this.addWidget('spotify', 'widget-title-spotify', 'fab fa-spotify');
 
@@ -131,12 +125,14 @@ class Spotify extends Integration {
     }
   }
 
+  @onChange('connection.username')
   onUsernameChange (key: string, value: string) {
     if (value.length > 0) global.log.info(chalk.yellow('SPOTIFY: ') + `Access to account ${value} granted`)
   }
 
+  @onChange('enabled')
   onStateChange (key: string, value: string) {
-    this.settings._.currentSong = JSON.stringify({})
+    this.currentSong = JSON.stringify({})
     if (value) {
       this.connect()
       this.getMe()
@@ -151,12 +147,16 @@ class Spotify extends Integration {
 
   async playNextSongFromRequest() {
     try {
-      this.currentUris = this.uris.shift().uri // FIFO
+      const uri =  this.uris.shift()
+      if (typeof uri === 'undefined') {
+        throw new Error('URIs are empty');
+      }
+      this.currentUris = uri.uri // FIFO
       await axios({
         method: 'put',
         url: 'https://api.spotify.com/v1/me/player/play',
         headers: {
-          'Authorization': 'Bearer ' + this.settings._.accessToken,
+          'Authorization': 'Bearer ' + this.accessToken,
           'Content-Type': 'application/json'
         },
         data: {
@@ -165,9 +165,10 @@ class Spotify extends Integration {
       })
 
       // force is_playing and uri just to not skip until track refresh
+      const song = JSON.parse(this.currentSong)
       song.uri = this.currentUris
       song.is_playing = true
-      this.settings._.currentSong = JSON.stringify(song)
+      this.currentSong = JSON.stringify(song)
     } catch (e) {
       global.log.error(e.stack)
     }
@@ -181,11 +182,11 @@ class Spotify extends Integration {
         method: 'put',
         url: 'https://api.spotify.com/v1/me/player/play',
         headers: {
-          'Authorization': 'Bearer ' + this.settings._.accessToken,
+          'Authorization': 'Bearer ' + this.accessToken,
           'Content-Type': 'application/json'
         },
         data: {
-          context_uri: this.settings.output.playlistToPlay,
+          context_uri: this.playlistToPlay,
           offset
         }
       })
@@ -194,7 +195,7 @@ class Spotify extends Integration {
         method: 'post',
         url: 'https://api.spotify.com/v1/me/player/next',
         headers: {
-          'Authorization': 'Bearer ' + this.settings._.accessToken
+          'Authorization': 'Bearer ' + this.accessToken
         }
       })
       this.currentUris = null
@@ -208,11 +209,11 @@ class Spotify extends Integration {
   }
 
   async sendSongs () {
-    if (!this.settings._.userId || !this.settings.enabled) {
+    if (!this.userId || !(await this.isEnabled())) {
       return
     }
 
-    const song = JSON.parse(this.settings._.currentSong)
+    const song = JSON.parse(this.currentSong)
 
     if (__DEBUG__.REQUEST) {
       global.log.debug({
@@ -249,7 +250,7 @@ class Spotify extends Integration {
 
     // if song is part of currentUris and is not playing (finished playing), continue from playlist if set
     if (typeof song.uri !== 'undefined' && this.currentUris === song.uri && (!song.is_playing || song.force_skip) && this.uris.length === 0) {
-      if (this.settings.output.playlistToPlay.length > 0 && this.settings.output.continueOnPlaylistAfterRequest) {
+      if (this.playlistToPlay.length > 0 && this.continueOnPlaylistAfterRequest) {
         this.playNextSongFromPlaylist();
       }
     } else if (this.uris.length > 0) { // or we have requests
@@ -263,17 +264,17 @@ class Spotify extends Integration {
     clearTimeout(this.timeouts['getMe'])
 
     try {
-      if (this.settings.enabled && !_.isNil(this.client)) {
+      if ((await this.isEnabled()) && !_.isNil(this.client)) {
         let data = await this.client.getMe()
-        this.settings._.userId = data.body.id
-        this.settings.connection.username = data.body.display_name ? data.body.display_name : data.body.id
+        this.userId = data.body.id
+        this.username = data.body.display_name ? data.body.display_name : data.body.id
       }
     } catch (e) {
       if (e.message !== 'Unauthorized') {
         global.log.info(chalk.yellow('SPOTIFY: ') + 'Get of user failed, check your credentials')
       }
-      this.settings.connection.username = ''
-      this.settings._.userId = null
+      this.username = ''
+      this.userId = null
     }
 
     this.timeouts['getMe'] = setTimeout(() => this.getMe(), 30000)
@@ -283,10 +284,10 @@ class Spotify extends Integration {
     clearTimeout(this.timeouts['ICurrentSong'])
 
     try {
-      if (!this.settings.fetchCurrentSongWhenOffline && !(await global.cache.isOnline())) throw Error('Stream is offline')
+      if (!this.fetchCurrentSongWhenOffline && !(await global.cache.isOnline())) throw Error('Stream is offline')
       let data = await this.client.getMyCurrentPlayingTrack()
 
-      let currentSong = JSON.parse(this.settings._.currentSong)
+      let currentSong = JSON.parse(this.currentSong)
       if (typeof currentSong.song === 'undefined' || currentSong.song !== data.body.item.name) {
         currentSong = {
           finished_at: Date.now() - data.body.item.duration_ms, // may be off ~10s, but its important for requests
@@ -294,14 +295,14 @@ class Spotify extends Integration {
           artist: data.body.item.artists[0].name,
           uri: data.body.item.uri,
           is_playing: data.body.is_playing,
-          is_enabled: this.settings.enabled
+          is_enabled: await this.isEnabled()
         }
       }
       currentSong.is_playing = data.body.is_playing
-      currentSong.is_enabled = this.settings.enabled
-      this.settings._.currentSong = JSON.stringify(currentSong)
+      currentSong.is_enabled = await this.isEnabled()
+      this.currentSong = JSON.stringify(currentSong)
     } catch (e) {
-      this.settings._.currentSong = JSON.stringify({})
+      this.currentSong = JSON.stringify({})
     }
     this.timeouts['ICurrentSong'] = setTimeout(() => this.ICurrentSong(), 5000)
   }
@@ -310,10 +311,10 @@ class Spotify extends Integration {
     clearTimeout(this.timeouts['IRefreshToken'])
 
     try {
-      if (!_.isNil(this.client) && this.settings._.refreshToken) {
+      if (!_.isNil(this.client) && this.refreshToken) {
         let data = await this.client.refreshAccessToken()
         this.client.setAccessToken(data.body['access_token'])
-        this.settings._.accessToken = data.body['access_token']
+        this.accessToken = data.body['access_token']
       }
     } catch (e) {
       global.log.info(chalk.yellow('SPOTIFY: ') + 'Refreshing access token failed')
@@ -338,7 +339,7 @@ class Spotify extends Integration {
             let check = async (resolve) => {
               this.client.getMe()
                 .then((data) => {
-                  this.settings.connection.username = data.body.display_name ? data.body.display_name : data.body.id
+                  this.username = data.body.display_name ? data.body.display_name : data.body.id
                   resolve()
                 }, () => {
                   setTimeout(() => {
@@ -350,7 +351,7 @@ class Spotify extends Integration {
           })
         }
 
-        this.settings._.currentSong = JSON.stringify({})
+        this.currentSong = JSON.stringify({})
         this.connect({ token })
         await waitForUsername()
         callback(null, true)
@@ -358,15 +359,15 @@ class Spotify extends Integration {
       socket.on('revoke', async (cb) => {
         clearTimeout(this.timeouts['IRefreshToken'])
 
-        const username = this.settings.connection.username
+        const username = this.username
         this.client.resetAccessToken()
         this.client.resetRefreshToken()
-        this.settings._.userId = null
-        this.settings._.accessToken = null
-        this.settings._.refreshToken = null
-        this.settings.connection._authenticatedScopes = []
-        this.settings.connection.username = ''
-        this.settings._.currentSong = JSON.stringify({})
+        this.userId = null
+        this.accessToken = null
+        this.refreshToken = null
+        this._authenticatedScopes = []
+        this.username = ''
+        this.currentSong = JSON.stringify({})
 
         global.log.info(chalk.yellow('SPOTIFY: ') + `Access to account ${username} is revoked`)
 
@@ -375,8 +376,8 @@ class Spotify extends Integration {
       })
       socket.on('authorize', async (cb) => {
         if (
-          this.settings.connection.clientId === '' ||
-          this.settings.connection.clientSecret === ''
+          this.clientId === '' ||
+          this.clientSecret === ''
         ) {
           cb('Cannot authorize! Missing clientId or clientSecret.', null)
         } else {
@@ -395,36 +396,36 @@ class Spotify extends Integration {
     })
   }
 
-  connect (opts: Object = {}) {
+  connect (opts: { token?: string } = {}) {
     let isNewConnection = this.client === null
     try {
-      let error = []
-      if (this.settings.connection.clientId.trim().length === 0) error.push('clientId')
-      if (this.settings.connection.clientSecret.trim().length === 0) error.push('clientSecret')
-      if (this.settings.connection.redirectURI.trim().length === 0) error.push('redirectURI')
+      let error: string[] = []
+      if (this.clientId.trim().length === 0) error.push('clientId')
+      if (this.clientSecret.trim().length === 0) error.push('clientSecret')
+      if (this.redirectURI.trim().length === 0) error.push('redirectURI')
       if (error.length > 0) throw new Error(error.join(', ') + 'missing')
 
       this.client = new SpotifyWebApi({
-        clientId: this.settings.connection.clientId,
-        clientSecret: this.settings.connection.clientSecret,
-        redirectUri: this.settings.connection.redirectURI
+        clientId: this.clientId,
+        clientSecret: this.clientSecret,
+        redirectUri: this.redirectURI
       })
 
-      if (this.settings._.accessToken && this.settings._.refreshToken) {
-        this.client.setAccessToken(this.settings._.accessToken)
-        this.client.setRefreshToken(this.settings._.refreshToken)
+      if (this.accessToken && this.refreshToken) {
+        this.client.setAccessToken(this.accessToken)
+        this.client.setRefreshToken(this.refreshToken)
       }
 
       try {
         if (opts.token && !_.isNil(this.client)) {
           this.client.authorizationCodeGrant(opts.token)
             .then((data) => {
-              this.settings.connection._authenticatedScopes = data.body.scope.split(' ')
-              this.settings._.accessToken = data.body['access_token']
-              this.settings._.refreshToken = data.body['refresh_token']
+              this._authenticatedScopes = data.body.scope.split(' ')
+              this.accessToken = data.body['access_token']
+              this.refreshToken = data.body['refresh_token']
 
-              this.client.setAccessToken(this.settings._.accessToken)
-              this.client.setRefreshToken(this.settings._.refreshToken)
+              this.client.setAccessToken(this.accessToken)
+              this.client.setRefreshToken(this.refreshToken)
             }, (err) => {
               if (err) global.log.info(chalk.yellow('SPOTIFY: ') + 'Getting of accessToken and refreshToken failed')
             })
@@ -448,7 +449,7 @@ class Spotify extends Integration {
     if (_.isNil(this.client)) return null
     let state = crypto.createHash('md5').update(Math.random().toString()).digest('hex')
     this.state = state
-    return this.client.createAuthorizeURL(this.settings.connection.scopes, state)
+    return this.client.createAuthorizeURL(this.scopes, state)
   }
 
   @command('!spotify')
@@ -460,7 +461,7 @@ class Spotify extends Integration {
       global.workers.sendToMaster({ type: 'call', ns: 'integrations.spotify', fnc: 'main', args: [opts] })
       return
     }
-    if (!this.settings.songRequests) return
+    if (!this.songRequests) return
 
     try {
       let [spotifyId] = new Expects(opts.parameters)
@@ -480,7 +481,7 @@ class Spotify extends Integration {
           method: 'get',
           url: 'https://api.spotify.com/v1/tracks/' + id,
           headers: {
-            'Authorization': 'Bearer ' + this.settings._.accessToken
+            'Authorization': 'Bearer ' + this.accessToken
           }
         })
         let track = response.data
@@ -499,7 +500,7 @@ class Spotify extends Integration {
           method: 'get',
           url: 'https://api.spotify.com/v1/search?type=track&limit=1&q=' + encodeURI(spotifyId),
           headers: {
-            'Authorization': 'Bearer ' + this.settings._.accessToken,
+            'Authorization': 'Bearer ' + this.accessToken,
             'Content-Type': 'application/json'
           }
         })

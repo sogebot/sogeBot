@@ -656,7 +656,7 @@ class Module {
     } else { return []; }
   }
 
-  public async isEnabled() {
+  public async isEnabled(): Promise<boolean> {
     return this.status({ quiet: true });
   }
 
