@@ -54,6 +54,7 @@ class Currency extends Core {
       }
     } catch (e) {
       global.log.warning(`Currency exchange error - ${e.message}`);
+      global.log.warning(`Available currencies: ${Object.keys(this.rates).join(', ')}`);
       return value; // don't change rate if code not found
     }
   }
