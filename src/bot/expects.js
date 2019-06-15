@@ -224,17 +224,17 @@ class Expects {
 
   username (opts) {
     opts = opts || {}
-    _.defaults(opts, { optional: false })
+    _.defaults(opts, { optional: false, default: null })
     if (!opts.optional) this.checkText()
 
     const regexp = XRegExp(`@?(?<username>[A-Za-z0-9_]+)`, 'ix')
     const match = XRegExp.exec(`${this.text}`, regexp)
     if (!_.isNil(match)) {
-      this.match.push(match.username)
+      this.match.push(match.username.toLowerCase())
       this.text = this.text.replace(match.username, '') // remove from text matched pattern
     } else {
       if (!opts.optional) throw Error('Username not found')
-      else this.match.push(null)
+      else this.match.push(opts.default)
     }
     return this
   }
