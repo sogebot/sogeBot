@@ -379,7 +379,7 @@ class Users extends Core {
         await global.db.engine.update('users.watched', { id }, { watched: isNaN(Number(viewer.time.watched)) ? 0 : Number(viewer.time.watched) })
         delete viewer.time.watched
 
-        const bits = viewer.stats.bits; delete viewer.stats.bits
+        const bits = _.cloneDeep(viewer.stats.bits);
         for (let b of bits) {
           delete b.editation
           if (b.new) {
@@ -391,8 +391,14 @@ class Users extends Core {
             await global.db.engine.update('users.bits', { _id }, b)
           }
         }
+        for (const t of (await global.db.engine.find('users.bits', { id }))) {
+          if (!viewer.stats.bits.map(p => String(p._id)).includes(String(t._id))) {
+            await global.db.engine.remove('users.bits', { _id: String(t._id) });
+          }
+        }
+        delete viewer.stats.bits;
 
-        const tips = viewer.stats.tips; delete viewer.stats.tips
+        const tips = _.cloneDeep(viewer.stats.tips);
         for (let b of tips) {
           delete b.editation
           if (b.new) {
@@ -404,6 +410,12 @@ class Users extends Core {
             await global.db.engine.update('users.tips', { _id }, b)
           }
         }
+        for (const t of (await global.db.engine.find('users.tips', { id }))) {
+          if (!viewer.stats.tips.map(p => String(p._id)).includes(String(t._id))) {
+            await global.db.engine.remove('users.tips', { _id: String(t._id) });
+          }
+        }
+        delete viewer.stats.tips;
 
         await global.db.engine.update('users', { id }, viewer)
         cb(null, id)
