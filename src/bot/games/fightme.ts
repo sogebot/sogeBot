@@ -55,15 +55,15 @@ class FightMe extends Game {
       };
 
       // vs broadcaster
-      if (await isBroadcaster(opts.sender) || await isBroadcaster(username)) {
+      if (isBroadcaster(opts.sender) || isBroadcaster(username)) {
         sendMessage(
           prepare('gambling.fightme.broadcaster', {
-            winner: await isBroadcaster(opts.sender) ? opts.sender.username : username,
-            loser: await isBroadcaster(opts.sender) ? username : opts.sender.username
+            winner: isBroadcaster(opts.sender) ? opts.sender.username : username,
+            loser: isBroadcaster(opts.sender) ? username : opts.sender.username
           }),
           opts.sender);
-        const isBroadcasterModCheck = await isBroadcaster(opts.sender) ? isMod.user : isMod.sender;
-        if (!isBroadcasterModCheck) {timeout(await isBroadcaster(opts.sender) ? username : opts.sender.username, null, this.timeout);}
+        const isBroadcasterModCheck = isBroadcaster(opts.sender) ? isMod.user : isMod.sender;
+        if (!isBroadcasterModCheck) {timeout(isBroadcaster(opts.sender) ? username : opts.sender.username, null, this.timeout);}
         global.db.engine.remove(this.collection.users, { _id: challenge._id.toString() });
         return;
       }
@@ -106,7 +106,7 @@ class FightMe extends Game {
       const cooldown = this.cooldown;
       const isMod = await isModerator(opts.sender);
       if (new Date().getTime() - new Date(this._cooldown).getTime() < cooldown * 1000 &&
-        !(this.bypassCooldownByOwnerAndMods && (isMod || await isBroadcaster(opts.sender)))) {
+        !(this.bypassCooldownByOwnerAndMods && (isMod || isBroadcaster(opts.sender)))) {
         sendMessage(prepare('gambling.fightme.cooldown', {
           command: opts.command,
           cooldown: Math.round(((cooldown * 1000) - (new Date().getTime() - new Date(this._cooldown).getTime())) / 1000 / 60),
@@ -116,7 +116,7 @@ class FightMe extends Game {
       }
 
       // save new timestamp if not bypassed
-      if (!(this.bypassCooldownByOwnerAndMods && (isMod || await isBroadcaster(opts.sender)))) {this._cooldown = String(new Date());}
+      if (!(this.bypassCooldownByOwnerAndMods && (isMod || isBroadcaster(opts.sender)))) {this._cooldown = String(new Date());}
 
       const isAlreadyChallenged = !_.isEmpty(await global.db.engine.findOne(this.collection.users, { key: '_users', user: opts.sender.username, challenging: username }));
       if (!isAlreadyChallenged) {await global.db.engine.insert(this.collection.users, { key: '_users', user: opts.sender.username, challenging: username });}
