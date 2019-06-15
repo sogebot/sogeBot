@@ -92,7 +92,7 @@ class Heist extends Game {
   constructor () {
     super();
 
-    if (isMainThread) {this.timeouts['iCheckFinished'] = setTimeout(() => this.iCheckFinished(), 10000);} // wait for proper config startup
+    if (isMainThread) {this.timeouts['iCheckFinished'] = global.setTimeout(() => this.iCheckFinished(), 10000);} // wait for proper config startup
   }
 
   async iCheckFinished () {
@@ -121,7 +121,7 @@ class Heist extends Game {
         // cleanup
         this.startedAt = null;
         await global.db.engine.remove(this.collection.users, {});
-        this.timeouts['iCheckFinished'] = setTimeout(() => this.iCheckFinished(), 10000);
+        this.timeouts['iCheckFinished'] = global.setTimeout(() => this.iCheckFinished(), 10000);
         return;
       }
 
@@ -132,7 +132,7 @@ class Heist extends Game {
         let isSurvivor = _.random(0, 100, false) <= level['winPercentage'];
         let user = users[0];
         let outcome = isSurvivor ? this.singleUserSuccess : this.singleUserFailed;
-        setTimeout(async () => { sendMessage(outcome.replace('$user', (global.tmi.settings.chat.showWithAt ? '@' : '') + user.username), getOwner()); }, 5000);
+        global.setTimeout(async () => { sendMessage(outcome.replace('$user', (global.tmi.settings.chat.showWithAt ? '@' : '') + user.username), getOwner()); }, 5000);
 
         if (isSurvivor) {
           // add points to user
@@ -154,9 +154,9 @@ class Heist extends Game {
         let percentage = (100 / users.length) * winners.length;
         let ordered = _.orderBy(this.results, [(o) => o.percentage], 'asc');
         let result = _.find(ordered, (o) => o.percentage >= percentage);
-        setTimeout(async () => { sendMessage(_.isNil(result) ? '' : result.message, getOwner()); }, 5000);
+        global.setTimeout(async () => { sendMessage(_.isNil(result) ? '' : result.message, getOwner()); }, 5000);
         if (winners.length > 0) {
-          setTimeout(async () => {
+          global.setTimeout(async () => {
             const chunk: string[][] = _.chunk(winners, this.showMaxUsers);
             let winnersList = chunk.shift() || [];
             let andXMore = _.flatten(winners).length;
@@ -180,7 +180,7 @@ class Heist extends Game {
       this.lastHeistTimestamp = 0;
       sendMessage((this.copsCooldown), getOwner());
     }
-    this.timeouts['iCheckFinished'] = setTimeout(() => this.iCheckFinished(), 10000);
+    this.timeouts['iCheckFinished'] = global.setTimeout(() => this.iCheckFinished(), 10000);
   }
 
   @command('!bankheist')

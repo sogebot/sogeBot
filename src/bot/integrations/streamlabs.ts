@@ -88,7 +88,7 @@ class Streamlabs extends Integration {
           widgets: global.widgets,
           integrations: global.integrations
         })) {
-          for (let [name, system] of Object.entries(systems as any[])) {
+          for (let [name, system] of Object.entries(systems)) {
             if (name.startsWith('_') || typeof system.on === 'undefined') {continue;}
             if (typeof system.on.tip === 'function') {
               system.on.tip({

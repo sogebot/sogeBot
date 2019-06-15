@@ -18,6 +18,7 @@ class Alerts extends Overlay {
 
   constructor() {
     super();
+
     this.addMenu({ category: 'settings', name: 'overlays', id: 'overlays' });
   }
 

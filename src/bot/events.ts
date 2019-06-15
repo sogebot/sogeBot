@@ -281,7 +281,9 @@ class Events extends Core {
     }
 
     // Update widgets and titles
-    global.widgets.custom_variables.io.emit('refresh');
+    if (global.widgets.custom_variables.socket) {
+      global.widgets.custom_variables.socket.emit('refresh');
+    }
     const regexp = new RegExp(`\\$_${customVariableName}`, 'ig');
     const title = await global.cache.rawStatus();
     if (title.match(regexp)) { global.api.setTitleAndGame(null); }
@@ -302,7 +304,9 @@ class Events extends Core {
     }
 
     // Update widgets and titles
-    global.widgets.custom_variables.io.emit('refresh');
+    if (global.widgets.custom_variables.socket) {
+      global.widgets.custom_variables.socket.emit('refresh');
+    }
     const regexp = new RegExp(`\\$_${customVariableName}`, 'ig');
     const title = await global.cache.rawStatus();
     if (title.match(regexp)) { global.api.setTitleAndGame(null); }

@@ -1,4 +1,3 @@
-/* globals translations token */
 import _ from 'lodash';
 import Vue from 'vue';
 import Overlays from './index.vue';

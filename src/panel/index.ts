@@ -1,4 +1,3 @@
-/* globals translations token */
 import 'moment/min/locales.min';
 import './others/checklist';
 import './widgets/dashboard';

@@ -13,6 +13,8 @@ class Module {
   public collection: { [x: string]: string };
   public timeouts: { [x: string]: NodeJS.Timeout } = {};
   public settingsList: { category: string; key: string }[] = [];
+  public on: InterfaceSettings.On;
+  public socket: SocketIOClient.Socket | null;
 
   get enabled(): boolean {
     return _.get(this, '_enabled', true);
@@ -39,8 +41,6 @@ class Module {
   protected _parsers: Parser[];
   protected _rollback: { name: string }[];
   protected _enabled: boolean = true;
-  protected on: InterfaceSettings.On;
-  protected socket: SocketIOClient.Socket | null;
 
   constructor(name: string = 'core', enabled: boolean = true) {
     this.on = {
@@ -459,7 +459,7 @@ class Module {
     const areDependenciesEnabled = await this._dependenciesEnabled();
     const isMasterAndStatusOnly = isMainThread && _.isNil(opts.state);
     const isStatusChanged = !_.isNil(opts.state);
-    const isDisabledByEnv = !_.isNil(process.env.DISABLE) &&
+    const isDisabledByEnv = process.env.DISABLE &&
       (process.env.DISABLE.toLowerCase().split(',').includes(this.constructor.name.toLowerCase()) || process.env.DISABLE === '*');
 
     if (isStatusChanged) { this.enabled = opts.state; } else { opts.state = this.enabled; }
@@ -561,8 +561,7 @@ class Module {
 
       if (_.isNil(parser.name)) { throw Error('Parsers name must be defined'); }
 
-      if (parser.dependsOn) {
-        if (_.isString(parser.dependsOn)) { parser.dependsOn = parser.dependsOn.split(','); }
+      if (typeof parser.dependsOn !== 'undefined') {
         for (const dependency of parser.dependsOn) {
           const dependencyPointer = _.get(global, dependency, null);
           // skip parser if dependency is not enabled
@@ -617,7 +616,7 @@ class Module {
         if (_.isNil(command.name)) { throw Error('Command name must be defined'); }
 
         // if fnc is not set
-        if (_.isNil(command.fnc)) {
+        if (typeof command.fnc === 'undefined') {
           command.fnc = 'main';
           if (command.name.split(' ').length > 1) {
             command.fnc = '';
@@ -631,7 +630,6 @@ class Module {
         }
 
         if (command.dependsOn) {
-          if (_.isString(command.dependsOn)) { command.dependsOn = command.dependsOn.split(','); }
           for (const dependency of command.dependsOn) {
             const dependencyPointer = _.get(global, dependency, null);
             // skip command if dependency is not enabled
@@ -639,8 +637,8 @@ class Module {
           }
         }
 
-        command.permission = _.isNil(command.permission) ? permission.VIEWERS : command.permission;
-        command.command = _.isNil(command.command) ? command.name : command.command;
+        command.permission = typeof command.permission === 'undefined' ? permission.VIEWERS : command.permission;
+        command.command = typeof command.command === 'undefined' ? command.name : command.command;
         commands.push({
           this: this,
           id: command.name,
@@ -662,7 +660,7 @@ class Module {
 
   public async getUI() {
     // we need to go through all ui and trigger functions and delete attr if false
-    const ui = _.cloneDeep(this._ui);
+    const ui: InterfaceSettings.UI = _.cloneDeep(this._ui);
     for (const [k, v] of Object.entries(ui)) {
       if (typeof v !== 'undefined' && typeof v !== 'boolean') {
         if (typeof v.type !== 'undefined') {

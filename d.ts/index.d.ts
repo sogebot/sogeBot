@@ -142,20 +142,20 @@ interface onEventTip {
   amount: number;
   message: string;
   currency: string;
-  timestamp: string;
+  timestamp: number;
 }
 
 interface onEventBit {
   username: string;
   amount: number;
   message: string;
-  timestamp: string;
+  timestamp: number;
 }
 
 interface onEventMessage {
   sender: Sender | null;
   message: string;
-  timestamp: string;
+  timestamp: number;
 }
 
 declare namespace InterfaceSettings {

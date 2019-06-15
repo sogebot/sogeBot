@@ -47,7 +47,7 @@ class Duel extends Game {
     const total = users.reduce((total, v) => total + v.tickets, 0);
 
     if (timestamp === 0 || new Date().getTime() - timestamp < 1000 * 60 * duelDuration) {
-      this.timeouts['pickDuelWinner'] = setTimeout(() => this.pickDuelWinner(), 30000);
+      this.timeouts['pickDuelWinner'] = global.setTimeout(() => this.pickDuelWinner(), 30000);
       return;
     }
 
@@ -86,7 +86,7 @@ class Duel extends Game {
     await global.db.engine.remove(this.collection.users, {});
     this._timestamp = 0;
 
-    this.timeouts['pickDuelWinner'] = setTimeout(() => this.pickDuelWinner(), 30000);
+    this.timeouts['pickDuelWinner'] = global.setTimeout(() => this.pickDuelWinner(), 30000);
   }
 
   @command('!duel bank')
@@ -156,7 +156,7 @@ class Duel extends Game {
       }
 
       const tickets = (await global.db.engine.findOne(this.collection.users, { id: opts.sender.userId })).tickets;
-      setTimeout(async () => {
+      global.setTimeout(async () => {
         message = await prepare(isNewDuelist ? 'gambling.duel.joined' : 'gambling.duel.added', {
           pointsName: await global.systems.points.getPointsName(tickets),
           points: tickets
