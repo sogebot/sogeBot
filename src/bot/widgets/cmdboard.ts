@@ -42,4 +42,5 @@ class Cmdboard extends Widget {
   }
 }
 
-module.exports = new Cmdboard();
+export default Cmdboard;
+export { Cmdboard };

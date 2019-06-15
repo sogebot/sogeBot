@@ -7,4 +7,5 @@ class Social extends Widget {
   }
 }
 
-module.exports = new Social();
+export default Social;
+export { Social };

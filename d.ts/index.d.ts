@@ -38,7 +38,15 @@ declare namespace NodeJS {
     configuration: any;
     cpu: any;
     db: any;
-    games: any;
+    games: {
+      duel: import('../src/bot/games/duel').Duel;
+      fightme: import('../src/bot/games/fightme').FightMe;
+      gamble: import('../src/bot/games/gamble').Gamble;
+      heist: import('../src/bot/games/heist').Heist;
+      roulette: import('../src/bot/games/roulette').Roulette;
+      seppuku: import('../src/bot/games/seppuku').Seppuku;
+      wheelOfFortune: import('../src/bot/games/wheelOfFortune').WheelOfFortune;
+    };
     general: any;
     bot: any;
     translate: any;
@@ -75,7 +83,15 @@ declare namespace NodeJS {
     customvariables: any;
     tmi: any;
     events: import('../src/bot/events').Events;
-    widgets: any;
+    widgets: {
+      chat: import('../src/bot/widgets/chat').Chat;
+      cmdboard: import('../src/bot/widgets/cmdboard').Cmdboard;
+      custom_variables: import('../src/bot/widgets/custom_variables').CustomVariables;
+      eventlist: import('../src/bot/widgets/eventlist').EventList;
+      joinpart: import('../src/bot/widgets/joinpart').JoinPart;
+      social: import('../src/bot/widgets/social').Social;
+      soundboard: import('../src/bot/widgets/soundboard').SoundBoard;
+    };
     oauth: import('../src/bot/oauth').OAuth;
   }
 }

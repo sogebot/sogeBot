@@ -31,4 +31,5 @@ class SoundBoard extends Widget {
   }
 }
 
-module.exports = new SoundBoard();
+export default SoundBoard;
+export { SoundBoard };
