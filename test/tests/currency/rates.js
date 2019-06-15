@@ -55,17 +55,17 @@ describe('Currency - rates check', () => {
       before(() => {
         global.currency.base = base
       })
-      for (let to of Object.keys(rates)) {
-        for (let from of Object.keys(rates)) {
-          it(`[${base}] ${from} => ${to} ${from === to ? '= 1' : '!= 1'}`, async () => {
+      it(`Checking if all rates are correctly computed with '${base}' as base`, async () => {
+        for (let to of Object.keys(rates)) {
+          for (let from of Object.keys(rates)) {
             if (from === to) {
               assert.strictEqual(global.currency.exchange(1, from, to), 1)
             } else {
               assert.notEqual(global.currency.exchange(1, from, to), 1)
             }
-          })
+          }
         }
-      }
+      })
     }
   })
 })
