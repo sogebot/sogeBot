@@ -13,7 +13,7 @@ export const VariableWatcher = {
   add(key: string, value: any) {
     variables[key] = cloneDeep(value);
   },
-  check() {
+  async check() {
     for (const k of Object.keys(variables)) {
       let value = get(global, k.replace('core.', ''), null);
       if (!isEqual(value, variables[k])) {
@@ -44,7 +44,7 @@ export const VariableWatcher = {
         }
 
         if (isMainThread && self) {
-          global.db.engine.update(self.collection.settings, { system: name, key: variable }, { value });
+          await global.db.engine.update(self.collection.settings, { system: name, key: variable }, { value });
           if (typeof self.on !== 'undefined'
             && typeof self.on.change !== 'undefined'
             && self.on.change[variable]) {

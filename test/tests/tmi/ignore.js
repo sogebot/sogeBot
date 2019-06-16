@@ -13,11 +13,16 @@ const testuser2 = { username: 'testuser2' }
 const testuser3 = { username: 'testuser3' }
 
 const commons = require('../../../dest/commons');
+const { VariableWatcher } = require('../../../dest/watchers');
 
 describe('TMI - ignore', () => {
   before(async () => {
     await db.cleanup()
     await message.prepare()
+  })
+
+  beforeEach(async () => {
+    await VariableWatcher.check()
   })
 
   describe('Ignore workflow', () => {
