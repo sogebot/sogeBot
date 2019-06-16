@@ -251,7 +251,7 @@ class Moderation extends System {
         this.timeoutUser(opts.sender, whitelisted,
           global.translate('moderation.user-is-warned-about-links'),
           global.translate('moderation.user-have-timeout-for-links'),
-          timeout, 'links');
+          this.cLinksTimeout, 'links');
         return false;
       }
     } else {
@@ -277,14 +277,14 @@ class Moderation extends System {
           this.timeoutUser(opts.sender, opts.message,
             global.translate('moderation.user-is-warned-about-symbols'),
             global.translate('moderation.user-have-timeout-for-symbols'),
-            timeout, 'symbols');
+            this.cSymbolsTimeout, 'symbols');
           return false;
         }
         symbolsLength = symbolsLength + symbols.length;
       }
     }
     if (Math.ceil(symbolsLength / (msgLength / 100)) >= this.cSymbolsMaxSymbolsPercent) {
-      this.timeoutUser(opts.sender, opts.message, global.translate('moderation.warnings.symbols'), global.translate('moderation.symbols'), timeout, 'symbols');
+      this.timeoutUser(opts.sender, opts.message, global.translate('moderation.warnings.symbols'), global.translate('moderation.symbols'), this.cSymbolsTimeout, 'symbols');
       return false;
     }
     return true;
@@ -301,7 +301,7 @@ class Moderation extends System {
       this.timeoutUser(opts.sender, opts.message,
         global.translate('moderation.user-is-warned-about-long-message'),
         global.translate('moderation.user-have-timeout-for-long-message'),
-        timeout, 'longmessage');
+        this.cLongMessageTimeout, 'longmessage');
       return false;
     }
   }
@@ -340,7 +340,7 @@ class Moderation extends System {
       this.timeoutUser(opts.sender, opts.message,
         global.translate('moderation.user-is-warned-about-caps'),
         global.translate('moderation.user-have-timeout-for-caps'),
-        timeout, 'caps');
+        this.cCapsTimeout, 'caps');
       return false;
     }
     return true;
@@ -361,7 +361,7 @@ class Moderation extends System {
         this.timeoutUser(opts.sender, opts.message,
           global.translate('moderation.user-have-timeout-for-spam'),
           global.translate('moderation.user-is-warned-about-spam'),
-          timeout, 'spam');
+          this.cSpamTimeout, 'spam');
         return false;
       }
     }
@@ -378,7 +378,7 @@ class Moderation extends System {
       this.timeoutUser(opts.sender, opts.message,
         global.translate('moderation.user-is-warned-about-color'),
         global.translate('moderation.user-have-timeout-for-color'),
-        timeout, 'color');
+        this.cColorTimeout, 'color');
       return false;
     } else {return true;}
   }
@@ -396,7 +396,7 @@ class Moderation extends System {
       this.timeoutUser(opts.sender, opts.message,
         global.translate('moderation.user-is-warned-about-emotes'),
         global.translate('moderation.user-have-timeout-for-emotes'),
-        timeout, 'emotes');
+        this.cEmotesTimeout, 'emotes');
       return false;
     } else {return true;}
   }
@@ -417,7 +417,7 @@ class Moderation extends System {
           this.timeoutUser(opts.sender, opts.message,
             global.translate('moderation.user-is-warned-about-blacklist'),
             global.translate('moderation.user-have-timeout-for-blacklist'),
-            timeout, 'blacklist');
+            this.cListsTimeout, 'blacklist');
           break;
         }
       }
