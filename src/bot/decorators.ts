@@ -1,5 +1,6 @@
 import * as _ from 'lodash';
 import { parse, sep as separator } from 'path';
+import { VariableWatcher } from './watchers';
 
 function getNameAndTypeFromStackTrace() {
   const _prepareStackTrace = Error.prepareStackTrace;
@@ -35,20 +36,7 @@ export function settings(category?: string) {
       }
       try {
         const self = type === 'core' ? global[name] : global[type][name];
-        const defaultValue = self[key];
-
-        Object.defineProperty(self, key, {
-          get: () => {
-            return _.get(self, '_data.' + key, defaultValue);
-          },
-          set: (valueSetArg: any) => {
-            if (!_.isEqual(_.get(self, '_data.' + key, defaultValue), valueSetArg)) {
-              _.set(self, '_data.' + key, valueSetArg);
-              // update variable in db and send to all workers
-              self.updateSettings(path, valueSetArg);
-            }
-          },
-        });
+        VariableWatcher.add(`${type}.${name}.${key}`, self[key]);
 
         // load variable from db
         const loadVariableValue = () => {
@@ -57,6 +45,7 @@ export function settings(category?: string) {
           }
           self.loadVariableValue(path).then((value) => {
             if (value) {
+              VariableWatcher.add(`${type}.${name}.${key}`, value); // rewrite value on var load
               _.set(self, key, value);
             }
           });
@@ -86,6 +75,8 @@ export function shared() {
       try {
         const self = type === 'core' ? global[name] : global[type][name];
         const defaultValue = self[key];
+
+        VariableWatcher.add(`${type}.${name}.${key}`, defaultValue);
 
         Object.defineProperty(self, key, {
           get: () => {

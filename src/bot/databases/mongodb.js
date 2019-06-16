@@ -12,6 +12,7 @@ const {
 const {
   flatten, unflatten
 } = require('../commons');
+import { debug } from '../debug';
 
 const _ = require('lodash')
 
@@ -29,6 +30,7 @@ class IMongoDB extends Interface {
     this.dbName = mongodbUri.parse(this.mongoUri).database
 
     this.connect()
+    debug('db', 'Starting MongoDB - ' + isMainThread);
   }
 
   async index (table, opts) {

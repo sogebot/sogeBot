@@ -25,6 +25,7 @@ class Workers {
   }
 
   public sendToAll(opts) {
+    console.log({opts, isMainThread})
     if (isMainThread) {
       this.sendToAllWorkers(opts);
     } else {
@@ -162,12 +163,12 @@ class Workers {
         // remove core from path
         if (data.system === 'core') {
           const obj = Object.values(global).find((o) => {
-            return o.constructor.name === data.class;
+            return o.constructor.name.toLowerCase() === data.class.toLowerCase();
           });
           if (obj) { set(obj, data.path, data.value); }
         } else {
           const obj = Object.values(global[data.system]).find((o: any) => {
-            return o.constructor.name === data.class;
+            return o.constructor.name.toLowerCase() === data.class.toLowerCase();
           }) as any;
           if (obj) { set(obj, data.path, data.value); }
         }
@@ -181,18 +182,26 @@ class Workers {
           // remove core from path
           if (data.system === 'core') {
             const obj = Object.values(global).find((o) => {
-              return o.constructor.name === data.class;
+              return o.constructor.name.toLowerCase() === data.class.toLowerCase();
             });
-            if (obj) { set(obj, data.path, data.value); }
+            if (obj) {
+              set(obj, data.path, data.value);
+            } else {
+              throw Error(`${data.class} not found`);
+            }
           } else if (data.system === 'widgets') {
             // widgets are only on master
             break;
           } else {
             try {
               const obj = Object.values(global[data.system]).find((o: any) => {
-                return o.constructor.name === data.class;
+                return o.constructor.name.toLowerCase() === data.class.toLowerCase();
               }) as any;
-              if (obj) { set(obj, data.path, data.value); }
+              if (obj) {
+                set(obj, data.path, data.value);
+              } else {
+                throw Error(`${data.class} not found`);
+              }
             } catch (e) {
               global.log.error(e.stack);
               global.log.error('Something went wrong when updating interface variable');

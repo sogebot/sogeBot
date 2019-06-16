@@ -1,10 +1,8 @@
 import chalk from 'chalk';
 import _ from 'lodash';
 import { setTimeout } from 'timers'; // tslint workaround
-import util from 'util';
 import { isMainThread } from 'worker_threads';
 
-import { debug } from './debug';
 import { permission } from './permissions';
 
 class Module {
@@ -107,53 +105,6 @@ class Module {
     }
 
     return variable.value;
-  }
-
-  public updateSettings(key, value) {
-    debug('interface.update', `Updating ${key} = ${util.inspect(value)}, ${isMainThread}`);
-    if (Array.isArray(value)) {
-      value = [...value]; // we need to retype otherwise we have worker clone error
-    }
-    const proc = {
-      type: 'interface',
-      system: this._name,
-      class: this.constructor.name,
-      path: `_data.${key}`,
-      value,
-    };
-
-    if (isMainThread) {
-      global.db.engine.update(this.collection.settings, { system: this.constructor.name.toLowerCase(), key }, { value });
-      // send to all threads
-      global.workers.sendToAllWorkers(proc);
-
-      if (typeof this.on !== 'undefined'
-          && typeof this.on.change !== 'undefined'
-          && this.on.change[key]) {
-        // run on.change functions only on master
-        for (const fnc of this.on.change[key]) {
-          if (typeof this[fnc] === 'function') {
-            this[fnc](key, value);
-          } else {
-            global.log.error(`${fnc}() is not function in ${this._name}/${this.constructor.name.toLowerCase()}`);
-          }
-        }
-      }
-    } else {
-      // send to master to update
-      global.workers.sendToMaster(proc);
-    }
-
-    // manually update commands as they are not part of settings anymore
-    if (proc.path.startsWith('settings.commands.')) {
-      const c = this._commands.find((o) => o.name === key.replace('commands.', ''));
-      if (c) {
-        c.command = value;
-        if (c.command === c.name && isMainThread) { // remove if default value
-          global.db.engine.remove(this.collection.settings, { system: this.constructor.name.toLowerCase(), key });
-        }
-      }
-    }
   }
 
   public prepareCommand(opts: string | Command) {
