@@ -183,7 +183,7 @@ let migration = {
             'chat.showWithAt': 'showWithAt',
             'chat.mute': 'mute',
             'chat.whisperListener': 'whisperListener',
-          }
+          },
           currency: {
             'currency.mainCurrency': 'mainCurrency',
           }
