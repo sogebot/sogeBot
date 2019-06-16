@@ -11,7 +11,7 @@ class Workers {
   protected path: string = join(__dirname, 'main.js');
   protected list: Worker[] = [];
 
-  public sendToAll(opts) {
+  public callOnAll(opts) {
     if (isMainThread) {
       // run on master
       const namespace = get(global, opts.ns, null);
@@ -24,7 +24,7 @@ class Workers {
     }
   }
 
-  public setOnAll(opts) {
+  public sendToAll(opts) {
     if (isMainThread) {
       this.sendToAllWorkers(opts);
     } else {

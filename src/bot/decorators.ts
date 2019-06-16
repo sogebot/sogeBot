@@ -102,7 +102,7 @@ export function shared() {
                 path: '_shared.' + key,
                 value,
               };
-              global.workers.setOnAll(proc);
+              global.workers.sendToAll(proc);
             }
           },
         });

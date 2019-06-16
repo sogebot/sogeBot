@@ -8,7 +8,6 @@ import { debug } from './debug';
 import { permission } from './permissions';
 
 class Module {
-  public name: string = 'core';
   public dependsOn: string[] = [];
   public collection: { [x: string]: string };
   public timeouts: { [x: string]: NodeJS.Timeout } = {};
@@ -26,7 +25,7 @@ class Module {
       // update variable in all workers (only RAM)
       const proc = {
         type: 'interface',
-        system: this.name,
+        system: this._name,
         class: this.constructor.name.toLowerCase(),
         path: '_enabled',
         value: v,
