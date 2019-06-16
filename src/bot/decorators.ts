@@ -55,8 +55,6 @@ export function settings(category?: string) {
   const { name, type } = getNameAndTypeFromStackTrace();
 
   return (target: object, key: string) => {
-    const path = category ? `${category}.${key}` : key;
-
     const registerSettings = () => {
       const isAvailableModule = type !== 'core' && typeof global[type] !== 'undefined' && typeof global[type][name] !== 'undefined';
       const isAvailableLibrary = type === 'core' && typeof global[name] !== 'undefined';
@@ -72,7 +70,7 @@ export function settings(category?: string) {
           if (!global.db.engine.connected) {
             return setTimeout(() => loadVariableValue(), 1000);
           }
-          self.loadVariableValue(path).then((value) => {
+          self.loadVariableValue(key).then((value) => {
             if (value) {
               VariableWatcher.add(`${type}.${name}.${key}`, value); // rewrite value on var load
               _.set(self, key, value);

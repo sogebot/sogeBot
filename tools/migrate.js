@@ -164,18 +164,28 @@ let migration = {
 
         const mappings = {
           oauth: {
-            'general.channel': 'general.generalChannel',
-            'general.owners': 'general.generalOwners',
+            'general.channel': 'generalChannel',
+            'general.owners': 'generalOwners',
 
-            'broadcaster.accessToken': 'broadcaster.broadcasterAccessToken',
-            'broadcaster.refreshToken': 'broadcaster.broadcasterRefreshToken',
-            'broadcaster.username': 'broadcaster.broadcasterUsername',
-            'broadcaster._authenticatedScopes': 'broadcaster.broadcasterCurrentScopes',
+            'broadcaster.accessToken': 'broadcasterAccessToken',
+            'broadcaster.refreshToken': 'broadcasterRefreshToken',
+            'broadcaster.username': 'broadcasterUsername',
+            'broadcaster._authenticatedScopes': 'broadcasterCurrentScopes',
 
-            'bot.accessToken': 'bot.botAccessToken',
-            'bot.refreshToken': 'bot.botRefreshToken',
-            'bot.username': 'bot.botUsername',
-            'bot._authenticatedScopes': 'bot.botCurrentScopes',
+            'bot.accessToken': 'botAccessToken',
+            'bot.refreshToken': 'botRefreshToken',
+            'bot.username': 'botUsername',
+            'bot._authenticatedScopes': 'botCurrentScopes',
+          },
+          tmi: {
+            'chat.ignorelist': 'ignorelist',
+            'chat.sendWithMe': 'sendWithMe',
+            'chat.showWithAt': 'showWithAt',
+            'chat.mute': 'mute',
+            'chat.whisperListener': 'whisperListener',
+          }
+          currency: {
+            'currency.mainCurrency': 'mainCurrency',
           }
         }
 
