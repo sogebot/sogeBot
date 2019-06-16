@@ -105,7 +105,7 @@ describe('systems/moderation - blacklist()', () => {
     for (let text of _.get(test, 'should.return.true', [])) {
       it(`pattern '${pattern}' should ignore '${text}'`, async () => {
         global.systems.moderation.cListsBlacklist = [pattern]
-        await variable.isEqual('systems.moderation.settings.lists.blacklist', [pattern])
+        await variable.isEqual('systems.moderation.cListsBlacklist', [pattern])
         let result = await global.systems.moderation.blacklist({ sender: { username: 'testuser', badges: {} }, message: text })
         assert.isTrue(result)
       })
@@ -113,7 +113,7 @@ describe('systems/moderation - blacklist()', () => {
     for (let text of _.get(test, 'should.return.false', [])) {
       it(`pattern '${pattern}' should timeout on '${text}'`, async () => {
         global.systems.moderation.cListsBlacklist = [pattern]
-        await variable.isEqual('systems.moderation.settings.lists.blacklist', [pattern])
+        await variable.isEqual('systems.moderation.cListsBlacklist', [pattern])
         let result = await global.systems.moderation.blacklist({ sender: { username: 'testuser', badges: {} }, message: text })
         assert.isFalse(result)
       })
