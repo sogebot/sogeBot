@@ -9,6 +9,7 @@ require('../../general.js')
 
 const db = require('../../general.js').db
 const variable = require('../../general.js').variable
+const message = require('../../general.js').message
 
 const _ = require('lodash')
 const assert = require('chai').assert
@@ -99,6 +100,7 @@ const tests = {
 describe('systems/moderation - blacklist()', () => {
   before(async () => {
     await db.cleanup()
+    await message.prepare()
   })
 
   for (let [pattern, test] of Object.entries(tests)) {

@@ -9,6 +9,7 @@ require('../../general.js')
 
 const db = require('../../general.js').db
 const variable = require('../../general.js').variable
+const message = require('../../general.js').message
 const assert = require('chai').assert
 
 const tests = {
@@ -29,6 +30,7 @@ describe('systems/moderation - Caps()', () => {
   describe('moderationCaps=false', async () => {
     before(async () => {
       await db.cleanup()
+      await message.prepare()
       global.systems.moderation.cCapsEnabled = false
       await variable.isEqual('global.systems.moderation.cCapsEnabled', false)
     })
@@ -47,7 +49,8 @@ describe('systems/moderation - Caps()', () => {
   })
   describe('moderationCaps=true', async () => {
     before(async () => {
-      await db.cleanup()
+            await message.prepare()
+            await message.prepare()
       global.systems.moderation.cCapsEnabled = true
       await variable.isEqual('global.systems.moderation.cCapsEnabled', true)
     })

@@ -9,6 +9,7 @@ require('../../general.js')
 
 const db = require('../../general.js').db
 const variable = require('../../general.js').variable
+const message = require('../../general.js').message
 const assert = require('chai').assert
 
 const tests = {
@@ -24,6 +25,7 @@ describe('systems/moderation - longMessage()', () => {
   describe('moderationLongMessage=false', async () => {
     before(async () => {
       await db.cleanup()
+      await message.prepare()
       global.systems.moderation.cLongMessageEnabled = false
       await variable.isEqual('global.systems.moderation.cLongMessageEnabled', false)
     })
@@ -43,6 +45,7 @@ describe('systems/moderation - longMessage()', () => {
   describe('moderationLongMessage=true', async () => {
     before(async () => {
       await db.cleanup()
+      await message.prepare()
       global.systems.moderation.cLongMessageEnabled = true
       await variable.isEqual('global.systems.moderation.cLongMessageEnabled', true)
     })
