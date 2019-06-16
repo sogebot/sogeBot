@@ -106,9 +106,9 @@ class Credits extends Overlay {
         for (let event of events) {
           if (!_.isNil(event.amount) && !_.isNil(event.currency)) {
             event.amount = this.cCreditsAggregated
-              ? global.currency.exchange(event.amount, event.currency, global.currency.settings.currency.mainCurrency)
+              ? global.currency.exchange(event.amount, event.currency, global.currency.mainCurrency)
               : event.amount;
-            event.currency = global.currency.symbol(this.cCreditsAggregated ? global.currency.settings.currency.mainCurrency : event.currency);
+            event.currency = global.currency.symbol(this.cCreditsAggregated ? global.currency.mainCurrency : event.currency);
           }
         }
 

@@ -47,7 +47,7 @@ class Goals extends Overlay {
     for (const goal of tipsGoals) {
       const uid = String(goal.uid);
       if (new Date(goal.endAfter).getTime() >= new Date().getTime() || goal.endAfterIgnore) {
-        const amount = parseFloat(global.currency.exchange(bit.amount / 100, 'USD', global.currency.settings.currency.mainCurrency));
+        const amount = parseFloat(global.currency.exchange(bit.amount / 100, 'USD', global.currency.mainCurrency));
         await global.db.engine.incrementOne(this.collection.goals, { uid }, { currentAmount: amount });
       }
     }
@@ -58,7 +58,7 @@ class Goals extends Overlay {
     const goals: Goals.Goal[] = await global.db.engine.find(this.collection.goals, { type: 'tips' });
     for (const goal of goals) {
       const uid = String(goal.uid);
-      const currentAmount = Number(global.currency.exchange(tip.amount, tip.currency, global.currency.settings.currency.mainCurrency));
+      const currentAmount = Number(global.currency.exchange(tip.amount, tip.currency, global.currency.mainCurrency));
       if (new Date(goal.endAfter).getTime() >= new Date().getTime() || goal.endAfterIgnore) {
         await global.db.engine.incrementOne(this.collection.goals, { uid }, { currentAmount });
       }

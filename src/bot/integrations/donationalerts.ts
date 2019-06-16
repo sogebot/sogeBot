@@ -86,15 +86,15 @@ class Donationalerts extends Integration {
           username: data.username.toLowerCase(),
           amount: parseFloat(data.amount).toFixed(2),
           currency: data.currency,
-          amountInBotCurrency: parseFloat(global.currency.exchange(data.amount, data.currency, global.currency.settings.currency.mainCurrency)).toFixed(2),
-          currencyInBot: global.currency.settings.currency.mainCurrency,
+          amountInBotCurrency: parseFloat(global.currency.exchange(data.amount, data.currency, global.currency.mainCurrency)).toFixed(2),
+          currencyInBot: global.currency.mainCurrency,
           message: data.message,
         });
 
         if (!data._is_test_alert) {
           const id = await global.users.getIdByName(data.username.toLowerCase(), false);
           if (id) {global.db.engine.insert('users.tips', { id, amount: data.amount, message: data.message, currency: data.currency, timestamp: _.now() });}
-          if (await global.cache.isOnline()) {await global.db.engine.increment('api.current', { key: 'tips' }, { value: parseFloat(global.currency.exchange(data.amount, data.currency, global.currency.settings.currency.mainCurrency)) });}
+          if (await global.cache.isOnline()) {await global.db.engine.increment('api.current', { key: 'tips' }, { value: parseFloat(global.currency.exchange(data.amount, data.currency, global.currency.mainCurrency)) });}
         }
 
         // go through all systems and trigger on.tip

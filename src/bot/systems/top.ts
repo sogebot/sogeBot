@@ -128,7 +128,7 @@ class Top extends System {
           if (_.isNil(users[username])) {
             users[username] = { username, value: 0 };
           }
-          users[username].value += global.currency.exchange(tip.amount, tip.currency, global.currency.settings.currency.mainCurrency);
+          users[username].value += global.currency.exchange(tip.amount, tip.currency, global.currency.mainCurrency);
         }
         sorted = _.orderBy(users, 'value', 'desc');
         break;
@@ -211,7 +211,7 @@ class Top extends System {
             message += [user.value, getLocalizedName(user.value, 'core.months')].join(' ');
             break;
           case TYPE.TIPS:
-            message += user.value.toFixed(2) + global.currency.symbol(global.currency.settings.currency.mainCurrency);
+            message += user.value.toFixed(2) + global.currency.symbol(global.currency.mainCurrency);
             break;
           case TYPE.POINTS:
             message += user.value + ' ' + await global.systems.points.getPointsName(user.value);

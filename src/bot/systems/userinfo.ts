@@ -243,7 +243,7 @@ class UserInfo extends System {
       if (message.includes('$tips')) {
         const idx = message.indexOf('$tips');
         const tips = await global.db.engine.find('users.tips', { id: opts.sender.userId });
-        const currency = global.currency.settings.currency.mainCurrency;
+        const currency = global.currency.mainCurrency;
         let tipAmount = 0;
         for (const t of tips) {
           tipAmount += global.currency.exchange(t.amount, t.currency, currency);

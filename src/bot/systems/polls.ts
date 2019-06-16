@@ -300,7 +300,7 @@ class Polls extends System {
           const vote: Vote = {
             vid: String(cVote._id),
             votedBy: opts.username,
-            votes: Number(global.currency.exchange(opts.amount, opts.currency, global.currency.settings.currency.mainCurrency)),
+            votes: Number(global.currency.exchange(opts.amount, opts.currency, global.currency.mainCurrency)),
             option: i - 1,
           };
           // no update as we will not switch vote option as in normal vote

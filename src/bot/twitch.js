@@ -61,7 +61,7 @@ class Twitch extends Core {
 
     let onlineFollowers = _.intersection(onlineViewers, followers)
     events = _.filter(_.orderBy(events, 'timestamp', 'desc'), (o) => { return o.event === 'follow' })
-    moment.locale(global.general.settings.lang)
+    moment.locale(global.general.lang)
 
     let lastFollowAgo = ''
     let lastFollowUsername = 'n/a'

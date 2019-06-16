@@ -16,7 +16,7 @@ describe('libs/webhooks - follower()', () => {
   before(async () => {
     await db.cleanup()
     await message.prepare()
-    global.oauth.settings._.channelId = channelId
+    global.oauth.channelId = channelId
   })
 
   it('testuser should not be in webhooks cache', async () => {
@@ -37,7 +37,7 @@ describe('libs/webhooks - follower()', () => {
         data: {
           from_id: id,
           from_name: 'testuser',
-          to_id: global.oauth.settings._.channelId,
+          to_id: global.oauth.channelId,
           to_name: 'channeluser'
         }
       })
