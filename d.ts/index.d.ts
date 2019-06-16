@@ -197,7 +197,7 @@ interface InterfaceSettings {
 
 interface UISelector {
   type: 'selector';
-  values: string[];
+  values: string[] | (() => string[]);
   if?: () => boolean;
 }
 

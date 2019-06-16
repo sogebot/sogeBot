@@ -57,14 +57,13 @@ class OAuth extends Core {
   @ui({ ignore: true })
   public broadcasterCurrentScopes: string[] = [];
 
-  @settings('broadcaster')
   @ui({
     type: 'link',
     href: 'https://twitchtokengenerator.com/quick/RkshHUnw16',
     class: 'btn btn-primary btn-block',
     text: 'commons.generate',
     target: '_blank',
-  })
+  }, 'broadcaster')
   public broadcasterGenerateLink: null = null;
 
   @settings('bot')
@@ -98,14 +97,13 @@ class OAuth extends Core {
   @ui({ ignore: true })
   public botCurrentScopes: string[] = [];
 
-  @settings('bot')
   @ui({
     type: 'link',
     href: 'https://twitchtokengenerator.com/quick/UQ6SHl81nt',
     class: 'btn btn-primary btn-block',
     text: 'commons.generate',
     target: '_blank',
-  })
+  }, 'bot')
   public botGenerateLink: null = null;
 
   constructor() {

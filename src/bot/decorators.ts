@@ -17,8 +17,37 @@ function getNameAndTypeFromStackTrace() {
 }
 
 export function ui(opts, category?: string) {
+  const { name, type } = getNameAndTypeFromStackTrace();
+
   return (target: object, key: string) => {
-    return;
+    let path = category ? `${category}.${key}` : key;
+
+    const register = (retries = 0) => {
+      const isAvailableModule = type !== 'core' && typeof global[type] !== 'undefined' && typeof global[type][name] !== 'undefined';
+      const isAvailableLibrary = type === 'core' && typeof global[name] !== 'undefined';
+      if (!isAvailableLibrary && !isAvailableModule) {
+        return setTimeout(() => register(0), 1000);
+      }
+      try {
+        const self = type === 'core' ? global[name] : global[type][name];
+
+        // get category from settingsList
+        if (!category) {
+          const s = self.settingsList.find(o => o.key === path);
+          if (s) {
+            path = s.category? s.category + '.' + path : path;
+          } else {
+            if (retries < 500) { // try to wait to settings to be registered
+              return setTimeout(() => register(retries++), 10);
+            }
+          }
+        }
+        _.set(self, '_ui.' + path, opts);
+      } catch (e) {
+        console.log(e);
+      }
+    };
+    register();
   };
 }
 

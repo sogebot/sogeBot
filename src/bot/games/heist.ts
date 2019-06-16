@@ -176,7 +176,7 @@ class Heist extends Game {
     }
 
     // check if cops done patrolling
-    if (!_.isNil(lastHeistTimestamp) && _.now() - lastHeistTimestamp >= copsCooldown * 60000) {
+    if (lastHeistTimestamp !== 0 && _.now() - lastHeistTimestamp >= copsCooldown * 60000) {
       this.lastHeistTimestamp = 0;
       sendMessage((this.copsCooldown), getOwner());
     }

@@ -624,6 +624,12 @@ class Module {
               delete ui[k];
             }
           }
+
+          if (v.type === 'selector') {
+            if (typeof v.values === 'function') {
+              v.values = v.values();
+            }
+          }
         } else {
           for (const [k2, v2] of Object.entries(v)) {
             if (typeof v2 !== 'undefined') {
@@ -631,6 +637,9 @@ class Module {
                 if (!v2.if()) {
                   delete ui[k][k2];
                 }
+              }
+              if (typeof v2.values === 'function') {
+                v2.values = v2.values();
               }
             }
           }
