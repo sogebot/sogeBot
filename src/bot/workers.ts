@@ -25,7 +25,6 @@ class Workers {
   }
 
   public sendToAll(opts) {
-    console.log({opts, isMainThread})
     if (isMainThread) {
       this.sendToAllWorkers(opts);
     } else {

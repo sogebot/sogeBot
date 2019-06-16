@@ -157,6 +157,41 @@ let migration = {
     }
   }],
   settings: [{
+    version: '9.1.0',
+    do: async () => {
+      let processed = 0;
+        console.info('Updating core.settings')
+
+        const mappings = {
+          oauth: {
+            'general.channel': 'general.generalChannel',
+            'general.owners': 'general.generalOwners',
+
+            'broadcaster.accessToken': 'broadcaster.broadcasterAccessToken',
+            'broadcaster.refreshToken': 'broadcaster.broadcasterRefreshToken',
+            'broadcaster.username': 'broadcaster.broadcasterUsername',
+            'broadcaster._authenticatedScopes': 'broadcaster.broadcasterCurrentScopes',
+
+            'bot.accessToken': 'bot.botAccessToken',
+            'bot.refreshToken': 'bot.botRefreshToken',
+            'bot.username': 'bot.botUsername',
+            'bot._authenticatedScopes': 'bot.botCurrentScopes',
+          }
+        }
+
+      for (const system of Object.keys(mappings)) {
+        for (const [ before, after ] of Object.entries(mappings[system])) {
+          let item = await global.db.engine.findOne('core.settings', { key: before, system })
+          if (typeof item.key !== 'undefined') {
+            console.info(` -> ${system}.${before} => ${system}.${after}`)
+            await global.db.engine.update('core.settings', { _id: String(item._id) }, { key: after, system })
+            processed++
+          }
+        }
+      }
+      console.info(` => ${processed} processed`)
+    }
+  }, {
     version: '9.0.0',
     do: async () => {
       let processed = 0

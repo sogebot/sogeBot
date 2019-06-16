@@ -349,7 +349,6 @@ function Panel () {
     socket.on('systems', async (cb) => {
       let toEmit = []
       for (let system of Object.keys(global.systems).filter(o => !o.startsWith('_'))) {
-        if (!global.systems[system].settings) continue
         toEmit.push({
           name: system.toLowerCase(),
           enabled: global.systems[system].enabled,
@@ -362,7 +361,6 @@ function Panel () {
     socket.on('core', async (cb) => {
       let toEmit = []
       for (let system of ['oauth', 'tmi', 'currency', 'ui', 'general', 'twitch']) {
-        if (!global[system].settings) continue
         toEmit.push({
           name: system.toLowerCase()
         })

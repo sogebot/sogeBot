@@ -465,7 +465,9 @@ class Module {
     // go through expected settings
     for (const { category, key } of this.settingsList) {
       if (category) {
-        promisedSettings[category] = {};
+        if (typeof promisedSettings[category] === 'undefined') {
+          promisedSettings[category] = {};
+        }
 
         if (category === 'commands') {
           _.set(promisedSettings, `${category}.${key}`, this.getCommand(key));
@@ -491,6 +493,8 @@ class Module {
       }
     }
 
+    // add status info
+    promisedSettings.enabled = this._enabled;
     return promisedSettings;
   }
 

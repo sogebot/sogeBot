@@ -223,13 +223,19 @@ class OAuth extends Core {
 
       global.status.API = request.status === 200 ? constants.CONNECTED : constants.DISCONNECTED;
     } catch (e) {
-      console.error(e);
+      if (!e.message.includes('no access token')) {
+        console.error(e);
+      }
       status = false;
       if ((this[type + 'RefreshToken']) !== '') { this.refreshAccessToken(type); } else {
         this[type + 'Username'] = '';
         this[type + 'CurrentScopes'] = [];
 
-        if (type === 'bot') { this.botId = ''; } else { this.broadcasterId = ''; }
+        if (type === 'bot') {
+          this.botId = '';
+        } else {
+          this.broadcasterId = '';
+        }
       }
     }
     this.timeouts[`validateOAuth-${type}`] = global.setTimeout(() => this.validateOAuth(type), 60000);
