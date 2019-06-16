@@ -59,9 +59,9 @@ class TMI extends Core {
   async ignoreAdd (opts: Object) {
     try {
       const username = new Expects(opts.parameters).username().toArray()[0].toLowerCase()
-      global.tmi.settings.chat.ignorelist = [
+      global.tmi.ignorelist = [
         ...new Set([
-          ...global.tmi.settings.chat.ignorelist,
+          ...global.tmi.ignorelist,
           username,
         ]
       )];
@@ -77,7 +77,7 @@ class TMI extends Core {
   async ignoreRm (opts: Object) {
     try {
       const username = new Expects(opts.parameters).username().toArray()[0].toLowerCase()
-      global.tmi.settings.chat.ignorelist = global.tmi.settings.chat.ignorelist.filter(o => o !== username)
+      global.tmi.ignorelist = global.tmi.ignorelist.filter(o => o !== username)
       // update ignore list
       commons.sendMessage(commons.prepare('ignore.user.is.removed', { username }), opts.sender)
     } catch (e) {
@@ -619,7 +619,7 @@ class TMI extends Core {
 
     if (!skip
         && sender['message-type'] === 'whisper'
-        && (global.tmi.settings.chat.whisperListener || isOwner(sender))) {
+        && (global.tmi.whisperListener || isOwner(sender))) {
       global.log.whisperIn(message, { username: sender.username })
     } else if (!skip && !commons.isBot(sender.username)) {
       global.log.chatIn(message, { username: sender.username })

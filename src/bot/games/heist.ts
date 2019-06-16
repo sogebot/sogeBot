@@ -132,7 +132,7 @@ class Heist extends Game {
         let isSurvivor = _.random(0, 100, false) <= level['winPercentage'];
         let user = users[0];
         let outcome = isSurvivor ? this.singleUserSuccess : this.singleUserFailed;
-        global.setTimeout(async () => { sendMessage(outcome.replace('$user', (global.tmi.settings.chat.showWithAt ? '@' : '') + user.username), getOwner()); }, 5000);
+        global.setTimeout(async () => { sendMessage(outcome.replace('$user', (global.tmi.showWithAt ? '@' : '') + user.username), getOwner()); }, 5000);
 
         if (isSurvivor) {
           // add points to user
@@ -162,7 +162,7 @@ class Heist extends Game {
             let andXMore = _.flatten(winners).length;
 
             let message = await global.translate('games.heist.results');
-            message = message.replace('$users', winnersList.map((o) => (global.tmi.settings.chat.showWithAt ? '@' : '') + o).join(', '));
+            message = message.replace('$users', winnersList.map((o) => (global.tmi.showWithAt ? '@' : '') + o).join(', '));
             if (andXMore > 0) {message = message + ' ' + (await global.translate('games.heist.andXMore')).replace('$count', andXMore);}
             sendMessage(message, getOwner());
           }, 5500);

@@ -23,15 +23,14 @@ module.exports = {
       }
       await global.permissions.ensurePreservedPermissionsInDb() // re-do core permissions
 
+      global.oauth.generalChannel = 'soge__'
+      await variable.isEqual('global.oauth.generalChannel', 'soge__')
 
-      global.oauth.settings.general.channel = 'soge__'
-      await variable.isEqual('global.oauth.settings.general.channel', 'soge__')
+      global.oauth.generalOwners = ['soge__', '__owner__']
+      await variable.isEqual('global.oauth.generalOwners', ['soge__', '__owner__'])
 
-      global.oauth.settings.general.owners = ['soge__', '__owner__']
-      await variable.isEqual('global.oauth.settings.general.owners', ['soge__', '__owner__'])
-
-      global.oauth.settings.broadcaster.username = 'broadcaster'
-      await variable.isEqual('global.oauth.settings.broadcaster.username', 'broadcaster')
+      global.oauth.broadcasterUsername = 'broadcaster'
+      await variable.isEqual('global.oauth.broadcasterUsername', 'broadcaster')
 
       resolve()
     }

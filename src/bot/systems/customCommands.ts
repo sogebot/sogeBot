@@ -314,7 +314,7 @@ class CustomCommands extends System {
         let rPrmsn: any = permissions.find(o => o.v === r.permission);
         const response = await prepare('customcmds.response', { command, index: ++r.order, response: r.response, after: r.stopIfExecuted ? '_' : 'v', permission: rPrmsn.string });
         global.log.chatOut(response, { username: opts.sender.username });
-        message(global.tmi.settings.chat.sendWithMe ? 'me' : 'say', getOwner(), response);
+        message(global.tmi.sendWithMe ? 'me' : 'say', getOwner(), response);
       }
     }
   }

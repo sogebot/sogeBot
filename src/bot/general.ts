@@ -51,7 +51,7 @@ class General extends Core {
     };
 
     const lang = this.lang;
-    const mute = global.tmi.settings.chat.mute;
+    const mute = global.tmi.mute;
 
     const enabledSystems: any = {};
     for (const category of ['systems', 'games', 'integrations']) {

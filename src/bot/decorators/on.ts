@@ -1,4 +1,4 @@
-import { set } from 'lodash';
+import { set, get } from 'lodash';
 import { parse, sep as separator } from 'path';
 
 export function onChange(variableArg: string) {
@@ -14,7 +14,9 @@ export function onChange(variableArg: string) {
 
       try {
         const self = type === 'core' ? global[name] : global[type][name];
-        set(self, `on.change.${variableArg}`, key);
+        const on = get(self, `on.change.${variableArg}`, []);
+        on.push(key);
+        set(self, `on.change.${variableArg}`, on);
       } catch (e) {
         console.error(e);
       }
@@ -36,7 +38,9 @@ export function onLoad(fncNameArg: string) {
 
       try {
         const self = type === 'core' ? global[name] : global[type][name];
-        set(self, `on.load.${key}`, fncNameArg);
+        const on = get(self, `on.load.${fncNameArg}`, []);
+        on.push(key);
+        set(self, `on.load.${fncNameArg}`, on);
       } catch (e) {
         console.error(e);
       }

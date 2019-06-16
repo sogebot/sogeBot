@@ -75,7 +75,7 @@ export function unflatten(data) {
 }
 
 export function getIgnoreList() {
-  return global.tmi.settings.chat.ignorelist.map((o) => {
+  return global.tmi.ignorelist.map((o) => {
     return o.trim().toLowerCase();
   });
 }
@@ -99,7 +99,7 @@ export async function prepare(translate: string, attr?: {[x: string]: any }): Pr
   for (const key of Object.keys(attr).sort((a, b) => b.length - a.length)) {
     let value = attr[key];
     if (['username', 'who', 'winner', 'sender', 'loser'].includes(key)) {
-      value = global.tmi.settings.chat.showWithAt ? `@${value}` : value;
+      value = global.tmi.showWithAt ? `@${value}` : value;
     }
     msg = msg.replace(new RegExp('[$]' + key, 'g'), value);
   }
@@ -155,15 +155,15 @@ export async function sendMessage(messageToSend, sender, attr?: {
 
   // if sender is null/undefined, we can assume, that username is from dashboard -> bot
   if ((typeof sender.username === 'undefined' || sender.username === null) && !attr.force) { return false; } // we don't want to reply on bot commands
-  messageToSend = !_.isNil(sender.username) ? messageToSend.replace(/\$sender/g, (global.tmi.settings.chat.showWithAt ? '@' : '') + sender.username) : messageToSend;
-  if (!global.tmi.settings.chat.mute || attr.force) {
+  messageToSend = !_.isNil(sender.username) ? messageToSend.replace(/\$sender/g, (global.tmi.showWithAt ? '@' : '') + sender.username) : messageToSend;
+  if (!global.tmi.mute || attr.force) {
     if ((!_.isNil(attr.quiet) && attr.quiet)) { return true; }
     if (sender['message-type'] === 'whisper') {
       global.log.whisperOut(messageToSend, { username: sender.username });
       message('whisper', sender.username, messageToSend);
     } else {
       global.log.chatOut(messageToSend, { username: sender.username });
-      if (global.tmi.settings.chat.sendWithMe && !messageToSend.startsWith('/')) {
+      if (global.tmi.sendWithMe && !messageToSend.startsWith('/')) {
         message('me', null, messageToSend);
       } else {
         message('say', null, messageToSend);

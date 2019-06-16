@@ -158,7 +158,7 @@ class Queue extends System {
     await global.db.engine.remove(this.collection.picked, {});
     for (let user of users) {await global.db.engine.update(this.collection.picked, { username: user.username }, user);}
 
-    const atUsername = global.tmi.settings.chat.showWithAt;
+    const atUsername = global.tmi.showWithAt;
 
     var msg;
     switch (users.length) {
@@ -180,7 +180,7 @@ class Queue extends System {
   @default_permission(permission.CASTERS)
   async list (opts) {
     let [atUsername, users] = await Promise.all([
-      global.tmi.settings.chat.showWithAt,
+      global.tmi.showWithAt,
       global.db.engine.find(this.collection.data)
     ]);
     users = users.map(o => atUsername ? `@${o.username}` : o).join(', ');

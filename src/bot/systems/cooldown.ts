@@ -67,7 +67,7 @@ class Cooldown extends System {
 
     if (!_.isNil(command)) { // command
       let key = subcommand ? `${command} ${subcommand}` : command;
-      const parsed = await (new Parser().find(subcommand ? `${command} ${subcommand}` : command));
+      const parsed = await (new Parser.default().find(subcommand ? `${command} ${subcommand}` : command));
       if (parsed) {
         key = parsed.command;
       } else {
@@ -75,7 +75,7 @@ class Cooldown extends System {
         if (global.systems.customCommands.isEnabled()) {
           let commands: any = await global.db.engine.find(global.systems.customCommands.collection.data);
           commands = _(commands).flatMap().sortBy(o => -o.command.length).value();
-          const customparsed = await (new Parser().find(subcommand ? `${command} ${subcommand}` : command, commands));
+          const customparsed = await (new Parser.default().find(subcommand ? `${command} ${subcommand}` : command, commands));
           if (customparsed) {
             key = customparsed.command;
           }
@@ -190,7 +190,7 @@ class Cooldown extends System {
 
     if (!_.isNil(command)) { // command
       let key = subcommand ? `${command} ${subcommand}` : command;
-      const parsed = await (new Parser().find(subcommand ? `${command} ${subcommand}` : command));
+      const parsed = await (new Parser.default().find(subcommand ? `${command} ${subcommand}` : command));
       if (parsed) {
         key = parsed.command;
       } else {
@@ -198,7 +198,7 @@ class Cooldown extends System {
         if (global.systems.customCommands.isEnabled()) {
           let commands = await global.db.engine.find(global.systems.customCommands.collection.data);
           commands = _(commands).flatMap().sortBy(o => -o.command.length).value();
-          const customparsed = await (new Parser().find(subcommand ? `${command} ${subcommand}` : command, commands));
+          const customparsed = await (new Parser.default().find(subcommand ? `${command} ${subcommand}` : command, commands));
           if (customparsed) {
             key = customparsed.command;
           }

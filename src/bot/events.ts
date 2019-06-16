@@ -245,7 +245,7 @@ class Events extends Core {
   public async fireSendChatMessageOrWhisper(operation, attributes, whisper) {
     const username = _.isNil(attributes.username) ? getOwner() : attributes.username;
     let message = operation.messageToSend;
-    const atUsername = global.tmi.settings.chat.showWithAt;
+    const atUsername = global.tmi.showWithAt;
 
     attributes = flatten(attributes);
     for (const key of Object.keys(attributes).sort((a, b) => a.length - b.length)) {

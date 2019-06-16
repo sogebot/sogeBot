@@ -30,7 +30,7 @@ class Alias extends System {
 
   @parser()
   async run (opts) {
-    const parser = new Parser();
+    const p = new Parser.default();
     let alias;
 
     // is it an command?
@@ -52,7 +52,7 @@ class Alias extends System {
     for (let i = 0; i < length; i++) { // search for correct alias
       if (cmdArray.length === alias.command.split(' ').length) {break;} // command is correct (have same number of parameters as command)
 
-      const parsedCmd = await parser.find(cmdArray.join(' '));
+      const parsedCmd = await p.find(cmdArray.join(' '));
       const isRegistered = !_.isNil(parsedCmd) && parsedCmd.command.split(' ').length === cmdArray.length;
 
       if (isRegistered) {

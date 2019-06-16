@@ -108,7 +108,7 @@ class Price extends System {
   @parser({ priority: constants.HIGH })
   async check (opts) {
     const parsed = opts.message.match(/^(![\S]+)/);
-    const helpers = (await (new Parser()).getCommandsList()).filter(o => o.isHelper).map(o => o.command);
+    const helpers = (await (new Parser.default()).getCommandsList()).filter(o => o.isHelper).map(o => o.command);
     if (
       _.isNil(parsed) ||
       isOwner(opts.sender) ||
@@ -134,7 +134,7 @@ class Price extends System {
   @rollback()
   async restorePointsRollback (opts) {
     const parsed = opts.message.match(/^(![\S]+)/);
-    const helpers = (await (new Parser()).getCommandsList()).filter(o => o.isHelper).map(o => o.command);
+    const helpers = (await (new Parser.default()).getCommandsList()).filter(o => o.isHelper).map(o => o.command);
     if (
       _.isNil(parsed) ||
       isOwner(opts.sender) ||

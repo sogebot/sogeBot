@@ -202,7 +202,7 @@ class Top extends System {
       sorted = _.chunk(sorted, 10)[0];
 
       for (const user of sorted) {
-        message += (i + 1) + '. ' + (global.tmi.settings.chat.showWithAt ? '@' : '') + (user.username || 'unknown') + ' - ';
+        message += (i + 1) + '. ' + (global.tmi.showWithAt ? '@' : '') + (user.username || 'unknown') + ' - ';
         switch (type) {
           case TYPE.TIME:
             message += (user.value / 1000 / 60 / 60).toFixed(1) + 'h';
