@@ -62,7 +62,9 @@ export function onMessage() {
 
       try {
         const self = type === 'core' ? global[name] : global[type][name];
-        set(self, `on.message.${key}`, key);
+        const on = get(self, `on.message`, []);
+        on.push(key);
+        set(self, `on.message`, on);
       } catch (e) {
         console.error(e);
       }
@@ -84,7 +86,9 @@ export function onStreamEnd() {
 
       try {
         const self = type === 'core' ? global[name] : global[type][name];
-        set(self, `on.streamEnd.${key}`, key);
+        const on = get(self, `on.streamEnd`, []);
+        on.push(key);
+        set(self, `on.streamEnd`, on);
       } catch (e) {
         console.error(e);
       }
@@ -106,7 +110,9 @@ export function onTip() {
 
       try {
         const self = type === 'core' ? global[name] : global[type][name];
-        set(self, `on.tip.${key}`, key);
+        const on = get(self, `on.tip`, []);
+        on.push(key);
+        set(self, `on.tip`, on);
       } catch (e) {
         console.error(e);
       }
@@ -128,7 +134,9 @@ export function onFollow() {
 
       try {
         const self = type === 'core' ? global[name] : global[type][name];
-        set(self, `on.follow.${key}`, key);
+        const on = get(self, `on.follow`, []);
+        on.push(key);
+        set(self, `on.follow`, on);
       } catch (e) {
         console.error(e);
       }
@@ -150,7 +158,9 @@ export function onSub() {
 
       try {
         const self = type === 'core' ? global[name] : global[type][name];
-        set(self, `on.sub.${key}`, key);
+        const on = get(self, `on.sub`, []);
+        on.push(key);
+        set(self, `on.sub`, on);
       } catch (e) {
         console.error(e);
       }
@@ -172,7 +182,9 @@ export function onBit() {
 
       try {
         const self = type === 'core' ? global[name] : global[type][name];
-        set(self, `on.bit.${key}`, key);
+        const on = get(self, `on.bit`, []);
+        on.push(key);
+        set(self, `on.bit`, on);
       } catch (e) {
         console.error(e);
       }

@@ -96,7 +96,7 @@ class Duel extends Game {
 
     sendMessage(
       prepare('gambling.duel.bank', {
-        command: this.commands['!duel'],
+        command: this.getCommand('!duel'),
         points: bank,
         pointsName: await global.systems.points.getPointsName(bank),
       }), opts.sender);

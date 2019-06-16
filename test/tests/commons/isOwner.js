@@ -18,8 +18,8 @@ describe('lib/commons - isOwner()', () => {
     await db.cleanup()
     await message.prepare()
 
-    global.oauth.settings.general.owners = ['soge__']
-    variable.isEqual('global.oauth.settings.general.owners', ['soge__'])
+    global.oauth.generalOwners = ['soge__']
+    variable.isEqual('global.oauth.generalOwners', ['soge__'])
   })
 
   it('should be returned as owner', async () => {

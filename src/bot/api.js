@@ -359,7 +359,7 @@ class API {
     }
 
     for (let chatter of chatters) {
-      if (isIgnored(chatter) || global.oauth.settings.bot.username === chatter) {
+      if (isIgnored(chatter) || global.oauth.botUsername === chatter) {
         // even if online, remove ignored user from collection
         await global.db.engine.remove('users.online', { username: chatter })
       } else if (!_.includes(allOnlineUsers, chatter)) {
@@ -906,8 +906,10 @@ class API {
             })) {
               for (let [name, system] of Object.entries(systems)) {
                 if (name.startsWith('_') || typeof system.on === 'undefined') continue
-                if (typeof system.on.streamEnd === 'function') {
-                  system.on.streamEnd()
+                if (Array.isArray(system.on.streamEnd)) {
+                  for (const fnc of system.on.streamEnd) {
+                    system[fnc]()
+                  }
                 }
               }
             }

@@ -107,14 +107,16 @@ class Donationalerts extends Integration {
         })) {
           for (let [name, system] of Object.entries(systems)) {
             if (name.startsWith('_') || typeof system.on === 'undefined') {continue;}
-            if (typeof system.on.tip === 'function') {
-              system.on.tip({
-                username: data.username.toLowerCase(),
-                amount: data.amount,
-                message: data.message,
-                currency: data.currency,
-                timestamp: _.now()
-              });
+            if (Array.isArray(system.on.tip)) {
+              for (const fnc of system.on.tip) {
+                system[fnc]({
+                  username: data.username.toLowerCase(),
+                  amount: data.amount,
+                  message: data.message,
+                  currency: data.currency,
+                  timestamp: _.now()
+                });
+              }
             }
           }
         }

@@ -25,8 +25,8 @@ describe('Polls - tips', () => {
     await time.waitMs(1000)
     await message.prepare()
 
-    global.currency.settings.currency.mainCurrency = 'EUR'
-    await variable.isEqual('global.currency.settings.currency.mainCurrency', 'EUR')
+    global.currency.mainCurrency = 'EUR'
+    await variable.isEqual('global.currency.mainCurrency', 'EUR')
   })
 
   describe('Close not opened voting', () => {

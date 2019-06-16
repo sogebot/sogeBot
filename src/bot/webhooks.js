@@ -235,11 +235,13 @@ class Webhooks {
           })) {
             for (let [name, system] of Object.entries(systems)) {
               if (name.startsWith('_') || typeof system.on === 'undefined') continue
-              if (typeof system.on.follow === 'function') {
-                system.on.follow({
-                  username: data.from_name,
-                  userId: data.from_id,
-                })
+              if (Array.isArray(system.on.follow)) {
+                for (const fnc of system.on.follow) {
+                  system[fnc]({
+                    username: data.from_name,
+                    userId: data.from_id,
+                  });
+                }
               }
             }
           }

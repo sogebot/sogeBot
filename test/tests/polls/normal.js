@@ -62,9 +62,9 @@ describe('Polls - normal', () => {
 
       await global.systems.polls.main({ sender: owner, parameters: ''  })
       await message.isSent('systems.polls.status', owner, { title: 'Lorem Ipsum?' })
-      await message.isSentRaw(global.systems.polls.settings.commands['!vote'] + ` 1 - Lorem - 0 ${commons.getLocalizedName(0, 'systems.polls.votes')}, 0.00%`, owner)
-      await message.isSentRaw(global.systems.polls.settings.commands['!vote'] + ` 2 - Ipsum - 0 ${commons.getLocalizedName(0, 'systems.polls.votes')}, 0.00%`, owner)
-      await message.isSentRaw(global.systems.polls.settings.commands['!vote'] + ` 3 - Dolor Sit - 0 ${commons.getLocalizedName(0, 'systems.polls.votes')}, 0.00%`, owner)
+      await message.isSentRaw(global.systems.polls.getCommand('!vote') + ` 1 - Lorem - 0 ${commons.getLocalizedName(0, 'systems.polls.votes')}, 0.00%`, owner)
+      await message.isSentRaw(global.systems.polls.getCommand('!vote') + ` 2 - Ipsum - 0 ${commons.getLocalizedName(0, 'systems.polls.votes')}, 0.00%`, owner)
+      await message.isSentRaw(global.systems.polls.getCommand('!vote') + ` 3 - Dolor Sit - 0 ${commons.getLocalizedName(0, 'systems.polls.votes')}, 0.00%`, owner)
     })
     it(`User ${owner.username} will vote for option 0 - should fail`, async () => {
       await global.systems.polls.main({ sender: owner, parameters: '0' })
@@ -111,9 +111,9 @@ describe('Polls - normal', () => {
 
       await global.systems.polls.main({ sender: owner, parameters: ''  })
       await message.isSent('systems.polls.status', owner, { title: 'Lorem Ipsum?' })
-      await message.isSentRaw(global.systems.polls.settings.commands['!vote'] + ` 1 - Lorem - 10 ${commons.getLocalizedName(10, 'systems.polls.votes')}, 47.62%`, owner)
-      await message.isSentRaw(global.systems.polls.settings.commands['!vote'] + ` 2 - Ipsum - 10 ${commons.getLocalizedName(10, 'systems.polls.votes')}, 47.62%`, owner)
-      await message.isSentRaw(global.systems.polls.settings.commands['!vote'] + ` 3 - Dolor Sit - 1 ${commons.getLocalizedName(1, 'systems.polls.votes')}, 4.76%`, owner)
+      await message.isSentRaw(global.systems.polls.getCommand('!vote') + ` 1 - Lorem - 10 ${commons.getLocalizedName(10, 'systems.polls.votes')}, 47.62%`, owner)
+      await message.isSentRaw(global.systems.polls.getCommand('!vote') + ` 2 - Ipsum - 10 ${commons.getLocalizedName(10, 'systems.polls.votes')}, 47.62%`, owner)
+      await message.isSentRaw(global.systems.polls.getCommand('!vote') + ` 3 - Dolor Sit - 1 ${commons.getLocalizedName(1, 'systems.polls.votes')}, 4.76%`, owner)
     })
 
     it('Close voting', async () => {
@@ -122,9 +122,9 @@ describe('Polls - normal', () => {
 
       assert.isTrue(await global.systems.polls.close({ sender: owner }))
       await message.isSent('systems.polls.status_closed', owner, { title: 'Lorem Ipsum?' })
-      await message.isSentRaw(global.systems.polls.settings.commands['!vote'] + ` 1 - Lorem - 10 ${commons.getLocalizedName(10, 'systems.polls.votes')}, 47.62%`, owner)
-      await message.isSentRaw(global.systems.polls.settings.commands['!vote'] + ` 2 - Ipsum - 10 ${commons.getLocalizedName(10, 'systems.polls.votes')}, 47.62%`, owner)
-      await message.isSentRaw(global.systems.polls.settings.commands['!vote'] + ` 3 - Dolor Sit - 1 ${commons.getLocalizedName(1, 'systems.polls.votes')}, 4.76%`, owner)
+      await message.isSentRaw(global.systems.polls.getCommand('!vote') + ` 1 - Lorem - 10 ${commons.getLocalizedName(10, 'systems.polls.votes')}, 47.62%`, owner)
+      await message.isSentRaw(global.systems.polls.getCommand('!vote') + ` 2 - Ipsum - 10 ${commons.getLocalizedName(10, 'systems.polls.votes')}, 47.62%`, owner)
+      await message.isSentRaw(global.systems.polls.getCommand('!vote') + ` 3 - Dolor Sit - 1 ${commons.getLocalizedName(1, 'systems.polls.votes')}, 4.76%`, owner)
     })
 
     it(`!vote should return not in progress info`, async () => {

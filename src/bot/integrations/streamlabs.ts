@@ -90,14 +90,16 @@ class Streamlabs extends Integration {
         })) {
           for (let [name, system] of Object.entries(systems)) {
             if (name.startsWith('_') || typeof system.on === 'undefined') {continue;}
-            if (typeof system.on.tip === 'function') {
-              system.on.tip({
-                username: event.from.toLowerCase(),
-                amount: event.amount,
-                message: event.message,
-                currency: event.currency,
-                timestamp: _.now()
-              });
+            if (Array.isArray(system.on.tip)) {
+              for (const fnc of system.on.tip) {
+                system[fnc]({
+                  username: event.username.toLowerCase(),
+                  amount: event.amount,
+                  message: event.message,
+                  currency: event.currency,
+                  timestamp: _.now()
+                });
+              }
             }
           }
         }

@@ -230,12 +230,14 @@ class TMI extends Core {
             })) {
               for (let [name, system] of Object.entries(systems)) {
                 if (name.startsWith('_') || typeof system.on === 'undefined') continue
-                if (typeof system.on.message === 'function') {
-                  system.on.message({
-                    sender: message.tags,
-                    message: message.message,
-                    timestamp: _.now()
-                  })
+                if (Array.isArray(system.on.message)) {
+                  for (const fnc of system.on.message) {
+                    system[fnc]({
+                      sender: message.tags,
+                      message: message.message,
+                      timestamp: _.now()
+                    })
+                  }
                 }
               }
             }
@@ -366,12 +368,14 @@ class TMI extends Core {
       })) {
         for (let [name, system] of Object.entries(systems)) {
           if (name.startsWith('_') || typeof system.on === 'undefined') continue
-          if (typeof system.on.sub === 'function') {
-            system.on.sub({
-              username: username,
-              userId: userstate.userId,
-              subCumulativeMonths
-            })
+          if (Array.isArray(system.on.sub)) {
+            for (const fnc of system.on.sub) {
+              system[fnc]({
+                username: username,
+                userId: userstate.userId,
+                subCumulativeMonths
+              });
+            }
           }
         }
       }
@@ -554,13 +558,15 @@ class TMI extends Core {
       })) {
         for (let [name, system] of Object.entries(systems)) {
           if (name.startsWith('_') || typeof system.on === 'undefined') continue
-          if (typeof system.on.bit === 'function') {
-            system.on.bit({
-              username: username,
-              amount: userstate.bits,
-              message: messageFromUser,
-              timestamp: _.now()
-            })
+          if (Array.isArray(system.on.bit)) {
+            for (const fnc of system.on.bit) {
+              system[fnc]({
+                username: username,
+                amount: userstate.bits,
+                message: messageFromUser,
+                timestamp: _.now()
+              });
+            }
           }
         }
       }

@@ -87,7 +87,7 @@ class Twitch extends Core {
 
     let onlineSubscribers = _.intersection(onlineViewers, subscribers)
     events = _.filter(_.orderBy(events, 'timestamp', 'desc'), (o) => { return o.event === 'sub' || o.event === 'resub' || o.event === 'subgift' })
-    moment.locale(global.general.settings.lang)
+    moment.locale(global.general.lang)
 
     let lastSubAgo = ''
     let lastSubUsername = 'n/a'
