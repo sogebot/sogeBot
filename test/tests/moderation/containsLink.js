@@ -65,10 +65,10 @@ describe('systems/moderation - containsLink()', () => {
     before(async () => {
       await db.cleanup()
 
-      global.systems.moderation.settings.links.includeSpaces = true
-      await variable.isEqual('systems.moderation.settings.links.includeSpaces', true)
-      global.systems.moderation.settings.links.includeClips = true
-      await variable.isEqual('systems.moderation.settings.links.includeClips', true)
+      global.systems.moderation.cLinksIncludeSpaces = true
+      await variable.isEqual('systems.moderation.cLinksIncludeSpaces', true)
+      global.systems.moderation.cLinksIncludeClips = true
+      await variable.isEqual('systems.moderation.cLinksIncludeClips', true)
     })
 
     for (let [type, listOfTests] of Object.entries(tests)) {
@@ -107,10 +107,10 @@ describe('systems/moderation - containsLink()', () => {
     before(async () => {
       await db.cleanup()
 
-      global.systems.moderation.settings.links.includeSpaces = true
-      await variable.isEqual('systems.moderation.settings.links.includeSpaces', true)
-      global.systems.moderation.settings.links.includeClips = false
-      await variable.isEqual('systems.moderation.settings.links.includeClips', false)
+      global.systems.moderation.cLinksIncludeSpaces = true
+      await variable.isEqual('systems.moderation.cLinksIncludeSpaces', true)
+      global.systems.moderation.cLinksIncludeClips = false
+      await variable.isEqual('systems.moderation.cLinksIncludeClips', false)
     })
 
     for (let [type, listOfTests] of Object.entries(tests)) {
@@ -149,10 +149,10 @@ describe('systems/moderation - containsLink()', () => {
     before(async () => {
       await db.cleanup()
 
-      global.systems.moderation.settings.links.includeSpaces = false
-      await variable.isEqual('systems.moderation.settings.links.includeSpaces', false)
-      global.systems.moderation.settings.links.includeClips = true
-      await variable.isEqual('systems.moderation.settings.links.includeClips', true)
+      global.systems.moderation.cLinksIncludeSpaces = false
+      await variable.isEqual('systems.moderation.cLinksIncludeSpaces', false)
+      global.systems.moderation.cLinksIncludeClips = true
+      await variable.isEqual('systems.moderation.cLinksIncludeClips', true)
     })
 
     for (let [type, listOfTests] of Object.entries(tests)) {

@@ -24,8 +24,8 @@ describe('systems/moderation - longMessage()', () => {
   describe('moderationLongMessage=false', async () => {
     before(async () => {
       await db.cleanup()
-      global.systems.moderation.settings.longMessage.enabled = false
-      await variable.isEqual('global.systems.moderation.settings.longMessage.enabled', false)
+      global.systems.moderation.cLongMessageEnabled = false
+      await variable.isEqual('global.systems.moderation.cLongMessageEnabled', false)
     })
 
     for (let test of tests.timeout) {
@@ -43,8 +43,8 @@ describe('systems/moderation - longMessage()', () => {
   describe('moderationLongMessage=true', async () => {
     before(async () => {
       await db.cleanup()
-      global.systems.moderation.settings.longMessage.enabled = true
-      await variable.isEqual('global.systems.moderation.settings.longMessage.enabled', true)
+      global.systems.moderation.cLongMessageEnabled = true
+      await variable.isEqual('global.systems.moderation.cLongMessageEnabled', true)
     })
 
     for (let test of tests.timeout) {

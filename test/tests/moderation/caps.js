@@ -29,8 +29,8 @@ describe('systems/moderation - Caps()', () => {
   describe('moderationCaps=false', async () => {
     before(async () => {
       await db.cleanup()
-      global.systems.moderation.settings.caps.enabled = false
-      await variable.isEqual('global.systems.moderation.settings.caps.enabled', false)
+      global.systems.moderation.cCapsEnabled = false
+      await variable.isEqual('global.systems.moderation.cCapsEnabled', false)
     })
 
     for (let test of tests.timeout) {
@@ -48,8 +48,8 @@ describe('systems/moderation - Caps()', () => {
   describe('moderationCaps=true', async () => {
     before(async () => {
       await db.cleanup()
-      global.systems.moderation.settings.caps.enabled = true
-      await variable.isEqual('global.systems.moderation.settings.caps.enabled', true)
+      global.systems.moderation.cCapsEnabled = true
+      await variable.isEqual('global.systems.moderation.cCapsEnabled', true)
     })
 
     for (let test of tests.timeout) {
