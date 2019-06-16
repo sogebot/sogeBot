@@ -93,7 +93,7 @@ class Streamlabs extends Integration {
             if (Array.isArray(system.on.tip)) {
               for (const fnc of system.on.tip) {
                 system[fnc]({
-                  username: event.username.toLowerCase(),
+                  username: event.from.toLowerCase(),
                   amount: event.amount,
                   message: event.message,
                   currency: event.currency,
