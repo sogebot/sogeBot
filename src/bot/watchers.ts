@@ -35,11 +35,11 @@ export const VariableWatcher = {
         let self: null | any = null;
         if (type === 'core') {
           self = Object.values(global).find((o) => {
-            return o.constructor.name.toLowerCase() === name.toLowerCase();
+            return typeof o !== 'undefined' && o.constructor.name.toLowerCase() === name.toLowerCase();
           });
         } else {
           self = Object.values(global[type]).find((o: any) => {
-            return o.constructor.name.toLowerCase() === name.toLowerCase();
+            return typeof o !== 'undefined' && o.constructor.name.toLowerCase() === name.toLowerCase();
           }) as any;
         }
 
