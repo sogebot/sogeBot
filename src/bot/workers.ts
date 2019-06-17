@@ -11,7 +11,7 @@ class Workers {
   protected path: string = join(__dirname, 'main.js');
   protected list: Worker[] = [];
 
-  public sendToAll(opts) {
+  public callOnAll(opts) {
     if (isMainThread) {
       // run on master
       const namespace = get(global, opts.ns, null);
@@ -22,6 +22,15 @@ class Workers {
       // need to be sent to master
       this.sendToMaster(opts);
     }
+  }
+
+  public sendToAll(opts) {
+    if (isMainThread) {
+      this.sendToAllWorkers(opts);
+    } else {
+      this.sendToMaster(opts);
+    }
+
   }
 
   public send(opts) {
@@ -153,12 +162,12 @@ class Workers {
         // remove core from path
         if (data.system === 'core') {
           const obj = Object.values(global).find((o) => {
-            return o.constructor.name === data.class;
+            return o.constructor.name.toLowerCase() === data.class.toLowerCase();
           });
           if (obj) { set(obj, data.path, data.value); }
         } else {
           const obj = Object.values(global[data.system]).find((o: any) => {
-            return o.constructor.name === data.class;
+            return o.constructor.name.toLowerCase() === data.class.toLowerCase();
           }) as any;
           if (obj) { set(obj, data.path, data.value); }
         }
@@ -172,18 +181,26 @@ class Workers {
           // remove core from path
           if (data.system === 'core') {
             const obj = Object.values(global).find((o) => {
-              return o.constructor.name === data.class;
+              return o.constructor.name.toLowerCase() === data.class.toLowerCase();
             });
-            if (obj) { set(obj, data.path, data.value); }
+            if (obj) {
+              set(obj, data.path, data.value);
+            } else {
+              throw Error(`${data.class} not found`);
+            }
           } else if (data.system === 'widgets') {
             // widgets are only on master
             break;
           } else {
             try {
               const obj = Object.values(global[data.system]).find((o: any) => {
-                return o.constructor.name === data.class;
+                return o.constructor.name.toLowerCase() === data.class.toLowerCase();
               }) as any;
-              if (obj) { set(obj, data.path, data.value); }
+              if (obj) {
+                set(obj, data.path, data.value);
+              } else {
+                throw Error(`${data.class} not found`);
+              }
             } catch (e) {
               global.log.error(e.stack);
               global.log.error('Something went wrong when updating interface variable');

@@ -2,7 +2,8 @@ import _ from 'lodash';
 import { isMainThread } from 'worker_threads';
 
 import { getLocalizedName, getOwner, prepare, sendMessage } from '../commons.js';
-import { command, default_permission, helper } from '../decorators';
+import { command, default_permission, helper, settings } from '../decorators';
+import { onBit, onMessage, onTip } from '../decorators/on';
 import Expects from '../expects.js';
 import { permission } from '../permissions';
 import System from './_interface';
@@ -24,30 +25,17 @@ enum ERROR {
  */
 
 class Polls extends System {
-  private currentMessages: number;
-  private lastMessageRemind: number;
-  private lastTimeRemind: number;
+  private currentMessages: number = 0;
+  private lastMessageRemind: number = 0;
+  private lastTimeRemind: number = 0;
+
+  @settings('reminder')
+  everyXMessages: number = 0;
+  @settings('reminder')
+  everyXSeconds: number = 0;
 
   constructor() {
-    const options: InterfaceSettings = {
-      settings: {
-        reminder: {
-          everyXMessages: 0,
-          everyXSeconds: 0,
-        },
-      },
-      on: {
-        message: (message): Promise<void> => this.countMessage(),
-        tip: (tip): Promise<void> => this.parseTip(tip),
-        bit: (bit): Promise<void> => this.parseBit(bit),
-      },
-    };
-
-    super(options);
-
-    this.currentMessages = 0;
-    this.lastMessageRemind = 0;
-    this.lastTimeRemind = 0;
+    super();
 
     if (isMainThread) {
       global.db.engine.index(this.collection.votes, { index: 'vid' });
@@ -73,6 +61,7 @@ class Polls extends System {
             sender: {
               username: getOwner(),
               userId: '0',
+              emotes: [],
               badges: {
                 subscriber: 1,
               },
@@ -91,6 +80,7 @@ class Polls extends System {
             sender: {
               username: getOwner(),
               userId: '0',
+              emotes: [],
               badges: {
                 subscriber: 1,
               },
@@ -275,7 +265,8 @@ class Polls extends System {
     }
   }
 
-  private async parseBit(opts: { username: string; amount: number; message: string }): Promise<void> {
+  @onBit()
+  protected async parseBit(opts: { username: string; amount: number; message: string }): Promise<void> {
     const cVote: Poll = await global.db.engine.findOne(this.collection.data, { isOpened: true });
 
     if (!_.isEmpty(cVote) && cVote.type === 'bits') {
@@ -297,7 +288,8 @@ class Polls extends System {
     }
   }
 
-  private async parseTip(opts: { username: string; amount: number; message: string; currency: string }): Promise<void> {
+  @onTip()
+  protected async parseTip(opts: { username: string; amount: number; message: string; currency: string }): Promise<void> {
     const cVote: Poll = await global.db.engine.findOne(this.collection.data, { isOpened: true });
 
     if (!_.isEmpty(cVote) && cVote.type === 'tips') {
@@ -308,7 +300,7 @@ class Polls extends System {
           const vote: Vote = {
             vid: String(cVote._id),
             votedBy: opts.username,
-            votes: Number(global.currency.exchange(opts.amount, opts.currency, global.currency.settings.currency.mainCurrency)),
+            votes: Number(global.currency.exchange(opts.amount, opts.currency, global.currency.mainCurrency)),
             option: i - 1,
           };
           // no update as we will not switch vote option as in normal vote
@@ -319,7 +311,8 @@ class Polls extends System {
     }
   }
 
-  private async countMessage() {
+  @onMessage()
+  protected async countMessage() {
     this.currentMessages = this.currentMessages + 1;
   }
 
@@ -327,26 +320,26 @@ class Polls extends System {
     const vote: Poll = await global.db.engine.findOne(this.collection.data, { isOpened: true });
     const shouldRemind = { messages: false, time: false };
 
-    if (this.settings.reminder.everyXMessages === 0 && this.settings.reminder.everyXSeconds === 0 || _.isEmpty(vote)) {
+    if (this.everyXMessages === 0 && this.everyXSeconds === 0 || _.isEmpty(vote)) {
       this.lastMessageRemind = this.currentMessages;
       this.lastTimeRemind = 0;
       return; // reminder is disabled
     }
 
-    if (this.settings.reminder.everyXMessages === 0) {
+    if (this.everyXMessages === 0) {
       shouldRemind.messages = true;
     } else {
-      if (this.currentMessages - this.lastMessageRemind >= this.settings.reminder.everyXMessages) {
+      if (this.currentMessages - this.lastMessageRemind >= this.everyXMessages) {
         shouldRemind.messages = true;
       } else {
         shouldRemind.messages = false;
       }
     }
 
-    if (this.settings.reminder.everyXSeconds === 0) {
+    if (this.everyXSeconds === 0) {
       shouldRemind.time = true;
     } else {
-      if (new Date().getTime() - new Date(this.lastTimeRemind).getTime() > this.settings.reminder.everyXSeconds * 1000) {
+      if (new Date().getTime() - new Date(this.lastTimeRemind).getTime() > this.everyXSeconds * 1000) {
         shouldRemind.time = true;
       } else {
         shouldRemind.time = false;

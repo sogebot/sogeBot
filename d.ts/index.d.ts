@@ -1,20 +1,35 @@
 declare module '*.vue' {
-  import Vue from 'vue'
-  export default Vue
+  import Vue from 'vue';
+  export default Vue;
 }
 
 declare namespace NodeJS {
   export interface Global {
+    linesParsed: number;
+    status: {
+      API: 0 | 1 | 2;
+    };
     overlays: {
       alerts: import('../src/bot/overlays/alerts').Alerts;
       bets: import('../src/bot/overlays/bets').Bets;
+      carousel: import('../src/bot/overlays/carousel').Carousel;
+      clips: import('../src/bot/overlays/clips').Clips;
+      clipsCarousel: import('../src/bot/overlays/clipsCarousel').ClipsCarousel;
+      credits: import('../src/bot/overlays/credits').Credits;
+      emotes: import('../src/bot/overlays/emotes').Emotes;
+      eventlist: import('../src/bot/overlays/eventlist').EventList;
+      gallery: import('../src/bot/overlays/gallery').Gallery;
       goals: import('../src/bot/overlays/goals').Goals;
       polls: import('../src/bot/overlays/polls').Polls;
-      [x: string]: any; // remove after all overlays are ported to TS
+      stats: import('../src/bot/overlays/stats').Stats;
+      text: import('../src/bot/overlays/text').Text;
     };
     integrations: {
+      donationalerts: import('../src/bot/integrations/donationalerts').Donationalerts;
+      phillipshue: import('../src/bot/integrations/phillipshue').PhillipsHue;
+      spotify: import('../src/bot/integrations/spotify').Spotify;
+      streamlabs: import('../src/bot/integrations/streamlabs').Streamlabs;
       twitter: import('../src/bot/integrations/twitter').Twitter;
-      [x: string]: any; // remove after all integrations are ported to TS
     };
     cache: any;
     client: any;
@@ -23,6 +38,15 @@ declare namespace NodeJS {
     configuration: any;
     cpu: any;
     db: any;
+    games: {
+      duel: import('../src/bot/games/duel').Duel;
+      fightme: import('../src/bot/games/fightme').FightMe;
+      gamble: import('../src/bot/games/gamble').Gamble;
+      heist: import('../src/bot/games/heist').Heist;
+      roulette: import('../src/bot/games/roulette').Roulette;
+      seppuku: import('../src/bot/games/seppuku').Seppuku;
+      wheelOfFortune: import('../src/bot/games/wheelOfFortune').WheelOfFortune;
+    };
     general: any;
     bot: any;
     translate: any;
@@ -30,12 +54,27 @@ declare namespace NodeJS {
     currency: any;
     panel: any;
     systems: {
+      alias: import('../src/bot/systems/alias').Alias;
       bets: import('../src/bot/systems/bets').Bets;
+      checklist: import('../src/bot/systems/checklist').Checklist;
+      commercial: import('../src/bot/systems/commercial').Commercial;
+      cooldown: import('../src/bot/systems/cooldown').Cooldown;
+      customCommands: import('../src/bot/systems/customCommands').CustomCommands;
+      highlights: import('../src/bot/systems/highlights').Highlights;
+      keywords: import('../src/bot/systems/keywords').Keywords;
+      moderation: import('../src/bot/systems/moderation').Moderation;
+      points: import('../src/bot/systems/points').Points;
       polls: import('../src/bot/systems/polls').Polls;
+      price: import('../src/bot/systems/price').Price;
+      queue: import('../src/bot/systems/queue').Queue;
+      quotes: import('../src/bot/systems/quotes').Quotes;
+      raffles: import('../src/bot/systems/raffles').Raffles;
+      ranks: import('../src/bot/systems/ranks').Ranks;
       scrim: import('../src/bot/systems/scrim').Scrim;
+      songs: import('../src/bot/systems/songs').Songs;
+      timers: import('../src/bot/systems/timers').Timers;
       top: import('../src/bot/systems/top').Top;
       userinfo: import('../src/bot/systems/userinfo').UserInfo;
-      [x: string]: any; // remove after all systems are ported to TS
     };
     users: any;
     lib: any;
@@ -44,31 +83,23 @@ declare namespace NodeJS {
     customvariables: any;
     tmi: any;
     events: import('../src/bot/events').Events;
-    widgets: any;
-    oauth: {
-      settings: {
-        _: {
-          channelId: string;
-        };
-        broadcaster: {
-          username: string;
-        };
-        bot: {
-          username: string;
-          accessToken: string;
-        };
-        general: {
-          owners: string[];
-          channel: string;
-        };
-      };
+    widgets: {
+      chat: import('../src/bot/widgets/chat').Chat;
+      cmdboard: import('../src/bot/widgets/cmdboard').Cmdboard;
+      custom_variables: import('../src/bot/widgets/custom_variables').CustomVariables;
+      eventlist: import('../src/bot/widgets/eventlist').EventList;
+      joinpart: import('../src/bot/widgets/joinpart').JoinPart;
+      social: import('../src/bot/widgets/social').Social;
+      soundboard: import('../src/bot/widgets/soundboard').SoundBoard;
     };
+    oauth: import('../src/bot/oauth').OAuth;
   }
 }
 
 interface Sender {
   username: string;
   userId: string;
+  emotes: { id: number; start: number; end: number }[];
   badges: {
     subscriber?: undefined | number;
     premium?: undefined | number;
@@ -111,20 +142,20 @@ interface onEventTip {
   amount: number;
   message: string;
   currency: string;
-  timestamp: string;
+  timestamp: number;
 }
 
 interface onEventBit {
   username: string;
   amount: number;
   message: string;
-  timestamp: string;
+  timestamp: number;
 }
 
 interface onEventMessage {
   sender: Sender | null;
   message: string;
-  timestamp: string;
+  timestamp: number;
 }
 
 declare namespace InterfaceSettings {
@@ -166,7 +197,7 @@ interface InterfaceSettings {
 
 interface UISelector {
   type: 'selector';
-  values: string[];
+  values: string[] | (() => string[]);
   if?: () => boolean;
 }
 

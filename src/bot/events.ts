@@ -170,7 +170,7 @@ class Events extends Core {
   }
 
   public async fireBotWillJoinChannel(operation, attributes) {
-    global.client.join('#' + await global.oauth.settings.broadcaster.username);
+    global.client.join('#' + await global.oauth.broadcasterUsername);
   }
 
   public async fireBotWillLeaveChannel(operation, attributes) {
@@ -179,10 +179,10 @@ class Events extends Core {
   }
 
   public async fireStartCommercial(operation, attributes) {
-    const cid = global.oauth.settings._.channelId;
+    const cid = global.oauth.channelId;
     const url = `https://api.twitch.tv/kraken/channels/${cid}/commercial`;
 
-    const token = await global.oauth.settings.bot.accessToken;
+    const token = await global.oauth.botAccessToken;
     if (token === '') { return; }
 
     await axios({
@@ -245,7 +245,7 @@ class Events extends Core {
   public async fireSendChatMessageOrWhisper(operation, attributes, whisper) {
     const username = _.isNil(attributes.username) ? getOwner() : attributes.username;
     let message = operation.messageToSend;
-    const atUsername = global.tmi.settings.chat.showWithAt;
+    const atUsername = global.tmi.showWithAt;
 
     attributes = flatten(attributes);
     for (const key of Object.keys(attributes).sort((a, b) => a.length - b.length)) {
@@ -281,7 +281,9 @@ class Events extends Core {
     }
 
     // Update widgets and titles
-    global.widgets.custom_variables.io.emit('refresh');
+    if (global.widgets.custom_variables.socket) {
+      global.widgets.custom_variables.socket.emit('refresh');
+    }
     const regexp = new RegExp(`\\$_${customVariableName}`, 'ig');
     const title = await global.cache.rawStatus();
     if (title.match(regexp)) { global.api.setTitleAndGame(null); }
@@ -302,7 +304,9 @@ class Events extends Core {
     }
 
     // Update widgets and titles
-    global.widgets.custom_variables.io.emit('refresh');
+    if (global.widgets.custom_variables.socket) {
+      global.widgets.custom_variables.socket.emit('refresh');
+    }
     const regexp = new RegExp(`\\$_${customVariableName}`, 'ig');
     const title = await global.cache.rawStatus();
     if (title.match(regexp)) { global.api.setTitleAndGame(null); }
@@ -540,7 +544,7 @@ class Events extends Core {
           method: _.random(0, 1, false) === 0 ? 'Twitch Prime' : '',
           amount: _.random(0, 9999, true).toFixed(2),
           currency: _.sample(['CZK', 'USD', 'EUR']),
-          currencyInBot: global.currency.settings.currency.mainCurrency,
+          currencyInBot: global.currency.mainCurrency,
           amountInBotCurrency: _.random(0, 9999, true).toFixed(2),
         };
         for (const operation of (await global.db.engine.find('events.operations', { eventId }))) {

@@ -52,10 +52,10 @@ class Message {
     this.message = this.message.replace(/\$latestCheerMessage/g, !_.isNil(latestCheer) ? latestCheer.message : 'n/a')
     this.message = this.message.replace(/\$latestCheer/g, !_.isNil(latestCheer) ? latestCheer.username : 'n/a')
 
-    const spotifySong = JSON.parse(global.integrations.spotify.settings._.currentSong)
+    const spotifySong = JSON.parse(global.integrations.spotify.currentSong)
     if (!_.isNil(global.integrations) && !_.isEmpty(spotifySong) && spotifySong.is_playing && spotifySong.is_enabled) {
       // load spotify format
-      const format = global.integrations.spotify.settings.output.format
+      const format = global.integrations.spotify.format
       if (opts.escape) {
         spotifySong.song = spotifySong.song.replace(new RegExp(opts.escape, 'g'), `\\${opts.escape}`)
         spotifySong.artist = spotifySong.artist.replace(new RegExp(opts.escape, 'g'), `\\${opts.escape}`)
@@ -65,7 +65,7 @@ class Message {
 
 
     if (await global.systems.songs.isEnabled() && this.message.includes('$ytSong')) {
-      let currentSong = _.get(JSON.parse(await global.systems.songs.settings._.currentSong), 'title', global.translate('songs.not-playing'))
+      let currentSong = _.get(JSON.parse(await global.systems.songs.currentSong), 'title', global.translate('songs.not-playing'))
       if (opts.escape) {
         currentSong = currentSong.replace(new RegExp(opts.escape, 'g'), `\\${opts.escape}`)
       }
@@ -100,7 +100,7 @@ class Message {
         })
         const followers = _.filter(
           (await global.db.engine.find('users', { is: { follower: true } })).map((o) => o.username),
-          (o) => o !== attr.sender && o !== global.oauth.settings.bot.username.toLowerCase())
+          (o) => o !== attr.sender && o !== global.oauth.botUsername.toLowerCase())
         let onlineFollowers = _.intersection(onlineViewers, followers)
         if (onlineFollowers.length === 0) return 'unknown'
         return _.sample(onlineFollowers)
@@ -115,7 +115,7 @@ class Message {
         })
         const subscribers = _.filter(
           (await global.db.engine.find('users', { is: { subscriber: true } })).map((o) => o.username),
-          (o) => o !== attr.sender && o !== global.oauth.settings.bot.username.toLowerCase())
+          (o) => o !== attr.sender && o !== global.oauth.botUsername.toLowerCase())
         let onlineSubscribers = _.intersection(onlineViewers, subscribers)
         if (onlineSubscribers.length === 0) return 'unknown'
         return _.sample(onlineSubscribers)
@@ -223,13 +223,13 @@ class Message {
         if (typeof attr.param !== 'undefined') {
           attr.param = attr.param.replace('@', '')
           if (attr.param.length > 0) {
-            if (global.tmi.settings.chat.showWithAt) {
+            if (global.tmi.showWithAt) {
               attr.param = '@' + attr.param;
             }
             return attr.param;
           }
         }
-        return (global.tmi.settings.chat.showWithAt ? '@' : '') + attr.sender;
+        return (global.tmi.showWithAt ? '@' : '') + attr.sender;
       },
       '$param': async function (filter) {
         if (!_.isUndefined(attr.param) && attr.param.length !== 0) return attr.param
@@ -261,8 +261,8 @@ class Message {
         }
 
         let tips = (await global.db.engine.find('widgetsEventList', { event: 'tip' })).sort((a, b) => {
-          const aTip = global.currency.exchange(a.amount, a.currency, global.currency.settings.currency.mainCurrency);
-          const bTip = global.currency.exchange(b.amount, b.currency, global.currency.settings.currency.mainCurrency)
+          const aTip = global.currency.exchange(a.amount, a.currency, global.currency.mainCurrency);
+          const bTip = global.currency.exchange(b.amount, b.currency, global.currency.mainCurrency)
           return bTip - aTip;
         }, 0);
 
@@ -297,7 +297,7 @@ class Message {
         let cmd = filter
           .replace('!', '') // replace first !
           .replace(/\(|\)/g, '')
-          .replace(/\$sender/g, (global.tmi.settings.chat.showWithAt ? '@' : '') + attr.sender)
+          .replace(/\$sender/g, (global.tmi.showWithAt ? '@' : '') + attr.sender)
           .replace(/\$param/g, attr.param)
         global.tmi.message({
           message: {
@@ -313,7 +313,7 @@ class Message {
         if (!_.isString(attr.sender)) attr.sender = _.get(attr, 'sender.username', null)
         let cmd = filter
           .replace(/\(|\)/g, '')
-          .replace(/\$sender/g, (global.tmi.settings.chat.showWithAt ? '@' : '') + attr.sender)
+          .replace(/\$sender/g, (global.tmi.showWithAt ? '@' : '') + attr.sender)
           .replace(/\$param/g, attr.param)
         global.tmi.message({
           message: {
@@ -498,7 +498,7 @@ class Message {
           users: users,
           is: is,
           random: randomVar,
-          sender: global.tmi.settings.chat.showWithAt ? `@${attr.sender}` : `${attr.sender}`,
+          sender: global.tmi.showWithAt ? `@${attr.sender}` : `${attr.sender}`,
           param: _.isNil(attr.param) ? null : attr.param
         }
 
@@ -534,7 +534,7 @@ class Message {
       '(stream|#|game)': async function (filter) {
         const channel = filter.replace('(stream|', '').replace('|game)', '')
 
-        const token = await global.oauth.settings.bot.accessToken
+        const token = await global.oauth.botAccessToken
         if (token === '') return 'n/a'
 
         try {
@@ -556,7 +556,7 @@ class Message {
       '(stream|#|title)': async function (filter) {
         const channel = filter.replace('(stream|', '').replace('|title)', '')
 
-        const token = await global.oauth.settings.bot.accessToken
+        const token = await global.oauth.botAccessToken
         if (token === '') return 'n/a'
 
         try {
@@ -582,7 +582,7 @@ class Message {
       '(stream|#|viewers)': async function (filter) {
         const channel = filter.replace('(stream|', '').replace('|viewers)', '')
 
-        const token = await global.oauth.settings.bot.accessToken
+        const token = await global.oauth.botAccessToken
         if (token === '') return '0'
 
         try {
@@ -617,7 +617,7 @@ class Message {
     await this.parseMessageEach(param, true)
     // local replaces
     if (!_.isNil(attr)) {
-      const isWithAt = global.tmi.settings.chat.showWithAt
+      const isWithAt = global.tmi.showWithAt
       for (let [key, value] of Object.entries(attr)) {
         if (_.includes(['sender'], key)) value = isWithAt ? `@${value}` : value
         this.message = this.message.replace(new RegExp('[$]' + key, 'g'), value)

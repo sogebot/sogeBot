@@ -207,7 +207,7 @@ class Parser {
     ) {
       var text = message.trim().replace(new RegExp('^(' + command.command + ')', 'i'), '').trim()
       let opts = {
-        sender: _.isNil(sender) ? { username: global.oauth.settings.bot.username.toLowerCase() } : sender,
+        sender: _.isNil(sender) ? { username: global.oauth.botUsername.toLowerCase() } : sender,
         command: command.command,
         parameters: text.trim()
       }

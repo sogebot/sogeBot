@@ -1,9 +1,8 @@
 import Module from '../_interface';
 
 class Overlay extends Module {
-  constructor(opts) {
-    opts = opts || {};
-    super(opts, 'overlays');
+  constructor() {
+    super('overlays', true);
     this.addMenu({ category: 'settings', name: 'overlays', id: 'overlays' });
   }
 }

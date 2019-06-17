@@ -85,7 +85,7 @@ class Users extends Core {
     if (_.isNil(username)) return global.log.error('username is NULL!\n' + new Error().stack)
 
     username = username.toLowerCase()
-    if (username === global.oauth.settings.bot.username.toLowerCase() || _.isNil(username)) return // it shouldn't happen, but there can be more than one instance of a bot
+    if (username === global.oauth.botUsername.toLowerCase() || _.isNil(username)) return // it shouldn't happen, but there can be more than one instance of a bot
 
     const user = await global.db.engine.findOne('users', { username })
     object.username = username
@@ -268,9 +268,9 @@ class Users extends Core {
         ])
 
         for (const v of viewers) {
-          _.set(v, 'stats.tips', v.tips.map((o) => global.currency.exchange(o.amount, o.currency, global.currency.settings.currency.mainCurrency)).reduce((a, b) => a + b, 0));
+          _.set(v, 'stats.tips', v.tips.map((o) => global.currency.exchange(o.amount, o.currency, global.currency.mainCurrency)).reduce((a, b) => a + b, 0));
           _.set(v, 'stats.bits', v.bits.map((o) => o.amount).reduce((a, b) => a + b, 0));
-          _.set(v, 'custom.currency', global.currency.settings.currency.mainCurrency);
+          _.set(v, 'custom.currency', global.currency.mainCurrency);
           _.set(v, 'points', (v.points[0] || { points: 0 }).points);
           _.set(v, 'messages', (v.messages[0] || { messages: 0 }).messages);
           _.set(v, 'time.watched', (v.watched[0] || { watched: 0 }).watched);
@@ -286,10 +286,10 @@ class Users extends Core {
       })
       socket.on('followedAt.viewer', async (id, cb) => {
         try {
-          const cid = global.oauth.settings._.channelId
+          const cid = global.oauth.channelId
           const url = `https://api.twitch.tv/helix/users/follows?from_id=${id}&to_id=${cid}`
 
-          const token = global.oauth.settings.bot.accessToken
+          const token = global.oauth.botAccessToken
           if (token === '') cb(new Error('no token available'), null)
 
           const request = await axios.get(url, {

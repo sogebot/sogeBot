@@ -1012,6 +1012,10 @@
         }
       }
     },
+    "@types/eslint-visitor-keys": {
+      "version": "1.0.0",
+      "dev": true
+    },
     "@types/estree": {
       "version": "0.0.39",
       "dev": true
@@ -1102,7 +1106,7 @@
       }
     },
     "@types/lodash": {
-      "version": "4.14.133",
+      "version": "4.14.134",
       "dev": true
     },
     "@types/luxon": {
@@ -1186,7 +1190,7 @@
       "dev": true
     },
     "@types/node": {
-      "version": "12.0.4",
+      "version": "12.0.8",
       "dev": true
     },
     "@types/node-hue-api": {
@@ -1248,7 +1252,7 @@
       }
     },
     "@types/sinon": {
-      "version": "7.0.12",
+      "version": "7.0.13",
       "dev": true
     },
     "@types/sizzle": {
@@ -1375,37 +1379,36 @@
       "dev": true
     },
     "@typescript-eslint/eslint-plugin": {
-      "version": "1.9.0",
+      "version": "1.10.2",
       "dev": true,
       "requires": {
-        "@typescript-eslint/experimental-utils": "1.9.0",
-        "@typescript-eslint/parser": "1.9.0",
+        "@typescript-eslint/experimental-utils": "1.10.2",
         "eslint-utils": "^1.3.1",
         "functional-red-black-tree": "^1.0.1",
         "regexpp": "^2.0.1",
-        "requireindex": "^1.2.0",
         "tsutils": "^3.7.0"
       }
     },
     "@typescript-eslint/experimental-utils": {
-      "version": "1.9.0",
+      "version": "1.10.2",
       "dev": true,
       "requires": {
-        "@typescript-eslint/typescript-estree": "1.9.0"
+        "@typescript-eslint/typescript-estree": "1.10.2",
+        "eslint-scope": "^4.0.0"
       }
     },
     "@typescript-eslint/parser": {
-      "version": "1.9.0",
+      "version": "1.10.2",
       "dev": true,
       "requires": {
-        "@typescript-eslint/experimental-utils": "1.9.0",
-        "@typescript-eslint/typescript-estree": "1.9.0",
-        "eslint-scope": "^4.0.0",
+        "@types/eslint-visitor-keys": "^1.0.0",
+        "@typescript-eslint/experimental-utils": "1.10.2",
+        "@typescript-eslint/typescript-estree": "1.10.2",
         "eslint-visitor-keys": "^1.0.0"
       }
     },
     "@typescript-eslint/typescript-estree": {
-      "version": "1.9.0",
+      "version": "1.10.2",
       "dev": true,
       "requires": {
         "lodash.unescape": "4.0.1",
@@ -1452,6 +1455,10 @@
             "indexes-of": "^1.0.1",
             "uniq": "^1.0.1"
           }
+        },
+        "prettier": {
+          "version": "1.16.3",
+          "dev": true
         }
       }
     },
@@ -3822,25 +3829,42 @@
       "dev": true
     },
     "css-loader": {
-      "version": "2.1.1",
+      "version": "3.0.0",
       "dev": true,
       "requires": {
-        "camelcase": "^5.2.0",
-        "icss-utils": "^4.1.0",
+        "camelcase": "^5.3.1",
+        "cssesc": "^3.0.0",
+        "icss-utils": "^4.1.1",
         "loader-utils": "^1.2.3",
         "normalize-path": "^3.0.0",
-        "postcss": "^7.0.14",
+        "postcss": "^7.0.17",
         "postcss-modules-extract-imports": "^2.0.0",
-        "postcss-modules-local-by-default": "^2.0.6",
+        "postcss-modules-local-by-default": "^3.0.2",
         "postcss-modules-scope": "^2.1.0",
-        "postcss-modules-values": "^2.0.0",
-        "postcss-value-parser": "^3.3.0",
+        "postcss-modules-values": "^3.0.0",
+        "postcss-value-parser": "^4.0.0",
         "schema-utils": "^1.0.0"
       },
       "dependencies": {
         "normalize-path": {
           "version": "3.0.0",
           "dev": true
+        },
+        "postcss": {
+          "version": "7.0.17",
+          "dev": true,
+          "requires": {
+            "chalk": "^2.4.2",
+            "source-map": "^0.6.1",
+            "supports-color": "^6.1.0"
+          }
+        },
+        "supports-color": {
+          "version": "6.1.0",
+          "dev": true,
+          "requires": {
+            "has-flag": "^3.0.0"
+          }
         }
       }
     },
@@ -5694,12 +5718,8 @@
         "safer-buffer": ">= 2.1.2 < 3"
       }
     },
-    "icss-replace-symbols": {
-      "version": "1.1.0",
-      "dev": true
-    },
     "icss-utils": {
-      "version": "4.1.0",
+      "version": "4.1.1",
       "dev": true,
       "requires": {
         "postcss": "^7.0.14"
@@ -6541,7 +6561,7 @@
       "dev": true
     },
     "mathjs": {
-      "version": "5.10.3",
+      "version": "6.0.2",
       "requires": {
         "complex.js": "2.0.11",
         "decimal.js": "10.2.0",
@@ -7911,12 +7931,31 @@
       }
     },
     "postcss-modules-local-by-default": {
-      "version": "2.0.6",
+      "version": "3.0.2",
       "dev": true,
       "requires": {
-        "postcss": "^7.0.6",
-        "postcss-selector-parser": "^6.0.0",
-        "postcss-value-parser": "^3.3.1"
+        "icss-utils": "^4.1.1",
+        "postcss": "^7.0.16",
+        "postcss-selector-parser": "^6.0.2",
+        "postcss-value-parser": "^4.0.0"
+      },
+      "dependencies": {
+        "postcss": {
+          "version": "7.0.17",
+          "dev": true,
+          "requires": {
+            "chalk": "^2.4.2",
+            "source-map": "^0.6.1",
+            "supports-color": "^6.1.0"
+          }
+        },
+        "supports-color": {
+          "version": "6.1.0",
+          "dev": true,
+          "requires": {
+            "has-flag": "^3.0.0"
+          }
+        }
       }
     },
     "postcss-modules-scope": {
@@ -7928,10 +7967,10 @@
       }
     },
     "postcss-modules-values": {
-      "version": "2.0.0",
+      "version": "3.0.0",
       "dev": true,
       "requires": {
-        "icss-replace-symbols": "^1.1.0",
+        "icss-utils": "^4.0.0",
         "postcss": "^7.0.6"
       }
     },
@@ -7945,7 +7984,7 @@
       }
     },
     "postcss-value-parser": {
-      "version": "3.3.1",
+      "version": "4.0.0",
       "dev": true
     },
     "prelude-ls": {
@@ -7961,7 +8000,7 @@
       "dev": true
     },
     "prettier": {
-      "version": "1.16.3",
+      "version": "1.18.2",
       "dev": true
     },
     "prismjs": {
@@ -8404,10 +8443,6 @@
           "version": "2.0.0"
         }
       }
-    },
-    "requireindex": {
-      "version": "1.2.0",
-      "dev": true
     },
     "resolve": {
       "version": "1.10.1",
@@ -9272,7 +9307,7 @@
       }
     },
     "terminal-kit": {
-      "version": "1.28.0",
+      "version": "1.28.1",
       "requires": {
         "@cronvel/get-pixels": "^3.3.1",
         "lazyness": "^1.1.1",
@@ -9654,7 +9689,7 @@
       "dev": true
     },
     "typescript": {
-      "version": "3.5.1",
+      "version": "3.5.2",
       "dev": true
     },
     "uglify-js": {
@@ -10083,7 +10118,7 @@
       }
     },
     "webpack": {
-      "version": "4.33.0",
+      "version": "4.34.0",
       "dev": true,
       "requires": {
         "@webassemblyjs/ast": "1.8.5",
@@ -10113,7 +10148,7 @@
       }
     },
     "webpack-cli": {
-      "version": "3.3.2",
+      "version": "3.3.4",
       "dev": true,
       "requires": {
         "chalk": "^2.4.1",
@@ -10124,6 +10159,7 @@
         "import-local": "^2.0.0",
         "interpret": "^1.1.0",
         "loader-utils": "^1.1.0",
+        "prettier": "^1.17.0",
         "supports-color": "^5.5.0",
         "v8-compile-cache": "^2.0.2",
         "yargs": "^12.0.5"

@@ -15,11 +15,27 @@ import { permission } from './permissions';
 const Expects = require('./expects')
 import Core from './_interface'
 const constants = require('./constants')
+import { settings } from './decorators';
 
 const __DEBUG__ =
   (process.env.DEBUG && process.env.DEBUG.includes('tmi.client'));
 
 class TMI extends Core {
+  @settings('chat')
+  sendWithMe = false;
+
+  @settings('chat')
+  ignorelist = [];
+
+  @settings('chat')
+  showWithAt = true;
+
+  @settings('chat')
+  mute = false;
+
+  @settings('chat')
+  whisperListener = false;
+
   channel: string = ''
   timeouts: Object = {}
   client: Object = {}
@@ -29,16 +45,7 @@ class TMI extends Core {
   ignoreGiftsFromUser: { [string]: { count: number, time: Date }} = {}
 
   constructor () {
-    const settings = {
-      chat: {
-        sendWithMe: false,
-        ignorelist: [],
-        showWithAt: true,
-        mute: false,
-        whisperListener: false,
-      },
-    }
-    super({ settings })
+    super()
 
     this.addMenu({ category: 'settings', name: 'core', id: 'core' })
 
@@ -52,9 +59,9 @@ class TMI extends Core {
   async ignoreAdd (opts: Object) {
     try {
       const username = new Expects(opts.parameters).username().toArray()[0].toLowerCase()
-      global.tmi.settings.chat.ignorelist = [
+      global.tmi.ignorelist = [
         ...new Set([
-          ...global.tmi.settings.chat.ignorelist,
+          ...global.tmi.ignorelist,
           username,
         ]
       )];
@@ -70,7 +77,7 @@ class TMI extends Core {
   async ignoreRm (opts: Object) {
     try {
       const username = new Expects(opts.parameters).username().toArray()[0].toLowerCase()
-      global.tmi.settings.chat.ignorelist = global.tmi.settings.chat.ignorelist.filter(o => o !== username)
+      global.tmi.ignorelist = global.tmi.ignorelist.filter(o => o !== username)
       // update ignore list
       commons.sendMessage(commons.prepare('ignore.user.is.removed', { username }), opts.sender)
     } catch (e) {
@@ -92,9 +99,9 @@ class TMI extends Core {
   async initClient (type: string) {
     clearTimeout(this.timeouts[`initClient.${type}`])
     const [token, username, channel] = await Promise.all([
-      global.oauth.settings[type].accessToken,
-      global.oauth.settings[type].username,
-      global.oauth.settings.general.channel
+      global.oauth[type + 'AccessToken'],
+      global.oauth[type + 'Username'],
+      global.oauth.generalChannel
     ])
 
     try {
@@ -126,9 +133,9 @@ class TMI extends Core {
     try {
       if (typeof this.client[type] === 'undefined') throw Error('TMI: cannot reconnect, connection is not established')
       const [token, username, channel] = await Promise.all([
-        global.oauth.settings[type].accessToken,
-        global.oauth.settings[type].username,
-        global.oauth.settings.general.channel
+        global.oauth[type + 'AccessToken'],
+        global.oauth[type + 'Username'],
+        global.oauth.generalChannel
       ])
 
       if (this.channel !== channel) {
@@ -223,12 +230,14 @@ class TMI extends Core {
             })) {
               for (let [name, system] of Object.entries(systems)) {
                 if (name.startsWith('_') || typeof system.on === 'undefined') continue
-                if (typeof system.on.message === 'function') {
-                  system.on.message({
-                    sender: message.tags,
-                    message: message.message,
-                    timestamp: _.now()
-                  })
+                if (Array.isArray(system.on.message)) {
+                  for (const fnc of system.on.message) {
+                    system[fnc]({
+                      sender: message.tags,
+                      message: message.message,
+                      timestamp: _.now()
+                    })
+                  }
                 }
               }
             }
@@ -359,12 +368,14 @@ class TMI extends Core {
       })) {
         for (let [name, system] of Object.entries(systems)) {
           if (name.startsWith('_') || typeof system.on === 'undefined') continue
-          if (typeof system.on.sub === 'function') {
-            system.on.sub({
-              username: username,
-              userId: userstate.userId,
-              subCumulativeMonths
-            })
+          if (Array.isArray(system.on.sub)) {
+            for (const fnc of system.on.sub) {
+              system[fnc]({
+                username: username,
+                userId: userstate.userId,
+                subCumulativeMonths
+              });
+            }
           }
         }
       }
@@ -547,13 +558,15 @@ class TMI extends Core {
       })) {
         for (let [name, system] of Object.entries(systems)) {
           if (name.startsWith('_') || typeof system.on === 'undefined') continue
-          if (typeof system.on.bit === 'function') {
-            system.on.bit({
-              username: username,
-              amount: userstate.bits,
-              message: messageFromUser,
-              timestamp: _.now()
-            })
+          if (Array.isArray(system.on.bit)) {
+            for (const fnc of system.on.bit) {
+              system[fnc]({
+                username: username,
+                amount: userstate.bits,
+                message: messageFromUser,
+                timestamp: _.now()
+              });
+            }
           }
         }
       }
@@ -612,7 +625,7 @@ class TMI extends Core {
 
     if (!skip
         && sender['message-type'] === 'whisper'
-        && (global.tmi.settings.chat.whisperListener || isOwner(sender))) {
+        && (global.tmi.whisperListener || isOwner(sender))) {
       global.log.whisperIn(message, { username: sender.username })
     } else if (!skip && !commons.isBot(sender.username)) {
       global.log.chatIn(message, { username: sender.username })

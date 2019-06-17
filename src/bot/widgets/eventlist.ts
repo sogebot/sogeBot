@@ -1,24 +1,34 @@
+import { settings } from '../decorators';
 import Widget from './_interface';
 
 class EventList extends Widget {
+  @settings()
+  public widgetEventlistFollows: boolean = true;
+  @settings()
+  public widgetEventlistHosts: boolean = true;
+  @settings()
+  public widgetEventlistRaids: boolean = true;
+  @settings()
+  public widgetEventlistCheers: boolean = true;
+  @settings()
+  public widgetEventlistSubs: boolean = true;
+  @settings()
+  public widgetEventlistSubgifts: boolean = true;
+  @settings()
+  public widgetEventlistSubcommunitygifts: boolean = true;
+  @settings()
+  public widgetEventlistResubs: boolean = true;
+  @settings()
+  public widgetEventlistTips: boolean = true;
+  @settings()
+  public widgetEventlistShow: number = 5;
+  @settings()
+  public widgetEventlistSize: number = 20;
+  @settings()
+  public widgetEventlistMessageSize: number = 15;
+
   constructor() {
-    const options: InterfaceSettings = {
-      settings: {
-        widgetEventlistFollows: true,
-        widgetEventlistHosts: true,
-        widgetEventlistRaids: true,
-        widgetEventlistCheers: true,
-        widgetEventlistSubs: true,
-        widgetEventlistSubgifts: true,
-        widgetEventlistSubcommunitygifts: true,
-        widgetEventlistResubs: true,
-        widgetEventlistTips: true,
-        widgetEventlistShow: 5,
-        widgetEventlistSize: 20,
-        widgetEventlistMessageSize: 15,
-      },
-    };
-    super(options);
+    super();
     this.addWidget('eventlist', 'eventlist', 'far fa-calendar');
   }
 
@@ -39,7 +49,7 @@ class EventList extends Widget {
 
   public async update() {
     try {
-      const limit = this.settings.widgetEventlistShow;
+      const limit = this.widgetEventlistShow;
       const events = await global.db.engine.find('widgetsEventList', {
         _sort: 'timestamp',
         _total: limit,
@@ -51,4 +61,5 @@ class EventList extends Widget {
   }
 }
 
-module.exports = new EventList();
+export default EventList;
+export { EventList };

@@ -1,9 +1,8 @@
 import Module from '../_interface';
 
 class Game extends Module {
-  constructor(opts) {
-    opts.settings.enabled = typeof opts.settings.enabled !== 'undefined' ? opts.settings.enabled : false;
-    super(opts, 'games');
+  constructor() {
+    super('games', false);
     this.addMenu({ category: 'settings', name: 'games', id: 'games' });
   }
 }

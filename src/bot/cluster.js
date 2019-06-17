@@ -5,6 +5,8 @@ const _ = require('lodash')
 
 import { Events } from './events'
 import { Permissions } from './permissions'
+import { OAuth } from './oauth';
+import { Currency } from './currency';
 const { autoLoad } = require('./commons');
 
 cluster()
@@ -18,7 +20,7 @@ function cluster () {
   try {
     global.general = new (require('./general'))()
     global.ui = new (require('./ui'))()
-    global.currency = new (require('./currency'))()
+    global.currency = new Currency()
     global.users = new (require('./users'))()
     global.events = new Events();
     global.customvariables = new (require('./customvariables'))()
@@ -29,7 +31,7 @@ function cluster () {
     global.lib.translate = new (require('./translate'))()
     global.translate = global.lib.translate.translate
 
-    global.oauth = new (require('./oauth.js'))()
+    global.oauth = new OAuth()
     global.api = new (require('./api'))()
     global.tmi = new (require('./tmi'))()
   } catch (e) {

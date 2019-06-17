@@ -1,43 +1,21 @@
 import config from '@config';
-import { readdir } from 'fs';
+import { readdirSync } from 'fs';
 import gitCommitInfo from 'git-commit-info';
 import { get, isBoolean, isFinite, isNil, isNumber, isString, map, set } from 'lodash';
 import Core from './_interface';
 import { sendMessage } from './commons';
-import { command, default_permission } from './decorators';
+import { command, default_permission, settings, ui } from './decorators';
+import { onChange, onLoad } from './decorators/on';
 import { permission } from './permissions';
+import { isMainThread } from 'worker_threads';
 
 class General extends Core {
-  constructor() {
-    const options: InterfaceSettings = {
-      settings: {
-        lang: 'en',
-      },
-      ui: {
-        lang: {
-          type: 'selector',
-          values: [],
-        },
-      },
-      on: {
-        change: {
-          lang: ['onLangUpdate'],
-        },
-        load: {
-          lang: ['onLangLoad'],
-        },
-      },
-    };
-
-    super(options);
-
-    // update lang values
-    readdir('./locales/', (err, f) => {
-      if (typeof this._ui.lang === 'object' && this._ui.lang.type === 'selector') {
-        this._ui.lang.values = [...new Set(f.map((o) => o.split('.')[0]))];
-      }
-    });
-  }
+  @settings('general')
+  @ui({ type: 'selector', values: () => {
+    const f = readdirSync('./locales/');
+    return [...new Set(f.map((o) => o.split('.')[0]))];
+  }})
+  public lang: string = 'en';
 
   @command('!enable')
   @default_permission(permission.CASTERS)
@@ -51,10 +29,14 @@ class General extends Core {
     this.setStatus({...opts, enable: false});
   }
 
+  @onChange('lang')
+  @onLoad('lang')
   public async onLangUpdate() {
-    global.workers.sendToAll({ type: 'call', ns: 'lib.translate', fnc: '_load' });
+    global.workers.callOnAll({ type: 'call', ns: 'lib.translate', fnc: '_load' });
     await global.lib.translate._load();
-    global.log.warning(global.translate('core.lang-selected'));
+    if (isMainThread) {
+      global.log.warning(global.translate('core.lang-selected'));
+    }
   }
 
   public async onLangLoad() {
@@ -67,12 +49,12 @@ class General extends Core {
     const widgets = await global.db.engine.find('widgets');
 
     const oauth = {
-      broadcaster: global.oauth.settings.broadcaster.username !== '',
-      bot: global.oauth.settings.bot.username !== '',
+      broadcaster: global.oauth.broadcasterUsername !== '',
+      bot: global.oauth.botUsername !== '',
     };
 
-    const lang = this.settings.lang;
-    const mute = global.tmi.settings.chat.mute;
+    const lang = this.lang;
+    const mute = global.tmi.mute;
 
     const enabledSystems: any = {};
     for (const category of ['systems', 'games', 'integrations']) {
@@ -80,7 +62,7 @@ class General extends Core {
       for (const system of Object.keys(global[category]).filter((o) => !o.startsWith('_'))) {
         if (!global[category][system].settings) { continue; }
         const [enabled, areDependenciesEnabled, isDisabledByEnv] = await Promise.all([
-          global[category][system].settings.enabled,
+          global[category][system].enabled,
           global[category][system]._dependenciesEnabled(),
           !isNil(process.env.DISABLE) && (process.env.DISABLE.toLowerCase().split(',').includes(system.toLowerCase()) || process.env.DISABLE === '*'),
         ]);

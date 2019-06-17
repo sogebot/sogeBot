@@ -23,7 +23,7 @@ describe('Raffles - pick()', () => {
 
   describe('#1318 - 4 subs should have 25% win', () => {
     it('Set subscribers luck to 150%', async () => {
-      global.systems.raffles.settings.luck.subscribersPercent = 150
+      global.systems.raffles.subscribersPercent = 150
     })
 
     it('Create subscribers raffle', async () => {

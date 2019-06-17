@@ -15,9 +15,3 @@
     - gets an info about bet
 - !bet [index] [amount]
     - bet [amount] of points on [index]
-
-#### Settings
-- !set betPercentGain [0-100]
-    - sets amount of gain per option
-- !set betCloseTimer [minutes]
-    - amount of minutes when you can bet

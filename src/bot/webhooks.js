@@ -45,8 +45,8 @@ class Webhooks {
   async unsubscribe (type) {
     clearTimeout(this.timeouts[`unsubscribe-${type}`])
 
-    const cid = global.oauth.settings._.channelId
-    const clientId = await global.oauth.settings._.clientId
+    const cid = global.oauth.channelId
+    const clientId = await global.oauth.clientId
     if (cid === '' || clientId === '') {
       this.timeouts[`unsubscribe-${type}`] = setTimeout(() => this.subscribe(type), 1000)
       return
@@ -97,8 +97,8 @@ class Webhooks {
   async subscribe (type, quiet) {
     clearTimeout(this.timeouts[`subscribe-${type}`])
 
-    const cid = global.oauth.settings._.channelId
-    const clientId = await global.oauth.settings._.clientId
+    const cid = global.oauth.channelId
+    const clientId = await global.oauth.clientId
     if (cid === '' || clientId === '') {
       this.timeouts[`subscribe-${type}`] = setTimeout(() => this.subscribe(type), 1000)
       return
@@ -161,14 +161,14 @@ class Webhooks {
 
   async event (aEvent, res) {
     // somehow stream doesn't have a topic
-    if (_.get(aEvent, 'topic', null) === `https://api.twitch.tv/helix/users/follows?first=1&to_id=${global.oauth.settings._.channelId}`) this.follower(aEvent) // follow
+    if (_.get(aEvent, 'topic', null) === `https://api.twitch.tv/helix/users/follows?first=1&to_id=${global.oauth.channelId}`) this.follower(aEvent) // follow
     else if (_.get(!_.isNil(aEvent.data[0]) ? aEvent.data[0] : {}, 'type', null) === 'live') this.stream(aEvent) // streams
 
     res.sendStatus(200)
   }
 
   async challenge (req, res) {
-    const cid = global.oauth.settings._.channelId
+    const cid = global.oauth.channelId
     // set webhooks enabled
     switch (req.query['hub.topic']) {
       case `https://api.twitch.tv/helix/users/follows?first=1&to_id=${cid}`:
@@ -197,7 +197,7 @@ class Webhooks {
   */
   async follower (aEvent) {
     try {
-      const cid = global.oauth.settings._.channelId
+      const cid = global.oauth.channelId
       const data = aEvent.data
       if (_.isEmpty(cid)) setTimeout(() => this.follower(aEvent), 10) // wait until channelId is set
       if (parseInt(data.to_id, 10) !== parseInt(cid, 10)) return
@@ -235,11 +235,13 @@ class Webhooks {
           })) {
             for (let [name, system] of Object.entries(systems)) {
               if (name.startsWith('_') || typeof system.on === 'undefined') continue
-              if (typeof system.on.follow === 'function') {
-                system.on.follow({
-                  username: data.from_name,
-                  userId: data.from_id,
-                })
+              if (Array.isArray(system.on.follow)) {
+                for (const fnc of system.on.follow) {
+                  system[fnc]({
+                    username: data.from_name,
+                    userId: data.from_id,
+                  });
+                }
               }
             }
           }
@@ -278,7 +280,7 @@ class Webhooks {
     }
   */
   async stream (aEvent) {
-    const cid = global.oauth.settings._.channelId
+    const cid = global.oauth.channelId
     if (cid === '') setTimeout(() => this.stream(aEvent), 1000) // wait until channelId is set
 
     // stream is online

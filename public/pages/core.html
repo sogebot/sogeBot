@@ -55,7 +55,7 @@
                   ></toggle>
                   <textarea-from-array
                     class="pt-1 pb-1"
-                    v-else-if="currentValue.constructor === Array"
+                    v-else-if="Array.isArray(currentValue)"
                     v-bind:value="currentValue"
                     v-bind:title="commons.translate('core.' + selectedSystem + '.settings.' + defaultValue)"
                     v-on:update="value[defaultValue] = $event; triggerDataChange()"
@@ -66,7 +66,6 @@
                     v-bind:type="typeof currentValue"
                     v-bind:value="currentValue"
                     v-bind:title="'core.' + selectedSystem + '.settings.' + defaultValue"
-                    :permission="settings._permissions[defaultValue]"
                     v-on:update="value[defaultValue] = $event.value; triggerDataChange()">
                   </number-input>
                   <text-input
@@ -75,7 +74,6 @@
                     v-bind:type="typeof currentValue"
                     v-bind:value="currentValue"
                     v-bind:title="'core.' + selectedSystem + '.settings.' + defaultValue"
-                    :permission="settings._permissions[defaultValue]"
                     v-on:update="value[defaultValue] = $event.value; triggerDataChange()"
                   ></text-input>
                 </template>
@@ -194,7 +192,6 @@
           this.state.loading = 1
           this.socket[system].emit('settings', (err, _setting, _ui) => {
             if (system !== this.selectedSystem) return // skip if we quickly changed system
-
             this.state.loading = 0
             _settings = _(_setting).toPairs().value()
             _ui = _(_ui).toPairs().value()

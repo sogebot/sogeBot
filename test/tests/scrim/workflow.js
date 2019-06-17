@@ -21,8 +21,8 @@ describe('Scrim - full workflow', () => {
       await db.cleanup()
       await message.prepare()
 
-      global.systems.scrim.settings.time.waitForMatchIdsInSeconds = 10
-      await variable.isEqual('global.systems.scrim.settings.time.waitForMatchIdsInSeconds', 10)
+      global.systems.scrim.waitForMatchIdsInSeconds = 10
+      await variable.isEqual('global.systems.scrim.waitForMatchIdsInSeconds', 10)
     })
 
     it('Create cooldown only scrim for 1 minute', async () => {
@@ -114,8 +114,8 @@ describe('Scrim - full workflow', () => {
       await db.cleanup()
       await message.prepare()
 
-      global.systems.scrim.settings.time.waitForMatchIdsInSeconds = 10
-      await variable.isEqual('global.systems.scrim.settings.time.waitForMatchIdsInSeconds', 10)
+      global.systems.scrim.waitForMatchIdsInSeconds = 10
+      await variable.isEqual('global.systems.scrim.waitForMatchIdsInSeconds', 10)
     })
 
     it('Create scrim for 1 minute', async () => {
@@ -207,8 +207,8 @@ describe('Scrim - full workflow', () => {
       await db.cleanup()
       await message.prepare()
 
-      global.systems.scrim.settings.time.waitForMatchIdsInSeconds = 10
-      await variable.isEqual('global.systems.scrim.settings.time.waitForMatchIdsInSeconds', 10)
+      global.systems.scrim.waitForMatchIdsInSeconds = 10
+      await variable.isEqual('global.systems.scrim.waitForMatchIdsInSeconds', 10)
     })
 
     it('Create scrim for 1 minute', async () => {

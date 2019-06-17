@@ -1,5 +1,3 @@
-/* globals translations */
-
 export default function(key) {
   const results = new RegExp('[\?&]' + key + '=([^&#]*)').exec(window.location.href);
   if (results == null) {

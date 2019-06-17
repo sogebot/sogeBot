@@ -128,7 +128,7 @@ class Top extends System {
           if (_.isNil(users[username])) {
             users[username] = { username, value: 0 };
           }
-          users[username].value += global.currency.exchange(tip.amount, tip.currency, global.currency.settings.currency.mainCurrency);
+          users[username].value += global.currency.exchange(tip.amount, tip.currency, global.currency.mainCurrency);
         }
         sorted = _.orderBy(users, 'value', 'desc');
         break;
@@ -198,11 +198,11 @@ class Top extends System {
 
       _.remove(sorted, (o) => _.includes(ignored, o.username));
       // remove broadcaster and bot accounts
-      _.remove(sorted, (o) => _.includes([getChannel(), global.oauth.settings.bot.username.toLowerCase()], o.username));
+      _.remove(sorted, (o) => _.includes([getChannel(), global.oauth.botUsername.toLowerCase()], o.username));
       sorted = _.chunk(sorted, 10)[0];
 
       for (const user of sorted) {
-        message += (i + 1) + '. ' + (global.tmi.settings.chat.showWithAt ? '@' : '') + (user.username || 'unknown') + ' - ';
+        message += (i + 1) + '. ' + (global.tmi.showWithAt ? '@' : '') + (user.username || 'unknown') + ' - ';
         switch (type) {
           case TYPE.TIME:
             message += (user.value / 1000 / 60 / 60).toFixed(1) + 'h';
@@ -211,7 +211,7 @@ class Top extends System {
             message += [user.value, getLocalizedName(user.value, 'core.months')].join(' ');
             break;
           case TYPE.TIPS:
-            message += user.value.toFixed(2) + global.currency.symbol(global.currency.settings.currency.mainCurrency);
+            message += user.value.toFixed(2) + global.currency.symbol(global.currency.mainCurrency);
             break;
           case TYPE.POINTS:
             message += user.value + ' ' + await global.systems.points.getPointsName(user.value);

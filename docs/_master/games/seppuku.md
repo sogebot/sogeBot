@@ -8,8 +8,6 @@
 
 ## Settings
 
-`!set games.seppuku.settings.timeout <seconds>` - how long should timeout last
-
 `!enable game seppuku` |
 `!disable game seppuku` - enable/disable game
 

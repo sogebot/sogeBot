@@ -7,6 +7,7 @@ const {
 const {
   flatten, unflatten
 } = require('../commons');
+import { debug } from '../debug';
 
 const Interface = require('./interface')
 const Datastore = require('nedb')
@@ -15,11 +16,16 @@ class INeDB extends Interface {
   constructor (forceIndexes) {
     super('nedb')
     this.createIndexes = forceIndexes || !isMainThread // create indexes on worker (cpu is always 1)
-    this.connected = true
+
+    setTimeout(() => {
+      this.connected = true; // slow down for proper load
+    }, isMainThread ? 0 : 5000)
 
     if (!fs.existsSync('./db')) fs.mkdirSync('./db')
     if (!fs.existsSync('./db/nedb')) fs.mkdirSync('./db/nedb')
     this.table = {}
+
+    debug('db', 'Starting NeDB - ' + isMainThread);
   }
 
   async index (table, opts) {

@@ -9,7 +9,7 @@ npm-shrinkwrap.json*
 yarn.lock
 *.zip
 config.json
-*.db
+db/
 
 public/dist/*
 public/custom/*

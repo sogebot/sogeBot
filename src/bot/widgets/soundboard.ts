@@ -4,7 +4,7 @@ import Widget from './_interface';
 
 class SoundBoard extends Widget {
   constructor() {
-    super({});
+    super();
     this.addWidget('soundboard', 'widget-title-soundboard', 'fas fa-music');
   }
 
@@ -31,4 +31,5 @@ class SoundBoard extends Widget {
   }
 }
 
-module.exports = new SoundBoard();
+export default SoundBoard;
+export { SoundBoard };

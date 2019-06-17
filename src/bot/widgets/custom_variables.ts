@@ -5,7 +5,7 @@ import Widget from './_interface';
 
 class CustomVariables extends Widget {
   constructor() {
-    super({});
+    super();
     this.addWidget('customvariables', 'widget-title-customvariables', 'fas fa-dollar-sign');
 
     require('cluster').on('message', (worker, message) => {
@@ -63,4 +63,5 @@ class CustomVariables extends Widget {
   }
 }
 
-module.exports = new CustomVariables();
+export default CustomVariables;
+export { CustomVariables };

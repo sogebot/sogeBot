@@ -33,7 +33,7 @@ class Twitch extends Core {
   }
 
   async sendTwitchVideo (self, socket) {
-    socket.emit('twitchVideo', (await global.oauth.settings.broadcaster.username).toLowerCase())
+    socket.emit('twitchVideo', (await global.oauth.broadcasterUsername).toLowerCase())
   }
 
   @command('!uptime')
@@ -61,11 +61,11 @@ class Twitch extends Core {
 
     let onlineFollowers = _.intersection(onlineViewers, followers)
     events = _.filter(_.orderBy(events, 'timestamp', 'desc'), (o) => { return o.event === 'follow' })
-    moment.locale(global.general.settings.lang)
+    moment.locale(global.general.lang)
 
     let lastFollowAgo = ''
     let lastFollowUsername = 'n/a'
-    let onlineFollowersCount = _.size(_.filter(onlineFollowers, (o) => o !== global.oauth.settings.bot.username.toLowerCase() && o !== getChannel())) // except bot and user
+    let onlineFollowersCount = _.size(_.filter(onlineFollowers, (o) => o !== global.oauth.botUsername.toLowerCase() && o !== getChannel())) // except bot and user
     if (events.length > 0) {
       lastFollowUsername = events[0].username
       lastFollowAgo = moment(events[0].timestamp).fromNow()
@@ -87,11 +87,11 @@ class Twitch extends Core {
 
     let onlineSubscribers = _.intersection(onlineViewers, subscribers)
     events = _.filter(_.orderBy(events, 'timestamp', 'desc'), (o) => { return o.event === 'sub' || o.event === 'resub' || o.event === 'subgift' })
-    moment.locale(global.general.settings.lang)
+    moment.locale(global.general.lang)
 
     let lastSubAgo = ''
     let lastSubUsername = 'n/a'
-    let onlineSubCount = _.size(_.filter(onlineSubscribers, (o) => o !== getChannel() && o !== global.oauth.settings.bot.username.toLowerCase())) // except bot and user
+    let onlineSubCount = _.size(_.filter(onlineSubscribers, (o) => o !== getChannel() && o !== global.oauth.botUsername.toLowerCase())) // except bot and user
     if (events.length > 0) {
       lastSubUsername = events[0].username
       lastSubAgo = moment(events[0].timestamp).fromNow()

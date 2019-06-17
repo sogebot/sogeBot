@@ -5,7 +5,7 @@ import moment from 'moment';
 import 'moment-precise-range-plugin';
 
 import { sendMessage } from '../commons';
-import { command, default_permission } from '../decorators';
+import { command, default_permission, settings, ui } from '../decorators';
 import { permission } from '../permissions';
 import System from './_interface';
 
@@ -18,22 +18,12 @@ const ERROR_MISSING_TOKEN = '2';
  */
 
 class Highlights extends System {
+  @settings('generator')
+  @ui({ type: 'highlights-url-generator' })
+  urls: { url: string; clip: boolean; highlight: boolean }[] = [];
+
   constructor() {
-    const options: InterfaceSettings = {
-      settings: {
-        generator: {
-          urls: [],
-        },
-      },
-      ui: {
-        generator: {
-          urls: {
-            type: 'highlights-url-generator',
-          },
-        },
-      },
-    };
-    super(options);
+    super();
 
     this.addMenu({ category: 'manage', name: 'highlights', id: 'highlights/list' });
   }
@@ -59,7 +49,7 @@ class Highlights extends System {
 
   public async url(req: Request, res: Response) {
     const url = req.get('host') + req.originalUrl;
-    const settings = this.settings.generator.urls.find((o) => o.url.endsWith(url));
+    const settings = this.urls.find((o) => o.url.endsWith(url));
     if (settings) {
       if (!(await this.isEnabled())) {
         return res.status(412).send({ error: 'Highlights system is disabled' });
@@ -88,8 +78,8 @@ class Highlights extends System {
   @default_permission(permission.CASTERS)
   public async main(opts) {
     const when = await global.cache.when();
-    const token = global.oauth.settings.bot.accessToken;
-    const cid = global.oauth.settings._.channelId;
+    const token = global.oauth.botAccessToken;
+    const cid = global.oauth.channelId;
     const url = `https://api.twitch.tv/helix/videos?user_id=${cid}&type=archive&first=1`;
 
     try {
@@ -168,4 +158,5 @@ class Highlights extends System {
   }
 }
 
-module.exports = new Highlights();
+export default Highlights;
+export { Highlights };

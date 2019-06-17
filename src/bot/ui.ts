@@ -1,25 +1,25 @@
 import Core from './_interface';
+import { settings, ui } from './decorators';
 
 class UI extends Core {
-  constructor() {
-    const options: InterfaceSettings = {
-      settings: {
-        theme: 'light',
-        percentage: true,
-        shortennumbers: true,
-        stickystats: false,
-        showdiff: true,
-      },
-      ui: {
-        theme: {
-          type: 'selector',
-          values: ['light', 'dark'],
-        },
-      },
-    };
+  @settings()
+  @ui({
+    type: 'selector',
+    values: ['light', 'dark'],
+  })
+  public theme: 'light' | 'dark' = 'light';
 
-    super(options);
-  }
+  @settings()
+  public percentage: boolean = true;
+
+  @settings()
+  public shortennumbers: boolean = true;
+
+  @settings()
+  public stickystats: boolean = true;
+
+  @settings()
+  public showdiff: boolean = true;
 }
 
 module.exports = UI;

@@ -4,8 +4,8 @@
     "timeout": {
       "title": "Čas trvání timeoutu",
       "help": "Sekundy"
-    }
-  },
-  "winnerWillGet": "Kolik bodů bude přidáno při výhře",
-  "loserWillLose": "Kolik bodů bude ztraceno při prohře"
+    },
+    "winnerWillGet": "Kolik bodů bude přidáno při výhře",
+    "loserWillLose": "Kolik bodů bude ztraceno při prohře"
+  }
 }

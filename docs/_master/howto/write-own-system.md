@@ -10,21 +10,17 @@
 // bot libraries
 const constants = require('../constants')
 import System from './_interface';
-import { command, default_permission, parser } from '../decorators';
+import { command, default_permission, parser, settings, ui, shared } from '../decorators';
 import { permissions } from '../permission'; // set of core permissions
 
 class Yoursystem extends System {
-  [x: string]: any;
+  public dependsOn: string[] = []
 
-  constructor () {
-    const options: InterfaceSettings = {
-      settings: {},
-      ui: {},
-      dependsOn: [],
-      on: {},
-    };
-    super(options)
-  }
+  @settings('myCategory')
+  yourSettingsVariableInMyCategory: string = 'lorem'
+
+  @settings()
+  yourSettingsVariableWithoutMyCategory: string = 'ipsum'
 }
 
 export default YourSystem;
@@ -35,16 +31,41 @@ export default YourSystem;
 Some systems have dependencies, e.g. bet system cannot work without points system
 
 ``` typescript
-const options: InterfaceSettings = {
-  // ...
-  dependsOn: ['systems.points'],
+class Yoursystem extends System {
+  public dependsOn: string[] = ['systems.points']
+
   // ...
 }
 ```
 
 ### Settings variable
 
-Settings variable may contain settings for `yoursystem`
+**@settings(category?: string)** variable may contain settings for `yoursystem`,
+customizable through ui and are saved in db
+
+``` typescript
+class Yoursystem extends System {
+  @settings('myCategory')
+  yourSettingsVariableInMyCategory: string = 'lorem'
+
+  @settings()
+  yourSettingsVariableWithoutMyCategory: string = 'ipsum'
+  // ...
+}
+```
+
+### Shared variable
+
+**@shared()** variables are shared through workers and should be correctly accesible
+in master and worker
+
+``` typescript
+class Yoursystem extends System {
+  @shared()
+  yourSharedVariableShouldBeSameAcrossThreads: string = 'lorem'
+  // ...
+}
+```
 
 #### Commands
 
@@ -82,57 +103,6 @@ public someParser(opts: ParserOptions) {
 @parser({ fireAndForget: true })
 public anotherParser(opts: ParserOptions) {
   // ... parser logic ...
-}
-```
-
-#### Others
-
-You can set your own settings variables. Only `array`, `number`, `boolean` and `string`
-is supported. You can also add category for your settings. Use **null** value
-if you dont want to have type check.
-Arrays are **not recommended** as autosync is supported only for array functions,
-not direct index access! Change of full array will trigger autosync between threads.
-
-!> To be sure **arrays** are properly saved and synced use
-   `this.updateSettings(pathToYourVariable, this.settings.pathToYourVariable);`
-   after working with variable.
-
-##### Configurable in UI
-
-``` javascript
-const settings = {
-  // ...
-  mySettingValueArr: [], // not recommended
-  mySettingValueNum: 1,
-  mySettingValueBool: true,
-  mySettingValueString: 'Lorem Ipsum',
-  mySettingWithoutTypeCheck: null,
-  mySettingsCategory: {
-    valueArr: [], // not recommended
-    valueNum: 1,
-    valueBool: false,
-    valueString: 'Lorem Ipsum',
-    WithoutTypeCheck: null,
-  }
-  // ...
-  // example of array change
-  //            v-------------------------v path of your variable
-  this.settings.mySettingsCategory.valueArr.push('someValue');
-  this.updateSettings('mySettingsCategory.valueArr', this.settings.mySettingsCategory.valueArr);
-}
-```
-
-##### Not configurable starts with _
-
-``` javascript
-const settings = {
-  // ...
-  _: {
-    mySettingValueNum: 1,
-    mySettingValueBool: true,
-    mySettingValueString: 'Lorem Ipsum'
-  }
-  // ...
 }
 ```
 

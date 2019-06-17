@@ -22,18 +22,18 @@ describe('API - getLatest100Followers()', () => {
 
     global.api.timeouts['getLatest100Followers'].isPaused = true
 
-    global.oauth.settings._.channelId = '12345'
-    await variable.isEqual('global.oauth.settings._.channelId', '12345')
-    global.oauth.settings.bot.accessToken = 'foobar'
-    await variable.isEqual('global.oauth.settings.bot.accessToken', 'foobar')
-    global.oauth.settings.bot.username = '__bot_username__'
-    await variable.isEqual('global.oauth.settings.bot.username', '__bot_username__')
+    global.oauth.channelId = '12345'
+    await variable.isEqual('global.oauth.channelId', '12345')
+    global.oauth.botAccessToken = 'foobar'
+    await variable.isEqual('global.oauth.botAccessToken', 'foobar')
+    global.oauth.botUsername = '__bot_username__'
+    await variable.isEqual('global.oauth.botUsername', '__bot_username__')
   })
 
   after(() => {
     global.api.timeouts['getLatest100Followers'].isPaused = false
-    global.oauth.settings._.channelId = ''
-    global.oauth.settings.bot.accessToken = ''
+    global.oauth.channelId = ''
+    global.oauth.botAccessToken = ''
   })
 
   describe('Example data', () => {

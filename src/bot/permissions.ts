@@ -6,7 +6,7 @@ import {
   sendMessage,
 } from './commons';
 import { debug } from './debug';
-import { command, default_permission } from './decorators';
+import { command, default_permission, settings } from './decorators';
 
 const permission = Object.freeze({
   CASTERS: '4300ed23-dca0-4ed9-8014-f5f2f7af55a9',
@@ -18,16 +18,14 @@ const permission = Object.freeze({
 });
 
 class Permissions extends Core {
+  @settings('warnings')
+  public sendWarning = false;
+
+  @settings('warnings')
+  public sendByWhisper = false;
+
   constructor() {
-    const options: InterfaceSettings = {
-      settings: {
-        warnings: {
-          sendWarning: false,
-          sendByWhisper: true,
-        },
-      },
-    };
-    super(options);
+    super();
 
     this.ensurePreservedPermissionsInDb();
     this.addMenu({ category: 'settings', name: 'permissions', id: '/settings/permissions' });
@@ -207,7 +205,7 @@ class Permissions extends Core {
           amount = user.stats.tier || 0;
           break;
         case 'tips':
-          amount = user.tips.reduce((a, b) => (a + global.currency.exchange(b.amount, b.currency, global.currency.settings.currency.mainCurrency)), 0);
+          amount = user.tips.reduce((a, b) => (a + global.currency.exchange(b.amount, b.currency, global.currency.mainCurrency)), 0);
           break;
         case 'watched':
           amount = user.watched.reduce((a, b) => (a + b.watched), 0) / (60 * 60 * 1000 /*hours*/);
@@ -225,7 +223,7 @@ class Permissions extends Core {
           }
           break;
         case '==':
-          if (!(Number(amount) === Number(f.value))) {
+          if (Number(amount) !== Number(f.value)) {
             return false;
           }
           break;

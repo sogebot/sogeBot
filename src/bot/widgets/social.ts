@@ -2,9 +2,10 @@ import Widget from './_interface';
 
 class Social extends Widget {
   constructor() {
-    super({});
+    super();
     this.addWidget('social', 'widget-title-social', 'fas fa-share-square');
   }
 }
 
-module.exports = new Social();
+export default Social;
+export { Social };

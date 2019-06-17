@@ -1,28 +1,24 @@
-// 3rdparty libraries
 import { isNil } from 'lodash';
 import { isMainThread } from 'worker_threads';
-import { command, default_permission } from '../decorators';
+
+import { command, default_permission, ui } from '../decorators';
 import Message from '../message';
 import { permission } from '../permissions';
 import Overlay from './_interface';
 
 class Alerts extends Overlay {
-  constructor() {
-    const options: InterfaceSettings = {
-      ui: {
-        links: {
-          overlay: {
-            type: 'link',
-            href: '/overlays/alerts',
-            class: 'btn btn-primary btn-block',
-            rawText: '/overlays/alerts',
-            target: '_blank',
-          },
-        },
-      },
-    };
+  @ui({
+    type: 'link',
+    href: '/overlays/alerts',
+    class: 'btn btn-primary btn-block',
+    rawText: '/overlays/alerts',
+    target: '_blank',
+  }, 'links')
+  linkBtn: null = null;
 
-    super(options);
+  constructor() {
+    super();
+
     this.addMenu({ category: 'settings', name: 'overlays', id: 'overlays' });
   }
 
@@ -38,7 +34,7 @@ class Alerts extends Overlay {
     let send: {[x: string]: string}[] = [];
     for (const string of opts.parameters.trim().split(' | ')) {
       const object = {};
-      for (const setting of string.match(/([\w-]+)=([\w-://.%?=$_|@&]+|'[\S ]+')/g) || []) {
+      for (const setting of string.match(/([\w-]+)=([\w-:/.%?=$_|@&]+|'[\S ]+')/g) || []) {
         const data = { key: setting.split(/=(.+)/)[0], value: setting.split(/=(.+)/)[1] };
         if (data.key === 'text') {
           data.value = data.value.replace(/\$sender/g, opts.sender.username);

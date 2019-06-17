@@ -5,7 +5,7 @@ import Widget from './_interface';
 
 class Chat extends Widget {
   constructor() {
-    super({});
+    super();
     this.addWidget('chat', 'widget-title-chat', 'far fa-comments');
   }
 
@@ -15,16 +15,16 @@ class Chat extends Widget {
     }
     this.socket.on('connection', (socket) => {
       socket.on('chat.message.send', (message) => {
-        sendMessage(message, { username: global.oauth.settings.bot.username }, { force: true });
+        sendMessage(message, { username: global.oauth.botUsername }, { force: true });
       });
 
       socket.on('room', (cb) => {
-        cb(null, global.oauth.settings.general.channel.toLowerCase());
+        cb(null, global.oauth.generalChannel.toLowerCase());
       });
 
       socket.on('viewers', async (cb) => {
         try {
-          const url = `https://tmi.twitch.tv/group/user/${(await global.oauth.settings.general.channel).toLowerCase()}/chatters`;
+          const url = `https://tmi.twitch.tv/group/user/${(await global.oauth.generalChannel).toLowerCase()}/chatters`;
           const response = await axios.get(url);
 
           if (response.status === 200) {
@@ -40,4 +40,5 @@ class Chat extends Widget {
   }
 }
 
-module.exports = new Chat();
+export default Chat;
+export { Chat };

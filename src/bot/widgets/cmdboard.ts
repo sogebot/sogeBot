@@ -1,17 +1,15 @@
 import { getOwner } from '../commons';
+import { settings } from '../decorators';
 import Widget from './_interface';
 
 class Cmdboard extends Widget {
+  @settings()
+  public displayAsOpts: string[] = ['list', 'grid'];
+  @settings()
+  public displayAs: string = 'list';
+
   constructor() {
-    const options: InterfaceSettings = {
-      settings: {
-        _: {
-          displayAsOpts: ['list', 'grid'],
-        },
-        displayAs: 'list',
-      },
-    };
-    super(options);
+    super();
     this.addWidget('cmdboard', 'widget-title-cmdboard', 'fas fa-th');
   }
 
@@ -44,4 +42,5 @@ class Cmdboard extends Widget {
   }
 }
 
-module.exports = new Cmdboard();
+export default Cmdboard;
+export { Cmdboard };

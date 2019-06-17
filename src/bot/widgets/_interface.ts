@@ -1,9 +1,9 @@
 import Module from '../_interface';
 
-class System extends Module {
-  constructor(opts) {
-    super(opts, 'widgets');
+class Widget extends Module {
+  constructor() {
+    super('widgets', true);
   }
 }
 
-export default System;
+export default Widget;

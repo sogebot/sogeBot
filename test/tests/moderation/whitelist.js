@@ -180,16 +180,16 @@ describe('systems/moderation - whitelist()', () => {
   for (let [pattern, test] of Object.entries(tests)) {
     for (let text of _.get(test, 'should.return.changed', [])) {
       it(`pattern '${pattern}' should change '${text}'`, async () => {
-        global.systems.moderation.settings.lists.whitelist = [pattern]
-        await variable.isEqual('systems.moderation.settings.lists.whitelist', [pattern])
+        global.systems.moderation.cListsWhitelist = [pattern]
+        await variable.isEqual('systems.moderation.cListsWhitelist', [pattern])
         let result = await global.systems.moderation.whitelist(text)
         assert.isTrue(text !== result)
       })
     }
     for (let text of _.get(test, 'should.return.same', [])) {
       it(`pattern '${pattern}' should not change '${text}'`, async () => {
-        global.systems.moderation.settings.lists.whitelist = [pattern]
-        await variable.isEqual('systems.moderation.settings.lists.whitelist', [pattern])
+        global.systems.moderation.cListsWhitelist = [pattern]
+        await variable.isEqual('systems.moderation.cListsWhitelist', [pattern])
         let result = await global.systems.moderation.whitelist(text)
         assert.isTrue(text === result)
       })

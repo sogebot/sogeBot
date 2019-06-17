@@ -157,6 +157,164 @@ let migration = {
     }
   }],
   settings: [{
+    version: '9.1.0',
+    do: async () => {
+      let processed = 0;
+      console.info('Performing update of settings for 9.1.0');
+
+      const mappings = {
+        'core.settings': {
+          oauth: {
+            'general.channel': 'generalChannel',
+            'general.owners': 'generalOwners',
+
+            'broadcaster.accessToken': 'broadcasterAccessToken',
+            'broadcaster.refreshToken': 'broadcasterRefreshToken',
+            'broadcaster.username': 'broadcasterUsername',
+            'broadcaster._authenticatedScopes': 'broadcasterCurrentScopes',
+
+            'bot.accessToken': 'botAccessToken',
+            'bot.refreshToken': 'botRefreshToken',
+            'bot.username': 'botUsername',
+            'bot._authenticatedScopes': 'botCurrentScopes',
+          },
+          tmi: {
+            'chat.ignorelist': 'ignorelist',
+            'chat.sendWithMe': 'sendWithMe',
+            'chat.showWithAt': 'showWithAt',
+            'chat.mute': 'mute',
+            'chat.whisperListener': 'whisperListener',
+          },
+          currency: {
+            'currency.mainCurrency': 'mainCurrency',
+          }
+        },
+        'systems.settings': {
+          moderation: {
+            'lists.whitelist': 'cListsWhitelist',
+            'lists.blacklist': 'cListsBlacklist',
+            'lists.moderateSubscribers': 'cListsModerateSubscribers',
+            'lists.timeout': 'cListsTimeout',
+            'links.enabled': 'cLinksEnabled',
+            'links.moderateSubscribers': 'cLinksModerateSubscribers',
+            'links.includeSpaces': 'cLinksIncludeSpaces',
+            'links.includeClips': 'cLinksIncludeClips',
+            'links.timeout': 'cLinksTimeout',
+            'symbols.enabled': 'cSymbolsEnabled',
+            'symbols.moderateSubscribers': 'cSymbolsModerateSubscribers',
+            'symbols.triggerLength': 'cSymbolsTriggerLength',
+            'symbols.maxSymbolsConsecutively': 'cSymbolsMaxSymbolsConsecutively',
+            'symbols.maxSymbolsPercent': 'cSymbolsMaxSymbolsPercent',
+            'symbols.timeout': 'cSymbolsTimeout',
+            'longMessage.enabled': 'cLongMessageEnabled',
+            'longMessage.moderateSubscribers': 'cLongMessageModerateSubscribers',
+            'longMessage.triggerLength': 'cLongMessageTriggerLength',
+            'longMessage.timeout': 'cLongMessageTimeout',
+            'caps.enabled': 'cCapsEnabled',
+            'caps.moderateSubscribers': 'cCapsModerateSubscribers',
+            'caps.triggerLenght': 'cCapsTriggerLength',
+            'caps.maxCapsPercent': 'cCapsMaxCapsPercent',
+            'caps.timeout': 'cCapsTimeout',
+            'spam.enabled': 'cSpamEnabled',
+            'spam.moderateSubscribers': 'cSpamModerateSubscribers',
+            'spam.triggerLength': 'cSpamTriggerLength',
+            'spam.maxLength': 'cSpamMaxLength',
+            'spam.timeout': 'cSpamTimeout',
+            'color.enabled': 'cColorEnabled',
+            'color.moderateSubscribers': 'cColorModerateSubscribers',
+            'color.timeout': 'cColorTimeout',
+            'emotes.enabled': 'cEmotesEnabled',
+            'emotes.moderateSubscribers': 'cEmotesModerateSubscribers',
+            'emotes.maxCount': 'cEmotesMaxCount',
+            'emotes.timeout': 'cEmotesTimeout',
+            'warnings.warningCount': 'cWarningsAllowedCount',
+            'warnings.announce': 'cWarningsAnnounceTimeouts',
+            'warnings.shouldClearChat': 'cWarningsShouldClearChat',
+          },
+          queue: {
+            'eligibility.all': 'eligibilityAll',
+            'eligibility.followers': 'eligibilityFollowers',
+            'eligibility.subscribers': 'eligibilitySubscribers'
+          }
+        },
+        'overlays.settings': {
+          polls: {
+            'display.theme': 'cDisplayTheme',
+            'display.hideAfterInactivity': 'cDisplayHideAfterInactivity',
+            'display.inactivityTime': 'cDisplayInactivityTime',
+            'display.align': 'cDisplayAlign',
+          },
+          clipscarousel: {
+            'clips.customPeriodInDays': 'cClipsCustomPeriodInDays',
+            'clips.numOfClips': 'cClipsNumOfClips',
+            'clips.timeToNextClip': 'cClipsTimeToNextClip',
+          },
+          clips: {
+            'clips.volume': 'cClipsVolume',
+            'clips.filter': 'cClipsFilter',
+            'clips.label': 'cClipsLabel',
+          },
+          emotes: {
+            'emotes.size': 'cEmotesSize',
+            'emotes.maxEmotesPerMessage': 'cEmotesMaxEmotesPerMessage',
+            'emotes.animation': 'cEmotesAnimation',
+            'emotes.animationTime': 'cEmotesAnimationTime',
+            'explosion.numOfEmotes': 'cExplosionNumOfEmotes',
+            'fireworks.numOfEmotesPerExplosion': 'cExplosionNumOfEmotesPerExplosion',
+            'fireworks.numOfExplosions': 'cExplosionNumOfExplosions',
+          },
+          credits: {
+            'credits.speed': 'cCreditsSpeed',
+            'credits.aggregated': 'cCreditsAggregated',
+            'show.followers': 'cShowFollowers',
+            'show.hosts': 'cShowHosts',
+            'show.raids': 'cShowRaids',
+            'show.subscribers': 'cShowSubscribers',
+            'show.subgifts': 'cShowSubgifts',
+            'show.subcommunitygifts': 'cShowSubcommunitygifts',
+            'show.resubs': 'cShowResubs',
+            'show.cheers': 'cShowCheers',
+            'show.clips': 'cShowClips',
+            'show.tips': 'cShowTips',
+            'text.lastMessage': 'cTextLastMessage',
+            'text.lastSubMessage': 'cTextLastSubMessage',
+            'text.streamBy': 'cTextStreamBy',
+            'text.follow': 'cTextFollow',
+            'text.host': 'cTextHost',
+            'text.raid': 'cTextRaid',
+            'text.cheer': 'cTextCheer',
+            'text.sub': 'cTextSub',
+            'text.resub': 'cTextResub',
+            'text.subgift': 'cTextSubgift',
+            'text.subcommunitygift': 'cTextSubcommunitygift',
+            'text.tip': 'cTextTip',
+            'customTexts.values': 'cCustomTextsValues',
+            'social.values': 'cSocialValues',
+            'clips.period': 'cClipsPeriod',
+            'clips.customPeriodInDays': 'cClipsCustomPeriodInDays',
+            'clips.numOfClips': 'cClipsNumOfClips',
+            'clips.shouldPlay': 'cClipsShouldPlay',
+            'clips.volume': 'cClipsVolume',
+          }
+        }
+      };
+
+      for (const collection of Object.keys(mappings)) {
+        console.info(`\t*** ${collection}`);
+        for (const system of Object.keys(mappings[collection])) {
+          for (const [ before, after ] of Object.entries(mappings[collection][system])) {
+            let item = await global.db.engine.findOne(collection, { key: before, system })
+            if (typeof item.key !== 'undefined') {
+              console.info(`\t\t-> ${system}.${before} => ${system}.${after}`)
+              await global.db.engine.update(collection, { _id: String(item._id) }, { key: after, system })
+              processed++;
+            }
+          }
+        }
+      }
+      console.info(`\t=> ${processed} processed`);
+    }
+  }, {
     version: '9.0.0',
     do: async () => {
       let processed = 0

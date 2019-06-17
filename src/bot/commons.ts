@@ -75,7 +75,7 @@ export function unflatten(data) {
 }
 
 export function getIgnoreList() {
-  return global.tmi.settings.chat.ignorelist.map((o) => {
+  return global.tmi.ignorelist.map((o) => {
     return o.trim().toLowerCase();
   });
 }
@@ -93,13 +93,13 @@ export function isIgnored(sender) {
  * @param translate Translation key
  * @param attr Attributes to replace { 'replaceKey': 'value' }
  */
-export async function prepare(translate: string, attr?: {[x: string]: string }): Promise<string> {
+export async function prepare(translate: string, attr?: {[x: string]: any }): Promise<string> {
   attr = attr || {};
   let msg = global.translate(translate);
   for (const key of Object.keys(attr).sort((a, b) => b.length - a.length)) {
     let value = attr[key];
     if (['username', 'who', 'winner', 'sender', 'loser'].includes(key)) {
-      value = global.tmi.settings.chat.showWithAt ? `@${value}` : value;
+      value = global.tmi.showWithAt ? `@${value}` : value;
     }
     msg = msg.replace(new RegExp('[$]' + key, 'g'), value);
   }
@@ -155,15 +155,15 @@ export async function sendMessage(messageToSend, sender, attr?: {
 
   // if sender is null/undefined, we can assume, that username is from dashboard -> bot
   if ((typeof sender.username === 'undefined' || sender.username === null) && !attr.force) { return false; } // we don't want to reply on bot commands
-  messageToSend = !_.isNil(sender.username) ? messageToSend.replace(/\$sender/g, (global.tmi.settings.chat.showWithAt ? '@' : '') + sender.username) : messageToSend;
-  if (!global.tmi.settings.chat.mute || attr.force) {
+  messageToSend = !_.isNil(sender.username) ? messageToSend.replace(/\$sender/g, (global.tmi.showWithAt ? '@' : '') + sender.username) : messageToSend;
+  if (!global.tmi.mute || attr.force) {
     if ((!_.isNil(attr.quiet) && attr.quiet)) { return true; }
     if (sender['message-type'] === 'whisper') {
       global.log.whisperOut(messageToSend, { username: sender.username });
       message('whisper', sender.username, messageToSend);
     } else {
       global.log.chatOut(messageToSend, { username: sender.username });
-      if (global.tmi.settings.chat.sendWithMe && !messageToSend.startsWith('/')) {
+      if (global.tmi.sendWithMe && !messageToSend.startsWith('/')) {
         message('me', null, messageToSend);
       } else {
         message('say', null, messageToSend);
@@ -180,7 +180,7 @@ export async function message(type, username, messageToSend, retry = true) {
     global.workers.sendToMaster({ type, sender: username, message: messageToSend });
   } else if (isMainThread) {
     try {
-      if (username === null) { username = await global.oauth.settings.general.channel; }
+      if (username === null) { username = await global.oauth.generalChannel; }
       if (username === '') {
         global.log.error('TMI: channel is not defined, message cannot be sent');
       } else {
@@ -198,24 +198,24 @@ export async function timeout(username, reason, timeMs) {
     if (reason) {
       reason = reason.replace(/\$sender/g, username);
     }
-    global.tmi.client.bot.chat.timeout(global.oauth.settings.general.channel, username, timeMs, reason);
+    global.tmi.client.bot.chat.timeout(global.oauth.generalChannel, username, timeMs, reason);
   } else { global.workers.sendToMaster({ type: 'timeout', username, timeout: timeMs, reason }); }
 }
 
 export function getOwner() {
   try {
-    return global.oauth.settings.general.owners[0].trim();
+    return global.oauth.generalOwners[0].trim();
   } catch (e) {
     return '';
   }
 }
 export function getOwners() {
-  return global.oauth.settings.general.owners;
+  return global.oauth.generalOwners;
 }
 
 export function getChannel() {
   try {
-    return global.oauth.settings.general.channel.toLowerCase().trim();
+    return global.oauth.generalChannel.toLowerCase().trim();
   } catch (e) {
     return '';
   }
@@ -223,7 +223,7 @@ export function getChannel() {
 
 export function getBroadcaster() {
   try {
-    return global.oauth.settings.broadcaster.username.toLowerCase().trim();
+    return global.oauth.broadcasterUsername.toLowerCase().trim();
   } catch (e) {
     return '';
   }
@@ -232,7 +232,7 @@ export function getBroadcaster() {
 export function isBroadcaster(user) {
   try {
     if (_.isString(user)) { user = { username: user }; }
-    return global.oauth.settings.broadcaster.username.toLowerCase().trim() === user.username.toLowerCase().trim();
+    return global.oauth.broadcasterUsername.toLowerCase().trim() === user.username.toLowerCase().trim();
   } catch (e) {
     return false;
   }
@@ -290,8 +290,8 @@ export async function isSubscriber(user) {
 export function isBot(user) {
   try {
     if (_.isString(user)) { user = { username: user }; }
-    if (global.oauth.settings.bot.username) {
-      return global.oauth.settings.bot.username.toLowerCase().trim() === user.username.toLowerCase().trim();
+    if (global.oauth.botUsername) {
+      return global.oauth.botUsername.toLowerCase().trim() === user.username.toLowerCase().trim();
     } else { return false; }
   } catch (e) {
     return true; // we can expect, if user is null -> bot or admin
@@ -301,8 +301,8 @@ export function isBot(user) {
 export function isOwner(user) {
   try {
     if (_.isString(user)) { user = { username: user }; }
-    if (global.oauth.settings.general.owners) {
-      const owners = _.map(_.filter(global.oauth.settings.general.owners, _.isString), (owner) => {
+    if (global.oauth.generalOwners) {
+      const owners = _.map(_.filter(global.oauth.generalOwners, _.isString), (owner) => {
         return _.trim(owner.toLowerCase());
       });
       return _.includes(owners, user.username.toLowerCase().trim());

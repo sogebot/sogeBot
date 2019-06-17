@@ -1,5 +1,9 @@
 const _ = require('lodash')
 const crypto = require('crypto')
+import { debug } from '../debug';
+const {
+  isMainThread
+} = require('worker_threads');
 
 const Interface = require('./interface')
 
@@ -13,6 +17,8 @@ class IMasterController extends Interface {
     this.data = []
 
     this.connect()
+
+    debug('db', 'Starting master - ' + isMainThread);
   }
 
   async connect() {

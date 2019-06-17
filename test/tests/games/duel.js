@@ -57,8 +57,8 @@ describe('Gambling - duel', () => {
     })
 
     it('set duel timestamp to 0 to force new duel', async () => {
-      global.games.duel.settings._.timestamp = 0
-      await variable.isEqual('global.games.duel.settings._.timestamp', 0)
+      global.games.duel._timestamp = 0
+      await variable.isEqual('global.games.duel._timestamp', 0)
     })
 
     it('add points for users', async () => {
@@ -69,8 +69,8 @@ describe('Gambling - duel', () => {
     it('user 1 is challenging', async () => {
       await global.games.duel.main({ sender: user1, parameters: 'all', command })
       await message.isSent('gambling.duel.new', user1, {
-        minutesName: getLocalizedName(await global.games.duel.settings.duration, 'core.minutes'),
-        minutes: await global.games.duel.settings.duration,
+        minutesName: getLocalizedName(await global.games.duel.duration, 'core.minutes'),
+        minutes: await global.games.duel.duration,
         command
       })
       await message.isSent('gambling.duel.joined', user1, {
@@ -90,8 +90,8 @@ describe('Gambling - duel', () => {
 
     it('set duel timestamp to force duel to end', async () => {
       // cannot set as 0 - duel is then ignored
-      global.games.duel.settings._.timestamp = 1
-      await variable.isEqual('global.games.duel.settings._.timestamp', 1)
+      global.games.duel._timestamp = 1
+      await variable.isEqual('global.games.duel._timestamp', 1)
     })
 
     it('call pickDuelWinner()', () => {
@@ -124,7 +124,7 @@ describe('Gambling - duel', () => {
     })
 
     it('create duel', async () => {
-      global.games.duel.settings._.timestamp = Number(new Date())
+      global.games.duel._timestamp = Number(new Date())
 
       for (let user of ['testuser', 'testuser2', 'testuser3', 'testuser4', 'testuser5']) {
         let tickets = Math.floor(Number.MAX_SAFE_INTEGER / 10)

@@ -98,8 +98,8 @@ describe('Cooldowns - check()', () => {
       await db.cleanup()
       await message.prepare()
 
-      global.games.gamble.settings.enabled = true
-      await variable.isEqual('global.games.gamble.settings.enabled', true)
+      global.games.gamble.enabled = true
+      await variable.isEqual('global.games.gamble.enabled', true)
     })
 
     it('Add usermod1 as moderator', async () => {
@@ -145,8 +145,8 @@ describe('Cooldowns - check()', () => {
       await db.cleanup()
       await message.prepare()
 
-      global.games.gamble.settings.enabled = true
-      await variable.isEqual('global.games.gamble.settings.enabled', true)
+      global.games.gamble.enabled = true
+      await variable.isEqual('global.games.gamble.enabled', true)
     })
 
     it('Add usermod1 as moderator', async () => {
@@ -196,8 +196,8 @@ describe('Cooldowns - check()', () => {
       await db.cleanup()
       await message.prepare()
 
-      global.games.gamble.settings.enabled = true
-      await variable.isEqual('global.games.gamble.settings.enabled', true)
+      global.games.gamble.enabled = true
+      await variable.isEqual('global.games.gamble.enabled', true)
     })
 
     it('test', async () => {
@@ -227,8 +227,8 @@ describe('Cooldowns - check()', () => {
       await db.cleanup()
       await message.prepare()
 
-      global.games.gamble.settings.enabled = true
-      await variable.isEqual('global.games.gamble.settings.enabled', true)
+      global.games.gamble.enabled = true
+      await variable.isEqual('global.games.gamble.enabled', true)
     })
 
     it('test', async () => {
@@ -252,8 +252,8 @@ describe('Cooldowns - check()', () => {
       await db.cleanup()
       await message.prepare()
 
-      global.games.gamble.settings.enabled = true
-      await variable.isEqual('global.games.gamble.settings.enabled', true)
+      global.games.gamble.enabled = true
+      await variable.isEqual('global.games.gamble.enabled', true)
     })
 
     it('test', async () => {
@@ -279,8 +279,8 @@ describe('Cooldowns - check()', () => {
       await db.cleanup()
       await message.prepare()
 
-      global.games.gamble.settings.enabled = true
-      await variable.isEqual('global.games.gamble.settings.enabled', true)
+      global.games.gamble.enabled = true
+      await variable.isEqual('global.games.gamble.enabled', true)
     })
 
     it('test', async () => {
@@ -307,8 +307,8 @@ describe('Cooldowns - check()', () => {
       await db.cleanup()
       await message.prepare()
 
-      global.games.gamble.settings.enabled = true
-      await variable.isEqual('global.games.gamble.settings.enabled', true)
+      global.games.gamble.enabled = true
+      await variable.isEqual('global.games.gamble.enabled', true)
     })
 
     it('test', async () => {
@@ -335,8 +335,8 @@ describe('Cooldowns - check()', () => {
       await db.cleanup()
       await message.prepare()
 
-      global.games.gamble.settings.enabled = true
-      await variable.isEqual('global.games.gamble.settings.enabled', true)
+      global.games.gamble.enabled = true
+      await variable.isEqual('global.games.gamble.enabled', true)
     })
 
     it('test', async () => {
@@ -366,8 +366,8 @@ describe('Cooldowns - check()', () => {
       await db.cleanup()
       await message.prepare()
 
-      global.games.gamble.settings.enabled = true
-      await variable.isEqual('global.games.gamble.settings.enabled', true)
+      global.games.gamble.enabled = true
+      await variable.isEqual('global.games.gamble.enabled', true)
     })
 
     it('test', async () => {

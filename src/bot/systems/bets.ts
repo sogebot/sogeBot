@@ -2,11 +2,10 @@ import _ from 'lodash';
 import { isMainThread } from 'worker_threads';
 
 import { getOwner, prepare, sendMessage } from '../commons';
-import { command, default_permission, helper } from '../decorators';
+import { command, default_permission, helper, settings, ui } from '../decorators';
 import Expects from '../expects';
 import { permission } from '../permissions';
 import System from './_interface';
-import Points from './points';
 
 const ERROR_NOT_ENOUGH_OPTIONS = 'Expected more parameters';
 const ERROR_ALREADY_OPENED = '1';
@@ -29,24 +28,14 @@ const ERROR_NOT_OPTION = '7';
  */
 
 class Bets extends System {
+  public dependsOn: string[] = ['systems.points'];
+
+  @settings()
+  @ui({ type: 'number-input', step: 1, min: 0, max: 100 })
+  public betPercentGain: number = 20;
+
   constructor() {
-    const options: InterfaceSettings = {
-      ui: {
-        betPercentGain: {
-          type: 'number-input',
-          step: 1,
-          min: 0,
-          max: 100,
-        },
-      },
-      settings: {
-        betPercentGain: 20,
-      },
-      dependsOn: [
-        'systems.points',
-      ],
-    };
-    super(options);
+    super();
 
     if (isMainThread) {
       this.checkIfBetExpired();
@@ -193,7 +182,7 @@ class Bets extends System {
       switch (e.message) {
         case ERROR_ZERO_BET:
           sendMessage(global.translate('bets.zeroBet')
-            .replace(/\$pointsName/g, await Points.getPointsName(0)), opts.sender);
+            .replace(/\$pointsName/g, await global.systems.points.getPointsName(0)), opts.sender);
           break;
         case ERROR_NOT_RUNNING:
           sendMessage(global.translate('bets.notRunning'), opts.sender);
@@ -249,7 +238,7 @@ class Bets extends System {
       if (_.isEmpty(currentBet)) { throw Error(ERROR_NOT_RUNNING); }
       if (_.isNil(currentBet.options[index])) { throw Error(ERROR_NOT_OPTION); }
 
-      const percentGain = (currentBet.options.length * parseInt(this.settings.betPercentGain, 10)) / 100;
+      const percentGain = (currentBet.options.length * this.betPercentGain) / 100;
 
       const users = await global.db.engine.find(this.collection.users);
       let total = 0;
@@ -264,7 +253,7 @@ class Bets extends System {
       sendMessage(global.translate('bets.closed')
         .replace(/\$option/g, currentBet.options[index].name)
         .replace(/\$amount/g, _.filter(users, (o) => o.option === index).length)
-        .replace(/\$pointsName/g, await Points.getPointsName(total))
+        .replace(/\$pointsName/g, await global.systems.points.getPointsName(total))
         .replace(/\$points/g, total), opts.sender);
       await global.db.engine.remove(this.collection.data, { _id: currentBet._id.toString() });
     } catch (e) {
