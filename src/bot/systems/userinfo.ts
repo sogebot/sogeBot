@@ -202,7 +202,7 @@ class UserInfo extends System {
       const message: string[] = [];
 
       // build message
-      for (const i of this._order) {
+      for (const i of this.order) {
         if (!this._formatDisabled.includes(i)) {
           message.push(i);
         }
