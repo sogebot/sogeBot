@@ -78,7 +78,7 @@ class Module {
     this.loadVariableValue('enabled').then((value) => {
       this._enabled = typeof value === 'undefined' ? this._enabled : value;
       this.status({ state: this._enabled, quiet: !isMainThread });
-    })
+    });
   }
 
   public sockets() {
