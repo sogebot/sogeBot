@@ -160,9 +160,10 @@ let migration = {
     version: '9.1.0',
     do: async () => {
       let processed = 0;
-        console.info('Updating core.settings')
+      console.info('Performing update of settings for 9.1.0');
 
-        const mappings = {
+      const mappings = {
+        'core.settings': {
           oauth: {
             'general.channel': 'generalChannel',
             'general.owners': 'generalOwners',
@@ -187,19 +188,71 @@ let migration = {
           currency: {
             'currency.mainCurrency': 'mainCurrency',
           }
+        },
+        'systems.settings': {
+          moderation: {
+            'lists.whitelist': 'cListsWhitelist',
+            'lists.blacklist': 'cListsBlacklist',
+            'lists.moderateSubscribers': 'cListsModerateSubscribers',
+            'lists.timeout': 'cListsTimeout',
+            'links.enabled': 'cLinksEnabled',
+            'links.moderateSubscribers': 'cLinksModerateSubscribers',
+            'links.includeSpaces': 'cLinksIncludeSpaces',
+            'links.includeClips': 'cLinksIncludeClips',
+            'links.timeout': 'cLinksTimeout',
+            'symbols.enabled': 'cSymbolsEnabled',
+            'symbols.moderateSubscribers': 'cSymbolsModerateSubscribers',
+            'symbols.triggerLength': 'cSymbolsTriggerLength',
+            'symbols.maxSymbolsConsecutively': 'cSymbolsMaxSymbolsConsecutively',
+            'symbols.maxSymbolsPercent': 'cSymbolsMaxSymbolsPercent',
+            'symbols.timeout': 'cSymbolsTimeout',
+            'longMessage.enabled': 'cLongMessageEnabled',
+            'longMessage.moderateSubscribers': 'cLongMessageModerateSubscribers',
+            'longMessage.triggerLength': 'cLongMessageTriggerLength',
+            'longMessage.timeout': 'cLongMessageTimeout',
+            'caps.enabled': 'cCapsEnabled',
+            'caps.moderateSubscribers': 'cCapsModerateSubscribers',
+            'caps.triggerLenght': 'cCapsTriggerLength',
+            'caps.maxCapsPercent': 'cCapsMaxCapsPercent',
+            'caps.timeout': 'cCapsTimeout',
+            'spam.enabled': 'cSpamEnabled',
+            'spam.moderateSubscribers': 'cSpamModerateSubscribers',
+            'spam.triggerLength': 'cSpamTriggerLength',
+            'spam.maxLength': 'cSpamMaxLength',
+            'spam.timeout': 'cSpamTimeout',
+            'color.enabled': 'cColorEnabled',
+            'color.moderateSubscribers': 'cColorModerateSubscribers',
+            'color.timeout': 'cColorTimeout',
+            'emotes.enabled': 'cEmotesEnabled',
+            'emotes.moderateSubscribers': 'cEmotesModerateSubscribers',
+            'emotes.maxCount': 'cEmotesMaxCount',
+            'emotes.timeout': 'cEmotesTimeout',
+            'warnings.warningCount': 'cWarningsAllowedCount',
+            'warnings.announce': 'cWarningsAnnounceTimeouts',
+            'warnings.shouldClearChat': 'cWarningsShouldClearChat',
+          },
+          queue: {
+            'eligibility.all': 'eligibilityAll',
+            'eligibility.followers': 'eligibilityFollowers',
+            'eligibility.subscribers': 'eligibilitySubscribers'
+          }
         }
+      };
 
-      for (const system of Object.keys(mappings)) {
-        for (const [ before, after ] of Object.entries(mappings[system])) {
-          let item = await global.db.engine.findOne('core.settings', { key: before, system })
-          if (typeof item.key !== 'undefined') {
-            console.info(` -> ${system}.${before} => ${system}.${after}`)
-            await global.db.engine.update('core.settings', { _id: String(item._id) }, { key: after, system })
-            processed++
+      for (const collection of Object.keys(mappings)) {
+        console.info(`\t*** ${collection}`);
+        for (const system of Object.keys(mappings[collection])) {
+          for (const [ before, after ] of Object.entries(mappings[collection][system])) {
+            let item = await global.db.engine.findOne(collection, { key: before, system })
+            if (typeof item.key !== 'undefined') {
+              console.info(`\t\t-> ${system}.${before} => ${system}.${after}`)
+              await global.db.engine.update(collection, { _id: String(item._id) }, { key: after, system })
+              processed++;
+            }
           }
         }
       }
-      console.info(` => ${processed} processed`)
+      console.info(`\t=> ${processed} processed`);
     }
   }, {
     version: '9.0.0',

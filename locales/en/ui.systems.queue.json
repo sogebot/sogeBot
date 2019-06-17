@@ -1,8 +1,8 @@
 {
   "settings": {
     "enabled": "Status",
-    "all": "All",
-    "followers": "Followers",
-    "subscribers": "Subscribers"
+    "eligibilityAll": "All",
+    "eligibilityFollowers": "Followers",
+    "eligibilitySubscribers": "Subscribers"
   }
 }
