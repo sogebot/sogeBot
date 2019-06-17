@@ -4,6 +4,7 @@ import { setTimeout } from 'timers'; // tslint workaround
 import { isMainThread } from 'worker_threads';
 
 import { permission } from './permissions';
+import { flatten, unflatten } from './commons';
 
 class Module {
   public dependsOn: string[] = [];
@@ -164,13 +165,62 @@ class Module {
             cb(null, await this[variable]);
           });
           socket.on('settings.update', async (data: { [x: string]: any }, cb) => {
+            // flatten and remove category
+            data = flatten(data);
+            const remap: ({ key: string; actual: string; toRemove: string[] } | { key: null; actual: null; toRemove: null })[] = Object.keys(flatten(data)).map(o => {
+              // skip commands, enabled and permissions
+              if (o.startsWith('commands') || o.startsWith('enabled') || o.startsWith('_permissions')) {
+                return {
+                  key: o,
+                  actual: o,
+                  toRemove: []
+                };
+              }
+
+              let toRemove: string[] = [];
+              for (const possibleVariable of o.split('.')) {
+                let isVariableFound = this.settingsList.find(o => possibleVariable === o.key);
+                if (isVariableFound) {
+                  return {
+                    key: o,
+                    actual: isVariableFound.key,
+                    toRemove
+                  };
+                } else {
+                  toRemove.push(possibleVariable);
+                }
+              }
+              return {
+                key: null,
+                actual: null,
+                toRemove: null,
+              };
+            });
+
+            for (const { key, actual, toRemove } of remap) {
+              if (key === null || toRemove === null || actual === null) {
+                continue;
+              }
+
+              const joinedToRemove = toRemove.join('.');
+              for (const key of Object.keys(data)) {
+                if (joinedToRemove.length > 0) {
+                  const value = data[key];
+                  data[key.replace(joinedToRemove + '.', '')] = value;
+
+                  if (key.replace(joinedToRemove + '.', '') !== key) {
+                    delete data[key];
+                  }
+                }
+              }
+            }
             try {
-              for (const [key, value] of Object.entries(data)) {
+              for (const [key, value] of Object.entries(unflatten(data))) {
                 if (key === 'enabled' && ['core', 'overlays', 'widgets'].includes(this._name)) {
                   // ignore enabled if its core, overlay or widgets (we don't want them to be disabled)
                   continue;
                 } else if (key === '_permissions') {
-                  for (const [command, currentValue] of Object.entries(value)) {
+                  for (const [command, currentValue] of Object.entries(value as any)) {
                     const c = this._commands.find((o) => o.name === command);
                     if (c) {
                       if (currentValue === c.permission) {
@@ -183,7 +233,7 @@ class Module {
                 } else if (key === 'enabled') {
                   this.status({ state: value });
                 } else if (key === 'commands') {
-                  for (const [defaultValue, currentValue] of Object.entries(value)) {
+                  for (const [defaultValue, currentValue] of Object.entries(value as any)) {
                     if (this._commands) {
                       this.setCommand(defaultValue, currentValue as string);
                     }

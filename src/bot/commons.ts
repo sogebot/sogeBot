@@ -30,9 +30,9 @@ export async function autoLoad(directory): Promise<{ [x: string]: any }> {
  * Flatten object keys
  * { a: { b: 'c' }} => { 'a.b': 'c' }
  */
-export function flatten(data) {
+export function flatten(data): { [x: string]: any } {
   const result = {};
-  function recurse(cur, prop) {
+  function recurse(cur, prop): void {
     if (Object(cur) !== cur || Array.isArray(cur)) {
       result[prop] = cur;
     } else {
