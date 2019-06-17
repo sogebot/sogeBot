@@ -16,11 +16,6 @@
 
 ## Settings
 
-`!set games.gamble.settings.minimalBet <points>` - how much points should be as
-minimal bet
-
-`!set games.gamble.settings.chanceToWin <number>` - percentage possibility to win
-
 `!enable game gamble` |
 `!disable game gamble` - enable/disable game
 
