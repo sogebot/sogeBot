@@ -163,11 +163,11 @@ class Module {
           socket.on('get.value', async (variable, cb) => {
             cb(null, await this[variable]);
           });
-          socket.on('settings.update', async (data: { [x: string]: { [y: string]: any } }, cb) => {
-            /*
+          socket.on('settings.update', async (data: { [x: string]: any }, cb) => {
             try {
               for (const [key, value] of Object.entries(data)) {
                 if (key === 'enabled' && ['core', 'overlays', 'widgets'].includes(this._name)) {
+                  // ignore enabled if its core, overlay or widgets (we don't want them to be disabled)
                   continue;
                 } else if (key === '_permissions') {
                   for (const [command, currentValue] of Object.entries(value)) {
@@ -183,22 +183,13 @@ class Module {
                 } else if (key === 'enabled') {
                   this.status({ state: value });
                 } else if (key === 'commands') {
-                  /* TODO: commands
                   for (const [defaultValue, currentValue] of Object.entries(value)) {
-                    if (this.settings.commands) {
-                      this.settings.commands[defaultValue] = currentValue;
+                    if (this._commands) {
+                      this.setCommand(defaultValue, currentValue as string);
                     }
                   }
-                   *
                 } else {
-                  if (_.isObjectLike(value)) {
-                    for (const [defaultValue, currentValue] of Object.entries(value)) {
-                      if (typeof this[key] !== 'undefined' && typeof this[key][defaultValue] !== 'undefined') {
-                        // save only defined values
-                        this[key][defaultValue] = currentValue;
-                      }
-                    }
-                  } else { this[key] = value; }
+                  this[key] = value;
                 }
               }
             } catch (e) {
@@ -211,7 +202,6 @@ class Module {
             if (typeof cb === 'function') {
               setTimeout(() => cb(null), 1000);
             }
-            */
           });
           // difference between set and update is that set will set exact 1:1 values of opts.items
           // so it will also DELETE additional data
@@ -657,6 +647,18 @@ class Module {
       return c.command;
     } else {
       return command;
+    }
+  }
+
+  /**
+   *
+   */
+  protected setCommand(command: string, updated: string): void {
+    const c = this._commands.find((o) => o.name === command);
+    if (c) {
+      c.command = updated;
+    } else {
+      global.log.warning(`Command ${command} cannot be updated to ${updated}`);
     }
   }
 }
