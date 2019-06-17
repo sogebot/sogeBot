@@ -40,7 +40,7 @@
                     :levels="currentValue"
                     @update="value[defaultValue] = $event" />
                 </template>
-                <template v-else-if="selectedGames === 'heist' && category === 'results' && defaultValue === 'data'">
+                <template v-else-if="selectedGames === 'heist' && category === 'results' && defaultValue === 'results'">
                   <heist-results
                     :results="currentValue"
                     @update="value[defaultValue] = $event" />
@@ -251,6 +251,7 @@
 
             this.settings = Object.assign({}, settings)
             this.ui = Object.assign({}, ui)
+            console.debug('[EMIT] settings', {system, settings, ui});
           })
         },
         getBorderStyle: function (system) {
