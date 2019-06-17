@@ -14,7 +14,6 @@ class General extends Core {
     const f = readdirSync('./locales/');
     return [...new Set(f.map((o) => o.split('.')[0]))];
   }})
-  @onLoad('onLangLoad')
   public lang: string = 'en';
 
   @command('!enable')
@@ -30,6 +29,7 @@ class General extends Core {
   }
 
   @onChange('lang')
+  @onLoad('lang')
   public async onLangUpdate() {
     global.workers.callOnAll({ type: 'call', ns: 'lib.translate', fnc: '_load' });
     await global.lib.translate._load();

@@ -1,6 +1,8 @@
 import Overlay from './_interface';
 
 class Gallery extends Overlay {
+  showInUI: boolean = false;
+
   constructor () {
     super();
     this.addMenu({ category: 'registry', name: 'gallery', id: 'registry.gallery/list' });

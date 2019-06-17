@@ -1,10 +1,10 @@
 {
   "settings": {
     "enabled": "Status",
-    "theme": "Theme",
-    "hideAfterInactivity": "Hide on inactivity",
-    "align": "Align",
-    "inactivityTime": {
+    "cDisplayTheme": "Theme",
+    "cDisplayHideAfterInactivity": "Hide on inactivity",
+    "cDisplayAlign": "Align",
+    "cDisplayInactivityTime": {
       "title": "Inactivity after",
       "help": "in miliseconds"
     },

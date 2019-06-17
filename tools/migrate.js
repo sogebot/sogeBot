@@ -236,6 +236,66 @@ let migration = {
             'eligibility.followers': 'eligibilityFollowers',
             'eligibility.subscribers': 'eligibilitySubscribers'
           }
+        },
+        'overlays.settings': {
+          polls: {
+            'display.theme': 'cDisplayTheme',
+            'display.hideAfterInactivity': 'cDisplayHideAfterInactivity',
+            'display.inactivityTime': 'cDisplayInactivityTime',
+            'display.align': 'cDisplayAlign',
+          },
+          clipscarousel: {
+            'clips.customPeriodInDays': 'cClipsCustomPeriodInDays',
+            'clips.numOfClips': 'cClipsNumOfClips',
+            'clips.timeToNextClip': 'cClipsTimeToNextClip',
+          },
+          clips: {
+            'clips.volume': 'cClipsVolume',
+            'clips.filter': 'cClipsFilter',
+            'clips.label': 'cClipsLabel',
+          },
+          emotes: {
+            'emotes.size': 'cEmotesSize',
+            'emotes.maxEmotesPerMessage': 'cEmotesMaxEmotesPerMessage',
+            'emotes.animation': 'cEmotesAnimation',
+            'emotes.animationTime': 'cEmotesAnimationTime',
+            'explosion.numOfEmotes': 'cExplosionNumOfEmotes',
+            'fireworks.numOfEmotesPerExplosion': 'cExplosionNumOfEmotesPerExplosion',
+            'fireworks.numOfExplosions': 'cExplosionNumOfExplosions',
+          },
+          credits: {
+            'credits.speed': 'cCreditsSpeed',
+            'credits.aggregated': 'cCreditsAggregated',
+            'show.followers': 'cShowFollowers',
+            'show.hosts': 'cShowHosts',
+            'show.raids': 'cShowRaids',
+            'show.subscribers': 'cShowSubscribers',
+            'show.subgifts': 'cShowSubgifts',
+            'show.subcommunitygifts': 'cShowSubcommunitygifts',
+            'show.resubs': 'cShowResubs',
+            'show.cheers': 'cShowCheers',
+            'show.clips': 'cShowClips',
+            'show.tips': 'cShowTips',
+            'text.lastMessage': 'cTextLastMessage',
+            'text.lastSubMessage': 'cTextLastSubMessage',
+            'text.streamBy': 'cTextStreamBy',
+            'text.follow': 'cTextFollow',
+            'text.host': 'cTextHost',
+            'text.raid': 'cTextRaid',
+            'text.cheer': 'cTextCheer',
+            'text.sub': 'cTextSub',
+            'text.resub': 'cTextResub',
+            'text.subgift': 'cTextSubgift',
+            'text.subcommunitygift': 'cTextSubcommunitygift',
+            'text.tip': 'cTextTip',
+            'customTexts.values': 'cCustomTextsValues',
+            'social.values': 'cSocialValues',
+            'clips.period': 'cClipsPeriod',
+            'clips.customPeriodInDays': 'cClipsCustomPeriodInDays',
+            'clips.numOfClips': 'cClipsNumOfClips',
+            'clips.shouldPlay': 'cClipsShouldPlay',
+            'clips.volume': 'cClipsVolume',
+          }
         }
       };
 

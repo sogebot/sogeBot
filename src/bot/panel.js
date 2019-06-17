@@ -370,7 +370,7 @@ function Panel () {
     socket.on('integrations', async (cb) => {
       let toEmit = []
       for (let system of Object.keys(global.integrations).filter(o => !o.startsWith('_'))) {
-        if (!global.integrations[system].settings || global.integrations[system]._ui._hidden) continue
+        if (!global.integrations[system].showInUI) continue
         toEmit.push({
           name: system.toLowerCase(),
           enabled: global.integrations[system].enabled,
@@ -383,7 +383,7 @@ function Panel () {
     socket.on('overlays', async (cb) => {
       let toEmit = []
       for (let system of Object.keys(global.overlays).filter(o => !o.startsWith('_'))) {
-        if (!global.overlays[system].settings || global.overlays[system]._ui._hidden) continue
+        if (!global.overlays[system].showInUI) continue
         toEmit.push({
           name: system.toLowerCase(),
           enabled: global.overlays[system].enabled,
@@ -396,7 +396,7 @@ function Panel () {
     socket.on('games', async (cb) => {
       let toEmit = []
       for (let system of Object.keys(global.games).filter(o => !o.startsWith('_'))) {
-        if (!global.games[system].settings) continue
+        if (!global.games[system].showInUI) continue
         toEmit.push({
           name: system.toLowerCase(),
           enabled: global.games[system].enabled,

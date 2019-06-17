@@ -2,6 +2,6 @@
   "settings": {
     "enabled": "Status",
     "formatSeparator": "Format separator",
-    "format": "Format"
+    "order": "Format"
   }
 }

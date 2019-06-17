@@ -7,6 +7,8 @@ import { isMainThread } from 'worker_threads';
 import { onSub, onFollow, onTip, onBit } from '../decorators/on';
 
 class Goals extends Overlay {
+  showInUI: boolean = false;
+
   constructor() {
     super();
     this.addMenu({ category: 'registry', name: 'goals', id: '/registry/goals/list' });

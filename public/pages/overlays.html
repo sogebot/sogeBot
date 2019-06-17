@@ -85,7 +85,6 @@
                     v-bind:type="typeof currentValue"
                     v-bind:value="currentValue"
                     v-bind:title="'systems.' + selected + '.settings.' + defaultValue"
-                    :permission="settings._permissions[defaultValue]"
                     v-on:update="value[defaultValue] = $event.value; triggerDataChange()">
                   </number-input>
                   <text-input
@@ -94,7 +93,6 @@
                     v-bind:type="typeof currentValue"
                     v-bind:value="currentValue"
                     v-bind:title="'systems.' + selected + '.settings.' + defaultValue"
-                    :permission="settings._permissions[defaultValue]"
                     v-on:update="value[defaultValue] = $event.value; triggerDataChange()"
                   ></text-input>
                 </template>

@@ -20,12 +20,12 @@ class UserInfo extends System {
   @settings('me')
   @ui({
     type: 'sortable-list',
-    values: '_order',
+    values: 'order',
     toggle: '_formatDisabled',
     toggleOnIcon: 'fa-eye',
     toggleOffIcon: 'fa-eye-slash',
   })
-  _order: string[] = ['$sender', '$rank', '$watched', '$points', '$messages', '$tips'];
+  order: string[] = ['$sender', '$rank', '$watched', '$points', '$messages', '$tips'];
 
   @settings('me')
   _formatDisabled: string[] = [];

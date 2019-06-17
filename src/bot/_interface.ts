@@ -7,6 +7,7 @@ import { permission } from './permissions';
 
 class Module {
   public dependsOn: string[] = [];
+  public showInUI: boolean = true;
   public collection: { [x: string]: string };
   public timeouts: { [x: string]: NodeJS.Timeout } = {};
   public settingsList: { category: string; key: string }[] = [];
@@ -74,17 +75,14 @@ class Module {
     // prepare proxies for variables
     this._sockets();
     this._indexDbs();
-    setTimeout(() => {
-      this._status();
-    }, 1000);
+    this.loadVariableValue('enabled').then((value) => {
+      this._enabled = typeof value === 'undefined' ? this._enabled : value;
+      this.status({ state: this._enabled, quiet: !isMainThread });
+    })
   }
 
   public sockets() {
     return;
-  }
-
-  public _status() {
-    this.status({ state: this.enabled, quiet: !isMainThread }); // force status change and quiet on workers
   }
 
   public emit(event: string, ...args: any[]) {

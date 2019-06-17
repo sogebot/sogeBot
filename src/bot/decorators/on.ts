@@ -25,7 +25,7 @@ export function onChange(variableArg: string) {
   };
 }
 
-export function onLoad(fncNameArg: string) {
+export function onLoad(variableArg: string) {
   const { name, type } = getNameAndTypeFromStackTrace();
 
   return (target: object, key: string) => {
@@ -38,9 +38,9 @@ export function onLoad(fncNameArg: string) {
 
       try {
         const self = type === 'core' ? global[name] : global[type][name];
-        const on = get(self, `on.load.${fncNameArg}`, []);
+        const on = get(self, `on.load.${variableArg}`, []);
         on.push(key);
-        set(self, `on.load.${fncNameArg}`, on);
+        set(self, `on.load.${variableArg}`, on);
       } catch (e) {
         console.error(e);
       }
