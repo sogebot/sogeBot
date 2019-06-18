@@ -13,7 +13,7 @@ class Module {
   public timeouts: { [x: string]: NodeJS.Timeout } = {};
   public settingsList: { category: string; key: string }[] = [];
   public on: InterfaceSettings.On;
-  public socket: SocketIOClient.Socket | null;
+  public socket: SocketIOClient.Socket | null | { emit: () => void };
 
   get enabled(): boolean {
     return _.get(this, '_enabled', true);
@@ -87,8 +87,10 @@ class Module {
   }
 
   public emit(event: string, ...args: any[]) {
-    if (this.socket) {
+    if (this.socket && isMainThread) {
       this.socket.emit(event, ...args);
+    } else if (!isMainThread) {
+      global.workers.sendToMaster({ type: 'emit', system: this._name, class: this.constructor.name, event, args });
     }
   }
 
@@ -139,7 +141,9 @@ class Module {
   }
 
   public _sockets() {
-    if (!isMainThread) { return; }
+    if (!isMainThread) {
+      return;
+    }
 
     clearTimeout(this.timeouts[`${this.constructor.name}.sockets`]);
     if (_.isNil(global.panel)) {
