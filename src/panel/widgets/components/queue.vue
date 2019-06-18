@@ -78,7 +78,7 @@
           <button v-if="multiSelection" class="btn btn-sm btn-primary" @click="pick(selectedUsers)">Pick {{ selectedUsers.length }}</button>
           <button @click="multiSelection = !multiSelection; selectedUsers = []" :class="[multiSelection ? 'btn-success' : 'btn-danger']" class="btn btn-sm">Toggle selection</button>
           <span style="position:relative; top: 3px">
-            <fa :icon="['far', 'eye-slash']"></fa>
+            <fa icon="eye-slash"></fa>
             {{ users.length - fUsers.length }}
           </span>
           <button class="btn btn-sm btn-danger" @click="clear">Clear</button>
@@ -137,11 +137,12 @@ export default {
       this.users = users
     }), 1000)
     this.socket.emit('settings', (err, data) => {
-      this.eligibility.all = data.eligibility.all
-      this.eligibility.followers = data.eligibility.followers
-      this.eligibility.subscribers = data.eligibility.subscribers
-
-      this.locked = data._.locked
+      this.eligibility.eligibilityAll = data.eligibility.eligibilityAll
+      this.eligibility.eligibilityFollowers = data.eligibility.eligibilityFollowers
+      this.eligibility.eligibilitySubscribers = data.eligibility.eligibilitySubscribers
+    })
+    this.socket.emit('get.value', 'locked', (err, locked) => {
+      this.locked = locked
     })
   },
   watch: {
@@ -151,11 +152,9 @@ export default {
     updated: _.debounce(function () {
       const data = {
         eligibility: this.eligibility,
-        _: {
-          locked: this.locked
-        }
       }
       this.socket.emit('settings.update', data, () => {})
+      this.socket.emit('set.value', 'locked', this.locked)
     }, 500)
   },
   computed: {
@@ -173,9 +172,9 @@ export default {
   data: function () {
     return {
       eligibility: {
-        all: true,
-        followers: false,
-        subscribers: false
+        eligibilityAll: true,
+        eligibilityFollowers: false,
+        eligibilitySubscribers: false
       },
       selectedUsers: [],
       locked: true,

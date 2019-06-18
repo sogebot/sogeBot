@@ -108,7 +108,9 @@ export default {
         this.bets = _bets
       })
     }), 1000)
-    this.socket.emit('settings', (err, settings) => { this.betPercentGain = settings.betPercentGain })
+    this.socket.emit('settings', (err, settings) => {
+      this.betPercentGain = settings.betPercentGain
+    })
   },
   methods: {
     close: function (index) {

@@ -118,8 +118,8 @@ export default {
       this.socket.emit('set.value', 'uris', this.requests)
     },
     fetchCurrentSong() {
-      this.socket.emit('settings', (err, s) => {
-        this.currentSong = JSON.parse(s._.currentSong);
+      this.socket.emit('get.value', 'currentSong', (err, v) => {
+        this.currentSong = JSON.parse(v);
         setTimeout(this.fetchCurrentSong, 1000)
       })
     },
@@ -134,8 +134,7 @@ export default {
     this.socket.emit('settings', (err, s) => {
       this.command = s.commands['!spotify'];
       this.songRequestsEnabled = s.songRequests;
-      this.continueOnPlaylistAfterRequest = s.output.continueOnPlaylistAfterRequest;
-      this.currentSong = JSON.parse(s._.currentSong);
+      this.continueOnPlaylistAfterRequest = s.continueOnPlaylistAfterRequest;
       setTimeout(this.fetchCurrentSong, 1000)
       setTimeout(this.fetchSongRequests, 1000)
     })
