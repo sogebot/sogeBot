@@ -5,6 +5,7 @@ import { isMainThread } from 'worker_threads';
 
 import { permission } from './permissions';
 import { flatten, unflatten } from './commons';
+import * as Parser from './parser';
 
 class Module {
   public dependsOn: string[] = [];
@@ -41,6 +42,7 @@ class Module {
   protected _parsers: Parser[];
   protected _rollback: { name: string }[];
   protected _enabled: boolean = true;
+  protected _parser: any = new Parser.default();
 
   constructor(name: string = 'core', enabled: boolean = true) {
     this.on = {
@@ -522,6 +524,7 @@ class Module {
 
         if (category === 'commands') {
           _.set(promisedSettings, `${category}.${key}`, this.getCommand(key));
+          _.set(promisedSettings, `__cmd_count__.${key}`, this._parser.getCountOfCommandUsage(key))
         } else {
           _.set(promisedSettings, `${category}.${key}`, this[key]);
         }
