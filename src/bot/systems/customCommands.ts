@@ -111,7 +111,7 @@ class CustomCommands extends System {
 
               if (!r._id) {
                 rIds.push(
-                  String(await global.db.engine.insert(this.collection.responses, r)._id)
+                  String((await global.db.engine.insert(this.collection.responses, r))._id)
                 );
               } else {
                 const _id = String(r._id); delete r._id;
