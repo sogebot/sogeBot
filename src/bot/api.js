@@ -1325,7 +1325,7 @@ class API {
       }
       const followedAt = user.lock && user.lock.followed_at ? Number(user.time.follow) : 0
       const isFollower = user.lock && user.lock.follower ? user.is.follower : false
-      global.users.setById(id, { username: user.username, is: { follower: isFollower }, time: { followCheck: new Date().getTime(), follow: followedAt } }, user.is.follower)
+      await global.users.setById(id, { username: user.username, is: { follower: isFollower }, time: { followCheck: new Date().getTime(), follow: followedAt } }, user.is.follower)
       return { isFollower: false, followedAt: null }
     } else {
       // is follower
@@ -1358,7 +1358,7 @@ class API {
       }
       const followedAt = user.lock && user.lock.followed_at ? Number(user.time.follow) : parseInt(moment(request.data.data[0].followed_at).format('x'), 10)
       const isFollower = user.lock && user.lock.follower ? user.is.follower : true
-      global.users.set(user.username, { id, is: { follower: isFollower }, time: { followCheck: new Date().getTime(), follow: followedAt } }, !user.is.follower)
+      await global.users.set(user.username, { id, is: { follower: isFollower }, time: { followCheck: new Date().getTime(), follow: followedAt } }, !user.is.follower)
       return { isFollower, followedAt }
     }
   }

@@ -45,7 +45,7 @@ class UserInfo extends System {
     }
 
     const isFollowerUpdate = await global.api.isFollowerUpdate({
-      id: opts.sender.userId,
+      id: await global.users.getIdByName(username),
     });
     debug('userinfo.followage', JSON.stringify(isFollowerUpdate));
 
