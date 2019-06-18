@@ -143,7 +143,7 @@ export default {
       this.socket.emit('settings', (err, data) => {
         if (err) return console.error(err)
         this.displayAs = data.displayAs
-        this.displayAsOpts = data._.displayAsOpts
+        this.displayAsOpts = data.displayAsOpts
       })
   },
   methods: {

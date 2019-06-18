@@ -296,8 +296,8 @@ export default {
   created: function () {
     this.socket.emit('settings', (err, data) => {
       this.raffleAnnounceInterval = data.raffleAnnounceInterval
-      this.luck.subscribersPercent = data.luck.subscribersPercent
-      this.luck.followersPercent = data.luck.followersPercent
+      this.luck.subscribersPercent = data.subscribersPercent
+      this.luck.followersPercent = data.followersPercent
     })
 
     if (localStorage.getItem('/widget/raffles/eligibility/all')) this.eligibility.all = JSON.parse(localStorage.getItem('/widget/raffles/eligibility/all'))
