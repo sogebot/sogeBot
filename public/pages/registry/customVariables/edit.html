@@ -203,7 +203,7 @@
           },
         ],
         selectedType: '',
-        selectedRunEvery: 0,
+        selectedRunEvery: null,
         runEveryX: 1,
         deleteState: 'waiting',
 
@@ -434,6 +434,7 @@ return '';`,
         selectedType: function (cur, old) {
           if (cur === 'eval') {
             this.initializeEvalTextArea()
+            this.selectedRunEvery = this.selectedRunEvery || 'isUsed'
           } else if (cur === 'options') {
             // check if value or change it
             if (!this.usableOptionsArray.includes(this.currentValue)) this.currentValue = this.usableOptionsArray[0]
