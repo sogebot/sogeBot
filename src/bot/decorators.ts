@@ -102,28 +102,7 @@ export function shared() {
       try {
         const self = type === 'core' ? global[name] : global[type][name];
         const defaultValue = self[key];
-
         VariableWatcher.add(`${type}.${name}.${key}`, defaultValue);
-
-        Object.defineProperty(self, key, {
-          get: () => {
-            return _.get(self, '_shared.' + key, defaultValue);
-          },
-          set: (value: any) => {
-            if (!_.isEqual(_.get(self, '_shared.' + key, defaultValue), value)) {
-              _.set(self, '_shared.' + key, value);
-              // update variable in all workers (only RAM)
-              const proc = {
-                type: 'interface',
-                system: type,
-                class: name,
-                path: '_shared.' + key,
-                value,
-              };
-              global.workers.sendToAll(proc);
-            }
-          },
-        });
       } catch (e) {
         console.log(e);
       }

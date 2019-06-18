@@ -10,7 +10,7 @@ import { isMainThread } from 'worker_threads';
 
 import Core from './_interface';
 import constants from './constants';
-import { settings, ui } from './decorators';
+import { settings, ui, shared } from './decorators';
 
 class Currency extends Core {
   @settings('currency')
@@ -20,7 +20,9 @@ class Currency extends Core {
   })
   public mainCurrency: 'USD' | 'AUD' | 'BGN' | 'BRL' | 'CAD' | 'CHF' | 'CNY' | 'CZK' | 'DKK' | 'EUR' | 'GBP' | 'HKD' | 'HRK' | 'HUF' | 'IDR' | 'ILS' | 'INR' | 'ISK' | 'JPY' | 'KRW' | 'MXN' | 'MYR' | 'NOK' | 'NZD' | 'PHP' | 'PLN' | 'RON' | 'RUB' | 'SEK' | 'SGD' | 'THB' | 'TRY' | 'ZAR' = 'EUR';
 
+  @shared()
   public rates: { [x: string]: number } = {};
+
   public timeouts: any = {};
   public base: string = 'CZK';
 
@@ -73,10 +75,7 @@ class Currency extends Core {
           linenum++;
           continue;
         }
-        line = line.split('|');
-        const count = line[2];
-        const code = line[3];
-        const rate = line[4];
+        const [,, count, code, rate] = line.split('|');
         this.rates[code] = Number((rate.replace(',', '.') / count).toFixed(3));
       }
       global.log.info(chalk.yellow('CURRENCY:') + ' fetched rates');
