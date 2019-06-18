@@ -226,7 +226,7 @@ class CustomVariables {
           username,
           id: await global.users.getIdByName(username, false),
           is: {
-            online: await global.db.engine.find('users.online', { username }).length > 0,
+            online: (await global.db.engine.find('users.online', { username })).length > 0,
             follower: _.get(_user, 'is.follower', false),
             vip: _.get(_user, 'is.vip', false),
             subscriber: _.get(_user, 'is.subscriber', false),
