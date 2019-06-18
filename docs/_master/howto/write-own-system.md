@@ -26,6 +26,17 @@ class Yoursystem extends System {
 export default YourSystem;
 ```
 
+### Disable system by default
+
+``` typescript
+class Yoursystem extends System {
+  _enabled: boolean = false;
+
+  // ...
+}
+```
+
+
 ### Depends on different system
 
 Some systems have dependencies, e.g. bet system cannot work without points system
