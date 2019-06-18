@@ -171,6 +171,19 @@ class Workers {
           }) as any;
           if (obj) { set(obj, data.path, data.value); }
         }
+      } else if ( data.type === 'emit') {
+        // remove core from path
+        if (data.system === 'core') {
+          const obj = Object.values(global).find((o) => {
+            return o.constructor.name.toLowerCase() === data.class.toLowerCase();
+          });
+          if (obj && obj.socket) { obj.emit(data.event, ...data.args); }
+        } else {
+          const obj = Object.values(global[data.system]).find((o: any) => {
+            return o.constructor.name.toLowerCase() === data.class.toLowerCase();
+          }) as any;
+          if (obj && obj.socket) { obj.emit(data.event, ...data.args); }
+        }
       } else if ( data.type === 'crash') {
         process.exit(1); // kill main thread
       }

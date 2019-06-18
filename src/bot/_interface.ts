@@ -87,8 +87,10 @@ class Module {
   }
 
   public emit(event: string, ...args: any[]) {
-    if (this.socket) {
+    if (this.socket && isMainThread) {
       this.socket.emit(event, ...args);
+    } else if (!isMainThread) {
+      global.workers.sendToMaster({ type: 'emit', system: this._name, class: this.constructor.name, event, args });
     }
   }
 
@@ -139,7 +141,9 @@ class Module {
   }
 
   public _sockets() {
-    if (!isMainThread) { return; }
+    if (!isMainThread) {
+      return;
+    }
 
     clearTimeout(this.timeouts[`${this.constructor.name}.sockets`]);
     if (_.isNil(global.panel)) {
