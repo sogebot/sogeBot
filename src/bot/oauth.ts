@@ -12,7 +12,7 @@ class OAuth extends Core {
   @shared()
   public currentChannel: string = '';
   @shared()
-  public broadcasterType: string = '';
+  public broadcasterType: string | null = null;
   @shared()
   public broadcaster: string = '';
   @shared()
