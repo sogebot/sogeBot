@@ -296,6 +296,25 @@ let migration = {
             'clips.shouldPlay': 'cClipsShouldPlay',
             'clips.volume': 'cClipsVolume',
           }
+        },
+        'integrations.settings': {
+          spotify: {
+            '_.accessToken': '_accessToken',
+            '_.refreshToken': '_refreshToken',
+            'output.format': 'format',
+            'output.playlistToPlay': 'playlistToPlay',
+            'output.continueOnPlaylistAfterRequest': 'continueOnPlaylistAfterRequest',
+            'connection.clientId': 'clientId',
+            'connection.clientSecret': 'clientSecret',
+            'connection.redirectURI': 'redirectURI',
+            'connection._authenticatedScopes': 'authenticatedScopes',
+          },
+          twitter: {
+            'token.consumerKey': 'consumerKey',
+            'token.consumerSecret': 'consumerSecret',
+            'token.accessToken': 'accessToken',
+            'token.secretToken': 'secretToken',
+          }
         }
       };
 

@@ -35,11 +35,6 @@ class Spotify extends Integration {
   originalUri: string | null = null;
   skipToNextSong: boolean = false;
   state: any = null;
-
-  @shared()
-  accessToken: string | null = null;
-  @shared()
-  refreshToken: string | null = null;
   @shared()
   userId: string | null = null;
   @shared()
@@ -47,6 +42,10 @@ class Spotify extends Integration {
   @shared()
   currentSong: string = JSON.stringify({});
 
+  @settings()
+  _accessToken: string | null = null;
+  @settings()
+  _refreshToken: string | null = null;
   @settings()
   songRequests: boolean = true;
   @settings()
@@ -71,7 +70,7 @@ class Spotify extends Integration {
   @ui({ type: 'text-input', readOnly: true })
   username: string = '';
   @settings('connection')
-  @ui({ type: 'check-list', current: '_authenticatedScopes' })
+  @ui({ type: 'check-list', current: 'authenticatedScopes' })
   scopes: string[] = [
     'user-read-currently-playing',
     'user-read-private',
@@ -83,28 +82,28 @@ class Spotify extends Integration {
     'playlist-read-private',
     'user-modify-playback-state' ];
   @settings('connection')
-  _authenticatedScopes: string[] = [];
+  @ui({ ignore: true })
+  authenticatedScopes: string[] = [];
 
   @ui({
     type: 'button-socket',
     on: '/integrations/spotify',
     class: 'btn btn-primary btn-block',
     text: 'integrations.spotify.settings.authorize',
-    if: function () { return this.username.length === 0; },
+    if: () => global.integrations.spotify.username.length === 0,
     emit: 'authorize'
-  })
+  }, 'connection')
   authorizeBtn: null = null;
 
   @ui({
     type: 'button-socket',
     on: '/integrations/spotify',
-    if: function () { return this.username.length > 0; },
+    if: () => global.integrations.spotify.username.length > 0,
     emit: 'revoke',
     class: 'btn btn-primary btn-block',
     text: 'integrations.spotify.settings.revoke'
-  })
+  }, 'connection')
   revokeBtn: null = null;
-
 
   constructor () {
     super();
@@ -116,6 +115,11 @@ class Spotify extends Integration {
       this.timeouts.ICurrentSong = global.setTimeout(() => this.ICurrentSong(), 10000);
       this.timeouts.getMe = global.setTimeout(() => this.getMe(), 10000);
       setInterval(() => this.sendSongs(), 500);
+      setTimeout(() => {
+        this.isEnabled().then(value => {
+          this.onStateChange('enabled', value);
+        });
+      }, 10000);
     }
   }
 
@@ -125,12 +129,14 @@ class Spotify extends Integration {
   }
 
   @onChange('enabled')
-  onStateChange (key: string, value: string) {
+  onStateChange (key: string, value: boolean) {
     this.currentSong = JSON.stringify({});
     if (value) {
       this.connect();
       this.getMe();
-    } else {this.disconnect();}
+    } else {
+      this.disconnect();
+    }
   }
 
   @command('!spotify skip')
@@ -150,7 +156,7 @@ class Spotify extends Integration {
         method: 'put',
         url: 'https://api.spotify.com/v1/me/player/play',
         headers: {
-          'Authorization': 'Bearer ' + this.accessToken,
+          'Authorization': 'Bearer ' + this._accessToken,
           'Content-Type': 'application/json'
         },
         data: {
@@ -176,7 +182,7 @@ class Spotify extends Integration {
         method: 'put',
         url: 'https://api.spotify.com/v1/me/player/play',
         headers: {
-          'Authorization': 'Bearer ' + this.accessToken,
+          'Authorization': 'Bearer ' + this._accessToken,
           'Content-Type': 'application/json'
         },
         data: {
@@ -189,7 +195,7 @@ class Spotify extends Integration {
         method: 'post',
         url: 'https://api.spotify.com/v1/me/player/next',
         headers: {
-          'Authorization': 'Bearer ' + this.accessToken
+          'Authorization': 'Bearer ' + this._accessToken
         }
       });
       this.currentUris = null;
@@ -305,10 +311,10 @@ class Spotify extends Integration {
     clearTimeout(this.timeouts['IRefreshToken']);
 
     try {
-      if (!_.isNil(this.client) && this.refreshToken) {
+      if (!_.isNil(this.client) && this._refreshToken) {
         let data = await this.client.refreshAccessToken();
         this.client.setAccessToken(data.body['access_token']);
-        this.accessToken = data.body['access_token'];
+        this._accessToken = data.body['access_token'];
       }
     } catch (e) {
       global.log.info(chalk.yellow('SPOTIFY: ') + 'Refreshing access token failed');
@@ -357,9 +363,9 @@ class Spotify extends Integration {
         this.client.resetAccessToken();
         this.client.resetRefreshToken();
         this.userId = null;
-        this.accessToken = null;
-        this.refreshToken = null;
-        this._authenticatedScopes = [];
+        this._accessToken = null;
+        this._refreshToken = null;
+        this.authenticatedScopes = [];
         this.username = '';
         this.currentSong = JSON.stringify({});
 
@@ -377,8 +383,9 @@ class Spotify extends Integration {
         } else {
           try {
             const authorizeURI = this.authorizeURI();
-            if (!authorizeURI) {cb('Integration must enabled to authorize');}
-            else {
+            if (!authorizeURI) {
+              cb('Integration must enabled to authorize');
+            } else {
               cb(null, { do: 'redirect', opts: [authorizeURI] });
             }
           } catch (e) {
@@ -397,7 +404,7 @@ class Spotify extends Integration {
       if (this.clientId.trim().length === 0) {error.push('clientId');}
       if (this.clientSecret.trim().length === 0) {error.push('clientSecret');}
       if (this.redirectURI.trim().length === 0) {error.push('redirectURI');}
-      if (error.length > 0) {throw new Error(error.join(', ') + 'missing');}
+      if (error.length > 0) {throw new Error(error.join(', ') + ' missing');}
 
       this.client = new SpotifyWebApi({
         clientId: this.clientId,
@@ -405,21 +412,21 @@ class Spotify extends Integration {
         redirectUri: this.redirectURI
       });
 
-      if (this.accessToken && this.refreshToken) {
-        this.client.setAccessToken(this.accessToken);
-        this.client.setRefreshToken(this.refreshToken);
+      if (this._accessToken && this._refreshToken) {
+        this.client.setAccessToken(this._accessToken);
+        this.client.setRefreshToken(this._refreshToken);
       }
 
       try {
         if (opts.token && !_.isNil(this.client)) {
           this.client.authorizationCodeGrant(opts.token)
             .then((data) => {
-              this._authenticatedScopes = data.body.scope.split(' ');
-              this.accessToken = data.body['access_token'];
-              this.refreshToken = data.body['refresh_token'];
+              this.authenticatedScopes = data.body.scope.split(' ');
+              this._accessToken = data.body['access_token'];
+              this._refreshToken = data.body['refresh_token'];
 
-              this.client.setAccessToken(this.accessToken);
-              this.client.setRefreshToken(this.refreshToken);
+              this.client.setAccessToken(this._accessToken);
+              this.client.setRefreshToken(this._refreshToken);
             }, (err) => {
               if (err) {global.log.info(chalk.yellow('SPOTIFY: ') + 'Getting of accessToken and refreshToken failed');}
             });
@@ -440,7 +447,9 @@ class Spotify extends Integration {
   }
 
   authorizeURI () {
-    if (_.isNil(this.client)) {return null;}
+    if (_.isNil(this.client)) {
+      return null;
+    }
     let state = crypto.createHash('md5').update(Math.random().toString()).digest('hex');
     this.state = state;
     return this.client.createAuthorizeURL(this.scopes, state);
@@ -475,7 +484,7 @@ class Spotify extends Integration {
           method: 'get',
           url: 'https://api.spotify.com/v1/tracks/' + id,
           headers: {
-            'Authorization': 'Bearer ' + this.accessToken
+            'Authorization': 'Bearer ' + this._accessToken
           }
         });
         let track = response.data;
@@ -494,7 +503,7 @@ class Spotify extends Integration {
           method: 'get',
           url: 'https://api.spotify.com/v1/search?type=track&limit=1&q=' + encodeURI(spotifyId),
           headers: {
-            'Authorization': 'Bearer ' + this.accessToken,
+            'Authorization': 'Bearer ' + this._accessToken,
             'Content-Type': 'application/json'
           }
         });

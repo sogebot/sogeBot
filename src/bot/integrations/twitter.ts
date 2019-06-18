@@ -39,6 +39,11 @@ class Twitter extends Integration {
       setInterval(() => {
         this.updateStreams();
       }, 10000);
+      setTimeout(() => {
+        this.isEnabled().then(value => {
+          this.onStateChange('enabled', value);
+        });
+      }, 10000);
     }
   }
 
@@ -121,7 +126,7 @@ class Twitter extends Integration {
   }
 
   @onChange('enabled')
-  public onStateChange(key: string, value: string) {
+  public onStateChange(key: string, value: boolean) {
     if (value) {
       this.connect();
     } else {
