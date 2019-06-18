@@ -5,6 +5,7 @@ import chalk from 'chalk';
 import Integration from './_interface';
 import { settings, ui } from '../decorators';
 import { onChange } from '../decorators/on';
+import { isMainThread } from 'worker_threads';
 
 class Streamlabs extends Integration {
   socket: SocketIOClient.Socket | null = null;
@@ -13,8 +14,20 @@ class Streamlabs extends Integration {
   @ui({ type: 'text-input', secret: true })
   socketToken: string = '';
 
+  constructor () {
+    super();
+
+    if (isMainThread) {
+      setTimeout(() => {
+        this.isEnabled().then(value => {
+          this.onStateChange('enabled', value);
+        });
+      }, 10000);
+    }
+  }
+
   @onChange('enabled')
-  onStateChange (key: string, val: string) {
+  onStateChange (key: string, val: boolean) {
     if (val) {this.connect();}
     else {this.disconnect();}
   }

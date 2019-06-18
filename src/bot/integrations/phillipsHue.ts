@@ -45,6 +45,14 @@ class PhillipsHue extends Integration {
   constructor () {
     super();
 
+    if (isMainThread) {
+      setTimeout(() => {
+        this.isEnabled().then(value => {
+          this.onStateChange('enabled', value);
+        });
+      }, 10000);
+    }
+
     setInterval(() => {
       if (!this.isEnabled()) {return;}
       for (let index = 0, length = this.states.length; index < length; index++) {
@@ -86,7 +94,7 @@ class PhillipsHue extends Integration {
   }
 
   @onChange('enabled')
-  onStateChange (key: string, value: string) {
+  onStateChange (key: string, value: boolean) {
     if (value) {
       if (this.host.length === 0 || this.user.length === 0) {return;}
 

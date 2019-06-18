@@ -19,12 +19,17 @@ class Donationalerts extends Integration {
     super();
 
     if (isMainThread) {
+      setTimeout(() => {
+        this.isEnabled().then(value => {
+          this.onStateChange('enabled', value);
+        });
+      }, 10000);
       setInterval(() => this.connect(), constants.HOUR); // restart socket each hour
     }
   }
 
   @onChange('enabled')
-  onStateChange (key: string, val: string) {
+  onStateChange (key: string, val: boolean) {
     if (val) {this.connect();}
     else {this.disconnect();}
   }
