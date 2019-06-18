@@ -13,7 +13,7 @@ class Module {
   public timeouts: { [x: string]: NodeJS.Timeout } = {};
   public settingsList: { category: string; key: string }[] = [];
   public on: InterfaceSettings.On;
-  public socket: SocketIOClient.Socket | null | { emit: () => void };
+  public socket: SocketIOClient.Socket | null;
 
   get enabled(): boolean {
     return _.get(this, '_enabled', true);
