@@ -9,6 +9,7 @@ import { prepare, sendMessage, timeout } from '../commons';
 import { command, default_permission, settings, shared, ui } from '../decorators';
 import { permission } from '../permissions';
 import System from './_interface';
+import { onChange } from '../decorators/on';
 
 class Songs extends System {
   youtubeApi = new YouTube('AIzaSyDYevtuLOxbyqBjh17JNZNvSQO854sngK0');
@@ -38,6 +39,8 @@ class Songs extends System {
   notify: boolean = false;
   @settings()
   onlyMusicCategory: boolean = false;
+  @settings()
+  calculateVolumeByLoudness: boolean = true;
 
   constructor () {
     super();
@@ -124,7 +127,7 @@ class Songs extends System {
   }
 
   async getVolume (item) {
-    if (!item.forceVolume) {
+    if (!item.forceVolume && this.calculateVolumeByLoudness) {
       item.loudness = !_.isNil(item.loudness) ? item.loudness : -15;
       const volume = this.volume;
       var correction = Math.ceil((volume / 100) * 3);
@@ -136,7 +139,13 @@ class Songs extends System {
   }
 
   async getCurrentVolume (socket) {
-    socket.emit('newVolume', await this.getVolume(JSON.parse(this.currentSong)));
+    let volume = 0;
+    if (this.calculateVolumeByLoudness) {
+      volume = await this.getVolume(JSON.parse(this.currentSong));
+    } else {
+      volume = this.volume;
+    }
+    socket.emit('newVolume', volume);
   }
 
   setTrim (socket, data) {
@@ -177,6 +186,7 @@ class Songs extends System {
     }
   }
 
+  @onChange('calculateVolumeByLoudness')
   async refreshPlaylistVolume () {
     let playlist = await global.db.engine.find(this.collection.playlist);
     for (let item of playlist) {
