@@ -7,6 +7,8 @@ import { settings, shared, ui } from './decorators';
 import { onChange } from './decorators/on';
 
 class OAuth extends Core {
+  private toWait: number = 10;
+
   @shared()
   public cache: { bot: string; broadcaster: string } = { bot: '', broadcaster: '' };
   @shared()
@@ -119,24 +121,27 @@ class OAuth extends Core {
 
   public async getChannelId() {
     if (!isMainThread || global.mocha) { return; }
-    if (typeof global.api === 'undefined' || typeof global.tmi === 'undefined') { return setTimeout(() => this.getChannelId(), 1000); }
+    if (typeof global.api === 'undefined' || typeof global.tmi === 'undefined') {
+      return setTimeout(() => this.getChannelId(), 1000);
+    }
     clearTimeout(this.timeouts.getChannelId);
 
     let timeout = 1000;
 
     if (this.currentChannel !== this.generalChannel && this.generalChannel !== '') {
-      this.currentChannel = this.generalChannel;
       const cid = await global.api.getIdFromTwitch(this.generalChannel, true);
       if (typeof cid !== 'undefined' && cid !== null) {
+        this.currentChannel = this.generalChannel;
         this.channelId = cid;
         global.log.info('Channel ID set to ' + cid);
         global.tmi.reconnect('bot');
         global.tmi.reconnect('broadcaster');
         global.api.updateChannelViewsAndBroadcasterType();
+        this.toWait = 10;
       } else {
-        const toWait = Math.max(Number(global.api.calls.bot.refresh - (Date.now() / 1000)), 30);
-        global.log.error(`Cannot get channel ID of ${this.generalChannel} - waiting ${toWait.toFixed()}s`);
-        timeout = toWait * 1000;
+        global.log.error(`Cannot get channel ID of ${this.generalChannel} - waiting ${this.toWait.toFixed()}s`);
+        timeout = this.toWait * 1000;
+        this.toWait = this.toWait * 2;
       }
     }
 
@@ -220,6 +225,9 @@ class OAuth extends Core {
       }
 
       global.status.API = request.status === 200 ? constants.CONNECTED : constants.DISCONNECTED;
+
+      this.toWait = 10;
+      this.getChannelId();
     } catch (e) {
       if (!e.message.includes('no access token')) {
         console.error(e);
