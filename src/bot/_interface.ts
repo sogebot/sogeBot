@@ -19,17 +19,18 @@ class Module {
     return _.get(this, '_enabled', true);
   }
 
-  set enabled(v: boolean) {
-    if (!_.isEqual(_.get(this, '_enabled', true), v)) {
-      _.set(this, '_enabled', v);
+  set enabled(value: boolean) {
+    if (!_.isEqual(_.get(this, '_enabled', true), value)) {
+      _.set(this, '_enabled', value);
       // update variable in all workers (only RAM)
       const proc = {
         type: 'interface',
         system: this._name,
         class: this.constructor.name.toLowerCase(),
         path: '_enabled',
-        value: v,
+        value,
       };
+      global.db.engine.update(this.collection.settings, { system: this.constructor.name.toLowerCase(), key: 'enabled' }, { value });
       global.workers.sendToAll(proc);
     }
   }
@@ -454,7 +455,11 @@ class Module {
     const isDisabledByEnv = process.env.DISABLE &&
       (process.env.DISABLE.toLowerCase().split(',').includes(this.constructor.name.toLowerCase()) || process.env.DISABLE === '*');
 
-    if (isStatusChanged) { this.enabled = opts.state; } else { opts.state = this.enabled; }
+    if (isStatusChanged) {
+      this.enabled = opts.state;
+    } else {
+      opts.state = this.enabled;
+    }
 
     if (!areDependenciesEnabled || isDisabledByEnv) { opts.state = false; } // force disable if dependencies are disabled or disabled by env
 
@@ -463,7 +468,11 @@ class Module {
       if (this.on && this.on.change && this.on.change.enabled) {
         // run on.change functions only on master
         for (const fnc of this.on.change.enabled) {
-          if (typeof this[fnc] === 'function') { this[fnc]('enabled', opts.state); } else { global.log.error(`${fnc}() is not function in ${this._name}/${this.constructor.name.toLowerCase()}`); }
+          if (typeof this[fnc] === 'function') {
+            this[fnc]('enabled', opts.state);
+          } else {
+            global.log.error(`${fnc}() is not function in ${this._name}/${this.constructor.name.toLowerCase()}`);
+          }
         }
       }
     }
