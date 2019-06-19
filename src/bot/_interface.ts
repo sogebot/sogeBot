@@ -713,13 +713,37 @@ class Module {
     }
   }
 
+  protected async loadCommand(command: string): Promise<void> {
+    const cmd = await global.db.engine.findOne(this.collection.settings, { system: this.constructor.name.toLowerCase(), key: 'commands.' + command });
+    if (cmd.value) {
+      const c = this._commands.find((o) => o.name === command);
+      if (c) {
+        c.command = cmd.value;
+      }
+    }
+  }
+
   /**
    *
    */
-  protected setCommand(command: string, updated: string): void {
+  protected async setCommand(command: string, updated: string): Promise<void> {
     const c = this._commands.find((o) => o.name === command);
     if (c) {
-      c.command = updated;
+      if (c.name === updated) {
+        // default value
+        await global.db.engine.remove(this.collection.settings, { system: this.constructor.name.toLowerCase(), key: 'commands.' + command });
+        delete c.command;
+      } else {
+        c.command = updated;
+        await global.db.engine.update(this.collection.settings, { system: this.constructor.name.toLowerCase(), key: 'commands.' + command }, { value: updated });
+        global.workers.sendToAll({
+          type: 'interfaceFnc',
+          fnc: 'loadCommand',
+          system: this._name,
+          class: this.constructor.name.toLowerCase(),
+          args: [ command ]
+        });
+      }
     } else {
       global.log.warning(`Command ${command} cannot be updated to ${updated}`);
     }
