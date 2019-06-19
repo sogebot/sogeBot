@@ -71,7 +71,7 @@ export function settings(category?: string) {
             return setTimeout(() => loadVariableValue(), 1000);
           }
           self.loadVariableValue(key).then((value) => {
-            if (value) {
+            if (typeof value !== 'undefined') {
               VariableWatcher.add(`${type}.${name}.${key}`, value); // rewrite value on var load
               _.set(self, key, value);
             }
