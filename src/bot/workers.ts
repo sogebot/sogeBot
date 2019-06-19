@@ -166,10 +166,23 @@ class Workers {
           });
           if (obj) { set(obj, data.path, data.value); }
         } else {
-          const obj = Object.values(global[data.system]).find((o: any) => {
-            return o.constructor.name.toLowerCase() === data.class.toLowerCase();
-          }) as any;
-          if (obj) { set(obj, data.path, data.value); }
+          try {
+            const obj = Object.values(global[data.system]).find((o: any) => {
+              return o.constructor.name.toLowerCase() === data.class.toLowerCase();
+            }) as any;
+            if (obj) { set(obj, data.path, data.value); }
+          } catch (e) {
+            if ((data.retry || 0) < 5) {
+              setTimeout(() => {
+                data.retry = (data.retry || 0) + 1;
+                this.process(data);
+              }, 5000);
+            } else {
+              global.log.error(e.stack);
+              global.log.error('Something went wrong when emiting');
+              global.log.error(inspect(data, undefined, 5));
+            }
+          }
         }
       } else if ( data.type === 'emit') {
         // remove core from path
@@ -195,6 +208,36 @@ class Workers {
             } else {
               global.log.error(e.stack);
               global.log.error('Something went wrong when emiting');
+              global.log.error(inspect(data, undefined, 5));
+            }
+          }
+        }
+      } else if ( data.type === 'interfaceFnc') {
+        // remove core from path
+        if (data.system === 'core') {
+          const obj = Object.values(global).find((o) => {
+            return o.constructor.name.toLowerCase() === data.class.toLowerCase();
+          });
+          if (obj) {
+            obj[data.fnc](...data.args);
+          }
+        } else {
+          try {
+            const obj = Object.values(global[data.system]).find((o: any) => {
+              return o.constructor.name.toLowerCase() === data.class.toLowerCase();
+            }) as any;
+            if (obj) {
+              obj[data.fnc](...data.args);
+            }
+          } catch (e) {
+            if ((data.retry || 0) < 5) {
+              setTimeout(() => {
+                data.retry = (data.retry || 0) + 1;
+                this.process(data);
+              }, 5000);
+            } else {
+              global.log.error(e.stack);
+              global.log.error('Something went wrong when running interfaceFnc');
               global.log.error(inspect(data, undefined, 5));
             }
           }
@@ -233,6 +276,37 @@ class Workers {
               global.log.error(e.stack);
               global.log.error('Something went wrong when updating interface variable');
               global.log.error(inspect(data, undefined, 5));
+            }
+          }
+          break;
+        case 'interfaceFnc':
+          // remove core from path
+          if (data.system === 'core') {
+            const obj = Object.values(global).find((o) => {
+              return o.constructor.name.toLowerCase() === data.class.toLowerCase();
+            });
+            if (obj) {
+              obj[data.fnc](...data.args);
+            }
+          } else {
+            try {
+              const obj = Object.values(global[data.system]).find((o: any) => {
+                return o.constructor.name.toLowerCase() === data.class.toLowerCase();
+              }) as any;
+              if (obj) {
+                obj[data.fnc](...data.args);
+              }
+            } catch (e) {
+              if ((data.retry || 0) < 5) {
+                setTimeout(() => {
+                  data.retry = (data.retry || 0) + 1;
+                  this.process(data);
+                }, 5000);
+              } else {
+                global.log.error(e.stack);
+                global.log.error('Something went wrong when running interfaceFnc');
+                global.log.error(inspect(data, undefined, 5));
+              }
             }
           }
           break;
