@@ -380,11 +380,13 @@ class Users extends Core {
         delete viewer.time.watched
 
         const bits = _.cloneDeep(viewer.stats.bits);
+        const newBitsIds = [];
         for (let b of bits) {
           delete b.editation
           if (b.new) {
             delete b.new; delete b._id
-            await global.db.engine.insert('users.bits', b)
+            const bit = await global.db.engine.insert('users.bits', b)
+            newBitsIds.push(String(bit._id));
           } else {
             delete b.new
             const _id = String(b._id); delete b._id
@@ -392,18 +394,20 @@ class Users extends Core {
           }
         }
         for (const t of (await global.db.engine.find('users.bits', { id }))) {
-          if (!viewer.stats.bits.map(p => String(p._id)).includes(String(t._id))) {
+          if (!viewer.stats.bits.map(p => String(p._id)).includes(String(t._id)) && !newBitsIds.includes(String(t._id))) {
             await global.db.engine.remove('users.bits', { _id: String(t._id) });
           }
         }
         delete viewer.stats.bits;
 
         const tips = _.cloneDeep(viewer.stats.tips);
+        const newTipsIds = [];
         for (let b of tips) {
           delete b.editation
           if (b.new) {
-            delete b.new
-            await global.db.engine.insert('users.tips', b)
+            delete b.new; delete b._id
+            const tip = await global.db.engine.insert('users.tips', b)
+            newTipsIds.push(String(tip._id));
           } else {
             delete b.new
             const _id = String(b._id); delete b._id
@@ -411,7 +415,7 @@ class Users extends Core {
           }
         }
         for (const t of (await global.db.engine.find('users.tips', { id }))) {
-          if (!viewer.stats.tips.map(p => String(p._id)).includes(String(t._id))) {
+          if (!viewer.stats.tips.map(p => String(p._id)).includes(String(t._id)) && !newTipsIds.includes(String(t._id))) {
             await global.db.engine.remove('users.tips', { _id: String(t._id) });
           }
         }
