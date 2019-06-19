@@ -179,10 +179,25 @@ class Workers {
           });
           if (obj && obj.socket) { obj.emit(data.event, ...data.args); }
         } else {
-          const obj = Object.values(global[data.system]).find((o: any) => {
-            return o.constructor.name.toLowerCase() === data.class.toLowerCase();
-          }) as any;
-          if (obj && obj.socket) { obj.emit(data.event, ...data.args); }
+          try {
+            const obj = Object.values(global[data.system]).find((o: any) => {
+              return o.constructor.name.toLowerCase() === data.class.toLowerCase();
+            }) as any;
+            if (obj) {
+              obj.emit(data.event, ...data.args);
+            }
+          } catch (e) {
+            if ((data.retry || 0) < 5) {
+              setTimeout(() => {
+                data.retry = (data.retry || 0) + 1;
+                this.process(data);
+              }, 5000);
+            } else {
+              global.log.error(e.stack);
+              global.log.error('Something went wrong when emiting');
+              global.log.error(inspect(data, undefined, 5));
+            }
+          }
         }
       } else if ( data.type === 'crash') {
         process.exit(1); // kill main thread
