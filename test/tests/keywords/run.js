@@ -23,4 +23,15 @@ describe('Keywords - run()', () => {
     global.systems.keywords.remove({ sender: owner, parameters: 'a' })
     await message.isSent('keywords.keyword-was-removed', owner, { keyword: 'a', sender: owner.username })
   })
+
+  it.only('#2293 - trigger should be case insensitive', async () => {
+    global.systems.keywords.add({ sender: owner, parameters: 'alpha Lorem Ipsum' })
+    await message.isSent('keywords.keyword-was-added', owner, { keyword: 'alpha', response: 'Lorem Ipsum', sender: owner.username })
+
+    global.systems.keywords.run({ sender: owner, message: 'AlphA' })
+    await message.isSentRaw('Lorem Ipsum', owner)
+
+    global.systems.keywords.remove({ sender: owner, parameters: 'alpha' })
+    await message.isSent('keywords.keyword-was-removed', owner, { keyword: 'alpha', sender: owner.username })
+  })
 })
