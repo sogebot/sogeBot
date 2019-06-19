@@ -229,7 +229,7 @@ class Message {
             return attr.param;
           }
         }
-        return (global.tmi.showWithAt ? '@' : '') + attr.sender;
+        return (global.tmi.showWithAt ? '@' : '') + attr.sender.username;
       },
       '$param': async function (filter) {
         if (!_.isUndefined(attr.param) && attr.param.length !== 0) return attr.param
@@ -293,15 +293,14 @@ class Message {
     }
     let command = {
       '(!!#)': async function (filter) {
-        if (!_.isString(attr.sender)) attr.sender = _.get(attr, 'sender.username', null)
         let cmd = filter
           .replace('!', '') // replace first !
           .replace(/\(|\)/g, '')
-          .replace(/\$sender/g, (global.tmi.showWithAt ? '@' : '') + attr.sender)
+          .replace(/\$sender/g, (global.tmi.showWithAt ? '@' : '') + attr.sender.username)
           .replace(/\$param/g, attr.param)
         global.tmi.message({
           message: {
-            tags: { username: attr.sender },
+            tags: attr.sender,
             message: cmd,
           },
           skip: true,
@@ -310,14 +309,13 @@ class Message {
         return ''
       },
       '(!#)': async function (filter) {
-        if (!_.isString(attr.sender)) attr.sender = _.get(attr, 'sender.username', null)
         let cmd = filter
           .replace(/\(|\)/g, '')
-          .replace(/\$sender/g, (global.tmi.showWithAt ? '@' : '') + attr.sender)
+          .replace(/\$sender/g, (global.tmi.showWithAt ? '@' : '') + attr.sender.username)
           .replace(/\$param/g, attr.param)
         global.tmi.message({
           message: {
-            tags: { username: attr.sender },
+            tags: attr.sender,
             message: cmd,
           },
           skip: true,
@@ -430,7 +428,6 @@ class Message {
     let evaluate = {
       '(eval#)': async function (filter) {
         let toEvaluate = filter.replace('(eval ', '').slice(0, -1)
-        if (_.isObject(attr.sender)) attr.sender = attr.sender.username
 
         const containUsers = !_.isNil(toEvaluate.match(/users/g))
         const containRandom = !_.isNil(toEvaluate.replace(/Math\.random|_\.random/g, '').match(/random/g))
@@ -458,7 +455,7 @@ class Message {
         if (containUsers || containRandom) {
           users = await global.users.getAll()
         }
-        let user = await global.users.get(attr.sender)
+        let user = await global.users.get(attr.sender.username)
 
         let onlineViewers = []
         let onlineSubscribers = []
@@ -471,13 +468,13 @@ class Message {
             let user = await global.db.engine.find('users', { username: viewer.username, is: { subscriber: true } })
             if (!_.isEmpty(user)) onlineSubscribers.push(user.username)
           }
-          onlineSubscribers = _.filter(onlineSubscribers, function (o) { return o !== attr.sender })
+          onlineSubscribers = _.filter(onlineSubscribers, function (o) { return o !== attr.sender.username })
 
           for (let viewer of onlineViewers) {
             let user = await global.db.engine.find('users', { username: viewer.username, is: { follower: true } })
             if (!_.isEmpty(user)) onlineFollowers.push(user.username)
           }
-          onlineFollowers = _.filter(onlineFollowers, function (o) { return o !== attr.sender })
+          onlineFollowers = _.filter(onlineFollowers, function (o) { return o !== attr.sender.username })
         }
 
         let randomVar = {
@@ -498,7 +495,7 @@ class Message {
           users: users,
           is: is,
           random: randomVar,
-          sender: global.tmi.showWithAt ? `@${attr.sender}` : `${attr.sender}`,
+          sender: global.tmi.showWithAt ? `@${attr.sender.username}` : `${attr.sender.username}`,
           param: _.isNil(attr.param) ? null : attr.param
         }
 
