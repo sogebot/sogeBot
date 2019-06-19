@@ -81,7 +81,7 @@
                      style="cursor: pointer"
                      v-for="p of permissions"
                      :key="p.id"
-                     @click="updatePermission(alias._id, p.id)">{{ getPermissionName(alias.permission) | capitalize }}</a>
+                     @click="updatePermission(alias._id, p.id)">{{ getPermissionName(p.id) | capitalize }}</a>
                 </div>
                 <button v-bind:title="alias.enabled ? commons.translate('enabled') : commons.translate('disabled')" v-on:click="alias.enabled = !alias.enabled; update(alias._id)"  class="btn btn-outline-dark p-1 border-0"><i class="fas m-1 fa-fw"  v-bind:class="[ alias.enabled ? 'fa-toggle-on' : 'fa-toggle-off' ]" aria-hidden="true"></i></button>
                 <hold-button class="btn-outline-dark p-1 border-0" @trigger="remove(alias._id)" holdtitle="" title="" icon="fa-trash m-1"></hold-button>
