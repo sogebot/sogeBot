@@ -60,6 +60,7 @@ class Polls extends System {
             parameters,
             sender: {
               username: getOwner(),
+              displayName: getOwner(),
               userId: '0',
               emotes: [],
               badges: {
@@ -79,6 +80,7 @@ class Polls extends System {
             parameters: '',
             sender: {
               username: getOwner(),
+              displayName: getOwner(),
               userId: '0',
               emotes: [],
               badges: {

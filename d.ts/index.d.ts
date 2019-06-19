@@ -98,6 +98,7 @@ declare namespace NodeJS {
 
 interface Sender {
   username: string;
+  displayName: string;
   userId: string;
   emotes: { id: number; start: number; end: number }[];
   badges: {
