@@ -246,7 +246,7 @@ class UserInfo extends System {
         const currency = global.currency.mainCurrency;
         let tipAmount = 0;
         for (const t of tips) {
-          tipAmount += global.currency.exchange(t.amount, t.currency, currency);
+          tipAmount += global.currency.exchange(Number(t.amount), t.currency, currency);
         }
         message[idx] = `${Number(tipAmount).toFixed(2)}${global.currency.symbol(currency)}`;
       }
