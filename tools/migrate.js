@@ -193,7 +193,7 @@ let migration = {
           raffles: {
             'luck.subscribersPercent': 'subscribersPercent',
             'luck.followersPercent': 'followersPercent',
-          }
+          },
           points: {
             'points.name': 'name',
             'points.interval': 'interval',
