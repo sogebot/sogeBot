@@ -190,6 +190,33 @@ let migration = {
           }
         },
         'systems.settings': {
+          raffles: {
+            'luck.subscribersPercent': 'subscribersPercent',
+            'luck.followersPercent': 'followersPercent',
+          }
+          points: {
+            'points.name': 'name',
+            'points.interval': 'interval',
+            'points.perInterval': 'perInterval',
+            'points.offlineInterval': 'offlineInterval',
+            'points.perOfflineInterval': 'perOfflineInterval',
+            'points.messageInterval': 'messageInterval',
+            'points.perMessageInterval': 'perMessageInterval',
+            'points.messageOfflineInterval': 'messageOfflineInterval',
+            'points.perMessageOfflineInterval': 'perMessageOfflineInterval',
+          },
+          scrim: {
+            'time.waitForMatchIdsInSeconds': 'waitForMatchIdsInSeconds',
+          },
+          polls: {
+            'polls.everyXMessages': 'everyXMessages',
+            'polls.everyXSeconds': 'everyXSeconds',
+          }
+          userinfo: {
+            'me._order': 'order',
+            'me._formatDisabled': '_formatDisabled',
+            'me.formatSeparator': 'formatSeparator',
+          },
           moderation: {
             'lists.whitelist': 'cListsWhitelist',
             'lists.blacklist': 'cListsBlacklist',
