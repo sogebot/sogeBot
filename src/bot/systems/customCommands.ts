@@ -268,19 +268,9 @@ class CustomCommands extends System {
     if (responses.length === 0) {return;}
     const response = responses.shift();
 
-    // search for $count('!another') functions
-    const countRegex = new RegExp('\\$count\\(\\\'(?<command>\\!\\S*)\\\'\\)', 'gm');
-    let match;
-    while(match = countRegex.exec(response.response)) {
-      const stringToReplace = match[0];
-      const count = await getCountOfCommandUsage(match.groups.command);
-      response.response = response.response.replace(stringToReplace, count);
-    }
-
     await sendMessage(response.response, opts.sender, {
       param: opts.param,
       cmd: opts.command,
-      count: opts.count,
     });
     setTimeout(() => {
       this.sendResponse(responses, opts);
