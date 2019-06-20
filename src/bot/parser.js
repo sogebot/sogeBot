@@ -5,6 +5,7 @@ const _ = require('lodash');
 const constants = require('./constants');
 import { debug } from './debug';
 import { sendMessage } from './commons';
+import { incrementCountOfCommandUsage } from './helpers/commands/count'
 
 class Parser {
   constructor (opts) {
@@ -195,30 +196,6 @@ class Parser {
     return commands;
   }
 
-  async getCountOfCommandUsage (command: string): Promise<number> {
-    let count = 0;
-    for (let item of await global.db.engine.find(this.collection.cmdusage, { command })) {
-      let toAdd = !_.isNaN(parseInt(_.get(item, 'count', 0))) ? _.get(item, 'count', 0) : 0;
-      count = count + Number(toAdd);
-    }
-    if (Number(count) < 0) {count = 0;}
-
-    return Number(count) <= Number.MAX_SAFE_INTEGER
-      ? count
-      : Number.MAX_SAFE_INTEGER;
-  }
-
-  async incrementCountOfCommandUsage (command: string): Promise<number> {
-    const count = await this.getCountOfCommandUsage(command);
-    await global.db.engine.remove(this.collection.count, { command });
-    await global.db.engine.insert(this.collection.count, { command, count: count + 1 });
-    return (count + 1);
-  }
-
-  async resetCountOfCommandUsage (command: string): void {
-    await global.db.engine.remove(this.collection.cmdusage, { command });
-  }
-
   async command (sender, message, skip) {
     if (!message.startsWith('!')) {return}; // do nothing, this is not a command or user is ignored
     let command = await this.find(message);
@@ -239,7 +216,7 @@ class Parser {
       if (_.isNil(command.id)) {throw Error(`command id is missing from ${command['fnc']}`)};
 
       if (typeof command.fnc === 'function' && !_.isNil(command.id)) {
-        this.incrementCountOfCommandUsage(command.command);
+        incrementCountOfCommandUsage(command.command);
         command['fnc'].apply(command.this, [opts]);
 
       } else {global.log.error(command.command + ' have wrong undefined function ' + command._fncName + '() registered!', { fnc: 'Parser.prototype.parseCommands' })};

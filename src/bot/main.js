@@ -99,6 +99,7 @@ async function main () {
   }))
 
   global.lib.translate._load().then(async () => {
+    global.stats = await autoLoad('./dest/stats/')
     global.systems = await autoLoad('./dest/systems/');
     global.widgets = await autoLoad('./dest/widgets/')
     global.overlays = await autoLoad('./dest/overlays/')

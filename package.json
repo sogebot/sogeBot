@@ -57,6 +57,7 @@
     "url-join": "4.0.0",
     "velocity-animate": "1.5.2",
     "vue": "2.6.10",
+    "vue-chartkick": "0.5.1",
     "winston": "3.2.1",
     "xregexp": "4.2.4",
     "yargs": "13.2.4",

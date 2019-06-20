@@ -9,7 +9,7 @@ import constants from '../constants';
 import { parser } from '../decorators';
 import Expects from '../expects';
 import { sendMessage, prepare, message, getOwner, isModerator, isSubscriber, isVIP, isBroadcaster, isBot, isOwner } from '../commons';
-import * as Parser from '../parser';
+import { getCountOfCommandUsage, incrementCountOfCommandUsage, resetCountOfCommandUsage } from '../helpers/commands/count';
 
 /*
  * !command                                                                 - gets an info about command usage
@@ -42,8 +42,6 @@ interface Command {
 };
 
 class CustomCommands extends System {
-  parser: any = new Parser.default();
-
   constructor () {
     super();
 
@@ -66,7 +64,7 @@ class CustomCommands extends System {
 
         let items: Command[] = await global.db.engine.find(opts.collection, opts.where);
         for (let i of items) {
-          i.count = await this.parser.getCountOfCommandUsage(i.command);
+          i.count = await getCountOfCommandUsage(i.command);
           i.responses = await global.db.engine.find(this.collection.responses, { cid: String(i._id) });
         }
         if (_.isFunction(cb)) {cb(null, items);}
@@ -80,7 +78,7 @@ class CustomCommands extends System {
         opts.where = opts.where || {};
 
         let item: Command = await global.db.engine.findOne(opts.collection, opts.where);
-        item.count = await this.parser.getCountOfCommandUsage(item.command);
+        item.count = await getCountOfCommandUsage(item.command);
         item.responses = await global.db.engine.find(this.collection.responses, { cid: String(item._id) });
         if (_.isFunction(cb)) {cb(null, item);}
       });
@@ -101,10 +99,10 @@ class CustomCommands extends System {
             else {await global.db.engine.update(opts.collection, { _id }, item);}
 
             // set command count
-            const cCount = await this.parser.getCountOfCommandUsage(itemFromDb.command);
+            const cCount = await getCountOfCommandUsage(itemFromDb.command);
             if (count !== cCount && count === 0) {
               // we assume its always reset (set to 0)
-              await global.db.engine.remove(this.collection.count, { command: itemFromDb.command });
+              await resetCountOfCommandUsage(itemFromDb.command);
             }
 
             // update responses
@@ -247,7 +245,7 @@ class CustomCommands extends System {
 
     // remove found command from message to get param
     const param = opts.message.replace(new RegExp('^(' + cmdArray.join(' ') + ')', 'i'), '').trim();
-    const count = await this.parser.incrementCountOfCommandUsage(command.command);
+    const count = await incrementCountOfCommandUsage(command.command);
 
     const responses: Response[] = await global.db.engine.find(this.collection.responses, { cid: String(command._id) });
     let atLeastOnePermissionOk = false;
@@ -275,7 +273,7 @@ class CustomCommands extends System {
     let match;
     while(match = countRegex.exec(response.response)) {
       const stringToReplace = match[0];
-      const count = await this.parser.getCountOfCommandUsage(match.groups.command);
+      const count = await getCountOfCommandUsage(match.groups.command);
       response.response = response.response.replace(stringToReplace, count);
     }
 

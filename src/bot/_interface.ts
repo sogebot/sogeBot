@@ -42,7 +42,6 @@ class Module {
   protected _parsers: Parser[];
   protected _rollback: { name: string }[];
   protected _enabled: boolean = true;
-  protected _parser: any = new Parser.default();
 
   constructor(name: string = 'core', enabled: boolean = true) {
     this.on = {
@@ -449,7 +448,7 @@ class Module {
 
   public async status(opts) {
     opts = opts || {};
-    if (['core', 'overlays', 'widgets'].includes(this._name)) { return true; }
+    if (['core', 'overlays', 'widgets', 'stats'].includes(this._name)) { return true; }
 
     const areDependenciesEnabled = await this._dependenciesEnabled();
     const isMasterAndStatusOnly = isMainThread && _.isNil(opts.state);
@@ -524,7 +523,6 @@ class Module {
 
         if (category === 'commands') {
           _.set(promisedSettings, `${category}.${key}`, this.getCommand(key));
-          _.set(promisedSettings, `__cmd_count__.${key}`, this._parser.getCountOfCommandUsage(key))
         } else {
           _.set(promisedSettings, `${category}.${key}`, this[key]);
         }

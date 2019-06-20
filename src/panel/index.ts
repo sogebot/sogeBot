@@ -93,6 +93,8 @@ const main = async () => {
     mode: 'hash',
     base: __dirname,
     routes: [
+      { path: '/stats/commandcount', name: 'CommandCountLogger', component: () => import('./views/loggers/commandcount.vue') },
+
       { path: '/manage/polls', name: 'PollsManager', component: () => import('./views/managers/polls.vue') },
 
       { path: '/manage/events/', redirect: '/manage/events/list' },
