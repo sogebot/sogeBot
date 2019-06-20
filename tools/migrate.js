@@ -211,7 +211,7 @@ let migration = {
           polls: {
             'polls.everyXMessages': 'everyXMessages',
             'polls.everyXSeconds': 'everyXSeconds',
-          }
+          },
           userinfo: {
             'me._order': 'order',
             'me._formatDisabled': '_formatDisabled',
