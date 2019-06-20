@@ -41,6 +41,7 @@ function cluster () {
 
   global.lib.translate._load().then(async () => {
     try {
+      global.stats = await autoLoad('./dest/stats/')
       global.systems = await autoLoad('./dest/systems/')
       global.overlays = await autoLoad('./dest/overlays/')
       global.games = await autoLoad('./dest/games/')

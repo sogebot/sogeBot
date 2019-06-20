@@ -9,6 +9,7 @@ import constants from '../constants';
 import { parser } from '../decorators';
 import Expects from '../expects';
 import { sendMessage, prepare, message, getOwner, isModerator, isSubscriber, isVIP, isBroadcaster, isBot, isOwner } from '../commons';
+import { getCountOfCommandUsage, incrementCountOfCommandUsage, resetCountOfCommandUsage } from '../helpers/commands/count';
 
 /*
  * !command                                                                 - gets an info about command usage
@@ -63,7 +64,7 @@ class CustomCommands extends System {
 
         let items: Command[] = await global.db.engine.find(opts.collection, opts.where);
         for (let i of items) {
-          i.count = await this.getCountOf(i.command);
+          i.count = await getCountOfCommandUsage(i.command);
           i.responses = await global.db.engine.find(this.collection.responses, { cid: String(i._id) });
         }
         if (_.isFunction(cb)) {cb(null, items);}
@@ -77,7 +78,7 @@ class CustomCommands extends System {
         opts.where = opts.where || {};
 
         let item: Command = await global.db.engine.findOne(opts.collection, opts.where);
-        item.count = await this.getCountOf(item.command);
+        item.count = await getCountOfCommandUsage(item.command);
         item.responses = await global.db.engine.find(this.collection.responses, { cid: String(item._id) });
         if (_.isFunction(cb)) {cb(null, item);}
       });
@@ -98,10 +99,10 @@ class CustomCommands extends System {
             else {await global.db.engine.update(opts.collection, { _id }, item);}
 
             // set command count
-            const cCount = await this.getCountOf(itemFromDb.command);
+            const cCount = await getCountOfCommandUsage(itemFromDb.command);
             if (count !== cCount && count === 0) {
               // we assume its always reset (set to 0)
-              await global.db.engine.remove(this.collection.count, { command: itemFromDb.command });
+              await resetCountOfCommandUsage(itemFromDb.command);
             }
 
             // update responses
@@ -244,10 +245,7 @@ class CustomCommands extends System {
 
     // remove found command from message to get param
     const param = opts.message.replace(new RegExp('^(' + cmdArray.join(' ') + ')', 'i'), '').trim();
-    const count = await this.getCountOf(command.command);
-
-    await global.db.engine.remove(this.collection.count, { command: command.command });
-    await global.db.engine.insert(this.collection.count, { command: command.command, count: count + 1 });
+    const count = await incrementCountOfCommandUsage(command.command);
 
     const responses: Response[] = await global.db.engine.find(this.collection.responses, { cid: String(command._id) });
     let atLeastOnePermissionOk = false;
@@ -270,19 +268,9 @@ class CustomCommands extends System {
     if (responses.length === 0) {return;}
     const response = responses.shift();
 
-    // search for $count('!another') functions
-    const countRegex = new RegExp('\\$count\\(\\\'(?<command>\\!\\S*)\\\'\\)', 'gm');
-    let match;
-    while(match = countRegex.exec(response.response)) {
-      const stringToReplace = match[0];
-      const count = await this.getCountOf(match.groups.command);
-      response.response = response.response.replace(stringToReplace, count);
-    }
-
     await sendMessage(response.response, opts.sender, {
       param: opts.param,
       cmd: opts.command,
-      count: opts.count,
     });
     setTimeout(() => {
       this.sendResponse(responses, opts);
@@ -410,19 +398,6 @@ class CustomCommands extends System {
     } catch (e) {
       return sendMessage(prepare('customcmds.commands-parse-failed'), opts.sender);
     }
-  }
-
-  async getCountOf (command: string) {
-    let count = 0;
-    for (let item of await global.db.engine.find(this.collection.count, { command })) {
-      let toAdd = !_.isNaN(parseInt(_.get(item, 'count', 0))) ? _.get(item, 'count', 0) : 0;
-      count = count + Number(toAdd);
-    }
-    if (Number(count) < 0) {count = 0;}
-
-    return Number(count) <= Number.MAX_SAFE_INTEGER
-      ? count
-      : Number.MAX_SAFE_INTEGER;
   }
 
   async checkFilter (opts: Record<string, any>, filter: string) {

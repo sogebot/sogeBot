@@ -47,6 +47,9 @@ declare namespace NodeJS {
       seppuku: import('../src/bot/games/seppuku').Seppuku;
       wheelOfFortune: import('../src/bot/games/wheelOfFortune').WheelOfFortune;
     };
+    logs: {
+      commandcount: import('../src/bot/logs/commandcount').CommandCount;
+    };
     general: any;
     bot: any;
     translate: any;

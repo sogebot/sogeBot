@@ -5,6 +5,7 @@ import { isMainThread } from 'worker_threads';
 
 import { permission } from './permissions';
 import { flatten, unflatten } from './commons';
+import * as Parser from './parser';
 
 class Module {
   public dependsOn: string[] = [];
@@ -447,7 +448,7 @@ class Module {
 
   public async status(opts) {
     opts = opts || {};
-    if (['core', 'overlays', 'widgets'].includes(this._name)) { return true; }
+    if (['core', 'overlays', 'widgets', 'stats'].includes(this._name)) { return true; }
 
     const areDependenciesEnabled = await this._dependenciesEnabled();
     const isMasterAndStatusOnly = isMainThread && _.isNil(opts.state);

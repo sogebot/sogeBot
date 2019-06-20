@@ -9,6 +9,7 @@ require('../../general.js')
 
 const db = require('../../general.js').db
 const message = require('../../general.js').message
+const time = require('../../general.js').time
 const assert = require('assert')
 
 const { permission } = require('../../../dest/permissions')
@@ -62,14 +63,14 @@ describe('Custom Commands - count filter', () => {
       await global.db.engine.insert('systems.customcommands.responses', { cid: String(cmd._id), filter: '', response: 'Command usage count: $count', permission: permission.VIEWERS })
     })
 
-    it('$count should be 0', async () => {
-      global.systems.customCommands.run({ sender: owner, message: '!cmd3' })
-      await message.isSentRaw('Command usage count: 0', owner)
-    })
-
     it('$count should be 1', async () => {
       global.systems.customCommands.run({ sender: owner, message: '!cmd3' })
       await message.isSentRaw('Command usage count: 1', owner)
+    })
+
+    it('$count should be 2', async () => {
+      global.systems.customCommands.run({ sender: owner, message: '!cmd3' })
+      await message.isSentRaw('Command usage count: 2', owner)
     })
   })
 })

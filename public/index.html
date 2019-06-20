@@ -88,6 +88,13 @@
           </a>
           <ul class="dropdown-menu" id="menu-logs"></ul>
         </li>
+        <li class="nav-item dropdown">
+          <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+            <span data-lang="menu.stats"></span>
+            <span class="caret"></span>
+          </a>
+          <ul class="dropdown-menu" id="menu-stats"></ul>
+        </li>
       </ul>
 
       <ul class="navbar-nav mr-auto">
@@ -562,6 +569,7 @@
           if ((obj.id === 'games') && games) return
           if ((obj.id === 'core') && core) return
           if ((obj.id === 'logs') && logs) return
+          if ((obj.id === 'stats') && stats) return
           $('#menu-' + obj.category).append('<li class="nav-item"><a class="nav-link" href="#/' + obj.id.replace(/\./g, '/') + '" data-page="' +
             obj.id.replace(/\./g, '/') + '">' + commons.translate('menu.' + obj.name) + '</a></li>')
         }
@@ -571,6 +579,7 @@
         if (obj.id === 'registry') registry = true
         if (obj.id === 'core') core = true
         if (obj.id === 'logs') logs = true
+        if (obj.id === 'stats') stats = true
         if (obj.id === 'games') games = true
       })
       loadedMenu = true

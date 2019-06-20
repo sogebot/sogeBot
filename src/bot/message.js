@@ -9,6 +9,8 @@ const commons = require('./commons')
 const gitCommitInfo = require('git-commit-info');
 const Entities = require('html-entities').AllHtmlEntities
 
+import { getCountOfCommandUsage } from './helpers/commands/count';
+
 class Message {
   constructor (message) {
     this.message = Entities.decode(message)
@@ -292,6 +294,20 @@ class Message {
       }
     }
     let command = {
+      '$count(\'#\')': async function (filter) {
+        const countRegex = new RegExp('\\$count\\(\\\'(?<command>\\!\\S*)\\\'\\)', 'gm');
+        let match = countRegex.exec(filter);
+        if (match && match.groups) {
+          return String(await getCountOfCommandUsage(match.groups.command));
+        }
+        return '0';
+      },
+      '$count': async function (filter) {
+        if (attr.cmd) {
+          return String((await getCountOfCommandUsage(attr.cmd)));
+        }
+        return '0';
+      },
       '(!!#)': async function (filter) {
         let cmd = filter
           .replace('!', '') // replace first !
@@ -682,8 +698,7 @@ class Message {
       let rMessage = this.message.match((new RegExp('(' + regexp + ')', 'g')))
       if (!_.isNull(rMessage)) {
         for (var bkey in rMessage) {
-          await fnc(rMessage[bkey])
-          this.message = this.message.replace(rMessage[bkey], '').trim()
+          this.message = this.message.replace(rMessage[bkey], await fnc(rMessage[bkey])).trim()
         }
       }
     }
