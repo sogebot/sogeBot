@@ -721,6 +721,11 @@ class Module {
       if (c) {
         c.command = cmd.value;
       }
+    } else {
+      const c = this._commands.find((o) => o.name === command);
+      if (c) {
+        c.command = c.name;
+      }
     }
   }
 
@@ -737,14 +742,14 @@ class Module {
       } else {
         c.command = updated;
         await global.db.engine.update(this.collection.settings, { system: this.constructor.name.toLowerCase(), key: 'commands.' + command }, { value: updated });
-        global.workers.sendToAll({
-          type: 'interfaceFnc',
-          fnc: 'loadCommand',
-          system: this._name,
-          class: this.constructor.name.toLowerCase(),
-          args: [ command ]
-        });
       }
+      global.workers.sendToAll({
+        type: 'interfaceFnc',
+        fnc: 'loadCommand',
+        system: this._name,
+        class: this.constructor.name.toLowerCase(),
+        args: [ command ]
+      });
     } else {
       global.log.warning(`Command ${command} cannot be updated to ${updated}`);
     }
