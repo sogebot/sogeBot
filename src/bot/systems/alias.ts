@@ -79,7 +79,7 @@ class Alias extends System {
             tags: opts.sender,
             message,
           }, skip: true });
-        incrementCountOfCommandUsage(alias.command);
+        incrementCountOfCommandUsage(alias.alias);
       } else {
         return false;
       }
