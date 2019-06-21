@@ -19,7 +19,7 @@
                       <template v-if="sort === 'sort.follow'">{{ commons.translate('followed-since') }}</template>
                       <template v-if="sort === 'sort.subscribed_at'">{{ commons.translate('subscribed-since') }}</template>
                       <template v-if="sort === 'points'">{{ commons.translate('points') }}</template>
-                      <template v-if="sort === 'stats.messages'">{{ commons.translate('messages') }}</template>
+                      <template v-if="sort === 'messages'">{{ commons.translate('messages') }}</template>
                       <template v-if="sort === 'stats.tips'">{{ commons.translate('tips') }}</template>
                       <template v-if="sort === 'stats.bits'">{{ commons.translate('bits') }}</template>
                       <template v-if="sort === 'custom.subgiftCount'">{{ commons.translate('subgifts') }}</template>
@@ -35,7 +35,7 @@
                     <a class="dropdown-item" @click="sort = 'sort.follow'; sortOrder = 'desc'">{{ commons.translate('followed-since') }}</a>
                     <a class="dropdown-item" @click="sort = 'sort.subscribed_at'; sortOrder = 'desc'">{{ commons.translate('subscribed-since') }}</a>
                     <a class="dropdown-item" @click="sort = 'points'; sortOrder = 'desc'">{{ commons.translate('points') }}</a>
-                    <a class="dropdown-item" @click="sort = 'stats.messages'; sortOrder = 'desc'">{{ commons.translate('messages') }}</a>
+                    <a class="dropdown-item" @click="sort = 'messages'; sortOrder = 'desc'">{{ commons.translate('messages') }}</a>
                     <a class="dropdown-item" @click="sort = 'stats.tips'; sortOrder = 'desc'">{{ commons.translate('tips') }}</a>
                     <a class="dropdown-item" @click="sort = 'stats.bits'; sortOrder = 'desc'">{{ commons.translate('bits') }}</a>
                     <a class="dropdown-item" @click="sort = 'custom.subgiftCount'; sortOrder = 'desc'">{{ commons.translate('subgifts') }}</a>
@@ -170,7 +170,7 @@
                   <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
                     {{ commons.translate('messages') }}:
                   </strong>
-                  {{ _.get(item, 'stats.messages', 0) }}
+                  {{ _.get(item, 'messages', 0) }}
                 </div>
                 <div>
                   <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
