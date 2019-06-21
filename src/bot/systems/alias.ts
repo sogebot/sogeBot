@@ -9,6 +9,8 @@ import Message from '../message';
 import * as Parser from '../parser';
 import { permission } from '../permissions';
 import System from './_interface';
+import { incrementCountOfCommandUsage } from '../helpers/commands/count';
+
 
 /*
  * !alias                                              - gets an info about alias usage
@@ -77,6 +79,7 @@ class Alias extends System {
             tags: opts.sender,
             message,
           }, skip: true });
+        incrementCountOfCommandUsage(alias.command);
       } else {
         return false;
       }
