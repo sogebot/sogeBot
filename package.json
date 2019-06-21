@@ -145,6 +145,7 @@
     "axios-mock-adapter": "1.16.0",
     "bestzip": "2.1.4",
     "bootstrap-vue": "2.0.0-rc.19",
+    "cache-loader": "4.0.0",
     "chai": "4.2.0",
     "clean-webpack-plugin": "3.0.0",
     "cross-var": "1.1.0",

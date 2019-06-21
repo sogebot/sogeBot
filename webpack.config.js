@@ -1,5 +1,4 @@
 const path = require('path')
-
 const VueLoaderPlugin = require('vue-loader/lib/plugin')
 
 module.exports = [{
@@ -25,14 +24,18 @@ module.exports = [{
     rules: [
       {
         test: /\.ts$/,
-        loader: 'ts-loader',
-        options: {
-          appendTsSuffixTo: [/\.vue$/]
-        }
+        use: [{
+          loader: 'cache-loader'
+        }, {
+          loader: 'ts-loader',
+          options: {
+            appendTsSuffixTo: [/\.vue$/],
+          }
+        }]
       },
       {
         test: /\.vue$/,
-        loader: 'vue-loader'
+        use: ['cache-loader', 'vue-loader'],
       },
       {
         test: /\.css$/,
@@ -85,14 +88,18 @@ module.exports = [{
     rules: [
       {
         test: /\.ts$/,
-        loader: 'ts-loader',
-        options: {
-          appendTsSuffixTo: [/\.vue$/]
-        }
+        use: [{
+          loader: 'cache-loader'
+        }, {
+          loader: 'ts-loader',
+          options: {
+            appendTsSuffixTo: [/\.vue$/],
+          }
+        }]
       },
       {
         test: /\.vue$/,
-        loader: 'vue-loader'
+        use: ['cache-loader', 'vue-loader'],
       },
       {
         test: /\.css$/,
