@@ -948,7 +948,7 @@ class API {
     let maxViewers = await global.db.engine.findOne('api.max', { key: 'viewers' })
     if (_.isNil(maxViewers.value) || maxViewers.value < stream.viewer_count) await global.db.engine.update('api.max', { key: 'viewers' }, { value: stream.viewer_count })
 
-    global.stats.save({
+    global.stats2.save({
       timestamp: new Date().getTime(),
       whenOnline: (await global.cache.when()).online,
       currentViewers: _.get(await global.db.engine.findOne('api.current', { key: 'viewers' }), 'value', 0),

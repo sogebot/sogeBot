@@ -65,7 +65,7 @@ async function main () {
     global.general = new (require('./general.js'))()
     global.ui = new (require('./ui.js'))()
     global.currency = new Currency()
-    global.stats = new (require('./stats.js'))()
+    global.stats2 = new (require('./stats.js'))()
     global.users = new (require('./users.js'))()
     global.logger = new (require('./logging.js'))()
 
