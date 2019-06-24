@@ -136,14 +136,14 @@ export function getTime(time, isChat) {
   }
 }
 
-export async function sendMessage(messageToSend: string, sender: Sender | null, attr?: {
+export async function sendMessage(messageToSend: string | Promise<string>, sender: Sender | null, attr?: {
   sender?: Sender;
   quiet?: boolean;
   skip?: boolean;
   force?: boolean;
   [x: string]: any;
 }) {
-  messageToSend = await messageToSend; // await if messageToSend is promise (like prepare)
+  messageToSend = await messageToSend as string; // await if messageToSend is promise (like prepare)
   attr = attr || {};
   sender = sender || null;
 
@@ -153,7 +153,7 @@ export async function sendMessage(messageToSend: string, sender: Sender | null, 
     attr.sender = sender;
   }
 
-  if (!attr.skip) { messageToSend = await new Message(messageToSend).parse(attr); }
+  if (!attr.skip) { messageToSend = await new Message(messageToSend).parse(attr) as string; }
   if (messageToSend.length === 0) { return false; } // if message is empty, don't send anything
 
   // if sender is null/undefined, we can assume, that username is from dashboard -> bot
