@@ -79,7 +79,7 @@ class Scrim extends System {
       );
     } catch (e) {
       if (isNaN(Number(e.message))) {
-        sendMessage('$sender, cmd_error [' + opts.command + ']: ' + e.message, opts.sender);
+        sendMessage('$sender, cmd_error [' + opts.command + ']: ' + e.message, opts.sender, opts.attr);
       }
     }
   }
@@ -95,7 +95,7 @@ class Scrim extends System {
       }
     } catch (e) {
       if (isNaN(Number(e.message))) {
-        sendMessage('$sender, cmd_error [' + opts.command + ']: ' + e.message, opts.sender);
+        sendMessage('$sender, cmd_error [' + opts.command + ']: ' + e.message, opts.sender, opts.attr);
       }
     }
   }
@@ -106,8 +106,16 @@ class Scrim extends System {
     this.closingAt = 0;
     this.lastRemindAt = Date.now();
 
+    const userObj = await global.users.getByName(getOwner());
     sendMessage(
-      prepare('systems.scrim.stopped'), { username: getOwner() },
+      prepare('systems.scrim.stopped'), {
+        username: userObj.username,
+        displayName: userObj.displayName || userObj.username,
+        userId: userObj.id,
+        emotes: [],
+        badges: {},
+        'message-type': 'chat'
+      },
     );
   }
 
@@ -120,6 +128,7 @@ class Scrim extends System {
 
       const minutesToGo = (this.closingAt - Date.now()) / constants.MINUTE;
       const secondsToGo = round5((this.closingAt - Date.now()) / constants.SECOND);
+      const userObj = await global.users.getByName(getOwner());
 
       if (minutesToGo > 1) {
         // countdown every minute
@@ -129,8 +138,14 @@ class Scrim extends System {
               type: this.type,
               time: minutesToGo.toFixed(),
               unit: getLocalizedName(minutesToGo.toFixed(), 'core.minutes'),
-            }),
-            { username: getOwner() },
+            }),{
+              username: userObj.username,
+              displayName: userObj.displayName || userObj.username,
+              userId: userObj.id,
+              emotes: [],
+              badges: {},
+              'message-type': 'chat'
+            },
           );
           this.lastRemindAt = Date.now();
         }
@@ -142,8 +157,14 @@ class Scrim extends System {
               type: this.type,
               time: String(secondsToGo === 60 ? 1 : secondsToGo),
               unit: secondsToGo === 60 ? getLocalizedName(1, 'core.minutes') : getLocalizedName(secondsToGo, 'core.seconds'),
-            }),
-            { username: getOwner() },
+            }), {
+              username: userObj.username,
+              displayName: userObj.displayName || userObj.username,
+              userId: userObj.id,
+              emotes: [],
+              badges: {},
+              'message-type': 'chat'
+            },
           );
           this.lastRemindAt = Date.now();
         }
@@ -155,6 +176,7 @@ class Scrim extends System {
   }
 
   private async currentMatches() {
+    const userObj = await global.users.getByName(getOwner());
     const atUsername = global.tmi.showWithAt;
     const matches: {
       [x: string]: string[];
@@ -175,11 +197,19 @@ class Scrim extends System {
       prepare('systems.scrim.currentMatches', {
         matches: output.length === 0 ? '<' + global.translate('core.empty') + '>' : output.join(' | '),
       }),
-      { username: getOwner() },
+      {
+        username: userObj.username,
+        displayName: userObj.displayName || userObj.username,
+        userId: userObj.id,
+        emotes: [],
+        badges: {},
+        'message-type': 'chat'
+      },
     );
   }
 
-  private countdown() {
+  private async countdown() {
+    const userObj = await global.users.getByName(getOwner());
     for (let i = 0; i < 4; i++) {
       setTimeout(() => {
         if (i < 3) {
@@ -189,11 +219,25 @@ class Scrim extends System {
               time: (3 - i) + '.',
               unit: '',
             }),
-            { username: getOwner() },
+            {
+              username: userObj.username,
+              displayName: userObj.displayName || userObj.username,
+              userId: userObj.id,
+              emotes: [],
+              badges: {},
+              'message-type': 'chat'
+            },
           );
         } else {
           this.closingAt = 0;
-          sendMessage(prepare('systems.scrim.go'), { username: getOwner() });
+          sendMessage(prepare('systems.scrim.go'), {
+            username: userObj.username,
+            displayName: userObj.displayName || userObj.username,
+            userId: userObj.id,
+            emotes: [],
+            badges: {},
+            'message-type': 'chat'
+          });
           if (!this.isCooldownOnly) {
             setTimeout(() => {
               if (this.closingAt !== 0) {
@@ -203,7 +247,14 @@ class Scrim extends System {
                 prepare('systems.scrim.putMatchIdInChat', {
                   command: this.getCommand('!snipe match'),
                 }),
-                { username: getOwner() },
+                {
+                  username: userObj.username,
+                  displayName: userObj.displayName || userObj.username,
+                  userId: userObj.id,
+                  emotes: [],
+                  badges: {},
+                  'message-type': 'chat'
+                },
               );
               setTimeout(async () => {
                 if (this.closingAt !== 0) {

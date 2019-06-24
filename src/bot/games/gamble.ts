@@ -45,13 +45,13 @@ class Gamble extends Game {
           pointsName: await global.systems.points.getPointsName(updatedPoints),
           points: updatedPoints
         });
-        sendMessage(message, opts.sender);
+        sendMessage(message, opts.sender, opts.attr);
       } else {
         message = await prepare('gambling.gamble.lose', {
           pointsName: await global.systems.points.getPointsName(await global.systems.points.getPointsOf(opts.sender.userId)),
           points: await global.systems.points.getPointsOf(opts.sender.userId)
         });
-        sendMessage(message, opts.sender);
+        sendMessage(message, opts.sender, opts.attr);
       }
     } catch (e) {
       switch (e.message) {
@@ -59,17 +59,17 @@ class Gamble extends Game {
           message = await prepare('gambling.gamble.zeroBet', {
             pointsName: await global.systems.points.getPointsName(0)
           });
-          sendMessage(message, opts.sender);
+          sendMessage(message, opts.sender, opts.attr);
           break;
         case ERROR_NOT_ENOUGH_OPTIONS:
-          sendMessage(global.translate('gambling.gamble.notEnoughOptions'), opts.sender);
+          sendMessage(global.translate('gambling.gamble.notEnoughOptions'), opts.sender, opts.attr);
           break;
         case ERROR_NOT_ENOUGH_POINTS:
           message = await prepare('gambling.gamble.notEnoughPoints', {
             pointsName: await global.systems.points.getPointsName(points),
             points: points
           });
-          sendMessage(message, opts.sender);
+          sendMessage(message, opts.sender, opts.attr);
           break;
         case ERROR_MINIMAL_BET:
           points = this.minimalBet;
@@ -77,11 +77,11 @@ class Gamble extends Game {
             pointsName: await global.systems.points.getPointsName(points),
             points: points
           });
-          sendMessage(message, opts.sender);
+          sendMessage(message, opts.sender, opts.attr);
           break;
         default:
           global.log.error(e.stack);
-          sendMessage(global.translate('core.error'), opts.sender);
+          sendMessage(global.translate('core.error'), opts.sender, opts.attr);
       }
     }
   }

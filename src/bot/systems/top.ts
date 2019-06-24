@@ -237,7 +237,7 @@ class Top extends System {
     if (__DEBUG__) {
       global.log.debug(message);
     }
-    sendMessage(message, opts.sender);
+    sendMessage(message, opts.sender, opts.attr);
   }
 }
 

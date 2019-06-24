@@ -145,13 +145,13 @@ class CustomCommands extends System {
   @command('!command')
   @default_permission(permission.CASTERS)
   @helper()
-  main (opts: Record<string, any>) {
-    sendMessage(global.translate('core.usage') + ': !command add (-p [uuid|name]) (-s=true|false) <!cmd> <response> | !command edit (-p [uuid|name]) (-s=true|false) <!cmd> <number> <response> | !command remove <!command> | !command remove <!command> <number> | !command list | !command list <!command>', opts.sender);
+  main (opts: CommandOptions) {
+    sendMessage(global.translate('core.usage') + ': !command add (-p [uuid|name]) (-s=true|false) <!cmd> <response> | !command edit (-p [uuid|name]) (-s=true|false) <!cmd> <number> <response> | !command remove <!command> | !command remove <!command> <number> | !command list | !command list <!command>', opts.sender, opts.attr);
   }
 
   @command('!command edit')
   @default_permission(permission.CASTERS)
-  async edit (opts: Record<string, any>) {
+  async edit (opts: CommandOptions) {
     try {
       const [userlevel, stopIfExecuted, command, rId, response] = new Expects(opts.parameters)
         .permission({ optional: true, default: permission.VIEWERS })
@@ -166,10 +166,10 @@ class CustomCommands extends System {
       }
 
       let cDb = await global.db.engine.findOne(this.collection.data, { command });
-      if (!cDb._id) {return sendMessage(prepare('customcmds.command-was-not-found', { command }), opts.sender);}
+      if (!cDb._id) {return sendMessage(prepare('customcmds.command-was-not-found', { command }), opts.sender, opts.attr);}
 
       let rDb = await global.db.engine.findOne(this.collection.responses, { cid: String(cDb._id), order: rId - 1 });
-      if (!rDb._id) {return sendMessage(prepare('customcmds.response-was-not-found', { command, response: rId }), opts.sender);}
+      if (!rDb._id) {return sendMessage(prepare('customcmds.response-was-not-found', { command, response: rId }), opts.sender, opts.attr);}
 
 
       const pItem: Permissions.Item | null = await global.permissions.get(userlevel);
@@ -183,15 +183,15 @@ class CustomCommands extends System {
       if (stopIfExecuted) {rDb.stopIfExecuted = stopIfExecuted;}
 
       await global.db.engine.update(this.collection.responses, { _id }, rDb);
-      sendMessage(prepare('customcmds.command-was-edited', { command, response }), opts.sender);
+      sendMessage(prepare('customcmds.command-was-edited', { command, response }), opts.sender, opts.attr);
     } catch (e) {
-      sendMessage(prepare('customcmds.commands-parse-failed'), opts.sender);
+      sendMessage(prepare('customcmds.commands-parse-failed'), opts.sender, opts.attr);
     }
   }
 
   @command('!command add')
   @default_permission(permission.CASTERS)
-  async add (opts: Record<string, any>) {
+  async add (opts: CommandOptions) {
     try {
       const [userlevel, stopIfExecuted, command, response] = new Expects(opts.parameters)
         .permission({ optional: true, default: permission.VIEWERS })
@@ -224,14 +224,14 @@ class CustomCommands extends System {
         stopIfExecuted,
         response
       });
-      sendMessage(prepare('customcmds.command-was-added', { command }), opts.sender);
+      sendMessage(prepare('customcmds.command-was-added', { command }), opts.sender, opts.attr);
     } catch (e) {
-      sendMessage(prepare('customcmds.commands-parse-failed'), opts.sender);
+      sendMessage(prepare('customcmds.commands-parse-failed'), opts.sender, opts.attr);
     }
   }
 
   @parser({ priority: constants.LOW })
-  async run (opts: Record<string, any>) {
+  async run (opts: ParserOptions) {
     if (!opts.message.startsWith('!')) {return true;} // do nothing if it is not a command
     let _responses: Response[] = [];
     var command: any = {};
@@ -259,7 +259,6 @@ class CustomCommands extends System {
         }
       }
     }
-
     this.sendResponse(_.cloneDeep(_responses), { param, sender: opts.sender, command: command.command, count });
     return atLeastOnePermissionOk;
   }
@@ -279,20 +278,20 @@ class CustomCommands extends System {
 
   @command('!command list')
   @default_permission(permission.CASTERS)
-  async list (opts: Record<string, any>) {
+  async list (opts: CommandOptions) {
     const command = new Expects(opts.parameters).command({ optional: true }).toArray()[0];
 
     if (!command) {
       // print commands
       let commands = await global.db.engine.find(this.collection.data, { visible: true, enabled: true });
       var output = (commands.length === 0 ? global.translate('customcmds.list-is-empty') : global.translate('customcmds.list-is-not-empty').replace(/\$list/g, _.map(_.orderBy(commands, 'command'), 'command').join(', ')));
-      sendMessage(output, opts.sender);
+      sendMessage(output, opts.sender, opts.attr);
     } else {
       // print responses
       const cid = String((await global.db.engine.findOne(this.collection.data, { command }))._id);
       const responses = _.orderBy((await global.db.engine.find(this.collection.responses, { cid })), 'order', 'asc');
 
-      if (responses.length === 0) {sendMessage(prepare('customcmdustomcmds.list-of-responses-is-empty', { command }), opts.sender);}
+      if (responses.length === 0) {sendMessage(prepare('customcmdustomcmds.list-of-responses-is-empty', { command }), opts.sender, opts.attr);}
       let permissions = (await global.db.engine.find(global.permissions.collection.data)).map((o) => {
         return {
           v: o.id, string: o.name
@@ -307,7 +306,7 @@ class CustomCommands extends System {
     }
   }
 
-  async togglePermission (opts: Record<string, any>) {
+  async togglePermission (opts: CommandOptions) {
     const command = await global.db.engine.findOne(this.collection.data, { command: opts.parameters });
     if (!_.isEmpty(command)) {
       await global.db.engine.update(this.collection.data, { _id: command._id.toString() }, { permission: command.permission === 3 ? 0 : ++command.permission });
@@ -316,64 +315,64 @@ class CustomCommands extends System {
 
   @command('!command toggle')
   @default_permission(permission.CASTERS)
-  async toggle (opts: Record<string, any>) {
+  async toggle (opts: CommandOptions) {
     const match = XRegExp.exec(opts.parameters, constants.COMMAND_REGEXP) as unknown as { [x: string]: string } | null;
     if (_.isNil(match)) {
       let message = await prepare('customcmds.commands-parse-failed');
-      sendMessage(message, opts.sender);
+      sendMessage(message, opts.sender, opts.attr);
       return false;
     }
 
     const command = await global.db.engine.findOne(this.collection.data, { command: match.command });
     if (_.isEmpty(command)) {
       let message = await prepare('customcmds.command-was-not-found', { command: match.command });
-      sendMessage(message, opts.sender);
+      sendMessage(message, opts.sender, opts.attr);
       return false;
     }
 
     await global.db.engine.update(this.collection.data, { command: match.command }, { enabled: !command.enabled });
 
     let message = await prepare(!command.enabled ? 'customcmds.command-was-enabled' : 'customcmds.command-was-disabled', { command: command.command });
-    sendMessage(message, opts.sender);
+    sendMessage(message, opts.sender, opts.attr);
   }
 
   @command('!command toggle-visibility')
   @default_permission(permission.CASTERS)
-  async toggleVisibility (opts: Record<string, any>) {
+  async toggleVisibility (opts: CommandOptions) {
     const match = XRegExp.exec(opts.parameters, constants.COMMAND_REGEXP) as unknown as { [x: string]: string } | null;
     if (_.isNil(match)) {
       let message = await prepare('customcmds.commands-parse-failed');
-      sendMessage(message, opts.sender);
+      sendMessage(message, opts.sender, opts.attr);
       return false;
     }
 
     const command = await global.db.engine.findOne(this.collection.data, { command: match.command });
     if (_.isEmpty(command)) {
       let message = await prepare('customcmds.command-was-not-found', { command: match.command });
-      sendMessage(message, opts.sender);
+      sendMessage(message, opts.sender, opts.attr);
       return false;
     }
 
     await global.db.engine.update(this.collection.data, { command: match.command }, { visible: !command.visible });
     let message = await prepare(!command.visible ? 'customcmds.command-was-exposed' : 'customcmds.command-was-concealed', { command: command.command });
-    sendMessage(message, opts.sender);
+    sendMessage(message, opts.sender, opts.attr);
   }
 
   @command('!command remove')
   @default_permission(permission.CASTERS)
-  async remove (opts: Record<string, any>) {
+  async remove (opts: CommandOptions) {
     try {
       const [command, response] = new Expects(opts.parameters).command().number({ optional: true }).toArray();
       let cid = (await global.db.engine.findOne(this.collection.data, { command }))._id;
       if (!cid) {
-        sendMessage(prepare('customcmds.command-was-not-found', { command }), opts.sender);
+        sendMessage(prepare('customcmds.command-was-not-found', { command }), opts.sender, opts.attr);
       } else {
         cid = String(cid);
         if (response) {
           const order = Number(response) - 1;
           let removed = await global.db.engine.remove(this.collection.responses, { cid, order });
           if (removed > 0) {
-            sendMessage(prepare('customcmds.response-was-removed', { command, response }), opts.sender);
+            sendMessage(prepare('customcmds.response-was-removed', { command, response }), opts.sender, opts.attr);
 
             // update order
             const responses = _.orderBy(await global.db.engine.find(this.collection.responses, { cid }), 'order', 'asc');
@@ -389,18 +388,18 @@ class CustomCommands extends System {
               await global.db.engine.update(this.collection.responses, { _id }, r);
               order++;
             }
-          } else {sendMessage(prepare('customcmds.response-was-not-found', { command, response }), opts.sender);}
+          } else {sendMessage(prepare('customcmds.response-was-not-found', { command, response }), opts.sender, opts.attr);}
         } else {
           await global.db.engine.remove(this.collection.data, { command });
-          sendMessage(prepare('customcmds.command-was-removed', { command }), opts.sender);
+          sendMessage(prepare('customcmds.command-was-removed', { command }), opts.sender, opts.attr);
         }
       }
     } catch (e) {
-      return sendMessage(prepare('customcmds.commands-parse-failed'), opts.sender);
+      return sendMessage(prepare('customcmds.commands-parse-failed'), opts.sender, opts.attr);
     }
   }
 
-  async checkFilter (opts: Record<string, any>, filter: string) {
+  async checkFilter (opts: CommandOptions | ParserOptions, filter: string) {
     if (typeof filter === 'undefined' || filter.trim().length === 0) {return true;}
     let toEval = `(function evaluation () { return ${filter} })()`;
 

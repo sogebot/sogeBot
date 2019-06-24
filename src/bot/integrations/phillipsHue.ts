@@ -125,7 +125,7 @@ class PhillipsHue extends Integration {
         _.each(lights.lights, function (light) {
           output.push('id: ' + light.id + ', name: \'' + light.name + '\'');
         });
-        sendMessage(global.translate('phillipsHue.list') + output.join(' | '), opts.sender);
+        sendMessage(global.translate('phillipsHue.list') + output.join(' | '), opts.sender, opts.attr);
       })
       .fail(function (err) { global.log.error(err, 'PhillipsHue.prototype.getLights#1'); });
   }

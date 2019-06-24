@@ -152,7 +152,15 @@ class Events extends Core {
     if (cid) { // OK
       if (Boolean(operation.announce) === true) {
         const message = await prepare('api.clips.created', { link: `https://clips.twitch.tv/${cid}` });
-        sendMessage(message, { username: getOwner() });
+        const userObj = await global.users.getByName(getOwner());
+        sendMessage(message, {
+          username: userObj.username,
+          displayName: userObj.displayName || userObj.username,
+          userId: userObj.id,
+          emotes: [],
+          badges: {},
+          'message-type': 'chat'
+        });
       }
       global.log.info('Clip was created successfully');
       return cid;
@@ -229,6 +237,7 @@ class Events extends Core {
         sender: (_.get(operation, 'isCommandQuiet', false) ? {} : { username: getOwner() }),
         message: command,
         skip: true,
+        quiet: _.get(operation, 'isCommandQuiet', false)
       });
       await parse.process();
     } else {
@@ -238,12 +247,14 @@ class Events extends Core {
           message: command,
         },
         skip: true,
+        quiet: _.get(operation, 'isCommandQuiet', false)
       });
     }
   }
 
   public async fireSendChatMessageOrWhisper(operation, attributes, whisper) {
     const username = _.isNil(attributes.username) ? getOwner() : attributes.username;
+    const userObj = await global.users.getByName(username);
     let message = operation.messageToSend;
     const atUsername = global.tmi.showWithAt;
 
@@ -255,7 +266,14 @@ class Events extends Core {
       const replace = new RegExp(`\\$${key}`, 'g');
       message = message.replace(replace, val);
     }
-    sendMessage(message, { 'username': username, 'message-type': (whisper ? 'whisper' : 'chat') });
+    sendMessage(message, {
+      username,
+      displayName: userObj.displayName || username,
+      userId: userObj.id,
+      emotes: [],
+      badges: {},
+      'message-type': (whisper ? 'whisper' : 'chat')
+    });
   }
 
   public async fireSendWhisper(operation, attributes) {

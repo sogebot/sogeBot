@@ -73,12 +73,27 @@ class Bets extends System {
         currentBet.locked = true;
 
         const _bets = await global.db.engine.find(this.collection.users);
+        const userObj = await global.users.getByName(getOwner());
         if (_bets.length > 0) {
-          sendMessage(global.translate('bets.locked'), { username: getOwner() });
+          sendMessage(global.translate('bets.locked'), {
+            username: userObj.username,
+            displayName: userObj.displayName || userObj.username,
+            userId: userObj.id,
+            emotes: [],
+            badges: {},
+            'message-type': 'chat'
+          });
           const _id = currentBet._id.toString(); delete currentBet._id;
           await global.db.engine.update(this.collection.data, { _id }, currentBet);
         } else {
-          sendMessage(global.translate('bets.removed'), getOwner());
+          sendMessage(global.translate('bets.removed'), {
+            username: userObj.username,
+            displayName: userObj.displayName || userObj.username,
+            userId: userObj.id,
+            emotes: [],
+            badges: {},
+            'message-type': 'chat'
+          });
           await global.db.engine.remove(this.collection.data, { key: 'bets' });
         }
       }
@@ -123,7 +138,7 @@ class Bets extends System {
     } catch (e) {
       switch (e.message) {
         case ERROR_NOT_ENOUGH_OPTIONS:
-          sendMessage(global.translate('bets.notEnoughOptions'), opts.sender);
+          sendMessage(global.translate('bets.notEnoughOptions'), opts.sender, opts.attr);
           break;
         case ERROR_ALREADY_OPENED:
           sendMessage(
@@ -135,14 +150,14 @@ class Bets extends System {
           break;
         default:
           global.log.warning(e.stack);
-          sendMessage(global.translate('core.error'), opts.sender);
+          sendMessage(global.translate('core.error'), opts.sender, opts.attr);
       }
     }
   }
 
   public async info(opts) {
     const currentBet = await global.db.engine.findOne(this.collection.data, { key: 'bets' });
-    if (_.isEmpty(currentBet)) { sendMessage(global.translate('bets.notRunning'), opts.sender); } else {
+    if (_.isEmpty(currentBet)) { sendMessage(global.translate('bets.notRunning'), opts.sender, opts.attr); } else {
       sendMessage(await prepare(currentBet.locked ? 'bets.lockedInfo' : 'bets.info', {
         command: opts.command,
         title: currentBet.title,
@@ -185,21 +200,21 @@ class Bets extends System {
             .replace(/\$pointsName/g, await global.systems.points.getPointsName(0)), opts.sender);
           break;
         case ERROR_NOT_RUNNING:
-          sendMessage(global.translate('bets.notRunning'), opts.sender);
+          sendMessage(global.translate('bets.notRunning'), opts.sender, opts.attr);
           break;
         case ERROR_UNDEFINED_BET:
-          sendMessage(await prepare('bets.undefinedBet', { command: opts.command }), opts.sender);
+          sendMessage(await prepare('bets.undefinedBet', { command: opts.command }), opts.sender, opts.attr);
           break;
         case ERROR_IS_LOCKED:
-          sendMessage(global.translate('bets.timeUpBet'), opts.sender);
+          sendMessage(global.translate('bets.timeUpBet'), opts.sender, opts.attr);
           break;
         case ERROR_DIFF_BET:
           const result = _.pickBy(currentBet.bets, (v, k) => Object.keys(v).includes(opts.sender.username));
-          sendMessage(global.translate('bets.diffBet').replace(/\$option/g, Object.keys(result)[0]), opts.sender);
+          sendMessage(global.translate('bets.diffBet').replace(/\$option/g, Object.keys(result)[0]), opts.sender, opts.attr);
           break;
         default:
           global.log.warning(e.stack);
-          sendMessage((await prepare('bets.error', { command: opts.command })).replace(/\$maxIndex/g, String(currentBet.options.length - 1)), opts.sender);
+          sendMessage((await prepare('bets.error', { command: opts.command })).replace(/\$maxIndex/g, String(currentBet.options.length - 1)), opts.sender, opts.attr);
       }
     }
   }
@@ -213,15 +228,15 @@ class Bets extends System {
         await global.db.engine.increment('users.points', { id: user.id }, { points: parseInt(user.points, 10) });
       }
       await global.db.engine.remove(this.collection.users, {});
-      sendMessage(global.translate('bets.refund'), opts.sender);
+      sendMessage(global.translate('bets.refund'), opts.sender, opts.attr);
     } catch (e) {
       switch (e.message) {
         case ERROR_NOT_RUNNING:
-          sendMessage(global.translate('bets.notRunning'), opts.sender);
+          sendMessage(global.translate('bets.notRunning'), opts.sender, opts.attr);
           break;
         default:
           global.log.warning(e.stack);
-          sendMessage(global.translate('core.error'), opts.sender);
+          sendMessage(global.translate('core.error'), opts.sender, opts.attr);
       }
     } finally {
       await global.db.engine.remove(this.collection.data, { key: 'bets' });
@@ -259,17 +274,17 @@ class Bets extends System {
     } catch (e) {
       switch (e.message) {
         case ERROR_NOT_ENOUGH_OPTIONS:
-          sendMessage(global.translate('bets.closeNotEnoughOptions'), opts.sender);
+          sendMessage(global.translate('bets.closeNotEnoughOptions'), opts.sender, opts.attr);
           break;
         case ERROR_NOT_RUNNING:
-          sendMessage(global.translate('bets.notRunning'), opts.sender);
+          sendMessage(global.translate('bets.notRunning'), opts.sender, opts.attr);
           break;
         case ERROR_NOT_OPTION:
-          sendMessage(await prepare('bets.notOption', { command: opts.command }), opts.sender);
+          sendMessage(await prepare('bets.notOption', { command: opts.command }), opts.sender, opts.attr);
           break;
         default:
           global.log.warning(e.stack);
-          sendMessage(global.translate('core.error'), opts.sender);
+          sendMessage(global.translate('core.error'), opts.sender, opts.attr);
       }
     }
   }

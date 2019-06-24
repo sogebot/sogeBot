@@ -38,14 +38,14 @@ class Cooldown extends System {
 
     if (_.isNil(match)) {
       let message = await prepare('cooldowns.cooldown-parse-failed');
-      sendMessage(message, opts.sender);
+      sendMessage(message, opts.sender, opts.attr);
       return false;
     }
 
     if (parseInt(match.seconds, 10) === 0) {
       await global.db.engine.remove(this.collection.data, { key: match.command, type: match.type });
       let message = await prepare('cooldowns.cooldown-was-unset', { type: match.type, command: match.command });
-      sendMessage(message, opts.sender);
+      sendMessage(message, opts.sender, opts.attr);
       return;
     }
 
@@ -54,7 +54,7 @@ class Cooldown extends System {
     else {await global.db.engine.update(this.collection.data, { key: match.command, type: match.type }, { miliseconds: parseInt(match.seconds, 10) * 1000 });}
 
     let message = await prepare('cooldowns.cooldown-was-set', { seconds: match.seconds, type: match.type, command: match.command });
-    sendMessage(message, opts.sender);
+    sendMessage(message, opts.sender, opts.attr);
   }
 
   @parser({ priority: constants.HIGH })
@@ -165,12 +165,12 @@ class Cooldown extends System {
         if (!cooldown.quiet && this.cooldownNotifyAsWhisper) {
           opts.sender['message-type'] = 'whisper'; // we want to whisp cooldown message
           let message = await prepare('cooldowns.cooldown-triggered', { command: cooldown.key, seconds: Math.ceil((cooldown.miliseconds - now + timestamp) / 1000) });
-          await sendMessage(message, opts.sender);
+          await sendMessage(message, opts.sender, opts.attr);
         }
         if (!cooldown.quiet && this.cooldownNotifyAsChat) {
           opts.sender['message-type'] = 'chat';
           let message = await prepare('cooldowns.cooldown-triggered', { command: cooldown.key, seconds: Math.ceil((cooldown.miliseconds - now + timestamp) / 1000) });
-          await sendMessage(message, opts.sender);
+          await sendMessage(message, opts.sender, opts.attr);
         }
         result = false;
         break; // disable _.each and updateQueue with false
@@ -282,14 +282,14 @@ class Cooldown extends System {
 
     if (_.isNil(match)) {
       let message = await prepare('cooldowns.cooldown-parse-failed');
-      sendMessage(message, opts.sender);
+      sendMessage(message, opts.sender, opts.attr);
       return false;
     }
 
     const cooldown = await global.db.engine.findOne(this.collection.data, { key: match.command, type: match.type });
     if (_.isEmpty(cooldown)) {
       let message = await prepare('cooldowns.cooldown-not-found', { command: match.command });
-      sendMessage(message, opts.sender);
+      sendMessage(message, opts.sender, opts.attr);
       return false;
     }
 
@@ -310,7 +310,7 @@ class Cooldown extends System {
     if (type === 'quiet' || type === 'type') {return;} // those two are setable only from dashboard
 
     let message = await prepare(`cooldowns.cooldown-was-${status}${path}`, { command: cooldown.key });
-    sendMessage(message, opts.sender);
+    sendMessage(message, opts.sender, opts.attr);
   }
 
   @command('!cooldown toggle enabled')

@@ -30,7 +30,7 @@ class Ranks extends System {
 
     if (_.isNil(parsed)) {
       let message = await prepare('ranks.rank-parse-failed');
-      sendMessage(message, opts.sender);
+      sendMessage(message, opts.sender, opts.attr);
       return false;
     }
 
@@ -43,7 +43,7 @@ class Ranks extends System {
     if (ranks.length === 0) { global.db.engine.insert(this.collection.data, values); }
 
     let message = await prepare(ranks.length === 0 ? 'ranks.rank-was-added' : 'ranks.ranks-already-exist', { rank: values.value, hours: values.hours });
-    sendMessage(message, opts.sender);
+    sendMessage(message, opts.sender, opts.attr);
   }
 
   @command('!rank edit')
@@ -53,7 +53,7 @@ class Ranks extends System {
 
     if (_.isNil(parsed)) {
       let message = await prepare('ranks.rank-parse-failed');
-      sendMessage(message, opts.sender);
+      sendMessage(message, opts.sender, opts.attr);
       return false;
     }
 
@@ -63,13 +63,13 @@ class Ranks extends System {
     let item = await global.db.engine.findOne(this.collection.data, { hours: parseInt(hours, 10) });
     if (_.isEmpty(item)) {
       let message = await prepare('ranks.rank-was-not-found', { hours: hours });
-      sendMessage(message, opts.sender);
+      sendMessage(message, opts.sender, opts.attr);
       return false;
     }
 
     await global.db.engine.update(this.collection.data, { hours: parseInt(hours, 10) }, { value: rank });
     let message = await prepare('ranks.rank-was-edited', { hours: parseInt(hours, 10), rank: rank });
-    sendMessage(message, opts.sender);
+    sendMessage(message, opts.sender, opts.attr);
   }
 
   @command('!rank set')
@@ -79,14 +79,14 @@ class Ranks extends System {
 
     if (_.isNil(parsed)) {
       let message = await prepare('ranks.rank-parse-failed');
-      sendMessage(message, opts.sender);
+      sendMessage(message, opts.sender, opts.attr);
       return false;
     }
 
     global.users.set(parsed[1], { custom: { rank: parsed[2].trim() } });
 
     let message = await prepare('ranks.custom-rank-was-set-to-user', { rank: parsed[2].trim(), username: parsed[1] });
-    sendMessage(message, opts.sender);
+    sendMessage(message, opts.sender, opts.attr);
   }
 
   @command('!rank unset')
@@ -96,19 +96,19 @@ class Ranks extends System {
 
     if (_.isNil(parsed)) {
       let message = await prepare('ranks.rank-parse-failed');
-      sendMessage(message, opts.sender);
+      sendMessage(message, opts.sender, opts.attr);
       return false;
     }
 
     global.users.set(parsed[1], { custom: { rank: null } });
     let message = await prepare('ranks.custom-rank-was-unset-for-user', { username: parsed[1] });
-    sendMessage(message, opts.sender);
+    sendMessage(message, opts.sender, opts.attr);
   }
 
   @command('!rank help')
   @default_permission(permission.CASTERS)
   help (opts) {
-    sendMessage(global.translate('core.usage') + ': !rank add <hours> <rank> | !rank edit <hours> <rank> | !rank remove <hour> | !rank list | !rank set <username> <rank> | !rank unset <username>', opts.sender);
+    sendMessage(global.translate('core.usage') + ': !rank add <hours> <rank> | !rank edit <hours> <rank> | !rank remove <hour> | !rank list | !rank set <username> <rank> | !rank unset <username>', opts.sender, opts.attr);
   }
 
   @command('!rank list')
@@ -116,7 +116,7 @@ class Ranks extends System {
   async list (opts) {
     let ranks = await global.db.engine.find(this.collection.data);
     var output = await prepare(ranks.length === 0 ? 'ranks.list-is-empty' : 'ranks.list-is-not-empty', { list: _.map(_.orderBy(ranks, 'hours', 'asc'), function (l) { return l.hours + 'h - ' + l.value; }).join(', ') });
-    sendMessage(output, opts.sender);
+    sendMessage(output, opts.sender, opts.attr);
   }
 
   @command('!rank remove')
@@ -125,7 +125,7 @@ class Ranks extends System {
     const parsed = opts.parameters.match(/^(\d+)$/);
     if (_.isNil(parsed)) {
       let message = await prepare('ranks.rank-parse-failed');
-      sendMessage(message, opts.sender);
+      sendMessage(message, opts.sender, opts.attr);
       return false;
     }
 
@@ -133,7 +133,7 @@ class Ranks extends System {
     const removed = await global.db.engine.remove(this.collection.data, { hours: hours });
 
     let message = await prepare(removed ? 'ranks.rank-was-removed' : 'ranks.rank-was-not-found', { hours: hours });
-    sendMessage(message, opts.sender);
+    sendMessage(message, opts.sender, opts.attr);
   }
 
   @command('!rank')
@@ -154,7 +154,7 @@ class Ranks extends System {
 
     if (_.isNil(rank)) {
       let message = await prepare('ranks.user-dont-have-rank');
-      sendMessage(message, opts.sender);
+      sendMessage(message, opts.sender, opts.attr);
       return true;
     }
 
@@ -164,12 +164,12 @@ class Ranks extends System {
       let toWatch = (toNextRank - toNextRankWatched);
       let percentage = 100 - (((toWatch) / toNextRank) * 100);
       let message = await prepare('ranks.show-rank-with-next-rank', { rank: rank, nextrank: `${nextRank.value} ${percentage.toFixed(1)}% (${toWatch.toFixed(1)}h)` });
-      sendMessage(message, opts.sender);
+      sendMessage(message, opts.sender, opts.attr);
       return true;
     }
 
     let message = await prepare('ranks.show-rank-without-next-rank', { rank: rank });
-    sendMessage(message, opts.sender);
+    sendMessage(message, opts.sender, opts.attr);
   }
 
   async get (user) {

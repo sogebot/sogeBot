@@ -96,7 +96,7 @@ class General extends Core {
     const pointer = splitted.shift();
     let newValue = splitted.join(' ');
     if (!pointer) {
-      return sendMessage(`$sender, settings does not exists`, opts.sender);
+      return sendMessage(`$sender, settings does not exists`, opts.sender, opts.attr);
     }
     const currentValue = await get(global, pointer, undefined);
     if (typeof currentValue !== 'undefined') {
@@ -104,25 +104,25 @@ class General extends Core {
         newValue = newValue.toLowerCase().trim();
         if (['true', 'false'].includes(newValue)) {
           set(global, pointer, newValue === 'true');
-          sendMessage(`$sender, ${pointer} set to ${newValue}`, opts.sender);
+          sendMessage(`$sender, ${pointer} set to ${newValue}`, opts.sender, opts.attr);
         } else {
-          sendMessage('$sender, !set error: bool is expected', opts.sender);
+          sendMessage('$sender, !set error: bool is expected', opts.sender, opts.attr);
         }
       } else if (isNumber(currentValue)) {
         if (isFinite(Number(newValue))) {
           set(global, pointer, Number(newValue));
-          sendMessage(`$sender, ${pointer} set to ${newValue}`, opts.sender);
+          sendMessage(`$sender, ${pointer} set to ${newValue}`, opts.sender, opts.attr);
         } else {
-          sendMessage('$sender, !set error: number is expected', opts.sender);
+          sendMessage('$sender, !set error: number is expected', opts.sender, opts.attr);
         }
       } else if (isString(currentValue)) {
         set(global, pointer, newValue);
-        sendMessage(`$sender, ${pointer} set to '${newValue}'`, opts.sender);
+        sendMessage(`$sender, ${pointer} set to '${newValue}'`, opts.sender, opts.attr);
       } else {
-        sendMessage(`$sender, ${pointer} is not supported settings to change`, opts.sender);
+        sendMessage(`$sender, ${pointer} is not supported settings to change`, opts.sender, opts.attr);
       }
     } else {
-      sendMessage(`$sender, ${pointer} settings not exists`, opts.sender);
+      sendMessage(`$sender, ${pointer} settings not exists`, opts.sender, opts.attr);
     }
   }
 

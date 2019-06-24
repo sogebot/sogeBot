@@ -93,7 +93,7 @@ class Points extends System {
   }
 
   @parser({ fireAndForget: true })
-  async messagePoints (opts) {
+  async messagePoints (opts: ParserOptions) {
     if (opts.skip || opts.message.startsWith('!')) {return true;}
 
     let [perMessageInterval, messageInterval, perMessageOfflineInterval, messageOfflineInterval, isOnline] = await Promise.all([
@@ -149,7 +149,7 @@ class Points extends System {
 
   @command('!points set')
   @default_permission(permission.CASTERS)
-  async set (opts) {
+  async set (opts: CommandOptions) {
     try {
       const [username, points] = new Expects(opts.parameters).username().points({ all: false }).toArray();
 
@@ -164,17 +164,17 @@ class Points extends System {
           username,
           pointsName: await this.getPointsName(points)
         });
-        sendMessage(message, opts.sender);
+        sendMessage(message, opts.sender, opts.attr);
       } else {
         throw new Error('User doesn\'t have ID');
       }
     } catch (err) {
-      sendMessage(global.translate('points.failed.set').replace('$command', opts.command), opts.sender);
+      sendMessage(global.translate('points.failed.set').replace('$command', opts.command), opts.sender, opts.attr);
     }
   }
 
   @command('!points give')
-  async give (opts) {
+  async give (opts: CommandOptions) {
     try {
       const [username, points] = new Expects(opts.parameters).username().points({ all: true }).toArray();
       if (opts.sender.username.toLowerCase() === username.toLowerCase()) {return;}
@@ -190,7 +190,7 @@ class Points extends System {
           username,
           pointsName: await this.getPointsName(points)
         });
-        sendMessage(message, opts.sender);
+        sendMessage(message, opts.sender, opts.attr);
       } else if (points === 'all') {
         await global.db.engine.update('users.points', { id: opts.sender.userId }, { points: 0 });
         await global.db.engine.increment('users.points', { id: guser.id }, { points: availablePoints });
@@ -199,7 +199,7 @@ class Points extends System {
           username,
           pointsName: await this.getPointsName(availablePoints)
         });
-        sendMessage(message, opts.sender);
+        sendMessage(message, opts.sender, opts.attr);
       } else {
         await global.db.engine.increment('users.points', { id: opts.sender.userId }, { points: (parseInt(points, 10) * -1) });
         await global.db.engine.increment('users.points', { id: guser.id }, { points: parseInt(points, 10) });
@@ -208,10 +208,10 @@ class Points extends System {
           username,
           pointsName: await this.getPointsName(points)
         });
-        sendMessage(message, opts.sender);
+        sendMessage(message, opts.sender, opts.attr);
       }
     } catch (err) {
-      sendMessage(global.translate('points.failed.give').replace('$command', opts.command), opts.sender);
+      sendMessage(global.translate('points.failed.give').replace('$command', opts.command), opts.sender, opts.attr);
     }
   }
 
@@ -263,7 +263,7 @@ class Points extends System {
 
   @command('!points get')
   @default_permission(permission.CASTERS)
-  async get (opts) {
+  async get (opts: CommandOptions) {
     try {
       const [username] = new Expects(opts.parameters).username({ optional: true, default: opts.sender.username }).toArray();
       const user = await global.users.getByName(username);
@@ -276,15 +276,15 @@ class Points extends System {
         username: username,
         pointsName: await this.getPointsName(points)
       });
-      sendMessage(message, opts.sender);
+      sendMessage(message, opts.sender, opts.attr);
     } catch (err) {
-      sendMessage(global.translate('points.failed.get').replace('$command', opts.command), opts.sender);
+      sendMessage(global.translate('points.failed.get').replace('$command', opts.command), opts.sender, opts.attr);
     }
   }
 
   @command('!points all')
   @default_permission(permission.CASTERS)
-  async all (opts) {
+  async all (opts: CommandOptions) {
     try {
       const points = new Expects(opts.parameters).points({ all: false }).toArray();
 
@@ -301,15 +301,15 @@ class Points extends System {
         amount: points,
         pointsName: await this.getPointsName(points)
       });
-      sendMessage(message, opts.sender);
+      sendMessage(message, opts.sender, opts.attr);
     } catch (err) {
-      sendMessage(global.translate('points.failed.all').replace('$command', opts.command), opts.sender);
+      sendMessage(global.translate('points.failed.all').replace('$command', opts.command), opts.sender, opts.attr);
     }
   }
 
   @command('!makeitrain')
   @default_permission(permission.CASTERS)
-  async rain (opts) {
+  async rain (opts: CommandOptions) {
     try {
       const points = new Expects(opts.parameters).points({ all: false }).toArray();
 
@@ -326,15 +326,15 @@ class Points extends System {
         amount: points,
         pointsName: await this.getPointsName(points)
       });
-      sendMessage(message, opts.sender);
+      sendMessage(message, opts.sender, opts.attr);
     } catch (err) {
-      sendMessage(global.translate('points.failed.rain').replace('$command', opts.command), opts.sender);
+      sendMessage(global.translate('points.failed.rain').replace('$command', opts.command), opts.sender, opts.attr);
     }
   }
 
   @command('!points add')
   @default_permission(permission.CASTERS)
-  async add (opts) {
+  async add (opts: CommandOptions) {
     try {
       const [username, points] = new Expects(opts.parameters).username().points({ all: false }).toArray();
       let user = await global.db.engine.findOne('users', { username });
@@ -352,15 +352,15 @@ class Points extends System {
         username: username,
         pointsName: await this.getPointsName(points)
       });
-      sendMessage(message, opts.sender);
+      sendMessage(message, opts.sender, opts.attr);
     } catch (err) {
-      sendMessage(global.translate('points.failed.add').replace('$command', opts.command), opts.sender);
+      sendMessage(global.translate('points.failed.add').replace('$command', opts.command), opts.sender, opts.attr);
     }
   }
 
   @command('!points remove')
   @default_permission(permission.CASTERS)
-  async remove (opts) {
+  async remove (opts: CommandOptions) {
     try {
       const [username, points] = new Expects(opts.parameters).username().points({ all: true }).toArray();
       let user = await global.db.engine.findOne('users', { username });
@@ -380,17 +380,17 @@ class Points extends System {
           username: username,
           pointsName: await this.getPointsName(points === 'all' ? 0 : points)
         });
-        sendMessage(message, opts.sender);
+        sendMessage(message, opts.sender, opts.attr);
       } else {
         throw new Error('User doesn\'t have ID');
       }
     } catch (err) {
-      sendMessage(global.translate('points.failed.remove').replace('$command', opts.command), opts.sender);
+      sendMessage(global.translate('points.failed.remove').replace('$command', opts.command), opts.sender, opts.attr);
     }
   }
 
   @command('!points')
-  main (opts) {
+  main (opts: CommandOptions) {
     this.get(opts);
   }
 }

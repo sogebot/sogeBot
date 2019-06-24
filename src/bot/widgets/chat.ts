@@ -14,8 +14,16 @@ class Chat extends Widget {
       return setTimeout(() => this.sockets(), 100);
     }
     this.socket.on('connection', (socket) => {
-      socket.on('chat.message.send', (message) => {
-        sendMessage(message, { username: global.oauth.botUsername }, { force: true });
+      socket.on('chat.message.send', async (message) => {
+        const userObj = await global.users.getByName(global.oauth.botUsername);
+        sendMessage(message, {
+          username: userObj.username,
+          displayName: userObj.displayName || userObj.username,
+          userId: userObj.id,
+          emotes: [],
+          badges: {},
+          'message-type': 'chat'
+        }, { force: true });
       });
 
       socket.on('room', (cb) => {

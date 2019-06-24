@@ -113,16 +113,16 @@ class Timers extends System {
       this.getCommand('!timers toggle'),
       this.getCommand('!timers list')
     ];
-    sendMessage('╔ ' + global.translate('core.usage'), opts.sender);
-    sendMessage(`║ ${main} - gets an info about timers usage`, opts.sender);
-    sendMessage(`║ ${set} -name [name-of-timer] -messages [num-of-msgs-to-trigger|default:0] -seconds [trigger-every-x-seconds|default:60] - add new timer`, opts.sender);
-    sendMessage(`║ ${unset} -name [name-of-timer] - remove timer`, opts.sender);
-    sendMessage(`║ ${add} -name [name-of-timer] -response '[response]' - add new response to timer`, opts.sender);
-    sendMessage(`║ ${rm} -id [response-id] - remove response by id`, opts.sender);
-    sendMessage(`║ ${toggle} -name [name-of-timer] - enable/disable timer by name`, opts.sender);
-    sendMessage(`║ ${toggle} -id [id-of-response] - enable/disable response by id`, opts.sender);
-    sendMessage(`║ ${list} - get timers list`, opts.sender);
-    sendMessage(`╚ ${list} -name [name-of-timer] - get list of responses on timer`, opts.sender);
+    sendMessage('╔ ' + global.translate('core.usage'), opts.sender, opts.attr);
+    sendMessage(`║ ${main} - gets an info about timers usage`, opts.sender, opts.attr);
+    sendMessage(`║ ${set} -name [name-of-timer] -messages [num-of-msgs-to-trigger|default:0] -seconds [trigger-every-x-seconds|default:60] - add new timer`, opts.sender, opts.attr);
+    sendMessage(`║ ${unset} -name [name-of-timer] - remove timer`, opts.sender, opts.attr);
+    sendMessage(`║ ${add} -name [name-of-timer] -response '[response]' - add new response to timer`, opts.sender, opts.attr);
+    sendMessage(`║ ${rm} -id [response-id] - remove response by id`, opts.sender, opts.attr);
+    sendMessage(`║ ${toggle} -name [name-of-timer] - enable/disable timer by name`, opts.sender, opts.attr);
+    sendMessage(`║ ${toggle} -id [id-of-response] - enable/disable response by id`, opts.sender, opts.attr);
+    sendMessage(`║ ${list} - get timers list`, opts.sender, opts.attr);
+    sendMessage(`╚ ${list} -name [name-of-timer] - get list of responses on timer`, opts.sender, opts.attr);
   }
 
   async init () {
@@ -143,7 +143,15 @@ class Timers extends System {
       let response = _.orderBy(responses, 'timestamp', 'asc')[0];
 
       if (!_.isNil(response)) {
-        sendMessage(response.response, getOwner());
+        const userObj = await global.users.getByName(getOwner());
+        sendMessage(response.response, {
+          username: userObj.username,
+          displayName: userObj.displayName || userObj.username,
+          userId: userObj.id,
+          emotes: [],
+          badges: {},
+          'message-type': 'chat'
+        });
         await global.db.engine.update(this.collection.responses, { _id: response._id }, { timestamp: new Date().getTime() });
       }
       await global.db.engine.update(this.collection.data, { _id: timer._id.toString() }, { trigger: { messages: global.linesParsed, timestamp: new Date().getTime() } });
@@ -174,7 +182,7 @@ class Timers extends System {
     let seconds = opts.parameters.match(/-seconds ([0-9]+)/);
 
     if (_.isNil(name)) {
-      sendMessage(global.translate('timers.name-must-be-defined'), opts.sender);
+      sendMessage(global.translate('timers.name-must-be-defined'), opts.sender, opts.attr);
       return false;
     } else {
       name = name[1];
@@ -184,7 +192,7 @@ class Timers extends System {
     seconds = _.isNil(seconds) ? 60 : parseInt(seconds[1], 10);
 
     if (messages === 0 && seconds === 0) {
-      sendMessage(global.translate('timers.cannot-set-messages-and-seconds-0'), opts.sender);
+      sendMessage(global.translate('timers.cannot-set-messages-and-seconds-0'), opts.sender, opts.attr);
       return false;
     }
     await global.db.engine.update(this.collection.data, { name: name }, { name: name, messages: messages, seconds: seconds, enabled: true, trigger: { messages: global.linesParsed, timestamp: new Date().getTime() } });
@@ -201,7 +209,7 @@ class Timers extends System {
     let name = opts.parameters.match(/-name ([\S]+)/);
 
     if (_.isNil(name)) {
-      sendMessage(global.translate('timers.name-must-be-defined'), opts.sender);
+      sendMessage(global.translate('timers.name-must-be-defined'), opts.sender, opts.attr);
       return false;
     } else {
       name = name[1];
@@ -209,7 +217,7 @@ class Timers extends System {
 
     let timer = await global.db.engine.findOne(this.collection.data, { name: name });
     if (_.isEmpty(timer)) {
-      sendMessage(global.translate('timers.timer-not-found').replace(/\$name/g, name), opts.sender);
+      sendMessage(global.translate('timers.timer-not-found').replace(/\$name/g, name), opts.sender, opts.attr);
       return false;
     }
 
@@ -226,7 +234,7 @@ class Timers extends System {
     let id = opts.parameters.match(/-id ([a-zA-Z0-9]+)/);
 
     if (_.isNil(id)) {
-      sendMessage(global.translate('timers.id-must-be-defined'), opts.sender);
+      sendMessage(global.translate('timers.id-must-be-defined'), opts.sender, opts.attr);
       return false;
     } else {
       id = id[1];
@@ -245,14 +253,14 @@ class Timers extends System {
     let response = opts.parameters.match(/-response ['"](.+)['"]/);
 
     if (_.isNil(name)) {
-      sendMessage(global.translate('timers.name-must-be-defined'), opts.sender);
+      sendMessage(global.translate('timers.name-must-be-defined'), opts.sender, opts.attr);
       return false;
     } else {
       name = name[1];
     }
 
     if (_.isNil(response)) {
-      sendMessage(global.translate('timers.response-must-be-defined'), opts.sender);
+      sendMessage(global.translate('timers.response-must-be-defined'), opts.sender, opts.attr);
       return false;
     } else {
       response = response[1];
@@ -279,7 +287,7 @@ class Timers extends System {
 
     if (_.isNil(name)) {
       let timers = await global.db.engine.find(this.collection.data);
-      sendMessage(global.translate('timers.timers-list').replace(/\$list/g, _.map(_.orderBy(timers, 'name'), (o) => (o.enabled ? '⚫' : '⚪') + ' ' + o.name).join(', ')), opts.sender);
+      sendMessage(global.translate('timers.timers-list').replace(/\$list/g, _.map(_.orderBy(timers, 'name'), (o) => (o.enabled ? '⚫' : '⚪') + ' ' + o.name).join(', ')), opts.sender, opts.attr);
       return true;
     } else { name = name[1]; }
 
@@ -291,8 +299,8 @@ class Timers extends System {
     }
 
     let responses = await global.db.engine.find(this.collection.responses, { timerId: timer._id.toString() });
-    await sendMessage(global.translate('timers.responses-list').replace(/\$name/g, name), opts.sender);
-    for (let response of responses) {await sendMessage((response.enabled ? '⚫ ' : '⚪ ') + `${response._id} - ${response.response}`, opts.sender);}
+    await sendMessage(global.translate('timers.responses-list').replace(/\$name/g, name), opts.sender, opts.attr);
+    for (let response of responses) {await sendMessage((response.enabled ? '⚫ ' : '⚪ ') + `${response._id} - ${response.response}`, opts.sender, opts.attr);}
     return true;
   }
 
@@ -304,7 +312,7 @@ class Timers extends System {
     let name = opts.parameters.match(/-name ([\S]+)/);
 
     if ((_.isNil(id) && _.isNil(name)) || (!_.isNil(id) && !_.isNil(name))) {
-      sendMessage(global.translate('timers.id-or-name-must-be-defined'), opts.sender);
+      sendMessage(global.translate('timers.id-or-name-must-be-defined'), opts.sender, opts.attr);
       return false;
     }
 
@@ -312,7 +320,7 @@ class Timers extends System {
       id = id[1];
       let response = await global.db.engine.findOne(this.collection.responses, { _id: id });
       if (_.isEmpty(response)) {
-        sendMessage(global.translate('timers.response-not-found').replace(/\$id/g, id), opts.sender);
+        sendMessage(global.translate('timers.response-not-found').replace(/\$id/g, id), opts.sender, opts.attr);
         return false;
       }
 
@@ -326,7 +334,7 @@ class Timers extends System {
       name = name[1];
       let timer = await global.db.engine.findOne(this.collection.data, { name: name });
       if (_.isEmpty(timer)) {
-        sendMessage(global.translate('timers.timer-not-found').replace(/\$name/g, name), opts.sender);
+        sendMessage(global.translate('timers.timer-not-found').replace(/\$name/g, name), opts.sender, opts.attr);
         return false;
       }
 

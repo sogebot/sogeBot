@@ -116,8 +116,16 @@ class Heist extends Game {
         return; // don't do anything if there is no level
       }
 
+      const userObj = await global.users.getByName(getOwner());
       if (users.length === 0) {
-        sendMessage(this.noUser, getOwner());
+        sendMessage(this.noUser, {
+          username: userObj.username,
+          displayName: userObj.displayName || userObj.username,
+          userId: userObj.id,
+          emotes: [],
+          badges: {},
+          'message-type': 'chat'
+        });
         // cleanup
         this.startedAt = null;
         await global.db.engine.remove(this.collection.users, {});
@@ -125,14 +133,28 @@ class Heist extends Game {
         return;
       }
 
-      sendMessage(started.replace('$bank', level.name), getOwner());
+      sendMessage(started.replace('$bank', level.name), {
+        username: userObj.username,
+        displayName: userObj.displayName || userObj.username,
+        userId: userObj.id,
+        emotes: [],
+        badges: {},
+        'message-type': 'chat'
+      });
 
       if (users.length === 1) {
         // only one user
         let isSurvivor = _.random(0, 100, false) <= level['winPercentage'];
         let user = users[0];
         let outcome = isSurvivor ? this.singleUserSuccess : this.singleUserFailed;
-        global.setTimeout(async () => { sendMessage(outcome.replace('$user', (global.tmi.showWithAt ? '@' : '') + user.username), getOwner()); }, 5000);
+        global.setTimeout(async () => { sendMessage(outcome.replace('$user', (global.tmi.showWithAt ? '@' : '') + user.username), {
+          username: userObj.username,
+          displayName: userObj.displayName || userObj.username,
+          userId: userObj.id,
+          emotes: [],
+          badges: {},
+          'message-type': 'chat'
+        }); }, 5000);
 
         if (isSurvivor) {
           // add points to user
@@ -154,7 +176,14 @@ class Heist extends Game {
         let percentage = (100 / users.length) * winners.length;
         let ordered = _.orderBy(this.results, [(o) => o.percentage], 'asc');
         let result = _.find(ordered, (o) => o.percentage >= percentage);
-        global.setTimeout(async () => { sendMessage(_.isNil(result) ? '' : result.message, getOwner()); }, 5000);
+        global.setTimeout(async () => { sendMessage(_.isNil(result) ? '' : result.message, {
+          username: userObj.username,
+          displayName: userObj.displayName || userObj.username,
+          userId: userObj.id,
+          emotes: [],
+          badges: {},
+          'message-type': 'chat'
+        }); }, 5000);
         if (winners.length > 0) {
           global.setTimeout(async () => {
             const chunk: string[][] = _.chunk(winners, this.showMaxUsers);
@@ -164,7 +193,14 @@ class Heist extends Game {
             let message = await global.translate('games.heist.results');
             message = message.replace('$users', winnersList.map((o) => (global.tmi.showWithAt ? '@' : '') + o).join(', '));
             if (andXMore > 0) {message = message + ' ' + (await global.translate('games.heist.andXMore')).replace('$count', andXMore);}
-            sendMessage(message, getOwner());
+            sendMessage(message, {
+              username: userObj.username,
+              displayName: userObj.displayName || userObj.username,
+              userId: userObj.id,
+              emotes: [],
+              badges: {},
+              'message-type': 'chat'
+            });
           }, 5500);
         }
       }
@@ -178,7 +214,15 @@ class Heist extends Game {
     // check if cops done patrolling
     if (lastHeistTimestamp !== 0 && _.now() - lastHeistTimestamp >= copsCooldown * 60000) {
       this.lastHeistTimestamp = 0;
-      sendMessage((this.copsCooldown), getOwner());
+      const userObj = await global.users.getByName(getOwner());
+      sendMessage((this.copsCooldown), {
+        username: userObj.username,
+        displayName: userObj.displayName || userObj.username,
+        userId: userObj.id,
+        emotes: [],
+        badges: {},
+        'message-type': 'chat'
+      });
     }
     this.timeouts['iCheckFinished'] = global.setTimeout(() => this.iCheckFinished(), 10000);
   }
@@ -201,7 +245,7 @@ class Heist extends Game {
         this.lastAnnouncedCops = _.now();
         sendMessage(
           (this.copsOnPatrol)
-            .replace('$cooldown', minutesLeft + ' ' + getLocalizedName(minutesLeft, 'core.minutes')), opts.sender);
+            .replace('$cooldown', minutesLeft + ' ' + getLocalizedName(minutesLeft, 'core.minutes')), opts.sender, opts.attr);
       }
       return;
     }
@@ -221,7 +265,7 @@ class Heist extends Game {
     if (!newHeist && _.now() - this.startedAt > entryCooldown * 1000 && _.now() - (this.lastAnnouncedHeistInProgress) >= 60000) {
       this.lastAnnouncedHeistInProgress = _.now();
       sendMessage(
-        (await global.translate('games.heist.lateEntryMessage')).replace('$command', opts.command), opts.sender);
+        (await global.translate('games.heist.lateEntryMessage')).replace('$command', opts.command), opts.sender, opts.attr);
       return;
     }
 
@@ -231,7 +275,7 @@ class Heist extends Game {
     } catch (e) {
       if (!newHeist) {
         sendMessage(
-          (await global.translate('games.heist.entryInstruction')).replace('$command', opts.command), opts.sender);
+          (await global.translate('games.heist.entryInstruction')).replace('$command', opts.command), opts.sender, opts.attr);
         global.log.warning(`${opts.command} ${e.message}`);
       }
       return;
@@ -242,7 +286,7 @@ class Heist extends Game {
 
     if (points === 0 || _.isNil(points) || _.isNaN(points)) {
       sendMessage(
-        (await global.translate('games.heist.entryInstruction')).replace('$command', opts.command), opts.sender);
+        (await global.translate('games.heist.entryInstruction')).replace('$command', opts.command), opts.sender, opts.attr);
       return;
     } // send entryInstruction if command is not ok
 
@@ -268,10 +312,10 @@ class Heist extends Game {
         if (nextLevel) {
           sendMessage(this.nextLevelMessage
             .replace('$bank', level.name)
-            .replace('$nextBank', nextLevel.name), opts.sender);
+            .replace('$nextBank', nextLevel.name), opts.sender, opts.attr);
         } else {
           sendMessage(this.maxLevelMessage
-            .replace('$bank', level.name), opts.sender);
+            .replace('$bank', level.name), opts.sender, opts.attr);
         }
       }
     }

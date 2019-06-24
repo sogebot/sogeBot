@@ -113,7 +113,7 @@ class Highlights extends System {
       switch (e.message) {
         case ERROR_STREAM_NOT_ONLINE:
           global.log.error('Cannot highlight - stream offline');
-          sendMessage(global.translate('highlights.offline'), opts.sender);
+          sendMessage(global.translate('highlights.offline'), opts.sender, opts.attr);
           break;
         case ERROR_MISSING_TOKEN:
           global.log.error('Cannot highlight - missing token');
@@ -142,7 +142,7 @@ class Highlights extends System {
     const latestStreamId = sortedHighlights.length > 0 ? sortedHighlights[0].id : null;
 
     if (isNil(latestStreamId)) {
-      sendMessage(global.translate('highlights.list.empty'), opts.sender);
+      sendMessage(global.translate('highlights.list.empty'), opts.sender, opts.attr);
       return;
     }
     highlights = highlights.filter((o) => o.id === latestStreamId);

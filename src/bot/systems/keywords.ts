@@ -31,26 +31,26 @@ class Keywords extends System {
 
     if (_.isNil(match)) {
       let message = await prepare('keywords.keyword-parse-failed');
-      sendMessage(message, opts.sender);
+      sendMessage(message, opts.sender, opts.attr);
       return false;
     }
 
     let item = await global.db.engine.findOne(this.collection.data, { keyword: match.keyword });
     if (_.isEmpty(item)) {
       let message = await prepare('keywords.keyword-was-not-found', { keyword: match.keyword });
-      sendMessage(message, opts.sender);
+      sendMessage(message, opts.sender, opts.attr);
       return false;
     }
 
     await global.db.engine.update(this.collection.data, { keyword: match.keyword }, { response: match.response });
     let message = await prepare('keywords.keyword-was-edited', { keyword: match.keyword, response: match.response });
-    sendMessage(message, opts.sender);
+    sendMessage(message, opts.sender, opts.attr);
   }
 
   @command('!keyword')
   @default_permission(permission.CASTERS)
   main (opts) {
-    sendMessage(global.translate('core.usage') + ': !keyword add <keyword> <response> | !keyword edit <keyword> <response> | !keyword remove <keyword> | !keyword list', opts.sender);
+    sendMessage(global.translate('core.usage') + ': !keyword add <keyword> <response> | !keyword edit <keyword> <response> | !keyword remove <keyword> | !keyword list', opts.sender, opts.attr);
   }
 
   @command('!keyword add')
@@ -60,7 +60,7 @@ class Keywords extends System {
 
     if (_.isNil(match)) {
       let message = await prepare('keywords.keyword-parse-failed');
-      sendMessage(message, opts.sender);
+      sendMessage(message, opts.sender, opts.attr);
       return false;
     }
 
@@ -69,13 +69,13 @@ class Keywords extends System {
 
     if (!_.isEmpty(await global.db.engine.findOne(this.collection.data, { keyword: match.keyword }))) {
       let message = await prepare('keywords.keyword-already-exist', { keyword: match.keyword });
-      sendMessage(message, opts.sender);
+      sendMessage(message, opts.sender, opts.attr);
       return false;
     }
 
     await global.db.engine.update(this.collection.data, { keyword: match.keyword }, keyword);
     let message = await prepare('keywords.keyword-was-added', { keyword: match.keyword });
-    sendMessage(message, opts.sender);
+    sendMessage(message, opts.sender, opts.attr);
   }
 
   @parser()
@@ -87,7 +87,7 @@ class Keywords extends System {
     for (let keyword of keywords) {
       if (!keyword.enabled) {continue;}
       let message = await new Message(keyword.response).parse({ sender: opts.sender.username });
-      sendMessage(message, opts.sender);
+      sendMessage(message, opts.sender, opts.attr);
     }
     return true;
   }
@@ -97,7 +97,7 @@ class Keywords extends System {
   async list (opts) {
     let keywords = await global.db.engine.find(this.collection.data);
     var output = (keywords.length === 0 ? global.translate('keywords.list-is-empty') : global.translate('keywords.list-is-not-empty').replace(/\$list/g, _.map(_.orderBy(keywords, 'keyword'), 'keyword').join(', ')));
-    sendMessage(output, opts.sender);
+    sendMessage(output, opts.sender, opts.attr);
   }
 
   @command('!keyword toggle')
@@ -105,7 +105,7 @@ class Keywords extends System {
   async toggle (opts) {
     if (opts.parameters.trim().length === 0) {
       let message = await prepare('keywords.keyword-parse-failed');
-      sendMessage(message, opts.sender);
+      sendMessage(message, opts.sender, opts.attr);
       return false;
     }
     let id = opts.parameters.trim();
@@ -113,14 +113,14 @@ class Keywords extends System {
     const keyword = await global.db.engine.findOne(this.collection.data, { keyword: id });
     if (_.isEmpty(keyword)) {
       let message = await prepare('keywords.keyword-was-not-found', { keyword: id });
-      sendMessage(message, opts.sender);
+      sendMessage(message, opts.sender, opts.attr);
       return;
     }
 
     await global.db.engine.update(this.collection.data, { keyword: id }, { enabled: !keyword.enabled });
 
     let message = await prepare(!keyword.enabled ? 'keywords.keyword-was-enabled' : 'keywords.keyword-was-disabled', { keyword: keyword.keyword });
-    sendMessage(message, opts.sender);
+    sendMessage(message, opts.sender, opts.attr);
   }
 
   @command('!keyword remove')
@@ -128,7 +128,7 @@ class Keywords extends System {
   async remove (opts) {
     if (opts.parameters.trim().length === 0) {
       let message = await prepare('keywords.keyword-parse-failed');
-      sendMessage(message, opts.sender);
+      sendMessage(message, opts.sender, opts.attr);
       return false;
     }
     let id = opts.parameters.trim();
@@ -136,11 +136,11 @@ class Keywords extends System {
     let removed = await global.db.engine.remove(this.collection.data, { keyword: id });
     if (!removed) {
       let message = await prepare('keywords.keyword-was-not-found', { keyword: id });
-      sendMessage(message, opts.sender);
+      sendMessage(message, opts.sender, opts.attr);
       return false;
     }
     let message = await prepare('keywords.keyword-was-removed', { keyword: id });
-    sendMessage(message, opts.sender);
+    sendMessage(message, opts.sender, opts.attr);
   }
 }
 

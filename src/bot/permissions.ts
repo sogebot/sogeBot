@@ -246,11 +246,11 @@ class Permissions extends Core {
   @default_permission(permission.CASTERS)
   protected async list(opts: CommandOptions): Promise<void> {
     const permissions: Permissions.Item[] = _.orderBy(await global.db.engine.find(this.collection.data), 'order', 'asc');
-    sendMessage(prepare('core.permissions.list'), opts.sender);
+    sendMessage(prepare('core.permissions.list'), opts.sender, opts.attr);
     for (let i = 0; i < permissions.length; i++) {
       setTimeout(() => {
         const symbol = permissions[i].isWaterfallAllowed ? '≥' : '=';
-        sendMessage(`${symbol} | ${permissions[i].name} | ${permissions[i].id}`, opts.sender);
+        sendMessage(`${symbol} | ${permissions[i].name} | ${permissions[i].id}`, opts.sender, opts.attr);
       }, 500 * i);
     }
   }

@@ -115,7 +115,15 @@ class Raffles extends System {
       max: raffle.max,
       eligibility: eligibility.join(', ')
     });
-    sendMessage(message, getOwner());
+    const userObj = await global.users.getByName(getOwner());
+    sendMessage(message, {
+      username: userObj.username,
+      displayName: userObj.displayName || userObj.username,
+      userId: userObj.id,
+      emotes: [],
+      badges: {},
+      'message-type': 'chat'
+    });
 
     this.timeouts['raffleAnnounce'] = global.setTimeout(() => this.announce(), 60000);
   }
@@ -156,7 +164,7 @@ class Raffles extends System {
     let keyword = opts.parameters.match(/(![\S]+)/);
     if (_.isNil(keyword)) {
       let message = await prepare('raffles.cannot-create-raffle-without-keyword');
-      sendMessage(message, opts.sender);
+      sendMessage(message, opts.sender, opts.attr);
       return;
     }
     keyword = keyword[1];
@@ -165,7 +173,7 @@ class Raffles extends System {
     let raffle = await global.db.engine.findOne(this.collection.data, { winner: null });
     if (!_.isEmpty(raffle)) {
       let message = await prepare('raffles.raffle-is-already-running', { keyword: raffle.keyword });
-      sendMessage(message, opts.sender);
+      sendMessage(message, opts.sender, opts.attr);
       return;
     }
 
@@ -194,7 +202,15 @@ class Raffles extends System {
       min: minTickets,
       max: maxTickets
     });
-    sendMessage(message, getOwner());
+    const userObj = await global.users.getByName(getOwner());
+    sendMessage(message, {
+      username: userObj.username,
+      displayName: userObj.displayName || userObj.username,
+      userId: userObj.id,
+      emotes: [],
+      badges: {},
+      'message-type': 'chat'
+    });
 
     this.lastAnnounce = _.now();
   }
@@ -205,7 +221,7 @@ class Raffles extends System {
 
     if (_.isEmpty(raffle)) {
       let message = await prepare('raffles.no-raffle-is-currently-running');
-      sendMessage(message, opts.sender);
+      sendMessage(message, opts.sender, opts.attr);
       return;
     }
 
@@ -223,7 +239,15 @@ class Raffles extends System {
       max: raffle.max,
       eligibility: eligibility.join(', ')
     });
-    sendMessage(message, getOwner());
+    const userObj = await global.users.getByName(getOwner());
+    sendMessage(message, {
+      username: userObj.username,
+      displayName: userObj.displayName || userObj.username,
+      userId: userObj.id,
+      emotes: [],
+      badges: {},
+      'message-type': 'chat'
+    });
   }
 
   @parser()
@@ -241,7 +265,7 @@ class Raffles extends System {
 
     if (_.isEmpty(raffle)) { // shouldn't happen, but just to be sure (user can join when closing raffle)
       let message = await prepare('no-raffle-is-currently-running');
-      sendMessage(message, opts.sender);
+      sendMessage(message, opts.sender, opts.attr);
       return false;
     }
 
@@ -297,7 +321,15 @@ class Raffles extends System {
     let participants = await global.db.engine.find(this.collection.participants, { raffle_id: raffle._id.toString(), eligible: true });
     if (participants.length === 0) {
       let message = await prepare('raffles.no-participants-to-pick-winner');
-      sendMessage(message, getOwner());
+      const userObj = await global.users.getByName(getOwner());
+      sendMessage(message, {
+        username: userObj.username,
+        displayName: userObj.displayName || userObj.username,
+        userId: userObj.id,
+        emotes: [],
+        badges: {},
+        'message-type': 'chat'
+      });
       return true;
     }
 
@@ -357,7 +389,15 @@ class Raffles extends System {
       keyword: raffle.keyword,
       probability: _.round(probability, 2)
     });
-    sendMessage(message, getOwner());
+    const userObj = await global.users.getByName(getOwner());
+    sendMessage(message, {
+      username: userObj.username,
+      displayName: userObj.displayName || userObj.username,
+      userId: userObj.id,
+      emotes: [],
+      badges: {},
+      'message-type': 'chat'
+    });
   }
 }
 
