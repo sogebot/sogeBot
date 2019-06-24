@@ -24,7 +24,8 @@ jobs:
   include:
     - stage: eslint
       before_install:
-        - npm install -g typescript eslint @typescript-eslint/parser @typescript-eslint/eslint-plugin
+        - npm install -g mocha typescript
+        - npm install eslint@latest @typescript-eslint/parser@latest @typescript-eslint/eslint-plugin@latest
       install: skip
       os: linux
       before_script: skip
