@@ -184,7 +184,9 @@
           if (this.search.length === 0) return this.commands
           return this.commands.filter((o) => {
             const isSearchInCommand = !_.isNil(o.command.match(new RegExp(this.search, 'ig')))
-            const isSearchInResponse = !_.isNil(o.response.match(new RegExp(this.search, 'ig')))
+            const isSearchInResponse = o.responses.filter(o => {
+              return !_.isNil(o.response.match(new RegExp(this.search, 'ig')))
+            }).length > 0
             return isSearchInCommand || isSearchInResponse
           })
         }
