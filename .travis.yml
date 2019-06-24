@@ -1,6 +1,7 @@
 language: node_js
 before_install:
-  - npm install -g mocha typescript eslint @typescript-eslint/parser @typescript-eslint/eslint-plugin
+  - npm install -g mocha typescript
+  - npm install eslint@latest @typescript-eslint/parser@latest @typescript-eslint/eslint-plugin@latest
   - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then choco install make; fi
 install:
   - travis_wait make ENV=development
