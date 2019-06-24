@@ -143,7 +143,15 @@ class Timers extends System {
       let response = _.orderBy(responses, 'timestamp', 'asc')[0];
 
       if (!_.isNil(response)) {
-        sendMessage(response.response, getOwner());
+        const userObj = await global.users.getByName(getOwner());
+        sendMessage(response.response, {
+          username: userObj.username,
+          displayName: userObj.displayName || userObj.username,
+          userId: userObj.id,
+          emotes: [],
+          badges: {},
+          'message-type': 'chat'
+        });
         await global.db.engine.update(this.collection.responses, { _id: response._id }, { timestamp: new Date().getTime() });
       }
       await global.db.engine.update(this.collection.data, { _id: timer._id.toString() }, { trigger: { messages: global.linesParsed, timestamp: new Date().getTime() } });

@@ -61,6 +61,7 @@ class Polls extends System {
             sender: {
               username: getOwner(),
               displayName: getOwner(),
+              'message-type': 'chat',
               userId: '0',
               emotes: [],
               badges: {
@@ -81,6 +82,7 @@ class Polls extends System {
             sender: {
               username: getOwner(),
               displayName: getOwner(),
+              'message-type': 'chat',
               userId: '0',
               emotes: [],
               badges: {
@@ -354,13 +356,38 @@ class Polls extends System {
       this.lastTimeRemind = Date.now();
 
       const translations = `systems.polls.opened_${vote.type}`;
+      const userObj = await global.users.getByName(getOwner());
       sendMessage(prepare(translations, {
         title: vote.title,
         command: this.getCommand('!vote'),
-      }), getOwner());
+      }), {
+        username: userObj.username,
+        displayName: userObj.displayName || userObj.username,
+        userId: userObj.id,
+        emotes: [],
+        badges: {},
+        'message-type': 'chat'
+      });
       for (const index of Object.keys(vote.options)) {
         setTimeout(() => {
-          if (vote.type === 'normal') { sendMessage(this.getCommand('!vote') + ` ${(Number(index) + 1)} => ${vote.options[index]}`, getOwner()); } else { sendMessage(`#vote${(Number(index) + 1)} => ${vote.options[index]}`, getOwner()); }
+          if (vote.type === 'normal') {
+            sendMessage(this.getCommand('!vote') + ` ${(Number(index) + 1)} => ${vote.options[index]}`, {
+              username: userObj.username,
+              displayName: userObj.displayName || userObj.username,
+              userId: userObj.id,
+              emotes: [],
+              badges: {},
+              'message-type': 'chat'
+            });
+          } else {
+            sendMessage(`#vote${(Number(index) + 1)} => ${vote.options[index]}`, {
+              username: userObj.username,
+              displayName: userObj.displayName || userObj.username,
+              userId: userObj.id,
+              emotes: [],
+              badges: {},
+              'message-type': 'chat'
+            }); }
         }, 300 * (Number(index) + 1));
       }
     }

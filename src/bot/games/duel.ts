@@ -77,7 +77,15 @@ class Duel extends Game {
       tickets: winnerUser.tickets,
       winner: winnerUser.username
     });
-    sendMessage(m, { username: getOwner() }, { force: true });
+    const userObj = await global.users.getByName(getOwner());
+    sendMessage(m, {
+      username: userObj.username,
+      displayName: userObj.displayName || userObj.username,
+      userId: userObj.id,
+      emotes: [],
+      badges: {},
+      'message-type': 'chat'
+    }, { force: true });
 
     // give user his points
     await global.db.engine.increment('users.points', { id: winnerUser.id }, { points: parseInt(total, 10) });

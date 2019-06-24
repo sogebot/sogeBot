@@ -73,12 +73,27 @@ class Bets extends System {
         currentBet.locked = true;
 
         const _bets = await global.db.engine.find(this.collection.users);
+        const userObj = await global.users.getByName(getOwner());
         if (_bets.length > 0) {
-          sendMessage(global.translate('bets.locked'), { username: getOwner() });
+          sendMessage(global.translate('bets.locked'), {
+            username: userObj.username,
+            displayName: userObj.displayName || userObj.username,
+            userId: userObj.id,
+            emotes: [],
+            badges: {},
+            'message-type': 'chat'
+          });
           const _id = currentBet._id.toString(); delete currentBet._id;
           await global.db.engine.update(this.collection.data, { _id }, currentBet);
         } else {
-          sendMessage(global.translate('bets.removed'), getOwner());
+          sendMessage(global.translate('bets.removed'), {
+            username: userObj.username,
+            displayName: userObj.displayName || userObj.username,
+            userId: userObj.id,
+            emotes: [],
+            badges: {},
+            'message-type': 'chat'
+          });
           await global.db.engine.remove(this.collection.data, { key: 'bets' });
         }
       }

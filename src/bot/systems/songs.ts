@@ -326,7 +326,15 @@ class Songs extends System {
       else {translation = 'songs.current-song-from-songrequest';}
     }
     let message = await prepare(translation, { name: currentSong.title, username: currentSong.username });
-    sendMessage(message, { username: await global.oauth.broadcasterUsername });
+    const userObj = await global.users.getByName(global.oauth.broadcasterUsername);
+    sendMessage(message, {
+      username: userObj.username,
+      displayName: userObj.displayName || userObj.username,
+      userId: userObj.id,
+      emotes: [],
+      badges: {},
+      'message-type': 'chat'
+    });
   }
 
   async notifySong () {
@@ -337,7 +345,15 @@ class Songs extends System {
       else {translation = 'songs.current-song-from-songrequest';}
     } else {return;}
     let message = await prepare(translation, { name: currentSong.title, username: currentSong.username });
-    sendMessage(message, { username: await global.oauth.broadcasterUsername });
+    const userObj = await global.users.getByName(global.oauth.broadcasterUsername);
+    sendMessage(message, {
+      username: userObj.username,
+      displayName: userObj.displayName || userObj.username,
+      userId: userObj.id,
+      emotes: [],
+      badges: {},
+      'message-type': 'chat'
+    });
   }
 
   @command('!playlist steal')
@@ -347,7 +363,15 @@ class Songs extends System {
       const currentSong = JSON.parse(this.currentSong);
       this.addSongToPlaylist({ sender: null, parameters: currentSong.videoID });
     } catch (err) {
-      sendMessage(global.translate('songs.noCurrentSong'), { username: await global.oauth.broadcasterUsername });
+      const userObj = await global.users.getByName(global.oauth.broadcasterUsername);
+      sendMessage(global.translate('songs.noCurrentSong'), {
+        username: userObj.username,
+        displayName: userObj.displayName || userObj.username,
+        userId: userObj.id,
+        emotes: [],
+        badges: {},
+        'message-type': 'chat'
+      });
     }
   }
 
@@ -361,7 +385,15 @@ class Songs extends System {
   @command('!playlist')
   @default_permission(permission.CASTERS)
   async help () {
-    sendMessage(global.translate('core.usage') + ': !playlist add <youtubeid> | !playlist remove <youtubeid> | !playlist ban <youtubeid> | !playlist random on/off | !playlist steal', { username: await global.oauth.broadcasterUsername });
+    const userObj = await global.users.getByName(global.oauth.broadcasterUsername);
+    sendMessage(global.translate('core.usage') + ': !playlist add <youtubeid> | !playlist remove <youtubeid> | !playlist ban <youtubeid> | !playlist random on/off | !playlist steal', {
+      username: userObj.username,
+      displayName: userObj.displayName || userObj.username,
+      userId: userObj.id,
+      emotes: [],
+      badges: {},
+      'message-type': 'chat'
+    });
   }
 
   @command('!songrequest')

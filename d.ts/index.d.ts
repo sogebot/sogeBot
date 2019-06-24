@@ -48,7 +48,7 @@ declare namespace NodeJS {
       wheelOfFortune: import('../src/bot/games/wheelOfFortune').WheelOfFortune;
     };
     logs: {
-      commandcount: import('../src/bot/logs/commandcount').CommandCount;
+      commandcount: import('../src/bot/stats/commandcount').CommandCount;
     };
     general: any;
     bot: any;
@@ -103,6 +103,7 @@ interface Sender {
   username: string;
   displayName: string;
   userId: string;
+  'message-type': 'chat' | 'whisper';
   emotes: { id: number; start: number; end: number }[];
   badges: {
     subscriber?: undefined | number;
