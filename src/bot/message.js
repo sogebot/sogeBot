@@ -188,12 +188,12 @@ class Message {
             // default
             if (state.isOk && !state.isEval) {
               let msg = await commons.prepare('filters.setVariable', { value: state.updated.setValue, variable: variable });
-              commons.sendMessage(msg, attr.sender, { skip: true, quiet: _.get(attr, 'quiet', false) }, opts.attr);
+              commons.sendMessage(msg, attr.sender, { skip: true, quiet: _.get(attr, 'quiet', false) });
             }
             return state.updated.currentValue;
           } else if (state.updated.responseType === 1) {
             // custom
-            commons.sendMessage(state.updated.responseText.replace('$value', state.updated.setValue), attr.sender, { skip: true, quiet: _.get(attr, 'quiet', false) }, opts.attr);
+            commons.sendMessage(state.updated.responseText.replace('$value', state.updated.setValue), attr.sender, { skip: true, quiet: _.get(attr, 'quiet', false) });
             return '';
           } else {
             // command
