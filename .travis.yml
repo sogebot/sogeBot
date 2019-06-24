@@ -30,7 +30,7 @@ jobs:
       os: linux
       before_script: skip
       script:
-        - npm run eslint || travis_terminate 1
+        - npx eslint --ext .ts src --quiet || travis_terminate 1
     - stage: test
       env: DB=nedb
       os: linux

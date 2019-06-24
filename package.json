@@ -67,7 +67,6 @@
   },
   "scripts": {
     "build": "cross-env ENV=development make info eslint bot ui",
-    "eslint": "npx eslint --ext .ts src --quiet",
     "test": "mocha --recursive --timeout 20000 --exit --require source-map-support/register 2>&1 | tee report && node tools/rerunTests.js",
     "test:config:mongodb": "cp config.example.json config.json && sed -i -- 's/nedb/mongodb/g' config.json",
     "test:config:nedb": "cp config.example.json config.json",
