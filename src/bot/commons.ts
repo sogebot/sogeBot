@@ -146,7 +146,11 @@ export async function sendMessage(messageToSend, sender, attr?: {
   debug('commons.sendMessage', JSON.stringify({messageToSend, sender, attr}));
   if (_.isString(sender)) { sender = { username: String(sender) }; }
 
-  if (_.isNil(sender) || _.isNil(sender.username)) { sender.username = undefined; } else { attr.sender = sender.username; }
+  if (_.isNil(sender) || _.isNil(sender.username)) {
+    sender.username = undefined;
+  } else {
+    attr.sender = sender;
+  }
 
   if (!_.isNil(sender.quiet)) { attr.quiet = sender.quiet; }
   if (!_.isNil(sender.skip)) { attr.skip = sender.skip; }

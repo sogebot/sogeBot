@@ -145,13 +145,13 @@ class CustomCommands extends System {
   @command('!command')
   @default_permission(permission.CASTERS)
   @helper()
-  main (opts: Record<string, any>) {
+  main (opts: CommandOptions) {
     sendMessage(global.translate('core.usage') + ': !command add (-p [uuid|name]) (-s=true|false) <!cmd> <response> | !command edit (-p [uuid|name]) (-s=true|false) <!cmd> <number> <response> | !command remove <!command> | !command remove <!command> <number> | !command list | !command list <!command>', opts.sender);
   }
 
   @command('!command edit')
   @default_permission(permission.CASTERS)
-  async edit (opts: Record<string, any>) {
+  async edit (opts: CommandOptions) {
     try {
       const [userlevel, stopIfExecuted, command, rId, response] = new Expects(opts.parameters)
         .permission({ optional: true, default: permission.VIEWERS })
@@ -191,7 +191,7 @@ class CustomCommands extends System {
 
   @command('!command add')
   @default_permission(permission.CASTERS)
-  async add (opts: Record<string, any>) {
+  async add (opts: CommandOptions) {
     try {
       const [userlevel, stopIfExecuted, command, response] = new Expects(opts.parameters)
         .permission({ optional: true, default: permission.VIEWERS })
@@ -231,7 +231,7 @@ class CustomCommands extends System {
   }
 
   @parser({ priority: constants.LOW })
-  async run (opts: Record<string, any>) {
+  async run (opts: ParserOptions) {
     if (!opts.message.startsWith('!')) {return true;} // do nothing if it is not a command
     let _responses: Response[] = [];
     var command: any = {};
@@ -259,7 +259,6 @@ class CustomCommands extends System {
         }
       }
     }
-
     this.sendResponse(_.cloneDeep(_responses), { param, sender: opts.sender, command: command.command, count });
     return atLeastOnePermissionOk;
   }
@@ -279,7 +278,7 @@ class CustomCommands extends System {
 
   @command('!command list')
   @default_permission(permission.CASTERS)
-  async list (opts: Record<string, any>) {
+  async list (opts: CommandOptions) {
     const command = new Expects(opts.parameters).command({ optional: true }).toArray()[0];
 
     if (!command) {
@@ -307,7 +306,7 @@ class CustomCommands extends System {
     }
   }
 
-  async togglePermission (opts: Record<string, any>) {
+  async togglePermission (opts: CommandOptions) {
     const command = await global.db.engine.findOne(this.collection.data, { command: opts.parameters });
     if (!_.isEmpty(command)) {
       await global.db.engine.update(this.collection.data, { _id: command._id.toString() }, { permission: command.permission === 3 ? 0 : ++command.permission });
@@ -316,7 +315,7 @@ class CustomCommands extends System {
 
   @command('!command toggle')
   @default_permission(permission.CASTERS)
-  async toggle (opts: Record<string, any>) {
+  async toggle (opts: CommandOptions) {
     const match = XRegExp.exec(opts.parameters, constants.COMMAND_REGEXP) as unknown as { [x: string]: string } | null;
     if (_.isNil(match)) {
       let message = await prepare('customcmds.commands-parse-failed');
@@ -339,7 +338,7 @@ class CustomCommands extends System {
 
   @command('!command toggle-visibility')
   @default_permission(permission.CASTERS)
-  async toggleVisibility (opts: Record<string, any>) {
+  async toggleVisibility (opts: CommandOptions) {
     const match = XRegExp.exec(opts.parameters, constants.COMMAND_REGEXP) as unknown as { [x: string]: string } | null;
     if (_.isNil(match)) {
       let message = await prepare('customcmds.commands-parse-failed');
@@ -361,7 +360,7 @@ class CustomCommands extends System {
 
   @command('!command remove')
   @default_permission(permission.CASTERS)
-  async remove (opts: Record<string, any>) {
+  async remove (opts: CommandOptions) {
     try {
       const [command, response] = new Expects(opts.parameters).command().number({ optional: true }).toArray();
       let cid = (await global.db.engine.findOne(this.collection.data, { command }))._id;
@@ -400,7 +399,7 @@ class CustomCommands extends System {
     }
   }
 
-  async checkFilter (opts: Record<string, any>, filter: string) {
+  async checkFilter (opts: CommandOptions | ParserOptions, filter: string) {
     if (typeof filter === 'undefined' || filter.trim().length === 0) {return true;}
     let toEval = `(function evaluation () { return ${filter} })()`;
 

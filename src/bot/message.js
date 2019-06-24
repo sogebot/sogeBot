@@ -328,7 +328,7 @@ class Message {
         let cmd = filter
           .replace(/\(|\)/g, '')
           .replace(/\$sender/g, (global.tmi.showWithAt ? '@' : '') + attr.sender.username)
-          .replace(/\$param/g, attr.param)
+          .replace(/\$param/g, attr.param);
         global.tmi.message({
           message: {
             tags: attr.sender,
