@@ -38,6 +38,3 @@ jobs:
       env: DB=mongodb
       services: mongodb
       os: linux
-    - stage: test
-      env: DB=nedb
-      os: osx
