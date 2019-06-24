@@ -86,7 +86,7 @@ class Keywords extends System {
     });
     for (let keyword of keywords) {
       if (!keyword.enabled) {continue;}
-      let message = await new Message(keyword.response).parse({ sender: opts.sender });
+      let message = await new Message(keyword.response).parse({ sender: opts.sender.username });
       sendMessage(message, opts.sender);
     }
     return true;
