@@ -1,7 +1,7 @@
 language: node_js
 before_install:
-  - yarn add mocha typescript
-  - yarn add eslint@latest @typescript-eslint/parser@latest @typescript-eslint/eslint-plugin@latest
+  - yarn add mocha typescript --ignore-engines
+  - yarn add eslint@latest @typescript-eslint/parser@latest @typescript-eslint/eslint-plugin@latest --ignore-engines
   - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then choco install make; fi
 install:
   - travis_wait make ENV=development
@@ -24,8 +24,8 @@ jobs:
   include:
     - stage: eslint
       before_install:
-        - yarn add mocha typescript
-        - yarn add eslint@latest @typescript-eslint/parser@latest @typescript-eslint/eslint-plugin@latest
+        - yarn add mocha typescript --ignore-engines
+        - yarn add eslint@latest @typescript-eslint/parser@latest @typescript-eslint/eslint-plugin@latest --ignore-engines
       install: skip
       os: linux
       before_script: skip
