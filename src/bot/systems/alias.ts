@@ -90,7 +90,7 @@ class Alias extends System {
   @command('!alias')
   @default_permission(permission.CASTERS)
   main (opts) {
-    sendMessage(global.translate('core.usage') + ': !alias add -p [uuid|name] <!alias> <!command> | !alias edit -p [uuid|name] <!alias> <!command> | !alias remove <!alias> | !alias list | !alias toggle <!alias> | !alias toggle-visibility <!alias>', opts.sender);
+    sendMessage(global.translate('core.usage') + ': !alias add -p [uuid|name] <!alias> <!command> | !alias edit -p [uuid|name] <!alias> <!command> | !alias remove <!alias> | !alias list | !alias toggle <!alias> | !alias toggle-visibility <!alias>', opts.sender, opts.attr);
   }
 
   @command('!alias edit')
@@ -115,15 +115,15 @@ class Alias extends System {
       const item = await global.db.engine.findOne(this.collection.data, { alias });
       if (_.isEmpty(item)) {
         let message = await prepare('alias.alias-was-not-found', { alias });
-        sendMessage(message, opts.sender);
+        sendMessage(message, opts.sender, opts.attr);
         return false;
       }
       await global.db.engine.update(this.collection.data, { alias }, { command, permission: pItem.id });
 
       let message = await prepare('alias.alias-was-edited', { alias, command });
-      sendMessage(message, opts.sender);
+      sendMessage(message, opts.sender, opts.attr);
     } catch (e) {
-      sendMessage(prepare('alias.alias-parse-failed'), opts.sender);
+      sendMessage(prepare('alias.alias-parse-failed'), opts.sender, opts.attr);
     }
   }
 
@@ -155,9 +155,9 @@ class Alias extends System {
       };
       await global.db.engine.insert(this.collection.data, aliasObj);
       let message = await prepare('alias.alias-was-added', aliasObj);
-      sendMessage(message, opts.sender);
+      sendMessage(message, opts.sender, opts.attr);
     } catch (e) {
-      sendMessage(prepare('alias.alias-parse-failed'), opts.sender);
+      sendMessage(prepare('alias.alias-parse-failed'), opts.sender, opts.attr);
     }
   }
 
@@ -166,7 +166,7 @@ class Alias extends System {
   async list (opts) {
     let alias = await global.db.engine.find(this.collection.data, { visible: true, enabled: true });
     var output = (alias.length === 0 ? global.translate('alias.list-is-empty') : global.translate('alias.list-is-not-empty').replace(/\$list/g, (_.map(_.orderBy(alias, 'alias'), 'alias')).join(', ')));
-    sendMessage(output, opts.sender);
+    sendMessage(output, opts.sender, opts.attr);
   }
 
   @command('!alias toggle')
@@ -184,16 +184,16 @@ class Alias extends System {
       const item = await global.db.engine.findOne(this.collection.data, { alias });
       if (_.isEmpty(item)) {
         let message = await prepare('alias.alias-was-not-found', { alias });
-        sendMessage(message, opts.sender);
+        sendMessage(message, opts.sender, opts.attr);
         return;
       }
 
       await global.db.engine.update(this.collection.data, { alias }, { enabled: !item.enabled });
       let message = await prepare(!item.enabled ? 'alias.alias-was-enabled' : 'alias.alias-was-disabled', item);
-      sendMessage(message, opts.sender);
+      sendMessage(message, opts.sender, opts.attr);
     } catch (e) {
       let message = await prepare('alias.alias-parse-failed');
-      sendMessage(message, opts.sender);
+      sendMessage(message, opts.sender, opts.attr);
     }
   }
 
@@ -212,16 +212,16 @@ class Alias extends System {
       const item = await global.db.engine.findOne(this.collection.data, { alias });
       if (_.isEmpty(item)) {
         let message = await prepare('alias.alias-was-not-found', { alias });
-        sendMessage(message, opts.sender);
+        sendMessage(message, opts.sender, opts.attr);
         return false;
       }
 
       await global.db.engine.update(this.collection.data, { alias }, { visible: !item.visible });
       let message = await prepare(!item.visible ? 'alias.alias-was-exposed' : 'alias.alias-was-concealed', item);
-      sendMessage(message, opts.sender);
+      sendMessage(message, opts.sender, opts.attr);
     } catch (e) {
       let message = await prepare('alias.alias-parse-failed');
-      sendMessage(message, opts.sender);
+      sendMessage(message, opts.sender, opts.attr);
     }
   }
 
@@ -240,15 +240,15 @@ class Alias extends System {
       let removed = await global.db.engine.remove(this.collection.data, { alias });
       if (!removed) {
         let message = await prepare('alias.alias-was-not-found', { alias });
-        sendMessage(message, opts.sender);
+        sendMessage(message, opts.sender, opts.attr);
         return false;
       }
 
       let message = await prepare('alias.alias-was-removed', { alias });
-      sendMessage(message, opts.sender);
+      sendMessage(message, opts.sender, opts.attr);
     } catch (e) {
       let message = await prepare('alias.alias-parse-failed');
-      sendMessage(message, opts.sender);
+      sendMessage(message, opts.sender, opts.attr);
     }
   }
 }

@@ -252,6 +252,10 @@ interface CommandOptions {
   sender: Sender;
   command: string;
   parameters: string;
+  attr?: {
+    skip?: boolean;
+    quiet?: boolean;
+  };
 }
 
 interface ParserOptions {

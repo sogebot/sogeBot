@@ -147,7 +147,7 @@ class Duel extends Game {
             minutesName: getLocalizedName(Math.round(((cooldown * 1000) - (new Date().getTime() - new Date(this._cooldown).getTime())) / 1000 / 60), 'core.minutes'),
             cooldown: Math.round(((cooldown * 1000) - (new Date().getTime() - new Date(this._cooldown).getTime())) / 1000 / 60),
             command: opts.command });
-          sendMessage(message, opts.sender);
+          sendMessage(message, opts.sender, opts.attr);
           return true;
         }
       }
@@ -160,7 +160,7 @@ class Duel extends Game {
           minutesName: getLocalizedName(5, 'core.minutes'),
           minutes: this.duration,
           command: opts.command });
-        sendMessage(message, opts.sender);
+        sendMessage(message, opts.sender, opts.attr);
       }
 
       const tickets = (await global.db.engine.findOne(this.collection.users, { id: opts.sender.userId })).tickets;
@@ -169,26 +169,26 @@ class Duel extends Game {
           pointsName: await global.systems.points.getPointsName(tickets),
           points: tickets
         });
-        sendMessage(message, opts.sender);
+        sendMessage(message, opts.sender, opts.attr);
       }, isNewDuel ? 500 : 0);
       return true;
     } catch (e) {
       switch (e.message) {
         case ERROR_NOT_ENOUGH_OPTIONS:
-          sendMessage(global.translate('gambling.duel.notEnoughOptions'), opts.sender);
+          sendMessage(global.translate('gambling.duel.notEnoughOptions'), opts.sender, opts.attr);
           break;
         case ERROR_ZERO_BET:
           message = await prepare('gambling.duel.zeroBet', {
             pointsName: await global.systems.points.getPointsName(0)
           });
-          sendMessage(message, opts.sender);
+          sendMessage(message, opts.sender, opts.attr);
           break;
         case ERROR_NOT_ENOUGH_POINTS:
           message = await prepare('gambling.duel.notEnoughPoints', {
             pointsName: await global.systems.points.getPointsName(bet),
             points: bet
           });
-          sendMessage(message, opts.sender);
+          sendMessage(message, opts.sender, opts.attr);
           break;
         case ERROR_MINIMAL_BET:
           bet = this.minimalBet;
@@ -197,11 +197,11 @@ class Duel extends Game {
             points: bet,
             command: opts.command
           });
-          sendMessage(message, opts.sender);
+          sendMessage(message, opts.sender, opts.attr);
           break;
         default:
           global.log.error(e.stack);
-          sendMessage(global.translate('core.error'), opts.sender);
+          sendMessage(global.translate('core.error'), opts.sender, opts.attr);
       }
     }
   }

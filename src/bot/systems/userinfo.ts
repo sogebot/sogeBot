@@ -51,7 +51,7 @@ class UserInfo extends System {
 
     const user = await global.users.getByName(username);
     if (_.isNil(user) || _.isNil(user.time) || _.isNil(user.time.follow) || _.isNil(user.is.follower) || !user.is.follower) {
-      sendMessage(prepare('followage.' + (opts.sender.username === username.toLowerCase() ? 'successSameUsername' : 'success') + '.never', { username }), opts.sender);
+      sendMessage(prepare('followage.' + (opts.sender.username === username.toLowerCase() ? 'successSameUsername' : 'success') + '.never', { username }), opts.sender, opts.attr);
     } else {
       const units: string[] = ['years', 'months', 'days', 'hours', 'minutes'];
       const diff = dateDiff(new Date(user.time.follow).getTime(), Date.now());
@@ -134,7 +134,7 @@ class UserInfo extends System {
 
     const user = await global.users.getByName(username);
     if (_.isNil(user) || _.isNil(user.time) || _.isNil(user.time.created_at)) {
-      sendMessage(prepare('age.failed', { username }), opts.sender);
+      sendMessage(prepare('age.failed', { username }), opts.sender, opts.attr);
     } else {
       const units: string[] = ['years', 'months', 'days', 'hours', 'minutes'];
       const diff = dateDiff(new Date(user.time.created_at).getTime(), Date.now());
@@ -165,7 +165,7 @@ class UserInfo extends System {
 
       const user = await global.users.getByName(parsed[0]);
       if (_.isNil(user) || _.isNil(user.time) || _.isNil(user.time.message)) {
-        sendMessage(global.translate('lastseen.success.never').replace(/\$username/g, parsed[0]), opts.sender);
+        sendMessage(global.translate('lastseen.success.never').replace(/\$username/g, parsed[0]), opts.sender, opts.attr);
       } else {
         moment.locale(global.lib.translate.lang);
         sendMessage(global.translate('lastseen.success.time')
@@ -173,7 +173,7 @@ class UserInfo extends System {
           .replace(/\$when/g, moment(user.time.message).format('L') + ' ' + moment(user.time.message).format('LTS')), opts.sender);
       }
     } catch (e) {
-      sendMessage(global.translate('lastseen.failed.parse'), opts.sender);
+      sendMessage(global.translate('lastseen.failed.parse'), opts.sender, opts.attr);
     }
   }
 
@@ -190,9 +190,9 @@ class UserInfo extends System {
         id = await global.users.getIdByName(username);
       }
       const time = id ? Number((await global.users.getWatchedOf(id) / (60 * 60 * 1000))).toFixed(1) : 0;
-      sendMessage(prepare('watched.success.time', { time: String(time), username }), opts.sender);
+      sendMessage(prepare('watched.success.time', { time: String(time), username }), opts.sender, opts.attr);
     } catch (e) {
-      sendMessage(global.translate('watched.failed.parse'), opts.sender);
+      sendMessage(global.translate('watched.failed.parse'), opts.sender, opts.attr);
     }
   }
 
@@ -250,7 +250,7 @@ class UserInfo extends System {
         }
         message[idx] = `${Number(tipAmount).toFixed(2)}${global.currency.symbol(currency)}`;
       }
-      sendMessage(message.join(this.formatSeparator), opts.sender);
+      sendMessage(message.join(this.formatSeparator), opts.sender, opts.attr);
     } catch (e) {
       global.log.error(e.stack);
     }

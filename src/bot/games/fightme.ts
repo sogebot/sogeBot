@@ -35,12 +35,12 @@ class FightMe extends Game {
       userId = (await global.users.getByName(username)).id;
       opts.sender.username = opts.sender.username.toLowerCase();
     } catch (e) {
-      sendMessage(global.translate('gambling.fightme.notEnoughOptions'), opts.sender);
+      sendMessage(global.translate('gambling.fightme.notEnoughOptions'), opts.sender, opts.attr);
       return;
     }
 
     if (opts.sender.username === username) {
-      sendMessage(global.translate('gambling.fightme.cannotFightWithYourself'), opts.sender);
+      sendMessage(global.translate('gambling.fightme.cannotFightWithYourself'), opts.sender, opts.attr);
       return;
     }
 
@@ -99,7 +99,7 @@ class FightMe extends Game {
         username,
         winner: winner ? username : opts.sender.username,
         loser: winner ? opts.sender.username : username
-      }), opts.sender);
+      }), opts.sender, opts.attr);
       global.db.engine.remove(this.collection.users, { _id: challenge._id.toString() });
     } else {
       // check if under gambling cooldown
@@ -111,7 +111,7 @@ class FightMe extends Game {
           command: opts.command,
           cooldown: Math.round(((cooldown * 1000) - (new Date().getTime() - new Date(this._cooldown).getTime())) / 1000 / 60),
           minutesName: getLocalizedName(Math.round(((cooldown * 1000) - (new Date().getTime() - new Date(this._cooldown).getTime())) / 1000 / 60), 'core.minutes')
-        }), opts.sender);
+        }), opts.sender, opts.attr);
         return;
       }
 
@@ -121,7 +121,7 @@ class FightMe extends Game {
       const isAlreadyChallenged = !_.isEmpty(await global.db.engine.findOne(this.collection.users, { key: '_users', user: opts.sender.username, challenging: username }));
       if (!isAlreadyChallenged) {await global.db.engine.insert(this.collection.users, { key: '_users', user: opts.sender.username, challenging: username });}
       let message = prepare('gambling.fightme.challenge', { username: username, sender: opts.sender.username, command: opts.command });
-      sendMessage(message, opts.sender);
+      sendMessage(message, opts.sender, opts.attr);
     }
   }
 }

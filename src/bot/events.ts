@@ -237,6 +237,7 @@ class Events extends Core {
         sender: (_.get(operation, 'isCommandQuiet', false) ? {} : { username: getOwner() }),
         message: command,
         skip: true,
+        quiet: _.get(operation, 'isCommandQuiet', false)
       });
       await parse.process();
     } else {
@@ -246,6 +247,7 @@ class Events extends Core {
           message: command,
         },
         skip: true,
+        quiet: _.get(operation, 'isCommandQuiet', false)
       });
     }
   }

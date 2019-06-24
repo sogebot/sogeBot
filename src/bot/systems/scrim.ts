@@ -79,7 +79,7 @@ class Scrim extends System {
       );
     } catch (e) {
       if (isNaN(Number(e.message))) {
-        sendMessage('$sender, cmd_error [' + opts.command + ']: ' + e.message, opts.sender);
+        sendMessage('$sender, cmd_error [' + opts.command + ']: ' + e.message, opts.sender, opts.attr);
       }
     }
   }
@@ -95,7 +95,7 @@ class Scrim extends System {
       }
     } catch (e) {
       if (isNaN(Number(e.message))) {
-        sendMessage('$sender, cmd_error [' + opts.command + ']: ' + e.message, opts.sender);
+        sendMessage('$sender, cmd_error [' + opts.command + ']: ' + e.message, opts.sender, opts.attr);
       }
     }
   }

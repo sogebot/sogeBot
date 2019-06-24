@@ -44,7 +44,7 @@ class Commercial extends System {
     let parsed = opts.parameters.match(/^([\d]+)? ?(.*)?$/);
 
     if (_.isNil(parsed)) {
-      sendMessage('$sender, something went wrong with !commercial', opts.sender);
+      sendMessage('$sender, something went wrong with !commercial', opts.sender, opts.attr);
     }
 
     let commercial = {
@@ -53,7 +53,7 @@ class Commercial extends System {
     };
 
     if (_.isNil(commercial.duration)) {
-      sendMessage('Usage: !commercial [duration] [optional-message]', opts.sender);
+      sendMessage('Usage: !commercial [duration] [optional-message]', opts.sender, opts.attr);
       return;
     }
 
@@ -79,13 +79,13 @@ class Commercial extends System {
 
         global.events.fire('commercial', { duration: commercial.duration });
         global.client.commercial(await global.oauth.broadcasterUsername, commercial.duration);
-        if (!_.isNil(commercial.message)) {sendMessage(commercial.message, opts.sender);}
+        if (!_.isNil(commercial.message)) {sendMessage(commercial.message, opts.sender, opts.attr);}
       } catch (e) {
         global.log.error(`API: ${url} - ${e.status} ${_.get(e, 'body.message', e.statusText)}`);
         global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'commercial', api: 'kraken', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.statusText)}` });
       }
     } else {
-      sendMessage('$sender, available commercial duration are: 30, 60, 90, 120, 150 and 180', opts.sender);
+      sendMessage('$sender, available commercial duration are: 30, 60, 90, 120, 150 and 180', opts.sender, opts.attr);
     }
   }
 }

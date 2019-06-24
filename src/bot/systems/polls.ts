@@ -126,11 +126,11 @@ class Polls extends System {
             const votesCount = count[index] || 0;
             const percentage = Number((100 / _total) * votesCount || 0).toFixed(2);
             if (cVote.type === 'normal') {
-              sendMessage(this.getCommand('!vote') + ` ${Number(index) + 1} - ${option} - ${votesCount} ${getLocalizedName(votesCount, 'systems.polls.votes')}, ${percentage}%`, opts.sender);
+              sendMessage(this.getCommand('!vote') + ` ${Number(index) + 1} - ${option} - ${votesCount} ${getLocalizedName(votesCount, 'systems.polls.votes')}, ${percentage}%`, opts.sender, opts.attr);
             } else if (cVote.type === 'tips') {
-              sendMessage(`#vote${Number(index) + 1} - ${option} - ${Number(votesCount).toFixed(2)} ${getLocalizedName(votesCount, 'systems.polls.votes')}, ${percentage}%`, opts.sender);
+              sendMessage(`#vote${Number(index) + 1} - ${option} - ${Number(votesCount).toFixed(2)} ${getLocalizedName(votesCount, 'systems.polls.votes')}, ${percentage}%`, opts.sender, opts.attr);
             } else {
-              sendMessage(`#vote${Number(index) + 1} - ${option} - ${votesCount} ${getLocalizedName(votesCount, 'systems.polls.votes')}, ${percentage}%`, opts.sender);
+              sendMessage(`#vote${Number(index) + 1} - ${option} - ${votesCount} ${getLocalizedName(votesCount, 'systems.polls.votes')}, ${percentage}%`, opts.sender, opts.attr);
             }
           }, 300 * (Number(index) + 1));
         }
@@ -138,7 +138,7 @@ class Polls extends System {
     } catch (e) {
       switch (e.message) {
         case String(ERROR.ALREADY_CLOSED):
-          sendMessage(global.translate('systems.polls.notInProgress'), opts.sender);
+          sendMessage(global.translate('systems.polls.notInProgress'), opts.sender, opts.attr);
           break;
       }
       return false;
@@ -171,7 +171,7 @@ class Polls extends System {
       }), opts.sender);
       for (const index of Object.keys(options)) {
         setTimeout(() => {
-          if (type === 'normal') { sendMessage(this.getCommand('!vote') + ` ${(Number(index) + 1)} => ${options[index]}`, opts.sender); } else { sendMessage(`#vote${(Number(index) + 1)} => ${options[index]}`, opts.sender); }
+          if (type === 'normal') { sendMessage(this.getCommand('!vote') + ` ${(Number(index) + 1)} => ${options[index]}`, opts.sender); } else { sendMessage(`#vote${(Number(index) + 1)} => ${options[index]}`, opts.sender, opts.attr); }
         }, 300 * (Number(index) + 1));
       }
 
@@ -180,7 +180,7 @@ class Polls extends System {
     } catch (e) {
       switch (e.message) {
         case String(ERROR.NOT_ENOUGH_OPTIONS):
-          sendMessage(global.translate('voting.notEnoughOptions'), opts.sender);
+          sendMessage(global.translate('voting.notEnoughOptions'), opts.sender, opts.attr);
           break;
         case String(ERROR.ALREADY_OPENED):
           const translations = 'systems.polls.opened' + (cVote.type.length > 0 ? `_${cVote.type}` : '');
@@ -190,13 +190,13 @@ class Polls extends System {
           }), opts.sender);
           for (const index of Object.keys(cVote.options)) {
             setTimeout(() => {
-              if (cVote.type === 'normal') { sendMessage(this.getCommand('!poll open') + ` ${index} => ${cVote.options[index]}`, opts.sender); } else { sendMessage(`#vote${(Number(index) + 1)} => ${cVote.options[index]}`, opts.sender); }
+              if (cVote.type === 'normal') { sendMessage(this.getCommand('!poll open') + ` ${index} => ${cVote.options[index]}`, opts.sender); } else { sendMessage(`#vote${(Number(index) + 1)} => ${cVote.options[index]}`, opts.sender, opts.attr); }
             }, 300 * (Number(index) + 1));
           }
           break;
         default:
           global.log.warning(e.stack);
-          sendMessage(global.translate('core.error'), opts.sender);
+          sendMessage(global.translate('core.error'), opts.sender, opts.attr);
       }
       return false;
     }
@@ -228,11 +228,11 @@ class Polls extends System {
             const votesCount = count[i] || 0;
             const percentage = Number((100 / _total) * votesCount || 0).toFixed(2);
             if (cVote.type === 'normal') {
-              sendMessage(this.getCommand('!vote') + ` ${Number(i) + 1} - ${option} - ${votesCount} ${getLocalizedName(votesCount, 'systems.polls.votes')}, ${percentage}%`, opts.sender);
+              sendMessage(this.getCommand('!vote') + ` ${Number(i) + 1} - ${option} - ${votesCount} ${getLocalizedName(votesCount, 'systems.polls.votes')}, ${percentage}%`, opts.sender, opts.attr);
             } else if (cVote.type === 'tips') {
-              sendMessage(`#vote${Number(i) + 1} - ${option} - ${Number(votesCount).toFixed(2)} ${getLocalizedName(votesCount, 'systems.polls.votes')}, ${percentage}%`, opts.sender);
+              sendMessage(`#vote${Number(i) + 1} - ${option} - ${Number(votesCount).toFixed(2)} ${getLocalizedName(votesCount, 'systems.polls.votes')}, ${percentage}%`, opts.sender, opts.attr);
             } else {
-              sendMessage(`#vote${Number(i) + 1} - ${option} - ${votesCount} ${getLocalizedName(votesCount, 'systems.polls.votes')}, ${percentage}%`, opts.sender);
+              sendMessage(`#vote${Number(i) + 1} - ${option} - ${votesCount} ${getLocalizedName(votesCount, 'systems.polls.votes')}, ${percentage}%`, opts.sender, opts.attr);
             }
           }, 100 * (Number(i) + 1));
         }
@@ -260,7 +260,7 @@ class Polls extends System {
     } catch (e) {
       switch (e.message) {
         case String(ERROR.NO_VOTING_IN_PROGRESS):
-          sendMessage(prepare('systems.polls.notInProgress'), opts.sender);
+          sendMessage(prepare('systems.polls.notInProgress'), opts.sender, opts.attr);
           break;
         case String(ERROR.INVALID_VOTE):
           // pass, we don't want to have error message

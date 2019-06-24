@@ -245,7 +245,7 @@ class Heist extends Game {
         this.lastAnnouncedCops = _.now();
         sendMessage(
           (this.copsOnPatrol)
-            .replace('$cooldown', minutesLeft + ' ' + getLocalizedName(minutesLeft, 'core.minutes')), opts.sender);
+            .replace('$cooldown', minutesLeft + ' ' + getLocalizedName(minutesLeft, 'core.minutes')), opts.sender, opts.attr);
       }
       return;
     }
@@ -265,7 +265,7 @@ class Heist extends Game {
     if (!newHeist && _.now() - this.startedAt > entryCooldown * 1000 && _.now() - (this.lastAnnouncedHeistInProgress) >= 60000) {
       this.lastAnnouncedHeistInProgress = _.now();
       sendMessage(
-        (await global.translate('games.heist.lateEntryMessage')).replace('$command', opts.command), opts.sender);
+        (await global.translate('games.heist.lateEntryMessage')).replace('$command', opts.command), opts.sender, opts.attr);
       return;
     }
 
@@ -275,7 +275,7 @@ class Heist extends Game {
     } catch (e) {
       if (!newHeist) {
         sendMessage(
-          (await global.translate('games.heist.entryInstruction')).replace('$command', opts.command), opts.sender);
+          (await global.translate('games.heist.entryInstruction')).replace('$command', opts.command), opts.sender, opts.attr);
         global.log.warning(`${opts.command} ${e.message}`);
       }
       return;
@@ -286,7 +286,7 @@ class Heist extends Game {
 
     if (points === 0 || _.isNil(points) || _.isNaN(points)) {
       sendMessage(
-        (await global.translate('games.heist.entryInstruction')).replace('$command', opts.command), opts.sender);
+        (await global.translate('games.heist.entryInstruction')).replace('$command', opts.command), opts.sender, opts.attr);
       return;
     } // send entryInstruction if command is not ok
 
@@ -312,10 +312,10 @@ class Heist extends Game {
         if (nextLevel) {
           sendMessage(this.nextLevelMessage
             .replace('$bank', level.name)
-            .replace('$nextBank', nextLevel.name), opts.sender);
+            .replace('$nextBank', nextLevel.name), opts.sender, opts.attr);
         } else {
           sendMessage(this.maxLevelMessage
-            .replace('$bank', level.name), opts.sender);
+            .replace('$bank', level.name), opts.sender, opts.attr);
         }
       }
     }

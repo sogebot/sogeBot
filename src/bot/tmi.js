@@ -607,10 +607,10 @@ class TMI extends Core {
       })
     }
 
-    let sender = data.message.tags
-    let message = data.message.message
-    let skip = data.skip
-    let quiet = data.quiet
+    let sender = data.message.tags;
+    let message = data.message.message;
+    let skip = data.skip;
+    let quiet = data.quiet;
 
     if (!sender.userId && sender.username) {
       // this can happen if we are sending commands from dashboards etc.
@@ -677,7 +677,7 @@ class TMI extends Core {
           global.events.fire('command-send-x-times', { username: sender.username, message: message })
         } else if (!message.startsWith('!')) global.db.engine.increment('users.messages', { id: sender.userId }, { messages: 1 })
       }
-      await parse.process()
+      await parse.process();
     }
     this.avgResponse({ value: parse.time(), message })
   }

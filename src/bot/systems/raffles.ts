@@ -164,7 +164,7 @@ class Raffles extends System {
     let keyword = opts.parameters.match(/(![\S]+)/);
     if (_.isNil(keyword)) {
       let message = await prepare('raffles.cannot-create-raffle-without-keyword');
-      sendMessage(message, opts.sender);
+      sendMessage(message, opts.sender, opts.attr);
       return;
     }
     keyword = keyword[1];
@@ -173,7 +173,7 @@ class Raffles extends System {
     let raffle = await global.db.engine.findOne(this.collection.data, { winner: null });
     if (!_.isEmpty(raffle)) {
       let message = await prepare('raffles.raffle-is-already-running', { keyword: raffle.keyword });
-      sendMessage(message, opts.sender);
+      sendMessage(message, opts.sender, opts.attr);
       return;
     }
 
@@ -221,7 +221,7 @@ class Raffles extends System {
 
     if (_.isEmpty(raffle)) {
       let message = await prepare('raffles.no-raffle-is-currently-running');
-      sendMessage(message, opts.sender);
+      sendMessage(message, opts.sender, opts.attr);
       return;
     }
 
@@ -265,7 +265,7 @@ class Raffles extends System {
 
     if (_.isEmpty(raffle)) { // shouldn't happen, but just to be sure (user can join when closing raffle)
       let message = await prepare('no-raffle-is-currently-running');
-      sendMessage(message, opts.sender);
+      sendMessage(message, opts.sender, opts.attr);
       return false;
     }
 

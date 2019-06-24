@@ -82,21 +82,21 @@ class Queue extends System {
 
   @command('!queue')
   main (opts) {
-    sendMessage(global.translate(this.locked ? 'queue.info.closed' : 'queue.info.opened'), opts.sender);
+    sendMessage(global.translate(this.locked ? 'queue.info.closed' : 'queue.info.opened'), opts.sender, opts.attr);
   }
 
   @command('!queue open')
   @default_permission(permission.CASTERS)
   open (opts) {
     this.locked = false;
-    sendMessage(global.translate('queue.open'), opts.sender);
+    sendMessage(global.translate('queue.open'), opts.sender, opts.attr);
   }
 
   @command('!queue close')
   @default_permission(permission.CASTERS)
   close (opts) {
     this.locked = true;
-    sendMessage(global.translate('queue.close'), opts.sender);
+    sendMessage(global.translate('queue.close'), opts.sender, opts.attr);
   }
 
   @command('!queue join')
@@ -117,10 +117,10 @@ class Queue extends System {
 
       if (eligible) {
         await global.db.engine.update(this.collection.data, { username: opts.sender.username }, { username: opts.sender.username, is: user.is, created_at: String(new Date()) });
-        sendMessage(global.translate('queue.join.opened'), opts.sender);
+        sendMessage(global.translate('queue.join.opened'), opts.sender, opts.attr);
       }
     } else {
-      sendMessage(global.translate('queue.join.closed'), opts.sender);
+      sendMessage(global.translate('queue.join.closed'), opts.sender, opts.attr);
     }
   }
 
@@ -129,7 +129,7 @@ class Queue extends System {
   clear (opts) {
     global.db.engine.remove(this.collection.data, {});
     global.db.engine.remove(this.collection.picked, {});
-    sendMessage(global.translate('queue.clear'), opts.sender);
+    sendMessage(global.translate('queue.clear'), opts.sender, opts.attr);
   }
 
   @command('!queue random')
@@ -172,7 +172,7 @@ class Queue extends System {
         msg = global.translate('queue.picked.multi');
     }
 
-    sendMessage(msg.replace(/\$users/g, users.map(o => atUsername ? `@${o.username}` : o.username).join(', ')), opts.sender);
+    sendMessage(msg.replace(/\$users/g, users.map(o => atUsername ? `@${o.username}` : o.username).join(', ')), opts.sender, opts.attr);
     return users;
   }
 

@@ -225,9 +225,9 @@ class Moderation extends System {
       for (let i = 0; i < count; i++) {await global.db.engine.insert(this.collection.permits, { username: parsed[1].toLowerCase() });}
 
       let m = await prepare('moderation.user-have-link-permit', { username: parsed[1].toLowerCase(), link: getLocalizedName(count, 'core.links'), count: count });
-      sendMessage(m, opts.sender);
+      sendMessage(m, opts.sender, opts.attr);
     } catch (e) {
-      sendMessage(global.translate('moderation.permit-parse-failed'), opts.sender);
+      sendMessage(global.translate('moderation.permit-parse-failed'), opts.sender, opts.attr);
     }
   }
 

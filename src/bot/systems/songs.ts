@@ -167,7 +167,7 @@ class Songs extends System {
     let update = await global.db.engine.update(this.collection.ban, { videoId: currentSong.videoID }, { videoId: currentSong.videoID, title: currentSong.title });
     if (update.length > 0) {
       let message = await prepare('songs.song-was-banned', { name: currentSong.title });
-      sendMessage(message, opts.sender);
+      sendMessage(message, opts.sender, opts.attr);
 
       // send timeouts to all users who requested song
       const request = (await global.db.engine.find(this.collection.request, { videoID: opts.parameters })).map(o => o.username);
@@ -207,7 +207,7 @@ class Songs extends System {
               global.log.error(err, { fnc: 'Songs.prototype.banSongById#1' });
             } else if (!_.isNil(videoInfo) && !_.isNil(videoInfo.title)) {
               banned++;
-              sendMessage(global.translate('songs.bannedSong').replace(/\$title/g, videoInfo.title), opts.sender);
+              sendMessage(global.translate('songs.bannedSong').replace(/\$title/g, videoInfo.title), opts.sender, opts.attr);
 
               // send timeouts to all users who requested song
               const request = (await global.db.engine.find(this.collection.request, { videoID: opts.parameters })).map(o => o.username);
@@ -247,9 +247,9 @@ class Songs extends System {
   async unbanSong (opts) {
     let removed = await global.db.engine.remove(this.collection.ban, { videoId: opts.parameters });
     if (removed > 0) {
-      sendMessage(global.translate('songs.song-was-unbanned'), opts.sender);
+      sendMessage(global.translate('songs.song-was-unbanned'), opts.sender, opts.attr);
     } else {
-      sendMessage(global.translate('songs.song-was-not-banned'), opts.sender);
+      sendMessage(global.translate('songs.song-was-not-banned'), opts.sender, opts.attr);
     }
   }
 
@@ -400,9 +400,9 @@ class Songs extends System {
   async addSongToQueue (opts) {
     if (opts.parameters.length < 1 || !this.songrequest) {
       if (this.songrequest) {
-        sendMessage(global.translate('core.usage') + ': !songrequest <video-id|video-url|search-string>', opts.sender);
+        sendMessage(global.translate('core.usage') + ': !songrequest <video-id|video-url|search-string>', opts.sender, opts.attr);
       } else {
-        sendMessage('$sender, ' + global.translate('core.settings.songs.songrequest.false'), opts.sender);
+        sendMessage('$sender, ' + global.translate('core.settings.songs.songrequest.false'), opts.sender, opts.attr);
       }
       return;
     }
@@ -426,7 +426,7 @@ class Songs extends System {
     // is song banned?
     let ban = await global.db.engine.findOne(this.collection.ban, { videoID: videoID });
     if (!_.isEmpty(ban)) {
-      sendMessage(global.translate('songs.song-is-banned'), opts.sender);
+      sendMessage(global.translate('songs.song-is-banned'), opts.sender, opts.attr);
       return;
     }
 
@@ -435,7 +435,7 @@ class Songs extends System {
       try {
         const video = await this.youtubeApi.getVideo(videoID);
         if (video.data.snippet.categoryId !== '10') {
-          return sendMessage(global.translate('songs.incorrect-category'), opts.sender);
+          return sendMessage(global.translate('songs.incorrect-category'), opts.sender, opts.attr);
         }
       } catch (e) {}
     }
@@ -443,13 +443,13 @@ class Songs extends System {
     ytdl.getInfo('https://www.youtube.com/watch?v=' + videoID, async (err, videoInfo) => {
       if (err) {return global.log.error(err, { fnc: 'Songs.prototype.addSongToQueue#1' });}
       if (_.isUndefined(videoInfo) || _.isUndefined(videoInfo.title) || _.isNull(videoInfo.title)) {
-        sendMessage(global.translate('songs.song-was-not-found'), opts.sender);
+        sendMessage(global.translate('songs.song-was-not-found'), opts.sender, opts.attr);
       } else if (Number(videoInfo.length_seconds) / 60 > this.duration) {
-        sendMessage(global.translate('songs.song-is-too-long'), opts.sender);
+        sendMessage(global.translate('songs.song-is-too-long'), opts.sender, opts.attr);
       } else {
         global.db.engine.update(this.collection.request, { addedAt: new Date().getTime() }, { videoID: videoID, title: videoInfo.title, addedAt: new Date().getTime(), loudness: videoInfo.loudness, length_seconds: videoInfo.length_seconds, username: opts.sender.username });
         let message = await prepare('songs.song-was-added-to-queue', { name: videoInfo.title });
-        sendMessage(message, opts.sender);
+        sendMessage(message, opts.sender, opts.attr);
         this.getMeanLoudness();
       }
     });
@@ -462,7 +462,7 @@ class Songs extends System {
     if (!_.isNil(sr)) {
       await global.db.engine.remove(this.collection.request, { username: opts.sender.username, _id: sr._id.toString() });
       let m = await prepare('songs.song-was-removed-from-queue', { name: sr.title });
-      sendMessage(m, opts.sender);
+      sendMessage(m, opts.sender, opts.attr);
       this.getMeanLoudness();
     }
   }
@@ -514,7 +514,7 @@ class Songs extends System {
 
     this.refreshPlaylistVolume();
     this.getMeanLoudness();
-    sendMessage(await prepare('songs.playlist-imported', { imported, skipped: done - imported }), opts.sender);
+    sendMessage(await prepare('songs.playlist-imported', { imported, skipped: done - imported }), opts.sender, opts.attr);
     return { imported, skipped: done - imported };
   }
 
@@ -528,9 +528,9 @@ class Songs extends System {
     if (!_.isEmpty(song)) {
       await global.db.engine.remove(this.collection.playlist, { videoID: videoID });
       let message = await prepare('songs.song-was-removed-from-playlist', { name: song.title });
-      sendMessage(message, opts.sender);
+      sendMessage(message, opts.sender, opts.attr);
     } else {
-      sendMessage(global.translate('songs.song-was-not-found'), opts.sender);
+      sendMessage(global.translate('songs.song-was-not-found'), opts.sender, opts.attr);
     }
   }
 
@@ -556,7 +556,7 @@ class Songs extends System {
     const ids = await global.systems.songs.getSongsIdsFromPlaylist(opts.parameters);
 
     if (ids.length === 0) {
-      sendMessage(await prepare('songs.playlist-is-empty'), opts.sender);
+      sendMessage(await prepare('songs.playlist-is-empty'), opts.sender, opts.attr);
     } else {
       let imported = 0;
       let done = 0;
@@ -599,7 +599,7 @@ class Songs extends System {
 
       await this.refreshPlaylistVolume();
       await this.getMeanLoudness();
-      sendMessage(await prepare('songs.playlist-imported', { imported, skipped: done - imported }), opts.sender);
+      sendMessage(await prepare('songs.playlist-imported', { imported, skipped: done - imported }), opts.sender, opts.attr);
       return { imported, skipped: done - imported };
     }
   }

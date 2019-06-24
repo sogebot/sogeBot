@@ -13,17 +13,17 @@ class Seppuku extends Game {
   @command('!seppuku')
   async main (opts) {
     if (isBroadcaster(opts.sender)) {
-      sendMessage(global.translate('gambling.seppuku.broadcaster'), opts.sender);
+      sendMessage(global.translate('gambling.seppuku.broadcaster'), opts.sender, opts.attr);
       return;
     }
 
     const isMod = await isModerator(opts.sender);
     if (isMod) {
-      sendMessage(global.translate('gambling.seppuku.mod'), opts.sender);
+      sendMessage(global.translate('gambling.seppuku.mod'), opts.sender, opts.attr);
       return;
     }
 
-    sendMessage(global.translate('gambling.seppuku.text'), opts.sender);
+    sendMessage(global.translate('gambling.seppuku.text'), opts.sender, opts.attr);
     timeout(opts.sender.username, global.translate('gambling.seppuku.text'), this.timeout);
   }
 }

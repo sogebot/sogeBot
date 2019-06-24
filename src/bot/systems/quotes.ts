@@ -44,10 +44,10 @@ class Quotes extends System {
       await global.db.engine.insert(this.collection.data, { id, tags, quote, quotedBy: opts.sender['userId'], createdAt: new Date() });
 
       const message = await prepare('systems.quotes.add.ok', { id, quote, tags: tags.join(', ') });
-      sendMessage(message, opts.sender);
+      sendMessage(message, opts.sender, opts.attr);
     } catch (e) {
       const message = await prepare('systems.quotes.add.error', { command: opts.command });
-      sendMessage(message, opts.sender);
+      sendMessage(message, opts.sender, opts.attr);
     }
   }
 
@@ -62,14 +62,14 @@ class Quotes extends System {
       let item = await global.db.engine.remove(this.collection.data, { id });
       if (item > 0) {
         const message = await prepare('systems.quotes.remove.ok', { id });
-        sendMessage(message, opts.sender);
+        sendMessage(message, opts.sender, opts.attr);
       } else {
         const message = await prepare('systems.quotes.remove.not-found', { id });
-        sendMessage(message, opts.sender);
+        sendMessage(message, opts.sender, opts.attr);
       }
     } catch (e) {
       const message = await prepare('systems.quotes.remove.error');
-      sendMessage(message, opts.sender);
+      sendMessage(message, opts.sender, opts.attr);
     }
   }
 
@@ -84,14 +84,14 @@ class Quotes extends System {
         const tags = tag.split(',').map((o) => o.trim());
         await global.db.engine.update(this.collection.data, { id }, { tags });
         const message = await prepare('systems.quotes.set.ok', { id, tags: tags.join(', ') });
-        sendMessage(message, opts.sender);
+        sendMessage(message, opts.sender, opts.attr);
       } else {
         const message = await prepare('systems.quotes.set.error.not-found-by-id', { id });
-        sendMessage(message, opts.sender);
+        sendMessage(message, opts.sender, opts.attr);
       }
     } catch (e) {
       const message = await prepare('systems.quotes.set.error.no-parameters', { command: opts.command });
-      sendMessage(message, opts.sender);
+      sendMessage(message, opts.sender, opts.attr);
     }
   }
 
@@ -101,7 +101,7 @@ class Quotes extends System {
     const message = await prepare(
       (['localhost', '127.0.0.1'].includes(urlBase) ? 'systems.quotes.list.is-localhost' : 'systems.quotes.list.ok'),
       { urlBase });
-    return sendMessage(message, opts.sender);
+    return sendMessage(message, opts.sender, opts.attr);
   }
 
   @command('!quote')
@@ -109,7 +109,7 @@ class Quotes extends System {
     let [id, tag] = new Expects(opts.parameters).argument({ type: Number, name: 'id', optional: true }).argument({ name: 'tag', optional: true, multi: true, delimiter: '' }).toArray();
     if (_.isNil(id) && _.isNil(tag)) {
       const message = await prepare('systems.quotes.show.error.no-parameters', { command: opts.command });
-      return sendMessage(message, opts.sender);
+      return sendMessage(message, opts.sender, opts.attr);
     }
 
     if (!_.isNil(id)) {
@@ -117,10 +117,10 @@ class Quotes extends System {
       if (!_.isEmpty(quote) && typeof quote !== 'undefined') {
         const quotedBy = (await global.users.getUsernamesFromIds([quote.quotedBy]))[quote.quotedBy];
         const message = await prepare('systems.quotes.show.ok', { quote: quote.quote, id: quote.id, quotedBy });
-        sendMessage(message, opts.sender);
+        sendMessage(message, opts.sender, opts.attr);
       } else {
         const message = await prepare('systems.quotes.show.error.not-found-by-id', { id });
-        sendMessage(message, opts.sender);
+        sendMessage(message, opts.sender, opts.attr);
       }
     } else {
       let quotes: Quote[] = await global.db.engine.find(this.collection.data);
@@ -137,11 +137,11 @@ class Quotes extends System {
         if (typeof quote !== 'undefined') {
           const quotedBy = (await global.users.getUsernamesFromIds([quote.quotedBy]))[quote.quotedBy];
           const message = await prepare('systems.quotes.show.ok', { quote: quote.quote, id: quote.id, quotedBy });
-          sendMessage(message, opts.sender);
+          sendMessage(message, opts.sender, opts.attr);
         }
       } else {
         const message = await prepare('systems.quotes.show.error.not-found-by-tag', { tag });
-        sendMessage(message, opts.sender);
+        sendMessage(message, opts.sender, opts.attr);
       }
     }
   }

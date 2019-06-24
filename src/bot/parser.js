@@ -15,9 +15,8 @@ class Parser {
     this.message = opts.message || '';
     this.sender = opts.sender || null;
     this.skip = opts.skip || false;
+    this.quiet = opts.quiet || false;
     this.successfullParserRuns = [];
-
-    if (!_.isNil(this.sender) && opts.quiet) {this.sender.quiet = opts.quiet};
 
     this.isCommand = this.message.startsWith('!');
     this.list = this.populateList();
@@ -36,7 +35,7 @@ class Parser {
       const opts = {
         sender: this.sender,
         message: this.message.trim(),
-        skip: this.skip
+        skip: this.skip,
       };
       const isOk = await parser['fnc'].apply(parser.this, [opts]);
       if (!isOk) {
@@ -92,7 +91,7 @@ class Parser {
       }
     }
     if (this.isCommand) {
-      this.command(this.sender, this.message.trim(), this.skip);
+      this.command(this.sender, this.message.trim());
     }
   }
 
@@ -196,7 +195,7 @@ class Parser {
     return commands;
   }
 
-  async command (sender, message, skip) {
+  async command (sender, message) {
     if (!message.startsWith('!')) {return}; // do nothing, this is not a command or user is ignored
     let command = await this.find(message);
     if (_.isNil(command)) {return}; // command not found, do nothing
@@ -208,9 +207,13 @@ class Parser {
     ) {
       var text = message.trim().replace(new RegExp('^(' + command.command + ')', 'i'), '').trim();
       let opts = {
-        sender: _.isNil(sender) ? { username: global.oauth.botUsername.toLowerCase() } : sender,
+        sender: sender,
         command: command.command,
-        parameters: text.trim()
+        parameters: text.trim(),
+        attr: {
+          skip: this.skip,
+          quiet: this.quiet,
+        }
       };
 
       if (_.isNil(command.id)) {throw Error(`command id is missing from ${command['fnc']}`)};
@@ -218,12 +221,11 @@ class Parser {
       if (typeof command.fnc === 'function' && !_.isNil(command.id)) {
         incrementCountOfCommandUsage(command.command);
         command['fnc'].apply(command.this, [opts]);
-
       } else {global.log.error(command.command + ' have wrong undefined function ' + command._fncName + '() registered!', { fnc: 'Parser.prototype.parseCommands' })};
     } else {
       // user doesn't have permissions for command
       sender['message-type'] = 'whisper';
-      sendMessage(global.translate('permissions.without-permission').replace(/\$command/g, message), sender);
+      sendMessage(global.translate('permissions.without-permission').replace(/\$command/g, message), sender, opts.attr);
 
       // do all rollbacks when permission failed
       const rollbacks = await this.rollbacks();
