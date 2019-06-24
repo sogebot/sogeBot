@@ -99,7 +99,11 @@ export async function prepare(translate: string, attr?: {[x: string]: any }): Pr
   for (const key of Object.keys(attr).sort((a, b) => b.length - a.length)) {
     let value = attr[key];
     if (['username', 'who', 'winner', 'sender', 'loser'].includes(key)) {
-      value = global.tmi.showWithAt ? `@${value}` : value;
+      if (typeof value.username !== 'undefined') {
+        value = global.tmi.showWithAt ? `@${value.username}` : value.username;
+      } else {
+        value = global.tmi.showWithAt ? `@${value}` : value;
+      }
     }
     msg = msg.replace(new RegExp('[$]' + key, 'g'), value);
   }
@@ -132,8 +136,8 @@ export function getTime(time, isChat) {
   }
 }
 
-export async function sendMessage(messageToSend, sender, attr?: {
-  sender?: any;
+export async function sendMessage(messageToSend: string, sender: Sender | null, attr?: {
+  sender?: Sender;
   quiet?: boolean;
   skip?: boolean;
   force?: boolean;
@@ -141,40 +145,38 @@ export async function sendMessage(messageToSend, sender, attr?: {
 }) {
   messageToSend = await messageToSend; // await if messageToSend is promise (like prepare)
   attr = attr || {};
-  sender = sender || {};
+  sender = sender || null;
 
   debug('commons.sendMessage', JSON.stringify({messageToSend, sender, attr}));
-  if (_.isString(sender)) { sender = { username: String(sender) }; }
 
-  if (_.isNil(sender) || _.isNil(sender.username)) {
-    sender.username = undefined;
-  } else {
+  if (sender) {
     attr.sender = sender;
   }
 
-  if (!_.isNil(sender.quiet)) { attr.quiet = sender.quiet; }
-  if (!_.isNil(sender.skip)) { attr.skip = sender.skip; }
   if (!attr.skip) { messageToSend = await new Message(messageToSend).parse(attr); }
   if (messageToSend.length === 0) { return false; } // if message is empty, don't send anything
 
   // if sender is null/undefined, we can assume, that username is from dashboard -> bot
-  if ((typeof sender.username === 'undefined' || sender.username === null) && !attr.force) { return false; } // we don't want to reply on bot commands
-  messageToSend = !_.isNil(sender.username) ? messageToSend.replace(/\$sender/g, (global.tmi.showWithAt ? '@' : '') + sender.username) : messageToSend;
-  if (!global.tmi.mute || attr.force) {
-    if ((!_.isNil(attr.quiet) && attr.quiet)) { return true; }
-    if (sender['message-type'] === 'whisper') {
-      global.log.whisperOut(messageToSend, { username: sender.username });
-      message('whisper', sender.username, messageToSend);
-    } else {
-      global.log.chatOut(messageToSend, { username: sender.username });
-      if (global.tmi.sendWithMe && !messageToSend.startsWith('/')) {
-        message('me', null, messageToSend);
+  if (!sender && !attr.force) { return false; } // we don't want to reply on bot commands
+
+  if (sender) {
+    messageToSend = !_.isNil(sender.username) ? messageToSend.replace(/\$sender/g, (global.tmi.showWithAt ? '@' : '') + sender.username) : messageToSend;
+    if (!global.tmi.mute || attr.force) {
+      if ((!_.isNil(attr.quiet) && attr.quiet)) { return true; }
+      if (sender['message-type'] === 'whisper') {
+        global.log.whisperOut(messageToSend, { username: sender.username });
+        message('whisper', sender.username, messageToSend);
       } else {
-        message('say', null, messageToSend);
+        global.log.chatOut(messageToSend, { username: sender.username });
+        if (global.tmi.sendWithMe && !messageToSend.startsWith('/')) {
+          message('me', null, messageToSend);
+        } else {
+          message('say', null, messageToSend);
+        }
       }
     }
+    return true;
   }
-  return true;
 }
 
 /* TODO: move to tmi */

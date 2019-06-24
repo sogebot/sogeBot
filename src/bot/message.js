@@ -630,9 +630,14 @@ class Message {
     await this.parseMessageEach(param, true)
     // local replaces
     if (!_.isNil(attr)) {
-      const isWithAt = global.tmi.showWithAt
       for (let [key, value] of Object.entries(attr)) {
-        if (_.includes(['sender'], key)) value = isWithAt ? `@${value}` : value
+        if (_.includes(['sender'], key)) {
+          if (typeof value.username !== 'undefined') {
+            value = global.tmi.showWithAt ? `@${value.username}` : value.username;
+          } else {
+            value = global.tmi.showWithAt ? `@${value}` : value;
+          }
+        }
         this.message = this.message.replace(new RegExp('[$]' + key, 'g'), value)
       }
     }
