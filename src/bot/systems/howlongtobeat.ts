@@ -96,16 +96,16 @@ class HowLongToBeat extends System {
       }
     }
     const gameToShow: Game = await global.db.engine.findOne(this.collection.data, { game });
-    if (typeof gameToShow._id === 'undefined') {
+    if (!gameToShow || typeof gameToShow._id === 'undefined') {
       await sendMessage(prepare('systems.howlongtobeat.error', { game }), opts.sender, opts.attr);
       return;
     }
-    const timeToBeatMain = (gameToShow || { timeToBeatMain: 0 }).timeToBeatMain / constants.HOUR;
-    const timeToBeatCompletionist = (gameToShow || { timeToBeatCompletionist: 0 }).timeToBeatCompletionist / constants.HOUR;
-    const gameplayMain = (gameToShow || { gameplayMain: 0 }).gameplayMain;
-    const gameplayCompletionist = (gameToShow || { gameplayCompletionist: 0 }).gameplayCompletionist;
-    const finishedMain = (gameToShow || { isFinishedMain: false }).isFinishedMain;
-    const finishedCompletionist = (gameToShow || { isFinishedCompletionist: false }).isFinishedCompletionist;
+    const timeToBeatMain = gameToShow.timeToBeatMain / constants.HOUR;
+    const timeToBeatCompletionist = gameToShow.timeToBeatCompletionist / constants.HOUR;
+    const gameplayMain = gameToShow.gameplayMain;
+    const gameplayCompletionist = gameToShow.gameplayCompletionist;
+    const finishedMain = gameToShow.isFinishedMain;
+    const finishedCompletionist = gameToShow.isFinishedCompletionist;
     await sendMessage(
       prepare('systems.howlongtobeat.game', {
         game, hltbMain: gameplayMain, hltbCompletionist: gameplayCompletionist, currentMain: timeToBeatMain.toFixed(1), currentCompletionist: timeToBeatCompletionist.toFixed(1),
