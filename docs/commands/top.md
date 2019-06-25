@@ -45,3 +45,9 @@
 `!top gifts`
 
 !> Default permission is **OWNER**
+
+## Top 10 by sub months
+
+`!top submonths`
+
+!> Default permission is **OWNER**
