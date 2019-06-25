@@ -26,14 +26,14 @@
                 <dd class="col-6">
                   <fa icon="spinner" spin v-if="!game.isFinishedMain" class="text-info"/>
                   <fa icon="check" class="text-success" v-else/>
-                  {{ Number(game.timeToBeatMain / 1000 / 60 / 60).toFixed(1)}}h / {{ game.gameplayMain }}h
+                  {{ Number(game.timeToBeatMain / 1000 / 60 / 60).toFixed(1)}}<small>h</small> / {{ game.gameplayMain }}<small>h</small>
                   <span class="percent">60<small>%</small></span>
                 </dd>
                 <dt class="col-6">Completionist</dt>
                 <dd class="col-6">
                   <fa icon="spinner" spin v-if="!game.isFinishedMain" class="text-info"/>
                   <fa icon="check" class="text-success" v-else/>
-                  {{ Number(game.timeToBeatCompletionist / 1000 / 60 / 60).toFixed(1)}}h / {{ game.gameplayCompletionist }}h
+                  {{ Number(game.timeToBeatCompletionist / 1000 / 60 / 60).toFixed(1)}}<small>h</small> / {{ game.gameplayCompletionist }}<small>h</small>
                   <span class="percent">60<small>%</small></span>
                 </dd>
               </dl>
@@ -108,6 +108,9 @@
 }
 
 .percent {
-  font-size: 2rem;
+  font-size: 1.4rem;
+}
+small {
+  font-size: 0.6rem;
 }
 </style>
