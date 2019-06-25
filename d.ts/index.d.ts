@@ -64,6 +64,7 @@ declare namespace NodeJS {
       cooldown: import('../src/bot/systems/cooldown').Cooldown;
       customCommands: import('../src/bot/systems/customCommands').CustomCommands;
       highlights: import('../src/bot/systems/highlights').Highlights;
+      howlongtobeat: import('../src/bot/systems/howlongtobeat').HowLongToBeat;
       keywords: import('../src/bot/systems/keywords').Keywords;
       moderation: import('../src/bot/systems/moderation').Moderation;
       points: import('../src/bot/systems/points').Points;
