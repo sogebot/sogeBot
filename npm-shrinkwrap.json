@@ -2913,6 +2913,9 @@
         "type-is": "~1.6.17"
       }
     },
+    "boolbase": {
+      "version": "1.0.0"
+    },
     "bootstrap": {
       "version": "4.3.1"
     },
@@ -3296,6 +3299,17 @@
     "check-error": {
       "version": "1.0.2",
       "dev": true
+    },
+    "cheerio": {
+      "version": "1.0.0-rc.3",
+      "requires": {
+        "css-select": "~1.2.0",
+        "dom-serializer": "~0.1.1",
+        "entities": "~1.1.1",
+        "htmlparser2": "^3.9.1",
+        "lodash": "^4.15.0",
+        "parse5": "^3.0.1"
+      }
     },
     "chokidar": {
       "version": "2.1.5",
@@ -3943,6 +3957,18 @@
         }
       }
     },
+    "css-select": {
+      "version": "1.2.0",
+      "requires": {
+        "boolbase": "~1.0.0",
+        "css-what": "2.1",
+        "domutils": "1.5.1",
+        "nth-check": "~1.0.1"
+      }
+    },
+    "css-what": {
+      "version": "2.1.3"
+    },
     "cssesc": {
       "version": "3.0.0",
       "dev": true
@@ -4461,9 +4487,32 @@
         "esutils": "^2.0.2"
       }
     },
+    "dom-serializer": {
+      "version": "0.1.1",
+      "requires": {
+        "domelementtype": "^1.3.0",
+        "entities": "^1.1.1"
+      }
+    },
     "domain-browser": {
       "version": "1.2.0",
       "dev": true
+    },
+    "domelementtype": {
+      "version": "1.3.1"
+    },
+    "domhandler": {
+      "version": "2.4.2",
+      "requires": {
+        "domelementtype": "1"
+      }
+    },
+    "domutils": {
+      "version": "1.5.1",
+      "requires": {
+        "dom-serializer": "0",
+        "domelementtype": "1"
+      }
     },
     "dot-prop": {
       "version": "4.2.0",
@@ -4644,6 +4693,9 @@
         "memory-fs": "^0.4.0",
         "tapable": "^1.0.0"
       }
+    },
+    "entities": {
+      "version": "1.1.2"
     },
     "env-variable": {
       "version": "0.0.5"
@@ -5119,8 +5171,7 @@
       "version": "2.0.0"
     },
     "fast-levenshtein": {
-      "version": "2.0.6",
-      "dev": true
+      "version": "2.0.6"
     },
     "fast-safe-stringify": {
       "version": "2.0.6"
@@ -5812,8 +5863,44 @@
       "version": "2.7.1",
       "dev": true
     },
+    "howlongtobeat": {
+      "version": "1.1.1",
+      "requires": {
+        "cheerio": "^1.0.0-rc.2",
+        "fast-levenshtein": "^2.0.6",
+        "request": "^2.88.0"
+      }
+    },
     "html-entities": {
       "version": "1.2.1"
+    },
+    "htmlparser2": {
+      "version": "3.10.1",
+      "requires": {
+        "domelementtype": "^1.3.1",
+        "domhandler": "^2.3.0",
+        "domutils": "^1.5.1",
+        "entities": "^1.1.1",
+        "inherits": "^2.0.1",
+        "readable-stream": "^3.1.1"
+      },
+      "dependencies": {
+        "domutils": {
+          "version": "1.7.0",
+          "requires": {
+            "dom-serializer": "0",
+            "domelementtype": "1"
+          }
+        },
+        "readable-stream": {
+          "version": "3.3.0",
+          "requires": {
+            "inherits": "^2.0.3",
+            "string_decoder": "^1.1.1",
+            "util-deprecate": "^1.0.1"
+          }
+        }
+      }
     },
     "http-errors": {
       "version": "1.7.2",
@@ -7498,6 +7585,12 @@
         "set-blocking": "~2.0.0"
       }
     },
+    "nth-check": {
+      "version": "1.0.2",
+      "requires": {
+        "boolbase": "~1.0.0"
+      }
+    },
     "number-is-nan": {
       "version": "1.0.1",
       "dev": true
@@ -7888,6 +7981,17 @@
     "parse-passwd": {
       "version": "1.0.0",
       "dev": true
+    },
+    "parse5": {
+      "version": "3.0.3",
+      "requires": {
+        "@types/node": "*"
+      },
+      "dependencies": {
+        "@types/node": {
+          "version": "12.0.0"
+        }
+      }
     },
     "parseqs": {
       "version": "0.0.5",

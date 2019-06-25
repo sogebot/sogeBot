@@ -15,33 +15,47 @@
     <template v-for="(chunkGames, index) of _.chunk(games, itemsPerLine)">
       <div class="card-deck" v-bind:key="index">
         <template v-for="game of chunkGames">
-          <div class="card mb-3 p-0 border" v-bind:key="String(game.game)" :class="[game.isOpened ? 'border-info' : '']">
+          <div class="card mb-3 p-0 border" v-bind:key="String(game.game)">
             <div class="col p-0 text-center" style="{ max-height: 250px; background-color: black; }">
-              <img :src="game.imageUrl" v-bind:key="String(game.game)"/>
+              <img class="max" :src="game.imageUrl" v-bind:key="String(game.game)"/>
               <h5 class="centered" style="text-transform: inherit;">{{ game.game }}</h5>
+              <div class="btn-group w-100" role="group" aria-label="Basic example">
+                <button @click="game.isFinishedMain = !game.isFinishedMain; update('isFinishedMain', game.isFinishedMain, game.game);" class="btn btn-sm" :class="{ 'btn-success': game.isFinishedMain, 'btn-danger': !game.isFinishedMain }">
+                  <fa icon="check" fixed-width v-if="game.isFinishedMain"/>
+                  <fa icon="ban" fixed-width v-else/>
+                  Main
+                  <small v-if="game.isFinishedMain">(done)</small>
+                </button>
+
+                <button @click="game.isFinishedCompletionist = !game.isFinishedCompletionist; update('isFinishedCompletionist', game.isFinishedCompletionist, game.game);"  class="btn btn-sm" :class="{ 'btn-success': game.isFinishedCompletionist, 'btn-danger': !game.isFinishedCompletionist }">
+                  <fa icon="check" fixed-width v-if="game.isFinishedCompletionist"/>
+                  <fa icon="ban" fixed-width v-else/>
+                  Completionist
+                  <small v-if="game.isFinishedCompletionist">(done)</small>
+                </button>
+              </div>
             </div>
             <div class="card-body col">
               <dl class="row">
                 <dt class="col-6">Main</dt>
                 <dd class="col-6">
-                  <fa icon="spinner" spin v-if="!game.isFinishedMain" class="text-info"/>
-                  <fa icon="check" class="text-success" v-else/>
-                  {{ Number(game.timeToBeatMain / 1000 / 60 / 60).toFixed(1)}}<small>h</small> / {{ game.gameplayMain }}<small>h</small>
-                  <span class="percent">60<small>%</small></span>
+                  <fa icon="spinner" spin v-if="!game.isFinishedMain" class="text-info" fixed-width/>
+                  <fa icon="check" class="text-success" v-else fixed-width/>
+                  {{ getHours(game.timeToBeatMain).toFixed(1) }}<small class="small">h</small> / {{ game.gameplayMain }}<small class="small">h</small>
+                  <span class="percent">
+                    {{ ((getHours(game.timeToBeatMain) / game.gameplayMain) * 100).toFixed(2) }}<small class="small">%</small>
+                  </span>
                 </dd>
                 <dt class="col-6">Completionist</dt>
                 <dd class="col-6">
-                  <fa icon="spinner" spin v-if="!game.isFinishedMain" class="text-info"/>
+                  <fa icon="spinner" spin v-if="!game.isFinishedCompletionist" class="text-info"/>
                   <fa icon="check" class="text-success" v-else/>
-                  {{ Number(game.timeToBeatCompletionist / 1000 / 60 / 60).toFixed(1)}}<small>h</small> / {{ game.gameplayCompletionist }}<small>h</small>
-                  <span class="percent">60<small>%</small></span>
+                  {{ getHours(game.timeToBeatCompletionist).toFixed(1) }}<small class="small">h</small> / {{ game.gameplayCompletionist }}<small class="small">h</small>
+                  <span class="percent">
+                    {{ ((getHours(game.timeToBeatCompletionist) / game.gameplayCompletionist) * 100).toFixed(2) }}<small class="small">%</small>
+                  </span>
                 </dd>
               </dl>
-            </div>
-            <div class="card-footer">
-              <button type="button" class="btn btn-block btn-danger" @click="stop(String(game._id))">
-                <fa icon='stop'></fa> {{ translate('systems.howlongtobeat.stopMain') }}
-              </button>
             </div>
           </div>
         </template>
@@ -79,19 +93,48 @@
       const object: {
         socket: any,
         itemsPerLine: number,
+        interval: number,
         games: import('../../../bot/systems/howlongtobeat').Game[],
+        domWidth: number,
       } = {
         socket: io('/systems/howlongtobeat', { query: "token=" + this.token }),
         games: [],
         itemsPerLine: 2,
+        interval: 0,
+        domWidth: 1080,
       }
       return object
     },
+    beforeDestroy() {
+      window.clearInterval(this.interval);
+    },
     created() {
+      this.interval = window.setInterval(() => {
+        this.domWidth = (this.$refs['window'] as HTMLElement).clientWidth
+      }, 100)
       this.socket.emit('find', {}, (err, data) => {
         if (err) return console.error(err)
         this.games = this._.orderBy(data, 'startedAt', 'desc')
       })
+    },
+    watch: {
+      domWidth(val) {
+        if (val < 800) {
+          this.itemsPerLine = 1
+        } else if (val < 1200) {
+          this.itemsPerLine = 2
+        } else {
+          this.itemsPerLine = 3
+        }
+      }
+    },
+    methods: {
+      update(attr: string, value: boolean, game: string) {
+        this.socket.emit('update', { collection: 'data', key: 'game', items: [{ game, [attr]: value}]})
+      },
+      getHours(time: number): number {
+        return Number(time / 1000 / 60 / 60)
+      }
     }
   })
 </script>
@@ -110,7 +153,11 @@
 .percent {
   font-size: 1.4rem;
 }
-small {
+.small {
   font-size: 0.6rem;
+}
+
+img.max {
+  max-height: 250px;
 }
 </style>
