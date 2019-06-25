@@ -95,6 +95,8 @@ const main = async () => {
     routes: [
       { path: '/stats/commandcount', name: 'CommandCountLogger', component: () => import('./views/loggers/commandcount.vue') },
 
+      { path: '/manage/hltb', name: 'HLTBManager', component: () => import('./views/managers/hltb.vue') },
+
       { path: '/manage/polls', name: 'PollsManager', component: () => import('./views/managers/polls.vue') },
 
       { path: '/manage/events/', redirect: '/manage/events/list' },
