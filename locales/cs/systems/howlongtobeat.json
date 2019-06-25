@@ -1,0 +1,5 @@
+{
+  "error": "$sender, $game nebyla nalezena v databázi nebo je to hra více hráčů.",
+  "game": "$sender, $game | Main$doneMain: $currentMain/$hltbMainh - $percentMain% | Completionist$doneCompletionist: $currentCompletionist/$hltbCompletionisth - $percentCompletionist%",
+  "done": "(hotovo)"
+}

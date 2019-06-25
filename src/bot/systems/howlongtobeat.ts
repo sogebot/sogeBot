@@ -6,6 +6,7 @@ import { command, default_permission } from '../decorators';
 import { permission } from '../permissions';
 import { HowLongToBeatService /*, HowLongToBeatEntry */ } from 'howlongtobeat';
 import Expects from '../expects';
+import { sendMessage, prepare } from '../commons';
 
 export interface Game {
   _id?: string;
@@ -82,30 +83,37 @@ class HowLongToBeat extends System {
   @command('!hltb')
   @default_permission(permission.CASTERS)
   async currentGameInfo(opts: CommandOptions) {
-    try {
-      let [game] = new Expects(opts.parameters)
-        .everything({ optional: true })
-        .toArray();
+    let [game] = new Expects(opts.parameters)
+      .everything({ optional: true })
+      .toArray();
 
+    if (!game) {
+      game = await global.db.engine.findOne('api.current', { key: 'game' });
       if (!game) {
-        game = await global.db.engine.findOne('api.current', { key: 'game' });
-        if (!game) {
-          return; // skip if we don't have game
-        } else {
-          game = game.value;
-        }
+        return; // skip if we don't have game
+      } else {
+        game = game.value;
       }
-
-      const gameToShow: Game | null = await global.db.engine.findOne(this.collection, { game });
-      const timeToBeatMain = (gameToShow || { timeToBeatMain: 0 }).timeToBeatMain;
-      const timeToBeatCompletionist = (gameToShow || { timeToBeatCompletionist: 0 }).timeToBeatCompletionist;
-      const gameplayMain = (gameToShow || { gameplayMain: 0 }).gameplayMain;
-      const gameplayCompletionist = (gameToShow || { gameplayCompletionist: 0 }).gameplayCompletionist;
-      console.log({timeToBeatMain, gameplayMain, timeToBeatCompletionist, gameplayCompletionist});
-    } catch (e) {
-      console.log(e);
-      // something went wrong
     }
+    const gameToShow: Game = await global.db.engine.findOne(this.collection.data, { game });
+    if (typeof gameToShow._id === 'undefined') {
+      await sendMessage(prepare('systems.howlongtobeat.error', { game }), opts.sender, opts.attr);
+      return;
+    }
+    const timeToBeatMain = (gameToShow || { timeToBeatMain: 0 }).timeToBeatMain / constants.HOUR;
+    const timeToBeatCompletionist = (gameToShow || { timeToBeatCompletionist: 0 }).timeToBeatCompletionist / constants.HOUR;
+    const gameplayMain = (gameToShow || { gameplayMain: 0 }).gameplayMain;
+    const gameplayCompletionist = (gameToShow || { gameplayCompletionist: 0 }).gameplayCompletionist;
+    const finishedMain = (gameToShow || { isFinishedMain: false }).isFinishedMain;
+    const finishedCompletionist = (gameToShow || { isFinishedCompletionist: false }).isFinishedCompletionist;
+    await sendMessage(
+      prepare('systems.howlongtobeat.game', {
+        game, hltbMain: gameplayMain, hltbCompletionist: gameplayCompletionist, currentMain: timeToBeatMain.toFixed(1), currentCompletionist: timeToBeatCompletionist.toFixed(1),
+        percentMain: Number((timeToBeatMain / gameplayMain) * 100).toFixed(2),
+        percentCompletionist: Number((timeToBeatCompletionist / gameplayCompletionist) * 100).toFixed(2),
+        doneMain: finishedMain ? await prepare('systems.howlongtobeat.done') : '',
+        doneCompletionist: finishedCompletionist ? await prepare('systems.howlongtobeat.done') : '',
+      }), opts.sender, opts.attr);
   }
 }
 
