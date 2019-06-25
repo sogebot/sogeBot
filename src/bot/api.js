@@ -411,9 +411,9 @@ class API {
           global.db.engine.update('api.current', { key: 'subscribers' }, { value: 0 })
         }
         delete opts.count;
-        return { state: false, opts: { noAffiliateOrPartnerWarningSent: true, ...opts } }
+        return { state: false, opts: { ...opts, noAffiliateOrPartnerWarningSent: true } }
       } else {
-        return { state: false, opts: { noAffiliateOrPartnerWarningSent: false, ...opts } }
+        return { state: false, opts: { ...opts, noAffiliateOrPartnerWarningSent: false } }
       }
     }
 
