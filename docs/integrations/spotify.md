@@ -1,5 +1,9 @@
 Current integration is enabling `$spotifySong` and song requests(PREMIUM) from Spotify
 
+!> Spotify WEB Api is often bugged. Although bot offer functionality to skip,
+   request songs, there *may* be issues with connection to spotify. Which is on spotify
+   side.
+
 ## How to setup
 
 1. Go to https://beta.developer.spotify.com/dashboard/

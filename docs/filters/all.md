@@ -118,6 +118,9 @@
 
 `$!_#` - same as variable above, except set message is always silent
 
+`$!!_#` - full silent variable, useful in multi responses where first response
+          might be just setting of variable
+
 `$touser` - is user param variable, if empty, current user is used. This
 param accepts `@user` and `user`
 
@@ -184,7 +187,10 @@ needed.
 e.g. `(api|https://httpbin.org/get?test=a\\nb) Lorem (api.args.test)`
 
 ## Command filters
-`$count` - return how many times command was used
+
+`$count` - return how many times current command was used
+
+`$count('!another')` - return how many times `!another` command was used
 
 `(!<command> <argument>)` - run `!<command> argument`
 
