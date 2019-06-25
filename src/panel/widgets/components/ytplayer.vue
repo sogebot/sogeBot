@@ -45,8 +45,14 @@
         </table>
       </div>
       <div role="tabpanel" class="tab-pane active" id="yt-main">
-        <vue-plyr ref="player" :emit="['ready','timeupdate']" @timeupdate="videoTimeUpdated" @ready="ready" :options='{ controls: ["volume"], fullscreen: { enabled: false }, clickToPlay: false }' :style="{ 'visibility': currentSong ? 'visible' : 'hidden'}">
-          <div data-plyr-provider="youtube"></div>
+        <vue-plyr ref="player"
+          class="vcenter"
+          v-if="currentSong !== null"
+          :emit="['timeupdate']"
+          @timeupdate="videoTimeUpdated"
+          :options='{ controls: ["volume", "progress", "current-time", "restart"], fullscreen: { enabled: false }, clickToPlay: false }'
+          :key="(currentSong || { videoID: ''}).videoID">
+          <div data-plyr-provider="youtube" :data-plyr-embed-id="(currentSong || { videoID: ''}).videoID"></div>
         </vue-plyr>
       </div>
 
@@ -68,19 +74,20 @@ export default {
   },
   data: function () {
     return {
-      initialized: false,
       autoplay: false,
       waitingForNext: false,
 
       currentSong: null,
       requests: [],
 
+      player: null,
+
       socket: io('/systems/songs', { query: "token=" + token })
     }
   },
-  computed: {
-    player () {
-      return this.$refs.player.player
+  updated() {
+    if (this.$refs.player) {
+      this.player = this.$refs.player.player;
     }
   },
   methods: {
@@ -96,58 +103,55 @@ export default {
         }
       }
     },
-    ready: function () {
-      if (!this.initialized) {
-        this.initialized = true
-        setInterval(() => {
-          if (this.autoplay && !this.player.playing && !this.player.loading && !this.waitingForNext) {
-            this.next()
-          }
-        }, 1000)
-      }
-    },
     next: function () {
       if (!this.waitingForNext) {
         this.waitingForNext = true
-        this.player.pause()
+        if (this.player) this.player.pause()
         this.socket.emit('next')
       }
     },
     pause: function () {
       this.autoplay = false
-      this.player.pause()
+      if (this.player) this.player.pause()
     },
     play: function () {
       this.autoplay = true
-      this.player.play()
-    }
-  },
-  created: function () {
-    this.socket.on('videoID', item => {
+      if (this.player) this.player.play()
+      if (this.currentSong === null) {
+        this.socket.emit('next')
+      }
+    },
+    playThisSong(item, retry = false) {
       if (!item) {
         this.currentSong = null
-        this.waitingForNext = false
         return
       }
-      this.currentSong = item
-      this.player.source = {
-        type: 'video',
-        sources: [
-          {
-            src: item.videoID,
-            provider: 'youtube',
-          },
-        ]
-      }
+      this.waitingForNext = false
 
+      if (retry && this.currentSong && this.currentSong.videoID !== item.videoID) {
+        return;
+      } else {
+        this.currentSong = item
+      }
+      if (!this.player) {
+        return setTimeout(() => {
+          console.log('retrying playThisSong')
+          this.playThisSong(item, true); //retry after while
+        }, 500)
+      }
       this.player.once('ready', event => {
         if (item.startTime) this.player.currentTime = item.startTime
         if (this.autoplay) {
           this.player.play()
         }
         this.player.volume = item.volume / 100
-        this.waitingForNext = false
       })
+    }
+  },
+  created: function () {
+    this.socket.on('videoID', item => {
+      this.player = null; // reset player
+      this.playThisSong(item)
     })
 
     setInterval(() => {
@@ -176,4 +180,11 @@ export default {
 
 <style scoped>
   .nav { flex-wrap: initial; }
+
+  #yt-main { background-color: black; }
+  .vcenter {
+    position: relative;
+    top: 50%;
+    transform: translate(0, -50%);
+  }
 </style>

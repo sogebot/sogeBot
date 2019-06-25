@@ -938,6 +938,15 @@
       "requires": {
         "@types/jquery": "*",
         "popper.js": "^1.14.1"
+      },
+      "dependencies": {
+        "@types/jquery": {
+          "version": "3.3.29",
+          "dev": true,
+          "requires": {
+            "@types/sizzle": "*"
+          }
+        }
       }
     },
     "@types/bootstrap-slider": {
@@ -945,6 +954,15 @@
       "dev": true,
       "requires": {
         "@types/jquery": "*"
+      },
+      "dependencies": {
+        "@types/jquery": {
+          "version": "3.3.29",
+          "dev": true,
+          "requires": {
+            "@types/sizzle": "*"
+          }
+        }
       }
     },
     "@types/bootstrap-toggle": {
@@ -952,6 +970,15 @@
       "dev": true,
       "requires": {
         "@types/jquery": "*"
+      },
+      "dependencies": {
+        "@types/jquery": {
+          "version": "3.3.29",
+          "dev": true,
+          "requires": {
+            "@types/sizzle": "*"
+          }
+        }
       }
     },
     "@types/bson": {
@@ -1092,7 +1119,7 @@
       "dev": true
     },
     "@types/jquery": {
-      "version": "3.3.29",
+      "version": "3.3.30",
       "dev": true,
       "requires": {
         "@types/sizzle": "*"
@@ -1337,6 +1364,15 @@
       "dev": true,
       "requires": {
         "@types/jquery": "*"
+      },
+      "dependencies": {
+        "@types/jquery": {
+          "version": "3.3.29",
+          "dev": true,
+          "requires": {
+            "@types/sizzle": "*"
+          }
+        }
       }
     },
     "@types/vuelidate": {
@@ -1347,7 +1383,7 @@
       }
     },
     "@types/webpack": {
-      "version": "4.4.33",
+      "version": "4.4.34",
       "dev": true,
       "requires": {
         "@types/anymatch": "*",
@@ -4743,7 +4779,7 @@
       }
     },
     "eslint": {
-      "version": "6.0.0",
+      "version": "6.0.1",
       "dev": true,
       "requires": {
         "@babel/code-frame": "^7.0.0",
@@ -7955,12 +7991,13 @@
       }
     },
     "plyr": {
-      "version": "3.5.6",
+      "version": "3.5.3",
       "requires": {
-        "core-js": "^3.1.4",
+        "core-js": "^3.0.1",
         "custom-event-polyfill": "^1.0.7",
         "loadjs": "^3.6.1",
         "rangetouch": "^2.0.0",
+        "raven-js": "^3.27.0",
         "url-polyfill": "^1.1.5"
       },
       "dependencies": {
@@ -8210,8 +8247,7 @@
       "version": "2.0.0"
     },
     "raven-js": {
-      "version": "3.27.0",
-      "dev": true
+      "version": "3.27.2"
     },
     "raw-body": {
       "version": "2.4.0",
@@ -10191,18 +10227,17 @@
       },
       "dependencies": {
         "core-js": {
-          "version": "3.0.1",
+          "version": "3.1.4",
           "dev": true
         },
         "plyr": {
-          "version": "3.5.4",
+          "version": "3.5.6",
           "dev": true,
           "requires": {
-            "core-js": "^3.0.1",
+            "core-js": "^3.1.4",
             "custom-event-polyfill": "^1.0.7",
             "loadjs": "^3.6.1",
             "rangetouch": "^2.0.0",
-            "raven-js": "^3.27.0",
             "url-polyfill": "^1.1.5"
           }
         }
