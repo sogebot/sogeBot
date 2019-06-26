@@ -821,7 +821,7 @@ class API {
             justStarted = true
 
             // go through all systems and trigger on.streamStart
-            for (let [type, systems] of Object.entries({
+            for (let [/* type */, systems] of Object.entries({
               systems: global.systems,
               games: global.games,
               overlays: global.overlays,
@@ -829,9 +829,13 @@ class API {
               integrations: global.integrations
             })) {
               for (let [name, system] of Object.entries(systems)) {
-                if (name.startsWith('_') || typeof system.on === 'undefined') continue
-                if (typeof system.on.streamStart === 'function') {
-                  system.on.streamStart()
+                if (name.startsWith('_') || typeof system.on === 'undefined') {
+                  continue;
+                }
+                if (Array.isArray(system.on.streamStart)) {
+                  for (const fnc of system.on.streamStart) {
+                    system[fnc]();
+                  }
                 }
               }
             }
