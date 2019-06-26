@@ -10359,6 +10359,9 @@
       "version": "3.0.6",
       "dev": true
     },
+    "vue-select": {
+      "version": "3.1.0"
+    },
     "vue-style-loader": {
       "version": "4.1.2",
       "dev": true,
