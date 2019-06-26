@@ -31,8 +31,8 @@
         <b-input-group-prepend is-text>
           <b-form-radio plain v-model="selectedTitle" name="selectedTitle" :value="typeof title._id === 'undefined' ? 'current' : title._id"></b-form-radio>
         </b-input-group-prepend>
-        <b-form-input v-model="title.title" :disabled="typeof title._id === 'undefined'" @blur="selectedTitle = title._id"></b-form-input>
-        <button slot="append" v-if="typeof title._id !== 'undefined'" class="btn btn-danger">
+        <b-form-input v-model="title.title" :disabled="typeof title._id === 'undefined'" @focus="selectedTitle = title._id"></b-form-input>
+        <button slot="append" v-if="typeof title._id !== 'undefined'" class="btn btn-danger" @click="titles = titles.filter(o => o._id !== title._id)">
           <font-awesome-icon icon="trash"/>
         </button>
       </b-input-group>
