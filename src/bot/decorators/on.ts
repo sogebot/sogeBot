@@ -73,6 +73,30 @@ export function onMessage() {
   };
 }
 
+export function onStreamStart() {
+  const { name, type } = getNameAndTypeFromStackTrace();
+
+  return (target: object, key: string) => {
+    const register = () => {
+      const isAvailableModule = type !== 'core' && typeof global[type] !== 'undefined' && typeof global[type][name] !== 'undefined';
+      const isAvailableLibrary = type === 'core' && typeof global[name] !== 'undefined';
+      if (!isAvailableLibrary && !isAvailableModule) {
+        return setTimeout(() => register(), 1000);
+      }
+
+      try {
+        const self = type === 'core' ? global[name] : global[type][name];
+        const on = get(self, `on.streamStart`, []);
+        on.push(key);
+        set(self, `on.streamStart`, on);
+      } catch (e) {
+        console.error(e);
+      }
+    };
+    register();
+  };
+}
+
 export function onStreamEnd() {
   const { name, type } = getNameAndTypeFromStackTrace();
 
