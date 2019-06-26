@@ -510,6 +510,7 @@ Panel.prototype.sendStreamData = async function (self, socket) {
     currentHosts: _.get(await global.db.engine.findOne('api.current', { key: 'hosts' }), 'value', 0),
     currentWatched: global.api._stream.watchedTime,
     tags: await global.db.engine.find('core.api.currentTags'),
+    cachedTags: await global.db.engine.find('core.api.tags'),
   }
   socket.emit('stats', data)
 }

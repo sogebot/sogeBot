@@ -7,7 +7,7 @@
     </template>
     <template v-else>
       <div class="row">
-        <div class="col-sm stream-info" onclick="saveHighlight()">
+        <div class="col-sm stream-info" @click="saveHighlight">
           <h2>
             <span>{{ translate('uptime') }}</span>
             <small>{{ translate('click-to-highlight') }}</small>
@@ -300,8 +300,8 @@
       },
       filterTags (is_auto) {
         return this.tags.filter(o => o.is_auto === is_auto).map((o) => {
-          const lang = _.get(this.configuration, 'core.general.lang', 'en')
-          const localekey  = Object.keys(o.localization_names).find((l) => l.startsWith(lang))
+          const lang = _.get(this.configuration, 'lang', 'en')
+          const localekey  = Object.keys(o.localization_names).find((l) => l.includes(lang))
           if (localekey) {
             return { name: o.localization_names[localekey], is_auto: o.is_auto }
           }

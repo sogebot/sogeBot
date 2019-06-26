@@ -142,3 +142,9 @@ $status-connecting-border: #fd7e14 !default;
 .vs__dropdown-option--highlight {
   background: $orange !important;
 }
+
+.vs__selected {
+  color: black !important;
+  border-color: $gray-600 !important;
+  background-color: $gray-700 !important;
+}

@@ -1,6 +1,6 @@
 
 <template>
-  <b-modal id="game_and_title_dlg" size="lg" :title="translate('change-game')" no-fade>
+  <b-modal id="game_and_title_dlg" size="lg" :title="translate('change-game')" no-fade @ok="handleOk">
     <div class="d-flex text-center" v-if="games.length > 0" @dragleave="dragleave" @dragenter="dragenter">
       <button class="btn btn-lg btn-block btn-outline-dark border-0 p-3" style="width: fit-content;flex: max-content;" @click="carouselPage--;" :disabled="carouselPage === 0">
         <font-awesome-icon icon="caret-left"></font-awesome-icon>
@@ -24,7 +24,6 @@
              v-for="index in (6 - _.chunk(games, 6)[carouselPage].length)" :key="index"></div>
       </div>
 
-
       <button class="btn btn-lg  btn-block btn-outline-dark border-0 p-3" style="width: fit-content;flex: max-content;" @click="carouselPage++;" :disabled="(carouselPage + 1) === _.chunk(games, 6).length">
         <font-awesome-icon icon="caret-right"></font-awesome-icon>
       </button>
@@ -46,6 +45,11 @@
         </button>
       </b-input-group>
     </div>
+
+    <h5 class="modal-title mt-4">
+      {{ translate('tags')}}
+    </h5>
+    <v-select :placeholder="translate('search-tags')" class="form-control mt-2 mb-4" :options="searchForTagsOpts" @search="searchForTags($event);" :searchable="true" @input="currentTags = $event; searchForTags('');" multiple :value="currentTags"></v-select>
   </b-modal>
 </template>
 
@@ -78,10 +82,13 @@
         manuallySelected: boolean
         cachedGamesOrder: string[],
         searchForGameOpts: string[],
+        searchForTagsOpts: string[],
         selectedTitle: any,
         draggingGame: string | null,
         draggingEnter: number,
-        draggingTimestamp: number
+        draggingTimestamp: number,
+        currentTags: any[],
+        cachedTags: any[],
       } = {
         socket: io('/', { query: "token=" + this.token }),
         data: [],
@@ -91,10 +98,13 @@
         manuallySelected: false,
         cachedGamesOrder: [],
         searchForGameOpts: [],
+        searchForTagsOpts: [],
         selectedTitle: 'current',
         draggingGame: null,
         draggingEnter: 0,
         draggingTimestamp: Date.now(),
+        currentTags: [],
+        cachedTags: [],
       }
       return object
     },
@@ -104,6 +114,9 @@
       }
     },
     methods: {
+      handleOk() {
+        console.log('Saving', this.currentGame, this.currentTags, this.currentTitle)
+      },
       dragstart(game) {
         this.draggingEnter = 0;
         this.draggingGame = game;
@@ -130,6 +143,22 @@
         } else {
           this.searchForGameOpts = [];
         }
+      },
+      searchForTags(value) {
+        this.searchForTagsOpts = this.cachedTags.map(o => {
+          const localization = Object.keys(o.localization_names).find(p => p.includes(this.configuration.lang))
+          return o.localization_names[localization || 'en-us']
+        }).filter(o => {
+          return o.toLowerCase().includes(value) && !this.currentTags.includes(o)
+        }).sort((a, b) => {
+          if ((a || { name: ''}).name < (b || { name: ''}).name)  { //sort string ascending
+            return -1;
+          }
+          if ((a || { name: ''}).name > (b || { name: ''}).name) {
+            return 1;
+          }
+          return 0; //default return value (no sorting)
+        });
       }
     },
     computed: {
@@ -165,6 +194,12 @@
         if (!this.currentGame) {
           this.currentGame = data.game;
           this.currentTitle = data.status;
+          this.currentTags = data.tags.filter(o => !o.is_auto).map(o => {
+            const localization = Object.keys(o.localization_names).find(p => p.includes(this.configuration.lang))
+            return o.localization_names[localization || 'en-us']
+          });
+          this.cachedTags = data.cachedTags.filter(o => !o.is_auto);
+          this.searchForTags(''); // buildup opts
           this.selectedTitle = 'current';
         }
       });

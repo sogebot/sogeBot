@@ -237,7 +237,7 @@ class UserInfo extends System {
       if (message.includes('$messages')) {
         const messages = await global.users.getMessagesOf(opts.sender.userId);
         const idx = message.indexOf('$messages');
-        message[idx] = messages + ' ' + getLocalizedName(messages, 'core.messages');
+        message[idx] = messagekts + ' ' + getLocalizedName(messages, 'core.messages');
       }
 
       if (message.includes('$tips')) {

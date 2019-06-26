@@ -678,6 +678,7 @@
     "search-by-username": "Search by username",
     "create-and-use-a-new-game": "Create and use a new game",
     "create-and-use-a-new-title": "Create and use a new title",
+    "search-tags": "Search for available tags (some game tags might missing / twitch policy)",
     "followers-show-number": "Show",
     "followers-show": "followers",
     "eventlist-overflow-height": "Max widget height",
