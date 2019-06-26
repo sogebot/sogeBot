@@ -1,3 +1,8 @@
+.vs--single .vs__selected, .vs__search {
+  position: relative;
+  top: -5px;
+}
+
 // reverse icon of btns
 .btn-reverse > div {
   flex-direction: row-reverse !important;

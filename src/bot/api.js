@@ -395,12 +395,16 @@ class API {
   }
 
   async getAllStreamTags(opts) {
-    if (!isMainThread) throw new Error('API can run only on master')
-    let url = `https://api.twitch.tv/helix/tags/streams?first=100`
-    if (opts.cursor) url += '&after=' + opts.cursor
+    if (!isMainThread) {
+      throw new Error('API can run only on master');
+    }
+    let url = `https://api.twitch.tv/helix/tags/streams?first=100`;
+    if (opts.cursor) {
+      url += '&after=' + opts.cursor;
+    }
 
-    const token = global.oauth.settings.bot.accessToken
-    const needToWait = _.isNil(global.overlays) || token === ''
+    const token = global.oauth.botAccessToken;
+    const needToWait = _.isNil(global.overlays) || token === '';
     const notEnoughAPICalls = this.calls.bot.remaining <= 30 && this.calls.bot.refresh > _.now() / 1000
 
     if (needToWait || notEnoughAPICalls) {
@@ -818,10 +822,10 @@ class API {
   async getCurrentStreamTags (opts) {
     if (!isMainThread) throw new Error('API can run only on master')
 
-    const cid = global.oauth.settings._.channelId
+    const cid = global.oauth.channelId
     const url = `https://api.twitch.tv/helix/streams/tags?broadcaster_id=${cid}`
 
-    const token = await global.oauth.settings.bot.accessToken
+    const token = await global.oauth.botAccessToken
     const needToWait = _.isNil(cid) || cid === '' || _.isNil(global.overlays) || token === ''
     const notEnoughAPICalls = this.calls.bot.remaining <= 30 && this.calls.bot.refresh > _.now() / 1000
     if (needToWait || notEnoughAPICalls) {
@@ -1193,7 +1197,7 @@ class API {
     }
 
     if (_.isNull(request.data.games)) {
-      if (socket) socket.emit('sendGameFromTwitch', false)
+      if (socket) socket.emit('sendGameFromTwitch', [])
       return false
     } else {
       if (socket) socket.emit('sendGameFromTwitch', _.map(request.data.games, 'name'))
