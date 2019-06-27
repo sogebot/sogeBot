@@ -97,7 +97,7 @@
         filtered: function () {
           if (this.search.length === 0) return this.items
           return this.items.filter((o) => {
-            const isSearchInPrice = !_.isNil(o.price.match(new RegExp(this.search, 'ig')))
+            const isSearchInPrice = !_.isNil(o.command.match(new RegExp(this.search, 'ig')))
             return isSearchInPrice
           })
         }
