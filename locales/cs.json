@@ -23,6 +23,7 @@
     "minutes": "minuta|4:minuty|minut",
     "seconds": "sekunda|4:sekundy|sekund",
     "messages": "zprava|4:zprávy|zpráv",
+    "bits": "bit|4:bity|bitů",
     "empty": "prázdné",
     "links": "odkaz|4:odkazy|odkazů",
     "isRegistered": "$sender, nelze pouzit $keyword, protoze je uz prirazena k jine akci!"

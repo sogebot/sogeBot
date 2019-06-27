@@ -25,7 +25,7 @@ class UserInfo extends System {
     toggleOnIcon: 'fa-eye',
     toggleOffIcon: 'fa-eye-slash',
   })
-  order: string[] = ['$sender', '$rank', '$watched', '$points', '$messages', '$tips'];
+  order: string[] = ['$sender', '$rank', '$watched', '$points', '$messages', '$tips', '$bits'];
 
   @settings('me')
   _formatDisabled: string[] = [];
@@ -235,9 +235,9 @@ class UserInfo extends System {
       }
 
       if (message.includes('$messages')) {
-        const messages = await global.users.getMessagesOf(opts.sender.userId);
+        const msgCount = await global.users.getMessagesOf(opts.sender.userId);
         const idx = message.indexOf('$messages');
-        message[idx] = message + ' ' + getLocalizedName(messages, 'core.messages');
+        message[idx] = msgCount + ' ' + getLocalizedName(msgCount, 'core.messages');
       }
 
       if (message.includes('$tips')) {
@@ -249,6 +249,13 @@ class UserInfo extends System {
           tipAmount += global.currency.exchange(Number(t.amount), t.currency, currency);
         }
         message[idx] = `${Number(tipAmount).toFixed(2)}${global.currency.symbol(currency)}`;
+      }
+
+      if (message.includes('$bits')) {
+        const idx = message.indexOf('$bits');
+        const bits = await global.db.engine.find('users.bits', { id: opts.sender.userId });
+        let bitAmount = bits.map(o => o.amount).reduce((a, b) => a + b, 0);
+        message[idx] = `${bitAmount} ${getLocalizedName(bitAmount, 'core.bits')}`;
       }
       sendMessage(message.join(this.formatSeparator), opts.sender, opts.attr);
     } catch (e) {
