@@ -1112,7 +1112,7 @@ class API {
           const localization = Object.keys(o.localization_names).find(p => p.includes(global.general.lang))
           return tagsArg.includes(o.localization_names[localization]);
         })
-      const request = await axios({
+      await axios({
         method: 'put',
         url,
         data: {
