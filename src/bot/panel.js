@@ -166,34 +166,43 @@ function Panel () {
       }
       socket.emit('sendUserTwitchGamesAndTitles', await global.db.engine.find('cache.titles'))
     })
-    socket.on('deleteUserTwitchTitle', async (data) => {
-      let items = await global.db.engine.find('cache.titles', { game: data.game })
-      for (let item of items) {
-        if (item.title === data.title) await global.db.engine.remove('cache.titles', { _id: String(item._id) })
+    socket.on('cleanupGameAndTitle', async (data, cb) => {
+      // remove empty titles
+      const emptyTitles = data.filter(o => o.title.trim().length === 0);
+      for (const t of emptyTitles) {
+        await global.db.engine.remove('cache.titles', { _id: String(t._id) });
       }
-      socket.emit('sendUserTwitchGamesAndTitles', await global.db.engine.find('cache.titles'))
-    })
-    socket.on('editUserTwitchTitle', async (data) => {
-      data.new = data.new.trim()
 
-      if (data.new.length === 0) {
-        let items = await global.db.engine.find('cache.titles', { game: data.game })
-        for (let item of items) {
-          if (item.title === data.title) await global.db.engine.remove('cache.titles', { _id: String(item._id) })
+      // update titles
+      const updateTitles = data.filter(o => o.title.trim().length > 0);
+      for (const t of updateTitles) {
+        await global.db.engine.update('cache.titles', { _id: String(t._id) }, { title: t.title });
+      }
+
+      // remove removed titles
+      let allTitles = await global.db.engine.find('cache.titles');
+      for (const t of allTitles) {
+        const titles = updateTitles.filter(o => o.game === t.game && o.title === t.title);
+        if (titles.length === 0) {
+          await global.db.engine.remove('cache.titles', { _id: String(t._id) });
         }
-        socket.emit('sendUserTwitchGamesAndTitles', await global.db.engine.find('cache.titles'))
-        return
       }
 
-      let item = await global.db.engine.findOne('cache.titles', { game: data.game, title: data.title.trim() })
-      if (_.isEmpty(item)) {
-        await global.db.engine.insert('cache.titles', { game: data.game, title: data.new })
-      } else {
-        await global.db.engine.update('cache.titles', { _id: String(item._id) }, { game: data.game, title: data.new })
+      // remove duplicates
+      allTitles = await global.db.engine.find('cache.titles');
+      for (const t of allTitles) {
+        const titles = allTitles.filter(o => o.game === t.game && o.title === t.title);
+        if (titles.length > 1) {
+          // remove title if we have more than one title
+          allTitles = allTitles.filter(o => String(o._id) !== String(t._id));
+          await global.db.engine.remove('cache.titles', { _id: String(t._id) });
+        }
       }
-    })
+      cb(null, await global.db.engine.find('cache.titles'));
+    });
     socket.on('updateGameAndTitle', async (data, cb) => {
       const status = await global.api.setTitleAndGame(null, data)
+      await global.api.setTags(null, data.tags);
 
       if (!status) { // twitch refused update
         cb(true)

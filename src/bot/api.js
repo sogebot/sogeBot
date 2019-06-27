@@ -1092,6 +1092,53 @@ class API {
     return title
   }
 
+  async setTags (sender, tagsArg) {
+    if (!isMainThread) {
+      throw new Error('API can run only on master')
+    }
+    const cid = global.oauth.channelId
+    const url = `https://api.twitch.tv/helix/streams/tags?broadcaster_id=${cid}`
+
+    const token = await global.oauth.botAccessToken
+    const needToWait = _.isNil(cid) || cid === '' || _.isNil(global.overlays) || token === ''
+    if (needToWait) {
+      setTimeout(() => this.setTags(sender, tagsArg), 1000)
+      return
+    }
+
+    try {
+      const tags = (await global.db.engine.find('core.api.tags'))
+        .filter(o => {
+          const localization = Object.keys(o.localization_names).find(p => p.includes(global.general.lang))
+          return tagsArg.includes(o.localization_names[localization]);
+        })
+      const request = await axios({
+        method: 'put',
+        url,
+        data: {
+          tag_ids: tags.map(o => {
+            return o.tag_id
+          }),
+        },
+        headers: {
+          'Authorization': 'Bearer ' + token,
+          'Content-Type': 'application/json'
+        }
+      })
+      await global.db.engine.remove('core.api.currentTags', { is_auto: false });
+      await global.db.engine.insert('core.api.currentTags', tags.map(o => {
+        delete o._id
+        return o
+      }))
+    } catch (e) {
+      global.log.error(`API: ${url} - ${e.message}`)
+      if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'setTitleAndGame', api: 'kraken', endpoint: url, code: _.get(e, 'response.status', '500'), data: e.stack })
+      return false
+    }
+
+
+  }
+
   async setTitleAndGame (sender, args) {
     if (!isMainThread) throw new Error('API can run only on master')
 
