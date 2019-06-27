@@ -345,7 +345,11 @@
     url(url: string, opts?: { method: 'POST' | 'GET', headers: object, data: object}): Promise<{ data: object, status: number, statusText: string}>
  *
  * Available variables
-    _, _current, users, sender (only in custom commands, keyword), param (only in custom command)
+    _, _current, users, param (only in custom command)
+    sender?: { // (only in custom commands, keyword)
+      username: string,
+      userId: string,
+    }
     random: {
       online: {
         viewer: string,

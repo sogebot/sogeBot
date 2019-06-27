@@ -56,7 +56,7 @@ class CustomVariables {
       socket.on('test.script', async (opts, cb) => {
         let returnedValue
         try {
-          returnedValue = await this.runScript(opts.evalValue, { _current: opts.currentValue, sender: 'TestUser' })
+          returnedValue = await this.runScript(opts.evalValue, { _current: opts.currentValue, sender: { username: 'testuser', userId: '0' }})
         } catch (e) {
           cb(e.stack, null)
         }
@@ -100,6 +100,13 @@ class CustomVariables {
   async runScript (script, opts) {
     let sender = !_.isNil(opts.sender) ? opts.sender : null
     let param = !_.isNil(opts.param) ? opts.param : null
+
+    if (typeof sender === 'string') {
+      sender = {
+        username: sender,
+        userId: await global.users.getIdByName(sender)
+      }
+    }
 
     // we need to check +1 variables, as they are part of commentary
     const containUsers = !_.isNil(script.match(/users/g)) && script.match(/users/g).length > 1
