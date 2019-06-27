@@ -2,7 +2,7 @@ import _ from 'lodash';
 import Vue from 'vue';
 import Overlays from './index.vue';
 
-import isAvailableVariable from '../panel/helpers/isAvailableVariable';
+import { isAvailableVariable } from '../panel/helpers/isAvailableVariable';
 import translate from '../panel/helpers/translate';
 
 export interface Global {

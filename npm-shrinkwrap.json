@@ -1,6 +1,6 @@
 {
   "name": "sogebot",
-  "version": "9.1.0-SNAPSHOT",
+  "version": "9.2.0-SNAPSHOT",
   "lockfileVersion": 1,
   "requires": true,
   "dependencies": {
@@ -2939,15 +2939,15 @@
       "version": "2.2.2"
     },
     "bootstrap-vue": {
-      "version": "2.0.0-rc.19",
+      "version": "2.0.0-rc.24",
       "dev": true,
       "requires": {
         "@nuxt/opencollective": "^0.2.2",
         "bootstrap": "^4.3.1",
         "core-js": ">=2.6.5 <3.0.0",
         "popper.js": "^1.15.0",
-        "portal-vue": "^2.1.1",
-        "vue-functional-data-merge": "^2.0.7"
+        "portal-vue": "^2.1.5",
+        "vue-functional-data-merge": "^3.1.0"
       }
     },
     "boxen": {
@@ -8117,7 +8117,7 @@
       "version": "1.15.0"
     },
     "portal-vue": {
-      "version": "2.1.4",
+      "version": "2.1.5",
       "dev": true
     },
     "posix-character-classes": {
@@ -10291,7 +10291,7 @@
       }
     },
     "vue-functional-data-merge": {
-      "version": "2.0.7",
+      "version": "3.1.0",
       "dev": true
     },
     "vue-hot-reload-api": {
@@ -10358,6 +10358,9 @@
     "vue-router": {
       "version": "3.0.6",
       "dev": true
+    },
+    "vue-select": {
+      "version": "3.1.0"
     },
     "vue-style-loader": {
       "version": "4.1.2",

@@ -1,3 +1,26 @@
+.form-control.v-select {
+  height: fit-content !important;
+}
+
+.vs--single .vs__selected, .vs__search {
+  position: relative;
+  top: -4px;
+}
+
+.vs__dropdown-toggle {
+  border: 0 !important;
+  padding: 0; margin: 0;
+}
+
+.vs__selected {
+  position: relative;
+  top: -4px;
+}
+
+.vs__actions {
+  display: none !important;
+}
+
 // reverse icon of btns
 .btn-reverse > div {
   flex-direction: row-reverse !important;

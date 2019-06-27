@@ -134,183 +134,10 @@
   </nav>
 
   <!-- CHANGE TITLE/GAME DLG -->
-  <div class="modal" id="game_and_title_dlg" tabindex="-1" role="dialog" aria-labelledby="game_and_title_dlg">
-    <div class="modal-dialog modal-lg" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h4 class="modal-title" data-lang="change-game"></h4>
-        </div>
-        <div class="modal-body dlg-game-and-title">
-          <div id="carousel-games" class="carousel" data-interval="false" data-keyboard="false">
-            <!-- Wrapper for slides -->
-            <div class="carousel-inner carousel-games-inner" role="listbox"></div>
-
-            <!-- Controls -->
-
-            <a class="carousel-control-prev" href="#carousel-games" role="button" data-slide="prev">
-              <i class="fas fa-chevron-left" aria-hidden="true"></i>
-              <span class="sr-only">Previous</span>
-            </a>
-            <a class="carousel-control-next" href="#carousel-games" role="button" data-slide="next">
-              <i class="fas fa-chevron-right" aria-hidden="true"></i>
-              <span class="sr-only">Next</span>
-            </a>
-          </div>
-          <div class="form-group has-feedback" style="padding-top: 1rem;" id="change-game-group">
-            <input type="text" class="form-control" id="change-game-input" placeholder="Add new game" onkeyup="changeGT.gameInput(this)">
-            <ul id="change-game-search-list"></ul>
-            <div class="invalid-feedback">
-              Please provide a valid game.
-            </div>
-          </div>
-        </div>
-        <div class="modal-header" style="padding-top: 0">
-          <h4 class="modal-title">
-            <i data-lang="change-title"></i>
-            <small id="titleForGame"></small>
-          </h4>
-        </div>
-        <div class="modal-body dlg-game-and-title">
-          <div id="titles-list"></div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-danger disabled" style="display: none" id="title-error">
-            <i data-lang="custom-title-empty-error"></i>
-          </button>
-          <button type="button" class="btn btn-danger" data-dismiss="modal">
-            <i data-lang="close"></i>
-          </button>
-          <button type="button" class="btn btn-primary" id="dlgSetTitleAndGame" onclick="changeGT.save()">
-            <i data-lang="save-changes"></i>
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
+  <div id="changegamedlg"></div> <!-- vue.js others/changegamedlg -->
 
   <!-- SNIPPETS -->
-  <div class="stream-info-container container-fluid" id="quickStatsApp">
-    <template v-if="!isLoaded">
-      <div class="mx-auto text-center p-3 pt-4">
-        <div class="spinner-grow" role="status"></div>
-      </div>
-    </template>
-    <template v-else>
-      <div class="row">
-        <div class="col-sm stream-info" onclick="saveHighlight()">
-          <h2>
-            <span>{{ commons.translate('uptime') }}</span>
-            <small>{{ commons.translate('click-to-highlight') }}</small>
-          </h2>
-          <span class="data" id="uptime">{{ uptime }}</span>
-          <span class="stats">&nbsp;</span>
-        </div>
-
-        <div class="col-sm stream-info" v-on:click="toggleViewerShow">
-          <h2>
-            <span>{{ commons.translate('viewers') }}</span>
-            <small>{{ commons.translate('click-to-toggle-display') }}</small>
-          </h2>
-          <span class="data" v-html="currentViewersComputed"></span>
-          <span class="stats">&nbsp;</span>
-        </div>
-
-        <div class="col-sm stream-info" v-on:click="toggleViewerShow">
-          <h2>
-            <span>{{ commons.translate('max-viewers') }}</span>
-            <small>{{ commons.translate('click-to-toggle-display') }}</small>
-          </h2>
-          <span class="data" v-html="maxViewersComputed"></span>
-          <span class="stats" v-html="difference(averageStats.maxViewers, maxViewersComputed)"></span>
-        </div>
-
-        <div class="col-sm stream-info" v-on:click="toggleViewerShow">
-          <h2>
-            <span>{{ commons.translate('new-chatters') }}</span>
-            <small>{{ commons.translate('click-to-toggle-display') }}</small>
-          </h2>
-          <span class="data" v-html="newChattersComputed"></span>
-          <span class="stats" v-html="difference(averageStats.newChatters, newChattersComputed)"></span>
-        </div>
-
-        <div class="col-sm stream-info">
-          <h2>{{ commons.translate('chat-messages') }}</h2>
-          <span class="data" v-bind:title="chatMessages">{{ chatMessages | shortenNumber(b_shortenNumber) }}</span>
-          <span class="stats" v-html="difference(averageStats.chatMessages, chatMessages)"></span>
-        </div>
-
-        <div class="col-sm stream-info">
-          <h2>{{ commons.translate('views') }}</h2>
-          <span class="data" v-bind:title="currentViews">{{ currentViews | shortenNumber(b_shortenNumber) }}</span>
-          <span class="stats" v-html="difference(averageStats.currentViews, currentViews)"></span>
-        </div>
-
-        <div class="col-sm stream-info">
-          <h2>{{ commons.translate('hosts') }}</h2>
-          <span class="data">{{ currentHosts }}</span>
-          <span class="stats" id="curHostsChange">&nbsp;</span>
-        </div>
-
-        <div class="col-sm stream-info">
-          <h2>{{ commons.translate('followers') }}</h2>
-          <span class="data" v-bind:title="currentFollowers">{{ currentFollowers | shortenNumber(b_shortenNumber) }}</span>
-          <span class="stats" v-html="difference(averageStats.currentFollowers, currentFollowers)"></span>
-        </div>
-
-        <div class="col-sm stream-info">
-          <h2>{{ commons.translate('subscribers') }}</h2>
-          <template v-if="broadcasterType !== ''">
-            <span class="data">{{ currentSubscribers }}</span>
-            <span class="stats" v-html="difference(averageStats.currentSubscribers, currentSubscribers)"></span>
-          </template>
-          <template v-else>
-            <span class="data text-muted" style="font-size:0.7rem;">{{ commons.translate('not-affiliate-or-partner') }}</span>
-          </template>
-        </div>
-
-        <div class="col-sm stream-info">
-          <h2>{{ commons.translate('bits') }}</h2>
-          <template v-if="broadcasterType !== ''">
-            <span class="data" v-bind:title="currentBits">{{ currentBits | shortenNumber(b_shortenNumber) }}</span>
-            <span class="stats" v-html="difference(averageStats.currentBits, currentBits)"></span>
-          </template>
-          <template v-else>
-            <span class="data text-muted" style="font-size:0.7rem;">{{ commons.translate('not-affiliate-or-partner') }}</span>
-          </template>
-        </div>
-
-        <div class="col-sm stream-info">
-          <h2>{{ commons.translate('tips') }}</h2>
-          <span class="data">{{ Number(currentTips).toFixed(2) }}</span><span class="data ml-0 pl-0">{{ currency }}</span>
-          <span class="stats" v-html="difference(averageStats.currentTips, currentTips, false, currency)"></span>
-        </div>
-
-        <div class="col-sm stream-info">
-          <h2>{{ commons.translate('watched-time') }}</h2>
-          <span class="data">{{ Number(currentWatched / 1000 / 60 / 60).toFixed(1) }}h</span>
-          <span class="stats" v-html="difference(averageStats.currentWatched / 1000 / 60 / 60, currentWatched / 1000 / 60 / 60, false, 'h', 1)"></span>
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="col-md stream-info" onclick="changeGT.showDlg()">
-          <h2>
-            <span>{{ commons.translate('game') }}</span>
-            <small>{{ commons.translate('click-to-change') }}</small>
-          </h2>
-          <span class="data" id="game">{{ commons.translate('not-available') }}</span>
-        </div>
-
-        <div class="col stream-info" onclick="changeGT.showDlg()">
-          <h2>
-            <span>{{ commons.translate('title') }}</span>
-            <small>{{ commons.translate('click-to-change') }}</small>
-          </h2>
-          <span class="data" id="title">{{ commons.translate('not-available') }}</span>
-        </div>
-      </div>
-    </template>
-  </div>
+  <div id="quickStatsApp"></div>
 
   <div class="container-fluid" style="overflow-x: hidden;">
     <!-- widgets -->
@@ -408,7 +235,6 @@
       query: "token=" + token
     });
 
-    var highlightsSocket = io('/systems/highlights', { query: "token=" + token })
     var loadedMenu = false
     var addingWidget = false
     var systems
@@ -478,20 +304,10 @@
     socket.emit('getConfiguration')
     socket.on('configuration', function (data) {
       configuration = data
-      console.log(data)
       moment.locale(data.lang) // set moment locale
       // THEME
       if (data.core.ui.theme === 'dark') {
         $('head').append('<link rel="stylesheet" href="./dist/css/dark.css">')
-      }
-
-      quickStatsApp.b_percentage = data.core.ui.percentage
-      quickStatsApp.b_showAvgDiff = data.core.ui.showdiff
-      quickStatsApp.b_shortenNumber = data.core.ui.shortennumbers
-
-      if (data.core.ui.stickystats) {
-        $('#quickStatsApp').addClass('sticky-top')
-        $('#quickStatsApp').css('top', '50px')
       }
     })
 
@@ -628,6 +444,7 @@
         currentTips: 0,
         currency: 'n/a',
         broadcasterType: '',
+        tags: [],
 
         isLoaded: false,
       },
@@ -655,6 +472,23 @@
         }
       },
       methods: {
+        filterTags (is_auto) {
+          return this.tags.filter(o => o.is_auto === is_auto).map((o) => {
+            const lang = _.get(configuration, 'core.general.lang', 'en')
+            const localekey  = Object.keys(o.localization_names).find((l) => l.startsWith(lang))
+            if (localekey) {
+              return { name: o.localization_names[localekey], is_auto: o.is_auto }
+            }
+          }).sort((a, b) => {
+            if (a.name < b.name)  { //sort string ascending
+              return -1;
+            }
+            if (a.name > b.name) {
+              return 1;
+            }
+            return 0; //default return value (no sorting)
+          });
+        },
         difference: function (number, current, shorten, postfix, toFixed) {
           postfix = postfix || ''
           shorten = typeof shorten === 'undefined' ? true : shorten
@@ -728,24 +562,6 @@
     })
 
     /* STATS */
-    socket.on('stats', async function (data) {
-      let title = await generateTitle(data.status, data.rawStatus)
-      $("#title").html(title)
-
-      $('#title').prop('title', data.rawStatus)
-      $("#game").text(data.game)
-      $('#game').prop('title', data.game)
-    })
-
-    socket.on('sendGameFromTwitch', function (status) {
-      changeGT.gameInputStatus(status)
-    })
-
-    socket.on('sendUserTwitchGamesAndTitles', function (data) {
-      delete data._id
-      changeGT.update(data)
-    })
-
     socket.on('lang', function (data) {
       translations = data
       let elements = $('[data-lang]')
@@ -766,388 +582,12 @@
       var audio = new Audio(sound).play()
     })
 
-    var changeGT = {
-      selectedGame: '',
-      selectedTitle: '',
-
-      icon: $("#change-game-icon"),
-      ticon: $("#change-title-icon"),
-      group: $("#change-game-group"),
-      tgroup: $("#change-title-group"),
-
-      timeout: null,
-      lastSearch: '',
-
-      cachedData: null,
-
-      setGameInput: function (el) {
-        $('#change-game-search-list').css('display', 'none')
-        $('#change-game-input').val(el.dataset.game)
-        $('#change-game-input').keyup()
-        this.group.children('input').removeClass().addClass('form-control is-checking')
-      },
-      gameInput: function (el) {
-        if ($(el).val().trim() === this.lastSearch) return
-
-        clearTimeout(this.timeout)
-        var self = this
-        this.timeout = setTimeout(function () {
-          self.group.removeClass()
-          self.group.addClass('form-group')
-          self.lastSearch = $(el).val().trim()
-          if ($(el).val().trim() !== '') {
-            self.group.children('input').removeClass().addClass('form-control is-checking')
-            console.debug('EMIT [getGameFromTwitch]', $(el).val())
-            socket.emit('getGameFromTwitch', $(el).val())
-          }
-        }, 1000)
-      },
-      gameInputStatus: function (games) {
-        console.group('gameInputStatus')
-        console.debug('Game list', games)
-        console.debug('Selected game', $('#change-game-input').val())
-        console.debug('Is searched game in list', _.includes(games, $('#change-game-input').val()))
-        console.groupEnd()
-        if (games !== false) {
-          if (_.includes(games, $('#change-game-input').val())) {
-            this.group.children('input').removeClass().addClass('form-control is-valid')
-            this.setSelectedGame(_.find(games, (o) => o === $('#change-game-input').val()))
-            this.update(this.cachedData, _.find(games, (o) => o === $('#change-game-input').val()))
-          } else {
-            this.group.children('input').removeClass().addClass('form-control is-invalid')
-            $('#change-game-search-list').empty()
-            _.each(games, function (game) {
-              $('#change-game-search-list').append('<li onclick="changeGT.setGameInput(this)" data-game="' +
-                game + '">' + game.replace(new RegExp('(' + $('#change-game-input').val() + ')', 'gi'),
-                  "<strong>$1</strong>") + '</li>')
-            })
-          }
-        } else {
-          this.group.children('input').removeClass().addClass('form-control is-invalid')
-        }
-      },
-      checkEmptyTitle: function (el) {
-        // only if title input radio is selected
-        if ($(el).val().trim().length > 0) {
-          $(el).removeClass().addClass('form-control is-valid')
-        } else {
-          $(el).removeClass().addClass('form-control is-invalid')
-        }
-      },
-
-      gameSelect: function (el) {
-        // unfocus every img
-        _.each($('.carousel-games-inner').children('div').children('span'), function (unfocus) {
-          $(unfocus).removeClass()
-          $(unfocus).addClass('col-md-2-auto titles-list-item')
-        })
-        $(el).parent().addClass('focus')
-        this.setSelectedGame(el.dataset.game)
-      },
-      setSelectedGame: function (game) {
-        this.selectedGame = game
-        $("#titleForGame").text(translations['for'] + ' ' + game)
-
-        // also, we want to update radios
-        this.updateRadios()
-      },
-
-      update: function (data, curGame = null) {
-        if (_.isArray(data)) data = _.groupBy(data, 'game') // remap array to object if needed
-        this.cachedData = data
-        curGame = _.isNull(curGame) ? $('#game').text() : curGame
-
-        $('.carousel-games-inner').empty()
-        var divItem = $('<div class="carousel-item active">')
-
-        if (curGame !== translations['not-available'] && curGame !== '') {
-          var div = $('<span class="" style="cursor: pointer">')
-            .addClass('col-md-2-auto focus titles-list-item')
-          var img = $('<img>')
-          img.attr('src', 'https://static-cdn.jtvnw.net/ttv-boxart/' + encodeURIComponent(curGame) +
-            '-100x140.jpg')
-          img.attr('onclick', 'changeGT.gameSelect(this)')
-          img.attr('title', curGame)
-          img.attr('data-game', curGame)
-          img.attr('data-deletable', false)
-          img.attr('class', 'titles-list-image')
-          div.append(img)
-          divItem.append(div)
-          this.setSelectedGame(curGame)
-        }
-
-        var count = (curGame !== translations['not-available'] && curGame !== '') ? 1 : 0
-        _.each(data, function (aTitles, aGame) {
-          if (aGame === curGame) return // current game is already in carousel
-
-          if (count === 6) { // if 6 elements exists, flush data
-            $('.carousel-games-inner').append(divItem)
-            divItem = $('<div class="carousel-item">')
-            count = 0
-          }
-          var div = $('<span style="cursor: pointer">')
-            .addClass('col-md-2-auto titles-list-item')
-          var img = $('<img>')
-          img.attr('src', 'https://static-cdn.jtvnw.net/ttv-boxart/' + encodeURIComponent(aGame) +
-            '-100x140.jpg')
-          img.attr('onclick', 'changeGT.gameSelect(this)')
-          img.attr('title', aGame)
-          img.attr('data-game', aGame)
-          img.attr('class', 'titles-list-image')
-
-          div.append(img)
-          divItem.append(div)
-
-          count += 1
-        })
-        // flush remaining data
-        $('.carousel-games-inner').append(divItem)
-        // refresh carousel
-        $('#carousel-games').carousel()
-        // refresh dropdown
-        var menu = new BootstrapMenu(".titles-list-image", {
-          fetchElementData: function ($el) {
-            return $el.data();
-          },
-          actions: [{
-            name: 'Delete',
-            iconClass: 'fa-trash-alt',
-            onClick: function (game) {
-              console.debug('EMIT [deleteUserTwitchGame]', game.game)
-              socket.emit('deleteUserTwitchGame', game.game)
-            },
-            isEnabled: function (game) {
-              return game.deletable;
-            }
-          }]
-        })
-      },
-      updateRadios: function () {
-        var self = this
-        $('#titles-list').empty()
-        var curTitle = !_.isNil(cachedRawTitle) && useRaw ? cachedRawTitle : $('#title').text()
-
-        // all
-        var row = $('<div>').addClass('row')
-
-        if (_.isNil(this.cachedData[this.selectedGame])) this.cachedData[this.selectedGame] = []
-        if (curTitle !== translations['not-available'] && curTitle !== '') {
-          this.selectedTitle = curTitle
-          let col = $('<div>').addClass('col-12')
-          let inputGroup = $('<div>').addClass('input-group')
-            .data('title', this.selectedTitle)
-            .data('game', this.selectedGame)
-            .on('click', (ev) => {
-              // remove checks on all radios
-              $('#titles-list input[type=radio]').attr('checked', false)
-
-              //check current radio
-              $(ev.currentTarget).children('span').children('span').children('input[type=radio]').attr('checked', true)
-              this.selectedTitle = $(ev.currentTarget).data('title')
-            })
-          let inputGroupPrepend = $('<span>').addClass('input-group-prepend')
-          let inputGroupText = $('<span>').addClass('input-group-text')
-          let radio = $('<input>')
-            .attr('type', 'radio')
-            .attr('checked', 'checked')
-            .attr('name', 'title')
-
-          let input = $('<input>')
-            .attr('type', 'text')
-            .attr('disabled', 'disabled')
-            .addClass("form-control")
-            .val(curTitle)
-
-          inputGroupPrepend.append(inputGroupText.append(radio))
-          inputGroup.append(inputGroupPrepend)
-          inputGroup.append(input)
-          col.append(inputGroup)
-
-          row.append(col)
-          $('#titles-list').append(row)
-        }
-
-        // items
-        for (let item of this.cachedData[this.selectedGame]) {
-          let col = $('<div>').addClass('col-12')
-          let inputGroup = $('<div>').addClass('input-group')
-          let inputGroupPrepend = $('<span>').addClass('input-group-prepend')
-          let inputGroupText = $('<span>').addClass('input-group-text')
-          let inputGroupTextRight = $('<span>').addClass('input-group-text')
-          let radio = $('<input>').attr('type', 'radio').attr('name', 'title')
-            .data('title', item.title)
-            .data('game', this.selectedGame)
-            .on('click', (ev) => {
-              // remove checks on all radios
-              $('#titles-list input[type=radio]').attr('checked', false)
-
-              //check current radio
-              $(ev.currentTarget).attr('checked', true)
-              this.selectedTitle = $(ev.currentTarget).data('title')
-            })
-          let inputGroupAppendRight = $('<span>')
-            .addClass('input-group-append')
-            .data('title', item.title)
-            .data('game', this.selectedGame)
-            .on('click', (ev) => {
-              console.group('Title delete event')
-              console.debug('Game:', $(ev.currentTarget).data('game'))
-              console.debug('Original title:', $(ev.currentTarget).data('title'))
-              console.groupEnd()
-              socket.emit('deleteUserTwitchTitle', {
-                game: $(ev.currentTarget).data('game'),
-                title: $(ev.currentTarget).data('title')
-              })
-            })
-          let deleteBtn = $('<i>').addClass('far fa-trash-alt')
-          let input = $('<input>')
-            .attr('type', 'text')
-            .addClass("form-control")
-            .val(item.title)
-            .data('title', item.title)
-            .data('game', this.selectedGame)
-            .on('click', (ev) => {
-              // remove checks on all radios
-              $('#titles-list input[type=radio]').attr('checked', false)
-              this.selectedTitle = $(ev.currentTarget).val()
-
-              // set check on current radio
-              $(ev.currentTarget).parent().children('span').children('span').children('input[type=radio]').attr('checked', true)
-            })
-            .on('change', (ev) => {
-              console.group('Title change event')
-              console.debug('Game:', $(ev.currentTarget).data('game'))
-              console.debug('Original title:', $(ev.currentTarget).data('title'))
-              console.debug('New title:', $(ev.currentTarget).val())
-              console.groupEnd()
-
-              socket.emit('editUserTwitchTitle', {
-                game: $(ev.currentTarget).data('game'),
-                title: $(ev.currentTarget).data('title'),
-                new: $(ev.currentTarget).val()
-              })
-
-              $(ev.currentTarget).data('title', $(ev.currentTarget).val())
-              this.selectedTitle = $(ev.currentTarget).val()
-            })
-
-          inputGroupPrepend.append(inputGroupText.append(radio))
-          inputGroupAppendRight.append(inputGroupTextRight.append(deleteBtn))
-
-          inputGroup.append(inputGroupPrepend)
-          inputGroup.append(input)
-          inputGroup.append(inputGroupAppendRight)
-          col.append(inputGroup)
-
-          row.append(col)
-          $('#titles-list').append(row)
-        }
-
-        let col = $('<div>').addClass('col-12')
-        let inputGroup = $('<div>').addClass('input-group')
-        let inputGroupPrepend = $('<span>').addClass('input-group-prepend')
-        let inputGroupText = $('<span>').addClass('input-group-text')
-        let radio = $('<input>').attr('type', 'radio').attr('name', 'title')
-        let input = $('<input>').attr('type', 'text').addClass("form-control").attr('id', 'change-title').attr('placeholder', commons.translate('create-and-use-a-new-title'))
-          .on('click', function (ev) {
-            changeGT.checkEmptyTitle(this)
-
-            // remove checks on all radios
-            $('#titles-list input[type=radio]').attr('checked', false)
-
-            // set check on current radio
-            $(ev.currentTarget).parent().children('span').children('span').children('input[type=radio]').attr('checked', true)
-          })
-          .on('keyup', function (ev) {
-            changeGT.checkEmptyTitle(this)
-          })
-
-        inputGroupPrepend.append(inputGroupText.append(radio))
-        inputGroup.append(inputGroupPrepend)
-        inputGroup.append(input)
-        col.append(inputGroup)
-
-        row.append(col)
-        $('#titles-list').append(row)
-      },
-      showDlg: function () {
-        $("#title-error").css('display', 'none')
-
-        $("#change-game-input").val('')
-        $("#change-title").val('')
-        $('#game_and_title_dlg').modal();
-        console.debug('EMIT [getUserTwitchGames]')
-        socket.emit('getUserTwitchGames')
-      },
-      save: function () {
-        let value = $("#change-title").val()
-        let invalid = $("#change-title").hasClass('is-invalid')
-        let checked = $("#change-title").parent().children('span').children('span').children('input[type=radio').prop('checked')
-
-        if (invalid && checked) {
-          $("#title-error").css('display', 'inline-block')
-          return
-        } else if (checked) {
-          this.selectedTitle = value
-        }
-        console.debug('EMIT [updateGameAndTitle]', {
-          game: this.selectedGame,
-          title: this.selectedTitle
-        })
-
-        const button = document.getElementById("dlgSetTitleAndGame")
-        button.textContent = commons.translate('dialog.buttons.saveChanges.progress');
-        socket.emit('updateGameAndTitle', {
-          game: this.selectedGame,
-          title: this.selectedTitle
-        }, (err) => {
-          if (err) {
-            button.textContent = commons.translate('dialog.buttons.something-went-wrong')
-          } else {
-            button.textContent = commons.translate('dialog.buttons.saveChanges.done')
-            $('#game_and_title_dlg').modal('hide')
-          }
-          setTimeout(() => {
-            button.textContent = commons.translate('dialog.buttons.saveChanges.idle')
-          }, 1000)
-        })
-      }
-    }
-
-    var saveHighlight = function () {
-      console.debug('EMIT [highlight]')
-      highlightsSocket.emit('highlight')
-
-    }
-
-    var useRaw = false
-    var cachedTitle = null
-    var cachedRawTitle = null
-
     var loadCustomVariableValue = async function (variable) {
       return new Promise((resolve, reject) => {
         socket.emit('custom.variable.value', variable, (err, value) => {
           resolve(value)
         })
       })
-    }
-
-    var generateTitle = async function (current, raw) {
-      if (raw.length === 0) return current
-      cachedRawTitle = raw
-
-      let variables = raw.match(/(\$_[a-zA-Z0-9_]+)/g)
-      if (cachedTitle === current && _.isNil(variables)) return cachedTitle
-
-      if (!_.isNil(variables)) {
-        for (let variable of variables) {
-          useRaw = true
-          let value = await loadCustomVariableValue(variable)
-          raw = raw.replace(variable, `<strong style="border-bottom: 1px dotted gray" data-toggle="tooltip" data-placement="bottom" title="${variable}">${value}</strong>`)
-        }
-      }
-      cachedTitle = raw
-      return raw
     }
 
     var setStatus = function (id, status) {

@@ -1,12 +1,12 @@
-const path = require('path')
-const VueLoaderPlugin = require('vue-loader/lib/plugin')
+const path = require('path');
+const VueLoaderPlugin = require('vue-loader/lib/plugin');
 
 module.exports = [{
   mode: process.env.NODE_ENV,
   performance: { hints: false },
   entry: './src/panel/index.ts',
   resolve: {
-    extensions: ['.js', '.vue', '.json', '.ts'],
+    extensions: ['.ts', '.js', '.vue', '.json'],
     alias: {
       'vue$': 'vue/dist/vue.esm.js'
     }
@@ -70,7 +70,7 @@ module.exports = [{
   performance: { hints: false },
   entry: ['./src/overlay/index.ts'],
   resolve: {
-    extensions: ['.js', '.vue', '.json', '.ts'],
+    extensions: ['.ts', '.js', '.vue', '.json'],
     alias: {
       'vue$': 'vue/dist/vue.esm.js'
     }
@@ -129,4 +129,4 @@ module.exports = [{
       }
     ]
   }
-}]
+}];

@@ -124,3 +124,27 @@ $status-connecting-border: #fd7e14 !default;
   color: lighten(#606b77, 20) !important;
   opacity: 1; /* Firefox */
 }
+
+.vs__selected, .vs__search {
+  color: $gray-700 !important;
+}
+
+.vs__dropdown-menu {
+  background-color: black !important;
+  color: $gray-700 !important;
+  border-color: #868e96 !important
+}
+
+.vs__dropdown-option {
+  color: $gray-700 !important;
+}
+
+.vs__dropdown-option--highlight {
+  background: $orange !important;
+}
+
+.vs__selected {
+  color: black !important;
+  border-color: $gray-600 !important;
+  background-color: $gray-700 !important;
+}
