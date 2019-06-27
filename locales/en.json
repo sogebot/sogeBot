@@ -27,6 +27,7 @@
     "minutes": "minute|minutes",
     "seconds": "second|seconds",
     "messages": "message|messages",
+    "bits": "bit|bits",
     "links": "link|links",
     "empty": "empty",
     "isRegistered": "$sender, you cannot use !$keyword, because is already in use for another action!"
