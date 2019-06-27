@@ -1,5 +1,5 @@
 <template>
-  <div class="stream-info-container container-fluid">
+  <div class="stream-info-container container-fluid" :class="{ 'sticky-top': b_sticky }" :style="{ 'top': b_sticky ? '50px' : undefined }">
     <template v-if="!isLoaded">
       <div class="mx-auto text-center p-3 pt-4">
         <div class="spinner-grow" role="status"></div>
@@ -172,6 +172,7 @@
         b_shortenNumber: boolean,
         b_showAvgDiff: boolean,
         b_percentage: boolean,
+        b_sticky: boolean,
         timestamp: null | number,
         uptime: string,
         currentViewers: number,
@@ -203,6 +204,7 @@
         b_shortenNumber: true,
         b_showAvgDiff: false,
         b_percentage: false,
+        b_sticky: false,
 
         timestamp: null,
         uptime: '--:--:--',
@@ -234,11 +236,7 @@
       this.b_percentage = this.configuration.core.ui.percentage
       this.b_showAvgDiff = this.configuration.core.ui.showdiff
       this.b_shortenNumber = this.configuration.core.ui.shortennumbers
-
-      if (this.configuration.core.ui.stickystats) {
-        $('#quickStatsApp').addClass('sticky-top')
-        $('#quickStatsApp').css('top', '50px')
-      }
+      this.b_sticky = this.configuration.core.ui.stickystats
     },
     watch: {
       timestamp() {
