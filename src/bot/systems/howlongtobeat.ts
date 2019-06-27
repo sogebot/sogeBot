@@ -49,6 +49,10 @@ class HowLongToBeat extends System {
       game = game.value;
     }
 
+    if (game.trim().length === 0) {
+      return; // skip if we have empty game
+    }
+
     let gameToInc: Game = await global.db.engine.findOne(this.collection.data, { game });
     if (typeof gameToInc._id !== 'undefined') {
       delete gameToInc._id;
