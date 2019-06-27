@@ -185,14 +185,71 @@ class TMI extends Core {
     this.client[type].chat.on('DISCONNECT', async (message) => {
       global.log.info(`TMI: ${type} is disconnected`)
       global.status.TMI = constants.DISCONNECTED
+      // go through all systems and trigger on.partChannel
+      for (let [/* type */, systems] of Object.entries({
+        systems: global.systems,
+        games: global.games,
+        overlays: global.overlays,
+        widgets: global.widgets,
+        integrations: global.integrations
+      })) {
+        for (let [name, system] of Object.entries(systems)) {
+          if (name.startsWith('_') || typeof system.on === 'undefined') {
+            continue;
+          }
+          if (Array.isArray(system.on.partChannel)) {
+            for (const fnc of system.on.partChannel) {
+              system[fnc]();
+            }
+          }
+        }
+      }
     })
     this.client[type].chat.on('RECONNECT', async (message) => {
       global.log.info(`TMI: ${type} is reconnecting`)
       global.status.TMI = constants.RECONNECTING
+      // go through all systems and trigger on.reconnectChannel
+      for (let [/* type */, systems] of Object.entries({
+        systems: global.systems,
+        games: global.games,
+        overlays: global.overlays,
+        widgets: global.widgets,
+        integrations: global.integrations
+      })) {
+        for (let [name, system] of Object.entries(systems)) {
+          if (name.startsWith('_') || typeof system.on === 'undefined') {
+            continue;
+          }
+          if (Array.isArray(system.on.reconnectChannel)) {
+            for (const fnc of system.on.reconnectChannel) {
+              system[fnc]();
+            }
+          }
+        }
+      }
     })
     this.client[type].chat.on('CONNECTED', async (message) => {
       global.log.info(`TMI: ${type} is connected`)
       global.status.TMI = constants.CONNECTED
+      // go through all systems and trigger on.joinChannel
+      for (let [/* type */, systems] of Object.entries({
+        systems: global.systems,
+        games: global.games,
+        overlays: global.overlays,
+        widgets: global.widgets,
+        integrations: global.integrations
+      })) {
+        for (let [name, system] of Object.entries(systems)) {
+          if (name.startsWith('_') || typeof system.on === 'undefined') {
+            continue;
+          }
+          if (Array.isArray(system.on.joinChannel)) {
+            for (const fnc of system.on.joinChannel) {
+              system[fnc]();
+            }
+          }
+        }
+      }
     })
 
     if (type === 'bot') {
