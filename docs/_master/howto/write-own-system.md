@@ -118,7 +118,7 @@ public anotherParser(opts: ParserOptions) {
 ```
 
 ## Database collections
-r
+
 In systems, you can use `this.collection` object variable to be consistent
 in collection names.
 
