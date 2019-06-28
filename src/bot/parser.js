@@ -5,7 +5,7 @@ const _ = require('lodash');
 const constants = require('./constants');
 import { debug } from './debug';
 import { sendMessage } from './commons';
-import { incrementCountOfCommandUsage } from './helpers/commands/count'
+import { incrementCountOfCommandUsage } from './helpers/commands/count';
 
 class Parser {
   constructor (opts) {
@@ -27,11 +27,11 @@ class Parser {
   }
 
   async isModerated () {
-    if (this.skip) {return false};
+    if (this.skip) {return false;};
 
     const parsers = await this.parsers();
     for (let parser of parsers) {
-      if (parser.priority !== constants.MODERATION) {continue}; // skip non-moderation parsers
+      if (parser.priority !== constants.MODERATION) {continue;}; // skip non-moderation parsers
       const opts = {
         sender: this.sender,
         message: this.message.trim(),
@@ -51,7 +51,7 @@ class Parser {
 
     const parsers = await this.parsers();
     for (let parser of parsers) {
-      if (parser.priority === constants.MODERATION) {continue}; // skip moderation parsers
+      if (parser.priority === constants.MODERATION) {continue;}; // skip moderation parsers
       if (
         _.isNil(this.sender) // if user is null -> we are running command through a bot
         || this.skip
@@ -190,16 +190,16 @@ class Parser {
     commands = _(await Promise.all(commands)).flatMap().sortBy(o => -o.command.length).value();
     for (let command of commands) {
       let permission = await global.db.engine.findOne(global.permissions.collection.commands, { key: command.id });
-      if (!_.isEmpty(permission)) {command.permission = permission.permission}; // change to custom permission
+      if (!_.isEmpty(permission)) {command.permission = permission.permission;}; // change to custom permission
     }
     return commands;
   }
 
   async command (sender, message) {
-    if (!message.startsWith('!')) {return}; // do nothing, this is not a command or user is ignored
+    if (!message.startsWith('!')) {return;}; // do nothing, this is not a command or user is ignored
     let command = await this.find(message);
-    if (_.isNil(command)) {return}; // command not found, do nothing
-    if (command.permission === null) {return}; // command is disabled
+    if (_.isNil(command)) {return;}; // command not found, do nothing
+    if (command.permission === null) {return;}; // command is disabled
     if (
       _.isNil(this.sender) // if user is null -> we are running command through a bot
       || this.skip
@@ -216,16 +216,16 @@ class Parser {
         }
       };
 
-      if (_.isNil(command.id)) {throw Error(`command id is missing from ${command['fnc']}`)};
+      if (_.isNil(command.id)) {throw Error(`command id is missing from ${command['fnc']}`);};
 
       if (typeof command.fnc === 'function' && !_.isNil(command.id)) {
         incrementCountOfCommandUsage(command.command);
         command['fnc'].apply(command.this, [opts]);
-      } else {global.log.error(command.command + ' have wrong undefined function ' + command._fncName + '() registered!', { fnc: 'Parser.prototype.parseCommands' })};
+      } else {global.log.error(command.command + ' have wrong undefined function ' + command._fncName + '() registered!', { fnc: 'Parser.prototype.parseCommands' });};
     } else {
       // user doesn't have permissions for command
       sender['message-type'] = 'whisper';
-      sendMessage(global.translate('permissions.without-permission').replace(/\$command/g, message), sender, opts.attr);
+      sendMessage(global.translate('permissions.without-permission').replace(/\$command/g, message), sender, {});
 
       // do all rollbacks when permission failed
       const rollbacks = await this.rollbacks();
