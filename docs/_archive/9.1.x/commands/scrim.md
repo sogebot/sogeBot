@@ -78,10 +78,3 @@
   <strong>bot:</strong> Current Matches: 123-as-erq - testuser, testuser2 |
                         111-as-eee - testuser3
 </blockquote>
-
-## Settings
-
-`!set systems.scrim.settings.time.waitForMatchIdsInSeconds <minutes>` - how long
-to wait until current matches are printed automatically
-
-!> Default permission is **OWNER**
