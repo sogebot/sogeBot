@@ -48,8 +48,9 @@
         <vue-plyr ref="player"
           class="vcenter"
           v-if="currentSong !== null"
-          :emit="['timeupdate']"
+          :emit="['timeupdate', 'ended']"
           @timeupdate="videoTimeUpdated"
+          @ended="videoEnded"
           :options='{ controls: ["volume", "progress", "current-time", "restart"], fullscreen: { enabled: false }, clickToPlay: false }'
           :key="(currentSong || { videoID: ''}).videoID">
           <div data-plyr-provider="youtube" :data-plyr-embed-id="(currentSong || { videoID: ''}).videoID"></div>
@@ -96,9 +97,16 @@ export default {
       this.requests = this.requests.filter((o) => String(o._id) !== _id)
       this.socket.emit('delete', { collection: 'request', where: { _id } })
     },
+    videoEnded: function (event) {
+      console.debug('[YTPLAYER.ended] - autoplay ', this.autoplay)
+      this.currentSong = null;
+      if (this.autoplay) {
+        this.next();
+      }
+    },
     videoTimeUpdated: function (event) {
       if (this.autoplay && this.currentSong) {
-        if (this.currentSong.endTime && event.detail.plyr.currentTime > this.currentSong.endTime) {
+        if (this.currentSong.endTime && event.detail.plyr.currentTime >= this.currentSong.endTime) {
           this.next() // go to next if we are at endTime
         }
       }
@@ -112,11 +120,11 @@ export default {
     },
     pause: function () {
       this.autoplay = false
-      if (this.player) this.player.pause()
+      if (this.player && this.currentSong) this.player.pause()
     },
     play: function () {
       this.autoplay = true
-      if (this.player) this.player.play()
+      if (this.player && this.currentSong) this.player.play()
       if (this.currentSong === null) {
         this.socket.emit('next')
       }
