@@ -10,17 +10,17 @@
       </div>
     </div>
 
-    <panel cards></panel>
-    <div class="row">
-      <div class="col">
-        <line-chart :data="generateChartData()"></line-chart>
-      </div>
-      <div class="form-group">
-        <datetime v-model="dateRange" :config="dateTimePicker"></datetime>
-      </div>
-    </div>
+    <panel cards>
+      <template slot="right">
+        <div class="form-group">
+          <datetime v-model="fromDate" :config="dateTimePickerFrom" class="form-control"></datetime>
+          <datetime v-model="toDate" :config="dateTimePickerTo" class="form-control"></datetime>
+        </div>
+      </template>
+    </panel>
 
-  {{ timestampSmooth }}
+    <line-chart :data="generateChartData()"></line-chart>
+
     <table class="table table-striped">
       <thead>
         <tr>
@@ -94,45 +94,46 @@
           timestamp: number,
         }[],
         showChartCommands: string[],
-        dateTimePicker: any,
-        dateRange: any,
+        dateTimePickerFrom: any,
+        dateTimePickerTo: any,
+        fromDate: string,
+        toDate: string,
       } = {
         socket: io('/stats/commandcount', { query: "token=" + this.token }),
         commandsUsage: [],
         showChartCommands: [],
-        dateTimePicker: {
-          mode: "range",
-          maxDate: new Date(),
-          inline: true,
+        dateTimePickerFrom: {
+          maxDate: new Date().getFullYear() + '-' + (new Date().getMonth() + 1) + '-' + (new Date().getDate() - 1),
         },
-        dateRange:
-            new Date().getFullYear() + '-' + (new Date().getMonth() + 1) + '-' + (new Date().getDate() - 14) + ' to ' +
-            new Date().getFullYear() + '-' + (new Date().getMonth() + 1) + '-' + new Date().getDate()
+        dateTimePickerTo: {
+          maxDate: new Date(),
+          minDate: new Date().getFullYear() + '-' + (new Date().getMonth() + 1) + '-' + (new Date().getDate() - 13),
+        },
+        fromDate: new Date().getFullYear() + '-' + (new Date().getMonth() + 1) + '-' + (new Date().getDate() - 14),
+        toDate: new Date().getFullYear() + '-' + (new Date().getMonth() + 1) + '-' + new Date().getDate(),
       }
       return object
     },
     watch: {
       showChartCommands() {
         localStorage.setItem('/stats/commandcount/showChartCommands', JSON.stringify(this.showChartCommands))
+      },
+      toDate() {
+        Vue.set(this.dateTimePickerFrom, 'maxDate',
+          new Date(this.toDate).getFullYear() + '-' +
+          (new Date(this.toDate).getMonth() + 1) + '-' +
+          (new Date(this.toDate).getDate() - 1));
+      },
+      fromDate() {
+        Vue.set(this.dateTimePickerTo, 'minDate',
+          new Date(this.fromDate).getFullYear() + '-' +
+          (new Date(this.fromDate).getMonth() + 1) + '-' +
+          (new Date(this.fromDate).getDate() + 1));
       }
     },
     computed: {
       commands(): string[] {
         return [...new Set(this.commandsUsage.map(o => o.command))];
-      },
-      fromDate(): number {
-        if (this.dateRange.includes('to')) {
-          return new Date(this.dateRange.split(' to ')[0]).getTime()
-        } else {
-          return new Date(this.dateRange.length > 0 ? this.dateRange : Date.now()).getTime()
-        }
-      },
-      toDate(): number {
-        if (this.dateRange.includes('to')) {
-          return new Date(this.dateRange.split(' to ')[1]).getTime()
-        } else {
-          return new Date().getTime()
-        }
       },
       timestampList(): number[] {
         const from = new Date(this.fromDate).getTime()
@@ -195,6 +196,9 @@
           name: string; data: { [x: string]: number };
         }[] = [];
 
+        const from = new Date(this.fromDate).getTime()
+        const to = new Date(this.toDate).getTime();
+
         for (const command of this.commands) {
           if (!this.showChartCommands.includes(command)) {
             continue;
@@ -202,8 +206,8 @@
           const timestamps = this.commandsUsage
             .filter(o => {
               const isCommand = o.command === command;
-              const isHigherThanFromDate = o.timestamp >= this.fromDate;
-              const isLowerThanToDate = o.timestamp <= this.toDate;
+              const isHigherThanFromDate = o.timestamp >= from;
+              const isLowerThanToDate = o.timestamp <= to;
               return isCommand && isHigherThanFromDate && isLowerThanToDate;
             })
             .map(o => {
@@ -254,7 +258,4 @@
 </script>
 
 <style scoped>
-.flatpickr-input {
-  display: none;
-}
 </style>
