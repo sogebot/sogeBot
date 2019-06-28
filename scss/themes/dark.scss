@@ -84,8 +84,9 @@ $status-connecting-bg:     #fd7e14 !default;
 $status-connecting-border: #fd7e14 !default;
 
 @import "../../node_modules/bootstrap/scss/bootstrap";
-@import "../custom.scss";
+@import '../../node_modules/bootstrap-vue/src/index.scss';
 @import "../colors.scss";
+@import "../custom.scss";
 
 // Force text color on buttons to be more readable (yiq is somehow too dark)
 .btn-primary {
