@@ -306,14 +306,14 @@ a.active {
 }
 
 h6 {
-  font-size: .9rem;
-  text-transform: uppercase;
-  margin-top: 0;
-  line-height: 2.6rem;
-  font-weight: bold;
-  color:theme-color("primary");
-  margin-right: .5rem;
-  margin-left: .5rem;
+  font-size: .9rem !important;
+  text-transform: uppercase !important;
+  margin-top: 0 !important;
+  line-height: 2.6rem !important;
+  font-weight: bold !important;
+  color: theme-color("primary") !important;
+  margin-right: .5rem !important;
+  margin-left: .5rem !important;
   font-family: 'PT Sans', sans-serif !important;
 
 }
@@ -932,9 +932,9 @@ table tr td hr {
   padding: 0;
 }
 
-.nav-link {
-  padding-top: 0.1rem;
-  padding-bottom: 0.1rem;
+.navbar-nav .nav-link {
+  padding-top: 0.1rem !important;
+  padding-bottom: 0.1rem !important;
 }
 
 .nav-tabs .nav-link {

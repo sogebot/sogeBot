@@ -48,6 +48,11 @@ $bot-response-border-color: $gray-400 !default;
 
 $bot-version: $blue !default;
 
+$theme-colors: (
+  "primary": #007bff,
+  "secondary": #606b77
+);
+
 $hr: $gray-800 !default;
 
 $eventlist: (
@@ -76,9 +81,11 @@ $status-connecting:        darken($yellow, 50) !default;
 $status-connecting-bg:     $yellow !default;
 $status-connecting-border: $yellow !default;
 
-@import "../../node_modules/bootstrap/scss/bootstrap";
-@import "../custom.scss";
+
+@import "../../node_modules/bootstrap/scss/bootstrap.scss";
+@import '../../node_modules/bootstrap-vue/src/index.scss';
 @import "../colors.scss";
+@import "../custom.scss";
 
 
 .btn-outline-dark:hover {
