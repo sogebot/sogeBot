@@ -51,7 +51,7 @@
           :emit="['timeupdate', 'ended']"
           @timeupdate="videoTimeUpdated"
           @ended="videoEnded"
-          :options='{ controls: ["volume", "progress", "current-time", "restart"], fullscreen: { enabled: false }, clickToPlay: false }'
+          :options='{ controls: ["volume", "progress", "current-time", "restart", "mute"], fullscreen: { enabled: false }, clickToPlay: false }'
           :key="(currentSong || { videoID: ''}).videoID">
           <div data-plyr-provider="youtube" :data-plyr-embed-id="(currentSong || { videoID: ''}).videoID"></div>
         </vue-plyr>
@@ -149,10 +149,14 @@ export default {
       }
       this.player.once('ready', event => {
         if (item.startTime) this.player.currentTime = item.startTime
-        if (this.autoplay) {
-          this.player.play()
-        }
         this.player.volume = item.volume / 100
+        this.player.muted = true
+        this.$nextTick(() => {
+          if (this.autoplay) {
+            this.player.play()
+          }
+          this.player.muted = false
+        })
       })
     }
   },
