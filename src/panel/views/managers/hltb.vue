@@ -5,7 +5,7 @@
         <span class="title text-default mb-2">
           {{ translate('menu.manage') }}
           <small><i class="fas fa-angle-right"></i></small>
-          {{ translate('menu.hltb') }}
+          {{ translate('menu.howlongtobeat') }}
         </span>
       </div>
     </div>

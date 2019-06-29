@@ -29,7 +29,7 @@ class HowLongToBeat extends System {
     super();
 
     global.db.engine.index(this.collection.data, [{ index: 'game', unique: true }]);
-    this.addMenu({ category: 'manage', name: 'hltb', id: 'manage/hltb' });
+    this.addMenu({ category: 'manage', name: 'howlongtobeat', id: 'manage/hltb' });
 
     if (isMainThread) {
       setInterval(async () => {
