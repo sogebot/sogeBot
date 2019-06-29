@@ -166,6 +166,9 @@
         this.searchForTags(''); // buildup opts
         this.selectedTitle = 'current';
         this.newTitle = ''
+        this.socket.emit('getCachedTags', (data) => {
+          this.cachedTags = data.filter(o => !o.is_auto);
+        })
       },
       handleOk() {
         let title
@@ -280,7 +283,6 @@
             const localization = Object.keys(o.localization_names).find(p => p.includes(this.configuration.lang))
             return o.localization_names[localization || 'en-us']
           });
-          this.cachedTags = data.cachedTags.filter(o => !o.is_auto);
         }
       });
 
