@@ -254,7 +254,7 @@ class UserInfo extends System {
       if (message.includes('$bits')) {
         const idx = message.indexOf('$bits');
         const bits = await global.db.engine.find('users.bits', { id: opts.sender.userId });
-        let bitAmount = bits.map(o => o.amount).reduce((a, b) => a + b, 0);
+        let bitAmount = bits.map(o => Number(o.amount)).reduce((a, b) => a + b, 0);
         message[idx] = `${bitAmount} ${getLocalizedName(bitAmount, 'core.bits')}`;
       }
       sendMessage(message.join(this.formatSeparator), opts.sender, opts.attr);
