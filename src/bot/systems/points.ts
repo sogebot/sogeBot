@@ -153,11 +153,14 @@ class Points extends System {
     try {
       const [username, points] = new Expects(opts.parameters).username().points({ all: false }).toArray();
 
-      const user = global.users.getByName(username);
-      if (!user.id) {user.id = await global.api.getIdFromTwitch(username);}
+      const user = await global.users.getByName(username);
+      if (!user.id) {
+        user.id = await global.api.getIdFromTwitch(username);
+      }
 
       if (user.id) {
-        await global.db.engine.increment('users.points', { id: user.id }, { points });
+        await global.db.engine.remove('users.points', { id: user.id });
+        await global.db.engine.insert('users.points', { id: user.id, points });
 
         let message = await prepare('points.success.set', {
           amount: points,
@@ -169,6 +172,7 @@ class Points extends System {
         throw new Error('User doesn\'t have ID');
       }
     } catch (err) {
+      global.log.error(err);
       sendMessage(global.translate('points.failed.set').replace('$command', opts.command), opts.sender, opts.attr);
     }
   }
@@ -268,7 +272,9 @@ class Points extends System {
       const [username] = new Expects(opts.parameters).username({ optional: true, default: opts.sender.username }).toArray();
       const user = await global.users.getByName(username);
 
-      if (!user.id) {user.id = await global.api.getIdFromTwitch(username);}
+      if (!user.id) {
+        user.id = await global.api.getIdFromTwitch(username);
+      }
 
       let points = await this.getPointsOf(user.id);
       let message = await prepare('points.defaults.pointsResponse', {
