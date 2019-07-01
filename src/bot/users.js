@@ -248,8 +248,8 @@ class Users extends Core {
         const usersByName = await global.db.engine.find('users', { username: { $regex: regexp } })
         cb({
           results: [
-          ...usersById,
-          ...usersByName,
+            ...usersById,
+            ...usersByName,
           ],
           state: opts.state,
         })
