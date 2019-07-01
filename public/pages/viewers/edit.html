@@ -120,7 +120,7 @@
                 <td scope="row">{{ moment(bits.timestamp).format('LLL') }}</td>
                 <td>
                   <input type="number" min="0" v-model="bits.amount" v-if="bits.editation" class="form-control">
-                  <strong v-else>{{ bits.amount }}</strong>
+                  <strong v-else>{{ Number(bits.amount) }}</strong>
                 </td>
                 <td>
                   <textarea v-model="bits.message" class="form-control" v-if="bits.editation"></textarea>

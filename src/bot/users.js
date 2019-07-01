@@ -269,7 +269,7 @@ class Users extends Core {
 
         for (const v of viewers) {
           _.set(v, 'stats.tips', v.tips.map((o) => global.currency.exchange(o.amount, o.currency, global.currency.mainCurrency)).reduce((a, b) => a + b, 0));
-          _.set(v, 'stats.bits', v.bits.map((o) => o.amount).reduce((a, b) => a + b, 0));
+          _.set(v, 'stats.bits', v.bits.map((o) => Number(o.amount)).reduce((a, b) => a + b, 0));
           _.set(v, 'custom.currency', global.currency.mainCurrency);
           _.set(v, 'points', (v.points[0] || { points: 0 }).points);
           _.set(v, 'messages', (v.messages[0] || { messages: 0 }).messages);
