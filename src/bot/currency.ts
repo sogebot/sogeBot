@@ -41,11 +41,13 @@ class Currency extends Core {
     return getSymbolFromCurrency(code);
   }
 
-  public exchange(value: number, from: string, to: string) {
+  public exchange(value: number, from: string, to: string): number {
     try {
       this.rates[this.base] = 1; // base is always 1:1
 
-      if (from.toLowerCase().trim() === to.toLowerCase().trim()) { return value; } // nothing to do
+      if (from.toLowerCase().trim() === to.toLowerCase().trim()) {
+        return Number(value); // nothing to do
+      }
       if (_.isNil(this.rates[from])) { throw Error(`${from} code was not found`); }
       if (_.isNil(this.rates[to]) && to.toLowerCase().trim() !== this.base.toLowerCase().trim()) { throw Error(`${to} code was not found`); }
 
@@ -57,7 +59,7 @@ class Currency extends Core {
     } catch (e) {
       global.log.warning(`Currency exchange error - ${e.message}`);
       global.log.warning(`Available currencies: ${Object.keys(this.rates).join(', ')}`);
-      return value; // don't change rate if code not found
+      return Number(value); // don't change rate if code not found
     }
   }
 
