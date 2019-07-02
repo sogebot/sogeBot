@@ -139,6 +139,7 @@
       components: {
         'toggle': toggleEnable,
         'text-input': textInput,
+        'global-ignorelist-exclude': globalIgnorelistExclude,
         'number-input': numberInput,
         'command-input-with-permission': commandInputWithPermissions,
         'textarea-from-array': textAreaFromArray,
@@ -229,6 +230,7 @@
             }
             this.isDataChanged = false
 
+            console.debug({ui, settings});
             this.settings = Object.assign({}, settings)
             this.ui = Object.assign({}, ui)
           })

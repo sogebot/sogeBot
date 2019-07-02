@@ -1,6 +1,7 @@
 {
   "settings": {
-    "ignorelist": "Seznam ignorovaných",
+    "ignorelist": "Seznam ignorovaných (ID nebo uživ. jm.)",
+    "globalIgnoreListExclude": "Odebrat z globálního seznamu ignorovaných",
     "showWithAt": "Zobraz uzivatele s @",
     "sendWithMe": "Posílat zprávy s /me",
     "mute": "Bot je ztišen",

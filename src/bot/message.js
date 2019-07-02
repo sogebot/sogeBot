@@ -84,9 +84,9 @@ class Message {
       '(random.online.viewer)': async function () {
         const usernames = await global.users.getAllOnlineUsernames();
         const onlineViewers = usernames.filter((username) => {
-          const isSender = username === attr.sender;
+          const isSender = username === attr.sender.username;
           const isBot = commons.isBot(username);
-          const isIgnored = commons.isIgnored(username);
+          const isIgnored = commons.isIgnored(attr.sender);
           return !isSender && !isBot && !isIgnored;
         });
         if (onlineViewers.length === 0) {return 'unknown'};
@@ -95,9 +95,9 @@ class Message {
       '(random.online.follower)': async function () {
         const usernames = await global.users.getAllOnlineUsernames();
         const onlineViewers = usernames.filter((username) => {
-          const isSender = username === attr.sender;
+          const isSender = username === attr.sender.username;
           const isBot = commons.isBot(username);
-          const isIgnored = commons.isIgnored(username);
+          const isIgnored = commons.isIgnored(attr.sender);
           return !isSender && !isBot && !isIgnored;
         });
         const followers = _.filter(
@@ -110,9 +110,9 @@ class Message {
       '(random.online.subscriber)': async function () {
         const usernames = await global.users.getAllOnlineUsernames();
         const onlineViewers = usernames.filter((username) => {
-          const isSender = username === attr.sender;
+          const isSender = username === attr.sender.username;
           const isBot = commons.isBot(username);
-          const isIgnored = commons.isIgnored(username);
+          const isIgnored = commons.isIgnored(attr.sender);
           return !isSender && !isBot && !isIgnored;
         });
         const subscribers = _.filter(
@@ -125,9 +125,9 @@ class Message {
       '(random.viewer)': async function () {
         let viewer = (await global.users.getAll()).map((o) => o.username);
         viewer = viewer.filter((username) => {
-          const isSender = username === attr.sender;
+          const isSender = username === attr.sender.username;
           const isBot = commons.isBot(username);
-          const isIgnored = commons.isIgnored(username);
+          const isIgnored = commons.isIgnored(attr.sender);
           return !isSender && !isBot && !isIgnored;
         });
         if (viewer.length === 0) {return 'unknown'};
@@ -136,9 +136,9 @@ class Message {
       '(random.follower)': async function () {
         let follower = (await global.db.engine.find('users', { is: { follower: true } })).map((o) => o.username);
         follower = follower.filter((username) => {
-          const isSender = username === attr.sender;
+          const isSender = username === attr.sender.username;
           const isBot = commons.isBot(username);
-          const isIgnored = commons.isIgnored(username);
+          const isIgnored = commons.isIgnored(attr.sender);
           return !isSender && !isBot && !isIgnored;
         });
         if (follower.length === 0) {return 'unknown'};
@@ -147,9 +147,9 @@ class Message {
       '(random.subscriber)': async function () {
         let subscriber = (await global.db.engine.find('users', { is: { subscriber: true } })).map((o) => o.username);
         subscriber = subscriber.filter((username) => {
-          const isSender = username === attr.sender;
+          const isSender = username === attr.sender.username;
           const isBot = commons.isBot(username);
-          const isIgnored = commons.isIgnored(username);
+          const isIgnored = commons.isIgnored(attr.sender);
           return !isSender && !isBot && !isIgnored;
         });
         if (subscriber.length === 0) {return 'unknown'};
