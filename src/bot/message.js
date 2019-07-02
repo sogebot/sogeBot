@@ -86,7 +86,7 @@ class Message {
         const onlineViewers = usernames.filter((username) => {
           const isSender = username === attr.sender.username;
           const isBot = commons.isBot(username);
-          const isIgnored = commons.isIgnored(attr.sender);
+          const isIgnored = commons.isIgnored({ username });
           return !isSender && !isBot && !isIgnored;
         });
         if (onlineViewers.length === 0) {return 'unknown'};
@@ -97,7 +97,7 @@ class Message {
         const onlineViewers = usernames.filter((username) => {
           const isSender = username === attr.sender.username;
           const isBot = commons.isBot(username);
-          const isIgnored = commons.isIgnored(attr.sender);
+          const isIgnored = commons.isIgnored({ username });
           return !isSender && !isBot && !isIgnored;
         });
         const followers = _.filter(
@@ -112,7 +112,7 @@ class Message {
         const onlineViewers = usernames.filter((username) => {
           const isSender = username === attr.sender.username;
           const isBot = commons.isBot(username);
-          const isIgnored = commons.isIgnored(attr.sender);
+          const isIgnored = commons.isIgnored({ username });
           return !isSender && !isBot && !isIgnored;
         });
         const subscribers = _.filter(
@@ -127,7 +127,7 @@ class Message {
         viewer = viewer.filter((username) => {
           const isSender = username === attr.sender.username;
           const isBot = commons.isBot(username);
-          const isIgnored = commons.isIgnored(attr.sender);
+          const isIgnored = commons.isIgnored({ username });
           return !isSender && !isBot && !isIgnored;
         });
         if (viewer.length === 0) {return 'unknown'};
@@ -138,7 +138,7 @@ class Message {
         follower = follower.filter((username) => {
           const isSender = username === attr.sender.username;
           const isBot = commons.isBot(username);
-          const isIgnored = commons.isIgnored(attr.sender);
+          const isIgnored = commons.isIgnored({ username });
           return !isSender && !isBot && !isIgnored;
         });
         if (follower.length === 0) {return 'unknown'};
@@ -149,7 +149,7 @@ class Message {
         subscriber = subscriber.filter((username) => {
           const isSender = username === attr.sender.username;
           const isBot = commons.isBot(username);
-          const isIgnored = commons.isIgnored(attr.sender);
+          const isIgnored = commons.isIgnored({ username });
           return !isSender && !isBot && !isIgnored;
         });
         if (subscriber.length === 0) {return 'unknown'};
