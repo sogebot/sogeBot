@@ -138,7 +138,7 @@ class Users extends Core {
         }
         let updated = []
         for (let username of users) {
-          const isIgnored = commons.isIgnored(username)
+          const isIgnored = commons.isIgnored({username})
           const isBot = commons.isBot(username)
           const isOwner = commons.isOwner(username)
           const isNewUser = typeof this.watchedList[username] === 'undefined'

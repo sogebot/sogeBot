@@ -1146,3 +1146,90 @@ window.sortableList = {
     </div>
   `
 }
+
+
+
+/* globalIgnorelistExclude */
+window.globalIgnorelistExclude = {
+  props: ['value', 'values', 'title'],
+  data: function () {
+    return {
+      currentValues: this.values,
+      currentValue: this.value,
+      translatedTitle: commons.translate(this.title),
+      search: '',
+    };
+  },
+  watch: {
+    currentValue: function () {
+      this.onChange();
+    }
+  },
+  computed: {
+    computedValues() {
+      if (this.search.trim().length) {
+        const keys = Object.keys(this.values).filter(key => {
+          return (String(key).includes(this.search) ||
+                 this.values[key].known_aliases.filter(k => k.toLowerCase().includes(this.search.toLowerCase())).length > 0) &&
+                 !Object.keys(this.excludedValues).includes(key);
+        });
+        let toReturn = {};
+        for (const key of keys) {
+          toReturn[key] = this.values[key];
+        }
+        return toReturn;
+      } else {
+        return [];
+      }
+    },
+    excludedValues() {
+      const excludedIds = Object.keys(this.values).filter(o => this.currentValue.includes(o));
+      let toReturn = {};
+      for (const key of excludedIds) {
+        toReturn[key] = this.values[key];
+      }
+      return toReturn;
+    }
+  },
+  methods: {
+    addToExcludeList(key) {
+      this.currentValue = [...new Set([key, ...this.currentValue])];
+    },
+    removeFromExcludeList(key) {
+      this.currentValue = this.currentValue.filter(o => o !== key);
+    },
+    onChange: function () {
+      this.$emit('update', { value: this.currentValue });
+    },
+  },
+  template: `
+    <div>
+      <div class="d-flex">
+        <div class="input-group-prepend">
+          <span class="input-group-text">
+            <template v-if="typeof translatedTitle === 'string'">{{ translatedTitle }}</template>
+            <template v-else>
+              {{ translatedTitle.title }}
+              <small class="textInputTooltip text-info" data-toggle="tooltip" data-html="true" :title="translatedTitle.help">[?]</small>
+            </template>
+          </span>
+        </div>
+
+        <input class="form-control w-100" type="text" placeholder="Type id or username to search through global ignore list" v-model="search"></input>
+      </div>
+      <ul style="font-size: 0.75rem;" class="list-group list-group-horizontal text-left" v-for="chunkValues of _.chunk(Object.keys(excludedValues), 2)">
+        <button type="button" @click="removeFromExcludeList(key)" class="list-group-item w-50 list-group-item-primary" v-for="key of chunkValues" v-key="key">
+        <strong>ID:</strong> {{ key }}<strong><br>Known aliases:</strong> {{ values[key].known_aliases.join(', ') }}<br><strong>Reason:</strong> {{ values[key].reason }}
+        </button>
+      </ul>
+      <ul style="font-size: 0.75rem;" class="list-group list-group-horizontal text-left" v-for="chunkValues of _.chunk(Object.keys(computedValues), 2)">
+        <button type="button" @click="addToExcludeList(key)" class="list-group-item w-50" v-for="key of chunkValues" v-key="key">
+          <strong>ID:</strong> {{ key }}<strong><br>Known aliases:</strong> {{ values[key].known_aliases.join(', ') }}<br><strong>Reason:</strong> {{ values[key].reason }}
+        </button>
+      </ul>
+      <ul class="list-group list-group-horizontal" style="font-size:0.75rem;">
+        <li class="list-group-item w-100 text-center list-group-item-info">Use search input, there are <strong style="font-size: 1.25rem">{{Object.keys(values).length}}</strong> globally ignored users.</li>
+      </ul>
+    </div>
+  `
+};

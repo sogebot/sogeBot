@@ -355,7 +355,7 @@ class API {
       if (!_.includes(chatters, user)) {
         // user is no longer in channel
         await global.db.engine.remove('users.online', { username: user })
-        if (!isIgnored(user)) {
+        if (!isIgnored({ username: user })) {
           bulkParted.push({ username: user })
           global.widgets.joinpart.send({ username: user, type: 'part' })
         }
@@ -363,7 +363,7 @@ class API {
     }
 
     for (let chatter of chatters) {
-      if (isIgnored(chatter) || global.oauth.botUsername === chatter) {
+      if (isIgnored({ username: chatter }) || global.oauth.botUsername === chatter) {
         // even if online, remove ignored user from collection
         await global.db.engine.remove('users.online', { username: chatter })
       } else if (!_.includes(allOnlineUsers, chatter)) {

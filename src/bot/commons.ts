@@ -7,6 +7,7 @@ import { isMainThread } from 'worker_threads';
 
 import { debug, isEnabled as debugIsEnabled } from './debug';
 import Message from './message';
+import { globalIgnoreList } from './data/globalIgnoreList';
 
 export async function autoLoad(directory): Promise<{ [x: string]: any }> {
   const directoryListing = readdirSync(directory);
@@ -80,12 +81,27 @@ export function getIgnoreList() {
   });
 }
 
-export function isIgnored(sender) {
-  if (sender !== null) { // null can be bot from dashboard or event
-    if (typeof sender === 'string') { sender = { username: sender }; }
-    const isInIgnoreList = getIgnoreList().includes(sender.username);
-    return isInIgnoreList && !isBroadcaster(sender);
-  } else { return false; }
+export function getGlobalIgnoreList() {
+  return Object.keys(globalIgnoreList)
+    .filter(o => !global.tmi.globalIgnoreListExclude.includes(o))
+    .map(o => { return { id: o, ...globalIgnoreList[o] }; });
+}
+
+export function isIgnored(sender: { username: string | null; userId?: string }) {
+  if (sender.username === null) {
+    return false; // null can be bot from dashboard or event
+  }
+
+  const isInIgnoreList = getIgnoreList().includes(sender.username) || getIgnoreList().includes(sender.userId);
+  let isInGlobalIgnoreList = false;
+  for (const [, data] of Object.entries(getGlobalIgnoreList())) {
+    if (data.id === sender.userId || data.known_aliases.includes(sender.username.toLowerCase())) {
+      isInGlobalIgnoreList = true;
+      break;
+    }
+  }
+
+  return (isInGlobalIgnoreList || isInIgnoreList) && !isBroadcaster(sender);
 }
 
 /**

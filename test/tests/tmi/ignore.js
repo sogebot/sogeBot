@@ -8,9 +8,11 @@ const message = require('../../general.js').message
 
 // users
 const owner = { username: 'soge__' }
-const testuser = { username: 'testuser' }
-const testuser2 = { username: 'testuser2' }
-const testuser3 = { username: 'testuser3' }
+const testuser = { username: 'testuser', userId: '1' }
+const testuser2 = { username: 'testuser2', userId: '2' }
+const testuser3 = { username: 'testuser3', userId: '3' }
+const nightbot = { username: 'nightbot', userId: '4' }
+const botwithchangedname = { username: 'asdsadas', userId: '24900234' }
 
 const commons = require('../../../dest/commons');
 const { VariableWatcher } = require('../../../dest/watchers');
@@ -19,21 +21,46 @@ describe('TMI - ignore', () => {
   before(async () => {
     await db.cleanup()
     await message.prepare()
+
+    global.tmi.globalIgnoreListExclude = [];
+    global.tmi.ignorelist = [];
+
+    await global.db.engine.insert('users', testuser)
+    await global.db.engine.insert('users', testuser2)
+    await global.db.engine.insert('users', testuser3)
   })
 
   beforeEach(async () => {
     await VariableWatcher.check()
   })
 
+  describe('Global ignore workflow', () => {
+    it ('nightbot should be ignored by default', async () => {
+      assert.isTrue(await commons.isIgnored(nightbot)); // checked by known_alias
+    });
+
+    it ('botwithchangedname should be ignored by default', async () => {
+      assert.isTrue(await commons.isIgnored(botwithchangedname)); // checked by id
+    });
+
+    it ('exclude botwithchangedname from ignore list', async () => {
+      global.tmi.globalIgnoreListExclude = [botwithchangedname.userId];
+    });
+
+    it ('botwithchangedname should not be ignored anymore', async () => {
+      assert.isFalse(await commons.isIgnored(botwithchangedname)); // checked by id
+    });
+  });
+
   describe('Ignore workflow', () => {
     it('testuser is not ignored by default', async () => {
-      assert.isFalse(await commons.isIgnored(testuser))
-    })
+      assert.isFalse(await commons.isIgnored(testuser));
+    });
 
     it('add testuser to ignore list', async () => {
-      global.tmi.ignoreAdd({ sender: owner, parameters: 'testuser' })
-      await message.isSent('ignore.user.is.added', owner, testuser)
-    })
+      global.tmi.ignoreAdd({ sender: owner, parameters: 'testuser' });
+      await message.isSent('ignore.user.is.added', owner, testuser);
+    });
 
     it('add @testuser2 to ignore list', async () => {
       global.tmi.ignoreAdd({ sender: owner, parameters: '@testuser2' })
@@ -80,6 +107,14 @@ describe('TMI - ignore', () => {
       global.tmi.ignoreCheck({ sender: owner, parameters: 'testuser' })
       await message.isSent('ignore.user.is.not.ignored', owner, testuser)
       assert.isFalse(await commons.isIgnored(testuser))
+    })
+
+    it('add testuser by id to ignore list', async () => {
+      global.tmi.ignorelist = [ testuser.userId ];
+    })
+
+    it('user should be ignored by id', async () => {
+      assert.isTrue(await commons.isIgnored(testuser))
     })
   })
 })

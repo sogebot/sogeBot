@@ -30,7 +30,7 @@ describe('Message - random filter', () => {
     it('From 100 randoms ignoreduser shouldn\'t be picked', async () => {
       for (var i = 0; i < 100; i++) {
         await setUsersOnline(['ignoreduser', 'user1'])
-        let message = await new Message('(random.online.viewer)').parse({})
+        let message = await new Message('(random.online.viewer)').parse({ sender: { username: 'soge__' }})
         assert.equal(message, 'user1')
       }
     })
@@ -56,7 +56,7 @@ describe('Message - random filter', () => {
     it('From 100 randoms ignoreduser shouldn\'t be picked', async () => {
       for (var i = 0; i < 100; i++) {
         await setUsersOnline(['ignoreduser', 'user1'])
-        let message = await new Message('(random.online.follower)').parse({})
+        let message = await new Message('(random.online.follower)').parse({ sender: { username: 'soge__' }})
         assert.equal(message, 'user1')
       }
     })
@@ -82,7 +82,7 @@ describe('Message - random filter', () => {
     it('From 100 randoms ignoreduser shouldn\'t be picked', async () => {
       for (var i = 0; i < 100; i++) {
         await setUsersOnline(['ignoreduser', 'user1'])
-        let message = await new Message('(random.online.subscriber)').parse({})
+        let message = await new Message('(random.online.subscriber)').parse({ sender: { username: 'soge__' }})
         assert.equal(message, 'user1')
       }
     })
@@ -108,7 +108,7 @@ describe('Message - random filter', () => {
 
     it('From 100 randoms ignoreduser shouldn\'t be picked', async () => {
       for (var i = 0; i < 100; i++) {
-        let message = await new Message('(random.viewer)').parse({})
+        let message = await new Message('(random.viewer)').parse({ sender: { username: 'soge__' }})
         assert.equal(message, 'user1')
       }
     })
@@ -133,7 +133,7 @@ describe('Message - random filter', () => {
 
     it('From 100 randoms ignoreduser shouldn\'t be picked', async () => {
       for (var i = 0; i < 100; i++) {
-        let message = await new Message('(random.follower)').parse({})
+        let message = await new Message('(random.follower)').parse({ sender: { username: 'soge__' }})
         assert.equal(message, 'user1')
       }
     })
@@ -158,7 +158,7 @@ describe('Message - random filter', () => {
 
     it('From 100 randoms ignoreduser shouldn\'t be picked', async () => {
       for (var i = 0; i < 100; i++) {
-        let message = await new Message('(random.subscriber)').parse({})
+        let message = await new Message('(random.subscriber)').parse({ sender: { username: 'soge__' }})
         assert.equal(message, 'user1')
       }
     })
