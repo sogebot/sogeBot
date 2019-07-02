@@ -413,7 +413,7 @@ class TMI extends Core {
 
       await global.users.setById(userstate.userId, { username, is: { subscriber: isSubscriber }, time: { subscribed_at: subscribedAt }, stats: { subStreak: 1, subCumulativeMonths, tier: method.prime ? 'Prime' : method.plan / 1000 } })
       global.overlays.eventlist.add({ type: 'sub', tier: (method.prime ? 'Prime' : method.plan / 1000), username, method: (!_.isNil(method.prime) && method.prime) ? 'Twitch Prime' : '' })
-      global.log.sub(`${username}, tier: ${method.prime ? 'Prime' : method.plan / 1000}`)
+      global.log.sub(`${username}#${userstate.userId}, tier: ${method.prime ? 'Prime' : method.plan / 1000}`)
       global.events.fire('subscription', { username: username, method: (!_.isNil(method.prime) && method.prime) ? 'Twitch Prime' : '', subCumulativeMonths })
       // go through all systems and trigger on.sub
       for (let [type, systems] of Object.entries({
@@ -477,7 +477,7 @@ class TMI extends Core {
         subCumulativeMonthsName: commons.getLocalizedName(subCumulativeMonths, 'core.months'),
         message: messageFromUser
       })
-      global.log.resub(`${username}, streak share: ${subStreakShareEnabled}, streak: ${subStreak}, months: ${subCumulativeMonths}, message: ${messageFromUser}, tier: ${method.prime ? 'Prime' : method.plan / 1000}`)
+      global.log.resub(`${username}#${userstate.userId}, streak share: ${subStreakShareEnabled}, streak: ${subStreak}, months: ${subCumulativeMonths}, message: ${messageFromUser}, tier: ${method.prime ? 'Prime' : method.plan / 1000}`)
       global.events.fire('resub', {
         username,
         subStreakShareEnabled,
@@ -509,7 +509,7 @@ class TMI extends Core {
 
       global.overlays.eventlist.add({ type: 'subcommunitygift', username, count })
       global.events.fire('subcommunitygift', { username, count })
-      global.log.subcommunitygift(`${username}, to ${count} viewers`)
+      global.log.subcommunitygift(`${username}#${userId}, to ${count} viewers`)
     } catch (e) {
       global.log.error('Error parsing subscriptionGiftCommunity event')
       global.log.error(util.inspect(message))
@@ -573,7 +573,7 @@ class TMI extends Core {
       await global.users.setById(user.id, { username: recipient, is: { subscriber: isSubscriber }, time: { subscribed_at: subscribedAt }, stats: { subCumulativeMonths } })
       await global.db.engine.increment('users', { id: user.id }, { stats: { subStreak: 1 }})
       global.overlays.eventlist.add({ type: 'subgift', username: recipient, from: username, monthsName: commons.getLocalizedName(subCumulativeMonths, 'core.months'), months: subCumulativeMonths })
-      global.log.subgift(`${recipient}, from: ${username}, months: ${subCumulativeMonths}`)
+      global.log.subgift(`${recipient}#${recipientId}, from: ${username}, months: ${subCumulativeMonths}`)
 
       // also set subgift count to gifter
       if (!(await commons.isIgnored(username))) {
@@ -600,7 +600,7 @@ class TMI extends Core {
       await global.db.engine.update('users', { id: userId }, { username })
 
       global.overlays.eventlist.add({ type: 'cheer', username, bits: userstate.bits, message: messageFromUser })
-      global.log.cheer(`${username}, bits: ${userstate.bits}, message: ${messageFromUser}`)
+      global.log.cheer(`${username}#${userId}, bits: ${userstate.bits}, message: ${messageFromUser}`)
       global.db.engine.insert('users.bits', { id: userId, amount: userstate.bits, message: messageFromUser, timestamp: _.now() })
       global.events.fire('cheer', { username, bits: userstate.bits, message: messageFromUser })
       if (await global.cache.isOnline()) await global.db.engine.increment('api.current', { key: 'bits' }, { value: parseInt(userstate.bits, 10) })
