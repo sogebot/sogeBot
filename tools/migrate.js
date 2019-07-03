@@ -110,6 +110,29 @@ let updates = async (from, to) => {
 }
 
 let migration = {
+  forceRetype: [
+    {
+      version: '9.4.0',
+      do: async () => {
+        let processed = 0;
+
+        console.info('Force type Number(amount)');
+        for (const item of await global.db.engine.find('users.bits')) {
+          if (typeof item.amount !== 'number') {
+            await global.db.engine.update('users.bits', item, { amount: Number(item.amount) })
+            processed++;
+          }
+        }
+        for (const item of await global.db.engine.find('users.tips')) {
+          if (typeof item.amount !== 'number') {
+            await global.db.engine.update('users.tips', item, { amount: Number(item.amount) })
+            processed++;
+          }
+        }
+        console.info(` => ${processed} processed`)
+      }
+    }
+  ],
   events: [{
     version: '9.0.0',
     do: async () => {

@@ -72,7 +72,7 @@ class Streamlabs extends Integration {
       for (let event of eventData.message) {
         if (!event.isTest) {
           const id = await global.users.getIdByName(event.from.toLowerCase(), false);
-          if (id) {global.db.engine.insert('users.tips', { id, amount: event.amount, message: event.message, currency: event.currency, timestamp: _.now() });}
+          if (id) {global.db.engine.insert('users.tips', { id, amount: Number(event.amount), message: event.message, currency: event.currency, timestamp: _.now() });}
           if (await global.cache.isOnline()) {await global.db.engine.increment('api.current', { key: 'tips' }, { value: parseFloat(global.currency.exchange(event.amount, event.currency, global.currency.mainCurrency)) });}
         }
         global.overlays.eventlist.add({
