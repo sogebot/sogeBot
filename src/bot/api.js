@@ -579,7 +579,14 @@ class API {
           // check if status is same as updated status
           if (this.retries.getChannelDataOldAPI >= 15) {
             this.retries.getChannelDataOldAPI = 0
-            await global.cache.rawStatus(request.data.status)
+
+            // if we want title to be forced
+            if (global.twitch.isTitleForced) {
+              this.setTitleAndGame(null, {});
+              return { state: true, opts }
+            } else {
+              await global.cache.rawStatus(request.data.status);
+            }
           } else {
             this.retries.getChannelDataOldAPI++
             return { state: false, opts }

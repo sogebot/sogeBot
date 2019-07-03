@@ -8,7 +8,7 @@ const {
 const {
   getTime, sendMessage, prepare, getChannel
 } = require('./commons');
-import { command, default_permission } from './decorators';
+import { command, default_permission, settings } from './decorators';
 import { permission } from './permissions'
 import Core from './_interface';
 
@@ -18,6 +18,9 @@ const config = require('@config')
 config.timezone = config.timezone === 'system' || _.isNil(config.timezone) ? moment.tz.guess() : config.timezone
 
 class Twitch extends Core {
+  @settings('general')
+  isTitleForced = false;
+
   constructor () {
     super()
 
