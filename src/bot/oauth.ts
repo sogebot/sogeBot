@@ -274,7 +274,7 @@ class OAuth extends Core {
       return request.data.token;
     } catch (e) {
       this[type + 'Username'] = '';
-      this[type + 'ExpectedScopes'] = [];
+      this[type + 'CurrentScopes'] = [];
 
       if (type === 'bot') { this.botId = ''; } else { this.broadcasterId = ''; }
 
