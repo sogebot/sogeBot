@@ -264,21 +264,38 @@ class OAuth extends Core {
     global.log.warning('Refreshing access token of ' + type);
     const url = 'https://twitchtokengenerator.com/api/refresh/';
     try {
-      if (['bot', 'broadcaster'].includes(type) && (this[type + 'RefreshToken']) === '') { throw new Error('no refresh token for ' + type); } else if (!['bot', 'broadcaster'].includes(type)) { throw new Error(`Type ${type} is not supported`); }
+      if (['bot', 'broadcaster'].includes(type) && (this[type + 'RefreshToken']) === '') {
+        throw new Error('no refresh token for ' + type);
+      } else if (!['bot', 'broadcaster'].includes(type)) {
+        throw new Error(`Type ${type} is not supported`);
+      }
 
       const request = await axios.post(url + encodeURIComponent(this[type + 'RefreshToken']));
+      if (typeof request.data.token !== 'string') {
+        throw new Error(`Access token for ${type} was not correctly fetched (not a string)`);
+      }
+      if (typeof request.data.refresh !== 'string') {
+        throw new Error(`Refresh token for ${type} was not correctly fetched (not a string)`);
+      }
       this[type + 'AccessToken'] = request.data.token;
       this[type + 'RefreshToken'] = request.data.refresh;
 
       global.log.warning('Access token of ' + type + ' was refreshed.');
+      global.log.warning('New access token of ' + type + ': ' + request.data.token);
+      global.log.warning('New refresh token of ' + type + ': ' + request.data.refresh);
       return request.data.token;
     } catch (e) {
       this[type + 'Username'] = '';
       this[type + 'ExpectedScopes'] = [];
 
-      if (type === 'bot') { this.botId = ''; } else { this.broadcasterId = ''; }
+      if (type === 'bot') {
+        this.botId = '';
+      } else {
+        this.broadcasterId = '';
+      }
 
       global.log.error('Access token of ' + type + ' was not refreshed.');
+      global.log.error(e.stack);
     }
   }
 }
