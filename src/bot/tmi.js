@@ -606,7 +606,7 @@ class TMI extends Core {
 
       global.overlays.eventlist.add({ type: 'cheer', username, bits: userstate.bits, message: messageFromUser })
       global.log.cheer(`${username}#${userId}, bits: ${userstate.bits}, message: ${messageFromUser}`)
-      global.db.engine.insert('users.bits', { id: userId, amount: userstate.bits, message: messageFromUser, timestamp: _.now() })
+      global.db.engine.insert('users.bits', { id: userId, amount: Number(userstate.bits), message: messageFromUser, timestamp: _.now() })
       global.events.fire('cheer', { username, bits: userstate.bits, message: messageFromUser })
       if (await global.cache.isOnline()) await global.db.engine.increment('api.current', { key: 'bits' }, { value: parseInt(userstate.bits, 10) })
 

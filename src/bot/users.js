@@ -383,6 +383,7 @@ class Users extends Core {
         const newBitsIds = [];
         for (let b of bits) {
           delete b.editation
+          b.amount = Number(b.amount); // force retype amount to be sure we really have number (ui is sending string)
           if (b.new) {
             delete b.new; delete b._id
             const bit = await global.db.engine.insert('users.bits', b)
@@ -404,6 +405,7 @@ class Users extends Core {
         const newTipsIds = [];
         for (let b of tips) {
           delete b.editation
+          b.tips = Number(b.tips); // force retype amount to be sure we really have number (ui is sending string)
           if (b.new) {
             delete b.new; delete b._id
             const tip = await global.db.engine.insert('users.tips', b)
