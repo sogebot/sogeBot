@@ -165,7 +165,8 @@
         this.manuallySelected = false;
         this.searchForTags(''); // buildup opts
         this.selectedTitle = 'current';
-        this.newTitle = ''
+        this.newTitle = '';
+        this.carouselPage = 0;
         this.socket.emit('getCachedTags', (data) => {
           this.cachedTags = data.filter(o => !o.is_auto);
         })
@@ -195,7 +196,11 @@
           } else {
             this.saveState = 2;
             this.show = false;
-            this.socket.emit('cleanupGameAndTitle', this.data, (err, data) => {
+            this.socket.emit('cleanupGameAndTitle', {
+              game: this.currentGame,
+              title,
+              titles: this.data
+            }, (err, data) => {
               this.data = data
             })
           }
@@ -261,9 +266,30 @@
         if (this.manuallySelected) {
           return (this as any).cachedGamesOrder;
         } else if (this.currentGame) {
-          (this as any).cachedGamesOrder = [...new Set([(this as any).currentGame, ...(this as any).data.map(o => o.game)])];
+          (this as any).cachedGamesOrder = [
+            ...new Set([
+              (this as any).currentGame,
+              ...(this as any).data.sort((a,b) => {
+                if (a.timestamp < b.timestamp) {
+                  return -1;
+                } else if (a.timestamp > b.timestamp) {
+                  return 1;
+                } else {
+                  return 0;
+                }
+              }).map(o => o.game)
+            ]
+          )];
         } else {
-          (this as any).cachedGamesOrder = [...new Set((this as any).data.map(o => o.game))];
+          (this as any).cachedGamesOrder = [...new Set((this as any).data.sort((a,b) => {
+            if (a.timestamp < b.timestamp) {
+              return -1;
+            } else if (a.timestamp > b.timestamp) {
+              return 1;
+            } else {
+              return 0;
+            }
+          }).map(o => o.game))];
         }
         return (this as any).cachedGamesOrder;
       }

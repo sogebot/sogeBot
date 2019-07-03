@@ -1116,7 +1116,7 @@ class API {
           const localization = Object.keys(o.localization_names).find(p => p.includes(global.general.lang))
           return tagsArg.includes(o.localization_names[localization]);
         })
-      await axios({
+      const request = await axios({
         method: 'put',
         url,
         data: {
@@ -1130,13 +1130,16 @@ class API {
         }
       })
       await global.db.engine.remove('core.api.currentTags', { is_auto: false });
-      await global.db.engine.insert('core.api.currentTags', tags.map(o => {
-        delete o._id
-        return o
-      }))
+      if (tags.length > 0) {
+        await global.db.engine.insert('core.api.currentTags', tags.map(o => {
+          delete o._id
+          return o
+        }))
+      }
+      if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'setTags', api: 'helix', endpoint: url, code: request.status, data: request.data })
     } catch (e) {
       global.log.error(`API: ${url} - ${e.message}`)
-      if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'setTitleAndGame', api: 'kraken', endpoint: url, code: _.get(e, 'response.status', '500'), data: e.stack })
+      if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'setTags', api: 'helix', endpoint: url, code: _.get(e, 'response.status', '500'), data: e.stack })
       return false
     }
 

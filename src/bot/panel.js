@@ -170,15 +170,19 @@ function Panel () {
     })
     socket.on('cleanupGameAndTitle', async (data, cb) => {
       // remove empty titles
-      const emptyTitles = data.filter(o => o.title.trim().length === 0);
+      const emptyTitles = data.titles.filter(o => o.title.trim().length === 0);
       for (const t of emptyTitles) {
         await global.db.engine.remove('cache.titles', { _id: String(t._id) });
       }
 
       // update titles
-      const updateTitles = data.filter(o => o.title.trim().length > 0);
+      const updateTitles = data.titles.filter(o => o.title.trim().length > 0);
       for (const t of updateTitles) {
-        await global.db.engine.update('cache.titles', { _id: String(t._id) }, { title: t.title });
+        if (t.title === data.title && t.game === data.game) {
+          await global.db.engine.update('cache.titles', { _id: String(t._id) }, { title: t.title, timestamp: Date.now() });
+        } else {
+          await global.db.engine.update('cache.titles', { _id: String(t._id) }, { title: t.title });
+        }
       }
 
       // remove removed titles
@@ -186,7 +190,9 @@ function Panel () {
       for (const t of allTitles) {
         const titles = updateTitles.filter(o => o.game === t.game && o.title === t.title);
         if (titles.length === 0) {
-          await global.db.engine.remove('cache.titles', { _id: String(t._id) });
+          if (t.game !== data.game || t.title !== data.title) { // don't remove current/new title
+            await global.db.engine.remove('cache.titles', { _id: String(t._id) });
+          }
         }
       }
 
