@@ -51,7 +51,7 @@ export function ui(opts, category?: string) {
   };
 }
 
-export function settings(category?: string) {
+export function settings(category?: string, isReadOnly: boolean = false) {
   const { name, type } = getNameAndTypeFromStackTrace();
 
   return (target: object, key: string) => {
@@ -63,21 +63,23 @@ export function settings(category?: string) {
       }
       try {
         const self = type === 'core' ? global[name] : global[type][name];
-        VariableWatcher.add(`${type}.${name}.${key}`, self[key]);
+        VariableWatcher.add(`${type}.${name}.${key}`, self[key], isReadOnly);
 
-        // load variable from db
-        const loadVariableValue = () => {
-          if (!global.db.engine.connected) {
-            return setTimeout(() => loadVariableValue(), 1000);
-          }
-          self.loadVariableValue(key).then((value) => {
-            if (typeof value !== 'undefined') {
-              VariableWatcher.add(`${type}.${name}.${key}`, value); // rewrite value on var load
-              _.set(self, key, value);
+        if (!isReadOnly) {
+          // load variable from db
+          const loadVariableValue = () => {
+            if (!global.db.engine.connected) {
+              return setTimeout(() => loadVariableValue(), 1000);
             }
-          });
-        };
-        setTimeout(() => loadVariableValue(), 5000);
+            self.loadVariableValue(key).then((value) => {
+              if (typeof value !== 'undefined') {
+                VariableWatcher.add(`${type}.${name}.${key}`, value); // rewrite value on var load
+                _.set(self, key, value);
+              }
+            });
+          };
+          setTimeout(() => loadVariableValue(), 5000);
+        }
 
         // add variable to settingsList
         self.settingsList.push({ category, key });
