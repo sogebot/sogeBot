@@ -734,10 +734,14 @@ class TMI extends Core {
           global.workers.sendToMaster({ type: 'api', fnc: 'isFollower', username: sender.username })
         }
 
-        global.events.fire('keyword-send-x-times', { username: sender.username, message: message })
-        if (message.startsWith('!')) {
-          global.events.fire('command-send-x-times', { username: sender.username, message: message })
-        } else if (!message.startsWith('!')) global.db.engine.increment('users.messages', { id: sender.userId }, { messages: 1 })
+        if (await global.cache.isOnline()) {
+          global.events.fire('keyword-send-x-times', { username: sender.username, message: message })
+          if (message.startsWith('!')) {
+            global.events.fire('command-send-x-times', { username: sender.username, message: message })
+          } else if (!message.startsWith('!')) {
+            global.db.engine.increment('users.messages', { id: sender.userId }, { messages: 1 })
+          }
+        }
       }
       await parse.process();
     }
