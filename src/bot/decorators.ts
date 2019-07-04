@@ -73,7 +73,7 @@ export function settings(category?: string, isReadOnly: boolean = false) {
             }
             self.loadVariableValue(key).then((value) => {
               if (typeof value !== 'undefined') {
-                VariableWatcher.add(`${type}.${name}.${key}`, value); // rewrite value on var load
+                VariableWatcher.add(`${type}.${name}.${key}`, value, isReadOnly); // rewrite value on var load
                 _.set(self, key, value);
               }
             });
@@ -104,7 +104,7 @@ export function shared() {
       try {
         const self = type === 'core' ? global[name] : global[type][name];
         const defaultValue = self[key];
-        VariableWatcher.add(`${type}.${name}.${key}`, defaultValue);
+        VariableWatcher.add(`${type}.${name}.${key}`, defaultValue, false);
       } catch (e) {
         console.log(e);
       }
