@@ -44,7 +44,7 @@ export const VariableWatcher = {
         }
 
         if (isMainThread && self) {
-          await global.db.engine.update(self.collection.settings, { system: name, key: variable }, { value });
+          await global.db.engine.update(self.collection.settings, { system: name.toLowerCase(), key: variable }, { value });
           if (typeof self.on !== 'undefined'
             && typeof self.on.change !== 'undefined'
             && self.on.change[variable]) {
