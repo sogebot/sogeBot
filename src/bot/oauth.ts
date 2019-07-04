@@ -283,6 +283,8 @@ class OAuth extends Core {
       global.log.warning('Access token of ' + type + ' was refreshed.');
       global.log.warning('New access token of ' + type + ': ' + request.data.token);
       global.log.warning('New refresh token of ' + type + ': ' + request.data.refresh);
+      this.validateOAuth(type);
+
       return request.data.token;
     } catch (e) {
       this[type + 'Username'] = '';
