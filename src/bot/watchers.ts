@@ -1,7 +1,10 @@
-import { get, isEqual, cloneDeep } from 'lodash';
+import { set, get, isEqual, cloneDeep } from 'lodash';
 import { isMainThread } from 'worker_threads';
 
 const variables: {
+  [x: string]: any;
+} = {};
+const readonly: {
   [x: string]: any;
 } = {};
 
@@ -10,8 +13,12 @@ setInterval(() => {
 }, 1000);
 
 export const VariableWatcher = {
-  add(key: string, value: any) {
-    variables[key] = cloneDeep(value);
+  add(key: string, value: any, isReadOnly: boolean) {
+    if (isReadOnly) {
+      readonly[key] = cloneDeep(value);
+    } else {
+      variables[key] = cloneDeep(value);
+    }
   },
   async check() {
     for (const k of Object.keys(variables)) {
@@ -58,6 +65,14 @@ export const VariableWatcher = {
             }
           }
         }
+      }
+    }
+    for (const k of Object.keys(readonly)) {
+      let value = get(global, k.replace('core.', ''), null);
+      if (!isEqual(value, readonly[k])) {
+        const [type, name, variable] = k.split('.');
+        global.log.error(`Cannot change read-only variable, forcing initial value for ${type}.${name}.${variable}`);
+        set(global, k.replace('core.', ''), readonly[k]);
       }
     }
   }

@@ -46,7 +46,7 @@ class OAuth extends Core {
   @ui({ readOnly: true, type: 'text-input' })
   public broadcasterUsername: string = '';
 
-  @settings('broadcaster')
+  @settings('broadcaster', true)
   @ui({ type: 'check-list', current: 'broadcasterCurrentScopes' })
   public broadcasterExpectedScopes: string[] = [
     'chat:read',
@@ -80,7 +80,7 @@ class OAuth extends Core {
   @ui({ readOnly: true, type: 'text-input' })
   public botUsername: string = '';
 
-  @settings('bot')
+  @settings('bot', true)
   @ui({ type: 'check-list', current: 'botCurrentScopes' })
   public botExpectedScopes: string[] = [
     'channel:moderate',
