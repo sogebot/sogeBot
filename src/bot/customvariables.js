@@ -336,7 +336,7 @@ class CustomVariables {
     if (isOk) {
       this.updateWidgetAndTitle(variableName)
       if (!isEval) {
-        this.addChangeToHistory({ sender: opts.sender.username, item, oldValue })
+        this.addChangeToHistory({ sender: _.get(opts, 'sender.username', null), item, oldValue })
         item.currentValue = '' // be silent if parsed correctly
       }
     }
