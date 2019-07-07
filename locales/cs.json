@@ -963,13 +963,13 @@
     "success": {
       "never": "$sender, $username není subscriberem kanálu.",
       "notNow": "$sender, $username není momentálně subscriberem kanálu. Celkově $subCumulativeMonths $subCumulativeMonthsName.",
-      "timeWithSubStreak": "$sender, $username je subscriberem tohoto kanálu. Současný substreak od $diff ($subStreak $subStreakMonth) a celkově $subCumulativeMonths $subCumulativeMonthsName.",
+      "timeWithSubStreak": "$sender, $username je subscriberem tohoto kanálu. Současný substreak od $diff ($subStreak $subStreakMonthsName) a celkově $subCumulativeMonths $subCumulativeMonthsName.",
       "time": "$sender, $username je subscriberem tohoto kanálu. Celkově $subCumulativeMonths $subCumulativeMonthsName."
     },
     "successSameUsername": {
       "never": "$sender, nejsi subscriberem kanálu.",
       "notNow": "$sender, nejsi subscriberem kanálu. Celkově $subCumulativeMonths $subCumulativeMonthsName.",
-      "timeWithSubStreak": "$sender, je subscriberem tohoto kanálu. Současný substreak od $diff ($subStreak $subStreakMonth) a celkově $subCumulativeMonths $subCumulativeMonthsName.",
+      "timeWithSubStreak": "$sender, je subscriberem tohoto kanálu. Současný substreak od $diff ($subStreak $subStreakMonthsName) a celkově $subCumulativeMonths $subCumulativeMonthsName.",
       "time": "$sender, je subscriberem tohoto kanálu. Celkově $subCumulativeMonths $subCumulativeMonthsName."
     }
   },
