@@ -234,7 +234,7 @@ class Events extends Core {
 
     if (global.mocha) {
       const parse = new Parser.default({
-        sender: (_.get(operation, 'isCommandQuiet', false) ? {} : { username: getOwner() }),
+        sender: { username: getOwner() },
         message: command,
         skip: true,
         quiet: _.get(operation, 'isCommandQuiet', false)
@@ -243,7 +243,7 @@ class Events extends Core {
     } else {
       global.tmi.message({
         message: {
-          tags: _.get(operation, 'isCommandQuiet', false) ? {} : { username: getOwner() },
+          tags: { username: getOwner() },
           message: command,
         },
         skip: true,
