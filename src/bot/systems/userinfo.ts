@@ -115,7 +115,7 @@ class UserInfo extends System {
         subCumulativeMonths,
         subCumulativeMonthsName: getLocalizedName(subCumulativeMonths || 0, 'core.months'),
         subStreak,
-        subStreakName: getLocalizedName(subStreak || 0, 'core.months'),
+        subStreakMonthsName: getLocalizedName(subStreak || 0, 'core.months'),
         diff: output.join(', '),
       }), opts.sender);
     }
