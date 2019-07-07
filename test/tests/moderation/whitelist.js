@@ -196,7 +196,7 @@ describe('systems/moderation - whitelist()', () => {
     }
   }
 
-  describe.only(`#2392 - changed !songrequest => !zahrej should be whitelisted`, () => {
+  describe(`#2392 - changed !songrequest => !zahrej should be whitelisted`, () => {
     it('change command from !songrequest => !zahrej', async () => {
       await global.systems.songs.setCommand('!songrequest', '!zahrej')
     })
