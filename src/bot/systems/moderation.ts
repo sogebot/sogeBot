@@ -183,10 +183,11 @@ class Moderation extends System {
     // check if songrequest -or- alias of songrequest contain youtube link
     if (await global.systems.songs.isEnabled()) {
       let alias = await global.db.engine.findOne(global.systems.alias.collection.data, { command: '!songrequest' });
+      const cmd = global.systems.songs.getCommand('!songrequest');
       if (!_.isEmpty(alias) && alias.enabled && await global.systems.alias.isEnabled()) {
-        ytRegex = new RegExp('^(!songrequest|' + alias.alias + ') \\S+(?:youtu.be\\/|v\\/|e\\/|u\\/\\w+\\/|embed\\/|v=)([^#&?]*).*', 'gi');
+        ytRegex = new RegExp('^(' + cmd + '|' + alias.alias + ') \\S+(?:youtu.be\\/|v\\/|e\\/|u\\/\\w+\\/|embed\\/|v=)([^#&?]*).*', 'gi');
       } else {
-        ytRegex = /^(!songrequest) \S+(?:youtu.be\/|v\/|e\/|u\/\w+\/|embed\/|v=)([^#&?]*).*/gi;
+        ytRegex =  new RegExp('^(' + cmd + ') \\S+(?:youtu.be\\/|v\\/|e\\/|u\\/\\w+\\/|embed\\/|v=)([^#&?]*).*', 'gi');
       }
       text = text.replace(ytRegex, '');
     }

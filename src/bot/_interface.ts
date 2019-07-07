@@ -705,7 +705,7 @@ class Module {
    * Returns updated value of command if changed by user
    * @param command - default command to serach
   */
-  protected getCommand(command: string): string {
+  public getCommand(command: string): string {
     const c = this._commands.find((o) => o.name === command);
     if (c && c.command) {
       return c.command;
