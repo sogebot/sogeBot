@@ -195,4 +195,16 @@ describe('systems/moderation - whitelist()', () => {
       })
     }
   }
+
+  describe.only(`#2392 - changed !songrequest => !zahrej should be whitelisted`, () => {
+    it('change command from !songrequest => !zahrej', async () => {
+      await global.systems.songs.setCommand('!songrequest', '!zahrej')
+    })
+
+    it('!zahrej command should be whitelisted', async () => {
+      const text = '!zahrej https://youtu.be/HmZYgqBp1gI';
+      const result = await global.systems.moderation.whitelist(text)
+      assert.isTrue(text !== result)
+    })
+  })
 })
