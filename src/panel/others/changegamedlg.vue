@@ -40,7 +40,7 @@
         </b-input-group-prepend>
         <b-form-input :placeholder="['current', 'new'].includes(title._id) ? translate('create-and-use-a-new-title') : ''" v-if="title._id === 'new'" v-model="newTitle"></b-form-input>
         <b-form-input :placeholder="['current', 'new'].includes(title._id) ? translate('create-and-use-a-new-title') : ''" v-else v-model="title.title" :disabled="typeof title._id === 'undefined' && index === 0"></b-form-input>
-        <button slot="append" v-if="!['current', 'new'].includes(title._id)" class="btn btn-danger" @click="deleteTitle(title._id)">
+        <button slot="append" v-if="!['current', 'new'].includes(title._id) && index !== 0" class="btn btn-danger" @click="deleteTitle(title._id)">
           <font-awesome-icon icon="trash"/>
         </button>
       </b-input-group>
