@@ -577,12 +577,15 @@ class API {
 
         if (request.data.status !== status && !opts.forceUpdate) {
           // check if status is same as updated status
-          if (this.retries.getChannelDataOldAPI >= 15) {
+          const numOfRetries = global.twitch.isTitleForced ? 1 : 15;
+          if (this.retries.getChannelDataOldAPI >= numOfRetries) {
             this.retries.getChannelDataOldAPI = 0
 
             // if we want title to be forced
             if (global.twitch.isTitleForced) {
-              this.setTitleAndGame(null, {});
+              const game = await global.cache.gameCache();
+              global.log.info(`Title/game force enabled => ${game} | ${rawStatus}`);
+              this.setTitleAndGame(null, { });
               return { state: true, opts }
             } else {
               await global.cache.rawStatus(request.data.status);
