@@ -27,7 +27,7 @@
                 :class="[ settings.widgetEventlistHosts ? 'btn-outline-success' : 'btn-outline-danger' ]"
                 @click="toggle('widgetEventlistHosts')">
                 <font-awesome-layers style="height: 1em; line-height: 0.8em; width: 1em">
-                  <fa icon="bullhorn"></fa>
+                  <fa icon="tv"></fa>
                 </font-awesome-layers>
               </button>
               <button
@@ -125,7 +125,7 @@
                 </div>
                 <div style="flex-shrink: 15;">
                   <fa v-if="event.event === 'follow'" icon="heart" :class="[`icon-${event.event}`, 'icon']" />
-                  <fa v-if="event.event === 'host'" icon="bullhorn" :class="[`icon-${event.event}`, 'icon']" />
+                  <fa v-if="event.event === 'host'" icon="tv" :class="[`icon-${event.event}`, 'icon']" />
                   <fa v-if="event.event === 'raid'" icon="random" :class="[`icon-${event.event}`, 'icon']" />
                   <fa v-if="event.event === 'sub'" icon="star" :class="[`icon-${event.event}`, 'icon']" />
                   <fa v-if="event.event === 'subgift'" icon="gift" :class="[`icon-${event.event}`, 'icon']" />
