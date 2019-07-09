@@ -14,7 +14,7 @@ class Module {
   public showInUI: boolean = true;
   public collection: { [x: string]: string };
   public timeouts: { [x: string]: NodeJS.Timeout } = {};
-  public settingsList: { category: string; key: string; isLoaded: boolean }[] = [];
+  public settingsList: { category: string; key: string }[] = [];
   public on: InterfaceSettings.On;
   public socket: SocketIOClient.Socket | null;
 
