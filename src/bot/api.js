@@ -480,6 +480,11 @@ class API {
         }
       })
       const subscribers = request.data.data
+      if (opts.subscribers) {
+        opts.subscribers = [...subscribers, ...opts.subscribers];
+      } else {
+        opts.subscribers = subscribers;
+      }
 
       if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { data: subscribers, timestamp: _.now(), call: 'getChannelSubscribers', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining })
 
@@ -489,14 +494,12 @@ class API {
       this.calls.bot.limit = request.headers['ratelimit-limit']
       global.workers.callOnAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', request.headers['ratelimit-limit'], request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] })
 
-      this.setSubscribers(subscribers.filter(o => {
-        return !isBroadcaster(o.user_name)  && !isBot(o.user_name)
-      }))
       if (subscribers.length === 100) {
         // move to next page
-        this.getChannelSubscribers({ cursor: request.data.pagination.cursor, count: subscribers.length + opts.count })
+        this.getChannelSubscribers({ cursor: request.data.pagination.cursor, count: subscribers.length + opts.count, subscribers })
       } else {
         await global.db.engine.update('api.current', { key: 'subscribers' }, { value: subscribers.length + opts.count })
+        this.setSubscribers(opts.subscribers.filter(o => !isBroadcaster(o.user_name) && !isBot(o.user_name)));
       }
 
       // reset warning after correct calls (user may have affiliate or have correct oauth)
@@ -508,7 +511,7 @@ class API {
         global.log.warning('Broadcaster have not correct oauth, will not check subs')
         global.db.engine.update('api.current', { key: 'subscribers' }, { value: 0 })
       } else {
-        global.log.error(`${url} - ${e.message}`)
+        global.log.error(`${url} - ${e.stack}`)
         if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getChannelSubscribers', api: 'helix', endpoint: url, code: e.response.status, data: e.stack, remaining: this.calls.bot.remaining })
       }
     }
@@ -522,19 +525,16 @@ class API {
     // check if current subscribers are still subs
     for (let user of currentSubscribers) {
       if (typeof user.lock === 'undefined' || (typeof user.lock !== 'undefined' && !user.lock.subscriber)) {
-        if (!subscribers.map((o) => o.user_id).includes(user.id)) {
+        if (!subscribers
+              .map((o) => String(o.user_id))
+              .includes(String(user.id))) {
           // subscriber is not sub anymore -> unsub and set subStreak to 0
           await global.db.engine.update('users', { id: user.id }, {  is: { subscriber: false }, stats: { subStreak: 0 } })
         }
       }
-
-      // remove id if parsed
-      subscribers = subscribers.filter((o) => {
-        return o.user_id !== user.id
-      })
     }
 
-    // set rest users as subs
+    // update subscribers tier and set them active
     for (let user of subscribers) {
       await global.db.engine.update('users', { id: user.user_id }, { username: user.user_name.toLowerCase(), is: { subscriber: true }, stats: { tier: user.tier / 1000 } })
     }
