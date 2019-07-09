@@ -172,6 +172,7 @@ declare namespace InterfaceSettings {
   }
 
   interface On {
+    startup?: string[];
     message?: (message: onEventMessage) => void;
     sub?: (syb: onEventSub) => void;
     follow?: (follow: onEventFollow) => void;

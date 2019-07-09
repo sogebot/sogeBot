@@ -4,7 +4,7 @@ import constants from '../constants.js';
 import { isMainThread } from 'worker_threads';
 
 import Integration from './_interface';
-import { onChange } from '../decorators/on.js';
+import { onChange, onStartup } from '../decorators/on.js';
 import { settings } from '../decorators';
 import { ui } from '../decorators.js';
 
@@ -19,15 +19,11 @@ class Donationalerts extends Integration {
     super();
 
     if (isMainThread) {
-      setTimeout(() => {
-        this.isEnabled().then(value => {
-          this.onStateChange('enabled', value);
-        });
-      }, 10000);
       setInterval(() => this.connect(), constants.HOUR); // restart socket each hour
     }
   }
 
+  @onStartup()
   @onChange('enabled')
   onStateChange (key: string, val: boolean) {
     if (val) {this.connect();}
