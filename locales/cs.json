@@ -361,6 +361,7 @@
         "autohost": "Autohost (true/false)",
         "duration": "Doba trvání",
         "method": "Metoda",
+        "tier": "Tier",
         "months": "Počet měsíců",
         "monthsName": "Název měsíce (1 měsíc, 2 měsíce)",
         "oldGame": "Hra před změnou",
