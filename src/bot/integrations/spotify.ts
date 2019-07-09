@@ -7,7 +7,7 @@ import { isMainThread } from 'worker_threads';
 
 import { prepare, sendMessage } from '../commons';
 import { command, default_permission, settings, shared, ui } from '../decorators';
-import { onChange } from '../decorators/on';
+import { onChange, onStartup } from '../decorators/on';
 import Expects from '../expects';
 import Integration from './_interface';
 
@@ -115,11 +115,6 @@ class Spotify extends Integration {
       this.timeouts.ICurrentSong = global.setTimeout(() => this.ICurrentSong(), 10000);
       this.timeouts.getMe = global.setTimeout(() => this.getMe(), 10000);
       setInterval(() => this.sendSongs(), 500);
-      setTimeout(() => {
-        this.isEnabled().then(value => {
-          this.onStateChange('enabled', value);
-        });
-      }, 10000);
     }
   }
 
@@ -128,6 +123,7 @@ class Spotify extends Integration {
     if (value.length > 0) {global.log.info(chalk.yellow('SPOTIFY: ') + `Access to account ${value} granted`);}
   }
 
+  @onStartup()
   @onChange('enabled')
   onStateChange (key: string, value: boolean) {
     this.currentSong = JSON.stringify({});

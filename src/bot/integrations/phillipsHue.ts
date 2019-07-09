@@ -5,7 +5,7 @@ import { isMainThread } from 'worker_threads';
 
 import { sendMessage } from '../commons';
 import { command, default_permission, settings } from '../decorators';
-import { onChange } from '../decorators/on';
+import { onChange, onStartup } from '../decorators/on';
 import { permission } from '../permissions';
 import Integration from './_interface';
 
@@ -44,14 +44,6 @@ class PhillipsHue extends Integration {
 
   constructor () {
     super();
-
-    if (isMainThread) {
-      setTimeout(() => {
-        this.isEnabled().then(value => {
-          this.onStateChange('enabled', value);
-        });
-      }, 10000);
-    }
 
     setInterval(() => {
       if (!this.isEnabled()) {return;}
@@ -93,6 +85,7 @@ class PhillipsHue extends Integration {
     }, 20);
   }
 
+  @onStartup()
   @onChange('enabled')
   onStateChange (key: string, value: boolean) {
     if (value) {

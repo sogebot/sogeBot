@@ -6,13 +6,15 @@ import { isMainThread } from 'worker_threads';
 import { permission } from './permissions';
 import { flatten, unflatten } from './commons';
 import * as Parser from './parser';
+import { getFunctionList } from './decorators/on';
+import { loadingInProgress } from './decorators';
 
 class Module {
   public dependsOn: string[] = [];
   public showInUI: boolean = true;
   public collection: { [x: string]: string };
   public timeouts: { [x: string]: NodeJS.Timeout } = {};
-  public settingsList: { category: string; key: string }[] = [];
+  public settingsList: { category: string; key: string; isLoaded: boolean }[] = [];
   public on: InterfaceSettings.On;
   public socket: SocketIOClient.Socket | null;
 
@@ -78,10 +80,25 @@ class Module {
     // prepare proxies for variables
     this._sockets();
     this._indexDbs();
-    this.loadVariableValue('enabled').then((value) => {
-      this._enabled = typeof value === 'undefined' ? this._enabled : value;
-      this.status({ state: this._enabled, quiet: !isMainThread });
-    });
+    setTimeout(() => {
+      this.loadVariableValue('enabled').then((value) => {
+        const onStartup = () => {
+          if (loadingInProgress.length > 0) {
+            // wait until all settings are loaded
+            return setTimeout(() => onStartup(), 100);
+          }
+          this._enabled = typeof value === 'undefined' ? this._enabled : value;
+          this.status({ state: this._enabled, quiet: !isMainThread });
+          if (isMainThread) {
+            const path = this._name === 'core' ? this.constructor.name.toLowerCase() : `${this._name}.${this.constructor.name.toLowerCase()}`;
+            for (const fnc of getFunctionList('startup', path)) {
+              this[fnc]('enabled', value);
+            }
+          };
+        };
+        onStartup();
+      });
+    }, 5000); // slow down little bit to have everything preloaded or in progress of loading
   }
 
   public sockets() {
