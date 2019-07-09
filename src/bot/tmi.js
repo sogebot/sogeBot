@@ -405,6 +405,7 @@ class TMI extends Core {
       const username = message.tags.login
       const subCumulativeMonths = Number(message.parameters.cumulativeMonths)
       const method = this.getMethod(message)
+      const tier = method.prime ? 'Prime' : method.plan / 1000;
       const userstate = message.tags
 
       if (await commons.isIgnored({username, userId: userstate.userId})) return
@@ -416,10 +417,10 @@ class TMI extends Core {
       if (user.lock && user.lock.subscribed_at) subscribedAt = undefined
       if (user.lock && user.lock.subscriber) isSubscriber = undefined
 
-      await global.users.setById(userstate.userId, { username, is: { subscriber: isSubscriber }, time: { subscribed_at: subscribedAt }, stats: { subStreak: 1, subCumulativeMonths, tier: method.prime ? 'Prime' : method.plan / 1000 } })
+      await global.users.setById(userstate.userId, { username, is: { subscriber: isSubscriber }, time: { subscribed_at: subscribedAt }, stats: { subStreak: 1, subCumulativeMonths, tier } });
       global.overlays.eventlist.add({ type: 'sub', tier: (method.prime ? 'Prime' : method.plan / 1000), username, method: (!_.isNil(method.prime) && method.prime) ? 'Twitch Prime' : '' })
       global.log.sub(`${username}#${userstate.userId}, tier: ${method.prime ? 'Prime' : method.plan / 1000}`)
-      global.events.fire('subscription', { username: username, method: (!_.isNil(method.prime) && method.prime) ? 'Twitch Prime' : '', subCumulativeMonths })
+      global.events.fire('subscription', { username: username, method: (!_.isNil(method.prime) && method.prime) ? 'Twitch Prime' : '', subCumulativeMonths, tier });
       // go through all systems and trigger on.sub
       for (let [type, systems] of Object.entries({
         systems: global.systems,
@@ -457,6 +458,7 @@ class TMI extends Core {
       const streakMonths = Number(message.parameters.streakMonths)
       const userstate = message.tags
       const messageFromUser = message.message
+      const tier = method.prime ? 'Prime' : method.plan / 1000
 
       if (await commons.isIgnored({username, userId: userstate.userId})) return
 
@@ -469,22 +471,23 @@ class TMI extends Core {
       if (user.lock && user.lock.subscribed_at) subscribed_at = undefined
       if (user.lock && user.lock.subscriber) isSubscriber = undefined
 
-      await global.users.setById(userstate.userId, { username, id: userstate.userId, is: { subscriber: isSubscriber }, time: { subscribed_at }, stats: { subStreak, subCumulativeMonths, tier: method.prime ? 'Prime' : method.plan / 1000 } })
+      await global.users.setById(userstate.userId, { username, id: userstate.userId, is: { subscriber: isSubscriber }, time: { subscribed_at }, stats: { subStreak, subCumulativeMonths, tier } })
 
       global.overlays.eventlist.add({
         type: 'resub',
-        tier: (method.prime ? 'Prime' : method.plan / 1000),
-        username: username,
+        tier,
+        username,
         subStreakShareEnabled,
         subStreak,
         subStreakName: commons.getLocalizedName(subStreak, 'core.months'),
         subCumulativeMonths,
         subCumulativeMonthsName: commons.getLocalizedName(subCumulativeMonths, 'core.months'),
         message: messageFromUser
-      })
-      global.log.resub(`${username}#${userstate.userId}, streak share: ${subStreakShareEnabled}, streak: ${subStreak}, months: ${subCumulativeMonths}, message: ${messageFromUser}, tier: ${method.prime ? 'Prime' : method.plan / 1000}`)
+      });
+      global.log.resub(`${username}#${userstate.userId}, streak share: ${subStreakShareEnabled}, streak: ${subStreak}, months: ${subCumulativeMonths}, message: ${messageFromUser}, tier: ${tier}`)
       global.events.fire('resub', {
         username,
+        tier,
         subStreakShareEnabled,
         subStreak,
         subStreakName: commons.getLocalizedName(subStreak, 'core.months'),
@@ -524,10 +527,12 @@ class TMI extends Core {
 
   async subgift (message: Object) {
     try {
-      const username = message.tags.login
-      const subCumulativeMonths = Number(message.parameters.months)
-      const recipient = message.parameters.recipientUserName.toLowerCase()
-      const recipientId = message.parameters.recipientId
+      const username = message.tags.login;
+      const subCumulativeMonths = Number(message.parameters.months);
+      const recipient = message.parameters.recipientUserName.toLowerCase();
+      const recipientId = message.parameters.recipientId;
+      const tier = this.getMethod(message).plan / 1000;
+
 
       // update recipient ID
       await global.db.engine.update('users', { id: recipientId }, { username: recipient })
@@ -544,7 +549,7 @@ class TMI extends Core {
       if (typeof this.ignoreGiftsFromUser[username] !== 'undefined' && this.ignoreGiftsFromUser[username].count !== 0) {
         this.ignoreGiftsFromUser[username].count--
       } else {
-        global.events.fire('subgift', { username: username, recipient: recipient })
+        global.events.fire('subgift', { username: username, recipient: recipient, tier })
         // go through all systems and trigger on.sub
         for (let [type, systems] of Object.entries({
           systems: global.systems,
@@ -575,7 +580,7 @@ class TMI extends Core {
       if (user.lock && user.lock.subscribed_at) subscribedAt = undefined
       if (user.lock && user.lock.subscriber) isSubscriber = undefined
 
-      await global.users.setById(user.id, { username: recipient, is: { subscriber: isSubscriber }, time: { subscribed_at: subscribedAt }, stats: { subCumulativeMonths } })
+      await global.users.setById(user.id, { username: recipient, is: { subscriber: isSubscriber }, time: { subscribed_at: subscribedAt }, stats: { subCumulativeMonths, tier } })
       await global.db.engine.increment('users', { id: user.id }, { stats: { subStreak: 1 }})
       global.overlays.eventlist.add({ type: 'subgift', username: recipient, from: username, monthsName: commons.getLocalizedName(subCumulativeMonths, 'core.months'), months: subCumulativeMonths })
       global.log.subgift(`${recipient}#${recipientId}, from: ${username}, months: ${subCumulativeMonths}`)

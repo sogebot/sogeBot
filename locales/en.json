@@ -355,6 +355,7 @@
         "autohost": "Autohost (true/false)",
         "duration": "Duration",
         "method": "Method",
+        "tier": "Tier",
         "months": "Months",
         "monthsName": "localized name of month (1 month, 2 months)",
         "oldGame": "Game before change",
