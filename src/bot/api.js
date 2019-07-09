@@ -12,7 +12,7 @@ const chalk = require('chalk')
 const constants = require('./constants')
 
 const {
-  getBroadcaster, getChannel, isIgnored, isOwner, isBot, sendMessage
+  getBroadcaster, getChannel, isIgnored, isBroadcaster, isBot, sendMessage
 } = require('./commons')
 
 const __DEBUG__ = {
@@ -490,7 +490,7 @@ class API {
       global.workers.callOnAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', request.headers['ratelimit-limit'], request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] })
 
       this.setSubscribers(subscribers.filter(o => {
-        return !isOwner(o.user_name)  && !isBot(o.user_name)
+        return !isBroadcaster(o.user_name)  && !isBot(o.user_name)
       }))
       if (subscribers.length === 100) {
         // move to next page
@@ -536,7 +536,7 @@ class API {
 
     // set rest users as subs
     for (let user of subscribers) {
-      await global.db.engine.update('users', { id: user.user_id }, { username: user.user_name, is: { subscriber: true }, stats: { tier: user.tier / 1000 } })
+      await global.db.engine.update('users', { id: user.user_id }, { username: user.user_name.toLowerCase(), is: { subscriber: true }, stats: { tier: user.tier / 1000 } })
     }
 
     // update all subscribed_at
