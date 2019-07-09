@@ -9,7 +9,7 @@ import { getOwner } from '../commons';
 import Message from '../message';
 import Integration from './_interface';
 import { settings, ui } from '../decorators';
-import { onChange, onStartup } from '../decorators/on';
+import { onChange } from '../decorators/on';
 
 class Twitter extends Integration {
   public watchedStreams: {
@@ -38,6 +38,11 @@ class Twitter extends Integration {
       this.addEvent();
       setInterval(() => {
         this.updateStreams();
+      }, 10000);
+      setTimeout(() => {
+        this.isEnabled().then(value => {
+          this.onStateChange('enabled', value);
+        });
       }, 10000);
     }
   }
@@ -120,7 +125,6 @@ class Twitter extends Integration {
     global.log.info(chalk.yellow('TWITTER: ') + 'Stream for ' + hash + ' was ended.');
   }
 
-  @onStartup()
   @onChange('enabled')
   public onStateChange(key: string, value: boolean) {
     if (value) {

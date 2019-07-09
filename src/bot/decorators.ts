@@ -2,8 +2,6 @@ import * as _ from 'lodash';
 import { parse, sep as separator } from 'path';
 import { VariableWatcher } from './watchers';
 
-export let loadingInProgress: string[] = [];
-
 function getNameAndTypeFromStackTrace() {
   const _prepareStackTrace = Error.prepareStackTrace;
   Error.prepareStackTrace = (_s, s) => s;
@@ -57,10 +55,6 @@ export function settings(category?: string, isReadOnly: boolean = false) {
   const { name, type } = getNameAndTypeFromStackTrace();
 
   return (target: object, key: string) => {
-    if (!isReadOnly) {
-      loadingInProgress.push(`${type}.${name}.${key}`);
-    }
-
     const registerSettings = () => {
       const isAvailableModule = type !== 'core' && typeof global[type] !== 'undefined' && typeof global[type][name] !== 'undefined';
       const isAvailableLibrary = type === 'core' && typeof global[name] !== 'undefined';
@@ -82,7 +76,6 @@ export function settings(category?: string, isReadOnly: boolean = false) {
                 VariableWatcher.add(`${type}.${name}.${key}`, value, isReadOnly); // rewrite value on var load
                 _.set(self, key, value);
               }
-              loadingInProgress = loadingInProgress.filter(o => o !== `${type}.${name}.${key}`);
             });
           };
           setTimeout(() => loadVariableValue(), 5000);

@@ -1,19 +1,6 @@
 import { set, get } from 'lodash';
 import { parse, sep as separator } from 'path';
 
-const on: {
-  startup: {
-    path: string;
-    fName: string;
-  }[];
-} = {
-  startup: [],
-};
-
-export function getFunctionList(type: 'startup', path: string): string[] {
-  return on[type].filter(o => o.path === path).map(o => o.fName);
-}
-
 export function onChange(variableArg: string) {
   const { name, type } = getNameAndTypeFromStackTrace();
 
@@ -59,15 +46,6 @@ export function onLoad(variableArg: string) {
       }
     };
     register();
-  };
-}
-
-export function onStartup() {
-  const { name, type } = getNameAndTypeFromStackTrace();
-
-  return (target: object, fName: string) => {
-    const path = type === 'core' ? name : `${type}.${name.toLowerCase()}`;
-    on.startup.push({ path, fName });
   };
 }
 
