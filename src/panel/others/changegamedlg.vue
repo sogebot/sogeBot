@@ -170,6 +170,7 @@
         this.socket.emit('getCachedTags', (data) => {
           this.cachedTags = data.filter(o => !o.is_auto);
         })
+        this.socket.emit('getUserTwitchGames');
       },
       handleOk() {
         let title
@@ -270,9 +271,11 @@
             ...new Set([
               (this as any).currentGame,
               ...(this as any).data.sort((a,b) => {
-                if (a.timestamp < b.timestamp) {
+                if (typeof a.timestamp === 'undefined') { a.timestamp = 0; }
+                if (typeof b.timestamp === 'undefined') { b.timestamp = 0; }
+                if (a.timestamp > b.timestamp) {
                   return -1;
-                } else if (a.timestamp > b.timestamp) {
+                } else if (a.timestamp < b.timestamp) {
                   return 1;
                 } else {
                   return 0;
@@ -282,9 +285,11 @@
           )];
         } else {
           (this as any).cachedGamesOrder = [...new Set((this as any).data.sort((a,b) => {
-            if (a.timestamp < b.timestamp) {
+            if (typeof a.timestamp === 'undefined') { a.timestamp = 0; }
+            if (typeof b.timestamp === 'undefined') { b.timestamp = 0; }
+            if (a.timestamp > b.timestamp) {
               return -1;
-            } else if (a.timestamp > b.timestamp) {
+            } else if (a.timestamp < b.timestamp) {
               return 1;
             } else {
               return 0;
@@ -300,7 +305,7 @@
     mounted() {
       this.init();
       this.socket.on('sendGameFromTwitch', (data) => this.searchForGameOpts = data);
-      this.socket.on('sendUserTwitchGamesAndTitles', (data) => this.data = data);
+      this.socket.on('sendUserTwitchGamesAndTitles', (data) => { this.data = data });
       this.socket.on('stats', (data) => {
         if (!this.currentGame) {
           this.currentGame = data.game;
