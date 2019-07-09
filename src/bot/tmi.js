@@ -418,8 +418,8 @@ class TMI extends Core {
       if (user.lock && user.lock.subscriber) isSubscriber = undefined
 
       await global.users.setById(userstate.userId, { username, is: { subscriber: isSubscriber }, time: { subscribed_at: subscribedAt }, stats: { subStreak: 1, subCumulativeMonths, tier } });
-      global.overlays.eventlist.add({ type: 'sub', tier: (method.prime ? 'Prime' : method.plan / 1000), username, method: (!_.isNil(method.prime) && method.prime) ? 'Twitch Prime' : '' })
-      global.log.sub(`${username}#${userstate.userId}, tier: ${method.prime ? 'Prime' : method.plan / 1000}`)
+      global.overlays.eventlist.add({ type: 'sub', tier, username, method: (!_.isNil(method.prime) && method.prime) ? 'Twitch Prime' : '' })
+      global.log.sub(`${username}#${userstate.userId}, tier: ${tier}`)
       global.events.fire('subscription', { username: username, method: (!_.isNil(method.prime) && method.prime) ? 'Twitch Prime' : '', subCumulativeMonths, tier });
       // go through all systems and trigger on.sub
       for (let [type, systems] of Object.entries({
