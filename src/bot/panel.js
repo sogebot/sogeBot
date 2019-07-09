@@ -221,7 +221,7 @@ function Panel () {
 
       let item = await global.db.engine.findOne('cache.titles', { game: data.game, title: data.title.trim() })
       if (_.isEmpty(item)) {
-        await global.db.engine.insert('cache.titles', { game: data.game, title: data.title })
+        await global.db.engine.insert('cache.titles', { game: data.game, title: data.title, timestamp: Date.now() })
       }
 
       self.sendStreamData(self, global.panel.io) // force dashboard update
