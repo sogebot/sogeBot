@@ -56,7 +56,7 @@ export default {
       this.bDisplay = !this.bDisplay
     },
     update: function () {
-      this.socket.emit('findOne', { collection: 'settings', where: { key: 'checklist.itemsArray' }}, (err, data) => {
+      this.socket.emit('findOne', { collection: 'settings', where: { key: 'itemsArray' }}, (err, data) => {
         if (err) return console.error(err)
         if (typeof data.value !== 'undefined' && data.value.length > 0) {
           // load complete data

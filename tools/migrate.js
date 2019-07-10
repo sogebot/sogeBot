@@ -180,6 +180,36 @@ let migration = {
     }
   }],
   settings: [{
+    version: '9.5.0',
+    do: async () => {
+      let processed = 0;
+      console.info('Performing update of settings for 9.5.0');
+
+      const mappings = {
+        'systems.settings': {
+          checklist: {
+            'checklist.itemsArray': 'itemsArray',
+          },
+        }
+      };
+
+      for (const collection of Object.keys(mappings)) {
+        console.info(`\t*** ${collection}`);
+        for (const system of Object.keys(mappings[collection])) {
+          for (const [ before, after ] of Object.entries(mappings[collection][system])) {
+            let item = await global.db.engine.findOne(collection, { key: before, system })
+            if (typeof item.key !== 'undefined') {
+              console.info(`\t\t-> ${system}.${before} => ${system}.${after}`)
+              await global.db.engine.update(collection, { _id: String(item._id) }, { key: after, system })
+              processed++;
+            }
+          }
+        }
+      }
+      console.info(`\t=> ${processed} processed`);
+    }
+  },
+  {
     version: '9.1.0',
     do: async () => {
       let processed = 0;
