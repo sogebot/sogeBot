@@ -867,7 +867,7 @@ class API {
       }
     } catch (e) {
       global.log.error(`${url} - ${e.message}`)
-      if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getCurrentStreamData', api: 'getCurrentStreamTags', endpoint: url, code: e.response.status, data: e.stack, remaining: this.calls.bot.remaining })
+      if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getCurrentStreamTags', api: 'getCurrentStreamTags', endpoint: url, code: e.response.status, data: e.stack, remaining: this.calls.bot.remaining })
       return { state: false, opts }
     }
     return { state: true, opts }
@@ -893,6 +893,8 @@ class API {
           'Authorization': 'Bearer ' + token
         }
       })
+
+      global.status.API = request.status === 200 ? constants.CONNECTED : constants.DISCONNECTED;
 
       // save remaining api calls
       this.calls.bot.remaining = request.headers['ratelimit-remaining']
