@@ -72,5 +72,5 @@ if (argv._[0] === 'cli') {
 function prepareMessage(change) {
   const regexp = /(fix|feat)\((?<type>\w*)\)\: (?<message>.*)/;
   const match = regexp.exec(change.message);
-  return `* **${match.groups.type}** - ${match.groups.message}, ${change.fixes.join(', ')} ([${change.commit}](https://github.com/sogehige/sogeBot/commit/${change.commit}))`;
+  return `* **${match.groups.type}** - ${match.groups.message}${change.fixes.length > 0 ? ', ' + change.fixes.join(', ') : ''} ([${change.commit}](https://github.com/sogehige/sogeBot/commit/${change.commit}))`;
 }
