@@ -140,7 +140,7 @@
                 {{ translate('menu.' + system.name) }}
 
                 <small
-                  v-if="$route.params.type !== 'core'"
+                  v-if="!['core', 'overlays'].includes($route.params.type)"
                   :class="[ system.enabled && !system.isDisabledByEnv && system.areDependenciesEnabled ? 'text-success' : 'text-danger' ]"
                   style="margin: 0px 0px 3px; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px;"
                 >
@@ -197,7 +197,6 @@ export default class interfaceSettings extends Vue {
 
   @Watch('$route.params.type')
   refresh(v) {
-    console.log({v});
     this.socket.emit(this.$route.params.type, (err, systems: systemFromIO[] ) => {
       if (!systems.map(o => o.name).includes(this.$route.params.id)) {
         this.$router.push({ name: 'InterfaceSettings', params: { type: this.$route.params.type, id: systems[0].name } });
@@ -229,7 +228,10 @@ export default class interfaceSettings extends Vue {
 
   @Watch('$route.params.id')
   loadSettings(system) {
-    console.log({system});
+    if (!this.$route.params.id) {
+      return this.refresh(this.$route.params.type)
+    };
+
     this.state.loaded = State.PROGRESS;
     const socket = io(`/${this.$route.params.type}/${system}`, { query: "token=" + this.token });
     socket.emit('settings', (err, _settings, _ui) => {
