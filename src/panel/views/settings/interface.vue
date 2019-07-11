@@ -193,7 +193,7 @@ export default class interfaceSettings extends Vue {
   error: string | null = null;
   showError: boolean = false;
 
-  mounted() { this.refresh(); }
+  mounted() { this.refresh(this.$route.params.type); }
 
   @Watch('$route.params.type')
   refresh(v) {
