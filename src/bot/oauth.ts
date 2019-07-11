@@ -111,7 +111,7 @@ class OAuth extends Core {
   constructor() {
     super();
 
-    this.addMenu({ category: 'settings', name: 'core', id: 'core' });
+    this.addMenu({ category: 'settings', name: 'core', id: '/settings/core' });
     setTimeout(() => {
       this.validateOAuth('bot');
       this.validateOAuth('broadcaster');

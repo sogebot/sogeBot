@@ -134,8 +134,6 @@ function Panel () {
   this.widgets = []
   this.socketListeners = []
 
-  this.addMenu({ category: 'settings', name: 'systems', id: 'systems' })
-
   this.registerSockets({
     self: this,
     expose: ['sendStreamData'],
@@ -477,7 +475,11 @@ Panel.prototype.authUser = async function (req, res, next) {
   }
 }
 
-Panel.prototype.addMenu = function (menu) { this.menu.push(menu) }
+Panel.prototype.addMenu = function (menu) {
+  if (!this.menu.find(o => o.id === menu.id)) {
+    this.menu.push(menu);
+  }
+}
 
 Panel.prototype.sendMenu = function (socket) { socket.emit('menu', this.menu) }
 

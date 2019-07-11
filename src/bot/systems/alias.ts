@@ -27,7 +27,6 @@ class Alias extends System {
     super();
 
     this.addMenu({ category: 'manage', name: 'alias', id: 'alias/list' });
-    this.addMenu({ category: 'settings', name: 'systems', id: 'systems' });
   }
 
   @parser()
