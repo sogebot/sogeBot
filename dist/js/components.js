@@ -1,51 +1,51 @@
 /* globals translations, commons, Vue, _ $, io  */
 
 const flattenKeys = (obj, path = []) =>
-    !_.isObject(obj)
-        ? { [path.join('.')]: obj }
-        : _.reduce(obj, (cum, next, key) => _.merge(cum, flattenKeys(next, [...path, key])), {});
+  !_.isObject(obj)
+    ? { [path.join('.')]: obj }
+    : _.reduce(obj, (cum, next, key) => _.merge(cum, flattenKeys(next, [...path, key])), {});
 
 /* div with html filters */
 window.textWithTags = {
   props: ['value'],
   filters: {
     filterize: function (val) {
-      const filtersRegExp = new RegExp('\\$(' + _.sortBy(_.keys(flattenKeys(translations.responses.variable)), (o) => -o.length).join('|') + ')', 'g')
-      val = val.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
-      let matches = val.match(filtersRegExp)
-      let output = val
+      const filtersRegExp = new RegExp('\\$(' + _.sortBy(_.keys(flattenKeys(translations.responses.variable)), (o) => -o.length).join('|') + ')', 'g');
+      val = val.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+      let matches = val.match(filtersRegExp);
+      let output = val;
       if (!_.isNil(matches)) {
         for (let match of matches) {
           output = output.replace(match,
             `<span contenteditable="false" class="editable-variable">
               ${commons.translate('responses.variable.' + match.replace('$', ''))}
-            </span>&nbsp;`)
+            </span>&nbsp;`);
         }
       }
-      return output
+      return output;
     }
   },
   template: `
     <div style="flex: 1 1 auto;" v-html="$options.filters.filterize(value)"></div>
     `
-}
+};
 
 /* number input for settings  */
 window.numberInput = {
   props: ['value', 'title', 'readonly', 'min', 'max', 'step'],
   methods: {
     update: function () {
-      let step = String(this.step || 0)
+      let step = String(this.step || 0);
 
       if (step.includes('.')) {
-        step = step.split('.')[1].length
+        step = step.split('.')[1].length;
       }
 
-      this.currentValue = Number(Number(this.currentValue).toFixed(step))
-      if (typeof this.min !== 'undefined' && this.min > this.currentValue) this.currentValue = this.min
-      if (typeof this.max !== 'undefined' && this.max < this.currentValue) this.currentValue = this.max
+      this.currentValue = Number(Number(this.currentValue).toFixed(step));
+      if (typeof this.min !== 'undefined' && this.min > this.currentValue) {this.currentValue = this.min;}
+      if (typeof this.max !== 'undefined' && this.max < this.currentValue) {this.currentValue = this.max;}
 
-      this.$emit('update', { value: Number(this.currentValue) })
+      this.$emit('update', { value: Number(this.currentValue) });
     }
   },
   data: function () {
@@ -53,10 +53,10 @@ window.numberInput = {
       show: false,
       currentValue: this.value,
       translatedTitle: commons.translate(this.title)
-    }
+    };
   },
   mounted: function () {
-    $('.textInputTooltip').tooltip()
+    $('.textInputTooltip').tooltip();
   },
   template: `
     <div class="input-group">
@@ -71,7 +71,7 @@ window.numberInput = {
       </div>
       <input :min="min" :max="max" v-on:keyup="update" @focus="show = true" @blur="show = false" v-model="currentValue" :step="step || 1" type="number" class="form-control" :readonly="readonly" />
     </div>`
-}
+};
 
 /* text input for settings  */
 window.textInput = {
@@ -79,10 +79,10 @@ window.textInput = {
   methods: {
     update: function () {
       if (this.type === 'number') {
-        if (_.isFinite(Number(this.currentValue))) this.currentValue = Number(this.currentValue)
-        else this.currentValue = this.value
+        if (_.isFinite(Number(this.currentValue))) {this.currentValue = Number(this.currentValue);}
+        else {this.currentValue = this.value;};
       }
-      this.$emit('update', { value: this.currentValue })
+      this.$emit('update', { value: this.currentValue });
     }
   },
   data: function () {
@@ -90,10 +90,10 @@ window.textInput = {
       show: false,
       currentValue: this.value,
       translatedTitle: commons.translate(this.title)
-    }
+    };
   },
   mounted: function () {
-    $('.textInputTooltip').tooltip()
+    $('.textInputTooltip').tooltip();
   },
   template: `
     <div class="input-group">
@@ -108,7 +108,7 @@ window.textInput = {
       </div>
       <input v-on:keyup="update" @focus="show = true" @blur="show = false" v-model="currentValue" class="form-control" :type="secret && !show ? 'password' : 'text'" :readonly="readonly" />
     </div>`
-}
+};
 
 /* command input for settings  */
 window.commandInput = {
@@ -116,16 +116,16 @@ window.commandInput = {
   methods: {
     update: function () {
       if (this.type === 'number') {
-        if (_.isFinite(Number(this.currentValue))) this.currentValue = Number(this.currentValue)
-        else this.currentValue = this.value
+        if (_.isFinite(Number(this.currentValue))) {this.currentValue = Number(this.currentValue);}
+        else {this.currentValue = this.value;};
       }
-      this.$emit('update', this.currentValue)
+      this.$emit('update', this.currentValue);
     }
   },
   data: function () {
     return {
       currentValue: this.value
-    }
+    };
   },
   template: `
     <div class="input-group">
@@ -134,109 +134,21 @@ window.commandInput = {
       </div>
       <input v-on:keyup="update" v-model="currentValue" class="form-control" type="text" />
     </div>`
-}
+};
 
-/* command input for settings with permissions  */
-window.commandInputWithPermissions = {
-  props: ['value', 'command', 'type', 'permissions', 'token'],
-  watch: {
-    currentPermissions: function () { this.update() }
-  },
-  methods: {
-    update: function () {
-      if (this.type === 'number') {
-        if (_.isFinite(Number(this.currentValue))) this.currentValue = Number(this.currentValue)
-        else this.currentValue = this.value
-      }
-      this.$emit('update', { value: this.currentValue, permissions: this.currentPermissions })
-    },
-    getPermissionName: function (id) {
-      if (!id) return 'Disabled'
-      const permission = this.permissionsList.find((o) => {
-        return o.id === id
-      })
-      if (typeof permission !== 'undefined') {
-        if (permission.name.trim() === '') {
-          return permission.id
-        } else {
-          return permission.name
-        }
-      } else {
-        return null
-      }
-    }
-  },
-  data: function () {
-    return {
-      socket: io('/core/permissions', { query: "token=" + this.token }),
-      currentValue: this.value,
-      currentPermissions: this.permissions,
-      permissionsList: [],
-      permissionsLoaded: false,
-    }
-  },
-  mounted() {
-    this.socket.emit('find', {}, (err, data) => {
-      if (err) return console.error(err)
-      this.permissionsList = _.orderBy(data, 'order', 'asc');
-      this.permissionsLoaded = true
-    })
-  },
-  template: `
-    <div class="input-group">
-      <div class="input-group-prepend">
-        <span class="input-group-text">{{ command }}</span>
-      </div>
-      <input v-on:keyup="update" v-model="currentValue" class="form-control" type="text" />
-      <div v-if="!permissionsLoaded" class="input-group-append">
-        <div class="spinner-grow spinner-grow-sm" role="status">
-          <span class="sr-only">Loading...</span>
-        </div>
-      </div>
-      <div class="input-group-append" v-else>
-        <div class="dropdown">
-          <button class="btn dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown"
-                  :class="{'btn-light': currentPermissions === null, 'btn-dark': currentPermissions !== null && getPermissionName(currentPermissions) !== null, 'btn-danger': currentPermissions !== null && getPermissionName(currentPermissions) === null}">
-            <template v-if="permissionsLoaded">
-              <span v-if="getPermissionName(currentPermissions) !== null">{{ getPermissionName(currentPermissions) }}</span>
-              <span v-else>
-                <i class="fas fa-exclamation-triangle"></i> Permission not found
-              </span>
-            </template>
-            <div v-else class="spinner-grow spinner-grow-sm" role="status">
-              <span class="sr-only">Loading...</span>
-            </div>
-          </button>
-          <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="z-index: 9999;">
-            <button
-              v-if="permissionsLoaded"
-              v-for="p of permissionsList"
-              class="dropdown-item"
-              @click="currentPermissions = p.id"
-            >{{getPermissionName(p.id)}}</button>
-            <button
-              v-if="permissionsLoaded"
-              class="dropdown-item"
-              @click="currentPermissions = null"
-            >Disabled</button>
-          </div>
-        </div>
-      </div>
-    </div>`
-}
 
 /* textarea input for arrays  */
 window.textAreaFromArray = {
   props: ['value', 'title'],
   methods: {
     update: function () {
-      this.$emit('update', this.currentValue.split('\n'))
+      this.$emit('update', this.currentValue.split('\n'));
     }
   },
   data: function () {
     return {
       currentValue: this.value.join('\n')
-    }
+    };
   },
   template: `
     <div class="input-group">
@@ -250,37 +162,7 @@ window.textAreaFromArray = {
       </div>
       <textarea v-on:keyup="update" v-model="currentValue" class="form-control" type="text"></textarea>
     </div>`
-}
-
-/* simple enable/disable button toggler */
-window.toggleEnable = {
-  props: ['value', 'title'],
-  methods: {
-    update: function () {
-      this.$emit('update', !this.value)
-    }
-  },
-  template: `
-    <div class="input-group">
-      <div v-if="title" class="input-group-prepend">
-        <span class="input-group-text">
-          <template v-if="typeof title === 'string'">{{ title }}</template>
-          <template v-else>
-            {{ title.title }}
-            <small class="textInputTooltip text-info pl-1" data-toggle="tooltip" data-html="true" :title="title.help">[?]</small>
-          </template>
-        </span>
-      </div>
-      <button
-        class="btn form-control"
-        v-bind:class="{'btn-success': this.value, 'btn-danger': !this.value}"
-        v-on:click="update()">
-        <template v-if="this.value">{{ commons.translate('enabled') }}</template>
-        <template v-else>{{ commons.translate('disabled') }}</template>
-      </button>
-    </div>
-  `
-}
+};
 
 /* textarea with editation */
 window.textAreaWithTags = {
@@ -290,113 +172,113 @@ window.textAreaWithTags = {
       if (val) {
         // focus textarea and set height
         if (this.currentValue.trim().length === 0) {
-          this.height = this.$refs.placeholder.clientHeight
-        } else this.height = this.$refs.div.clientHeight
+          this.height = this.$refs.placeholder.clientHeight;
+        } else {this.height = this.$refs.div.clientHeight;};
         Vue.nextTick(() => {
-          this.$refs.textarea.focus()
-        })
+          this.$refs.textarea.focus();
+        });
       } else {
         // texteare unfocused, set height of div
-        this.height = this.$refs.textarea.clientHeight
+        this.height = this.$refs.textarea.clientHeight;
       }
     }
   },
   computed: {
     _placeholder: function () {
-      return !this.placeholder || this.placeholder.trim().length === 0 ? '&nbsp;' : this.placeholder
+      return !this.placeholder || this.placeholder.trim().length === 0 ? '&nbsp;' : this.placeholder;
     },
     currentValue: {
       get: function () {
-        return this.value
+        return this.value;
       },
       set: function (newValue) {
-        this.$emit('update', newValue)
+        this.$emit('update', newValue);
       }
     },
     heightStyle: function () {
-      if (this.height === 0) return 'height: auto'
-      return `height: ${this.height + 2}px`
+      if (this.height === 0) {return 'height: auto';};
+      return `height: ${this.height + 2}px`;
     },
   },
   mounted() {
     this.timeout = setInterval(() => {
       this.updateFilterBtnPosX();
       this.updateFilterBtnPosY();
-    }, 100)
+    }, 100);
   },
   destroyed() {
-    clearInterval(this.timeout)
+    clearInterval(this.timeout);
   },
   filters: {
     filterize: function (val) {
-      const filtersRegExp = new RegExp('\\$(' + _.sortBy(_.keys(flattenKeys(translations.responses.variable)), (o) => -o.length).join('|') + ')', 'g')
-      val = val.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
-      let matches = val.match(filtersRegExp)
-      let output = val
+      const filtersRegExp = new RegExp('\\$(' + _.sortBy(_.keys(flattenKeys(translations.responses.variable)), (o) => -o.length).join('|') + ')', 'g');
+      val = val.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+      let matches = val.match(filtersRegExp);
+      let output = val;
       if (!_.isNil(matches)) {
         for (let match of matches) {
           output = output.replace(match,
             `<span contenteditable="false" class="editable-variable">
               ${commons.translate('responses.variable.' + match.replace('$', ''))}
-            </span>&nbsp;`)
+            </span>&nbsp;`);
         }
       }
-      return output
+      return output;
     }
   },
   methods: {
     updateFilterBtnPosX() {
       Vue.nextTick(() => {
-        let client = null
+        let client = null;
 
         if (this.editation) {
-          client = this.$refs.textarea.getBoundingClientRect()
+          client = this.$refs.textarea.getBoundingClientRect();
         } else {
           if (this.currentValue.trim().length === 0) {
-            client = this.$refs.placeholder.getBoundingClientRect()
+            client = this.$refs.placeholder.getBoundingClientRect();
           } else {
-            client = this.$refs.div.getBoundingClientRect()
+            client = this.$refs.div.getBoundingClientRect();
           }
         }
         this.btnPosX = client.x + client.width - 50;
-      })
+      });
     },
     updateFilterBtnPosY() {
       Vue.nextTick(() => {
-        let client = null
+        let client = null;
 
         if (this.editation) {
-          client = this.$refs.textarea.getBoundingClientRect()
+          client = this.$refs.textarea.getBoundingClientRect();
         } else {
           if (this.currentValue.trim().length === 0) {
-            client = this.$refs.placeholder.getBoundingClientRect()
+            client = this.$refs.placeholder.getBoundingClientRect();
           } else {
-            client = this.$refs.div.getBoundingClientRect()
+            client = this.$refs.div.getBoundingClientRect();
           }
         }
         this.btnPosY = client.y + client.height - 47;
-      })
+      });
     },
     onEnter (e) {
       // don't add newline
-      e.stopPropagation()
-      e.preventDefault()
-      e.returnValue = false
-      this.input = e.target.value
+      e.stopPropagation();
+      e.preventDefault();
+      e.returnValue = false;
+      this.input = e.target.value;
     },
     addVariable(variable) {
-      this.currentValue += '$' + variable
+      this.currentValue += '$' + variable;
       this.editation = true;
       Vue.nextTick(() => {
-        this.$refs.textarea.focus()
-      })
+        this.$refs.textarea.focus();
+      });
     },
     toggleFilters() {
       this.isFiltersVisible = !this.isFiltersVisible;
       this.editation = true;
       Vue.nextTick(() => {
-        this.$refs.textarea.focus()
-      })
+        this.$refs.textarea.focus();
+      });
     },
   },
   data: function () {
@@ -408,7 +290,7 @@ window.textAreaWithTags = {
       btnPosX: 0,
       btnPosY: 0,
       timeout: null,
-    }
+    };
   },
   template: `
     <div style="flex: 1 1 auto;"
@@ -479,52 +361,52 @@ window.textAreaWithTags = {
       </div>
     </div>
     `
-}
+};
 
 /* wheel of fortune responses settings */
 window.wofTextArea = {
   props: ['value', 'placeholder', 'rid', 'oid'],
   watch: {
     currentValue: function (val) {
-      const data = { option: this.oid, response: this.rid, value: val }
-      console.debug('[WOF] Updating response', data)
-      this.$emit('update', { oid: this.oid, rid: this.rid, value: val })
+      const data = { option: this.oid, response: this.rid, value: val };
+      console.debug('[WOF] Updating response', data);
+      this.$emit('update', { oid: this.oid, rid: this.rid, value: val });
     },
     editation: function (val, old) {
       if (val) {
         // focus textarea and set height
-        this.height = this.$refs.div.clientHeight
+        this.height = this.$refs.div.clientHeight;
         Vue.nextTick(() => {
-          this.$refs.textarea.focus()
-        })
+          this.$refs.textarea.focus();
+        });
       } else {
         // texteare unfocused, set height of div
-        this.height = this.$refs.textarea.clientHeight
+        this.height = this.$refs.textarea.clientHeight;
       }
     }
   },
   computed: {
     valueWithHTML: function () {
       if (this.currentValue.trim().length === 0) {
-        return `<span class="text-muted">${this.placeholder}</span>`
+        return `<span class="text-muted">${this.placeholder}</span>`;
       } else {
-        const filtersRegExp = new RegExp('\\$(' + _.sortBy(_.keys(translations.responses.variable), (o) => -o.length).join('|') + ')', 'g')
-        let matches = this.currentValue.match(filtersRegExp)
-        let output = this.currentValue
+        const filtersRegExp = new RegExp('\\$(' + _.sortBy(_.keys(translations.responses.variable), (o) => -o.length).join('|') + ')', 'g');
+        let matches = this.currentValue.match(filtersRegExp);
+        let output = this.currentValue;
         if (!_.isNil(matches)) {
           for (let match of matches) {
             output = output.replace(match,
               `<span contenteditable="false" class="editable-variable">
                 ${commons.translate('responses.variable.' + match.replace('$', ''))}
-              </span>&nbsp;`)
+              </span>&nbsp;`);
           }
         }
-        return output
+        return output;
       }
     },
     heightStyle: function () {
-      if (this.height === 0) return 'height: auto'
-      return `height: ${this.height + 2}px`
+      if (this.height === 0) {return 'height: auto';};
+      return `height: ${this.height + 2}px`;
     }
   },
   data: function () {
@@ -532,7 +414,7 @@ window.wofTextArea = {
       currentValue: this.value,
       height: 0,
       editation: false
-    }
+    };
   },
   template: `
     <div style="flex: 1 1 auto; height: fit-content">
@@ -545,48 +427,48 @@ window.wofTextArea = {
       </div>
     </div>
     `
-}
+};
 
 window.wofResponses = {
   props: ['options'],
   data: function () {
     return {
       w_options: this.options
-    }
+    };
   },
   components: {
     'textarea-with-tags': window.wofTextArea
   },
   watch: {
     w_options: function (val, old) {
-      console.log('[WOF] emitting options changes', val)
-      this.$emit('update', this.w_options)
+      console.log('[WOF] emitting options changes', val);
+      this.$emit('update', this.w_options);
     }
   },
   methods: {
     updateOption: function (index, value) {
-      let option = this.w_options[index]
-      option.title = value
-      Vue.set(this.w_options, index, option)
+      let option = this.w_options[index];
+      option.title = value;
+      Vue.set(this.w_options, index, option);
     },
     addOption: function () {
-      this.w_options.push({ title: '', responses: [''] })
+      this.w_options.push({ title: '', responses: [''] });
     },
     removeOption: function (index) {
-      this.w_options.splice(index, 1)
+      this.w_options.splice(index, 1);
     },
     addResponse: function (oid) {
-      this.w_options[oid].responses.push('')
+      this.w_options[oid].responses.push('');
     },
     updateResponse: function (opts) {
-      let option = this.w_options[opts.oid]
-      option.responses[opts.rid] = opts.value
-      Vue.set(this.w_options, opts.oid, option)
+      let option = this.w_options[opts.oid];
+      option.responses[opts.rid] = opts.value;
+      Vue.set(this.w_options, opts.oid, option);
     },
     removeResponse: function (oid, rid) {
-      let option = this.w_options[oid]
-      option.responses.splice(rid, 1)
-      Vue.set(this.w_options, oid, option)
+      let option = this.w_options[oid];
+      option.responses.splice(rid, 1);
+      Vue.set(this.w_options, oid, option);
     }
   },
   template: `
@@ -641,7 +523,7 @@ window.wofResponses = {
       <button v-on:click="addOption" class="btn btn-success btn-block mt-3"><i class="fas fa-plus"></i> {{ commons.translate('games.wheeloffortune.addOption') }}</button>
     </div>
     `
-}
+};
 
 /* heist levels */
 window.heistLevels = {
@@ -649,19 +531,19 @@ window.heistLevels = {
   data: function () {
     return {
       w_levels: this.levels.sort((a, b) => {
-        return a.maxUsers - b.maxUsers
+        return a.maxUsers - b.maxUsers;
       })
-    }
+    };
   },
   watch: {
     w_levels: function (val, old) {
-      this.update()
+      this.update();
     }
   },
   methods: {
     update: function () {
-      console.log('[HEIST] emitting levels changes', this.w_levels)
-      this.$emit('update', this.w_levels)
+      console.log('[HEIST] emitting levels changes', this.w_levels);
+      this.$emit('update', this.w_levels);
     },
     addLevel: function () {
       this.w_levels.push({
@@ -669,10 +551,10 @@ window.heistLevels = {
         winPercentage: 10,
         payoutMultiplier: 1,
         maxUsers: 10
-      })
+      });
     },
     removeLevel: function (index) {
-      this.w_levels.splice(index, 1)
+      this.w_levels.splice(index, 1);
     }
   },
   template: `
@@ -709,7 +591,7 @@ window.heistLevels = {
       <button class="btn btn-success btn-block mt-2" @click="addLevel"><i class="fas fa-plus"></i></button>
     </div>
   `
-}
+};
 
 /* heist results */
 window.heistResults = {
@@ -717,28 +599,28 @@ window.heistResults = {
   data: function () {
     return {
       w_results: this.results.sort((a, b) => {
-        return a.percentage - b.percentage
+        return a.percentage - b.percentage;
       })
-    }
+    };
   },
   watch: {
     w_results: function (val, old) {
-      this.update()
+      this.update();
     }
   },
   methods: {
     update: function () {
-      console.log('[HEIST] emitting results changes', this.w_results)
-      this.$emit('update', this.w_results)
+      console.log('[HEIST] emitting results changes', this.w_results);
+      this.$emit('update', this.w_results);
     },
     addResult: function () {
       this.w_results.push({
         percentage: 10,
         message: ''
-      })
+      });
     },
     removeResult: function (index) {
-      this.w_results.splice(index, 1)
+      this.w_results.splice(index, 1);
     }
   },
   template: `
@@ -767,7 +649,7 @@ window.heistResults = {
       <button class="btn btn-success btn-block mt-2" @click="addResult"><i class="fas fa-plus"></i></button>
     </div>
   `
-}
+};
 
 /* checklist */
 window.checkList = {
@@ -777,7 +659,7 @@ window.checkList = {
       show: false,
       currentValue: this.value,
       translatedTitle: commons.translate(this.title)
-    }
+    };
   },
   template: `
     <div class="d-flex">
@@ -795,7 +677,7 @@ window.checkList = {
       </ul>
     </div>
   `
-}
+};
 
 /* selector */
 window.selector = {
@@ -804,11 +686,11 @@ window.selector = {
     return {
       currentValue: this.value,
       translatedTitle: commons.translate(this.title)
-    }
+    };
   },
   methods: {
     onChange: function () {
-      this.$emit('update', { value: this.currentValue })
+      this.$emit('update', { value: this.currentValue });
     }
   },
   template: `
@@ -827,7 +709,7 @@ window.selector = {
       </select>
     </div>
     `
-}
+};
 
 /* hold button */
 window.holdButton = {
@@ -839,47 +721,47 @@ window.holdButton = {
       trigger: false,
       percentage: 0,
       intervals: []
-    }
+    };
   },
   watch: {
     trigger: function (val) {
       if (val) {
-        this.$emit('trigger')
+        this.$emit('trigger');
       }
     },
     isMouseOver: function (val) {
       if (!val) {
-        this.onMouseDownStarted = 0
-        this.trigger = false
-        this.percentage = 0
+        this.onMouseDownStarted = 0;
+        this.trigger = false;
+        this.percentage = 0;
       }
     }
   },
   destroyed: function () {
-    for (let i of this.intervals) clearInterval(i)
+    for (let i of this.intervals) {clearInterval(i);};
   },
   mounted: function () {
-    this.intervals.push(setInterval(() => this.shouldBeTriggered(), 10))
+    this.intervals.push(setInterval(() => this.shouldBeTriggered(), 10));
   },
   methods: {
     shouldBeTriggered: function () {
-      const ttc = this.ttc || 1000
+      const ttc = this.ttc || 1000;
       if (this.isMouseOver && this.onMouseDownStarted !== 0) {
-        this.percentage = (ttc / 10) * ((Date.now() - this.onMouseDownStarted) / 1000)
-        if (this.percentage > 100) this.percentage = 100
+        this.percentage = (ttc / 10) * ((Date.now() - this.onMouseDownStarted) / 1000);
+        if (this.percentage > 100) {this.percentage = 100;};
 
         if (Date.now() - this.onMouseDownStarted > ttc) {
-          this.trigger = true
+          this.trigger = true;
         }
       }
     },
     onMouseDown: function () {
-      this.onMouseDownStarted = Date.now()
+      this.onMouseDownStarted = Date.now();
     },
     onMouseUp: function () {
-      this.onMouseDownStarted = 0
-      this.trigger = false
-      this.percentage = 0
+      this.onMouseDownStarted = 0;
+      this.trigger = false;
+      this.percentage = 0;
     }
   },
   template: `
@@ -895,7 +777,7 @@ window.holdButton = {
       </span>
     </button>
   `
-}
+};
 
 /* button with socket */
 window.buttonSocket = {
@@ -904,29 +786,29 @@ window.buttonSocket = {
     return {
       socket: io(this.object.on, { query: 'token=' + this.token }),
       state: 0
-    }
+    };
   },
   methods: {
     send: function () {
-      this.state = 1
-      console.log(`EMIT => ${this.object.on} [${this.object.emit}]`)
+      this.state = 1;
+      console.log(`EMIT => ${this.object.on} [${this.object.emit}]`);
       io(this.object.on, { query: 'token=' + this.token }).emit(this.object.emit, (err, data) => {
         if (err) {
-          this.state = 2
-          this.$emit('error', err)
+          this.state = 2;
+          this.$emit('error', err);
           setTimeout(() => {
-            this.state = 0
-          }, 2000)
+            this.state = 0;
+          }, 2000);
         } else {
           // to do eval data
           if (data.do === 'redirect') {
-            window.location = data.opts[0]
+            window.location = data.opts[0];
           } else if (data.do === 'refresh') {
-            window.location.reload()
+            window.location.reload();
           }
-          this.state = 0
+          this.state = 0;
         }
-      })
+      });
     }
   },
   template: `
@@ -936,7 +818,7 @@ window.buttonSocket = {
       {{ commons.translate(object.text) }}
     </button>
   `
-}
+};
 
 /* configurableList */
 window.configurableList = {
@@ -946,19 +828,19 @@ window.configurableList = {
       show: false,
       currentValue: this.value,
       translatedTitle: commons.translate(this.title)
-    }
+    };
   },
   watch: {
     currentValue: function () {
-      this.onChange()
+      this.onChange();
     }
   },
   methods: {
     onChange: function () {
-      this.$emit('update', { value: this.currentValue })
+      this.$emit('update', { value: this.currentValue });
     },
     removeItem: function (index) {
-      this.currentValue.splice(index, 1)
+      this.currentValue.splice(index, 1);
     }
   },
   template: `
@@ -987,7 +869,7 @@ window.configurableList = {
       </ul>
     </div>
   `
-}
+};
 
 window.highlightsUrlGenerator = {
   props: ['values', 'title'],
@@ -995,7 +877,7 @@ window.highlightsUrlGenerator = {
     return {
       currentValues: this.values,
       translatedTitle: commons.translate(this.title)
-    }
+    };
   },
   methods: {
     uuid() {
@@ -1019,10 +901,10 @@ window.highlightsUrlGenerator = {
       return uuid;
     },
     onChange: function () {
-      this.$emit('update', this.currentValues)
+      this.$emit('update', this.currentValues);
     },
     removeItem: function (index) {
-      this.currentValues.splice(index, 1)
+      this.currentValues.splice(index, 1);
     }
   },
   template: `
@@ -1058,94 +940,7 @@ window.highlightsUrlGenerator = {
     </ul>
   </div>
   `
-}
-
-/* sortableList */
-window.sortableList = {
-  props: ['values', 'toggle', 'toggleonicon', 'toggleofficon', 'title'],
-  data: function () {
-    return {
-      currentValues: this.values,
-      currentToggle: this.toggle,
-      translatedTitle: commons.translate(this.title),
-      draggingItem: null,
-    }
-  },
-  watch: {
-    currentValue: function () {
-      this.onChange()
-    }
-  },
-  methods: {
-    onChange: function () {
-      this.$emit('update', { value: this.currentValues, toggle: this.currentToggle })
-    },
-    toggleItem: function (idx) {
-      this.currentToggle = _.xor(this.currentToggle, [this.currentValues[idx]]);
-      this.$forceUpdate()
-      this.onChange()
-    },
-    isToggled: function (idx) {
-      const value = this.currentValues[idx]
-      return this.currentToggle.indexOf(value) !== -1
-    },
-    dragstart: function(item, e) {
-      this.draggingItem = item;
-      this.$refs['list_' + item][0].style.opacity = 0.5;
-      e.dataTransfer.setData('text/plain', 'dummy');
-    },
-    dragenter: function(newIndex, e) {
-      const value = this.currentValues[this.draggingItem]
-      this.currentValues.splice(this.draggingItem, 1);
-      this.currentValues.splice(newIndex, 0, value);
-      this.draggingItem = newIndex;
-
-      for (let i = 0, length = this.currentValues.length; i < length; i++) {
-        this.$refs['list_' + i][0].style.opacity = 1;
-      }
-      this.$refs['list_' + newIndex][0].style.opacity = 0.5;
-
-      this.$forceUpdate()
-      this.onChange()
-    },
-    dragend: function(item, e) {
-      for (let i = 0, length = this.currentValues.length; i < length; i++) {
-        this.$refs['list_' + i][0].style.opacity = 1;
-      }
-    },
-  },
-  template: `
-    <div class="d-flex">
-      <div class="input-group-prepend">
-        <span class="input-group-text">
-          <template v-if="typeof translatedTitle === 'string'">{{ translatedTitle }}</template>
-          <template v-else>
-            {{ translatedTitle.title }}
-            <small class="textInputTooltip text-info" data-toggle="tooltip" data-html="true" :title="translatedTitle.help">[?]</small>
-          </template>
-        </span>
-      </div>
-      <ul class="list-group list-group-flush w-100 border border-input">
-        <li class="list-group-item border-0 d-flex" v-for='(v, index) of currentValues' :ref='"list_" + index'>
-          <div class="text-muted btn"
-            style="cursor: grab;"
-            v-on:dragstart="dragstart(index, $event)"
-            v-on:dragend="dragend(index, $event)"
-            v-on:dragenter="dragenter(index, $event)"
-            draggable="true">
-            <i class="fas fa-ellipsis-v"></i>
-          </div>
-          <div class="w-100" :key="index">
-            <input type="text" class="form-control" v-model="currentValues[index]" readonly="true"/>
-          </div>
-          <button class="btn btn-outline-dark border-0" @click="toggleItem(index)">
-            <i class="fas" :class="{ [toggleonicon]: !isToggled(index), [toggleofficon]: isToggled(index) }"></i>
-          </button>
-        </li>
-      </ul>
-    </div>
-  `
-}
+};
 
 
 

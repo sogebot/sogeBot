@@ -12,98 +12,93 @@
         </span>
 
         <loading v-if="state.loaded !== 2 /* State.DONE */" />
-        <template v-else>
-          {{ settings }}
-        </template>
-
-        <!--template v-if="state.loading === 1">
-          <div class="alert alert-info text-center"><i class="fas fa-circle-notch fa-spin"></i> loading settings from server ...</div>
-        </template>
-        <template v-for="(value, category) of settings" v-if="category !== '_permissions' && state.loading === 0 && !_.isEmpty(value)">
-          <h6>{{ category }}</h6>
-          <div class="card mb-2" >
+        <template v-else v-for="(value, category) of settingsWithoutPermissions">
+          <h6 :key="category" >{{ category }}</h6>
+          <div class="card mb-2" :key="category">
             <div class="card-body">
-              <div v-if="typeof value === 'object' && !defaultValue.startsWith('_')" class="p-0 pl-2 pr-2 " v-for="(currentValue, defaultValue) of value">
-                <template v-if="typeof ui[category] !== 'undefined' && typeof ui[category][defaultValue] !== 'undefined'">
-                  <sortable-list
-                    v-if="ui[category][defaultValue].type === 'sortable-list'"
-                    :values="value[ui[category][defaultValue].values]"
-                    :toggle="value[ui[category][defaultValue].toggle]"
-                    :toggleonicon="ui[category][defaultValue].toggleOnIcon"
-                    :toggleofficon="ui[category][defaultValue].toggleOffIcon"
-                    :title="'systems.' + selectedSystem + '.settings.' + defaultValue"
-                    @update="value[ui[category][defaultValue].toggle] = $event.toggle; value[defaultValue] = $event.value; triggerDataChange()"
-                    class="pt-1 pb-1"></sortable-list>
-                  <highlights-url-generator
-                    v-else-if="ui[category][defaultValue].type === 'highlights-url-generator'"
-                    :values="currentValue"
-                    :title="'systems.' + selectedSystem + '.settings.' + defaultValue"
-                    v-on:update="value[defaultValue] = $event; triggerDataChange()"
-                  />
-                  <component
-                    v-else
-                    :is="ui[category][defaultValue].type"
-                    :readonly="ui[category][defaultValue].readOnly"
-                    :secret="ui[category][defaultValue].secret"
-                    :step="ui[category][defaultValue].step"
-                    :min="ui[category][defaultValue].min"
-                    :max="ui[category][defaultValue].max"
-                    :value="currentValue"
-                    :values="ui[category][defaultValue].values"
-                    @update="value[defaultValue] = $event.value; triggerDataChange()"
-                    :title="'systems.' + selectedSystem + '.settings.' + defaultValue"
-                    :current="value[ui[category][defaultValue].current]"
-                    class="pt-1 pb-1"></component>
-                </template>
-                <template v-else>
-                  <command-input-with-permission
-                    v-if="category === 'commands'"
-                    class="pt-1 pb-1"
-                    v-bind:type="typeof currentValue"
-                    v-bind:value="currentValue"
-                    v-bind:command="defaultValue"
-                    :permissions="settings._permissions[defaultValue]"
-                    :token="token"
-                    v-on:update="value[defaultValue] = $event.value; settings._permissions[defaultValue] = $event.permissions; triggerDataChange()"
-                  ></command-input-with-permission>
-                  <toggle
-                    class="pt-1 pb-1"
-                    v-bind:title="translate('systems.' + selectedSystem + '.settings.' + defaultValue)"
-                    v-else-if="typeof currentValue === 'boolean'"
-                    v-bind:value="currentValue"
-                    v-on:update="value[defaultValue] = !value[defaultValue]; triggerDataChange()"
-                  ></toggle>
-                  <textarea-from-array
-                    class="pt-1 pb-1"
-                    v-else-if="currentValue.constructor === Array"
-                    v-bind:value="currentValue"
-                    v-bind:title="translate('systems.' + selectedSystem + '.settings.' + defaultValue)"
-                    v-on:update="value[defaultValue] = $event; triggerDataChange()"
-                  ></textarea-from-array>
-                  <number-input
-                    v-else-if="typeof currentValue === 'number'"
-                    class="pt-1 pb-1"
-                    v-bind:type="typeof currentValue"
-                    v-bind:value="currentValue"
-                    min="0"
-                    v-bind:title="'systems.' + selectedSystem + '.settings.' + defaultValue"
-                    :permission="settings._permissions[defaultValue]"
-                    v-on:update="value[defaultValue] = $event.value; triggerDataChange()">
-                  </number-input>
-                  <text-input
-                    v-else
-                    class="pt-1 pb-1"
-                    v-bind:type="typeof currentValue"
-                    v-bind:value="currentValue"
-                    v-bind:title="'systems.' + selectedSystem + '.settings.' + defaultValue"
-                    :permission="settings._permissions[defaultValue]"
-                    v-on:update="value[defaultValue] = $event.value; triggerDataChange()"
-                  ></text-input>
-                </template>
-              </div>
+              <template v-for="(currentValue, defaultValue) of value">
+                <div v-if="typeof value === 'object' && !defaultValue.startsWith('_')" class="p-0 pl-2 pr-2 " :key="currentValue">
+                  <template v-if="typeof ui[category] !== 'undefined' && typeof ui[category][defaultValue] !== 'undefined'">
+                    <sortable-list
+                      v-if="ui[category][defaultValue].type === 'sortable-list'"
+                      :values="value[ui[category][defaultValue].values]"
+                      :toggle="value[ui[category][defaultValue].toggle]"
+                      :toggleonicon="ui[category][defaultValue].toggleOnIcon"
+                      :toggleofficon="ui[category][defaultValue].toggleOffIcon"
+                      :title="'systems.' + $route.params.id + '.settings.' + defaultValue"
+                      @update="value[ui[category][defaultValue].toggle] = $event.toggle; value[defaultValue] = $event.value; triggerDataChange()"
+                      class="pt-1 pb-1"></sortable-list>
+                    <!--highlights-url-generator
+                      v-else-if="ui[category][defaultValue].type === 'highlights-url-generator'"
+                      :values="currentValue"
+                      :title="'systems.' + $route.params.id + '.settings.' + defaultValue"
+                      v-on:update="value[defaultValue] = $event; triggerDataChange()"
+                    />
+                    <component
+                      v-else
+                      :is="ui[category][defaultValue].type"
+                      :readonly="ui[category][defaultValue].readOnly"
+                      :secret="ui[category][defaultValue].secret"
+                      :step="ui[category][defaultValue].step"
+                      :min="ui[category][defaultValue].min"
+                      :max="ui[category][defaultValue].max"
+                      :value="currentValue"
+                      :values="ui[category][defaultValue].values"
+                      @update="value[defaultValue] = $event.value; triggerDataChange()"
+                      :title="'systems.' + $route.params.id + '.settings.' + defaultValue"
+                      :current="value[ui[category][defaultValue].current]"
+                      class="pt-1 pb-1"></component-->
+                  </template>
+                  <template v-else>
+                    <command-input-with-permission
+                      v-if="category === 'commands'"
+                      class="pt-1 pb-1"
+                      v-bind:type="typeof currentValue"
+                      v-bind:value="currentValue"
+                      v-bind:command="defaultValue"
+                      :permissions="settings._permissions[defaultValue]"
+                      :token="token"
+                      v-on:update="value[defaultValue] = $event.value; settings._permissions[defaultValue] = $event.permissions; triggerDataChange()"
+                    ></command-input-with-permission>
+                    <toggle
+                      class="pt-1 pb-1"
+                      v-bind:title="translate('systems.' + $route.params.id + '.settings.' + defaultValue)"
+                      v-else-if="typeof currentValue === 'boolean'"
+                      v-bind:value="currentValue"
+                      v-on:update="value[defaultValue] = !value[defaultValue]; triggerDataChange()"
+                    ></toggle>
+                    <!--textarea-from-array
+                      class="pt-1 pb-1"
+                      v-else-if="currentValue.constructor === Array"
+                      v-bind:value="currentValue"
+                      v-bind:title="translate('systems.' + $route.params.id + '.settings.' + defaultValue)"
+                      v-on:update="value[defaultValue] = $event; triggerDataChange()"
+                    ></textarea-from-array>
+                    <number-input
+                      v-else-if="typeof currentValue === 'number'"
+                      class="pt-1 pb-1"
+                      v-bind:type="typeof currentValue"
+                      v-bind:value="currentValue"
+                      min="0"
+                      v-bind:title="'systems.' + $route.params.id + '.settings.' + defaultValue"
+                      :permission="settings._permissions[defaultValue]"
+                      v-on:update="value[defaultValue] = $event.value; triggerDataChange()">
+                    </number-input>
+                    <text-input
+                      v-else
+                      class="pt-1 pb-1"
+                      v-bind:type="typeof currentValue"
+                      v-bind:value="currentValue"
+                      v-bind:title="'systems.' + $route.params.id + '.settings.' + defaultValue"
+                      :permission="settings._permissions[defaultValue]"
+                      v-on:update="value[defaultValue] = $event.value; triggerDataChange()"
+                    ></text-input-->
+                  </template>
+                </div>
+              </template>
             </div>
           </div>
-        </template-->
+        </template>
       </div>
 
       <div class="col-lg-3 col-md-4 col-sm-6">
@@ -169,12 +164,13 @@ enum State {
 
 @Component({
   components: {
+    'command-input-with-permission': () => import('./components/interface/command-input-with-permission.vue'),
     'loading': () => import('../../components/loading.vue'),
+    'sortable-list': () => import('./components/interface/sortable-list.vue'),
+    'toggle': () => import('./components/interface/toggle-enable.vue'),
     /*
-    'toggle': toggleEnable,
     'text-input': textInput,
     'number-input': numberInput,
-    'command-input-with-permission': commandInputWithPermissions,
     'textarea-from-array': textAreaFromArray,
     'configurable-list': configurableList,
     'sortable-list': sortableList,
@@ -192,6 +188,14 @@ export default class interfaceSettings extends Vue {
   isDataChanged: boolean = false;
   error: string | null = null;
   showError: boolean = false;
+
+  get settingsWithoutPermissions() {
+    let withoutPermissions = {};
+    Object.keys(this.settings).filter(o => o !== '_permissions').forEach((key) => {
+      withoutPermissions[key] = this.settings[key]
+    })
+    return withoutPermissions
+  }
 
   mounted() { this.refresh(this.$route.params.type); }
 
