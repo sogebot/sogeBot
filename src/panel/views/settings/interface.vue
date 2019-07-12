@@ -47,7 +47,7 @@
                       @update="value[defaultValue] = $event.value; triggerDataChange()"
                       :title="$route.params.type + '.' + $route.params.id + '.settings.' + defaultValue"
                       :current="value[ui[category][defaultValue].current]"
-                      class="pt-1 pb-1"></component-->
+                      class="pt-1 pb-1"></component>
                   </template>
                   <template v-else>
                     <command-input-with-permission
@@ -67,7 +67,7 @@
                       v-bind:value="currentValue"
                       v-on:update="value[defaultValue] = !value[defaultValue]; triggerDataChange()"
                     ></toggle>
-                    <!--textarea-from-array
+                    <textarea-from-array
                       class="pt-1 pb-1"
                       v-else-if="currentValue.constructor === Array"
                       v-bind:value="currentValue"
@@ -92,7 +92,7 @@
                       v-bind:title="$route.params.type + '.' + $route.params.id + '.settings.' + defaultValue"
                       :permission="settings._permissions[defaultValue]"
                       v-on:update="value[defaultValue] = $event.value; triggerDataChange()"
-                    ></text-input-->
+                    ></text-input>
                   </template>
                 </div>
               </template>
@@ -168,12 +168,12 @@ enum State {
     'configurable-list': () => import('./components/interface/configurable-list.vue'),
     'highlights-url-generator': () => import('./components/interface/highlights-url-generator.vue'),
     'loading': () => import('../../components/loading.vue'),
+    'number-input': () => import('./components/interface/number-input.vue'),
     'sortable-list': () => import('./components/interface/sortable-list.vue'),
+    'text-input': () => import('./components/interface/text-input.vue'),
+    'textarea-from-array': () => import('./components/interface/textarea-from-array.vue'),
     'toggle': () => import('./components/interface/toggle-enable.vue'),
     /*
-    'text-input': textInput,
-    'number-input': numberInput,
-    'textarea-from-array': textAreaFromArray,
     'sortable-list': sortableList,
   */ }
 })

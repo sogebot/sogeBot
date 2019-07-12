@@ -1,4 +1,4 @@
-/* globals translations, commons, Vue, _ $, io  */
+/* globals translations, commons, Vue, _, io  */
 
 const flattenKeys = (obj, path = []) =>
   !_.isObject(obj)
@@ -28,86 +28,6 @@ window.textWithTags = {
   template: `
     <div style="flex: 1 1 auto;" v-html="$options.filters.filterize(value)"></div>
     `
-};
-
-/* number input for settings  */
-window.numberInput = {
-  props: ['value', 'title', 'readonly', 'min', 'max', 'step'],
-  methods: {
-    update: function () {
-      let step = String(this.step || 0);
-
-      if (step.includes('.')) {
-        step = step.split('.')[1].length;
-      }
-
-      this.currentValue = Number(Number(this.currentValue).toFixed(step));
-      if (typeof this.min !== 'undefined' && this.min > this.currentValue) {this.currentValue = this.min;}
-      if (typeof this.max !== 'undefined' && this.max < this.currentValue) {this.currentValue = this.max;}
-
-      this.$emit('update', { value: Number(this.currentValue) });
-    }
-  },
-  data: function () {
-    return {
-      show: false,
-      currentValue: this.value,
-      translatedTitle: commons.translate(this.title)
-    };
-  },
-  mounted: function () {
-    $('.textInputTooltip').tooltip();
-  },
-  template: `
-    <div class="input-group">
-      <div class="input-group-prepend">
-        <span class="input-group-text">
-          <template v-if="typeof translatedTitle === 'string'">{{ translatedTitle }}</template>
-          <template v-else>
-            {{ translatedTitle.title }}
-            <small class="textInputTooltip text-info pl-1" data-toggle="tooltip" data-html="true" :title="translatedTitle.help">[?]</small>
-          </template>
-        </span>
-      </div>
-      <input :min="min" :max="max" v-on:keyup="update" @focus="show = true" @blur="show = false" v-model="currentValue" :step="step || 1" type="number" class="form-control" :readonly="readonly" />
-    </div>`
-};
-
-/* text input for settings  */
-window.textInput = {
-  props: ['value', 'title', 'type', 'readonly', 'secret'],
-  methods: {
-    update: function () {
-      if (this.type === 'number') {
-        if (_.isFinite(Number(this.currentValue))) {this.currentValue = Number(this.currentValue);}
-        else {this.currentValue = this.value;};
-      }
-      this.$emit('update', { value: this.currentValue });
-    }
-  },
-  data: function () {
-    return {
-      show: false,
-      currentValue: this.value,
-      translatedTitle: commons.translate(this.title)
-    };
-  },
-  mounted: function () {
-    $('.textInputTooltip').tooltip();
-  },
-  template: `
-    <div class="input-group">
-      <div class="input-group-prepend">
-        <span class="input-group-text">
-          <template v-if="typeof translatedTitle === 'string'">{{ translatedTitle }}</template>
-          <template v-else-if="typeof translatedTitle === 'object'">
-            {{ translatedTitle.title }}
-            <small style="cursor: help;" class="textInputTooltip text-info ml-1" data-toggle="tooltip" data-html="true" :title="translatedTitle.help">[?]</small>
-          </template>
-        </span>
-      </div>
-      <input v-on:keyup="update" @focus="show = true" @blur="show = false" v-model="currentValue" class="form-control" :type="secret && !show ? 'password' : 'text'" :readonly="readonly" />
-    </div>`
 };
 
 /* command input for settings  */
