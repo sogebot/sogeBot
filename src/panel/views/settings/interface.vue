@@ -25,13 +25,13 @@
                       :toggle="value[ui[category][defaultValue].toggle]"
                       :toggleonicon="ui[category][defaultValue].toggleOnIcon"
                       :toggleofficon="ui[category][defaultValue].toggleOffIcon"
-                      :title="'systems.' + $route.params.id + '.settings.' + defaultValue"
+                      :title="$route.params.type + '.' + $route.params.id + '.settings.' + defaultValue"
                       @update="value[ui[category][defaultValue].toggle] = $event.toggle; value[defaultValue] = $event.value; triggerDataChange()"
                       class="pt-1 pb-1"></sortable-list>
-                    <!--highlights-url-generator
+                    <highlights-url-generator
                       v-else-if="ui[category][defaultValue].type === 'highlights-url-generator'"
                       :values="currentValue"
-                      :title="'systems.' + $route.params.id + '.settings.' + defaultValue"
+                      :title="$route.params.type + '.' + $route.params.id + '.settings.' + defaultValue"
                       v-on:update="value[defaultValue] = $event; triggerDataChange()"
                     />
                     <component
@@ -45,7 +45,7 @@
                       :value="currentValue"
                       :values="ui[category][defaultValue].values"
                       @update="value[defaultValue] = $event.value; triggerDataChange()"
-                      :title="'systems.' + $route.params.id + '.settings.' + defaultValue"
+                      :title="$route.params.type + '.' + $route.params.id + '.settings.' + defaultValue"
                       :current="value[ui[category][defaultValue].current]"
                       class="pt-1 pb-1"></component-->
                   </template>
@@ -62,7 +62,7 @@
                     ></command-input-with-permission>
                     <toggle
                       class="pt-1 pb-1"
-                      v-bind:title="translate('systems.' + $route.params.id + '.settings.' + defaultValue)"
+                      v-bind:title="translate($route.params.type + '.' + $route.params.id + '.settings.' + defaultValue)"
                       v-else-if="typeof currentValue === 'boolean'"
                       v-bind:value="currentValue"
                       v-on:update="value[defaultValue] = !value[defaultValue]; triggerDataChange()"
@@ -71,7 +71,7 @@
                       class="pt-1 pb-1"
                       v-else-if="currentValue.constructor === Array"
                       v-bind:value="currentValue"
-                      v-bind:title="translate('systems.' + $route.params.id + '.settings.' + defaultValue)"
+                      v-bind:title="translate($route.params.type + '.' + $route.params.id + '.settings.' + defaultValue)"
                       v-on:update="value[defaultValue] = $event; triggerDataChange()"
                     ></textarea-from-array>
                     <number-input
@@ -80,7 +80,7 @@
                       v-bind:type="typeof currentValue"
                       v-bind:value="currentValue"
                       min="0"
-                      v-bind:title="'systems.' + $route.params.id + '.settings.' + defaultValue"
+                      v-bind:title="$route.params.type + '.' + $route.params.id + '.settings.' + defaultValue"
                       :permission="settings._permissions[defaultValue]"
                       v-on:update="value[defaultValue] = $event.value; triggerDataChange()">
                     </number-input>
@@ -89,7 +89,7 @@
                       class="pt-1 pb-1"
                       v-bind:type="typeof currentValue"
                       v-bind:value="currentValue"
-                      v-bind:title="'systems.' + $route.params.id + '.settings.' + defaultValue"
+                      v-bind:title="$route.params.type + '.' + $route.params.id + '.settings.' + defaultValue"
                       :permission="settings._permissions[defaultValue]"
                       v-on:update="value[defaultValue] = $event.value; triggerDataChange()"
                     ></text-input-->
@@ -165,6 +165,8 @@ enum State {
 @Component({
   components: {
     'command-input-with-permission': () => import('./components/interface/command-input-with-permission.vue'),
+    'configurable-list': () => import('./components/interface/configurable-list.vue'),
+    'highlights-url-generator': () => import('./components/interface/highlights-url-generator.vue'),
     'loading': () => import('../../components/loading.vue'),
     'sortable-list': () => import('./components/interface/sortable-list.vue'),
     'toggle': () => import('./components/interface/toggle-enable.vue'),
@@ -172,9 +174,7 @@ enum State {
     'text-input': textInput,
     'number-input': numberInput,
     'textarea-from-array': textAreaFromArray,
-    'configurable-list': configurableList,
     'sortable-list': sortableList,
-    'highlights-url-generator': highlightsUrlGenerator
   */ }
 })
 export default class interfaceSettings extends Vue {
