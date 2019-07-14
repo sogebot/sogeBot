@@ -13,11 +13,11 @@
 
         <loading v-if="state.loaded !== 2 /* State.DONE */" />
         <template v-else v-for="(value, category) of settingsWithoutPermissions">
-          <h6 :key="category" >{{ category }}</h6>
-          <div class="card mb-2" :key="category">
+          <h6 :key="category + '#1'" >{{ category }}</h6>
+          <div class="card mb-2" :key="category + '#2'">
             <div class="card-body">
               <template v-for="(currentValue, defaultValue) of value">
-                <div v-if="typeof value === 'object' && !defaultValue.startsWith('_')" class="p-0 pl-2 pr-2 " :key="currentValue">
+                <div v-if="typeof value === 'object' && !defaultValue.startsWith('_')" class="p-0 pl-2 pr-2 " :key="$route.params.type + '.' + $route.params.id + '.settings.' + defaultValue">
                   <template v-if="typeof ui[category] !== 'undefined' && typeof ui[category][defaultValue] !== 'undefined'">
                     <sortable-list
                       v-if="ui[category][defaultValue].type === 'sortable-list'"
@@ -60,13 +60,13 @@
                       :token="token"
                       v-on:update="value[defaultValue] = $event.value; settings._permissions[defaultValue] = $event.permissions; triggerDataChange()"
                     ></command-input-with-permission>
-                    <toggle
+                    <toggle-enable
                       class="pt-1 pb-1"
                       v-bind:title="translate($route.params.type + '.' + $route.params.id + '.settings.' + defaultValue)"
                       v-else-if="typeof currentValue === 'boolean'"
                       v-bind:value="currentValue"
                       v-on:update="value[defaultValue] = !value[defaultValue]; triggerDataChange()"
-                    ></toggle>
+                    ></toggle-enable>
                     <textarea-from-array
                       class="pt-1 pb-1"
                       v-else-if="currentValue.constructor === Array"
@@ -166,16 +166,16 @@ enum State {
   components: {
     'command-input-with-permission': () => import('./components/interface/command-input-with-permission.vue'),
     'configurable-list': () => import('./components/interface/configurable-list.vue'),
+    'heist-levels': () => import('./components/interface/heist-levels.vue'),
+    'heist-results': () => import('./components/interface/heist-results.vue'),
     'highlights-url-generator': () => import('./components/interface/highlights-url-generator.vue'),
     'loading': () => import('../../components/loading.vue'),
     'number-input': () => import('./components/interface/number-input.vue'),
     'sortable-list': () => import('./components/interface/sortable-list.vue'),
     'text-input': () => import('./components/interface/text-input.vue'),
     'textarea-from-array': () => import('./components/interface/textarea-from-array.vue'),
-    'toggle': () => import('./components/interface/toggle-enable.vue'),
-    /*
-    'sortable-list': sortableList,
-  */ }
+    'toggle-enable': () => import('./components/interface/toggle-enable.vue'),
+    }
 })
 export default class interfaceSettings extends Vue {
   @Prop() readonly commons: any;
@@ -197,10 +197,10 @@ export default class interfaceSettings extends Vue {
     return withoutPermissions
   }
 
-  mounted() { this.refresh(this.$route.params.type); }
+  mounted() { this.refresh(); }
 
   @Watch('$route.params.type')
-  refresh(v) {
+  refresh() {
     this.socket.emit(this.$route.params.type, (err, systems: systemFromIO[] ) => {
       if (!systems.map(o => o.name).includes(this.$route.params.id)) {
         this.$router.push({ name: 'InterfaceSettings', params: { type: this.$route.params.type, id: systems[0].name } });
@@ -233,7 +233,7 @@ export default class interfaceSettings extends Vue {
   @Watch('$route.params.id')
   loadSettings(system) {
     if (!this.$route.params.id) {
-      return this.refresh(this.$route.params.type)
+      return this.refresh()
     };
 
     this.state.loaded = State.PROGRESS;
@@ -249,8 +249,11 @@ export default class interfaceSettings extends Vue {
       let ui: any = { settings: {} }
 
       // sorting
-      // enabled is first
-      settings.settings.enabled = _(_settings.filter(o => o[0] === 'enabled')).flatten().value()[1]
+      // enabled is first - remove on core/overlay
+      if (!['core', 'overlays'].includes(this.$route.params.type)) {
+        settings.settings.enabled = _(_settings.filter(o => o[0] === 'enabled')).flatten().value()[1]
+      }
+
       // everything else except commands and enabled and are string|number|bool
       for (let [name, value] of _(_settings.filter(o => o[0] !== '_' && o[0] !== 'enabled' && o[0] !== 'commands' && typeof o[1] !== 'object')).value()) {
         settings.settings[name] = value
@@ -280,14 +283,48 @@ export default class interfaceSettings extends Vue {
       }
       this.isDataChanged = false;
 
+      // remove empty categories
+      Object.keys(settings).forEach(key => {
+        if (_.size(settings[key]) === 0) {
+          delete settings[key]
+        }
+      })
+      Object.keys(ui).forEach(key => {
+        if (_.size(ui[key]) === 0) {
+          delete ui[key]
+        }
+      })
+
+      console.debug({ui, settings});
       this.settings = Object.assign({}, settings)
       this.ui = Object.assign({}, ui)
     })
   }
 
   saveSettings() {
-    console.log('saving')
-  }
+    this.state.settings = 1
+    let settings = _.cloneDeep(this.settings)
+    for (let [name,value] of Object.entries(settings.settings)) {
+      delete settings.settings[name]
+      settings[name] = value
+    }
+    delete settings.settings
+
+    io(`/${this.$route.params.type}/${this.$route.params.id}`, { query: "token=" + this.token })
+      .emit('settings.update', settings, (err) => {
+        setTimeout(() => this.state.settings = 0, 1000)
+        if (err) {
+          this.state.settings = 3
+          console.error(err)
+        } else {
+          this.state.settings = 2
+          this.isDataChanged = false
+        }
+        setTimeout(() => {
+          this.refresh();
+        })
+      })
+    }
 
   triggerError (error) {
     this.error = error;
