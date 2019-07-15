@@ -34,6 +34,10 @@
                       :title="$route.params.type + '.' + $route.params.id + '.settings.' + defaultValue"
                       v-on:update="value[defaultValue] = $event; triggerDataChange()"
                     />
+                    <a v-else-if="ui[category][defaultValue].type === 'link'" :href="ui[category][defaultValue].href" class="mt-1 mb-1" :class="ui[category][defaultValue].class" :target="ui[category][defaultValue].target">
+                      <template v-if="ui[category][defaultValue].rawText">{{ ui[category][defaultValue].rawText }}</template>
+                      <template v-else>{{ commons.translate(ui[category][defaultValue].text) }}</template>
+                    </a>
                     <component
                       v-else
                       :is="ui[category][defaultValue].type"

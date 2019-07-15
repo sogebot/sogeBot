@@ -19,12 +19,6 @@
           <div class="card mb-2" >
             <div class="card-body">
               <div v-if="typeof value === 'object' && (typeof value[defaultValue] === 'undefined' || value[defaultValue] === null)" class="p-0 pl-2 pr-2 " v-for="(currentValue, defaultValue) of ui[category]">
-                <template v-if="ui[category][defaultValue].type === 'link'">
-                  <a :href="currentValue.href" class="mt-1 mb-1" :class="currentValue.class" :target="currentValue.target">
-                    <template v-if="currentValue.rawText">{{ currentValue.rawText }}</template>
-                    <template v-else>{{ commons.translate(currentValue.text) }}</template>
-                  </a>
-                </template>
                 <template v-if="ui[category][defaultValue].type === 'test'">
                   <button @click="emoteTest(currentValue.test)" class="mt-1 mb-1" :class="currentValue.class" :target="currentValue.target">
                     <template v-if="currentValue.rawText">{{ currentValue.rawText }}</template>
