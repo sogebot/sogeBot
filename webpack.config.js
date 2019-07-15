@@ -24,18 +24,19 @@ module.exports = [{
     rules: [
       {
         test: /\.ts$/,
+        exclude: /(node_modules|bower_components)/,
         use: [{
-          loader: 'cache-loader'
-        }, {
           loader: 'ts-loader',
           options: {
+            experimentalFileCaching: true,
             appendTsSuffixTo: [/\.vue$/],
           }
         }]
       },
       {
         test: /\.vue$/,
-        use: ['cache-loader', 'vue-loader'],
+        exclude: /(node_modules|bower_components)/,
+        use: ['vue-loader'],
       },
       {
         test: /\.css$/,
@@ -49,6 +50,7 @@ module.exports = [{
                 loader: 'css-loader',
                 options: {
                   modules: true,
+                  cacheDirectory: true,
                   localIdentName: '[local]_[hash:base64:8]'
                 }
               }
@@ -88,18 +90,19 @@ module.exports = [{
     rules: [
       {
         test: /\.ts$/,
+        exclude: /(node_modules|bower_components)/,
         use: [{
-          loader: 'cache-loader'
-        }, {
           loader: 'ts-loader',
           options: {
             appendTsSuffixTo: [/\.vue$/],
+            experimentalFileCaching: true
           }
         }]
       },
       {
         test: /\.vue$/,
-        use: ['cache-loader', 'vue-loader'],
+        exclude: /(node_modules|bower_components)/,
+        use: ['vue-loader'],
       },
       {
         test: /\.css$/,
@@ -113,7 +116,8 @@ module.exports = [{
                 loader: 'css-loader',
                 options: {
                   modules: true,
-                  localIdentName: '[local]_[hash:base64:8]'
+                  localIdentName: '[local]_[hash:base64:8]',
+                  cacheDirectory: true
                 }
               }
             ]
