@@ -88,10 +88,22 @@ class Emotes extends Overlay {
 
   sockets () {
     global.panel.io.of('/overlays/emotes').on('connection', (socket) => {
-      socket.on('removeCache', () => this.removeCache());
-      socket.on('testExplosion', () => this._testExplosion());
-      socket.on('testFireworks', () => this._testFireworks());
-      socket.on('test', () => this._test());
+      socket.on('removeCache', (cb) => {
+        this.removeCache();
+        cb(null, null);
+      });
+      socket.on('testExplosion', (cb) => {
+        this._testExplosion();
+        cb(null, null);
+      });
+      socket.on('testFireworks', (cb) => {
+        this._testFireworks();
+        cb(null, null);
+      });
+      socket.on('test', (cb) => {
+        this._test();
+        cb(null, null);
+      });
     });
   }
 

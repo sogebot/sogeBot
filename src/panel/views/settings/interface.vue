@@ -36,7 +36,7 @@
                     />
                     <a v-else-if="ui[category][defaultValue].type === 'link'" :href="ui[category][defaultValue].href" class="mt-1 mb-1" :class="ui[category][defaultValue].class" :target="ui[category][defaultValue].target">
                       <template v-if="ui[category][defaultValue].rawText">{{ ui[category][defaultValue].rawText }}</template>
-                      <template v-else>{{ commons.translate(ui[category][defaultValue].text) }}</template>
+                      <template v-else>{{ translate(ui[category][defaultValue].text) }}</template>
                     </a>
                     <component
                       v-else
@@ -174,6 +174,7 @@ enum State {
     'configurable-list': () => import('./components/interface/configurable-list.vue'),
     'credits-custom-texts': () => import('./components/interface/credits-custom-texts.vue'),
     'credits-social': () => import('./components/interface/credits-social.vue'),
+    'global-ignorelist-exclude': () => import('./components/interface/global-ignorelist-exclude.vue'),
     'heist-levels': () => import('./components/interface/heist-levels.vue'),
     'heist-results': () => import('./components/interface/heist-results.vue'),
     'highlights-url-generator': () => import('./components/interface/highlights-url-generator.vue'),

@@ -1,5 +1,7 @@
 <template>
-  <button class="btn" @click="emitToBackend">
+<button ref="button" @click="emitToBackend" :disabled="state !== 0" :class="this.state === 2 ? 'btn-danger' : ''">
+    <fa v-if="state === 1" icon="circle-notch" spin/>
+    <fa v-if="state === 2" icon="exclamation"/>
     {{translate(this.title)}}
   </button>
 </template>
@@ -12,9 +14,30 @@ export default class btnEmit extends Vue {
   @Prop() readonly emit: any;
   @Prop() readonly title: any;
 
+  state: number = 0
+
   emitToBackend() {
+    this.state = 1;
     io(`/${this.$route.params.type}/${this.$route.params.id}`, { query: "token=" + this.token })
-      .emit(this.emit)
+      .emit(this.emit, (err, data) => {
+        if (err) {
+          this.state = 2;
+          this.$emit('error', err);
+          setTimeout(() => {
+            this.state = 0;
+          }, 2000);
+        } else {
+          if (data) {
+            // to do eval data
+            if (data.do === 'redirect') {
+              window.location = data.opts[0];
+            } else if (data.do === 'refresh') {
+              window.location.reload();
+            }
+          }
+          this.state = 0;
+        }
+      });
   }
 };
 </script>
