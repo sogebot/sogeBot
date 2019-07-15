@@ -69,6 +69,10 @@ export function settings(category?: string, isReadOnly: boolean = false) {
       }
       try {
         const self = type === 'core' ? global[name] : global[type][name];
+        if (category === key) {
+          throw Error(`Category and variable name cannot be same - ${type}.${name}.${key} in category ${category}`);
+        }
+
         VariableWatcher.add(`${type}.${name}.${key}`, self[key], isReadOnly);
 
         if (!isReadOnly) {

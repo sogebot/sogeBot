@@ -3,7 +3,7 @@ import { isMainThread } from 'worker_threads';
 
 import Expects from '../expects.js';
 import Game from './_interface';
-import { command, shared, settings } from '../decorators';
+import { command, shared, settings, ui } from '../decorators';
 import { sendMessage, getOwner, getLocalizedName } from '../commons.js';
 
 class Heist extends Game {
@@ -47,7 +47,8 @@ class Heist extends Game {
   @settings('results')
   noUser: string = global.translate('games.heist.noUser');
   @settings('results')
-  results: { percentage: number; message: string} [] = [
+  @ui({ type: 'heist-results' }, 'results')
+  resultsValues: { percentage: number; message: string} [] = [
     { percentage: 0, message: global.translate('games.heist.result.0') },
     { percentage: 33, message: global.translate('games.heist.result.33') },
     { percentage: 50, message: global.translate('games.heist.result.50') },
@@ -56,7 +57,8 @@ class Heist extends Game {
   ];
 
   @settings('levels')
-  levels: { name: string; winPercentage: number; payoutMultiplier: number; maxUsers: number }[] = [
+  @ui({ type: 'heist-levels' }, 'levels')
+  levelsValues: { name: string; winPercentage: number; payoutMultiplier: number; maxUsers: number }[] = [
     {
       'name': global.translate('games.heist.levels.bankVan'),
       'winPercentage': 60,
@@ -105,7 +107,7 @@ class Heist extends Game {
       this.copsCooldownInMinutes,
       this.started
     ]);
-    let levels = _.orderBy(this.levels, 'maxUsers', 'asc');
+    let levels = _.orderBy(this.levelsValues, 'maxUsers', 'asc');
 
     // check if heist is finished
     if (!_.isNil(startedAt) && _.now() - startedAt > (entryCooldown * 1000) + 10000) {
@@ -174,7 +176,7 @@ class Heist extends Game {
           }
         }
         let percentage = (100 / users.length) * winners.length;
-        let ordered = _.orderBy(this.results, [(o) => o.percentage], 'asc');
+        let ordered = _.orderBy(this.resultsValues, [(o) => o.percentage], 'asc');
         let result = _.find(ordered, (o) => o.percentage >= percentage);
         global.setTimeout(async () => { sendMessage(_.isNil(result) ? '' : result.message, {
           username: userObj.username,
@@ -236,7 +238,7 @@ class Heist extends Game {
       this.lastHeistTimestamp,
       this.copsCooldownInMinutes
     ]);
-    let levels = _.orderBy(this.levels, 'maxUsers', 'asc');
+    let levels = _.orderBy(this.levelsValues, 'maxUsers', 'asc');
 
     // is cops patrolling?
     if (_.now() - lastHeistTimestamp < copsCooldown * 60000) {

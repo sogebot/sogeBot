@@ -70,7 +70,7 @@ class Spotify extends Integration {
   @ui({ type: 'text-input', readOnly: true })
   username: string = '';
   @settings('connection')
-  @ui({ type: 'check-list', current: 'authenticatedScopes' })
+  @ui({ type: 'checklist', current: 'authenticatedScopes' })
   scopes: string[] = [
     'user-read-currently-playing',
     'user-read-private',
@@ -86,22 +86,18 @@ class Spotify extends Integration {
   authenticatedScopes: string[] = [];
 
   @ui({
-    type: 'button-socket',
-    on: '/integrations/spotify',
-    class: 'btn btn-primary btn-block',
-    text: 'integrations.spotify.settings.authorize',
+    type: 'btn-emit',
+    class: 'btn btn-primary btn-block mt-1 mb-1',
     if: () => global.integrations.spotify.username.length === 0,
     emit: 'authorize'
   }, 'connection')
   authorizeBtn: null = null;
 
   @ui({
-    type: 'button-socket',
-    on: '/integrations/spotify',
+    type: 'btn-emit',
+    class: 'btn btn-primary btn-block mt-1 mb-1',
     if: () => global.integrations.spotify.username.length > 0,
     emit: 'revoke',
-    class: 'btn btn-primary btn-block',
-    text: 'integrations.spotify.settings.revoke'
   }, 'connection')
   revokeBtn: null = null;
 

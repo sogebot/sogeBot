@@ -99,7 +99,6 @@ class Moderation extends System {
 
   constructor () {
     super();
-    this.addMenu({ category: 'settings', name: 'systems', id: 'systems' });
   }
 
   sockets () {

@@ -52,8 +52,6 @@ class TMI extends Core {
   constructor () {
     super()
 
-    this.addMenu({ category: 'settings', name: 'core', id: 'core' })
-
     if (isMainThread) {
       global.status.TMI = constants.DISCONNECTED
     }

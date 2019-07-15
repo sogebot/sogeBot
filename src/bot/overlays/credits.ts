@@ -1,4 +1,4 @@
-import * as _ from 'lodash';
+import _ from 'lodash';
 
 import Overlay from './_interface';
 import { settings, ui } from '../decorators';
@@ -60,11 +60,11 @@ class Credits extends Overlay {
   cTextTip: string = 'Tips by';
 
   @settings('customTexts')
-  @ui({ type: 'custom-texts' })
+  @ui({ type: 'credits-custom-texts' })
   cCustomTextsValues: string[] = [];
 
   @settings('social')
-  @ui({ type: 'social' })
+  @ui({ type: 'credits-social' })
   cSocialValues: string[] = [];
 
   @settings('clips')

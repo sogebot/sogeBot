@@ -15,7 +15,11 @@ class WheelOfFortune extends Game {
   btnLink: null = null;
 
   @settings('options')
-  data: string = JSON.stringify([]);
+  @ui({ type: 'wof-responses' }, 'options')
+  data: {
+    title: string;
+    responses: string[];
+  }[] = [];
 
   sockets () {
     if (this.socket === null) {
@@ -24,11 +28,10 @@ class WheelOfFortune extends Game {
 
     this.socket.on('connection', (socket) => {
       socket.on('win', async (index, username) => {
-        let options = JSON.parse(this.data);
         // compensate for slight delay
         setTimeout(async () => {
           const userObj = await global.users.getByName(username);
-          for (let response of options[index].responses) {
+          for (let response of this.data[index].responses) {
             if (response.trim().length > 0) {sendMessage(response, {
               username: userObj.username,
               displayName: userObj.displayName || userObj.username,
@@ -46,8 +49,7 @@ class WheelOfFortune extends Game {
   @command('!wof')
   async main (opts) {
     if (isMainThread) {
-      const options = JSON.parse(this.data);
-      global.panel.io.of('/games/wheeloffortune').emit('spin', { options, username: opts.sender.username });
+      global.panel.io.of('/games/wheeloffortune').emit('spin', { options: this.data, username: opts.sender.username });
     } else {
       global.workers.sendToMaster({ type: 'call', ns: 'games.wheelOfFortune', fnc: 'main', args: [opts] });
     }

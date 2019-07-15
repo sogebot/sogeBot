@@ -1,13 +1,6 @@
 {
   "settings": {
     "enabled": "Status",
-    "cDisplayTheme": "Theme",
-    "cDisplayHideAfterInactivity": "Hide on inactivity",
-    "cDisplayAlign": "Align",
-    "cDisplayInactivityTime": {
-      "title": "Inactivity after",
-      "help": "in miliseconds"
-    },
     "everyXMessages": {
       "title": "Remind every X messages",
       "help": "0 = disabled; both remind conditions must be true to bot print remind"

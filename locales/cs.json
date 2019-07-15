@@ -43,6 +43,7 @@
     }
   },
   "webpanel": {
+    "loading": "Načítám",
     "display-as": "Zobrazit jako",
     "set-default": "Výchozí nastavení",
     "add": "Přidat",
