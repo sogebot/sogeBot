@@ -46,6 +46,8 @@
                       :step="ui[category][defaultValue].step"
                       :min="ui[category][defaultValue].min"
                       :max="ui[category][defaultValue].max"
+                      :class="ui[category][defaultValue].class"
+                      :emit="ui[category][defaultValue].emit"
                       :value="currentValue"
                       :values="ui[category][defaultValue].values"
                       @update="value[defaultValue] = $event.value; triggerDataChange()"
@@ -85,7 +87,6 @@
                       v-bind:value="currentValue"
                       min="0"
                       v-bind:title="$route.params.type + '.' + $route.params.id + '.settings.' + defaultValue"
-                      :permission="settings._permissions[defaultValue]"
                       v-on:update="value[defaultValue] = $event.value; triggerDataChange()">
                     </number-input>
                     <text-input
@@ -94,7 +95,6 @@
                       v-bind:type="typeof currentValue"
                       v-bind:value="currentValue"
                       v-bind:title="$route.params.type + '.' + $route.params.id + '.settings.' + defaultValue"
-                      :permission="settings._permissions[defaultValue]"
                       v-on:update="value[defaultValue] = $event.value; triggerDataChange()"
                     ></text-input>
                   </template>
@@ -168,13 +168,18 @@ enum State {
 
 @Component({
   components: {
+    'btn-emit': () => import('./components/interface/btn-emit.vue'),
+    'checklist': () => import('./components/interface/checklist.vue'),
     'command-input-with-permission': () => import('./components/interface/command-input-with-permission.vue'),
     'configurable-list': () => import('./components/interface/configurable-list.vue'),
+    'credits-custom-texts': () => import('./components/interface/credits-custom-texts.vue'),
+    'credits-social': () => import('./components/interface/credits-social.vue'),
     'heist-levels': () => import('./components/interface/heist-levels.vue'),
     'heist-results': () => import('./components/interface/heist-results.vue'),
     'highlights-url-generator': () => import('./components/interface/highlights-url-generator.vue'),
     'loading': () => import('../../components/loading.vue'),
     'number-input': () => import('./components/interface/number-input.vue'),
+    'selector': () => import('./components/interface/selector.vue'),
     'sortable-list': () => import('./components/interface/sortable-list.vue'),
     'text-input': () => import('./components/interface/text-input.vue'),
     'textarea-from-array': () => import('./components/interface/textarea-from-array.vue'),
@@ -242,68 +247,68 @@ export default class interfaceSettings extends Vue {
     };
 
     this.state.loaded = State.PROGRESS;
-    const socket = io(`/${this.$route.params.type}/${system}`, { query: "token=" + this.token });
-    socket.emit('settings', (err, _settings, _ui) => {
-      if (system !== this.$route.params.id) return // skip if we quickly changed system
+    io(`/${this.$route.params.type}/${system}`, { query: "token=" + this.token })
+      .emit('settings', (err, _settings, _ui) => {
+        if (system !== this.$route.params.id) return // skip if we quickly changed system
 
-      this.state.loaded = State.DONE
-      _settings = _(_settings).toPairs().value()
-      _ui = _(_ui).toPairs().value()
+        this.state.loaded = State.DONE
+        _settings = _(_settings).toPairs().value()
+        _ui = _(_ui).toPairs().value()
 
-      let settings: any = { settings: {} }
-      let ui: any = { settings: {} }
+        let settings: any = { settings: {} }
+        let ui: any = { settings: {} }
 
-      // sorting
-      // enabled is first - remove on core/overlay
-      if (!['core', 'overlays'].includes(this.$route.params.type)) {
-        settings.settings.enabled = _(_settings.filter(o => o[0] === 'enabled')).flatten().value()[1]
-      }
-
-      // everything else except commands and enabled and are string|number|bool
-      for (let [name, value] of _(_settings.filter(o => o[0] !== '_' && o[0] !== 'enabled' && o[0] !== 'commands' && typeof o[1] !== 'object')).value()) {
-        settings.settings[name] = value
-      }
-      // everything else except commands and enabled and are objects -> own category
-      for (let [name, value] of _(_settings.filter(o => o[0] !== '_' && o[0] !== 'enabled' && o[0] !== 'commands' && typeof o[1] === 'object')).value()) {
-        settings[name] = value
-      }
-      // commands at last
-      for (let [name, value] of _(_settings.filter(o => o[0] === 'commands')).value()) {
-        settings[name] = value
-      }
-
-      // ui
-      // everything else except commands and enabled and are string|number|bool
-      for (let [name, value] of _(_ui.filter(o => o[0] !== '_' && o[0] !== 'enabled' && o[0] !== 'commands' && typeof o[1].type !== 'undefined')).value()) {
-        if (typeof settings.settings[name] === 'undefined') settings.settings[name] = null
-        ui.settings[name] = value
-      }
-      // everything else except commands and enabled and are objects -> own category
-      for (let [name, value] of _(_ui.filter(o => o[0] !== '_' && o[0] !== 'enabled' && o[0] !== 'commands' && typeof o[1].type === 'undefined')).value()) {
-        if (typeof settings[name] === 'undefined') settings[name] = {}
-        for (let [k, /* v */] of Object.entries(value)) {
-          if (typeof settings[name][k] === 'undefined') settings[name][k] = null
+        // sorting
+        // enabled is first - remove on core/overlay
+        if (!['core', 'overlays'].includes(this.$route.params.type)) {
+          settings.settings.enabled = _(_settings.filter(o => o[0] === 'enabled')).flatten().value()[1]
         }
-        ui[name] = value
-      }
-      this.isDataChanged = false;
 
-      // remove empty categories
-      Object.keys(settings).forEach(key => {
-        if (_.size(settings[key]) === 0) {
-          delete settings[key]
+        // everything else except commands and enabled and are string|number|bool
+        for (let [name, value] of _(_settings.filter(o => o[0] !== '_' && o[0] !== 'enabled' && o[0] !== 'commands' && typeof o[1] !== 'object')).value()) {
+          settings.settings[name] = value
         }
+        // everything else except commands and enabled and are objects -> own category
+        for (let [name, value] of _(_settings.filter(o => o[0] !== '_' && o[0] !== 'enabled' && o[0] !== 'commands' && typeof o[1] === 'object')).value()) {
+          settings[name] = value
+        }
+        // commands at last
+        for (let [name, value] of _(_settings.filter(o => o[0] === 'commands')).value()) {
+          settings[name] = value
+        }
+
+        // ui
+        // everything else except commands and enabled and are string|number|bool
+        for (let [name, value] of _(_ui.filter(o => o[0] !== '_' && o[0] !== 'enabled' && o[0] !== 'commands' && typeof o[1].type !== 'undefined')).value()) {
+          if (typeof settings.settings[name] === 'undefined') settings.settings[name] = null
+          ui.settings[name] = value
+        }
+        // everything else except commands and enabled and are objects -> own category
+        for (let [name, value] of _(_ui.filter(o => o[0] !== '_' && o[0] !== 'enabled' && o[0] !== 'commands' && typeof o[1].type === 'undefined')).value()) {
+          if (typeof settings[name] === 'undefined') settings[name] = {}
+          for (let [k, /* v */] of Object.entries(value)) {
+            if (typeof settings[name][k] === 'undefined') settings[name][k] = null
+          }
+          ui[name] = value
+        }
+        this.isDataChanged = false;
+
+        // remove empty categories
+        Object.keys(settings).forEach(key => {
+          if (_.size(settings[key]) === 0) {
+            delete settings[key]
+          }
+        })
+        Object.keys(ui).forEach(key => {
+          if (_.size(ui[key]) === 0) {
+            delete ui[key]
+          }
+        })
+
+        console.debug({ui, settings});
+        this.settings = Object.assign({}, settings)
+        this.ui = Object.assign({}, ui)
       })
-      Object.keys(ui).forEach(key => {
-        if (_.size(ui[key]) === 0) {
-          delete ui[key]
-        }
-      })
-
-      console.debug({ui, settings});
-      this.settings = Object.assign({}, settings)
-      this.ui = Object.assign({}, ui)
-    })
   }
 
   saveSettings() {

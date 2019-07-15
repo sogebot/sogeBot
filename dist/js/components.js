@@ -283,66 +283,6 @@ window.textAreaWithTags = {
     `
 };
 
-/* checklist */
-window.checkList = {
-  props: ['current', 'value', 'title'],
-  data: function () {
-    return {
-      show: false,
-      currentValue: this.value,
-      translatedTitle: commons.translate(this.title)
-    };
-  },
-  template: `
-    <div class="d-flex">
-      <div class="input-group-prepend">
-        <span class="input-group-text">
-          <template v-if="typeof translatedTitle === 'string'">{{ translatedTitle }}</template>
-          <template v-else>
-            {{ translatedTitle.title }}
-            <small class="textInputTooltip text-info" data-toggle="tooltip" data-html="true" :title="translatedTitle.help">[?]</small>
-          </template>
-        </span>
-      </div>
-      <ul class="list-group list-group-flush w-100 border border-input">
-        <li class="list-group-item border-0" v-for='v of value' :class="[current.includes(v) ? 'list-group-item-success' : 'list-group-item-danger']">{{ v }}</li>
-      </ul>
-    </div>
-  `
-};
-
-/* selector */
-window.selector = {
-  props: ['readonly', 'value', 'title', 'current', 'values'],
-  data: function () {
-    return {
-      currentValue: this.value,
-      translatedTitle: commons.translate(this.title)
-    };
-  },
-  methods: {
-    onChange: function () {
-      this.$emit('update', { value: this.currentValue });
-    }
-  },
-  template: `
-    <div class="d-flex">
-      <div class="input-group-prepend">
-        <span class="input-group-text">
-          <template v-if="typeof translatedTitle === 'string'">{{ translatedTitle }}</template>
-          <template v-else>
-            {{ translatedTitle.title }}
-            <small class="textInputTooltip text-info" data-toggle="tooltip" data-html="true" :title="translatedTitle.help">[?]</small>
-          </template>
-        </span>
-      </div>
-      <select class="form-control" :readonly="readonly" v-model="currentValue" v-on:change="onChange">
-        <option v-for="v of values">{{v}}</option>
-      </select>
-    </div>
-    `
-};
-
 /* hold button */
 window.holdButton = {
   props: ['holdtitle', 'title', 'ttc', 'icon'],

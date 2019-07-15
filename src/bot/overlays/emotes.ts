@@ -62,15 +62,15 @@ class Emotes extends Overlay {
   @ui({ type: 'number-input', step: '1', min: '1' })
   cExplosionNumOfExplosions: number = 5;
 
-  @ui({ type: 'test', test: 'explosion', text: 'systems.emotes.settings.test.emoteExplosion', class: 'btn btn-secondary btn-block' }, 'test')
+  @ui({ type: 'btn-emit', class: 'btn btn-secondary btn-block mt-1 mb-1', emit: 'testExplosion' }, 'test')
   btnTestExplosion: null = null;
-  @ui({ type: 'test', test: 'emote', text: 'systems.emotes.settings.test.emote', class: 'btn btn-secondary btn-block' }, 'test')
+  @ui({ type: 'btn-emit', class: 'btn btn-secondary btn-block mt-1 mb-1', emit: 'test' }, 'test')
   btnTestEmote: null = null;
-  @ui({ type: 'test', test: 'fireworks', text: 'systems.emotes.settings.test.emoteFirework', class: 'btn btn-secondary btn-block' }, 'test')
+  @ui({ type: 'btn-emit', class: 'btn btn-secondary btn-block mt-1 mb-1', emit: 'testFireworks' }, 'test')
   btnTestFirework: null = null;
   @ui({ type: 'link', href: '/overlays/emotes', class: 'btn btn-primary btn-block', rawText: '/overlays/emotes (1920x1080)', target: '_blank' }, 'links')
   btnLink: null = null;
-  @ui({ type: 'removecache', explosion: false, text: 'systems.emotes.settings.removecache', class: 'btn btn-danger btn-block' }, 'emotes')
+  @ui({ type: 'btn-emit', class: 'btn btn-danger btn-block mt-1 mb-1', emit: 'removeCache' }, 'emotes')
   btnRemoveCache: null = null;
 
   constructor () {
@@ -88,12 +88,10 @@ class Emotes extends Overlay {
 
   sockets () {
     global.panel.io.of('/overlays/emotes').on('connection', (socket) => {
-      socket.on('remove.cache', () => this.removeCache());
-      socket.on('emote.test', (test) => {
-        if (test === 'explosion') {this._testExplosion();}
-        else if (test === 'fireworks') {this._testFireworks();}
-        else {this._test();}
-      });
+      socket.on('removeCache', () => this.removeCache());
+      socket.on('testExplosion', () => this._testExplosion());
+      socket.on('testFireworks', () => this._testFireworks());
+      socket.on('test', () => this._test());
     });
   }
 

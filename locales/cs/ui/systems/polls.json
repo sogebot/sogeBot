@@ -1,13 +1,6 @@
 {
   "settings": {
     "enabled": "Status",
-    "cDisplayTheme": "Theme",
-    "cDisplayHideAfterInactivity": "Skrýt při neaktivitě",
-    "cDisplayAlign": "Zarovnání",
-    "cDisplayInactivityTime": {
-      "title": "Neaktivita po",
-      "help": "v milisekundách"
-    },
     "everyXMessages": {
       "title": "Připomenout každých X zpráv",
       "help": "0 = vypnuto; obě podmínky musí být splněny, aby bot vypsal připomenutí do chatu"
