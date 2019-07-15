@@ -14,8 +14,8 @@
       "help": "Available variables: $song, $artist"
     },
     "username": "Authorized user",
-    "revoke": "Revoke user authorization",
-    "authorize": "Authorize user",
+    "revokeBtn": "Revoke user authorization",
+    "authorizeBtn": "Authorize user",
     "scopes": "Scopes",
     "playlistToPlay": {
       "title": "Main playlist",
