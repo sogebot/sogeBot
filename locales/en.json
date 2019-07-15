@@ -37,6 +37,7 @@
     "offline": "Stream is currently offline for (if $days>0|$daysd )(if $hours>0|$hoursh )(if $minutes>0|$minutesm )(if $seconds>0|$secondss)"
   },
   "webpanel": {
+    "loading": "Loading",
     "display-as": "Display as",
     "set-default": "Set default",
     "add": "Add",

@@ -47,7 +47,7 @@ class OAuth extends Core {
   public broadcasterUsername: string = '';
 
   @settings('broadcaster', true)
-  @ui({ type: 'check-list', current: 'broadcasterCurrentScopes' })
+  @ui({ type: 'checklist', current: 'broadcasterCurrentScopes' })
   public broadcasterExpectedScopes: string[] = [
     'chat:read',
     'chat:edit',
@@ -81,7 +81,7 @@ class OAuth extends Core {
   public botUsername: string = '';
 
   @settings('bot', true)
-  @ui({ type: 'check-list', current: 'botCurrentScopes' })
+  @ui({ type: 'checklist', current: 'botCurrentScopes' })
   public botExpectedScopes: string[] = [
     'channel:moderate',
     'chat:edit',
@@ -111,7 +111,7 @@ class OAuth extends Core {
   constructor() {
     super();
 
-    this.addMenu({ category: 'settings', name: 'core', id: 'core' });
+    this.addMenu({ category: 'settings', name: 'core', id: '/settings/core' });
     setTimeout(() => {
       this.validateOAuth('bot');
       this.validateOAuth('broadcaster');

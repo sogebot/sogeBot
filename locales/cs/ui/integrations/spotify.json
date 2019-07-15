@@ -14,8 +14,8 @@
       "help": "Dostupné proměnné: $song, $artist"
     },
     "username": "Autorizovaný uživatel",
-    "revoke": "Zrušit autorizaci uživatele",
-    "authorize": "Autorizovat uživatele",
+    "revokeBtn": "Zrušit autorizaci uživatele",
+    "authorizeBtn": "Autorizovat uživatele",
     "scopes": "Scopes",
     "playlistToPlay": {
       "title": "Hlavní playlist",

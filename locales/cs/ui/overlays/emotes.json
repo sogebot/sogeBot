@@ -1,17 +1,15 @@
 {
   "settings": {
-    "removecache": "Smazat cache",
+    "btnRemoveCache": "Smazat cache",
+    "btnTestExplosion": "Exploze emotikonů",
+    "btnTestEmote": "Emotikon",
+    "btnTestFirework": "Ohňostroj emotikonů",
     "cEmotesSize": "Velikost emotikonů",
     "cEmotesMaxEmotesPerMessage": "Maximální počet emotikonů",
     "cEmotesAnimation": "Animace",
     "cEmotesAnimationTime": "Doba trvání animace",
     "cExplosionNumOfEmotes": "Počet emotikonů",
     "cExplosionNumOfEmotesPerExplosion": "Počet emotikonů za explozi",
-    "cExplosionNumOfExplosions": "Počet explozí",
-    "test": {
-      "emoteExplosion": "Exploze emotikonů",
-      "emote": "Emotikon",
-      "emoteFirework": "Ohňostroj emotikonů"
-    }
+    "cExplosionNumOfExplosions": "Počet explozí"
   }
 }
