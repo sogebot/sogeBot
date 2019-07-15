@@ -315,11 +315,14 @@ export default class interfaceSettings extends Vue {
   saveSettings() {
     this.state.settings = 1
     let settings = _.cloneDeep(this.settings)
-    for (let [name,value] of Object.entries(settings.settings)) {
-      delete settings.settings[name]
-      settings[name] = value
+
+    if (settings.settings) {
+      for (let [name,value] of Object.entries(settings.settings)) {
+        delete settings.settings[name]
+        settings[name] = value
+      }
+      delete settings.settings
     }
-    delete settings.settings
 
     io(`/${this.$route.params.type}/${this.$route.params.id}`, { query: "token=" + this.token })
       .emit('settings.update', settings, (err) => {
