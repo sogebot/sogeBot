@@ -22,9 +22,10 @@ const tests = {
   'ok': [
     { message: 'SomeMSG SomeMSg', sender: { username: 'testuser', badges: {}, emotes: [] } },
     { message: '123123123213123123123123213123', sender: { username: 'testuser', badges: {}, emotes: [] } },
-    { message: 'zdarec KAPOW KAPOW', sender: { username: 'testuser', badges: {}, emotes: [{ id: '133537', start: 7, end: 11 }, { id: '133537', start: 13, end: 17 }] } }
+    { message: 'zdarec KAPOW KAPOW', sender: { username: 'testuser', badges: {}, emotes: [{ id: '133537', start: 7, end: 11 }, { id: '133537', start: 13, end: 17 }] } },
+    { message: '😀 😁 😂 🤣 😃 😄 😅 😆 😉 😊 😋 😎 😍 😘 😗 😙 😚 🙂 🤗 🤩 🤔 🤨 😐 😑 😶 🙄 😏 😣 😥 😮 🤐 😯 😪 😫 😴 😌 😛 😜 😝 🤤 😒 😓 😔 😕 🙃 🤑 😲 ☹️ 🙁 😖 😞 😟 😤 😢 😭 😦 😧 😨 😩 🤯 😬 😰 😱', sender: { username: 'testuser', badges: {}, emotes: [] } },
   ]
-}
+};
 
 describe('systems/moderation - Caps()', () => {
   describe('moderationCaps=false', async () => {
