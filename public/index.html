@@ -330,7 +330,6 @@
       if (currentPage === id.split('-')[0]) return
       else currentPage = id.split('-')[0]
       var visibility = id !== 'dashboard' ? 'none' : 'flex'
-      var visibilityBlock = id !== 'dashboard' ? 'none' : 'block'
 
       $("#pages-old").empty()
 
@@ -349,7 +348,8 @@
             }
           })
         }))
-      $(".widgets").css('display', visibilityBlock)
+      $(".widgets").css('top', id !== 'dashboard' ? '-99999px' : '')
+      $(".widgets").css('position', id !== 'dashboard' ? 'absolute' : 'inherit')
     })
     page({ popstate:true })
 
