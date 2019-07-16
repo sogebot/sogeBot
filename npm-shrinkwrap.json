@@ -4686,7 +4686,7 @@
       }
     },
     "emoji-regex": {
-      "version": "7.0.3"
+      "version": "8.0.0"
     },
     "emojis-list": {
       "version": "2.1.0",
@@ -7174,6 +7174,10 @@
             "ms": "^2.1.1"
           }
         },
+        "emoji-regex": {
+          "version": "7.0.3",
+          "dev": true
+        },
         "get-caller-file": {
           "version": "2.0.5",
           "dev": true
@@ -9549,6 +9553,10 @@
           "version": "4.1.0",
           "dev": true
         },
+        "emoji-regex": {
+          "version": "7.0.3",
+          "dev": true
+        },
         "string-width": {
           "version": "3.1.0",
           "dev": true,
@@ -10761,6 +10769,9 @@
             "strip-ansi": "^5.2.0",
             "wrap-ansi": "^5.1.0"
           }
+        },
+        "emoji-regex": {
+          "version": "7.0.3"
         },
         "get-caller-file": {
           "version": "2.0.5"
