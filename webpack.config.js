@@ -2,6 +2,9 @@ const path = require('path');
 const VueLoaderPlugin = require('vue-loader/lib/plugin');
 
 module.exports = [{
+  watchOptions: {
+    ignored: /node_modules/
+  },
   mode: process.env.NODE_ENV,
   performance: { hints: false },
   entry: './src/panel/index.ts',
@@ -68,6 +71,9 @@ module.exports = [{
     ]
   }
 }, {
+  watchOptions: {
+    ignored: /node_modules/
+  },
   mode: process.env.NODE_ENV,
   performance: { hints: false },
   entry: ['./src/overlay/index.ts'],
