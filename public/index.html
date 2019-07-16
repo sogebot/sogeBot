@@ -691,6 +691,15 @@
       e.preventDefault()
       e.stopPropagation();
     });
+
+    // force dropdowns outside of overflow
+    $(document).on('show.bs.dropdown', function() {
+      $('body').append($('.dropdown-menu').css({
+        position: 'absolute',
+        left: $('.dropdown-menu').offset().left,
+        top: $('.dropdown-menu').offset().top
+      }).detach());
+    });
   </script>
 </body>
 </html>
