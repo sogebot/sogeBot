@@ -1,6 +1,7 @@
 // 3rdparty libraries
 import * as _ from 'lodash';
 import XRegExp from 'xregexp';
+import emojiRegex from 'emoji-regex';
 
 import constants from '../constants';
 import { permission } from '../permissions';
@@ -83,6 +84,8 @@ class Moderation extends System {
 
   @settings('emotes')
   cEmotesEnabled: boolean = true;
+  @settings('emotes')
+  cEmotesEmojisAreEmotes: boolean = true;
   @settings('emotes')
   cEmotesModerateSubscribers: boolean = true;
   @settings('emotes')
@@ -308,7 +311,7 @@ class Moderation extends System {
 
   @parser({ priority: constants.MODERATION })
   async caps (opts) {
-    const whitelisted = await this.whitelist(opts.message);
+    let whitelisted = await this.whitelist(opts.message);
 
     let emotesCharList: number[] = [];
     if (Symbol.iterator in Object(opts.sender.emotes)) {
@@ -321,6 +324,9 @@ class Moderation extends System {
 
     var msgLength = whitelisted.trim().length;
     var capsLength = 0;
+
+    // exclude emotes from caps check
+    whitelisted = whitelisted.replace(emojiRegex(), '').trim();
 
     const regexp = /[\u2000-\u206F\u2E00-\u2E7F\\'!"#$%&()*+,\-./:;<=>?@[\]^_`{|}~]/gi;
     for (let i = 0; i < whitelisted.length; i++) {
@@ -384,12 +390,19 @@ class Moderation extends System {
   }
 
   @parser({ priority: constants.MODERATION })
-  async emotes (opts) {
+  async emotes (opts: ParserOptions) {
     if (!(Symbol.iterator in Object(opts.sender.emotes))) {return true;}
 
     var count = opts.sender.emotes.length;
     if (isOwner(opts.sender) || (await isModerator(opts.sender)) || !this.cEmotesEnabled || (typeof opts.sender.badges.subscriber !== 'undefined' && !this.cEmotesModerateSubscribers)) {
       return true;
+    }
+
+    if (this.cEmotesEmojisAreEmotes) {
+      const regex = emojiRegex();
+      while (regex.exec(opts.message)) {
+        count++;
+      }
     }
 
     if (count > this.cEmotesMaxCount) {
