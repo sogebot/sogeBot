@@ -234,8 +234,6 @@ export default class interfaceSettings extends Vue {
 
   heightOfMenuUpdate() {
     this.heightOfMenu = String(window.innerHeight - Math.max((<HTMLElement>this.$refs.menu).getBoundingClientRect().top, this.topOfMenu) - 50) + 'px';
-    console.log(Math.max((<HTMLElement>this.$refs.menu).getBoundingClientRect().top, this.topOfMenu))
-    console.log(this.heightOfMenu)
   }
 
   @Watch('$route.params.type')
