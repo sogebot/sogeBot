@@ -40,6 +40,7 @@
     "cSpamMaxLength": "Max length",
     "cEmotesMaxCount": "Max count",
     "cWarningsAnnounceTimeouts": "Announce timeouts in chat for everyone",
-    "cWarningsAllowedCount": "Warning count"
+    "cWarningsAllowedCount": "Warning count",
+    "cEmotesEmojisAreEmotes": "Treat Emojis as Emotes"
   }
 }
