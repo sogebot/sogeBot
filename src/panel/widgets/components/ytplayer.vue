@@ -17,9 +17,19 @@
         </button>
       </li>
       <li role="presentation" class="nav-item" style="flex-shrink: 0">
-        <button class="btn nav-btn btn-secondary" @click="next">
-          <fa icon="forward" />
-        </button>
+        <div class="btn-group" style="height:100%;">
+          <button class="btn nav-btn btn-secondary" @click="next">
+            <fa icon="forward" />
+          </button>
+          <button type="button" style="border-left: 1px solid rgba(0, 0, 0, 0.2);" class="btn btn-secondary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <span class="sr-only">Toggle Dropdown</span>
+          </button>
+          <div class="dropdown-menu">
+            <button type="button" class="dropdown-item" @click="nextAndRemoveFromPlaylist">
+              skip &amp; remove from playlist
+            </button>
+          </div>
+        </div>
       </li>
       <li role="presentation" class="nav-item w-100">
         <a class="nav-link active" href="#yt-main" aria-controls="home" role="tab" data-toggle="tab" title="Song Requests">
@@ -109,6 +119,12 @@ export default {
         if (this.currentSong.endTime && event.detail.plyr.currentTime >= this.currentSong.endTime) {
           this.next() // go to next if we are at endTime
         }
+      }
+    },
+    nextAndRemoveFromPlaylist() {
+      if (this.currentSong) {
+        this.socket.emit('delete.playlist', this.currentSong._id);
+        this.next()
       }
     },
     next: function () {
