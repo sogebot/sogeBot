@@ -106,8 +106,20 @@
       </div>
 
       <div class="col-lg-3 col-md-4 col-sm-6">
-        <div class="sticky-top" style="top: 185px; z-index:0">
-          <div class="widget pt-1 mt-3 border-0 bg-light" style="height: auto">
+        <div
+          ref="menu"
+          :class="{
+            'sticky-top': configuration.core.ui.stickystats,
+            'pr-2': configuration.core.ui.stickystats,
+          }"
+          class="pt-3"
+          :style="{
+            top: configuration.core.ui.stickystats ? topOfMenu + 'px' : '',
+            height: configuration.core.ui.stickystats ? heightOfMenu : 'auto',
+            overflow: configuration.core.ui.stickystats ? 'scroll' : 'inherit',
+            'z-index': 0
+            }">
+          <div class="widget border-0 bg-light" style="height: auto">
           <div class="pl-2 pr-2 pb-4">
             <transition name="fade">
               <div v-show="isDataChanged" class="alert alert-warning" style="cursor: initial">
@@ -200,6 +212,10 @@ export default class interfaceSettings extends Vue {
   error: string | null = null;
   showError: boolean = false;
 
+  topOfMenu: number = 168;
+  heightOfMenu: string = '0';
+  heightOfMenuInterval: number = 0;
+
   get settingsWithoutPermissions() {
     let withoutPermissions = {};
     Object.keys(this.settings).filter(o => o !== '_permissions').forEach((key) => {
@@ -208,7 +224,19 @@ export default class interfaceSettings extends Vue {
     return withoutPermissions
   }
 
-  mounted() { this.refresh(); }
+  mounted() {
+    this.refresh();
+
+    this.heightOfMenuInterval = window.setInterval(() => {
+      this.heightOfMenuUpdate()
+    }, 1000)
+  }
+
+  heightOfMenuUpdate() {
+    this.heightOfMenu = String(window.innerHeight - Math.max((<HTMLElement>this.$refs.menu).getBoundingClientRect().top, this.topOfMenu) - 50) + 'px';
+    console.log(Math.max((<HTMLElement>this.$refs.menu).getBoundingClientRect().top, this.topOfMenu))
+    console.log(this.heightOfMenu)
+  }
 
   @Watch('$route.params.type')
   refresh() {
