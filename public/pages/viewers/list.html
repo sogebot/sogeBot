@@ -4,7 +4,16 @@
       <div class="col-12">
         <span data-lang="menu.viewers" class="title text-default"></span>
         <template v-if="!loaded">
-          <div class="alert alert-info"><i class="fas fa-circle-notch fa-spin"></i> Loading users data, this <strong>may</strong> take a while.</div>
+          <div class="text-center" >
+            <div class="spinner-border text-primary" style="width: 5rem; height: 5rem; margin-top: 5rem;" role="status"></div>
+            <div
+              style="text-transform: uppercase; letter-spacing: 1px; font-size: 0.7rem; position: relative; top: -3rem; max-width: fit-content;"
+              class="text-primary text-center m-auto">{{ commons.translate('loading') }}
+            </div>
+            <div
+              style="text-transform: uppercase; letter-spacing: 1px; font-size: 0.7rem; position: relative; top: -1rem; max-width: fit-content;"
+              class="text-primary text-center m-auto" v-html="commons.translate('this-may-take-a-while')"></div>
+          </div>
         </template>
         <div v-else class="pt-3 pb-3 mt-3 mb-3 m-0 border-top border-bottom row">
           <div class="col-sm-12 text-right form-inline d-block">
