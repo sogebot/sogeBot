@@ -1,12 +1,41 @@
 const path = require('path');
 const VueLoaderPlugin = require('vue-loader/lib/plugin');
 
+const optimization = {
+  minimize: process.env.NODE_ENV === 'production',
+  moduleIds: 'hashed',
+  chunkIds: 'named',
+  splitChunks: {
+    chunks: 'async',
+    minSize: 30000,
+    maxSize: 0,
+    minChunks: 1,
+    maxAsyncRequests: 5,
+    maxInitialRequests: 3,
+    automaticNameDelimiter: '~',
+    automaticNameMaxLength: 30,
+    name: true,
+    cacheGroups: {
+      vendors: {
+        test: /[\\/]node_modules[\\/]/,
+        priority: -10
+      },
+      default: {
+        minChunks: 2,
+        priority: -20,
+        reuseExistingChunk: true
+      }
+    }
+  }
+};
+
 module.exports = [{
   watchOptions: {
     ignored: /node_modules/
   },
   mode: process.env.NODE_ENV,
   performance: { hints: false },
+  optimization,
   entry: './src/panel/index.ts',
   resolve: {
     extensions: ['.ts', '.js', '.vue', '.json'],
@@ -17,6 +46,7 @@ module.exports = [{
   output: {
     path: path.resolve(__dirname, 'public', 'dist', 'js'),
     filename: 'main.js',
+    chunkFilename: '[chunkhash].js',
     publicPath: '/dist/js/'
   },
   plugins: [
@@ -76,6 +106,7 @@ module.exports = [{
   },
   mode: process.env.NODE_ENV,
   performance: { hints: false },
+  optimization,
   entry: ['./src/overlay/index.ts'],
   resolve: {
     extensions: ['.ts', '.js', '.vue', '.json'],
@@ -85,7 +116,8 @@ module.exports = [{
   },
   output: {
     path: path.resolve(__dirname, 'public', 'dist', 'js'),
-    filename: 'overlay.js',
+    filename: 'output.js',
+    chunkFilename: '[chunkhash].js',
     publicPath: '/dist/js/'
   },
   plugins: [
