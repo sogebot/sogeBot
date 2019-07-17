@@ -24,7 +24,7 @@
           <button type="button" style="border-left: 1px solid rgba(0, 0, 0, 0.2);" class="btn btn-secondary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             <span class="sr-only">Toggle Dropdown</span>
           </button>
-          <div class="dropdown-menu">
+          <div class="dropdown-menu dropdown-detach">
             <button type="button" class="dropdown-item" @click="nextAndRemoveFromPlaylist">
               skip &amp; remove from playlist
             </button>

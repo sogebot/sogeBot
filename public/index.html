@@ -694,10 +694,10 @@
 
     // force dropdowns outside of overflow
     $(document).on('show.bs.dropdown', function() {
-      $('body').append($('.dropdown-menu').css({
+      $('body').append($('.dropdown-detach').css({
         position: 'absolute',
-        left: $('.dropdown-menu').offset().left,
-        top: $('.dropdown-menu').offset().top
+        left: $('.dropdown-detach').offset().left,
+        top: $('.dropdown-detach').offset().top
       }).detach());
     });
   </script>
