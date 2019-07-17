@@ -1,20 +1,133 @@
-<span id="customVariables-edit">
-  <span class="title text-default" style="padding: 0 !important;">
-    <a class="btn btn-outline-info" style="border: 0 !important;" href="/#/registry/customVariables/list"><i class="fas fa-chevron-circle-left"></i></a>
-    <span style="position: relative; top: 2px;">{{ title }} </span>
-    <span style="position: relative; top: 2px;" v-if="isEditation">{{ variableName }}</span>
-  </span>
+<template>
+  <b-container fluid ref="window">
+    <b-row>
+      <b-col>
+        <span class="title text-default mb-2">
+          {{ translate('menu.registry') }}
+          <small><i class="fas fa-angle-right"></i></small>
+          {{ translate('menu.custom-variables') }}
+          <template v-if="state.loaded && $route.params.id">
+            <small><i class="fas fa-angle-right"></i></small>
+            {{variableName}}
+            <small>{{$route.params.id}}</small>
+          </template>
+        </span>
+      </b-col>
+    </b-row>
 
-  <span class="float-right">
-    <span v-if="_.filter(this.hasError, (o) => o === true).length !== 0" style="cursor: auto;" class="alert-danger btn m-0">{{commons.translate('dialog.formNotValid')}}</span>
-    <button v-if="saveState === 0" type="button" class="btn btn-primary" v-on:click="saveChanges()">{{ commons.translate('dialog.buttons.saveChanges.idle') }}</button>
-    <button v-if="saveState === 1" disabled="disabled" type="button" class="btn btn-info"><i class="fas fa-spinner fa-spin"></i> {{ commons.translate('dialog.buttons.saveChanges.progress') }}</button>
-    <button v-if="saveState === 2" disabled="disabled" type="button" class="btn btn-success"><i class="fas fa-check"></i> {{ commons.translate('dialog.buttons.saveChanges.done') }}</span></button>
-    <button v-if="saveState === 3" disabled="disabled" type="button" class="btn btn-danger"><i class="fas fa-exclamation"></i> {{ commons.translate('dialog.buttons.something-went-wrong') }}</span></button>
-  </span>
+    <panel>
+      <template v-slot:left>
+        <button-with-icon class="btn-secondary btn-reverse" icon="caret-left" href="#/registry/customvariables/list">{{translate('commons.back')}}</button-with-icon>
+        <hold-button v-if="$route.params.id" icon="trash" class="btn-danger">
+          <template slot="title">{{translate('dialog.buttons.delete')}}</template>
+          <template slot="onHoldTitle">{{translate('dialog.buttons.hold-to-delete')}}</template>
+        </hold-button>
+      </template>
+      <template v-slot:right>
+        <state-button @click="save()" text="saveChanges" :state="state.save"/>
+      </template>
+    </panel>
+
+    <loading v-if="!state.loaded /* State.DONE */" />
+
+  </b-container>
+</template>
+
+<script lang="ts">
+import { Vue, Component/* , Prop */ } from 'vue-property-decorator';
+import { chunk, orderBy } from 'lodash';
+
+@Component({
+  components: {
+    'loading': () => import('../../../components/loading.vue'),
+  }
+})
+export default class customVariablesEdit extends Vue {
+  socket = io('/registry/customVariables', { query: "token=" + this.token });
+  psocket = io('/core/permissions', { query: "token=" + this.token });
+
+  state: { loaded: boolean; save: number; } = { loaded: false, save: 0 }
+
+  types = [{
+      value: 'number',
+      text: this.translate('registry.customvariables.types.number')
+    },
+    {
+      value: 'text',
+      text: this.translate('registry.customvariables.types.text')
+    },
+    {
+      value: 'options',
+      text: this.translate('registry.customvariables.types.options')
+    },
+    {
+      value: 'eval',
+      text: this.translate('registry.customvariables.types.eval')
+    }];
+  runEveryOptions = [
+    { value: 0, type: 'isUsed' },
+    { value: 1000, type: 'seconds' },
+    { value: 1000 * 60, type: 'minutes' },
+    { value: 1000 * 60 * 60, type: 'hours' },
+    { value: 1000 * 60 * 60 * 24, type: 'days' },
+  ]
+
+  selectedType: string = '';
+  selectedRunEvery: string | null = null;
+  runEveryX: number = 1;
+
+  variableNameInitial: string = '';
+  variableName: string = '';
+  description: string = '';
+  currentValue: string = '';
+  usableOptions: string = '';
+  readOnly: boolean = false;
+  permission: string | null = null;
+
+  evalValueInit: string = '';
+  evalInput: string | null = null;
+  evalError: string = '';
+
+  responseType: number = 0;
+  responseText: string = '';
+
+  history: any[] = [];
+  permissions: any[] = [];
+
+  mounted() {
+    this.state.loaded = false;
+    if (this.$route.params.id) {
+      this.socket.emit('load', this.$route.params.id, (data) => {
+        this.variableNameInitial = data.variable.variableName
+        this.variableName = data.variable.variableName
+        this.description = data.variable.description
+        this.currentValue = data.variable.currentValue
+        this.usableOptions = data.variable.usableOptions
+        this.evalValueInit = data.variable.evalValue
+        this.selectedRunEvery = data.variable.runEveryType
+        this.runEveryX = data.variable.runEvery / data.variable.runEveryTypeValue
+        this.selectedType = data.variable.type
+        this.responseType = data.variable.responseType
+        this.responseText = data.variable.responseText
+        this.permission = data.variable.permission || 0
+        this.readOnly = data.variable.readOnly || false
+        for (let h of data.history) {
+          // change timestamp to milliseconds
+          h.timestamp = new Date(h.timestamp).getTime()
+        }
+        this.history = chunk(orderBy(data.history, 'timestamp', 'desc'), 15)[0] || []
+        this.state.loaded = true;
+      })
+    } else {
+      this.state.loaded = true;
+    }
+  }
+}
+</script>
+<!--
 
   <div class="widget pt-3">
-    <!-- Editation stuff here -->
+    <!-- Editation stuff here ->
     <form>
         <div class="form-group col-md-12">
           <label for="variable_name_input">{{ commons.translate('registry.customvariables.variable.name') }}</label>
@@ -149,95 +262,11 @@
         </div>
         <small class="form-text text-danger" v-html="commons.translate('registry.customvariables.warning')"></small>
       </div>
-    <!-- -->
+    <!-- ->
   </div>
 </span>
 
 <script>
-  Vue.prototype.commons = commons
-
-  function customVariablesEditInit () {
-    if (_.size(translations) === 0) return setTimeout(() => customVariablesEditInit(), 1)
-
-    var customVariablesEdit = new Vue({
-      el: '#customVariables-edit',
-      data: {
-        types: [
-          {
-            value: 'number',
-            text: commons.translate('registry.customvariables.types.number')
-          },
-          {
-            value: 'text',
-            text: commons.translate('registry.customvariables.types.text')
-          },
-          {
-            value: 'options',
-            text: commons.translate('registry.customvariables.types.options')
-          },
-          {
-            value: 'eval',
-            text: commons.translate('registry.customvariables.types.eval')
-          }
-        ],
-        runEveryOptions: [
-          {
-            value: 0,
-            type: 'isUsed',
-          },
-          {
-            value: 1000,
-            type: 'seconds',
-          },
-          {
-            value: 1000 * 60,
-            type: 'minutes',
-          },
-          {
-            value: 1000 * 60 * 60,
-            type: 'hours',
-          },
-          {
-            value: 1000 * 60 * 60 * 24,
-            type: 'days',
-          },
-        ],
-        selectedType: '',
-        selectedRunEvery: null,
-        runEveryX: 1,
-        deleteState: 'waiting',
-
-        variableNameInitial: '',
-        variableName: '',
-        description: '',
-        currentValue: '',
-        usableOptions: '',
-        readOnly: false,
-        permission: null,
-
-        evalValueInit: '',
-        evalInput: null,
-        evalError: '',
-
-        responseType: 0,
-        responseText: '',
-
-        history: [],
-
-        hasError: {
-          variableName: false,
-          selectedType: false,
-          usableOptions: false,
-          isNotUnique: false
-        },
-
-        psocket: io('/core/permissions', { query: "token=" + token }),
-        permissions: [],
-
-        socket: io('/registry/customVariables', { query: "token=" + token }),
-
-        saveState: 0
-      },
       methods: {
         getPermissionName: function (id) {
           if (!id) return 'Disabled'
@@ -469,31 +498,5 @@ return '';`,
         }
       }
     })
-
-    // load up from db
-    if (commons.urlParam('id')) {
-      customVariablesEdit.socket.emit('load', commons.urlParam('id'), (data) => {
-        customVariablesEdit.id = commons.urlParam('id')
-        customVariablesEdit.variableNameInitial = data.variable.variableName
-        customVariablesEdit.variableName = data.variable.variableName
-        customVariablesEdit.description = data.variable.description
-        customVariablesEdit.currentValue = data.variable.currentValue
-        customVariablesEdit.usableOptions = data.variable.usableOptions
-        customVariablesEdit.evalValueInit = data.variable.evalValue
-        customVariablesEdit.selectedRunEvery = data.variable.runEveryType
-        customVariablesEdit.runEveryX = data.variable.runEvery / data.variable.runEveryTypeValue
-        customVariablesEdit.selectedType = data.variable.type
-        customVariablesEdit.responseType = data.variable.responseType
-        customVariablesEdit.responseText = data.variable.responseText
-        customVariablesEdit.permission = data.variable.permission || 0
-        customVariablesEdit.readOnly = data.variable.readOnly || false
-        for (let h of data.history) {
-          // change timestamp to milliseconds
-          h.timestamp = new Date(h.timestamp).getTime()
-        }
-        customVariablesEdit.history = _.chunk(_.orderBy(data.history, 'timestamp', 'desc'), 15)[0] || []
-      })
-    }
-  }
-  customVariablesEditInit()
 </script>
+-->
