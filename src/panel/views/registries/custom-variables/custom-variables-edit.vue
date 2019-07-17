@@ -29,6 +29,152 @@
     </panel>
 
     <loading v-if="!state.loaded /* State.DONE */" />
+    <b-form v-else>
+      <b-form-group
+        :label="translate('registry.customvariables.variable.name')"
+        label-for="variableName"
+        :description="translate('registry.customvariables.variable.help')"
+      >
+        <b-form-input
+          id="variableName"
+          v-model="variableName"
+          type="text"
+          :placeholder="translate('registry.customvariables.variable.placeholder')"
+        ></b-form-input>
+      </b-form-group>
+
+      <b-form-group
+        :label="translate('registry.customvariables.description.name')"
+        label-for="description"
+        :description="translate('registry.customvariables.description.help')"
+      >
+        <b-form-input
+          id="description"
+          v-model="description"
+          type="text"
+          :placeholder="translate('registry.customvariables.description.placeholder')"
+        ></b-form-input>
+      </b-form-group>
+
+      <b-row>
+        <b-col>
+          <b-form-group
+            :label="translate('registry.customvariables.response.name')"
+            label-for="response"
+          >
+            <button :class="[responseType === 0 ? 'btn-primary' : 'btn-outline-primary']" type="button" class="btn" @click="responseType = 0; responseText = ''">{{ translate('registry.customvariables.response.default') }}</button>
+            <button :class="[responseType === 1 ? 'btn-primary' : 'btn-outline-primary']" type="button" class="btn" @click="responseType = 1; responseText = ''">{{ translate('registry.customvariables.response.custom') }}</button>
+            <button ref="tooltip1" :class="[responseType === 2 ? 'btn-primary' : 'btn-outline-primary']" type="button" class="btn" @click="responseType = 2; responseText = ''">{{ translate('registry.customvariables.response.command') }}
+              <fa icon="question"/>
+            </button>
+
+            <b-tooltip :target="() => $refs['tooltip1']" placement="bottom" triggers="hover">
+              {{translate('registry.customvariables.useIfInCommand')}}
+            </b-tooltip>
+          </b-form-group>
+          <b-form-group
+            v-if="responseType === 1"
+            :description="translate('registry.customvariables.response.default-help')"
+          >
+            <b-form-input
+              v-model="responseText"
+              type="text"
+              :placeholder="translate('registry.customvariables.response.default-placeholder')"
+            ></b-form-input>
+          </b-form-group>
+        </b-col>
+        <b-col>
+          <b-form-group
+            :label="translate('registry.customvariables.permissionToChange')"
+            label-for="permission"
+          >
+            <b-form-select plain v-model="permission" id="permission">
+              <option v-for="p of permissions" v-bind:value="p.id" :key="p.id">
+                {{ getPermissionName(p.id) | capitalize }}
+              </option>
+            </b-form-select>
+          </b-form-group>
+        </b-col>
+      </b-row>
+
+      <b-row>
+        <b-col>
+          <b-form-group
+            :label="translate('registry.customvariables.type.name')"
+            label-for="type"
+          >
+            <b-form-select plain v-model="selectedType" id="selectedType">
+              <option v-for="type in types" v-bind:value="type.value" :key="type.value">
+                {{ type.text }}
+              </option>
+            </b-form-select>
+          </b-form-group>
+        </b-col>
+        <b-col>
+          <b-form-group
+            :label="translate('registry.customvariables.currentValue.name')"
+            label-for="type"
+          >
+            <b-input-group>
+              <b-form-input
+                v-if="selectedType !== 'options'"
+                v-model="currentValue"
+                :type="selectedType"
+                :readonly="(['', 'eval'].includes(selectedType))"
+                :placeholder="translate('registry.customvariables.response.default-placeholder')"
+              ></b-form-input>
+              <b-form-select plain v-model="currentValue" id="selectedType" v-else>
+                <option v-for="option in usableOptionsArray" :value="option" :key="option">{{ option }}</option>
+              </b-form-select>
+              <b-input-group-append v-if="selectedType !== 'eval'">
+                <b-button :variant="readOnly ? 'danger' : 'success'" @click="readOnly = !readOnly">
+                  <template v-if="readOnly">
+                    {{ translate('registry.customvariables.isReadOnly') }}
+                  </template>
+                  <template v-else>
+                    {{ translate('registry.customvariables.isNotReadOnly') }}
+                  </template>
+                </b-button>
+              </b-input-group-append>
+            </b-input-group>
+            <small class="form-text text-muted" v-html="translate('registry.customvariables.currentValue.help')"></small>
+          </b-form-group>
+        </b-col>
+      </b-row>
+
+      <b-form-group
+        v-if="selectedType.toLowerCase() === 'options'"
+        :label="translate('registry.customvariables.usableOptions.name')"
+        label-for="usableOptions"
+        :description="translate('registry.customvariables.usableOptions.help')"
+      >
+        <b-form-input
+          id="usableOptions"
+          v-model="usableOptions"
+          :placeholder="translate('registry.customvariables.usableOptions.placeholder')"
+        ></b-form-input>
+      </b-form-group>
+
+
+      <b-form-group
+        v-if="selectedType.toLowerCase() !== 'eval'"
+        :label="translate('registry.customvariables.history')"
+        label-for="history"
+      >
+        <b-table class="hide-headers" :fields="['time', 'sender', 'newValue']" :items="history" borderless small>
+          <template slot="time" slot-scope="data">
+            {{data.item.timestamp | moment('LL')}} {{ data.item.timestamp | moment('LTS') }}
+          </template>
+          <template slot="sender" slot-scope="data">
+            {{ data.value ? data.value : 'Dashboard'}}
+          </template>
+          <template slot="newValue" slot-scope="data">
+            {{ data.item.currentValue }}
+          </template>
+        </b-table>
+      </b-form-group>
+
+    </b-form>
 
   </b-container>
 </template>
@@ -94,125 +240,87 @@ export default class customVariablesEdit extends Vue {
   history: any[] = [];
   permissions: any[] = [];
 
-  mounted() {
+  async mounted() {
     this.state.loaded = false;
     if (this.$route.params.id) {
-      this.socket.emit('load', this.$route.params.id, (data) => {
-        this.variableNameInitial = data.variable.variableName
-        this.variableName = data.variable.variableName
-        this.description = data.variable.description
-        this.currentValue = data.variable.currentValue
-        this.usableOptions = data.variable.usableOptions
-        this.evalValueInit = data.variable.evalValue
-        this.selectedRunEvery = data.variable.runEveryType
-        this.runEveryX = data.variable.runEvery / data.variable.runEveryTypeValue
-        this.selectedType = data.variable.type
-        this.responseType = data.variable.responseType
-        this.responseText = data.variable.responseText
-        this.permission = data.variable.permission || 0
-        this.readOnly = data.variable.readOnly || false
-        for (let h of data.history) {
-          // change timestamp to milliseconds
-          h.timestamp = new Date(h.timestamp).getTime()
-        }
-        this.history = chunk(orderBy(data.history, 'timestamp', 'desc'), 15)[0] || []
-        this.state.loaded = true;
-      })
+      await Promise.all([
+        new Promise(resolve => {
+          this.psocket.emit('find', {}, (err, data) => {
+            if (err) return console.error(err)
+            this.permissions = orderBy(data, 'order', 'asc')
+
+            if (!this.$route.params.id) {
+              if (!this.permission) {
+                this.permission = orderBy(this.permissions, 'order', 'asc').pop().id
+              }
+            }
+            resolve()
+          })
+        }),
+        new Promise(resolve => {
+          this.socket.emit('load', this.$route.params.id, (data) => {
+            this.variableNameInitial = data.variable.variableName
+            this.variableName = data.variable.variableName
+            this.description = data.variable.description
+            this.currentValue = data.variable.currentValue
+            this.usableOptions = data.variable.usableOptions
+            this.evalValueInit = data.variable.evalValue
+            this.selectedRunEvery = data.variable.runEveryType
+            this.runEveryX = data.variable.runEvery / data.variable.runEveryTypeValue
+            this.selectedType = data.variable.type
+            this.responseType = data.variable.responseType
+            this.responseText = data.variable.responseText
+            this.permission = data.variable.permission || 0
+            this.readOnly = data.variable.readOnly || false
+            for (let h of data.history) {
+              // change timestamp to milliseconds
+              h.timestamp = new Date(h.timestamp).getTime()
+            }
+            this.history = chunk(orderBy(data.history, 'timestamp', 'desc'), 15)[0] || []
+            resolve()
+          })
+        })
+      ])
+    }
+    this.state.loaded = true;
+  }
+
+  /*get evalValue() {
+    return !_.isNil(this.evalInput) ? this.evalInput.getValue() : ''
+  }*/
+
+  get usableOptionsArray() {
+    if (typeof this.usableOptions === 'string') {
+      return this.usableOptions.split(',').map((o) => o.trim()).filter((o) => o.length > 0)
     } else {
-      this.state.loaded = true;
+      return []
+    }
+  }
+
+  getPermissionName(id) {
+    if (!id) return 'Disabled'
+    const permission = this.permissions.find((o) => {
+      return o.id === id
+    })
+    if (typeof permission !== 'undefined') {
+      if (permission.name.trim() === '') {
+        return permission.id
+      } else {
+        return permission.name
+      }
+    } else {
+      return null
     }
   }
 }
 </script>
+
+<style>
+  table.hide-headers thead { display: none !important; }
+</style>
+
 <!--
 
-  <div class="widget pt-3">
-    <!-- Editation stuff here ->
-    <form>
-        <div class="form-group col-md-12">
-          <label for="variable_name_input">{{ commons.translate('registry.customvariables.variable.name') }}</label>
-          <input v-bind:class="{ 'is-invalid': hasError.variableName || hasError.isNotUnique }" v-model="variableName" type="text" class="form-control" id="variable_name_input" v-bind:placeholder="commons.translate('registry.customvariables.variable.placeholder')">
-          <small class="form-text text-muted">{{ commons.translate('registry.customvariables.variable.help') }}</small>
-          <div class="invalid-feedback">
-            <span v-if="hasError.isNotUnique" v-html="commons.translate('registry.customvariables.variable.error.isNotUnique')"></span>
-            <span v-if="!hasError.isNotUnique">{{ commons.translate('registry.customvariables.variable.error.isEmpty') }}</span>
-          </div>
-        </div>
-
-        <div class="form-group col-md-12">
-          <label for="description_input">{{ commons.translate('registry.customvariables.description.name') }}</label>
-          <input v-model="description" type="text" class="form-control" id="description_input" v-bind:placeholder="commons.translate('registry.customvariables.description.placeholder')">
-          <small class="form-text text-muted">{{ commons.translate('registry.customvariables.description.help') }}</small>
-        </div>
-
-        <div class="form-group row col-12 pr-0">
-          <div class="col-4">
-            <div class="row ml-0 mr-0">
-              <label for="description_input">{{ commons.translate('registry.customvariables.response.name') }}</label>
-            </div>
-
-            <button :class="[responseType === 0 ? 'btn-primary' : 'btn-outline-primary']" type="button" class="btn" @click="responseType = 0; responseText = ''">{{ commons.translate('registry.customvariables.response.default') }}</button>
-            <button :class="[responseType === 1 ? 'btn-primary' : 'btn-outline-primary']" type="button" class="btn" @click="responseType = 1; responseText = ''">{{ commons.translate('registry.customvariables.response.custom') }}</button>
-            <button :class="[responseType === 2 ? 'btn-primary' : 'btn-outline-primary']" type="button" class="btn" @click="responseType = 2; responseText = ''">{{ commons.translate('registry.customvariables.response.command') }}
-              <strong style="border-bottom: 1px dotted gray" data-toggle="tooltip" data-placement="bottom" :title="commons.translate('registry.customvariables.useIfInCommand')">?</strong>
-            </button>
-          </div>
-
-          <div class="col-4">
-            <label style="margin: 0px 0px 3px; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px;">{{ commons.translate('registry.customvariables.permissionToChange') }}</label>
-            <select class="form-control" v-model="permission">
-              <option v-for="p of permissions" v-bind:value="p.id" :key="p.id">
-                  {{ getPermissionName(p.id) | capitalize }}
-              </option>
-            </select>
-          </div>
-
-          <div class="col-12 pr-0">
-            <input v-if="responseType === 1" v-model="responseText" type="text" class="form-control mt-2" v-bind:placeholder="commons.translate('registry.customvariables.response.default-placeholder')">
-            <small v-if="responseType === 1" class="form-text text-muted">{{ commons.translate('registry.customvariables.response.default-help') }}</small>
-          </div>
-        </div>
-
-        <div class="form-group row pl-3 pr-3">
-          <div class="col-md-4">
-            <label for="type">{{ commons.translate('registry.customvariables.type.name') }}</label>
-            <select id="type" class="form-control" v-bind:class="{ 'is-invalid': hasError.selectedType }" v-model="selectedType">
-              <option value="" selected>{{ commons.translate('registry.customvariables.choose') }}</option>
-              <option v-for="type in types" v-bind:value="type.value">
-                {{ type.text }}
-              </option>
-            </select>
-            <div class="invalid-feedback">{{ commons.translate('registry.customvariables.type.error.isNotSelected') }}</div>
-          </div>
-
-          <div class="col-md-8">
-            <label for="current_value_input">{{ commons.translate('registry.customvariables.currentValue.name') }}</label>
-            <div class="input-group">
-              <input v-if="selectedType !== 'options'" v-model="currentValue" type="text" class="form-control" id="current_value_input" :readonly="(['', 'eval'].includes(selectedType)) ? true : false">
-              <select v-if="selectedType === 'options'" v-model="currentValue" class="form-control">
-                  <option v-for="option in usableOptionsArray" :value="option">{{ option }}</option>
-              </select>
-
-              <div class="input-group-append" v-if="selectedType !== 'eval'">
-                <button  class="btn form-control" v-bind:class="{ 'btn-danger': readOnly, 'btn-success': !readOnly }" v-on:click="toggleReadOnly">
-                  <template v-if="readOnly">
-                    {{ commons.translate('registry.customvariables.isReadOnly') }}
-                  </template>
-                  <template v-else>
-                    {{ commons.translate('registry.customvariables.isNotReadOnly') }}
-                  </template>
-                </button>
-              </div>
-            </div>
-            <small class="form-text text-muted" v-html="commons.translate('registry.customvariables.currentValue.help')"></small>
-          </div>
-        </div>
-        <div class="form-group col-md-12" v-if="selectedType.toLowerCase() === 'options'">
-          <label for="usable_options_input">{{ commons.translate('registry.customvariables.usableOptions.name') }}</label>
-          <input v-bind:class="{ 'is-invalid': hasError.usableOptions }" v-model="usableOptions" type="text" class="form-control" id="usable_options_input" v-bind:placeholder="commons.translate('registry.customvariables.usableOptions.placeholder')">
-          <small class="form-text text-muted" v-html="commons.translate('registry.customvariables.usableOptions.help')"></small>
-          <div class="invalid-feedback">{{ commons.translate('registry.customvariables.usableOptions.error.atLeastOneValue') }}</div>
-        </div>
 
         <div class="form-group row pl-3 pr-3" v-if="selectedType === 'eval'">
           <div class="col-md-8">
@@ -236,60 +344,13 @@ export default class customVariablesEdit extends Vue {
 
           </div>
         </div>
-
-        <div class="form-group row pl-3 pr-3" v-if="selectedType !== 'eval'">
-          <div class="col">
-              <label for="variable_name_input">{{ commons.translate('registry.customvariables.history') }}</label>
-              <div class="alert alert-danger" v-if="history.length === 0">{{ commons.translate('registry.customvariables.historyIsEmpty') }}</div>
-              <div v-for="h of history" v-else class="alert alert-light p-0 m-0">
-                <div class="row">
-                  <div class="col-4">{{moment(h.timestamp).format('LL')}} {{ moment(h.timestamp).format('LTS') }}</div>
-                  <div class="col-2"><strong>{{ h.sender ? h.sender : 'Dashboard'}}</strong></div>
-                  <div class="col">
-                    {{ h.oldValue }} => {{ h.currentValue}}
-                  </div>
-                </div>
-              </div>
-            </div>
-        </div>
       </form>
-
-      <div class="form-group col-md-12" v-if="isEditation">
-        <button type="button" class="btn btn-danger" key="deleting" data-lang="dialog.buttons.delete" v-if="deleteState === 'waiting'" v-on:click="deleteState='deleting'">{{ commons.translate('dialog.buttons.delete') }}</button>
-        <div class="btn-group" role="group" v-if="deleteState === 'deleting'">
-          <button type="button" class="btn btn-danger" key="deleted" data-lang="dialog.buttons.yes" v-on:click="deleteState='deleted'">{{ commons.translate('dialog.buttons.yes') }}</button>
-          <button type="button" class="btn btn-success" key="waiting" data-lang="dialog.buttons.no" v-on:click="deleteState='waiting'">{{ commons.translate('dialog.buttons.no') }}</button>
-        </div>
-        <small class="form-text text-danger" v-html="commons.translate('registry.customvariables.warning')"></small>
-      </div>
     <!-- ->
   </div>
 </span>
 
 <script>
       methods: {
-        getPermissionName: function (id) {
-          if (!id) return 'Disabled'
-          const permission = this.permissions.find((o) => {
-            return o.id === id
-          })
-          if (typeof permission !== 'undefined') {
-            if (permission.name.trim() === '') {
-              return permission.id
-            } else {
-              return permission.name
-            }
-          } else {
-            return null
-          }
-        },
-        moment: function (args) {
-          return moment(args) // expose moment function
-        },
-        toggleReadOnly: function (event) {
-          if (event) event.preventDefault()
-          this.readOnly = !this.readOnly
-        },
         testScript: function () {
           this.socket.emit('test.script', { evalValue: this.evalValue, currentValue: this.currentValue }, (err, response) => {
             if (err) {
