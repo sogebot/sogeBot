@@ -116,7 +116,7 @@ module.exports = [{
   },
   output: {
     path: path.resolve(__dirname, 'public', 'dist', 'js'),
-    filename: 'output.js',
+    filename: 'overlay.js',
     chunkFilename: '[chunkhash].js',
     publicPath: '/dist/js/'
   },
