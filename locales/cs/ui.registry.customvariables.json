@@ -1,4 +1,7 @@
 {
+  "urls": "Adresy URL",
+  "generateurl": "Vygenerovat novou URL",
+  "show-examples": "Ukázat CURL příklady",
   "response": {
     "name": "Odpověď po nastavení",
     "default": "Výchozí",

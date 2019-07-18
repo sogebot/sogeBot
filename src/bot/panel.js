@@ -51,6 +51,14 @@ function Panel () {
     global.systems.highlights.url(req, res)
   })
 
+  // customvariables system
+  app.get('/customvariables/:id', (req, res) => {
+    global.customvariables.getURL(req, res)
+  })
+  app.post('/customvariables/:id', (req, res) => {
+    global.customvariables.postURL(req, res)
+  })
+
   // static routing
   app.use('/dist', express.static(path.join(__dirname, '..', 'public', 'dist')))
   app.get('/popout/', this.authUser, function (req, res) {
