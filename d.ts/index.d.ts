@@ -3,6 +3,11 @@ declare module '*.vue' {
   export default Vue;
 }
 
+declare module '*.txt' {
+  const content: string;
+  export default content;
+}
+
 declare namespace NodeJS {
   export interface Global {
     linesParsed: number;
