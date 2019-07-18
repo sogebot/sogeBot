@@ -56,6 +56,10 @@ module.exports = [{
   module: {
     rules: [
       {
+        test: /\.txt$/i,
+        use: 'raw-loader',
+      },
+      {
         test: /\.ts$/,
         exclude: /(node_modules|bower_components)/,
         use: [{
@@ -126,6 +130,10 @@ module.exports = [{
   ],
   module: {
     rules: [
+      {
+        test: /\.txt$/i,
+        use: 'raw-loader',
+      },
       {
         test: /\.ts$/,
         exclude: /(node_modules|bower_components)/,

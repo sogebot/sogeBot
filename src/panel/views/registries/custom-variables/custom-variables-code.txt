@@ -1,0 +1,41 @@
+/* Available functions
+  user(username?: string): Promise<{ username: string, id: string, is: { follower: boolean, mod: boolean, online: boolean, subscriber: boolean, vip: boolean }}> - returns user object (if null -> sender)
+  url(url: string, opts?: { method: 'POST' | 'GET', headers: object, data: object}): Promise<{ data: object, status: number, statusText: string}>
+*
+* Available variables
+  _, _current, users, param (only in custom command)
+  sender?: { // (only in custom commands, keyword)
+    username: string,
+    userId: string,
+  }
+  random: {
+    online: {
+      viewer: string,
+      follower: string,
+      subscriber: string
+    },
+    viewer: string,
+    follower: string,
+    subscriber: string
+  }
+  stream: {
+    uptime: string,
+    chatMessages: number,
+    currentViewers: number,
+    currentBits: number,
+    currentFollowers: number,
+    currentHosts: number,
+    currentViews: number,
+    currentTips: number,
+    currentWatched: number,
+    currency: string,
+    maxViewers: number,
+    newChatters: number,
+    game: string,
+    status: string
+  }
+*
+* IMPORTANT: Must contain return statement!
+*/
+
+return '';
