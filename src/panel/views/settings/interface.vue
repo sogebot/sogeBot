@@ -232,6 +232,10 @@ export default class interfaceSettings extends Vue {
     }, 1000)
   }
 
+  destroyed() {
+    clearInterval(this.heightOfMenuInterval)
+  }
+
   heightOfMenuUpdate() {
     this.heightOfMenu = String(window.innerHeight - Math.max((<HTMLElement>this.$refs.menu).getBoundingClientRect().top, this.topOfMenu) - 50) + 'px';
   }
