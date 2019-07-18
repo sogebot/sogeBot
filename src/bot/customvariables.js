@@ -23,6 +23,53 @@ class CustomVariables {
     }
   }
 
+  async getURL(req: Request, res: Response) {
+    try {
+      const variable = (await global.db.engine.find('custom.variables'))
+        .find(variable => {
+          return _.get(variable, 'urls', []).find(url => url.id === req.params.id)
+        });
+      if (variable) {
+        if (_.get(variable.urls.find(url => url.id === req.params.id), 'access.GET', false)) {
+          return res.status(200).send({ value: await this.getValueOf(variable.variableName) });
+        } else {
+          return res.status(403).send({ error: 'This endpoint is not enabled for GET', code: 403 });
+        }
+      } else {
+        return res.status(404).send({ error: 'Variable not found', code: 404 });
+      }
+    } catch (e) {
+      res.status(500).send({ error: 'Internal Server Error', code: 500 });
+      throw e;
+    }
+  }
+
+  async postURL(req: Request, res: Response) {
+    try {
+      const variable = (await global.db.engine.find('custom.variables'))
+        .find(variable => {
+          return _.get(variable, 'urls', []).find(url => url.id === req.params.id)
+        });
+      if (variable) {
+        if (_.get(variable.urls.find(url => url.id === req.params.id), 'access.POST', false)) {
+          const value = await this.setValueOf(variable.variableName, req.body.value, {});
+          if (value.isOk) {
+            return res.status(200).send({ oldValue: variable.currentValue, value: value.updated.setValue });
+          } else {
+            return res.status(400).send({ error: 'This value is not applicable for this endpoint', code: 400 });
+          }
+        } else {
+          return res.status(403).send({ error: 'This endpoint is not enabled for POST', code: 403 });
+        }
+      } else {
+        return res.status(404).send({ error: 'Variable not found', code: 404 });
+      }
+    } catch (e) {
+      res.status(500).send({ error: 'Internal Server Error', code: 500 });
+      throw e;
+    }
+  }
+
   async addMenuAndListenersToPanel () {
     clearTimeout(this.timeouts[`${this.constructor.name}.addMenuAndListenersToPanel`]);
 
@@ -291,12 +338,6 @@ class CustomVariables {
     } else {
       // set item permission to owner if missing
       item.permission = typeof item.permission === 'undefined' ? permission.CASTERS : item.permission;
-      let [isVIP, isMod, isOwner] = await Promise.all([
-        commons.isVIP(opts.sender),
-        commons.isModerator(opts.sender),
-        commons.isOwner(opts.sender)
-      ]);
-
       if (typeof opts.sender === 'string') {
         opts.sender = {
           username: opts.sender,

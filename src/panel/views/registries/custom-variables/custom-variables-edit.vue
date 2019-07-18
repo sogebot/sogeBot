@@ -57,6 +57,73 @@
         ></b-form-input>
       </b-form-group>
 
+      <b-form-group>
+        <label>{{translate('registry.customvariables.urls')}}</label> <b-button size="sm" :variant="showCurlExample ? 'secondary' : 'outline-secondary'" @click="showCurlExample = !showCurlExample">{{translate('registry.customvariables.show-examples')}}</b-button>
+        <b-row v-if="showCurlExample">
+          <b-col class="mb-0 p-3 mt-3 ml-3 mr-3 border">
+            <kbd style="font-size: 0.7rem;">
+              $ curl -X GET {{origin}}/customvariables/&lt;generated-id&gt; <br/>
+              { "value": "{{currentValue}}" }
+            </kbd>
+          </b-col>
+          <b-col class="mb-0 p-3 mt-3 ml-3 mr-3 border">
+            <kbd style="font-size: 0.7rem;">
+              $ curl -X POST {{origin}}/customvariables/&lt;generated-id&gt; -H "Content-Type:
+ application/json" -d '{ "value": "yourNewValue" }' <br/>
+              { "oldValue": "{{currentValue}}", "value": "yourNewValue" }
+            </kbd>
+          </b-col>
+        </b-row>
+        <b-row v-if="showCurlExample">
+          <b-col class="mb-0 p-3 mt-3 ml-3 mr-3 border">
+            <kbd style="font-size: 0.7rem;">
+              $ curl -X GET {{origin}}/customvariables/&lt;generated-id&gt; <br/>
+              { "error": "This endpoint is not enabled for GET", code: 403 }
+            </kbd>
+          </b-col>
+          <b-col class="mb-0 p-3 mt-3 ml-3 mr-3 border">
+            <kbd style="font-size: 0.7rem;">
+              $ curl -X POST {{origin}}/customvariables/&lt;generated-id&gt; -H "Content-Type:
+ application/json" -d '{ "value": "yourNewValue" }' <br/>
+              { "error": "This endpoint is not enabled for POST", code: 400 }
+            </kbd>
+          </b-col>
+        </b-row>
+        <b-row v-if="showCurlExample">
+          <b-col class="p-3 m-3"></b-col>
+          <b-col class="p-3 m-3 border">
+            <kbd style="font-size: 0.7rem;">
+              $ curl -X POST {{origin}}/customvariables/&lt;generated-id&gt; -H "Content-Type:
+ application/json" -d '{ "value": "yourNewValue" }' <br/>
+              { "error": "This value is not applicable for this endpoint", code: 400 }
+            </kbd>
+          </b-col>
+        </b-row>
+        <b-row v-if="showCurlExample">
+          <b-col class="p-3 m-3"></b-col>
+          <b-col class="p-3 m-3 border">
+            <kbd style="font-size: 0.7rem;">
+              $ curl -X POST {{origin}}/customvariables/&lt;generated-id&gt; -H "Content-Type:
+ application/json" -d '{ "value": "yourNewValue" }' <br/>
+              { "error": "This value is not applicable for this endpoint", acceptableValues: ['value1', 'value2'], code: 400 }
+            </kbd>
+          </b-col>
+        </b-row>
+        <b-list-group>
+          <b-list-group-item v-for="url of urls" :key="url.id" class="p-0 d-flex">
+            <b-button-group size="sm" class="btn-block" style="flex-basis: max-content;">
+              <b-button :variant="url.access.GET ? 'success' : 'danger'" @click="url.access.GET = !url.access.GET">GET</b-button>
+              <b-button :variant="url.access.POST ? 'success' : 'danger'" @click="url.access.POST = !url.access.POST">POST</b-button>
+            </b-button-group>
+            <div class="w-100 p-2">{{origin}}/customvariables/{{url.id}}</div>
+            <b-button-group size="sm" class="btn-block" style="flex-basis: max-content;">
+              <hold-button class="btn-danger btn-sm" icon="trash" @trigger="removeURL(url.id)"/>
+            </b-button-group>
+          </b-list-group-item>
+          <b-list-group-item button variant="info" @click="generateURL"><fa icon="plus"/> {{ translate('registry.customvariables.generateurl') }}</b-list-group-item>
+        </b-list-group>
+      </b-form-group>
+
       <b-row>
         <b-col>
           <b-form-group
@@ -216,6 +283,7 @@
 <script lang="ts">
 import { Vue, Component, Watch } from 'vue-property-decorator';
 import { chunk, orderBy, get } from 'lodash';
+import uuid from 'uuid/v4';
 
 import { codemirror } from 'vue-codemirror';
 import 'codemirror/lib/codemirror.css';
@@ -275,12 +343,15 @@ export default class customVariablesEdit extends Vue {
   selectedRunEvery: string = 'isUsed';
   runEveryX: number = 1;
 
+  showCurlExample: boolean = false;
+
   variableName: string = '';
   description: string = '';
   currentValue: string = '';
   usableOptions: string = '';
   readOnly: boolean = false;
   permission: string | null = null;
+  urls: { id: string; access: { GET: boolean; POST: boolean }}[] = [];
 
   evalValue: string = evalDefault;
   evalError: string | null = null
@@ -330,6 +401,7 @@ export default class customVariablesEdit extends Vue {
             this.selectedType = data.variable.type;
             this.responseType = data.variable.responseType;
             this.responseText = data.variable.responseText;
+            this.urls = data.variable.urls || [];
             this.permission = data.variable.permission || 0;
             this.readOnly = data.variable.readOnly || false;
             for (let h of data.history) {
@@ -374,6 +446,21 @@ export default class customVariablesEdit extends Vue {
     } else {
       return []
     }
+  }
+
+  get origin() {
+    return window.location.origin;
+  }
+
+  generateURL() {
+    this.urls.push({
+      id: uuid(),
+      access: { GET: false, POST: false }
+    });
+  }
+
+  removeURL(id) {
+    this.urls = this.urls.filter(o => o.id !== id);
   }
 
   getPermissionName(id) {
@@ -445,6 +532,7 @@ export default class customVariablesEdit extends Vue {
         variableName: this.variableName,
         description: this.description,
         currentValue: this.currentValue,
+        urls: this.urls,
         usableOptions: this.usableOptions || '',
         evalValue: this.evalValue,
         runEvery: this.selectedType === 'eval'
