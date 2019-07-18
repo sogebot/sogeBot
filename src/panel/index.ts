@@ -110,6 +110,8 @@ const main = async () => {
       { path: '/settings/permissions/:id?', name: 'PermissionsSettings', component: () => import('./views/settings/permissions.vue') },
       { path: '/settings/:type/:id?', name: 'InterfaceSettings', component: () => import('./views/settings/interface.vue') },
 
+      { path: '/registry/customvariables/list', name: 'CustomVariableList', component: () => import('./views/registries/custom-variables/custom-variables-list.vue') },
+      { path: '/registry/customvariables/edit/:id?', name: 'CustomVariableEdit', component: () => import('./views/registries/custom-variables/custom-variables-edit.vue') },
       { path: '/registry/goals/list', name: 'GoalsRegistryList', component: () => import('./views/registries/goalsList.vue') },
       { path: '/registry/goals/edit/:id?', name: 'GoalsRegistryEdit', component: () => import('./views/registries/goalsEdit.vue') },
     ],
@@ -118,7 +120,7 @@ const main = async () => {
   new Vue({
     router,
     created() {
-      this.$moment.locale(global.configuration.core.general.lang); // set proper moment locale
+      this.$moment.locale(global.configuration.lang); // set proper moment locale
     },
     template: `
       <div id="app">
