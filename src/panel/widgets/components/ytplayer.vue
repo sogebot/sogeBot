@@ -16,7 +16,7 @@
           <fa icon="pause" />
         </button>
       </li>
-      <li role="presentation" class="nav-item" style="flex-shrink: 0">
+      <li role="presentation" class="nav-item" style="flex-shrink: 0" id="youtubeDropdown">
         <div class="btn-group" style="height:100%;">
           <button class="btn nav-btn btn-secondary" @click="next">
             <fa icon="forward" />
@@ -24,7 +24,7 @@
           <button type="button" style="border-left: 1px solid rgba(0, 0, 0, 0.2);" class="btn btn-secondary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             <span class="sr-only">Toggle Dropdown</span>
           </button>
-          <div class="dropdown-menu dropdown-detach">
+          <div class="dropdown-menu" id="youtubeDropdownData">
             <button type="button" class="dropdown-item" @click="nextAndRemoveFromPlaylist">
               skip &amp; remove from playlist
             </button>
@@ -202,6 +202,14 @@ export default {
   },
   mounted: function () {
     this.$emit('mounted')
+
+    $('#youtubeDropdown').on('show.bs.dropdown', function() {
+      $('body').append($('#youtubeDropdownData').css({
+        position: 'absolute',
+        left: $('#youtubeDropdown').offset().left,
+        top: $('#youtubeDropdown').offset().top + 5
+      }).detach())
+    })
   }
 }
 </script>
