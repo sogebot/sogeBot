@@ -1,4 +1,7 @@
 {
+  "urls": "URLs",
+  "generateurl": "Generate new URL",
+  "show-examples": "show CURL examples",
   "response": {
     "name": "Response after variable set",
     "default": "Default",
