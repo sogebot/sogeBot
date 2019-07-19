@@ -291,6 +291,12 @@ import 'codemirror/lib/codemirror.css';
 
 import evalDefault from './custom-variables-code.txt';
 
+Component.registerHooks([
+  'beforeRouteEnter',
+  'beforeRouteLeave',
+  'beforeRouteUpdate' // for vue-router 2.2+
+])
+
 type State = { IDLE: 0, PROGRESS: 1, DONE: 2, ERROR: 3 }
 const State: State = { IDLE: 0, PROGRESS: 1, DONE: 2, ERROR: 3 }
 
@@ -419,6 +425,32 @@ export default class customVariablesEdit extends Vue {
       })
     ])
     this.state.loaded = true;
+  }
+
+  beforeRouteUpdate(to, from, next) {
+    if (this.pending) {
+      const isOK = confirm('You will lose your pending changes. Do you want to continue?')
+      if (!isOK) {
+        next(false);
+      } else {
+        next();
+      }
+    } else {
+      next();
+    }
+  }
+
+  beforeRouteLeave(to, from, next) {
+    if (this.pending) {
+      const isOK = confirm('You will lose your pending changes. Do you want to continue?')
+      if (!isOK) {
+        next(false);
+      } else {
+        next();
+      }
+    } else {
+      next();
+    }
   }
 
   @Watch('variableName')
@@ -576,6 +608,7 @@ export default class customVariablesEdit extends Vue {
         }
         this.state.save = State.DONE
         this.error = null;
+        this.pending = false;
         this.$router.push({ name: 'CustomVariableEdit', params: { id: _id } });
       })
     } catch (e) {
