@@ -112,12 +112,12 @@
         </b-row>
         <b-list-group>
           <b-list-group-item v-for="url of urls" :key="url.id" class="p-0 d-flex">
-            <b-button-group size="sm" class="btn-block" style="flex-basis: max-content;">
+            <b-button-group size="sm" class="btn-block" style="flex-basis: 0;">
               <b-button :variant="url.access.GET ? 'success' : 'danger'" @click="url.access.GET = !url.access.GET">GET</b-button>
               <b-button :variant="url.access.POST ? 'success' : 'danger'" @click="url.access.POST = !url.access.POST">POST</b-button>
             </b-button-group>
             <div class="w-100 p-2">{{origin}}/customvariables/{{url.id}}</div>
-            <b-button-group size="sm" class="btn-block" style="flex-basis: max-content;">
+            <b-button-group size="sm" class="btn-block" style="flex-basis: 0;">
               <hold-button class="btn-danger btn-sm" icon="trash" @trigger="removeURL(url.id)"/>
             </b-button-group>
           </b-list-group-item>
