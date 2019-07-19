@@ -24,6 +24,7 @@
         </hold-button>
       </template>
       <template v-slot:right>
+        <b-alert show variant="info" v-if="pending" v-html="translate('dialog.changesPending')" class="mr-2 p-2 mb-0"></b-alert>
         <b-alert show variant="danger" v-if="error" v-html="error" class="mr-2 p-2 mb-0"></b-alert>
         <state-button @click="save()" text="saveChanges" :state="state.save"/>
       </template>
@@ -314,6 +315,7 @@ export default class customVariablesEdit extends Vue {
 
   State: State = State;
   state: { loaded: boolean; save: number; test: number } = { loaded: false, save: 0, test: State.IDLE }
+  pending: boolean = false;
 
   types = [{
       value: 'number',
@@ -417,6 +419,25 @@ export default class customVariablesEdit extends Vue {
       })
     ])
     this.state.loaded = true;
+  }
+
+  @Watch('variableName')
+  @Watch('description')
+  @Watch('currentValue')
+  @Watch('usableOptions')
+  @Watch('evalValue')
+  @Watch('selectedRunEvery')
+  @Watch('runEveryX')
+  @Watch('selectedType')
+  @Watch('responseType')
+  @Watch('responseText')
+  @Watch('urls')
+  @Watch('permission')
+  @Watch('readOnly')
+  setPendingState() {
+    if (this.state.loaded) {
+      this.pending = true;
+    }
   }
 
   @Watch('variableName')
