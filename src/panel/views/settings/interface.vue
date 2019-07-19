@@ -102,6 +102,46 @@
               </template>
             </div>
           </div>
+          <template v-if="permissions.length > 0 && Object.keys(settings).includes('__permission_based__') && settings['__permission_based__'][category]">
+            <div :key="category + '__permission_based__#1'">
+              <b-card no-body>
+                <b-tabs pills card vertical>
+                  <b-tab v-for="permission of permissions" :title="permission.name" :key="permission.id">
+                    <b-card-text>
+                      <template v-for="(currentValue, defaultValue) of settings['__permission_based__'][category]">
+                        <div v-if="typeof value === 'object' && !defaultValue.startsWith('_')" class="p-0 pl-2 pr-2 " :key="$route.params.type + '.' + $route.params.id + '.settings.' + defaultValue">
+                          <textarea-from-array
+                            class="pt-1 pb-1"
+                            v-if="currentValue.constructor === Array"
+                            v-bind:value="currentValue[permission.id]"
+                            v-bind:title="translate($route.params.type + '.' + $route.params.id + '.settings.' + defaultValue)"
+                            v-on:update="settings['__permission_based__'][category][defaultValue][permission.id] = $event; triggerDataChange()"
+                          ></textarea-from-array>
+                          <number-input
+                            v-else-if="typeof currentValue[permission.id] === 'number'"
+                            class="pt-1 pb-1"
+                            v-bind:type="typeof currentValue[permission.id]"
+                            v-bind:value="currentValue[permission.id]"
+                            min="0"
+                            v-bind:title="$route.params.type + '.' + $route.params.id + '.settings.' + defaultValue"
+                            v-on:update="settings['__permission_based__'][category][defaultValue][permission.id] = $event.value; triggerDataChange()">
+                          </number-input>
+                          <text-input
+                            v-else
+                            class="pt-1 pb-1"
+                            v-bind:type="typeof currentValue[permission.id]"
+                            v-bind:value="currentValue[permission.id]"
+                            v-bind:title="$route.params.type + '.' + $route.params.id + '.settings.' + defaultValue"
+                            v-on:update="settings['__permission_based__'][category][defaultValue][permission.id] = $event.value; triggerDataChange()"
+                          ></text-input>
+                        </div>
+                      </template>
+                    </b-card-text>
+                  </b-tab>
+                </b-tabs>
+              </b-card>
+            </div>
+          </template>
         </template>
       </div>
 
@@ -204,6 +244,7 @@ export default class interfaceSettings extends Vue {
   @Prop() readonly commons: any;
 
   socket: SocketIOClient.Socket = io({ query: "token=" + this.token });
+  psocket: SocketIOClient.Socket = io('/core/permissions', { query: "token=" + this.token });
   list: systemFromIO[] = [];
   state: { loaded: State; settings: State } = { loaded: State.NONE, settings: State.NONE };
   settings: any = {};
@@ -216,9 +257,11 @@ export default class interfaceSettings extends Vue {
   heightOfMenu: string = '0';
   heightOfMenuInterval: number = 0;
 
+  permissions: Permissions.Item[] = [];
+
   get settingsWithoutPermissions() {
     let withoutPermissions = {};
-    Object.keys(this.settings).filter(o => o !== '_permissions').forEach((key) => {
+    Object.keys(this.settings).filter(o => !o.includes('permission')).forEach((key) => {
       withoutPermissions[key] = this.settings[key]
     })
     return withoutPermissions
@@ -230,6 +273,11 @@ export default class interfaceSettings extends Vue {
     this.heightOfMenuInterval = window.setInterval(() => {
       this.heightOfMenuUpdate()
     }, 1000)
+
+    this.psocket.emit('find', {}, (err, data) => {
+      if (err) return console.error(err)
+      this.permissions = _.orderBy(data, 'order', 'asc')
+    })
   }
 
   destroyed() {
@@ -353,7 +401,6 @@ export default class interfaceSettings extends Vue {
       }
       delete settings.settings
     }
-
     io(`/${this.$route.params.type}/${this.$route.params.id}`, { query: "token=" + this.token })
       .emit('settings.update', settings, (err) => {
         setTimeout(() => this.state.settings = 0, 1000)

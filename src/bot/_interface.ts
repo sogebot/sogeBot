@@ -15,6 +15,7 @@ class Module {
   public collection: { [x: string]: string };
   public timeouts: { [x: string]: NodeJS.Timeout } = {};
   public settingsList: { category: string; key: string }[] = [];
+  public settingsPermList: { category: string; key: string }[] = [];
   public on: InterfaceSettings.On;
   public socket: SocketIOClient.Socket | null;
 
@@ -124,7 +125,7 @@ class Module {
       }
     }
 
-    return variable.value;
+    return key.startsWith('__permission_based') ? JSON.parse(variable.value) : variable.value;
   }
 
   public prepareCommand(opts: string | Command) {
@@ -260,6 +261,10 @@ class Module {
                     if (this._commands) {
                       this.setCommand(defaultValue, currentValue as string);
                     }
+                  }
+                } else if (key === '__permission_based__') {
+                  for (const vKey of Object.keys(value as any)) {
+                    this['__permission_based__' + vKey] = (value as any)[vKey];
                   }
                 } else {
                   this[key] = value;
@@ -548,6 +553,23 @@ class Module {
       }
     }
 
+    // go through expected permission based settings
+    for (const { category, key } of this.settingsPermList) {
+      if (typeof promisedSettings['__permission_based__'] === 'undefined') {
+        promisedSettings['__permission_based__'] = {};
+      }
+
+      if (category) {
+        if (typeof promisedSettings['__permission_based__'][category] === 'undefined') {
+          promisedSettings['__permission_based__'][category] = {};
+        }
+
+        _.set(promisedSettings, `__permission_based__.${category}.${key}`, await this.getPermissionBasedSettingsValue(key));
+      } else {
+        _.set(promisedSettings, `__permission_based__.${key}`, await this.getPermissionBasedSettingsValue(key));
+      }
+    }
+
     // add command permissions
     if (this._commands.length > 0) {
       promisedSettings._permissions = {};
@@ -770,6 +792,18 @@ class Module {
     } else {
       global.log.warning(`Command ${command} cannot be updated to ${updated}`);
     }
+  }
+
+  protected async getPermissionBasedSettingsValue(key: string): Promise<{[permissionId: string]: any}> {
+    // current permission settings by user
+    const permSet = {};
+
+    // get current full list of permissions
+    for (const p of (_.orderBy(await global.db.engine.find(global.permissions.collection.data), 'order', 'asc')) as Permissions.Item[]) {
+      // set proper value for permId or default value
+      permSet[p.id] = _.get(this, `__permission_based__${key}.${p.id}`, this[key]);
+    }
+    return permSet;
   }
 }
 
