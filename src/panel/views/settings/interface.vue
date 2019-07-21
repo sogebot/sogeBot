@@ -117,6 +117,7 @@
             top: configuration.core.ui.stickystats ? topOfMenu + 'px' : '',
             height: configuration.core.ui.stickystats ? heightOfMenu : 'auto',
             overflow: configuration.core.ui.stickystats ? 'scroll' : 'inherit',
+            'overflow-x': 'hidden',
             'z-index': 0
             }">
           <div class="widget border-0 bg-light" style="height: auto">
