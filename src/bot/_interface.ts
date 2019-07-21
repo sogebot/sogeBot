@@ -125,7 +125,17 @@ class Module {
       }
     }
 
-    return key.startsWith('__permission_based') ? JSON.parse(variable.value) : variable.value;
+    try {
+      if (variable.value) {
+        return key.startsWith('__permission_based') ? JSON.parse(variable.value) : variable.value;
+      } else {
+        return undefined;
+      }
+    } catch (e) {
+      global.log.error({key, variable});
+      global.log.error(e);
+      return undefined;
+    }
   }
 
   public prepareCommand(opts: string | Command) {
@@ -564,9 +574,9 @@ class Module {
           promisedSettings['__permission_based__'][category] = {};
         }
 
-        _.set(promisedSettings, `__permission_based__.${category}.${key}`, await this.getPermissionBasedSettingsValue(key));
+        _.set(promisedSettings, `__permission_based__.${category}.${key}`, await this.getPermissionBasedSettingsValue(key, false));
       } else {
-        _.set(promisedSettings, `__permission_based__.${key}`, await this.getPermissionBasedSettingsValue(key));
+        _.set(promisedSettings, `__permission_based__.${key}`, await this.getPermissionBasedSettingsValue(key, false));
       }
     }
 
@@ -794,14 +804,28 @@ class Module {
     }
   }
 
-  protected async getPermissionBasedSettingsValue(key: string): Promise<{[permissionId: string]: any}> {
+  protected async getPermissionBasedSettingsValue(key: string, set_default_values: boolean = true): Promise<{[permissionId: string]: any}> {
     // current permission settings by user
     const permSet = {};
+    let permId = permission.VIEWERS;
 
     // get current full list of permissions
-    for (const p of (_.orderBy(await global.db.engine.find(global.permissions.collection.data), 'order', 'asc')) as Permissions.Item[]) {
+    for (const p of (_.orderBy(await global.db.engine.find(global.permissions.collection.data), 'order', 'desc')) as Permissions.Item[]) {
       // set proper value for permId or default value
-      permSet[p.id] = _.get(this, `__permission_based__${key}.${p.id}`, this[key]);
+      if (set_default_values || p.id === permission.VIEWERS) {
+        if (p.id === permission.VIEWERS) {
+          // set default value if viewers
+          permSet[p.id] = _.get(this, `__permission_based__${key}.${p.id}`, this[key]);
+        } else {
+          // set value of permission before if anything else (to have proper waterfall inheriting)
+          // we should have correct values as we are desc ordering
+          permSet[p.id] = _.get(this, `__permission_based__${key}.${p.id}`,
+            _.get(this, `__permission_based__${key}.${permId}`, this[key]));
+        }
+        permId = p.id;
+      } else {
+        permSet[p.id] = _.get(this, `__permission_based__${key}.${p.id}`, null);
+      }
     }
     return permSet;
   }

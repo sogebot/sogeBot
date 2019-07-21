@@ -110,30 +110,38 @@
                     <b-card-text>
                       <template v-for="(currentValue, defaultValue) of settings['__permission_based__'][category]">
                         <div v-if="typeof value === 'object' && !defaultValue.startsWith('_')" class="p-0 pl-2 pr-2 " :key="$route.params.type + '.' + $route.params.id + '.settings.' + defaultValue">
-                          <textarea-from-array
-                            class="pt-1 pb-1"
-                            v-if="currentValue.constructor === Array"
-                            v-bind:value="currentValue[permission.id]"
-                            v-bind:title="translate($route.params.type + '.' + $route.params.id + '.settings.' + defaultValue)"
-                            v-on:update="settings['__permission_based__'][category][defaultValue][permission.id] = $event; triggerDataChange()"
-                          ></textarea-from-array>
-                          <number-input
-                            v-else-if="typeof currentValue[permission.id] === 'number'"
-                            class="pt-1 pb-1"
-                            v-bind:type="typeof currentValue[permission.id]"
-                            v-bind:value="currentValue[permission.id]"
-                            min="0"
-                            v-bind:title="$route.params.type + '.' + $route.params.id + '.settings.' + defaultValue"
-                            v-on:update="settings['__permission_based__'][category][defaultValue][permission.id] = $event.value; triggerDataChange()">
-                          </number-input>
-                          <text-input
-                            v-else
-                            class="pt-1 pb-1"
-                            v-bind:type="typeof currentValue[permission.id]"
-                            v-bind:value="currentValue[permission.id]"
-                            v-bind:title="$route.params.type + '.' + $route.params.id + '.settings.' + defaultValue"
-                            v-on:update="settings['__permission_based__'][category][defaultValue][permission.id] = $event.value; triggerDataChange()"
-                          ></text-input>
+                          <div class="d-flex pt-1 pb-1">
+                            <textarea-from-array
+                              v-if="currentValue.constructor === Array"
+                              v-bind:value="getPermissionSettingsValue(permission.id, currentValue)"
+                              v-bind:title="translate($route.params.type + '.' + $route.params.id + '.settings.' + defaultValue)"
+                              v-on:update="settings['__permission_based__'][category][defaultValue][permission.id] = $event; triggerDataChange()"
+                              :readonly="currentValue[permission.id] === null"
+                            ></textarea-from-array>
+                            <number-input
+                              v-else-if="typeof getPermissionSettingsValue(permission.id, currentValue) === 'number'"
+                              v-bind:type="typeof getPermissionSettingsValue(permission.id, currentValue)"
+                              v-bind:value="getPermissionSettingsValue(permission.id, currentValue)"
+                              min="0"
+                              :readonly="currentValue[permission.id] === null"
+                              v-bind:title="$route.params.type + '.' + $route.params.id + '.settings.' + defaultValue"
+                              v-on:update="settings['__permission_based__'][category][defaultValue][permission.id] = $event.value; triggerDataChange()">
+                            </number-input>
+                            <text-input
+                              v-else
+                              v-bind:type="typeof getPermissionSettingsValue(permission.id, currentValue)"
+                              v-bind:value="getPermissionSettingsValue(permission.id, currentValue)"
+                              v-bind:title="$route.params.type + '.' + $route.params.id + '.settings.' + defaultValue"
+                              :readonly="currentValue[permission.id] === null"
+                              v-on:update="settings['__permission_based__'][category][defaultValue][permission.id] = $event.value; triggerDataChange()"
+                            ></text-input>
+                            <button class="btn" :class="[ currentValue[permission.id] === null ? 'btn-primary' : 'btn-secondary' ]"
+                              v-if="permission.id !== '0efd7b1c-e460-4167-8e06-8aaf2c170311' /* VIEWERS */"
+                              @click="togglePermissionLock(permission, currentValue); triggerDataChange()">
+                              <fa v-if="currentValue[permission.id] === null" icon="lock"></fa>
+                              <fa v-else icon="lock-open"></fa>
+                            </button>
+                          </div>
                         </div>
                       </template>
                     </b-card-text>
@@ -424,6 +432,25 @@ export default class interfaceSettings extends Vue {
   }
   triggerDataChange() {
     this.isDataChanged = false; this.isDataChanged = true;
+  }
+
+  getPermissionSettingsValue(permId, values) {
+    const startingOrder = _.get(this.permissions.find(permission => permission.id === permId), 'order', this.permissions.length);
+    for (let i = startingOrder; i <= this.permissions.length; i++) {
+      const value = values[_.get(this.permissions.find(permission => permission.order === i), 'id', '0efd7b1c-e460-4167-8e06-8aaf2c170311' /* viewers */)];
+      if (typeof value !== 'undefined' && value !== null) {
+        return value
+      }
+    }
+    throw new Error(`Value for ${permId} not found in ${JSON.stringify(values)}`);
+  }
+
+  togglePermissionLock(permission, currentValue) {
+    if(currentValue[permission.id] === null) {
+      currentValue[permission.id] = this.getPermissionSettingsValue(permission.id, currentValue)
+    } else {
+      currentValue[permission.id] = null
+    }
   }
 }
 </script>
