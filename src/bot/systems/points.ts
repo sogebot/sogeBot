@@ -112,17 +112,23 @@ class Points extends System {
     if (opts.skip || opts.message.startsWith('!')) {return true;}
 
     let [perMessageInterval, messageInterval, perMessageOfflineInterval, messageOfflineInterval, isOnline] = await Promise.all([
-      this.perMessageInterval,
-      this.messageInterval,
-      this.perMessageOfflineInterval,
-      this.messageOfflineInterval,
+      this.getPermissionBasedSettingsValue('perMessageInterval'),
+      this.getPermissionBasedSettingsValue('messageInterval'),
+      this.getPermissionBasedSettingsValue('perMessageOfflineInterval'),
+      this.getPermissionBasedSettingsValue('messageOfflineInterval'),
       global.cache.isOnline()
     ]);
 
-    const interval = isOnline ? messageInterval : messageOfflineInterval;
-    const ptsPerInterval = isOnline ? perMessageInterval : perMessageOfflineInterval;
+    // get user max permission
+    const permId = await global.permissions.getUserHighestPermission(opts.sender.userId);
+    if (!permId) {
+      return true; // skip without permission
+    }
 
-    if (interval === 0 || ptsPerInterval === 0) {return;}
+    const interval_calculated = isOnline ? messageInterval[permId] : messageOfflineInterval[permId];
+    const ptsPerInterval = isOnline ? perMessageInterval[permId] : perMessageOfflineInterval[permId];
+
+    if (interval_calculated === 0 || ptsPerInterval === 0) {return;}
 
     let [user, userMessages] = await Promise.all([
       global.users.getById(opts.sender.userId),
@@ -130,7 +136,7 @@ class Points extends System {
     ]);
     let lastMessageCount = _.isNil(user.custom.lastMessagePoints) ? 0 : user.custom.lastMessagePoints;
 
-    if (lastMessageCount + interval <= userMessages) {
+    if (lastMessageCount + interval_calculated <= userMessages) {
       await global.db.engine.increment('users.points', { id: opts.sender.userId }, { points: ptsPerInterval });
       await global.db.engine.update('users', { id: opts.sender.userId }, { custom: { lastMessagePoints: userMessages } });
     }
