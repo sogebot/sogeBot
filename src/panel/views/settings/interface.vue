@@ -109,7 +109,7 @@
                   <b-tab v-for="permission of permissions" :title="permission.name" :key="permission.id">
                     <b-card-text>
                       <template v-for="(currentValue, defaultValue) of settings['__permission_based__'][category]">
-                        <div v-if="typeof value === 'object' && !defaultValue.startsWith('_')" class="p-0 pl-2 pr-2 " :key="$route.params.type + '.' + $route.params.id + '.settings.' + defaultValue">
+                        <div v-if="typeof value === 'object' && !defaultValue.startsWith('_')" class="p-0 pl-2 pr-2 " :key="$route.params.type + '.' + $route.params.id + '.settings.' + defaultValue + getPermissionSettingsValue(permission.id, currentValue) ">
                           <div class="d-flex pt-1 pb-1">
                             <textarea-from-array
                               v-if="currentValue.constructor === Array"
