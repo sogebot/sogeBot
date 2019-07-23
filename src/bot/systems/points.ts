@@ -4,7 +4,7 @@ import * as _ from 'lodash';
 import { isMainThread } from 'worker_threads';
 
 import { isBot, prepare, sendMessage } from '../commons';
-import { command, default_permission, parser, settings } from '../decorators';
+import { command, default_permission, parser, settings, permission_settings } from '../decorators';
 import Expects from '../expects';
 import { permission } from '../permissions';
 import System from './_interface';
@@ -13,28 +13,28 @@ class Points extends System {
   @settings('points')
   name: string = 'point|points'; // default is <singular>|<plural> | in some languages can be set with custom <singular>|<x:multi>|<plural> where x <= 10
 
-  @settings('points')
+  @permission_settings('points')
   interval: number = 10;
 
-  @settings('points')
+  @permission_settings('points')
   perInterval: number = 1;
 
-  @settings('points')
+  @permission_settings('points')
   offlineInterval: number = 30;
 
-  @settings('points')
+  @permission_settings('points')
   perOfflineInterval: number = 1;
 
-  @settings('points')
+  @permission_settings('points')
   messageInterval: number = 5;
 
-  @settings('points')
+  @permission_settings('points')
   perMessageInterval: number = 1;
 
-  @settings('points')
+  @permission_settings('points')
   messageOfflineInterval: number = 5;
 
-  @settings('points')
+  @permission_settings('points')
   perMessageOfflineInterval: number = 0;
 
 
@@ -53,29 +53,44 @@ class Points extends System {
       return;
     }
 
-    let [interval, perInterval, offlineInterval, perOfflineInterval, isOnline] = await Promise.all([
-      this.interval,
-      this.perInterval,
-      this.offlineInterval,
-      this.perOfflineInterval,
+    let [interval, offlineInterval, perInterval, perOfflineInterval, isOnline] = await Promise.all([
+      this.getPermissionBasedSettingsValue('interval'),
+      this.getPermissionBasedSettingsValue('offlineInterval'),
+      this.getPermissionBasedSettingsValue('perInterval'),
+      this.getPermissionBasedSettingsValue('perOfflineInterval'),
       global.cache.isOnline()
     ]);
-
-    interval = isOnline ? interval * 60 * 1000 : offlineInterval * 60 * 1000;
-    var ptsPerInterval = isOnline ? perInterval : perOfflineInterval;
 
     try {
       for (let username of (await global.users.getAllOnlineUsernames())) {
         if (isBot(username)) {continue;}
 
+        const userId = await global.users.getIdByName(username);
+        if (!userId) {
+          continue; // skip without id
+        }
+
+        // get user max permission
+        const permId = await global.permissions.getUserHighestPermission(userId);
+        if (!permId) {
+          continue; // skip without permission
+        }
+
+        var interval_calculated = isOnline ? interval[permId] * 60 * 1000 : offlineInterval[permId]  * 60 * 1000;
+        var ptsPerInterval = isOnline ? perInterval[permId]  : perOfflineInterval[permId] ;
+
         let user = await global.db.engine.findOne('users', { username });
         if (_.isEmpty(user)) {user.id = await global.api.getIdFromTwitch(username);}
         if (user.id) {
-          if (interval !== 0 && ptsPerInterval !== 0) {
+          if (interval_calculated !== 0 && ptsPerInterval[permId]  !== 0) {
             _.set(user, 'time.points', _.get(user, 'time.points', 0));
-            let shouldUpdate = new Date().getTime() - new Date(user.time.points).getTime() >= interval;
-            if (shouldUpdate) {
-              await global.db.engine.increment('users.points', { id: user.id }, { points: ptsPerInterval });
+            // as we can have different intervals from 1s to Xs and this interval is running each 60s, we calculate how many points should be given to user up to ~60
+            let pointsPortionCalculated = new Date().getTime() - new Date(user.time.points).getTime() / interval_calculated;
+            if (pointsPortionCalculated > 1 && pointsPortionCalculated < 61) { // 60 is max as we can have max 60x1s intervals
+              await global.db.engine.increment('users.points', { id: user.id }, { points: Math.floor(pointsPortionCalculated * ptsPerInterval) });
+              await global.db.engine.update('users', { id: user.id }, { id: user.id, username, time: { points: String(new Date()) } });
+            } else {
+              // we can assume that user is just recently online again
               await global.db.engine.update('users', { id: user.id }, { id: user.id, username, time: { points: String(new Date()) } });
             }
           } else {
@@ -88,7 +103,7 @@ class Points extends System {
       global.log.error(e);
       global.log.error(e.stack);
     } finally {
-      this.timeouts['updatePoints'] = global.setTimeout(() => this.updatePoints(), interval === 0 ? 60000 : interval);
+      this.timeouts['updatePoints'] = global.setTimeout(() => this.updatePoints(), 60000);
     }
   }
 
@@ -97,17 +112,23 @@ class Points extends System {
     if (opts.skip || opts.message.startsWith('!')) {return true;}
 
     let [perMessageInterval, messageInterval, perMessageOfflineInterval, messageOfflineInterval, isOnline] = await Promise.all([
-      this.perMessageInterval,
-      this.messageInterval,
-      this.perMessageOfflineInterval,
-      this.messageOfflineInterval,
+      this.getPermissionBasedSettingsValue('perMessageInterval'),
+      this.getPermissionBasedSettingsValue('messageInterval'),
+      this.getPermissionBasedSettingsValue('perMessageOfflineInterval'),
+      this.getPermissionBasedSettingsValue('messageOfflineInterval'),
       global.cache.isOnline()
     ]);
 
-    const interval = isOnline ? messageInterval : messageOfflineInterval;
-    const ptsPerInterval = isOnline ? perMessageInterval : perMessageOfflineInterval;
+    // get user max permission
+    const permId = await global.permissions.getUserHighestPermission(opts.sender.userId);
+    if (!permId) {
+      return true; // skip without permission
+    }
 
-    if (interval === 0 || ptsPerInterval === 0) {return;}
+    const interval_calculated = isOnline ? messageInterval[permId] : messageOfflineInterval[permId];
+    const ptsPerInterval = isOnline ? perMessageInterval[permId] : perMessageOfflineInterval[permId];
+
+    if (interval_calculated === 0 || ptsPerInterval === 0) {return;}
 
     let [user, userMessages] = await Promise.all([
       global.users.getById(opts.sender.userId),
@@ -115,7 +136,7 @@ class Points extends System {
     ]);
     let lastMessageCount = _.isNil(user.custom.lastMessagePoints) ? 0 : user.custom.lastMessagePoints;
 
-    if (lastMessageCount + interval <= userMessages) {
+    if (lastMessageCount + interval_calculated <= userMessages) {
       await global.db.engine.increment('users.points', { id: opts.sender.userId }, { points: ptsPerInterval });
       await global.db.engine.update('users', { id: opts.sender.userId }, { custom: { lastMessagePoints: userMessages } });
     }

@@ -102,6 +102,53 @@ export function settings(category?: string, isReadOnly: boolean = false) {
   };
 }
 
+
+export function permission_settings(category?: string) {
+  const { name, type } = getNameAndTypeFromStackTrace();
+
+  return (target: object, key: string) => {
+    loadingInProgress.push(`${type}.${name}.${key}`);
+
+    const register = () => {
+      const isAvailableModule = type !== 'core' && typeof global[type] !== 'undefined' && typeof global[type][name] !== 'undefined';
+      const isAvailableLibrary = type === 'core' && typeof global[name] !== 'undefined';
+      if (!isAvailableLibrary && !isAvailableModule) {
+        return setTimeout(() => register(), 1000);
+      }
+      try {
+        const self = type === 'core' ? global[name] : global[type][name];
+        if (category === key) {
+          throw Error(`Category and variable name cannot be same - ${type}.${name}.${key} in category ${category}`);
+        }
+
+        _.set(self, '__permission_based__' + key, {}); // set init value
+        VariableWatcher.add(`${type}.${name}.__permission_based__${key}`, {}, false);
+
+        // load variable from db
+        const loadVariableValue = () => {
+          if (!global.db.engine.connected) {
+            return setTimeout(() => loadVariableValue(), 1000);
+          }
+          self.loadVariableValue('__permission_based__' + key).then((value: { [permissionId: string]: string }) => {
+            if (typeof value !== 'undefined') {
+              VariableWatcher.add(`${type}.${name}.__permission_based__${key}`, value, false);
+              _.set(self, '__permission_based__' + key, value);
+            }
+            loadingInProgress = loadingInProgress.filter(o => o !== `${type}.${name}.${key}`);
+          });
+        };
+        setTimeout(() => loadVariableValue(), 5000);
+
+        // add variable to settingsPermList
+        self.settingsPermList.push({ category, key });
+      } catch (e) {
+        console.log(e);
+      }
+    };
+    register();
+  };
+}
+
 export function shared() {
   const { name, type } = getNameAndTypeFromStackTrace();
 

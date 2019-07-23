@@ -107,6 +107,15 @@ class Permissions extends Core {
     return pItem;
   }
 
+  public async getUserHighestPermission(userId: string): Promise<null | string> {
+    for (const p of (_.orderBy(await global.db.engine.find(this.collection.data), 'order', 'asc')) as Permissions.Item[]) {
+      if ((await this.check(userId, p.id, true)).access) {
+        return p.id;
+      }
+    }
+    return null;
+  }
+
   public async check(userId: string, permId: string, partial: boolean = false): Promise<{access: boolean; permission: Permissions.Item | null}> {
     const user: User & {
       tips: User.Tips[]; bits: User.Bits[]; points: User.Points[]; watched: User.Watched[]; messages: User.Messages[];

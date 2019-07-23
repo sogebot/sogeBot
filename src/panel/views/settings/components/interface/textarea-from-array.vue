@@ -8,7 +8,7 @@
         </span>
       </span>
     </div>
-    <textarea v-on:keyup="update" v-model="currentValue" class="form-control" type="text"></textarea>
+    <textarea v-on:keyup="update" v-model="currentValue" class="form-control" type="text" :readonly="readonly"></textarea>
   </div>
 </template>
 
@@ -19,6 +19,7 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 export default class textAreaFromArray extends Vue {
   @Prop() readonly value: any;
   @Prop() readonly title: any;
+  @Prop() readonly readonly: any;
 
   currentValue = this.value.join('\n');
 
