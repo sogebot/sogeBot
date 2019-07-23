@@ -126,7 +126,7 @@ class Module {
     }
 
     try {
-      if (variable.value) {
+      if (typeof variable.value !== 'undefined') {
         return key.startsWith('__permission_based') ? JSON.parse(variable.value) : variable.value;
       } else {
         return undefined;
