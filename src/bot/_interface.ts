@@ -657,7 +657,7 @@ class Module {
         command: string;
         fnc: (opts: CommandOptions) => void;
         _fncName: string;
-        permission: string;
+        permission: string | null;
         isHelper: boolean;
       }[] = [];
       for (const command of this._commands) {
