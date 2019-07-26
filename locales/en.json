@@ -38,7 +38,7 @@
   },
   "webpanel": {
     "loading": "Loading",
-    "this-may-take-a-while": "Může to <strong>chvíli</strong> trvat",
+    "this-may-take-a-while": "This <strong>may</strong> take a while",
     "display-as": "Display as",
     "set-default": "Set default",
     "add": "Add",
