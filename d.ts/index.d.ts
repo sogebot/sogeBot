@@ -124,7 +124,7 @@ interface Command {
   command?: string;
   fnc?: string;
   isHelper?: boolean;
-  permission?: string;
+  permission?: string | null;
   dependsOn?: string[];
 }
 

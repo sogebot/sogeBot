@@ -3,6 +3,7 @@ import { parse, sep as separator } from 'path';
 import { VariableWatcher } from './watchers';
 
 export let loadingInProgress: string[] = [];
+export let permissions: { [command: string]: string | null } = {};
 
 function getNameAndTypeFromStackTrace() {
   const _prepareStackTrace = Error.prepareStackTrace;
@@ -197,9 +198,8 @@ export function command(opts: string) {
 
 export function default_permission(uuid: string | null) {
   const { name, type } = getNameAndTypeFromStackTrace();
-
   return (target: object, key: string | symbol, descriptor: PropertyDescriptor) => {
-    registerPermission(uuid, { type, name, fnc: key });
+    permissions[`${type}.${name.toLowerCase()}.${String(key).toLowerCase()}`] = uuid;
     return descriptor;
   };
 }
@@ -222,7 +222,7 @@ export function rollback() {
   };
 }
 
-async function registerCommand(opts, m) {
+async function registerCommand(opts: string | Command, m) {
   const isAvailableModule = m.type !== 'core' && typeof global[m.type] !== 'undefined' && typeof global[m.type][m.name] !== 'undefined';
   const isAvailableLibrary = m.type === 'core' && typeof global[m.name] !== 'undefined';
   if (!isAvailableLibrary && !isAvailableModule) {
@@ -230,8 +230,13 @@ async function registerCommand(opts, m) {
   }
   try {
     const self = m.type === 'core' ? global[m.name] : global[m.type][m.name];
+    if (typeof opts === 'string') {
+      opts = {
+        name: opts
+      };
+    }
+    opts.fnc = m.fnc; // force function to decorated function
     const c = self.prepareCommand(opts);
-    c.fnc = m.fnc; // force function to decorated function
 
     if (typeof self._commands === 'undefined') {
       self._commands = [];
@@ -251,28 +256,6 @@ async function registerCommand(opts, m) {
     self._commands.push(c);
   } catch (e) {
     global.log.error(e);
-  }
-}
-
-function registerPermission(uuid, m, retry = 0) {
-  if (!global[m.type] || !global[m.type][m.name]) {
-    return setTimeout(() => registerPermission(uuid, m), 10);
-  }
-  try {
-    const self = global[m.type][m.name];
-    // find command with function
-    const c = self._commands.find((o) => o.fnc === m.fnc);
-    if (!c) {
-      throw Error();
-    } else {
-      c.permission = uuid;
-    }
-  } catch (e) {
-    if (retry < 100) {
-      return setTimeout(() => registerPermission(uuid, m, retry++), 10);
-    } else {
-      global.log.error('Command with function ' + m.fnc + ' not found!');
-    }
   }
 }
 
