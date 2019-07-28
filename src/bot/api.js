@@ -575,7 +575,9 @@ class API {
         let rawStatus = await global.cache.rawStatus()
         let status = await this.parseTitle()
 
-        if (request.data.status !== status && !opts.forceUpdate) {
+        if (request.data.status !== status && this.retries.getChannelDataOldAPI === -1) {
+          return { state: true, opts }
+        } else if (request.data.status !== status && !opts.forceUpdate) {
           // check if status is same as updated status
           const numOfRetries = global.twitch.isTitleForced ? 1 : 15;
           if (this.retries.getChannelDataOldAPI >= numOfRetries) {
@@ -588,7 +590,9 @@ class API {
               this.setTitleAndGame(null, { });
               return { state: true, opts }
             } else {
-              await global.cache.rawStatus(request.data.status);
+              global.log.info(`Title/game changed outside of a bot => ${request.data.game} | ${request.data.status}`);
+              this.retries.getChannelDataOldAPI = -1;
+              rawStatus = request.data.status;
             }
           } else {
             this.retries.getChannelDataOldAPI++
@@ -611,6 +615,7 @@ class API {
       return { state: false, opts }
     }
 
+    this.retries.getChannelDataOldAPI = 0
     return { state: true, opts }
   }
 
@@ -1226,9 +1231,6 @@ class API {
         if (response.status.trim() === status.trim()) {
           sendMessage(global.translate('title.change.success')
             .replace(/\$title/g, response.status), sender)
-
-          // we changed title outside of bot
-          if (response.status !== status) await global.cache.rawStatus(response.status)
           await global.db.engine.update('api.current', { key: 'title' }, { value: response.status })
         } else {
           sendMessage(global.translate('title.change.failed')
