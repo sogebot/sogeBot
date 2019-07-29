@@ -559,6 +559,11 @@ class API {
     if (needToWait) {
       return { state: false, opts }
     }
+    // getChannelDatraOldAPI only if stream is offline
+    if (await global.cache.isOnline()) {
+      this.retries.getChannelDataOldAPI = 0;
+      return { state: true, opts };
+    }
 
     var request
     try {
@@ -987,6 +992,8 @@ class API {
             if (this.retries.getCurrentStreamData >= 12) {
               this.retries.getCurrentStreamData = 0
               rawStatus = stream.title
+              global.log.error('saving stream title from twitch!!! ' + stream.title)
+              glob
               await global.cache.rawStatus(rawStatus)
             } else {
               this.retries.getCurrentStreamData++
@@ -1237,7 +1244,8 @@ class API {
             .replace(/\$title/g, (await global.db.engine.findOne('api.current', { key: 'title' })).value), sender)
         }
       }
-      this.gameOrTitleChangedManually = true
+      this.gameOrTitleChangedManually = true;
+      this.retries.getCurrentStreamData = 0;
       return true;
     }
   }
