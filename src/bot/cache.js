@@ -39,6 +39,7 @@ class Cache {
 
   // attribute
   async rawStatus (value) {
+    global.log.error((new Error()).stack)
     if (value) {
       // setter
       await global.db.engine.update('cache', { key: 'title' }, {
