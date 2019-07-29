@@ -63,6 +63,7 @@ class Keywords extends System {
       sendMessage(prepare('keywords.keyword-was-added', data), opts.sender);
       return data;
     } catch (e) {
+      global.log.error(e.stack);
       sendMessage(prepare('keywords.keyword-parse-failed'), opts.sender);
       return null;
     }
@@ -106,6 +107,7 @@ class Keywords extends System {
         return keywords[0];
       }
     } catch (e) {
+      global.log.error(e.stack);
       sendMessage(prepare('keywords.keyword-parse-failed'), opts.sender);
       return null;
     }
@@ -140,6 +142,93 @@ class Keywords extends System {
     }
   }
 
+
+  /**
+   * Remove keyword
+   *
+   * format: !keyword edit -k [uuid|regexp]
+   * @param {CommandOptions} opts - options
+   * @return {Promise<boolean>}
+   */
+  @command('!keyword remove')
+  @default_permission(permission.CASTERS)
+  public async remove(opts: CommandOptions): Promise<boolean> {
+    try {
+      const [keywordRegexOrUUID] =
+        new Expects(opts.parameters)
+          .argument({ name: 'k', optional: false, multi: true, delimiter: '' })
+          .toArray();
+
+      let keywords: Keyword[] = [];
+      if (isUUID(keywordRegexOrUUID)) {
+        keywords = await global.db.engine.find(this.collection.data, { id: keywordRegexOrUUID });
+      } else {
+        keywords = await global.db.engine.find(this.collection.data, { keyword: keywordRegexOrUUID });
+      }
+
+      if (keywords.length === 0) {
+        sendMessage(prepare('keywords.keyword-was-not-found'), opts.sender);
+        return false;
+      } else if (keywords.length > 1) {
+        sendMessage(prepare('keywords.keyword-is-ambiguous'), opts.sender);
+        return false;
+      } else {
+        await global.db.engine.remove(this.collection.data, { id: keywords[0].id });
+        sendMessage(prepare('keywords.keyword-was-removed', keywords[0]), opts.sender);
+        return true;
+      }
+    } catch (e) {
+      global.log.error(e.stack);
+      sendMessage(prepare('keywords.keyword-parse-failed'), opts.sender);
+      return false;
+    }
+  }
+
+
+  /**
+   * Enable/disable keyword
+   *
+   * format: !keyword toggle -k [uuid|regexp]
+   * @param {CommandOptions} opts - options
+   * @return {Promise<boolean>}
+   */
+  @command('!keyword toggle')
+  @default_permission(permission.CASTERS)
+  public async toggle(opts: CommandOptions): Promise<boolean> {
+    try {
+      const [keywordRegexOrUUID] =
+        new Expects(opts.parameters)
+          .argument({ name: 'k', optional: false, multi: true, delimiter: '' })
+          .toArray();
+
+      let keywords: Keyword[] = [];
+      if (isUUID(keywordRegexOrUUID)) {
+        keywords = await global.db.engine.find(this.collection.data, { id: keywordRegexOrUUID });
+      } else {
+        keywords = await global.db.engine.find(this.collection.data, { keyword: keywordRegexOrUUID });
+      }
+
+      if (keywords.length === 0) {
+        sendMessage(prepare('keywords.keyword-was-not-found'), opts.sender);
+        return false;
+      } else if (keywords.length > 1) {
+        sendMessage(prepare('keywords.keyword-is-ambiguous'), opts.sender);
+        return false;
+      } else {
+        delete keywords[0]._id;
+        keywords[0].enabled = !keywords[0].enabled;
+        await global.db.engine.update(this.collection.data, { id: keywords[0].id }, keywords[0]);
+
+        sendMessage(prepare(keywords[0].enabled ? 'keywords.keyword-was-enabled' : 'keywords.keyword-was-disabled', keywords[0]), opts.sender);
+        return true;
+      }
+    } catch (e) {
+      global.log.error(e.stack);
+      sendMessage(prepare('keywords.keyword-parse-failed'), opts.sender);
+      return false;
+    }
+  }
+
   /**
    * Parses message for keywords
    *
@@ -165,48 +254,7 @@ class Keywords extends System {
     }
     return true;
   }
-/*
-
-  async toggle(opts) {
-    if (opts.parameters.trim().length === 0) {
-      let message = await commons.prepare('keywords.keyword-parse-failed')
-      commons.sendMessage(message, opts.sender)
-      return false
-    }
-    let id = opts.parameters.trim()
-
-    const keyword = await global.db.engine.findOne(this.collection.data, { keyword: id })
-    if (isEmpty(keyword)) {
-      let message = await prepare('keywords.keyword-was-not-found', { keyword: id })
-      sendMessage(message, opts.sender)
-      return
-    }
-
-    await global.db.engine.update(this.collection.data, { keyword: id }, { enabled: !keyword.enabled })
-
-    let message = await commons.prepare(!keyword.enabled ? 'keywords.keyword-was-enabled' : 'keywords.keyword-was-disabled', { keyword: keyword.keyword })
-    commons.sendMessage(message, opts.sender)
-  }
-
-  async remove(opts) {
-    if (opts.parameters.trim().length === 0) {
-      let message = await commons.prepare('keywords.keyword-parse-failed')
-      commons.sendMessage(message, opts.sender)
-      return false
-    }
-    let id = opts.parameters.trim()
-
-    let removed = await global.db.engine.remove(this.collection.data, { keyword: id })
-    if (!removed) {
-      let message = await commons.prepare('keywords.keyword-was-not-found', { keyword: id })
-      commons.sendMessage(message, opts.sender)
-      return false
-    }
-    let message = await commons.prepare('keywords.keyword-was-removed', { keyword: id })
-    commons.sendMessage(message, opts.sender)
-  }
-  */
 }
 
-export default new Keywords();
+export default Keywords;
 export { Keywords };
