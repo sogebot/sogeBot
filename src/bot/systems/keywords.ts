@@ -9,6 +9,15 @@ import { sendMessage, prepare, isUUID } from '../commons';
 import { isMainThread } from 'worker_threads';
 import debug from '../debug';
 
+
+export interface KeywordInterface {
+  _id?: string;
+  id: string;
+  keyword: string;
+  response: string;
+  enabled: boolean;
+}
+
 /*
  * !keyword                                     - gets an info about keyword usage
  * !keyword add -k [regexp] -r [response]       - add keyword with specified response
@@ -17,11 +26,11 @@ import debug from '../debug';
  * !keyword toggle -k [uuid|regexp]             - enable/disable specified keyword
  * !keyword list                                - get keywords list
  */
-
 class Keywords extends System {
+
   constructor() {
     super();
-    this.addMenu({ category: 'manage', name: 'keywords', id: 'keywords/list' });
+    this.addMenu({ category: 'manage', name: 'keywords', id: 'manage/keywords/list' });
     if (isMainThread) {
       global.db.engine.index(this.collection.data, [{ index: 'id', unique: true }, { index: 'keyword' }]);
     }
@@ -46,14 +55,14 @@ class Keywords extends System {
    */
   @command('!keyword add')
   @default_permission(permission.CASTERS)
-  public async add(opts: CommandOptions): Promise<Keyword | null> {
+  public async add(opts: CommandOptions): Promise<KeywordInterface | null> {
     try {
       const [keywordRegex, response] =
         new Expects(opts.parameters)
           .argument({ name: 'k', optional: false, multi: true, delimiter: '' })
           .argument({ name: 'r', optional: false, multi: true, delimiter: '' })
           .toArray();
-      const data: Keyword = {
+      const data: KeywordInterface = {
         id: uuidv4(),
         keyword: keywordRegex,
         response,
@@ -78,7 +87,7 @@ class Keywords extends System {
    */
   @command('!keyword edit')
   @default_permission(permission.CASTERS)
-  public async edit(opts: CommandOptions): Promise<Keyword | null> {
+  public async edit(opts: CommandOptions): Promise<KeywordInterface | null> {
     try {
       const [keywordRegexOrUUID, response] =
         new Expects(opts.parameters)
@@ -86,7 +95,7 @@ class Keywords extends System {
           .argument({ name: 'r', optional: false, multi: true, delimiter: '' })
           .toArray();
 
-      let keywords: Keyword[] = [];
+      let keywords: KeywordInterface[] = [];
       if (isUUID(keywordRegexOrUUID)) {
         keywords = await global.db.engine.find(this.collection.data, { id: keywordRegexOrUUID });
       } else {
@@ -159,7 +168,7 @@ class Keywords extends System {
           .argument({ name: 'k', optional: false, multi: true, delimiter: '' })
           .toArray();
 
-      let keywords: Keyword[] = [];
+      let keywords: KeywordInterface[] = [];
       if (isUUID(keywordRegexOrUUID)) {
         keywords = await global.db.engine.find(this.collection.data, { id: keywordRegexOrUUID });
       } else {
@@ -201,7 +210,7 @@ class Keywords extends System {
           .argument({ name: 'k', optional: false, multi: true, delimiter: '' })
           .toArray();
 
-      let keywords: Keyword[] = [];
+      let keywords: KeywordInterface[] = [];
       if (isUUID(keywordRegexOrUUID)) {
         keywords = await global.db.engine.find(this.collection.data, { id: keywordRegexOrUUID });
       } else {

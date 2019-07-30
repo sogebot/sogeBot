@@ -1,5 +1,7 @@
 {
   "new": "New Keyword",
+  "empty": "No keywords were created yet.",
+  "emptyAfterSearch": "No keywords were found by your search for <strong>\"$search\"</strong>.",
   "command": {
     "name": "keyword",
     "placeholder": ""

@@ -1,5 +1,7 @@
 {
   "new": "Nové Klíčové Slovo",
+  "empty": "Žádná klíčová slova nebyla vytvořena.",
+  "emptyAfterSearch": "Žádná klíčová slova nebyla nalezena pro tvé hledání <strong>\"$search\"</strong>.",
   "command": {
     "name": "klíčové slovo",
     "placeholder": ""
