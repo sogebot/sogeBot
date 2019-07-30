@@ -992,8 +992,6 @@ class API {
             if (this.retries.getCurrentStreamData >= 12) {
               this.retries.getCurrentStreamData = 0
               rawStatus = stream.title
-              global.log.error('saving stream title from twitch!!! ' + stream.title)
-              glob
               await global.cache.rawStatus(rawStatus)
             } else {
               this.retries.getCurrentStreamData++
