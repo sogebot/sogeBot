@@ -2,13 +2,14 @@
   "new": "New Keyword",
   "empty": "No keywords were created yet.",
   "emptyAfterSearch": "No keywords were found by your search for <strong>\"$search\"</strong>.",
-  "command": {
-    "name": "keyword",
-    "placeholder": ""
+  "keyword": {
+    "name": "Keyword / Regular Expression",
+    "placeholder": "Set your keyword or regular expression to trigger keyword.",
+    "help": "You can use regexp (case insensitive) to use keywords, e.g. <strong>hello.*|hi</strong>"
   },
   "response": {
-    "name": "response",
-    "placeholder": ""
+    "name": "Response",
+    "placeholder": "Set your response here."
   },
   "error": {
     "isEmpty": "This value cannot be empty"

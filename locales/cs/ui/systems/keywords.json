@@ -2,13 +2,14 @@
   "new": "Nové Klíčové Slovo",
   "empty": "Žádná klíčová slova nebyla vytvořena.",
   "emptyAfterSearch": "Žádná klíčová slova nebyla nalezena pro tvé hledání <strong>\"$search\"</strong>.",
-  "command": {
-    "name": "klíčové slovo",
-    "placeholder": ""
+  "keyword": {
+    "name": "Klíčové slovo / Regulární výraz",
+    "placeholder": "Nastavte klíčové slovo nebo regulární výraz.",
+    "help": "Můžete použít regulární výrazy (bez ohledu na malá a velká písmena), např. <strong>hello.*|hi</strong>"
   },
   "response": {
-    "name": "odpověď",
-    "placeholder": ""
+    "name": "Odpověď",
+    "placeholder": "Nastavte odpověď bota zde."
   },
   "error": {
     "isEmpty": "Tato hodnota nesmí být prázdná"

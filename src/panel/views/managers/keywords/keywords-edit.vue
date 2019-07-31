@@ -8,7 +8,7 @@
           {{ translate('menu.keywords') }}
           <template v-if="$route.params.id">
             <small><i class="fas fa-angle-right"></i></small>
-            {{event.name}}
+            {{keyword}}
             <small>{{$route.params.id}}</small>
           </template>
         </span>
@@ -28,39 +28,40 @@
       </template>
       <template v-slot:right>
         <b-alert show variant="info" v-if="state.pending" v-html="translate('dialog.changesPending')" class="mr-2 p-2 mb-0"></b-alert>
-        <state-button @click="save()" text="saveChanges" :state="state.save" :invalid="!!$v.$invalid"/>
+        <state-button @click="save()" text="saveChanges" :state="state.save" :invalid="!!$v.$invalid && !!$v.$dirty"/>
       </template>
     </panel>
 
     <loading v-if="state.loading === 1"/>
     <b-form v-else>
       <b-form-group
-        :label="translate('manage.keywords.keyword.name')"
+        :label="translate('systems.keywords.keyword.name')"
         label-for="keyword"
       >
         <b-form-input
           id="keyword"
           v-model="keyword"
           type="text"
-          :placeholder="translate('manage.keywords.keyword.placeholder')"
-          :state="$v.keyword.$invalid ? 'invalid' : null"
+          :placeholder="translate('systems.keywords.keyword.placeholder')"
+          :state="$v.keyword.$invalid && $v.keyword.$dirty ? 'invalid' : null"
+          @input="$v.keyword.$touch()"
         ></b-form-input>
         <b-form-invalid-feedback>{{ translate('dialog.errors.required') }}</b-form-invalid-feedback>
-        <small class="form-text text-muted" v-html="translate('manage.keywords.keyword.help')"></small>
+        <small class="form-text text-muted" v-html="translate('systems.keywords.keyword.help')"></small>
       </b-form-group>
       <b-form-group
-        :label="translate('manage.keywords.response.name')"
+        :label="translate('systems.keywords.response.name')"
         label-for="response"
       >
         <b-form-textarea
           id="response"
           v-model="response"
-          :placeholder="translate('manage.keywords.response.placeholder')"
-          :state="$v.response.$invalid ? 'invalid' : null"
+          :placeholder="translate('systems.keywords.response.placeholder')"
+          :state="$v.response.$invalid && $v.response.$dirty ? 'invalid' : null"
           rows="8"
+          @input="$v.response.$touch()"
         ></b-form-textarea>
         <b-form-invalid-feedback>{{ translate('dialog.errors.required') }}</b-form-invalid-feedback>
-        <small class="form-text text-muted" v-html="translate('manage.keywords.response.help')"></small>
       </b-form-group>
     </b-form>
   </b-container>
@@ -104,8 +105,11 @@ export default class keywordsEdit extends Vue {
   @Watch('keyword')
   @Watch('response')
   pending() {
-    this.state.pending = true;
+    if (this.state.loading === ButtonStates.success) {
+      this.state.pending = true;
+    }
   }
+
 
   mounted() {
     if (this.$route.params.id) {
@@ -119,10 +123,48 @@ export default class keywordsEdit extends Vue {
         this.response = data.response;
         this.enabled = data.enabled;
 
-        this.state.loading = ButtonStates.success;
+        this.$nextTick(() => {
+          this.state.loading = ButtonStates.success;
+        });
       })
     } else {
       this.state.loading = ButtonStates.success;
+    }
+  }
+
+  del() {
+    this.socket.emit('delete', { where: { id: this.$route.params.id }}, (err, deleted) => {
+      if (err) {
+        return console.error(err);
+      }
+      this.$router.push({ name: 'KeywordsManagerList' })
+    })
+  }
+
+  save() {
+    this.$v.$touch();
+    if (!this.$v.$invalid) {
+      const keyword: KeywordInterface = {
+        id: this.id,
+        keyword: this.keyword,
+        response: this.response,
+        enabled: this.enabled,
+      }
+      this.state.save = ButtonStates.progress;
+
+      this.socket.emit('update', { key: 'id', items: [keyword] }, (err, data) => {
+        if (err) {
+          this.state.save = ButtonStates.fail;
+          return console.error(err);
+        }
+
+        this.state.save = ButtonStates.success;
+        this.state.pending = false;
+        this.$router.push({ name: 'KeywordsManagerEdit', params: { id: String(data.id) } })
+        setTimeout(() => {
+          this.state.save = ButtonStates.idle;
+        }, 1000)
+      });
     }
   }
 }

@@ -16,22 +16,33 @@
       </div>
     </div>
 
-    <panel cards search @search="search = $event">
+    <panel search @search="search = $event">
       <template v-slot:left>
         <button-with-icon class="btn-primary btn-reverse" icon="plus" href="#/manage/keywords/edit">{{translate('systems.keywords.new')}}</button-with-icon>
       </template>
     </panel>
 
     <loading v-if="state.loading === 1"/>
-    <div class="alert alert-danger" v-else-if="state.loading === 2 && fItems.length === 0 && search.length > 0">
+    <b-alert show variant="danger" v-else-if="state.loading === 2 && fItems.length === 0 && search.length > 0">
       <fa icon="search"/> <span v-html="translate('systems.keywords.emptyAfterSearch').replace('$search', search)"/>
-    </div>
-    <div class="alert alert-info" v-else-if="state.loading === 2 && items.length === 0">
+    </b-alert>
+    <b-alert show v-else-if="state.loading === 2 && items.length === 0">
       {{translate('systems.keywords.empty')}}
-    </div>
-    <div v-else>
-      {{ items }}
-    </div>
+    </b-alert>
+    <b-table v-else striped small :items="fItems" :fields="fields">
+      <div slot="buttons" slot-scope="data" class="text-right">
+        <button-with-icon :class="[ data.item.enabled ? 'btn-success' : 'btn-danger' ]" class="btn-only-icon btn-reverse" icon="power-off" @click="data.item.enabled = !data.item.enabled; update(data.item)">
+          {{ translate('dialog.buttons.' + (data.item.enabled? 'enabled' : 'disabled')) }}
+        </button-with-icon>
+        <button-with-icon class="btn-only-icon btn-primary btn-reverse" icon="edit" v-bind:href="'#/manage/keywords/edit/' + data.item.id">
+          {{ translate('dialog.buttons.edit') }}
+        </button-with-icon>
+        <hold-button @trigger="del(data.item.id)" icon="trash" class="btn-danger btn-reverse btn-only-icon">
+          <template slot="title">{{translate('dialog.buttons.delete')}}</template>
+          <template slot="onHoldTitle">{{translate('dialog.buttons.hold-to-delete')}}</template>
+        </hold-button>
+      </div>
+    </b-table>
   </div>
 </template>
 
@@ -56,6 +67,13 @@ export default class keywordsList extends Vue {
     loading: ButtonStates.progress,
   }
 
+  fields = [
+    { key: 'keyword', label: this.translate('systems.keywords.keyword.name'), sortable: true },
+    { key: 'response', label: this.translate('systems.keywords.response.name'), sortable: true },
+    { key: 'buttons', label: '' },
+  ];
+
+
   get fItems(): KeywordInterface[] {
     let items = this.items
     if (this.search.trim() !== '') {
@@ -75,13 +93,35 @@ export default class keywordsList extends Vue {
       return 0; //default return value (no sorting)
       })
   }
-
   mounted() {
+    this.refresh();
+  }
+
+  refresh() {
+    this.state.loading = ButtonStates.progress;
     this.socket.emit('find', {}, (err, data: KeywordInterface[]) => {
       if (err) return console.error(err);
       this.items = data;
       this.state.loading = ButtonStates.success;
     })
+  }
+
+  del(id) {
+    this.socket.emit('delete', { where: { id }}, (err, deleted) => {
+      if (err) {
+        return console.error(err);
+      }
+      this.refresh();
+    })
+  }
+
+  update(keyword: KeywordInterface) {
+    delete keyword._id;
+    this.socket.emit('update', { key: 'id', items: [keyword] }, (err, data) => {
+      if (err) {
+        return console.error(err);
+      }
+    });
   }
 }
 </script>

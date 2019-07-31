@@ -340,8 +340,11 @@ describe('Cooldowns - check()', () => {
     })
 
     it('test', async () => {
-      global.systems.keywords.add({ sender: owner, parameters: 'me (!me)' })
-      await message.isSent('keywords.keyword-was-added', owner, { keyword: 'me', sender: owner.username })
+      await global.db.engine.insert(global.systems.keywords.collection.data, {
+        'keyword': 'me',
+        'response': '(!me)',
+        'enabled': true
+      })
 
       let [command, type, seconds, quiet] = ['me', 'user', '60', true]
       global.systems.cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` })
@@ -371,8 +374,11 @@ describe('Cooldowns - check()', () => {
     })
 
     it('test', async () => {
-      global.systems.keywords.add({ sender: owner, parameters: 'me (!me)' })
-      await message.isSent('keywords.keyword-was-added', owner, { keyword: 'me', sender: owner.username })
+      await global.db.engine.insert(global.systems.keywords.collection.data, {
+        'keyword': 'me',
+        'response': '(!me)',
+        'enabled': true
+      })
 
       let [command, type, seconds, quiet] = ['me', 'global', '60', true]
       global.systems.cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` })
