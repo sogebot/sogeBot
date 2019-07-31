@@ -3,7 +3,7 @@ SHELL   := /bin/bash
 VERSION := `node -pe "require('./package.json').version"`
 ENV     ?= production
 
-all : clean prepare yarn dependencies shrinkwrap ui bot info
+all : clean prepare yarn dependencies shrinkwrap css js jsdist bot info
 .PHONY : all
 
 # detect what shell is used
@@ -41,12 +41,16 @@ eslint:
 	@echo -ne "\n\t ----- Checking eslint\n"
 	@npx eslint --ext .ts src --quiet
 
-ui:
+css:
 	@echo -ne "\n\t ----- Generating CSS themes\n"
 	@npx node-sass --output-style expanded --precision 6 scss/themes/light.scss public/dist/css/light.css
 	@npx node-sass --output-style expanded --precision 6 scss/themes/dark.scss public/dist/css/dark.css
+
+js:
 	@echo -ne "\n\t ----- Bundling with webpack\n"
 	@NODE_ENV=$(ENV) npx webpack
+
+jsdist:
 	@echo -ne "\n\t ----- Copying dist files\n"
 	@node tools/copy-dist-files.js
 
