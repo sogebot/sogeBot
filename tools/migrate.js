@@ -32,6 +32,18 @@ const end = function (updated) {
 }
 
 const migration = {
+  1564570105388: async () => {
+    header('Add id to keywords');
+    let updated = 0;
+    for (let item of await global.db.engine.find('systems.keywords')) {
+      if (typeof item.id === 'undefined') {
+        item.id = uuidv4();
+        await global.db.engine.update('systems.keywords', { _id: String(item._id) }, item);
+        updated++;
+      }
+    }
+    end(updated);
+  },
   1563786326463: async () => {
     header('Updating points settings to permission based settings');
     let updated = 0;
@@ -134,8 +146,8 @@ var runMigration = async function () {
 
   console.info(('-').repeat(56))
   console.info('All process DONE! Database is upgraded to %s', version)
-  if (dbVersion !== '0.0.0') await global.db.engine.update('info', { version: dbVersion }, { version: version })
-  else await global.db.engine.insert('info', { version: version })
+  await global.db.engine.remove('info', {})
+  await global.db.engine.insert('info', { version: version })
   process.exit()
 }
 

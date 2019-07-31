@@ -177,6 +177,7 @@
     "vue-style-loader": "4.1.2",
     "vue-template-compiler": "2.6.10",
     "vuelidate": "0.7.4",
+    "vuelidate-property-decorators": "1.0.27",
     "webpack": "4.37.0",
     "webpack-cli": "3.3.6",
     "weekstart": "1.0.0",
