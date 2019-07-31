@@ -32,7 +32,7 @@ const end = function (updated) {
 }
 
 const migration = {
-  1564570105388: async () => {
+  2: async () => {
     header('Add id to keywords');
     let updated = 0;
     for (let item of await global.db.engine.find('systems.keywords')) {
@@ -44,7 +44,7 @@ const migration = {
     }
     end(updated);
   },
-  1563786326463: async () => {
+  1: async () => {
     header('Updating points settings to permission based settings');
     let updated = 0;
     const permId = '0efd7b1c-e460-4167-8e06-8aaf2c170311';
@@ -116,13 +116,13 @@ var runMigration = async function () {
     return
   }
   let info = await global.db.engine.find('info')
-  const version = Object.keys(migration).sort()[0];
+  const version = Object.keys(migration).sort().reverse()[0];
 
   let dbVersion = _.isEmpty(info) || _.isNil(_.find(info, (o) => !_.isNil(o.version)).version)
     ? 0
     : _.find(info, (o) => !_.isNil(o.version)).version
 
-  if (isNaN(Number(dbVersion))) {
+  if (isNaN(Number(dbVersion)) || dbVersion > 1000000) {
     dbVersion = 0;
   }
 
