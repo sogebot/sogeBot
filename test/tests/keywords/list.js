@@ -1,31 +1,59 @@
-/* global describe it beforeEach */
-require('../../general.js')
+/* global describe it */
+require('../../general.js');
 
-const db = require('../../general.js').db
-const message = require('../../general.js').message
+const db = require('../../general.js').db;
+const message = require('../../general.js').message;
+const assert = require('assert');
 
 // users
-const owner = { username: 'soge__' }
+const owner = { username: 'soge__' };
 
-describe('Keywords - list()', () => {
-  beforeEach(async () => {
-    await db.cleanup()
-    await message.prepare()
-  })
+function randomString() {
+  return Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5);
+}
 
-  it('empty list', async () => {
-    global.systems.keywords.list({ sender: owner, parameters: '' })
-    await message.isSent('keywords.list-is-empty', owner, { sender: owner.username })
-  })
 
-  it('populated list', async () => {
-    global.systems.keywords.add({ sender: owner, parameters: 'a me' })
-    await message.isSent('keywords.keyword-was-added', owner, { keyword: 'a', sender: owner.username })
+describe('Keywords - listing', () => {
+  describe('Listing without any keywords', () => {
+    before(async () => {
+      await db.cleanup();
+      await message.prepare();
+    });
 
-    global.systems.keywords.add({ sender: owner, parameters: 'b me' })
-    await message.isSent('keywords.keyword-was-added', owner, { keyword: 'b', sender: owner.username })
+    it('Expecting empty list', async () => {
+      await global.systems.keywords.list({ sender: owner, parameters: '' });
+      await message.isSent('keywords.list-is-empty', owner);
+    });
+  });
 
-    global.systems.keywords.list({ sender: owner, parameters: '' })
-    await message.isSent('keywords.list-is-not-empty', owner, { list: 'a, b', sender: owner.username })
-  })
-})
+  describe('Listing with keywords', () => {
+    before(async () => {
+      await db.cleanup();
+      await message.prepare();
+    });
+
+    let keywords = [];
+
+    for (let i = 0; i < 10; i++) {
+      it ('Creating random keyword', async () => {
+        const keyword = randomString();
+        const response = randomString();
+        const enabled = Math.random() >= 0.5;
+        const k = await global.systems.keywords.add({ sender: owner, parameters: `-k ${keyword} -r ${response}` });
+        assert.notStrictEqual(k, null);
+
+        keywords.push({ id: k.id, keyword, response, enabled });
+        await global.db.engine.update(global.systems.keywords.collection.data, { id: k.id }, { enabled });
+      });
+    }
+
+    it('Expecting populated list', async () => {
+      await global.systems.keywords.list({ sender: owner, parameters: '' });
+      await message.isSent('keywords.list-is-not-empty', owner);
+
+      for(const k of keywords) {
+        await message.isSentRaw(`${k.enabled ? '🗹' : '☐'} ${k.id} | ${k.keyword} | ${k.response}`, owner);
+      }
+    });
+  });
+});
