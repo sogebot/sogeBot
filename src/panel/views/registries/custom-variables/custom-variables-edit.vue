@@ -115,6 +115,7 @@
             <b-button-group size="sm" class="btn-block" style="flex-basis: 0;">
               <b-button :variant="url.access.GET ? 'success' : 'danger'" @click="url.access.GET = !url.access.GET">GET</b-button>
               <b-button :variant="url.access.POST ? 'success' : 'danger'" @click="url.access.POST = !url.access.POST">POST</b-button>
+              <b-button :variant="url.showResponse ? 'success' : 'danger'" @click="url.showResponse = !url.showResponse">{{ translate('registry.customvariables.response.show') }}</b-button>
             </b-button-group>
             <div class="w-100 p-2">{{origin}}/customvariables/{{url.id}}</div>
             <b-button-group size="sm" class="btn-block" style="flex-basis: 0;">
@@ -359,7 +360,7 @@ export default class customVariablesEdit extends Vue {
   usableOptions: string = '';
   readOnly: boolean = false;
   permission: string | null = null;
-  urls: { id: string; access: { GET: boolean; POST: boolean }}[] = [];
+  urls: { id: string; showResponse: boolean; access: { GET: boolean; POST: boolean }}[] = [];
 
   evalValue: string = evalDefault;
   evalError: string | null = null
@@ -508,6 +509,7 @@ export default class customVariablesEdit extends Vue {
   generateURL() {
     this.urls.push({
       id: uuid(),
+      showResponse: false,
       access: { GET: false, POST: false }
     });
   }

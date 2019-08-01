@@ -3,6 +3,7 @@
   "generateurl": "Generate new URL",
   "show-examples": "show CURL examples",
   "response": {
+    "show": "Show response after POST",
     "name": "Response after variable set",
     "default": "Default",
     "default-placeholder": "Set your bot response",

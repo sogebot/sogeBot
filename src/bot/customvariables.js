@@ -53,7 +53,21 @@ class CustomVariables {
       if (variable) {
         if (_.get(variable.urls.find(url => url.id === req.params.id), 'access.POST', false)) {
           const value = await this.setValueOf(variable.variableName, req.body.value, {});
+
           if (value.isOk) {
+            if (_.get(variable.urls.find(url => url.id === req.params.id), 'showResponse', false)) {
+              if (value.updated.responseType === 0) {
+                commons.sendMessage(
+                  commons.prepare('filters.setVariable', { value: state.updated.setValue, variable: variable }),
+                  commons.getOwner(), { skip: true, quiet: _.get(attr, 'quiet', false) }
+                );
+              } else if (value.updated.responseType === 1) {
+                commons.sendMessage(
+                  value.updated.responseText.replace('$value', value.updated.setValue),
+                  commons.getOwner(), { skip: true, quiet: _.get(attr, 'quiet', false) }
+                );
+              }
+            }
             return res.status(200).send({ oldValue: variable.currentValue, value: value.updated.setValue });
           } else {
             return res.status(400).send({ error: 'This value is not applicable for this endpoint', code: 400 });
