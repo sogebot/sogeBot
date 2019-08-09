@@ -32,7 +32,19 @@ const end = function (updated) {
 }
 
 const migration = {
-  1563786326463: async () => {
+  2: async () => {
+    header('Add id to keywords');
+    let updated = 0;
+    for (let item of await global.db.engine.find('systems.keywords')) {
+      if (typeof item.id === 'undefined') {
+        item.id = uuidv4();
+        await global.db.engine.update('systems.keywords', { _id: String(item._id) }, item);
+        updated++;
+      }
+    }
+    end(updated);
+  },
+  1: async () => {
     header('Updating points settings to permission based settings');
     let updated = 0;
     const permId = '0efd7b1c-e460-4167-8e06-8aaf2c170311';
@@ -104,13 +116,13 @@ var runMigration = async function () {
     return
   }
   let info = await global.db.engine.find('info')
-  const version = Object.keys(migration).sort()[0];
+  const version = Object.keys(migration).sort().reverse()[0];
 
   let dbVersion = _.isEmpty(info) || _.isNil(_.find(info, (o) => !_.isNil(o.version)).version)
     ? 0
     : _.find(info, (o) => !_.isNil(o.version)).version
 
-  if (isNaN(Number(dbVersion))) {
+  if (isNaN(Number(dbVersion)) || dbVersion > 1000000) {
     dbVersion = 0;
   }
 
@@ -134,8 +146,8 @@ var runMigration = async function () {
 
   console.info(('-').repeat(56))
   console.info('All process DONE! Database is upgraded to %s', version)
-  if (dbVersion !== '0.0.0') await global.db.engine.update('info', { version: dbVersion }, { version: version })
-  else await global.db.engine.insert('info', { version: version })
+  await global.db.engine.remove('info', {})
+  await global.db.engine.insert('info', { version: version })
   process.exit()
 }
 

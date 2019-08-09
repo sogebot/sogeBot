@@ -4,6 +4,8 @@ import { setTimeout } from 'timers'; // tslint workaround
 import { isMainThread } from 'worker_threads';
 
 import { permission } from './permissions';
+import { permissions as permissionsList } from './decorators';
+
 import { flatten, unflatten } from './commons';
 import * as Parser from './parser';
 import { getFunctionList } from './decorators/on';
@@ -126,7 +128,7 @@ class Module {
     }
 
     try {
-      if (variable.value) {
+      if (typeof variable.value !== 'undefined') {
         return key.startsWith('__permission_based') ? JSON.parse(variable.value) : variable.value;
       } else {
         return undefined;
@@ -138,24 +140,15 @@ class Module {
     }
   }
 
-  public prepareCommand(opts: string | Command) {
-    let key = opts;
-    let pUuid = permission.VIEWERS;
-    let fnc;
-    let isHelper = false;
-
-    if (typeof key === 'object') {
-      pUuid = key.permission || permission.VIEWERS;
-      fnc = key.fnc || fnc;
-      isHelper = key.isHelper || false;
+  public prepareCommand(opts:  Command) {
+    const defaultPermission = permissionsList[`${this._name}.${this.constructor.name.toLowerCase()}.${(opts.fnc || '').toLowerCase()}`];
+    if (typeof defaultPermission === 'undefined') {
+      opts.permission = opts.permission || permission.VIEWERS;
+    } else {
+      opts.permission = defaultPermission;
     }
-    key = typeof key === 'object' ? key.name : key;
-    return {
-      name: key,
-      permission: pUuid,
-      fnc,
-      isHelper,
-    };
+    opts.isHelper = opts.isHelper || false;
+    return opts;
   }
 
   public async _indexDbs() {
@@ -664,7 +657,7 @@ class Module {
         command: string;
         fnc: (opts: CommandOptions) => void;
         _fncName: string;
-        permission: string;
+        permission: string | null;
         isHelper: boolean;
       }[] = [];
       for (const command of this._commands) {

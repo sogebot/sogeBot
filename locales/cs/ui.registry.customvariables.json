@@ -3,6 +3,7 @@
   "generateurl": "Vygenerovat novou URL",
   "show-examples": "Ukázat CURL příklady",
   "response": {
+    "show": "Zobrazit odpověď po POST",
     "name": "Odpověď po nastavení",
     "default": "Výchozí",
     "default-placeholder": "Nastavte svou odpověď",

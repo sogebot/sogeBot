@@ -38,7 +38,7 @@
   },
   "webpanel": {
     "loading": "Loading",
-    "this-may-take-a-while": "Může to <strong>chvíli</strong> trvat",
+    "this-may-take-a-while": "This <strong>may</strong> take a while",
     "display-as": "Display as",
     "set-default": "Set default",
     "add": "Add",
@@ -856,11 +856,11 @@
   },
   "keywords": {
     "keyword-parse-failed": "{core.command-parse} !keyword",
+    "keyword-is-ambiguous": "$sender, keyword $keyword is ambiguous, use ID of keyword",
     "keyword-was-not-found": "$sender, keyword $keyword was not found in database",
     "keyword-was-edited": "$sender, keyword $keyword is changed to '$response'",
-    "keyword-was-added": "$sender, keyword $keyword was added",
-    "keyword-already-exist": "$sender, keyword $keyword already exist",
-    "list-is-not-empty": "$sender, list of keywords: $list",
+    "keyword-was-added": "$sender, keyword $keyword ($id) was added",
+    "list-is-not-empty": "$sender, list of keywords",
     "list-is-empty": "$sender, list of keywords is empty",
     "keyword-was-enabled": "$sender, keyword $keyword was enabled",
     "keyword-was-disabled": "$sender, keyword $keyword was disabled",
