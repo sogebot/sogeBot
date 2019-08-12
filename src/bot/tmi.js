@@ -346,7 +346,7 @@ class TMI extends Core {
           }
 
           global.overlays.eventlist.add(data)
-          global.events.fire('raided', data)
+          global.events.fire('raid', data)
         } else if (message.event === 'SUBSCRIPTION') {
           this.subscription(message)
         } else if (message.event === 'RESUBSCRIPTION') {
