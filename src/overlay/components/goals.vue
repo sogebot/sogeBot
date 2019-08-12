@@ -166,7 +166,8 @@ export default Vue.extend({
       lastSwapTime: number,
       triggerUpdate: string[],
       cssLoaded: string[],
-      current: { subscribers: number, followers: number }
+      current: { subscribers: number, followers: number },
+      interval: number[]
     } = {
       show: -1,
       group: null,
@@ -176,15 +177,21 @@ export default Vue.extend({
       loadedFonts: [],
       triggerUpdate: [],
       cssLoaded: [],
-      current: { subscribers: 0, followers: 0 }
+      current: { subscribers: 0, followers: 0 },
+      interval: [],
     };
     return object
+  },
+  beforeDestroy: function() {
+    for(const interval of this.interval) {
+      clearInterval(interval);
+    }
   },
   mounted: function () {
     this.$moment.locale(this.configuration.lang)
     this.refresh()
-    setInterval(() => this.refresh(), 5000)
-    setInterval(() => {
+    this.interval.push(window.setInterval(() => this.refresh(), 5000));
+    this.interval.push(window.setInterval(() => {
       if (this.group === null) return
 
       if (this.show === -1) return (this.lastSwapTime = Date.now())
@@ -196,7 +203,7 @@ export default Vue.extend({
           else this.show = this.show + 1
         }
       }
-    }, 100)
+    }, 100));
   },
   methods: {
     beforeEnter: function (el) {

@@ -34,7 +34,13 @@ export default {
       }),
       isPlaying: false,
       clips: [],
-      settings: []
+      settings: [],
+      interval: [],
+    }
+  },
+  beforeDestroy: function() {
+    for(const interval of this.interval) {
+      clearInterval(interval);
     }
   },
   created: function () {
@@ -45,7 +51,7 @@ export default {
       }
     })
 
-    setInterval(() => {
+    this.interval.push(setInterval(() => {
       const video = this.$refs['video']
       if (typeof video !== 'undefined' && video.ended) {
         this.isPlaying = false
@@ -56,7 +62,7 @@ export default {
       if (!this.isPlaying) {
         this.isPlaying = this.getPlayingClip() !== null
       }
-    }, 100)
+    }, 100));
   },
   watch: {
     isPlaying: function (val) {

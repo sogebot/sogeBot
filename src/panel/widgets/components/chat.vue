@@ -70,7 +70,13 @@ export default {
       chatMessage: '',
       chatters: [],
       isRefreshing: false,
-      room: ''
+      room: '',
+      interval: [],
+    }
+  },
+  beforeDestroy: function() {
+    for(const interval of this.interval) {
+      clearInterval(interval);
     }
   },
   mounted: function () {
@@ -103,7 +109,7 @@ export default {
   },
   created: function () {
     this._chatters();
-    setInterval(() => this._chatters(), 60000);
+    this.interval.push(setInterval(() => this._chatters(), 60000));
 
     this.socket.emit('room', (err, room) => {
       if (err) return console.error(err)
