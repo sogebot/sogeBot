@@ -23,7 +23,7 @@ class Yoursystem extends System {
   yourSettingsVariableWithoutMyCategory: string = 'ipsum'
 }
 
-export default Yoursystem;
+export default YourSystem;
 ```
 
 ### Disable system by default
