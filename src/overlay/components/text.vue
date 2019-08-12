@@ -13,12 +13,18 @@
         text: '',
         js: null,
         css: null,
-        external: false
+        external: false,
+        interval: [],
+      }
+    },
+    beforeDestroy: function() {
+      for(const interval of this.interval) {
+        clearInterval(interval);
       }
     },
     mounted: function () {
       this.refresh()
-      setInterval(() => this.refresh(), 5000)
+      this.interval.push(setInterval(() => this.refresh(), 5000))
     },
     watch: {
       css: function (css) {

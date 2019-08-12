@@ -70,7 +70,13 @@ export default {
     return {
       socket: io('/overlays/alerts', {query: "token="+token}),
       isPlaying: false,
-      alerts: []
+      alerts: [],
+      interval: [],
+    }
+  },
+  beforeDestroy: function() {
+    for(const interval of this.interval) {
+      clearInterval(interval);
     }
   },
   mounted: function () {
@@ -85,7 +91,7 @@ export default {
       this.alerts.push(data)
     })
 
-    setInterval(() => {
+    this.interval.push(setInterval(() => {
       if (!this.isPlaying) {
         this.isPlaying = this.getCurrentAlertList() !== null
       } else {
@@ -189,7 +195,7 @@ export default {
 
         }
       }
-    }, 100)
+    }, 100));
   },
   computed: {
     finishedCount: function () {
