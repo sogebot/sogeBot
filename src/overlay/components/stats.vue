@@ -48,12 +48,18 @@ export default {
   data: function () {
     return {
       socket: io('/overlays/stats', {query: "token="+token}),
-      stats: {}
+      stats: {},
+      interval: [],
+    }
+  },
+  beforeDestroy: function() {
+    for(const interval of this.interval) {
+      clearInterval(interval);
     }
   },
   created: function () {
     this.refresh()
-    setInterval(() => this.refresh(), 1000)
+    this.interval.push(setInterval(() => this.refresh(), 1000));
   },
   methods: {
     refresh: function () {
