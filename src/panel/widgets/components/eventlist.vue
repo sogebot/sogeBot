@@ -213,7 +213,13 @@ export default {
       events: null,
       eventlistShow: 0,
       eventlistSize: 0,
-      eventlistMessageSize: 0
+      eventlistMessageSize: 0,
+      interval: [],
+    }
+  },
+  beforeDestroy: function() {
+    for(const interval of this.interval) {
+      clearInterval(interval);
     }
   },
   mounted: function () {
@@ -252,7 +258,7 @@ export default {
     this.socket.on('update', events => this.events = events)
 
     // refresh timestamps
-    setInterval(() => this.socket.emit('get'), 60000)
+    this.interval.push(setInterval(() => this.socket.emit('get'), 60000))
   },
   computed: {
     fEvents: function () {

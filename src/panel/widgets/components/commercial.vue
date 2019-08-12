@@ -42,18 +42,24 @@ export default {
     return {
       socket: io('/systems/commercial', { query: "token=" + this.token }),
       seconds: [30, 60, 90, 120, 150, 180],
-      countdown: 0
+      countdown: 0,
+      interval: [],
+    }
+  },
+  beforeDestroy: function() {
+    for(const interval of this.interval) {
+      clearInterval(interval);
     }
   },
   mounted: function () {
     this.$emit('mounted')
   },
   created: function () {
-    setInterval(() => {
+    this.interval.push(setInterval(() => {
       if (this.countdown > 0) {
         this.countdown--
       }
-    }, 1000)
+    }, 1000));
   },
   methods: {
     run: function (seconds) {

@@ -25,14 +25,20 @@ export default {
       socket: io('/overlays/carousel', {
         query: "token=" + token
       }),
-      images: []
+      images: [],
+      interval: [],
+    }
+  },
+  beforeDestroy: function() {
+    for(const interval of this.interval) {
+      clearInterval(interval);
     }
   },
   created: function () {
     this.socket.emit('load', images => this.images = images)
-    setInterval(() => {
+    this.interval.push(setInterval(() => {
       this.triggerAnimation()
-    }, 100)
+    }, 100));
   },
   methods: {
     wait: function (type) {

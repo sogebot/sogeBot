@@ -129,13 +129,22 @@ export default {
   mounted: function () {
     this.$emit('mounted')
   },
+  beforeDestroy: function() {
+    for(const interval of this.interval) {
+      clearInterval(interval);
+    }
+  },
   created: function () {
-    setInterval(() => this.socket.emit('find', { collection: 'picked' }, (err, users) => {
-      this.picked = users
-    }), 1000)
-    setInterval(() => this.socket.emit('find', {}, (err, users) => {
-      this.users = users
-    }), 1000)
+    this.interval.push(
+      setInterval(() => this.socket.emit('find', { collection: 'picked' }, (err, users) => {
+        this.picked = users
+      }), 1000)
+    );
+    this.interval.push(
+      setInterval(() => this.socket.emit('find', {}, (err, users) => {
+        this.users = users
+      }), 1000)
+    )
     this.socket.emit('settings', (err, data) => {
       this.eligibility.eligibilityAll = data.eligibility.eligibilityAll
       this.eligibility.eligibilityFollowers = data.eligibility.eligibilityFollowers
@@ -184,7 +193,8 @@ export default {
       users: [],
       picked: [],
       updated: String(new Date()),
-      socket: io('/systems/queue', {query: "token=" + this.token})
+      socket: io('/systems/queue', {query: "token=" + this.token}),
+      interval: [],
     }
   },
   methods: {
