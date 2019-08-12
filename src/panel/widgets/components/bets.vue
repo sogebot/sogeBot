@@ -78,7 +78,8 @@ export default {
       locked: false,
       options: [],
       timer: null,
-      title: ''
+      title: '',
+      interval: [],
     }
   },
   watch: {
@@ -90,27 +91,34 @@ export default {
     }
   },
   created: function () {
-    setInterval(() => this.socket.emit('findOne', { where: { key: 'bets' } }, (err, _current) => {
-      if (err) return console.error(err)
-      this.socket.emit('find', { collection: 'users' }, (err, _bets) => {
+    this.interval.push(
+      setInterval(() => this.socket.emit('findOne', { where: { key: 'bets' } }, (err, _current) => {
         if (err) return console.error(err)
-        if (!_.isEmpty(_current)) {
-          this.locked = _current.locked
-          this.options = _current.options
-          this.timer = Number((Number(_current.end) - new Date().getTime()) / 1000).toFixed(0)
-          if (this.timer <= 0) this.timer = 0
-          this.title = _current.title
-        } else {
-          this.title = ''
-          this.timer = null,
-          this.options = []
-        }
-        this.bets = _bets
-      })
-    }), 1000)
+        this.socket.emit('find', { collection: 'users' }, (err, _bets) => {
+          if (err) return console.error(err)
+          if (!_.isEmpty(_current)) {
+            this.locked = _current.locked
+            this.options = _current.options
+            this.timer = Number((Number(_current.end) - new Date().getTime()) / 1000).toFixed(0)
+            if (this.timer <= 0) this.timer = 0
+            this.title = _current.title
+          } else {
+            this.title = ''
+            this.timer = null,
+            this.options = []
+          }
+          this.bets = _bets
+        })
+      }), 1000)
+    );
     this.socket.emit('settings', (err, settings) => {
       this.betPercentGain = settings.betPercentGain
     })
+  },
+  beforeDestroy: function() {
+    for(const interval of this.interval) {
+      clearInterval(interval);
+    }
   },
   methods: {
     close: function (index) {

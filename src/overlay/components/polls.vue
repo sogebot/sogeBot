@@ -77,6 +77,12 @@ export default {
         inativityTime: 5000,
         align: 'top'
       },
+      interval: [],
+    }
+  },
+  beforeDestroy: function() {
+    for(const interval of this.interval) {
+      clearInterval(interval);
     }
   },
   mounted: function () {
@@ -84,7 +90,7 @@ export default {
   },
   created: function () {
     this.refresh()
-    setInterval(() => this.currentTime = Date.now(), 100)
+    this.interval.push(setInterval(() => this.currentTime = Date.now(), 100));
     this.socket.emit('getVoteCommand', (cmd) => this.voteCommand = cmd)
   },
   computed: {

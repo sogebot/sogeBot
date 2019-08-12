@@ -34,7 +34,13 @@ export default {
       socket: io('/overlays/emotes', {
         query: "token=" + token
       }),
-      emotes: []
+      emotes: [],
+      interval: [],
+    }
+  },
+  beforeDestroy: function() {
+    for(const interval of this.interval) {
+      clearInterval(interval);
     }
   },
   created: function () {
@@ -42,10 +48,10 @@ export default {
     this.socket.on('emote.firework', (opts) => this.firework(opts))
     this.socket.on('emote', (opts) => this.addEmote(opts))
 
-    setInterval(() => {
+    this.interval.push(setInterval(() => {
       this.triggerAnimation()
       this.cleanEmotes()
-    }, 100)
+    }, 100));
   },
   methods: {
     cleanEmotes: function () {

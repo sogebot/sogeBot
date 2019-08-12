@@ -93,12 +93,18 @@ export default {
 
       player: null,
 
-      socket: io('/systems/songs', { query: "token=" + token })
+      socket: io('/systems/songs', { query: "token=" + token }),
+      interval: [],
     }
   },
   updated() {
     if (this.$refs.player) {
       this.player = this.$refs.player.player;
+    }
+  },
+  beforeDestroy: function() {
+    for(const interval of this.interval) {
+      clearInterval(interval);
     }
   },
   methods: {
@@ -182,11 +188,11 @@ export default {
       this.playThisSong(item)
     })
 
-    setInterval(() => {
+    this.interval.push(setInterval(() => {
       this.socket.emit('find.request', {}, (err, items) => {
         this.requests = items
       })
-    }, 1000)
+    }, 1000));
   },
   filters: {
     formatTime: function (seconds) {
