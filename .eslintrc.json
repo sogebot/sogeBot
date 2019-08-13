@@ -13,6 +13,8 @@
         "@typescript-eslint/no-use-before-define": 0,
         "@typescript-eslint/class-name-casing": 0,
         "@typescript-eslint/no-unused-vars": ["error", { "args": "none" }],
+        "@typescript-eslint/prefer-interface": false,
+        "interface-over-type-literal": false,
         "@typescript-eslint/no-inferrable-types": 2,
         "semi": "off",
         "@typescript-eslint/semi": ["error"],

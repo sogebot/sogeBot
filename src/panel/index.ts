@@ -49,6 +49,7 @@ import BootstrapVue from 'bootstrap-vue';
 Vue.use(BootstrapVue);
 
 import Vuelidate from 'vuelidate';
+import { ButtonStates, states } from './helpers/buttonStates';
 Vue.use(Vuelidate);
 
 /* import widely used components */
@@ -72,6 +73,7 @@ declare module 'vue/types/vue' {
     token: string;
     configuration: any;
     $moment?: any;
+    $state: states;
     _: _.LoDashStatic;
     urlParam(key: string): string | null;
     translate(id: string): string;
@@ -92,6 +94,7 @@ const main = async () => {
   Vue.prototype.token = token;
   Vue.prototype.configuration = global.configuration;
   Vue.prototype._ = _;
+  Vue.prototype.$state = ButtonStates;
 
   setMainLoaded();
 
@@ -113,6 +116,8 @@ const main = async () => {
       { path: '/settings/permissions/:id?', name: 'PermissionsSettings', component: () => import('./views/settings/permissions.vue') },
       { path: '/settings/:type/:id?', name: 'InterfaceSettings', component: () => import('./views/settings/interface.vue') },
 
+      { path: '/registry/alerts/list', name: 'alertsList', component: () => import('./views/registries/alerts/alerts-list.vue') },
+      { path: '/registry/alerts/edit/:id?', name: 'alertsEdit', component: () => import('./views/registries/alerts/alerts-edit.vue') },
       { path: '/registry/customvariables/list', name: 'CustomVariableList', component: () => import('./views/registries/custom-variables/custom-variables-list.vue') },
       { path: '/registry/customvariables/edit/:id?', name: 'CustomVariableEdit', component: () => import('./views/registries/custom-variables/custom-variables-edit.vue') },
       { path: '/registry/textoverlay/list', name: 'TextOverlayList', component: () => import('./views/registries/text-overlay/text-overlay-list.vue') },
