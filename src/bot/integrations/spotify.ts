@@ -284,7 +284,7 @@ class Spotify extends Integration {
         currentSong = {
           finished_at: Date.now() - data.body.item.duration_ms, // may be off ~10s, but its important for requests
           song: data.body.item.name,
-          artist: data.body.item.artists[0].name,
+          artist: data.body.item.artists.map(o => o.name).join(', '),
           uri: data.body.item.uri,
           is_playing: data.body.is_playing,
           is_enabled: await this.isEnabled()
