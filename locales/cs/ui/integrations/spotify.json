@@ -11,7 +11,7 @@
     "redirectURI": "redirectURI",
     "format": {
       "title": "Formát",
-      "help": "Dostupné proměnné: $song, $artist"
+      "help": "Dostupné proměnné: $song, $artist, $artists"
     },
     "username": "Autorizovaný uživatel",
     "revokeBtn": "Zrušit autorizaci uživatele",
