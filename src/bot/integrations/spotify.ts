@@ -29,7 +29,7 @@ class Spotify extends Integration {
     uri: string;
     requestBy: string;
     artist: string;
-    artists: string,
+    artists: string;
     song: string;
   }[] = [];
   currentUris: string | null = null;
