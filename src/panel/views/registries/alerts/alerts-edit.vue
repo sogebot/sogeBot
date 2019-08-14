@@ -92,33 +92,46 @@
         <b-textarea v-model.trim="customProfanityList" placeholder="kitty zebra horse"></b-textarea>
       </b-form-group>
 
+      <b-tabs align="center" v-model="selectedTabIndex" >
+        <b-tab v-for="event in supportedEvents" :key="'event-tab-' + event" :title="translate('registry.alerts.event.' + event)">
+          <b-card no-body>
+            <b-tabs card vertical pills>
+              <!-- New Tab Button (Using tabs slot) -->
+              <template slot="tabs">
+                <b-nav-item @click.prevent="newAlert" href="#"><b>+ new alert</b></b-nav-item>
+              </template>
 
-      <b-card no-body>
-        <b-tabs pills card vertical>
-          <!--b-tab :active="idx === 0" v-for="(ev, idx) of supportedEvents" :key="ev">
-            <template slot="title">
-              <fa icon="check"/> {{ translate('registry.alerts.' + ev) }}
-            </template>
-            <p class="p-3">
-              <b-form-group
-                :label="translate('registry.alerts.simple.text.name')"
-                label-for="name"
-                :description="translate('registry.alerts.simple.text.help')"
-              >
-                <b-form-input
-                  id="text"
-                  v-model="alerts[ev].simple.text"
-                  type="text"
-                  :placeholder="translate('registry.alerts.simple.text.placeholder')"
-                  @input="$v.alerts[ev].$touch()"
-                  :state="$v.alerts[ev].$invalid && $v.alerts[ev].$dirty ? 'invalid' : null"
-                ></b-form-input>
-                <b-form-invalid-feedback>{{ translate('dialog.errors.required') }}</b-form-invalid-feedback>
-              </b-form-group>
-            </p>
-          </b-tab-->
-        </b-tabs>
-      </b-card>
+              <!-- Render this if no tabs -->
+              <div slot="empty" class="text-center text-muted">
+                There are no alerts<br>
+                Create new alert using the <b>+</b> button on left side.
+              </div>
+              <!--b-tab :active="idx === 0" v-for="(ev, idx) of supportedEvents" :key="ev">
+                <template slot="title">
+                  <fa icon="check"/> {{ translate('registry.alerts.' + ev) }}
+                </template>
+                <p class="p-3">
+                  <b-form-group
+                    :label="translate('registry.alerts.simple.text.name')"
+                    label-for="name"
+                    :description="translate('registry.alerts.simple.text.help')"
+                  >
+                    <b-form-input
+                      id="text"
+                      v-model="alerts[ev].simple.text"
+                      type="text"
+                      :placeholder="translate('registry.alerts.simple.text.placeholder')"
+                      @input="$v.alerts[ev].$touch()"
+                      :state="$v.alerts[ev].$invalid && $v.alerts[ev].$dirty ? 'invalid' : null"
+                    ></b-form-input>
+                    <b-form-invalid-feedback>{{ translate('dialog.errors.required') }}</b-form-invalid-feedback>
+                  </b-form-group>
+                </p>
+              </b-tab-->
+            </b-tabs>
+          </b-card>
+        </b-tab>
+      </b-tabs>
     </b-form>
   </b-container>
 </template>
@@ -157,13 +170,16 @@ export default class AlertsEdit extends Vue {
   state: { loaded: number; save: number } = { loaded: this.$state.progress, save: this.$state.idle }
   pending: boolean = false;
 
+  supportedEvents: string[] = ['follow', 'cheer', 'subscribe', 'host', 'resubscribe']
+  selectedTabIndex: number = 0;
+
   item: Registry.Alerts.Alert = {
     id: uuid(),
     name: '',
     alertDelayInMs: 5000,
     profanityFilterType: 'replace-with-asterisk',
     loadStandardProfanityList: true,
-    customProfanityList: ['lorem', 'ipsum'],
+    customProfanityList: [],
     alerts: [],
   }
 
@@ -226,6 +242,10 @@ export default class AlertsEdit extends Vue {
     if (this.state.loaded === this.$state.success) {
       this.pending = true;
     }
+  }
+
+  newAlert() {
+    console.log(`creating new alert ${this.supportedEvents[this.selectedTabIndex]}`);
   }
 
   async remove () {
