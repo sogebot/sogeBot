@@ -11,7 +11,7 @@
     "redirectURI": "redirectURI",
     "format": {
       "title": "Format",
-      "help": "Available variables: $song, $artist"
+      "help": "Available variables: $song, $artist, $artists"
     },
     "username": "Authorized user",
     "revokeBtn": "Revoke user authorization",

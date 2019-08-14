@@ -29,6 +29,7 @@ class Spotify extends Integration {
     uri: string;
     requestBy: string;
     artist: string;
+    artists: string;
     song: string;
   }[] = [];
   currentUris: string | null = null;
@@ -285,6 +286,7 @@ class Spotify extends Integration {
           finished_at: Date.now() - data.body.item.duration_ms, // may be off ~10s, but its important for requests
           song: data.body.item.name,
           artist: data.body.item.artists[0].name,
+          artists: data.body.item.artists.map(o => o.name).join(', '),
           uri: data.body.item.uri,
           is_playing: data.body.is_playing,
           is_enabled: await this.isEnabled()
@@ -482,13 +484,14 @@ class Spotify extends Integration {
         let track = response.data;
         sendMessage(
           prepare('integrations.spotify.song-requested', {
-            name: track.name, artist: track.artists[0].name
+            name: track.name, artist: track.artists[0].name, artists: track.artists.map(o => o.name).join(', ')
           }), opts.sender);
         this.uris.push({
           uri: 'spotify:track:' + id,
           requestBy: opts.sender.username,
           song: track.name,
           artist: track.artists[0].name,
+          artists: track.artists.map(o => o.name).join(', ')
         });
       } else {
         let response = await axios({
@@ -509,6 +512,7 @@ class Spotify extends Integration {
           requestBy: opts.sender.username,
           song: track.name,
           artist: track.artists[0].name,
+          artists: track.artists.map(o => o.name).join(', ')
         });
       }
     } catch (e) {
