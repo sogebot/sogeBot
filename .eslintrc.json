@@ -14,7 +14,7 @@
         "@typescript-eslint/class-name-casing": 0,
         "@typescript-eslint/no-unused-vars": ["error", { "args": "none" }],
         "@typescript-eslint/prefer-interface": false,
-        "interface-over-type-literal": false,
+        "interface-over-type-literal": 0,
         "@typescript-eslint/no-inferrable-types": 2,
         "semi": "off",
         "@typescript-eslint/semi": ["error"],
@@ -37,13 +37,9 @@
       "brace-style": "error",
       "no-useless-call": "error"
     },
-    "parserOptions": {
-      "ecmaFeatures": {
-        "jsx": true
-      },
-      "useJSXTextNode": true,
-      "project": "./tsconfig.json",
-      "tsconfigRootDir": "./",
-      "extraFileExtensions": [".vue"]
-    }
+    "useJSXTextNode": true,
+    "project": "./tsconfig.json",
+    "tsconfigRootDir": "./",
+    "extraFileExtensions": [".vue"]
   }
+}
