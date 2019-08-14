@@ -17,9 +17,9 @@ class Gamble extends Game {
   dependsOn = [  'systems.points' ];
 
   @settings()
-  minimalBet: number = 0;
+  minimalBet = 0;
   @settings()
-  chanceToWin: number = 50;
+  chanceToWin = 50;
 
   @command('!gamble')
   async main (opts) {
@@ -27,7 +27,7 @@ class Gamble extends Game {
 
     opts.sender['message-type'] = 'chat'; // force responses to chat
     try {
-      let parsed = opts.parameters.trim().match(/^([\d]+|all)$/);
+      const parsed = opts.parameters.trim().match(/^([\d]+|all)$/);
       if (_.isNil(parsed)) {throw Error(ERROR_NOT_ENOUGH_OPTIONS);}
 
       const pointsOfUser = await global.systems.points.getPointsOf(opts.sender.userId);
@@ -40,7 +40,7 @@ class Gamble extends Game {
       await global.db.engine.increment('users.points', { id: opts.sender.userId }, { points: parseInt(points, 10) * -1 });
       if (_.random(0, 100, false) <= this.chanceToWin) {
         await global.db.engine.increment('users.points', { id: opts.sender.userId }, { points: parseInt(points, 10) * 2 });
-        let updatedPoints = await global.systems.points.getPointsOf(opts.sender.userId);
+        const updatedPoints = await global.systems.points.getPointsOf(opts.sender.userId);
         message = await prepare('gambling.gamble.win', {
           pointsName: await global.systems.points.getPointsName(updatedPoints),
           points: updatedPoints

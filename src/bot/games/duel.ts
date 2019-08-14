@@ -18,18 +18,18 @@ class Duel extends Game {
   dependsOn = [ 'systems.points' ];
 
   @shared()
-  _timestamp: number = 0;
+  _timestamp = 0;
   @shared()
-  _cooldown: string = String(new Date());
+  _cooldown = String(new Date());
 
   @settings()
-  cooldown: number = 0;
+  cooldown = 0;
   @settings()
-  duration: number = 5;
+  duration = 5;
   @settings()
-  minimalBet: number = 0;
+  minimalBet = 0;
   @settings()
-  bypassCooldownByOwnerAndMods: boolean = false;
+  bypassCooldownByOwnerAndMods = false;
 
   constructor () {
     super();
@@ -59,7 +59,7 @@ class Duel extends Game {
 
     let winner = _.random(0, total, false);
     let winnerUser;
-    for (let user of users) {
+    for (const user of users) {
       winner = winner - user.tickets;
       if (winner <= 0) { // winner tickets are <= 0 , we have winner
         winnerUser = user;
@@ -69,7 +69,7 @@ class Duel extends Game {
 
     const probability = winnerUser.tickets / (total / 100);
 
-    let m = await prepare(_.size(users) === 1 ? 'gambling.duel.noContestant' : 'gambling.duel.winner', {
+    const m = await prepare(_.size(users) === 1 ? 'gambling.duel.noContestant' : 'gambling.duel.winner', {
       pointsName: await global.systems.points.getPointsName(total),
       points: total,
       probability: _.round(probability, 2),
@@ -116,7 +116,7 @@ class Duel extends Game {
 
     opts.sender['message-type'] = 'chat'; // force responses to chat
     try {
-      let parsed = opts.parameters.trim().match(/^([\d]+|all)$/);
+      const parsed = opts.parameters.trim().match(/^([\d]+|all)$/);
       if (_.isNil(parsed)) {throw Error(ERROR_NOT_ENOUGH_OPTIONS);}
 
       const points = await global.systems.points.getPointsOf(opts.sender.userId);
@@ -127,7 +127,7 @@ class Duel extends Game {
       if (bet < (this.minimalBet)) {throw Error(ERROR_MINIMAL_BET);}
 
       // check if user is already in duel and add points
-      let userFromDB = await global.db.engine.findOne(this.collection.users, { id: opts.sender.userId });
+      const userFromDB = await global.db.engine.findOne(this.collection.users, { id: opts.sender.userId });
       const isNewDuelist = _.isEmpty(userFromDB);
       if (!isNewDuelist) {
         await global.db.engine.update(this.collection.users, { _id: String(userFromDB._id) }, { tickets: Number(userFromDB.tickets) + Number(bet) });

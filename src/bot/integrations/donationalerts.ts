@@ -13,7 +13,7 @@ class Donationalerts extends Integration {
 
   @settings()
   @ui({ type: 'text-input', secret: true })
-  secretToken: string = '';
+  secretToken = '';
 
   constructor () {
     super();
@@ -70,7 +70,7 @@ class Donationalerts extends Integration {
       this.socket.off('donation').on('donation', async (data) => {
         data = JSON.parse(data);
         if (parseInt(data.alert_type, 10) !== 1) {return;}
-        let additionalData = JSON.parse(data.additional_data);
+        const additionalData = JSON.parse(data.additional_data);
         global.overlays.eventlist.add({
           type: 'tip',
           amount: data.amount,
@@ -99,14 +99,14 @@ class Donationalerts extends Integration {
         }
 
         // go through all systems and trigger on.tip
-        for (let [, systems] of Object.entries({
+        for (const [, systems] of Object.entries({
           systems: global.systems,
           games: global.games,
           overlays: global.overlays,
           widgets: global.widgets,
           integrations: global.integrations
         })) {
-          for (let [name, system] of Object.entries(systems)) {
+          for (const [name, system] of Object.entries(systems)) {
             if (name.startsWith('_') || typeof system.on === 'undefined') {continue;}
             if (Array.isArray(system.on.tip)) {
               for (const fnc of system.on.tip) {

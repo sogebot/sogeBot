@@ -41,13 +41,13 @@ class Commercial extends System {
   @default_permission(permission.CASTERS)
   @helper()
   async main (opts) {
-    let parsed = opts.parameters.match(/^([\d]+)? ?(.*)?$/);
+    const parsed = opts.parameters.match(/^([\d]+)? ?(.*)?$/);
 
     if (_.isNil(parsed)) {
       sendMessage('$sender, something went wrong with !commercial', opts.sender, opts.attr);
     }
 
-    let commercial = {
+    const commercial = {
       duration: !_.isNil(parsed[1]) ? parseInt(parsed[1], 10) : null,
       message: !_.isNil(parsed[2]) ? parsed[2] : null
     };

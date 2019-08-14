@@ -13,7 +13,7 @@ import { loadingInProgress } from './decorators';
 
 class Module {
   public dependsOn: string[] = [];
-  public showInUI: boolean = true;
+  public showInUI = true;
   public collection: { [x: string]: string };
   public timeouts: { [x: string]: NodeJS.Timeout } = {};
   public settingsList: { category: string; key: string }[] = [];
@@ -46,9 +46,9 @@ class Module {
   protected _commands: Command[];
   protected _parsers: Parser[];
   protected _rollback: { name: string }[];
-  protected _enabled: boolean = true;
+  protected _enabled = true;
 
-  constructor(name: string = 'core', enabled: boolean = true) {
+  constructor(name = 'core', enabled = true) {
     this.on = {
       change: {
         enabled: [],
@@ -204,9 +204,9 @@ class Module {
                 };
               }
 
-              let toRemove: string[] = [];
+              const toRemove: string[] = [];
               for (const possibleVariable of o.split('.')) {
-                let isVariableFound = this.settingsList.find(o => possibleVariable === o.key);
+                const isVariableFound = this.settingsList.find(o => possibleVariable === o.key);
                 if (isVariableFound) {
                   return {
                     key: o,
@@ -797,7 +797,7 @@ class Module {
     }
   }
 
-  protected async getPermissionBasedSettingsValue(key: string, set_default_values: boolean = true): Promise<{[permissionId: string]: any}> {
+  protected async getPermissionBasedSettingsValue(key: string, set_default_values = true): Promise<{[permissionId: string]: any}> {
     // current permission settings by user
     const permSet = {};
     let permId = permission.VIEWERS;

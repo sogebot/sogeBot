@@ -34,13 +34,13 @@ class PhillipsHue extends Integration {
   states: State[] = [];
 
   @settings('connection')
-  host: string = '';
+  host = '';
   @settings('connection')
-  user: string = '';
+  user = '';
   @settings('connection')
-  port: number = 0;
+  port = 0;
   @settings('connection')
-  timeout: number = 30000;
+  timeout = 30000;
 
   constructor () {
     super();
@@ -114,7 +114,7 @@ class PhillipsHue extends Integration {
     }
     this.api.lights()
       .then(function (lights) {
-        var output: string[] = [];
+        const output: string[] = [];
         _.each(lights.lights, function (light) {
           output.push('id: ' + light.id + ', name: \'' + light.name + '\'');
         });
@@ -130,7 +130,7 @@ class PhillipsHue extends Integration {
     if (!isMainThread) {
       return global.workers.sendToMaster({ type: 'call', ns: 'systems.phillipshue', fnc: 'hue', args: [{sender: opts.sender, text: opts.parameters }]});
     }
-    var rgb = this.parseText(opts.parameters, 'rgb', '255,255,255').split(',').map(o => Number(o));
+    let rgb = this.parseText(opts.parameters, 'rgb', '255,255,255').split(',').map(o => Number(o));
     if (rgb.length < 3) {rgb = [255, 255, 255];}
 
     this.states.push({
@@ -149,7 +149,7 @@ class PhillipsHue extends Integration {
 
   parseText (text: string, value: string, defaultValue: string) {
     defaultValue = defaultValue || '0';
-    for (let part of text.trim().split(' ')) {
+    for (const part of text.trim().split(' ')) {
       if (part.startsWith(value + '=')) {
         defaultValue = part.replace(value + '=', '');
         break;

@@ -15,7 +15,7 @@ class General extends Core {
     const f = readdirSync('./locales/');
     return [...new Set(f.map((o) => o.split('.')[0]))];
   }})
-  public lang: string = 'en';
+  public lang = 'en';
 
   @command('!enable')
   @default_permission(permission.CASTERS)

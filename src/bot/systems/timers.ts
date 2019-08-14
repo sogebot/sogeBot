@@ -36,14 +36,14 @@ class Timers extends System {
 
     this.socket.on('connection', (socket) => {
       socket.on('find.timers', async (callback) => {
-        let [timers, responses] = await Promise.all([
+        const [timers, responses] = await Promise.all([
           global.db.engine.find(this.collection.data),
           global.db.engine.find(this.collection.responses)
         ]);
         callback(null, { timers: timers, responses: responses });
       });
       socket.on('findOne.timer', async (opts, callback) => {
-        let [timer, responses] = await Promise.all([
+        const [timer, responses] = await Promise.all([
           global.db.engine.findOne(this.collection.data, { _id: opts._id }),
           global.db.engine.find(this.collection.responses, { timerId: opts._id })
         ]);
@@ -79,8 +79,8 @@ class Timers extends System {
           ]);
         }
 
-        var insertArray: any[] = [];
-        for (let response of data.responses) {
+        const insertArray: any[] = [];
+        for (const response of data.responses) {
           insertArray.push(global.db.engine.insert(this.collection.responses, {
             timerId: data.timer._id,
             response: response.response,
@@ -126,21 +126,21 @@ class Timers extends System {
   }
 
   async init () {
-    let timers = await global.db.engine.find(this.collection.data);
-    for (let timer of timers) {await global.db.engine.update(this.collection.data, { _id: timer._id.toString() }, { trigger: { messages: 0, timestamp: new Date().getTime() } });}
+    const timers = await global.db.engine.find(this.collection.data);
+    for (const timer of timers) {await global.db.engine.update(this.collection.data, { _id: timer._id.toString() }, { trigger: { messages: 0, timestamp: new Date().getTime() } });}
     this.check();
   }
 
   async check () {
     clearTimeout(this.timeouts['timersCheck']);
 
-    let timers = await global.db.engine.find(this.collection.data, { enabled: true });
-    for (let timer of timers) {
+    const timers = await global.db.engine.find(this.collection.data, { enabled: true });
+    for (const timer of timers) {
       if (timer.messages > 0 && timer.trigger.messages - global.linesParsed + timer.messages > 0) {continue;} // not ready to trigger with messages
       if (timer.seconds > 0 && new Date().getTime() - timer.trigger.timestamp < timer.seconds * 1000) {continue;} // not ready to trigger with seconds
 
-      let responses = await global.db.engine.find(this.collection.responses, { timerId: timer._id.toString(), enabled: true });
-      let response = _.orderBy(responses, 'timestamp', 'asc')[0];
+      const responses = await global.db.engine.find(this.collection.responses, { timerId: timer._id.toString(), enabled: true });
+      const response = _.orderBy(responses, 'timestamp', 'asc')[0];
 
       if (!_.isNil(response)) {
         const userObj = await global.users.getByName(getOwner());
@@ -162,7 +162,7 @@ class Timers extends System {
   async editName (self, socket, data) {
     if (data.value.length === 0) {await self.unset(self, null, `-name ${data.id}`);}
     else {
-      let name = data.value.match(/([a-zA-Z0-9_]+)/);
+      const name = data.value.match(/([a-zA-Z0-9_]+)/);
       if (_.isNil(name)) {return;}
       await global.db.engine.update(this.collection.data, { name: data.id.toString() }, { name: name[0] });
     }
@@ -215,7 +215,7 @@ class Timers extends System {
       name = name[1];
     }
 
-    let timer = await global.db.engine.findOne(this.collection.data, { name: name });
+    const timer = await global.db.engine.findOne(this.collection.data, { name: name });
     if (_.isEmpty(timer)) {
       sendMessage(global.translate('timers.timer-not-found').replace(/\$name/g, name), opts.sender, opts.attr);
       return false;
@@ -265,14 +265,14 @@ class Timers extends System {
     } else {
       response = response[1];
     }
-    let timer = await global.db.engine.findOne(this.collection.data, { name: name });
+    const timer = await global.db.engine.findOne(this.collection.data, { name: name });
     if (_.isEmpty(timer)) {
       sendMessage(global.translate('timers.timer-not-found')
         .replace(/\$name/g, name), opts.sender);
       return false;
     }
 
-    let item = await global.db.engine.insert(this.collection.responses, { response: response, timestamp: new Date().getTime(), enabled: true, timerId: timer._id.toString() });
+    const item = await global.db.engine.insert(this.collection.responses, { response: response, timestamp: new Date().getTime(), enabled: true, timerId: timer._id.toString() });
     sendMessage(global.translate('timers.response-was-added')
       .replace(/\$id/g, item._id)
       .replace(/\$name/g, name)
@@ -286,21 +286,21 @@ class Timers extends System {
     let name = opts.parameters.match(/-name ([\S]+)/);
 
     if (_.isNil(name)) {
-      let timers = await global.db.engine.find(this.collection.data);
+      const timers = await global.db.engine.find(this.collection.data);
       sendMessage(global.translate('timers.timers-list').replace(/\$list/g, _.map(_.orderBy(timers, 'name'), (o) => (o.enabled ? '⚫' : '⚪') + ' ' + o.name).join(', ')), opts.sender, opts.attr);
       return true;
     } else { name = name[1]; }
 
-    let timer = await global.db.engine.findOne(this.collection.data, { name: name });
+    const timer = await global.db.engine.findOne(this.collection.data, { name: name });
     if (_.isEmpty(timer)) {
       sendMessage(global.translate('timers.timer-not-found')
         .replace(/\$name/g, name), opts.sender);
       return false;
     }
 
-    let responses = await global.db.engine.find(this.collection.responses, { timerId: timer._id.toString() });
+    const responses = await global.db.engine.find(this.collection.responses, { timerId: timer._id.toString() });
     await sendMessage(global.translate('timers.responses-list').replace(/\$name/g, name), opts.sender, opts.attr);
-    for (let response of responses) {await sendMessage((response.enabled ? '⚫ ' : '⚪ ') + `${response._id} - ${response.response}`, opts.sender, opts.attr);}
+    for (const response of responses) {await sendMessage((response.enabled ? '⚫ ' : '⚪ ') + `${response._id} - ${response.response}`, opts.sender, opts.attr);}
     return true;
   }
 
@@ -318,7 +318,7 @@ class Timers extends System {
 
     if (!_.isNil(id)) {
       id = id[1];
-      let response = await global.db.engine.findOne(this.collection.responses, { _id: id });
+      const response = await global.db.engine.findOne(this.collection.responses, { _id: id });
       if (_.isEmpty(response)) {
         sendMessage(global.translate('timers.response-not-found').replace(/\$id/g, id), opts.sender, opts.attr);
         return false;
@@ -332,7 +332,7 @@ class Timers extends System {
 
     if (!_.isNil(name)) {
       name = name[1];
-      let timer = await global.db.engine.findOne(this.collection.data, { name: name });
+      const timer = await global.db.engine.findOne(this.collection.data, { name: name });
       if (_.isEmpty(timer)) {
         sendMessage(global.translate('timers.timer-not-found').replace(/\$name/g, name), opts.sender, opts.attr);
         return false;

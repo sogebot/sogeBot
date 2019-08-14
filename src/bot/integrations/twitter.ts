@@ -20,16 +20,16 @@ class Twitter extends Integration {
 
   @settings('token')
   @ui({ type: 'text-input', secret: true })
-  consumerKey: string = '';
+  consumerKey = '';
   @settings('token')
   @ui({ type: 'text-input', secret: true })
-  consumerSecret: string = '';
+  consumerSecret = '';
   @settings('token')
   @ui({ type: 'text-input', secret: true })
-  accessToken: string = '';
+  accessToken = '';
   @settings('token')
   @ui({ type: 'text-input', secret: true })
-  secretToken: string = '';
+  secretToken = '';
 
   constructor() {
     super();

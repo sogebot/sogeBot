@@ -12,22 +12,22 @@ class Heist extends Game {
   @shared()
   startedAt: null | number = null;
   @shared()
-  lastAnnouncedLevel: string = '';
+  lastAnnouncedLevel = '';
   @shared()
-  lastHeistTimestamp: number = 0;
+  lastHeistTimestamp = 0;
   @shared()
-  lastAnnouncedCops: number = 0;
+  lastAnnouncedCops = 0;
   @shared()
-  lastAnnouncedHeistInProgress: number = 0;
+  lastAnnouncedHeistInProgress = 0;
   @shared()
-  lastAnnouncedStart: number = 0;
+  lastAnnouncedStart = 0;
 
   @settings('options')
-  showMaxUsers: number = 20;
+  showMaxUsers = 20;
   @settings('options')
-  copsCooldownInMinutes: number = 10;
+  copsCooldownInMinutes = 10;
   @settings('options')
-  entryCooldownInSeconds: number = 120;
+  entryCooldownInSeconds = 120;
 
   @settings('notifications')
   started: string = global.translate('games.heist.started');
@@ -100,19 +100,19 @@ class Heist extends Game {
   async iCheckFinished () {
     clearTimeout(this.timeouts['iCheckFinished']);
 
-    let [startedAt, entryCooldown, lastHeistTimestamp, copsCooldown, started] = await Promise.all([
+    const [startedAt, entryCooldown, lastHeistTimestamp, copsCooldown, started] = await Promise.all([
       this.startedAt,
       this.entryCooldownInSeconds,
       this.lastHeistTimestamp,
       this.copsCooldownInMinutes,
       this.started
     ]);
-    let levels = _.orderBy(this.levelsValues, 'maxUsers', 'asc');
+    const levels = _.orderBy(this.levelsValues, 'maxUsers', 'asc');
 
     // check if heist is finished
     if (!_.isNil(startedAt) && _.now() - startedAt > (entryCooldown * 1000) + 10000) {
-      let users = await global.db.engine.find(this.collection.users);
-      let level = _.find(levels, (o) => o.maxUsers >= users.length || _.isNil(o.maxUsers)); // find appropriate level or max level
+      const users = await global.db.engine.find(this.collection.users);
+      const level = _.find(levels, (o) => o.maxUsers >= users.length || _.isNil(o.maxUsers)); // find appropriate level or max level
 
       if (!level) {
         return; // don't do anything if there is no level
@@ -146,9 +146,9 @@ class Heist extends Game {
 
       if (users.length === 1) {
         // only one user
-        let isSurvivor = _.random(0, 100, false) <= level['winPercentage'];
-        let user = users[0];
-        let outcome = isSurvivor ? this.singleUserSuccess : this.singleUserFailed;
+        const isSurvivor = _.random(0, 100, false) <= level['winPercentage'];
+        const user = users[0];
+        const outcome = isSurvivor ? this.singleUserSuccess : this.singleUserFailed;
         global.setTimeout(async () => { sendMessage(outcome.replace('$user', (global.tmi.showWithAt ? '@' : '') + user.username), {
           username: userObj.username,
           displayName: userObj.displayName || userObj.username,
@@ -160,24 +160,24 @@ class Heist extends Game {
 
         if (isSurvivor) {
           // add points to user
-          let points = parseInt((await global.db.engine.findOne(this.collection.users, { username: user.username })).points, 10);
+          const points = parseInt((await global.db.engine.findOne(this.collection.users, { username: user.username })).points, 10);
           await global.db.engine.increment('users.points', { id: user.id }, { points: Number(points * level.payoutMultiplier).toFixed() });
         }
       } else {
-        let winners: string[] = [];
-        for (let user of users) {
-          let isSurvivor = _.random(0, 100, false) <= level.winPercentage;
+        const winners: string[] = [];
+        for (const user of users) {
+          const isSurvivor = _.random(0, 100, false) <= level.winPercentage;
 
           if (isSurvivor) {
             // add points to user
-            let points = parseInt((await global.db.engine.findOne(this.collection.users, { username: user.username })).points, 10);
+            const points = parseInt((await global.db.engine.findOne(this.collection.users, { username: user.username })).points, 10);
             await global.db.engine.increment('users.points', { id: user.id }, { points: Number(points * level.payoutMultiplier).toFixed() });
             winners.push(user.username);
           }
         }
-        let percentage = (100 / users.length) * winners.length;
-        let ordered = _.orderBy(this.resultsValues, [(o) => o.percentage], 'asc');
-        let result = _.find(ordered, (o) => o.percentage >= percentage);
+        const percentage = (100 / users.length) * winners.length;
+        const ordered = _.orderBy(this.resultsValues, [(o) => o.percentage], 'asc');
+        const result = _.find(ordered, (o) => o.percentage >= percentage);
         global.setTimeout(async () => { sendMessage(_.isNil(result) ? '' : result.message, {
           username: userObj.username,
           displayName: userObj.displayName || userObj.username,
@@ -189,8 +189,8 @@ class Heist extends Game {
         if (winners.length > 0) {
           global.setTimeout(async () => {
             const chunk: string[][] = _.chunk(winners, this.showMaxUsers);
-            let winnersList = chunk.shift() || [];
-            let andXMore = _.flatten(winners).length;
+            const winnersList = chunk.shift() || [];
+            const andXMore = _.flatten(winners).length;
 
             let message = await global.translate('games.heist.results');
             message = message.replace('$users', winnersList.map((o) => (global.tmi.showWithAt ? '@' : '') + o).join(', '));
@@ -233,16 +233,16 @@ class Heist extends Game {
   async main (opts) {
     const expects = new Expects();
 
-    let [entryCooldown, lastHeistTimestamp, copsCooldown] = await Promise.all([
+    const [entryCooldown, lastHeistTimestamp, copsCooldown] = await Promise.all([
       this.entryCooldownInSeconds,
       this.lastHeistTimestamp,
       this.copsCooldownInMinutes
     ]);
-    let levels = _.orderBy(this.levelsValues, 'maxUsers', 'asc');
+    const levels = _.orderBy(this.levelsValues, 'maxUsers', 'asc');
 
     // is cops patrolling?
     if (_.now() - lastHeistTimestamp < copsCooldown * 60000) {
-      let minutesLeft = Number(copsCooldown - (_.now() - lastHeistTimestamp) / 60000).toFixed(1);
+      const minutesLeft = Number(copsCooldown - (_.now() - lastHeistTimestamp) / 60000).toFixed(1);
       if (_.now() - (this.lastAnnouncedCops) >= 60000) {
         this.lastAnnouncedCops = _.now();
         sendMessage(
@@ -298,10 +298,10 @@ class Heist extends Game {
     ]);
 
     // check how many users are in heist
-    let users = await global.db.engine.find(this.collection.users);
-    let level = _.find(levels, (o) => o.maxUsers >= users.length || _.isNil(o.maxUsers));
+    const users = await global.db.engine.find(this.collection.users);
+    const level = _.find(levels, (o) => o.maxUsers >= users.length || _.isNil(o.maxUsers));
     if (level) {
-      let nextLevel = _.find(levels, (o) => {
+      const nextLevel = _.find(levels, (o) => {
         if (level) {
           return o.maxUsers > level.maxUsers;
         } else {

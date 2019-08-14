@@ -12,7 +12,7 @@ class Stats extends Overlay {
     rawText: '/overlays/stats (500x55)',
     target: '_blank'
   }, 'links')
-  linkBtn: null = null;
+  linkBtn = null;
 
   sockets () {
     global.panel.io.of('/overlays/stats').on('connection', (socket) => {

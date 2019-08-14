@@ -40,7 +40,7 @@ class Price extends System {
     const parsed = opts.parameters.match(/^(![\S]+) ([0-9]+)$/);
 
     if (_.isNil(parsed)) {
-      let message = await prepare('price.price-parse-failed');
+      const message = await prepare('price.price-parse-failed');
       sendMessage(message, opts.sender, opts.attr);
       return false;
     }
@@ -52,7 +52,7 @@ class Price extends System {
     }
 
     await global.db.engine.update(this.collection.data, { command: command }, { command: command, price: parseInt(price, 10), enabled: true });
-    let message = await prepare('price.price-was-set', { command, amount: parseInt(price, 10), pointsName: await global.systems.points.getPointsName(price) });
+    const message = await prepare('price.price-was-set', { command, amount: parseInt(price, 10), pointsName: await global.systems.points.getPointsName(price) });
     sendMessage(message, opts.sender, opts.attr);
   }
 
@@ -62,14 +62,14 @@ class Price extends System {
     const parsed = opts.parameters.match(/^(![\S]+)$/);
 
     if (_.isNil(parsed)) {
-      let message = await prepare('price.price-parse-failed');
+      const message = await prepare('price.price-parse-failed');
       sendMessage(message, opts.sender, opts.attr);
       return false;
     }
 
     const command = parsed[1];
     await global.db.engine.remove(this.collection.data, { command: command });
-    let message = await prepare('price.price-was-unset', { command });
+    const message = await prepare('price.price-was-unset', { command });
     sendMessage(message, opts.sender, opts.attr);
   }
 
@@ -79,7 +79,7 @@ class Price extends System {
     const parsed = opts.parameters.match(/^(![\S]+)$/);
 
     if (_.isNil(parsed)) {
-      let message = await prepare('price.price-parse-failed');
+      const message = await prepare('price.price-parse-failed');
       sendMessage(message, opts.sender, opts.attr);
       return false;
     }
@@ -87,21 +87,21 @@ class Price extends System {
     const command = parsed[1];
     const price = await global.db.engine.findOne(this.collection.data, { command: command });
     if (_.isEmpty(price)) {
-      let message = await prepare('price.price-was-not-found', { command });
+      const message = await prepare('price.price-was-not-found', { command });
       sendMessage(message, opts.sender, opts.attr);
       return false;
     }
 
     await global.db.engine.update(this.collection.data, { command: command }, { enabled: !price.enabled });
-    let message = await prepare(!price.enabled ? 'price.price-was-enabled' : 'price.price-was-disabled', { command });
+    const message = await prepare(!price.enabled ? 'price.price-was-enabled' : 'price.price-was-disabled', { command });
     sendMessage(message, opts.sender, opts.attr);
   }
 
   @command('!price list')
   @default_permission(permission.CASTERS)
   async list (opts) {
-    let prices = await global.db.engine.find(this.collection.data);
-    var output = (prices.length === 0 ? global.translate('price.list-is-empty') : global.translate('price.list-is-not-empty').replace(/\$list/g, (_.map(_.orderBy(prices, 'command'), (o) => { return `${o.command} - ${o.price}`; })).join(', ')));
+    const prices = await global.db.engine.find(this.collection.data);
+    const output = (prices.length === 0 ? global.translate('price.list-is-empty') : global.translate('price.list-is-not-empty').replace(/\$list/g, (_.map(_.orderBy(prices, 'command'), (o) => { return `${o.command} - ${o.price}`; })).join(', ')));
     sendMessage(output, opts.sender, opts.attr);
   }
 
@@ -119,11 +119,11 @@ class Price extends System {
     if (_.isEmpty(price)) { // no price set
       return true;
     }
-    var availablePts = await global.systems.points.getPointsOf(opts.sender.userId);
-    var removePts = parseInt(price.price, 10);
-    let haveEnoughPoints = availablePts >= removePts;
+    const availablePts = await global.systems.points.getPointsOf(opts.sender.userId);
+    const removePts = parseInt(price.price, 10);
+    const haveEnoughPoints = availablePts >= removePts;
     if (!haveEnoughPoints) {
-      let message = await prepare('price.user-have-not-enough-points', { amount: removePts, command: `${price.command}`, pointsName: await global.systems.points.getPointsName(removePts) });
+      const message = await prepare('price.user-have-not-enough-points', { amount: removePts, command: `${price.command}`, pointsName: await global.systems.points.getPointsName(removePts) });
       sendMessage(message, opts.sender, opts.attr);
     } else {
       await global.db.engine.increment('users.points', { id: opts.sender.userId }, { points: (removePts * -1) });

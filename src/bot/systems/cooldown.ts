@@ -20,10 +20,10 @@ import System from './_interface';
 
 class Cooldown extends System {
   @settings()
-  cooldownNotifyAsWhisper: boolean = false;
+  cooldownNotifyAsWhisper = false;
 
   @settings()
-  cooldownNotifyAsChat: boolean = true;
+  cooldownNotifyAsChat = true;
 
   constructor () {
     super();
@@ -37,29 +37,29 @@ class Cooldown extends System {
     const match = XRegExp.exec(opts.parameters, constants.COOLDOWN_REGEXP_SET) as unknown as { [x: string]: string } | null;;
 
     if (_.isNil(match)) {
-      let message = await prepare('cooldowns.cooldown-parse-failed');
+      const message = await prepare('cooldowns.cooldown-parse-failed');
       sendMessage(message, opts.sender, opts.attr);
       return false;
     }
 
     if (parseInt(match.seconds, 10) === 0) {
       await global.db.engine.remove(this.collection.data, { key: match.command, type: match.type });
-      let message = await prepare('cooldowns.cooldown-was-unset', { type: match.type, command: match.command });
+      const message = await prepare('cooldowns.cooldown-was-unset', { type: match.type, command: match.command });
       sendMessage(message, opts.sender, opts.attr);
       return;
     }
 
-    let cooldown = await global.db.engine.findOne(this.collection.data, { key: match.command, type: match.type });
+    const cooldown = await global.db.engine.findOne(this.collection.data, { key: match.command, type: match.type });
     if (_.isEmpty(cooldown)) {await global.db.engine.update(this.collection.data, { key: match.command, type: match.type }, { miliseconds: parseInt(match.seconds, 10) * 1000, type: match.type, timestamp: 0, quiet: _.isNil(match.quiet) ? false : match.quiet, enabled: true, owner: false, moderator: false, subscriber: true, follower: true });}
     else {await global.db.engine.update(this.collection.data, { key: match.command, type: match.type }, { miliseconds: parseInt(match.seconds, 10) * 1000 });}
 
-    let message = await prepare('cooldowns.cooldown-was-set', { seconds: match.seconds, type: match.type, command: match.command });
+    const message = await prepare('cooldowns.cooldown-was-set', { seconds: match.seconds, type: match.type, command: match.command });
     sendMessage(message, opts.sender, opts.attr);
   }
 
   @parser({ priority: constants.HIGH })
   async check (opts: Record<string, any>) {
-    var data, viewer, timestamp, now;
+    let data, viewer, timestamp, now;
     const [command, subcommand] = new Expects(opts.message)
       .command({ optional: true })
       .string({ optional: true })
@@ -82,7 +82,7 @@ class Cooldown extends System {
         }
       }
 
-      let cooldown = await global.db.engine.findOne(this.collection.data, { key });
+      const cooldown = await global.db.engine.findOne(this.collection.data, { key });
       if (_.isEmpty(cooldown)) { // command is not on cooldown -> recheck with text only
         const replace = new RegExp(`${XRegExp.escape(key)}`, 'ig');
         opts.message = opts.message.replace(replace, '');
@@ -111,7 +111,7 @@ class Cooldown extends System {
 
       data = [];
       _.each(keywords, (keyword) => {
-        let cooldown = _.find(cooldowns, (o) => o.key.toLowerCase() === keyword.keyword.toLowerCase());
+        const cooldown = _.find(cooldowns, (o) => o.key.toLowerCase() === keyword.keyword.toLowerCase());
         if (keyword.enabled && !_.isEmpty(cooldown)) {
           data.push({
             key: cooldown.key,
@@ -139,7 +139,7 @@ class Cooldown extends System {
     const isSubscriber = typeof opts.sender.badges.subscriber !== 'undefined';
     const isFollower = user.is && user.is.follower ? user.is.follower : false;
 
-    for (let cooldown of data) {
+    for (const cooldown of data) {
       if ((isOwner(opts.sender) && !cooldown.owner) || (isMod && !cooldown.moderator) || (isSubscriber && !cooldown.subscriber) || (isFollower && !cooldown.follower)) {
         result = true;
         continue;
@@ -164,12 +164,12 @@ class Cooldown extends System {
       } else {
         if (!cooldown.quiet && this.cooldownNotifyAsWhisper) {
           opts.sender['message-type'] = 'whisper'; // we want to whisp cooldown message
-          let message = await prepare('cooldowns.cooldown-triggered', { command: cooldown.key, seconds: Math.ceil((cooldown.miliseconds - now + timestamp) / 1000) });
+          const message = await prepare('cooldowns.cooldown-triggered', { command: cooldown.key, seconds: Math.ceil((cooldown.miliseconds - now + timestamp) / 1000) });
           await sendMessage(message, opts.sender, opts.attr);
         }
         if (!cooldown.quiet && this.cooldownNotifyAsChat) {
           opts.sender['message-type'] = 'chat';
-          let message = await prepare('cooldowns.cooldown-triggered', { command: cooldown.key, seconds: Math.ceil((cooldown.miliseconds - now + timestamp) / 1000) });
+          const message = await prepare('cooldowns.cooldown-triggered', { command: cooldown.key, seconds: Math.ceil((cooldown.miliseconds - now + timestamp) / 1000) });
           await sendMessage(message, opts.sender, opts.attr);
         }
         result = false;
@@ -182,7 +182,7 @@ class Cooldown extends System {
   @rollback()
   async cooldownRollback (opts: Record<string, any>) {
     // TODO: redundant duplicated code (search of cooldown), should be unified for check and cooldownRollback
-    var data, viewer;
+    let data, viewer;
     const [command, subcommand] = new Expects(opts.message)
       .command({ optional: true })
       .string({ optional: true })
@@ -205,7 +205,7 @@ class Cooldown extends System {
         }
       }
 
-      let cooldown = await global.db.engine.findOne(this.collection.data, { key });
+      const cooldown = await global.db.engine.findOne(this.collection.data, { key });
       if (_.isEmpty(cooldown)) { // command is not on cooldown -> recheck with text only
         const replace = new RegExp(`${XRegExp.escape(key)}`, 'ig');
         opts.message = opts.message.replace(replace, '');
@@ -234,7 +234,7 @@ class Cooldown extends System {
 
       data = [];
       _.each(keywords, (keyword) => {
-        let cooldown = _.find(cooldowns, (o) => o.key.toLowerCase() === keyword.keyword.toLowerCase());
+        const cooldown = _.find(cooldowns, (o) => o.key.toLowerCase() === keyword.keyword.toLowerCase());
         if (keyword.enabled && !_.isEmpty(cooldown)) {
           data.push({
             key: cooldown.key,
@@ -261,7 +261,7 @@ class Cooldown extends System {
     const isSubscriber = typeof opts.sender.badges.subscriber !== 'undefined';
     const isFollower = user.is && user.is.follower ? user.is.follower : false;
 
-    for (let cooldown of data) {
+    for (const cooldown of data) {
       if ((isOwner(opts.sender) && !cooldown.owner) || (isMod && !cooldown.moderator) || (isSubscriber && !cooldown.subscriber) || (isFollower && !cooldown.follower)) {
         continue;
       }
@@ -281,14 +281,14 @@ class Cooldown extends System {
     const match = XRegExp.exec(opts.parameters, constants.COOLDOWN_REGEXP) as unknown as { [x: string]: string } | null;
 
     if (_.isNil(match)) {
-      let message = await prepare('cooldowns.cooldown-parse-failed');
+      const message = await prepare('cooldowns.cooldown-parse-failed');
       sendMessage(message, opts.sender, opts.attr);
       return false;
     }
 
     const cooldown = await global.db.engine.findOne(this.collection.data, { key: match.command, type: match.type });
     if (_.isEmpty(cooldown)) {
-      let message = await prepare('cooldowns.cooldown-not-found', { command: match.command });
+      const message = await prepare('cooldowns.cooldown-not-found', { command: match.command });
       sendMessage(message, opts.sender, opts.attr);
       return false;
     }
@@ -301,7 +301,7 @@ class Cooldown extends System {
     await global.db.engine.update(this.collection.data, { key: match.command, type: match.type }, cooldown);
 
     let path = '';
-    let status = cooldown[type] ? 'enabled' : 'disabled';
+    const status = cooldown[type] ? 'enabled' : 'disabled';
 
     if (type === 'moderator') {path = '-for-moderators';}
     if (type === 'owner') {path = '-for-owners';}
@@ -309,7 +309,7 @@ class Cooldown extends System {
     if (type === 'follower') {path = '-for-followers';}
     if (type === 'quiet' || type === 'type') {return;} // those two are setable only from dashboard
 
-    let message = await prepare(`cooldowns.cooldown-was-${status}${path}`, { command: cooldown.key });
+    const message = await prepare(`cooldowns.cooldown-was-${status}${path}`, { command: cooldown.key });
     sendMessage(message, opts.sender, opts.attr);
   }
 

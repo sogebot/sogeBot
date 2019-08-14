@@ -25,14 +25,14 @@ enum ERROR {
  */
 
 class Polls extends System {
-  private currentMessages: number = 0;
-  private lastMessageRemind: number = 0;
-  private lastTimeRemind: number = 0;
+  private currentMessages = 0;
+  private lastMessageRemind = 0;
+  private lastTimeRemind = 0;
 
   @settings('reminder')
-  everyXMessages: number = 0;
+  everyXMessages = 0;
   @settings('reminder')
-  everyXSeconds: number = 0;
+  everyXSeconds = 0;
 
   constructor() {
     super();

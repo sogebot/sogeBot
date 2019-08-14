@@ -10,16 +10,16 @@ class UI extends Core {
   public theme: 'light' | 'dark' = 'light';
 
   @settings()
-  public percentage: boolean = true;
+  public percentage = true;
 
   @settings()
-  public shortennumbers: boolean = true;
+  public shortennumbers = true;
 
   @settings()
-  public stickystats: boolean = true;
+  public stickystats = true;
 
   @settings()
-  public showdiff: boolean = true;
+  public showdiff = true;
 }
 
 module.exports = UI;

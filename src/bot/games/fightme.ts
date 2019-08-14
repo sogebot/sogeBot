@@ -10,25 +10,25 @@ import { prepare, sendMessage, isModerator, isBroadcaster, getLocalizedName, tim
 
 class FightMe extends Game {
   @shared()
-  _cooldown: string = String(new Date());
+  _cooldown = String(new Date());
 
   @settings()
-  timeout: number = 10;
+  timeout = 10;
   @settings()
-  cooldown: number = 0;
+  cooldown = 0;
   @settings()
-  bypassCooldownByOwnerAndMods: boolean = false;
+  bypassCooldownByOwnerAndMods = false;
 
   @settings('rewards')
-  winnerWillGet: number = 0;
+  winnerWillGet = 0;
   @settings('rewards')
-  loserWillLose: number = 0;
+  loserWillLose = 0;
 
   @command('!fightme')
   async main (opts) {
     opts.sender['message-type'] = 'chat'; // force responses to chat
-    var username;
-    var userId;
+    let username;
+    let userId;
 
     try {
       username = opts.parameters.trim().match(/^@?([\S]+)$/)[1].toLowerCase();
@@ -48,8 +48,8 @@ class FightMe extends Game {
     const challenge = await global.db.engine.findOne(this.collection.users, { key: '_users', user: username, challenging: opts.sender.username });
     const isChallenged = !_.isEmpty(challenge);
     if (isChallenged) {
-      let winner = _.random(0, 1, false);
-      let isMod = {
+      const winner = _.random(0, 1, false);
+      const isMod = {
         user: await isModerator(username),
         sender: await isModerator(opts.sender.username)
       };
@@ -120,7 +120,7 @@ class FightMe extends Game {
 
       const isAlreadyChallenged = !_.isEmpty(await global.db.engine.findOne(this.collection.users, { key: '_users', user: opts.sender.username, challenging: username }));
       if (!isAlreadyChallenged) {await global.db.engine.insert(this.collection.users, { key: '_users', user: opts.sender.username, challenging: username });}
-      let message = prepare('gambling.fightme.challenge', { username: username, sender: opts.sender.username, command: opts.command });
+      const message = prepare('gambling.fightme.challenge', { username: username, sender: opts.sender.username, command: opts.command });
       sendMessage(message, opts.sender, opts.attr);
     }
   }

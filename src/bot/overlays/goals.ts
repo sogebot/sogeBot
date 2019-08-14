@@ -7,7 +7,7 @@ import { isMainThread } from 'worker_threads';
 import { onSub, onFollow, onTip, onBit } from '../decorators/on';
 
 class Goals extends Overlay {
-  showInUI: boolean = false;
+  showInUI = false;
 
   constructor() {
     super();

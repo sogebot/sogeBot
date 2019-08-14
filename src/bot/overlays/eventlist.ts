@@ -15,7 +15,7 @@ class EventList extends Overlay {
     rawText: '/overlays/eventlist (350x220)',
     target: '_blank',
   }, 'links')
-  linkBtn: null = null;
+  linkBtn = null;
 
   sockets () {
     global.panel.io.of('/overlays/eventlist').on('connection', (socket) => {

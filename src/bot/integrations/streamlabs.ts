@@ -11,7 +11,7 @@ class Streamlabs extends Integration {
 
   @settings()
   @ui({ type: 'text-input', secret: true })
-  socketToken: string = '';
+  socketToken = '';
 
   @onStartup()
   @onChange('enabled')
@@ -57,7 +57,7 @@ class Streamlabs extends Integration {
 
   async parse(eventData) {
     if (eventData.type === 'donation') {
-      for (let event of eventData.message) {
+      for (const event of eventData.message) {
         if (!event.isTest) {
           const id = await global.users.getIdByName(event.from.toLowerCase(), false);
           if (id) {global.db.engine.insert('users.tips', { id, amount: Number(event.amount), message: event.message, currency: event.currency, timestamp: _.now() });}
@@ -82,14 +82,14 @@ class Streamlabs extends Integration {
         });
 
         // go through all systems and trigger on.tip
-        for (let [, systems] of Object.entries({
+        for (const [, systems] of Object.entries({
           systems: global.systems,
           games: global.games,
           overlays: global.overlays,
           widgets: global.widgets,
           integrations: global.integrations
         })) {
-          for (let [name, system] of Object.entries(systems)) {
+          for (const [name, system] of Object.entries(systems)) {
             if (name.startsWith('_') || typeof system.on === 'undefined') {continue;}
             if (Array.isArray(system.on.tip)) {
               for (const fnc of system.on.tip) {

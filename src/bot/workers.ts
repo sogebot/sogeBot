@@ -7,7 +7,7 @@ import { message, timeout } from './commons';
 import { debug } from './debug';
 
 class Workers {
-  public onlineCount: number = 0;
+  public onlineCount = 0;
   protected path: string = join(__dirname, 'main.js');
   protected list: Worker[] = [];
 
@@ -15,7 +15,7 @@ class Workers {
     if (isMainThread) {
       // run on master
       const namespace = get(global, opts.ns, null);
-      namespace[opts.fnc].apply(namespace, opts.args);
+      namespace[opts.fnc](...opts.args);
       opts.type = 'call';
       this.sendToAllWorkers(opts);
     } else {
@@ -143,7 +143,7 @@ class Workers {
         await global.lib.translate._load();
       } else if (data.type === 'call') {
         const namespace = get(global, data.ns, null);
-        namespace[data.fnc].apply(namespace, data.args);
+        namespace[data.fnc](...data.args);
       } else if (data.type === 'log') {
         return global.log[data.level](data.message, data.params);
       } else if (data.type === 'say') {
@@ -312,7 +312,7 @@ class Workers {
           break;
         case 'call':
           const namespace = get(global, data.ns, null);
-          namespace[data.fnc].apply(namespace, data.args);
+          namespace[data.fnc](...data.args);
           break;
         case 'lang':
           global.lib.translate._load();

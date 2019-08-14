@@ -34,44 +34,44 @@ class Emotes extends Overlay {
     bttv: false
   };
 
-  lastGlobalEmoteChk: number = 0;
-  lastSubscriberEmoteChk: number = 0;
+  lastGlobalEmoteChk = 0;
+  lastSubscriberEmoteChk = 0;
   lastChannelChk: string | null = null;
-  lastFFZEmoteChk: number = 0;
-  lastBTTVEmoteChk: number = 0;
+  lastFFZEmoteChk = 0;
+  lastBTTVEmoteChk = 0;
 
   @settings('emotes')
   @ui({ type: 'selector', values: ['1', '2', '3'] })
-  cEmotesSize: number = 1;
+  cEmotesSize = 1;
   @settings('emotes')
-  cEmotesMaxEmotesPerMessage: number = 5;
+  cEmotesMaxEmotesPerMessage = 5;
   @settings('emotes')
   @ui({ type: 'selector', values: ['fadeup', 'fadezoom', 'facebook'] })
   cEmotesAnimation: 'fadeup' | 'fadezoom' | 'facebook' = 'fadeup';
   @settings('emotes')
-  cEmotesAnimationTime: number = 1000;
+  cEmotesAnimationTime = 1000;
 
   @settings('explosion')
   @ui({ type: 'number-input', step: '1', min: '1' })
-  cExplosionNumOfEmotes: number = 20;
+  cExplosionNumOfEmotes = 20;
 
   @settings('fireworks')
   @ui({ type: 'number-input', step: '1', min: '1' })
-  cExplosionNumOfEmotesPerExplosion: number = 10;
+  cExplosionNumOfEmotesPerExplosion = 10;
   @settings('fireworks')
   @ui({ type: 'number-input', step: '1', min: '1' })
-  cExplosionNumOfExplosions: number = 5;
+  cExplosionNumOfExplosions = 5;
 
   @ui({ type: 'btn-emit', class: 'btn btn-secondary btn-block mt-1 mb-1', emit: 'testExplosion' }, 'test')
-  btnTestExplosion: null = null;
+  btnTestExplosion = null;
   @ui({ type: 'btn-emit', class: 'btn btn-secondary btn-block mt-1 mb-1', emit: 'test' }, 'test')
-  btnTestEmote: null = null;
+  btnTestEmote = null;
   @ui({ type: 'btn-emit', class: 'btn btn-secondary btn-block mt-1 mb-1', emit: 'testFireworks' }, 'test')
-  btnTestFirework: null = null;
+  btnTestFirework = null;
   @ui({ type: 'link', href: '/overlays/emotes', class: 'btn btn-primary btn-block', rawText: '/overlays/emotes (1920x1080)', target: '_blank' }, 'links')
-  btnLink: null = null;
+  btnLink = null;
   @ui({ type: 'btn-emit', class: 'btn btn-danger btn-block mt-1 mb-1', emit: 'removeCache' }, 'emotes')
-  btnRemoveCache: null = null;
+  btnRemoveCache = null;
 
   constructor () {
     super();
@@ -373,10 +373,10 @@ class Emotes extends Overlay {
       return;
     }
 
-    let parsed: string[] = [];
-    let usedEmotes = {};
+    const parsed: string[] = [];
+    const usedEmotes = {};
 
-    let cache: cachedEmote[] = await global.db.engine.find(this.collection.cache);
+    const cache: cachedEmote[] = await global.db.engine.find(this.collection.cache);
 
     // add simple emotes
     for (const code of Object.keys(this.simpleEmotes)) {
@@ -446,9 +446,9 @@ class Emotes extends Overlay {
   }
 
   async parseEmotes (emotes: string[]) {
-    let emotesArray: string[] = [];
+    const emotesArray: string[] = [];
 
-    for (var i = 0, length = emotes.length; i < length; i++) {
+    for (let i = 0, length = emotes.length; i < length; i++) {
       if (_.includes(Object.keys(this.simpleEmotes), emotes[i])) {
         emotesArray.push(this.simpleEmotes[emotes[i]] + this.cEmotesSize + '.0');
       } else {

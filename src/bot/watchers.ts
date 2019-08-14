@@ -68,7 +68,7 @@ export const VariableWatcher = {
       }
     }
     for (const k of Object.keys(readonly)) {
-      let value = get(global, k.replace('core.', ''), null);
+      const value = get(global, k.replace('core.', ''), null);
       if (!isEqual(value, readonly[k])) {
         const [type, name, variable] = k.split('.');
         global.log.error(`Cannot change read-only variable, forcing initial value for ${type}.${name}.${variable}`);

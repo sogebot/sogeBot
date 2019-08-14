@@ -12,18 +12,18 @@ class Roulette extends Game {
   dependsOn = ['systems.points'];
 
   @settings()
-  timeout: number = 10;
+  timeout = 10;
 
   @settings('rewards')
-  winnerWillGet: number = 0;
+  winnerWillGet = 0;
   @settings('rewards')
-  loserWillLose: number = 0;
+  loserWillLose = 0;
 
   @command('!roulette')
   async main (opts) {
     opts.sender['message-type'] = 'chat'; // force responses to chat
 
-    let isAlive = _.random(0, 1, false);
+    const isAlive = _.random(0, 1, false);
 
     const [isMod] = await Promise.all([
       isModerator(opts.sender)
