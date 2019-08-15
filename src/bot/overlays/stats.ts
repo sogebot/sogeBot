@@ -10,9 +10,9 @@ class Stats extends Overlay {
     href: '/overlays/stats',
     class: 'btn btn-primary btn-block',
     rawText: '/overlays/stats (500x55)',
-    target: '_blank'
+    target: '_blank',
   }, 'links')
-  linkBtn: null = null;
+  linkBtn = null;
 
   sockets () {
     global.panel.io.of('/overlays/stats').on('connection', (socket) => {
@@ -23,7 +23,7 @@ class Stats extends Overlay {
           viewers: get(await global.db.engine.findOne('api.current', { key: 'viewers' }), 'value', 0),
           followers: get(await global.db.engine.findOne('api.current', { key: 'followers' }), 'value', 0),
           subscribers: get(await global.db.engine.findOne('api.current', { key: 'subscribers' }), 'value', 0),
-          bits: get(await global.db.engine.findOne('api.current', { key: 'tips' }), 'value', 0)
+          bits: get(await global.db.engine.findOne('api.current', { key: 'tips' }), 'value', 0),
         };
         cb(stats);
       });

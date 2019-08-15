@@ -12,7 +12,7 @@ import Expects from '../expects';
 import Integration from './_interface';
 
 const __DEBUG__ = {
-  REQUEST: (process.env.DEBUG && process.env.DEBUG.includes('spotify.request')) || (process.env.DEBUG && process.env.DEBUG.includes('spotify.*'))
+  REQUEST: (process.env.DEBUG && process.env.DEBUG.includes('spotify.request')) || (process.env.DEBUG && process.env.DEBUG.includes('spotify.*')),
 };
 
 /*
@@ -34,7 +34,7 @@ class Spotify extends Integration {
   }[] = [];
   currentUris: string | null = null;
   originalUri: string | null = null;
-  skipToNextSong: boolean = false;
+  skipToNextSong = false;
   state: any = null;
   @shared()
   userId: string | null = null;
@@ -48,28 +48,28 @@ class Spotify extends Integration {
   @settings()
   _refreshToken: string | null = null;
   @settings()
-  songRequests: boolean = true;
+  songRequests = true;
   @settings()
-  fetchCurrentSongWhenOffline: boolean = false;
+  fetchCurrentSongWhenOffline = false;
 
   @settings('output')
-  format: string = '$song - $artist';
+  format = '$song - $artist';
   @settings('output')
-  playlistToPlay: string = '';
+  playlistToPlay = '';
   @settings('output')
-  continueOnPlaylistAfterRequest: boolean = true;
+  continueOnPlaylistAfterRequest = true;
 
   @settings('connection')
   @ui({ type: 'text-input', secret: true })
-  clientId: string = '';
+  clientId = '';
   @settings('connection')
   @ui({ type: 'text-input', secret: true })
-  clientSecret: string = '';
+  clientSecret = '';
   @settings('connection')
-  redirectURI: string = 'http://localhost:20000/oauth/spotify';
+  redirectURI = 'http://localhost:20000/oauth/spotify';
   @settings('connection')
   @ui({ type: 'text-input', readOnly: true })
-  username: string = '';
+  username = '';
   @settings('connection')
   @ui({ type: 'checklist', current: 'authenticatedScopes' })
   scopes: string[] = [
@@ -90,9 +90,9 @@ class Spotify extends Integration {
     type: 'btn-emit',
     class: 'btn btn-primary btn-block mt-1 mb-1',
     if: () => global.integrations.spotify.username.length === 0,
-    emit: 'authorize'
+    emit: 'authorize',
   }, 'connection')
-  authorizeBtn: null = null;
+  authorizeBtn = null;
 
   @ui({
     type: 'btn-emit',
@@ -100,7 +100,7 @@ class Spotify extends Integration {
     if: () => global.integrations.spotify.username.length > 0,
     emit: 'revoke',
   }, 'connection')
-  revokeBtn: null = null;
+  revokeBtn = null;
 
   constructor () {
     super();
@@ -117,7 +117,9 @@ class Spotify extends Integration {
 
   @onChange('connection.username')
   onUsernameChange (key: string, value: string) {
-    if (value.length > 0) {global.log.info(chalk.yellow('SPOTIFY: ') + `Access to account ${value} granted`);}
+    if (value.length > 0) {
+      global.log.info(chalk.yellow('SPOTIFY: ') + `Access to account ${value} granted`);
+    }
   }
 
   @onStartup()
@@ -150,11 +152,11 @@ class Spotify extends Integration {
         url: 'https://api.spotify.com/v1/me/player/play',
         headers: {
           'Authorization': 'Bearer ' + this._accessToken,
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
         data: {
-          uris: [this.currentUris]
-        }
+          uris: [this.currentUris],
+        },
       });
 
       // force is_playing and uri just to not skip until track refresh
@@ -176,20 +178,20 @@ class Spotify extends Integration {
         url: 'https://api.spotify.com/v1/me/player/play',
         headers: {
           'Authorization': 'Bearer ' + this._accessToken,
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
         data: {
           context_uri: this.playlistToPlay,
-          offset
-        }
+          offset,
+        },
       });
       // skip to next song in playlist
       await axios({
         method: 'post',
         url: 'https://api.spotify.com/v1/me/player/next',
         headers: {
-          'Authorization': 'Bearer ' + this._accessToken
-        }
+          'Authorization': 'Bearer ' + this._accessToken,
+        },
       });
       this.currentUris = null;
     } catch (e) {
@@ -213,7 +215,7 @@ class Spotify extends Integration {
         song,
         originalUri: this.originalUri,
         cachedRequests: this.currentUris,
-        requests: this.uris
+        requests: this.uris,
       });
     }
 
@@ -254,11 +256,11 @@ class Spotify extends Integration {
   }
 
   async getMe () {
-    clearTimeout(this.timeouts['getMe']);
+    clearTimeout(this.timeouts.getMe);
 
     try {
       if ((await this.isEnabled()) && !_.isNil(this.client)) {
-        let data = await this.client.getMe();
+        const data = await this.client.getMe();
         this.userId = data.body.id;
         this.username = data.body.display_name ? data.body.display_name : data.body.id;
       }
@@ -270,15 +272,17 @@ class Spotify extends Integration {
       this.userId = null;
     }
 
-    this.timeouts['getMe'] = global.setTimeout(() => this.getMe(), 30000);
+    this.timeouts.getMe = global.setTimeout(() => this.getMe(), 30000);
   }
 
   async ICurrentSong () {
-    clearTimeout(this.timeouts['ICurrentSong']);
+    clearTimeout(this.timeouts.ICurrentSong);
 
     try {
-      if (!this.fetchCurrentSongWhenOffline && !(await global.cache.isOnline())) {throw Error('Stream is offline');}
-      let data = await this.client.getMyCurrentPlayingTrack();
+      if (!this.fetchCurrentSongWhenOffline && !(await global.cache.isOnline())) {
+        throw Error('Stream is offline');
+      }
+      const data = await this.client.getMyCurrentPlayingTrack();
 
       let currentSong = JSON.parse(this.currentSong);
       if (typeof currentSong.song === 'undefined' || currentSong.song !== data.body.item.name) {
@@ -289,7 +293,7 @@ class Spotify extends Integration {
           artists: data.body.item.artists.map(o => o.name).join(', '),
           uri: data.body.item.uri,
           is_playing: data.body.is_playing,
-          is_enabled: await this.isEnabled()
+          is_enabled: await this.isEnabled(),
         };
       }
       currentSong.is_playing = data.body.is_playing;
@@ -298,22 +302,22 @@ class Spotify extends Integration {
     } catch (e) {
       this.currentSong = JSON.stringify({});
     }
-    this.timeouts['ICurrentSong'] = global.setTimeout(() => this.ICurrentSong(), 5000);
+    this.timeouts.ICurrentSong = global.setTimeout(() => this.ICurrentSong(), 5000);
   }
 
   async IRefreshToken () {
-    clearTimeout(this.timeouts['IRefreshToken']);
+    clearTimeout(this.timeouts.IRefreshToken);
 
     try {
       if (!_.isNil(this.client) && this._refreshToken) {
-        let data = await this.client.refreshAccessToken();
-        this.client.setAccessToken(data.body['access_token']);
-        this._accessToken = data.body['access_token'];
+        const data = await this.client.refreshAccessToken();
+        this.client.setAccessToken(data.body.access_token);
+        this._accessToken = data.body.access_token;
       }
     } catch (e) {
       global.log.info(chalk.yellow('SPOTIFY: ') + 'Refreshing access token failed');
     }
-    this.timeouts['IRefreshToken'] = global.setTimeout(() => this.IRefreshToken(), 60000);
+    this.timeouts.IRefreshToken = global.setTimeout(() => this.IRefreshToken(), 60000);
   }
 
   sockets () {
@@ -330,7 +334,7 @@ class Spotify extends Integration {
       socket.on('code', async (token, callback) => {
         const waitForUsername = () => {
           return new Promise((resolve, reject) => {
-            let check = async (resolve) => {
+            const check = async (resolve) => {
               this.client.getMe()
                 .then((data) => {
                   this.username = data.body.display_name ? data.body.display_name : data.body.id;
@@ -351,7 +355,7 @@ class Spotify extends Integration {
         callback(null, true);
       });
       socket.on('revoke', async (cb) => {
-        clearTimeout(this.timeouts['IRefreshToken']);
+        clearTimeout(this.timeouts.IRefreshToken);
 
         const username = this.username;
         this.client.resetAccessToken();
@@ -365,13 +369,13 @@ class Spotify extends Integration {
 
         global.log.info(chalk.yellow('SPOTIFY: ') + `Access to account ${username} is revoked`);
 
-        this.timeouts['IRefreshToken'] = global.setTimeout(() => this.IRefreshToken(), 60000);
+        this.timeouts.IRefreshToken = global.setTimeout(() => this.IRefreshToken(), 60000);
         cb(null, { do: 'refresh' });
       });
       socket.on('authorize', async (cb) => {
         if (
-          this.clientId === '' ||
-          this.clientSecret === ''
+          this.clientId === ''
+          || this.clientSecret === ''
         ) {
           cb('Cannot authorize! Missing clientId or clientSecret.', null);
         } else {
@@ -392,18 +396,26 @@ class Spotify extends Integration {
   }
 
   connect (opts: { token?: string } = {}) {
-    let isNewConnection = this.client === null;
+    const isNewConnection = this.client === null;
     try {
-      let error: string[] = [];
-      if (this.clientId.trim().length === 0) {error.push('clientId');}
-      if (this.clientSecret.trim().length === 0) {error.push('clientSecret');}
-      if (this.redirectURI.trim().length === 0) {error.push('redirectURI');}
-      if (error.length > 0) {throw new Error(error.join(', ') + ' missing');}
+      const error: string[] = [];
+      if (this.clientId.trim().length === 0) {
+        error.push('clientId');
+      }
+      if (this.clientSecret.trim().length === 0) {
+        error.push('clientSecret');
+      }
+      if (this.redirectURI.trim().length === 0) {
+        error.push('redirectURI');
+      }
+      if (error.length > 0) {
+        throw new Error(error.join(', ') + ' missing');
+      }
 
       this.client = new SpotifyWebApi({
         clientId: this.clientId,
         clientSecret: this.clientSecret,
-        redirectUri: this.redirectURI
+        redirectUri: this.redirectURI,
       });
 
       if (this._accessToken && this._refreshToken) {
@@ -416,16 +428,20 @@ class Spotify extends Integration {
           this.client.authorizationCodeGrant(opts.token)
             .then((data) => {
               this.authenticatedScopes = data.body.scope.split(' ');
-              this._accessToken = data.body['access_token'];
-              this._refreshToken = data.body['refresh_token'];
+              this._accessToken = data.body.access_token;
+              this._refreshToken = data.body.refresh_token;
 
               this.client.setAccessToken(this._accessToken);
               this.client.setRefreshToken(this._refreshToken);
             }, (err) => {
-              if (err) {global.log.info(chalk.yellow('SPOTIFY: ') + 'Getting of accessToken and refreshToken failed');}
+              if (err) {
+                global.log.info(chalk.yellow('SPOTIFY: ') + 'Getting of accessToken and refreshToken failed');
+              }
             });
         }
-        if (isNewConnection) {global.log.info(chalk.yellow('SPOTIFY: ') + 'Client connected to service');}
+        if (isNewConnection) {
+          global.log.info(chalk.yellow('SPOTIFY: ') + 'Client connected to service');
+        }
       } catch (e) {
         global.log.error(e.stack);
         global.log.info(chalk.yellow('SPOTIFY: ') + 'Client connection failed');
@@ -444,7 +460,7 @@ class Spotify extends Integration {
     if (_.isNil(this.client)) {
       return null;
     }
-    let state = crypto.createHash('md5').update(Math.random().toString()).digest('hex');
+    const state = crypto.createHash('md5').update(Math.random().toString()).digest('hex');
     this.state = state;
     return this.client.createAuthorizeURL(this.scopes, state);
   }
@@ -452,67 +468,75 @@ class Spotify extends Integration {
   @command('!spotify')
   @default_permission(null)
   async main (opts: CommandOptions) {
-    if (!(await global.cache.isOnline())) {return;} // don't do anything on offline stream
+    if (!(await global.cache.isOnline())) {
+      return;
+    } // don't do anything on offline stream
     if (!isMainThread) {
       // we have client connected on master -> send process to master
       global.workers.sendToMaster({ type: 'call', ns: 'integrations.spotify', fnc: 'main', args: [opts] });
       return;
     }
-    if (!this.songRequests) {return;}
+    if (!this.songRequests) {
+      return;
+    }
 
     try {
-      let [spotifyId] = new Expects(opts.parameters)
+      const [spotifyId] = new Expects(opts.parameters)
         .everything()
         .toArray();
 
       if (spotifyId.startsWith('spotify:') || spotifyId.startsWith('https://open.spotify.com/track/')) {
         let id = '';
-        if (spotifyId.startsWith('spotify:')) {id = spotifyId.replace('spotify:track:', '');}
-        else {
+        if (spotifyId.startsWith('spotify:')) {
+          id = spotifyId.replace('spotify:track:', '');
+        } else {
           const regex = new RegExp('\\S+open\\.spotify\\.com\\/track\\/(\\w+)(.*)?', 'gi');
           const exec = regex.exec(spotifyId);
-          if (exec) {id = exec[1];}
-          else {throw Error('ID was not found in ' + spotifyId);}
+          if (exec) {
+            id = exec[1];
+          } else {
+            throw Error('ID was not found in ' + spotifyId);
+          }
         }
-        let response = await axios({
+        const response = await axios({
           method: 'get',
           url: 'https://api.spotify.com/v1/tracks/' + id,
           headers: {
-            'Authorization': 'Bearer ' + this._accessToken
-          }
+            'Authorization': 'Bearer ' + this._accessToken,
+          },
         });
-        let track = response.data;
+        const track = response.data;
         sendMessage(
           prepare('integrations.spotify.song-requested', {
-            name: track.name, artist: track.artists[0].name, artists: track.artists.map(o => o.name).join(', ')
+            name: track.name, artist: track.artists[0].name, artists: track.artists.map(o => o.name).join(', '),
           }), opts.sender);
         this.uris.push({
           uri: 'spotify:track:' + id,
           requestBy: opts.sender.username,
           song: track.name,
           artist: track.artists[0].name,
-          artists: track.artists.map(o => o.name).join(', ')
+          artists: track.artists.map(o => o.name).join(', '),
         });
       } else {
-        let response = await axios({
+        const response = await axios({
           method: 'get',
           url: 'https://api.spotify.com/v1/search?type=track&limit=1&q=' + encodeURI(spotifyId),
           headers: {
             'Authorization': 'Bearer ' + this._accessToken,
-            'Content-Type': 'application/json'
-          }
+            'Content-Type': 'application/json',
+          },
         });
-        let track = response.data.tracks.items[0];
+        const track = response.data.tracks.items[0];
         sendMessage(
           prepare('integrations.spotify.song-requested', {
-            name: track.name, artist: track.artists[0].name
+            name: track.name, artist: track.artists[0].name,
           }), opts.sender);
         this.uris.push({
           uri: track.uri,
           requestBy: opts.sender.username,
           song: track.name,
           artist: track.artists[0].name,
-          artists: track.artists.map(o => o.name).join(', ')
+          artists: track.artists.map(o => o.name).join(', '),
         });
       }
     } catch (e) {

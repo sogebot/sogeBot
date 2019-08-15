@@ -3,29 +3,29 @@ import Widget from './_interface';
 
 class EventList extends Widget {
   @settings()
-  public widgetEventlistFollows: boolean = true;
+  public widgetEventlistFollows = true;
   @settings()
-  public widgetEventlistHosts: boolean = true;
+  public widgetEventlistHosts = true;
   @settings()
-  public widgetEventlistRaids: boolean = true;
+  public widgetEventlistRaids = true;
   @settings()
-  public widgetEventlistCheers: boolean = true;
+  public widgetEventlistCheers = true;
   @settings()
-  public widgetEventlistSubs: boolean = true;
+  public widgetEventlistSubs = true;
   @settings()
-  public widgetEventlistSubgifts: boolean = true;
+  public widgetEventlistSubgifts = true;
   @settings()
-  public widgetEventlistSubcommunitygifts: boolean = true;
+  public widgetEventlistSubcommunitygifts = true;
   @settings()
-  public widgetEventlistResubs: boolean = true;
+  public widgetEventlistResubs = true;
   @settings()
-  public widgetEventlistTips: boolean = true;
+  public widgetEventlistTips = true;
   @settings()
-  public widgetEventlistShow: number = 5;
+  public widgetEventlistShow = 5;
   @settings()
-  public widgetEventlistSize: number = 20;
+  public widgetEventlistSize = 20;
   @settings()
-  public widgetEventlistMessageSize: number = 15;
+  public widgetEventlistMessageSize = 15;
 
   constructor() {
     super();

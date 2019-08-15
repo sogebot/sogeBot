@@ -41,15 +41,15 @@ class Commercial extends System {
   @default_permission(permission.CASTERS)
   @helper()
   async main (opts) {
-    let parsed = opts.parameters.match(/^([\d]+)? ?(.*)?$/);
+    const parsed = opts.parameters.match(/^([\d]+)? ?(.*)?$/);
 
     if (_.isNil(parsed)) {
       sendMessage('$sender, something went wrong with !commercial', opts.sender, opts.attr);
     }
 
-    let commercial = {
+    const commercial = {
       duration: !_.isNil(parsed[1]) ? parseInt(parsed[1], 10) : null,
-      message: !_.isNil(parsed[2]) ? parsed[2] : null
+      message: !_.isNil(parsed[2]) ? parsed[2] : null,
     };
 
     if (_.isNil(commercial.duration)) {
@@ -63,7 +63,9 @@ class Commercial extends System {
       const url = `https://api.twitch.tv/kraken/channels/${cid}/commercial`;
 
       const token = await global.oauth.botAccessToken;
-      if (token === '') {return;}
+      if (token === '') {
+        return;
+      }
 
       try {
         await axios({
@@ -73,13 +75,15 @@ class Commercial extends System {
           headers: {
             'Authorization': 'OAuth ' + token,
             'Accept': 'application/vnd.twitchtv.v5+json',
-            'Content-Type': 'application/json'
-          }
+            'Content-Type': 'application/json',
+          },
         });
 
         global.events.fire('commercial', { duration: commercial.duration });
         global.client.commercial(await global.oauth.broadcasterUsername, commercial.duration);
-        if (!_.isNil(commercial.message)) {sendMessage(commercial.message, opts.sender, opts.attr);}
+        if (!_.isNil(commercial.message)) {
+          sendMessage(commercial.message, opts.sender, opts.attr);
+        }
       } catch (e) {
         global.log.error(`API: ${url} - ${e.status} ${_.get(e, 'body.message', e.statusText)}`);
         global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'commercial', api: 'kraken', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.statusText)}` });

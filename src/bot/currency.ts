@@ -10,7 +10,7 @@ import { isMainThread } from 'worker_threads';
 
 import Core from './_interface';
 import constants from './constants';
-import { settings, ui, shared } from './decorators';
+import { settings, shared, ui } from './decorators';
 
 class Currency extends Core {
   @settings('currency')
@@ -24,7 +24,7 @@ class Currency extends Core {
   public rates: { [x: string]: number } = {};
 
   public timeouts: any = {};
-  public base: string = 'CZK';
+  public base = 'CZK';
 
   constructor() {
     super();
@@ -48,8 +48,12 @@ class Currency extends Core {
       if (from.toLowerCase().trim() === to.toLowerCase().trim()) {
         return Number(value); // nothing to do
       }
-      if (_.isNil(this.rates[from])) { throw Error(`${from} code was not found`); }
-      if (_.isNil(this.rates[to]) && to.toLowerCase().trim() !== this.base.toLowerCase().trim()) { throw Error(`${to} code was not found`); }
+      if (_.isNil(this.rates[from])) {
+        throw Error(`${from} code was not found`); 
+      }
+      if (_.isNil(this.rates[to]) && to.toLowerCase().trim() !== this.base.toLowerCase().trim()) {
+        throw Error(`${to} code was not found`); 
+      }
 
       if (to.toLowerCase().trim() !== this.base.toLowerCase().trim()) {
         return (value * this.rates[from]) / this.rates[to];
@@ -72,7 +76,7 @@ class Currency extends Core {
       // base is always CZK
       const result = await axios.get('http://www.cnb.cz/cs/financni_trhy/devizovy_trh/kurzy_devizoveho_trhu/denni_kurz.txt');
       let linenum = 0;
-      for (let line of result.data.toString().split('\n')) {
+      for (const line of result.data.toString().split('\n')) {
         if (linenum < 2 || line.trim().length === 0) {
           linenum++;
           continue;

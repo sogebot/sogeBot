@@ -49,11 +49,11 @@ function heapDump() {
 
   fs.appendFileSync(csvfilePath, `${memMB}, ${Date.now()}\n`);
 
-  global.log.info(chalk.bgRed((isMainThread ? 'Master' : 'Cluster') +
-    ' # Current mem usage: ' + memMB +
-    ', last mem usage: ' + memMBlast +
-    ', change: ' + (memMB - memMBlast) +
-    ', threshold: ' + nextMBThreshold));
+  global.log.info(chalk.bgRed((isMainThread ? 'Master' : 'Cluster')
+    + ' # Current mem usage: ' + memMB
+    + ', last mem usage: ' + memMBlast
+    + ', change: ' + (memMB - memMBlast)
+    + ', threshold: ' + nextMBThreshold));
   memMBlast = memMB;
   if (memMB > nextMBThreshold) {
     heapTaken = 2 * 60; // wait more before next heap (making heap may cause enxt heap to be too high)

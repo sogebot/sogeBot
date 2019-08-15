@@ -114,7 +114,9 @@ class Events extends Core {
         owner: isOwner(attributes.recipient),
       };
     }
-    if (_.get(attributes, 'reset', false)) { return this.reset(eventId); }
+    if (_.get(attributes, 'reset', false)) {
+      return this.reset(eventId); 
+    }
 
     const events = await global.db.engine.find('events', { key: eventId, enabled: true });
 
@@ -124,7 +126,9 @@ class Events extends Core {
         this.checkFilter(id, attributes),
         this.checkDefinition(_.clone(event), attributes),
       ]);
-      if ((!shouldRunByFilter || !shouldRunByDefinition)) { continue; }
+      if ((!shouldRunByFilter || !shouldRunByDefinition)) {
+        continue; 
+      }
 
       for (const operation of (await global.db.engine.find('events.operations', { eventId: id }))) {
         const isOperationSupported = !_.isNil(_.find(this.supportedOperationsList, (o) => o.id === operation.key));
@@ -159,7 +163,7 @@ class Events extends Core {
           userId: userObj.id,
           emotes: [],
           badges: {},
-          'message-type': 'chat'
+          'message-type': 'chat',
         });
       }
       global.log.info('Clip was created successfully');
@@ -191,7 +195,9 @@ class Events extends Core {
     const url = `https://api.twitch.tv/kraken/channels/${cid}/commercial`;
 
     const token = await global.oauth.botAccessToken;
-    if (token === '') { return; }
+    if (token === '') {
+      return; 
+    }
 
     await axios({
       method: 'post',
@@ -226,7 +232,9 @@ class Events extends Core {
     let command = operation.commandToRun;
     for (const key of Object.keys(attributes).sort((a, b) => a.length - b.length)) {
       const val = attributes[key];
-      if (_.isObject(val) && _.size(val) === 0) { return; } // skip empty object
+      if (_.isObject(val) && _.size(val) === 0) {
+        return; 
+      } // skip empty object
       const replace = new RegExp(`\\$${key}`, 'g');
       command = command.replace(replace, val);
     }
@@ -237,7 +245,7 @@ class Events extends Core {
         sender: { username: getOwner() },
         message: command,
         skip: true,
-        quiet: _.get(operation, 'isCommandQuiet', false)
+        quiet: _.get(operation, 'isCommandQuiet', false),
       });
       await parse.process();
     } else {
@@ -247,7 +255,7 @@ class Events extends Core {
           message: command,
         },
         skip: true,
-        quiet: _.get(operation, 'isCommandQuiet', false)
+        quiet: _.get(operation, 'isCommandQuiet', false),
       });
     }
   }
@@ -261,8 +269,12 @@ class Events extends Core {
     attributes = flatten(attributes);
     for (const key of Object.keys(attributes).sort((a, b) => a.length - b.length)) {
       let val = attributes[key];
-      if (_.isObject(val) && _.size(val) === 0) { continue; } // skip empty object
-      if (key.includes('username') || key.includes('recipient')) { val = atUsername ? `@${val}` : val; }
+      if (_.isObject(val) && _.size(val) === 0) {
+        continue; 
+      } // skip empty object
+      if (key.includes('username') || key.includes('recipient')) {
+        val = atUsername ? `@${val}` : val; 
+      }
       const replace = new RegExp(`\\$${key}`, 'g');
       message = message.replace(replace, val);
     }
@@ -272,7 +284,7 @@ class Events extends Core {
       userId: userObj.id,
       emotes: [],
       badges: {},
-      'message-type': (whisper ? 'whisper' : 'chat')
+      'message-type': (whisper ? 'whisper' : 'chat'),
     });
   }
 
@@ -294,7 +306,11 @@ class Events extends Core {
     if (_.isEmpty(cvFromDb)) {
       await global.db.engine.insert('customvars', { key: customVariableName, value: numberToIncrement });
     } else {
-      if (!_.isFinite(parseInt(cvFromDb.value, 10))) { value = numberToIncrement; } else { value = parseInt(cvFromDb.value, 10) + parseInt(numberToIncrement, 10); }
+      if (!_.isFinite(parseInt(cvFromDb.value, 10))) {
+        value = numberToIncrement; 
+      } else {
+        value = parseInt(cvFromDb.value, 10) + parseInt(numberToIncrement, 10); 
+      }
       await global.db.engine.update('customvars', { _id: cvFromDb._id.toString() }, { value: value.toString() });
     }
 
@@ -304,7 +320,9 @@ class Events extends Core {
     }
     const regexp = new RegExp(`\\$_${customVariableName}`, 'ig');
     const title = await global.cache.rawStatus();
-    if (title.match(regexp)) { global.api.setTitleAndGame(null); }
+    if (title.match(regexp)) {
+      global.api.setTitleAndGame(null); 
+    }
   }
 
   public async fireDecrementCustomVariable(operation, attributes) {
@@ -317,7 +335,11 @@ class Events extends Core {
     if (_.isEmpty(cvFromDb)) {
       await global.db.engine.insert('customvars', { key: customVariableName, value: numberToDecrement });
     } else {
-      if (!_.isFinite(parseInt(cvFromDb.value, 10))) { value = numberToDecrement * -1; } else { value = parseInt(cvFromDb.value, 10) - parseInt(numberToDecrement, 10); }
+      if (!_.isFinite(parseInt(cvFromDb.value, 10))) {
+        value = numberToDecrement * -1; 
+      } else {
+        value = parseInt(cvFromDb.value, 10) - parseInt(numberToDecrement, 10); 
+      }
       await global.db.engine.update('customvars', { _id: cvFromDb._id.toString() }, { value: value.toString() });
     }
 
@@ -327,7 +349,9 @@ class Events extends Core {
     }
     const regexp = new RegExp(`\\$_${customVariableName}`, 'ig');
     const title = await global.cache.rawStatus();
-    if (title.match(regexp)) { global.api.setTitleAndGame(null); }
+    if (title.match(regexp)) {
+      global.api.setTitleAndGame(null); 
+    }
   }
 
   public async everyXMinutesOfStream(event, attributes) {
@@ -351,8 +375,8 @@ class Events extends Core {
 
   public async checkHosted(event, attributes) {
     event.definitions.viewersAtLeast = parseInt(event.definitions.viewersAtLeast, 10); // force Integer
-    const shouldTrigger = (attributes.viewers >= event.definitions.viewersAtLeast) &&
-                        ((!attributes.autohost && event.definitions.ignoreAutohost) || !event.definitions.ignoreAutohost);
+    const shouldTrigger = (attributes.viewers >= event.definitions.viewersAtLeast)
+                        && ((!attributes.autohost && event.definitions.ignoreAutohost) || !event.definitions.ignoreAutohost);
     return shouldTrigger;
   }
 
@@ -376,9 +400,9 @@ class Events extends Core {
 
     const viewers = (await global.db.engine.findOne('api.current', { key: 'viewers' })).value;
 
-    const shouldTrigger = viewers >= event.definitions.viewersAtLeast &&
-                        ((event.definitions.runInterval > 0 && _.now() - event.triggered.runInterval >= event.definitions.runInterval * 1000) ||
-                        (event.definitions.runInterval === 0 && event.triggered.runInterval === 0));
+    const shouldTrigger = viewers >= event.definitions.viewersAtLeast
+                        && ((event.definitions.runInterval > 0 && _.now() - event.triggered.runInterval >= event.definitions.runInterval * 1000)
+                        || (event.definitions.runInterval === 0 && event.triggered.runInterval === 0));
     if (shouldTrigger) {
       event.triggered.runInterval = _.now();
       await global.db.engine.update('events', { id: event.id }, event);
@@ -399,10 +423,10 @@ class Events extends Core {
       event.triggered.runInterval = parseInt(event.triggered.runInterval, 10); // force Integer
 
       event.triggered.runEveryXCommands++;
-      shouldTrigger =
-        event.triggered.runEveryXCommands >= event.definitions.runEveryXCommands &&
-        ((event.definitions.runInterval > 0 && _.now() - event.triggered.runInterval >= event.definitions.runInterval * 1000) ||
-        (event.definitions.runInterval === 0 && event.triggered.runInterval === 0));
+      shouldTrigger
+        = event.triggered.runEveryXCommands >= event.definitions.runEveryXCommands
+        && ((event.definitions.runInterval > 0 && _.now() - event.triggered.runInterval >= event.definitions.runInterval * 1000)
+        || (event.definitions.runInterval === 0 && event.triggered.runInterval === 0));
       if (shouldTrigger) {
         event.triggered.runInterval = _.now();
         event.triggered.runEveryXCommands = 0;
@@ -432,10 +456,10 @@ class Events extends Core {
       // add count from match
       event.triggered.runEveryXKeywords = Number(event.triggered.runEveryXKeywords) + Number(match.length);
 
-      shouldTrigger =
-        event.triggered.runEveryXKeywords >= event.definitions.runEveryXKeywords &&
-        ((event.definitions.runInterval > 0 && _.now() - event.triggered.runInterval >= event.definitions.runInterval * 1000) ||
-        (event.definitions.runInterval === 0 && event.triggered.runInterval === 0));
+      shouldTrigger
+        = event.triggered.runEveryXKeywords >= event.definitions.runEveryXKeywords
+        && ((event.definitions.runInterval > 0 && _.now() - event.triggered.runInterval >= event.definitions.runInterval * 1000)
+        || (event.definitions.runInterval === 0 && event.triggered.runInterval === 0));
       if (shouldTrigger) {
         event.triggered.runInterval = _.now();
         event.triggered.runEveryXKeywords = 0;
@@ -455,7 +479,9 @@ class Events extends Core {
 
   public async checkFilter(eventId, attributes) {
     const filter = (await global.db.engine.findOne('events.filters', { eventId })).filters;
-    if (typeof filter === 'undefined' || filter.trim().length === 0) { return true; }
+    if (typeof filter === 'undefined' || filter.trim().length === 0) {
+      return true; 
+    }
 
     // get custom variables
     const customVariablesDb = await global.db.engine.find('custom.variables');
@@ -640,12 +666,16 @@ class Events extends Core {
             // fade out commands
             if (event.key === 'command-send-x-times') {
               if (!_.isNil(_.get(event, 'triggered.runEveryXCommands', null))) {
-                if (event.triggered.runEveryXCommands <= 0) { continue; }
+                if (event.triggered.runEveryXCommands <= 0) {
+                  continue; 
+                }
                 await global.db.engine.update('events', { id: event.id }, { triggered: { fadeOutInterval: _.now(), runEveryXCommands: event.triggered.runEveryXCommands - event.definitions.fadeOutXCommands } });
               }
             } else if (event.key === 'keyword-send-x-times') {
               if (!_.isNil(_.get(event, 'triggered.runEveryXKeywords', null))) {
-                if (event.triggered.runEveryXKeywords <= 0) { continue; }
+                if (event.triggered.runEveryXKeywords <= 0) {
+                  continue; 
+                }
                 await global.db.engine.update('events', { id: event.id }, { triggered: { fadeOutInterval: _.now(), runEveryXKeywords: event.triggered.runEveryXKeywords - event.definitions.fadeOutXKeywords } });
               }
             }

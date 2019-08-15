@@ -35,23 +35,31 @@ class Alias extends System {
     let alias;
 
     // is it an command?
-    if (!opts.message.startsWith('!')) {return true;}
+    if (!opts.message.startsWith('!')) {
+      return true;
+    }
 
     let cmdArray = opts.message.toLowerCase().split(' ');
-    let length = opts.message.toLowerCase().split(' ').length;
+    const length = opts.message.toLowerCase().split(' ').length;
     for (let i = 0; i < length; i++) {
       alias = await global.db.engine.findOne(this.collection.data, { alias: cmdArray.join(' '), enabled: true });
-      if (!_.isEmpty(alias)) {break;}
+      if (!_.isEmpty(alias)) {
+        break;
+      }
       cmdArray.pop(); // remove last array item if not found
     }
-    if (_.isEmpty(alias)) {return true;} // no alias was found - return
+    if (_.isEmpty(alias)) {
+      return true;
+    } // no alias was found - return
 
-    let replace = new RegExp(`${alias.alias}`, 'i');
+    const replace = new RegExp(`${alias.alias}`, 'i');
     cmdArray = opts.message.replace(replace, `${alias.command}`).split(' ');
     let tryingToBypass = false;
 
     for (let i = 0; i < length; i++) { // search for correct alias
-      if (cmdArray.length === alias.command.split(' ').length) {break;} // command is correct (have same number of parameters as command)
+      if (cmdArray.length === alias.command.split(' ').length) {
+        break;
+      } // command is correct (have same number of parameters as command)
 
       const parsedCmd = await p.find(cmdArray.join(' '));
       const isRegistered = !_.isNil(parsedCmd) && parsedCmd.command.split(' ').length === cmdArray.length;
@@ -70,7 +78,7 @@ class Alias extends System {
       } else if ((await global.permissions.check(opts.sender.userId, alias.permission)).access) {
         // parse variables
         const message = await new Message(opts.message.replace(replace, `${alias.command}`)).parse({
-          sender: opts.sender
+          sender: opts.sender,
         });
         global.log.process({ type: 'parse', sender: opts.sender, message });
         global.tmi.message({
@@ -113,13 +121,13 @@ class Alias extends System {
 
       const item = await global.db.engine.findOne(this.collection.data, { alias });
       if (_.isEmpty(item)) {
-        let message = await prepare('alias.alias-was-not-found', { alias });
+        const message = await prepare('alias.alias-was-not-found', { alias });
         sendMessage(message, opts.sender, opts.attr);
         return false;
       }
       await global.db.engine.update(this.collection.data, { alias }, { command, permission: pItem.id });
 
-      let message = await prepare('alias.alias-was-edited', { alias, command });
+      const message = await prepare('alias.alias-was-edited', { alias, command });
       sendMessage(message, opts.sender, opts.attr);
     } catch (e) {
       sendMessage(prepare('alias.alias-parse-failed'), opts.sender, opts.attr);
@@ -150,10 +158,10 @@ class Alias extends System {
         command,
         enabled: true,
         visible: true,
-        permission: pItem.id
+        permission: pItem.id,
       };
       await global.db.engine.insert(this.collection.data, aliasObj);
-      let message = await prepare('alias.alias-was-added', aliasObj);
+      const message = await prepare('alias.alias-was-added', aliasObj);
       sendMessage(message, opts.sender, opts.attr);
     } catch (e) {
       sendMessage(prepare('alias.alias-parse-failed'), opts.sender, opts.attr);
@@ -163,8 +171,8 @@ class Alias extends System {
   @command('!alias list')
   @default_permission(permission.CASTERS)
   async list (opts) {
-    let alias = await global.db.engine.find(this.collection.data, { visible: true, enabled: true });
-    var output = (alias.length === 0 ? global.translate('alias.list-is-empty') : global.translate('alias.list-is-not-empty').replace(/\$list/g, (_.map(_.orderBy(alias, 'alias'), 'alias')).join(', ')));
+    const alias = await global.db.engine.find(this.collection.data, { visible: true, enabled: true });
+    const output = (alias.length === 0 ? global.translate('alias.list-is-empty') : global.translate('alias.list-is-not-empty').replace(/\$list/g, (_.map(_.orderBy(alias, 'alias'), 'alias')).join(', ')));
     sendMessage(output, opts.sender, opts.attr);
   }
 
@@ -182,16 +190,16 @@ class Alias extends System {
 
       const item = await global.db.engine.findOne(this.collection.data, { alias });
       if (_.isEmpty(item)) {
-        let message = await prepare('alias.alias-was-not-found', { alias });
+        const message = await prepare('alias.alias-was-not-found', { alias });
         sendMessage(message, opts.sender, opts.attr);
         return;
       }
 
       await global.db.engine.update(this.collection.data, { alias }, { enabled: !item.enabled });
-      let message = await prepare(!item.enabled ? 'alias.alias-was-enabled' : 'alias.alias-was-disabled', item);
+      const message = await prepare(!item.enabled ? 'alias.alias-was-enabled' : 'alias.alias-was-disabled', item);
       sendMessage(message, opts.sender, opts.attr);
     } catch (e) {
-      let message = await prepare('alias.alias-parse-failed');
+      const message = await prepare('alias.alias-parse-failed');
       sendMessage(message, opts.sender, opts.attr);
     }
   }
@@ -210,16 +218,16 @@ class Alias extends System {
 
       const item = await global.db.engine.findOne(this.collection.data, { alias });
       if (_.isEmpty(item)) {
-        let message = await prepare('alias.alias-was-not-found', { alias });
+        const message = await prepare('alias.alias-was-not-found', { alias });
         sendMessage(message, opts.sender, opts.attr);
         return false;
       }
 
       await global.db.engine.update(this.collection.data, { alias }, { visible: !item.visible });
-      let message = await prepare(!item.visible ? 'alias.alias-was-exposed' : 'alias.alias-was-concealed', item);
+      const message = await prepare(!item.visible ? 'alias.alias-was-exposed' : 'alias.alias-was-concealed', item);
       sendMessage(message, opts.sender, opts.attr);
     } catch (e) {
-      let message = await prepare('alias.alias-parse-failed');
+      const message = await prepare('alias.alias-parse-failed');
       sendMessage(message, opts.sender, opts.attr);
     }
   }
@@ -236,17 +244,17 @@ class Alias extends System {
         throw Error('Not starting with !');
       }
 
-      let removed = await global.db.engine.remove(this.collection.data, { alias });
+      const removed = await global.db.engine.remove(this.collection.data, { alias });
       if (!removed) {
-        let message = await prepare('alias.alias-was-not-found', { alias });
+        const message = await prepare('alias.alias-was-not-found', { alias });
         sendMessage(message, opts.sender, opts.attr);
         return false;
       }
 
-      let message = await prepare('alias.alias-was-removed', { alias });
+      const message = await prepare('alias.alias-was-removed', { alias });
       sendMessage(message, opts.sender, opts.attr);
     } catch (e) {
-      let message = await prepare('alias.alias-parse-failed');
+      const message = await prepare('alias.alias-parse-failed');
       sendMessage(message, opts.sender, opts.attr);
     }
   }

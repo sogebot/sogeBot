@@ -15,7 +15,7 @@ class EventList extends Overlay {
     rawText: '/overlays/eventlist (350x220)',
     target: '_blank',
   }, 'links')
-  linkBtn: null = null;
+  linkBtn = null;
 
   sockets () {
     global.panel.io.of('/overlays/eventlist').on('connection', (socket) => {
@@ -25,7 +25,9 @@ class EventList extends Overlay {
   }
 
   async sendDataToOverlay () {
-    if (!this.socket) {return setTimeout(() => this.sendDataToOverlay(), 1000);}
+    if (!this.socket) {
+      return setTimeout(() => this.sendDataToOverlay(), 1000);
+    }
 
     let events = await global.db.engine.find('widgetsEventList');
     events = _.uniqBy(_.orderBy(events, 'timestamp', 'desc'), o =>
@@ -35,12 +37,14 @@ class EventList extends Overlay {
   }
 
   async add (data: EventList.Event) {
-    if (isBot(data.username)) {return;} // don't save event from a bot
+    if (isBot(data.username)) {
+      return;
+    } // don't save event from a bot
 
     const newEvent = {
       event: data.type,
       timestamp: _.now(),
-      ...data
+      ...data,
     };
     await global.db.engine.insert('widgetsEventList', newEvent);
     global.overlays.eventlist.sendDataToOverlay();

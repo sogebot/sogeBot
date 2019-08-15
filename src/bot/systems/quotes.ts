@@ -26,11 +26,13 @@ class Quotes extends System {
   @default_permission(permission.CASTERS)
   async add (opts) {
     try {
-      if (opts.parameters.length === 0) {throw new Error();}
+      if (opts.parameters.length === 0) {
+        throw new Error();
+      }
       let [tags, quote] = new Expects(opts.parameters).argument({ name: 'tags', optional: true, default: 'general', multi: true, delimiter: '' }).argument({ name: 'quote', multi: true, delimiter: '' }).toArray();
       tags = tags.split(',').map((o) => o.trim());
 
-      let quotes: Quote[] = await global.db.engine.find(this.collection.data, {});
+      const quotes: Quote[] = await global.db.engine.find(this.collection.data, {});
       let id;
       if (!_.isEmpty(quotes)) {
         const maxBy = _.maxBy(quotes, 'id');
@@ -41,7 +43,7 @@ class Quotes extends System {
         id = 1;
       }
 
-      await global.db.engine.insert(this.collection.data, { id, tags, quote, quotedBy: opts.sender['userId'], createdAt: new Date() });
+      await global.db.engine.insert(this.collection.data, { id, tags, quote, quotedBy: opts.sender.userId, createdAt: new Date() });
 
       const message = await prepare('systems.quotes.add.ok', { id, quote, tags: tags.join(', ') });
       sendMessage(message, opts.sender, opts.attr);
@@ -55,11 +57,15 @@ class Quotes extends System {
   @default_permission(permission.CASTERS)
   async remove (opts) {
     try {
-      if (opts.parameters.length === 0) {throw new Error();}
-      let id = new Expects(opts.parameters).argument({ type: Number, name: 'id' }).toArray()[0];
-      if (_.isNaN(id)) {throw new Error();}
+      if (opts.parameters.length === 0) {
+        throw new Error();
+      }
+      const id = new Expects(opts.parameters).argument({ type: Number, name: 'id' }).toArray()[0];
+      if (_.isNaN(id)) {
+        throw new Error();
+      }
 
-      let item = await global.db.engine.remove(this.collection.data, { id });
+      const item = await global.db.engine.remove(this.collection.data, { id });
       if (item > 0) {
         const message = await prepare('systems.quotes.remove.ok', { id });
         sendMessage(message, opts.sender, opts.attr);
@@ -77,9 +83,11 @@ class Quotes extends System {
   @default_permission(permission.CASTERS)
   async set (opts) {
     try {
-      if (opts.parameters.length === 0) {throw new Error();}
-      let [id, tag] = new Expects(opts.parameters).argument({ type: Number, name: 'id' }).argument({ name: 'tag', multi: true, delimiter: '' }).toArray();
-      let quote = await global.db.engine.findOne(this.collection.data, { id });
+      if (opts.parameters.length === 0) {
+        throw new Error();
+      }
+      const [id, tag] = new Expects(opts.parameters).argument({ type: Number, name: 'id' }).argument({ name: 'tag', multi: true, delimiter: '' }).toArray();
+      const quote = await global.db.engine.findOne(this.collection.data, { id });
       if (!_.isEmpty(quote)) {
         const tags = tag.split(',').map((o) => o.trim());
         await global.db.engine.update(this.collection.data, { id }, { tags });
@@ -106,14 +114,14 @@ class Quotes extends System {
 
   @command('!quote')
   async main (opts) {
-    let [id, tag] = new Expects(opts.parameters).argument({ type: Number, name: 'id', optional: true }).argument({ name: 'tag', optional: true, multi: true, delimiter: '' }).toArray();
+    const [id, tag] = new Expects(opts.parameters).argument({ type: Number, name: 'id', optional: true }).argument({ name: 'tag', optional: true, multi: true, delimiter: '' }).toArray();
     if (_.isNil(id) && _.isNil(tag)) {
       const message = await prepare('systems.quotes.show.error.no-parameters', { command: opts.command });
       return sendMessage(message, opts.sender, opts.attr);
     }
 
     if (!_.isNil(id)) {
-      let quote: Quote | undefined = await global.db.engine.findOne(this.collection.data, { id });
+      const quote: Quote | undefined = await global.db.engine.findOne(this.collection.data, { id });
       if (!_.isEmpty(quote) && typeof quote !== 'undefined') {
         const quotedBy = (await global.users.getUsernamesFromIds([quote.quotedBy]))[quote.quotedBy];
         const message = await prepare('systems.quotes.show.ok', { quote: quote.quote, id: quote.id, quotedBy });
@@ -123,17 +131,17 @@ class Quotes extends System {
         sendMessage(message, opts.sender, opts.attr);
       }
     } else {
-      let quotes: Quote[] = await global.db.engine.find(this.collection.data);
-      let quotesWithTags: Quote[] = [];
+      const quotes: Quote[] = await global.db.engine.find(this.collection.data);
+      const quotesWithTags: Quote[] = [];
 
-      for (let quote of quotes) {
+      for (const quote of quotes) {
         if (quote.tags.includes(tag)) {
           quotesWithTags.push(quote);
         }
       }
 
       if (quotesWithTags.length > 0) {
-        let quote: Quote | undefined = _.sample(quotesWithTags);
+        const quote: Quote | undefined = _.sample(quotesWithTags);
         if (typeof quote !== 'undefined') {
           const quotedBy = (await global.users.getUsernamesFromIds([quote.quotedBy]))[quote.quotedBy];
           const message = await prepare('systems.quotes.show.ok', { quote: quote.quote, id: quote.id, quotedBy });

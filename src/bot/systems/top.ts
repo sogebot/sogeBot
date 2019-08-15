@@ -18,10 +18,10 @@ enum TYPE {
   SUBMONTHS,
 }
 
-const __DEBUG__ =
-  (process.env.DEBUG && process.env.DEBUG.includes('systems.*')) ||
-  (process.env.DEBUG && process.env.DEBUG.includes('systems.top')) ||
-  (process.env.DEBUG && process.env.DEBUG.includes('systems.top.*'));
+const __DEBUG__
+  = (process.env.DEBUG && process.env.DEBUG.includes('systems.*'))
+  || (process.env.DEBUG && process.env.DEBUG.includes('systems.top'))
+  || (process.env.DEBUG && process.env.DEBUG.includes('systems.top.*'));
 
 /*
  * !top time

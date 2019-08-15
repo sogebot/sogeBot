@@ -7,7 +7,7 @@ import { message, timeout } from './commons';
 import { debug } from './debug';
 
 class Workers {
-  public onlineCount: number = 0;
+  public onlineCount = 0;
   protected path: string = join(__dirname, 'main.js');
   protected list: Worker[] = [];
 
@@ -15,7 +15,7 @@ class Workers {
     if (isMainThread) {
       // run on master
       const namespace = get(global, opts.ns, null);
-      namespace[opts.fnc].apply(namespace, opts.args);
+      namespace[opts.fnc](...opts.args);
       opts.type = 'call';
       this.sendToAllWorkers(opts);
     } else {
@@ -109,7 +109,9 @@ class Workers {
 
   protected setListeners(worker: Worker) {
     if (isMainThread) {
-      if (typeof worker === 'undefined' || worker === null) { throw Error('Cannot create empty listeners in main thread!'); }
+      if (typeof worker === 'undefined' || worker === null) {
+        throw Error('Cannot create empty listeners in main thread!'); 
+      }
       this.setListenersMain(worker);
     } else {
       this.setListenersWorker();
@@ -122,7 +124,9 @@ class Workers {
       if (data.type === 'db') {
         // add data to master controller
         if (typeof global.db === 'undefined') {
-          return setTimeout(() => { this.process(data); }, 100);
+          return setTimeout(() => {
+            this.process(data); 
+          }, 100);
         }
 
         if (typeof global.db.engine.data !== 'undefined') {
@@ -135,7 +139,9 @@ class Workers {
         return;
       }
 
-      if (!global.db.engine.connected || !(global.lib && global.lib.translate)) { return setTimeout(() => this.process(data), 1000); }
+      if (!global.db.engine.connected || !(global.lib && global.lib.translate)) {
+        return setTimeout(() => this.process(data), 1000); 
+      }
       debug('workers.messages', 'MAIN: ' + JSON.stringify(data));
 
       if (data.type === 'lang') {
@@ -143,7 +149,7 @@ class Workers {
         await global.lib.translate._load();
       } else if (data.type === 'call') {
         const namespace = get(global, data.ns, null);
-        namespace[data.fnc].apply(namespace, data.args);
+        namespace[data.fnc](...data.args);
       } else if (data.type === 'log') {
         return global.log[data.level](data.message, data.params);
       } else if (data.type === 'say') {
@@ -164,13 +170,17 @@ class Workers {
           const obj = Object.values(global).find((o) => {
             return o.constructor.name.toLowerCase() === data.class.toLowerCase();
           });
-          if (obj) { set(obj, data.path, data.value); }
+          if (obj) {
+            set(obj, data.path, data.value); 
+          }
         } else {
           try {
             const obj = Object.values(global[data.system]).find((o: any) => {
               return o.constructor.name.toLowerCase() === data.class.toLowerCase();
             }) as any;
-            if (obj) { set(obj, data.path, data.value); }
+            if (obj) {
+              set(obj, data.path, data.value); 
+            }
           } catch (e) {
             if ((data.retry || 0) < 5) {
               setTimeout(() => {
@@ -190,7 +200,9 @@ class Workers {
           const obj = Object.values(global).find((o) => {
             return o.constructor.name.toLowerCase() === data.class.toLowerCase();
           });
-          if (obj && obj.socket) { obj.emit(data.event, ...data.args); }
+          if (obj && obj.socket) {
+            obj.emit(data.event, ...data.args); 
+          }
         } else {
           try {
             const obj = Object.values(global[data.system]).find((o: any) => {
@@ -312,7 +324,7 @@ class Workers {
           break;
         case 'call':
           const namespace = get(global, data.ns, null);
-          namespace[data.fnc].apply(namespace, data.args);
+          namespace[data.fnc](...data.args);
           break;
         case 'lang':
           global.lib.translate._load();
@@ -361,13 +373,17 @@ class Workers {
 
   protected setListenersMain(worker) {
     debug('workers.messages', 'MAIN: loading listeners');
-    worker.on('message', (msg) => { this.process(msg); });
+    worker.on('message', (msg) => {
+      this.process(msg); 
+    });
   }
 
   protected setListenersWorker() {
     debug('workers.messages', 'THREAD(' + threadId + '): loading listeners');
     if (parentPort) {
-      parentPort.on('message', (msg) => { this.process(msg); });
+      parentPort.on('message', (msg) => {
+        this.process(msg); 
+      });
     } else {
       throw new Error('parentPort is null');
     }

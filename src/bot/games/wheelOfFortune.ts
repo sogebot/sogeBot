@@ -10,9 +10,9 @@ class WheelOfFortune extends Game {
     href: '/overlays/wheeloffortune',
     class: 'btn btn-primary btn-block',
     rawText: '/overlays/wheeloffortune (500x55)',
-    target: '_blank'
+    target: '_blank',
   })
-  btnLink: null = null;
+  btnLink = null;
 
   @settings('options')
   @ui({ type: 'wof-responses' }, 'options')
@@ -31,15 +31,17 @@ class WheelOfFortune extends Game {
         // compensate for slight delay
         setTimeout(async () => {
           const userObj = await global.users.getByName(username);
-          for (let response of this.data[index].responses) {
-            if (response.trim().length > 0) {sendMessage(response, {
-              username: userObj.username,
-              displayName: userObj.displayName || userObj.username,
-              userId: userObj.id,
-              emotes: [],
-              badges: {},
-              'message-type': 'chat'
-            });}
+          for (const response of this.data[index].responses) {
+            if (response.trim().length > 0) {
+              sendMessage(response, {
+                username: userObj.username,
+                displayName: userObj.displayName || userObj.username,
+                userId: userObj.id,
+                emotes: [],
+                badges: {},
+                'message-type': 'chat',
+              });
+            }
           }
         }, 2000);
       });

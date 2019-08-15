@@ -6,7 +6,7 @@ class Cmdboard extends Widget {
   @settings()
   public displayAsOpts: string[] = ['list', 'grid'];
   @settings()
-  public displayAs: string = 'list';
+  public displayAs = 'list';
 
   constructor() {
     super();

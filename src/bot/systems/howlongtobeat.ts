@@ -6,7 +6,7 @@ import { command, default_permission } from '../decorators';
 import { permission } from '../permissions';
 import { HowLongToBeatService /*, HowLongToBeatEntry */ } from 'howlongtobeat';
 import Expects from '../expects';
-import { sendMessage, prepare } from '../commons';
+import { prepare, sendMessage } from '../commons';
 
 export interface Game {
   _id?: string;
@@ -74,7 +74,7 @@ class HowLongToBeat extends System {
         timeToBeatMain: this.interval,
         timeToBeatCompletionist: this.interval,
         imageUrl: (gameFromHltb || { imageUrl: '' }).imageUrl,
-        startedAt: Date.now()
+        startedAt: Date.now(),
       };
     }
 

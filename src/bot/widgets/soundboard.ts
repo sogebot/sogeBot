@@ -15,7 +15,9 @@ class SoundBoard extends Widget {
     this.socket.on('connection', (socket) => {
       socket.on('getSoundBoardSounds', (cb) => {
         glob('public/dist/soundboard/*.mp3', (err, files) => {
-          if (err) { return cb([]); }
+          if (err) {
+            return cb([]); 
+          }
 
           const sounds: string[] = [];
           for (const file of files) {

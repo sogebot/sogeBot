@@ -4,7 +4,7 @@ export interface Global {
   translations: any;
 }
 
-declare var global: Global;
+declare let global: Global;
 
 export default function(key) {
   /* TODO: metrics
