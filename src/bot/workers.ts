@@ -15,7 +15,7 @@ class Workers {
     if (isMainThread) {
       // run on master
       const namespace = get(global, opts.ns, null);
-      namespace[opts.fnc](...opts.args);
+      namespace[opts.fnc](...(opts.args || []));
       opts.type = 'call';
       this.sendToAllWorkers(opts);
     } else {
@@ -110,7 +110,7 @@ class Workers {
   protected setListeners(worker: Worker) {
     if (isMainThread) {
       if (typeof worker === 'undefined' || worker === null) {
-        throw Error('Cannot create empty listeners in main thread!'); 
+        throw Error('Cannot create empty listeners in main thread!');
       }
       this.setListenersMain(worker);
     } else {
@@ -125,7 +125,7 @@ class Workers {
         // add data to master controller
         if (typeof global.db === 'undefined') {
           return setTimeout(() => {
-            this.process(data); 
+            this.process(data);
           }, 100);
         }
 
@@ -140,7 +140,7 @@ class Workers {
       }
 
       if (!global.db.engine.connected || !(global.lib && global.lib.translate)) {
-        return setTimeout(() => this.process(data), 1000); 
+        return setTimeout(() => this.process(data), 1000);
       }
       debug('workers.messages', 'MAIN: ' + JSON.stringify(data));
 
@@ -149,7 +149,7 @@ class Workers {
         await global.lib.translate._load();
       } else if (data.type === 'call') {
         const namespace = get(global, data.ns, null);
-        namespace[data.fnc](...data.args);
+        namespace[data.fnc](...(data.args || []));
       } else if (data.type === 'log') {
         return global.log[data.level](data.message, data.params);
       } else if (data.type === 'say') {
@@ -171,7 +171,7 @@ class Workers {
             return o.constructor.name.toLowerCase() === data.class.toLowerCase();
           });
           if (obj) {
-            set(obj, data.path, data.value); 
+            set(obj, data.path, data.value);
           }
         } else {
           try {
@@ -179,7 +179,7 @@ class Workers {
               return o.constructor.name.toLowerCase() === data.class.toLowerCase();
             }) as any;
             if (obj) {
-              set(obj, data.path, data.value); 
+              set(obj, data.path, data.value);
             }
           } catch (e) {
             if ((data.retry || 0) < 5) {
@@ -201,7 +201,7 @@ class Workers {
             return o.constructor.name.toLowerCase() === data.class.toLowerCase();
           });
           if (obj && obj.socket) {
-            obj.emit(data.event, ...data.args); 
+            obj.emit(data.event, ...(data.args || []));
           }
         } else {
           try {
@@ -209,7 +209,7 @@ class Workers {
               return o.constructor.name.toLowerCase() === data.class.toLowerCase();
             }) as any;
             if (obj) {
-              obj.emit(data.event, ...data.args);
+              obj.emit(data.event, ...(data.args || []));
             }
           } catch (e) {
             if ((data.retry || 0) < 5) {
@@ -231,7 +231,7 @@ class Workers {
             return o.constructor.name.toLowerCase() === data.class.toLowerCase();
           });
           if (obj) {
-            obj[data.fnc](...data.args);
+            obj[data.fnc](...(data.args || []));
           }
         } else {
           try {
@@ -239,7 +239,7 @@ class Workers {
               return o.constructor.name.toLowerCase() === data.class.toLowerCase();
             }) as any;
             if (obj) {
-              obj[data.fnc](...data.args);
+              obj[data.fnc](...(data.args || []));
             }
           } catch (e) {
             if ((data.retry || 0) < 5) {
@@ -298,7 +298,7 @@ class Workers {
               return o.constructor.name.toLowerCase() === data.class.toLowerCase();
             });
             if (obj) {
-              obj[data.fnc](...data.args);
+              obj[data.fnc](...(data.args || []));
             }
           } else {
             try {
@@ -306,7 +306,7 @@ class Workers {
                 return o.constructor.name.toLowerCase() === data.class.toLowerCase();
               }) as any;
               if (obj) {
-                obj[data.fnc](...data.args);
+                obj[data.fnc](...(data.args || []));
               }
             } catch (e) {
               if ((data.retry || 0) < 5) {
@@ -324,7 +324,7 @@ class Workers {
           break;
         case 'call':
           const namespace = get(global, data.ns, null);
-          namespace[data.fnc](...data.args);
+          namespace[data.fnc](...(data.args || []));
           break;
         case 'lang':
           global.lib.translate._load();
@@ -374,7 +374,7 @@ class Workers {
   protected setListenersMain(worker) {
     debug('workers.messages', 'MAIN: loading listeners');
     worker.on('message', (msg) => {
-      this.process(msg); 
+      this.process(msg);
     });
   }
 
@@ -382,7 +382,7 @@ class Workers {
     debug('workers.messages', 'THREAD(' + threadId + '): loading listeners');
     if (parentPort) {
       parentPort.on('message', (msg) => {
-        this.process(msg); 
+        this.process(msg);
       });
     } else {
       throw new Error('parentPort is null');
