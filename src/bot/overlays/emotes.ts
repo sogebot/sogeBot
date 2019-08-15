@@ -24,64 +24,72 @@ class Emotes extends Overlay {
     'o_O': 'https://static-cdn.jtvnw.net/emoticons/v1/6/',
     ':D': 'https://static-cdn.jtvnw.net/emoticons/v1/3/',
     '>(': 'https://static-cdn.jtvnw.net/emoticons/v1/4/',
-    '<3': 'https://static-cdn.jtvnw.net/emoticons/v1/9/'
+    '<3': 'https://static-cdn.jtvnw.net/emoticons/v1/9/',
   };
 
   fetch = {
     global: false,
     channel: false,
     ffz: false,
-    bttv: false
+    bttv: false,
   };
 
-  lastGlobalEmoteChk: number = 0;
-  lastSubscriberEmoteChk: number = 0;
+  lastGlobalEmoteChk = 0;
+  lastSubscriberEmoteChk = 0;
   lastChannelChk: string | null = null;
-  lastFFZEmoteChk: number = 0;
-  lastBTTVEmoteChk: number = 0;
+  lastFFZEmoteChk = 0;
+  lastBTTVEmoteChk = 0;
 
   @settings('emotes')
   @ui({ type: 'selector', values: ['1', '2', '3'] })
-  cEmotesSize: number = 1;
+  cEmotesSize = 1;
   @settings('emotes')
-  cEmotesMaxEmotesPerMessage: number = 5;
+  cEmotesMaxEmotesPerMessage = 5;
   @settings('emotes')
   @ui({ type: 'selector', values: ['fadeup', 'fadezoom', 'facebook'] })
   cEmotesAnimation: 'fadeup' | 'fadezoom' | 'facebook' = 'fadeup';
   @settings('emotes')
-  cEmotesAnimationTime: number = 1000;
+  cEmotesAnimationTime = 1000;
 
   @settings('explosion')
   @ui({ type: 'number-input', step: '1', min: '1' })
-  cExplosionNumOfEmotes: number = 20;
+  cExplosionNumOfEmotes = 20;
 
   @settings('fireworks')
   @ui({ type: 'number-input', step: '1', min: '1' })
-  cExplosionNumOfEmotesPerExplosion: number = 10;
+  cExplosionNumOfEmotesPerExplosion = 10;
   @settings('fireworks')
   @ui({ type: 'number-input', step: '1', min: '1' })
-  cExplosionNumOfExplosions: number = 5;
+  cExplosionNumOfExplosions = 5;
 
   @ui({ type: 'btn-emit', class: 'btn btn-secondary btn-block mt-1 mb-1', emit: 'testExplosion' }, 'test')
-  btnTestExplosion: null = null;
+  btnTestExplosion = null;
   @ui({ type: 'btn-emit', class: 'btn btn-secondary btn-block mt-1 mb-1', emit: 'test' }, 'test')
-  btnTestEmote: null = null;
+  btnTestEmote = null;
   @ui({ type: 'btn-emit', class: 'btn btn-secondary btn-block mt-1 mb-1', emit: 'testFireworks' }, 'test')
-  btnTestFirework: null = null;
+  btnTestFirework = null;
   @ui({ type: 'link', href: '/overlays/emotes', class: 'btn btn-primary btn-block', rawText: '/overlays/emotes (1920x1080)', target: '_blank' }, 'links')
-  btnLink: null = null;
+  btnLink = null;
   @ui({ type: 'btn-emit', class: 'btn btn-danger btn-block mt-1 mb-1', emit: 'removeCache' }, 'emotes')
-  btnRemoveCache: null = null;
+  btnRemoveCache = null;
 
   constructor () {
     super();
     if (isMainThread) {
       global.db.engine.index(this.collection.cache, { index: 'code' });
       setTimeout(() => {
-        if (!this.fetch.global) {this.fetchEmotesGlobal();}
-        if (!this.fetch.channel) {this.fetchEmotesChannel();}
-        if (!this.fetch.ffz) {this.fetchEmotesFFZ();}
-        if (!this.fetch.bttv) {this.fetchEmotesBTTV();}
+        if (!this.fetch.global) {
+          this.fetchEmotesGlobal();
+        }
+        if (!this.fetch.channel) {
+          this.fetchEmotesChannel();
+        }
+        if (!this.fetch.ffz) {
+          this.fetchEmotesFFZ();
+        }
+        if (!this.fetch.bttv) {
+          this.fetchEmotesBTTV();
+        }
       }, 10000);
     }
   }
@@ -114,10 +122,18 @@ class Emotes extends Overlay {
     this.lastBTTVEmoteChk = 0;
     await global.db.engine.remove(this.collection.cache, {});
 
-    if (!this.fetch.global) {this.fetchEmotesGlobal();}
-    if (!this.fetch.channel) {this.fetchEmotesChannel();}
-    if (!this.fetch.ffz) {this.fetchEmotesFFZ();}
-    if (!this.fetch.bttv) {this.fetchEmotesBTTV();}
+    if (!this.fetch.global) {
+      this.fetchEmotesGlobal();
+    }
+    if (!this.fetch.channel) {
+      this.fetchEmotesChannel();
+    }
+    if (!this.fetch.ffz) {
+      this.fetchEmotesFFZ();
+    }
+    if (!this.fetch.bttv) {
+      this.fetchEmotesBTTV();
+    }
   }
 
   async fetchEmotesChannel () {
@@ -138,14 +154,14 @@ class Emotes extends Overlay {
             await global.db.engine.update(this.collection.cache,
               {
                 code: emotes[j].code,
-                type: 'twitch'
+                type: 'twitch',
               },
               {
                 urls: {
                   '1': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emotes[j].id + '/1.0',
                   '2': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emotes[j].id + '/2.0',
-                  '3': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emotes[j].id + '/3.0'
-                }
+                  '3': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emotes[j].id + '/3.0',
+                },
               });
           }
           global.log.info(`EMOTES: Fetched channel ${cid} emotes`);
@@ -174,18 +190,20 @@ class Emotes extends Overlay {
         const request = await axios.get('https://api.twitchemotes.com/api/v4/channels/0');
         const emotes = request.data.emotes;
         for (let i = 0, length = emotes.length; i < length; i++) {
-          if (emotes[i].id < 15) {continue;} // skip simple emotes
+          if (emotes[i].id < 15) {
+            continue;
+          } // skip simple emotes
           await global.db.engine.update(this.collection.cache,
             {
               code: emotes[i].code,
-              type: 'twitch'
+              type: 'twitch',
             },
             {
               urls: {
                 '1': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emotes[i].id + '/1.0',
                 '2': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emotes[i].id + '/2.0',
-                '3': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emotes[i].id + '/3.0'
-              }
+                '3': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emotes[i].id + '/3.0',
+              },
             });
         }
         global.log.info('EMOTES: Fetched global emotes');
@@ -216,14 +234,14 @@ class Emotes extends Overlay {
             await global.db.engine.update(this.collection.cache,
               {
                 code: emotes[j].code,
-                type: 'twitch'
+                type: 'twitch',
               },
               {
                 urls: {
                   '1': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emotes[j].id + '/1.0',
                   '2': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emotes[j].id + '/2.0',
-                  '3': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emotes[j].id + '/3.0'
-                }
+                  '3': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emotes[j].id + '/3.0',
+                },
               });
           }
           global.log.info(`EMOTES: Fetched channel ${cid} emotes`);
@@ -261,10 +279,10 @@ class Emotes extends Overlay {
           await global.db.engine.update(this.collection.cache,
             {
               code: emotes[i].name,
-              type: 'ffz'
+              type: 'ffz',
             },
             {
-              urls: emotes[i].urls
+              urls: emotes[i].urls,
             });
         }
         global.log.info('EMOTES: Fetched ffz emotes');
@@ -294,14 +312,14 @@ class Emotes extends Overlay {
           await global.db.engine.update(this.collection.cache,
             {
               code: emotes[i].code,
-              type: 'bttv'
+              type: 'bttv',
             },
             {
               urls: {
                 '1': urlTemplate.replace('{{id}}', emotes[i].id).replace('{{image}}', '1x'),
                 '2': urlTemplate.replace('{{id}}', emotes[i].id).replace('{{image}}', '2x'),
-                '3': urlTemplate.replace('{{id}}', emotes[i].id).replace('{{image}}', '3x')
-              }
+                '3': urlTemplate.replace('{{id}}', emotes[i].id).replace('{{image}}', '3x'),
+              },
 
             });
         }
@@ -328,9 +346,9 @@ class Emotes extends Overlay {
       settings: {
         emotes: {
           animation: this.cEmotesAnimation,
-          animationTime: this.cEmotesAnimationTime
-        }
-      }
+          animationTime: this.cEmotesAnimationTime,
+        },
+      },
     });
   }
 
@@ -340,13 +358,13 @@ class Emotes extends Overlay {
       emotes,
       settings: {
         emotes: {
-          animationTime: this.cEmotesAnimationTime
+          animationTime: this.cEmotesAnimationTime,
         },
         fireworks: {
           numOfEmotesPerExplosion: this.cExplosionNumOfEmotesPerExplosion,
-          numOfExplosions: this.cExplosionNumOfExplosions
-        }
-      }
+          numOfExplosions: this.cExplosionNumOfExplosions,
+        },
+      },
     });
   }
 
@@ -356,27 +374,29 @@ class Emotes extends Overlay {
       emotes,
       settings: {
         emotes: {
-          animationTime: this.cEmotesAnimationTime
+          animationTime: this.cEmotesAnimationTime,
         },
         explosion: {
-          numOfEmotes: this.cExplosionNumOfEmotes
-        }
-      }
+          numOfEmotes: this.cExplosionNumOfEmotes,
+        },
+      },
     });
   }
 
   @parser({ priority: constants.LOW, fireAndForget: true })
   async containsEmotes (opts: ParserOptions) {
-    if (_.isNil(opts.sender) || !opts.sender.emotes) {return true;}
+    if (_.isNil(opts.sender) || !opts.sender.emotes) {
+      return true;
+    }
     if (!isMainThread) {
       global.workers.sendToMaster({ type: 'call', ns: 'overlays.emotes', fnc: 'containsEmotes', args: [opts] });
       return;
     }
 
-    let parsed: string[] = [];
-    let usedEmotes = {};
+    const parsed: string[] = [];
+    const usedEmotes = {};
 
-    let cache: cachedEmote[] = await global.db.engine.find(this.collection.cache);
+    const cache: cachedEmote[] = await global.db.engine.find(this.collection.cache);
 
     // add simple emotes
     for (const code of Object.keys(this.simpleEmotes)) {
@@ -386,17 +406,21 @@ class Emotes extends Overlay {
         urls: {
           '1': this.simpleEmotes[code] + '1.0',
           '2': this.simpleEmotes[code] + '2.0',
-          '3': this.simpleEmotes[code] + '3.0'
-        }
+          '3': this.simpleEmotes[code] + '3.0',
+        },
       });
     }
 
     // add emotes from twitch which are not maybe in cache (other partner emotes etc)
     for (const emote of opts.sender.emotes) {
       // don't include simple emoted (id 1-14)
-      if (emote.id < 15) {continue;}
+      if (emote.id < 15) {
+        continue;
+      }
       // if emote is already in cache, continue
-      if (cache.find((o) => o.code === opts.message.slice(emote.start, emote.end+1))) {continue;}
+      if (cache.find((o) => o.code === opts.message.slice(emote.start, emote.end+1))) {
+        continue;
+      }
       const data: cachedEmote = {
         type: 'twitch',
         code: opts.message.slice(emote.start, emote.end+1),
@@ -404,7 +428,7 @@ class Emotes extends Overlay {
           '1': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emote.id + '/1.0',
           '2': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emote.id + '/2.0',
           '3': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emote.id + '/3.0',
-        }
+        },
       };
 
       cache.push(data);
@@ -413,16 +437,18 @@ class Emotes extends Overlay {
       global.db.engine.update(this.collection.cache,
         {
           code: data.code,
-          type: 'twitch'
+          type: 'twitch',
         },
         {
-          urls: data.urls
+          urls: data.urls,
         });
     }
 
     for (let j = 0, jl = cache.length; j < jl; j++) {
       const emote = cache[j];
-      if (parsed.includes(emote.code)) {continue;} // this emote was already parsed
+      if (parsed.includes(emote.code)) {
+        continue;
+      } // this emote was already parsed
       for (let i = 0, length = (opts.message.match(new RegExp('\\b' + XRegExp.escape(emote.code) + '\\b', 'g')) || []).length; i < length; i++) {
         usedEmotes[emote.code] = emote;
         parsed.push(emote.code);
@@ -436,9 +462,9 @@ class Emotes extends Overlay {
         settings: {
           emotes: {
             animation: this.cEmotesAnimation,
-            animationTime: this.cEmotesAnimationTime
-          }
-        }
+            animationTime: this.cEmotesAnimationTime,
+          },
+        },
       });
     }
 
@@ -446,9 +472,9 @@ class Emotes extends Overlay {
   }
 
   async parseEmotes (emotes: string[]) {
-    let emotesArray: string[] = [];
+    const emotesArray: string[] = [];
 
-    for (var i = 0, length = emotes.length; i < length; i++) {
+    for (let i = 0, length = emotes.length; i < length; i++) {
       if (_.includes(Object.keys(this.simpleEmotes), emotes[i])) {
         emotesArray.push(this.simpleEmotes[emotes[i]] + this.cEmotesSize + '.0');
       } else {

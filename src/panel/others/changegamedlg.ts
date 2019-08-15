@@ -13,7 +13,7 @@ export const init = async () => {
     el: '#changegamedlg',
     render: function (createElement) {
       return createElement(Component);
-    }
+    },
   });
 };
 

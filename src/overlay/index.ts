@@ -10,8 +10,8 @@ export interface Global {
   configuration: any;
 }
 
-declare var global: Global;
-declare var token: string;
+declare let global: Global;
+declare let token: string;
 
 declare module 'vue/types/vue' {
   interface Vue {

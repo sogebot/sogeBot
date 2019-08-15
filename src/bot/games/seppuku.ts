@@ -8,7 +8,7 @@ import Game from './_interface';
 
 class Seppuku extends Game {
   @settings()
-  timeout: number = 10;
+  timeout = 10;
 
   @command('!seppuku')
   async main (opts) {

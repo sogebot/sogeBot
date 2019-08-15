@@ -20,16 +20,16 @@ class Twitter extends Integration {
 
   @settings('token')
   @ui({ type: 'text-input', secret: true })
-  consumerKey: string = '';
+  consumerKey = '';
   @settings('token')
   @ui({ type: 'text-input', secret: true })
-  consumerSecret: string = '';
+  consumerSecret = '';
   @settings('token')
   @ui({ type: 'text-input', secret: true })
-  accessToken: string = '';
+  accessToken = '';
   @settings('token')
   @ui({ type: 'text-input', secret: true })
-  secretToken: string = '';
+  secretToken = '';
 
   constructor() {
     super();
@@ -169,11 +169,21 @@ class Twitter extends Integration {
   private connect() {
     try {
       const error: string[] = [];
-      if (this.consumerKey.trim().length === 0) { error.push('consumerKey'); }
-      if (this.consumerSecret.trim().length === 0) { error.push('consumerSecret'); }
-      if (this.accessToken.trim().length === 0) { error.push('accessToken'); }
-      if (this.secretToken.trim().length === 0) { error.push('secretToken'); }
-      if (error.length > 0) { throw new Error(error.join(', ') + 'missing'); }
+      if (this.consumerKey.trim().length === 0) {
+        error.push('consumerKey'); 
+      }
+      if (this.consumerSecret.trim().length === 0) {
+        error.push('consumerSecret'); 
+      }
+      if (this.accessToken.trim().length === 0) {
+        error.push('accessToken'); 
+      }
+      if (this.secretToken.trim().length === 0) {
+        error.push('secretToken'); 
+      }
+      if (error.length > 0) {
+        throw new Error(error.join(', ') + 'missing'); 
+      }
 
       this.client = new Client({
         consumer_key: this.consumerKey.trim(),

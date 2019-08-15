@@ -22,7 +22,7 @@ class Chat extends Widget {
           userId: userObj.id,
           emotes: [],
           badges: {},
-          'message-type': 'chat'
+          'message-type': 'chat',
         }, { force: true });
       });
 

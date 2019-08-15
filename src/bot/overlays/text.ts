@@ -10,9 +10,9 @@ class Text extends Overlay {
     href: '/overlays/text',
     class: 'btn btn-primary btn-block',
     rawText: '/overlays/text',
-    target: '_blank'
+    target: '_blank',
   }, 'links')
-  linkBtn: null = null;
+  linkBtn = null;
   constructor () {
     super();
     this.addMenu({ category: 'registry', name: 'textoverlay', id: 'registry.textOverlay/list' });
@@ -24,12 +24,14 @@ class Text extends Overlay {
       socket.on('get', async (_id, callback) => {
         const item = await global.db.engine.findOne(this.collection.data, { _id });
         if (item.text) {
-          let match = item.text.match(regexp);
+          const match = item.text.match(regexp);
           if (!_.isNil(match)) {
-            for (let variable of item.text.match(regexp)) {
-              let isVariable = await global.customvariables.isVariableSet(variable);
+            for (const variable of item.text.match(regexp)) {
+              const isVariable = await global.customvariables.isVariableSet(variable);
               let value = `<strong><i class="fas fa-dollar-sign">_${variable.replace('$_', '')}</i></strong>`;
-              if (isVariable) {value = await global.customvariables.getValueOf(variable);}
+              if (isVariable) {
+                value = await global.customvariables.getValueOf(variable);
+              }
               item.text = item.text.replace(new RegExp(`\\${variable}`, 'g'), value);
             }
           }

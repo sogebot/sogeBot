@@ -32,7 +32,7 @@ class Bets extends System {
 
   @settings()
   @ui({ type: 'number-input', step: 1, min: 0, max: 100 })
-  public betPercentGain: number = 20;
+  public betPercentGain = 20;
 
   constructor() {
     super();
@@ -66,7 +66,9 @@ class Bets extends System {
   public async checkIfBetExpired() {
     try {
       const currentBet = await global.db.engine.findOne(this.collection.data, { key: 'bets' });
-      if (_.isEmpty(currentBet) || currentBet.locked) { throw Error(ERROR_NOT_RUNNING); }
+      if (_.isEmpty(currentBet) || currentBet.locked) {
+        throw Error(ERROR_NOT_RUNNING); 
+      }
 
       const isExpired = currentBet.end <= new Date().getTime();
       if (isExpired) {
@@ -81,7 +83,7 @@ class Bets extends System {
             userId: userObj.id,
             emotes: [],
             badges: {},
-            'message-type': 'chat'
+            'message-type': 'chat',
           });
           const _id = currentBet._id.toString(); delete currentBet._id;
           await global.db.engine.update(this.collection.data, { _id }, currentBet);
@@ -92,7 +94,7 @@ class Bets extends System {
             userId: userObj.id,
             emotes: [],
             badges: {},
-            'message-type': 'chat'
+            'message-type': 'chat',
           });
           await global.db.engine.remove(this.collection.data, { key: 'bets' });
         }
@@ -114,17 +116,23 @@ class Bets extends System {
   public async open(opts) {
     const currentBet = await global.db.engine.findOne(this.collection.data, { key: 'bets' });
     try {
-      if (!_.isEmpty(currentBet)) { throw new Error(ERROR_ALREADY_OPENED); }
+      if (!_.isEmpty(currentBet)) {
+        throw new Error(ERROR_ALREADY_OPENED); 
+      }
 
       const [timeout, title, options] = new Expects(opts.parameters)
         .argument({ name: 'timeout', optional: true, default: 2, type: Number })
         .argument({ name: 'title', optional: false, multi: true })
         .list({ delimiter: '|' })
         .toArray();
-      if (options.length < 2) { throw new Error(ERROR_NOT_ENOUGH_OPTIONS); }
+      if (options.length < 2) {
+        throw new Error(ERROR_NOT_ENOUGH_OPTIONS); 
+      }
 
       const bet = { title, locked: false, options: [], key: 'bets', end: new Date().getTime() + timeout * 1000 * 60 };
-      for (const i of Object.keys(options)) { bet.options[i] = { name: options[i] }; }
+      for (const i of Object.keys(options)) {
+        bet.options[i] = { name: options[i] }; 
+      }
 
       await global.db.engine.insert(this.collection.data, bet);
       sendMessage(await prepare('bets.opened', {
@@ -157,7 +165,9 @@ class Bets extends System {
 
   public async info(opts) {
     const currentBet = await global.db.engine.findOne(this.collection.data, { key: 'bets' });
-    if (_.isEmpty(currentBet)) { sendMessage(global.translate('bets.notRunning'), opts.sender, opts.attr); } else {
+    if (_.isEmpty(currentBet)) {
+      sendMessage(global.translate('bets.notRunning'), opts.sender, opts.attr); 
+    } else {
       sendMessage(await prepare(currentBet.locked ? 'bets.lockedInfo' : 'bets.info', {
         command: opts.command,
         title: currentBet.title,
@@ -177,15 +187,29 @@ class Bets extends System {
         const pointsOfUser = await global.systems.points.getPointsOf(opts.sender.userId);
         const _betOfUser = await global.db.engine.findOne(this.collection.users, { id: opts.sender.userId });
 
-        if (points === 'all' || points > pointsOfUser) { points = pointsOfUser; }
+        if (points === 'all' || points > pointsOfUser) {
+          points = pointsOfUser; 
+        }
 
-        if (points === 0) { throw Error(ERROR_ZERO_BET); }
-        if (_.isEmpty(currentBet)) { throw Error(ERROR_NOT_RUNNING); }
-        if (_.isNil(currentBet.options[index])) { throw Error(ERROR_UNDEFINED_BET); }
-        if (currentBet.locked) { throw Error(ERROR_IS_LOCKED); }
-        if (!_.isEmpty(_betOfUser) && _betOfUser.option !== index) { throw Error(ERROR_DIFF_BET); }
+        if (points === 0) {
+          throw Error(ERROR_ZERO_BET); 
+        }
+        if (_.isEmpty(currentBet)) {
+          throw Error(ERROR_NOT_RUNNING); 
+        }
+        if (_.isNil(currentBet.options[index])) {
+          throw Error(ERROR_UNDEFINED_BET); 
+        }
+        if (currentBet.locked) {
+          throw Error(ERROR_IS_LOCKED); 
+        }
+        if (!_.isEmpty(_betOfUser) && _betOfUser.option !== index) {
+          throw Error(ERROR_DIFF_BET); 
+        }
 
-        if (_.isEmpty(_betOfUser)) { _betOfUser.points = 0; }
+        if (_.isEmpty(_betOfUser)) {
+          _betOfUser.points = 0; 
+        }
 
         // All OK
         await global.db.engine.increment('users.points', { id: opts.sender.userId }, { points: points * -1 });
@@ -223,7 +247,9 @@ class Bets extends System {
   @default_permission(permission.MODERATORS)
   public async refund(opts) {
     try {
-      if (_.isEmpty(await global.db.engine.findOne(this.collection.data, { key: 'bets' }))) { throw Error(ERROR_NOT_RUNNING); }
+      if (_.isEmpty(await global.db.engine.findOne(this.collection.data, { key: 'bets' }))) {
+        throw Error(ERROR_NOT_RUNNING); 
+      }
       for (const user of await global.db.engine.find(this.collection.users)) {
         await global.db.engine.increment('users.points', { id: user.id }, { points: parseInt(user.points, 10) });
       }
@@ -250,8 +276,12 @@ class Bets extends System {
     try {
       const index = new Expects(opts.parameters).number().toArray()[0];
 
-      if (_.isEmpty(currentBet)) { throw Error(ERROR_NOT_RUNNING); }
-      if (_.isNil(currentBet.options[index])) { throw Error(ERROR_NOT_OPTION); }
+      if (_.isEmpty(currentBet)) {
+        throw Error(ERROR_NOT_RUNNING); 
+      }
+      if (_.isNil(currentBet.options[index])) {
+        throw Error(ERROR_NOT_OPTION); 
+      }
 
       const percentGain = (currentBet.options.length * this.betPercentGain) / 100;
 
@@ -293,7 +323,11 @@ class Bets extends System {
   @default_permission(permission.MODERATORS)
   @helper()
   public main(opts) {
-    if (opts.parameters.length === 0) { this.info(opts); } else { this.participate(opts); }
+    if (opts.parameters.length === 0) {
+      this.info(opts); 
+    } else {
+      this.participate(opts); 
+    }
   }
 }
 

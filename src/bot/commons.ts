@@ -84,7 +84,9 @@ export function getIgnoreList() {
 export function getGlobalIgnoreList() {
   return Object.keys(globalIgnoreList)
     .filter(o => !global.tmi.globalIgnoreListExclude.includes(o))
-    .map(o => { return { id: o, ...globalIgnoreList[o] }; });
+    .map(o => {
+      return { id: o, ...globalIgnoreList[o] }; 
+    });
 }
 
 export function isIgnored(sender: { username: string | null; userId?: string }) {
@@ -169,16 +171,24 @@ export async function sendMessage(messageToSend: string | Promise<string>, sende
     attr.sender = sender;
   }
 
-  if (!attr.skip) { messageToSend = await new Message(messageToSend).parse(attr) as string; }
-  if (messageToSend.length === 0) { return false; } // if message is empty, don't send anything
+  if (!attr.skip) {
+    messageToSend = await new Message(messageToSend).parse(attr) as string; 
+  }
+  if (messageToSend.length === 0) {
+    return false; 
+  } // if message is empty, don't send anything
 
   // if sender is null/undefined, we can assume, that username is from dashboard -> bot
-  if (!sender && !attr.force) { return false; } // we don't want to reply on bot commands
+  if (!sender && !attr.force) {
+    return false; 
+  } // we don't want to reply on bot commands
 
   if (sender) {
     messageToSend = !_.isNil(sender.username) ? messageToSend.replace(/\$sender/g, (global.tmi.showWithAt ? '@' : '') + sender.username) : messageToSend;
     if (!global.tmi.mute || attr.force) {
-      if ((!_.isNil(attr.quiet) && attr.quiet)) { return true; }
+      if ((!_.isNil(attr.quiet) && attr.quiet)) {
+        return true; 
+      }
       if (sender['message-type'] === 'whisper') {
         global.log.whisperOut(messageToSend, { username: sender.username });
         message('whisper', sender.username, messageToSend);
@@ -197,19 +207,27 @@ export async function sendMessage(messageToSend: string | Promise<string>, sende
 
 /* TODO: move to tmi */
 export async function message(type, username, messageToSend, retry = true) {
-  if (debugIsEnabled('tmi')) { return; }
+  if (debugIsEnabled('tmi')) {
+    return; 
+  }
   if (!isMainThread) {
     global.workers.sendToMaster({ type, sender: username, message: messageToSend });
   } else if (isMainThread) {
     try {
-      if (username === null) { username = await global.oauth.generalChannel; }
+      if (username === null) {
+        username = await global.oauth.generalChannel; 
+      }
       if (username === '') {
         global.log.error('TMI: channel is not defined, message cannot be sent');
       } else {
         global.tmi.client.bot.chat[type](username, messageToSend);
       }
     } catch (e) {
-      if (retry) { setTimeout(() => message(type, username, messageToSend, false), 5000); } else { global.log.error(e); }
+      if (retry) {
+        setTimeout(() => message(type, username, messageToSend, false), 5000); 
+      } else {
+        global.log.error(e); 
+      }
     }
   }
 }
@@ -221,7 +239,9 @@ export async function timeout(username, reason, timeMs) {
       reason = reason.replace(/\$sender/g, username);
     }
     global.tmi.client.bot.chat.timeout(global.oauth.generalChannel, username, timeMs, reason);
-  } else { global.workers.sendToMaster({ type: 'timeout', username, timeout: timeMs, reason }); }
+  } else {
+    global.workers.sendToMaster({ type: 'timeout', username, timeout: timeMs, reason }); 
+  }
 }
 
 export function getOwner() {
@@ -253,7 +273,9 @@ export function getBroadcaster() {
 
 export function isBroadcaster(user) {
   try {
-    if (_.isString(user)) { user = { username: user }; }
+    if (_.isString(user)) {
+      user = { username: user }; 
+    }
     return global.oauth.broadcasterUsername.toLowerCase().trim() === user.username.toLowerCase().trim();
   } catch (e) {
     return false;
@@ -283,7 +305,9 @@ export async function isModerator(user): Promise<boolean> {
 
 export async function isVIP(user) {
   try {
-    if (_.isString(user)) { user = await global.users.getByName(user); }
+    if (_.isString(user)) {
+      user = await global.users.getByName(user); 
+    }
     return !_.isNil(user.is.vip) ? user.is.vip : false;
   } catch (e) {
     return false;
@@ -292,7 +316,9 @@ export async function isVIP(user) {
 
 export async function isFollower(user) {
   try {
-    if (_.isString(user)) { user = await global.users.getByName(user); }
+    if (_.isString(user)) {
+      user = await global.users.getByName(user); 
+    }
     return !_.isNil(user.is.follower) ? user.is.follower : false;
   } catch (e) {
     return false;
@@ -301,7 +327,9 @@ export async function isFollower(user) {
 
 export async function isSubscriber(user) {
   try {
-    if (_.isString(user)) { user = await global.users.getByName(user); }
+    if (_.isString(user)) {
+      user = await global.users.getByName(user); 
+    }
     debug('commons.isSubscriber', JSON.stringify(user));
     return !_.isNil(user.is.subscriber) ? user.is.subscriber : false;
   } catch (e) {
@@ -311,10 +339,14 @@ export async function isSubscriber(user) {
 
 export function isBot(user) {
   try {
-    if (_.isString(user)) { user = { username: user }; }
+    if (_.isString(user)) {
+      user = { username: user }; 
+    }
     if (global.oauth.botUsername) {
       return global.oauth.botUsername.toLowerCase().trim() === user.username.toLowerCase().trim();
-    } else { return false; }
+    } else {
+      return false; 
+    }
   } catch (e) {
     return true; // we can expect, if user is null -> bot or admin
   }
@@ -322,13 +354,17 @@ export function isBot(user) {
 
 export function isOwner(user) {
   try {
-    if (_.isString(user)) { user = { username: user }; }
+    if (_.isString(user)) {
+      user = { username: user }; 
+    }
     if (global.oauth.generalOwners) {
       const owners = _.map(_.filter(global.oauth.generalOwners, _.isString), (owner) => {
         return _.trim(owner.toLowerCase());
       });
       return _.includes(owners, user.username.toLowerCase().trim());
-    } else { return false; }
+    } else {
+      return false; 
+    }
   } catch (e) {
     return true; // we can expect, if user is null -> bot or admin
   }

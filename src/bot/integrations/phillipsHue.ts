@@ -34,22 +34,26 @@ class PhillipsHue extends Integration {
   states: State[] = [];
 
   @settings('connection')
-  host: string = '';
+  host = '';
   @settings('connection')
-  user: string = '';
+  user = '';
   @settings('connection')
-  port: number = 0;
+  port = 0;
   @settings('connection')
-  timeout: number = 30000;
+  timeout = 30000;
 
   constructor () {
     super();
 
     setInterval(() => {
-      if (!this.isEnabled()) {return;}
+      if (!this.isEnabled()) {
+        return;
+      }
       for (let index = 0, length = this.states.length; index < length; index++) {
         const state = this.states[index];
-        if (_.isNil(state) || state.status.blocked) {return true;}
+        if (_.isNil(state) || state.status.blocked) {
+          return true;
+        }
 
         if (new Date().getTime() - state.status.time >= state.time) {
           state.status.time = new Date().getTime();
@@ -67,7 +71,9 @@ class PhillipsHue extends Integration {
           } else {
             state.status.blocked = true;
             state.status.state = 0;
-            this.api.setLightState(state.light, { 'on': false }).fail(function () { return true; }).done(function () {
+            this.api.setLightState(state.light, { 'on': false }).fail(function () {
+              return true; 
+            }).done(function () {
               state.status.blocked = false;
               state.status.loop++;
             });
@@ -76,7 +82,9 @@ class PhillipsHue extends Integration {
 
         if (state.status.loop === state.loop * 2) {
           setTimeout(() => {
-            this.api.setLightState(state.light, { 'on': false }).fail(function () { return true; });
+            this.api.setLightState(state.light, { 'on': false }).fail(function () {
+              return true; 
+            });
           }, state.time + 100);
 
           this.states.splice(index, 1); // remove from list
@@ -89,7 +97,9 @@ class PhillipsHue extends Integration {
   @onChange('enabled')
   onStateChange (key: string, value: boolean) {
     if (value) {
-      if (this.host.length === 0 || this.user.length === 0) {return;}
+      if (this.host.length === 0 || this.user.length === 0) {
+        return;
+      }
 
       this.api = new HueApi(
         this.host,
@@ -114,13 +124,15 @@ class PhillipsHue extends Integration {
     }
     this.api.lights()
       .then(function (lights) {
-        var output: string[] = [];
+        const output: string[] = [];
         _.each(lights.lights, function (light) {
           output.push('id: ' + light.id + ', name: \'' + light.name + '\'');
         });
         sendMessage(global.translate('phillipsHue.list') + output.join(' | '), opts.sender, opts.attr);
       })
-      .fail(function (err) { global.log.error(err, 'PhillipsHue.prototype.getLights#1'); });
+      .fail(function (err) {
+        global.log.error(err, 'PhillipsHue.prototype.getLights#1'); 
+      });
   }
 
 
@@ -130,8 +142,10 @@ class PhillipsHue extends Integration {
     if (!isMainThread) {
       return global.workers.sendToMaster({ type: 'call', ns: 'systems.phillipshue', fnc: 'hue', args: [{sender: opts.sender, text: opts.parameters }]});
     }
-    var rgb = this.parseText(opts.parameters, 'rgb', '255,255,255').split(',').map(o => Number(o));
-    if (rgb.length < 3) {rgb = [255, 255, 255];}
+    let rgb = this.parseText(opts.parameters, 'rgb', '255,255,255').split(',').map(o => Number(o));
+    if (rgb.length < 3) {
+      rgb = [255, 255, 255];
+    }
 
     this.states.push({
       'rgb': rgb,
@@ -142,14 +156,14 @@ class PhillipsHue extends Integration {
         'loop': 0,
         'state': 0,
         'time': new Date().getTime(),
-        'blocked': false
-      }
+        'blocked': false,
+      },
     });
   }
 
   parseText (text: string, value: string, defaultValue: string) {
     defaultValue = defaultValue || '0';
-    for (let part of text.trim().split(' ')) {
+    for (const part of text.trim().split(' ')) {
       if (part.startsWith(value + '=')) {
         defaultValue = part.replace(value + '=', '');
         break;

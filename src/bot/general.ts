@@ -15,7 +15,7 @@ class General extends Core {
     const f = readdirSync('./locales/');
     return [...new Set(f.map((o) => o.split('.')[0]))];
   }})
-  public lang: string = 'en';
+  public lang = 'en';
 
   @command('!enable')
   @default_permission(permission.CASTERS)
@@ -58,15 +58,21 @@ class General extends Core {
 
     const enabledSystems: any = {};
     for (const category of ['systems', 'games', 'integrations']) {
-      if (isNil(enabledSystems[category])) { enabledSystems[category] = []; }
+      if (isNil(enabledSystems[category])) {
+        enabledSystems[category] = []; 
+      }
       for (const system of Object.keys(global[category]).filter((o) => !o.startsWith('_'))) {
-        if (!global[category][system].settings) { continue; }
+        if (!global[category][system].settings) {
+          continue; 
+        }
         const [enabled, areDependenciesEnabled, isDisabledByEnv] = await Promise.all([
           global[category][system].enabled,
           global[category][system]._dependenciesEnabled(),
           !isNil(process.env.DISABLE) && (process.env.DISABLE.toLowerCase().split(',').includes(system.toLowerCase()) || process.env.DISABLE === '*'),
         ]);
-        if (!enabled || !areDependenciesEnabled || isDisabledByEnv) { continue; }
+        if (!enabled || !areDependenciesEnabled || isDisabledByEnv) {
+          continue; 
+        }
         enabledSystems[category].push(system);
       }
     }
@@ -127,7 +133,9 @@ class General extends Core {
   }
 
   private async setStatus(opts: CommandOptions & { enable: boolean }) {
-    if (opts.parameters.trim().length === 0) { return; }
+    if (opts.parameters.trim().length === 0) {
+      return; 
+    }
     try {
       const [type, name] = opts.parameters.split(' ');
 

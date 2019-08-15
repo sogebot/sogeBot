@@ -15,16 +15,16 @@ import {
   faBell, faCalendar, faCheckCircle, faCircle, faClock, faMoneyBillAlt,
 } from '@fortawesome/free-regular-svg-icons';
 import {
-  faAngleDown, faAngleRight, faAngleUp, faBan, faBoxOpen, faTv, faCaretDown, faCaretLeft, faCaretRight,
-  faCheck, faCircleNotch, faClone, faCode, faCog, faCoins, faCommentAlt, faComments, faDollarSign, faDownload,
-  faEdit, faEllipsisH, faEllipsisV, faEquals, faEraser, faExclamation, faExclamationCircle,
-  faExternalLinkAlt, faEye, faEyeSlash, faFilter, faFont, faForward, faGem, faGift, faGreaterThanEqual,
-  faHandPointer, faHeadphones, faHeart, faInfinity, faLink, faList, faLock, faLockOpen,
-  faLongArrowAltLeft, faLongArrowAltRight, faMinus, faMusic, faPause, faPlay, faPlus,
-  faPlusSquare, faQuestion, faRandom, faSave, faSearch, faShareSquare, faSignInAlt, faSignOutAlt,
+  faAngleDown, faAngleRight, faAngleUp, faBan, faBoxOpen, faCaretDown, faCaretLeft, faCaretRight, faCheck,
+  faCircleNotch, faClone, faCode, faCog, faCoins, faCommentAlt, faComments, faDollarSign, faDownload, faEdit,
+  faEllipsisH, faEllipsisV, faEquals, faEraser, faExclamation, faExclamationCircle, faExternalLinkAlt,
+  faEye, faEyeSlash, faFilter, faFont, faForward, faGem, faGift, faGreaterThanEqual, faHandPointer,
+  faHeadphones, faHeart, faInfinity, faLink, faList, faLock, faLockOpen, faLongArrowAltLeft,
+  faLongArrowAltRight, faMinus, faMusic, faPause, faPlay, faPlus, faPlusSquare,
+  faPowerOff, faQuestion, faRandom, faSave, faSearch, faShareSquare, faSignInAlt, faSignOutAlt,
   faSlash, faSpinner, faStar, faStarHalf, faStop, faSync, faSyncAlt, faTasks, faTerminal, faTh, faThLarge,
-  faThList, faTimes, faToggleOff, faToggleOn, faTrash, faTrashAlt, faTrophy, faUser, faUsers,
-  faVial, faVolumeDown, faVolumeUp, faPowerOff
+  faThList, faTimes, faToggleOff, faToggleOn, faTrash, faTrashAlt, faTrophy, faTv, faUser,
+  faUsers, faVial, faVolumeDown, faVolumeUp,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
@@ -64,8 +64,8 @@ export interface Global {
   isMainLoaded?: boolean;
 }
 
-declare var global: Global;
-declare var token: string;
+declare let global: Global;
+declare let token: string;
 
 declare module 'vue/types/vue' {
   interface Vue {

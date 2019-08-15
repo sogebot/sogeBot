@@ -1,4 +1,4 @@
-import { set, get } from 'lodash';
+import { get, set } from 'lodash';
 import { parse, sep as separator } from 'path';
 
 const on: {

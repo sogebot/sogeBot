@@ -6,10 +6,10 @@ class Polls extends Overlay {
   @ui({ type: 'selector', values: ['light', 'dark', 'Soge\'s green']  })
   cDisplayTheme: 'light' | 'dark' | 'Soge\'s green' = 'light';
   @settings('display')
-  cDisplayHideAfterInactivity: boolean = true;
+  cDisplayHideAfterInactivity = true;
   @settings('display')
   @ui({ type: 'number-input', min: 0 })
-  cDisplayInactivityTime: number = 5000;
+  cDisplayInactivityTime = 5000;
   @settings('display')
   @ui({ type: 'selector', values: ['top', 'bottom'] })
   cDisplayAlign: 'top' | 'bottom' = 'top';
@@ -21,7 +21,7 @@ class Polls extends Overlay {
     rawText: '/overlays/polls',
     target: '_blank',
   }, 'links')
-  linkBtn: null = null;
+  linkBtn = null;
 
   public sockets() {
     global.panel.io.of('/overlays/polls').on('connection', (socket) => {

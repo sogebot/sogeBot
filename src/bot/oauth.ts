@@ -7,44 +7,44 @@ import { settings, shared, ui } from './decorators';
 import { onChange } from './decorators/on';
 
 class OAuth extends Core {
-  private toWait: number = 10;
+  private toWait = 10;
 
   @shared()
   public cache: { bot: string; broadcaster: string } = { bot: '', broadcaster: '' };
   @shared()
-  public currentChannel: string = '';
+  public currentChannel = '';
   @shared()
   public broadcasterType: string | null = null;
   @shared()
-  public broadcaster: string = '';
+  public broadcaster = '';
   @shared()
-  public bot: string = '';
+  public bot = '';
   @shared()
-  public clientId: string = '';
+  public clientId = '';
   @shared()
-  public channelId: string = '';
+  public channelId = '';
   @shared()
-  public botId: string = '';
+  public botId = '';
   @shared()
-  public broadcasterId: string = '';
+  public broadcasterId = '';
 
   @settings('general')
-  public generalChannel: string = '';
+  public generalChannel = '';
 
   @settings('general')
   public generalOwners: string[] = [];
 
   @settings('broadcaster')
   @ui({ type: 'text-input', secret: true })
-  public broadcasterAccessToken: string = '';
+  public broadcasterAccessToken = '';
 
   @settings('broadcaster')
   @ui({ type: 'text-input', secret: true })
-  public broadcasterRefreshToken: string = '';
+  public broadcasterRefreshToken = '';
 
   @settings('broadcaster')
   @ui({ readOnly: true, type: 'text-input' })
-  public broadcasterUsername: string = '';
+  public broadcasterUsername = '';
 
   @settings('broadcaster', true)
   @ui({ type: 'checklist', current: 'broadcasterCurrentScopes' })
@@ -66,19 +66,19 @@ class OAuth extends Core {
     text: 'commons.generate',
     target: '_blank',
   }, 'broadcaster')
-  public broadcasterGenerateLink: null = null;
+  public broadcasterGenerateLink = null;
 
   @settings('bot')
   @ui({ type: 'text-input', secret: true })
-  public botAccessToken: string = '';
+  public botAccessToken = '';
 
   @settings('bot')
   @ui({ type: 'text-input', secret: true })
-  public botRefreshToken: string = '';
+  public botRefreshToken = '';
 
   @settings('bot')
   @ui({ readOnly: true, type: 'text-input' })
-  public botUsername: string = '';
+  public botUsername = '';
 
   @settings('bot', true)
   @ui({ type: 'checklist', current: 'botCurrentScopes' })
@@ -106,7 +106,7 @@ class OAuth extends Core {
     text: 'commons.generate',
     target: '_blank',
   }, 'bot')
-  public botGenerateLink: null = null;
+  public botGenerateLink = null;
 
   constructor() {
     super();
@@ -120,7 +120,9 @@ class OAuth extends Core {
   }
 
   public async getChannelId() {
-    if (!isMainThread || global.mocha) { return; }
+    if (!isMainThread || global.mocha) {
+      return; 
+    }
     if (typeof global.api === 'undefined' || typeof global.tmi === 'undefined') {
       return setTimeout(() => this.getChannelId(), 1000);
     }
@@ -186,7 +188,9 @@ class OAuth extends Core {
       }
     */
   public async validateOAuth(type: string) {
-    if (!isMainThread || global.mocha) { return; }
+    if (!isMainThread || global.mocha) {
+      return; 
+    }
     clearTimeout(this.timeouts[`validateOAuth-${type}`]);
 
     const url = 'https://id.twitch.tv/oauth2/validate';
@@ -233,7 +237,9 @@ class OAuth extends Core {
         console.error(e);
       }
       status = false;
-      if ((this[type + 'RefreshToken']) !== '') { this.refreshAccessToken(type); } else {
+      if ((this[type + 'RefreshToken']) !== '') {
+        this.refreshAccessToken(type); 
+      } else {
         this[type + 'Username'] = '';
         this[type + 'CurrentScopes'] = [];
 
@@ -260,7 +266,9 @@ class OAuth extends Core {
       }
     */
   public async refreshAccessToken(type: string) {
-    if (!isMainThread) { return; }
+    if (!isMainThread) {
+      return; 
+    }
     global.log.warning('Refreshing access token of ' + type);
     const url = 'https://twitchtokengenerator.com/api/refresh/';
     try {

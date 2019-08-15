@@ -25,14 +25,14 @@ enum ERROR {
  */
 
 class Polls extends System {
-  private currentMessages: number = 0;
-  private lastMessageRemind: number = 0;
-  private lastTimeRemind: number = 0;
+  private currentMessages = 0;
+  private lastMessageRemind = 0;
+  private lastTimeRemind = 0;
 
   @settings('reminder')
-  everyXMessages: number = 0;
+  everyXMessages = 0;
   @settings('reminder')
-  everyXSeconds: number = 0;
+  everyXSeconds = 0;
 
   constructor() {
     super();
@@ -113,7 +113,11 @@ class Polls extends System {
         const count = {};
         let _total = 0;
         for (let i = 0, length = votes.length; i < length; i++) {
-          if (!count[votes[i].option]) { count[votes[i].option] = votes[i].votes; } else { count[votes[i].option] = count[votes[i].option] + votes[i].votes; }
+          if (!count[votes[i].option]) {
+            count[votes[i].option] = votes[i].votes; 
+          } else {
+            count[votes[i].option] = count[votes[i].option] + votes[i].votes; 
+          }
           _total = _total + votes[i].votes;
         }
         // get vote status
@@ -152,14 +156,18 @@ class Polls extends System {
     const cVote: Poll = await global.db.engine.findOne(this.collection.data, { isOpened: true });
 
     try {
-      if (!_.isEmpty(cVote)) { throw new Error(String(ERROR.ALREADY_OPENED)); }
+      if (!_.isEmpty(cVote)) {
+        throw new Error(String(ERROR.ALREADY_OPENED)); 
+      }
 
       const [type, title, options] = new Expects(opts.parameters)
         .switch({ name: 'type', values: ['tips', 'bits', 'normal'], optional: true, default: 'normal' })
         .argument({ name: 'title', optional: false, multi: true })
         .list({ delimiter: '|' })
         .toArray();
-      if (options.length < 2) { throw new Error(String(ERROR.NOT_ENOUGH_OPTIONS)); }
+      if (options.length < 2) {
+        throw new Error(String(ERROR.NOT_ENOUGH_OPTIONS)); 
+      }
 
       const voting: Poll = { type, title, isOpened: true, options, openedAt: Date.now() };
       await global.db.engine.insert(this.collection.data, voting);
@@ -171,7 +179,11 @@ class Polls extends System {
       }), opts.sender);
       for (const index of Object.keys(options)) {
         setTimeout(() => {
-          if (type === 'normal') { sendMessage(this.getCommand('!vote') + ` ${(Number(index) + 1)} => ${options[index]}`, opts.sender); } else { sendMessage(`#vote${(Number(index) + 1)} => ${options[index]}`, opts.sender, opts.attr); }
+          if (type === 'normal') {
+            sendMessage(this.getCommand('!vote') + ` ${(Number(index) + 1)} => ${options[index]}`, opts.sender); 
+          } else {
+            sendMessage(`#vote${(Number(index) + 1)} => ${options[index]}`, opts.sender, opts.attr); 
+          }
         }, 300 * (Number(index) + 1));
       }
 
@@ -190,7 +202,11 @@ class Polls extends System {
           }), opts.sender);
           for (const index of Object.keys(cVote.options)) {
             setTimeout(() => {
-              if (cVote.type === 'normal') { sendMessage(this.getCommand('!poll open') + ` ${index} => ${cVote.options[index]}`, opts.sender); } else { sendMessage(`#vote${(Number(index) + 1)} => ${cVote.options[index]}`, opts.sender, opts.attr); }
+              if (cVote.type === 'normal') {
+                sendMessage(this.getCommand('!poll open') + ` ${index} => ${cVote.options[index]}`, opts.sender); 
+              } else {
+                sendMessage(`#vote${(Number(index) + 1)} => ${cVote.options[index]}`, opts.sender, opts.attr); 
+              }
             }, 300 * (Number(index) + 1));
           }
           break;
@@ -215,7 +231,11 @@ class Polls extends System {
         const count = {};
         let _total = 0;
         for (let i = 0, length = votes.length; i < length; i++) {
-          if (!count[votes[i].option]) { count[votes[i].option] = votes[i].votes; } else { count[votes[i].option] = count[votes[i].option] + votes[i].votes; }
+          if (!count[votes[i].option]) {
+            count[votes[i].option] = votes[i].votes; 
+          } else {
+            count[votes[i].option] = count[votes[i].option] + votes[i].votes; 
+          }
           _total = _total + votes[i].votes;
         }
         // get vote status
@@ -237,7 +257,9 @@ class Polls extends System {
           }, 100 * (Number(i) + 1));
         }
 
-      } else if (_.isEmpty(cVote)) { throw new Error(String(ERROR.NO_VOTING_IN_PROGRESS)); } else if (cVote.type === 'normal') {
+      } else if (_.isEmpty(cVote)) {
+        throw new Error(String(ERROR.NO_VOTING_IN_PROGRESS)); 
+      } else if (cVote.type === 'normal') {
         // we expects number
         [index] = new Expects(opts.parameters)
           .number()
@@ -366,7 +388,7 @@ class Polls extends System {
         userId: userObj.id,
         emotes: [],
         badges: {},
-        'message-type': 'chat'
+        'message-type': 'chat',
       });
       for (const index of Object.keys(vote.options)) {
         setTimeout(() => {
@@ -377,7 +399,7 @@ class Polls extends System {
               userId: userObj.id,
               emotes: [],
               badges: {},
-              'message-type': 'chat'
+              'message-type': 'chat',
             });
           } else {
             sendMessage(`#vote${(Number(index) + 1)} => ${vote.options[index]}`, {
@@ -386,8 +408,9 @@ class Polls extends System {
               userId: userObj.id,
               emotes: [],
               badges: {},
-              'message-type': 'chat'
-            }); }
+              'message-type': 'chat',
+            }); 
+          }
         }, 300 * (Number(index) + 1));
       }
     }

@@ -20,19 +20,19 @@ enum ERROR {
  */
 
 class Scrim extends System {
-  private cleanedUpOnStart: boolean = false;
+  private cleanedUpOnStart = false;
 
   @shared()
-  closingAt: number = 0;
+  closingAt = 0;
   @shared()
-  type: string = '';
+  type = '';
   @shared()
   lastRemindAt: number = Date.now();
   @shared()
-  isCooldownOnly: boolean = false;
+  isCooldownOnly = false;
 
   @settings('time')
-  waitForMatchIdsInSeconds: number = 60;
+  waitForMatchIdsInSeconds = 60;
 
   constructor() {
     super();
@@ -114,7 +114,7 @@ class Scrim extends System {
         userId: userObj.id,
         emotes: [],
         badges: {},
-        'message-type': 'chat'
+        'message-type': 'chat',
       },
     );
   }
@@ -144,7 +144,7 @@ class Scrim extends System {
               userId: userObj.id,
               emotes: [],
               badges: {},
-              'message-type': 'chat'
+              'message-type': 'chat',
             },
           );
           this.lastRemindAt = Date.now();
@@ -163,7 +163,7 @@ class Scrim extends System {
               userId: userObj.id,
               emotes: [],
               badges: {},
-              'message-type': 'chat'
+              'message-type': 'chat',
             },
           );
           this.lastRemindAt = Date.now();
@@ -203,7 +203,7 @@ class Scrim extends System {
         userId: userObj.id,
         emotes: [],
         badges: {},
-        'message-type': 'chat'
+        'message-type': 'chat',
       },
     );
   }
@@ -225,7 +225,7 @@ class Scrim extends System {
               userId: userObj.id,
               emotes: [],
               badges: {},
-              'message-type': 'chat'
+              'message-type': 'chat',
             },
           );
         } else {
@@ -236,7 +236,7 @@ class Scrim extends System {
             userId: userObj.id,
             emotes: [],
             badges: {},
-            'message-type': 'chat'
+            'message-type': 'chat',
           });
           if (!this.isCooldownOnly) {
             setTimeout(() => {
@@ -253,7 +253,7 @@ class Scrim extends System {
                   userId: userObj.id,
                   emotes: [],
                   badges: {},
-                  'message-type': 'chat'
+                  'message-type': 'chat',
                 },
               );
               setTimeout(async () => {

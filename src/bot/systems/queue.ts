@@ -17,14 +17,14 @@ import System from './_interface';
  */
 class Queue extends System {
   @shared()
-  locked: boolean = false;
+  locked = false;
 
   @settings('eligibility')
-  eligibilityAll: boolean = true;
+  eligibilityAll = true;
   @settings('eligibility')
-  eligibilityFollowers: boolean = true;
+  eligibilityFollowers = true;
   @settings('eligibility')
-  eligibilitySubscribers: boolean = true;
+  eligibilitySubscribers = true;
 
   constructor () {
     super();
@@ -40,15 +40,19 @@ class Queue extends System {
     this.socket.on('connection', (socket) => {
       socket.on('pick', async (data, cb) => {
         if (data.username) {
-          let users: any[] = [];
-          if (_.isString(data.username)) {data.username = [data.username];}
+          const users: any[] = [];
+          if (_.isString(data.username)) {
+            data.username = [data.username];
+          }
           for (let user of data.username) {
             user = await global.db.engine.findOne(this.collection.data, { username: user });
             delete user._id;
             users.push(user);
           }
           cb(null, await this.pickUsers({ sender: getOwner(), users }, data.random));
-        } else {cb(null, await this.pickUsers({ sender: getOwner(), parameters: String(data.count) }, data.random));}
+        } else {
+          cb(null, await this.pickUsers({ sender: getOwner(), parameters: String(data.count) }, data.random));
+        }
       });
     });
   }
@@ -63,18 +67,22 @@ class Queue extends System {
       users = users.sort(o => -(new Date(o.created_at).getTime()));
     }
 
-    let toReturn: any[] = [];
+    const toReturn: any[] = [];
     let i = 0;
-    for (let user of users) {
+    for (const user of users) {
       const isNotFollowerEligible = !user.is.follower && (this.eligibilityFollowers);
       const isNotSubscriberEligible = !user.is.subscriber && (this.eligibilitySubscribers);
-      if (isNotFollowerEligible && isNotSubscriberEligible) {continue;}
+      if (isNotFollowerEligible && isNotSubscriberEligible) {
+        continue;
+      }
 
       if (i < opts.amount) {
         await global.db.engine.remove(this.collection.data, { _id: String(user._id) });
         delete user._id;
         toReturn.push(user);
-      } else {break;}
+      } else {
+        break;
+      }
       i++;
     }
     return toReturn;
@@ -102,15 +110,19 @@ class Queue extends System {
   @command('!queue join')
   async join (opts) {
     if (!(this.locked)) {
-      let user = await global.db.engine.findOne('users', { username: opts.sender.username });
+      const user = await global.db.engine.findOne('users', { username: opts.sender.username });
 
       const [all, followers, subscribers] = await Promise.all([this.eligibilityAll, this.eligibilityFollowers, this.eligibilitySubscribers]);
 
       let eligible = false;
       if (!all) {
-        if ((followers && subscribers) && (user.is.follower || user.is.subscriber)) {eligible = true;}
-        else if (followers && user.is.follower) {eligible = true;}
-        else if (subscribers && user.is.subscriber) {eligible = true;}
+        if ((followers && subscribers) && (user.is.follower || user.is.subscriber)) {
+          eligible = true;
+        } else if (followers && user.is.follower) {
+          eligible = true;
+        } else if (subscribers && user.is.subscriber) {
+          eligible = true;
+        }
       } else {
         eligible = true;
       }
@@ -147,20 +159,24 @@ class Queue extends System {
   async pickUsers (opts, random) {
     let users;
     if (!opts.users) {
-      var input = opts.parameters.match(/^(\d+)?/)[0];
-      var amount = (input === '' ? 1 : parseInt(input, 10));
+      const input = opts.parameters.match(/^(\d+)?/)[0];
+      const amount = (input === '' ? 1 : parseInt(input, 10));
       users = await this.getUsers({ amount, random });
     } else {
       users = opts.users;
-      for (let user of users) {await global.db.engine.remove(this.collection.data, { username: user.username });}
+      for (const user of users) {
+        await global.db.engine.remove(this.collection.data, { username: user.username });
+      }
     }
 
     await global.db.engine.remove(this.collection.picked, {});
-    for (let user of users) {await global.db.engine.update(this.collection.picked, { username: user.username }, user);}
+    for (const user of users) {
+      await global.db.engine.update(this.collection.picked, { username: user.username }, user);
+    }
 
     const atUsername = global.tmi.showWithAt;
 
-    var msg;
+    let msg;
     switch (users.length) {
       case 0:
         msg = global.translate('queue.picked.none');
@@ -181,7 +197,7 @@ class Queue extends System {
   async list (opts) {
     let [atUsername, users] = await Promise.all([
       global.tmi.showWithAt,
-      global.db.engine.find(this.collection.data)
+      global.db.engine.find(this.collection.data),
     ]);
     users = users.map(o => atUsername ? `@${o.username}` : o).join(', ');
     sendMessage(
