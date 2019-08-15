@@ -47,9 +47,9 @@ class Points extends System {
   }
 
   async updatePoints () {
-    clearTimeout(this.timeouts['updatePoints']);
+    clearTimeout(this.timeouts.updatePoints);
     if (!(await this.isEnabled())) {
-      this.timeouts['updatePoints'] = global.setTimeout(() => this.updatePoints(), 5000);
+      this.timeouts.updatePoints = global.setTimeout(() => this.updatePoints(), 5000);
       return;
     }
 
@@ -103,7 +103,7 @@ class Points extends System {
       global.log.error(e);
       global.log.error(e.stack);
     } finally {
-      this.timeouts['updatePoints'] = global.setTimeout(() => this.updatePoints(), 60000);
+      this.timeouts.updatePoints = global.setTimeout(() => this.updatePoints(), 60000);
     }
   }
 

@@ -94,11 +94,11 @@ class Heist extends Game {
   constructor () {
     super();
 
-    if (isMainThread) {this.timeouts['iCheckFinished'] = global.setTimeout(() => this.iCheckFinished(), 10000);} // wait for proper config startup
+    if (isMainThread) {this.timeouts.iCheckFinished = global.setTimeout(() => this.iCheckFinished(), 10000);} // wait for proper config startup
   }
 
   async iCheckFinished () {
-    clearTimeout(this.timeouts['iCheckFinished']);
+    clearTimeout(this.timeouts.iCheckFinished);
 
     const [startedAt, entryCooldown, lastHeistTimestamp, copsCooldown, started] = await Promise.all([
       this.startedAt,
@@ -131,7 +131,7 @@ class Heist extends Game {
         // cleanup
         this.startedAt = null;
         await global.db.engine.remove(this.collection.users, {});
-        this.timeouts['iCheckFinished'] = global.setTimeout(() => this.iCheckFinished(), 10000);
+        this.timeouts.iCheckFinished = global.setTimeout(() => this.iCheckFinished(), 10000);
         return;
       }
 
@@ -146,7 +146,7 @@ class Heist extends Game {
 
       if (users.length === 1) {
         // only one user
-        const isSurvivor = _.random(0, 100, false) <= level['winPercentage'];
+        const isSurvivor = _.random(0, 100, false) <= level.winPercentage;
         const user = users[0];
         const outcome = isSurvivor ? this.singleUserSuccess : this.singleUserFailed;
         global.setTimeout(async () => { sendMessage(outcome.replace('$user', (global.tmi.showWithAt ? '@' : '') + user.username), {
@@ -226,7 +226,7 @@ class Heist extends Game {
         'message-type': 'chat',
       });
     }
-    this.timeouts['iCheckFinished'] = global.setTimeout(() => this.iCheckFinished(), 10000);
+    this.timeouts.iCheckFinished = global.setTimeout(() => this.iCheckFinished(), 10000);
   }
 
   @command('!bankheist')

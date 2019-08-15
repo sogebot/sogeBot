@@ -29,7 +29,8 @@
           "ignoreDeclarationSort": true,
           "ignoreMemberSort": false,
           "memberSyntaxSortOrder": ["none", "all", "multiple", "single"]
-      }]
+      }],
+      "dot-notation": 2
     },
     "parserOptions": {
       "ecmaFeatures": {

@@ -254,7 +254,7 @@ class Spotify extends Integration {
   }
 
   async getMe () {
-    clearTimeout(this.timeouts['getMe']);
+    clearTimeout(this.timeouts.getMe);
 
     try {
       if ((await this.isEnabled()) && !_.isNil(this.client)) {
@@ -270,11 +270,11 @@ class Spotify extends Integration {
       this.userId = null;
     }
 
-    this.timeouts['getMe'] = global.setTimeout(() => this.getMe(), 30000);
+    this.timeouts.getMe = global.setTimeout(() => this.getMe(), 30000);
   }
 
   async ICurrentSong () {
-    clearTimeout(this.timeouts['ICurrentSong']);
+    clearTimeout(this.timeouts.ICurrentSong);
 
     try {
       if (!this.fetchCurrentSongWhenOffline && !(await global.cache.isOnline())) {throw Error('Stream is offline');}
@@ -298,22 +298,22 @@ class Spotify extends Integration {
     } catch (e) {
       this.currentSong = JSON.stringify({});
     }
-    this.timeouts['ICurrentSong'] = global.setTimeout(() => this.ICurrentSong(), 5000);
+    this.timeouts.ICurrentSong = global.setTimeout(() => this.ICurrentSong(), 5000);
   }
 
   async IRefreshToken () {
-    clearTimeout(this.timeouts['IRefreshToken']);
+    clearTimeout(this.timeouts.IRefreshToken);
 
     try {
       if (!_.isNil(this.client) && this._refreshToken) {
         const data = await this.client.refreshAccessToken();
-        this.client.setAccessToken(data.body['access_token']);
-        this._accessToken = data.body['access_token'];
+        this.client.setAccessToken(data.body.access_token);
+        this._accessToken = data.body.access_token;
       }
     } catch (e) {
       global.log.info(chalk.yellow('SPOTIFY: ') + 'Refreshing access token failed');
     }
-    this.timeouts['IRefreshToken'] = global.setTimeout(() => this.IRefreshToken(), 60000);
+    this.timeouts.IRefreshToken = global.setTimeout(() => this.IRefreshToken(), 60000);
   }
 
   sockets () {
@@ -351,7 +351,7 @@ class Spotify extends Integration {
         callback(null, true);
       });
       socket.on('revoke', async (cb) => {
-        clearTimeout(this.timeouts['IRefreshToken']);
+        clearTimeout(this.timeouts.IRefreshToken);
 
         const username = this.username;
         this.client.resetAccessToken();
@@ -365,7 +365,7 @@ class Spotify extends Integration {
 
         global.log.info(chalk.yellow('SPOTIFY: ') + `Access to account ${username} is revoked`);
 
-        this.timeouts['IRefreshToken'] = global.setTimeout(() => this.IRefreshToken(), 60000);
+        this.timeouts.IRefreshToken = global.setTimeout(() => this.IRefreshToken(), 60000);
         cb(null, { do: 'refresh' });
       });
       socket.on('authorize', async (cb) => {
@@ -416,8 +416,8 @@ class Spotify extends Integration {
           this.client.authorizationCodeGrant(opts.token)
             .then((data) => {
               this.authenticatedScopes = data.body.scope.split(' ');
-              this._accessToken = data.body['access_token'];
-              this._refreshToken = data.body['refresh_token'];
+              this._accessToken = data.body.access_token;
+              this._refreshToken = data.body.refresh_token;
 
               this.client.setAccessToken(this._accessToken);
               this.client.setRefreshToken(this._refreshToken);

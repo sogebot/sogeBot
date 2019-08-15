@@ -41,7 +41,7 @@ class Quotes extends System {
         id = 1;
       }
 
-      await global.db.engine.insert(this.collection.data, { id, tags, quote, quotedBy: opts.sender['userId'], createdAt: new Date() });
+      await global.db.engine.insert(this.collection.data, { id, tags, quote, quotedBy: opts.sender.userId, createdAt: new Date() });
 
       const message = await prepare('systems.quotes.add.ok', { id, quote, tags: tags.join(', ') });
       sendMessage(message, opts.sender, opts.attr);

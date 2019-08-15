@@ -37,7 +37,7 @@ class Duel extends Game {
   }
 
   async pickDuelWinner () {
-    clearTimeout(this.timeouts['pickDuelWinner']);
+    clearTimeout(this.timeouts.pickDuelWinner);
 
     const [users, timestamp, duelDuration] = await Promise.all([
       global.db.engine.find(this.collection.users),
@@ -47,7 +47,7 @@ class Duel extends Game {
     const total = users.reduce((total, v) => total + v.tickets, 0);
 
     if (timestamp === 0 || new Date().getTime() - timestamp < 1000 * 60 * duelDuration) {
-      this.timeouts['pickDuelWinner'] = global.setTimeout(() => this.pickDuelWinner(), 30000);
+      this.timeouts.pickDuelWinner = global.setTimeout(() => this.pickDuelWinner(), 30000);
       return;
     }
 
@@ -94,7 +94,7 @@ class Duel extends Game {
     await global.db.engine.remove(this.collection.users, {});
     this._timestamp = 0;
 
-    this.timeouts['pickDuelWinner'] = global.setTimeout(() => this.pickDuelWinner(), 30000);
+    this.timeouts.pickDuelWinner = global.setTimeout(() => this.pickDuelWinner(), 30000);
   }
 
   @command('!duel bank')

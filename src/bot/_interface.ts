@@ -556,13 +556,13 @@ class Module {
 
     // go through expected permission based settings
     for (const { category, key } of this.settingsPermList) {
-      if (typeof promisedSettings['__permission_based__'] === 'undefined') {
-        promisedSettings['__permission_based__'] = {};
+      if (typeof promisedSettings.__permission_based__ === 'undefined') {
+        promisedSettings.__permission_based__ = {};
       }
 
       if (category) {
-        if (typeof promisedSettings['__permission_based__'][category] === 'undefined') {
-          promisedSettings['__permission_based__'][category] = {};
+        if (typeof promisedSettings.__permission_based__[category] === 'undefined') {
+          promisedSettings.__permission_based__[category] = {};
         }
 
         _.set(promisedSettings, `__permission_based__.${category}.${key}`, await this.getPermissionBasedSettingsValue(key, false));

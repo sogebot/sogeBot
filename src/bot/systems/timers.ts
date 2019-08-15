@@ -132,7 +132,7 @@ class Timers extends System {
   }
 
   async check () {
-    clearTimeout(this.timeouts['timersCheck']);
+    clearTimeout(this.timeouts.timersCheck);
 
     const timers = await global.db.engine.find(this.collection.data, { enabled: true });
     for (const timer of timers) {
@@ -156,7 +156,7 @@ class Timers extends System {
       }
       await global.db.engine.update(this.collection.data, { _id: timer._id.toString() }, { trigger: { messages: global.linesParsed, timestamp: new Date().getTime() } });
     }
-    this.timeouts['timersCheck'] = global.setTimeout(() => this.check(), 1000); // this will run check 1s after full check is correctly done
+    this.timeouts.timersCheck = global.setTimeout(() => this.check(), 1000); // this will run check 1s after full check is correctly done
   }
 
   async editName (self, socket, data) {
