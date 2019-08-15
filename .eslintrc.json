@@ -1,41 +1,45 @@
 {
-    "parser": "@typescript-eslint/parser",
-    "plugins": ["@typescript-eslint"],
-    "extends": ["plugin:@typescript-eslint/recommended"],
-    "rules": {
-        "indent": "off",
-        "@typescript-eslint/indent": ["error", 2],
-        "@typescript-eslint/explicit-member-accessibility": "off",
-        "quotes": ["error", "single", { "allowTemplateLiterals": true }],
-        "@typescript-eslint/camelcase": "off",
-        "@typescript-eslint/no-explicit-any": "off",
-        "@typescript-eslint/explicit-function-return-type": 0,
-        "@typescript-eslint/no-use-before-define": 0,
-        "@typescript-eslint/class-name-casing": 0,
-        "@typescript-eslint/no-unused-vars": ["error", { "args": "none" }],
-        "@typescript-eslint/prefer-interface": false,
-        "interface-over-type-literal": 0,
-        "@typescript-eslint/no-inferrable-types": 2,
-        "semi": "off",
-        "@typescript-eslint/semi": ["error"],
-        "curly": ["error"],
-        "prefer-const": ["error", {
-          "destructuring": "all",
-          "ignoreReadBeforeAssign": false
-        }],
-        "no-var": 2,
-        "prefer-spread": "error",
-        "comma-dangle": [2, "always-multiline"],
-        "sort-imports": ["error", {
-          "ignoreCase": true,
-          "ignoreDeclarationSort": true,
-          "ignoreMemberSort": false,
-          "memberSyntaxSortOrder": ["none", "all", "multiple", "single"]
+  "parser": "@typescript-eslint/parser",
+  "plugins": ["@typescript-eslint"],
+  "extends": ["plugin:@typescript-eslint/recommended"],
+  "rules": {
+      "indent": "off",
+      "@typescript-eslint/indent": ["error", 2],
+      "@typescript-eslint/explicit-member-accessibility": "off",
+      "quotes": ["error", "single", { "allowTemplateLiterals": true }],
+      "@typescript-eslint/camelcase": "off",
+      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/explicit-function-return-type": 0,
+      "@typescript-eslint/no-use-before-define": 0,
+      "@typescript-eslint/class-name-casing": 0,
+      "@typescript-eslint/no-unused-vars": ["error", { "args": "none" }],
+      "@typescript-eslint/prefer-interface": 0,
+      "interface-over-type-literal": 0,
+      "@typescript-eslint/no-inferrable-types": 2,
+      "semi": "off",
+      "@typescript-eslint/semi": ["error"],
+      "curly": ["error"],
+      "prefer-const": ["error", {
+        "destructuring": "all",
+        "ignoreReadBeforeAssign": false
       }],
-      "dot-notation": 2,
-      "operator-linebreak": ["error", "before"],
-      "brace-style": "error",
-      "no-useless-call": "error"
+      "no-var": 2,
+      "prefer-spread": "error",
+      "comma-dangle": [2, "always-multiline"],
+      "sort-imports": ["error", {
+        "ignoreCase": true,
+        "ignoreDeclarationSort": true,
+        "ignoreMemberSort": false,
+        "memberSyntaxSortOrder": ["none", "all", "multiple", "single"]
+    }],
+    "dot-notation": 2,
+    "operator-linebreak": ["error", "before"],
+    "brace-style": "error",
+    "no-useless-call": "error"
+  },
+  "parserOptions": {
+    "ecmaFeatures": {
+      "jsx": true
     },
     "useJSXTextNode": true,
     "project": "./tsconfig.json",
