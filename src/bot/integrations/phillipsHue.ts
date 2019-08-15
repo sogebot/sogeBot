@@ -46,10 +46,14 @@ class PhillipsHue extends Integration {
     super();
 
     setInterval(() => {
-      if (!this.isEnabled()) {return;}
+      if (!this.isEnabled()) {
+        return;
+      }
       for (let index = 0, length = this.states.length; index < length; index++) {
         const state = this.states[index];
-        if (_.isNil(state) || state.status.blocked) {return true;}
+        if (_.isNil(state) || state.status.blocked) {
+          return true;
+        }
 
         if (new Date().getTime() - state.status.time >= state.time) {
           state.status.time = new Date().getTime();
@@ -67,7 +71,9 @@ class PhillipsHue extends Integration {
           } else {
             state.status.blocked = true;
             state.status.state = 0;
-            this.api.setLightState(state.light, { 'on': false }).fail(function () { return true; }).done(function () {
+            this.api.setLightState(state.light, { 'on': false }).fail(function () {
+              return true; 
+            }).done(function () {
               state.status.blocked = false;
               state.status.loop++;
             });
@@ -76,7 +82,9 @@ class PhillipsHue extends Integration {
 
         if (state.status.loop === state.loop * 2) {
           setTimeout(() => {
-            this.api.setLightState(state.light, { 'on': false }).fail(function () { return true; });
+            this.api.setLightState(state.light, { 'on': false }).fail(function () {
+              return true; 
+            });
           }, state.time + 100);
 
           this.states.splice(index, 1); // remove from list
@@ -89,7 +97,9 @@ class PhillipsHue extends Integration {
   @onChange('enabled')
   onStateChange (key: string, value: boolean) {
     if (value) {
-      if (this.host.length === 0 || this.user.length === 0) {return;}
+      if (this.host.length === 0 || this.user.length === 0) {
+        return;
+      }
 
       this.api = new HueApi(
         this.host,
@@ -120,7 +130,9 @@ class PhillipsHue extends Integration {
         });
         sendMessage(global.translate('phillipsHue.list') + output.join(' | '), opts.sender, opts.attr);
       })
-      .fail(function (err) { global.log.error(err, 'PhillipsHue.prototype.getLights#1'); });
+      .fail(function (err) {
+        global.log.error(err, 'PhillipsHue.prototype.getLights#1'); 
+      });
   }
 
 
@@ -131,7 +143,9 @@ class PhillipsHue extends Integration {
       return global.workers.sendToMaster({ type: 'call', ns: 'systems.phillipshue', fnc: 'hue', args: [{sender: opts.sender, text: opts.parameters }]});
     }
     let rgb = this.parseText(opts.parameters, 'rgb', '255,255,255').split(',').map(o => Number(o));
-    if (rgb.length < 3) {rgb = [255, 255, 255];}
+    if (rgb.length < 3) {
+      rgb = [255, 255, 255];
+    }
 
     this.states.push({
       'rgb': rgb,

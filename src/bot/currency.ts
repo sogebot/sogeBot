@@ -48,8 +48,12 @@ class Currency extends Core {
       if (from.toLowerCase().trim() === to.toLowerCase().trim()) {
         return Number(value); // nothing to do
       }
-      if (_.isNil(this.rates[from])) { throw Error(`${from} code was not found`); }
-      if (_.isNil(this.rates[to]) && to.toLowerCase().trim() !== this.base.toLowerCase().trim()) { throw Error(`${to} code was not found`); }
+      if (_.isNil(this.rates[from])) {
+        throw Error(`${from} code was not found`); 
+      }
+      if (_.isNil(this.rates[to]) && to.toLowerCase().trim() !== this.base.toLowerCase().trim()) {
+        throw Error(`${to} code was not found`); 
+      }
 
       if (to.toLowerCase().trim() !== this.base.toLowerCase().trim()) {
         return (value * this.rates[from]) / this.rates[to];

@@ -26,7 +26,9 @@ class Quotes extends System {
   @default_permission(permission.CASTERS)
   async add (opts) {
     try {
-      if (opts.parameters.length === 0) {throw new Error();}
+      if (opts.parameters.length === 0) {
+        throw new Error();
+      }
       let [tags, quote] = new Expects(opts.parameters).argument({ name: 'tags', optional: true, default: 'general', multi: true, delimiter: '' }).argument({ name: 'quote', multi: true, delimiter: '' }).toArray();
       tags = tags.split(',').map((o) => o.trim());
 
@@ -55,9 +57,13 @@ class Quotes extends System {
   @default_permission(permission.CASTERS)
   async remove (opts) {
     try {
-      if (opts.parameters.length === 0) {throw new Error();}
+      if (opts.parameters.length === 0) {
+        throw new Error();
+      }
       const id = new Expects(opts.parameters).argument({ type: Number, name: 'id' }).toArray()[0];
-      if (_.isNaN(id)) {throw new Error();}
+      if (_.isNaN(id)) {
+        throw new Error();
+      }
 
       const item = await global.db.engine.remove(this.collection.data, { id });
       if (item > 0) {
@@ -77,7 +83,9 @@ class Quotes extends System {
   @default_permission(permission.CASTERS)
   async set (opts) {
     try {
-      if (opts.parameters.length === 0) {throw new Error();}
+      if (opts.parameters.length === 0) {
+        throw new Error();
+      }
       const [id, tag] = new Expects(opts.parameters).argument({ type: Number, name: 'id' }).argument({ name: 'tag', multi: true, delimiter: '' }).toArray();
       const quote = await global.db.engine.findOne(this.collection.data, { id });
       if (!_.isEmpty(quote)) {

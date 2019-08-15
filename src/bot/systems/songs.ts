@@ -270,7 +270,9 @@ class Songs extends System {
         currentSong.type = 'songrequests';
         this.currentSong = JSON.stringify(currentSong);
 
-        if (this.notify) {this.notifySong();}
+        if (this.notify) {
+          this.notifySong();
+        }
         if (this.socket) {
           this.socket.emit('videoID', currentSong);
         }
@@ -303,7 +305,9 @@ class Songs extends System {
       currentSong.type = 'playlist';
       this.currentSong = JSON.stringify(currentSong);
 
-      if (this.notify) {this.notifySong();}
+      if (this.notify) {
+        this.notifySong();
+      }
 
       if (this.socket) {
         this.socket.emit('videoID', currentSong);
@@ -322,8 +326,11 @@ class Songs extends System {
     let translation = 'songs.no-song-is-currently-playing';
     const currentSong = JSON.parse(this.currentSong);
     if (!_.isNil(currentSong.title)) {
-      if (currentSong.type === 'playlist') {translation = 'songs.current-song-from-playlist';}
-      else {translation = 'songs.current-song-from-songrequest';}
+      if (currentSong.type === 'playlist') {
+        translation = 'songs.current-song-from-playlist';
+      } else {
+        translation = 'songs.current-song-from-songrequest';
+      }
     }
     const message = await prepare(translation, { name: currentSong.title, username: currentSong.username });
     const userObj = await global.users.getByName(global.oauth.broadcasterUsername);
@@ -341,9 +348,14 @@ class Songs extends System {
     let translation;
     const currentSong = JSON.parse(this.currentSong);
     if (!_.isNil(currentSong.title)) {
-      if (currentSong.type === 'playlist') {translation = 'songs.current-song-from-playlist';}
-      else {translation = 'songs.current-song-from-songrequest';}
-    } else {return;}
+      if (currentSong.type === 'playlist') {
+        translation = 'songs.current-song-from-playlist';
+      } else {
+        translation = 'songs.current-song-from-songrequest';
+      }
+    } else {
+      return;
+    }
     const message = await prepare(translation, { name: currentSong.title, username: currentSong.username });
     const userObj = await global.users.getByName(global.oauth.broadcasterUsername);
     sendMessage(message, {
@@ -414,7 +426,9 @@ class Songs extends System {
 
     if (_.isNil(videoID.match(idRegex))) { // not id or url
       ytsearch(opts.parameters, { maxResults: 1, key: 'AIzaSyDYevtuLOxbyqBjh17JNZNvSQO854sngK0' }, (err, results) => {
-        if (err) {return global.log.error(err, { fnc: 'Songs.prototype.addSongToQueue#3' });}
+        if (err) {
+          return global.log.error(err, { fnc: 'Songs.prototype.addSongToQueue#3' });
+        }
         if (typeof results !== 'undefined' && results[0].id) {
           opts.parameters = results[0].id;
           this.addSongToQueue(opts);
@@ -441,7 +455,9 @@ class Songs extends System {
     }
 
     ytdl.getInfo('https://www.youtube.com/watch?v=' + videoID, async (err, videoInfo) => {
-      if (err) {return global.log.error(err, { fnc: 'Songs.prototype.addSongToQueue#1' });}
+      if (err) {
+        return global.log.error(err, { fnc: 'Songs.prototype.addSongToQueue#1' });
+      }
       if (_.isUndefined(videoInfo) || _.isUndefined(videoInfo.title) || _.isNull(videoInfo.title)) {
         sendMessage(global.translate('songs.song-was-not-found'), opts.sender, opts.attr);
       } else if (Number(videoInfo.length_seconds) / 60 > this.duration) {
@@ -470,7 +486,9 @@ class Songs extends System {
   @command('!playlist add')
   @default_permission(permission.CASTERS)
   async addSongToPlaylist (opts) {
-    if (_.isNil(opts.parameters)) {return;}
+    if (_.isNil(opts.parameters)) {
+      return;
+    }
 
     const urlRegex = /^.*(?:youtu.be\/|v\/|e\/|u\/\w+\/|embed\/|v=)([^#&?]*).*/;
     const match = opts.parameters.match(urlRegex);
@@ -491,8 +509,9 @@ class Songs extends System {
     } else {
       ytdl.getInfo('https://www.youtube.com/watch?v=' + id, async (err, videoInfo) => {
         done++;
-        if (err) {return global.log.error(`=> Skipped ${id} - ${err.message}`);}
-        else if (!_.isNil(videoInfo) && !_.isNil(videoInfo.title)) {
+        if (err) {
+          return global.log.error(`=> Skipped ${id} - ${err.message}`);
+        } else if (!_.isNil(videoInfo) && !_.isNil(videoInfo.title)) {
           global.log.info(`=> Imported ${id} - ${videoInfo.title}`);
           global.db.engine.update(this.collection.playlist, { videoID: id }, { videoID: id, title: videoInfo.title, loudness: videoInfo.loudness, length_seconds: videoInfo.length_seconds, lastPlayedAt: new Date().getTime(), seed: 1 });
           imported++;
@@ -503,8 +522,11 @@ class Songs extends System {
     const waitForImport = function () {
       return new Promise((resolve) => {
         const check = (resolve) => {
-          if (done === 1) {resolve();}
-          else {setTimeout(() => check(resolve), 500);}
+          if (done === 1) {
+            resolve();
+          } else {
+            setTimeout(() => check(resolve), 500);
+          }
         };
         check(resolve);
       });
@@ -521,7 +543,9 @@ class Songs extends System {
   @command('!playlist remove')
   @default_permission(permission.CASTERS)
   async removeSongFromPlaylist (opts) {
-    if (opts.parameters.length < 1) {return;}
+    if (opts.parameters.length < 1) {
+      return;
+    }
     const videoID = opts.parameters;
 
     const song = await global.db.engine.findOne(this.collection.playlist, { videoID: videoID });
@@ -538,7 +562,9 @@ class Songs extends System {
     const get = function ():  Promise<{ items: any[] }> {
       return new Promise((resolve, reject): any => {
         ytpl(playlist, { limit: Number.MAX_SAFE_INTEGER }, function (err, playlist: { items: any[] }) {
-          if (err) {reject(err);}
+          if (err) {
+            reject(err);
+          }
           resolve(playlist);
         });
       });
@@ -588,8 +614,11 @@ class Songs extends System {
       const waitForImport = function () {
         return new Promise((resolve) => {
           const check = (resolve) => {
-            if (done === ids.length) {resolve();}
-            else {setTimeout(() => check(resolve), 500);}
+            if (done === ids.length) {
+              resolve();
+            } else {
+              setTimeout(() => check(resolve), 500);
+            }
           };
           check(resolve);
         });

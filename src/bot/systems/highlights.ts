@@ -83,8 +83,12 @@ class Highlights extends System {
     const url = `https://api.twitch.tv/helix/videos?user_id=${cid}&type=archive&first=1`;
 
     try {
-      if (isNil(when.online)) { throw Error(ERROR_STREAM_NOT_ONLINE); }
-      if (token === '' || cid === '') { throw Error(ERROR_MISSING_TOKEN); }
+      if (isNil(when.online)) {
+        throw Error(ERROR_STREAM_NOT_ONLINE); 
+      }
+      if (token === '' || cid === '') {
+        throw Error(ERROR_MISSING_TOKEN); 
+      }
 
       // we need to load video id
       const request = await axios.get(url, {

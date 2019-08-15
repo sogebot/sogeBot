@@ -41,14 +41,18 @@ class Queue extends System {
       socket.on('pick', async (data, cb) => {
         if (data.username) {
           const users: any[] = [];
-          if (_.isString(data.username)) {data.username = [data.username];}
+          if (_.isString(data.username)) {
+            data.username = [data.username];
+          }
           for (let user of data.username) {
             user = await global.db.engine.findOne(this.collection.data, { username: user });
             delete user._id;
             users.push(user);
           }
           cb(null, await this.pickUsers({ sender: getOwner(), users }, data.random));
-        } else {cb(null, await this.pickUsers({ sender: getOwner(), parameters: String(data.count) }, data.random));}
+        } else {
+          cb(null, await this.pickUsers({ sender: getOwner(), parameters: String(data.count) }, data.random));
+        }
       });
     });
   }
@@ -68,13 +72,17 @@ class Queue extends System {
     for (const user of users) {
       const isNotFollowerEligible = !user.is.follower && (this.eligibilityFollowers);
       const isNotSubscriberEligible = !user.is.subscriber && (this.eligibilitySubscribers);
-      if (isNotFollowerEligible && isNotSubscriberEligible) {continue;}
+      if (isNotFollowerEligible && isNotSubscriberEligible) {
+        continue;
+      }
 
       if (i < opts.amount) {
         await global.db.engine.remove(this.collection.data, { _id: String(user._id) });
         delete user._id;
         toReturn.push(user);
-      } else {break;}
+      } else {
+        break;
+      }
       i++;
     }
     return toReturn;
@@ -108,9 +116,13 @@ class Queue extends System {
 
       let eligible = false;
       if (!all) {
-        if ((followers && subscribers) && (user.is.follower || user.is.subscriber)) {eligible = true;}
-        else if (followers && user.is.follower) {eligible = true;}
-        else if (subscribers && user.is.subscriber) {eligible = true;}
+        if ((followers && subscribers) && (user.is.follower || user.is.subscriber)) {
+          eligible = true;
+        } else if (followers && user.is.follower) {
+          eligible = true;
+        } else if (subscribers && user.is.subscriber) {
+          eligible = true;
+        }
       } else {
         eligible = true;
       }
@@ -152,11 +164,15 @@ class Queue extends System {
       users = await this.getUsers({ amount, random });
     } else {
       users = opts.users;
-      for (const user of users) {await global.db.engine.remove(this.collection.data, { username: user.username });}
+      for (const user of users) {
+        await global.db.engine.remove(this.collection.data, { username: user.username });
+      }
     }
 
     await global.db.engine.remove(this.collection.picked, {});
-    for (const user of users) {await global.db.engine.update(this.collection.picked, { username: user.username }, user);}
+    for (const user of users) {
+      await global.db.engine.update(this.collection.picked, { username: user.username }, user);
+    }
 
     const atUsername = global.tmi.showWithAt;
 

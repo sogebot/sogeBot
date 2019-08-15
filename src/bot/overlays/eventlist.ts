@@ -25,7 +25,9 @@ class EventList extends Overlay {
   }
 
   async sendDataToOverlay () {
-    if (!this.socket) {return setTimeout(() => this.sendDataToOverlay(), 1000);}
+    if (!this.socket) {
+      return setTimeout(() => this.sendDataToOverlay(), 1000);
+    }
 
     let events = await global.db.engine.find('widgetsEventList');
     events = _.uniqBy(_.orderBy(events, 'timestamp', 'desc'), o =>
@@ -35,7 +37,9 @@ class EventList extends Overlay {
   }
 
   async add (data: EventList.Event) {
-    if (isBot(data.username)) {return;} // don't save event from a bot
+    if (isBot(data.username)) {
+      return;
+    } // don't save event from a bot
 
     const newEvent = {
       event: data.type,

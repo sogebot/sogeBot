@@ -9,7 +9,9 @@ class CustomVariables extends Widget {
     this.addWidget('customvariables', 'widget-title-customvariables', 'fas fa-dollar-sign');
 
     require('cluster').on('message', (worker, message) => {
-      if (message.type !== 'widget_custom_variables') { return; }
+      if (message.type !== 'widget_custom_variables') {
+        return; 
+      }
       this.emit(message.emit); // send update to widget
     });
   }
@@ -50,13 +52,19 @@ class CustomVariables extends Widget {
       socket.on('rm.watch', async (variableId, cb) => {
         await global.db.engine.remove('custom.variables.watch', { variableId });
         // force reorder
-        const variables = _.orderBy((await global.db.engine.find('custom.variables.watch')).map((o) => { o._id = o._id.toString(); return o; }), 'order', 'asc');
-        for (let order = 0; order < variables.length; order++) { await global.db.engine.update('custom.variables.watch', { _id: variables[order]._id }, { order }); }
+        const variables = _.orderBy((await global.db.engine.find('custom.variables.watch')).map((o) => {
+          o._id = o._id.toString(); return o; 
+        }), 'order', 'asc');
+        for (let order = 0; order < variables.length; order++) {
+          await global.db.engine.update('custom.variables.watch', { _id: variables[order]._id }, { order }); 
+        }
         cb(null, variableId);
       });
       socket.on('set.value', async (opts, cb) => {
         const name = await global.customvariables.isVariableSetById(opts._id);
-        if (name) { await global.customvariables.setValueOf(name, opts.value, { readOnlyBypass: true }); }
+        if (name) {
+          await global.customvariables.setValueOf(name, opts.value, { readOnlyBypass: true }); 
+        }
         cb(null);
       });
     });

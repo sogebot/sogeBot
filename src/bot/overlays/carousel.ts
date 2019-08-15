@@ -21,20 +21,28 @@ class Carousel extends Overlay {
   sockets () {
     global.panel.io.of('/overlays/carousel').on('connection', (socket) => {
       socket.on('load', async (cb) => {
-        const images = (await global.db.engine.find('overlays.carousel')).map((o) => { o._id = o._id.toString(); return o; });
+        const images = (await global.db.engine.find('overlays.carousel')).map((o) => {
+          o._id = o._id.toString(); return o; 
+        });
         cb(_.orderBy(images, 'order', 'asc'));
       });
 
       socket.on('delete.image', async (id, cb) => {
         await global.db.engine.remove('overlays.carousel', { _id: id });
         // force reorder
-        const images = _.orderBy((await global.db.engine.find('overlays.carousel')).map((o) => { o._id = o._id.toString(); return o; }), 'order', 'asc');
-        for (let order = 0; order < images.length; order++) {await global.db.engine.update('overlays.carousel', { _id: images[order]._id }, { order });}
+        const images = _.orderBy((await global.db.engine.find('overlays.carousel')).map((o) => {
+          o._id = o._id.toString(); return o; 
+        }), 'order', 'asc');
+        for (let order = 0; order < images.length; order++) {
+          await global.db.engine.update('overlays.carousel', { _id: images[order]._id }, { order });
+        }
         cb();
       });
 
       socket.on('move', async (go, id, cb) => {
-        const images = (await global.db.engine.find('overlays.carousel')).map((o) => { o._id = o._id.toString(); return o; });
+        const images = (await global.db.engine.find('overlays.carousel')).map((o) => {
+          o._id = o._id.toString(); return o; 
+        });
 
         const image = _.find(images, (o) => o._id === id);
         const upImage = _.find(images, (o) => Number(o.order) === Number(image.order) - 1);
@@ -66,7 +74,9 @@ class Carousel extends Overlay {
 
       socket.on('upload', async (data, cb) => {
         const matches = data.match(/^data:([A-Za-z-+/]+);base64,(.+)$/);
-        if (matches.length !== 3) { return false; }
+        if (matches.length !== 3) {
+          return false; 
+        }
 
         const type = matches[1];
         const base64 = matches[2];

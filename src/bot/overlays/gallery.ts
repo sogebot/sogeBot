@@ -14,7 +14,9 @@ class Gallery extends Overlay {
         const filename = data[0];
         const filedata = data[1];
         const matches = filedata.match(/^data:([0-9A-Za-z-+/]+);base64,(.+)$/);
-        if (matches.length !== 3) { return false; }
+        if (matches.length !== 3) {
+          return false; 
+        }
         const type = matches[1];
         const item = await global.db.engine.insert(this.collection.data, { type, data: filedata, name: filename });
         cb({ type, _id: String(item._id), name: filename });

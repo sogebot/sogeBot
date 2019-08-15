@@ -78,10 +78,18 @@ class Emotes extends Overlay {
     if (isMainThread) {
       global.db.engine.index(this.collection.cache, { index: 'code' });
       setTimeout(() => {
-        if (!this.fetch.global) {this.fetchEmotesGlobal();}
-        if (!this.fetch.channel) {this.fetchEmotesChannel();}
-        if (!this.fetch.ffz) {this.fetchEmotesFFZ();}
-        if (!this.fetch.bttv) {this.fetchEmotesBTTV();}
+        if (!this.fetch.global) {
+          this.fetchEmotesGlobal();
+        }
+        if (!this.fetch.channel) {
+          this.fetchEmotesChannel();
+        }
+        if (!this.fetch.ffz) {
+          this.fetchEmotesFFZ();
+        }
+        if (!this.fetch.bttv) {
+          this.fetchEmotesBTTV();
+        }
       }, 10000);
     }
   }
@@ -114,10 +122,18 @@ class Emotes extends Overlay {
     this.lastBTTVEmoteChk = 0;
     await global.db.engine.remove(this.collection.cache, {});
 
-    if (!this.fetch.global) {this.fetchEmotesGlobal();}
-    if (!this.fetch.channel) {this.fetchEmotesChannel();}
-    if (!this.fetch.ffz) {this.fetchEmotesFFZ();}
-    if (!this.fetch.bttv) {this.fetchEmotesBTTV();}
+    if (!this.fetch.global) {
+      this.fetchEmotesGlobal();
+    }
+    if (!this.fetch.channel) {
+      this.fetchEmotesChannel();
+    }
+    if (!this.fetch.ffz) {
+      this.fetchEmotesFFZ();
+    }
+    if (!this.fetch.bttv) {
+      this.fetchEmotesBTTV();
+    }
   }
 
   async fetchEmotesChannel () {
@@ -174,7 +190,9 @@ class Emotes extends Overlay {
         const request = await axios.get('https://api.twitchemotes.com/api/v4/channels/0');
         const emotes = request.data.emotes;
         for (let i = 0, length = emotes.length; i < length; i++) {
-          if (emotes[i].id < 15) {continue;} // skip simple emotes
+          if (emotes[i].id < 15) {
+            continue;
+          } // skip simple emotes
           await global.db.engine.update(this.collection.cache,
             {
               code: emotes[i].code,
@@ -367,7 +385,9 @@ class Emotes extends Overlay {
 
   @parser({ priority: constants.LOW, fireAndForget: true })
   async containsEmotes (opts: ParserOptions) {
-    if (_.isNil(opts.sender) || !opts.sender.emotes) {return true;}
+    if (_.isNil(opts.sender) || !opts.sender.emotes) {
+      return true;
+    }
     if (!isMainThread) {
       global.workers.sendToMaster({ type: 'call', ns: 'overlays.emotes', fnc: 'containsEmotes', args: [opts] });
       return;
@@ -394,9 +414,13 @@ class Emotes extends Overlay {
     // add emotes from twitch which are not maybe in cache (other partner emotes etc)
     for (const emote of opts.sender.emotes) {
       // don't include simple emoted (id 1-14)
-      if (emote.id < 15) {continue;}
+      if (emote.id < 15) {
+        continue;
+      }
       // if emote is already in cache, continue
-      if (cache.find((o) => o.code === opts.message.slice(emote.start, emote.end+1))) {continue;}
+      if (cache.find((o) => o.code === opts.message.slice(emote.start, emote.end+1))) {
+        continue;
+      }
       const data: cachedEmote = {
         type: 'twitch',
         code: opts.message.slice(emote.start, emote.end+1),
@@ -422,7 +446,9 @@ class Emotes extends Overlay {
 
     for (let j = 0, jl = cache.length; j < jl; j++) {
       const emote = cache[j];
-      if (parsed.includes(emote.code)) {continue;} // this emote was already parsed
+      if (parsed.includes(emote.code)) {
+        continue;
+      } // this emote was already parsed
       for (let i = 0, length = (opts.message.match(new RegExp('\\b' + XRegExp.escape(emote.code) + '\\b', 'g')) || []).length; i < length; i++) {
         usedEmotes[emote.code] = emote;
         parsed.push(emote.code);

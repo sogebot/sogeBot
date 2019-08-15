@@ -28,14 +28,22 @@ class Gamble extends Game {
     opts.sender['message-type'] = 'chat'; // force responses to chat
     try {
       const parsed = opts.parameters.trim().match(/^([\d]+|all)$/);
-      if (_.isNil(parsed)) {throw Error(ERROR_NOT_ENOUGH_OPTIONS);}
+      if (_.isNil(parsed)) {
+        throw Error(ERROR_NOT_ENOUGH_OPTIONS);
+      }
 
       const pointsOfUser = await global.systems.points.getPointsOf(opts.sender.userId);
       points = parsed[1] === 'all' ? pointsOfUser : parsed[1];
 
-      if (parseInt(points, 10) === 0) {throw Error(ERROR_ZERO_BET);}
-      if (pointsOfUser < points) {throw Error(ERROR_NOT_ENOUGH_POINTS);}
-      if (points < (this.minimalBet)) {throw Error(ERROR_MINIMAL_BET);}
+      if (parseInt(points, 10) === 0) {
+        throw Error(ERROR_ZERO_BET);
+      }
+      if (pointsOfUser < points) {
+        throw Error(ERROR_NOT_ENOUGH_POINTS);
+      }
+      if (points < (this.minimalBet)) {
+        throw Error(ERROR_MINIMAL_BET);
+      }
 
       await global.db.engine.increment('users.points', { id: opts.sender.userId }, { points: parseInt(points, 10) * -1 });
       if (_.random(0, 100, false) <= this.chanceToWin) {

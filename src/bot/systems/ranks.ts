@@ -40,7 +40,9 @@ class Ranks extends System {
     };
 
     const ranks = await global.db.engine.find(this.collection.data, { hours: values.hours });
-    if (ranks.length === 0) { global.db.engine.insert(this.collection.data, values); }
+    if (ranks.length === 0) {
+      global.db.engine.insert(this.collection.data, values); 
+    }
 
     const message = await prepare(ranks.length === 0 ? 'ranks.rank-was-added' : 'ranks.ranks-already-exist', { rank: values.value, hours: values.hours });
     sendMessage(message, opts.sender, opts.attr);
@@ -115,7 +117,9 @@ class Ranks extends System {
   @default_permission(permission.CASTERS)
   async list (opts) {
     const ranks = await global.db.engine.find(this.collection.data);
-    const output = await prepare(ranks.length === 0 ? 'ranks.list-is-empty' : 'ranks.list-is-not-empty', { list: _.map(_.orderBy(ranks, 'hours', 'asc'), function (l) { return l.hours + 'h - ' + l.value; }).join(', ') });
+    const output = await prepare(ranks.length === 0 ? 'ranks.list-is-empty' : 'ranks.list-is-not-empty', { list: _.map(_.orderBy(ranks, 'hours', 'asc'), function (l) {
+      return l.hours + 'h - ' + l.value; 
+    }).join(', ') });
     sendMessage(output, opts.sender, opts.attr);
   }
 
@@ -173,8 +177,12 @@ class Ranks extends System {
   }
 
   async get (user) {
-    if (!_.isObject(user)) {user = await global.users.getByName(user);}
-    if (!_.isNil(user.custom.rank)) {return user.custom.rank;}
+    if (!_.isObject(user)) {
+      user = await global.users.getByName(user);
+    }
+    if (!_.isNil(user.custom.rank)) {
+      return user.custom.rank;
+    }
 
     const [watched, ranks] = await Promise.all([
       global.users.getWatchedOf(user.id),
@@ -185,7 +193,9 @@ class Ranks extends System {
     for (const rank of _.orderBy(ranks, 'hours', 'asc')) {
       if (watched / 1000 / 60 / 60 >= rank.hours) {
         rankToReturn = rank.value;
-      } else {break;}
+      } else {
+        break;
+      }
     }
     return rankToReturn;
   }

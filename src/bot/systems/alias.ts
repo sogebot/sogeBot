@@ -35,23 +35,31 @@ class Alias extends System {
     let alias;
 
     // is it an command?
-    if (!opts.message.startsWith('!')) {return true;}
+    if (!opts.message.startsWith('!')) {
+      return true;
+    }
 
     let cmdArray = opts.message.toLowerCase().split(' ');
     const length = opts.message.toLowerCase().split(' ').length;
     for (let i = 0; i < length; i++) {
       alias = await global.db.engine.findOne(this.collection.data, { alias: cmdArray.join(' '), enabled: true });
-      if (!_.isEmpty(alias)) {break;}
+      if (!_.isEmpty(alias)) {
+        break;
+      }
       cmdArray.pop(); // remove last array item if not found
     }
-    if (_.isEmpty(alias)) {return true;} // no alias was found - return
+    if (_.isEmpty(alias)) {
+      return true;
+    } // no alias was found - return
 
     const replace = new RegExp(`${alias.alias}`, 'i');
     cmdArray = opts.message.replace(replace, `${alias.command}`).split(' ');
     let tryingToBypass = false;
 
     for (let i = 0; i < length; i++) { // search for correct alias
-      if (cmdArray.length === alias.command.split(' ').length) {break;} // command is correct (have same number of parameters as command)
+      if (cmdArray.length === alias.command.split(' ').length) {
+        break;
+      } // command is correct (have same number of parameters as command)
 
       const parsedCmd = await p.find(cmdArray.join(' '));
       const isRegistered = !_.isNil(parsedCmd) && parsedCmd.command.split(' ').length === cmdArray.length;

@@ -50,8 +50,11 @@ class Cooldown extends System {
     }
 
     const cooldown = await global.db.engine.findOne(this.collection.data, { key: match.command, type: match.type });
-    if (_.isEmpty(cooldown)) {await global.db.engine.update(this.collection.data, { key: match.command, type: match.type }, { miliseconds: parseInt(match.seconds, 10) * 1000, type: match.type, timestamp: 0, quiet: _.isNil(match.quiet) ? false : match.quiet, enabled: true, owner: false, moderator: false, subscriber: true, follower: true });}
-    else {await global.db.engine.update(this.collection.data, { key: match.command, type: match.type }, { miliseconds: parseInt(match.seconds, 10) * 1000 });}
+    if (_.isEmpty(cooldown)) {
+      await global.db.engine.update(this.collection.data, { key: match.command, type: match.type }, { miliseconds: parseInt(match.seconds, 10) * 1000, type: match.type, timestamp: 0, quiet: _.isNil(match.quiet) ? false : match.quiet, enabled: true, owner: false, moderator: false, subscriber: true, follower: true });
+    } else {
+      await global.db.engine.update(this.collection.data, { key: match.command, type: match.type }, { miliseconds: parseInt(match.seconds, 10) * 1000 });
+    }
 
     const message = await prepare('cooldowns.cooldown-was-set', { seconds: match.seconds, type: match.type, command: match.command });
     sendMessage(message, opts.sender, opts.attr);
@@ -86,8 +89,11 @@ class Cooldown extends System {
       if (_.isEmpty(cooldown)) { // command is not on cooldown -> recheck with text only
         const replace = new RegExp(`${XRegExp.escape(key)}`, 'ig');
         opts.message = opts.message.replace(replace, '');
-        if (opts.message.length > 0) {return this.check(opts);}
-        else {return true;}
+        if (opts.message.length > 0) {
+          return this.check(opts);
+        } else {
+          return true;
+        }
       }
       data = [{
         key: cooldown.key,
@@ -209,8 +215,11 @@ class Cooldown extends System {
       if (_.isEmpty(cooldown)) { // command is not on cooldown -> recheck with text only
         const replace = new RegExp(`${XRegExp.escape(key)}`, 'ig');
         opts.message = opts.message.replace(replace, '');
-        if (opts.message.length > 0) {return this.cooldownRollback(opts);}
-        else {return true;}
+        if (opts.message.length > 0) {
+          return this.cooldownRollback(opts);
+        } else {
+          return true;
+        }
       }
       data = [{
         key: cooldown.key,
@@ -295,7 +304,9 @@ class Cooldown extends System {
 
     if (type === 'type') {
       cooldown[type] = cooldown[type] === 'global' ? 'user' : 'global';
-    } else {cooldown[type] = !cooldown[type];}
+    } else {
+      cooldown[type] = !cooldown[type];
+    }
 
     delete cooldown._id;
     await global.db.engine.update(this.collection.data, { key: match.command, type: match.type }, cooldown);
@@ -303,11 +314,21 @@ class Cooldown extends System {
     let path = '';
     const status = cooldown[type] ? 'enabled' : 'disabled';
 
-    if (type === 'moderator') {path = '-for-moderators';}
-    if (type === 'owner') {path = '-for-owners';}
-    if (type === 'subscriber') {path = '-for-subscribers';}
-    if (type === 'follower') {path = '-for-followers';}
-    if (type === 'quiet' || type === 'type') {return;} // those two are setable only from dashboard
+    if (type === 'moderator') {
+      path = '-for-moderators';
+    }
+    if (type === 'owner') {
+      path = '-for-owners';
+    }
+    if (type === 'subscriber') {
+      path = '-for-subscribers';
+    }
+    if (type === 'follower') {
+      path = '-for-followers';
+    }
+    if (type === 'quiet' || type === 'type') {
+      return;
+    } // those two are setable only from dashboard
 
     const message = await prepare(`cooldowns.cooldown-was-${status}${path}`, { command: cooldown.key });
     sendMessage(message, opts.sender, opts.attr);
@@ -315,26 +336,40 @@ class Cooldown extends System {
 
   @command('!cooldown toggle enabled')
   @default_permission(permission.CASTERS)
-  async toggleEnabled (opts: Record<string, any>) { await this.toggle(opts, 'enabled'); }
+  async toggleEnabled (opts: Record<string, any>) {
+    await this.toggle(opts, 'enabled'); 
+  }
 
   @command('!cooldown toggle moderators')
   @default_permission(permission.CASTERS)
-  async toggleModerators (opts: Record<string, any>) { await this.toggle(opts, 'moderator'); }
+  async toggleModerators (opts: Record<string, any>) {
+    await this.toggle(opts, 'moderator'); 
+  }
 
   @command('!cooldown toggle owners')
   @default_permission(permission.CASTERS)
-  async toggleOwners (opts: Record<string, any>) { await this.toggle(opts, 'owner'); }
+  async toggleOwners (opts: Record<string, any>) {
+    await this.toggle(opts, 'owner'); 
+  }
 
   @command('!cooldown toggle subscribers')
   @default_permission(permission.CASTERS)
-  async toggleSubscribers (opts: Record<string, any>) { await this.toggle(opts, 'subscriber'); }
+  async toggleSubscribers (opts: Record<string, any>) {
+    await this.toggle(opts, 'subscriber'); 
+  }
 
   @command('!cooldown toggle followers')
   @default_permission(permission.CASTERS)
-  async toggleFollowers (opts: Record<string, any>) { await this.toggle(opts, 'follower'); }
+  async toggleFollowers (opts: Record<string, any>) {
+    await this.toggle(opts, 'follower'); 
+  }
 
-  async toggleNotify (opts: Record<string, any>) { await this.toggle(opts, 'quiet'); }
-  async toggleType (opts: Record<string, any>) { await this.toggle(opts, 'type'); }
+  async toggleNotify (opts: Record<string, any>) {
+    await this.toggle(opts, 'quiet'); 
+  }
+  async toggleType (opts: Record<string, any>) {
+    await this.toggle(opts, 'type'); 
+  }
 }
 
 export default Cooldown;

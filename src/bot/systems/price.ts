@@ -101,7 +101,9 @@ class Price extends System {
   @default_permission(permission.CASTERS)
   async list (opts) {
     const prices = await global.db.engine.find(this.collection.data);
-    const output = (prices.length === 0 ? global.translate('price.list-is-empty') : global.translate('price.list-is-not-empty').replace(/\$list/g, (_.map(_.orderBy(prices, 'command'), (o) => { return `${o.command} - ${o.price}`; })).join(', ')));
+    const output = (prices.length === 0 ? global.translate('price.list-is-empty') : global.translate('price.list-is-not-empty').replace(/\$list/g, (_.map(_.orderBy(prices, 'command'), (o) => {
+      return `${o.command} - ${o.price}`; 
+    })).join(', ')));
     sendMessage(output, opts.sender, opts.attr);
   }
 
@@ -113,7 +115,9 @@ class Price extends System {
       _.isNil(parsed)
       || isOwner(opts.sender)
       || helpers.includes(opts.message)
-    ) {return true;}
+    ) {
+      return true;
+    }
     const price = await global.db.engine.findOne(this.collection.data, { command: parsed[1], enabled: true });
 
     if (_.isEmpty(price)) { // no price set
@@ -139,7 +143,9 @@ class Price extends System {
       _.isNil(parsed)
       || isOwner(opts.sender)
       || helpers.includes(opts.message)
-    ) {return true;}
+    ) {
+      return true;
+    }
     const price = await global.db.engine.findOne(this.collection.data, { command: parsed[1], enabled: true });
 
     if (_.isEmpty(price)) { // no price set

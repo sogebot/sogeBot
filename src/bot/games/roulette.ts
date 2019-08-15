@@ -41,7 +41,9 @@ class Roulette extends Game {
     }
 
     setTimeout(async () => {
-      if (!isAlive) {timeout(opts.sender.username, null, this.timeout);}
+      if (!isAlive) {
+        timeout(opts.sender.username, null, this.timeout);
+      }
       await global.db.engine.increment('users.points', { id: opts.sender.userId }, { points: isAlive ? Math.abs(Number(this.winnerWillGet)) : -Math.abs(Number(this.loserWillLose)) });
       sendMessage(isAlive ? global.translate('gambling.roulette.alive') : global.translate('gambling.roulette.dead'), opts.sender, opts.attr);
     }, 2000);

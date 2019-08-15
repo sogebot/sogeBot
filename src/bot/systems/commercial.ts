@@ -63,7 +63,9 @@ class Commercial extends System {
       const url = `https://api.twitch.tv/kraken/channels/${cid}/commercial`;
 
       const token = await global.oauth.botAccessToken;
-      if (token === '') {return;}
+      if (token === '') {
+        return;
+      }
 
       try {
         await axios({
@@ -79,7 +81,9 @@ class Commercial extends System {
 
         global.events.fire('commercial', { duration: commercial.duration });
         global.client.commercial(await global.oauth.broadcasterUsername, commercial.duration);
-        if (!_.isNil(commercial.message)) {sendMessage(commercial.message, opts.sender, opts.attr);}
+        if (!_.isNil(commercial.message)) {
+          sendMessage(commercial.message, opts.sender, opts.attr);
+        }
       } catch (e) {
         global.log.error(`API: ${url} - ${e.status} ${_.get(e, 'body.message', e.statusText)}`);
         global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'commercial', api: 'kraken', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.statusText)}` });

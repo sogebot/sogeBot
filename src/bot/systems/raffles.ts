@@ -62,7 +62,9 @@ class Raffles extends System {
 
   @parser({ fireAndForget: true })
   async messages (opts) {
-    if (opts.skip) {return true;}
+    if (opts.skip) {
+      return true;
+    }
 
     const raffles = await global.db.engine.find(this.collection.data);
     if (_.isEmpty(raffles)) {
@@ -96,7 +98,9 @@ class Raffles extends System {
     this.lastAnnounce = _.now();
 
     let locale = 'raffles.announce-raffle';
-    if (raffle.type === TYPE_TICKETS) {locale = 'raffles.announce-ticket-raffle';}
+    if (raffle.type === TYPE_TICKETS) {
+      locale = 'raffles.announce-ticket-raffle';
+    }
 
     const eligibility: string[] = [];
     if (raffle.followers === true) {
@@ -132,7 +136,9 @@ class Raffles extends System {
   @default_permission(permission.CASTERS)
   async remove (self) {
     const raffle = await global.db.engine.findOne(this.collection.data, { winner: null });
-    if (_.isEmpty(raffle)) {return;}
+    if (_.isEmpty(raffle)) {
+      return;
+    }
 
     await Promise.all([
       global.db.engine.remove(this.collection.data, { _id: raffle._id.toString() }),
@@ -147,7 +153,9 @@ class Raffles extends System {
   async open (opts) {
     const [followers, subscribers] = [opts.parameters.indexOf('followers') >= 0, opts.parameters.indexOf('subscribers') >= 0];
     let type = (opts.parameters.indexOf('-min') >= 0 || opts.parameters.indexOf('-max') >= 0) ? TYPE_TICKETS : TYPE_NORMAL;
-    if (!(await global.systems.points.isEnabled())) {type = TYPE_NORMAL;} // force normal type if points are disabled
+    if (!(await global.systems.points.isEnabled())) {
+      type = TYPE_NORMAL;
+    } // force normal type if points are disabled
 
     let minTickets = 0;
     let maxTickets = 100;
@@ -155,10 +163,14 @@ class Raffles extends System {
     if (type === TYPE_TICKETS) {
       let match;
       match = opts.parameters.match(/-min (\d+)/);
-      if (!_.isNil(match)) {minTickets = match[1];}
+      if (!_.isNil(match)) {
+        minTickets = match[1];
+      }
 
       match = opts.parameters.match(/-max (\d+)/);
-      if (!_.isNil(match)) {maxTickets = match[1];}
+      if (!_.isNil(match)) {
+        maxTickets = match[1];
+      }
     }
 
     let keyword = opts.parameters.match(/(![\S]+)/);
@@ -192,9 +204,15 @@ class Raffles extends System {
     ]);
 
     const eligibility: string[] = [];
-    if (followers) {eligibility.push(await prepare('raffles.eligibility-followers-item'));}
-    if (subscribers) {eligibility.push(await prepare('raffles.eligibility-subscribers-item'));}
-    if (_.isEmpty(eligibility)) {eligibility.push(await prepare('raffles.eligibility-everyone-item'));}
+    if (followers) {
+      eligibility.push(await prepare('raffles.eligibility-followers-item'));
+    }
+    if (subscribers) {
+      eligibility.push(await prepare('raffles.eligibility-subscribers-item'));
+    }
+    if (_.isEmpty(eligibility)) {
+      eligibility.push(await prepare('raffles.eligibility-everyone-item'));
+    }
 
     const message = await prepare(type === TYPE_NORMAL ? 'raffles.announce-raffle' : 'raffles.announce-ticket-raffle', {
       keyword: keyword,
@@ -226,12 +244,20 @@ class Raffles extends System {
     }
 
     let locale = 'raffles.announce-raffle';
-    if (raffle.type === TYPE_TICKETS) {locale = 'raffles.announce-ticket-raffle';}
+    if (raffle.type === TYPE_TICKETS) {
+      locale = 'raffles.announce-ticket-raffle';
+    }
 
     const eligibility: string[] = [];
-    if (raffle.followers === true) {eligibility.push(await prepare('raffles.eligibility-followers-item'));}
-    if (raffle.subscribers === true) {eligibility.push(await prepare('raffles.eligibility-subscribers-item'));}
-    if (_.isEmpty(eligibility)) {eligibility.push(await prepare('raffles.eligibility-everyone-item'));}
+    if (raffle.followers === true) {
+      eligibility.push(await prepare('raffles.eligibility-followers-item'));
+    }
+    if (raffle.subscribers === true) {
+      eligibility.push(await prepare('raffles.eligibility-subscribers-item'));
+    }
+    if (_.isEmpty(eligibility)) {
+      eligibility.push(await prepare('raffles.eligibility-everyone-item'));
+    }
 
     const message = await prepare(locale, {
       keyword: raffle.keyword,
@@ -252,13 +278,19 @@ class Raffles extends System {
 
   @parser()
   async participate (opts) {
-    if (_.isNil(opts.sender) || _.isNil(opts.sender.username)) {return true;}
+    if (_.isNil(opts.sender) || _.isNil(opts.sender.username)) {
+      return true;
+    }
 
     const [raffle, user] = await Promise.all([global.db.engine.findOne(this.collection.data, { winner: null }), global.users.getByName(opts.sender.username)]);
-    if (_.isEmpty(raffle)) {return true;}
+    if (_.isEmpty(raffle)) {
+      return true;
+    }
 
     const isStartingWithRaffleKeyword = opts.message.toLowerCase().startsWith(raffle.keyword.toLowerCase());
-    if (!isStartingWithRaffleKeyword || _.isEmpty(raffle)) {return true;}
+    if (!isStartingWithRaffleKeyword || _.isEmpty(raffle)) {
+      return true;
+    }
 
     opts.message = opts.message.toString().replace(raffle.keyword, '');
     let tickets = opts.message.trim() === 'all' && !_.isNil(await global.systems.points.getPointsOf(opts.sender.userId)) ? await global.systems.points.getPointsOf(opts.sender.userId) : parseInt(opts.message.trim(), 10);
@@ -272,7 +304,9 @@ class Raffles extends System {
     if ((!_.isFinite(tickets) || tickets <= 0 || tickets > parseInt(raffle.max, 10) || tickets < parseInt(raffle.min, 10)) && raffle.type === TYPE_TICKETS) {
       return false;
     }
-    if (!_.isFinite(tickets)) {tickets = 0;}
+    if (!_.isFinite(tickets)) {
+      tickets = 0;
+    }
 
     const participant = await global.db.engine.findOne(this.collection.participants, { raffle_id: raffle._id.toString(), username: opts.sender.username });
     let curTickets = 0;
@@ -281,7 +315,9 @@ class Raffles extends System {
     }
     let newTickets = curTickets + tickets;
 
-    if (newTickets > raffle.max) { newTickets = raffle.max; }
+    if (newTickets > raffle.max) {
+      newTickets = raffle.max; 
+    }
     tickets = newTickets - curTickets;
 
     const participantUser = {
@@ -292,7 +328,9 @@ class Raffles extends System {
       is: user.is,
       raffle_id: raffle._id.toString(),
     };
-    if (raffle.type === TYPE_TICKETS && await global.systems.points.getPointsOf(opts.sender.userId) < tickets) {return;} // user doesn't have enough points
+    if (raffle.type === TYPE_TICKETS && await global.systems.points.getPointsOf(opts.sender.userId) < tickets) {
+      return;
+    } // user doesn't have enough points
 
     if (raffle.followers && raffle.subscribers) {
       participantUser.eligible = (!_.isNil(user.is.follower) && user.is.follower) || (!_.isNil(user.is.subscriber) && user.is.subscriber);
@@ -303,7 +341,9 @@ class Raffles extends System {
     }
 
     if (participantUser.eligible) {
-      if (raffle.type === TYPE_TICKETS) {await global.db.engine.increment('users.points', { id: opts.sender.userId }, { points: tickets * -1 });}
+      if (raffle.type === TYPE_TICKETS) {
+        await global.db.engine.increment('users.points', { id: opts.sender.userId }, { points: tickets * -1 });
+      }
       await global.db.engine.update(this.collection.participants, { raffle_id: raffle._id.toString(), username: opts.sender.username }, participantUser);
     }
     return true;
@@ -313,7 +353,9 @@ class Raffles extends System {
   @default_permission(permission.CASTERS)
   async pick () {
     const raffles = await global.db.engine.find(this.collection.data);
-    if (_.size(raffles) === 0) {return true;} // no raffle ever
+    if (_.size(raffles) === 0) {
+      return true;
+    } // no raffle ever
 
     // get only latest raffle
     const raffle = _.orderBy(raffles, 'timestamp', 'desc')[0];

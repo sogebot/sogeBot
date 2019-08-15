@@ -26,8 +26,11 @@ class Donationalerts extends Integration {
   @onStartup()
   @onChange('enabled')
   onStateChange (key: string, val: boolean) {
-    if (val) {this.connect();}
-    else {this.disconnect();}
+    if (val) {
+      this.connect();
+    } else {
+      this.disconnect();
+    }
   }
 
   async disconnect () {
@@ -41,7 +44,9 @@ class Donationalerts extends Integration {
   async connect () {
     this.disconnect();
 
-    if (this.secretToken.trim() === '' || !(await this.isEnabled())) {return;}
+    if (this.secretToken.trim() === '' || !(await this.isEnabled())) {
+      return;
+    }
 
     this.socket = require('socket.io-client').connect('wss://socket.donationalerts.ru:443',
       {
@@ -69,7 +74,9 @@ class Donationalerts extends Integration {
 
       this.socket.off('donation').on('donation', async (data) => {
         data = JSON.parse(data);
-        if (parseInt(data.alert_type, 10) !== 1) {return;}
+        if (parseInt(data.alert_type, 10) !== 1) {
+          return;
+        }
         const additionalData = JSON.parse(data.additional_data);
         global.overlays.eventlist.add({
           type: 'tip',
@@ -94,8 +101,12 @@ class Donationalerts extends Integration {
 
         if (!data._is_test_alert) {
           const id = await global.users.getIdByName(data.username.toLowerCase(), false);
-          if (id) {global.db.engine.insert('users.tips', { id, amount: Number(data.amount), message: data.message, currency: data.currency, timestamp: _.now() });}
-          if (await global.cache.isOnline()) {await global.db.engine.increment('api.current', { key: 'tips' }, { value: parseFloat(global.currency.exchange(data.amount, data.currency, global.currency.mainCurrency)) });}
+          if (id) {
+            global.db.engine.insert('users.tips', { id, amount: Number(data.amount), message: data.message, currency: data.currency, timestamp: _.now() });
+          }
+          if (await global.cache.isOnline()) {
+            await global.db.engine.increment('api.current', { key: 'tips' }, { value: parseFloat(global.currency.exchange(data.amount, data.currency, global.currency.mainCurrency)) });
+          }
         }
 
         // go through all systems and trigger on.tip
@@ -107,7 +118,9 @@ class Donationalerts extends Integration {
           integrations: global.integrations,
         })) {
           for (const [name, system] of Object.entries(systems)) {
-            if (name.startsWith('_') || typeof system.on === 'undefined') {continue;}
+            if (name.startsWith('_') || typeof system.on === 'undefined') {
+              continue;
+            }
             if (Array.isArray(system.on.tip)) {
               for (const fnc of system.on.tip) {
                 system[fnc]({

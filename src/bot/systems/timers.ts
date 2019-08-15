@@ -26,7 +26,9 @@ class Timers extends System {
     super();
 
     this.addMenu({ category: 'manage', name: 'timers', id: 'timers/list' });
-    if (isMainThread) {this.init();}
+    if (isMainThread) {
+      this.init();
+    }
   }
 
   sockets () {
@@ -71,8 +73,9 @@ class Timers extends System {
             timestamp: new Date().getTime(),
           },
         };
-        if (_.isNil(data.timer._id)) {data.timer._id = String((await global.db.engine.insert(this.collection.data, timer))._id);}
-        else {
+        if (_.isNil(data.timer._id)) {
+          data.timer._id = String((await global.db.engine.insert(this.collection.data, timer))._id);
+        } else {
           await Promise.all([
             global.db.engine.update(this.collection.data, { _id: data.timer._id }, timer),
             global.db.engine.remove(this.collection.responses, { timerId: data.timer._id }),
@@ -127,7 +130,9 @@ class Timers extends System {
 
   async init () {
     const timers = await global.db.engine.find(this.collection.data);
-    for (const timer of timers) {await global.db.engine.update(this.collection.data, { _id: timer._id.toString() }, { trigger: { messages: 0, timestamp: new Date().getTime() } });}
+    for (const timer of timers) {
+      await global.db.engine.update(this.collection.data, { _id: timer._id.toString() }, { trigger: { messages: 0, timestamp: new Date().getTime() } });
+    }
     this.check();
   }
 
@@ -136,8 +141,12 @@ class Timers extends System {
 
     const timers = await global.db.engine.find(this.collection.data, { enabled: true });
     for (const timer of timers) {
-      if (timer.messages > 0 && timer.trigger.messages - global.linesParsed + timer.messages > 0) {continue;} // not ready to trigger with messages
-      if (timer.seconds > 0 && new Date().getTime() - timer.trigger.timestamp < timer.seconds * 1000) {continue;} // not ready to trigger with seconds
+      if (timer.messages > 0 && timer.trigger.messages - global.linesParsed + timer.messages > 0) {
+        continue;
+      } // not ready to trigger with messages
+      if (timer.seconds > 0 && new Date().getTime() - timer.trigger.timestamp < timer.seconds * 1000) {
+        continue;
+      } // not ready to trigger with seconds
 
       const responses = await global.db.engine.find(this.collection.responses, { timerId: timer._id.toString(), enabled: true });
       const response = _.orderBy(responses, 'timestamp', 'asc')[0];
@@ -160,17 +169,23 @@ class Timers extends System {
   }
 
   async editName (self, socket, data) {
-    if (data.value.length === 0) {await self.unset(self, null, `-name ${data.id}`);}
-    else {
+    if (data.value.length === 0) {
+      await self.unset(self, null, `-name ${data.id}`);
+    } else {
       const name = data.value.match(/([a-zA-Z0-9_]+)/);
-      if (_.isNil(name)) {return;}
+      if (_.isNil(name)) {
+        return;
+      }
       await global.db.engine.update(this.collection.data, { name: data.id.toString() }, { name: name[0] });
     }
   }
 
   async editResponse (self, socket, data) {
-    if (data.value.length === 0) {await self.rm(self, null, `-id ${data.id}`);}
-    else {global.db.engine.update(this.collection.responses, { _id: data.id }, { response: data.value });}
+    if (data.value.length === 0) {
+      await self.rm(self, null, `-id ${data.id}`);
+    } else {
+      global.db.engine.update(this.collection.responses, { _id: data.id }, { response: data.value });
+    }
   }
 
   @command('!timers set')
@@ -289,7 +304,9 @@ class Timers extends System {
       const timers = await global.db.engine.find(this.collection.data);
       sendMessage(global.translate('timers.timers-list').replace(/\$list/g, _.map(_.orderBy(timers, 'name'), (o) => (o.enabled ? '⚫' : '⚪') + ' ' + o.name).join(', ')), opts.sender, opts.attr);
       return true;
-    } else { name = name[1]; }
+    } else {
+      name = name[1]; 
+    }
 
     const timer = await global.db.engine.findOne(this.collection.data, { name: name });
     if (_.isEmpty(timer)) {
@@ -300,7 +317,9 @@ class Timers extends System {
 
     const responses = await global.db.engine.find(this.collection.responses, { timerId: timer._id.toString() });
     await sendMessage(global.translate('timers.responses-list').replace(/\$name/g, name), opts.sender, opts.attr);
-    for (const response of responses) {await sendMessage((response.enabled ? '⚫ ' : '⚪ ') + `${response._id} - ${response.response}`, opts.sender, opts.attr);}
+    for (const response of responses) {
+      await sendMessage((response.enabled ? '⚫ ' : '⚪ ') + `${response._id} - ${response.response}`, opts.sender, opts.attr);
+    }
     return true;
   }
 

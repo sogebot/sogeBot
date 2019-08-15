@@ -120,7 +120,9 @@ class OAuth extends Core {
   }
 
   public async getChannelId() {
-    if (!isMainThread || global.mocha) { return; }
+    if (!isMainThread || global.mocha) {
+      return; 
+    }
     if (typeof global.api === 'undefined' || typeof global.tmi === 'undefined') {
       return setTimeout(() => this.getChannelId(), 1000);
     }
@@ -186,7 +188,9 @@ class OAuth extends Core {
       }
     */
   public async validateOAuth(type: string) {
-    if (!isMainThread || global.mocha) { return; }
+    if (!isMainThread || global.mocha) {
+      return; 
+    }
     clearTimeout(this.timeouts[`validateOAuth-${type}`]);
 
     const url = 'https://id.twitch.tv/oauth2/validate';
@@ -233,7 +237,9 @@ class OAuth extends Core {
         console.error(e);
       }
       status = false;
-      if ((this[type + 'RefreshToken']) !== '') { this.refreshAccessToken(type); } else {
+      if ((this[type + 'RefreshToken']) !== '') {
+        this.refreshAccessToken(type); 
+      } else {
         this[type + 'Username'] = '';
         this[type + 'CurrentScopes'] = [];
 
@@ -260,7 +266,9 @@ class OAuth extends Core {
       }
     */
   public async refreshAccessToken(type: string) {
-    if (!isMainThread) { return; }
+    if (!isMainThread) {
+      return; 
+    }
     global.log.warning('Refreshing access token of ' + type);
     const url = 'https://twitchtokengenerator.com/api/refresh/';
     try {

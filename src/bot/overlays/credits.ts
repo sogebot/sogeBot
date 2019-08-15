@@ -96,7 +96,9 @@ class Credits extends Overlay {
       socket.on('load', async (cb) => {
         const when = await global.cache.when();
 
-        if (typeof when.online === 'undefined' || when.online === null) {when.online = _.now() - 5000000000;} // 5000000
+        if (typeof when.online === 'undefined' || when.online === null) {
+          when.online = _.now() - 5000000000;
+        } // 5000000
 
         const timestamp = new Date(when.online).getTime();
         let events = await global.db.engine.find('widgetsEventList');

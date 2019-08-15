@@ -32,14 +32,16 @@ class WheelOfFortune extends Game {
         setTimeout(async () => {
           const userObj = await global.users.getByName(username);
           for (const response of this.data[index].responses) {
-            if (response.trim().length > 0) {sendMessage(response, {
-              username: userObj.username,
-              displayName: userObj.displayName || userObj.username,
-              userId: userObj.id,
-              emotes: [],
-              badges: {},
-              'message-type': 'chat',
-            });}
+            if (response.trim().length > 0) {
+              sendMessage(response, {
+                username: userObj.username,
+                displayName: userObj.displayName || userObj.username,
+                userId: userObj.id,
+                emotes: [],
+                badges: {},
+                'message-type': 'chat',
+              });
+            }
           }
         }, 2000);
       });

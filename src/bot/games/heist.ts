@@ -94,7 +94,9 @@ class Heist extends Game {
   constructor () {
     super();
 
-    if (isMainThread) {this.timeouts.iCheckFinished = global.setTimeout(() => this.iCheckFinished(), 10000);} // wait for proper config startup
+    if (isMainThread) {
+      this.timeouts.iCheckFinished = global.setTimeout(() => this.iCheckFinished(), 10000);
+    } // wait for proper config startup
   }
 
   async iCheckFinished () {
@@ -149,14 +151,16 @@ class Heist extends Game {
         const isSurvivor = _.random(0, 100, false) <= level.winPercentage;
         const user = users[0];
         const outcome = isSurvivor ? this.singleUserSuccess : this.singleUserFailed;
-        global.setTimeout(async () => { sendMessage(outcome.replace('$user', (global.tmi.showWithAt ? '@' : '') + user.username), {
-          username: userObj.username,
-          displayName: userObj.displayName || userObj.username,
-          userId: userObj.id,
-          emotes: [],
-          badges: {},
-          'message-type': 'chat',
-        }); }, 5000);
+        global.setTimeout(async () => {
+          sendMessage(outcome.replace('$user', (global.tmi.showWithAt ? '@' : '') + user.username), {
+            username: userObj.username,
+            displayName: userObj.displayName || userObj.username,
+            userId: userObj.id,
+            emotes: [],
+            badges: {},
+            'message-type': 'chat',
+          }); 
+        }, 5000);
 
         if (isSurvivor) {
           // add points to user
@@ -178,14 +182,16 @@ class Heist extends Game {
         const percentage = (100 / users.length) * winners.length;
         const ordered = _.orderBy(this.resultsValues, [(o) => o.percentage], 'asc');
         const result = _.find(ordered, (o) => o.percentage >= percentage);
-        global.setTimeout(async () => { sendMessage(_.isNil(result) ? '' : result.message, {
-          username: userObj.username,
-          displayName: userObj.displayName || userObj.username,
-          userId: userObj.id,
-          emotes: [],
-          badges: {},
-          'message-type': 'chat',
-        }); }, 5000);
+        global.setTimeout(async () => {
+          sendMessage(_.isNil(result) ? '' : result.message, {
+            username: userObj.username,
+            displayName: userObj.displayName || userObj.username,
+            userId: userObj.id,
+            emotes: [],
+            badges: {},
+            'message-type': 'chat',
+          }); 
+        }, 5000);
         if (winners.length > 0) {
           global.setTimeout(async () => {
             const chunk: string[][] = _.chunk(winners, this.showMaxUsers);
@@ -194,7 +200,9 @@ class Heist extends Game {
 
             let message = await global.translate('games.heist.results');
             message = message.replace('$users', winnersList.map((o) => (global.tmi.showWithAt ? '@' : '') + o).join(', '));
-            if (andXMore > 0) {message = message + ' ' + (await global.translate('games.heist.andXMore')).replace('$count', andXMore);}
+            if (andXMore > 0) {
+              message = message + ' ' + (await global.translate('games.heist.andXMore')).replace('$count', andXMore);
+            }
             sendMessage(message, {
               username: userObj.username,
               displayName: userObj.displayName || userObj.username,

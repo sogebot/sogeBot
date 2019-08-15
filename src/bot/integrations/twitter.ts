@@ -169,11 +169,21 @@ class Twitter extends Integration {
   private connect() {
     try {
       const error: string[] = [];
-      if (this.consumerKey.trim().length === 0) { error.push('consumerKey'); }
-      if (this.consumerSecret.trim().length === 0) { error.push('consumerSecret'); }
-      if (this.accessToken.trim().length === 0) { error.push('accessToken'); }
-      if (this.secretToken.trim().length === 0) { error.push('secretToken'); }
-      if (error.length > 0) { throw new Error(error.join(', ') + 'missing'); }
+      if (this.consumerKey.trim().length === 0) {
+        error.push('consumerKey'); 
+      }
+      if (this.consumerSecret.trim().length === 0) {
+        error.push('consumerSecret'); 
+      }
+      if (this.accessToken.trim().length === 0) {
+        error.push('accessToken'); 
+      }
+      if (this.secretToken.trim().length === 0) {
+        error.push('secretToken'); 
+      }
+      if (error.length > 0) {
+        throw new Error(error.join(', ') + 'missing'); 
+      }
 
       this.client = new Client({
         consumer_key: this.consumerKey.trim(),

@@ -135,7 +135,9 @@ class Moderation extends System {
       await global.db.engine.remove(global.systems.moderation.collection.warnings, { _id: warning._id.toString() });
       wasCleaned = true;
     }
-    if (wasCleaned) {warnings = await global.db.engine.find(global.systems.moderation.collection.warnings, { username: sender.username });}
+    if (wasCleaned) {
+      warnings = await global.db.engine.find(global.systems.moderation.collection.warnings, { username: sender.username });
+    }
 
     if (this.cWarningsAllowedCount === 0) {
       msg = await new Message(msg.replace(/\$count/g, -1)).parse();
@@ -223,9 +225,13 @@ class Moderation extends System {
     try {
       const parsed = opts.parameters.match(/^@?([\S]+) ?(\d+)?$/);
       let count = 1;
-      if (!_.isNil(parsed[2])) {count = parseInt(parsed[2], 10);}
+      if (!_.isNil(parsed[2])) {
+        count = parseInt(parsed[2], 10);
+      }
 
-      for (let i = 0; i < count; i++) {await global.db.engine.insert(this.collection.permits, { username: parsed[1].toLowerCase() });}
+      for (let i = 0; i < count; i++) {
+        await global.db.engine.insert(this.collection.permits, { username: parsed[1].toLowerCase() });
+      }
 
       const m = await prepare('moderation.user-have-link-permit', { username: parsed[1].toLowerCase(), link: getLocalizedName(count, 'core.links'), count: count });
       sendMessage(m, opts.sender, opts.attr);
@@ -386,12 +392,16 @@ class Moderation extends System {
         global.translate('moderation.user-have-timeout-for-color'),
         this.cColorTimeout, 'color');
       return false;
-    } else {return true;}
+    } else {
+      return true;
+    }
   }
 
   @parser({ priority: constants.MODERATION })
   async emotes (opts: ParserOptions) {
-    if (!(Symbol.iterator in Object(opts.sender.emotes))) {return true;}
+    if (!(Symbol.iterator in Object(opts.sender.emotes))) {
+      return true;
+    }
 
     let count = opts.sender.emotes.length;
     if (isOwner(opts.sender) || (await isModerator(opts.sender)) || !this.cEmotesEnabled || (typeof opts.sender.badges.subscriber !== 'undefined' && !this.cEmotesModerateSubscribers)) {
@@ -411,7 +421,9 @@ class Moderation extends System {
         global.translate('moderation.user-have-timeout-for-emotes'),
         this.cEmotesTimeout, 'emotes');
       return false;
-    } else {return true;}
+    } else {
+      return true;
+    }
   }
 
   @parser({ priority: constants.MODERATION })

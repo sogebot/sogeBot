@@ -63,7 +63,9 @@ class Points extends System {
 
     try {
       for (const username of (await global.users.getAllOnlineUsernames())) {
-        if (isBot(username)) {continue;}
+        if (isBot(username)) {
+          continue;
+        }
 
         const userId = await global.users.getIdByName(username);
         if (!userId) {
@@ -80,7 +82,9 @@ class Points extends System {
         const ptsPerInterval = isOnline ? perInterval[permId]  : perOfflineInterval[permId] ;
 
         const user = await global.db.engine.findOne('users', { username });
-        if (_.isEmpty(user)) {user.id = await global.api.getIdFromTwitch(username);}
+        if (_.isEmpty(user)) {
+          user.id = await global.api.getIdFromTwitch(username);
+        }
         if (user.id) {
           if (interval_calculated !== 0 && ptsPerInterval[permId]  !== 0) {
             _.set(user, 'time.points', _.get(user, 'time.points', 0));
@@ -109,7 +113,9 @@ class Points extends System {
 
   @parser({ fireAndForget: true })
   async messagePoints (opts: ParserOptions) {
-    if (opts.skip || opts.message.startsWith('!')) {return true;}
+    if (opts.skip || opts.message.startsWith('!')) {
+      return true;
+    }
 
     const [perMessageInterval, messageInterval, perMessageOfflineInterval, messageOfflineInterval, isOnline] = await Promise.all([
       this.getPermissionBasedSettingsValue('perMessageInterval'),
@@ -128,7 +134,9 @@ class Points extends System {
     const interval_calculated = isOnline ? messageInterval[permId] : messageOfflineInterval[permId];
     const ptsPerInterval = isOnline ? perMessageInterval[permId] : perMessageOfflineInterval[permId];
 
-    if (interval_calculated === 0 || ptsPerInterval === 0) {return;}
+    if (interval_calculated === 0 || ptsPerInterval === 0) {
+      return;
+    }
 
     const [user, userMessages] = await Promise.all([
       global.users.getById(opts.sender.userId),
@@ -161,7 +169,9 @@ class Points extends System {
       const itemPoints = !_.isNaN(parseInt(_.get(item, 'points', 0))) ? _.get(item, 'points', 0) : 0;
       points = points + Number(itemPoints);
     }
-    if (Number(points) < 0) {points = 0;}
+    if (Number(points) < 0) {
+      points = 0;
+    }
 
     return points <= Number.MAX_SAFE_INTEGER
       ? points
@@ -202,12 +212,16 @@ class Points extends System {
   async give (opts: CommandOptions) {
     try {
       const [username, points] = new Expects(opts.parameters).username().points({ all: true }).toArray();
-      if (opts.sender.username.toLowerCase() === username.toLowerCase()) {return;}
+      if (opts.sender.username.toLowerCase() === username.toLowerCase()) {
+        return;
+      }
 
       const availablePoints = await this.getPointsOf(opts.sender.userId);
       const guser = await global.users.getByName(username);
 
-      if (!guser.id) {guser.id = await global.api.getIdFromTwitch(username);}
+      if (!guser.id) {
+        guser.id = await global.api.getIdFromTwitch(username);
+      }
 
       if (points !== 'all' && availablePoints < points) {
         const message = await prepare('points.failed.giveNotEnough'.replace('$command', opts.command), {
@@ -316,7 +330,9 @@ class Points extends System {
       const points = new Expects(opts.parameters).points({ all: false }).toArray();
 
       for (const username of (await global.users.getAllOnlineUsernames())) {
-        if (isBot(username)) {continue;}
+        if (isBot(username)) {
+          continue;
+        }
 
         const user = await global.db.engine.findOne('users', { username });
 
@@ -341,7 +357,9 @@ class Points extends System {
       const points = new Expects(opts.parameters).points({ all: false }).toArray();
 
       for (const username of (await global.users.getAllOnlineUsernames())) {
-        if (isBot(username)) {continue;}
+        if (isBot(username)) {
+          continue;
+        }
 
         const user = await global.db.engine.findOne('users', { username });
 
@@ -392,7 +410,9 @@ class Points extends System {
       const [username, points] = new Expects(opts.parameters).username().points({ all: true }).toArray();
       const user = await global.db.engine.findOne('users', { username });
 
-      if (!user.id) {user.id = await global.api.getIdFromTwitch(username);}
+      if (!user.id) {
+        user.id = await global.api.getIdFromTwitch(username);
+      }
 
       if (user.id) {
         if (points === 'all') {

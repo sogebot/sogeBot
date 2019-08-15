@@ -31,7 +31,8 @@
           "memberSyntaxSortOrder": ["none", "all", "multiple", "single"]
       }],
       "dot-notation": 2,
-      "operator-linebreak": ["error", "before"]
+      "operator-linebreak": ["error", "before"],
+      "brace-style": "error"
     },
     "parserOptions": {
       "ecmaFeatures": {

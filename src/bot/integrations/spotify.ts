@@ -117,7 +117,9 @@ class Spotify extends Integration {
 
   @onChange('connection.username')
   onUsernameChange (key: string, value: string) {
-    if (value.length > 0) {global.log.info(chalk.yellow('SPOTIFY: ') + `Access to account ${value} granted`);}
+    if (value.length > 0) {
+      global.log.info(chalk.yellow('SPOTIFY: ') + `Access to account ${value} granted`);
+    }
   }
 
   @onStartup()
@@ -277,7 +279,9 @@ class Spotify extends Integration {
     clearTimeout(this.timeouts.ICurrentSong);
 
     try {
-      if (!this.fetchCurrentSongWhenOffline && !(await global.cache.isOnline())) {throw Error('Stream is offline');}
+      if (!this.fetchCurrentSongWhenOffline && !(await global.cache.isOnline())) {
+        throw Error('Stream is offline');
+      }
       const data = await this.client.getMyCurrentPlayingTrack();
 
       let currentSong = JSON.parse(this.currentSong);
@@ -395,10 +399,18 @@ class Spotify extends Integration {
     const isNewConnection = this.client === null;
     try {
       const error: string[] = [];
-      if (this.clientId.trim().length === 0) {error.push('clientId');}
-      if (this.clientSecret.trim().length === 0) {error.push('clientSecret');}
-      if (this.redirectURI.trim().length === 0) {error.push('redirectURI');}
-      if (error.length > 0) {throw new Error(error.join(', ') + ' missing');}
+      if (this.clientId.trim().length === 0) {
+        error.push('clientId');
+      }
+      if (this.clientSecret.trim().length === 0) {
+        error.push('clientSecret');
+      }
+      if (this.redirectURI.trim().length === 0) {
+        error.push('redirectURI');
+      }
+      if (error.length > 0) {
+        throw new Error(error.join(', ') + ' missing');
+      }
 
       this.client = new SpotifyWebApi({
         clientId: this.clientId,
@@ -422,10 +434,14 @@ class Spotify extends Integration {
               this.client.setAccessToken(this._accessToken);
               this.client.setRefreshToken(this._refreshToken);
             }, (err) => {
-              if (err) {global.log.info(chalk.yellow('SPOTIFY: ') + 'Getting of accessToken and refreshToken failed');}
+              if (err) {
+                global.log.info(chalk.yellow('SPOTIFY: ') + 'Getting of accessToken and refreshToken failed');
+              }
             });
         }
-        if (isNewConnection) {global.log.info(chalk.yellow('SPOTIFY: ') + 'Client connected to service');}
+        if (isNewConnection) {
+          global.log.info(chalk.yellow('SPOTIFY: ') + 'Client connected to service');
+        }
       } catch (e) {
         global.log.error(e.stack);
         global.log.info(chalk.yellow('SPOTIFY: ') + 'Client connection failed');
@@ -452,13 +468,17 @@ class Spotify extends Integration {
   @command('!spotify')
   @default_permission(null)
   async main (opts: CommandOptions) {
-    if (!(await global.cache.isOnline())) {return;} // don't do anything on offline stream
+    if (!(await global.cache.isOnline())) {
+      return;
+    } // don't do anything on offline stream
     if (!isMainThread) {
       // we have client connected on master -> send process to master
       global.workers.sendToMaster({ type: 'call', ns: 'integrations.spotify', fnc: 'main', args: [opts] });
       return;
     }
-    if (!this.songRequests) {return;}
+    if (!this.songRequests) {
+      return;
+    }
 
     try {
       const [spotifyId] = new Expects(opts.parameters)
@@ -467,12 +487,16 @@ class Spotify extends Integration {
 
       if (spotifyId.startsWith('spotify:') || spotifyId.startsWith('https://open.spotify.com/track/')) {
         let id = '';
-        if (spotifyId.startsWith('spotify:')) {id = spotifyId.replace('spotify:track:', '');}
-        else {
+        if (spotifyId.startsWith('spotify:')) {
+          id = spotifyId.replace('spotify:track:', '');
+        } else {
           const regex = new RegExp('\\S+open\\.spotify\\.com\\/track\\/(\\w+)(.*)?', 'gi');
           const exec = regex.exec(spotifyId);
-          if (exec) {id = exec[1];}
-          else {throw Error('ID was not found in ' + spotifyId);}
+          if (exec) {
+            id = exec[1];
+          } else {
+            throw Error('ID was not found in ' + spotifyId);
+          }
         }
         const response = await axios({
           method: 'get',

@@ -33,7 +33,9 @@ class Duel extends Game {
 
   constructor () {
     super();
-    if (isMainThread) {this.pickDuelWinner();}
+    if (isMainThread) {
+      this.pickDuelWinner();
+    }
   }
 
   async pickDuelWinner () {
@@ -117,14 +119,22 @@ class Duel extends Game {
     opts.sender['message-type'] = 'chat'; // force responses to chat
     try {
       const parsed = opts.parameters.trim().match(/^([\d]+|all)$/);
-      if (_.isNil(parsed)) {throw Error(ERROR_NOT_ENOUGH_OPTIONS);}
+      if (_.isNil(parsed)) {
+        throw Error(ERROR_NOT_ENOUGH_OPTIONS);
+      }
 
       const points = await global.systems.points.getPointsOf(opts.sender.userId);
       bet = parsed[1] === 'all' ? points : parsed[1];
 
-      if (points === 0) {throw Error(ERROR_ZERO_BET);}
-      if (points < bet) {throw Error(ERROR_NOT_ENOUGH_POINTS);}
-      if (bet < (this.minimalBet)) {throw Error(ERROR_MINIMAL_BET);}
+      if (points === 0) {
+        throw Error(ERROR_ZERO_BET);
+      }
+      if (points < bet) {
+        throw Error(ERROR_NOT_ENOUGH_POINTS);
+      }
+      if (bet < (this.minimalBet)) {
+        throw Error(ERROR_MINIMAL_BET);
+      }
 
       // check if user is already in duel and add points
       const userFromDB = await global.db.engine.findOne(this.collection.users, { id: opts.sender.userId });
@@ -139,7 +149,9 @@ class Duel extends Game {
         if (new Date().getTime() - new Date(this._cooldown).getTime() > cooldown * 1000
           || (this.bypassCooldownByOwnerAndMods && (isMod || isBroadcaster(opts.sender)))) {
           // save new cooldown if not bypassed
-          if (!(this.bypassCooldownByOwnerAndMods && (isMod || isBroadcaster(opts.sender)))) {this._cooldown = String(new Date());}
+          if (!(this.bypassCooldownByOwnerAndMods && (isMod || isBroadcaster(opts.sender)))) {
+            this._cooldown = String(new Date());
+          }
           await global.db.engine.insert(this.collection.users, { id: opts.sender.userId, username: opts.sender.username, tickets: Number(bet) });
           await global.db.engine.increment('users.points', { id: opts.sender.userId }, { points: parseInt(bet, 10) * -1 });
         } else {

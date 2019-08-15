@@ -63,7 +63,9 @@ class FightMe extends Game {
           }),
           opts.sender);
         const isBroadcasterModCheck = isBroadcaster(opts.sender) ? isMod.user : isMod.sender;
-        if (!isBroadcasterModCheck) {timeout(isBroadcaster(opts.sender) ? username : opts.sender.username, null, this.timeout);}
+        if (!isBroadcasterModCheck) {
+          timeout(isBroadcaster(opts.sender) ? username : opts.sender.username, null, this.timeout);
+        }
         global.db.engine.remove(this.collection.users, { _id: challenge._id.toString() });
         return;
       }
@@ -116,10 +118,14 @@ class FightMe extends Game {
       }
 
       // save new timestamp if not bypassed
-      if (!(this.bypassCooldownByOwnerAndMods && (isMod || isBroadcaster(opts.sender)))) {this._cooldown = String(new Date());}
+      if (!(this.bypassCooldownByOwnerAndMods && (isMod || isBroadcaster(opts.sender)))) {
+        this._cooldown = String(new Date());
+      }
 
       const isAlreadyChallenged = !_.isEmpty(await global.db.engine.findOne(this.collection.users, { key: '_users', user: opts.sender.username, challenging: username }));
-      if (!isAlreadyChallenged) {await global.db.engine.insert(this.collection.users, { key: '_users', user: opts.sender.username, challenging: username });}
+      if (!isAlreadyChallenged) {
+        await global.db.engine.insert(this.collection.users, { key: '_users', user: opts.sender.username, challenging: username });
+      }
       const message = prepare('gambling.fightme.challenge', { username: username, sender: opts.sender.username, command: opts.command });
       sendMessage(message, opts.sender, opts.attr);
     }
