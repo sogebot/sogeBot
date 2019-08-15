@@ -136,8 +136,8 @@ class Duel extends Game {
         // check if under gambling cooldown
         const cooldown = this.cooldown;
         const isMod = await isModerator(opts.sender);
-        if (new Date().getTime() - new Date(this._cooldown).getTime() > cooldown * 1000 ||
-          (this.bypassCooldownByOwnerAndMods && (isMod || isBroadcaster(opts.sender)))) {
+        if (new Date().getTime() - new Date(this._cooldown).getTime() > cooldown * 1000
+          || (this.bypassCooldownByOwnerAndMods && (isMod || isBroadcaster(opts.sender)))) {
           // save new cooldown if not bypassed
           if (!(this.bypassCooldownByOwnerAndMods && (isMod || isBroadcaster(opts.sender)))) {this._cooldown = String(new Date());}
           await global.db.engine.insert(this.collection.users, { id: opts.sender.userId, username: opts.sender.username, tickets: Number(bet) });

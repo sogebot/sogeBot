@@ -476,8 +476,8 @@ class Module {
     const areDependenciesEnabled = await this._dependenciesEnabled();
     const isMasterAndStatusOnly = isMainThread && _.isNil(opts.state);
     const isStatusChanged = !_.isNil(opts.state);
-    const isDisabledByEnv = process.env.DISABLE &&
-      (process.env.DISABLE.toLowerCase().split(',').includes(this.constructor.name.toLowerCase()) || process.env.DISABLE === '*');
+    const isDisabledByEnv = process.env.DISABLE
+      && (process.env.DISABLE.toLowerCase().split(',').includes(this.constructor.name.toLowerCase()) || process.env.DISABLE === '*');
 
     if (isStatusChanged) {
       this.enabled = opts.state;

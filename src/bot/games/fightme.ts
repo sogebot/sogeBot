@@ -105,8 +105,8 @@ class FightMe extends Game {
       // check if under gambling cooldown
       const cooldown = this.cooldown;
       const isMod = await isModerator(opts.sender);
-      if (new Date().getTime() - new Date(this._cooldown).getTime() < cooldown * 1000 &&
-        !(this.bypassCooldownByOwnerAndMods && (isMod || isBroadcaster(opts.sender)))) {
+      if (new Date().getTime() - new Date(this._cooldown).getTime() < cooldown * 1000
+        && !(this.bypassCooldownByOwnerAndMods && (isMod || isBroadcaster(opts.sender)))) {
         sendMessage(prepare('gambling.fightme.cooldown', {
           command: opts.command,
           cooldown: Math.round(((cooldown * 1000) - (new Date().getTime() - new Date(this._cooldown).getTime())) / 1000 / 60),

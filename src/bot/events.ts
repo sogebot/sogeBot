@@ -351,8 +351,8 @@ class Events extends Core {
 
   public async checkHosted(event, attributes) {
     event.definitions.viewersAtLeast = parseInt(event.definitions.viewersAtLeast, 10); // force Integer
-    const shouldTrigger = (attributes.viewers >= event.definitions.viewersAtLeast) &&
-                        ((!attributes.autohost && event.definitions.ignoreAutohost) || !event.definitions.ignoreAutohost);
+    const shouldTrigger = (attributes.viewers >= event.definitions.viewersAtLeast)
+                        && ((!attributes.autohost && event.definitions.ignoreAutohost) || !event.definitions.ignoreAutohost);
     return shouldTrigger;
   }
 
@@ -376,9 +376,9 @@ class Events extends Core {
 
     const viewers = (await global.db.engine.findOne('api.current', { key: 'viewers' })).value;
 
-    const shouldTrigger = viewers >= event.definitions.viewersAtLeast &&
-                        ((event.definitions.runInterval > 0 && _.now() - event.triggered.runInterval >= event.definitions.runInterval * 1000) ||
-                        (event.definitions.runInterval === 0 && event.triggered.runInterval === 0));
+    const shouldTrigger = viewers >= event.definitions.viewersAtLeast
+                        && ((event.definitions.runInterval > 0 && _.now() - event.triggered.runInterval >= event.definitions.runInterval * 1000)
+                        || (event.definitions.runInterval === 0 && event.triggered.runInterval === 0));
     if (shouldTrigger) {
       event.triggered.runInterval = _.now();
       await global.db.engine.update('events', { id: event.id }, event);
@@ -399,10 +399,10 @@ class Events extends Core {
       event.triggered.runInterval = parseInt(event.triggered.runInterval, 10); // force Integer
 
       event.triggered.runEveryXCommands++;
-      shouldTrigger =
-        event.triggered.runEveryXCommands >= event.definitions.runEveryXCommands &&
-        ((event.definitions.runInterval > 0 && _.now() - event.triggered.runInterval >= event.definitions.runInterval * 1000) ||
-        (event.definitions.runInterval === 0 && event.triggered.runInterval === 0));
+      shouldTrigger
+        = event.triggered.runEveryXCommands >= event.definitions.runEveryXCommands
+        && ((event.definitions.runInterval > 0 && _.now() - event.triggered.runInterval >= event.definitions.runInterval * 1000)
+        || (event.definitions.runInterval === 0 && event.triggered.runInterval === 0));
       if (shouldTrigger) {
         event.triggered.runInterval = _.now();
         event.triggered.runEveryXCommands = 0;
@@ -432,10 +432,10 @@ class Events extends Core {
       // add count from match
       event.triggered.runEveryXKeywords = Number(event.triggered.runEveryXKeywords) + Number(match.length);
 
-      shouldTrigger =
-        event.triggered.runEveryXKeywords >= event.definitions.runEveryXKeywords &&
-        ((event.definitions.runInterval > 0 && _.now() - event.triggered.runInterval >= event.definitions.runInterval * 1000) ||
-        (event.definitions.runInterval === 0 && event.triggered.runInterval === 0));
+      shouldTrigger
+        = event.triggered.runEveryXKeywords >= event.definitions.runEveryXKeywords
+        && ((event.definitions.runInterval > 0 && _.now() - event.triggered.runInterval >= event.definitions.runInterval * 1000)
+        || (event.definitions.runInterval === 0 && event.triggered.runInterval === 0));
       if (shouldTrigger) {
         event.triggered.runInterval = _.now();
         event.triggered.runEveryXKeywords = 0;

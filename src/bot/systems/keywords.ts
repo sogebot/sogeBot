@@ -57,8 +57,8 @@ class Keywords extends System {
   @default_permission(permission.CASTERS)
   public async add(opts: CommandOptions): Promise<KeywordInterface | null> {
     try {
-      const [keywordRegex, response] =
-        new Expects(opts.parameters)
+      const [keywordRegex, response]
+        = new Expects(opts.parameters)
           .argument({ name: 'k', optional: false, multi: true, delimiter: '' })
           .argument({ name: 'r', optional: false, multi: true, delimiter: '' })
           .toArray();
@@ -89,8 +89,8 @@ class Keywords extends System {
   @default_permission(permission.CASTERS)
   public async edit(opts: CommandOptions): Promise<KeywordInterface | null> {
     try {
-      const [keywordRegexOrUUID, response] =
-        new Expects(opts.parameters)
+      const [keywordRegexOrUUID, response]
+        = new Expects(opts.parameters)
           .argument({ name: 'k', optional: false, multi: true, delimiter: '' })
           .argument({ name: 'r', optional: false, multi: true, delimiter: '' })
           .toArray();
@@ -163,8 +163,8 @@ class Keywords extends System {
   @default_permission(permission.CASTERS)
   public async remove(opts: CommandOptions): Promise<boolean> {
     try {
-      const [keywordRegexOrUUID] =
-        new Expects(opts.parameters)
+      const [keywordRegexOrUUID]
+        = new Expects(opts.parameters)
           .argument({ name: 'k', optional: false, multi: true, delimiter: '' })
           .toArray();
 
@@ -205,8 +205,8 @@ class Keywords extends System {
   @default_permission(permission.CASTERS)
   public async toggle(opts: CommandOptions): Promise<boolean> {
     try {
-      const [keywordRegexOrUUID] =
-        new Expects(opts.parameters)
+      const [keywordRegexOrUUID]
+        = new Expects(opts.parameters)
           .argument({ name: 'k', optional: false, multi: true, delimiter: '' })
           .toArray();
 

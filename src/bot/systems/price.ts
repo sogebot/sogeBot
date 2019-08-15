@@ -110,9 +110,9 @@ class Price extends System {
     const parsed = opts.message.match(/^(![\S]+)/);
     const helpers = (await (new Parser.default()).getCommandsList()).filter(o => o.isHelper).map(o => o.command);
     if (
-      _.isNil(parsed) ||
-      isOwner(opts.sender) ||
-      helpers.includes(opts.message)
+      _.isNil(parsed)
+      || isOwner(opts.sender)
+      || helpers.includes(opts.message)
     ) {return true;}
     const price = await global.db.engine.findOne(this.collection.data, { command: parsed[1], enabled: true });
 
@@ -136,9 +136,9 @@ class Price extends System {
     const parsed = opts.message.match(/^(![\S]+)/);
     const helpers = (await (new Parser.default()).getCommandsList()).filter(o => o.isHelper).map(o => o.command);
     if (
-      _.isNil(parsed) ||
-      isOwner(opts.sender) ||
-      helpers.includes(opts.message)
+      _.isNil(parsed)
+      || isOwner(opts.sender)
+      || helpers.includes(opts.message)
     ) {return true;}
     const price = await global.db.engine.findOne(this.collection.data, { command: parsed[1], enabled: true });
 

@@ -370,8 +370,8 @@ class Spotify extends Integration {
       });
       socket.on('authorize', async (cb) => {
         if (
-          this.clientId === '' ||
-          this.clientSecret === ''
+          this.clientId === ''
+          || this.clientSecret === ''
         ) {
           cb('Cannot authorize! Missing clientId or clientSecret.', null);
         } else {

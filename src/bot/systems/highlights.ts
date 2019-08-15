@@ -149,9 +149,9 @@ class Highlights extends System {
     const list: string[] = [];
 
     for (const highlight of highlights) {
-      list.push(highlight.timestamp.hours + 'h' +
-        highlight.timestamp.minutes + 'm' +
-        highlight.timestamp.seconds + 's');
+      list.push(highlight.timestamp.hours + 'h'
+        + highlight.timestamp.minutes + 'm'
+        + highlight.timestamp.seconds + 's');
     }
     sendMessage(global.translate(list.length > 0 ? 'highlights.list.items' : 'highlights.list.empty')
       .replace(/\$items/g, list.join(', ')), opts.sender);
