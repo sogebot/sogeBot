@@ -1,5 +1,6 @@
 import chalk from 'chalk';
 import _ from 'lodash';
+import { setTimeout } from 'timers';
 import { isMainThread } from 'worker_threads';
 
 import { flatten, unflatten } from './commons';
