@@ -13,7 +13,7 @@ export const init = async () => {
     el: '#quickStatsApp',
     render: function (createElement) {
       return createElement(Component);
-    }
+    },
   });
 };
 

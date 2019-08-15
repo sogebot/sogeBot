@@ -15,7 +15,7 @@ class Bets extends Overlay {
     rawText: '/overlays/bets',
     target: '_blank',
   }, 'links')
-  linkBtn: null = null;
+  linkBtn = null;
 
   constructor() {
     super();

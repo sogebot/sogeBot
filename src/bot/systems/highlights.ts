@@ -83,8 +83,12 @@ class Highlights extends System {
     const url = `https://api.twitch.tv/helix/videos?user_id=${cid}&type=archive&first=1`;
 
     try {
-      if (isNil(when.online)) { throw Error(ERROR_STREAM_NOT_ONLINE); }
-      if (token === '' || cid === '') { throw Error(ERROR_MISSING_TOKEN); }
+      if (isNil(when.online)) {
+        throw Error(ERROR_STREAM_NOT_ONLINE); 
+      }
+      if (token === '' || cid === '') {
+        throw Error(ERROR_MISSING_TOKEN); 
+      }
 
       // we need to load video id
       const request = await axios.get(url, {
@@ -149,9 +153,9 @@ class Highlights extends System {
     const list: string[] = [];
 
     for (const highlight of highlights) {
-      list.push(highlight.timestamp.hours + 'h' +
-        highlight.timestamp.minutes + 'm' +
-        highlight.timestamp.seconds + 's');
+      list.push(highlight.timestamp.hours + 'h'
+        + highlight.timestamp.minutes + 'm'
+        + highlight.timestamp.seconds + 's');
     }
     sendMessage(global.translate(list.length > 0 ? 'highlights.list.items' : 'highlights.list.empty')
       .replace(/\$items/g, list.join(', ')), opts.sender);

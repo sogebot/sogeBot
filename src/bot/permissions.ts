@@ -116,7 +116,7 @@ class Permissions extends Core {
     return null;
   }
 
-  public async check(userId: string, permId: string, partial: boolean = false): Promise<{access: boolean; permission: Permissions.Item | null}> {
+  public async check(userId: string, permId: string, partial = false): Promise<{access: boolean; permission: Permissions.Item | null}> {
     const user: User & {
       tips: User.Tips[]; bits: User.Bits[]; points: User.Points[]; watched: User.Watched[]; messages: User.Messages[];
     } = await global.db.engine.findOne('users', { id: userId }, [

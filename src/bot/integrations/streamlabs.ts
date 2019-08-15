@@ -11,13 +11,16 @@ class Streamlabs extends Integration {
 
   @settings()
   @ui({ type: 'text-input', secret: true })
-  socketToken: string = '';
+  socketToken = '';
 
   @onStartup()
   @onChange('enabled')
   onStateChange (key: string, val: boolean) {
-    if (val) {this.connect();}
-    else {this.disconnect();}
+    if (val) {
+      this.connect();
+    } else {
+      this.disconnect();
+    }
   }
 
   async disconnect () {
@@ -31,7 +34,9 @@ class Streamlabs extends Integration {
   async connect () {
     this.disconnect();
 
-    if (this.socketToken.trim() === '' || !this.enabled) {return;}
+    if (this.socketToken.trim() === '' || !this.enabled) {
+      return;
+    }
 
     this.socket = io.connect('https://sockets.streamlabs.com?token=' + this.socketToken);
 
@@ -57,11 +62,15 @@ class Streamlabs extends Integration {
 
   async parse(eventData) {
     if (eventData.type === 'donation') {
-      for (let event of eventData.message) {
+      for (const event of eventData.message) {
         if (!event.isTest) {
           const id = await global.users.getIdByName(event.from.toLowerCase(), false);
-          if (id) {global.db.engine.insert('users.tips', { id, amount: Number(event.amount), message: event.message, currency: event.currency, timestamp: _.now() });}
-          if (await global.cache.isOnline()) {await global.db.engine.increment('api.current', { key: 'tips' }, { value: parseFloat(global.currency.exchange(event.amount, event.currency, global.currency.mainCurrency)) });}
+          if (id) {
+            global.db.engine.insert('users.tips', { id, amount: Number(event.amount), message: event.message, currency: event.currency, timestamp: _.now() });
+          }
+          if (await global.cache.isOnline()) {
+            await global.db.engine.increment('api.current', { key: 'tips' }, { value: parseFloat(global.currency.exchange(event.amount, event.currency, global.currency.mainCurrency)) });
+          }
         }
         global.overlays.eventlist.add({
           type: 'tip',
@@ -82,15 +91,17 @@ class Streamlabs extends Integration {
         });
 
         // go through all systems and trigger on.tip
-        for (let [, systems] of Object.entries({
+        for (const [, systems] of Object.entries({
           systems: global.systems,
           games: global.games,
           overlays: global.overlays,
           widgets: global.widgets,
-          integrations: global.integrations
+          integrations: global.integrations,
         })) {
-          for (let [name, system] of Object.entries(systems)) {
-            if (name.startsWith('_') || typeof system.on === 'undefined') {continue;}
+          for (const [name, system] of Object.entries(systems)) {
+            if (name.startsWith('_') || typeof system.on === 'undefined') {
+              continue;
+            }
             if (Array.isArray(system.on.tip)) {
               for (const fnc of system.on.tip) {
                 system[fnc]({
@@ -98,7 +109,7 @@ class Streamlabs extends Integration {
                   amount: event.amount,
                   message: event.message,
                   currency: event.currency,
-                  timestamp: _.now()
+                  timestamp: _.now(),
                 });
               }
             }

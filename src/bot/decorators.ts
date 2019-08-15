@@ -3,7 +3,7 @@ import { parse, sep as separator } from 'path';
 import { VariableWatcher } from './watchers';
 
 export let loadingInProgress: string[] = [];
-export let permissions: { [command: string]: string | null } = {};
+export const permissions: { [command: string]: string | null } = {};
 
 function getNameAndTypeFromStackTrace() {
   const _prepareStackTrace = Error.prepareStackTrace;
@@ -54,7 +54,7 @@ export function ui(opts, category?: string) {
   };
 }
 
-export function settings(category?: string, isReadOnly: boolean = false) {
+export function settings(category?: string, isReadOnly = false) {
   const { name, type } = getNameAndTypeFromStackTrace();
 
   return (target: object, key: string) => {
@@ -232,7 +232,7 @@ async function registerCommand(opts: string | Command, m) {
     const self = m.type === 'core' ? global[m.name] : global[m.type][m.name];
     if (typeof opts === 'string') {
       opts = {
-        name: opts
+        name: opts,
       };
     }
     opts.fnc = m.fnc; // force function to decorated function

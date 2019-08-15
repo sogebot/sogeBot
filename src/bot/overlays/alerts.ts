@@ -14,7 +14,7 @@ class Alerts extends Overlay {
     rawText: '/overlays/alerts',
     target: '_blank',
   }, 'links')
-  linkBtn: null = null;
+  linkBtn = null;
 
   constructor() {
     super();

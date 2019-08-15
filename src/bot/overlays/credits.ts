@@ -7,57 +7,57 @@ class Credits extends Overlay {
   @settings('credits')
   @ui({
     type: 'selector',
-    values: ['very slow', 'slow', 'medium', 'fast', 'very fast']
+    values: ['very slow', 'slow', 'medium', 'fast', 'very fast'],
   })
   cCreditsSpeed: 'very slow' | 'slow' | 'medium' | 'fast' | 'very fast' = 'medium';
   @settings('credits')
-  cCreditsAggregated: boolean = false;
+  cCreditsAggregated = false;
 
   @settings('show')
-  cShowFollowers: boolean = true;
+  cShowFollowers = true;
   @settings('show')
-  cShowHosts: boolean = true;
+  cShowHosts = true;
   @settings('show')
-  cShowRaids: boolean = true;
+  cShowRaids = true;
   @settings('show')
-  cShowSubscribers: boolean = true;
+  cShowSubscribers = true;
   @settings('show')
-  cShowSubgifts: boolean = true;
+  cShowSubgifts = true;
   @settings('show')
-  cShowSubcommunitygifts: boolean = true;
+  cShowSubcommunitygifts = true;
   @settings('show')
-  cShowResubs: boolean = true;
+  cShowResubs = true;
   @settings('show')
-  cShowCheers: boolean = true;
+  cShowCheers = true;
   @settings('show')
-  cShowClips: boolean = true;
+  cShowClips = true;
   @settings('show')
-  cShowTips: boolean = true;
+  cShowTips = true;
 
   @settings('text')
-  cTextLastMessage: string = 'Thanks for watching';
+  cTextLastMessage = 'Thanks for watching';
   @settings('text')
-  cTextLastSubMessage: string = '~ see you on the next stream ~';
+  cTextLastSubMessage = '~ see you on the next stream ~';
   @settings('text')
-  cTextStreamBy: string = 'Stream by';
+  cTextStreamBy = 'Stream by';
   @settings('text')
-  cTextFollow: string = 'Followed by';
+  cTextFollow = 'Followed by';
   @settings('text')
-  cTextHost: string = 'Hosted by';
+  cTextHost = 'Hosted by';
   @settings('text')
-  cTextRaid: string = 'Raided by';
+  cTextRaid = 'Raided by';
   @settings('text')
-  cTextCheer: string = 'Cheered by';
+  cTextCheer = 'Cheered by';
   @settings('text')
-  cTextSub: string = 'Subscribed by';
+  cTextSub = 'Subscribed by';
   @settings('text')
-  cTextResub: string = 'Resubscribed by';
+  cTextResub = 'Resubscribed by';
   @settings('text')
-  cTextSubgift: string = 'Subgitfs by';
+  cTextSubgift = 'Subgitfs by';
   @settings('text')
-  cTextSubcommunitygift: string = 'Sub community gifts by';
+  cTextSubcommunitygift = 'Sub community gifts by';
   @settings('text')
-  cTextTip: string = 'Tips by';
+  cTextTip = 'Tips by';
 
   @settings('customTexts')
   @ui({ type: 'credits-custom-texts' })
@@ -72,38 +72,40 @@ class Credits extends Overlay {
   cClipsPeriod: 'stream' | 'custom' = 'custom';
   @settings('clips')
   @ui({ type: 'number-input', step: '1', min: '0' })
-  cClipsCustomPeriodInDays: number = 31;
+  cClipsCustomPeriodInDays = 31;
   @settings('clips')
   @ui({ type: 'number-input', step: '1', min: '0' })
-  cClipsNumOfClips: number = 3;
+  cClipsNumOfClips = 3;
   @settings('clips')
-  cClipsShouldPlay: boolean = true;
+  cClipsShouldPlay = true;
   @settings('clips')
   @ui({ type: 'number-input', step: '1', min: '0', max: '100' })
-  cClipsVolume: number = 20;
+  cClipsVolume = 20;
 
   @ui({
     type: 'link',
     href: '/overlays/credits',
     class: 'btn btn-primary btn-block',
     rawText: '/overlays/credits (1920x1080)',
-    target: '_blank'
+    target: '_blank',
   }, 'links')
-  btnLink: null = null;
+  btnLink = null;
 
   sockets () {
     global.panel.io.of('/overlays/credits').on('connection', (socket) => {
       socket.on('load', async (cb) => {
         const when = await global.cache.when();
 
-        if (typeof when.online === 'undefined' || when.online === null) {when.online = _.now() - 5000000000;} // 5000000
+        if (typeof when.online === 'undefined' || when.online === null) {
+          when.online = _.now() - 5000000000;
+        } // 5000000
 
-        let timestamp = new Date(when.online).getTime();
+        const timestamp = new Date(when.online).getTime();
         let events = await global.db.engine.find('widgetsEventList');
 
         // change tips if neccessary for aggregated events (need same currency)
         events = events.filter((o) => o.timestamp >= timestamp);
-        for (let event of events) {
+        for (const event of events) {
           if (!_.isNil(event.amount) && !_.isNil(event.currency)) {
             event.amount = this.cCreditsAggregated
               ? global.currency.exchange(event.amount, event.currency, global.currency.mainCurrency)
@@ -116,7 +118,7 @@ class Credits extends Overlay {
           settings: {
             clips: {
               shouldPlay: this.cClipsShouldPlay,
-              volume: this.cClipsVolume
+              volume: this.cClipsVolume,
             },
             speed: this.cCreditsSpeed,
             text: {
@@ -131,7 +133,7 @@ class Credits extends Overlay {
               resub: this.cTextResub,
               subgift: this.cTextSubgift,
               subcommunitygift: this.cTextSubcommunitygift,
-              tip: this.cTextTip
+              tip: this.cTextTip,
             },
             show: {
               follow: this.cShowFollowers,
@@ -143,8 +145,8 @@ class Credits extends Overlay {
               resub: this.cShowResubs,
               cheer: this.cShowCheers,
               clips: this.cShowClips,
-              tip: this.cShowTips
-            }
+              tip: this.cShowTips,
+            },
           },
           streamer: global.oauth.broadcasterUsername,
           game: await global.db.engine.findOne('api.current', { key: 'game' }),
@@ -152,7 +154,7 @@ class Credits extends Overlay {
           clips: this.cShowClips ? await global.api.getTopClips({ period: this.cClipsPeriod, days: this.cClipsCustomPeriodInDays, first: this.cClipsNumOfClips }) : [],
           events: events.filter((o) => o.timestamp >= timestamp),
           customTexts: this.cCustomTextsValues,
-          social: this.cSocialValues
+          social: this.cSocialValues,
         });
       });
     });
