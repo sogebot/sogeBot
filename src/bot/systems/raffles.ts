@@ -78,7 +78,7 @@ class Raffles extends System {
       const winner = await global.db.engine.findOne(this.collection.participants, { username: opts.sender.username, raffle_id: raffle._id.toString() });
       winner.messages.push({
         timestamp: _.now(),
-        text: opts.message
+        text: opts.message,
       });
       await global.db.engine.update(this.collection.participants, { username: opts.sender.username, raffle_id: raffle._id.toString() }, { messages: winner.messages });
     }
@@ -113,7 +113,7 @@ class Raffles extends System {
       keyword: raffle.keyword,
       min: raffle.min,
       max: raffle.max,
-      eligibility: eligibility.join(', ')
+      eligibility: eligibility.join(', '),
     });
     const userObj = await global.users.getByName(getOwner());
     sendMessage(message, {
@@ -122,7 +122,7 @@ class Raffles extends System {
       userId: userObj.id,
       emotes: [],
       badges: {},
-      'message-type': 'chat'
+      'message-type': 'chat',
     });
 
     this.timeouts['raffleAnnounce'] = global.setTimeout(() => this.announce(), 60000);
@@ -136,7 +136,7 @@ class Raffles extends System {
 
     await Promise.all([
       global.db.engine.remove(this.collection.data, { _id: raffle._id.toString() }),
-      global.db.engine.remove(this.collection.participants, { raffle_id: raffle._id.toString() })
+      global.db.engine.remove(this.collection.participants, { raffle_id: raffle._id.toString() }),
     ]);
 
     self.refresh();
@@ -186,9 +186,9 @@ class Raffles extends System {
         max: maxTickets,
         type: type,
         winner: null,
-        timestamp: _.now()
+        timestamp: _.now(),
       }),
-      global.db.engine.remove(this.collection.participants, {})
+      global.db.engine.remove(this.collection.participants, {}),
     ]);
 
     const eligibility: string[] = [];
@@ -200,7 +200,7 @@ class Raffles extends System {
       keyword: keyword,
       eligibility: eligibility.join(', '),
       min: minTickets,
-      max: maxTickets
+      max: maxTickets,
     });
     const userObj = await global.users.getByName(getOwner());
     sendMessage(message, {
@@ -209,7 +209,7 @@ class Raffles extends System {
       userId: userObj.id,
       emotes: [],
       badges: {},
-      'message-type': 'chat'
+      'message-type': 'chat',
     });
 
     this.lastAnnounce = _.now();
@@ -237,7 +237,7 @@ class Raffles extends System {
       keyword: raffle.keyword,
       min: raffle.min,
       max: raffle.max,
-      eligibility: eligibility.join(', ')
+      eligibility: eligibility.join(', '),
     });
     const userObj = await global.users.getByName(getOwner());
     sendMessage(message, {
@@ -246,7 +246,7 @@ class Raffles extends System {
       userId: userObj.id,
       emotes: [],
       badges: {},
-      'message-type': 'chat'
+      'message-type': 'chat',
     });
   }
 
@@ -290,7 +290,7 @@ class Raffles extends System {
       username: opts.sender.username,
       messages: [],
       is: user.is,
-      raffle_id: raffle._id.toString()
+      raffle_id: raffle._id.toString(),
     };
     if (raffle.type === TYPE_TICKETS && await global.systems.points.getPointsOf(opts.sender.userId) < tickets) {return;} // user doesn't have enough points
 
@@ -328,7 +328,7 @@ class Raffles extends System {
         userId: userObj.id,
         emotes: [],
         badges: {},
-        'message-type': 'chat'
+        'message-type': 'chat',
       });
       return true;
     }
@@ -381,13 +381,13 @@ class Raffles extends System {
     // uneligible winner (don't want to pick second time same user if repick)
     await Promise.all([
       global.db.engine.update(this.collection.participants, { raffle_id: raffle._id.toString(), username: winner.username }, { eligible: false }),
-      global.db.engine.update(this.collection.data, { _id: raffle._id.toString() }, { winner: winner.username, timestamp: new Date().getTime() })
+      global.db.engine.update(this.collection.data, { _id: raffle._id.toString() }, { winner: winner.username, timestamp: new Date().getTime() }),
     ]);
 
     const message = await prepare('raffles.raffle-winner-is', {
       username: winner.username,
       keyword: raffle.keyword,
-      probability: _.round(probability, 2)
+      probability: _.round(probability, 2),
     });
     const userObj = await global.users.getByName(getOwner());
     sendMessage(message, {
@@ -396,7 +396,7 @@ class Raffles extends System {
       userId: userObj.id,
       emotes: [],
       badges: {},
-      'message-type': 'chat'
+      'message-type': 'chat',
     });
   }
 }

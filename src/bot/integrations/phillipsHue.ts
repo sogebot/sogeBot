@@ -142,8 +142,8 @@ class PhillipsHue extends Integration {
         'loop': 0,
         'state': 0,
         'time': new Date().getTime(),
-        'blocked': false
-      }
+        'blocked': false,
+      },
     });
   }
 

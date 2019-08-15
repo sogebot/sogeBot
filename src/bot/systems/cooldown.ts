@@ -100,7 +100,7 @@ class Cooldown extends System {
         moderator: typeof cooldown.moderator === 'undefined' ? true : cooldown.moderator,
         subscriber: typeof cooldown.subscriber === 'undefined' ? true : cooldown.subscriber,
         follower: typeof cooldown.follower === 'undefined' ? true : cooldown.follower,
-        owner: typeof cooldown.owner === 'undefined' ? true : cooldown.owner
+        owner: typeof cooldown.owner === 'undefined' ? true : cooldown.owner,
       }];
     } else { // text
       let [keywords, cooldowns] = await Promise.all([global.db.engine.find(global.systems.keywords.collection.data), global.db.engine.find(this.collection.data)]);
@@ -124,7 +124,7 @@ class Cooldown extends System {
             moderator: typeof cooldown.moderator === 'undefined' ? true : cooldown.moderator,
             subscriber: typeof cooldown.subscriber === 'undefined' ? true : cooldown.subscriber,
             follower: typeof cooldown.follower === 'undefined' ? true : cooldown.follower,
-            owner: typeof cooldown.owner === 'undefined' ? true : cooldown.owner
+            owner: typeof cooldown.owner === 'undefined' ? true : cooldown.owner,
           });
         }
       });
@@ -223,7 +223,7 @@ class Cooldown extends System {
         moderator: typeof cooldown.moderator === 'undefined' ? true : cooldown.moderator,
         subscriber: typeof cooldown.subscriber === 'undefined' ? true : cooldown.subscriber,
         follower: typeof cooldown.follower === 'undefined' ? true : cooldown.follower,
-        owner: typeof cooldown.owner === 'undefined' ? true : cooldown.owner
+        owner: typeof cooldown.owner === 'undefined' ? true : cooldown.owner,
       }];
     } else { // text
       let [keywords, cooldowns] = await Promise.all([global.db.engine.find(global.systems.keywords.collection.data), global.db.engine.find(this.collection.data)]);
@@ -247,7 +247,7 @@ class Cooldown extends System {
             moderator: typeof cooldown.moderator === 'undefined' ? true : cooldown.moderator,
             subscriber: typeof cooldown.subscriber === 'undefined' ? true : cooldown.subscriber,
             follower: typeof cooldown.follower === 'undefined' ? true : cooldown.follower,
-            owner: typeof cooldown.owner === 'undefined' ? true : cooldown.owner
+            owner: typeof cooldown.owner === 'undefined' ? true : cooldown.owner,
           });
         }
       });

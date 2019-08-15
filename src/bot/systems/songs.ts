@@ -24,7 +24,7 @@ class Songs extends System {
     type: 'number-input',
     step: '1',
     min: '0',
-    max: '100'
+    max: '100',
   })
   volume = 25;
   @settings()
@@ -222,7 +222,7 @@ class Songs extends System {
               await Promise.all([
                 global.db.engine.update(this.collection.ban, { videoId: opts.parameters }, { videoId: opts.parameters, title: videoInfo.title }),
                 global.db.engine.remove(this.collection.playlist, { videoID: opts.parameters }),
-                global.db.engine.remove(this.collection.request, { videoID: opts.parameters })
+                global.db.engine.remove(this.collection.request, { videoID: opts.parameters }),
               ]);
             };
             resolve();
@@ -333,7 +333,7 @@ class Songs extends System {
       userId: userObj.id,
       emotes: [],
       badges: {},
-      'message-type': 'chat'
+      'message-type': 'chat',
     });
   }
 
@@ -352,7 +352,7 @@ class Songs extends System {
       userId: userObj.id,
       emotes: [],
       badges: {},
-      'message-type': 'chat'
+      'message-type': 'chat',
     });
   }
 
@@ -370,7 +370,7 @@ class Songs extends System {
         userId: userObj.id,
         emotes: [],
         badges: {},
-        'message-type': 'chat'
+        'message-type': 'chat',
       });
     }
   }
@@ -392,7 +392,7 @@ class Songs extends System {
       userId: userObj.id,
       emotes: [],
       badges: {},
-      'message-type': 'chat'
+      'message-type': 'chat',
     });
   }
 

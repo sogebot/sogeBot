@@ -53,7 +53,7 @@ class Heist extends Game {
     { percentage: 33, message: global.translate('games.heist.result.33') },
     { percentage: 50, message: global.translate('games.heist.result.50') },
     { percentage: 99, message: global.translate('games.heist.result.99') },
-    { percentage: 100, message: global.translate('games.heist.result.100') }
+    { percentage: 100, message: global.translate('games.heist.result.100') },
   ];
 
   @settings('levels')
@@ -63,32 +63,32 @@ class Heist extends Game {
       'name': global.translate('games.heist.levels.bankVan'),
       'winPercentage': 60,
       'payoutMultiplier': 1.5,
-      'maxUsers': 5
+      'maxUsers': 5,
     },
     {
       'name': global.translate('games.heist.levels.cityBank'),
       'winPercentage': 46,
       'payoutMultiplier': 1.7,
-      'maxUsers': 10
+      'maxUsers': 10,
     },
     {
       'name': global.translate('games.heist.levels.stateBank'),
       'winPercentage': 40,
       'payoutMultiplier': 1.9,
-      'maxUsers': 20
+      'maxUsers': 20,
     },
     {
       'name': global.translate('games.heist.levels.nationalReserve'),
       'winPercentage': 35,
       'payoutMultiplier': 2.1,
-      'maxUsers': 30
+      'maxUsers': 30,
     },
     {
       'name': global.translate('games.heist.levels.federalReserve'),
       'winPercentage': 31,
       'payoutMultiplier': 2.5,
-      'maxUsers': 1000
-    }
+      'maxUsers': 1000,
+    },
   ];
 
   constructor () {
@@ -105,7 +105,7 @@ class Heist extends Game {
       this.entryCooldownInSeconds,
       this.lastHeistTimestamp,
       this.copsCooldownInMinutes,
-      this.started
+      this.started,
     ]);
     const levels = _.orderBy(this.levelsValues, 'maxUsers', 'asc');
 
@@ -126,7 +126,7 @@ class Heist extends Game {
           userId: userObj.id,
           emotes: [],
           badges: {},
-          'message-type': 'chat'
+          'message-type': 'chat',
         });
         // cleanup
         this.startedAt = null;
@@ -141,7 +141,7 @@ class Heist extends Game {
         userId: userObj.id,
         emotes: [],
         badges: {},
-        'message-type': 'chat'
+        'message-type': 'chat',
       });
 
       if (users.length === 1) {
@@ -155,7 +155,7 @@ class Heist extends Game {
           userId: userObj.id,
           emotes: [],
           badges: {},
-          'message-type': 'chat'
+          'message-type': 'chat',
         }); }, 5000);
 
         if (isSurvivor) {
@@ -184,7 +184,7 @@ class Heist extends Game {
           userId: userObj.id,
           emotes: [],
           badges: {},
-          'message-type': 'chat'
+          'message-type': 'chat',
         }); }, 5000);
         if (winners.length > 0) {
           global.setTimeout(async () => {
@@ -201,7 +201,7 @@ class Heist extends Game {
               userId: userObj.id,
               emotes: [],
               badges: {},
-              'message-type': 'chat'
+              'message-type': 'chat',
             });
           }, 5500);
         }
@@ -223,7 +223,7 @@ class Heist extends Game {
         userId: userObj.id,
         emotes: [],
         badges: {},
-        'message-type': 'chat'
+        'message-type': 'chat',
       });
     }
     this.timeouts['iCheckFinished'] = global.setTimeout(() => this.iCheckFinished(), 10000);
@@ -236,7 +236,7 @@ class Heist extends Game {
     const [entryCooldown, lastHeistTimestamp, copsCooldown] = await Promise.all([
       this.entryCooldownInSeconds,
       this.lastHeistTimestamp,
-      this.copsCooldownInMinutes
+      this.copsCooldownInMinutes,
     ]);
     const levels = _.orderBy(this.levelsValues, 'maxUsers', 'asc');
 
@@ -294,7 +294,7 @@ class Heist extends Game {
 
     await Promise.all([
       global.db.engine.increment('users.points', { id: opts.sender.userId }, { points: parseInt(points, 10) * -1 }), // remove points from user
-      global.db.engine.update(this.collection.users, { id: opts.sender.userId }, { username: opts.sender.username, points: points }) // add user to heist list
+      global.db.engine.update(this.collection.users, { id: opts.sender.userId }, { username: opts.sender.username, points: points }), // add user to heist list
     ]);
 
     // check how many users are in heist

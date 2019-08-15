@@ -75,5 +75,5 @@ export const VariableWatcher = {
         set(global, k.replace('core.', ''), readonly[k]);
       }
     }
-  }
+  },
 };

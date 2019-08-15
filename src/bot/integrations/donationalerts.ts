@@ -48,7 +48,7 @@ class Donationalerts extends Integration {
         reconnection: true,
         reconnectionDelay: 1000,
         reconnectionDelayMax: 5000,
-        reconnectionAttempts: Infinity
+        reconnectionAttempts: Infinity,
       });
 
     if (this.socket !== null) {
@@ -104,7 +104,7 @@ class Donationalerts extends Integration {
           games: global.games,
           overlays: global.overlays,
           widgets: global.widgets,
-          integrations: global.integrations
+          integrations: global.integrations,
         })) {
           for (const [name, system] of Object.entries(systems)) {
             if (name.startsWith('_') || typeof system.on === 'undefined') {continue;}
@@ -115,7 +115,7 @@ class Donationalerts extends Integration {
                   amount: data.amount,
                   message: data.message,
                   currency: data.currency,
-                  timestamp: _.now()
+                  timestamp: _.now(),
                 });
               }
             }

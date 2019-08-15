@@ -10,7 +10,7 @@ class Text extends Overlay {
     href: '/overlays/text',
     class: 'btn btn-primary btn-block',
     rawText: '/overlays/text',
-    target: '_blank'
+    target: '_blank',
   }, 'links')
   linkBtn = null;
   constructor () {

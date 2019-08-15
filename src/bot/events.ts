@@ -159,7 +159,7 @@ class Events extends Core {
           userId: userObj.id,
           emotes: [],
           badges: {},
-          'message-type': 'chat'
+          'message-type': 'chat',
         });
       }
       global.log.info('Clip was created successfully');
@@ -237,7 +237,7 @@ class Events extends Core {
         sender: { username: getOwner() },
         message: command,
         skip: true,
-        quiet: _.get(operation, 'isCommandQuiet', false)
+        quiet: _.get(operation, 'isCommandQuiet', false),
       });
       await parse.process();
     } else {
@@ -247,7 +247,7 @@ class Events extends Core {
           message: command,
         },
         skip: true,
-        quiet: _.get(operation, 'isCommandQuiet', false)
+        quiet: _.get(operation, 'isCommandQuiet', false),
       });
     }
   }
@@ -272,7 +272,7 @@ class Events extends Core {
       userId: userObj.id,
       emotes: [],
       badges: {},
-      'message-type': (whisper ? 'whisper' : 'chat')
+      'message-type': (whisper ? 'whisper' : 'chat'),
     });
   }
 

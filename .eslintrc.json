@@ -22,7 +22,8 @@
           "ignoreReadBeforeAssign": false
         }],
         "no-var": 2,
-        "prefer-spread": "error"
+        "prefer-spread": "error",
+        "comma-dangle": [2, "always-multiline"]
     },
     "parserOptions": {
       "ecmaFeatures": {

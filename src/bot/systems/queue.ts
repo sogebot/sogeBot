@@ -181,7 +181,7 @@ class Queue extends System {
   async list (opts) {
     let [atUsername, users] = await Promise.all([
       global.tmi.showWithAt,
-      global.db.engine.find(this.collection.data)
+      global.db.engine.find(this.collection.data),
     ]);
     users = users.map(o => atUsername ? `@${o.username}` : o).join(', ');
     sendMessage(

@@ -112,7 +112,7 @@ class Moderation extends System {
       socket.on('lists.get', async (cb) => {
         cb(null, {
           blacklist: this.cListsBlacklist,
-          whitelist: this.cListsWhitelist
+          whitelist: this.cListsWhitelist,
         });
       });
       socket.on('lists.set', async (data) => {
@@ -125,7 +125,7 @@ class Moderation extends System {
   async timeoutUser (sender, text, warning, msg, time, type) {
     let [warnings, silent] = await Promise.all([
       global.db.engine.find(global.systems.moderation.collection.warnings, { username: sender.username }),
-      this.isSilent(type)
+      this.isSilent(type),
     ]);
     text = text.trim();
 

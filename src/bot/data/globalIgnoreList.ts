@@ -2,367 +2,367 @@ export const globalIgnoreList = {
   '2943': {
     'reason': 'bot account',
     'known_aliases': [
-      'teyyd'
-    ]
+      'teyyd',
+    ],
   },
   '1564983': {
     'reason': 'bot account',
     'known_aliases': [
-      'moobot'
-    ]
+      'moobot',
+    ],
   },
   '19264788': {
     'reason': 'bot account',
     'known_aliases': [
-      'nightbot'
-    ]
+      'nightbot',
+    ],
   },
   '24900234': {
     'reason': 'bot account',
     'known_aliases': [
-      'bloodlustr'
-    ]
+      'bloodlustr',
+    ],
   },
   '25681094': {
     'reason': 'bot account',
     'known_aliases': [
-      'commanderroot'
-    ]
+      'commanderroot',
+    ],
   },
   '27446517': {
     'reason': 'bot account',
     'known_aliases': [
-      'monstercat'
-    ]
+      'monstercat',
+    ],
   },
   '29201680': {
     'reason': 'bot account',
     'known_aliases': [
-      'xanbot'
-    ]
+      'xanbot',
+    ],
   },
   '29762758': {
     'reason': 'bot account',
     'known_aliases': [
-      'philderbeast'
-    ]
+      'philderbeast',
+    ],
   },
   '52268235': {
     'reason': 'bot account',
     'known_aliases': [
-      'wizebot'
-    ]
+      'wizebot',
+    ],
   },
   '55056264': {
     'reason': 'bot account',
     'known_aliases': [
-      'coebot'
-    ]
+      'coebot',
+    ],
   },
   '59172433': {
     'reason': 'bot account',
     'known_aliases': [
-      'skinnyseahorse'
-    ]
+      'skinnyseahorse',
+    ],
   },
   '62809083': {
     'reason': 'bot account',
     'known_aliases': [
-      'ohbot'
-    ]
+      'ohbot',
+    ],
   },
   '69142710': {
     'reason': 'bot account',
     'known_aliases': [
-      'unixchat'
-    ]
+      'unixchat',
+    ],
   },
   '69857893': {
     'reason': 'bot account',
     'known_aliases': [
-      'zanekyber'
-    ]
+      'zanekyber',
+    ],
   },
   '70576998': {
     'reason': 'bot account',
     'known_aliases': [
-      'vivbot'
-    ]
+      'vivbot',
+    ],
   },
   '72810762': {
     'reason': 'bot account',
     'known_aliases': [
-      'not47y'
-    ]
+      'not47y',
+    ],
   },
   '72923126': {
     'reason': 'bot account',
     'known_aliases': [
-      'alphaduplo'
-    ]
+      'alphaduplo',
+    ],
   },
   '73764126': {
     'reason': 'bot account',
     'known_aliases': [
-      'cyclemotion'
-    ]
+      'cyclemotion',
+    ],
   },
   '78917118': {
     'reason': 'bot account',
     'known_aliases': [
-      'hnlbot'
-    ]
+      'hnlbot',
+    ],
   },
   '81577067': {
     'reason': 'bot account',
     'known_aliases': [
-      'branebot'
-    ]
+      'branebot',
+    ],
   },
   '88020958': {
     'reason': 'bot account',
     'known_aliases': [
-      'muxybot'
-    ]
+      'muxybot',
+    ],
   },
   '88713356': {
     'reason': 'bot account',
     'known_aliases': [
-      'revlobot'
-    ]
+      'revlobot',
+    ],
   },
   '90078902': {
     'reason': 'bot account',
     'known_aliases': [
-      'uhhhspike'
-    ]
+      'uhhhspike',
+    ],
   },
   '91688618': {
     'reason': 'bot account',
     'known_aliases': [
-      'streamjar'
-    ]
+      'streamjar',
+    ],
   },
   '100135110': {
     'reason': 'bot account',
     'known_aliases': [
-      'streamelements'
-    ]
+      'streamelements',
+    ],
   },
   '101905203': {
     'reason': 'bot account',
     'known_aliases': [
-      's1faka'
-    ]
+      's1faka',
+    ],
   },
   '105962478': {
     'reason': 'bot account',
     'known_aliases': [
-      'energyzbot'
-    ]
+      'energyzbot',
+    ],
   },
   '114547979': {
     'reason': 'bot account',
     'known_aliases': [
-      'curseappbot'
-    ]
+      'curseappbot',
+    ],
   },
   '114583109': {
     'reason': 'bot account',
     'known_aliases': [
-      'electricalskateboard'
-    ]
+      'electricalskateboard',
+    ],
   },
   '115211897': {
     'reason': 'bot account',
     'known_aliases': [
-      'faegwent'
-    ]
+      'faegwent',
+    ],
   },
   '126732100': {
     'reason': 'bot account',
     'known_aliases': [
-      'virgoproz'
-    ]
+      'virgoproz',
+    ],
   },
   '128255790': {
     'reason': 'bot account',
     'known_aliases': [
-      'jacksere'
-    ]
+      'jacksere',
+    ],
   },
   '135204446': {
     'reason': 'bot account',
     'known_aliases': [
-      'pretzelrocks'
-    ]
+      'pretzelrocks',
+    ],
   },
   '143450202': {
     'reason': 'bot account',
     'known_aliases': [
-      'martinnemibot'
-    ]
+      'martinnemibot',
+    ],
   },
   '157264230': {
     'reason': 'bot account',
     'known_aliases': [
-      'slocool'
-    ]
+      'slocool',
+    ],
   },
   '183484964': {
     'reason': 'bot account',
     'known_aliases': [
-      'stay_hydrated_bot'
-    ]
+      'stay_hydrated_bot',
+    ],
   },
   '187633179': {
     'reason': 'bot account',
     'known_aliases': [
-      'dittys14'
-    ]
+      'dittys14',
+    ],
   },
   '194921579': {
     'reason': 'bot account',
     'known_aliases': [
-      'thronezilla'
-    ]
+      'thronezilla',
+    ],
   },
   '195471777': {
     'reason': 'bot account',
     'known_aliases': [
-      'stayhealthybot'
-    ]
+      'stayhealthybot',
+    ],
   },
   '198236322': {
     'reason': 'bot account',
     'known_aliases': [
-      'electricallongboard'
-    ]
+      'electricallongboard',
+    ],
   },
   '205052173': {
     'reason': 'bot account',
     'known_aliases': [
-      'freddyybot'
-    ]
+      'freddyybot',
+    ],
   },
   '207248342': {
     'reason': 'bot account',
     'known_aliases': [
-      'fatmanleg'
-    ]
+      'fatmanleg',
+    ],
   },
   '219353269': {
     'reason': 'bot account',
     'known_aliases': [
-      'lanfusion'
-    ]
+      'lanfusion',
+    ],
   },
   '219406686': {
     'reason': 'bot account',
     'known_aliases': [
-      'nowsongbot'
-    ]
+      'nowsongbot',
+    ],
   },
   '223493826': {
     'reason': 'bot account',
     'known_aliases': [
-      'ddwithers1'
-    ]
+      'ddwithers1',
+    ],
   },
   '227202086': {
     'reason': 'bot account',
     'known_aliases': [
-      'v_and_k'
-    ]
+      'v_and_k',
+    ],
   },
   '233208809': {
     'reason': 'bot account',
     'known_aliases': [
-      'communityshowcase'
-    ]
+      'communityshowcase',
+    ],
   },
   '234992844': {
     'reason': 'bot account',
     'known_aliases': [
-      'aislinnsatu'
-    ]
+      'aislinnsatu',
+    ],
   },
   '236791797': {
     'reason': 'bot account',
     'known_aliases': [
-      'decafsmurf'
-    ]
+      'decafsmurf',
+    ],
   },
   '242355655': {
     'reason': 'bot account',
     'known_aliases': [
-      'woppes'
-    ]
+      'woppes',
+    ],
   },
   '245330668': {
     'reason': 'bot account',
     'known_aliases': [
-      'wormy_official'
-    ]
+      'wormy_official',
+    ],
   },
   '246267529': {
     'reason': 'bot account',
     'known_aliases': [
-      'undefined_ninja'
-    ]
+      'undefined_ninja',
+    ],
   },
   '249378946': {
     'reason': 'bot account',
     'known_aliases': [
-      'konkky'
-    ]
+      'konkky',
+    ],
   },
   '252248316': {
     'reason': 'bot account',
     'known_aliases': [
-      'lurxx'
-    ]
+      'lurxx',
+    ],
   },
   '261751321': {
     'reason': 'bot account',
     'known_aliases': [
-      'd__u__c__k__e__r__z'
-    ]
+      'd__u__c__k__e__r__z',
+    ],
   },
   '264246119': {
     'reason': 'bot account',
     'known_aliases': [
-      'p0lizei_'
-    ]
+      'p0lizei_',
+    ],
   },
   '274110779': {
     'reason': 'bot account',
     'known_aliases': [
-      'avocadobadado'
-    ]
+      'avocadobadado',
+    ],
   },
   '406576975': {
     'reason': 'bot account',
     'known_aliases': [
-      'anotherttvviewer'
-    ]
+      'anotherttvviewer',
+    ],
   },
   '410250281': {
     'reason': 'bot account',
     'known_aliases': [
-      'cachebear'
-    ]
+      'cachebear',
+    ],
   },
   '412934702': {
     'reason': 'bot account',
     'known_aliases': [
-      'feuerwehr'
-    ]
+      'feuerwehr',
+    ],
   },
   '426232928': {
     'reason': 'bot account',
     'known_aliases': [
-      'apex_pro_community'
-    ]
-  }
+      'apex_pro_community',
+    ],
+  },
 };

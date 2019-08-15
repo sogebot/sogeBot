@@ -70,7 +70,7 @@ class Alias extends System {
       } else if ((await global.permissions.check(opts.sender.userId, alias.permission)).access) {
         // parse variables
         const message = await new Message(opts.message.replace(replace, `${alias.command}`)).parse({
-          sender: opts.sender
+          sender: opts.sender,
         });
         global.log.process({ type: 'parse', sender: opts.sender, message });
         global.tmi.message({
@@ -150,7 +150,7 @@ class Alias extends System {
         command,
         enabled: true,
         visible: true,
-        permission: pItem.id
+        permission: pItem.id,
       };
       await global.db.engine.insert(this.collection.data, aliasObj);
       const message = await prepare('alias.alias-was-added', aliasObj);

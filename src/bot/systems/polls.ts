@@ -366,7 +366,7 @@ class Polls extends System {
         userId: userObj.id,
         emotes: [],
         badges: {},
-        'message-type': 'chat'
+        'message-type': 'chat',
       });
       for (const index of Object.keys(vote.options)) {
         setTimeout(() => {
@@ -377,7 +377,7 @@ class Polls extends System {
               userId: userObj.id,
               emotes: [],
               badges: {},
-              'message-type': 'chat'
+              'message-type': 'chat',
             });
           } else {
             sendMessage(`#vote${(Number(index) + 1)} => ${vote.options[index]}`, {
@@ -386,7 +386,7 @@ class Polls extends System {
               userId: userObj.id,
               emotes: [],
               badges: {},
-              'message-type': 'chat'
+              'message-type': 'chat',
             }); }
         }, 300 * (Number(index) + 1));
       }

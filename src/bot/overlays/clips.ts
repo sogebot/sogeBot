@@ -7,7 +7,7 @@ class Clips extends Overlay {
     href: '/overlays/clips',
     class: 'btn btn-primary btn-block',
     rawText: '/overlays/clips (640x360)',
-    target: '_blank'
+    target: '_blank',
   }, 'links')
   linkBtn = null;
 
@@ -33,8 +33,8 @@ class Clips extends Overlay {
         settings: {
           volume: this.cClipsVolume,
           filter: this.cClipsFilter,
-          label: this.cClipsLabel
-        }
+          label: this.cClipsLabel,
+        },
       });
   }
 }

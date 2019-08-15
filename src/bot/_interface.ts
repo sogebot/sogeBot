@@ -200,7 +200,7 @@ class Module {
                 return {
                   key: o,
                   actual: o,
-                  toRemove: []
+                  toRemove: [],
                 };
               }
 
@@ -211,7 +211,7 @@ class Module {
                   return {
                     key: o,
                     actual: isVariableFound.key,
-                    toRemove
+                    toRemove,
                   };
                 } else {
                   toRemove.push(possibleVariable);
@@ -790,7 +790,7 @@ class Module {
         fnc: 'loadCommand',
         system: this._name,
         class: this.constructor.name.toLowerCase(),
-        args: [ command ]
+        args: [ command ],
       });
     } else {
       global.log.warning(`Command ${command} cannot be updated to ${updated}`);

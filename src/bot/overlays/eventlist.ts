@@ -40,7 +40,7 @@ class EventList extends Overlay {
     const newEvent = {
       event: data.type,
       timestamp: _.now(),
-      ...data
+      ...data,
     };
     await global.db.engine.insert('widgetsEventList', newEvent);
     global.overlays.eventlist.sendDataToOverlay();

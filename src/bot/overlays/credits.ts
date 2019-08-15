@@ -7,7 +7,7 @@ class Credits extends Overlay {
   @settings('credits')
   @ui({
     type: 'selector',
-    values: ['very slow', 'slow', 'medium', 'fast', 'very fast']
+    values: ['very slow', 'slow', 'medium', 'fast', 'very fast'],
   })
   cCreditsSpeed: 'very slow' | 'slow' | 'medium' | 'fast' | 'very fast' = 'medium';
   @settings('credits')
@@ -87,7 +87,7 @@ class Credits extends Overlay {
     href: '/overlays/credits',
     class: 'btn btn-primary btn-block',
     rawText: '/overlays/credits (1920x1080)',
-    target: '_blank'
+    target: '_blank',
   }, 'links')
   btnLink = null;
 
@@ -116,7 +116,7 @@ class Credits extends Overlay {
           settings: {
             clips: {
               shouldPlay: this.cClipsShouldPlay,
-              volume: this.cClipsVolume
+              volume: this.cClipsVolume,
             },
             speed: this.cCreditsSpeed,
             text: {
@@ -131,7 +131,7 @@ class Credits extends Overlay {
               resub: this.cTextResub,
               subgift: this.cTextSubgift,
               subcommunitygift: this.cTextSubcommunitygift,
-              tip: this.cTextTip
+              tip: this.cTextTip,
             },
             show: {
               follow: this.cShowFollowers,
@@ -143,8 +143,8 @@ class Credits extends Overlay {
               resub: this.cShowResubs,
               cheer: this.cShowCheers,
               clips: this.cShowClips,
-              tip: this.cShowTips
-            }
+              tip: this.cShowTips,
+            },
           },
           streamer: global.oauth.broadcasterUsername,
           game: await global.db.engine.findOne('api.current', { key: 'game' }),
@@ -152,7 +152,7 @@ class Credits extends Overlay {
           clips: this.cShowClips ? await global.api.getTopClips({ period: this.cClipsPeriod, days: this.cClipsCustomPeriodInDays, first: this.cClipsNumOfClips }) : [],
           events: events.filter((o) => o.timestamp >= timestamp),
           customTexts: this.cCustomTextsValues,
-          social: this.cSocialValues
+          social: this.cSocialValues,
         });
       });
     });

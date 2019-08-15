@@ -12,7 +12,7 @@ import Expects from '../expects';
 import Integration from './_interface';
 
 const __DEBUG__ = {
-  REQUEST: (process.env.DEBUG && process.env.DEBUG.includes('spotify.request')) || (process.env.DEBUG && process.env.DEBUG.includes('spotify.*'))
+  REQUEST: (process.env.DEBUG && process.env.DEBUG.includes('spotify.request')) || (process.env.DEBUG && process.env.DEBUG.includes('spotify.*')),
 };
 
 /*
@@ -90,7 +90,7 @@ class Spotify extends Integration {
     type: 'btn-emit',
     class: 'btn btn-primary btn-block mt-1 mb-1',
     if: () => global.integrations.spotify.username.length === 0,
-    emit: 'authorize'
+    emit: 'authorize',
   }, 'connection')
   authorizeBtn = null;
 
@@ -150,11 +150,11 @@ class Spotify extends Integration {
         url: 'https://api.spotify.com/v1/me/player/play',
         headers: {
           'Authorization': 'Bearer ' + this._accessToken,
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
         data: {
-          uris: [this.currentUris]
-        }
+          uris: [this.currentUris],
+        },
       });
 
       // force is_playing and uri just to not skip until track refresh
@@ -176,20 +176,20 @@ class Spotify extends Integration {
         url: 'https://api.spotify.com/v1/me/player/play',
         headers: {
           'Authorization': 'Bearer ' + this._accessToken,
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
         data: {
           context_uri: this.playlistToPlay,
-          offset
-        }
+          offset,
+        },
       });
       // skip to next song in playlist
       await axios({
         method: 'post',
         url: 'https://api.spotify.com/v1/me/player/next',
         headers: {
-          'Authorization': 'Bearer ' + this._accessToken
-        }
+          'Authorization': 'Bearer ' + this._accessToken,
+        },
       });
       this.currentUris = null;
     } catch (e) {
@@ -213,7 +213,7 @@ class Spotify extends Integration {
         song,
         originalUri: this.originalUri,
         cachedRequests: this.currentUris,
-        requests: this.uris
+        requests: this.uris,
       });
     }
 
@@ -289,7 +289,7 @@ class Spotify extends Integration {
           artists: data.body.item.artists.map(o => o.name).join(', '),
           uri: data.body.item.uri,
           is_playing: data.body.is_playing,
-          is_enabled: await this.isEnabled()
+          is_enabled: await this.isEnabled(),
         };
       }
       currentSong.is_playing = data.body.is_playing;
@@ -403,7 +403,7 @@ class Spotify extends Integration {
       this.client = new SpotifyWebApi({
         clientId: this.clientId,
         clientSecret: this.clientSecret,
-        redirectUri: this.redirectURI
+        redirectUri: this.redirectURI,
       });
 
       if (this._accessToken && this._refreshToken) {
@@ -478,20 +478,20 @@ class Spotify extends Integration {
           method: 'get',
           url: 'https://api.spotify.com/v1/tracks/' + id,
           headers: {
-            'Authorization': 'Bearer ' + this._accessToken
-          }
+            'Authorization': 'Bearer ' + this._accessToken,
+          },
         });
         const track = response.data;
         sendMessage(
           prepare('integrations.spotify.song-requested', {
-            name: track.name, artist: track.artists[0].name, artists: track.artists.map(o => o.name).join(', ')
+            name: track.name, artist: track.artists[0].name, artists: track.artists.map(o => o.name).join(', '),
           }), opts.sender);
         this.uris.push({
           uri: 'spotify:track:' + id,
           requestBy: opts.sender.username,
           song: track.name,
           artist: track.artists[0].name,
-          artists: track.artists.map(o => o.name).join(', ')
+          artists: track.artists.map(o => o.name).join(', '),
         });
       } else {
         const response = await axios({
@@ -499,20 +499,20 @@ class Spotify extends Integration {
           url: 'https://api.spotify.com/v1/search?type=track&limit=1&q=' + encodeURI(spotifyId),
           headers: {
             'Authorization': 'Bearer ' + this._accessToken,
-            'Content-Type': 'application/json'
-          }
+            'Content-Type': 'application/json',
+          },
         });
         const track = response.data.tracks.items[0];
         sendMessage(
           prepare('integrations.spotify.song-requested', {
-            name: track.name, artist: track.artists[0].name
+            name: track.name, artist: track.artists[0].name,
           }), opts.sender);
         this.uris.push({
           uri: track.uri,
           requestBy: opts.sender.username,
           song: track.name,
           artist: track.artists[0].name,
-          artists: track.artists.map(o => o.name).join(', ')
+          artists: track.artists.map(o => o.name).join(', '),
         });
       }
     } catch (e) {

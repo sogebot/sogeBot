@@ -24,7 +24,7 @@ import {
   faPlusSquare, faQuestion, faRandom, faSave, faSearch, faShareSquare, faSignInAlt, faSignOutAlt,
   faSlash, faSpinner, faStar, faStarHalf, faStop, faSync, faSyncAlt, faTasks, faTerminal, faTh, faThLarge,
   faThList, faTimes, faToggleOff, faToggleOn, faTrash, faTrashAlt, faTrophy, faUser, faUsers,
-  faVial, faVolumeDown, faVolumeUp, faPowerOff
+  faVial, faVolumeDown, faVolumeUp, faPowerOff,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 

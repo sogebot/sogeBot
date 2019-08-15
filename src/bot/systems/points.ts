@@ -58,7 +58,7 @@ class Points extends System {
       this.getPermissionBasedSettingsValue('offlineInterval'),
       this.getPermissionBasedSettingsValue('perInterval'),
       this.getPermissionBasedSettingsValue('perOfflineInterval'),
-      global.cache.isOnline()
+      global.cache.isOnline(),
     ]);
 
     try {
@@ -116,7 +116,7 @@ class Points extends System {
       this.getPermissionBasedSettingsValue('messageInterval'),
       this.getPermissionBasedSettingsValue('perMessageOfflineInterval'),
       this.getPermissionBasedSettingsValue('messageOfflineInterval'),
-      global.cache.isOnline()
+      global.cache.isOnline(),
     ]);
 
     // get user max permission
@@ -132,7 +132,7 @@ class Points extends System {
 
     const [user, userMessages] = await Promise.all([
       global.users.getById(opts.sender.userId),
-      global.users.getMessagesOf(opts.sender.userId)
+      global.users.getMessagesOf(opts.sender.userId),
     ]);
     const lastMessageCount = _.isNil(user.custom.lastMessagePoints) ? 0 : user.custom.lastMessagePoints;
 
@@ -186,7 +186,7 @@ class Points extends System {
         const message = await prepare('points.success.set', {
           amount: points,
           username,
-          pointsName: await this.getPointsName(points)
+          pointsName: await this.getPointsName(points),
         });
         sendMessage(message, opts.sender, opts.attr);
       } else {
@@ -213,7 +213,7 @@ class Points extends System {
         const message = await prepare('points.failed.giveNotEnough'.replace('$command', opts.command), {
           amount: points,
           username,
-          pointsName: await this.getPointsName(points)
+          pointsName: await this.getPointsName(points),
         });
         sendMessage(message, opts.sender, opts.attr);
       } else if (points === 'all') {
@@ -222,7 +222,7 @@ class Points extends System {
         const message = await prepare('points.success.give', {
           amount: availablePoints,
           username,
-          pointsName: await this.getPointsName(availablePoints)
+          pointsName: await this.getPointsName(availablePoints),
         });
         sendMessage(message, opts.sender, opts.attr);
       } else {
@@ -231,7 +231,7 @@ class Points extends System {
         const message = await prepare('points.success.give', {
           amount: points,
           username,
-          pointsName: await this.getPointsName(points)
+          pointsName: await this.getPointsName(points),
         });
         sendMessage(message, opts.sender, opts.attr);
       }
@@ -301,7 +301,7 @@ class Points extends System {
       const message = await prepare('points.defaults.pointsResponse', {
         amount: points,
         username: username,
-        pointsName: await this.getPointsName(points)
+        pointsName: await this.getPointsName(points),
       });
       sendMessage(message, opts.sender, opts.attr);
     } catch (err) {
@@ -326,7 +326,7 @@ class Points extends System {
       }
       const message = await prepare('points.success.all', {
         amount: points,
-        pointsName: await this.getPointsName(points)
+        pointsName: await this.getPointsName(points),
       });
       sendMessage(message, opts.sender, opts.attr);
     } catch (err) {
@@ -351,7 +351,7 @@ class Points extends System {
       }
       const message = await prepare('points.success.rain', {
         amount: points,
-        pointsName: await this.getPointsName(points)
+        pointsName: await this.getPointsName(points),
       });
       sendMessage(message, opts.sender, opts.attr);
     } catch (err) {
@@ -377,7 +377,7 @@ class Points extends System {
       const message = await prepare('points.success.add', {
         amount: points,
         username: username,
-        pointsName: await this.getPointsName(points)
+        pointsName: await this.getPointsName(points),
       });
       sendMessage(message, opts.sender, opts.attr);
     } catch (err) {
@@ -405,7 +405,7 @@ class Points extends System {
         const message = await prepare('points.success.remove', {
           amount: points,
           username: username,
-          pointsName: await this.getPointsName(points === 'all' ? 0 : points)
+          pointsName: await this.getPointsName(points === 'all' ? 0 : points),
         });
         sendMessage(message, opts.sender, opts.attr);
       } else {

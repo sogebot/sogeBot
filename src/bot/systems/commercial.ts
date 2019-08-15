@@ -49,7 +49,7 @@ class Commercial extends System {
 
     const commercial = {
       duration: !_.isNil(parsed[1]) ? parseInt(parsed[1], 10) : null,
-      message: !_.isNil(parsed[2]) ? parsed[2] : null
+      message: !_.isNil(parsed[2]) ? parsed[2] : null,
     };
 
     if (_.isNil(commercial.duration)) {
@@ -73,8 +73,8 @@ class Commercial extends System {
           headers: {
             'Authorization': 'OAuth ' + token,
             'Accept': 'application/vnd.twitchtv.v5+json',
-            'Content-Type': 'application/json'
-          }
+            'Content-Type': 'application/json',
+          },
         });
 
         global.events.fire('commercial', { duration: commercial.duration });

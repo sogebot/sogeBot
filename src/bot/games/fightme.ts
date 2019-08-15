@@ -51,7 +51,7 @@ class FightMe extends Game {
       const winner = _.random(0, 1, false);
       const isMod = {
         user: await isModerator(username),
-        sender: await isModerator(opts.sender.username)
+        sender: await isModerator(opts.sender.username),
       };
 
       // vs broadcaster
@@ -59,7 +59,7 @@ class FightMe extends Game {
         sendMessage(
           prepare('gambling.fightme.broadcaster', {
             winner: isBroadcaster(opts.sender) ? opts.sender.username : username,
-            loser: isBroadcaster(opts.sender) ? username : opts.sender.username
+            loser: isBroadcaster(opts.sender) ? username : opts.sender.username,
           }),
           opts.sender);
         const isBroadcasterModCheck = isBroadcaster(opts.sender) ? isMod.user : isMod.sender;
@@ -82,7 +82,7 @@ class FightMe extends Game {
         sendMessage(
           prepare('gambling.fightme.oneModerator', {
             winner: isMod.sender ? opts.sender.username : username,
-            loser: isMod.sender ? username : opts.sender.username
+            loser: isMod.sender ? username : opts.sender.username,
           }),
           opts.sender);
         timeout(isMod.sender ? username : opts.sender.username, null, this.timeout);
@@ -98,7 +98,7 @@ class FightMe extends Game {
       sendMessage(prepare('gambling.fightme.winner', {
         username,
         winner: winner ? username : opts.sender.username,
-        loser: winner ? opts.sender.username : username
+        loser: winner ? opts.sender.username : username,
       }), opts.sender, opts.attr);
       global.db.engine.remove(this.collection.users, { _id: challenge._id.toString() });
     } else {
@@ -110,7 +110,7 @@ class FightMe extends Game {
         sendMessage(prepare('gambling.fightme.cooldown', {
           command: opts.command,
           cooldown: Math.round(((cooldown * 1000) - (new Date().getTime() - new Date(this._cooldown).getTime())) / 1000 / 60),
-          minutesName: getLocalizedName(Math.round(((cooldown * 1000) - (new Date().getTime() - new Date(this._cooldown).getTime())) / 1000 / 60), 'core.minutes')
+          minutesName: getLocalizedName(Math.round(((cooldown * 1000) - (new Date().getTime() - new Date(this._cooldown).getTime())) / 1000 / 60), 'core.minutes'),
         }), opts.sender, opts.attr);
         return;
       }

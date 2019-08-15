@@ -74,7 +74,7 @@ class HowLongToBeat extends System {
         timeToBeatMain: this.interval,
         timeToBeatCompletionist: this.interval,
         imageUrl: (gameFromHltb || { imageUrl: '' }).imageUrl,
-        startedAt: Date.now()
+        startedAt: Date.now(),
       };
     }
 

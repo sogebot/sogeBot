@@ -232,7 +232,7 @@ async function registerCommand(opts: string | Command, m) {
     const self = m.type === 'core' ? global[m.name] : global[m.type][m.name];
     if (typeof opts === 'string') {
       opts = {
-        name: opts
+        name: opts,
       };
     }
     opts.fnc = m.fnc; // force function to decorated function

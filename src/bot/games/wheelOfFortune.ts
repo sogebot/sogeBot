@@ -10,7 +10,7 @@ class WheelOfFortune extends Game {
     href: '/overlays/wheeloffortune',
     class: 'btn btn-primary btn-block',
     rawText: '/overlays/wheeloffortune (500x55)',
-    target: '_blank'
+    target: '_blank',
   })
   btnLink = null;
 
@@ -38,7 +38,7 @@ class WheelOfFortune extends Game {
               userId: userObj.id,
               emotes: [],
               badges: {},
-              'message-type': 'chat'
+              'message-type': 'chat',
             });}
           }
         }, 2000);

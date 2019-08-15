@@ -42,7 +42,7 @@ class Duel extends Game {
     const [users, timestamp, duelDuration] = await Promise.all([
       global.db.engine.find(this.collection.users),
       this._timestamp,
-      this.duration
+      this.duration,
     ]);
     const total = users.reduce((total, v) => total + v.tickets, 0);
 
@@ -75,7 +75,7 @@ class Duel extends Game {
       probability: _.round(probability, 2),
       ticketsName: await global.systems.points.getPointsName(winnerUser.tickets),
       tickets: winnerUser.tickets,
-      winner: winnerUser.username
+      winner: winnerUser.username,
     });
     const userObj = await global.users.getByName(getOwner());
     sendMessage(m, {
@@ -84,7 +84,7 @@ class Duel extends Game {
       userId: userObj.id,
       emotes: [],
       badges: {},
-      'message-type': 'chat'
+      'message-type': 'chat',
     }, { force: true });
 
     // give user his points
@@ -167,7 +167,7 @@ class Duel extends Game {
       global.setTimeout(async () => {
         message = await prepare(isNewDuelist ? 'gambling.duel.joined' : 'gambling.duel.added', {
           pointsName: await global.systems.points.getPointsName(tickets),
-          points: tickets
+          points: tickets,
         });
         sendMessage(message, opts.sender, opts.attr);
       }, isNewDuel ? 500 : 0);
@@ -179,14 +179,14 @@ class Duel extends Game {
           break;
         case ERROR_ZERO_BET:
           message = await prepare('gambling.duel.zeroBet', {
-            pointsName: await global.systems.points.getPointsName(0)
+            pointsName: await global.systems.points.getPointsName(0),
           });
           sendMessage(message, opts.sender, opts.attr);
           break;
         case ERROR_NOT_ENOUGH_POINTS:
           message = await prepare('gambling.duel.notEnoughPoints', {
             pointsName: await global.systems.points.getPointsName(bet),
-            points: bet
+            points: bet,
           });
           sendMessage(message, opts.sender, opts.attr);
           break;
@@ -195,7 +195,7 @@ class Duel extends Game {
           message = await prepare('gambling.duel.lowerThanMinimalBet', {
             pointsName: await global.systems.points.getPointsName(bet),
             points: bet,
-            command: opts.command
+            command: opts.command,
           });
           sendMessage(message, opts.sender, opts.attr);
           break;

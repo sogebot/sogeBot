@@ -36,7 +36,7 @@ class Ranks extends System {
 
     const values = {
       hours: parseInt(parsed[1], 10),
-      value: parsed[2]
+      value: parsed[2],
     };
 
     const ranks = await global.db.engine.find(this.collection.data, { hours: values.hours });
@@ -178,7 +178,7 @@ class Ranks extends System {
 
     const [watched, ranks] = await Promise.all([
       global.users.getWatchedOf(user.id),
-      global.db.engine.find(this.collection.data)
+      global.db.engine.find(this.collection.data),
     ]);
     let rankToReturn = null;
 

@@ -24,14 +24,14 @@ class Emotes extends Overlay {
     'o_O': 'https://static-cdn.jtvnw.net/emoticons/v1/6/',
     ':D': 'https://static-cdn.jtvnw.net/emoticons/v1/3/',
     '>(': 'https://static-cdn.jtvnw.net/emoticons/v1/4/',
-    '<3': 'https://static-cdn.jtvnw.net/emoticons/v1/9/'
+    '<3': 'https://static-cdn.jtvnw.net/emoticons/v1/9/',
   };
 
   fetch = {
     global: false,
     channel: false,
     ffz: false,
-    bttv: false
+    bttv: false,
   };
 
   lastGlobalEmoteChk = 0;
@@ -138,14 +138,14 @@ class Emotes extends Overlay {
             await global.db.engine.update(this.collection.cache,
               {
                 code: emotes[j].code,
-                type: 'twitch'
+                type: 'twitch',
               },
               {
                 urls: {
                   '1': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emotes[j].id + '/1.0',
                   '2': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emotes[j].id + '/2.0',
-                  '3': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emotes[j].id + '/3.0'
-                }
+                  '3': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emotes[j].id + '/3.0',
+                },
               });
           }
           global.log.info(`EMOTES: Fetched channel ${cid} emotes`);
@@ -178,14 +178,14 @@ class Emotes extends Overlay {
           await global.db.engine.update(this.collection.cache,
             {
               code: emotes[i].code,
-              type: 'twitch'
+              type: 'twitch',
             },
             {
               urls: {
                 '1': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emotes[i].id + '/1.0',
                 '2': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emotes[i].id + '/2.0',
-                '3': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emotes[i].id + '/3.0'
-              }
+                '3': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emotes[i].id + '/3.0',
+              },
             });
         }
         global.log.info('EMOTES: Fetched global emotes');
@@ -216,14 +216,14 @@ class Emotes extends Overlay {
             await global.db.engine.update(this.collection.cache,
               {
                 code: emotes[j].code,
-                type: 'twitch'
+                type: 'twitch',
               },
               {
                 urls: {
                   '1': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emotes[j].id + '/1.0',
                   '2': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emotes[j].id + '/2.0',
-                  '3': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emotes[j].id + '/3.0'
-                }
+                  '3': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emotes[j].id + '/3.0',
+                },
               });
           }
           global.log.info(`EMOTES: Fetched channel ${cid} emotes`);
@@ -261,10 +261,10 @@ class Emotes extends Overlay {
           await global.db.engine.update(this.collection.cache,
             {
               code: emotes[i].name,
-              type: 'ffz'
+              type: 'ffz',
             },
             {
-              urls: emotes[i].urls
+              urls: emotes[i].urls,
             });
         }
         global.log.info('EMOTES: Fetched ffz emotes');
@@ -294,14 +294,14 @@ class Emotes extends Overlay {
           await global.db.engine.update(this.collection.cache,
             {
               code: emotes[i].code,
-              type: 'bttv'
+              type: 'bttv',
             },
             {
               urls: {
                 '1': urlTemplate.replace('{{id}}', emotes[i].id).replace('{{image}}', '1x'),
                 '2': urlTemplate.replace('{{id}}', emotes[i].id).replace('{{image}}', '2x'),
-                '3': urlTemplate.replace('{{id}}', emotes[i].id).replace('{{image}}', '3x')
-              }
+                '3': urlTemplate.replace('{{id}}', emotes[i].id).replace('{{image}}', '3x'),
+              },
 
             });
         }
@@ -328,9 +328,9 @@ class Emotes extends Overlay {
       settings: {
         emotes: {
           animation: this.cEmotesAnimation,
-          animationTime: this.cEmotesAnimationTime
-        }
-      }
+          animationTime: this.cEmotesAnimationTime,
+        },
+      },
     });
   }
 
@@ -340,13 +340,13 @@ class Emotes extends Overlay {
       emotes,
       settings: {
         emotes: {
-          animationTime: this.cEmotesAnimationTime
+          animationTime: this.cEmotesAnimationTime,
         },
         fireworks: {
           numOfEmotesPerExplosion: this.cExplosionNumOfEmotesPerExplosion,
-          numOfExplosions: this.cExplosionNumOfExplosions
-        }
-      }
+          numOfExplosions: this.cExplosionNumOfExplosions,
+        },
+      },
     });
   }
 
@@ -356,12 +356,12 @@ class Emotes extends Overlay {
       emotes,
       settings: {
         emotes: {
-          animationTime: this.cEmotesAnimationTime
+          animationTime: this.cEmotesAnimationTime,
         },
         explosion: {
-          numOfEmotes: this.cExplosionNumOfEmotes
-        }
-      }
+          numOfEmotes: this.cExplosionNumOfEmotes,
+        },
+      },
     });
   }
 
@@ -386,8 +386,8 @@ class Emotes extends Overlay {
         urls: {
           '1': this.simpleEmotes[code] + '1.0',
           '2': this.simpleEmotes[code] + '2.0',
-          '3': this.simpleEmotes[code] + '3.0'
-        }
+          '3': this.simpleEmotes[code] + '3.0',
+        },
       });
     }
 
@@ -404,7 +404,7 @@ class Emotes extends Overlay {
           '1': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emote.id + '/1.0',
           '2': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emote.id + '/2.0',
           '3': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emote.id + '/3.0',
-        }
+        },
       };
 
       cache.push(data);
@@ -413,10 +413,10 @@ class Emotes extends Overlay {
       global.db.engine.update(this.collection.cache,
         {
           code: data.code,
-          type: 'twitch'
+          type: 'twitch',
         },
         {
-          urls: data.urls
+          urls: data.urls,
         });
     }
 
@@ -436,9 +436,9 @@ class Emotes extends Overlay {
         settings: {
           emotes: {
             animation: this.cEmotesAnimation,
-            animationTime: this.cEmotesAnimationTime
-          }
-        }
+            animationTime: this.cEmotesAnimationTime,
+          },
+        },
       });
     }
 

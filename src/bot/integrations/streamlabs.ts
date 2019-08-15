@@ -87,7 +87,7 @@ class Streamlabs extends Integration {
           games: global.games,
           overlays: global.overlays,
           widgets: global.widgets,
-          integrations: global.integrations
+          integrations: global.integrations,
         })) {
           for (const [name, system] of Object.entries(systems)) {
             if (name.startsWith('_') || typeof system.on === 'undefined') {continue;}
@@ -98,7 +98,7 @@ class Streamlabs extends Integration {
                   amount: event.amount,
                   message: event.message,
                   currency: event.currency,
-                  timestamp: _.now()
+                  timestamp: _.now(),
                 });
               }
             }

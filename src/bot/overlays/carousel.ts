@@ -48,7 +48,7 @@ class Carousel extends Overlay {
             }
             cb([
               { imageId: id, order: Number(upImage.order) },
-              { imageId: String(upImage._id), order: Number(image.order) }
+              { imageId: String(upImage._id), order: Number(image.order) },
             ]);
             break;
           case 'down':
@@ -58,7 +58,7 @@ class Carousel extends Overlay {
             }
             cb([
               { imageId: id, order: Number(downImage.order) },
-              { imageId: String(downImage._id), order: Number(image.order) }
+              { imageId: String(downImage._id), order: Number(image.order) },
             ]);
             break;
         }
@@ -87,7 +87,7 @@ class Carousel extends Overlay {
             // order
             order,
             // showOnlyOncePerStream
-            showOnlyOncePerStream: false
+            showOnlyOncePerStream: false,
           });
         cb(image);
       });

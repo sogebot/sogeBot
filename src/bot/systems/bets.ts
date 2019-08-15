@@ -81,7 +81,7 @@ class Bets extends System {
             userId: userObj.id,
             emotes: [],
             badges: {},
-            'message-type': 'chat'
+            'message-type': 'chat',
           });
           const _id = currentBet._id.toString(); delete currentBet._id;
           await global.db.engine.update(this.collection.data, { _id }, currentBet);
@@ -92,7 +92,7 @@ class Bets extends System {
             userId: userObj.id,
             emotes: [],
             badges: {},
-            'message-type': 'chat'
+            'message-type': 'chat',
           });
           await global.db.engine.remove(this.collection.data, { key: 'bets' });
         }

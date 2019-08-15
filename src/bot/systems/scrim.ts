@@ -114,7 +114,7 @@ class Scrim extends System {
         userId: userObj.id,
         emotes: [],
         badges: {},
-        'message-type': 'chat'
+        'message-type': 'chat',
       },
     );
   }
@@ -144,7 +144,7 @@ class Scrim extends System {
               userId: userObj.id,
               emotes: [],
               badges: {},
-              'message-type': 'chat'
+              'message-type': 'chat',
             },
           );
           this.lastRemindAt = Date.now();
@@ -163,7 +163,7 @@ class Scrim extends System {
               userId: userObj.id,
               emotes: [],
               badges: {},
-              'message-type': 'chat'
+              'message-type': 'chat',
             },
           );
           this.lastRemindAt = Date.now();
@@ -203,7 +203,7 @@ class Scrim extends System {
         userId: userObj.id,
         emotes: [],
         badges: {},
-        'message-type': 'chat'
+        'message-type': 'chat',
       },
     );
   }
@@ -225,7 +225,7 @@ class Scrim extends System {
               userId: userObj.id,
               emotes: [],
               badges: {},
-              'message-type': 'chat'
+              'message-type': 'chat',
             },
           );
         } else {
@@ -236,7 +236,7 @@ class Scrim extends System {
             userId: userObj.id,
             emotes: [],
             badges: {},
-            'message-type': 'chat'
+            'message-type': 'chat',
           });
           if (!this.isCooldownOnly) {
             setTimeout(() => {
@@ -253,7 +253,7 @@ class Scrim extends System {
                   userId: userObj.id,
                   emotes: [],
                   badges: {},
-                  'message-type': 'chat'
+                  'message-type': 'chat',
                 },
               );
               setTimeout(async () => {

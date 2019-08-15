@@ -26,7 +26,7 @@ class Roulette extends Game {
     const isAlive = _.random(0, 1, false);
 
     const [isMod] = await Promise.all([
-      isModerator(opts.sender)
+      isModerator(opts.sender),
     ]);
 
     sendMessage(global.translate('gambling.roulette.trigger'), opts.sender, opts.attr);

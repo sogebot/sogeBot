@@ -131,7 +131,7 @@ class CustomCommands extends System {
             if (_.isFunction(cb)) {
               cb(null, {
                 command: itemFromDb,
-                responses: await global.db.engine.find(this.collection.responses, { cid: itemFromDb._id })
+                responses: await global.db.engine.find(this.collection.responses, { cid: itemFromDb._id }),
               });
             }
           }
@@ -207,7 +207,7 @@ class CustomCommands extends System {
       let cDb = await global.db.engine.findOne(this.collection.data, { command });
       if (!cDb._id) {
         cDb = await global.db.engine.insert(this.collection.data, {
-          command, enabled: true, visible: true
+          command, enabled: true, visible: true,
         });
       }
 
@@ -222,7 +222,7 @@ class CustomCommands extends System {
         order: rDb.length,
         permission: pItem.id,
         stopIfExecuted,
-        response
+        response,
       });
       sendMessage(prepare('customcmds.command-was-added', { command }), opts.sender, opts.attr);
     } catch (e) {
@@ -294,7 +294,7 @@ class CustomCommands extends System {
       if (responses.length === 0) {sendMessage(prepare('customcmdustomcmds.list-of-responses-is-empty', { command }), opts.sender, opts.attr);}
       const permissions = (await global.db.engine.find(global.permissions.collection.data)).map((o) => {
         return {
-          v: o.id, string: o.name
+          v: o.id, string: o.name,
         };
       });
       for (const r of responses) {
@@ -437,7 +437,7 @@ class CustomCommands extends System {
       $followers: _.get(await global.db.engine.findOne('api.current', { key: 'followers' }), 'value', 0),
       $hosts: _.get(await global.db.engine.findOne('api.current', { key: 'hosts' }), 'value', 0),
       $subscribers: _.get(await global.db.engine.findOne('api.current', { key: 'subscribers' }), 'value', 0),
-      ...customVariables
+      ...customVariables,
     };
     let result = false;
     try {
