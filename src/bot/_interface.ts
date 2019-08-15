@@ -3,7 +3,7 @@ import _ from 'lodash';
 import { setTimeout } from 'timers';
 import { isMainThread } from 'worker_threads';
 
-import { flatten, unflatten } from './commons';
+import { flatten, unflatten } from './helpers/flatten';
 import { loadingInProgress, permissions as permissionsList } from './decorators';
 import { getFunctionList } from './decorators/on';
 import * as Parser from './parser';

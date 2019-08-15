@@ -25,7 +25,7 @@
       </template>
       <template v-slot:right>
         <b-alert show variant="info" v-if="pending" v-html="translate('dialog.changesPending')" class="mr-2 p-2 mb-0"></b-alert>
-        <state-button @click="save()" text="saveChanges" :state="state.save" :invalid="!!$v.$invalid && !!$v.$dirty"/>
+        <state-button @click="save()" text="saveChanges" :state="state.save" :invalid="(!!$v.$invalid && !!$v.$dirty) || !isAllValid"/>
       </template>
     </panel>
 
@@ -96,9 +96,22 @@
         <b-tab v-for="event in supportedEvents" :key="'event-tab-' + event" :title="translate('registry.alerts.event.' + event)">
           <b-card no-body>
             <b-tabs card vertical pills>
+              <b-tab :active="idx === 0" v-for="(alert, idx) of item.alerts[event]" :key="event + idx">
+                <template slot="title">
+                  <fa icon="exclamation-circle" v-if="!isValid[event][idx]" class="text-danger"/>
+                  <fa :icon="['fas', 'circle']" v-else-if="alert.enabled"/>
+                  <fa :icon="['far', 'circle']" v-else/>
+                  Alert {{ idx + 1 }}
+                </template>
+                <p class="p-3">
+                  <form-follow v-if="event === 'follows'" :alert.sync="alert" :isValid.sync="isValid[event][idx]" />
+                </p>
+              </b-tab>
+
               <!-- New Tab Button (Using tabs slot) -->
               <template slot="tabs">
-                <b-nav-item @click.prevent="newAlert" href="#"><b>+ new alert</b></b-nav-item>
+                <b-nav-item @click.prevent="newAlert" href="#">
+                  <fa icon="plus"/> <b>new alert</b></b-nav-item>
               </template>
 
               <!-- Render this if no tabs -->
@@ -106,28 +119,6 @@
                 There are no alerts<br>
                 Create new alert using the <b>+</b> button on left side.
               </div>
-              <!--b-tab :active="idx === 0" v-for="(ev, idx) of supportedEvents" :key="ev">
-                <template slot="title">
-                  <fa icon="check"/> {{ translate('registry.alerts.' + ev) }}
-                </template>
-                <p class="p-3">
-                  <b-form-group
-                    :label="translate('registry.alerts.simple.text.name')"
-                    label-for="name"
-                    :description="translate('registry.alerts.simple.text.help')"
-                  >
-                    <b-form-input
-                      id="text"
-                      v-model="alerts[ev].simple.text"
-                      type="text"
-                      :placeholder="translate('registry.alerts.simple.text.placeholder')"
-                      @input="$v.alerts[ev].$touch()"
-                      :state="$v.alerts[ev].$invalid && $v.alerts[ev].$dirty ? 'invalid' : null"
-                    ></b-form-input>
-                    <b-form-invalid-feedback>{{ translate('dialog.errors.required') }}</b-form-invalid-feedback>
-                  </b-form-group>
-                </p>
-              </b-tab-->
             </b-tabs>
           </b-card>
         </b-tab>
@@ -143,6 +134,7 @@ import { Validations } from 'vuelidate-property-decorators';
 import { required } from 'vuelidate/lib/validators'
 
 import uuid from 'uuid/v4';
+import axios from 'axios';
 
 Component.registerHooks([
   'beforeRouteEnter',
@@ -153,6 +145,7 @@ Component.registerHooks([
 @Component({
   components: {
     'loading': () => import('../../../components/loading.vue'),
+    'form-follow': () => import('./components/form-follow.vue'),
   },
   filters: {
     capitalize: function (value) {
@@ -170,8 +163,9 @@ export default class AlertsEdit extends Vue {
   state: { loaded: number; save: number } = { loaded: this.$state.progress, save: this.$state.idle }
   pending: boolean = false;
 
-  supportedEvents: string[] = ['follow', 'cheer', 'subscribe', 'host', 'resubscribe']
+  supportedEvents: string[] = ['follows', 'cheers', 'subscribes', 'hosts', 'resubscribes']
   selectedTabIndex: number = 0;
+  fonts: string[] = [];
 
   item: Registry.Alerts.Alert = {
     id: uuid(),
@@ -180,8 +174,16 @@ export default class AlertsEdit extends Vue {
     profanityFilterType: 'replace-with-asterisk',
     loadStandardProfanityList: true,
     customProfanityList: [],
-    alerts: [],
+    alerts: {
+      follows: []
+    },
   }
+
+  isValid: {
+    follows: boolean[];
+  } = {
+    follows: [],
+  };
 
   get customProfanityList() {
     return this.item.customProfanityList.join(' ');
@@ -189,6 +191,15 @@ export default class AlertsEdit extends Vue {
 
   set customProfanityList(value) {
     this.item.customProfanityList = value.split(' ').filter(String);
+  }
+
+  get isAllValid() {
+    for (const key of Object.keys(this.isValid)) {
+      if (!this._.every(this.isValid[key])) {
+        return false;
+      }
+    }
+    return true;
   }
 
   profanityFilterTypeOptions: { value: string; text: string }[] = [
@@ -203,12 +214,22 @@ export default class AlertsEdit extends Vue {
   validations = {
     item: {
       name: {required},
+      alerts: {
+        follows: {
+          messageTemplate: {required},
+        }
+      }
     },
   }
 
   async mounted() {
     this.state.loaded = this.$state.progress;
     this.state.loaded = this.$state.success;
+
+    axios.get('/fonts')
+      .then((r) => {
+        this.fonts = r.data.items.map((o) => o.family)
+      })
   }
 
   beforeRouteUpdate(to, from, next) {
@@ -245,7 +266,32 @@ export default class AlertsEdit extends Vue {
   }
 
   newAlert() {
-    console.log(`creating new alert ${this.supportedEvents[this.selectedTabIndex]}`);
+    switch(this.supportedEvents[this.selectedTabIndex]) {
+      case 'follows':
+        this.isValid.follows.push(true);
+        this.item.alerts.follows.push({
+          enabled: true,
+          layout: '1',
+          animationIn: 'fade-in',
+          animationOut: 'fade-out',
+          animationText: 'wiggle',
+          messageTemplate: 'Thanks for follow {name}!',
+          image: 'https://miro.medium.com/max/366/0*uJ7vuxfxDVOWzN8r.gif', // TBD to change
+          sound: 'https://www.soundsnap.com/streamers/play.php?id=1565879472.5998:4c6153c1b2cbc60fb8a99130f0837139468ebeb0:a633887891242348b435273d685479d0c198cf98b32b47d00180fc1d87c2d09f52cf56b4d79b3fded10346b38de5b9973c8203eede5f86f1730b804f14a42c343c035562c22ec10d66182c2b985657373ff3e4f50538a3374cab96802f593aaaa2abf4ef450a77decd3261443d1767ffa349d676bd05833a82cfdc17bbeef628c02285d2c5e1e1118f3681076dfdced34fd0fe8186782e2a08d8220ef667c7bd029801d2fae778b1145ccd11ea7b8297dbdc832b4aa4372956b5ed90dfb8963629845e168da46e52bed68798d972462fc245bbdfb9a7c85a069230db72c76014286cf0e61fa17b1f4d7aa9482ab02a267357035c2eaac1b67750d19c17233e346ad3fe71d8ec2006edd9be338d7e0290d5c31b35fb646fd6076a64da8dd98053', // TBD to change
+          soundVolume: 20,
+          alertDurationInMs: 10000,
+          alertTextDelayInMs: 0,
+          enableAdvancedMode: false,
+          font: {
+            family: 'PT Sans',
+            size: 24,
+            weight: 800,
+            color: '#ffffff',
+            highlightcolor: '#00ff00',
+          },
+        })
+        break;
+    }
   }
 
   async remove () {

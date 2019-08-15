@@ -10,6 +10,7 @@ var basicAuth = require('basic-auth')
 var _ = require('lodash')
 const util = require('util')
 const commons = require('./commons')
+const flatten = require('./helpers/flatten')
 const gitCommitInfo = require('git-commit-info');
 
 const Parser = require('./parser')
@@ -250,7 +251,7 @@ function Panel () {
     })
 
     socket.on('responses.get', async function (at, callback) {
-      const responses = commons.flatten(!_.isNil(at) ? global.lib.translate.translations[global.general.lang][at] : global.lib.translate.translations[global.general.lang])
+      const responses = flatten.flatten(!_.isNil(at) ? global.lib.translate.translations[global.general.lang][at] : global.lib.translate.translations[global.general.lang])
       _.each(responses, function (value, key) {
         let _at = !_.isNil(at) ? at + '.' + key : key
         responses[key] = {} // remap to obj
