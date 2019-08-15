@@ -32,7 +32,8 @@
       }],
       "dot-notation": 2,
       "operator-linebreak": ["error", "before"],
-      "brace-style": "error"
+      "brace-style": "error",
+      "no-useless-call": "error"
     },
     "parserOptions": {
       "ecmaFeatures": {
