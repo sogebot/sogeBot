@@ -8,7 +8,7 @@ import { permission } from '../permissions';
 import { command, default_permission, parser, settings } from '../decorators';
 import Message from '../message';
 import System from './_interface';
-import { timeout, sendMessage, prepare, getLocalizedName, isModerator, isOwner } from '../commons';
+import { getLocalizedName, isModerator, isOwner, prepare, sendMessage, timeout } from '../commons';
 
 class Moderation extends System {
   @settings('lists')

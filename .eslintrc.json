@@ -23,7 +23,13 @@
         }],
         "no-var": 2,
         "prefer-spread": "error",
-        "comma-dangle": [2, "always-multiline"]
+        "comma-dangle": [2, "always-multiline"],
+        "sort-imports": ["error", {
+          "ignoreCase": true,
+          "ignoreDeclarationSort": true,
+          "ignoreMemberSort": false,
+          "memberSyntaxSortOrder": ["none", "all", "multiple", "single"]
+      }]
     },
     "parserOptions": {
       "ecmaFeatures": {

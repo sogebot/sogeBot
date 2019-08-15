@@ -1,15 +1,12 @@
 import chalk from 'chalk';
 import _ from 'lodash';
-import { setTimeout } from 'timers'; // tslint workaround
 import { isMainThread } from 'worker_threads';
 
-import { permission } from './permissions';
-import { permissions as permissionsList } from './decorators';
-
 import { flatten, unflatten } from './commons';
-import * as Parser from './parser';
+import { loadingInProgress, permissions as permissionsList } from './decorators';
 import { getFunctionList } from './decorators/on';
-import { loadingInProgress } from './decorators';
+import * as Parser from './parser';
+import { permission } from './permissions';
 
 class Module {
   public dependsOn: string[] = [];

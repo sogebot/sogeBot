@@ -4,7 +4,7 @@ import Overlay from '../overlays/_interface';
 
 import _ from 'lodash';
 import { isMainThread } from 'worker_threads';
-import { onSub, onFollow, onTip, onBit } from '../decorators/on';
+import { onBit, onFollow, onSub, onTip } from '../decorators/on';
 
 class Goals extends Overlay {
   showInUI = false;

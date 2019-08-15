@@ -9,7 +9,7 @@ import constants from '../constants';
 import { permission } from '../permissions';
 import { command, default_permission, rollback } from '../decorators';
 import { parser } from '../decorators';
-import { sendMessage, prepare, isOwner } from '../commons';
+import { isOwner, prepare, sendMessage } from '../commons';
 
 /*
  * !price                     - gets an info about price usage

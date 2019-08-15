@@ -1,8 +1,8 @@
 import _ from 'lodash';
 
-import { command, shared, settings } from '../decorators';
+import { command, settings, shared } from '../decorators';
 import Game from './_interface';
-import { prepare, sendMessage, isModerator, isBroadcaster, getLocalizedName, timeout } from '../commons';
+import { getLocalizedName, isBroadcaster, isModerator, prepare, sendMessage, timeout } from '../commons';
 
 /*
  * !fightme [user] - challenge [user] to fight

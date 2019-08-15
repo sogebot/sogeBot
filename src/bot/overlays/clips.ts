@@ -1,5 +1,5 @@
 import Overlay from './_interface';
-import { ui, settings } from '../decorators';
+import { settings, ui } from '../decorators';
 
 class Clips extends Overlay {
   @ui({

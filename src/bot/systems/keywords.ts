@@ -5,7 +5,7 @@ import Message from '../message';
 import { command, default_permission, parser } from '../decorators';
 import { permission } from '../permissions';
 import System from './_interface';
-import { sendMessage, prepare, isUUID } from '../commons';
+import { isUUID, prepare, sendMessage } from '../commons';
 import { isMainThread } from 'worker_threads';
 import debug from '../debug';
 

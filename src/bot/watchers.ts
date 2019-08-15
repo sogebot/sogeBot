@@ -1,4 +1,4 @@
-import { set, get, isEqual, cloneDeep } from 'lodash';
+import { cloneDeep, get, isEqual, set } from 'lodash';
 import { isMainThread } from 'worker_threads';
 
 const variables: {

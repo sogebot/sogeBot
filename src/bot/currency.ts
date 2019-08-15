@@ -10,7 +10,7 @@ import { isMainThread } from 'worker_threads';
 
 import Core from './_interface';
 import constants from './constants';
-import { settings, ui, shared } from './decorators';
+import { settings, shared, ui } from './decorators';
 
 class Currency extends Core {
   @settings('currency')

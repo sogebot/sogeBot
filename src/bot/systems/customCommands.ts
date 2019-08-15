@@ -8,7 +8,7 @@ import System from './_interface';
 import constants from '../constants';
 import { parser } from '../decorators';
 import Expects from '../expects';
-import { sendMessage, prepare, message, getOwner, isModerator, isSubscriber, isVIP, isBroadcaster, isBot, isOwner } from '../commons';
+import { getOwner, isBot, isBroadcaster, isModerator, isOwner, isSubscriber, isVIP, message, prepare, sendMessage } from '../commons';
 import { getCountOfCommandUsage, incrementCountOfCommandUsage, resetCountOfCommandUsage } from '../helpers/commands/count';
 
 /*

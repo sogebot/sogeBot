@@ -2,7 +2,7 @@ import _ from 'lodash';
 import { isMainThread } from 'worker_threads';
 
 import { getLocalizedName, getOwner, isBroadcaster, isModerator, prepare, sendMessage } from '../commons';
-import { command, shared, settings } from '../decorators';
+import { command, settings, shared } from '../decorators';
 import Game from './_interface';
 
 const ERROR_NOT_ENOUGH_OPTIONS = '0';

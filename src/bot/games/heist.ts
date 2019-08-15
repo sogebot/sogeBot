@@ -3,8 +3,8 @@ import { isMainThread } from 'worker_threads';
 
 import Expects from '../expects.js';
 import Game from './_interface';
-import { command, shared, settings, ui } from '../decorators';
-import { sendMessage, getOwner, getLocalizedName } from '../commons.js';
+import { command, settings, shared, ui } from '../decorators';
+import { getLocalizedName, getOwner, sendMessage } from '../commons.js';
 
 class Heist extends Game {
   dependsOn = [ 'systems.points' ];

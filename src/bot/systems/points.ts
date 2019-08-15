@@ -4,7 +4,7 @@ import * as _ from 'lodash';
 import { isMainThread } from 'worker_threads';
 
 import { isBot, prepare, sendMessage } from '../commons';
-import { command, default_permission, parser, settings, permission_settings } from '../decorators';
+import { command, default_permission, parser, permission_settings, settings } from '../decorators';
 import Expects from '../expects';
 import { permission } from '../permissions';
 import System from './_interface';
