@@ -8,6 +8,11 @@ declare module '*.txt' {
   export default content;
 }
 
+declare module '*.gif' {
+  const content: string;
+  export default content;
+}
+
 declare namespace NodeJS {
   export interface Global {
     linesParsed: number;
