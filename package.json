@@ -81,6 +81,7 @@
     "cleanup": "node ./tools/cleanup.js || true"
   },
   "devDependencies": {
+    "vue-audio-visual": "1.3.0",
     "@babel/cli": "7.5.5",
     "@babel/core": "7.5.5",
     "@babel/plugin-proposal-class-properties": "7.5.5",

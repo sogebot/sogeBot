@@ -19,9 +19,9 @@ declare namespace Registry {
     export type Follow = {
       enabled: boolean;
       layout: '1' | '2' | '3';
-      animationIn: AnimationIn;
-      animationOut: AnimationOut;
-      animationText: AnimationText;
+      animationIn: AnimationIn; // TBD UI
+      animationOut: AnimationOut; // TBD UI
+      animationText: AnimationText; // TBD UI
       messageTemplate: string;
       image: string;
       sound: string;
@@ -29,9 +29,12 @@ declare namespace Registry {
       alertDurationInMs: number;
       alertTextDelayInMs: number;
       enableAdvancedMode: boolean;
+      // tts TBD
       font: {
         family: string;
         size: number;
+        borderPx: number;
+        borderColor: string;
         weight: number;
         color: string;
         highlightcolor: string;

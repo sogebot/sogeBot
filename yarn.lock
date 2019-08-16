@@ -10402,6 +10402,14 @@ vm-browserify@^1.0.1:
   resolved "https://registry.yarnpkg.com/vm-browserify/-/vm-browserify-1.1.0.tgz#bd76d6a23323e2ca8ffa12028dc04559c75f9019"
   integrity sha512-iq+S7vZJE60yejDYM0ek6zg308+UZsdtPExWP9VZoCFCz1zkJoXFnAX7aZfd/ZwrkidzdUZL0C/ryW+JwAiIGw==
 
+vue-audio-visual@1.3.0:
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/vue-audio-visual/-/vue-audio-visual-1.3.0.tgz#13da1707c13e4c0a5b2d312b95fbe31a0772172f"
+  integrity sha512-px0wYa0zQzi+lPuQ4NFRtDUOgcAK3OkV5fqpIkRKED8GM+NTJBu/AiyWwGfW2VzvwevKpwwgsKUF5CIntHJAVg==
+  dependencies:
+    axios "^0.18.0"
+    vue "^2.5.17"
+
 vue-chartkick@0.5.2:
   version "0.5.2"
   resolved "https://registry.yarnpkg.com/vue-chartkick/-/vue-chartkick-0.5.2.tgz#0c26a5a3c6a0a511c8d7a87b5aa372836a2e9c29"
