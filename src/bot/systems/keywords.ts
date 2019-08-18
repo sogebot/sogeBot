@@ -8,6 +8,7 @@ import System from './_interface';
 import { isUUID, prepare, sendMessage } from '../commons';
 import { isMainThread } from 'worker_threads';
 import debug from '../debug';
+import XRegExp from 'xregexp';
 
 
 export interface KeywordInterface {
@@ -251,9 +252,10 @@ class Keywords extends System {
     }
 
     const keywords = (await global.db.engine.find(this.collection.data)).filter((o) => {
-      const isFoundInMessage = opts.message.search(new RegExp('\\b' + o.keyword + '\\b', 'gi')) >= 0;
+      const regexp = `([\\b\\s]${o.keyword}[\\b\\s])|(^${o.keyword}[\\b\\s])|([\\b\\s]${o.keyword}$)|(^${o.keyword}$)`;
+      const isFoundInMessage = XRegExp(regexp, 'giu').test(opts.message);
       const isEnabled = o.enabled;
-      debug('keywords.run', `\n\t<\t${opts.message}\n\t?\t${o.keyword}\n\t-\tisFoundInMessage: ${isFoundInMessage}, isEnabled: ${isEnabled}`);
+      debug('keywords.run', `\n\t<\t${opts.message}\n\t?\t${o.keyword}\n\t-\tisFoundInMessage: ${isFoundInMessage}, isEnabled: ${isEnabled}\n\t-\t${regexp}`);
       return isFoundInMessage && isEnabled;
     });
 
