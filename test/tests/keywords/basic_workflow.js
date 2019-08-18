@@ -26,6 +26,13 @@ const failedTests = [
 
 const successTests = [
   {
+    keyword: 'привет ты', response: randomString(),
+    tests: [
+      { type: 'add' },
+      { type: 'run', triggers: ['This line will be triggered привет ты', 'Hi how привет ты you'], '-triggers': ['This line wont be triggered'] },
+    ]
+  },
+  {
     keyword: 'hello.*|hi', response: randomString(),
     tests: [
       { type: 'add' },
