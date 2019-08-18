@@ -26,6 +26,13 @@ const failedTests = [
 
 const successTests = [
   {
+    keyword: 'test', response: '(!me)', actualResponse: "@soge__ | 0.0h | 0 points | 0 messages | 0.00€ | 0 bits",
+    tests: [
+      { type: 'add' },
+      { type: 'run', triggers: ['This line will be triggered test'], '-triggers': [] },
+    ]
+  },
+  {
     keyword: 'привет ты', response: randomString(),
     tests: [
       { type: 'add' },
@@ -144,7 +151,11 @@ describe('Keywords - basic worflow (add, run, edit)', () => {
               for (const r of t.triggers) {
                 it (`run() | ${r} => ${t.afterEdit ? test.editResponse : test.response}`, async () => {
                   await global.systems.keywords.run({ sender: owner, message: r });
-                  await message.isSentRaw(t.afterEdit ? test.editResponse : test.response, owner);
+                  await message.isSentRaw(t.afterEdit
+                    ? test.editResponse
+                    : (test.actualResponse
+                      ? test.actualResponse
+                      : test.response), owner);
                 });
               }
               for (const r of t['-triggers']) {

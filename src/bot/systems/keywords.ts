@@ -260,7 +260,7 @@ class Keywords extends System {
     });
 
     for (const k of keywords) {
-      const message = await (new Message(k.response).parse({ sender: opts.sender.username }));
+      const message = await (new Message(k.response).parse({ sender: opts.sender }));
       sendMessage(message, opts.sender);
     }
     return true;
