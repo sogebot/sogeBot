@@ -67,6 +67,11 @@
     </b-form-group>
 
     <b-form-group label-cols-sm="4" label-cols-lg="3"
+                  :label="translate('registry.alerts.layoutPicker.name')">
+      <layout-picker :layout.sync="data.layout"/>
+    </b-form-group>
+
+    <b-form-group label-cols-sm="4" label-cols-lg="3"
             :label="translate('registry.alerts.image.name')"
             label-for="image">
       <media :media.sync="data.image" type="image"/>
@@ -230,6 +235,7 @@ import { required } from 'vuelidate/lib/validators'
 @Component({
   components: {
     media: () => import('../../../../components/media'),
+    'layout-picker': () => import('./layout-picker'),
   }
 })
 export default class AlertsEditFollowForm extends Vue {

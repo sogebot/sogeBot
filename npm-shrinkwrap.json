@@ -3458,7 +3458,6 @@
         "p-timeout": {
           "version": "2.0.1",
           "dev": true,
-          "optional": true,
           "requires": {
             "p-finally": "^1.0.0"
           }
@@ -4603,14 +4602,6 @@
             "source-map": "^0.6.1",
             "supports-color": "^6.1.0"
           }
-        },
-        "schema-utils": {
-          "version": "2.0.1",
-          "dev": true,
-          "requires": {
-            "ajv": "^6.1.0",
-            "ajv-keywords": "^3.1.0"
-          }
         }
       }
     },
@@ -4784,7 +4775,6 @@
     "decompress-response": {
       "version": "3.3.0",
       "dev": true,
-      "optional": true,
       "requires": {
         "mimic-response": "^1.0.0"
       }
@@ -5955,7 +5945,6 @@
     "ext-list": {
       "version": "2.2.2",
       "dev": true,
-      "optional": true,
       "requires": {
         "mime-db": "^1.28.0"
       }
@@ -5963,7 +5952,6 @@
     "ext-name": {
       "version": "5.0.0",
       "dev": true,
-      "optional": true,
       "requires": {
         "ext-list": "^2.0.0",
         "sort-keys-length": "^1.0.0"
@@ -6096,6 +6084,14 @@
       "dev": true,
       "requires": {
         "flat-cache": "^2.0.1"
+      }
+    },
+    "file-loader": {
+      "version": "4.2.0",
+      "dev": true,
+      "requires": {
+        "loader-utils": "^1.2.3",
+        "schema-utils": "^2.0.0"
       }
     },
     "file-type": {
@@ -8269,8 +8265,7 @@
     },
     "mimic-response": {
       "version": "1.0.1",
-      "dev": true,
-      "optional": true
+      "dev": true
     },
     "miniget": {
       "version": "1.5.3"
@@ -9284,7 +9279,6 @@
     "p-timeout": {
       "version": "1.2.1",
       "dev": true,
-      "optional": true,
       "requires": {
         "p-finally": "^1.0.0"
       }
@@ -9615,8 +9609,7 @@
     },
     "prepend-http": {
       "version": "2.0.0",
-      "dev": true,
-      "optional": true
+      "dev": true
     },
     "preserve": {
       "version": "0.2.0",
@@ -9801,16 +9794,6 @@
       "requires": {
         "loader-utils": "^1.1.0",
         "schema-utils": "^2.0.1"
-      },
-      "dependencies": {
-        "schema-utils": {
-          "version": "2.0.1",
-          "dev": true,
-          "requires": {
-            "ajv": "^6.1.0",
-            "ajv-keywords": "^3.1.0"
-          }
-        }
       }
     },
     "rc": {
@@ -10339,11 +10322,10 @@
       "version": "1.2.4"
     },
     "schema-utils": {
-      "version": "1.0.0",
+      "version": "2.0.1",
       "dev": true,
       "requires": {
         "ajv": "^6.1.0",
-        "ajv-errors": "^1.0.0",
         "ajv-keywords": "^3.1.0"
       }
     },
@@ -10649,7 +10631,6 @@
     "sort-keys": {
       "version": "1.1.2",
       "dev": true,
-      "optional": true,
       "requires": {
         "is-plain-obj": "^1.0.0"
       }
@@ -10657,7 +10638,6 @@
     "sort-keys-length": {
       "version": "1.0.1",
       "dev": true,
-      "optional": true,
       "requires": {
         "sort-keys": "^1.0.0"
       }
@@ -11081,13 +11061,11 @@
     },
     "temp-dir": {
       "version": "1.0.0",
-      "dev": true,
-      "optional": true
+      "dev": true
     },
     "tempfile": {
       "version": "2.0.0",
       "dev": true,
-      "optional": true,
       "requires": {
         "temp-dir": "^1.0.0",
         "uuid": "^3.0.1"
@@ -11147,6 +11125,15 @@
         "worker-farm": "^1.7.0"
       },
       "dependencies": {
+        "schema-utils": {
+          "version": "1.0.0",
+          "dev": true,
+          "requires": {
+            "ajv": "^6.1.0",
+            "ajv-errors": "^1.0.0",
+            "ajv-keywords": "^3.1.0"
+          }
+        },
         "source-map-support": {
           "version": "0.5.12",
           "dev": true,
@@ -12065,6 +12052,35 @@
         "neo-async": {
           "version": "2.6.1",
           "dev": true
+        },
+        "schema-utils": {
+          "version": "1.0.0",
+          "dev": true,
+          "requires": {
+            "ajv": "^6.1.0",
+            "ajv-errors": "^1.0.0",
+            "ajv-keywords": "^3.1.0"
+          },
+          "dependencies": {
+            "ajv": {
+              "version": "6.10.0",
+              "dev": true,
+              "requires": {
+                "fast-deep-equal": "^2.0.1",
+                "fast-json-stable-stringify": "^2.0.0",
+                "json-schema-traverse": "^0.4.1",
+                "uri-js": "^4.2.2"
+              }
+            },
+            "ajv-errors": {
+              "version": "1.0.1",
+              "dev": true
+            },
+            "ajv-keywords": {
+              "version": "3.4.0",
+              "dev": true
+            }
+          }
         }
       }
     },

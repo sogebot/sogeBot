@@ -56,6 +56,10 @@ module.exports = [{
   module: {
     rules: [
       {
+        test: /\.(mp3)$/i,
+        use: 'file-loader',
+      },
+      {
         test: /\.(gif|png|jpe?g|svg)$/i,
         use: [
           'file-loader',

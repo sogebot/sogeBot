@@ -18,7 +18,7 @@ declare namespace Registry {
 
     export type Follow = {
       enabled: boolean;
-      layout: '1' | '2' | '3';
+      layout: '1' | '2' | '3'; /// TBD UI
       animationIn: AnimationIn; // TBD UI
       animationOut: AnimationOut; // TBD UI
       animationText: AnimationText; // TBD UI

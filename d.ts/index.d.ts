@@ -13,6 +13,11 @@ declare module '*.gif' {
   export default content;
 }
 
+declare module '*.mp3' {
+  const content: string;
+  export default content;
+}
+
 declare namespace NodeJS {
   export interface Global {
     linesParsed: number;
