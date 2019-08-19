@@ -18,7 +18,7 @@
 
     <b-card @click="layout_number = '3'">
       <b-card-text class="text-center">
-        <b-row no-gutters style="position: relative;top: 0.6rem;"">
+        <b-row no-gutters style="position: relative;top: 0.6rem;">
           <b-col class="ml-3" md="auto">
             <img src="https://via.placeholder.com/50x50.png?text=Placeholder+Image"/>
           </b-col>
