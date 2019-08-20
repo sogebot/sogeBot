@@ -17,59 +17,40 @@
     </panel>
 
     <loading v-if="state.loaded === $state.progress" />
+    <b-alert show variant="danger" v-else-if="state.loaded === $state.success && filtered.length === 0 && search.length > 0">
+      <fa icon="search"/> <span v-html="translate('registry.alerts.emptyAfterSearch').replace('$search', search)"/>
+    </b-alert>
+    <b-alert show v-else-if="state.loaded === $state.success && items.length === 0">
+      {{translate('registry.alerts.empty')}}
+    </b-alert>
     <b-table v-else :fields="fields" :items="filtered">
-      <template slot="description" slot-scope="data">
-        <small v-bind:class="{ 'text-muted': !data.value || data.value.length === 0 }">
-          {{ data.value && data.value.length !== 0 ? data.value : translate('not-available') }}
-        </small>
-      </template>
-      <template slot="type" slot-scope="data">
-        <div style="font-size: 1.2rem;">
-          {{ translate('registry.customvariables.types.' + data.value) }}
-        </div>
-      </template>
-      <template slot="currentValue" slot-scope="data">
-        <small v-bind:class="{ 'text-muted': !data.value || data.value.length === 0 }">
-          {{ data.value && data.value.length !== 0 ? data.value : translate('not-available') }}
-        </small>
-      </template>
       <template slot="additional-info" slot-scope="data">
-        <span v-if="data.item.type === 'eval'">
-          <strong>{{ translate('registry.customvariables.run-script') }}:</strong>
-          <template v-if="data.item.runEveryTypeValue > 0">
-            {{ data.item.runEvery / data.item.runEveryTypeValue }} {{ translate('registry.customvariables.runEvery.' + data.item.runEveryType) }}
-          </template>
-          <template v-else>
-            {{ translate('registry.customvariables.runEvery.' + data.item.runEveryType) }}
-          </template>
-          <div>
-            {{ translate('registry.customvariables.last-run') }} <strong>{{ data.item.runAt ? new Date(data.item.runAt).toLocaleString() : translate('commons.never') }}</strong>
-          </div>
+        <span :class="{'text-primary': data.item.alerts.follows.length > 0, 'text-muted': data.item.alerts.follows.length === 0}">
+          FOLLOW<span v-if="data.item.alerts.follows.length > 0">({{data.item.alerts.follows.length}})</span>
         </span>
-        <span v-if="data.item.type === 'options'">
-          <strong>{{ translate('registry.customvariables.usableOptions.name') }}:</strong>
-          {{ data.item.usableOptions }}
+        <span :class="{'text-primary': data.item.alerts.hosts.length > 0, 'text-muted': data.item.alerts.hosts.length === 0}">
+          HOSTS<span v-if="data.item.alerts.hosts.length > 0">({{data.item.alerts.hosts.length}})</span>
         </span>
-        <div v-if="data.item.readOnly">
-          <strong>{{ translate('registry.customvariables.isReadOnly') | capitalize }}</strong>
-        </div>
-
-        <div>
-          <strong>{{ translate('registry.customvariables.response.name') }}:</strong>
-          <span v-if="data.item.responseType === 0">{{ translate('registry.customvariables.response.default') }}</span>
-          <span v-if="data.item.responseType === 1">{{ translate('registry.customvariables.response.custom') }}</span>
-          <span v-if="data.item.responseType === 2">{{ translate('registry.customvariables.response.command') }}</span>
-          <i v-if="data.item.responseType === 1">{{ data.item.responseText }}</i>
-        </div>
-        <div>
-          <strong> {{ translate('registry.customvariables.permissionToChange') }}:</strong>
-          <span v-if="getPermissionName(data.item.permission)">{{ getPermissionName(data.item.permission) }}</span>
-          <span v-else class="text-danger"><i class="fas fa-exclamation-triangle"></i> Permission not found</span>
-        </div>
+        <span :class="{'text-primary': data.item.alerts.cheers.length > 0, 'text-muted': data.item.alerts.cheers.length === 0}">
+          CHEERS<span v-if="data.item.alerts.cheers.length > 0">({{data.item.alerts.cheers.length}})</span>
+        </span>
+        <span :class="{'text-primary': data.item.alerts.subs.length > 0, 'text-muted': data.item.alerts.subs.length === 0}">
+          SUBS<span v-if="data.item.alerts.subs.length > 0">({{data.item.alerts.subs.length}})</span>
+        </span>
+        <span :class="{'text-primary': data.item.alerts.resubs.length > 0, 'text-muted': data.item.alerts.resubs.length === 0}">
+          RESUBS<span v-if="data.item.alerts.resubs.length > 0">({{data.item.alerts.resubs.length}})</span>
+        </span>
       </template>
       <template slot="buttons" slot-scope="data">
-        <a v-bind:href="'#/registry/customVariables/edit/' + data.item._id" class="btn btn-primary btn-block"><fa icon="edit"/> {{ translate('dialog.buttons.edit') }}</a>
-        <button v-if="data.item.type === 'eval'" v-on:click="debouncedRunScript(data.item._id)" class="btn btn-secondary btn-block"><fa icon="cog"/> {{ translate('registry.customvariables.run-script') }}</button>
+        <div class="text-right">
+          <button-with-icon class="btn-only-icon btn-primary btn-reverse" icon="edit" v-bind:href="'#/registry/alerts/edit/' + data.item.id">
+            {{ translate('dialog.buttons.edit') }}
+          </button-with-icon>
+          <hold-button @trigger="del(data.item.id)" icon="trash" class="btn-danger btn-reverse btn-only-icon">
+            <template slot="title">{{translate('dialog.buttons.delete')}}</template>
+            <template slot="onHoldTitle">{{translate('dialog.buttons.hold-to-delete')}}</template>
+          </hold-button>
+        </div>
       </template>
     </b-table>
   </div>
@@ -91,28 +72,60 @@ import { Vue, Component } from 'vue-property-decorator';
   }
 })
 export default class customVariablesList extends Vue {
-  socket: SocketIOClient.Socket =  io('/registry/alerts', { query: "token=" + this.token });
+  socket: SocketIOClient.Socket =  io('/registries/alerts', { query: "token=" + this.token });
 
   fields = [
-    { key: 'variableName', label: '$_', sortable: true },
-    { key: 'description', label: this.translate('registry.customvariables.description.name') },
-    { key: 'type', sortable: true, label: this.translate('registry.customvariables.type.name') },
-    { key: 'currentValue', label: this.translate('registry.customvariables.currentValue.name') },
+    { key: 'name', label: this.translate('registry.alerts.name.name'), sortable: true },
     // virtual attributes
     { key: 'additional-info', label: this.translate('registry.customvariables.additional-info') },
     { key: 'buttons', label: '' },
   ];
 
-  items: any[] = [];
+  items: Registry.Alerts.Alert[] = [];
+  search: string = '';
 
   state: { loaded: number; } = { loaded: this.$state.progress }
 
-  get filtered() {
-    return this.items;
+  get filtered(): Registry.Alerts.Alert[] {
+    let items = this.items
+    if (this.search.trim() !== '') {
+      items = this.items.filter((o) => {
+        return o.name.trim().toLowerCase().includes(this.search.trim().toLowerCase())
+      })
+    }
+    return items.sort((a, b) => {
+      const A = a.name.toLowerCase();
+      const B = b.name.toLowerCase();
+      if (A < B)  { //sort string ascending
+        return -1;
+      }
+      if (A > B) {
+        return 1;
+      }
+      return 0; //default return value (no sorting)
+      })
+  }
+
+  del(id) {
+    this.socket.emit('delete', { where: { id }}, (err, deleted) => {
+      if (err) {
+        return console.error(err);
+      }
+      this.refresh();
+    })
+  }
+
+  refresh() {
+    this.state.loaded = this.$state.progress;
+    this.socket.emit('find', {}, (err, data: Registry.Alerts.Alert[]) => {
+      if (err) return console.error(err);
+      this.items = data;
+      this.state.loaded = this.$state.success;
+    })
   }
 
   mounted() {
-    this.state.loaded = this.$state.progress;
+    this.refresh();
   }
 }
 </script>

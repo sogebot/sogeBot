@@ -1,17 +1,17 @@
 <template>
   <b-card-group deck>
     <b-card :class="{'bg-secondary': layout_number === '1'}" @click="layout_number = '1'">
-      <b-card-text class="text-center text mb-0">text</b-card-text>
-      <b-card-text class="text-center m-0">
-        <fa icon="image" size="4x" class="text-muted"/>
-      </b-card-text>
-    </b-card>
-
-    <b-card :class="{'bg-secondary': layout_number === '2'}" @click="layout_number = '2'">
       <b-card-text class="text-center m-0">
         <fa icon="image" size="4x" class="text-muted"/>
       </b-card-text>
       <b-card-text class="text-center text pb-1">text</b-card-text>
+    </b-card>
+
+    <b-card :class="{'bg-secondary': layout_number === '2'}" @click="layout_number = '2'">
+      <b-card-text class="text-center text mb-0">text</b-card-text>
+      <b-card-text class="text-center m-0">
+        <fa icon="image" size="4x" class="text-muted"/>
+      </b-card-text>
     </b-card>
 
     <b-card :class="{'bg-secondary': layout_number === '3'}" @click="layout_number = '3'">

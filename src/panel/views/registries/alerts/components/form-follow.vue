@@ -245,7 +245,7 @@ export default class AlertsEditFollowForm extends Vue {
 
   @Watch('$v', { deep: true })
   emitValidation() {
-    this.$emit('update:isValid', !(!!this.$v.$invalid && !!this.$v.$dirty))
+    this.$emit('update:isValid', !this.$v.$error)
   }
 
   @Validations()
@@ -262,6 +262,7 @@ export default class AlertsEditFollowForm extends Vue {
           return { text: o.family, value: o.family }
         })
       })
+    this.emitValidation();
   }
 }
 </script>

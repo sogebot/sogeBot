@@ -6,9 +6,9 @@
           {{ translate('menu.registry') }}
           <small><i class="fas fa-angle-right"></i></small>
           {{ translate('menu.alerts') }}
-          <template v-if="state.loaded === $state.DONE && $route.params.id">
+          <template v-if="state.loaded === $state.success && $route.params.id">
             <small><i class="fas fa-angle-right"></i></small>
-            {{name}}
+            {{item.name}}
             <small>{{$route.params.id}}</small>
           </template>
         </span>
@@ -18,18 +18,18 @@
     <panel>
       <template v-slot:left>
         <button-with-icon class="btn-secondary btn-reverse" icon="caret-left" href="#/registry/alerts/list">{{translate('commons.back')}}</button-with-icon>
-        <hold-button v-if="$route.params.id" icon="trash" class="btn-danger" @trigger="remove()">
+        <hold-button v-if="$route.params.id && state.loaded === $state.success" icon="trash" class="btn-danger" @trigger="remove()">
           <template slot="title">{{translate('dialog.buttons.delete')}}</template>
           <template slot="onHoldTitle">{{translate('dialog.buttons.hold-to-delete')}}</template>
         </hold-button>
       </template>
-      <template v-slot:right>
+      <template v-slot:right v-if="state.loaded === $state.success">
         <b-alert show variant="info" v-if="pending" v-html="translate('dialog.changesPending')" class="mr-2 p-2 mb-0"></b-alert>
-        <state-button @click="save()" text="saveChanges" :state="state.save" :invalid="(!!$v.$invalid && !!$v.$dirty) || !isAllValid"/>
+        <state-button @click="save()" text="saveChanges" :state="state.save" :invalid="!!$v.$error || !isAllValid"/>
       </template>
     </panel>
 
-    <loading v-if="!state.loaded === $state.DONE" />
+    <loading v-if="state.loaded !== $state.success" />
     <b-form v-else>
       <b-form-group
         :label="translate('registry.alerts.name.name')"
@@ -158,14 +158,14 @@ Component.registerHooks([
   }
 })
 export default class AlertsEdit extends Vue {
-  socket = io('/registry/alerts', { query: "token=" + this.token });
+  socket = io('/registries/alerts', { query: "token=" + this.token });
 
   error: any = null;
 
   state: { loaded: number; save: number } = { loaded: this.$state.progress, save: this.$state.idle }
   pending: boolean = false;
 
-  supportedEvents: string[] = ['follows', 'cheers', 'subscribes', 'hosts', 'resubscribes']
+  supportedEvents: string[] = ['follows', 'cheers', 'subs', 'hosts', 'resubs']
   selectedTabIndex: number = 0;
 
   item: Registry.Alerts.Alert = {
@@ -176,7 +176,11 @@ export default class AlertsEdit extends Vue {
     loadStandardProfanityList: true,
     customProfanityList: [],
     alerts: {
-      follows: []
+      follows: [],
+      hosts: [],
+      cheers: [],
+      subs: [],
+      resubs: [],
     },
   }
 
@@ -215,17 +219,23 @@ export default class AlertsEdit extends Vue {
   validations = {
     item: {
       name: {required},
-      alerts: {
-        follows: {
-          messageTemplate: {required},
-        }
-      }
-    },
+    }
   }
 
   async mounted() {
     this.state.loaded = this.$state.progress;
-    this.state.loaded = this.$state.success;
+    if (this.$route.params.id) {
+      this.socket.emit('findOne', { id: this.$route.params.id }, (err, data: Registry.Alerts.Alert) => {
+        console.debug('Loaded', {data});
+        this.item = data;
+        this.state.loaded = this.$state.success;
+        this.$nextTick(() => {
+          this.pending = false;
+        });
+      })
+    } else {
+      this.state.loaded = this.$state.success;
+    }
   }
 
   beforeRouteUpdate(to, from, next) {
@@ -293,21 +303,34 @@ export default class AlertsEdit extends Vue {
   }
 
   async remove () {
-    /*
     await new Promise(resolve => {
-      this.socket.emit('delete', this.$route.params.id, () => {
+      this.socket.emit('delete', { where: { id: this.$route.params.id } }, () => {
         resolve();
       })
     })
-    this.$router.push({ name: 'CustomVariableList' });
-    */
+    this.$router.push({ name: 'alertsList' });
   }
 
   async save () {
     this.$v.$touch();
     if (!this.$v.$invalid) {
       this.state.save = this.$state.progress;
+      console.debug('Saving', this.item);
+      this.socket.emit('update', { key: 'id', items: [this.item] }, (err, data) => {
+        if (err) {
+          this.state.save = this.$state.fail;
+          return console.error(err);
+        }
 
+        this.state.save = this.$state.success;
+        this.pending = false;
+        this.$router.push({ name: 'alertsEdit', params: { id: String(data.id) } })
+
+        setTimeout(() => {
+          this.state.save = this.$state.idle;
+        }, 1000)
+      });
+    } else {
       setTimeout(() => {
         this.state.save = this.$state.idle;
       }, 1000)

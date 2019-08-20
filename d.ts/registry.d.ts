@@ -13,6 +13,10 @@ declare namespace Registry {
       customProfanityList: string[];
       alerts: {
         follows: Follow[];
+        hosts: [];
+        cheers: [];
+        subs: [];
+        resubs: [];
       };
     };
 
