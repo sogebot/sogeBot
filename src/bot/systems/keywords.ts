@@ -252,7 +252,7 @@ class Keywords extends System {
     }
 
     const keywords = (await global.db.engine.find(this.collection.data)).filter((o) => {
-      const regexp = `([\\b\\s]${o.keyword}[\\b\\s])|(^${o.keyword}[\\b\\s])|([\\b\\s]${o.keyword}$)|(^${o.keyword}$)`;
+      const regexp = `([!"#$%&'()*+,-.\\/:;<=>?\\b\\s]${o.keyword}[!"#$%&'()*+,-.\\/:;<=>?\\b\\s])|(^${o.keyword}[!"#$%&'()*+,-.\\/:;<=>?\\b\\s])|([!"#$%&'()*+,-.\\/:;<=>?\\b\\s]${o.keyword}$)|(^${o.keyword}$)`;
       const isFoundInMessage = XRegExp(regexp, 'giu').test(opts.message);
       const isEnabled = o.enabled;
       debug('keywords.run', `\n\t<\t${opts.message}\n\t?\t${o.keyword}\n\t-\tisFoundInMessage: ${isFoundInMessage}, isEnabled: ${isEnabled}\n\t-\t${regexp}`);
