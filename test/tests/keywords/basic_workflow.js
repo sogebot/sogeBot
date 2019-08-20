@@ -36,23 +36,23 @@ const successTests = [
     keyword: 'привет ты', response: randomString(),
     tests: [
       { type: 'add' },
-      { type: 'run', triggers: ['This line will be triggered привет ты', 'Hi how привет ты you'], '-triggers': ['This line wont be triggered'] },
+      { type: 'run', triggers: ['This line will be triggered привет ты', 'привет ты?', ',привет ты', 'Hi how привет ты you'], '-triggers': ['This line wont be triggered'] },
     ]
   },
   {
     keyword: 'hello.*|hi', response: randomString(),
     tests: [
       { type: 'add' },
-      { type: 'run', triggers: ['This line will be triggered hello', 'Hi how are you'], '-triggers': ['This line wont be triggered'] },
+      { type: 'run', triggers: ['This line will be triggered hello', 'This line will be triggered hello?', 'Hi how are you'], '-triggers': ['This line wont be triggered'] },
     ]
   },
   {
     keyword: 'ahoj', response: randomString(), editResponse: randomString(),
     tests: [
       { type: 'add' },
-      { type: 'run', triggers: ['ahoj', 'ahoj jak je', 'jak je ahoj'], '-triggers': ['ahojda', 'sorry jako'] },
+      { type: 'run', triggers: ['ahoj', 'ahoj jak je', 'jak je ahoj', ",ahoj", "ahoj?"], '-triggers': ['ahojda', 'sorry jako'] },
       { type: 'edit' },
-      { type: 'run', afterEdit: true, triggers: ['ahoj', 'ahoj jak je', 'jak je ahoj'], '-triggers': ['ahojda', 'sorry jako'] },
+      { type: 'run', afterEdit: true, triggers: ['ahoj', 'ahoj jak je', 'jak je ahoj', ",ahoj", "ahoj?"], '-triggers': ['ahojda', 'sorry jako'] },
     ]
   },
   {
