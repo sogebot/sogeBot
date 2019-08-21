@@ -7,7 +7,7 @@
     </template>
     <template v-else>
       <div class="row">
-        <div class="col-sm stream-info" @click="saveHighlight">
+        <div class="col-6 col-sm-4 col-md-4 col-lg-1 stream-info" @click="saveHighlight">
           <h2>
             <span>{{ translate('uptime') }}</span>
             <small>{{ translate('click-to-highlight') }}</small>
@@ -16,7 +16,7 @@
           <span class="stats">&nbsp;</span>
         </div>
 
-        <div class="col-sm stream-info" v-on:click="toggleViewerShow">
+        <div class="col-6 col-sm-4 col-md-4 col-lg-1 stream-info" v-on:click="toggleViewerShow">
           <h2>
             <span>{{ translate('viewers') }}</span>
             <small>{{ translate('click-to-toggle-display') }}</small>
@@ -28,7 +28,7 @@
           <span class="stats">&nbsp;</span>
         </div>
 
-        <div class="col-sm stream-info" v-on:click="toggleViewerShow">
+        <div class="col-6 col-sm-4 col-md-4 col-lg-1 stream-info" v-on:click="toggleViewerShow">
           <h2>
             <span>{{ translate('max-viewers') }}</span>
             <small>{{ translate('click-to-toggle-display') }}</small>
@@ -40,7 +40,7 @@
           <span class="stats" v-html="difference(averageStats.maxViewers, maxViewers)"></span>
         </div>
 
-        <div class="col-sm stream-info" v-on:click="toggleViewerShow">
+        <div class="col-6 col-sm-4 col-md-4 col-lg-1 stream-info" v-on:click="toggleViewerShow">
           <h2>
             <span>{{ translate('new-chatters') }}</span>
             <small>{{ translate('click-to-toggle-display') }}</small>
@@ -52,31 +52,31 @@
           <span class="stats" v-html="difference(averageStats.newChatters, newChatters)"></span>
         </div>
 
-        <div class="col-sm stream-info">
+        <div class="col-6 col-sm-4 col-md-4 col-lg-1 stream-info">
           <h2>{{ translate('chat-messages') }}</h2>
           <span class="data" v-bind:title="chatMessages">{{ shortenNumber(chatMessages, b_shortenNumber) }}</span>
           <span class="stats" v-html="difference(averageStats.chatMessages, chatMessages)"></span>
         </div>
 
-        <div class="col-sm stream-info">
+        <div class="col-6 col-sm-4 col-md-4 col-lg-1 stream-info">
           <h2>{{ translate('views') }}</h2>
           <span class="data" v-bind:title="currentViews">{{ shortenNumber(currentViews, b_shortenNumber) }}</span>
           <span class="stats" v-html="difference(averageStats.currentViews, currentViews)"></span>
         </div>
 
-        <div class="col-sm stream-info">
+        <div class="col-6 col-sm-4 col-md-4 col-lg-1 stream-info">
           <h2>{{ translate('hosts') }}</h2>
           <span class="data">{{ currentHosts }}</span>
           <span class="stats" id="curHostsChange">&nbsp;</span>
         </div>
 
-        <div class="col-sm stream-info">
+        <div class="col-6 col-sm-4 col-md-4 col-lg-1 stream-info">
           <h2>{{ translate('followers') }}</h2>
           <span class="data" v-bind:title="currentFollowers">{{ shortenNumber(currentFollowers, b_shortenNumber) }}</span>
           <span class="stats" v-html="difference(averageStats.currentFollowers, currentFollowers)"></span>
         </div>
 
-        <div class="col-sm stream-info">
+        <div class="col-6 col-sm-4 col-md-4 col-lg-1 stream-info">
           <h2>{{ translate('subscribers') }}</h2>
           <template v-if="broadcasterType !== ''">
             <span class="data">{{ currentSubscribers }}</span>
@@ -87,7 +87,7 @@
           </template>
         </div>
 
-        <div class="col-sm stream-info">
+        <div class="col-6 col-sm-4 col-md-4 col-lg-1 stream-info">
           <h2>{{ translate('bits') }}</h2>
           <template v-if="broadcasterType !== ''">
             <span class="data" v-bind:title="currentBits">{{ shortenNumber(currentBits, b_shortenNumber) }}</span>
@@ -98,13 +98,13 @@
           </template>
         </div>
 
-        <div class="col-sm stream-info">
+        <div class="col-6 col-sm-4 col-md-4 col-lg-1 stream-info">
           <h2>{{ translate('tips') }}</h2>
           <span class="data">{{ Number(currentTips).toFixed(2) }}</span><span class="data ml-0 pl-0">{{ currency }}</span>
           <span class="stats" v-html="difference(averageStats.currentTips, currentTips, false, currency)"></span>
         </div>
 
-        <div class="col-sm stream-info">
+        <div class="col-6 col-sm-4 col-md-4 col-lg-1 stream-info">
           <h2>{{ translate('watched-time') }}</h2>
           <span class="data">{{ Number(currentWatched / 1000 / 60 / 60).toFixed(1) }}h</span>
           <span class="stats" v-html="difference(averageStats.currentWatched / 1000 / 60 / 60, currentWatched / 1000 / 60 / 60, false, 'h', 1)"></span>
@@ -121,7 +121,7 @@
           <span  class="data" v-else>{{ translate('not-available') }}</span>
         </div>
 
-        <div class="col stream-info" @click="showGameAndTitleDlg">
+        <div class="col-md stream-info" @click="showGameAndTitleDlg">
           <h2>
             <span>{{ translate('title') }}</span>
             <small>{{ translate('click-to-change') }}</small>
@@ -130,7 +130,7 @@
           <span class="data" v-else>{{ translate('not-available') }}</span>
         </div>
 
-        <div class="col stream-info" @click="showGameAndTitleDlg">
+        <div class="col-md stream-info" @click="showGameAndTitleDlg">
           <h2>
             <span>{{ translate('tags') }}</span>
             <small>{{ translate('click-to-change') }}</small>
@@ -374,4 +374,27 @@
 </script>
 
 <style scoped>
+@media (max-width : 576px) {
+  .stream-info:first-child::before {
+    border-left: 0;
+  }
+  .stream-info:nth-child(2n-1)::before {
+    border-left: 0;
+  }
+}
+
+@media (min-width : 576px) and (max-width : 992px) {
+  .stream-info:first-child::before {
+    border-left: 0;
+  }
+  .stream-info:nth-child(3n+1)::before {
+    border-left: 0;
+  }
+}
+
+@media (min-width : 992px){
+  .stream-info:nth-child(13)::before {
+    border-left: 0;
+  }
+}
 </style>
