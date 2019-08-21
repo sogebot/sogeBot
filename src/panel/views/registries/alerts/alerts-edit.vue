@@ -24,6 +24,13 @@
         </hold-button>
       </template>
       <template v-slot:right v-if="state.loaded === $state.success">
+        <button-with-icon
+          :text="'/overlays/alerts/' + item.id"
+          :href="'/overlays/alerts/' + item.id"
+          class="btn-dark mr-3"
+          icon="link"
+          target="_blank"
+          />
         <b-alert show variant="info" v-if="pending" v-html="translate('dialog.changesPending')" class="mr-2 p-2 mb-0"></b-alert>
         <state-button @click="save()" text="saveChanges" :state="state.save" :invalid="!!$v.$error || !isAllValid"/>
       </template>
@@ -346,5 +353,14 @@ export default class AlertsEdit extends Vue {
     font-weight: inherit !important;
     text-indent: inherit !important;
     letter-spacing: inherit !important;
+  }
+</style>
+
+<style scoped>
+  .nav-pills {
+    padding: 0;
+  }
+  .nav-pills li a {
+    min-width: 300px;
   }
 </style>

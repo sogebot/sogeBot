@@ -77,6 +77,7 @@ export default class AlertsEditFollowForm extends Vue {
     padding: 1rem 0;
   }
   .text {
+    color: white;
     text-shadow: 0 0 2px #000, 0 0 3px #000, 0 0 4px #000, 0 0 5px #000;
     font-variant: small-caps;
 

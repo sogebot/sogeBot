@@ -23,7 +23,7 @@
     <b-alert show v-else-if="state.loaded === $state.success && items.length === 0">
       {{translate('registry.alerts.empty')}}
     </b-alert>
-    <b-table v-else :fields="fields" :items="filtered">
+    <b-table v-else :fields="fields" :items="filtered" hover small style="cursor: pointer;" @row-clicked="linkTo($event)">
       <template slot="additional-info" slot-scope="data">
         <span :class="{'text-primary': data.item.alerts.follows.length > 0, 'text-muted': data.item.alerts.follows.length === 0}">
           FOLLOW<span v-if="data.item.alerts.follows.length > 0">({{data.item.alerts.follows.length}})</span>
@@ -43,6 +43,13 @@
       </template>
       <template slot="buttons" slot-scope="data">
         <div class="text-right">
+          <button-with-icon
+            :text="'/overlays/alerts/' + data.item.id"
+            :href="'/overlays/alerts/' + data.item.id"
+            class="btn-dark btn-only-icon"
+            icon="link"
+            target="_blank"
+            />
           <button-with-icon class="btn-only-icon btn-primary btn-reverse" icon="edit" v-bind:href="'#/registry/alerts/edit/' + data.item.id">
             {{ translate('dialog.buttons.edit') }}
           </button-with-icon>
@@ -104,6 +111,11 @@ export default class customVariablesList extends Vue {
       }
       return 0; //default return value (no sorting)
       })
+  }
+
+  linkTo(item) {
+    console.debug('Clicked', item.id);
+    this.$router.push({ name: 'alertsEdit', params: { id: item.id } });
   }
 
   del(id) {
