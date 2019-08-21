@@ -1,10 +1,12 @@
 <template>
   <div v-if="isSystemEnabled">
     <div
-      class="btn"
+      class="btn btn-sm"
+      style="overflow: hidden;max-height: 30px;"
       @click="toggleDisplay()"
       v-bind:class="[completed === items.length ? btnClass + 'success' : btnClass + 'danger']">
-      {{completed}}/{{items.length}} {{commons.translate('systems.checklist.check')}}
+      {{completed}}/{{items.length}}
+      <span><fa icon="tasks"/></span>
     </div>
     <div v-bind:class="[bDisplay ? 'd-block' : 'd-none']" style="position: absolute; width:200px">
       <div class="list-group">
