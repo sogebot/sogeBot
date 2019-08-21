@@ -177,31 +177,6 @@ a.active {
   vertical-align: sub;
 }
 
-
-@media (max-width : 770px) {
-  .stream-info:first-child::before {
-    border-left: 0;
-  }
-  .stream-info:nth-child(2n-1)::before {
-    border-left: 0;
-  }
-}
-
-@media (min-width : 770px) and (max-width : 992px) {
-  .stream-info:first-child::before {
-    border-left: 0;
-  }
-  .stream-info:nth-child(3n+1)::before {
-    border-left: 0;
-  }
-}
-
-@media (min-width : 992px){
-  .stream-info:nth-child(12)::before {
-    border-left: 0;
-  }
-}
-
 .stream-info::before {
     content: "";
     position: absolute;
