@@ -69,7 +69,7 @@
       configuration = data
       moment.locale(data.lang) // set moment locale
       /* THEME */
-      if (data.theme === 'dark') {
+      if (data.core.ui.theme === 'dark') {
         $('head').append('<link rel="stylesheet" href="../dist/css/dark.css">')
       } else {
         $('head').append('<link rel="stylesheet" href="../dist/css/light.css">')
