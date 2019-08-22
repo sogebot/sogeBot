@@ -65,6 +65,12 @@ export default class AlertsEditFollowForm extends Vue {
     color: white;
     text-shadow: 0 0 2px #000, 0 0 3px #000, 0 0 4px #000, 0 0 5px #000;
     font-variant: small-caps;
-
+  }
+  .card-deck .card {
+    max-width: 75px;
+    min-width: 75px;
+    margin: 5px;
+    margin-left: 15px;
+    margin-right: 15px;
   }
 </style>
