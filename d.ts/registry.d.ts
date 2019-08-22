@@ -15,7 +15,7 @@ declare namespace Registry {
         follows: Follow[];
         hosts: Host[];
         raids: Host[];
-        tips: Tip[];
+        tips: Cheer[];
         cheers: Cheer[];
         subs: Sub[];
       };
@@ -71,26 +71,6 @@ declare namespace Registry {
     export type Sub = {
       messageTemplateResub: string;
       message: {
-        allowEmotes: {
-          twitch: boolean;
-          ffz: boolean;
-          bttv: boolean;
-        };
-        font: {
-          family: string;
-          size: number;
-          borderPx: number;
-          borderColor: string;
-          weight: number;
-          color: string;
-        };
-      };
-    } & CommonSettings;
-
-    export type Tip = {
-      minAmountToAlert: number;
-      message: {
-        minAmountToShow: number;
         allowEmotes: {
           twitch: boolean;
           ffz: boolean;

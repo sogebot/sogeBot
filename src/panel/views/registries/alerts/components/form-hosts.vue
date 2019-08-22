@@ -12,6 +12,33 @@
     <b-form-group
       label-cols-sm="4"
       label-cols-lg="3"
+      label-for="showAutoHost"
+      :label="translate('registry.alerts.showAutoHost')"
+    >
+      <b-form-checkbox id="showAutoHost" v-model="data.showAutoHost" name="showAutoHost" switch></b-form-checkbox>
+    </b-form-group>
+
+    <b-form-group
+      label-cols-sm="4"
+      label-cols-lg="3"
+      :label="translate('registry.alerts.minViewers.name')"
+      label-for="messageTemplate"
+      :description="translate('registry.alerts.minViewers.help')"
+    >
+      <b-form-input
+        id="minViewers"
+        v-model="data.minViewers"
+        type="number"
+        min="0"
+        :placeholder="translate('registry.alerts.minViewers.placeholder')"
+        @input="$v.data.$touch()"
+        :state="$v.data.minViewers.$invalid && $v.data.minViewers.$dirty ? 'invalid' : null"
+      ></b-form-input>
+    </b-form-group>
+
+    <b-form-group
+      label-cols-sm="4"
+      label-cols-lg="3"
       :label="translate('registry.alerts.messageTemplate.name')"
       label-for="messageTemplate"
       :description="translate('registry.alerts.messageTemplate.help')"
@@ -230,7 +257,7 @@ import { Vue, Component, PropSync, Watch } from 'vue-property-decorator';
 import axios from 'axios';
 
 import { Validations } from 'vuelidate-property-decorators';
-import { required } from 'vuelidate/lib/validators'
+import { required, minValue } from 'vuelidate/lib/validators'
 
 @Component({
   components: {
@@ -252,6 +279,7 @@ export default class AlertsEditFollowForm extends Vue {
   validations = {
     data: {
       messageTemplate: {required},
+      minViewers: {required, minValue: minValue(0)},
     }
   }
 

@@ -25,6 +25,7 @@
       </template>
       <template v-slot:right v-if="state.loaded === $state.success">
         <button-with-icon
+          v-if="$route.params.id && state.loaded === $state.success"
           :text="'/overlays/alerts/' + item.id"
           :href="'/overlays/alerts/' + item.id"
           class="btn-dark mr-3"
@@ -112,7 +113,9 @@
                 </template>
                 <p class="p-3">
                   <form-follow v-if="event === 'follows'" :alert.sync="alert" :isValid.sync="isValid[event][idx]" />
-                  <form-cheers v-else-if="event === 'cheers'" :alert.sync="alert" :isValid.sync="isValid[event][idx]" />
+                  <form-cheers v-else-if="event === 'cheers' || event === 'tips'" :alert.sync="alert" :isValid.sync="isValid[event][idx]" />
+                  <form-subs v-else-if="event === 'subs'" :alert.sync="alert" :isValid.sync="isValid[event][idx]" />
+                  <form-hosts v-else-if="event === 'hosts' || event === 'raids'" :alert.sync="alert" :isValid.sync="isValid[event][idx]" />
                 </p>
               </b-tab>
 
@@ -157,6 +160,8 @@ Component.registerHooks([
     'loading': () => import('../../../components/loading.vue'),
     'form-follow': () => import('./components/form-follow.vue'),
     'form-cheers': () => import('./components/form-cheers.vue'),
+    'form-subs': () => import('./components/form-subs.vue'),
+    'form-hosts': () => import('./components/form-hosts.vue'),
   },
   filters: {
     capitalize: function (value) {
@@ -196,8 +201,18 @@ export default class AlertsEdit extends Vue {
 
   isValid: {
     follows: boolean[];
+    cheers: boolean[];
+    subs: boolean[];
+    tips: boolean[];
+    hosts: boolean[];
+    raids: boolean[];
   } = {
     follows: [],
+    cheers: [],
+    subs: [],
+    tips: [],
+    hosts: [],
+    raids: [],
   };
 
   get customProfanityList() {

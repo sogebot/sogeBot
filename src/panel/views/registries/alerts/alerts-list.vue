@@ -31,14 +31,17 @@
         <span :class="{'text-primary': data.item.alerts.hosts.length > 0, 'text-muted': data.item.alerts.hosts.length === 0}">
           HOSTS<span v-if="data.item.alerts.hosts.length > 0">({{data.item.alerts.hosts.length}})</span>
         </span>
+        <span :class="{'text-primary': data.item.alerts.raids.length > 0, 'text-muted': data.item.alerts.raids.length === 0}">
+          RAID<span v-if="data.item.alerts.raids.length > 0">({{data.item.alerts.raids.length}})</span>
+        </span>
         <span :class="{'text-primary': data.item.alerts.cheers.length > 0, 'text-muted': data.item.alerts.cheers.length === 0}">
           CHEERS<span v-if="data.item.alerts.cheers.length > 0">({{data.item.alerts.cheers.length}})</span>
         </span>
         <span :class="{'text-primary': data.item.alerts.subs.length > 0, 'text-muted': data.item.alerts.subs.length === 0}">
           SUBS<span v-if="data.item.alerts.subs.length > 0">({{data.item.alerts.subs.length}})</span>
         </span>
-        <span :class="{'text-primary': data.item.alerts.resubs.length > 0, 'text-muted': data.item.alerts.resubs.length === 0}">
-          RESUBS<span v-if="data.item.alerts.resubs.length > 0">({{data.item.alerts.resubs.length}})</span>
+        <span :class="{'text-primary': data.item.alerts.tips.length > 0, 'text-muted': data.item.alerts.tips.length === 0}">
+          TIPS<span v-if="data.item.alerts.tips.length > 0">({{data.item.alerts.tips.length}})</span>
         </span>
       </template>
       <template slot="buttons" slot-scope="data">

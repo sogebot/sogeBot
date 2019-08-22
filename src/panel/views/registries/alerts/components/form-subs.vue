@@ -22,7 +22,24 @@
         type="text"
         :placeholder="translate('registry.alerts.messageTemplate.placeholder')"
         @input="$v.data.$touch()"
-        :state="$v.data.$invalid && $v.data.messageTemplate.$dirty ? 'invalid' : null"
+        :state="$v.data.messageTemplate.$invalid && $v.data.messageTemplate.$dirty ? 'invalid' : null"
+      ></b-form-input>
+    </b-form-group>
+
+    <b-form-group
+      label-cols-sm="4"
+      label-cols-lg="3"
+      :label="translate('registry.alerts.messageTemplateResub.name')"
+      label-for="messageTemplate"
+      :description="translate('registry.alerts.messageTemplateResub.help')"
+    >
+      <b-form-input
+        id="messageTemplateResub"
+        v-model="data.messageTemplateResub"
+        type="text"
+        :placeholder="translate('registry.alerts.messageTemplateResub.placeholder')"
+        @input="$v.data.$touch()"
+        :state="$v.data.messageTemplateResub.$invalid && $v.data.messageTemplateResub.$dirty ? 'invalid' : null"
       ></b-form-input>
     </b-form-group>
 
@@ -114,12 +131,119 @@
 
     <b-card no-body>
       <b-card-header header-tag="header" class="p-1" role="tab">
+        <b-button block href="#" v-b-toggle.accordion-2 variant="light" class="text-left">{{translate('registry.alerts.message.setting')}}</b-button>
+      </b-card-header>
+      <b-collapse id="accordion-2" accordion="message-accordion" role="tabpanel">
+        <b-card-body>
+          <b-form-group
+            label-cols-sm="4"
+            label-cols-lg="3"
+            :label="translate('registry.alerts.allowEmotes.name')">
+            <b-form-checkbox v-model="data.message.allowEmotes.twitch" name="twitch">Twitch</b-form-checkbox>
+            <b-form-checkbox v-model="data.message.allowEmotes.ffz" name="ffz">FrankenFaceZ</b-form-checkbox>
+            <b-form-checkbox v-model="data.message.allowEmotes.bttv" name="bttv">BetterTTV</b-form-checkbox>
+          </b-form-group>
+
+          <b-form-group label-cols-sm="4" label-cols-lg="3"
+                       :label="translate('registry.alerts.font.name')">
+            <b-form-select v-model="data.message.font.family" :options="fonts" plain></b-form-select>
+          </b-form-group>
+
+          <b-form-group label-cols-sm="4" label-cols-lg="3"
+                  :label="translate('registry.alerts.font.size.name')"
+                  label-for="font.size">
+            <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
+              <b-form-input
+                id="font.size"
+                v-model="data.message.font.size"
+                type="range"
+                min="1"
+                max="200"
+                step="1"
+              ></b-form-input>
+              <b-input-group-text slot="append" class="pr-3 pl-3">
+                <div style="width: 3rem;">
+                  {{data.message.font.size}}px
+                </div>
+              </b-input-group-text>
+            </b-input-group>
+          </b-form-group>
+
+          <b-form-group label-cols-sm="4" label-cols-lg="3"
+                  :label="translate('registry.alerts.font.weight.name')"
+                  label-for="font.weight">
+            <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
+              <b-form-input
+                id="font.weight"
+                v-model="data.message.font.weight"
+                type="range"
+                min="100"
+                max="900"
+                step="100"
+              ></b-form-input>
+              <b-input-group-text slot="append" class="pr-3 pl-3">
+                <div style="width: 3rem;">
+                  {{ data.message.font.weight}}
+                </div>
+              </b-input-group-text>
+            </b-input-group>
+          </b-form-group>
+
+          <b-form-group label-cols-sm="4" label-cols-lg="3"
+                  :label="translate('registry.alerts.font.borderPx.name')"
+                  label-for="font.borderPx">
+            <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
+              <b-form-input
+                id="font.borderPx"
+                v-model="data.message.font.borderPx"
+                type="range"
+                min="0"
+                max="100"
+                step="1"
+              ></b-form-input>
+              <b-input-group-text slot="append" class="pr-3 pl-3">
+                <div style="width: 3rem;">
+                  {{ data.message.font.borderPx}}px
+                </div>
+              </b-input-group-text>
+            </b-input-group>
+          </b-form-group>
+
+          <b-form-group label-cols-sm="4" label-cols-lg="3"
+                  :label="translate('registry.alerts.font.borderColor.name')"
+                  label-for="font.borderColor">
+            <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
+              <b-form-input
+                id="font.borderColor"
+                v-model="data.message.font.borderColor"
+                type="color"
+              ></b-form-input>
+            </b-input-group>
+          </b-form-group>
+
+          <b-form-group label-cols-sm="4" label-cols-lg="3"
+                  :label="translate('registry.alerts.font.color.name')"
+                  label-for="font.color">
+            <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
+              <b-form-input
+                id="font.color"
+                v-model="data.message.font.color"
+                type="color"
+              ></b-form-input>
+            </b-input-group>
+          </b-form-group>
+        </b-card-body>
+      </b-collapse>
+    </b-card>
+
+    <b-card no-body>
+      <b-card-header header-tag="header" class="p-1" role="tab">
         <b-button block href="#" v-b-toggle.accordion-1 variant="light" class="text-left">{{translate('registry.alerts.font.setting')}}</b-button>
       </b-card-header>
       <b-collapse id="accordion-1" accordion="my-accordion" role="tabpanel">
         <b-card-body>
           <b-form-group label-cols-sm="4" label-cols-lg="3"
-                       :label="translate('registry.alerts.font.name')">
+                       :label="translate('registry.alerts.alertDurationInMs.name')">
             <b-form-select v-model="data.font.family" :options="fonts" plain></b-form-select>
           </b-form-group>
 
@@ -230,7 +354,7 @@ import { Vue, Component, PropSync, Watch } from 'vue-property-decorator';
 import axios from 'axios';
 
 import { Validations } from 'vuelidate-property-decorators';
-import { required } from 'vuelidate/lib/validators'
+import { required, minValue } from 'vuelidate/lib/validators'
 
 @Component({
   components: {
@@ -252,6 +376,11 @@ export default class AlertsEditFollowForm extends Vue {
   validations = {
     data: {
       messageTemplate: {required},
+      messageTemplateResub: {required},
+      minAmountToAlert: {required, minValue: minValue(0)},
+      message: {
+        minAmountToShow: {required, minValue: minValue(0)},
+      }
     }
   }
 
@@ -268,12 +397,13 @@ export default class AlertsEditFollowForm extends Vue {
 </script>
 
 <style>
-  .col-form-label {
+  .col-form-label, .custom-control-label {
     font-size: 1rem !important;
     font-variant: inherit !important;
     font-weight: inherit !important;
     text-indent: inherit !important;
     letter-spacing: inherit !important;
+    text-transform: inherit !important;
   }
 
   .custom-switch {
