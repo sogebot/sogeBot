@@ -6,27 +6,28 @@ declare namespace Registry {
 
     export type Alert = {
       id: string;
-      name: string,
+      name: string;
       alertDelayInMs: number;
       profanityFilterType: 'disabled' | 'replace-with-asterisk' | 'replace-with-happy-words' | 'hide-messages' | 'disable-alerts';
       loadStandardProfanityList: boolean;
       customProfanityList: string[];
       alerts: {
         follows: Follow[];
-        hosts: [];
-        cheers: [];
-        subs: [];
-        resubs: [];
+        hosts: Host[];
+        raids: Host[];
+        tips: Tip[];
+        cheers: Cheer[];
+        subs: Sub[];
       };
     };
 
-    export type Follow = {
+    export type CommonSettings = {
       enabled: boolean;
+      messageTemplate: string;
       layout: '1' | '2' | '3' | '4' | '5';
       animationIn: AnimationIn; // TBD UI
       animationOut: AnimationOut; // TBD UI
       animationText: AnimationText; // TBD UI
-      messageTemplate: string;
       image: string;
       sound: string;
       soundVolume: number;
@@ -44,5 +45,71 @@ declare namespace Registry {
         highlightcolor: string;
       };
     };
+
+    export type Follow = CommonSettings;
+
+    export type Cheer = {
+      minAmountToAlert: number;
+      message: {
+        minAmountToShow: number;
+        allowEmotes: {
+          twitch: boolean;
+          ffz: boolean;
+          bttv: boolean;
+        };
+        font: {
+          family: string;
+          size: number;
+          borderPx: number;
+          borderColor: string;
+          weight: number;
+          color: string;
+        };
+      };
+    } & CommonSettings;
+
+    export type Sub = {
+      messageTemplateResub: string;
+      message: {
+        allowEmotes: {
+          twitch: boolean;
+          ffz: boolean;
+          bttv: boolean;
+        };
+        font: {
+          family: string;
+          size: number;
+          borderPx: number;
+          borderColor: string;
+          weight: number;
+          color: string;
+        };
+      };
+    } & CommonSettings;
+
+    export type Tip = {
+      minAmountToAlert: number;
+      message: {
+        minAmountToShow: number;
+        allowEmotes: {
+          twitch: boolean;
+          ffz: boolean;
+          bttv: boolean;
+        };
+        font: {
+          family: string;
+          size: number;
+          borderPx: number;
+          borderColor: string;
+          weight: number;
+          color: string;
+        };
+      };
+    } & CommonSettings;
+
+    export type Host = {
+      showAutoHost: boolean;
+      minViewers: number;
+    } & CommonSettings;
   }
 }

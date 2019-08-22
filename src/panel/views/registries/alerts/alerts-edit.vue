@@ -108,10 +108,11 @@
                   <fa icon="exclamation-circle" v-if="!isValid[event][idx]" class="text-danger"/>
                   <fa :icon="['fas', 'circle']" v-else-if="alert.enabled"/>
                   <fa :icon="['far', 'circle']" v-else/>
-                  Alert {{ idx + 1 }}
+                  Variant {{ idx + 1 }}
                 </template>
                 <p class="p-3">
                   <form-follow v-if="event === 'follows'" :alert.sync="alert" :isValid.sync="isValid[event][idx]" />
+                  <form-cheers v-else-if="event === 'cheers'" :alert.sync="alert" :isValid.sync="isValid[event][idx]" />
                 </p>
               </b-tab>
 
@@ -155,6 +156,7 @@ Component.registerHooks([
   components: {
     'loading': () => import('../../../components/loading.vue'),
     'form-follow': () => import('./components/form-follow.vue'),
+    'form-cheers': () => import('./components/form-cheers.vue'),
   },
   filters: {
     capitalize: function (value) {
@@ -172,7 +174,7 @@ export default class AlertsEdit extends Vue {
   state: { loaded: number; save: number } = { loaded: this.$state.progress, save: this.$state.idle }
   pending: boolean = false;
 
-  supportedEvents: string[] = ['follows', 'cheers', 'subs', 'hosts', 'resubs']
+  supportedEvents: string[] = ['follows', 'cheers', 'subs', 'tips', 'hosts', 'raids']
   selectedTabIndex: number = 0;
 
   item: Registry.Alerts.Alert = {
@@ -185,9 +187,10 @@ export default class AlertsEdit extends Vue {
     alerts: {
       follows: [],
       hosts: [],
+      raids: [],
       cheers: [],
       subs: [],
-      resubs: [],
+      tips: [],
     },
   }
 
@@ -279,31 +282,113 @@ export default class AlertsEdit extends Vue {
   }
 
   newAlert() {
+    const _default: Omit<Registry.Alerts.CommonSettings, "messageTemplate">  = {
+      enabled: true,
+      layout: '1',
+      animationIn: 'fade-in',
+      animationOut: 'fade-out',
+      animationText: 'wiggle',
+      image: defaultImage,
+      sound: defaultAudio,
+      soundVolume: 20,
+      alertDurationInMs: 10000,
+      alertTextDelayInMs: 0,
+      enableAdvancedMode: false,
+      font: {
+        family: 'PT Sans',
+        size: 24,
+        borderPx: 5,
+        borderColor: '#000000',
+        weight: 800,
+        color: '#ffffff',
+        highlightcolor: '#00ff00',
+      },
+    };
+
+    this.isValid[this.supportedEvents[this.selectedTabIndex]].push(true);
     switch(this.supportedEvents[this.selectedTabIndex]) {
       case 'follows':
-        this.isValid.follows.push(true);
         this.item.alerts.follows.push({
-          enabled: true,
-          layout: '1',
-          animationIn: 'fade-in',
-          animationOut: 'fade-out',
-          animationText: 'wiggle',
-          messageTemplate: 'Thanks for follow {name}!',
-          image: defaultImage,
-          sound: defaultAudio,
-          soundVolume: 20,
-          alertDurationInMs: 10000,
-          alertTextDelayInMs: 0,
-          enableAdvancedMode: false,
-          font: {
-            family: 'PT Sans',
-            size: 24,
-            borderPx: 5,
-            borderColor: '#000000',
-            weight: 800,
-            color: '#ffffff',
-            highlightcolor: '#00ff00',
+          messageTemplate: '{name} is now following!',
+          ..._default,
+        })
+        break;
+      case 'cheers':
+        this.item.alerts.cheers.push({
+          minAmountToAlert: 0,
+          messageTemplate: '{name} cheered! x{amount}',
+          message: {
+            minAmountToShow: 0,
+            allowEmotes: {
+              twitch: true, ffz: true, bttv: true
+            },
+            font: {
+              family: 'PT Sans',
+              size: 12,
+              borderPx: 2,
+              borderColor: '#000000',
+              weight: 500,
+              color: '#ffffff',
+            },
           },
+          ..._default,
+        })
+        break;
+      case 'subs':
+        this.item.alerts.subs.push({
+          messageTemplate: '{name} just subscribed!',
+          messageTemplateResub: '{name} just resubscribed! {amount}',
+          message: {
+            allowEmotes: {
+              twitch: true, ffz: true, bttv: true
+            },
+            font: {
+              family: 'PT Sans',
+              size: 12,
+              borderPx: 2,
+              borderColor: '#000000',
+              weight: 500,
+              color: '#ffffff',
+            },
+          },
+          ..._default,
+        })
+        break;
+      case 'tips':
+        this.item.alerts.tips.push({
+          messageTemplate: '{name} donated {amount}!',
+          minAmountToAlert: 0,
+          message: {
+            minAmountToShow: 0,
+            allowEmotes: {
+              twitch: true, ffz: true, bttv: true
+            },
+            font: {
+              family: 'PT Sans',
+              size: 12,
+              borderPx: 2,
+              borderColor: '#000000',
+              weight: 500,
+              color: '#ffffff',
+            },
+          },
+          ..._default,
+        })
+        break;
+      case 'hosts':
+        this.item.alerts.hosts.push({
+          showAutoHost: false,
+          minViewers: 0,
+          messageTemplate: '{name} is now hosting my stream with {count} viewers!',
+          ..._default,
+        })
+        break;
+      case 'raids':
+        this.item.alerts.raids.push({
+          showAutoHost: false,
+          minViewers: 0,
+          messageTemplate: '{name} is raiding with a party of {count}!',
+          ..._default,
         })
         break;
     }
