@@ -1,9 +1,9 @@
 <template>
   <b-input-group>
     <b-form-select v-model="_condition" :options="options" class="col" plain :disabled="event === 'follow'"></b-form-select>
-
     <b-form-select v-if="_condition === 'random'" v-model="_amount" :options="randomOptions" class="col" plain></b-form-select>
     <b-form-input
+      :state="state"
       v-else
       v-model="_amount"
       type="number"
@@ -18,6 +18,7 @@ import { Vue, Component, Prop, PropSync, Watch } from 'vue-property-decorator';
 @Component({})
 export default class Variant extends Vue {
   @Prop() event !: string
+  @Prop() state !: boolean
   @PropSync('condition') _condition !: string
   @PropSync('amount') _amount !: number
 

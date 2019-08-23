@@ -35,6 +35,7 @@
       <variant
         :condition.sync="data.variantCondition"
         :amount.sync="data.variantAmount"
+        :state="$v.data.variantAmount.$invalid && $v.data.variantAmount.$dirty ? 'invalid' : null"
       ></variant>
     </b-form-group>
 
@@ -60,7 +61,7 @@
         type="text"
         :placeholder="translate('registry.alerts.messageTemplate.placeholder')"
         @input="$v.data.$touch()"
-        :state="$v.data.$invalid && $v.data.messageTemplate.$dirty ? 'invalid' : null"
+        :state="$v.data.messageTemplate.$invalid && $v.data.messageTemplate.$dirty ? 'invalid' : null"
       ></b-form-input>
     </b-form-group>
 
@@ -333,10 +334,16 @@ export default class AlertsEditFollowForm extends Vue {
     this.$emit('update:isValid', !this.$v.$error)
   }
 
+  @Watch('data.variantAmount')
+  triggerInput() {
+    this.$v.$touch();
+  }
+
   @Validations()
   validations = {
     data: {
       messageTemplate: {required},
+      variantAmount: {required, minValue: minValue(0)},
     }
   }
 

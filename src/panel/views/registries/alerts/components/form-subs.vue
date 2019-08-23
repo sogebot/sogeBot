@@ -35,6 +35,7 @@
       <variant
         :condition.sync="data.variantCondition"
         :amount.sync="data.variantAmount"
+        :state="$v.data.variantAmount.$invalid && $v.data.variantAmount.$dirty ? 'invalid' : null"
       ></variant>
     </b-form-group>
 
@@ -453,6 +454,7 @@ export default class AlertsEditFollowForm extends Vue {
     data: {
       messageTemplate: {required},
       messageTemplateResub: {required},
+      variantAmount: {required, minValue: minValue(0)},
       minAmountToAlert: {required, minValue: minValue(0)},
       message: {
         minAmountToShow: {required, minValue: minValue(0)},
