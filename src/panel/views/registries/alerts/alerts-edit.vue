@@ -107,7 +107,7 @@
               <b-tab :active="idx === 0" v-for="(alert, idx) of item.alerts[event]" :key="event + idx">
                 <template slot="title">
                   <fa icon="exclamation-circle" v-if="!isValid[event][idx]" class="text-danger"/>
-                  <fa :icon="['fas', 'circle']" v-else-if="alert.enabled"/>
+                  <fa :icon="['far', 'check-circle']" v-else-if="alert.enabled"/>
                   <fa :icon="['far', 'circle']" v-else/>
 
                   <template v-if="alert.title.length > 0">{{alert.title}}</template>
