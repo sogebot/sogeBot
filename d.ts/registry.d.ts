@@ -1,8 +1,26 @@
 declare namespace Registry {
   namespace Alerts {
-    type AnimationIn = 'fade-in' | 'zoom-in';
-    type AnimationOut = 'fade-out' | 'zoom-out';
-    type AnimationText = 'wiggle';
+    type AnimationIn
+      = 'fadeIn' | 'fadeInDown' | 'fadeInLeft' | 'fadeInRight'
+      | 'fadeInUp' | 'fadeInDownBig' | 'fadeInLeftBig' | 'fadeInRightBig'
+      | 'fadeInUpBig' | 'bounceIn' | 'bounceInDown' | 'bounceInLeft'
+      | 'bounceInRight' | 'bounceInUp' | 'flipInX' | 'flipInY' | 'lightSpeedIn'
+      | 'rotateIn' | 'rotateInDownLeft' | 'rotateInDownRight' | 'rotateInUpLeft'
+      | 'rotateInUpRight' | 'slideInDown' | 'slideInLeft' | 'slideInRight'
+      | 'slideInUp' | 'zoomIn' | 'zoomInDown' | 'zoomInLeft' | 'zoomInRight'
+      | 'zoomInUp' | 'rollIn' | 'jackInTheBox';
+    type AnimationOut
+      = 'fadeOut' | 'fadeOutDown' | 'fadeOutLeft' | 'fadeOutRight' | 'fadeOutUp'
+      | 'fadeOutDownBig' | 'fadeOutLeftBig' | 'fadeOutRightBig' | 'fadeOutUpBig'
+      | 'bounceOut' | 'bounceOutDown' | 'bounceOutLeft' | 'bounceOutRight'
+      | 'bounceOutUp' | 'flipOutX' | 'flipOutY' | 'lightSpeedOut' | 'rotateOut'
+      | 'rotateOutDownLeft' | 'rotateOutDownRight' | 'rotateOutUpLeft'
+      | 'rotateOutUpRight' | 'slideOutDown' | 'slideOutLeft' | 'slideOutRight'
+      | 'slideOutUp' | 'zoomOut' | 'zoomOutDown' | 'zoomOutLeft' | 'zoomOutRight'
+      | 'zoomOutUp' | 'rollOut';
+    type AnimationText
+      = 'none' | 'bounce' | 'bounce2' | 'flip' | 'flash' | 'pulse2' | 'rubberBand'
+      | 'shake2' | 'swing' | 'tada' | 'wave' | 'wobble' | 'wiggle' | 'wiggle2' | 'jello';
 
     export type Alert = {
       id: string;

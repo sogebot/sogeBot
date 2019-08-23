@@ -22,23 +22,23 @@
     </b-card>
     <b-card v-else-if="type === 'audio'">
       <b-card-text v-show="data.length > 0" :style="{position: data.length === 0 ? 'absolute' : 'inherit'}">
-        <audio :src="data" ref="audio" controls="true" preload="metadata" style="visibility:hidden; position: absolute;" ></audio>
-        <av-line canv-class="w-100" ref-link="audio" :canv-width="1000" v-show="data.length > 0"></av-line>
+        <audio :src="data" :ref="uuid" controls="true" preload="metadata" style="visibility:hidden; position: absolute;" ></audio>
+        <av-line canv-class="w-100" :ref-link="uuid" :canv-width="1000" v-show="data.length > 0"></av-line>
       </b-card-text>
       <b-card-text class="absolute">
         <b-button squared variant="outline-danger" class="border-0" @click="data = ''" v-if="data.length > 0">
           <fa icon="times" class="mr-1"/> {{ translate('dialog.buttons.delete') }}
         </b-button>
-        <b-button squared variant="outline-primary" class="border-0" v-if="data.length > 0" @click="$refs.audio.play()">
+        <b-button squared variant="outline-primary" class="border-0" v-if="data.length > 0" @click="$refs[uuid].play()">
           <fa icon="play" class="mr-1"/> {{ translate('dialog.buttons.play') }} ({{duration}}s)
         </b-button>
-        <b-button squared variant="outline-dark" class="border-0" @click="$refs.uploadAudio.click()">
+        <b-button squared variant="outline-dark" class="border-0" @click="$refs['uploadAudio-' + uuid].click()">
           <fa icon="upload" class="mr-1"/> {{ translate('dialog.buttons.upload.idle') }}
         </b-button>
         <input
           class="d-none"
           type="file"
-          ref="uploadAudio"
+          :ref="'uploadAudio-' + uuid"
           @change="filesChange($event.target.files)"
           accept="audio/*"/>
       </b-card-text>
@@ -48,6 +48,7 @@
 
 <script lang="ts">
 import { Vue, Component, PropSync, Prop, Watch } from 'vue-property-decorator';
+import uuid from 'uuid/v4';
 
 import AudioVisual from 'vue-audio-visual'
 Vue.use(AudioVisual)
@@ -58,6 +59,7 @@ export default class MediaForm extends Vue {
   @Prop() readonly type !: 'image' | 'audio';
   @Prop() readonly volume !: number;
 
+  uuid: string = uuid();
   interval = 0;
   duration = 0
 
@@ -65,7 +67,7 @@ export default class MediaForm extends Vue {
   @Watch('data')
   setVolume() {
     if (this.type === 'audio' && this.data.length > 0) {
-      (this.$refs.audio as HTMLAudioElement).volume = this.volume / 100;
+      (this.$refs[this.uuid] as HTMLAudioElement).volume = this.volume / 100;
     }
   }
 
@@ -77,7 +79,7 @@ export default class MediaForm extends Vue {
           return;
         }
         this.setVolume();
-        this.duration = (this.$refs.audio as HTMLAudioElement).duration;
+        this.duration = (this.$refs[this.uuid] as HTMLAudioElement).duration;
         if (isNaN(this.duration)) {
           this.duration = 0;
         } else {

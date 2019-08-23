@@ -300,8 +300,8 @@ export default class AlertsEdit extends Vue {
     const _default: Omit<Registry.Alerts.CommonSettings, "messageTemplate">  = {
       enabled: true,
       layout: '1',
-      animationIn: 'fade-in',
-      animationOut: 'fade-out',
+      animationIn: 'fadeIn',
+      animationOut: 'fadeOut',
       animationText: 'wiggle',
       image: defaultImage,
       sound: defaultAudio,

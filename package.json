@@ -142,6 +142,7 @@
     "@types/yargs": "13.0.2",
     "@typescript-eslint/eslint-plugin": "2.0.0",
     "@typescript-eslint/parser": "2.0.0",
+    "animate.css": "3.7.2",
     "axios-mock-adapter": "1.17.0",
     "bestzip": "2.1.4",
     "bootstrap-vue": "2.0.0-rc.24",

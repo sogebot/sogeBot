@@ -26,6 +26,42 @@
       ></b-form-input>
     </b-form-group>
 
+    <b-form-group
+      label-cols-sm="4"
+      label-cols-lg="3"
+      :label="translate('registry.alerts.animationText.name')"
+      label-for="animationText"
+    >
+      <text-animation
+        id="animationText"
+        :animation.sync="data.animationText"
+      ></text-animation>
+    </b-form-group>
+
+    <b-form-group
+      label-cols-sm="4"
+      label-cols-lg="3"
+      :label="translate('registry.alerts.animationIn.name')"
+      label-for="animationIn"
+    >
+      <animation-in
+        id="animationIn"
+        :animation.sync="data.animationIn"
+      ></animation-in>
+    </b-form-group>
+
+    <b-form-group
+      label-cols-sm="4"
+      label-cols-lg="3"
+      :label="translate('registry.alerts.animationOut.name')"
+      label-for="animationOut"
+    >
+      <animation-out
+        id="animationOut"
+        :animation.sync="data.animationOut"
+      ></animation-out>
+    </b-form-group>
+
     <b-form-group label-cols-sm="4" label-cols-lg="3"
                   :label="translate('registry.alerts.alertDurationInMs.name')"
                   label-for="alertDurationInMs">
@@ -236,6 +272,9 @@ import { required } from 'vuelidate/lib/validators'
   components: {
     media: () => import('../../../../components/media'),
     'layout-picker': () => import('./layout-picker'),
+    'text-animation': () => import('./text-animation'),
+    'animation-in': () => import('./animation-in'),
+    'animation-out': () => import('./animation-out'),
   }
 })
 export default class AlertsEditFollowForm extends Vue {
