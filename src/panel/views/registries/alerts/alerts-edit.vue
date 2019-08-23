@@ -112,10 +112,10 @@
                   Variant {{ idx + 1 }}
                 </template>
                 <p class="p-3">
-                  <form-follow v-if="event === 'follows'" :alert.sync="alert" :isValid.sync="isValid[event][idx]" />
-                  <form-cheers v-else-if="event === 'cheers' || event === 'tips'" :alert.sync="alert" :isValid.sync="isValid[event][idx]" />
-                  <form-subs v-else-if="event === 'subs'" :alert.sync="alert" :isValid.sync="isValid[event][idx]" />
-                  <form-hosts v-else-if="event === 'hosts' || event === 'raids'" :alert.sync="alert" :isValid.sync="isValid[event][idx]" />
+                  <form-follow v-if="event === 'follows'" :index="idx" :alert.sync="alert" :isValid.sync="isValid[event][idx]" @delete="deleteVariant(event, $event)"/>
+                  <form-cheers v-else-if="event === 'cheers' || event === 'tips'" :index="idx" :alert.sync="alert" :isValid.sync="isValid[event][idx]" @delete="deleteVariant(event, $event)"/>
+                  <form-subs v-else-if="event === 'subs'" :index="idx" :alert.sync="alert" :isValid.sync="isValid[event][idx]" @delete="deleteVariant(event, $event)"/>
+                  <form-hosts v-else-if="event === 'hosts' || event === 'raids'" :index="idx" :alert.sync="alert" :isValid.sync="isValid[event][idx]" @delete="deleteVariant(event, $event)"/>
                 </p>
               </b-tab>
 
@@ -407,6 +407,11 @@ export default class AlertsEdit extends Vue {
         })
         break;
     }
+  }
+
+  deleteVariant(event, index) {
+    console.debug('Removing', event, index, this.item.alerts[event][index]);
+    this.item.alerts[event].splice(index, 1);
   }
 
   async remove () {

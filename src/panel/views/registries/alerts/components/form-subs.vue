@@ -381,11 +381,16 @@
         </b-card-body>
       </b-collapse>
     </b-card>
+
+    <hold-button @trigger="$emit('delete', index)" icon="trash" class="btn-danger btn-block btn-reverse mt-3">
+      <template slot="title">{{translate('dialog.buttons.delete')}}</template>
+      <template slot="onHoldTitle">{{translate('dialog.buttons.hold-to-delete')}}</template>
+    </hold-button>
   </div>
 </template>
 
 <script lang="ts">
-import { Vue, Component, PropSync, Watch } from 'vue-property-decorator';
+import { Vue, Component, Prop, PropSync, Watch } from 'vue-property-decorator';
 
 import axios from 'axios';
 
@@ -399,10 +404,12 @@ import { required, minValue } from 'vuelidate/lib/validators'
     'text-animation': () => import('./text-animation'),
     'animation-in': () => import('./animation-in'),
     'animation-out': () => import('./animation-out'),
+    'hold-button': () => import('../../../../components/holdButton'),
   }
 })
 export default class AlertsEditFollowForm extends Vue {
   @PropSync('alert') readonly data !: Registry.Alerts.Follow
+  @Prop() readonly index !: number
 
   fonts: {text: string; value: string}[] = [];
 
