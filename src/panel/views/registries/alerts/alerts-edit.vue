@@ -101,10 +101,10 @@
       </b-form-group>
 
       <b-tabs align="center" v-model="selectedTabIndex" >
-        <b-tab v-for="event in supportedEvents" :key="'event-tab-' + event" :title="translate('registry.alerts.event.' + event)">
+        <b-tab v-for="event in supportedEvents" :key="'event-tab-' + event" :title="translate('registry.alerts.event.' + event)" no-fade>
           <b-card no-body>
             <b-tabs card vertical pills>
-              <template v-if="event === 'hosts'">
+              <template v-if="event === 'hosts' || event === 'raids'">
                 <template v-for="[key, group] of Object.entries(_.groupBy(item.alerts[event], (o) => String(o.minViewers)))">
                   <b-tab disabled :key="'disabled' + event + key" no-fade>
                     <template slot="title" class="text-muted">{{ translate('registry.alerts.minViewers.name')}}: <span style="font-weight: bold; font-size: 1.5rem;">{{ key }}</span></template>
@@ -117,10 +117,7 @@
                       Variant {{ idx + 1 }}
                     </template>
                     <p class="p-3">
-                      <form-follow v-if="event === 'follows'" :alert.sync="alert" :isValid.sync="isValid[event][idx]" @delete="deleteVariant(event, $event)"/>
-                      <form-cheers v-else-if="event === 'cheers' || event === 'tips'" :alert.sync="alert" :isValid.sync="isValid[event][idx]" @delete="deleteVariant(event, $event)"/>
-                      <form-subs v-else-if="event === 'subs'" :alert.sync="alert" :isValid.sync="isValid[event][idx]" @delete="deleteVariant(event, $event)"/>
-                      <form-hosts v-else-if="event === 'hosts' || event === 'raids'" :alert.sync="alert" :isValid.sync="isValid[event][idx]" @delete="deleteVariant(event, $event)"/>
+                      <form-hosts :alert.sync="alert" :isValid.sync="isValid[event][idx]" @delete="deleteVariant(event, $event)"/>
                     </p>
                   </b-tab>
                 </template>
@@ -136,7 +133,6 @@
                   <form-follow v-if="event === 'follows'" :alert.sync="alert" :isValid.sync="isValid[event][idx]" @delete="deleteVariant(event, $event)"/>
                   <form-cheers v-else-if="event === 'cheers' || event === 'tips'" :alert.sync="alert" :isValid.sync="isValid[event][idx]" @delete="deleteVariant(event, $event)"/>
                   <form-subs v-else-if="event === 'subs'" :alert.sync="alert" :isValid.sync="isValid[event][idx]" @delete="deleteVariant(event, $event)"/>
-                  <form-hosts v-else-if="event === 'hosts' || event === 'raids'" :alert.sync="alert" :isValid.sync="isValid[event][idx]" @delete="deleteVariant(event, $event)"/>
                 </p>
               </b-tab>
 
