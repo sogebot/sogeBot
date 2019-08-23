@@ -101,38 +101,23 @@
       </b-form-group>
 
       <b-tabs align="center" v-model="selectedTabIndex" >
-        <b-tab v-for="event in supportedEvents" :key="'event-tab-' + event" :title="translate('registry.alerts.event.' + event)" no-fade>
+        <b-tab v-for="event in supportedEvents" :key="'event-tab-' + event" :title="translate('registry.alerts.event.' + event)">
           <b-card no-body>
             <b-tabs card vertical pills>
-              <template v-if="event === 'hosts' || event === 'raids'">
-                <template v-for="[key, group] of Object.entries(_.groupBy(item.alerts[event], (o) => String(o.minViewers)))">
-                  <b-tab disabled :key="'disabled' + event + key" no-fade>
-                    <template slot="title" class="text-muted">{{ translate('registry.alerts.minViewers.name')}}: <span style="font-weight: bold; font-size: 1.5rem;">{{ key }}</span></template>
-                  </b-tab>
-                  <b-tab :active="idx === 0" v-for="(alert, idx) of group" :key="alert.uuid" no-fade>
-                    <template slot="title">
-                      <fa icon="exclamation-circle" v-if="!isValid[event][idx]" class="text-danger"/>
-                      <fa :icon="['fas', 'circle']" v-else-if="alert.enabled"/>
-                      <fa :icon="['far', 'circle']" v-else/>
-                      Variant {{ idx + 1 }}
-                    </template>
-                    <p class="p-3">
-                      <form-hosts :alert.sync="alert" :isValid.sync="isValid[event][idx]" @delete="deleteVariant(event, $event)"/>
-                    </p>
-                  </b-tab>
-                </template>
-              </template>
-              <b-tab v-else :active="idx === 0" v-for="(alert, idx) of item.alerts[event]" :key="event + idx" no-fade>
+              <b-tab :active="idx === 0" v-for="(alert, idx) of item.alerts[event]" :key="event + idx">
                 <template slot="title">
                   <fa icon="exclamation-circle" v-if="!isValid[event][idx]" class="text-danger"/>
                   <fa :icon="['fas', 'circle']" v-else-if="alert.enabled"/>
                   <fa :icon="['far', 'circle']" v-else/>
-                  Variant {{ idx + 1 }}
+
+                  <template v-if="alert.title.length > 0">{{alert.title}}</template>
+                  <template v-else>Variant {{ idx + 1 }}</template>
                 </template>
                 <p class="p-3">
                   <form-follow v-if="event === 'follows'" :alert.sync="alert" :isValid.sync="isValid[event][idx]" @delete="deleteVariant(event, $event)"/>
                   <form-cheers v-else-if="event === 'cheers' || event === 'tips'" :alert.sync="alert" :isValid.sync="isValid[event][idx]" @delete="deleteVariant(event, $event)"/>
                   <form-subs v-else-if="event === 'subs'" :alert.sync="alert" :isValid.sync="isValid[event][idx]" @delete="deleteVariant(event, $event)"/>
+                  <form-hosts v-else-if="event === 'hosts' || event === 'raids'" :alert.sync="alert" :isValid.sync="isValid[event][idx]" @delete="deleteVariant(event, $event)"/>
                 </p>
               </b-tab>
 
@@ -316,6 +301,9 @@ export default class AlertsEdit extends Vue {
   newAlert() {
     const _default: Omit<Registry.Alerts.CommonSettings, "messageTemplate">  = {
       uuid: uuid(),
+      title: '',
+      variantCondition: 'random',
+      variantAmount: 2,
       enabled: true,
       layout: '1',
       animationIn: 'fadeIn',
@@ -348,7 +336,6 @@ export default class AlertsEdit extends Vue {
         break;
       case 'cheers':
         this.item.alerts.cheers.push({
-          minAmountToAlert: 0,
           messageTemplate: '{name} cheered! x{amount}',
           message: {
             minAmountToShow: 0,
@@ -390,7 +377,6 @@ export default class AlertsEdit extends Vue {
       case 'tips':
         this.item.alerts.tips.push({
           messageTemplate: '{name} donated {amount}!',
-          minAmountToAlert: 0,
           message: {
             minAmountToShow: 0,
             allowEmotes: {
@@ -411,7 +397,6 @@ export default class AlertsEdit extends Vue {
       case 'hosts':
         this.item.alerts.hosts.push({
           showAutoHost: false,
-          minViewers: 0,
           messageTemplate: '{name} is now hosting my stream with {count} viewers!',
           ..._default,
         })
@@ -419,7 +404,6 @@ export default class AlertsEdit extends Vue {
       case 'raids':
         this.item.alerts.raids.push({
           showAutoHost: false,
-          minViewers: 0,
           messageTemplate: '{name} is raiding with a party of {count}!',
           ..._default,
         })

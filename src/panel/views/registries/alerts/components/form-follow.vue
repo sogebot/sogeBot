@@ -12,6 +12,36 @@
     <b-form-group
       label-cols-sm="4"
       label-cols-lg="3"
+      :label="translate('registry.alerts.title.name')"
+      label-for="title"
+      :description="translate('registry.alerts.title.help')"
+    >
+      <b-form-input
+        id="title"
+        v-model="data.title"
+        type="text"
+        :placeholder="translate('registry.alerts.title.placeholder')"
+        @input="$v.data.$touch()"
+      ></b-form-input>
+    </b-form-group>
+
+    <b-form-group
+      label-cols-sm="4"
+      label-cols-lg="3"
+      :label="translate('registry.alerts.variant.name')"
+      label-for="variant"
+      :description="translate('registry.alerts.variant.help')"
+    >
+      <variant
+        :condition.sync="data.variantCondition"
+        :amount.sync="data.variantAmount"
+        event="follow"
+      ></variant>
+    </b-form-group>
+
+    <b-form-group
+      label-cols-sm="4"
+      label-cols-lg="3"
       :label="translate('registry.alerts.messageTemplate.name')"
       label-for="messageTemplate"
       :description="translate('registry.alerts.messageTemplate.help')"
@@ -280,6 +310,7 @@ import { required } from 'vuelidate/lib/validators'
     'text-animation': () => import('./text-animation'),
     'animation-in': () => import('./animation-in'),
     'animation-out': () => import('./animation-out'),
+    'variant': () => import('./variant'),
     'hold-button': () => import('../../../../components/holdButton'),
   }
 })

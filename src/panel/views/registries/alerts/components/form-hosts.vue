@@ -12,28 +12,39 @@
     <b-form-group
       label-cols-sm="4"
       label-cols-lg="3"
-      label-for="showAutoHost"
-      :label="translate('registry.alerts.showAutoHost')"
+      :label="translate('registry.alerts.title.name')"
+      label-for="title"
+      :description="translate('registry.alerts.title.help')"
     >
-      <b-form-checkbox id="showAutoHost" v-model="data.showAutoHost" name="showAutoHost" switch></b-form-checkbox>
+      <b-form-input
+        id="title"
+        v-model="data.title"
+        type="text"
+        :placeholder="translate('registry.alerts.title.placeholder')"
+        @input="$v.data.$touch()"
+      ></b-form-input>
     </b-form-group>
 
     <b-form-group
       label-cols-sm="4"
       label-cols-lg="3"
-      :label="translate('registry.alerts.minViewers.name')"
-      label-for="messageTemplate"
-      :description="translate('registry.alerts.minViewers.help')"
+      :label="translate('registry.alerts.variant.name')"
+      label-for="variant"
+      :description="translate('registry.alerts.variant.help')"
     >
-      <b-form-input
-        id="minViewers"
-        v-model="data.minViewers"
-        type="number"
-        min="0"
-        :placeholder="translate('registry.alerts.minViewers.placeholder')"
-        @input="$v.data.$touch()"
-        :state="$v.data.minViewers.$invalid && $v.data.minViewers.$dirty ? 'invalid' : null"
-      ></b-form-input>
+      <variant
+        :condition.sync="data.variantCondition"
+        :amount.sync="data.variantAmount"
+      ></variant>
+    </b-form-group>
+
+    <b-form-group
+      label-cols-sm="4"
+      label-cols-lg="3"
+      label-for="showAutoHost"
+      :label="translate('registry.alerts.showAutoHost')"
+    >
+      <b-form-checkbox id="showAutoHost" v-model="data.showAutoHost" name="showAutoHost" switch></b-form-checkbox>
     </b-form-group>
 
     <b-form-group
@@ -307,6 +318,7 @@ import { required, minValue } from 'vuelidate/lib/validators'
     'text-animation': () => import('./text-animation'),
     'animation-in': () => import('./animation-in'),
     'animation-out': () => import('./animation-out'),
+    'variant': () => import('./variant'),
     'hold-button': () => import('../../../../components/holdButton'),
   }
 })
@@ -325,7 +337,6 @@ export default class AlertsEditFollowForm extends Vue {
   validations = {
     data: {
       messageTemplate: {required},
-      minViewers: {required, minValue: minValue(0)},
     }
   }
 

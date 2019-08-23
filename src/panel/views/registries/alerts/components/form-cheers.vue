@@ -12,19 +12,30 @@
     <b-form-group
       label-cols-sm="4"
       label-cols-lg="3"
-      :label="translate('registry.alerts.minAmountToAlert.name')"
-      label-for="messageTemplate"
-      :description="translate('registry.alerts.minAmountToAlert.help')"
+      :label="translate('registry.alerts.title.name')"
+      label-for="title"
+      :description="translate('registry.alerts.title.help')"
     >
       <b-form-input
-        id="minAmountToAlert"
-        v-model="data.minAmountToAlert"
-        type="number"
-        min="0"
-        :placeholder="translate('registry.alerts.minAmountToAlert.placeholder')"
+        id="title"
+        v-model="data.title"
+        type="text"
+        :placeholder="translate('registry.alerts.title.placeholder')"
         @input="$v.data.$touch()"
-        :state="$v.data.minAmountToAlert.$invalid && $v.data.minAmountToAlert.$dirty ? 'invalid' : null"
       ></b-form-input>
+    </b-form-group>
+
+    <b-form-group
+      label-cols-sm="4"
+      label-cols-lg="3"
+      :label="translate('registry.alerts.variant.name')"
+      label-for="variant"
+      :description="translate('registry.alerts.variant.help')"
+    >
+      <variant
+        :condition.sync="data.variantCondition"
+        :amount.sync="data.variantAmount"
+      ></variant>
     </b-form-group>
 
     <b-form-group
@@ -423,6 +434,7 @@ import { required, minValue } from 'vuelidate/lib/validators'
     'text-animation': () => import('./text-animation'),
     'animation-in': () => import('./animation-in'),
     'animation-out': () => import('./animation-out'),
+    'variant': () => import('./variant'),
     'hold-button': () => import('../../../../components/holdButton'),
   }
 })
@@ -441,7 +453,6 @@ export default class AlertsEditFollowForm extends Vue {
   validations = {
     data: {
       messageTemplate: {required},
-      minAmountToAlert: {required, minValue: minValue(0)},
       message: {
         minAmountToShow: {required, minValue: minValue(0)},
       }

@@ -42,6 +42,9 @@ declare namespace Registry {
     export type CommonSettings = {
       uuid: string;
       enabled: boolean;
+      title: string;
+      variantCondition: 'random' | 'exact' | 'gt-eq';
+      variantAmount: number;
       messageTemplate: string;
       layout: '1' | '2' | '3' | '4' | '5';
       animationIn: AnimationIn; // TBD UI
@@ -68,7 +71,6 @@ declare namespace Registry {
     export type Follow = CommonSettings;
 
     export type Cheer = {
-      minAmountToAlert: number;
       message: {
         minAmountToShow: number;
         allowEmotes: {
@@ -108,7 +110,6 @@ declare namespace Registry {
 
     export type Host = {
       showAutoHost: boolean;
-      minViewers: number;
     } & CommonSettings;
   }
 }
