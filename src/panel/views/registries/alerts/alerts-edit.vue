@@ -414,6 +414,7 @@ export default class AlertsEdit extends Vue {
   deleteVariant(event, uuid) {
     console.debug('Removing', event, uuid);
     this._.remove(this.item.alerts[event], (o: Registry.Alerts.CommonSettings) => o.uuid === uuid);
+    this.$forceUpdate();
   }
 
   async remove () {

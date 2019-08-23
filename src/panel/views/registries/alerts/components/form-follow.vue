@@ -302,7 +302,7 @@ import { Vue, Component, Prop, PropSync, Watch } from 'vue-property-decorator';
 import axios from 'axios';
 
 import { Validations } from 'vuelidate-property-decorators';
-import { required } from 'vuelidate/lib/validators'
+import { required, minValue } from 'vuelidate/lib/validators'
 
 @Component({
   components: {
