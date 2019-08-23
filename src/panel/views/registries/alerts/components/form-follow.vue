@@ -258,7 +258,7 @@
       </b-collapse>
     </b-card>
 
-    <hold-button @trigger="$emit('delete', index)" icon="trash" class="btn-danger btn-block btn-reverse mt-3">
+    <hold-button @trigger="$emit('delete', data.uuid)" icon="trash" class="btn-danger btn-block btn-reverse mt-3">
       <template slot="title">{{translate('dialog.buttons.delete')}}</template>
       <template slot="onHoldTitle">{{translate('dialog.buttons.hold-to-delete')}}</template>
     </hold-button>

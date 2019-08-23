@@ -104,7 +104,28 @@
         <b-tab v-for="event in supportedEvents" :key="'event-tab-' + event" :title="translate('registry.alerts.event.' + event)">
           <b-card no-body>
             <b-tabs card vertical pills>
-              <b-tab :active="idx === 0" v-for="(alert, idx) of item.alerts[event]" :key="event + idx">
+              <template v-if="event === 'hosts'">
+                <template v-for="[key, group] of Object.entries(_.groupBy(item.alerts[event], (o) => String(o.minViewers)))">
+                  <b-tab disabled :key="'disabled' + event + key" no-fade>
+                    <template slot="title" class="text-muted">{{ translate('registry.alerts.minViewers.name')}}: <span style="font-weight: bold; font-size: 1.5rem;">{{ key }}</span></template>
+                  </b-tab>
+                  <b-tab :active="idx === 0" v-for="(alert, idx) of group" :key="alert.uuid" no-fade>
+                    <template slot="title">
+                      <fa icon="exclamation-circle" v-if="!isValid[event][idx]" class="text-danger"/>
+                      <fa :icon="['fas', 'circle']" v-else-if="alert.enabled"/>
+                      <fa :icon="['far', 'circle']" v-else/>
+                      Variant {{ idx + 1 }}
+                    </template>
+                    <p class="p-3">
+                      <form-follow v-if="event === 'follows'" :alert.sync="alert" :isValid.sync="isValid[event][idx]" @delete="deleteVariant(event, $event)"/>
+                      <form-cheers v-else-if="event === 'cheers' || event === 'tips'" :alert.sync="alert" :isValid.sync="isValid[event][idx]" @delete="deleteVariant(event, $event)"/>
+                      <form-subs v-else-if="event === 'subs'" :alert.sync="alert" :isValid.sync="isValid[event][idx]" @delete="deleteVariant(event, $event)"/>
+                      <form-hosts v-else-if="event === 'hosts' || event === 'raids'" :alert.sync="alert" :isValid.sync="isValid[event][idx]" @delete="deleteVariant(event, $event)"/>
+                    </p>
+                  </b-tab>
+                </template>
+              </template>
+              <b-tab v-else :active="idx === 0" v-for="(alert, idx) of item.alerts[event]" :key="event + idx" no-fade>
                 <template slot="title">
                   <fa icon="exclamation-circle" v-if="!isValid[event][idx]" class="text-danger"/>
                   <fa :icon="['fas', 'circle']" v-else-if="alert.enabled"/>
@@ -112,10 +133,10 @@
                   Variant {{ idx + 1 }}
                 </template>
                 <p class="p-3">
-                  <form-follow v-if="event === 'follows'" :index="idx" :alert.sync="alert" :isValid.sync="isValid[event][idx]" @delete="deleteVariant(event, $event)"/>
-                  <form-cheers v-else-if="event === 'cheers' || event === 'tips'" :index="idx" :alert.sync="alert" :isValid.sync="isValid[event][idx]" @delete="deleteVariant(event, $event)"/>
-                  <form-subs v-else-if="event === 'subs'" :index="idx" :alert.sync="alert" :isValid.sync="isValid[event][idx]" @delete="deleteVariant(event, $event)"/>
-                  <form-hosts v-else-if="event === 'hosts' || event === 'raids'" :index="idx" :alert.sync="alert" :isValid.sync="isValid[event][idx]" @delete="deleteVariant(event, $event)"/>
+                  <form-follow v-if="event === 'follows'" :alert.sync="alert" :isValid.sync="isValid[event][idx]" @delete="deleteVariant(event, $event)"/>
+                  <form-cheers v-else-if="event === 'cheers' || event === 'tips'" :alert.sync="alert" :isValid.sync="isValid[event][idx]" @delete="deleteVariant(event, $event)"/>
+                  <form-subs v-else-if="event === 'subs'" :alert.sync="alert" :isValid.sync="isValid[event][idx]" @delete="deleteVariant(event, $event)"/>
+                  <form-hosts v-else-if="event === 'hosts' || event === 'raids'" :alert.sync="alert" :isValid.sync="isValid[event][idx]" @delete="deleteVariant(event, $event)"/>
                 </p>
               </b-tab>
 
@@ -298,6 +319,7 @@ export default class AlertsEdit extends Vue {
 
   newAlert() {
     const _default: Omit<Registry.Alerts.CommonSettings, "messageTemplate">  = {
+      uuid: uuid(),
       enabled: true,
       layout: '1',
       animationIn: 'fadeIn',
@@ -409,9 +431,9 @@ export default class AlertsEdit extends Vue {
     }
   }
 
-  deleteVariant(event, index) {
-    console.debug('Removing', event, index, this.item.alerts[event][index]);
-    this.item.alerts[event].splice(index, 1);
+  deleteVariant(event, uuid) {
+    console.debug('Removing', event, uuid);
+    this._.remove(this.item.alerts[event], (o: Registry.Alerts.CommonSettings) => o.uuid === uuid);
   }
 
   async remove () {

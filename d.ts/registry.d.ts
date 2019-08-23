@@ -40,6 +40,7 @@ declare namespace Registry {
     };
 
     export type CommonSettings = {
+      uuid: string;
       enabled: boolean;
       messageTemplate: string;
       layout: '1' | '2' | '3' | '4' | '5';
