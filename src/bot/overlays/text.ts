@@ -15,7 +15,7 @@ class Text extends Overlay {
   linkBtn = null;
   constructor () {
     super();
-    this.addMenu({ category: 'registry', name: 'textoverlay', id: 'registry.textOverlay/list' });
+    this.addMenu({ category: 'registry', name: 'textoverlay', id: 'registry.textoverlay/list' });
   }
 
   sockets () {
