@@ -11,7 +11,7 @@
           <slot name="onHoldTitle"></slot>
         </template>
       </div>
-      <div class="btn-icon" :style="{opacity: 1 - this.percentage / 100 }">
+      <div v-if="icon" class="btn-icon" :style="{opacity: 1 - this.percentage / 100 }">
         <slot name="icon"><fa :icon="icon" fixed-width></fa></slot>
       </div>
     </div>

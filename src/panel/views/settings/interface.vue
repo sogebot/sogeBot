@@ -245,7 +245,7 @@ enum State {
     'sortable-list': () => import('./components/interface/sortable-list.vue'),
     'text-input': () => import('./components/interface/text-input.vue'),
     'textarea-from-array': () => import('./components/interface/textarea-from-array.vue'),
-    'toggle-enable': () => import('./components/interface/toggle-enable.vue'),
+    'toggle-enable': () => import('../../components/toggle-enable.vue'),
     'wof-responses': () => import('./components/interface/wof-responses.vue'),
     }
 })
