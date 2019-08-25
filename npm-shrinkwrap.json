@@ -4647,6 +4647,14 @@
         "prismjs": "^1.15.0",
         "tinydate": "^1.0.0",
         "tweezer.js": "^1.4.0"
+      },
+      "dependencies": {
+        "prismjs": {
+          "version": "1.16.0",
+          "requires": {
+            "clipboard": "^2.0.0"
+          }
+        }
       }
     },
     "docsify-cli": {
@@ -8598,7 +8606,8 @@
       "dev": true
     },
     "prismjs": {
-      "version": "1.16.0",
+      "version": "1.17.1",
+      "dev": true,
       "requires": {
         "clipboard": "^2.0.0"
       }
@@ -10756,6 +10765,10 @@
           }
         }
       }
+    },
+    "vue-prism-component": {
+      "version": "1.1.1",
+      "dev": true
     },
     "vue-property-decorator": {
       "version": "8.2.1",
