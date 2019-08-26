@@ -24,7 +24,6 @@ export default class baffleText extends Vue {
   setTimeToReveal() {
     this.baffledTimeToReveal = [];
     for (let i = 0; i < this.text.length; i++) {
-      console.log(Math.floor(Math.random() * 1000) + (this.options.maxTimeToDecrypt - 1000))
       this.baffledTimeToReveal.push(Math.floor(Math.random() * 1000) + (this.options.maxTimeToDecrypt - 1000));
     }
   }

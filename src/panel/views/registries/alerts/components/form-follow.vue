@@ -14,7 +14,6 @@
       label-cols-lg="3"
       :label="translate('registry.alerts.title.name')"
       label-for="title"
-      :description="translate('registry.alerts.title.help')"
     >
       <b-form-input
         id="title"
@@ -30,7 +29,6 @@
       label-cols-lg="3"
       :label="translate('registry.alerts.variant.name')"
       label-for="variant"
-      :description="translate('registry.alerts.variant.help')"
     >
       <variant
         :condition.sync="data.variantCondition"
@@ -276,7 +274,7 @@
           </b-form-group>
 
           <b-form-group label-cols-sm="4" label-cols-lg="3"
-                  :label="translate('registry.alerts.font.size.highlightcolor')"
+                  :label="translate('registry.alerts.font.highlightcolor.name')"
                   label-for="font.highlightcolor">
             <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
               <b-form-input
@@ -354,6 +352,7 @@ export default class AlertsEditFollowForm extends Vue {
     font-weight: inherit !important;
     text-indent: inherit !important;
     letter-spacing: inherit !important;
+    text-transform: none !important;
   }
 
   .custom-switch {

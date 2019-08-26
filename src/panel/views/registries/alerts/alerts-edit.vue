@@ -42,7 +42,6 @@
       <b-form-group
         :label="translate('registry.alerts.name.name')"
         label-for="name"
-        :description="translate('registry.alerts.name.help')"
       >
         <b-form-input
           id="name"
@@ -58,7 +57,6 @@
       <b-form-group
         :label="translate('registry.alerts.alertDelayInMs.name')"
         label-for="alertDelayInMs"
-        :description="translate('registry.alerts.alertDelayInMs.help')"
       >
         <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
           <b-form-input
@@ -84,7 +82,6 @@
         label-for="profanityFilterType"
       >
         <b-form-select v-model="item.profanityFilterType" :options="profanityFilterTypeOptions" plain />
-        <small class="form-text text-muted" v-html="translate('registry.alerts.profanityFilterType.help')"></small>
         <b-form-checkbox class="mt-2 ml-2 normalLabel"
           v-model="item.loadStandardProfanityList"
         >
