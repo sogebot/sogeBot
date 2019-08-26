@@ -309,6 +309,11 @@ export default class AlertsEdit extends Vue {
       animationIn: 'fadeIn',
       animationOut: 'fadeOut',
       animationText: 'wiggle',
+      animationTextOptions: {
+        speed: 'slow',
+        characters: '█▓░ </>',
+        maxTimeToDecrypt: 4000,
+      },
       image: defaultImage,
       sound: defaultAudio,
       soundVolume: 20,

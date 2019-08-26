@@ -66,6 +66,7 @@
       <text-animation
         id="animationText"
         :animation.sync="data.animationText"
+        :animationOptions.sync="data.animationTextOptions"
       ></text-animation>
     </b-form-group>
 

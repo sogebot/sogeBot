@@ -19,7 +19,7 @@ declare namespace Registry {
       | 'slideOutUp' | 'zoomOut' | 'zoomOutDown' | 'zoomOutLeft' | 'zoomOutRight'
       | 'zoomOutUp' | 'rollOut';
     type AnimationText
-      = 'none' | 'bounce' | 'bounce2' | 'flip' | 'flash' | 'pulse2' | 'rubberBand'
+      = 'none' | 'baffle' | 'bounce' | 'bounce2' | 'flip' | 'flash' | 'pulse2' | 'rubberBand'
       | 'shake2' | 'swing' | 'tada' | 'wave' | 'wobble' | 'wiggle' | 'wiggle2' | 'jello';
 
     export type Alert = {
@@ -47,9 +47,14 @@ declare namespace Registry {
       variantAmount: number;
       messageTemplate: string;
       layout: '1' | '2' | '3' | '4' | '5';
-      animationIn: AnimationIn; // TBD UI
-      animationOut: AnimationOut; // TBD UI
-      animationText: AnimationText; // TBD UI
+      animationIn: AnimationIn;
+      animationOut: AnimationOut;
+      animationText: AnimationText;
+      animationTextOptions: {
+        speed: number | 'slower' | 'slow' | 'fast' | 'faster';
+        maxTimeToDecrypt: number;
+        characters: string;
+      };
       image: string;
       sound: string;
       soundVolume: number;
