@@ -204,8 +204,9 @@
                   :class="[ system.enabled && !system.isDisabledByEnv && system.areDependenciesEnabled ? 'text-success' : 'text-danger' ]"
                   style="margin: 0px 0px 3px; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px;"
                 >
-                <template v-if="system.isDisabledByEnv">DISABLED BY ENV</template>
-                <template v-if="!system.enabled">{{ translate('disabled') }}</template>
+                <template v-if="system.enabled === null"></template>
+                <template v-else-if="system.isDisabledByEnv">DISABLED BY ENV</template>
+                <template v-else-if="system.enabled === false">{{ translate('disabled') }}</template>
                 <template v-else-if="!system.areDependenciesEnabled">DEPENDENCIES DISABLED</template>
                 <template v-else>{{ translate('enabled') }}</template>
               </small>
@@ -392,9 +393,18 @@ export default class interfaceSettings extends Vue {
             delete ui[key]
           }
         })
-
         console.debug({ui, settings});
-        this.settings = Object.assign({}, settings)
+
+        for (const k of Object.keys(settings)) {
+          settings[k] = _.pickBy(settings[k], (value) => {
+            return value !== null;
+          });
+          if (Object.keys(settings[k]).length === 0) {
+            delete settings[k]
+          }
+        };
+        console.debug({ui, settings});
+        this.settings = Object.assign({}, settings);
         this.ui = Object.assign({}, ui)
       })
   }

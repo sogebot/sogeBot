@@ -21,6 +21,9 @@ declare namespace Registry {
     type AnimationText
       = 'none' | 'baffle' | 'bounce' | 'bounce2' | 'flip' | 'flash' | 'pulse2' | 'rubberBand'
       | 'shake2' | 'swing' | 'tada' | 'wave' | 'wobble' | 'wiggle' | 'wiggle2' | 'jello';
+    type TTS = {
+      voice: string;
+    }
 
     export type Alert = {
       id: string;
@@ -61,7 +64,7 @@ declare namespace Registry {
       alertDurationInMs: number;
       alertTextDelayInMs: number;
       enableAdvancedMode: boolean;
-      // tts TBD
+      tts: TTS;
       font: {
         family: string;
         size: number;

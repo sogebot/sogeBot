@@ -44,7 +44,7 @@ class Module {
   protected _commands: Command[];
   protected _parsers: Parser[];
   protected _rollback: { name: string }[];
-  protected _enabled = true;
+  protected _enabled: boolean | null = true;
 
   constructor(name = 'core', enabled = true) {
     this.on = {
@@ -503,7 +503,7 @@ class Module {
 
   public async status(opts) {
     opts = opts || {};
-    if (['core', 'overlays', 'widgets', 'stats', 'registries'].includes(this._name)) {
+    if (['core', 'overlays', 'widgets', 'stats', 'registries'].includes(this._name) || (opts.state === null && typeof opts.state !== 'undefined')) {
       return true;
     }
 

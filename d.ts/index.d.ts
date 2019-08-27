@@ -50,6 +50,7 @@ declare namespace NodeJS {
       donationalerts: import('../src/bot/integrations/donationalerts').Donationalerts;
       phillipshue: import('../src/bot/integrations/phillipshue').PhillipsHue;
       spotify: import('../src/bot/integrations/spotify').Spotify;
+      responsivevoice: import('../src/bot/integrations/responsivevoice').ResponsiveVoice;
       streamlabs: import('../src/bot/integrations/streamlabs').Streamlabs;
       twitter: import('../src/bot/integrations/twitter').Twitter;
     };

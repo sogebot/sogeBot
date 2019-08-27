@@ -411,6 +411,8 @@
       </b-collapse>
     </b-card>
 
+    <tts :tts.sync="data.tts"/>
+
     <hold-button @trigger="$emit('delete', data.uuid)" icon="trash" class="btn-danger btn-block btn-reverse mt-3">
       <template slot="title">{{translate('dialog.buttons.delete')}}</template>
       <template slot="onHoldTitle">{{translate('dialog.buttons.hold-to-delete')}}</template>
@@ -434,6 +436,7 @@ import { required, minValue } from 'vuelidate/lib/validators'
     'animation-in': () => import('./animation-in'),
     'animation-out': () => import('./animation-out'),
     'variant': () => import('./variant'),
+    'tts': () => import('./tts'),
     'hold-button': () => import('../../../../components/holdButton'),
   }
 })

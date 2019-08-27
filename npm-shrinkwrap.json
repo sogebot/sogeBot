@@ -5025,8 +5025,6 @@
       "version": "2.0.0",
       "dev": true,
       "requires": {
-<<<<<<< HEAD
-=======
         "arrify": "^1.0.1",
         "path-type": "^3.0.0"
       },
@@ -5047,14 +5045,12 @@
     "docsify": {
       "version": "4.9.4",
       "requires": {
->>>>>>> cow gif
         "marked": "^0.5.1",
         "medium-zoom": "^0.4.0",
         "opencollective": "^1.0.3",
         "prismjs": "^1.15.0",
         "tinydate": "^1.0.0",
         "tweezer.js": "^1.4.0"
-<<<<<<< HEAD
       },
       "dependencies": {
         "prismjs": {
@@ -5063,8 +5059,6 @@
             "clipboard": "^2.0.0"
           }
         }
-=======
->>>>>>> cow gif
       }
     },
     "docsify-cli": {
@@ -7563,6 +7557,9 @@
     },
     "jquery": {
       "version": "3.4.1"
+    },
+    "jquery-migrate": {
+      "version": "3.1.0"
     },
     "jquery-ui": {
       "version": "1.12.1"
@@ -11914,6 +11911,10 @@
       "requires": {
         "moment": "^2.11.1"
       }
+    },
+    "vue-plugin-load-script": {
+      "version": "1.2.0",
+      "dev": true
     },
     "vue-plyr": {
       "version": "4.0.0",

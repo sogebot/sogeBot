@@ -30,6 +30,9 @@ var modules = {
   'jquery': {
     'js': 'dist/jquery.min.js'
   },
+  'jquery-migrate': {
+    'js': 'dist/jquery-migrate.min.js'
+  },
   'sortablejs': {
     'js': 'Sortable.min.js'
   },

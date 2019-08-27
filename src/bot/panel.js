@@ -332,7 +332,6 @@ function Panel () {
       }
 
       for (let system of Object.keys(global.systems).filter(o => !o.startsWith('_'))) {
-        if (!global.systems[system].settings) continue
         if (typeof data.systems === 'undefined') {
           data.systems = {}
         }
@@ -340,7 +339,6 @@ function Panel () {
       }
 
       for (let system of Object.keys(global.integrations).filter(o => !o.startsWith('_'))) {
-        if (!global.integrations[system].settings) continue
         if (typeof data.integrations === 'undefined') {
           data.integrations = {}
         }
@@ -348,7 +346,6 @@ function Panel () {
       }
 
       for (let system of Object.keys(global.games).filter(o => !o.startsWith('_'))) {
-        if (!global.games[system].settings) continue
         if (typeof data.games === 'undefined') {
           data.games = {}
         }
@@ -364,7 +361,6 @@ function Panel () {
 
       // lang
       data.lang = global.general.lang;
-
       if (_.isFunction(cb)) cb(data)
       else socket.emit('configuration', data)
     })

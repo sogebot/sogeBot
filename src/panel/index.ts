@@ -13,6 +13,7 @@ import Vue from 'vue';
 import VueMoment from 'vue-moment';
 import VueRouter from 'vue-router';
 import Vuelidate from 'vuelidate';
+import LoadScript from 'vue-plugin-load-script';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faSpotify, faTwitch, faTwitter } from '@fortawesome/free-brands-svg-icons';
@@ -50,6 +51,7 @@ Vue.use(VueMoment, {
 Vue.use(BootstrapVue);
 
 Vue.use(Vuelidate);
+Vue.use(LoadScript);
 
 /* import widely used components */
 Vue.component('panel', () => import('./components/panel.vue'));
@@ -72,6 +74,8 @@ declare module 'vue/types/vue' {
     token: string;
     configuration: any;
     $moment?: any;
+    $loadScript: (script: string) => Promise<void>;
+    $unloadScript: (script: string) => Promise<void>;
     $state: states;
     _: _.LoDashStatic;
     urlParam(key: string): string | null;
