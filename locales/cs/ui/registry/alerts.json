@@ -118,5 +118,13 @@
   "message": {
     "setting": "Nastavení zprávy"
   },
-  "showAutoHost": "Zobrazit autohost"
+  "showAutoHost": "Zobrazit autohost",
+  "voice": "Hlas",
+  "volume": "Hlasitost",
+  "rate": "Tempo",
+  "pitch": "Výška",
+  "test": "Test",
+  "tts": {
+    "setting": "Nastavení TTS"
+  }
 }

@@ -6,10 +6,75 @@
       <b-collapse id="tts-accordion" accordion="my-accordion" role="tabpanel">
         <b-card-body v-if="state.loaded === $state.success">
           <b-form-group label-cols-sm="4" label-cols-lg="3"
-              :label="translate('registry.alerts.voices.name')">
+              :label="translate('registry.alerts.voice')">
             <b-form-select v-model="data.voice" :options="voices" plain></b-form-select>
           </b-form-group>
-          <button type="button" @click="speak()">Test</button>
+
+          <b-form-group label-cols-sm="4" label-cols-lg="3"
+                  :label="translate('registry.alerts.volume')"
+                  label-for="volume">
+            <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
+              <b-form-input
+                id="volume"
+                v-model="data.volume"
+                type="range"
+                min="0"
+                max="1"
+                step="0.1"
+              ></b-form-input>
+              <b-input-group-text slot="append" class="pr-3 pl-3">
+                <div style="width: 3rem;">
+                  {{ String(data.volume * 100) + '%' }}
+                </div>
+              </b-input-group-text>
+            </b-input-group>
+          </b-form-group>
+
+          <b-form-group label-cols-sm="4" label-cols-lg="3"
+                  :label="translate('registry.alerts.rate')"
+                  label-for="rate">
+            <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
+              <b-form-input
+                id="rate"
+                v-model="data.rate"
+                type="range"
+                min="0"
+                max="1.5"
+                step="0.1"
+              ></b-form-input>
+              <b-input-group-text slot="append" class="pr-3 pl-3">
+                <div style="width: 3rem;">
+                  {{ String(data.rate) }}
+                </div>
+              </b-input-group-text>
+            </b-input-group>
+          </b-form-group>
+
+          <b-form-group label-cols-sm="4" label-cols-lg="3"
+                  :label="translate('registry.alerts.pitch')"
+                  label-for="pitch">
+            <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
+              <b-form-input
+                id="pitch"
+                v-model="data.pitch"
+                type="range"
+                min="0"
+                max="2"
+                step="0.1"
+              ></b-form-input>
+              <b-input-group-text slot="append" class="pr-3 pl-3">
+                <div style="width: 3rem;">
+                  {{ String(data.pitch) }}
+                </div>
+              </b-input-group-text>
+            </b-input-group>
+          </b-form-group>
+
+          <b-form-group label-cols-sm="4" label-cols-lg="3"
+              :label="translate('registry.alerts.test')">
+            <b-textarea v-model="text"/>
+            <b-button type="button" @click="speak()" variant="primary" block>{{ translate('registry.alerts.test') }}</b-button>
+          </b-form-group>
         </b-card-body>
         <b-card-body v-if="state.loaded === $state.fail">
           <b-alert show variant="info">
@@ -38,7 +103,7 @@ declare global {
 export default class TTS extends Vue {
   @PropSync('tts') readonly data !: Registry.Alerts.TTS;
 
-  text = "Hello world!";
+  text = "This is test donation message :)";
   state: { loaded: number } = { loaded: this.$state.progress }
 
   voices: {text: string; value: string}[] = [];
@@ -64,7 +129,7 @@ export default class TTS extends Vue {
   }
 
   speak() {
-    window.responsiveVoice.speak(this.text, this.data.voice);
+    window.responsiveVoice.speak(this.text, this.data.voice, { rate: this.data.rate, pitch: this.data.pitch, volume: this.data.volume });
   }
 }
 </script>

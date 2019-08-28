@@ -118,5 +118,13 @@
   "message": {
     "setting": "Message settings"
   },
-  "showAutoHost": "Zobrazit autohost"
+  "showAutoHost": "Show autohost",
+  "voice": "Voice",
+  "volume": "Volume",
+  "rate": "Rate",
+  "pitch": "Pitch",
+  "test": "Test",
+  "tts": {
+    "setting": "Nastavení TTS"
+  }
 }

@@ -23,6 +23,9 @@ declare namespace Registry {
       | 'shake2' | 'swing' | 'tada' | 'wave' | 'wobble' | 'wiggle' | 'wiggle2' | 'jello';
     type TTS = {
       voice: string;
+      pitch: number;
+      volume: number;
+      rate: number;
     }
 
     export type Alert = {

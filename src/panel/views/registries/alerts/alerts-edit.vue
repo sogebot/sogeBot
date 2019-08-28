@@ -319,6 +319,9 @@ export default class AlertsEdit extends Vue {
       enableAdvancedMode: false,
       tts: {
         voice: 'UK English Female',
+        volume: 1,
+        rate: 1,
+        pitch: 1,
       },
       font: {
         family: 'PT Sans',
