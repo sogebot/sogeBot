@@ -60,26 +60,25 @@ finished: {{ (getCurrentAlertList() || []).filter(o => o.finished) }}
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { Vue, Component, Watch } from 'vue-property-decorator';
 import { TweenLite } from 'gsap/TweenMax'
 import io from 'socket.io-client';
 
-export default {
-  props: ['token'],
-  data: function () {
-    return {
-      socket: io('/overlays/alerts', {query: "token="+token}),
-      isPlaying: false,
-      alerts: [],
-      interval: [],
-    }
-  },
-  beforeDestroy: function() {
+@Component({})
+export default class CarouselOverlay extends Vue {
+  socket = io('/overlays/alerts', {query: "token="+this.token});
+  isPlaying = false;
+  alerts: any[] = [];
+  interval: any[] = [];
+
+  beforeDestroy() {
     for(const interval of this.interval) {
       clearInterval(interval);
     }
-  },
-  mounted: function () {
+  }
+
+  mounted () {
     this.socket.on('alert', data => {
       for (let d of data) {
         d.run = false
@@ -108,7 +107,7 @@ export default {
               a.finished = true
               continue
             }
-            const audio = this.$refs.audio
+            const audio = this.$refs.audio as HTMLMediaElement[]
             if (audio) {
               for (let el of audio) {
                 if (el.src === a.url) {
@@ -132,7 +131,7 @@ export default {
               a.finished = true
               continue
             }
-            const video = this.$refs.video
+            const video = this.$refs.video as HTMLMediaElement[]
             if (video) {
               for (let el of video) {
                 if (el.dataset.src === a.url) {
@@ -196,62 +195,54 @@ export default {
         }
       }
     }, 100));
-  },
-  computed: {
-    finishedCount: function () {
-      if (this.getCurrentAlertList()) {
-        return this.getCurrentAlertList().filter(o => o.finished).length
-      } else return 0
-    },
-    isFinished: function () {
-      if (this.getCurrentAlertList())
-        return this.finishedCount === this.getCurrentAlertList().length
-      else
-        return true
-    }
-  },
-  watch: {
-    isFinished: function (val) {
-      if (val) {
-        this.isPlaying = false,
-        this.alerts.shift()
-        if (this.alerts[0]) {
-          for (let a of this.alerts[0]) {
-            a.receivedAt = Date.now()
-          }
-        }
-      }
-    }
-  },
-  methods: {
-    urlParam: function (name) {
-      var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
-      if (results == null) {
-        return null
-      } else {
-        return decodeURI(results[1]) || 0;
-      }
-    },
-    doEnterAnimation: function (el, done) {
-      TweenLite.to(el, (this.getCurrentAlertList()[el.dataset.index].duration || 1000) / 1000, {
-        opacity: 1,
-        onComplete: () => {
-          done()
-        }
-      })
-    },
-    doLeaveAnimation: function (el, done) {
-      TweenLite.to(el, (this.getCurrentAlertList()[el.dataset.index].duration || 1000) / 1000, {
-        opacity: 0,
-        onComplete: () => {
-          done()
-        }
-      })
-    },
-    getCurrentAlertList: function () {
-      return this.alerts.length > 0 ? this.alerts[0] : null
-    },
+  }
 
+  get finishedCount () {
+    if (this.getCurrentAlertList()) {
+      return this.getCurrentAlertList().filter(o => o.finished).length
+    } else return 0
+  }
+
+  get isFinished () {
+    if (this.getCurrentAlertList())
+      return this.finishedCount === this.getCurrentAlertList().length
+    else
+      return true
+  }
+
+  @Watch('isFinished')
+  isFinishedWatch (val) {
+    if (val) {
+      this.isPlaying = false,
+      this.alerts.shift()
+      if (this.alerts[0]) {
+        for (let a of this.alerts[0]) {
+          a.receivedAt = Date.now()
+        }
+      }
+    }
+  }
+
+  doEnterAnimation (el, done) {
+    TweenLite.to(el, (this.getCurrentAlertList()[el.dataset.index].duration || 1000) / 1000, {
+      opacity: 1,
+      onComplete: () => {
+        done()
+      }
+    })
+  }
+
+  doLeaveAnimation (el, done) {
+    TweenLite.to(el, (this.getCurrentAlertList()[el.dataset.index].duration || 1000) / 1000, {
+      opacity: 0,
+      onComplete: () => {
+        done()
+      }
+    })
+  }
+
+  getCurrentAlertList () {
+    return this.alerts.length > 0 ? this.alerts[0] : null
   }
 }
 </script>
