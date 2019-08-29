@@ -1,6 +1,3 @@
-// 3rdparty libraries
-import _ from 'lodash';
-
 // bot libraries
 import Integration from './_interface';
 import { settings, ui } from '../decorators';
