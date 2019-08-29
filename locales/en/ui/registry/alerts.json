@@ -20,7 +20,7 @@
   "loadStandardProfanityList": "Load standard profanity list",
   "customProfanityList": {
     "name": "Custom profanity list",
-    "help": "Words should be separated with space."
+    "help": "Words should be separated with comma."
   },
   "event": {
     "follows": "Follows",

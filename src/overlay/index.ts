@@ -4,6 +4,7 @@ import { isAvailableVariable } from '../panel/helpers/isAvailableVariable';
 import translate from '../panel/helpers/translate';
 import VueRouter from 'vue-router';
 
+import { ButtonStates, states } from '../panel/helpers/buttonStates';
 
 import moment from 'moment';
 import momentTimezone from 'moment-timezone';
@@ -30,6 +31,7 @@ declare module 'vue/types/vue' {
     configuration: any;
     $moment?: any;
     urlParam(key: string): string | null;
+    $state: states;
   }
 }
 
@@ -42,14 +44,15 @@ const overlays = async () => {
   Vue.prototype.translate = (v) => translate(v);
   Vue.prototype.urlParam = (v) => urlParam(v);
   Vue.prototype.token = token;
-  Vue.prototype.token = token;
   Vue.prototype.configuration = global.configuration;
+  Vue.prototype.$state = ButtonStates;
 
   const router = new VueRouter({
     mode: 'history',
     base: __dirname,
     routes: [
       { path: '/overlays/alerts', name: 'alertsOverlay', component: () => import('./views/alerts.vue') },
+      { path: '/overlays/alerts/:id', name: 'alertsRegistryOverlay', component: () => import('./views/alertsRegistry.vue') },
       { path: '/overlays/bets', name: 'betsOverlay', component: () => import('./views/bets.vue') },
       { path: '/overlays/carousel', name: 'carouselOverlay', component: () => import('./views/carousel.vue') },
       { path: '/overlays/clips', name: 'clipsOverlay', component: () => import('./views/clips.vue') },

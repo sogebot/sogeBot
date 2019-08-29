@@ -66,7 +66,7 @@ import { TweenLite } from 'gsap/TweenMax'
 import io from 'socket.io-client';
 
 @Component({})
-export default class CarouselOverlay extends Vue {
+export default class AlertsOverlay extends Vue {
   socket = io('/overlays/alerts', {query: "token="+this.token});
   isPlaying = false;
   alerts: any[] = [];

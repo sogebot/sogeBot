@@ -20,7 +20,7 @@
   "loadStandardProfanityList": "Nahrát standardní seznam vulgarit",
   "customProfanityList": {
     "name": "Vlastní list vulgarit",
-    "help": "Slova musí být oddělena mezerou"
+    "help": "Slova musí být oddělena čárkou."
   },
   "event": {
     "follows": "Sledující",

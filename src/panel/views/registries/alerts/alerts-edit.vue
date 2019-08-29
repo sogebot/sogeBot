@@ -82,19 +82,26 @@
         label-for="profanityFilterType"
       >
         <b-form-select v-model="item.profanityFilterType" :options="profanityFilterTypeOptions" plain />
-        <b-form-checkbox class="mt-2 ml-2 normalLabel"
-          v-model="item.loadStandardProfanityList"
-        >
-          {{ translate('registry.alerts.loadStandardProfanityList') }}
-        </b-form-checkbox>
       </b-form-group>
 
+      <b-form-group
+        :label="translate('registry.alerts.loadStandardProfanityList')"
+        label-for="profanityFilterType"
+      >
+        <b-row>
+          <b-col sm="auto" v-for="lang of Object.keys(item.loadStandardProfanityList)" v-bind:key="lang">
+            <b-form-checkbox class="mt-2 ml-2 normalLabel" v-model="item.loadStandardProfanityList[lang]">
+              {{ lang }}
+            </b-form-checkbox>
+          </b-col>
+        </b-row>
+      </b-form-group>
       <b-form-group
         :label="translate('registry.alerts.customProfanityList.name')"
         label-for="customProfanityList"
         :description="translate('registry.alerts.customProfanityList.help')"
       >
-        <b-textarea v-model.trim="customProfanityList" placeholder="kitty zebra horse"></b-textarea>
+        <b-textarea v-model="item.customProfanityList" placeholder="kitty, zebra, horse"></b-textarea>
       </b-form-group>
 
       <b-tabs align="center" v-model="selectedTabIndex" >
@@ -186,8 +193,12 @@ export default class AlertsEdit extends Vue {
     name: '',
     alertDelayInMs: 5000,
     profanityFilterType: 'replace-with-asterisk',
-    loadStandardProfanityList: true,
-    customProfanityList: [],
+    loadStandardProfanityList: {
+      cs: false,
+      en: true,
+      ru: false,
+    },
+    customProfanityList: '',
     alerts: {
       follows: [],
       hosts: [],
@@ -213,14 +224,6 @@ export default class AlertsEdit extends Vue {
     hosts: [],
     raids: [],
   };
-
-  get customProfanityList() {
-    return this.item.customProfanityList.join(' ');
-  }
-
-  set customProfanityList(value) {
-    this.item.customProfanityList = value.split(' ').filter(String);
-  }
 
   get isAllValid() {
     for (const key of Object.keys(this.isValid)) {
