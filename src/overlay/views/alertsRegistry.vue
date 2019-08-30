@@ -54,7 +54,7 @@ require('animate.css');
   components: {
     JsonViewer,
     VRuntimeTemplate,
-    'baffle': () => import('../../panel/components/baffle'),
+    'baffle': () => import('src/panel/components/baffle.vue'),
   }
 })
 export default class AlertsRegistryOverlays extends Vue {

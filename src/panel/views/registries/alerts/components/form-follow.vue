@@ -305,13 +305,13 @@ import { required, minValue } from 'vuelidate/lib/validators'
 
 @Component({
   components: {
-    media: () => import('../../../../components/media'),
-    'layout-picker': () => import('./layout-picker'),
-    'text-animation': () => import('./text-animation'),
-    'animation-in': () => import('./animation-in'),
-    'animation-out': () => import('./animation-out'),
-    'variant': () => import('./variant'),
-    'hold-button': () => import('../../../../components/holdButton'),
+    media: () => import('src/panel/components/media.vue'),
+    'layout-picker': () => import('./layout-picker.vue'),
+    'text-animation': () => import('./text-animation.vue'),
+    'animation-in': () => import('./animation-in.vue'),
+    'animation-out': () => import('./animation-out.vue'),
+    'variant': () => import('./variant.vue'),
+    'hold-button': () => import('../../../../components/holdButton.vue'),
   }
 })
 export default class AlertsEditFollowForm extends Vue {

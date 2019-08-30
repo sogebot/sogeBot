@@ -40,7 +40,8 @@ module.exports = [{
   resolve: {
     extensions: ['.ts', '.js', '.vue', '.json'],
     alias: {
-      'vue$': 'vue/dist/vue.esm.js'
+      'vue$': 'vue/dist/vue.esm.js',
+      src: path.resolve(__dirname, 'src'),
     }
   },
   output: {
@@ -132,7 +133,8 @@ module.exports = [{
   resolve: {
     extensions: ['.ts', '.js', '.vue', '.json'],
     alias: {
-      'vue$': 'vue/dist/vue.esm.js'
+      'vue$': 'vue/dist/vue.esm.js',
+      src: path.resolve(__dirname, 'src'),
     }
   },
   output: {
