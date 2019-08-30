@@ -114,7 +114,7 @@
       <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
         <b-form-input
           id="alertDurationInMs"
-          v-model="data.alertDurationInMs"
+          v-model.number="data.alertDurationInMs"
           type="range"
           min="0"
           max="60000"
@@ -134,7 +134,7 @@
       <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
         <b-form-input
           id="alertTextDelayInMs"
-          v-model="data.alertTextDelayInMs"
+          v-model.number="data.alertTextDelayInMs"
           type="range"
           min="0"
           max="60000"

@@ -69,7 +69,7 @@
         <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
           <b-form-input
             id="alertDelayInMs"
-            v-model="item.alertDelayInMs"
+            v-model.number="item.alertDelayInMs"
             type="range"
             min="0"
             max="30000"
@@ -337,7 +337,7 @@ export default class AlertsEdit extends Vue {
       font: {
         family: 'PT Sans',
         size: 24,
-        borderPx: 5,
+        borderPx: 1,
         borderColor: '#000000',
         weight: 800,
         color: '#ffffff',

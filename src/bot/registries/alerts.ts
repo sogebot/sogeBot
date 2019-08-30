@@ -29,7 +29,7 @@ class Alerts extends Registry {
 
     const amount = Math.floor(Math.random() * 1000);
     const data: Registry.Alerts.EmitData = {
-      username: generateUsername(),
+      name: generateUsername(),
       amount,
       currency: global.currency.mainCurrency,
       monthsName: getLocalizedName(amount, 'core.months'),
@@ -40,7 +40,7 @@ class Alerts extends Registry {
         : '',
     };
 
-    global.panel.io.of('/registries/alerts').emit('alert', { data });
+    global.panel.io.of('/registries/alerts').emit('alert', data);
   }
 }
 

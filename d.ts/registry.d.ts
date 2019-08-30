@@ -29,14 +29,14 @@ declare namespace Registry {
     };
 
     export type EmitData = {
-      username: string;
+      name: string;
       amount: number;
       currency: string;
       monthsName: string;
       event: keyof Registry.Alerts.List;
       isResub: boolean;
       message: string;
-    }
+    };
 
     export type List = {
       follows: Follow[];
