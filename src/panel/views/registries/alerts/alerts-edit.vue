@@ -24,6 +24,14 @@
         </hold-button>
       </template>
       <template v-slot:right v-if="state.loaded === $state.success">
+        <b-dropdown id="dropdown-buttons" :text="translate('registry.alerts.test')" class="m-2">
+          <b-dropdown-item-button
+            @click="socket.emit('test', event)"
+            v-for="event of ['follows', 'cheers', 'tips', 'subs', 'hosts', 'raids']"
+            v-bind:key="event">
+            {{ translate('registry.alerts.event.' + event) }}</b-dropdown-item-button>
+        </b-dropdown>
+
         <button-with-icon
           v-if="$route.params.id && state.loaded === $state.success"
           :text="'/overlays/alerts/' + item.id"

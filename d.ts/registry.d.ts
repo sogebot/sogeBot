@@ -26,7 +26,26 @@ declare namespace Registry {
       pitch: number;
       volume: number;
       rate: number;
+    };
+
+    export type EmitData = {
+      username: string;
+      amount: number;
+      currency: string;
+      monthsName: string;
+      event: keyof Registry.Alerts.List;
+      isResub: boolean;
+      message: string;
     }
+
+    export type List = {
+      follows: Follow[];
+      hosts: Host[];
+      raids: Host[];
+      tips: Cheer[];
+      cheers: Cheer[];
+      subs: Sub[];
+    };
 
     export type Alert = {
       id: string;
@@ -39,14 +58,7 @@ declare namespace Registry {
         ru: boolean;
       };
       customProfanityList: string;
-      alerts: {
-        follows: Follow[];
-        hosts: Host[];
-        raids: Host[];
-        tips: Cheer[];
-        cheers: Cheer[];
-        subs: Sub[];
-      };
+      alerts: List;
     };
 
     export type CommonSettings = {

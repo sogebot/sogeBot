@@ -3,6 +3,7 @@
     <template v-if="state.loaded === $state.success">
       <div v-if="urlParam('debug')" class="debug">
         <json-viewer :value="data" boxed></json-viewer>
+        <json-viewer :value="alerts" boxed></json-viewer>
       </div>
     </template>
   </div>
@@ -31,6 +32,8 @@ export default class AlertsRegistryOverlays extends Vue {
   data: null | Registry.Alerts.Alert = null;
   defaultProfanityList: string[] = [];
 
+  alerts: Registry.Alerts.EmitData[] = []
+
   mounted() {
     this.id = this.$route.params.id
     this.socket.emit('findOne', { where: { id: this.id }}, (err, data: Registry.Alerts.Alert) => {
@@ -50,6 +53,11 @@ export default class AlertsRegistryOverlays extends Vue {
 
       console.debug('Profanity list', this.defaultProfanityList);
       this.state.loaded = this.$state.success;
+    })
+
+    this.socket.on('alert', (data: Registry.Alerts.EmitData) => {
+      console.debug('Incoming alert', data);
+      this.alerts.push(data)
     })
   }
 }

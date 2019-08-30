@@ -9,6 +9,7 @@ import { flatten } from './helpers/flatten';
 import { getLocalizedName, getOwner, isBot, isBroadcaster, isModerator, isOwner, isSubscriber, isVIP, prepare, sendMessage } from './commons';
 import Message from './message';
 import * as Parser from './parser';
+import { generateUsername } from './helpers/generateUsername';
 
 class Events extends Core {
   public timeouts: { [x: string]: NodeJS.Timeout } = {};
@@ -545,12 +546,6 @@ class Events extends Core {
       });
 
       socket.on('test.event', async (eventId, cb) => {
-        const generateUsername = () => {
-          const adject = ['Encouraging', 'Plucky', 'Glamorous', 'Endearing', 'Fast', 'Agitated', 'Mushy', 'Muddy', 'Sarcastic', 'Real', 'Boring'];
-          const subject = ['Sloth', 'Beef', 'Fail', 'Fish', 'Fast', 'Raccoon', 'Dog', 'Man', 'Pepperonis', 'RuleFive', 'Slug', 'Cat', 'SogeBot'];
-          return _.sample(adject) || adject[0] + _.sample(subject) || subject[0];
-        };
-
         const username = _.sample(['short', 'someFreakingLongUsername', generateUsername()]) || 'short';
         const recipient = _.sample(['short', 'someFreakingLongUsername', generateUsername()]) || 'short';
         const months = _.random(0, 99, false);
