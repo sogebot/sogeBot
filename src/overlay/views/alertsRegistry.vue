@@ -187,7 +187,7 @@ export default class AlertsRegistryOverlays extends Vue {
               }
             }
 
-            console.log({possibleAlertsWithRandomCount, possibleAlertsWithExactAmount, possibleAlertsWithGtEqAmount})
+            console.debug({possibleAlertsWithRandomCount, possibleAlertsWithExactAmount, possibleAlertsWithGtEqAmount})
 
             let alert;
             if (possibleAlertsWithExactAmount.length > 0) {
