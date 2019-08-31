@@ -11,20 +11,42 @@
           <source :src="runningAlert.alert.sound">
         </audio>
         <div v-show="runningAlert.isShowing" style="display: flex;" class="center" :class="['layout-' + runningAlert.alert.layout]">
-          <img :src="runningAlert.alert.image" :class="{ center: runningAlert.alert.layout === '3' }" />
+          <img :src="runningAlert.alert.image" :class="{ center: runningAlert.alert.layout === '3', [runningAlert.animation]: true }" class="slow animated"/>
           <div
             v-if="runningAlert.isShowingText"
             :class="{
-              center: runningAlert.alert.layout === '3'
+              center: runningAlert.alert.layout === '3',
+              [runningAlert.animationText]: true
             }"
+            class="slow animated"
             :style="{
               'font-family': runningAlert.alert.font.family,
               'font-size': runningAlert.alert.font.size + 'px',
               'font-weight': runningAlert.alert.font.weight,
               'color': runningAlert.alert.font.color,
+              'text-align': 'center',
               'text-shadow': textStrokeGenerator(runningAlert.alert.font.borderPx, runningAlert.alert.font.borderColor)
             }">
               <v-runtime-template :template="prepareMessageTemplate(runningAlert.alert.messageTemplate)"></v-runtime-template>
+              <div
+                v-if="
+                     typeof runningAlert.alert.message !== 'undefined'
+                  && typeof runningAlert.alert.message.minAmountToShow !== 'undefined'
+                  && runningAlert.alert.message.minAmountToShow <= runningAlert.amount"
+                :class="{
+                }"
+                :style="{
+                  'width': '30rem',
+                  'text-align': 'left',
+                  'flex': '1 0 0px',
+                  'font-family': runningAlert.alert.message.font.family,
+                  'font-size': runningAlert.alert.message.font.size + 'px',
+                  'font-weight': runningAlert.alert.message.font.weight,
+                  'color': runningAlert.alert.message.font.color,
+                  'text-shadow': textStrokeGenerator(runningAlert.alert.message.font.borderPx, runningAlert.alert.message.font.borderColor)
+                }">
+                  {{ runningAlert.message }}
+              </div>
           </div>
           <div v-else
             :style="{
@@ -34,7 +56,10 @@
               'font-weight': runningAlert.alert.font.weight,
               'color': runningAlert.alert.font.color,
               'text-shadow': textStrokeGenerator(runningAlert.alert.font.borderPx, runningAlert.alert.font.borderColor)
-            }">{{runningAlert.alert.messageTemplate}}</div> <!-- empty div to mitigate text area -->
+            }">
+              {{runningAlert.alert.messageTemplate}}
+              <div>{{ runningAlert.message }}</div>
+            </div> <!-- empty div to mitigate text area -->
         </div>
       </div>
     </template>
@@ -73,30 +98,56 @@ export default class AlertsRegistryOverlays extends Vue {
   defaultProfanityList: string[] = [];
 
   alerts: Registry.Alerts.EmitData[] = [];
-  runningAlert: Registry.Alerts.EmitData & { isShowingText: boolean; isShowing: boolean; soundPlayed: boolean; hideAt: number; showTextAt: number; showAt: number; alert: Registry.Alerts.Follow | Registry.Alerts.Host | Registry.Alerts.Cheer | Registry.Alerts.Sub } | null = null;
+  runningAlert: Registry.Alerts.EmitData & { animation: string; animationText: string; isShowingText: boolean; isShowing: boolean; soundPlayed: boolean; hideAt: number; showTextAt: number; showAt: number; alert: Registry.Alerts.Follow | Registry.Alerts.Host | Registry.Alerts.Cheer | Registry.Alerts.Sub } | null = null;
 
   beforeDestroyed() {
     clearInterval(this.interval);
   }
 
+  animationTextClass() {
+    if (this.runningAlert && this.runningAlert.showTextAt <= Date.now()) {
+      return this.runningAlert.hideAt - Date.now() <= 0
+        ? this.runningAlert.alert.animationOut
+        : this.runningAlert.alert.animationIn;
+    } else {
+      return 'none';
+    }
+  }
+
+  animationClass() {
+    if (this.runningAlert) {
+      return this.runningAlert.hideAt - Date.now() <= 0
+        ? this.runningAlert.alert.animationOut
+        : this.runningAlert.alert.animationIn;
+    } else {
+      return 'none';
+    }
+  }
+
   mounted() {
     this.interval = window.setInterval(() => {
       if (this.runningAlert) {
-        // cleanup
-        if (this.runningAlert.hideAt <= Date.now() + 2000) {
+        // cleanup alert after 5s
+        if (this.runningAlert.hideAt - Date.now() + 5000 <= 0) {
           this.runningAlert = null;
           return;
         }
 
+        this.runningAlert.animation = this.animationClass();
+        this.runningAlert.animationText = this.animationTextClass();
+
         if (this.runningAlert.showAt <= Date.now() && !this.runningAlert.isShowing) {
+          console.debug('showing image');
           this.runningAlert.isShowing = true;
         }
 
         if (this.runningAlert.showTextAt <= Date.now() && !this.runningAlert.isShowingText) {
+          console.debug('showing text');
           this.runningAlert.isShowingText = true;
         }
 
-        if (this.runningAlert.showAt >= Date.now() && !this.runningAlert.soundPlayed) {
+        if (this.runningAlert.showAt <= Date.now() && !this.runningAlert.soundPlayed) {
+          console.debug('playing audio');
           (this.$refs.audio as HTMLMediaElement).volume = this.runningAlert.alert.soundVolume / 100;
           (this.$refs.audio as HTMLMediaElement).play();
           this.runningAlert.soundPlayed = true;
@@ -108,9 +159,48 @@ export default class AlertsRegistryOverlays extends Vue {
         if (emitData && this.data) {
           const possibleAlerts = this.data.alerts[emitData.event];
           if (possibleAlerts.length > 0) {
-            const alert = possibleAlerts[Math.floor(Math.random() * possibleAlerts.length)];
+            // search for exact variants
+            const possibleAlertsWithExactAmount = possibleAlerts.filter(o => {
+              return o.enabled
+                  && o.variantCondition === 'exact'
+                  && o.variantAmount === emitData.amount;
+            });
+
+            // search for gt-eq variants
+            const possibleAlertsWithGtEqAmount = possibleAlerts.filter(o => {
+              return o.enabled
+                  && o.variantCondition === 'gt-eq'
+                  && o.variantAmount <= emitData.amount
+            });
+
+            // search for random variants
+            let possibleAlertsWithRandomCount: (Registry.Alerts.Follow | Registry.Alerts.Host | Registry.Alerts.Cheer | Registry.Alerts.Sub)[] = [];
+            for (const alert of possibleAlerts) {
+              if (!alert.enabled) {
+                continue;
+              }
+
+              if (alert.variantCondition === 'random') {
+                for (let i = 0; i < alert.variantAmount; i++) {
+                  possibleAlertsWithRandomCount.push(alert)
+                }
+              }
+            }
+
+            console.log({possibleAlertsWithRandomCount, possibleAlertsWithExactAmount, possibleAlertsWithGtEqAmount})
+
+            let alert;
+            if (possibleAlertsWithExactAmount.length > 0) {
+              alert = possibleAlertsWithExactAmount[Math.floor(Math.random() * possibleAlertsWithExactAmount.length)];
+            } else if (possibleAlertsWithGtEqAmount.length > 0) {
+              alert = possibleAlertsWithGtEqAmount[Math.floor(Math.random() * possibleAlertsWithGtEqAmount.length)];
+            } else {
+              alert = possibleAlertsWithRandomCount[Math.floor(Math.random() * possibleAlertsWithRandomCount.length)];
+            }
             this.runningAlert = {
               ...emitData,
+              animation: "none",
+              animationText: "none",
               soundPlayed: false,
               isShowing: false,
               isShowingText: false,
@@ -182,13 +272,24 @@ export default class AlertsRegistryOverlays extends Vue {
           return char;
         }
       })
+      let amount: string | string[] = String(this.runningAlert.amount).split('').map((char, index) => {
+        if (this.runningAlert !== null) {
+          return `<div class="animated infinite ${this.runningAlert.alert.animationText} ${this.runningAlert.alert.animationTextOptions.speed}" style="animation-delay: ${index * 50}ms; color: ${this.runningAlert.alert.font.highlightcolor}; display: inline-block;">${char}</div>`;
+        } else {
+          return char;
+        }
+      })
 
       if (this.runningAlert.alert.animationText === 'baffle') {
         name = `<baffle :text="runningAlert.name" :options="runningAlert.alert.animationTextOptions" style="color: ${this.runningAlert.alert.font.highlightcolor}"/>`
+        amount = `<baffle :text="runningAlert.amount" :options="runningAlert.alert.animationTextOptions" style="color: ${this.runningAlert.alert.font.highlightcolor}"/>`
       } else {
         name = name.join('');
+        amount = amount.join('');
       }
-      msg = msg.replace(/\{name\}/g, name);
+      msg = msg
+        .replace(/\{name\}/g, name)
+        .replace(/\{amount\}/g, amount);
     }
     return `<span>${msg}</span>`;
   }

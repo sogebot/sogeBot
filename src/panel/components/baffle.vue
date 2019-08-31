@@ -34,6 +34,7 @@ export default class baffleText extends Vue {
 
   mounted() {
     this.start()
+    console.debug('== baffle', { interval: this.interval, text: this.text, options: this.options});
   }
 
   @Watch('options', { deep: true })

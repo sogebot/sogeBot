@@ -199,7 +199,7 @@ export default class AlertsEdit extends Vue {
   item: Registry.Alerts.Alert = {
     id: uuid(),
     name: '',
-    alertDelayInMs: 5000,
+    alertDelayInMs: 0,
     profanityFilterType: 'replace-with-asterisk',
     loadStandardProfanityList: {
       cs: false,
@@ -326,7 +326,7 @@ export default class AlertsEdit extends Vue {
       sound: defaultAudio,
       soundVolume: 20,
       alertDurationInMs: 10000,
-      alertTextDelayInMs: 0,
+      alertTextDelayInMs: 1500,
       enableAdvancedMode: false,
       tts: {
         voice: 'UK English Female',
@@ -363,8 +363,8 @@ export default class AlertsEdit extends Vue {
             },
             font: {
               family: 'PT Sans',
-              size: 12,
-              borderPx: 2,
+              size: 16,
+              borderPx: 1,
               borderColor: '#000000',
               weight: 500,
               color: '#ffffff',
@@ -416,14 +416,14 @@ export default class AlertsEdit extends Vue {
       case 'hosts':
         this.item.alerts.hosts.push({
           showAutoHost: false,
-          messageTemplate: '{name} is now hosting my stream with {count} viewers!',
+          messageTemplate: '{name} is now hosting my stream with {amount} viewers!',
           ..._default,
         })
         break;
       case 'raids':
         this.item.alerts.raids.push({
           showAutoHost: false,
-          messageTemplate: '{name} is raiding with a party of {count}!',
+          messageTemplate: '{name} is raiding with a party of {amount} raiders!',
           ..._default,
         })
         break;

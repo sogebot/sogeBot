@@ -3462,6 +3462,7 @@
         "p-timeout": {
           "version": "2.0.1",
           "dev": true,
+          "optional": true,
           "requires": {
             "p-finally": "^1.0.0"
           }
@@ -4077,7 +4078,6 @@
     },
     "clipboard": {
       "version": "2.0.4",
-      "optional": true,
       "requires": {
         "good-listener": "^1.2.2",
         "select": "^1.1.2",
@@ -4779,6 +4779,7 @@
     "decompress-response": {
       "version": "3.3.0",
       "dev": true,
+      "optional": true,
       "requires": {
         "mimic-response": "^1.0.0"
       }
@@ -4950,8 +4951,7 @@
       "version": "1.0.0"
     },
     "delegate": {
-      "version": "3.2.0",
-      "optional": true
+      "version": "3.2.0"
     },
     "delegates": {
       "version": "1.0.0",
@@ -5943,6 +5943,7 @@
     "ext-list": {
       "version": "2.2.2",
       "dev": true,
+      "optional": true,
       "requires": {
         "mime-db": "^1.28.0"
       }
@@ -5950,6 +5951,7 @@
     "ext-name": {
       "version": "5.0.0",
       "dev": true,
+      "optional": true,
       "requires": {
         "ext-list": "^2.0.0",
         "sort-keys-length": "^1.0.0"
@@ -6606,7 +6608,6 @@
     },
     "good-listener": {
       "version": "1.2.2",
-      "optional": true,
       "requires": {
         "delegate": "^3.1.2"
       }
@@ -8266,7 +8267,8 @@
     },
     "mimic-response": {
       "version": "1.0.1",
-      "dev": true
+      "dev": true,
+      "optional": true
     },
     "miniget": {
       "version": "1.5.3"
@@ -9280,6 +9282,7 @@
     "p-timeout": {
       "version": "1.2.1",
       "dev": true,
+      "optional": true,
       "requires": {
         "p-finally": "^1.0.0"
       }
@@ -9610,7 +9613,8 @@
     },
     "prepend-http": {
       "version": "2.0.0",
-      "dev": true
+      "dev": true,
+      "optional": true
     },
     "preserve": {
       "version": "0.2.0",
@@ -10367,8 +10371,7 @@
       }
     },
     "select": {
-      "version": "1.1.2",
-      "optional": true
+      "version": "1.1.2"
     },
     "semver": {
       "version": "5.7.0"
@@ -10632,6 +10635,7 @@
     "sort-keys": {
       "version": "1.1.2",
       "dev": true,
+      "optional": true,
       "requires": {
         "is-plain-obj": "^1.0.0"
       }
@@ -10639,6 +10643,7 @@
     "sort-keys-length": {
       "version": "1.0.1",
       "dev": true,
+      "optional": true,
       "requires": {
         "sort-keys": "^1.0.0"
       }
@@ -11062,11 +11067,13 @@
     },
     "temp-dir": {
       "version": "1.0.0",
-      "dev": true
+      "dev": true,
+      "optional": true
     },
     "tempfile": {
       "version": "2.0.0",
       "dev": true,
+      "optional": true,
       "requires": {
         "temp-dir": "^1.0.0",
         "uuid": "^3.0.1"
@@ -11759,6 +11766,10 @@
       "version": "10.148.2",
       "optional": true
     },
+    "v-runtime-template": {
+      "version": "1.10.0",
+      "dev": true
+    },
     "v8-compile-cache": {
       "version": "2.0.3",
       "dev": true
@@ -11886,6 +11897,14 @@
     "vue-hot-reload-api": {
       "version": "2.3.3",
       "dev": true
+    },
+    "vue-json-viewer": {
+      "version": "2.2.2",
+      "dev": true,
+      "requires": {
+        "clipboard": "^2.0.4",
+        "vue": "^2.6.9"
+      }
     },
     "vue-loader": {
       "version": "15.7.1",
