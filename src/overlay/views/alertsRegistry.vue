@@ -75,6 +75,12 @@ import VRuntimeTemplate from "v-runtime-template";
 require('../../../scss/letter-animations.css');
 require('animate.css');
 
+declare global {
+  interface Window {
+    responsiveVoice: any;
+  }
+}
+
 @Component({
   components: {
     JsonViewer,
@@ -98,7 +104,17 @@ export default class AlertsRegistryOverlays extends Vue {
   defaultProfanityList: string[] = [];
 
   alerts: Registry.Alerts.EmitData[] = [];
-  runningAlert: Registry.Alerts.EmitData & { animation: string; animationText: string; isShowingText: boolean; isShowing: boolean; soundPlayed: boolean; hideAt: number; showTextAt: number; showAt: number; alert: Registry.Alerts.Follow | Registry.Alerts.Host | Registry.Alerts.Cheer | Registry.Alerts.Sub } | null = null;
+  runningAlert: Registry.Alerts.EmitData & {
+    animation: string;
+    animationText: string;
+    isShowingText: boolean;
+    isShowing: boolean;
+    soundPlayed: boolean;
+    hideAt: number;
+    showTextAt: number;
+    showAt: number;
+    waitingForTTS: boolean;
+    alert: Registry.Alerts.Follow | Registry.Alerts.Host | Registry.Alerts.Cheer | Registry.Alerts.Sub } | null = null;
 
   beforeDestroyed() {
     clearInterval(this.interval);
@@ -106,7 +122,7 @@ export default class AlertsRegistryOverlays extends Vue {
 
   animationTextClass() {
     if (this.runningAlert && this.runningAlert.showTextAt <= Date.now()) {
-      return this.runningAlert.hideAt - Date.now() <= 0
+      return this.runningAlert.hideAt - Date.now() <= 0 && (!window.responsiveVoice.isPlaying() || this.runningAlert.waitingForTTS)
         ? this.runningAlert.alert.animationOut
         : this.runningAlert.alert.animationIn;
     } else {
@@ -116,7 +132,7 @@ export default class AlertsRegistryOverlays extends Vue {
 
   animationClass() {
     if (this.runningAlert) {
-      return this.runningAlert.hideAt - Date.now() <= 0
+      return this.runningAlert.hideAt - Date.now() <= 0 && (!window.responsiveVoice.isPlaying() || this.runningAlert.waitingForTTS)
         ? this.runningAlert.alert.animationOut
         : this.runningAlert.alert.animationIn;
     } else {
@@ -124,11 +140,24 @@ export default class AlertsRegistryOverlays extends Vue {
     }
   }
 
+  speak(text, voice, rate, pitch, volume) {
+    window.responsiveVoice.speak(text, voice, { rate, pitch, volume });
+  }
+
   mounted() {
+    if (this.configuration.integrations.responsiveVoice.api.key.trim().length > 0) {
+      this.$loadScript("https://code.responsivevoice.org/responsivevoice.js?key=" + this.configuration.integrations.responsiveVoice.api.key)
+        .then(() => {
+          window.responsiveVoice.init();
+        });
+    } else {
+      console.debug('TTS disabled, responsiveVoice key is not set')
+    }
+
     this.interval = window.setInterval(() => {
       if (this.runningAlert) {
-        // cleanup alert after 5s
-        if (this.runningAlert.hideAt - Date.now() + 5000 <= 0) {
+        // cleanup alert after 5s and if responsiveVoice is done
+        if (this.runningAlert.hideAt - Date.now() + 5000 <= 0 && (!window.responsiveVoice.isPlaying() || this.runningAlert.waitingForTTS)) {
           this.runningAlert = null;
           return;
         }
@@ -144,6 +173,14 @@ export default class AlertsRegistryOverlays extends Vue {
         if (this.runningAlert.showTextAt <= Date.now() && !this.runningAlert.isShowingText) {
           console.debug('showing text');
           this.runningAlert.isShowingText = true;
+          if (this.runningAlert.alert.tts.enabled) {
+            this.runningAlert.waitingForTTS = true;
+          }
+        }
+
+        if (this.runningAlert.waitingForTTS && (this.$refs.audio as HTMLMediaElement).ended) {
+          this.speak(this.runningAlert.message, this.runningAlert.alert.tts.voice, this.runningAlert.alert.tts.rate, this.runningAlert.alert.tts.pitch, this.runningAlert.alert.tts.volume)
+          this.runningAlert.waitingForTTS = false;
         }
 
         if (this.runningAlert.showAt <= Date.now() && !this.runningAlert.soundPlayed) {
@@ -200,6 +237,7 @@ export default class AlertsRegistryOverlays extends Vue {
             this.runningAlert = {
               ...emitData,
               animation: "none",
+              waitingForTTS: false,
               animationText: "none",
               soundPlayed: false,
               isShowing: false,

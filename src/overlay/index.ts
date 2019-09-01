@@ -2,6 +2,7 @@ import Vue from 'vue';
 
 import { isAvailableVariable } from '../panel/helpers/isAvailableVariable';
 import translate from '../panel/helpers/translate';
+import LoadScript from 'vue-plugin-load-script';
 import VueRouter from 'vue-router';
 
 import { ButtonStates, states } from '../panel/helpers/buttonStates';
@@ -15,11 +16,14 @@ Vue.use(VueMoment, {
   moment, momentTimezone,
 });
 Vue.use(VueRouter);
+Vue.use(LoadScript);
 
 
 export interface Global {
   translations: any;
   configuration: any;
+  $loadScript: (script: string) => Promise<void>;
+  $unloadScript: (script: string) => Promise<void>;
 }
 
 declare let global: Global;

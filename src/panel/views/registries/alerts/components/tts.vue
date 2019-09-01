@@ -5,6 +5,15 @@
       </b-card-header>
       <b-collapse id="tts-accordion" accordion="my-accordion" role="tabpanel">
         <b-card-body v-if="state.loaded === $state.success">
+          <b-form-group
+            label-cols-sm="4"
+            label-cols-lg="3"
+            label-for="tts-enabled"
+            :label="translate('registry.alerts.enabled')"
+          >
+            <b-form-checkbox id="tts-enabled" v-model="data.enabled" name="enabled" switch></b-form-checkbox>
+          </b-form-group>
+
           <b-form-group label-cols-sm="4" label-cols-lg="3"
               :label="translate('registry.alerts.voice')">
             <b-form-select v-model="data.voice" :options="voices" plain></b-form-select>
@@ -115,7 +124,7 @@ export default class TTS extends Vue {
   mounted() {
     this.state.loaded = this.$state.progress;
     if (this.configuration.integrations.responsiveVoice.api.key.trim().length === 0) {
-    this.state.loaded = this.$state.fail;
+      this.state.loaded = this.$state.fail;
     } else {
       this.$loadScript("https://code.responsivevoice.org/responsivevoice.js?key=" + this.configuration.integrations.responsiveVoice.api.key)
         .then(() => {

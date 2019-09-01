@@ -329,6 +329,7 @@ export default class AlertsEdit extends Vue {
       alertTextDelayInMs: 1500,
       enableAdvancedMode: false,
       tts: {
+        enabled: false,
         voice: 'UK English Female',
         volume: 1,
         rate: 1,

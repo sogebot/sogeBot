@@ -30,9 +30,11 @@ class Alerts extends Registry {
     const amount = Math.floor(Math.random() * 1000);
     const messages = [
       'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Etiam dictum tincidunt diam. Aliquam erat volutpat. Mauris tincidunt sem sed arcu. Etiam sapien elit, consequat eget, tristique non, venenatis quis, ante. Praesent id justo in neque elementum ultrices. Integer pellentesque quam vel velit. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Etiam commodo dui eget wisi. Cras pede libero, dapibus nec, pretium sit amet, tempor quis. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.',
+      'Lorem ipsum dolor sit amet, consectetuer adipiscing elit.',
+      'This is some testing message :)',
       'Lorem ipsum dolor sit amet',
       '',
-    ]
+    ];
     const data: Registry.Alerts.EmitData = {
       name: generateUsername(),
       amount,
@@ -40,7 +42,7 @@ class Alerts extends Registry {
       monthsName: getLocalizedName(amount, 'core.months'),
       event: opts.event,
       isResub: opts.isResub,
-      message: messages[Math.floor(Math.random() * messages.length)]
+      message: messages[Math.floor(Math.random() * messages.length)],
     };
 
     global.panel.io.of('/registries/alerts').emit('alert', data);
