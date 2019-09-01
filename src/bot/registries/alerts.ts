@@ -42,7 +42,9 @@ class Alerts extends Registry {
       monthsName: getLocalizedName(amount, 'core.months'),
       event: opts.event,
       isResub: opts.isResub,
-      message: messages[Math.floor(Math.random() * messages.length)],
+      message: ['tips', 'cheers'].includes(opts.event)
+        ? messages[Math.floor(Math.random() * messages.length)]
+        : '',
     };
 
     global.panel.io.of('/registries/alerts').emit('alert', data);

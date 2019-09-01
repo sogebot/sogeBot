@@ -102,6 +102,7 @@ export default class AlertsRegistryOverlays extends Vue {
   id: null | string = null;
   data: null | Registry.Alerts.Alert = null;
   defaultProfanityList: string[] = [];
+  listHappyWords: string[] = [];
 
   alerts: Registry.Alerts.EmitData[] = [];
   runningAlert: Registry.Alerts.EmitData & {
@@ -264,6 +265,9 @@ export default class AlertsRegistryOverlays extends Vue {
         if (isEnabled) {
           let list = require('../../bot/data/vulgarities/' + lang + '.txt');
           this.defaultProfanityList = [...this.defaultProfanityList, ...list.default.split(/\r?\n/)]
+
+          let listHappyWords = require('../../bot/data/happyWords/' + lang + '.txt');
+          this.listHappyWords = [...this.listHappyWords, ...listHappyWords.default.split(/\r?\n/)]
         }
       }
 
@@ -273,6 +277,7 @@ export default class AlertsRegistryOverlays extends Vue {
       ]
 
       console.debug('Profanity list', this.defaultProfanityList);
+      console.debug('Happy words', this.listHappyWords);
       this.state.loaded = this.$state.success;
 
 
@@ -297,7 +302,31 @@ export default class AlertsRegistryOverlays extends Vue {
 
     this.socket.on('alert', (data: Registry.Alerts.EmitData) => {
       console.debug('Incoming alert', data);
-      this.alerts.push(data)
+
+      // checking for vulgarities
+      for (let vulgar of this.defaultProfanityList) {
+        if (this.data) {
+          if (this.data.profanityFilterType === 'replace-with-asterisk') {
+            data.message = data.message.replace(new RegExp(vulgar, 'gmi'), '***')
+          } else if (this.data.profanityFilterType === 'replace-with-happy-words') {
+            data.message = data.message.replace(new RegExp(vulgar, 'gmi'), this.listHappyWords[Math.floor(Math.random() * this.listHappyWords.length)])
+          } else if (this.data.profanityFilterType === 'hide-messages') {
+            if (data.message.search(new RegExp(vulgar, 'gmi')) >= 0) {
+              console.debug('Message contain vulgarity "' + vulgar + '" and is hidden.')
+              data.message = '';
+            }
+          } else if (this.data.profanityFilterType === 'disable-alerts') {
+            if (data.message.search(new RegExp(vulgar, 'gmi')) >= 0) {
+              console.debug('Message contain vulgarity "' + vulgar + '" and is alert disabled.');
+              return;
+            }
+          }
+        }
+      }
+
+      if (data !== null) {
+        this.alerts.push(data)
+      }
     })
   }
 
