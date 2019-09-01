@@ -70,7 +70,8 @@
 import { Vue, Component } from 'vue-property-decorator';
 import JsonViewer from 'vue-json-viewer'
 import io from 'socket.io-client';
-import VRuntimeTemplate from "v-runtime-template";
+import VRuntimeTemplate from 'v-runtime-template';
+import { isEqual } from 'lodash';
 
 require('../../../scss/letter-animations.css');
 require('animate.css');
@@ -90,7 +91,7 @@ declare global {
 })
 export default class AlertsRegistryOverlays extends Vue {
   socket = io('/registries/alerts', {query: "token="+this.token});
-  interval = 0;
+  interval: number[] = [];
   loadedFonts: string[] = [];
 
   state: {
@@ -118,7 +119,9 @@ export default class AlertsRegistryOverlays extends Vue {
     alert: Registry.Alerts.Follow | Registry.Alerts.Host | Registry.Alerts.Cheer | Registry.Alerts.Sub } | null = null;
 
   beforeDestroyed() {
-    clearInterval(this.interval);
+    for (const interval of this.interval) {
+      clearInterval(interval);
+    }
   }
 
   animationTextClass() {
@@ -163,7 +166,7 @@ export default class AlertsRegistryOverlays extends Vue {
       console.debug('TTS disabled, responsiveVoice key is not set')
     }
 
-    this.interval = window.setInterval(() => {
+    this.interval.push(window.setInterval(() => {
       if (this.runningAlert) {
         // cleanup alert after 5s and if responsiveVoice is done
         if (this.runningAlert.hideAt - Date.now() + 5000 <= 0 && (!window.responsiveVoice.isPlaying() || this.runningAlert.waitingForTTS)) {
@@ -263,50 +266,53 @@ export default class AlertsRegistryOverlays extends Vue {
           this.runningAlert = null;
         }
       }
-    }, 100);
+    }, 100));
 
     this.id = this.$route.params.id
-    this.socket.emit('findOne', { where: { id: this.id }}, (err, data: Registry.Alerts.Alert) => {
-      this.data = data;
+    this.interval.push(window.setInterval(() => {
+      this.socket.emit('findOne', { where: { id: this.id }}, (err, data: Registry.Alerts.Alert) => {
+        if (!isEqual(data, this.data)) {
+          this.data = data;
 
-      for (const [lang, isEnabled] of Object.entries(this.data.loadStandardProfanityList)) {
-        if (isEnabled) {
-          let list = require('../../bot/data/vulgarities/' + lang + '.txt');
-          this.defaultProfanityList = [...this.defaultProfanityList, ...list.default.split(/\r?\n/)]
+          for (const [lang, isEnabled] of Object.entries(this.data.loadStandardProfanityList)) {
+            if (isEnabled) {
+              let list = require('../../bot/data/vulgarities/' + lang + '.txt');
+              this.defaultProfanityList = [...this.defaultProfanityList, ...list.default.split(/\r?\n/)]
 
-          let listHappyWords = require('../../bot/data/happyWords/' + lang + '.txt');
-          this.listHappyWords = [...this.listHappyWords, ...listHappyWords.default.split(/\r?\n/)]
-        }
-      }
-
-      this.defaultProfanityList = [
-        ...this.defaultProfanityList,
-        ...data.customProfanityList.split(',').map(o => o.trim()),
-      ]
-
-      console.debug('Profanity list', this.defaultProfanityList);
-      console.debug('Happy words', this.listHappyWords);
-      this.state.loaded = this.$state.success;
-
-
-      const head = document.getElementsByTagName('head')[0]
-      const style = document.createElement('style')
-      style.type = 'text/css';
-      for (const lists of Object.values(data.alerts)) {
-        for (const event of lists) {
-          if (!this.loadedFonts.includes(event.font.family)) {
-            console.debug('Loading font', event.font.family)
-            this.loadedFonts.push(event.font.family)
-            const font = event.font.family.replace(/ /g, '+')
-            const css = "@import url('https://fonts.googleapis.com/css?family=" + font + "');"
-            style.appendChild(document.createTextNode(css));
+              let listHappyWords = require('../../bot/data/happyWords/' + lang + '.txt');
+              this.listHappyWords = [...this.listHappyWords, ...listHappyWords.default.split(/\r?\n/)]
+            }
           }
-        }
-      }
-      head.appendChild(style);
 
-      console.debug('== alerts ready ==')
-    })
+          this.defaultProfanityList = [
+            ...this.defaultProfanityList,
+            ...data.customProfanityList.split(',').map(o => o.trim()),
+          ]
+
+          console.debug('Profanity list', this.defaultProfanityList);
+          console.debug('Happy words', this.listHappyWords);
+          this.state.loaded = this.$state.success;
+
+          const head = document.getElementsByTagName('head')[0]
+          const style = document.createElement('style')
+          style.type = 'text/css';
+          for (const lists of Object.values(data.alerts)) {
+            for (const event of lists) {
+              if (!this.loadedFonts.includes(event.font.family)) {
+                console.debug('Loading font', event.font.family)
+                this.loadedFonts.push(event.font.family)
+                const font = event.font.family.replace(/ /g, '+')
+                const css = "@import url('https://fonts.googleapis.com/css?family=" + font + "');"
+                style.appendChild(document.createTextNode(css));
+              }
+            }
+          }
+          head.appendChild(style);
+
+          console.debug('== alerts ready ==')
+        }
+      })
+    }, 1000));
 
     this.socket.on('alert', (data: Registry.Alerts.EmitData) => {
       console.debug('Incoming alert', data);
