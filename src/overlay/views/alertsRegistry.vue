@@ -145,11 +145,19 @@ export default class AlertsRegistryOverlays extends Vue {
     window.responsiveVoice.speak(text, voice, { rate, pitch, volume });
   }
 
+  initResponsiveVoice() {
+    if (typeof window.responsiveVoice === 'undefined') {
+      return setTimeout(() => this.initResponsiveVoice(), 200);
+    }
+    window.responsiveVoice.init();
+    this.state.loaded = this.$state.success;
+  }
+
   mounted() {
     if (this.configuration.integrations.responsiveVoice.api.key.trim().length > 0) {
       this.$loadScript("https://code.responsivevoice.org/responsivevoice.js?key=" + this.configuration.integrations.responsiveVoice.api.key)
         .then(() => {
-          window.responsiveVoice.init();
+          this.initResponsiveVoice();
         });
     } else {
       console.debug('TTS disabled, responsiveVoice key is not set')

@@ -3,10 +3,10 @@
     <b-form-group
       label-cols-sm="4"
       label-cols-lg="3"
-      label-for="enabled"
+      :label-for="'enabled' + data.uuid"
       :label="translate('registry.alerts.enabled')"
     >
-      <b-form-checkbox id="enabled" v-model="data.enabled" name="enabled" switch></b-form-checkbox>
+      <b-form-checkbox v-bind:key="'enabled' + data.uuid" :id="'enabled' + data.uuid" v-model="data.enabled" :name="'enabled' + data.uuid" switch></b-form-checkbox>
     </b-form-group>
 
     <b-form-group
@@ -180,10 +180,10 @@
     <b-form-group
       label-cols-sm="4"
       label-cols-lg="3"
-      label-for="enableAdvancedMode"
+      :label-for="'enableAdvancedMode' + data.uuid"
       :label="translate('registry.alerts.enableAdvancedMode')"
     >
-      <b-form-checkbox id="enableAdvancedMode" v-model="data.enableAdvancedMode" name="enableAdvancedMode" switch></b-form-checkbox>
+      <b-form-checkbox v-bind:key="'enableAdvancedMode' + data.uuid" :id="'enableAdvancedMode' + data.uuid" v-model="data.enableAdvancedMode" :name="'enableAdvancedMode' + data.uuid" switch></b-form-checkbox>
     </b-form-group>
 
     <b-card no-body>

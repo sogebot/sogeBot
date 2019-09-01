@@ -125,7 +125,7 @@
                   <template v-if="alert.title.length > 0">{{alert.title}}</template>
                   <template v-else>Variant {{ idx + 1 }}</template>
                 </template>
-                <p class="p-3">
+                <p class="p-3" v-bind:key="event + idx">
                   <form-follow v-if="event === 'follows'" :alert.sync="alert" :isValid.sync="isValid[event][idx]" @delete="deleteVariant(event, $event)"/>
                   <form-cheers v-else-if="event === 'cheers' || event === 'tips'" :alert.sync="alert" :isValid.sync="isValid[event][idx]" @delete="deleteVariant(event, $event)"/>
                   <form-subs v-else-if="event === 'subs'" :alert.sync="alert" :isValid.sync="isValid[event][idx]" @delete="deleteVariant(event, $event)"/>
@@ -459,7 +459,7 @@ export default class AlertsEdit extends Vue {
 
         this.state.save = this.$state.success;
         this.pending = false;
-        this.$router.push({ name: 'alertsEdit', params: { id: String(data.id) } })
+        this.$router.push({ name: 'alertsEdit', params: { id: String(data.id) } }).catch(err => {})
 
         setTimeout(() => {
           this.state.save = this.$state.idle;

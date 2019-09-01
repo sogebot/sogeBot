@@ -8,10 +8,10 @@
           <b-form-group
             label-cols-sm="4"
             label-cols-lg="3"
-            label-for="tts-enabled"
+            :label-for="'tts-enabled' + uuid"
             :label="translate('registry.alerts.enabled')"
           >
-            <b-form-checkbox id="tts-enabled" v-model="data.enabled" name="enabled" switch></b-form-checkbox>
+            <b-form-checkbox v-bind:key="'tts-enabled' + uuid" :id="'tts-enabled' + uuid" v-model="data.enabled" :name="'tts-enabled' + uuid" switch></b-form-checkbox>
           </b-form-group>
 
           <b-form-group label-cols-sm="4" label-cols-lg="3"
@@ -97,7 +97,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, PropSync } from 'vue-property-decorator';
+import { Vue, Component, Prop, PropSync } from 'vue-property-decorator';
 
 declare global {
   interface Window {
@@ -111,6 +111,7 @@ declare global {
 })
 export default class TTS extends Vue {
   @PropSync('tts') readonly data !: Registry.Alerts.TTS;
+  @Prop() readonly uuid !: string;
 
   text = "This is test donation message :)";
   state: { loaded: number } = { loaded: this.$state.progress }
@@ -128,13 +129,20 @@ export default class TTS extends Vue {
     } else {
       this.$loadScript("https://code.responsivevoice.org/responsivevoice.js?key=" + this.configuration.integrations.responsiveVoice.api.key)
         .then(() => {
-          window.responsiveVoice.init();
-        this.voices = window.responsiveVoice.getVoices().map(o => {
-            return { text: o.name, value: o.name }
-          });
-          this.state.loaded = this.$state.success;
+          this.initResponsiveVoice();
         })
     }
+  }
+
+  initResponsiveVoice() {
+    if (typeof window.responsiveVoice === 'undefined') {
+      return setTimeout(() => this.initResponsiveVoice(), 200);
+    }
+    window.responsiveVoice.init();
+    this.voices = window.responsiveVoice.getVoices().map(o => {
+      return { text: o.name, value: o.name }
+    });
+    this.state.loaded = this.$state.success;
   }
 
   speak() {
