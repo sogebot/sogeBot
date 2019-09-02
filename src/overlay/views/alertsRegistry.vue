@@ -383,9 +383,7 @@ export default class AlertsRegistryOverlays extends Vue {
         }
       }
 
-      if (data !== null) {
-        this.alerts.push(data)
-      }
+      this.alerts.push(data)
     })
   }
 
