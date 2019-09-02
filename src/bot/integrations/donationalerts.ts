@@ -98,6 +98,15 @@ class Donationalerts extends Integration {
           currencyInBot: global.currency.mainCurrency,
           message: data.message,
         });
+        global.registries.alerts.trigger({
+          event: 'tips',
+          name: data.username.toLowerCase(),
+          amount: Number(parseFloat(data.amount).toFixed(2)),
+          currency: data.currency,
+          monthsName: '',
+          isResub: false,
+          message: data.message,
+        });
 
         if (!data._is_test_alert) {
           const id = await global.users.getIdByName(data.username.toLowerCase(), false);

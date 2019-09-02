@@ -57,7 +57,7 @@
   "messageTemplate": {
     "name": "Message template",
     "placeholder": "Set your message template",
-    "help": "Available variables: {name}, {amount} (cheers, subs, tips)"
+    "help": "Available variables: {name}, {amount} (cheers, subs, tips), {monthsName} (subs), {currency} (tips)"
   },
   "animationText": {
     "name": "Animation text"

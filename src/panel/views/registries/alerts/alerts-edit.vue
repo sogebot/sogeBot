@@ -377,7 +377,7 @@ export default class AlertsEdit extends Vue {
       case 'subs':
         this.item.alerts.subs.push({
           messageTemplate: '{name} just subscribed!',
-          messageTemplateResub: '{name} just resubscribed! {amount}',
+          messageTemplateResub: '{name} just resubscribed! {amount} {monthsName}',
           message: {
             allowEmotes: {
               twitch: true, ffz: true, bttv: true
@@ -396,7 +396,7 @@ export default class AlertsEdit extends Vue {
         break;
       case 'tips':
         this.item.alerts.tips.push({
-          messageTemplate: '{name} donated {amount}!',
+          messageTemplate: '{name} donated {amount}{currency}!',
           message: {
             minAmountToShow: 0,
             allowEmotes: {

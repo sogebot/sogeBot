@@ -79,6 +79,9 @@ declare namespace NodeJS {
     log: any;
     currency: any;
     panel: any;
+    registries: {
+      alerts: import('../src/bot/registries/alerts').Alerts;
+    };
     systems: {
       alias: import('../src/bot/systems/alias').Alias;
       bets: import('../src/bot/systems/bets').Bets;

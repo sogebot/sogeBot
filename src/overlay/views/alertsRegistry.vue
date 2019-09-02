@@ -398,6 +398,7 @@ export default class AlertsRegistryOverlays extends Vue {
           return char;
         }
       })
+
       let amount: string | string[] = String(this.runningAlert.amount).split('').map((char, index) => {
         if (this.runningAlert !== null) {
           return `<div class="animated infinite ${this.runningAlert.alert.animationText} ${this.runningAlert.alert.animationTextOptions.speed}" style="animation-delay: ${index * 50}ms; color: ${this.runningAlert.alert.font.highlightcolor}; display: inline-block;">${char}</div>`;
@@ -406,7 +407,29 @@ export default class AlertsRegistryOverlays extends Vue {
         }
       })
 
+      let currency: string | string[] = String(this.runningAlert.currency).split('').map((char, index) => {
+        if (this.runningAlert !== null) {
+          return `<div class="animated infinite ${this.runningAlert.alert.animationText} ${this.runningAlert.alert.animationTextOptions.speed}" style="animation-delay: ${index * 50}ms; color: ${this.runningAlert.alert.font.highlightcolor}; display: inline-block;">${char}</div>`;
+        } else {
+          return char;
+        }
+      })
+
+      let monthsName: string | string[] = String(this.runningAlert.monthsName).split('').map((char, index) => {
+        if (this.runningAlert !== null) {
+          return `<div class="animated infinite ${this.runningAlert.alert.animationText} ${this.runningAlert.alert.animationTextOptions.speed}" style="animation-delay: ${index * 50}ms; color: ${this.runningAlert.alert.font.highlightcolor}; display: inline-block;">${char}</div>`;
+        } else {
+          return char;
+        }
+      })
+
       if (this.runningAlert.alert.animationText === 'baffle') {
+        // set maxTimeToDecrypt 0 if fading out to not reset decryption
+        if (this.runningAlert.hideAt - Date.now() <= 0
+          && !this.isTTSPlaying
+          && !this.runningAlert.waitingForTTS) {
+          this.runningAlert.alert.animationTextOptions.maxTimeToDecrypt = 0;
+        }
         name = `<baffle :text="runningAlert.name" :options="runningAlert.alert.animationTextOptions" style="color: ${this.runningAlert.alert.font.highlightcolor}"/>`
         amount = `<baffle :text="runningAlert.amount" :options="runningAlert.alert.animationTextOptions" style="color: ${this.runningAlert.alert.font.highlightcolor}"/>`
       } else {
@@ -415,7 +438,9 @@ export default class AlertsRegistryOverlays extends Vue {
       }
       msg = msg
         .replace(/\{name\}/g, name)
-        .replace(/\{amount\}/g, amount);
+        .replace(/\{amount\}/g, amount)
+        .replace(/\{currency\}/g, currency)
+        .replace(/\{monthsName\}/g, monthsName);
     }
     return `<span>${msg}</span>`;
   }

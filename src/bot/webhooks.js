@@ -224,6 +224,15 @@ class Webhooks {
           })
           global.log.follow(data.from_name)
           global.events.fire('follow', { username: data.from_name, webhooks: true })
+          global.registries.alerts.trigger({
+            event: 'follows',
+            name: data.from_name,
+            amount: 0,
+            currency: '',
+            monthsName: '',
+            isResub: false,
+            message: ''
+          })
 
           // go through all systems and trigger on.follow
           for (let [type, systems] of Object.entries({

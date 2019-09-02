@@ -21,6 +21,10 @@ class Alerts extends Registry {
     });
   }
 
+  trigger(opts: Registry.Alerts.EmitData) {
+    global.panel.io.of('/registries/alerts').emit('alert', opts);
+  }
+
   test(opts: { event: keyof Registry.Alerts.List; isResub: boolean }) {
     if (!isMainThread) {
       global.workers.sendToMaster({ type: 'call', ns: 'registries.alerts', fnc: 'test', args: [opts] });
@@ -47,7 +51,7 @@ class Alerts extends Registry {
         : '',
     };
 
-    global.panel.io.of('/registries/alerts').emit('alert', data);
+    this.trigger(data);
   }
 }
 
