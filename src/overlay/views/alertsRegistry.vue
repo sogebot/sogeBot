@@ -44,8 +44,7 @@
                   'font-weight': runningAlert.alert.message.font.weight,
                   'color': runningAlert.alert.message.font.color,
                   'text-shadow': textStrokeGenerator(runningAlert.alert.message.font.borderPx, runningAlert.alert.message.font.borderColor)
-                }">
-                  {{ runningAlert.message }}
+                }" v-html="withEmotes(runningAlert.message)">
               </div>
           </div>
           <div v-else
@@ -71,7 +70,7 @@ import { Vue, Component } from 'vue-property-decorator';
 import JsonViewer from 'vue-json-viewer'
 import io from 'socket.io-client';
 import VRuntimeTemplate from 'v-runtime-template';
-import { isEqual } from 'lodash';
+import { isEqual, get } from 'lodash';
 
 require('../../../scss/letter-animations.css');
 require('animate.css');
@@ -93,6 +92,8 @@ export default class AlertsRegistryOverlays extends Vue {
   socket = io('/registries/alerts', {query: "token="+this.token});
   interval: number[] = [];
   loadedFonts: string[] = [];
+  cleanupAlert = false;
+  isTTSPlaying = false;
 
   state: {
     loaded: number,
@@ -104,6 +105,7 @@ export default class AlertsRegistryOverlays extends Vue {
   data: null | Registry.Alerts.Alert = null;
   defaultProfanityList: string[] = [];
   listHappyWords: string[] = [];
+  emotes: Overlay.Emotes.cache[] = [];
 
   alerts: Registry.Alerts.EmitData[] = [];
   runningAlert: Registry.Alerts.EmitData & {
@@ -124,9 +126,30 @@ export default class AlertsRegistryOverlays extends Vue {
     }
   }
 
+  withEmotes(text) {
+    // checking emotes
+    for (let emote of this.emotes) {
+      if (get(this.runningAlert, `message.allowEmotes.${emote.type}`, false)) {
+        text = text
+          .replace(
+            new RegExp(`[!"#$%&'()*+,-.\\/:;<=>?\\b\\s]${emote.code}[!"#$%&'()*+,-.\\/:;<=>?\\b\\s]`, 'gm'),
+            ` <img src='${emote.urls[1]}' style='position: relative; top: 0.1rem;'/> `
+          );
+      }
+    }
+    return text;
+  }
+
+  isTTSPlayingFnc() {
+    this.isTTSPlaying = typeof window.responsiveVoice !== 'undefined' && window.responsiveVoice.isPlaying();
+    return this.isTTSPlaying
+  }
+
   animationTextClass() {
     if (this.runningAlert && this.runningAlert.showTextAt <= Date.now()) {
-      return this.runningAlert.hideAt - Date.now() <= 0 && (!window.responsiveVoice.isPlaying() || this.runningAlert.waitingForTTS)
+      return this.runningAlert.hideAt - Date.now() <= 0
+        && !this.isTTSPlaying
+        && !this.runningAlert.waitingForTTS
         ? this.runningAlert.alert.animationOut
         : this.runningAlert.alert.animationIn;
     } else {
@@ -136,7 +159,9 @@ export default class AlertsRegistryOverlays extends Vue {
 
   animationClass() {
     if (this.runningAlert) {
-      return this.runningAlert.hideAt - Date.now() <= 0 && (!window.responsiveVoice.isPlaying() || this.runningAlert.waitingForTTS)
+      return this.runningAlert.hideAt - Date.now() <= 0
+        && !this.isTTSPlaying
+        && !this.runningAlert.waitingForTTS
         ? this.runningAlert.alert.animationOut
         : this.runningAlert.alert.animationIn;
     } else {
@@ -154,6 +179,7 @@ export default class AlertsRegistryOverlays extends Vue {
     }
     window.responsiveVoice.init();
     this.state.loaded = this.$state.success;
+    console.debug('= ResponsiveVoice init OK')
   }
 
   mounted() {
@@ -168,14 +194,24 @@ export default class AlertsRegistryOverlays extends Vue {
 
     this.interval.push(window.setInterval(() => {
       if (this.runningAlert) {
-        // cleanup alert after 5s and if responsiveVoice is done
-        if (this.runningAlert.hideAt - Date.now() + 5000 <= 0 && (!window.responsiveVoice.isPlaying() || this.runningAlert.waitingForTTS)) {
-          this.runningAlert = null;
-          return;
-        }
+        this.isTTSPlayingFnc();
 
         this.runningAlert.animation = this.animationClass();
         this.runningAlert.animationText = this.animationTextClass();
+
+        // cleanup alert after 5s and if responsiveVoice is done
+        if (this.runningAlert.hideAt - Date.now() <= 0
+          && !this.isTTSPlaying
+          && !this.runningAlert.waitingForTTS) {
+          if (!this.cleanupAlert) {
+            this.cleanupAlert = true;
+            setTimeout(() => {
+              this.runningAlert = null;
+              this.cleanupAlert = false;
+            }, 5000)
+          }
+          return;
+        }
 
         if (this.runningAlert.showAt <= Date.now() && !this.runningAlert.isShowing) {
           console.debug('showing image');
@@ -185,7 +221,7 @@ export default class AlertsRegistryOverlays extends Vue {
         if (this.runningAlert.showTextAt <= Date.now() && !this.runningAlert.isShowingText) {
           console.debug('showing text');
           this.runningAlert.isShowingText = true;
-          if (this.runningAlert.alert.tts.enabled) {
+          if (this.runningAlert.alert.tts.enabled && typeof window.responsiveVoice !== 'undefined') {
             this.runningAlert.waitingForTTS = true;
           }
         }
@@ -270,7 +306,7 @@ export default class AlertsRegistryOverlays extends Vue {
 
     this.id = this.$route.params.id
     this.interval.push(window.setInterval(() => {
-      this.socket.emit('findOne', { where: { id: this.id }}, (err, data: Registry.Alerts.Alert) => {
+      this.socket.emit('findOne', { where: { id: this.id }}, async (err, data: Registry.Alerts.Alert) => {
         if (!isEqual(data, this.data)) {
           this.data = data;
 
@@ -309,6 +345,15 @@ export default class AlertsRegistryOverlays extends Vue {
           }
           head.appendChild(style);
 
+          // load emotes
+          await new Promise((done) => {
+            this.socket.emit('find', { collection: '_overlays.emotes.cache' }, (err, data) => {
+              this.emotes = data;
+              console.debug('= Emotes loaded')
+              done();
+            })
+          })
+
           console.debug('== alerts ready ==')
         }
       })
@@ -316,7 +361,7 @@ export default class AlertsRegistryOverlays extends Vue {
 
     this.socket.on('alert', (data: Registry.Alerts.EmitData) => {
       console.debug('Incoming alert', data);
-
+      data.message = 'Testing twitch emotes Kappa HeyGuys Testing BTTV emotes monkaS PepeHands Testing FFZ emotes LULW Pog'
       // checking for vulgarities
       for (let vulgar of this.defaultProfanityList) {
         if (this.data) {
