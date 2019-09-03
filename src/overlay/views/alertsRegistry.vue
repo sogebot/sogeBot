@@ -455,8 +455,6 @@ export default class AlertsRegistryOverlays extends Vue {
     this.socket.on('alert', (data: Registry.Alerts.EmitData) => {
       console.debug('Incoming alert', data);
 
-      if (this.data)
-
       // checking for vulgarities
       for (let vulgar of this.defaultProfanityList) {
         if (this.data) {
