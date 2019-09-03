@@ -7,58 +7,64 @@
         <json-viewer :value="{alerts}" v-if="alerts" boxed copyable :expand-depth="2"></json-viewer>
       </div>
       <div v-if="runningAlert">
-        <audio style="visibility: hidden; position: absolute" ref="audio">
+        <audio ref="audio">
           <source :src="runningAlert.alert.sound">
         </audio>
-        <div v-show="runningAlert.isShowing" style="display: flex;" class="center" :class="['layout-' + runningAlert.alert.layout]">
-          <img :src="runningAlert.alert.image" :class="{ center: runningAlert.alert.layout === '3', [runningAlert.animation]: true }" class="slow animated"/>
-          <div
-            v-if="runningAlert.isShowingText"
-            :class="{
-              center: runningAlert.alert.layout === '3',
-              [runningAlert.animationText]: true
-            }"
-            class="slow animated"
-            :style="{
-              'font-family': runningAlert.alert.font.family,
-              'font-size': runningAlert.alert.font.size + 'px',
-              'font-weight': runningAlert.alert.font.weight,
-              'color': runningAlert.alert.font.color,
-              'text-align': 'center',
-              'text-shadow': textStrokeGenerator(runningAlert.alert.font.borderPx, runningAlert.alert.font.borderColor)
-            }">
-              <v-runtime-template :template="prepareMessageTemplate(runningAlert.alert.messageTemplate)"></v-runtime-template>
-              <div
-                v-if="
-                     typeof runningAlert.alert.message !== 'undefined'
-                  && typeof runningAlert.alert.message.minAmountToShow !== 'undefined'
-                  && runningAlert.alert.message.minAmountToShow <= runningAlert.amount"
-                :class="{
-                }"
-                :style="{
-                  'width': '30rem',
-                  'text-align': 'left',
-                  'flex': '1 0 0px',
-                  'font-family': runningAlert.alert.message.font.family,
-                  'font-size': runningAlert.alert.message.font.size + 'px',
-                  'font-weight': runningAlert.alert.message.font.weight,
-                  'color': runningAlert.alert.message.font.color,
-                  'text-shadow': textStrokeGenerator(runningAlert.alert.message.font.borderPx, runningAlert.alert.message.font.borderColor)
-                }" v-html="withEmotes(runningAlert.message)">
-              </div>
-          </div>
-          <div v-else
-            :style="{
-              'visibility': 'hidden',
-              'font-family': runningAlert.alert.font.family,
-              'font-size': runningAlert.alert.font.size + 'px',
-              'font-weight': runningAlert.alert.font.weight,
-              'color': runningAlert.alert.font.color,
-              'text-shadow': textStrokeGenerator(runningAlert.alert.font.borderPx, runningAlert.alert.font.borderColor)
-            }">
-              {{runningAlert.alert.messageTemplate}}
-              <div>{{ runningAlert.message }}</div>
-            </div> <!-- empty div to mitigate text area -->
+        <div v-if="runningAlert.isShowing" class="center" :class="['layout-' + runningAlert.alert.layout]">
+          <template v-if="!runningAlert.alert.enableAdvancedMode">
+            <img :src="runningAlert.alert.image" :class="{ center: runningAlert.alert.layout === '3', [runningAlert.animation]: true }" class="slow animated"/>
+            <div
+              v-if="runningAlert.isShowingText"
+              :class="{
+                center: runningAlert.alert.layout === '3',
+                [runningAlert.animationText]: true
+              }"
+              class="slow animated"
+              :style="{
+                'font-family': runningAlert.alert.font.family,
+                'font-size': runningAlert.alert.font.size + 'px',
+                'font-weight': runningAlert.alert.font.weight,
+                'color': runningAlert.alert.font.color,
+                'text-align': 'center',
+                'text-shadow': textStrokeGenerator(runningAlert.alert.font.borderPx, runningAlert.alert.font.borderColor)
+              }">
+                <v-runtime-template :template="prepareMessageTemplate(runningAlert.alert.messageTemplate)"></v-runtime-template>
+                <div
+                  v-if="
+                      typeof runningAlert.alert.message !== 'undefined'
+                    && typeof runningAlert.alert.message.minAmountToShow !== 'undefined'
+                    && runningAlert.alert.message.minAmountToShow <= runningAlert.amount"
+                  :class="{
+                  }"
+                  :style="{
+                    'width': '30rem',
+                    'text-align': 'left',
+                    'flex': '1 0 0px',
+                    'font-family': runningAlert.alert.message.font.family,
+                    'font-size': runningAlert.alert.message.font.size + 'px',
+                    'font-weight': runningAlert.alert.message.font.weight,
+                    'color': runningAlert.alert.message.font.color,
+                    'text-shadow': textStrokeGenerator(runningAlert.alert.message.font.borderPx, runningAlert.alert.message.font.borderColor)
+                  }" v-html="withEmotes(runningAlert.message)">
+                </div>
+            </div>
+            <div v-else
+              :style="{
+                'visibility': 'hidden',
+                'font-family': runningAlert.alert.font.family,
+                'font-size': runningAlert.alert.font.size + 'px',
+                'font-weight': runningAlert.alert.font.weight,
+                'color': runningAlert.alert.font.color,
+                'text-shadow': textStrokeGenerator(runningAlert.alert.font.borderPx, runningAlert.alert.font.borderColor)
+              }">
+                {{runningAlert.alert.messageTemplate}}
+                <div>{{ runningAlert.message }}</div>
+              </div> <!-- empty div to mitigate text area -->
+          </template>
+          <v-runtime-template
+            v-else
+            :template="preparedAdvancedHTML">
+          </v-runtime-template>
         </div>
       </div>
     </template>
@@ -92,8 +98,11 @@ export default class AlertsRegistryOverlays extends Vue {
   socket = io('/registries/alerts', {query: "token="+this.token});
   interval: number[] = [];
   loadedFonts: string[] = [];
+  loadedCSS: string[] = [];
   cleanupAlert = false;
   isTTSPlaying = false;
+
+  preparedAdvancedHTML: string = '';
 
   state: {
     loaded: number,
@@ -232,9 +241,13 @@ export default class AlertsRegistryOverlays extends Vue {
         }
 
         if (this.runningAlert.showAt <= Date.now() && !this.runningAlert.soundPlayed) {
-          console.debug('playing audio');
-          (this.$refs.audio as HTMLMediaElement).volume = this.runningAlert.alert.soundVolume / 100;
-          (this.$refs.audio as HTMLMediaElement).play();
+          if (this.runningAlert.alert.sound.length > 0) {
+            console.debug('playing audio');
+            (this.$refs.audio as HTMLMediaElement).volume = this.runningAlert.alert.soundVolume / 100;
+            (this.$refs.audio as HTMLMediaElement).play();
+          } else {
+            console.debug('skipping audio (not set)');
+          }
           this.runningAlert.soundPlayed = true;
         }
       }
@@ -282,6 +295,60 @@ export default class AlertsRegistryOverlays extends Vue {
             } else {
               alert = possibleAlertsWithRandomCount[Math.floor(Math.random() * possibleAlertsWithRandomCount.length)];
             }
+
+            // advancedMode
+            if (alert.enableAdvancedMode) {
+              // prepare HTML
+              this.preparedAdvancedHTML =
+                alert.advancedMode.html
+                  .replace(/\{message\}/g, emitData.message)
+                  .replace(/\{messageTemplate\}/g, `<v-runtime-template :template="prepareMessageTemplate(runningAlert.alert.messageTemplate)"></v-runtime-template>`)
+                  .replace(/\{name\}/g, emitData.name)
+                  .replace(/\{amount\}/g, emitData.amount)
+                  .replace(/\{monthsName\}/g, emitData.monthsName)
+                  .replace(/\{currency\}/g, emitData.currency)
+                  .replace('"wrap"', '"wrap-' + alert.uuid +'"')
+                  .replace('ref="text"', `
+                    v-if="runningAlert.isShowingText"
+                    :class="{[runningAlert.animationText]: true}"
+                    class="slow animated"
+                    :style="{
+                      'font-family': runningAlert.alert.font.family,
+                      'font-size': runningAlert.alert.font.size + 'px',
+                      'font-weight': runningAlert.alert.font.weight,
+                      'color': runningAlert.alert.font.color,
+                      'text-align': 'center',
+                      'text-shadow': textStrokeGenerator(runningAlert.alert.font.borderPx, runningAlert.alert.font.borderColor)
+                    }"
+                  `).replace('ref="image"', `
+                    v-if="runningAlert.isShowingText"
+                    :class="{[runningAlert.animation]: true}"
+                    class="slow animated"
+                    :src="runningAlert.alert.image"
+                  `);
+
+              // load CSS
+              if (!this.loadedCSS.includes(alert.uuid)) {
+                console.debug('loaded custom CSS for ' + alert.uuid);
+                this.loadedCSS.push(alert.uuid);
+                const head = document.getElementsByTagName('head')[0]
+                const style = document.createElement('style')
+                style.type = 'text/css';
+                if (!this.loadedFonts.includes(alert.advancedMode.css)) {
+                  this.loadedFonts.push(alert.advancedMode.css)
+                  const css = alert.advancedMode.css
+                    .replace(/\#wrap/g, '#wrap-' + alert.uuid) // replace .wrap with only this goal wrap
+                  style.appendChild(document.createTextNode(css));
+                }
+                head.appendChild(style);
+              }
+
+              // eval JS
+              this.$nextTick(() => {
+                eval(`(function evaluation () { ${alert.advancedMode.js} })()`);
+              })
+            }
+
             this.runningAlert = {
               ...emitData,
               animation: "none",
@@ -307,6 +374,9 @@ export default class AlertsRegistryOverlays extends Vue {
     this.id = this.$route.params.id
     this.interval.push(window.setInterval(() => {
       this.socket.emit('findOne', { where: { id: this.id }}, async (err, data: Registry.Alerts.Alert) => {
+        if (this.runningAlert !== null) {
+          return; // skip any changes if alert in progress
+        }
         if (!isEqual(data, this.data)) {
           this.data = data;
 
@@ -361,7 +431,7 @@ export default class AlertsRegistryOverlays extends Vue {
 
     this.socket.on('alert', (data: Registry.Alerts.EmitData) => {
       console.debug('Incoming alert', data);
-      data.message = 'Testing twitch emotes Kappa HeyGuys Testing BTTV emotes monkaS PepeHands Testing FFZ emotes LULW Pog'
+
       // checking for vulgarities
       for (let vulgar of this.defaultProfanityList) {
         if (this.data) {
@@ -443,6 +513,10 @@ export default class AlertsRegistryOverlays extends Vue {
     return `<span>${msg}</span>`;
   }
 
+  prepareAdvancedMode(html) {
+
+  }
+
   textStrokeGenerator(radius, color) {
     if (radius === 0) return ''
 
@@ -484,16 +558,23 @@ export default class AlertsRegistryOverlays extends Vue {
   }
 
   .layout-1 {
+    display: flex;
     flex-direction: column;
   }
   .layout-2 {
+    display: flex;
     flex-direction: column-reverse;
   }
+  .layout-3 {
+    display: flex;
+  }
   .layout-4 {
+    display: flex;
     align-items: center;
     flex-direction: row-reverse;
   }
   .layout-5 {
+    display: flex;
     align-items: center;
     flex-direction: row;
   }
@@ -502,5 +583,10 @@ export default class AlertsRegistryOverlays extends Vue {
     max-width: max-content;
     margin-left: auto;
     margin-right: auto;
+  }
+
+  audio {
+    visibility: hidden;
+    position: absolute;
   }
 </style>

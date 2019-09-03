@@ -84,6 +84,11 @@ declare namespace Registry {
       alertDurationInMs: number;
       alertTextDelayInMs: number;
       enableAdvancedMode: boolean;
+      advancedMode: {
+        html: null | string;
+        css: string;
+        js: string;
+      };
       tts: TTS;
       font: {
         family: string;
