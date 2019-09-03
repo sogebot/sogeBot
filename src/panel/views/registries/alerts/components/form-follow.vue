@@ -208,7 +208,6 @@
       }"></codemirror>
     </div>
 
-
     <b-card no-body>
       <b-card-header header-tag="header" class="p-1" role="tab">
         <b-button block href="#" v-b-toggle.accordion-1 variant="light" class="text-left">{{translate('registry.alerts.font.setting')}}</b-button>

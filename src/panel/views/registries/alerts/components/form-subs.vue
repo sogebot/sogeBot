@@ -149,6 +149,7 @@
     </b-form-group>
 
     <b-form-group label-cols-sm="4" label-cols-lg="3"
+                  v-if="!data.enableAdvancedMode"
                   :label="translate('registry.alerts.layoutPicker.name')">
       <layout-picker :layout.sync="data.layout"/>
     </b-form-group>
@@ -194,6 +195,34 @@
       <b-form-checkbox v-bind:key="'enableAdvancedMode' + data.uuid" :id="'enableAdvancedMode' + data.uuid" v-model="data.enableAdvancedMode" :name="'enableAdvancedMode' + data.uuid" switch></b-form-checkbox>
     </b-form-group>
 
+    <div class="btn-group col-md-12 p-0" role="group" v-if="data.enableAdvancedMode">
+      <button type="button" class="btn" @click="customShow = 'html'" :class="[customShow === 'html' ? 'btn-dark' : 'btn-outline-dark']">HTML</button>
+      <button type="button" class="btn" @click="customShow = 'css'" :class="[customShow === 'css' ? 'btn-dark' : 'btn-outline-dark']">CSS</button>
+      <button type="button" class="btn" @click="customShow = 'js'" :class="[customShow === 'js' ? 'btn-dark' : 'btn-outline-dark']">JS</button>
+    </div>
+    <div class="col-md-12 p-0 pb-2" v-if="data.enableAdvancedMode">
+      <codemirror style="font-size: 0.8em;" v-if="customShow === 'html'" class="w-100" v-model="data.advancedMode.html" :options="{
+        tabSize: 4,
+        mode: 'text/html',
+        theme: 'base16-' + configuration.core.ui.theme,
+        lineNumbers: true,
+        line: true,
+      }"></codemirror>
+      <codemirror style="font-size: 0.8em;" v-if="customShow === 'js'" class="w-100" v-model="data.advancedMode.js" :options="{
+        tabSize: 4,
+        mode: 'text/javascript',
+        theme: 'base16-' + configuration.core.ui.theme,
+        lineNumbers: true,
+        line: true,
+      }"></codemirror>
+      <codemirror style="font-size: 0.8em;" v-if="customShow === 'css'" class="w-100"  v-model="data.advancedMode.css" :options="{
+        tabSize: 4,
+        mode: 'text/css',
+        theme: 'base16-' + configuration.core.ui.theme,
+        lineNumbers: true,
+        line: true,
+      }"></codemirror>
+    </div>
     <b-card no-body>
       <b-card-header header-tag="header" class="p-1" role="tab">
         <b-button block href="#" v-b-toggle.accordion-2 variant="light" class="text-left">{{translate('registry.alerts.message.setting')}}</b-button>
@@ -421,6 +450,15 @@
 <script lang="ts">
 import { Vue, Component, Prop, PropSync, Watch } from 'vue-property-decorator';
 
+import { codemirror } from 'vue-codemirror';
+import 'codemirror/mode/javascript/javascript.js';
+import 'codemirror/mode/htmlmixed/htmlmixed.js';
+import 'codemirror/mode/css/css.js';
+import 'codemirror/theme/base16-dark.css';
+import 'codemirror/theme/base16-light.css';
+import 'codemirror/lib/codemirror.css';
+import text from 'src/bot/data/templates/alerts.txt';
+
 import axios from 'axios';
 
 import { Validations } from 'vuelidate-property-decorators';
@@ -428,6 +466,7 @@ import { required, minValue } from 'vuelidate/lib/validators'
 
 @Component({
   components: {
+    codemirror,
     media: () => import('src/panel/components/media.vue'),
     'layout-picker': () => import('./layout-picker.vue'),
     'text-animation': () => import('./text-animation.vue'),
@@ -462,6 +501,9 @@ export default class AlertsEditFollowForm extends Vue {
   }
 
   mounted() {
+    if (this.data.advancedMode.html === null) {
+      this.data.advancedMode.html = text;
+    }
     axios.get('/fonts')
       .then((r) => {
         this.fonts = r.data.items.map((o) => {
