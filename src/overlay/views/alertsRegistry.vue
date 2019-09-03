@@ -87,6 +87,12 @@ declare global {
   }
 }
 
+let waitingForTTS = false;
+let isTTSPlaying = false;
+let cleanupAlert = false;
+
+let alerts: Registry.Alerts.EmitData[] = [];
+
 @Component({
   components: {
     JsonViewer,
@@ -99,8 +105,6 @@ export default class AlertsRegistryOverlays extends Vue {
   interval: number[] = [];
   loadedFonts: string[] = [];
   loadedCSS: string[] = [];
-  cleanupAlert = false;
-  isTTSPlaying = false;
 
   preparedAdvancedHTML: string = '';
 
@@ -116,7 +120,6 @@ export default class AlertsRegistryOverlays extends Vue {
   listHappyWords: string[] = [];
   emotes: Overlay.Emotes.cache[] = [];
 
-  alerts: Registry.Alerts.EmitData[] = [];
   runningAlert: Registry.Alerts.EmitData & {
     animation: string;
     animationText: string;
@@ -126,7 +129,6 @@ export default class AlertsRegistryOverlays extends Vue {
     hideAt: number;
     showTextAt: number;
     showAt: number;
-    waitingForTTS: boolean;
     alert: Registry.Alerts.Follow | Registry.Alerts.Host | Registry.Alerts.Cheer | Registry.Alerts.Sub } | null = null;
 
   beforeDestroyed() {
@@ -150,15 +152,15 @@ export default class AlertsRegistryOverlays extends Vue {
   }
 
   isTTSPlayingFnc() {
-    this.isTTSPlaying = typeof window.responsiveVoice !== 'undefined' && window.responsiveVoice.isPlaying();
-    return this.isTTSPlaying
+    isTTSPlaying = typeof window.responsiveVoice !== 'undefined' && window.responsiveVoice.isPlaying();
+    return isTTSPlaying
   }
 
   animationTextClass() {
     if (this.runningAlert && this.runningAlert.showTextAt <= Date.now()) {
       return this.runningAlert.hideAt - Date.now() <= 0
-        && !this.isTTSPlaying
-        && !this.runningAlert.waitingForTTS
+        && !isTTSPlaying
+        && !waitingForTTS
         ? this.runningAlert.alert.animationOut
         : this.runningAlert.alert.animationIn;
     } else {
@@ -169,8 +171,8 @@ export default class AlertsRegistryOverlays extends Vue {
   animationClass() {
     if (this.runningAlert) {
       return this.runningAlert.hideAt - Date.now() <= 0
-        && !this.isTTSPlaying
-        && !this.runningAlert.waitingForTTS
+        && !isTTSPlaying
+        && !waitingForTTS
         ? this.runningAlert.alert.animationOut
         : this.runningAlert.alert.animationIn;
     } else {
@@ -210,13 +212,20 @@ export default class AlertsRegistryOverlays extends Vue {
 
         // cleanup alert after 5s and if responsiveVoice is done
         if (this.runningAlert.hideAt - Date.now() <= 0
-          && !this.isTTSPlaying
-          && !this.runningAlert.waitingForTTS) {
-          if (!this.cleanupAlert) {
-            this.cleanupAlert = true;
+          && !isTTSPlaying
+          && !waitingForTTS) {
+          if (!cleanupAlert) {
+            // eval onEnded
+            this.$nextTick(() => {
+              if (this.runningAlert) {
+                eval(`${this.runningAlert.alert.advancedMode.js}; onEnded()`);
+              }
+            })
+
+            cleanupAlert = true;
             setTimeout(() => {
               this.runningAlert = null;
-              this.cleanupAlert = false;
+              cleanupAlert = false;
             }, 5000)
           }
           return;
@@ -231,13 +240,13 @@ export default class AlertsRegistryOverlays extends Vue {
           console.debug('showing text');
           this.runningAlert.isShowingText = true;
           if (this.runningAlert.alert.tts.enabled && typeof window.responsiveVoice !== 'undefined') {
-            this.runningAlert.waitingForTTS = true;
+            waitingForTTS = true;
           }
         }
 
-        if (this.runningAlert.waitingForTTS && (this.$refs.audio as HTMLMediaElement).ended) {
+        if (waitingForTTS && (this.$refs.audio as HTMLMediaElement).ended) {
           this.speak(this.runningAlert.message, this.runningAlert.alert.tts.voice, this.runningAlert.alert.tts.rate, this.runningAlert.alert.tts.pitch, this.runningAlert.alert.tts.volume)
-          this.runningAlert.waitingForTTS = false;
+          waitingForTTS = false;
         }
 
         if (this.runningAlert.showAt <= Date.now() && !this.runningAlert.soundPlayed) {
@@ -252,8 +261,8 @@ export default class AlertsRegistryOverlays extends Vue {
         }
       }
 
-      if (this.runningAlert === null && this.alerts.length > 0) {
-        const emitData = this.alerts.shift()
+      if (this.runningAlert === null && alerts.length > 0) {
+        const emitData = alerts.shift()
         if (emitData && this.data) {
           const possibleAlerts = this.data.alerts[emitData.event];
           if (possibleAlerts.length > 0) {
@@ -307,6 +316,10 @@ export default class AlertsRegistryOverlays extends Vue {
                   .replace(/\{amount\}/g, emitData.amount)
                   .replace(/\{monthsName\}/g, emitData.monthsName)
                   .replace(/\{currency\}/g, emitData.currency)
+                  .replace(/\{name:highlight\}/g, `<v-runtime-template :template="prepareMessageTemplate('{name:highlight}')"></v-runtime-template>`)
+                  .replace(/\{amount:highlight\}/g, `<v-runtime-template :template="prepareMessageTemplate('{amount:highlight}')"></v-runtime-template>`)
+                  .replace(/\{monthsName:highlight\}/g, `<v-runtime-template :template="prepareMessageTemplate('{monthsName:highlight}')"></v-runtime-template>`)
+                  .replace(/\{currency:highlight\}/g, `<v-runtime-template :template="prepareMessageTemplate('{currency:highlight}')"></v-runtime-template>`)
                   .replace('"wrap"', '"wrap-' + alert.uuid +'"')
                   .replace('ref="text"', `
                     v-if="runningAlert.isShowingText"
@@ -345,14 +358,24 @@ export default class AlertsRegistryOverlays extends Vue {
 
               // eval JS
               this.$nextTick(() => {
-                eval(`(function evaluation () { ${alert.advancedMode.js} })()`);
+                // eval onStarted
+                this.$nextTick(() => {
+                  eval(`${alert.advancedMode.js}; onStarted()`);
+                })
               })
+            } else {
+              // we need to add :highlight to name, amount, monthName, currency by default
+              alert.messageTemplate = alert.messageTemplate
+                .replace(/\{name\}/g, '{name:highlight}')
+                .replace(/\{amount\}/g, '{amount:highlight}')
+                .replace(/\{monthName\}/g, '{monthName:highlight}')
+                .replace(/\{currency\}/g, '{currency:highlight}');
             }
 
+            waitingForTTS = false;
             this.runningAlert = {
               ...emitData,
               animation: "none",
-              waitingForTTS: false,
               animationText: "none",
               soundPlayed: false,
               isShowing: false,
@@ -386,14 +409,14 @@ export default class AlertsRegistryOverlays extends Vue {
               this.defaultProfanityList = [...this.defaultProfanityList, ...list.default.split(/\r?\n/)]
 
               let listHappyWords = require('../../bot/data/happyWords/' + lang + '.txt');
-              this.listHappyWords = [...this.listHappyWords, ...listHappyWords.default.split(/\r?\n/)]
+              this.listHappyWords = [...this.listHappyWords, ...listHappyWords.default.split(/\r?\n/)].filter(o => o.trim().length > 0)
             }
           }
 
           this.defaultProfanityList = [
             ...this.defaultProfanityList,
             ...data.customProfanityList.split(',').map(o => o.trim()),
-          ]
+          ].filter(o => o.trim().length > 0)
 
           console.debug('Profanity list', this.defaultProfanityList);
           console.debug('Happy words', this.listHappyWords);
@@ -432,6 +455,8 @@ export default class AlertsRegistryOverlays extends Vue {
     this.socket.on('alert', (data: Registry.Alerts.EmitData) => {
       console.debug('Incoming alert', data);
 
+      if (this.data)
+
       // checking for vulgarities
       for (let vulgar of this.defaultProfanityList) {
         if (this.data) {
@@ -453,7 +478,7 @@ export default class AlertsRegistryOverlays extends Vue {
         }
       }
 
-      this.alerts.push(data)
+      alerts.push(data)
     })
   }
 
@@ -492,23 +517,32 @@ export default class AlertsRegistryOverlays extends Vue {
       })
 
       if (this.runningAlert.alert.animationText === 'baffle') {
+        let maxTimeToDecrypt = this.runningAlert.alert.animationTextOptions.maxTimeToDecrypt
         // set maxTimeToDecrypt 0 if fading out to not reset decryption
         if (this.runningAlert.hideAt - Date.now() <= 0
-          && !this.isTTSPlaying
-          && !this.runningAlert.waitingForTTS) {
-          this.runningAlert.alert.animationTextOptions.maxTimeToDecrypt = 0;
+          && !isTTSPlaying
+          && !waitingForTTS) {
+          maxTimeToDecrypt = 0;
         }
-        name = `<baffle :text="runningAlert.name" :options="runningAlert.alert.animationTextOptions" style="color: ${this.runningAlert.alert.font.highlightcolor}"/>`
-        amount = `<baffle :text="runningAlert.amount" :options="runningAlert.alert.animationTextOptions" style="color: ${this.runningAlert.alert.font.highlightcolor}"/>`
+        name = `<baffle :text="this.runningAlert.name" :options="{...this.runningAlert.alert.animationTextOptions, maxTimeToDecrypt: ${maxTimeToDecrypt}}" style="color: ${this.runningAlert.alert.font.highlightcolor}"/>`
+        amount = `<baffle :text="this.runningAlert.amount" :options="{...this.runningAlert.alert.animationTextOptions, maxTimeToDecrypt: ${maxTimeToDecrypt}}" style="color: ${this.runningAlert.alert.font.highlightcolor}"/>`
+        currency = `<baffle :text="this.runningAlert.currency" :options="{...this.runningAlert.alert.animationTextOptions, maxTimeToDecrypt: ${maxTimeToDecrypt}}" style="color: ${this.runningAlert.alert.font.highlightcolor}"/>`
+        monthsName = `<baffle :text="this.runningAlert.monthsName" :options="{...this.runningAlert.alert.animationTextOptions, maxTimeToDecrypt: ${maxTimeToDecrypt}}" style="color: ${this.runningAlert.alert.font.highlightcolor}"/>`
       } else {
         name = name.join('');
         amount = amount.join('');
+        currency = currency.join('');
+        monthsName = monthsName.join('');
       }
       msg = msg
-        .replace(/\{name\}/g, name)
-        .replace(/\{amount\}/g, amount)
-        .replace(/\{currency\}/g, currency)
-        .replace(/\{monthsName\}/g, monthsName);
+        .replace(/\{name:highlight\}/g, name)
+        .replace(/\{amount:highlight\}/g, amount)
+        .replace(/\{currency:highlight\}/g, currency)
+        .replace(/\{monthsName:highlight\}/g, monthsName)
+        .replace(/\{name\}/g, this.runningAlert.name)
+        .replace(/\{amount\}/g, this.runningAlert.amount)
+        .replace(/\{currency\}/g, this.runningAlert.currency)
+        .replace(/\{monthsName\}/g, this.runningAlert.monthsName);
     }
     return `<span>${msg}</span>`;
   }

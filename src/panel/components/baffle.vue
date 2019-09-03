@@ -9,7 +9,7 @@ import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 
 @Component({})
 export default class baffleText extends Vue {
-  @Prop() readonly text !: string;
+  @Prop() readonly text !: string | number;
   @Prop() readonly options !: any;
 
   interval: number = 0;
@@ -18,12 +18,12 @@ export default class baffleText extends Vue {
 
   exclude = [' ']
 
-  baffledArray = this.text.split('');
+  baffledArray = String(this.text).split('');
   baffledTimeToReveal: number[] = []
 
   setTimeToReveal() {
     this.baffledTimeToReveal = [];
-    for (let i = 0; i < this.text.length; i++) {
+    for (let i = 0; i < String(this.text).length; i++) {
       this.baffledTimeToReveal.push(Math.floor(Math.random() * 1000) + (this.options.maxTimeToDecrypt - 1000));
     }
   }
@@ -34,7 +34,7 @@ export default class baffleText extends Vue {
 
   mounted() {
     this.start()
-    console.debug('== baffle', { interval: this.interval, text: this.text, options: this.options});
+    console.debug('== baffle', { interval: this.interval, text: String(this.text), options: this.options});
   }
 
   @Watch('options', { deep: true })
@@ -48,8 +48,8 @@ export default class baffleText extends Vue {
         const length = this.baffledArray.length;
         this.baffledArray = [];
         for (let i = 0; i < length; i++) {
-          if (this.exclude.includes(this.text[i]) || this.baffledTimeToReveal[i] <= Date.now() - this.startTime) {
-            this.baffledArray.push(this.text[i]);
+          if (this.exclude.includes(String(this.text)[i]) || this.baffledTimeToReveal[i] <= Date.now() - this.startTime) {
+            this.baffledArray.push(String(this.text)[i]);
           } else {
             this.baffledArray.push(this.options.characters[Math.floor(Math.random() * this.options.characters.length)]);
           }

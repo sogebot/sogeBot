@@ -331,7 +331,7 @@ export default class AlertsEdit extends Vue {
       advancedMode: {
         html: null,
         css: '',
-        js: '',
+        js: null,
       },
       tts: {
         enabled: false,

@@ -336,6 +336,7 @@ import 'codemirror/theme/base16-dark.css';
 import 'codemirror/theme/base16-light.css';
 import 'codemirror/lib/codemirror.css';
 import text from 'src/bot/data/templates/alerts.txt';
+import textjs from 'src/bot/data/templates/alerts-js.txt';
 
 import axios from 'axios';
 
@@ -377,6 +378,9 @@ export default class AlertsEditFollowForm extends Vue {
   mounted() {
     if (this.data.advancedMode.html === null) {
       this.data.advancedMode.html = text;
+    }
+    if (this.data.advancedMode.js === null) {
+      this.data.advancedMode.js = textjs;
     }
     axios.get('/fonts')
       .then((r) => {

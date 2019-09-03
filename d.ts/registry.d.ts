@@ -87,7 +87,7 @@ declare namespace Registry {
       advancedMode: {
         html: null | string;
         css: string;
-        js: string;
+        js: null | string;
       };
       tts: TTS;
       font: {
