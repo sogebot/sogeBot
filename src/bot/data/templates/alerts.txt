@@ -1,0 +1,15 @@
+<!-- whole alert is wrapped in display: flex -->
+<!-- we are using refs: image, text to ensure animations trigger -->
+<!-- available variables are {messageTemplate}, {name}, {amount}, {monthName}, {currency} -->
+<!-- available higlighted variables are {name:highlight}, {amount:highlight}, {monthName:highlight}, {currency:highlight} -->
+
+<!-- wrap is needed for CSS to not interfere with each other -->
+<div id="wrap">
+  <img ref="image"/>
+
+  <div ref="text">
+    <!-- {messageTemplate} will be replaced with your message template -->
+    <!-- for example : {name} is now following! or {name} donated {amount} -->
+    <div>{messageTemplate}</div>
+  </div>
+</div>

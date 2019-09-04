@@ -46,11 +46,11 @@ inactivityTime: {{currentTime - lastUpdatedAt}}
 </div>
 </template>
 
-<script>
-import Vue from 'vue'
-  import moment from 'moment'
-  import VueMoment from 'vue-moment'
-  import momentTimezone from 'moment-timezone'
+<script lang="ts">
+import { Vue, Component, Watch } from 'vue-property-decorator';
+import moment from 'moment'
+import VueMoment from 'vue-moment'
+import momentTimezone from 'moment-timezone'
 import io from 'socket.io-client';
 
 require('moment/locale/cs')
@@ -60,96 +60,87 @@ Vue.use(VueMoment, {
     moment, momentTimezone
 })
 
-export default {
-  props: ['token'],
-  data: function () {
-    return {
-      socket: io('/overlays/polls', {query: "token="+token}),
-      currentVote: {},
-      votes: [],
-      lastUpdatedAt: 0,
-      currentTime: 0,
-      cachedVotes: [],
-      voteCommand: '!vote',
-      settings: {
-        display: 'light',
-        hideAfterInactivity: true,
-        inativityTime: 5000,
-        align: 'top'
-      },
-      interval: [],
-    }
-  },
-  beforeDestroy: function() {
+@Component({})
+export default class PollsOverlay extends Vue {
+  socket = io('/overlays/polls', {query: "token="+this.token});
+  currentVote: any = {};
+  votes: any[] = [];
+  lastUpdatedAt = 0;
+  currentTime = 0;
+  cachedVotes: any[] = [];
+  voteCommand = '!vote';
+  settings = {
+    display: 'light',
+    hideAfterInactivity: true,
+    inativityTime: 5000,
+    align: 'top'
+  };
+  interval: any[] = [];
+
+  beforeDestroy() {
     for(const interval of this.interval) {
       clearInterval(interval);
     }
-  },
-  mounted: function () {
+  }
+
+  mounted () {
     this.$moment.locale(this.configuration.lang)
-  },
-  created: function () {
+  }
+
+  created () {
     this.refresh()
     this.interval.push(setInterval(() => this.currentTime = Date.now(), 100));
     this.socket.emit('getVoteCommand', (cmd) => this.voteCommand = cmd)
-  },
-  computed: {
-    activeTime: function () {
-      return this.currentTime - (new Date(this.currentVote.openedAt)).getTime()
-    },
-    totalVotes: function () {
-      let votes = 0
-      for (let i = 0, length = this.votes.length; i < length; i++) {
-        votes += this.votes[i].votes
-      }
-      return votes
+  }
+
+  get activeTime () {
+    return this.currentTime - (new Date(this.currentVote.openedAt)).getTime()
+  }
+  get totalVotes () {
+    let votes = 0
+    for (let i = 0, length = this.votes.length; i < length; i++) {
+      votes += this.votes[i].votes
     }
-  },
-  watch: {
-    votes: function (val, old) {
-      if (typeof this.currentVote.options !== 'undefined') {
-        for (let idx of Object.keys(this.currentVote.options)) {
-          let count = 0
-          let cachedCount = 0
-          for (let v of val.filter(o => String(o.option) === idx)) count += v.votes
-          for (let v of this.cachedVotes.filter(o => String(o.option) === idx)) cachedCount += v.votes
-          if (cachedCount !== count) this.lastUpdatedAt = Date.now() // there is some change
-        }
-        this.cachedVotes = val // update cached votes
-      } else {
-        this.cachedVotes = []
+    return votes
+  }
+
+  @Watch('votes')
+  votesWatcher (val, old) {
+    if (typeof this.currentVote.options !== 'undefined') {
+      for (let idx of Object.keys(this.currentVote.options)) {
+        let count = 0
+        let cachedCount = 0
+        for (let v of val.filter(o => String(o.option) === idx)) count += v.votes
+        for (let v of this.cachedVotes.filter(o => String(o.option) === idx)) cachedCount += v.votes
+        if (cachedCount !== count) this.lastUpdatedAt = Date.now() // there is some change
       }
+      this.cachedVotes = val // update cached votes
+    } else {
+      this.cachedVotes = []
     }
-  },
-  methods: {
-    getTheme: function (theme) {
-      return theme.replace(/ /g, '_').toLowerCase().replace(/\W/g, '')
-    },
-    urlParam: function (name) {
-      var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
-      if (results == null) {
-        return null
-      } else {
-        return decodeURI(results[1]) || 0;
-      }
-    },
-    getPercentage: function (index, toFixed) {
-      let votes = 0
-      for (let i = 0, length = this.votes.length; i < length; i++) {
-        if (this.votes[i].option === index) votes += this.votes[i].votes
-      }
-      return Number((100 / this.totalVotes) * votes || 0).toFixed(toFixed || 0);
-    },
-    refresh: function () {
-      this.socket.emit('data', (cb, votes, settings) => {
-        // force show if new vote
-        if (typeof this.currentVote.title === 'undefined') this.lastUpdatedAt = Date.now()
-        this.votes = votes
-        this.currentVote = cb
-        this.settings = settings
-        setTimeout(() => this.refresh(), 5000)
-      })
+  }
+
+  getTheme (theme) {
+    return theme.replace(/ /g, '_').toLowerCase().replace(/\W/g, '')
+  }
+
+  getPercentage (index, toFixed) {
+    let votes = 0
+    for (let i = 0, length = this.votes.length; i < length; i++) {
+      if (this.votes[i].option === index) votes += this.votes[i].votes
     }
+    return Number((100 / this.totalVotes) * votes || 0).toFixed(toFixed || 0);
+  }
+
+  refresh () {
+    this.socket.emit('data', (cb, votes, settings) => {
+      // force show if new vote
+      if (typeof this.currentVote.title === 'undefined') this.lastUpdatedAt = Date.now()
+      this.votes = votes
+      this.currentVote = cb
+      this.settings = settings
+      setTimeout(() => this.refresh(), 5000)
+    })
   }
 }
 </script>

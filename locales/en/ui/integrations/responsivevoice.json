@@ -1,0 +1,8 @@
+{
+  "settings": {
+    "key": {
+      "title": "Key",
+      "help": "Get your key at http://responsivevoice.org"
+    }
+  }
+}

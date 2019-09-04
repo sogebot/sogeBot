@@ -89,6 +89,14 @@ class Streamlabs extends Integration {
           currencyInBot: global.currency.mainCurrency,
           message: event.message,
         });
+        global.registries.alerts.trigger({
+          event: 'tips',
+          name: event.from.toLowerCase(),
+          amount: Number(parseFloat(event.amount).toFixed(2)),
+          currency: event.currency,
+          monthsName: '',
+          message: event.message,
+        });
 
         // go through all systems and trigger on.tip
         for (const [, systems] of Object.entries({

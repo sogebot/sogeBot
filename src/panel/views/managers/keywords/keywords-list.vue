@@ -62,9 +62,9 @@ export default class keywordsList extends Vue {
   items: KeywordInterface[] = [];
   search: string = '';
   state: {
-    loading: ButtonStates;
+    loading: number;
   } = {
-    loading: ButtonStates.progress,
+    loading: this.$state.progress,
   }
 
   fields = [
@@ -98,11 +98,11 @@ export default class keywordsList extends Vue {
   }
 
   refresh() {
-    this.state.loading = ButtonStates.progress;
+    this.state.loading = this.$state.progress;
     this.socket.emit('find', {}, (err, data: KeywordInterface[]) => {
       if (err) return console.error(err);
       this.items = data;
-      this.state.loading = ButtonStates.success;
+      this.state.loading = this.$state.success;
     })
   }
 

@@ -27,54 +27,6 @@ export async function autoLoad(directory): Promise<{ [x: string]: any }> {
   return loaded;
 }
 
-/*
- * Flatten object keys
- * { a: { b: 'c' }} => { 'a.b': 'c' }
- */
-export function flatten(data): { [x: string]: any } {
-  const result = {};
-  function recurse(cur, prop): void {
-    if (Object(cur) !== cur || Array.isArray(cur)) {
-      result[prop] = cur;
-    } else {
-      let isEmpty = true;
-      for (const p of Object.keys(cur)) {
-        isEmpty = false;
-        recurse(cur[p], prop ? prop + '.' + p : p);
-      }
-      if (isEmpty && prop) {
-        result[prop] = {};
-      }
-    }
-  }
-  recurse(data, '');
-  return result;
-}
-
-/*
- * Unflatten object keys
- * { 'a.b': 'c' } => { a: { b: 'c' }}
- */
-export function unflatten(data) {
-  let result;
-  if (Array.isArray(data)) {
-    result = [];
-    // create unflatten each item
-    for (const o of data) {
-      result.push(unflatten(o));
-    }
-  } else {
-    result = {};
-    for (const i of Object.keys(data)) {
-      const keys = i.split('.');
-      keys.reduce((r, e, j)  => {
-        return r[e] || (r[e] = isNaN(Number(keys[j + 1])) ? (keys.length - 1 === j ? data[i] : {}) : []);
-      }, result);
-    }
-  }
-  return result;
-}
-
 export function getIgnoreList() {
   return global.tmi.ignorelist.map((o) => {
     return o.trim().toLowerCase();
@@ -85,7 +37,7 @@ export function getGlobalIgnoreList() {
   return Object.keys(globalIgnoreList)
     .filter(o => !global.tmi.globalIgnoreListExclude.includes(o))
     .map(o => {
-      return { id: o, ...globalIgnoreList[o] }; 
+      return { id: o, ...globalIgnoreList[o] };
     });
 }
 
@@ -172,22 +124,22 @@ export async function sendMessage(messageToSend: string | Promise<string>, sende
   }
 
   if (!attr.skip) {
-    messageToSend = await new Message(messageToSend).parse(attr) as string; 
+    messageToSend = await new Message(messageToSend).parse(attr) as string;
   }
   if (messageToSend.length === 0) {
-    return false; 
+    return false;
   } // if message is empty, don't send anything
 
   // if sender is null/undefined, we can assume, that username is from dashboard -> bot
   if (!sender && !attr.force) {
-    return false; 
+    return false;
   } // we don't want to reply on bot commands
 
   if (sender) {
     messageToSend = !_.isNil(sender.username) ? messageToSend.replace(/\$sender/g, (global.tmi.showWithAt ? '@' : '') + sender.username) : messageToSend;
     if (!global.tmi.mute || attr.force) {
       if ((!_.isNil(attr.quiet) && attr.quiet)) {
-        return true; 
+        return true;
       }
       if (sender['message-type'] === 'whisper') {
         global.log.whisperOut(messageToSend, { username: sender.username });
@@ -208,14 +160,14 @@ export async function sendMessage(messageToSend: string | Promise<string>, sende
 /* TODO: move to tmi */
 export async function message(type, username, messageToSend, retry = true) {
   if (debugIsEnabled('tmi')) {
-    return; 
+    return;
   }
   if (!isMainThread) {
     global.workers.sendToMaster({ type, sender: username, message: messageToSend });
   } else if (isMainThread) {
     try {
       if (username === null) {
-        username = await global.oauth.generalChannel; 
+        username = await global.oauth.generalChannel;
       }
       if (username === '') {
         global.log.error('TMI: channel is not defined, message cannot be sent');
@@ -224,9 +176,9 @@ export async function message(type, username, messageToSend, retry = true) {
       }
     } catch (e) {
       if (retry) {
-        setTimeout(() => message(type, username, messageToSend, false), 5000); 
+        setTimeout(() => message(type, username, messageToSend, false), 5000);
       } else {
-        global.log.error(e); 
+        global.log.error(e);
       }
     }
   }
@@ -240,7 +192,7 @@ export async function timeout(username, reason, timeMs) {
     }
     global.tmi.client.bot.chat.timeout(global.oauth.generalChannel, username, timeMs, reason);
   } else {
-    global.workers.sendToMaster({ type: 'timeout', username, timeout: timeMs, reason }); 
+    global.workers.sendToMaster({ type: 'timeout', username, timeout: timeMs, reason });
   }
 }
 
@@ -274,7 +226,7 @@ export function getBroadcaster() {
 export function isBroadcaster(user) {
   try {
     if (_.isString(user)) {
-      user = { username: user }; 
+      user = { username: user };
     }
     return global.oauth.broadcasterUsername.toLowerCase().trim() === user.username.toLowerCase().trim();
   } catch (e) {
@@ -306,7 +258,7 @@ export async function isModerator(user): Promise<boolean> {
 export async function isVIP(user) {
   try {
     if (_.isString(user)) {
-      user = await global.users.getByName(user); 
+      user = await global.users.getByName(user);
     }
     return !_.isNil(user.is.vip) ? user.is.vip : false;
   } catch (e) {
@@ -317,7 +269,7 @@ export async function isVIP(user) {
 export async function isFollower(user) {
   try {
     if (_.isString(user)) {
-      user = await global.users.getByName(user); 
+      user = await global.users.getByName(user);
     }
     return !_.isNil(user.is.follower) ? user.is.follower : false;
   } catch (e) {
@@ -328,7 +280,7 @@ export async function isFollower(user) {
 export async function isSubscriber(user) {
   try {
     if (_.isString(user)) {
-      user = await global.users.getByName(user); 
+      user = await global.users.getByName(user);
     }
     debug('commons.isSubscriber', JSON.stringify(user));
     return !_.isNil(user.is.subscriber) ? user.is.subscriber : false;
@@ -340,12 +292,12 @@ export async function isSubscriber(user) {
 export function isBot(user) {
   try {
     if (_.isString(user)) {
-      user = { username: user }; 
+      user = { username: user };
     }
     if (global.oauth.botUsername) {
       return global.oauth.botUsername.toLowerCase().trim() === user.username.toLowerCase().trim();
     } else {
-      return false; 
+      return false;
     }
   } catch (e) {
     return true; // we can expect, if user is null -> bot or admin
@@ -355,7 +307,7 @@ export function isBot(user) {
 export function isOwner(user) {
   try {
     if (_.isString(user)) {
-      user = { username: user }; 
+      user = { username: user };
     }
     if (global.oauth.generalOwners) {
       const owners = _.map(_.filter(global.oauth.generalOwners, _.isString), (owner) => {
@@ -363,7 +315,7 @@ export function isOwner(user) {
       });
       return _.includes(owners, user.username.toLowerCase().trim());
     } else {
-      return false; 
+      return false;
     }
   } catch (e) {
     return true; // we can expect, if user is null -> bot or admin

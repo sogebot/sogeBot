@@ -40,7 +40,8 @@ module.exports = [{
   resolve: {
     extensions: ['.ts', '.js', '.vue', '.json'],
     alias: {
-      'vue$': 'vue/dist/vue.esm.js'
+      'vue$': 'vue/dist/vue.esm.js',
+      src: path.resolve(__dirname, 'src'),
     }
   },
   output: {
@@ -55,6 +56,23 @@ module.exports = [{
   ],
   module: {
     rules: [
+      {
+        test: /\.(mp3)$/i,
+        use: 'file-loader',
+      },
+      {
+        test: /\.(gif|png|jpe?g|svg)$/i,
+        use: [
+          'file-loader',
+          {
+            loader: 'image-webpack-loader',
+            options: {
+              bypassOnDebug: true, // webpack@1.x
+              disable: true, // webpack@2.x and newer
+            },
+          },
+        ],
+      },
       {
         test: /\.txt$/i,
         use: 'raw-loader',
@@ -115,7 +133,8 @@ module.exports = [{
   resolve: {
     extensions: ['.ts', '.js', '.vue', '.json'],
     alias: {
-      'vue$': 'vue/dist/vue.esm.js'
+      'vue$': 'vue/dist/vue.esm.js',
+      src: path.resolve(__dirname, 'src'),
     }
   },
   output: {
@@ -130,6 +149,19 @@ module.exports = [{
   ],
   module: {
     rules: [
+      {
+        test: /\.(gif|png|jpe?g|svg)$/i,
+        use: [
+          'file-loader',
+          {
+            loader: 'image-webpack-loader',
+            options: {
+              bypassOnDebug: true, // webpack@1.x
+              disable: true, // webpack@2.x and newer
+            },
+          },
+        ],
+      },
       {
         test: /\.txt$/i,
         use: 'raw-loader',

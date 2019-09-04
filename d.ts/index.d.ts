@@ -8,6 +8,23 @@ declare module '*.txt' {
   export default content;
 }
 
+declare module '*.gif' {
+  const content: string;
+  export default content;
+}
+
+declare module '*.png' {
+  const content: string;
+  export default content;
+}
+
+declare module '*.mp3' {
+  const content: string;
+  export default content;
+}
+
+type Omit<T, K extends keyof any> = Pick<T, Exclude<keyof T, K>>;
+
 declare namespace NodeJS {
   export interface Global {
     linesParsed: number;
@@ -33,6 +50,7 @@ declare namespace NodeJS {
       donationalerts: import('../src/bot/integrations/donationalerts').Donationalerts;
       phillipshue: import('../src/bot/integrations/phillipshue').PhillipsHue;
       spotify: import('../src/bot/integrations/spotify').Spotify;
+      responsivevoice: import('../src/bot/integrations/responsivevoice').ResponsiveVoice;
       streamlabs: import('../src/bot/integrations/streamlabs').Streamlabs;
       twitter: import('../src/bot/integrations/twitter').Twitter;
     };
@@ -61,6 +79,9 @@ declare namespace NodeJS {
     log: any;
     currency: any;
     panel: any;
+    registries: {
+      alerts: import('../src/bot/registries/alerts').Alerts;
+    };
     systems: {
       alias: import('../src/bot/systems/alias').Alias;
       bets: import('../src/bot/systems/bets').Bets;
@@ -287,11 +308,4 @@ interface Poll {
   options: string[];
   openedAt: number;
   closedAt?: number;
-}
-
-declare const enum ButtonStates {
-  idle,
-  progress,
-  success,
-  fail
 }

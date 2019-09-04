@@ -7,7 +7,6 @@ import XRegExp from 'xregexp';
 import Overlay from './_interface';
 import { parser, settings, ui } from '../decorators';
 
-interface cachedEmote { type: 'twitch' | 'bttv' | 'ffz'; code: string; urls: { '1': string; '2': string; '3': string }}
 
 class Emotes extends Overlay {
   simpleEmotes = {
@@ -396,7 +395,7 @@ class Emotes extends Overlay {
     const parsed: string[] = [];
     const usedEmotes = {};
 
-    const cache: cachedEmote[] = await global.db.engine.find(this.collection.cache);
+    const cache: Overlay.Emotes.cache[] = await global.db.engine.find(this.collection.cache);
 
     // add simple emotes
     for (const code of Object.keys(this.simpleEmotes)) {
@@ -421,7 +420,7 @@ class Emotes extends Overlay {
       if (cache.find((o) => o.code === opts.message.slice(emote.start, emote.end+1))) {
         continue;
       }
-      const data: cachedEmote = {
+      const data: Overlay.Emotes.cache = {
         type: 'twitch',
         code: opts.message.slice(emote.start, emote.end+1),
         urls: {

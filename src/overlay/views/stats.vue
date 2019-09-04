@@ -32,7 +32,9 @@
 </span>
 </template>
 
-<script>
+<script lang="ts">
+import { Vue, Component } from 'vue-property-decorator';
+
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faStar, faGem, faUsers, faClock, faEye } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
@@ -40,33 +42,31 @@ import io from 'socket.io-client';
 
 library.add(faStar, faGem, faUsers, faClock, faEye)
 
-export default {
-  props: ['token'],
+@Component({
   components: {
     'font-awesome-icon': FontAwesomeIcon
-  },
-  data: function () {
-    return {
-      socket: io('/overlays/stats', {query: "token="+token}),
-      stats: {},
-      interval: [],
-    }
-  },
-  beforeDestroy: function() {
+  }
+})
+export default class StatsOverlay extends Vue {
+  socket = io('/overlays/stats', {query: "token="+this.token});
+  stats: any = {};
+  interval: any[] = []
+
+  beforeDestroy() {
     for(const interval of this.interval) {
       clearInterval(interval);
     }
-  },
-  created: function () {
+  }
+
+  created () {
     this.refresh()
     this.interval.push(setInterval(() => this.refresh(), 1000));
-  },
-  methods: {
-    refresh: function () {
-      this.socket.emit('get', (cb) => {
-        this.stats = cb
-      })
-    }
+  }
+
+  refresh () {
+    this.socket.emit('get', (cb) => {
+      this.stats = cb
+    })
   }
 }
 </script>
