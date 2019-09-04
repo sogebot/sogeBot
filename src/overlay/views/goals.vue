@@ -10,7 +10,7 @@
       <b-progress
         v-if="goal.display === 'simple' && (goals.length === 1 || show === index || group.display.type === 'multi')"
         :height="goal.customization.bar.height + 'px'"
-        :max="goal.goalAmount"
+        :max="Number(goal.goalAmount)"
         style="border-radius: 0;"
         class="w-100"
         :class="{ disabled: isDisabled(index), 'position-absolute': group.display.type !== 'multi' }"
@@ -135,7 +135,8 @@
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
 import io from 'socket.io-client';
-import safeEval from 'safe-eval'
+import safeEval from 'safe-eval';
+import { find } from 'lodash';
 
 import BootstrapVue from 'bootstrap-vue'
 import 'bootstrap/dist/css/bootstrap.css'
@@ -269,7 +270,7 @@ export default class GoalsOverlay extends Vue {
       // run check first
       if (this.goals.length > 0) {
         for (const goal of this.goals) {
-          let _goal = this._.find(this.goals, (o) => o.uid === goal.uid)
+          let _goal = find(this.goals, (o) => o.uid === goal.uid)
           if (typeof _goal !== 'undefined') {
             if (Number(_goal.currentAmount) !== Number(goal.currentAmount)) {
               console.debug(_goal.currentAmount + ' => ' + goal.currentAmount)
