@@ -376,12 +376,9 @@ export default class AlertsRegistryOverlays extends Vue {
                 const head = document.getElementsByTagName('head')[0]
                 const style = document.createElement('style')
                 style.type = 'text/css';
-                if (!this.loadedFonts.includes(alert.advancedMode.css)) {
-                  this.loadedFonts.push(alert.advancedMode.css)
-                  const css = alert.advancedMode.css
-                    .replace(/\#wrap/g, '#wrap-' + alert.uuid) // replace .wrap with only this goal wrap
-                  style.appendChild(document.createTextNode(css));
-                }
+                const css = alert.advancedMode.css
+                  .replace(/\#wrap/g, '#wrap-' + alert.uuid) // replace .wrap with only this goal wrap
+                style.appendChild(document.createTextNode(css));
                 head.appendChild(style);
               }
 
