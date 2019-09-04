@@ -334,10 +334,15 @@ export default class AlertsRegistryOverlays extends Vue {
                 }
               }
 
+              const messageTemplate = this._.get(this, 'runningAlert.alert.messageTemplate', '')
+                .replace(/\{name\}/g, '{name:highlight}')
+                .replace(/\{amount\}/g, '{amount:highlight}')
+                .replace(/\{monthsName\}/g, '{monthsName:highlight}')
+                .replace(/\{currency\}/g, '{currency:highlight}')
               this.preparedAdvancedHTML =
                 this.preparedAdvancedHTML
                   .replace(/\{message\}/g, emitData.message)
-                  .replace(/\{messageTemplate\}/g, `<v-runtime-template :template="prepareMessageTemplate(runningAlert.alert.messageTemplate)"></v-runtime-template>`)
+                  .replace(/\{messageTemplate\}/g, `<v-runtime-template :template="prepareMessageTemplate('${messageTemplate}')"></v-runtime-template>`)
                   .replace(/\{name\}/g, emitData.name)
                   .replace(/\{amount\}/g, String(emitData.amount))
                   .replace(/\{monthsName\}/g, emitData.monthsName)
