@@ -10,6 +10,7 @@ var basicAuth = require('basic-auth')
 var _ = require('lodash')
 const util = require('util')
 const commons = require('./commons')
+const flatten = require('./helpers/flatten')
 const gitCommitInfo = require('git-commit-info');
 
 const Parser = require('./parser')
@@ -250,7 +251,7 @@ function Panel () {
     })
 
     socket.on('responses.get', async function (at, callback) {
-      const responses = commons.flatten(!_.isNil(at) ? global.lib.translate.translations[global.general.lang][at] : global.lib.translate.translations[global.general.lang])
+      const responses = flatten.flatten(!_.isNil(at) ? global.lib.translate.translations[global.general.lang][at] : global.lib.translate.translations[global.general.lang])
       _.each(responses, function (value, key) {
         let _at = !_.isNil(at) ? at + '.' + key : key
         responses[key] = {} // remap to obj
@@ -331,7 +332,6 @@ function Panel () {
       }
 
       for (let system of Object.keys(global.systems).filter(o => !o.startsWith('_'))) {
-        if (!global.systems[system].settings) continue
         if (typeof data.systems === 'undefined') {
           data.systems = {}
         }
@@ -339,7 +339,6 @@ function Panel () {
       }
 
       for (let system of Object.keys(global.integrations).filter(o => !o.startsWith('_'))) {
-        if (!global.integrations[system].settings) continue
         if (typeof data.integrations === 'undefined') {
           data.integrations = {}
         }
@@ -347,7 +346,6 @@ function Panel () {
       }
 
       for (let system of Object.keys(global.games).filter(o => !o.startsWith('_'))) {
-        if (!global.games[system].settings) continue
         if (typeof data.games === 'undefined') {
           data.games = {}
         }
@@ -363,7 +361,6 @@ function Panel () {
 
       // lang
       data.lang = global.general.lang;
-
       if (_.isFunction(cb)) cb(data)
       else socket.emit('configuration', data)
     })

@@ -330,6 +330,14 @@ class TMI extends Core {
         if (message.event === 'HOST_ON') {
           if (typeof message.numberOfViewers !== 'undefined') { // may occur on restart bot when hosting
             global.events.fire('hosting', { target: message.username, viewers: message.numberOfViewers })
+            global.registries.alerts.trigger({
+              event: 'hosts',
+              name: message.username,
+              amount: Number(message.numberOfViewers),
+              currency: '',
+              monthsName: '',
+              message: '',
+            });
           }
         }
       })
@@ -347,6 +355,15 @@ class TMI extends Core {
 
           global.overlays.eventlist.add(data)
           global.events.fire('raid', data)
+          global.registries.alerts.trigger({
+              event: 'raids',
+              name: message.parameters.login,
+              amount: Number(message.parameters.viewerCount),
+              currency: '',
+              monthsName: '',
+              message: '',
+            });
+
         } else if (message.event === 'SUBSCRIPTION') {
           this.subscription(message)
         } else if (message.event === 'RESUBSCRIPTION') {
@@ -419,6 +436,15 @@ class TMI extends Core {
       global.overlays.eventlist.add({ type: 'sub', tier, username, method: (!_.isNil(method.prime) && method.prime) ? 'Twitch Prime' : '' })
       global.log.sub(`${username}#${userstate.userId}, tier: ${tier}`)
       global.events.fire('subscription', { username: username, method: (!_.isNil(method.prime) && method.prime) ? 'Twitch Prime' : '', subCumulativeMonths, tier });
+      global.registries.alerts.trigger({
+        event: 'subs',
+        name: username,
+        amount: 0,
+        currency: '',
+        monthsName: '',
+        message: '',
+      });
+
       // go through all systems and trigger on.sub
       for (let [type, systems] of Object.entries({
         systems: global.systems,
@@ -493,6 +519,14 @@ class TMI extends Core {
         subCumulativeMonthsName: commons.getLocalizedName(subCumulativeMonths, 'core.months'),
         message: messageFromUser
       })
+      global.registries.alerts.trigger({
+        event: 'resubs',
+        name: username,
+        amount: Number(subCumulativeMonths),
+        currency: '',
+        monthsName: commons.getLocalizedName(subCumulativeMonths, 'core.months'),
+        message: messageFromUser,
+      });
     } catch (e) {
       global.log.error('Error parsing resub event')
       global.log.error(util.inspect(message))
@@ -516,6 +550,14 @@ class TMI extends Core {
       global.overlays.eventlist.add({ type: 'subcommunitygift', username, count })
       global.events.fire('subcommunitygift', { username, count })
       global.log.subcommunitygift(`${username}#${userId}, to ${count} viewers`)
+      global.registries.alerts.trigger({
+        event: 'subgifts',
+        name: username,
+        amount: Number(count),
+        currency: '',
+        monthsName: '',
+        message: '',
+      });
     } catch (e) {
       global.log.error('Error parsing subscriptionGiftCommunity event')
       global.log.error(util.inspect(message))
@@ -611,6 +653,14 @@ class TMI extends Core {
       global.log.cheer(`${username}#${userId}, bits: ${userstate.bits}, message: ${messageFromUser}`)
       global.db.engine.insert('users.bits', { id: userId, amount: Number(userstate.bits), message: messageFromUser, timestamp: _.now() })
       global.events.fire('cheer', { username, bits: userstate.bits, message: messageFromUser })
+      global.registries.alerts.trigger({
+        event: 'cheers',
+        name: username,
+        amount: Number(userstate.bits),
+        currency: '',
+        monthsName: '',
+        message: messageFromUser,
+      });
       if (await global.cache.isOnline()) await global.db.engine.increment('api.current', { key: 'bits' }, { value: parseInt(userstate.bits, 10) })
 
       // go through all systems and trigger on.bit

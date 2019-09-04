@@ -3,7 +3,7 @@ import _ from 'lodash';
 import { setTimeout } from 'timers';
 import { isMainThread } from 'worker_threads';
 
-import { flatten, unflatten } from './commons';
+import { flatten, unflatten } from './helpers/flatten';
 import { loadingInProgress, permissions as permissionsList } from './decorators';
 import { getFunctionList } from './decorators/on';
 import * as Parser from './parser';
@@ -44,7 +44,7 @@ class Module {
   protected _commands: Command[];
   protected _parsers: Parser[];
   protected _rollback: { name: string }[];
-  protected _enabled = true;
+  protected _enabled: boolean | null = true;
 
   constructor(name = 'core', enabled = true) {
     this.on = {
@@ -66,7 +66,7 @@ class Module {
     this.collection = new Proxy({}, {
       get: (t, n, r) => {
         if (_.isSymbol(n)) {
-          return undefined; 
+          return undefined;
         }
         let collection = '';
         if (n === 'data') {
@@ -123,9 +123,9 @@ class Module {
       if (this.on.load[key]) {
         for (const fnc of this.on.load[key]) {
           if (typeof this[fnc] === 'function') {
-            this[fnc](key, _.get(this, key)); 
+            this[fnc](key, _.get(this, key));
           } else {
-            global.log.error(`${fnc}() is not function in ${this._name}/${this.constructor.name.toLowerCase()}`); 
+            global.log.error(`${fnc}() is not function in ${this._name}/${this.constructor.name.toLowerCase()}`);
           }
         }
       }
@@ -191,7 +191,7 @@ class Module {
           socket.on('set.value', async (variable, value, cb) => {
             this[variable] = value;
             if (typeof cb === 'function') {
-              cb(null, {variable, value}); 
+              cb(null, {variable, value});
             }
           });
           socket.on('get.value', async (variable, cb) => {
@@ -343,19 +343,19 @@ class Module {
                 let itemFromDb = Object.assign({}, item);
                 const _id = item._id; delete item._id;
                 if (_.isNil(_id) && _.isNil(opts.key)) {
-                  itemFromDb = await global.db.engine.insert(opts.collection, item); 
+                  itemFromDb = await global.db.engine.insert(opts.collection, item);
                 } else if (_id) {
-                  await global.db.engine.update(opts.collection, { _id }, item); 
+                  await global.db.engine.update(opts.collection, { _id }, item);
                 } else {
-                  await global.db.engine.update(opts.collection, { [opts.key]: item[opts.key] }, item); 
+                  await global.db.engine.update(opts.collection, { [opts.key]: item[opts.key] }, item);
                 }
                 if (_.isFunction(cb)) {
-                  cb(null, Object.assign({ _id }, itemFromDb)); 
+                  cb(null, Object.assign({ _id }, itemFromDb));
                 }
               }
             } else {
               if (_.isFunction(cb)) {
-                cb(null, []); 
+                cb(null, []);
               }
             }
           });
@@ -377,11 +377,11 @@ class Module {
                 created.push(await global.db.engine.insert(opts.collection, item));
               }
               if (_.isFunction(cb)) {
-                cb(null, created); 
+                cb(null, created);
               }
             } else {
               if (_.isFunction(cb)) {
-                cb(null, []); 
+                cb(null, []);
               }
             }
           });
@@ -408,7 +408,7 @@ class Module {
             }
 
             if (_.isFunction(cb)) {
-              cb(null); 
+              cb(null);
             }
           });
           socket.on('find', async (opts, cb) => {
@@ -434,7 +434,7 @@ class Module {
               if (opts.omit.length > 0) {
                 items = items.map((o) => {
                   for (const omit of opts.omit) {
-                    delete o[omit]; 
+                    delete o[omit];
                   }
                   return o;
                 });
@@ -465,7 +465,7 @@ class Module {
               if (opts.omit.length > 0) {
                 items = items.map((o) => {
                   for (const omit of opts.omit) {
-                    delete o[omit]; 
+                    delete o[omit];
                   }
                   return o;
                 });
@@ -486,9 +486,9 @@ class Module {
           const dependencyPointer = _.get(global, dependency, null);
           if (!dependencyPointer || !_.isFunction(dependencyPointer.status)) {
             if (retry > 0) {
-              setTimeout(() => check(--retry), 10); 
+              setTimeout(() => check(--retry), 10);
             } else {
-              throw new Error(`[${this.constructor.name}] Dependency error - possibly wrong path`); 
+              throw new Error(`[${this.constructor.name}] Dependency error - possibly wrong path`);
             }
             return;
           } else {
@@ -503,8 +503,8 @@ class Module {
 
   public async status(opts) {
     opts = opts || {};
-    if (['core', 'overlays', 'widgets', 'stats'].includes(this._name)) {
-      return true; 
+    if (['core', 'overlays', 'widgets', 'stats', 'registries'].includes(this._name) || (opts.state === null && typeof opts.state !== 'undefined')) {
+      return true;
     }
 
     const areDependenciesEnabled = await this._dependenciesEnabled();
@@ -520,7 +520,7 @@ class Module {
     }
 
     if (!areDependenciesEnabled || isDisabledByEnv) {
-      opts.state = false; 
+      opts.state = false;
     } // force disable if dependencies are disabled or disabled by env
 
     // on.change handler on enabled
@@ -539,11 +539,11 @@ class Module {
 
     if ((isMasterAndStatusOnly || isStatusChanged) && !opts.quiet) {
       if (isDisabledByEnv) {
-        global.log.info(`${chalk.red('DISABLED BY ENV')}: ${this.constructor.name} (${this._name})`); 
+        global.log.info(`${chalk.red('DISABLED BY ENV')}: ${this.constructor.name} (${this._name})`);
       } else if (areDependenciesEnabled) {
-        global.log.info(`${opts.state ? chalk.green('ENABLED') : chalk.red('DISABLED')}: ${this.constructor.name} (${this._name})`); 
+        global.log.info(`${opts.state ? chalk.green('ENABLED') : chalk.red('DISABLED')}: ${this.constructor.name} (${this._name})`);
       } else {
-        global.log.info(`${chalk.red('DISABLED BY DEP')}: ${this.constructor.name} (${this._name})`); 
+        global.log.info(`${chalk.red('DISABLED BY DEP')}: ${this.constructor.name} (${this._name})`);
       }
     }
 
@@ -634,7 +634,7 @@ class Module {
 
   public async parsers() {
     if (!(await this.isEnabled())) {
-      return []; 
+      return [];
     }
 
     const parsers: {
@@ -650,7 +650,7 @@ class Module {
       parser.priority = typeof parser.priority !== 'undefined' ? parser.priority : 3 /* constants.LOW */;
 
       if (_.isNil(parser.name)) {
-        throw Error('Parsers name must be defined'); 
+        throw Error('Parsers name must be defined');
       }
 
       if (typeof parser.dependsOn !== 'undefined') {
@@ -658,7 +658,7 @@ class Module {
           const dependencyPointer = _.get(global, dependency, null);
           // skip parser if dependency is not enabled
           if (!dependencyPointer || !_.isFunction(dependencyPointer.status) || !(await dependencyPointer.status())) {
-            continue; 
+            continue;
           }
         }
       }
@@ -677,7 +677,7 @@ class Module {
 
   public async rollbacks() {
     if (!(await this.isEnabled())) {
-      return []; 
+      return [];
     }
 
     const rollbacks: {
@@ -687,7 +687,7 @@ class Module {
     }[] = [];
     for (const rollback of this._rollback) {
       if (_.isNil(rollback.name)) {
-        throw Error('Rollback name must be defined'); 
+        throw Error('Rollback name must be defined');
       }
 
       rollbacks.push({
@@ -712,7 +712,7 @@ class Module {
       }[] = [];
       for (const command of this._commands) {
         if (_.isNil(command.name)) {
-          throw Error('Command name must be defined'); 
+          throw Error('Command name must be defined');
         }
 
         // if fnc is not set
@@ -723,7 +723,7 @@ class Module {
             const _fnc = command.name.split(' ')[1].split('-');
             for (const part of _fnc) {
               if (command.fnc.length === 0) {
-                command.fnc = part; 
+                command.fnc = part;
               } else {
                 command.fnc = command.fnc + part.charAt(0).toUpperCase() + part.slice(1);
               }
@@ -736,7 +736,7 @@ class Module {
             const dependencyPointer = _.get(global, dependency, null);
             // skip command if dependency is not enabled
             if (!dependencyPointer || !_.isFunction(dependencyPointer.status) || !(await dependencyPointer.status())) {
-              continue; 
+              continue;
             }
           }
         }
@@ -756,7 +756,7 @@ class Module {
 
       return commands;
     } else {
-      return []; 
+      return [];
     }
   }
 

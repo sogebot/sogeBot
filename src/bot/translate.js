@@ -5,7 +5,7 @@
 var glob = require('glob')
 var fs = require('fs')
 var _ = require('lodash')
-const { flatten } = require('./commons');
+const { flatten } = require('./helpers/flatten');
 
 const {
   isMainThread,

@@ -5,9 +5,15 @@ import './others/checklist';
 import './widgets/dashboard';
 import './widgets/popout';
 
+import BootstrapVue from 'bootstrap-vue';
 import _ from 'lodash';
+import moment from 'moment';
+import momentTimezone from 'moment-timezone';
 import Vue from 'vue';
+import VueMoment from 'vue-moment';
 import VueRouter from 'vue-router';
+import Vuelidate from 'vuelidate';
+import LoadScript from 'vue-plugin-load-script';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faSpotify, faTwitch, faTwitter } from '@fortawesome/free-brands-svg-icons';
@@ -15,41 +21,37 @@ import {
   faBell, faCalendar, faCheckCircle, faCircle, faClock, faMoneyBillAlt,
 } from '@fortawesome/free-regular-svg-icons';
 import {
-  faAngleDown, faAngleRight, faAngleUp, faBan, faBoxOpen, faCaretDown, faCaretLeft, faCaretRight, faCheck,
-  faCircleNotch, faClone, faCode, faCog, faCoins, faCommentAlt, faComments, faDollarSign, faDownload, faEdit,
-  faEllipsisH, faEllipsisV, faEquals, faEraser, faExclamation, faExclamationCircle, faExternalLinkAlt,
-  faEye, faEyeSlash, faFilter, faFont, faForward, faGem, faGift, faGreaterThanEqual, faHandPointer,
-  faHeadphones, faHeart, faInfinity, faLink, faList, faLock, faLockOpen, faLongArrowAltLeft,
-  faLongArrowAltRight, faMinus, faMusic, faPause, faPlay, faPlus, faPlusSquare,
-  faPowerOff, faQuestion, faRandom, faSave, faSearch, faShareSquare, faSignInAlt, faSignOutAlt,
-  faSlash, faSpinner, faStar, faStarHalf, faStop, faSync, faSyncAlt, faTasks, faTerminal, faTh, faThLarge,
-  faThList, faTimes, faToggleOff, faToggleOn, faTrash, faTrashAlt, faTrophy, faTv, faUser,
-  faUsers, faVial, faVolumeDown, faVolumeUp,
+  faAngleDown, faAngleRight, faAngleUp, faBan, faBoxOpen, faCaretDown, faCaretLeft, faCaretRight,
+  faCheck, faCircle as faCircle2, faCircleNotch, faClone, faCode, faCog, faCoins, faCommentAlt,
+  faComments, faDollarSign, faDownload, faEdit, faEllipsisH, faEllipsisV, faEquals, faEraser,
+  faExclamation, faExclamationCircle, faExternalLinkAlt, faEye, faEyeSlash, faFilter, faFont,
+  faForward, faGem, faGift, faGreaterThanEqual, faHandPointer, faHeadphones, faHeart, faImage,
+  faInfinity, faLink, faList, faLock, faLockOpen, faLongArrowAltLeft, faLongArrowAltRight, faMinus,
+  faMusic, faPause, faPlay, faPlus, faPlusSquare, faPowerOff, faQuestion, faRandom, faSave, faSearch,
+  faShareSquare, faSignInAlt, faSignOutAlt, faSlash, faSpinner, faStar, faStarHalf, faStop,
+  faSync, faSyncAlt, faTasks, faTerminal, faTh, faThLarge, faThList, faTimes, faToggleOff,
+  faToggleOn, faTrash, faTrashAlt, faTrophy, faTv, faUpload, faUser, faUsers, faVial,
+  faVolumeDown, faVolumeUp,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
+import { ButtonStates, states } from './helpers/buttonStates';
 import { isAvailableVariable, setMainLoaded } from './helpers/isAvailableVariable';
 import translate from './helpers/translate';
 import urlParam from './helpers/urlParam';
 
-library.add(faCaretRight, faTasks, faCaretDown, faSlash, faFilter, faToggleOn, faToggleOff, faBell, faShareSquare, faExclamationCircle, faQuestion, faVial, faEquals, faGreaterThanEqual, faLongArrowAltLeft, faBan, faPlusSquare, faMusic, faList, faPlay, faPause, faForward, faSpotify, faMoneyBillAlt, faPlus, faSpinner, faTimes, faGift, faHeadphones, faTh, faDollarSign, faSignInAlt, faSignOutAlt, faUsers, faMusic, faCalendar, faTwitter, faList, faCheck, faMusic, faMusic, faVolumeUp, faVolumeDown, faUsers, faGift, faTrophy, faCog, faExternalLinkAlt, faTrash, faPlus, faTimes, faSync, faComments, faTwitch, faCircle, faCheckCircle, faLock, faUsers, faUser, faCheck, faTimes, faHeart, faStar, faLockOpen, faHandPointer, faRandom, faEyeSlash, faSignOutAlt, faSignInAlt, faBoxOpen, faEye, faCog, faExternalLinkAlt, faHeart, faTv, faRandom, faGem, faStar, faGift, faDollarSign, faStarHalf, faLongArrowAltRight, faCircleNotch, faCalendar, faDollarSign, faCog, faCode, faAngleUp, faTrashAlt, faAngleDown, faFont, faPlus, faMinus, faDownload, faDollarSign, faTerminal, faCog, faCommentAlt, faUsers, faExternalLinkAlt, faSyncAlt, faClock, faCog, faInfinity, faTrophy, faClone, faGem, faCoins, faExclamation, faStop, faBan, faSpinner, faCheck, faAngleRight, faPlus, faEdit, faEraser, faLink, faTrash, faPlus, faCaretLeft, faExternalLinkAlt, faLink, faSave, faThLarge, faThList, faSearch, faCircleNotch, faCheck, faEllipsisH, faEllipsisV, faPowerOff);
+library.add(faImage, faUpload, faCircle2, faCaretRight, faTasks, faCaretDown, faSlash, faFilter, faToggleOn, faToggleOff, faBell, faShareSquare, faExclamationCircle, faQuestion, faVial, faEquals, faGreaterThanEqual, faLongArrowAltLeft, faBan, faPlusSquare, faMusic, faList, faPlay, faPause, faForward, faSpotify, faMoneyBillAlt, faPlus, faSpinner, faTimes, faGift, faHeadphones, faTh, faDollarSign, faSignInAlt, faSignOutAlt, faUsers, faMusic, faCalendar, faTwitter, faList, faCheck, faMusic, faMusic, faVolumeUp, faVolumeDown, faUsers, faGift, faTrophy, faCog, faExternalLinkAlt, faTrash, faPlus, faTimes, faSync, faComments, faTwitch, faCircle, faCheckCircle, faLock, faUsers, faUser, faCheck, faTimes, faHeart, faStar, faLockOpen, faHandPointer, faRandom, faEyeSlash, faSignOutAlt, faSignInAlt, faBoxOpen, faEye, faCog, faExternalLinkAlt, faHeart, faTv, faRandom, faGem, faStar, faGift, faDollarSign, faStarHalf, faLongArrowAltRight, faCircleNotch, faCalendar, faDollarSign, faCog, faCode, faAngleUp, faTrashAlt, faAngleDown, faFont, faPlus, faMinus, faDownload, faDollarSign, faTerminal, faCog, faCommentAlt, faUsers, faExternalLinkAlt, faSyncAlt, faClock, faCog, faInfinity, faTrophy, faClone, faGem, faCoins, faExclamation, faStop, faBan, faSpinner, faCheck, faAngleRight, faPlus, faEdit, faEraser, faLink, faTrash, faPlus, faCaretLeft, faExternalLinkAlt, faLink, faSave, faThLarge, faThList, faSearch, faCircleNotch, faCheck, faEllipsisH, faEllipsisV, faPowerOff);
 Vue.component('fa', FontAwesomeIcon);
 Vue.component('font-awesome-icon', FontAwesomeIcon);
-
-import moment from 'moment';
-import momentTimezone from 'moment-timezone';
-import 'moment/min/locales.min';
-import VueMoment from 'vue-moment';
 
 Vue.use(VueMoment, {
   moment, momentTimezone,
 });
 
-import BootstrapVue from 'bootstrap-vue';
 Vue.use(BootstrapVue);
 
-import Vuelidate from 'vuelidate';
 Vue.use(Vuelidate);
+Vue.use(LoadScript);
 
 /* import widely used components */
 Vue.component('panel', () => import('./components/panel.vue'));
@@ -72,6 +74,9 @@ declare module 'vue/types/vue' {
     token: string;
     configuration: any;
     $moment?: any;
+    $loadScript: (script: string) => Promise<void>;
+    $unloadScript: (script: string) => Promise<void>;
+    $state: states;
     _: _.LoDashStatic;
     urlParam(key: string): string | null;
     translate(id: string): string;
@@ -92,6 +97,7 @@ const main = async () => {
   Vue.prototype.token = token;
   Vue.prototype.configuration = global.configuration;
   Vue.prototype._ = _;
+  Vue.prototype.$state = ButtonStates;
 
   setMainLoaded();
 
@@ -113,6 +119,8 @@ const main = async () => {
       { path: '/settings/permissions/:id?', name: 'PermissionsSettings', component: () => import('./views/settings/permissions.vue') },
       { path: '/settings/:type/:id?', name: 'InterfaceSettings', component: () => import('./views/settings/interface.vue') },
 
+      { path: '/registry/alerts/list', name: 'alertsList', component: () => import('./views/registries/alerts/alerts-list.vue') },
+      { path: '/registry/alerts/edit/:id?', name: 'alertsEdit', component: () => import('./views/registries/alerts/alerts-edit.vue') },
       { path: '/registry/customvariables/list', name: 'CustomVariableList', component: () => import('./views/registries/custom-variables/custom-variables-list.vue') },
       { path: '/registry/customvariables/edit/:id?', name: 'CustomVariableEdit', component: () => import('./views/registries/custom-variables/custom-variables-edit.vue') },
       { path: '/registry/textoverlay/list', name: 'TextOverlayList', component: () => import('./views/registries/text-overlay/text-overlay-list.vue') },

@@ -9,7 +9,8 @@
 </div>
 </template>
 
-<script>
+<script lang="ts">
+import { Vue, Component } from 'vue-property-decorator';
 import Winwheel from 'winwheel'
 import io from 'socket.io-client';
 
@@ -21,19 +22,18 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
 library.add(faSortDown)
 
-export default {
-  props: ['token'],
+@Component({
   components: {
     'font-awesome-icon': FontAwesomeIcon
-  },
-  data: function () {
-    return {
-      socket: io('/games/wheeloffortune', {query: "token="+token}),
-      username: null,
-      theWheel: null
-    }
-  },
-  created: function () {
+  }
+})
+export default class WheelOfFortuneOverlay extends Vue {
+
+  socket = io('/games/wheeloffortune', {query: "token="+this.token});
+  username: null | string = null;
+  theWheel: any = null;
+
+  created () {
     this.socket.on('spin', opts => {
       this.username = opts.username
       let segments = new Array()
@@ -63,36 +63,35 @@ export default {
 
       setTimeout(() => this.finished(), 6000)
     })
-  },
-  methods: {
-    getRandomColor: function () {
-      var letters = '0123456789ABCDEF'
-      var color = '#'
-      for (var i = 0; i < 6; i++) {
-        color += letters[Math.floor(Math.random() * 16)]
-      }
-      return color
-    },
-    finished: function () {
-      let winningSegmentNumber = this.theWheel.getIndicatedSegmentNumber()
-      // Loop and set fillStyle of all segments to gray.
-      for (var x = 1; x < this.theWheel.segments.length; x ++)
-      {
-          this.theWheel.segments[x].fillStyle = 'gray';
-      }
+  }
 
-      // Make the winning one yellow.
-      this.theWheel.segments[winningSegmentNumber].fillStyle = 'yellow';
-
-      // Call draw function to render changes.
-      this.theWheel.draw();
-
-      setTimeout(() => {
-        this.socket.emit('win', winningSegmentNumber - 1, this.username)
-        TweenLite.to(this.$refs["pointer"], 1.5, { opacity: 0 })
-        TweenLite.to(this.$refs["canvas"], 1.5, { opacity: 0 })
-      }, 1000)
+  getRandomColor () {
+    var letters = '0123456789ABCDEF'
+    var color = '#'
+    for (var i = 0; i < 6; i++) {
+      color += letters[Math.floor(Math.random() * 16)]
     }
+    return color
+  }
+
+  finished () {
+    let winningSegmentNumber = this.theWheel.getIndicatedSegmentNumber()
+    // Loop and set fillStyle of all segments to gray.
+    for (var x = 1; x < this.theWheel.segments.length; x ++) {
+        this.theWheel.segments[x].fillStyle = 'gray';
+    }
+
+    // Make the winning one yellow.
+    this.theWheel.segments[winningSegmentNumber].fillStyle = 'yellow';
+
+    // Call draw function to render changes.
+    this.theWheel.draw();
+
+    setTimeout(() => {
+      this.socket.emit('win', winningSegmentNumber - 1, this.username)
+      TweenLite.to(this.$refs["pointer"], 1.5, { opacity: 0 })
+      TweenLite.to(this.$refs["canvas"], 1.5, { opacity: 0 })
+    }, 1000)
   }
 }
 </script>

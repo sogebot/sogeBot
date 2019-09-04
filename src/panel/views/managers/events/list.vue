@@ -184,7 +184,7 @@
         deletionInProgress: {[x:string]: number},
         heightOfElement: {[x:string]: any},
         state: {
-          loading: ButtonStates,
+          loading: number,
         }
       } = {
         socket: io('/core/events', { query: "token=" + this.token }),
@@ -198,7 +198,7 @@
         testingInProgress: {},
         deletionInProgress: {},
         state: {
-          loading: ButtonStates.progress
+          loading: this.$state.progress
         }
       }
       return object
@@ -237,7 +237,7 @@
             if (err) return console.error(err);
             this.filters = data;
 
-            this.state.loading = ButtonStates.idle;
+            this.state.loading = this.$state.idle;
           })
         })
       })

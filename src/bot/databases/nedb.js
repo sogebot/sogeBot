@@ -6,7 +6,7 @@ const {
 } = require('worker_threads');
 const {
   flatten, unflatten
-} = require('../commons');
+} = require('../helpers/flatten');
 import { debug } from '../debug';
 
 const Interface = require('./interface')

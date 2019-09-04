@@ -5,9 +5,11 @@ import safeEval from 'safe-eval';
 import { setTimeout } from 'timers'; // tslint workaround
 import { isMainThread } from 'worker_threads';
 import Core from './_interface';
-import { flatten, getLocalizedName, getOwner, isBot, isBroadcaster, isModerator, isOwner, isSubscriber, isVIP, prepare, sendMessage } from './commons';
+import { flatten } from './helpers/flatten';
+import { getLocalizedName, getOwner, isBot, isBroadcaster, isModerator, isOwner, isSubscriber, isVIP, prepare, sendMessage } from './commons';
 import Message from './message';
 import * as Parser from './parser';
+import { generateUsername } from './helpers/generateUsername';
 
 class Events extends Core {
   public timeouts: { [x: string]: NodeJS.Timeout } = {};
@@ -115,7 +117,7 @@ class Events extends Core {
       };
     }
     if (_.get(attributes, 'reset', false)) {
-      return this.reset(eventId); 
+      return this.reset(eventId);
     }
 
     const events = await global.db.engine.find('events', { key: eventId, enabled: true });
@@ -127,7 +129,7 @@ class Events extends Core {
         this.checkDefinition(_.clone(event), attributes),
       ]);
       if ((!shouldRunByFilter || !shouldRunByDefinition)) {
-        continue; 
+        continue;
       }
 
       for (const operation of (await global.db.engine.find('events.operations', { eventId: id }))) {
@@ -196,7 +198,7 @@ class Events extends Core {
 
     const token = await global.oauth.botAccessToken;
     if (token === '') {
-      return; 
+      return;
     }
 
     await axios({
@@ -233,7 +235,7 @@ class Events extends Core {
     for (const key of Object.keys(attributes).sort((a, b) => a.length - b.length)) {
       const val = attributes[key];
       if (_.isObject(val) && _.size(val) === 0) {
-        return; 
+        return;
       } // skip empty object
       const replace = new RegExp(`\\$${key}`, 'g');
       command = command.replace(replace, val);
@@ -270,10 +272,10 @@ class Events extends Core {
     for (const key of Object.keys(attributes).sort((a, b) => a.length - b.length)) {
       let val = attributes[key];
       if (_.isObject(val) && _.size(val) === 0) {
-        continue; 
+        continue;
       } // skip empty object
       if (key.includes('username') || key.includes('recipient')) {
-        val = atUsername ? `@${val}` : val; 
+        val = atUsername ? `@${val}` : val;
       }
       const replace = new RegExp(`\\$${key}`, 'g');
       message = message.replace(replace, val);
@@ -307,9 +309,9 @@ class Events extends Core {
       await global.db.engine.insert('customvars', { key: customVariableName, value: numberToIncrement });
     } else {
       if (!_.isFinite(parseInt(cvFromDb.value, 10))) {
-        value = numberToIncrement; 
+        value = numberToIncrement;
       } else {
-        value = parseInt(cvFromDb.value, 10) + parseInt(numberToIncrement, 10); 
+        value = parseInt(cvFromDb.value, 10) + parseInt(numberToIncrement, 10);
       }
       await global.db.engine.update('customvars', { _id: cvFromDb._id.toString() }, { value: value.toString() });
     }
@@ -321,7 +323,7 @@ class Events extends Core {
     const regexp = new RegExp(`\\$_${customVariableName}`, 'ig');
     const title = await global.cache.rawStatus();
     if (title.match(regexp)) {
-      global.api.setTitleAndGame(null); 
+      global.api.setTitleAndGame(null);
     }
   }
 
@@ -336,9 +338,9 @@ class Events extends Core {
       await global.db.engine.insert('customvars', { key: customVariableName, value: numberToDecrement });
     } else {
       if (!_.isFinite(parseInt(cvFromDb.value, 10))) {
-        value = numberToDecrement * -1; 
+        value = numberToDecrement * -1;
       } else {
-        value = parseInt(cvFromDb.value, 10) - parseInt(numberToDecrement, 10); 
+        value = parseInt(cvFromDb.value, 10) - parseInt(numberToDecrement, 10);
       }
       await global.db.engine.update('customvars', { _id: cvFromDb._id.toString() }, { value: value.toString() });
     }
@@ -350,7 +352,7 @@ class Events extends Core {
     const regexp = new RegExp(`\\$_${customVariableName}`, 'ig');
     const title = await global.cache.rawStatus();
     if (title.match(regexp)) {
-      global.api.setTitleAndGame(null); 
+      global.api.setTitleAndGame(null);
     }
   }
 
@@ -480,7 +482,7 @@ class Events extends Core {
   public async checkFilter(eventId, attributes) {
     const filter = (await global.db.engine.findOne('events.filters', { eventId })).filters;
     if (typeof filter === 'undefined' || filter.trim().length === 0) {
-      return true; 
+      return true;
     }
 
     // get custom variables
@@ -544,12 +546,6 @@ class Events extends Core {
       });
 
       socket.on('test.event', async (eventId, cb) => {
-        const generateUsername = () => {
-          const adject = ['Encouraging', 'Plucky', 'Glamorous', 'Endearing', 'Fast', 'Agitated', 'Mushy', 'Muddy', 'Sarcastic', 'Real', 'Boring'];
-          const subject = ['Sloth', 'Beef', 'Fail', 'Fish', 'Fast', 'Raccoon', 'Dog', 'Man', 'Pepperonis', 'RuleFive', 'Slug', 'Cat', 'SogeBot'];
-          return _.sample(adject) || adject[0] + _.sample(subject) || subject[0];
-        };
-
         const username = _.sample(['short', 'someFreakingLongUsername', generateUsername()]) || 'short';
         const recipient = _.sample(['short', 'someFreakingLongUsername', generateUsername()]) || 'short';
         const months = _.random(0, 99, false);
@@ -667,14 +663,14 @@ class Events extends Core {
             if (event.key === 'command-send-x-times') {
               if (!_.isNil(_.get(event, 'triggered.runEveryXCommands', null))) {
                 if (event.triggered.runEveryXCommands <= 0) {
-                  continue; 
+                  continue;
                 }
                 await global.db.engine.update('events', { id: event.id }, { triggered: { fadeOutInterval: _.now(), runEveryXCommands: event.triggered.runEveryXCommands - event.definitions.fadeOutXCommands } });
               }
             } else if (event.key === 'keyword-send-x-times') {
               if (!_.isNil(_.get(event, 'triggered.runEveryXKeywords', null))) {
                 if (event.triggered.runEveryXKeywords <= 0) {
-                  continue; 
+                  continue;
                 }
                 await global.db.engine.update('events', { id: event.id }, { triggered: { fadeOutInterval: _.now(), runEveryXKeywords: event.triggered.runEveryXKeywords - event.definitions.fadeOutXKeywords } });
               }

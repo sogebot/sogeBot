@@ -12,7 +12,8 @@
 </div>
 </template>
 
-<script>
+<script lang="ts">
+import { Vue, Component, Watch } from 'vue-property-decorator';
 import { TweenMax } from 'gsap/TweenMax'
 import io from 'socket.io-client';
 
@@ -22,28 +23,24 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
 library.add(faCircle)
 
-export default {
-  props: ['token'],
+@Component({
   components: {
     'font-awesome-icon': FontAwesomeIcon
-  },
-  data: function () {
-    return {
-      socket: io('/overlays/clips', {
-        query: "token=" + token
-      }),
-      isPlaying: false,
-      clips: [],
-      settings: [],
-      interval: [],
-    }
-  },
-  beforeDestroy: function() {
+  }
+})
+export default class ClipsOverlay extends Vue {
+  socket = io('/overlays/clips', { query: "token=" + this.token });
+  isPlaying = false;
+  clips: any[] = [];
+  settings: any[] = [];
+  interval: any[] = [];
+
+  beforeDestroy() {
     for(const interval of this.interval) {
       clearInterval(interval);
     }
-  },
-  created: function () {
+  }
+  created () {
     this.socket.on('clips', data => {
       for (let i = 0, len = data.clips.length; i < len; i++) {
         this.settings.push(data.settings)
@@ -52,7 +49,7 @@ export default {
     })
 
     this.interval.push(setInterval(() => {
-      const video = this.$refs['video']
+      const video = this.$refs['video'] as HTMLMediaElement
       if (typeof video !== 'undefined' && video.ended) {
         this.isPlaying = false
         this.clips.shift()
@@ -63,27 +60,26 @@ export default {
         this.isPlaying = this.getPlayingClip() !== null
       }
     }, 100));
-  },
-  watch: {
-    isPlaying: function (val) {
-      if (val) {
-        const video = this.$refs['video']
-        video.volume = this.getPlayingSettings().volume / 100
-        video.play()
+  }
+  @Watch('isPlaying')
+  isPlayingWatcher (val) {
+    if (val) {
+      const video = this.$refs['video'] as HTMLMediaElement
+      video.volume = this.getPlayingSettings().volume / 100
+      video.play()
 
-        this.$nextTick(function () {
-          if (this.getPlayingSettings().label && this.$refs['label']) TweenMax.fromTo(this.$refs['label'], 1, { opacity: 0 }, { opacity: 1, yoyo: true, repeat:-1} )
-        })
-      }
+      this.$nextTick(function () {
+        if (this.getPlayingSettings().label && this.$refs['label']) TweenMax.fromTo(this.$refs['label'], 1, { opacity: 0 }, { opacity: 1, yoyo: true, repeat:-1} )
+      })
     }
-  },
-  methods: {
-    getPlayingClip: function () {
-      return this.clips.length > 0 ? this.clips[0] : null
-    },
-    getPlayingSettings: function () {
-      return this.settings.length > 0 ? this.settings[0] : null
-    }
+  }
+
+  getPlayingClip () {
+    return this.clips.length > 0 ? this.clips[0] : null
+  }
+
+  getPlayingSettings () {
+    return this.settings.length > 0 ? this.settings[0] : null
   }
 }
 </script>
