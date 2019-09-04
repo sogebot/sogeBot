@@ -64,7 +64,7 @@ const overlays = async () => {
       { path: '/overlays/credits', name: 'creditsOverlay', component: () => import('./views/credits.vue') },
       { path: '/overlays/emotes', name: 'emotesOverlay', component: () => import('./views/emotes.vue') },
       { path: '/overlays/eventlist', name: 'eventlistOverlay', component: () => import('./views/eventlist.vue') },
-      { path: '/overlays/goals', name: 'goalsOverlay', component: () => import('./views/goals.vue') },
+      { path: '/overlays/goals/:id', name: 'goalsOverlay', component: () => import('./views/goals.vue') },
       { path: '/overlays/polls', name: 'pollsOverlay', component: () => import('./views/polls.vue') },
       { path: '/overlays/stats', name: 'statsOverlay', component: () => import('./views/stats.vue') },
       { path: '/overlays/text', name: 'textOverlay', component: () => import('./views/text.vue') },
