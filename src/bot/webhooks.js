@@ -230,7 +230,6 @@ class Webhooks {
             amount: 0,
             currency: '',
             monthsName: '',
-            isResub: false,
             message: ''
           })
 

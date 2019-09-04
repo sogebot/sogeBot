@@ -27,7 +27,7 @@
         <b-dropdown id="dropdown-buttons" :text="translate('registry.alerts.test')" class="m-2">
           <b-dropdown-item-button
             @click="socket.emit('test', event)"
-            v-for="event of ['follows', 'cheers', 'tips', 'subs', 'hosts', 'raids']"
+            v-for="event of ['follows', 'cheers', 'tips', 'subs', 'resubs', 'subgifts', 'hosts', 'raids']"
             v-bind:key="event">
             {{ translate('registry.alerts.event.' + event) }}</b-dropdown-item-button>
         </b-dropdown>
@@ -126,9 +126,9 @@
                   <template v-else>Variant {{ idx + 1 }}</template>
                 </template>
                 <p class="p-3" v-bind:key="event + idx">
-                  <form-follow v-if="event === 'follows'" :alert.sync="alert" :isValid.sync="isValid[event][idx]" @delete="deleteVariant(event, $event)"/>
+                  <form-follow v-if="event === 'follows' || event === 'subs' || event === 'subgifts'" :alert.sync="alert" :isValid.sync="isValid[event][idx]" @delete="deleteVariant(event, $event)"/>
                   <form-cheers v-else-if="event === 'cheers' || event === 'tips'" :alert.sync="alert" :isValid.sync="isValid[event][idx]" @delete="deleteVariant(event, $event)"/>
-                  <form-subs v-else-if="event === 'subs'" :alert.sync="alert" :isValid.sync="isValid[event][idx]" @delete="deleteVariant(event, $event)"/>
+                  <form-resubs v-else-if="event === 'resubs'" :alert.sync="alert" :isValid.sync="isValid[event][idx]" @delete="deleteVariant(event, $event)"/>
                   <form-hosts v-else-if="event === 'hosts' || event === 'raids'" :alert.sync="alert" :isValid.sync="isValid[event][idx]" @delete="deleteVariant(event, $event)"/>
                 </p>
               </b-tab>
@@ -174,7 +174,7 @@ Component.registerHooks([
     'loading': () => import('../../../components/loading.vue'),
     'form-follow': () => import('./components/form-follow.vue'),
     'form-cheers': () => import('./components/form-cheers.vue'),
-    'form-subs': () => import('./components/form-subs.vue'),
+    'form-resubs': () => import('./components/form-resubs.vue'),
     'form-hosts': () => import('./components/form-hosts.vue'),
   },
   filters: {
@@ -193,7 +193,7 @@ export default class AlertsEdit extends Vue {
   state: { loaded: number; save: number } = { loaded: this.$state.progress, save: this.$state.idle }
   pending: boolean = false;
 
-  supportedEvents: string[] = ['follows', 'cheers', 'subs', 'tips', 'hosts', 'raids']
+  supportedEvents: string[] = ['follows', 'cheers', 'subs', 'resubs', 'subgifts',  'tips', 'hosts', 'raids']
   selectedTabIndex: number = 0;
 
   item: Registry.Alerts.Alert = {
@@ -214,6 +214,8 @@ export default class AlertsEdit extends Vue {
       cheers: [],
       subs: [],
       tips: [],
+      resubs: [],
+      subgifts: [],
     },
   }
 
@@ -221,6 +223,8 @@ export default class AlertsEdit extends Vue {
     follows: boolean[];
     cheers: boolean[];
     subs: boolean[];
+    resubs: boolean[];
+    subgifts: boolean[];
     tips: boolean[];
     hosts: boolean[];
     raids: boolean[];
@@ -228,6 +232,8 @@ export default class AlertsEdit extends Vue {
     follows: [],
     cheers: [],
     subs: [],
+    resubs: [],
+    subgifts: [],
     tips: [],
     hosts: [],
     raids: [],
@@ -379,10 +385,21 @@ export default class AlertsEdit extends Vue {
           ..._default,
         })
         break;
+      case 'subgifts':
+        this.item.alerts.subgifts.push({
+          messageTemplate: '{name} just gifted {amount} subscribes!',
+          ..._default,
+        })
+        break;
       case 'subs':
         this.item.alerts.subs.push({
           messageTemplate: '{name} just subscribed!',
-          messageTemplateResub: '{name} just resubscribed! {amount} {monthsName}',
+          ..._default,
+        })
+        break;
+      case 'resubs':
+        this.item.alerts.resubs.push({
+          messageTemplate: '{name} just resubscribed! {amount} {monthsName}',
           message: {
             allowEmotes: {
               twitch: true, ffz: true, bttv: true

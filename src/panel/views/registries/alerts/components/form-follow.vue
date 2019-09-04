@@ -356,7 +356,7 @@ import { required, minValue } from 'vuelidate/lib/validators'
   }
 })
 export default class AlertsEditFollowForm extends Vue {
-  @PropSync('alert') data !: Registry.Alerts.Follow
+  @PropSync('alert') data !: Registry.Alerts.CommonSettings
   @Prop() readonly index !: number
 
   customShow: 'html' | 'css' | 'js' = 'html';

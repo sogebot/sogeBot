@@ -40,6 +40,12 @@
         <span :class="{'text-primary': data.item.alerts.subs.length > 0, 'text-muted': data.item.alerts.subs.length === 0}">
           SUBS<span v-if="data.item.alerts.subs.length > 0">({{data.item.alerts.subs.length}})</span>
         </span>
+        <span :class="{'text-primary': data.item.alerts.subs.length > 0, 'text-muted': data.item.alerts.resubs.length === 0}">
+          RESUBS<span v-if="data.item.alerts.resubs.length > 0">({{data.item.alerts.resubs.length}})</span>
+        </span>
+        <span :class="{'text-primary': data.item.alerts.subs.length > 0, 'text-muted': data.item.alerts.subgifts.length === 0}">
+          SUBGIFTS<span v-if="data.item.alerts.subgifts.length > 0">({{data.item.alerts.subgifts.length}})</span>
+        </span>
         <span :class="{'text-primary': data.item.alerts.tips.length > 0, 'text-muted': data.item.alerts.tips.length === 0}">
           TIPS<span v-if="data.item.alerts.tips.length > 0">({{data.item.alerts.tips.length}})</span>
         </span>

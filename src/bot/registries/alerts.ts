@@ -16,7 +16,7 @@ class Alerts extends Registry {
 
     this.socket.on('connection', (socket) => {
       socket.on('test', async (event: keyof Registry.Alerts.List) => {
-        this.test({ event, isResub: Math.random() < 0.5 });
+        this.test({ event });
       });
     });
   }
@@ -25,7 +25,7 @@ class Alerts extends Registry {
     global.panel.io.of('/registries/alerts').emit('alert', opts);
   }
 
-  test(opts: { event: keyof Registry.Alerts.List; isResub: boolean }) {
+  test(opts: { event: keyof Registry.Alerts.List }) {
     if (!isMainThread) {
       global.workers.sendToMaster({ type: 'call', ns: 'registries.alerts', fnc: 'test', args: [opts] });
       return;
@@ -45,7 +45,6 @@ class Alerts extends Registry {
       currency: global.currency.mainCurrency,
       monthsName: getLocalizedName(amount, 'core.months'),
       event: opts.event,
-      isResub: opts.isResub,
       message: ['tips', 'cheers'].includes(opts.event)
         ? messages[Math.floor(Math.random() * messages.length)]
         : '',

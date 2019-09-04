@@ -57,23 +57,6 @@
     <b-form-group
       label-cols-sm="4"
       label-cols-lg="3"
-      :label="translate('registry.alerts.messageTemplateResub.name')"
-      label-for="messageTemplate"
-      :description="translate('registry.alerts.messageTemplateResub.help')"
-    >
-      <b-form-input
-        id="messageTemplateResub"
-        v-model="data.messageTemplateResub"
-        type="text"
-        :placeholder="translate('registry.alerts.messageTemplateResub.placeholder')"
-        @input="$v.data.$touch()"
-        :state="$v.data.messageTemplateResub.$invalid && $v.data.messageTemplateResub.$dirty ? 'invalid' : null"
-      ></b-form-input>
-    </b-form-group>
-
-    <b-form-group
-      label-cols-sm="4"
-      label-cols-lg="3"
       :label="translate('registry.alerts.animationText.name')"
       label-for="animationText"
     >
@@ -478,7 +461,7 @@ import { required, minValue } from 'vuelidate/lib/validators'
   }
 })
 export default class AlertsEditFollowForm extends Vue {
-  @PropSync('alert') readonly data !: Registry.Alerts.Follow
+  @PropSync('alert') readonly data !: Registry.Alerts.CommonSettings
   @Prop() readonly index !: number
 
   customShow: 'html' | 'css' | 'js' = 'html';
@@ -493,7 +476,6 @@ export default class AlertsEditFollowForm extends Vue {
   validations = {
     data: {
       messageTemplate: {required},
-      messageTemplateResub: {required},
       variantAmount: {required, minValue: minValue(0)},
       minAmountToAlert: {required, minValue: minValue(0)},
       message: {

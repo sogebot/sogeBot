@@ -129,7 +129,7 @@ export default class AlertsRegistryOverlays extends Vue {
     hideAt: number;
     showTextAt: number;
     showAt: number;
-    alert: Registry.Alerts.Follow | Registry.Alerts.Host | Registry.Alerts.Cheer | Registry.Alerts.Sub } | null = null;
+    alert: Registry.Alerts.CommonSettings | Registry.Alerts.Host | Registry.Alerts.Cheer | Registry.Alerts.Resub } | null = null;
 
   beforeDestroyed() {
     for (const interval of this.interval) {
@@ -281,7 +281,7 @@ export default class AlertsRegistryOverlays extends Vue {
             });
 
             // search for random variants
-            let possibleAlertsWithRandomCount: (Registry.Alerts.Follow | Registry.Alerts.Host | Registry.Alerts.Cheer | Registry.Alerts.Sub)[] = [];
+            let possibleAlertsWithRandomCount: (Registry.Alerts.CommonSettings | Registry.Alerts.Host | Registry.Alerts.Cheer | Registry.Alerts.Resub)[] = [];
             for (const alert of possibleAlerts) {
               if (!alert.enabled) {
                 continue;

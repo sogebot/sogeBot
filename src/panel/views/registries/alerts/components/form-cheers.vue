@@ -481,8 +481,8 @@ import { required, minValue } from 'vuelidate/lib/validators'
     'hold-button': () => import('src/panel/components/holdButton.vue'),
   }
 })
-export default class AlertsEditFollowForm extends Vue {
-  @PropSync('alert') readonly data !: Registry.Alerts.Follow
+export default class AlertsEditCheersForm extends Vue {
+  @PropSync('alert') readonly data !: Registry.Alerts.Cheer
   @Prop() readonly index !: number
 
   customShow: 'html' | 'css' | 'js' = 'html';

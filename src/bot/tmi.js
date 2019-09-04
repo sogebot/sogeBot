@@ -336,7 +336,6 @@ class TMI extends Core {
               amount: Number(message.numberOfViewers),
               currency: '',
               monthsName: '',
-              isResub: false,
               message: '',
             });
           }
@@ -362,7 +361,6 @@ class TMI extends Core {
               amount: Number(message.parameters.viewerCount),
               currency: '',
               monthsName: '',
-              isResub: false,
               message: '',
             });
 
@@ -444,7 +442,6 @@ class TMI extends Core {
         amount: 0,
         currency: '',
         monthsName: '',
-        isResub: false,
         message: '',
       });
 
@@ -523,12 +520,11 @@ class TMI extends Core {
         message: messageFromUser
       })
       global.registries.alerts.trigger({
-        event: 'subs',
+        event: 'resubs',
         name: username,
         amount: Number(subCumulativeMonths),
         currency: '',
         monthsName: commons.getLocalizedName(subCumulativeMonths, 'core.months'),
-        isResub: true,
         message: messageFromUser,
       });
     } catch (e) {
@@ -554,6 +550,14 @@ class TMI extends Core {
       global.overlays.eventlist.add({ type: 'subcommunitygift', username, count })
       global.events.fire('subcommunitygift', { username, count })
       global.log.subcommunitygift(`${username}#${userId}, to ${count} viewers`)
+      global.registries.alerts.trigger({
+        event: 'subgifts',
+        name: username,
+        amount: Number(count),
+        currency: '',
+        monthsName: '',
+        message: '',
+      });
     } catch (e) {
       global.log.error('Error parsing subscriptionGiftCommunity event')
       global.log.error(util.inspect(message))
@@ -655,7 +659,6 @@ class TMI extends Core {
         amount: Number(userstate.bits),
         currency: '',
         monthsName: '',
-        isResub: false,
         message: messageFromUser,
       });
       if (await global.cache.isOnline()) await global.db.engine.increment('api.current', { key: 'bits' }, { value: parseInt(userstate.bits, 10) })

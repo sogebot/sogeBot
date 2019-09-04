@@ -748,7 +748,6 @@ class API {
                     amount: 0,
                     currency: '',
                     monthsName: '',
-                    isResub: false,
                     message: ''
                   })
 
@@ -1524,7 +1523,6 @@ class API {
           amount: 0,
           currency: '',
           monthsName: '',
-          isResub: false,
           message: ''
         })
 

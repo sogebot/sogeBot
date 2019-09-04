@@ -35,17 +35,18 @@ declare namespace Registry {
       currency: string;
       monthsName: string;
       event: keyof Registry.Alerts.List;
-      isResub: boolean;
       message: string;
     };
 
     export type List = {
-      follows: Follow[];
+      follows: CommonSettings[];
       hosts: Host[];
       raids: Host[];
       tips: Cheer[];
       cheers: Cheer[];
-      subs: Sub[];
+      subs: CommonSettings[];
+      resubs: Resub[];
+      subgifts: CommonSettings[];
     };
 
     export type Alert = {
@@ -101,8 +102,6 @@ declare namespace Registry {
       };
     };
 
-    export type Follow = CommonSettings;
-
     export type Cheer = {
       message: {
         minAmountToShow: number;
@@ -122,8 +121,7 @@ declare namespace Registry {
       };
     } & CommonSettings;
 
-    export type Sub = {
-      messageTemplateResub: string;
+    export type Resub = {
       message: {
         allowEmotes: {
           twitch: boolean;

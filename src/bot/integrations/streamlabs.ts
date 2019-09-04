@@ -95,7 +95,6 @@ class Streamlabs extends Integration {
           amount: Number(parseFloat(event.amount).toFixed(2)),
           currency: event.currency,
           monthsName: '',
-          isResub: false,
           message: event.message,
         });
 

@@ -104,7 +104,6 @@ class Donationalerts extends Integration {
           amount: Number(parseFloat(data.amount).toFixed(2)),
           currency: data.currency,
           monthsName: '',
-          isResub: false,
           message: data.message,
         });
 
