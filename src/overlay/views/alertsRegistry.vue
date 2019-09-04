@@ -308,12 +308,38 @@ export default class AlertsRegistryOverlays extends Vue {
             // advancedMode
             if (alert.enableAdvancedMode) {
               // prepare HTML
+              this.preparedAdvancedHTML = alert.advancedMode.html;
+
+              // load ref="text" class
+              const refTextClassMatch = /\<div.*class="(.*?)".*ref="text"\>|\<div.*ref="text".*class="(.*?)"\>/gm.exec(this.preparedAdvancedHTML);
+              let refTextClass = '';
+              if (refTextClassMatch) {
+                if (refTextClassMatch[1]) {
+                  refTextClass = refTextClassMatch[1];
+                }
+                if (refTextClassMatch[2]) {
+                  refTextClass = refTextClassMatch[2];
+                }
+              }
+
+              // load ref="image" class
+              const refImageClassMatch = /\<div.*class="(.*?)".*ref="image"\>|\<div.*ref="image".*class="(.*?)"\>/gm.exec(this.preparedAdvancedHTML);
+              let refImageClass = '';
+              if (refImageClassMatch) {
+                if (refImageClassMatch[1]) {
+                  refImageClass = refImageClassMatch[1];
+                }
+                if (refImageClassMatch[2]) {
+                  refImageClass = refImageClassMatch[2];
+                }
+              }
+
               this.preparedAdvancedHTML =
-                alert.advancedMode.html
+                this.preparedAdvancedHTML
                   .replace(/\{message\}/g, emitData.message)
                   .replace(/\{messageTemplate\}/g, `<v-runtime-template :template="prepareMessageTemplate(runningAlert.alert.messageTemplate)"></v-runtime-template>`)
                   .replace(/\{name\}/g, emitData.name)
-                  .replace(/\{amount\}/g, emitData.amount)
+                  .replace(/\{amount\}/g, String(emitData.amount))
                   .replace(/\{monthsName\}/g, emitData.monthsName)
                   .replace(/\{currency\}/g, emitData.currency)
                   .replace(/\{name:highlight\}/g, `<v-runtime-template :template="prepareMessageTemplate('{name:highlight}')"></v-runtime-template>`)
@@ -321,10 +347,11 @@ export default class AlertsRegistryOverlays extends Vue {
                   .replace(/\{monthsName:highlight\}/g, `<v-runtime-template :template="prepareMessageTemplate('{monthsName:highlight}')"></v-runtime-template>`)
                   .replace(/\{currency:highlight\}/g, `<v-runtime-template :template="prepareMessageTemplate('{currency:highlight}')"></v-runtime-template>`)
                   .replace('"wrap"', '"wrap-' + alert.uuid +'"')
+                  .replace(/\<div.*class="(.*?)".*ref="text"\>|\<div.*ref="text".*class="(.*?)"\>/gm, '<div ref="text">') // we need to replace ref with class with proper ref
                   .replace('ref="text"', `
                     v-if="runningAlert.isShowingText"
                     :class="{[runningAlert.animationText]: true}"
-                    class="slow animated"
+                    class="slow animated ${refTextClass}"
                     :style="{
                       'font-family': runningAlert.alert.font.family,
                       'font-size': runningAlert.alert.font.size + 'px',
@@ -333,10 +360,12 @@ export default class AlertsRegistryOverlays extends Vue {
                       'text-align': 'center',
                       'text-shadow': textStrokeGenerator(runningAlert.alert.font.borderPx, runningAlert.alert.font.borderColor)
                     }"
-                  `).replace('ref="image"', `
+                  `)
+                  .replace(/\<div.*class="(.*?)".*ref="image"\>|\<div.*ref="image".*class="(.*?)"\>/gm, '<div ref="image">') // we need to replace ref with class with proper ref
+                  .replace('ref="image"', `
                     v-if="runningAlert.isShowingText"
                     :class="{[runningAlert.animation]: true}"
-                    class="slow animated"
+                    class="slow animated ${refImageClass}"
                     :src="runningAlert.alert.image"
                   `);
 
