@@ -85,12 +85,12 @@ export default class keywordsEdit extends Vue {
   socket = io('/systems/keywords', { query: "token=" + this.token });
 
   state: {
-    loading: ButtonStates;
-    save: ButtonStates;
+    loading: number;
+    save: number;
     pending: boolean;
   } = {
-    loading: ButtonStates.progress,
-    save: ButtonStates.idle,
+    loading: this.$state.progress,
+    save: this.$state.idle,
     pending: false,
   }
 
@@ -105,11 +105,10 @@ export default class keywordsEdit extends Vue {
   @Watch('keyword')
   @Watch('response')
   pending() {
-    if (this.state.loading === ButtonStates.success) {
+    if (this.state.loading === this.$state.success) {
       this.state.pending = true;
     }
   }
-
 
   mounted() {
     if (this.$route.params.id) {
@@ -124,11 +123,11 @@ export default class keywordsEdit extends Vue {
         this.enabled = data.enabled;
 
         this.$nextTick(() => {
-          this.state.loading = ButtonStates.success;
+          this.state.loading = this.$state.success;
         });
       })
     } else {
-      this.state.loading = ButtonStates.success;
+      this.state.loading = this.$state.success;
     }
   }
 
@@ -150,19 +149,19 @@ export default class keywordsEdit extends Vue {
         response: this.response,
         enabled: this.enabled,
       }
-      this.state.save = ButtonStates.progress;
+      this.state.save = this.$state.progress;
 
       this.socket.emit('update', { key: 'id', items: [keyword] }, (err, data) => {
         if (err) {
-          this.state.save = ButtonStates.fail;
+          this.state.save = this.$state.fail;
           return console.error(err);
         }
 
-        this.state.save = ButtonStates.success;
+        this.state.save = this.$state.success;
         this.state.pending = false;
         this.$router.push({ name: 'KeywordsManagerEdit', params: { id: String(data.id) } })
         setTimeout(() => {
-          this.state.save = ButtonStates.idle;
+          this.state.save = this.$state.idle;
         }, 1000)
       });
     }

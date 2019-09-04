@@ -742,6 +742,14 @@ class API {
                 if (!quiet && !isBot(user.username)) {
                   global.log.follow(user.username)
                   global.events.fire('follow', { username: user.username })
+                  global.registries.alerts.trigger({
+                    event: 'follows',
+                    name: user.username,
+                    amount: 0,
+                    currency: '',
+                    monthsName: '',
+                    message: ''
+                  })
 
                   // go through all systems and trigger on.follow
                   for (let [type, systems] of Object.entries({
@@ -1509,6 +1517,14 @@ class API {
         })
         global.log.follow(user.username)
         global.events.fire('follow', { username: user.username })
+        global.registries.alerts.trigger({
+          event: 'follows',
+          name: user.username,
+          amount: 0,
+          currency: '',
+          monthsName: '',
+          message: ''
+        })
 
         // go through all systems and trigger on.follow
         for (let [type, systems] of Object.entries({

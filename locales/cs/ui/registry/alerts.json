@@ -1,0 +1,132 @@
+{
+  "enabled": "Status",
+  "empty": "Registr alertů je prázdný, vytvořte nový.",
+  "emptyAfterSearch": "Registr alertů je prázdný při hledání \"<strong>$search</strong>\"",
+  "name": {
+    "name": "Název",
+    "placeholder": "Zadejte název svých alertů"
+  },
+  "alertDelayInMs": {
+    "name": "Zpoždění alertů"
+  },
+  "profanityFilterType": {
+    "name": "Filtr vulgarit",
+    "disabled": "Vypnuto",
+    "replace-with-asterisk": "Zaměnit za hvězdičky",
+    "replace-with-happy-words": "Zaměnit za šťastná slova",
+    "hide-messages": "Schovat zprávu",
+    "disable-alerts": "Vypnout alerty"
+  },
+  "loadStandardProfanityList": "Nahrát standardní seznam vulgarit",
+  "customProfanityList": {
+    "name": "Vlastní list vulgarit",
+    "help": "Slova musí být oddělena čárkou."
+  },
+  "event": {
+    "follows": "Sledující",
+    "cheers": "Bity",
+    "subs": "Předplatitel",
+    "resubs": "Předplatitel (resub)",
+    "subgifts": "Darování subscribe",
+    "tips": "Spropitné",
+    "hosts": "Hostování",
+    "raids": "Raidy"
+  },
+  "title": {
+    "name": "Název varianty",
+    "placeholder": "Zadejte název varianty"
+  },
+  "variant": {
+    "name": "Výskyt varianty"
+  },
+  "speed": {
+    "name": "Rychlost"
+  },
+  "maxTimeToDecrypt": {
+    "name": "Maximální čas dešifrování"
+  },
+  "characters": {
+    "name": "Znaky"
+  },
+  "random": "Náhodně",
+  "exact-amount": "Přesný počet",
+  "greater-than-or-equal-to-amount": "Více nebo stejně jako počet",
+  "very-rarely": "Velmi zřídka",
+  "rarely": "Zřídka",
+  "default": "Normálně",
+  "frequently": "Často",
+  "very-frequently": "Velmi často",
+  "messageTemplate": {
+    "name": "Šablona zprávy",
+    "placeholder": "Zadejte svou šablonu zprávy",
+    "help": "Dostupné proměnné: {name}, {amount} (cheers, subs, tips), {monthsName} (subs), {currency} (tips)"
+  },
+  "animationText": {
+    "name": "Animace textu"
+  },
+  "animationIn": {
+    "name": "Vstupní animace"
+  },
+  "animationOut": {
+    "name": "Výstupní animace"
+  },
+  "alertDurationInMs": {
+    "name": "Trvání alertu"
+  },
+  "alertTextDelayInMs": {
+    "name": "Zpoždění textu alertu"
+  },
+  "layoutPicker": {
+    "name": "Rozvržení"
+  },
+  "image": {
+    "name": "Obrázek"
+  },
+  "sound": {
+    "name": "Zvuk"
+  },
+  "soundVolume": {
+    "name": "Hlasitost zvuku"
+  },
+  "enableAdvancedMode": "Zapnout pokročilý mód",
+  "font": {
+    "setting": "Nastavení fontu",
+    "name": "Font",
+    "size": {
+      "name": "Velikost fontu"
+    },
+    "weight": {
+      "name": "Tloušťka fontu"
+    },
+    "borderPx": {
+      "name": "Ohraničení fontu"
+    },
+    "borderColor": {
+      "name": "Barva ohraničení fontu"
+    },
+    "color": {
+      "name": "Barva fontu"
+    },
+    "highlightcolor": {
+      "name": "Barva zvýraznění"
+    }
+  },
+  "minAmountToShow": {
+    "name": "Minimální počet k zobrazení"
+  },
+  "allowEmotes": {
+    "name": "Povolit emotikony"
+  },
+  "message": {
+    "setting": "Nastavení zprávy"
+  },
+  "showAutoHost": "Zobrazit autohost",
+  "voice": "Hlas",
+  "volume": "Hlasitost",
+  "rate": "Tempo",
+  "pitch": "Výška",
+  "test": "Test",
+  "tts": {
+    "setting": "Nastavení TTS"
+  }
+}

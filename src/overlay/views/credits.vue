@@ -26,8 +26,10 @@ current: {{ current }}
 </div>
 </template>
 
-<script>
-import { TweenLite, Power0, Sine } from 'gsap/TweenMax'
+<script lang="ts">
+import { Vue, Component, Watch } from 'vue-property-decorator';
+import { TweenMax, TweenLite, Power0, Sine } from 'gsap/TweenMax';
+import { groupBy } from 'lodash';
 import io from 'socket.io-client';
 
 import { library } from '@fortawesome/fontawesome-svg-core'
@@ -36,26 +38,24 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
 library.add(faDeviantart, faDiscord, faFacebook, faGithub, faGoogle, faInstagram, faLinkedin, faPaypal, faPinterest, faPlaystation, faReddit, faSkype, faSnapchat, faSpotify, faSteam, faStrava, faTelegram, faTwitter, faVk, faWindows, faXbox, faYoutube)
 
-export default {
-  props: ['token'],
+@Component({
   components: {
     'font-awesome-icon': FontAwesomeIcon
-  },
-  data: function () {
-    return {
-      socket: io('/overlays/credits', {
-        query: "token=" + token
-      }),
-      settings: {},
-      pages: [],
-      clipsPages: [],
-      currentPage: 0,
-      isLoaded: false,
-      isPlaying: false,
-      isEnded: false
-    }
-  },
-  mounted: function () {
+  }
+})
+export default class CreditsOverlay extends Vue {
+  socket = io('/overlays/credits', {
+    query: "token=" + this.token
+  });
+  settings: any = {};
+  pages: any[] = [];
+  clipsPages: any[] = [];
+  currentPage = 0;
+  isLoaded = false;
+  isPlaying = false;
+  isEnded = false;
+
+  mounted () {
     this.socket.emit('load', (err, opts) => {
       this.settings = opts.settings
 
@@ -102,9 +102,9 @@ export default {
       ])
 
       let currentKey = ''
-      let page = []
+      let page: any = []
       let withoutPadding = true
-      for (let [key, object] of Object.entries(_.groupBy(opts.events, 'event'))) {
+      for (let [key, object] of Object.entries(groupBy(opts.events, 'event'))) {
         if (!opts.settings.show[key]) continue
         if (key !== currentKey) {
           currentKey = key
@@ -116,7 +116,7 @@ export default {
           withoutPadding = false
         }
 
-        const groupByUsername = Object.entries(_.groupBy(object, 'username'))
+        const groupByUsername = Object.entries(groupBy(object, 'username'))
         for (let [username, o] of groupByUsername) {
           let html = username
           if (key === 'cheer') {
@@ -214,7 +214,7 @@ export default {
       }
 
       // last page is lastMessage and lastSubMessage
-      let social = []
+      let social: any = []
       for (let s of opts.social) {
         social.push({
           text: s.text,
@@ -244,95 +244,87 @@ export default {
 
       this.isLoaded = true
     })
-  },
-  computed: {
-    current: function () {
-      return this.pages[this.currentPage]
-    }
-  },
-  watch: {
-    isEnded: function (val) {
-      if (val) {
-        if (this.pages[this.currentPage + 1]) {
-          this.$refs.page.style.top = window.innerHeight + 'px'
-          this.isEnded = false
-          this.isPlaying = false
-          this.currentPage++
-        }
+  }
+
+  get current () {
+    return this.pages[this.currentPage]
+  }
+
+  @Watch('isEnded')
+  isEndedWatcher (val) {
+    if (val) {
+      if (this.pages[this.currentPage + 1]) {
+        (this.$refs.page as HTMLElement).style.top = window.innerHeight + 'px'
+        this.isEnded = false
+        this.isPlaying = false
+        this.currentPage++
       }
-    },
-    isLoaded: function () {
-      setInterval(() => {
-        if (!this.isPlaying) {
-          if (this.$refs.page.clientHeight === 0) return
-          this.$refs.page.style.top = window.innerHeight + 'px'
+    }
+  }
 
-          this.$nextTick(() => { // force next tick
-            this.isPlaying = true
-            // normal linear if non clips
-            if (!this.clipsPages.includes(this.currentPage)) {
-              // set endPos to 0 if last page (so we see last page)
-              const endPos = this.pages[this.currentPage + 1] ? -(this.$refs.page.clientHeight + 100) : 0
-              const duration = (window.innerHeight + (-endPos)) * this.settings.speed
-              TweenLite.to(this.$refs.page, duration / 1000, {
-                top: endPos,
-                ease: endPos === 0 ? Sine.easeOut : Power0.easeNone,
-                onComplete: () => {
-                  this.isEnded = true
-                }
-              })
-            } else {
-              // clip page
-              const duration1 = window.innerHeight * this.settings.speed
-              const duration2 = (this.$refs.page.clientHeight + 100) * this.settings.speed
-              TweenLite.to(this.$refs.page, duration1 / 1000, {
-                top: 0,
-                ease: Sine.easeOut,
-                onComplete: () => {
-                  // play clip
-                  const video = this.$refs.video[0]
-                  video.volume = this.settings.clips.volume / 100
+  @Watch('isLoaded')
+  isLoadedWatcher () {
+    setInterval(() => {
+      if (!this.isPlaying) {
+        if ((this.$refs.page as HTMLElement).clientHeight === 0) return
+        (this.$refs.page as HTMLElement).style.top = window.innerHeight + 'px'
 
-                  if (this.settings.clips.shouldPlay) {
-                    video.play()
-                    video.onended = () => {
-                      TweenLite.to(this.$refs.page, duration2 / 1000, {
-                        top: -(this.$refs.page.clientHeight + 100),
-                        ease: Sine.easeIn,
-                        onComplete: () => {
-                          this.isEnded = true
-                        }
-                      })
-                    }
-                  } else {
-                    TweenLite.to(this.$refs.page, duration2 / 1000, {
-                      top: -(this.$refs.page.clientHeight + 100),
-                      ease: Power0.easeNone,
+        this.$nextTick(() => { // force next tick
+          this.isPlaying = true
+          // normal linear if non clips
+          if (!this.clipsPages.includes(this.currentPage)) {
+            // set endPos to 0 if last page (so we see last page)
+            const endPos = this.pages[this.currentPage + 1] ? -((this.$refs.page as HTMLElement).clientHeight + 100) : 0
+            const duration = (window.innerHeight + (-endPos)) * this.settings.speed
+            TweenLite.to((this.$refs.page as HTMLElement), duration / 1000, {
+              top: endPos,
+              ease: endPos === 0 ? Sine.easeOut : Power0.easeNone,
+              onComplete: () => {
+                this.isEnded = true
+              }
+            })
+          } else {
+            // clip page
+            const duration1 = window.innerHeight * this.settings.speed
+            const duration2 = ((this.$refs.page as HTMLElement).clientHeight + 100) * this.settings.speed
+            TweenLite.to((this.$refs.page as HTMLElement), duration1 / 1000, {
+              top: 0,
+              ease: Sine.easeOut,
+              onComplete: () => {
+                // play clip
+                const video = this.$refs.video[0]
+                video.volume = this.settings.clips.volume / 100
+
+                if (this.settings.clips.shouldPlay) {
+                  video.play()
+                  video.onended = () => {
+                    TweenLite.to((this.$refs.page as HTMLElement), duration2 / 1000, {
+                      top: -((this.$refs.page as HTMLElement).clientHeight + 100),
+                      ease: Sine.easeIn,
                       onComplete: () => {
                         this.isEnded = true
                       }
                     })
                   }
+                } else {
+                  TweenLite.to((this.$refs.page as HTMLElement), duration2 / 1000, {
+                    top: -((this.$refs.page as HTMLElement).clientHeight + 100),
+                    ease: Power0.easeNone,
+                    onComplete: () => {
+                      this.isEnded = true
+                    }
+                  })
                 }
-              })
-            }
-          })
-        }
-      }, 10)
-    }
-  },
-  methods: {
-    stopAnimation: function () {
-      TweenMax.killAll()
-    },
-    urlParam: function (name) {
-      var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
-      if (results == null) {
-        return null
-      } else {
-        return decodeURI(results[1]) || 0;
+              }
+            })
+          }
+        })
       }
-    }
+    }, 10)
+  }
+
+  stopAnimation () {
+    TweenMax.killAll()
   }
 }
 </script>
