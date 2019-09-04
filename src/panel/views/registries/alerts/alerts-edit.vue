@@ -266,7 +266,7 @@ export default class AlertsEdit extends Vue {
   async mounted() {
     this.state.loaded = this.$state.progress;
     if (this.$route.params.id) {
-      this.socket.emit('findOne', { id: this.$route.params.id }, (err, data: Registry.Alerts.Alert) => {
+      this.socket.emit('findOne', { where: { id: this.$route.params.id } }, (err, data: Registry.Alerts.Alert) => {
         console.debug('Loaded', {data});
         this.item = data;
         this.state.loaded = this.$state.success;
