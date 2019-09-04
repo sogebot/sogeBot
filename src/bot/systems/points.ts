@@ -89,7 +89,7 @@ class Points extends System {
           if (interval_calculated !== 0 && ptsPerInterval[permId]  !== 0) {
             _.set(user, 'time.points', _.get(user, 'time.points', 0));
             // as we can have different intervals from 1s to Xs and this interval is running each 60s, we calculate how many points should be given to user up to ~60
-            const pointsPortionCalculated = new Date().getTime() - new Date(user.time.points).getTime() / interval_calculated;
+            const pointsPortionCalculated = (new Date().getTime() - new Date(user.time.points).getTime()) / interval_calculated;
             if (pointsPortionCalculated > 1 && pointsPortionCalculated < 61) { // 60 is max as we can have max 60x1s intervals
               await global.db.engine.increment('users.points', { id: user.id }, { points: Math.floor(pointsPortionCalculated * ptsPerInterval) });
               await global.db.engine.update('users', { id: user.id }, { id: user.id, username, time: { points: String(new Date()) } });
