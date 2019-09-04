@@ -334,7 +334,7 @@ export default class AlertsRegistryOverlays extends Vue {
                 }
               }
 
-              const messageTemplate = this._.get(this, 'runningAlert.alert.messageTemplate', '')
+              const messageTemplate = get(this, 'runningAlert.alert.messageTemplate', '')
                 .replace(/\{name\}/g, '{name:highlight}')
                 .replace(/\{amount\}/g, '{amount:highlight}')
                 .replace(/\{monthsName\}/g, '{monthsName:highlight}')
