@@ -102,9 +102,11 @@ let alerts: Registry.Alerts.EmitData[] = [];
 })
 export default class AlertsRegistryOverlays extends Vue {
   socket = io('/registries/alerts', {query: "token="+this.token});
+  socketRV = io('/integrations/responsivevoice', {query: "token="+this.token});
   interval: number[] = [];
   loadedFonts: string[] = [];
   loadedCSS: string[] = [];
+  responsiveAPIKey: string | null = null;
 
   preparedAdvancedHTML: string = '';
 
@@ -189,20 +191,34 @@ export default class AlertsRegistryOverlays extends Vue {
       return setTimeout(() => this.initResponsiveVoice(), 200);
     }
     window.responsiveVoice.init();
-    this.state.loaded = this.$state.success;
     console.debug('= ResponsiveVoice init OK')
   }
 
-  mounted() {
-    if (this.configuration.integrations.responsiveVoice.api.key.trim().length > 0) {
-      this.$loadScript("https://code.responsivevoice.org/responsivevoice.js?key=" + this.configuration.integrations.responsiveVoice.api.key)
-        .then(() => {
-          this.initResponsiveVoice();
-        });
-    } else {
-      console.debug('TTS disabled, responsiveVoice key is not set')
-    }
+  checkResponsiveVoiceAPIKey() {
+    this.socketRV.emit('get.value', 'key', (err, value) => {
+      if (this.responsiveAPIKey !== value) {
+        // unload if values doesn't match
+        this.$unloadScript("https://code.responsivevoice.org/responsivevoice.js?key=" + this.responsiveAPIKey)
+          .catch(() => {}); // skip error
+        if (value.trim().length > 0) {
+          this.$loadScript("https://code.responsivevoice.org/responsivevoice.js?key=" + value)
+            .then(() => {
+              this.responsiveAPIKey = value;
+              this.initResponsiveVoice();
+              setTimeout(() => this.checkResponsiveVoiceAPIKey(), 1000);
+            });
+        } else {
+          console.debug('TTS disabled, responsiveVoice key is not set')
+          this.responsiveAPIKey = value;
+          setTimeout(() => this.checkResponsiveVoiceAPIKey(), 1000);
+        }
+      }
+      setTimeout(() => this.checkResponsiveVoiceAPIKey(), 1000);
+    })
+  }
 
+  mounted() {
+    this.checkResponsiveVoiceAPIKey();
     this.interval.push(window.setInterval(() => {
       if (this.runningAlert) {
         this.isTTSPlayingFnc();
