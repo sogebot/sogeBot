@@ -112,10 +112,10 @@
         <b-textarea v-model="item.customProfanityList" placeholder="kitty, zebra, horse"></b-textarea>
       </b-form-group>
 
-      <b-tabs align="center" v-model="selectedTabIndex" >
+      <b-tabs align="center" v-model="selectedTabIndex">
         <b-tab v-for="event in supportedEvents" :key="'event-tab-' + event" :title="translate('registry.alerts.event.' + event)">
           <b-card no-body>
-            <b-tabs card vertical pills>
+            <b-tabs card vertical pills content-class="col-9" nav-wrapper-class="col-3" nav-class="p-0">
               <b-tab :active="idx === 0" v-for="(alert, idx) of item.alerts[event]" :key="event + idx">
                 <template slot="title">
                   <fa icon="exclamation-circle" v-if="!isValid[event][idx]" class="text-danger"/>
