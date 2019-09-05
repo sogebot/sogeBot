@@ -67,6 +67,10 @@ export default class MediaForm extends Vue {
   @Watch('data')
   setVolume() {
     if (this.type === 'audio' && this.data.length > 0) {
+      if (typeof this.$refs[this.uuid] === 'undefined') {
+        console.debug(`Retrying setVolume ${this.uuid}`);
+        return setTimeout(() => this.setVolume(), 100);
+      }
       (this.$refs[this.uuid] as HTMLAudioElement).volume = this.volume / 100;
     }
   }
