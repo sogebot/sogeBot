@@ -2,6 +2,10 @@
   "settings": {
     "enabled": "Status",
     "formatSeparator": "Oddělovač formátu",
-    "order": "Formát"
+    "order": "Formát",
+    "lastSeenFormat": {
+      "title": "Zobrazení času",
+      "help": "Možné hodnoty naleznete na https://momentjs.com/docs/#/displaying/format/"
+    }
   }
 }

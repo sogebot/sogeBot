@@ -33,6 +33,9 @@ class UserInfo extends System {
   @settings('me')
   formatSeparator = ' | ';
 
+  @settings('lastseen')
+  lastSeenFormat = 'L LTS';
+
   @command('!followage')
   protected async followage(opts: CommandOptions) {
     let username;
@@ -170,7 +173,7 @@ class UserInfo extends System {
         moment.locale(global.lib.translate.lang);
         sendMessage(global.translate('lastseen.success.time')
           .replace(/\$username/g, parsed[0])
-          .replace(/\$when/g, moment(user.time.message).format('L') + ' ' + moment(user.time.message).format('LTS')), opts.sender);
+          .replace(/\$when/g, moment(user.time.message).format(this.lastSeenFormat)), opts.sender);
       }
     } catch (e) {
       sendMessage(global.translate('lastseen.failed.parse'), opts.sender, opts.attr);
