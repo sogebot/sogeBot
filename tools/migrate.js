@@ -32,6 +32,19 @@ const end = function (updated) {
 }
 
 const migration = {
+  3: async () => {
+    header('set user.time.points to 0 to work with new chat time');
+    let updated = 0;
+    for (let item of await global.db.engine.find('users')) {
+      if (typeof item.id === 'undefined') {
+        _.set(item, 'time.points', 0);
+        item.id = uuidv4();
+        await global.db.engine.update('users', { _id: String(item._id) }, item);
+        updated++;
+      }
+    }
+    end(updated);
+  },
   2: async () => {
     header('Add id to keywords');
     let updated = 0;

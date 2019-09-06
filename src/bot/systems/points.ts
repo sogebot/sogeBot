@@ -64,59 +64,13 @@ class Points extends System {
     ]);
 
     try {
+      const userPromises: Promise<void>[] = [];
       for (const username of (await global.users.getAllOnlineUsernames())) {
         if (isBot(username)) {
           continue;
         }
-
-        const userId = await global.users.getIdByName(username);
-        if (!userId) {
-          continue; // skip without id
-        }
-
-        // get user max permission
-        const permId = await global.permissions.getUserHighestPermission(userId);
-        if (!permId) {
-          continue; // skip without permission
-        }
-
-        const interval_calculated = isOnline ? interval[permId] * 60 * 1000 : offlineInterval[permId]  * 60 * 1000;
-        const ptsPerInterval = isOnline ? perInterval[permId]  : perOfflineInterval[permId] ;
-
-        const user = await global.db.engine.findOne('users', { username });
-        if (_.isEmpty(user)) {
-          user.id = await global.api.getIdFromTwitch(username);
-        }
-        if (user.id) {
-          const tick = Date.now();
-          if (interval_calculated !== 0 && ptsPerInterval[permId]  !== 0) {
-            _.set(user, 'time.points', _.get(user, 'time.points', 0));
-            // as we can have different intervals from 1m to Xm and this interval is running each 60s, we calculate how many points should be given to user up to ~3
-            const userTimePoints = new Date(user.time.points).getTime();
-            const pointsPortionCalculated = (tick - userTimePoints) / interval_calculated;
-            if (tick - _.get(user, 'time.tick', 0) < 5 * constants.MINUTE) {
-              // user is alive
-              if (pointsPortionCalculated > 1) {
-                // user should be calculated
-                debug('points.update', `${user.username}#${user.id}[${permId}] +${Math.floor(pointsPortionCalculated * ptsPerInterval)}points, timebetween: ${tick - userTimePoints}, portion: ${pointsPortionCalculated}`);
-                await global.db.engine.increment('users.points', { id: user.id }, { points: Math.floor(pointsPortionCalculated * ptsPerInterval) });
-                await global.db.engine.update('users', { id: user.id }, { id: user.id, username, time: { points: String(new Date()), tick } });
-              } else {
-                debug('points.update', `${user.username}#${user.id}[${permId}] portion: ${pointsPortionCalculated}`);
-              }
-            } else {
-              // we can assume that user is just recently online again
-              debug('points.update', `${user.username}#${user.id}[${permId}] | new user | tick: ${tick}, between: ${tick - _.get(user, 'time.tick', 0)}`);
-              await global.db.engine.update('users', { id: user.id }, { id: user.id, username, time: { points: String(new Date()), tick } });
-            }
-          } else {
-            // force time update if interval or points are 0
-            debug('points.update', `${user.username}#${user.id}[${permId}] adding no points because interval or points are disabled`);
-            await global.db.engine.update('users', { id: user.id }, { id: user.id, username, time: { points: String(new Date()), tick } });
-          }
-        } else {
-          debug('points.update', `${username} doesn't have id`);
-        }
+        userPromises.push(this.processPoints(username, { interval, offlineInterval, perInterval, perOfflineInterval, isOnline }));
+        await Promise.all(userPromises);
       }
     } catch (e) {
       global.log.error(e);
@@ -124,6 +78,53 @@ class Points extends System {
     } finally {
       this.timeouts.updatePoints = global.setTimeout(() => this.updatePoints(), 60000);
     }
+  }
+
+  private async processPoints(username: string, opts: {interval: {[permissionId: string]: any}; offlineInterval: {[permissionId: string]: any}; perInterval: {[permissionId: string]: any}; perOfflineInterval: {[permissionId: string]: any}; isOnline: boolean}): Promise<void> {
+    return new Promise(async (resolve) => {
+      const userId = await global.users.getIdByName(username);
+      if (!userId) {
+        return resolve(); // skip without id
+      }
+
+      // get user max permission
+      const permId = await global.permissions.getUserHighestPermission(userId);
+      if (!permId) {
+        return resolve(); // skip without id
+      }
+
+      const interval_calculated = opts.isOnline ? opts.interval[permId] * 60 * 1000 : opts.offlineInterval[permId]  * 60 * 1000;
+      const ptsPerInterval = opts.isOnline ? opts.perInterval[permId]  : opts.perOfflineInterval[permId] ;
+
+      const user = await global.db.engine.findOne('users', { username });
+      if (_.isEmpty(user)) {
+        user.id = await global.api.getIdFromTwitch(username);
+      }
+      if (user.id) {
+        const chat = await global.users.getChatOf(user.id);
+        if (interval_calculated !== 0 && ptsPerInterval[permId]  !== 0) {
+          debug('points.update', `${user.username}#${user.id}[${permId}] ${chat} | ${_.get(user, 'time.points', 'n/a')}`);
+          _.set(user, 'time.points', _.get(user, 'time.points', chat));
+
+          if (user.time.points + interval_calculated <= chat) {
+            // add points to user.time.points + interval to user to not overcalculate (this should ensure recursive add points in time)
+            const userTimePoints = user.time.points + interval_calculated;
+            debug('points.update', `${user.username}#${user.id}[${permId}] +${Math.floor(ptsPerInterval)}`);
+            await global.db.engine.increment('users.points', { id: user.id }, { points: ptsPerInterval });
+            await global.db.engine.update('users', { id: user.id }, { id: user.id, username, time: { points: userTimePoints } });
+          } else {
+            await global.db.engine.update('users', { id: user.id }, { id: user.id, username, time: { points: user.time.points } });
+            debug('points.update', `${user.username}#${user.id}[${permId}] need another ${Number.parseFloat(String(Math.abs((chat - user.time.points - interval_calculated) / constants.MINUTE))).toFixed(2)} minutes to count`);
+          }
+        } else {
+          debug('points.update', `${user.username}#${user.id}[${permId}] points disled or interval is 0, settint points time to chat`);
+          await global.db.engine.update('users', { id: user.id }, { id: user.id, username, time: { points: chat } });
+        }
+      } else {
+        debug('points.update', `${username} doesn't have id`);
+      }
+      resolve();
+    });
   }
 
   @parser({ fireAndForget: true })

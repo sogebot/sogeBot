@@ -23,7 +23,9 @@ class Users extends Core {
     this.addMenu({ category: 'manage', name: 'viewers', id: 'viewers/list' })
 
     if (isMainThread) {
+      global.db.engine.index('users.chat', [{ index: 'id' }]);
       this.updateWatchTime(true);
+      this.updateChatTime();
     }
   }
 
@@ -112,6 +114,75 @@ class Users extends Core {
         ...((await global.db.engine.find('users.online')).map(o => o.username))
       ])
     ]
+  }
+
+  async updateChatTime () {
+    if (isDebugEnabled('users.chat')) {
+      const message = 'chat time update ' + new Date()
+      debug('users.chat', Array(message.length + 1).join('='))
+      debug('users.chat', message)
+      debug('users.chat', Array(message.length + 1).join('='))
+    }
+
+    clearTimeout(this.timeouts['updateChatTime'])
+    let timeout = constants.MINUTE
+    try {
+      let users = await this.getAllOnlineUsernames()
+      if (users.length === 0) {
+        throw Error('No online users.')
+      }
+      let updated = []
+      for (let username of users) {
+        const isIgnored = commons.isIgnored({username})
+        const isBot = commons.isBot(username)
+        const isOwner = commons.isOwner(username)
+        const isNewUser = typeof this.chatList[username] === 'undefined'
+
+        if (isIgnored || isBot) continue
+
+        const chat = isNewUser ? 0 : Date.now() - this.chatList[username]
+        const id = await global.users.getIdByName(username)
+        if (!id) {
+          debug('users.chat', 'error: cannot get id of ' + username)
+          continue
+        }
+
+        if (isNewUser) this.checkNewChatter(id, username)
+        if (!isOwner) global.api._stream.chatTime += chat
+        await global.db.engine.increment('users.chat', { id }, { chat })
+        debug('users.chat', username + ': ' + (chat / 1000 / 60) + ' minutes added')
+        updated.push(username)
+        this.chatList[username] = Date.now()
+      }
+
+      // remove offline users from chat list
+      for (let u of Object.entries(this.chatList)) {
+        if (!updated.includes(u[0])) {
+          debug('users.chat', u[0] + ': removed from online list')
+          delete this.chatList[u[0]]
+        }
+      }
+    } catch (e) {
+      debug('users.chat', e.message)
+      this.chatList = {}
+      global.users.newChattersList = []
+      timeout = 1000
+    }
+    this.timeouts['updateChatTime'] = setTimeout(() => this.updateChatTime(), timeout)
+  }
+
+  async getChatOf (id: string) {
+    let chat = 0
+    for (let item of await global.db.engine.find('users.chat', { id })) {
+      let itemPoints = !_.isNaN(parseInt(_.get(item, 'chat', 0))) ? _.get(item, 'chat', 0) : 0
+      chat = chat + Number(itemPoints)
+    }
+    if (Number(chat) < 0) chat = 0
+
+    return parseInt(
+      Number(chat) <= Number.MAX_SAFE_INTEGER
+        ? chat
+        : Number.MAX_SAFE_INTEGER, 10)
   }
 
   async updateWatchTime (isInit) {
