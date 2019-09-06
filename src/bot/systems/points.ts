@@ -3,6 +3,7 @@
 import * as _ from 'lodash';
 import { isMainThread } from 'worker_threads';
 
+import debug from '../debug';
 import { isBot, prepare, sendMessage } from '../commons';
 import { command, default_permission, parser, permission_settings, settings } from '../decorators';
 import Expects from '../expects';
@@ -88,9 +89,11 @@ class Points extends System {
         if (user.id) {
           if (interval_calculated !== 0 && ptsPerInterval[permId]  !== 0) {
             _.set(user, 'time.points', _.get(user, 'time.points', 0));
-            // as we can have different intervals from 1s to Xs and this interval is running each 60s, we calculate how many points should be given to user up to ~60
-            const pointsPortionCalculated = (new Date().getTime() - new Date(user.time.points).getTime()) / interval_calculated;
-            if (pointsPortionCalculated > 1 && pointsPortionCalculated < 61) { // 60 is max as we can have max 60x1s intervals
+            // as we can have different intervals from 1m to Xm and this interval is running each 60s, we calculate how many points should be given to user up to ~3
+            const userTimePoints = new Date(user.time.points).getTime();
+            const pointsPortionCalculated = (Date.now() - userTimePoints) / interval_calculated;
+            if (pointsPortionCalculated > 1 && pointsPortionCalculated < 3) {
+              debug('points.update', `${user.username}#${user.id}[${permId}] +${Math.floor(pointsPortionCalculated * ptsPerInterval)}points, timebetween: ${Date.now() - userTimePoints}, portion: ${pointsPortionCalculated}`)
               await global.db.engine.increment('users.points', { id: user.id }, { points: Math.floor(pointsPortionCalculated * ptsPerInterval) });
               await global.db.engine.update('users', { id: user.id }, { id: user.id, username, time: { points: String(new Date()) } });
             } else {
@@ -99,8 +102,11 @@ class Points extends System {
             }
           } else {
             // force time update if interval or points are 0
+            debug('points.update', `${user.username}#${user.id}[${permId}] adding no points because interval or points are disabled`)
             await global.db.engine.update('users', { id: user.id }, { id: user.id, username, time: { points: String(new Date()) } });
           }
+        } else {
+          debug('points.update', `${username} doesn't have id`);
         }
       }
     } catch (e) {
