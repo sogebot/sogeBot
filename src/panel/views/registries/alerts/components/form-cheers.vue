@@ -50,8 +50,7 @@
         type="text"
         :placeholder="translate('registry.alerts.messageTemplate.placeholder')"
         @input="$v.data.$touch()"
-        :state="$v.data.messageTemplate.$invalid && $v.data.messageTemplate.$dirty ? 'invalid' : null"
-      ></b-form-input>
+        :state="$v.data.messageTemplate.$invalid && $v.data.messageTemplate.$dirty ? 'invalid' : null"      ></b-form-input>
     </b-form-group>
 
     <b-form-group
