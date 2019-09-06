@@ -9,6 +9,7 @@ import { command, default_permission, parser, permission_settings, settings } fr
 import Expects from '../expects';
 import { permission } from '../permissions';
 import System from './_interface';
+import * as constants from '../constants';
 
 class Points extends System {
   @settings('points')
@@ -87,23 +88,31 @@ class Points extends System {
           user.id = await global.api.getIdFromTwitch(username);
         }
         if (user.id) {
+          const tick = Date.now();
           if (interval_calculated !== 0 && ptsPerInterval[permId]  !== 0) {
             _.set(user, 'time.points', _.get(user, 'time.points', 0));
             // as we can have different intervals from 1m to Xm and this interval is running each 60s, we calculate how many points should be given to user up to ~3
             const userTimePoints = new Date(user.time.points).getTime();
-            const pointsPortionCalculated = (Date.now() - userTimePoints) / interval_calculated;
-            if (pointsPortionCalculated > 1 && pointsPortionCalculated < 3) {
-              debug('points.update', `${user.username}#${user.id}[${permId}] +${Math.floor(pointsPortionCalculated * ptsPerInterval)}points, timebetween: ${Date.now() - userTimePoints}, portion: ${pointsPortionCalculated}`)
-              await global.db.engine.increment('users.points', { id: user.id }, { points: Math.floor(pointsPortionCalculated * ptsPerInterval) });
-              await global.db.engine.update('users', { id: user.id }, { id: user.id, username, time: { points: String(new Date()) } });
+            const pointsPortionCalculated = (tick - userTimePoints) / interval_calculated;
+            if (tick - _.get(user, 'time.tick', 0) < 5 * constants.MINUTE) {
+              // user is alive
+              if (pointsPortionCalculated > 1) {
+                // user should be calculated
+                debug('points.update', `${user.username}#${user.id}[${permId}] +${Math.floor(pointsPortionCalculated * ptsPerInterval)}points, timebetween: ${tick - userTimePoints}, portion: ${pointsPortionCalculated}`);
+                await global.db.engine.increment('users.points', { id: user.id }, { points: Math.floor(pointsPortionCalculated * ptsPerInterval) });
+                await global.db.engine.update('users', { id: user.id }, { id: user.id, username, time: { points: String(new Date()), tick } });
+              } else {
+                debug('points.update', `${user.username}#${user.id}[${permId}] portion: ${pointsPortionCalculated}`);
+              }
             } else {
               // we can assume that user is just recently online again
-              await global.db.engine.update('users', { id: user.id }, { id: user.id, username, time: { points: String(new Date()) } });
+              debug('points.update', `${user.username}#${user.id}[${permId}] | new user | tick: ${tick}, between: ${tick - _.get(user, 'time.tick', 0)}`);
+              await global.db.engine.update('users', { id: user.id }, { id: user.id, username, time: { points: String(new Date()), tick } });
             }
           } else {
             // force time update if interval or points are 0
-            debug('points.update', `${user.username}#${user.id}[${permId}] adding no points because interval or points are disabled`)
-            await global.db.engine.update('users', { id: user.id }, { id: user.id, username, time: { points: String(new Date()) } });
+            debug('points.update', `${user.username}#${user.id}[${permId}] adding no points because interval or points are disabled`);
+            await global.db.engine.update('users', { id: user.id }, { id: user.id, username, time: { points: String(new Date()), tick } });
           }
         } else {
           debug('points.update', `${username} doesn't have id`);
