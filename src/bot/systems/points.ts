@@ -101,24 +101,25 @@ class Points extends System {
         user.id = await global.api.getIdFromTwitch(username);
       }
       if (user.id) {
-        const chat = await global.users.getChatOf(user.id);
+        const chat = await global.users.getChatOf(user.id, opts.isOnline);
+        const userPointsKey = opts.isOnline ? 'pointsOnline' : 'pointsOffline';
         if (interval_calculated !== 0 && ptsPerInterval[permId]  !== 0) {
           debug('points.update', `${user.username}#${user.id}[${permId}] ${chat} | ${_.get(user, 'time.points', 'n/a')}`);
-          _.set(user, 'time.points', _.get(user, 'time.points', chat));
+          _.set(user, 'time.' + userPointsKey, _.get(user, 'time.' + userPointsKey, chat));
 
-          if (user.time.points + interval_calculated <= chat) {
-            // add points to user.time.points + interval to user to not overcalculate (this should ensure recursive add points in time)
-            const userTimePoints = user.time.points + interval_calculated;
+          if (user.time[userPointsKey] + interval_calculated <= chat) {
+            // add points to user.time[userPointsKey] + interval to user to not overcalculate (this should ensure recursive add points in time)
+            const userTimePoints = user.time[userPointsKey] + interval_calculated;
             debug('points.update', `${user.username}#${user.id}[${permId}] +${Math.floor(ptsPerInterval)}`);
             await global.db.engine.increment('users.points', { id: user.id }, { points: ptsPerInterval });
-            await global.db.engine.update('users', { id: user.id }, { id: user.id, username, time: { points: userTimePoints } });
+            await global.db.engine.update('users', { id: user.id }, { id: user.id, username, time: { [userPointsKey]: userTimePoints } });
           } else {
-            await global.db.engine.update('users', { id: user.id }, { id: user.id, username, time: { points: user.time.points } });
-            debug('points.update', `${user.username}#${user.id}[${permId}] need another ${Number.parseFloat(String(Math.abs((chat - user.time.points - interval_calculated) / constants.MINUTE))).toFixed(2)} minutes to count`);
+            await global.db.engine.update('users', { id: user.id }, { id: user.id, username, time: { [userPointsKey]: user.time[userPointsKey] } });
+            debug('points.update', `${user.username}#${user.id}[${permId}] need another ${Number.parseFloat(String(Math.abs((chat - user.time[userPointsKey] - interval_calculated) / constants.MINUTE))).toFixed(2)} minutes to count`);
           }
         } else {
           debug('points.update', `${user.username}#${user.id}[${permId}] points disled or interval is 0, settint points time to chat`);
-          await global.db.engine.update('users', { id: user.id }, { id: user.id, username, time: { points: chat } });
+          await global.db.engine.update('users', { id: user.id }, { id: user.id, username, time: { [userPointsKey]: chat } });
         }
       } else {
         debug('points.update', `${username} doesn't have id`);
