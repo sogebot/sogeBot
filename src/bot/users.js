@@ -149,7 +149,9 @@ class Users extends Core {
 
         if (isNewUser) this.checkNewChatter(id, username)
         if (!isOwner) global.api._stream.chatTime += chat
-        await global.db.engine.increment('users.chat', { id }, { chat })
+
+        const online = await global.cache.isOnline();
+        await global.db.engine.increment('users.chat', { id, online }, { chat });
         debug('users.chat', username + ': ' + (chat / 1000 / 60) + ' minutes added')
         updated.push(username)
         this.chatList[username] = Date.now()
