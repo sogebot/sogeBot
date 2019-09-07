@@ -171,9 +171,9 @@ class Users extends Core {
     this.timeouts['updateChatTime'] = setTimeout(() => this.updateChatTime(), timeout)
   }
 
-  async getChatOf (id: string) {
+  async getChatOf (id: string, online: boolean) {
     let chat = 0
-    for (let item of await global.db.engine.find('users.chat', { id })) {
+    for (let item of await global.db.engine.find('users.chat', { id, online })) {
       let itemPoints = !_.isNaN(parseInt(_.get(item, 'chat', 0))) ? _.get(item, 'chat', 0) : 0
       chat = chat + Number(itemPoints)
     }

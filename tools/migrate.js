@@ -33,12 +33,11 @@ const end = function (updated) {
 
 const migration = {
   3: async () => {
-    header('set user.time.points to 0 to work with new chat time');
+    header('remove user.time.points');
     let updated = 0;
     for (let item of await global.db.engine.find('users')) {
-      if (typeof item.id === 'undefined') {
-        _.set(item, 'time.points', 0);
-        item.id = uuidv4();
+      if (typeof _.get(item, 'time.points', undefined) !== 'undefined') {
+        delete item.time.points;
         await global.db.engine.update('users', { _id: String(item._id) }, item);
         updated++;
       }
