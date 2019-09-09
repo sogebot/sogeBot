@@ -11,6 +11,10 @@
     "songrequest": "Přehrávání ze song requestu",
     "playlist": "Přehrávání z playlistu",
     "onlyMusicCategory": "Přehrávání pouze z kategorie Hudba",
+    "apiKey": {
+      "title": "YouTube API Key",
+      "help": "Pokud zůstane prázdný, použije se erární API Key"
+    },
     "notify": "Odeslat zprávu při změně skladby"
   },
   "error": {
