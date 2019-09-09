@@ -5,7 +5,7 @@ import emojiRegex from 'emoji-regex';
 
 import constants from '../constants';
 import { permission } from '../permissions';
-import { command, default_permission, parser, settings } from '../decorators';
+import { command, default_permission, parser, permission_settings, settings } from '../decorators';
 import Message from '../message';
 import System from './_interface';
 import { getLocalizedName, isModerator, isOwner, prepare, sendMessage, timeout } from '../commons';
@@ -15,82 +15,82 @@ class Moderation extends System {
   cListsWhitelist: string[] = [];
   @settings('lists')
   cListsBlacklist: string[] = [];
-  @settings('lists')
-  cListsModerateSubscribers = true;
-  @settings('lists')
+  @permission_settings('lists')
+  cListsEnabled = true;
+  @permission_settings('lists')
   cListsTimeout = 120;
 
-  @settings('links')
+  @permission_settings('links')
   cLinksEnabled = true;
-  @settings('links')
+  @permission_settings('links')
   cLinksModerateSubscribers = true;
-  @settings('links')
+  @permission_settings('links')
   cLinksIncludeSpaces = false;
-  @settings('links')
+  @permission_settings('links')
   cLinksIncludeClips = true;
-  @settings('links')
+  @permission_settings('links')
   cLinksTimeout = 120;
 
-  @settings('symbols')
+  @permission_settings('symbols')
   cSymbolsEnabled = true;
-  @settings('symbols')
+  @permission_settings('symbols')
   cSymbolsModerateSubscribers = true;
-  @settings('symbols')
+  @permission_settings('symbols')
   cSymbolsTriggerLength = 15;
-  @settings('symbols')
+  @permission_settings('symbols')
   cSymbolsMaxSymbolsConsecutively = 10;
-  @settings('symbols')
+  @permission_settings('symbols')
   cSymbolsMaxSymbolsPercent = 50;
-  @settings('symbols')
+  @permission_settings('symbols')
   cSymbolsTimeout = 120;
 
-  @settings('longMessage')
+  @permission_settings('longMessage')
   cLongMessageEnabled = true;
-  @settings('longMessage')
+  @permission_settings('longMessage')
   cLongMessageModerateSubscribers = true;
-  @settings('longMessage')
+  @permission_settings('longMessage')
   cLongMessageTriggerLength = 300;
-  @settings('longMessage')
+  @permission_settings('longMessage')
   cLongMessageTimeout = 120;
 
-  @settings('caps')
+  @permission_settings('caps')
   cCapsEnabled = true;
-  @settings('caps')
+  @permission_settings('caps')
   cCapsModerateSubscribers = true;
-  @settings('caps')
+  @permission_settings('caps')
   cCapsTriggerLength = 15;
-  @settings('caps')
+  @permission_settings('caps')
   cCapsMaxCapsPercent = 50;
-  @settings('caps')
+  @permission_settings('caps')
   cCapsTimeout = 120;
 
-  @settings('spam')
+  @permission_settings('spam')
   cSpamEnabled = true;
-  @settings('spam')
+  @permission_settings('spam')
   cSpamModerateSubscribers = true;
-  @settings('spam')
+  @permission_settings('spam')
   cSpamTriggerLength = 15;
-  @settings('spam')
+  @permission_settings('spam')
   cSpamMaxLength = 50;
-  @settings('spam')
+  @permission_settings('spam')
   cSpamTimeout = 300;
 
-  @settings('color')
+  @permission_settings('color')
   cColorEnabled = true;
-  @settings('color')
+  @permission_settings('color')
   cColorModerateSubscribers = true;
-  @settings('color')
+  @permission_settings('color')
   cColorTimeout = 300;
 
-  @settings('emotes')
+  @permission_settings('emotes')
   cEmotesEnabled = true;
-  @settings('emotes')
+  @permission_settings('emotes')
   cEmotesEmojisAreEmotes = true;
-  @settings('emotes')
+  @permission_settings('emotes')
   cEmotesModerateSubscribers = true;
-  @settings('emotes')
+  @permission_settings('emotes')
   cEmotesMaxCount = 15;
-  @settings('emotes')
+  @permission_settings('emotes')
   cEmotesTimeout = 120;
 
   @settings('warnings')
