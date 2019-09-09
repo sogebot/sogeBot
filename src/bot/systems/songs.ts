@@ -9,16 +9,22 @@ import { prepare, sendMessage, timeout } from '../commons';
 import { command, default_permission, settings, shared, ui } from '../decorators';
 import { permission } from '../permissions';
 import System from './_interface';
-import { onChange } from '../decorators/on';
+import { onChange, onLoad } from '../decorators/on';
+
+const defaultApiKey = 'AIzaSyDYevtuLOxbyqBjh17JNZNvSQO854sngK0';
 
 class Songs extends System {
-  youtubeApi = new YouTube('AIzaSyDYevtuLOxbyqBjh17JNZNvSQO854sngK0');
+  youtubeApi: any = null;
 
   @shared()
   meanLoudness = -15;
   @shared()
   currentSong: string = JSON.stringify({ videoID: null });
 
+
+  @settings()
+  @ui({ type: 'text-input', secret: true })
+  apiKey = '';
   @settings()
   @ui({
     type: 'number-input',
@@ -51,6 +57,16 @@ class Songs extends System {
       this.addMenu({ category: 'manage', name: 'playlist', id: 'songs/playlist' });
       this.addMenu({ category: 'manage', name: 'bannedsongs', id: 'songs/bannedsongs' });
       this.addWidget('ytplayer', 'widget-title-ytplayer', 'fas fa-headphones');
+    }
+  }
+
+  @onChange('apiKey')
+  @onLoad('apiKey')
+  initYoutubeApi() {
+    if (this.apiKey.trim().length > 0) {
+      this.youtubeApi = new YouTube(this.apiKey);
+    } else {
+      this.youtubeApi = new YouTube(defaultApiKey);
     }
   }
 
