@@ -23,8 +23,6 @@ class Moderation extends System {
   @permission_settings('links')
   cLinksEnabled = true;
   @permission_settings('links')
-  cLinksModerateSubscribers = true;
-  @permission_settings('links')
   cLinksIncludeSpaces = false;
   @permission_settings('links')
   cLinksIncludeClips = true;
@@ -33,8 +31,6 @@ class Moderation extends System {
 
   @permission_settings('symbols')
   cSymbolsEnabled = true;
-  @permission_settings('symbols')
-  cSymbolsModerateSubscribers = true;
   @permission_settings('symbols')
   cSymbolsTriggerLength = 15;
   @permission_settings('symbols')
@@ -47,16 +43,12 @@ class Moderation extends System {
   @permission_settings('longMessage')
   cLongMessageEnabled = true;
   @permission_settings('longMessage')
-  cLongMessageModerateSubscribers = true;
-  @permission_settings('longMessage')
   cLongMessageTriggerLength = 300;
   @permission_settings('longMessage')
   cLongMessageTimeout = 120;
 
   @permission_settings('caps')
   cCapsEnabled = true;
-  @permission_settings('caps')
-  cCapsModerateSubscribers = true;
   @permission_settings('caps')
   cCapsTriggerLength = 15;
   @permission_settings('caps')
@@ -67,8 +59,6 @@ class Moderation extends System {
   @permission_settings('spam')
   cSpamEnabled = true;
   @permission_settings('spam')
-  cSpamModerateSubscribers = true;
-  @permission_settings('spam')
   cSpamTriggerLength = 15;
   @permission_settings('spam')
   cSpamMaxLength = 50;
@@ -78,16 +68,12 @@ class Moderation extends System {
   @permission_settings('color')
   cColorEnabled = true;
   @permission_settings('color')
-  cColorModerateSubscribers = true;
-  @permission_settings('color')
   cColorTimeout = 300;
 
   @permission_settings('emotes')
   cEmotesEnabled = true;
   @permission_settings('emotes')
   cEmotesEmojisAreEmotes = true;
-  @permission_settings('emotes')
-  cEmotesModerateSubscribers = true;
   @permission_settings('emotes')
   cEmotesMaxCount = 15;
   @permission_settings('emotes')
