@@ -8,7 +8,7 @@ import { permission } from '../permissions';
 import { command, default_permission, parser, permission_settings, settings } from '../decorators';
 import Message from '../message';
 import System from './_interface';
-import { getLocalizedName, isModerator, isOwner, prepare, sendMessage, timeout } from '../commons';
+import { getLocalizedName, prepare, sendMessage, timeout } from '../commons';
 
 class Moderation extends System {
   @settings('lists')
@@ -154,7 +154,7 @@ class Moderation extends System {
     }
   }
 
-  async whitelist (text) {
+  async whitelist (text, permId: string | null) {
     let ytRegex, clipsRegex, spotifyRegex;
 
     // check if spotify -or- alias of spotify contain open.spotify.com link
@@ -182,9 +182,12 @@ class Moderation extends System {
       text = text.replace(ytRegex, '');
     }
 
-    if (!this.cLinksIncludeClips) {
-      clipsRegex = /.*(clips.twitch.tv\/)(\w+)/;
-      text = text.replace(clipsRegex, '');
+    if (permId) {
+      const cLinksIncludeClips = (await this.getPermissionBasedSettingsValue('cLinksIncludeClips'))[permId];
+      if (!cLinksIncludeClips) {
+        clipsRegex = /.*(clips.twitch.tv\/)(\w+)/;
+        text = text.replace(clipsRegex, '');
+      }
     }
 
     text = ` ${text} `;
@@ -227,13 +230,20 @@ class Moderation extends System {
   }
 
   @parser({ priority: constants.MODERATION })
-  async containsLink (opts) {
-    if (isOwner(opts.sender) || (await isModerator(opts.sender)) || !this.cLinksEnabled || (typeof opts.sender.badges.subscriber !== 'undefined' && !this.cLinksModerateSubscribers)) {
+  async containsLink (opts: ParserOptions) {
+    const [enabled, cLinksIncludeSpaces, timeout, permId] = await Promise.all([
+      this.getPermissionBasedSettingsValue('cLinksEnabled'),
+      this.getPermissionBasedSettingsValue('cLinksIncludeSpaces'),
+      this.getPermissionBasedSettingsValue('cLinksTimeout'),
+      global.permissions.getUserHighestPermission(opts.sender.userId),
+    ]);
+
+    if (permId === null || !enabled[permId]) {
       return true;
     }
 
-    const whitelisted = await this.whitelist(opts.message);
-    const urlRegex = this.cLinksIncludeSpaces
+    const whitelisted = await this.whitelist(opts.message, permId);
+    const urlRegex = cLinksIncludeSpaces[permId]
       ? /(www)? ??\.? ?[a-zA-Z0-9]+([a-zA-Z0-9-]+) ??\. ?(aero|bet|biz|com|coop|edu|gov|info|int|mil|museum|name|net|org|shop|ac|ad|ae|af|ag|ai|al|am|an|ao|aq|ar|as|at|au|aw|az|ba|bb|bd|be|bf|bg|bh|bi|bj|bm|bn|bo|br|bs|bt|bv|bw|by|bz|ca|cc|cd|cf|cg|ch|ci|ck|cl|cm|cn|co|cr|cs|cu|cv|cx|cy|cz|de|dj|dk|dm|do|dz|ec|ee|eg|eh|er|es|et|fi|fj|fk|fm|fo|fr|ga|gb|gd|ge|gf|gg|gh|gi|gl|gm|gn|gp|gq|gr|gs|gt|gu|gw|gy|hk|hm|hn|hr|ht|hu|id|ie|il|im|in|io|iq|ir|is|it|je|jm|jo|jp|ke|kg|kh|ki|km|kn|kp|kr|kw|ky|kz|la|lb|lc|li|lk|lr|ls|lt|lu|lv|ly|ma|mc|md|me|mg|mh|mk|ml|mm|mn|mo|money|mp|mq|mr|ms|mt|mu|mv|mw|mx|my|mz|na|nc|ne|nf|ng|ni|nl|no|np|nr|nu|nz|om|pa|pe|pf|pg|ph|pk|pl|pm|pn|pr|ps|pt|pw|py|qa|re|ro|ru|rw|sa|sb|sc|sd|se|sg|sh|si|sj|sk|sl|sm|sn|so|sr|st|su|sv|sy|sz|tc|td|tf|tg|th|tj|tk|tm|tn|to|tp|tr|tt|tv|tw|tz|ua|ug|uk|um|us|uy|uz|va|vc|ve|vg|vi|vn|vu|wf|ws|ye|yt|yu|za|zm|zr|zw)\b/ig
       : /[a-zA-Z0-9]+([a-zA-Z0-9-]+)?\.(aero|bet|biz|com|coop|edu|gov|info|int|mil|museum|name|net|org|shop|ac|ad|ae|af|ag|ai|al|am|an|ao|aq|ar|as|at|au|aw|az|ba|bb|bd|be|bf|bg|bh|bi|bj|bm|bn|bo|br|bs|bt|bv|bw|by|bz|ca|cc|cd|cf|cg|ch|ci|ck|cl|cm|cn|co|cr|cs|cu|cv|cx|cy|cz|de|dj|dk|dm|do|dz|ec|ee|eg|eh|er|es|et|fi|fj|fk|fm|fo|fr|ga|gb|gd|ge|gf|gg|gh|gi|gl|gm|gn|gp|gq|gr|gs|gt|gu|gw|gy|hk|hm|hn|hr|ht|hu|id|ie|il|im|in|io|iq|ir|is|it|je|jm|jo|jp|ke|kg|kh|ki|km|kn|kp|kr|kw|ky|kz|la|lb|lc|li|lk|lr|ls|lt|lu|lv|ly|ma|mc|md|me|mg|mh|mk|ml|mm|mn|mo|money|mp|mq|mr|ms|mt|mu|mv|mw|mx|my|mz|na|nc|ne|nf|ng|ni|nl|no|np|nr|nu|nz|om|pa|pe|pf|pg|ph|pk|pl|pm|pn|pr|ps|pt|pw|py|qa|re|ro|ru|rw|sa|sb|sc|sd|se|sg|sh|si|sj|sk|sl|sm|sn|so|sr|st|su|sv|sy|sz|tc|td|tf|tg|th|tj|tk|tm|tn|to|tp|tr|tt|tv|tw|tz|ua|ug|uk|um|us|uy|uz|va|vc|ve|vg|vi|vn|vu|wf|ws|ye|yt|yu|za|zm|zr|zw)\b/ig;
 
@@ -246,7 +256,7 @@ class Moderation extends System {
         this.timeoutUser(opts.sender, whitelisted,
           global.translate('moderation.user-is-warned-about-links'),
           global.translate('moderation.user-have-timeout-for-links'),
-          this.cLinksTimeout, 'links');
+          timeout[permId], 'links');
         return false;
       }
     } else {
@@ -255,12 +265,25 @@ class Moderation extends System {
   }
 
   @parser({ priority: constants.MODERATION })
-  async symbols (opts) {
-    const whitelisted = await this.whitelist(opts.message);
+  async symbols (opts: ParserOptions) {
+    const [enabled, cSymbolsTriggerLength, cSymbolsMaxSymbolsConsecutively, cSymbolsMaxSymbolsPercent, timeout, permId] = await Promise.all([
+      this.getPermissionBasedSettingsValue('cSymbolsEnabled'),
+      this.getPermissionBasedSettingsValue('cSymbolsTriggerLength'),
+      this.getPermissionBasedSettingsValue('cSymbolsMaxSymbolsConsecutively'),
+      this.getPermissionBasedSettingsValue('cSymbolsMaxSymbolsPercent'),
+      this.getPermissionBasedSettingsValue('cSymbolsTimeout'),
+      global.permissions.getUserHighestPermission(opts.sender.userId),
+    ]);
+
+    if (permId === null || !enabled[permId]) {
+      return true;
+    }
+
+    const whitelisted = await this.whitelist(opts.message, permId);
     const msgLength = whitelisted.trim().length;
     let symbolsLength = 0;
 
-    if (isOwner(opts.sender) || (await isModerator(opts.sender)) || msgLength < this.cSymbolsTriggerLength || !this.cSymbolsEnabled || (typeof opts.sender.badges.subscriber !== 'undefined' && !this.cSymbolsEnabled)) {
+    if (msgLength < cSymbolsTriggerLength[permId]) {
       return true;
     }
 
@@ -268,47 +291,69 @@ class Moderation extends System {
     for (const item in out) {
       if (out.hasOwnProperty(item)) {
         const symbols = out[item];
-        if (symbols.length >= this.cSymbolsMaxSymbolsConsecutively) {
+        if (symbols.length >= cSymbolsMaxSymbolsConsecutively[permId]) {
           this.timeoutUser(opts.sender, opts.message,
             global.translate('moderation.user-is-warned-about-symbols'),
             global.translate('moderation.user-have-timeout-for-symbols'),
-            this.cSymbolsTimeout, 'symbols');
+            timeout[permId], 'symbols');
           return false;
         }
         symbolsLength = symbolsLength + symbols.length;
       }
     }
-    if (Math.ceil(symbolsLength / (msgLength / 100)) >= this.cSymbolsMaxSymbolsPercent) {
-      this.timeoutUser(opts.sender, opts.message, global.translate('moderation.warnings.symbols'), global.translate('moderation.symbols'), this.cSymbolsTimeout, 'symbols');
+    if (Math.ceil(symbolsLength / (msgLength / 100)) >= cSymbolsMaxSymbolsPercent[permId]) {
+      this.timeoutUser(opts.sender, opts.message, global.translate('moderation.warnings.symbols'), global.translate('moderation.symbols'), timeout[permId], 'symbols');
       return false;
     }
     return true;
   }
 
   @parser({ priority: constants.MODERATION })
-  async longMessage (opts) {
-    const whitelisted = await this.whitelist(opts.message);
+  async longMessage (opts: ParserOptions) {
+    const [enabled, cLongMessageTriggerLength, timeout, permId] = await Promise.all([
+      this.getPermissionBasedSettingsValue('cLongMessageEnabled'),
+      this.getPermissionBasedSettingsValue('cLongMessageTriggerLength'),
+      this.getPermissionBasedSettingsValue('cLongMessageTimeout'),
+      global.permissions.getUserHighestPermission(opts.sender.userId),
+    ]);
+
+    if (permId === null || !enabled[permId]) {
+      return true;
+    }
+
+    const whitelisted = await this.whitelist(opts.message, permId);
 
     const msgLength = whitelisted.trim().length;
-    if (isOwner(opts.sender) || (await isModerator(opts.sender)) || msgLength < this.cLongMessageTriggerLength || !this.cLongMessageEnabled || (typeof opts.sender.badges.subscriber !== 'undefined' && !this.cLongMessageModerateSubscribers)) {
+    if (msgLength < cLongMessageTriggerLength[permId]) {
       return true;
     } else {
       this.timeoutUser(opts.sender, opts.message,
         global.translate('moderation.user-is-warned-about-long-message'),
         global.translate('moderation.user-have-timeout-for-long-message'),
-        this.cLongMessageTimeout, 'longmessage');
+        timeout[permId], 'longmessage');
       return false;
     }
   }
 
   @parser({ priority: constants.MODERATION })
-  async caps (opts) {
-    let whitelisted = await this.whitelist(opts.message);
+  async caps (opts: ParserOptions) {
+    const [enabled, cCapsTriggerLength, cCapsMaxCapsPercent, timeout, permId] = await Promise.all([
+      this.getPermissionBasedSettingsValue('cCapsEnabled'),
+      this.getPermissionBasedSettingsValue('cCapsTriggerLength'),
+      this.getPermissionBasedSettingsValue('cCapsMaxCapsPercent'),
+      this.getPermissionBasedSettingsValue('cCapsTimeout'),
+      global.permissions.getUserHighestPermission(opts.sender.userId),
+    ]);
+
+    if (permId === null || !enabled[permId]) {
+      return true;
+    }
+    let whitelisted = await this.whitelist(opts.message, permId);
 
     const emotesCharList: number[] = [];
     if (Symbol.iterator in Object(opts.sender.emotes)) {
       for (const emote of opts.sender.emotes) {
-        for (const i of _.range(parseInt(emote.start, 10), parseInt(emote.end, 10) + 1)) {
+        for (const i of _.range(emote.start, emote.end + 1)) {
           emotesCharList.push(i);
         }
       }
@@ -331,35 +376,46 @@ class Moderation extends System {
       }
     }
 
-    if (isOwner(opts.sender) || (await isModerator(opts.sender)) || msgLength < this.cCapsTriggerLength || !this.cCapsEnabled || (typeof opts.sender.badges.subscriber !== 'undefined' && !this.cCapsModerateSubscribers)) {
+    if (msgLength < cCapsTriggerLength[permId]) {
       return true;
     }
-    if (Math.ceil(capsLength / (msgLength / 100)) >= this.cCapsMaxCapsPercent) {
+    if (Math.ceil(capsLength / (msgLength / 100)) >= cCapsMaxCapsPercent[permId]) {
       this.timeoutUser(opts.sender, opts.message,
         global.translate('moderation.user-is-warned-about-caps'),
         global.translate('moderation.user-have-timeout-for-caps'),
-        this.cCapsTimeout, 'caps');
+        timeout[permId], 'caps');
       return false;
     }
     return true;
   }
 
   @parser({ priority: constants.MODERATION })
-  async spam (opts) {
-    const whitelisted = await this.whitelist(opts.message);
+  async spam (opts: ParserOptions) {
+    const [enabled, cSpamTriggerLength, cSpamMaxLength, timeout, permId] = await Promise.all([
+      this.getPermissionBasedSettingsValue('cSpamEnabled'),
+      this.getPermissionBasedSettingsValue('cSpamTriggerLength'),
+      this.getPermissionBasedSettingsValue('cSpamMaxLength'),
+      this.getPermissionBasedSettingsValue('cSpamTimeout'),
+      global.permissions.getUserHighestPermission(opts.sender.userId),
+    ]);
+
+    if (permId === null || !enabled[permId]) {
+      return true;
+    }
+    const whitelisted = await this.whitelist(opts.message,permId);
 
     const msgLength = whitelisted.trim().length;
 
-    if (isOwner(opts.sender) || (await isModerator(opts.sender)) || msgLength < this.cSpamTriggerLength || !this.cSpamEnabled || (typeof opts.sender.badges.subscriber !== 'undefined' && !this.cSpamModerateSubscribers)) {
+    if (msgLength < cSpamTriggerLength[permId]) {
       return true;
     }
     const out = whitelisted.match(/(.+)(\1+)/g);
     for (const item in out) {
-      if (out.hasOwnProperty(item) && out[item].length >= this.cSpamMaxLength) {
+      if (out.hasOwnProperty(item) && out[item].length >= cSpamMaxLength[permId]) {
         this.timeoutUser(opts.sender, opts.message,
           global.translate('moderation.user-have-timeout-for-spam'),
           global.translate('moderation.user-is-warned-about-spam'),
-          this.cSpamTimeout, 'spam');
+          timeout[permId], 'spam');
         return false;
       }
     }
@@ -367,8 +423,14 @@ class Moderation extends System {
   }
 
   @parser({ priority: constants.MODERATION })
-  async color (opts) {
-    if (isOwner(opts.sender) || (await isModerator(opts.sender)) || !this.cColorEnabled || (typeof opts.sender.badges.subscriber !== 'undefined' && !this.cColorModerateSubscribers)) {
+  async color (opts: ParserOptions) {
+    const [enabled, timeout, permId] = await Promise.all([
+      this.getPermissionBasedSettingsValue('cColorEnabled'),
+      this.getPermissionBasedSettingsValue('cColorTimeout'),
+      global.permissions.getUserHighestPermission(opts.sender.userId),
+    ]);
+
+    if (permId === null || !enabled[permId]) {
       return true;
     }
 
@@ -376,7 +438,7 @@ class Moderation extends System {
       this.timeoutUser(opts.sender, opts.message,
         global.translate('moderation.user-is-warned-about-color'),
         global.translate('moderation.user-have-timeout-for-color'),
-        this.cColorTimeout, 'color');
+        timeout[permId], 'color');
       return false;
     } else {
       return true;
@@ -389,23 +451,31 @@ class Moderation extends System {
       return true;
     }
 
-    let count = opts.sender.emotes.length;
-    if (isOwner(opts.sender) || (await isModerator(opts.sender)) || !this.cEmotesEnabled || (typeof opts.sender.badges.subscriber !== 'undefined' && !this.cEmotesModerateSubscribers)) {
+    const [enabled, cEmotesEmojisAreEmotes, cEmotesMaxCount, timeout, permId] = await Promise.all([
+      this.getPermissionBasedSettingsValue('cEmotesEnabled'),
+      this.getPermissionBasedSettingsValue('cEmotesEmojisAreEmotes'),
+      this.getPermissionBasedSettingsValue('cEmotesMaxCount'),
+      this.getPermissionBasedSettingsValue('cEmotesTimeout'),
+      global.permissions.getUserHighestPermission(opts.sender.userId),
+    ]);
+
+    if (permId === null || !enabled[permId]) {
       return true;
     }
 
-    if (this.cEmotesEmojisAreEmotes) {
+    let count = opts.sender.emotes.length;
+    if (cEmotesEmojisAreEmotes[permId]) {
       const regex = emojiRegex();
       while (regex.exec(opts.message)) {
         count++;
       }
     }
 
-    if (count > this.cEmotesMaxCount) {
+    if (count > cEmotesMaxCount[permId]) {
       this.timeoutUser(opts.sender, opts.message,
         global.translate('moderation.user-is-warned-about-emotes'),
         global.translate('moderation.user-have-timeout-for-emotes'),
-        this.cEmotesTimeout, 'emotes');
+        timeout[permId], 'emotes');
       return false;
     } else {
       return true;
@@ -413,8 +483,14 @@ class Moderation extends System {
   }
 
   @parser({ priority: constants.MODERATION })
-  async blacklist (opts) {
-    if (isOwner(opts.sender) || (await isModerator(opts.sender)) || (typeof opts.sender.badges.subscriber !== 'undefined' && !this.cListsModerateSubscribers)) {
+  async blacklist (opts: ParserOptions) {
+    const [enabled, timeout, permId] = await Promise.all([
+      this.getPermissionBasedSettingsValue('cListsEnabled'),
+      this.getPermissionBasedSettingsValue('cListsTimeout'),
+      global.permissions.getUserHighestPermission(opts.sender.userId),
+    ]);
+
+    if (permId === null || !enabled[permId]) {
       return true;
     }
 
@@ -428,7 +504,7 @@ class Moderation extends System {
           this.timeoutUser(opts.sender, opts.message,
             global.translate('moderation.user-is-warned-about-blacklist'),
             global.translate('moderation.user-have-timeout-for-blacklist'),
-            this.cListsTimeout, 'blacklist');
+            timeout[permId], 'blacklist');
           break;
         }
       }
