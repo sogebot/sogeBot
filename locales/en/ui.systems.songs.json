@@ -11,6 +11,10 @@
     "songrequest": "Play from song request",
     "playlist": "Play from playlist",
     "onlyMusicCategory": "Allow only category music",
+    "apiKey": {
+      "title": "YouTube API Key",
+      "help": "If empty, default bot API Key will be used."
+    },
     "notify": "Send message on song change"
   },
   "error": {
