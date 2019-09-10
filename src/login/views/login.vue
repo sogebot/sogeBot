@@ -1,7 +1,6 @@
 <template>
   <b-container class="border border-danger center p-5 bg-dark">
     <h5 class="text-light">You need to be logged in to use sogeBot</h5>
-    <b-btn variant="primary" block :href="'http://oauth.sogebot.xyz/?state=' + url">Login</b-btn>
   </b-container>
 </template>
 
@@ -12,6 +11,11 @@ import { Vue, Component } from 'vue-property-decorator';
 export default class Login extends Vue {
   get url() {
     return window.location.origin;
+  }
+
+  mounted() {
+    // autorefresh
+    window.location.replace('http://oauth.sogebot.xyz/?state=' + this.url);
   }
 }
 </script>

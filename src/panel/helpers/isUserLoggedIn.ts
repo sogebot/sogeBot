@@ -10,10 +10,10 @@ export const isUserLoggedIn = async function () {
   } else {
     const axiosData = await axios.get(`https://api.twitch.tv/helix/users`, {
       headers: {
-        'Authorization': 'Bearer ' + code
-      }
+        'Authorization': 'Bearer ' + code,
+      },
     });
-    const data = get(axiosData, 'data.data[0]', null)
+    const data = get(axiosData, 'data.data[0]', null);
     if (data === null) {
       console.log('Redirecting, user code expired');
       window.location.replace(window.location.origin + '/login');
