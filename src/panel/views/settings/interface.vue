@@ -14,7 +14,7 @@
         <loading v-if="state.loaded !== 2 /* State.DONE */" />
         <template v-else v-for="(value, category) of settingsWithoutPermissions">
           <h6 :key="category + '#1'" >{{ category }}</h6>
-          <div class="card mb-2" :key="category + '#2'">
+          <div class="card mb-2" :key="category + '#2'" v-if="value !== null">
             <div class="card-body">
               <template v-for="(currentValue, defaultValue) of value">
                 <div v-if="typeof value === 'object' && !defaultValue.startsWith('_')" class="p-0 pl-2 pr-2 " :key="$route.params.type + '.' + $route.params.id + '.settings.' + defaultValue">
@@ -118,6 +118,13 @@
                               v-on:update="settings['__permission_based__'][category][defaultValue][permission.id] = $event; triggerDataChange()"
                               :readonly="currentValue[permission.id] === null"
                             ></textarea-from-array>
+                            <toggle-enable
+                              v-bind:title="translate($route.params.type + '.' + $route.params.id + '.settings.' + defaultValue)"
+                              v-else-if="typeof getPermissionSettingsValue(permission.id, currentValue) === 'boolean'"
+                              v-bind:value="getPermissionSettingsValue(permission.id, currentValue)"
+                              v-on:update="settings['__permission_based__'][category][defaultValue][permission.id] = $event; triggerDataChange()"
+                              :disabled="currentValue[permission.id] === null"
+                            ></toggle-enable>
                             <number-input
                               v-else-if="typeof getPermissionSettingsValue(permission.id, currentValue) === 'number'"
                               v-bind:type="typeof getPermissionSettingsValue(permission.id, currentValue)"
@@ -270,10 +277,37 @@ export default class interfaceSettings extends Vue {
   permissions: Permissions.Item[] = [];
 
   get settingsWithoutPermissions() {
-    let withoutPermissions = {};
+    let withoutPermissions: any = {};
     Object.keys(this.settings).filter(o => !o.includes('permission')).forEach((key) => {
       withoutPermissions[key] = this.settings[key]
     })
+    for (const k of Object.keys(this.settings['__permission_based__'] || {})) {
+      withoutPermissions = {
+        [k]: null,
+        ...withoutPermissions
+      }
+    }
+
+    // set settings as first and commands as last
+    const settings = withoutPermissions.settings; delete withoutPermissions.settings;
+    const commands = withoutPermissions.commands; delete withoutPermissions.commands;
+    const ordered = {};
+    Object.keys(withoutPermissions).sort().forEach(function(key) {
+      ordered[key] = withoutPermissions[key];
+    });
+    if (settings) {
+      withoutPermissions = {
+        settings,
+        ...ordered,
+      }
+    }
+    if (commands) {
+      withoutPermissions = {
+        ...ordered,
+        commands,
+      }
+    }
+    console.log({withoutPermissions})
     return withoutPermissions
   }
 

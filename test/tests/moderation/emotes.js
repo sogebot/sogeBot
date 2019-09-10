@@ -10,15 +10,17 @@ require('../../general.js')
 const db = require('../../general.js').db
 const variable = require('../../general.js').variable
 const message = require('../../general.js').message
+const user = require('../../general.js').user
 const assert = require('chai').assert
 
 describe('systems/moderation - Emotes()', () => {
-  const cEmotesEmojisAreEmotes = { message: '😀 😁 😂 🤣 😃 😄 😅 😆 😉 😊 😋 😎 😍 😘 😗 😙 😚 🙂 🤗 🤩 🤔 🤨 😐 😑 😶 🙄 😏 😣 😥 😮 🤐 😯 😪 😫 😴 😌 😛 😜 😝 🤤 😒 😓 😔 😕 🙃 🤑 😲 ☹️ 🙁 😖 😞 😟 😤 😢 😭 😦 😧 😨 😩 🤯 😬 😰 😱', sender: { username: 'testuser', badges: {}, emotes: [] }};
+  const cEmotesEmojisAreEmotes = { message: '😀 😁 😂 🤣 😃 😄 😅 😆 😉 😊 😋 😎 😍 😘 😗 😙 😚 🙂 🤗 🤩 🤔 🤨 😐 😑 😶 🙄 😏 😣 😥 😮 🤐 😯 😪 😫 😴 😌 😛 😜 😝 🤤 😒 😓 😔 😕 🙃 🤑 😲 ☹️ 🙁 😖 😞 😟 😤 😢 😭 😦 😧 😨 😩 🤯 😬 😰 😱', sender: user.viewer};
 
   describe('cEmotesEmojisAreEmotes=false', async () => {
     before(async () => {
       await db.cleanup();
       await message.prepare();
+      await user.prepare();
       global.systems.moderation.cEmotesEmojisAreEmotes = false;
       await variable.isEqual('systems.moderation.cEmotesEmojisAreEmotes', false);
     })
@@ -32,6 +34,7 @@ describe('systems/moderation - Emotes()', () => {
     before(async () => {
       await db.cleanup();
       await message.prepare();
+      await user.prepare();
       global.systems.moderation.cEmotesEmojisAreEmotes = true;
       await variable.isEqual('systems.moderation.cEmotesEmojisAreEmotes', true);
     })
