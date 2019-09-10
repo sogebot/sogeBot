@@ -2,20 +2,11 @@ import _ from 'lodash';
 
 import Core from './_interface';
 import {
-  isBot, isBroadcaster, isFollower, isModerator, isOwner, isSubscriber, isVIP, prepare,
-  sendMessage,
+  getBroadcaster, isBot, isBroadcaster, isFollower, isModerator, isOwner, isSubscriber, isVIP, prepare, sendMessage,
 } from './commons';
 import { debug } from './debug';
+import { permission } from './helpers/permissions';
 import { command, default_permission, settings } from './decorators';
-
-const permission = Object.freeze({
-  CASTERS: '4300ed23-dca0-4ed9-8014-f5f2f7af55a9',
-  MODERATORS: 'b38c5adb-e912-47e3-937a-89fabd12393a',
-  SUBSCRIBERS: 'e3b557e7-c26a-433c-a183-e56c11003ab7',
-  VIP: 'e8490e6e-81ea-400a-b93f-57f55aad8e31',
-  FOLLOWERS: 'c168a63b-aded-4a90-978f-ed357e95b0d2',
-  VIEWERS: '0efd7b1c-e460-4167-8e06-8aaf2c170311',
-});
 
 class Permissions extends Core {
   @settings('warnings')
@@ -117,6 +108,11 @@ class Permissions extends Core {
   }
 
   public async check(userId: string, permId: string, partial = false): Promise<{access: boolean; permission: Permissions.Item | null}> {
+    if (_.filter(global.oauth.generalOwners, (o) => _.isString(o) && o.trim().length > 0).length === 0 && getBroadcaster() === '') {
+      global.log.warning('Owners or broadcaster oauth is not set, all users are treated as CASTERS!!!');
+      const pItem: Permissions.Item = await global.db.engine.findOne(this.collection.data, { id: permission.CASTERS });
+      return { access: true, permission: pItem };
+    }
     const user: User & {
       tips: User.Tips[]; bits: User.Bits[]; points: User.Points[]; watched: User.Watched[]; messages: User.Messages[];
     } = await global.db.engine.findOne('users', { id: userId }, [
@@ -160,7 +156,11 @@ class Permissions extends Core {
           shouldProceed = true;
           break;
         case 'casters':
-          shouldProceed = isBot(user) || isBroadcaster(user) || isOwner(user);
+          if (_.filter(global.oauth.generalOwners, _.isString).length === 0 && getBroadcaster() === '') {
+            shouldProceed = true;
+          } else {
+            shouldProceed = isBot(user) || isBroadcaster(user) || isOwner(user);
+          }
           break;
         case 'moderators':
           shouldProceed = await isModerator(user);

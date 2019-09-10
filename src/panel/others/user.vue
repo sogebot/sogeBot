@@ -11,7 +11,7 @@
             <b-img :src="$loggedUser.profile_image_url" rounded="circle" alt="Circle image" style="width:70px;"></b-img>
           </div>
           <div class="col-12" style="justify-content: center; display: flex; flex-direction: column;">
-            <div><strong style="font-size: 1.2rem">{{$loggedUser.login}}</strong> <small class="text-muted">({{viewer.id}})</small></div>
+            <div><strong style="font-size: 1.2rem">{{$loggedUser.login}}</strong> <small class="text-muted">({{$loggedUser.id}})</small></div>
             <div style="font-size: 0.8rem" class="text-secondary">
               <span v-for="k of viewerIs" :key="k"> {{k}} </span>
             </div>

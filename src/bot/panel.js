@@ -12,6 +12,10 @@ const commons = require('./commons')
 const flatten = require('./helpers/flatten')
 const gitCommitInfo = require('git-commit-info');
 
+import {
+  getBroadcaster,
+} from './commons';
+
 const Parser = require('./parser')
 
 const config = require('@config')
@@ -160,8 +164,6 @@ function Panel () {
   var self = this
   this.io.on('connection', function (socket) {
     // check auth
-    socket.emit('authenticated')
-
     self.sendMenu(socket)
 
     socket.on('metrics.translations', function (key) { global.lib.translate.addMetrics(key, true) })
@@ -364,6 +366,9 @@ function Panel () {
 
       // lang
       data.lang = global.general.lang;
+
+      data.isCastersSet = _.filter(global.oauth.generalOwners, (o) => _.isString(o) && o.trim().length > 0).length > 0 || getBroadcaster() !== '';
+
       if (_.isFunction(cb)) cb(data)
       else socket.emit('configuration', data)
     })

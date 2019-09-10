@@ -1,6 +1,8 @@
 <template>
   <b-container class="border border-danger center p-5 bg-dark">
-    <h5 class="text-light">You need to be logged in to use sogeBot</h5>
+    <h3 class="text-danger" v-if="error === 'must+be+caster'">
+      User must be caster to have access to dashboard
+    </h3>
   </b-container>
 </template>
 
@@ -9,13 +11,23 @@ import { Vue, Component } from 'vue-property-decorator';
 
 @Component({})
 export default class Login extends Vue {
+  error: null | string = null;
+
   get url() {
     return window.location.origin;
   }
 
   mounted() {
-    // autorefresh
-    window.location.replace('http://oauth.sogebot.xyz/?state=' + this.url);
+    const hash = window.location.hash
+    if (hash.trim().length > 0) {
+      const error = hash.match(/error=[a-zA-Z0-9+]*/)
+      if (error) {
+        this.error = error[0].split('=')[1];
+      }
+    } else {
+      // autorefresh
+      window.location.replace('http://oauth.sogebot.xyz/?state=' + this.url);
+    }
   }
 }
 </script>
@@ -36,5 +48,9 @@ export default class Login extends Vue {
       #333 10px,
       #333 20px
     );
+  }
+  h3 {
+    font-weight: bold;
+    text-transform: uppercase;
   }
 </style>

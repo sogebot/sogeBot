@@ -38,7 +38,7 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
 import { ButtonStates, states } from './helpers/buttonStates';
 import { isAvailableVariable, setMainLoaded } from './helpers/isAvailableVariable';
-import { isUserLoggedIn } from './helpers/isUserLoggedIn';
+import { isUserCaster, isUserLoggedIn } from './helpers/isUserLoggedIn';
 import translate from './helpers/translate';
 import urlParam from './helpers/urlParam';
 
@@ -92,15 +92,15 @@ const main = async () => {
   // init prototypes
   Vue.prototype.translate = (v) => translate(v);
   Vue.prototype.urlParam = (v) => urlParam(v);
+  Vue.prototype.token = token;
 
-  // check login first
-  Vue.prototype.$loggedUser = await isUserLoggedIn();
+  Vue.prototype.$loggedUser = await isUserLoggedIn(token);
+  await isUserCaster(Vue.prototype.$loggedUser.id, token);
+
   await Promise.all([
     isAvailableVariable('translations'),
     isAvailableVariable('configuration'),
   ]);
-
-  Vue.prototype.token = token;
   Vue.prototype.configuration = global.configuration;
   Vue.prototype._ = _;
   Vue.prototype.$state = ButtonStates;
