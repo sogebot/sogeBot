@@ -2,6 +2,7 @@ import 'moment/min/locales.min';
 import './others/quickStatsApp';
 import './others/changegamedlg';
 import './others/checklist';
+import './others/user';
 import './widgets/dashboard';
 import './widgets/popout';
 
@@ -37,6 +38,7 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
 import { ButtonStates, states } from './helpers/buttonStates';
 import { isAvailableVariable, setMainLoaded } from './helpers/isAvailableVariable';
+import { isUserLoggedIn } from './helpers/isUserLoggedIn';
 import translate from './helpers/translate';
 import urlParam from './helpers/urlParam';
 
@@ -80,20 +82,24 @@ declare module 'vue/types/vue' {
     _: _.LoDashStatic;
     urlParam(key: string): string | null;
     translate(id: string): string;
+    $loggedUser: any | null;
   }
 }
 
 Vue.use(VueRouter);
 
 const main = async () => {
+  // init prototypes
+  Vue.prototype.translate = (v) => translate(v);
+  Vue.prototype.urlParam = (v) => urlParam(v);
+
+  // check login first
+  Vue.prototype.$loggedUser = await isUserLoggedIn();
   await Promise.all([
     isAvailableVariable('translations'),
     isAvailableVariable('configuration'),
   ]);
 
-  // init prototypes
-  Vue.prototype.translate = (v) => translate(v);
-  Vue.prototype.urlParam = (v) => urlParam(v);
   Vue.prototype.token = token;
   Vue.prototype.configuration = global.configuration;
   Vue.prototype._ = _;

@@ -21,7 +21,7 @@
     "noResolve": false,
     "baseUrl": "./",
     "paths": {
-      "@config": ["config.json", "config.example.json"],
+      "@config": ["config.json", "config.example.json"]
     }
   },
   "include": [
@@ -31,5 +31,5 @@
   ],
   "exclude": [
     "node_modules"
-  ],
+  ]
 }

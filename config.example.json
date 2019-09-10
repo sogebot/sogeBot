@@ -7,8 +7,6 @@
   },
   "panel": {
     "__COMMENT__": "set correctly your domain and to be safe, change your token",
-    "username": "admin",
-    "password": "admin",
     "port": 20000,
     "domain": "localhost",
     "token": "7911776886"

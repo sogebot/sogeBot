@@ -62,7 +62,7 @@ function Panel () {
 
   // static routing
   app.use('/dist', express.static(path.join(__dirname, '..', 'public', 'dist')))
-  app.get('/popout/', this.authUser, function (req, res) {
+  app.get('/popout/', function (req, res) {
     res.sendFile(path.join(__dirname, '..', 'public', 'popout.html'))
   })
   app.get('/gallery/:id', async function (req, res) {
@@ -76,7 +76,13 @@ function Panel () {
       res.end(data)
     } else res.sendStatus(404)
   })
-  app.get('/oauth/:page', this.authUser, function (req, res) {
+  app.get('/oauth', function (req, res) {
+    res.sendFile(path.join(__dirname, '..', 'public', 'oauth.html'))
+  })
+  app.get('/login', function (req, res) {
+    res.sendFile(path.join(__dirname, '..', 'public', 'login.html'))
+  })
+  app.get('/oauth/:page', function (req, res) {
     res.sendFile(path.join(__dirname, '..', 'public', 'oauth', req.params.page + '.html'))
   })
   app.get('/auth/token.js', async function (req, res) {
@@ -117,22 +123,22 @@ function Panel () {
   app.get('/favicon.ico', function (req, res) {
     res.sendFile(path.join(__dirname, '..', 'public', 'favicon.ico'))
   })
-  app.get('/', this.authUser, function (req, res) {
+  app.get('/', function (req, res) {
     res.sendFile(path.join(__dirname, '..', 'public', 'index.html'))
   })
-  app.get('/:type/registry/:subtype/:page', this.authUser, function (req, res) {
+  app.get('/:type/registry/:subtype/:page', function (req, res) {
     const file = path.join(__dirname, '..', 'public', req.params.type, 'registry', req.params.subtype, req.params.page)
     if (fs.existsSync(file)) {
       res.sendFile(file)
     }
   })
-  app.get('/:type/:subtype/:page', this.authUser, function (req, res) {
+  app.get('/:type/:subtype/:page', function (req, res) {
     const file = path.join(__dirname, '..', 'public', req.params.type, req.params.subtype, req.params.page)
     if (fs.existsSync(file)) {
       res.sendFile(file)
     }
   })
-  app.get('/:type/:page', this.authUser, function (req, res) {
+  app.get('/:type/:page', function (req, res) {
     try {
       res.sendFile(path.join(__dirname, '..', 'public', req.params.type, req.params.page))
     } catch (e) {}
@@ -463,21 +469,6 @@ Panel.prototype.expose = function () {
   this.server.listen(global.panel.port, function () {
     global.log.info(`WebPanel is available at http://localhost:${global.panel.port}`)
   })
-}
-
-Panel.prototype.authUser = async function (req, res, next) {
-  var user = basicAuth(req)
-  try {
-    if (user.name === config.panel.username &&
-        user.pass === config.panel.password) {
-      return next()
-    } else {
-      throw new Error(NOT_AUTHORIZED)
-    }
-  } catch (e) {
-    res.set('WWW-Authenticate', `Basic realm="Authorize to '${(await global.oauth.broadcasterUsername).toUpperCase()}' WebPanel`)
-    return res.sendStatus(401)
-  }
 }
 
 Panel.prototype.addMenu = function (menu) {

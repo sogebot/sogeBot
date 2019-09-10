@@ -378,18 +378,22 @@ class Users extends Core {
         }
       })
       socket.on('findOne.viewer', async (opts, cb) => {
-        let [viewer, tips, bits, points, messages, watched] = await Promise.all([
+        let [viewer, tips, bits, points, messages, watched, permId] = await Promise.all([
           global.db.engine.findOne('users', { id: opts.where.id }),
           global.db.engine.find('users.tips', { id: opts.where.id }),
           global.db.engine.find('users.bits', { id: opts.where.id }),
           global.systems.points.getPointsOf(opts.where.id),
           global.users.getMessagesOf(opts.where.id),
-          global.users.getWatchedOf(opts.where.id)
+          global.users.getWatchedOf(opts.where.id),
+          global.permissions.getUserHighestPermission(opts.where.id)
         ])
         let online = await global.db.engine.findOne('users.online', { username: viewer.username })
 
         _.set(viewer, 'stats.tips', tips)
         _.set(viewer, 'stats.bits', bits)
+        _.set(viewer, 'stats.aggregatedTips', tips.map((o) => global.currency.exchange(o.amount, o.currency, global.currency.mainCurrency)).reduce((a, b) => a + b, 0));
+        _.set(viewer, 'stats.aggregatedBits', bits.map((o) => Number(o.amount)).reduce((a, b) => a + b, 0));
+        _.set(viewer, 'custom.currency', global.currency.mainCurrency);
         _.set(viewer, 'stats.messages', messages)
         _.set(viewer, 'points', points)
         _.set(viewer, 'time.watched', watched)
@@ -419,6 +423,9 @@ class Users extends Core {
           if (typeof viewer.is.subscriber === 'undefined' || viewer.is.subscriber === null) viewer.is.subscriber = false
           if (typeof viewer.is.vip === 'undefined' || viewer.is.vip === null) viewer.is.vip = false
         }
+
+        // PERMISSION
+        viewer.permission = await global.permissions.get(permId);
 
         // ONLINE
         let isOnline = !_.isEmpty(_.filter(online, (o) => o.username === viewer.username))
