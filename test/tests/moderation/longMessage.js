@@ -10,6 +10,7 @@ require('../../general.js')
 const db = require('../../general.js').db
 const variable = require('../../general.js').variable
 const message = require('../../general.js').message
+const user = require('../../general.js').user
 const assert = require('chai').assert
 
 const tests = {
@@ -26,19 +27,20 @@ describe('systems/moderation - longMessage()', () => {
     before(async () => {
       await db.cleanup()
       await message.prepare()
+      await user.prepare()
       global.systems.moderation.cLongMessageEnabled = false
       await variable.isEqual('global.systems.moderation.cLongMessageEnabled', false)
     })
 
     for (let test of tests.timeout) {
       it(`message '${test}' should not timeout`, async () => {
-        assert.isTrue(await global.systems.moderation.longMessage({ sender: { username: 'testuser', badges: {} }, message: test }))
+        assert.isTrue(await global.systems.moderation.longMessage({ sender: user.viewer, message: test }))
       })
     }
 
     for (let test of tests.ok) {
       it(`message '${test}' should not timeout`, async () => {
-        assert.isTrue(await global.systems.moderation.longMessage({ sender: { username: 'testuser', badges: {} }, message: test }))
+        assert.isTrue(await global.systems.moderation.longMessage({ sender: user.viewer, message: test }))
       })
     }
   })
@@ -46,19 +48,20 @@ describe('systems/moderation - longMessage()', () => {
     before(async () => {
       await db.cleanup()
       await message.prepare()
+      await user.prepare()
       global.systems.moderation.cLongMessageEnabled = true
       await variable.isEqual('global.systems.moderation.cLongMessageEnabled', true)
     })
 
     for (let test of tests.timeout) {
       it(`message '${test}' should timeout`, async () => {
-        assert.isFalse(await global.systems.moderation.longMessage({ sender: { username: 'testuser', badges: {} }, message: test }))
+        assert.isFalse(await global.systems.moderation.longMessage({ sender: user.viewer, message: test }))
       })
     }
 
     for (let test of tests.ok) {
       it(`message '${test}' should not timeout`, async () => {
-        assert.isTrue(await global.systems.moderation.longMessage({ sender: { username: 'testuser', badges: {} }, message: test }))
+        assert.isTrue(await global.systems.moderation.longMessage({ sender: user.viewer, message: test }))
       })
     }
   })

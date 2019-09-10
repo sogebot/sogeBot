@@ -182,7 +182,7 @@ describe('systems/moderation - whitelist()', () => {
       it(`pattern '${pattern}' should change '${text}'`, async () => {
         global.systems.moderation.cListsWhitelist = [pattern]
         await variable.isEqual('systems.moderation.cListsWhitelist', [pattern])
-        let result = await global.systems.moderation.whitelist(text)
+        let result = await global.systems.moderation.whitelist(text, '0efd7b1c-e460-4167-8e06-8aaf2c170311')
         assert.isTrue(text !== result)
       })
     }
@@ -190,7 +190,7 @@ describe('systems/moderation - whitelist()', () => {
       it(`pattern '${pattern}' should not change '${text}'`, async () => {
         global.systems.moderation.cListsWhitelist = [pattern]
         await variable.isEqual('systems.moderation.cListsWhitelist', [pattern])
-        let result = await global.systems.moderation.whitelist(text)
+        let result = await global.systems.moderation.whitelist(text, '0efd7b1c-e460-4167-8e06-8aaf2c170311')
         assert.isTrue(text === result)
       })
     }
@@ -203,7 +203,7 @@ describe('systems/moderation - whitelist()', () => {
 
     it('!zahrej command should be whitelisted', async () => {
       const text = '!zahrej https://youtu.be/HmZYgqBp1gI';
-      const result = await global.systems.moderation.whitelist(text)
+      const result = await global.systems.moderation.whitelist(text, '0efd7b1c-e460-4167-8e06-8aaf2c170311')
       assert.isTrue(text !== result)
     })
   })
