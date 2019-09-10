@@ -32,8 +32,58 @@ const end = function (updated) {
 }
 
 const migration = {
+  4: async () => {
+    header('Update moderation settings to __permission_based__')
+    let updated = 0;
+
+    const keys = [
+      'cListsEnabled', 'cListsTimeout',
+      'cLinksEnabled', 'cLinksIncludeSpaces', 'cLinksTimeout',
+      'cSymbolsEnabled', 'cSymbolsTriggerLength', 'cSymbolsMaxSymbolsConsecutively', 'cSymbolsMaxSymbolsPercent', 'cSymbolsTimeout',
+      'cLongMessageEnabled', 'cLongMessageTriggerLength', 'cLongMessageTimeout',
+      'cCapsEnabled', 'cCapsTriggerLength', 'cCapsMaxCapsPercent', 'cCapsTimeout',
+      'cSpamEnabled', 'cSpamTriggerLength', 'cSpamMaxLength', 'cSpamTimeout',
+      'cColorEnabled', 'cColorTimeout',
+      'cEmotesEnabled', 'cEmotesEmojisAreEmotes', 'cEmotesMaxCount', 'cEmotesTimeout',
+    ];
+    for (const key of keys) {
+      const item = await global.db.engine.findOne('systems.settings', { key })
+      if (typeof item.value !== 'undefined') {
+        const value = {
+          '0efd7b1c-e460-4167-8e06-8aaf2c170311': item.value,
+          'c168a63b-aded-4a90-978f-ed357e95b0d2': null,
+          'e8490e6e-81ea-400a-b93f-57f55aad8e31': null,
+          'e3b557e7-c26a-433c-a183-e56c11003ab7': null,
+          'b38c5adb-e912-47e3-937a-89fabd12393a': null,
+          '4300ed23-dca0-4ed9-8014-f5f2f7af55a9': null
+        }
+        await global.db.engine.remove('systems.settings', { key });
+        await global.db.engine.insert('systems.settings',
+          { key: '__permission_based__' + key, value });
+      }
+      updated++;
+    }
+
+    const keysToDelete = [
+      'cLinksModerateSubscribers',
+      'cSymbolsModerateSubscribers',
+      'cLongMessageModerateSubscribers',
+      'cCapsModerateSubscribers',
+      'cSpamModerateSubscribers',
+      'cColorModerateSubscribers',
+      'cEmoteModerateSubscribers',
+    ];
+    for (const key of keysToDelete) {
+      const item = await global.db.engine.findOne('systems.settings', { key })
+      if (typeof item.value !== 'undefined') {
+        await global.db.engine.remove('systems.settings', { key });
+      }
+      updated++;
+    }
+    end(updated);
+  },
   3: async () => {
-    header('remove user.time.points');
+    header('Remove user.time.points');
     let updated = 0;
     for (let item of await global.db.engine.find('users')) {
       if (typeof _.get(item, 'time.points', undefined) !== 'undefined') {

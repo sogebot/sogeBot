@@ -10,6 +10,7 @@
       </span>
     </div>
     <button
+      :disabled="disabled"
       class="btn form-control"
       v-bind:class="{'btn-success': this.value, 'btn-danger': !this.value}"
       v-on:click="update()">
@@ -26,6 +27,7 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 export default class toggleEnable extends Vue {
   @Prop() readonly value: any;
   @Prop() readonly title: any;
+  @Prop() readonly disabled !: boolean;
 
   update() {
     this.$emit('update', !this.value);

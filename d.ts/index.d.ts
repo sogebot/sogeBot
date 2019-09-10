@@ -130,7 +130,7 @@ interface Sender {
   username: string;
   displayName: string;
   userId: string;
-  'message-type': 'chat' | 'whisper';
+  'message-type': 'chat' | 'whisper' | 'action';
   emotes: { id: number; start: number; end: number }[];
   badges: {
     subscriber?: undefined | number;

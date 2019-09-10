@@ -10,6 +10,7 @@ require('../../general.js')
 const db = require('../../general.js').db
 const variable = require('../../general.js').variable
 const message = require('../../general.js').message
+const user = require('../../general.js').user
 
 const _ = require('lodash')
 const assert = require('chai').assert
@@ -101,6 +102,7 @@ describe('systems/moderation - blacklist()', () => {
   before(async () => {
     await db.cleanup()
     await message.prepare()
+    await user.prepare();
   })
 
   for (let [pattern, test] of Object.entries(tests)) {
@@ -108,7 +110,7 @@ describe('systems/moderation - blacklist()', () => {
       it(`pattern '${pattern}' should ignore '${text}'`, async () => {
         global.systems.moderation.cListsBlacklist = [pattern]
         await variable.isEqual('systems.moderation.cListsBlacklist', [pattern])
-        let result = await global.systems.moderation.blacklist({ sender: { username: 'testuser', badges: {} }, message: text })
+        let result = await global.systems.moderation.blacklist({ sender: user.viewer, message: text })
         assert.isTrue(result)
       })
     }
@@ -116,7 +118,7 @@ describe('systems/moderation - blacklist()', () => {
       it(`pattern '${pattern}' should timeout on '${text}'`, async () => {
         global.systems.moderation.cListsBlacklist = [pattern]
         await variable.isEqual('systems.moderation.cListsBlacklist', [pattern])
-        let result = await global.systems.moderation.blacklist({ sender: { username: 'testuser', badges: {} }, message: text })
+        let result = await global.systems.moderation.blacklist({ sender: user.viewer, message: text })
         assert.isFalse(result)
       })
     }
