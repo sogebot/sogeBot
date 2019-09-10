@@ -4,7 +4,7 @@ import { get } from 'lodash';
 export const isUserLoggedIn = async function () {
   // check if we have auth code
   const code = localStorage.getItem('code') || '';
-  if (code === null || code.trim().length === 0) {
+  if (code.trim().length === 0) {
     console.log('Redirecting, user is not authenticated');
     window.location.replace(window.location.origin + '/login');
   } else {

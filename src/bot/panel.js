@@ -6,7 +6,6 @@ var express = require('express')
 const bodyParser = require('body-parser')
 var http = require('http')
 var path = require('path')
-var basicAuth = require('basic-auth')
 var _ = require('lodash')
 const util = require('util')
 const commons = require('./commons')
@@ -18,8 +17,6 @@ const Parser = require('./parser')
 const config = require('@config')
 
 const moment = require('moment-timezone')
-
-const NOT_AUTHORIZED = '0'
 
 function Panel () {
   // setup static server
