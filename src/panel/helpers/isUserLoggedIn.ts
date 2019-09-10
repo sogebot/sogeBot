@@ -36,7 +36,7 @@ export const isUserLoggedIn = async function (token: string) {
       }, (err, data) => {
         resolve();
       });
-    })
+    });
     return data;
   }
 };
