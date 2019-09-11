@@ -430,11 +430,14 @@ export default class interfaceSettings extends Vue {
         console.debug({ui, settings});
 
         for (const k of Object.keys(settings)) {
-          settings[k] = _.pickBy(settings[k], (value) => {
-            return value !== null;
-          });
-          if (Object.keys(settings[k]).length === 0) {
-            delete settings[k]
+          // dont update _permissions as they might be null
+          if (k !== '_permissions') {
+            settings[k] = _.pickBy(settings[k], (value) => {
+              return value !== null;
+            });
+            if (Object.keys(settings[k]).length === 0) {
+              delete settings[k]
+            }
           }
         };
         console.debug({ui, settings});
