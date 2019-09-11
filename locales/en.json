@@ -634,6 +634,7 @@
     "start-time": "Start Time",
     "end-time": "End Time",
     "watched-time": "Watched time",
+    "group": "Group",
     "followed-since": "Followed since",
     "subscribed-since": "Subscribed since",
     "username": "Username",

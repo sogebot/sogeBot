@@ -1,6 +1,10 @@
 <template>
-  <div class="text-center" >
-    <b-spinner variant="primary" style="width: 5rem; height: 5rem; margin-top: 5rem;"></b-spinner>
+  <div class="text-center">
+    <b-spinner variant="primary"
+    style="width: 5rem; height: 5rem;"
+      :style="{
+        'margin-top': noMargin ? '0' : '5rem'
+      }"></b-spinner>
     <div
       style="text-transform: uppercase; letter-spacing: 1px; font-size: 0.7rem; position: relative; top: -3rem; max-width: fit-content;"
       class="text-primary text-center m-auto">{{ translate('loading') }}</div>
@@ -20,5 +24,6 @@ import { BSpinner } from 'bootstrap-vue'
 })
 export default class loading extends Vue {
   @Prop(Boolean) readonly slow: boolean | undefined;
+  @Prop(Boolean) readonly noMargin: boolean | undefined;
 };
 </script>
