@@ -229,6 +229,7 @@
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import _ from 'lodash';
+import {get} from 'lodash';
 import {flatten, unflatten} from 'src/bot/helpers/flatten';
 
 type systemFromIO = { name: string; enabled: boolean; areDependenciesEnabled: boolean; isDisabledByEnv: boolean }
@@ -433,8 +434,8 @@ export default class interfaceSettings extends Vue {
         for (const k of Object.keys(settings)) {
           // dont update _permissions as they might be null
           if (k !== '_permissions') {
-            settings[k] = _.pickBy(settings[k], (value) => {
-              return value !== null;
+            settings[k] = _.pickBy(settings[k], (value, key) => {
+              return value !== null || get(ui, `${k}.${key}`, null) !== null;
             });
             if (Object.keys(settings[k]).length === 0) {
               delete settings[k]
