@@ -12,6 +12,7 @@
     <h4 class="text-danger" v-if="error === 'popout+must+be+logged'">
       <fa icon="skull-crossbones" fixed-width size="4x"/>
       <div>Cannot access without login.</div>
+      <b-btn variant="success" class="mt-3" @click="login">Login</b-btn>
       <b-btn variant="secondary" class="mt-3" @click="goBack">Try again</b-btn>
     </h4>
   </b-container>
