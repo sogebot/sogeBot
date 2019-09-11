@@ -293,24 +293,24 @@ export default class interfaceSettings extends Vue {
     // set settings as first and commands as last
     const settings = withoutPermissions.settings; delete withoutPermissions.settings;
     const commands = withoutPermissions.commands; delete withoutPermissions.commands;
-    const ordered = {};
+    let ordered = {};
     Object.keys(withoutPermissions).sort().forEach(function(key) {
       ordered[key] = withoutPermissions[key];
     });
     if (settings) {
-      withoutPermissions = {
+      ordered = {
         settings,
         ...ordered,
       }
     }
     if (commands) {
-      withoutPermissions = {
+      ordered = {
         ...ordered,
         commands,
       }
     }
-    console.log({withoutPermissions})
-    return withoutPermissions
+    console.log({ordered})
+    return ordered
   }
 
   mounted() {
