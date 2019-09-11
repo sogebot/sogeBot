@@ -229,6 +229,7 @@
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import _ from 'lodash';
+import {flatten, unflatten} from 'src/bot/helpers/flatten';
 
 type systemFromIO = { name: string; enabled: boolean; areDependenciesEnabled: boolean; isDisabledByEnv: boolean }
 enum State {
@@ -457,6 +458,23 @@ export default class interfaceSettings extends Vue {
       }
       delete settings.settings
     }
+
+    // flat permission based variables - getting rid of category
+    settings.__permission_based__ = flatten(settings.__permission_based__)
+    for (const key of Object.keys(settings.__permission_based__)) {
+      const match = key.match(/\./g);
+      if (match && match.length > 1) {
+        const value = settings.__permission_based__[key];
+        delete settings.__permission_based__[key]
+        const keyWithoutCategory = key.replace(/([\w]*\.)/, '');
+        console.debug(`FROM: ${key}`);
+        console.debug(`TO:   ${keyWithoutCategory}`);
+        settings.__permission_based__[keyWithoutCategory] = value;
+      };
+    }
+    settings.__permission_based__ = unflatten(settings.__permission_based__)
+
+    console.debug('Saving settings', settings);
     io(`/${this.$route.params.type}/${this.$route.params.id}`, { query: "token=" + this.token })
       .emit('settings.update', settings, (err) => {
         setTimeout(() => this.state.settings = 0, 1000)
