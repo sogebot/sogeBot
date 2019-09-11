@@ -25,10 +25,10 @@ class UserInfo extends System {
     toggleOnIcon: 'fa-eye',
     toggleOffIcon: 'fa-eye-slash',
   })
-  order: string[] = ['$sender', '$rank', '$watched', '$points', '$messages', '$tips', '$bits'];
+  order: string[] = ['$sender', '$rank', '$role', '$watched', '$points', '$messages', '$tips', '$bits'];
 
   @settings('me')
-  _formatDisabled: string[] = [];
+  _formatDisabled: string[] = ['$role'];
 
   @settings('me')
   formatSeparator = ' | ';
@@ -202,7 +202,7 @@ class UserInfo extends System {
   @command('!me')
   protected async showMe(opts: CommandOptions) {
     try {
-      const message: string[] = [];
+      const message: (string | null)[] = [];
 
       // build message
       for (const i of this.order) {
@@ -260,7 +260,19 @@ class UserInfo extends System {
         const bitAmount = bits.map(o => Number(o.amount)).reduce((a, b) => a + b, 0);
         message[idx] = `${bitAmount} ${getLocalizedName(bitAmount, 'core.bits')}`;
       }
-      sendMessage(message.join(this.formatSeparator), opts.sender, opts.attr);
+
+      if (message.includes('$role')) {
+        const idx = message.indexOf('$role');
+        message[idx] = null;
+        const permId = await global.permissions.getUserHighestPermission(opts.sender.userId);
+        if (permId) {
+          const pItem = await global.permissions.get(permId);
+          if (pItem) {
+            message[idx] = pItem.name;
+          }
+        }
+      }
+      sendMessage(message.filter(o => o !== null).join(this.formatSeparator), opts.sender, opts.attr);
     } catch (e) {
       global.log.error(e.stack);
     }
