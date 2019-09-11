@@ -266,7 +266,7 @@ class UserInfo extends System {
         message[idx] = null;
         const permId = await global.permissions.getUserHighestPermission(opts.sender.userId);
         if (permId) {
-          const pItem = await global.permissions.get(permId)
+          const pItem = await global.permissions.get(permId);
           if (pItem) {
             message[idx] = pItem.name;
           }
