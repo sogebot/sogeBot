@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <title></title>
+  <meta charset="utf-8">
+  <meta name="robots" content="index, follow">
+  <meta name="theme-color" content="#f4f5f6">
+  <meta name="apple-mobile-web-app-status-bar-style" content="#f4f5f6">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans|Poppins|PT+Sans|PT+Sans+Narrow|PT+Mono" rel="stylesheet">
+  <link href="https://use.fontawesome.com/releases/v5.0.6/css/all.css" rel="stylesheet">
+  <!-- Latest compiled and minified CSS -->
+  <link rel="stylesheet" href="../dist/css/light.css">
+  <!-- Optional theme -->
+  <link rel="stylesheet" href="../dist/css/sortable-theme-bootstrap.css">
+  <link rel="stylesheet" href="../dist/bootstrap-toggle/css/bootstrap-toggle.min.css" />
+  <link rel="stylesheet" href="../dist/bootstrap-slider/css/bootstrap-slider.min.css" />
+  <script src="/socket.io/socket.io.js"></script>
+
+  <style>
+    html {
+      height: 100%;
+    }
+
+    #widget {
+      height:100%
+    }
+
+    .card, .widget {
+      border: 0 !important;
+    }
+  </style>
+</head>
+
+<body style="padding-top: 0; height: 100%; width: 100%">
+  <div id="popout"> </div>
+
+  <!-- jQuery and Popper (necessary for Bootstrap's JavaScript plugins) -->
+  <script src="../dist/jquery/js/jquery.min.js"></script>
+  <script src="../dist/popper.js/js/popper.min.js"></script>
+  <!-- Router -->
+  <script src="../dist/page/js/page.js"></script>
+  <!-- LoDash goodness -->
+  <script src="../dist/lodash/js/lodash.min.js"></script>
+  <!-- Latest compiled and minified JavaScript -->
+  <script src="../dist/bootstrap/js/bootstrap.min.js" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="../dist/bootstrap-toggle/js/bootstrap-toggle.min.js"></script>
+  <script type="text/javascript" src="../dist/bootstrap-slider/js/bootstrap-slider.min.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.20.1/moment-with-locales.min.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/markdown-it/8.3.1/markdown-it.js"></script>
+  <script type="text/javascript" src="/auth/token.js"></script>
+  <script src="/dist/velocity-animate/js/velocity.min.js"></script>
+  <script type="text/javascript" src="/dist/js/commons/commons.js"></script>
+
+  <script>
+    try {
+      const url = new URL(window.location.href);
+      const code = url.searchParams.get('code');
+      const state = url.searchParams.get('state');
+
+      // save token code to localStorage
+      localStorage.setItem('code', code);
+      window.location.replace(`${state}`);
+    } catch (error) {
+      console.log({error});
+      window.location.replace(window.location.origin + '/login');
+    }
+  </script>
+</body>
+
+</html>

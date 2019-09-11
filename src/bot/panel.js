@@ -6,20 +6,21 @@ var express = require('express')
 const bodyParser = require('body-parser')
 var http = require('http')
 var path = require('path')
-var basicAuth = require('basic-auth')
 var _ = require('lodash')
 const util = require('util')
 const commons = require('./commons')
 const flatten = require('./helpers/flatten')
 const gitCommitInfo = require('git-commit-info');
 
+import {
+  getBroadcaster,
+} from './commons';
+
 const Parser = require('./parser')
 
 const config = require('@config')
 
 const moment = require('moment-timezone')
-
-const NOT_AUTHORIZED = '0'
 
 function Panel () {
   // setup static server
@@ -62,7 +63,7 @@ function Panel () {
 
   // static routing
   app.use('/dist', express.static(path.join(__dirname, '..', 'public', 'dist')))
-  app.get('/popout/', this.authUser, function (req, res) {
+  app.get('/popout/', function (req, res) {
     res.sendFile(path.join(__dirname, '..', 'public', 'popout.html'))
   })
   app.get('/gallery/:id', async function (req, res) {
@@ -76,7 +77,13 @@ function Panel () {
       res.end(data)
     } else res.sendStatus(404)
   })
-  app.get('/oauth/:page', this.authUser, function (req, res) {
+  app.get('/oauth', function (req, res) {
+    res.sendFile(path.join(__dirname, '..', 'public', 'oauth.html'))
+  })
+  app.get('/login', function (req, res) {
+    res.sendFile(path.join(__dirname, '..', 'public', 'login.html'))
+  })
+  app.get('/oauth/:page', function (req, res) {
     res.sendFile(path.join(__dirname, '..', 'public', 'oauth', req.params.page + '.html'))
   })
   app.get('/auth/token.js', async function (req, res) {
@@ -117,22 +124,22 @@ function Panel () {
   app.get('/favicon.ico', function (req, res) {
     res.sendFile(path.join(__dirname, '..', 'public', 'favicon.ico'))
   })
-  app.get('/', this.authUser, function (req, res) {
+  app.get('/', function (req, res) {
     res.sendFile(path.join(__dirname, '..', 'public', 'index.html'))
   })
-  app.get('/:type/registry/:subtype/:page', this.authUser, function (req, res) {
+  app.get('/:type/registry/:subtype/:page', function (req, res) {
     const file = path.join(__dirname, '..', 'public', req.params.type, 'registry', req.params.subtype, req.params.page)
     if (fs.existsSync(file)) {
       res.sendFile(file)
     }
   })
-  app.get('/:type/:subtype/:page', this.authUser, function (req, res) {
+  app.get('/:type/:subtype/:page', function (req, res) {
     const file = path.join(__dirname, '..', 'public', req.params.type, req.params.subtype, req.params.page)
     if (fs.existsSync(file)) {
       res.sendFile(file)
     }
   })
-  app.get('/:type/:page', this.authUser, function (req, res) {
+  app.get('/:type/:page', function (req, res) {
     try {
       res.sendFile(path.join(__dirname, '..', 'public', req.params.type, req.params.page))
     } catch (e) {}
@@ -157,8 +164,6 @@ function Panel () {
   var self = this
   this.io.on('connection', function (socket) {
     // check auth
-    socket.emit('authenticated')
-
     self.sendMenu(socket)
 
     socket.on('metrics.translations', function (key) { global.lib.translate.addMetrics(key, true) })
@@ -361,6 +366,9 @@ function Panel () {
 
       // lang
       data.lang = global.general.lang;
+
+      data.isCastersSet = _.filter(global.oauth.generalOwners, (o) => _.isString(o) && o.trim().length > 0).length > 0 || getBroadcaster() !== '';
+
       if (_.isFunction(cb)) cb(data)
       else socket.emit('configuration', data)
     })
@@ -463,21 +471,6 @@ Panel.prototype.expose = function () {
   this.server.listen(global.panel.port, function () {
     global.log.info(`WebPanel is available at http://localhost:${global.panel.port}`)
   })
-}
-
-Panel.prototype.authUser = async function (req, res, next) {
-  var user = basicAuth(req)
-  try {
-    if (user.name === config.panel.username &&
-        user.pass === config.panel.password) {
-      return next()
-    } else {
-      throw new Error(NOT_AUTHORIZED)
-    }
-  } catch (e) {
-    res.set('WWW-Authenticate', `Basic realm="Authorize to '${(await global.oauth.broadcasterUsername).toUpperCase()}' WebPanel`)
-    return res.sendStatus(401)
-  }
 }
 
 Panel.prototype.addMenu = function (menu) {

@@ -1,5 +1,8 @@
 <template>
   <div class="stream-info-container container-fluid" :class="{ 'sticky-top': b_sticky }" :style="{ 'top': b_sticky ? '50px' : undefined }">
+    <b-toast title="Owner and broadcaster oauth is not set" no-auto-hide visible variant="danger" solid v-if="!configuration.isCastersSet">
+      Please set your <a href="#/settings/core/oauth">broadcaster oauth or owners</a>, or all users <strong>will have access</strong> to this dashboard and will be considered as <strong>casters</strong>.
+    </b-toast>
     <template v-if="!isLoaded">
       <div class="mx-auto text-center p-3 pt-4">
         <div class="spinner-grow" role="status"></div>
@@ -161,10 +164,16 @@
 
   import { EventBus } from '../helpers/event-bus';
 
+  // we are using window.socket to reuse socket from index.html
+  declare global {
+    interface Window {
+      socket: any;
+    }
+  }
+
   export default Vue.extend({
     data: function () {
       const object: {
-        socket: any,
         highlightsSocket: any,
 
         averageStats: any,
@@ -196,7 +205,6 @@
         rawStatus: string,
         cachedTitle: string,
       } = {
-        socket: io({ query: "token=" + this.token }),
         highlightsSocket: io('/systems/highlights', { query: "token=" + this.token }),
         averageStats: {},
 
@@ -237,6 +245,27 @@
       this.b_showAvgDiff = this.configuration.core.ui.showdiff
       this.b_shortenNumber = this.configuration.core.ui.shortennumbers
       this.b_sticky = this.configuration.core.ui.stickystats
+
+      window.socket.emit('getLatestStats')
+      window.socket.emit('panel.sendStreamData')
+
+      setInterval(() => {
+        window.socket.emit('getLatestStats')
+        window.socket.emit('panel.sendStreamData')
+      }, 1000)
+
+      window.socket.on('latestStats', (data) => { this.averageStats = data })
+      window.socket.on('stats', async (data) => {
+        for (let [key, value] of Object.entries(data)) {
+          this[key] = value // populate data
+        }
+        this.timestamp = Date.now()
+        this.isLoaded = true
+
+        this.title = await this.generateTitle(data.status, data.rawStatus);
+        this.rawStatus = data.rawStatus;
+        this.game = data.game;
+      })
     },
     watch: {
       timestamp() {
@@ -256,7 +285,7 @@
       },
       loadCustomVariableValue: async function (variable) {
         return new Promise((resolve, reject) => {
-          this.socket.emit('custom.variable.value', variable, (err, value) => {
+          window.socket.emit('custom.variable.value', variable, (err, value) => {
             resolve(value)
           })
         })
@@ -348,28 +377,6 @@
         this.hideStats = !this.hideStats
       }
     },
-    created: function () {
-      this.socket.emit('getLatestStats')
-      this.socket.emit('panel.sendStreamData')
-
-      setInterval(() => {
-        this.socket.emit('getLatestStats')
-        this.socket.emit('panel.sendStreamData')
-      }, 1000)
-
-      this.socket.on('latestStats', (data) => { this.averageStats = data })
-      this.socket.on('stats', async (data) => {
-        for (let [key, value] of Object.entries(data)) {
-          this[key] = value // populate data
-        }
-        this.timestamp = Date.now()
-        this.isLoaded = true
-
-        this.title = await this.generateTitle(data.status, data.rawStatus);
-        this.rawStatus = data.rawStatus;
-        this.game = data.game;
-      })
-    }
   })
 </script>
 
