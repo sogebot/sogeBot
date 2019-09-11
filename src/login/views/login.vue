@@ -1,8 +1,19 @@
 <template>
-  <b-container class="border border-danger center p-5 bg-dark">
-    <h3 class="text-danger" v-if="error === 'must+be+caster'">
-      User must be caster to have access to dashboard
-    </h3>
+  <b-container class="center p-5 text-center">
+    <h4 class="text-danger" v-if="error === 'must+be+caster'">
+      <fa icon="skull-crossbones" fixed-width size="4x"/>
+      <div>Insufficient permission.</div>
+    </h4>
+    <h4 class="text-success" v-if="error === 'logged+out'">
+      <fa icon="check-circle" fixed-width size="4x"/>
+      <div>You have successfully logged out.</div>
+      <b-btn variant="success" class="mt-3" @click="login">Login</b-btn>
+    </h4>
+    <h4 class="text-danger" v-if="error === 'popout+must+be+logged'">
+      <fa icon="skull-crossbones" fixed-width size="4x"/>
+      <div>Cannot access without login.</div>
+      <b-btn variant="secondary" class="mt-3" @click="goBack">Try again</b-btn>
+    </h4>
   </b-container>
 </template>
 
@@ -12,9 +23,20 @@ import { Vue, Component } from 'vue-property-decorator';
 @Component({})
 export default class Login extends Vue {
   error: null | string = null;
+  popoutUrl: null | string = null;
 
   get url() {
     return window.location.origin;
+  }
+
+  goBack() {
+    if (this.popoutUrl) {
+      window.location.replace(this.popoutUrl)
+    }
+  }
+
+  login() {
+    window.location.replace('http://oauth.sogebot.xyz/?state=' + this.url)
   }
 
   mounted() {
@@ -24,9 +46,13 @@ export default class Login extends Vue {
       if (error) {
         this.error = error[0].split('=')[1];
       }
+      const url = hash.match(/url=[a-zA-Z0-9+:\/#]*/)
+      if (url) {
+        this.popoutUrl = url[0].split('=')[1];
+      }
     } else {
       // autorefresh
-      window.location.replace('http://oauth.sogebot.xyz/?state=' + this.url);
+      this.login();
     }
   }
 }
@@ -48,9 +74,5 @@ export default class Login extends Vue {
       #333 10px,
       #333 20px
     );
-  }
-  h3 {
-    font-weight: bold;
-    text-transform: uppercase;
   }
 </style>

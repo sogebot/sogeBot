@@ -104,7 +104,7 @@ export default class User extends Vue {
 
   logout() {
     localStorage.setItem('code', '');
-    window.location.replace(window.location.origin + '/login');
+    window.location.replace(window.location.origin + '/login#error=logged+out');
   }
 
   refreshViewer() {

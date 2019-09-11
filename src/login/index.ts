@@ -14,6 +14,16 @@ import momentTimezone from 'moment-timezone';
 import VueMoment from 'vue-moment';
 import urlParam from '../panel/helpers/urlParam';
 
+import { library } from '@fortawesome/fontawesome-svg-core';
+
+import {
+  faCheckCircle, faSkullCrossbones,
+} from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+library.add(faCheckCircle, faSkullCrossbones);
+Vue.component('fa', FontAwesomeIcon);
+Vue.component('font-awesome-icon', FontAwesomeIcon);
+
 Vue.use(VueMoment, {
   moment, momentTimezone,
 });

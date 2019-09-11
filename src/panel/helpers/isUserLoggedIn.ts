@@ -8,7 +8,11 @@ export const isUserLoggedIn = async function (token: string) {
   const code = localStorage.getItem('code') || '';
   if (code.trim().length === 0) {
     console.log('Redirecting, user is not authenticated');
-    window.location.replace(window.location.origin + '/login');
+    if (window.location.href.includes('popout')) {
+      window.location.replace(window.location.origin + '/login#error=popout+must+be+logged#url=' + window.location.href);
+    } else {
+      window.location.replace(window.location.origin + '/login');
+    }
   } else {
     const axiosData = await axios.get(`https://api.twitch.tv/helix/users`, {
       headers: {
@@ -18,7 +22,11 @@ export const isUserLoggedIn = async function (token: string) {
     const data = get(axiosData, 'data.data[0]', null);
     if (data === null) {
       console.log('Redirecting, user code expired');
-      window.location.replace(window.location.origin + '/login');
+      if (window.location.href.includes('popout')) {
+        window.location.replace(window.location.origin + '/login#error=popout+must+be+logged');
+      } else {
+        window.location.replace(window.location.origin + '/login');
+      }
     }
 
     // save userId to db
