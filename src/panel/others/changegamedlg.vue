@@ -86,7 +86,6 @@
 
 <script lang="ts">
   import Vue from 'vue'
-  import io from 'socket.io-client';
   import _ from 'lodash';
 
   import { EventBus } from '../helpers/event-bus';
@@ -98,10 +97,16 @@
   Vue.use(ModalPlugin);
   Vue.component('v-select', vSelect)
 
+  // we are using window.socket to reuse socket from index.html
+  declare global {
+    interface Window {
+      socket: any;
+    }
+  }
+
   export default Vue.extend({
     data: function () {
       const object: {
-        socket: any,
         data: {
           game: string,
           title: string,
@@ -125,7 +130,6 @@
         saveState: -1 | 0 | 1 | 2;
         show: boolean;
       } = {
-        socket: io('/', { query: "token=" + this.token }),
         data: [],
         currentGame: null,
         currentTitle: '',
@@ -167,10 +171,10 @@
         this.selectedTitle = 'current';
         this.newTitle = '';
         this.carouselPage = 0;
-        this.socket.emit('getCachedTags', (data) => {
+        window.socket.emit('getCachedTags', (data) => {
           this.cachedTags = data.filter(o => !o.is_auto);
         })
-        this.socket.emit('getUserTwitchGames');
+        window.socket.emit('getUserTwitchGames');
       },
       handleOk() {
         let title
@@ -187,7 +191,7 @@
           tags: this.currentTags,
         })
         this.saveState = 1
-        this.socket.emit('updateGameAndTitle', {
+        window.socket.emit('updateGameAndTitle', {
           game: this.currentGame,
           title,
           tags: this.currentTags,
@@ -197,7 +201,7 @@
           } else {
             this.saveState = 2;
             this.show = false;
-            this.socket.emit('cleanupGameAndTitle', {
+            window.socket.emit('cleanupGameAndTitle', {
               game: this.currentGame,
               title,
               titles: this.data
@@ -232,7 +236,7 @@
       },
       searchForGame(value) {
         if (value.trim().length !== 0) {
-          this.socket.emit('getGameFromTwitch', value);
+          window.socket.emit('getGameFromTwitch', value);
         } else {
           this.searchForGameOpts = [];
         }
@@ -304,9 +308,9 @@
     },
     mounted() {
       this.init();
-      this.socket.on('sendGameFromTwitch', (data) => this.searchForGameOpts = data);
-      this.socket.on('sendUserTwitchGamesAndTitles', (data) => { this.data = data });
-      this.socket.on('stats', (data) => {
+      window.socket.on('sendGameFromTwitch', (data) => this.searchForGameOpts = data);
+      window.socket.on('sendUserTwitchGamesAndTitles', (data) => { this.data = data });
+      window.socket.on('stats', (data) => {
         if (!this.currentGame) {
           this.currentGame = data.game;
           this.currentTitle = data.status;
@@ -320,7 +324,7 @@
       EventBus.$on('show-game_and_title_dlg', () => {
         this.init();
         this.show = true;
-        this.socket.emit('getUserTwitchGames');
+        window.socket.emit('getUserTwitchGames');
       });
     }
   })
