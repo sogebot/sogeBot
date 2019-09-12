@@ -230,7 +230,8 @@ class Webhooks {
             amount: 0,
             currency: '',
             monthsName: '',
-            message: ''
+            message: '',
+            autohost: false,
           })
 
           // go through all systems and trigger on.follow

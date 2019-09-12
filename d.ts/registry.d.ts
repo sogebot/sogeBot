@@ -36,6 +36,7 @@ declare namespace Registry {
       monthsName: string;
       event: keyof Registry.Alerts.List;
       message: string;
+      autohost: boolean;
     };
 
     export type List = {
