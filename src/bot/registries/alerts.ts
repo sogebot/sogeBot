@@ -45,6 +45,7 @@ class Alerts extends Registry {
       currency: global.currency.mainCurrency,
       monthsName: getLocalizedName(amount, 'core.months'),
       event: opts.event,
+      autohost: true,
       message: ['tips', 'cheers'].includes(opts.event)
         ? messages[Math.floor(Math.random() * messages.length)]
         : '',

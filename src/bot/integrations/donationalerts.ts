@@ -105,6 +105,7 @@ class Donationalerts extends Integration {
           currency: data.currency,
           monthsName: '',
           message: data.message,
+          autohost: false,
         });
 
         if (!data._is_test_alert) {
