@@ -1,6 +1,6 @@
 <template>
   <div class="ml-2 mr-2">
-    <b-dropdown no-caret variant="light" toggle-class="btn-sm p-0 pl-1 pr-1">
+    <b-dropdown no-caret variant="light" toggle-class="btn-sm p-0 pl-1 pr-1" v-if="$loggedUser">
       <template v-slot:button-content>
         <b-img :src="$loggedUser.profile_image_url" rounded="circle" alt="Circle image" style="width:30px;"></b-img>
         {{$loggedUser.login}}
@@ -108,6 +108,9 @@ export default class User extends Vue {
   }
 
   refreshViewer() {
+    if (typeof this.$loggedUser === 'undefined') {
+      return setTimeout(() => this.refreshViewer(), 100);
+    }
     this.socket.emit('findOne.viewer', { where: { id: this.$loggedUser.id }}, (err, viewer) => {
       this.viewer = viewer;
       this.isViewerLoaded = true;
