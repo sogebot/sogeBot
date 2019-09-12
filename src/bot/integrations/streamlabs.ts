@@ -96,6 +96,7 @@ class Streamlabs extends Integration {
           currency: event.currency,
           monthsName: '',
           message: event.message,
+          autohost: false,
         });
 
         // go through all systems and trigger on.tip

@@ -280,7 +280,13 @@ export default class AlertsRegistryOverlays extends Vue {
       if (this.runningAlert === null && alerts.length > 0) {
         const emitData = alerts.shift()
         if (emitData && this.data) {
-          const possibleAlerts = this.data.alerts[emitData.event];
+          let possibleAlerts = this.data.alerts[emitData.event];
+
+          // remove if autohost and autohosts are disabled for alert
+          if (emitData.event === 'hosts' && emitData.autohost) {
+            possibleAlerts = (possibleAlerts as Registry.Alerts.Host[]).filter(o => o.showAutoHost)
+          }
+
           if (possibleAlerts.length > 0) {
             // search for exact variants
             const possibleAlertsWithExactAmount = possibleAlerts.filter(o => {

@@ -337,6 +337,7 @@ class TMI extends Core {
               currency: '',
               monthsName: '',
               message: '',
+              autohost: false,
             });
           }
         }
@@ -362,6 +363,7 @@ class TMI extends Core {
               currency: '',
               monthsName: '',
               message: '',
+              autohost: false,
             });
 
         } else if (message.event === 'SUBSCRIPTION') {
@@ -409,6 +411,15 @@ class TMI extends Core {
 
         global.overlays.eventlist.add(data)
         global.events.fire('hosted', data)
+        global.registries.alerts.trigger({
+          event: 'hosts',
+          name: username,
+          amount: Number(viewers),
+          currency: '',
+          monthsName: '',
+          message: '',
+          autohost,
+        });
       })
     } else {
       throw Error(`This ${type} is not supported`)
@@ -443,6 +454,7 @@ class TMI extends Core {
         currency: '',
         monthsName: '',
         message: '',
+        autohost: false,
       });
 
       // go through all systems and trigger on.sub
@@ -526,6 +538,7 @@ class TMI extends Core {
         currency: '',
         monthsName: commons.getLocalizedName(subCumulativeMonths, 'core.months'),
         message: messageFromUser,
+        autohost: false,
       });
     } catch (e) {
       global.log.error('Error parsing resub event')
@@ -557,6 +570,7 @@ class TMI extends Core {
         currency: '',
         monthsName: '',
         message: '',
+        autohost: false,
       });
     } catch (e) {
       global.log.error('Error parsing subscriptionGiftCommunity event')
@@ -660,6 +674,7 @@ class TMI extends Core {
         currency: '',
         monthsName: '',
         message: messageFromUser,
+        autohost: false,
       });
       if (await global.cache.isOnline()) await global.db.engine.increment('api.current', { key: 'bits' }, { value: parseInt(userstate.bits, 10) })
 
