@@ -26,6 +26,34 @@ describe('Custom Commands - run()', () => {
     await global.db.engine.insert('users', { username: user1.username, id: user1.userId })
   })
 
+  describe.only('\'!test qwerty\' should trigger correct commands', () => {
+    it('create \'!test\' command with $param', async () => {
+      let cmd = await global.db.engine.insert('systems.customcommands', { command: '!test', enabled: true, visible: true })
+      await global.db.engine.insert('systems.customcommands.responses', { cid: String(cmd._id), filter: '', response: '$param by !test command with param', permission: permission.VIEWERS })
+    })
+    it('create \'!test\' command without $param', async () => {
+      let cmd = await global.db.engine.insert('systems.customcommands', { command: '!test', enabled: true, visible: true })
+      await global.db.engine.insert('systems.customcommands.responses', { cid: String(cmd._id), filter: '', response: 'This should not be triggered', permission: permission.VIEWERS })
+    })
+    it('create \'!test qwerty\' command without $param', async () => {
+      let cmd = await global.db.engine.insert('systems.customcommands', { command: '!test qwerty', enabled: true, visible: true })
+      await global.db.engine.insert('systems.customcommands.responses', { cid: String(cmd._id), filter: '', response: 'This should be triggered', permission: permission.VIEWERS })
+    })
+    it('create second \'!test qwerty\' command without $param', async () => {
+      let cmd = await global.db.engine.insert('systems.customcommands', { command: '!test qwerty', enabled: true, visible: true })
+      await global.db.engine.insert('systems.customcommands.responses', { cid: String(cmd._id), filter: '', response: 'This should be triggered as well', permission: permission.VIEWERS })
+    })
+
+    it('run command', async () => {
+      global.systems.customCommands.run({ sender: user1, message: '!test qwerty' })
+      await message.isSentRaw('This should be triggered', user1)
+      await message.isSentRaw('This should be triggered as well', user1)
+      await message.isSentRaw('qwerty by !test command with param', user1)
+      await message.isNotSentRaw('This should not be triggered', user1)
+    })
+
+  })
+
   describe('!cmd with username filter', () => {
     it('create command and response with filter', async () => {
       let cmd = await global.db.engine.insert('systems.customcommands', { command: '!cmd', enabled: true, visible: true })

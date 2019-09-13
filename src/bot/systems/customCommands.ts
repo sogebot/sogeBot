@@ -261,36 +261,47 @@ class CustomCommands extends System {
       return true;
     } // do nothing if it is not a command
     const _responses: Response[] = [];
-    let command: any = {};
+    const commands: {
+      command: any;
+      cmdArray: string[];
+    }[] = [];
     const cmdArray = opts.message.toLowerCase().split(' ');
     for (let i = 0, len = opts.message.toLowerCase().split(' ').length; i < len; i++) {
-      command = await global.db.engine.findOne(this.collection.data, { command: cmdArray.join(' '), enabled: true });
-      if (!_.isEmpty(command)) {
-        break;
+      const db_commands = await global.db.engine.find(this.collection.data, { command: cmdArray.join(' '), enabled: true });
+      for (const command of db_commands) {
+        commands.push({
+          cmdArray: _.cloneDeep(cmdArray),
+          command,
+        });
       }
       cmdArray.pop(); // remove last array item if not found
     }
-    if (Object.keys(command).length === 0) {
+    if (commands.length === 0) {
       return true;
     } // no command was found - return
 
-    // remove found command from message to get param
-    const param = opts.message.replace(new RegExp('^(' + cmdArray.join(' ') + ')', 'i'), '').trim();
-    const count = await incrementCountOfCommandUsage(command.command);
-
-    const responses: Response[] = await global.db.engine.find(this.collection.responses, { cid: String(command._id) });
+    // go through all commands
     let atLeastOnePermissionOk = false;
-    for (const r of _.orderBy(responses, 'order', 'asc')) {
-      if ((await global.permissions.check(opts.sender.userId, r.permission)).access
-          && await this.checkFilter(opts, r.filter)) {
-        _responses.push(r);
-        atLeastOnePermissionOk = true;
-        if (r.stopIfExecuted) {
-          break;
+    for (const command of commands) {
+      // remove found command from message to get param
+      const param = opts.message.replace(new RegExp('^(' + command.cmdArray.join(' ') + ')', 'i'), '').trim();
+      const count = await incrementCountOfCommandUsage(command.command.command);
+      const responses: Response[] = await global.db.engine.find(this.collection.responses, { cid: String(command.command._id) });
+      for (const r of _.orderBy(responses, 'order', 'asc')) {
+        if ((await global.permissions.check(opts.sender.userId, r.permission)).access
+            && await this.checkFilter(opts, r.filter)) {
+          if (param.length > 0 && !r.response.includes('$param')) {
+            continue;
+          }
+          _responses.push(r);
+          atLeastOnePermissionOk = true;
+          if (r.stopIfExecuted) {
+            break;
+          }
         }
       }
+      this.sendResponse(_.cloneDeep(_responses), { param, sender: opts.sender, command: command.command.command, count });
     }
-    this.sendResponse(_.cloneDeep(_responses), { param, sender: opts.sender, command: command.command, count });
     return atLeastOnePermissionOk;
   }
 
