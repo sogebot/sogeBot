@@ -262,7 +262,7 @@ class CustomCommands extends System {
     } // do nothing if it is not a command
     const _responses: Response[] = [];
     const commands: {
-      command: any
+      command: any;
       cmdArray: string[];
     }[] = [];
     const cmdArray = opts.message.toLowerCase().split(' ');
