@@ -315,6 +315,9 @@ class Users extends Core {
 
   async sockets () {
     this.socket.on('connection', (socket) => {
+      socket.on('getNameById', async (id, cb) => {
+        cb(await this.getNameById(id));
+      });
       socket.on('search', async(opts, cb) => {
         const regexp = new RegExp(opts.search, 'i')
         const usersById = await global.db.engine.find('users', { id: { $regex: regexp } })
