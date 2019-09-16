@@ -8,8 +8,8 @@ import Expects from '../expects';
 import { permission } from '../permissions';
 import System from './_interface';
 
-interface Quote {
-  quotedBy: string; id: string; quote: string; tags: string;
+export interface QuoteInterface {
+  quotedBy: string; id: string; quote: string; tags: string; createdAt: number;
 }
 
 class Quotes extends System {
@@ -19,7 +19,7 @@ class Quotes extends System {
   constructor () {
     super();
 
-    this.addMenu({ category: 'manage', name: 'quotes', id: 'quotes/list' });
+    this.addMenu({ category: 'manage', name: 'quotes', id: 'manage/quotes/list' });
   }
 
   @command('!quote add')
@@ -32,7 +32,7 @@ class Quotes extends System {
       let [tags, quote] = new Expects(opts.parameters).argument({ name: 'tags', optional: true, default: 'general', multi: true, delimiter: '' }).argument({ name: 'quote', multi: true, delimiter: '' }).toArray();
       tags = tags.split(',').map((o) => o.trim());
 
-      const quotes: Quote[] = await global.db.engine.find(this.collection.data, {});
+      const quotes: QuoteInterface[] = await global.db.engine.find(this.collection.data, {});
       let id;
       if (!_.isEmpty(quotes)) {
         const maxBy = _.maxBy(quotes, 'id');
@@ -43,7 +43,7 @@ class Quotes extends System {
         id = 1;
       }
 
-      await global.db.engine.insert(this.collection.data, { id, tags, quote, quotedBy: opts.sender.userId, createdAt: new Date() });
+      await global.db.engine.insert(this.collection.data, { id, tags, quote, quotedBy: opts.sender.userId, createdAt: Date.now() });
 
       const message = await prepare('systems.quotes.add.ok', { id, quote, tags: tags.join(', ') });
       sendMessage(message, opts.sender, opts.attr);
@@ -121,7 +121,7 @@ class Quotes extends System {
     }
 
     if (!_.isNil(id)) {
-      const quote: Quote | undefined = await global.db.engine.findOne(this.collection.data, { id });
+      const quote: QuoteInterface | undefined = await global.db.engine.findOne(this.collection.data, { id });
       if (!_.isEmpty(quote) && typeof quote !== 'undefined') {
         const quotedBy = (await global.users.getUsernamesFromIds([quote.quotedBy]))[quote.quotedBy];
         const message = await prepare('systems.quotes.show.ok', { quote: quote.quote, id: quote.id, quotedBy });
@@ -131,8 +131,8 @@ class Quotes extends System {
         sendMessage(message, opts.sender, opts.attr);
       }
     } else {
-      const quotes: Quote[] = await global.db.engine.find(this.collection.data);
-      const quotesWithTags: Quote[] = [];
+      const quotes: QuoteInterface[] = await global.db.engine.find(this.collection.data);
+      const quotesWithTags: QuoteInterface[] = [];
 
       for (const quote of quotes) {
         if (quote.tags.includes(tag)) {
@@ -141,7 +141,7 @@ class Quotes extends System {
       }
 
       if (quotesWithTags.length > 0) {
-        const quote: Quote | undefined = _.sample(quotesWithTags);
+        const quote: QuoteInterface | undefined = _.sample(quotesWithTags);
         if (typeof quote !== 'undefined') {
           const quotedBy = (await global.users.getUsernamesFromIds([quote.quotedBy]))[quote.quotedBy];
           const message = await prepare('systems.quotes.show.ok', { quote: quote.quote, id: quote.id, quotedBy });

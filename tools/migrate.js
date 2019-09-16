@@ -32,6 +32,17 @@ const end = function (updated) {
 }
 
 const migration = {
+  5: async () => {
+    header('Update quotes datetime to timestamp')
+    let updated = 0;
+
+    const quotes = await global.db.engine.find('systems.quotes')
+    for (const quote of quotes) {
+      await global.db.engine.update('systems.quotes', { _id: String(quote._id) }, { createdAt: new Date(quote.createdAt).getTime() });
+      updated++;
+    }
+    end(updated)
+  },
   4: async () => {
     header('Update moderation settings to __permission_based__')
     let updated = 0;

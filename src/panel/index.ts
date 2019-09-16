@@ -120,6 +120,7 @@ const main = async () => {
       { path: '/manage/events/edit/:id?', name: 'EventsManagerEdit', component: () => import('./views/managers/events/edit.vue') },
       { path: '/manage/keywords/', redirect: '/manage/keywords/list' },
       { path: '/manage/keywords/list', name: 'KeywordsManagerList', component: () => import('./views/managers/keywords/keywords-list.vue') },
+      { path: '/manage/quotes/list', name: 'QuotesManagerList', component: () => import('./views/managers/quotes/quotes-list.vue') },
       { path: '/manage/keywords/edit/:id?', name: 'KeywordsManagerEdit', component: () => import('./views/managers/keywords/keywords-edit.vue') },
 
       { path: '/settings/permissions/:id?', name: 'PermissionsSettings', component: () => import('./views/settings/permissions.vue') },
