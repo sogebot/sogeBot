@@ -13,7 +13,7 @@
             {{ search }}
           </template>
         </span>
-        <div class="text-right" style="float:right" v-if="quotes.length > 0">
+        <div class="text-right" style="float:right" v-if="quotesFromDb.length > 0">
           <strong>{{ translate('systems.quotes.tag-filter') }}</strong>
           <span class="border-0 bg-light widget p-1" style="height: auto; line-height: 3rem; word-break: break-all;">
             <span v-for="tag of tags"
@@ -35,10 +35,10 @@
 
     <loading v-if="state.loading === $state.progress || state.settings === $state.progress" />
     <b-alert show variant="danger" v-else-if="state.loading === $state.success && state.settings === $state.success && quotes.length === 0 && search.length > 0">
-      <fa icon="search"/> <span v-html="translate('registry.alerts.emptyAfterSearch').replace('$search', search)"/>
+      <fa icon="search"/> <span v-html="translate('systems.quotes.emptyAfterSearch').replace('$search', search)"/>
     </b-alert>
     <b-alert show v-else-if="state.loading === $state.success && state.settings === $state.success && quotes.length === 0">
-      {{translate('registry.alerts.empty')}}
+      {{translate('systems.quotes.empty')}}
     </b-alert>
     <b-table v-else :fields="fields" :items="quotes" hover small style="cursor: pointer;" @row-clicked="linkTo($event)">
       <template slot="createdAt" slot-scope="data">
@@ -54,7 +54,7 @@
           <button-with-icon class="btn-only-icon btn-primary btn-reverse" icon="edit" v-bind:href="'#/manage/quotes/edit/' + data.item.id">
             {{ translate('dialog.buttons.edit') }}
           </button-with-icon>
-          <hold-button @trigger="del(data.item.id)" icon="trash" class="btn-danger btn-reverse btn-only-icon">
+          <hold-button @trigger="deleteQuote(data.item.id)" icon="trash" class="btn-danger btn-reverse btn-only-icon">
             <template slot="title">{{translate('dialog.buttons.delete')}}</template>
             <template slot="onHoldTitle">{{translate('dialog.buttons.hold-to-delete')}}</template>
           </hold-button>
@@ -75,7 +75,6 @@ import { getUsernameById } from '../../../helpers/userById';
 @Component({
   components: {
     'loading': () => import('../../../components/loading.vue'),
-    //'text-with-tags': textWithTags
   },
   filters: {
     capitalize(value) {
@@ -128,22 +127,33 @@ export default class quotesList extends Vue {
   };
 
   get quotes() {
-    if (this.filteredTags.length === 0) return this.quotesFromDb
-    else {
-      let quotes: QuoteInterface[] = []
+    let quotesFilteredBySearch: QuoteInterface[] = []
+    if (this.search.trim().length > 0) {
       for (let quote of this.quotesFromDb) {
+        if (quote.quote.toLowerCase().includes(this.search)) {
+          quotesFilteredBySearch.push(quote);
+        }
+      }
+     } else {
+       quotesFilteredBySearch = this.quotesFromDb;
+     }
+
+    if (this.filteredTags.length === 0) return quotesFilteredBySearch
+    else {
+      let quotesFilteredByTags: QuoteInterface[] = []
+      for (let quote of quotesFilteredBySearch) {
         for (let tag of quote.tags) {
           if (this.filteredTags.includes(tag)) {
-            quotes.push(quote)
+            quotesFilteredByTags.push(quote);
             break
           }
         }
       }
-      return quotes
+      return quotesFilteredByTags
     }
   }
   get tags() {
-    let tags: string[] = []
+    let tags: string[][] = []
     for (let quote of this.quotesFromDb) tags.push(quote.tags)
     return _(tags).flatten().uniq().orderBy().value()
   }
@@ -154,12 +164,12 @@ export default class quotesList extends Vue {
 
   deleteQuote(id) {
     this.quotesFromDb = this.quotes.filter((o) => o.id !== id)
-    this.socket.emit('delete', {_id: id})
+    this.socket.emit('delete', {id})
   }
 
   linkTo(item) {
     console.debug('Clicked', item.id);
-    this.$router.push({ name: 'quotesEdit', params: { id: item.id } });
+    this.$router.push({ name: 'QuotesManagerEdit', params: { id: item.id } });
   }
 }
 </script>

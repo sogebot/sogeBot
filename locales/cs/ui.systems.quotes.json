@@ -1,5 +1,8 @@
 {
   "no-quotes-found": "Je nám líto, ale v databázi nebyly nalezeny žádné citace.",
+  "new": "Přidat nový citát",
+  "empty": "Seznam citací je prázdný, vytvořte novou.",
+  "emptyAfterSearch": "Seznam citací je prázdný při hledání \"<strong>$search</strong>\"",
   "quote": {
     "name": "Citát",
     "placeholder": "Nastavte zde svou citaci"

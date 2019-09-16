@@ -7,9 +7,10 @@ import { command, default_permission, settings } from '../decorators';
 import Expects from '../expects';
 import { permission } from '../permissions';
 import System from './_interface';
+import uuid from 'uuid/v4';
 
 export interface QuoteInterface {
-  quotedBy: string; id: string; quote: string; tags: string; createdAt: number;
+  quotedBy: string; id: string; quote: string; tags: string[]; createdAt: number;
 }
 
 class Quotes extends System {
@@ -32,19 +33,8 @@ class Quotes extends System {
       let [tags, quote] = new Expects(opts.parameters).argument({ name: 'tags', optional: true, default: 'general', multi: true, delimiter: '' }).argument({ name: 'quote', multi: true, delimiter: '' }).toArray();
       tags = tags.split(',').map((o) => o.trim());
 
-      const quotes: QuoteInterface[] = await global.db.engine.find(this.collection.data, {});
-      let id;
-      if (!_.isEmpty(quotes)) {
-        const maxBy = _.maxBy(quotes, 'id');
-        if (maxBy) {
-          id = maxBy.id + 1;
-        }
-      } else {
-        id = 1;
-      }
-
+      const id = uuid();
       await global.db.engine.insert(this.collection.data, { id, tags, quote, quotedBy: opts.sender.userId, createdAt: Date.now() });
-
       const message = await prepare('systems.quotes.add.ok', { id, quote, tags: tags.join(', ') });
       sendMessage(message, opts.sender, opts.attr);
     } catch (e) {
