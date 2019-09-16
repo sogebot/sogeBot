@@ -9,8 +9,8 @@ export const getUsernameById = async function (id: string) {
     const username = await new Promise((resolve: (value: string | null) => void) => {
       socket.emit('getNameById', id, (username: string | null) => {
         resolve(username);
-      })
-    })
+      });
+    });
     if (username) {
       cache[id] = username;
       return cache[id];
@@ -20,4 +20,4 @@ export const getUsernameById = async function (id: string) {
   } else {
     return cache[id];
   }
-}
+};
