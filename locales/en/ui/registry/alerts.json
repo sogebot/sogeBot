@@ -2,6 +2,7 @@
   "enabled": "Enabled",
   "empty": "Alerts registry is empty, create new alerts.",
   "emptyAfterSearch": "Alerts registry is empty in searching for \"<strong>$search</strong>\"",
+  "revertcode": "Revert code to defaults",
   "name": {
     "name": "Name",
     "placeholder": "Set name of your alerts"
