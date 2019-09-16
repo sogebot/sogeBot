@@ -205,6 +205,7 @@
         lineNumbers: true,
         line: true,
       }"></codemirror>
+      <b-btn @click="revertCode" variant="primary" class="mt-2 mb-2">{{translate('registry.alerts.revertcode')}}</b-btn>
     </div>
 
     <b-card no-body>
@@ -371,6 +372,16 @@ export default class AlertsEditFollowForm extends Vue {
     data: {
       variantAmount: {required, minValue: minValue(0)},
       messageTemplate: {required},
+    }
+  }
+
+  revertCode() {
+    if (this.customShow === 'css') {
+      this.data.advancedMode[this.customShow] = '';
+    } else if (this.customShow === 'js') {
+      this.data.advancedMode[this.customShow] = textjs;
+    } else if (this.customShow === 'html') {
+      this.data.advancedMode[this.customShow] = text;
     }
   }
 
