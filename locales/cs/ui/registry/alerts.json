@@ -2,6 +2,7 @@
   "enabled": "Status",
   "empty": "Registr alertů je prázdný, vytvořte nový.",
   "emptyAfterSearch": "Registr alertů je prázdný při hledání \"<strong>$search</strong>\"",
+  "revertcode": "Vrátit kód do výchozího stavu",
   "name": {
     "name": "Název",
     "placeholder": "Zadejte název svých alertů"
