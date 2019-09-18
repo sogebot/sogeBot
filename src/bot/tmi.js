@@ -344,49 +344,7 @@ class TMI extends Core {
       })
 
       this.client[type].chat.on('USERNOTICE', message => {
-        if (message.event === 'RAID') {
-          global.log.raid(`${message.parameters.login}, viewers: ${message.parameters.viewerCount}`)
-          global.db.engine.update('cache.raids', { username: message.parameters.login }, { username: message.parameters.login })
-
-          const data = {
-            username: message.parameters.login,
-            viewers: message.parameters.viewerCount,
-            type: 'raid'
-          }
-
-          global.overlays.eventlist.add(data)
-          global.events.fire('raid', data)
-          global.registries.alerts.trigger({
-              event: 'raids',
-              name: message.parameters.login,
-              amount: Number(message.parameters.viewerCount),
-              currency: '',
-              monthsName: '',
-              message: '',
-              autohost: false,
-            });
-
-        } else if (message.event === 'SUBSCRIPTION') {
-          this.subscription(message)
-        } else if (message.event === 'RESUBSCRIPTION') {
-          this.resub(message)
-        } else if (message.event === 'SUBSCRIPTION_GIFT') {
-          this.subgift(message)
-        } else if (message.event === 'SUBSCRIPTION_GIFT_COMMUNITY') {
-          this.subscriptionGiftCommunity(message)
-        } else if (message.event === 'RITUAL') {
-          if (message.parameters.ritualName === 'new_chatter') {
-            if (!global.users.newChattersList.includes(message.tags.username.toLowerCase())) {
-              global.users.newChattersList.push(message.tags.username.toLowerCase())
-              global.db.engine.increment('api.new', { key: 'chatters' }, { value: 1 })
-            }
-          } else {
-            global.log.info('Unknown RITUAL')
-          }
-        } else {
-          global.log.info('Unknown USERNOTICE')
-          global.log.info(JSON.stringify(message))
-        }
+        this.usernotice(message);
       })
 
       this.client[type].chat.on('NOTICE', message => {
@@ -423,6 +381,56 @@ class TMI extends Core {
       })
     } else {
       throw Error(`This ${type} is not supported`)
+    }
+  }
+
+  usernotice(message) {
+    if (message.event === 'RAID') {
+      global.log.raid(`${message.parameters.login}, viewers: ${message.parameters.viewerCount}`)
+      global.db.engine.update('cache.raids', { username: message.parameters.login }, { username: message.parameters.login })
+
+      const data = {
+        username: message.parameters.login,
+        viewers: message.parameters.viewerCount,
+        type: 'raid'
+      }
+
+      global.overlays.eventlist.add(data)
+      global.events.fire('raid', data)
+      global.registries.alerts.trigger({
+          event: 'raids',
+          name: message.parameters.login,
+          amount: Number(message.parameters.viewerCount),
+          currency: '',
+          monthsName: '',
+          message: '',
+          autohost: false,
+        });
+
+    } else if (message.event === 'SUBSCRIPTION') {
+      this.subscription(message)
+    } else if (message.event === 'RESUBSCRIPTION') {
+      this.resub(message)
+    } else if (message.event === 'SUBSCRIPTION_GIFT') {
+      this.subgift(message)
+    } else if (message.event === 'SUBSCRIPTION_GIFT_COMMUNITY') {
+      this.subscriptionGiftCommunity(message)
+    } else if (message.event === 'RITUAL') {
+      if (message.parameters.ritualName === 'new_chatter') {
+        /*
+        Workaround for https://github.com/sogehige/sogeBot/issues/2581
+        TODO: update for tmi-js
+        if (!global.users.newChattersList.includes(message.tags.login.toLowerCase())) {
+          global.users.newChattersList.push(message.tags.login.toLowerCase())
+          global.db.engine.increment('api.new', { key: 'chatters' }, { value: 1 })
+        }
+        */
+      } else {
+        global.log.info('Unknown RITUAL')
+      }
+    } else {
+      global.log.info('Unknown USERNOTICE')
+      global.log.info(JSON.stringify(message))
     }
   }
 
