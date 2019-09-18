@@ -30,18 +30,20 @@
       {{translate('systems.keywords.empty')}}
     </b-alert>
     <b-table v-else striped small :items="fItems" :fields="fields">
-      <div slot="buttons" slot-scope="data" class="text-right">
-        <button-with-icon :class="[ data.item.enabled ? 'btn-success' : 'btn-danger' ]" class="btn-only-icon btn-reverse" icon="power-off" @click="data.item.enabled = !data.item.enabled; update(data.item)">
-          {{ translate('dialog.buttons.' + (data.item.enabled? 'enabled' : 'disabled')) }}
-        </button-with-icon>
-        <button-with-icon class="btn-only-icon btn-primary btn-reverse" icon="edit" v-bind:href="'#/manage/keywords/edit/' + data.item.id">
-          {{ translate('dialog.buttons.edit') }}
-        </button-with-icon>
-        <hold-button @trigger="del(data.item.id)" icon="trash" class="btn-danger btn-reverse btn-only-icon">
-          <template slot="title">{{translate('dialog.buttons.delete')}}</template>
-          <template slot="onHoldTitle">{{translate('dialog.buttons.hold-to-delete')}}</template>
-        </hold-button>
-      </div>
+      <template v-slot:cell(buttons)="data">
+        <div class="text-right">
+          <button-with-icon :class="[ data.item.enabled ? 'btn-success' : 'btn-danger' ]" class="btn-only-icon btn-reverse" icon="power-off" @click="data.item.enabled = !data.item.enabled; update(data.item)">
+            {{ translate('dialog.buttons.' + (data.item.enabled? 'enabled' : 'disabled')) }}
+          </button-with-icon>
+          <button-with-icon class="btn-only-icon btn-primary btn-reverse" icon="edit" v-bind:href="'#/manage/keywords/edit/' + data.item.id">
+            {{ translate('dialog.buttons.edit') }}
+          </button-with-icon>
+          <hold-button @trigger="del(data.item.id)" icon="trash" class="btn-danger btn-reverse btn-only-icon">
+            <template slot="title">{{translate('dialog.buttons.delete')}}</template>
+            <template slot="onHoldTitle">{{translate('dialog.buttons.hold-to-delete')}}</template>
+          </hold-button>
+        </div>
+      </template>
     </b-table>
   </div>
 </template>

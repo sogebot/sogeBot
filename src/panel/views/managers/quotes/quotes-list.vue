@@ -41,15 +41,15 @@
       {{translate('systems.quotes.empty')}}
     </b-alert>
     <b-table v-else :fields="fields" :items="quotes" hover small style="cursor: pointer;" @row-clicked="linkTo($event)">
-      <template slot="createdAt" slot-scope="data">
+      <template v-slot:cell(createdAt)="data">
         {{ data.item.createdAt | moment('LL')}} {{ data.item.createdAt | moment('LTS') }}
       </template>
 
-      <template slot="tags" slot-scope="data">
+      <template v-slot:cell(tags)="data">
         <span class="p-2 m-1 text-light bg-dark" v-for="tag of data.item.tags" v-bind:key="tag" variant="dark">{{ tag }}</span>
       </template>
 
-      <template slot="buttons" slot-scope="data">
+      <template v-slot:cell(buttons)="data">
         <div class="text-right">
           <button-with-icon class="btn-only-icon btn-primary btn-reverse" icon="edit" v-bind:href="'#/manage/quotes/edit/' + data.item.id">
             {{ translate('dialog.buttons.edit') }}

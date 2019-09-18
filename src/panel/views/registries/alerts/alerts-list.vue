@@ -24,7 +24,7 @@
       {{translate('registry.alerts.empty')}}
     </b-alert>
     <b-table v-else :fields="fields" :items="filtered" hover small style="cursor: pointer;" @row-clicked="linkTo($event)">
-      <template slot="additional-info" slot-scope="data">
+      <template v-slot:cell(additional-info)="data">
         <span :class="{'text-primary': data.item.alerts.follows.length > 0, 'text-muted': data.item.alerts.follows.length === 0}">
           FOLLOW<span v-if="data.item.alerts.follows.length > 0">({{data.item.alerts.follows.length}})</span>
         </span>
@@ -50,7 +50,7 @@
           TIPS<span v-if="data.item.alerts.tips.length > 0">({{data.item.alerts.tips.length}})</span>
         </span>
       </template>
-      <template slot="buttons" slot-scope="data">
+      <template v-slot:cell(buttons)="data">
         <div class="text-right">
           <button-with-icon
             :text="'/overlays/alerts/' + data.item.id"
