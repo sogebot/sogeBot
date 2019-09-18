@@ -117,7 +117,7 @@
           <b-card no-body>
             <b-tabs card vertical pills content-class="col-9" nav-wrapper-class="col-3" nav-class="p-0">
               <b-tab :active="idx === 0" v-for="(alert, idx) of item.alerts[event]" :key="event + idx">
-                <template slot="title">
+                <template v-slot:title>
                   <fa icon="exclamation-circle" v-if="!isValid[event][idx]" class="text-danger"/>
                   <fa :icon="['far', 'check-circle']" v-else-if="alert.enabled"/>
                   <fa :icon="['far', 'circle']" v-else/>
@@ -134,16 +134,18 @@
               </b-tab>
 
               <!-- New Tab Button (Using tabs slot) -->
-              <template slot="tabs">
+              <template v-slot:tabs-end>
                 <b-nav-item @click.prevent="newAlert" href="#">
                   <fa icon="plus"/> <b>new alert</b></b-nav-item>
               </template>
 
               <!-- Render this if no tabs -->
-              <div slot="empty" class="text-center text-muted">
-                There are no alerts<br>
-                Create new alert using the <b>+</b> button on left side.
-              </div>
+              <template v-slot:empty>
+                <div class="text-center text-muted">
+                  There are no alerts<br>
+                  Create new alert using the <b>+</b> button on left side.
+                </div>
+              </template>
             </b-tabs>
           </b-card>
         </b-tab>
