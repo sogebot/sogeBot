@@ -18,22 +18,22 @@
 
     <loading v-if="!state.loaded /* State.DONE */" />
     <b-table v-else :fields="fields" :items="filteredVariables">
-      <template slot="description" slot-scope="data">
+      <template v-slot:cell(description)="data">
         <small v-bind:class="{ 'text-muted': !data.value || data.value.length === 0 }">
           {{ data.value && data.value.length !== 0 ? data.value : translate('not-available') }}
         </small>
       </template>
-      <template slot="type" slot-scope="data">
+      <template v-slot:cell(type)="data">
         <div style="font-size: 1.2rem;">
           {{ translate('registry.customvariables.types.' + data.value) }}
         </div>
       </template>
-      <template slot="currentValue" slot-scope="data">
+      <template v-slot:cell(currentValue)="data">
         <small v-bind:class="{ 'text-muted': !data.value || data.value.length === 0 }">
           {{ data.value && data.value.length !== 0 ? data.value : translate('not-available') }}
         </small>
       </template>
-      <template slot="additional-info" slot-scope="data">
+      <template v-slot:cell(additional-info)="data">
         <span v-if="data.item.type === 'eval'">
           <strong>{{ translate('registry.customvariables.run-script') }}:</strong>
           <template v-if="data.item.runEveryTypeValue > 0">
@@ -67,7 +67,7 @@
           <span v-else class="text-danger"><i class="fas fa-exclamation-triangle"></i> Permission not found</span>
         </div>
       </template>
-      <template slot="buttons" slot-scope="data">
+      <template v-slot:cell(buttons)="data">
         <a v-bind:href="'#/registry/customVariables/edit/' + data.item._id" class="btn btn-primary btn-block"><fa icon="edit"/> {{ translate('dialog.buttons.edit') }}</a>
         <button v-if="data.item.type === 'eval'" v-on:click="debouncedRunScript(data.item._id)" class="btn btn-secondary btn-block"><fa icon="cog"/> {{ translate('registry.customvariables.run-script') }}</button>
       </template>

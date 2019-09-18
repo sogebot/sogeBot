@@ -267,13 +267,13 @@
         label-for="history"
       >
         <b-table class="hide-headers" :fields="['time', 'sender', 'newValue']" :items="history" borderless small>
-          <template slot="time" slot-scope="data">
+          <template v-slot:cell(time)="data">
             {{data.item.timestamp | moment('LL')}} {{ data.item.timestamp | moment('LTS') }}
           </template>
-          <template slot="sender" slot-scope="data">
+          <template v-slot:cell(sender)="data">
             {{ data.value ? data.value : 'Dashboard'}}
           </template>
-          <template slot="newValue" slot-scope="data">
+          <template v-slot:cell(newValue)="data">
             {{ data.item.currentValue }}
           </template>
         </b-table>
