@@ -31,6 +31,24 @@ const end = function (updated) {
 };
 
 const migration = {
+  8: async () => {
+    header('Add id for polls and update vid in votes');
+    let updated = 0;
+
+    const polls = await global.db.engine.find('systems.polls');
+    for (const poll of polls) {
+      const id = uuidv4();
+      await global.db.engine.update('systems.polls', { _id: String(poll._id) }, { id });
+      updated++;
+
+      const votes = await global.db.engine.find('systems.polls.votes', { vid: String(poll._id) });
+      for (const vote of votes) {
+        updated++;
+        await global.db.engine.update('systems.polls.votes', { _id: String(vote._id) }, { vid: id });
+      }
+    }
+    end(updated);
+  },
   7: async () => {
     header('Add id for dashboard and update dashboardId in widgets');
     let updated = 0;
@@ -46,7 +64,6 @@ const migration = {
         updated++;
         await global.db.engine.update('widgets', { _id: String(widget._id) }, { dashboardId: id });
       }
-
     }
     const mainWidgetsWith0String = await global.db.engine.find('widgets', { dashboardId: '0' });
     const mainWidgetsWith0Number = await global.db.engine.find('widgets', { dashboardId: 0 });
