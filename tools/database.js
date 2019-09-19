@@ -45,11 +45,11 @@ if (!availableDbs.includes(argv.to)) {
   return console.error('Error: From database ' + argv.from + ' is not supported - available options: ' + availableDbs.join(', '));
 }
 if ((argv.from === 'nedb') && (!fs.existsSync('./db') || (!fs.existsSync('./db/nedb')))) {
-return console.error('Error: no NeDB directory was found')
-;};
+  return console.error('Error: no NeDB directory was found');
+};
 if ((argv.from === 'mongodb' || argv.to === 'mongodb') && !argv.mongoUri) {
-return console.error('Error: --mongoUri needs to be defined for MongoDB')
-;};
+  return console.error('Error: --mongoUri needs to be defined for MongoDB');
+};
 
 // NeDB prerequisites
 if (argv.to === 'nedb') {
@@ -84,8 +84,8 @@ const to = new (require('../dest/databases/database'))(false, false, argv.to, db
 
 async function main() {
   if (!from.engine.connected || !to.engine.connected) {
-return setTimeout(() => main(), 10)
-;};
+    return setTimeout(() => main(), 10);
+  };
 
   console.log('Info: Databases connections established');
   const key = '_id';
@@ -99,10 +99,10 @@ return setTimeout(() => main(), 10)
     // remove tables from collections
     const idx = collections.indexOf(table);
     if (idx > -1) {
-      collections.splice(idx, 1); 
-} else {
-console.log(table + ' not found');
-};
+      collections.splice(idx, 1);
+    } else {
+      console.log(table + ' not found');
+    };
 
     const items = await from.engine.find(table, {});
     for (const item of items) {
@@ -110,8 +110,8 @@ console.log(table + ' not found');
       const newItem = await to.engine.insert(table, item);
 
       if (typeof mappings[table] === 'undefined') {
-mappings[table] = []
-;};
+        mappings[table] = [];
+      };
       mappings[table].push({
         oldId: _id,
         newId: String(newItem._id),
@@ -140,8 +140,8 @@ mappings[table] = []
         const _id = String(item[key]); delete item._id;
         const oldId = item[key];
         if (typeof item[key] === 'undefined') {
-continue
-;};
+          continue;
+        };
 
         if (typeof mappings[k] !== 'undefined') {
           const mapping = mappings[k].find(o => o.oldId === oldId);
