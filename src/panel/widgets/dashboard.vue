@@ -106,7 +106,7 @@ export default {
       const grid = $('.grid-stack-for-board-' + dashboardId).data('gridstack')
       if (grid) grid.destroy(true)
       this.dashboards = this.dashboards.filter(o => String(o.id) !== dashboardId)
-      this.currentDashboard = 0
+      this.currentDashboard = null
     },
     addWidget: function (event) {
       event.dashboardId = String(event.dashboardId)

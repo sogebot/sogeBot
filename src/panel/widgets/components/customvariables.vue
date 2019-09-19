@@ -29,7 +29,7 @@
             </div>
             <template v-if="variable.type === 'text'">
               <number-or-text
-                v-bind:id="String(variable._id)"
+                v-bind:id="variable.id"
                 v-bind:value="variable.currentValue"
                 type="text"
                 v-on:update="onUpdate">
@@ -41,14 +41,14 @@
             </template>
             <template v-else-if="variable.type ==='number'">
               <number-or-text
-                v-bind:id="String(variable._id)"
+                v-bind:id="variable.id"
                 v-bind:value="variable.currentValue"
                 type="number"
                 v-on:update="onUpdate">
               </number-or-text>
             </template>
             <template v-else-if="variable.type ==='options'">
-              <select class="form-control" v-model="variable.currentValue" v-on:change="onUpdate(String(variable._id), variable.currentValue)">
+              <select class="form-control" v-model="variable.currentValue" v-on:change="onUpdate(variable.id, variable.currentValue)">
                 <option
                   v-for="option of variable.usableOptions.split(',').map((o) => o.trim())"
                   v-bind:key="option"
@@ -64,7 +64,7 @@
       <div role="tabpanel" class="tab-pane" id="customvariables-settings">
         <span v-if="nonWatchedVariablesCount > 0">
           <select class="form-control" v-model="selectedVariable">
-            <option v-bind:value="String(variable._id)" :key="String(variable._id)" v-for="variable of nonWatchedVariables">{{ variable.variableName }}</option>
+            <option v-bind:value="variable.id" :key="variable.id" v-for="variable of nonWatchedVariables">{{ variable.variableName }}</option>
           </select>
           <button class="btn btn-block btn-primary" v-on:click="addToWatch(selectedVariable)">{{ commons.translate('widgets.customvariables.add-variable-into-watchlist') }}</button>
         </span>
@@ -176,7 +176,7 @@ export default {
     watchedVariables: function () {
       let watched = []
       for (let variable of this.variables) {
-        let filtered = this.watched.filter((o) => o.variableId === String(variable._id))
+        let filtered = this.watched.filter((o) => o.variableId === variable.id)
         if (filtered.length !== 0) {
           variable.order = filtered[0].order
           watched.push(variable)
@@ -187,7 +187,7 @@ export default {
     nonWatchedVariables: function () {
       let nonWatched = []
       for (let variable of this.variables) {
-        let filtered = this.watched.filter((o) => o.variableId === String(variable._id))
+        let filtered = this.watched.filter((o) => o.variableId === variable.id)
         if (filtered.length === 0) nonWatched.push(variable)
       }
       return nonWatched
