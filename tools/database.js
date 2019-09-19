@@ -88,36 +88,6 @@ async function main() {
     }
   }
 
-  // # update second part of relationship with new ids
-  for (const k of Object.keys(relationships)) {
-    for (const [table, key] of relationships[k].map((o) => o.split('|'))) {
-      console.log('RemappingTable: ' + table);
-      const items = await to.engine.find(table, {});
-      for (const item of items) {
-        const _id = String(item[key]); delete item._id;
-        const oldId = item[key];
-        if (typeof item[key] === 'undefined') {
-          continue;
-        };
-
-        if (typeof mappings[k] !== 'undefined') {
-          const mapping = mappings[k].find(o => o.oldId === oldId);
-          if (typeof oldId === 'object') {
-            console.log('     IncorrectKeyFormat[' + key + ']: ' + typeof oldId);
-            await to.engine.remove(table, { _id: String(item._id) }, item);
-          } else if (mapping) {
-            console.log('     Remapping: ' + oldId + ' => ' + mapping.newId);
-            item[key] = mapping.newId;
-            await to.engine.update(table, { [key]: _id }, item);
-          } else {
-            console.log('     NotFound[' + key + ']: ' + oldId);
-            await to.engine.remove(table, { [key]: _id }, item);
-          }
-        }
-      }
-    }
-  }
-
   console.log('Info: Completed');
   process.exit();
 };
