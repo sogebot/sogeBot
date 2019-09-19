@@ -25,9 +25,6 @@ const relationships = {
     'custom.variables.watch|variableId',
     'custom.variables.history|cvarId'
   ],
-  'dashboards': [
-    'widgets|dashboardId'
-  ],
   'systems.customcommands': [
     'systems.customcommands.responses|cid'
   ],

@@ -5,8 +5,8 @@
       v-for="board of dashboards"
       v-bind:key="board.createdAt"
       class="btn btn-sm"
-      :class="[currentDashboard === String(board._id) ? 'btn-primary' : 'btn-outline-primary border-0']"
-      @click="currentDashboard = String(board._id)">{{board.name}}</button>
+      :class="[currentDashboard === board.id ? 'btn-primary' : 'btn-outline-primary border-0']"
+      @click="currentDashboard = board.id">{{board.name}}</button>
     <button type="button" class="btn btn-sm btn-outline-primary border-0" v-if="!addDashboard" @click="addDashboard = true">
       <fa icon='plus-square'></fa>
     </button>
@@ -30,12 +30,12 @@
       v-for="board of dashboards"
       v-bind:key="board.createdAt">
       <div class="grid-stack"
-        :class="[ 'grid-stack-for-board-' + String(board._id) ]"
+        :class="[ 'grid-stack-for-board-' + board.id ]"
         v-if="show"
-        v-show="currentDashboard === String(board._id)">
+        v-show="currentDashboard === board.id">
         <template v-for="item in items">
           <div :key="item.id"
-            v-if="item.dashboardId === String(board._id)"
+            v-if="item.dashboardId === board.id"
             v-bind:id="'widget-' + item.id"
             v-bind:data-dashboardId="item.dashboardId"
             v-bind:data-gs-x="item.position.x"
@@ -87,7 +87,7 @@ export default {
     return {
       dashboardName: '',
       addDashboard: false,
-      currentDashboard: '0',
+      currentDashboard: null,
       show: true,
       isLoaded: false,
       loaded: 0
@@ -105,7 +105,7 @@ export default {
     removeDashboard: function (dashboardId) {
       const grid = $('.grid-stack-for-board-' + dashboardId).data('gridstack')
       if (grid) grid.destroy(true)
-      this.dashboards = this.dashboards.filter(o => String(o._id) !== dashboardId)
+      this.dashboards = this.dashboards.filter(o => String(o.id) !== dashboardId)
       this.currentDashboard = 0
     },
     addWidget: function (event) {
@@ -113,8 +113,8 @@ export default {
       const grid = $('.grid-stack-for-board-' + event.dashboardId).data('gridstack')
       if (grid) grid.destroy(true)
 
-      const dashboard = _.cloneDeep(this.dashboards.find(o => String(o._id) === event.dashboardId))
-      this.dashboards = this.dashboards.filter(o => String(o._id) !== event.dashboardId)
+      const dashboard = _.cloneDeep(this.dashboards.find(o => String(o.id) === event.dashboardId))
+      this.dashboards = this.dashboards.filter(o => String(o.id) !== event.dashboardId)
       this.$nextTick(() => {
         this.dashboards.push(dashboard)
         this.dashboards = _.orderBy(this.dashboards, 'createdAt', 'asc')
