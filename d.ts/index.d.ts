@@ -302,6 +302,7 @@ interface Vote {
 
 interface Poll {
   _id?: any;
+  id: string;
   type: 'tips' | 'bits' | 'normal';
   title: string;
   isOpened: boolean;

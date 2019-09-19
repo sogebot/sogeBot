@@ -69,7 +69,7 @@
               </div>
             </div>
           </template>
-          <div class="card mb-3 p-0 border" v-else v-bind:key="String(vote._id)" :class="[vote.isOpened ? 'border-info' : '']">
+          <div class="card mb-3 p-0 border" v-else v-bind:key="vote.id" :class="[vote.isOpened ? 'border-info' : '']">
             <div class="text-info current" v-if="vote.isOpened">
               <fa icon="spinner" spin />
                 {{ translate('systems.polls.running') }}
@@ -98,7 +98,7 @@
                 :class="[index === 0 ? 'first' : '', index === vote.options.length - 1 ? 'last': '']">
                 <div class="d-flex" style="width:100%">
                   <div class="w-100">{{option}}</div>
-                  <div class="text-right w-100 percentage">{{getPercentage(String(vote._id), index, 1)}}%</div>
+                  <div class="text-right w-100 percentage">{{getPercentage(vote.id, index, 1)}}%</div>
                 </div>
                 <div class="pb-2" style="width:100%;">
                   <div class="progress">
@@ -107,7 +107,7 @@
                         vote.isOpened ? 'progress-bar-animated' : ''
                       ]"
                       :style="{
-                        'width': getPercentage(String(vote._id), index, 1) === 0 ? '5px' : getPercentage(String(vote._id), index, 1) + '%'
+                        'width': getPercentage(vote.id, index, 1) === 0 ? '5px' : getPercentage(vote.id, index, 1) + '%'
                       }"></div>
                   </div>
                 </div>
@@ -117,21 +117,21 @@
               <div class="d-flex">
                 <div style="width: 100%">
                   {{ translate('systems.polls.totalVotes') }}
-                  <strong v-if="vote.type !== 'tips'">{{ totalVotes(String(vote._id)) }}</strong>
-                  <strong v-else>{{ Number(totalVotes(String(vote._id))).toFixed(1) }}</strong>
+                  <strong v-if="vote.type !== 'tips'">{{ totalVotes(vote.id) }}</strong>
+                  <strong v-else>{{ Number(totalVotes(vote.id)).toFixed(1) }}</strong>
                 </div>
-                <div style="width: 100%" v-if="vote.isOpened">{{ translate('systems.polls.activeFor') }} <strong>{{ activeTime(String(vote._id)) | duration('humanize') }}</strong></div>
+                <div style="width: 100%" v-if="vote.isOpened">{{ translate('systems.polls.activeFor') }} <strong>{{ activeTime(vote.id) | duration('humanize') }}</strong></div>
                 <div style="width: 100%" v-else>{{ translate('systems.polls.closedAt') }} <strong>{{ vote.closedAt | moment('LLL') }}</strong></div>
               </div>
             </div>
             <div class="card-footer">
               <template v-if="vote.isOpened">
-                <button type="button" class="btn btn-block btn-danger" @click="stop(String(vote._id))">
+                <button type="button" class="btn btn-block btn-danger" @click="stop(vote.id)">
                   <fa icon='stop'></fa> {{ translate('systems.polls.stop') }}
                 </button>
               </template>
               <template v-else>
-                <button type="button" class="btn btn-block btn-info" style="white-space: normal;" :disabled="isRunning" @click="copy(String(vote._id))">
+                <button type="button" class="btn btn-block btn-info" style="white-space: normal;" :disabled="isRunning" @click="copy(vote.id)">
                   <fa icon='clone'></fa>
                   <template v-if="isRunning">{{ translate('systems.polls.cannotCopyIfInProgress') }}</template>
                   <template v-else>{{ translate('systems.polls.copy') }}</template>
@@ -161,6 +161,7 @@
   require('moment/locale/ru')
 
   import io from 'socket.io-client';
+import uuid from 'uuid'
 
   Vue.use(VueMoment, {
       moment, momentTimezone
@@ -189,6 +190,7 @@
         isMounted: false,
         domWidth: 0,
         newVote: {
+          id: uuid(),
           type: 'normal',
           title: '',
           isOpened: true,
@@ -272,6 +274,7 @@
             else {
               this.refresh();
               this.newVote = {
+                id: uuid(),
                 type: 'normal',
                 title: '',
                 isOpened: true,
@@ -282,10 +285,10 @@
           })
       },
       copy: function (vid) {
-        const vote = this.votes.find(o => typeof o !== 'string' && String(o._id) === vid);
+        const vote = this.votes.find(o => typeof o !== 'string' && o.id === vid);
         if (typeof vote === 'object') {
           let newVote = this._.cloneDeep(vote)
-          delete newVote._id;
+          delete newVote._id; newVote.id = uuid();
 
           for (let i = 0, length = newVote.options.length; i < 5 - length; i++) {
             newVote.options.push('')
@@ -295,7 +298,7 @@
         }
       },
       stop: function (vid) {
-        let vote = this.votes.find(o => typeof o !== 'string' && String(o._id) === vid)
+        let vote = this.votes.find(o => typeof o !== 'string' && o.id === vid)
         if (typeof vote === 'object') {
           vote.isOpened = false;
           vote.closedAt = Date.now();
@@ -313,7 +316,7 @@
         return totalVotes
       },
       activeTime: function (vid) {
-        const vote = this.votes.find(o => typeof o !== 'string' && String(o._id) === vid);
+        const vote = this.votes.find(o => typeof o !== 'string' && o.id === vid);
         if (typeof vote === 'object') {
           return this.currentTime - (new Date(vote.openedAt)).getTime();
         } else {
