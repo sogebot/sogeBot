@@ -13,7 +13,7 @@ describe('Timers - toggle()', () => {
     await db.cleanup()
     await message.prepare()
     const id = uuid()
-    let timer = await global.db.engine.insert(global.systems.timers.collection.data, { id, name: 'test', messages: 0, seconds: 60, enabled: true, trigger: { messages: global.linesParsed, timestamp: new Date().getTime() } })
+    await global.db.engine.insert(global.systems.timers.collection.data, { id, name: 'test', messages: 0, seconds: 60, enabled: true, trigger: { messages: global.linesParsed, timestamp: new Date().getTime() } })
     await global.db.engine.insert(global.systems.timers.collection.responses, { response: 'Lorem Ipsum', timerId: id, enabled: true })
   })
 
