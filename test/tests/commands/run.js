@@ -21,7 +21,7 @@ const user1 = { username: 'user1', userId: Math.random() }
 describe('Custom Commands - run()', () => {
   before(async () => {
     await db.cleanup()
-    await message.prepare()
+    message.prepare()
 
     await global.db.engine.insert('users', { username: owner.username, id: owner.userId })
     await global.db.engine.insert('users', { username: user1.username, id: user1.userId })
