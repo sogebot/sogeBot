@@ -35,7 +35,7 @@ class INeDB extends Interface {
     if (!Array.isArray(opts)) opts = [opts]
     for (const o of opts) {
       o.unique = o.unique || false
-      if (!o.index) throw new Error('Missing index option')
+      if (!o.index) throw new Error(`Missing index option for ${table}`)
       await this.on(table).ensureIndex({ fieldName: o.index, unique: o.unique })
     }
   }
