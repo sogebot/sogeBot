@@ -37,9 +37,11 @@ class Quotes extends System {
       await global.db.engine.insert(this.collection.data, { id, tags, quote, quotedBy: opts.sender.userId, createdAt: Date.now() });
       const message = await prepare('systems.quotes.add.ok', { id, quote, tags: tags.join(', ') });
       sendMessage(message, opts.sender, opts.attr);
+      return { id, quote, tags };
     } catch (e) {
       const message = await prepare('systems.quotes.add.error', { command: opts.command });
       sendMessage(message, opts.sender, opts.attr);
+      return {};
     }
   }
 

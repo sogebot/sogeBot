@@ -6,7 +6,7 @@ if (!isMainThread) process.exit()
 
 
 require('../../general.js')
-import uuid from 'uuid/v4'
+const uuid = require('uuid/v4')
 
 const db = require('../../general.js').db
 const message = require('../../general.js').message
@@ -27,7 +27,7 @@ describe('Custom Commands - run()', () => {
     await global.db.engine.insert('users', { username: user1.username, id: user1.userId })
   })
 
-  describe.only('\'!test qwerty\' should trigger correct commands', () => {
+  describe('\'!test qwerty\' should trigger correct commands', () => {
     it('create \'!test\' command with $param', async () => {
       let cmd = await global.db.engine.insert('systems.customcommands', { id: uuid(), command: '!test', enabled: true, visible: true })
       await global.db.engine.insert('systems.customcommands.responses', { cid: cmd.id, filter: '', response: '$param by !test command with param', permission: permission.VIEWERS })

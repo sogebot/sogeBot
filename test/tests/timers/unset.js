@@ -7,6 +7,7 @@ if (!isMainThread) process.exit()
 
 const assert = require('chai').assert
 require('../../general.js')
+const uuid = require('uuid/v4')
 
 const db = require('../../general.js').db
 const message = require('../../general.js').message
@@ -18,7 +19,7 @@ describe('Timers - unset()', () => {
   beforeEach(async () => {
     await db.cleanup()
     await message.prepare()
-    await global.db.engine.insert(global.systems.timers.collection.data, { name: 'test', messages: 0, seconds: 60, enabled: true, trigger: { messages: global.linesParsed, timestamp: new Date().getTime() } })
+    await global.db.engine.insert(global.systems.timers.collection.data, { id: uuid(), name: 'test', messages: 0, seconds: 60, enabled: true, trigger: { messages: global.linesParsed, timestamp: new Date().getTime() } })
   })
 
   it('', async () => {

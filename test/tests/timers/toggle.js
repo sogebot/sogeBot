@@ -2,6 +2,7 @@
 require('../../general.js')
 
 const db = require('../../general.js').db
+const uuid = require('uuid/v4')
 const message = require('../../general.js').message
 
 // users
@@ -11,8 +12,9 @@ describe('Timers - toggle()', () => {
   beforeEach(async () => {
     await db.cleanup()
     await message.prepare()
-    let timer = await global.db.engine.insert(global.systems.timers.collection.data, { name: 'test', messages: 0, seconds: 60, enabled: true, trigger: { messages: global.linesParsed, timestamp: new Date().getTime() } })
-    await global.db.engine.insert(global.systems.timers.collection.responses, { response: 'Lorem Ipsum', timerId: timer._id, enabled: true })
+    const id = uuid()
+    await global.db.engine.insert(global.systems.timers.collection.data, { id, name: 'test', messages: 0, seconds: 60, enabled: true, trigger: { messages: global.linesParsed, timestamp: new Date().getTime() } })
+    await global.db.engine.insert(global.systems.timers.collection.responses, { response: 'Lorem Ipsum', timerId: id, enabled: true })
   })
 
   it('', async () => {

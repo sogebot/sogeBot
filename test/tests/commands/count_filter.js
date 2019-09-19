@@ -6,6 +6,7 @@ if (!isMainThread) process.exit()
 
 
 require('../../general.js')
+const uuid = require('uuid/v4')
 
 const db = require('../../general.js').db
 const message = require('../../general.js').message
@@ -29,8 +30,8 @@ describe('Custom Commands - count filter', () => {
 
   describe('$count(\'!cmd2\') should be properly parsed', () => {
     it('create command and response with $count variable', async () => {
-      let cmd = await global.db.engine.insert('systems.customcommands', { command: '!cmd', enabled: true, visible: true })
-      await global.db.engine.insert('systems.customcommands.responses', { cid: String(cmd._id), filter: '', response: 'Count of !cmd2 is $count(\'!cmd2\') and count of !second $count(\'!second\')', permission: permission.VIEWERS })
+      let cmd = await global.db.engine.insert('systems.customcommands', { id: uuid(), command: '!cmd', enabled: true, visible: true })
+      await global.db.engine.insert('systems.customcommands.responses', { cid: cmd.id, filter: '', response: 'Count of !cmd2 is $count(\'!cmd2\') and count of !second $count(\'!second\')', permission: permission.VIEWERS })
     })
 
     it('create command to increment count', async () => {
@@ -59,8 +60,8 @@ describe('Custom Commands - count filter', () => {
 
   describe('$count should be properly parsed', () => {
     it('create command and response with $count variable', async () => {
-      let cmd = await global.db.engine.insert('systems.customcommands', { command: '!cmd3', enabled: true, visible: true })
-      await global.db.engine.insert('systems.customcommands.responses', { cid: String(cmd._id), filter: '', response: 'Command usage count: $count', permission: permission.VIEWERS })
+      let cmd = await global.db.engine.insert('systems.customcommands', { id: uuid(), command: '!cmd3', enabled: true, visible: true })
+      await global.db.engine.insert('systems.customcommands.responses', { cid: cmd.id, filter: '', response: 'Command usage count: $count', permission: permission.VIEWERS })
     })
 
     it('$count should be 1', async () => {

@@ -20,13 +20,6 @@ const argv = require('yargs')
   .epilog('  <database> can be ' + availableDbs.join(', ') + '\n\n!!! WARNING: All data on --to <database> will be erased !!!')
   .argv;
 
-const relationships = {
-  'custom.variables': [
-    'custom.variables.watch|variableId',
-    'custom.variables.history|cvarId',
-  ],
-};
-
 const mappings = {};
 
 if (argv.from.toLowerCase() === argv.to.toLowerCase()) {
@@ -82,37 +75,7 @@ async function main() {
   };
 
   console.log('Info: Databases connections established');
-  const key = '_id';
   const collections = await from.engine.collections();
-
-  // # go through main relationship -> create new ids
-  for (const table of Object.keys(relationships)) {
-
-    await to.engine.remove(table, {});
-    console.log('Process: ' + table);
-    // remove tables from collections
-    const idx = collections.indexOf(table);
-    if (idx > -1) {
-      collections.splice(idx, 1);
-    } else {
-      console.log(table + ' not found');
-    };
-
-    const items = await from.engine.find(table, {});
-    for (const item of items) {
-      const _id = String(item[key]); delete item[key];
-      const newItem = await to.engine.insert(table, item);
-
-      if (typeof mappings[table] === 'undefined') {
-        mappings[table] = [];
-      };
-      mappings[table].push({
-        oldId: _id,
-        newId: String(newItem._id),
-      });
-
-    }
-  }
 
   // # go through rest 1:1 collections
   for (const table of collections) {

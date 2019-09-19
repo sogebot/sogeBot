@@ -31,6 +31,30 @@ const end = function (updated) {
 };
 
 const migration = {
+  11: async () => {
+    header('Add id for custom variables and update variableId(watch), cvarId(history)');
+    let updated = 0;
+
+    const commands = await global.db.engine.find('custom.variables');
+    for (const command of commands) {
+      const id = uuidv4();
+      await global.db.engine.update('custom.variables', { _id: String(command._id) }, { id });
+      updated++;
+
+      const watch = await global.db.engine.find('custom.variables.watch', { variableId: String(command._id) });
+      for (const w of watch) {
+        updated++;
+        await global.db.engine.update('custom.variables.watch', { _id: String(w._id) }, { variableId: id });
+      }
+
+      const history = await global.db.engine.find('custom.variables.history', { cvarId: String(command._id) });
+      for (const h of history) {
+        updated++;
+        await global.db.engine.update('custom.variables.history', { _id: String(h._id) }, { cvarId: id });
+      }
+    }
+    end(updated);
+  },
   10: async () => {
     header('Add id for custom commands and update cid in responses');
     let updated = 0;

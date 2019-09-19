@@ -11,6 +11,7 @@ import Expects from '../expects';
 import { getOwner, isBot, isBroadcaster, isModerator, isOwner, isSubscriber, isVIP, message, prepare, sendMessage } from '../commons';
 import { getCountOfCommandUsage, incrementCountOfCommandUsage, resetCountOfCommandUsage } from '../helpers/commands/count';
 import { isMainThread } from 'worker_threads';
+import uuid from 'uuid';
 
 /*
  * !command                                                                 - gets an info about command usage
@@ -240,7 +241,7 @@ class CustomCommands extends System {
       let cDb = await global.db.engine.findOne(this.collection.data, { command });
       if (!cDb.id) {
         cDb = await global.db.engine.insert(this.collection.data, {
-          command, enabled: true, visible: true,
+          command, enabled: true, visible: true, id: uuid(),
         });
       }
 
