@@ -15,6 +15,14 @@ class Alerts extends Registry {
     }
 
     this.socket.on('connection', (socket) => {
+      socket.on('isAlertUpdated', async ({updatedAt, id}: { updatedAt: number; id: string }, cb: (isUpdated: boolean, updatedAt: number) => void) => {
+        const alert = await global.db.engine.findOne(this.collection.data, { id });
+        if (typeof alert.id !== 'undefined') {
+          cb(updatedAt < (alert.updatedAt || 0), alert.updatedAt || 0);
+        } else {
+          cb(false, 0);
+        }
+      });
       socket.on('test', async (event: keyof Registry.Alerts.List) => {
         this.test({ event });
       });

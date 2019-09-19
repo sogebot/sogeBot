@@ -200,6 +200,7 @@ export default class AlertsEdit extends Vue {
 
   item: Registry.Alerts.Alert = {
     id: uuid(),
+    updatedAt: Date.now(),
     name: '',
     alertDelayInMs: 0,
     profanityFilterType: 'replace-with-asterisk',
@@ -474,6 +475,7 @@ export default class AlertsEdit extends Vue {
     this.$v.$touch();
     if (!this.$v.$invalid) {
       this.state.save = this.$state.progress;
+      this.item.updatedAt = Date.now(); // save updateAt
       console.debug('Saving', this.item);
       this.socket.emit('update', { key: 'id', items: [this.item] }, (err, data) => {
         if (err) {

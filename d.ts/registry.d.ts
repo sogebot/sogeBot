@@ -52,6 +52,7 @@ declare namespace Registry {
 
     export type Alert = {
       id: string;
+      updatedAt: number;
       name: string;
       alertDelayInMs: number;
       profanityFilterType: 'disabled' | 'replace-with-asterisk' | 'replace-with-happy-words' | 'hide-messages' | 'disable-alerts';
