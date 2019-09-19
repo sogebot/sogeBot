@@ -31,6 +31,24 @@ const end = function (updated) {
 };
 
 const migration = {
+  10: async () => {
+    header('Add id for custom commands and update cid in responses');
+    let updated = 0;
+
+    const commands = await global.db.engine.find('systems.customcommands');
+    for (const command of commands) {
+      const id = uuidv4();
+      await global.db.engine.update('systems.customcommands', { _id: String(command._id) }, { id });
+      updated++;
+
+      const responses = await global.db.engine.find('systems.customcommands.responses', { cid: String(command._id) });
+      for (const response of responses) {
+        updated++;
+        await global.db.engine.update('systems.customcommands.responses', { _id: String(response._id) }, { cid: id });
+      }
+    }
+    end(updated);
+  },
   9: async () => {
     header('Add id for timers and update timerId in responses');
     let updated = 0;
@@ -259,7 +277,7 @@ const runMigration = async function () {
     return;
   }
   const info = await global.db.engine.find('info');
-  const version = Object.keys(migration).sort().reverse()[0];
+  const version = Object.keys(migration).sort((a,b) => a-b).reverse()[0];
 
   let dbVersion = _.isEmpty(info) || _.isNil(_.find(info, (o) => !_.isNil(o.version)).version)
     ? 0
@@ -303,9 +321,8 @@ if (process.argv[2] && process.argv[2] === '--delete') {
 const updates = async (from, to) => {
   console.info('Performing update from %s to %s', from, to);
   console.info(('-').repeat(56));
-
   for (const key of Object.keys(migration).sort((a,b) => a-b )) {
-    if (key > from) {
+    if (Number(key) > Number(from)) {
       await migration[key]();
     }
   }

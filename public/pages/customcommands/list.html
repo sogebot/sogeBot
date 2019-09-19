@@ -47,7 +47,7 @@
                           style="cursor: pointer"
                           v-for="p of permissions"
                           :key="p.id"
-                          @click="updatePermission(command._id, r._id, p.id)">{{ getPermissionName(p.id) | capitalize }}</a>
+                          @click="updatePermission(command.id, r._id, p.id)">{{ getPermissionName(p.id) | capitalize }}</a>
                     </div>
                   </span>
 
@@ -56,8 +56,8 @@
                       <i class="fas mr-1" :class="[r.stopIfExecuted ? 'fa-stop' : 'fa-play']" aria-hidden="true"></i>
                       {{ commons.translate(r.stopIfExecuted ? 'commons.stop-if-executed' : 'commons.continue-if-executed') | capitalize }}</button>
                     <div class="dropdown-menu">
-                      <a class="dropdown-item" style="cursor: pointer" v-on:click="updateStopIfExecuted(command._id, r._id, true)">{{ commons.translate('commons.stop-if-executed') | capitalize }}</a>
-                      <a class="dropdown-item" style="cursor: pointer" v-on:click="updateStopIfExecuted(command._id, r._id, false)">{{ commons.translate('commons.continue-if-executed') | capitalize }}</a>
+                      <a class="dropdown-item" style="cursor: pointer" v-on:click="updateStopIfExecuted(command.id, r._id, true)">{{ commons.translate('commons.stop-if-executed') | capitalize }}</a>
+                      <a class="dropdown-item" style="cursor: pointer" v-on:click="updateStopIfExecuted(command.id, r._id, false)">{{ commons.translate('commons.continue-if-executed') | capitalize }}</a>
                     </div>
                   </span>
                 </div>
@@ -77,10 +77,10 @@
               </div>
               <div class="col-6 text-right">
                 <div class="btn-group" role="group">
-                  <a v-bind:href="'?id='+ command._id + '#customcommands/edit'" class="btn btn-outline-dark p-3 border-0"><i class="fas fa-pencil-alt mr-1" aria-hidden="true"></i> {{ commons.translate('dialog.buttons.edit') }}</a>
-                  <button v-on:click="command.visible = !command.visible; sendUpdate(command._id)" class="btn btn-outline-dark p-3 border-0"><i class="fas mr-1" v-bind:class="[ command.visible ? 'fa-eye' : 'fa-eye-slash' ]" aria-hidden="true"></i> {{ (command.visible ? commons.translate('visible') : commons.translate('hidden')) | capitalize }}</button>
-                  <button v-on:click="command.enabled = !command.enabled; sendUpdate(command._id)"  class="btn btn-outline-dark p-3 border-0"><i class="fas mr-1"  v-bind:class="[ command.enabled ? 'fa-toggle-on' : 'fa-toggle-off' ]" aria-hidden="true"></i> {{ command.enabled ? commons.translate('enabled') : commons.translate('disabled') }}</button>
-                  <hold-button class="btn-outline-dark p-3 border-0" @trigger="deleteCommand(command._id)" :holdtitle="commons.translate('dialog.buttons.hold-to-delete')" :title="commons.translate('dialog.buttons.delete')" icon="fa-trash"></hold-button>
+                  <a v-bind:href="'?id='+ command.id + '#customcommands/edit'" class="btn btn-outline-dark p-3 border-0"><i class="fas fa-pencil-alt mr-1" aria-hidden="true"></i> {{ commons.translate('dialog.buttons.edit') }}</a>
+                  <button v-on:click="command.visible = !command.visible; sendUpdate(command.id)" class="btn btn-outline-dark p-3 border-0"><i class="fas mr-1" v-bind:class="[ command.visible ? 'fa-eye' : 'fa-eye-slash' ]" aria-hidden="true"></i> {{ (command.visible ? commons.translate('visible') : commons.translate('hidden')) | capitalize }}</button>
+                  <button v-on:click="command.enabled = !command.enabled; sendUpdate(command.id)"  class="btn btn-outline-dark p-3 border-0"><i class="fas mr-1"  v-bind:class="[ command.enabled ? 'fa-toggle-on' : 'fa-toggle-off' ]" aria-hidden="true"></i> {{ command.enabled ? commons.translate('enabled') : commons.translate('disabled') }}</button>
+                  <hold-button class="btn-outline-dark p-3 border-0" @trigger="deleteCommand(command.id)" :holdtitle="commons.translate('dialog.buttons.hold-to-delete')" :title="commons.translate('dialog.buttons.delete')" icon="fa-trash"></hold-button>
                 </div>
               </div>
             </div>
@@ -117,7 +117,7 @@
                           style="cursor: pointer"
                           v-for="p of permissions"
                           :key="p.id"
-                          @click="updatePermission(command._id, r._id, p.id)">{{ getPermissionName(p.id) | capitalize }}</a>
+                          @click="updatePermission(command.id, r._id, p.id)">{{ getPermissionName(p.id) | capitalize }}</a>
                     </div>
                   </span>
 
@@ -126,8 +126,8 @@
                       <i class="fas mr-1" :class="[r.stopIfExecuted ? 'fa-stop' : 'fa-play']" aria-hidden="true"></i>
                       {{ commons.translate(r.stopIfExecuted ? 'commons.stop-if-executed' : 'commons.continue-if-executed') | capitalize }}</button>
                     <div class="dropdown-menu">
-                      <a class="dropdown-item" style="cursor: pointer" v-on:click="updateStopIfExecuted(command._id, r._id, true)">{{ commons.translate('commons.stop-if-executed') | capitalize }}</a>
-                      <a class="dropdown-item" style="cursor: pointer" v-on:click="updateStopIfExecuted(command._id, r._id, false)">{{ commons.translate('commons.continue-if-executed') | capitalize }}</a>
+                      <a class="dropdown-item" style="cursor: pointer" v-on:click="updateStopIfExecuted(command.id, r._id, true)">{{ commons.translate('commons.stop-if-executed') | capitalize }}</a>
+                      <a class="dropdown-item" style="cursor: pointer" v-on:click="updateStopIfExecuted(command.id, r._id, false)">{{ commons.translate('commons.continue-if-executed') | capitalize }}</a>
                     </div>
                   </span>
                 </div>
@@ -137,10 +137,10 @@
             </div>
             <div class="col-md-2">
               <div class="p-0 text-right">
-                <a v-bind:href="'?id='+ command._id + '#customcommands/edit'" v-bind:title="commons.translate('dialog.buttons.edit')" class="btn btn-outline-dark p-1 border-0"><i class="fas fa-pencil-alt m-1" aria-hidden="true"></i></a>
-                <button v-bind:title="(command.visible ? commons.translate('visible') : commons.translate('hidden'))" v-on:click="command.visible = !command.visible; sendUpdate(command._id)" class="btn btn-outline-dark p-1 border-0"><i class="fas m-1" v-bind:class="[ command.visible ? 'fa-eye' : 'fa-eye-slash' ]" aria-hidden="true"></i></button>
-                <button v-bind:title="command.enabled ? commons.translate('enabled') : commons.translate('disabled')" v-on:click="command.enabled = !command.enabled; sendUpdate(command._id)"  class="btn btn-outline-dark p-1 border-0"><i class="fas m-1"  v-bind:class="[ command.enabled ? 'fa-toggle-on' : 'fa-toggle-off' ]" aria-hidden="true"></i></button>
-                <hold-button class="btn-outline-dark p-1 border-0" @trigger="deleteCommand(command._id)" holdtitle="" title="" icon="fa-trash m-1"></hold-button>
+                <a v-bind:href="'?id='+ command.id + '#customcommands/edit'" v-bind:title="commons.translate('dialog.buttons.edit')" class="btn btn-outline-dark p-1 border-0"><i class="fas fa-pencil-alt m-1" aria-hidden="true"></i></a>
+                <button v-bind:title="(command.visible ? commons.translate('visible') : commons.translate('hidden'))" v-on:click="command.visible = !command.visible; sendUpdate(command.id)" class="btn btn-outline-dark p-1 border-0"><i class="fas m-1" v-bind:class="[ command.visible ? 'fa-eye' : 'fa-eye-slash' ]" aria-hidden="true"></i></button>
+                <button v-bind:title="command.enabled ? commons.translate('enabled') : commons.translate('disabled')" v-on:click="command.enabled = !command.enabled; sendUpdate(command.id)"  class="btn btn-outline-dark p-1 border-0"><i class="fas m-1"  v-bind:class="[ command.enabled ? 'fa-toggle-on' : 'fa-toggle-off' ]" aria-hidden="true"></i></button>
+                <hold-button class="btn-outline-dark p-1 border-0" @trigger="deleteCommand(command.id)" holdtitle="" title="" icon="fa-trash m-1"></hold-button>
               </div>
             </div>
           </div>
@@ -234,24 +234,24 @@
           }
         },
         updatePermission: function (cid, rid, permission) {
-          let command = this.commands.filter((o) => o._id === cid)[0]
+          let command = this.commands.filter((o) => o.id === cid)[0]
           let response = command.responses.filter((o) => o._id === rid)[0]
           response.permission = permission
           this.socket.emit('update.command', {items: [command]})
         },
         updateStopIfExecuted: function (cid, rid, stopIfExecuted) {
-          let command = this.commands.filter((o) => o._id === cid)[0]
+          let command = this.commands.filter((o) => o.id === cid)[0]
           let response = command.responses.filter((o) => o._id === rid)[0]
           response.stopIfExecuted = stopIfExecuted
           this.socket.emit('update.command', {items: [command]})
         },
         deleteCommand: function (id) {
-          this.socket.emit('delete', {_id: id}, () => {
-            this.commands = this.commands.filter((o) => o._id !== id)
+          this.socket.emit('delete', {id}, () => {
+            this.commands = this.commands.filter((o) => o.id !== id)
           })
         },
         sendUpdate: function (_id) {
-          this.socket.emit('update.command', {items: this.commands.filter((o) => o._id === _id)})
+          this.socket.emit('update.command', {items: this.commands.filter((o) => o.id === _id)})
         }
       }
     })
