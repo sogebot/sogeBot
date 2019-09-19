@@ -117,6 +117,7 @@ export default class AlertsRegistryOverlays extends Vue {
   }
 
   id: null | string = null;
+  updatedAt: number = -1; // force initial load
   data: null | Registry.Alerts.Alert = null;
   defaultProfanityList: string[] = [];
   listHappyWords: string[] = [];
@@ -448,62 +449,7 @@ export default class AlertsRegistryOverlays extends Vue {
     }, 100));
 
     this.id = this.$route.params.id
-    this.interval.push(window.setInterval(() => {
-      this.socket.emit('findOne', { where: { id: this.id }}, async (err, data: Registry.Alerts.Alert) => {
-        if (this.runningAlert !== null) {
-          return; // skip any changes if alert in progress
-        }
-        if (!isEqual(data, this.data)) {
-          this.data = data;
-
-          for (const [lang, isEnabled] of Object.entries(this.data.loadStandardProfanityList)) {
-            if (isEnabled) {
-              let list = require('../../bot/data/vulgarities/' + lang + '.txt');
-              this.defaultProfanityList = [...this.defaultProfanityList, ...list.default.split(/\r?\n/)]
-
-              let listHappyWords = require('../../bot/data/happyWords/' + lang + '.txt');
-              this.listHappyWords = [...this.listHappyWords, ...listHappyWords.default.split(/\r?\n/)].filter(o => o.trim().length > 0)
-            }
-          }
-
-          this.defaultProfanityList = [
-            ...this.defaultProfanityList,
-            ...data.customProfanityList.split(',').map(o => o.trim()),
-          ].filter(o => o.trim().length > 0)
-
-          console.debug('Profanity list', this.defaultProfanityList);
-          console.debug('Happy words', this.listHappyWords);
-          this.state.loaded = this.$state.success;
-
-          const head = document.getElementsByTagName('head')[0]
-          const style = document.createElement('style')
-          style.type = 'text/css';
-          for (const lists of Object.values(data.alerts)) {
-            for (const event of lists) {
-              if (!this.loadedFonts.includes(event.font.family)) {
-                console.debug('Loading font', event.font.family)
-                this.loadedFonts.push(event.font.family)
-                const font = event.font.family.replace(/ /g, '+')
-                const css = "@import url('https://fonts.googleapis.com/css?family=" + font + "');"
-                style.appendChild(document.createTextNode(css));
-              }
-            }
-          }
-          head.appendChild(style);
-
-          // load emotes
-          await new Promise((done) => {
-            this.socket.emit('find', { collection: '_overlays.emotes.cache' }, (err, data) => {
-              this.emotes = data;
-              console.debug('= Emotes loaded')
-              done();
-            })
-          })
-
-          console.debug('== alerts ready ==')
-        }
-      })
-    }, 1000));
+    this.refreshAlert();
 
     this.socket.on('alert', (data: Registry.Alerts.EmitData) => {
       console.debug('Incoming alert', data);
@@ -531,6 +477,76 @@ export default class AlertsRegistryOverlays extends Vue {
 
       alerts.push(data)
     })
+  }
+
+  refreshAlert() {
+    this.socket.emit('isAlertUpdated', { updatedAt: this.updatedAt, id: this.id }, async (isUpdated: boolean, updatedAt: number) => {
+      if (isUpdated) {
+        console.debug('Alert is updating')
+        this.updatedAt = updatedAt;
+        await new Promise((resolve) => {
+          this.socket.emit('findOne', { where: { id: this.id }}, async (err, data: Registry.Alerts.Alert) => {
+            if (this.runningAlert !== null) {
+              return; // skip any changes if alert in progress
+            }
+            if (!isEqual(data, this.data)) {
+              this.data = data;
+
+              for (const [lang, isEnabled] of Object.entries(this.data.loadStandardProfanityList)) {
+                if (isEnabled) {
+                  let list = require('../../bot/data/vulgarities/' + lang + '.txt');
+                  this.defaultProfanityList = [...this.defaultProfanityList, ...list.default.split(/\r?\n/)]
+
+                  let listHappyWords = require('../../bot/data/happyWords/' + lang + '.txt');
+                  this.listHappyWords = [...this.listHappyWords, ...listHappyWords.default.split(/\r?\n/)].filter(o => o.trim().length > 0)
+                }
+              }
+
+              this.defaultProfanityList = [
+                ...this.defaultProfanityList,
+                ...data.customProfanityList.split(',').map(o => o.trim()),
+              ].filter(o => o.trim().length > 0)
+
+              console.debug('Profanity list', this.defaultProfanityList);
+              console.debug('Happy words', this.listHappyWords);
+              this.state.loaded = this.$state.success;
+
+              const head = document.getElementsByTagName('head')[0]
+              const style = document.createElement('style')
+              style.type = 'text/css';
+              for (const lists of Object.values(data.alerts)) {
+                for (const event of lists) {
+                  if (!this.loadedFonts.includes(event.font.family)) {
+                    console.debug('Loading font', event.font.family)
+                    this.loadedFonts.push(event.font.family)
+                    const font = event.font.family.replace(/ /g, '+')
+                    const css = "@import url('https://fonts.googleapis.com/css?family=" + font + "');"
+                    style.appendChild(document.createTextNode(css));
+                  }
+                }
+              }
+              head.appendChild(style);
+
+              // load emotes
+              await new Promise((done) => {
+                this.socket.emit('find', { collection: '_overlays.emotes.cache' }, (err, data) => {
+                  this.emotes = data;
+                  console.debug('= Emotes loaded')
+                  done();
+                })
+              })
+
+              console.debug('== alerts ready ==')
+              resolve();
+            }
+          })
+        })
+      }
+
+      setTimeout(() => this.refreshAlert(), 10000)
+    })
+
+
   }
 
   prepareMessageTemplate(msg) {
