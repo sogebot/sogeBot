@@ -15,6 +15,7 @@ const gitCommitInfo = require('git-commit-info');
 import {
   getBroadcaster,
 } from './commons';
+import uuid from 'uuid'
 
 const Parser = require('./parser')
 
@@ -23,6 +24,9 @@ const config = require('@config')
 const moment = require('moment-timezone')
 
 function Panel () {
+  global.db.engine.index('dashboards', [{ index: 'id', unique: true }]);
+  global.db.engine.index('widgets', [{ index: 'dashboardId' }]);
+
   // setup static server
   var app = express()
   app.use(bodyParser.json())
@@ -307,12 +311,12 @@ function Panel () {
     })
 
     socket.on('createDashboard', async (name, cb) => {
-      cb(await global.db.engine.insert('dashboards', { name, createdAt: Date.now() }))
+      cb(await global.db.engine.insert('dashboards', { name, createdAt: Date.now(), id: uuid() }))
     })
 
-    socket.on('removeDashboard', async (_id) => {
-      await global.db.engine.remove('dashboards', { _id })
-      await global.db.engine.remove('widgets', { dashboardId: _id })
+    socket.on('removeDashboard', async (id) => {
+      await global.db.engine.remove('dashboards', { id })
+      await global.db.engine.remove('widgets', { dashboardId: id })
     })
 
     socket.on('addWidget', async function (widget, dashboardId, cb) {

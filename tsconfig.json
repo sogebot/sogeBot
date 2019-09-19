@@ -25,9 +25,11 @@
     }
   },
   "include": [
+    "src/**/*.js",
     "src/**/*.ts",
     "src/**/*.vue",
-    "d.ts/*"
+    "d.ts/*",
+    "tools/*"
   ],
   "exclude": [
     "node_modules"
