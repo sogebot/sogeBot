@@ -46,7 +46,7 @@
 
       <div class="form-group col-md-12">
         <label style="margin: 0px 0px 3px; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px;">{{ commons.translate('timers.dialog.responses') }}</label>
-        <div class="input-group" v-for="response of responses" :key="response._id">
+        <div class="input-group" v-for="response of responses" :key="response.id">
           <div class="input-group-prepend">
             <button class="btn" type="button" @click="response.enabled=!response.enabled;pending=true" :class="[response.enabled ? 'btn-success' : 'btn-danger']">
               {{commons.translate(response.enabled ? 'enabled' : 'disabled')}}
@@ -57,7 +57,7 @@
             v-bind:placeholder="''"
             v-on:update="response.response=$event;pending=true" />
           <div class="input-group-append">
-            <button class="btn btn-danger" type="button" @click="removeResponse(response._id);pending=true">
+            <button class="btn btn-danger" type="button" @click="removeResponse(response.id);pending=true">
               <i class="far fa-trash-alt"></i>
             </button>
           </div>
@@ -111,13 +111,13 @@
       methods: {
         addResponse: function () {
           this.responses.push({
-            _id: 'new_' + _.now(),
+            id: 'new_' + _.now(),
             response: '',
             enabled: true
           })
         },
         removeResponse: function (id) {
-          this.responses = this.responses.filter(o => o._id !== id)
+          this.responses = this.responses.filter(o => o.id !== id)
         },
         validateForm: function () {
           // reset errors
@@ -130,7 +130,7 @@
           return _.filter(this.hasError, (o) => o === true).length === 0
         },
         deleteItem: function () {
-          this.socket.emit('delete.timer', this.timer._id, () => {
+          this.socket.emit('delete.timer', this.timer.id, () => {
             page('/#timers/list')
           })
         },
@@ -139,7 +139,7 @@
             this.states.save = 1
             const data = {
               timer: {
-                _id: this.id,
+                id: this.id,
                 seconds: parseInt(this.timer.seconds),
                 messages: parseInt(this.timer.messages),
                 name: this.timer.name,
@@ -152,7 +152,7 @@
                 console.error(err)
                 return this.states.save = 3
               }
-              this.id = String(data.timer._id)
+              this.id = data.timer.id
               this.states.save = 2
               this.pending = false
               this.timer = data.timer
@@ -165,7 +165,7 @@
       },
       computed: {
         isEditation: function () {
-          return !_.isNil(this.timer._id)
+          return !_.isNil(this.timer.id)
         },
         title: function () {
           return commons.translate(this.isEditation ? 'dialog.title.edit' : 'dialog.title.add')
@@ -183,7 +183,7 @@
     // load up from db
     if (commons.urlParam('id')) {
       timersEdit.id = commons.urlParam('id')
-      timersEdit.socket.emit('findOne.timer', { _id: commons.urlParam('id') }, (err, data) => {
+      timersEdit.socket.emit('findOne.timer', { id: commons.urlParam('id') }, (err, data) => {
         timersEdit.timer = data.timer
         timersEdit.responses = data.responses
         timersEdit.$nextTick(() => { timersEdit.pending = false })
