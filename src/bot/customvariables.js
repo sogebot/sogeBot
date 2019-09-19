@@ -19,6 +19,8 @@ class CustomVariables {
     if (isMainThread) {
       this.addMenuAndListenersToPanel();
       this.checkIfCacheOrRefresh();
+      global.db.engine.index('custom.variables', [{ id: 'cvarId', unique: true }]);
+      global.db.engine.index('custom.variables.watch', [{ index: 'variableId' }]);
       global.db.engine.index('custom.variables.history', [{ index: 'cvarId' }]);
     }
   }
@@ -103,11 +105,11 @@ class CustomVariables {
         let variables = await global.db.engine.find('custom.variables');
         cb(null, variables);
       });
-      socket.on('run.script', async (_id, cb) => {
+      socket.on('run.script', async (id, cb) => {
         let item;
         try {
-          item = await global.db.engine.findOne('custom.variables', { _id: String(_id) });
-          item = await global.db.engine.update('custom.variables', { _id: String(_id) }, { currentValue: await this.runScript(item.evalValue, { _current: item.currentValue }), runAt: Date.now() });
+          item = await global.db.engine.findOne('custom.variables', { id });
+          item = await global.db.engine.update('custom.variables', { id }, { currentValue: await this.runScript(item.evalValue, { _current: item.currentValue }), runAt: Date.now() });
         } catch (e) {
           cb(e.stack, null);
         }
@@ -123,35 +125,32 @@ class CustomVariables {
         cb(null, returnedValue);
       });
       socket.on('isUnique', async ({ variable, id }, cb) => {
-        cb(null, (await global.db.engine.find('custom.variables', { variableName: String(variable) })).filter(o => String(o._id) !== id).length === 0);
+        cb(null, (await global.db.engine.find('custom.variables', { variableName: String(variable) })).filter(o => o.id !== id).length === 0);
       });
       socket.on('delete', async (id, cb) => {
-        await global.db.engine.remove('custom.variables', { _id: String(id) });
-        await global.db.engine.remove('custom.variables.watch', { variableId: String(id) }); // force unwatch
+        await global.db.engine.remove('custom.variables', { id });
+        await global.db.engine.remove('custom.variables.watch', { variableId: id }); // force unwatch
         this.updateWidgetAndTitle();
         cb();
       });
       socket.on('load', async (id, cb) => {
-        const variable = await global.db.engine.findOne('custom.variables', { _id: String(id) });
-        const history = await global.db.engine.find('custom.variables.history', { cvarId: String(id) });
+        const variable = await global.db.engine.findOne('custom.variables', { id });
+        const history = await global.db.engine.find('custom.variables.history', { cvarId: id });
         cb({variable, history});
       });
       socket.on('save', async (data, cb) => {
-        var _id;
         try {
-          if (!_.isNil(data._id)) {
-            _id = String(data._id); delete (data._id);
-            await global.db.engine.update('custom.variables', { _id }, data);
+          if (!_.isNil(data.id)) {
+            await global.db.engine.update('custom.variables', { id: data.id }, data);
             this.updateWidgetAndTitle(data.variableName);
+            cb(null, data.id);
           } else {
-            delete (data._id);
             let item = await global.db.engine.insert('custom.variables', data);
-            _id = String(item._id);
             this.updateWidgetAndTitle(data.variableName);
+            cb(null, item.id);
           }
-          cb(null, _id);
         } catch (e) {
-          cb(e.stack, _id);
+          cb(e.stack, data.id);
         }
       });
     });
@@ -309,11 +308,11 @@ class CustomVariables {
 
   async isVariableSet (variableName) {
     let item = await global.db.engine.findOne('custom.variables', { variableName });
-    return !_.isEmpty(item) ? String(item._id) : null;
+    return !_.isEmpty(item) ? item.id : null;
   }
 
-  async isVariableSetById (_id) {
-    let item = await global.db.engine.findOne('custom.variables', { _id });
+  async isVariableSetById (id) {
+    let item = await global.db.engine.findOne('custom.variables', { id });
     return !_.isEmpty(item) ? String(item.variableName) : null;
   }
 
@@ -398,7 +397,7 @@ class CustomVariables {
   }
 
   async addChangeToHistory(opts) {
-    await global.db.engine.insert('custom.variables.history', { cvarId: String(opts.item._id), sender: opts.sender, oldValue: opts.oldValue, currentValue: opts.item.currentValue, timestamp: String(new Date())});
+    await global.db.engine.insert('custom.variables.history', { cvarId: opts.item.id, sender: opts.sender, oldValue: opts.oldValue, currentValue: opts.item.currentValue, timestamp: String(new Date())});
   }
 
   async checkIfCacheOrRefresh () {
@@ -411,7 +410,7 @@ class CustomVariables {
         const shouldRun = item.runEvery > 0 && Date.now() - new Date(item.runAt).getTime() >= item.runEvery;
         if (shouldRun) {
           let newValue = await this.runScript(item.evalValue, { _current: item.currentValue });
-          await global.db.engine.update('custom.variables', { _id: String(item._id) }, { runAt: Date.now(), currentValue: newValue });
+          await global.db.engine.update('custom.variables', { id: item.id }, { runAt: Date.now(), currentValue: newValue });
           await this.updateWidgetAndTitle(item.variableName);
         }
       } catch (e) {} // silence errors

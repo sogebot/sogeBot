@@ -68,8 +68,8 @@
         </div>
       </template>
       <template v-slot:cell(buttons)="data">
-        <a v-bind:href="'#/registry/customVariables/edit/' + data.item._id" class="btn btn-primary btn-block"><fa icon="edit"/> {{ translate('dialog.buttons.edit') }}</a>
-        <button v-if="data.item.type === 'eval'" v-on:click="debouncedRunScript(data.item._id)" class="btn btn-secondary btn-block"><fa icon="cog"/> {{ translate('registry.customvariables.run-script') }}</button>
+        <a v-bind:href="'#/registry/customVariables/edit/' + data.item.id" class="btn btn-primary btn-block"><fa icon="edit"/> {{ translate('dialog.buttons.edit') }}</a>
+        <button v-if="data.item.type === 'eval'" v-on:click="debouncedRunScript(data.item.id)" class="btn btn-secondary btn-block"><fa icon="cog"/> {{ translate('registry.customvariables.run-script') }}</button>
       </template>
     </b-table>
   </div>
@@ -105,7 +105,7 @@ export default class customVariablesList extends Vue {
     { key: 'buttons', label: '' },
   ];
 
-  variables: {_id: string;currentValue: string;runAt: string;variableName: string}[] = [];
+  variables: {id: string;currentValue: string;runAt: string;variableName: string}[] = [];
   permissions: {id: string; name: string;}[] = [];
   debouncedRunScript: ((id: any) => void) | null = null;
   search: string = '';
@@ -165,7 +165,7 @@ export default class customVariablesList extends Vue {
   runScript(id) {
     this.socket.emit('run.script', id, (err, item) => {
       // update variable data
-      let variable = this.variables.filter((o) => o._id === id)[0]
+      let variable = this.variables.filter((o) => o.id === id)[0]
       variable.currentValue = item.currentValue
       variable.runAt = item.runAt
     })

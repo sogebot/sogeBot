@@ -583,7 +583,7 @@ export default class customVariablesEdit extends Vue {
       ])
 
       const data = {
-        _id: this.$route.params.id,
+        id: this.$route.params.id || uuid(),
         variableName: this.variableName,
         description: this.description,
         currentValue: this.currentValue,
@@ -603,7 +603,7 @@ export default class customVariablesEdit extends Vue {
         responseText: this.responseText,
         permission: this.permission
       }
-      this.socket.emit('save', data, (err, _id) => {
+      this.socket.emit('save', data, (err, id) => {
         if (err) {
           console.error(err)
           return this.state.save = State.ERROR
@@ -611,7 +611,7 @@ export default class customVariablesEdit extends Vue {
         this.state.save = State.DONE
         this.error = null;
         this.pending = false;
-        this.$router.push({ name: 'CustomVariableEdit', params: { id: _id } });
+        this.$router.push({ name: 'CustomVariableEdit', params: { id: id } });
       })
     } catch (e) {
       this.state.save = State.ERROR
