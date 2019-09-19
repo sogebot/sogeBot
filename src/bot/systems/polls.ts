@@ -40,7 +40,7 @@ class Polls extends System {
 
     if (isMainThread) {
       global.db.engine.index(this.collection.votes, { index: 'vid' });
-      global.db.engine.index(this.collection.data, [{ index: 'openedAt' }, { index: 'id' }]);
+      global.db.engine.index(this.collection.data, [{ index: 'openedAt' }, { index: 'id', unique: true }]);
 
       setInterval(() => this.reminder(), 1000);
     }
