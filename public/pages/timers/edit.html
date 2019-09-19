@@ -152,7 +152,7 @@
                 console.error(err)
                 return this.states.save = 3
               }
-              this.id = String(data.timer.id)
+              this.id = data.timer.id
               this.states.save = 2
               this.pending = false
               this.timer = data.timer
