@@ -6,6 +6,7 @@ if (!isMainThread) process.exit()
 
 
 require('../../general.js')
+import uuid from 'uuid/v4'
 
 const db = require('../../general.js').db
 const message = require('../../general.js').message
@@ -28,20 +29,20 @@ describe('Custom Commands - run()', () => {
 
   describe.only('\'!test qwerty\' should trigger correct commands', () => {
     it('create \'!test\' command with $param', async () => {
-      let cmd = await global.db.engine.insert('systems.customcommands', { command: '!test', enabled: true, visible: true })
-      await global.db.engine.insert('systems.customcommands.responses', { cid: String(cmd._id), filter: '', response: '$param by !test command with param', permission: permission.VIEWERS })
+      let cmd = await global.db.engine.insert('systems.customcommands', { id: uuid(), command: '!test', enabled: true, visible: true })
+      await global.db.engine.insert('systems.customcommands.responses', { cid: cmd.id, filter: '', response: '$param by !test command with param', permission: permission.VIEWERS })
     })
     it('create \'!test\' command without $param', async () => {
-      let cmd = await global.db.engine.insert('systems.customcommands', { command: '!test', enabled: true, visible: true })
-      await global.db.engine.insert('systems.customcommands.responses', { cid: String(cmd._id), filter: '', response: 'This should not be triggered', permission: permission.VIEWERS })
+      let cmd = await global.db.engine.insert('systems.customcommands', { id: uuid(), command: '!test', enabled: true, visible: true })
+      await global.db.engine.insert('systems.customcommands.responses', { cid: cmd.id, filter: '', response: 'This should not be triggered', permission: permission.VIEWERS })
     })
     it('create \'!test qwerty\' command without $param', async () => {
-      let cmd = await global.db.engine.insert('systems.customcommands', { command: '!test qwerty', enabled: true, visible: true })
-      await global.db.engine.insert('systems.customcommands.responses', { cid: String(cmd._id), filter: '', response: 'This should be triggered', permission: permission.VIEWERS })
+      let cmd = await global.db.engine.insert('systems.customcommands', { id: uuid(), command: '!test qwerty', enabled: true, visible: true })
+      await global.db.engine.insert('systems.customcommands.responses', { cid: cmd.id, filter: '', response: 'This should be triggered', permission: permission.VIEWERS })
     })
     it('create second \'!test qwerty\' command without $param', async () => {
-      let cmd = await global.db.engine.insert('systems.customcommands', { command: '!test qwerty', enabled: true, visible: true })
-      await global.db.engine.insert('systems.customcommands.responses', { cid: String(cmd._id), filter: '', response: 'This should be triggered as well', permission: permission.VIEWERS })
+      let cmd = await global.db.engine.insert('systems.customcommands', { id: uuid(), command: '!test qwerty', enabled: true, visible: true })
+      await global.db.engine.insert('systems.customcommands.responses', { cid: cmd.id, filter: '', response: 'This should be triggered as well', permission: permission.VIEWERS })
     })
 
     it('run command', async () => {
@@ -56,8 +57,8 @@ describe('Custom Commands - run()', () => {
 
   describe('!cmd with username filter', () => {
     it('create command and response with filter', async () => {
-      let cmd = await global.db.engine.insert('systems.customcommands', { command: '!cmd', enabled: true, visible: true })
-      await global.db.engine.insert('systems.customcommands.responses', { cid: String(cmd._id), filter: '$sender == "user1"', response: 'Lorem Ipsum', permission: permission.VIEWERS })
+      let cmd = await global.db.engine.insert('systems.customcommands', { id: uuid(), command: '!cmd', enabled: true, visible: true })
+      await global.db.engine.insert('systems.customcommands.responses', { cid: cmd.id, filter: '$sender == "user1"', response: 'Lorem Ipsum', permission: permission.VIEWERS })
     })
 
     it('run command as user not defined in filter', async () => {
