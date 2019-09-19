@@ -6,7 +6,7 @@ if (!isMainThread) process.exit()
 
 
 require('../../general.js')
-import uuid from 'uuid/v4'
+const uuid = require('uuid/v4')
 
 const db = require('../../general.js').db
 const message = require('../../general.js').message
