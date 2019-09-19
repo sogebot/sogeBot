@@ -28,9 +28,6 @@ const relationships = {
   'systems.customcommands': [
     'systems.customcommands.responses|cid',
   ],
-  'systems.timers': [
-    'systems.timers.responses|timerId',
-  ],
 };
 
 const mappings = {};

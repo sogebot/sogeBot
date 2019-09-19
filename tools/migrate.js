@@ -31,6 +31,24 @@ const end = function (updated) {
 };
 
 const migration = {
+  9: async () => {
+    header('Add id for timers and update timerId in responses');
+    let updated = 0;
+
+    const timers = await global.db.engine.find('systems.timers');
+    for (const timer of timers) {
+      const id = uuidv4();
+      await global.db.engine.update('systems.timers', { _id: String(timer._id) }, { id });
+      updated++;
+
+      const responses = await global.db.engine.find('systems.timer.responses', { timerId: String(timer._id) });
+      for (const response of responses) {
+        updated++;
+        await global.db.engine.update('systems.timer.responses', { _id: String(response._id) }, { timerId: id });
+      }
+    }
+    end(updated);
+  },
   8: async () => {
     header('Add id for polls and update vid in votes');
     let updated = 0;
