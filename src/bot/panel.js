@@ -511,28 +511,47 @@ Panel.prototype.registerSockets = util.deprecate(function (options) {
 }, 'registerSockets() is deprecated. Use socket from system interface directly.')
 
 Panel.prototype.sendStreamData = async function (self, socket) {
-  const whenOnline = (await global.cache.when()).online
-  var data = {
-    broadcasterType: global.oauth.broadcasterType,
-    uptime: commons.getTime(whenOnline, false),
-    currentViewers: _.get(await global.db.engine.findOne('api.current', { key: 'viewers' }), 'value', 0),
-    currentSubscribers: _.get(await global.db.engine.findOne('api.current', { key: 'subscribers' }), 'value', 0),
-    currentBits: _.get(await global.db.engine.findOne('api.current', { key: 'bits' }), 'value', 0),
-    currentTips: _.get(await global.db.engine.findOne('api.current', { key: 'tips' }), 'value', 0),
-    currency: global.currency.symbol(global.currency.mainCurrency),
-    chatMessages: await global.cache.isOnline() ? global.linesParsed - global.api.chatMessagesAtStart : 0,
-    currentFollowers: _.get(await global.db.engine.findOne('api.current', { key: 'followers' }), 'value', 0),
-    currentViews: _.get(await global.db.engine.findOne('api.current', { key: 'views' }), 'value', 0),
-    maxViewers: _.get(await global.db.engine.findOne('api.max', { key: 'viewers' }), 'value', 0),
-    newChatters: _.get(await global.db.engine.findOne('api.new', { key: 'chatters' }), 'value', 0),
-    game: _.get(await global.db.engine.findOne('api.current', { key: 'game' }), 'value', null),
-    status: _.get(await global.db.engine.findOne('api.current', { key: 'title' }), 'value', null),
-    rawStatus: await global.cache.rawStatus(),
-    currentHosts: _.get(await global.db.engine.findOne('api.current', { key: 'hosts' }), 'value', 0),
-    currentWatched: global.api._stream.watchedTime,
-    tags: await global.db.engine.find('core.api.currentTags'),
+  try {
+    if (typeof global.systems === 'undefined'
+        || typeof global.systems.songs === 'undefined'
+        || typeof global.integrations === 'undefined'
+        || typeof global.integrations.spotify === 'undefined') {
+      return
+    }
+
+    const whenOnline = (await global.cache.when()).online
+
+    const ytCurrentSong = _.get(JSON.parse(global.systems.songs.currentSong), 'title', null);
+    let spotifyCurrentSong = _.get(JSON.parse(global.integrations.spotify.currentSong), 'song', '') + ' - ' + _.get(JSON.parse(global.integrations.spotify.currentSong), 'artist', '');
+    if (spotifyCurrentSong.trim().length === 1 /* '-' */  || !_.get(JSON.parse(global.integrations.spotify.currentSong), 'is_playing', false)) {
+      spotifyCurrentSong = null;
+    }
+
+    var data = {
+      broadcasterType: global.oauth.broadcasterType,
+      uptime: commons.getTime(whenOnline, false),
+      currentViewers: _.get(await global.db.engine.findOne('api.current', { key: 'viewers' }), 'value', 0),
+      currentSubscribers: _.get(await global.db.engine.findOne('api.current', { key: 'subscribers' }), 'value', 0),
+      currentBits: _.get(await global.db.engine.findOne('api.current', { key: 'bits' }), 'value', 0),
+      currentTips: _.get(await global.db.engine.findOne('api.current', { key: 'tips' }), 'value', 0),
+      currency: global.currency.symbol(global.currency.mainCurrency),
+      chatMessages: await global.cache.isOnline() ? global.linesParsed - global.api.chatMessagesAtStart : 0,
+      currentFollowers: _.get(await global.db.engine.findOne('api.current', { key: 'followers' }), 'value', 0),
+      currentViews: _.get(await global.db.engine.findOne('api.current', { key: 'views' }), 'value', 0),
+      maxViewers: _.get(await global.db.engine.findOne('api.max', { key: 'viewers' }), 'value', 0),
+      newChatters: _.get(await global.db.engine.findOne('api.new', { key: 'chatters' }), 'value', 0),
+      game: _.get(await global.db.engine.findOne('api.current', { key: 'game' }), 'value', null),
+      status: _.get(await global.db.engine.findOne('api.current', { key: 'title' }), 'value', null),
+      rawStatus: await global.cache.rawStatus(),
+      currentSong: ytCurrentSong || spotifyCurrentSong || global.translate('songs.not-playing'),
+      currentHosts: _.get(await global.db.engine.findOne('api.current', { key: 'hosts' }), 'value', 0),
+      currentWatched: global.api._stream.watchedTime,
+      tags: await global.db.engine.find('core.api.currentTags'),
+    }
+    socket.emit('stats', data)
+  } catch (e) {
+    global.log.error(e.stack);
   }
-  socket.emit('stats', data)
 }
 
 module.exports = Panel

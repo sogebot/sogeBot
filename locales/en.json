@@ -634,6 +634,7 @@
     "start-time": "Start Time",
     "end-time": "End Time",
     "watched-time": "Watched time",
+    "currentsong": "Current song",
     "group": "Group",
     "followed-since": "Followed since",
     "subscribed-since": "Subscribed since",

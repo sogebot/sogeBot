@@ -152,6 +152,19 @@
             </span>
           </span>
         </div>
+
+        <div class="col-md stream-info">
+          <h2>
+            <span>{{ translate('currentsong') }}</span>
+          </h2>
+          <span class="data">
+            <span v-if="currentSong.length === 0">{{translate('not-available')}}</span>
+            <span v-else>
+                {{ currentSong }}
+              </span>
+            </span>
+          </span>
+        </div>
       </div>
     </template>
   </div>
@@ -191,6 +204,7 @@
         currentHosts: number,
         currentViews: number,
         currentBits: number,
+        currentSong: string,
         currentWatched: number,
         currentSubscribers: number,
         currentFollowers: number,
@@ -227,6 +241,7 @@
         currentSubscribers: 0,
         currentFollowers: 0,
         currentTips: 0,
+        currentSong: '',
         currency: 'n/a',
         broadcasterType: '',
         tags: [],
