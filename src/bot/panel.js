@@ -523,7 +523,7 @@ Panel.prototype.sendStreamData = async function (self, socket) {
 
     const ytCurrentSong = _.get(JSON.parse(global.systems.songs.currentSong), 'title', null);
     let spotifyCurrentSong = _.get(JSON.parse(global.integrations.spotify.currentSong), 'song', '') + ' - ' + _.get(JSON.parse(global.integrations.spotify.currentSong), 'artist', '');
-    if (spotifyCurrentSong.trim().length === 1 /* '-' */  || !_.get(JSON.parse(global.integrations.spotify.currentSong, 'is_playing', false))) {
+    if (spotifyCurrentSong.trim().length === 1 /* '-' */  || !_.get(JSON.parse(global.integrations.spotify.currentSong), 'is_playing', false)) {
       spotifyCurrentSong = null;
     }
 
