@@ -204,7 +204,7 @@
             return _.filter(this.hasError, (o) => o === true).length === 0
           },
           deleteItem: function () {
-            this.socket.emit('delete', {_id: this.id}, () => {
+            this.socket.emit('delete', {id: this.id}, () => {
               page('/#customcommands/list')
             })
           },
@@ -212,7 +212,7 @@
             if (this.validateForm()) {
               this.states.save = 1
               const data = {
-                _id: this.id,
+                id: this.id,
                 responses: this.responses,
                 command: this.command.trim(),
                 visible: this.visible,
@@ -226,7 +226,7 @@
                 }
                 this.states.save = 2
                 this.pending = false
-                this.id = String(data.command._id)
+                this.id = data.command.id
                 this.responses = data.responses
                 page('?id=' + this.id + '#customcommands/edit')
                 setTimeout(() => this.states.save = 0, 1000)
@@ -270,7 +270,7 @@
       // load up from db
       if (commons.urlParam('id')) {
         customCommandsEdit.id = commons.urlParam('id')
-        customCommandsEdit.socket.emit('findOne.command', { where: { _id: commons.urlParam('id') } }, (err, data) => {
+        customCommandsEdit.socket.emit('findOne.command', { where: { id: commons.urlParam('id') } }, (err, data) => {
           // add empty filter if undefined
           for (let i = 0, length = data.responses.length; i < length; i++) {
             if (!data.responses[i].filter) data.responses[i].filter = ''
