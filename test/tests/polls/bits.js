@@ -54,7 +54,7 @@ describe('Polls - bits', () => {
       assert.deepEqual(cVote.options, ['Lorem', 'Ipsum', 'Dolor Sit'])
       assert.deepEqual(cVote.type, 'bits')
       assert.equal(cVote.title, 'Lorem Ipsum?')
-      vid = String(cVote._id)
+      vid = cVote.id
     })
     it(`!vote should return correct vote status`, async () => {
       await time.waitMs(1000)

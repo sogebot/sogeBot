@@ -31,13 +31,15 @@ const tests = [
 describe('Quotes - add()', () => {
   for (let test of tests) {
     describe(test.parameters, async () => {
+      let id = null;
       before(async () => {
         await db.cleanup()
         await message.prepare()
       })
 
       it('Run !quote add', async () => {
-        global.systems.quotes.add({ sender: test.sender, parameters: test.parameters, command: '!quote add' })
+        const quote = await global.systems.quotes.add({ sender: test.sender, parameters: test.parameters, command: '!quote add' })
+        id = quote.id;
       })
       if (test.shouldFail) {
         it('Should throw error', async () => {
@@ -49,7 +51,7 @@ describe('Quotes - add()', () => {
         })
       } else {
         it('Should sent success message', async () => {
-          await message.isSent('systems.quotes.add.ok', owner, { tags: test.tags, quote: test.quote, id: 1 })
+          await message.isSent('systems.quotes.add.ok', owner, { tags: test.tags, quote: test.quote, id })
         })
         it('Database should contain new quote', async () => {
           let items = await global.db.engine.find('systems.quotes')

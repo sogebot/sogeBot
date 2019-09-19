@@ -324,11 +324,10 @@ class Timers extends System {
         .replace(/\$name/g, name), opts.sender);
       return false;
     }
-
     const responses = await global.db.engine.find(this.collection.responses, { timerId: timer.id });
     await sendMessage(global.translate('timers.responses-list').replace(/\$name/g, name), opts.sender, opts.attr);
     for (const response of responses) {
-      await sendMessage((response.enabled ? '⚫ ' : '⚪ ') + `${response.id} - ${response.response}`, opts.sender, opts.attr);
+      await sendMessage((response.enabled ? '⚫ ' : '⚪ ') + `${String(response._id)} - ${response.response}`, opts.sender, opts.attr);
     }
     return true;
   }
@@ -347,13 +346,13 @@ class Timers extends System {
 
     if (!_.isNil(id)) {
       id = id[1];
-      const response = await global.db.engine.findOne(this.collection.responses, { id: id });
+      const response = await global.db.engine.findOne(this.collection.responses, { _id: id });
       if (_.isEmpty(response)) {
         sendMessage(global.translate('timers.response-not-found').replace(/\$id/g, id), opts.sender, opts.attr);
         return false;
       }
 
-      await global.db.engine.update(this.collection.responses, { id: id }, { enabled: !response.enabled });
+      await global.db.engine.update(this.collection.responses, { _id: id }, { enabled: !response.enabled });
       sendMessage(global.translate(!response.enabled ? 'timers.response-enabled' : 'timers.response-disabled')
         .replace(/\$id/g, id), opts.sender);
       return true;

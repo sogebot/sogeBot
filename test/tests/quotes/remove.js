@@ -14,6 +14,7 @@ const message = require('../../general.js').message
 // users
 const owner = { username: 'soge__' }
 
+
 const tests = [
   { sender: owner, parameters: '', shouldFail: true },
   { sender: owner, parameters: '-id', shouldFail: true },
