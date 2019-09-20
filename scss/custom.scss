@@ -1,3 +1,43 @@
+body {
+  font-family: 'PT Sans', sans-serif;
+  background-color: $gray-100;
+}
+
+@media (min-width: 900px) {
+  body {
+    padding-top: 50px;
+  }
+  .main-menu {
+    position: absolute;
+    z-index: 2;
+    overflow-x: auto;
+    overflow-y: hidden;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+}
+@media (max-width: 900px) {
+  body {
+    padding-top: 80px;
+  }
+  .main-menu {
+    position: relative;
+    z-index: 2;
+    overflow-x: auto;
+    overflow-y: hidden;
+    margin: auto;
+  }
+}
+
+ul.main-dropdown-menu > li.nav-item > a.nav-link {
+  padding: .1rem .5rem;
+}
+
+.dropdown-detach {
+  z-index: 99999999999;
+}
+
 .form-control.v-select {
   height: fit-content !important;
 }
@@ -65,12 +105,6 @@ div.CodeMirror span.CodeMirror-matchingbracket {color: black !important; font-we
 
 [data-lang] {
   font-style: normal;
-}
-
-body {
-  font-family: 'PT Sans', sans-serif;
-  padding-top: 50px;
-  background-color: $gray-100;
 }
 
 .navbar-fixed-top {
