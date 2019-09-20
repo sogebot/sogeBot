@@ -8,7 +8,7 @@
       {{completed}}/{{items.length}}
       <span><fa icon="tasks"/></span>
     </div>
-    <div v-bind:class="[bDisplay ? 'd-block' : 'd-none']" style="position: absolute; width:200px">
+    <div v-bind:class="[bDisplay ? 'd-block' : 'd-none']" style="position: absolute; width:200px; right: 1rem; z-index:9999999">
       <div class="list-group">
         <button :key="index" v-for="(item, index) of items" type="button" style="padding: 0.25rem 1.25rem" class="list-group-item list-group-item-action" @click="items[index].completed = !items[index].completed; onChange()">
           <span class="pr-1" :class="[item.completed? 'text-success' : 'text-danger']">

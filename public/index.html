@@ -44,93 +44,76 @@
     </div>
   </div>
 
+  <div class="navbar navbar-light bg-light fixed-top">
+    <header class="w-100">
+      <div class="row flex-nowrap justify-content-between align-items-center;">
+        <div class="col text-left">
+          <a class="blog-header-logo text-dark" href="#" style="line-height: 36px;"><strong id="bot_name"></strong> <span id="current_version" class="d-none d-sm-inline"></span></a>
+        </div>
+        <div class="col d-flex justify-content-end align-items-center">
+          <div id="checklist"></div> <!-- vue.js others/checklist -->
+          <div id="user"></div> <!-- vue.js others/user -->
 
-  <nav class="navbar navbar-expand-md navbar-light bg-light fixed-top">
-    <a class="navbar-brand" href="#"><strong id="bot_name"></strong> <span id="current_version"></span></a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault"
-      aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
+          <div class="pr-1">
+            <button class="btn btn-xs btn-light dropdown-toggle" type="button" id="settingsButton" data-toggle="dropdown" aria-haspopup="true"
+              aria-expanded="false">
+              <i class="fas fa-bars" aria-hidden="true"></i>
+            </button>
+            <div class="dropdown-menu dropdown-detach dropdown-menu-right"  aria-labelledby="settingsButton">
+              <button class="dropdown-item text-success" onclick="joinBot()">
+                <i class="fas fa-sign-in-alt"></i>
+                join channel
+              </button>
+              <button class="dropdown-item text-danger" onclick="leaveBot()">
+                <i class="fas fa-sign-out-alt"></i>
+                leave from channel
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
 
-    <div class="collapse navbar-collapse" id="navbarsExampleDefault">
-      <ul class="navbar-nav mr-auto" id="menu-main">
-        <li class="nav-item" id="menuDashboard">
-          <a href="/#/" data-page="dashboard" class="nav-link active" data-lang="dashboard"></a>
-        </li>
-        <li class="nav-item dropdown">
-          <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-            <span data-lang="manage"></span>
-            <span class="caret"></span>
-          </a>
-          <ul class="dropdown-menu" id="menu-manage"></ul>
-        </li>
-        <li class="nav-item dropdown">
-          <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+    <div class="main-menu">
+      <nav class="nav d-flex justify-content-between" style="width: max-content">
+        <span class="dropdown">
+          <a href="#" class="nav-link dropdown-toggle text-dark p-1" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+              <span data-lang="manage"></span>
+              <span class="caret"></span>
+            </a>
+            <ul class="main-dropdown-menu dropdown-menu dropdown-detach" id="menu-manage"></ul>
+        </span>
+        <span class="dropdown">
+          <a href="#" class="nav-link dropdown-toggle text-dark p-1" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
             <span data-lang="settings"></span>
             <span class="caret"></span>
           </a>
-          <ul class="dropdown-menu" id="menu-settings"></ul>
-        </li>
-        <li class="nav-item dropdown">
-          <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+          <ul class="main-dropdown-menu dropdown-menu dropdown-detach" id="menu-settings"></ul>
+        </span>
+        <span>
+          <a href="#" class="nav-link dropdown-toggle text-dark p-1" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
             <span data-lang="menu.registry"></span>
             <span class="caret"></span>
           </a>
-          <ul class="dropdown-menu" id="menu-registry"></ul>
-        </li>
-        <li class="nav-item dropdown">
-          <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+          <ul class="main-dropdown-menu dropdown-menu dropdown-detach" id="menu-registry"></ul>
+        </span>
+        <span>
+          <a href="#" class="nav-link dropdown-toggle text-dark p-1" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
             <span data-lang="menu.logs"></span>
             <span class="caret"></span>
           </a>
-          <ul class="dropdown-menu" id="menu-logs"></ul>
-        </li>
-        <li class="nav-item dropdown">
-          <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+          <ul class="main-dropdown-menu dropdown-menu dropdown-detach" id="menu-logs"></ul>
+        </span>
+        <span>
+          <a href="#" class="nav-link dropdown-toggle text-dark p-1" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
             <span data-lang="menu.stats"></span>
             <span class="caret"></span>
           </a>
-          <ul class="dropdown-menu" id="menu-stats"></ul>
-        </li>
-      </ul>
-
-      <ul class="navbar-nav mr-auto">
-        <li class="nav-item page-menu d-flex pl-2 pr-2" style="font-size: 0.6rem; position: relative; top: .7rem">
-          <span class="alert alert-warning" style="padding:0;" id="APIStatus" title="API checking">API</span>
-          <span class="alert alert-warning" style="padding:0;" id="TMIStatus" title="TMI checking">TMI</span>
-          <span class="alert alert-warning" style="padding:0;" id="SOCStatus" title="SOC checking">SOC</span>
-          <span class="alert alert-warning" style="padding:0;" id="MODStatus" title="MOD checking">MOD</span>
-          <span class="alert alert-warning" style="padding:0;" id="RESStatus" title="RES checking">0ms</span>
-        </li>
-      </ul>
-
-      <div id="checklist"></div> <!-- vue.js others/checklist -->
-
-      <button class="ml-4 btn btn-success" href="#" id="new-version-notice" style="display: none; font-weight: bold; cursor: pointer;"
-        data-toggle="modal" data-target="#new_version_dlg">
-        <i class="fas fa-code-fork" aria-hidden="true"></i> Version <span id="version"></span> available
-      </button>
-
-      <div id="user"></div> <!-- vue.js others/user -->
-
-      <div>
-        <button class="btn btn-xs btn-light dropdown-toggle" type="button" id="settingsButton" data-toggle="dropdown" aria-haspopup="true"
-          aria-expanded="false">
-          <i class="fas fa-bars" aria-hidden="true"></i>
-        </button>
-        <div class="dropdown-menu dropdown-menu-right" style="right: 0; left: auto;" aria-labelledby="settingsButton">
-          <button class="dropdown-item text-success" onclick="joinBot()">
-            <i class="fas fa-sign-in-alt"></i>
-            join channel
-          </button>
-          <button class="dropdown-item text-danger" onclick="leaveBot()">
-            <i class="fas fa-sign-out-alt"></i>
-            leave from channel
-          </button>
-        </div>
-      </div>
+          <ul class="main-dropdown-menu dropdown-menu dropdown-detach" id="menu-stats"></ul>
+        </span>
+      </nav>
     </div>
-  </nav>
+  </div>
 
   <!-- CHANGE TITLE/GAME DLG -->
   <div id="changegamedlg"></div> <!-- vue.js others/changegamedlg -->
@@ -153,6 +136,11 @@
   </div>
 
   <footer class="footer">
+    <span class="alert alert-warning" style="padding:0;" id="APIStatus" title="API checking">API</span>
+    <span class="alert alert-warning" style="padding:0;" id="TMIStatus" title="TMI checking">TMI</span>
+    <span class="alert alert-warning" style="padding:0;" id="SOCStatus" title="SOC checking">SOC</span>
+    <span class="alert alert-warning" style="padding:0;" id="MODStatus" title="MOD checking">MOD</span>
+    <span class="alert alert-warning" style="padding:0;" id="RESStatus" title="RES checking">0ms</span>
     <a href="https://github.com/sogehige/SogeBot">GitHub</a> |
     <a href="https://github.com/sogehige/SogeBot/issues">Issues</a> |
     <a href="https://github.com/sogehige/SogeBot/blob/master/LICENSE">MIT License</a>
@@ -244,53 +232,6 @@
     socket.emit('getVersion')
     socket.once('version', function (version) {
       $('#current_version').text(version)
-      $.get('https://api.github.com/repos/sogehige/sogebot/releases/latest', function (response) {
-        var md = new markdownit()
-        var commits = new RegExp('(?!added)[0-9a-f]{5,40}', 'gm')
-        let commits_match = response.body.match(commits)
-        if (!_.isNil(commits_match)) {
-          for (let commit of commits_match) {
-            commit_short = commit.substring(0, 6)
-            response.body = response.body.replace(commit, commit_short)
-          }
-        }
-
-        var issues = new RegExp('#[0-9]{1,4}', 'gm')
-        let issues_match = response.body.match(issues)
-        if (!_.isNil(issues_match)) {
-          for (let issue of issues_match) {
-            response.body = response.body.replace(issue, '[' + issue +
-              '](https://github.com/sogehige/sogeBot/issues/' + issue.replace('#', '') + ')')
-          }
-        }
-
-        response.body = response.body.replace(/### /g, '##### '); // change h3 => h5
-
-        $('#new_version_dlg .modal-body').html(md.render(response.body.replace('**Changelog**', '').trim()))
-        $('#new_version_dlg .modal-header small').text(response.tag_name)
-        console.debug('GITHUB version', response.tag_name)
-        console.debug('LOCAL version', version)
-        $('#version').text(response.tag_name)
-        $('title').text($('title').text() + ' ' + version)
-
-        let botVersion = version.replace('-SNAPSHOT', '').split('.')
-        let gitVersion = response.tag_name.split('.')
-
-        let isNewer = false
-        for (let index in botVersion) {
-          botVersion[index] = parseInt(botVersion[index], 10)
-          gitVersion[index] = parseInt(gitVersion[index], 10)
-          if (botVersion[index] < gitVersion[index]) {
-            isNewer = true
-            break
-          } else if (botVersion[index] === gitVersion[index]) continue
-          else {
-            isNewer = false
-            break
-          }
-        }
-        if (isNewer) $('#new-version-notice').css('display', 'inline')
-      })
     })
 
     socket.emit('systems', function (err, data) {
@@ -384,7 +325,7 @@
           if ((obj.id === 'core') && core) return
           if ((obj.id === 'logs') && logs) return
           if ((obj.id === 'stats') && stats) return
-          $('#menu-' + obj.category).append('<li class="nav-item"><a class="nav-link" href="#/' + obj.id.replace(/\./g, '/') + '" data-page="' +
+          $('#menu-' + obj.category).append('<li class="nav-item"><a class="nav-link text-dark" href="#/' + obj.id.replace(/\./g, '/') + '" data-page="' +
             obj.id.replace(/\./g, '/') + '">' + commons.translate('menu.' + obj.name) + '</a></li>')
         }
         if (obj.id === 'systems') systems = true
@@ -545,16 +486,28 @@
       e.stopPropagation();
     });
 
+    var dropdown;
+
     // force dropdowns outside of overflow
-    $(document).on('show.bs.dropdown', function() {
-      if ($('.dropdown-detach').length > 0) {
-        $('body').append($('.dropdown-detach').css({
-          position: 'absolute',
-          left: $('.dropdown-detach').offset().left,
-          top: $('.dropdown-detach').offset().top
-        }).detach());
+    $(document).on('show.bs.dropdown', function(event) {
+      for (const child of event.target.children) {
+        if (child.classList.contains('dropdown-detach')) {
+          dropdown = $(child)
+          let offset = $(event.target).offset().left;
+          if ($(child).outerWidth() + offset > document.body.clientWidth - 10) {
+            offset = document.body.clientWidth - $(child).outerWidth() - 10
+          }
+          $('body').append($(child).css({
+            position: 'absolute',
+            left: offset,
+            top: $(event.target).offset().top + event.target.clientHeight,
+          }).detach());
+        }
       }
     });
+    $(document).on('hidden.bs.dropdown', function(event) {
+      $(event.target).append(dropdown.detach());
+    })
   </script>
 </body>
 </html>

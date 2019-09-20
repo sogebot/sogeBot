@@ -1,7 +1,10 @@
 <template>
-  <div class="stream-info-container container-fluid" :class="{ 'sticky-top': b_sticky }" :style="{ 'top': b_sticky ? '50px' : undefined }">
+  <div class="stream-info-container container-fluid" :class="{ 'sticky-top': b_sticky }" :style="{ 'top': b_sticky ? top + 'px' : undefined }" ref="window">
     <b-toast title="Owner and broadcaster oauth is not set" no-auto-hide visible variant="danger" solid v-if="!configuration.isCastersSet">
       Please set your <a href="#/settings/core/oauth">broadcaster oauth or owners</a>, or all users <strong>will have access</strong> to this dashboard and will be considered as <strong>casters</strong>.
+    </b-toast>
+    <b-toast title="New update available" visible variant="info" solid v-if="update.version">
+      New bot version {{ update.version }} available at <a :href="'https://github.com/sogehige/sogeBot/releases/tag/' + update.version">GitHub</a>.
     </b-toast>
     <template v-if="!isLoaded">
       <div class="mx-auto text-center p-3 pt-4">
@@ -115,7 +118,7 @@
       </div>
 
       <div class="row">
-        <div class="col-md stream-info" @click="showGameAndTitleDlg">
+        <div class="col-6 col-sm-4 col-md-4 col-lg-4 stream-info" @click="showGameAndTitleDlg">
           <h2>
             <span>{{ translate('game') }}</span>
             <small>{{ translate('click-to-change') }}</small>
@@ -124,36 +127,26 @@
           <span  class="data" v-else>{{ translate('not-available') }}</span>
         </div>
 
-        <div class="col-md stream-info" @click="showGameAndTitleDlg">
+        <div class="col-12 col-sm-12 col-md-4 col-lg-4 stream-info" @click="showGameAndTitleDlg">
           <h2>
             <span>{{ translate('title') }}</span>
             <small>{{ translate('click-to-change') }}</small>
           </h2>
           <span class="data" v-if="title" :title="rawStatus" v-html="title"></span>
           <span class="data" v-else>{{ translate('not-available') }}</span>
-        </div>
-
-        <div class="col-md stream-info" @click="showGameAndTitleDlg">
-          <h2>
-            <span>{{ translate('tags') }}</span>
-            <small>{{ translate('click-to-change') }}</small>
-          </h2>
           <span class="data">
-            <span v-if="tags.length === 0">{{translate('not-available')}}</span>
-            <span v-else>
-              <small v-for="tag of filterTags(true)" :key="tag.name"
-                :class="{ 'text-muted': tag.is_auto }" :title="tag.is_auto ? 'Automatically added tag' : 'Manual tag'">
-                {{ tag.name }}
-              </small>
-              <span v-for="tag of filterTags(false)" :key="tag.name"
-                :class="{ 'text-muted': tag.is_auto }" :title="tag.is_auto ? 'Automatically added tag' : 'Manual tag'">
-                {{ tag.name }}
-              </span>
+            <small v-for="tag of filterTags(true)" :key="tag.name"
+              :class="{ 'text-muted': tag.is_auto }" :title="tag.is_auto ? 'Automatically added tag' : 'Manual tag'">
+              {{ tag.name }}
+            </small>
+            <span v-for="tag of filterTags(false)" :key="tag.name"
+              :class="{ 'text-muted': tag.is_auto }" :title="tag.is_auto ? 'Automatically added tag' : 'Manual tag'">
+              {{ tag.name }}
             </span>
           </span>
         </div>
 
-        <div class="col-md stream-info">
+        <div class="col-12 col-sm-12 col-md-4 col-lg-4 stream-info">
           <h2>
             <span>{{ translate('currentsong') }}</span>
           </h2>
@@ -161,7 +154,6 @@
             <span v-if="currentSong.length === 0">{{translate('not-available')}}</span>
             <span v-else>
                 {{ currentSong }}
-              </span>
             </span>
           </span>
         </div>
@@ -214,10 +206,18 @@
         tags: any[],
         isLoaded: boolean,
 
+        version: string;
+        update: {
+          version: null | string
+        },
+
         title: string | null,
         game: string | null,
         rawStatus: string,
         cachedTitle: string,
+
+        top: string,
+        widthOfMenuInterval: number,
       } = {
         highlightsSocket: io('/systems/highlights', { query: "token=" + this.token }),
         averageStats: {},
@@ -246,20 +246,67 @@
         broadcasterType: '',
         tags: [],
 
+        version: '',
+        update: {
+          version: null,
+        },
+
         title: null,
         game: null,
         rawStatus: '',
         cachedTitle: '',
 
         isLoaded: false,
+
+        top: '50',
+        widthOfMenuInterval: 0,
       }
       return object
     },
+
+    destroyed() {
+      clearInterval(this.widthOfMenuInterval)
+    },
+
     mounted() {
       this.b_percentage = this.configuration.core.ui.percentage
       this.b_showAvgDiff = this.configuration.core.ui.showdiff
       this.b_shortenNumber = this.configuration.core.ui.shortennumbers
       this.b_sticky = this.configuration.core.ui.stickystats
+
+
+      this.widthOfMenuInterval = window.setInterval(() => {
+        this.widthOfMenuUpdate()
+      }, 100)
+
+      console.debug('EMIT [getVersion]')
+      window.socket.emit('getVersion')
+      window.socket.once('version', (version) => {
+        this.version = version
+        $.get('https://api.github.com/repos/sogehige/sogebot/releases/latest', (response) => {
+          let botVersion = version.replace('-SNAPSHOT', '').split('.')
+          let gitVersion = response.tag_name.split('.')
+
+          let isNewer = false
+          for (let index in botVersion) {
+            botVersion[index] = parseInt(botVersion[index], 10)
+            gitVersion[index] = parseInt(gitVersion[index], 10)
+            if (botVersion[index] < gitVersion[index]) {
+              isNewer = true
+              break
+            } else if (botVersion[index] === gitVersion[index]) continue
+            else {
+              isNewer = false
+              break
+            }
+          }
+
+          if (isNewer) {
+            this.update.version = gitVersion.join('.');
+          }
+        })
+      })
+
 
       window.socket.emit('getLatestStats')
       window.socket.emit('panel.sendStreamData')
@@ -295,6 +342,9 @@
       }
     },
     methods: {
+      widthOfMenuUpdate() {
+        this.top = (<HTMLElement>this.$refs.window).getBoundingClientRect().right < 900 ? '80' : '50';
+      },
       showGameAndTitleDlg: function () {
         EventBus.$emit('show-game_and_title_dlg');
       },
