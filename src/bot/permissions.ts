@@ -7,6 +7,7 @@ import {
 import { debug } from './debug';
 import { permission } from './helpers/permissions';
 import { command, default_permission, settings } from './decorators';
+import { isMainThread } from 'worker_threads';
 
 class Permissions extends Core {
   @settings('warnings')
@@ -17,9 +18,12 @@ class Permissions extends Core {
 
   constructor() {
     super();
-
-    this.ensurePreservedPermissionsInDb();
     this.addMenu({ category: 'settings', name: 'permissions', id: '/settings/permissions' });
+
+    if (isMainThread) {
+      global.db.engine.index(this.collection.data, [{ index: 'id', unique: true }]);
+      this.ensurePreservedPermissionsInDb();
+    }
   }
 
   public sockets() {
