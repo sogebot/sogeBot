@@ -7,6 +7,9 @@ class Alerts extends Registry {
   constructor() {
     super();
     this.addMenu({ category: 'registry', name: 'alerts', id: '/registry/alerts/list' });
+    if (isMainThread) {
+      global.db.engine.index(this.collection.data, [{ index: 'id', unique: true }]);
+    }
   }
 
   sockets () {
