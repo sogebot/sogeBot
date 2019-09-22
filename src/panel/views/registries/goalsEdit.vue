@@ -4,9 +4,9 @@
       <div class="col-12">
         <span class="title text-default mb-2">
           {{ translate('menu.registry') }}
-          <small><i class="fas fa-angle-right"></i></small>
+          <small><fa icon="angle-right"/></small>
           {{ translate('menu.goals') }}
-          <small><i class="fas fa-angle-right"></i></small>
+          <small><fa icon="angle-right"/></small>
           <template v-if="$route.params.id">
             {{group.name}}
             <small>{{$route.params.id}}</small>

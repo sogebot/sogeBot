@@ -41,7 +41,7 @@
             <div class="h-auto w-auto" style="flex-shrink: 0;">
               <button data-toggle="dropdown" class="btn btn-outline-dark border-0 h-100 w-100" style="margin: 0; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px;"><i class="fas fa-key mr-1" aria-hidden="true"></i>
                 <span v-if="getPermissionName(response.permission)">{{ getPermissionName(response.permission) }}</span>
-                <span v-else class="text-danger"><i class="fas fa-exclamation-triangle"></i> Permission not found</span>
+                <span v-else class="text-danger"><fa icon="exclamation-triangle"/> Permission not found</span>
               </button>
               <div class="dropdown-menu" aria-labelledby="permissionsMenuButton">
                 <a class="dropdown-item"

@@ -4,7 +4,7 @@
       <div class="col-12">
         <span class="title text-default mb-2">
           {{ translate('menu.manage') }}
-          <small><i class="fas fa-angle-right"></i></small>
+          <small><fa icon="angle-right"/></small>
           {{ translate('menu.polls') }}
         </span>
       </div>

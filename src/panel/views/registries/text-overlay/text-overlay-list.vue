@@ -4,7 +4,7 @@
       <b-col>
         <span class="title text-default mb-2">
           {{ translate('menu.registry') }}
-          <small><i class="fas fa-angle-right"></i></small>
+          <small><fa icon="angle-right"/></small>
           {{ translate('menu.textoverlay') }}
         </span>
       </b-col>
