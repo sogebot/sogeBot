@@ -56,7 +56,7 @@ class CustomCommands extends System {
 
         opts.where = opts.where || {};
 
-        const items: Command[] = await global.db.engine.find(opts.collection, opts.where);
+        const items: (Command & { responses?: Response[] })[] = await global.db.engine.find(opts.collection, opts.where);
         for (const i of items) {
           i.count = await getCountOfCommandUsage(i.command);
           i.responses = await global.db.engine.find(this.collection.responses, { cid: i.id });
@@ -77,9 +77,9 @@ class CustomCommands extends System {
 
         const item: Command = await global.db.engine.findOne(opts.collection, opts.where);
         item.count = await getCountOfCommandUsage(item.command);
-        item.responses = await global.db.engine.find(this.collection.responses, { cid: item.id });
+        const responses = await global.db.engine.find(this.collection.responses, { cid: item.id });
         if (_.isFunction(cb)) {
-          cb(null, item);
+          cb(null, { responses, ...item });
         }
       });
       socket.on('update.command', async (opts, cb) => {
