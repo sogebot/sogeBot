@@ -254,12 +254,12 @@ class CustomCommands extends System {
     } // do nothing if it is not a command
     const _responses: Response[] = [];
     const commands: {
-      command: any;
+      command: Command;
       cmdArray: string[];
     }[] = [];
     const cmdArray = opts.message.toLowerCase().split(' ');
     for (let i = 0, len = opts.message.toLowerCase().split(' ').length; i < len; i++) {
-      const db_commands = await global.db.engine.find(this.collection.data, { command: cmdArray.join(' '), enabled: true });
+      const db_commands: Command[] = await global.db.engine.find(this.collection.data, { command: cmdArray.join(' '), enabled: true });
       for (const command of db_commands) {
         commands.push({
           cmdArray: _.cloneDeep(cmdArray),
