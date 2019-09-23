@@ -1,5 +1,8 @@
 {
   "new": "Nový Vlastní Příkaz",
+  "no-responses-set": "Bez odpovědí",
+  "empty": "Žádný vlastní příkaz nebyl vytvořen.",
+  "emptyAfterSearch": "Žádný vlastní příkaz  nebyla nalezena pro tvé hledání <strong>\"$search\"</strong>.",
   "command": {
     "name": "vlastní příkaz",
     "placeholder": ""
@@ -12,9 +15,6 @@
   "filter": {
     "name": "filter",
     "placeholder": "Přidat filtr k této odpovědi"
-  },
-  "error": {
-    "isEmpty": "Tato hodnota nesmí být prázdná"
   },
   "warning": "Tato akce nemůže být vrácena!",
   "settings": {

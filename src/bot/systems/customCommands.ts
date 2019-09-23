@@ -13,6 +13,8 @@ import { getCountOfCommandUsage, incrementCountOfCommandUsage, resetCountOfComma
 import { isMainThread } from 'worker_threads';
 import uuid from 'uuid';
 
+import { Command, Response } from './customCommands.d';
+
 /*
  * !command                                                                 - gets an info about command usage
  * !command add (-p [uuid|name]) ?-s true|false ![cmd] [response]           - add command with specified response
@@ -25,30 +27,11 @@ import uuid from 'uuid';
  * !command list ![cmd]                                                     - get responses of command
  */
 
-interface Response {
-  _id?: string;
-  order: number;
-  response: string;
-  stopIfExecuted: boolean;
-  permission: string;
-  filter: string;
-};
-
-interface Command {
-  _id?: string;
-  id: string;
-  command: string;
-  enabled: boolean;
-  visible: boolean;
-  responses?: Response[];
-  count?: number;
-};
-
 class CustomCommands extends System {
   constructor () {
     super();
 
-    this.addMenu({ category: 'manage', name: 'customcommands', id: 'customcommands/list' });
+    this.addMenu({ category: 'manage', name: 'customcommands', id: 'manage/commands/list' });
 
     if (isMainThread) {
       global.db.engine.index(this.collection.data, { index: 'id', unique: true });
@@ -73,7 +56,7 @@ class CustomCommands extends System {
 
         opts.where = opts.where || {};
 
-        const items: Command[] = await global.db.engine.find(opts.collection, opts.where);
+        const items: (Command & { responses?: Response[] })[] = await global.db.engine.find(opts.collection, opts.where);
         for (const i of items) {
           i.count = await getCountOfCommandUsage(i.command);
           i.responses = await global.db.engine.find(this.collection.responses, { cid: i.id });
@@ -94,9 +77,9 @@ class CustomCommands extends System {
 
         const item: Command = await global.db.engine.findOne(opts.collection, opts.where);
         item.count = await getCountOfCommandUsage(item.command);
-        item.responses = await global.db.engine.find(this.collection.responses, { cid: item.id });
+        const responses = await global.db.engine.find(this.collection.responses, { cid: item.id });
         if (_.isFunction(cb)) {
-          cb(null, item);
+          cb(null, { responses, ...item });
         }
       });
       socket.on('update.command', async (opts, cb) => {
@@ -271,12 +254,12 @@ class CustomCommands extends System {
     } // do nothing if it is not a command
     const _responses: Response[] = [];
     const commands: {
-      command: any;
+      command: Command;
       cmdArray: string[];
     }[] = [];
     const cmdArray = opts.message.toLowerCase().split(' ');
     for (let i = 0, len = opts.message.toLowerCase().split(' ').length; i < len; i++) {
-      const db_commands = await global.db.engine.find(this.collection.data, { command: cmdArray.join(' '), enabled: true });
+      const db_commands: Command[] = await global.db.engine.find(this.collection.data, { command: cmdArray.join(' '), enabled: true });
       for (const command of db_commands) {
         commands.push({
           cmdArray: _.cloneDeep(cmdArray),

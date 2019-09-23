@@ -16,7 +16,7 @@
           <template v-if="permissionsLoaded">
             <span v-if="getPermissionName(currentPermissions) !== null">{{ getPermissionName(currentPermissions) }}</span>
             <span v-else>
-              <i class="fas fa-exclamation-triangle"></i> Permission not found
+              <fa icon="exclamation-triangle"/> Permission not found
             </span>
           </template>
           <div v-else class="spinner-grow spinner-grow-sm" role="status">

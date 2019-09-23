@@ -113,6 +113,9 @@ const main = async () => {
     routes: [
       { path: '/stats/commandcount', name: 'CommandCountLogger', component: () => import('./views/loggers/commandcount.vue') },
 
+      { path: '/manage/commands/', redirect: '/manage/commands/list' },
+      { path: '/manage/commands/list', name: 'CommandsManagerList', component: () => import('./views/managers/commands/commands-list.vue') },
+      { path: '/manage/commands/edit/:id?', name: 'CommandsManagerEdit', component: () => import('./views/managers/commands/commands-edit.vue') },
       { path: '/manage/hltb', name: 'HLTBManager', component: () => import('./views/managers/hltb.vue') },
       { path: '/manage/polls', name: 'PollsManager', component: () => import('./views/managers/polls.vue') },
       { path: '/manage/events/', redirect: '/manage/events/list' },
@@ -120,9 +123,9 @@ const main = async () => {
       { path: '/manage/events/edit/:id?', name: 'EventsManagerEdit', component: () => import('./views/managers/events/edit.vue') },
       { path: '/manage/keywords/', redirect: '/manage/keywords/list' },
       { path: '/manage/keywords/list', name: 'KeywordsManagerList', component: () => import('./views/managers/keywords/keywords-list.vue') },
+      { path: '/manage/keywords/edit/:id?', name: 'KeywordsManagerEdit', component: () => import('./views/managers/keywords/keywords-edit.vue') },
       { path: '/manage/quotes/list', name: 'QuotesManagerList', component: () => import('./views/managers/quotes/quotes-list.vue') },
       { path: '/manage/quotes/edit/:id?', name: 'QuotesManagerEdit', component: () => import('./views/managers/quotes/quotes-edit.vue') },
-      { path: '/manage/keywords/edit/:id?', name: 'KeywordsManagerEdit', component: () => import('./views/managers/keywords/keywords-edit.vue') },
 
       { path: '/settings/permissions/:id?', name: 'PermissionsSettings', component: () => import('./views/settings/permissions.vue') },
       { path: '/settings/:type/:id?', name: 'InterfaceSettings', component: () => import('./views/settings/interface.vue') },

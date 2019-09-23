@@ -4,12 +4,12 @@
       <div class="col-12">
         <span class="title text-default mb-2">
           {{ translate('menu.manage') }}
-          <small><i class="fas fa-angle-right"></i></small>
+          <small><fa icon="angle-right"/></small>
           {{ translate('menu.event-listeners') }}
-          <small><i class="fas fa-angle-right"></i></small>
+          <small><fa icon="angle-right"/></small>
           <template v-if="$route.params.id">
             {{event.name}}
-            <small>{{$route.params.id}}</small>
+            <small class="text-muted text-monospace" style="font-size:0.7rem">{{$route.params.id}}</small>
           </template>
         </span>
       </div>

@@ -63,7 +63,7 @@
     },
     watch: {
       showAs: function (value) {
-        this.$emit('event', { type: 'showAs', value })
+        this.$emit('showAs', value)
       }
     },
     mounted: function () {

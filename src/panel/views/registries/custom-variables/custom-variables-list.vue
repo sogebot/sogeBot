@@ -4,7 +4,7 @@
       <div class="col-12">
         <span class="title text-default mb-2">
           {{ translate('menu.registry') }}
-          <small><i class="fas fa-angle-right"></i></small>
+          <small><fa icon="angle-right"/></small>
           {{ translate('menu.custom-variables') }}
         </span>
       </div>
@@ -64,7 +64,7 @@
         <div>
           <strong> {{ translate('registry.customvariables.permissionToChange') }}:</strong>
           <span v-if="getPermissionName(data.item.permission)">{{ getPermissionName(data.item.permission) }}</span>
-          <span v-else class="text-danger"><i class="fas fa-exclamation-triangle"></i> Permission not found</span>
+          <span v-else class="text-danger"><fa icon="exclamation-triangle"/> Permission not found</span>
         </div>
       </template>
       <template v-slot:cell(buttons)="data">

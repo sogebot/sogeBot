@@ -4,12 +4,12 @@
       <b-col>
         <span class="title text-default mb-2">
           {{ translate('menu.manage') }}
-          <small><i class="fas fa-angle-right"></i></small>
+          <small><fa icon="angle-right"/></small>
           {{ translate('menu.quotes') }}
           <template v-if="state.loaded === $state.success && $route.params.id">
-            <small><i class="fas fa-angle-right"></i></small>
+            <small><fa icon="angle-right"/></small>
             {{item.name}}
-            <small>{{$route.params.id}}</small>
+            <small class="text-muted text-monospace" style="font-size:0.7rem">{{$route.params.id}}</small>
           </template>
         </span>
       </b-col>
