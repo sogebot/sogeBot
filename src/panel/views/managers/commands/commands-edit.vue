@@ -86,7 +86,7 @@
 
           <div class="h-auto w-auto" style="flex-shrink: 0;">
             <button v-if="item.responses.length > 1" data-toggle="dropdown" class="btn btn-block btn-outline-dark border-0 h-100 w-100"><i class="fas fa-ellipsis-v"></i></button>
-            <div class="dropdown-menu p-0" v-if="item.responses.length > 1">
+            <div class="dropdown-menu p-0">
               <button v-if="i !== 0" class="dropdown-item p-2 pl-4 pr-4" style="cursor: pointer" type="button" @click="moveUpResponse(response.order)"><i class="fas fa-sort-up fa-fw"></i> {{ translate('commons.moveUp') | capitalize }}</button>
               <button v-if="i !== item.responses.length - 1" class="dropdown-item p-2 pl-4 pr-4" style="cursor: pointer" type="button" @click="moveDownResponse(response.order)"><i class="fas fa-sort-down fa-fw"></i> {{ translate('commons.moveDown') | capitalize }}</button>
               <button class="dropdown-item p-2 pl-4 pr-4 text-danger" style="cursor: pointer" type="button" @click="deleteResponse(response.order)"><i class="fas fa-trash-alt fa-fw"></i> {{ translate('delete') }}</button>
@@ -318,7 +318,7 @@ export default class CommandsEdit extends Vue {
           const responses: Response[] = this.item.responses.map(o => { return { cid: this.item.id, ...o} });
           console.debug('Saving responses', responses);
           if (responses.length > 0) {
-            this.socket.emit('update', { collection: 'responses', key: 'id', items: responses }, (err, data) => {
+            this.socket.emit('set', { collection: 'responses', where: { cid: this.item.id }, items: responses }, (err) => {
               if (err) {
                 this.state.save = this.$state.fail;
                 return console.error(err);
