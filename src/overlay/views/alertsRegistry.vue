@@ -17,18 +17,19 @@
               v-if="runningAlert.isShowingText"
               :class="{
                 center: runningAlert.alert.layout === '3',
-                [runningAlert.animationText]: true
+                [runningAlert.animationText]: true,
               }"
-              class="slow animated"
-              :style="{
-                'font-family': runningAlert.alert.font.family,
-                'font-size': runningAlert.alert.font.size + 'px',
-                'font-weight': runningAlert.alert.font.weight,
-                'color': runningAlert.alert.font.color,
-                'text-align': 'center',
-                'text-shadow': textStrokeGenerator(runningAlert.alert.font.borderPx, runningAlert.alert.font.borderColor)
-              }">
-                <v-runtime-template :template="prepareMessageTemplate(runningAlert.alert.messageTemplate)"></v-runtime-template>
+              :style="{'text-align': 'center'}"
+              class="slow animated">
+                <span :style="{
+                  'font-family': runningAlert.alert.font.family,
+                  'font-size': runningAlert.alert.font.size + 'px',
+                  'font-weight': runningAlert.alert.font.weight,
+                  'color': runningAlert.alert.font.color,
+                  'text-shadow': textStrokeGenerator(runningAlert.alert.font.borderPx, runningAlert.alert.font.borderColor)
+                  }">
+                  <v-runtime-template :template="prepareMessageTemplate(runningAlert.alert.messageTemplate)"></v-runtime-template>
+                </span>
                 <div
                   v-if="
                       typeof runningAlert.alert.message !== 'undefined'
@@ -48,6 +49,7 @@
                   }" v-html="withEmotes(runningAlert.message)">
                 </div>
             </div>
+             <!-- empty div to mitigate text area -->
             <div v-else
               :style="{
                 'visibility': 'hidden',
@@ -57,9 +59,10 @@
                 'color': runningAlert.alert.font.color,
                 'text-shadow': textStrokeGenerator(runningAlert.alert.font.borderPx, runningAlert.alert.font.borderColor)
               }">
-                {{runningAlert.alert.messageTemplate}}
-                <div>{{ runningAlert.message }}</div>
-              </div> <!-- empty div to mitigate text area -->
+              {{runningAlert.alert.messageTemplate}}
+              <div>{{ runningAlert.message }}</div>
+            </div>
+            <!-- empty div to mitigate text area -->
           </template>
           <v-runtime-template
             v-else
