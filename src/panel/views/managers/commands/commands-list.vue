@@ -62,7 +62,7 @@
         </template>
       </template>
       <template v-slot:cell(buttons)="data">
-        <div class="text-right" style="width: max-content !important;">
+        <div class="float-right" style="width: max-content !important;">
           <button-with-icon :class="[ data.item.enabled ? 'btn-success' : 'btn-danger' ]" class="btn-only-icon btn-reverse" icon="power-off" @click="data.item.enabled = !data.item.enabled; sendUpdate(data.item.id)">
             {{ translate('dialog.buttons.' + (data.item.enabled? 'enabled' : 'disabled')) }}
           </button-with-icon>
