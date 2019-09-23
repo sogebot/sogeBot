@@ -1,289 +1,339 @@
-<span id="customcommands-edit">
-    <span class="title text-default" style="padding: 0 !important;">
-      <a class="btn btn-outline-info" style="border: 0 !important;" href="/#customcommands/list"><i class="fas fa-chevron-circle-left"></i></a>
-      <span style="position: relative; top: 2px;">{{ title }} </span>
-      <span style="position: relative; top: 2px;" v-if="isEditation">{{ command }}</span>
-    </span>
+<template>
+  <b-container fluid ref="window">
+    <b-row>
+      <b-col>
+        <span class="title text-default mb-2">
+          {{ translate('menu.manage') }}
+          <small><fa icon="angle-right"/></small>
+          {{ translate('menu.customcommands') }}
+          <template v-if="state.loadedCmd === $state.success && state.loadedPerm === $state.success && $route.params.id">
+            <small><fa icon="angle-right"/></small>
+            !{{item.command}}
+            <small class="text-muted text-monospace" style="font-size:0.7rem">{{$route.params.id}}</small>
+          </template>
+        </span>
+      </b-col>
+    </b-row>
 
-    <span class="float-right">
-      <span v-if="pending" style="cursor: auto;" class="alert-danger btn m-0">{{commons.translate('dialog.changesPending')}}</span>
-      <button v-if="states.save === 0" type="button" class="btn btn-primary" v-on:click="saveChanges()">{{ commons.translate('dialog.buttons.saveChanges.idle') }}</button>
-      <button v-if="states.save === 1" disabled="disabled" type="button" class="btn btn-primary"><i class="fas fa-circle-notch fa-spin"></i> {{ commons.translate('dialog.buttons.saveChanges.progress') }}</button>
-      <button v-if="states.save === 2" disabled="disabled" type="button" class="btn btn-success"><i class="fas fa-check"></i> {{ commons.translate('dialog.buttons.saveChanges.done') }}</span></button>
-      <button v-if="states.save === 3" disabled="disabled" type="button" class="btn btn-danger"><i class="fas fa-exclamation"></i> {{ commons.translate('dialog.buttons.something-went-wrong') }}</span></button>
-    </span>
+    <panel>
+      <template v-slot:left>
+        <button-with-icon class="btn-secondary btn-reverse" icon="caret-left" href="#/manage/commands/list">{{translate('commons.back')}}</button-with-icon>
+        <hold-button v-if="$route.params.id && state.loadedCmd === $state.success && state.loadedPerm === $state.success" icon="trash" class="btn-danger" @trigger="remove()">
+          <template slot="title">{{translate('dialog.buttons.delete')}}</template>
+          <template slot="onHoldTitle">{{translate('dialog.buttons.hold-to-delete')}}</template>
+        </hold-button>
+      </template>
+      <template v-slot:right v-if="state.loadedCmd === $state.success && state.loadedPerm === $state.success">
+        <b-alert show variant="info" v-if="pending" v-html="translate('dialog.changesPending')" class="mr-2 p-2 mb-0"></b-alert>
+        <state-button @click="save()" text="saveChanges" :state="state.save" :invalid="!!$v.$error"/>
+      </template>
+    </panel>
 
-    <div class="widget pt-3">
-      <!-- Editation stuff here -->
-      <form>
-        <div class="form-group col-md-12">
-          <label style="margin: 0px 0px 3px; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px;">{{ commons.translate('systems.customcommands.command.name') }}</label>
-          <input v-bind:class="{ 'is-invalid': hasError.command }" v-model="command" type="text" class="form-control" v-bind:placeholder="commons.translate('systems.customcommands.command.placeholder')">
-          <div class="invalid-feedback">{{ commons.translate('systems.customcommands.error.isEmpty') }}</div>
-        </div>
+    <loading v-if="state.loadedCmd !== $state.success || state.loadedPerm !== $state.success" />
+    <b-form v-else>
+      <b-form-group
+        :label="translate('systems.customcommands.command.name')"
+        label-for="name"
+      >
+        <b-input-group prepend="!">
+          <b-form-input
+            id="name"
+            v-model="item.command"
+            type="text"
+            :placeholder="translate('systems.customcommands.command.placeholder')"
+            @input="$v.item.command.$touch()"
+            :state="$v.item.command.$invalid && $v.item.command.$dirty ? false : null"
+          ></b-form-input>
+        </b-input-group>
+        <b-form-invalid-feedback>{{ translate('dialog.errors.required') }}</b-form-invalid-feedback>
+      </b-form-group>
 
-        <div class="form-group col-md-12">
-          <label style="margin: 0px 0px 3px; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px;">{{ commons.translate('systems.customcommands.response.name') }}</label>
-
-          <div style="display: flex; flex: 1 1 auto" :class="[i !== 0 ? 'pt-2' : '']" v-for="(response, i) of _.orderBy(responses, 'order', 'asc')">
-            <textarea-with-tags
-              v-bind:error="hasError.responses && response.response.trim().length === 0"
-              v-bind:value="response.response"
-              v-bind:placeholder="commons.translate('systems.customcommands.response.placeholder')"
-              v-bind:filters="['global', 'sender', 'param', '!param', 'touser']"
-              v-on:update="response.response = $event"></textarea-with-tags>
-            <textarea-with-tags
-              v-bind:value="response.filter"
-              v-bind:placeholder="commons.translate('systems.customcommands.filter.placeholder')"
-              v-on:update="response.filter = $event"
-              v-bind:filters="['sender', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'rank', 'game', 'title', 'views', 'followers', 'hosts', 'subscribers']"></textarea-with-tags>
-
-            <div class="h-auto w-auto" style="flex-shrink: 0;">
-              <button data-toggle="dropdown" class="btn btn-outline-dark border-0 h-100 w-100" style="margin: 0; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px;"><i class="fas fa-key mr-1" aria-hidden="true"></i>
-                <span v-if="getPermissionName(response.permission)">{{ getPermissionName(response.permission) }}</span>
-                <span v-else class="text-danger"><fa icon="exclamation-triangle"/> Permission not found</span>
-              </button>
-              <div class="dropdown-menu" aria-labelledby="permissionsMenuButton">
-                <a class="dropdown-item"
-                    style="cursor: pointer"
-                    v-for="p of permissions"
-                    :key="p.id"
-                    @click="response.permission = p.id; pending = true;">{{ getPermissionName(p.id) | capitalize }}</a>
-              </div>
+      <b-form-group>
+        <label>{{ translate('systems.customcommands.response.name') }}</label>
+        <div style="display: flex; flex: 1 1 auto" :key="i" :class="[i !== 0 ? 'pt-2' : '']" v-for="(response, i) of _.orderBy(item.responses, 'order', 'asc')">
+          <textarea-with-tags
+            :value.sync="response.response"
+            v-bind:placeholder="translate('systems.customcommands.response.placeholder')"
+            v-bind:filters="['global', 'sender', 'param', '!param', 'touser']"
+            v-on:update="response.response = $event"></textarea-with-tags>
+          <textarea-with-tags
+            :value.sync="response.filter"
+            v-bind:placeholder="translate('systems.customcommands.filter.placeholder')"
+            v-on:update="response.filter = $event"
+            v-bind:filters="['sender', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'rank', 'game', 'title', 'views', 'followers', 'hosts', 'subscribers']"></textarea-with-tags>
+          <div class="h-auto w-auto" style="flex-shrink: 0;">
+            <button data-toggle="dropdown" class="btn btn-outline-dark border-0 h-100 w-100" style="margin: 0; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px;"><i class="fas fa-key mr-1" aria-hidden="true"></i>
+              <span v-if="getPermissionName(response.permission)">{{ getPermissionName(response.permission) }}</span>
+              <span v-else class="text-danger"><fa icon="exclamation-triangle"/> Permission not found</span>
+            </button>
+            <div class="dropdown-menu" aria-labelledby="permissionsMenuButton">
+              <a class="dropdown-item"
+                  style="cursor: pointer"
+                  v-for="p of permissions"
+                  :key="p.id"
+                  @click="response.permission = p.id; pending = true;">{{ getPermissionName(p.id) | capitalize }}</a>
             </div>
-            <div class="h-auto w-auto" style="flex-shrink: 0;">
-              <button data-toggle="dropdown" class="btn btn-outline-dark border-0 h-100 w-100" style="margin: 0; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px;">
-                <i class="fas mr-1" :class="[response.stopIfExecuted ? 'fa-stop' : 'fa-play']" aria-hidden="true"></i>
-                {{ commons.translate(response.stopIfExecuted ? 'commons.stop-if-executed' : 'commons.continue-if-executed') | capitalize }}</button>
-              <div class="dropdown-menu">
-                <a class="dropdown-item" style="cursor: pointer" v-on:click="response.stopIfExecuted = true; pending = true">{{ commons.translate('commons.stop-if-executed') | capitalize }}</a>
-                <a class="dropdown-item" style="cursor: pointer" v-on:click="response.stopIfExecuted = false; pending = true">{{ commons.translate('commons.continue-if-executed') | capitalize }}</a>
-              </div>
-            </div>
-
-            <div class="h-auto w-auto" style="flex-shrink: 0;">
-              <button v-if="responses.length > 1" data-toggle="dropdown" class="btn btn-block btn-outline-dark border-0 h-100 w-100"><i class="fas fa-ellipsis-v"></i></button>
-              <div class="dropdown-menu p-0" v-if="responses.length > 1">
-                <button v-if="i !== 0" class="dropdown-item p-2 pl-4 pr-4" style="cursor: pointer" type="button" @click="moveUpResponse(response.order)"><i class="fas fa-sort-up fa-fw"></i> {{ commons.translate('commons.moveUp') | capitalize }}</button>
-                <button v-if="i !== responses.length - 1" class="dropdown-item p-2 pl-4 pr-4" style="cursor: pointer" type="button" @click="moveDownResponse(response.order)"><i class="fas fa-sort-down fa-fw"></i> {{ commons.translate('commons.moveDown') | capitalize }}</button>
-                <button class="dropdown-item p-2 pl-4 pr-4 text-danger" style="cursor: pointer" type="button" @click="deleteResponse(response.order)"><i class="fas fa-trash-alt fa-fw"></i> {{ commons.translate('delete') }}</button>
-              </div>
+          </div>
+          <div class="h-auto w-auto" style="flex-shrink: 0;">
+            <button data-toggle="dropdown" class="btn btn-outline-dark border-0 h-100 w-100" style="margin: 0; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px;">
+              <i class="fas mr-1" :class="[response.stopIfExecuted ? 'fa-stop' : 'fa-play']" aria-hidden="true"></i>
+              {{ translate(response.stopIfExecuted ? 'commons.stop-if-executed' : 'commons.continue-if-executed') | capitalize }}</button>
+            <div class="dropdown-menu">
+              <a class="dropdown-item" style="cursor: pointer" v-on:click="response.stopIfExecuted = true; pending = true">{{ translate('commons.stop-if-executed') | capitalize }}</a>
+              <a class="dropdown-item" style="cursor: pointer" v-on:click="response.stopIfExecuted = false; pending = true">{{ translate('commons.continue-if-executed') | capitalize }}</a>
             </div>
           </div>
-          <div class="invalid-feedback" :style="{'display': hasError.responses === true ? 'block !important' : 'no'}">{{ commons.translate('systems.customcommands.error.isEmpty') }}</div>
-          <button class="btn btn-primary btn-block mt-2" type="button" @click="responses.push({ filter: '', order: responses.length, response: '', permission: _.orderBy(permissions, 'order', 'asc').pop().id })">{{ commons.translate('systems.customcommands.addResponse') }}</button>
-        </div>
 
-        <div class="form-group row pl-3 pr-3">
-          <div class="col-md-2">
-            <label style="margin: 0px 0px 3px; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px;">{{ commons.translate('count') }}</label>
-            <input type="number" class="form-control" v-model="count" readonly="true">
-            <button type="button" class="btn btn-block btn-danger" @click="resetCount">{{ commons.translate('commons.reset') | capitalize }}</button>
-          </div>
-          <div class="col-md-2">
-              <label style="margin: 0px 0px 3px; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px;">{{ commons.translate('visible') }}</label>
-            <button type="button" class="btn btn-block" v-on:click="visible = !visible" v-bind:class="[ visible ? 'btn-success' : 'btn-danger' ]" aria-hidden="true">{{ (visible ? commons.translate('visible') : commons.translate('hidden')) | capitalize }}</button>
-          </div>
-          <div class="col-md-2">
-              <label style="margin: 0px 0px 3px; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px;">{{ commons.translate('status') }}</label>
-            <button type="button" class="btn btn-block" v-on:click="enabled = !enabled" v-bind:class="[ enabled ? 'btn-success' : 'btn-danger' ]" aria-hidden="true">{{ (enabled ? commons.translate('enabled') : commons.translate('disabled')) | capitalize }}</button>
+          <div class="h-auto w-auto" style="flex-shrink: 0;">
+            <button v-if="item.responses.length > 1" data-toggle="dropdown" class="btn btn-block btn-outline-dark border-0 h-100 w-100"><i class="fas fa-ellipsis-v"></i></button>
+            <div class="dropdown-menu p-0" v-if="item.responses.length > 1">
+              <button v-if="i !== 0" class="dropdown-item p-2 pl-4 pr-4" style="cursor: pointer" type="button" @click="moveUpResponse(response.order)"><i class="fas fa-sort-up fa-fw"></i> {{ translate('commons.moveUp') | capitalize }}</button>
+              <button v-if="i !== item.responses.length - 1" class="dropdown-item p-2 pl-4 pr-4" style="cursor: pointer" type="button" @click="moveDownResponse(response.order)"><i class="fas fa-sort-down fa-fw"></i> {{ translate('commons.moveDown') | capitalize }}</button>
+              <button class="dropdown-item p-2 pl-4 pr-4 text-danger" style="cursor: pointer" type="button" @click="deleteResponse(response.order)"><i class="fas fa-trash-alt fa-fw"></i> {{ translate('delete') }}</button>
+            </div>
           </div>
         </div>
-      </form>
+        <button class="btn btn-primary btn-block mt-2" type="button" @click="item.responses.push({ filter: '', order: item.responses.length, response: '', permission: _.orderBy(permissions, 'order', 'asc').pop().id })">{{ translate('systems.customcommands.addResponse') }}</button>
+      </b-form-group>
 
-      <div class="form-group col-md-12" v-if="isEditation">
-        <button type="button" class="btn btn-danger" key="deleting" data-lang="dialog.buttons.delete" v-if="states.delete === 0" v-on:click="states.delete=1">{{ commons.translate('dialog.buttons.delete') }}</button>
-        <div class="btn-group" role="group" v-if="states.delete === 1">
-          <button type="button" class="btn btn-danger" key="deleted" data-lang="dialog.buttons.yes" v-on:click="deleteItem">{{ commons.translate('dialog.buttons.yes') }}</button>
-          <button type="button" class="btn btn-success" key="waiting" data-lang="dialog.buttons.no" v-on:click="states.delete=0">{{ commons.translate('dialog.buttons.no') }}</button>
-        </div>
-        <small class="form-text text-danger" v-html="commons.translate('systems.customcommands.warning')"></small>
-      </div>
-      <!-- -->
-    </div>
-  </span>
+      <b-form-group>
+        <b-row>
+          <b-col>
+            <label>{{ translate('count') }}</label>
+            <input type="number" class="form-control" v-model="item.count" readonly="true">
+            <button type="button" class="btn btn-block btn-danger" @click="resetCount">{{ translate('commons.reset') | capitalize }}</button>
+          </b-col>
+          <b-col>
+            <label>{{ translate('visible') }}</label>
+            <button type="button" class="btn btn-block" v-on:click="item.visible = !item.visible" v-bind:class="[ item.visible ? 'btn-success' : 'btn-danger' ]" aria-hidden="true">{{ (item.visible ? translate('visible') : translate('hidden')) | capitalize }}</button>
+          </b-col>
+          <b-col>
+            <label>{{ translate('status') }}</label>
+            <button type="button" class="btn btn-block" v-on:click="item.enabled = !item.enabled" v-bind:class="[ item.enabled ? 'btn-success' : 'btn-danger' ]" aria-hidden="true">{{ (item.enabled ? translate('enabled') : translate('disabled')) | capitalize }}</button>
+          </b-col>
+        </b-row>
+      </b-form-group>
+    </b-form>
+  </b-container>
+</template>
 
-  <script>
-    Vue.prototype.commons = commons
+<script lang="ts">
+import { Vue, Component, Watch } from 'vue-property-decorator';
+import _ from 'lodash'
 
-    function customCommandsEditInit () {
-      if (_.size(translations) === 0) return setTimeout(() => customCommandsEditInit(), 1)
+import { Validations } from 'vuelidate-property-decorators';
+import { required } from 'vuelidate/lib/validators';
 
-      var customCommandsEdit = new Vue({
-        el: '#customcommands-edit',
-        components: {
-          'textarea-with-tags': textAreaWithTags
-        },
-        data: {
-          id: null,
-          responses: [{filter: '', response: '', order: 0, permission: null, stopIfExecuted: false}],
-          command: '',
-          visible: true,
-          enabled: true,
-          count: 0,
-          permissions: [],
+import { Command, Response } from 'src/bot/systems/customCommands.d';
 
-          pending: false,
+import uuid from 'uuid/v4';
 
-          hasError: {
-            responses: false,
-            command: false
-          },
+Component.registerHooks([
+  'beforeRouteEnter',
+  'beforeRouteLeave',
+  'beforeRouteUpdate' // for vue-router 2.2+
+])
 
-          psocket: io('/core/permissions', { query: "token=" + token }),
-          socket: io('/systems/customcommands', { query: "token=" + token }),
-
-          states: {
-            save: 0,
-            delete: 0
-          }
-        },
-        created() {
-          this.psocket.emit('find', {}, (err, data) => {
-            if (err) return console.error(err)
-            this.permissions = _.orderBy(data, 'order', 'asc')
-
-            if (!commons.urlParam('id')) {
-              for (let r of this.responses) {
-                if (!r.permission) {
-                  r.permission = _.orderBy(this.permissions, 'order', 'asc').pop().id
-                }
-              }
-            }
-          });
-        },
-        methods: {
-          getPermissionName: function (id) {
-            if (!id) return 'Disabled'
-            const permission = this.permissions.find((o) => {
-              return o.id === id
-            })
-            if (typeof permission !== 'undefined') {
-              if (permission.name.trim() === '') {
-                return permission.id
-              } else {
-                return permission.name
-              }
-            } else {
-              return null
-            }
-          },
-          moveUpResponse: function (order) {
-            this.responses.filter((o) => o.order === order - 1 || o.order === order).map(o => {
-              if (o.order === order - 1) o.order++
-              else o.order--
-              return o
-            })
-          },
-          moveDownResponse: function (order) {
-            this.responses.filter((o) => o.order === order + 1 || o.order === order).map(o => {
-              if (o.order === order + 1) o.order--
-              else o.order++
-              return o
-            })
-          },
-          deleteResponse: function (order) {
-            let i = 0
-            this.responses = this.responses.filter(o => o.order !== order)
-            _.orderBy(this.responses, 'order', 'asc').map((o) => {
-              o.order = i++
-              return o
-            })
-          },
-          resetCount: function () {
-            this.count = 0
-            this.pending = true
-          },
-          validateForm: function () {
-            // reset errors
-            for (let [key, value] of Object.entries(this.hasError)) {
-              this.hasError[key] = false
-            }
-            for (let r of this.responses) if (r.response.length === 0) this.hasError.responses = true
-            if (this.command.trim().length <= 1) this.hasError.command = true
-            return _.filter(this.hasError, (o) => o === true).length === 0
-          },
-          deleteItem: function () {
-            this.socket.emit('delete', {id: this.id}, () => {
-              page('/#customcommands/list')
-            })
-          },
-          saveChanges: function () {
-            if (this.validateForm()) {
-              this.states.save = 1
-              const data = {
-                id: this.id,
-                responses: this.responses,
-                command: this.command.trim(),
-                visible: this.visible,
-                enabled: this.enabled,
-                count: this.count
-              }
-              this.socket.emit('update.command', {items: [data]}, (err, data) => {
-                if (err) {
-                  console.error(err)
-                  return this.states.save = 3
-                }
-                this.states.save = 2
-                this.pending = false
-                this.id = data.command.id
-                this.responses = data.responses
-                page('?id=' + this.id + '#customcommands/edit')
-                setTimeout(() => this.states.save = 0, 1000)
-              })
-            }
-          },
-        },
-        watch: {
-          enabled: function (val, old) {
-            this.pending = true
-          },
-          visible: function (val, old) {
-            this.pending = true
-          },
-          response: function (val, old) {
-            this.pending = true
-          },
-          command: function (val, old) {
-            if (!val.startsWith('!')) this.command = `!${val}`
-            this.pending = true
-          }
-        },
-        computed: {
-          isEditation: function () {
-            return !_.isNil(this.id)
-          },
-          title: function () {
-            return commons.translate(this.isEditation ? 'dialog.title.edit' : 'dialog.title.add') +
-              ' ' + commons.translate('systems.customcommands.command.name')
-          }
-        },
-        filters: {
-          capitalize: function (value) {
-            if (!value) return ''
-            value = value.toString()
-            return value.charAt(0).toUpperCase() + value.slice(1)
-          },
-        }
-      })
-
-      // load up from db
-      if (commons.urlParam('id')) {
-        customCommandsEdit.id = commons.urlParam('id')
-        customCommandsEdit.socket.emit('findOne.command', { where: { id: commons.urlParam('id') } }, (err, data) => {
-          // add empty filter if undefined
-          for (let i = 0, length = data.responses.length; i < length; i++) {
-            if (!data.responses[i].filter) data.responses[i].filter = ''
-          }
-          customCommandsEdit.responses = data.responses
-
-          customCommandsEdit.command = data.command
-          customCommandsEdit.visible = data.visible
-          customCommandsEdit.enabled = data.enabled
-          customCommandsEdit.count = data.count
-          customCommandsEdit.$nextTick(() => { customCommandsEdit.pending = false })
-        })
-      }
+@Component({
+  components: {
+    'loading': () => import('../../../components/loading.vue'),
+    'textarea-with-tags': () => import('../../../components/textareaWithTags.vue'),
+  },
+  filters: {
+    capitalize(value) {
+      if (!value) return ''
+      value = value.toString()
+      return value.charAt(0).toUpperCase() + value.slice(1)
     }
-    customCommandsEditInit()
+  }
+})
+export default class CommandsEdit extends Vue {
+  item: Command & { responses: Response[] } = {
+    id: uuid(),
+    command: '',
+    enabled: true,
+    visible: true,
+    responses: [],
+    count: 0,
+  }
+  permissions: any[] = [];
+
+  psocket = io('/core/permissions', { query: "token=" + this.token });
+  socket = io('/systems/customcommands', { query: "token=" + this.token });
+
+  state: { loadedPerm: number; loadedCmd: number; save: number } = {
+    loadedPerm: this.$state.progress,
+    loadedCmd: this.$state.progress,
+    save: this.$state.idle
+  };
+  pending: boolean = false;
+
+  supportedEvents: string[] = ['follows', 'cheers', 'subs', 'resubs', 'subgifts',  'tips', 'hosts', 'raids']
+  selectedTabIndex: number = 0;
+
+  @Validations()
+  validations = {
+    item: {
+      command: {required},
+    }
+  }
+
+  beforeRouteUpdate(to, from, next) {
+    if (this.pending) {
+      const isOK = confirm('You will lose your pending changes. Do you want to continue?')
+      if (!isOK) {
+        next(false);
+      } else {
+        next();
+      }
+    } else {
+      next();
+    }
+  }
+
+  beforeRouteLeave(to, from, next) {
+    if (this.pending) {
+      const isOK = confirm('You will lose your pending changes. Do you want to continue?')
+      if (!isOK) {
+        next(false);
+      } else {
+        next();
+      }
+    } else {
+      next();
+    }
+  }
+
+  @Watch('item', { deep: true })
+  setPendingState() {
+    if (this.state.loadedCmd === this.$state.success && this.state.loadedPerm === this.$state.success) {
+      this.pending = true;
+    }
+  }
+
+  created() {
+    this.psocket.emit('find', {}, (err, data) => {
+      if (err) return console.error(err)
+      this.permissions = _.orderBy(data, 'order', 'asc')
+      this.state.loadedPerm = this.$state.success;
+    });
+
+    if (this.$route.params.id) {
+      this.socket.emit('findOne.command', { where: { id: this.$route.params.id } }, (err, data: Command & { responses: Response[] }) => {
+        data.command = data.command.replace('!', '');
+        console.debug('Loaded', {data})
+        // add empty filter if undefined
+        for (let i = 0, length = data.responses.length; i < length; i++) {
+          if (!data.responses[i].filter) data.responses[i].filter = ''
+        }
+        this.item = data
+        this.$nextTick(() => { this.pending = false })
+        this.state.loadedCmd = this.$state.success;
+      })
+    } else {
+      this.state.loadedCmd = this.$state.success;
+    }
+  }
+
+  getPermissionName(id) {
+    if (!id) return 'Disabled'
+    const permission = this.permissions.find((o) => {
+      return o.id === id
+    })
+    if (typeof permission !== 'undefined') {
+      if (permission.name.trim() === '') {
+        return permission.id
+      } else {
+        return permission.name
+      }
+    } else {
+      return null
+    }
+  }
+
+  moveUpResponse(order) {
+    this.item.responses.filter((o) => o.order === order - 1 || o.order === order).map(o => {
+      if (o.order === order - 1) o.order++
+      else o.order--
+      return o
+    })
+  }
+
+  moveDownResponse(order) {
+    this.item.responses.filter((o) => o.order === order + 1 || o.order === order).map(o => {
+      if (o.order === order + 1) o.order--
+      else o.order++
+      return o
+    })
+  }
+
+  deleteResponse(order) {
+    let i = 0
+    this.item.responses = this.item.responses.filter(o => o.order !== order)
+    _.orderBy(this.item.responses, 'order', 'asc').map((o) => {
+      o.order = i++
+      return o
+    })
+  }
+
+  resetCount() {
+    this.item.count = 0
+    this.pending = true
+  }
+
+  async remove() {
+    await Promise.all([
+      await new Promise(resolve => {
+        this.socket.emit('delete', { where: { id: this.$route.params.id } }, () => {
+          resolve();
+        })
+      }),
+      await new Promise(resolve => {
+        this.socket.emit('delete', { collection: 'responses', where: { cid: this.$route.params.id } }, () => {
+          resolve();
+        })
+      }),
+    ])
+    this.$router.push({ name: 'CommandsManagerList' });
+  }
+
+  async save() {
+    this.$v.$touch();
+    if (!this.$v.$invalid) {
+      this.state.save = this.$state.progress;
+      await Promise.all([
+        new Promise(resolve => {
+          const command: Command = (({responses, ...keys}) => ({...keys}))(this.item);
+          command.command = '!' + command.command;
+          console.debug('Saving command', command);
+          this.socket.emit('update', { key: 'id', items: [command] }, (err, data) => {
+            if (err) {
+              this.state.save = this.$state.fail;
+              return console.error(err);
+            }
+            resolve()
+          });
+        }),
+        new Promise(resolve => {
+          const responses: Response[] = this.item.responses.map(o => { return { cid: this.item.id, ...o} });
+          console.debug('Saving responses', responses);
+          this.socket.emit('update', { collection: 'responses', key: 'id', items: responses }, (err, data) => {
+            if (err) {
+              this.state.save = this.$state.fail;
+              return console.error(err);
+            }
+            resolve()
+          });
+        })
+      ])
+
+      this.state.save = this.$state.success;
+      this.pending = false;
+      this.$router.push({ name: 'CommandsManagerEdit', params: { id: this.item.id } }).catch(err => {})
+    }
+    setTimeout(() => {
+      this.state.save = this.$state.idle;
+    }, 1000)
+  }
+}
   </script>

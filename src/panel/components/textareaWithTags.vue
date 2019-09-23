@@ -3,21 +3,21 @@
     class="border-0 p-0 m-0 d-flex"
     v-bind:class="{ 'is-invalid': error }">
 
-    <textarea style="min-height: 6em;" v-show="editation" v-on:keydown.enter="onEnter" v-on:blur="editation = false" ref="textarea" v-model="currentValue" v-bind:placeholder="placeholder" class="form-control" v-bind:style="heightStyle"></textarea>
+    <textarea style="min-height: 6em;" v-show="editation" v-on:keydown.enter="onEnter" v-on:blur="editation = false" ref="textarea" v-model="_value" v-bind:placeholder="placeholder" class="form-control" v-bind:style="heightStyle"></textarea>
 
     <div class="form-control" ref="placeholder" style="cursor: text; overflow: auto; resize: vertical; min-height: 6em;"
       v-bind:class="{ 'is-invalid': error }"
-      v-show="!editation && value.trim().length === 0"
+      v-show="!editation && _value.trim().length === 0"
       v-bind:style="heightStyle"
       v-on:click="editation=true"><span class="text-muted" v-html="d_placeholder"></span>
     </div>
 
     <div class="form-control" ref="div" style="word-break: break-all; cursor: text; overflow: auto; resize: vertical; min-height: 6em;"
       v-bind:class="{ 'is-invalid': error }"
-      v-show="!editation && value.trim().length > 0"
+      v-show="!editation && _value.trim().length > 0"
       v-on:click="editation=true"
       v-bind:style="heightStyle"
-      v-html="$options.filters.filterize(value)">
+      v-html="$options.filters.filterize(_value)">
     </div>
 
     <div v-if="filters && filters.length > 0">
@@ -63,20 +63,10 @@
   </div>
 </template>
 <script lang="ts">
-import { Vue, Component, Watch } from 'vue-property-decorator';
+import { Vue, Component, Watch, Prop, PropSync } from 'vue-property-decorator';
 import { flattenKeys } from '../../bot/helpers';
 import { sortBy, keys, isNil } from 'lodash';
 import translate from '../helpers/translate';
-
-
-const props = Vue.extend({
-  props: {
-    filters: Array as () => Array<any>,
-    value: String,
-    error: Boolean,
-    placeholder: String,
-  },
-})
 
 @Component({
   filters: {
@@ -97,11 +87,15 @@ const props = Vue.extend({
     }
   }
 })
-export default class textareaWithTags extends props {
+export default class textareaWithTags extends Vue {
+  @PropSync('value') _value !: string;
+  @Prop() filters !: any[];
+  @Prop() error: boolean | undefined;
+  @Prop() placeholder: string | undefined;
+
   height = 0;
   editation = false;
   isMounted = false;
-  currentValue = '';
   d_placeholder = !this.placeholder || this.placeholder.trim().length === 0 ? '&nbsp;' : this.placeholder
 
   get heightStyle() {
@@ -109,37 +103,29 @@ export default class textareaWithTags extends props {
     return `height: ${this.height + 2}px`
   }
 
-  mounted() {
-    this.currentValue = this.value;
-  }
-
   onEnter (e) {
     // don't add newline
     e.stopPropagation()
     e.preventDefault()
     e.returnValue = false
-    this.currentValue = e.target.value
+    this._value = e.target.value
   }
 
   addVariable(variable) {
-    this.currentValue += ' $' + variable
-    this.currentValue = this.currentValue.trim()
+    this._value = this._value + ' $' + variable;
     this.editation = true;
     Vue.nextTick(() => {
-      (<HTMLElement>this.$refs.textarea).focus()
+      window.setTimeout(() => {
+        (<HTMLElement>this.$refs.textarea).focus()
+      }, 10)
     })
-  }
-
-  @Watch('currentValue')
-  onCurrentValueChanged(val: string, oldVal: string) {
-    this.$emit('change', val)
   }
 
   @Watch('editation')
   onEditationChanged(val, old) {
     if (val) {
       // focus textarea and set height
-      if (this.currentValue.trim().length === 0) {
+      if (this._value.trim().length === 0) {
         this.height = (<HTMLElement>this.$refs.placeholder).clientHeight
       } else this.height = (<HTMLElement>this.$refs.div).clientHeight
       Vue.nextTick(() => {

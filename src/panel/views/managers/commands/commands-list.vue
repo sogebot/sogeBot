@@ -18,15 +18,16 @@
 
     <loading v-if="state.loadingCmd === 1 || state.loadingPerm === 1"/>
     <b-alert show variant="danger" v-else-if="state.loadingCmd === 2 && state.loadingPerm === 2 && commandsFiltered.length === 0 && search.length > 0">
-      <fa icon="search"/> <span v-html="translate('systems.commands.emptyAfterSearch').replace('$search', search)"/>
+      <fa icon="search"/> <span v-html="translate('systems.customcommands.emptyAfterSearch').replace('$search', search)"/>
     </b-alert>
     <b-alert show v-else-if="state.loadingCmd === 2 && state.loadingPerm === 2 && commands.length === 0">
-      {{translate('systems.commands.empty')}}
+      {{translate('systems.customcommands.empty')}}
     </b-alert>
     <b-table v-else striped small :items="commandsFiltered" :fields="fields" responsive >
       <template v-slot:cell(response)="data">
+        <span v-if="data.item.responses.length === 0" class="text-muted">{{ translate('systems.customcommands.no-responses-set') }}</span>
         <template v-for="(r, i) of _.orderBy(data.item.responses, 'order', 'asc')">
-          <div :style="{ 'margin-top': i !== 0 ? '15px' : 'inherit' }" style="margin: 0; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px; margin-bottom: -3px;">
+          <div :key="i" :style="{ 'margin-top': i !== 0 ? '15px' : 'inherit' }" style="margin: 0; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px; margin-bottom: -3px;">
             <span style="display: inline-block">
               {{translate('response')}}#{{i + 1}}
             </span>
@@ -56,8 +57,8 @@
               </div>
             </span>
           </div>
-          <text-with-tags v-if='r.filter' v-bind:value='r.filter' style="font-size: .8rem;border: 1px dashed #eee; display: inline-block;padding: 0.1rem; padding-left: 0.3rem; padding-right: 0.3rem;"></text-with-tags>
-          <text-with-tags v-bind:value='r.response' style="display: inline-block"></text-with-tags>
+          <text-with-tags :key="10 + i" v-if='r.filter' v-bind:value='r.filter' style="font-size: .8rem;border: 1px dashed #eee; display: inline-block;padding: 0.1rem; padding-left: 0.3rem; padding-right: 0.3rem;"></text-with-tags>
+          <text-with-tags :key="100 + i" v-bind:value='r.response' style="display: inline-block"></text-with-tags>
         </template>
       </template>
       <template v-slot:cell(buttons)="data">
@@ -71,7 +72,7 @@
           <button-with-icon class="btn-only-icon btn-dark btn-reverse" :icon="['fas', data.item.visible ? 'eye' : 'eye-slash']" @click="data.item.visible = !data.item.visible; sendUpdate(data.item.id)">
             {{ translate('dialog.buttons.edit') }}
           </button-with-icon>
-          <hold-button @trigger="deleteCommand(data.item.id)" icon="trash" class="btn-danger btn-reverse btn-only-icon">
+          <hold-button @trigger="remove(data.item.id)" icon="trash" class="btn-danger btn-reverse btn-only-icon">
             <template slot="title">{{translate('dialog.buttons.delete')}}</template>
             <template slot="onHoldTitle">{{translate('dialog.buttons.hold-to-delete')}}</template>
           </hold-button>
@@ -126,13 +127,19 @@ export default class commandsList extends Vue {
 
   fields = [
     { key: 'command', label: this.translate('command'), sortable: true },
-    { key: 'count', label: this.translate('count'), sortable: true },
+    { key: 'count', label: this.capitalize(this.translate('count')), sortable: true },
     { key: 'response', label: this.translate('response') },
     { key: 'buttons', label: '' },
   ];
 
   psocket = io('/core/permissions', { query: "token=" + this.token });
   socket = io('/systems/customcommands', { query: "token=" + this.token });
+
+  capitalize (value) {
+    if (!value) return ''
+    value = value.toString()
+    return value.charAt(0).toUpperCase() + value.slice(1)
+  }
 
   get commandsFiltered() {
     if (this.search.length === 0) return this.commands
@@ -180,6 +187,7 @@ export default class commandsList extends Vue {
     let response = command.responses.filter((o) => o._id === rid)[0]
     response.permission = permission
     this.socket.emit('update.command', {items: [command]})
+    this.$forceUpdate();
   }
 
   updateStopIfExecuted (cid, rid, stopIfExecuted) {
@@ -187,12 +195,24 @@ export default class commandsList extends Vue {
     let response = command.responses.filter((o) => o._id === rid)[0]
     response.stopIfExecuted = stopIfExecuted
     this.socket.emit('update.command', {items: [command]})
+    this.$forceUpdate();
   }
 
-  deleteCommand (id) {
-    this.socket.emit('delete', {id}, () => {
-      this.commands = this.commands.filter((o) => o.id !== id)
-    })
+  async remove(id) {
+    await Promise.all([
+      await new Promise(resolve => {
+        this.socket.emit('delete', { where: { id } }, () => {
+          resolve();
+        })
+      }),
+      await new Promise(resolve => {
+        this.socket.emit('delete', { collection: 'responses', where: { cid: id } }, () => {
+          resolve();
+        })
+      }),
+    ])
+    this.commands = this.commands.filter((o) => o.id !== id)
+    this.$router.push({ name: 'CommandsManagerList' });
   }
 
   sendUpdate (_id) {

@@ -13,6 +13,8 @@ import { getCountOfCommandUsage, incrementCountOfCommandUsage, resetCountOfComma
 import { isMainThread } from 'worker_threads';
 import uuid from 'uuid';
 
+import { Command, Response } from './customCommands.d';
+
 /*
  * !command                                                                 - gets an info about command usage
  * !command add (-p [uuid|name]) ?-s true|false ![cmd] [response]           - add command with specified response
@@ -24,25 +26,6 @@ import uuid from 'uuid';
  * !command list                                                            - get commands list
  * !command list ![cmd]                                                     - get responses of command
  */
-
-interface Response {
-  _id?: string;
-  order: number;
-  response: string;
-  stopIfExecuted: boolean;
-  permission: string;
-  filter: string;
-};
-
-interface Command {
-  _id?: string;
-  id: string;
-  command: string;
-  enabled: boolean;
-  visible: boolean;
-  responses?: Response[];
-  count?: number;
-};
 
 class CustomCommands extends System {
   constructor () {

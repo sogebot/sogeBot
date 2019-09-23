@@ -9,7 +9,7 @@
           <template v-if="state.loaded && $route.params.id">
             <small><fa icon="angle-right"/></small>
             {{name}}
-            <small>{{$route.params.id}}</small>
+            <small class="text-muted text-monospace" style="font-size:0.7rem">{{$route.params.id}}</small>
           </template>
         </span>
       </b-col>

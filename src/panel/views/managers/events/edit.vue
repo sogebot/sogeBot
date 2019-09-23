@@ -9,7 +9,7 @@
           <small><fa icon="angle-right"/></small>
           <template v-if="$route.params.id">
             {{event.name}}
-            <small>{{$route.params.id}}</small>
+            <small class="text-muted text-monospace" style="font-size:0.7rem">{{$route.params.id}}</small>
           </template>
         </span>
       </div>
