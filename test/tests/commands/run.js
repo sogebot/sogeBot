@@ -51,7 +51,7 @@ describe('Custom Commands - run()', () => {
 
     it('run command by owner', async () => {
       global.systems.customCommands.run({ sender: user1, message: '!test qwerty' })
-      await message.isSentRaw('@soge__, $_variable was set to me.', user1)
+      await message.isSentRaw('@soge__, $_variable was set to qwerty.', user1)
       await message.isSentRaw('This should be triggered', user1)
       await message.isSentRaw('This should be triggered as well', user1)
       await message.isSentRaw('qwerty by !test command with param', user1)
@@ -60,7 +60,7 @@ describe('Custom Commands - run()', () => {
 
     it('run command by viewer', async () => {
       global.systems.customCommands.run({ sender: user1, message: '!test qwerty' })
-      await message.isNotSentRaw('@user1, $_variable was set to me.', user1)
+      await message.isNotSentRaw('@user1, $_variable was set to qwerty.', user1)
       await message.isSentRaw('This should be triggered', user1)
       await message.isSentRaw('This should be triggered as well', user1)
       await message.isSentRaw('qwerty by !test command with param', user1)
