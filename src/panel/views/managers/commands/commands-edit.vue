@@ -317,13 +317,17 @@ export default class CommandsEdit extends Vue {
         new Promise(resolve => {
           const responses: Response[] = this.item.responses.map(o => { return { cid: this.item.id, ...o} });
           console.debug('Saving responses', responses);
-          this.socket.emit('update', { collection: 'responses', key: 'id', items: responses }, (err, data) => {
-            if (err) {
-              this.state.save = this.$state.fail;
-              return console.error(err);
-            }
+          if (responses.length > 0) {
+            this.socket.emit('update', { collection: 'responses', key: 'id', items: responses }, (err, data) => {
+              if (err) {
+                this.state.save = this.$state.fail;
+                return console.error(err);
+              }
+              resolve()
+            });
+          } else {
             resolve()
-          });
+          }
         })
       ])
 
