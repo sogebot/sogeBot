@@ -372,9 +372,9 @@ class Message {
 
         switch (system) {
           case 'alias':
-            return _.size(alias) === 0 ? ' ' : (_.map(alias, (o) => o.alias.replace('!', ''))).join(', ');
+            return _.size(alias) === 0 ? ' ' : (_.map(alias, (o) => o.alias.replace('!', ''))).sort().join(', ');
           case '!alias':
-            return _.size(alias) === 0 ? ' ' : (_.map(alias, 'alias')).join(', ');
+            return _.size(alias) === 0 ? ' ' : (_.map(alias, 'alias')).sort().join(', ');
           case 'command':
             if (permission) {
               const responses = await global.db.engine.find(global.systems.customCommands.collection.responses);
@@ -386,7 +386,7 @@ class Message {
                 commands = [];
               }
             }
-            return _.size(commands) === 0 ? ' ' : (_.map(commands, (o) => o.command.replace('!', ''))).join(', ');
+            return _.size(commands) === 0 ? ' ' : (_.map(commands, (o) => o.command.replace('!', ''))).sort().join(', ');
           case '!command':
             if (permission) {
               const responses = await global.db.engine.find(global.systems.customCommands.collection.responses);
@@ -398,7 +398,7 @@ class Message {
                 commands = [];
               }
             }
-            return _.size(commands) === 0 ? ' ' : (_.map(commands, 'command')).join(', ');
+            return _.size(commands) === 0 ? ' ' : (_.map(commands, 'command')).sort().join(', ');
           case 'cooldown':
             list = _.map(cooldowns, function (o, k) {
               const time = o.miliseconds;
