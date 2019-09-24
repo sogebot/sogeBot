@@ -3,39 +3,23 @@ SHELL   := /bin/bash
 VERSION := `node -pe "require('./package.json').version"`
 ENV     ?= production
 
-all : clean prepare yarn dependencies shrinkwrap css js jsdist bot info
+all : clean prepare dependencies shrinkwrap css js jsdist bot info
 .PHONY : all
-
-# detect what shell is used
-ifeq ($(findstring cmd.exe,$(SHELL)),cmd.exe)
-DEVNUL := NUL
-WHICH := where
-else
-DEVNUL := /dev/null
-WHICH := which
-endif
 
 info:
 	@echo -ne "\n\t ----- Build ENV: $(ENV)"
 	@echo -ne "\n\t ----- Build commit\n\n"
 	@git log --oneline -3 | cat
 
-yarn:
-	@echo -ne "\n\t ----- Checking yarn installation"
-ifeq ($(shell ${WHICH} yarn 2>${DEVNUL}),)
-	@echo -ne "\n\t ----- Installing yarn"
-	@npm install --global yarn
-else
-	@echo -ne "\n\t ----- OK \n"
-endif
-
 shrinkwrap:
 	@echo -ne "\n\t ----- Generating shrinkwrap\n"
 	@npm shrinkwrap
 
 dependencies:
-	@echo -ne "\n\t ----- Using yarn for dependencies install\n"
-	@yarn install --ignore-engines
+	@echo -ne "\n\t ----- Installation of production dependencies\n"
+	@npm install --production
+	@echo -ne "\n\t ----- Installation of development dependencies\n"
+	@npm install --only=dev
 
 eslint:
 	@echo -ne "\n\t ----- Checking eslint\n"
