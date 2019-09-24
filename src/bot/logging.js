@@ -64,7 +64,10 @@ if (!isMainThread) {
       format.printf(info => {
         let level
         if (info.level === 'error') level = '!!! ERROR !!!'
-        if (info.level === 'debug') level = chalk.bgRed.bold('DEBUG:')
+        if (info.level === 'debug') {
+          level = chalk.bgRed.bold('DEBUG:');
+          info.category = '';
+        }
         if (info.level === 'chatIn') level = '<<<'
         if (info.level === 'chatOut') level = '>>>'
         if (info.level === 'whisperIn') level = '<w<'
