@@ -59,21 +59,23 @@ class General extends Core {
     const enabledSystems: any = {};
     for (const category of ['systems', 'games', 'integrations']) {
       if (isNil(enabledSystems[category])) {
-        enabledSystems[category] = []; 
+        enabledSystems[category] = [];
       }
       for (const system of Object.keys(global[category]).filter((o) => !o.startsWith('_'))) {
-        if (!global[category][system].settings) {
-          continue; 
-        }
         const [enabled, areDependenciesEnabled, isDisabledByEnv] = await Promise.all([
           global[category][system].enabled,
           global[category][system]._dependenciesEnabled(),
           !isNil(process.env.DISABLE) && (process.env.DISABLE.toLowerCase().split(',').includes(system.toLowerCase()) || process.env.DISABLE === '*'),
         ]);
-        if (!enabled || !areDependenciesEnabled || isDisabledByEnv) {
-          continue; 
+        if (!enabled) {
+          enabledSystems[category].push('-' + system);
+        } else if (!areDependenciesEnabled) {
+          enabledSystems[category].push('-dep-' + system);
+        } else if (isDisabledByEnv) {
+          enabledSystems[category].push('-env-' + system);
+        } else {
+          enabledSystems[category].push(system);
         }
-        enabledSystems[category].push(system);
       }
     }
     const version = get(process, 'env.npm_package_version', 'x.y.z');
@@ -83,7 +85,7 @@ class General extends Core {
     global.log.debug(`             | DB: ${config.database.type}`);
     global.log.debug(`             | Threads: ${global.cpu}`);
     global.log.debug(`             | HEAP: ${Number(process.memoryUsage().heapUsed / 1048576).toFixed(2)} MB`);
-    global.log.debug(`             | Uptime: ${process.uptime()} seconds`);
+    global.log.debug(`             | Uptime: ${Math.trunc(process.uptime())} seconds`);
     global.log.debug(`             | Language: ${lang}`);
     global.log.debug(`             | Mute: ${mute}`);
     global.log.debug(`SYSTEMS      | ${enabledSystems.systems.join(', ')}`);
@@ -134,7 +136,7 @@ class General extends Core {
 
   private async setStatus(opts: CommandOptions & { enable: boolean }) {
     if (opts.parameters.trim().length === 0) {
-      return; 
+      return;
     }
     try {
       const [type, name] = opts.parameters.split(' ');
