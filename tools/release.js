@@ -35,12 +35,16 @@ function buildZipFile() {
   console.log(chalk.yellow('2.') + ' Unzip downloaded zip file');
   spawnSync('unzip', [argv.branch + '.zip']);
 
-
   console.log(chalk.yellow('3.') + ' Running make');
   spawnSync('cd', [argv.branch]);
-  spawnSync('make', {
+  const make = spawnSync('make', {
     cwd: 'sogeBot-' + argv.branch,
   });
+  if (make.stderr.toString().length > 0) {
+    console.error(make.stdout.toString());
+    console.error(make.stderr.toString());
+    process.exit(1);
+  }
 
   console.log(chalk.yellow('4.') + ' Creating release package');
   spawnSync('make', ['pack'], {
