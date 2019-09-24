@@ -1,5 +1,5 @@
 <template>
-  <div class="stream-info-container container-fluid" :class="{ 'sticky-top': b_sticky }" :style="{ 'top': b_sticky ? top + 'px' : undefined }" ref="window">
+  <div class="stream-info-container container-fluid" :class="{ 'sticky-top': b_sticky }" :style="{ 'top': b_sticky ? top + 'px' : undefined }" ref="quickwindow">
     <b-toast title="Owner and broadcaster oauth is not set" no-auto-hide visible variant="danger" solid v-if="!configuration.isCastersSet">
       Please set your <a href="#/settings/core/oauth">broadcaster oauth or owners</a>, or all users <strong>will have access</strong> to this dashboard and will be considered as <strong>casters</strong>.
     </b-toast>
@@ -343,7 +343,7 @@
     },
     methods: {
       widthOfMenuUpdate() {
-        this.top = (<HTMLElement>this.$refs.window).getBoundingClientRect().right < 900 ? '80' : '50';
+        this.top = (<HTMLElement>this.$refs.quickwindow).getBoundingClientRect().right < 900 ? '80' : '50';
       },
       showGameAndTitleDlg: function () {
         EventBus.$emit('show-game_and_title_dlg');
