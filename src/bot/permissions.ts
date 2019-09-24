@@ -9,6 +9,8 @@ import { permission } from './helpers/permissions';
 import { command, default_permission, settings } from './decorators';
 import { isMainThread } from 'worker_threads';
 
+let isWarnedAboutCasters = false;
+
 class Permissions extends Core {
   @settings('warnings')
   public sendWarning = false;
@@ -112,7 +114,8 @@ class Permissions extends Core {
   }
 
   public async check(userId: string, permId: string, partial = false): Promise<{access: boolean; permission: Permissions.Item | null}> {
-    if (_.filter(global.oauth.generalOwners, (o) => _.isString(o) && o.trim().length > 0).length === 0 && getBroadcaster() === '') {
+    if (_.filter(global.oauth.generalOwners, (o) => _.isString(o) && o.trim().length > 0).length === 0 && getBroadcaster() === '' && !isWarnedAboutCasters) {
+      isWarnedAboutCasters = true;
       global.log.warning('Owners or broadcaster oauth is not set, all users are treated as CASTERS!!!');
       const pItem: Permissions.Item = await global.db.engine.findOne(this.collection.data, { id: permission.CASTERS });
       return { access: true, permission: pItem };
