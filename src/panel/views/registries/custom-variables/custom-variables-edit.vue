@@ -183,13 +183,13 @@
         <b-col>
           <b-form-group
             :label="translate('registry.customvariables.currentValue.name')"
-            label-for="type"
+            label-for="currentValue"
           >
             <b-input-group>
               <b-form-input
+                name="currentValue"
                 v-if="selectedType !== 'options'"
                 v-model="currentValue"
-                :type="selectedType"
                 :readonly="(['', 'eval'].includes(selectedType))"
                 :placeholder="translate('registry.customvariables.response.default-placeholder')"
               ></b-form-input>
