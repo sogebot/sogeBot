@@ -3,17 +3,13 @@ SHELL   := /bin/bash
 VERSION := `node -pe "require('./package.json').version"`
 ENV     ?= production
 
-all : clean prepare dependencies shrinkwrap css js jsdist bot info
+all : clean prepare dependencies css js jsdist bot info
 .PHONY : all
 
 info:
 	@echo -ne "\n\t ----- Build ENV: $(ENV)"
 	@echo -ne "\n\t ----- Build commit\n\n"
 	@git log --oneline -3 | cat
-
-shrinkwrap:
-	@echo -ne "\n\t ----- Generating shrinkwrap\n"
-	@npm shrinkwrap
 
 dependencies:
 	@echo -ne "\n\t ----- Installation of production dependencies\n"
