@@ -282,7 +282,10 @@ class CustomCommands extends System {
       for (const r of _.orderBy(responses, 'order', 'asc')) {
         if ((await global.permissions.check(opts.sender.userId, r.permission)).access
             && await this.checkFilter(opts, r.filter)) {
-          if (param.length > 0 && !(r.response.includes('$param') || r.response.search(/\$_[a-zA-Z_]*/g) >= 0)) {
+          if (param.length > 0
+            && !(r.response.includes('$param')
+              || r.response.includes('$touser')
+              || r.response.search(/\$_[a-zA-Z_]*/g) >= 0)) {
             continue;
           }
           _responses.push(r);
