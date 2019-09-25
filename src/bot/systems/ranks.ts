@@ -6,6 +6,7 @@ import { prepare, sendMessage } from '../commons';
 import { command, default_permission } from '../decorators';
 import { permission } from '../permissions';
 import System from './_interface';
+import { isMainThread } from 'worker_threads';
 
 /*
  * !rank                       - show user rank
@@ -19,6 +20,10 @@ import System from './_interface';
 class Ranks extends System {
   constructor () {
     super();
+
+    if (isMainThread) {
+      global.db.engine.index(this.collection.data, [{ index: 'hours' }]);
+    }
 
     this.addMenu({ category: 'manage', name: 'ranks', id: 'ranks/list' });
   }
@@ -41,7 +46,7 @@ class Ranks extends System {
 
     const ranks = await global.db.engine.find(this.collection.data, { hours: values.hours });
     if (ranks.length === 0) {
-      global.db.engine.insert(this.collection.data, values); 
+      global.db.engine.insert(this.collection.data, values);
     }
 
     const message = await prepare(ranks.length === 0 ? 'ranks.rank-was-added' : 'ranks.ranks-already-exist', { rank: values.value, hours: values.hours });
@@ -118,7 +123,7 @@ class Ranks extends System {
   async list (opts) {
     const ranks = await global.db.engine.find(this.collection.data);
     const output = await prepare(ranks.length === 0 ? 'ranks.list-is-empty' : 'ranks.list-is-not-empty', { list: _.map(_.orderBy(ranks, 'hours', 'asc'), function (l) {
-      return l.hours + 'h - ' + l.value; 
+      return l.hours + 'h - ' + l.value;
     }).join(', ') });
     sendMessage(output, opts.sender, opts.attr);
   }

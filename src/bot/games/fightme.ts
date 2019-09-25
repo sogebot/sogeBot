@@ -3,6 +3,7 @@ import _ from 'lodash';
 import { command, settings, shared } from '../decorators';
 import Game from './_interface';
 import { getLocalizedName, isBroadcaster, isModerator, prepare, sendMessage, timeout } from '../commons';
+import { isMainThread } from 'worker_threads';
 
 /*
  * !fightme [user] - challenge [user] to fight
@@ -23,6 +24,13 @@ class FightMe extends Game {
   winnerWillGet = 0;
   @settings('rewards')
   loserWillLose = 0;
+
+  constructor() {
+    super();
+    if(isMainThread) {
+      global.db.engine.index(this.collection.users, [{ index: 'user' }]);
+    }
+  }
 
   @command('!fightme')
   async main (opts) {

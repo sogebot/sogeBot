@@ -113,7 +113,16 @@ class API {
       this.interval('checkClips', constants.MINUTE)
       this.interval('getAllStreamTags', constants.HOUR * 12)
 
+      global.db.engine.index('cache', [{ index: 'key', unique: true }]);
+      global.db.engine.index('cache.raids', [{ index: 'username', unique: true }]);
+      global.db.engine.index('cache.titles', [{ index: 'game' }]);
+      global.db.engine.index('api.clips', [{ index: 'clipId', unique: true }]);
+      global.db.engine.index('api.current', [{ index: 'key', unique: true }]);
+      global.db.engine.index('api.max', [{ index: 'key', unique: true }]);
+      global.db.engine.index('api.new', [{ index: 'key', unique: true }]);
       global.db.engine.index('core.api.tags', [{ index: 'tag_id', unique: true }]);
+      global.db.engine.index('core.api.currentTags', [{ index: 'tag_id', unique: true }]);
+      global.db.engine.index('core.api.games', [{ index: 'id', unique: true }]);
     } else {
       this.calls = {
         bot: {

@@ -39,6 +39,7 @@ class Raffles extends System {
 
     if (isMainThread) {
       this.announce();
+      global.db.engine.index(this.collection.participants, [{ index: 'raffle_id' }, { index: 'username' }]);
     }
   }
 
@@ -316,7 +317,7 @@ class Raffles extends System {
     let newTickets = curTickets + tickets;
 
     if (newTickets > raffle.max) {
-      newTickets = raffle.max; 
+      newTickets = raffle.max;
     }
     tickets = newTickets - curTickets;
 

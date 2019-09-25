@@ -10,6 +10,7 @@ import * as Parser from '../parser';
 import { permission } from '../permissions';
 import System from './_interface';
 import { incrementCountOfCommandUsage } from '../helpers/commands/count';
+import { isMainThread } from 'worker_threads';
 
 
 /*
@@ -25,6 +26,10 @@ import { incrementCountOfCommandUsage } from '../helpers/commands/count';
 class Alias extends System {
   constructor () {
     super();
+
+    if(isMainThread) {
+      global.db.engine.index(this.collection.data, [{ index: 'alias' }]);
+    }
 
     this.addMenu({ category: 'manage', name: 'alias', id: 'alias/list' });
   }
