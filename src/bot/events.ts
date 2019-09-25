@@ -303,23 +303,19 @@ class Events extends Core {
     const numberToIncrement = operation.numberToIncrement;
 
     // check if value is number
-    const cvFromDb = await global.db.engine.findOne('customvars', { key: customVariableName });
-    let value = 0;
-    if (_.isEmpty(cvFromDb)) {
-      await global.db.engine.insert('customvars', { key: customVariableName, value: numberToIncrement });
+    let currentValue = await global.customvariables.getValueOf('$_' + customVariableName);
+    if (!_.isFinite(parseInt(currentValue, 10))) {
+      currentValue = numberToIncrement;
     } else {
-      if (!_.isFinite(parseInt(cvFromDb.value, 10))) {
-        value = numberToIncrement;
-      } else {
-        value = parseInt(cvFromDb.value, 10) + parseInt(numberToIncrement, 10);
-      }
-      await global.db.engine.update('customvars', { _id: cvFromDb._id.toString() }, { value: value.toString() });
+      currentValue = parseInt(currentValue, 10) - parseInt(numberToIncrement, 10);
     }
+    await global.customvariables.setValueOf(customVariableName, currentValue, {});
 
     // Update widgets and titles
     if (global.widgets.custom_variables.socket) {
       global.widgets.custom_variables.socket.emit('refresh');
     }
+
     const regexp = new RegExp(`\\$_${customVariableName}`, 'ig');
     const title = await global.cache.rawStatus();
     if (title.match(regexp)) {
@@ -332,18 +328,13 @@ class Events extends Core {
     const numberToDecrement = operation.numberToDecrement;
 
     // check if value is number
-    const cvFromDb = await global.db.engine.findOne('customvars', { key: customVariableName });
-    let value = 0;
-    if (_.isEmpty(cvFromDb)) {
-      await global.db.engine.insert('customvars', { key: customVariableName, value: numberToDecrement });
+    let currentValue = await global.customvariables.getValueOf('$_' + customVariableName);
+    if (!_.isFinite(parseInt(currentValue, 10))) {
+      currentValue = numberToDecrement * -1;
     } else {
-      if (!_.isFinite(parseInt(cvFromDb.value, 10))) {
-        value = numberToDecrement * -1;
-      } else {
-        value = parseInt(cvFromDb.value, 10) - parseInt(numberToDecrement, 10);
-      }
-      await global.db.engine.update('customvars', { _id: cvFromDb._id.toString() }, { value: value.toString() });
+      currentValue = parseInt(currentValue, 10) - parseInt(numberToDecrement, 10);
     }
+    await global.customvariables.setValueOf(customVariableName, currentValue, {});
 
     // Update widgets and titles
     if (global.widgets.custom_variables.socket) {

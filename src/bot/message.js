@@ -432,9 +432,10 @@ class Message {
         let match = toEvaluate.match(regexp);
         if (match) {
           for (let variable of match) {
+            const currentValue = await global.customvariables.getValueOf(variable);
             toEvaluate = toEvaluate.replace(
               variable,
-              _.get((await global.db.engine.findOne('customvars', { key: variable.replace('$_', '') })), 'value', 0)
+              isNaN(Number(currentValue)) ? 0 : currentValue
             );
           }
         }
