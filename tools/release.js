@@ -46,15 +46,20 @@ function buildZipFile() {
     process.exit(1);
   }
 
-  console.log(chalk.yellow('4.') + ' Creating release package');
+  console.log(chalk.yellow('4.') + ' Creating docker package');
+  spawnSync('make', ['docker'], {
+    cwd: 'sogeBot-' + argv.branch,
+  });
+
+  console.log(chalk.yellow('5.') + ' Creating release package');
   spawnSync('make', ['pack'], {
     cwd: 'sogeBot-' + argv.branch,
   });
 
-  console.log(chalk.yellow('5.') + ' Copy release package to /');
+  console.log(chalk.yellow('6.') + ' Copy release package to /');
   spawnSync('cp', ['sogeBot-' + argv.branch + '/*.zip', '.']);
 
-  console.log(chalk.yellow('6.') + ' Cleanup directory');
+  console.log(chalk.yellow('7.') + ' Cleanup directory');
   spawnSync('rm', ['-rf', 'sogeBot-' + argv.branch]);
   spawnSync('rm', ['-rf', argv.branch + '.zip']);
 }
