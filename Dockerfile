@@ -1,4 +1,4 @@
-FROM node:12.10.0
+FROM node:12.10.0-alpine
 
 ENV LAST_UPDATED 201709241704
 
@@ -8,8 +8,9 @@ ENV DB mongodb
 ENV MONGOURI mongodb://localhost:27017/your-db-name
 ENV NODE_ENV production
 
-RUN apt-get update
-RUN apt-get install -y net-tools
+RUN apk add --no-cache make
+RUN apk add --no-cache bash
+RUN apk add --no-cache git
 
 # Copy source code
 COPY . /app
