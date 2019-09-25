@@ -63,6 +63,7 @@ class IMongoDB extends Interface {
         useNewUrlParser: true,
         reconnectTries: Number.MAX_VALUE,
         connectTimeoutMS: 60000,
+        useUnifiedTopology: true,
       })
 
     // create indexes
