@@ -34,7 +34,7 @@ describe('Gambling - duel', () => {
 
     it('Add 200 points to duel bank', async () => {
       for (let i = 0; i < 200; i++) {
-        await global.db.engine.insert(global.games.duel.collection.users, { tickets: 1, user: 'user' + i, userId: i });
+        await global.db.engine.insert(global.games.duel.collection.users, { tickets: 1, user: 'user' + i, id: i });
       }
       const items = await global.db.engine.find(global.games.duel.collection.users);
       assert.equal(items.length, 200);
