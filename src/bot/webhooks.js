@@ -306,7 +306,7 @@ class Webhooks {
       await global.db.engine.update('api.current', { key: 'title' }, { value: stream.title })
       await global.db.engine.update('api.current', { key: 'game' }, { value: await global.api.getGameFromId(stream.game_id) })
 
-      if (!(await global.cache.isOnline()) || global.twitch.streamType !== stream.type) {
+      if (!(await global.cache.isOnline()) && Number(global.twitch.streamId) !== Number(stream.id)) {
         if (__DEBUG__.STREAM) {
           global.log.debug('WEBHOOKS: ' + JSON.stringify(aEvent))
         }
@@ -324,6 +324,7 @@ class Webhooks {
 
       global.api.curRetries = 0
       global.api.saveStreamData(stream)
+      global.api.streamId = stream.id
       global.api.streamType = stream.type
       await global.cache.isOnline(true)
     } else {
