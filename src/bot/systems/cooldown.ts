@@ -8,6 +8,7 @@ import Expects from '../expects';
 import * as Parser from '../parser';
 import { permission } from '../permissions';
 import System from './_interface';
+import { isMainThread } from 'worker_threads';
 
 /*
  * !cooldown [keyword|!command] [global|user] [seconds] [true/false] - set cooldown for keyword or !command - 0 for disable, true/false set quiet mode
@@ -27,6 +28,11 @@ class Cooldown extends System {
 
   constructor () {
     super();
+
+    if(isMainThread) {
+      global.db.engine.index(this.collection.data, [{ index: 'key' }]);
+      global.db.engine.index(this.collection.viewers, [{ index: 'username' }]);
+    }
 
     this.addMenu({ category: 'manage', name: 'cooldown', id: 'cooldown/list' });
   }
@@ -337,38 +343,38 @@ class Cooldown extends System {
   @command('!cooldown toggle enabled')
   @default_permission(permission.CASTERS)
   async toggleEnabled (opts: Record<string, any>) {
-    await this.toggle(opts, 'enabled'); 
+    await this.toggle(opts, 'enabled');
   }
 
   @command('!cooldown toggle moderators')
   @default_permission(permission.CASTERS)
   async toggleModerators (opts: Record<string, any>) {
-    await this.toggle(opts, 'moderator'); 
+    await this.toggle(opts, 'moderator');
   }
 
   @command('!cooldown toggle owners')
   @default_permission(permission.CASTERS)
   async toggleOwners (opts: Record<string, any>) {
-    await this.toggle(opts, 'owner'); 
+    await this.toggle(opts, 'owner');
   }
 
   @command('!cooldown toggle subscribers')
   @default_permission(permission.CASTERS)
   async toggleSubscribers (opts: Record<string, any>) {
-    await this.toggle(opts, 'subscriber'); 
+    await this.toggle(opts, 'subscriber');
   }
 
   @command('!cooldown toggle followers')
   @default_permission(permission.CASTERS)
   async toggleFollowers (opts: Record<string, any>) {
-    await this.toggle(opts, 'follower'); 
+    await this.toggle(opts, 'follower');
   }
 
   async toggleNotify (opts: Record<string, any>) {
-    await this.toggle(opts, 'quiet'); 
+    await this.toggle(opts, 'quiet');
   }
   async toggleType (opts: Record<string, any>) {
-    await this.toggle(opts, 'type'); 
+    await this.toggle(opts, 'type');
   }
 }
 

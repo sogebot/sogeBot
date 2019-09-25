@@ -8,6 +8,7 @@ import Expects from '../expects';
 import { permission } from '../permissions';
 import System from './_interface';
 import uuid from 'uuid/v4';
+import { isMainThread } from 'worker_threads';
 
 export interface QuoteInterface {
   quotedBy: string; id: string; quote: string; tags: string[]; createdAt: number;
@@ -19,6 +20,10 @@ class Quotes extends System {
 
   constructor () {
     super();
+
+    if(isMainThread) {
+      global.db.engine.index(this.collection.data, [{ index: 'id', unique: true }]);
+    }
 
     this.addMenu({ category: 'manage', name: 'quotes', id: 'manage/quotes/list' });
   }

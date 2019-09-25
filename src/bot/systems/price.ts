@@ -10,6 +10,7 @@ import { permission } from '../permissions';
 import { command, default_permission, rollback } from '../decorators';
 import { parser } from '../decorators';
 import { isOwner, prepare, sendMessage } from '../commons';
+import { isMainThread } from 'worker_threads';
 
 /*
  * !price                     - gets an info about price usage
@@ -24,6 +25,10 @@ class Price extends System {
 
   constructor () {
     super();
+
+    if(isMainThread) {
+      global.db.engine.index(this.collection.data, [{ index: 'command' }]);
+    }
 
     this.addMenu({ category: 'manage', name: 'price', id: 'price/list' });
   }
@@ -102,7 +107,7 @@ class Price extends System {
   async list (opts) {
     const prices = await global.db.engine.find(this.collection.data);
     const output = (prices.length === 0 ? global.translate('price.list-is-empty') : global.translate('price.list-is-not-empty').replace(/\$list/g, (_.map(_.orderBy(prices, 'command'), (o) => {
-      return `${o.command} - ${o.price}`; 
+      return `${o.command} - ${o.price}`;
     })).join(', ')));
     sendMessage(output, opts.sender, opts.attr);
   }

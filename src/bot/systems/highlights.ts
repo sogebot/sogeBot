@@ -8,6 +8,7 @@ import { sendMessage } from '../commons';
 import { command, default_permission, settings, ui } from '../decorators';
 import { permission } from '../permissions';
 import System from './_interface';
+import { isMainThread } from 'worker_threads';
 
 const ERROR_STREAM_NOT_ONLINE = '1';
 const ERROR_MISSING_TOKEN = '2';
@@ -24,6 +25,10 @@ class Highlights extends System {
 
   constructor() {
     super();
+
+    if(isMainThread) {
+      global.db.engine.index(this.collection.data, [{ index: 'id' }]);
+    }
 
     this.addMenu({ category: 'manage', name: 'highlights', id: 'highlights/list' });
   }
@@ -84,10 +89,10 @@ class Highlights extends System {
 
     try {
       if (isNil(when.online)) {
-        throw Error(ERROR_STREAM_NOT_ONLINE); 
+        throw Error(ERROR_STREAM_NOT_ONLINE);
       }
       if (token === '' || cid === '') {
-        throw Error(ERROR_MISSING_TOKEN); 
+        throw Error(ERROR_MISSING_TOKEN);
       }
 
       // we need to load video id

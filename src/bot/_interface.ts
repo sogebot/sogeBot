@@ -162,7 +162,7 @@ class Module {
         this.timeouts[`${this.constructor.name}._indexDbs`] = setTimeout(() => this._indexDbs(), 1000);
       } else {
         // add indexing to settings
-        global.db.engine.index(this.collection.settings, [{ index: 'key' }]);
+        global.db.engine.index(this.collection.settings, [{ index: 'key' }, { index: 'system' }]);
       }
     }
   }

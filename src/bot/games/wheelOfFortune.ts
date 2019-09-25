@@ -21,6 +21,13 @@ class WheelOfFortune extends Game {
     responses: string[];
   }[] = [];
 
+  constructor() {
+    super();
+    if(isMainThread) {
+      global.db.engine.index(this.collection.data, [{ index: 'key', unique: true }]);
+    }
+  }
+
   sockets () {
     if (this.socket === null) {
       return setTimeout(() => this.sockets(), 100);

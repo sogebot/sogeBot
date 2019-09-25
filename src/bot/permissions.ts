@@ -24,6 +24,8 @@ class Permissions extends Core {
 
     if (isMainThread) {
       global.db.engine.index(this.collection.data, [{ index: 'id', unique: true }]);
+      global.db.engine.index(this.collection.commands, [{ index: 'key', unique: true }]);
+
       this.ensurePreservedPermissionsInDb();
     }
   }

@@ -4,6 +4,7 @@ import crypto from 'crypto';
 import Overlay from './_interface';
 import { isBot } from '../commons';
 import { ui } from '../decorators';
+import { isMainThread } from 'worker_threads';
 
 class EventList extends Overlay {
   socket: any = null;
@@ -16,6 +17,13 @@ class EventList extends Overlay {
     target: '_blank',
   }, 'links')
   linkBtn = null;
+
+  constructor() {
+    super();
+    if (isMainThread) {
+      global.db.engine.index('widgetsEventList', { index: 'timestamp' });
+    }
+  }
 
   sockets () {
     global.panel.io.of('/overlays/eventlist').on('connection', (socket) => {

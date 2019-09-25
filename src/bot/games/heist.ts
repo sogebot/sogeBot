@@ -96,6 +96,8 @@ class Heist extends Game {
 
     if (isMainThread) {
       this.timeouts.iCheckFinished = global.setTimeout(() => this.iCheckFinished(), 10000);
+      global.db.engine.index(this.collection.data, [{ index: 'key', unique: true }]);
+      global.db.engine.index(this.collection.users, [{ index: 'id', unique: true }]);
     } // wait for proper config startup
   }
 
@@ -159,7 +161,7 @@ class Heist extends Game {
             emotes: [],
             badges: {},
             'message-type': 'chat',
-          }); 
+          });
         }, 5000);
 
         if (isSurvivor) {
@@ -190,7 +192,7 @@ class Heist extends Game {
             emotes: [],
             badges: {},
             'message-type': 'chat',
-          }); 
+          });
         }, 5000);
         if (winners.length > 0) {
           global.setTimeout(async () => {

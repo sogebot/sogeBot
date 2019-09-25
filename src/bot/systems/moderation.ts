@@ -9,6 +9,7 @@ import { command, default_permission, parser, permission_settings, settings } fr
 import Message from '../message';
 import System from './_interface';
 import { getLocalizedName, prepare, sendMessage, timeout } from '../commons';
+import { isMainThread } from 'worker_threads';
 
 class Moderation extends System {
   @settings('lists')
@@ -88,6 +89,12 @@ class Moderation extends System {
 
   constructor () {
     super();
+
+    if(isMainThread) {
+      global.db.engine.index(this.collection.messagecooldown, [{ index: 'key', unique: true }]);
+      global.db.engine.index(this.collection.permits, [{ index: 'username' }]);
+      global.db.engine.index(this.collection.warnings, [{ index: 'username' }]);
+    }
   }
 
   sockets () {
