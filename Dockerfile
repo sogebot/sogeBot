@@ -3,7 +3,7 @@ FROM node:12.10.0-alpine
 ENV LAST_UPDATED 201709241704
 
 ENV DOMAIN localhost
-ENV TOKEN 7911776886
+ENV TOKEN __random__
 ENV DB mongodb
 ENV MONGOURI mongodb://localhost:27017/your-db-name
 ENV NODE_ENV production
