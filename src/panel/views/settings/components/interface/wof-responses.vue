@@ -4,7 +4,7 @@
       {{ translate('games.wheeloffortune.noOptionsFound') }}
     </div>
     <template v-for="(option, index) of w_options">
-      <div :key="index + option.title" class="input-group" style="height: fit-content" v-bind:class="{ 'pt-4': index > 0 }">
+      <div :key="'wofresponse-1' + index" class="input-group" style="height: fit-content" v-bind:class="{ 'pt-4': index > 0 }">
         <div class="input-group-prepend">
           <span class="input-group-text">{{ translate('games.wheeloffortune.title.name') }}</span>
         </div>
@@ -14,7 +14,7 @@
           v-on:input="updateOption(index, option.title)">
         <button v-on:click="removeOption(index)" class="btn btn-danger btn-sm"><i class="fas fa-minus"></i> {{ translate('games.wheeloffortune.remove.option') }}</button>
       </div>
-      <div :key="index + option.title" class="d-flex" style="height: fit-content">
+      <div :key="'wofresponse-2' + index" class="d-flex" style="height: fit-content">
         <div class="input-group-prepend">
           <span class="input-group-text d-block text-left">
             <div>{{ translate('games.wheeloffortune.responses.name') }}</div>
@@ -23,7 +23,7 @@
         </div>
         <div class="d-block w-100 p-0 border-0" style="height: fit-content">
           <template v-if="option.responses.length > 1">
-            <div class="d-flex" v-for="(response, index2) of option.responses" :key="response + index2">
+            <div class="d-flex" v-for="(response, index2) of option.responses" :key="'wofresponse-3' + index2">
               <textarea-with-tags
                 v-bind:placeholder="translate('games.wheeloffortune.responses.placeholder')"
                 v-bind:value="response"
