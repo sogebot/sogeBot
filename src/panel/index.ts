@@ -41,6 +41,7 @@ import { isAvailableVariable, setMainLoaded } from './helpers/isAvailableVariabl
 import { isUserCaster, isUserLoggedIn } from './helpers/isUserLoggedIn';
 import translate from './helpers/translate';
 import urlParam from './helpers/urlParam';
+import { getListOf } from './helpers/getListOf';
 
 library.add(faImage, faUpload, faCircle2, faCaretRight, faTasks, faCaretDown, faSlash, faFilter, faToggleOn, faToggleOff, faBell, faShareSquare, faExclamationCircle, faQuestion, faVial, faEquals, faGreaterThanEqual, faLongArrowAltLeft, faBan, faPlusSquare, faMusic, faList, faPlay, faPause, faForward, faSpotify, faMoneyBillAlt, faPlus, faSpinner, faTimes, faGift, faHeadphones, faTh, faDollarSign, faSignInAlt, faSignOutAlt, faUsers, faMusic, faCalendar, faTwitter, faList, faCheck, faMusic, faMusic, faVolumeUp, faVolumeDown, faUsers, faGift, faTrophy, faCog, faExternalLinkAlt, faTrash, faPlus, faTimes, faSync, faComments, faTwitch, faCircle, faCheckCircle, faLock, faUsers, faUser, faCheck, faTimes, faHeart, faStar, faLockOpen, faHandPointer, faRandom, faEyeSlash, faSignOutAlt, faSignInAlt, faBoxOpen, faEye, faCog, faExternalLinkAlt, faHeart, faTv, faRandom, faGem, faStar, faGift, faDollarSign, faStarHalf, faLongArrowAltRight, faCircleNotch, faCalendar, faDollarSign, faCog, faCode, faAngleUp, faTrashAlt, faAngleDown, faFont, faPlus, faMinus, faDownload, faDollarSign, faTerminal, faCog, faCommentAlt, faUsers, faExternalLinkAlt, faSyncAlt, faClock, faCog, faInfinity, faTrophy, faClone, faGem, faCoins, faExclamation, faStop, faBan, faSpinner, faCheck, faAngleRight, faPlus, faEdit, faEraser, faLink, faTrash, faPlus, faCaretLeft, faExternalLinkAlt, faLink, faSave, faThLarge, faThList, faSearch, faCircleNotch, faCheck, faEllipsisH, faEllipsisV, faPowerOff);
 Vue.component('fa', FontAwesomeIcon);
@@ -83,6 +84,24 @@ declare module 'vue/types/vue' {
     urlParam(key: string): string | null;
     translate(id: string): string;
     $loggedUser: any | null;
+    $systems: {
+      name: string;
+      enabled: boolean;
+      areDependenciesEnabled: boolean;
+      isDisabledByEnv: boolean;
+    }[];
+    $core: {
+      name: string;
+      enabled: boolean;
+      areDependenciesEnabled: boolean;
+      isDisabledByEnv: boolean;
+    }[];
+    $integrations: {
+      name: string;
+      enabled: boolean;
+      areDependenciesEnabled: boolean;
+      isDisabledByEnv: boolean;
+    }[];
   }
 }
 
@@ -96,6 +115,10 @@ const main = async () => {
 
   Vue.prototype.$loggedUser = await isUserLoggedIn(token);
   await isUserCaster(Vue.prototype.$loggedUser.id, token);
+
+  Vue.prototype.$core = await getListOf('core');
+  Vue.prototype.$systems = await getListOf('systems');
+  Vue.prototype.$integrations = await getListOf('integrations');
 
   await Promise.all([
     isAvailableVariable('translations'),

@@ -1,7 +1,7 @@
 <template>
   <div class="container-fluid" ref="window">
-    <div class="row">
-      <div class="col-12">
+    <b-row>
+      <b-col>
         <span class="title text-default mb-2">
           {{ translate('menu.manage') }}
           <small><fa icon="angle-right"/></small>
@@ -13,8 +13,8 @@
             {{ search }}
           </template>
         </span>
-      </div>
-    </div>
+      </b-col>
+    </b-row>
 
     <panel cards search @search="search = $event">
       <template v-slot:left>
