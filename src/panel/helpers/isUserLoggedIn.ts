@@ -22,7 +22,7 @@ export const isUserLoggedIn = async function (token: string) {
       });
       const data = get(axiosData, 'data.data[0]', null);
       if (data === null) {
-        throw Error('User must be logged')
+        throw Error('User must be logged');
       }
 
       // save userId to db
