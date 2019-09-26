@@ -9,6 +9,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@master
       - name: Build & Push to GitHub Package
         uses: opspresso/action-docker@master
         env:
