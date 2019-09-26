@@ -1,5 +1,4 @@
 name: Docker Image CI
-date: $(date +%s)
 
 on:
   push:
