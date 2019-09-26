@@ -18,5 +18,5 @@ jobs:
           PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
           REGISTRY: docker.pkg.github.com
           IMAGE_NAME: "sogehige/sogebot"
-          TAG_NAME: ${{ github.ref }}
+          TAG_NAME: release:${{ github.ref }}
           LATEST: "true"
