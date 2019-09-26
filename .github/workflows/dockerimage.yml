@@ -9,12 +9,11 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@master
-    - name: Publish to Registry
-      uses: elgohr/Publish-Docker-Github-Action@master
-      with:
-        name: sogehige/sogebot
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
-        registry: docker.pkg.github.com
-        snapshot: true
+      - name: Build & Push to GitHub Package
+        uses: opspresso/action-docker@master
+        env:
+          USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+          REGISTRY: docker.pkg.github.com
+          TAG_NAME: nightly-${{ github.sha }}
+          LATEST: "true"
