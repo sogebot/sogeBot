@@ -1,15 +1,16 @@
-name: Docker Image CI - nightly
+name: Docker Image CI - release
 
 on:
-  push:
-    branches:
-      - master
+  project_column:
+    types: [published]
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
+        with:
+          ref: ${{ github.ref }}
       - name: Build & Push to GitHub Package
         uses: opspresso/action-docker@master
         env:
@@ -17,5 +18,5 @@ jobs:
           PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
           REGISTRY: docker.pkg.github.com
           IMAGE_NAME: "sogehige/sogebot"
-          TAG_NAME: nightly
-          LATEST: "false"
+          TAG_NAME: ${{ github.ref }}
+          LATEST: "true"
