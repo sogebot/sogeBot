@@ -11,7 +11,7 @@ jobs:
       - uses: actions/checkout@master
         with:
           ref: ${{ github.ref }}
-      - name: Build & Push to GitHub Package
+      - name: Build & Push to GitHub Package with ref
         uses: opspresso/action-docker@master
         env:
           USERNAME: ${{ secrets.DOCKER_USERNAME }}
@@ -19,4 +19,12 @@ jobs:
           REGISTRY: docker.pkg.github.com
           IMAGE_NAME: "sogehige/sogebot"
           TAG_NAME: release:${{ github.ref }}
-          LATEST: "true"
+      - name: Build & Push to GitHub Package as latest
+        uses: opspresso/action-docker@master
+        env:
+          USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+          REGISTRY: docker.pkg.github.com
+          IMAGE_NAME: "sogehige/sogebot"
+          TAG_NAME: release:latest
+
