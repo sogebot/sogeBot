@@ -43,6 +43,8 @@ docker run -it --name <name-of-container> \
 
 - Example full command
 
+!> When using non-specific image for latest version, use `docker pull <image>` to update your local image
+
 ``` bash
 docker run -it --name sogebot \
 --env DOMAIN=my.publicdoma.in \
