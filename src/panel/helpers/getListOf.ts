@@ -12,4 +12,4 @@ export const getListOf = async function (type: string) {
       resolve(data);
     });
   });
-}
+};
