@@ -163,23 +163,22 @@ export default {
       } else {
         this.currentSong = item
       }
-      if (!this.player) {
-        return setTimeout(() => {
-          console.log('retrying playThisSong')
-          this.playThisSong(item, true); //retry after while
-        }, 500)
-      }
-      this.player.once('ready', event => {
+      try {
         if (item.startTime) this.player.currentTime = item.startTime
         this.player.volume = item.volume / 100
         this.player.muted = true
         this.$nextTick(() => {
           if (this.autoplay) {
-            this.player.play()
+          this.player.play()
           }
           this.player.muted = false
         })
-      })
+      } catch (e) {
+        return setTimeout(() => {
+          console.log('retrying playThisSong')
+          this.playThisSong(item, true); //retry after while
+        }, 1000)
+      }
     }
   },
   created: function () {
@@ -228,5 +227,12 @@ export default {
     position: relative;
     top: 50%;
     transform: translate(0, -50%);
+  }
+</style>
+<style>
+
+
+  .plyr__video-embed iframe {
+    z-index: 2;
   }
 </style>

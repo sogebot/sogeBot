@@ -207,6 +207,14 @@ export function getOwners() {
   return global.oauth.generalOwners;
 }
 
+export function getBot() {
+  try {
+    return global.oauth.botUsername.toLowerCase().trim();
+  } catch (e) {
+    return '';
+  }
+}
+
 export function getChannel() {
   try {
     return global.oauth.generalChannel.toLowerCase().trim();
