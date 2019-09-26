@@ -20,8 +20,18 @@
 
 - Startup docker with sogebot
 
-    `docker rm sogebot; docker run -it --name <name-of-container> --env TOKEN=<token> --env MONGOURI=<mongouri> -p <port>:20000 sogebot:<version>`
+``` bash
+docker run -it --name <name-of-container> \
+--env TOKEN=<token> \
+--env MONGOURI=<mongouri> \
+-p <port>:20000 \
+<image>
+```
 
+- Change `<image>` to one of these
+  - Unstable latest nightly: `docker.pkg.github.com/sogehige/sogebot/nightly`
+  - Latest release: `docker.pkg.github.com/sogehige/sogebot/release`
+  - Specific release of bot (e.g. 9.8.0): `docker.pkg.github.com/sogehige/sogebot/release:9.8.0`
 - Change `<port>` to port on where bot should be served
 - Change `<mongouri>` to your mongodb uri connection
 - Change `<version>` to `latest` or release tag (e.g. `9.8.0`)
@@ -33,7 +43,13 @@
 
 - Example full command
 
-    `docker run -it --name sogebot --env DOMAIN=my.publicdoma.in --env TOKEN=${cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1} --env MONGOURI=mongodb://localhost:27017/sogebot -p 80:20000 sogebot:9.8.0`
+``` bash
+docker run -it --name sogebot \
+--env DOMAIN=my.publicdoma.in \
+--env TOKEN=`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1` \
+--env MONGOURI=mongodb://localhost:27017/sogebot \
+-p 80:20000 docker.pkg.github.com/sogehige/sogebot/release:9.8.0
+```
 
 !> If you are using localhost mongodb, be sure that you can access mongodb server by HOST IP (e.g. 172.17.0.1).
    Example of error `(node:38) UnhandledPromiseRejectionWarning: MongoNetworkError: failed to connect to server [172.17.0.1:27017] on first connect [Error: connect ECONNREFUSED 172.17.0.1:27017`
@@ -41,7 +57,9 @@
 !> If you are using dockerized mongodb, be sure to add `--bind_ip_all`
    to your mongodb docker container
 
-   `docker run -it --hostname mongodb --name=mongodb --net=bridge --expose=27017 mongo --bind_ip_all`
+``` bash
+docker run -it --hostname mongodb --name=mongodb --net=bridge --expose=27017 mongo --bind_ip_all
+```
 
 ## From zipfile
 

@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
-      - name: Build & Push to GitHub Package
+      - name: Build & Push to GitHub Package with shasum
         uses: opspresso/action-docker@master
         env:
           USERNAME: ${{ secrets.DOCKER_USERNAME }}
@@ -18,4 +18,12 @@ jobs:
           REGISTRY: docker.pkg.github.com
           IMAGE_NAME: "sogehige/sogebot"
           TAG_NAME: nightly:${{ github.sha }}
-          LATEST: "true"
+      - name: Build & Push to GitHub Package as latest
+        uses: opspresso/action-docker@master
+        env:
+          USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+          REGISTRY: docker.pkg.github.com
+          IMAGE_NAME: "sogehige/sogebot"
+          TAG_NAME: nightly:latest
+
