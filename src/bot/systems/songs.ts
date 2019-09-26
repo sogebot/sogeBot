@@ -5,7 +5,7 @@ import ytsearch from 'youtube-search';
 import ytdl from 'ytdl-core';
 import ytpl from 'ytpl';
 
-import { prepare, sendMessage, timeout, getBot } from '../commons';
+import { getBot, prepare, sendMessage, timeout } from '../commons';
 import { command, default_permission, settings, shared, ui } from '../decorators';
 import { permission } from '../permissions';
 import System from './_interface';
