@@ -37,7 +37,12 @@ export default class Login extends Vue {
   }
 
   login() {
-    window.location.replace('http://oauth.sogebot.xyz/?state=' + encodeURIComponent(window.btoa(this.url)))
+    window.location.replace('http://oauth.sogebot.xyz/?state=' + encodeURIComponent(window.btoa(
+      JSON.stringify({
+        popoutUrl: this.popoutUrl,
+        url: this.url,
+      })
+    )))
   }
 
   mounted() {

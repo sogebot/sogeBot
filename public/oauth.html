@@ -59,11 +59,11 @@
     try {
       const url = new URL(window.location.href);
       const code = url.searchParams.get('code');
-      const state = window.atob(url.searchParams.get('state'));
+      const state = JSON.parse(window.atob(url.searchParams.get('state')));
 
       // save token code to localStorage
       localStorage.setItem('code', code);
-      window.location.replace(`${state}`);
+      window.location.replace(`${state.popoutUrl || state.url}`);
     } catch (error) {
       console.log({error});
       window.location.replace(window.location.origin + '/login');
