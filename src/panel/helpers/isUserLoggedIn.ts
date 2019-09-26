@@ -14,38 +14,43 @@ export const isUserLoggedIn = async function (token: string) {
       window.location.replace(window.location.origin + '/login');
     }
   } else {
-    const axiosData = await axios.get(`https://api.twitch.tv/helix/users`, {
-      headers: {
-        'Authorization': 'Bearer ' + code,
-      },
-    });
-    const data = get(axiosData, 'data.data[0]', null);
-    if (data === null) {
+    try {
+      const axiosData = await axios.get(`https://api.twitch.tv/helix/users`, {
+        headers: {
+          'Authorization': 'Bearer ' + code,
+        },
+      });
+      const data = get(axiosData, 'data.data[0]', null);
+      if (data === null) {
+        throw Error('User must be logged')
+      }
+
+      // save userId to db
+      await new Promise((resolve) => {
+        const socket = io('/core/users', { query: 'token=' + token });
+        socket.emit('update', {
+          collection: '_users',
+          key: 'id',
+          items: [
+            {
+              id: data.id,
+              username: data.login,
+            },
+          ],
+        }, (err, data) => {
+          resolve();
+        });
+      });
+      return data;
+    } catch(e) {
       console.log('Redirecting, user code expired');
       if (window.location.href.includes('popout')) {
         window.location.replace(window.location.origin + '/login#error=popout+must+be+logged');
       } else {
         window.location.replace(window.location.origin + '/login');
       }
+      return;
     }
-
-    // save userId to db
-    await new Promise((resolve) => {
-      const socket = io('/core/users', { query: 'token=' + token });
-      socket.emit('update', {
-        collection: '_users',
-        key: 'id',
-        items: [
-          {
-            id: data.id,
-            username: data.login,
-          },
-        ],
-      }, (err, data) => {
-        resolve();
-      });
-    });
-    return data;
   }
 };
 
