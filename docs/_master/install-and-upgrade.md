@@ -48,7 +48,6 @@ docker run -it --name <name-of-container> \
 ``` bash
 docker run -it --name sogebot \
 --env DOMAIN=my.publicdoma.in \
---env TOKEN=`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1` \
 --env MONGOURI=mongodb://localhost:27017/sogebot \
 -p 80:20000 docker.pkg.github.com/sogehige/sogebot/release:9.8.0
 ```
