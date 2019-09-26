@@ -134,6 +134,7 @@ const main = async () => {
     mode: 'hash',
     base: __dirname,
     routes: [
+      { path: '/', name: 'Dashboard', component: () => import('./views/dashboard/stub.vue') },
       { path: '/stats/commandcount', name: 'CommandCountLogger', component: () => import('./views/loggers/commandcount.vue') },
 
       { path: '/manage/commands/', redirect: '/manage/commands/list' },
