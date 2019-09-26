@@ -5,7 +5,7 @@ import ytsearch from 'youtube-search';
 import ytdl from 'ytdl-core';
 import ytpl from 'ytpl';
 
-import { prepare, sendMessage, timeout } from '../commons';
+import { getBot, prepare, sendMessage, timeout } from '../commons';
 import { command, default_permission, settings, shared, ui } from '../decorators';
 import { permission } from '../permissions';
 import System from './_interface';
@@ -322,6 +322,7 @@ class Songs extends System {
       await global.db.engine.update(this.collection.playlist, { _id: pl._id.toString() }, { seed: 1, lastPlayedAt: new Date().getTime() });
       const currentSong = pl;
       currentSong.volume = await this.getVolume(currentSong);
+      currentSong.username = getBot();
       currentSong.type = 'playlist';
       this.currentSong = JSON.stringify(currentSong);
 
