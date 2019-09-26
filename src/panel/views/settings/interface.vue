@@ -231,6 +231,7 @@ import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import _ from 'lodash';
 import {get} from 'lodash';
 import {flatten, unflatten} from 'src/bot/helpers/flatten';
+import { getListOf } from 'src/panel/helpers/getListOf';
 
 type systemFromIO = { name: string; enabled: boolean; areDependenciesEnabled: boolean; isDisabledByEnv: boolean }
 enum State {
@@ -477,7 +478,7 @@ export default class interfaceSettings extends Vue {
 
     console.debug('Saving settings', settings);
     io(`/${this.$route.params.type}/${this.$route.params.id}`, { query: "token=" + this.token })
-      .emit('settings.update', settings, (err) => {
+      .emit('settings.update', settings, async (err) => {
         setTimeout(() => this.state.settings = 0, 1000)
         if (err) {
           this.state.settings = 3
@@ -485,6 +486,12 @@ export default class interfaceSettings extends Vue {
         } else {
           this.state.settings = 2
           this.isDataChanged = false
+
+          // Update prototypes
+          Vue.prototype.$core = await getListOf('core');
+          Vue.prototype.$systems = await getListOf('systems');
+          Vue.prototype.$integrations = await getListOf('integrations');
+
         }
         setTimeout(() => {
           this.refresh();

@@ -1,7 +1,7 @@
 <template>
   <b-container fluid ref="window">
     <b-row>
-      <b-col cols="12">
+      <b-col>
         <span class="title text-default mb-2">
           {{ translate('menu.manage') }}
           <small><fa icon="angle-right"/></small>
@@ -24,6 +24,11 @@
                   style="cursor: pointer;">{{ tag }}</span>
           </span>
         </div>
+      </b-col>
+      <b-col v-if="!$systems.find(o => o.name === 'quotes').enabled" style=" text-align: right;">
+        <b-alert show variant="danger" style="padding: .5rem; margin: 0; display: inline-block;">
+          <fa icon="exclamation-circle" fixed-width/> {{ translate('this-system-is-disabled') }}
+        </b-alert>
       </b-col>
     </b-row>
 
