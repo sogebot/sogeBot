@@ -1,7 +1,7 @@
 name: Docker Image CI - release
 
 on:
-  project_column:
+  release:
     types: [published]
 
 jobs:
