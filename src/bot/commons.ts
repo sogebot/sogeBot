@@ -215,6 +215,25 @@ export function getBot() {
   }
 }
 
+export function getBotID() {
+  try {
+    return global.oauth.botId;
+  } catch (e) {
+    return '';
+  }
+}
+
+export function getBotSender(): Sender {
+  return {
+    username: getBot(),
+    displayName: getBot(),
+    userId: getBotID(),
+    emotes: [],
+    badges: {},
+    'message-type': 'chat',
+  };
+}
+
 export function getChannel() {
   try {
     return global.oauth.generalChannel.toLowerCase().trim();

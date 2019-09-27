@@ -98,6 +98,11 @@ module.exports = {
     }, 5000)
   },
   isSent: async function (entry, user, opts, wait) {
+    if (typeof user === 'string') {
+      user = {
+        username: user
+      }
+    }
     user = _.cloneDeep(user)
     opts = opts || {}
     return until(async setError => {
@@ -141,6 +146,11 @@ module.exports = {
     }, wait || 5000)
   },
   isSentRaw: async function (expected, user, wait) {
+    if (typeof user === 'string') {
+      user = {
+        username: user
+      }
+    }
     user = _.cloneDeep(user)
     return until(setError => {
       try {
@@ -166,6 +176,11 @@ module.exports = {
     }, wait || 5000)
   },
   isNotSent: async function (expected, user, wait) {
+    if (typeof user === 'string') {
+      user = {
+        username: user
+      }
+    }
     user = _.cloneDeep(user)
     const race = await Promise.race([
       this.isSent(expected, user, wait * 2),
@@ -176,6 +191,11 @@ module.exports = {
     assert.isTrue(!race, 'Message was unexpectedly sent ' + expected);
   },
   isNotSentRaw: async function (expected, user, wait) {
+    if (typeof user === 'string') {
+      user = {
+        username: user
+      }
+    }
     user = _.cloneDeep(user)
     const race = await Promise.race([
       this.isSentRaw(expected, user, wait * 2),
