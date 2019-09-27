@@ -65,6 +65,11 @@ declare namespace Registry {
       alerts: List;
     };
 
+    export type AlertMedia = {
+      id: string;
+      b64data: string;
+    };
+
     export type CommonSettings = {
       uuid: string;
       enabled: boolean;
@@ -81,8 +86,8 @@ declare namespace Registry {
         maxTimeToDecrypt: number;
         characters: string;
       };
-      image: string;
-      sound: string;
+      imageId: string;
+      soundId: string;
       soundVolume: number;
       alertDurationInMs: number;
       alertTextDelayInMs: number;

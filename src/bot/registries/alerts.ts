@@ -9,6 +9,21 @@ class Alerts extends Registry {
     this.addMenu({ category: 'registry', name: 'alerts', id: '/registry/alerts/list' });
     if (isMainThread) {
       global.db.engine.index(this.collection.data, [{ index: 'id', unique: true }]);
+      global.db.engine.index(this.collection.media, [{ index: 'id', unique: true }]);
+      global.panel.getApp().get('/registry/alerts/:mediaid', async (req, res) => {
+        const media: Registry.Alerts.AlertMedia = await global.db.engine.findOne(this.collection.media, { id: req.params.mediaid });
+        if (typeof media.id === 'undefined') {
+          res.send(404);
+        } else {
+          const match = (media.b64data.match(/^data:\w+\/\w+;base64,/) || [ 'data:image/gif;base64,' ])[0];
+          const data = Buffer.from(media.b64data.replace(/^data:\w+\/\w+;base64,/, ''), 'base64');
+          res.writeHead(200, {
+            'Content-Type': match.replace('data:', '').replace(';base64,', ''),
+            'Content-Length': data.length,
+          });
+          res.end(data);
+        }
+      });
     }
   }
 
