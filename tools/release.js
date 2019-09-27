@@ -7,61 +7,14 @@ const { spawnSync } = require('child_process');
 
 const argv = require('yargs') // eslint-disable-line
   .usage('node tools/release.js <cmd> [args]')
-  .command('build [branch]', 'make a zip file from branch', (yargs) => {
-    yargs.demandOption(['branch'], 'Please provide branch argument to work with this tool');
-    yargs.positional('branch', {
-      type: 'string',
-      describe: 'github origin branch',
-    });
-  })
   .command('docs', 'move master docs to main docs', (yargs) => {
   })
   .demandCommand()
   .help()
   .argv;
 
-if (argv._[0] === 'build') {
-  buildZipFile();
-} else if (argv._[0] === 'docs') {
+if (argv._[0] === 'docs') {
   buildDocs();
-}
-
-function buildZipFile() {
-  console.log(chalk.inverse('Creating a zip file from ' + argv.branch + ' branch'));
-
-  console.log(chalk.yellow('1.') + ' Download branch zip file');
-  spawnSync('curl', ['https://codeload.github.com/sogehige/sogeBot/zip/' + argv.branch, '--output', argv.branch + '.zip']);
-
-  console.log(chalk.yellow('2.') + ' Unzip downloaded zip file');
-  spawnSync('unzip', [argv.branch + '.zip']);
-
-  console.log(chalk.yellow('3.') + ' Running make');
-  spawnSync('cd', [argv.branch]);
-  const make = spawnSync('make', {
-    cwd: 'sogeBot-' + argv.branch,
-  });
-  if (make.stderr.toString().length > 0) {
-    console.error(make.stdout.toString());
-    console.error(make.stderr.toString());
-    process.exit(1);
-  }
-
-  console.log(chalk.yellow('4.') + ' Creating docker package');
-  spawnSync('make', ['docker'], {
-    cwd: 'sogeBot-' + argv.branch,
-  });
-
-  console.log(chalk.yellow('5.') + ' Creating release package');
-  spawnSync('make', ['pack'], {
-    cwd: 'sogeBot-' + argv.branch,
-  });
-
-  console.log(chalk.yellow('6.') + ' Copy release package to /');
-  spawnSync('cp', ['sogeBot-' + argv.branch + '/*.zip', '.']);
-
-  console.log(chalk.yellow('7.') + ' Cleanup directory');
-  spawnSync('rm', ['-rf', 'sogeBot-' + argv.branch]);
-  spawnSync('rm', ['-rf', argv.branch + '.zip']);
 }
 
 function buildDocs() {
