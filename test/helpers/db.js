@@ -32,6 +32,15 @@ module.exports = {
       global.oauth.broadcasterUsername = 'broadcaster'
       await variable.isEqual('global.oauth.broadcasterUsername', 'broadcaster')
 
+      global.oauth.botUsername = 'bot'
+      await variable.isEqual('global.oauth.botUsername', 'bot')
+
+      global.oauth.botId = '12345'
+      await variable.isEqual('global.oauth.botId', '12345')
+
+      global.oauth.broadcasterUsername = 'broadcaster'
+      await variable.isEqual('global.oauth.broadcasterUsername', 'broadcaster')
+
       resolve()
     }
     return new Promise((resolve, reject) => {

@@ -1,6 +1,6 @@
 import { isMainThread } from 'worker_threads';
 
-import { getLocalizedName, getOwner, prepare, round5, sendMessage } from '../commons';
+import { getBotSender, getLocalizedName, getOwner, prepare, round5, sendMessage } from '../commons';
 import constants from '../constants';
 import { debug } from '../debug';
 import { command, default_permission, settings, shared } from '../decorators';
@@ -75,7 +75,7 @@ class Scrim extends System {
           time: minutes,
           unit: getLocalizedName(minutes, 'core.minutes'),
         }),
-        opts.sender,
+        getBotSender(),
       );
     } catch (e) {
       if (isNaN(Number(e.message))) {
@@ -119,7 +119,7 @@ class Scrim extends System {
     );
   }
 
-  private async reminder() {
+  private reminder() {
     if (!this.cleanedUpOnStart) {
       this.cleanedUpOnStart = true;
       this.closingAt = 0;
@@ -128,7 +128,6 @@ class Scrim extends System {
 
       const minutesToGo = (this.closingAt - Date.now()) / constants.MINUTE;
       const secondsToGo = round5((this.closingAt - Date.now()) / constants.SECOND);
-      const userObj = await global.users.getByName(getOwner());
 
       if (minutesToGo > 1) {
         // countdown every minute
@@ -138,14 +137,7 @@ class Scrim extends System {
               type: this.type,
               time: minutesToGo.toFixed(),
               unit: getLocalizedName(minutesToGo.toFixed(), 'core.minutes'),
-            }),{
-              username: userObj.username,
-              displayName: userObj.displayName || userObj.username,
-              userId: userObj.id,
-              emotes: [],
-              badges: {},
-              'message-type': 'chat',
-            },
+            }), getBotSender(),
           );
           this.lastRemindAt = Date.now();
         }
@@ -157,14 +149,7 @@ class Scrim extends System {
               type: this.type,
               time: String(secondsToGo === 60 ? 1 : secondsToGo),
               unit: secondsToGo === 60 ? getLocalizedName(1, 'core.minutes') : getLocalizedName(secondsToGo, 'core.seconds'),
-            }), {
-              username: userObj.username,
-              displayName: userObj.displayName || userObj.username,
-              userId: userObj.id,
-              emotes: [],
-              badges: {},
-              'message-type': 'chat',
-            },
+            }), getBotSender(),
           );
           this.lastRemindAt = Date.now();
         }
@@ -176,7 +161,6 @@ class Scrim extends System {
   }
 
   private async currentMatches() {
-    const userObj = await global.users.getByName(getOwner());
     const atUsername = global.tmi.showWithAt;
     const matches: {
       [x: string]: string[];
@@ -197,19 +181,11 @@ class Scrim extends System {
       prepare('systems.scrim.currentMatches', {
         matches: output.length === 0 ? '<' + global.translate('core.empty') + '>' : output.join(' | '),
       }),
-      {
-        username: userObj.username,
-        displayName: userObj.displayName || userObj.username,
-        userId: userObj.id,
-        emotes: [],
-        badges: {},
-        'message-type': 'chat',
-      },
+      getBotSender(),
     );
   }
 
-  private async countdown() {
-    const userObj = await global.users.getByName(getOwner());
+  private countdown() {
     for (let i = 0; i < 4; i++) {
       setTimeout(() => {
         if (i < 3) {
@@ -219,25 +195,11 @@ class Scrim extends System {
               time: (3 - i) + '.',
               unit: '',
             }),
-            {
-              username: userObj.username,
-              displayName: userObj.displayName || userObj.username,
-              userId: userObj.id,
-              emotes: [],
-              badges: {},
-              'message-type': 'chat',
-            },
+            getBotSender(),
           );
         } else {
           this.closingAt = 0;
-          sendMessage(prepare('systems.scrim.go'), {
-            username: userObj.username,
-            displayName: userObj.displayName || userObj.username,
-            userId: userObj.id,
-            emotes: [],
-            badges: {},
-            'message-type': 'chat',
-          });
+          sendMessage(prepare('systems.scrim.go'), getBotSender());
           if (!this.isCooldownOnly) {
             setTimeout(() => {
               if (this.closingAt !== 0) {
@@ -247,14 +209,7 @@ class Scrim extends System {
                 prepare('systems.scrim.putMatchIdInChat', {
                   command: this.getCommand('!snipe match'),
                 }),
-                {
-                  username: userObj.username,
-                  displayName: userObj.displayName || userObj.username,
-                  userId: userObj.id,
-                  emotes: [],
-                  badges: {},
-                  'message-type': 'chat',
-                },
+                getBotSender(),
               );
               setTimeout(async () => {
                 if (this.closingAt !== 0) {
