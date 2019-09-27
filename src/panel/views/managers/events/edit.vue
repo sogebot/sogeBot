@@ -109,11 +109,11 @@
                     <label for="type_selector">{{ translate("events.definitions." + defKey + ".label") }}</label>
                     <textarea-with-tags
                       v-if="['messageToSend', 'commandToRun'].includes(defKey)"
-                      :value="operation.definitions[defKey]"
+                      :value.sync="operation.definitions[defKey]"
                       :placeholder="translate('events.definitions.' + defKey + '.placeholder')"
                       :error="false"
                       :filters="['global', ...(supported.events.find((o) => o.id === event.key) || { variables: []}).variables]"
-                      @change="operation.definitions[defKey] = $event"
+                      @update="operation.definitions[defKey] = $event"
                     />
                     <select class="form-control"
                             v-else-if="Array.isArray(supported.operations.find(o => o.id === operation.key).definitions[defKey])" v-model="operation.definitions[defKey]">
