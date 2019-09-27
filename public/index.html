@@ -506,7 +506,10 @@
       }
     });
     $(document).on('hidden.bs.dropdown', function(event) {
-      $(event.target).append(dropdown.detach());
+      if (dropdown) {
+        $(event.target).append(dropdown.detach());
+      }
+      dropdown = null;
     })
   </script>
 </body>
