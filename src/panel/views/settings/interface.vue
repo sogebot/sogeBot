@@ -516,7 +516,10 @@ export default class interfaceSettings extends Vue {
         return value
       }
     }
-    throw new Error(`Value for ${permId} not found in ${JSON.stringify(values)}`);
+
+    // if order is last -> mirror viewers values
+    console.error(`Value for ${permId} not found in ${JSON.stringify(values)}`);
+    return values['0efd7b1c-e460-4167-8e06-8aaf2c170311' /* viewers */];
   }
 
   togglePermissionLock(permission, currentValue) {
