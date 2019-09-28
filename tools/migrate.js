@@ -31,6 +31,44 @@ const end = function (updated) {
 };
 
 const migration = {
+  12: async () => {
+    header('Add id for gallery');
+    let updated = 0;
+
+    const items = await global.db.engine.find('overlays.gallery');
+    for (const item of items) {
+      const id = uuidv4();
+      const regex = new RegExp(String(item._id), 'g')
+
+      await global.db.engine.update('overlays.gallery', { _id: String(item._id) }, { id });
+      updated++;
+
+      const responses = await global.db.engine.find('systems.customcommands.responses');
+      for (const response of responses) {
+        await global.db.engine.update('systems.customcommands.responses', { _id: String(response._id) }, {
+          response: response.response.replace(regex, id)
+        })
+        updated++;
+      }
+
+      const aliases = await global.db.engine.find('systems.alias');
+      for (const alias of aliases) {
+        await global.db.engine.update('systems.alias', { _id: String(alias._id) }, {
+          command: alias.command.replace(regex, id)
+        })
+        updated++;
+      }
+
+      const variables = await global.db.engine.find('custom.variables', { type: 'eval' });
+      for (const variable of variables) {
+        await global.db.engine.update('custom.variables', { _id: String(variable._id) }, {
+          evalValue: variable.evalValue.replace(regex, id)
+        })
+        updated++;
+      }
+    }
+    end(updated);
+  },
   11: async () => {
     header('Add id for custom variables and update variableId(watch), cvarId(history)');
     let updated = 0;

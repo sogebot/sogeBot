@@ -23,12 +23,14 @@ const config = require('@config')
 
 const moment = require('moment-timezone')
 
+let app;
+
 function Panel () {
   global.db.engine.index('dashboards', [{ index: 'id', unique: true }]);
   global.db.engine.index('widgets', [{ index: 'dashboardId' }]);
 
   // setup static server
-  var app = express()
+  app = express()
   app.use(bodyParser.json())
   app.use(bodyParser.urlencoded({ extended: true }))
 
@@ -69,17 +71,6 @@ function Panel () {
   app.use('/dist', express.static(path.join(__dirname, '..', 'public', 'dist')))
   app.get('/popout/', function (req, res) {
     res.sendFile(path.join(__dirname, '..', 'public', 'popout.html'))
-  })
-  app.get('/gallery/:id', async function (req, res) {
-    const file = await global.db.engine.findOne(global.overlays.gallery.collection.data, { _id: req.params.id })
-    if (!_.isEmpty(file)) {
-      const data = Buffer.from(file.data.split(',')[1], 'base64')
-      res.writeHead(200, {
-        'Content-Type': file.type,
-        'Content-Length': data.length
-      })
-      res.end(data)
-    } else res.sendStatus(404)
   })
   app.get('/oauth', function (req, res) {
     res.sendFile(path.join(__dirname, '..', 'public', 'oauth.html'))
@@ -131,23 +122,27 @@ function Panel () {
   app.get('/', function (req, res) {
     res.sendFile(path.join(__dirname, '..', 'public', 'index.html'))
   })
-  app.get('/:type/registry/:subtype/:page', function (req, res) {
-    const file = path.join(__dirname, '..', 'public', req.params.type, 'registry', req.params.subtype, req.params.page)
-    if (fs.existsSync(file)) {
-      res.sendFile(file)
-    }
-  })
-  app.get('/:type/:subtype/:page', function (req, res) {
-    const file = path.join(__dirname, '..', 'public', req.params.type, req.params.subtype, req.params.page)
-    if (fs.existsSync(file)) {
-      res.sendFile(file)
-    }
-  })
-  app.get('/:type/:page', function (req, res) {
-    try {
-      res.sendFile(path.join(__dirname, '..', 'public', req.params.type, req.params.page))
-    } catch (e) {}
-  })
+
+  // wait little bit to other systems have change to load its routes
+  setTimeout(() => {
+    app.get('/:type/registry/:subtype/:page', function (req, res) {
+      const file = path.join(__dirname, '..', 'public', req.params.type, 'registry', req.params.subtype, req.params.page)
+      if (fs.existsSync(file)) {
+        res.sendFile(file)
+      }
+    })
+    app.get('/:type/:subtype/:page', function (req, res) {
+      const file = path.join(__dirname, '..', 'public', req.params.type, req.params.subtype, req.params.page)
+      if (fs.existsSync(file)) {
+        res.sendFile(file)
+      }
+    })
+    app.get('/:type/:page', function (req, res) {
+      try {
+        res.sendFile(path.join(__dirname, '..', 'public', req.params.type, req.params.page))
+      } catch (e) {}
+    })
+  }, 5000);
 
   this.io = require('socket.io')(this.server)
   this.menu = [{ category: 'main', name: 'dashboard', id: 'dashboard' }]
@@ -471,6 +466,10 @@ function Panel () {
   })
 }
 
+Panel.prototype.getApp = function () {
+  return app;
+}
+
 Panel.prototype.expose = function () {
   this.server.listen(global.panel.port, function () {
     global.log.info(`WebPanel is available at http://localhost:${global.panel.port}`)
@@ -486,6 +485,7 @@ Panel.prototype.addMenu = function (menu) {
 Panel.prototype.sendMenu = function (socket) { socket.emit('menu', this.menu) }
 
 Panel.prototype.addWidget = function (id, name, icon) { this.widgets.push({ id: id, name: name, icon: icon }) }
+
 
 Panel.prototype.updateWidgetsInDb = async function (self, widgets, socket) {
   await global.db.engine.remove('widgets', {}) // remove widgets

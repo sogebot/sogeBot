@@ -42,20 +42,20 @@
         <div class="card-deck mb-3" v-else-if="filtered.length > 0" v-for="(chunk, index) of _.chunk(filtered, itemCountPerRow)">
           <div class="card" v-for="item of chunk">
             <div class="card-body border-top p-0 text-right" style="flex: 0 1 auto;">
-              <a v-bind:href="'/gallery/'+ item._id" class="btn btn-outline-dark p-3 border-0 w-100" target="_blank"><i class="fas fa-link"></i> {{ item.name | item._id }}</a>
+              <a v-bind:href="'/gallery/'+ item.id" class="btn btn-outline-dark p-3 border-0 w-100" target="_blank"><i class="fas fa-link"></i> {{ item.name | item.id }}</a>
             </div>
             <div class="card-body border-top p-0 text-right" style="flex: 1 1 auto;">
-              <img class="w-100" :src="'/gallery/'+ item._id" v-if="item.type.includes('png') || item.type.includes('jpg') || item.type.includes('jpeg') || item.type.includes('gif')">
+              <img class="w-100" :src="'/gallery/'+ item.id" v-if="item.type.includes('png') || item.type.includes('jpg') || item.type.includes('jpeg') || item.type.includes('gif')">
               <video class="w-100" v-if="item.type.includes('mp4')" controls>
-                <source :type="item.type" :src="'/gallery/'+ item._id">
+                <source :type="item.type" :src="'/gallery/'+ item.id">
               </video>
               <audio class="w-100" v-if="item.type.includes('audio')" controls>
-                <source :type="item.type" :src="'/gallery/'+ item._id">
+                <source :type="item.type" :src="'/gallery/'+ item.id">
               </audio>
             </div>
 
             <div class="card-footer p-0">
-              <button class="btn btn-danger p-3 w-100" @click="remove(item._id)"><i class="fas fa-trash mr-1" aria-hidden="true"></i> {{ commons.translate('dialog.buttons.delete') }}</a>
+              <button class="btn btn-danger p-3 w-100" @click="remove(item.id)"><i class="fas fa-trash mr-1" aria-hidden="true"></i> {{ commons.translate('dialog.buttons.delete') }}</a>
             </div>
           </div>
 
@@ -149,9 +149,9 @@
             this.exclude = this.exclude.filter(o => o !== type)
           } else this.exclude.push(type)
         },
-        remove: function (_id) {
-          this.socket.emit('delete', { _id }, () => {
-            this.items = this.items.filter(o => o._id != _id)
+        remove: function (id) {
+          this.socket.emit('delete', { id }, () => {
+            this.items = this.items.filter(o => o.id != id)
           })
         },
         filesChange: function (files) {
