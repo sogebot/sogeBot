@@ -14,13 +14,14 @@
         <button v-for="p of _.orderBy(currentData, 'order')"
                 class="list-group-item list-group-item-action"
                 :class="{ active: $route.params.id === p.id }"
-                style="cursor: grab; font-size:1.2em; font-family: 'PT Sans Narrow', sans-serif;"
+                style="font-size:1.2em; font-family: 'PT Sans Narrow', sans-serif;"
                 :key="p.name"
+                :style="{'cursor': p.id === '0efd7b1c-e460-4167-8e06-8aaf2c170311' ? 'inherit' : 'grab' }"
                 @click="setPermission(p.id)"
                 v-on:dragstart="dragstart(p.id, $event)"
                 v-on:dragenter="dragenter(p.id, $event)"
                 v-on:dragend="dragend()"
-                draggable="true"
+                :draggable="p.id !== '0efd7b1c-e460-4167-8e06-8aaf2c170311'"
                 v-else>
 
           <fa icon="greater-than-equal" fixed-width v-if="p.isWaterfallAllowed" size="xs" transform="shrink-8"/>
@@ -89,12 +90,19 @@
         this.$router.push({ name: 'PermissionsSettings', params: { id: pid } })
       },
       dragstart: function(pid, e) {
-        this.setPermission(pid);
-        this.draggingPID = pid;
-        e.dataTransfer.setData('text/plain', 'dummy');
+        if (pid !== '0efd7b1c-e460-4167-8e06-8aaf2c170311') {
+          this.setPermission(pid);
+          this.draggingPID = pid;
+          e.dataTransfer.setData('text/plain', 'dummy');
+        } else {
+          this.draggingPID = null;
+          e.stopPropagation();
+        }
       },
       dragenter: function(pid, e) {
-        if (this.draggingPID === null) return
+        if (this.draggingPID === null || pid === '0efd7b1c-e460-4167-8e06-8aaf2c170311') {
+          return;
+        }
         const dragged = this.currentData.find((o) => o.id === this.draggingPID)
         const drop = this.currentData.find((o) => o.id === pid)
 
