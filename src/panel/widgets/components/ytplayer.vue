@@ -76,6 +76,7 @@
 <script>
 import Vue from 'vue'
 import VuePlyr from 'vue-plyr'
+import { isEqual} from 'lodash'
 Vue.use(VuePlyr)
 
 export default {
@@ -151,14 +152,14 @@ export default {
         this.socket.emit('next')
       }
     },
-    playThisSong(item, retry = false) {
+    playThisSong(item, retry = 0) {
+      this.waitingForNext = false
       if (!item) {
         this.currentSong = null
         return
       }
-      this.waitingForNext = false
 
-      if (retry && this.currentSong && this.currentSong.videoID !== item.videoID) {
+      if (retry > 10 && this.currentSong && this.currentSong.videoID !== item.videoID) {
         return;
       } else {
         this.currentSong = item
@@ -176,7 +177,7 @@ export default {
       } catch (e) {
         return setTimeout(() => {
           console.log('retrying playThisSong')
-          this.playThisSong(item, true); //retry after while
+          this.playThisSong(item, retry++); //retry after while
         }, 1000)
       }
     }
@@ -189,6 +190,11 @@ export default {
 
     this.interval.push(setInterval(() => {
       this.socket.emit('find.request', {}, (err, items) => {
+        if (!isEqual(this.requests, items)) {
+          if (this.currentSong === null && this.autoplay) {
+            this.next();
+          }
+        }
         this.requests = items
       })
     }, 1000));
