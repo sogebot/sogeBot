@@ -8,10 +8,18 @@ const assert = require('assert');
 // users
 const owner = { username: 'soge__' };
 
-function randomString() {
-  return Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5);
-}
-
+const keywords = [
+  { keyword: 'slqca', response: 'hptqm', enabled: Math.random() >= 0.5 },
+  { keyword: 'urfiu', response: 'mtcjt', enabled: Math.random() >= 0.5 },
+  { keyword: 'frqzw', response: 'lordw', enabled: Math.random() >= 0.5 },
+  { keyword: 'awpgh', response: 'powyc', enabled: Math.random() >= 0.5 },
+  { keyword: 'tanhq', response: 'tlygw', enabled: Math.random() >= 0.5 },
+  { keyword: 'nvgqy', response: 'vjkvb', enabled: Math.random() >= 0.5 },
+  { keyword: 'yulym', response: 'cvhis', enabled: Math.random() >= 0.5 },
+  { keyword: 'xgbxs', response: 'fdezi', enabled: Math.random() >= 0.5 },
+  { keyword: 'grgju', response: 'lgexv', enabled: Math.random() >= 0.5 },
+  { keyword: 'mwhpv', response: 'pmuex', enabled: Math.random() >= 0.5 },
+];
 
 describe('Keywords - listing', () => {
   describe('Listing without any keywords', () => {
@@ -32,28 +40,21 @@ describe('Keywords - listing', () => {
       await message.prepare();
     });
 
-    let keywords = [];
-
-    for (let i = 0; i < 10; i++) {
-      it ('Creating random keyword', async () => {
-        const keyword = randomString();
-        const response = randomString();
-        const enabled = Math.random() >= 0.5;
-        const k = await global.systems.keywords.add({ sender: owner, parameters: `-k ${keyword} -r ${response}` });
+    for(const k of keywords) {
+      it (`Creating random keyword | ${k.keyword} | ${k.response}`, async () => {
+        const keyword = await global.systems.keywords.add({ sender: owner, parameters: `-k ${k.keyword} -r ${k.response}` });
+        k.id = keyword.id;
         assert.notStrictEqual(k, null);
-
-        keywords.push({ id: k.id, keyword, response, enabled });
-        await global.db.engine.update(global.systems.keywords.collection.data, { id: k.id }, { enabled });
+        await global.db.engine.update(global.systems.keywords.collection.data, { id: keyword.id }, { enabled: k.enabled });
       });
     }
 
-    it('Expecting populated list', async () => {
-      await global.systems.keywords.list({ sender: owner, parameters: '' });
-      await message.isSent('keywords.list-is-not-empty', owner);
-
-      for(const k of keywords) {
-        await message.isSentRaw(`${k.enabled ? '🗹' : '☐'} ${k.id} | ${k.keyword} | ${k.response}`, owner);
-      }
-    });
+    for(const k of keywords) {
+      it(`Expecting populated list | ${k.keyword} | ${k.response}`, async () => {
+        await global.systems.keywords.list({ sender: owner, parameters: '' });
+        await message.isSent('keywords.list-is-not-empty', owner);
+        await message.isSentRaw(`${k.enabled ? '🗹' : '☐'} ${k.id} | ${k.keyword} | ${k.response}`, owner, 5000);
+      });
+    }
   });
 });
