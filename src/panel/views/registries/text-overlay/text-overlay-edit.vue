@@ -108,6 +108,7 @@
 
 <script lang="ts">
 import { Vue, Component, Watch } from 'vue-property-decorator';
+import { getSocket } from 'src/panel/helpers/socket';
 
 import { codemirror } from 'vue-codemirror';
 import 'codemirror/lib/codemirror.css';
@@ -178,7 +179,7 @@ export default class textOverlayEdit extends Vue {
   }
   externalJsInput: string = '';
 
-  socket = io('/overlays/text', { query: "token=" + this.token });
+  socket = getSocket('/overlays/text');
 
   state: {
     loaded: boolean,

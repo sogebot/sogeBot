@@ -72,6 +72,7 @@
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
 import { QuoteInterface } from '../../../../bot/systems/quotes';
+import { getSocket } from 'src/panel/helpers/socket';
 import _ from 'lodash';
 
 import { getUsernameById } from '../../../helpers/userById';
@@ -115,7 +116,7 @@ export default class quotesList extends Vue {
     loading: this.$state.progress,
   }
 
-  socket = io('/systems/quotes', { query: "token=" + this.token });
+  socket = getSocket('/systems/quotes');
 
   created() {
     this.socket.emit('find', {}, async (err, items: QuoteInterface[]) => {

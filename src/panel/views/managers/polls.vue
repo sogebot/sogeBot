@@ -165,8 +165,8 @@
   require('moment/locale/cs')
   require('moment/locale/ru')
 
-  import io from 'socket.io-client';
-import uuid from 'uuid'
+  import { getSocket } from 'src/panel/helpers/socket';
+  import uuid from 'uuid'
 
   Vue.use(VueMoment, {
       moment, momentTimezone
@@ -188,7 +188,7 @@ import uuid from 'uuid'
         interval: number,
         search: string,
       } = {
-        socket: io('/systems/polls', { query: "token=" + this.token }),
+        socket: getSocket('/systems/polls'),
         votes: [],
         votings: [],
         currentTime: 0,

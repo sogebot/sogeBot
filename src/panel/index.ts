@@ -70,11 +70,9 @@ export interface Global {
 }
 
 declare let global: Global;
-declare let token: string;
 
 declare module 'vue/types/vue' {
   interface Vue {
-    token: string;
     configuration: any;
     $moment?: any;
     $loadScript: (script: string) => Promise<void>;
@@ -111,10 +109,9 @@ const main = async () => {
   // init prototypes
   Vue.prototype.translate = (v) => translate(v);
   Vue.prototype.urlParam = (v) => urlParam(v);
-  Vue.prototype.token = token;
 
-  Vue.prototype.$loggedUser = await isUserLoggedIn(token);
-  await isUserCaster(Vue.prototype.$loggedUser.id, token);
+  Vue.prototype.$loggedUser = await isUserLoggedIn();
+  await isUserCaster(Vue.prototype.$loggedUser.id);
 
   Vue.prototype.$core = await getListOf('core');
   Vue.prototype.$systems = await getListOf('systems');

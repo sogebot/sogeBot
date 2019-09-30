@@ -48,7 +48,7 @@
 
 <script lang="ts">
   import Vue from 'vue'
-  import io from 'socket.io-client';
+  import { getSocket } from 'src/panel/helpers/socket';
 
   export default Vue.extend({
     props: ['update'],
@@ -61,7 +61,7 @@
       } = {
         draggingPID: null,
         currentData: [],
-        socket: io('/core/permissions', { query: "token=" + this.token }),
+        socket: getSocket('/core/permissions'),
         isLoading: true,
       }
       return data

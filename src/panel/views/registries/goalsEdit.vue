@@ -317,7 +317,7 @@ import 'codemirror/lib/codemirror.css'
 import VueFlatPickr from 'vue-flatpickr-component';
 import 'flatpickr/dist/flatpickr.css';
 
-import io from 'socket.io-client';
+import { getSocket } from 'src/panel/helpers/socket';
 import uuid from 'uuid/v4';
 import axios from 'axios';
 
@@ -347,7 +347,7 @@ export default Vue.extend({
       },
       dateTimePicker: any,
     } = {
-      socket: io('/overlays/goals', { query: "token=" + this.token }),
+      socket: getSocket('/overlays/goals'),
       search: '',
       groupId: uuid(),
       goals: [],

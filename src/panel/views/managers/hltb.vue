@@ -84,7 +84,7 @@
   require('moment/locale/cs')
   require('moment/locale/ru')
 
-  import io from 'socket.io-client';
+  import { getSocket } from '../../helpers/socket';
 
   Vue.use(VueMoment, {
       moment, momentTimezone
@@ -102,7 +102,7 @@
         games: import('../../../bot/systems/howlongtobeat').Game[],
         domWidth: number,
       } = {
-        socket: io('/systems/howlongtobeat', { query: "token=" + this.token }),
+        socket: getSocket('/systems/howlongtobeat'),
         games: [],
         itemsPerLine: 2,
         interval: 0,

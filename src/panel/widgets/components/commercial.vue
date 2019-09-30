@@ -36,11 +36,12 @@
 </template>
 
 <script>
+import { getSocket } from 'src/panel/helpers/socket';
 export default {
   props: ['commons'],
   data: function () {
     return {
-      socket: io('/systems/commercial', { query: "token=" + this.token }),
+      socket: getSocket('/systems/commercial'),
       seconds: [30, 60, 90, 120, 150, 180],
       countdown: 0,
       interval: [],

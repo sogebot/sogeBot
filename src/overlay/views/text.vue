@@ -4,11 +4,11 @@
 
 <script lang="ts">
 import { Vue, Component, Watch } from 'vue-property-decorator';
-import io from 'socket.io-client';
+import { getSocket } from 'src/panel/helpers/socket';
 
 @Component({})
 export default class CarouselOverlay extends Vue {
-  socket = io('/overlays/text', {query: "token="+this.token});
+  socket = getSocket('/overlays/text');
   text = '';
   js: any = null;
   css: any = null;

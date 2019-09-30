@@ -1,8 +1,9 @@
-/* globals io token commons _ socket configuration */
+/* globals commons _ socket configuration */
 import Vue from 'vue';
 import Dashboard from './dashboard.vue';
 
 import { isAvailableVariable, isMainLoaded } from '../helpers/isAvailableVariable';
+import { getSocket } from 'src/panel/helpers/socket';
 
 async function initDashboard () {
   await Promise.all([
@@ -16,7 +17,7 @@ async function initDashboard () {
     data: {
       items: [],
       dashboards: [],
-      socket: io({ query: 'token=' + token }),
+      socket: getSocket('/'),
     },
     created: function () {
       this.socket.emit('getWidgets', (items, dashboards) => {
@@ -35,7 +36,7 @@ async function initDashboard () {
       });
     },
     render: function (createElement) {
-      return createElement(Dashboard, { props: { items: this.items, commons, socket, token, configuration, dashboards: this.dashboards } });
+      return createElement(Dashboard, { props: { items: this.items, commons, socket, configuration, dashboards: this.dashboards } });
     },
   });
 }

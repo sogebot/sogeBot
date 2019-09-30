@@ -8,6 +8,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
+import { getSocket } from 'src/panel/helpers/socket';
 
 @Component({})
 export default class btnEmit extends Vue {
@@ -18,7 +19,7 @@ export default class btnEmit extends Vue {
 
   emitToBackend() {
     this.state = 1;
-    io(`/${this.$route.params.type}/${this.$route.params.id}`, { query: "token=" + this.token })
+    getSocket(`/${this.$route.params.type}/${this.$route.params.id}`)
       .emit(this.emit, (err, data) => {
         if (err) {
           this.state = 2;

@@ -75,11 +75,12 @@
 </template>
 
 <script>
+import { getSocket } from 'src/panel/helpers/socket';
 import MarqueeText from 'vue-marquee-text-component'
 import { FontAwesomeLayers } from '@fortawesome/vue-fontawesome'
 
 export default {
-  props: ['token', 'commons'],
+  props: ['commons'],
   components: {
     holdButton: () => import('../../components/holdButton.vue'),
     'font-awesome-layers': FontAwesomeLayers,
@@ -93,7 +94,7 @@ export default {
       songRequestsEnabled: true,
       continueOnPlaylistAfterRequest: true,
 
-      socket: io('/integrations/spotify', { query: "token=" + token })
+      socket: getSocket('/integrations/spotify')
     }
   },
   watch: {

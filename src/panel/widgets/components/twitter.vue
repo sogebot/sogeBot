@@ -33,10 +33,11 @@
 </template>
 
 <script>
+import { getSocket } from 'src/panel/helpers/socket';
 export default {
-  props: ['socket', 'commons'],
+  props: ['commons'],
   data: function () {
-    return { message: '' }
+    return { message: '', socket: getSocket('/') }
   },
   methods: {
     send: function () {

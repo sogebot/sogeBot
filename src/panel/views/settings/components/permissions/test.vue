@@ -53,7 +53,7 @@
 
 <script lang="ts">
   import Vue from 'vue'
-  import io from 'socket.io-client';
+  import { getSocket } from 'src/panel/helpers/socket';
   import uuid from 'uuid/v4';
 
   export default Vue.extend({
@@ -69,7 +69,7 @@
         status: {},
         partialStatus: {},
       } = {
-        socket: io('/core/permissions', { query: "token=" + this.token }),
+        socket: getSocket('/core/permissions'),
         inputUsername: '',
         testUsername: '',
         isFocused: false,

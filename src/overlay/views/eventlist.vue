@@ -14,11 +14,11 @@
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
 import _ from 'lodash'
-import io from 'socket.io-client';
+import { getSocket } from 'src/panel/helpers/socket';
 
 @Component({})
 export default class ClipsOverlay extends Vue {
-  socket = io('/overlays/eventlist', {query: "token="+this.token});
+  socket = getSocket('/overlays/eventlist');
   events: any[] = [];
   created () {
     this.socket.emit('get')

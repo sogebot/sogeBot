@@ -164,17 +164,10 @@
 
 <script lang="ts">
   import Vue from 'vue'
-  import io from 'socket.io-client';
   import _ from 'lodash';
 
   import { EventBus } from '../helpers/event-bus';
-
-  // we are using window.socket to reuse socket from index.html
-  declare global {
-    interface Window {
-      socket: any;
-    }
-  }
+  import { getSocket } from '../helpers/socket';
 
   export default Vue.extend({
     data: function () {
@@ -218,8 +211,9 @@
 
         top: string,
         widthOfMenuInterval: number,
+        socket: SocketIOClient.Socket
       } = {
-        highlightsSocket: io('/systems/highlights', { query: "token=" + this.token }),
+        highlightsSocket: getSocket('/systems/highlights'),
         averageStats: {},
 
         hideStats: false,
@@ -260,6 +254,8 @@
 
         top: '50',
         widthOfMenuInterval: 0,
+
+        socket: getSocket('/'),
       }
       return object
     },
@@ -280,8 +276,8 @@
       }, 100)
 
       console.debug('EMIT [getVersion]')
-      window.socket.emit('getVersion')
-      window.socket.once('version', (version) => {
+      this.socket.emit('getVersion')
+      this.socket.once('version', (version) => {
         this.version = version
         $.get('https://api.github.com/repos/sogehige/sogebot/releases/latest', (response) => {
           let botVersion = version.replace('-SNAPSHOT', '').split('.')
@@ -308,16 +304,16 @@
       })
 
 
-      window.socket.emit('getLatestStats')
-      window.socket.emit('panel.sendStreamData')
+      this.socket.emit('getLatestStats')
+      this.socket.emit('panel.sendStreamData')
 
       setInterval(() => {
-        window.socket.emit('getLatestStats')
-        window.socket.emit('panel.sendStreamData')
+        this.socket.emit('getLatestStats')
+        this.socket.emit('panel.sendStreamData')
       }, 1000)
 
-      window.socket.on('latestStats', (data) => { this.averageStats = data })
-      window.socket.on('stats', async (data) => {
+      this.socket.on('latestStats', (data) => { this.averageStats = data })
+      this.socket.on('stats', async (data) => {
         for (let [key, value] of Object.entries(data)) {
           this[key] = value // populate data
         }
@@ -350,7 +346,7 @@
       },
       loadCustomVariableValue: async function (variable) {
         return new Promise((resolve, reject) => {
-          window.socket.emit('custom.variable.value', variable, (err, value) => {
+          this.socket.emit('custom.variable.value', variable, (err, value) => {
             resolve(value)
           })
         })

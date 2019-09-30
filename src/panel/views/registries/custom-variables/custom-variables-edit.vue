@@ -286,6 +286,7 @@
 import { Vue, Component, Watch } from 'vue-property-decorator';
 import { chunk, orderBy, get } from 'lodash';
 import uuid from 'uuid/v4';
+import { getSocket } from 'src/panel/helpers/socket';
 
 import { codemirror } from 'vue-codemirror';
 import 'codemirror/lib/codemirror.css';
@@ -315,8 +316,8 @@ const State: State = { IDLE: 0, PROGRESS: 1, DONE: 2, ERROR: 3 }
   }
 })
 export default class customVariablesEdit extends Vue {
-  socket = io('/registry/customVariables', { query: "token=" + this.token });
-  psocket = io('/core/permissions', { query: "token=" + this.token });
+  socket = getSocket('/registry/customVariables');
+  psocket = getSocket('/core/permissions');
 
   error: any = null;
 

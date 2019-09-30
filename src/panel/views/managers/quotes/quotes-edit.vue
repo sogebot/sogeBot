@@ -76,6 +76,7 @@
 
 <script lang="ts">
 import { Vue, Component, Watch } from 'vue-property-decorator';
+import { getSocket } from 'src/panel/helpers/socket';
 
 import { Validations } from 'vuelidate-property-decorators';
 import { required } from 'vuelidate/lib/validators';
@@ -104,7 +105,7 @@ Component.registerHooks([
   }
 })
 export default class QuotesEdit extends Vue {
-  socket = io('/systems/quotes', { query: "token=" + this.token });
+  socket = getSocket('/systems/quotes');
 
   error: any = null;
 

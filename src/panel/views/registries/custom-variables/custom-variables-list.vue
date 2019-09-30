@@ -78,6 +78,7 @@
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
 import { debounce, orderBy } from 'lodash';
+import { getSocket } from 'src/panel/helpers/socket';
 
 @Component({
   components: {
@@ -92,8 +93,8 @@ import { debounce, orderBy } from 'lodash';
   }
 })
 export default class customVariablesList extends Vue {
-  psocket: SocketIOClient.Socket = io('/core/permissions', { query: 'token=' + this.token });
-  socket: SocketIOClient.Socket =  io('/registry/customVariables', { query: "token=" + this.token });
+  psocket: SocketIOClient.Socket = getSocket('/core/permissions');
+  socket: SocketIOClient.Socket =  getSocket('/registry/customVariables');
 
   fields = [
     { key: 'variableName', label: '$_', sortable: true },

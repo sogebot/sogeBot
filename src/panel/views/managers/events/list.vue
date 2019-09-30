@@ -165,7 +165,7 @@
   import { FontAwesomeLayers } from '@fortawesome/vue-fontawesome'
   import { TweenMax } from 'gsap/TweenMax'
 
-  import io from 'socket.io-client';
+  import { getSocket } from '../../../helpers/socket';
 
   export default Vue.extend({
     components: {
@@ -187,7 +187,7 @@
           loading: number,
         }
       } = {
-        socket: io('/core/events', { query: "token=" + this.token }),
+        socket: getSocket('/core/events'),
         events: [],
         filters: [],
         operations: [],

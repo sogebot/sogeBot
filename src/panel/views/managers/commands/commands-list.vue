@@ -95,6 +95,8 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import { faEye, faEyeSlash, faPlay, faStop, faKey } from '@fortawesome/free-solid-svg-icons';
 library.add(faEye, faEyeSlash, faPlay, faKey, faStop);
 
+import { getSocket } from '../../../helpers/socket';
+
 @Component({
   components: {
     loading: () => import('../../../components/loading.vue'),
@@ -137,8 +139,8 @@ export default class commandsList extends Vue {
     { key: 'buttons', label: '' },
   ];
 
-  psocket = io('/core/permissions', { query: "token=" + this.token });
-  socket = io('/systems/customcommands', { query: "token=" + this.token });
+  psocket = getSocket('/core/permissions');
+  socket = getSocket('/systems/customcommands');
 
   capitalize (value) {
     if (!value) return ''

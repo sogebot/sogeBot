@@ -124,8 +124,9 @@
 </template>
 
 <script>
+import { getSocket } from 'src/panel/helpers/socket';
 export default {
-  props: ['token', 'commons', 'popout'],
+  props: ['commons', 'popout'],
   mounted: function () {
     this.$emit('mounted')
   },
@@ -193,7 +194,7 @@ export default {
       users: [],
       picked: [],
       updated: String(new Date()),
-      socket: io('/systems/queue', {query: "token=" + this.token}),
+      socket: getSocket('/systems/queue'),
       interval: [],
     }
   },

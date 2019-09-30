@@ -12,7 +12,7 @@
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
 import Winwheel from 'winwheel'
-import io from 'socket.io-client';
+import { getSocket } from 'src/panel/helpers/socket';
 
 import { TweenLite } from 'gsap/TweenMax'
 
@@ -29,7 +29,7 @@ library.add(faSortDown)
 })
 export default class WheelOfFortuneOverlay extends Vue {
 
-  socket = io('/games/wheeloffortune', {query: "token="+this.token});
+  socket = getSocket('/games/wheeloffortune');
   username: null | string = null;
   theWheel: any = null;
 

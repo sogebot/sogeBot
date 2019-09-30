@@ -14,14 +14,14 @@
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
 import { TweenLite } from 'gsap/TweenMax'
-import io from 'socket.io-client';
+import { getSocket } from 'src/panel/helpers/socket';
 
 @Component({})
 export default class CarouselOverlay extends Vue {
   currentImage: any = null;
   ready = true;
   show = true;
-  socket = io('/overlays/carousel', { query: "token=" + this.token });
+  socket = getSocket('/overlays/carousel');
   images: any[] = [];
   interval: any[] = [];
 

@@ -31,14 +31,16 @@
 </template>
 
 <script>
+import { getSocket } from 'src/panel/helpers/socket';
 export default {
   data: function () {
     return {
+      socket: getSocket('/'),
       room: '',
       isRefreshing: false
     }
   },
-  props: ['socket', 'commons'],
+  props: ['commons'],
   created: function () {
     this.socket.emit('twitch.sendTwitchVideo')
     this.socket.once('twitchVideo', (room) => {

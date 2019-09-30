@@ -1,4 +1,4 @@
-/* globals token commons systems */
+/* globals commons systems */
 import Vue from 'vue';
 import User from './user.vue';
 
@@ -18,7 +18,7 @@ async function initUser () {
     },
     render: function (createElement) {
       if (typeof systems !== 'undefined') {
-        return createElement(User, { props: { commons, token, systems } });
+        return createElement(User, { props: { commons, systems } });
       } else {
         return false;
       }

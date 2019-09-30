@@ -62,11 +62,12 @@
 </template>
 
 <script>
+import { getSocket } from 'src/panel/helpers/socket';
 export default {
   props: ['commons', 'popout', 'configuration'],
   data: function () {
     return {
-      socket: io('/widgets/chat', { query: "token=" + this.token }),
+      socket: getSocket('/widgets/chat'),
       chatMessage: '',
       chatters: [],
       isRefreshing: false,

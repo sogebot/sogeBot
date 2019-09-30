@@ -70,6 +70,7 @@
 import { Vue, Component } from 'vue-property-decorator';
 import { isNil, orderBy } from 'lodash';
 import Prism from 'vue-prism-component'
+import { getSocket } from 'src/panel/helpers/socket';
 
 import 'prismjs'
 import 'prismjs/themes/prism.css'
@@ -94,7 +95,7 @@ export default class textOverlayList extends Vue {
     state: { loaded: boolean; } = { loaded: false }
     showMore: string[] = [];
     items: any[] = [];
-    socket = io('/overlays/text', { query: "token=" + this.token });
+    socket = getSocket('/overlays/text');
 
     get filtered() {
       if (this.search.length === 0) return this.items

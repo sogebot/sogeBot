@@ -128,6 +128,9 @@ import { Command, Response } from 'src/bot/systems/customCommands.d';
 
 import uuid from 'uuid/v4';
 
+
+import { getSocket } from '../../../helpers/socket';
+
 Component.registerHooks([
   'beforeRouteEnter',
   'beforeRouteLeave',
@@ -158,8 +161,8 @@ export default class CommandsEdit extends Vue {
   }
   permissions: any[] = [];
 
-  psocket = io('/core/permissions', { query: "token=" + this.token });
-  socket = io('/systems/customcommands', { query: "token=" + this.token });
+  psocket = getSocket('/core/permissions');
+  socket = getSocket('/systems/customcommands');
 
   state: { loadedPerm: number; loadedCmd: number; save: number } = {
     loadedPerm: this.$state.progress,

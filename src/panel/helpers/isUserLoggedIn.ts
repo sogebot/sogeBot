@@ -1,9 +1,9 @@
 import axios from 'axios';
-import io from 'socket.io-client';
 import { get } from 'lodash';
 import { permission } from 'src/bot/helpers/permissions';
+import { getSocket } from './socket';
 
-export const isUserLoggedIn = async function (token: string) {
+export const isUserLoggedIn = async function () {
   // check if we have auth code
   const code = localStorage.getItem('code') || '';
   if (code.trim().length === 0) {
@@ -27,7 +27,7 @@ export const isUserLoggedIn = async function (token: string) {
 
       // save userId to db
       await new Promise((resolve) => {
-        const socket = io('/core/users', { query: 'token=' + token });
+        const socket = getSocket('/core/users');
         socket.emit('update', {
           collection: '_users',
           key: 'id',
@@ -54,9 +54,9 @@ export const isUserLoggedIn = async function (token: string) {
   }
 };
 
-export const isUserCaster = async function (userId: string, token: string) {
+export const isUserCaster = async function (userId: string) {
   return new Promise((resolve) => {
-    const socket = io('/core/users', { query: 'token=' + token });
+    const socket = getSocket('/core/users');
     socket.emit('findOne.viewer', { where: { id: userId }}, (err, viewer) => {
       if (viewer.permission.id !== permission.CASTERS) {
         window.location.replace(window.location.origin + '/login#error=must+be+caster');

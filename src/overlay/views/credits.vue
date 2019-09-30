@@ -30,7 +30,7 @@ current: {{ current }}
 import { Vue, Component, Watch } from 'vue-property-decorator';
 import { TweenMax, TweenLite, Power0, Sine } from 'gsap/TweenMax';
 import { groupBy } from 'lodash';
-import io from 'socket.io-client';
+import { getSocket } from 'src/panel/helpers/socket';
 
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faDeviantart, faDiscord, faFacebook, faGithub, faGoogle, faInstagram, faLinkedin, faPaypal, faPinterest, faPlaystation, faReddit, faSkype, faSnapchat, faSpotify, faSteam, faStrava, faTelegram, faTwitter, faVk, faWindows, faXbox, faYoutube } from '@fortawesome/free-brands-svg-icons'
@@ -44,9 +44,7 @@ library.add(faDeviantart, faDiscord, faFacebook, faGithub, faGoogle, faInstagram
   }
 })
 export default class CreditsOverlay extends Vue {
-  socket = io('/overlays/credits', {
-    query: "token=" + this.token
-  });
+  socket = getSocket('/overlays/credits');
   settings: any = {};
   pages: any[] = [];
   clipsPages: any[] = [];

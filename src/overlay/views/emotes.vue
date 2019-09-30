@@ -25,14 +25,12 @@
 import { Vue, Component } from 'vue-property-decorator';
 import { TweenLite } from 'gsap/TweenMax'
 import _ from 'lodash'
-import io from 'socket.io-client';
+import { getSocket } from 'src/panel/helpers/socket';
 
 @Component({})
 export default class EmotesOverlay extends Vue {
   show = true;
-  socket = io('/overlays/emotes', {
-    query: "token=" + this.token
-  });
+  socket = getSocket('/overlays/emotes');
   emotes: any[] = [];
   interval: any[] = [];
 

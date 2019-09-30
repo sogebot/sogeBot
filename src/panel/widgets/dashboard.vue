@@ -46,7 +46,7 @@
           >
             <div class="grid-stack-item-content">
               <keep-alive>
-                <component :is="item.id" :token="token" :socket="socket" :commons="commons" @mounted="loaded = loaded + 1" :popout="false"></component>
+                <component :is="item.id" :socket="socket" :commons="commons" @mounted="loaded = loaded + 1" :popout="false"></component>
               </keep-alive>
             </div>
           </div>
@@ -54,15 +54,16 @@
       </div>
     </div>
     <div class="w-100"></div>
-    <widget-create v-bind:dashboardId="currentDashboard" v-bind:socket="socket" v-bind:commons="commons" class="pt-4" @addWidget="addWidget"></widget-create>
+    <widget-create v-bind:dashboardId="currentDashboard" v-bind:commons="commons" class="pt-4" @addWidget="addWidget"></widget-create>
     <dashboard-remove v-show="currentDashboard !== String(0)" v-bind:dashboardId="currentDashboard" v-bind:socket="socket" v-bind:commons="commons" class="pt-4" @update="currentDashboard = 0" @removeDashboard="removeDashboard"></dashboard-remove>
   </div>
 </div>
 </template>
 
 <script>
+import { getSocket } from 'src/panel/helpers/socket';
 export default {
-  props: ['items', 'commons', 'socket', 'token', 'dashboards'],
+  props: ['items', 'commons', 'dashboards'],
   components: {
     bets: () => import('./components/bets.vue'),
     chat: () => import('./components/chat.vue'),
@@ -90,7 +91,8 @@ export default {
       currentDashboard: null,
       show: true,
       isLoaded: false,
-      loaded: 0
+      loaded: 0,
+      socket: getSocket('/')
     }
   },
   watch: {
