@@ -7,8 +7,16 @@
 </template>
 
 <script>
+import { getSocket } from 'src/panel/helpers/socket';
 export default {
-  props: ['socket', 'commons', 'dashboardId'],
+  props: ['commons', 'dashboardId'],
+
+  data: function () {
+    return {
+      socket: getSocket('/'),
+    }
+  },
+
   methods: {
     remove: function () {
       this.socket.emit('removeDashboard', this.dashboardId)

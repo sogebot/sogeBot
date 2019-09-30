@@ -37,6 +37,8 @@
 
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
+import { getSocket } from '../helpers/socket';
+
 @Component({
   components: {
     'loading': () => import('../components/loading.vue'),
@@ -44,7 +46,7 @@ import { Vue, Component } from 'vue-property-decorator';
 })
 export default class User extends Vue {
   data: any = null;
-  socket = io('/core/users', { query: "token=" + this.token });
+  socket = getSocket('/core/users');
   interval = 0;
 
   isViewerLoaded: boolean = false;

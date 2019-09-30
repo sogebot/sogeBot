@@ -65,6 +65,7 @@
 </template>
 
 <script>
+import { getSocket } from 'src/panel/helpers/socket';
 export default {
   props: ['commons', 'token'],
   mounted: function () {
@@ -72,7 +73,7 @@ export default {
   },
   data: function () {
     return {
-      socket: io('/systems/bets', {query: "token=" + this.token}),
+      socket: getSocket('/systems/bets'),
       betPercentGain: 0,
 
       locked: false,

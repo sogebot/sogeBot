@@ -38,7 +38,7 @@ import { Vue, Component } from 'vue-property-decorator';
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faStar, faGem, faUsers, faClock, faEye } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import io from 'socket.io-client';
+import { getSocket } from 'src/panel/helpers/socket';
 
 library.add(faStar, faGem, faUsers, faClock, faEye)
 
@@ -48,7 +48,7 @@ library.add(faStar, faGem, faUsers, faClock, faEye)
   }
 })
 export default class StatsOverlay extends Vue {
-  socket = io('/overlays/stats', {query: "token="+this.token});
+  socket = getSocket('/overlays/stats');
   stats: any = {};
   interval: any[] = []
 

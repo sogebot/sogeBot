@@ -156,6 +156,7 @@
 
 <script lang="ts">
 import { Vue, Component, Watch } from 'vue-property-decorator';
+import { getSocket } from 'src/panel/helpers/socket';
 
 import defaultImage from '!!base64-loader!./media/cow01.gif';
 import defaultAudio from '!!base64-loader!./media/456968__funwithsound__success-resolution-video-game-fanfare-sound-effect.mp3';
@@ -188,7 +189,7 @@ Component.registerHooks([
   }
 })
 export default class AlertsEdit extends Vue {
-  socket = io('/registries/alerts', { query: "token=" + this.token });
+  socket = getSocket('/registries/alerts');
 
   error: any = null;
 

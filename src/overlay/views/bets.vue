@@ -26,12 +26,12 @@
 
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
-import io from 'socket.io-client';
+import { getSocket } from 'src/panel/helpers/socket';
 
 @Component({})
 export default class BetsOverlay extends Vue {
   isRunning: boolean = false;
-  socket = io('/overlays/bets', { query: "token=" + this.token });
+  socket = getSocket('/overlays/bets');
   colors = [ 'blue', 'red', 'orange', 'green', 'purple', 'yellow', 'pink', 'cyan' ];
   currentBet: any = {};
   bets: any[] = [];

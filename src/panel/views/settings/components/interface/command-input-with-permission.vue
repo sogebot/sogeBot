@@ -45,6 +45,7 @@
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { isFinite, orderBy } from 'lodash';
+import { getSocket } from 'src/panel/helpers/socket';
 
 @Component({})
 export default class sortableList extends Vue {
@@ -54,7 +55,7 @@ export default class sortableList extends Vue {
   @Prop() readonly permissions: any;
   @Prop() readonly token: any;
 
-  socket: SocketIOClient.Socket = io('/core/permissions', { query: 'token=' + this.token });
+  socket: SocketIOClient.Socket = getSocket('/core/permissions');
   currentValue = this.value;
   currentPermissions = this.permissions;
   permissionsList: any[] = [];

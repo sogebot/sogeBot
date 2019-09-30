@@ -53,11 +53,12 @@
 </template>
 
 <script>
+import { getSocket } from 'src/panel/helpers/socket';
 export default {
   props: ['commons'],
   data: function () {
     return {
-      socket: io('/widgets/soundboard', { query: "token=" + this.token }),
+      socket: getSocket('/widgets/soundboard'),
       volume: 50,
       audio: null,
       sounds: []

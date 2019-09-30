@@ -1,7 +1,7 @@
-declare let token: string;
+import { getSocket } from './socket';
 
 const cache: { [id: string]: string } = {};
-const socket = io('/core/users', { query: 'token=' + token });
+const socket = getSocket('/core/users');
 
 
 export const getUsernameById = async function (id: string) {

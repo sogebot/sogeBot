@@ -63,11 +63,11 @@ finished: {{ (getCurrentAlertList() || []).filter(o => o.finished) }}
 <script lang="ts">
 import { Vue, Component, Watch } from 'vue-property-decorator';
 import { TweenLite } from 'gsap/TweenMax'
-import io from 'socket.io-client';
+import { getSocket } from 'src/panel/helpers/socket';
 
 @Component({})
 export default class AlertsOverlay extends Vue {
-  socket = io('/overlays/alerts', {query: "token="+this.token});
+  socket = getSocket('/overlays/alerts');
   isPlaying = false;
   alerts: any[] = [];
   interval: any[] = [];

@@ -142,7 +142,7 @@
   import { cloneDeep } from 'lodash';
   import { required, requiredIf, minValue } from "vuelidate/lib/validators";
 
-  import io from 'socket.io-client';
+  import { getSocket } from '../../../helpers/socket';
 
   export default Vue.extend({
     components: {
@@ -170,7 +170,7 @@
         }
       } = {
         eventId: this.$route.params.id || eventId,
-        socket: io('/core/events', { query: "token=" + this.token }),
+        socket: getSocket('/core/events'),
         event: {
           id: eventId,
           key: '',

@@ -24,6 +24,7 @@
 </template>
 
 <script>
+import { getSocket } from 'src/panel/helpers/socket';
 export default {
   props: ['commons', 'systems', 'token'],
   data: function () {
@@ -31,7 +32,7 @@ export default {
       bDisplay: false,
       total: 0,
       items: [],
-      socket: io('/systems/checklist', {query: "token=" + this.token}),
+      socket: getSocket('/systems/checklist'),
     }
   },
   computed: {

@@ -88,7 +88,7 @@
 <script lang="ts">
   import Vue from 'vue'
 
-  import io from 'socket.io-client';
+  import { getSocket } from 'src/panel/helpers/socket';
 
   export default Vue.extend({
     components: {
@@ -107,7 +107,7 @@
         interval: number,
         isMounted: boolean,
       } = {
-        socket: io('/overlays/goals', { query: "token=" + this.token }),
+        socket: getSocket('/overlays/goals'),
         search: '',
         groups: [],
         goals: [],

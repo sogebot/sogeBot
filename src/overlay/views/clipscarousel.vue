@@ -27,12 +27,12 @@ nextOffset: {{ nextOffset }}
 
 import { Vue, Component, Watch } from 'vue-property-decorator';
 import { TweenMax } from 'gsap/TweenMax'
-import io from 'socket.io-client';
+import { getSocket } from 'src/panel/helpers/socket';
 import { chunk, cloneDeep } from 'lodash';
 
 @Component({})
 export default class ClipsCarouselOverlay extends Vue {
-  socket = io('/overlays/clipscarousel', { query: "token=" + this.token });
+  socket = getSocket('/overlays/clipscarousel');
   isPlaying = false;
   clips: any[] = [];
   clipsSet: any[] = [];

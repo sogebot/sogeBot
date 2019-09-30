@@ -68,6 +68,7 @@
 </template>
 <script lang="ts">
 import { Vue, Component, Watch } from 'vue-property-decorator';
+import { getSocket } from 'src/panel/helpers/socket';
 
 import { Validate } from 'vuelidate-property-decorators';
 import { required } from 'vuelidate/lib/validators'
@@ -82,7 +83,7 @@ import { KeywordInterface } from '../../../../bot/systems/keywords';
   },
 })
 export default class keywordsEdit extends Vue {
-  socket = io('/systems/keywords', { query: "token=" + this.token });
+  socket = getSocket('/systems/keywords');
 
   state: {
     loading: number;

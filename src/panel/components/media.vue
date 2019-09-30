@@ -52,6 +52,7 @@
 <script lang="ts">
 import { Vue, Component, Prop, PropSync, Watch } from 'vue-property-decorator';
 import uuid from 'uuid/v4';
+import { getSocket } from '../helpers/socket';
 
 import AudioVisual from 'vue-audio-visual'
 Vue.use(AudioVisual)
@@ -88,7 +89,7 @@ export default class MediaForm extends Vue {
   }
 
   created() {
-    this.io = io(this.socket, { query: 'token=' + this.token });
+    this.io = getSocket(this.socket);
     this.io.emit('find', { collection: 'media', where: { id: this.id } }, (err, data: Registry.Alerts.AlertMedia[]) => {
       console.log({data})
       this.b64data = data.sort((a,b) => a.chunkNo - b.chunkNo).map(o => o.b64data).join('');

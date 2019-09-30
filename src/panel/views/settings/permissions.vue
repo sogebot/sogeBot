@@ -34,7 +34,7 @@
 <script lang="ts">
   import Vue from 'vue'
 
-  import io from 'socket.io-client';
+  import { getSocket } from '../../helpers/socket';
   import uuid from 'uuid/v4';
 
   import { library } from '@fortawesome/fontawesome-svg-core'
@@ -57,7 +57,7 @@
         pending: boolean,
       } = {
         update: Date.now(),
-        socket: io('/core/permissions', { query: "token=" + this.token }),
+        socket: getSocket('/core/permissions'),
         pending: false,
       }
       return object

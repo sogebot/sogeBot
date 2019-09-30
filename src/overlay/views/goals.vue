@@ -134,7 +134,7 @@
 
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
-import io from 'socket.io-client';
+import { getSocket } from 'src/panel/helpers/socket';
 import safeEval from 'safe-eval';
 import { find } from 'lodash';
 
@@ -160,7 +160,7 @@ export default class GoalsOverlay extends Vue {
   group: Goals.Group | null = null;
   goals: Goals.Goal[] = [];
   loadedFonts: string[] = [];
-  socket = io('/overlays/goals', {query: "token=" + this.token});
+  socket = getSocket('/overlays/goals');
   lastSwapTime: number = Date.now();
   triggerUpdate: string[] = [];
   cssLoaded: string[] = [];

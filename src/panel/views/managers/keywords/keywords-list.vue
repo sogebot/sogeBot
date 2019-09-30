@@ -55,6 +55,7 @@
 
 <script lang="ts">
 import { Vue, Component/*, Watch */ } from 'vue-property-decorator';
+import { getSocket } from 'src/panel/helpers/socket';
 
 import { KeywordInterface } from '../../../../bot/systems/keywords';
 
@@ -64,7 +65,7 @@ import { KeywordInterface } from '../../../../bot/systems/keywords';
   },
 })
 export default class keywordsList extends Vue {
-  socket = io('/systems/keywords', { query: "token=" + this.token });
+  socket = getSocket('/systems/keywords');
 
   items: KeywordInterface[] = [];
   search: string = '';

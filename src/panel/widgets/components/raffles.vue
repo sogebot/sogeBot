@@ -247,6 +247,7 @@
 </template>
 
 <script>
+import { getSocket } from 'src/panel/helpers/socket';
 export default {
   props: ['commons', 'token'],
   mounted: function () {
@@ -276,7 +277,7 @@ export default {
       winner: null,
       participants: [],
 
-      socket: io('/systems/raffles', {query: "token=" + this.token}),
+      socket: getSocket('/systems/raffles'),
       updated: String(new Date())
     }
   },

@@ -76,7 +76,8 @@
 <script>
 import Vue from 'vue'
 import VuePlyr from 'vue-plyr'
-import { isEqual} from 'lodash'
+import { isEqual } from 'lodash'
+import { getSocket } from 'src/panel/helpers/socket';
 Vue.use(VuePlyr)
 
 export default {
@@ -94,7 +95,7 @@ export default {
 
       player: null,
 
-      socket: io('/systems/songs', { query: "token=" + token }),
+      socket: getSocket('/systems/songs'),
       interval: [],
     }
   },

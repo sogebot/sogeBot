@@ -232,6 +232,7 @@ import _ from 'lodash';
 import {get} from 'lodash';
 import {flatten, unflatten} from 'src/bot/helpers/flatten';
 import { getListOf } from 'src/panel/helpers/getListOf';
+import { getSocket } from 'src/panel/helpers/socket';
 
 type systemFromIO = { name: string; enabled: boolean; areDependenciesEnabled: boolean; isDisabledByEnv: boolean }
 enum State {
@@ -264,7 +265,7 @@ export default class interfaceSettings extends Vue {
   @Prop() readonly commons: any;
 
   socket: SocketIOClient.Socket = io({ query: "token=" + this.token });
-  psocket: SocketIOClient.Socket = io('/core/permissions', { query: "token=" + this.token });
+  psocket: SocketIOClient.Socket = getSocket('/core/permissions');
   list: systemFromIO[] = [];
   state: { loaded: State; settings: State } = { loaded: State.NONE, settings: State.NONE };
   settings: any = {};

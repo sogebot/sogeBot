@@ -15,7 +15,7 @@
 <script lang="ts">
 import { Vue, Component, Watch } from 'vue-property-decorator';
 import { TweenMax } from 'gsap/TweenMax'
-import io from 'socket.io-client';
+import { getSocket } from 'src/panel/helpers/socket';
 
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faCircle } from '@fortawesome/free-solid-svg-icons'
@@ -29,7 +29,7 @@ library.add(faCircle)
   }
 })
 export default class ClipsOverlay extends Vue {
-  socket = io('/overlays/clips', { query: "token=" + this.token });
+  socket = getSocket('/overlays/clips');
   isPlaying = false;
   clips: any[] = [];
   settings: any[] = [];

@@ -51,7 +51,7 @@ import { Vue, Component, Watch } from 'vue-property-decorator';
 import moment from 'moment'
 import VueMoment from 'vue-moment'
 import momentTimezone from 'moment-timezone'
-import io from 'socket.io-client';
+import { getSocket } from 'src/panel/helpers/socket';
 
 require('moment/locale/cs')
 require('moment/locale/ru')
@@ -62,7 +62,7 @@ Vue.use(VueMoment, {
 
 @Component({})
 export default class PollsOverlay extends Vue {
-  socket = io('/overlays/polls', {query: "token="+this.token});
+  socket = getSocket('/overlays/polls');
   currentVote: any = {};
   votes: any[] = [];
   lastUpdatedAt = 0;

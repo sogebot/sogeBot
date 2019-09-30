@@ -77,7 +77,7 @@
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
 import JsonViewer from 'vue-json-viewer'
-import io from 'socket.io-client';
+import { getSocket } from 'src/panel/helpers/socket';
 import VRuntimeTemplate from 'v-runtime-template';
 import { isEqual, get } from 'lodash';
 
@@ -104,8 +104,8 @@ let alerts: Registry.Alerts.EmitData[] = [];
   }
 })
 export default class AlertsRegistryOverlays extends Vue {
-  socket = io('/registries/alerts', {query: "token="+this.token});
-  socketRV = io('/integrations/responsivevoice', {query: "token="+this.token});
+  socket = getSocket('/registries/alerts');
+  socketRV = getSocket('/integrations/responsivevoice');
   interval: number[] = [];
   loadedFonts: string[] = [];
   loadedCSS: string[] = [];

@@ -62,6 +62,7 @@
 
 <script lang="ts">
 import Vue from 'vue'
+import { getSocket } from 'src/panel/helpers/socket';
 export default Vue.extend({
   props: ['commons', 'popout'],
   data: function () {
@@ -71,7 +72,7 @@ export default Vue.extend({
       state: { loaded: boolean },
       interval: number,
     } = {
-      socket: io('/widgets/social', { query: "token=" + this.token }),
+      socket: getSocket('/widgets/social'),
       items: [],
       state: {
         loaded: false,

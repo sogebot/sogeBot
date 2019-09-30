@@ -60,7 +60,7 @@
 
 <script lang="ts">
   import Vue from 'vue'
-  import io from 'socket.io-client';
+  import { getSocket } from 'src/panel/helpers/socket';
   import uuid from 'uuid/v4';
 
   export default Vue.extend({
@@ -82,7 +82,7 @@
         searchData: {}[],
         searchPage: number,
       } = {
-        usersSocket: io('/core/users', { query: "token=" + this.token }),
+        usersSocket: getSocket('/core/users'),
         currentIds: this.ids,
         currentUsers: [],
         users: [],

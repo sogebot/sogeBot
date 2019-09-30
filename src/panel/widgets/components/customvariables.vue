@@ -99,6 +99,7 @@
 </template>
 
 <script>
+import { getSocket } from 'src/panel/helpers/socket';
 var numberOrTextComponent = {
   props: ['id', 'value', 'type'],
   watch: {
@@ -158,7 +159,7 @@ export default {
       variables: [],
       watched: [],
       selectedVariable: null,
-      socket: io('/widgets/customvariables', { query: "token=" + token })
+      socket: getSocket('/widgets/customvariables')
       }
   },
   mounted: function () {

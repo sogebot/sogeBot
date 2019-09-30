@@ -74,6 +74,7 @@
 
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
+import { getSocket } from 'src/panel/helpers/socket';
 
 @Component({
   components: {
@@ -88,7 +89,7 @@ import { Vue, Component } from 'vue-property-decorator';
   }
 })
 export default class customVariablesList extends Vue {
-  socket: SocketIOClient.Socket =  io('/registries/alerts', { query: "token=" + this.token });
+  socket: SocketIOClient.Socket =  getSocket('/registries/alerts');
 
   fields = [
     { key: 'name', label: this.translate('registry.alerts.name.name'), sortable: true },

@@ -1,10 +1,10 @@
 <template>
-  <component :is="widget" v-bind:socket="socket" v-bind:commons="commons" :popout="true"></component>
+  <component :is="widget" v-bind:commons="commons" :popout="true"></component>
 </template>
 
 <script>
 export default {
-  props: ['items', 'commons', 'socket', 'page'],
+  props: ['items', 'commons', 'page'],
   components: {
     bets: () => import('./components/bets.vue'),
     chat: () => import('./components/chat.vue'),

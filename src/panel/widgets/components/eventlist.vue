@@ -188,6 +188,7 @@
 </template>
 
 <script>
+import { getSocket } from 'src/panel/helpers/socket';
 import { FontAwesomeLayers } from '@fortawesome/vue-fontawesome'
 export default {
   props: ['commons', 'popout'],
@@ -197,7 +198,7 @@ export default {
   },
   data: function () {
     return {
-      socket: io('/widgets/eventlist', { query: "token=" + this.token }),
+      socket: getSocket('/widgets/eventlist'),
       settings: {
         widgetEventlistFollows: true,
         widgetEventlistHosts: true,
