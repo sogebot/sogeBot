@@ -9,14 +9,16 @@ class Alerts extends Registry {
     this.addMenu({ category: 'registry', name: 'alerts', id: '/registry/alerts/list' });
     if (isMainThread) {
       global.db.engine.index(this.collection.data, [{ index: 'id', unique: true }]);
-      global.db.engine.index(this.collection.media, [{ index: 'id', unique: true }]);
+      // not unique ids as we will be storing chunks
+      global.db.engine.index(this.collection.media, [{ index: 'id', unique: false }]);
       global.panel.getApp().get('/registry/alerts/:mediaid', async (req, res) => {
-        const media: Registry.Alerts.AlertMedia = await global.db.engine.findOne(this.collection.media, { id: req.params.mediaid });
-        if (typeof media.id === 'undefined') {
+        const media: Registry.Alerts.AlertMedia[] = await global.db.engine.find(this.collection.media, { id: req.params.mediaid });
+        const b64data = media.sort((a,b) => a.chunkNo - b.chunkNo).map(o => o.b64data).join('');
+        if (b64data.trim().length === 0) {
           res.send(404);
         } else {
-          const match = (media.b64data.match(/^data:\w+\/\w+;base64,/) || [ 'data:image/gif;base64,' ])[0];
-          const data = Buffer.from(media.b64data.replace(/^data:\w+\/\w+;base64,/, ''), 'base64');
+          const match = (b64data.match(/^data:\w+\/\w+;base64,/) || [ 'data:image/gif;base64,' ])[0];
+          const data = Buffer.from(b64data.replace(/^data:\w+\/\w+;base64,/, ''), 'base64');
           res.writeHead(200, {
             'Content-Type': match.replace('data:', '').replace(';base64,', ''),
             'Content-Length': data.length,
@@ -40,6 +42,19 @@ class Alerts extends Registry {
         } else {
           cb(false, 0);
         }
+      });
+      socket.on('clear-media', async () => {
+        const alerts: Registry.Alerts.Alert[] = await global.db.engine.find(this.collection.data);
+        const mediaIds: string[] = [];
+        for (const alert of alerts) {
+          for (const event of Object.keys(alert.alerts)) {
+            alert.alerts[event].map(o => {
+              mediaIds.push(o.imageId);
+              mediaIds.push(o.soundId);
+            });
+          }
+        }
+        await global.db.engine.remove(this.collection.media, { id: { $nin: mediaIds } });
       });
       socket.on('test', async (event: keyof Registry.Alerts.List) => {
         this.test({ event });

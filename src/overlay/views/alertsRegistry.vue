@@ -253,7 +253,6 @@ export default class AlertsRegistryOverlays extends Vue {
 
         if (this.runningAlert.showAt <= Date.now() && !this.runningAlert.isShowing) {
           console.debug('showing image');
-          this.runningAlert.alert.imageId += '?t=' + Date.now();
           this.runningAlert.isShowing = true;
         }
 
@@ -272,7 +271,6 @@ export default class AlertsRegistryOverlays extends Vue {
 
         if (this.runningAlert.showAt <= Date.now() && !this.runningAlert.soundPlayed) {
           console.debug('playing audio');
-          this.runningAlert.alert.soundId += '?t=' + Date.now();
           (this.$refs.audio as HTMLMediaElement).volume = this.runningAlert.alert.soundVolume / 100;
           (this.$refs.audio as HTMLMediaElement).play();
           this.runningAlert.soundPlayed = true;

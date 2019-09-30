@@ -68,6 +68,7 @@ declare namespace Registry {
     export type AlertMedia = {
       id: string;
       b64data: string;
+      chunkNo: number;
     };
 
     export type CommonSettings = {

@@ -116,9 +116,9 @@ class INeDB extends Interface {
     const total = where._total || undefined
 
     delete where._sort; delete where._sum; delete where._total; delete where._group
-    if (_.some(Object.keys(flatten(where)).map(o => o.includes('$regex')))) {
+    if (_.some(Object.keys(flatten(where)).map(o => o.includes('$regex') || o.includes('$nin')))) {
       if (Object.keys(flatten(where)).length > 1) {
-        throw Error('Don\'t use $regex with other search attributes');
+        throw Error('Don\'t use $regex, $nin with other search attributes');
       }
     } else {
       where = flatten(where)
@@ -215,18 +215,25 @@ class INeDB extends Interface {
   }
 
   async remove (table, where) {
-    this.on(table) // init table
+    this.on(table); // init table
+    if (_.some(Object.keys(flatten(where)).map(o => o.includes('$regex') | o.includes('$nin')))) {
+      if (Object.keys(flatten(where)).length > 1) {
+        throw Error('Don\'t use $regex, $nin with other search attributes');
+      }
+    } else {
+      where = flatten(where);
+    }
 
-    var self = this
-    return new Promise(function (resolve, reject) {
-      self.on(table).remove(flatten(where), { multi: true }, function (err, numRemoved) {
+    return new Promise((resolve, reject) => {
+      this.on(table).remove(where, { multi: true }, function (err, numRemoved) {
         if (err) {
           global.log.error(err.message)
-          global.log.error(util.inspect({ type: 'remove', table, where }))
+          global.log.error(util.inspect({ type: 'remove', table, where }));
+          reject(err);
         }
-        resolve(numRemoved)
-      })
-    })
+        resolve(numRemoved);
+      });
+    });
   }
 
   async update (table, where, object) {

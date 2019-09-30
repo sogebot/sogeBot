@@ -3,8 +3,10 @@
     <b-card
       v-if="type === 'image'"
       overlay
-      :img-src="b64data"
+      :img-src="!isUploading ? b64data : ''"
+      :style="{ height: isUploading ? '150px' : 'inherit'}"
     >
+      <loading no-margin slow v-if="isUploading"/>
       <b-card-text class="absolute">
         <b-button squared variant="outline-danger" class="border-0" @click="removeMedia()" v-if="b64data.length > 0">
           <fa icon="times" class="mr-1"/> {{ translate('dialog.buttons.delete') }}
@@ -21,24 +23,25 @@
       </b-card-text>
     </b-card>
     <b-card v-else-if="type === 'audio'">
+      <loading no-margin slow v-if="isUploading"/>
       <b-card-text v-show="b64data.length > 0" :style="{position: b64data.length === 0 ? 'absolute' : 'inherit'}">
-        <audio :src="b64data" :ref="uuid" controls="true" preload="metadata" style="visibility:hidden; position: absolute;" ></audio>
-        <av-line canv-class="w-100" :ref-link="uuid" :canv-width="1000" v-show="b64data.length > 0"></av-line>
+        <audio :src="b64data" :ref="id" controls="true" preload="metadata" style="visibility:hidden; position: absolute;" ></audio>
+        <av-line canv-class="w-100" :ref-link="id" :canv-width="1000" v-show="b64data.length > 0"></av-line>
       </b-card-text>
       <b-card-text class="absolute">
         <b-button squared variant="outline-danger" class="border-0" @click="removeMedia()" v-if="b64data.length > 0">
           <fa icon="times" class="mr-1"/> {{ translate('dialog.buttons.delete') }}
         </b-button>
-        <b-button squared variant="outline-primary" class="border-0" v-if="b64data.length > 0" @click="$refs[uuid].play()">
+        <b-button squared variant="outline-primary" class="border-0" v-if="b64data.length > 0" @click="$refs[id].play()">
           <fa icon="play" class="mr-1"/> {{ translate('dialog.buttons.play') }} ({{duration}}s)
         </b-button>
-        <b-button squared variant="outline-dark" class="border-0" @click="$refs['uploadAudio-' + uuid].click()">
+        <b-button squared variant="outline-dark" class="border-0" @click="$refs['uploadAudio-' + id].click()">
           <fa icon="upload" class="mr-1"/> {{ translate('dialog.buttons.upload.idle') }}
         </b-button>
         <input
           class="d-none"
           type="file"
-          :ref="'uploadAudio-' + uuid"
+          :ref="'uploadAudio-' + id"
           @change="filesChange($event.target.files)"
           accept="audio/*"/>
       </b-card-text>
@@ -47,15 +50,19 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { Vue, Component, Prop, PropSync, Watch } from 'vue-property-decorator';
 import uuid from 'uuid/v4';
 
 import AudioVisual from 'vue-audio-visual'
 Vue.use(AudioVisual)
 
-@Component({})
+@Component({
+  components: {
+    loading: () => import('./loading.vue'),
+  }
+})
 export default class MediaForm extends Vue {
-  @Prop() media !: string;
+  @PropSync('media') id !: string;
   @Prop() default !: string | undefined;
   @Prop() socket !: string;
   @Prop() readonly type !: 'image' | 'audio';
@@ -63,28 +70,28 @@ export default class MediaForm extends Vue {
 
   b64data: string = '';
 
-  uuid: string = uuid();
   interval = 0;
   duration = 0;
   io: any = null;
+  isUploading = false;
 
   @Watch('volume')
   @Watch('data')
   setVolume() {
     if (this.type === 'audio' && this.b64data.length === 0) {
-      if (typeof this.$refs[this.uuid] === 'undefined') {
-        console.debug(`Retrying setVolume ${this.uuid}`);
+      if (typeof this.$refs[this.id] === 'undefined') {
+        console.debug(`Retrying setVolume ${this.id}`);
         return setTimeout(() => this.setVolume(), 100);
       }
-      (this.$refs[this.uuid] as HTMLAudioElement).volume = this.volume / 100;
+      (this.$refs[this.id] as HTMLAudioElement).volume = this.volume / 100;
     }
   }
 
   created() {
     this.io = io(this.socket, { query: 'token=' + this.token });
-    console.log(this.io);
-    this.io.emit('findOne', { collection: 'media', where: { id: this.media } }, (err, data: Registry.Alerts.AlertMedia) => {
-      this.b64data = data.b64data;
+    this.io.emit('find', { collection: 'media', where: { id: this.id } }, (err, data: Registry.Alerts.AlertMedia[]) => {
+      console.log({data})
+      this.b64data = data.sort((a,b) => a.chunkNo - b.chunkNo).map(o => o.b64data).join('');
     });
   }
 
@@ -96,7 +103,7 @@ export default class MediaForm extends Vue {
           return;
         }
         this.setVolume();
-        this.duration = (this.$refs[this.uuid] as HTMLAudioElement).duration;
+        this.duration = (this.$refs[this.id] as HTMLAudioElement).duration;
         if (isNaN(this.duration)) {
           this.duration = 0;
         } else {
@@ -110,21 +117,56 @@ export default class MediaForm extends Vue {
     clearInterval(this.interval)
   }
 
+  fileUpload(chunks) {
+    this.id = uuid();
+    this.isUploading = true;
+    const promises: Promise<void>[] = []
+    this.$nextTick(async () => {
+      console.log('Uploading new media with id', this.id);
+
+      for (let i = 0; i < chunks.length; i++) {
+        promises.push(
+          new Promise((resolve, reject) => {
+            const chunk = {
+              id: this.id,
+              b64data: chunks[i],
+              chunkNo: i
+            }
+            console.log('Uploading chunk#' + i, chunk)
+            this.io.emit('insert', {
+              collection: 'media',
+              items:[chunk]
+            }, (err, data) => {
+              if (err) {
+                console.error(err)
+                reject();
+              }
+              console.log('Uploaded chunk#' + i);
+              resolve()
+            })
+          })
+        )
+      };
+
+      await Promise.all(promises);
+      this.isUploading = false;
+    });
+  }
+
   filesChange(file) {
     const reader = new FileReader()
-    reader.onload = (e => {
-      console.log('uploading')
-      this.io.emit('update', { collection: 'media', key: 'id', items:[{ id: this.media, b64data: String(reader.result) }]}, (err, data) => {
-        console.log('done')
-        this.b64data = String(reader.result);
-      })
+    reader.onload = (async e => {
+      const chunks = String(reader.result).match(/.{1,1000000}/g)
+      await this.fileUpload(chunks);
+      console.log('done')
+      this.b64data = String(reader.result);
     })
     reader.readAsDataURL(file[0])
   }
 
   removeMedia() {
     this.b64data = ''
-    this.io.emit('delete', { collection: 'media', where: { id: this.media }})
+    this.io.emit('delete', { collection: 'media', where: { id: this.id }})
   }
 }
 </script>

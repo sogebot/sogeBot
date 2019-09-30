@@ -497,6 +497,9 @@ export default class AlertsEdit extends Vue {
         setTimeout(() => {
           this.state.save = this.$state.idle;
         }, 1000)
+
+        console.debug('Clearing unused media')
+        this.socket.emit('clear-media')
       });
     } else {
       setTimeout(() => {
