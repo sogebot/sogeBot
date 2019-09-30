@@ -157,7 +157,7 @@ export default class MediaForm extends Vue {
     const reader = new FileReader()
     reader.onload = (async e => {
       const chunks = String(reader.result).match(/.{1,1000000}/g)
-      await this.fileUpload(chunks);
+      this.fileUpload(chunks);
       console.log('done')
       this.b64data = String(reader.result);
     })
