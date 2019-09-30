@@ -8,11 +8,11 @@
       </div>
       <div v-if="runningAlert">
         <audio ref="audio">
-          <source :src="runningAlert.alert.sound">
+          <source :src="'/registry/alerts/' + runningAlert.alert.soundId">
         </audio>
         <div v-if="runningAlert.isShowing" class="center" :class="['layout-' + runningAlert.alert.layout]">
           <template v-if="!runningAlert.alert.enableAdvancedMode">
-            <img :src="runningAlert.alert.image" :class="{ center: runningAlert.alert.layout === '3', [runningAlert.animation]: true }" class="slow animated"/>
+            <img :src="'/registry/alerts/' + runningAlert.alert.imageId" :class="{ center: runningAlert.alert.layout === '3', [runningAlert.animation]: true }" class="slow animated"/>
             <div
               v-if="runningAlert.isShowingText"
               :class="{
@@ -270,13 +270,9 @@ export default class AlertsRegistryOverlays extends Vue {
         }
 
         if (this.runningAlert.showAt <= Date.now() && !this.runningAlert.soundPlayed) {
-          if (this.runningAlert.alert.sound.length > 0) {
-            console.debug('playing audio');
-            (this.$refs.audio as HTMLMediaElement).volume = this.runningAlert.alert.soundVolume / 100;
-            (this.$refs.audio as HTMLMediaElement).play();
-          } else {
-            console.debug('skipping audio (not set)');
-          }
+          console.debug('playing audio');
+          (this.$refs.audio as HTMLMediaElement).volume = this.runningAlert.alert.soundVolume / 100;
+          (this.$refs.audio as HTMLMediaElement).play();
           this.runningAlert.soundPlayed = true;
         }
       }
@@ -397,7 +393,7 @@ export default class AlertsRegistryOverlays extends Vue {
                     v-if="runningAlert.isShowingText"
                     :class="{[runningAlert.animation]: true}"
                     class="slow animated ${refImageClass}"
-                    :src="runningAlert.alert.image"
+                    :src="'/registry/alerts/' + runningAlert.alert.imageId"
                   `);
 
               // load CSS

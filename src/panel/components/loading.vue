@@ -11,7 +11,7 @@
     <div
       v-if="slow"
       style="text-transform: uppercase; letter-spacing: 1px; font-size: 0.7rem; position: relative; top: -1rem; max-width: fit-content;"
-      class="text-primary text-center m-auto" v-html="commons.translate('this-may-take-a-while')"></div>
+      class="text-primary text-center m-auto" v-html="translate('this-may-take-a-while')"></div>
   </div>
 </template>
 

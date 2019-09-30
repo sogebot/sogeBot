@@ -149,13 +149,13 @@
     <b-form-group label-cols-sm="4" label-cols-lg="3"
             :label="translate('registry.alerts.image.name')"
             label-for="image">
-      <media :media.sync="data.image" type="image"/>
+      <media :media.sync="data.imageId" type="image" socket="/registries/alerts"/>
     </b-form-group>
 
     <b-form-group label-cols-sm="4" label-cols-lg="3"
             :label="translate('registry.alerts.sound.name')"
             label-for="sound">
-      <media :media.sync="data.sound" type="audio" :volume="data.soundVolume"/>
+      <media :media.sync="data.soundId" type="audio" socket="/registries/alerts" :volume="data.soundVolume"/>
     </b-form-group>
 
     <b-form-group label-cols-sm="4" label-cols-lg="3"

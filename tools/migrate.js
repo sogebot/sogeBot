@@ -31,6 +31,32 @@ const end = function (updated) {
 };
 
 const migration = {
+  13: async () => {
+    header('Move alerts media to own collection');
+    let updated = 0;
+    const alerts = await global.db.engine.find('registries.alerts');
+    for (let i = 0; i < alerts.length; i++) {
+      for (const event of Object.keys(alerts[i].alerts)) {
+        for (const variant of alerts[i].alerts[event]) {
+          const imageId = uuidv4();
+          const soundId = uuidv4();
+          await global.db.engine.insert('registries.alerts.media', [
+            { id: imageId, chunk: 0, b64data: variant.image },
+            { id: soundId, chunk: 0, b64data: variant.sound },
+          ])
+          delete variant.image;
+          delete variant.sound;
+          variant.imageId = imageId;
+          variant.soundId = soundId;
+          updated++;
+        }
+      }
+      await global.db.engine.remove('registries.alerts', { id: alerts[i].id });
+      await global.db.engine.insert('registries.alerts', alerts[i]);
+      updated++;
+    }
+    end(updated);
+  },
   12: async () => {
     header('Add id for gallery');
     let updated = 0;

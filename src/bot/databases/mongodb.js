@@ -120,9 +120,9 @@ class IMongoDB extends Interface {
       let items
       const order = sortBy.startsWith('-') ? 1 : -1
 
-      if (_.some(Object.keys(flatten(where)).map(o => o.includes('$regex')))) {
+      if (_.some(Object.keys(flatten(where)).map(o => o.includes('$regex') | o.includes('$nin')))) {
         if (Object.keys(flatten(where)).length > 1) {
-          throw Error('Don\'t use $regex with other search attributes');
+          throw Error('Don\'t use $regex, $nin with other search attributes');
         }
       } else {
         where = flatten(where)
@@ -272,8 +272,17 @@ class IMongoDB extends Interface {
   }
 
   async remove (table, where) {
-    if (!_.isNil(where._id)) where._id = new ObjectID(where._id)
-    else where = flatten(where)
+    if (!_.isNil(where._id)) {
+      where._id = new ObjectID(where._id)
+    } else {
+      if (_.some(Object.keys(flatten(where)).map(o => o.includes('$regex') | o.includes('$nin')))) {
+        if (Object.keys(flatten(where)).length > 1) {
+          throw Error('Don\'t use $regex, $nin with other search attributes');
+        }
+      } else {
+        where = flatten(where)
+      }
+    }
 
     try {
       let db = this.client.db(this.dbName)

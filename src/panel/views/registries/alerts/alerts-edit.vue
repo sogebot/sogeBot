@@ -57,7 +57,7 @@
           type="text"
           :placeholder="translate('registry.alerts.name.placeholder')"
           @input="$v.item.name.$touch()"
-          :state="$v.item.name.$invalid && $v.item.name.$dirty ? 'invalid' : null"
+          :state="$v.item.name.$invalid && $v.item.name.$dirty ? false : null"
         ></b-form-input>
         <b-form-invalid-feedback>{{ translate('dialog.errors.required') }}</b-form-invalid-feedback>
       </b-form-group>
@@ -157,11 +157,11 @@
 <script lang="ts">
 import { Vue, Component, Watch } from 'vue-property-decorator';
 
+import defaultImage from '!!base64-loader!./media/cow01.gif';
+import defaultAudio from '!!base64-loader!./media/456968__funwithsound__success-resolution-video-game-fanfare-sound-effect.mp3';
+
 import { Validations } from 'vuelidate-property-decorators';
 import { required } from 'vuelidate/lib/validators';
-
-import defaultImage from './media/cow01.gif';
-import defaultAudio from './media/456968__funwithsound__success-resolution-video-game-fanfare-sound-effect.mp3';
 
 import uuid from 'uuid/v4';
 
@@ -331,8 +331,8 @@ export default class AlertsEdit extends Vue {
         characters: '█▓░ </>',
         maxTimeToDecrypt: 4000,
       },
-      image: defaultImage,
-      sound: defaultAudio,
+      imageId: uuid(),
+      soundId: uuid(),
       soundVolume: 20,
       alertDurationInMs: 10000,
       alertTextDelayInMs: 1500,
@@ -360,100 +360,107 @@ export default class AlertsEdit extends Vue {
       },
     };
 
-    this.isValid[this.supportedEvents[this.selectedTabIndex]].push(true);
-    switch(this.supportedEvents[this.selectedTabIndex]) {
-      case 'follows':
-        this.item.alerts.follows.push({
-          messageTemplate: '{name} is now following!',
-          ..._default,
-        })
-        break;
-      case 'cheers':
-        this.item.alerts.cheers.push({
-          messageTemplate: '{name} cheered! x{amount}',
-          message: {
-            minAmountToShow: 0,
-            allowEmotes: {
-              twitch: true, ffz: true, bttv: true
+
+    // save default media
+    this.socket.emit('update', { collection: 'media', key: 'id', items: [
+      { id: _default.imageId, b64data: 'data:image/gif;base64,' + defaultImage },
+      { id: _default.soundId, b64data: 'data:audio/mp3;base64,' + defaultAudio },
+    ] }, () => {
+      this.isValid[this.supportedEvents[this.selectedTabIndex]].push(true);
+      switch(this.supportedEvents[this.selectedTabIndex]) {
+        case 'follows':
+          this.item.alerts.follows.push({
+            messageTemplate: '{name} is now following!',
+            ..._default,
+          })
+          break;
+        case 'cheers':
+          this.item.alerts.cheers.push({
+            messageTemplate: '{name} cheered! x{amount}',
+            message: {
+              minAmountToShow: 0,
+              allowEmotes: {
+                twitch: true, ffz: true, bttv: true
+              },
+              font: {
+                family: 'PT Sans',
+                size: 16,
+                borderPx: 1,
+                borderColor: '#000000',
+                weight: 500,
+                color: '#ffffff',
+              },
             },
-            font: {
-              family: 'PT Sans',
-              size: 16,
-              borderPx: 1,
-              borderColor: '#000000',
-              weight: 500,
-              color: '#ffffff',
+            ..._default,
+          })
+          break;
+        case 'subgifts':
+          this.item.alerts.subgifts.push({
+            messageTemplate: '{name} just gifted {amount} subscribes!',
+            ..._default,
+          })
+          break;
+        case 'subs':
+          this.item.alerts.subs.push({
+            messageTemplate: '{name} just subscribed!',
+            ..._default,
+          })
+          break;
+        case 'resubs':
+          this.item.alerts.resubs.push({
+            messageTemplate: '{name} just resubscribed! {amount} {monthsName}',
+            message: {
+              allowEmotes: {
+                twitch: true, ffz: true, bttv: true
+              },
+              font: {
+                family: 'PT Sans',
+                size: 12,
+                borderPx: 2,
+                borderColor: '#000000',
+                weight: 500,
+                color: '#ffffff',
+              },
             },
-          },
-          ..._default,
-        })
-        break;
-      case 'subgifts':
-        this.item.alerts.subgifts.push({
-          messageTemplate: '{name} just gifted {amount} subscribes!',
-          ..._default,
-        })
-        break;
-      case 'subs':
-        this.item.alerts.subs.push({
-          messageTemplate: '{name} just subscribed!',
-          ..._default,
-        })
-        break;
-      case 'resubs':
-        this.item.alerts.resubs.push({
-          messageTemplate: '{name} just resubscribed! {amount} {monthsName}',
-          message: {
-            allowEmotes: {
-              twitch: true, ffz: true, bttv: true
+            ..._default,
+          })
+          break;
+        case 'tips':
+          this.item.alerts.tips.push({
+            messageTemplate: '{name} donated {amount}{currency}!',
+            message: {
+              minAmountToShow: 0,
+              allowEmotes: {
+                twitch: true, ffz: true, bttv: true
+              },
+              font: {
+                family: 'PT Sans',
+                size: 12,
+                borderPx: 2,
+                borderColor: '#000000',
+                weight: 500,
+                color: '#ffffff',
+              },
             },
-            font: {
-              family: 'PT Sans',
-              size: 12,
-              borderPx: 2,
-              borderColor: '#000000',
-              weight: 500,
-              color: '#ffffff',
-            },
-          },
-          ..._default,
-        })
-        break;
-      case 'tips':
-        this.item.alerts.tips.push({
-          messageTemplate: '{name} donated {amount}{currency}!',
-          message: {
-            minAmountToShow: 0,
-            allowEmotes: {
-              twitch: true, ffz: true, bttv: true
-            },
-            font: {
-              family: 'PT Sans',
-              size: 12,
-              borderPx: 2,
-              borderColor: '#000000',
-              weight: 500,
-              color: '#ffffff',
-            },
-          },
-          ..._default,
-        })
-        break;
-      case 'hosts':
-        this.item.alerts.hosts.push({
-          showAutoHost: false,
-          messageTemplate: '{name} is now hosting my stream with {amount} viewers!',
-          ..._default,
-        })
-        break;
-      case 'raids':
-        this.item.alerts.raids.push({
-          showAutoHost: false,
-          messageTemplate: '{name} is raiding with a party of {amount} raiders!',
-          ..._default,
-        })
-        break;
-    }
+            ..._default,
+          })
+          break;
+        case 'hosts':
+          this.item.alerts.hosts.push({
+            showAutoHost: false,
+            messageTemplate: '{name} is now hosting my stream with {amount} viewers!',
+            ..._default,
+          })
+          break;
+        case 'raids':
+          this.item.alerts.raids.push({
+            showAutoHost: false,
+            messageTemplate: '{name} is raiding with a party of {amount} raiders!',
+            ..._default,
+          })
+          break;
+      }
+    });
   }
 
   deleteVariant(event, uuid) {
@@ -490,6 +497,9 @@ export default class AlertsEdit extends Vue {
         setTimeout(() => {
           this.state.save = this.$state.idle;
         }, 1000)
+
+        console.debug('Clearing unused media')
+        this.socket.emit('clear-media')
       });
     } else {
       setTimeout(() => {
