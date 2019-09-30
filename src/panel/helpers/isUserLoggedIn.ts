@@ -3,7 +3,7 @@ import { get } from 'lodash';
 import { permission } from 'src/bot/helpers/permissions';
 import { getSocket } from './socket';
 
-export const isUserLoggedIn = async function (token: string) {
+export const isUserLoggedIn = async function () {
   // check if we have auth code
   const code = localStorage.getItem('code') || '';
   if (code.trim().length === 0) {
@@ -54,7 +54,7 @@ export const isUserLoggedIn = async function (token: string) {
   }
 };
 
-export const isUserCaster = async function (userId: string, token: string) {
+export const isUserCaster = async function (userId: string) {
   return new Promise((resolve) => {
     const socket = getSocket('/core/users');
     socket.emit('findOne.viewer', { where: { id: userId }}, (err, viewer) => {

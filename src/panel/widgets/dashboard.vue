@@ -46,7 +46,7 @@
           >
             <div class="grid-stack-item-content">
               <keep-alive>
-                <component :is="item.id" :token="token" :socket="socket" :commons="commons" @mounted="loaded = loaded + 1" :popout="false"></component>
+                <component :is="item.id" :socket="socket" :commons="commons" @mounted="loaded = loaded + 1" :popout="false"></component>
               </keep-alive>
             </div>
           </div>
@@ -63,7 +63,7 @@
 <script>
 import { getSocket } from 'src/panel/helpers/socket';
 export default {
-  props: ['items', 'commons', 'token', 'dashboards'],
+  props: ['items', 'commons', 'dashboards'],
   components: {
     bets: () => import('./components/bets.vue'),
     chat: () => import('./components/chat.vue'),

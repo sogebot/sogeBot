@@ -26,7 +26,7 @@
 <script>
 import { getSocket } from 'src/panel/helpers/socket';
 export default {
-  props: ['commons', 'systems', 'token'],
+  props: ['commons', 'systems'],
   data: function () {
     return {
       bDisplay: false,

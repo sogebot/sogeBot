@@ -53,7 +53,6 @@ export default class sortableList extends Vue {
   @Prop() readonly command: any;
   @Prop() readonly type: any;
   @Prop() readonly permissions: any;
-  @Prop() readonly token: any;
 
   socket: SocketIOClient.Socket = getSocket('/core/permissions');
   currentValue = this.value;

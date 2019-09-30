@@ -80,7 +80,7 @@ import MarqueeText from 'vue-marquee-text-component'
 import { FontAwesomeLayers } from '@fortawesome/vue-fontawesome'
 
 export default {
-  props: ['token', 'commons'],
+  props: ['commons'],
   components: {
     holdButton: () => import('../../components/holdButton.vue'),
     'font-awesome-layers': FontAwesomeLayers,

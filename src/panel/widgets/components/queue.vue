@@ -126,7 +126,7 @@
 <script>
 import { getSocket } from 'src/panel/helpers/socket';
 export default {
-  props: ['token', 'commons', 'popout'],
+  props: ['commons', 'popout'],
   mounted: function () {
     this.$emit('mounted')
   },

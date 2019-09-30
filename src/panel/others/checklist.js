@@ -1,4 +1,4 @@
-/* globals token commons _ translations configuration systems */
+/* globals commons _ translations configuration systems */
 import Vue from 'vue'
 import Checklist from './checklist.vue'
 
@@ -14,7 +14,7 @@ function initChecklist () {
     },
     render: function (createElement) {
       if (typeof systems !== 'undefined') {
-        return createElement(Checklist, { props: { commons, token, systems } })
+        return createElement(Checklist, { props: { commons, systems } })
       } else {
         return false
       }

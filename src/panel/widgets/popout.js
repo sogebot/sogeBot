@@ -1,6 +1,7 @@
-/* globals io token commons _ translations configuration socket page */
-import Vue from 'vue'
-import Popout from './popout.vue'
+/* globals  commons _ translations configuration socket page */
+import Vue from 'vue';
+import Popout from './popout.vue';
+import { getSocket } from 'src/panel/helpers/socket';
 
 function initPopout () {
   const isTranslationsLoaded = typeof translations === 'undefined' || _.size(translations) === 0
@@ -11,7 +12,7 @@ function initPopout () {
     el: '#popout',
     data: {
       items: [],
-      socket: io({ query: 'token=' + token })
+      socket: getSocket('/')
     },
     render: function (createElement) {
       return createElement(Popout, { props: { commons, socket, page, configuration } })

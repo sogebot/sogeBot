@@ -63,7 +63,6 @@
                       v-bind:value="currentValue"
                       v-bind:command="defaultValue"
                       :permissions="settings._permissions[defaultValue]"
-                      :token="token"
                       v-on:update="value[defaultValue] = $event.value; settings._permissions[defaultValue] = $event.permissions; triggerDataChange()"
                     ></command-input-with-permission>
                     <toggle-enable
@@ -264,7 +263,7 @@ enum State {
 export default class interfaceSettings extends Vue {
   @Prop() readonly commons: any;
 
-  socket: SocketIOClient.Socket = io({ query: "token=" + this.token });
+  socket: SocketIOClient.Socket = getSocket('/');
   psocket: SocketIOClient.Socket = getSocket('/core/permissions');
   list: systemFromIO[] = [];
   state: { loaded: State; settings: State } = { loaded: State.NONE, settings: State.NONE };
@@ -374,7 +373,7 @@ export default class interfaceSettings extends Vue {
     };
 
     this.state.loaded = State.PROGRESS;
-    io(`/${this.$route.params.type}/${system}`, { query: "token=" + this.token })
+    getSocket(`/${this.$route.params.type}/${system}`)
       .emit('settings', (err, _settings, _ui) => {
         if (system !== this.$route.params.id) return // skip if we quickly changed system
 
@@ -478,7 +477,7 @@ export default class interfaceSettings extends Vue {
     settings.__permission_based__ = unflatten(settings.__permission_based__)
 
     console.debug('Saving settings', settings);
-    io(`/${this.$route.params.type}/${this.$route.params.id}`, { query: "token=" + this.token })
+    getSocket(`/${this.$route.params.type}/${this.$route.params.id}`)
       .emit('settings.update', settings, async (err) => {
         setTimeout(() => this.state.settings = 0, 1000)
         if (err) {
