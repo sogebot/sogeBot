@@ -22,8 +22,6 @@ const Parser = require('./parser')
 const config = require('@config')
 
 const moment = require('moment-timezone')
-var app;
-
 let app;
 
 function Panel () {
