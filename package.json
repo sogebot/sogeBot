@@ -54,6 +54,7 @@
     "source-map-support": "0.5.13",
     "spotify-web-api-node": "4.0.0",
     "stacktrace-parser": "0.1.7",
+    "strip-ansi": "5.2.0",
     "terminal-kit": "1.31.3",
     "twitch-js": "2.0.0-beta.30",
     "twitter": "1.7.1",

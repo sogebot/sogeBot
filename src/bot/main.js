@@ -8,7 +8,7 @@ import { Permissions } from './permissions';
 import { Events } from './events';
 import { OAuth } from './oauth';
 import { Currency } from './currency';
-import { error, warning } from './helpers/log';
+import { info, error, warning } from './helpers/log';
 
 const figlet = require('figlet')
 const os = require('os')
@@ -86,7 +86,8 @@ async function main () {
     font: 'ANSI Shadow',
     horizontalLayout: 'default',
     verticalLayout: 'default'
-  }))
+  }));
+  info('Bot is starting up')
 
   global.lib.translate._load().then(async () => {
     global.stats = await autoLoad('./dest/stats/')

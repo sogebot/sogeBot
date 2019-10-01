@@ -1,9 +1,10 @@
 import fs from 'fs';
 import moment from 'moment-timezone';
 import * as configfile from '../../config.json';
-import chalk from 'chalk';
+import os from 'os';
 import util from 'util';
 import { parse } from 'path';
+import stripAnsi from 'strip-ansi';
 
 const config = configfile;
 
@@ -15,7 +16,7 @@ if (!fs.existsSync(logDir)) {
 };
 
 const logLevel = process.env.LOGLEVEL ? process.env.LOGLEVEL.toLowerCase().trim() : 'info'
-const logFile = './logs/sogebot.log';
+const logFile = fs.createWriteStream('./logs/sogebot.log', { flags: 'a' });
 enum Levels {
   debug,
   error,
@@ -42,7 +43,7 @@ enum Levels {
 };
 const levelFormat = {
   error: '!!! ERROR !!!',
-  debug: chalk.bgRed.bold('DEBUG:'),
+  debug: 'DEBUG:',
   chatIn: '<<<',
   chatOut: '>>>',
   whisperIn: '<w<',
@@ -100,7 +101,7 @@ function log(message: string | object) {
   if (Levels[level] <= Levels[logLevel]) {
     const formattedMessage = format(Levels[level], message);
     console.log(formattedMessage);
-    fs.appendFile(logFile, formattedMessage, () => {});
+    logFile.write(stripAnsi(formattedMessage) + os.EOL);
   }
 }
 
@@ -112,8 +113,8 @@ export function debug(category: string, message: string | object) {
   }
   if (isDebugEnabled(category) || category == '*') {
     const formattedMessage = format(Levels.debug, message, category);
-    console.debug(formattedMessage);
-    fs.appendFile(logFile, formattedMessage + '\n', () => {});
+    console.log(formattedMessage);
+    logFile.write(formattedMessage + os.EOL);
   }
 }
 export function error(message: string | object) { log(message); }
@@ -137,13 +138,3 @@ export function subcommunitygift(message: string | object) { log(message); }
 export function resub(message: string | object) { log(message); }
 export function start(message: string | object) { log(message); }
 export function stop(message: string | object) { log(message); }
-/*
-if (!isMainThread) {
-  global.log = {}
-  for (let level of Object.entries(levels)) {
-    global.log[level[0]] = function (message, params) {
-      global.workers.sendToMaster({ type: 'log', level: level[0], message: message, params: params })
-    }
-  }
-}
-*/
