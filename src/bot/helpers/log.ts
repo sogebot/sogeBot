@@ -1,6 +1,6 @@
 import fs from 'fs';
 import moment from 'moment-timezone';
-import * as configfile from '../../../config.json';
+import * as configfile from '@config';
 import os from 'os';
 import util from 'util';
 import { parse } from 'path';
