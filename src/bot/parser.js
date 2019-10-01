@@ -3,9 +3,8 @@
 const _ = require('lodash');
 
 const constants = require('./constants');
-import { debug } from './debug';
 import { sendMessage } from './commons';
-import { error } from './helpers/log';
+import { debug, error } from './helpers/log';
 import { incrementCountOfCommandUsage } from './helpers/commands/count';
 
 class Parser {
