@@ -1,7 +1,6 @@
 'use strict'
 
 const util = require('util')
-const _ = require('lodash')
 
 import { Events } from './events'
 import { Permissions } from './permissions'

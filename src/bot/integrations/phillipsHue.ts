@@ -132,7 +132,7 @@ class PhillipsHue extends Integration {
         sendMessage(global.translate('phillipsHue.list') + output.join(' | '), opts.sender, opts.attr);
       })
       .fail(function (err) {
-        error(err, 'PhillipsHue.prototype.getLights#1');
+        error(err);
       });
   }
 

@@ -222,7 +222,9 @@ class Parser {
       if (typeof command.fnc === 'function' && !_.isNil(command.id)) {
         incrementCountOfCommandUsage(command.command);
         command['fnc'].apply(command.this, [opts]);
-      } else {error(command.command + ' have wrong undefined function ' + command._fncName + '() registered!', { fnc: 'Parser.prototype.parseCommands' });};
+      } else {
+        error(command.command + ' have wrong undefined function ' + command._fncName + '() registered!');
+      };
     } else {
       // user doesn't have permissions for command
       sender['message-type'] = 'whisper';
