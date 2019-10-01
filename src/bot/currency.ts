@@ -11,7 +11,7 @@ import { isMainThread } from 'worker_threads';
 import Core from './_interface';
 import constants from './constants';
 import { settings, shared, ui } from './decorators';
-import { info, error, warning } from './helpers/log';
+import { error, info, warning } from './helpers/log';
 
 class Currency extends Core {
   @settings('currency')

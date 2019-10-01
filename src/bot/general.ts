@@ -8,7 +8,7 @@ import { command, default_permission, settings, ui } from './decorators';
 import { onChange, onLoad } from './decorators/on';
 import { permission } from './permissions';
 import { isMainThread } from 'worker_threads';
-import { error, debug, warning } from './helpers/log';
+import { debug, error, warning } from './helpers/log';
 
 class General extends Core {
   @settings('general')

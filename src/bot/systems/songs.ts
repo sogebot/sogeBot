@@ -10,7 +10,7 @@ import { command, default_permission, settings, shared, ui } from '../decorators
 import { permission } from '../permissions';
 import System from './_interface';
 import { onChange, onLoad } from '../decorators/on';
-import { info, error } from '../helpers/log';
+import { error, info } from '../helpers/log';
 
 const defaultApiKey = 'AIzaSyDYevtuLOxbyqBjh17JNZNvSQO854sngK0';
 

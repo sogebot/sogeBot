@@ -10,7 +10,7 @@ import { command, default_permission, settings, shared, ui } from '../decorators
 import { onChange, onStartup } from '../decorators/on';
 import Expects from '../expects';
 import Integration from './_interface';
-import { info, error, debug, warning } from '../helpers/log';
+import { debug, error, info, warning } from '../helpers/log';
 
 /*
  * How to integrate:

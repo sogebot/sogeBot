@@ -8,7 +8,7 @@ import { Permissions } from './permissions';
 import { Events } from './events';
 import { OAuth } from './oauth';
 import { Currency } from './currency';
-import { info, error, warning } from './helpers/log';
+import { error, info, warning } from './helpers/log';
 
 const figlet = require('figlet')
 const os = require('os')

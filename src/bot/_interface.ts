@@ -8,7 +8,7 @@ import { loadingInProgress, permissions as permissionsList } from './decorators'
 import { getFunctionList } from './decorators/on';
 import * as Parser from './parser';
 import { permission } from './permissions';
-import { info, error, warning } from './helpers/log';
+import { error, info, warning } from './helpers/log';
 
 class Module {
   public dependsOn: string[] = [];

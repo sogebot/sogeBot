@@ -15,7 +15,7 @@ if (!fs.existsSync(logDir)) {
   fs.mkdirSync(logDir);
 };
 
-const logLevel = process.env.LOGLEVEL ? process.env.LOGLEVEL.toLowerCase().trim() : 'info'
+const logLevel = process.env.LOGLEVEL ? process.env.LOGLEVEL.toLowerCase().trim() : 'info';
 const logFile = fs.createWriteStream('./logs/sogebot.log', { flags: 'a' });
 enum Levels {
   debug,
@@ -117,24 +117,66 @@ export function debug(category: string, message: string | object) {
     logFile.write(formattedMessage + os.EOL);
   }
 }
-export function error(message: string | object) { log(message); }
-export function chatIn(message: string | object) { log(message); }
-export function chatOut(message: string | object) { log(message); }
-export function whisperIn(message: string | object) { log(message); }
-export function whisperOut(message: string | object) { log(message); }
-export function info(message: string | object) { log(message); }
-export function warning(message: string | object) { log(message); }
-export function timeout(message: string | object) { log(message); }
-export function ban(message: string | object) { log(message); }
-export function follow(message: string | object) { log(message); }
-export function host(message: string | object) { log(message); }
-export function raid(message: string | object) { log(message); }
-export function unfollow(message: string | object) { log(message); }
-export function cheer(message: string | object) { log(message); }
-export function tip(message: string | object) { log(message); }
-export function sub(message: string | object) { log(message); }
-export function subgift(message: string | object) { log(message); }
-export function subcommunitygift(message: string | object) { log(message); }
-export function resub(message: string | object) { log(message); }
-export function start(message: string | object) { log(message); }
-export function stop(message: string | object) { log(message); }
+export function error(message: string | object) {
+  log(message); 
+}
+export function chatIn(message: string | object) {
+  log(message); 
+}
+export function chatOut(message: string | object) {
+  log(message); 
+}
+export function whisperIn(message: string | object) {
+  log(message); 
+}
+export function whisperOut(message: string | object) {
+  log(message); 
+}
+export function info(message: string | object) {
+  log(message); 
+}
+export function warning(message: string | object) {
+  log(message); 
+}
+export function timeout(message: string | object) {
+  log(message); 
+}
+export function ban(message: string | object) {
+  log(message); 
+}
+export function follow(message: string | object) {
+  log(message); 
+}
+export function host(message: string | object) {
+  log(message); 
+}
+export function raid(message: string | object) {
+  log(message); 
+}
+export function unfollow(message: string | object) {
+  log(message); 
+}
+export function cheer(message: string | object) {
+  log(message); 
+}
+export function tip(message: string | object) {
+  log(message); 
+}
+export function sub(message: string | object) {
+  log(message); 
+}
+export function subgift(message: string | object) {
+  log(message); 
+}
+export function subcommunitygift(message: string | object) {
+  log(message); 
+}
+export function resub(message: string | object) {
+  log(message); 
+}
+export function start(message: string | object) {
+  log(message); 
+}
+export function stop(message: string | object) {
+  log(message); 
+}

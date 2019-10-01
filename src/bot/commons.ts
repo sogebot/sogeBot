@@ -5,7 +5,7 @@ import 'moment-precise-range-plugin';
 import { join, normalize } from 'path';
 import { isMainThread } from 'worker_threads';
 
-import { debug, isDebugEnabled as debugIsEnabled, whisperOut, chatOut } from './helpers/log';
+import { chatOut, debug, isDebugEnabled as debugIsEnabled, whisperOut } from './helpers/log';
 import Message from './message';
 import { globalIgnoreList } from './data/globalIgnoreList';
 import { error } from './helpers/log';

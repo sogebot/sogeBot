@@ -10,7 +10,7 @@ import { getLocalizedName, getOwner, isBot, isBroadcaster, isModerator, isOwner,
 import Message from './message';
 import * as Parser from './parser';
 import { generateUsername } from './helpers/generateUsername';
-import { info, error, warning } from './helpers/log';
+import { error, info, warning } from './helpers/log';
 
 class Events extends Core {
   public timeouts: { [x: string]: NodeJS.Timeout } = {};

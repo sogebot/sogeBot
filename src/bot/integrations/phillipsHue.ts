@@ -8,7 +8,7 @@ import { command, default_permission, settings } from '../decorators';
 import { onChange, onStartup } from '../decorators/on';
 import { permission } from '../permissions';
 import Integration from './_interface';
-import { info, error } from '../helpers/log';
+import { error, info } from '../helpers/log';
 
 interface State {
   rgb: number[];

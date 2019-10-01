@@ -6,7 +6,7 @@ import XRegExp from 'xregexp';
 
 import Overlay from './_interface';
 import { parser, settings, ui } from '../decorators';
-import { info, error } from '../helpers/log';
+import { error, info } from '../helpers/log';
 
 
 class Emotes extends Overlay {

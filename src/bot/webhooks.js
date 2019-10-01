@@ -4,7 +4,7 @@ const config = require('@config')
 const util = require('util');
 const { isBot } = require('./commons');
 
-import { debug, warning, info, error, follow } from './helpers/log';
+import { debug, warning, error, info, follow } from './helpers/log';
 
 class Webhooks {
   constructor () {
