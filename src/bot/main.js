@@ -114,7 +114,7 @@ if (isMainThread) {
     error(`Possibly Unhandled Rejection at: ${util.inspect(p)} reason: ${reason}`)
   })
 
-  process.on('uncaughtException', (error) => {
+  process.on('uncaughtException', (err) => {
     error(util.inspect(error))
     error('+------------------------------------------------------------------------------+')
     error('| BOT HAS UNEXPECTEDLY CRASHED                                                 |')

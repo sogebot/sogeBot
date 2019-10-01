@@ -11,7 +11,7 @@ import { permission } from '../permissions';
 import System from './_interface';
 import { incrementCountOfCommandUsage } from '../helpers/commands/count';
 import { isMainThread } from 'worker_threads';
-import { warning } from '../helpers/log';
+import { warning, debug } from '../helpers/log';
 
 
 /*
@@ -86,6 +86,7 @@ class Alias extends System {
         const message = await new Message(opts.message.replace(replace, `${alias.command}`)).parse({
           sender: opts.sender,
         });
+        debug('alias.process', message);
         global.tmi.message({
           message: {
             tags: opts.sender,

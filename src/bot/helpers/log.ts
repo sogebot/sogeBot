@@ -6,10 +6,10 @@ import util from 'util';
 import { parse } from 'path';
 import stripAnsi from 'strip-ansi';
 
-const config = configfile;
+const config: any = configfile;
 
 const logDir = './logs';
-config.timezone = config.timezone === 'system' ? moment.tz.guess() : config.timezone;
+config.timezone = typeof config.timezone === 'undefined' || config.timezone === 'system' ? moment.tz.guess() : config.timezone;
 
 if (!fs.existsSync(logDir)) {
   fs.mkdirSync(logDir);
@@ -79,6 +79,7 @@ function getNameFromStackTrace() {
 
 function format(level: Levels, message: string | object, category?: string) {
   const timestamp = moment().tz(config.timezone).format('YYYY-MM-DD[T]HH:mm:ss.SSS');
+
   if (typeof message === 'object') {
     message = util.inspect(message);
   }
