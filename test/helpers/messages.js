@@ -55,13 +55,10 @@ module.exports = {
   debug: async function (category, expected) {
     await until(setError => {
       const args = log.debug.lastCall.args;
-      try {
-        assert.isTrue(args[0] === category);
-        assert.isTrue(args[1] === expected);
+      if (log.debug.calledWith(category, expected)) {
         return true;
-      } catch (err) {
-        return setError(`\nExpected args: '${category}', '${expected}'\nActual args:   ${args}`);
       }
+      return setError(`\nExpected args: '${category}', '${expected}'\nActual args:   ${args}`);
     }, 5000);
   },
   isWarned: async function (entry, user, opts) {
