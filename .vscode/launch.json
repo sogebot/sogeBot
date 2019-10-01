@@ -12,7 +12,6 @@
             "runtimeArgs": [
                 "run-script",
                 "debug",
-                "start-no-migration"
             ],
             "console": "internalConsole",
             "env": {
@@ -22,11 +21,7 @@
                 "DEBUG": "tmi",
             },
             "preLaunchTask": "npm: build",
-            "outputCapture": "std",
-            "skipFiles": [
-                "${workspaceFolder}/node_modules/**/*.js",
-                "<node_internals>/**/*.js"
-            ],
+            "outputCapture": "console",
             "sourceMaps": true,
             "port": 9229
         },
@@ -38,7 +33,6 @@
             "runtimeArgs": [
                 "run-script",
                 "debug",
-                "start-no-migration"
             ],
             "console": "internalConsole",
             "env": {
@@ -47,11 +41,7 @@
                 "DEBUG": "tmi",
             },
             "preLaunchTask": "npm: build",
-            "outputCapture": "std",
-            "skipFiles": [
-                "${workspaceFolder}/node_modules/**/*.js",
-                "<node_internals>/**/*.js"
-            ],
+            "outputCapture": "console",
             "sourceMaps": true,
             "port": 9229
         }

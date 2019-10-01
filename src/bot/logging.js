@@ -99,12 +99,58 @@ if (!isMainThread) {
     ),
     exceptionHandlers: [
       new winston.transports.File({ filename: logDir + '/exceptions.log', colorize: false, maxsize: 5242880 }),
-      new winston.transports.Console()
+      new winston.transports.Console({
+        //
+        // Possible to override the log method of the
+        // internal transports of winston@3.0.0.
+        //
+        log(info, callback) {
+          setImmediate(() => this.emit('logged', info));
+
+          if (this.stderrLevels[info[Symbol.for('level')]]) {
+            console.error(info[Symbol.for('message')]);
+
+            if (callback) {
+              callback();
+            }
+            return;
+          }
+
+          console.log(info[Symbol.for('message')]);
+
+          if (callback) {
+            callback();
+          }
+        }
+      })
     ],
     transports: [
       new winston.transports.File({ filename: logDir + '/sogebot.log', colorize: false, maxsize: 5242880, maxFiles: 5, tailable: true }),
       new winston.transports.File({ filename: logDir + '/debug.log', colorize: true, maxsize: 5242880, maxFiles: 5, level: 'debug', tailable: true }),
-      new winston.transports.Console()
+      new winston.transports.Console({
+        //
+        // Possible to override the log method of the
+        // internal transports of winston@3.0.0.
+        //
+        log(info, callback) {
+          setImmediate(() => this.emit('logged', info));
+
+          if (this.stderrLevels[info[Symbol.for('level')]]) {
+            console.error(info[Symbol.for('message')]);
+
+            if (callback) {
+              callback();
+            }
+            return;
+          }
+
+          console.log(info[Symbol.for('message')]);
+
+          if (callback) {
+            callback();
+          }
+        }
+      })
     ]
   })
 }
