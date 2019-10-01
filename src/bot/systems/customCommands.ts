@@ -14,6 +14,7 @@ import { isMainThread } from 'worker_threads';
 import uuid from 'uuid';
 
 import { Command, Response } from './customCommands.d';
+import { chatOut } from '../helpers/log';
 
 /*
  * !command                                                                 - gets an info about command usage
@@ -341,7 +342,7 @@ class CustomCommands extends System {
       for (const r of responses) {
         const rPrmsn: any = permissions.find(o => o.v === r.permission);
         const response = await prepare('customcmds.response', { command, index: ++r.order, response: r.response, after: r.stopIfExecuted ? '_' : 'v', permission: rPrmsn.string });
-        global.log.chatOut(response, { username: opts.sender.username });
+        chatOut(`${response} [${opts.sender.username}]`);
         message(global.tmi.sendWithMe ? 'me' : 'say', getOwner(), response);
       }
     }

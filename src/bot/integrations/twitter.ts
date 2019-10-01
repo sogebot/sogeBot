@@ -10,6 +10,7 @@ import Message from '../message';
 import Integration from './_interface';
 import { settings, ui } from '../decorators';
 import { onChange, onStartup } from '../decorators/on';
+import { info } from '../helpers/log';
 
 class Twitter extends Integration {
   public watchedStreams: {
@@ -79,7 +80,7 @@ class Twitter extends Integration {
     }
     this.client.post('statuses/update', { status: text }, (error, tweet, response) => {
       if (error) {
-        global.log.error(error, 'Twitch#send');
+        error(error, 'Twitch#send');
       }
     });
   }
@@ -87,7 +88,7 @@ class Twitter extends Integration {
   public async enableStreamForHash(hash: string): Promise<void> {
     if (!this.watchedStreams.find((o) => o.hash === hash)) {
       this.client.stream('statuses/filter', {track: hash}, (stream) => {
-        global.log.info(chalk.yellow('TWITTER: ') + 'Stream for ' + hash + ' was started.');
+        info(chalk.yellow('TWITTER: ') + 'Stream for ' + hash + ' was started.');
         this.watchedStreams.push({ hash, stream });
         stream.on('data', (tweet) => {
           const data = {
@@ -105,7 +106,7 @@ class Twitter extends Integration {
         });
 
         stream.on('error', (error) => {
-          global.log.error(chalk.yellow('TWITTER: ') + error);
+          error(chalk.yellow('TWITTER: ') + error);
         });
       });
     }
@@ -117,7 +118,7 @@ class Twitter extends Integration {
       stream.stream.destroy();
     }
     this.watchedStreams = this.watchedStreams.filter((o) => o.hash !== hash);
-    global.log.info(chalk.yellow('TWITTER: ') + 'Stream for ' + hash + ' was ended.');
+    info(chalk.yellow('TWITTER: ') + 'Stream for ' + hash + ' was ended.');
   }
 
   @onStartup()
@@ -163,26 +164,26 @@ class Twitter extends Integration {
 
   private disconnect() {
     this.client = null;
-    global.log.info(chalk.yellow('TWITTER: ') + 'Client disconnected from service');
+    info(chalk.yellow('TWITTER: ') + 'Client disconnected from service');
   }
 
   private connect() {
     try {
       const error: string[] = [];
       if (this.consumerKey.trim().length === 0) {
-        error.push('consumerKey'); 
+        error.push('consumerKey');
       }
       if (this.consumerSecret.trim().length === 0) {
-        error.push('consumerSecret'); 
+        error.push('consumerSecret');
       }
       if (this.accessToken.trim().length === 0) {
-        error.push('accessToken'); 
+        error.push('accessToken');
       }
       if (this.secretToken.trim().length === 0) {
-        error.push('secretToken'); 
+        error.push('secretToken');
       }
       if (error.length > 0) {
-        throw new Error(error.join(', ') + 'missing'); 
+        throw new Error(error.join(', ') + 'missing');
       }
 
       this.client = new Client({
@@ -191,9 +192,9 @@ class Twitter extends Integration {
         access_token_key: this.accessToken.trim(),
         access_token_secret: this.secretToken.trim(),
       });
-      global.log.info(chalk.yellow('TWITTER: ') + 'Client connected to service');
+      info(chalk.yellow('TWITTER: ') + 'Client connected to service');
     } catch (e) {
-      global.log.info(chalk.yellow('TWITTER: ') + e.message);
+      info(chalk.yellow('TWITTER: ') + e.message);
     }
   }
 }

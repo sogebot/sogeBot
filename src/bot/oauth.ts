@@ -5,6 +5,7 @@ import Core from './_interface';
 import constants from './constants';
 import { settings, shared, ui } from './decorators';
 import { onChange } from './decorators/on';
+import { info, error, warning } from './helpers/log';
 
 class OAuth extends Core {
   private toWait = 10;
@@ -121,7 +122,7 @@ class OAuth extends Core {
 
   public async getChannelId() {
     if (!isMainThread || global.mocha) {
-      return; 
+      return;
     }
     if (typeof global.api === 'undefined' || typeof global.tmi === 'undefined') {
       return setTimeout(() => this.getChannelId(), 1000);
@@ -135,13 +136,13 @@ class OAuth extends Core {
       if (typeof cid !== 'undefined' && cid !== null) {
         this.currentChannel = this.generalChannel;
         this.channelId = cid;
-        global.log.info('Channel ID set to ' + cid);
+        info('Channel ID set to ' + cid);
         global.tmi.reconnect('bot');
         global.tmi.reconnect('broadcaster');
         global.api.updateChannelViewsAndBroadcasterType();
         this.toWait = 10;
       } else {
-        global.log.error(`Cannot get channel ID of ${this.generalChannel} - waiting ${this.toWait.toFixed()}s`);
+        error(`Cannot get channel ID of ${this.generalChannel} - waiting ${this.toWait.toFixed()}s`);
         timeout = this.toWait * 1000;
         this.toWait = this.toWait * 2;
       }
@@ -189,7 +190,7 @@ class OAuth extends Core {
     */
   public async validateOAuth(type: string) {
     if (!isMainThread || global.mocha) {
-      return; 
+      return;
     }
     clearTimeout(this.timeouts[`validateOAuth-${type}`]);
 
@@ -216,7 +217,7 @@ class OAuth extends Core {
       }
 
       if (type === 'bot' && this.botId === this.broadcasterId) {
-        global.log.warning('You shouldn\'t use same account for bot and broadcaster!');
+        warning('You shouldn\'t use same account for bot and broadcaster!');
       }
 
       this[type + 'CurrentScopes'] = request.data.scopes;
@@ -238,7 +239,7 @@ class OAuth extends Core {
       }
       status = false;
       if ((this[type + 'RefreshToken']) !== '') {
-        this.refreshAccessToken(type); 
+        this.refreshAccessToken(type);
       } else {
         this[type + 'Username'] = '';
         this[type + 'CurrentScopes'] = [];
@@ -267,9 +268,9 @@ class OAuth extends Core {
     */
   public async refreshAccessToken(type: string) {
     if (!isMainThread) {
-      return; 
+      return;
     }
-    global.log.warning('Refreshing access token of ' + type);
+    warning('Refreshing access token of ' + type);
     const url = 'https://twitchtokengenerator.com/api/refresh/';
     try {
       if (['bot', 'broadcaster'].includes(type) && (this[type + 'RefreshToken']) === '') {
@@ -288,9 +289,9 @@ class OAuth extends Core {
       this[type + 'AccessToken'] = request.data.token;
       this[type + 'RefreshToken'] = request.data.refresh;
 
-      global.log.warning('Access token of ' + type + ' was refreshed.');
-      global.log.warning('New access token of ' + type + ': ' + request.data.token);
-      global.log.warning('New refresh token of ' + type + ': ' + request.data.refresh);
+      warning('Access token of ' + type + ' was refreshed.');
+      warning('New access token of ' + type + ': ' + request.data.token);
+      warning('New refresh token of ' + type + ': ' + request.data.refresh);
       this.validateOAuth(type);
 
       return request.data.token;
@@ -304,8 +305,8 @@ class OAuth extends Core {
         this.broadcasterId = '';
       }
 
-      global.log.error('Access token of ' + type + ' was not refreshed.');
-      global.log.error(e.stack);
+      error('Access token of ' + type + ' was not refreshed.');
+      error(e.stack);
     }
   }
 }

@@ -15,6 +15,7 @@ const gitCommitInfo = require('git-commit-info');
 import {
   getBroadcaster,
 } from './commons';
+import { error, info } from './helpers/log';
 import uuid from 'uuid'
 
 const Parser = require('./parser')
@@ -448,7 +449,7 @@ function Panel () {
             ' widget=' + listener.self.constructor.name + ' on=' + listener.on)
         }
         try { await listener.fnc(listener.self, self.io, data) } catch (e) {
-          global.log.error('Error on ' + listener.on + ' listener')
+          error('Error on ' + listener.on + ' listener')
         }
         if (listener.finally && listener.finally !== listener.fnc) listener.finally(listener.self, self.io)
       })
@@ -471,7 +472,7 @@ Panel.prototype.getApp = function () {
 
 Panel.prototype.expose = function () {
   this.server.listen(global.panel.port, function () {
-    global.log.info(`WebPanel is available at http://localhost:${global.panel.port}`)
+    info(`WebPanel is available at http://localhost:${global.panel.port}`)
   })
 }
 
@@ -504,7 +505,7 @@ Panel.prototype.socketListening = function (self, on, fnc) {
 Panel.prototype.registerSockets = util.deprecate(function (options) {
   const name = options.self.constructor.name.toLowerCase()
   for (let fnc of options.expose) {
-    if (!_.isFunction(options.self[fnc])) global.log.error(`Function ${fnc} of ${options.self.constructor.name} is undefined`)
+    if (!_.isFunction(options.self[fnc])) error(`Function ${fnc} of ${options.self.constructor.name} is undefined`)
     else this.socketListeners.push({ self: options.self, on: `${name}.${fnc}`, fnc: options.self[fnc], finally: options.finally })
   }
 }, 'registerSockets() is deprecated. Use socket from system interface directly.')
@@ -549,7 +550,7 @@ Panel.prototype.sendStreamData = async function (self, socket) {
     }
     socket.emit('stats', data)
   } catch (e) {
-    global.log.error(e.stack);
+    error(e.stack);
   }
 }
 

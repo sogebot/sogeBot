@@ -10,6 +10,7 @@ import { command, default_permission, settings, shared, ui } from '../decorators
 import { permission } from '../permissions';
 import System from './_interface';
 import { onChange, onLoad } from '../decorators/on';
+import { info, error } from '../helpers/log';
 
 const defaultApiKey = 'AIzaSyDYevtuLOxbyqBjh17JNZNvSQO854sngK0';
 
@@ -224,7 +225,7 @@ class Songs extends System {
         const ban = (resolve) => {
           ytdl.getInfo('https://www.youtube.com/watch?v=' + opts.parameters, async (err, videoInfo) => {
             if (err) {
-              global.log.error(err, { fnc: 'Songs.prototype.banSongById#1' });
+              error(err);
             } else if (!_.isNil(videoInfo) && !_.isNil(videoInfo.title)) {
               banned++;
               sendMessage(global.translate('songs.bannedSong').replace(/\$title/g, videoInfo.title), opts.sender, opts.attr);
@@ -448,7 +449,7 @@ class Songs extends System {
     if (_.isNil(videoID.match(idRegex))) { // not id or url
       ytsearch(opts.parameters, { maxResults: 1, key: 'AIzaSyDYevtuLOxbyqBjh17JNZNvSQO854sngK0' }, (err, results) => {
         if (err) {
-          return global.log.error(err, { fnc: 'Songs.prototype.addSongToQueue#3' });
+          return error(err);
         }
         if (typeof results !== 'undefined' && results[0].id) {
           opts.parameters = results[0].id;
@@ -477,7 +478,7 @@ class Songs extends System {
 
     ytdl.getInfo('https://www.youtube.com/watch?v=' + videoID, async (err, videoInfo) => {
       if (err) {
-        return global.log.error(err, { fnc: 'Songs.prototype.addSongToQueue#1' });
+        return error(err);
       }
       if (_.isUndefined(videoInfo) || _.isUndefined(videoInfo.title) || _.isNull(videoInfo.title)) {
         sendMessage(global.translate('songs.song-was-not-found'), opts.sender, opts.attr);
@@ -522,18 +523,18 @@ class Songs extends System {
     const banFromDb = (await global.db.engine.find(this.collection.ban)).map(o => o.videoID);
 
     if (idsFromDB.includes(id)) {
-      global.log.info(`=> Skipped ${id} - Already in playlist`);
+      info(`=> Skipped ${id} - Already in playlist`);
       done++;
     } else if (banFromDb.includes(id)) {
-      global.log.info(`=> Skipped ${id} - Song is banned`);
+      info(`=> Skipped ${id} - Song is banned`);
       done++;
     } else {
       ytdl.getInfo('https://www.youtube.com/watch?v=' + id, async (err, videoInfo) => {
         done++;
         if (err) {
-          return global.log.error(`=> Skipped ${id} - ${err.message}`);
+          return error(`=> Skipped ${id} - ${err.message}`);
         } else if (!_.isNil(videoInfo) && !_.isNil(videoInfo.title)) {
-          global.log.info(`=> Imported ${id} - ${videoInfo.title}`);
+          info(`=> Imported ${id} - ${videoInfo.title}`);
           global.db.engine.update(this.collection.playlist, { videoID: id }, { videoID: id, title: videoInfo.title, loudness: videoInfo.loudness, length_seconds: videoInfo.length_seconds, lastPlayedAt: new Date().getTime(), seed: 1 });
           imported++;
         }
@@ -613,18 +614,18 @@ class Songs extends System {
 
       for (const id of ids) {
         if (idsFromDB.includes(id)) {
-          global.log.info(`=> Skipped ${id} - Already in playlist`);
+          info(`=> Skipped ${id} - Already in playlist`);
           done++;
         } else if (banFromDb.includes(id)) {
-          global.log.info(`=> Skipped ${id} - Song is banned`);
+          info(`=> Skipped ${id} - Song is banned`);
           done++;
         } else {
           ytdl.getInfo('https://www.youtube.com/watch?v=' + id, async (err, videoInfo) => {
             done++;
             if (err) {
-              return global.log.error(`=> Skipped ${id} - ${err.message}`);
+              return error(`=> Skipped ${id} - ${err.message}`);
             } else if (!_.isNil(videoInfo) && !_.isNil(videoInfo.title)) {
-              global.log.info(`=> Imported ${id} - ${videoInfo.title}`);
+              info(`=> Imported ${id} - ${videoInfo.title}`);
               global.db.engine.update(this.collection.playlist, { videoID: id }, { videoID: id, title: videoInfo.title, loudness: videoInfo.loudness, length_seconds: videoInfo.length_seconds, lastPlayedAt: new Date().getTime(), seed: 1 });
               imported++;
             }

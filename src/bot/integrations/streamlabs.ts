@@ -5,6 +5,7 @@ import chalk from 'chalk';
 import Integration from './_interface';
 import { settings, ui } from '../decorators';
 import { onChange, onStartup } from '../decorators/on';
+import { info, tip } from '../helpers/log';
 
 class Streamlabs extends Integration {
   socket: SocketIOClient.Socket | null = null;
@@ -41,15 +42,15 @@ class Streamlabs extends Integration {
     this.socket = io.connect('https://sockets.streamlabs.com?token=' + this.socketToken);
 
     this.socket.on('reconnect_attempt', () => {
-      global.log.info(chalk.yellow('STREAMLABS:') + ' Trying to reconnect to service');
+      info(chalk.yellow('STREAMLABS:') + ' Trying to reconnect to service');
     });
 
     this.socket.on('connect', () => {
-      global.log.info(chalk.yellow('STREAMLABS:') + ' Successfully connected socket to service');
+      info(chalk.yellow('STREAMLABS:') + ' Successfully connected socket to service');
     });
 
     this.socket.on('disconnect', () => {
-      global.log.info(chalk.yellow('STREAMLABS:') + ' Socket disconnected from service');
+      info(chalk.yellow('STREAMLABS:') + ' Socket disconnected from service');
       if (this.socket) {
         this.socket.open();
       }
@@ -80,7 +81,7 @@ class Streamlabs extends Integration {
           message: event.message,
           timestamp: Date.now(),
         });
-        global.log.tip(`${event.from.toLowerCase()}, amount: ${event.amount}${event.currency}, message: ${event.message}`);
+        tip(`${event.from.toLowerCase()}, amount: ${event.amount}${event.currency}, message: ${event.message}`);
         global.events.fire('tip', {
           username: event.from.toLowerCase(),
           amount: parseFloat(event.amount).toFixed(2),

@@ -6,6 +6,7 @@ import XRegExp from 'xregexp';
 
 import Overlay from './_interface';
 import { parser, settings, ui } from '../decorators';
+import { info, error } from '../helpers/log';
 
 
 class Emotes extends Overlay {
@@ -141,9 +142,9 @@ class Emotes extends Overlay {
 
     if (cid && global.oauth.broadcasterType !== null && (Date.now() - this.lastSubscriberEmoteChk > 1000 * 60 * 60 * 24 * 7 || this.lastChannelChk !== cid)) {
       if (global.oauth.broadcasterType === '') {
-        global.log.info(`EMOTES: Skipping fetching of ${cid} emotes - not subscriber/affiliate`);
+        info(`EMOTES: Skipping fetching of ${cid} emotes - not subscriber/affiliate`);
       } else {
-        global.log.info(`EMOTES: Fetching channel ${cid} emotes`);
+        info(`EMOTES: Fetching channel ${cid} emotes`);
         this.lastSubscriberEmoteChk = Date.now();
         this.lastChannelChk = cid;
         try {
@@ -163,13 +164,13 @@ class Emotes extends Overlay {
                 },
               });
           }
-          global.log.info(`EMOTES: Fetched channel ${cid} emotes`);
+          info(`EMOTES: Fetched channel ${cid} emotes`);
         } catch (e) {
           if (String(e).includes('404')) {
-            global.log.error(`EMOTES: Error fetching channel ${cid} emotes. Your channel was not found on twitchemotes.com. Add your channel at https://twitchemotes.com/contact/tip`);
+            error(`EMOTES: Error fetching channel ${cid} emotes. Your channel was not found on twitchemotes.com. Add your channel at https://twitchemotes.com/contact/tip`);
           } else {
-            global.log.error(e);
-            global.log.error(e.stack);
+            error(e);
+            error(e.stack);
           }
         }
       }
@@ -183,7 +184,7 @@ class Emotes extends Overlay {
 
     // we want to update once every week
     if (Date.now() - this.lastGlobalEmoteChk > 1000 * 60 * 60 * 24 * 7) {
-      global.log.info('EMOTES: Fetching global emotes');
+      info('EMOTES: Fetching global emotes');
       this.lastGlobalEmoteChk = Date.now();
       try {
         const request = await axios.get('https://api.twitchemotes.com/api/v4/channels/0');
@@ -205,10 +206,10 @@ class Emotes extends Overlay {
               },
             });
         }
-        global.log.info('EMOTES: Fetched global emotes');
+        info('EMOTES: Fetched global emotes');
       } catch (e) {
-        global.log.error(e);
-        global.log.error(e.stack);
+        error(e);
+        error(e.stack);
       }
     }
 
@@ -221,9 +222,9 @@ class Emotes extends Overlay {
 
     if (cid && global.oauth.broadcasterType !== null && (Date.now() - this.lastSubscriberEmoteChk > 1000 * 60 * 60 * 24 * 7 || this.lastChannelChk !== cid)) {
       if (global.oauth.broadcasterType === '') {
-        global.log.info(`EMOTES: Skipping fetching of ${cid} emotes - not subscriber/affiliate`);
+        info(`EMOTES: Skipping fetching of ${cid} emotes - not subscriber/affiliate`);
       } else {
-        global.log.info(`EMOTES: Fetching channel ${cid} emotes`);
+        info(`EMOTES: Fetching channel ${cid} emotes`);
         this.lastSubscriberEmoteChk = Date.now();
         this.lastChannelChk = cid;
         try {
@@ -243,13 +244,13 @@ class Emotes extends Overlay {
                 },
               });
           }
-          global.log.info(`EMOTES: Fetched channel ${cid} emotes`);
+          info(`EMOTES: Fetched channel ${cid} emotes`);
         } catch (e) {
           if (String(e).includes('404')) {
-            global.log.error(`EMOTES: Error fetching channel ${cid} emotes. Your channel was not found on twitchemotes.com. Add your channel at https://twitchemotes.com/contact/tip`);
+            error(`EMOTES: Error fetching channel ${cid} emotes. Your channel was not found on twitchemotes.com. Add your channel at https://twitchemotes.com/contact/tip`);
           } else {
-            global.log.error(e);
-            global.log.error(e.stack);
+            error(e);
+            error(e.stack);
           }
         }
       }
@@ -264,7 +265,7 @@ class Emotes extends Overlay {
 
     // fetch FFZ emotes
     if (cid && Date.now() - this.lastFFZEmoteChk > 1000 * 60 * 60 * 24 * 7) {
-      global.log.info('EMOTES: Fetching ffz emotes');
+      info('EMOTES: Fetching ffz emotes');
       this.lastFFZEmoteChk = Date.now();
       try {
         const request = await axios.get('https://api.frankerfacez.com/v1/room/id/' + cid);
@@ -284,9 +285,9 @@ class Emotes extends Overlay {
               urls: emotes[i].urls,
             });
         }
-        global.log.info('EMOTES: Fetched ffz emotes');
+        info('EMOTES: Fetched ffz emotes');
       } catch (e) {
-        global.log.error(e);
+        error(e);
       }
 
       this.fetch.ffz = false;
@@ -299,7 +300,7 @@ class Emotes extends Overlay {
 
     // fetch BTTV emotes
     if (channel && Date.now() - this.lastBTTVEmoteChk > 1000 * 60 * 60 * 24 * 7) {
-      global.log.info('EMOTES: Fetching bttv emotes');
+      info('EMOTES: Fetching bttv emotes');
       this.lastBTTVEmoteChk = Date.now();
       try {
         const request = await axios.get('https://api.betterttv.net/2/channels/' + channel);
@@ -322,9 +323,9 @@ class Emotes extends Overlay {
 
             });
         }
-        global.log.info('EMOTES: Fetched bttv emotes');
+        info('EMOTES: Fetched bttv emotes');
       } catch (e) {
-        global.log.error(e);
+        error(e);
       }
     }
 

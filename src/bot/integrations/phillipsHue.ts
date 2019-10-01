@@ -8,6 +8,7 @@ import { command, default_permission, settings } from '../decorators';
 import { onChange, onStartup } from '../decorators/on';
 import { permission } from '../permissions';
 import Integration from './_interface';
+import { info, error } from '../helpers/log';
 
 interface State {
   rgb: number[];
@@ -72,7 +73,7 @@ class PhillipsHue extends Integration {
             state.status.blocked = true;
             state.status.state = 0;
             this.api.setLightState(state.light, { 'on': false }).fail(function () {
-              return true; 
+              return true;
             }).done(function () {
               state.status.blocked = false;
               state.status.loop++;
@@ -83,7 +84,7 @@ class PhillipsHue extends Integration {
         if (state.status.loop === state.loop * 2) {
           setTimeout(() => {
             this.api.setLightState(state.light, { 'on': false }).fail(function () {
-              return true; 
+              return true;
             });
           }, state.time + 100);
 
@@ -108,10 +109,10 @@ class PhillipsHue extends Integration {
         this.port);
 
       this.states = [];
-      global.log.info(chalk.yellow('PHILLIPSHUE: ') + 'Connected to api');
+      info(chalk.yellow('PHILLIPSHUE: ') + 'Connected to api');
     } else {
       this.api = null;
-      global.log.info(chalk.yellow('PHILLIPSHUE: ') + 'Not connected to api');
+      info(chalk.yellow('PHILLIPSHUE: ') + 'Not connected to api');
     }
   }
 
@@ -131,7 +132,7 @@ class PhillipsHue extends Integration {
         sendMessage(global.translate('phillipsHue.list') + output.join(' | '), opts.sender, opts.attr);
       })
       .fail(function (err) {
-        global.log.error(err, 'PhillipsHue.prototype.getLights#1'); 
+        error(err, 'PhillipsHue.prototype.getLights#1');
       });
   }
 

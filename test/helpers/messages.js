@@ -40,16 +40,6 @@ module.exports = {
         }
       }
     }
-
-    try {
-      sinon.stub(global.log, 'chatOut')
-      sinon.stub(global.log, 'warning')
-      sinon.stub(global.log, 'process')
-    } catch (e) {
-      global.log.chatOut.reset()
-      global.log.warning.reset()
-      global.log.process.reset()
-    }
   },
   process: async function (expected, user) {
     await until(setError => {

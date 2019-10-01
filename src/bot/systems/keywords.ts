@@ -9,6 +9,7 @@ import { isUUID, prepare, sendMessage } from '../commons';
 import { isMainThread } from 'worker_threads';
 import debug from '../debug';
 import XRegExp from 'xregexp';
+import { error } from '../helpers/log';
 
 
 export interface KeywordInterface {
@@ -73,7 +74,7 @@ class Keywords extends System {
       sendMessage(prepare('keywords.keyword-was-added', data), opts.sender);
       return data;
     } catch (e) {
-      global.log.error(e.stack);
+      error(e.stack);
       sendMessage(prepare('keywords.keyword-parse-failed'), opts.sender);
       return null;
     }
@@ -117,7 +118,7 @@ class Keywords extends System {
         return keywords[0];
       }
     } catch (e) {
-      global.log.error(e.stack);
+      error(e.stack);
       sendMessage(prepare('keywords.keyword-parse-failed'), opts.sender);
       return null;
     }
@@ -188,7 +189,7 @@ class Keywords extends System {
         return true;
       }
     } catch (e) {
-      global.log.error(e.stack);
+      error(e.stack);
       sendMessage(prepare('keywords.keyword-parse-failed'), opts.sender);
       return false;
     }
@@ -233,7 +234,7 @@ class Keywords extends System {
         return true;
       }
     } catch (e) {
-      global.log.error(e.stack);
+      error(e.stack);
       sendMessage(prepare('keywords.keyword-parse-failed'), opts.sender);
       return false;
     }

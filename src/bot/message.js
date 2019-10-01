@@ -9,6 +9,7 @@ const commons = require('./commons');
 const gitCommitInfo = require('git-commit-info');
 const Entities = require('html-entities').AllHtmlEntities;
 
+import { warning } from './helpers/log';
 import { getCountOfCommandUsage } from './helpers/commands/count';
 
 class Message {
@@ -418,7 +419,7 @@ class Message {
             }).join(', ');
             return list.length > 0 ? list : ' ';
           default:
-            global.log.warning('unknown list system ' + system);
+            warning('unknown list system ' + system);
             return '';
         }
       }

@@ -10,6 +10,7 @@ import chalk from 'chalk';
 import fs from 'fs';
 import { writeHeapSnapshot } from 'v8';
 import { isMainThread } from 'worker_threads';
+import { info } from './helpers/log';
 
 let _datadir = null;
 let nextMBThreshold = 100;
@@ -49,7 +50,7 @@ function heapDump() {
 
   fs.appendFileSync(csvfilePath, `${memMB}, ${Date.now()}\n`);
 
-  global.log.info(chalk.bgRed((isMainThread ? 'Master' : 'Cluster')
+  info(chalk.bgRed((isMainThread ? 'Master' : 'Cluster')
     + ' # Current mem usage: ' + memMB
     + ', last mem usage: ' + memMBlast
     + ', change: ' + (memMB - memMBlast)
@@ -58,7 +59,7 @@ function heapDump() {
   if (memMB > nextMBThreshold) {
     heapTaken = 2 * 60; // wait more before next heap (making heap may cause enxt heap to be too high)
     nextMBThreshold = memMB + 25;
-    global.log.info('Taking snapshot - ' + (isMainThread ? 'Master' : 'Cluster'));
+    info('Taking snapshot - ' + (isMainThread ? 'Master' : 'Cluster'));
     saveHeapSnapshot(_datadir);
   }
 }
@@ -71,5 +72,5 @@ function heapDump() {
 function saveHeapSnapshot(datadir) {
   const name = datadir + (isMainThread ? 'master' : 'cluster') + '-' + Date.now() + '.heapsnapshot';
   writeHeapSnapshot(name);
-  global.log.info('Heap snapshot written to ' + name);
+  info('Heap snapshot written to ' + name);
 }

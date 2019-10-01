@@ -8,6 +8,7 @@ import { loadingInProgress, permissions as permissionsList } from './decorators'
 import { getFunctionList } from './decorators/on';
 import * as Parser from './parser';
 import { permission } from './permissions';
+import { info, error, warning } from './helpers/log';
 
 class Module {
   public dependsOn: string[] = [];
@@ -125,7 +126,7 @@ class Module {
           if (typeof this[fnc] === 'function') {
             this[fnc](key, _.get(this, key));
           } else {
-            global.log.error(`${fnc}() is not function in ${this._name}/${this.constructor.name.toLowerCase()}`);
+            error(`${fnc}() is not function in ${this._name}/${this.constructor.name.toLowerCase()}`);
           }
         }
       }
@@ -138,8 +139,8 @@ class Module {
         return undefined;
       }
     } catch (e) {
-      global.log.error({key, variable});
-      global.log.error(e);
+      error({key, variable});
+      error(e);
       return undefined;
     }
   }
@@ -179,7 +180,7 @@ class Module {
       this.socket = global.panel.io.of('/' + this._name + '/' + this.constructor.name.toLowerCase());
       this.sockets();
       this.sockets = function() {
-        global.log.error('/' + this._name + '/' + this.constructor.name.toLowerCase() + ': Cannot initialize sockets second time');
+        error('/' + this._name + '/' + this.constructor.name.toLowerCase() + ': Cannot initialize sockets second time');
       };
 
       if (this.socket) {
@@ -280,7 +281,7 @@ class Module {
                 }
               }
             } catch (e) {
-              global.log.error(e.stack);
+              error(e.stack);
               if (typeof cb === 'function') {
                 setTimeout(() => cb(e.stack), 1000);
               }
@@ -531,7 +532,7 @@ class Module {
           if (typeof this[fnc] === 'function') {
             this[fnc]('enabled', opts.state);
           } else {
-            global.log.error(`${fnc}() is not function in ${this._name}/${this.constructor.name.toLowerCase()}`);
+            error(`${fnc}() is not function in ${this._name}/${this.constructor.name.toLowerCase()}`);
           }
         }
       }
@@ -539,11 +540,11 @@ class Module {
 
     if ((isMasterAndStatusOnly || isStatusChanged) && !opts.quiet) {
       if (isDisabledByEnv) {
-        global.log.info(`${chalk.red('DISABLED BY ENV')}: ${this.constructor.name} (${this._name})`);
+        info(`${chalk.red('DISABLED BY ENV')}: ${this.constructor.name} (${this._name})`);
       } else if (areDependenciesEnabled) {
-        global.log.info(`${opts.state ? chalk.green('ENABLED') : chalk.red('DISABLED')}: ${this.constructor.name} (${this._name})`);
+        info(`${opts.state ? chalk.green('ENABLED') : chalk.red('DISABLED')}: ${this.constructor.name} (${this._name})`);
       } else {
-        global.log.info(`${chalk.red('DISABLED BY DEP')}: ${this.constructor.name} (${this._name})`);
+        info(`${chalk.red('DISABLED BY DEP')}: ${this.constructor.name} (${this._name})`);
       }
     }
 
@@ -851,7 +852,7 @@ class Module {
         args: [ command ],
       });
     } else {
-      global.log.warning(`Command ${command} cannot be updated to ${updated}`);
+      warning(`Command ${command} cannot be updated to ${updated}`);
     }
   }
 

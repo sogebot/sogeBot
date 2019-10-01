@@ -1,17 +1,14 @@
-/* @flow */
-
-'use strict'
-require('module-alias/register')
-
 if (Number(process.versions.node.split('.')[0]) < 11) {
   console.log('Upgrade your version of NodeJs! You need at least NodeJs 11.0.0, https://nodejs.org/en/. Current version is ' + process.versions.node)
   process.exit(1)
 }
+
 import { Workers } from './workers';
-import { Permissions } from './permissions'
-import { Events } from './events'
-import { OAuth } from './oauth'
-import { Currency } from './currency'
+import { Permissions } from './permissions';
+import { Events } from './events';
+import { OAuth } from './oauth';
+import { Currency } from './currency';
+import { error, warning } from './helpers/log';
 
 const figlet = require('figlet')
 const os = require('os')
@@ -19,12 +16,11 @@ const util = require('util')
 const _ = require('lodash')
 const chalk = require('chalk')
 const gitCommitInfo = require('git-commit-info');
-
 const { isMainThread, } = require('worker_threads');
 const { autoLoad } = require('./commons');
 
 const constants = require('./constants')
-const config = require('@config')
+const config = require('../config.json')
 
 global.cache = new (require('./cache'))()
 global.workers = new Workers()
@@ -39,8 +35,6 @@ global.status = { // TODO: move it?
   'MOD': false,
   'RES': 0
 }
-
-require('./logging') // logger is on master / worker have own global.log sending data through process
 
 const isNeDB = config.database.type === 'nedb'
 global.cpu = config.threads === 'auto' ? os.cpus().length : parseInt(_.get(config, 'cpu', 1), 10)
@@ -67,7 +61,6 @@ async function main () {
     global.currency = new Currency()
     global.stats2 = new (require('./stats.js'))()
     global.users = new (require('./users.js'))()
-    global.logger = new (require('./logging.js'))()
 
     global.events = new Events();
     global.customvariables = new (require('./customvariables.js'))()
@@ -83,11 +76,8 @@ async function main () {
     global.oauth = new OAuth();
     global.webhooks = new (require('./webhooks'))()
     global.api = new (require('./api'))()
-
-    // panel
-    global.logger._panel()
   } catch (e) {
-    console.error(e); global.log.error(e)
+    error(e)
     process.exit()
   }
 
@@ -110,7 +100,7 @@ async function main () {
     global.panel.expose()
 
     if (process.env.HEAP && process.env.HEAP.toLowerCase() === 'true') {
-      global.log.warning(chalk.bgRed.bold('HEAP debugging is ENABLED'))
+      warning(chalk.bgRed.bold('HEAP debugging is ENABLED'))
       setTimeout(() => require('./heapdump.js').init('heap/'), 120000)
     }
 
@@ -120,17 +110,16 @@ async function main () {
 
 if (isMainThread) {
   process.on('unhandledRejection', function (reason, p) {
-    global.log.error(`Possibly Unhandled Rejection at: ${util.inspect(p)} reason: ${reason}`)
+    error(`Possibly Unhandled Rejection at: ${util.inspect(p)} reason: ${reason}`)
   })
 
   process.on('uncaughtException', (error) => {
-    if (_.isNil(global.log)) return console.log(error)
-    global.log.error(util.inspect(error))
-    global.log.error('+------------------------------------------------------------------------------+')
-    global.log.error('| BOT HAS UNEXPECTEDLY CRASHED                                                 |')
-    global.log.error('| PLEASE CHECK https://github.com/sogehige/SogeBot/wiki/How-to-report-an-issue |')
-    global.log.error('| AND ADD logs/exceptions.log file to your report                              |')
-    global.log.error('+------------------------------------------------------------------------------+')
+    error(util.inspect(error))
+    error('+------------------------------------------------------------------------------+')
+    error('| BOT HAS UNEXPECTEDLY CRASHED                                                 |')
+    error('| PLEASE CHECK https://github.com/sogehige/SogeBot/wiki/How-to-report-an-issue |')
+    error('| AND ADD logs/exceptions.log file to your report                              |')
+    error('+------------------------------------------------------------------------------+')
     process.exit(1)
   })
 }

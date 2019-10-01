@@ -10,6 +10,7 @@ import Expects from '../expects';
 import { permission } from '../permissions';
 import System from './_interface';
 import * as constants from '../constants';
+import { error } from '../helpers/log';
 
 class Points extends System {
   @settings('points')
@@ -73,8 +74,8 @@ class Points extends System {
         await Promise.all(userPromises);
       }
     } catch (e) {
-      global.log.error(e);
-      global.log.error(e.stack);
+      error(e);
+      error(e.stack);
     } finally {
       this.timeouts.updatePoints = global.setTimeout(() => this.updatePoints(), 60000);
     }
@@ -220,7 +221,7 @@ class Points extends System {
         throw new Error('User doesn\'t have ID');
       }
     } catch (err) {
-      global.log.error(err);
+      error(err);
       sendMessage(global.translate('points.failed.set').replace('$command', opts.command), opts.sender, opts.attr);
     }
   }

@@ -6,6 +6,7 @@ import { command, default_permission, helper, settings, ui } from '../decorators
 import Expects from '../expects';
 import { permission } from '../permissions';
 import System from './_interface';
+import { error, warning } from '../helpers/log';
 
 const ERROR_NOT_ENOUGH_OPTIONS = 'Expected more parameters';
 const ERROR_ALREADY_OPENED = '1';
@@ -51,7 +52,6 @@ class Bets extends System {
     this.socket.on('connection', (socket) => {
       socket.on('close', async (option) => {
         const message = '!bet ' + (option === 'refund' ? option : 'close ' + option);
-        global.log.process({ type: 'parse', sender: { username: getOwner() }, message });
         global.tmi.message({
           message: {
             tags: { username: getOwner() },
@@ -67,7 +67,7 @@ class Bets extends System {
     try {
       const currentBet = await global.db.engine.findOne(this.collection.data, { key: 'bets' });
       if (_.isEmpty(currentBet) || currentBet.locked) {
-        throw Error(ERROR_NOT_RUNNING); 
+        throw Error(ERROR_NOT_RUNNING);
       }
 
       const isExpired = currentBet.end <= new Date().getTime();
@@ -104,7 +104,7 @@ class Bets extends System {
         case ERROR_NOT_RUNNING:
           break;
         default:
-          global.log.error(e.stack);
+          error(e.stack);
           break;
       }
     }
@@ -117,7 +117,7 @@ class Bets extends System {
     const currentBet = await global.db.engine.findOne(this.collection.data, { key: 'bets' });
     try {
       if (!_.isEmpty(currentBet)) {
-        throw new Error(ERROR_ALREADY_OPENED); 
+        throw new Error(ERROR_ALREADY_OPENED);
       }
 
       const [timeout, title, options] = new Expects(opts.parameters)
@@ -126,12 +126,12 @@ class Bets extends System {
         .list({ delimiter: '|' })
         .toArray();
       if (options.length < 2) {
-        throw new Error(ERROR_NOT_ENOUGH_OPTIONS); 
+        throw new Error(ERROR_NOT_ENOUGH_OPTIONS);
       }
 
       const bet = { title, locked: false, options: [], key: 'bets', end: new Date().getTime() + timeout * 1000 * 60 };
       for (const i of Object.keys(options)) {
-        bet.options[i] = { name: options[i] }; 
+        bet.options[i] = { name: options[i] };
       }
 
       await global.db.engine.insert(this.collection.data, bet);
@@ -157,7 +157,7 @@ class Bets extends System {
             }), opts.sender);
           break;
         default:
-          global.log.warning(e.stack);
+          warning(e.stack);
           sendMessage(global.translate('core.error'), opts.sender, opts.attr);
       }
     }
@@ -166,7 +166,7 @@ class Bets extends System {
   public async info(opts) {
     const currentBet = await global.db.engine.findOne(this.collection.data, { key: 'bets' });
     if (_.isEmpty(currentBet)) {
-      sendMessage(global.translate('bets.notRunning'), opts.sender, opts.attr); 
+      sendMessage(global.translate('bets.notRunning'), opts.sender, opts.attr);
     } else {
       sendMessage(await prepare(currentBet.locked ? 'bets.lockedInfo' : 'bets.info', {
         command: opts.command,
@@ -188,27 +188,27 @@ class Bets extends System {
         const _betOfUser = await global.db.engine.findOne(this.collection.users, { id: opts.sender.userId });
 
         if (points === 'all' || points > pointsOfUser) {
-          points = pointsOfUser; 
+          points = pointsOfUser;
         }
 
         if (points === 0) {
-          throw Error(ERROR_ZERO_BET); 
+          throw Error(ERROR_ZERO_BET);
         }
         if (_.isEmpty(currentBet)) {
-          throw Error(ERROR_NOT_RUNNING); 
+          throw Error(ERROR_NOT_RUNNING);
         }
         if (_.isNil(currentBet.options[index])) {
-          throw Error(ERROR_UNDEFINED_BET); 
+          throw Error(ERROR_UNDEFINED_BET);
         }
         if (currentBet.locked) {
-          throw Error(ERROR_IS_LOCKED); 
+          throw Error(ERROR_IS_LOCKED);
         }
         if (!_.isEmpty(_betOfUser) && _betOfUser.option !== index) {
-          throw Error(ERROR_DIFF_BET); 
+          throw Error(ERROR_DIFF_BET);
         }
 
         if (_.isEmpty(_betOfUser)) {
-          _betOfUser.points = 0; 
+          _betOfUser.points = 0;
         }
 
         // All OK
@@ -237,7 +237,7 @@ class Bets extends System {
           sendMessage(global.translate('bets.diffBet').replace(/\$option/g, Object.keys(result)[0]), opts.sender, opts.attr);
           break;
         default:
-          global.log.warning(e.stack);
+          warning(e.stack);
           sendMessage((await prepare('bets.error', { command: opts.command })).replace(/\$maxIndex/g, String(currentBet.options.length - 1)), opts.sender, opts.attr);
       }
     }
@@ -248,7 +248,7 @@ class Bets extends System {
   public async refund(opts) {
     try {
       if (_.isEmpty(await global.db.engine.findOne(this.collection.data, { key: 'bets' }))) {
-        throw Error(ERROR_NOT_RUNNING); 
+        throw Error(ERROR_NOT_RUNNING);
       }
       for (const user of await global.db.engine.find(this.collection.users)) {
         await global.db.engine.increment('users.points', { id: user.id }, { points: parseInt(user.points, 10) });
@@ -261,7 +261,7 @@ class Bets extends System {
           sendMessage(global.translate('bets.notRunning'), opts.sender, opts.attr);
           break;
         default:
-          global.log.warning(e.stack);
+          warning(e.stack);
           sendMessage(global.translate('core.error'), opts.sender, opts.attr);
       }
     } finally {
@@ -277,10 +277,10 @@ class Bets extends System {
       const index = new Expects(opts.parameters).number().toArray()[0];
 
       if (_.isEmpty(currentBet)) {
-        throw Error(ERROR_NOT_RUNNING); 
+        throw Error(ERROR_NOT_RUNNING);
       }
       if (_.isNil(currentBet.options[index])) {
-        throw Error(ERROR_NOT_OPTION); 
+        throw Error(ERROR_NOT_OPTION);
       }
 
       const percentGain = (currentBet.options.length * this.betPercentGain) / 100;
@@ -313,7 +313,7 @@ class Bets extends System {
           sendMessage(await prepare('bets.notOption', { command: opts.command }), opts.sender, opts.attr);
           break;
         default:
-          global.log.warning(e.stack);
+          warning(e.stack);
           sendMessage(global.translate('core.error'), opts.sender, opts.attr);
       }
     }
@@ -324,9 +324,9 @@ class Bets extends System {
   @helper()
   public main(opts) {
     if (opts.parameters.length === 0) {
-      this.info(opts); 
+      this.info(opts);
     } else {
-      this.participate(opts); 
+      this.participate(opts);
     }
   }
 }

@@ -17,6 +17,7 @@ import Core from './_interface'
 const constants = require('./constants')
 import { settings, ui } from './decorators';
 import { globalIgnoreList } from './data/globalIgnoreList';
+import { error, info, ban, host, raid, sub, resub, subcommunitygift, subgift, cheer, whisperIn, chatIn } from './helpers/log';
 
 const __DEBUG__ =
   (process.env.DEBUG && process.env.DEBUG.includes('tmi.client'));
@@ -71,7 +72,7 @@ class TMI extends Core {
       // update ignore list
       commons.sendMessage(commons.prepare('ignore.user.is.added', { username }), opts.sender)
     } catch (e) {
-      global.log.error(e.message)
+      error(e.message)
     }
   }
 
@@ -84,7 +85,7 @@ class TMI extends Core {
       // update ignore list
       commons.sendMessage(commons.prepare('ignore.user.is.removed', { username }), opts.sender)
     } catch (e) {
-      global.log.error(e.message)
+      error(e.message)
     }
   }
 
@@ -121,8 +122,8 @@ class TMI extends Core {
       await this.join(type, channel)
     } catch (e) {
       if (type === 'broadcaster' && !this.broadcasterWarning) {
-        global.log.error('Broadcaster oauth is not properly set - hosts will not be loaded')
-        global.log.error('Broadcaster oauth is not properly set - subscribers will not be loaded')
+        error('Broadcaster oauth is not properly set - hosts will not be loaded')
+        error('Broadcaster oauth is not properly set - subscribers will not be loaded')
         this.broadcasterWarning = true
       }
       this.timeouts[`initClient.${type}`] = setTimeout(() => this.initClient(type), 10000)
@@ -142,7 +143,7 @@ class TMI extends Core {
       ])
 
       if (this.channel !== channel) {
-        global.log.info(`TMI: ${type} is reconnecting`)
+        info(`TMI: ${type} is reconnecting`)
 
         await this.client[type].chat.part(this.channel)
         await this.client[type].chat.reconnect({ token, username, onAuthenticationFailure: () => global.oauth.refreshAccessToken(type).then(token => token) })
@@ -156,13 +157,13 @@ class TMI extends Core {
 
   async join (type: string, channel: string) {
     if (typeof this.client[type] === 'undefined') {
-      global.log.info(`TMI: ${type} oauth is not properly set, cannot join`)
+      info(`TMI: ${type} oauth is not properly set, cannot join`)
     } else {
       if (channel === '') {
-        global.log.info(`TMI: ${type} is not properly set, cannot join empty channel`)
+        info(`TMI: ${type} is not properly set, cannot join empty channel`)
       } else {
         await this.client[type].chat.join(channel)
-        global.log.info(`TMI: ${type} joined channel ${channel}`)
+        info(`TMI: ${type} joined channel ${channel}`)
         this.channel = channel;
       }
     }
@@ -170,10 +171,10 @@ class TMI extends Core {
 
   async part (type: string) {
     if (typeof this.client[type] === 'undefined') {
-      global.log.info(`TMI: ${type} is not connected in any channel`)
+      info(`TMI: ${type} is not connected in any channel`)
     } else {
       await this.client[type].chat.part(this.channel)
-      global.log.info(`TMI: ${type} parted channel ${this.channel}`)
+      info(`TMI: ${type} parted channel ${this.channel}`)
     }
   }
 
@@ -186,7 +187,7 @@ class TMI extends Core {
   loadListeners (type: string) {
     // common for bot and broadcaster
     this.client[type].chat.on('DISCONNECT', async (message) => {
-      global.log.info(`TMI: ${type} is disconnected`)
+      info(`TMI: ${type} is disconnected`)
       global.status.TMI = constants.DISCONNECTED
       // go through all systems and trigger on.partChannel
       for (let [/* type */, systems] of Object.entries({
@@ -209,7 +210,7 @@ class TMI extends Core {
       }
     })
     this.client[type].chat.on('RECONNECT', async (message) => {
-      global.log.info(`TMI: ${type} is reconnecting`)
+      info(`TMI: ${type} is reconnecting`)
       global.status.TMI = constants.RECONNECTING
       // go through all systems and trigger on.reconnectChannel
       for (let [/* type */, systems] of Object.entries({
@@ -232,7 +233,7 @@ class TMI extends Core {
       }
     })
     this.client[type].chat.on('CONNECTED', async (message) => {
-      global.log.info(`TMI: ${type} is connected`)
+      info(`TMI: ${type} is connected`)
       global.status.TMI = constants.CONNECTED
       // go through all systems and trigger on.joinChannel
       for (let [/* type */, systems] of Object.entries({
@@ -316,7 +317,7 @@ class TMI extends Core {
           const username = message.username.toLowerCase()
 
           if (typeof duration === 'undefined') {
-            global.log.ban(`${username}, reason: ${reason}`)
+            ban(`${username}, reason: ${reason}`)
             global.events.fire('ban', { username: username, reason: reason })
           } else {
             global.events.fire('timeout', { username, reason, duration })
@@ -348,7 +349,7 @@ class TMI extends Core {
       })
 
       this.client[type].chat.on('NOTICE', message => {
-        global.log.info(message.message)
+        info(message.message)
       })
     } else if (type === 'broadcaster') {
       this.client[type].chat.on('PRIVMSG/HOSTED', async (message) => {
@@ -357,7 +358,7 @@ class TMI extends Core {
         const autohost = message.message.includes('auto')
         let viewers = message.numberOfViewers || '0'
 
-        global.log.host(`${username}, viewers: ${viewers}, autohost: ${autohost}`)
+        host(`${username}, viewers: ${viewers}, autohost: ${autohost}`)
         global.db.engine.update('cache.hosts', { username }, { username })
 
         const data = {
@@ -386,7 +387,7 @@ class TMI extends Core {
 
   usernotice(message) {
     if (message.event === 'RAID') {
-      global.log.raid(`${message.parameters.login}, viewers: ${message.parameters.viewerCount}`)
+      raid(`${message.parameters.login}, viewers: ${message.parameters.viewerCount}`)
       global.db.engine.update('cache.raids', { username: message.parameters.login }, { username: message.parameters.login })
 
       const data = {
@@ -426,11 +427,11 @@ class TMI extends Core {
         }
         */
       } else {
-        global.log.info('Unknown RITUAL')
+        info('Unknown RITUAL')
       }
     } else {
-      global.log.info('Unknown USERNOTICE')
-      global.log.info(JSON.stringify(message))
+      info('Unknown USERNOTICE')
+      info(JSON.stringify(message))
     }
   }
 
@@ -453,7 +454,7 @@ class TMI extends Core {
 
       await global.users.setById(userstate.userId, { username, is: { subscriber: isSubscriber }, time: { subscribed_at: subscribedAt }, stats: { subStreak: 1, subCumulativeMonths, tier } });
       global.overlays.eventlist.add({ type: 'sub', tier, username, method: (!_.isNil(method.prime) && method.prime) ? 'Twitch Prime' : '' })
-      global.log.sub(`${username}#${userstate.userId}, tier: ${tier}`)
+      sub(`${username}#${userstate.userId}, tier: ${tier}`)
       global.events.fire('subscription', { username: username, method: (!_.isNil(method.prime) && method.prime) ? 'Twitch Prime' : '', subCumulativeMonths, tier });
       global.registries.alerts.trigger({
         event: 'subs',
@@ -487,9 +488,9 @@ class TMI extends Core {
         }
       }
     } catch (e) {
-      global.log.error('Error parsing subscription event')
-      global.log.error(util.inspect(message))
-      global.log.error(e.stack)
+      error('Error parsing subscription event')
+      error(util.inspect(message))
+      error(e.stack)
     }
   }
 
@@ -528,7 +529,7 @@ class TMI extends Core {
         subCumulativeMonthsName: commons.getLocalizedName(subCumulativeMonths, 'core.months'),
         message: messageFromUser
       });
-      global.log.resub(`${username}#${userstate.userId}, streak share: ${subStreakShareEnabled}, streak: ${subStreak}, months: ${subCumulativeMonths}, message: ${messageFromUser}, tier: ${tier}`)
+      resub(`${username}#${userstate.userId}, streak share: ${subStreakShareEnabled}, streak: ${subStreak}, months: ${subCumulativeMonths}, message: ${messageFromUser}, tier: ${tier}`)
       global.events.fire('resub', {
         username,
         tier,
@@ -549,9 +550,9 @@ class TMI extends Core {
         autohost: false,
       });
     } catch (e) {
-      global.log.error('Error parsing resub event')
-      global.log.error(util.inspect(message))
-      global.log.error(e.stack)
+      error('Error parsing resub event')
+      error(util.inspect(message))
+      error(e.stack)
     }
   }
 
@@ -570,7 +571,7 @@ class TMI extends Core {
 
       global.overlays.eventlist.add({ type: 'subcommunitygift', username, count })
       global.events.fire('subcommunitygift', { username, count })
-      global.log.subcommunitygift(`${username}#${userId}, to ${count} viewers`)
+      subcommunitygift(`${username}#${userId}, to ${count} viewers`)
       global.registries.alerts.trigger({
         event: 'subgifts',
         name: username,
@@ -581,9 +582,9 @@ class TMI extends Core {
         autohost: false,
       });
     } catch (e) {
-      global.log.error('Error parsing subscriptionGiftCommunity event')
-      global.log.error(util.inspect(message))
-      global.log.error(e.stack)
+      error('Error parsing subscriptionGiftCommunity event')
+      error(util.inspect(message))
+      error(e.stack)
     }
   }
 
@@ -645,16 +646,16 @@ class TMI extends Core {
       await global.users.setById(user.id, { username: recipient, is: { subscriber: isSubscriber }, time: { subscribed_at: subscribedAt }, stats: { subCumulativeMonths, tier } })
       await global.db.engine.increment('users', { id: user.id }, { stats: { subStreak: 1 }})
       global.overlays.eventlist.add({ type: 'subgift', username: recipient, from: username, monthsName: commons.getLocalizedName(subCumulativeMonths, 'core.months'), months: subCumulativeMonths })
-      global.log.subgift(`${recipient}#${recipientId}, from: ${username}, months: ${subCumulativeMonths}`)
+      subgift(`${recipient}#${recipientId}, from: ${username}, months: ${subCumulativeMonths}`)
 
       // also set subgift count to gifter
       if (!(await commons.isIgnored({username, userId: user.id}))) {
         await global.db.engine.increment('users', { id: message.tags.userId }, { custom: { subgiftCount: 1 } })
       }
     } catch (e) {
-      global.log.error('Error parsing subgift event')
-      global.log.error(util.inspect(message))
-      global.log.error(e.stack)
+      error('Error parsing subgift event')
+      error(util.inspect(message))
+      error(e.stack)
     }
   }
 
@@ -672,7 +673,7 @@ class TMI extends Core {
       await global.db.engine.update('users', { id: userId }, { username })
 
       global.overlays.eventlist.add({ type: 'cheer', username, bits: userstate.bits, message: messageFromUser })
-      global.log.cheer(`${username}#${userId}, bits: ${userstate.bits}, message: ${messageFromUser}`)
+      cheer(`${username}#${userId}, bits: ${userstate.bits}, message: ${messageFromUser}`)
       global.db.engine.insert('users.bits', { id: userId, amount: Number(userstate.bits), message: messageFromUser, timestamp: _.now() })
       global.events.fire('cheer', { username, bits: userstate.bits, message: messageFromUser })
       global.registries.alerts.trigger({
@@ -709,9 +710,9 @@ class TMI extends Core {
         }
       }
     } catch (e) {
-      global.log.error('Error parsing cheer event')
-      global.log.error(util.inspect(message))
-      global.log.error(e.stack)
+      error('Error parsing cheer event')
+      error(util.inspect(message))
+      error(e.stack)
     }
   }
 
@@ -764,9 +765,9 @@ class TMI extends Core {
     if (!skip
         && sender['message-type'] === 'whisper'
         && (global.tmi.whisperListener || isOwner(sender))) {
-      global.log.whisperIn(message, { username: sender.username })
+      whisperIn(`${message} [${sender.username}]`)
     } else if (!skip && !commons.isBot(sender.username)) {
-      global.log.chatIn(message, { username: sender.username })
+      chatIn(`${message} [${sender.username}]`)
     }
 
     const isModerated = await parse.isModerated()
@@ -835,7 +836,7 @@ class TMI extends Core {
     }
     let avgTime = 0
     global.avgResponse.push(opts.value)
-    if (opts.value > 1000) global.log.warning(`Took ${opts.value}ms to process: ${opts.message}`)
+    if (opts.value > 1000) warning(`Took ${opts.value}ms to process: ${opts.message}`)
     if (global.avgResponse.length > 100) global.avgResponse.shift()
     for (let time of global.avgResponse) avgTime += parseInt(time, 10)
     global.status['RES'] = (avgTime / global.avgResponse.length).toFixed(0)

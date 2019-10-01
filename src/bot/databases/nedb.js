@@ -7,7 +7,7 @@ const {
 const {
   flatten, unflatten
 } = require('../helpers/flatten');
-import { debug } from '../debug';
+import { debug, error } from '../helpers/log';
 
 const Interface = require('./interface')
 const Datastore = require('nedb')
@@ -127,8 +127,8 @@ class INeDB extends Interface {
     return new Promise((resolve, reject) => {
       this.on(table).find(where, async (err, items) => {
         if (err) {
-          global.log.error(err.message)
-          global.log.error(util.inspect({ type: 'find', table, where }))
+          error(err.message)
+          error(util.inspect({ type: 'find', table, where }))
         }
 
         if (lookup) {
@@ -178,8 +178,8 @@ class INeDB extends Interface {
     return new Promise(function (resolve, reject) {
       self.on(table).findOne(flatten(where), async (err, item) => {
         if (err) {
-          global.log.error(err.message)
-          global.log.error(util.inspect({ type: 'findOne', table, where }))
+          error(err.message)
+          error(util.inspect({ type: 'findOne', table, where }))
         }
 
         if (lookup && item !== null) {
@@ -206,8 +206,8 @@ class INeDB extends Interface {
     return new Promise(function (resolve, reject) {
       self.on(table).insert(unflatten(object), function (err, item) {
         if (err) {
-          global.log.error(err.message)
-          global.log.error(util.inspect({ type: 'insert', table, object }))
+          error(err.message)
+          error(util.inspect({ type: 'insert', table, object }))
         }
         resolve(item)
       })
@@ -227,8 +227,8 @@ class INeDB extends Interface {
     return new Promise((resolve, reject) => {
       this.on(table).remove(where, { multi: true }, function (err, numRemoved) {
         if (err) {
-          global.log.error(err.message)
-          global.log.error(util.inspect({ type: 'remove', table, where }));
+          error(err.message)
+          error(util.inspect({ type: 'remove', table, where }));
           reject(err);
         }
         resolve(numRemoved);
@@ -240,8 +240,8 @@ class INeDB extends Interface {
     this.on(table) // init table
 
     if (_.isEmpty(object)) {
-      global.log.error('Object to update cannot be empty')
-      global.log.error(util.inspect({ type: 'update', table, object, where }))
+      error('Object to update cannot be empty')
+      error(util.inspect({ type: 'update', table, object, where }))
       return null
     }
 
@@ -250,8 +250,8 @@ class INeDB extends Interface {
       // DON'T EVER DELETE flatten ON OBJECT - with flatten object get updated and not replaced
       self.on(table).update(flatten(where), { $set: flatten(object, { safe: true }) }, { upsert: (_.isNil(where._id) && !_.isEmpty(where)), multi: (_.isEmpty(where)), returnUpdatedDocs: true }, function (err, numReplaced, affectedDocs) {
         if (err) {
-          global.log.error(err.message)
-          global.log.error(util.inspect({ type: 'update', table, object, where }))
+          error(err.message)
+          error(util.inspect({ type: 'update', table, object, where }))
         }
         resolve(affectedDocs)
       })
@@ -262,8 +262,8 @@ class INeDB extends Interface {
     this.on(table) // init table
 
     if (_.isEmpty(object)) {
-      global.log.error('Object to update cannot be empty')
-      global.log.error(util.inspect({ type: 'incrementOne', table, object, where }))
+      error('Object to update cannot be empty')
+      error(util.inspect({ type: 'incrementOne', table, object, where }))
       return null
     }
 
@@ -272,8 +272,8 @@ class INeDB extends Interface {
       // DON'T EVER DELETE flatten ON OBJECT - with flatten object get updated and not replaced
       self.on(table).update(flatten(where), { $inc: flatten(object) }, { upsert: true, multi: false, returnUpdatedDocs: true }, function (err, numReplaced, affectedDocs) {
         if (err) {
-          global.log.error(err.message)
-          global.log.error(util.inspect({ type: 'incrementOne', table, object, where }))
+          error(err.message)
+          error(util.inspect({ type: 'incrementOne', table, object, where }))
         }
         resolve(affectedDocs)
       })
@@ -284,8 +284,8 @@ class INeDB extends Interface {
     this.on(table) // init table
 
     if (_.isEmpty(object)) {
-      global.log.error('Object to update cannot be empty')
-      global.log.error(util.inspect({ type: 'increment', table, object, where }))
+      error('Object to update cannot be empty')
+      error(util.inspect({ type: 'increment', table, object, where }))
       return null
     }
 
@@ -294,8 +294,8 @@ class INeDB extends Interface {
       // DON'T EVER DELETE flatten ON OBJECT - with flatten object get updated and not replaced
       self.on(table).update(flatten(where), { $inc: flatten(object) }, { upsert: true, multi: true, returnUpdatedDocs: true }, function (err, numReplaced, affectedDocs) {
         if (err) {
-          global.log.error(err.message)
-          global.log.error(util.inspect({ type: 'increment', table, object, where }))
+          error(err.message)
+          error(util.inspect({ type: 'increment', table, object, where }))
         }
         resolve(affectedDocs)
       })
@@ -310,8 +310,8 @@ class INeDB extends Interface {
       // DON'T EVER DELETE flatten ON OBJECT - with flatten object get updated and not replaced
       self.on(table).count({}, function (err, count) {
         if (err) {
-          global.log.error(err.message)
-          global.log.error(util.inspect({ type: 'count', table }))
+          error(err.message)
+          error(util.inspect({ type: 'count', table }))
         }
         resolve(count)
       })
@@ -322,7 +322,7 @@ class INeDB extends Interface {
     try {
       return fs.readdirSync('./db/nedb').map(o => o.replace('.db', ''))
     } catch (e) {
-      global.log.error(e.message)
+      error(e.message)
       throw e
     }
   }

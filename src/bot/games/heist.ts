@@ -5,6 +5,7 @@ import Expects from '../expects.js';
 import Game from './_interface';
 import { command, settings, shared, ui } from '../decorators';
 import { getLocalizedName, getOwner, sendMessage } from '../commons.js';
+import { warning } from '../helpers/log.js';
 
 class Heist extends Game {
   dependsOn = [ 'systems.points' ];
@@ -288,7 +289,7 @@ class Heist extends Game {
       if (!newHeist) {
         sendMessage(
           (await global.translate('games.heist.entryInstruction')).replace('$command', opts.command), opts.sender, opts.attr);
-        global.log.warning(`${opts.command} ${e.message}`);
+        warning(`${opts.command} ${e.message}`);
       }
       return;
     }
