@@ -1,5 +1,6 @@
 import { cloneDeep, get, isEqual, set } from 'lodash';
 import { isMainThread } from 'worker_threads';
+import { error } from './helpers/log';
 
 const variables: {
   [x: string]: any;
@@ -60,7 +61,7 @@ export const VariableWatcher = {
               if (typeof self[fnc] === 'function') {
                 self[fnc](variable, value);
               } else {
-                global.log.error(`${fnc}() is not function in ${self._name}/${self.constructor.name.toLowerCase()}`);
+                error(`${fnc}() is not function in ${self._name}/${self.constructor.name.toLowerCase()}`);
               }
             }
           }
@@ -71,7 +72,7 @@ export const VariableWatcher = {
       const value = get(global, k.replace('core.', ''), null);
       if (!isEqual(value, readonly[k])) {
         const [type, name, variable] = k.split('.');
-        global.log.error(`Cannot change read-only variable, forcing initial value for ${type}.${name}.${variable}`);
+        error(`Cannot change read-only variable, forcing initial value for ${type}.${name}.${variable}`);
         set(global, k.replace('core.', ''), readonly[k]);
       }
     }

@@ -9,6 +9,7 @@ import { command, default_permission, parser, permission_settings, settings } fr
 import Message from '../message';
 import System from './_interface';
 import { getLocalizedName, prepare, sendMessage, timeout } from '../commons';
+import { timeout as timeoutLog } from '../helpers/log';
 import { isMainThread } from 'worker_threads';
 
 class Moderation extends System {
@@ -134,7 +135,7 @@ class Moderation extends System {
 
     if (this.cWarningsAllowedCount === 0) {
       msg = await new Message(msg.replace(/\$count/g, -1)).parse();
-      global.log.timeout(`${sender.username} [${type}] ${time}s timeout | ${text}`);
+      timeoutLog(`${sender.username} [${type}] ${time}s timeout | ${text}`);
       timeout(sender.username, msg, time);
       return;
     }
@@ -142,7 +143,7 @@ class Moderation extends System {
     const isWarningCountAboveThreshold = warnings.length >= this.cWarningsAllowedCount;
     if (isWarningCountAboveThreshold) {
       msg = await new Message(warning.replace(/\$count/g, this.cWarningsAllowedCount - warnings.length)).parse();
-      global.log.timeout(`${sender.username} [${type}] ${time}s timeout | ${text}`);
+      timeoutLog(`${sender.username} [${type}] ${time}s timeout | ${text}`);
       timeout(sender.username, msg, time);
       await global.db.engine.remove(global.systems.moderation.collection.warnings, { username: sender.username });
     } else {
@@ -150,7 +151,7 @@ class Moderation extends System {
       const warningsLeft = this.cWarningsAllowedCount - warnings.length;
       warning = await new Message(warning.replace(/\$count/g, warningsLeft < 0 ? 0 : warningsLeft)).parse();
       if (this.cWarningsShouldClearChat) {
-        global.log.timeout(`${sender.username} [${type}] 1s timeout, warnings left ${warningsLeft < 0 ? 0 : warningsLeft} | ${text}`);
+        timeoutLog(`${sender.username} [${type}] 1s timeout, warnings left ${warningsLeft < 0 ? 0 : warningsLeft} | ${text}`);
         timeout(sender.username, warning, 1);
       }
 

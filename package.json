@@ -7,6 +7,7 @@
   "author": "Michal Orlik <sogehige@gmail.com>",
   "license": "MIT",
   "dependencies": {
+    "@momothepug/tsmodule-alias": "1.0.0",
     "axios": "0.19.0",
     "babel-plugin-source-map-support": "2.1.1",
     "basic-auth": "2.0.1",
@@ -53,6 +54,7 @@
     "source-map-support": "0.5.13",
     "spotify-web-api-node": "4.0.0",
     "stacktrace-parser": "0.1.7",
+    "strip-ansi": "5.2.0",
     "terminal-kit": "1.31.3",
     "twitch-js": "2.0.0-beta.30",
     "twitter": "1.7.1",
@@ -62,7 +64,6 @@
     "vue": "2.6.10",
     "vue-chartkick": "0.5.2",
     "vue-select": "3.2.0",
-    "winston": "3.2.1",
     "xregexp": "4.2.4",
     "yargs": "14.0.0",
     "youtube-search": "1.1.4",
@@ -72,13 +73,13 @@
   "scripts": {
     "watch": "cross-env NODE_ENV=development npx webpack --watch --progress",
     "build": "cross-env ENV=development make bot",
-    "test": "mocha --recursive --timeout 20000 --exit --require source-map-support/register 2>&1 | tee report && node tools/rerunTests.js",
+    "test": "mocha --recursive --timeout 20000 --exit -r module-alias/register --require source-map-support/register 2>&1 | tee report && node tools/rerunTests.js",
     "test:config:mongodb": "cp config.example.json config.json && sed -i -- 's/nedb/mongodb/g' config.json",
     "test:config:nedb": "cp config.example.json config.json",
     "migrate": "node ./tools/migrate && node ./tools/migrate --delete",
-    "start": "npm run migrate && cross-env NODE_ENV=production node --experimental-worker -r source-map-support/register  ./dest/main || true",
-    "start-no-migration": "cross-env NODE_ENV=production node --require source-map-support/register --experimental-worker ./dest/main || true",
-    "debug": "cross-env NODE_ENV=development node --require source-map-support/register --inspect --nolazy --inspect-brk=9229 --experimental-worker ./dest/main || true",
+    "start": "npm run migrate && cross-env NODE_ENV=production node -r module-alias/register -r source-map-support/register  ./dest/main || true",
+    "start-no-migration": "cross-env NODE_ENV=production node -r module-alias/register --require source-map-support/register ./dest/main || true",
+    "debug": "cross-env NODE_ENV=development node -r module-alias/register --require source-map-support/register --inspect --nolazy --inspect-brk=9229 ./dest/main || true",
     "cleanup": "node ./tools/cleanup.js || true"
   },
   "devDependencies": {
@@ -201,15 +202,5 @@
   "_moduleAliases": {
     "@root": ".",
     "@config": "./config.json"
-  },
-  "greenkeeper": {
-    "commitMessages": {
-      "initialBadge": "docs/readme: Add Greenkeeper badge",
-      "initialDependencies": "chore: Update dependencies",
-      "initialBranches": "chore: Whitelist greenkeeper branches",
-      "dependencyUpdate": "chore: Update ${dependency} to version ${version}",
-      "devDependencyUpdate": "chore: Update ${dependency} to version ${version}",
-      "closes": "\n\nCloses #${number}"
-    }
   }
 }

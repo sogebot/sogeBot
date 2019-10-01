@@ -26,55 +26,55 @@ const failedTests = [
 
 const successTests = [
   {
-    keyword: 'test', response: '(!me)', actualResponse: "@soge__ | 0.0h | 0 points | 0 messages | 0.00€ | 0 bits",
+    keyword: 'test', response: '(!me)', actualResponse: '@soge__ | 0.0h | 0 points | 0 messages | 0.00€ | 0 bits',
     tests: [
       { type: 'add' },
       { type: 'run', triggers: ['This line will be triggered test'], '-triggers': [] },
-    ]
+    ],
   },
   {
     keyword: 'привет ты', response: randomString(),
     tests: [
       { type: 'add' },
       { type: 'run', triggers: ['This line will be triggered привет ты', 'привет ты?', ',привет ты', 'Hi how привет ты you'], '-triggers': ['This line wont be triggered'] },
-    ]
+    ],
   },
   {
     keyword: 'hello.*|hi', response: randomString(),
     tests: [
       { type: 'add' },
       { type: 'run', triggers: ['This line will be triggered hello', 'This line will be triggered hello?', 'Hi how are you'], '-triggers': ['This line wont be triggered'] },
-    ]
+    ],
   },
   {
     keyword: 'ahoj', response: randomString(), editResponse: randomString(),
     tests: [
       { type: 'add' },
-      { type: 'run', triggers: ['ahoj', 'ahoj jak je', 'jak je ahoj', ",ahoj", "ahoj?"], '-triggers': ['ahojda', 'sorry jako'] },
+      { type: 'run', triggers: ['ahoj', 'ahoj jak je', 'jak je ahoj', ',ahoj', 'ahoj?'], '-triggers': ['ahojda', 'sorry jako'] },
       { type: 'edit' },
-      { type: 'run', afterEdit: true, triggers: ['ahoj', 'ahoj jak je', 'jak je ahoj', ",ahoj", "ahoj?"], '-triggers': ['ahojda', 'sorry jako'] },
-    ]
+      { type: 'run', afterEdit: true, triggers: ['ahoj', 'ahoj jak je', 'jak je ahoj', ',ahoj', 'ahoj?'], '-triggers': ['ahojda', 'sorry jako'] },
+    ],
   },
   {
     keyword: 'ahoj jak je', response: randomString(),
     tests: [
       { type: 'add' },
       { type: 'run', triggers: ['ahoj jak je'], '-triggers': ['ahoj', 'ahojda', 'jak je ahoj', 'sorry jako'] },
-    ]
+    ],
   },
   {
     keyword: 'ahoj|jak', response: randomString(),
     tests: [
       { type: 'add' },
       { type: 'run', triggers: ['ahoj', 'ahoj jak je', 'jak je ahoj'], '-triggers': ['ahojda', 'sorry jako'] },
-    ]
+    ],
   },
   {
     keyword: 'ahoj.*', response: randomString(),
     tests: [
       { type: 'add' },
       { type: 'run', triggers: ['ahoj', 'ahojda', 'ahoj jak je', 'jak je ahoj'], '-triggers': ['sorry jako'] },
-    ]
+    ],
   },
   {
     keyword: 'ahoj.*|sorry jako', response: randomString(),
@@ -88,7 +88,7 @@ const successTests = [
       { type: 'remove' },
       { type: 'run', triggers: [], '-triggers': ['Lorem ipsum dolor sit amet nevim co dal psat ahoj jak je ty vole?', 'ahoj', 'ahojda', 'ahoj jak je', 'jak je ahoj', 'sorry jako'] },
 
-    ]
+    ],
   },
 ];
 
@@ -108,7 +108,7 @@ describe('Keywords - basic worflow (add, run, edit)', () => {
   });
 
   describe('Advanced tests', () => {
-    for (let test of successTests) {
+    for (const test of successTests) {
       describe(generateCommand(test), () => {
         before(async () => {
           await db.cleanup();
@@ -116,7 +116,7 @@ describe('Keywords - basic worflow (add, run, edit)', () => {
         beforeEach(async () => {
           await message.prepare();
         });
-        for (let t of test.tests) {
+        for (const t of test.tests) {
           switch (t.type) {
             case 'add':
               it ('add()', async () => {

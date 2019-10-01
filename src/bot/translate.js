@@ -14,6 +14,8 @@ const config = require('@config')
 const axios = require('axios')
 const chalk = require('chalk')
 
+import { info, warning } from './helpers/log';
+
 config.metrics = config.metrics || {}
 config.metrics.translations = typeof config.metrics.translations === 'undefined' ? true : config.metrics.translations
 
@@ -39,7 +41,7 @@ class Translate {
           _.set(this.translations, withoutLocales.split('/').join('.'), JSON.parse(fs.readFileSync(f, 'utf8')))
         }
         if (_.isNil(this.translations[this.lang])) {
-          if (isMainThread) global.log.warning(`Language ${this.lang} not found - fallback to en`)
+          if (isMainThread) warning(`Language ${this.lang} not found - fallback to en`)
           this.lang = 'en'
         }
 
@@ -76,7 +78,7 @@ class Translate {
 
         if (!this.initialMetricsSent && isMainThread) {
           this.initialMetricsSent = true
-          global.log.info(`${config.metrics.translations ? chalk.green('ENABLED') : chalk.red('DISABLED')}: Translations (metrics)`)
+          info(`${config.metrics.translations ? chalk.green('ENABLED') : chalk.red('DISABLED')}: Translations (metrics)`)
         }
         resolve()
       })

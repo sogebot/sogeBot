@@ -4,7 +4,7 @@ import { inspect } from 'util';
 import { isMainThread, parentPort, threadId, Worker } from 'worker_threads';
 
 import { message, timeout } from './commons';
-import { debug } from './debug';
+import { debug, error, warning } from './helpers/log';
 
 class Workers {
   public onlineCount = 0;
@@ -81,11 +81,11 @@ class Workers {
   protected newWorker() {
     if (!isMainThread) {
       // although its possible to create thread in thread we don't want to
-      return global.log.error('Cannot create new worker in thread');
+      return error('Cannot create new worker in thread');
     }
     if (global.mocha) {
       this.onlineCount = global.cpu;
-      return global.log.warning('Testing, not creating any workers');
+      return warning('Testing, not creating any workers');
     }
 
     const worker = new Worker(this.path);
@@ -150,8 +150,6 @@ class Workers {
       } else if (data.type === 'call') {
         const namespace = get(global, data.ns, null);
         namespace[data.fnc](...(data.args || []));
-      } else if (data.type === 'log') {
-        return global.log[data.level](data.message, data.params);
       } else if (data.type === 'say') {
         message('say', null, data.message);
       } else if (data.type === 'me') {
@@ -188,9 +186,9 @@ class Workers {
                 this.process(data);
               }, 5000);
             } else {
-              global.log.error(e.stack);
-              global.log.error('Something went wrong when emiting');
-              global.log.error(inspect(data, undefined, 5));
+              error(e.stack);
+              error('Something went wrong when emiting');
+              error(inspect(data, undefined, 5));
             }
           }
         }
@@ -218,9 +216,9 @@ class Workers {
                 this.process(data);
               }, 5000);
             } else {
-              global.log.error(e.stack);
-              global.log.error('Something went wrong when emiting');
-              global.log.error(inspect(data, undefined, 5));
+              error(e.stack);
+              error('Something went wrong when emiting');
+              error(inspect(data, undefined, 5));
             }
           }
         }
@@ -248,9 +246,9 @@ class Workers {
                 this.process(data);
               }, 5000);
             } else {
-              global.log.error(e.stack);
-              global.log.error('Something went wrong when running interfaceFnc');
-              global.log.error(inspect(data, undefined, 5));
+              error(e.stack);
+              error('Something went wrong when running interfaceFnc');
+              error(inspect(data, undefined, 5));
             }
           }
         }
@@ -285,9 +283,9 @@ class Workers {
                 throw Error(`${data.class} not found`);
               }
             } catch (e) {
-              global.log.error(e.stack);
-              global.log.error('Something went wrong when updating interface variable');
-              global.log.error(inspect(data, undefined, 5));
+              error(e.stack);
+              error('Something went wrong when updating interface variable');
+              error(inspect(data, undefined, 5));
             }
           }
           break;
@@ -315,9 +313,9 @@ class Workers {
                   this.process(data);
                 }, 5000);
               } else {
-                global.log.error(e.stack);
-                global.log.error('Something went wrong when running interfaceFnc');
-                global.log.error(inspect(data, undefined, 5));
+                error(e.stack);
+                error('Something went wrong when running interfaceFnc');
+                error(inspect(data, undefined, 5));
               }
             }
           }
@@ -362,8 +360,8 @@ class Workers {
               data.items = await global.db.engine.count(data.table, data.where, data.object);
               break;
             default:
-              global.log.error('This db call is not correct');
-              global.log.error(data);
+              error('This db call is not correct');
+              error(data);
           }
 
           global.workers.sendToMaster(data);

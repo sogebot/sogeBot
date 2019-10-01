@@ -1,127 +1,129 @@
 /* global describe it before */
 const {
-  isMainThread
+  isMainThread,
 } = require('worker_threads');
-if (!isMainThread) process.exit()
+if (!isMainThread) {
+  process.exit();
+}
 
 
-require('../../general.js')
-const uuid = require('uuid/v4')
+require('../../general.js');
+const uuid = require('uuid/v4');
 
-const db = require('../../general.js').db
-const message = require('../../general.js').message
-const assert = require('assert')
+const db = require('../../general.js').db;
+const message = require('../../general.js').message;
+const assert = require('assert');
 
-const { permission } = require('../../../dest/permissions')
+const { permission } = require('../../../dest/permissions');
 
 // users
-const owner = { username: 'soge__', userId: Math.random() }
-const user1 = { username: 'user1', userId: Math.random() }
+const owner = { username: 'soge__', userId: Math.random() };
+const user1 = { username: 'user1', userId: Math.random() };
 
 describe('Custom Commands - run()', () => {
   before(async () => {
-    await db.cleanup()
-    message.prepare()
+    await db.cleanup();
+    message.prepare();
 
-    await global.db.engine.insert('users', { username: owner.username, id: owner.userId })
-    await global.db.engine.insert('users', { username: user1.username, id: user1.userId })
-  })
+    await global.db.engine.insert('users', { username: owner.username, id: owner.userId });
+    await global.db.engine.insert('users', { username: user1.username, id: user1.userId });
+  });
 
   describe('\'!test qwerty\' should trigger correct commands', () => {
     it('create \'!test\' command with $_variable', async () => {
-      let cmd = await global.db.engine.insert('systems.customcommands', { id: uuid(), command: '!test', enabled: true, visible: true })
-      await global.db.engine.insert('systems.customcommands.responses', { cid: cmd.id, filter: '', response: '$_variable', permission: permission.VIEWERS })
-    })
+      const cmd = await global.db.engine.insert('systems.customcommands', { id: uuid(), command: '!test', enabled: true, visible: true });
+      await global.db.engine.insert('systems.customcommands.responses', { cid: cmd.id, filter: '', response: '$_variable', permission: permission.VIEWERS });
+    });
     it('create \'!test\' command with $param', async () => {
-      let cmd = await global.db.engine.insert('systems.customcommands', { id: uuid(), command: '!test', enabled: true, visible: true })
-      await global.db.engine.insert('systems.customcommands.responses', { cid: cmd.id, filter: '', response: '$param by !test command with param', permission: permission.VIEWERS })
-    })
+      const cmd = await global.db.engine.insert('systems.customcommands', { id: uuid(), command: '!test', enabled: true, visible: true });
+      await global.db.engine.insert('systems.customcommands.responses', { cid: cmd.id, filter: '', response: '$param by !test command with param', permission: permission.VIEWERS });
+    });
     it('create \'!test\' command without $param', async () => {
-      let cmd = await global.db.engine.insert('systems.customcommands', { id: uuid(), command: '!test', enabled: true, visible: true })
-      await global.db.engine.insert('systems.customcommands.responses', { cid: cmd.id, filter: '', response: 'This should not be triggered', permission: permission.VIEWERS })
-    })
+      const cmd = await global.db.engine.insert('systems.customcommands', { id: uuid(), command: '!test', enabled: true, visible: true });
+      await global.db.engine.insert('systems.customcommands.responses', { cid: cmd.id, filter: '', response: 'This should not be triggered', permission: permission.VIEWERS });
+    });
     it('create \'!test qwerty\' command without $param', async () => {
-      let cmd = await global.db.engine.insert('systems.customcommands', { id: uuid(), command: '!test qwerty', enabled: true, visible: true })
-      await global.db.engine.insert('systems.customcommands.responses', { cid: cmd.id, filter: '', response: 'This should be triggered', permission: permission.VIEWERS })
-    })
+      const cmd = await global.db.engine.insert('systems.customcommands', { id: uuid(), command: '!test qwerty', enabled: true, visible: true });
+      await global.db.engine.insert('systems.customcommands.responses', { cid: cmd.id, filter: '', response: 'This should be triggered', permission: permission.VIEWERS });
+    });
     it('create second \'!test qwerty\' command without $param', async () => {
-      let cmd = await global.db.engine.insert('systems.customcommands', { id: uuid(), command: '!test qwerty', enabled: true, visible: true })
-      await global.db.engine.insert('systems.customcommands.responses', { cid: cmd.id, filter: '', response: 'This should be triggered as well', permission: permission.VIEWERS })
-    })
+      const cmd = await global.db.engine.insert('systems.customcommands', { id: uuid(), command: '!test qwerty', enabled: true, visible: true });
+      await global.db.engine.insert('systems.customcommands.responses', { cid: cmd.id, filter: '', response: 'This should be triggered as well', permission: permission.VIEWERS });
+    });
 
     it('run command by owner', async () => {
-      global.systems.customCommands.run({ sender: owner, message: '!test qwerty' })
-      await message.isSentRaw('@soge__, $_variable was set to qwerty.', owner)
-      await message.isSentRaw('This should be triggered', owner)
-      await message.isSentRaw('This should be triggered as well', owner)
-      await message.isSentRaw('qwerty by !test command with param', owner)
-      await message.isNotSentRaw('This should not be triggered', owner)
-    })
+      global.systems.customCommands.run({ sender: owner, message: '!test qwerty' });
+      await message.isSentRaw('@soge__, $_variable was set to qwerty.', owner);
+      await message.isSentRaw('This should be triggered', owner);
+      await message.isSentRaw('This should be triggered as well', owner);
+      await message.isSentRaw('qwerty by !test command with param', owner);
+      await message.isNotSentRaw('This should not be triggered', owner);
+    });
 
     it('run command by viewer', async () => {
-      global.systems.customCommands.run({ sender: user1, message: '!test qwerty' })
-      await message.isSentRaw('This should be triggered', user1)
-      await message.isSentRaw('This should be triggered as well', user1)
-      await message.isSentRaw('qwerty by !test command with param', user1)
-      await message.isNotSentRaw('This should not be triggered', user1)
-      await message.isNotSentRaw('@user1, $_variable was set to qwerty.', user1)
-    })
+      global.systems.customCommands.run({ sender: user1, message: '!test qwerty' });
+      await message.isSentRaw('This should be triggered', user1);
+      await message.isSentRaw('This should be triggered as well', user1);
+      await message.isSentRaw('qwerty by !test command with param', user1);
+      await message.isNotSentRaw('This should not be triggered', user1);
+      await message.isNotSentRaw('@user1, $_variable was set to qwerty.', user1);
+    });
 
-  })
+  });
 
   describe('!cmd with username filter', () => {
     it('create command and response with filter', async () => {
-      let cmd = await global.db.engine.insert('systems.customcommands', { id: uuid(), command: '!cmd', enabled: true, visible: true })
-      await global.db.engine.insert('systems.customcommands.responses', { cid: cmd.id, filter: '$sender == "user1"', response: 'Lorem Ipsum', permission: permission.VIEWERS })
-    })
+      const cmd = await global.db.engine.insert('systems.customcommands', { id: uuid(), command: '!cmd', enabled: true, visible: true });
+      await global.db.engine.insert('systems.customcommands.responses', { cid: cmd.id, filter: '$sender == "user1"', response: 'Lorem Ipsum', permission: permission.VIEWERS });
+    });
 
     it('run command as user not defined in filter', async () => {
-      global.systems.customCommands.run({ sender: owner, message: '!cmd' })
-      let notSent = false
+      global.systems.customCommands.run({ sender: owner, message: '!cmd' });
+      let notSent = false;
       try {
-        await message.isSentRaw('Lorem Ipsum', owner)
+        await message.isSentRaw('Lorem Ipsum', owner);
       } catch (e) {
-        notSent = true
+        notSent = true;
       }
-      assert.ok(!!notSent)
-    })
+      assert.ok(!!notSent);
+    });
 
     it('run command as user defined in filter', async () => {
-      global.systems.customCommands.run({ sender: user1, message: '!cmd' })
-      await message.isSentRaw('Lorem Ipsum', user1)
-    })
-  })
+      global.systems.customCommands.run({ sender: user1, message: '!cmd' });
+      await message.isSentRaw('Lorem Ipsum', user1);
+    });
+  });
 
   it('!a will show Lorem Ipsum', async () => {
-    global.systems.customCommands.add({ sender: owner, parameters: '-c !a -r Lorem Ipsum' })
-    await message.isSent('customcmds.command-was-added', owner, { command: '!a', response: 'Lorem Ipsum', sender: owner.username })
+    global.systems.customCommands.add({ sender: owner, parameters: '-c !a -r Lorem Ipsum' });
+    await message.isSent('customcmds.command-was-added', owner, { command: '!a', response: 'Lorem Ipsum', sender: owner.username });
 
-    global.systems.customCommands.run({ sender: owner, message: '!a' })
-    await message.isSentRaw('Lorem Ipsum', owner)
+    global.systems.customCommands.run({ sender: owner, message: '!a' });
+    await message.isSentRaw('Lorem Ipsum', owner);
 
-    global.systems.customCommands.remove({ sender: owner, parameters: '!a' })
-    await message.isSent('customcmds.command-was-removed', owner, { command: '!a', sender: owner.username })
-  })
+    global.systems.customCommands.remove({ sender: owner, parameters: '!a' });
+    await message.isSent('customcmds.command-was-removed', owner, { command: '!a', sender: owner.username });
+  });
 
   it('!한글 will show Lorem Ipsum', async () => {
-    global.systems.customCommands.add({ sender: owner, parameters: '-c !한글 -r Lorem Ipsum' })
-    await message.isSent('customcmds.command-was-added', owner, { command: '!한글', response: 'Lorem Ipsum', sender: owner.username })
+    global.systems.customCommands.add({ sender: owner, parameters: '-c !한글 -r Lorem Ipsum' });
+    await message.isSent('customcmds.command-was-added', owner, { command: '!한글', response: 'Lorem Ipsum', sender: owner.username });
 
-    global.systems.customCommands.run({ sender: owner, message: '!한글' })
-    await message.isSentRaw('Lorem Ipsum', owner)
+    global.systems.customCommands.run({ sender: owner, message: '!한글' });
+    await message.isSentRaw('Lorem Ipsum', owner);
 
-    global.systems.customCommands.remove({ sender: owner, parameters: '!한글' })
-    await message.isSent('customcmds.command-was-removed', owner, { command: '!한글', sender: owner.username })
-  })
+    global.systems.customCommands.remove({ sender: owner, parameters: '!한글' });
+    await message.isSent('customcmds.command-was-removed', owner, { command: '!한글', sender: owner.username });
+  });
 
   it('!русский will show Lorem Ipsum', async () => {
-    global.systems.customCommands.add({ sender: owner, parameters: '-c !русский -r Lorem Ipsum' })
-    await message.isSent('customcmds.command-was-added', owner, { command: '!русский', response: 'Lorem Ipsum', sender: owner.username })
+    global.systems.customCommands.add({ sender: owner, parameters: '-c !русский -r Lorem Ipsum' });
+    await message.isSent('customcmds.command-was-added', owner, { command: '!русский', response: 'Lorem Ipsum', sender: owner.username });
 
-    global.systems.customCommands.run({ sender: owner, message: '!русский' })
-    await message.isSentRaw('Lorem Ipsum', owner)
+    global.systems.customCommands.run({ sender: owner, message: '!русский' });
+    await message.isSentRaw('Lorem Ipsum', owner);
 
-    global.systems.customCommands.remove({ sender: owner, parameters: '!русский' })
-    await message.isSent('customcmds.command-was-removed', owner, { command: '!русский', sender: owner.username })
-  })
-})
+    global.systems.customCommands.remove({ sender: owner, parameters: '!русский' });
+    await message.isSent('customcmds.command-was-removed', owner, { command: '!русский', sender: owner.username });
+  });
+});

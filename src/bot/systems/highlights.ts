@@ -9,6 +9,7 @@ import { command, default_permission, settings, ui } from '../decorators';
 import { permission } from '../permissions';
 import System from './_interface';
 import { isMainThread } from 'worker_threads';
+import { error } from '../helpers/log';
 
 const ERROR_STREAM_NOT_ONLINE = '1';
 const ERROR_MISSING_TOKEN = '2';
@@ -121,14 +122,14 @@ class Highlights extends System {
       global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'highlights', api: 'helix', endpoint: url, code: e.stack, remaining: global.api.remainingAPICalls });
       switch (e.message) {
         case ERROR_STREAM_NOT_ONLINE:
-          global.log.error('Cannot highlight - stream offline');
+          error('Cannot highlight - stream offline');
           sendMessage(global.translate('highlights.offline'), opts.sender, opts.attr);
           break;
         case ERROR_MISSING_TOKEN:
-          global.log.error('Cannot highlight - missing token');
+          error('Cannot highlight - missing token');
           break;
         default:
-          global.log.error(e.stack);
+          error(e.stack);
       }
     }
   }

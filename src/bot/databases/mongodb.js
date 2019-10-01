@@ -5,14 +5,14 @@ const mongodbUri = require('mongodb-uri')
 const Interface = require('./interface')
 const config = global.migration ? {
   database: {}
-} : require('@config')
+} : require('../../config.json')
 const {
   isMainThread
 } = require('worker_threads');
 const {
   flatten, unflatten
 } = require('../helpers/flatten');
-import { debug } from '../debug';
+import { debug, error } from '../helpers/log';
 
 const _ = require('lodash')
 
@@ -155,9 +155,9 @@ class IMongoDB extends Interface {
       }
       return items.toArray()
     } catch (e) {
-      global.log.error(e.stack)
+      error(e.stack)
       if (e.message.match(/EPIPE/g)) {
-        global.log.error('Something went wrong with mongodb instance (EPIPE error)')
+        error('Something went wrong with mongodb instance (EPIPE error)')
         process.exit()
       }
     }
@@ -186,9 +186,9 @@ class IMongoDB extends Interface {
         return item || {}
       }
     } catch (e) {
-      global.log.error(e.stack)
+      error(e.stack)
       if (e.message.match(/EPIPE/g)) {
-        global.log.error('Something went wrong with mongodb instance (EPIPE error)')
+        error('Something went wrong with mongodb instance (EPIPE error)')
         process.exit()
       }
     }
@@ -206,7 +206,7 @@ class IMongoDB extends Interface {
       return item.ops[0]
     } catch (e) {
       if (e.message.match(/EPIPE/g)) {
-        global.log.error('Something went wrong with mongodb instance (EPIPE error)')
+        error('Something went wrong with mongodb instance (EPIPE error)')
         process.exit()
       }
     }
@@ -231,9 +231,9 @@ class IMongoDB extends Interface {
       )
       return item.value
     } catch (e) {
-      global.log.error(e.stack)
+      error(e.stack)
       if (e.message.match(/EPIPE/g)) {
-        global.log.error('Something went wrong with mongodb instance (EPIPE error)')
+        error('Something went wrong with mongodb instance (EPIPE error)')
         process.exit()
       }
     }
@@ -263,9 +263,9 @@ class IMongoDB extends Interface {
       let items = await db.collection(table).find(where).toArray()
       return items
     } catch (e) {
-      global.log.error(e.stack)
+      error(e.stack)
       if (e.message.match(/EPIPE/g)) {
-        global.log.error('Something went wrong with mongodb instance (EPIPE error)')
+        error('Something went wrong with mongodb instance (EPIPE error)')
         process.exit()
       }
     }
@@ -289,9 +289,9 @@ class IMongoDB extends Interface {
       let result = await db.collection(table).deleteMany(where)
       return result.result.n
     } catch (e) {
-      global.log.error(e.stack)
+      error(e.stack)
       if (e.message.match(/EPIPE/g)) {
-        global.log.error('Something went wrong with mongodb instance (EPIPE error)')
+        error('Something went wrong with mongodb instance (EPIPE error)')
         process.exit()
       }
     }
@@ -329,11 +329,11 @@ class IMongoDB extends Interface {
         // this often means that update was too fast...re-do after io
         setImmediate(() => this.update(table, where, object))
       } else if (e.message.match(/EPIPE/g)) {
-        global.log.error(e.stack)
-        global.log.error('Something went wrong with mongodb instance (EPIPE error)')
+        error(e.stack)
+        error('Something went wrong with mongodb instance (EPIPE error)')
         process.exit()
       } else {
-        global.log.error(e.stack)
+        error(e.stack)
       }
     }
   }
@@ -343,9 +343,9 @@ class IMongoDB extends Interface {
       let db = this.client.db(this.dbName)
       return db.collection(table).countDocuments()
     } catch (e) {
-      global.log.error(e.stack)
+      error(e.stack)
       if (e.message.match(/EPIPE/g)) {
-        global.log.error('Something went wrong with mongodb instance (EPIPE error)')
+        error('Something went wrong with mongodb instance (EPIPE error)')
         process.exit()
       }
     }
@@ -356,9 +356,9 @@ class IMongoDB extends Interface {
       let db = this.client.db(this.dbName)
       return (await db.listCollections().toArray()).map(o => o.name)
     } catch (e) {
-      global.log.error(e.stack)
+      error(e.stack)
       if (e.message.match(/EPIPE/g)) {
-        global.log.error('Something went wrong with mongodb instance (EPIPE error)')
+        error('Something went wrong with mongodb instance (EPIPE error)')
         process.exit()
       }
     }
@@ -369,9 +369,9 @@ class IMongoDB extends Interface {
       let db = this.client.db(this.dbName)
       return db.collection(table).drop()
     } catch (e) {
-      global.log.error(e.stack)
+      error(e.stack)
       if (e.message.match(/EPIPE/g)) {
-        global.log.error('Something went wrong with mongodb instance (EPIPE error)')
+        error('Something went wrong with mongodb instance (EPIPE error)')
         process.exit()
       }
     }

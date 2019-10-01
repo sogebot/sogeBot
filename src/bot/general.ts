@@ -8,6 +8,7 @@ import { command, default_permission, settings, ui } from './decorators';
 import { onChange, onLoad } from './decorators/on';
 import { permission } from './permissions';
 import { isMainThread } from 'worker_threads';
+import { debug, error, warning } from './helpers/log';
 
 class General extends Core {
   @settings('general')
@@ -35,7 +36,7 @@ class General extends Core {
     global.workers.callOnAll({ type: 'call', ns: 'lib.translate', fnc: '_load' });
     await global.lib.translate._load();
     if (isMainThread) {
-      global.log.warning(global.translate('core.lang-selected'));
+      warning(global.translate('core.lang-selected'));
     }
   }
 
@@ -79,21 +80,21 @@ class General extends Core {
       }
     }
     const version = get(process, 'env.npm_package_version', 'x.y.z');
-    global.log.debug('======= COPY DEBUG MESSAGE FROM HERE =======');
-    global.log.debug(`GENERAL      | OS: ${process.env.npm_config_user_agent}`);
-    global.log.debug(`             | Bot version: ${version.replace('SNAPSHOT', gitCommitInfo().shortHash || 'SNAPSHOT')}`);
-    global.log.debug(`             | DB: ${config.database.type}`);
-    global.log.debug(`             | Threads: ${global.cpu}`);
-    global.log.debug(`             | HEAP: ${Number(process.memoryUsage().heapUsed / 1048576).toFixed(2)} MB`);
-    global.log.debug(`             | Uptime: ${Math.trunc(process.uptime())} seconds`);
-    global.log.debug(`             | Language: ${lang}`);
-    global.log.debug(`             | Mute: ${mute}`);
-    global.log.debug(`SYSTEMS      | ${enabledSystems.systems.join(', ')}`);
-    global.log.debug(`GAMES        | ${enabledSystems.games.join(', ')}`);
-    global.log.debug(`INTEGRATIONS | ${enabledSystems.integrations.join(', ')}`);
-    global.log.debug(`WIDGETS      | ${map(widgets, 'id').join(', ')}`);
-    global.log.debug(`OAUTH        | BOT ${oauth.bot} | BROADCASTER ${oauth.broadcaster}`);
-    global.log.debug('======= END OF DEBUG MESSAGE =======');
+    debug('*', '======= COPY DEBUG MESSAGE FROM HERE =======');
+    debug('*', `GENERAL      | OS: ${process.env.npm_config_user_agent}`);
+    debug('*', `             | Bot version: ${version.replace('SNAPSHOT', gitCommitInfo().shortHash || 'SNAPSHOT')}`);
+    debug('*', `             | DB: ${config.database.type}`);
+    debug('*', `             | Threads: ${global.cpu}`);
+    debug('*', `             | HEAP: ${Number(process.memoryUsage().heapUsed / 1048576).toFixed(2)} MB`);
+    debug('*', `             | Uptime: ${Math.trunc(process.uptime())} seconds`);
+    debug('*', `             | Language: ${lang}`);
+    debug('*', `             | Mute: ${mute}`);
+    debug('*', `SYSTEMS      | ${enabledSystems.systems.join(', ')}`);
+    debug('*', `GAMES        | ${enabledSystems.games.join(', ')}`);
+    debug('*', `INTEGRATIONS | ${enabledSystems.integrations.join(', ')}`);
+    debug('*', `WIDGETS      | ${map(widgets, 'id').join(', ')}`);
+    debug('*', `OAUTH        | BOT ${oauth.bot} | BROADCASTER ${oauth.broadcaster}`);
+    debug('*', '======= END OF DEBUG MESSAGE =======');
   }
 
   @command('!set')
@@ -151,7 +152,7 @@ class General extends Core {
 
       global[type][name].status({ state: opts.enable });
     } catch (e) {
-      global.log.error(e.message);
+      error(e.message);
     }
   }
 }

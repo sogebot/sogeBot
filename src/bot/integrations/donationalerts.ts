@@ -7,6 +7,7 @@ import Integration from './_interface';
 import { onChange, onStartup } from '../decorators/on.js';
 import { settings } from '../decorators';
 import { ui } from '../decorators.js';
+import { info, tip } from '../helpers/log.js';
 
 class Donationalerts extends Integration {
   socket: SocketIOClient.Socket | null = null;
@@ -61,13 +62,13 @@ class Donationalerts extends Integration {
         if (this.socket !== null) {
           this.socket.emit('add-user', { token: this.secretToken, type: 'minor' });
         }
-        global.log.info(chalk.yellow('DONATIONALERTS.RU:') + ' Successfully connected socket to service');
+        info(chalk.yellow('DONATIONALERTS.RU:') + ' Successfully connected socket to service');
       });
       this.socket.on('reconnect_attempt', () => {
-        global.log.info(chalk.yellow('DONATIONALERTS.RU:') + ' Trying to reconnect to service');
+        info(chalk.yellow('DONATIONALERTS.RU:') + ' Trying to reconnect to service');
       });
       this.socket.on('disconnect', () => {
-        global.log.info(chalk.yellow('DONATIONALERTS.RU:') + ' Socket disconnected from service');
+        info(chalk.yellow('DONATIONALERTS.RU:') + ' Socket disconnected from service');
         this.disconnect();
         this.socket = null;
       });
@@ -89,7 +90,7 @@ class Donationalerts extends Integration {
           timestamp: Date.now(),
         });
 
-        global.log.tip(`${data.username.toLowerCase()}, amount: ${data.amount}${data.currency}, message: ${data.message}`);
+        tip(`${data.username.toLowerCase()}, amount: ${data.amount}${data.currency}, message: ${data.message}`);
         global.events.fire('tip', {
           username: data.username.toLowerCase(),
           amount: parseFloat(data.amount).toFixed(2),

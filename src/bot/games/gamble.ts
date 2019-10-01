@@ -3,6 +3,7 @@ import _ from 'lodash';
 import Game from './_interface';
 import { command, settings } from '../decorators';
 import { prepare, sendMessage } from '../commons';
+import { error } from '../helpers/log';
 
 const ERROR_NOT_ENOUGH_OPTIONS = '0';
 const ERROR_ZERO_BET = '1';
@@ -88,7 +89,7 @@ class Gamble extends Game {
           sendMessage(message, opts.sender, opts.attr);
           break;
         default:
-          global.log.error(e.stack);
+          error(e.stack);
           sendMessage(global.translate('core.error'), opts.sender, opts.attr);
       }
     }

@@ -1,12 +1,12 @@
 'use strict'
 
 const util = require('util')
-const _ = require('lodash')
 
 import { Events } from './events'
 import { Permissions } from './permissions'
 import { OAuth } from './oauth';
 import { Currency } from './currency';
+import { error } from './helpers/log'
 const { autoLoad } = require('./commons');
 
 cluster()
@@ -35,7 +35,7 @@ function cluster () {
     global.api = new (require('./api'))()
     global.tmi = new (require('./tmi'))()
   } catch (e) {
-    console.error(e); global.log.error(e)
+    console.error(e); error(e)
     return global.workers.sendToMaster({ type: 'crash' })
   }
 
@@ -48,7 +48,7 @@ function cluster () {
       global.games = await autoLoad('./dest/games/')
       global.integrations = await autoLoad('./dest/integrations/')
     } catch (e) {
-      console.error(e); global.log.error(e)
+      console.error(e); error(e)
     }
 
     global.workers.setListeners()
@@ -60,17 +60,15 @@ function cluster () {
 }
 
 process.on('unhandledRejection', function (reason, p) {
-  if (_.isNil(global.log)) return console.log(`Possibly Unhandled Rejection at: ${util.inspect(p)} reason: ${reason}`)
-  global.log.error(`Possibly Unhandled Rejection at: ${util.inspect(p)} reason: ${reason}`)
+  error(`Possibly Unhandled Rejection at: ${util.inspect(p)} reason: ${reason}`)
 })
 
 process.on('uncaughtException', (error) => {
-  if (_.isNil(global.log)) return console.log(error)
-  global.log.error(util.inspect(error))
-  global.log.error('+------------------------------------------------------------------------------+')
-  global.log.error('| WORKER HAS UNEXPECTEDLY CRASHED                                              |')
-  global.log.error('| PLEASE CHECK https://github.com/sogehige/SogeBot/wiki/How-to-report-an-issue |')
-  global.log.error('| AND ADD logs/exceptions.log file to your report                              |')
-  global.log.error('+------------------------------------------------------------------------------+')
+  error(util.inspect(error))
+  error('+------------------------------------------------------------------------------+')
+  error('| WORKER HAS UNEXPECTEDLY CRASHED                                              |')
+  error('| PLEASE CHECK https://github.com/sogehige/SogeBot/wiki/How-to-report-an-issue |')
+  error('| AND ADD logs/exceptions.log file to your report                              |')
+  error('+------------------------------------------------------------------------------+')
   process.exit(1)
 })

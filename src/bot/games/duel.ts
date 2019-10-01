@@ -4,6 +4,7 @@ import { isMainThread } from 'worker_threads';
 import { getLocalizedName, getOwner, isBroadcaster, isModerator, prepare, sendMessage } from '../commons';
 import { command, settings, shared } from '../decorators';
 import Game from './_interface';
+import { error } from '../helpers/log';
 
 const ERROR_NOT_ENOUGH_OPTIONS = '0';
 const ERROR_ZERO_BET = '1';
@@ -213,7 +214,7 @@ class Duel extends Game {
           sendMessage(message, opts.sender, opts.attr);
           break;
         default:
-          global.log.error(e.stack);
+          error(e.stack);
           sendMessage(global.translate('core.error'), opts.sender, opts.attr);
       }
     }

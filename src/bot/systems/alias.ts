@@ -11,6 +11,7 @@ import { permission } from '../permissions';
 import System from './_interface';
 import { incrementCountOfCommandUsage } from '../helpers/commands/count';
 import { isMainThread } from 'worker_threads';
+import { debug, warning } from '../helpers/log';
 
 
 /*
@@ -78,14 +79,14 @@ class Alias extends System {
     if (!tryingToBypass) {
       // Don't run alias if its same as command e.g. alias !me -> command !me
       if (alias.command === alias.alias) {
-        global.log.warning(`Cannot run alias ${alias.alias}, because it exec ${alias.command}`);
+        warning(`Cannot run alias ${alias.alias}, because it exec ${alias.command}`);
         return false;
       } else if ((await global.permissions.check(opts.sender.userId, alias.permission)).access) {
         // parse variables
         const message = await new Message(opts.message.replace(replace, `${alias.command}`)).parse({
           sender: opts.sender,
         });
-        global.log.process({ type: 'parse', sender: opts.sender, message });
+        debug('alias.process', message);
         global.tmi.message({
           message: {
             tags: opts.sender,

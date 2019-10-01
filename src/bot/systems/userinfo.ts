@@ -2,10 +2,10 @@ import _ from 'lodash';
 import moment from 'moment';
 
 import { dateDiff, getLocalizedName, prepare, sendMessage } from '../commons';
-import { debug } from '../debug';
 import { command, settings, ui } from '../decorators';
 import { onMessage } from '../decorators/on';
 import System from './_interface';
+import { debug, error } from '../helpers/log';
 
 /*
  * !me
@@ -274,7 +274,7 @@ class UserInfo extends System {
       }
       sendMessage(message.filter(o => o !== null).join(this.formatSeparator), opts.sender, opts.attr);
     } catch (e) {
-      global.log.error(e.stack);
+      error(e.stack);
     }
   }
 

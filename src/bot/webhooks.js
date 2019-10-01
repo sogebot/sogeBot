@@ -4,9 +4,7 @@ const config = require('@config')
 const util = require('util');
 const { isBot } = require('./commons');
 
-const __DEBUG__ = {
-  STREAM: (process.env.DEBUG && process.env.DEBUG.includes('webhooks.stream'))
-}
+import { debug, warning, error, info, follow } from './helpers/log';
 
 class Webhooks {
   constructor () {
@@ -106,7 +104,7 @@ class Webhooks {
 
     // get proper domain
     let domains = config.panel.domain.split(',').map((o) => o.trim()).filter((o) => o !== 'localhost')
-    if (domains.length === 0) return global.log.warning(`No suitable domain found to use with ${type} webhook ... localhost is not suitable`)
+    if (domains.length === 0) return warning(`No suitable domain found to use with ${type} webhook ... localhost is not suitable`)
     let domain = domains[0]
 
     const leaseSeconds = 864000
@@ -130,8 +128,8 @@ class Webhooks {
             'hub.lease_seconds': leaseSeconds
           }
         })
-        if (res.status === 202 && res.statusText === 'Accepted') global.log.info('WEBHOOK: follows waiting for challenge')
-        else global.log.error('WEBHOOK: follows NOT subscribed')
+        if (res.status === 202 && res.statusText === 'Accepted') info('WEBHOOK: follows waiting for challenge')
+        else error('WEBHOOK: follows NOT subscribed')
         break
       case 'streams':
         res = await axios({
@@ -148,8 +146,8 @@ class Webhooks {
             'hub.lease_seconds': leaseSeconds
           }
         })
-        if (res.status === 202 && res.statusText === 'Accepted') global.log.info('WEBHOOK: streams waiting for challenge')
-        else global.log.error('WEBHOOK: streams NOT subscribed')
+        if (res.status === 202 && res.statusText === 'Accepted') info('WEBHOOK: streams waiting for challenge')
+        else error('WEBHOOK: streams NOT subscribed')
         break
       default:
         return // don't resubcribe if subscription is not correct
@@ -172,11 +170,11 @@ class Webhooks {
     // set webhooks enabled
     switch (req.query['hub.topic']) {
       case `https://api.twitch.tv/helix/users/follows?first=1&to_id=${cid}`:
-        global.log.info('WEBHOOK: follows subscribed')
+        info('WEBHOOK: follows subscribed')
         this.enabled.follows = true
         break
       case `https://api.twitch.tv/helix/streams?user_id=${cid}`:
-        global.log.info('WEBHOOK: streams subscribed')
+        info('WEBHOOK: streams subscribed')
         this.enabled.streams = true
         break
     }
@@ -222,7 +220,7 @@ class Webhooks {
             type: 'follow',
             username: data.from_name
           })
-          global.log.follow(data.from_name)
+          follow(data.from_name)
           global.events.fire('follow', { username: data.from_name, webhooks: true })
           global.registries.alerts.trigger({
             event: 'follows',
@@ -265,8 +263,8 @@ class Webhooks {
         global.db.engine.update('users', { id: data.from_id }, { username: data.from_name, is: { follower: isFollower }, time: { followCheck: new Date().getTime(), follow: followedAt } })
       }
     } catch (e) {
-      global.log.error(e.stack)
-      global.log.error(util.inspect(aEvent))
+      error(e.stack)
+      error(util.inspect(aEvent))
     }
   }
 
@@ -307,10 +305,8 @@ class Webhooks {
       await global.db.engine.update('api.current', { key: 'game' }, { value: await global.api.getGameFromId(stream.game_id) })
 
       if (!(await global.cache.isOnline()) && Number(global.twitch.streamId) !== Number(stream.id)) {
-        if (__DEBUG__.STREAM) {
-          global.log.debug('WEBHOOKS: ' + JSON.stringify(aEvent))
-        }
-        global.log.start(
+        debug('webhooks.stream', 'WEBHOOKS: ' + JSON.stringify(aEvent))
+        start(
           `id: ${stream.id} | startedAt: ${stream.started_at} | title: ${stream.title} | game: ${await global.api.getGameFromId(stream.game_id)} | type: ${stream.type} | channel ID: ${cid}`
         )
         global.cache.when({ online: stream.started_at })

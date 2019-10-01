@@ -10,6 +10,7 @@ import { getLocalizedName, getOwner, isBot, isBroadcaster, isModerator, isOwner,
 import Message from './message';
 import * as Parser from './parser';
 import { generateUsername } from './helpers/generateUsername';
+import { error, info, warning } from './helpers/log';
 
 class Events extends Core {
   public timeouts: { [x: string]: NodeJS.Timeout } = {};
@@ -168,10 +169,10 @@ class Events extends Core {
           'message-type': 'chat',
         });
       }
-      global.log.info('Clip was created successfully');
+      info('Clip was created successfully');
       return cid;
     } else { // NG
-      global.log.warning('Clip was not created successfully');
+      warning('Clip was not created successfully');
       return null;
     }
   }
@@ -670,7 +671,7 @@ class Events extends Core {
         }
       }
     } catch (e) {
-      global.log.error(e.stack);
+      error(e.stack);
     } finally {
       clearTimeout(this.timeouts.fadeOut);
       this.timeouts.fadeOut = setTimeout(() => this.fadeOut(), 1000);

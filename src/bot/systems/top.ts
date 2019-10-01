@@ -5,6 +5,7 @@ import { getChannel, getIgnoreList, getLocalizedName, isIgnored, sendMessage } f
 import { command, default_permission } from '../decorators';
 import { permission } from '../permissions';
 import System from './_interface';
+import { debug } from '../helpers/log';
 
 enum TYPE {
   TIME,
@@ -17,11 +18,6 @@ enum TYPE {
   GIFTS,
   SUBMONTHS,
 }
-
-const __DEBUG__
-  = (process.env.DEBUG && process.env.DEBUG.includes('systems.*'))
-  || (process.env.DEBUG && process.env.DEBUG.includes('systems.top'))
-  || (process.env.DEBUG && process.env.DEBUG.includes('systems.top.*'));
 
 /*
  * !top time
@@ -234,9 +230,7 @@ class Top extends System {
     } else {
       message += 'no data available';
     }
-    if (__DEBUG__) {
-      global.log.debug(message);
-    }
+    debug('systems.top', message);
     sendMessage(message, opts.sender, opts.attr);
   }
 }

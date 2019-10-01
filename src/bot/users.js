@@ -9,8 +9,8 @@ const {
 } = require('worker_threads');
 const axios = require('axios')
 import Core from './_interface'
-import { debug, isEnabled as isDebugEnabled } from './debug';
 const commons = require('./commons');
+import { debug, isDebugEnabled, error } from './helpers/log';
 
 class Users extends Core {
   uiSortCache: String | null = null
@@ -53,7 +53,7 @@ class Users extends Core {
         else global.workers.sendToMaster({ type: 'api', fnc: 'fetchAccountAge', username: username, id: user.id })
       }
     } catch (e) {
-      global.log.error(e.stack)
+      error(e.stack)
     }
     return user
   }
@@ -73,7 +73,7 @@ class Users extends Core {
         else global.workers.sendToMaster({ type: 'api', fnc: 'fetchAccountAge', username: user.username, id: user.id })
       }
     } catch (e) {
-      global.log.error(e.stack)
+      error(e.stack)
     }
     return user
   }
@@ -84,7 +84,7 @@ class Users extends Core {
   }
 
   async set (username: string, object: Object) {
-    if (_.isNil(username)) return global.log.error('username is NULL!\n' + new Error().stack)
+    if (_.isNil(username)) return error('username is NULL!\n' + new Error().stack)
 
     username = username.toLowerCase()
     if (username === global.oauth.botUsername.toLowerCase() || _.isNil(username)) return // it shouldn't happen, but there can be more than one instance of a bot
@@ -513,7 +513,7 @@ class Users extends Core {
   }
 
   async setById (id: string, object: Object) {
-    if (_.isNil(id)) return global.log.error('id is NULL!\n' + new Error().stack)
+    if (_.isNil(id)) return error('id is NULL!\n' + new Error().stack)
     return global.db.engine.update('users', { id }, object)
   }
 }

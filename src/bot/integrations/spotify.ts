@@ -10,10 +10,7 @@ import { command, default_permission, settings, shared, ui } from '../decorators
 import { onChange, onStartup } from '../decorators/on';
 import Expects from '../expects';
 import Integration from './_interface';
-
-const __DEBUG__ = {
-  REQUEST: (process.env.DEBUG && process.env.DEBUG.includes('spotify.request')) || (process.env.DEBUG && process.env.DEBUG.includes('spotify.*')),
-};
+import { debug, error, info, warning } from '../helpers/log';
 
 /*
  * How to integrate:
@@ -118,7 +115,7 @@ class Spotify extends Integration {
   @onChange('connection.username')
   onUsernameChange (key: string, value: string) {
     if (value.length > 0) {
-      global.log.info(chalk.yellow('SPOTIFY: ') + `Access to account ${value} granted`);
+      info(chalk.yellow('SPOTIFY: ') + `Access to account ${value} granted`);
     }
   }
 
@@ -165,7 +162,7 @@ class Spotify extends Integration {
       song.is_playing = true;
       this.currentSong = JSON.stringify(song);
     } catch (e) {
-      global.log.error(e.stack);
+      error(e.stack);
     }
   }
 
@@ -195,8 +192,8 @@ class Spotify extends Integration {
       });
       this.currentUris = null;
     } catch (e) {
-      global.log.warning('Cannot continue playlist from ' + String(this.originalUri));
-      global.log.warning('Playlist will continue from random track');
+      warning('Cannot continue playlist from ' + String(this.originalUri));
+      warning('Playlist will continue from random track');
       this.originalUri = null;
     } finally {
 
@@ -210,14 +207,12 @@ class Spotify extends Integration {
 
     const song = JSON.parse(this.currentSong);
 
-    if (__DEBUG__.REQUEST) {
-      global.log.debug({
-        song,
-        originalUri: this.originalUri,
-        cachedRequests: this.currentUris,
-        requests: this.uris,
-      });
-    }
+    debug('spotify.request', {
+      song,
+      originalUri: this.originalUri,
+      cachedRequests: this.currentUris,
+      requests: this.uris,
+    });
 
     // if song is not part of currentUris => save context
     if (typeof song.uri !== 'undefined' && this.currentUris !== song.uri && this.uris.length === 0) {
@@ -266,7 +261,7 @@ class Spotify extends Integration {
       }
     } catch (e) {
       if (e.message !== 'Unauthorized') {
-        global.log.info(chalk.yellow('SPOTIFY: ') + 'Get of user failed, check your credentials');
+        info(chalk.yellow('SPOTIFY: ') + 'Get of user failed, check your credentials');
       }
       this.username = '';
       this.userId = null;
@@ -315,7 +310,7 @@ class Spotify extends Integration {
         this._accessToken = data.body.access_token;
       }
     } catch (e) {
-      global.log.info(chalk.yellow('SPOTIFY: ') + 'Refreshing access token failed');
+      info(chalk.yellow('SPOTIFY: ') + 'Refreshing access token failed');
     }
     this.timeouts.IRefreshToken = global.setTimeout(() => this.IRefreshToken(), 60000);
   }
@@ -367,7 +362,7 @@ class Spotify extends Integration {
         this.username = '';
         this.currentSong = JSON.stringify({});
 
-        global.log.info(chalk.yellow('SPOTIFY: ') + `Access to account ${username} is revoked`);
+        info(chalk.yellow('SPOTIFY: ') + `Access to account ${username} is revoked`);
 
         this.timeouts.IRefreshToken = global.setTimeout(() => this.IRefreshToken(), 60000);
         cb(null, { do: 'refresh' });
@@ -387,7 +382,7 @@ class Spotify extends Integration {
               cb(null, { do: 'redirect', opts: [authorizeURI] });
             }
           } catch (e) {
-            global.log.error(e.stack);
+            error(e.stack);
             cb(e.stack, null);
           }
         }
@@ -398,18 +393,18 @@ class Spotify extends Integration {
   connect (opts: { token?: string } = {}) {
     const isNewConnection = this.client === null;
     try {
-      const error: string[] = [];
+      const err: string[] = [];
       if (this.clientId.trim().length === 0) {
-        error.push('clientId');
+        err.push('clientId');
       }
       if (this.clientSecret.trim().length === 0) {
-        error.push('clientSecret');
+        err.push('clientSecret');
       }
       if (this.redirectURI.trim().length === 0) {
-        error.push('redirectURI');
+        err.push('redirectURI');
       }
-      if (error.length > 0) {
-        throw new Error(error.join(', ') + ' missing');
+      if (err.length > 0) {
+        throw new Error(err.join(', ') + ' missing');
       }
 
       this.client = new SpotifyWebApi({
@@ -435,25 +430,25 @@ class Spotify extends Integration {
               this.client.setRefreshToken(this._refreshToken);
             }, (err) => {
               if (err) {
-                global.log.info(chalk.yellow('SPOTIFY: ') + 'Getting of accessToken and refreshToken failed');
+                info(chalk.yellow('SPOTIFY: ') + 'Getting of accessToken and refreshToken failed');
               }
             });
         }
         if (isNewConnection) {
-          global.log.info(chalk.yellow('SPOTIFY: ') + 'Client connected to service');
+          info(chalk.yellow('SPOTIFY: ') + 'Client connected to service');
         }
       } catch (e) {
-        global.log.error(e.stack);
-        global.log.info(chalk.yellow('SPOTIFY: ') + 'Client connection failed');
+        error(e.stack);
+        info(chalk.yellow('SPOTIFY: ') + 'Client connection failed');
       }
     } catch (e) {
-      global.log.info(chalk.yellow('SPOTIFY: ') + e.message);
+      info(chalk.yellow('SPOTIFY: ') + e.message);
     }
   }
 
   disconnect () {
     this.client = null;
-    global.log.info(chalk.yellow('SPOTIFY: ') + 'Client disconnected from service');
+    info(chalk.yellow('SPOTIFY: ') + 'Client disconnected from service');
   }
 
   authorizeURI () {

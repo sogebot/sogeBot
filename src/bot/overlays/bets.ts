@@ -2,6 +2,7 @@ import { isMainThread } from 'worker_threads';
 
 import { ui } from '../decorators';
 import Overlay from './_interface';
+import { error } from '../helpers/log';
 
 class Bets extends Overlay {
   public modifiedAt: number;
@@ -48,7 +49,7 @@ class Bets extends Overlay {
         this.bets = await global.db.engine.find(global.systems.bets.collection.users);
       }
     } catch (e) {
-      global.log.error(e.stack);
+      error(e.stack);
     } finally {
       this.timeouts.betsInterval = global.setTimeout(() => this.interval(), 1000);
     }

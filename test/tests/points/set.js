@@ -1,18 +1,18 @@
 /* global describe it before */
 
-require('../../general.js')
+require('../../general.js');
 
-const db = require('../../general.js').db
-const message = require('../../general.js').message
-const _ = require('lodash')
+const db = require('../../general.js').db;
+const message = require('../../general.js').message;
+const _ = require('lodash');
 
-const user = { username: 'oneuser', userId: String(_.random(999999, false)) }
+const user = { username: 'oneuser', userId: String(_.random(999999, false)) };
 
 describe('Points - set()', () => {
   before(async () => {
-    await db.cleanup()
-    await message.prepare()
-  })
+    await db.cleanup();
+    await message.prepare();
+  });
 
   describe('Points should be correctly set, not added', () => {
     it('create user', async () => {
@@ -24,7 +24,7 @@ describe('Points - set()', () => {
       await message.isSent('points.defaults.pointsResponse', { username: user.username }, {
         amount: Math.floor(0),
         username: user.username,
-        pointsName: await global.systems.points.getPointsName(Math.floor(0))
+        pointsName: await global.systems.points.getPointsName(Math.floor(0)),
       });
     });
 
@@ -33,7 +33,7 @@ describe('Points - set()', () => {
       await message.isSent('points.success.set', { username: user.username }, {
         amount: Math.floor(5),
         username: user.username,
-        pointsName: await global.systems.points.getPointsName(Math.floor(5))
+        pointsName: await global.systems.points.getPointsName(Math.floor(5)),
       });
     });
 
@@ -42,7 +42,7 @@ describe('Points - set()', () => {
       await message.isSent('points.defaults.pointsResponse', { username: user.username }, {
         amount: Math.floor(5),
         username: user.username,
-        pointsName: await global.systems.points.getPointsName(Math.floor(5))
+        pointsName: await global.systems.points.getPointsName(Math.floor(5)),
       });
     });
 
@@ -51,7 +51,7 @@ describe('Points - set()', () => {
       await message.isSent('points.success.set', { username: user.username }, {
         amount: Math.floor(10),
         username: user.username,
-        pointsName: await global.systems.points.getPointsName(Math.floor(10))
+        pointsName: await global.systems.points.getPointsName(Math.floor(10)),
       });
     });
 
@@ -60,7 +60,7 @@ describe('Points - set()', () => {
       await message.isSent('points.defaults.pointsResponse', { username: user.username }, {
         amount: Math.floor(10),
         username: user.username,
-        pointsName: await global.systems.points.getPointsName(Math.floor(10))
+        pointsName: await global.systems.points.getPointsName(Math.floor(10)),
       });
     });
   });

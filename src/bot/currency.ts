@@ -11,6 +11,7 @@ import { isMainThread } from 'worker_threads';
 import Core from './_interface';
 import constants from './constants';
 import { settings, shared, ui } from './decorators';
+import { error, info, warning } from './helpers/log';
 
 class Currency extends Core {
   @settings('currency')
@@ -49,10 +50,10 @@ class Currency extends Core {
         return Number(value); // nothing to do
       }
       if (_.isNil(this.rates[from])) {
-        throw Error(`${from} code was not found`); 
+        throw Error(`${from} code was not found`);
       }
       if (_.isNil(this.rates[to]) && to.toLowerCase().trim() !== this.base.toLowerCase().trim()) {
-        throw Error(`${to} code was not found`); 
+        throw Error(`${to} code was not found`);
       }
 
       if (to.toLowerCase().trim() !== this.base.toLowerCase().trim()) {
@@ -61,8 +62,8 @@ class Currency extends Core {
         return value * this.rates[from];
       }
     } catch (e) {
-      global.log.warning(`Currency exchange error - ${e.message}`);
-      global.log.warning(`Available currencies: ${Object.keys(this.rates).join(', ')}`);
+      warning(`Currency exchange error - ${e.message}`);
+      warning(`Available currencies: ${Object.keys(this.rates).join(', ')}`);
       return Number(value); // don't change rate if code not found
     }
   }
@@ -72,7 +73,7 @@ class Currency extends Core {
 
     let refresh = constants.DAY;
     try {
-      global.log.info(chalk.yellow('CURRENCY:') + ' fetching rates');
+      info(chalk.yellow('CURRENCY:') + ' fetching rates');
       // base is always CZK
       const result = await axios.get('http://www.cnb.cz/cs/financni_trhy/devizovy_trh/kurzy_devizoveho_trhu/denni_kurz.txt');
       let linenum = 0;
@@ -84,9 +85,9 @@ class Currency extends Core {
         const [,, count, code, rate] = line.split('|');
         this.rates[code] = Number((rate.replace(',', '.') / count).toFixed(3));
       }
-      global.log.info(chalk.yellow('CURRENCY:') + ' fetched rates');
+      info(chalk.yellow('CURRENCY:') + ' fetched rates');
     } catch (e) {
-      global.log.error(e.stack);
+      error(e.stack);
       refresh = constants.SECOND;
     }
 

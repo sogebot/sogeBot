@@ -1,6 +1,7 @@
 import * as _ from 'lodash';
 import { parse, sep as separator } from 'path';
 import { VariableWatcher } from './watchers';
+import { error } from './helpers/log';
 
 export let loadingInProgress: string[] = [];
 export const permissions: { [command: string]: string | null } = {};
@@ -255,7 +256,7 @@ async function registerCommand(opts: string | Command, m) {
     }
     self._commands.push(c);
   } catch (e) {
-    global.log.error(e);
+    error(e);
   }
 }
 
@@ -276,7 +277,7 @@ function registerHelper(m, retry = 0) {
     if (retry < 100) {
       return setTimeout(() => registerHelper(m, retry++), 10);
     } else {
-      global.log.error('Command with function ' + m.fnc + ' not found!');
+      error('Command with function ' + m.fnc + ' not found!');
     }
   }
 }
@@ -291,7 +292,7 @@ function registerRollback(m) {
       name: m.fnc,
     });
   } catch (e) {
-    global.log.error(e.stack);
+    error(e.stack);
   }
 }
 
@@ -309,6 +310,6 @@ function registerParser(opts, m) {
       fireAndForget: opts.fireAndForget,
     });
   } catch (e) {
-    global.log.error(e.stack);
+    error(e.stack);
   }
 }

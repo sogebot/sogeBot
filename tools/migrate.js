@@ -6,10 +6,6 @@ const config = require('../config.json');
 const fs = require('fs');
 const uuidv4 = require('uuid/v4');
 
-// logger
-const Logger = require('../dest/logging');
-global.logger = new Logger();
-
 const dropFiles = [ 'settings' ];
 
 // db

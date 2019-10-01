@@ -1,6 +1,6 @@
 const XRegExp = require('xregexp')
 const _ = require('lodash')
-import { debug } from './debug';
+import { debug } from './helpers/log';
 
 class Expects {
   constructor (text) {

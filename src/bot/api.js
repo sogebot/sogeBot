@@ -10,6 +10,7 @@ const stacktrace = require('stacktrace-parser')
 const fs = require('fs')
 const chalk = require('chalk')
 const constants = require('./constants')
+const { debug, error, warning, info, follow, start, stop, unfollow } = require('./helpers/log')
 
 const {
   getBroadcaster, getChannel, isIgnored, isBroadcaster, isBot, sendMessage
@@ -45,7 +46,7 @@ class API {
             if (Number(value) === Number(obj[prop])) return true
 
             if (prop === 'remaining' && __DEBUG__.CALLS) {
-              global.log.debug(`API: ${prop} changed to ${value} at ${stacktrace.parse((new Error()).stack)[1].methodName}`)
+              debug(`API: ${prop} changed to ${value} at ${stacktrace.parse((new Error()).stack)[1].methodName}`)
               const remaining = obj.remaining || 'n/a'
               const refresh = obj.refresh || 'n/a'
               const limit = obj.limit || 'n/a'
@@ -68,7 +69,7 @@ class API {
             if (Number(value) === Number(obj[prop])) return true
 
             if (prop === 'remaining' && __DEBUG__.CALLS) {
-              global.log.debug(`API: ${prop} changed to ${value} at ${stacktrace.parse((new Error()).stack)[1].methodName}`)
+              debug(`API: ${prop} changed to ${value} at ${stacktrace.parse((new Error()).stack)[1].methodName}`)
               const remaining = obj.remaining || 'n/a'
               const refresh = obj.refresh || 'n/a'
               const limit = obj.limit || 'n/a'
@@ -157,12 +158,12 @@ class API {
 
       if (!this.timeouts[fnc].isRunning) {
         this.timeouts[fnc].isRunning = true
-        if (__DEBUG__.INTERVAL) global.log.info(chalk.yellow(fnc + '() ') + 'start')
+        if (__DEBUG__.INTERVAL) info(chalk.yellow(fnc + '() ') + 'start')
         const value = await Promise.race([
           this[fnc](this.timeouts[fnc].opts),
           this.timeoutAfterMs(10000)
         ])
-        if (__DEBUG__.INTERVAL) global.log.info(chalk.yellow(fnc + '() ') + JSON.stringify(value))
+        if (__DEBUG__.INTERVAL) info(chalk.yellow(fnc + '() ') + JSON.stringify(value))
 
         if (value.disable) return
         if (value.state) { // if is ok, update opts and run unlock after a while
@@ -447,7 +448,7 @@ class API {
         this.getAllStreamTags({ cursor: request.data.pagination.cursor })
       }
     } catch (e) {
-      global.log.error(`${url} - ${e.message}`)
+      error(`${url} - ${e.message}`)
       if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getChannelSubscribers', api: 'helix', endpoint: url, code: e.response.status || 200, data: e.stack, remaining: this.calls.bot.remaining })
     }
     delete opts.count;
@@ -471,7 +472,7 @@ class API {
     if (needToWait || notEnoughAPICalls || global.oauth.broadcasterType === '') {
       if (global.oauth.broadcasterType === '') {
         if (!opts.noAffiliateOrPartnerWarningSent) {
-          global.log.warning('Broadcaster is not affiliate/partner, will not check subs')
+          warning('Broadcaster is not affiliate/partner, will not check subs')
           global.db.engine.update('api.current', { key: 'subscribers' }, { value: 0 })
         }
         delete opts.count;
@@ -517,10 +518,10 @@ class API {
     } catch (e) {
       if (e.message === '403 Forbidden' && !opts.notCorrectOauthWarningSent) {
         opts.notCorrectOauthWarningSent = true
-        global.log.warning('Broadcaster have not correct oauth, will not check subs')
+        warning('Broadcaster have not correct oauth, will not check subs')
         global.db.engine.update('api.current', { key: 'subscribers' }, { value: 0 })
       } else {
-        global.log.error(`${url} - ${e.stack}`)
+        error(`${url} - ${e.stack}`)
         if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getChannelSubscribers', api: 'helix', endpoint: url, code: e.response.status, data: e.stack, remaining: this.calls.bot.remaining })
       }
     }
@@ -600,11 +601,11 @@ class API {
             // if we want title to be forced
             if (global.twitch.isTitleForced) {
               const game = await global.cache.gameCache();
-              global.log.info(`Title/game force enabled => ${game} | ${rawStatus}`);
+              info(`Title/game force enabled => ${game} | ${rawStatus}`);
               this.setTitleAndGame(null, { });
               return { state: true, opts }
             } else {
-              global.log.info(`Title/game changed outside of a bot => ${request.data.game} | ${request.data.status}`);
+              info(`Title/game changed outside of a bot => ${request.data.game} | ${request.data.status}`);
               this.retries.getChannelDataOldAPI = -1;
               rawStatus = request.data.status;
             }
@@ -624,7 +625,7 @@ class API {
         this.gameOrTitleChangedManually = false
       }
     } catch (e) {
-      global.log.error(`${url} - ${e.message}`)
+      error(`${url} - ${e.message}`)
       if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getChannelDataOldAPI', api: 'kraken', endpoint: url, code: e.response.status, data: e.stack })
       return { state: false, opts }
     }
@@ -655,7 +656,7 @@ class API {
         await global.db.engine.update('cache.hosts', { username: host }, { username: host })
       }
     } catch (e) {
-      global.log.error(`${url} - ${e.message}`)
+      error(`${url} - ${e.message}`)
       if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getChannelHosts', api: 'tmi', endpoint: url, code: e.response.status, data: e.stack })
       return { state: e.response.status === 500 }
     }
@@ -699,7 +700,7 @@ class API {
         this.calls.bot.refresh = e.response.headers['ratelimit-reset']
       }
 
-      global.log.error(`${url} - ${e.message}`)
+      error(`${url} - ${e.message}`)
       if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'updateChannelViewsAndBroadcasterType', api: 'helix', endpoint: url, code: e.response.status, data: e.stack, remaining: this.calls.bot.remaining })
     }
     return { state: true }
@@ -749,7 +750,7 @@ class API {
                   username: user.username
                 })
                 if (!quiet && !isBot(user.username)) {
-                  global.log.follow(user.username)
+                  follow(user.username)
                   global.events.fire('follow', { username: user.username })
                   global.registries.alerts.trigger({
                     event: 'follows',
@@ -788,7 +789,7 @@ class API {
             const isFollower = user.lock && user.lock.follower ? user.is.follower : true
             global.db.engine.update('users', { id: f.from_id }, { username: f.from_name, is: { follower: isFollower }, time: { followCheck: new Date().getTime(), follow: followedAt } })
           } catch (e) {
-            global.log.error(e.stack)
+            error(e.stack)
           }
         }
       }
@@ -803,7 +804,7 @@ class API {
       }
 
       quiet = e.errno !== 'ECONNREFUSED' && e.errno !== 'ETIMEDOUT'
-      global.log.error(`${url} - ${e.message}`)
+      error(`${url} - ${e.message}`)
       if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getLatest100Followers', api: 'helix', endpoint: url, code: e.response.status, data: e.stack, remaining: this.calls.bot.remaining })
       return { state: false, opts: quiet }
     }
@@ -850,8 +851,8 @@ class API {
       }
 
       const game = await global.db.engine.findOne('api.current', { key: 'game' })
-      global.log.warning(`Couldn't find name of game for gid ${id} - fallback to ${game.value}`)
-      global.log.error(`API: ${url} - ${e.stack}`)
+      warning(`Couldn't find name of game for gid ${id} - fallback to ${game.value}`)
+      error(`API: ${url} - ${e.stack}`)
       if (isMainThread) if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getGameFromId', api: 'helix', endpoint: url, code: e.response.status, data: e.stack, remaining: this.calls.bot.remaining })
       return game.value
     }
@@ -894,7 +895,7 @@ class API {
         }
       }
     } catch (e) {
-      global.log.error(`${url} - ${e.message}`)
+      error(`${url} - ${e.message}`)
       if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getCurrentStreamTags', api: 'getCurrentStreamTags', endpoint: url, code: e.response.status, data: e.stack, remaining: this.calls.bot.remaining })
       return { state: false, opts }
     }
@@ -935,7 +936,7 @@ class API {
       let justStarted = false
 
       if (__DEBUG__.STREAM) {
-        global.log.debug('API: ' + JSON.stringify(request.data))
+        debug('API: ' + JSON.stringify(request.data))
       }
 
       if (request.status === 200 && !_.isNil(request.data.data[0])) {
@@ -948,9 +949,9 @@ class API {
 
           if (!global.webhooks.enabled.streams && Number(this.streamId) !== Number(stream.id)) {
             if (__DEBUG__.STREAM) {
-              global.log.debug('API: ' + JSON.stringify(stream))
+              debug('API: ' + JSON.stringify(stream))
             }
-            global.log.start(
+            start(
               `id: ${stream.id} | startedAt: ${stream.started_at} | title: ${stream.title} | game: ${await this.getGameFromId(stream.game_id)} | type: ${stream.type} | channel ID: ${cid}`
             )
             global.events.fire('stream-started')
@@ -1032,7 +1033,7 @@ class API {
 
           let when = await global.cache.when()
           if (_.isNil(when.offline)) {
-            if (!_.isNil(when.online)) global.log.stop('')
+            if (!_.isNil(when.online)) stop('')
             this._stream.watchedTime = 0
             global.cache.when({ offline: moment().format() })
             global.events.fire('stream-stopped')
@@ -1077,7 +1078,7 @@ class API {
         this.calls.bot.refresh = e.response.headers['ratelimit-reset']
       }
 
-      global.log.error(`${url} - ${e.message}`)
+      error(`${url} - ${e.message}`)
       if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getCurrentStreamData', api: 'helix', endpoint: url, code: e.response.status, data: e.stack, remaining: this.calls.bot.remaining })
       return { state: false, opts }
     }
@@ -1178,7 +1179,7 @@ class API {
       }
       if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'setTags', api: 'helix', endpoint: url, code: request.status, data: request.data })
     } catch (e) {
-      global.log.error(`API: ${url} - ${e.message}`)
+      error(`API: ${url} - ${e.message}`)
       if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'setTags', api: 'helix', endpoint: url, code: _.get(e, 'response.status', '500'), data: e.stack })
       return false
     }
@@ -1230,7 +1231,7 @@ class API {
       })
       if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'setTitleAndGame', api: 'kraken', endpoint: url, code: request.status })
     } catch (e) {
-      global.log.error(`API: ${url} - ${e.message}`)
+      error(`API: ${url} - ${e.message}`)
       if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'setTitleAndGame', api: 'kraken', endpoint: url, code: e.response.status, data: e.stack })
       return false
     }
@@ -1283,7 +1284,7 @@ class API {
       })
       if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'sendGameFromTwitch', api: 'kraken', endpoint: url, code: request.status })
     } catch (e) {
-      global.log.error(`API: ${url} - ${e.stack}`)
+      error(`API: ${url} - ${e.stack}`)
       if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'sendGameFromTwitch', api: 'kraken', endpoint: url, code: e.response.status, data: e.stack })
       return
     }
@@ -1350,7 +1351,7 @@ class API {
         this.calls.bot.refresh = e.response.headers['ratelimit-reset']
       }
 
-      global.log.error(`API: ${url} - ${e.stack}`)
+      error(`API: ${url} - ${e.stack}`)
       if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'checkClips', api: 'helix', endpoint: url, code: e.response.status, data: e.stack })
     }
     return { state: true }
@@ -1411,7 +1412,7 @@ class API {
         this.calls.bot.refresh = e.response.headers['ratelimit-reset']
       }
 
-      global.log.error(`API: ${url} - ${e.stack}`)
+      error(`API: ${url} - ${e.stack}`)
       if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'createClip', api: 'helix', endpoint: url, code: e.response.status, data: e.stack })
       return
     }
@@ -1448,7 +1449,7 @@ class API {
       }
 
       if (logError) {
-        global.log.error(`API: ${url} - ${e.stack}`)
+        error(`API: ${url} - ${e.stack}`)
         if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'fetchAccountAge', api: 'kraken', endpoint: url, code: e.response.status, data: e.stack })
       }
       return
@@ -1502,7 +1503,7 @@ class API {
         this.calls.bot.refresh = e.response.headers['ratelimit-reset']
       }
 
-      global.log.error(`API: ${url} - ${e.stack}`)
+      error(`API: ${url} - ${e.stack}`)
       if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'isFollowerUpdate', api: 'helix', endpoint: url, code: e.response.status, data: e.stack, remaining: this.calls.bot.remaining })
       return null
     }
@@ -1511,7 +1512,7 @@ class API {
       // not a follower
       // if was follower, fire unfollow event
       if (user.is.follower) {
-        global.log.unfollow(user.username)
+        unfollow(user.username)
         global.events.fire('unfollow', { username: user.username })
       }
       const followedAt = user.lock && user.lock.followed_at ? Number(user.time.follow) : 0
@@ -1525,7 +1526,7 @@ class API {
           type: 'follow',
           username: user.username
         })
-        global.log.follow(user.username)
+        follow(user.username)
         global.events.fire('follow', { username: user.username })
         global.registries.alerts.trigger({
           event: 'follows',
@@ -1594,7 +1595,7 @@ class API {
       if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'createMarker', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining, data: request.data })
     } catch (e) {
       if (e.errno === 'ECONNRESET' || e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT') return this.createMarker()
-      global.log.error(`API: Marker was not created - ${e.message}`)
+      error(`API: Marker was not created - ${e.message}`)
       if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'createMarker', api: 'helix', endpoint: url, code: e.response.status, data: e.stack, remaining: this.calls.bot.remaining })
     }
   }
@@ -1616,7 +1617,7 @@ class API {
       global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'getClipById', api: 'kraken', endpoint: url, code: request.status, remaining: this.remainingAPICalls })
       return request.data
     } catch (e) {
-      global.log.error(`${url} - ${e.message}`)
+      error(`${url} - ${e.message}`)
       global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getClipById', api: 'kraken', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.statusText)}`, remaining: this.remainingAPICalls })
       return null
     }
@@ -1666,7 +1667,7 @@ class API {
       }
       return request.data.data
     } catch (e) {
-      global.log.error(`API: ${url} - ${e.stack}`)
+      error(`API: ${url} - ${e.stack}`)
       if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getTopClips', api: 'helix', endpoint: url, code: e.response.status, data: e.stack })
     }
   }

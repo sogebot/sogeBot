@@ -5,9 +5,10 @@ import 'moment-precise-range-plugin';
 import { join, normalize } from 'path';
 import { isMainThread } from 'worker_threads';
 
-import { debug, isEnabled as debugIsEnabled } from './debug';
+import { chatOut, debug, isDebugEnabled as debugIsEnabled, whisperOut } from './helpers/log';
 import Message from './message';
 import { globalIgnoreList } from './data/globalIgnoreList';
+import { error } from './helpers/log';
 
 export async function autoLoad(directory): Promise<{ [x: string]: any }> {
   const directoryListing = readdirSync(directory);
@@ -142,10 +143,10 @@ export async function sendMessage(messageToSend: string | Promise<string>, sende
         return true;
       }
       if (sender['message-type'] === 'whisper') {
-        global.log.whisperOut(messageToSend, { username: sender.username });
+        whisperOut(`${messageToSend} [${sender.username}]`);
         message('whisper', sender.username, messageToSend);
       } else {
-        global.log.chatOut(messageToSend, { username: sender.username });
+        chatOut(`${messageToSend} [${sender.username}]`);
         if (global.tmi.sendWithMe && !messageToSend.startsWith('/')) {
           message('me', null, messageToSend);
         } else {
@@ -170,7 +171,7 @@ export async function message(type, username, messageToSend, retry = true) {
         username = await global.oauth.generalChannel;
       }
       if (username === '') {
-        global.log.error('TMI: channel is not defined, message cannot be sent');
+        error('TMI: channel is not defined, message cannot be sent');
       } else {
         global.tmi.client.bot.chat[type](username, messageToSend);
       }
@@ -178,7 +179,7 @@ export async function message(type, username, messageToSend, retry = true) {
       if (retry) {
         setTimeout(() => message(type, username, messageToSend, false), 5000);
       } else {
-        global.log.error(e);
+        error(e);
       }
     }
   }
@@ -277,7 +278,7 @@ export async function isModerator(user): Promise<boolean> {
       return false;
     }
   } catch (e) {
-    global.log.error(e.stack);
+    error(e.stack);
     return false;
   }
 }

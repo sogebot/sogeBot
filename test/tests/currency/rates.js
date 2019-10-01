@@ -1,16 +1,18 @@
 /* global describe it before */
 const {
-  isMainThread
+  isMainThread,
 } = require('worker_threads');
-if (!isMainThread) process.exit()
+if (!isMainThread) {
+  process.exit();
+}
 
 
-require('../../general.js')
+require('../../general.js');
 
-const assert = require('chai').assert
+const assert = require('chai').assert;
 
 describe('Currency - rates check', () => {
-  let rates = {
+  const rates = {
     AUD: '16.065',
     BRL: '5.893',
     BGN: '13.206',
@@ -43,29 +45,29 @@ describe('Currency - rates check', () => {
     THB: '0.735',
     TRY: '3.925',
     USD: '23.093',
-    GBP: '29.147'
-  }
+    GBP: '29.147',
+  };
 
   before(async () => {
     global.currency.rates = rates;
-  })
+  });
 
   describe('rates should be correctly calculated between each other', () => {
-    for (let base of Object.keys(rates)) {
+    for (const base of Object.keys(rates)) {
       before(() => {
-        global.currency.base = base
-      })
+        global.currency.base = base;
+      });
       it(`Checking if all rates are correctly computed with '${base}' as base`, async () => {
-        for (let to of Object.keys(rates)) {
-          for (let from of Object.keys(rates)) {
+        for (const to of Object.keys(rates)) {
+          for (const from of Object.keys(rates)) {
             if (from === to) {
-              assert.strictEqual(global.currency.exchange(1, from, to), 1)
+              assert.strictEqual(global.currency.exchange(1, from, to), 1);
             } else {
-              assert.notEqual(global.currency.exchange(1, from, to), 1)
+              assert.notEqual(global.currency.exchange(1, from, to), 1);
             }
           }
         }
-      })
+      });
     }
-  })
-})
+  });
+});

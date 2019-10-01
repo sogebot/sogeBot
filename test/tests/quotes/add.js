@@ -1,18 +1,20 @@
 /* global describe it before */
 const {
-  isMainThread
+  isMainThread,
 } = require('worker_threads');
-if (!isMainThread) process.exit()
+if (!isMainThread) {
+  process.exit();
+}
 
 
-require('../../general.js')
+require('../../general.js');
 
-const db = require('../../general.js').db
-const assert = require('chai').assert
-const message = require('../../general.js').message
+const db = require('../../general.js').db;
+const assert = require('chai').assert;
+const message = require('../../general.js').message;
 
 // users
-const owner = { username: 'soge__' }
+const owner = { username: 'soge__' };
 
 const tests = [
   { sender: owner, parameters: '', shouldFail: true },
@@ -25,39 +27,39 @@ const tests = [
   { sender: owner, parameters: '-quote Lorem Ipsum Dolor', quote: 'Lorem Ipsum Dolor', tags: 'general', shouldFail: false },
   { sender: owner, parameters: '-quote Lorem Ipsum Dolor -tags lorem', quote: 'Lorem Ipsum Dolor', tags: 'lorem', shouldFail: false },
   { sender: owner, parameters: '-quote Lorem Ipsum Dolor -tags lorem ipsum', quote: 'Lorem Ipsum Dolor', tags: 'lorem ipsum', shouldFail: false },
-  { sender: owner, parameters: ' -tags lorem ipsum, dolor sit -quote Lorem Ipsum Dolor', quote: 'Lorem Ipsum Dolor', tags: 'lorem ipsum, dolor sit', shouldFail: false }
-]
+  { sender: owner, parameters: ' -tags lorem ipsum, dolor sit -quote Lorem Ipsum Dolor', quote: 'Lorem Ipsum Dolor', tags: 'lorem ipsum, dolor sit', shouldFail: false },
+];
 
 describe('Quotes - add()', () => {
-  for (let test of tests) {
+  for (const test of tests) {
     describe(test.parameters, async () => {
       let id = null;
       before(async () => {
-        await db.cleanup()
-        await message.prepare()
-      })
+        await db.cleanup();
+        await message.prepare();
+      });
 
       it('Run !quote add', async () => {
-        const quote = await global.systems.quotes.add({ sender: test.sender, parameters: test.parameters, command: '!quote add' })
+        const quote = await global.systems.quotes.add({ sender: test.sender, parameters: test.parameters, command: '!quote add' });
         id = quote.id;
-      })
+      });
       if (test.shouldFail) {
         it('Should throw error', async () => {
-          await message.isSent('systems.quotes.add.error', owner, { command: '!quote add' })
-        })
+          await message.isSent('systems.quotes.add.error', owner, { command: '!quote add' });
+        });
         it('Database should be empty', async () => {
-          let items = await global.db.engine.find('systems.quotes')
-          assert.isEmpty(items)
-        })
+          const items = await global.db.engine.find('systems.quotes');
+          assert.isEmpty(items);
+        });
       } else {
         it('Should sent success message', async () => {
-          await message.isSent('systems.quotes.add.ok', owner, { tags: test.tags, quote: test.quote, id })
-        })
+          await message.isSent('systems.quotes.add.ok', owner, { tags: test.tags, quote: test.quote, id });
+        });
         it('Database should contain new quote', async () => {
-          let items = await global.db.engine.find('systems.quotes')
-          assert.isNotEmpty(items)
-        })
+          const items = await global.db.engine.find('systems.quotes');
+          assert.isNotEmpty(items);
+        });
       }
-    })
+    });
   }
-})
+});

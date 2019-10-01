@@ -2,7 +2,7 @@ import { isMainThread } from 'worker_threads';
 
 import { getBotSender, getLocalizedName, getOwner, prepare, round5, sendMessage } from '../commons';
 import constants from '../constants';
-import { debug } from '../debug';
+import { debug } from '../helpers/log';
 import { command, default_permission, settings, shared } from '../decorators';
 import Expects from '../expects.js';
 import { permission } from '../permissions';

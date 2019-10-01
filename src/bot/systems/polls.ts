@@ -8,6 +8,7 @@ import Expects from '../expects.js';
 import { permission } from '../permissions';
 import System from './_interface';
 import uuid from 'uuid';
+import { warning } from '../helpers/log.js';
 
 enum ERROR {
   NOT_ENOUGH_OPTIONS,
@@ -212,7 +213,7 @@ class Polls extends System {
           }
           break;
         default:
-          global.log.warning(e.stack);
+          warning(e.stack);
           sendMessage(global.translate('core.error'), opts.sender, opts.attr);
       }
       return false;

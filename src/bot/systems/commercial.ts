@@ -7,6 +7,7 @@ import { permission } from '../permissions';
 import { command, default_permission, helper } from '../decorators';
 import System from './_interface';
 import { getOwner, sendMessage } from '../commons';
+import { error } from '../helpers/log';
 
 /*
  * !commercial                        - gets an info about alias usage
@@ -85,7 +86,7 @@ class Commercial extends System {
           sendMessage(commercial.message, opts.sender, opts.attr);
         }
       } catch (e) {
-        global.log.error(`API: ${url} - ${e.status} ${_.get(e, 'body.message', e.statusText)}`);
+        error(`API: ${url} - ${e.status} ${_.get(e, 'body.message', e.statusText)}`);
         global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'commercial', api: 'kraken', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.statusText)}` });
       }
     } else {
