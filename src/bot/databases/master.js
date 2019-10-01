@@ -1,6 +1,6 @@
 const _ = require('lodash')
 const crypto = require('crypto')
-import { debug } from '../debug';
+import { debug } from '../helpers/log';
 const {
   isMainThread
 } = require('worker_threads');

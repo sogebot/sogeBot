@@ -3,14 +3,13 @@
 import * as _ from 'lodash';
 import { isMainThread } from 'worker_threads';
 
-import debug from '../debug';
 import { isBot, prepare, sendMessage } from '../commons';
 import { command, default_permission, parser, permission_settings, settings } from '../decorators';
 import Expects from '../expects';
 import { permission } from '../permissions';
 import System from './_interface';
 import * as constants from '../constants';
-import { error } from '../helpers/log';
+import { debug, error } from '../helpers/log';
 
 class Points extends System {
   @settings('points')

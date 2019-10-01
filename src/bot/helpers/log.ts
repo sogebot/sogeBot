@@ -1,6 +1,6 @@
 import fs from 'fs';
 import moment from 'moment-timezone';
-import * as configfile from '../../config.json';
+import * as configfile from '../../../config.json';
 import os from 'os';
 import util from 'util';
 import { parse } from 'path';
@@ -118,65 +118,65 @@ export function debug(category: string, message: string | object) {
   }
 }
 export function error(message: string | object) {
-  log(message); 
+  log(message);
 }
 export function chatIn(message: string | object) {
-  log(message); 
+  log(message);
 }
 export function chatOut(message: string | object) {
-  log(message); 
+  log(message);
 }
 export function whisperIn(message: string | object) {
-  log(message); 
+  log(message);
 }
 export function whisperOut(message: string | object) {
-  log(message); 
+  log(message);
 }
 export function info(message: string | object) {
-  log(message); 
+  log(message);
 }
 export function warning(message: string | object) {
-  log(message); 
+  log(message);
 }
 export function timeout(message: string | object) {
-  log(message); 
+  log(message);
 }
 export function ban(message: string | object) {
-  log(message); 
+  log(message);
 }
 export function follow(message: string | object) {
-  log(message); 
+  log(message);
 }
 export function host(message: string | object) {
-  log(message); 
+  log(message);
 }
 export function raid(message: string | object) {
-  log(message); 
+  log(message);
 }
 export function unfollow(message: string | object) {
-  log(message); 
+  log(message);
 }
 export function cheer(message: string | object) {
-  log(message); 
+  log(message);
 }
 export function tip(message: string | object) {
-  log(message); 
+  log(message);
 }
 export function sub(message: string | object) {
-  log(message); 
+  log(message);
 }
 export function subgift(message: string | object) {
-  log(message); 
+  log(message);
 }
 export function subcommunitygift(message: string | object) {
-  log(message); 
+  log(message);
 }
 export function resub(message: string | object) {
-  log(message); 
+  log(message);
 }
 export function start(message: string | object) {
-  log(message); 
+  log(message);
 }
 export function stop(message: string | object) {
-  log(message); 
+  log(message);
 }

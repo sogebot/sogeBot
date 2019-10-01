@@ -2,11 +2,10 @@ import _ from 'lodash';
 import moment from 'moment';
 
 import { dateDiff, getLocalizedName, prepare, sendMessage } from '../commons';
-import { debug } from '../debug';
 import { command, settings, ui } from '../decorators';
 import { onMessage } from '../decorators/on';
 import System from './_interface';
-import { error } from '../helpers/log';
+import { debug, error } from '../helpers/log';
 
 /*
  * !me

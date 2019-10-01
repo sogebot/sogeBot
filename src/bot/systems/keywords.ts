@@ -7,9 +7,8 @@ import { permission } from '../permissions';
 import System from './_interface';
 import { isUUID, prepare, sendMessage } from '../commons';
 import { isMainThread } from 'worker_threads';
-import debug from '../debug';
 import XRegExp from 'xregexp';
-import { error } from '../helpers/log';
+import { debug, error } from '../helpers/log';
 
 
 export interface KeywordInterface {
