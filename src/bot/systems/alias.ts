@@ -11,7 +11,7 @@ import { permission } from '../permissions';
 import System from './_interface';
 import { incrementCountOfCommandUsage } from '../helpers/commands/count';
 import { isMainThread } from 'worker_threads';
-import { warning, debug } from '../helpers/log';
+import { debug, warning } from '../helpers/log';
 
 
 /*
