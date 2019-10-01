@@ -119,7 +119,7 @@ if (isMainThread) {
     error('+------------------------------------------------------------------------------+')
     error('| BOT HAS UNEXPECTEDLY CRASHED                                                 |')
     error('| PLEASE CHECK https://github.com/sogehige/SogeBot/wiki/How-to-report-an-issue |')
-    error('| AND ADD logs/exceptions.log file to your report                              |')
+    error('| AND ADD logs/sogebot.log file to your report                                 |')
     error('+------------------------------------------------------------------------------+')
     process.exit(1)
   })
