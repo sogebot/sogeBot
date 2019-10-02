@@ -3,8 +3,8 @@ import moment from 'moment-timezone';
 import * as configfile from '@config';
 import os from 'os';
 import util from 'util';
-import { parse } from 'path';
 import stripAnsi from 'strip-ansi';
+import { getFunctionNameFromStackTrace } from './stacktrace';
 
 const config: any = configfile;
 
@@ -66,16 +66,6 @@ const levelFormat = {
   stop: '== STREAM STOPPED',
 };
 
-function getNameFromStackTrace() {
-  const _prepareStackTrace = Error.prepareStackTrace;
-  Error.prepareStackTrace = (_s, s) => s;
-  const stack = (new Error().stack as unknown as NodeJS.CallSite[]);
-  Error.prepareStackTrace = _prepareStackTrace;
-  const path = parse(stack[2].getFunctionName() || '');
-  const name = path.name;
-  return name;
-}
-
 
 function format(level: Levels, message: string | object, category?: string) {
   const timestamp = moment().tz(config.timezone).format('YYYY-MM-DD[T]HH:mm:ss.SSS');
@@ -98,7 +88,7 @@ export function isDebugEnabled(category: string) {
 }
 
 function log(message: string | object) {
-  const level = getNameFromStackTrace();
+  const level = getFunctionNameFromStackTrace();
   if (Levels[level] <= Levels[logLevel]) {
     const formattedMessage = format(Levels[level], message);
     console.log(formattedMessage);

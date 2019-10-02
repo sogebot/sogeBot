@@ -17,7 +17,9 @@ import Core from './_interface'
 const constants = require('./constants')
 import { settings, ui } from './decorators';
 import { globalIgnoreList } from './data/globalIgnoreList';
-import { error, info, ban, host, raid, sub, resub, subcommunitygift, subgift, cheer, whisperIn, chatIn } from './helpers/log';
+import { ban, chatIn, cheer, error, host, info, raid, resub, sub, subcommunitygift, subgift, whisperIn } from './helpers/log';
+import { triggerInterfaceOnBit, triggerInterfaceOnMessage, triggerInterfaceOnSub } from './helpers/interface/triggers';
+
 
 const __DEBUG__ =
   (process.env.DEBUG && process.env.DEBUG.includes('tmi.client'));
@@ -280,28 +282,11 @@ class TMI extends Core {
             message.message = message.message.replace('\u0001ACTION ', '').replace('\u0001', '')
             global.tmi.message({message})
             global.linesParsed++
-
-            // go through all systems and trigger on.message
-            for (let [type, systems] of Object.entries({
-              systems: global.systems,
-              games: global.games,
-              overlays: global.overlays,
-              widgets: global.widgets,
-              integrations: global.integrations
-            })) {
-              for (let [name, system] of Object.entries(systems)) {
-                if (name.startsWith('_') || typeof system.on === 'undefined') continue
-                if (Array.isArray(system.on.message)) {
-                  for (const fnc of system.on.message) {
-                    system[fnc]({
-                      sender: message.tags,
-                      message: message.message,
-                      timestamp: _.now()
-                    })
-                  }
-                }
-              }
-            }
+            triggerInterfaceOnMessage({
+              sender: message.tags,
+              message: message.message,
+              timestamp: _.now()
+            })
 
             if (message.tags['message-type'] === 'action') global.events.fire('action', { username: message.tags.username.toLowerCase() })
           }
@@ -466,27 +451,11 @@ class TMI extends Core {
         autohost: false,
       });
 
-      // go through all systems and trigger on.sub
-      for (let [type, systems] of Object.entries({
-        systems: global.systems,
-        games: global.games,
-        overlays: global.overlays,
-        widgets: global.widgets,
-        integrations: global.integrations
-      })) {
-        for (let [name, system] of Object.entries(systems)) {
-          if (name.startsWith('_') || typeof system.on === 'undefined') continue
-          if (Array.isArray(system.on.sub)) {
-            for (const fnc of system.on.sub) {
-              system[fnc]({
-                username: username,
-                userId: userstate.userId,
-                subCumulativeMonths
-              });
-            }
-          }
-        }
-      }
+      triggerInterfaceOnSub({
+        username: username,
+        userId: userstate.userId,
+        subCumulativeMonths,
+      });
     } catch (e) {
       error('Error parsing subscription event')
       error(util.inspect(message))
@@ -613,24 +582,10 @@ class TMI extends Core {
         this.ignoreGiftsFromUser[username].count--
       } else {
         global.events.fire('subgift', { username: username, recipient: recipient, tier })
-        // go through all systems and trigger on.sub
-        for (let [type, systems] of Object.entries({
-          systems: global.systems,
-          games: global.games,
-          overlays: global.overlays,
-          widgets: global.widgets,
-          integrations: global.integrations
-        })) {
-          for (let [name, system] of Object.entries(systems)) {
-            if (name.startsWith('_') || typeof system.on === 'undefined') continue
-            if (typeof system.on.sub === 'function') {
-              system.on.sub({
-                username: recipient,
-                userId: recipientId,
-              })
-            }
-          }
-        }
+        triggerInterfaceOnSub({
+          username: recipient,
+          userId: recipientId,
+        });
       }
       if (await commons.isIgnored({username, userId: userstate.userId})) return
 
@@ -687,28 +642,12 @@ class TMI extends Core {
       });
       if (await global.cache.isOnline()) await global.db.engine.increment('api.current', { key: 'bits' }, { value: parseInt(userstate.bits, 10) })
 
-      // go through all systems and trigger on.bit
-      for (let [type, systems] of Object.entries({
-        systems: global.systems,
-        games: global.games,
-        overlays: global.overlays,
-        widgets: global.widgets,
-        integrations: global.integrations
-      })) {
-        for (let [name, system] of Object.entries(systems)) {
-          if (name.startsWith('_') || typeof system.on === 'undefined') continue
-          if (Array.isArray(system.on.bit)) {
-            for (const fnc of system.on.bit) {
-              system[fnc]({
-                username: username,
-                amount: userstate.bits,
-                message: messageFromUser,
-                timestamp: _.now()
-              });
-            }
-          }
-        }
-      }
+      triggerInterfaceOnBit({
+        username: username,
+        amount: userstate.bits,
+        message: messageFromUser,
+        timestamp: _.now()
+      });
     } catch (e) {
       error('Error parsing cheer event')
       error(util.inspect(message))

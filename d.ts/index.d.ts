@@ -48,9 +48,9 @@ declare namespace NodeJS {
     };
     integrations: {
       donationalerts: import('../src/bot/integrations/donationalerts').Donationalerts;
-      phillipshue: import('../src/bot/integrations/phillipshue').PhillipsHue;
+      phillipshue: import('../src/bot/integrations/phillipsHue').PhillipsHue;
       spotify: import('../src/bot/integrations/spotify').Spotify;
-      responsivevoice: import('../src/bot/integrations/responsivevoice').ResponsiveVoice;
+      responsivevoice: import('../src/bot/integrations/responsiveVoice').ResponsiveVoice;
       streamlabs: import('../src/bot/integrations/streamlabs').Streamlabs;
       twitter: import('../src/bot/integrations/twitter').Twitter;
     };
@@ -158,37 +158,37 @@ interface Parser {
   dependsOn?: string[];
 }
 
-interface onEventSub {
+type onEventSub = {
   username: string;
   userId: string;
   subCumulativeMonths: number;
-}
+};
 
-interface onEventFollow {
+type onEventFollow = {
   username: string;
   userId: string;
-}
+};
 
-interface onEventTip {
+type onEventTip = {
   username: string;
   amount: number;
   message: string;
   currency: string;
   timestamp: number;
-}
+};
 
-interface onEventBit {
+type onEventBit = {
   username: string;
   amount: number;
   message: string;
   timestamp: number;
-}
+};
 
-interface onEventMessage {
+type onEventMessage = {
   sender: Sender | null;
   message: string;
   timestamp: number;
-}
+};
 
 declare namespace InterfaceSettings {
   interface Settings<C> {
@@ -200,7 +200,7 @@ declare namespace InterfaceSettings {
   interface On {
     startup?: string[];
     message?: (message: onEventMessage) => void;
-    sub?: (syb: onEventSub) => void;
+    sub?: (sub: onEventSub) => void;
     follow?: (follow: onEventFollow) => void;
     tip?: (tip: onEventTip) => void;
     bit?: (bit: onEventBit) => void;

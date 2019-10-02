@@ -5,6 +5,7 @@ const util = require('util');
 const { isBot } = require('./commons');
 
 import { debug, warning, error, info, follow } from './helpers/log';
+import { triggerInterfaceOnFollow } from './helpers/interface/triggers';
 
 class Webhooks {
   constructor () {
@@ -232,26 +233,10 @@ class Webhooks {
             autohost: false,
           })
 
-          // go through all systems and trigger on.follow
-          for (let [type, systems] of Object.entries({
-            systems: global.systems,
-            games: global.games,
-            overlays: global.overlays,
-            widgets: global.widgets,
-            integrations: global.integrations
-          })) {
-            for (let [name, system] of Object.entries(systems)) {
-              if (name.startsWith('_') || typeof system.on === 'undefined') continue
-              if (Array.isArray(system.on.follow)) {
-                for (const fnc of system.on.follow) {
-                  system[fnc]({
-                    username: data.from_name,
-                    userId: data.from_id,
-                  });
-                }
-              }
-            }
-          }
+          triggerInterfaceOnFollow({
+            username: data.from_name,
+            userId: data.from_id,
+          });
         }
       }
 

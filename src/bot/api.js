@@ -16,6 +16,8 @@ const {
   getBroadcaster, getChannel, isIgnored, isBroadcaster, isBot, sendMessage
 } = require('./commons')
 
+import { triggerInterfaceOnFollow } from './helpers/interface/triggers';
+
 const __DEBUG__ = {
   STREAM: (process.env.DEBUG && process.env.DEBUG.includes('api.stream')),
   CALLS: (process.env.DEBUG && process.env.DEBUG.includes('api.calls')),
@@ -762,24 +764,10 @@ class API {
                     autohost: false,
                   })
 
-                  // go through all systems and trigger on.follow
-                  for (let [type, systems] of Object.entries({
-                    systems: global.systems,
-                    games: global.games,
-                    overlays: global.overlays,
-                    widgets: global.widgets,
-                    integrations: global.integrations
-                  })) {
-                    for (let [name, system] of Object.entries(systems)) {
-                      if (name.startsWith('_') || typeof system.on === 'undefined') continue
-                      if (typeof system.on.follow === 'function') {
-                        system.on.follow({
-                          username: user.username,
-                          userId: f.from_id,
-                        })
-                      }
-                    }
-                  }
+                  triggerInterfaceOnFollow({
+                    username: user.username,
+                    userId: f.from_id,
+                  });
                 }
               }
             }
@@ -1538,24 +1526,10 @@ class API {
           autohost: false,
         })
 
-        // go through all systems and trigger on.follow
-        for (let [type, systems] of Object.entries({
-          systems: global.systems,
-          games: global.games,
-          overlays: global.overlays,
-          widgets: global.widgets,
-          integrations: global.integrations
-        })) {
-          for (let [name, system] of Object.entries(systems)) {
-            if (name.startsWith('_') || typeof system.on === 'undefined') continue
-            if (typeof system.on.follow === 'function') {
-              system.on.follow({
-                username: user.username,
-                userId: id,
-              })
-            }
-          }
-        }
+        triggerInterfaceOnFollow({
+          username: user.username,
+          userId: id,
+        });
       }
       const followedAt = user.lock && user.lock.followed_at ? Number(user.time.follow) : parseInt(moment(request.data.data[0].followed_at).format('x'), 10)
       const isFollower = user.lock && user.lock.follower ? user.is.follower : true
