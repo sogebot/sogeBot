@@ -1,37 +1,44 @@
-export function triggerMessage(message: onEventMessage) {
-  console.log({message})
+import { getFunctionNameFromStackTrace } from '../stacktrace';
+import { debug } from '../log';
+
+export function triggerInterfaceOnMessage(opts: onEventMessage) {
+  trigger(opts);
 }
 
-export function triggerSub(opts: onEventSub) {
-  console.log({opts})
-
+export function triggerInterfaceOnSub(opts: onEventSub) {
+  trigger(opts);
 }
 
-export function triggerTip(opts: onEventTip) {
-  console.log({opts})
+export function triggerInterfaceOnFollow(opts: onEventTip) {
+  trigger(opts);
+}
+
+export function triggerInterfaceOnTip(opts: onEventTip) {
+  trigger(opts);
+}
+
+export function triggerInterfaceOnBit(opts: onEventTip) {
+  trigger(opts);
 }
 
 function trigger(opts: onEventMessage | onEventSub | onEventBit | onEventTip | onEventFollow) {
-  for (const systems of [
-    ...global.systems, ...global.games, ...global.overlays, ...global.widgets, ...global.integrations
-  ])
-  for (let [type, systems] of Object.entries({
-    systems: global.systems,
-    games: global.games,
-    overlays: global.overlays,
-    widgets: global.widgets,
-    integrations: global.integrations
-  })) {
-    for (let [name, system] of Object.entries(systems)) {
-      if (name.startsWith('_') || typeof system.on === 'undefined') continue
-      if (Array.isArray(system.on.message)) {
-        for (const fnc of system.on.message) {
-          system[fnc]({
-            sender: message.tags,
-            message: message.message,
-            timestamp: _.now()
-          })
-        }
+  const on_trigger = getFunctionNameFromStackTrace().replace('triggerInterfaceOn', '').toLowerCase();
+  debug('trigger', `event ${on_trigger}`);
+  for (const system of [
+    ...Object.values(global.systems),
+    ...Object.values(global.games),
+    ...Object.values(global.overlays),
+    ...Object.values(global.widgets),
+    ...Object.values(global.integrations),
+    ...Object.values(global.registries),
+  ]) {
+    if (system.constructor.name.startsWith('_') || typeof system.on === 'undefined') {
+      continue;
+    }
+    if (Array.isArray(system.on[on_trigger])) {
+      for (const fnc of system.on[on_trigger]) {
+        debug('trigger', `event ${on_trigger} => ${system.constructor.name}`);
+        system[fnc](opts);
       }
     }
   }

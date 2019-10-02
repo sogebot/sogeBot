@@ -18,7 +18,7 @@ const constants = require('./constants')
 import { settings, ui } from './decorators';
 import { globalIgnoreList } from './data/globalIgnoreList';
 import { ban, chatIn, cheer, error, host, info, raid, resub, sub, subcommunitygift, subgift, whisperIn } from './helpers/log';
-import { triggerMessage } from './helpers/interface/triggers';
+import { triggerInterfaceOnBit, triggerInterfaceOnMessage, triggerInterfaceOnSub } from './helpers/interface/triggers';
 
 
 const __DEBUG__ =
@@ -282,7 +282,7 @@ class TMI extends Core {
             message.message = message.message.replace('\u0001ACTION ', '').replace('\u0001', '')
             global.tmi.message({message})
             global.linesParsed++
-            triggerMessage({
+            triggerInterfaceOnMessage({
               sender: message.tags,
               message: message.message,
               timestamp: _.now()
@@ -451,27 +451,11 @@ class TMI extends Core {
         autohost: false,
       });
 
-      // go through all systems and trigger on.sub
-      for (let [type, systems] of Object.entries({
-        systems: global.systems,
-        games: global.games,
-        overlays: global.overlays,
-        widgets: global.widgets,
-        integrations: global.integrations
-      })) {
-        for (let [name, system] of Object.entries(systems)) {
-          if (name.startsWith('_') || typeof system.on === 'undefined') continue
-          if (Array.isArray(system.on.sub)) {
-            for (const fnc of system.on.sub) {
-              system[fnc]({
-                username: username,
-                userId: userstate.userId,
-                subCumulativeMonths
-              });
-            }
-          }
-        }
-      }
+      triggerInterfaceOnSub({
+        username: username,
+        userId: userstate.userId,
+        subCumulativeMonths,
+      });
     } catch (e) {
       error('Error parsing subscription event')
       error(util.inspect(message))
@@ -598,24 +582,10 @@ class TMI extends Core {
         this.ignoreGiftsFromUser[username].count--
       } else {
         global.events.fire('subgift', { username: username, recipient: recipient, tier })
-        // go through all systems and trigger on.sub
-        for (let [type, systems] of Object.entries({
-          systems: global.systems,
-          games: global.games,
-          overlays: global.overlays,
-          widgets: global.widgets,
-          integrations: global.integrations
-        })) {
-          for (let [name, system] of Object.entries(systems)) {
-            if (name.startsWith('_') || typeof system.on === 'undefined') continue
-            if (typeof system.on.sub === 'function') {
-              system.on.sub({
-                username: recipient,
-                userId: recipientId,
-              })
-            }
-          }
-        }
+        triggerInterfaceOnSub({
+          username: recipient,
+          userId: recipientId,
+        });
       }
       if (await commons.isIgnored({username, userId: userstate.userId})) return
 
@@ -672,28 +642,12 @@ class TMI extends Core {
       });
       if (await global.cache.isOnline()) await global.db.engine.increment('api.current', { key: 'bits' }, { value: parseInt(userstate.bits, 10) })
 
-      // go through all systems and trigger on.bit
-      for (let [type, systems] of Object.entries({
-        systems: global.systems,
-        games: global.games,
-        overlays: global.overlays,
-        widgets: global.widgets,
-        integrations: global.integrations
-      })) {
-        for (let [name, system] of Object.entries(systems)) {
-          if (name.startsWith('_') || typeof system.on === 'undefined') continue
-          if (Array.isArray(system.on.bit)) {
-            for (const fnc of system.on.bit) {
-              system[fnc]({
-                username: username,
-                amount: userstate.bits,
-                message: messageFromUser,
-                timestamp: _.now()
-              });
-            }
-          }
-        }
-      }
+      triggerInterfaceOnBit({
+        username: username,
+        amount: userstate.bits,
+        message: messageFromUser,
+        timestamp: _.now()
+      });
     } catch (e) {
       error('Error parsing cheer event')
       error(util.inspect(message))

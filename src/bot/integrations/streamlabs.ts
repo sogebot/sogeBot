@@ -6,6 +6,7 @@ import Integration from './_interface';
 import { settings, ui } from '../decorators';
 import { onChange, onStartup } from '../decorators/on';
 import { info, tip } from '../helpers/log';
+import { triggerInterfaceOnTip } from '../helpers/interface/triggers';
 
 class Streamlabs extends Integration {
   socket: SocketIOClient.Socket | null = null;
@@ -100,31 +101,13 @@ class Streamlabs extends Integration {
           autohost: false,
         });
 
-        // go through all systems and trigger on.tip
-        for (const [, systems] of Object.entries({
-          systems: global.systems,
-          games: global.games,
-          overlays: global.overlays,
-          widgets: global.widgets,
-          integrations: global.integrations,
-        })) {
-          for (const [name, system] of Object.entries(systems)) {
-            if (name.startsWith('_') || typeof system.on === 'undefined') {
-              continue;
-            }
-            if (Array.isArray(system.on.tip)) {
-              for (const fnc of system.on.tip) {
-                system[fnc]({
-                  username: event.from.toLowerCase(),
-                  amount: event.amount,
-                  message: event.message,
-                  currency: event.currency,
-                  timestamp: _.now(),
-                });
-              }
-            }
-          }
-        }
+        triggerInterfaceOnTip({
+          username: event.from.toLowerCase(),
+          amount: event.amount,
+          message: event.message,
+          currency: event.currency,
+          timestamp: _.now(),
+        });
       }
     }
   }

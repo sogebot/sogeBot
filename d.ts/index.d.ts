@@ -158,18 +158,18 @@ interface Parser {
   dependsOn?: string[];
 }
 
-export type onEventSub = {
+type onEventSub = {
   username: string;
   userId: string;
   subCumulativeMonths: number;
 };
 
-export type onEventFollow = {
+type onEventFollow = {
   username: string;
   userId: string;
 };
 
-export type onEventTip = {
+type onEventTip = {
   username: string;
   amount: number;
   message: string;
@@ -177,14 +177,14 @@ export type onEventTip = {
   timestamp: number;
 };
 
-export type onEventBit = {
+type onEventBit = {
   username: string;
   amount: number;
   message: string;
   timestamp: number;
 };
 
-export type onEventMessage = {
+type onEventMessage = {
   sender: Sender | null;
   message: string;
   timestamp: number;

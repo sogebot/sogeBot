@@ -8,6 +8,7 @@ import { onChange, onStartup } from '../decorators/on.js';
 import { settings } from '../decorators';
 import { ui } from '../decorators.js';
 import { info, tip } from '../helpers/log.js';
+import { triggerInterfaceOnTip } from '../helpers/interface/triggers.js';
 
 class Donationalerts extends Integration {
   socket: SocketIOClient.Socket | null = null;
@@ -119,31 +120,13 @@ class Donationalerts extends Integration {
           }
         }
 
-        // go through all systems and trigger on.tip
-        for (const [, systems] of Object.entries({
-          systems: global.systems,
-          games: global.games,
-          overlays: global.overlays,
-          widgets: global.widgets,
-          integrations: global.integrations,
-        })) {
-          for (const [name, system] of Object.entries(systems)) {
-            if (name.startsWith('_') || typeof system.on === 'undefined') {
-              continue;
-            }
-            if (Array.isArray(system.on.tip)) {
-              for (const fnc of system.on.tip) {
-                system[fnc]({
-                  username: data.username.toLowerCase(),
-                  amount: data.amount,
-                  message: data.message,
-                  currency: data.currency,
-                  timestamp: _.now(),
-                });
-              }
-            }
-          }
-        }
+        triggerInterfaceOnTip({
+          username: data.username.toLowerCase(),
+          amount: data.amount,
+          message: data.message,
+          currency: data.currency,
+          timestamp: _.now(),
+        });
       });
     }
   }
