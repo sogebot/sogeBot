@@ -21,7 +21,7 @@ class Permissions extends Core {
 
   constructor() {
     super();
-    this.addMenu({ category: 'settings', name: 'permissions', id: '/settings/permissions' });
+    this.addMenu({ category: 'settings', name: 'permissions', id: 'settings/permissions' });
 
     if (isMainThread) {
       global.db.engine.index(this.collection.data, [{ index: 'id', unique: true }]);

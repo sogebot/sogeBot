@@ -6,7 +6,7 @@ import { getLocalizedName } from '../commons';
 class Alerts extends Registry {
   constructor() {
     super();
-    this.addMenu({ category: 'registry', name: 'alerts', id: '/registry/alerts/list' });
+    this.addMenu({ category: 'registry', name: 'alerts', id: 'registry/alerts/list' });
     if (isMainThread) {
       global.db.engine.index(this.collection.data, [{ index: 'id', unique: true }]);
       // not unique ids as we will be storing chunks

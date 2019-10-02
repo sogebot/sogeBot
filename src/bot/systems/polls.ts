@@ -46,7 +46,7 @@ class Polls extends System {
       setInterval(() => this.reminder(), 1000);
     }
 
-    this.addMenu({ category: 'manage', name: 'polls', id: '/manage/polls' });
+    this.addMenu({ category: 'manage', name: 'polls', id: 'manage/polls' });
   }
 
   public async sockets() {

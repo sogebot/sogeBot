@@ -3,6 +3,7 @@ import './others/quickStatsApp';
 import './others/changegamedlg';
 import './others/checklist';
 import './others/user';
+import './others/menu';
 import './widgets/dashboard';
 import './widgets/popout';
 
