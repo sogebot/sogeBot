@@ -163,8 +163,6 @@ function Panel () {
   var self = this
   this.io.on('connection', function (socket) {
     // check auth
-    self.sendMenu(socket)
-
     socket.on('metrics.translations', function (key) { global.lib.translate.addMetrics(key, true) })
     socket.on('getCachedTags', async (cb) => {
       cb(await global.db.engine.find('core.api.tags'))
@@ -442,6 +440,10 @@ function Panel () {
       socket.emit(data.emit, { isRegistered: new Parser.default().find(data.command) })
     })
 
+    socket.on('menu', (cb) => {
+      cb(self.menu);
+    });
+
     _.each(self.socketListeners, function (listener) {
       socket.on(listener.on, async function (data) {
         if (typeof listener.fnc !== 'function') {
@@ -481,8 +483,6 @@ Panel.prototype.addMenu = function (menu) {
     this.menu.push(menu);
   }
 }
-
-Panel.prototype.sendMenu = function (socket) { socket.emit('menu', this.menu) }
 
 Panel.prototype.addWidget = function (id, name, icon) { this.widgets.push({ id: id, name: name, icon: icon }) }
 

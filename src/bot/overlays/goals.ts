@@ -11,7 +11,7 @@ class Goals extends Overlay {
 
   constructor() {
     super();
-    this.addMenu({ category: 'registry', name: 'goals', id: '/registry/goals/list' });
+    this.addMenu({ category: 'registry', name: 'goals', id: 'registry/goals/list' });
 
     if (isMainThread) {
       global.db.engine.index(this.collection.groups, { index: 'uid', unique: true });
