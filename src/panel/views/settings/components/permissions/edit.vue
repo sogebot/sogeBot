@@ -7,7 +7,7 @@
         <fa icon="long-arrow-alt-left"/>
         {{ translate('core.permissions.selectPermissionGroup') }}
       </div>
-      <div v-else-if="_.some(isLoading)"
+      <div v-else-if="some(isLoading)"
            class="card-header alert-info text-uppercase"
            style="letter-spacing: -1px;">
         <fa icon="spinner" spin/>
@@ -17,7 +17,7 @@
            class="card-header">
         {{ translate('core.permissions.settings') }}
       </div>
-      <div class="card-body p-0 m-0" v-if="!_.some(isLoading) && $route.params.id && item">
+      <div class="card-body p-0 m-0" v-if="!some(isLoading) && $route.params.id && item">
         <div class="pt-3">
           <div class="form-group col-md-12">
             <label for="name_input">{{ translate('core.permissions.name') }}</label>
@@ -86,6 +86,7 @@
 <script lang="ts">
   import Vue from 'vue'
   import { getSocket } from 'src/panel/helpers/socket';
+  import { some } from 'lodash-es';
 
   export default Vue.extend({
     props: ['update'],
@@ -98,6 +99,7 @@
     },
     data() {
       const data: {
+        some: any;
         item: Permissions.Item | null,
         socket: any,
         isPending: boolean,
@@ -106,6 +108,7 @@
           [x:string]: boolean,
         },
       } = {
+        some: some,
         item: null,
         socket: getSocket('/core/permissions'),
         isSaving: 0,
