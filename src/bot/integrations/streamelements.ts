@@ -1,4 +1,3 @@
-import * as _ from 'lodash';
 import io from 'socket.io-client';
 import chalk from 'chalk';
 
@@ -97,9 +96,12 @@ class StreamElements extends Integration {
     if (eventData.type !== 'tip') {
       return;
     }
-    const id = await global.users.getIdByName(eventData.data.username.toLowerCase(), false);
+
+    const { username } = eventData.data
+
+    const id = await global.users.getIdByName(username.toLowerCase(), false);
     if (id) {
-      global.db.engine.insert('users.tips', { id, amount: eventData.data.amount, message: eventData.data.message, currency: eventData.data.currency, timestamp: _.now() });
+      global.db.engine.insert('users.tips', { id, amount: eventData.data.amount, message: eventData.data.message, currency: eventData.data.currency, timestamp: Date.now() });
     }
     if (await global.cache.isOnline()) {
       await global.db.engine.increment('api.current', { key: 'tips' }, { value: parseFloat(global.currency.exchange(eventData.data.amount, eventData.data.currency, global.currency.mainCurrency)) });
@@ -108,13 +110,13 @@ class StreamElements extends Integration {
       type: 'tip',
       amount: eventData.data.amount,
       currency: eventData.data.currency,
-      username: eventData.data.username.toLowerCase(),
+      username: username.toLowerCase(),
       message: eventData.data.message,
       timestamp: Date.now(),
     });
-    tip(`${eventData.data.username.toLowerCase()}, amount: ${eventData.data.amount}${eventData.data.currency}, message: ${eventData.data.message}`);
+    tip(`${username.toLowerCase()}${id ? '#' + id : ''}, amount: ${eventData.data.amount}${eventData.data.currency}, message: ${eventData.data.message}`);
     global.events.fire('tip', {
-      username: eventData.data.username.toLowerCase(),
+      username: username.toLowerCase(),
       amount: parseFloat(eventData.data.amount).toFixed(2),
       currency: eventData.data.currency,
       amountInBotCurrency: parseFloat(global.currency.exchange(eventData.data.amount, eventData.data.currency, global.currency.mainCurrency)).toFixed(2),
@@ -123,7 +125,7 @@ class StreamElements extends Integration {
     });
     global.registries.alerts.trigger({
       event: 'tips',
-      name: eventData.data.username.toLowerCase(),
+      name: username.toLowerCase(),
       amount: Number(parseFloat(eventData.data.amount).toFixed(2)),
       currency: eventData.data.currency,
       monthsName: '',
@@ -132,11 +134,11 @@ class StreamElements extends Integration {
     });
 
     triggerInterfaceOnTip({
-      username: eventData.data.username.toLowerCase(),
+      username: username.toLowerCase(),
       amount: eventData.data.amount,
       message: eventData.data.message,
       currency: eventData.data.currency,
-      timestamp: _.now(),
+      timestamp: Date.now(),
     });
   }
 }
