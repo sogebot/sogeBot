@@ -310,7 +310,7 @@ class Moderation extends System {
       }
     }
     if (Math.ceil(symbolsLength / (msgLength / 100)) >= cSymbolsMaxSymbolsPercent[permId]) {
-      this.timeoutUser(opts.sender, opts.message, global.translate('moderation.warnings.symbols'), global.translate('moderation.symbols'), timeout[permId], 'symbols');
+      this.timeoutUser(opts.sender, opts.message, global.translate('moderation.user-is-warned-about-symbols'), global.translate('moderation.symbols'), timeout[permId], 'symbols');
       return false;
     }
     return true;
