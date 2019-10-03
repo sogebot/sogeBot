@@ -11,7 +11,7 @@
           <fa icon="spinner" spin/>
           {{translate('core.permissions.loadingInProgress')}}
         </div>
-        <button v-for="p of _.orderBy(currentData, 'order')"
+        <button v-for="p of orderBy(currentData, 'order')"
                 class="list-group-item list-group-item-action"
                 :class="{ active: $route.params.id === p.id }"
                 style="font-size:1.2em; font-family: 'PT Sans Narrow', sans-serif;"
@@ -49,16 +49,19 @@
 <script lang="ts">
   import Vue from 'vue'
   import { getSocket } from 'src/panel/helpers/socket';
+  import { orderBy } from 'lodash-es';
 
   export default Vue.extend({
     props: ['update'],
     data() {
       const data: {
+        orderBy: any;
         draggingPID: null | string,
         currentData: Permissions.Item[],
         socket: any,
         isLoading: boolean,
       } = {
+        orderBy: orderBy,
         draggingPID: null,
         currentData: [],
         socket: getSocket('/core/permissions'),
