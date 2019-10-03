@@ -504,7 +504,7 @@ export default Vue.extend({
   mounted: function () {
     if (this.$route.params.id) {
       this.socket.emit('findOne', { collection: 'groups', where: { uid: this.$route.params.id }}, (err, d: Goals.Group) => {
-        if (this._.size(d) === 0) this.$router.push({ name: 'GoalsRegistryList' })
+        if (Object.keys(d).length === 0) this.$router.push({ name: 'GoalsRegistryList' })
         this.groupId = String(d.uid)
         this.group = d
       })

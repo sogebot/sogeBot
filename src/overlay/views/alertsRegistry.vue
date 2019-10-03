@@ -79,7 +79,7 @@ import { Vue, Component } from 'vue-property-decorator';
 import JsonViewer from 'vue-json-viewer'
 import { getSocket } from 'src/panel/helpers/socket';
 import VRuntimeTemplate from 'v-runtime-template';
-import { isEqual, get } from 'lodash';
+import { isEqual, get } from 'lodash-es';
 
 require('../../../scss/letter-animations.css');
 require('animate.css');

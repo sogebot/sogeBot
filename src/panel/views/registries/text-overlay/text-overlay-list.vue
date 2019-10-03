@@ -68,7 +68,7 @@
 
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
-import { isNil, orderBy } from 'lodash';
+import { isNil, orderBy } from 'lodash-es';
 import Prism from 'vue-prism-component'
 import { getSocket } from 'src/panel/helpers/socket';
 

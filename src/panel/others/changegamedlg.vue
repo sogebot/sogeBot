@@ -7,7 +7,7 @@
       </button>
 
       <div class="w-100 d-flex" style="flex-wrap: wrap;justify-content: center;">
-        <img v-for="game of _.chunk(games, 6)[carouselPage]"
+        <img v-for="game of chunk(this.games, 6)[carouselPage]"
             draggable="true"
             style="width: 15%; margin-top: 0.55rem !important;"
             @dragstart="dragstart(game)"
@@ -21,10 +21,10 @@
         <div @dragleave="dragleave"
              class="m-1"
              style="width: 15%; height: 1px;pointer-events: none"
-             v-for="index in (6 - _.chunk(games, 6)[carouselPage].length)" :key="index"></div>
+             v-for="index in (6 - chunk(this.games, 6)[carouselPage].length)" :key="index"></div>
       </div>
 
-      <button class="btn btn-lg  btn-block btn-outline-dark border-0 p-3" style="width: fit-content;flex: max-content;" @click="carouselPage++;" :disabled="(carouselPage + 1) === _.chunk(games, 6).length">
+      <button class="btn btn-lg  btn-block btn-outline-dark border-0 p-3" style="width: fit-content;flex: max-content;" @click="carouselPage++;" :disabled="(carouselPage + 1) === chunk(this.games, 6).length">
         <font-awesome-icon icon="caret-right"></font-awesome-icon>
       </button>
     </div>
@@ -86,7 +86,7 @@
 
 <script lang="ts">
   import Vue from 'vue'
-  import _ from 'lodash';
+  import { chunk, debounce } from 'lodash-es'
 
   import { EventBus } from '../helpers/event-bus';
   import { getSocket } from 'src/panel/helpers/socket';
@@ -101,6 +101,8 @@
   export default Vue.extend({
     data: function () {
       const object: {
+        chunk: any;
+
         data: {
           game: string,
           title: string,
@@ -126,6 +128,7 @@
 
         socket: SocketIOClient.Socket;
       } = {
+        chunk: chunk,
         data: [],
         currentGame: null,
         currentTitle: '',
@@ -301,7 +304,7 @@
       }
     },
     created() {
-      this.searchForGame = _.debounce(this.searchForGame, 500);
+      this.searchForGame = debounce(this.searchForGame, 500);
     },
     mounted() {
       this.init();

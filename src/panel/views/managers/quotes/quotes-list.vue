@@ -73,7 +73,7 @@
 import { Vue, Component } from 'vue-property-decorator';
 import { QuoteInterface } from '../../../../bot/systems/quotes';
 import { getSocket } from 'src/panel/helpers/socket';
-import _ from 'lodash';
+import { orderBy, uniq, xor, flatten } from 'lodash-es';
 
 import { getUsernameById } from '../../../helpers/userById';
 
@@ -161,11 +161,11 @@ export default class quotesList extends Vue {
   get tags() {
     let tags: string[][] = []
     for (let quote of this.quotesFromDb) tags.push(quote.tags)
-    return _(tags).flatten().uniq().orderBy().value()
+    return orderBy(uniq(flatten(tags)))
   }
 
   toggleTags(tag) {
-    this.filteredTags = _.xor(this.filteredTags, [tag])
+    this.filteredTags = xor(this.filteredTags, [tag])
   }
 
   deleteQuote(id) {

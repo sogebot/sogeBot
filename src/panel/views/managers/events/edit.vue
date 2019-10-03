@@ -139,7 +139,7 @@
   import Vue from 'vue'
   import { FontAwesomeLayers } from '@fortawesome/vue-fontawesome'
   import uuid from 'uuid/v4';
-  import { cloneDeep } from 'lodash';
+  import { cloneDeep, get } from 'lodash-es';
   import { required, requiredIf, minValue } from "vuelidate/lib/validators";
 
   import { getSocket } from '../../../helpers/socket';
@@ -432,7 +432,7 @@
     },
     methods: {
       getDefinitionValidation(key) {
-        return this._.get(this, '$v.event.definitions.' + key, { $invalid: false });
+        return get(this, '$v.event.definitions.' + key, { $invalid: false });
       },
       del: function () {
         this.socket.emit('delete.event', this.event.id, (err, eventId) => {

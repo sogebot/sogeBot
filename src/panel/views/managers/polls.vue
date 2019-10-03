@@ -157,6 +157,7 @@
 
 <script lang="ts">
   import Vue from 'vue'
+  import { cloneDeep, isNil, orderBy } from 'lodash-es'
 
   import moment from 'moment'
   import VueMoment from 'vue-moment'
@@ -229,7 +230,7 @@
         if (this.search.trim().length === 0) return this.votes;
           return this.votes.filter((o) => {
             if (typeof o !== 'string') {
-            const isSearchInKeyword = !this._.isNil(o.title.match(new RegExp(this.search, 'ig')))
+            const isSearchInKeyword = !isNil(o.title.match(new RegExp(this.search, 'ig')))
             const isOpened = o.isOpened === true
             return isSearchInKeyword || isOpened
             } else {
@@ -261,7 +262,7 @@
       refresh: function () {
         this.socket.emit('find', {}, (err, data) => {
           if (err) return console.error(err)
-          this.votes = this._.orderBy(data, 'openedAt', 'desc')
+          this.votes = orderBy(data, 'openedAt', 'desc')
           this.votes.unshift('new')
         })
         this.socket.emit('find', { collection: 'votes' }, (err, data) => {
@@ -292,7 +293,7 @@
       copy: function (vid) {
         const vote = this.votes.find(o => typeof o !== 'string' && o.id === vid);
         if (typeof vote === 'object') {
-          let newVote = this._.cloneDeep(vote)
+          let newVote = cloneDeep(vote)
           delete newVote._id; newVote.id = uuid();
 
           for (let i = 0, length = newVote.options.length; i < 5 - length; i++) {

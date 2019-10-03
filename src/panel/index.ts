@@ -8,7 +8,6 @@ import './widgets/dashboard';
 import './widgets/popout';
 
 import BootstrapVue from 'bootstrap-vue';
-import _ from 'lodash';
 import moment from 'moment';
 import momentTimezone from 'moment-timezone';
 import Vue from 'vue';
@@ -79,7 +78,6 @@ declare module 'vue/types/vue' {
     $loadScript: (script: string) => Promise<void>;
     $unloadScript: (script: string) => Promise<void>;
     $state: states;
-    _: _.LoDashStatic;
     urlParam(key: string): string | null;
     translate(id: string): string;
     $loggedUser: any | null;
@@ -123,7 +121,6 @@ const main = async () => {
     isAvailableVariable('configuration'),
   ]);
   Vue.prototype.configuration = global.configuration;
-  Vue.prototype._ = _;
   Vue.prototype.$state = ButtonStates;
 
   setMainLoaded();

@@ -157,6 +157,7 @@
 <script lang="ts">
 import { Vue, Component, Watch } from 'vue-property-decorator';
 import { getSocket } from 'src/panel/helpers/socket';
+import { remove, every } from 'lodash-es';
 
 import defaultImage from '!!base64-loader!./media/cow01.gif';
 import defaultAudio from '!!base64-loader!./media/456968__funwithsound__success-resolution-video-game-fanfare-sound-effect.mp3';
@@ -245,7 +246,7 @@ export default class AlertsEdit extends Vue {
 
   get isAllValid() {
     for (const key of Object.keys(this.isValid)) {
-      if (!this._.every(this.isValid[key])) {
+      if (!every(this.isValid[key])) {
         return false;
       }
     }
@@ -466,7 +467,7 @@ export default class AlertsEdit extends Vue {
 
   deleteVariant(event, uuid) {
     console.debug('Removing', event, uuid);
-    this._.remove(this.item.alerts[event], (o: Registry.Alerts.CommonSettings) => o.uuid === uuid);
+    remove(this.item.alerts[event], (o: Registry.Alerts.CommonSettings) => o.uuid === uuid);
     this.$forceUpdate();
   }
 

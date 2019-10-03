@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import { at, isNil } from 'lodash-es';
 
 export interface Global {
   translations: any;
@@ -15,5 +15,5 @@ export default function(key) {
   }
   */
   // return translation of a key
-  return _.isNil(_.at(global.translations, key)[0]) ? `{${key}}` : _.at(global.translations, key)[0];
+  return isNil(at(global.translations, key)[0]) ? `{${key}}` : at(global.translations, key)[0];
 }

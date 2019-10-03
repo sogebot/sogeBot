@@ -28,7 +28,7 @@ nextOffset: {{ nextOffset }}
 import { Vue, Component, Watch } from 'vue-property-decorator';
 import { TweenMax } from 'gsap/TweenMax'
 import { getSocket } from 'src/panel/helpers/socket';
-import { chunk, cloneDeep } from 'lodash';
+import { chunk, cloneDeep } from 'lodash-es';
 
 @Component({})
 export default class ClipsCarouselOverlay extends Vue {

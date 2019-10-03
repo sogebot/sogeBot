@@ -13,8 +13,8 @@
 
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
-import _ from 'lodash'
 import { getSocket } from 'src/panel/helpers/socket';
+import { chunk, orderBy, filter, includes } from 'lodash-es';
 
 @Component({})
 export default class ClipsOverlay extends Vue {
@@ -30,12 +30,12 @@ export default class ClipsOverlay extends Vue {
 
       console.debug({order, display, ignore, count})
 
-      data = _.chunk(
-        _.orderBy(
+      data = chunk(
+        orderBy(
           // filter out ignored events
-          _.filter(data, (o) => !_.includes(ignore, o.event))
+          filter(data, (o) => !includes(ignore, o.event))
           , 'timestamp', 'desc'), count)[0] // order by desc first to get chunk of data
-      data = _.orderBy(data, 'timestamp', order) // re-order as set in order
+      data = orderBy(data, 'timestamp', order) // re-order as set in order
 
       for (let event of data) {
         if (event.event === 'resub') event.summary = event.subCumulativeMonths + 'x ' + this.translate('overlays-eventlist-resub')

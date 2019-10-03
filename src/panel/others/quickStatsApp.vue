@@ -164,7 +164,7 @@
 
 <script lang="ts">
   import Vue from 'vue'
-  import _ from 'lodash';
+  import { isNil, get } from 'lodash-es'
 
   import { EventBus } from '../helpers/event-bus';
   import { getSocket } from '../helpers/socket';
@@ -355,11 +355,11 @@
         if (raw.length === 0) return current
 
         let variables = raw.match(/(\$_[a-zA-Z0-9_]+)/g)
-        if (this.cachedTitle === current && _.isNil(variables)) {
+        if (this.cachedTitle === current && isNil(variables)) {
           return this.cachedTitle
         }
 
-        if (!_.isNil(variables)) {
+        if (!isNil(variables)) {
           for (let variable of variables) {
             let value = await this.loadCustomVariableValue(variable)
             raw = raw.replace(variable, `<strong style="border-bottom: 1px dotted gray" data-toggle="tooltip" data-placement="bottom" title="${variable}">${value}</strong>`)
@@ -388,7 +388,7 @@
       },
       filterTags (is_auto) {
         return this.tags.filter(o => o.is_auto === is_auto).map((o) => {
-          const lang = _.get(this.configuration, 'lang', 'en')
+          const lang = get(this.configuration, 'lang', 'en')
           const localekey  = Object.keys(o.localization_names).find((l) => l.includes(lang))
           if (localekey) {
             return { name: o.localization_names[localekey], is_auto: o.is_auto }
@@ -407,7 +407,7 @@
         postfix = postfix || ''
         shorten = typeof shorten === 'undefined' ? true : shorten
         number = number || 0
-        if (_.isNaN(Number(current)) || this.uptime === '00:00:00' || !this.b_showAvgDiff) return '' // return nothing if current is not number (hidden, etc)
+        if (Number.isNaN(Number(current)) || this.uptime === '00:00:00' || !this.b_showAvgDiff) return '' // return nothing if current is not number (hidden, etc)
         else if (number === 0) return ''
         else {
           let isPositive = current - number >= 0

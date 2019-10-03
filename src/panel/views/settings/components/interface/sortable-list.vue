@@ -33,7 +33,7 @@
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 
-import { xor } from 'lodash';
+import { xor } from 'lodash-es';
 
 @Component({})
 export default class sortableList extends Vue {

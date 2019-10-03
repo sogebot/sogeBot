@@ -7,6 +7,7 @@ ENV TOKEN __random__
 ENV DB mongodb
 ENV MONGOURI mongodb://localhost:27017/your-db-name
 ENV NODE_ENV production
+ENV ENV production
 
 RUN apk add --no-cache make
 RUN apk add --no-cache bash
@@ -20,6 +21,8 @@ WORKDIR /app
 
 # Install dependencies
 RUN make
+# Remove dev dependencies (not needed anymore)
+RUN npm prune --production
 
 # Copy config example
 RUN cp config.example.json config.json

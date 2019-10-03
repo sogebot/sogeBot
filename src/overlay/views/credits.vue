@@ -29,7 +29,7 @@ current: {{ current }}
 <script lang="ts">
 import { Vue, Component, Watch } from 'vue-property-decorator';
 import { TweenMax, TweenLite, Power0, Sine } from 'gsap/TweenMax';
-import { groupBy } from 'lodash';
+import { groupBy } from 'lodash-es';
 import { getSocket } from 'src/panel/helpers/socket';
 
 import { library } from '@fortawesome/fontawesome-svg-core'

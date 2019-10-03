@@ -15,7 +15,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import { isFinite } from 'lodash';
+import { isFinite } from 'lodash-es';
 
 @Component({})
 export default class textInput extends Vue {
