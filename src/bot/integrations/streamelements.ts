@@ -5,9 +5,27 @@ import chalk from 'chalk';
 import Integration from './_interface';
 import { settings, ui } from '../decorators';
 import { onChange, onStartup } from '../decorators/on';
-import { info, /* tip */ } from '../helpers/log';
-/* import { triggerInterfaceOnTip } from '../helpers/interface/triggers'; */
+import { info, tip } from '../helpers/log';
+import { triggerInterfaceOnTip } from '../helpers/interface/triggers';
 
+/* example payload (eventData)
+{
+  _id: '5d967959cd89a10ce12818ad',
+  channel: '5afbafb0c3a79ebedde18249',
+  type: 'tip',
+  provider: 'twitch',
+  createdAt: '2019-10-03T22:42:33.023Z',
+  data: {
+    tipId: '5d967959531876d2589dd772',
+    username: 'qwe',
+    amount: 12,
+    currency: 'RUB',
+    message: 'saaaaaaa',
+    items: [],
+    avatar: 'https://static-cdn.jtvnw.net/user-default-pictures-uv/ebe4cd89-b4f4-4cd9-adac-2f30151b4209-profile_image-300x300.png'
+  },
+  updatedAt: '2019-10-03T22:42:33.023Z'
+} */
 class StreamElements extends Integration {
   socket: SocketIOClient.Socket | null = null;
 
@@ -71,7 +89,50 @@ class StreamElements extends Integration {
   }
 
   async parse(eventData) {
-    console.log(eventData)
+    if (eventData.type !== 'tip') {
+      return;
+    }
+    const id = await global.users.getIdByName(eventData.data.username.toLowerCase(), false);
+    if (id) {
+      global.db.engine.insert('users.tips', { id, amount: eventData.data.amount, message: eventData.data.message, currency: eventData.data.currency, timestamp: _.now() });
+    }
+    if (await global.cache.isOnline()) {
+      await global.db.engine.increment('api.current', { key: 'tips' }, { value: parseFloat(global.currency.exchange(eventData.data.amount, eventData.data.currency, global.currency.mainCurrency)) });
+    }
+    global.overlays.eventlist.add({
+      type: 'tip',
+      amount: eventData.data.amount,
+      currency: eventData.data.currency,
+      username: eventData.data.username.toLowerCase(),
+      message: eventData.data.message,
+      timestamp: Date.now(),
+    });
+    tip(`${eventData.data.username.toLowerCase()}, amount: ${eventData.data.amount}${eventData.data.currency}, message: ${eventData.data.message}`);
+    global.events.fire('tip', {
+      username: eventData.data.username.toLowerCase(),
+      amount: parseFloat(eventData.data.amount).toFixed(2),
+      currency: eventData.data.currency,
+      amountInBotCurrency: parseFloat(global.currency.exchange(eventData.data.amount, eventData.data.currency, global.currency.mainCurrency)).toFixed(2),
+      currencyInBot: global.currency.mainCurrency,
+      message: eventData.data.message,
+    });
+    global.registries.alerts.trigger({
+      event: 'tips',
+      name: eventData.data.username.toLowerCase(),
+      amount: Number(parseFloat(eventData.data.amount).toFixed(2)),
+      currency: eventData.data.currency,
+      monthsName: '',
+      message: eventData.data.message,
+      autohost: false,
+    });
+
+    triggerInterfaceOnTip({
+      username: eventData.data.username.toLowerCase(),
+      amount: eventData.data.amount,
+      message: eventData.data.message,
+      currency: eventData.data.currency,
+      timestamp: _.now(),
+    });
   }
 }
 
