@@ -80,6 +80,7 @@ class StreamElements extends Integration {
     this.socket.on('authenticated', () => {
       info(chalk.yellow('STREAMELEMENTS:') + ' Successfully authenticated on service');
     });
+    
     this.socket.on('disconnect', () => {
       info(chalk.yellow('STREAMELEMENTS:') + ' Socket disconnected from service');
       if (this.socket) {
