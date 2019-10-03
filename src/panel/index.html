@@ -97,16 +97,7 @@
     </div>
   </div>
 
-  <footer class="footer">
-    <span class="alert alert-warning" style="padding:0;" id="APIStatus" title="API checking">API</span>
-    <span class="alert alert-warning" style="padding:0;" id="TMIStatus" title="TMI checking">TMI</span>
-    <span class="alert alert-warning" style="padding:0;" id="SOCStatus" title="SOC checking">SOC</span>
-    <span class="alert alert-warning" style="padding:0;" id="MODStatus" title="MOD checking">MOD</span>
-    <span class="alert alert-warning" style="padding:0;" id="RESStatus" title="RES checking">0ms</span>
-    <a href="https://github.com/sogehige/SogeBot">GitHub</a> |
-    <a href="https://github.com/sogehige/SogeBot/issues">Issues</a> |
-    <a href="https://github.com/sogehige/SogeBot/blob/master/LICENSE">MIT License</a>
-  </footer>
+ <div id="footer" />
 
   <!-- jQuery and Popper (necessary for Bootstrap's JavaScript plugins) -->
   <script src="./dist/jquery/js/jquery.min.js"></script>
@@ -210,17 +201,6 @@
       }
     })
 
-    setInterval(function () {
-      console.debug('EMIT [getConnectionStatus]');
-      socket.emit('getConnectionStatus')
-      setStatus('SOC', socket.connected ? 3 : 0)
-    }, 1000)
-    socket.on('connectionStatus', function (data) {
-      _.each(data, function (status, conn) {
-        setStatus(conn, status)
-      })
-    })
-
     /* ROUTERS */
     let currentPage = null
     page('/', function(p){
@@ -288,56 +268,6 @@
           resolve(value)
         })
       })
-    }
-
-    var setStatus = function (id, status) {
-      $("#" + id + "Status").data('status', status)
-
-      $("#" + id + "Status").removeClass()
-
-      if (id === 'SOC' && status === 0) {
-        $("[id$='Status']").removeClass()
-        $("[id$='Status']").addClass('alert alert-muted')
-      }
-
-      if (id === 'RES') {
-        $("#" + id + "Status").attr('title', 'Average bot response ' + status + 'ms')
-        if (status >= 1500) {
-          $("#" + id + "Status").addClass('alert alert-danger')
-        } else if (status < 1500 && status >= 800) {
-          $("#" + id + "Status").addClass('alert alert-warning')
-        } else {
-          $("#" + id + "Status").addClass('alert alert-success')
-        }
-        $("#" + id + "Status").text(status + 'ms')
-        $("#" + id + "Status").css('padding', '0')
-      }
-
-      if (id === 'MOD') {
-        $("#" + id + "Status").attr('title', 'Bot is' + (status ? ' ' : ' not ') + 'a MOD')
-        $("#" + id + "Status").addClass('alert alert-' + (status ? 'success' : 'danger'))
-        $("#" + id + "Status").css('padding', '0')
-        return
-      }
-
-      switch (status) {
-        case 0:
-          $("#" + id + "Status").attr('title', id + ' disconnected')
-          $("#" + id + "Status").addClass('alert alert-danger')
-          break;
-        case 1:
-          $("#" + id + "Status").attr('title', id + ' connecting')
-          $("#" + id + "Status").addClass('alert alert-warning')
-          break;
-        case 2:
-          $("#" + id + "Status").attr('title', id + ' reconnecting')
-          $("#" + id + "Status").addClass('alert alert-warning')
-        case 3:
-          $("#" + id + "Status").attr('title', id + ' connected')
-          $("#" + id + "Status").addClass('alert alert-success')
-          break;
-      }
-      $("#" + id + "Status").css('padding', '0')
     }
 
    // dont save as html anywhere on contenteditables

@@ -316,7 +316,7 @@ function Panel () {
       cb(await self.addWidgetToDb(self, widget, dashboardId, socket));
     })
     socket.on('updateWidgets', function (widgets) { self.updateWidgetsInDb(self, widgets, socket) })
-    socket.on('getConnectionStatus', function () { socket.emit('connectionStatus', global.status) })
+    socket.on('connection_status', cb => { cb(global.status) });
     socket.on('saveConfiguration', function (data) {
       _.each(data, async function (index, value) {
         if (value.startsWith('_')) return true

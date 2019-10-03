@@ -4,6 +4,7 @@ import './others/changegamedlg';
 import './others/checklist';
 import './others/user';
 import './others/menu';
+import './others/footer';
 import './widgets/dashboard';
 import './widgets/popout';
 
