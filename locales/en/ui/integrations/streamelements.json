@@ -1,0 +1,9 @@
+{
+  "settings": {
+    "enabled": "Status",
+    "jwtToken": {
+      "title": "JWT token",
+      "help": "Get JWT token at dashboard settings->click show secrets"
+    }
+  }
+}
