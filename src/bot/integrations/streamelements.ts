@@ -97,7 +97,7 @@ class StreamElements extends Integration {
       return;
     }
 
-    const { username } = eventData.data
+    const { username } = eventData.data;
 
     const id = await global.users.getIdByName(username.toLowerCase(), false);
     if (id) {
