@@ -3,7 +3,7 @@
     "enabled": "Status",
     "jwtToken": {
       "title": "JWT token",
-      "help": "Get JWT token at dashboard settings->click show secrets"
+      "help": "Get JWT token at StreamElements dashboard settings->click show secrets"
     }
   }
 }
