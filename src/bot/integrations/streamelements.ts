@@ -59,7 +59,11 @@ class StreamElements extends Integration {
     }
 
     this.socket = io.connect('https://realtime.streamelements.com', {
-      transports: ['websocket']
+      reconnection: true,
+      reconnectionDelay: 1000,
+      reconnectionDelayMax: 5000,
+      reconnectionAttempts: Infinity,
+      transports: ['websocket'],
     });
 
     this.socket.on('reconnect_attempt', () => {
