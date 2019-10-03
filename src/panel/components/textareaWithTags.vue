@@ -65,7 +65,7 @@
 <script lang="ts">
 import { Vue, Component, Watch, Prop, PropSync } from 'vue-property-decorator';
 import { flattenKeys } from '../../bot/helpers';
-import { sortBy, keys, isNil } from 'lodash';
+import { sortBy, keys, isNil } from 'lodash-es';
 import translate from '../helpers/translate';
 
 @Component({

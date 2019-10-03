@@ -3,13 +3,6 @@ var fs = require('fs')
 var path = require('path')
 var _ = require('lodash')
 
-var dist = {
-  'js': {
-    'commons': 'commons.js',
-    'components': 'components.js'
-  }
-}
-
 var modules = {
   'gridstack': {
     'js': 'dist/gridstack.all.js',
@@ -76,18 +69,6 @@ _.each(modules, function (aList, aName) {
   _.each(aList, function (aFiles, aType) {
     if (typeof aFiles === 'string') aFiles = [aFiles]
     aFiles.map(function (x, i, ar) { ar[i] = ['node_modules', aName, ar[i]].join('/') })
-    _.each(aFiles, function (aFile) {
-      fs.mkdirRecursive(['public', 'dist', aName, aType].join('/'))
-      fs.createReadStream(aFile)
-        .pipe(fs.createWriteStream([['public', 'dist', aName, aType].join('/'), aFile.split('/')[aFile.split('/').length - 1]].join('/')))
-    })
-  })
-})
-
-_.each(dist, function (aList, aName) {
-  _.each(aList, function (aFiles, aType) {
-    if (typeof aFiles === 'string') aFiles = [aFiles]
-    aFiles.map(function (x, i, ar) { ar[i] = ['dist', aName, ar[i]].join('/') })
     _.each(aFiles, function (aFile) {
       fs.mkdirRecursive(['public', 'dist', aName, aType].join('/'))
       fs.createReadStream(aFile)

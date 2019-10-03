@@ -3,8 +3,8 @@ import Vue from 'vue'
 import Checklist from './checklist.vue'
 
 function initChecklist () {
-  const isTranslationsLoaded = typeof translations === 'undefined' || _.size(translations) === 0
-  const isConfigurationLoaded = typeof configuration === 'undefined' || _.size(configuration) === 0
+  const isTranslationsLoaded = typeof translations === 'undefined' || Object.keys(translations).length === 0
+  const isConfigurationLoaded = typeof configuration === 'undefined' || Object.keys(configuration).length === 0
   if (isTranslationsLoaded || isConfigurationLoaded) return setTimeout(() => initChecklist(), 10)
 
   new Vue({ // eslint-disable-line no-new

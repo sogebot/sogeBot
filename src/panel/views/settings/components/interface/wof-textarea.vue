@@ -12,7 +12,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
-import _ from 'lodash';
+import { sortBy, keys, isNil } from 'lodash-es'
 
 export interface Global {
   translations: any;
@@ -34,10 +34,10 @@ export default class wofTextarea extends Vue {
     if (this.currentValue.trim().length === 0) {
       return `<span class="text-muted">${this.placeholder}</span>`;
     } else {
-      const filtersRegExp = new RegExp('\\$(' + _.sortBy(_.keys(global.translations.responses.variable), (o) => -o.length).join('|') + ')', 'g');
+      const filtersRegExp = new RegExp('\\$(' + sortBy(keys(global.translations.responses.variable), (o) => -o.length).join('|') + ')', 'g');
       let matches = this.currentValue.match(filtersRegExp);
       let output = this.currentValue;
-      if (!_.isNil(matches)) {
+      if (!isNil(matches)) {
         for (let match of matches) {
           output = output.replace(match,
             `<span contenteditable="false" class="editable-variable">

@@ -44,7 +44,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
-import { isFinite, orderBy } from 'lodash';
+import { isFinite, orderBy } from 'lodash-es';
 import { getSocket } from 'src/panel/helpers/socket';
 
 @Component({})

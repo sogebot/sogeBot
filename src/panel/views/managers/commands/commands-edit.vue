@@ -50,7 +50,7 @@
 
       <b-form-group>
         <label>{{ translate('systems.customcommands.response.name') }}</label>
-        <div style="display: flex; flex: 1 1 auto" :key="i" :class="[i !== 0 ? 'pt-2' : '']" v-for="(response, i) of _.orderBy(item.responses, 'order', 'asc')">
+        <div style="display: flex; flex: 1 1 auto" :key="i" :class="[i !== 0 ? 'pt-2' : '']" v-for="(response, i) of orderBy(item.responses, 'order', 'asc')">
           <textarea-with-tags
             :value.sync="response.response"
             v-bind:placeholder="translate('systems.customcommands.response.placeholder')"
@@ -93,7 +93,7 @@
             </div>
           </div>
         </div>
-        <button class="btn btn-primary btn-block mt-2" type="button" @click="item.responses.push({ filter: '', order: item.responses.length, response: '', permission: _.orderBy(permissions, 'order', 'asc').pop().id })">{{ translate('systems.customcommands.addResponse') }}</button>
+        <button class="btn btn-primary btn-block mt-2" type="button" @click="item.responses.push({ filter: '', order: item.responses.length, response: '', permission: orderBy(permissions, 'order', 'asc').pop().id })">{{ translate('systems.customcommands.addResponse') }}</button>
       </b-form-group>
 
       <b-form-group>
@@ -119,7 +119,7 @@
 
 <script lang="ts">
 import { Vue, Component, Watch } from 'vue-property-decorator';
-import _ from 'lodash'
+import { orderBy } from  'lodash-es'
 
 import { Validations } from 'vuelidate-property-decorators';
 import { required } from 'vuelidate/lib/validators';
@@ -151,6 +151,9 @@ Component.registerHooks([
   }
 })
 export default class CommandsEdit extends Vue {
+  orderBy = orderBy;
+
+
   item: Command & { responses: Response[] } = {
     id: uuid(),
     command: '',
@@ -217,7 +220,7 @@ export default class CommandsEdit extends Vue {
   created() {
     this.psocket.emit('find', {}, (err, data) => {
       if (err) return console.error(err)
-      this.permissions = _.orderBy(data, 'order', 'asc')
+      this.permissions = orderBy(data, 'order', 'asc')
       this.state.loadedPerm = this.$state.success;
     });
 
@@ -273,7 +276,7 @@ export default class CommandsEdit extends Vue {
   deleteResponse(order) {
     let i = 0
     this.item.responses = this.item.responses.filter(o => o.order !== order)
-    _.orderBy(this.item.responses, 'order', 'asc').map((o) => {
+    orderBy(this.item.responses, 'order', 'asc').map((o) => {
       o.order = i++
       return o
     })

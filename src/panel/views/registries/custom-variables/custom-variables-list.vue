@@ -77,7 +77,7 @@
 
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
-import { debounce, orderBy } from 'lodash';
+import { debounce, orderBy } from 'lodash-es';
 import { getSocket } from 'src/panel/helpers/socket';
 
 @Component({

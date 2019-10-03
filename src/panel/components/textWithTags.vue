@@ -4,7 +4,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import { sortBy, keys, isNil } from 'lodash';
+import { sortBy, keys, isNil } from 'lodash-es';
 
 import { flatten } from 'src/bot/helpers/flatten';
 

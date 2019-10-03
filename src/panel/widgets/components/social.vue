@@ -62,6 +62,7 @@
 
 <script lang="ts">
 import Vue from 'vue'
+import { chunk, orderBy } from 'lodash-es'
 import { getSocket } from 'src/panel/helpers/socket';
 export default Vue.extend({
   props: ['commons', 'popout'],
@@ -94,7 +95,7 @@ export default Vue.extend({
   methods: {
     load() {
       this.socket.emit('find', {}, (err, d) => {
-        this.items = this._.chunk(this._.orderBy(d, 'timestamp', 'desc'), 50)[0];
+        this.items = chunk(orderBy(d, 'timestamp', 'desc'), 50)[0];
         this.state.loaded = true;
       })
     }

@@ -24,8 +24,8 @@
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
 import { TweenLite } from 'gsap/TweenMax'
-import _ from 'lodash'
 import { getSocket } from 'src/panel/helpers/socket';
+import { every, random, sample } from 'lodash-es';
 
 @Component({})
 export default class EmotesOverlay extends Vue {
@@ -52,7 +52,7 @@ export default class EmotesOverlay extends Vue {
   }
 
   cleanEmotes () {
-    if (_.every(this.emotes, o => o.animation.finished)) this.emotes = []
+    if (every(this.emotes, o => o.animation.finished)) this.emotes = []
   }
   doAnimation (el, done) {
     const id = el.id
@@ -69,8 +69,8 @@ export default class EmotesOverlay extends Vue {
       }
     } else if (emote.animation.type === 'facebook') {
       animation = {
-        top: emote.position.top - _.random(window.innerHeight / 4, window.innerHeight / 1.2),
-        left: _.random(emote.position.left - 60, emote.position.left + 60),
+        top: emote.position.top - random(window.innerHeight / 4, window.innerHeight / 1.2),
+        left: random(emote.position.left - 60, emote.position.left + 60),
         opacity: 0
       }
     } else if (emote.animation.type === 'fadezoom') {
@@ -80,14 +80,14 @@ export default class EmotesOverlay extends Vue {
       }
     } else if (emote.animation.type === 'explosion') {
       animation = {
-        top: _.random(0, window.innerHeight - 100),
-        left: _.random(0, window.innerWidth - 100),
+        top: random(0, window.innerHeight - 100),
+        left: random(0, window.innerWidth - 100),
         opacity: 0
       }
     } else if (emote.animation.type === 'firework') {
       animation = {
-        top: _.random(emote.position.top - 100, emote.position.top + 100),
-        left: _.random(emote.position.left - 100, emote.position.left + 100),
+        top: random(emote.position.top - 100, emote.position.top + 100),
+        left: random(emote.position.left - 100, emote.position.left + 100),
         opacity: 0
       }
     }
@@ -112,13 +112,13 @@ export default class EmotesOverlay extends Vue {
   }
 
   setLeft (type) {
-    if (type === 'fadeup' || type === 'fadezoom') return _.random(window.innerWidth - 200) + 100
-    else if (type === 'facebook') return _.random(200) + window.innerWidth - 250
+    if (type === 'fadeup' || type === 'fadezoom') return random(window.innerWidth - 200) + 100
+    else if (type === 'facebook') return random(200) + window.innerWidth - 250
     else return window.innerWidth / 2
   }
 
   setTop (type) {
-    if (type === 'fadeup' || type === 'fadezoom') return _.random(window.innerHeight - 200) + 100
+    if (type === 'fadeup' || type === 'fadezoom') return random(window.innerHeight - 200) + 100
     else if (type === 'facebook') return window.innerHeight - 20
     else return window.innerHeight / 2
   }
@@ -126,7 +126,7 @@ export default class EmotesOverlay extends Vue {
   addEmote (opts) {
     this.emotes.push({
       id: Math.random().toString(36).substr(2, 9) + '-' + Math.random().toString(36).substr(2, 9),
-      trigger: Date.now() + _.random(500),
+      trigger: Date.now() + random(500),
       show: false,
       animation: {
         type: opts.settings.emotes.animation,
@@ -146,7 +146,7 @@ export default class EmotesOverlay extends Vue {
     for (var i = 0; i < opts.settings.explosion.numOfEmotes; i++) {
       this.emotes.push({
         id: Math.random().toString(36).substr(2, 9) + '-' + Math.random().toString(36).substr(2, 9),
-        trigger: Date.now() + _.random(3000),
+        trigger: Date.now() + random(3000),
         show: false,
         animation: {
           type: 'explosion',
@@ -155,20 +155,20 @@ export default class EmotesOverlay extends Vue {
           finished: false
         },
         position: {
-          left: _.random(-300, 300) + window.innerWidth / 2,
-          top: _.random(-300, 300) + window.innerHeight / 2
+          left: random(-300, 300) + window.innerWidth / 2,
+          top: random(-300, 300) + window.innerHeight / 2
         },
-        url: _.sample(opts.emotes)
+        url: sample(opts.emotes)
       })
     }
   }
 
   firework (opts) {
     for (let i = 0; i < opts.settings.fireworks.numOfExplosions; i++) {
-      const commonTop = _.random(200, window.innerHeight - 200)
-      const commonLeft = _.random(200, window.innerWidth - 200)
-      const commonTrigger = Date.now() + _.random(3000)
-      const commonUrl = _.sample(opts.emotes)
+      const commonTop = random(200, window.innerHeight - 200)
+      const commonLeft = random(200, window.innerWidth - 200)
+      const commonTrigger = Date.now() + random(3000)
+      const commonUrl = sample(opts.emotes)
 
       for (let j = 0; j < opts.settings.fireworks.numOfEmotesPerExplosion; j++) {
         this.emotes.push({

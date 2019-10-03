@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { get } from 'lodash';
+import { get } from 'lodash-es';
 import { permission } from 'src/bot/helpers/permissions';
 import { getSocket } from './socket';
 

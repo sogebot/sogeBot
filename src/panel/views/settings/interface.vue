@@ -227,9 +227,8 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
-import _ from 'lodash';
-import {get} from 'lodash';
-import {flatten, unflatten} from 'src/bot/helpers/flatten';
+import { cloneDeep, get, orderBy, pickBy, filter } from 'lodash-es';
+import { flatten, unflatten } from 'src/bot/helpers/flatten';
 import { getListOf } from 'src/panel/helpers/getListOf';
 import { getSocket } from 'src/panel/helpers/socket';
 
@@ -323,7 +322,7 @@ export default class interfaceSettings extends Vue {
 
     this.psocket.emit('find', {}, (err, data) => {
       if (err) return console.error(err)
-      this.permissions = _.orderBy(data, 'order', 'asc')
+      this.permissions = orderBy(data, 'order', 'asc')
     })
   }
 
@@ -378,8 +377,8 @@ export default class interfaceSettings extends Vue {
         if (system !== this.$route.params.id) return // skip if we quickly changed system
 
         this.state.loaded = State.DONE
-        _settings = _(_settings).toPairs().value()
-        _ui = _(_ui).toPairs().value()
+        _settings = Object.entries(_settings);
+        _ui = Object.entries(_ui);
 
         let settings: any = { settings: {} }
         let ui: any = { settings: {} }
@@ -387,30 +386,30 @@ export default class interfaceSettings extends Vue {
         // sorting
         // enabled is first - remove on core/overlay
         if (!['core', 'overlays'].includes(this.$route.params.type)) {
-          settings.settings.enabled = _(_settings.filter(o => o[0] === 'enabled')).flatten().value()[1]
+          settings.settings.enabled = flatten(filter(_settings, o => o[0] === 'enabled'))[1]
         }
 
         // everything else except commands and enabled and are string|number|bool
-        for (let [name, value] of _(_settings.filter(o => o[0] !== '_' && o[0] !== 'enabled' && o[0] !== 'commands' && typeof o[1] !== 'object')).value()) {
+        for (let [name, value] of filter(_settings, o => o[0] !== '_' && o[0] !== 'enabled' && o[0] !== 'commands' && typeof o[1] !== 'object')) {
           settings.settings[name] = value
         }
         // everything else except commands and enabled and are objects -> own category
-        for (let [name, value] of _(_settings.filter(o => o[0] !== '_' && o[0] !== 'enabled' && o[0] !== 'commands' && typeof o[1] === 'object')).value()) {
+        for (let [name, value] of filter(_settings, o => o[0] !== '_' && o[0] !== 'enabled' && o[0] !== 'commands' && typeof o[1] === 'object')) {
           settings[name] = value
         }
         // commands at last
-        for (let [name, value] of _(_settings.filter(o => o[0] === 'commands')).value()) {
+        for (let [name, value] of filter(_settings, o => o[0] === 'commands')) {
           settings[name] = value
         }
 
         // ui
         // everything else except commands and enabled and are string|number|bool
-        for (let [name, value] of _(_ui.filter(o => o[0] !== '_' && o[0] !== 'enabled' && o[0] !== 'commands' && typeof o[1].type !== 'undefined')).value()) {
+        for (let [name, value] of filter(_ui, o => o[0] !== '_' && o[0] !== 'enabled' && o[0] !== 'commands' && typeof o[1].type !== 'undefined')) {
           if (typeof settings.settings[name] === 'undefined') settings.settings[name] = null
           ui.settings[name] = value
         }
         // everything else except commands and enabled and are objects -> own category
-        for (let [name, value] of _(_ui.filter(o => o[0] !== '_' && o[0] !== 'enabled' && o[0] !== 'commands' && typeof o[1].type === 'undefined')).value()) {
+        for (let [name, value] of filter(_ui, o => o[0] !== '_' && o[0] !== 'enabled' && o[0] !== 'commands' && typeof o[1].type === 'undefined')) {
           if (typeof settings[name] === 'undefined') settings[name] = {}
           for (let [k, /* v */] of Object.entries(value)) {
             if (typeof settings[name][k] === 'undefined') settings[name][k] = null
@@ -421,12 +420,12 @@ export default class interfaceSettings extends Vue {
 
         // remove empty categories
         Object.keys(settings).forEach(key => {
-          if (_.size(settings[key]) === 0) {
+          if (Object.keys(settings[key]).length === 0) {
             delete settings[key]
           }
         })
         Object.keys(ui).forEach(key => {
-          if (_.size(ui[key]) === 0) {
+          if (Object.keys(ui[key]).length === 0) {
             delete ui[key]
           }
         })
@@ -435,7 +434,7 @@ export default class interfaceSettings extends Vue {
         for (const k of Object.keys(settings)) {
           // dont update _permissions as they might be null
           if (k !== '_permissions') {
-            settings[k] = _.pickBy(settings[k], (value, key) => {
+            settings[k] = pickBy(settings[k], (value, key) => {
               return value !== null || get(ui, `${k}.${key}`, null) !== null;
             });
             if (Object.keys(settings[k]).length === 0) {
@@ -451,7 +450,7 @@ export default class interfaceSettings extends Vue {
 
   saveSettings() {
     this.state.settings = 1
-    let settings = _.cloneDeep(this.settings)
+    let settings = cloneDeep(this.settings)
 
     if (settings.settings) {
       for (let [name,value] of Object.entries(settings.settings)) {
@@ -509,9 +508,9 @@ export default class interfaceSettings extends Vue {
   }
 
   getPermissionSettingsValue(permId, values) {
-    const startingOrder = _.get(this.permissions.find(permission => permission.id === permId), 'order', this.permissions.length);
+    const startingOrder = get(this.permissions.find(permission => permission.id === permId), 'order', this.permissions.length);
     for (let i = startingOrder; i <= this.permissions.length; i++) {
-      const value = values[_.get(this.permissions.find(permission => permission.order === i), 'id', '0efd7b1c-e460-4167-8e06-8aaf2c170311' /* viewers */)];
+      const value = values[get(this.permissions.find(permission => permission.order === i), 'id', '0efd7b1c-e460-4167-8e06-8aaf2c170311' /* viewers */)];
       if (typeof value !== 'undefined' && value !== null) {
         return value
       }

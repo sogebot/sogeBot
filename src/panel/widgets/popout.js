@@ -4,8 +4,8 @@ import Popout from './popout.vue';
 import { getSocket } from 'src/panel/helpers/socket';
 
 function initPopout () {
-  const isTranslationsLoaded = typeof translations === 'undefined' || _.size(translations) === 0
-  const isConfigurationLoaded = typeof configuration === 'undefined' || _.size(configuration) === 0
+  const isTranslationsLoaded = typeof translations === 'undefined' || Object.keys(translations).length === 0
+  const isConfigurationLoaded = typeof configuration === 'undefined' || Object.keys(configuration).length === 0
   if (isTranslationsLoaded || isConfigurationLoaded) return setTimeout(() => initPopout(), 10)
 
   new Vue({ // eslint-disable-line no-new

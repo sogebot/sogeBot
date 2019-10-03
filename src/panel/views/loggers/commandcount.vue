@@ -66,6 +66,7 @@
   import Vue from 'vue';
   import Chartkick from 'vue-chartkick';
   import Chart from 'chart.js';
+  import { countBy } from 'lodash-es';
 
   import { library } from '@fortawesome/fontawesome-svg-core'
   import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
@@ -213,7 +214,7 @@
             .map(o => {
               return Number(Number(o.timestamp / (this.timestampSmooth)).toFixed()) * this.timestampSmooth;
             })
-          const countByTimestamps = this._.countBy(timestamps)
+          const countByTimestamps = countBy(timestamps)
           for (const t of this.timestampList) {
             if (!countByTimestamps[t]) {
               countByTimestamps[t] = 0;

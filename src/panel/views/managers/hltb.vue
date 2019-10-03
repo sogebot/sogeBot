@@ -76,6 +76,7 @@
 
 <script lang="ts">
   import Vue from 'vue'
+  import { orderBy } from 'lodash-es';
 
   import moment from 'moment'
   import VueMoment from 'vue-moment'
@@ -119,7 +120,7 @@
       }, 100)
       this.socket.emit('find', {}, (err, data) => {
         if (err) return console.error(err)
-        this.games = this._.orderBy(data, 'startedAt', 'desc')
+        this.games = orderBy(data, 'startedAt', 'desc')
       })
     },
     watch: {

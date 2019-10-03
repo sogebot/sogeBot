@@ -89,7 +89,7 @@
 
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
-import _ from 'lodash';
+import { isNil, orderBy } from 'lodash-es';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faEye, faEyeSlash, faPlay, faStop, faKey } from '@fortawesome/free-solid-svg-icons';
@@ -151,9 +151,9 @@ export default class commandsList extends Vue {
   get commandsFiltered() {
     if (this.search.length === 0) return this.commands
     return this.commands.filter((o) => {
-      const isSearchInCommand = !_.isNil(o.command.match(new RegExp(this.search, 'ig')))
+      const isSearchInCommand = !isNil(o.command.match(new RegExp(this.search, 'ig')))
       const isSearchInResponse = o.responses.filter(o => {
-        return !_.isNil(o.response.match(new RegExp(this.search, 'ig')))
+        return !isNil(o.response.match(new RegExp(this.search, 'ig')))
       }).length > 0
       return isSearchInCommand || isSearchInResponse
     })
@@ -164,11 +164,11 @@ export default class commandsList extends Vue {
     this.state.loadingPerm = this.$state.progress;
     this.psocket.emit('find', {}, (err, data) => {
       if (err) return console.error(err)
-      this.permissions = _.orderBy(data, 'order', 'asc');
+      this.permissions = orderBy(data, 'order', 'asc');
       this.state.loadingPerm = this.$state.success;
     })
     this.socket.emit('find.commands', {}, (err, items) => {
-      this.commands = _.orderBy(items, 'command', 'asc');
+      this.commands = orderBy(items, 'command', 'asc');
       this.state.loadingCmd = this.$state.success;
     })
   }
