@@ -227,7 +227,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
-import { cloneDeep, get, orderBy, pickBy, filter } from 'lodash-es';
+import { cloneDeep, get, orderBy, pickBy, filter, size } from 'lodash-es';
 import { flatten, unflatten } from 'src/bot/helpers/flatten';
 import { getListOf } from 'src/panel/helpers/getListOf';
 import { getSocket } from 'src/panel/helpers/socket';
@@ -386,7 +386,10 @@ export default class interfaceSettings extends Vue {
         // sorting
         // enabled is first - remove on core/overlay
         if (!['core', 'overlays'].includes(this.$route.params.type)) {
-          settings.settings.enabled = flatten(filter(_settings, o => o[0] === 'enabled'))[1]
+          const enabled = filter(_settings, o => o[0] === 'enabled')[1]
+          if (typeof enabled !== 'undefined') {
+            settings.settings.enabled = enabled
+          }
         }
 
         // everything else except commands and enabled and are string|number|bool
@@ -397,6 +400,7 @@ export default class interfaceSettings extends Vue {
         for (let [name, value] of filter(_settings, o => o[0] !== '_' && o[0] !== 'enabled' && o[0] !== 'commands' && typeof o[1] === 'object')) {
           settings[name] = value
         }
+
         // commands at last
         for (let [name, value] of filter(_settings, o => o[0] === 'commands')) {
           settings[name] = value
@@ -408,6 +412,7 @@ export default class interfaceSettings extends Vue {
           if (typeof settings.settings[name] === 'undefined') settings.settings[name] = null
           ui.settings[name] = value
         }
+
         // everything else except commands and enabled and are objects -> own category
         for (let [name, value] of filter(_ui, o => o[0] !== '_' && o[0] !== 'enabled' && o[0] !== 'commands' && typeof o[1].type === 'undefined')) {
           if (typeof settings[name] === 'undefined') settings[name] = {}
@@ -420,12 +425,13 @@ export default class interfaceSettings extends Vue {
 
         // remove empty categories
         Object.keys(settings).forEach(key => {
-          if (Object.keys(settings[key]).length === 0) {
+          if (size(settings[key]) === 0) {
             delete settings[key]
           }
         })
+
         Object.keys(ui).forEach(key => {
-          if (Object.keys(ui[key]).length === 0) {
+          if (size(ui[key]) === 0) {
             delete ui[key]
           }
         })
@@ -490,7 +496,6 @@ export default class interfaceSettings extends Vue {
           Vue.prototype.$core = await getListOf('core');
           Vue.prototype.$systems = await getListOf('systems');
           Vue.prototype.$integrations = await getListOf('integrations');
-
         }
         setTimeout(() => {
           this.refresh();
