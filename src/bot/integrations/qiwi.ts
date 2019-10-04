@@ -80,7 +80,7 @@ class Qiwi extends Integration {
         timestamp: Date.now(),
       });
       
-      tip(`${username}${id ? '#' + id : ''}, amount: ${amount}${DONATION_CURRENCY}, ${message ? 'message: ' + message : ''}`);
+      tip(`${username ? username : 'Anonymous'}${id ? '#' + id : ''}, amount: ${amount}${DONATION_CURRENCY}, ${message ? 'message: ' + message : ''}`);
 
       global.events.fire('tip', {
         username: username || 'Anonymous',
