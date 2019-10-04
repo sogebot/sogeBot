@@ -59,7 +59,7 @@ class Qiwi extends Integration {
       const amount = Number(DONATION_AMOUNT);
       const currency = DONATION_CURRENCY;
 
-      const id = username ? await global.users.getIdByName(username, false) : null
+      const id = username ? await global.users.getIdByName(username, false) : null;
       if (id) {
         global.db.engine.insert('users.tips', { id, amount, message, currency, timestamp: Date.now() });
       }
