@@ -14,6 +14,15 @@
       <template v-slot:left>
         <button-with-icon class="btn-primary btn-reverse" icon="plus" href="#/registry/alerts/edit">{{translate('dialog.title.add')}}</button-with-icon>
       </template>
+      <template v-slot:right>
+        <b-dropdown id="dropdown-buttons" :text="translate('registry.alerts.test')" class="m-2">
+          <b-dropdown-item-button
+            @click="socket.emit('test', event)"
+            v-for="event of ['follows', 'cheers', 'tips', 'subs', 'resubs', 'subgifts', 'hosts', 'raids']"
+            v-bind:key="event">
+            {{ translate('registry.alerts.event.' + event) }}</b-dropdown-item-button>
+        </b-dropdown>
+      </template>
     </panel>
 
     <loading v-if="state.loaded === $state.progress" />
