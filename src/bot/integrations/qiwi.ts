@@ -10,9 +10,6 @@ class Qiwi extends Integration {
   interval: any = null;
 
   @settings()
-  enabled = true;
-
-  @settings()
   @ui({ type: 'text-input', secret: true })
   secretToken = '';
 
