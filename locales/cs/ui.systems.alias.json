@@ -1,5 +1,7 @@
 {
   "new": "Nový Alias",
+  "empty": "Žádný alias nebyl vytvořen.",
+  "emptyAfterSearch": "Žádný alias nebyl nalezen pro tvé hledání <strong>\"$search\"</strong>.",
   "alias": {
     "name": "alias",
     "placeholder": "Nastavte zde svůj !alias"

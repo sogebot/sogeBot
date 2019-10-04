@@ -1,17 +1,11 @@
 <template>
-  <div class="container-fluid" ref="window">
+  <b-container fluid>
     <b-row>
       <b-col>
         <span class="title text-default mb-2">
           {{ translate('menu.manage') }}
           <small><fa icon="angle-right"/></small>
           {{ translate('menu.keywords') }}
-          <template v-if="search.length > 0">
-            <small>
-              <fa icon="search"/>
-            </small>
-            {{ search }}
-          </template>
         </span>
       </b-col>
       <b-col v-if="!$systems.find(o => o.name === 'keywords').enabled" style=" text-align: right;">
@@ -50,14 +44,12 @@
         </div>
       </template>
     </b-table>
-  </div>
+  </b-container>
 </template>
 
 <script lang="ts">
 import { Vue, Component/*, Watch */ } from 'vue-property-decorator';
 import { getSocket } from 'src/panel/helpers/socket';
-
-import { KeywordInterface } from '../../../../bot/systems/keywords';
 
 @Component({
   components: {
@@ -67,7 +59,7 @@ import { KeywordInterface } from '../../../../bot/systems/keywords';
 export default class keywordsList extends Vue {
   socket = getSocket('/systems/keywords');
 
-  items: KeywordInterface[] = [];
+  items: Types.Keywords.Item[] = [];
   search: string = '';
   state: {
     loading: number;
@@ -82,7 +74,7 @@ export default class keywordsList extends Vue {
   ];
 
 
-  get fItems(): KeywordInterface[] {
+  get fItems(): Types.Keywords.Item[] {
     let items = this.items
     if (this.search.trim() !== '') {
       items = this.items.filter((o) => {
@@ -107,7 +99,7 @@ export default class keywordsList extends Vue {
 
   refresh() {
     this.state.loading = this.$state.progress;
-    this.socket.emit('find', {}, (err, data: KeywordInterface[]) => {
+    this.socket.emit('find', {}, (err, data: Types.Keywords.Item[]) => {
       if (err) return console.error(err);
       this.items = data;
       this.state.loading = this.$state.success;
@@ -123,7 +115,7 @@ export default class keywordsList extends Vue {
     })
   }
 
-  update(keyword: KeywordInterface) {
+  update(keyword: Types.Keywords.Item) {
     delete keyword._id;
     this.socket.emit('update', { key: 'id', items: [keyword] }, (err, data) => {
       if (err) {

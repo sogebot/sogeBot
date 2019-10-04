@@ -1,5 +1,7 @@
 {
   "new": "New Alias",
+  "empty": "No alias were created yet.",
+  "emptyAfterSearch": "No alias were found by your search for <strong>\"$search\"</strong>.",
   "alias": {
     "name": "alias",
     "placeholder": "Set your !alias here"

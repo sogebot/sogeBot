@@ -27,6 +27,19 @@ const end = function (updated) {
 };
 
 const migration = {
+  14: async () => {
+    header('Add id for alias');
+    let updated = 0;
+
+    const items = await global.db.engine.find('systems.alias');
+    for (const item of items) {
+      const id = uuidv4();
+
+      await global.db.engine.update('systems.alias', { _id: String(item._id) }, { id });
+      updated++;
+    }
+    end(updated);
+  },
   13: async () => {
     header('Move alerts media to own collection');
     let updated = 0;

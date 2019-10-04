@@ -133,6 +133,9 @@ const main = async () => {
       { path: '/', name: 'Dashboard', component: () => import('./views/dashboard/stub.vue') },
       { path: '/stats/commandcount', name: 'CommandCountLogger', component: () => import('./views/loggers/commandcount.vue') },
 
+      { path: '/manage/alias/', redirect: '/manage/alias/list' },
+      { path: '/manage/alias/list', name: 'aliasManagerList', component: () => import('./views/managers/alias/alias-list.vue') },
+      { path: '/manage/alias/edit/:id?', name: 'aliasManagerEdit', component: () => import('./views/managers/alias/alias-edit.vue') },
       { path: '/manage/commands/', redirect: '/manage/commands/list' },
       { path: '/manage/commands/list', name: 'CommandsManagerList', component: () => import('./views/managers/commands/commands-list.vue') },
       { path: '/manage/commands/edit/:id?', name: 'CommandsManagerEdit', component: () => import('./views/managers/commands/commands-edit.vue') },
