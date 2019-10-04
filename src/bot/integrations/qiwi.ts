@@ -54,31 +54,36 @@ class Qiwi extends Integration {
     }
     for (const event of data.events) {
       const { DONATION_SENDER, DONATION_AMOUNT, DONATION_CURRENCY, DONATION_MESSAGE } = event.attributes;
-      const username = DONATION_SENDER ? DONATION_SENDER : 'Anonymous';
+      const username = DONATION_SENDER ? DONATION_SENDER.toLowerCase() : null;
       const message = DONATION_MESSAGE ? DONATION_MESSAGE : '';
       const amount = Number(DONATION_AMOUNT);
       const currency = DONATION_CURRENCY;
 
-      const id = await global.users.getIdByName(DONATION_SENDER.toLowerCase(), false);
+      const id = username ? await global.users.getIdByName(username, false) : null
       if (id) {
         global.db.engine.insert('users.tips', { id, amount, message, currency, timestamp: Date.now() });
       }
       if (await global.cache.isOnline()) {
         await global.db.engine.increment('api.current', { key: 'tips' }, { value: parseFloat(global.currency.exchange(amount, currency, global.currency.mainCurrency)) });
       }
+      
+      if (await global.cache.isOnline()) {
+        await global.db.engine.increment('api.current', { key: 'tips' }, { value: parseFloat(global.currency.exchange(amount, currency, global.currency.mainCurrency)) });
+      }
+
       global.overlays.eventlist.add({
         type: 'tip',
         amount,
         currency,
-        username,
+        username: username || 'Anonymous',
         message,
         timestamp: Date.now(),
       });
       
-      tip(`${DONATION_SENDER.toLowerCase()}${id ? '#' + id : ''}, amount: ${amount}${DONATION_CURRENCY}, ${message ? 'message: ' + message : ''}`);
+      tip(`${username}${id ? '#' + id : ''}, amount: ${amount}${DONATION_CURRENCY}, ${message ? 'message: ' + message : ''}`);
 
       global.events.fire('tip', {
-        username,
+        username: username || 'Anonymous',
         amount,
         currency,
         amountInBotCurrency: parseFloat(global.currency.exchange(amount, currency, global.currency.mainCurrency)).toFixed(2),
@@ -88,7 +93,7 @@ class Qiwi extends Integration {
 
       global.registries.alerts.trigger({
         event: 'tips',
-        name: username,
+        name: username || 'Anonymous',
         amount,
         currency,
         monthsName: '',
@@ -97,10 +102,10 @@ class Qiwi extends Integration {
       });
 
       triggerInterfaceOnTip({
-        username: username,
+        username: username || 'Anonymous',
         amount: amount,
         message: message,
-        currency: DONATION_CURRENCY,
+        currency: currency,
         timestamp: Date.now(),
       });
 
