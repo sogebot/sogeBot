@@ -59,46 +59,48 @@ class Qiwi extends Integration {
       const { DONATION_SENDER, DONATION_AMOUNT, DONATION_CURRENCY, DONATION_MESSAGE } = event.attributes;
       const username = DONATION_SENDER ? DONATION_SENDER : "Anonymous";
       const message = DONATION_MESSAGE ? DONATION_MESSAGE : "";
+      const amount = Number(DONATION_AMOUNT);
+      const currency = DONATION_CURRENCY;
 
       const id = await global.users.getIdByName(DONATION_SENDER.toLowerCase(), false);
       if (id) {
-        global.db.engine.insert('users.tips', { id, amount: DONATION_AMOUNT, message: DONATION_MESSAGE, currency: DONATION_CURRENCY, timestamp: Date.now() });
+        global.db.engine.insert('users.tips', { id, amount, message, currency, timestamp: Date.now() });
       }
       if (await global.cache.isOnline()) {
-        await global.db.engine.increment('api.current', { key: 'tips' }, { value: parseFloat(global.currency.exchange(DONATION_AMOUNT, DONATION_CURRENCY, global.currency.mainCurrency)) });
+        await global.db.engine.increment('api.current', { key: 'tips' }, { value: parseFloat(global.currency.exchange(amount, currency, global.currency.mainCurrency)) });
       }
       global.overlays.eventlist.add({
         type: 'tip',
-        amount: DONATION_AMOUNT,
-        currency: DONATION_CURRENCY,
-        username: username,
-        message: message,
+        amount,
+        currency,
+        username,
+        message,
         timestamp: Date.now(),
       })
       
-      tip(`${DONATION_SENDER.toLowerCase()}${id ? '#' + id : ''}, amount: ${DONATION_AMOUNT}${DONATION_CURRENCY}, ${message ? 'message: ' + message : ''}`);
+      tip(`${DONATION_SENDER.toLowerCase()}${id ? '#' + id : ''}, amount: ${amount}${DONATION_CURRENCY}, ${message ? 'message: ' + message : ''}`);
 
       global.events.fire('tip', {
-        username: username,
-        amount: DONATION_AMOUNT,
-        currency: DONATION_CURRENCY,
-        amountInBotCurrency: parseFloat(global.currency.exchange(DONATION_AMOUNT, DONATION_CURRENCY, global.currency.mainCurrency)).toFixed(2),
+        username,
+        amount,
+        currency,
+        amountInBotCurrency: parseFloat(global.currency.exchange(amount, currency, global.currency.mainCurrency)).toFixed(2),
         currencyInBot: global.currency.mainCurrency,
-        message: message,
+        message,
       })
       global.registries.alerts.trigger({
         event: 'tips',
-        name: DONATION_SENDER,
-        amount: Number(DONATION_AMOUNT),
-        currency: DONATION_CURRENCY,
+        name: username,
+        amount,
+        currency,
         monthsName: '',
-        message: message,
+        message,
         autohost: false,
       });
 
       triggerInterfaceOnTip({
         username: username,
-        amount: DONATION_AMOUNT,
+        amount: amount,
         message: message,
         currency: DONATION_CURRENCY,
         timestamp: Date.now()
