@@ -32,7 +32,7 @@ class CustomCommands extends System {
   constructor () {
     super();
 
-    this.addMenu({ category: 'manage', name: 'customcommands', id: 'manage/commands/list' });
+    this.addMenu({ category: 'manage', name: 'customcommands', id: 'manage/commands' });
 
     if (isMainThread) {
       global.db.engine.index(this.collection.data, { index: 'id', unique: true });

@@ -75,8 +75,6 @@ import { required } from 'vuelidate/lib/validators'
 
 import uuid from 'uuid/v4';
 
-import { KeywordInterface } from '../../../../bot/systems/keywords';
-
 @Component({
   components: {
     'loading': () => import('../../../components/loading.vue'),
@@ -113,7 +111,7 @@ export default class keywordsEdit extends Vue {
 
   mounted() {
     if (this.$route.params.id) {
-      this.socket.emit('findOne', { where: { id: this.$route.params.id } }, (err, data: KeywordInterface) => {
+      this.socket.emit('findOne', { where: { id: this.$route.params.id } }, (err, data: Types.Keywords.Item) => {
         if (err) {
           return console.error(err)
         }
@@ -144,7 +142,7 @@ export default class keywordsEdit extends Vue {
   save() {
     this.$v.$touch();
     if (!this.$v.$invalid) {
-      const keyword: KeywordInterface = {
+      const keyword: Types.Keywords.Item = {
         id: this.id,
         keyword: this.keyword,
         response: this.response,
@@ -169,6 +167,3 @@ export default class keywordsEdit extends Vue {
   }
 }
 </script>
-
-<style scoped>
-</style>

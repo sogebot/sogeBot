@@ -12,7 +12,7 @@ import System from './_interface';
 import { incrementCountOfCommandUsage } from '../helpers/commands/count';
 import { isMainThread } from 'worker_threads';
 import { debug, warning } from '../helpers/log';
-
+import uuid from 'uuid/v4';
 
 /*
  * !alias                                              - gets an info about alias usage
@@ -29,10 +29,10 @@ class Alias extends System {
     super();
 
     if(isMainThread) {
-      global.db.engine.index(this.collection.data, [{ index: 'alias' }]);
+      global.db.engine.index(this.collection.data, [{ index: 'alias' }, { index: 'id', unique: true }]);
     }
 
-    this.addMenu({ category: 'manage', name: 'alias', id: 'alias/list' });
+    this.addMenu({ category: 'manage', name: 'alias', id: 'manage/alias' });
   }
 
   @parser()
@@ -159,7 +159,8 @@ class Alias extends System {
         throw Error('Permission ' + perm + ' not found.');
       }
 
-      const aliasObj = {
+      const aliasObj: Types.Alias.Item = {
+        id: uuid(),
         alias,
         command,
         enabled: true,

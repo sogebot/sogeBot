@@ -10,15 +10,6 @@ import { isMainThread } from 'worker_threads';
 import XRegExp from 'xregexp';
 import { debug, error } from '../helpers/log';
 
-
-export interface KeywordInterface {
-  _id?: string;
-  id: string;
-  keyword: string;
-  response: string;
-  enabled: boolean;
-}
-
 /*
  * !keyword                                     - gets an info about keyword usage
  * !keyword add -k [regexp] -r [response]       - add keyword with specified response
@@ -56,14 +47,14 @@ class Keywords extends System {
    */
   @command('!keyword add')
   @default_permission(permission.CASTERS)
-  public async add(opts: CommandOptions): Promise<KeywordInterface | null> {
+  public async add(opts: CommandOptions): Promise<Types.Keywords.Item | null> {
     try {
       const [keywordRegex, response]
         = new Expects(opts.parameters)
           .argument({ name: 'k', optional: false, multi: true, delimiter: '' })
           .argument({ name: 'r', optional: false, multi: true, delimiter: '' })
           .toArray();
-      const data: KeywordInterface = {
+      const data: Types.Keywords.Item = {
         id: uuidv4(),
         keyword: keywordRegex,
         response,
@@ -88,7 +79,7 @@ class Keywords extends System {
    */
   @command('!keyword edit')
   @default_permission(permission.CASTERS)
-  public async edit(opts: CommandOptions): Promise<KeywordInterface | null> {
+  public async edit(opts: CommandOptions): Promise<Types.Keywords.Item | null> {
     try {
       const [keywordRegexOrUUID, response]
         = new Expects(opts.parameters)
@@ -96,7 +87,7 @@ class Keywords extends System {
           .argument({ name: 'r', optional: false, multi: true, delimiter: '' })
           .toArray();
 
-      let keywords: KeywordInterface[] = [];
+      let keywords: Types.Keywords.Item[] = [];
       if (isUUID(keywordRegexOrUUID)) {
         keywords = await global.db.engine.find(this.collection.data, { id: keywordRegexOrUUID });
       } else {
@@ -169,7 +160,7 @@ class Keywords extends System {
           .argument({ name: 'k', optional: false, multi: true, delimiter: '' })
           .toArray();
 
-      let keywords: KeywordInterface[] = [];
+      let keywords: Types.Keywords.Item[] = [];
       if (isUUID(keywordRegexOrUUID)) {
         keywords = await global.db.engine.find(this.collection.data, { id: keywordRegexOrUUID });
       } else {
@@ -211,7 +202,7 @@ class Keywords extends System {
           .argument({ name: 'k', optional: false, multi: true, delimiter: '' })
           .toArray();
 
-      let keywords: KeywordInterface[] = [];
+      let keywords: Types.Keywords.Item[] = [];
       if (isUUID(keywordRegexOrUUID)) {
         keywords = await global.db.engine.find(this.collection.data, { id: keywordRegexOrUUID });
       } else {

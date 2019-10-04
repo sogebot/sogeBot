@@ -222,8 +222,8 @@ export default class commandsList extends Vue {
     this.$router.push({ name: 'CommandsManagerList' });
   }
 
-  sendUpdate (_id) {
-    this.socket.emit('update.command', {items: this.commands.filter((o) => o.id === _id)})
+  sendUpdate (id) {
+    this.socket.emit('update.command', {items: this.commands.filter((o) => o.id === id)})
   }
 }
 </script>
