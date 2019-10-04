@@ -41,7 +41,7 @@ class Qiwi extends Integration {
     }
   }
   async check () {
-    let request: any
+    let request: any;
     try {
       request = await axios(`https://donate.qiwi.com/api/stream/v1/widgets/${this.secretToken}/events?limit=50`);
     } catch (e) {
@@ -52,10 +52,10 @@ class Qiwi extends Integration {
     if (data.events.length === 0) {
       return;
     }
-    for (let event of data.events) {
+    for (const event of data.events) {
       const { DONATION_SENDER, DONATION_AMOUNT, DONATION_CURRENCY, DONATION_MESSAGE } = event.attributes;
-      const username = DONATION_SENDER ? DONATION_SENDER : "Anonymous";
-      const message = DONATION_MESSAGE ? DONATION_MESSAGE : "";
+      const username = DONATION_SENDER ? DONATION_SENDER : 'Anonymous';
+      const message = DONATION_MESSAGE ? DONATION_MESSAGE : '';
       const amount = Number(DONATION_AMOUNT);
       const currency = DONATION_CURRENCY;
 
@@ -73,7 +73,7 @@ class Qiwi extends Integration {
         username,
         message,
         timestamp: Date.now(),
-      })
+      });
       
       tip(`${DONATION_SENDER.toLowerCase()}${id ? '#' + id : ''}, amount: ${amount}${DONATION_CURRENCY}, ${message ? 'message: ' + message : ''}`);
 
@@ -84,7 +84,8 @@ class Qiwi extends Integration {
         amountInBotCurrency: parseFloat(global.currency.exchange(amount, currency, global.currency.mainCurrency)).toFixed(2),
         currencyInBot: global.currency.mainCurrency,
         message,
-      })
+      });
+
       global.registries.alerts.trigger({
         event: 'tips',
         name: username,
@@ -100,7 +101,7 @@ class Qiwi extends Integration {
         amount: amount,
         message: message,
         currency: DONATION_CURRENCY,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       });
 
     }
