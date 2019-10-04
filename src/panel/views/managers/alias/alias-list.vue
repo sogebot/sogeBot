@@ -41,7 +41,7 @@
             <template v-slot:button-content><fa icon="key" fixed-width/></template>
             <b-dropdown-item
               v-for="permission of permissions"
-              :key="permission.id"
+              :key="data.item.id + permission.id"
               @click="updatePermission(data.item.id, permission.id)">
               {{ permission.name }}
             </b-dropdown-item>
