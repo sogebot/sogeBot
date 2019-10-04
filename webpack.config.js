@@ -91,6 +91,9 @@ const webpackConfig = {
       { from: 'dist/js/components.js', to: 'components.js' }
     ]),
     new HtmlWebpackPlugin({
+      filename: '../../popout.html', template: 'src/panel/popout.html', chunks: ['main']
+    }),
+    new HtmlWebpackPlugin({
       filename: '../../index.html', template: 'src/panel/index.html', chunks: ['main']
     }),
     new HtmlWebpackPlugin({
