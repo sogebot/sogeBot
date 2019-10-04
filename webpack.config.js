@@ -94,7 +94,7 @@ const webpackConfig = {
       filename: '../../index.html', template: 'src/panel/index.html', chunks: ['main']
     }),
     new HtmlWebpackPlugin({
-      filename: '../../overlays.html', template: 'src/overlay/index.html', chunks: ['overlays']
+      filename: '../../overlays.html', template: 'src/overlay/index.html', chunks: ['overlay']
     }),
     new HtmlWebpackPlugin({
       filename: '../../login.html', template: 'src/login/index.html', chunks: ['login']
