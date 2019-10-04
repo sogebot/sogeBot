@@ -6,6 +6,6 @@ declare namespace Types {
       keyword: string;
       response: string;
       enabled: boolean;
-    }
+    };
   }
 }
