@@ -41,15 +41,6 @@
           PLAYLIST
         </button>
       </li>
-      <li role="presentation" class="w-100 pl-1 pr-1" style="line-height: 2.55rem;">
-        <marquee-text :repeat="10" v-if="currentSong.is_playing">
-          <fa icon="music" class="pl-1 pr-1" fixed-width />
-          {{ currentSong.song }} - {{ currentSong.artist }}
-        </marquee-text>
-        <template v-else>
-          No song is currently playing
-        </template>
-      </li>
     </ul>
   </div>
 
@@ -76,15 +67,12 @@
 
 <script>
 import { getSocket } from 'src/panel/helpers/socket';
-import MarqueeText from 'vue-marquee-text-component'
 import { FontAwesomeLayers } from '@fortawesome/vue-fontawesome'
 
 export default {
-  props: ['commons'],
   components: {
     holdButton: () => import('../../components/holdButton.vue'),
     'font-awesome-layers': FontAwesomeLayers,
-    MarqueeText,
   },
   data: function () {
     return {
