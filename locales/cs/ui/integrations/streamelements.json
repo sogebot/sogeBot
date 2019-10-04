@@ -1,0 +1,9 @@
+{
+  "settings": {
+    "enabled": "Status",
+    "jwtToken": {
+      "title": "JWT token",
+      "help": "JWT token lze nalézt v StreamElements dashboardu, settings->click show secrets"
+    }
+  }
+}
