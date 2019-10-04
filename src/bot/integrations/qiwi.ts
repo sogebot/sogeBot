@@ -99,7 +99,7 @@ class Qiwi extends Integration {
       triggerInterfaceOnTip({
         username: username,
         amount: DONATION_AMOUNT,
-        message: DONATION_MESSAGE,
+        message: message,
         currency: DONATION_CURRENCY,
         timestamp: Date.now()
       });
