@@ -386,9 +386,11 @@ export default class interfaceSettings extends Vue {
         // sorting
         // enabled is first - remove on core/overlay
         if (!['core', 'overlays'].includes(this.$route.params.type)) {
-          const enabled = filter(_settings, o => o[0] === 'enabled')[1]
-          if (typeof enabled !== 'undefined') {
-            settings.settings.enabled = enabled
+          const enabled = _settings.find(o => {
+            return o[0] === 'enabled'
+          })
+          if (enabled.length > 0) {
+            settings.settings.enabled = enabled[1]
           }
         }
 
