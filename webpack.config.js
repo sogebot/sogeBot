@@ -79,7 +79,7 @@ const webpackConfig = {
   },
   output: {
     path: path.resolve(__dirname, 'public', 'dist', 'js'),
-    filename: '[name].js',
+    filename: '[name].[hash].js',
     chunkFilename: '[name].[hash].js',
     publicPath: '/dist/js/'
   },
