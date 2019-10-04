@@ -154,7 +154,6 @@
     "chai": "4.2.0",
     "clean-webpack-plugin": "3.0.0",
     "copy-webpack-plugin": "5.0.4",
-    "cross-var": "1.1.0",
     "css-loader": "3.2.0",
     "docsify": "4.9.4",
     "docsify-cli": "4.3.0",
