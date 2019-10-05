@@ -6,32 +6,55 @@ const regexp = /^  \d\)(.*)$/gm
 let match = file.match(regexp)
 
 let status = 0
-if (match) {
-  for (let suite of new Set(match.map((o) => {
-    return o.trim().split(/\d\) /)[1]
-  }))) {
-    console.log('\n\t => Re-Running ' + suite + ' tests')
-    const p = child_process.spawnSync('npx', [
-      'mocha',
-      '--timeout', '20000',
-      '--exit',
-      '--grep="' + suite + '"',
-      '--recursive',
-      'test/'
-    ], {
-      shell: true,
-    });
+async function retest() {
+  if (match) {
+    for (let suite of new Set(match.map((o) => {
+      return o.trim().split(/\d\) /)[1]
+    }))) {
+      await new Promise((resolve) => {
+        console.log('------------------------------------------------------------------------------')
+        console.log('\t=> Re-Running ' + suite + ' tests')
+        console.log('------------------------------------------------------------------------------')
+        const p = child_process.spawn('npx', [
+          'mocha',
+          '-r',  'module-alias/register',
+          '--timeout', '20000',
+          '--exit',
+          '--grep="' + suite + '"',
+          '--recursive',
+          'test/'
+        ], {
+          shell: true,
+        });
 
-    if (p.status !== 0) {
-      status = p.status;
-      console.log('\t   !!! Failed again :(')
-    } else {
-      console.log('\t   !!! Tests OK! :)')
+        p.stdout.on('data', (data) => {
+          console.log(data.toString());
+        });
+
+        p.stderr.on('data', (data) => {
+          console.error(data.toString());
+        });
+
+        p.on('close', (code) => {
+          if (code !== 0) {
+            status = code;
+            console.log('------------------------------------------------------------------------------')
+            console.log('\t=> Failed ' + suite + ' tests')
+            console.log('------------------------------------------------------------------------------')
+          } else {
+            console.log('------------------------------------------------------------------------------')
+            console.log('\t=> OK ' + suite + ' tests')
+            console.log('------------------------------------------------------------------------------')
+          }
+          resolve();
+        });
+      })
     }
+  } else {
+    console.log('\n\t No tests to rerun :)\n\n')
   }
-  console.log('\n\n')
-} else {
-  console.log('\n\t No tests to rerun :)\n\n')
+
+  process.exit(status);
 }
 
-process.exit(status)
+retest();
