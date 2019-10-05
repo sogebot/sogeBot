@@ -275,7 +275,7 @@ class CustomCommands extends System {
     // go through all commands
     let atLeastOnePermissionOk = false;
     for (const command of commands) {
-      let _responses: Response[] = [];
+      const _responses: Response[] = [];
       // remove found command from message to get param
       const param = opts.message.replace(new RegExp('^(' + command.cmdArray.join(' ') + ')', 'i'), '').trim();
       const count = await incrementCountOfCommandUsage(command.command.command);
