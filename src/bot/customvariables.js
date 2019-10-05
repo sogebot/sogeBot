@@ -347,7 +347,7 @@ class CustomVariables {
     opts.readOnlyBypass = _.isNil(opts.readOnlyBypass) ? false : opts.readOnlyBypass;
     // add simple text variable, if not existing
     if (_.isEmpty(item)) {
-      item = await global.db.engine.insert('custom.variables', { variableName, currentValue, type: 'text', responseType: 0, permission: permission.MODERATORS });
+      item = await global.db.engine.update('custom.variables', { variableName }, { variableName, currentValue, type: 'text', responseType: 0, permission: permission.MODERATORS });
     } else {
       // set item permission to owner if missing
       item.permission = typeof item.permission === 'undefined' ? permission.CASTERS : item.permission;

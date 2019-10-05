@@ -143,8 +143,8 @@ module.exports = {
         return true;
       } catch (err) {
         return setError(
-          '\nExpected message: "' + expected + '"\nExpected user: "' + JSON.stringify(user)
-          + '\n\nActual message:   "' + JSON.stringify(log.chatOut.args) + '"'
+          '\nExpected message:\t"' + expected
+          + '\nActual message:\t"' + log.chatOut.args.join('\n\t\t') + '"'
         );
       }
     }, wait || 5000);
@@ -175,8 +175,8 @@ module.exports = {
         return true;
       } catch (err) {
         return setError(
-          '\nExpected message: "' + expected + '"\n\nExpected user: "' + JSON.stringify(user)
-          + '\n\n\nActual message:   "' + log.chatOut.args + '"'
+          '\nExpected message:\t' + expected + ` [${user.username}]`
+          + '\nActual message:\t\t' + log.chatOut.args.join('\n\t\t\t')
         );
       }
     }, wait || 5000);

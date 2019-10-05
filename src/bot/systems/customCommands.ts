@@ -253,7 +253,6 @@ class CustomCommands extends System {
     if (!opts.message.startsWith('!')) {
       return true;
     } // do nothing if it is not a command
-    const _responses: Response[] = [];
     const commands: {
       command: Command;
       cmdArray: string[];
@@ -276,6 +275,7 @@ class CustomCommands extends System {
     // go through all commands
     let atLeastOnePermissionOk = false;
     for (const command of commands) {
+      let _responses: Response[] = [];
       // remove found command from message to get param
       const param = opts.message.replace(new RegExp('^(' + command.cmdArray.join(' ') + ')', 'i'), '').trim();
       const count = await incrementCountOfCommandUsage(command.command.command);
@@ -301,19 +301,15 @@ class CustomCommands extends System {
     return atLeastOnePermissionOk;
   }
 
-  async sendResponse(responses, opts) {
-    if (responses.length === 0) {
-      return;
+  sendResponse(responses, opts) {
+    for (let i = 0; i < responses.length; i++) {
+      setTimeout(() => {
+        sendMessage(responses[i].response, opts.sender, {
+          param: opts.param,
+          cmd: opts.command,
+        });
+      }, i * 300);
     }
-    const response = responses.shift();
-
-    await sendMessage(response.response, opts.sender, {
-      param: opts.param,
-      cmd: opts.command,
-    });
-    setTimeout(() => {
-      this.sendResponse(responses, opts);
-    }, 300);
   }
 
   @command('!command list')
