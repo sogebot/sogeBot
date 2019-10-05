@@ -3,7 +3,10 @@
   "version": "9.10.0-SNAPSHOT",
   "description": "Free Twitch Bot built on Node.js",
   "private": true,
-  "sideEffects": false,
+  "sideEffects": [
+    "*.css",
+    "*.vue"
+  ],
   "main": "main.js",
   "author": "Michal Orlik <sogehige@gmail.com>",
   "license": "MIT",
