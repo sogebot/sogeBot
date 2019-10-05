@@ -151,10 +151,13 @@ export function permission_settings(category?: string) {
   };
 }
 
-export function shared() {
+export function shared(db = false) {
   const { name, type } = getNameAndTypeFromStackTrace();
 
   return (target: object, key: string) => {
+    if (db) {
+      loadingInProgress.push(`${type}.${name}.${key}`);
+    }
     const register = () => {
       const isAvailableModule = type !== 'core' && typeof global[type] !== 'undefined' && typeof global[type][name] !== 'undefined';
       const isAvailableLibrary = type === 'core' && typeof global[name] !== 'undefined';
@@ -165,6 +168,21 @@ export function shared() {
         const self = type === 'core' ? global[name] : global[type][name];
         const defaultValue = self[key];
         VariableWatcher.add(`${type}.${name}.${key}`, defaultValue, false);
+        if (db) {
+          const loadVariableValue = () => {
+            if (!global.db.engine.connected) {
+              return setTimeout(() => loadVariableValue(), 1000);
+            }
+            self.loadVariableValue(key).then((value) => {
+              if (typeof value !== 'undefined') {
+                VariableWatcher.add(`${type}.${name}.${key}`, value, false); // rewrite value on var load
+                _.set(self, key, value);
+              }
+              loadingInProgress = loadingInProgress.filter(o => o !== `${type}.${name}.${key}`);
+            });
+          };
+          setTimeout(() => loadVariableValue(), 5000);
+        }
       } catch (e) {
         console.log(e);
       }
