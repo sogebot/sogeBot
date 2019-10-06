@@ -116,7 +116,7 @@ class Donationalerts extends Integration {
             global.db.engine.insert('users.tips', { id, amount: Number(data.amount), message: data.message, currency: data.currency, timestamp: _.now() });
           }
           if (global.api.isStreamOnline) {
-            global.api.statsCurrentTips = parseFloat(global.currency.exchange(data.amount, data.currency, global.currency.mainCurrency));
+            global.api.stats.currentTips = parseFloat(global.currency.exchange(data.amount, data.currency, global.currency.mainCurrency));
           }
         }
 

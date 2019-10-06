@@ -103,7 +103,7 @@ class Users extends Core {
     let watched = await this.getWatchedOf(id)
     // add user as a new chatter in a stream
     if (watched === 0 && !this.newChattersList.includes(username)) {
-      global.api.statsNewChatters += 1;
+      global.api.stats.newChatters += 1;
       this.newChattersList.push(username.toLowerCase())
     }
   }
@@ -226,7 +226,7 @@ class Users extends Core {
           }
 
           if (isNewUser) this.checkNewChatter(id, username)
-          if (!isOwner) global.api.statsCurrentWatchedTime += watched
+          if (!isOwner) global.api.stats.currentWatchedTime += watched
           await global.db.engine.increment('users.watched', { id }, { watched })
           debug('users.watched', username + ': ' + (watched / 1000 / 60) + ' minutes added')
           updated.push(username)

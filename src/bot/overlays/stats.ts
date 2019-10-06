@@ -17,10 +17,10 @@ class Stats extends Overlay {
       socket.on('get', async (cb) => {
         const stats = {
           uptime: getTime(global.api.isStreamOnline ? global.api.streamStatusChangeSince : 0, false),
-          viewers: global.api.statsCurrentViewers,
-          followers: global.api.statsCurrentFollowers,
-          subscribers: global.api.statsCurrentSubscribers,
-          bits: global.api.statsCurrentBits,
+          viewers: global.api.stats.currentViewers,
+          followers: global.api.stats.currentFollowers,
+          subscribers: global.api.stats.currentSubscribers,
+          bits: global.api.stats.currentBits,
         };
         cb(stats);
       });

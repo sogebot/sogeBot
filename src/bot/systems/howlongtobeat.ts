@@ -41,15 +41,15 @@ class HowLongToBeat extends System {
   }
 
   async addToGameTimestamp() {
-    if (!global.api.statsCurrentGame) {
+    if (!global.api.stats.currentGame) {
       return; // skip if we don't have game
     }
 
-    if (global.api.statsCurrentGame.trim().length === 0) {
+    if (global.api.stats.currentGame.trim().length === 0) {
       return; // skip if we have empty game
     }
 
-    let gameToInc: Game = await global.db.engine.findOne(this.collection.data, { game: global.api.statsCurrentGame });
+    let gameToInc: Game = await global.db.engine.findOne(this.collection.data, { game: global.api.stats.currentGame });
     if (typeof gameToInc._id !== 'undefined') {
       delete gameToInc._id;
       if (!gameToInc.isFinishedMain) {
@@ -59,10 +59,10 @@ class HowLongToBeat extends System {
         gameToInc.timeToBeatCompletionist += this.interval;
       }
     } else {
-      const gamesFromHltb = await this.hltbService.search(global.api.statsCurrentGame);
+      const gamesFromHltb = await this.hltbService.search(global.api.stats.currentGame);
       const gameFromHltb = gamesFromHltb.length > 0 ? gamesFromHltb[0] : null;
       gameToInc = {
-        game: global.api.statsCurrentGame,
+        game: global.api.stats.currentGame,
         gameplayMain: (gameFromHltb || { gameplayMain: 0 }).gameplayMain,
         gameplayCompletionist: (gameFromHltb || { gameplayMain: 0 }).gameplayCompletionist,
         isFinishedMain: false,
@@ -88,10 +88,10 @@ class HowLongToBeat extends System {
       .toArray();
 
     if (!game) {
-      if (!global.api.statsCurrentGame) {
+      if (!global.api.stats.currentGame) {
         return; // skip if we don't have game
       } else {
-        game = global.api.statsCurrentGame;
+        game = global.api.stats.currentGame;
       }
     }
     const gameToShow: Game = await global.db.engine.findOne(this.collection.data, { game });

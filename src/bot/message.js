@@ -19,14 +19,14 @@ class Message {
 
   async global (opts) {
     let variables = {
-      game: global.api.statsCurrentGame,
-      viewers: global.api.statsCurrentViewers,
-      views: global.api.statsCurrentViews,
-      followers: global.api.statsCurrentFollowers,
-      hosts: global.api.statsCurrentHosts,
-      subscribers: global.api.statsCurrentSubscribers,
-      bits: global.api.statsCurrentBits,
-      title: global.api.statsCurrentTitle
+      game: global.api.stats.currentGame,
+      viewers: global.api.stats.currentViewers,
+      views: global.api.stats.currentViews,
+      followers: global.api.stats.currentFollowers,
+      hosts: global.api.stats.currentHosts,
+      subscribers: global.api.stats.currentSubscribers,
+      bits: global.api.stats.currentBits,
+      title: global.api.stats.currentTitle
     };
     for (let variable of Object.keys(variables)) {
       const regexp = new RegExp(`\\$${variable}`, 'g');
@@ -291,10 +291,10 @@ class Message {
         return '';
       },
       '(game)': async function (filter) {
-        return global.api.statsCurrentGame || 'n/a';
+        return global.api.stats.currentGame || 'n/a';
       },
       '(status)': async function (filter) {
-        return global.api.statsCurrentTitle || 'n/a';
+        return global.api.stats.currentTitle || 'n/a';
       }
     };
     let command = {

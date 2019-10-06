@@ -286,8 +286,8 @@ class Webhooks {
       global.api.streamId = stream.id
       global.api.streamType = stream.type
 
-      global.api.statsCurrentTitle = stream.title;
-      global.api.statsCurrentGame = await global.api.getGameFromId(stream.game_id);
+      global.api.stats.currentTitle = stream.title;
+      global.api.stats.currentGame = await global.api.getGameFromId(stream.game_id);
 
       if (!(global.api.isStreamOnline) && Number(global.twitch.streamId) !== Number(stream.id)) {
         debug('webhooks.stream', 'WEBHOOKS: ' + JSON.stringify(aEvent))

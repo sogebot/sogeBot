@@ -43,29 +43,33 @@ const limitProxy = {
 
 class API extends Core {
   @shared(true)
-  statsCurrentWatchedTime = 0;
-  @shared(true)
-  statsCurrentViewers = 0;
-  @shared(true)
-  statsMaxViewers = 0;
-  @shared(true)
-  statsCurrentSubscribers = 0;
-  @shared(true)
-  statsCurrentBits = 0;
-  @shared(true)
-  statsCurrentTips = 0;
-  @shared(true)
-  statsCurrentFollowers = 0;
-  @shared(true)
-  statsCurrentViews = 0;
-  @shared(true)
-  statsCurrentGame: string | null = null;
-  @shared(true)
-  statsCurrentTitle: string | null = null;
-  @shared(true)
-  statsCurrentHosts = 0;
-  @shared(true)
-  statsNewChatters = 0;
+  stats: {
+    currentWatchedTime: number;
+    currentViewers: number;
+    maxViewers: number;
+    currentSubscribers: number;
+    currentBits: number;
+    currentTips: number;
+    currentFollowers: number;
+    currentViews: number;
+    currentGame: string | null;
+    currentTitle: string | null;
+    currentHosts: number;
+    newChatters: number;
+  } = {
+    currentWatchedTime: 0,
+    currentViewers: 0,
+    maxViewers: 0,
+    currentSubscribers: 0,
+    currentBits: 0,
+    currentTips: 0,
+    currentFollowers: 0,
+    currentViews: 0,
+    currentGame: null,
+    currentTitle: null,
+    currentHosts: 0,
+    newChatters: 0,
+  };
 
   @shared(true)
   isStreamOnline = false;
@@ -513,7 +517,7 @@ class API extends Core {
       if (global.oauth.broadcasterType === '') {
         if (!opts.noAffiliateOrPartnerWarningSent) {
           warning('Broadcaster is not affiliate/partner, will not check subs');
-          global.api.statsCurrentSubscribers = 0;
+          global.api.stats.currentSubscribers = 0;
         }
         delete opts.count;
         return { state: false, opts: { ...opts, noAffiliateOrPartnerWarningSent: true } };
@@ -550,7 +554,7 @@ class API extends Core {
         // move to next page
         this.getChannelSubscribers({ cursor: request.data.pagination.cursor, count: subscribers.length + opts.count, subscribers });
       } else {
-        this.statsCurrentSubscribers = subscribers.length + opts.count;
+        this.stats.currentSubscribers = subscribers.length + opts.count;
         this.setSubscribers(opts.subscribers.filter(o => !isBroadcaster(o.user_name) && !isBot(o.user_name)));
       }
 
@@ -561,7 +565,7 @@ class API extends Core {
       if (e.message === '403 Forbidden' && !opts.notCorrectOauthWarningSent) {
         opts.notCorrectOauthWarningSent = true;
         warning('Broadcaster have not correct oauth, will not check subs');
-        this.statsCurrentSubscribers = 0;
+        this.stats.currentSubscribers = 0;
       } else {
         error(`${url} - ${e.stack}`);
         if (global.panel && global.panel.io) {
@@ -665,8 +669,8 @@ class API extends Core {
           this.retries.getChannelDataOldAPI = 0;
         }
 
-        this.statsCurrentGame = request.data.game;
-        this.statsCurrentTitle = request.data.status;
+        this.stats.currentGame = request.data.game;
+        this.stats.currentTitle = request.data.status;
         this.gameCache = request.data.game;
         this.rawStatus = rawStatus;
       } else {
@@ -703,7 +707,7 @@ class API extends Core {
         global.panel.io.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'getChannelHosts', api: 'tmi', endpoint: url, code: request.status });
       }
 
-      this.statsCurrentHosts = request.data.hosts.length;
+      this.stats.currentHosts = request.data.hosts.length;
 
       // save hosts list
       for (const host of map(request.data.hosts, 'host_login')) {
@@ -749,7 +753,7 @@ class API extends Core {
 
       if (request.data.data.length > 0) {
         global.oauth.broadcasterType = request.data.data[0].broadcaster_type;
-        this.statsCurrentViews = request.data.data[0].view_count;
+        this.stats.currentViews = request.data.data[0].view_count;
       }
     } catch (e) {
       if (typeof e.response !== 'undefined' && e.response.status === 429) {
@@ -842,7 +846,7 @@ class API extends Core {
           }
         }
       }
-      this.statsCurrentFollowers =  request.data.total;
+      this.stats.currentFollowers =  request.data.total;
       quiet = false;
     } catch (e) {
       if (typeof e.response !== 'undefined' && e.response.status === 429) {
@@ -910,14 +914,14 @@ class API extends Core {
         this.calls.bot.refresh = e.response.headers['ratelimit-reset'];
       }
 
-      warning(`Couldn't find name of game for gid ${id} - fallback to ${this.statsCurrentGame}`);
+      warning(`Couldn't find name of game for gid ${id} - fallback to ${this.stats.currentGame}`);
       error(`API: ${url} - ${e.stack}`);
       if (isMainThread) {
         if (global.panel && global.panel.io) {
           global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'getGameFromId', api: 'helix', endpoint: url, code: e.response.status, data: e.stack, remaining: this.calls.bot.remaining });
         }
       }
-      return this.statsCurrentGame;
+      return this.stats.currentGame;
     }
   }
 
@@ -1074,8 +1078,8 @@ class API extends Core {
           const status = await this.parseTitle(null);
           const game = await this.getGameFromId(stream.game_id);
 
-          this.statsCurrentTitle = stream.title;
-          this.statsCurrentGame = game;
+          this.stats.currentTitle = stream.title;
+          this.stats.currentGame = game;
 
           if (stream.title !== status) {
             // check if status is same as updated status
@@ -1102,7 +1106,7 @@ class API extends Core {
           this.curRetries = 0;
           this.isStreamOnline = false;
           stop('');
-          this.statsCurrentWatchedTime = 0;
+          this.stats.currentWatchedTime = 0;
           this.streamStatusChangeSince = Date.now();
           global.events.fire('stream-stopped', {});
           global.events.fire('stream-is-running-x-minutes', { reset: true });
@@ -1128,11 +1132,11 @@ class API extends Core {
             }
           }
 
-          this.statsMaxViewers = 0;
-          this.statsNewChatters = 0;
-          this.statsCurrentViewers = 0;
-          this.statsCurrentBits = 0;
-          this.statsCurrentTips = 0;
+          this.stats.maxViewers = 0;
+          this.stats.newChatters = 0;
+          this.stats.currentViewers = 0;
+          this.stats.currentBits = 0;
+          this.stats.currentTips = 0;
 
           await global.db.engine.remove('cache.hosts', {}); // we dont want to have cached hosts on stream start
           await global.db.engine.remove('cache.raids', {}); // we dont want to have cached raids on stream start
@@ -1160,26 +1164,26 @@ class API extends Core {
     if (!isMainThread) {
       throw new Error('API can run only on master');
     }
-    this.statsCurrentViewers = stream.viewer_count;
+    this.stats.currentViewers = stream.viewer_count;
 
-    if (this.statsMaxViewers < stream.viewer_count) {
-      this.statsMaxViewers = stream.viewer_count;
+    if (this.stats.maxViewers < stream.viewer_count) {
+      this.stats.maxViewers = stream.viewer_count;
     }
 
     global.stats2.save({
       timestamp: new Date().getTime(),
       whenOnline: global.api.isStreamOnline ? global.api.streamStatusChangeSince : null,
-      currentViewers: this.statsCurrentViewers,
-      currentSubscribers: this.statsCurrentSubscribers,
-      currentFollowers: this.statsCurrentFollowers,
-      currentBits: this.statsCurrentBits,
-      currentTips: this.statsCurrentTips,
+      currentViewers: this.stats.currentViewers,
+      currentSubscribers: this.stats.currentSubscribers,
+      currentFollowers: this.stats.currentFollowers,
+      currentBits: this.stats.currentBits,
+      currentTips: this.stats.currentTips,
       chatMessages: global.linesParsed - this.chatMessagesAtStart,
-      currentViews: this.statsCurrentViews,
-      maxViewers: this.statsMaxViewers,
-      newChatters: this.statsNewChatters,
-      currentHosts: this.statsCurrentHosts,
-      currentWatched: this.statsCurrentWatchedTime,
+      currentViews: this.stats.currentViews,
+      maxViewers: this.stats.maxViewers,
+      newChatters: this.stats.newChatters,
+      currentHosts: this.stats.currentHosts,
+      currentWatched: this.stats.currentWatchedTime,
       game_id: stream.game_id,
       user_id: stream.user_id,
       type: stream.type,
@@ -1329,11 +1333,11 @@ class API extends Core {
         if (response.game.trim() === args.game.trim()) {
           sendMessage(global.translate('game.change.success')
             .replace(/\$game/g, response.game), sender);
-          global.events.fire('game-changed', { oldGame: this.statsCurrentGame, game: response.game });
-          this.statsCurrentGame = response.game;
+          global.events.fire('game-changed', { oldGame: this.stats.currentGame, game: response.game });
+          this.stats.currentGame = response.game;
         } else {
           sendMessage(global.translate('game.change.failed')
-            .replace(/\$game/g, this.statsCurrentGame), sender);
+            .replace(/\$game/g, this.stats.currentGame), sender);
         }
       }
 
@@ -1341,10 +1345,10 @@ class API extends Core {
         if (response.status.trim() === status.trim()) {
           sendMessage(global.translate('title.change.success')
             .replace(/\$title/g, response.status), sender);
-          this.statsCurrentTitle = response.status;
+          this.stats.currentTitle = response.status;
         } else {
           sendMessage(global.translate('title.change.failed')
-            .replace(/\$title/g, this.statsCurrentTitle), sender);
+            .replace(/\$title/g, this.stats.currentTitle), sender);
         }
       }
       this.gameOrTitleChangedManually = true;

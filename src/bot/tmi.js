@@ -408,7 +408,7 @@ class TMI extends Core {
         TODO: update for tmi-js
         if (!global.users.newChattersList.includes(message.tags.login.toLowerCase())) {
           global.users.newChattersList.push(message.tags.login.toLowerCase())
-          global.api.statsNewChatters += 1;
+          global.api.stats.newChatters += 1;
         }
         */
       } else {
@@ -641,7 +641,7 @@ class TMI extends Core {
         autohost: false,
       });
       if (global.api.isStreamOnline) {
-        global.api.statsCurrentBits += parseInt(userstate.bits, 10);
+        global.api.stats.currentBits += parseInt(userstate.bits, 10);
       }
 
       triggerInterfaceOnBit({

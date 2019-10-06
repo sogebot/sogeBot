@@ -473,12 +473,12 @@ class CustomCommands extends System {
       $is,
       $rank,
       // add global variables
-      $game: global.api.statsCurrentGame || 'n/a',
-      $title: global.api.statsCurrentTitle || 'n/a',
-      $views: global.api.statsCurrentViews,
-      $followers: global.api.statsCurrentFollowers,
-      $hosts: global.api.statsCurrentHosts,
-      $subscribers: global.api.statsCurrentSubscribers,
+      $game: global.api.stats.currentGame || 'n/a',
+      $title: global.api.stats.currentTitle || 'n/a',
+      $views: global.api.stats.currentViews,
+      $followers: global.api.stats.currentFollowers,
+      $hosts: global.api.stats.currentHosts,
+      $subscribers: global.api.stats.currentSubscribers,
       ...customVariables,
     };
     let result = false;

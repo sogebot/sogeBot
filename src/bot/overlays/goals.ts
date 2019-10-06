@@ -26,8 +26,8 @@ class Goals extends Overlay {
     this.socket.on('connection', (socket) => {
       socket.on('current', async (cb) => {
         cb(null, {
-          subscribers: global.api.statsCurrentSubscribers,
-          followers: global.api.statsCurrentFollowers,
+          subscribers: global.api.stats.currentSubscribers,
+          followers: global.api.stats.currentFollowers,
         });
       });
     });

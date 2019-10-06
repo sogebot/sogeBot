@@ -109,8 +109,8 @@ class Highlights extends System {
       const highlight = {
         id: request.data.data[0].id,
         timestamp: { hours: timestamp.hours, minutes: timestamp.minutes, seconds: timestamp.seconds },
-        game: global.api.statsCurrentGame || 'n/a',
-        title: global.api.statsCurrentTitle || 'n/a',
+        game: global.api.stats.currentGame || 'n/a',
+        title: global.api.stats.currentTitle || 'n/a',
         created_at: Date.now(),
       };
 

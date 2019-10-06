@@ -19,12 +19,12 @@ const owner = { username: 'soge__', userId: Math.random() };
 describe('Parser - case sensitive commands', async () => {
   const tests = [
     {
-      test: '!uptime',
-      expected: 'Stream is currently offline for',
+      test: '!me',
+      expected: '@soge__ | 0.0h | 0 points | 0 messages | 0.00€ | 0 bits',
     },
     {
-      test: '!UPTIME',
-      expected: 'Stream is currently offline for',
+      test: '!ME',
+      expected: '@soge__ | 0.0h | 0 points | 0 messages | 0.00€ | 0 bits',
     },
   ];
 

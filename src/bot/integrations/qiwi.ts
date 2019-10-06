@@ -65,7 +65,7 @@ class Qiwi extends Integration {
       }
 
       if (global.api.isStreamOnline) {
-        global.api.statsCurrentTips = parseFloat(global.currency.exchange(amount, currency, global.currency.mainCurrency));
+        global.api.stats.currentTips = parseFloat(global.currency.exchange(amount, currency, global.currency.mainCurrency));
       }
 
       global.overlays.eventlist.add({

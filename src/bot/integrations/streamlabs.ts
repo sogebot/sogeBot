@@ -71,7 +71,7 @@ class Streamlabs extends Integration {
             global.db.engine.insert('users.tips', { id, amount: Number(event.amount), message: event.message, currency: event.currency, timestamp: _.now() });
           }
           if (global.api.isStreamOnline) {
-            global.api.statsCurrentTips = parseFloat(global.currency.exchange(event.amount, event.currency, global.currency.mainCurrency));
+            global.api.stats.currentTips = parseFloat(global.currency.exchange(event.amount, event.currency, global.currency.mainCurrency));
           }
         }
         global.overlays.eventlist.add({
