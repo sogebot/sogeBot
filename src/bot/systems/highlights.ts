@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { Request, Response } from 'express';
-import { get, isNil, orderBy } from 'lodash';
+import { isNil, orderBy } from 'lodash';
 import moment from 'moment';
 import 'moment-precise-range-plugin';
 
@@ -60,7 +60,7 @@ class Highlights extends System {
       if (!(await this.isEnabled())) {
         return res.status(412).send({ error: 'Highlights system is disabled' });
       } else {
-        if (!(await global.cache.isOnline())) {
+        if (!(global.api.isStreamOnline)) {
           return res.status(412).send({ error: 'Stream is offline' });
         } else {
           if (settings.clip) {
@@ -83,13 +83,12 @@ class Highlights extends System {
   @command('!highlight')
   @default_permission(permission.CASTERS)
   public async main(opts) {
-    const when = await global.cache.when();
     const token = global.oauth.botAccessToken;
     const cid = global.oauth.channelId;
     const url = `https://api.twitch.tv/helix/videos?user_id=${cid}&type=archive&first=1`;
 
     try {
-      if (isNil(when.online)) {
+      if (!global.api.isStreamOnline) {
         throw Error(ERROR_STREAM_NOT_ONLINE);
       }
       if (token === '' || cid === '') {
@@ -110,8 +109,8 @@ class Highlights extends System {
       const highlight = {
         id: request.data.data[0].id,
         timestamp: { hours: timestamp.hours, minutes: timestamp.minutes, seconds: timestamp.seconds },
-        game: get(await global.db.engine.findOne('api.current', { key: 'game' }), 'value', 'n/a'),
-        title: get(await global.db.engine.findOne('api.current', { key: 'title' }), 'value', 'n/a'),
+        game: global.api.statsCurrentGame || 'n/a',
+        title: global.api.statsCurrentTitle || 'n/a',
         created_at: Date.now(),
       };
 

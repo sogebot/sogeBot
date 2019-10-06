@@ -1,0 +1,1815 @@
+import axios from 'axios';
+import querystring from 'querystring';
+import { setTimeout } from 'timers';
+import moment from 'moment';
+require('moment-precise-range-plugin'); // moment.preciseDiff
+import { isMainThread } from 'worker_threads';
+import chalk from 'chalk';
+import { chunk, defaults, filter, flatMap, get, includes, isEmpty, isNil, isNull, map } from 'lodash';
+
+import * as constants from './constants';
+import Core from './_interface';
+import { debug, error, follow, info, start, stop, unfollow, warning } from './helpers/log';
+import { getBroadcaster, getChannel, isBot, isBroadcaster, isIgnored, sendMessage } from './commons';
+
+import { triggerInterfaceOnFollow } from './helpers/interface/triggers';
+import { shared } from './decorators';
+
+const limitProxy = {
+  get: function (obj, prop) {
+    if (typeof obj[prop] === 'undefined') {
+      if (prop === 'limit') {
+        return 120;
+      }
+      if (prop === 'remaining') {
+        return 800;
+      }
+      if (prop === 'refresh') {
+        return (Date.now() / 1000) + 90;
+      }
+    } else {
+      return obj[prop];
+    }
+  },
+  set: function (obj, prop, value) {
+    if (Number(value) === Number(obj[prop])) {
+      return true;
+    }
+    value = Number(value);
+    obj[prop] = value;
+    return true;
+  },
+};
+
+class API extends Core {
+  @shared(true)
+  statsCurrentWatchedTime = 0;
+  @shared(true)
+  statsCurrentViewers = 0;
+  @shared(true)
+  statsMaxViewers = 0;
+  @shared(true)
+  statsCurrentSubscribers = 0;
+  @shared(true)
+  statsCurrentBits = 0;
+  @shared(true)
+  statsCurrentTips = 0;
+  @shared(true)
+  statsCurrentFollowers = 0;
+  @shared(true)
+  statsCurrentViews = 0;
+  @shared(true)
+  statsCurrentGame: string | null = null;
+  @shared(true)
+  statsCurrentTitle: string | null = null;
+  @shared(true)
+  statsCurrentHosts = 0;
+  @shared(true)
+  statsNewChatters = 0;
+
+  @shared(true)
+  isStreamOnline = false;
+  @shared(true)
+  streamStatusChangeSince: number =  Date.now();
+
+  @shared(true)
+  rawStatus = '';
+
+  @shared(true)
+  gameCache = '';
+
+  calls = {
+    bot: new Proxy({}, limitProxy),
+    broadcaster: new Proxy({}, limitProxy),
+  };
+  rate_limit_follower_check = new Set();
+  chatMessagesAtStart = global.linesParsed;
+  maxRetries = 3;
+  curRetries = 0;
+  streamType = 'live';
+  streamId: null | string = null;
+  streamStartedAt = Date.now();
+  gameOrTitleChangedManually = false;
+
+  retries = {
+    getCurrentStreamData: 0,
+    getChannelDataOldAPI: 0,
+    getChannelSubscribers: 0,
+  };
+
+  api_timeouts: {
+    [fnc: string]: {
+      isRunning: boolean;
+      opts: any;
+    };
+  } = {};
+
+  constructor () {
+    super();
+    this.addMenu({ category: 'logs', name: 'api', id: 'apistats' });
+
+    if (isMainThread) {
+      this.interval('getCurrentStreamData', constants.MINUTE);
+      this.interval('getCurrentStreamTags', constants.MINUTE);
+      this.interval('updateChannelViewsAndBroadcasterType', constants.MINUTE);
+      this.interval('getLatest100Followers', constants.MINUTE);
+      this.interval('getChannelHosts', constants.MINUTE);
+      this.interval('getChannelSubscribers', 2 * constants.MINUTE);
+      this.interval('getChannelChattersUnofficialAPI', constants.MINUTE);
+      this.interval('getChannelDataOldAPI', constants.MINUTE);
+      this.interval('intervalFollowerUpdate', constants.MINUTE);
+      this.interval('checkClips', constants.MINUTE);
+      this.interval('getAllStreamTags', constants.HOUR * 12);
+
+      global.db.engine.index('cache', [{ index: 'key', unique: true }]);
+      global.db.engine.index('cache.raids', [{ index: 'username', unique: true }]);
+      global.db.engine.index('cache.titles', [{ index: 'game' }]);
+      global.db.engine.index('api.clips', [{ index: 'clipId', unique: true }]);
+      global.db.engine.index('core.api.tags', [{ index: 'tag_id', unique: true }]);
+      global.db.engine.index('core.api.currentTags', [{ index: 'tag_id', unique: true }]);
+      global.db.engine.index('core.api.games', [{ index: 'id', unique: true }]);
+    } else {
+      this.calls = {
+        bot: {
+          limit: 0,
+          remaining: 0,
+          refresh: 0,
+        },
+        broadcaster: {
+          limit: 0,
+          remaining: 0,
+          refresh: 0,
+        },
+      };
+    }
+  }
+
+  async timeoutAfterMs (ms) {
+    return new Promise((resolve) => {
+      setTimeout(() => resolve({ state: false }), ms);
+    });
+  }
+
+  async setRateLimit (type, limit, remaining, reset) {
+    this.calls[type].limit = limit;
+    this.calls[type].remaining = remaining;
+    this.calls[type].reset = reset;
+  }
+
+  async interval (fnc, interval) {
+    setInterval(async () => {
+      if (typeof this.api_timeouts[fnc] === 'undefined') {
+        this.api_timeouts[fnc] = { opts: {}, isRunning: false };
+      }
+
+      if (!this.api_timeouts[fnc].isRunning) {
+        this.api_timeouts[fnc].isRunning = true;
+        debug('api.interval', chalk.yellow(fnc + '() ') + 'start');
+        const value = await Promise.race([
+          this[fnc](this.api_timeouts[fnc].opts),
+          this.timeoutAfterMs(10000),
+        ]);
+        debug('api.interval', chalk.yellow(fnc + '() ') + JSON.stringify(value));
+
+        if (value.disable) {
+          return;
+        }
+        if (value.state) { // if is ok, update opts and run unlock after a while
+          if (typeof value.opts !== 'undefined') {
+            this.api_timeouts[fnc].opts = value.opts;
+          }
+          setTimeout(() => {
+            this.api_timeouts[fnc].isRunning = false;
+          }, interval);
+        } else { // else run next tick
+          if (typeof value.opts !== 'undefined') {
+            this.api_timeouts[fnc].opts = value.opts;
+          }
+          this.api_timeouts[fnc].isRunning = false;
+        }
+      }
+    }, 1000);
+  }
+
+  async intervalFollowerUpdate () {
+    if (!isMainThread) {
+      throw new Error('API can run only on master');
+    }
+
+    for (const username of this.rate_limit_follower_check) {
+      const user = await global.users.getByName(username);
+      const isSkipped = user.username === getBroadcaster() || user.username === global.oauth.botUsername;
+      const userHaveId = !isNil(user.id);
+      if (new Date().getTime() - get(user, 'time.followCheck', 0) <= 1000 * 60 * 60 * 24 || isSkipped || !userHaveId) {
+        this.rate_limit_follower_check.delete(user.username);
+      }
+    }
+    if (this.rate_limit_follower_check.size > 0 && !isNil(global.overlays)) {
+      const user = await global.users.getByName(Array.from(this.rate_limit_follower_check)[0]);
+      this.rate_limit_follower_check.delete(user.username);
+      await this.isFollowerUpdate(user);
+    }
+    return { state: true };
+  }
+
+  async getUsernameFromTwitch (id) {
+    const url = `https://api.twitch.tv/helix/users?id=${id}`;
+    let request;
+    /*
+      {
+        "data": [{
+          "id": "44322889",
+          "login": "dallas",
+          "display_name": "dallas",
+          "type": "staff",
+          "broadcaster_type": "",
+          "description": "Just a gamer playing games and chatting. :)",
+          "profile_image_url": "https://static-cdn.jtvnw.net/jtv_user_pictures/dallas-profile_image-1a2c906ee2c35f12-300x300.png",
+          "offline_image_url": "https://static-cdn.jtvnw.net/jtv_user_pictures/dallas-channel_offline_image-1a2c906ee2c35f12-1920x1080.png",
+          "view_count": 191836881,
+          "email": "login@provider.com"
+        }]
+      }
+    */
+
+    const token = await global.oauth.botAccessToken;
+    const needToWait = token === '';
+    const notEnoughAPICalls = this.calls.bot.remaining <= 30 && this.calls.bot.refresh > Date.now() / 1000;
+    if ((needToWait || notEnoughAPICalls)) {
+      return null;
+    }
+
+    try {
+      request = await axios.get(url, {
+        headers: {
+          'Authorization': 'Bearer ' + token,
+        },
+      });
+
+      // save remaining api calls
+      // $FlowFixMe error with flow on request.headers
+      this.calls.bot.limit = request.headers['ratelimit-limit'];
+      // $FlowFixMe error with flow on request.headers
+      this.calls.bot.remaining = request.headers['ratelimit-remaining'];
+      // $FlowFixMe error with flow on request.headers
+      this.calls.bot.refresh = request.headers['ratelimit-reset'];
+      global.workers.callOnAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', request.headers['ratelimit-limit'], request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] });
+
+      if (global.panel && global.panel.io) {
+        global.panel.io.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'getUsernameFromTwitch', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining });
+      }
+      return request.data.data[0].login;
+    } catch (e) {
+      if (typeof e.response !== 'undefined' && e.response.status === 429) {
+        global.workers.callOnAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', 120, 0, e.response.headers['ratelimit-reset'] ] });
+        this.calls.bot.remaining = 0;
+        this.calls.bot.refresh = e.response.headers['ratelimit-reset'];
+      }
+      if (global.panel && global.panel.io) {
+        global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'getUsernameFromTwitch', api: 'helix', endpoint: url, code: e.response.status, data: e.stack, remaining: this.calls.bot.remaining });
+      }
+    }
+    return null;
+  }
+
+  async getIdFromTwitch (username, isChannelId = false) {
+    const url = `https://api.twitch.tv/helix/users?login=${username}`;
+    let request;
+    /*
+      {
+        "data": [{
+          "id": "44322889",
+          "login": "dallas",
+          "display_name": "dallas",
+          "type": "staff",
+          "broadcaster_type": "",
+          "description": "Just a gamer playing games and chatting. :)",
+          "profile_image_url": "https://static-cdn.jtvnw.net/jtv_user_pictures/dallas-profile_image-1a2c906ee2c35f12-300x300.png",
+          "offline_image_url": "https://static-cdn.jtvnw.net/jtv_user_pictures/dallas-channel_offline_image-1a2c906ee2c35f12-1920x1080.png",
+          "view_count": 191836881,
+          "email": "login@provider.com"
+        }]
+      }
+    */
+
+    const token = global.oauth.botAccessToken;
+    const needToWait = token === '';
+    const notEnoughAPICalls = this.calls.bot.remaining <= 30 && this.calls.bot.refresh > Date.now() / 1000;
+    if ((needToWait || notEnoughAPICalls) && !isChannelId) {
+      return null;
+    }
+
+    try {
+      request = await axios.get(url, {
+        headers: {
+          'Authorization': 'Bearer ' + token,
+        },
+      });
+
+      // save remaining api calls
+      // $FlowFixMe error with flow on request.headers
+      this.calls.bot.limit = request.headers['ratelimit-limit'];
+      // $FlowFixMe error with flow on request.headers
+      this.calls.bot.remaining = request.headers['ratelimit-remaining'];
+      // $FlowFixMe error with flow on request.headers
+      this.calls.bot.refresh = request.headers['ratelimit-reset'];
+      global.workers.callOnAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', request.headers['ratelimit-limit'], request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] });
+
+      if (global.panel && global.panel.io) {
+        global.panel.io.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'getIdFromTwitch', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining });
+      }
+
+      return request.data.data[0].id;
+    } catch (e) {
+      if (typeof e.response !== 'undefined' && e.response.status === 429) {
+        global.workers.callOnAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', 120, 0, e.response.headers['ratelimit-reset'] ] });
+        this.calls.bot.remaining = 0;
+        this.calls.bot.refresh = e.response.headers['ratelimit-reset'];
+        if (global.panel && global.panel.io) {
+          global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'getIdFromTwitch', api: 'helix', endpoint: url, code: e.response.status, data: e.stack, remaining: this.calls.bot.remaining });
+        }
+      } else {
+        if (global.panel && global.panel.io) {
+          global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'getIdFromTwitch', api: 'helix', endpoint: url, code: 'n/a', data: e.stack, remaining: this.calls.bot.remaining });
+        }
+      }
+    }
+    return null;
+  }
+
+  async getChannelChattersUnofficialAPI (opts) {
+    if (!isMainThread) {
+      throw new Error('API can run only on master');
+    }
+
+    const sendJoinEvent = async (bulk) => {
+      for (const user of bulk) {
+        await new Promise((resolve) => setTimeout(() => resolve(), 1000));
+        this.isFollower(user.username);
+        global.events.fire('user-joined-channel', { username: user.username });
+      }
+    };
+    const sendPartEvent = async (bulk) => {
+      for (const user of bulk) {
+        await new Promise((resolve) => setTimeout(() => resolve(), 1000));
+        global.events.fire('user-parted-channel', { username: user.username });
+      }
+    };
+
+    const url = `https://tmi.twitch.tv/group/user/${getChannel()}/chatters`;
+    const needToWait = isNil(global.widgets);
+    if (needToWait) {
+      return { state: false, opts };
+    }
+
+    let request;
+    try {
+      request = await axios.get(url);
+      if (global.panel && global.panel.io) {
+        global.panel.io.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'getChannelChattersUnofficialAPI', api: 'unofficial', endpoint: url, code: request.status });
+      }
+      opts.saveToWidget = true;
+    } catch (e) {
+      if (global.panel && global.panel.io) {
+        global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'getChannelChattersUnofficialAPI', api: 'unofficial', endpoint: url, code: e.response.status, data: e.stack });
+      }
+      return { state: false, opts };
+    }
+
+    if (typeof request.data.chatters === 'undefined') {
+      return { state: true };
+    }
+
+    const chatters: any[] = flatMap(request.data.chatters);
+    this.checkBotModeratorStatus(request.data.chatters.moderators);
+
+    const bulkInsert: any[] = [];
+    const bulkParted: any[] = [];
+    const allOnlineUsers = await global.users.getAllOnlineUsernames();
+
+    for (const user of allOnlineUsers) {
+      if (!includes(chatters, user)) {
+        // user is no longer in channel
+        await global.db.engine.remove('users.online', { username: user });
+        if (!isIgnored({ username: user })) {
+          bulkParted.push({ username: user });
+          global.widgets.joinpart.send({ username: user, type: 'part' });
+        }
+      }
+    }
+
+    for (const chatter of chatters) {
+      if (isIgnored({ username: chatter }) || global.oauth.botUsername === chatter) {
+        // even if online, remove ignored user from collection
+        await global.db.engine.remove('users.online', { username: chatter });
+      } else if (!includes(allOnlineUsers, chatter)) {
+        bulkInsert.push({ username: chatter });
+        global.widgets.joinpart.send({ username: chatter, type: 'join' });
+      }
+    }
+    // always remove bot from online users
+    global.db.engine.remove('users.online', { username: global.oauth.botUsername });
+
+    if (bulkInsert.length > 0) {
+      for (const chunkInsert of chunk(bulkInsert, 100)) {
+        await global.db.engine.insert('users.online', chunkInsert);
+      }
+    }
+
+    if (opts.saveToWidget) {
+      sendPartEvent(bulkParted);
+    }
+    if (opts.saveToWidget) {
+      sendJoinEvent(bulkInsert);
+    }
+
+    return { state: true, opts };
+  }
+
+  /**
+   * Checks if bot is moderator and set proper status
+   * @param {string[]} mods
+   */
+  async checkBotModeratorStatus (mods) {
+    global.status.MOD = mods.map(o => o.toLowerCase()).includes(global.oauth.botUsername);
+  }
+
+  async getAllStreamTags(opts) {
+    if (!isMainThread) {
+      throw new Error('API can run only on master');
+    }
+    let url = `https://api.twitch.tv/helix/tags/streams?first=100`;
+    if (opts.cursor) {
+      url += '&after=' + opts.cursor;
+    }
+
+    const token = global.oauth.botAccessToken;
+    const needToWait = isNil(global.overlays) || token === '';
+    const notEnoughAPICalls = this.calls.bot.remaining <= 30 && this.calls.bot.refresh > Date.now() / 1000;
+
+    if (needToWait || notEnoughAPICalls) {
+      delete opts.count;
+      return { state: false, opts };
+    }
+
+    let request;
+    try {
+      request = await axios.get(url, {
+        headers: {
+          'Authorization': 'Bearer ' + token,
+        },
+      });
+      const tags = request.data.data;
+
+      for(const tag of tags) {
+        await global.db.engine.update('core.api.tags', { tag_id: tag.tag_id }, tag);
+      }
+
+      if (global.panel && global.panel.io) {
+        global.panel.io.emit('api.stats', { data: tags, timestamp: Date.now(), call: 'getAllStreamTags', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining });
+      }
+
+      // save remaining api calls
+      this.calls.bot.remaining = request.headers['ratelimit-remaining'];
+      this.calls.bot.refresh = request.headers['ratelimit-reset'];
+      this.calls.bot.limit = request.headers['ratelimit-limit'];
+      global.workers.sendToAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', request.headers['ratelimit-limit'], request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] });
+
+      if (tags.length === 100) {
+        // move to next page
+        this.getAllStreamTags({ cursor: request.data.pagination.cursor });
+      }
+    } catch (e) {
+      error(`${url} - ${e.message}`);
+      if (global.panel && global.panel.io) {
+        global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'getChannelSubscribers', api: 'helix', endpoint: url, code: e.response.status || 200, data: e.stack, remaining: this.calls.bot.remaining });
+      }
+    }
+    delete opts.count;
+    return { state: true, opts };
+
+  }
+
+  async getChannelSubscribers (opts) {
+    if (!isMainThread) {
+      throw new Error('API can run only on master');
+    }
+    opts = opts || {};
+
+    const cid = global.oauth.channelId;
+    let url = `https://api.twitch.tv/helix/subscriptions?broadcaster_id=${cid}&first=100`;
+    if (opts.cursor) {
+      url += '&after=' + opts.cursor;
+    }
+    if (typeof opts.count === 'undefined') {
+      opts.count = -1;
+    } // start at -1 because owner is subbed as well
+
+    const token = global.oauth.broadcasterAccessToken;
+    const needToWait = isNil(cid) || cid === '' || isNil(global.overlays) || token === '';
+    const notEnoughAPICalls = this.calls.bot.remaining <= 30 && this.calls.bot.refresh > Date.now() / 1000;
+
+    if (needToWait || notEnoughAPICalls || global.oauth.broadcasterType === '') {
+      if (global.oauth.broadcasterType === '') {
+        if (!opts.noAffiliateOrPartnerWarningSent) {
+          warning('Broadcaster is not affiliate/partner, will not check subs');
+          global.api.statsCurrentSubscribers = 0;
+        }
+        delete opts.count;
+        return { state: false, opts: { ...opts, noAffiliateOrPartnerWarningSent: true } };
+      } else {
+        return { state: false, opts: { ...opts, noAffiliateOrPartnerWarningSent: false } };
+      }
+    }
+
+    let request;
+    try {
+      request = await axios.get(url, {
+        headers: {
+          'Authorization': 'Bearer ' + token,
+        },
+      });
+      const subscribers = request.data.data;
+      if (opts.subscribers) {
+        opts.subscribers = [...subscribers, ...opts.subscribers];
+      } else {
+        opts.subscribers = subscribers;
+      }
+
+      if (global.panel && global.panel.io) {
+        global.panel.io.emit('api.stats', { data: subscribers, timestamp: Date.now(), call: 'getChannelSubscribers', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining });
+      }
+
+      // save remaining api calls
+      this.calls.bot.remaining = request.headers['ratelimit-remaining'];
+      this.calls.bot.refresh = request.headers['ratelimit-reset'];
+      this.calls.bot.limit = request.headers['ratelimit-limit'];
+      global.workers.callOnAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', request.headers['ratelimit-limit'], request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] });
+
+      if (subscribers.length === 100) {
+        // move to next page
+        this.getChannelSubscribers({ cursor: request.data.pagination.cursor, count: subscribers.length + opts.count, subscribers });
+      } else {
+        this.statsCurrentSubscribers = subscribers.length + opts.count;
+        this.setSubscribers(opts.subscribers.filter(o => !isBroadcaster(o.user_name) && !isBot(o.user_name)));
+      }
+
+      // reset warning after correct calls (user may have affiliate or have correct oauth)
+      opts.noAffiliateOrPartnerWarningSent = false;
+      opts.notCorrectOauthWarningSent = false;
+    } catch (e) {
+      if (e.message === '403 Forbidden' && !opts.notCorrectOauthWarningSent) {
+        opts.notCorrectOauthWarningSent = true;
+        warning('Broadcaster have not correct oauth, will not check subs');
+        this.statsCurrentSubscribers = 0;
+      } else {
+        error(`${url} - ${e.stack}`);
+        if (global.panel && global.panel.io) {
+          global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'getChannelSubscribers', api: 'helix', endpoint: url, code: e.response.status, data: e.stack, remaining: this.calls.bot.remaining });
+        }
+      }
+    }
+    delete opts.count;
+    return { state: true, opts };
+  }
+
+  async setSubscribers (subscribers) {
+    const currentSubscribers = await global.db.engine.find('users', { is: { subscriber: true } });
+
+    // check if current subscribers are still subs
+    for (const user of currentSubscribers) {
+      if (typeof user.lock === 'undefined' || (typeof user.lock !== 'undefined' && !user.lock.subscriber)) {
+        if (!subscribers
+          .map((o) => String(o.user_id))
+          .includes(String(user.id))) {
+          // subscriber is not sub anymore -> unsub and set subStreak to 0
+          await global.db.engine.update('users', { id: user.id }, {  is: { subscriber: false }, stats: { subStreak: 0 } });
+        }
+      }
+    }
+
+    // update subscribers tier and set them active
+    for (const user of subscribers) {
+      await global.db.engine.update('users', { id: user.user_id }, { username: user.user_name.toLowerCase(), is: { subscriber: true }, stats: { tier: user.tier / 1000 } });
+    }
+
+    // update all subscribed_at
+    const subscribersAfter = await global.db.engine.find('users', { is: { subscriber: true } });
+    for (const user of subscribersAfter) {
+      if (typeof user.time !== 'undefined' && typeof user.time.subscribed_at !== 'undefined') {
+        await global.db.engine.update('users', { _id: String(user._id) }, { time: { subscribed_at: new Date(user.time.subscribed_at).getTime() }});
+      }
+    }
+  }
+
+  async getChannelDataOldAPI (opts) {
+    if (!isMainThread) {
+      throw new Error('API can run only on master');
+    }
+
+    const cid = global.oauth.channelId;
+    const url = `https://api.twitch.tv/kraken/channels/${cid}`;
+
+    const token = await global.oauth.botAccessToken;
+    const needToWait = isNil(cid) || cid === '' || isNil(global.overlays) || token === '';
+    if (needToWait) {
+      return { state: false, opts };
+    }
+    // getChannelDatraOldAPI only if stream is offline
+    if (this.isStreamOnline) {
+      this.retries.getChannelDataOldAPI = 0;
+      return { state: true, opts };
+    }
+
+    let request;
+    try {
+      request = await axios.get(url, {
+        headers: {
+          'Accept': 'application/vnd.twitchtv.v5+json',
+          'Authorization': 'OAuth ' + token,
+        },
+      });
+      if (global.panel && global.panel.io) {
+        global.panel.io.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'getChannelDataOldAPI', api: 'kraken', endpoint: url, code: request.status });
+      }
+
+      if (!this.gameOrTitleChangedManually) {
+        // Just polling update
+        let rawStatus = this.rawStatus;
+        const status = await this.parseTitle(null);
+
+        if (request.data.status !== status && this.retries.getChannelDataOldAPI === -1) {
+          return { state: true, opts };
+        } else if (request.data.status !== status && !opts.forceUpdate) {
+          // check if status is same as updated status
+          const numOfRetries = global.twitch.isTitleForced ? 1 : 15;
+          if (this.retries.getChannelDataOldAPI >= numOfRetries) {
+            this.retries.getChannelDataOldAPI = 0;
+
+            // if we want title to be forced
+            if (global.twitch.isTitleForced) {
+              const game = this.gameCache;
+              info(`Title/game force enabled => ${game} | ${rawStatus}`);
+              this.setTitleAndGame(null, { });
+              return { state: true, opts };
+            } else {
+              info(`Title/game changed outside of a bot => ${request.data.game} | ${request.data.status}`);
+              this.retries.getChannelDataOldAPI = -1;
+              rawStatus = request.data.status;
+            }
+          } else {
+            this.retries.getChannelDataOldAPI++;
+            return { state: false, opts };
+          }
+        } else {
+          this.retries.getChannelDataOldAPI = 0;
+        }
+
+        this.statsCurrentGame = request.data.game;
+        this.statsCurrentTitle = request.data.status;
+        this.gameCache = request.data.game;
+        this.rawStatus = rawStatus;
+      } else {
+        this.gameOrTitleChangedManually = false;
+      }
+    } catch (e) {
+      error(`${url} - ${e.message}`);
+      if (global.panel && global.panel.io) {
+        global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'getChannelDataOldAPI', api: 'kraken', endpoint: url, code: e.response.status, data: e.stack });
+      }
+      return { state: false, opts };
+    }
+
+    this.retries.getChannelDataOldAPI = 0;
+    return { state: true, opts };
+  }
+
+  async getChannelHosts () {
+    if (!isMainThread) {
+      throw new Error('API can run only on master');
+    }
+
+    const cid = global.oauth.channelId;
+
+    if (isNil(cid) || cid === '') {
+      return { state: false };
+    }
+
+    let request;
+    const url = `http://tmi.twitch.tv/hosts?include_logins=1&target=${cid}`;
+    try {
+      request = await axios.get(url);
+      if (global.panel && global.panel.io) {
+        global.panel.io.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'getChannelHosts', api: 'tmi', endpoint: url, code: request.status });
+      }
+
+      this.statsCurrentHosts = request.data.hosts.length;
+
+      // save hosts list
+      for (const host of map(request.data.hosts, 'host_login')) {
+        await global.db.engine.update('cache.hosts', { username: host }, { username: host });
+      }
+    } catch (e) {
+      error(`${url} - ${e.message}`);
+      if (global.panel && global.panel.io) {
+        global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'getChannelHosts', api: 'tmi', endpoint: url, code: e.response.status, data: e.stack });
+      }
+      return { state: e.response.status === 500 };
+    }
+    return { state: true };
+  }
+
+  async updateChannelViewsAndBroadcasterType () {
+    const cid = global.oauth.channelId;
+    const url = `https://api.twitch.tv/helix/users/?id=${cid}`;
+
+    const token = await global.oauth.botAccessToken;
+    const needToWait = isNil(cid) || cid === '' || isNil(global.overlays) || token === '';
+    const notEnoughAPICalls = this.calls.bot.remaining <= 30 && this.calls.bot.refresh > Date.now() / 1000;
+    if (needToWait || notEnoughAPICalls) {
+      return { state: false };
+    }
+
+    let request;
+    try {
+      request = await axios.get(url, {
+        headers: {
+          'Authorization': 'Bearer ' + token,
+        },
+      });
+      if (global.panel && global.panel.io) {
+        global.panel.io.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'updateChannelViewsAndBroadcasterType', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining });
+      }
+
+      // save remaining api calls
+      this.calls.bot.remaining = request.headers['ratelimit-remaining'];
+      this.calls.bot.refresh = request.headers['ratelimit-reset'];
+      this.calls.bot.limit = request.headers['ratelimit-limit'];
+      global.workers.callOnAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', request.headers['ratelimit-limit'], request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] });
+
+      if (request.data.data.length > 0) {
+        global.oauth.broadcasterType = request.data.data[0].broadcaster_type;
+        this.statsCurrentViews = request.data.data[0].view_count;
+      }
+    } catch (e) {
+      if (typeof e.response !== 'undefined' && e.response.status === 429) {
+        global.workers.callOnAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', 120, 0, e.response.headers['ratelimit-reset'] ] });
+        this.calls.bot.remaining = 0;
+        this.calls.bot.refresh = e.response.headers['ratelimit-reset'];
+      }
+
+      error(`${url} - ${e.message}`);
+      if (global.panel && global.panel.io) {
+        global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'updateChannelViewsAndBroadcasterType', api: 'helix', endpoint: url, code: e.response.status, data: e.stack, remaining: this.calls.bot.remaining });
+      }
+    }
+    return { state: true };
+  }
+
+  async getLatest100Followers (quiet) {
+    const cid = global.oauth.channelId;
+    const url = `https://api.twitch.tv/helix/users/follows?to_id=${cid}&first=100`;
+    const token = await global.oauth.botAccessToken;
+    const needToWait = isNil(cid) || cid === '' || isNil(global.overlays) || token === '';
+    const notEnoughAPICalls = this.calls.bot.remaining <= 30 && this.calls.bot.refresh > Date.now() / 1000;
+
+    if (needToWait || notEnoughAPICalls) {
+      return { state: false, opts: quiet };
+    }
+
+    let request;
+    try {
+      request = await axios.get(url, {
+        headers: {
+          'Authorization': 'Bearer ' + token,
+        },
+      });
+
+      // save remaining api calls
+      this.calls.bot.remaining = request.headers['ratelimit-remaining'];
+      this.calls.bot.refresh = request.headers['ratelimit-reset'];
+      this.calls.bot.limit = request.headers['ratelimit-limit'];
+      global.workers.callOnAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', request.headers['ratelimit-limit'], request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] });
+
+      if (global.panel && global.panel.io) {
+        global.panel.io.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'getLatest100Followers', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining });
+      }
+
+      if (request.status === 200 && !isNil(request.data.data)) {
+        // check if user id is in db, not in db load username from API
+        for (const f of request.data.data) {
+          f.from_name = String(f.from_name).toLowerCase();
+          const user = await global.users.getById(f.from_id);
+          user.username = f.from_name;
+          global.db.engine.update('users', { id: f.from_id }, { username: f.from_name });
+
+          if (!get(user, 'is.follower', false)) {
+            if (new Date().getTime() - new Date(f.followed_at).getTime() < 2 * constants.HOUR) {
+              if ((get(user, 'time.follow', 0) === 0 || new Date().getTime() - get(user, 'time.follow', 0) > 60000 * 60) && !global.webhooks.existsInCache('follow', user.id)) {
+                global.webhooks.addIdToCache('follow', user.id);
+                global.overlays.eventlist.add({
+                  type: 'follow',
+                  username: user.username,
+                  timestamp: Date.now(),
+                });
+                if (!quiet && !isBot(user.username)) {
+                  follow(user.username);
+                  global.events.fire('follow', { username: user.username });
+                  global.registries.alerts.trigger({
+                    event: 'follows',
+                    name: user.username,
+                    amount: 0,
+                    currency: '',
+                    monthsName: '',
+                    message: '',
+                    autohost: false,
+                  });
+
+                  triggerInterfaceOnFollow({
+                    username: user.username,
+                    userId: f.from_id,
+                  });
+                }
+              }
+            }
+          }
+          try {
+            const followedAt = user.lock && user.lock.followed_at ? Number(user.time.follow) : new Date(f.followed_at).getTime();
+            const isFollower = user.lock && user.lock.follower ? user.is.follower : true;
+            global.db.engine.update('users', { id: f.from_id }, { username: f.from_name, is: { follower: isFollower }, time: { followCheck: new Date().getTime(), follow: followedAt } });
+          } catch (e) {
+            error(e.stack);
+          }
+        }
+      }
+      this.statsCurrentFollowers =  request.data.total;
+      quiet = false;
+    } catch (e) {
+      if (typeof e.response !== 'undefined' && e.response.status === 429) {
+        global.workers.callOnAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', 120, 0, e.response.headers['ratelimit-reset'] ] });
+        this.calls.bot.remaining = 0;
+        this.calls.bot.refresh = e.response.headers['ratelimit-reset'];
+      }
+
+      quiet = e.errno !== 'ECONNREFUSED' && e.errno !== 'ETIMEDOUT';
+      error(`${url} - ${e.message}`);
+      if (global.panel && global.panel.io) {
+        global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'getLatest100Followers', api: 'helix', endpoint: url, code: e.response.status, data: e.stack, remaining: this.calls.bot.remaining });
+      }
+      return { state: false, opts: quiet };
+    }
+    return { state: true, opts: quiet };
+  }
+
+  async getGameFromId (id) {
+    let request;
+    const url = `https://api.twitch.tv/helix/games?id=${id}`;
+
+    if (id.toString().trim().length === 0 || parseInt(id, 10) === 0) {
+      return '';
+    } // return empty game if gid is empty
+
+    const gameFromDb = await global.db.engine.findOne('core.api.games', { id });
+
+    // check if id is cached
+    if (!isEmpty(gameFromDb)) {
+      return gameFromDb.name;
+    }
+
+    try {
+      const token = await global.oauth.botAccessToken;
+      if (token === '') {
+        throw new Error('token not available');
+      }
+      request = await axios.get(url, {
+        headers: {
+          'Authorization': 'Bearer ' + token,
+        },
+      });
+
+      // save remaining api calls
+      this.calls.bot.remaining = request.headers['ratelimit-remaining'];
+      this.calls.bot.refresh = request.headers['ratelimit-reset'];
+      this.calls.bot.limit = request.headers['ratelimit-limit'];
+      global.workers.callOnAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', request.headers['ratelimit-limit'], request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] });
+
+      if (isMainThread) {
+        if (global.panel && global.panel.io) {
+          global.panel.io.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'getGameFromId', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining });
+        }
+      }
+
+      // add id->game to cache
+      const name = request.data.data[0].name;
+      await global.db.engine.insert('core.api.games', { id, name });
+      return name;
+    } catch (e) {
+      if (typeof e.response !== 'undefined' && e.response.status === 429) {
+        global.workers.callOnAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', 120, 0, e.response.headers['ratelimit-reset'] ] });
+        this.calls.bot.remaining = 0;
+        this.calls.bot.refresh = e.response.headers['ratelimit-reset'];
+      }
+
+      warning(`Couldn't find name of game for gid ${id} - fallback to ${this.statsCurrentGame}`);
+      error(`API: ${url} - ${e.stack}`);
+      if (isMainThread) {
+        if (global.panel && global.panel.io) {
+          global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'getGameFromId', api: 'helix', endpoint: url, code: e.response.status, data: e.stack, remaining: this.calls.bot.remaining });
+        }
+      }
+      return this.statsCurrentGame;
+    }
+  }
+
+  async getCurrentStreamTags (opts) {
+    if (!isMainThread) {
+      throw new Error('API can run only on master');
+    }
+
+    const cid = global.oauth.channelId;
+    const url = `https://api.twitch.tv/helix/streams/tags?broadcaster_id=${cid}`;
+
+    const token = await global.oauth.botAccessToken;
+    const needToWait = isNil(cid) || cid === '' || isNil(global.overlays) || token === '';
+    const notEnoughAPICalls = this.calls.bot.remaining <= 30 && this.calls.bot.refresh > Date.now() / 1000;
+    if (needToWait || notEnoughAPICalls) {
+      return { state: false, opts };
+    }
+
+    let request;
+    try {
+      request = await axios.get(url, {
+        headers: {
+          'Authorization': 'Bearer ' + token,
+        },
+      });
+
+      // save remaining api calls
+      this.calls.bot.remaining = request.headers['ratelimit-remaining'];
+      this.calls.bot.refresh = request.headers['ratelimit-reset'];
+      this.calls.bot.limit = request.headers['ratelimit-limit'];
+      global.workers.sendToAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', request.headers['ratelimit-limit'], request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] });
+
+      if (global.panel && global.panel.io) {
+        global.panel.io.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'getCurrentStreamTags', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining });
+      }
+
+      if (request.status === 200 && !isNil(request.data.data[0])) {
+        const tags = request.data.data;
+        await global.db.engine.remove('core.api.currentTags', {});
+        for (const tag of tags) {
+          await global.db.engine.update('core.api.currentTags', { tag_id: tag.tag_id }, tag);
+        }
+      }
+    } catch (e) {
+      error(`${url} - ${e.message}`);
+      if (global.panel && global.panel.io) {
+        global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'getCurrentStreamTags', api: 'getCurrentStreamTags', endpoint: url, code: e.response.status, data: e.stack, remaining: this.calls.bot.remaining });
+      }
+      return { state: false, opts };
+    }
+    return { state: true, opts };
+  }
+
+  async getCurrentStreamData (opts) {
+    if (!isMainThread) {
+      throw new Error('API can run only on master');
+    }
+
+    const cid = global.oauth.channelId;
+    const url = `https://api.twitch.tv/helix/streams?user_id=${cid}`;
+
+    const token = await global.oauth.botAccessToken;
+    const needToWait = isNil(cid) || cid === '' || isNil(global.overlays) || token === '';
+    const notEnoughAPICalls = this.calls.bot.remaining <= 30 && this.calls.bot.refresh > Date.now() / 1000;
+    if (needToWait || notEnoughAPICalls) {
+      return { state: false, opts };
+    }
+
+    let request;
+    try {
+      request = await axios.get(url, {
+        headers: {
+          'Authorization': 'Bearer ' + token,
+        },
+      });
+
+      global.status.API = request.status === 200 ? constants.CONNECTED : constants.DISCONNECTED;
+
+      // save remaining api calls
+      this.calls.bot.remaining = request.headers['ratelimit-remaining'];
+      this.calls.bot.refresh = request.headers['ratelimit-reset'];
+      this.calls.bot.limit = request.headers['ratelimit-limit'];
+      global.workers.callOnAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', request.headers['ratelimit-limit'], request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] });
+
+      if (global.panel && global.panel.io) {
+        global.panel.io.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'getCurrentStreamData', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining });
+      }
+
+      let justStarted = false;
+
+      debug('api.stream', 'API: ' + JSON.stringify(request.data));
+
+      if (request.status === 200 && !isNil(request.data.data[0])) {
+        // correct status and we've got a data - stream online
+        const stream = request.data.data[0];
+
+        if (!moment.preciseDiff(moment(stream.started_at), moment(this.streamStatusChangeSince), true).firstDateWasLater) {
+          this.streamStatusChangeSince = (new Date(stream.started_at)).getTime();
+        }
+        if (!this.isStreamOnline || this.streamType !== stream.type) {
+          this.chatMessagesAtStart = global.linesParsed;
+
+          if (!global.webhooks.enabled.streams && Number(this.streamId) !== Number(stream.id)) {
+            debug('api.stream', 'API: ' + JSON.stringify(stream));
+            start(
+              `id: ${stream.id} | startedAt: ${stream.started_at} | title: ${stream.title} | game: ${await this.getGameFromId(stream.game_id)} | type: ${stream.type} | channel ID: ${cid}`
+            );
+            global.events.fire('stream-started', {});
+            global.events.fire('command-send-x-times', { reset: true });
+            global.events.fire('keyword-send-x-times', { reset: true });
+            global.events.fire('every-x-minutes-of-stream', { reset: true });
+            justStarted = true;
+
+            // go through all systems and trigger on.streamStart
+            for (const [/* type */, systems] of Object.entries({
+              systems: global.systems,
+              games: global.games,
+              overlays: global.overlays,
+              widgets: global.widgets,
+              integrations: global.integrations,
+            })) {
+              for (const [name, system] of Object.entries(systems)) {
+                if (name.startsWith('_') || typeof system.on === 'undefined') {
+                  continue;
+                }
+                if (Array.isArray(system.on.streamStart)) {
+                  for (const fnc of system.on.streamStart) {
+                    system[fnc]();
+                  }
+                }
+              }
+            }
+          }
+        }
+
+        // Always keep this updated
+        this.streamStartedAt = stream.started_at;
+        this.streamId = stream.id;
+        this.streamType = stream.type;
+
+        this.curRetries = 0;
+        this.saveStreamData(stream);
+        this.isStreamOnline = true;
+
+        if (!justStarted) {
+          // don't run events on first check
+          global.events.fire('number-of-viewers-is-at-least-x', {});
+          global.events.fire('stream-is-running-x-minutes', {});
+          global.events.fire('every-x-minutes-of-stream', {});
+        }
+
+        if (!this.gameOrTitleChangedManually) {
+          let rawStatus = this.rawStatus;
+          const status = await this.parseTitle(null);
+          const game = await this.getGameFromId(stream.game_id);
+
+          this.statsCurrentTitle = stream.title;
+          this.statsCurrentGame = game;
+
+          if (stream.title !== status) {
+            // check if status is same as updated status
+            if (this.retries.getCurrentStreamData >= 12) {
+              this.retries.getCurrentStreamData = 0;
+              rawStatus = stream.title;
+              this.rawStatus = rawStatus;
+            } else {
+              this.retries.getCurrentStreamData++;
+              return { state: false, opts };
+            }
+          } else {
+            this.retries.getCurrentStreamData = 0;
+          }
+          this.gameCache = game;
+          this.rawStatus = rawStatus;
+        }
+      } else {
+        if (this.isStreamOnline && this.curRetries < this.maxRetries) {
+          // retry if it is not just some network / twitch issue
+          this.curRetries = this.curRetries + 1;
+        } else {
+          // stream is really offline
+          this.curRetries = 0;
+          this.isStreamOnline = false;
+          stop('');
+          this.statsCurrentWatchedTime = 0;
+          this.streamStatusChangeSince = Date.now();
+          global.events.fire('stream-stopped', {});
+          global.events.fire('stream-is-running-x-minutes', { reset: true });
+          global.events.fire('number-of-viewers-is-at-least-x', { reset: true });
+
+          // go through all systems and trigger on.streamEnd
+          for (const [, systems] of Object.entries({
+            systems: global.systems,
+            games: global.games,
+            overlays: global.overlays,
+            widgets: global.widgets,
+            integrations: global.integrations,
+          })) {
+            for (const [name, system] of Object.entries(systems)) {
+              if (name.startsWith('_') || typeof system.on === 'undefined') {
+                continue;
+              }
+              if (Array.isArray(system.on.streamEnd)) {
+                for (const fnc of system.on.streamEnd) {
+                  system[fnc]();
+                }
+              }
+            }
+          }
+
+          this.statsMaxViewers = 0;
+          this.statsNewChatters = 0;
+          this.statsCurrentViewers = 0;
+          this.statsCurrentBits = 0;
+          this.statsCurrentTips = 0;
+
+          await global.db.engine.remove('cache.hosts', {}); // we dont want to have cached hosts on stream start
+          await global.db.engine.remove('cache.raids', {}); // we dont want to have cached raids on stream start
+
+          this.streamId = null;
+        }
+      }
+    } catch (e) {
+      if (typeof e.response !== 'undefined' && e.response.status === 429) {
+        global.workers.callOnAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', 120, 0, e.response.headers['ratelimit-reset'] ] });
+        this.calls.bot.remaining = 0;
+        this.calls.bot.refresh = e.response.headers['ratelimit-reset'];
+      }
+
+      error(`${url} - ${e.message}`);
+      if (global.panel && global.panel.io) {
+        global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'getCurrentStreamData', api: 'helix', endpoint: url, code: e.response.status, data: e.stack, remaining: this.calls.bot.remaining });
+      }
+      return { state: false, opts };
+    }
+    return { state: true, opts };
+  }
+
+  saveStreamData (stream) {
+    if (!isMainThread) {
+      throw new Error('API can run only on master');
+    }
+    this.statsCurrentViewers = stream.viewer_count;
+
+    if (this.statsMaxViewers < stream.viewer_count) {
+      this.statsMaxViewers = stream.viewer_count;
+    }
+
+    global.stats2.save({
+      timestamp: new Date().getTime(),
+      whenOnline: global.api.isStreamOnline ? global.api.streamStatusChangeSince : null,
+      currentViewers: this.statsCurrentViewers,
+      currentSubscribers: this.statsCurrentSubscribers,
+      currentFollowers: this.statsCurrentFollowers,
+      currentBits: this.statsCurrentBits,
+      currentTips: this.statsCurrentTips,
+      chatMessages: global.linesParsed - this.chatMessagesAtStart,
+      currentViews: this.statsCurrentViews,
+      maxViewers: this.statsMaxViewers,
+      newChatters: this.statsNewChatters,
+      currentHosts: this.statsCurrentHosts,
+      currentWatched: this.statsCurrentWatchedTime,
+      game_id: stream.game_id,
+      user_id: stream.user_id,
+      type: stream.type,
+      language: stream.language,
+      title: stream.title,
+      thumbnail_url: stream.thumbnail_url,
+    });
+  }
+
+  async parseTitle (title) {
+    if (isNil(title)) {
+      title = this.rawStatus;
+    }
+
+    const regexp = new RegExp('\\$_[a-zA-Z0-9_]+', 'g');
+    const match = title.match(regexp);
+
+    if (!isNil(match)) {
+      for (const variable of title.match(regexp)) {
+        let value;
+        if (await global.customvariables.isVariableSet(variable)) {
+          value = await global.customvariables.getValueOf(variable);
+        } else {
+          value = global.translate('webpanel.not-available');
+        }
+        title = title.replace(new RegExp(`\\${variable}`, 'g'), value);
+      }
+    }
+    return title;
+  }
+
+  async setTags (sender, tagsArg) {
+    if (!isMainThread) {
+      throw new Error('API can run only on master');
+    }
+    const cid = global.oauth.channelId;
+    const url = `https://api.twitch.tv/helix/streams/tags?broadcaster_id=${cid}`;
+
+    const token = await global.oauth.botAccessToken;
+    const needToWait = isNil(cid) || cid === '' || isNil(global.overlays) || token === '';
+    if (needToWait) {
+      setTimeout(() => this.setTags(sender, tagsArg), 1000);
+      return;
+    }
+
+    try {
+      const tags = (await global.db.engine.find('core.api.tags'))
+        .filter(o => {
+          const localization = Object.keys(o.localization_names).find(p => p.includes(global.general.lang));
+          return tagsArg.includes(o.localization_names[localization || '']);
+        });
+      const request = await axios({
+        method: 'put',
+        url,
+        data: {
+          tag_ids: tags.map(o => {
+            return o.tag_id;
+          }),
+        },
+        headers: {
+          'Authorization': 'Bearer ' + token,
+          'Content-Type': 'application/json',
+        },
+      });
+      await global.db.engine.remove('core.api.currentTags', { is_auto: false });
+      if (tags.length > 0) {
+        await global.db.engine.insert('core.api.currentTags', tags.map(o => {
+          delete o._id;
+          return o;
+        }));
+      }
+      if (global.panel && global.panel.io) {
+        global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'setTags', api: 'helix', endpoint: url, code: request.status, data: request.data });
+      }
+    } catch (e) {
+      error(`API: ${url} - ${e.message}`);
+      if (global.panel && global.panel.io) {
+        global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'setTags', api: 'helix', endpoint: url, code: get(e, 'response.status', '500'), data: e.stack });
+      }
+      return false;
+    }
+
+
+  }
+
+  async setTitleAndGame (sender, args) {
+    if (!isMainThread) {
+      throw new Error('API can run only on master');
+    }
+
+    args = defaults(args, { title: null }, { game: null });
+    const cid = global.oauth.channelId;
+    const url = `https://api.twitch.tv/kraken/channels/${cid}`;
+
+    const token = await global.oauth.botAccessToken;
+    const needToWait = isNil(cid) || cid === '' || isNil(global.overlays) || token === '';
+    if (needToWait) {
+      setTimeout(() => this.setTitleAndGame(sender, args), 1000);
+      return;
+    }
+
+    let request;
+    let status;
+    let game;
+    try {
+      if (!isNil(args.title)) {
+        this.rawStatus = args.title; // save raw status to cache, if changing title
+      }
+      status = await this.parseTitle(this.rawStatus);
+
+      if (!isNil(args.game)) {
+        game = args.game;
+        this.gameCache = args.game; // save game to cache, if changing gae
+      } else {
+        game = this.gameCache;
+      } // we are not setting game -> load last game
+
+      request = await axios({
+        method: 'put',
+        url,
+        data: {
+          channel: {
+            game: game,
+            status: status,
+          },
+        },
+        headers: {
+          'Accept': 'application/vnd.twitchtv.v5+json',
+          'Authorization': 'OAuth ' + token,
+        },
+      });
+      if (global.panel && global.panel.io) {
+        global.panel.io.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'setTitleAndGame', api: 'kraken', endpoint: url, code: request.status });
+      }
+    } catch (e) {
+      error(`API: ${url} - ${e.message}`);
+      if (global.panel && global.panel.io) {
+        global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'setTitleAndGame', api: 'kraken', endpoint: url, code: e.response.status, data: e.stack });
+      }
+      return false;
+    }
+
+    if (request.status === 200 && !isNil(request.data)) {
+      const response = request.data;
+      if (!isNil(args.game)) {
+        response.game = isNil(response.game) ? '' : response.game;
+        if (response.game.trim() === args.game.trim()) {
+          sendMessage(global.translate('game.change.success')
+            .replace(/\$game/g, response.game), sender);
+          global.events.fire('game-changed', { oldGame: this.statsCurrentGame, game: response.game });
+          this.statsCurrentGame = response.game;
+        } else {
+          sendMessage(global.translate('game.change.failed')
+            .replace(/\$game/g, this.statsCurrentGame), sender);
+        }
+      }
+
+      if (!isNull(args.title)) {
+        if (response.status.trim() === status.trim()) {
+          sendMessage(global.translate('title.change.success')
+            .replace(/\$title/g, response.status), sender);
+          this.statsCurrentTitle = response.status;
+        } else {
+          sendMessage(global.translate('title.change.failed')
+            .replace(/\$title/g, this.statsCurrentTitle), sender);
+        }
+      }
+      this.gameOrTitleChangedManually = true;
+      this.retries.getCurrentStreamData = 0;
+      return true;
+    }
+  }
+
+  async sendGameFromTwitch (self, socket, game) {
+    if (!isMainThread) {
+      throw new Error('API can run only on master');
+    }
+    const url = `https://api.twitch.tv/kraken/search/games?query=${encodeURIComponent(game)}&type=suggest`;
+
+    const token = await global.oauth.botAccessToken;
+    if (token === '') {
+      return;
+    }
+
+    let request;
+    try {
+      request = await axios.get(url, {
+        headers: {
+          'Accept': 'application/vnd.twitchtv.v5+json',
+          'Authorization': 'OAuth ' + token,
+        },
+      });
+      if (global.panel && global.panel.io) {
+        global.panel.io.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'sendGameFromTwitch', api: 'kraken', endpoint: url, code: request.status });
+      }
+    } catch (e) {
+      error(`API: ${url} - ${e.stack}`);
+      if (global.panel && global.panel.io) {
+        global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'sendGameFromTwitch', api: 'kraken', endpoint: url, code: e.response.status, data: e.stack });
+      }
+      return;
+    }
+
+    if (isNull(request.data.games)) {
+      if (socket) {
+        socket.emit('sendGameFromTwitch', []);
+      }
+      return false;
+    } else {
+      if (socket) {
+        socket.emit('sendGameFromTwitch', map(request.data.games, 'name'));
+      }
+      return map(request.data.games, 'name');
+    }
+  }
+
+  async checkClips () {
+    if (!isMainThread) {
+      throw new Error('API can run only on master');
+    }
+
+    const token = global.oauth.botAccessToken;
+    if (token === '') {
+      return { state: false };
+    }
+
+    let notCheckedClips = (await global.db.engine.find('api.clips', { isChecked: false }));
+
+    // remove clips which failed
+    for (const clip of filter(notCheckedClips, (o) => new Date(o.shouldBeCheckedAt).getTime() < new Date().getTime())) {
+      await global.db.engine.remove('api.clips', { _id: String(clip._id) });
+    }
+    notCheckedClips = filter(notCheckedClips, (o) => new Date(o.shouldBeCheckedAt).getTime() >= new Date().getTime());
+    const url = `https://api.twitch.tv/helix/clips?id=${notCheckedClips.map((o) => o.clipId).join(',')}`;
+
+    if (notCheckedClips.length === 0) { // nothing to do
+      return { state: true };
+    }
+
+    const notEnoughAPICalls = this.calls.bot.remaining <= 30 && this.calls.bot.refresh > Date.now() / 1000;
+    if (notEnoughAPICalls) {
+      return { state: false };
+    }
+
+    let request;
+    try {
+      request = await axios.get(url, {
+        headers: {
+          'Authorization': 'Bearer ' + token,
+        },
+      });
+
+      // save remaining api calls
+      this.calls.bot.remaining = request.headers['ratelimit-remaining'];
+      this.calls.bot.refresh = request.headers['ratelimit-reset'];
+      this.calls.bot.limit = request.headers['ratelimit-limit'];
+      global.workers.callOnAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', request.headers['ratelimit-limit'], request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] });
+
+      if (global.panel && global.panel.io) {
+        global.panel.io.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'checkClips', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining });
+      }
+
+      for (const clip of request.data.data) {
+        // clip found in twitch api
+        await global.db.engine.update('api.clips', { clipId: clip.id }, { isChecked: true });
+      }
+    } catch (e) {
+      if (typeof e.response !== 'undefined' && e.response.status === 429) {
+        global.workers.callOnAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', 120, 0, e.response.headers['ratelimit-reset'] ] });
+        this.calls.bot.remaining = 0;
+        this.calls.bot.refresh = e.response.headers['ratelimit-reset'];
+      }
+
+      error(`API: ${url} - ${e.stack}`);
+      if (global.panel && global.panel.io) {
+        global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'checkClips', api: 'helix', endpoint: url, code: e.response.status, data: e.stack });
+      }
+    }
+    return { state: true };
+  }
+
+  async createClip (opts) {
+    if (!isMainThread) {
+      throw Error('API can run only on master');
+    }
+
+    if (!(this.isStreamOnline)) {
+      return;
+    } // do nothing if stream is offline
+
+    const isClipChecked = async function (id) {
+      const check = async (resolve, reject) => {
+        const clip = await global.db.engine.findOne('api.clips', { clipId: id });
+        if (isEmpty(clip)) {
+          resolve(false);
+        } else if (clip.isChecked) {
+          resolve(true);
+        } else {
+          // not checked yet
+          setTimeout(() => check(resolve, reject), 100);
+        }
+      };
+      return new Promise(async (resolve, reject) => check(resolve, reject));
+    };
+
+    defaults(opts, { hasDelay: true });
+
+    const cid = global.oauth.channelId;
+    const url = `https://api.twitch.tv/helix/clips?broadcaster_id=${cid}`;
+
+    const token = await global.oauth.botAccessToken;
+    const needToWait = isNil(cid) || cid === '' || isNil(global.overlays) || token === '';
+    const notEnoughAPICalls = this.calls.bot.remaining <= 30 && this.calls.bot.refresh > Date.now() / 1000;
+    if (needToWait || notEnoughAPICalls) {
+      setTimeout(() => this.createClip(opts), 1000);
+      return;
+    }
+
+    let request;
+    try {
+      request = await axios({
+        method: 'post',
+        url,
+        headers: {
+          'Authorization': 'Bearer ' + token,
+        },
+      });
+
+      // save remaining api calls
+      this.calls.bot.remaining = request.headers['ratelimit-remaining'];
+      this.calls.bot.refresh = request.headers['ratelimit-reset'];
+      this.calls.bot.limit = request.headers['ratelimit-limit'];
+      global.workers.callOnAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', request.headers['ratelimit-limit'], request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] });
+
+      if (global.panel && global.panel.io) {
+        global.panel.io.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'createClip', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining });
+      }
+    } catch (e) {
+      if (typeof e.response !== 'undefined' && e.response.status === 429) {
+        global.workers.callOnAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', 120, 0, e.response.headers['ratelimit-reset'] ] });
+        this.calls.bot.remaining = 0;
+        this.calls.bot.refresh = e.response.headers['ratelimit-reset'];
+      }
+
+      error(`API: ${url} - ${e.stack}`);
+      if (global.panel && global.panel.io) {
+        global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'createClip', api: 'helix', endpoint: url, code: e.response.status, data: e.stack });
+      }
+      return;
+    }
+    const clipId = request.data.data[0].id;
+    const timestamp = new Date();
+    await global.db.engine.insert('api.clips', { clipId: clipId, isChecked: false, shouldBeCheckedAt: new Date(timestamp.getTime() + 120 * 1000) });
+    return (await isClipChecked(clipId)) ? clipId : null;
+  }
+
+  async fetchAccountAge (username, id) {
+    if (!isMainThread) {
+      throw new Error('API can run only on master');
+    }
+    const url = `https://api.twitch.tv/kraken/users/${id}`;
+
+    const token = await global.oauth.botAccessToken;
+    if (token === '') {
+      return;
+    }
+
+    let request;
+    try {
+      request = await axios.get(url, {
+        headers: {
+          'Accept': 'application/vnd.twitchtv.v5+json',
+          'Authorization': 'OAuth ' + token,
+        },
+      });
+      if (global.panel && global.panel.io) {
+        global.panel.io.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'fetchAccountAge', api: 'kraken', endpoint: url, code: request.status });
+      }
+    } catch (e) {
+      if (e.errno === 'ECONNRESET' || e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT') {
+        return;
+      } // ignore ECONNRESET errors
+
+      let logError;
+      try {
+        logError = e.response.data.status !== 422;
+      } catch (e) {
+        logError = true;
+      }
+
+      if (logError) {
+        error(`API: ${url} - ${e.stack}`);
+        if (global.panel && global.panel.io) {
+          global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'fetchAccountAge', api: 'kraken', endpoint: url, code: e.response.status, data: e.stack });
+        }
+      }
+      return;
+    }
+    await global.db.engine.update('users', { id }, { username: username, time: { created_at: new Date(request.data.created_at).getTime() } });
+  }
+
+  async isFollower (username) {
+    this.rate_limit_follower_check.add(username);
+  }
+
+  async isFollowerUpdate (user) {
+    if (!user.id && !user.userId) {
+      return;
+    }
+    const id = user.id || user.userId;
+
+    // reload user from db
+    user = await global.users.getById(id);
+
+    clearTimeout(this.timeouts['isFollowerUpdate-' + id]);
+
+    const cid = global.oauth.channelId;
+    const url = `https://api.twitch.tv/helix/users/follows?from_id=${id}&to_id=${cid}`;
+
+    const token = await global.oauth.botAccessToken;
+    const needToWait = isNil(cid) || cid === '' || (isNil(global.overlays) && isMainThread) || token === '';
+    const notEnoughAPICalls = this.calls.bot.remaining <= 40 && this.calls.bot.refresh > Date.now() / 1000;
+    if (needToWait || notEnoughAPICalls) {
+      this.timeouts['isFollowerUpdate-' + id] = setTimeout(() => this.isFollowerUpdate(user), 1000);
+      return null;
+    }
+
+    let request;
+    try {
+      request = await axios.get(url, {
+        headers: {
+          'Authorization': 'Bearer ' + token,
+        },
+      });
+
+      // save remaining api calls
+      this.calls.bot.remaining = request.headers['ratelimit-remaining'];
+      this.calls.bot.refresh = request.headers['ratelimit-reset'];
+      this.calls.bot.limit = request.headers['ratelimit-limit'];
+      global.workers.callOnAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', request.headers['ratelimit-limit'], request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] });
+
+      if (global.panel && global.panel.io) {
+        global.panel.io.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'isFollowerUpdate', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining });
+      }
+    } catch (e) {
+      if (typeof e.response !== 'undefined' && e.response.status === 429) {
+        global.workers.callOnAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', 120, 0, e.response.headers['ratelimit-reset'] ] });
+        this.calls.bot.remaining = 0;
+        this.calls.bot.refresh = e.response.headers['ratelimit-reset'];
+      }
+
+      error(`API: ${url} - ${e.stack}`);
+      if (global.panel && global.panel.io) {
+        global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'isFollowerUpdate', api: 'helix', endpoint: url, code: e.response.status, data: e.stack, remaining: this.calls.bot.remaining });
+      }
+      return null;
+    }
+
+    if (request.data.total === 0) {
+      // not a follower
+      // if was follower, fire unfollow event
+      if (user.is.follower) {
+        unfollow(user.username);
+        global.events.fire('unfollow', { username: user.username });
+      }
+      const followedAt = user.lock && user.lock.followed_at ? Number(user.time.follow) : 0;
+      const isFollower = user.lock && user.lock.follower ? user.is.follower : false;
+      await global.users.setById(id, { username: user.username, is: { follower: isFollower }, time: { followCheck: new Date().getTime(), follow: followedAt } }, user.is.follower);
+      return { isFollower: false, followedAt: null };
+    } else {
+      // is follower
+      if (!user.is.follower && new Date().getTime() - new Date(request.data.data[0].followed_at).getTime() < 60000 * 60) {
+        global.overlays.eventlist.add({
+          type: 'follow',
+          username: user.username,
+          timestamp: Date.now(),
+        });
+        follow(user.username);
+        global.events.fire('follow', { username: user.username });
+        global.registries.alerts.trigger({
+          event: 'follows',
+          name: user.username,
+          amount: 0,
+          currency: '',
+          monthsName: '',
+          message: '',
+          autohost: false,
+        });
+
+        triggerInterfaceOnFollow({
+          username: user.username,
+          userId: id,
+        });
+      }
+      const followedAt = user.lock && user.lock.followed_at ? Number(user.time.follow) : parseInt(moment(request.data.data[0].followed_at).format('x'), 10);
+      const isFollower = user.lock && user.lock.follower ? user.is.follower : true;
+      await global.users.set(user.username, { id, is: { follower: isFollower }, time: { followCheck: new Date().getTime(), follow: followedAt } }, !user.is.follower);
+      return { isFollower, followedAt };
+    }
+  }
+
+  async createMarker () {
+    const token = global.oauth.botAccessToken;
+    const cid = global.oauth.channelId;
+
+    const url = 'https://api.twitch.tv/helix/streams/markers';
+    try {
+      if (token === '') {
+        throw Error('missing bot accessToken');
+      }
+      if (cid === '') {
+        throw Error('channel is not set');
+      }
+
+      const request = await axios({
+        method: 'post',
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token,
+        },
+        data: {
+          user_id: String(cid),
+          description: 'Marked from sogeBot',
+        },
+      });
+
+      // save remaining api calls
+      this.calls.bot.remaining = request.headers['ratelimit-remaining'];
+      this.calls.bot.refresh = request.headers['ratelimit-reset'];
+      this.calls.bot.limit = request.headers['ratelimit-limit'];
+      global.workers.callOnAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', request.headers['ratelimit-limit'], request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] });
+
+      if (global.panel && global.panel.io) {
+        global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'createMarker', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining, data: request.data });
+      }
+    } catch (e) {
+      if (e.errno === 'ECONNRESET' || e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT') {
+        return this.createMarker();
+      }
+      error(`API: Marker was not created - ${e.message}`);
+      if (global.panel && global.panel.io) {
+        global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'createMarker', api: 'helix', endpoint: url, code: e.response.status, data: e.stack, remaining: this.calls.bot.remaining });
+      }
+    }
+  }
+
+  async getClipById (id) {
+    const url = `https://api.twitch.tv/helix/clips/?id=${id}`;
+
+    const token = await global.oauth.botAccessToken;
+    if (token === '') {
+      return null;
+    }
+
+    let request;
+    try {
+      request = await axios.get(url, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token,
+        },
+      });
+      global.panel.io.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'getClipById', api: 'kraken', endpoint: url, code: request.status, remaining: this.calls.bot.remaining });
+      return request.data;
+    } catch (e) {
+      error(`${url} - ${e.message}`);
+      global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'getClipById', api: 'kraken', endpoint: url, code: `${e.status} ${get(e, 'body.message', e.statusText)}`, remaining: this.calls.bot.remaining });
+      return null;
+    }
+  }
+
+  async getTopClips (opts) {
+    let url = 'https://api.twitch.tv/helix/clips?broadcaster_id=' + global.oauth.channelId;
+    const token = global.oauth.botAccessToken;
+    try {
+      if (token === '') {
+        throw Error('No broadcaster access token');
+      }
+      if (typeof opts === 'undefined' || !opts) {
+        throw Error('Missing opts');
+      }
+
+      if (opts.period) {
+        if (opts.period === 'stream') {
+          url += '&' + querystring.stringify({
+            started_at: (new Date(this.streamStartedAt)).toISOString(),
+            ended_at: (new Date()).toISOString(),
+          });
+        } else {
+          if (!opts.days || opts.days < 0) {
+            throw Error('Days cannot be < 0');
+          }
+          url += '&' + querystring.stringify({
+            started_at: (new Date((new Date()).setDate(-opts.days))).toISOString(),
+            ended_at: (new Date()).toISOString(),
+          });
+        }
+      }
+      if (opts.first) {
+        url += '&first=' + opts.first;
+      }
+
+      const request = await axios.get(url, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token,
+        },
+      });
+
+      // save remaining api calls
+      this.calls.bot.remaining = request.headers['ratelimit-remaining'];
+      this.calls.bot.refresh = request.headers['ratelimit-reset'];
+      this.calls.bot.limit = request.headers['ratelimit-limit'];
+      global.workers.callOnAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', request.headers['ratelimit-limit'], request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] });
+
+      global.panel.io.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'getClipById', api: 'kraken', endpoint: url, code: request.status, remaining: this.calls.bot.remaining });
+      // get mp4 from thumbnail
+      for (const c of request.data.data) {
+        c.mp4 = c.thumbnail_url.replace('-preview-480x272.jpg', '.mp4');
+        c.game = await this.getGameFromId(c.game_id);
+      }
+      return request.data.data;
+    } catch (e) {
+      error(`API: ${url} - ${e.stack}`);
+      if (global.panel && global.panel.io) {
+        global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'getTopClips', api: 'helix', endpoint: url, code: e.response.status, data: e.stack });
+      }
+    }
+  }
+}
+
+module.exports = API;

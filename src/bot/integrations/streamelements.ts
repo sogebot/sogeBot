@@ -79,7 +79,7 @@ class StreamElements extends Integration {
     this.socket.on('authenticated', () => {
       info(chalk.yellow('STREAMELEMENTS:') + ' Successfully authenticated on service');
     });
-    
+
     this.socket.on('disconnect', () => {
       info(chalk.yellow('STREAMELEMENTS:') + ' Socket disconnected from service');
       if (this.socket) {
@@ -103,8 +103,8 @@ class StreamElements extends Integration {
     if (id) {
       global.db.engine.insert('users.tips', { id, amount: eventData.data.amount, message: eventData.data.message, currency: eventData.data.currency, timestamp: Date.now() });
     }
-    if (await global.cache.isOnline()) {
-      await global.db.engine.increment('api.current', { key: 'tips' }, { value: parseFloat(global.currency.exchange(eventData.data.amount, eventData.data.currency, global.currency.mainCurrency)) });
+    if (global.api.isStreamOnline) {
+      global.api.statsCurrentTips = parseFloat(global.currency.exchange(eventData.data.amount, eventData.data.currency, global.currency.mainCurrency));
     }
     global.overlays.eventlist.add({
       type: 'tip',

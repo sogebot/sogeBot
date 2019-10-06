@@ -9,7 +9,7 @@ export function triggerInterfaceOnSub(opts: onEventSub) {
   trigger(opts);
 }
 
-export function triggerInterfaceOnFollow(opts: onEventTip) {
+export function triggerInterfaceOnFollow(opts: onEventFollow) {
   trigger(opts);
 }
 

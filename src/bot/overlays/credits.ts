@@ -94,13 +94,12 @@ class Credits extends Overlay {
   sockets () {
     global.panel.io.of('/overlays/credits').on('connection', (socket) => {
       socket.on('load', async (cb) => {
-        const when = await global.cache.when();
-
-        if (typeof when.online === 'undefined' || when.online === null) {
-          when.online = _.now() - 5000000000;
+        let when = global.api.isStreamOnline ? global.api.streamStatusChangeSince : null;
+        if (!global.api.isStreamOnline) {
+          when = _.now() - 5000000000;
         } // 5000000
 
-        const timestamp = new Date(when.online).getTime();
+        const timestamp = new Date(when).getTime();
         let events = await global.db.engine.find('widgetsEventList');
 
         // change tips if neccessary for aggregated events (need same currency)
@@ -149,8 +148,8 @@ class Credits extends Overlay {
             },
           },
           streamer: global.oauth.broadcasterUsername,
-          game: await global.db.engine.findOne('api.current', { key: 'game' }),
-          title: await global.db.engine.findOne('api.current', { key: 'title' }),
+          game: global.api.statsCurrentGame,
+          title: global.api.statsCurrentTitle,
           clips: this.cShowClips ? await global.api.getTopClips({ period: this.cClipsPeriod, days: this.cClipsCustomPeriodInDays, first: this.cClipsNumOfClips }) : [],
           events: events.filter((o) => o.timestamp >= timestamp),
           customTexts: this.cCustomTextsValues,

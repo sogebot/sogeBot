@@ -63,12 +63,9 @@ class Qiwi extends Integration {
       if (id) {
         global.db.engine.insert('users.tips', { id, amount, message, currency, timestamp: Date.now() });
       }
-      if (await global.cache.isOnline()) {
-        await global.db.engine.increment('api.current', { key: 'tips' }, { value: parseFloat(global.currency.exchange(amount, currency, global.currency.mainCurrency)) });
-      }
-      
-      if (await global.cache.isOnline()) {
-        await global.db.engine.increment('api.current', { key: 'tips' }, { value: parseFloat(global.currency.exchange(amount, currency, global.currency.mainCurrency)) });
+
+      if (global.api.isStreamOnline) {
+        global.api.statsCurrentTips = parseFloat(global.currency.exchange(amount, currency, global.currency.mainCurrency));
       }
 
       global.overlays.eventlist.add({
@@ -79,7 +76,7 @@ class Qiwi extends Integration {
         message,
         timestamp: Date.now(),
       });
-      
+
       tip(`${username ? username : 'Anonymous'}${id ? '#' + id : ''}, amount: ${amount}${DONATION_CURRENCY}, ${message ? 'message: ' + message : ''}`);
 
       global.events.fire('tip', {
@@ -110,7 +107,7 @@ class Qiwi extends Integration {
       });
 
     }
-   
+
   }
 }
 

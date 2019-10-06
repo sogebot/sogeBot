@@ -60,7 +60,7 @@ class Points extends System {
       this.getPermissionBasedSettingsValue('offlineInterval'),
       this.getPermissionBasedSettingsValue('perInterval'),
       this.getPermissionBasedSettingsValue('perOfflineInterval'),
-      global.cache.isOnline(),
+      global.api.isStreamOnline,
     ]);
 
     try {
@@ -139,7 +139,7 @@ class Points extends System {
       this.getPermissionBasedSettingsValue('messageInterval'),
       this.getPermissionBasedSettingsValue('perMessageOfflineInterval'),
       this.getPermissionBasedSettingsValue('messageOfflineInterval'),
-      global.cache.isOnline(),
+      global.api.isStreamOnline,
     ]);
 
     // get user max permission

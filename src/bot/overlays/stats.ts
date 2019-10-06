@@ -1,5 +1,3 @@
-import { get } from 'lodash';
-
 import { getTime } from '../commons';
 import { ui } from '../decorators';
 import Overlay from './_interface';
@@ -17,13 +15,12 @@ class Stats extends Overlay {
   sockets () {
     global.panel.io.of('/overlays/stats').on('connection', (socket) => {
       socket.on('get', async (cb) => {
-        const when = await global.cache.when();
         const stats = {
-          uptime: getTime(await global.cache.isOnline() ? when.online : 0, false),
-          viewers: get(await global.db.engine.findOne('api.current', { key: 'viewers' }), 'value', 0),
-          followers: get(await global.db.engine.findOne('api.current', { key: 'followers' }), 'value', 0),
-          subscribers: get(await global.db.engine.findOne('api.current', { key: 'subscribers' }), 'value', 0),
-          bits: get(await global.db.engine.findOne('api.current', { key: 'tips' }), 'value', 0),
+          uptime: getTime(global.api.isStreamOnline ? global.api.streamStatusChangeSince : 0, false),
+          viewers: global.api.statsCurrentViewers,
+          followers: global.api.statsCurrentFollowers,
+          subscribers: global.api.statsCurrentSubscribers,
+          bits: global.api.statsCurrentBits,
         };
         cb(stats);
       });

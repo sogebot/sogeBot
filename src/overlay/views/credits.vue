@@ -67,12 +67,12 @@ export default class CreditsOverlay extends Vue {
       // set page 1 -> title, game, text
       this.pages.push([
         {
-          text: opts.game.value,
+          text: opts.game,
           class: "game",
           index: Math.random()
         },
         {
-          text: opts.title.value,
+          text: opts.title,
           class: "title",
           index: Math.random()
         },

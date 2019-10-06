@@ -103,7 +103,7 @@ class Users extends Core {
     let watched = await this.getWatchedOf(id)
     // add user as a new chatter in a stream
     if (watched === 0 && !this.newChattersList.includes(username)) {
-      await global.db.engine.increment('api.new', { key: 'chatters' }, { value: 1 })
+      global.api.statsNewChatters += 1;
       this.newChattersList.push(username.toLowerCase())
     }
   }
@@ -150,7 +150,7 @@ class Users extends Core {
         if (isNewUser) this.checkNewChatter(id, username)
         if (!isOwner) global.api._stream.chatTime += chat
 
-        const online = await global.cache.isOnline();
+        const online = global.api.isStreamOnline;
         await global.db.engine.increment('users.chat', { id, online }, { chat });
         debug('users.chat', username + ': ' + (chat / 1000 / 60) + ' minutes added')
         updated.push(username)
@@ -204,7 +204,7 @@ class Users extends Core {
     let timeout = constants.MINUTE * 5
     try {
       // count watching time when stream is online
-      if (await global.cache.isOnline()) {
+      if (global.api.isStreamOnline) {
         let users = await this.getAllOnlineUsernames()
         if (users.length === 0) {
           throw Error('No online users.')
@@ -226,7 +226,7 @@ class Users extends Core {
           }
 
           if (isNewUser) this.checkNewChatter(id, username)
-          if (!isOwner) global.api._stream.watchedTime += watched
+          if (!isOwner) global.api.statsCurrentWatchedTime += watched
           await global.db.engine.increment('users.watched', { id }, { watched })
           debug('users.watched', username + ': ' + (watched / 1000 / 60) + ' minutes added')
           updated.push(username)

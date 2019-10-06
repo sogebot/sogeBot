@@ -33,8 +33,7 @@ class HowLongToBeat extends System {
 
     if (isMainThread) {
       setInterval(async () => {
-        const isOnline = await global.cache.isOnline();
-        if (isOnline) {
+        if (global.api.isStreamOnline) {
           this.addToGameTimestamp();
         }
       }, this.interval);
@@ -42,18 +41,15 @@ class HowLongToBeat extends System {
   }
 
   async addToGameTimestamp() {
-    let game = await global.db.engine.findOne('api.current', { key: 'game' });
-    if (!game) {
+    if (!global.api.statsCurrentGame) {
       return; // skip if we don't have game
-    } else {
-      game = game.value;
     }
 
-    if (game.trim().length === 0) {
+    if (global.api.statsCurrentGame.trim().length === 0) {
       return; // skip if we have empty game
     }
 
-    let gameToInc: Game = await global.db.engine.findOne(this.collection.data, { game });
+    let gameToInc: Game = await global.db.engine.findOne(this.collection.data, { game: global.api.statsCurrentGame });
     if (typeof gameToInc._id !== 'undefined') {
       delete gameToInc._id;
       if (!gameToInc.isFinishedMain) {
@@ -63,10 +59,10 @@ class HowLongToBeat extends System {
         gameToInc.timeToBeatCompletionist += this.interval;
       }
     } else {
-      const gamesFromHltb = await this.hltbService.search(game);
+      const gamesFromHltb = await this.hltbService.search(global.api.statsCurrentGame);
       const gameFromHltb = gamesFromHltb.length > 0 ? gamesFromHltb[0] : null;
       gameToInc = {
-        game,
+        game: global.api.statsCurrentGame,
         gameplayMain: (gameFromHltb || { gameplayMain: 0 }).gameplayMain,
         gameplayCompletionist: (gameFromHltb || { gameplayMain: 0 }).gameplayCompletionist,
         isFinishedMain: false,
@@ -92,11 +88,10 @@ class HowLongToBeat extends System {
       .toArray();
 
     if (!game) {
-      game = await global.db.engine.findOne('api.current', { key: 'game' });
-      if (!game) {
+      if (!global.api.statsCurrentGame) {
         return; // skip if we don't have game
       } else {
-        game = game.value;
+        game = global.api.statsCurrentGame;
       }
     }
     const gameToShow: Game = await global.db.engine.findOne(this.collection.data, { game });

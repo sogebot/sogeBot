@@ -22,7 +22,6 @@ const { autoLoad } = require('./commons');
 const constants = require('./constants')
 const config = require('../config.json')
 
-global.cache = new (require('./cache'))()
 global.workers = new Workers()
 
 global.startedClusters = 0
