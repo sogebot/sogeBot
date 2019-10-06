@@ -6,7 +6,7 @@ const message = require('../../general.js').message;
 const assert = require('assert');
 
 // users
-const owner = { username: 'soge__' };
+const owner = { username: 'soge__', userId: Math.random() };
 
 const keywords = [
   { keyword: 'slqca', response: 'hptqm', enabled: Math.random() >= 0.5 },
@@ -26,6 +26,7 @@ describe('Keywords - listing', () => {
     before(async () => {
       await db.cleanup();
       await message.prepare();
+      await global.db.engine.insert('users', { username: owner.username, id: owner.userId });
     });
 
     it('Expecting empty list', async () => {
@@ -49,10 +50,16 @@ describe('Keywords - listing', () => {
       });
     }
 
+    it('Trigger list command', async () => {
+      await global.systems.keywords.list({ sender: owner, parameters: '' });
+    })
+
+    it('List not empty', async () => {
+      await message.isSent('keywords.list-is-not-empty', owner);
+    })
+
     for(const k of keywords) {
-      it(`Expecting populated list | ${k.keyword} | ${k.response}`, async () => {
-        await global.systems.keywords.list({ sender: owner, parameters: '' });
-        await message.isSent('keywords.list-is-not-empty', owner);
+      it(`List populated by ${k.keyword} | ${k.response}`, async () => {
         await message.isSentRaw(`${k.enabled ? '🗹' : '☐'} ${k.id} | ${k.keyword} | ${k.response}`, owner, 5000);
       });
     }
