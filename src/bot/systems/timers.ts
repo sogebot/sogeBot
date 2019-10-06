@@ -67,7 +67,7 @@ class Timers extends System {
         _.remove(data.responses, (o: any) => o.response.trim().length === 0);
 
         const timer = {
-          id: uuid(),
+          id:  data.timer.id || uuid(),
           name: name,
           messages: _.toNumber(data.timer.messages),
           seconds: _.toNumber(data.timer.seconds),
@@ -79,18 +79,17 @@ class Timers extends System {
         };
         if (_.isNil(data.timer.id)) {
           await global.db.engine.insert(this.collection.data, timer);
-          data.timer.id = timer.id;
         } else {
           await Promise.all([
-            global.db.engine.update(this.collection.data, { id: data.timer.id }, timer),
-            global.db.engine.remove(this.collection.responses, { timerId: data.timer.id }),
+            global.db.engine.update(this.collection.data, { id: timer.id }, timer),
+            global.db.engine.remove(this.collection.responses, { timerId: timer.id }),
           ]);
         }
 
         const insertArray: any[] = [];
         for (const response of data.responses) {
           insertArray.push(global.db.engine.insert(this.collection.responses, {
-            timerId: data.timer.id,
+            timerId: timer.id,
             response: response.response,
             enabled: response.enabled,
             timestamp: 0,
@@ -98,8 +97,8 @@ class Timers extends System {
         }
         await Promise.all(insertArray);
         callback(null, {
-          timer: await global.db.engine.findOne(this.collection.data, { id: data.timer.id }),
-          responses: await global.db.engine.find(this.collection.responses, { timerId: data.timer.id }),
+          timer: await global.db.engine.findOne(this.collection.data, { id: timer.id }),
+          responses: await global.db.engine.find(this.collection.responses, { timerId: timer.id }),
         });
       });
     });
