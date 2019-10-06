@@ -139,7 +139,7 @@ class Keywords extends System {
     for (let i = 0; i < list.length; i++) {
       setTimeout(() => {
         sendMessage(list[i], opts.sender);
-      }, 100 * i);
+      }, 300 * (i + 1));
     }
   }
 
