@@ -1103,45 +1103,48 @@ class API extends Core {
           this.curRetries = this.curRetries + 1;
         } else {
           // stream is really offline
-          this.curRetries = 0;
-          this.isStreamOnline = false;
-          stop('');
-          this.stats.currentWatchedTime = 0;
-          this.streamStatusChangeSince = Date.now();
-          global.events.fire('stream-stopped', {});
-          global.events.fire('stream-is-running-x-minutes', { reset: true });
-          global.events.fire('number-of-viewers-is-at-least-x', { reset: true });
+          if (this.isStreamOnline) {
+            // online -> offline transition
+            stop('');
+            this.stats.currentWatchedTime = 0;
+            this.streamStatusChangeSince = Date.now();
+            this.isStreamOnline = false;
+            this.curRetries = 0;
+            global.events.fire('stream-stopped', {});
+            global.events.fire('stream-is-running-x-minutes', { reset: true });
+            global.events.fire('number-of-viewers-is-at-least-x', { reset: true });
 
-          // go through all systems and trigger on.streamEnd
-          for (const [, systems] of Object.entries({
-            systems: global.systems,
-            games: global.games,
-            overlays: global.overlays,
-            widgets: global.widgets,
-            integrations: global.integrations,
-          })) {
-            for (const [name, system] of Object.entries(systems)) {
-              if (name.startsWith('_') || typeof system.on === 'undefined') {
-                continue;
-              }
-              if (Array.isArray(system.on.streamEnd)) {
-                for (const fnc of system.on.streamEnd) {
-                  system[fnc]();
+            // go through all systems and trigger on.streamEnd
+            for (const [, systems] of Object.entries({
+              systems: global.systems,
+              games: global.games,
+              overlays: global.overlays,
+              widgets: global.widgets,
+              integrations: global.integrations,
+            })) {
+              for (const [name, system] of Object.entries(systems)) {
+                if (name.startsWith('_') || typeof system.on === 'undefined') {
+                  continue;
+                }
+                if (Array.isArray(system.on.streamEnd)) {
+                  for (const fnc of system.on.streamEnd) {
+                    system[fnc]();
+                  }
                 }
               }
             }
+
+            this.stats.maxViewers = 0;
+            this.stats.newChatters = 0;
+            this.stats.currentViewers = 0;
+            this.stats.currentBits = 0;
+            this.stats.currentTips = 0;
+
+            await global.db.engine.remove('cache.hosts', {}); // we dont want to have cached hosts on stream start
+            await global.db.engine.remove('cache.raids', {}); // we dont want to have cached raids on stream start
+
+            this.streamId = null;
           }
-
-          this.stats.maxViewers = 0;
-          this.stats.newChatters = 0;
-          this.stats.currentViewers = 0;
-          this.stats.currentBits = 0;
-          this.stats.currentTips = 0;
-
-          await global.db.engine.remove('cache.hosts', {}); // we dont want to have cached hosts on stream start
-          await global.db.engine.remove('cache.raids', {}); // we dont want to have cached raids on stream start
-
-          this.streamId = null;
         }
       }
     } catch (e) {
