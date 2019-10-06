@@ -13,12 +13,12 @@
 
       <input class="form-control w-100" type="text" placeholder="Type id or username to search through global ignore list" v-model="search"/>
     </div>
-    <ul style="font-size: 0.75rem;" class="list-group list-group-horizontal text-left" v-for="(chunkValues, index) of _.chunk(Object.keys(excludedValues), 2)" :key="'a' + index">
+    <ul style="font-size: 0.75rem;" class="list-group list-group-horizontal text-left" v-for="(chunkValues, index) of chunk(Object.keys(excludedValues), 2)" :key="'a' + index">
       <button type="button" @click="removeFromExcludeList(key)" class="list-group-item w-50 list-group-item-primary" v-for="key of chunkValues" :key="'b' + key">
       <strong>ID:</strong> {{ key }}<strong><br>Known aliases:</strong> {{ values[key].known_aliases.join(', ') }}<br><strong>Reason:</strong> {{ values[key].reason }}
       </button>
     </ul>
-    <ul style="font-size: 0.75rem;" class="list-group list-group-horizontal text-left" v-for="(chunkValues, index) of _.chunk(Object.keys(computedValues), 2)" :key="'c' + index">
+    <ul style="font-size: 0.75rem;" class="list-group list-group-horizontal text-left" v-for="(chunkValues, index) of chunk(Object.keys(computedValues), 2)" :key="'c' + index">
       <button type="button" @click="addToExcludeList(key)" class="list-group-item w-50 list-group-item-dark" v-for="key of chunkValues" :key="'d' + key">
         <strong>ID:</strong> {{ key }}<strong><br>Known aliases:</strong> {{ values[key].known_aliases.join(', ') }}<br><strong>Reason:</strong> {{ values[key].reason }}
       </button>
@@ -31,12 +31,15 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { chunk } from 'lodash-es';
 
 @Component({})
 export default class btnEmit extends Vue {
   @Prop() readonly value: any;
   @Prop() readonly values: any;
   @Prop() readonly title: any;
+
+  chunk = chunk;
 
   currentValues = this.values;
   currentValue = this.value;
