@@ -91,7 +91,7 @@ class Raffles extends System {
   async announce () {
     clearTimeout(this.timeouts.raffleAnnounce);
     const raffle = await global.db.engine.findOne(this.collection.data, { winner: null });
-    if (!(await global.cache.isOnline()) || _.isEmpty(raffle) || new Date().getTime() - new Date(this.lastAnnounce).getTime() < (this.raffleAnnounceInterval * 60 * 1000)) {
+    if (!(global.api.isStreamOnline) || _.isEmpty(raffle) || new Date().getTime() - new Date(this.lastAnnounce).getTime() < (this.raffleAnnounceInterval * 60 * 1000)) {
       this.timeouts.raffleAnnounce = global.setTimeout(() => this.announce(), 60000);
       return;
     }

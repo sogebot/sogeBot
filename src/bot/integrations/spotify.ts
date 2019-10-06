@@ -219,7 +219,7 @@ class Spotify extends Integration {
       this.originalUri = song.uri;
     }
 
-    //if (!(await global.cache.isOnline())) return // don't do anything on offline stream
+    //if (!(global.api.isStreamOnline)) return // don't do anything on offline stream
 
     if (this.skipToNextSong) {
       if (song.is_playing) {
@@ -274,7 +274,7 @@ class Spotify extends Integration {
     clearTimeout(this.timeouts.ICurrentSong);
 
     try {
-      if (!this.fetchCurrentSongWhenOffline && !(await global.cache.isOnline())) {
+      if (!this.fetchCurrentSongWhenOffline && !(global.api.isStreamOnline)) {
         throw Error('Stream is offline');
       }
       const data = await this.client.getMyCurrentPlayingTrack();
@@ -463,7 +463,7 @@ class Spotify extends Integration {
   @command('!spotify')
   @default_permission(null)
   async main (opts: CommandOptions) {
-    if (!(await global.cache.isOnline())) {
+    if (!(global.api.isStreamOnline)) {
       return;
     } // don't do anything on offline stream
     if (!isMainThread) {

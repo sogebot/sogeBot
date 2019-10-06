@@ -41,9 +41,8 @@ class Twitch extends Core {
 
   @command('!uptime')
   async uptime (opts) {
-    const when = await global.cache.when()
-    const time = getTime(await global.cache.isOnline() ? when.online : when.offline, true)
-    sendMessage(global.translate(await global.cache.isOnline() ? 'uptime.online' : 'uptime.offline')
+    const time = getTime(global.api.streamStatusChangeSince, true)
+    sendMessage(global.translate(global.api.isStreamOnline ? 'uptime.online' : 'uptime.offline')
       .replace(/\$days/g, time.days)
       .replace(/\$hours/g, time.hours)
       .replace(/\$minutes/g, time.minutes)
@@ -111,7 +110,7 @@ class Twitch extends Core {
   @command('!title')
   async getTitle (opts) {
     sendMessage(global.translate('title.current')
-      .replace(/\$title/g, _.get(await global.db.engine.findOne('api.current', { key: 'title' }), 'value', 'n/a')), opts.sender)
+      .replace(/\$title/g, global.api.stats.currentTitle || 'n/a'), opts.sender)
   }
 
   @command('!title set')
@@ -119,7 +118,7 @@ class Twitch extends Core {
   async setTitle (opts) {
     if (opts.parameters.length === 0) {
       sendMessage(global.translate('title.current')
-        .replace(/\$title/g, _.get(await global.db.engine.findOne('api.current', { key: 'title' }), 'value', 'n/a')), opts.sender)
+        .replace(/\$title/g, global.api.stats.currentTitle || 'n/a'), opts.sender)
       return
     }
     if (isMainThread) global.api.setTitleAndGame(opts.sender, { title: opts.parameters })
@@ -129,7 +128,7 @@ class Twitch extends Core {
   @command('!game')
   async getGame (opts) {
     sendMessage(global.translate('game.current')
-      .replace(/\$game/g, _.get(await global.db.engine.findOne('api.current', { key: 'game' }), 'value', 'n/a')), opts.sender)
+      .replace(/\$game/g, global.api.stats.currentGame || 'n/a'), opts.sender)
   }
 
   @command('!game set')
@@ -137,7 +136,7 @@ class Twitch extends Core {
   async setGame (opts) {
     if (opts.parameters.length === 0) {
       sendMessage(global.translate('game.current')
-        .replace(/\$game/g, _.get(await global.db.engine.findOne('api.current', { key: 'game' }), 'value', 'n/a')), opts.sender)
+        .replace(/\$game/g, global.api.stats.currentGame || 'n/a'), opts.sender)
       return
     }
     if (isMainThread) {

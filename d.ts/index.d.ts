@@ -30,6 +30,7 @@ declare namespace NodeJS {
     linesParsed: number;
     status: {
       API: 0 | 1 | 2;
+      MOD: boolean;
     };
     overlays: {
       alerts: import('../src/bot/overlays/alerts').Alerts;
@@ -56,11 +57,12 @@ declare namespace NodeJS {
     };
     cache: any;
     client: any;
-    api: any;
+    api: import('../src/bot/api').API;
     mocha: boolean;
     configuration: any;
     cpu: any;
     db: any;
+    stats2: any;
     games: {
       duel: import('../src/bot/games/duel').Duel;
       fightme: import('../src/bot/games/fightme').FightMe;
@@ -108,11 +110,13 @@ declare namespace NodeJS {
     };
     users: any;
     lib: any;
+    twitch: any;
     workers: import('../src/bot/workers').Workers;
     permissions: import('../src/bot/permissions').Permissions;
     customvariables: any;
     tmi: any;
     events: import('../src/bot/events').Events;
+    webhooks: any;
     widgets: {
       chat: import('../src/bot/widgets/chat').Chat;
       cmdboard: import('../src/bot/widgets/cmdboard').Cmdboard;

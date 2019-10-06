@@ -2,7 +2,6 @@
 
 import Overlay from '../overlays/_interface';
 
-import _ from 'lodash';
 import { isMainThread } from 'worker_threads';
 import { onBit, onFollow, onSub, onTip } from '../decorators/on';
 
@@ -27,8 +26,8 @@ class Goals extends Overlay {
     this.socket.on('connection', (socket) => {
       socket.on('current', async (cb) => {
         cb(null, {
-          subscribers: _.get(await global.db.engine.findOne('api.current', { key: 'subscribers' }), 'value', 0),
-          followers: _.get(await global.db.engine.findOne('api.current', { key: 'followers' }), 'value', 0),
+          subscribers: global.api.stats.currentSubscribers,
+          followers: global.api.stats.currentFollowers,
         });
       });
     });

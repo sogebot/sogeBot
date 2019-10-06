@@ -18,16 +18,19 @@ class Message {
   }
 
   async global (opts) {
-    let variables = [
-      'game', 'viewers', 'views', 'followers',
-      'hosts', 'subscribers', 'bits', 'title'
-    ];
-    let items = await global.db.engine.find('api.current');
-    for (let variable of variables) {
+    let variables = {
+      game: global.api.stats.currentGame,
+      viewers: global.api.stats.currentViewers,
+      views: global.api.stats.currentViews,
+      followers: global.api.stats.currentFollowers,
+      hosts: global.api.stats.currentHosts,
+      subscribers: global.api.stats.currentSubscribers,
+      bits: global.api.stats.currentBits,
+      title: global.api.stats.currentTitle
+    };
+    for (let variable of Object.keys(variables)) {
       const regexp = new RegExp(`\\$${variable}`, 'g');
-      let value = _.find(items, (o) => o.key === variable);
-      value = _.isEmpty(value) ? '' : value.value;
-      this.message = this.message.replace(regexp, value);
+      this.message = this.message.replace(regexp, variables[variable]);
     }
 
     const version = _.get(process, 'env.npm_package_version', 'x.y.z');
@@ -270,7 +273,7 @@ class Message {
         }, 0);
 
         if (match.groups.type === 'stream') {
-          const whenOnline = (await global.cache.when()).online;
+          const whenOnline = global.api.isStreamOnline ? global.api.streamStatusChangeSince : null;
           if (whenOnline) {
             tips = tips.filter((o) => o.timestamp >= (new Date(whenOnline)).getTime());
           } else {
@@ -288,10 +291,10 @@ class Message {
         return '';
       },
       '(game)': async function (filter) {
-        return _.get(await global.db.engine.findOne('api.current', { key: 'game' }), 'value', 'n/a');
+        return global.api.stats.currentGame || 'n/a';
       },
       '(status)': async function (filter) {
-        return _.get(await global.db.engine.findOne('api.current', { key: 'title' }), 'value', 'n/a');
+        return global.api.stats.currentTitle || 'n/a';
       }
     };
     let command = {
@@ -353,10 +356,10 @@ class Message {
     };
     let online = {
       '(onlineonly)': async function (filter) {
-        return global.cache.isOnline();
+        return global.api.isStreamOnline;
       },
       '(offlineonly)': async function (filter) {
-        return !(await global.cache.isOnline());
+        return !(global.api.isStreamOnline);
       }
     };
     let list = {

@@ -22,8 +22,6 @@ describe('API - getLatest100Followers()', () => {
     await db.cleanup();
     await message.prepare();
 
-    global.api.timeouts.getLatest100Followers.isPaused = true;
-
     global.oauth.channelId = '12345';
     await variable.isEqual('global.oauth.channelId', '12345');
     global.oauth.botAccessToken = 'foobar';
@@ -33,7 +31,6 @@ describe('API - getLatest100Followers()', () => {
   });
 
   after(() => {
-    global.api.timeouts.getLatest100Followers.isPaused = false;
     global.oauth.channelId = '';
     global.oauth.botAccessToken = '';
   });

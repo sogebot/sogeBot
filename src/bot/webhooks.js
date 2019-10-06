@@ -286,15 +286,17 @@ class Webhooks {
       global.api.streamId = stream.id
       global.api.streamType = stream.type
 
-      await global.db.engine.update('api.current', { key: 'title' }, { value: stream.title })
-      await global.db.engine.update('api.current', { key: 'game' }, { value: await global.api.getGameFromId(stream.game_id) })
+      global.api.stats.currentTitle = stream.title;
+      global.api.stats.currentGame = await global.api.getGameFromId(stream.game_id);
 
-      if (!(await global.cache.isOnline()) && Number(global.twitch.streamId) !== Number(stream.id)) {
+      if (!(global.api.isStreamOnline) && Number(global.twitch.streamId) !== Number(stream.id)) {
         debug('webhooks.stream', 'WEBHOOKS: ' + JSON.stringify(aEvent))
         start(
           `id: ${stream.id} | startedAt: ${stream.started_at} | title: ${stream.title} | game: ${await global.api.getGameFromId(stream.game_id)} | type: ${stream.type} | channel ID: ${cid}`
         )
-        global.cache.when({ online: stream.started_at })
+
+        global.api.isStreamOnline = true;
+        global.api.streamStatusChangeSince = (new Date(stream.started_at)).getTime()
         global.api.chatMessagesAtStart = global.linesParsed
 
         global.events.fire('stream-started')
@@ -307,7 +309,6 @@ class Webhooks {
       global.api.saveStreamData(stream)
       global.api.streamId = stream.id
       global.api.streamType = stream.type
-      await global.cache.isOnline(true)
     } else {
       // stream is offline - add curRetry + 1 and call getCurrentStreamData to do retries
       global.api.curRetries = global.api.curRetries + 1

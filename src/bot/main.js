@@ -22,7 +22,6 @@ const { autoLoad } = require('./commons');
 const constants = require('./constants')
 const config = require('../config.json')
 
-global.cache = new (require('./cache'))()
 global.workers = new Workers()
 
 global.startedClusters = 0
@@ -115,7 +114,7 @@ if (isMainThread) {
   })
 
   process.on('uncaughtException', (err) => {
-    error(util.inspect(error))
+    error(util.inspect(err))
     error('+------------------------------------------------------------------------------+')
     error('| BOT HAS UNEXPECTEDLY CRASHED                                                 |')
     error('| PLEASE CHECK https://github.com/sogehige/SogeBot/wiki/How-to-report-an-issue |')

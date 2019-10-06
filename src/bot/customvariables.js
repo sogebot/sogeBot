@@ -245,43 +245,21 @@ class CustomVariables {
       users: users,
       random: randomVar,
       stream: {
-        uptime: commons.getTime((await global.cache.when()).online, false),
-        currentViewers: _.get((await global.db.engine.findOne('api.current', {
-          key: 'viewers'
-        })), 'value', 0),
-        currentSubscribers: _.get((await global.db.engine.findOne('api.current', {
-          key: 'subscribers'
-        })), 'value', 0),
-        currentBits: _.get((await global.db.engine.findOne('api.current', {
-          key: 'bits'
-        })), 'value', 0),
-        currentTips: _.get((await global.db.engine.findOne('api.current', {
-          key: 'tips'
-        })), 'value', 0),
+        uptime: commons.getTime(global.api.isStreamOnline ? global.api.streamStatusChangeSince : null, false),
+        currentViewers: global.api.stats.currentViewers,
+        currentSubscribers: global.api.stats.currentSubscribers,
+        currentBits: global.api.stats.currentBits,
+        currentTips: global.api.stats.currentTips,
         currency: global.currency.symbol(global.currency.mainCurrency),
-        chatMessages: (await global.cache.isOnline()) ? global.linesParsed - global.api.chatMessagesAtStart : 0,
-        currentFollowers: _.get((await global.db.engine.findOne('api.current', {
-          key: 'followers'
-        })), 'value', 0),
-        currentViews: _.get((await global.db.engine.findOne('api.current', {
-          key: 'views'
-        })), 'value', 0),
-        maxViewers: _.get((await global.db.engine.findOne('api.max', {
-          key: 'viewers'
-        })), 'value', 0),
-        newChatters: _.get((await global.db.engine.findOne('api.new', {
-          key: 'chatters'
-        })), 'value', 0),
-        game: _.get((await global.db.engine.findOne('api.current', {
-          key: 'game'
-        })), 'value', null),
-        status: _.get((await global.db.engine.findOne('api.current', {
-          key: 'title'
-        })), 'value', null),
-        currentHosts: _.get((await global.db.engine.findOne('api.current', {
-          key: 'hosts'
-        })), 'value', 0),
-        currentWatched: global.api._stream.watchedTime
+        chatMessages: (global.api.isStreamOnline) ? global.linesParsed - global.api.chatMessagesAtStart : 0,
+        currentFollowers: global.api.stats.currentFollowers,
+        currentViews: global.api.stats.currentViews,
+        maxViewers: global.api.stats.maxViewers,
+        newChatters: global.api.stats.newChatters,
+        game: global.api.stats.currentGame,
+        status: global.api.stats.currentTitle,
+        currentHosts: global.api.stats.currentHosts,
+        currentWatched: global.api.stats.currentWatchedTime
       },
       sender,
       param: param,
@@ -425,9 +403,8 @@ class CustomVariables {
 
     if (!_.isNil(variable)) {
       const regexp = new RegExp(`\\${variable}`, 'ig');
-      let title = await global.cache.rawStatus();
 
-      if (title.match(regexp)) {
+      if (global.api.rawStatus.match(regexp)) {
         if (!isMainThread) {
           global.workers.sendToMaster({ type: 'call', ns: 'api', fnc: 'setTitleAndGame', args: [null] });
         } else {

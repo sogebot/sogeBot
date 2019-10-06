@@ -519,8 +519,6 @@ Panel.prototype.sendStreamData = async function (self, socket) {
       return
     }
 
-    const whenOnline = (await global.cache.when()).online
-
     const ytCurrentSong = _.get(JSON.parse(global.systems.songs.currentSong), 'title', null);
     let spotifyCurrentSong = _.get(JSON.parse(global.integrations.spotify.currentSong), 'song', '') + ' - ' + _.get(JSON.parse(global.integrations.spotify.currentSong), 'artist', '');
     if (spotifyCurrentSong.trim().length === 1 /* '-' */  || !_.get(JSON.parse(global.integrations.spotify.currentSong), 'is_playing', false)) {
@@ -529,23 +527,23 @@ Panel.prototype.sendStreamData = async function (self, socket) {
 
     var data = {
       broadcasterType: global.oauth.broadcasterType,
-      uptime: commons.getTime(whenOnline, false),
-      currentViewers: _.get(await global.db.engine.findOne('api.current', { key: 'viewers' }), 'value', 0),
-      currentSubscribers: _.get(await global.db.engine.findOne('api.current', { key: 'subscribers' }), 'value', 0),
-      currentBits: _.get(await global.db.engine.findOne('api.current', { key: 'bits' }), 'value', 0),
-      currentTips: _.get(await global.db.engine.findOne('api.current', { key: 'tips' }), 'value', 0),
+      uptime: commons.getTime(global.api.isStreamOnline ? global.api.streamStatusChangeSince : null, false),
+      currentViewers: global.api.stats.currentViewers,
+      currentSubscribers: global.api.stats.currentSubscribers,
+      currentBits: global.api.stats.currentBits,
+      currentTips: global.api.stats.currentTips,
       currency: global.currency.symbol(global.currency.mainCurrency),
-      chatMessages: await global.cache.isOnline() ? global.linesParsed - global.api.chatMessagesAtStart : 0,
-      currentFollowers: _.get(await global.db.engine.findOne('api.current', { key: 'followers' }), 'value', 0),
-      currentViews: _.get(await global.db.engine.findOne('api.current', { key: 'views' }), 'value', 0),
-      maxViewers: _.get(await global.db.engine.findOne('api.max', { key: 'viewers' }), 'value', 0),
-      newChatters: _.get(await global.db.engine.findOne('api.new', { key: 'chatters' }), 'value', 0),
-      game: _.get(await global.db.engine.findOne('api.current', { key: 'game' }), 'value', null),
-      status: _.get(await global.db.engine.findOne('api.current', { key: 'title' }), 'value', null),
-      rawStatus: await global.cache.rawStatus(),
+      chatMessages: global.api.isStreamOnline ? global.linesParsed - global.api.chatMessagesAtStart : 0,
+      currentFollowers: global.api.stats.currentFollowers,
+      currentViews: global.api.stats.currentViews,
+      maxViewers: global.api.stats.maxViewers,
+      newChatters: global.api.stats.newChatters,
+      game: global.api.stats.currentGame,
+      status: global.api.stats.currentTitle,
+      rawStatus: global.api.rawStatus,
       currentSong: ytCurrentSong || spotifyCurrentSong || global.translate('songs.not-playing'),
-      currentHosts: _.get(await global.db.engine.findOne('api.current', { key: 'hosts' }), 'value', 0),
-      currentWatched: global.api._stream.watchedTime,
+      currentHosts: global.api.stats.currentHosts,
+      currentWatched: global.api.stats.currentWatchedTime,
       tags: await global.db.engine.find('core.api.currentTags'),
     }
     socket.emit('stats', data)

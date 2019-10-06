@@ -408,7 +408,7 @@ class TMI extends Core {
         TODO: update for tmi-js
         if (!global.users.newChattersList.includes(message.tags.login.toLowerCase())) {
           global.users.newChattersList.push(message.tags.login.toLowerCase())
-          global.db.engine.increment('api.new', { key: 'chatters' }, { value: 1 })
+          global.api.stats.newChatters += 1;
         }
         */
       } else {
@@ -640,7 +640,9 @@ class TMI extends Core {
         message: messageFromUser,
         autohost: false,
       });
-      if (await global.cache.isOnline()) await global.db.engine.increment('api.current', { key: 'bits' }, { value: parseInt(userstate.bits, 10) })
+      if (global.api.isStreamOnline) {
+        global.api.stats.currentBits += parseInt(userstate.bits, 10);
+      }
 
       triggerInterfaceOnBit({
         username: username,
@@ -750,7 +752,7 @@ class TMI extends Core {
           global.workers.sendToMaster({ type: 'api', fnc: 'isFollower', username: sender.username })
         }
 
-        if (await global.cache.isOnline()) {
+        if (global.api.isStreamOnline) {
           global.events.fire('keyword-send-x-times', { username: sender.username, message: message })
           if (message.startsWith('!')) {
             global.events.fire('command-send-x-times', { username: sender.username, message: message })

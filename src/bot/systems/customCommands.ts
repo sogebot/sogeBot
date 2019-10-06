@@ -473,12 +473,12 @@ class CustomCommands extends System {
       $is,
       $rank,
       // add global variables
-      $game: _.get(await global.db.engine.findOne('api.current', { key: 'game' }), 'value', 'n/a'),
-      $title: _.get(await global.db.engine.findOne('api.current', { key: 'title' }), 'value', 'n/a'),
-      $views: _.get(await global.db.engine.findOne('api.current', { key: 'views' }), 'value', 0),
-      $followers: _.get(await global.db.engine.findOne('api.current', { key: 'followers' }), 'value', 0),
-      $hosts: _.get(await global.db.engine.findOne('api.current', { key: 'hosts' }), 'value', 0),
-      $subscribers: _.get(await global.db.engine.findOne('api.current', { key: 'subscribers' }), 'value', 0),
+      $game: global.api.stats.currentGame || 'n/a',
+      $title: global.api.stats.currentTitle || 'n/a',
+      $views: global.api.stats.currentViews,
+      $followers: global.api.stats.currentFollowers,
+      $hosts: global.api.stats.currentHosts,
+      $subscribers: global.api.stats.currentSubscribers,
       ...customVariables,
     };
     let result = false;
