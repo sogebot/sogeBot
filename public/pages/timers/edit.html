@@ -147,11 +147,13 @@
               },
               responses: this.responses
             }
+            console.debug('Saving', data)
             this.socket.emit('update.timer', data, (err, data) => {
               if (err) {
                 console.error(err)
                 return this.states.save = 3
               }
+              console.debug('Received', data)
               this.id = data.timer.id
               this.states.save = 2
               this.pending = false
