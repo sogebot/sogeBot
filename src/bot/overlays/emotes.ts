@@ -6,7 +6,7 @@ import XRegExp from 'xregexp';
 
 import Overlay from './_interface';
 import { parser, settings, ui } from '../decorators';
-import { error, info } from '../helpers/log';
+import { error, info, warning } from '../helpers/log';
 
 
 class Emotes extends Overlay {
@@ -325,7 +325,11 @@ class Emotes extends Overlay {
         }
         info('EMOTES: Fetched bttv emotes');
       } catch (e) {
-        error(e);
+        if (e.response.status === 404) {
+          warning(`EMOTES: Channel ${channel} not found in bttv`);
+        } else {
+          error(e);
+        }
       }
     }
 
