@@ -39,7 +39,7 @@ const migration = {
         }
       }
       delete alerts[i]._id;
-      await global.db.engine.update('registries.alerts', { uuid: alerts[i].uuid }, alerts[i]);
+      await global.db.engine.update('registries.alerts', { id: alerts[i].id }, alerts[i]);
       updated++;
     }
     end(updated);
