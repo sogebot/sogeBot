@@ -70,7 +70,9 @@ class Message {
     } else {this.message = this.message.replace(/\$spotifySong/g, global.translate('songs.not-playing'))};
 
 
-    if (await global.systems.songs.isEnabled() && this.message.includes('$ytSong')) {
+    if (await global.systems.songs.isEnabled()
+        && this.message.includes('$ytSong')
+        && Object.values(global.systems.songs.isPlaying).find(o => o)) {
       let currentSong = _.get(JSON.parse(await global.systems.songs.currentSong), 'title', global.translate('songs.not-playing'));
       if (opts.escape) {
         currentSong = currentSong.replace(new RegExp(opts.escape, 'g'), `\\${opts.escape}`);

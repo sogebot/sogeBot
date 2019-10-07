@@ -1,6 +1,7 @@
 import { YouTube } from 'better-youtube-api';
 import * as _ from 'lodash';
 import { isMainThread } from 'worker_threads';
+import { setInterval } from 'timers';
 import ytsearch from 'youtube-search';
 import ytdl from 'ytdl-core';
 import ytpl from 'ytpl';
@@ -15,13 +16,16 @@ import { error, info } from '../helpers/log';
 const defaultApiKey = 'AIzaSyDYevtuLOxbyqBjh17JNZNvSQO854sngK0';
 
 class Songs extends System {
+  interval: { [id: string]: NodeJS.Timeout } = {};
+
   youtubeApi: any = null;
 
   @shared()
   meanLoudness = -15;
   @shared()
   currentSong: string = JSON.stringify({ videoID: null });
-
+  @shared()
+  isPlaying: {[socketId: string]: boolean } = {};
 
   @settings()
   @ui({ type: 'text-input', secret: true })
@@ -81,6 +85,14 @@ class Songs extends System {
     }
 
     this.socket.on('connection', (socket) => {
+      socket.on('disconnect', (reason) => {
+        clearInterval(this.interval[socket.id]);
+        delete this.interval[socket.id];
+        delete this.isPlaying[socket.id];
+      });
+      this.interval[socket.id] = setInterval(async () => {
+        socket.emit('isPlaying', (isPlaying) => this.isPlaying[socket.id] = isPlaying);
+      }, 1000);
       socket.on('find.ban', async (where, cb) => {
         where = where || {};
         cb(null, await global.db.engine.find(this.collection.ban, where));
@@ -347,11 +359,13 @@ class Songs extends System {
   async getCurrentSong () {
     let translation = 'songs.no-song-is-currently-playing';
     const currentSong = JSON.parse(this.currentSong);
-    if (!_.isNil(currentSong.title)) {
-      if (currentSong.type === 'playlist') {
-        translation = 'songs.current-song-from-playlist';
-      } else {
-        translation = 'songs.current-song-from-songrequest';
+    if (Object.values(this.isPlaying).find(o => o)) {
+      if (!_.isNil(currentSong.title)) {
+        if (currentSong.type === 'playlist') {
+          translation = 'songs.current-song-from-playlist';
+        } else {
+          translation = 'songs.current-song-from-songrequest';
+        }
       }
     }
     const message = await prepare(translation, { name: currentSong.title, username: currentSong.username });
