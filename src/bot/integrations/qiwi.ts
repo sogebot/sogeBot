@@ -61,7 +61,14 @@ class Qiwi extends Integration {
 
       const id = username ? await global.users.getIdByName(username, false) : null;
       if (id) {
-        global.db.engine.insert('users.tips', { id, amount, message, currency, timestamp: Date.now() });
+        global.db.engine.insert('users.tips', {
+          id,
+          amount,
+          currency,
+          _amount: global.currency.exchange(Number(amount), currency, 'EUR'), // recounting amount to EUR to have simplified ordering
+          _currency: 'EUR', // we are forcing _currency to have simplified ordering
+          message,
+          timestamp: Date.now() });
       }
 
       if (global.api.isStreamOnline) {

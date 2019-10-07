@@ -115,18 +115,10 @@ class Top extends System {
         message = global.translate('systems.top.time').replace(/\$amount/g, 10);
         break;
       case TYPE.TIPS:
-        const users = {};
-        const tips = await global.db.engine.find('users.tips');
-
-        message = global.translate('systems.top.tips').replace(/\$amount/g, 10);
-        for (const tip of tips) {
-          const username = await global.users.getNameById(tip.id);
-          if (_.isNil(users[username])) {
-            users[username] = { username, value: 0 };
-          }
-          users[username].value += global.currency.exchange(Number(tip.amount), tip.currency, global.currency.mainCurrency);
+        for (const tip of (await global.db.engine.find('users.tips', { _sort: '_amount', _sum: '_amount', _total, _group: 'id' }))) {
+          sorted.push({ username: await global.users.getNameById(tip._id), value: global.currency.exchange(Number(tip._amount), 'EUR' /* we know that _currency is EUR */, global.currency.mainCurrency) });
         }
-        sorted = _.orderBy(users, 'value', 'desc');
+        message = global.translate('systems.top.tips').replace(/\$amount/g, 10);
         break;
       case TYPE.POINTS:
         if (!global.systems.points.isEnabled()) {

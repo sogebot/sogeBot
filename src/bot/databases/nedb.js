@@ -46,20 +46,10 @@ class INeDB extends Interface {
       this.table[table].persistence.setAutocompactionInterval(60000)
 
       switch (table) {
-        case 'users.bits':
-        case 'users.tips':
-          this.table[table].removeIndex('timestamp')
-          break
-        case 'users':
-        case 'users.online':
-        case 'users.points':
-        case 'users.messages':
-        case 'users.watched':
         case 'cache.hosts':
           this.table[table].removeIndex('username')
           this.table[table].removeIndex('id')
           break
-        case 'cache':
         case 'customTranslations':
           this.table[table].removeIndex('key')
           break
@@ -71,25 +61,6 @@ class INeDB extends Interface {
       // create indexes
       if (this.createIndexes) {
         switch (table) {
-          case 'users.bits':
-          case 'users.tips':
-            this.table[table].ensureIndex({ fieldName: 'timestamp' })
-            break
-          case 'users':
-            this.table[table].ensureIndex({ fieldName: 'username' })
-            this.table[table].ensureIndex({ fieldName: 'id', unique: true })
-            break
-          case 'cache.hosts':
-            this.table[table].ensureIndex({ fieldName: 'username', unique: true })
-            break
-          case 'users.online':
-            this.table[table].ensureIndex({ fieldName: 'username' })
-            break
-          case 'users.points':
-          case 'users.messages':
-          case 'users.watched':
-            this.table[table].ensureIndex({ fieldName: 'id', unique: true })
-            break
           case 'cache':
           case 'customTranslations':
             this.table[table].ensureIndex({ fieldName: 'key', unique: true })

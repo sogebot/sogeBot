@@ -24,6 +24,12 @@ class Users extends Core {
 
     if (isMainThread) {
       global.db.engine.index('users.chat', [{ index: 'id' }]);
+      global.db.engine.index('users.tips', [{ index: 'timestamp', unique: true }, { index: 'id' }]);
+      global.db.engine.index('users.bits', [{ index: 'timestamp', unique: true }, { index: 'id' }]);
+      global.db.engine.index('users.points', [{ index: 'id', unique: true }]);
+      global.db.engine.index('users.messages', [{ index: 'id', unique: true }]);
+      global.db.engine.index('users.watched', [{ index: 'id', unique: true }]);
+      global.db.engine.index('users.online', [{ index: 'username' }]);
       this.updateWatchTime(true);
       this.updateChatTime();
     }
@@ -491,6 +497,8 @@ class Users extends Core {
           b.tips = Number(b.tips); // force retype amount to be sure we really have number (ui is sending string)
           if (b.new) {
             delete b.new; delete b._id
+            b._amount = global.currency.exchange(Number(b.amount), b.currency, 'EUR'); // recounting amount to EUR to have simplified ordering
+            b._currency = 'EUR'; // we are forcing _currency to have simplified ordering
             const tip = await global.db.engine.insert('users.tips', b)
             newTipsIds.push(String(tip._id));
           } else {
