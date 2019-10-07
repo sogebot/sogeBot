@@ -14,6 +14,15 @@
             <b-form-checkbox v-bind:key="'tts-enabled' + uuid" :id="'tts-enabled' + uuid" v-model="data.enabled" :name="'tts-enabled' + uuid" switch></b-form-checkbox>
           </b-form-group>
 
+          <b-form-group
+            label-cols-sm="4"
+            label-cols-lg="3"
+            :label-for="'tts-keepAlertShown' + uuid"
+            :label="translate('registry.alerts.keepAlertShown')"
+          >
+            <b-form-checkbox v-bind:key="'tts-keepAlertShown' + uuid" :id="'tts-keepAlertShown' + uuid" v-model="data.keepAlertShown" :name="'tts-keepAlertShown' + uuid" switch></b-form-checkbox>
+          </b-form-group>
+
           <b-form-group label-cols-sm="4" label-cols-lg="3"
               :label="translate('registry.alerts.voice')">
             <b-form-select v-model="data.voice" :options="voices" plain></b-form-select>
