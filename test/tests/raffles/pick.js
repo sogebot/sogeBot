@@ -212,16 +212,16 @@ describe('Raffles - pick()', () => {
     });
 
     it('Create testuser/testuser2 with max points', async () => {
-      await global.db.engine.update('users.points', { username: testuser.username }, { points: max });
-      await global.db.engine.update('users.points', { username: testuser2.username }, { points: max });
+      await global.db.engine.update('users.points', { id: testuser.userId }, { points: max });
+      await global.db.engine.update('users.points', { id: testuser2.userId }, { points: max });
     });
 
     it('Set testuser as subscriber', async () => {
-      await global.db.engine.update('users', { username: testuser.username }, { is: { subscriber: true } });
+      await global.db.engine.update('users', { id: testuser.userId }, { username: testuser.username, is: { subscriber: true } });
     });
 
     it('Set testuser2 as follower', async () => {
-      await global.db.engine.update('users', { username: testuser2.username }, { is: { follower: true } });
+      await global.db.engine.update('users', { id: testuser2.userId }, { username: testuser2.username, is: { follower: true } });
     });
 
     it('testuser bets 100', async () => {
