@@ -31,7 +31,7 @@ describe('Top - !top tips', () => {
       });
       if (i != 0) {
         await global.db.engine.insert('users.tips', {
-          id, amount: i, _amount: i, currency: 'EUR', _currency: 'EUR', message: 'test',
+          id, amount: i, _amount: i, currency: 'EUR', _currency: 'EUR', message: 'test', timestamp: Math.random()
         });
       }
     }
