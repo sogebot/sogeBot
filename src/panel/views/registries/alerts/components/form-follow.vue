@@ -183,7 +183,7 @@
       <button type="button" class="btn" @click="customShow = 'css'" :class="[customShow === 'css' ? 'btn-dark' : 'btn-outline-dark']">CSS</button>
       <button type="button" class="btn" @click="customShow = 'js'" :class="[customShow === 'js' ? 'btn-dark' : 'btn-outline-dark']">JS</button>
     </div>
-    <div class="col-md-12 p-0 pb-2" v-if="data.enableAdvancedMode">
+    <div class="col-md-12 p-0 pb-2" v-if="data.enableAdvancedMode" :key="customShow + data.uuid + 'advancedMode'">
       <codemirror style="font-size: 0.8em;" v-if="customShow === 'html'" class="w-100" v-model="data.advancedMode.html" :options="{
         tabSize: 4,
         mode: 'text/html',

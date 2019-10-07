@@ -123,6 +123,7 @@
   },
   "showAutoHost": "Zobrazit autohost",
   "voice": "Hlas",
+  "keepAlertShown": "Alert zůstane zobrazen během TTS",
   "volume": "Hlasitost",
   "rate": "Tempo",
   "pitch": "Výška",

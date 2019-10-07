@@ -27,6 +27,23 @@ const end = function (updated) {
 };
 
 const migration = {
+  16: async () => {
+    header('Add keepAlertShown to alerts with tts');
+    let updated = 0;
+    const alerts = await global.db.engine.find('registries.alerts');
+    for (let i = 0; i < alerts.length; i++) {
+      for (const event of Object.keys(alerts[i].alerts)) {
+        for (const variant of alerts[i].alerts[event]) {
+          variant.tts.keepAlertShown = false;
+          updated++;
+        }
+      }
+      delete alerts[i]._id;
+      await global.db.engine.update('registries.alerts', { uuid: alerts[i].uuid }, alerts[i]);
+      updated++;
+    }
+    end(updated);
+  },
   15: async () => {
     header('Add _amount, _currency to tips for faster ordering');
     let updated = 0;

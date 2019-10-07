@@ -165,7 +165,7 @@ export default class AlertsRegistryOverlays extends Vue {
   animationTextClass() {
     if (this.runningAlert && this.runningAlert.showTextAt <= Date.now()) {
       return this.runningAlert.hideAt - Date.now() <= 0
-        && !isTTSPlaying
+        && (!isTTSPlaying || !this.runningAlert.alert.tts.keepAlertShown)
         && !waitingForTTS
         ? this.runningAlert.alert.animationOut
         : this.runningAlert.alert.animationIn;
@@ -177,7 +177,7 @@ export default class AlertsRegistryOverlays extends Vue {
   animationClass() {
     if (this.runningAlert) {
       return this.runningAlert.hideAt - Date.now() <= 0
-        && !isTTSPlaying
+        && (!isTTSPlaying || !this.runningAlert.alert.tts.keepAlertShown)
         && !waitingForTTS
         ? this.runningAlert.alert.animationOut
         : this.runningAlert.alert.animationIn;
@@ -222,10 +222,11 @@ export default class AlertsRegistryOverlays extends Vue {
   }
 
   mounted() {
+    console.log('mounted')
     this.checkResponsiveVoiceAPIKey();
     this.interval.push(window.setInterval(() => {
       if (this.runningAlert) {
-        this.isTTSPlayingFnc();
+        const isTTSPlaying = this.isTTSPlayingFnc();
 
         this.runningAlert.animation = this.animationClass();
         this.runningAlert.animationText = this.animationTextClass();
@@ -234,7 +235,8 @@ export default class AlertsRegistryOverlays extends Vue {
         if (this.runningAlert.hideAt - Date.now() <= 0
           && !isTTSPlaying
           && !waitingForTTS) {
-          if (!cleanupAlert) {
+            if (!cleanupAlert) {
+            console.debug('Cleanin up', { isTTSPlaying, waitingForTTS, hideAt: this.runningAlert.hideAt - Date.now() <= 0 })
             // eval onEnded
             this.$nextTick(() => {
               if (this.runningAlert) {
@@ -249,6 +251,8 @@ export default class AlertsRegistryOverlays extends Vue {
             }, 5000)
           }
           return;
+        } else {
+          cleanupAlert = false;
         }
 
         if (this.runningAlert.showAt <= Date.now() && !this.runningAlert.isShowing) {
@@ -445,7 +449,7 @@ export default class AlertsRegistryOverlays extends Vue {
           this.runningAlert = null;
         }
       }
-    }, 100));
+    }, 1000));
 
     this.id = this.$route.params.id
     this.refreshAlert();

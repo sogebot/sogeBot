@@ -123,6 +123,7 @@
   },
   "showAutoHost": "Show autohost",
   "voice": "Voice",
+  "keepAlertShown": "Alert keeps visible during TTS",
   "volume": "Volume",
   "rate": "Rate",
   "pitch": "Pitch",
