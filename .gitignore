@@ -5,7 +5,6 @@ heap-*.csv
 logs/*
 dest/*
 package-lock.json*
-npm-shrinkwrap.json*
 yarn.lock
 *.zip
 config.json
