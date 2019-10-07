@@ -105,7 +105,7 @@ class Highlights extends System {
       global.api.remainingAPICalls = request.headers['ratelimit-remaining'];
       global.api.refreshAPICalls = request.headers['ratelimit-reset'];
 
-      const timestamp = moment.preciseDiff(moment.utc(), moment.utc(global.api.streamStartedAt), true);
+      const timestamp = moment.preciseDiff(moment.utc(), moment.utc(global.api.streamStatusChangeSince), true);
       const highlight = {
         id: request.data.data[0].id,
         timestamp: { hours: timestamp.hours, minutes: timestamp.minutes, seconds: timestamp.seconds },
