@@ -92,7 +92,6 @@ class API extends Core {
   curRetries = 0;
   streamType = 'live';
   streamId: null | string = null;
-  streamStartedAt = Date.now();
   gameOrTitleChangedManually = false;
 
   retries = {
@@ -1058,7 +1057,7 @@ class API extends Core {
         }
 
         // Always keep this updated
-        this.streamStartedAt = stream.started_at;
+        this.streamStatusChangeSince = new Date(stream.started_at).getTime();
         this.streamId = stream.id;
         this.streamType = stream.type;
 
@@ -1773,7 +1772,7 @@ class API extends Core {
       if (opts.period) {
         if (opts.period === 'stream') {
           url += '&' + querystring.stringify({
-            started_at: (new Date(this.streamStartedAt)).toISOString(),
+            started_at: (new Date(this.streamStatusChangeSince)).toISOString(),
             ended_at: (new Date()).toISOString(),
           });
         } else {

@@ -4,7 +4,7 @@ const config = require('@config')
 const util = require('util');
 const { isBot } = require('./commons');
 
-import { debug, warning, error, info, follow } from './helpers/log';
+import { start, debug, warning, error, info, follow } from './helpers/log';
 import { triggerInterfaceOnFollow } from './helpers/interface/triggers';
 
 class Webhooks {
@@ -282,7 +282,7 @@ class Webhooks {
       if (parseInt(stream.user_id, 10) !== parseInt(cid, 10) || Number(stream.id) === Number(global.api.streamId)) return
 
       // Always keep this updated
-      global.api.streamStartedAt = stream.started_atx
+      global.api.streamStatusChangeSince = (new Date(stream.started_at)).getTime()
       global.api.streamId = stream.id
       global.api.streamType = stream.type
 
@@ -296,7 +296,6 @@ class Webhooks {
         )
 
         global.api.isStreamOnline = true;
-        global.api.streamStatusChangeSince = (new Date(stream.started_at)).getTime()
         global.api.chatMessagesAtStart = global.linesParsed
 
         global.events.fire('stream-started')
