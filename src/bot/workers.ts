@@ -359,6 +359,9 @@ class Workers {
             case 'count':
               data.items = await global.db.engine.count(data.table, data.where, data.object);
               break;
+            case 'removeIndex':
+              data.items = await global.db.engine.removeIndex(...data.opts);
+              break;
             default:
               error('This db call is not correct');
               error(data);

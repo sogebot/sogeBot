@@ -189,6 +189,14 @@ export default {
       this.playThisSong(item)
     })
 
+    this.socket.on('isPlaying', cb => {
+      if (this.player) {
+        cb(this.player.playing);
+      } else {
+        cb(false);
+      }
+    })
+
     this.interval.push(setInterval(() => {
       this.socket.emit('find.request', {}, (err, items) => {
         if (!isEqual(this.requests, items)) {
