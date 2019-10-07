@@ -113,7 +113,15 @@ class Donationalerts extends Integration {
         if (!data._is_test_alert) {
           const id = await global.users.getIdByName(data.username.toLowerCase(), false);
           if (id) {
-            global.db.engine.insert('users.tips', { id, amount: Number(data.amount), message: data.message, currency: data.currency, timestamp: _.now() });
+            global.db.engine.insert('users.tips', {
+              id,
+              amount: Number(data.amount),
+              currency: data.currency,
+              _amount: global.currency.exchange(Number(data.amount), data.currency, 'EUR'), // recounting amount to EUR to have simplified ordering
+              _currency: 'EUR', // we are forcing _currency to have simplified ordering
+              message: data.message,
+              timestamp: _.now(),
+            });
           }
           if (global.api.isStreamOnline) {
             global.api.stats.currentTips = parseFloat(global.currency.exchange(data.amount, data.currency, global.currency.mainCurrency));

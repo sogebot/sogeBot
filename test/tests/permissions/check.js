@@ -37,7 +37,7 @@ describe('Permissions - check()', () => {
     }
     await global.db.engine.insert('users.points', { id: 7, points: 100 });
     await global.db.engine.insert('users.watched', { id: 8, watched: 100 * (60 * 60 * 1000 /*hours*/) });
-    await global.db.engine.insert('users.tips', { id: 9, currency: 'EUR', amount: 100 });
+    await global.db.engine.insert('users.tips', { id: 9, currency: 'EUR', amount: 100, _amount: 100, _currency: 'EUR' });
     await global.db.engine.insert('users.bits', { id: 10, amount: 100 });
     await global.db.engine.insert('users.messages', { id: 11, messages: 100 });
   });

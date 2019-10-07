@@ -27,6 +27,27 @@ const end = function (updated) {
 };
 
 const migration = {
+  15: async () => {
+    header('Add _amount, _currency to tips for faster ordering');
+    let updated = 0;
+    const rates = {
+      AUD: '16.065', BRL: '5.893', BGN: '13.206', CNY: '3.344', DKK: '3.459', EUR: '25.830', PHP: '0.445', HKD: '2.947',
+      HRK: '3.482', INR: '0.333', IDR: '0.002', ISK: '0.186', ILS: '6.363', JPY: '0.213', ZAR: '1.586',
+      CAD: '17.109', KRW: '0.020', HUF: '0.080', MYR: '5.522', MXN: '1.168', XDR: '31.814', NOK: '2.642',
+      NZD: '15.159', PLN: '6.030', RON: '5.452', RUB: '0.353', SGD: '16.852', SEK: '2.433', CHF: '23.140',
+      THB: '0.735', TRY: '3.925', USD: '23.093', GBP: '29.147', CZK: '1',
+    }
+
+    const items = await global.db.engine.find('users.tips');
+    for (const item of items) {
+      const from = item.currency;
+      const to = 'EUR';
+      const amount = (item.amount * rates[from]) / rates[to];
+      await global.db.engine.update('users.tips', { _id: String(item._id) }, { _currency: "EUR", _amount: amount });
+      updated++;
+    }
+    end(updated);
+  },
   14: async () => {
     header('Add id for alias');
     let updated = 0;

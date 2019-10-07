@@ -71,28 +71,17 @@ class IMongoDB extends Interface {
 
     if (this.createIndexes || this.forceRemoveIndexes) {
       const collections = await db.listCollections().toArray()
-      const dropIndexes = [
-        'users.bits', 'users.tips', 'users.points', 'users.online', 'users.messages', 'users.watched',
-        'cache', 'customTranslations', 'users', 'stats'
-      ]
-      for (let table of dropIndexes) {
-        if (_.find(collections, (o) => o.name === table)) await db.collection(table).dropIndexes()
-        await db.createCollection(table)
+      for (let k of Object.keys(collections)) {
+        await db.collection(collections[k].name).dropIndexes()
+        await db.createCollection(collections[k].name)
       }
 
       if (this.createIndexes) {
-        await db.collection('users.bits').createIndex('timestamp')
-        await db.collection('users.tips').createIndex('timestamp')
         await db.collection('users').createIndex('username')
         await db.collection('users').createIndex(
           { id: 1 },
           { partialFilterExpression: { id: { $exists: true } }, unique: true }
         )
-        await db.collection('users.online').createIndex('username')
-        await db.collection('users.points').createIndex('id', { unique: true })
-        await db.collection('users.messages').createIndex('id', { unique: true })
-        await db.collection('users.watched').createIndex('id', { unique: true })
-        await db.collection('cache').createIndex('key', { unique: true })
         await db.collection('customTranslations').createIndex('key')
         await db.collection('stats').createIndex('whenOnline')
         await db.collection('cache.hosts').createIndex('username', { unique: true })
