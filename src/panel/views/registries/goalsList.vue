@@ -16,7 +16,7 @@
       </template>
     </panel>
 
-    <div class="card-deck" v-for="(chunk, index) of _.chunk(_.orderBy(groupsFiltered, 'createdAt', 'desc'), itemsPerPage)" :key="index">
+    <div class="card-deck" v-for="(chunk, index) of chunk(orderBy(groupsFiltered, 'createdAt', 'desc'), itemsPerPage)" :key="index">
       <div class="card mb-2 p-0" :class="['col-' + (12 / itemsPerPage)]" v-for="group of chunk" :key="group.uid">
         <div class="card-header">
           <strong>{{group.name}}</strong> <small class="text-muted">{{group.uid}}</small>
@@ -35,7 +35,7 @@
             </template>
           </dl>
           <ul class="list-group list-group-flush border-top-0">
-            <li v-for="goal of _.filter(goals, (o) => o.groupId === group.uid)" :key="goal.uid" class="list-group-item">
+            <li v-for="goal of filter(goals, (o) => o.groupId === group.uid)" :key="goal.uid" class="list-group-item">
               <dl class="row">
                 <h5 class="col-12">{{goal.name}}</h5>
                 <dt class="col-6">{{translate('registry.goals.input.type.title')}}</dt>
@@ -87,6 +87,7 @@
 
 <script lang="ts">
   import Vue from 'vue'
+  import { chunk, filter, orderBy } from 'lodash-es';
 
   import { getSocket } from 'src/panel/helpers/socket';
 
@@ -106,6 +107,9 @@
         domWidth: number,
         interval: number,
         isMounted: boolean,
+        chunk: any,
+        filter: any,
+        orderBy: any,
       } = {
         socket: getSocket('/overlays/goals'),
         search: '',
@@ -115,6 +119,9 @@
         domWidth: 0,
         interval: 0,
         isMounted: false,
+        chunk: chunk,
+        filter: filter,
+        orderBy: orderBy
       }
       return object
     },
