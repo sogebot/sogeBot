@@ -31,7 +31,7 @@ describe('Top - !top bits', () => {
       });
       if (i != 0) {
         await global.db.engine.insert('users.bits', {
-          id, amount: i,
+          id, amount: i, timestamp: Math.random()
         });
       }
     }
