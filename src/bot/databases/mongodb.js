@@ -190,9 +190,14 @@ class IMongoDB extends Interface {
 
     try {
       let db = this.client.db(this.dbName)
-      if (_.isArray(object)) await db.collection(table).insertMany(object)
-      let item = await db.collection(table).insertOne(unflatten(object))
-      return item.ops[0]
+      let item;
+      if (Array.isArray(object)) {
+        item = await db.collection(table).insertMany(object);
+        return item.ops;
+      } else {
+        item = await db.collection(table).insertOne(unflatten(object));
+        return item.ops[0];
+      }
     } catch (e) {
       if (e.message.match(/EPIPE/g)) {
         error('Something went wrong with mongodb instance (EPIPE error)')

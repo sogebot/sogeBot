@@ -213,7 +213,7 @@ class Users extends Core {
       : Number.MAX_SAFE_INTEGER;
   }
 
-  async updateWatchTime (isInit = true) {
+  async updateWatchTime (isInit = false) {
     if (isInit) {
       // set all users offline on start
       await global.db.engine.remove('users.online', {});
