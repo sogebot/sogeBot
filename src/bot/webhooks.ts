@@ -236,7 +236,7 @@ class Webhooks {
       global.db.engine.update('users', { id: data.from_id }, { username: data.from_name });
 
       if (!get(user, 'is.follower', false) && (get(user, 'time.follow', 0) === 0 || Date.now() - get(user, 'time.follow', 0) > 60000 * 60)) {
-        if (!(await isBot(data.from_name))) {
+        if (!isBot(data.from_name)) {
           global.overlays.eventlist.add({
             type: 'follow',
             username: data.from_name,
