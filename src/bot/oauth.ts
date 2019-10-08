@@ -211,9 +211,10 @@ class OAuth extends Core {
           },
         });
       } catch (e) {
-        const error = e.data.data ? e.data.data : `${e.response.status}: ${e.response.statusText}`;
-        error(`Error on validate ${type} OAuth token: ${error}`);
+        const errorMessage: string = e.data.data ? `${e.data.data.status} — ${e.data.data.message}` : `${e.response.status} — ${e.response.statusText}`;
+        error(`Error on validate ${type} OAuth token, error: ${errorMessage}`);
       }
+
       this.clientId = request.data.client_id;
 
       if (type === 'bot') {
