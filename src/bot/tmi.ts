@@ -5,10 +5,10 @@ import TwitchJs from 'twitch-js';
 import util from 'util';
 import { get, isNil, set } from 'lodash';
 
-import * as Parser from './parser';
+import Parser from './parser';
 import { command, default_permission } from './decorators';
 import { permission } from './permissions';
-import * as Expects from './expects';
+import Expects from './expects';
 import Core from './_interface';
 import * as constants from './constants';
 import { settings, ui } from './decorators';
