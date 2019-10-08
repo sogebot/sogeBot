@@ -336,7 +336,6 @@ class Webhooks {
     } else {
       // stream is offline - add curRetry + 1 and call getCurrentStreamData to do retries
       global.api.curRetries = global.api.curRetries + 1;
-      global.api.getCurrentStreamData(({ interval: false }));
     }
   }
 }
