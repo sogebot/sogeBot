@@ -10,6 +10,7 @@ import { error } from './helpers/log'
 const { autoLoad } = require('./commons');
 import { API } from './api';
 import { TMI } from './tmi';
+import { Twitch } from './twitch';
 
 cluster()
 
@@ -26,7 +27,7 @@ function cluster () {
     global.users = new (require('./users'))()
     global.events = new Events();
     global.customvariables = new (require('./customvariables'))()
-    global.twitch = new (require('./twitch'))()
+    global.twitch = new Twitch()
     global.permissions = new Permissions()
 
     global.lib = {}

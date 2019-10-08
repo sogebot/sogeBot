@@ -1,21 +1,17 @@
-'use strict'
+import moment from 'moment-timezone';
+require('moment-precise-range-plugin')
 
-const moment = require('moment-timezone')
-const _ = require('lodash')
-const {
-  isMainThread
-} = require('worker_threads');
-const {
-  getTime, sendMessage, prepare, getChannel
-} = require('./commons');
+import { isMainThread } from 'worker_threads';
+import { filter, orderBy, size, intersection, isNil } from 'lodash';
+
+import { getTime, sendMessage, prepare, getChannel } from './commons';
 import { command, default_permission, settings } from './decorators';
 import { permission } from './permissions'
 import Core from './_interface';
 
-require('moment-precise-range-plugin')
 
 const config = require('@config')
-config.timezone = config.timezone === 'system' || _.isNil(config.timezone) ? moment.tz.guess() : config.timezone
+config.timezone = config.timezone === 'system' || isNil(config.timezone) ? moment.tz.guess() : config.timezone
 
 class Twitch extends Core {
   @settings('general')
@@ -41,7 +37,7 @@ class Twitch extends Core {
 
   @command('!uptime')
   async uptime (opts) {
-    const time = getTime(global.api.streamStatusChangeSince, true)
+    const time = <any>getTime(global.api.streamStatusChangeSince, true)
     sendMessage(global.translate(global.api.isStreamOnline ? 'uptime.online' : 'uptime.offline')
       .replace(/\$days/g, time.days)
       .replace(/\$hours/g, time.hours)
@@ -61,13 +57,13 @@ class Twitch extends Core {
     const onlineViewers = await global.users.getAllOnlineUsernames()
     const followers = (await global.db.engine.find('users', { is: { follower: true } })).map((o) => o.username)
 
-    let onlineFollowers = _.intersection(onlineViewers, followers)
-    events = _.filter(_.orderBy(events, 'timestamp', 'desc'), (o) => { return o.event === 'follow' })
+    let onlineFollowers = intersection(onlineViewers, followers)
+    events = filter(orderBy(events, 'timestamp', 'desc'), (o) => { return o.event === 'follow' })
     moment.locale(global.general.lang)
 
     let lastFollowAgo = ''
     let lastFollowUsername = 'n/a'
-    let onlineFollowersCount = _.size(_.filter(onlineFollowers, (o) => o !== global.oauth.botUsername.toLowerCase() && o !== getChannel())) // except bot and user
+    let onlineFollowersCount = size(filter(onlineFollowers, (o) => o !== global.oauth.botUsername.toLowerCase() && o !== getChannel())) // except bot and user
     if (events.length > 0) {
       lastFollowUsername = events[0].username
       lastFollowAgo = moment(events[0].timestamp).fromNow()
@@ -87,13 +83,13 @@ class Twitch extends Core {
     const onlineViewers = await global.users.getAllOnlineUsernames()
     const subscribers = (await global.db.engine.find('users', { is: { subscriber: true } })).map((o) => o.username)
 
-    let onlineSubscribers = _.intersection(onlineViewers, subscribers)
-    events = _.filter(_.orderBy(events, 'timestamp', 'desc'), (o) => { return o.event === 'sub' || o.event === 'resub' || o.event === 'subgift' })
+    let onlineSubscribers = intersection(onlineViewers, subscribers)
+    events = filter(orderBy(events, 'timestamp', 'desc'), (o) => { return o.event === 'sub' || o.event === 'resub' || o.event === 'subgift' })
     moment.locale(global.general.lang)
 
     let lastSubAgo = ''
     let lastSubUsername = 'n/a'
-    let onlineSubCount = _.size(_.filter(onlineSubscribers, (o) => o !== getChannel() && o !== global.oauth.botUsername.toLowerCase())) // except bot and user
+    let onlineSubCount = size(filter(onlineSubscribers, (o) => o !== getChannel() && o !== global.oauth.botUsername.toLowerCase())) // except bot and user
     if (events.length > 0) {
       lastSubUsername = events[0].username
       lastSubAgo = moment(events[0].timestamp).fromNow()
@@ -141,10 +137,13 @@ class Twitch extends Core {
     }
     if (isMainThread) {
       const games = await global.api.sendGameFromTwitch (global.api, null, opts.parameters)
-      global.api.setTitleAndGame(opts.sender, { game: games[0] })
+      if (Array.isArray(games) && games.length > 0) {
+        global.api.setTitleAndGame(opts.sender, { game: games[0] })
+      }
     }
     else global.workers.sendToMaster({ type: 'call', ns: 'twitch', fnc: 'setGame', args: [opts] })
   }
 }
 
-module.exports = Twitch
+export default Twitch;
+export { Twitch };
