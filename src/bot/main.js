@@ -10,6 +10,7 @@ import { OAuth } from './oauth';
 import { Currency } from './currency';
 import { error, info, warning } from './helpers/log';
 import { TMI } from './tmi';
+import { API } from './api';
 
 const figlet = require('figlet')
 const os = require('os')
@@ -75,7 +76,7 @@ async function main () {
 
     global.oauth = new OAuth();
     global.webhooks = new (require('./webhooks'))()
-    global.api = new (require('./api'))()
+    global.api = new API();
   } catch (e) {
     error(e)
     process.exit()
