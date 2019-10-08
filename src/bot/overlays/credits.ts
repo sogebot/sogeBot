@@ -94,11 +94,7 @@ class Credits extends Overlay {
   sockets () {
     global.panel.io.of('/overlays/credits').on('connection', (socket) => {
       socket.on('load', async (cb) => {
-        let when = global.api.isStreamOnline ? global.api.streamStatusChangeSince : null;
-        if (!global.api.isStreamOnline) {
-          when = _.now() - 5000000000;
-        } // 5000000
-
+        const when = global.api.isStreamOnline ? global.api.streamStatusChangeSince : _.now() - 5000000000;
         const timestamp = new Date(when).getTime();
         let events = await global.db.engine.find('widgetsEventList');
 
