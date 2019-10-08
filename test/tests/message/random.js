@@ -20,6 +20,8 @@ describe('Message - random filter', () => {
     before(async () => {
       await db.cleanup();
       await msg.prepare();
+      global.tmi.ignoreRm({ sender: owner, parameters: 'ignoreduser' });
+      await msg.isSent('ignore.user.is.removed', owner, { username: 'ignoreduser' });
     });
 
     it('add user ignoreduser to ignore list', async () => {
@@ -40,6 +42,8 @@ describe('Message - random filter', () => {
     before(async () => {
       await db.cleanup();
       await msg.prepare();
+      global.tmi.ignoreRm({ sender: owner, parameters: 'ignoreduser' });
+      await msg.isSent('ignore.user.is.removed', owner, { username: 'ignoreduser' });
     });
     it('add user ignoreduser to ignore list', async () => {
       global.tmi.ignoreAdd({ sender: owner, parameters: 'ignoreduser' });
@@ -66,6 +70,8 @@ describe('Message - random filter', () => {
     before(async () => {
       await db.cleanup();
       await msg.prepare();
+      global.tmi.ignoreRm({ sender: owner, parameters: 'ignoreduser' });
+      await msg.isSent('ignore.user.is.removed', owner, { username: 'ignoreduser' });
     });
     it('add user ignoreduser to ignore list', async () => {
       global.tmi.ignoreAdd({ sender: owner, parameters: 'ignoreduser' });
@@ -92,6 +98,8 @@ describe('Message - random filter', () => {
     before(async () => {
       await db.cleanup();
       await msg.prepare();
+      global.tmi.ignoreRm({ sender: owner, parameters: 'ignoreduser' });
+      await msg.isSent('ignore.user.is.removed', owner, { username: 'ignoreduser' });
     });
 
     it('add user ignoreduser to ignore list', async () => {
@@ -118,6 +126,8 @@ describe('Message - random filter', () => {
     before(async () => {
       await db.cleanup();
       await msg.prepare();
+      global.tmi.ignoreRm({ sender: owner, parameters: 'ignoreduser' });
+      await msg.isSent('ignore.user.is.removed', owner, { username: 'ignoreduser' });
     });
     it('add user ignoreduser to ignore list', async () => {
       global.tmi.ignoreAdd({ sender: owner, parameters: 'ignoreduser' });
@@ -143,6 +153,8 @@ describe('Message - random filter', () => {
     before(async () => {
       await db.cleanup();
       await msg.prepare();
+      global.tmi.ignoreRm({ sender: owner, parameters: 'ignoreduser' });
+      await msg.isSent('ignore.user.is.removed', owner, { username: 'ignoreduser' });
     });
     it('add user ignoreduser to ignore list', async () => {
       global.tmi.ignoreAdd({ sender: owner, parameters: 'ignoreduser' });
