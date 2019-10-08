@@ -31,18 +31,8 @@ define('DAY', 1000 * 60 * 60 * 24)
 
 // regexp
 define(
-  'USERNAME_REGEXP',
-  XRegExp('@?(?<username> .* )', 'ix')
-)
-
-define(
   'COMMAND_REGEXP',
   XRegExp('(?<command> ![\\pL0-9]* ) # command', 'ix')
-)
-
-define(
-  'COMMAND_REGEXP_WITH_SPACES',
-  XRegExp('(?<command> ![\\pL0-9 ]* ) # command', 'ix')
 )
 
 define(
@@ -63,20 +53,4 @@ define(
            (?<seconds> \\d*       ) # seconds
            ?\\s                     # empty space
            ?(?<quiet> \\w*        ) # optional-quiet`, 'ix')
-)
-
-define(
-  'COMMAND_REGEXP_WITH_RESPONSE',
-  XRegExp(`(?<premission> owner|mod|regular|viewer) # permission
-           \\s                                      # empty space
-           (?<command> ![\\pL0-9]*                ) # command
-           \\s                                      # empty space
-           (?<response> .*                        ) # response`, 'ix')
-)
-
-define(
-  'COMMAND_REGEXP_WITH_OPTIONAL_RESPONSE',
-  XRegExp(`!(?<command> [\\pL0-9]* ) # command
-           ?\\s                   # empty space
-           ?(?<response> .*     ) # optional response`, 'ix')
 )
