@@ -9,6 +9,7 @@ import { Events } from './events';
 import { OAuth } from './oauth';
 import { Currency } from './currency';
 import { error, info, warning } from './helpers/log';
+import { tmi } from './tmi';
 
 const figlet = require('figlet')
 const os = require('os')
@@ -104,7 +105,7 @@ async function main () {
       setTimeout(() => require('./heapdump.js').init('heap/'), 120000)
     }
 
-    global.tmi = new (require('./tmi'))()
+    global.tmi = new tmi();
   })
 }
 
