@@ -13,6 +13,7 @@ import { TMI } from './tmi';
 import { API } from './api';
 import { Twitch } from './twitch';
 import { Webhooks } from './webhooks';
+import { Users } from './users';
 
 const figlet = require('figlet')
 const os = require('os')
@@ -63,7 +64,7 @@ async function main () {
     global.ui = new (require('./ui.js'))()
     global.currency = new Currency()
     global.stats2 = new (require('./stats.js'))()
-    global.users = new (require('./users.js'))()
+    global.users = new Users();
 
     global.events = new Events();
     global.customvariables = new (require('./customvariables.js'))()
