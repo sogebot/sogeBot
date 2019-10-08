@@ -64,14 +64,14 @@
 </template>
 <script lang="ts">
 import { Vue, Component, Watch, Prop, PropSync } from 'vue-property-decorator';
-import { flattenKeys } from '../../bot/helpers';
+import { flatten } from '../../bot/helpers/flatten';
 import { sortBy, keys, isNil } from 'lodash-es';
 import translate from '../helpers/translate';
 
 @Component({
   filters: {
     filterize: function (val) {
-      const filtersRegExp = new RegExp('\\$(' + sortBy(keys(flattenKeys(translate('responses.variable'))), (o) => -o.length).join('|') + ')', 'g')
+      const filtersRegExp = new RegExp('\\$(' + sortBy(keys(flatten(translate('responses.variable'))), (o) => -o.length).join('|') + ')', 'g')
       val = val.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
       let matches = val.match(filtersRegExp)
       let output = val
