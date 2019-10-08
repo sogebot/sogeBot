@@ -17,7 +17,7 @@ export function triggerInterfaceOnTip(opts: onEventTip) {
   trigger(opts);
 }
 
-export function triggerInterfaceOnBit(opts: onEventTip) {
+export function triggerInterfaceOnBit(opts: Omit<onEventTip, 'currency'>) {
   trigger(opts);
 }
 

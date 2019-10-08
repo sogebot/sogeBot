@@ -28,9 +28,12 @@ type Omit<T, K extends keyof any> = Pick<T, Exclude<keyof T, K>>;
 declare namespace NodeJS {
   export interface Global {
     linesParsed: number;
+    avgResponse: number[];
     status: {
       API: 0 | 1 | 2;
       MOD: boolean;
+      TMI: 0 | 1 | 2;
+      RES: number;
     };
     overlays: {
       alerts: import('../src/bot/overlays/alerts').Alerts;
@@ -114,7 +117,7 @@ declare namespace NodeJS {
     workers: import('../src/bot/workers').Workers;
     permissions: import('../src/bot/permissions').Permissions;
     customvariables: any;
-    tmi: any;
+    tmi: import('../src/bot/tmi').TMI;
     events: import('../src/bot/events').Events;
     webhooks: any;
     widgets: {
@@ -216,6 +219,9 @@ declare namespace InterfaceSettings {
     load?: {
       [x: string]: string[];
     };
+    partChannel?: () => void;
+    reconnectChannel?: () => void;
+    joinChannel?: () => void;
   }
 
   interface UI {
