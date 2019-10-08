@@ -203,11 +203,18 @@ class OAuth extends Core {
         throw new Error(`Type ${type} is not supported`);
       }
 
-      const request = await axios.get(url, {
-        headers: {
-          Authorization: 'OAuth ' + this[type + 'AccessToken'],
-        },
-      });
+      let request;
+      try {
+        request = await axios.get(url, {
+          headers: {
+            Authorization: 'OAuth ' + this[type + 'AccessToken'],
+          },
+        });
+      } catch (e) {
+        const errorMessage: string = e.data.data ? `${e.data.data.status} — ${e.data.data.message}` : `${e.response.status} — ${e.response.statusText}`;
+        throw new Error(`Error on validate ${type} OAuth token, error: ${errorMessage}`);
+      }
+
       this.clientId = request.data.client_id;
 
       if (type === 'bot') {
