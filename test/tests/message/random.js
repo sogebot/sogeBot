@@ -106,10 +106,10 @@ describe('Message - random filter', () => {
       });
     }
 
-    it('From 100 randoms ignoreduser shouldn\'t be picked', async () => {
-      for (let i = 0; i < 100; i++) {
+    it('From 200 randoms ignoreduser shouldn\'t be picked', async () => {
+      for (let i = 0; i < 200; i++) {
         const message = await new Message('(random.viewer)').parse({ sender: { username: 'soge__' }});
-        assert.equal(message, 'user1');
+        assert.notEqual(message, 'ignoreduser');
       }
     });
   });
@@ -131,10 +131,10 @@ describe('Message - random filter', () => {
       });
     }
 
-    it('From 100 randoms ignoreduser shouldn\'t be picked', async () => {
-      for (let i = 0; i < 100; i++) {
+    it('From 200 randoms ignoreduser shouldn\'t be picked', async () => {
+      for (let i = 0; i < 200; i++) {
         const message = await new Message('(random.follower)').parse({ sender: { username: 'soge__' }});
-        assert.equal(message, 'user1');
+        assert.notEqual(message, 'ignoreduser');
       }
     });
   });
@@ -156,10 +156,10 @@ describe('Message - random filter', () => {
       });
     }
 
-    it('From 100 randoms ignoreduser shouldn\'t be picked', async () => {
-      for (let i = 0; i < 100; i++) {
+    it('From 200 randoms ignoreduser shouldn\'t be picked', async () => {
+      for (let i = 0; i < 200; i++) {
         const message = await new Message('(random.subscriber)').parse({ sender: { username: 'soge__' }});
-        assert.equal(message, 'user1');
+        assert.notEqual(message, 'ignoreduser');
       }
     });
   });
