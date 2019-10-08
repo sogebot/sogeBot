@@ -90,7 +90,7 @@ class TMI extends Core {
   async ignoreCheck (opts: Record<string, any>) {
     try {
       const username = new Expects(opts.parameters).username().toArray()[0].toLowerCase();
-      const isUserIgnored = await isIgnored({ username });
+      const isUserIgnored = isIgnored({ username });
       sendMessage(prepare(isUserIgnored ? 'ignore.user.is.ignored' : 'ignore.user.is.not.ignored', { username }), opts.sender);
       return isUserIgnored;
     } catch (e) {}
@@ -433,7 +433,7 @@ class TMI extends Core {
       const tier = method.prime ? 'Prime' : method.plan / 1000;
       const userstate = message.tags;
 
-      if (await isIgnored({username, userId: userstate.userId})) {
+      if (isIgnored({username, userId: userstate.userId})) {
         return;
       }
 
@@ -491,7 +491,7 @@ class TMI extends Core {
       const messageFromUser = message.message;
       const tier = method.prime ? 'Prime' : method.plan / 1000;
 
-      if (await isIgnored({username, userId: userstate.userId})) {
+      if (isIgnored({username, userId: userstate.userId})) {
         return;
       }
 
@@ -560,7 +560,7 @@ class TMI extends Core {
 
       this.ignoreGiftsFromUser[username] = { count, time: new Date() };
 
-      if (await isIgnored({username, userId})) {
+      if (isIgnored({username, userId})) {
         return;
       }
 
@@ -619,7 +619,7 @@ class TMI extends Core {
           subCumulativeMonths: 0,
         });
       }
-      if (await isIgnored({username, userId: recipientId})) {
+      if (isIgnored({username, userId: recipientId})) {
         return;
       }
 
@@ -651,7 +651,7 @@ class TMI extends Core {
       subgift(`${recipient}#${recipientId}, from: ${username}, months: ${subCumulativeMonths}`);
 
       // also set subgift count to gifter
-      if (!(await isIgnored({username, userId: user.id}))) {
+      if (!(isIgnored({username, userId: user.id}))) {
         await global.db.engine.increment('users', { id: message.tags.userId }, { custom: { subgiftCount: 1 } });
       }
     } catch (e) {
@@ -669,7 +669,7 @@ class TMI extends Core {
       // remove <string>X or <string>X from message, but exclude from remove #<string>X
       const messageFromUser = message.message.replace(/(?<!#)(\b\w+[\d]+\b)/g, '').trim();
 
-      if (await isIgnored({username: userstate.username, userId: userstate.userId})) {
+      if (isIgnored({username: userstate.username, userId: userstate.userId})) {
         return;
       }
 
