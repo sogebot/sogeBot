@@ -11,6 +11,7 @@ import { Currency } from './currency';
 import { error, info, warning } from './helpers/log';
 import { TMI } from './tmi';
 import { API } from './api';
+import { Webhooks } from './webhooks';
 
 const figlet = require('figlet')
 const os = require('os')
@@ -75,7 +76,7 @@ async function main () {
     global.translate = global.lib.translate.translate
 
     global.oauth = new OAuth();
-    global.webhooks = new (require('./webhooks'))()
+    global.webhooks = new Webhooks();
     global.api = new API();
   } catch (e) {
     error(e)

@@ -119,7 +119,7 @@ declare namespace NodeJS {
     customvariables: any;
     tmi: import('../src/bot/tmi').TMI;
     events: import('../src/bot/events').Events;
-    webhooks: any;
+    webhooks: import('../src/bot/webhooks').Webhooks;
     widgets: {
       chat: import('../src/bot/widgets/chat').Chat;
       cmdboard: import('../src/bot/widgets/cmdboard').Cmdboard;
