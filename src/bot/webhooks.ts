@@ -334,7 +334,7 @@ class Webhooks {
       global.api.streamId = stream.id;
       global.api.streamType = stream.type;
     } else {
-      // stream is offline - add curRetry + 1 and call getCurrentStreamData to do retries
+      // stream is offline - add curRetry + 1
       global.api.curRetries = global.api.curRetries + 1;
     }
   }
