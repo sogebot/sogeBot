@@ -11,6 +11,7 @@ import { Currency } from './currency';
 import { error, info, warning } from './helpers/log';
 import { TMI } from './tmi';
 import { API } from './api';
+import { Twitch } from './twitch';
 import { Webhooks } from './webhooks';
 
 const figlet = require('figlet')
@@ -68,7 +69,7 @@ async function main () {
     global.customvariables = new (require('./customvariables.js'))()
 
     global.panel = new (require('./panel'))()
-    global.twitch = new (require('./twitch'))()
+    global.twitch = new Twitch()
     global.permissions = new Permissions()
 
     global.lib = {}

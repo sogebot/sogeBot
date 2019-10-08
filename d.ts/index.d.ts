@@ -113,7 +113,7 @@ declare namespace NodeJS {
     };
     users: any;
     lib: any;
-    twitch: any;
+    twitch: import('../src/bot/twitch').Twitch;
     workers: import('../src/bot/workers').Workers;
     permissions: import('../src/bot/permissions').Permissions;
     customvariables: any;

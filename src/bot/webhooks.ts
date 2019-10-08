@@ -315,7 +315,7 @@ class Webhooks {
       global.api.stats.currentTitle = stream.title;
       global.api.stats.currentGame = await global.api.getGameFromId(stream.game_id);
 
-      if (!(global.api.isStreamOnline) && Number(global.twitch.streamId) !== Number(stream.id)) {
+      if (!(global.api.isStreamOnline) && Number(global.api.streamId) !== Number(stream.id)) {
         debug('webhooks.stream', 'WEBHOOKS: ' + JSON.stringify(aEvent));
         start(
           `id: ${stream.id} | startedAt: ${stream.started_at} | title: ${stream.title} | game: ${await global.api.getGameFromId(stream.game_id)} | type: ${stream.type} | channel ID: ${cid}`
