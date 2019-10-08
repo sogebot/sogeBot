@@ -350,7 +350,7 @@ export function isOwner(user) {
   }
 }
 
-export function getLocalizedName(number, translation) {
+export function getLocalizedName(number, translation): string {
   let single;
   let multi;
   let xmulti;

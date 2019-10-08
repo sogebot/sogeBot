@@ -102,8 +102,8 @@ class Highlights extends System {
         },
       });
       // save remaining api calls
-      global.api.remainingAPICalls = request.headers['ratelimit-remaining'];
-      global.api.refreshAPICalls = request.headers['ratelimit-reset'];
+      global.api.calls.bot.remaining = request.headers['ratelimit-remaining'];
+      global.api.calls.bot.refresh = request.headers['ratelimit-reset'];
 
       const timestamp = moment.preciseDiff(moment.utc(), moment.utc(global.api.streamStatusChangeSince), true);
       const highlight = {
@@ -114,11 +114,11 @@ class Highlights extends System {
         created_at: Date.now(),
       };
 
-      global.panel.io.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'highlights', api: 'helix', endpoint: url, code: request.status, remaining: global.api.remainingAPICalls });
+      global.panel.io.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'highlights', api: 'helix', endpoint: url, code: request.status, remaining: global.api.calls.bot.remaining });
 
       this.add(highlight, timestamp, opts.sender);
     } catch (e) {
-      global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'highlights', api: 'helix', endpoint: url, code: e.stack, remaining: global.api.remainingAPICalls });
+      global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'highlights', api: 'helix', endpoint: url, code: e.stack, remaining: global.api.calls.bot.remaining });
       switch (e.message) {
         case ERROR_STREAM_NOT_ONLINE:
           error('Cannot highlight - stream offline');

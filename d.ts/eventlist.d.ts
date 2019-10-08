@@ -14,5 +14,13 @@ declare namespace EventList {
     tier?: string;
     song_title?: string;
     song_url?: string;
+    method?: string;
+    subStreakShareEnabled?: boolean;
+    subStreak?: number;
+    subStreakName?: string;
+    subCumulativeMonths?: number;
+    subCumulativeMonthsName?: string;
+    count?: number;
+    monthsName?: string;
   }
 }

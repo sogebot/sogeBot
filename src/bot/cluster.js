@@ -8,6 +8,8 @@ import { OAuth } from './oauth';
 import { Currency } from './currency';
 import { error } from './helpers/log'
 const { autoLoad } = require('./commons');
+import { API } from './api';
+import { TMI } from './tmi';
 
 cluster()
 
@@ -32,8 +34,8 @@ function cluster () {
     global.translate = global.lib.translate.translate
 
     global.oauth = new OAuth()
-    global.api = new (require('./api'))()
-    global.tmi = new (require('./tmi'))()
+    global.api = new API();
+    global.tmi = new TMI();
   } catch (e) {
     console.error(e); error(e)
     return global.workers.sendToMaster({ type: 'crash' })

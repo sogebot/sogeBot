@@ -1818,4 +1818,5 @@ class API extends Core {
   }
 }
 
-module.exports = API;
+export default API;
+export { API };

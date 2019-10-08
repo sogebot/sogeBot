@@ -189,7 +189,7 @@ class Events extends Core {
   }
 
   public async fireBotWillLeaveChannel(operation, attributes) {
-    global.tmi.part('bot', global.tmi.channel);
+    global.tmi.part('bot');
     global.db.engine.remove('users.online', {}); // force all users offline
   }
 
@@ -320,7 +320,7 @@ class Events extends Core {
     const regexp = new RegExp(`\\$_${customVariableName}`, 'ig');
     const title = global.api.rawStatus;
     if (title.match(regexp)) {
-      global.api.setTitleAndGame(null);
+      global.api.setTitleAndGame(null, {});
     }
   }
 
@@ -344,7 +344,7 @@ class Events extends Core {
     const regexp = new RegExp(`\\$_${customVariableName}`, 'ig');
     const title = global.api.rawStatus;
     if (title.match(regexp)) {
-      global.api.setTitleAndGame(null);
+      global.api.setTitleAndGame(null, {});
     }
   }
 
@@ -375,9 +375,12 @@ class Events extends Core {
   }
 
   public async checkStreamIsRunningXMinutes(event, attributes) {
+    if (!global.api.isStreamOnline) {
+      return false;
+    }
     event.triggered.runAfterXMinutes = _.get(event, 'triggered.runAfterXMinutes', 0);
     const shouldTrigger = event.triggered.runAfterXMinutes === 0
-                          && Number(moment.utc().format('X')) - Number(moment.utc(global.api.isStreamOnline ? global.api.streamStatusChangeSince : null).format('X')) > event.definitions.runAfterXMinutes * 60;
+                          && Number(moment.utc().format('X')) - Number(moment.utc(global.api.streamStatusChangeSince).format('X')) > event.definitions.runAfterXMinutes * 60;
     if (shouldTrigger) {
       event.triggered.runAfterXMinutes = event.definitions.runAfterXMinutes;
       await global.db.engine.update('events', { id: event.id }, event);
@@ -514,7 +517,7 @@ class Events extends Core {
       $views: global.api.stats.currentViews,
       $followers: global.api.stats.currentFollowers,
       $hosts: global.api.stats.currentHosts,
-      $subscribers: global.api.stats.currentSubscibers,
+      $subscribers: global.api.stats.currentSubscribers,
       ...customVariables,
     };
     let result = false;
