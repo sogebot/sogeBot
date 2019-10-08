@@ -2,6 +2,7 @@ import axios from 'axios';
 import config from '@config';
 import util from 'util';
 import { get, isNil } from 'lodash';
+import { setTimeout } from 'timers';
 
 import { isBot } from './commons';
 import { debug, error, follow, info, start, warning } from './helpers/log';
