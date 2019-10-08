@@ -27,11 +27,11 @@ describe('Message - random filter', () => {
       await msg.isSent('ignore.user.is.added', owner, { username: 'ignoreduser' });
     });
 
-    it('From 100 randoms ignoreduser shouldn\'t be picked', async () => {
-      for (let i = 0; i < 100; i++) {
+    it('From 200 randoms ignoreduser shouldn\'t be picked', async () => {
+      for (let i = 0; i < 200; i++) {
         await setUsersOnline(['ignoreduser', 'user1']);
         const message = await new Message('(random.online.viewer)').parse({ sender: { username: 'soge__' }});
-        assert.equal(message, 'user1');
+        assert.notEqual(message, 'ignoreduser');
       }
     });
   });
@@ -53,11 +53,11 @@ describe('Message - random filter', () => {
       });
     }
 
-    it('From 100 randoms ignoreduser shouldn\'t be picked', async () => {
-      for (let i = 0; i < 100; i++) {
+    it('From 200 randoms ignoreduser shouldn\'t be picked', async () => {
+      for (let i = 0; i < 200; i++) {
         await setUsersOnline(['ignoreduser', 'user1']);
         const message = await new Message('(random.online.follower)').parse({ sender: { username: 'soge__' }});
-        assert.equal(message, 'user1');
+        assert.notEqual(message, 'ignoreduser');
       }
     });
   });
@@ -79,11 +79,11 @@ describe('Message - random filter', () => {
       });
     }
 
-    it('From 100 randoms ignoreduser shouldn\'t be picked', async () => {
-      for (let i = 0; i < 100; i++) {
+    it('From 200 randoms ignoreduser shouldn\'t be picked', async () => {
+      for (let i = 0; i < 200; i++) {
         await setUsersOnline(['ignoreduser', 'user1']);
         const message = await new Message('(random.online.subscriber)').parse({ sender: { username: 'soge__' }});
-        assert.equal(message, 'user1');
+        assert.notEqual(message, 'ignoreduser');
       }
     });
   });
