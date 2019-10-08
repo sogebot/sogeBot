@@ -12,6 +12,7 @@ import { API } from './api';
 import { TMI } from './tmi';
 import { Twitch } from './twitch';
 import { Users } from './users';
+import { UI } from './ui';
 
 cluster()
 
@@ -23,7 +24,7 @@ function cluster () {
 
   try {
     global.general = new (require('./general'))()
-    global.ui = new (require('./ui'))()
+    global.ui = new UI()
     global.currency = new Currency()
     global.users = new Users()
     global.events = new Events();

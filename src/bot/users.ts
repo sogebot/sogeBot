@@ -595,4 +595,5 @@ class Users extends Core {
   }
 }
 
-module.exports = Users;
+export default Users;
+export { Users };

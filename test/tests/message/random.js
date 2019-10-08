@@ -20,6 +20,8 @@ describe('Message - random filter', () => {
     before(async () => {
       await db.cleanup();
       await msg.prepare();
+      global.tmi.ignoreRm({ sender: owner, parameters: 'ignoreduser' });
+      await msg.isSent('ignore.user.is.removed', owner, { username: 'ignoreduser' });
     });
 
     it('add user ignoreduser to ignore list', async () => {
@@ -27,11 +29,11 @@ describe('Message - random filter', () => {
       await msg.isSent('ignore.user.is.added', owner, { username: 'ignoreduser' });
     });
 
-    it('From 100 randoms ignoreduser shouldn\'t be picked', async () => {
-      for (let i = 0; i < 100; i++) {
+    it('From 200 randoms ignoreduser shouldn\'t be picked', async () => {
+      for (let i = 0; i < 200; i++) {
         await setUsersOnline(['ignoreduser', 'user1']);
         const message = await new Message('(random.online.viewer)').parse({ sender: { username: 'soge__' }});
-        assert.equal(message, 'user1');
+        assert.notEqual(message, 'ignoreduser');
       }
     });
   });
@@ -40,6 +42,8 @@ describe('Message - random filter', () => {
     before(async () => {
       await db.cleanup();
       await msg.prepare();
+      global.tmi.ignoreRm({ sender: owner, parameters: 'ignoreduser' });
+      await msg.isSent('ignore.user.is.removed', owner, { username: 'ignoreduser' });
     });
     it('add user ignoreduser to ignore list', async () => {
       global.tmi.ignoreAdd({ sender: owner, parameters: 'ignoreduser' });
@@ -53,11 +57,11 @@ describe('Message - random filter', () => {
       });
     }
 
-    it('From 100 randoms ignoreduser shouldn\'t be picked', async () => {
-      for (let i = 0; i < 100; i++) {
+    it('From 200 randoms ignoreduser shouldn\'t be picked', async () => {
+      for (let i = 0; i < 200; i++) {
         await setUsersOnline(['ignoreduser', 'user1']);
         const message = await new Message('(random.online.follower)').parse({ sender: { username: 'soge__' }});
-        assert.equal(message, 'user1');
+        assert.notEqual(message, 'ignoreduser');
       }
     });
   });
@@ -66,6 +70,8 @@ describe('Message - random filter', () => {
     before(async () => {
       await db.cleanup();
       await msg.prepare();
+      global.tmi.ignoreRm({ sender: owner, parameters: 'ignoreduser' });
+      await msg.isSent('ignore.user.is.removed', owner, { username: 'ignoreduser' });
     });
     it('add user ignoreduser to ignore list', async () => {
       global.tmi.ignoreAdd({ sender: owner, parameters: 'ignoreduser' });
@@ -79,11 +85,11 @@ describe('Message - random filter', () => {
       });
     }
 
-    it('From 100 randoms ignoreduser shouldn\'t be picked', async () => {
-      for (let i = 0; i < 100; i++) {
+    it('From 200 randoms ignoreduser shouldn\'t be picked', async () => {
+      for (let i = 0; i < 200; i++) {
         await setUsersOnline(['ignoreduser', 'user1']);
         const message = await new Message('(random.online.subscriber)').parse({ sender: { username: 'soge__' }});
-        assert.equal(message, 'user1');
+        assert.notEqual(message, 'ignoreduser');
       }
     });
   });
@@ -92,6 +98,8 @@ describe('Message - random filter', () => {
     before(async () => {
       await db.cleanup();
       await msg.prepare();
+      global.tmi.ignoreRm({ sender: owner, parameters: 'ignoreduser' });
+      await msg.isSent('ignore.user.is.removed', owner, { username: 'ignoreduser' });
     });
 
     it('add user ignoreduser to ignore list', async () => {
@@ -106,10 +114,10 @@ describe('Message - random filter', () => {
       });
     }
 
-    it('From 100 randoms ignoreduser shouldn\'t be picked', async () => {
-      for (let i = 0; i < 100; i++) {
+    it('From 200 randoms ignoreduser shouldn\'t be picked', async () => {
+      for (let i = 0; i < 200; i++) {
         const message = await new Message('(random.viewer)').parse({ sender: { username: 'soge__' }});
-        assert.equal(message, 'user1');
+        assert.notEqual(message, 'ignoreduser');
       }
     });
   });
@@ -118,6 +126,8 @@ describe('Message - random filter', () => {
     before(async () => {
       await db.cleanup();
       await msg.prepare();
+      global.tmi.ignoreRm({ sender: owner, parameters: 'ignoreduser' });
+      await msg.isSent('ignore.user.is.removed', owner, { username: 'ignoreduser' });
     });
     it('add user ignoreduser to ignore list', async () => {
       global.tmi.ignoreAdd({ sender: owner, parameters: 'ignoreduser' });
@@ -131,10 +141,10 @@ describe('Message - random filter', () => {
       });
     }
 
-    it('From 100 randoms ignoreduser shouldn\'t be picked', async () => {
-      for (let i = 0; i < 100; i++) {
+    it('From 200 randoms ignoreduser shouldn\'t be picked', async () => {
+      for (let i = 0; i < 200; i++) {
         const message = await new Message('(random.follower)').parse({ sender: { username: 'soge__' }});
-        assert.equal(message, 'user1');
+        assert.notEqual(message, 'ignoreduser');
       }
     });
   });
@@ -143,6 +153,8 @@ describe('Message - random filter', () => {
     before(async () => {
       await db.cleanup();
       await msg.prepare();
+      global.tmi.ignoreRm({ sender: owner, parameters: 'ignoreduser' });
+      await msg.isSent('ignore.user.is.removed', owner, { username: 'ignoreduser' });
     });
     it('add user ignoreduser to ignore list', async () => {
       global.tmi.ignoreAdd({ sender: owner, parameters: 'ignoreduser' });
@@ -156,10 +168,10 @@ describe('Message - random filter', () => {
       });
     }
 
-    it('From 100 randoms ignoreduser shouldn\'t be picked', async () => {
-      for (let i = 0; i < 100; i++) {
+    it('From 200 randoms ignoreduser shouldn\'t be picked', async () => {
+      for (let i = 0; i < 200; i++) {
         const message = await new Message('(random.subscriber)').parse({ sender: { username: 'soge__' }});
-        assert.equal(message, 'user1');
+        assert.notEqual(message, 'ignoreduser');
       }
     });
   });

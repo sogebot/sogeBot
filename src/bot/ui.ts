@@ -22,4 +22,5 @@ class UI extends Core {
   public showdiff = true;
 }
 
-module.exports = UI;
+export default UI;
+export { UI };

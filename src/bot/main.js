@@ -14,6 +14,7 @@ import { API } from './api';
 import { Twitch } from './twitch';
 import { Webhooks } from './webhooks';
 import { Users } from './users';
+import { UI } from './ui';
 
 const figlet = require('figlet')
 const os = require('os')
@@ -61,7 +62,7 @@ async function main () {
   if (!global.db.engine.connected || global.cpu !== global.workers.onlineCount) return setTimeout(() => main(), 10)
   try {
     global.general = new (require('./general.js'))()
-    global.ui = new (require('./ui.js'))()
+    global.ui = new UI()
     global.currency = new Currency()
     global.stats2 = new (require('./stats.js'))()
     global.users = new Users();
