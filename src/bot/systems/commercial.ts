@@ -86,8 +86,10 @@ class Commercial extends System {
           sendMessage(commercial.message, opts.sender, opts.attr);
         }
       } catch (e) {
-        error(`API: ${url} - ${e.status} ${_.get(e, 'body.message', e.statusText)}`);
-        global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'commercial', api: 'kraken', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.statusText)}` });
+        error(`API: ${url} - ${e.stack}`);
+        if (global.panel && global.panel.io) {
+          global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'commercial', api: 'kraken', endpoint: url, code: e.response.status, data: e.stack });
+        }
       }
     } else {
       sendMessage('$sender, available commercial duration are: 30, 60, 90, 120, 150 and 180', opts.sender, opts.attr);
