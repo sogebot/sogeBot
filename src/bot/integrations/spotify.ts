@@ -22,6 +22,7 @@ import { debug, error, info, warning } from '../helpers/log';
 
 class Spotify extends Integration {
   client: any = null;
+  retry: { IRefreshToken: number } = { IRefreshToken: 0 };
   uris: {
     uri: string;
     requestBy: string;
@@ -82,6 +83,7 @@ class Spotify extends Integration {
   @settings('connection')
   @ui({ ignore: true })
   authenticatedScopes: string[] = [];
+  _authenticatedScopes: string[] = []; // to save scopes for retries
 
   @ui({
     type: 'btn-emit',
@@ -303,14 +305,20 @@ class Spotify extends Integration {
   async IRefreshToken () {
     clearTimeout(this.timeouts.IRefreshToken);
 
-    try {
-      if (!_.isNil(this.client) && this._refreshToken) {
-        const data = await this.client.refreshAccessToken();
-        this.client.setAccessToken(data.body.access_token);
-        this._accessToken = data.body.access_token;
+    if (this.retry.IRefreshToken < 5) {
+      try {
+        if (!_.isNil(this.client) && this._refreshToken) {
+          const data = await this.client.refreshAccessToken();
+          this.client.setAccessToken(data.body.access_token);
+          this._accessToken = data.body.access_token;
+          this.retry.IRefreshToken = 0;
+          this.authenticatedScopes = [...this._authenticatedScopes];
+        }
+      } catch (e) {
+        this.retry.IRefreshToken++;
+        info(chalk.yellow('SPOTIFY: ') + 'Refreshing access token failed ' + (this.retry.IRefreshToken > 0 ? 'retrying #' + this.retry.IRefreshToken : ''));
+        this.authenticatedScopes = [];
       }
-    } catch (e) {
-      info(chalk.yellow('SPOTIFY: ') + 'Refreshing access token failed');
     }
     this.timeouts.IRefreshToken = global.setTimeout(() => this.IRefreshToken(), 60000);
   }
@@ -416,6 +424,7 @@ class Spotify extends Integration {
       if (this._accessToken && this._refreshToken) {
         this.client.setAccessToken(this._accessToken);
         this.client.setRefreshToken(this._refreshToken);
+        this.retry.IRefreshToken = 0;
       }
 
       try {
@@ -423,11 +432,13 @@ class Spotify extends Integration {
           this.client.authorizationCodeGrant(opts.token)
             .then((data) => {
               this.authenticatedScopes = data.body.scope.split(' ');
+              this._authenticatedScopes = data.body.scope.split(' ');
               this._accessToken = data.body.access_token;
               this._refreshToken = data.body.refresh_token;
 
               this.client.setAccessToken(this._accessToken);
               this.client.setRefreshToken(this._refreshToken);
+              this.retry.IRefreshToken = 0;
             }, (err) => {
               if (err) {
                 info(chalk.yellow('SPOTIFY: ') + 'Getting of accessToken and refreshToken failed');
