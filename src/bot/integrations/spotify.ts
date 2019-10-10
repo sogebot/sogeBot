@@ -424,6 +424,7 @@ class Spotify extends Integration {
       if (this._accessToken && this._refreshToken) {
         this.client.setAccessToken(this._accessToken);
         this.client.setRefreshToken(this._refreshToken);
+        this.retry.IRefreshToken = 0;
       }
 
       try {
@@ -437,6 +438,7 @@ class Spotify extends Integration {
 
               this.client.setAccessToken(this._accessToken);
               this.client.setRefreshToken(this._refreshToken);
+              this.retry.IRefreshToken = 0;
             }, (err) => {
               if (err) {
                 info(chalk.yellow('SPOTIFY: ') + 'Getting of accessToken and refreshToken failed');
