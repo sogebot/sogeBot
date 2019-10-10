@@ -63,6 +63,7 @@
 
 <script>
 import { getSocket } from 'src/panel/helpers/socket';
+import { sortedUniq, flatten } from 'lodash-es';
 export default {
   props: ['commons', 'popout', 'configuration'],
   data: function () {
@@ -104,7 +105,7 @@ export default {
         for (let chatter of Object.entries(data.chatters).map(o => o[1])) {
           chatters.push(chatter)
         }
-        this.chatters = _.sortedUniq(_.flatten(chatters))
+        this.chatters = sortedUniq(flatten(chatters))
       })
     }
   },

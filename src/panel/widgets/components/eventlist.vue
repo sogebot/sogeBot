@@ -190,6 +190,7 @@
 <script>
 import { getSocket } from 'src/panel/helpers/socket';
 import { FontAwesomeLayers } from '@fortawesome/vue-fontawesome'
+import { chunk, debounce, get, isNil } from 'lodash-es';
 export default {
   props: ['commons', 'popout'],
   components: {
@@ -237,15 +238,15 @@ export default {
   created: function () {
     this.socket.emit('settings', (e, data) => {
       this.settings = {
-        widgetEventlistFollows: _.isNil(data.widgetEventlistFollows) ? true : data.widgetEventlistFollows,
-        widgetEventlistHosts: _.isNil(data.widgetEventlistHosts) ? true : data.widgetEventlistHosts,
-        widgetEventlistRaids: _.isNil(data.widgetEventlistRaids) ? true : data.widgetEventlistRaids,
-        widgetEventlistCheers: _.isNil(data.widgetEventlistCheers) ? true : data.widgetEventlistCheers,
-        widgetEventlistSubs: _.isNil(data.widgetEventlistSubs) ? true : data.widgetEventlistSubs,
-        widgetEventlistSubgifts: _.isNil(data.widgetEventlistSubgifts) ? true : data.widgetEventlistSubgifts,
-        widgetEventlistSubcommunitygifts: _.isNil(data.widgetEventlistSubcommunitygifts) ? true : data.widgetEventlistSubcommunitygifts,
-        widgetEventlistResubs: _.isNil(data.widgetEventlistResubs) ? true : data.widgetEventlistResubs,
-        widgetEventlistTips: _.isNil(data.widgetEventlistTips) ? true : data.widgetEventlistTips
+        widgetEventlistFollows: isNil(data.widgetEventlistFollows) ? true : data.widgetEventlistFollows,
+        widgetEventlistHosts: isNil(data.widgetEventlistHosts) ? true : data.widgetEventlistHosts,
+        widgetEventlistRaids: isNil(data.widgetEventlistRaids) ? true : data.widgetEventlistRaids,
+        widgetEventlistCheers: isNil(data.widgetEventlistCheers) ? true : data.widgetEventlistCheers,
+        widgetEventlistSubs: isNil(data.widgetEventlistSubs) ? true : data.widgetEventlistSubs,
+        widgetEventlistSubgifts: isNil(data.widgetEventlistSubgifts) ? true : data.widgetEventlistSubgifts,
+        widgetEventlistSubcommunitygifts: isNil(data.widgetEventlistSubcommunitygifts) ? true : data.widgetEventlistSubcommunitygifts,
+        widgetEventlistResubs: isNil(data.widgetEventlistResubs) ? true : data.widgetEventlistResubs,
+        widgetEventlistTips: isNil(data.widgetEventlistTips) ? true : data.widgetEventlistTips
       }
 
       this.eventlistShow = data.widgetEventlistShow
@@ -273,26 +274,26 @@ export default {
       if (this.settings.widgetEventlistSubcommunitygifts) toShow.push('subcommunitygift')
       if (this.settings.widgetEventlistResubs) toShow.push('resub')
       if (this.settings.widgetEventlistTips) toShow.push('tip')
-      return _.chunk(this.events.filter(o => toShow.includes(o.event)), this.eventlistShow)[0]
+      return chunk(this.events.filter(o => toShow.includes(o.event)), this.eventlistShow)[0]
     }
   },
   watch: {
-    eventlistSize: _.debounce(function (value, old) {
-      if (_.isNaN(Number(value))) this.eventlistSize = old
+    eventlistSize: debounce(function (value, old) {
+      if (Number.isNaN(Number(value))) this.eventlistSize = old
       else {
         this.settings.widgetEventlistSize = value
         this.update = String(new Date())
       }
     }, 500),
-    eventlistShow: _.debounce(function (value, old) {
-      if (_.isNaN(Number(value))) this.eventlistShow = old
+    eventlistShow: debounce(function (value, old) {
+      if (Number.isNaN(Number(value))) this.eventlistShow = old
       else {
         this.settings.widgetEventlistShow = value
         this.update = String(new Date())
       }
     }, 500),
-    eventlistMessageSize: _.debounce(function (value, old) {
-      if (_.isNaN(Number(value))) this.eventlistMessageSize = old
+    eventlistMessageSize: debounce(function (value, old) {
+      if (Number.isNaN(Number(value))) this.eventlistMessageSize = old
       else {
         this.settings.widgetEventlistMessageSize = value
         this.update = String(new Date())
@@ -315,15 +316,15 @@ export default {
       if (event.event === 'resub' && !event.subStreakShareEnabled) {
         t = commons.translate(`eventlist-events.resubWithoutStreak`);
       }
-      t = t.replace('$formatted_amount', '<strong style="font-size: 1rem">' + _.get(event, 'currency', '$') + parseFloat(_.get(event, 'amount', '0')).toFixed(2) + '</strong>')
-      t = t.replace('$viewers', '<strong style="font-size: 1rem">' + _.get(event, 'viewers', '0') + '</strong>')
-      t = t.replace('$tier', `${commons.translate('tier')} <strong style="font-size: 1rem">${_.get(event, 'tier', 'n/a')}</strong>`)
-      t = t.replace('$username', _.get(event, 'from', 'n/a'))
-      t = t.replace('$subCumulativeMonthsName', _.get(event, 'subCumulativeMonthsName', 'months'))
-      t = t.replace('$subCumulativeMonths', '<strong style="font-size: 1rem">' + _.get(event, 'subCumulativeMonths', '0') + '</strong>')
-      t = t.replace('$subStreakName', _.get(event, 'subStreakName', 'months'))
-      t = t.replace('$subStreak', '<strong style="font-size: 1rem">' + _.get(event, 'subStreak', '0') + '</strong>')
-      t = t.replace('$bits', '<strong style="font-size: 1rem">' + _.get(event, 'bits', '0') + '</strong>')
+      t = t.replace('$formatted_amount', '<strong style="font-size: 1rem">' + get(event, 'currency', '$') + parseFloat(get(event, 'amount', '0')).toFixed(2) + '</strong>')
+      t = t.replace('$viewers', '<strong style="font-size: 1rem">' + get(event, 'viewers', '0') + '</strong>')
+      t = t.replace('$tier', `${commons.translate('tier')} <strong style="font-size: 1rem">${get(event, 'tier', 'n/a')}</strong>`)
+      t = t.replace('$username', get(event, 'from', 'n/a'))
+      t = t.replace('$subCumulativeMonthsName', get(event, 'subCumulativeMonthsName', 'months'))
+      t = t.replace('$subCumulativeMonths', '<strong style="font-size: 1rem">' + get(event, 'subCumulativeMonths', '0') + '</strong>')
+      t = t.replace('$subStreakName', get(event, 'subStreakName', 'months'))
+      t = t.replace('$subStreak', '<strong style="font-size: 1rem">' + get(event, 'subStreak', '0') + '</strong>')
+      t = t.replace('$bits', '<strong style="font-size: 1rem">' + get(event, 'bits', '0') + '</strong>')
 
       let output = `<span style="font-size:0.7rem; font-weight: normal">${t}</span>`
       if (event.song_url && event.song_title) output += `<div style="font-size: 0.7rem"><strong>${commons.translate('song-request')}:</strong> <a href="${event.song_url}">${event.song_title}</a></div>`

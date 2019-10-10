@@ -68,6 +68,7 @@
 <script>
 import { getSocket } from 'src/panel/helpers/socket';
 import { FontAwesomeLayers } from '@fortawesome/vue-fontawesome'
+import { debounce } from 'lodash-es';
 
 export default {
   components: {
@@ -86,10 +87,10 @@ export default {
     }
   },
   watch: {
-    songRequestsEnabled: _.debounce(function (val) {
+    songRequestsEnabled: debounce(function (val) {
       this.socket.emit('settings.update', { songRequests: val })
     }, 500),
-    continueOnPlaylistAfterRequest: _.debounce(function (val) {
+    continueOnPlaylistAfterRequest: debounce(function (val) {
       this.socket.emit('settings.update', { output: { continueOnPlaylistAfterRequest: val } })
     }, 500)
   },

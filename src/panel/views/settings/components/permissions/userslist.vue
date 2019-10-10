@@ -25,7 +25,7 @@
       <div>
         <button type="button"
                 class="btn col-4"
-                v-for="user of _.chunk(searchData, 15)[searchPage]"
+                v-for="user of chunk(searchData, 15)[searchPage]"
                 :class="[!currentIds.includes(user.id) ? 'btn-light' : 'btn-dark']"
                 :key="user.username"
                 @click="toggleUser(user.username, user.id)">
@@ -35,8 +35,8 @@
       </div>
       <div class="d-flex">
         <button class="btn btn-success col-4" type="button" @click="inputUsername = ''; searchData = []">{{translate('core.permissions.done')}}</button>
-        <button class="btn btn-primary col-4" type="button" :disabled="typeof _.chunk(searchData, 15)[searchPage-1] === 'undefined'" @click="searchPage--">{{translate('core.permissions.previous')}}</button>
-        <button class="btn btn-primary col-4" type="button" :disabled="typeof _.chunk(searchData, 15)[searchPage+1] === 'undefined'" @click="searchPage++">{{translate('core.permissions.next')}}</button>
+        <button class="btn btn-primary col-4" type="button" :disabled="typeof chunk(searchData, 15)[searchPage-1] === 'undefined'" @click="searchPage--">{{translate('core.permissions.previous')}}</button>
+        <button class="btn btn-primary col-4" type="button" :disabled="typeof chunk(searchData, 15)[searchPage+1] === 'undefined'" @click="searchPage++">{{translate('core.permissions.next')}}</button>
       </div>
     </div>
     <div class='p-3 alert-warning' v-else-if="currentIds.length === 0">
@@ -60,13 +60,15 @@
 
 <script lang="ts">
   import Vue from 'vue'
-  import { getSocket } from 'src/panel/helpers/socket';
   import uuid from 'uuid/v4';
+  import { chunk } from 'lodash-es';
+  import { getSocket } from 'src/panel/helpers/socket';
 
   export default Vue.extend({
     props: ['ids'],
     data() {
       const data: {
+        chunk: any,
         usersSocket: any,
         currentIds: string[],
         currentUsers: {
@@ -82,6 +84,7 @@
         searchData: {}[],
         searchPage: number,
       } = {
+        chunk: chunk,
         usersSocket: getSocket('/core/users'),
         currentIds: this.ids,
         currentUsers: [],

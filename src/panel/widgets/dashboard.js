@@ -4,6 +4,7 @@ import Dashboard from './dashboard.vue';
 
 import { isAvailableVariable, isMainLoaded } from '../helpers/isAvailableVariable';
 import { getSocket } from 'src/panel/helpers/socket';
+import { orderBy } from 'lodash-es';
 
 async function initDashboard () {
   await Promise.all([
@@ -21,7 +22,7 @@ async function initDashboard () {
     },
     created: function () {
       this.socket.emit('getWidgets', (items, dashboards) => {
-        this.items = _.orderBy(items, 'id', 'asc');
+        this.items = orderBy(items, 'id', 'asc');
         for (const item of this.items) {
           if (typeof item.dashboardId === 'undefined') {
             item.dashboardId = null;
@@ -32,7 +33,7 @@ async function initDashboard () {
           name: 'Main',
           id: null,
         });
-        this.dashboards = _.orderBy(dashboards, 'createdAt', 'asc');
+        this.dashboards = orderBy(dashboards, 'createdAt', 'asc');
       });
     },
     render: function (createElement) {

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="input-group pt-1 pb-1" v-for="(v, index) of _.orderBy(currentValues, 'order')" :key="index">
+    <div class="input-group pt-1 pb-1" v-for="(v, index) of orderBy(currentValues, 'order')" :key="index">
       <select v-model="v.type" class="form-control" style="height: auto !important;">
         <option v-for="(o, index2) of socials" :value="o.value" :key="index2">{{o.text}}</option>
       </select>
@@ -19,10 +19,13 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { orderBy } from 'lodash-es';
 
 @Component({})
 export default class configurableList extends Vue {
   @Prop() readonly value: any;
+
+  orderBy = orderBy;
 
   currentValues = this.value;
   socials: { value: string, text: string }[] = [

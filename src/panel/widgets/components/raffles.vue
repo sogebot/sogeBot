@@ -248,6 +248,7 @@
 
 <script>
 import { getSocket } from 'src/panel/helpers/socket';
+import { orderBy } from 'lodash-es';
 export default {
   props: ['commons'],
   mounted: function () {
@@ -255,6 +256,7 @@ export default {
   },
   data: function () {
     return {
+      orderBy: orderBy,
       raffleAnnounceInterval: 0,
       luck: {
         subscribersPercent: 0,
@@ -328,8 +330,8 @@ export default {
       await Promise.all([
         new Promise((resolve) => {
           this.socket.emit('find', {}, (err, raffles) => {
-            const raffle = _.orderBy(raffles, 'timestamp', 'desc')[0]
-            if (!_.isEmpty(raffle)) {
+            const raffle = orderBy(raffles, 'timestamp', 'desc')[0]
+            if (Object.keys(raffle).length > 0) {
               this.running = !raffle.winner
               if (!raffle.winner) {
                 this.keyword = raffle.keyword
