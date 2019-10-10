@@ -6,8 +6,8 @@
           {{ translate('menu.manage') }}
           <small><fa icon="angle-right"/></small>
           {{ translate('menu.event-listeners') }}
-          <small><fa icon="angle-right"/></small>
           <template v-if="$route.params.id">
+            <small><fa icon="angle-right"/></small>
             {{event.name}}
             <small class="text-muted text-monospace" style="font-size:0.7rem">{{$route.params.id}}</small>
           </template>
