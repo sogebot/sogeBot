@@ -62,6 +62,7 @@
 
 <script>
 import { getSocket } from 'src/panel/helpers/socket';
+import { cloneDeep, difference, orderBy, map } from 'lodash-es';
 export default {
   props: ['items', 'commons', 'dashboards'],
   components: {
@@ -115,11 +116,11 @@ export default {
       const grid = $('.grid-stack-for-board-' + event.dashboardId).data('gridstack')
       if (grid) grid.destroy(true)
 
-      const dashboard = _.cloneDeep(this.dashboards.find(o => String(o.id) === event.dashboardId))
+      const dashboard = cloneDeep(this.dashboards.find(o => String(o.id) === event.dashboardId))
       this.dashboards = this.dashboards.filter(o => String(o.id) !== event.dashboardId)
       this.$nextTick(() => {
         this.dashboards.push(dashboard)
-        this.dashboards = _.orderBy(this.dashboards, 'createdAt', 'asc')
+        this.dashboards = orderBy(this.dashboards, 'createdAt', 'asc')
         this.items.push(event.widget)
         this.$nextTick(() => {
           const options = { cellHeight: 42, verticalMargin: 10, removable: true, removeTimeout: 100, handleClass: 'card-header' }
@@ -177,7 +178,7 @@ export default {
             widget.size.height = $(item).attr('data-gs-height')
             widget.size.width = $(item).attr('data-gs-width')
           }
-          for (let changed of _.difference(_.map(this.items, o => o.id), _.map(widgets, o => o.id))) {
+          for (let changed of difference(map(this.items, o => o.id), map(widgets, o => o.id))) {
             if (this.items.find(o => o.id === changed)) {
               // remove
               this.items = this.items.filter(o => o.id !== changed)

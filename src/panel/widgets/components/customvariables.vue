@@ -100,6 +100,7 @@
 
 <script>
 import { getSocket } from 'src/panel/helpers/socket';
+import { isNil, size, orderBy } from 'lodash-es';
 var numberOrTextComponent = {
   props: ['id', 'value', 'type'],
   watch: {
@@ -114,7 +115,7 @@ var numberOrTextComponent = {
     update: function (val) {
       if (val) this.currentValue = Number(this.currentValue) + Number(val)
       else if (this.type === 'number') this.currentValue = Number(this.currentValue)
-      if (_.isNaN(this.currentValue)) this.currentValue = 0
+      if (Number.isNaN(this.currentValue)) this.currentValue = 0
 
       this.initialValue = this.currentValue
       this.showSaveButton = false
@@ -183,7 +184,7 @@ export default {
           watched.push(variable)
         }
       }
-      return _.orderBy(watched, 'order', 'asc')
+      return orderBy(watched, 'order', 'asc')
     },
     nonWatchedVariables: function () {
       let nonWatched = []
@@ -194,12 +195,12 @@ export default {
       return nonWatched
     },
     nonWatchedVariablesCount: function () {
-      return _.size(this.nonWatchedVariables)
+      return size(this.nonWatchedVariables)
     }
   },
   watch: {
     nonWatchedVariables: function () {
-      if (!_.isNil(this.nonWatchedVariables[0])) this.selectedVariable = this.nonWatchedVariables[0]._id
+      if (!isNil(this.nonWatchedVariables[0])) this.selectedVariable = this.nonWatchedVariables[0]._id
     }
   },
   methods: {
@@ -220,14 +221,14 @@ export default {
       })
     },
     addToWatch: function (variableId) {
-      if (!_.isNil(variableId)) {
+      if (!isNil(variableId)) {
         this.socket.emit('add.watch', variableId, (err, variableId) => {
           this.refreshWatchList()
         })
       }
     },
     unWatch: function (variableId) {
-      if (!_.isNil(variableId)) {
+      if (!isNil(variableId)) {
         this.socket.emit('rm.watch', variableId, (err, variableId) => {
           this.refreshWatchList()
         })

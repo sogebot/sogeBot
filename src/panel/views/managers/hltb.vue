@@ -17,7 +17,7 @@
 
     <panel cards></panel>
 
-    <template v-for="(chunkGames, index) of _.chunk(games, itemsPerLine)">
+    <template v-for="(chunkGames, index) of chunk(games, itemsPerLine)">
       <div class="card-deck" v-bind:key="index">
         <template v-for="game of chunkGames">
           <div class="card mb-3 p-0 border" v-bind:key="String(game.game)">
@@ -76,7 +76,7 @@
 
 <script lang="ts">
   import Vue from 'vue'
-  import { orderBy } from 'lodash-es';
+  import { chunk, orderBy } from 'lodash-es';
 
   import moment from 'moment'
   import VueMoment from 'vue-moment'
@@ -97,12 +97,14 @@
     },
     data: function () {
       const object: {
+        chunk: any,
         socket: any,
         itemsPerLine: number,
         interval: number,
         games: import('../../../bot/systems/howlongtobeat').Game[],
         domWidth: number,
       } = {
+        chunk: chunk,
         socket: getSocket('/systems/howlongtobeat'),
         games: [],
         itemsPerLine: 2,

@@ -31,7 +31,7 @@
     <b-table v-else striped small :items="commandsFiltered" :fields="fields" responsive >
       <template v-slot:cell(response)="data">
         <span v-if="data.item.responses.length === 0" class="text-muted">{{ translate('systems.customcommands.no-responses-set') }}</span>
-        <template v-for="(r, i) of _.orderBy(data.item.responses, 'order', 'asc')">
+        <template v-for="(r, i) of orderBy(data.item.responses, 'order', 'asc')">
           <div :key="i" :style="{ 'margin-top': i !== 0 ? '15px' : 'inherit' }" style="margin: 0; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px; margin-bottom: -3px;">
             <span style="display: inline-block">
               {{translate('response')}}#{{i + 1}}
@@ -116,6 +116,8 @@ import { getSocket } from '../../../helpers/socket';
   }
 })
 export default class commandsList extends Vue {
+  orderBy = orderBy;
+
   search = '';
 
   commands: any[] = [];

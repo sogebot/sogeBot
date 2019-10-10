@@ -85,7 +85,7 @@ export default {
   },
   watch: {
     betPercentGain: function (value, old) {
-      if (_.isNaN(Number(value))) this.betPercentGain = old
+      if (Number.isNaN(Number(value))) this.betPercentGain = old
       else {
         this.socket.emit('settings.update', {betPercentGain: value}, () => {})
       }
@@ -97,7 +97,7 @@ export default {
         if (err) return console.error(err)
         this.socket.emit('find', { collection: 'users' }, (err, _bets) => {
           if (err) return console.error(err)
-          if (!_.isEmpty(_current)) {
+          if (Object.keys(_current).length > 0) {
             this.locked = _current.locked
             this.options = _current.options
             this.timer = Number((Number(_current.end) - new Date().getTime()) / 1000).toFixed(0)

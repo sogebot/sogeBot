@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="input-group pt-1 pb-1" v-for="(v, index) of _.orderBy(currentValues, 'order')" :key="index">
+    <div class="input-group pt-1 pb-1" v-for="(v, index) of orderBy(currentValues, 'order')" :key="index">
       <div class="input-group-prepend d-flex" style="flex: 0 1 auto; flex-direction: column;">
         <button class="btn btn-block btn-secondary m-0 h-100" type="button" v-if="index !== 0" @click="moveUp(index)">
           <i class="fas fa-sort-up"></i>
@@ -29,10 +29,13 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { orderBy } from 'lodash-es';
 
 @Component({})
 export default class configurableList extends Vue {
   @Prop() readonly value: any;
+
+  orderBy = orderBy;
 
   currentValues = this.value;
   options: { value: string, text: string }[] = [

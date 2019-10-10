@@ -17,7 +17,7 @@
 
     <panel search cards @search="search = $event"></panel>
 
-    <template v-for="(chunkVotes, index) of _.chunk(filteredVotes, itemsPerPage)">
+    <template v-for="(chunkVotes, index) of chunk(filteredVotes, itemsPerPage)">
       <div class="card-deck" v-bind:key="index">
         <template v-for="vote of chunkVotes">
           <template v-if="vote === 'new'">
@@ -157,7 +157,7 @@
 
 <script lang="ts">
   import Vue from 'vue'
-  import { cloneDeep, isNil, orderBy } from 'lodash-es'
+  import { chunk, cloneDeep, isNil, orderBy } from 'lodash-es'
 
   import moment from 'moment'
   import VueMoment from 'vue-moment'
@@ -179,6 +179,7 @@
     },
     data: function () {
       const object: {
+        chunk: any,
         socket: any,
         votes: Array<Poll | 'new'>,
         votings: Array<Vote>,
@@ -189,6 +190,7 @@
         interval: number,
         search: string,
       } = {
+        chunk: chunk,
         socket: getSocket('/systems/polls'),
         votes: [],
         votings: [],

@@ -54,6 +54,7 @@
 
 <script>
 import { getSocket } from 'src/panel/helpers/socket';
+import { isNil } from 'lodash-es';
 export default {
   props: ['commons'],
   data: function () {
@@ -91,7 +92,7 @@ export default {
       this.volume = Math.round(Number(ev.offsetX / path[0].clientWidth * 100).toFixed(0) / 5) * 5
     },
     play: function (sound) {
-      if (!_.isNil(this.audio)) this.audio.pause()
+      if (!isNil(this.audio)) this.audio.pause()
       this.audio = new Audio('dist/soundboard/' + sound + '.mp3')
       this.audio.addEventListener('loadedmetadata', () => {
         this.audio.volume = this.volume / 100

@@ -62,8 +62,8 @@
                 </template>
                 <input v-else v-model="event.definitions[defKey]" :class="{ 'is-invalid': getDefinitionValidation(defKey).$invalid }" type="text" class="form-control" :id="defKey + '_input'" :placeholder="translate('events.definitions.' + defKey + '.placeholder')">
                 <div class="invalid-feedback" v-if="getDefinitionValidation(defKey)">
-                  <template v-if="!_.get(getDefinitionValidation(defKey), 'minValue', true)">
-                    {{translate('dialog.errors.minValue').replace('$value', _.get(getDefinitionValidation(defKey), '$params.minValue.min', 0)) }}
+                  <template v-if="!get(getDefinitionValidation(defKey), 'minValue', true)">
+                    {{translate('dialog.errors.minValue').replace('$value', get(getDefinitionValidation(defKey), '$params.minValue.min', 0)) }}
                   </template>
                   <template v-else>
                     {{translate('dialog.errors.required')}}
@@ -151,6 +151,7 @@
     data: function () {
       const eventId = uuid();
       const object: {
+        get: any,
         eventId: string,
         socket: any,
         event: Events.Event,
@@ -169,6 +170,7 @@
           save: number
         }
       } = {
+        get: get,
         eventId: this.$route.params.id || eventId,
         socket: getSocket('/core/events'),
         event: {

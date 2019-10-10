@@ -25,6 +25,7 @@
 
 <script>
 import { getSocket } from 'src/panel/helpers/socket';
+import { debounce } from 'lodash-es';
 export default {
   props: ['commons', 'systems'],
   data: function () {
@@ -48,7 +49,7 @@ export default {
     }
   },
   methods: {
-    onChange: _.debounce(function () {
+    onChange: debounce(function () {
       let items = []
       for (let item of this.items) {
         items.push({ value: item.text, completed: item.completed})

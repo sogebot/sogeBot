@@ -125,6 +125,7 @@
 
 <script>
 import { getSocket } from 'src/panel/helpers/socket';
+import { debounce } from 'lodash-es';
 export default {
   props: ['commons', 'popout'],
   mounted: function () {
@@ -159,7 +160,7 @@ export default {
     locked: function () {
       this.updated = String(new Date())
     },
-    updated: _.debounce(function () {
+    updated: debounce(function () {
       const data = {
         eligibility: this.eligibility,
       }
