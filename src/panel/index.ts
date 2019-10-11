@@ -131,7 +131,8 @@ const main = async () => {
     base: __dirname,
     routes: [
       { path: '/', name: 'Dashboard', component: () => import('./views/dashboard/stub.vue') },
-      { path: '/stats/commandcount', name: 'CommandCountLogger', component: () => import('./views/loggers/commandcount.vue') },
+      { path: '/stats/commandcount', name: 'CommandCountStats', component: () => import('./views/stats/commandcount.vue') },
+      { path: '/stats/api', name: 'APIStats', component: () => import('./views/stats/api.vue') },
 
       { path: '/manage/alias/', redirect: '/manage/alias/list' },
       { path: '/manage/alias/list', name: 'aliasManagerList', component: () => import('./views/managers/alias/alias-list.vue') },
