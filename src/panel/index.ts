@@ -139,6 +139,7 @@ const main = async () => {
       { path: '/manage/commands/', redirect: '/manage/commands/list' },
       { path: '/manage/commands/list', name: 'CommandsManagerList', component: () => import('./views/managers/commands/commands-list.vue') },
       { path: '/manage/commands/edit/:id?', name: 'CommandsManagerEdit', component: () => import('./views/managers/commands/commands-edit.vue') },
+      { path: '/manage/highlights', name: 'HighlightsManager', component: () => import('./views/managers/highlights.vue') },
       { path: '/manage/hltb', name: 'HLTBManager', component: () => import('./views/managers/hltb.vue') },
       { path: '/manage/polls', name: 'PollsManager', component: () => import('./views/managers/polls.vue') },
       { path: '/manage/events/', redirect: '/manage/events/list' },
