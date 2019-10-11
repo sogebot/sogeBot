@@ -43,7 +43,8 @@
             <template v-if="!hideStats">{{ maxViewers }}</template>
             <small v-else>{{translate('hidden')}}</small>
           </span>
-          <span class="stats" v-html="difference(averageStats.maxViewers, maxViewers)"></span>
+          <span class="stats" v-if="!hideStats" v-html="difference(averageStats.maxViewers, maxViewers)"></span>
+          <span class="stats" v-else>&nbsp;</span>
         </div>
 
         <div class="col-6 col-sm-4 col-md-4 col-lg-1 stream-info" v-on:click="toggleViewerShow">
@@ -55,7 +56,8 @@
             <template v-if="!hideStats">{{ newChatters }}</template>
             <small v-else>{{translate('hidden')}}</small>
           </span>
-          <span class="stats" v-html="difference(averageStats.newChatters, newChatters)"></span>
+          <span class="stats" v-if="!hideStats" v-html="difference(averageStats.newChatters, newChatters)"></span>
+          <span class="stats" v-else>&nbsp;</span>
         </div>
 
         <div class="col-6 col-sm-4 col-md-4 col-lg-1 stream-info">
