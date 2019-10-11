@@ -31,7 +31,7 @@ class Highlights extends System {
       global.db.engine.index(this.collection.data, [{ index: 'id' }]);
     }
 
-    this.addMenu({ category: 'manage', name: 'highlights', id: 'highlights/list' });
+    this.addMenu({ category: 'manage', name: 'highlights', id: 'manage/highlights' });
   }
 
   public sockets() {
