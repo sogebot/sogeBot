@@ -3,6 +3,10 @@ body {
   background-color: $gray-100;
 }
 
+.font-bigger {
+  font-size: 1.5rem;
+}
+
 @media (min-width: 900px) {
   body {
     padding-top: 50px;

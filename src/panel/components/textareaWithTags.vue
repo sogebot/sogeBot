@@ -21,7 +21,7 @@
     </div>
 
     <div v-if="filters && filters.length > 0">
-      <b-dropdown id="dropdown-1" variant="dark" class="h-100" :dropleft="true">
+      <b-dropdown id="dropdown-1" variant="dark" class="h-100" :dropleft="true" menu-class="dropdown-scroll">
         <template v-for="filter of filters">
           <template v-if="filter === 'global'">
             <b-dropdown-item class="dropdown-item" style="cursor: pointer" :key="filter + 'title'" @click="addVariable('title')"> {{ translate('responses.variable.title') }} </b-dropdown-item>
@@ -138,3 +138,11 @@ export default class textareaWithTags extends Vue {
   }
 }
 </script>
+
+<style>
+.dropdown-scroll {
+  height: 200px !important;
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+</style>
