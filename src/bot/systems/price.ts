@@ -27,10 +27,10 @@ class Price extends System {
     super();
 
     if(isMainThread) {
-      global.db.engine.index(this.collection.data, [{ index: 'command' }]);
+      global.db.engine.index(this.collection.data, [{ index: 'command' }, { index: 'id', unique: true }]);
     }
 
-    this.addMenu({ category: 'manage', name: 'price', id: 'price/list' });
+    this.addMenu({ category: 'manage', name: 'price', id: 'manage/price/list' });
   }
 
   @command('!price')

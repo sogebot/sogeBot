@@ -1,5 +1,7 @@
 {
   "new": "Nová Cena",
+  "empty": "Žádná cena nebyla vytvořena.",
+  "emptyAfterSearch": "Žádná cena nebyla nalezena pro tvé hledání <strong>\"$search\"</strong>.",
   "command": {
     "name": "příkaz",
     "placeholder": ""

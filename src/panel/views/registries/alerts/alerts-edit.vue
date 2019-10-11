@@ -59,7 +59,7 @@
           @input="$v.item.name.$touch()"
           :state="$v.item.name.$invalid && $v.item.name.$dirty ? false : null"
         ></b-form-input>
-        <b-form-invalid-feedback>{{ translate('dialog.errors.required') }}</b-form-invalid-feedback>
+        <b-form-invalid-feedback :state="!($v.item.name.$invalid && $v.item.name.$dirty)">{{ translate('dialog.errors.required') }}</b-form-invalid-feedback>
       </b-form-group>
 
       <b-form-group

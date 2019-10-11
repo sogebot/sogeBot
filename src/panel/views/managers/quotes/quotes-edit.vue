@@ -41,9 +41,9 @@
           type="text"
           :placeholder="translate('systems.quotes.quote.placeholder')"
           @input="$v.item.quote.$touch()"
-          :state="$v.item.quote.$invalid && $v.item.quote.$dirty ? 'invalid' : null"
+          :state="$v.item.quote.$invalid && $v.item.quote.$dirty ? false : null"
         ></b-form-input>
-        <b-form-invalid-feedback>{{ translate('dialog.errors.required') }}</b-form-invalid-feedback>
+        <b-form-invalid-feedback :state="!($v.item.quote.$invalid && $v.item.quote.$dirty)">{{ translate('dialog.errors.required') }}</b-form-invalid-feedback>
       </b-form-group>
 
       <b-form-group

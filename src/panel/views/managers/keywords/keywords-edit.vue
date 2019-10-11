@@ -43,10 +43,10 @@
           v-model="keyword"
           type="text"
           :placeholder="translate('systems.keywords.keyword.placeholder')"
-          :state="$v.keyword.$invalid && $v.keyword.$dirty ? 'invalid' : null"
+          :state="$v.keyword.$invalid && $v.keyword.$dirty ? false : null"
           @input="$v.keyword.$touch()"
         ></b-form-input>
-        <b-form-invalid-feedback>{{ translate('dialog.errors.required') }}</b-form-invalid-feedback>
+        <b-form-invalid-feedback :state="!($v.keyword.$invalid && $v.keyword.$dirty)">{{ translate('dialog.errors.required') }}</b-form-invalid-feedback>
         <small class="form-text text-muted" v-html="translate('systems.keywords.keyword.help')"></small>
       </b-form-group>
       <b-form-group
@@ -57,11 +57,11 @@
           id="response"
           v-model="response"
           :placeholder="translate('systems.keywords.response.placeholder')"
-          :state="$v.response.$invalid && $v.response.$dirty ? 'invalid' : null"
+          :state="$v.response.$invalid && $v.response.$dirty ? false : null"
           rows="8"
           @input="$v.response.$touch()"
         ></b-form-textarea>
-        <b-form-invalid-feedback>{{ translate('dialog.errors.required') }}</b-form-invalid-feedback>
+        <b-form-invalid-feedback :state="!($v.response.$invalid && $v.response.$dirty)">{{ translate('dialog.errors.required') }}</b-form-invalid-feedback>
       </b-form-group>
     </b-form>
   </b-container>
