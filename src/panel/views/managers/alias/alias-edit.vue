@@ -65,7 +65,7 @@
             :state="$v.item.alias.$invalid && $v.item.alias.$dirty ? false : null"
           ></b-form-input>
         </b-input-group>
-        <b-form-invalid-feedback>{{ translate('dialog.errors.required') }}</b-form-invalid-feedback>
+        <b-form-invalid-feedback :state="!($v.item.alias.$invalid && $v.item.alias.$dirty)">{{ translate('dialog.errors.required') }}</b-form-invalid-feedback>
       </b-form-group>
 
       <b-form-group>

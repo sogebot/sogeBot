@@ -46,10 +46,10 @@
                 v-model="name"
                 type="text"
                 :placeholder="translate('registry.textoverlay.name.placeholder')"
-                :state="$v.name.$invalid && $v.name.$dirty ? 'invalid' : null"
+                :state="$v.name.$invalid && $v.name.$dirty ? false : null"
                 @input="$v.name.$touch()"
               ></b-form-input>
-              <b-form-invalid-feedback>{{ translate('dialog.errors.required') }}</b-form-invalid-feedback>
+              <b-form-invalid-feedback :state="!($v.name.$invalid && $v.name.$dirty)">{{ translate('dialog.errors.required') }}</b-form-invalid-feedback>
             </b-form-group>
           </div>
           <div class="form-row pl-2 pr-2">

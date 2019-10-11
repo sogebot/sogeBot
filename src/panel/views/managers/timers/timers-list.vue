@@ -17,7 +17,7 @@
 
     <panel search @search="search = $event">
       <template v-slot:left>
-        <button-with-icon class="btn-primary btn-reverse" icon="plus" href="#/manage/timers/edit">{{translate('dialog.title.add')}}</button-with-icon>
+        <button-with-icon class="btn-primary btn-reverse" icon="plus" href="#/manage/timers/edit">{{translate('systems.timers.new')}}</button-with-icon>
       </template>
     </panel>
 
@@ -94,7 +94,6 @@ export default class timersList extends Vue {
     this.socket.emit('find.timers', (err, items) => {
       this.items.timers = orderBy(items.timers, 'name', 'asc')
       this.items.responses = items.responses
-      console.log({items})
       this.state.loading = this.$state.success;
     })
   }

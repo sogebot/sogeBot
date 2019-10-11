@@ -149,6 +149,8 @@ const main = async () => {
       { path: '/manage/keywords/', redirect: '/manage/keywords/list' },
       { path: '/manage/keywords/list', name: 'KeywordsManagerList', component: () => import('./views/managers/keywords/keywords-list.vue') },
       { path: '/manage/keywords/edit/:id?', name: 'KeywordsManagerEdit', component: () => import('./views/managers/keywords/keywords-edit.vue') },
+      { path: '/manage/price/list', name: 'PriceManagerList', component: () => import('./views/managers/price/price-list.vue') },
+      { path: '/manage/price/edit/:id?', name: 'PriceManagerEdit', component: () => import('./views/managers/price/price-edit.vue') },
       { path: '/manage/quotes/list', name: 'QuotesManagerList', component: () => import('./views/managers/quotes/quotes-list.vue') },
       { path: '/manage/quotes/edit/:id?', name: 'QuotesManagerEdit', component: () => import('./views/managers/quotes/quotes-edit.vue') },
       { path: '/manage/timers/list', name: 'TimersManagerList', component: () => import('./views/managers/timers/timers-list.vue') },

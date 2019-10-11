@@ -49,7 +49,7 @@
             :state="$v.item.timer.name.$invalid && $v.item.timer.name.$dirty ? false : null"
           ></b-form-input>
         </b-input-group>
-        <b-form-invalid-feedback>{{ translate('timers.errors.timer_name_must_be_compliant') }}</b-form-invalid-feedback>
+        <b-form-invalid-feedback :state="!($v.item.timer.name.$invalid && $v.item.timer.name.$dirty)">{{ translate('timers.errors.timer_name_must_be_compliant') }}</b-form-invalid-feedback>
       </b-form-group>
 
       <b-row>
