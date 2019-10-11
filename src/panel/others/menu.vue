@@ -30,7 +30,7 @@ import { getSocket } from '../helpers/socket';
 export default class Menu extends Vue {
   socket = getSocket('/');
   menu: any = [];
-  categories = ['manage', 'settings', 'registry', 'logs', 'stats'];
+  categories = ['manage', 'settings', 'registry', /* 'logs', */ 'stats'];
 
   mounted() {
     // Workaround for touch screens - https://github.com/mdbootstrap/perfect-scrollbar/issues/867

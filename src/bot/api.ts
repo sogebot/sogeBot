@@ -109,7 +109,7 @@ class API extends Core {
 
   constructor () {
     super();
-    this.addMenu({ category: 'logs', name: 'api', id: 'apistats' });
+    this.addMenu({ category: 'stats', name: 'api', id: 'stats/api' });
 
     if (isMainThread) {
       this.interval('getCurrentStreamData', constants.MINUTE);
