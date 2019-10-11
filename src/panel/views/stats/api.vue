@@ -119,8 +119,6 @@ export default class apiStats extends Vue {
         {name: 'Success', data: successPerMinute},
         {name: 'Errors', data: errorsPerMinute},
       ]
-      console.log(successPerMinute)
-      console.log(errorsPerMinute)
     }
 
     mounted() {
