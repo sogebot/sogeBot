@@ -26,7 +26,7 @@ class Timers extends System {
   constructor () {
     super();
 
-    this.addMenu({ category: 'manage', name: 'timers', id: 'timers/list' });
+    this.addMenu({ category: 'manage', name: 'timers', id: 'manage/timers/list' });
     if (isMainThread) {
       global.db.engine.index(this.collection.data, { index: 'id', unique: true });
       global.db.engine.index(this.collection.responses, { index: 'timerId' });
