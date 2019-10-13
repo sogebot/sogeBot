@@ -157,6 +157,7 @@ const main = async () => {
       { path: '/manage/timers/edit/:id?', name: 'TimersManagerEdit', component: () => import('./views/managers/timers/timers-edit.vue') },
 
       { path: '/settings/permissions/:id?', name: 'PermissionsSettings', component: () => import('./views/settings/permissions.vue') },
+      { path: '/settings/translations', name: 'TranslationsSettings', component: () => import('./views/settings/translations.vue') },
       { path: '/settings/:type/:id?', name: 'InterfaceSettings', component: () => import('./views/settings/interface.vue') },
 
       { path: '/registry/alerts/list', name: 'alertsList', component: () => import('./views/registries/alerts/alerts-list.vue') },

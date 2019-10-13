@@ -26,7 +26,7 @@ class Translate {
   mSentMetrics: Array<String> = [];
 
   constructor () {
-    if (isMainThread) global.panel.addMenu({ category: 'settings', name: 'translations', id: 'translations' })
+    if (isMainThread) global.panel.addMenu({ category: 'settings', name: 'translations', id: 'settings/translations' })
   }
 
   async _load () {
