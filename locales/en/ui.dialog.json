@@ -41,5 +41,6 @@
     "no": "No"
   },
   "changesPending": "Your changes was not saved.",
-  "formNotValid": "Form is invalid."
+  "formNotValid": "Form is invalid.",
+  "nothingToShow": "Nothing to show here."
 }

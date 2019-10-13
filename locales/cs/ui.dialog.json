@@ -41,5 +41,6 @@
     "no": "Ne"
   },
   "changesPending": "Vaše změny nebyly uloženy.",
-  "formNotValid": "Opravte chyby ve formuláři."
+  "formNotValid": "Opravte chyby ve formuláři.",
+  "nothingToShow": "Zde není nic k vidění"
 }
