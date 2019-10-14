@@ -21,11 +21,11 @@ export const HOUR = 1000 * 60 * 60;
 export const DAY = 1000 * 60 * 60 * 24;
 
 // regexp
-export const COMMAND_REGEXP = XRegExp('(?<command> ![\\pL0-9]* ) # command', 'ix')
+export const COMMAND_REGEXP = XRegExp('(?<command> ![\\pL0-9]* ) # command', 'ix');
 
 export const COOLDOWN_REGEXP = XRegExp(`(?<command> !?[\\pL0-9 ]* ) # command
            \\s                         # empty space
-           (?<type> global|user      ) # type`, 'ix')
+           (?<type> global|user      ) # type`, 'ix');
 
 export const KEYWORD_REGEXP = XRegExp('(?<keyword> !?[\\pL0-9]*)\\s(?<response> .*)', 'ix');
 
@@ -35,4 +35,4 @@ export const COOLDOWN_REGEXP_SET = XRegExp(`(?<command> !?[\\pL0-9 ]* ) # comman
            \\s                      # empty space
            (?<seconds> \\d*       ) # seconds
            ?\\s                     # empty space
-           ?(?<quiet> \\w*        ) # optional-quiet`, 'ix')
+           ?(?<quiet> \\w*        ) # optional-quiet`, 'ix');

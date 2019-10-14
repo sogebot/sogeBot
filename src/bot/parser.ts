@@ -10,7 +10,7 @@ class Parser {
   sender: Sender | null = null;
   skip = false;
   quiet = false;
-  successfullParserRuns: any[] = []
+  successfullParserRuns: any[] = [];
   isCommand = false;
   list: any = [];
 
@@ -30,19 +30,23 @@ class Parser {
   }
 
   async isModerated () {
-    if (this.skip) {return false;};
+    if (this.skip) {
+      return false;
+    };
 
     const parsers = await this.parsers();
-    for (let parser of parsers) {
-      if (parser.priority !== constants.MODERATION) {continue;}; // skip non-moderation parsers
+    for (const parser of parsers) {
+      if (parser.priority !== constants.MODERATION) {
+        continue;
+      }; // skip non-moderation parsers
       const opts = {
         sender: this.sender,
         message: this.message.trim(),
         skip: this.skip,
       };
-      const isOk = await parser['fnc'].apply(parser.this, [opts]);
+      const isOk = await parser.fnc.apply(parser.this, [opts]);
       if (!isOk) {
-        debug('parser.isModerated', 'Moderation failed ' + JSON.stringify(parser['fnc']));
+        debug('parser.isModerated', 'Moderation failed ' + JSON.stringify(parser.fnc));
         return true;
       }
     }
@@ -53,8 +57,10 @@ class Parser {
     debug('parser.process', 'PROCESS START of "' + this.message + '"');
 
     const parsers = await this.parsers();
-    for (let parser of parsers) {
-      if (parser.priority === constants.MODERATION) {continue;}; // skip moderation parsers
+    for (const parser of parsers) {
+      if (parser.priority === constants.MODERATION) {
+        continue;
+      }; // skip moderation parsers
       if (
         _.isNil(this.sender) // if user is null -> we are running command through a bot
         || this.skip
@@ -63,14 +69,14 @@ class Parser {
         const opts = {
           sender: this.sender,
           message: this.message.trim(),
-          skip: this.skip
+          skip: this.skip,
         };
 
         debug('parser.process', 'Processing ' + parser.name + ' (fireAndForget: ' + parser.fireAndForget + ')');
         if (parser.fireAndForget) {
-          parser['fnc'].apply(parser.this, [opts]);
+          parser.fnc.apply(parser.this, [opts]);
         } else {
-          const status = await parser['fnc'].apply(parser.this, [opts]);
+          const status = await parser.fnc.apply(parser.this, [opts]);
           if (!status) {
             const rollbacks = await this.rollbacks();
             for (const r of rollbacks) {
@@ -81,7 +87,7 @@ class Parser {
                 return parserSystem === rollbackSystem;
               })) {
                 debug('parser.process', 'Rollbacking ' + r.name);
-                await r['fnc'].apply(r.this, [opts]);
+                await r.fnc.apply(r.this, [opts]);
               } else {
                 debug('parser.process', 'Rollback skipped for ' + r.name);
               }
@@ -108,16 +114,16 @@ class Parser {
       global.general,
       global.tmi,
     ];
-    for (let system of Object.entries(global.systems)) {
+    for (const system of Object.entries(global.systems)) {
       list.push(system[1]);
     }
-    for (let overlay of Object.entries(global.overlays)) {
+    for (const overlay of Object.entries(global.overlays)) {
       list.push(overlay[1]);
     }
-    for (let game of Object.entries(global.games)) {
+    for (const game of Object.entries(global.games)) {
       list.push(game[1]);
     }
-    for (let integration of Object.entries(global.integrations)) {
+    for (const integration of Object.entries(global.integrations)) {
       list.push(integration[1]);
     }
     return list;
@@ -145,7 +151,7 @@ class Parser {
    * @returns object or empty list
    */
   async rollbacks () {
-    let rollbacks: any[] = [];
+    const rollbacks: any[] = [];
     for (let i = 0, length = this.list.length; i < length; i++) {
       if (_.isFunction(this.list[i].rollbacks)) {
         rollbacks.push(this.list[i].rollbacks());
@@ -168,9 +174,9 @@ class Parser {
     if (cmdlist === null) {
       cmdlist = await this.getCommandsList();
     }
-    for (let item of cmdlist) {
-      let onlyParams = message.trim().toLowerCase().replace(item.command, '');
-      let isStartingWith = message.trim().toLowerCase().startsWith(item.command);
+    for (const item of cmdlist) {
+      const onlyParams = message.trim().toLowerCase().replace(item.command, '');
+      const isStartingWith = message.trim().toLowerCase().startsWith(item.command);
 
       debug('parser.find', JSON.stringify({command: item.command, isStartingWith}));
 
@@ -193,39 +199,49 @@ class Parser {
       }
     }
     commands = _(await Promise.all(commands)).flatMap().sortBy(o => -o.command.length).value();
-    for (let command of commands) {
-      let permission = await global.db.engine.findOne(global.permissions.collection.commands, { key: command.id });
-      if (!_.isEmpty(permission)) {command.permission = permission.permission;}; // change to custom permission
+    for (const command of commands) {
+      const permission = await global.db.engine.findOne(global.permissions.collection.commands, { key: command.id });
+      if (!_.isEmpty(permission)) {
+        command.permission = permission.permission;
+      }; // change to custom permission
     }
     return commands;
   }
 
   async command (sender, message) {
-    if (!message.startsWith('!')) {return;}; // do nothing, this is not a command or user is ignored
-    let command = await this.find(message, null);
-    if (_.isNil(command)) {return;}; // command not found, do nothing
-    if (command.permission === null) {return;}; // command is disabled
+    if (!message.startsWith('!')) {
+      return;
+    }; // do nothing, this is not a command or user is ignored
+    const command = await this.find(message, null);
+    if (_.isNil(command)) {
+      return;
+    }; // command not found, do nothing
+    if (command.permission === null) {
+      return;
+    }; // command is disabled
     if (
       _.isNil(this.sender) // if user is null -> we are running command through a bot
       || this.skip
       || (await global.permissions.check(this.sender.userId, command.permission, false)).access
     ) {
-      var text = message.trim().replace(new RegExp('^(' + command.command + ')', 'i'), '').trim();
-      let opts = {
+      const text = message.trim().replace(new RegExp('^(' + command.command + ')', 'i'), '').trim();
+      const opts = {
         sender: sender,
         command: command.command,
         parameters: text.trim(),
         attr: {
           skip: this.skip,
           quiet: this.quiet,
-        }
+        },
       };
 
-      if (_.isNil(command.id)) {throw Error(`command id is missing from ${command['fnc']}`);};
+      if (_.isNil(command.id)) {
+        throw Error(`command id is missing from ${command.fnc}`);
+      };
 
       if (typeof command.fnc === 'function' && !_.isNil(command.id)) {
         incrementCountOfCommandUsage(command.command);
-        command['fnc'].apply(command.this, [opts]);
+        command.fnc.apply(command.this, [opts]);
       } else {
         error(command.command + ' have wrong undefined function ' + command._fncName + '() registered!');
       };
@@ -244,7 +260,7 @@ class Parser {
         });
         if (runnedRollback) {
           debug('parser.process', 'Rollbacking ' + r.name);
-          await r['fnc'].apply(r.this, [runnedRollback.opts]);
+          await r.fnc.apply(r.this, [runnedRollback.opts]);
         } else {
           debug('parser.process', 'Rollback skipped for ' + r.name);
         }
@@ -253,5 +269,5 @@ class Parser {
   }
 }
 
-export default Parser
-export { Parser }
+export default Parser;
+export { Parser };

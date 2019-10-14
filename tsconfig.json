@@ -34,7 +34,6 @@
     "test/**/*"
   ],
   "exclude": [
-    "src/bot",
     "node_modules",
     "config.json"
   ]
