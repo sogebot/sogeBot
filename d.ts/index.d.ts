@@ -23,8 +23,6 @@ declare module '*.mp3' {
   export default content;
 }
 
-type Omit<T, K extends keyof any> = Pick<T, Exclude<keyof T, K>>;
-
 declare namespace NodeJS {
   export interface Global {
     linesParsed: number;

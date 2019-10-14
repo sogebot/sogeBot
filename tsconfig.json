@@ -22,7 +22,10 @@
     "baseUrl": "./",
     "paths": {
       "@config": ["config.json", "config.example.json"]
-    }
+    },
+    "outDir": "dest",
+    "rootDir": "src",
+    "sourceMap": true,
   },
   "include": [
     "src/**/*.js",
@@ -33,6 +36,7 @@
     "test/**/*"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "config.json"
   ]
 }

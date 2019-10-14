@@ -124,8 +124,6 @@ import { orderBy } from  'lodash-es'
 import { Validations } from 'vuelidate-property-decorators';
 import { required } from 'vuelidate/lib/validators';
 
-import { Command, Response } from 'src/bot/systems/customCommands.d';
-
 import uuid from 'uuid/v4';
 
 
@@ -154,7 +152,7 @@ export default class CommandsEdit extends Vue {
   orderBy = orderBy;
 
 
-  item: Command & { responses: Response[] } = {
+  item: Types.CustomCommands.Command & { responses: Types.CustomCommands.Response[] } = {
     id: uuid(),
     command: '',
     enabled: true,
@@ -225,7 +223,7 @@ export default class CommandsEdit extends Vue {
     });
 
     if (this.$route.params.id) {
-      this.socket.emit('findOne.command', { where: { id: this.$route.params.id } }, (err, data: Command & { responses: Response[] }) => {
+      this.socket.emit('findOne.command', { where: { id: this.$route.params.id } }, (err, data: Types.CustomCommands.Command & { responses: Types.CustomCommands.Response[] }) => {
         data.command = data.command.replace('!', '');
         console.debug('Loaded', {data})
         // add empty filter if undefined
@@ -309,7 +307,7 @@ export default class CommandsEdit extends Vue {
       this.state.save = this.$state.progress;
       await Promise.all([
         new Promise(resolve => {
-          const command: Command = (({responses, ...keys}) => ({...keys}))(this.item);
+          const command: Types.CustomCommands.Command = (({responses, ...keys}) => ({...keys}))(this.item);
           command.command = '!' + command.command;
           console.debug('Saving command', command);
           this.socket.emit('update', { key: 'id', items: [command] }, (err, data) => {
@@ -321,7 +319,7 @@ export default class CommandsEdit extends Vue {
           });
         }),
         new Promise(resolve => {
-          const responses: Response[] = this.item.responses.map(o => { return { cid: this.item.id, ...o} });
+          const responses: Types.CustomCommands.Response[] = this.item.responses.map(o => { return { cid: this.item.id, ...o} });
           console.debug('Saving responses', responses);
           if (responses.length > 0) {
             this.socket.emit('set', { collection: 'responses', where: { cid: this.item.id }, items: responses }, (err) => {

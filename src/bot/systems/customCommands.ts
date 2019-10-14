@@ -13,7 +13,6 @@ import { getCountOfCommandUsage, incrementCountOfCommandUsage, resetCountOfComma
 import { isMainThread } from 'worker_threads';
 import uuid from 'uuid';
 
-import { Command, Response } from './customCommands.d';
 import { chatOut } from '../helpers/log';
 
 /*
@@ -57,7 +56,7 @@ class CustomCommands extends System {
 
         opts.where = opts.where || {};
 
-        const items: (Command & { responses?: Response[] })[] = await global.db.engine.find(opts.collection, opts.where);
+        const items: (Types.CustomCommands.Command & { responses?: Types.CustomCommands.Response[] })[] = await global.db.engine.find(opts.collection, opts.where);
         for (const i of items) {
           i.count = await getCountOfCommandUsage(i.command);
           i.responses = await global.db.engine.find(this.collection.responses, { cid: i.id });
@@ -76,7 +75,7 @@ class CustomCommands extends System {
 
         opts.where = opts.where || {};
 
-        const item: Command = await global.db.engine.findOne(opts.collection, opts.where);
+        const item: Types.CustomCommands.Command = await global.db.engine.findOne(opts.collection, opts.where);
         item.count = await getCountOfCommandUsage(item.command);
         const responses = await global.db.engine.find(this.collection.responses, { cid: item.id });
         if (_.isFunction(cb)) {
@@ -254,12 +253,12 @@ class CustomCommands extends System {
       return true;
     } // do nothing if it is not a command
     const commands: {
-      command: Command;
+      command: Types.CustomCommands.Command;
       cmdArray: string[];
     }[] = [];
     const cmdArray = opts.message.toLowerCase().split(' ');
     for (let i = 0, len = opts.message.toLowerCase().split(' ').length; i < len; i++) {
-      const db_commands: Command[] = await global.db.engine.find(this.collection.data, { command: cmdArray.join(' '), enabled: true });
+      const db_commands: Types.CustomCommands.Command[] = await global.db.engine.find(this.collection.data, { command: cmdArray.join(' '), enabled: true });
       for (const command of db_commands) {
         commands.push({
           cmdArray: _.cloneDeep(cmdArray),
@@ -275,11 +274,11 @@ class CustomCommands extends System {
     // go through all commands
     let atLeastOnePermissionOk = false;
     for (const command of commands) {
-      const _responses: Response[] = [];
+      const _responses: Types.CustomCommands.Response[] = [];
       // remove found command from message to get param
       const param = opts.message.replace(new RegExp('^(' + command.cmdArray.join(' ') + ')', 'i'), '').trim();
       const count = await incrementCountOfCommandUsage(command.command.command);
-      const responses: Response[] = await global.db.engine.find(this.collection.responses, { cid: command.command.id });
+      const responses: Types.CustomCommands.Response[] = await global.db.engine.find(this.collection.responses, { cid: command.command.id });
       for (const r of _.orderBy(responses, 'order', 'asc')) {
         if ((await global.permissions.check(opts.sender.userId, r.permission)).access
             && await this.checkFilter(opts, r.filter)) {

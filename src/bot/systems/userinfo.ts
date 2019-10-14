@@ -285,7 +285,7 @@ class UserInfo extends System {
         username: opts.sender.username,
         time: { message: new Date().getTime() },
         is: { subscriber: typeof opts.sender.badges.subscriber !== 'undefined' },
-      }, true);
+      });
       global.db.engine.update('users.online', { username: opts.sender.username }, { username: opts.sender.username });
     }
   }

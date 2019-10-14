@@ -86,7 +86,7 @@ class API extends Core {
     bot: new Proxy({}, limitProxy),
     broadcaster: new Proxy({}, limitProxy),
   };
-  rate_limit_follower_check = new Set();
+  rate_limit_follower_check: Set<string> = new Set();
   chatMessagesAtStart = global.linesParsed;
   maxRetries = 3;
   curRetries = 0;
@@ -1653,7 +1653,7 @@ class API extends Core {
       }
       const followedAt = user.lock && user.lock.followed_at ? Number(user.time.follow) : 0;
       const isFollower = user.lock && user.lock.follower ? user.is.follower : false;
-      await global.users.setById(id, { username: user.username, is: { follower: isFollower }, time: { followCheck: new Date().getTime(), follow: followedAt } }, user.is.follower);
+      await global.users.setById(id, { username: user.username, is: { follower: isFollower }, time: { followCheck: new Date().getTime(), follow: followedAt } });
       return { isFollower: false, followedAt: null };
     } else {
       // is follower
@@ -1682,7 +1682,7 @@ class API extends Core {
       }
       const followedAt = user.lock && user.lock.followed_at ? Number(user.time.follow) : parseInt(moment(request.data.data[0].followed_at).format('x'), 10);
       const isFollower = user.lock && user.lock.follower ? user.is.follower : true;
-      await global.users.set(user.username, { id, is: { follower: isFollower }, time: { followCheck: new Date().getTime(), follow: followedAt } }, !user.is.follower);
+      await global.users.set(user.username, { id, is: { follower: isFollower }, time: { followCheck: new Date().getTime(), follow: followedAt } });
       return { isFollower, followedAt };
     }
   }
