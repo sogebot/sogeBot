@@ -120,7 +120,7 @@
       </div>
 
       <div class="row">
-        <div class="col-6 col-sm-4 col-md-4 col-lg-4 stream-info" @click="showGameAndTitleDlg">
+        <div class="col-12 col-sm-12 col-md-4 col-lg-4 stream-info" @click="showGameAndTitleDlg">
           <h2>
             <span>{{ translate('game') }}</span>
             <small>{{ translate('click-to-change') }}</small>
