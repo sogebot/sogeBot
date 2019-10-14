@@ -1,0 +1,11 @@
+on:
+  push:
+  pull_request:
+
+jobs:
+  eslint:
+    name: eslint
+    runs-on: ubuntu-latest
+    steps:
+    - name: ESLint checks
+      uses: gimenete/eslint-action@1.0
