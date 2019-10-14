@@ -23,18 +23,14 @@
     "paths": {
       "@config": ["config.json", "config.example.json"]
     },
+    "outDir": "../../dest",
     "sourceMap": true,
   },
   "include": [
-    "src/**/*.js",
-    "src/**/*.ts",
-    "src/**/*.vue",
-    "d.ts/*",
-    "tools/*",
-    "test/**/*"
+    "**/*.js",
+    "**/*.ts",
+    "../../d.ts/*",
   ],
   "exclude": [
-    "node_modules",
-    "config.json"
   ]
 }
