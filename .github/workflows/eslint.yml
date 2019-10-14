@@ -1,11 +1,19 @@
 on:
   push:
-  pull_request:
 
 jobs:
   eslint:
     name: eslint
     runs-on: ubuntu-latest
     steps:
+    - uses: actions/checkout@master
+    - name: install node v12
+      uses: actions/setup-node@v1
+      with:
+        node-version: 12
+    - name: Install eslint and dependencies
+      run: npm install typescript eslint @typescript-eslint/parser @typescript-eslint/eslint-plugin --only=dev
     - name: ESLint checks
-      uses: gimenete/eslint-action@1.0
+      uses: docker://rkusa/eslint-action:latest
+      env:
+        GITHUB_TOKEN: ${{ secrets.github_token }}
