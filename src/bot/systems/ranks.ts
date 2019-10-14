@@ -7,6 +7,7 @@ import { command, default_permission } from '../decorators';
 import { permission } from '../permissions';
 import System from './_interface';
 import { isMainThread } from 'worker_threads';
+import uuid from 'uuid';
 
 /*
  * !rank                       - show user rank
@@ -25,7 +26,7 @@ class Ranks extends System {
       global.db.engine.index(this.collection.data, [{ index: 'hours' }]);
     }
 
-    this.addMenu({ category: 'manage', name: 'ranks', id: 'ranks/list' });
+    this.addMenu({ category: 'manage', name: 'ranks', id: 'manage/ranks/list' });
   }
 
   @command('!rank add')
@@ -40,6 +41,7 @@ class Ranks extends System {
     }
 
     const values = {
+      id: uuid(),
       hours: parseInt(parsed[1], 10),
       value: parsed[2],
     };

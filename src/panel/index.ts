@@ -155,6 +155,8 @@ const main = async () => {
       { path: '/manage/price/edit/:id?', name: 'PriceManagerEdit', component: () => import('./views/managers/price/price-edit.vue') },
       { path: '/manage/quotes/list', name: 'QuotesManagerList', component: () => import('./views/managers/quotes/quotes-list.vue') },
       { path: '/manage/quotes/edit/:id?', name: 'QuotesManagerEdit', component: () => import('./views/managers/quotes/quotes-edit.vue') },
+      { path: '/manage/ranks/list', name: 'ranksManagerList', component: () => import('./views/managers/ranks/ranks-list.vue') },
+      { path: '/manage/ranks/edit/:id?', name: 'ranksManagerEdit', component: () => import('./views/managers/ranks/ranks-edit.vue') },
       { path: '/manage/timers/list', name: 'TimersManagerList', component: () => import('./views/managers/timers/timers-list.vue') },
       { path: '/manage/timers/edit/:id?', name: 'TimersManagerEdit', component: () => import('./views/managers/timers/timers-edit.vue') },
 

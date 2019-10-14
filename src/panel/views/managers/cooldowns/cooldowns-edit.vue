@@ -197,7 +197,7 @@ export default class cooldownEdit extends Vue {
       if (err) {
         return console.error(err);
       }
-      this.$router.push({ name: 'cooldownManagerList ' })
+      this.$router.push({ name: 'cooldownManagerList' })
     })
   }
 
