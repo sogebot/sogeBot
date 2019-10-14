@@ -91,63 +91,123 @@ export default class AlertsOverlay extends Vue {
     })
 
     this.interval.push(setInterval(() => {
-      if (!this.isPlaying) {
-        this.isPlaying = this.getCurrentAlertList() !== null
-      } else {
-        for (let a of this.getCurrentAlertList()) {
-          if (a.run) continue
+      try {
+        if (!this.isPlaying) {
+          this.isPlaying = this.getCurrentAlertList() !== null
+        } else {
+          for (let a of this.getCurrentAlertList()) {
+            if (a.run) continue
 
-          a.delay = Number(a.delay)
-          if (isNaN(a.delay)) a.delay = 0
-          if (a.receivedAt + a.delay < Date.now()) a.run = true
-          else continue
+            a.delay = Number(a.delay)
+            if (isNaN(a.delay)) a.delay = 0
+            if (a.receivedAt + a.delay < Date.now()) a.run = true
+            else continue
 
-          if (a.type === 'audio') {
-            if (!a.url) {
-              a.finished = true
-              continue
-            }
-            const audio = this.$refs.audio as HTMLMediaElement[]
-            if (audio) {
-              for (let el of audio) {
-                if (el.src === a.url) {
-                  if (a.volume) el.volume = Number(a.volume) / 100
-                  if (!el.error) {
-                    el.onended = () => a.finished = true
-                    el.play()
-                  } else {
-                    a.finished = true
-                    console.error('Something went wrong with your audio file')
+            if (a.type === 'audio') {
+              if (!a.url) {
+                a.finished = true
+                continue
+              }
+              const audio = this.$refs.audio as HTMLMediaElement[]
+              if (audio) {
+                for (let el of audio) {
+                  if (el.src === a.url) {
+                    if (a.volume) el.volume = Number(a.volume) / 100
+                    if (!el.error) {
+                      el.onended = () => a.finished = true
+                      console.log('playing')
+                      el.play().catch((err) => {
+                        if (err) {
+                          console.error('Something went wrong with your audio file')
+                          console.error(err.message);
+                          if ((a.url.startsWith('https://') && window.location.protocol.startsWith('http:'))
+                              || (a.url.startsWith('http://') && window.location.protocol.startsWith('https:'))) {
+                            console.error('You are using mixed content https + http')
+                          }
+                          a.finished = true;
+                        }
+                      })
+                      //el.play()
+                    } else {
+                      a.finished = true
+                      console.error('Something went wrong with your audio file')
+                    }
                   }
                 }
+              } else {
+                a.run = false // we need to repeat if audio was not loaded yet
               }
-            } else {
-              a.run = false // we need to repeat if audio was not loaded yet
             }
-          }
 
-          if (a.type === 'video' || a.type === 'clip') {
-            if (!a.url) {
-              a.finished = true
-              continue
-            }
-            const video = this.$refs.video as HTMLMediaElement[]
-            if (video) {
-              for (let el of video) {
-                if (el.dataset.src === a.url) {
-                  if (typeof a.size === 'undefined') a.size = '100%'
-                  if (!el.error) {
-                    el.onended = () => {
-                      a.leaveAnimation = true // trigger leave animation
-                      setTimeout(() => a.finished = true, Number(a.duration || 1000)) // trigger finished
-                    }
-                    setTimeout(() => {
-                      // run even if oncanplaythrough wasn't triggered
-                      if (!a.canBePlayed) {
+            if (a.type === 'video' || a.type === 'clip') {
+              if (!a.url) {
+                a.finished = true
+                continue
+              }
+              const video = this.$refs.video as HTMLMediaElement[]
+              if (video) {
+                for (let el of video) {
+                  if (el.dataset.src === a.url) {
+                    if (typeof a.size === 'undefined') a.size = '100%'
+                    if (!el.error) {
+                      el.onended = () => {
+                        a.leaveAnimation = true // trigger leave animation
+                        setTimeout(() => a.finished = true, Number(a.duration || 1000)) // trigger finished
+                      }
+                      setTimeout(() => {
+                        // run even if oncanplaythrough wasn't triggered
+                        if (!a.canBePlayed) {
+                          if (!a.thumbnail) {
+                            a.thumbnail = true
+                            el.volume = 0
+                            el.play().catch((err) => {
+                              if (err) {
+                                console.error('Something went wrong with your video file')
+                                console.error(err.message);
+                                if ((a.url.startsWith('https://') && window.location.protocol.startsWith('http:'))
+                                    || (a.url.startsWith('http://') && window.location.protocol.startsWith('https:'))) {
+                                  console.error('You are using mixed content https + http')
+                                }
+                                a.finished = true;
+                              }
+                            })
+                            setTimeout(() => {
+                              el.pause()
+                              setTimeout(() => {
+                                if (a.volume) el.volume = Number(a.volume) / 100
+                                a.isLoaded = true
+                                el.play().catch((err) => {
+                                  if (err) {
+                                    console.error('Something went wrong with your video file')
+                                    console.error(err.message);
+                                    if ((a.url.startsWith('https://') && window.location.protocol.startsWith('http:'))
+                                        || (a.url.startsWith('http://') && window.location.protocol.startsWith('https:'))) {
+                                      console.error('You are using mixed content https + http')
+                                    }
+                                    a.finished = true;
+                                  }
+                                })
+                              }, 1000)
+                            }, 100)
+                          }
+                        }
+                      }, 5000)
+                      el.oncanplaythrough = () => {
+                        a.canBePlayed = true
                         if (!a.thumbnail) {
                           a.thumbnail = true
                           el.volume = 0
-                          el.play()
+                          el.play().catch((err) => {
+                            if (err) {
+                              console.error('Something went wrong with your video file')
+                              console.error(err.message);
+                              if ((a.url.startsWith('https://') && window.location.protocol.startsWith('http:'))
+                                  || (a.url.startsWith('http://') && window.location.protocol.startsWith('https:'))) {
+                                console.error('You are using mixed content https + http')
+                              }
+                              a.finished = true;
+                            }
+                          })
                           setTimeout(() => {
                             el.pause()
                             setTimeout(() => {
@@ -158,41 +218,27 @@ export default class AlertsOverlay extends Vue {
                           }, 100)
                         }
                       }
-                    }, 5000)
-                    el.oncanplaythrough = () => {
-                      a.canBePlayed = true
-                      if (!a.thumbnail) {
-                        a.thumbnail = true
-                        el.volume = 0
-                        el.play()
-                        setTimeout(() => {
-                          el.pause()
-                          setTimeout(() => {
-                            if (a.volume) el.volume = Number(a.volume) / 100
-                            a.isLoaded = true
-                            el.play()
-                          }, 1000)
-                        }, 100)
-                      }
+                    } else {
+                      a.leaveAnimation = true // trigger leave animation
+                      a.finished = true
+                      console.error('Something went wrong with your video file')
                     }
-                  } else {
-                    a.leaveAnimation = true // trigger leave animation
-                    a.finished = true
-                    console.error('Something went wrong with your video file')
                   }
                 }
+              } else {
+                a.run = false // we need to repeat if audio was not loaded yet
               }
-            } else {
-              a.run = false // we need to repeat if audio was not loaded yet
             }
-          }
 
-          if (!a.finished && !['audio', 'video', 'clip'].includes(a.type)) {
-            setTimeout(() => a.leaveAnimation = true, Number(a.duration || 1000) + Number(a.time||1000)) // trigger leave animation
-            setTimeout(() => a.finished = true, Number(a.duration || 1000) + Number(a.duration || 1000) + Number(a.time||1000)) // trigger finished
-          }
+            if (!a.finished && !['audio', 'video', 'clip'].includes(a.type)) {
+              setTimeout(() => a.leaveAnimation = true, Number(a.duration || 1000) + Number(a.time||1000)) // trigger leave animation
+              setTimeout(() => a.finished = true, Number(a.duration || 1000) + Number(a.duration || 1000) + Number(a.time||1000)) // trigger finished
+            }
 
+          }
         }
+      } catch (e) {
+        console.error(e)
       }
     }, 100));
   }
