@@ -9,6 +9,7 @@ import * as Parser from '../parser';
 import { permission } from '../permissions';
 import System from './_interface';
 import { isMainThread } from 'worker_threads';
+import uuid from 'uuid';
 
 /*
  * !cooldown [keyword|!command] [global|user] [seconds] [true/false] - set cooldown for keyword or !command - 0 for disable, true/false set quiet mode
@@ -30,11 +31,11 @@ class Cooldown extends System {
     super();
 
     if(isMainThread) {
-      global.db.engine.index(this.collection.data, [{ index: 'key' }]);
+      global.db.engine.index(this.collection.data, [{ index: 'key' }, { index: 'id', unique: true }]);
       global.db.engine.index(this.collection.viewers, [{ index: 'username' }]);
     }
 
-    this.addMenu({ category: 'manage', name: 'cooldown', id: 'cooldown/list' });
+    this.addMenu({ category: 'manage', name: 'cooldown', id: 'manage/cooldowns/list' });
   }
 
   @command('!cooldown')
@@ -57,9 +58,9 @@ class Cooldown extends System {
 
     const cooldown = await global.db.engine.findOne(this.collection.data, { key: match.command, type: match.type });
     if (_.isEmpty(cooldown)) {
-      await global.db.engine.update(this.collection.data, { key: match.command, type: match.type }, { miliseconds: parseInt(match.seconds, 10) * 1000, type: match.type, timestamp: 0, quiet: _.isNil(match.quiet) ? false : match.quiet, enabled: true, owner: false, moderator: false, subscriber: true, follower: true });
+      await global.db.engine.update(this.collection.data, { key: match.command, type: match.type }, { id: uuid(), miliseconds: parseInt(match.seconds, 10) * 1000, type: match.type, timestamp: 0, quiet: _.isNil(match.quiet) ? false : match.quiet, enabled: true, owner: false, moderator: false, subscriber: true, follower: true });
     } else {
-      await global.db.engine.update(this.collection.data, { key: match.command, type: match.type }, { miliseconds: parseInt(match.seconds, 10) * 1000 });
+      await global.db.engine.update(this.collection.data, { key: match.command, type: match.type }, { id: uuid(), miliseconds: parseInt(match.seconds, 10) * 1000 });
     }
 
     const message = await prepare('cooldowns.cooldown-was-set', { seconds: match.seconds, type: match.type, command: match.command });
@@ -126,6 +127,7 @@ class Cooldown extends System {
         const cooldown = _.find(cooldowns, (o) => o.key.toLowerCase() === keyword.keyword.toLowerCase());
         if (keyword.enabled && !_.isEmpty(cooldown)) {
           data.push({
+            id: cooldown.id,
             key: cooldown.key,
             miliseconds: cooldown.miliseconds,
             type: cooldown.type,
