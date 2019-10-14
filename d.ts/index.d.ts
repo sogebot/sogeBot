@@ -111,7 +111,7 @@ declare namespace NodeJS {
       top: import('../src/bot/systems/top').Top;
       userinfo: import('../src/bot/systems/userinfo').UserInfo;
     };
-    users: import('../src/bot/webhooks').Users;
+    users: import('../src/bot/users').Users;
     lib: any;
     twitch: import('../src/bot/twitch').Twitch;
     workers: import('../src/bot/workers').Workers;
