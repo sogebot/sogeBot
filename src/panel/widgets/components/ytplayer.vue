@@ -177,7 +177,8 @@ export default {
         })
       } catch (e) {
         return setTimeout(() => {
-          console.log('retrying playThisSong')
+          console.log('Retrying playThisSong')
+          console.log('If song si not playing and you are on Chrome, disable adblockers or popup blockers - https://github.com/sampotts/plyr/issues/1538')
           this.playThisSong(item, retry++); //retry after while
         }, 1000)
       }
