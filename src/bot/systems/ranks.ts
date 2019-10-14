@@ -7,7 +7,7 @@ import { command, default_permission } from '../decorators';
 import { permission } from '../permissions';
 import System from './_interface';
 import { isMainThread } from 'worker_threads';
-import uuid = require('uuid');
+import uuid from 'uuid';
 
 /*
  * !rank                       - show user rank
