@@ -27,6 +27,19 @@ const end = function (updated) {
 };
 
 const migration = {
+  19: async () => {
+    header('Add id for ranks');
+    let updated = 0;
+
+    const items = await global.db.engine.find('systems.ranks');
+    for (const item of items) {
+      const id = uuidv4();
+
+      await global.db.engine.update('systems.ranks', { _id: String(item._id) }, { id });
+      updated++;
+    }
+    end(updated);
+  },
   18: async () => {
     header('Add id for cooldown');
     let updated = 0;

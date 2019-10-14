@@ -5,10 +5,10 @@
         <span class="title text-default mb-2">
           {{ translate('menu.manage') }}
           <small><fa icon="angle-right"/></small>
-          {{ translate('menu.alias') }}
+          {{ translate('menu.ranks') }}
           <template v-if="$route.params.id">
             <small><fa icon="angle-right"/></small>
-            {{item.alias}}
+            {{item.value}}
             <small class="text-muted text-monospace" style="font-size:0.7rem">{{$route.params.id}}</small>
           </template>
         </span>
@@ -17,31 +17,11 @@
 
     <panel>
       <template v-slot:left>
-        <button-with-icon class="btn-secondary btn-reverse" icon="caret-left" href="#/manage/alias/list">{{translate('commons.back')}}</button-with-icon>
+        <button-with-icon class="btn-secondary btn-reverse" icon="caret-left" href="#/manage/ranks/list">{{translate('commons.back')}}</button-with-icon>
         <hold-button :if="$route.params.id || null" @trigger="del()" icon="trash" class="btn-danger">
           <template slot="title">{{translate('dialog.buttons.delete')}}</template>
           <template slot="onHoldTitle">{{translate('dialog.buttons.hold-to-delete')}}</template>
         </hold-button>
-        <button-with-icon :class="[ item.enabled ? 'btn-success' : 'btn-danger' ]" class="btn-reverse" icon="power-off" @click="item.enabled = !item.enabled">
-          {{ translate('dialog.buttons.' + (item.enabled? 'enabled' : 'disabled')) }}
-        </button-with-icon>
-        <button-with-icon :class="[ item.visible ? 'btn-success' : 'btn-danger' ]" class="btn-reverse" :icon="item.visible ? 'eye' : 'eye-slash'" @click="item.visible = !item.visible">
-          {{ translate((item.visible? 'visible' : 'hidden')) | capitalize }}
-        </button-with-icon>
-        <b-dropdown no-caret class="alias-edit-btn">
-          <template v-slot:button-content>
-            <span class="dropdown-icon">
-              <fa icon="key" fixed-width/>
-            </span>
-            {{ getPermissionName(item.permission) }}
-          </template>
-          <b-dropdown-item
-            v-for="permission of permissions"
-            :key="permission.id"
-            @click="item.permission = permission.id">
-            {{ permission.name }}
-          </b-dropdown-item>
-        </b-dropdown>
       </template>
       <template v-slot:right>
         <b-alert show variant="info" v-if="state.pending" v-html="translate('dialog.changesPending')" class="mr-2 p-2 mb-0"></b-alert>
@@ -52,29 +32,36 @@
     <loading v-if="state.loading === 1"/>
     <b-form v-else>
       <b-form-group
-        :label="translate('systems.alias.alias.name')"
+        :label="translate('rank')"
         label-for="name"
       >
         <b-input-group>
           <b-form-input
             id="name"
-            v-model="item.alias"
+            v-model="item.value"
             type="text"
-            :placeholder="translate('systems.alias.alias.placeholder')"
-            @input="$v.item.alias.$touch()"
-            :state="$v.item.alias.$invalid && $v.item.alias.$dirty ? false : null"
+            @input="$v.item.value.$touch()"
+            :state="$v.item.value.$invalid && $v.item.value.$dirty ? false : null"
           ></b-form-input>
         </b-input-group>
-        <b-form-invalid-feedback :state="!($v.item.alias.$invalid && $v.item.alias.$dirty)">{{ translate('dialog.errors.required') }}</b-form-invalid-feedback>
+        <b-form-invalid-feedback :state="!($v.item.value.$invalid && $v.item.value.$dirty)">{{ translate('dialog.errors.required') }}</b-form-invalid-feedback>
       </b-form-group>
 
-      <b-form-group>
-        <label>{{ translate('systems.alias.command.name') }}</label>
-        <textarea-with-tags
-          :value.sync="item.command"
-          v-bind:placeholder="translate('systems.alias.command.placeholder')"
-          v-bind:filters="['global', 'sender', 'param', '!param', 'touser']"
-          v-on:update="item.command = $event"></textarea-with-tags>
+      <b-form-group
+        :label="translate('hours')"
+        label-for="name"
+      >
+        <b-input-group>
+          <b-form-input
+            id="name"
+            v-model.number="item.hours"
+            type="number"
+            min="0"
+            @input="$v.item.hours.$touch()"
+            :state="$v.item.hours.$invalid && $v.item.hours.$dirty ? false : null"
+          ></b-form-input>
+        </b-input-group>
+        <b-form-invalid-feedback :state="!($v.item.hours.$invalid && $v.item.hours.$dirty)">{{ translate('dialog.errors.minValue').replace('$value', 0) }}</b-form-invalid-feedback>
       </b-form-group>
     </b-form>
   </b-container>
@@ -82,17 +69,11 @@
 <script lang="ts">
 import { Vue, Component, Watch } from 'vue-property-decorator';
 import { getSocket } from 'src/panel/helpers/socket';
-import { permission } from 'src/bot/helpers/permissions'
 
 import { Validations } from 'vuelidate-property-decorators';
-import { required } from 'vuelidate/lib/validators'
-import { orderBy } from 'lodash-es'
+import { required, minValue } from 'vuelidate/lib/validators'
 
 import uuid from 'uuid/v4';
-
-import { library } from '@fortawesome/fontawesome-svg-core';
-import { faKey } from '@fortawesome/free-solid-svg-icons';
-library.add(faKey);
 
 Component.registerHooks([
   'beforeRouteEnter',
@@ -112,9 +93,8 @@ Component.registerHooks([
     }
   }
 })
-export default class aliasEdit extends Vue {
-  psocket = getSocket('/core/permissions')
-  socket = getSocket('/systems/alias');
+export default class ranksEdit extends Vue {
+  socket = getSocket('/systems/ranks');
 
   state: {
     loading: number;
@@ -128,21 +108,18 @@ export default class aliasEdit extends Vue {
 
   permissions: Permissions.Item[] = [];
 
-  item: Types.Alias.Item = {
+  item: Types.Ranks.Item = {
     id: uuid(),
-    alias: '',
-    command: '',
-    enabled: true,
-    visible: true,
-    permission: permission.VIEWERS,
+    hours: 0,
+    value: '',
   }
 
 
   @Validations()
   validations = {
     item: {
-      alias: {required},
-      command: {required},
+      value: {required},
+      hours: {required, minValue: minValue(0)},
     }
   }
 
@@ -154,19 +131,9 @@ export default class aliasEdit extends Vue {
   }
 
   async mounted() {
-    await new Promise((resolve, reject) => {
-      this.psocket.emit('find', {}, (err, data) => {
-      if (err) {
-        reject(err)
-      }
-      this.permissions = orderBy(data, 'order', 'asc');
-      resolve()
-      })
-    })
-
     if (this.$route.params.id) {
       await new Promise((resolve, reject) => {
-        this.socket.emit('findOne', { where: { id: this.$route.params.id } }, (err, data: Types.Alias.Item) => {
+        this.socket.emit('findOne', { where: { id: this.$route.params.id } }, (err, data: Types.Ranks.Item) => {
           if (err) {
             reject(err)
           }
@@ -187,7 +154,7 @@ export default class aliasEdit extends Vue {
       if (err) {
         return console.error(err);
       }
-      this.$router.push({ name: 'aliasManagerList' })
+      this.$router.push({ name: 'ranksManagerList' })
     })
   }
 
@@ -221,7 +188,7 @@ export default class aliasEdit extends Vue {
 
         this.state.save = this.$state.success;
         this.state.pending = false;
-        this.$router.push({ name: 'aliasManagerEdit', params: { id: String(data.id) } })
+        this.$router.push({ name: 'ranksManagerEdit', params: { id: String(data.id) } })
         setTimeout(() => {
           this.state.save = this.$state.idle;
         }, 1000)
@@ -256,14 +223,3 @@ export default class aliasEdit extends Vue {
   }
 }
 </script>
-
-<style>
-.alias-edit-btn button {
-  padding-left: 0 !important;
-}
-
-.alias-edit-btn button .dropdown-icon {
-  background: rgba(0,0,0,0.15);
-  padding: 0.5rem 0.4rem;
-}
-</style>

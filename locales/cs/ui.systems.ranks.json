@@ -1,5 +1,7 @@
 {
   "new": "Nová Hodnost",
+  "empty": "Žádná hodnost nebyl vytvořen.",
+  "emptyAfterSearch": "Žádná hodnost nebyla nalezen pro tvé hledání <strong>\"$search\"</strong>.",
   "rank": {
     "name": "hodnost",
     "placeholder": ""
