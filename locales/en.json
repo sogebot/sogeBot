@@ -756,6 +756,7 @@
     "emote-explosion": "emote explosion",
     "emote-firework": "emote firework",
     "quiet": "quiet",
+    "noisy": "noisy",
     "true": "true",
     "false": "false",
     "light": "light theme",

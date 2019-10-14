@@ -686,8 +686,8 @@ span.queue-list-group-item {
   width: auto;
 }
 
-label {
-  font-size: 20px;
+label, legend {
+  font-size: 1rem !important;
   color:$gray-800;
   font-variant: small-caps;
   text-transform: lowercase;

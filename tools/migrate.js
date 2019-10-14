@@ -27,6 +27,19 @@ const end = function (updated) {
 };
 
 const migration = {
+  18: async () => {
+    header('Add id for cooldown');
+    let updated = 0;
+
+    const items = await global.db.engine.find('systems.cooldown');
+    for (const item of items) {
+      const id = uuidv4();
+
+      await global.db.engine.update('systems.cooldown', { _id: String(item._id) }, { id });
+      updated++;
+    }
+    end(updated);
+  },
   17: async () => {
     header('Add id for price');
     let updated = 0;
