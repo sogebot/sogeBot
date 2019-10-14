@@ -39,7 +39,7 @@ jsdist:
 
 bot:
 	@echo -ne "\n\t ----- Building bot\n"
-	@npx tsc
+	@npx tsc -p src/bot
 
 release:
 	ENV version=${VERSION} node tools/release.js
