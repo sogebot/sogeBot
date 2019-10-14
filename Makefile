@@ -42,6 +42,7 @@ bot:
 	@npx tsc -p src/bot
 
 release:
+	@cp ./src/bot/data/config.example.json ./
 	ENV version=${VERSION} node tools/release.js
 
 pack:

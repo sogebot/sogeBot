@@ -1,17 +1,20 @@
-'use strict';
-
-const _ = require('lodash');
-
-const constants = require('./constants');
+import _ from 'lodash';
+import * as constants from './constants';
 import { sendMessage } from './commons';
 import { debug, error } from './helpers/log';
 import { incrementCountOfCommandUsage } from './helpers/commands/count';
 
 class Parser {
-  constructor (opts) {
-    opts = opts || {};
+  started_at = Date.now();
+  message = '';
+  sender: Sender | null = null;
+  skip = false;
+  quiet = false;
+  successfullParserRuns: any[] = []
+  isCommand = false;
+  list: any = [];
 
-    this.started_at = new Date().getTime();
+  constructor (opts: any = {}) {
     this.message = opts.message || '';
     this.sender = opts.sender || null;
     this.skip = opts.skip || false;
@@ -23,7 +26,7 @@ class Parser {
   }
 
   time () {
-    return parseInt(new Date().getTime(), 10) - parseInt(this.started_at, 10);
+    return Date.now() - this.started_at;
   }
 
   async isModerated () {
@@ -126,7 +129,7 @@ class Parser {
    * @returns object or empty list
    */
   async parsers () {
-    let parsers = [];
+    let parsers: any[] = [];
     for (let i = 0, length = this.list.length; i < length; i++) {
       if (_.isFunction(this.list[i].parsers)) {
         parsers.push(this.list[i].parsers());
@@ -142,7 +145,7 @@ class Parser {
    * @returns object or empty list
    */
   async rollbacks () {
-    let rollbacks = [];
+    let rollbacks: any[] = [];
     for (let i = 0, length = this.list.length; i < length; i++) {
       if (_.isFunction(this.list[i].rollbacks)) {
         rollbacks.push(this.list[i].rollbacks());
@@ -155,12 +158,14 @@ class Parser {
    * Find first command called by message
    * @constructor
    * @param {string} message - Message from chat
-   * @param {string} cmdlist - Set of commands to check, if null all registered commands are checked
+   * @param {string[] | null} cmdlist - Set of commands to check, if null all registered commands are checked
    * @returns object or null if empty
    */
-  async find (message, cmdlist) {
+  async find (message, cmdlist: {
+    this: any; fnc: Function; command: string; id: string; permission: string | null; _fncName: string;
+  }[] | null = null) {
     debug('parser.find', JSON.stringify({message, cmdlist}));
-    if (!cmdlist) {
+    if (cmdlist === null) {
       cmdlist = await this.getCommandsList();
     }
     for (let item of cmdlist) {
@@ -181,7 +186,7 @@ class Parser {
   }
 
   async getCommandsList () {
-    let commands = [];
+    let commands: any[] = [];
     for (let i = 0, length = this.list.length; i < length; i++) {
       if (_.isFunction(this.list[i].commands)) {
         commands.push(this.list[i].commands());
@@ -197,7 +202,7 @@ class Parser {
 
   async command (sender, message) {
     if (!message.startsWith('!')) {return;}; // do nothing, this is not a command or user is ignored
-    let command = await this.find(message);
+    let command = await this.find(message, null);
     if (_.isNil(command)) {return;}; // command not found, do nothing
     if (command.permission === null) {return;}; // command is disabled
     if (
@@ -248,4 +253,5 @@ class Parser {
   }
 }
 
-module.exports = Parser;
+export default Parser
+export { Parser }

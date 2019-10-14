@@ -3,7 +3,7 @@ import axios from 'axios';
 import { cloneDeep, defaults, filter, get, isEmpty, isNil, set } from 'lodash';
 import { setTimeout } from 'timers';
 
-import * as  constants from './constants';
+import * as constants from './constants';
 import Core from './_interface';
 import * as commons from './commons';
 import { debug, error, isDebugEnabled } from './helpers/log';

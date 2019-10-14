@@ -371,7 +371,7 @@ class Points extends System {
   @default_permission(permission.CASTERS)
   async rain (opts: CommandOptions) {
     try {
-      const points = new Expects(opts.parameters).points({ all: false }).toArray();
+      const points = new Expects(opts.parameters).points({ all: false }).toArray()[0];
 
       for (const username of (await global.users.getAllOnlineUsernames())) {
         if (isBot(username)) {

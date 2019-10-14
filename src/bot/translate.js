@@ -20,10 +20,10 @@ config.metrics = config.metrics || {}
 config.metrics.translations = typeof config.metrics.translations === 'undefined' ? true : config.metrics.translations
 
 class Translate {
-  custom: Array<Object> = [];
-  translations: Object = {};
-  initialMetricsSent: boolean = false;
-  mSentMetrics: Array<String> = [];
+  custom = [];
+  translations = {};
+  initialMetricsSent = false;
+  mSentMetrics = [];
 
   constructor () {
     if (isMainThread) global.panel.addMenu({ category: 'settings', name: 'translations', id: 'settings/translations' })
@@ -94,7 +94,7 @@ class Translate {
     }
   }
 
-  addMetrics (key: String | Object, ui: Boolean) {
+  addMetrics (key, ui) {
     const version = _.get(process, 'env.npm_package_version', 'n/a')
     if (typeof key === 'object' || version === 'n/a') return // skip objects (returning more than one key)
     if (!isMainThread) {
@@ -122,7 +122,7 @@ class Translate {
     }
   }
 
-  translate (text: string | Object, orig: boolean) {
+  translate (text, orig) {
     const self = global.lib.translate
 
     if (config.metrics.translations) self.addMetrics(text, false)
@@ -136,7 +136,7 @@ class Translate {
     return null
   }
 
-  get (text: string | Object, orig: boolean) {
+  get (text, orig) {
     try {
       const self = global.lib.translate
       var translated

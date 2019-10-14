@@ -8,7 +8,7 @@ import Core from './_interface';
 import { flatten } from './helpers/flatten';
 import { getLocalizedName, getOwner, isBot, isBroadcaster, isModerator, isOwner, isSubscriber, isVIP, prepare, sendMessage } from './commons';
 import Message from './message';
-import * as Parser from './parser';
+import Parser from './parser';
 import { generateUsername } from './helpers/generateUsername';
 import { error, info, warning } from './helpers/log';
 
@@ -244,7 +244,7 @@ class Events extends Core {
     command = await new Message(command).parse({ username: getOwner() });
 
     if (global.mocha) {
-      const parse = new Parser.default({
+      const parse = new Parser({
         sender: { username: getOwner() },
         message: command,
         skip: true,

@@ -5,7 +5,7 @@ import safeEval from 'safe-eval';
 import { command, default_permission, helper } from '../decorators';
 import { permission } from '../permissions';
 import System from './_interface';
-import constants from '../constants';
+import * as constants from '../constants';
 import { parser } from '../decorators';
 import Expects from '../expects';
 import { getOwner, isBot, isBroadcaster, isModerator, isOwner, isSubscriber, isVIP, message, prepare, sendMessage } from '../commons';

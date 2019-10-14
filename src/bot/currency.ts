@@ -9,7 +9,7 @@ import _ from 'lodash';
 import { isMainThread } from 'worker_threads';
 
 import Core from './_interface';
-import constants from './constants';
+import * as constants from './constants';
 import { settings, shared, ui } from './decorators';
 import { error, info, warning } from './helpers/log';
 

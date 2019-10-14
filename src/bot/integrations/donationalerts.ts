@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import chalk from 'chalk';
-import constants from '../constants.js';
+import * as constants from '../constants.js';
 import { isMainThread } from 'worker_threads';
 
 import Integration from './_interface';

@@ -6,7 +6,6 @@ import { isMainThread } from 'worker_threads';
 import { flatten, unflatten } from './helpers/flatten';
 import { loadingInProgress, permissions as permissionsList } from './decorators';
 import { getFunctionList } from './decorators/on';
-import * as Parser from './parser';
 import { permission } from './permissions';
 import { error, info, warning } from './helpers/log';
 

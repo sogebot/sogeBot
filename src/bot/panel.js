@@ -437,7 +437,7 @@ function Panel () {
     })
 
     socket.on('parser.isRegistered', function (data) {
-      socket.emit(data.emit, { isRegistered: new Parser.default().find(data.command) })
+      socket.emit(data.emit, { isRegistered: new Parser().find(data.command) })
     })
 
     socket.on('menu', (cb) => {

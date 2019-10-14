@@ -25,7 +25,7 @@ class CustomVariables {
     }
   }
 
-  async getURL(req: Request, res: Response) {
+  async getURL(req, res) {
     try {
       const variable = (await global.db.engine.find('custom.variables'))
         .find(variable => {
@@ -46,7 +46,7 @@ class CustomVariables {
     }
   }
 
-  async postURL(req: Request, res: Response) {
+  async postURL(req, res) {
     try {
       const variable = (await global.db.engine.find('custom.variables'))
         .find(variable => {

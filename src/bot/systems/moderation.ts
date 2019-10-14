@@ -3,7 +3,7 @@ import * as _ from 'lodash';
 import XRegExp from 'xregexp';
 import emojiRegex from 'emoji-regex';
 
-import constants from '../constants';
+import * as constants from '../constants';
 import { permission } from '../permissions';
 import { command, default_permission, parser, permission_settings, settings } from '../decorators';
 import Message from '../message';

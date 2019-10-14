@@ -13,15 +13,15 @@
     "noUnusedLocals": true,
     "moduleResolution": "node",
     "lib": ["es2018", "dom"],
-    "declaration": false,
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "noResolve": false,
-    "baseUrl": "./",
+    "allowJs": true, /* REMOVE when jsfiles are gone */
+    "baseUrl": "src/bot",
     "paths": {
-      "@config": ["config.json", "config.example.json"]
+      "@config": ["../../config.json", "../../data/config.example.json"]
     },
     "outDir": "../../dest",
     "sourceMap": true,
@@ -29,6 +29,7 @@
   "include": [
     "**/*.js",
     "**/*.ts",
+    "../../d.ts/types.d.ts",
     "../../d.ts/*",
   ],
   "exclude": [
