@@ -1,6 +1,6 @@
 # SogeBot
 [![Discord](https://img.shields.io/discord/317348946144002050.svg?style=flat-square)](https://discordapp.com/invite/52KpmuH)
-[![Build Status](https://github.com/sogehige/sogebot/workflows/.github/workflows/testsl/badge.svg)](https://github.com/sogehige/sogeBot/actions)
+[![Build Status](https://github.com/sogehige/sogebot/workflows/Tests/badge.svg)](https://github.com/sogehige/sogeBot/actions)
 [![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat-square)](http://standardjs.com/)
 [![GitHub release](https://img.shields.io/github/release/sogehige/sogebot.svg?style=flat-square)](https://github.com/sogehige/sogeBot/releases)
 [![Downloads](https://img.shields.io/github/downloads/sogehige/sogebot/total.svg?style=flat-square)](https://github.com/sogehige/sogeBot/releases)
