@@ -37,13 +37,11 @@ jobs:
     needs: eslint
     services:
       mongodb:
-        image: mongodb
+        image: mongo
         ports:
           - 27017:27017
     runs-on: ubuntu-latest
-    #env:
-    #  GITHUB_MESSAGE: ${{ github.event.commits[0].message }}
-    #if: !contains(${{GITHUB_MESSAGE}}, 'skip-tests')
+    if: contains(github.event.commits[0].message, 'skip-tests')
     steps:
     - uses: actions/checkout@master
     - name: install node v12
