@@ -13,10 +13,6 @@ Quick Links for Contributing
 Coding Guidelines
 -----------------
 
-- sogeBot uses JavaScript Standard Style, for more
-  information, please read here:
-  https://standardjs.com/
-
 - Avoid trailing spaces.  To view trailing spaces before making a
   commit, use "git diff" on your changes.  If colors are enabled for
   git in the command prompt, it will show you any whitespace issues
