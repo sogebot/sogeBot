@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GITHUB_MESSAGE: ${{ github.event.commits[0].message }}
-    if: !contains(GITHUB_MESSAGE, 'skip-tests')
+    if: !contains(${{GITHUB_MESSAGE}}, 'skip-tests')
     steps:
     - uses: actions/checkout@master
     - name: install node v12
