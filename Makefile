@@ -3,7 +3,7 @@ SHELL   := /bin/bash
 VERSION := `node -pe "require('./package.json').version"`
 ENV     ?= production
 
-all : clean dependencies css js jsdist bot info
+all : clean prepare dependencies css js jsdist bot info
 .PHONY : all
 
 docker:
@@ -15,8 +15,10 @@ info:
 	@git log --oneline -3 | cat
 
 dependencies:
-	@echo -ne "\n\t ----- Installation of dependencies\n"
-	@npm ci
+	@echo -ne "\n\t ----- Installation of production dependencies\n"
+	@npm install --production
+	@echo -ne "\n\t ----- Installation of development dependencies\n"
+	@npm install --only=dev
 
 eslint:
 	@echo -ne "\n\t ----- Checking eslint\n"
@@ -46,6 +48,10 @@ release:
 pack:
 	@echo -ne "\n\t ----- Packing into sogeBot-$(VERSION).zip\n"
 	@npx bestzip sogeBot-$(VERSION).zip .npmrc npm-shrinkwrap.json config.example.json dest/ locales/ public/ LICENSE package.json docs/ AUTHORS tools/ bin/ bat/ dist/ fonts.json
+
+prepare:
+	@echo -ne "\n\t ----- Cleaning up node_modules\n"
+	@rm -rf node_modules
 
 clean:
 	@echo -ne "\n\t ----- Cleaning up compiled files\n"
