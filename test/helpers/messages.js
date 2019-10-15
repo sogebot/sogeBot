@@ -139,7 +139,6 @@ module.exports = {
           }
         }
         assert.isTrue(isCorrectlyCalled);
-        log.chatOut.reset();
         return true;
       } catch (err) {
         return setError(
