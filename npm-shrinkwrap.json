@@ -2288,9 +2288,9 @@
       }
     },
     "bluebird": {
-      "version": "3.7.0",
-      "resolved": "https://registry.npmjs.org/bluebird/-/bluebird-3.7.0.tgz",
-      "integrity": "sha512-aBQ1FxIa7kSWCcmKHlcHFlT2jt6J/l4FzC7KcPELkOJOsPOb/bccdhmIrKDfXhwFrmc7vDoDrrepFvGqjyXGJg==",
+      "version": "3.7.1",
+      "resolved": "https://registry.npmjs.org/bluebird/-/bluebird-3.7.1.tgz",
+      "integrity": "sha512-DdmyoGCleJnkbp3nkbxTLJ18rjDsE4yCggEwKNXkeV123sPNfOCYeDoeuOY+F2FrSjO1YXcTU+dsy96KMy+gcg==",
       "dev": true
     },
     "bn.js": {
@@ -3819,9 +3819,9 @@
           "dev": true
         },
         "schema-utils": {
-          "version": "2.4.1",
-          "resolved": "https://registry.npmjs.org/schema-utils/-/schema-utils-2.4.1.tgz",
-          "integrity": "sha512-RqYLpkPZX5Oc3fw/kHHHyP56fg5Y+XBpIpV8nCg0znIALfq3OH+Ea9Hfeac9BAMwG5IICltiZ0vxFvJQONfA5w==",
+          "version": "2.5.0",
+          "resolved": "https://registry.npmjs.org/schema-utils/-/schema-utils-2.5.0.tgz",
+          "integrity": "sha512-32ISrwW2scPXHUSusP8qMg5dLUawKkyV+/qIEV9JdXKx+rsM6mi8vZY8khg2M69Qom16rtroWXD3Ybtiws38gQ==",
           "dev": true,
           "requires": {
             "ajv": "^6.10.2",
@@ -6105,6 +6105,12 @@
         "pend": "~1.2.0"
       }
     },
+    "fecha": {
+      "version": "2.3.3",
+      "resolved": "https://registry.npmjs.org/fecha/-/fecha-2.3.3.tgz",
+      "integrity": "sha512-lUGBnIamTAwk4znq5BcqsDaxSmZ9nDVJaij6NvRt/Tg4R69gERA+otPKbS86ROw9nxVMw2/mp1fnaiWqbs6Sdg==",
+      "dev": true
+    },
     "figgy-pudding": {
       "version": "3.5.1",
       "resolved": "https://registry.npmjs.org/figgy-pudding/-/figgy-pudding-3.5.1.tgz",
@@ -6145,9 +6151,9 @@
       },
       "dependencies": {
         "schema-utils": {
-          "version": "2.4.1",
-          "resolved": "https://registry.npmjs.org/schema-utils/-/schema-utils-2.4.1.tgz",
-          "integrity": "sha512-RqYLpkPZX5Oc3fw/kHHHyP56fg5Y+XBpIpV8nCg0znIALfq3OH+Ea9Hfeac9BAMwG5IICltiZ0vxFvJQONfA5w==",
+          "version": "2.5.0",
+          "resolved": "https://registry.npmjs.org/schema-utils/-/schema-utils-2.5.0.tgz",
+          "integrity": "sha512-32ISrwW2scPXHUSusP8qMg5dLUawKkyV+/qIEV9JdXKx+rsM6mi8vZY8khg2M69Qom16rtroWXD3Ybtiws38gQ==",
           "dev": true,
           "requires": {
             "ajv": "^6.10.2",
@@ -9777,9 +9783,9 @@
       "optional": true
     },
     "miniget": {
-      "version": "1.6.0",
-      "resolved": "https://registry.npmjs.org/miniget/-/miniget-1.6.0.tgz",
-      "integrity": "sha512-CELIsH/oJfnDHixh7j//7H7PyQYkoMxgaTtzdoD08PYjyLW0YuYqxeIZGjLx59WF2/eapCLkQE4N5ppj82DW+A=="
+      "version": "1.6.1",
+      "resolved": "https://registry.npmjs.org/miniget/-/miniget-1.6.1.tgz",
+      "integrity": "sha512-I5oBwZmcaOuJrjQn7lpS29HM+aAZDbzKbX5ouxVyhFYdg6fA6YKOTwOCgzZQwlHuMek3FlCxz6eNrd4pOXbwOA=="
     },
     "minimalistic-assert": {
       "version": "1.0.1",
@@ -12425,9 +12431,9 @@
       },
       "dependencies": {
         "schema-utils": {
-          "version": "2.4.1",
-          "resolved": "https://registry.npmjs.org/schema-utils/-/schema-utils-2.4.1.tgz",
-          "integrity": "sha512-RqYLpkPZX5Oc3fw/kHHHyP56fg5Y+XBpIpV8nCg0znIALfq3OH+Ea9Hfeac9BAMwG5IICltiZ0vxFvJQONfA5w==",
+          "version": "2.5.0",
+          "resolved": "https://registry.npmjs.org/schema-utils/-/schema-utils-2.5.0.tgz",
+          "integrity": "sha512-32ISrwW2scPXHUSusP8qMg5dLUawKkyV+/qIEV9JdXKx+rsM6mi8vZY8khg2M69Qom16rtroWXD3Ybtiws38gQ==",
           "dev": true,
           "requires": {
             "ajv": "^6.10.2",
@@ -14856,9 +14862,9 @@
           }
         },
         "schema-utils": {
-          "version": "2.4.1",
-          "resolved": "https://registry.npmjs.org/schema-utils/-/schema-utils-2.4.1.tgz",
-          "integrity": "sha512-RqYLpkPZX5Oc3fw/kHHHyP56fg5Y+XBpIpV8nCg0znIALfq3OH+Ea9Hfeac9BAMwG5IICltiZ0vxFvJQONfA5w==",
+          "version": "2.5.0",
+          "resolved": "https://registry.npmjs.org/schema-utils/-/schema-utils-2.5.0.tgz",
+          "integrity": "sha512-32ISrwW2scPXHUSusP8qMg5dLUawKkyV+/qIEV9JdXKx+rsM6mi8vZY8khg2M69Qom16rtroWXD3Ybtiws38gQ==",
           "dev": true,
           "requires": {
             "ajv": "^6.10.2",
@@ -16010,6 +16016,15 @@
       "resolved": "https://registry.npmjs.org/vue-template-es2015-compiler/-/vue-template-es2015-compiler-1.9.1.tgz",
       "integrity": "sha512-4gDntzrifFnCEvyoO8PqyJDmguXgVPxKiIxrBKjIowvL9l+N66196+72XVYR8BBf1Uv1Fgt3bGevJ+sEmxfZzw==",
       "dev": true
+    },
+    "vue2-datepicker": {
+      "version": "2.13.0",
+      "resolved": "https://registry.npmjs.org/vue2-datepicker/-/vue2-datepicker-2.13.0.tgz",
+      "integrity": "sha512-ZXFKMER28pF4yXUl1sUQ3lTcYgpEU4FLgCSkDrvJwT2lxS0/REHgOAgxH/JaxxSWJ303QbPArA475UCAj2DtmA==",
+      "dev": true,
+      "requires": {
+        "fecha": "^2.3.3"
+      }
     },
     "vue2-perfect-scrollbar": {
       "version": "1.2.1",
