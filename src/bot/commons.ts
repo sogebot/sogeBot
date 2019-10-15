@@ -12,7 +12,7 @@ import { error } from './helpers/log';
 
 export async function autoLoad(directory): Promise<{ [x: string]: any }> {
   const directoryListing = readdirSync(directory);
-  const loaded = {};
+  const loaded = {}
   for (const file of directoryListing) {
     if (file.startsWith('_')) {
       continue;

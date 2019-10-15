@@ -16,6 +16,6 @@ jobs:
     - name: ESLint checks
       uses: stefanoeb/eslint-action@master
       with:
-        args: src/**.ts
+        args: --ext .ts src
       env:
         GITHUB_TOKEN: ${{ secrets.github_token }}
