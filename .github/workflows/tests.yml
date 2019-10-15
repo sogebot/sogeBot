@@ -38,3 +38,5 @@ jobs:
       - name: Dump GitHub message
         env:
           GITHUB_MESSAGE: ${{ github.event.commits[0].message }}
+        run:
+          echo ${{GITHUB_MESSAGE}}
