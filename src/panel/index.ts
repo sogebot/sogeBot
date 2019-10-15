@@ -15,7 +15,7 @@ import Vue from 'vue';
 import VueMoment from 'vue-moment';
 import VueRouter from 'vue-router';
 import Vuelidate from 'vuelidate';
-import LoadScript from 'vue-plugin-load-script'
+import LoadScript from 'vue-plugin-load-script';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faSpotify, faTwitch, faTwitter } from '@fortawesome/free-brands-svg-icons';
