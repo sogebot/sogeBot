@@ -8,7 +8,7 @@ const {
 } = require('worker_threads');
 const mathjs = require('mathjs');
 
-const Message = require('./message');
+import Message from './message';
 import { permission } from './permissions';
 const commons = require('./commons');
 
