@@ -1,3 +1,5 @@
+name: Tests
+
 on:
   push:
 
@@ -24,6 +26,8 @@ jobs:
     - uses: actions/checkout@master
     - name: install node v12
       uses: actions/setup-node@v1
+      with:
+        node-version: 12
     - name: Install all dependencies
       run: make
     - name: Set proper db to use
@@ -44,6 +48,8 @@ jobs:
     - uses: actions/checkout@master
     - name: install node v12
       uses: actions/setup-node@v1
+      with:
+        node-version: 12
     - name: Install all dependencies
       run: make
     - name: Set proper db to use
