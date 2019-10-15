@@ -29,9 +29,37 @@ jobs:
     - name: Install all dependencies
       run: make
     - name: Set proper db to use
-      run: npm run test:config:$DB
+      run: npm run test:config:nedb
     - name: Run mocha
       run: npm test
+  mongodb:
+    name: MongoDB tests
+    needs: eslint
+    services:
+      mongodb:
+        image: mongodb
+        ports:
+          - 27017:27017
+    runs-on: ubuntu-latest
+    #env:
+    #  GITHUB_MESSAGE: ${{ github.event.commits[0].message }}
+    #if: !contains(${{GITHUB_MESSAGE}}, 'skip-tests')
+    steps:
+    - uses: actions/checkout@master
+    - name: install node v12
+      uses: actions/setup-node@v1
+    - name: Install all dependencies
+      run: make
+    - name: Set proper db to use
+      run: npm run test:config:mongodb
+    - name: Run mocha
+      run: npm test
+  nginx:
+    image: nginx
+    ports:
+      - 8080:80
+    env:
+      NGINX_PORT: 80
   one:
     runs-on: ubuntu-16.04
     steps:
