@@ -19,7 +19,9 @@ jobs:
     name: NeDB tests
     needs: eslint
     runs-on: ubuntu-latest
-    if: !contains(github.event.commits[0].message, 'skip-tests')
+    env:
+      GITHUB_MESSAGE: ${{ github.event.commits[0].message }}
+    if: !contains(GITHUB_MESSAGE, 'skip-tests')
     steps:
     - uses: actions/checkout@master
     - name: install node v12
