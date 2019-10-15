@@ -3,7 +3,7 @@ on:
 
 jobs:
   eslint:
-    name: eslint
+    name: ESLint check
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
@@ -13,9 +13,5 @@ jobs:
         node-version: 12
     - name: Install eslint and dependencies
       run: npm install typescript eslint @typescript-eslint/parser @typescript-eslint/eslint-plugin --only=dev
-    - name: ESLint checks
-      uses: stefanoeb/eslint-action@master
-      with:
-        args: --ext .ts src
-      env:
-        GITHUB_TOKEN: ${{ secrets.github_token }}
+    - name: Run eslint
+      run: npx eslint --ext .ts src --quiet
