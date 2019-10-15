@@ -36,7 +36,7 @@ describe('Message - cvars filter', async () => {
       command: 'This is $_test',
       expectedSent: true,
       params: { param: 5 },
-    },/*
+    },
     {
       test: '$_test',
       variable: '$_test',
@@ -106,23 +106,13 @@ describe('Message - cvars filter', async () => {
       command: 'This is $!_test',
       expectedSent: false,
       params: { param: 5 },
-    },*/
+    },
   ];
 
   for (const p of Object.keys(permission)) {
     describe('Custom variable with ' + p + ' permission', async () => {
       for (const user of users) {
         describe('Custom variable with ' + p + ' permission => Testing with ' + user.username, async () => {
-          before(async () => {
-            await db.cleanup();
-            await msg.prepare();
-
-            for (const user of users) {
-              user.id = user.userId;
-              await global.db.engine.insert('users', user);
-            }
-          });
-
           for (const test of tests) {
             let message = null;
             let testName = null;
@@ -132,7 +122,16 @@ describe('Message - cvars filter', async () => {
               testName =`'${test.test}' expect '${test.command.replace(/\$_test|\$!_test/g, test.initialValue)}' with value after ${test.afterValue} because insufficient permissions`;
             }
 
-            describe(testName, async () => {
+            describe(testName, () => {
+              before(async () => {
+                await db.cleanup();
+                await msg.prepare();
+
+                for (const user of users) {
+                  user.id = user.userId;
+                  await global.db.engine.insert('users', user);
+                }
+              });
               it(`create initial value '${test.initialValue}' of ${test.variable}`, async () => {
                 await global.db.engine.update('custom.variables', { variableName: test.variable }, { readOnly: false, currentValue: test.initialValue, type: test.type, responseType: 0, permission: permission[p] });
               });
@@ -142,8 +141,6 @@ describe('Message - cvars filter', async () => {
                   sender: user,
                 });
               });
-
-
               it('message parsed correctly', async () => {
                 if (user.username === '__owner__' || (user.username === '__viewer__' && p === 'VIEWERS')) {
                   assert.equal(message, '');
@@ -203,7 +200,16 @@ describe('Message - cvars filter', async () => {
           // read only tests
           for (const test of tests) {
             let message = null;
-            describe(`'${test.test}' expect '${test.command.replace(/\$_test|\$!_test/g, test.initialValue)}' with value after ${test.initialValue} because readOnly`, async () => {
+            describe(`'${test.test}' expect '${test.command.replace(/\$_test|\$!_test/g, test.initialValue)}' with value after ${test.initialValue} because readOnly`, () => {
+              before(async () => {
+                await db.cleanup();
+                await msg.prepare();
+
+                for (const user of users) {
+                  user.id = user.userId;
+                  await global.db.engine.insert('users', user);
+                }
+              });
               it(`create initial value '${test.initialValue}' of ${test.variable}`, async () => {
                 await global.db.engine.update('custom.variables', { variableName: test.variable }, { readOnly: true, currentValue: test.initialValue, type: test.type, responseType: 0, permission: permission[p] });
               });
