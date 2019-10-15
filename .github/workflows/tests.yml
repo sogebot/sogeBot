@@ -54,12 +54,6 @@ jobs:
       run: npm run test:config:mongodb
     - name: Run mocha
       run: npm test
-  nginx:
-    image: nginx
-    ports:
-      - 8080:80
-    env:
-      NGINX_PORT: 80
   one:
     runs-on: ubuntu-16.04
     steps:
