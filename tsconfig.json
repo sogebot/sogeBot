@@ -21,7 +21,7 @@
     "noResolve": false,
     "baseUrl": "./",
     "paths": {
-      "@config": ["config.json", "config.example.json"]
+      "@config": ["config.json", "src/bot/data/config.example.json"]
     },
     "sourceMap": true,
   },
