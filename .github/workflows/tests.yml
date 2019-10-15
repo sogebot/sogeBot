@@ -39,7 +39,7 @@ jobs:
         ports:
           - 27017:27017
     runs-on: ubuntu-latest
-    #if: contains(github.event.commits[0].message, '[skip-tests]') != true && contains(github.event.commits[0].message, '[skip-test]')
+    if: contains(github.event.commits[0].message, '[skip-tests]') != true && contains(github.event.commits[0].message, '[skip-test]')
     steps:
     - uses: actions/checkout@master
     - name: install node v12
@@ -50,10 +50,3 @@ jobs:
       run: npm run test:config:mongodb
     - name: Run mocha
       run: npm test
-  one:
-    runs-on: ubuntu-16.04
-    steps:
-      - name: Dump GitHub message
-        env:
-          GITHUB_MESSAGE: ${{ github.event.commits[0].message }}
-        run: echo "$GITHUB_CONTEXT"
