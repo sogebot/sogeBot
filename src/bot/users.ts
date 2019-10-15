@@ -19,7 +19,7 @@ class Users extends Core {
   constructor () {
     super();
 
-    this.addMenu({ category: 'manage', name: 'viewers', id: 'viewers/list' });
+    this.addMenu({ category: 'manage', name: 'viewers', id: 'manage/viewers/list' });
 
     if (isMainThread) {
       global.db.engine.index('users.chat', [{ index: 'id' }]);

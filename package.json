@@ -185,6 +185,7 @@
     "vue-router": "3.1.3",
     "vue-style-loader": "4.1.2",
     "vue-template-compiler": "2.6.10",
+    "vue2-datepicker": "2.13.0",
     "vue2-perfect-scrollbar": "1.2.1",
     "vuelidate": "0.7.4",
     "vuelidate-property-decorators": "1.0.27",
