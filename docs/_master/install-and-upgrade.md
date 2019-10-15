@@ -71,7 +71,7 @@ docker run -it --hostname mongodb --name=mongodb --net=bridge --expose=27017 mon
 - if you want to use `!title` and `!game` you need to add bot as channel editor in [Permissions settings](http://twitch.tv/dashboard/permissions) on Twitch
 - before starting a bot, you need to install npm dependencies
 
-    `ENV=production npm install` or `npm install --production`
+    `npm install`
 
 - start bot
 
