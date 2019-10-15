@@ -72,6 +72,9 @@ describe('Custom Commands - run()', () => {
   });
 
   describe('!cmd with username filter', () => {
+    beforeEach(async () => {
+      await message.prepare();
+    })
     it('create command and response with filter', async () => {
       const cmd = await global.db.engine.insert('systems.customcommands', { id: uuid(), command: '!cmd', enabled: true, visible: true });
       await global.db.engine.insert('systems.customcommands.responses', { cid: cmd.id, filter: '$sender == "user1"', response: 'Lorem Ipsum', permission: permission.VIEWERS });
@@ -79,13 +82,7 @@ describe('Custom Commands - run()', () => {
 
     it('run command as user not defined in filter', async () => {
       global.systems.customCommands.run({ sender: owner, message: '!cmd' });
-      let notSent = false;
-      try {
-        await message.isSentRaw('Lorem Ipsum', owner);
-      } catch (e) {
-        notSent = true;
-      }
-      assert.ok(!!notSent);
+      await message.isNotSentRaw('Lorem Ipsum', owner);
     });
 
     it('run command as user defined in filter', async () => {
