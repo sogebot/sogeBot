@@ -45,11 +45,11 @@ module.exports = {
     try {
       sinon.stub(log, 'chatOut');
       sinon.stub(log, 'warning');
-      sinon.stub(log, 'debug');
+      sinon.spy(log, 'debug'); // spy because we want to have debug messages printed
     } catch (e) {
       log.chatOut.reset();
       log.warning.reset();
-      log.debug.reset();
+      log.debug.resetHistory();
     }
   },
   debug: async function (category, expected) {
@@ -139,7 +139,6 @@ module.exports = {
           }
         }
         assert.isTrue(isCorrectlyCalled);
-        log.chatOut.reset();
         return true;
       } catch (err) {
         return setError(
