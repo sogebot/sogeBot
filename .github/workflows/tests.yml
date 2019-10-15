@@ -21,18 +21,21 @@ jobs:
     name: NeDB tests
     needs: eslint
     runs-on: ubuntu-latest
-    if: contains(github.event.commits[0].message, '[skip-tests]') != true && contains(github.event.commits[0].message, '[skip-test]') != true
     steps:
     - uses: actions/checkout@master
     - name: install node v12
+      if: contains(github.event.commits[0].message, '[skip-tests]') != true && contains(github.event.commits[0].message, '[skip-test]') != true
       uses: actions/setup-node@v1
       with:
         node-version: 12
     - name: Install all dependencies
+      if: contains(github.event.commits[0].message, '[skip-tests]') != true && contains(github.event.commits[0].message, '[skip-test]') != true
       run: make
     - name: Set proper db to use
+      if: contains(github.event.commits[0].message, '[skip-tests]') != true && contains(github.event.commits[0].message, '[skip-test]') != true
       run: npm run test:config:nedb
     - name: Run mocha
+      if: contains(github.event.commits[0].message, '[skip-tests]') != true && contains(github.event.commits[0].message, '[skip-test]') != true
       run: npm test
   mongodb:
     name: MongoDB tests
@@ -43,16 +46,19 @@ jobs:
         ports:
           - 27017:27017
     runs-on: ubuntu-latest
-    if: contains(github.event.commits[0].message, '[skip-tests]') != true && contains(github.event.commits[0].message, '[skip-test]') != true
     steps:
     - uses: actions/checkout@master
     - name: install node v12
+      if: contains(github.event.commits[0].message, '[skip-tests]') != true && contains(github.event.commits[0].message, '[skip-test]') != true
       uses: actions/setup-node@v1
       with:
         node-version: 12
     - name: Install all dependencies
+      if: contains(github.event.commits[0].message, '[skip-tests]') != true && contains(github.event.commits[0].message, '[skip-test]') != true
       run: make
     - name: Set proper db to use
+      if: contains(github.event.commits[0].message, '[skip-tests]') != true && contains(github.event.commits[0].message, '[skip-test]') != true
       run: npm run test:config:mongodb
     - name: Run mocha
+      if: contains(github.event.commits[0].message, '[skip-tests]') != true && contains(github.event.commits[0].message, '[skip-test]') != true
       run: npm test

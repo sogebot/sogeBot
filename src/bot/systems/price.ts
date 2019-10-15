@@ -3,9 +3,9 @@
 import * as _ from 'lodash';
 
 // bot libraries
-import * as Parser from '../parser';
+import Parser from '../parser';
 import System from './_interface';
-import constants from '../constants';
+import * as constants from '../constants';
 import { permission } from '../permissions';
 import { command, default_permission, rollback } from '../decorators';
 import { parser } from '../decorators';
@@ -115,7 +115,7 @@ class Price extends System {
   @parser({ priority: constants.HIGH })
   async check (opts) {
     const parsed = opts.message.match(/^(![\S]+)/);
-    const helpers = (await (new Parser.default()).getCommandsList()).filter(o => o.isHelper).map(o => o.command);
+    const helpers = (await (new Parser()).getCommandsList()).filter(o => o.isHelper).map(o => o.command);
     if (
       _.isNil(parsed)
       || isOwner(opts.sender)
@@ -143,7 +143,7 @@ class Price extends System {
   @rollback()
   async restorePointsRollback (opts) {
     const parsed = opts.message.match(/^(![\S]+)/);
-    const helpers = (await (new Parser.default()).getCommandsList()).filter(o => o.isHelper).map(o => o.command);
+    const helpers = (await (new Parser()).getCommandsList()).filter(o => o.isHelper).map(o => o.command);
     if (
       _.isNil(parsed)
       || isOwner(opts.sender)

@@ -3,7 +3,7 @@ require('../../general.js');
 
 const db = require('../../general.js').db;
 const msg = require('../../general.js').message;
-const Message = require('../../../dest/message');
+const Message = require('../../../dest/message').default;
 const assert = require('assert');
 
 const owner = { username: 'soge__' };

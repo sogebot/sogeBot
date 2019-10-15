@@ -9,6 +9,7 @@ yarn.lock
 *.zip
 config.json
 db/
+tsconfig.tsbuildinfo
 
 public/dist/*
 public/custom/*

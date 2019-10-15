@@ -39,9 +39,10 @@ jsdist:
 
 bot:
 	@echo -ne "\n\t ----- Building bot\n"
-	@npx babel src/bot/ -d dest/ --extensions ".js,.ts,.tsx"
+	@npx tsc -p src/bot
 
 release:
+	@cp ./src/bot/data/config.example.json ./
 	ENV version=${VERSION} node tools/release.js
 
 pack:

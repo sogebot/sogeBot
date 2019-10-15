@@ -1,41 +1,36 @@
 {
   "compilerOptions": {
-    // this aligns with Vue's browser support
     "target": "es6",
     // this enables stricter inference for data properties on `this`
     "strict": true,
-    // if using webpack 2+ or rollup, to leverage tree shaking:
     "module": "commonjs",
     "incremental": true,
     "removeComments": true,
     "noImplicitAny": false,
     "noImplicitThis": true,
     "noUnusedLocals": true,
+    "esModuleInterop": true,
     "moduleResolution": "node",
     "lib": ["es2018", "dom"],
-    "declaration": false,
-    "esModuleInterop": true,
     "resolveJsonModule": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
+    "declaration": false,
     "noResolve": false,
-    "baseUrl": "./",
+    "allowJs": true, /* REMOVE when jsfiles are gone */
+    "baseUrl": "src/bot",
     "paths": {
-      "@config": ["config.json", "src/bot/data/config.example.json"]
+      "@config": ["../../config.json", "../../data/config.example.json"]
     },
-    "sourceMap": true,
+    "outDir": "../../dest",
+    "inlineSourceMap": true,
   },
   "include": [
-    "src/**/*.js",
-    "src/**/*.ts",
-    "src/**/*.vue",
-    "d.ts/*",
-    "tools/*",
-    "test/**/*"
+    "./",
+    "../../d.ts/types.d.ts",
+    "../../d.ts/*",
   ],
   "exclude": [
-    "src/bot",
     "node_modules",
-    "config.json"
   ]
 }

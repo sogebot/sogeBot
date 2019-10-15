@@ -809,4 +809,5 @@ class Message {
   }
 }
 
-module.exports = Message;
+export { Message };
+export default Message;

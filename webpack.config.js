@@ -12,12 +12,6 @@ const optimization = {
   moduleIds: 'hashed',
   chunkIds: 'named',
   usedExports: true,
-  minimizer: [new TerserPlugin({
-    parallel: true,
-    terserOptions: {
-      ecma: 6,
-    },
-  })],
   splitChunks: {
     chunks: 'async',
     minSize: 30000,
@@ -57,6 +51,15 @@ const optimization = {
     }
   }
 };
+
+if (process.env.NODE_ENV === 'production') {
+  optimization.minimizer = [new TerserPlugin({
+    parallel: true,
+    terserOptions: {
+      ecma: 6,
+    },
+  })]
+}
 
 const webpackConfig = {
   watchOptions: {
@@ -171,6 +174,10 @@ const webpackConfig = {
       }
     ]
   }
+}
+
+if (process.env.NODE_ENV === 'development') {
+  webpackConfig.devtool = 'source-map';
 }
 
 if (bundleAnalyze) {

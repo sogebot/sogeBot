@@ -6,7 +6,7 @@ import { prepare, sendMessage } from '../commons';
 import { command, default_permission, parser } from '../decorators';
 import Expects from '../expects';
 import Message from '../message';
-import * as Parser from '../parser';
+import Parser from '../parser';
 import { permission } from '../permissions';
 import System from './_interface';
 import { incrementCountOfCommandUsage } from '../helpers/commands/count';
@@ -37,7 +37,7 @@ class Alias extends System {
 
   @parser()
   async run (opts) {
-    const p = new Parser.default();
+    const p = new Parser();
     let alias;
 
     // is it an command?
@@ -67,7 +67,7 @@ class Alias extends System {
         break;
       } // command is correct (have same number of parameters as command)
 
-      const parsedCmd = await p.find(cmdArray.join(' '));
+      const parsedCmd = await p.find(cmdArray.join(' '), null);
       const isRegistered = !_.isNil(parsedCmd) && parsedCmd.command.split(' ').length === cmdArray.length;
 
       if (isRegistered) {
