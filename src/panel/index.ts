@@ -157,6 +157,8 @@ const main = async () => {
       { path: '/manage/quotes/edit/:id?', name: 'QuotesManagerEdit', component: () => import('./views/managers/quotes/quotes-edit.vue') },
       { path: '/manage/ranks/list', name: 'ranksManagerList', component: () => import('./views/managers/ranks/ranks-list.vue') },
       { path: '/manage/ranks/edit/:id?', name: 'ranksManagerEdit', component: () => import('./views/managers/ranks/ranks-edit.vue') },
+      { path: '/manage/songs/playlist', name: 'songsManagerPlaylist', component: () => import('./views/managers/songs/songs-playlist.vue') },
+      { path: '/manage/songs/bannedsongs', name: 'songsManagerBannedsongs', component: () => import('./views/managers/songs/songs-bannedsongs.vue') },
       { path: '/manage/timers/list', name: 'TimersManagerList', component: () => import('./views/managers/timers/timers-list.vue') },
       { path: '/manage/timers/edit/:id?', name: 'TimersManagerEdit', component: () => import('./views/managers/timers/timers-edit.vue') },
       { path: '/manage/viewers/list', name: 'viewersManagerList', component: () => import('./views/managers/viewers/viewers-list.vue') },
