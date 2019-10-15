@@ -1,0 +1,17 @@
+on:
+  push:
+
+jobs:
+  eslint:
+    name: ESLint check
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: install node v12
+      uses: actions/setup-node@v1
+      with:
+        node-version: 12
+    - name: Install eslint and dependencies
+      run: npm install typescript eslint @typescript-eslint/parser @typescript-eslint/eslint-plugin --only=dev
+    - name: Run eslint
+      run: npx eslint --ext .ts src --quiet
