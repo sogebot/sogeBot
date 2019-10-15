@@ -19,7 +19,7 @@ jobs:
     name: NeDB tests
     needs: eslint
     runs-on: ubuntu-latest
-    if: contains(github.event.commits[0].message, '[skip-tests]') != true && contains(github.event.commits[0].message, '[skip-test]')
+    if: contains(github.event.commits[0].message, '[skip-tests]') != true && contains(github.event.commits[0].message, '[skip-test]') != true
     steps:
     - uses: actions/checkout@master
     - name: install node v12
@@ -39,7 +39,7 @@ jobs:
         ports:
           - 27017:27017
     runs-on: ubuntu-latest
-    if: contains(github.event.commits[0].message, '[skip-tests]') != true && contains(github.event.commits[0].message, '[skip-test]')
+    if: contains(github.event.commits[0].message, '[skip-tests]') != true && contains(github.event.commits[0].message, '[skip-test]') != true
     steps:
     - uses: actions/checkout@master
     - name: install node v12
