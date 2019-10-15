@@ -42,7 +42,7 @@
       "jsx": true
     },
     "useJSXTextNode": true,
-    "project": "./tsconfig.json",
+    "project": [ "./tsconfig.json", "./src/bot/tsconfig.json" ],
     "tsconfigRootDir": "./",
     "extraFileExtensions": [".vue"]
   }
