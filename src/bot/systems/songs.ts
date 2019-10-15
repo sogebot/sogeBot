@@ -63,8 +63,8 @@ class Songs extends System {
       global.db.engine.index(this.collection.playlist, [{ index: 'videoID', unique: true }]);
       global.db.engine.index(this.collection.request, [{ index: 'videoID' }]);
 
-      this.addMenu({ category: 'manage', name: 'playlist', id: 'songs/playlist' });
-      this.addMenu({ category: 'manage', name: 'bannedsongs', id: 'songs/bannedsongs' });
+      this.addMenu({ category: 'manage', name: 'playlist', id: 'manage/songs/playlist' });
+      this.addMenu({ category: 'manage', name: 'bannedsongs', id: 'manage/songs/bannedsongs' });
       this.addWidget('ytplayer', 'widget-title-ytplayer', 'fas fa-headphones');
     }
   }
