@@ -12,7 +12,7 @@ require('../../general.js');
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 
-const Parser = require('../../../dest/parser');
+const Parser = require('../../../dest/parser').default;
 
 const owner = { username: 'soge__', userId: Math.random() };
 

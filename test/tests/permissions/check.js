@@ -8,7 +8,7 @@ const time = require('../../general.js').time;
 const assert = require('assert');
 
 const { permission } = require('../../../dest/permissions');
-const Parser = require('../../../dest/parser');
+const Parser = require('../../../dest/parser').default;
 
 const users = [
   { username: '__owner__', userId: 1, id: 1, stats: { subStreak: 0, subCumulativeMonths: 0 } },
