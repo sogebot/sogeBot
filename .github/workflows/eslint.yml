@@ -15,6 +15,7 @@ jobs:
       run: npm install typescript eslint @typescript-eslint/parser @typescript-eslint/eslint-plugin --only=dev
     - name: ESLint checks
       uses: stefanoeb/eslint-action@master
-      args: src/**.ts
+      with:
+        args: src/**.ts
       env:
         GITHUB_TOKEN: ${{ secrets.github_token }}
