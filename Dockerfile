@@ -1,6 +1,6 @@
-FROM node:12.10.0-alpine
+FROM node:12.12.0-alpine
 
-ENV LAST_UPDATED 201709241704
+ENV LAST_UPDATED 201910151750
 
 ENV DOMAIN localhost
 ENV TOKEN __random__
@@ -25,7 +25,7 @@ RUN make
 RUN npm prune --production
 
 # Copy config example
-RUN cp config.example.json config.json
+RUN cp src/bot/data/config.example.json config.json
 
 # Expose API port to the outside
 EXPOSE 20000
