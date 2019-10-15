@@ -138,7 +138,7 @@
               </div>
 
               <table class="table table-sm ml-2 mr-2" v-if="viewer.stats.bits.length !== 0">
-                <tr v-for="(bits, index) of _.orderBy(viewer.stats.bits, 'timestamp', 'desc')">
+                <tr v-for="bits of _.orderBy(viewer.stats.bits, 'timestamp', 'desc')">
                   <td scope="row">{{ moment(bits.timestamp).format('LLL') }}</td>
                   <td>
                     <input type="number" min="0" v-model="bits.amount" v-if="bits.editation" class="form-control">
@@ -178,7 +178,7 @@
               </div>
 
               <table class="table table-sm ml-2 mr-2" v-if="viewer.stats.tips.length !== 0">
-                <tr v-for="(tips, index) of _.orderBy(viewer.stats.tips, 'timestamp', 'desc')">
+                <tr v-for="tips of _.orderBy(viewer.stats.tips, 'timestamp', 'desc')">
                   <td scope="row">{{ moment(tips.timestamp).format('LLL') }}</td>
                   <td class="d-flex">
                     <template v-if="tips.editation">
