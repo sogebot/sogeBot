@@ -172,6 +172,8 @@ const main = async () => {
       { path: '/registry/alerts/edit/:id?', name: 'alertsEdit', component: () => import('./views/registries/alerts/alerts-edit.vue') },
       { path: '/registry/customvariables/list', name: 'CustomVariableList', component: () => import('./views/registries/custom-variables/custom-variables-list.vue') },
       { path: '/registry/customvariables/edit/:id?', name: 'CustomVariableEdit', component: () => import('./views/registries/custom-variables/custom-variables-edit.vue') },
+      { path: '/registry/carousel/list', name: 'carouselRegistryList', component: () => import('./views/registries/carousel-overlay/carousel-overlay-list.vue') },
+      { path: '/registry/carousel/edit/:id?', name: 'carouselRegistryEdit', component: () => import('./views/registries/carousel-overlay/carousel-overlay-edit.vue') },
       { path: '/registry/textoverlay/list', name: 'TextOverlayList', component: () => import('./views/registries/text-overlay/text-overlay-list.vue') },
       { path: '/registry/textoverlay/edit/:id?', name: 'TextOverlayEdit', component: () => import('./views/registries/text-overlay/text-overlay-edit.vue') },
       { path: '/registry/goals/list', name: 'GoalsRegistryList', component: () => import('./views/registries/goalsList.vue') },
