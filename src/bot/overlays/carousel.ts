@@ -2,6 +2,7 @@ import * as _ from 'lodash';
 
 import Overlay from './_interface';
 import { ui } from '../decorators';
+import uuid from 'uuid/v4';
 
 class Carousel extends Overlay {
   @ui({
@@ -15,67 +16,25 @@ class Carousel extends Overlay {
 
   constructor () {
     super();
-    this.addMenu({ category: 'registry', name: 'carouseloverlay', id: 'registry.carouselOverlay/list' });
+    this.addMenu({ category: 'registry', name: 'carouseloverlay', id: 'registry.carousel/list' });
   }
 
   sockets () {
     global.panel.io.of('/overlays/carousel').on('connection', (socket) => {
-      socket.on('load', async (cb) => {
-        const images = (await global.db.engine.find('overlays.carousel')).map((o) => {
-          o._id = o._id.toString(); return o; 
-        });
-        cb(_.orderBy(images, 'order', 'asc'));
-      });
-
       socket.on('delete.image', async (id, cb) => {
-        await global.db.engine.remove('overlays.carousel', { _id: id });
+        await global.db.engine.remove('overlays.carousel', { id });
         // force reorder
-        const images = _.orderBy((await global.db.engine.find('overlays.carousel')).map((o) => {
-          o._id = o._id.toString(); return o; 
-        }), 'order', 'asc');
+        const images = _.orderBy(await global.db.engine.find('overlays.carousel'), 'order', 'asc');
         for (let order = 0; order < images.length; order++) {
-          await global.db.engine.update('overlays.carousel', { _id: images[order]._id }, { order });
+          await global.db.engine.update('overlays.carousel', { id: images[order].id }, { order });
         }
         cb();
-      });
-
-      socket.on('move', async (go, id, cb) => {
-        const images = (await global.db.engine.find('overlays.carousel')).map((o) => {
-          o._id = o._id.toString(); return o; 
-        });
-
-        const image = _.find(images, (o) => o._id === id);
-        const upImage = _.find(images, (o) => Number(o.order) === Number(image.order) - 1);
-        const downImage = _.find(images, (o) => Number(o.order) === Number(image.order) + 1);
-
-        switch (go) {
-          case 'up':
-            if (!_.isNil(upImage)) {
-              await global.db.engine.update('overlays.carousel', { _id: image._id }, { order: Number(upImage.order) });
-              await global.db.engine.update('overlays.carousel', { _id: upImage._id }, { order: Number(image.order) });
-            }
-            cb([
-              { imageId: id, order: Number(upImage.order) },
-              { imageId: String(upImage._id), order: Number(image.order) },
-            ]);
-            break;
-          case 'down':
-            if (!_.isNil(downImage)) {
-              await global.db.engine.update('overlays.carousel', { _id: image._id }, { order: Number(downImage.order) });
-              await global.db.engine.update('overlays.carousel', { _id: downImage._id }, { order: Number(image.order) });
-            }
-            cb([
-              { imageId: id, order: Number(downImage.order) },
-              { imageId: String(downImage._id), order: Number(image.order) },
-            ]);
-            break;
-        }
       });
 
       socket.on('upload', async (data, cb) => {
         const matches = data.match(/^data:([A-Za-z-+/]+);base64,(.+)$/);
         if (matches.length !== 3) {
-          return false; 
+          return false;
         }
 
         const type = matches[1];
@@ -83,7 +42,9 @@ class Carousel extends Overlay {
 
         const order = (await global.db.engine.find('overlays.carousel')).length;
         const image = await global.db.engine.insert('overlays.carousel',
-          { type,
+          {
+            id: uuid(),
+            type,
             base64,
             // timers in ms
             waitBefore: 0,

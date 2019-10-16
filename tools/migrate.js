@@ -27,6 +27,18 @@ const end = function (updated) {
 };
 
 const migration = {
+  20: async () => {
+    header('Add id for carousel overlay');
+    let updated = 0;
+
+    const items = await global.db.engine.find('overlays.carouse');
+    for (const item of items) {
+      const id = uuidv4();
+      await global.db.engine.update('overlays.carouse', { _id: String(item._id) }, { id });
+      updated++;
+    }
+    end(updated);
+  },
   19: async () => {
     header('Add id for ranks');
     let updated = 0;
