@@ -122,7 +122,6 @@ const main = async () => {
   Vue.prototype.configuration = await getConfiguration();
 
   Vue.prototype.$state = ButtonStates;
-  console.log('go');
   setMainLoaded();
 
   const router = new VueRouter({
