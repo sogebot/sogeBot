@@ -5,6 +5,6 @@ declare namespace Types {
       waitBefore: number; waitAfter: number; duration: number;
       animationInDuration: number; animationIn: string; animationOutDuration: number;
       animationOut: string; order: number; showOnlyOncePerStream: boolean;
-    }
+    };
   }
 }
