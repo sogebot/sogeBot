@@ -11,26 +11,11 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-  <link href="https://fonts.googleapis.com/css?family=Open+Sans|Poppins|PT+Sans|PT+Sans+Narrow|PT+Mono" rel="stylesheet">
-  <link href="https://use.fontawesome.com/releases/v5.0.6/css/all.css" rel="stylesheet">
-  <!-- Latest compiled and minified CSS -->
-  <link rel="stylesheet" href="../../dist/css/light.css">
-  <!-- Optional theme -->
-  <link rel="stylesheet" href="../../dist/css/sortable-theme-bootstrap.css">
-  <link rel="stylesheet" href="../../dist/bootstrap-toggle/css/bootstrap-toggle.min.css" />
-  <link rel="stylesheet" href="../../dist/bootstrap-slider/css/bootstrap-slider.min.css" />
   <script src="/socket.io/socket.io.js"></script>
 </head>
 <body>
-  <div class="alert alert-danger d-none" role="alert" id="stateError">Unexpected error, please try to authenticate again</div>
-  <div class="alert alert-success d-none" role="alert" id="stateOk">Saving token to a bot, refreshing back to a bot.</div>
-
-  <!-- jQuery and Popper (necessary for Bootstrap's JavaScript plugins) -->
-  <script src="../../dist/jquery/js/jquery.min.js"></script>
-  <!-- LoDash goodness -->
-  <script src="../../dist/lodash/js/lodash.min.js"></script>
-  <!-- Latest compiled and minified JavaScript -->
-  <script src="../../dist/bootstrap/js/bootstrap.min.js" crossorigin="anonymous"></script>
+  <div id="stateError">Unexpected error, please try to authenticate again</div>
+  <div id="stateOk">Saving token to a bot, refreshing back to a bot.</div>
   <script type="text/javascript" src="/auth/token.js"></script>
 
   <script>
@@ -50,12 +35,12 @@
         }
 
         if (urlState === state) {
-          $('#stateOk').removeClass('d-none')
+          document.getElementById('stateError').style.display = 'none';
           socket.emit('code', urlCode, (err, cb) => {
             window.location.href = window.location.origin + "/#/settings/integrations/spotify"
           })
         } else {
-          $('#stateError').removeClass('d-none')
+          document.getElementById('stateOk').style.display = 'none';
         }
       })
     }
