@@ -1,10 +1,6 @@
 import { at, isNil } from 'lodash-es';
 
-export interface Global {
-  translations: any;
-}
-
-declare let global: Global;
+export let translations = {};
 
 export default function(key) {
   /* TODO: metrics
@@ -15,5 +11,9 @@ export default function(key) {
   }
   */
   // return translation of a key
-  return isNil(at(global.translations, key)[0]) ? `{${key}}` : at(global.translations, key)[0];
+  return isNil(at(translations, key)[0]) ? `{${key}}` : at(translations, key)[0];
 }
+
+export const setTranslations = (_translations) => {
+  translations = _translations;
+};

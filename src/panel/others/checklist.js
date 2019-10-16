@@ -14,7 +14,7 @@ function initChecklist () {
     },
     render: function (createElement) {
       if (typeof systems !== 'undefined') {
-        return createElement(Checklist, { props: { commons, systems } })
+        return createElement(Checklist, { props: { systems } })
       } else {
         return false
       }

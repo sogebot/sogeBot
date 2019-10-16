@@ -24,7 +24,7 @@
         </a>
       </li>
       <li class="nav-item ml-auto">
-        <h6 class="widget-title">{{ commons.translate('widget-title-chat') }}</h6>
+        <h6 class="widget-title">{{ translate('widget-title-chat') }}</h6>
       </li>
     </ul>
   </div>
@@ -38,10 +38,10 @@
         <div style="margin-top: -40px;">
           <div class="form-row">
             <div class="col">
-              <input type="text" v-model="chatMessage" class="form-control" v-bind:placeholder="commons.translate('send-message-as-a-bot')" />
+              <input type="text" v-model="chatMessage" class="form-control" v-bind:placeholder="translate('send-message-as-a-bot')" />
             </div>
             <div class="col">
-              <button v-on:click="sendChatMessage()" class="form-control btn btn-primary">{{ commons.translate('chat-as-bot') }}</button>
+              <button v-on:click="sendChatMessage()" class="form-control btn btn-primary">{{ translate('chat-as-bot') }}</button>
             </div>
           </div>
         </div>
@@ -65,7 +65,7 @@
 import { getSocket } from 'src/panel/helpers/socket';
 import { sortedUniq, flatten } from 'lodash-es';
 export default {
-  props: ['commons', 'popout', 'configuration'],
+  props: ['popout', 'configuration'],
   data: function () {
     return {
       socket: getSocket('/widgets/chat'),

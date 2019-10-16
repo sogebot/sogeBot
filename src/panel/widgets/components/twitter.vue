@@ -8,7 +8,7 @@
         </a>
       </li>
       <li class="nav-item ml-auto">
-        <h6 class="widget-title">{{ commons.translate('widget-title-twitter') }}</h6>
+        <h6 class="widget-title">{{ translate('widget-title-twitter') }}</h6>
       </li>
     </ul>
   </div>
@@ -35,7 +35,6 @@
 <script>
 import { getSocket } from 'src/panel/helpers/socket';
 export default {
-  props: ['commons'],
   data: function () {
     return { message: '', socket: getSocket('/') }
   },

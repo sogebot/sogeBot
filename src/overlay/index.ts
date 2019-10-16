@@ -1,6 +1,5 @@
 import Vue from 'vue';
 
-import { isAvailableVariable } from '../panel/helpers/isAvailableVariable';
 import translate from '../panel/helpers/translate';
 import LoadScript from 'vue-plugin-load-script';
 import VueRouter from 'vue-router';
@@ -11,6 +10,7 @@ import moment from 'moment';
 import momentTimezone from 'moment-timezone';
 import VueMoment from 'vue-moment';
 import urlParam from '../panel/helpers/urlParam';
+import { getConfiguration, getTranslations } from 'src/panel/helpers/socket';
 
 Vue.use(VueMoment, {
   moment, momentTimezone,
@@ -40,15 +40,12 @@ declare module 'vue/types/vue' {
 }
 
 const overlays = async () => {
-  await Promise.all([
-    isAvailableVariable('translations'),
-    isAvailableVariable('configuration'),
-  ]);
+  await getTranslations();
+  Vue.prototype.configuration = await getConfiguration();
 
   Vue.prototype.translate = (v) => translate(v);
   Vue.prototype.urlParam = (v) => urlParam(v);
   Vue.prototype.token = token;
-  Vue.prototype.configuration = global.configuration;
   Vue.prototype.$state = ButtonStates;
 
   const router = new VueRouter({

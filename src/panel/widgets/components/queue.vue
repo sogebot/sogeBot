@@ -43,7 +43,7 @@
         </a>
       </li>
       <li class="nav-item ml-auto">
-        <h6 class="widget-title">{{commons.translate('widget-title-queue')}}</h6>
+        <h6 class="widget-title">{{translate('widget-title-queue')}}</h6>
       </li>
     </ul>
   </div>
@@ -127,7 +127,7 @@
 import { getSocket } from 'src/panel/helpers/socket';
 import { debounce } from 'lodash-es';
 export default {
-  props: ['commons', 'popout'],
+  props: ['popout'],
   mounted: function () {
     this.$emit('mounted')
   },

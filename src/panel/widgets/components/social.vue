@@ -18,7 +18,7 @@
         </a>
       </li>
       <li class="nav-item ml-auto">
-        <h6 class="widget-title" >{{commons.translate('widget-title-social')}}</h6>
+        <h6 class="widget-title" >{{translate('widget-title-social')}}</h6>
       </li>
     </ul>
   </div>
@@ -65,7 +65,7 @@ import Vue from 'vue'
 import { chunk, orderBy } from 'lodash-es'
 import { getSocket } from 'src/panel/helpers/socket';
 export default Vue.extend({
-  props: ['commons', 'popout'],
+  props: ['popout'],
   data: function () {
     const data: {
       items: Array<{}>,

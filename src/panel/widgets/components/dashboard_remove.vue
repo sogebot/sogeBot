@@ -1,7 +1,7 @@
 <template>
 <div class="col">
   <div class="dashboardRemove" @click="remove">
-    <fa icon="trash" /> {{commons.translate('remove-dashboard')}}
+    <fa icon="trash" /> {{translate('remove-dashboard')}}
   </div>
 </div>
 </template>
@@ -9,7 +9,7 @@
 <script>
 import { getSocket } from 'src/panel/helpers/socket';
 export default {
-  props: ['commons', 'dashboardId'],
+  props: ['dashboardId'],
 
   data: function () {
     return {

@@ -24,7 +24,7 @@
     }
   },
   "list": {
-    "ok": "$sender, You can find quote list at http://$urlBase/public/quotes",
+    "ok": "$sender, You can find quote list at http://$urlBase/public/#/quotes",
     "is-localhost": "$sender, quote list url is not properly specified."
   }
 }

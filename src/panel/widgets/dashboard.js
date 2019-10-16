@@ -2,14 +2,12 @@
 import Vue from 'vue';
 import Dashboard from './dashboard.vue';
 
-import { isAvailableVariable, isMainLoaded } from '../helpers/isAvailableVariable';
+import { isMainLoaded } from '../helpers/isAvailableVariable';
 import { getSocket } from 'src/panel/helpers/socket';
 import { orderBy } from 'lodash-es';
 
 async function initDashboard () {
   await Promise.all([
-    isAvailableVariable('translations'),
-    isAvailableVariable('configuration'),
     isMainLoaded(),
   ]);
 
@@ -37,7 +35,7 @@ async function initDashboard () {
       });
     },
     render: function (createElement) {
-      return createElement(Dashboard, { props: { items: this.items, commons, socket, configuration, dashboards: this.dashboards } });
+      return createElement(Dashboard, { props: { items: this.items, socket, configuration, dashboards: this.dashboards } });
     },
   });
 }

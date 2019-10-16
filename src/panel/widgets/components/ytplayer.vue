@@ -81,7 +81,6 @@ import { getSocket } from 'src/panel/helpers/socket';
 Vue.use(VuePlyr)
 
 export default {
-  props: ['commons'],
   components: {
     holdButton: () => import('../../components/holdButton.vue'),
   },

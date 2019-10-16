@@ -25,7 +25,7 @@
         </span>
       </li>
       <li class="nav-item ml-auto">
-        <h6 class="widget-title">{{ commons.translate('widget-title-soundboard') }}</h6>
+        <h6 class="widget-title">{{ translate('widget-title-soundboard') }}</h6>
       </li>
     </ul>
   </div>
@@ -56,7 +56,6 @@
 import { getSocket } from 'src/panel/helpers/socket';
 import { isNil } from 'lodash-es';
 export default {
-  props: ['commons'],
   data: function () {
     return {
       socket: getSocket('/widgets/soundboard'),

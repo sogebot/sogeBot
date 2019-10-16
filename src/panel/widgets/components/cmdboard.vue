@@ -13,7 +13,7 @@
         </a>
       </li>
       <li class="nav-item ml-auto">
-        <h6 class="widget-title">{{commons.translate('widget-title-cmdboard')}}</h6>
+        <h6 class="widget-title">{{translate('widget-title-cmdboard')}}</h6>
       </li>
     </ul>
   </div>
@@ -58,21 +58,21 @@
       <div role="tabpanel" class="tab-pane" id="cmdboard-settings">
         <div class="input-group">
           <div class="input-group-prepend">
-            <span class="input-group-text">{{commons.translate('name')}}</span>
+            <span class="input-group-text">{{translate('name')}}</span>
           </div>
           <input type="text" class="form-control" v-model="name">
         </div>
         <div class="input-group">
           <div class="input-group-prepend">
-            <span class="input-group-text">{{commons.translate('command')}}</span>
+            <span class="input-group-text">{{translate('command')}}</span>
           </div>
           <input type="text" class="form-control" v-model="command">
         </div>
-        <button type="button" class="btn btn-success btn-block btn-cmdboard" v-on:click="add" :disabled="!isConfirmEnabled">{{commons.translate('confirm')}}</button>
+        <button type="button" class="btn btn-success btn-block btn-cmdboard" v-on:click="add" :disabled="!isConfirmEnabled">{{translate('confirm')}}</button>
 
         <div class="input-group pt-2">
           <div class="input-group-prepend">
-            <span class="input-group-text">{{commons.translate('display-as')}}</span>
+            <span class="input-group-text">{{translate('display-as')}}</span>
           </div>
           <div class="btn-group btn-group-toggle d-flex" data-toggle="buttons" style="flex: 1 auto;">
             <label
@@ -96,7 +96,6 @@
 <script>
 import { getSocket } from 'src/panel/helpers/socket';
 export default {
-  props: ['commons'],
   data: function () {
     return {
       socket: getSocket('/widgets/cmdboard'),

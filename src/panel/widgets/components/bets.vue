@@ -15,7 +15,7 @@
         </a>
       </li>
       <li class="nav-item ml-auto">
-        <h6 class="widget-title">{{commons.translate('widget-title-bets')}}</h6>
+        <h6 class="widget-title">{{translate('widget-title-bets')}}</h6>
       </li>
     </ul>
   </div>
@@ -39,7 +39,7 @@
           </div>
           <div class="pb-2">
             <button class='btn btn-block btn-danger p-1 text-left' @click="close('refund')">
-              {{commons.translate('refund') | capitalize}}
+              {{translate('refund') | capitalize}}
             </button>
           </div>
         </template>
@@ -49,7 +49,7 @@
       <div role="tabpanel" class="tab-pane" id="bets-settings">
         <div class="input-group">
           <div class="input-group-prepend">
-              <span class="input-group-text">{{commons.translate('gain-every-option')}}</span>
+              <span class="input-group-text">{{translate('gain-every-option')}}</span>
           </div>
           <input type="text" class="form-control" v-model="betPercentGain">
           <div class="input-group-append">
@@ -67,7 +67,6 @@
 <script>
 import { getSocket } from 'src/panel/helpers/socket';
 export default {
-  props: ['commons'],
   mounted: function () {
     this.$emit('mounted')
   },

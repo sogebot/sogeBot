@@ -24,7 +24,7 @@
     }
   },
   "list": {
-    "ok": "$sender, dalsi citace lze najit na http://$urlBase/public/quotes",
+    "ok": "$sender, dalsi citace lze najit na http://$urlBase/public/#/quotes",
     "is-localhost": "$sender, url citaci nebyla nastavena."
   }
 }

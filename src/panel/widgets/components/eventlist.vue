@@ -102,7 +102,7 @@
         </a>
       </li>
       <li class="nav-item ml-auto">
-        <h6 class="widget-title" >{{commons.translate('eventlist')}}</h6>
+        <h6 class="widget-title" >{{translate('eventlist')}}</h6>
       </li>
     </ul>
   </div>
@@ -151,16 +151,16 @@
       <div role="tabpanel" class="tab-pane" id="eventlist-settings">
         <div class="input-group">
           <div class="input-group-prepend">
-            <span class="input-group-text">{{commons.translate('eventlist-show-number')}}</span>
+            <span class="input-group-text">{{translate('eventlist-show-number')}}</span>
           </div>
           <input type="text" class="form-control" v-model="eventlistShow">
           <div class="input-group-append">
-            <span class="input-group-text">{{commons.translate('eventlist-show')}}</span>
+            <span class="input-group-text">{{translate('eventlist-show')}}</span>
           </div>
         </div>
         <div class="input-group">
           <div class="input-group-prepend">
-            <span class="input-group-text">{{commons.translate('followers-size')}}</span>
+            <span class="input-group-text">{{translate('followers-size')}}</span>
           </div>
           <input type="text" class="form-control" v-model="eventlistSize">
           <div class="input-group-append">
@@ -169,7 +169,7 @@
         </div>
         <div class="input-group">
           <div class="input-group-prepend">
-            <span class="input-group-text">{{commons.translate('followers-message-size')}}</span>
+            <span class="input-group-text">{{translate('followers-message-size')}}</span>
           </div>
           <input type="text" class="form-control" v-model="eventlistMessageSize">
           <div class="input-group-append">
@@ -192,7 +192,7 @@ import { getSocket } from 'src/panel/helpers/socket';
 import { FontAwesomeLayers } from '@fortawesome/vue-fontawesome'
 import { chunk, debounce, get, isNil } from 'lodash-es';
 export default {
-  props: ['commons', 'popout'],
+  props: ['popout'],
   components: {
     'font-awesome-layers': FontAwesomeLayers,
     holdButton: () => import('../../components/holdButton.vue'),
@@ -310,15 +310,15 @@ export default {
       this.events = []
     },
     prepareMessage: function (event) {
-      let t = commons.translate(`eventlist-events.${event.event}`)
+      let t = translate(`eventlist-events.${event.event}`)
 
       // change resub translate if not shared substreak
       if (event.event === 'resub' && !event.subStreakShareEnabled) {
-        t = commons.translate(`eventlist-events.resubWithoutStreak`);
+        t = translate(`eventlist-events.resubWithoutStreak`);
       }
       t = t.replace('$formatted_amount', '<strong style="font-size: 1rem">' + get(event, 'currency', '$') + parseFloat(get(event, 'amount', '0')).toFixed(2) + '</strong>')
       t = t.replace('$viewers', '<strong style="font-size: 1rem">' + get(event, 'viewers', '0') + '</strong>')
-      t = t.replace('$tier', `${commons.translate('tier')} <strong style="font-size: 1rem">${get(event, 'tier', 'n/a')}</strong>`)
+      t = t.replace('$tier', `${translate('tier')} <strong style="font-size: 1rem">${get(event, 'tier', 'n/a')}</strong>`)
       t = t.replace('$username', get(event, 'from', 'n/a'))
       t = t.replace('$subCumulativeMonthsName', get(event, 'subCumulativeMonthsName', 'months'))
       t = t.replace('$subCumulativeMonths', '<strong style="font-size: 1rem">' + get(event, 'subCumulativeMonths', '0') + '</strong>')
@@ -327,7 +327,7 @@ export default {
       t = t.replace('$bits', '<strong style="font-size: 1rem">' + get(event, 'bits', '0') + '</strong>')
 
       let output = `<span style="font-size:0.7rem; font-weight: normal">${t}</span>`
-      if (event.song_url && event.song_title) output += `<div style="font-size: 0.7rem"><strong>${commons.translate('song-request')}:</strong> <a href="${event.song_url}">${event.song_title}</a></div>`
+      if (event.song_url && event.song_title) output += `<div style="font-size: 0.7rem"><strong>${translate('song-request')}:</strong> <a href="${event.song_url}">${event.song_title}</a></div>`
       if (event.message) output += `<div class="eventlist-blockquote" style="font-size: ${this.eventlistMessageSize}px">${event.message.replace(/(\w{10})/g, '$1<wbr>')}</div>` // will force new line for long texts
 
       return output
