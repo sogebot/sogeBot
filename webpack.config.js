@@ -104,6 +104,12 @@ const webpackConfig = {
     }),
     new HtmlWebpackPlugin({
       filename: '../../login.html', template: 'src/login/index.html', chunks: ['login']
+    }),
+    new HtmlWebpackPlugin({
+      filename: '../../oauth.html', template: 'src/oauth/index.html', chunks: []
+    }),
+    new HtmlWebpackPlugin({
+      filename: '../../oauth-spotify.html', template: 'src/oauth/spotify.html', chunks: []
     })
   ],
   module: {

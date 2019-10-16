@@ -79,7 +79,7 @@ function Panel () {
     res.sendFile(path.join(__dirname, '..', 'public', 'login.html'))
   })
   app.get('/oauth/:page', function (req, res) {
-    res.sendFile(path.join(__dirname, '..', 'public', 'oauth', req.params.page + '.html'))
+    res.sendFile(path.join(__dirname, '..', 'public', 'oauth-' + req.params.page + '.html'))
   })
   app.get('/auth/token.js', async function (req, res) {
     const origin = req.headers.referer ? req.headers.referer.substring(0, req.headers.referer.length - 1) : undefined

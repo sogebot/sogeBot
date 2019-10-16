@@ -385,6 +385,7 @@ class Spotify extends Integration {
           try {
             const authorizeURI = this.authorizeURI();
             if (!authorizeURI) {
+              error('Integration must be enabled to authorize');
               cb('Integration must enabled to authorize');
             } else {
               cb(null, { do: 'redirect', opts: [authorizeURI] });
