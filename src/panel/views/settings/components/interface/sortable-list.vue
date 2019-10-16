@@ -17,13 +17,13 @@
           v-on:dragend="dragend(index, $event)"
           v-on:dragenter="dragenter(index, $event)"
           draggable="true">
-          <i class="fas fa-ellipsis-v"></i>
+          <fa icon="ellipsis-v"></fa>
         </div>
         <div class="w-100" :key="index">
           <input type="text" class="form-control" v-model="currentValues[index]" readonly="true"/>
         </div>
         <button class="btn btn-outline-dark border-0" @click="toggleItem(index)">
-          <i class="fas" :class="{ [toggleonicon]: !isToggled(index), [toggleofficon]: isToggled(index) }"></i>
+          <fa :icon="isToggled(index) ? toggleofficon : toggleonicon"></fa>
         </button>
       </li>
     </ul>

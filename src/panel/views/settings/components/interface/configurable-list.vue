@@ -14,11 +14,11 @@
           <div class="w-100" :key="index">
             <input type="text" class="form-control" v-model="currentValue[index]"/>
           </div>
-          <button class="btn btn-outline-dark border-0" @click="removeItem(index)"><i class="fas fa-times"></i></button>
+          <button class="btn btn-outline-dark border-0" @click="removeItem(index)"><fa icon="times"></fa></button>
         </li>
         <li class="list-group-item">
           <button class="btn btn-success" type="button" @click="currentValue.push('')">
-            <i class="fas fa-plus"></i> Add new item
+            <fa icon="plus"></fa> Add new item
           </button>
         </li>
       </ul>

@@ -7,12 +7,12 @@
       <textarea class="form-control" v-model="v.text" style="resize: none;"></textarea>
       <div class="input-group-append">
         <button class="btn btn-danger" type="button" @click="remove(index); reorder()">
-          <i class="far fa-trash-alt"></i>
+          <fa :icon="['far', 'trash-alt']"></fa>
         </button>
       </div>
     </div>
     <button class="btn btn-success btn-block" @click="currentValues.push({ order: currentValues.length, type: 'facebook', text: '' })">
-      <i class="fas fa-plus"></i>
+      <fa icon="plus"></fa>
     </button>
 </div>
 </template>

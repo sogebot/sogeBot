@@ -62,7 +62,8 @@
             v-on:update="response.filter = $event"
             v-bind:filters="['sender', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'rank', 'game', 'title', 'views', 'followers', 'hosts', 'subscribers']"></textarea-with-tags>
           <div class="h-auto w-auto" style="flex-shrink: 0;">
-            <button data-toggle="dropdown" class="btn btn-outline-dark border-0 h-100 w-100" style="margin: 0; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px;"><i class="fas fa-key mr-1" aria-hidden="true"></i>
+            <button data-toggle="dropdown" class="btn btn-outline-dark border-0 h-100 w-100" style="margin: 0; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px;">
+              <fa icon="key" class="mr-1" aria-hidden="true"></fa>
               <span v-if="getPermissionName(response.permission)">{{ getPermissionName(response.permission) }}</span>
               <span v-else class="text-danger"><fa icon="exclamation-triangle"/> Permission not found</span>
             </button>
@@ -76,7 +77,7 @@
           </div>
           <div class="h-auto w-auto" style="flex-shrink: 0;">
             <button data-toggle="dropdown" class="btn btn-outline-dark border-0 h-100 w-100" style="margin: 0; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px;">
-              <i class="fas mr-1" :class="[response.stopIfExecuted ? 'fa-stop' : 'fa-play']" aria-hidden="true"></i>
+              <fa class="mr-1" :icon="[response.stopIfExecuted ? 'stop' : 'play']" aria-hidden="true"></fa>
               {{ translate(response.stopIfExecuted ? 'commons.stop-if-executed' : 'commons.continue-if-executed') | capitalize }}</button>
             <div class="dropdown-menu">
               <a class="dropdown-item" style="cursor: pointer" v-on:click="response.stopIfExecuted = true; pending = true">{{ translate('commons.stop-if-executed') | capitalize }}</a>
@@ -85,11 +86,16 @@
           </div>
 
           <div class="h-auto w-auto" style="flex-shrink: 0;">
-            <button v-if="item.responses.length > 1" data-toggle="dropdown" class="btn btn-block btn-outline-dark border-0 h-100 w-100"><i class="fas fa-ellipsis-v"></i></button>
+            <button v-if="item.responses.length > 1" data-toggle="dropdown" class="btn btn-block btn-outline-dark border-0 h-100 w-100">
+              <fa icon="ellipsis-v"></fa>
+            </button>
             <div class="dropdown-menu p-0">
-              <button v-if="i !== 0" class="dropdown-item p-2 pl-4 pr-4" style="cursor: pointer" type="button" @click="moveUpResponse(response.order)"><i class="fas fa-sort-up fa-fw"></i> {{ translate('commons.moveUp') | capitalize }}</button>
-              <button v-if="i !== item.responses.length - 1" class="dropdown-item p-2 pl-4 pr-4" style="cursor: pointer" type="button" @click="moveDownResponse(response.order)"><i class="fas fa-sort-down fa-fw"></i> {{ translate('commons.moveDown') | capitalize }}</button>
-              <button class="dropdown-item p-2 pl-4 pr-4 text-danger" style="cursor: pointer" type="button" @click="deleteResponse(response.order)"><i class="fas fa-trash-alt fa-fw"></i> {{ translate('delete') }}</button>
+              <button v-if="i !== 0" class="dropdown-item p-2 pl-4 pr-4" style="cursor: pointer" type="button" @click="moveUpResponse(response.order)">
+                <fa icon="sort-up" fixed-width></fa> {{ translate('commons.moveUp') | capitalize }}</button>
+              <button v-if="i !== item.responses.length - 1" class="dropdown-item p-2 pl-4 pr-4" style="cursor: pointer" type="button" @click="moveDownResponse(response.order)">
+                <fa icon="sort-down" fixed-width></fa> {{ translate('commons.moveDown') | capitalize }}</button>
+              <button class="dropdown-item p-2 pl-4 pr-4 text-danger" style="cursor: pointer" type="button" @click="deleteResponse(response.order)">
+                <fa icon="trash-alt" fixed-width></fa> {{ translate('delete') }}</button>
             </div>
           </div>
         </div>

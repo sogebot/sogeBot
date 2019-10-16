@@ -17,11 +17,11 @@
             <b-input input type="text" class="form-control w-auto col-6" v-model="toAdd" placeholder="Paste your youtube link, id or playlist link" />
             <b-input-group-append>
               <b-button type="submit" v-if="state.import == 0" variant="primary" class="btn mr-2" v-on:click="addSongOrPlaylist()">
-                <i class="fas fa-plus"></i> {{ translate('systems.songs.add_song') }}</b-button>
+                <fa icon="plus"></fa> {{ translate('systems.songs.add_song') }}</b-button>
               <b-button v-else-if="state.import == 1" class="btn mr-2" variant="info" disabled="disabled">
-                <i class="fas fa-circle-notch fa-spin"></i> {{ translate('systems.songs.importing') }}</b-button>
+                <fa icon="circle-notch" spin></fa> {{ translate('systems.songs.importing') }}</b-button>
               <b-button v-else class="btn mr-2" variant="success" disabled="disabled">
-                <i class="fas fa-check"></i> {{ translate('systems.songs.importing_done') }}</b-button>
+                <fa icon="check"></fa> {{ translate('systems.songs.importing_done') }}</b-button>
             </b-input-group-append>
           </b-input-group>
           <div class="text-info">{{ importInfo }}</div>

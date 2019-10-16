@@ -3,10 +3,10 @@
     <div class="input-group pt-1 pb-1" v-for="(v, index) of orderBy(currentValues, 'order')" :key="index">
       <div class="input-group-prepend d-flex" style="flex: 0 1 auto; flex-direction: column;">
         <button class="btn btn-block btn-secondary m-0 h-100" type="button" v-if="index !== 0" @click="moveUp(index)">
-          <i class="fas fa-sort-up"></i>
+          <fa icon="sort-up"></fa>
         </button>
         <button class="btn btn-block btn-secondary m-0 h-100" type="button" v-if="index != currentValues.length - 1"  @click="moveDn(index)">
-          <i class="fas fa-sort-down"></i>
+          <fa icon="sort-down"></fa>
         </button>
       </div>
       <select v-model="v.type" class="form-control" style="height: auto !important;">
@@ -17,12 +17,12 @@
       <textarea class="form-control" v-model="v.right" style="resize: none;" :readonly="['separator', 'bigHeader'].includes(v.type)"></textarea>
       <div class="input-group-append">
         <button class="btn btn-danger" type="button" @click="remove(index); reorder()">
-          <i class="far fa-trash-alt"></i>
+          <fa :icon="['far', 'trash-alt']"></fa>
         </button>
       </div>
     </div>
     <button class="btn btn-success btn-block" @click="currentValues.push({ order: currentValues.length, type: 'bigHeader', text: { left: '', middle: '', right: '' } })">
-      <i class="fas fa-plus"></i>
+      <fa icon="plus"></fa>
     </button>
   </div>
 </template>

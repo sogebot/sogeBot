@@ -3,7 +3,7 @@ SHELL   := /bin/bash
 VERSION := `node -pe "require('./package.json').version"`
 ENV     ?= production
 
-all : clean prepare dependencies css js jsdist bot info
+all : clean prepare dependencies css ui bot info
 .PHONY : all
 
 docker:
@@ -29,13 +29,9 @@ css:
 	@npx node-sass --output-style expanded --precision 6 scss/themes/light.scss public/dist/css/light.css
 	@npx node-sass --output-style expanded --precision 6 scss/themes/dark.scss public/dist/css/dark.css
 
-js:
+ui:
 	@echo -ne "\n\t ----- Bundling with webpack\n"
 	@NODE_ENV=$(ENV) npx webpack
-
-jsdist:
-	@echo -ne "\n\t ----- Copying dist files\n"
-	@node tools/copy-dist-files.js
 
 bot:
 	@echo -ne "\n\t ----- Building bot\n"

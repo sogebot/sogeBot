@@ -17,11 +17,11 @@
             <b-input input type="text" class="form-control w-auto col-6" v-model="toAdd" placeholder="Paste your youtube link, id or playlist link" />
             <b-input-group-append>
               <b-button type="submit" v-if="state.import == 0" variant="primary" class="btn mr-2" v-on:click="addSongOrPlaylist()">
-                <i class="fas fa-plus"></i> {{ translate('systems.songs.add_or_import') }}</b-button>
+                <fa icon="plus"></fa> {{ translate('systems.songs.add_or_import') }}</b-button>
               <b-button v-else-if="state.import == 1" class="btn mr-2" variant="info" disabled="disabled">
-                <i class="fas fa-circle-notch fa-spin"></i> {{ translate('systems.songs.importing') }}</b-button>
+                <fa icon="circle-notch" spin></fa> {{ translate('systems.songs.importing') }}</b-button>
               <b-button v-else class="btn mr-2" variant="success" disabled="disabled">
-                <i class="fas fa-check"></i> {{ translate('systems.songs.importing_done') }}</b-button>
+                <fa icon="check"></fa> {{ translate('systems.songs.importing_done') }}</b-button>
             </b-input-group-append>
           </b-input-group>
           <div class="text-info">{{ importInfo }}</div>
@@ -37,11 +37,11 @@
       <template v-slot:cell(title)="data">
         {{ data.item.title }}
         <small class="d-block">
-          <i class="far fa-clock"></i> {{ data.item.length_seconds | formatTime }}
+          <fa :icon="[ 'far', 'clock' ]"></fa> {{ data.item.length_seconds | formatTime }}
           <i class="pl-3 fas fa-volume-up"></i> {{ Number(data.item.volume).toFixed(1) }}%
           <i class="pl-3 fas fa-step-backward"></i>
           {{ data.item.startTime | formatTime }} - {{ data.item.endTime | formatTime }}
-          <i class="fas fa-step-forward"></i>
+          <fa icon="step-forward"></fa>
           <i class="pl-3 fas fa-music"></i> {{ new Date(data.item.lastPlayedAt).toLocaleString() }}
         </small>
       </template>
@@ -94,9 +94,9 @@
             <button type="button" class="btn btn-secondary" @click="data.toggleDetails">{{translate('events.dialog.close')}}</button>
 
             <button v-if="state.save === 0" type="button" class="btn btn-primary" v-on:click="updateItem(data.item._id)">{{ translate('dialog.buttons.saveChanges.idle') }}</button>
-            <button v-if="state.save === 1" disabled="disabled" type="button" class="btn btn-primary"><i class="fas fa-circle-notch fa-spin"></i> {{ translate('dialog.buttons.saveChanges.progress') }}</button>
-            <button v-if="state.save === 2" disabled="disabled" type="button" class="btn btn-success"><i class="fas fa-check"></i> {{ translate('dialog.buttons.saveChanges.done') }}</span></button>
-            <button v-if="state.save === 3" disabled="disabled" type="button" class="btn btn-danger"><i class="fas fa-exclamation"></i> {{ translate('dialog.buttons.something-went-wrong') }}</span></button>
+            <button v-if="state.save === 1" disabled="disabled" type="button" class="btn btn-primary"><fa icon="circle-notch" spin></fa> {{ translate('dialog.buttons.saveChanges.progress') }}</button>
+            <button v-if="state.save === 2" disabled="disabled" type="button" class="btn btn-success"><fa icon="check"></fa> {{ translate('dialog.buttons.saveChanges.done') }}</button>
+            <button v-if="state.save === 3" disabled="disabled" type="button" class="btn btn-danger"><fa icon="exclamation"></fa> {{ translate('dialog.buttons.something-went-wrong') }}</button>
           </div>
         </b-card>
       </template>

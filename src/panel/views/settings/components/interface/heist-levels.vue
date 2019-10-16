@@ -26,10 +26,10 @@
       </div>
 
       <div class="col-1 pl-0">
-        <button class="btn btn-danger h-100 w-100" @click="removeLevel(index)"><i class="fas fa-trash-alt"></i></button>
+        <button class="btn btn-danger h-100 w-100" @click="removeLevel(index)"><fa icon="trash-alt"></fa></button>
       </div>
     </div>
-    <button class="btn btn-success btn-block mt-2" @click="addLevel"><i class="fas fa-plus"></i></button>
+    <button class="btn btn-success btn-block mt-2" @click="addLevel"><fa icon="plus"></fa></button>
   </div>
 </template>
 

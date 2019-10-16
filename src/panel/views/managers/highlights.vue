@@ -28,7 +28,7 @@
               <div style="padding-top:0.8rem !important">
                 {{ item.title }}
                 <small class="d-block">
-                  <i class="far fa-clock"></i> {{ timestampToString(item.timestamp) }}
+                  <fa :icon="[ 'far', 'clock' ]"></fa> {{ timestampToString(item.timestamp) }}
                   <i class="pl-2 far fa-calendar-alt"></i> {{ new Date(item.created_at).toLocaleString() }}
                   <i class="pl-2 fas fa-gamepad"></i> {{ item.game }}
                 </small>
@@ -37,9 +37,9 @@
           </div>
 
           <div class="col-sm-1 pl-0">
-            <button data-toggle="dropdown" class="btn btn-block btn-outline-dark border-0 h-100"><i class="fas fa-ellipsis-v"></i></button>
+            <button data-toggle="dropdown" class="btn btn-block btn-outline-dark border-0 h-100"><fa icon="ellipsis-v"></fa></button>
             <div class="dropdown-menu p-0">
-              <button class="dropdown-item p-2 pl-4 pr-4" style="cursor: pointer" v-on:click="deleteItem(item._id)"><i class="fas fa-trash-alt"></i> {{ translate('delete') }}</button>
+              <button class="dropdown-item p-2 pl-4 pr-4" style="cursor: pointer" v-on:click="deleteItem(item._id)"><fa icon="trash-alt"></fa> {{ translate('delete') }}</button>
             </div>
           </div>
         </div>

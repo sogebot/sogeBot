@@ -52,9 +52,12 @@
 
       <div class="card-body border-top p-0 text-right">
         <div class="btn-group" role="group">
-          <button class="btn btn-outline-dark p-3 border-0" @click="toggleShowMore(item._id)"><i class="fas mr-1" :class="[!showMore.includes(item._id) ? 'fa-ellipsis-h' : 'fa-ellipsis-v']"></i> {{ !showMore.includes(item._id) ? translate('commons.show-more') : translate('commons.show-less') }}</button>
-          <a v-bind:href="'/overlays/text?id='+ item._id" class="btn btn-outline-dark p-3 border-0" target="_blank"><i class="fas fa-link"></i> /overlays/text?id={{ item._id }}</a>
-          <button @click="goTo(item._id)" class="btn btn-outline-dark p-3 border-0"><i class="fas fa-pencil-alt mr-1" aria-hidden="true"></i> {{ translate('dialog.buttons.edit') }}</button>
+          <button class="btn btn-outline-dark p-3 border-0" @click="toggleShowMore(item._id)">
+            <fa class="mr-1" :icon="[!showMore.includes(item._id) ? 'ellipsis-h' : 'ellipsis-v']"></fa> {{ !showMore.includes(item._id) ? translate('commons.show-more') : translate('commons.show-less') }}</button>
+          <a v-bind:href="'/overlays/text?id='+ item._id" class="btn btn-outline-dark p-3 border-0" target="_blank"><fa icon="link"></fa> /overlays/text?id={{ item._id }}</a>
+          <button @click="goTo(item._id)" class="btn btn-outline-dark p-3 border-0">
+            <fa icon="pencil-alt" class="mr-1"></fa>
+            {{ translate('dialog.buttons.edit') }}</button>
           <hold-button class="btn-outline-dark border-0 btn-reverse"
             @trigger="remove(item._id)">
             <template slot="title"><fa icon="trash" fixed-width/> {{translate('dialog.buttons.delete')}}</template>

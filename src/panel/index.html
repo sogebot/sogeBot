@@ -11,15 +11,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
   <link href="https://fonts.googleapis.com/css?family=Open+Sans|Poppins|PT+Sans|PT+Sans+Narrow|PT+Mono" rel="stylesheet">
-  <link href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" rel="stylesheet">
 
   <!-- Latest compiled and minified CSS -->
   <link rel="stylesheet" href="./dist/css/light.css">
-  <!-- Optional theme -->
-  <link rel="stylesheet" href="./dist/css/sortable-theme-bootstrap.css">
-  <link rel="stylesheet" href="./dist/bootstrap-toggle/css/bootstrap-toggle.min.css" />
-  <link rel="stylesheet" href="./dist/bootstrap-slider/css/bootstrap-slider.min.css" />
-  <link rel="stylesheet" href="./dist/gridstack/css/gridstack.min.css" />
+
   <script src="/socket.io/socket.io.js"></script>
 </head>
 
@@ -57,15 +52,15 @@
           <div class="pr-1">
             <button class="btn btn-xs btn-light dropdown-toggle" type="button" id="settingsButton" data-toggle="dropdown" aria-haspopup="true"
               aria-expanded="false">
-              <i class="fas fa-bars" aria-hidden="true"></i>
+              <fa icon="bars"></fa>
             </button>
             <div class="dropdown-menu dropdown-detach dropdown-menu-right"  aria-labelledby="settingsButton">
               <button class="dropdown-item text-success" onclick="joinBot()">
-                <i class="fas fa-sign-in-alt"></i>
+                <fa icon="sign-in-alt"></fa>
                 join channel
               </button>
               <button class="dropdown-item text-danger" onclick="leaveBot()">
-                <i class="fas fa-sign-out-alt"></i>
+                <fa icon="sign-out-alt"></fa>
                 leave from channel
               </button>
             </div>
@@ -98,40 +93,6 @@
   </div>
 
  <div id="footer" />
-
-  <!-- jQuery and Popper (necessary for Bootstrap's JavaScript plugins) -->
-  <script src="./dist/jquery/js/jquery.min.js"></script>
-  <script src="./dist/jquery-migrate/js/jquery-migrate.min.js"></script>
-  <script src="./dist/popper.js/js/popper.min.js"></script>
-  <!-- Router -->
-  <script src="./dist/page/js/page.js"></script>
-  <!-- LoDash goodness -->
-  <script src="./dist/lodash/js/lodash.min.js"></script>
-  <!-- Widgets drag'n'drop -->
-  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js" integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU=" crossorigin="anonymous"></script>
-  <script src="./dist/gridstack/js/gridstack.all.js"></script>
-  <!-- Latest compiled and minified JavaScript -->
-  <script src="./dist/bootstrap/js/bootstrap.min.js" crossorigin="anonymous"></script>
-  <script src="./dist/sortablejs/js/Sortable.min.js" crossorigin="anonymous"></script>
-  <script type="text/javascript" src="./dist/bootstrap-toggle/js/bootstrap-toggle.min.js"></script>
-  <script type="text/javascript" src="./dist/bootstrap-slider/js/bootstrap-slider.min.js"></script>
-  <script type="text/javascript" src="./dist/bootstrap-menu/js/BootstrapMenu.min.js"></script>
-  <script src="https://unpkg.com/chart.js@2.7.2/dist/Chart.bundle.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/vue-chartkick@0.5.0/dist/vue-chartkick.min.js"></script>
-  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.20.1/moment-with-locales.min.js"></script>
-  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/markdown-it/8.3.1/markdown-it.js"></script>
-  <script type="text/javascript" src="/auth/token.js"></script>
-  <script src="/dist/velocity-animate/js/velocity.min.js"></script>
-  <!-- CodeMirror textarea editor -->
-  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/codemirror.min.js"></script>
-  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/mode/javascript/javascript.min.js"></script>
-  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/mode/htmlmixed/htmlmixed.min.js"></script>
-  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/mode/xml/xml.min.js"></script>
-  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/mode/css/css.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/addon/edit/matchbrackets.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/addon/lint/javascript-lint.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.40.2/addon/lint/lint.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jshint/2.9.5/jshint.min.js"></script>
 
   <!-- production version, optimized for size and speed -->
   <script src="https://cdn.jsdelivr.net/npm/vue"></script>
