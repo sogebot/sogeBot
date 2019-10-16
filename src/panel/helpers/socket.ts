@@ -20,7 +20,7 @@ export const getTranslations = async () => {
       resolve(translations);
     });
   });
-}
+};
 
 export const getConfiguration = async () => {
   console.debug('Getting configuration');
@@ -30,4 +30,4 @@ export const getConfiguration = async () => {
       resolve(configuration);
     });
   });
-}
+};

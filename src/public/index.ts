@@ -13,7 +13,7 @@ import translate from 'src/panel/helpers/translate';
 import { ButtonStates, states } from 'src/panel/helpers/buttonStates';
 import { setMainLoaded } from 'src/panel/helpers/isAvailableVariable';
 import { getListOf } from 'src/panel/helpers/getListOf';
-import { getTranslations, getConfiguration } from 'src/panel/helpers/socket';
+import { getConfiguration, getTranslations } from 'src/panel/helpers/socket';
 
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 Vue.component('fa', FontAwesomeIcon);

@@ -1,6 +1,6 @@
 import { at, isNil } from 'lodash-es';
 
-export let translations = {}
+export let translations = {};
 
 export default function(key) {
   /* TODO: metrics
@@ -16,4 +16,4 @@ export default function(key) {
 
 export const setTranslations = (_translations) => {
   translations = _translations;
-}
+};

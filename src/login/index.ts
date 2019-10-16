@@ -19,7 +19,7 @@ import {
   faCheckCircle, faSkullCrossbones,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { getTranslations, getConfiguration } from 'src/panel/helpers/socket';
+import { getConfiguration, getTranslations } from 'src/panel/helpers/socket';
 library.add(faCheckCircle, faSkullCrossbones);
 Vue.component('fa', FontAwesomeIcon);
 Vue.component('font-awesome-icon', FontAwesomeIcon);
