@@ -13,7 +13,7 @@
         </a>
       </li>
       <li class="nav-item ml-auto">
-        <h6 class="widget-title">{{commons.translate('widget-title-customvariables')}}</h6>
+        <h6 class="widget-title">{{translate('widget-title-customvariables')}}</h6>
       </li>
     </ul>
   </div>
@@ -66,14 +66,14 @@
           <select class="form-control" v-model="selectedVariable">
             <option v-bind:value="variable.id" :key="variable.id" v-for="variable of nonWatchedVariables">{{ variable.variableName }}</option>
           </select>
-          <button class="btn btn-block btn-primary" v-on:click="addToWatch(selectedVariable)">{{ commons.translate('widgets.customvariables.add-variable-into-watchlist') }}</button>
+          <button class="btn btn-block btn-primary" v-on:click="addToWatch(selectedVariable)">{{ translate('widgets.customvariables.add-variable-into-watchlist') }}</button>
         </span>
         <span v-else>
-          <div class="alert alert-warning" v-html="commons.translate('widgets.customvariables.no-custom-variable-found')"></div>
+          <div class="alert alert-warning" v-html="translate('widgets.customvariables.no-custom-variable-found')"></div>
         </span>
 
         <span v-if="watched.length > 0">
-          <h6 class="mt-2 mb-0">{{ commons.translate('widgets.customvariables.watchlist') }}</h6>
+          <h6 class="mt-2 mb-0">{{ translate('widgets.customvariables.watchlist') }}</h6>
           <ul class="list-group list-group-flush">
             <li class="list-group-item" v-for="(watch, index) of watchedVariables" :key="index">
               <span class="row">
@@ -151,7 +151,6 @@ var numberOrTextComponent = {
     `
 }
 export default {
-  props: ['commons'],
   components: {
     'number-or-text': numberOrTextComponent
   },

@@ -1,7 +1,6 @@
 const path = require('path');
 const VueLoaderPlugin = require('vue-loader/lib/plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const CopyPlugin = require('copy-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 
@@ -72,6 +71,7 @@ const webpackConfig = {
     main: './src/panel/index.ts',
     overlay: './src/overlay/index.ts',
     login: './src/login/index.ts',
+    public: './src/public/index.ts',
   },
   resolve: {
     extensions: ['.ts', '.js', '.vue', '.json'],
@@ -89,15 +89,14 @@ const webpackConfig = {
   plugins: [
     new VueLoaderPlugin(),
     new CleanWebpackPlugin(),
-    new CopyPlugin([ /* TODO: remove in future */
-      { from: 'dist/js/commons.js', to: 'commons.js' },
-      { from: 'dist/js/components.js', to: 'components.js' }
-    ]),
     new HtmlWebpackPlugin({
       filename: '../../popout.html', template: 'src/panel/popout.html', chunks: ['main']
     }),
     new HtmlWebpackPlugin({
       filename: '../../index.html', template: 'src/panel/index.html', chunks: ['main']
+    }),
+    new HtmlWebpackPlugin({
+      filename: '../../public.html', template: 'src/public/index.html', chunks: ['public']
     }),
     new HtmlWebpackPlugin({
       filename: '../../overlays.html', template: 'src/overlay/index.html', chunks: ['overlay']
@@ -150,6 +149,20 @@ const webpackConfig = {
         test: /\.vue$/,
         exclude: /(node_modules|bower_components)/,
         use: ['vue-loader'],
+      },
+      {
+        test: /\.pug$/,
+        oneOf: [
+          // this applies to `<template lang="pug">` in Vue components
+          {
+            resourceQuery: /^\?vue/,
+            use: ['pug-plain-loader']
+          },
+          // this applies to pug imports inside JavaScript
+          {
+            use: ['raw-loader', 'pug-plain-loader']
+          }
+        ]
       },
       {
         test: /\.css$/,

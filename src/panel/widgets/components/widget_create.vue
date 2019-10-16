@@ -2,7 +2,7 @@
 <div class="col">
   <div class="widgetAdd" @click="load" v-if="state < 2">
     <span v-if="state === 0">
-      <fa icon="plus" /> {{commons.translate('add-widget')}}
+      <fa icon="plus" /> {{translate('add-widget')}}
     </span>
     <span v-if="state === 1">
       <fa icon="spinner" spin /> Loading data from server.
@@ -16,14 +16,14 @@
       @click="add(widget.id)"
       class="list-group-item list-group-item-action">
       <fa :icon="widget.icon.split(' ').map(o => o.replace('fa-', ''))" fixed-width />
-      <span>{{commons.translate(widget.name).toUpperCase()}}</span>
+      <span>{{translate(widget.name).toUpperCase()}}</span>
     </a>
     <a
       @click="state = 0"
       href="#"
       class="list-group-item list-group-item-action">
       <fa icon="times" fixed-width />
-      <span style="font-size:1rem; text-transform:uppercase;">{{commons.translate('close')}}</span>
+      <span style="font-size:1rem; text-transform:uppercase;">{{translate('close')}}</span>
     </a>
   </div>
 </div>
@@ -32,7 +32,7 @@
 <script>
 import { getSocket } from 'src/panel/helpers/socket';
 export default {
-  props: ['commons', 'dashboardId'],
+  props: ['dashboardId'],
   data: function () {
     return {
       socket: getSocket('/'),

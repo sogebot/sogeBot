@@ -1,12 +1,13 @@
 /* globals  commons _ translations configuration socket page */
 import Vue from 'vue';
 import Popout from './popout.vue';
+import { isMainLoaded } from '../helpers/isAvailableVariable';
 import { getSocket } from 'src/panel/helpers/socket';
 
-function initPopout () {
-  const isTranslationsLoaded = typeof translations === 'undefined' || Object.keys(translations).length === 0
-  const isConfigurationLoaded = typeof configuration === 'undefined' || Object.keys(configuration).length === 0
-  if (isTranslationsLoaded || isConfigurationLoaded) return setTimeout(() => initPopout(), 10)
+async function initPopout () {
+  await Promise.all([
+    isMainLoaded(),
+  ]);
 
   new Vue({ // eslint-disable-line no-new
     el: '#popout',
@@ -15,7 +16,7 @@ function initPopout () {
       socket: getSocket('/')
     },
     render: function (createElement) {
-      return createElement(Popout, { props: { commons, socket, page, configuration } })
+      return createElement(Popout, { props: { socket, page, configuration } })
     }
   })
 }

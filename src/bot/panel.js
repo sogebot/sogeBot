@@ -98,9 +98,6 @@ function Panel () {
       res.status(403).send('403 Forbidden - You are looking at wrong castle.')
     }
   })
-  app.get('/playlist', function (req, res) {
-    res.sendFile(path.join(__dirname, '..', 'public', 'playlist', 'index.html'))
-  })
   app.get('/overlays/:overlay', function (req, res) {
     res.sendFile(path.join(__dirname, '..', 'public', 'overlays.html'))
   })
@@ -110,8 +107,8 @@ function Panel () {
   app.get('/custom/:custom', function (req, res) {
     res.sendFile(path.join(__dirname, '..', 'public', 'custom', req.params.custom + '.html'))
   })
-  app.get('/public/:public', function (req, res) {
-    res.sendFile(path.join(__dirname, '..', 'public', 'public', req.params.public + '.html'))
+  app.get('/public/', function (req, res) {
+    res.sendFile(path.join(__dirname, '..', 'public', 'public.html'))
   })
   app.get('/fonts', function (req, res) {
     res.sendFile(path.join(__dirname, '..', 'fonts.json'))
@@ -443,6 +440,16 @@ function Panel () {
     socket.on('menu', (cb) => {
       cb(self.menu);
     });
+
+    socket.on('translations', (cb) => {
+      let lang = {}
+      _.merge(
+        lang,
+        global.translate({ root: 'webpanel' }),
+        global.translate({ root: 'ui' }) // add ui root -> slowly refactoring to new name
+      )
+      cb(lang);
+    })
 
     _.each(self.socketListeners, function (listener) {
       socket.on(listener.on, async function (data) {

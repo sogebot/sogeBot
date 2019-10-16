@@ -1,6 +1,5 @@
 import Vue from 'vue';
 
-import { isAvailableVariable } from '../panel/helpers/isAvailableVariable';
 import translate from '../panel/helpers/translate';
 import LoadScript from 'vue-plugin-load-script';
 import VueRouter from 'vue-router';
@@ -20,6 +19,7 @@ import {
   faCheckCircle, faSkullCrossbones,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { getTranslations, getConfiguration } from 'src/panel/helpers/socket';
 library.add(faCheckCircle, faSkullCrossbones);
 Vue.component('fa', FontAwesomeIcon);
 Vue.component('font-awesome-icon', FontAwesomeIcon);
@@ -52,10 +52,8 @@ declare module 'vue/types/vue' {
 }
 
 const overlays = async () => {
-  await Promise.all([
-    isAvailableVariable('translations'),
-    isAvailableVariable('configuration'),
-  ]);
+  await getTranslations();
+  Vue.prototype.configuration = await getConfiguration();
 
   Vue.prototype.translate = (v) => translate(v);
   Vue.prototype.urlParam = (v) => urlParam(v);

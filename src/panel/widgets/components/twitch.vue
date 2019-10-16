@@ -14,7 +14,7 @@
         </a>
       </li>
       <li class="nav-item ml-auto">
-        <h6 class="widget-title">{{ commons.translate('widget-title-monitor') }}</h6>
+        <h6 class="widget-title">{{ translate('widget-title-monitor') }}</h6>
       </li>
     </ul>
   </div>
@@ -40,7 +40,6 @@ export default {
       isRefreshing: false
     }
   },
-  props: ['commons'],
   created: function () {
     this.socket.emit('twitch.sendTwitchVideo')
     this.socket.once('twitchVideo', (room) => {

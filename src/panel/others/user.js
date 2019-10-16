@@ -18,7 +18,7 @@ async function initUser () {
     },
     render: function (createElement) {
       if (typeof systems !== 'undefined') {
-        return createElement(User, { props: { commons, systems } });
+        return createElement(User, { props: { systems } });
       } else {
         return false;
       }

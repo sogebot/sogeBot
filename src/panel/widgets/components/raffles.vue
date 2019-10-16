@@ -30,7 +30,7 @@
         </a>
       </li>
       <li class="nav-item ml-auto">
-        <h6 class="widget-title">{{commons.translate('widget-title-raffles')}}</h6>
+        <h6 class="widget-title">{{translate('widget-title-raffles')}}</h6>
       </li>
     </ul>
   </div>
@@ -40,7 +40,7 @@
     <div class="tab-content">
       <div role="tabpanel" class="tab-pane" id="raffles-participants">
         <div class="input-group">
-          <input type="text" class="form-control" :placeholder="commons.translate('placeholder-search')" v-model="search">
+          <input type="text" class="form-control" :placeholder="translate('placeholder-search')" v-model="search">
           <span class="input-group-btn">
             <button class="btn btn-danger" type="button" title="Cancel search" @click="search = ''">
               <fa icon="trash"></fa>
@@ -56,7 +56,7 @@
           </li>
           <li class="text-danger">
             <fa icon="eye-slash"></fa>
-            {{Math.abs(fParticipants.length - participants.length)}} {{commons.translate('hidden')}}
+            {{Math.abs(fParticipants.length - participants.length)}} {{translate('hidden')}}
           </li>
         </ul>
       </div>
@@ -79,7 +79,7 @@
           <div class="input-group-prepend">
               <span class="input-group-text">!</span>
           </div>
-          <input type="text" class="form-control" :placeholder="commons.translate('placeholder-enter-keyword')" v-model="keyword" :disabled="running">
+          <input type="text" class="form-control" :placeholder="translate('placeholder-enter-keyword')" v-model="keyword" :disabled="running">
           <span class="input-group-btn btn-group">
             <button type="button" class="btn btn-success" :disabled="!running" @click="socket.emit('pick')">
               <fa icon="trophy" fixed-width></fa>
@@ -93,12 +93,12 @@
           <div class="w-100"></div>
           <div class="col text-center">
             <div class="d-flex">
-            <button type="button" class="btn btn-default btn-label w-100 text-left" disabled="disabled">{{commons.translate('eligible-to-enter')}}</button>
+            <button type="button" class="btn btn-default btn-label w-100 text-left" disabled="disabled">{{translate('eligible-to-enter')}}</button>
             <button
               class="btn d-block border-0 w-100" style="flex-shrink: 2;"
               :class="[ eligibility.all ? 'btn-outline-success' : 'btn-outline-danger' ]"
               @click="toggle('all')"
-              :title="commons.translate('everyone')"
+              :title="translate('everyone')"
               :disabled="running">
               <fa icon="users" />
             </button>
@@ -106,7 +106,7 @@
               class="btn d-block border-0 w-100" style="flex-shrink: 2;"
               :class="[ eligibility.followers ? 'btn-outline-success' : 'btn-outline-danger' ]"
               @click="toggle('followers')"
-              :title="commons.translate('followers')"
+              :title="translate('followers')"
               :disabled="running">
               <fa icon="heart" />
             </button>
@@ -114,7 +114,7 @@
               class="btn d-block border-0 w-100" style="flex-shrink: 2;"
               :class="[ eligibility.subscribers ? 'btn-outline-success' : 'btn-outline-danger' ]"
               @click="toggle('subscribers')"
-              :title="commons.translate('subscribers')"
+              :title="translate('subscribers')"
               :disabled="running">
               <fa icon="star" />
             </button>
@@ -125,18 +125,18 @@
         <div class="row pb-1">
           <div class="col">
             <div class="d-flex">
-              <button type="button" class="btn btn-default btn-label w-100 text-left" disabled="disabled">{{commons.translate('raffle-type')}}</button>
+              <button type="button" class="btn btn-default btn-label w-100 text-left" disabled="disabled">{{translate('raffle-type')}}</button>
               <button class="btn d-block w-100"
                 :class="[isTypeKeywords ? 'btn-primary' : 'btn-outline-primary border-0']"
                 @click="isTypeKeywords = true"
                 :disabled="running">
-                {{commons.translate('raffle-type-keywords')}}
+                {{translate('raffle-type-keywords')}}
               </button>
               <button class="btn d-block w-100"
                 :class="[isTypeKeywords ? 'btn-outline-primary border-0' : 'btn-primary']"
                 @click="isTypeKeywords = false"
                 :disabled="running">
-                {{commons.translate('raffle-type-tickets')}}
+                {{translate('raffle-type-tickets')}}
               </button>
             </div>
           </div>
@@ -145,7 +145,7 @@
         <div class="row" v-if="!isTypeKeywords">
           <div class="col">
             <div class="d-flex">
-              <button type="button" class="btn btn-default btn-label w-50 text-left" disabled>{{commons.translate('raffle-tickets-range')}}</button>
+              <button type="button" class="btn btn-default btn-label w-50 text-left" disabled>{{translate('raffle-tickets-range')}}</button>
               <div class="w-100">
                 <div class="input-group">
                   <div class="input-group-prepend">
@@ -177,11 +177,11 @@
 
           <div class="text-center">
             <div class="d-flex">
-              <div class="w-100 btn" style="cursor: initial" :class="[winner.is.follower ? 'text-success' : 'text-danger']">{{commons.translate('follower')}}</div>
-              <div class="w-100 btn" style="cursor: initial" :class="[winner.is.subscriber ? 'text-success' : 'text-danger']">{{commons.translate('subscriber')}}</div>
+              <div class="w-100 btn" style="cursor: initial" :class="[winner.is.follower ? 'text-success' : 'text-danger']">{{translate('follower')}}</div>
+              <div class="w-100 btn" style="cursor: initial" :class="[winner.is.subscriber ? 'text-success' : 'text-danger']">{{translate('subscriber')}}</div>
               <button type="button" class="btn btn-outline-secondary border-0 btn-block" @click="socket.emit('pick')">
                 <fa icon="sync"></fa>
-                {{commons.translate('roll-again')}}
+                {{translate('roll-again')}}
               </button>
             </div>
           </div>
@@ -192,7 +192,7 @@
                 <tr>
                   <td colspan="2" style="vertical-align: bottom; font-size: 18px;">
                   <fa icon="comments"></fa>
-                  {{commons.translate('messages')}}
+                  {{translate('messages')}}
                   </td>
                 </tr>
               </thead>
@@ -210,17 +210,17 @@
       <div role="tabpanel" class="tab-pane" id="raffles-settings">
         <div class="input-group">
           <div class="input-group-prepend">
-              <span class="input-group-text">{{commons.translate('announce-every')}}</span>
+              <span class="input-group-text">{{translate('announce-every')}}</span>
           </div>
           <input type="text" class="form-control" v-model="raffleAnnounceInterval">
           <div class="input-group-append">
-              <span class="input-group-text">{{commons.translate('minutes')}}</span>
+              <span class="input-group-text">{{translate('minutes')}}</span>
           </div>
         </div>
 
         <div class="input-group mt-2">
           <div class="input-group-prepend">
-              <span class="input-group-text">{{commons.translate('systems.raffles.widget.subscribers-luck')}}</span>
+              <span class="input-group-text">{{translate('systems.raffles.widget.subscribers-luck')}}</span>
           </div>
           <input type="text" class="form-control" v-model="luck.subscribersPercent">
           <div class="input-group-append">
@@ -230,7 +230,7 @@
 
         <div class="input-group mt-2">
           <div class="input-group-prepend">
-              <span class="input-group-text">{{commons.translate('systems.raffles.widget.followers-luck')}}</span>
+              <span class="input-group-text">{{translate('systems.raffles.widget.followers-luck')}}</span>
           </div>
           <input type="text" class="form-control" v-model="luck.followersPercent">
           <div class="input-group-append">
@@ -250,7 +250,6 @@
 import { getSocket } from 'src/panel/helpers/socket';
 import { orderBy } from 'lodash-es';
 export default {
-  props: ['commons'],
   mounted: function () {
     this.$emit('mounted')
   },
