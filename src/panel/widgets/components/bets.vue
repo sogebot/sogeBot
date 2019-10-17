@@ -1,17 +1,28 @@
 <template>
-  <div class="widget" @contextmenu.prevent="context.open($event, 'bets')">
-    <b-card class="border-0" no-body>
-      <b-tabs pills card>
-        <template v-slot:tabs-start>
-          <li class="nav-item align-self-center pl-2"><h6 class="widget-title">{{translate('widget-title-bets')}}</h6></li>
+  <div class="widget">
+    <b-card class="border-0 h-100" no-body>
+      <b-tabs pills card class="h-100">
+        <template v-slot:tabs-start v-if="!popout">
+          <li class="nav-item pt-2 px-2 grip text-secondary">
+            <fa icon="grip-vertical" fixed-width/>
+          </li>
+          <li class="nav-item">
+            <b-dropdown no-caret :text="translate('widget-title-bets')" class="widget-title" variant="link" ref="dropdown" toggle-class="text-decoration-none">
+              <b-dropdown-item class="widget-title">
+                <a href="#" @click.prevent="$refs.dropdown.hide(); $nextTick(() => EventBus.$emit('remove-widget', 'bets'))" class="text-danger">
+                  <fa icon="trash-alt" class="mr-2" fixed-width/> Remove <strong>{{translate('widget-title-bets')}}</strong> widget
+                </a>
+              </b-dropdown-item>
+            </b-dropdown>
+          </li>
         </template>
 
-        <b-tab active>
+        <b-tab activ>
           <template v-slot:title>
             <fa :icon='["far", "clock"]'></fa>
             <template v-if="timer !== null">{{ timer | formatTime }}</template>
           </template>
-          <b-card-text>
+          <b-card-text >
             <template v-if="timer !== null">
               <div v-for="(option, index) of options" :key="option.name" class="pb-2">
                 <div class="progress" style="height: 35px; cursor: pointer;" @click="close(index)">

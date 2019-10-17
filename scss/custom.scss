@@ -417,8 +417,11 @@ span.title.title-part.text-default + div.widget {
 }
 
 .widget .tab-content, .widget .tab-pane.active {
-  height: 100%;
+  height: calc(100% - 40px);
   padding: 0.2rem;
+}
+.widget .tab-content .tab-pane  {
+  height: 100%;
 }
 
 .widget .table tr:first-child > td {

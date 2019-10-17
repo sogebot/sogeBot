@@ -116,7 +116,7 @@ export default {
       currentDashboard: null,
       show: true,
       isLoaded: false,
-      layout: [],
+      layout: {'null': []},
       socket: getSocket('/')
     }
   },
@@ -137,7 +137,7 @@ export default {
       this.dashboards = orderBy(dashboards, 'createdAt', 'asc');
       this.isLoaded = true;
 
-      this.layout = {};
+      this.layout = {'null': []};
       let i = 0;
       for(const widget of this.items) {
         if (typeof this.layout[widget.dashboardId] === 'undefined') {

@@ -1,5 +1,5 @@
 <template>
-  <div class="widget"> <!-- @contextmenu.prevent="context.open($event, 'chat')"-->
+  <div class="widget">
     <b-card class="border-0 h-100" no-body>
       <b-tabs pills card class="h-100" style="overflow:hidden">
         <template v-slot:tabs-start v-if="!popout">
