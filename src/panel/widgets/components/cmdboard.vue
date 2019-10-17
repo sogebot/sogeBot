@@ -24,9 +24,9 @@
       <div role="tabpanel" style="overflow: auto" class="tab-pane active" id="cmdboard-main">
         <div class="list-group" style="flex-flow: wrap; display: flex;" v-if="displayAs === 'grid'">
           <button
-            class="list-group-item list-group-item-action cmdboard-list-group-item"
+            class="list-group-item list-group-item-action" @contextmenu.prevent="$refs.menu.open($event, item)"
             style="width: 50%; text-overflow: ellipsis; height: 3.1rem;"
-            v-for="item of items"
+            v-for="(item) of items"
             v-on:click="emit(item)"
             :data-name="item.text"
             :key="item._id"
@@ -39,9 +39,9 @@
         </div>
         <div v-else class="list-group" style="flex-flow: column wrap; display: flex;">
           <button
-            class="list-group-item list-group-item-action cmdboard-list-group-item"
+            class="list-group-item list-group-item-action" @contextmenu.prevent="$refs.menu.open($event, item)"
             style="width: 100%; text-overflow: ellipsis; height: 3.1rem;"
-            v-for="item of items"
+            v-for="(item) of items"
             v-on:click="emit(item)"
             :data-name="item.text"
             :key="item._id"
@@ -52,6 +52,18 @@
             </span>
           </button>
         </div>
+
+        <vue-context ref="menu"
+                     :close-on-click="true"
+                     :close-on-scroll="true">
+          <template slot-scope="child">
+            <li v-if="child.data">
+              <a href="#" @click.prevent="removeCommand(child.data)" class="text-danger">
+                <fa icon="trash-alt" class="mr-2" fixed-width/> Remove <strong>{{child.data.text}}</strong>
+              </a>
+            </li>
+          </template>
+        </vue-context>
       </div>
       <!-- /MAIN -->
 
@@ -95,7 +107,12 @@
 
 <script>
 import { getSocket } from 'src/panel/helpers/socket';
+import { VueContext } from 'vue-context';
+
 export default {
+  components: {
+    'vue-context': VueContext,
+  },
   data: function () {
     return {
       socket: getSocket('/widgets/cmdboard'),
@@ -119,23 +136,6 @@ export default {
   mounted: function () {
     this.$emit('mounted')
   },
-  updated: function () {
-    new BootstrapMenu(".cmdboard-list-group-item", {
-      fetchElementData: ($el) => {
-        return $el.data();
-      },
-      actions: [{
-        name: 'Delete',
-        classNames: ['action-danger'],
-        iconClass: 'fa-trash-alt',
-        onClick: (data) => {
-          this.socket.emit('cmdboard.widget.remove', data, (items) => {
-            this.items = items
-          })
-        }
-      }]
-    })
-  },
   created: function () {
       this.socket.emit('cmdboard.widget.fetch', (items) => {
         this.items = items
@@ -147,6 +147,11 @@ export default {
       })
   },
   methods: {
+    removeCommand: function(data) {
+      this.socket.emit('cmdboard.widget.remove', data, (items) => {
+        this.items = items
+      })
+    },
     emit: function (item) {
       this.socket.emit('cmdboard.widget.run', item.command)
     },

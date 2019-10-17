@@ -65,7 +65,7 @@
 import { getSocket } from 'src/panel/helpers/socket';
 import { sortedUniq, flatten } from 'lodash-es';
 export default {
-  props: ['popout', 'configuration'],
+  props: ['popout'],
   data: function () {
     return {
       socket: getSocket('/widgets/chat'),
@@ -117,7 +117,7 @@ export default {
       if (err) return console.error(err)
       this.room = room
       $("#chat-room").html('<iframe frameborder="0" scrolling="no" id="chat_embed" src="' + window.location.protocol +
-        '//twitch.tv/embed/' + room + '/chat' + (configuration.core.ui.theme.includes('dark') ? '?darkpopout' : '') +'" width="100%"></iframe>')
+        '//twitch.tv/embed/' + room + '/chat' + (this.configuration.core.ui.theme.includes('dark') ? '?darkpopout' : '') +'" width="100%"></iframe>')
     })
   }
 }

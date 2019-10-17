@@ -3,7 +3,7 @@
   <div class="card-header">
     <ul class="nav nav-pills" role="tablist">
       <li role="presentation" class="nav-item" style="flex-shrink: 0">
-        <hold-button class="nav-link btn btn-outline-danger border-0 h-100 pl-1 pr-1" @trigger="cleanupSongRequestList()">
+        <hold-button icon="list" class="nav-link btn btn-outline-danger border-0 h-100 pl-1 pr-1" @trigger="cleanupSongRequestList()">
           <template v-slot:icon>
             <font-awesome-layers>
               <fa icon="list" transform="left-3"/>
@@ -51,7 +51,7 @@
         <table class="table table-sm">
           <tr v-for="(request, index) of requests" :key="index">
             <td>
-              <hold-button @trigger="removeSongRequest(String(index))" :icon="'times'" class="btn-outline-danger btn-only-icon border-0"></hold-button>
+              <hold-button @trigger="removeSongRequest(String(index))" icon="times" class="btn-outline-danger btn-only-icon border-0"></hold-button>
             </td>
             <td>{{request.song}}</td>
             <td>{{request.artist}}</td>
@@ -69,6 +69,11 @@
 import { getSocket } from 'src/panel/helpers/socket';
 import { FontAwesomeLayers } from '@fortawesome/vue-fontawesome'
 import { debounce } from 'lodash-es';
+
+
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faList, faTimes } from '@fortawesome/free-solid-svg-icons';
+library.add(faList, faTimes);
 
 export default {
   components: {

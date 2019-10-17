@@ -266,9 +266,10 @@
 <script lang="ts">
   import Vue from 'vue'
   import { isNil, get } from 'lodash-es'
+  import axios from 'axios';
 
-  import { EventBus } from '../helpers/event-bus';
-  import { getSocket } from '../helpers/socket';
+  import { EventBus } from 'src/panel/helpers/event-bus';
+  import { getSocket } from 'src/panel/helpers/socket';
 
   export default Vue.extend({
     data: function () {
@@ -376,11 +377,13 @@
         this.widthOfMenuUpdate()
       }, 100)
 
-      this.socket.emit('version', (version) => {
-        this.version = version
-        $.get('https://api.github.com/repos/sogehige/sogebot/releases/latest', (response) => {
+      this.socket.emit('version', async (version) => {
+        this.version =  version;
+        try {
+          const response: any = await axios.get('https://api.github.com/repos/sogehige/sogebot/releases/latest');
           let botVersion = version.replace('-SNAPSHOT', '').split('.')
-          let gitVersion = response.tag_name.split('.')
+          let gitVersion = response.data.tag_name.split('.')
+          console.debug({botVersion, gitVersion});
 
           let isNewer = false
           for (let index in botVersion) {
@@ -399,7 +402,9 @@
           if (isNewer) {
             this.update.version = gitVersion.join('.');
           }
-        })
+        } catch (e) {
+          console.error(e);
+        }
       })
 
 

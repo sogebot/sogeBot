@@ -37,6 +37,8 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
+import { get } from 'lodash-es';
+
 import { ButtonStates, states } from './helpers/buttonStates';
 import { setMainLoaded } from './helpers/isAvailableVariable';
 import { isUserCaster, isUserLoggedIn } from './helpers/isUserLoggedIn';
@@ -52,9 +54,7 @@ Vue.component('font-awesome-icon', FontAwesomeIcon);
 Vue.use(VueMoment, {
   moment, momentTimezone,
 });
-
 Vue.use(BootstrapVue);
-
 Vue.use(Vuelidate);
 Vue.use(LoadScript);
 
@@ -98,20 +98,29 @@ declare module 'vue/types/vue' {
 
 Vue.use(VueRouter);
 
+declare global {
+  interface Window {
+    token: string | undefined;
+  }
+}
+
 const main = async () => {
   // init prototypes
   Vue.prototype.translate = (v) => translate(v);
   Vue.prototype.urlParam = (v) => urlParam(v);
 
-  Vue.prototype.$loggedUser = await isUserLoggedIn();
-  await isUserCaster(Vue.prototype.$loggedUser.id);
 
-  Vue.prototype.$core = await getListOf('core');
-  Vue.prototype.$systems = await getListOf('systems');
-  Vue.prototype.$integrations = await getListOf('integrations');
+  if (typeof window.token !== 'undefined') {
+    Vue.prototype.$loggedUser = await isUserLoggedIn();
+    await isUserCaster(Vue.prototype.$loggedUser.id);
 
-  await getTranslations();
-  Vue.prototype.configuration = await getConfiguration();
+    Vue.prototype.$core = await getListOf('core');
+    Vue.prototype.$systems = await getListOf('systems');
+    Vue.prototype.$integrations = await getListOf('integrations');
+
+    await getTranslations();
+    Vue.prototype.configuration = await getConfiguration();
+  }
 
   Vue.prototype.$state = ButtonStates;
   setMainLoaded();
@@ -120,7 +129,7 @@ const main = async () => {
     mode: 'hash',
     base: __dirname,
     routes: [
-      { path: '/', name: 'Dashboard', component: () => import('./views/dashboard/stub.vue') },
+      { path: '/', name: 'Dashboard', component: () => import('./views/dashboard/dashboard.vue') },
       { path: '/stats/commandcount', name: 'CommandCountStats', component: () => import('./views/stats/commandcount.vue') },
       { path: '/stats/api', name: 'APIStats', component: () => import('./views/stats/api.vue') },
 
@@ -176,14 +185,19 @@ const main = async () => {
     router,
     components: {
       navbar: () => import('./components/navbar/navbar.vue'),
+      statsbar: () => import('./components/statsbar/statsbar.vue'),
+      changegamedialog: () => import('./components/dialog/changegamedialog.vue'),
+      footerbar: () => import('./components/footer.vue'),
     },
     data() {
       const object: {
         isDropdownHidden: boolean;
         dropdown: any;
+        token: any;
       } = {
         isDropdownHidden: true,
         dropdown: null,
+        token: window.token,
       };
       return object;
     },
@@ -198,7 +212,15 @@ const main = async () => {
         this.isDropdownHidden = true;
       });
 
-      this.$moment.locale(Vue.prototype.configuration.lang); // set proper moment locale
+      // set proper moment locale
+      this.$moment.locale(get(Vue, 'prototype.configuration.lang', 'en'));
+
+      // theme load
+      const head = document.getElementsByTagName('head')[0];
+      const link = (document.createElement('link') as any);
+      link.setAttribute('rel', 'stylesheet');
+      link.setAttribute('href',`./dist/css/${get(Vue, 'prototype.configuration.core.ui.theme', 'light')}.css`);
+      head.appendChild(link);
     },
     methods: {
       dropdownShow(bvEvent) {
@@ -226,8 +248,30 @@ const main = async () => {
     },
     template: `
       <div id="app">
-        <navbar/>
-        <router-view class="view"></router-view>
+        <template v-if="token">
+          <navbar/>
+          <statsbar/>
+          <changegamedialog/>
+          <router-view class="view pt-3"></router-view>
+          <footerbar/>
+        </template>
+        <template v-else>
+        <div class="alert alert-danger ml-5 mr-5" role="alert">
+          This domain is not set as accessible in your <strong>config.json</strong>. Update your file and restart a bot to propagate changes. Example below:
+        </div>
+        <pre class="alert alert-info ml-5 mr-5" style="font-family: Monospace">
+... config.json ...
+"panel": {
+  "__COMMENT__": "set correctly your domain and to be safe, change your token",
+  "username": "***",
+  "password": "***",
+  "port": ***,
+  "domain": "yourdomain1, ${window.location.host.split(':')[0]}",
+  "token": "***"
+},
+... config.json ...
+            </pre>
+        </template>
       </div>
     `,
   }).$mount('#app');

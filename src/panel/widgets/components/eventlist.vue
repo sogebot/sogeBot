@@ -191,6 +191,7 @@
 import { getSocket } from 'src/panel/helpers/socket';
 import { FontAwesomeLayers } from '@fortawesome/vue-fontawesome'
 import { chunk, debounce, get, isNil } from 'lodash-es';
+import moment from 'moment';
 export default {
   props: ['popout'],
   components: {

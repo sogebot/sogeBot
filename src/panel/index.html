@@ -12,8 +12,6 @@
 
   <link href="https://fonts.googleapis.com/css?family=Open+Sans|Poppins|PT+Sans|PT+Sans+Narrow|PT+Mono" rel="stylesheet">
 
-  <!-- Latest compiled and minified CSS -->
-  <link rel="stylesheet" href="./dist/css/light.css">
   <script type="text/javascript" src="/auth/token.js"></script>
   <script src="/socket.io/socket.io.js"></script>
   <!-- important for $(document) events -->
@@ -66,136 +64,9 @@
     <div class="lds-hourglass"></div>
   </div>
 
-  <!-- changelog modal dialog ->
-  <div class="modal" id="new_version_dlg" tabindex="-1" role="dialog" aria-labelledby="new_version_dlg">
-    <div class="modal-dialog modal-lg" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h4 class="modal-title">Changelog
-            <small id="sogebot-version"></small>
-          </h4>
-        </div>
-        <div class="modal-body"></div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">
-            <i data-lang="close"></i>
-          </button>
-          <a class="btn btn-primary" href="https://github.com/sogehige/sogeBot/releases">Go to release download</a>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="navbar navbar-light bg-light fixed-top">
-    <header class="w-100">
-      <div class="row flex-nowrap justify-content-between align-items-center;">
-        <div class="col text-left">
-          <a class="blog-header-logo text-dark" href="#/" style="line-height: 36px;"><strong id="bot_name"></strong> <span id="current_version" class="d-none d-sm-inline"></span></a>
-        </div>
-        <div class="col d-flex justify-content-end align-items-center">
-          <div id="checklist"></div> <!-- vue.js others/checklist ->
-          <div id="user"></div> <!-- vue.js others/user ->
-
-          <div class="pr-1">
-            <button class="btn btn-xs btn-light dropdown-toggle" type="button" id="settingsButton" data-toggle="dropdown" aria-haspopup="true"
-              aria-expanded="false">
-              <fa icon="bars"></fa>
-            </button>
-            <div class="dropdown-menu dropdown-detach dropdown-menu-right"  aria-labelledby="settingsButton">
-              <button class="dropdown-item text-success" onclick="joinBot()">
-                <fa icon="sign-in-alt"></fa>
-                join channel
-              </button>
-              <button class="dropdown-item text-danger" onclick="leaveBot()">
-                <fa icon="sign-out-alt"></fa>
-                leave from channel
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </header>
-
-    <div id="menu"></div>
-  </div>
-
-  <!-- CHANGE TITLE/GAME DLG ->
-  <div id="changegamedlg"></div> <!-- vue.js others/changegamedlg ->
-
-  <!-- SNIPPETS ->
-  <div id="quickStatsApp"></div>
-
-  <div class="container-fluid" style="overflow-x: hidden;">
-    <!-- widgets ->
-    <span class="widgets p-0 pt-1">
-      <div id="dashboard"></div>
-    </span>
-  </div>
-
-  <div class="pages-wrapper pt-2 pb-5">
-    <div class="container-fluid">
-      <div id="pages"></div>
-    </div>
-  </div>
-
- <div id="footer" />
-
   <!-- production version, optimized for size and speed -->
   <script src="https://cdn.jsdelivr.net/npm/vue"></script>
   <!-- dev version ->
   <script src="https://vuejs.org/js/vue.js"></script-->
-
-  <!--script>
-    if (typeof token === 'undefined') {
-      $('body').empty().append(`
-      <div class="alert alert-danger ml-5 mr-5" role="alert">
-        This domain is not set as accessible in your <strong>config.json</strong>. Update your file and restart a bot to propagate changes. Example below:
-      </div>
-      <pre class="alert alert-info ml-5 mr-5" style="font-family: Monospace">
-  ... config.json ...
-  "panel": {
-    "__COMMENT__": "set correctly your domain and to be safe, change your token",
-    "username": "***",
-    "password": "***",
-    "port": ***,
-    "domain": "yourdomain1, ${window.location.host.split(':')[0]}",
-    "token": "***"
-  },
-  ... config.json ...
-      </pre>
-      `)
-    }
-    // addWidget
-    $("#addWidget").on('click', function (ev) {
-      if (!addingWidget) {
-        $(".widgets").append($('<div class="col">').load('widgets/widget_create.html'))
-        $("#addWidget").css('display', 'none')
-        addingWidget = true
-      }
-    })
-
-    /* STATS */
-    socket.on('lang', function (data) {
-      translations = data
-      let elements = $('[data-lang]')
-      for (let el of elements) {
-        let translation = _.get(translations, $(el).data('lang'), null)
-        if(_.isNil(translation)) {
-          $(el).html(`{${$(el).data('lang')}}`)
-        } else {
-          $(el).html(translation)
-        }
-      }
-      $('#change-game-input').attr('placeholder', translations['create-and-use-a-new-game'])
-      $('#change-title').attr('placeholder', translations['create-and-use-a-new-title'])
-    })
-
-    socket.off('play-sound')
-    socket.on('play-sound', function (sound) {
-      var audio = new Audio(sound).play()
-    })
-
-
-  </script-->
 </body>
 </html>

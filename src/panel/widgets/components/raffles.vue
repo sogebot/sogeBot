@@ -330,7 +330,7 @@ export default {
         new Promise((resolve) => {
           this.socket.emit('find', {}, (err, raffles) => {
             const raffle = orderBy(raffles, 'timestamp', 'desc')[0]
-            if (Object.keys(raffle).length > 0) {
+            if (Object.keys(raffle || {}).length > 0) {
               this.running = !raffle.winner
               if (!raffle.winner) {
                 this.keyword = raffle.keyword

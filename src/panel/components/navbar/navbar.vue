@@ -1,11 +1,12 @@
 <template lang="pug">
   div.navbar.navbar-light.bg-light.fixed-top
+    vue-headful(:title='name.toUpperCase() + " " + version')
     header.w-100
       b-row.flex-nowrap.justify-content-between.align-items-center
         b-col.text-left
           a(href="#/" style="line-height: 36px;").blog-header-logo.text-dark
-            strong {{ name }}
-              span.d-none.d-sm-inline {{ version }}
+            strong.text-uppercase {{ name }}
+              span.d-none.d-sm-inline.pl-2 {{ version }}
         b-col.d-flex.justify-content-end.align-items-center
           checklist
           user
@@ -26,6 +27,9 @@
 import { Vue, Component } from 'vue-property-decorator';
 import { getSocket } from 'src/panel/helpers/socket';
 
+import vueHeadful from 'vue-headful';
+Vue.component('vue-headful', vueHeadful);
+
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faBars, faSignInAlt, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
 library.add(faBars, faSignInAlt, faSignOutAlt);
@@ -43,12 +47,10 @@ export default class navbar extends Vue {
   name: string = '';
   version: string = '';
 
-
   mounted() {
     this.socket.emit('version', (version) => this.version = version);
-    this.socket.emit('name', (name) => this.name = name);
+    this.socket.emit('name', (name: string) => this.name = name );
   }
-
 
   joinBot() {
     this.socket.emit('joinBot');

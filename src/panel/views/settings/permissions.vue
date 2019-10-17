@@ -38,9 +38,7 @@
   import uuid from 'uuid/v4';
 
   import { library } from '@fortawesome/fontawesome-svg-core'
-  import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
   import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
-
   library.add(faExclamationTriangle)
 
   export default Vue.extend({
@@ -48,7 +46,6 @@
       panel: () => import('../../components/panel.vue'),
       list: () => import('./components/permissions/list.vue'),
       edit: () => import('./components/permissions/edit.vue'),
-      'font-awesome-icon': FontAwesomeIcon
     },
     data: function () {
       const object: {

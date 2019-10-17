@@ -40,7 +40,7 @@ class Cmdboard extends Widget {
         cb(await global.db.engine.find('widgetsCmdBoard'));
       });
       socket.on('cmdboard.widget.remove', async (data, cb) => {
-        await global.db.engine.remove('widgetsCmdBoard', { text: data.name });
+        await global.db.engine.remove('widgetsCmdBoard', { text: data.text });
         cb(await global.db.engine.find('widgetsCmdBoard'));
       });
     });

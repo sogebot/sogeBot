@@ -85,12 +85,12 @@ function Panel () {
     if (_.isNil(origin)) {
       // file CANNOT be accessed directly
       res.status(401).send('401 Access Denied - This is not a file you are looking for.')
-      return
+      return;
     }
 
     if (origin.match(new RegExp('^((http|https)\\:\\/\\/|)([\\w|-]+\\.)?' + domain))) {
       res.set('Content-Type', 'application/javascript')
-      res.send(`const token="${config.panel.token.trim()}"; const name="${global.oauth.botUsername}"`)
+      res.send(`window.token="${config.panel.token.trim()}"`);
     } else {
       // file CANNOT be accessed from different domain
       res.status(403).send('403 Forbidden - You are looking at wrong castle.')

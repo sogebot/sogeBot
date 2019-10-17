@@ -46,7 +46,7 @@
           >
             <div class="grid-stack-item-content">
               <keep-alive>
-                <component :is="item.id" :socket="socket" :commons="commons" @mounted="loaded = loaded + 1" :popout="false"></component>
+                <component :is="item.id" :socket="socket" @mounted="loaded = loaded + 1" :popout="false"></component>
               </keep-alive>
             </div>
           </div>
@@ -54,8 +54,8 @@
       </div>
     </div>
     <div class="w-100"></div>
-    <widget-create v-bind:dashboardId="currentDashboard" v-bind:commons="commons" class="pt-4" @addWidget="addWidget"></widget-create>
-    <dashboard-remove v-show="currentDashboard !== String(0)" v-bind:dashboardId="currentDashboard" v-bind:socket="socket" v-bind:commons="commons" class="pt-4" @update="currentDashboard = 0" @removeDashboard="removeDashboard"></dashboard-remove>
+    <widget-create v-bind:dashboardId="currentDashboard" class="pt-4" @addWidget="addWidget"></widget-create>
+    <dashboard-remove v-show="currentDashboard !== String(0)" v-bind:dashboardId="currentDashboard" v-bind:socket="socket" class="pt-4" @update="currentDashboard = 0" @removeDashboard="removeDashboard"></dashboard-remove>
   </div>
 </div>
 </template>
@@ -64,29 +64,31 @@
 import { getSocket } from 'src/panel/helpers/socket';
 import { cloneDeep, difference, orderBy, map } from 'lodash-es';
 export default {
-  props: ['items', 'commons', 'dashboards'],
   components: {
-    bets: () => import('./components/bets.vue'),
-    chat: () => import('./components/chat.vue'),
-    cmdboard: () => import('./components/cmdboard.vue'),
-    commercial: () => import('./components/commercial.vue'),
-    customvariables: () => import('./components/customvariables.vue'),
-    eventlist: () => import('./components/eventlist.vue'),
-    join: () => import('./components/join.vue'),
-    part: () => import('./components/part.vue'),
-    queue: () => import('./components/queue.vue'),
-    raffles: () => import('./components/raffles.vue'),
-    soundboard: () => import('./components/soundboard.vue'),
-    spotify: () => import('./components/spotify.vue'),
-    twitch: () => import('./components/twitch.vue'),
-    twitter: () => import('./components/twitter.vue'),
-    widgetCreate: () => import('./components/widget_create.vue'),
-    dashboardRemove: () => import('./components/dashboard_remove.vue'),
-    ytplayer: () => import('./components/ytplayer.vue'),
-    social: () => import('./components/social.vue'),
+    bets: () => import('src/panel/widgets/components/bets.vue'),
+    chat: () => import('src/panel/widgets/components/chat.vue'),
+    cmdboard: () => import('src/panel/widgets/components/cmdboard.vue'),
+    commercial: () => import('src/panel/widgets/components/commercial.vue'),
+    customvariables: () => import('src/panel/widgets/components/customvariables.vue'),
+    eventlist: () => import('src/panel/widgets/components/eventlist.vue'),
+    join: () => import('src/panel/widgets/components/join.vue'),
+    part: () => import('src/panel/widgets/components/part.vue'),
+    queue: () => import('src/panel/widgets/components/queue.vue'),
+    raffles: () => import('src/panel/widgets/components/raffles.vue'),
+    soundboard: () => import('src/panel/widgets/components/soundboard.vue'),
+    spotify: () => import('src/panel/widgets/components/spotify.vue'),
+    twitch: () => import('src/panel/widgets/components/twitch.vue'),
+    twitter: () => import('src/panel/widgets/components/twitter.vue'),
+    widgetCreate: () => import('src/panel/widgets/components/widget_create.vue'),
+    dashboardRemove: () => import('src/panel/widgets/components/dashboard_remove.vue'),
+    ytplayer: () => import('src/panel/widgets/components/ytplayer.vue'),
+    social: () => import('src/panel/widgets/components/social.vue'),
   },
   data: function () {
     return {
+      items: [],
+      dashboards: [],
+
       dashboardName: '',
       addDashboard: false,
       currentDashboard: null,
@@ -95,6 +97,22 @@ export default {
       loaded: 0,
       socket: getSocket('/')
     }
+  },
+  created() {
+    this.socket.emit('getWidgets', (items, dashboards) => {
+      this.items = orderBy(items, 'id', 'asc');
+      for (const item of this.items) {
+        if (typeof item.dashboardId === 'undefined') {
+          item.dashboardId = null;
+        }
+      }
+      dashboards.push({
+        createdAt: 0,
+        name: 'Main',
+        id: null,
+      });
+      this.dashboards = orderBy(dashboards, 'createdAt', 'asc');
+    });
   },
   watch: {
     loaded: function (value) {

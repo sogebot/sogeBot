@@ -132,6 +132,9 @@ import { required } from 'vuelidate/lib/validators';
 
 import uuid from 'uuid/v4';
 
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
+library.add(faExclamationTriangle)
 
 import { getSocket } from '../../../helpers/socket';
 
