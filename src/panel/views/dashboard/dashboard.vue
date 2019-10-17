@@ -30,7 +30,7 @@
     <div v-if="windowWidth <= 750">
       <div v-for="item in layout" class="pl-2 pr-2 pb-2" :key="item.id">
         <keep-alive>
-          <component :is="item.id" :popout="false" :context="$refs['widgets-menu']"></component>
+          <component :is="item.id" :popout="false"></component>
         </keep-alive>
       </div>
     </div>
@@ -51,7 +51,7 @@
           :use-css-transforms="true"
       >
         <grid-item v-for="item in layout[dashboard.id]"
-                    drag-allow-from=".card-header"
+                    drag-allow-from=".grip"
                     :x="item.x"
                     :y="item.y"
                     :w="item.w"
@@ -65,18 +65,6 @@
       </grid-layout>
     </div>
 
-    <vue-context ref="widgets-menu"
-                  :close-on-click="true"
-                  :close-on-scroll="true">
-      <template slot-scope="child">
-        <li v-if="child.data">
-          <a href="#" @click.prevent="removeWidget(child.data)" class="text-danger">
-            <fa icon="trash-alt" class="mr-2" fixed-width/> Remove <strong>{{translate('widget-title-' + child.data)}}</strong> widget
-          </a>
-        </li>
-      </template>
-    </vue-context>
-
     <template v-if="currentDashboard === null">
       <div class="w-100"></div>
       <widget-create v-bind:dashboardId="currentDashboard" class="pt-4" @addWidget="addWidget"></widget-create>
@@ -87,13 +75,12 @@
 </template>
 
 <script>
+import { EventBus } from 'src/panel/helpers/event-bus';
 import { getSocket } from 'src/panel/helpers/socket';
 import { cloneDeep, difference, orderBy, map } from 'lodash-es';
 
 import VueGridLayout from 'vue-grid-layout';
 import { vueWindowSizeMixin } from 'vue-window-size';
-
-import { VueContext } from 'vue-context';
 
 export default {
   mixins: [ vueWindowSizeMixin ],
@@ -118,7 +105,6 @@ export default {
     social: () => import('src/panel/widgets/components/social.vue'),
     GridLayout: VueGridLayout.GridLayout,
     GridItem: VueGridLayout.GridItem,
-    'vue-context': VueContext,
   },
   data: function () {
     return {
@@ -162,6 +148,10 @@ export default {
         });
         i++;
       }
+    });
+
+    EventBus.$on('remove-widget', (id) => {
+      this.removeWidget(id);
     });
   },
   methods: {

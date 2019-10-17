@@ -1,108 +1,104 @@
 <template>
-<div class="card widget">
-  <div class="card-header" @contextmenu.prevent="context.open($event, 'cmdboard')">
-    <ul class="nav nav-pills" role="tablist">
-      <li role="presentation" class="nav-item">
-        <a class="nav-link active" href="#cmdboard-main" aria-controls="home" role="tab" data-toggle="tab" title="CommandBoard">
-          <fa icon="terminal" />
-        </a>
-      </li>
-      <li role="presentation" class="nav-item">
-        <a class="nav-link" href="#cmdboard-settings" aria-controls="home" role="tab" data-toggle="tab" title="Settings">
-          <fa icon="cog" />
-        </a>
-      </li>
-      <li class="nav-item ml-auto">
-        <h6 class="widget-title">{{translate('widget-title-cmdboard')}}</h6>
-      </li>
-    </ul>
-  </div>
-
-  <!-- Tab panes -->
-  <div class="card-body">
-    <div class="tab-content">
-      <div role="tabpanel" style="overflow: auto" class="tab-pane active" id="cmdboard-main">
-        <div class="list-group" style="flex-flow: wrap; display: flex;" v-if="displayAs === 'grid'">
-          <button
-            class="list-group-item list-group-item-action" @contextmenu.prevent="$refs.menu.open($event, item)"
-            style="width: 50%; text-overflow: ellipsis; height: 3.1rem;"
-            v-for="(item) of items"
-            v-on:click="emit(item)"
-            :data-name="item.text"
-            :key="item._id"
-            :title="item.command">
-            <span style="overflow: hidden; display: inline-block; word-break: break-all; height: 30px;">
-              {{item.text}}
-              <small>{{item.command}}</small>
-            </span>
-          </button>
-        </div>
-        <div v-else class="list-group" style="flex-flow: column wrap; display: flex;">
-          <button
-            class="list-group-item list-group-item-action" @contextmenu.prevent="$refs.menu.open($event, item)"
-            style="width: 100%; text-overflow: ellipsis; height: 3.1rem;"
-            v-for="(item) of items"
-            v-on:click="emit(item)"
-            :data-name="item.text"
-            :key="item._id"
-            :title="item.command">
-            <span style="overflow: hidden; display: inline-block; word-break: break-all; height: 30px;">
-              {{item.text}}
-              <small>{{item.command}}</small>
-            </span>
-          </button>
-        </div>
-
-        <vue-context ref="menu"
-                     :close-on-click="true"
-                     :close-on-scroll="true">
-          <template slot-scope="child">
-            <li v-if="child.data">
-              <a href="#" @click.prevent="removeCommand(child.data)" class="text-danger">
-                <fa icon="trash-alt" class="mr-2" fixed-width/> Remove <strong>{{child.data.text}}</strong>
-              </a>
-            </li>
+  <div class="widget">
+    <b-card class="border-0 h-100" no-body>
+      <b-tabs pills card class="h-100" style="overflow:hidden">
+        <template v-slot:tabs-start>
+          <li class="nav-item align-self-center pl-2">
+            <h6 class="widget-title">
+              {{translate('widget-title-cmdboard')}}
+            </h6>
+          </li>
+        </template>
+        <b-tab active>
+          <template v-slot:title>
+            <fa icon="terminal" />
           </template>
-        </vue-context>
-      </div>
-      <!-- /MAIN -->
+          <b-card-text>
+            <div class="list-group" style="flex-flow: wrap; display: flex;" v-if="displayAs === 'grid'">
+              <button
+                class="list-group-item list-group-item-action" @contextmenu.prevent="$refs.menu.open($event, item)"
+                style="width: 50%; text-overflow: ellipsis; height: 3.1rem;"
+                v-for="(item) of items"
+                v-on:click="emit(item)"
+                :data-name="item.text"
+                :key="item._id"
+                :title="item.command">
+                <span style="overflow: hidden; display: inline-block; word-break: break-all; height: 30px;">
+                  {{item.text}}
+                  <small>{{item.command}}</small>
+                </span>
+              </button>
+            </div>
+            <div v-else class="list-group" style="flex-flow: column wrap; display: flex;">
+              <button
+                class="list-group-item list-group-item-action" @contextmenu.prevent="$refs.menu.open($event, item)"
+                style="width: 100%; text-overflow: ellipsis; height: 3.1rem;"
+                v-for="(item) of items"
+                v-on:click="emit(item)"
+                :data-name="item.text"
+                :key="item._id"
+                :title="item.command">
+                <span style="overflow: hidden; display: inline-block; word-break: break-all; height: 30px;">
+                  {{item.text}}
+                  <small>{{item.command}}</small>
+                </span>
+              </button>
+            </div>
 
-      <div role="tabpanel" class="tab-pane" id="cmdboard-settings">
-        <div class="input-group">
-          <div class="input-group-prepend">
-            <span class="input-group-text">{{translate('name')}}</span>
-          </div>
-          <input type="text" class="form-control" v-model="name">
-        </div>
-        <div class="input-group">
-          <div class="input-group-prepend">
-            <span class="input-group-text">{{translate('command')}}</span>
-          </div>
-          <input type="text" class="form-control" v-model="command">
-        </div>
-        <button type="button" class="btn btn-success btn-block btn-cmdboard" v-on:click="add" :disabled="!isConfirmEnabled">{{translate('confirm')}}</button>
+            <vue-context ref="menu"
+                        :close-on-click="true"
+                        :close-on-scroll="true">
+              <template slot-scope="child">
+                <li v-if="child.data">
+                  <a href="#" @click.prevent="removeCommand(child.data)" class="text-danger">
+                    <fa icon="trash-alt" class="mr-2" fixed-width/> Remove <strong>{{child.data.text}}</strong>
+                  </a>
+                </li>
+              </template>
+            </vue-context>
+          </b-card-text>
+        </b-tab>
 
-        <div class="input-group pt-2">
-          <div class="input-group-prepend">
-            <span class="input-group-text">{{translate('display-as')}}</span>
-          </div>
-          <div class="btn-group btn-group-toggle d-flex" data-toggle="buttons" style="flex: 1 auto;">
-            <label
-              v-for="o of displayAsOpts"
-              :key="o"
-              class="btn btn-secondary text-capitalize"
-              :class="[ displayAs === o ? 'active' : '']"
-              style="flex: 1 auto;"
-              v-on:click="displayAs = o">
-              <input type="radio" name="options" autocomplete="off" :checked="displayAs === o"> {{o}}
-            </label>
-          </div>
-        </div>
-      </div>
-      <!-- /SETTINGS -->
-    </div>
+        <b-tab>
+          <template v-slot:title>
+            <fa icon="cog" />
+          </template>
+          <b-card-text>
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text">{{translate('name')}}</span>
+              </div>
+              <input type="text" class="form-control" v-model="name">
+            </div>
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text">{{translate('command')}}</span>
+              </div>
+              <input type="text" class="form-control" v-model="command">
+            </div>
+            <button type="button" class="btn btn-success btn-block btn-cmdboard" v-on:click="add" :disabled="!isConfirmEnabled">{{translate('confirm')}}</button>
+
+            <div class="input-group pt-2">
+              <div class="input-group-prepend">
+                <span class="input-group-text">{{translate('display-as')}}</span>
+              </div>
+              <div class="btn-group btn-group-toggle d-flex" data-toggle="buttons" style="flex: 1 auto;">
+                <label
+                  v-for="o of displayAsOpts"
+                  :key="o"
+                  class="btn btn-secondary text-capitalize"
+                  :class="[ displayAs === o ? 'active' : '']"
+                  style="flex: 1 auto;"
+                  v-on:click="displayAs = o">
+                  <input type="radio" name="options" autocomplete="off" :checked="displayAs === o"> {{o}}
+                </label>
+              </div>
+            </div>
+          </b-card-text>
+        </b-tab>
+      </b-tabs>
+    </b-card>
   </div>
-</div>
 </template>
 
 <script>
