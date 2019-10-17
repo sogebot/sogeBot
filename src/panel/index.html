@@ -157,36 +157,5 @@
 
 
   </script-->
-
-  <script>
-    setTimeout(() => {
-      console.log('registered')
-      var dropdown;
-      // force dropdowns outside of overflow
-      $(document).on('bv::dropdown::show', function(event) {
-        console.log('a')
-        for (const child of event.target.children) {
-          if (child.classList.contains('dropdown-detach')) {
-            dropdown = $(child)
-            let offset = event.target.getBoundingClientRect().left;
-            if (child.offsetWidth + offset > document.body.clientWidth - 10) {
-              offset = document.body.clientWidth - child.offsetWidth - 10
-            }
-            $('body').append($(child).css({
-              position: 'absolute',
-              left: offset,
-              top: $(event.target).offset().top + event.target.clientHeight,
-            }).detach());
-          }
-        }
-      });
-      $(document).on('hidden.bs.dropdown', function(event) {
-        if (dropdown) {
-          $(event.target).append(dropdown.detach());
-        }
-        dropdown = null;
-      })
-    }, 1000)
-  </script>
 </body>
 </html>
