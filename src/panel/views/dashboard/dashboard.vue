@@ -118,6 +118,7 @@ export default {
     loaded: function (value) {
       if (value === this.items.length && !this.isLoaded) {
         this.isLoaded = true
+        // TODO: https://github.com/jbaysolutions/vue-grid-layout#readme
         this.initGridStack()
       }
     }
