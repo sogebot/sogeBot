@@ -34,32 +34,36 @@
         </keep-alive>
       </div>
     </div>
-    <grid-layout
-        v-else
-        :layout.sync="layout"
-        @layout-updated="updateLayout"
-        :col-num="12"
-        :row-height="42"
-        :is-draggable="true"
-        :is-resizable="true"
-        :is-mirrored="false"
-        :vertical-compact="false"
-        :margin="[10, 10]"
-        :use-css-transforms="true"
-    >
-      <grid-item v-for="item in layout"
-                  drag-allow-from=".card-header"
-                  :x="item.x"
-                  :y="item.y"
-                  :w="item.w"
-                  :h="item.h"
-                  :i="item.i"
-                  :key="item.id">
-        <keep-alive>
-          <component :is="item.id" :popout="false" :context="$refs['widgets-menu']"></component>
-        </keep-alive>
-      </grid-item>
-    </grid-layout>
+    <div v-else>
+      <grid-layout
+          v-for="dashboard of dashboards"
+          v-show="dashboard.id === currentDashboard"
+          :key="dashboard.id"
+          :layout="layout[dashboard.id]"
+          @layout-updated="updateLayout"
+          :col-num="12"
+          :row-height="42"
+          :is-draggable="true"
+          :is-resizable="true"
+          :is-mirrored="false"
+          :vertical-compact="false"
+          :margin="[10, 10]"
+          :use-css-transforms="true"
+      >
+        <grid-item v-for="item in layout[dashboard.id]"
+                    drag-allow-from=".card-header"
+                    :x="item.x"
+                    :y="item.y"
+                    :w="item.w"
+                    :h="item.h"
+                    :i="item.i"
+                    :key="item.id">
+          <keep-alive>
+            <component :is="item.id" :popout="false" :context="$refs['widgets-menu']"></component>
+          </keep-alive>
+        </grid-item>
+      </grid-layout>
+    </div>
 
     <vue-context ref="widgets-menu"
                   :close-on-click="true"
@@ -147,24 +151,33 @@ export default {
       this.dashboards = orderBy(dashboards, 'createdAt', 'asc');
       this.isLoaded = true;
 
-      this.layout =
-        this.items.filter(o => o.dashboardId === this.currentDashboard)
-                  .map((o, i) => { return { i, x: Number(o.position.x), y: Number(o.position.y), w: Number(o.size.width), h: Number(o.size.height), id: o.id } })
+      this.layout = {};
+      let i = 0;
+      for(const widget of this.items) {
+        if (typeof this.layout[widget.dashboardId] === 'undefined') {
+          this.layout[widget.dashboardId] = []
+        }
+        this.layout[widget.dashboardId].push({
+          i, x: Number(widget.position.x), y: Number(widget.position.y), w: Number(widget.size.width), h: Number(widget.size.height), id: widget.id
+        });
+        i++;
+      }
     });
-  },
-  watch: {
-    currentDashboard(value) {
-      this.layout =
-        this.items.filter(o => o.dashboardId === value)
-                  .map((o, i) => { return { i, x: Number(o.position.x), y: Number(o.position.y), w: Number(o.size.width), h: Number(o.size.height), id: o.id } })
-    }
   },
   methods: {
     removeWidget(id) {
       this.items = this.items.filter(o => o.id !== id);
-      this.layout = this.items
-        .filter(o => o.dashboardId === this.currentDashboard)
-        .map((o, i) => { return { i, x: Number(o.position.x), y: Number(o.position.y), w: Number(o.size.width), h: Number(o.size.height), id: o.id } });
+      this.layout = {};
+      let i = 0;
+      for(const widget of this.items) {
+        if (typeof this.layout[widget.dashboardId] === 'undefined') {
+          this.layout[widget.dashboardId] = []
+        }
+        this.layout[widget.dashboardId].push({
+          i, x: Number(widget.position.x), y: Number(widget.position.y), w: Number(widget.size.width), h: Number(widget.size.height), id: widget.id
+        });
+        i++;
+      }
       this.socket.emit('updateWidgets', this.items)
     },
     updateLayout(layout) {
