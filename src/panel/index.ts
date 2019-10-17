@@ -222,7 +222,7 @@ const main = async () => {
           child.remove();
           document.getElementsByTagName('BODY')[0].appendChild(child);
         }
-      }
+      },
     },
     template: `
       <div id="app">
