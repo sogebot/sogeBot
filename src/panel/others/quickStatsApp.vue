@@ -376,9 +376,7 @@
         this.widthOfMenuUpdate()
       }, 100)
 
-      console.debug('EMIT [getVersion]')
-      this.socket.emit('getVersion')
-      this.socket.once('version', (version) => {
+      this.socket.emit('version', (version) => {
         this.version = version
         $.get('https://api.github.com/repos/sogehige/sogebot/releases/latest', (response) => {
           let botVersion = version.replace('-SNAPSHOT', '').split('.')

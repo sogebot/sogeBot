@@ -37,11 +37,11 @@
 
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
-import { getSocket } from '../helpers/socket';
+import { getSocket } from 'src/panel/helpers/socket';
 
 @Component({
   components: {
-    'loading': () => import('../components/loading.vue'),
+    'loading': () => import('src/panel/components/loading.vue'),
   }
 })
 export default class User extends Vue {

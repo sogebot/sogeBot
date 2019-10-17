@@ -1,12 +1,12 @@
 import 'moment/min/locales.min';
-import './others/quickStatsApp';
+/*import './others/quickStatsApp';
 import './others/changegamedlg';
-import './others/checklist';
 import './others/user';
 import './others/menu';
 import './others/footer';
 import './widgets/dashboard';
 import './widgets/popout';
+*/
 
 import BootstrapVue from 'bootstrap-vue';
 import moment from 'moment';
@@ -64,14 +64,6 @@ Vue.component('hold-button', () => import('./components/holdButton.vue'));
 Vue.component('button-with-icon', () => import('./components/button.vue'));
 Vue.component('state-button', () => import('./components/stateButton.vue'));
 Vue.component('textarea-with-tags', () => import('./components/textareaWithTags.vue'));
-
-export interface Global {
-  translations: any;
-  configuration: any;
-  isMainLoaded?: boolean;
-}
-
-declare let global: Global;
 
 declare module 'vue/types/vue' {
   interface Vue {
@@ -182,15 +174,63 @@ const main = async () => {
 
   new Vue({
     router,
+    components: {
+      navbar: () => import('./components/navbar/navbar.vue'),
+    },
+    data() {
+      const object: {
+        isDropdownHidden: boolean;
+        dropdown: any;
+      } = {
+        isDropdownHidden: true,
+        dropdown: null,
+      };
+      return object;
+    },
     created() {
-      this.$moment.locale(global.configuration.lang); // set proper moment locale
+      // detaching all dropdowns to be shown
+      this.$root.$on('bv::dropdown::show', bvEvent => {
+        this.dropdownShow(bvEvent);
+      });
+
+      this.$root.$on('bv::dropdown::hidden', bvEvent => {
+        this.dropdown.remove();
+        this.isDropdownHidden = true;
+      });
+
+      this.$moment.locale(Vue.prototype.configuration.lang); // set proper moment locale
+    },
+    methods: {
+      dropdownShow(bvEvent) {
+        if (!this.isDropdownHidden) {
+          // try next tick again - wait for cleanup
+          console.debug('waiting to next tick for dropdownShow');
+          this.$nextTick(() => this.dropdownShow(bvEvent));
+        } else {
+          this.isDropdownHidden = false;
+          const child = bvEvent.target;
+          this.dropdown = child;
+          let offset = bvEvent.target.getBoundingClientRect().left;
+          if (child.offsetWidth + offset > document.body.clientWidth - 10) {
+            offset = document.body.clientWidth - child.offsetWidth - 10;
+          }
+
+          child.style.position = 'absolute';
+          child.style.left = offset;
+          child.style.top = bvEvent.target.getBoundingClientRect().top + bvEvent.target.clientHeight;
+          child.style['z-index'] = 99999999;
+          child.remove();
+          document.getElementsByTagName('BODY')[0].appendChild(child);
+        }
+      }
     },
     template: `
       <div id="app">
+        <navbar/>
         <router-view class="view"></router-view>
       </div>
     `,
-  }).$mount('#pages');
+  }).$mount('#app');
 };
 
 main();

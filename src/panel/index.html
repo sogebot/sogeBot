@@ -14,12 +14,19 @@
 
   <!-- Latest compiled and minified CSS -->
   <link rel="stylesheet" href="./dist/css/light.css">
-
+  <script type="text/javascript" src="/auth/token.js"></script>
   <script src="/socket.io/socket.io.js"></script>
+  <!-- important for $(document) events -->
+  <script
+  src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+  integrity="sha256-pasqAKBDmFT4eHoN2ndd6lN370kFiGUFyTiUHWhU7k8="
+  crossorigin="anonymous"></script>
 </head>
 
 <body>
-  <!-- changelog modal dialog -->
+  <div id="app"></div>
+
+  <!-- changelog modal dialog ->
   <div class="modal" id="new_version_dlg" tabindex="-1" role="dialog" aria-labelledby="new_version_dlg">
     <div class="modal-dialog modal-lg" role="document">
       <div class="modal-content">
@@ -46,8 +53,8 @@
           <a class="blog-header-logo text-dark" href="#/" style="line-height: 36px;"><strong id="bot_name"></strong> <span id="current_version" class="d-none d-sm-inline"></span></a>
         </div>
         <div class="col d-flex justify-content-end align-items-center">
-          <div id="checklist"></div> <!-- vue.js others/checklist -->
-          <div id="user"></div> <!-- vue.js others/user -->
+          <div id="checklist"></div> <!-- vue.js others/checklist ->
+          <div id="user"></div> <!-- vue.js others/user ->
 
           <div class="pr-1">
             <button class="btn btn-xs btn-light dropdown-toggle" type="button" id="settingsButton" data-toggle="dropdown" aria-haspopup="true"
@@ -72,14 +79,14 @@
     <div id="menu"></div>
   </div>
 
-  <!-- CHANGE TITLE/GAME DLG -->
-  <div id="changegamedlg"></div> <!-- vue.js others/changegamedlg -->
+  <!-- CHANGE TITLE/GAME DLG ->
+  <div id="changegamedlg"></div> <!-- vue.js others/changegamedlg ->
 
-  <!-- SNIPPETS -->
+  <!-- SNIPPETS ->
   <div id="quickStatsApp"></div>
 
   <div class="container-fluid" style="overflow-x: hidden;">
-    <!-- widgets -->
+    <!-- widgets ->
     <span class="widgets p-0 pt-1">
       <div id="dashboard"></div>
     </span>
@@ -88,7 +95,6 @@
   <div class="pages-wrapper pt-2 pb-5">
     <div class="container-fluid">
       <div id="pages"></div>
-      <div id="pages-old"></div>
     </div>
   </div>
 
@@ -99,10 +105,7 @@
   <!-- dev version ->
   <script src="https://vuejs.org/js/vue.js"></script-->
 
-  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.0-alpha14/js/tempusdominus-bootstrap-4.min.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.0-alpha14/css/tempusdominus-bootstrap-4.min.css" />
-
-  <script>
+  <!--script>
     if (typeof token === 'undefined') {
       $('body').empty().append(`
       <div class="alert alert-danger ml-5 mr-5" role="alert">
@@ -122,74 +125,6 @@
       </pre>
       `)
     }
-
-    $('title').text(`${name.toUpperCase()}`)
-    $('#bot_name').text(`${name.toUpperCase()}`)
-
-    var socket = io({
-      query: "token=" + token
-    });
-
-    var loadedMenu = false
-    var addingWidget = false
-    var systems
-    var configuration
-
-    var translations = {}
-
-    console.debug('EMIT [getVersion]')
-    socket.emit('getVersion')
-    socket.once('version', function (version) {
-      $('#current_version').text(version)
-    })
-
-    socket.emit('systems', function (err, data) {
-      console.debug('EMIT [systems]')
-      systems = data
-    })
-
-    console.debug('EMIT [getConfiguration]')
-    socket.emit('getConfiguration')
-    socket.on('configuration', function (data) {
-      configuration = data
-      moment.locale(data.lang) // set moment locale
-      // THEME
-      if (data.core.ui.theme === 'dark') {
-        $('head').append('<link rel="stylesheet" href="./dist/css/dark.css">')
-      }
-    })
-
-    /* ROUTERS */
-    let currentPage = null
-    page('/', function(p){
-      var id = p.hash.length === 0 || p.hash === '/' ? 'dashboard' : p.hash
-      if (id.startsWith('/')) id = id.replace('/', '')
-      if (currentPage === id.split('-')[0]) return
-      else currentPage = id.split('-')[0]
-      var visibility = id !== 'dashboard' ? 'none' : 'flex'
-
-      $("#pages-old").empty()
-
-      if (id !== 'dashboard') $("#pages-old").append($('<div id="P' + id.split('-')[0] + '">').load('pages/' + id.split('-')[0] + '.html',
-        function () {
-          commons.translate()
-          $('a[data-toggle="tab"]').off()
-          $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
-            var target = $(e.target).attr("href") // activated tab
-            if (target === '#manage') {
-              $('.plus-button').prop('disabled', false)
-              $('.plus-button').removeClass('disabled')
-            } else {
-              $('.plus-button').addClass('disabled')
-              $('.plus-button').prop('disabled', true)
-            }
-          })
-        }))
-      $(".widgets").css('top', id !== 'dashboard' ? '-99999px' : '')
-      $(".widgets").css('position', id !== 'dashboard' ? 'absolute' : 'inherit')
-    })
-    page({ popstate:true })
-
     // addWidget
     $("#addWidget").on('click', function (ev) {
       if (!addingWidget) {
@@ -220,91 +155,38 @@
       var audio = new Audio(sound).play()
     })
 
-    var loadCustomVariableValue = async function (variable) {
-      return new Promise((resolve, reject) => {
-        socket.emit('custom.variable.value', variable, (err, value) => {
-          resolve(value)
-        })
-      })
-    }
 
-   // dont save as html anywhere on contenteditables
-   $(document).on("paste","[contenteditable=true]", function(e) {
-    var text = '';
-    var that = $(this);
+  </script-->
 
-    if (e.clipboardData)
-        text = e.clipboardData.getData('text/plain');
-    else if (window.clipboardData)
-        text = window.clipboardData.getData('Text');
-    else if (e.originalEvent.clipboardData)
-        text = $('<div></div>').text(e.originalEvent.clipboardData.getData('text'));
-
-    if (document.queryCommandSupported('insertText')) {
-        document.execCommand('insertHTML', false, $(text).html());
-        return false;
-    }
-    else { // IE > 7
-      that.find('*').each(function () {
-            $(this).addClass('within');
-      });
-
-      setTimeout(function () {
-            // nochmal alle durchlaufen
-            that.find('*').each(function () {
-                  // wenn das element keine klasse 'within' hat, dann unwrap
-                  // http://api.jquery.com/unwrap/
-                  $(this).not('.within').contents().unwrap();
-            });
-      }, 1);
-    }
-    })
-
-    function joinBot() {
-      socket.emit('joinBot')
-    }
-
-    function leaveBot() {
-      socket.emit('leaveBot')
-    }
-
-    $(document).on('click', '.widget-popout a', (ev) => {
-      ev.preventDefault()
-      let widget = $(ev.currentTarget).attr('href').split('#')[1]
-      window.open($(ev.currentTarget).attr('href'),widget,'height=600,width=600');
-    })
-
-    // allow focus on dropdowns with data-allow-focus
-    $(document).on("click", "[data-allow-focus]", function(e) {
-      e.preventDefault()
-      e.stopPropagation();
-    });
-
-    var dropdown;
-
-    // force dropdowns outside of overflow
-    $(document).on('show.bs.dropdown', function(event) {
-      for (const child of event.target.children) {
-        if (child.classList.contains('dropdown-detach')) {
-          dropdown = $(child)
-          let offset = $(event.target).offset().left;
-          if ($(child).outerWidth() + offset > document.body.clientWidth - 10) {
-            offset = document.body.clientWidth - $(child).outerWidth() - 10
+  <script>
+    setTimeout(() => {
+      console.log('registered')
+      var dropdown;
+      // force dropdowns outside of overflow
+      $(document).on('bv::dropdown::show', function(event) {
+        console.log('a')
+        for (const child of event.target.children) {
+          if (child.classList.contains('dropdown-detach')) {
+            dropdown = $(child)
+            let offset = event.target.getBoundingClientRect().left;
+            if (child.offsetWidth + offset > document.body.clientWidth - 10) {
+              offset = document.body.clientWidth - child.offsetWidth - 10
+            }
+            $('body').append($(child).css({
+              position: 'absolute',
+              left: offset,
+              top: $(event.target).offset().top + event.target.clientHeight,
+            }).detach());
           }
-          $('body').append($(child).css({
-            position: 'absolute',
-            left: offset,
-            top: $(event.target).offset().top + event.target.clientHeight,
-          }).detach());
         }
-      }
-    });
-    $(document).on('hidden.bs.dropdown', function(event) {
-      if (dropdown) {
-        $(event.target).append(dropdown.detach());
-      }
-      dropdown = null;
-    })
+      });
+      $(document).on('hidden.bs.dropdown', function(event) {
+        if (dropdown) {
+          $(event.target).append(dropdown.detach());
+        }
+        dropdown = null;
+      })
+    }, 1000)
   </script>
 </body>
 </html>

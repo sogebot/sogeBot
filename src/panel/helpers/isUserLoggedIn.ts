@@ -44,6 +44,7 @@ export const isUserLoggedIn = async function () {
       return data;
     } catch(e) {
       console.log('Redirecting, user code expired');
+      console.log(e)
       if (window.location.href.includes('popout')) {
         window.location.replace(window.location.origin + '/login#error=popout+must+be+logged');
       } else {

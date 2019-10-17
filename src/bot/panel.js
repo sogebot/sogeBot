@@ -405,9 +405,13 @@ function Panel () {
       }
       cb(null, toEmit)
     })
-    socket.on('getVersion', function () {
-      const version = _.get(process, 'env.npm_package_version', 'x.y.z')
-      socket.emit('version', version.replace('SNAPSHOT', gitCommitInfo().shortHash || 'SNAPSHOT'))
+
+    socket.on('name', function (cb) {
+      cb(global.oauth.botUsername);
+    })
+    socket.on('version', function (cb) {
+      const version = _.get(process, 'env.npm_package_version', 'x.y.z');
+      cb(version.replace('SNAPSHOT', gitCommitInfo().shortHash || 'SNAPSHOT'));
     })
 
     socket.on('parser.isRegistered', function (data) {

@@ -32,7 +32,6 @@ import { faCheckSquare, faSquare } from '@fortawesome/free-regular-svg-icons';
 library.add(faCheckSquare, faSquare);
 
 export default {
-  props: ['commons', 'systems'],
   data: function () {
     return {
       bDisplay: false,
@@ -47,7 +46,7 @@ export default {
       else return 'btn-outline-'
     },
     isSystemEnabled: function () {
-      return this.systems.find(o => o.name === 'checklist').enabled
+      return this.$systems.find(o => o.name === 'checklist').enabled
     },
     completed: function () {
       return this.items.filter(o => o.completed).length
