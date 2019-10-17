@@ -1,12 +1,4 @@
 import 'moment/min/locales.min';
-/*import './others/quickStatsApp';
-import './others/changegamedlg';
-import './others/user';
-import './others/menu';
-import './others/footer';
-import './widgets/dashboard';
-import './widgets/popout';
-*/
 
 import BootstrapVue from 'bootstrap-vue';
 import moment from 'moment';

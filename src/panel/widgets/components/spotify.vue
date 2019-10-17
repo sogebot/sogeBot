@@ -1,6 +1,6 @@
 <template>
 <div class="card widget">
-  <div class="card-header">
+  <div class="card-header" @contextmenu.prevent="context.open($event, 'spotify')">
     <ul class="nav nav-pills" role="tablist">
       <li role="presentation" class="nav-item" style="flex-shrink: 0">
         <hold-button icon="list" class="nav-link btn btn-outline-danger border-0 h-100 pl-1 pr-1" @trigger="cleanupSongRequestList()">
@@ -76,6 +76,7 @@ import { faList, faTimes } from '@fortawesome/free-solid-svg-icons';
 library.add(faList, faTimes);
 
 export default {
+  props: ['context'],
   components: {
     holdButton: () => import('../../components/holdButton.vue'),
     'font-awesome-layers': FontAwesomeLayers,
@@ -126,6 +127,7 @@ export default {
     }
   },
   created: function () {
+    console.log(this.$parent.$refs)
     this.socket.emit('settings', (err, s) => {
       this.command = s.commands['!spotify'];
       this.songRequestsEnabled = s.songRequests;

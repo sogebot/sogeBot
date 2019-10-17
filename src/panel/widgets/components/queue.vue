@@ -1,6 +1,6 @@
 <template>
 <div class="card widget">
-  <div class="card-header">
+  <div class="card-header" @contextmenu.prevent="context.open($event, 'queue')">
     <ul class="nav nav-pills" role="tablist">
       <li role="presentation" class="nav-item">
         <a class="active nav-link" href="#queue-users" aria-controls="home" role="tab" data-toggle="tab" title="Queue">
@@ -127,7 +127,7 @@
 import { getSocket } from 'src/panel/helpers/socket';
 import { debounce } from 'lodash-es';
 export default {
-  props: ['popout'],
+  props: ['context', 'popout'],
   mounted: function () {
     this.$emit('mounted')
   },

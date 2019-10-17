@@ -1,6 +1,6 @@
 <template>
 <div class="card widget">
-  <div class="card-header">
+  <div class="card-header" @contextmenu.prevent="context.open($event, 'ytplayer')">
     <ul class="nav nav-pills" role="tablist">
       <li role="presentation" class="nav-item"  style="flex-shrink: 0">
         <a class="nav-link" href="#yt-song-requests" aria-controls="home" role="tab" data-toggle="tab" title="Song Requests">
@@ -81,6 +81,7 @@ import { getSocket } from 'src/panel/helpers/socket';
 Vue.use(VuePlyr)
 
 export default {
+  props: ['context'],
   components: {
     holdButton: () => import('../../components/holdButton.vue'),
   },

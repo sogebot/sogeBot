@@ -1,6 +1,6 @@
 <template>
 <div class="card widget">
-  <div class="card-header">
+  <div class="card-header" @contextmenu.prevent="context.open($event, 'social')">
     <ul class="nav nav-pills" role="tablist">
       <li role="presentation" class="nav-item">
         <a class="nav-link active" href="#social-main" aria-controls="home" role="tab" data-toggle="tab" title="Social">
@@ -65,7 +65,7 @@ import Vue from 'vue'
 import { chunk, orderBy } from 'lodash-es'
 import { getSocket } from 'src/panel/helpers/socket';
 export default Vue.extend({
-  props: ['popout'],
+  props: ['context', 'popout'],
   data: function () {
     const data: {
       items: Array<{}>,

@@ -1,6 +1,6 @@
 <template>
 <div class="card widget">
-  <div class="card-header">
+  <div class="card-header" @contextmenu.prevent="context.open($event, 'chat')">
     <ul class="nav nav-pills" role="tablist">
       <li role="presentation" class="nav-item">
         <a class="nav-link active" href="#chat-room-panel" aria-controls="home" role="tab" data-toggle="tab" title="Chat room">
@@ -65,7 +65,7 @@
 import { getSocket } from 'src/panel/helpers/socket';
 import { sortedUniq, flatten } from 'lodash-es';
 export default {
-  props: ['popout'],
+  props: ['context', 'popout'],
   data: function () {
     return {
       socket: getSocket('/widgets/chat'),

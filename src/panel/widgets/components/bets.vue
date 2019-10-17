@@ -1,6 +1,6 @@
 <template>
 <div class="card widget">
-  <div class="card-header">
+  <div class="card-header" @contextmenu.prevent="context.open($event, 'bets')">
     <ul class="nav nav-pills" role="tablist">
       <li role="presentation" class="nav-item">
         <a class="nav-link active" href="#bets-running" aria-controls="home" role="tab" data-toggle="tab" title="Betting">
@@ -67,6 +67,7 @@
 <script>
 import { getSocket } from 'src/panel/helpers/socket';
 export default {
+  props: ['context'],
   mounted: function () {
     this.$emit('mounted')
   },

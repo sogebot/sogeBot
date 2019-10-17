@@ -26,36 +26,58 @@
   </div>
 
   <div class="widgets pt-1">
-    <div
-      v-for="board of dashboards"
-      v-bind:key="board.createdAt">
-      <div class="grid-stack"
-        :class="[ 'grid-stack-for-board-' + board.id ]"
-        v-if="show"
-        v-show="currentDashboard === board.id">
-        <template v-for="item in items">
-          <div :key="item.id"
-            v-if="item.dashboardId === board.id"
-            v-bind:id="'widget-' + item.id"
-            v-bind:data-dashboardId="item.dashboardId"
-            v-bind:data-gs-x="item.position.x"
-            v-bind:data-gs-y="item.position.y"
-            v-bind:data-gs-width="item.size.width"
-            v-bind:data-gs-height="item.size.height"
-            class="grid-stack-item"
-          >
-            <div class="grid-stack-item-content">
-              <keep-alive>
-                <component :is="item.id" :socket="socket" @mounted="loaded = loaded + 1" :popout="false"></component>
-              </keep-alive>
-            </div>
-          </div>
-        </template>
+    <!-- mobile show -->
+    <div v-if="windowWidth <= 750">
+      <div v-for="item in layout" class="pl-2 pr-2 pb-2" :key="item.id">
+        <keep-alive>
+          <component :is="item.id" :popout="false" :context="$refs['widgets-menu']"></component>
+        </keep-alive>
       </div>
     </div>
-    <div class="w-100"></div>
-    <widget-create v-bind:dashboardId="currentDashboard" class="pt-4" @addWidget="addWidget"></widget-create>
-    <dashboard-remove v-show="currentDashboard !== String(0)" v-bind:dashboardId="currentDashboard" v-bind:socket="socket" class="pt-4" @update="currentDashboard = 0" @removeDashboard="removeDashboard"></dashboard-remove>
+    <grid-layout
+        v-else
+        :layout.sync="layout"
+        @layout-updated="updateLayout"
+        :col-num="12"
+        :row-height="42"
+        :is-draggable="true"
+        :is-resizable="true"
+        :is-mirrored="false"
+        :vertical-compact="false"
+        :margin="[10, 10]"
+        :use-css-transforms="true"
+    >
+      <grid-item v-for="item in layout"
+                  drag-allow-from=".card-header"
+                  :x="item.x"
+                  :y="item.y"
+                  :w="item.w"
+                  :h="item.h"
+                  :i="item.i"
+                  :key="item.id">
+        <keep-alive>
+          <component :is="item.id" :popout="false" :context="$refs['widgets-menu']"></component>
+        </keep-alive>
+      </grid-item>
+    </grid-layout>
+
+    <vue-context ref="widgets-menu"
+                  :close-on-click="true"
+                  :close-on-scroll="true">
+      <template slot-scope="child">
+        <li v-if="child.data">
+          <a href="#" @click.prevent="removeWidget(child.data)" class="text-danger">
+            <fa icon="trash-alt" class="mr-2" fixed-width/> Remove <strong>{{translate('widget-title-' + child.data)}}</strong> widget
+          </a>
+        </li>
+      </template>
+    </vue-context>
+
+    <template v-if="currentDashboard === null">
+      <div class="w-100"></div>
+      <widget-create v-bind:dashboardId="currentDashboard" class="pt-4" @addWidget="addWidget"></widget-create>
+    </template>
+    <dashboard-remove v-if="currentDashboard !== null" v-bind:dashboardId="currentDashboard" class="pt-4" @update="currentDashboard = 0" @removeDashboard="removeDashboard"></dashboard-remove>
   </div>
 </div>
 </template>
@@ -63,7 +85,14 @@
 <script>
 import { getSocket } from 'src/panel/helpers/socket';
 import { cloneDeep, difference, orderBy, map } from 'lodash-es';
+
+import VueGridLayout from 'vue-grid-layout';
+import { vueWindowSizeMixin } from 'vue-window-size';
+
+import { VueContext } from 'vue-context';
+
 export default {
+  mixins: [ vueWindowSizeMixin ],
   components: {
     bets: () => import('src/panel/widgets/components/bets.vue'),
     chat: () => import('src/panel/widgets/components/chat.vue'),
@@ -83,6 +112,9 @@ export default {
     dashboardRemove: () => import('src/panel/widgets/components/dashboard_remove.vue'),
     ytplayer: () => import('src/panel/widgets/components/ytplayer.vue'),
     social: () => import('src/panel/widgets/components/social.vue'),
+    GridLayout: VueGridLayout.GridLayout,
+    GridItem: VueGridLayout.GridItem,
+    'vue-context': VueContext,
   },
   data: function () {
     return {
@@ -94,11 +126,12 @@ export default {
       currentDashboard: null,
       show: true,
       isLoaded: false,
-      loaded: 0,
+      layout: [],
       socket: getSocket('/')
     }
   },
   created() {
+    this.isLoaded = false;
     this.socket.emit('getWidgets', (items, dashboards) => {
       this.items = orderBy(items, 'id', 'asc');
       for (const item of this.items) {
@@ -112,103 +145,64 @@ export default {
         id: null,
       });
       this.dashboards = orderBy(dashboards, 'createdAt', 'asc');
+      this.isLoaded = true;
+
+      this.layout =
+        this.items.filter(o => o.dashboardId === this.currentDashboard)
+                  .map((o, i) => { return { i, x: Number(o.position.x), y: Number(o.position.y), w: Number(o.size.width), h: Number(o.size.height), id: o.id } })
     });
   },
   watch: {
-    loaded: function (value) {
-      if (value === this.items.length && !this.isLoaded) {
-        this.isLoaded = true
-        // TODO: https://github.com/jbaysolutions/vue-grid-layout#readme
-        this.initGridStack()
-      }
+    currentDashboard(value) {
+      this.layout =
+        this.items.filter(o => o.dashboardId === value)
+                  .map((o, i) => { return { i, x: Number(o.position.x), y: Number(o.position.y), w: Number(o.size.width), h: Number(o.size.height), id: o.id } })
     }
   },
   methods: {
+    removeWidget(id) {
+      this.items = this.items.filter(o => o.id !== id);
+      this.layout = this.items
+        .filter(o => o.dashboardId === this.currentDashboard)
+        .map((o, i) => { return { i, x: Number(o.position.x), y: Number(o.position.y), w: Number(o.size.width), h: Number(o.size.height), id: o.id } });
+      this.socket.emit('updateWidgets', this.items)
+    },
+    updateLayout(layout) {
+        // remove current dashboard widgets
+        this.items = [
+          ...this.items.filter(o => o.dashboardId !== this.currentDashboard),
+          ...layout.map(o => {
+            return {
+              position: { x: o.x, y: o.y },
+              size: { width: o.w, height: o.h },
+              dashboardId: this.currentDashboard,
+              id: o.id,
+            }
+          }
+        )]
+        this.socket.emit('updateWidgets', this.items)
+    },
     removeDashboard: function (dashboardId) {
-      const grid = $('.grid-stack-for-board-' + dashboardId).data('gridstack')
-      if (grid) grid.destroy(true)
       this.dashboards = this.dashboards.filter(o => String(o.id) !== dashboardId)
       this.currentDashboard = null
     },
     addWidget: function (event) {
       event.dashboardId = String(event.dashboardId)
-      const grid = $('.grid-stack-for-board-' + event.dashboardId).data('gridstack')
-      if (grid) grid.destroy(true)
-
       const dashboard = cloneDeep(this.dashboards.find(o => String(o.id) === event.dashboardId))
       this.dashboards = this.dashboards.filter(o => String(o.id) !== event.dashboardId)
       this.$nextTick(() => {
         this.dashboards.push(dashboard)
         this.dashboards = orderBy(this.dashboards, 'createdAt', 'asc')
         this.items.push(event.widget)
-        this.$nextTick(() => {
-          const options = { cellHeight: 42, verticalMargin: 10, removable: true, removeTimeout: 100, handleClass: 'card-header' }
-          $('.grid-stack-for-board-' + event.dashboardId).gridstack(options)
-
-          this.$nextTick(() => {
-            this.setGridstack()
-          })
-        })
       })
     },
     createDashboard: function () {
       this.socket.emit('createDashboard', this.dashboardName, (created) => {
         this.dashboards.push(created)
-        this.$nextTick(() => {
-          this.initGridStack()
-        })
       })
       this.dashboardName = ''
       this.addDashboard = false
     },
-    initGridStack: function () {
-      const options = { cellHeight: 42, verticalMargin: 10, removable: true, removeTimeout: 100, handleClass: 'card-header' }
-      if ($('.grid-stack').length !== this.dashboards.length) return setTimeout(() => this.initGridStack(), 1000)
-      this.$nextTick(function () {
-        if ($('.grid-stack').length === 0) return
-        for (let grid of $('.grid-stack')) {
-          $(grid).gridstack(options)
-        }
-        this.setGridstack()
-      })
-    },
-    setGridstack() {
-      $('.grid-stack-item').draggable({cancel: "div.not-draggable" });
-        $('.grid-stack').off('change').on('change', () => {
-          let widgets = []
-          for (let item of $('.grid-stack-item')) {
-            widgets.push({
-              dashboardId: $(item).attr('data-dashboardId'),
-              id: $(item).attr('id').split('-')[1],
-              position: {
-                x: $(item).attr('data-gs-x'),
-                y: $(item).attr('data-gs-y')
-              },
-              size: {
-                height: $(item).attr('data-gs-height'),
-                width: $(item).attr('data-gs-width')
-              }
-            })
-
-            // update all positions
-            const widget = this.items.find(o => o.id === $(item).attr('id').split('-')[1])
-            widget.position.x = $(item).attr('data-gs-x')
-            widget.position.y = $(item).attr('data-gs-y')
-            widget.size.height = $(item).attr('data-gs-height')
-            widget.size.width = $(item).attr('data-gs-width')
-          }
-          for (let changed of difference(map(this.items, o => o.id), map(widgets, o => o.id))) {
-            if (this.items.find(o => o.id === changed)) {
-              // remove
-              this.items = this.items.filter(o => o.id !== changed)
-            } else {
-              // insert
-              this.items.push(widgets.find(o => o.id === changed))
-            }
-          }
-          this.socket.emit('updateWidgets', widgets)
-        })
-    }
   }
 }
 </script>

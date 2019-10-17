@@ -1,6 +1,6 @@
 <template>
 <div class="card widget">
-  <div class="card-header">
+  <div class="card-header" @contextmenu.prevent="context.open($event, 'cmdboard')">
     <ul class="nav nav-pills" role="tablist">
       <li role="presentation" class="nav-item">
         <a class="nav-link active" href="#cmdboard-main" aria-controls="home" role="tab" data-toggle="tab" title="CommandBoard">
@@ -110,6 +110,7 @@ import { getSocket } from 'src/panel/helpers/socket';
 import { VueContext } from 'vue-context';
 
 export default {
+  props: ['context'],
   components: {
     'vue-context': VueContext,
   },

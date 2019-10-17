@@ -1,6 +1,6 @@
 <template>
 <div class="card widget">
-  <div class="card-header">
+  <div class="card-header" @contextmenu.prevent="context.open($event, 'eventlist')">
     <ul class="nav nav-pills" role="tablist">
       <li role="presentation" class="nav-item">
         <a class="nav-link active" href="#eventlist-main" aria-controls="home" role="tab" data-toggle="tab" title="EventList">
@@ -193,7 +193,7 @@ import { FontAwesomeLayers } from '@fortawesome/vue-fontawesome'
 import { chunk, debounce, get, isNil } from 'lodash-es';
 import moment from 'moment';
 export default {
-  props: ['popout'],
+  props: ['context', 'popout'],
   components: {
     'font-awesome-layers': FontAwesomeLayers,
     holdButton: () => import('../../components/holdButton.vue'),

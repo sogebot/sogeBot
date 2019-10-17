@@ -1,6 +1,6 @@
 <template>
 <div class="card widget">
-  <div class="card-header">
+  <div class="card-header" @contextmenu.prevent="context.open($event, 'twitter')">
     <ul class="nav nav-pills" role="tablist">
       <li role="presentation" class="nav-item">
         <a class="nav-link active" href="#twitter-main" aria-controls="home" role="tab" data-toggle="tab" title="Send a twitch status">
@@ -35,6 +35,7 @@
 <script>
 import { getSocket } from 'src/panel/helpers/socket';
 export default {
+  props: ['context'],
   data: function () {
     return { message: '', socket: getSocket('/') }
   },

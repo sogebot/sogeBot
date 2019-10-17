@@ -1,6 +1,6 @@
 <template>
 <div class="card widget">
-  <div class="card-header">
+  <div class="card-header" @contextmenu.prevent="context.open($event, 'customvariables')">
     <ul class="nav nav-pills" role="tablist">
       <li role="presentation" class="nav-item">
         <a class="nav-link active" href="#customvariables-main" aria-controls="home" role="tab" data-toggle="tab" title="Custom Variables">
@@ -151,6 +151,7 @@ var numberOrTextComponent = {
     `
 }
 export default {
+  props: ['context'],
   components: {
     'number-or-text': numberOrTextComponent
   },

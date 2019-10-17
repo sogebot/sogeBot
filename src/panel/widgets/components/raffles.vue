@@ -1,6 +1,6 @@
 <template>
 <div class="card widget">
-  <div class="card-header">
+  <div class="card-header" @contextmenu.prevent="context.open($event, 'raffles')">
     <ul class="nav nav-pills" role="tablist">
       <li role="presentation" class="nav-item">
         <a class="nav-link" href="#raffles-participants" aria-controls="home" role="tab" data-toggle="tab" title="Participants">
@@ -250,6 +250,7 @@
 import { getSocket } from 'src/panel/helpers/socket';
 import { orderBy } from 'lodash-es';
 export default {
+  props: ['context'],
   mounted: function () {
     this.$emit('mounted')
   },
