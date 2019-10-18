@@ -3,14 +3,14 @@
     <b-card class="border-0 h-100" no-body>
       <b-tabs pills card class="h-100">
         <template v-slot:tabs-start v-if="!popout">
-          <li class="nav-item pt-2 px-2 grip text-secondary">
+          <li class="nav-item px-2 grip text-secondary align-self-center">
             <fa icon="grip-vertical" fixed-width/>
           </li>
           <li class="nav-item">
-            <b-dropdown no-caret :text="translate('widget-title-bets')" class="widget-title" variant="link" ref="dropdown" toggle-class="text-decoration-none">
-              <b-dropdown-item class="widget-title">
+            <b-dropdown no-caret :text="translate('widget-title-bets')" variant="outline-primary" ref="dropdown" toggle-class="border-0">
+              <b-dropdown-item>
                 <a href="#" @click.prevent="$refs.dropdown.hide(); $nextTick(() => EventBus.$emit('remove-widget', 'bets'))" class="text-danger">
-                  <fa icon="trash-alt" class="mr-2" fixed-width/> Remove <strong>{{translate('widget-title-bets')}}</strong> widget
+                  Remove <strong>{{translate('widget-title-bets')}}</strong> widget
                 </a>
               </b-dropdown-item>
             </b-dropdown>
@@ -69,7 +69,7 @@
 <script>
 import { getSocket } from 'src/panel/helpers/socket';
 export default {
-  props: ['context'],
+  props: ['popout'],
   mounted: function () {
     this.$emit('mounted')
   },

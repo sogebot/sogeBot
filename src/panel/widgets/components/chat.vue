@@ -3,14 +3,18 @@
     <b-card class="border-0 h-100" no-body>
       <b-tabs pills card class="h-100" style="overflow:hidden">
         <template v-slot:tabs-start v-if="!popout">
-          <li class="nav-item pt-2 px-2 grip text-secondary">
+          <li class="nav-item px-2 grip text-secondary align-self-center">
             <fa icon="grip-vertical" fixed-width/>
           </li>
           <li class="nav-item">
-            <b-dropdown no-caret :text="translate('widget-title-chat')" class="widget-title" variant="link" ref="dropdown" toggle-class="text-decoration-none">
-              <b-dropdown-item class="widget-title">
+            <b-dropdown no-caret :text="translate('widget-title-chat')" variant="outline-primary" ref="dropdown" toggle-class="border-0">
+              <b-dropdown-item href="/popout/#chat">
+                Popout
+              </b-dropdown-item>
+              <b-dropdown-divider></b-dropdown-divider>
+              <b-dropdown-item>
                 <a href="#" @click.prevent="$refs.dropdown.hide(); $nextTick(() => EventBus.$emit('remove-widget', 'chat'))" class="text-danger">
-                  <fa icon="trash-alt" class="mr-2" fixed-width/> Remove <strong>{{translate('widget-title-chat')}}</strong> widget
+                  Remove <strong>{{translate('widget-title-chat')}}</strong> widget
                 </a>
               </b-dropdown-item>
             </b-dropdown>
@@ -22,7 +26,7 @@
             <fa icon="comment-alt" />
           </template>
           <b-card-text class="h-100">
-            <div id="chat-room" style="height: calc(100% - 40px)"></div>
+            <div id="chat-room" style="height: 100%"></div>
 
             <div style="margin-top: -40px;">
               <div class="form-row">
@@ -55,9 +59,6 @@
             <fa icon="sync-alt" v-if="!isRefreshing"/>
             <fa icon="sync-alt" spin v-else/>
           </b-nav-item>
-          <a class="nav-link" title="Popout" target="_blank" href="/popout/#chat">
-            <fa icon="external-link-alt"></fa>
-          </a>
         </template>
       </b-tabs>
     </b-card>

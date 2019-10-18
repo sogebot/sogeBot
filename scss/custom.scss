@@ -230,14 +230,13 @@ a.active {
 
 /* WIDGETS */
 .nav-pills {
-  height: 40px;
+  height: 36px;
   overflow: hidden;
 }
 
 .nav-pills > li > a {
   border-radius: 0px;
-  font-weight: bold;
-  padding: 10px;
+  padding: 6px 0.5em;
 }
 .nav-pills > li > a > i {
   font-size: 1.2em;
@@ -308,7 +307,6 @@ a.active {
 
 .widget .card-header {
   padding: 0;
-  height: 40px;
 }
 
 .widget .card-body {
@@ -1072,19 +1070,6 @@ blockquote {
 #eventlist-main > .row:nth-child(2n) {
   background-color: $gray-100;
 }
-
-.nav-btn {
-  height: 100%;
-  border: 0 !important;
-}
-
-.nav-dropdown {
-  color: theme-color("primary") !important;
-}
-.nav-dropdown[aria-expanded=true] {
-  color: $white !important;
-}
-
 /* animations */
 .row:hover > .col-auto i.anim-heartbeat {
 	animation: beat 1.3s infinite alternate;

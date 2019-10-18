@@ -42,7 +42,7 @@
           :layout="layout[dashboard.id]"
           @layout-updated="updateLayout"
           :col-num="12"
-          :row-height="42"
+          :row-height="38"
           :is-draggable="true"
           :is-resizable="true"
           :is-mirrored="false"
@@ -77,7 +77,7 @@
 <script>
 import { EventBus } from 'src/panel/helpers/event-bus';
 import { getSocket } from 'src/panel/helpers/socket';
-import { cloneDeep, difference, orderBy, map } from 'lodash-es';
+import { cloneDeep, orderBy } from 'lodash-es';
 
 import VueGridLayout from 'vue-grid-layout';
 import { vueWindowSizeMixin } from 'vue-window-size';

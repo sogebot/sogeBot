@@ -311,7 +311,11 @@ class Module {
 
             // get all items by where
             if (opts.where === null || typeof opts.where === 'undefined') {
-              return cb(new Error('Where cannot be empty!'));
+              if (_.isFunction(cb)) {
+                return cb(new Error('Where cannot be empty or explicitely set as {}!'));
+              } else {
+                throw new Error('Where cannot be empty or explicitely set as {}!');
+              }
             }
 
             // remove all data
@@ -320,7 +324,9 @@ class Module {
               delete item._id;
               await global.db.engine.insert(opts.collection, item);
             }
-            cb(null, true);
+            if (typeof cb === 'function') {
+              cb(null, true);
+            }
           });
           socket.on('update', async (opts, cb) => {
             opts.collection = opts.collection || 'data';
@@ -440,6 +446,8 @@ class Module {
                 });
               }
               cb(null, items);
+            } else {
+              throw Error('No callback for find function');
             }
           });
           socket.on('findOne', async (opts, cb) => {

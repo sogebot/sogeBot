@@ -35,14 +35,6 @@ class Cmdboard extends Widget {
           skip: true,
         });
       });
-      socket.on('cmdboard.widget.add', async (data, cb) => {
-        await global.db.engine.insert('widgetsCmdBoard', { text: data.name, command: data.command });
-        cb(await global.db.engine.find('widgetsCmdBoard'));
-      });
-      socket.on('cmdboard.widget.remove', async (data, cb) => {
-        await global.db.engine.remove('widgetsCmdBoard', { text: data.text });
-        cb(await global.db.engine.find('widgetsCmdBoard'));
-      });
     });
   }
 }
