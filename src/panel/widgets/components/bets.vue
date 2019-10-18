@@ -7,7 +7,7 @@
             <fa icon="grip-vertical" fixed-width/>
           </li>
           <li class="nav-item">
-            <b-dropdown no-caret :text="translate('widget-title-bets')" variant="outline-primary" ref="dropdown" toggle-class="border-0">
+            <b-dropdown boundary="window" no-caret :text="translate('widget-title-bets')" variant="outline-primary" ref="dropdown" toggle-class="border-0">
               <b-dropdown-item>
                 <a href="#" @click.prevent="$refs.dropdown.hide(); $nextTick(() => EventBus.$emit('remove-widget', 'bets'))" class="text-danger">
                   Remove <strong>{{translate('widget-title-bets')}}</strong> widget

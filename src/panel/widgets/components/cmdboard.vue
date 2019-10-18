@@ -1,13 +1,13 @@
 <template>
   <div class="widget">
     <b-card class="border-0 h-100" no-body>
-      <b-tabs pills card class="h-100" style="overflow:hidden">
+      <b-tabs pills card class="h-100" style="overflow:hidden" v-model="tabIndex">
         <template v-slot:tabs-start v-if="!popout">
           <li class="nav-item px-2 grip text-secondary align-self-center">
             <fa icon="grip-vertical" fixed-width/>
           </li>
           <li class="nav-item">
-            <b-dropdown no-caret :text="translate('widget-title-cmdboard')" variant="outline-primary" ref="dropdown" toggle-class="border-0">
+            <b-dropdown boundary="window" no-caret :text="translate('widget-title-cmdboard')" variant="outline-primary" ref="dropdown" toggle-class="border-0">
               <b-dropdown-item @click="state.editation = $state.progress">
                 Edit actions
               </b-dropdown-item>
@@ -23,7 +23,7 @@
             </b-dropdown>
           </li>
         </template>
-        <b-tab active>
+        <b-tab>
           <template v-slot:title>
             <fa icon="terminal" />
           </template>
@@ -34,7 +34,7 @@
                 <b-button variant="danger" @click="remove" :disabled="selected.length === 0"><fa icon="trash-alt"/></b-button>
                 <b-button variant="primary" @click="save">Done</b-button>
               </div>
-              <div class="list-group" style="flex-flow: wrap; display: flex;">
+              <div class="list-group">
                 <b-row class="px-2">
                   <b-col v-for="item of orderBy(items, 'order')" :key="item._id" cols="6" class="p-1">
                     <button
@@ -46,7 +46,7 @@
                       v-on:click="state.editation === $state.idle ? emit(item) : toggle(item)"
                       :data-name="item.text"
                       :title="item.command">
-                      <span style="overflow: hidden; display: inline-block; word-break: break-all;line-height: 11px;">
+                      <span style="word-break: break-all;line-height: 15px;">
                         <span
                           v-if="state.editation === $state.progress"
                           class="text-secondary"
@@ -102,6 +102,7 @@ export default {
   data: function () {
     return {
       orderBy,
+      tabIndex: 0,
       state: {
         editation: this.$state.idle,
         loading: this.$state.progress,
@@ -132,6 +133,7 @@ export default {
   created: function () {
       this.socket.emit('find', { collection: '_widgetsCmdBoard' }, (err, items) => {
         this.items = items
+        console.log({items})
         this.state.loading = this.$state.success;
       })
       this.socket.emit('settings', (err, data) => {
@@ -167,13 +169,16 @@ export default {
       this.socket.emit('cmdboard.widget.run', item.command)
     },
     add: function () {
-      $('a[href="#cmdboard-main"]').tab('show')
-      this.socket.emit('cmdboard.widget.add', {
-        name: this.name,
-        command: this.command,
-        order: this.items.length,
-      }, (items) => {
-        this.items = items
+      this.tabIndex = 0;
+      this.socket.emit('insert', {
+        collection: '_widgetsCmdBoard',
+        items: [{
+          text: this.name,
+          command: this.command,
+          order: this.items.length,
+        }],
+      }, (err, items) => {
+        this.items = [...this.items, ...items]
       })
       this.name = ''
       this.command = ''
@@ -190,10 +195,7 @@ export default {
       entered.order = this.draggingItem;
       this.draggingItem = newOrder
       value.order = this.draggingItem;
-      /*this.items.splice(this.draggingItem, 1);
-      this.items.splice(newOrder, 0, value);
-      this.draggingItem = newOrder;
-*/
+
       for (let i = 0, length = this.items.length; i < length; i++) {
         this.$refs['item_' + this.items[i].order][0].style.opacity = 1;
       }

@@ -230,8 +230,6 @@ const main = async () => {
           }
 
           child.style.position = 'absolute';
-          child.style.left = offset;
-          child.style.top = bvEvent.target.getBoundingClientRect().top + bvEvent.target.clientHeight;
           child.style['z-index'] = 99999999;
           child.remove();
           document.getElementsByTagName('BODY')[0].appendChild(child);

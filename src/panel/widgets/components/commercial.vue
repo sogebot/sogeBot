@@ -1,49 +1,36 @@
-<template>
-<div class="card widget">
-  <div class="card-header" @contextmenu.prevent="context.open($event, 'commercial')">
-    <ul class="nav nav-pills" role="tablist">
-      <li role="presentation" class="nav-item">
-        <a class="nav-link active" href="#commercial-main" aria-controls="home" role="tab" data-toggle="tab" title="Commercials">
-          <fa icon="dollar-sign" />
-        </a>
-      </li>
-      <li role="presentation" class="nav-item">
-        <strong class="text-info nav-link" style="margin-top: 5px;" v-if="countdown > 0">
-          <fa :icon="['far', 'clock']" />
-          {{ countdown }}s
-        </strong>
-      </li>
-      <li class="nav-item ml-auto">
-        <h6 class="widget-title">{{ translate('widget-title-commercial') }}</h6>
-      </li>
-    </ul>
-  </div>
-
-  <!-- Tab panes -->
-  <div class="card-body">
-    <div class="tab-content">
-      <div role="tabpanel" class="tab-pane active" id="commercial-main">
-        <div class="text-center row row-widget">
-          <div class="col col-widget" v-for="second of seconds" :key="second">
-            <button type="button" class="btn btn-outline-secondary btn-widget" v-on:click="run(second)">{{second}}s</button>
-          </div>
-        </div>
-      </div>
-      <!-- /MAIN -->
-    </div>
-  </div>
-</div>
+<template lang="pug">
+  div.widget
+    b-card(no-body).border-0.h-100
+      b-tabs(pills card style="overflow:hidden").h-100
+        template(v-slot:tabs-start v-if="!popout")
+          li.nav-item.px-2.grip.text-secondary.align-self-center
+            fa(icon="grip-vertical" fixed-width)
+          li.nav-item
+            b-dropdown(boundary="window" no-caret :text="translate('widget-title-commercial')" variant="outline-primary" toggle-class="border-0")
+              b-dropdown-item
+                a(href="#" @click.prevent="$refs.dropdown.hide(); $nextTick(() => EventBus.$emit('remove-widget', 'commercial'))" class="text-danger")
+                  | Remove <strong>{{translate('widget-title-commercial')}}</strong> widget
+        b-tab(active)
+          template(v-slot:title)
+            fa(icon="dollar-sign")
+          b-card-text
+            b-row(v-if="countdown === 0").px-3
+              b-col.p-0.pr-1
+                b-form-input(v-model="value" max="180" min="30" step="30" type="range")
+              b-col.p-0
+                b-button(size="sm" @click="run").btn-block Run commercial ({{ formatTime() }})
+            hr(v-else).border-primary.shrink-animation(style="border-width: 2px;margin: auto; margin-top: 1em;" :style="{animation: 'shrink-commercial-animation ' + value + 's'}")
 </template>
 
 <script>
 import { getSocket } from 'src/panel/helpers/socket';
 export default {
-  props: ['context'],
+  props: ['popout'],
   data: function () {
     return {
       socket: getSocket('/systems/commercial'),
-      seconds: [30, 60, 90, 120, 150, 180],
       countdown: 0,
+      value: 30,
       interval: [],
     }
   },
@@ -63,10 +50,26 @@ export default {
     }, 1000));
   },
   methods: {
-    run: function (seconds) {
-      this.countdown = seconds
-      this.socket.emit('commercial.run', { seconds })
+    formatTime() {
+      const minutes = Math.trunc(this.value / 60);
+      const seconds = this.value - (minutes * 60) || '00';
+      return `${minutes}:${seconds}`
+    },
+    run: function () {
+      this.countdown = this.value
+      this.socket.emit('commercial.run', { seconds: this.value })
     }
   }
 }
 </script>
+
+<style>
+@keyframes shrink-commercial-animation {
+  0% {
+    width: 100%;
+  }
+  100% {
+    width: 0%;
+  }
+}
+</style>

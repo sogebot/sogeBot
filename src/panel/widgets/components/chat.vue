@@ -7,7 +7,7 @@
             <fa icon="grip-vertical" fixed-width/>
           </li>
           <li class="nav-item">
-            <b-dropdown no-caret :text="translate('widget-title-chat')" variant="outline-primary" ref="dropdown" toggle-class="border-0">
+            <b-dropdown boundary="window" no-caret :text="translate('widget-title-chat')" variant="outline-primary" ref="dropdown" toggle-class="border-0">
               <b-dropdown-item href="/popout/#chat">
                 Popout
               </b-dropdown-item>
