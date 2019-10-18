@@ -224,11 +224,6 @@ const main = async () => {
           this.isDropdownHidden = false;
           const child = bvEvent.target;
           this.dropdown = child;
-          let offset = bvEvent.target.getBoundingClientRect().left;
-          if (child.offsetWidth + offset > document.body.clientWidth - 10) {
-            offset = document.body.clientWidth - child.offsetWidth - 10;
-          }
-
           child.style.position = 'absolute';
           child.style['z-index'] = 99999999;
           child.remove();
