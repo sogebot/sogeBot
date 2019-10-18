@@ -127,9 +127,6 @@ export default {
       this.selected = []
     }
   },
-  mounted: function () {
-    this.$emit('mounted')
-  },
   created: function () {
       this.socket.emit('find', { collection: '_widgetsCmdBoard' }, (err, items) => {
         this.items = items

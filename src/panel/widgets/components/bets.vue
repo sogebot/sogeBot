@@ -45,9 +45,6 @@
 import { getSocket } from 'src/panel/helpers/socket';
 export default {
   props: ['popout'],
-  mounted: function () {
-    this.$emit('mounted')
-  },
   data: function () {
     return {
       socket: getSocket('/systems/bets'),

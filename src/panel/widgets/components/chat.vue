@@ -1,68 +1,49 @@
-<template>
-  <div class="widget">
-    <b-card class="border-0 h-100" no-body>
-      <b-tabs pills card class="h-100" style="overflow:hidden">
-        <template v-slot:tabs-start v-if="!popout">
-          <li class="nav-item px-2 grip text-secondary align-self-center">
-            <fa icon="grip-vertical" fixed-width/>
-          </li>
-          <li class="nav-item">
-            <b-dropdown boundary="window" no-caret :text="translate('widget-title-chat')" variant="outline-primary" ref="dropdown" toggle-class="border-0">
-              <b-dropdown-item href="/popout/#chat">
-                Popout
-              </b-dropdown-item>
-              <b-dropdown-divider></b-dropdown-divider>
-              <b-dropdown-item>
-                <a href="#" @click.prevent="$refs.dropdown.hide(); $nextTick(() => EventBus.$emit('remove-widget', 'chat'))" class="text-danger">
-                  Remove <strong>{{translate('widget-title-chat')}}</strong> widget
-                </a>
-              </b-dropdown-item>
-            </b-dropdown>
-          </li>
-        </template>
+<template lang="pug">
+  div.widget
+    b-card(no-body).border-0.h-100
+      b-tabs(pills card style="overflow:hidden").h-100
+        template(v-slot:tabs-start v-if="!popout")
+          li.nav-item.px-2.grip.text-secondary.align-self-center
+            fa(icon="grip-vertical" fixed-width)
+          li.nav-item
+            b-dropdown(boundary="window" no-caret :text="translate('widget-title-chat')" variant="outline-primary" toggle-class="border-0")
+              b-dropdown-item(href="/popout/#chat")
+                | Popout
+              b-dropdown-divider
+              b-dropdown-item
+                a(href="#" @click.prevent="$refs.dropdown.hide(); $nextTick(() => EventBus.$emit('remove-widget', 'chat'))").text-danger
+                  | Remove <strong>{{translate('widget-title-chat')}}</strong> widget
+        b-tab(active)
+          template(v-slot:title)
+            fa(icon='comment-alt')
+          b-card-text.h-100
+            div.h-100
+              iframe(
+                v-if="show && room.length !== ''"
+                frameborder="0"
+                scrolling="no"
+                :src="chatUrl"
+                width="100%"
+                style="height: calc(100% - 40px)"
+              )
+            div(style='margin-top: -40px;')
+              div.form-row
+                b-col
+                  input(type="text" v-model="chatMessage" :placeholder="translate('send-message-as-a-bot')").form-control
+                b-col
+                  button(@click="sendChatMessage()").form-control.btn.btn-primary {{ translate('chat-as-bot') }}
 
-        <b-tab active>
-          <template v-slot:title>
-            <fa icon="comment-alt" />
-          </template>
-          <b-card-text class="h-100">
-            <div id="chat-room" style="height: 100%"></div>
+        b-tab
+          template(v-slot:title)
+            fa(icon="users")
+          b-card-text
+            ul(style="list-style-type: none; -webkit-column-count: 3; -moz-column-count: 3; column-count: 3; margin: 0;")
+              li(v-for="chatter of chatters" :key="chatter") {{chatter}}
 
-            <div style="margin-top: -40px;">
-              <div class="form-row">
-                <div class="col">
-                  <input type="text" v-model="chatMessage" class="form-control" v-bind:placeholder="translate('send-message-as-a-bot')" />
-                </div>
-                <div class="col">
-                  <button v-on:click="sendChatMessage()" class="form-control btn btn-primary">{{ translate('chat-as-bot') }}</button>
-                </div>
-              </div>
-            </div>
-          </b-card-text>
-        </b-tab>
-
-        <b-tab>
-          <template v-slot:title>
-            <fa icon="users" />
-          </template>
-          <b-card-text>
-            <div id="chat-viewers">
-              <ul style="list-style-type: none; -webkit-column-count: 3; -moz-column-count: 3; column-count: 3; margin: 0;" id="chat-viewers-data">
-                <li v-for="chatter of chatters" :key="chatter">{{chatter}}</li>
-              </ul>
-            </div>
-          </b-card-text>
-        </b-tab>
-
-        <template v-slot:tabs-end>
-          <b-nav-item href="#" @click="refresh">
-            <fa icon="sync-alt" v-if="!isRefreshing"/>
-            <fa icon="sync-alt" spin v-else/>
-          </b-nav-item>
-        </template>
-      </b-tabs>
-    </b-card>
-  </div>
+        template(v-slot:tabs-end)
+          b-nav-item(href="#" @click="refresh")
+            fa(icon="sync-alt" v-if="!isRefreshing")
+            fa(icon="sync-alt" spin v-else)
 </template>
 
 <script>
@@ -81,6 +62,7 @@ export default {
       room: '',
       interval: [],
       EventBus: EventBus,
+      show: true,
     }
   },
 
@@ -89,17 +71,19 @@ export default {
       clearInterval(interval);
     }
   },
-  mounted: function () {
-    this.$emit('mounted')
+  computed: {
+    chatUrl() {
+      return window.location.protocol
+        + '//twitch.tv/embed/'
+        + this.room
+        + '/chat'
+        + (this.configuration.core.ui.theme.includes('dark') ? '?darkpopout' : '')
+    }
   },
   methods: {
     refresh: function (event) {
-      if (event) event.preventDefault()
-      this.isRefreshing = true
-      setTimeout(() => (this.isRefreshing = false), 2000)
-      $("#chat-room").empty()
-      $("#chat-room").html('<iframe frameborder="0" scrolling="no" id="chat_embed" src="' + window.location.protocol +
-        '//twitch.tv/embed/' + this.room + '/chat' + (this.configuration.core.ui.theme.includes('dark') ? '?darkpopout' : '') +'" width="100%"></iframe>')
+      this.show = false;
+      this.$nextTick(() => this.show = true);
     },
     sendChatMessage: function () {
       if (this.chatMessage.length > 0) this.socket.emit('chat.message.send', this.chatMessage)
@@ -107,7 +91,7 @@ export default {
     },
     _chatters() {
       this.socket.emit('viewers', (err, data) => {
-        if (err) return console.error(err)
+        if (err) return console.error('Server error', err)
 
         let chatters = []
         for (let chatter of Object.entries(data.chatters).map(o => o[1])) {
@@ -124,8 +108,7 @@ export default {
     this.socket.emit('room', (err, room) => {
       if (err) return console.error(err)
       this.room = room
-      $("#chat-room").html('<iframe frameborder="0" scrolling="no" id="chat_embed" src="' + window.location.protocol +
-        '//twitch.tv/embed/' + room + '/chat' + (this.configuration.core.ui.theme.includes('dark') ? '?darkpopout' : '') +'" width="100%"></iframe>')
+      this.room = 'soge__'
     })
   }
 }

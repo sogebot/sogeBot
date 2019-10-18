@@ -39,9 +39,6 @@ export default {
       clearInterval(interval);
     }
   },
-  mounted: function () {
-    this.$emit('mounted')
-  },
   created: function () {
     this.interval.push(setInterval(() => {
       if (this.countdown > 0) {
