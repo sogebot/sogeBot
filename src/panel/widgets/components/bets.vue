@@ -6,13 +6,13 @@
           li.nav-item.px-2.grip.text-secondary.align-self-center
             fa(icon="grip-vertical" fixed-width)
           li.nav-item
-            b-dropdown(boundary="window" no-caret :text="translate('widget-title-bets')" variant="outline-primary" toggle-class="border-0")
+            b-dropdown(ref="dropdown" boundary="window" no-caret :text="translate('widget-title-bets')" variant="outline-primary" toggle-class="border-0")
               b-dropdown-item
                 a(href="#" @click.prevent="$refs.dropdown.hide(); $nextTick(() => EventBus.$emit('remove-widget', 'bets'))" class="text-danger")
                   | Remove <strong>{{translate('widget-title-bets')}}</strong> widget
         b-tab(active)
           template(v-slot:title)
-            fa(:icon='["far", "clock"]')
+            fa(:icon='["far", "clock"]' fixed-width)
             template(v-if="timer !== null") {{ timer | formatTime }}
           b-card-text
             template(v-if="timer !== null")
@@ -43,10 +43,13 @@
 
 <script>
 import { getSocket } from 'src/panel/helpers/socket';
+import { EventBus } from 'src/panel/helpers/event-bus';
+
 export default {
   props: ['popout'],
   data: function () {
     return {
+      EventBus,
       socket: getSocket('/systems/bets'),
       betPercentGain: 0,
 

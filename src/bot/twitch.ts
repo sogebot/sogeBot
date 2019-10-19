@@ -22,7 +22,7 @@ class Twitch extends Core {
     super();
 
     if (isMainThread) {
-      global.panel.addWidget('twitch', 'widget-title-monitor', 'fab fa-twitch');
+      global.panel.addWidget('twitch', 'widget-title-twitch', 'fab fa-twitch');
 
       global.panel.registerSockets({
         self: this,

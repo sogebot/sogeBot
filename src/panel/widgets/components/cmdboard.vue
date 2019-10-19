@@ -7,7 +7,7 @@
             <fa icon="grip-vertical" fixed-width/>
           </li>
           <li class="nav-item">
-            <b-dropdown boundary="window" no-caret :text="translate('widget-title-cmdboard')" variant="outline-primary" ref="dropdown" toggle-class="border-0">
+            <b-dropdown ref="dropdown" boundary="window" no-caret :text="translate('widget-title-cmdboard')" variant="outline-primary" toggle-class="border-0">
               <b-dropdown-item @click="state.editation = $state.progress">
                 Edit actions
               </b-dropdown-item>
@@ -25,7 +25,7 @@
         </template>
         <b-tab>
           <template v-slot:title>
-            <fa icon="terminal" />
+            <fa icon="terminal"  fixed-width/>
           </template>
           <b-card-text>
             <loading v-if="state.loading === $state.progress"/>
@@ -67,7 +67,7 @@
 
         <b-tab>
           <template v-slot:title>
-            <fa icon="cog" />
+            <fa icon="cog" fixed-width />
           </template>
           <b-card-text>
             <div class="input-group">
@@ -92,6 +92,7 @@
 
 <script>
 import { getSocket } from 'src/panel/helpers/socket';
+import { EventBus } from 'src/panel/helpers/event-bus';
 import { orderBy } from 'lodash-es'
 
 export default {
@@ -101,6 +102,7 @@ export default {
   },
   data: function () {
     return {
+      EventBus,
       orderBy,
       tabIndex: 0,
       state: {

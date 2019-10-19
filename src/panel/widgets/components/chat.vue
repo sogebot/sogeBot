@@ -6,7 +6,7 @@
           li.nav-item.px-2.grip.text-secondary.align-self-center
             fa(icon="grip-vertical" fixed-width)
           li.nav-item
-            b-dropdown(boundary="window" no-caret :text="translate('widget-title-chat')" variant="outline-primary" toggle-class="border-0")
+            b-dropdown(ref="dropdown" boundary="window" no-caret :text="translate('widget-title-chat')" variant="outline-primary" toggle-class="border-0")
               b-dropdown-item(href="/popout/#chat")
                 | Popout
               b-dropdown-divider
@@ -15,11 +15,11 @@
                   | Remove <strong>{{translate('widget-title-chat')}}</strong> widget
         b-tab(active)
           template(v-slot:title)
-            fa(icon='comment-alt')
+            fa(icon='comment-alt' fixed-width)
           b-card-text.h-100
             div.h-100
               iframe(
-                v-if="show && room.length !== ''"
+                v-if="show"
                 frameborder="0"
                 scrolling="no"
                 :src="chatUrl"
@@ -35,15 +35,15 @@
 
         b-tab
           template(v-slot:title)
-            fa(icon="users")
+            fa(icon="users" fixed-width)
           b-card-text
             ul(style="list-style-type: none; -webkit-column-count: 3; -moz-column-count: 3; column-count: 3; margin: 0;")
               li(v-for="chatter of chatters" :key="chatter") {{chatter}}
 
         template(v-slot:tabs-end)
           b-nav-item(href="#" @click="refresh")
-            fa(icon="sync-alt" v-if="!isRefreshing")
-            fa(icon="sync-alt" spin v-else)
+            fa(icon="sync-alt" v-if="!isRefreshing" fixed-width)
+            fa(icon="sync-alt" spin v-else fixed-width)
 </template>
 
 <script>
@@ -61,7 +61,7 @@ export default {
       isRefreshing: false,
       room: '',
       interval: [],
-      EventBus: EventBus,
+      EventBus,
       show: true,
     }
   },
@@ -90,25 +90,28 @@ export default {
       this.chatMessage = ''
     },
     _chatters() {
-      this.socket.emit('viewers', (err, data) => {
-        if (err) return console.error('Server error', err)
+      if (this.room.length > 0) {
+        this.socket.emit('viewers', (err, data) => {
+          if (err) return console.error('Server error', err)
 
-        let chatters = []
-        for (let chatter of Object.entries(data.chatters).map(o => o[1])) {
-          chatters.push(chatter)
-        }
-        this.chatters = sortedUniq(flatten(chatters))
-      })
+          let chatters = []
+          for (let chatter of Object.entries(data.chatters).map(o => o[1])) {
+            chatters.push(chatter)
+          }
+          this.chatters = sortedUniq(flatten(chatters))
+        })
+      }
     }
   },
   created: function () {
-    this._chatters();
-    this.interval.push(setInterval(() => this._chatters(), 60000));
+    this.interval.push(setInterval(() => {
+      this._chatters();
+    }, 60000));
 
     this.socket.emit('room', (err, room) => {
       if (err) return console.error(err)
       this.room = room
-      this.room = 'soge__'
+      this._chatters();
     })
   }
 }

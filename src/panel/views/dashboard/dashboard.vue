@@ -26,6 +26,7 @@
   </div>
 
   <div class="widgets pt-1">
+    {{ layout }}
     <!-- mobile show -->
     <div v-if="windowWidth <= 750">
       <div v-for="item in layout" class="pl-2 pr-2 pb-2" :key="item.id">
@@ -39,7 +40,7 @@
           v-for="dashboard of dashboards"
           v-show="dashboard.id === currentDashboard"
           :key="dashboard.id"
-          :layout="layout[dashboard.id]"
+          :layout="layout[dashboard.id] || []"
           @layout-updated="updateLayout"
           :col-num="12"
           :row-height="38"
@@ -135,19 +136,8 @@ export default {
         id: null,
       });
       this.dashboards = orderBy(dashboards, 'createdAt', 'asc');
+      this.refreshWidgets();
       this.isLoaded = true;
-
-      this.layout = {'null': []};
-      let i = 0;
-      for(const widget of this.items) {
-        if (typeof this.layout[widget.dashboardId] === 'undefined') {
-          this.layout[widget.dashboardId] = []
-        }
-        this.layout[widget.dashboardId].push({
-          i, x: Number(widget.position.x), y: Number(widget.position.y), w: Number(widget.size.width), h: Number(widget.size.height), id: widget.id
-        });
-        i++;
-      }
     });
 
     EventBus.$on('remove-widget', (id) => {
@@ -155,6 +145,23 @@ export default {
     });
   },
   methods: {
+    refreshWidgets() {
+      const layout = {'null': []};
+      for (const dashboard of this.dashboards) {
+        if (typeof layout[dashboard.id] === 'undefined') {
+          layout[dashboard.id] = []
+        }
+      }
+      this.layout = layout;
+
+      let i = 0;
+      for(const widget of this.items) {
+        this.layout[widget.dashboardId].push({
+          i, x: Number(widget.position.x), y: Number(widget.position.y), w: Number(widget.size.width), h: Number(widget.size.height), id: widget.id
+        });
+        i++;
+      }
+    },
     removeWidget(id) {
       this.items = this.items.filter(o => o.id !== id);
       this.layout = {};
@@ -188,6 +195,7 @@ export default {
     removeDashboard: function (dashboardId) {
       this.dashboards = this.dashboards.filter(o => String(o.id) !== dashboardId)
       this.currentDashboard = null
+      this.refreshWidgets();
     },
     addWidget: function (event) {
       event.dashboardId = String(event.dashboardId)
@@ -197,6 +205,7 @@ export default {
         this.dashboards.push(dashboard)
         this.dashboards = orderBy(this.dashboards, 'createdAt', 'asc')
         this.items.push(event.widget)
+        this.refreshWidgets();
       })
     },
     createDashboard: function () {
@@ -205,6 +214,7 @@ export default {
       })
       this.dashboardName = ''
       this.addDashboard = false
+      this.refreshWidgets();
     },
   }
 }

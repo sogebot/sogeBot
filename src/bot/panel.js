@@ -483,7 +483,13 @@ Panel.prototype.updateWidgetsInDb = async function (self, widgets, socket) {
 }
 
 Panel.prototype.addWidgetToDb = async function (self, widget, dashboardId, socket) {
- return (await global.db.engine.update('widgets', { id: widget }, { dashboardId, id: widget, position: { x: 0, y: 0 }, size: { width: 4, height: 3 } }))
+  // add widget to bottom left
+  const widgets = await global.db.engine.find('widgets', { dashboardId });
+  let y = 0;
+  for (const widget of widgets) {
+    y = Math.max(y, widget.position.y + widget.size.height);
+  }
+ return (await global.db.engine.update('widgets', { id: widget }, { dashboardId, id: widget, position: { x: 0, y }, size: { width: 4, height: 3 } }))
 }
 
 Panel.prototype.socketListening = function (self, on, fnc) {
