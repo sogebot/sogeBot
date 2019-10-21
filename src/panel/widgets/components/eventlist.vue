@@ -93,6 +93,7 @@
 
 <script>
 import { getSocket } from 'src/panel/helpers/socket';
+import { EventBus } from 'src/panel/helpers/event-bus';
 import { FontAwesomeLayers } from '@fortawesome/vue-fontawesome'
 import { chunk, debounce, get, isNil } from 'lodash-es';
 import moment from 'moment';
@@ -105,6 +106,7 @@ export default {
   },
   data: function () {
     return {
+      EventBus,
       socket: getSocket('/widgets/eventlist'),
       settings: {
         widgetEventlistFollows: true,

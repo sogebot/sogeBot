@@ -1,92 +1,75 @@
-<template>
-<div class="card widget">
-  <div class="card-header" @contextmenu.prevent="context.open($event, 'ytplayer')">
-    <ul class="nav nav-pills" role="tablist">
-      <li role="presentation" class="nav-item"  style="flex-shrink: 0">
-        <a class="nav-link" href="#yt-song-requests" aria-controls="home" role="tab" data-toggle="tab" title="Song Requests">
-          <small>{{ requests.length }}</small>
-          <fa icon="list" />
-        </a>
-      </li>
-      <li role="presentation" class="nav-item" style="flex-shrink: 0">
-        <button class="btn nav-btn btn-success" @click="play" v-if="!autoplay">
-          <fa icon="play" />
-        </button>
-        <button class="btn nav-btn btn-danger" @click="pause" v-else>
-          <fa icon="pause" />
-        </button>
-      </li>
-      <li role="presentation" class="nav-item" style="flex-shrink: 0" id="youtubeDropdown">
-        <div class="btn-group" style="height:100%;">
-          <button class="btn nav-btn btn-secondary" @click="next">
-            <fa icon="forward" />
-          </button>
-          <button type="button" style="border-left: 1px solid rgba(0, 0, 0, 0.2);" class="btn btn-secondary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <span class="sr-only">Toggle Dropdown</span>
-          </button>
-          <div class="dropdown-menu" id="youtubeDropdownData">
-            <button type="button" class="dropdown-item" @click="nextAndRemoveFromPlaylist">
-              skip &amp; remove from playlist
-            </button>
-          </div>
-        </div>
-      </li>
-      <li role="presentation" class="nav-item w-100">
-        <a class="nav-link active" href="#yt-main" aria-controls="home" role="tab" data-toggle="tab" title="Song Requests">
-          <fa icon="play" v-if="autoplay"/>
-          <fa icon="pause" v-else/>
-          <template v-if="currentSong">{{ currentSong.title }}</template>
-        </a>
-      </li>
-    </ul>
-  </div>
+<template lang="pug">
+  div.widget
+    b-card(no-body).border-0.h-100
+      b-tabs(pills card style="overflow:hidden" fill content-class="blackbg").h-100
+        template(v-slot:tabs-start v-if="!popout")
+          li.nav-item.px-2.grip.text-secondary.align-self-center.shrink
+            fa(icon="grip-vertical" fixed-width)
+          li.nav-item.shrink
+            b-dropdown(ref="dropdown" boundary="window" no-caret :text="translate('widget-title-ytplayer')" variant="outline-primary" toggle-class="border-0")
+              b-dropdown-item(@click="nextAndRemoveFromPlaylist")
+                | skip &amp; remove from playlist
+              b-dropdown-divider
+              b-dropdown-item
+                a(href="#" @click.prevent="$refs.dropdown.hide(); $nextTick(() => EventBus.$emit('remove-widget', 'ytplayer'))" class="text-danger")
+                  | Remove <strong>{{translate('widget-title-ytplayer')}}</strong> widget
 
-  <!-- Tab panes -->
-  <div class="card-body">
-    <div class="tab-content">
-      <div role="tabpanel" class="tab-pane" id="yt-song-requests">
-        <table class="table table-sm">
-          <tr v-for="(request, index) of requests" :key="index">
-            <td><hold-button @trigger="removeSongRequest(String(request._id))" :icon="'times'" class="btn-outline-danger border-0"></hold-button></td>
-            <td>{{request.title}}</td>
-            <td>{{request.username}}</td>
-            <td class="pr-4">{{request.length_seconds | formatTime}}</td>
-          </tr>
-        </table>
-      </div>
-      <div role="tabpanel" class="tab-pane active" id="yt-main">
-        <vue-plyr ref="player"
-          class="vcenter"
-          v-if="currentSong !== null"
-          :emit="['timeupdate', 'ended']"
-          @timeupdate="videoTimeUpdated"
-          @ended="videoEnded"
-          :options='{ controls: ["volume", "progress", "current-time", "restart", "mute"], fullscreen: { enabled: false }, clickToPlay: false }'
-          :key="(currentSong || { videoID: ''}).videoID">
-          <div data-plyr-provider="youtube" :data-plyr-embed-id="(currentSong || { videoID: ''}).videoID"></div>
-        </vue-plyr>
-      </div>
-
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</div>
+        b-tab(title-item-class="shrink")
+          template(v-slot:title)
+            small {{ requests.length }} &nbsp;
+            fa(icon='list')
+          b-card-text
+            table.table.table-sm
+              tr(v-for="(request, index) of requests" :key="index")
+                td
+                  hold-button(@trigger="removeSongRequest(String(request._id))" :icon="'times'" class="btn-outline-danger border-0")
+                td {{request.title}}
+                td {{request.username}}
+                td.pr-4 {{request.length_seconds | formatTime}}
+        b-tab(active title-link-class="p-0 text-left overflow" title-item-class="widthmincontent")
+          template(v-slot:title)
+            button(@click="play" v-if="!autoplay").btn.nav-btn.btn-success
+              fa(icon="play")
+            button(@click="pause" v-else).btn.nav-btn.btn-danger
+              fa(icon="pause")
+            button(@click="next").btn.nav-btn.btn-secondary
+              fa(icon="forward")
+            span(style="position:relative; top: 2px;").align-self-center.mx-2
+              fa(icon="play" v-if="autoplay")
+              fa(icon="pause" v-else)
+            template(v-if="currentSong") {{ currentSong.title }}
+          b-card-text.vcenter
+            vue-plyr(
+              ref="player"
+              v-if="currentSong !== null"
+              :emit="['timeupdate', 'ended']"
+              @timeupdate="videoTimeUpdated"
+              @ended="videoEnded"
+              :options='{ controls: ["volume", "progress", "current-time", "restart", "mute"], fullscreen: { enabled: false }, clickToPlay: false }'
+              :key="(currentSong || { videoID: ''}).videoID"
+            )
+              div(
+                data-plyr-provider="youtube"
+                :data-plyr-embed-id="(currentSong || { videoID: ''}).videoID"
+              )
 </template>
 
 <script>
 import Vue from 'vue'
 import VuePlyr from 'vue-plyr'
+import { EventBus } from 'src/panel/helpers/event-bus';
 import { isEqual } from 'lodash-es'
 import { getSocket } from 'src/panel/helpers/socket';
 Vue.use(VuePlyr)
 
 export default {
-  props: ['context'],
+  props: ['popout'],
   components: {
     holdButton: () => import('../../components/holdButton.vue'),
   },
   data: function () {
     return {
+      EventBus,
       autoplay: false,
       waitingForNext: false,
 
@@ -246,9 +229,20 @@ export default {
   }
 </style>
 <style>
-
-
+  .shrink {
+    flex: 0 1 auto !important;
+  }
   .plyr__video-embed iframe {
     z-index: 2;
+  }
+  .overflow {
+    height: 36px;
+    overflow:hidden;
+  }
+  .widthmincontent{
+    width: min-content;
+  }
+  .blackbg {
+    background-color: black;
   }
 </style>

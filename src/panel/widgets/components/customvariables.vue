@@ -88,6 +88,7 @@
 </template>
 
 <script>
+import { EventBus } from 'src/panel/helpers/event-bus';
 import { getSocket } from 'src/panel/helpers/socket';
 import { isNil, size, orderBy } from 'lodash-es';
 var numberOrTextComponent = {
@@ -117,6 +118,7 @@ var numberOrTextComponent = {
   },
   data: function () {
     return {
+      EventBus,
       showSaveButton: false,
       currentValue: this.value
     }
