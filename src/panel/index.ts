@@ -196,7 +196,6 @@ const main = async () => {
       return object;
     },
     created() {
-
       this.$root.$on('bv::dropdown::show', bvEvent => {
         this.dropdownShow(bvEvent);
       });

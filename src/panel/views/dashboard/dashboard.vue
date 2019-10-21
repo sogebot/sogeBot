@@ -98,7 +98,6 @@ export default {
     soundboard: () => import('src/panel/widgets/components/soundboard.vue'),
     spotify: () => import('src/panel/widgets/components/spotify.vue'),
     twitch: () => import('src/panel/widgets/components/twitch.vue'),
-    twitter: () => import('src/panel/widgets/components/twitter.vue'),
     widgetCreate: () => import('src/panel/widgets/components/widget_create.vue'),
     dashboardRemove: () => import('src/panel/widgets/components/dashboard_remove.vue'),
     ytplayer: () => import('src/panel/widgets/components/ytplayer.vue'),
