@@ -79,7 +79,7 @@ class Streamlabs extends Integration {
             });
           }
           if (global.api.isStreamOnline) {
-            global.api.stats.currentTips = parseFloat(global.currency.exchange(event.amount, event.currency, global.currency.mainCurrency));
+            global.api.stats.currentTips += parseFloat(global.currency.exchange(event.amount, event.currency, global.currency.mainCurrency));
           }
         }
         global.overlays.eventlist.add({
@@ -90,7 +90,7 @@ class Streamlabs extends Integration {
           message: event.message,
           timestamp: Date.now(),
         });
-        tip(`${event.from.toLowerCase()}, amount: ${event.amount}${event.currency}, message: ${event.message}`);
+        tip(`${event.from.toLowerCase()}, amount: ${Number(event.amount).toFixed(2)}${event.currency}, message: ${event.message}`);
         global.events.fire('tip', {
           username: event.from.toLowerCase(),
           amount: parseFloat(event.amount).toFixed(2),
