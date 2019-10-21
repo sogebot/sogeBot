@@ -185,23 +185,24 @@ const main = async () => {
       const object: {
         isDropdownHidden: boolean;
         dropdown: any;
+        dropdownVue: any;
         token: any;
       } = {
         isDropdownHidden: true,
         dropdown: null,
+        dropdownVue: null,
         token: window.token,
       };
       return object;
     },
     created() {
-      // detaching all dropdowns to be shown
+
       this.$root.$on('bv::dropdown::show', bvEvent => {
-        this.dropdownShow(bvEvent);
+       this.dropdownShow(bvEvent);
       });
 
       this.$root.$on('bv::dropdown::hidden', bvEvent => {
-        this.dropdown.remove();
-        this.isDropdownHidden = true;
+        this.dropdownHide();
       });
 
       // set proper moment locale
@@ -215,15 +216,27 @@ const main = async () => {
       head.appendChild(link);
     },
     methods: {
-      dropdownShow(bvEvent) {
-        if (!this.isDropdownHidden) {
+      clickEvent(event) {
+        if ((typeof event.target.className !== 'string' || !event.target.className.includes('dropdown')) && !this.isDropdownHidden) {
+          console.debug('Clicked outside dropdown', event.target);
+          this.dropdownHide();
+        }
+      },
+      dropdownHide() {
+        this.dropdownVue.hide();
+        this.dropdown.remove();
+        this.isDropdownHidden = true;
+      },
+      dropdownShow(bvEvent, retry = false) {
+        if (!this.isDropdownHidden && !retry) {
           // try next tick again - wait for cleanup
           console.debug('waiting to next tick for dropdownShow');
-          this.$nextTick(() => this.dropdownShow(bvEvent));
+          this.$nextTick(() => this.dropdownShow(bvEvent, true));
         } else {
           this.isDropdownHidden = false;
           const child = bvEvent.target;
           this.dropdown = child;
+          this.dropdownVue = bvEvent.vueTarget;
           child.style.position = 'absolute';
           child.style['z-index'] = 99999999;
           child.remove();
@@ -232,7 +245,7 @@ const main = async () => {
       },
     },
     template: `
-      <div id="app">
+      <div id="app" @click.capture="clickEvent">
         <template v-if="token">
           <navbar/>
           <statsbar/>

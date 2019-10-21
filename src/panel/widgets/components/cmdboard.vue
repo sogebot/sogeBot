@@ -1,99 +1,74 @@
-<template>
-  <div class="widget">
-    <b-card class="border-0 h-100" no-body>
-      <b-tabs pills card class="h-100" style="overflow:hidden" v-model="tabIndex">
-        <template v-slot:tabs-start v-if="!popout">
-          <li class="nav-item px-2 grip text-secondary align-self-center">
-            <fa icon="grip-vertical" fixed-width/>
-          </li>
-          <li class="nav-item">
-            <b-dropdown ref="dropdown" boundary="window" no-caret :text="translate('widget-title-cmdboard')" variant="outline-primary" toggle-class="border-0">
-              <b-dropdown-item @click="state.editation = $state.progress">
-                Edit actions
-              </b-dropdown-item>
-              <b-dropdown-item href="/popout/#cmdboard">
-                Popout
-              </b-dropdown-item>
-              <b-dropdown-divider></b-dropdown-divider>
-              <b-dropdown-item>
-                <a href="#" @click.prevent="$refs.dropdown.hide(); $nextTick(() => EventBus.$emit('remove-widget', 'cmdboard'))" class="text-danger">
-                  Remove <strong>{{translate('widget-title-cmdboard')}}</strong> widget
-                </a>
-              </b-dropdown-item>
-            </b-dropdown>
-          </li>
-        </template>
-        <b-tab>
-          <template v-slot:title>
-            <fa icon="terminal"  fixed-width/>
-          </template>
-          <b-card-text>
-            <loading v-if="state.loading === $state.progress"/>
-            <template v-else>
-              <div v-if="state.editation === $state.progress" class="text-right">
-                <b-button variant="danger" @click="remove" :disabled="selected.length === 0"><fa icon="trash-alt"/></b-button>
-                <b-button variant="primary" @click="save">Done</b-button>
-              </div>
-              <div class="list-group">
-                <b-row class="px-2">
-                  <b-col v-for="item of orderBy(items, 'order')" :key="item._id" cols="6" class="p-1">
-                    <button
-                      v-on:dragenter="dragenter(item.order, $event)"
-                      :ref='"item_" + item.order'
-                      class="list-group-item list-group-item-action block px-2"
-                      :class="{'list-group-item-danger': state.editation === $state.progress && selected.includes(item._id) }"
+<template lang="pug">
+  div.widget
+    b-card(no-body).border-0.h-100
+      b-tabs(pills card style="overflow:hidden" v-model="tabIndex").h-100
+        template(v-slot:tabs-start v-if="!popout")
+          li.nav-item.px-2.grip.text-secondary.align-self-center
+            fa(icon="grip-vertical" fixed-width)
+          li.nav-item
+            b-dropdown(ref="dropdown" boundary="window" no-caret :text="translate('widget-title-cmdboard')" variant="outline-primary" toggle-class="border-0")
+              b-dropdown-item(@click="state.editation = $state.progress")
+                | Edit actions
+              b-dropdown-item(href="/popout/#cmdboard")
+                | Popout
+              b-dropdown-divider
+              b-dropdown-item
+                a(href="#" @click.prevent="$refs.dropdown.hide(); $nextTick(() => EventBus.$emit('remove-widget', 'cmdboard'))").text-danger
+                  | Remove <strong>{{translate('widget-title-cmdboard')}}</strong> widget
+        b-tab
+          template(v-slot:title)
+            fa(icon='terminal' fixed-width)
+          b-card-text
+            loading(v-if="state.loading === $state.progress")
+            template(v-else)
+              div(v-if="state.editation === $state.progress").text-right
+                b-button(variant="danger" @click="remove" :disabled="selected.length === 0")
+                  fa(icon="trash-alt")
+                b-button(variant="primary" @click="save")
+                  | Done
+              div.list-group
+                b-row.px-2
+                  b-col(v-for="item of orderBy(items, 'order')" :key="item._id" cols="6").p-1
+                    button(
                       style="text-overflow: ellipsis;"
-                      v-on:click="state.editation === $state.idle ? emit(item) : toggle(item)"
+                      @dragenter="dragenter(item.order, $event)"
+                      @click="state.editation === $state.idle ? emit(item) : toggle(item)"
+                      :class="{'list-group-item-danger': state.editation === $state.progress && selected.includes(item._id) }"
+                      :ref='"item_" + item.order'
                       :data-name="item.text"
-                      :title="item.command">
-                      <span style="word-break: break-all;line-height: 15px;">
-                        <span
+                      :title="item.command"
+                    ).list-group-item.list-group-item-action.block.px-2
+                      span(style="word-break: break-all;line-height: 15px;")
+                        span(
                           v-if="state.editation === $state.progress"
-                          class="text-secondary"
                           style="cursor: grab;"
-                          v-on:dragstart="dragstart(item.order, $event)"
-                          v-on:dragend="dragend(item.order, $event)"
-                          draggable="true">
-                          <fa icon="grip-vertical" fixed-width/></span>
-                        {{item.text}}
-                      </span>
-                    </button>
-                  </b-col>
-                </b-row>
-              </div>
-            </template>
-          </b-card-text>
-        </b-tab>
+                          @dragstart="dragstart(item.order, $event)"
+                          @dragend="dragend(item.order, $event)"
+                          draggable="true"
+                        ).text-secondary
+                          fa(icon="grip-vertical" fixed-width)
+                        | {{item.text}}
 
-        <b-tab>
-          <template v-slot:title>
-            <fa icon="cog" fixed-width />
-          </template>
-          <b-card-text>
-            <div class="input-group">
-              <div class="input-group-prepend">
-                <span class="input-group-text">{{translate('name')}}</span>
-              </div>
-              <input type="text" class="form-control" v-model="name">
-            </div>
-            <div class="input-group">
-              <div class="input-group-prepend">
-                <span class="input-group-text">{{translate('command')}}</span>
-              </div>
-              <input type="text" class="form-control" v-model="command">
-            </div>
-            <button type="button" class="btn btn-success btn-block btn-cmdboard" v-on:click="add" :disabled="!isConfirmEnabled">{{translate('confirm')}}</button>
-          </b-card-text>
-        </b-tab>
-      </b-tabs>
-    </b-card>
-  </div>
+        b-tab
+          template(v-slot:title)
+            fa(icon="cog" fixed-width)
+          b-card-text
+            div.input-group
+              div.input-group-prepend
+                span.input-group-text {{translate('name')}}
+              input(type="text" class="form-control" v-model="name")
+            div.input-group
+              div.input-group-prepend
+                span.input-group-text {{translate('command')}}
+              input(type="text" class="form-control" v-model="command")
+            button(type="button" @click="add" :disabled="!isConfirmEnabled").btn.btn-success.btn-block.btn-cmdboard
+              | {{translate('confirm')}}
 </template>
 
 <script>
 import { getSocket } from 'src/panel/helpers/socket';
 import { EventBus } from 'src/panel/helpers/event-bus';
-import { orderBy } from 'lodash-es'
+import { orderBy } from 'lodash-es';
 
 export default {
   props: ['popout'],
@@ -132,7 +107,7 @@ export default {
   created: function () {
       this.socket.emit('find', { collection: '_widgetsCmdBoard' }, (err, items) => {
         this.items = items
-        console.log({items})
+        console.debug({items})
         this.state.loading = this.$state.success;
       })
       this.socket.emit('settings', (err, data) => {
