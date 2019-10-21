@@ -26,7 +26,6 @@
   </div>
 
   <div class="widgets pt-1">
-    {{ layout }}
     <!-- mobile show -->
     <div v-if="windowWidth <= 750">
       <div v-for="item in layout" class="pl-2 pr-2 pb-2" :key="item.id">

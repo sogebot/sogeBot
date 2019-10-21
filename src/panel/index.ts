@@ -223,9 +223,11 @@ const main = async () => {
         }
       },
       dropdownHide() {
-        this.dropdownVue.hide();
-        this.dropdown.remove();
-        this.isDropdownHidden = true;
+        if (!this.isDropdownHidden) {
+          this.dropdownVue.hide();
+          this.dropdown.remove();
+          this.isDropdownHidden = true;
+        }
       },
       dropdownShow(bvEvent, retry = false) {
         if (!this.isDropdownHidden && !retry) {
