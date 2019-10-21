@@ -91,7 +91,7 @@ class Donationalerts extends Integration {
           timestamp: Date.now(),
         });
 
-        tip(`${data.username.toLowerCase()}, amount: ${data.amount}${data.currency}, message: ${data.message}`);
+        tip(`${data.username.toLowerCase()}, amount: ${Number(data.amount).toFixed(2)}${data.currency}, message: ${data.message}`);
         global.events.fire('tip', {
           username: data.username.toLowerCase(),
           amount: parseFloat(data.amount).toFixed(2),
@@ -124,7 +124,7 @@ class Donationalerts extends Integration {
             });
           }
           if (global.api.isStreamOnline) {
-            global.api.stats.currentTips = parseFloat(global.currency.exchange(data.amount, data.currency, global.currency.mainCurrency));
+            global.api.stats.currentTips += parseFloat(global.currency.exchange(data.amount, data.currency, global.currency.mainCurrency));
           }
         }
 

@@ -72,7 +72,7 @@ class Qiwi extends Integration {
       }
 
       if (global.api.isStreamOnline) {
-        global.api.stats.currentTips = parseFloat(global.currency.exchange(amount, currency, global.currency.mainCurrency));
+        global.api.stats.currentTips += parseFloat(global.currency.exchange(amount, currency, global.currency.mainCurrency));
       }
 
       global.overlays.eventlist.add({
@@ -84,7 +84,7 @@ class Qiwi extends Integration {
         timestamp: Date.now(),
       });
 
-      tip(`${username ? username : 'Anonymous'}${id ? '#' + id : ''}, amount: ${amount}${DONATION_CURRENCY}, ${message ? 'message: ' + message : ''}`);
+      tip(`${username ? username : 'Anonymous'}${id ? '#' + id : ''}, amount: ${Number(amount).toFixed(2)}${DONATION_CURRENCY}, ${message ? 'message: ' + message : ''}`);
 
       global.events.fire('tip', {
         username: username || 'Anonymous',

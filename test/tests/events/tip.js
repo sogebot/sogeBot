@@ -58,7 +58,7 @@ describe('Events - tip event', () => {
     for (const username of ['losslezos', 'rigneir', 'mikasa_hraje', 'foufhs']) {
       describe(username + ' tip event', () => {
         it('trigger tip event for 10 EUR - ' + username, async () => {
-          log.tip(`${username}, amount: 10EUR, message: Ahoj jak je`);
+          log.tip(`${username}, amount: 10.00EUR, message: Ahoj jak je`);
           global.events.fire('tip', { username: username, amount: 10.00, message: 'Ahoj jak je', currency: 'EUR' });
         });
 

@@ -104,7 +104,7 @@ class StreamElements extends Integration {
       global.db.engine.insert('users.tips', { id, amount: eventData.data.amount, message: eventData.data.message, currency: eventData.data.currency, timestamp: Date.now() });
     }
     if (global.api.isStreamOnline) {
-      global.api.stats.currentTips = parseFloat(global.currency.exchange(eventData.data.amount, eventData.data.currency, global.currency.mainCurrency));
+      global.api.stats.currentTips += parseFloat(global.currency.exchange(eventData.data.amount, eventData.data.currency, global.currency.mainCurrency));
     }
     global.overlays.eventlist.add({
       type: 'tip',
@@ -114,7 +114,7 @@ class StreamElements extends Integration {
       message: eventData.data.message,
       timestamp: Date.now(),
     });
-    tip(`${username.toLowerCase()}${id ? '#' + id : ''}, amount: ${eventData.data.amount}${eventData.data.currency}, message: ${eventData.data.message}`);
+    tip(`${username.toLowerCase()}${id ? '#' + id : ''}, amount: ${Number(eventData.data.amount).toFixed(2)}${eventData.data.currency}, message: ${eventData.data.message}`);
     global.events.fire('tip', {
       username: username.toLowerCase(),
       amount: parseFloat(eventData.data.amount).toFixed(2),
