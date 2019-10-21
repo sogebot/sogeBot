@@ -1028,6 +1028,15 @@ class API extends Core {
             start(
               `id: ${stream.id} | startedAt: ${stream.started_at} | title: ${stream.title} | game: ${await this.getGameFromId(stream.game_id)} | type: ${stream.type} | channel ID: ${cid}`
             );
+
+            // reset quick stats on stream start
+            this.stats.currentWatchedTime = 0;
+            this.stats.maxViewers = 0;
+            this.stats.newChatters = 0;
+            this.stats.currentViewers = 0;
+            this.stats.currentBits = 0;
+            this.stats.currentTips = 0;
+
             global.events.fire('stream-started', {});
             global.events.fire('command-send-x-times', { reset: true });
             global.events.fire('keyword-send-x-times', { reset: true });
@@ -1105,7 +1114,6 @@ class API extends Core {
           if (this.isStreamOnline) {
             // online -> offline transition
             stop('');
-            this.stats.currentWatchedTime = 0;
             this.streamStatusChangeSince = Date.now();
             this.isStreamOnline = false;
             this.curRetries = 0;
@@ -1132,12 +1140,6 @@ class API extends Core {
                 }
               }
             }
-
-            this.stats.maxViewers = 0;
-            this.stats.newChatters = 0;
-            this.stats.currentViewers = 0;
-            this.stats.currentBits = 0;
-            this.stats.currentTips = 0;
 
             await global.db.engine.remove('cache.hosts', {}); // we dont want to have cached hosts on stream start
             await global.db.engine.remove('cache.raids', {}); // we dont want to have cached raids on stream start
