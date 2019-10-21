@@ -198,7 +198,7 @@ const main = async () => {
     created() {
 
       this.$root.$on('bv::dropdown::show', bvEvent => {
-       this.dropdownShow(bvEvent);
+        this.dropdownShow(bvEvent);
       });
 
       this.$root.$on('bv::dropdown::hidden', bvEvent => {
