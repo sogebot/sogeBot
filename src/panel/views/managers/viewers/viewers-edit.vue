@@ -138,7 +138,7 @@
               </div>
 
               <table class="table table-sm ml-2 mr-2" v-if="viewer.stats.bits.length !== 0">
-                <tr v-for="bits of _.orderBy(viewer.stats.bits, 'timestamp', 'desc')">
+                <tr v-for="bits of orderBy(viewer.stats.bits, 'timestamp', 'desc')" :key="bits.timestamp">
                   <td scope="row">{{ moment(bits.timestamp).format('LLL') }}</td>
                   <td>
                     <input type="number" min="0" v-model="bits.amount" v-if="bits.editation" class="form-control">
@@ -178,11 +178,11 @@
               </div>
 
               <table class="table table-sm ml-2 mr-2" v-if="viewer.stats.tips.length !== 0">
-                <tr v-for="tips of _.orderBy(viewer.stats.tips, 'timestamp', 'desc')">
+                <tr v-for="tips of orderBy(viewer.stats.tips, 'timestamp', 'desc')" :key="tips.timestamp">
                   <td scope="row">{{ moment(tips.timestamp).format('LLL') }}</td>
                   <td class="d-flex">
                     <template v-if="tips.editation">
-                      <input type="number" min="0" v-model="tips.amount"class="form-control">
+                      <input type="number" min="0" v-model="tips.amount" class="form-control">
                       <select class="form-control" v-model="tips.currency">
                         <option value="USD">USD</option>
                         <option value="AUD">AUD</option>
@@ -281,7 +281,7 @@
 <script lang="ts">
 import { Vue, Component, Watch } from 'vue-property-decorator';
 import { getSocket } from 'src/panel/helpers/socket';
-import { remove, get } from 'lodash';
+import { orderBy, remove, get } from 'lodash';
 import DatePicker from 'vue2-datepicker';
 import moment from 'moment';
 
@@ -299,6 +299,7 @@ Component.registerHooks([
 })
 export default class viewersEdit extends Vue {
   moment = moment;
+  orderBy = orderBy;
 
   socket = getSocket('/core/users');
 
