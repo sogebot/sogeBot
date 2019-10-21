@@ -19,11 +19,11 @@
             fa(icon="music" fixed-width)
           b-card-text
             b-container
-              b-row
-                b-col(cols="4" v-for="sound of sounds" :key="sound")
+              b-row(no-gutters)
+                b-col(cols="4" v-for="sound of sounds" :key="sound").px-1.pt-0.pb-1
                   button(
-                    class="btn btn-outline-dark soundboard-list-group-item"
-                    style="border: 0;padding: 0; padding-bottom: 0.4rem;"
+                    style="overflow: hidden;"
+                    class="btn btn-outline-secondary border-0 soundboard-list-group-item btn-block"
                     v-on:click="play(sound)" type="button"
                   ) {{sound}}
 

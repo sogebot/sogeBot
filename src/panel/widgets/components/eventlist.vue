@@ -8,24 +8,27 @@
           li.nav-item
             b-dropdown(ref="dropdown" boundary="window" no-caret :text="translate('widget-title-eventlist')" variant="outline-primary" toggle-class="border-0")
               b-dropdown-group(header="Events filtering")
-                b-dropdown-item-button(@click="toggle('widgetEventlistFollows')" :variant="settings.widgetEventlistFollows ? 'success' : 'danger'")
-                  | Follows
-                b-dropdown-item-button(@click="toggle('widgetEventlistHosts')" :variant="settings.widgetEventlistHosts ? 'success' : 'danger'")
-                  | Hosts
-                b-dropdown-item-button(@click="toggle('widgetEventlistRaids')" :variant="settings.widgetEventlistRaids ? 'success' : 'danger'")
-                  | Raids
-                b-dropdown-item-button(@click="toggle('widgetEventlistCheers')" :variant="settings.widgetEventlistCheers ? 'success' : 'danger'")
-                  | Cheers
-                b-dropdown-item-button(@click="toggle('widgetEventlistSubs')" :variant="settings.widgetEventlistSubs ? 'success' : 'danger'")
-                  | Subs
-                b-dropdown-item-button(@click="toggle('widgetEventlistSubgifts')" :variant="settings.widgetEventlistSubgifts ? 'success' : 'danger'")
-                  | Sub Gifts
-                b-dropdown-item-button(@click="toggle('widgetEventlistSubcommunitygifts')" :variant="settings.widgetEventlistSubcommunitygifts ? 'success' : 'danger'")
-                  | Sub Community Gifts
-                b-dropdown-item-button(@click="toggle('widgetEventlistResubs')" :variant="settings.widgetEventlistResubs ? 'success' : 'danger'")
-                  | Resubs
-                b-dropdown-item-button(@click="toggle('widgetEventlistTips')" :variant="settings.widgetEventlistTips ? 'success' : 'danger'")
-                  | Tips
+                b-dropdown-form
+                  b-button(@click="toggle('widgetEventlistFollows')" :variant="settings.widgetEventlistFollows ? 'success' : 'danger'")
+                    fa(icon="heart")
+                  b-button(@click="toggle('widgetEventlistHosts')" :variant="settings.widgetEventlistHosts ? 'success' : 'danger'")
+                    fa(icon="tv")
+                  b-button(@click="toggle('widgetEventlistRaids')" :variant="settings.widgetEventlistRaids ? 'success' : 'danger'")
+                    fa(icon="random")
+                  b-button(@click="toggle('widgetEventlistCheers')" :variant="settings.widgetEventlistCheers ? 'success' : 'danger'")
+                    fa(icon="gem")
+                  b-button(@click="toggle('widgetEventlistSubs')" :variant="settings.widgetEventlistSubs ? 'success' : 'danger'")
+                    fa(icon="star")
+                  b-button(@click="toggle('widgetEventlistSubgifts')" :variant="settings.widgetEventlistSubgifts ? 'success' : 'danger'")
+                    fa(icon="gift")
+                  b-button(@click="toggle('widgetEventlistSubcommunitygifts')" :variant="settings.widgetEventlistSubcommunitygifts ? 'success' : 'danger'")
+                    fa(icon="box-open")
+                  b-button(@click="toggle('widgetEventlistResubs')" :variant="settings.widgetEventlistResubs ? 'success' : 'danger'")
+                    font-awesome-layers
+                      fa(icon="star-half")
+                      fa(icon="long-arrow-alt-right")
+                  b-button(@click="toggle('widgetEventlistTips')" :variant="settings.widgetEventlistTips ? 'success' : 'danger'")
+                    fa(icon="dollar-sign")
               b-dropdown-divider
               b-dropdown-item(href="/popout/#eventlist")
                 | Popout

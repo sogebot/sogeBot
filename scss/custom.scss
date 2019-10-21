@@ -586,10 +586,11 @@ span.queue-list-group-item {
 }
 
 .soundboard-list-group-item, .cmdboard-list-group-item {
-  font-size: 18px;
-  font-weight: bold;
+  font-size: 14px;
   text-align: center;
   cursor: pointer;
+  height: 40px;
+  line-height: 14px;
 }
 
 .cmdboard-list-group-item {
