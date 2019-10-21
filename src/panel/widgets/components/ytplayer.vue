@@ -203,17 +203,6 @@ export default {
         s > 9 ? s : '0' + s,
       ].filter(a => a).join(':');
     }
-  },
-  mounted: function () {
-    this.$emit('mounted')
-
-    $('#youtubeDropdown').on('show.bs.dropdown', function() {
-      $('body').append($('#youtubeDropdownData').css({
-        position: 'absolute',
-        left: $('#youtubeDropdown').offset().left,
-        top: $('#youtubeDropdown').offset().top + 5
-      }).detach())
-    })
   }
 }
 </script>
