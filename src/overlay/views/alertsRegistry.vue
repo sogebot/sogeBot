@@ -4,7 +4,6 @@
       <div v-if="urlParam('debug')" class="debug">
         <json-viewer :value="{data}" v-if="data" boxed copyable :expand-depth="2"></json-viewer>
         <json-viewer :value="{runningAlert}" v-if="runningAlert" boxed copyable :expand-depth="2"></json-viewer>
-        <json-viewer :value="{alerts}" v-if="alerts" boxed copyable :expand-depth="2"></json-viewer>
       </div>
       <div v-if="runningAlert">
         <audio ref="audio">
