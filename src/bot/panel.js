@@ -1,7 +1,5 @@
 'use strict'
 
-import fs from 'fs'
-
 var express = require('express')
 const bodyParser = require('body-parser')
 var http = require('http')
