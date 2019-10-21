@@ -26,7 +26,6 @@ export const getConfiguration = async () => {
   console.debug('Getting configuration');
   return new Promise((resolve) => {
     getSocket('/').emit('getConfiguration', (configuration) => {
-      console.debug({configuration});
       resolve(configuration);
     });
   });
