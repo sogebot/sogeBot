@@ -247,7 +247,6 @@ export default {
     refreshWatchList: function () {
       return new Promise((resolve) => {
         this.socket.emit('list.watch', (err, data) => {
-          ('Watched', { data })
           this.watched = data
           resolve()
         })

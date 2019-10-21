@@ -193,7 +193,7 @@ import { FontAwesomeLayers } from '@fortawesome/vue-fontawesome'
 import { chunk, debounce, get, isNil } from 'lodash-es';
 import moment from 'moment';
 export default {
-  props: ['context', 'popout'],
+  props: ['popout'],
   components: {
     'font-awesome-layers': FontAwesomeLayers,
     holdButton: () => import('../../components/holdButton.vue'),
