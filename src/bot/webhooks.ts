@@ -321,6 +321,14 @@ class Webhooks {
           `id: ${stream.id} | startedAt: ${stream.started_at} | title: ${stream.title} | game: ${await global.api.getGameFromId(stream.game_id)} | type: ${stream.type} | channel ID: ${cid}`
         );
 
+        // reset quick stats on stream start
+        global.api.stats.currentWatchedTime = 0;
+        global.api.stats.maxViewers = 0;
+        global.api.stats.newChatters = 0;
+        global.api.stats.currentViewers = 0;
+        global.api.stats.currentBits = 0;
+        global.api.stats.currentTips = 0;
+
         global.api.isStreamOnline = true;
         global.api.chatMessagesAtStart = global.linesParsed;
 
