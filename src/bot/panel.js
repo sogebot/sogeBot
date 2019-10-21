@@ -120,27 +120,6 @@ function Panel () {
     res.sendFile(path.join(__dirname, '..', 'public', 'index.html'))
   })
 
-  // wait little bit to other systems have change to load its routes
-  setTimeout(() => {
-    app.get('/:type/registry/:subtype/:page', function (req, res) {
-      const file = path.join(__dirname, '..', 'public', req.params.type, 'registry', req.params.subtype, req.params.page)
-      if (fs.existsSync(file)) {
-        res.sendFile(file)
-      }
-    })
-    app.get('/:type/:subtype/:page', function (req, res) {
-      const file = path.join(__dirname, '..', 'public', req.params.type, req.params.subtype, req.params.page)
-      if (fs.existsSync(file)) {
-        res.sendFile(file)
-      }
-    })
-    app.get('/:type/:page', function (req, res) {
-      try {
-        res.sendFile(path.join(__dirname, '..', 'public', req.params.type, req.params.page))
-      } catch (e) {}
-    })
-  }, 5000);
-
   this.io = require('socket.io')(this.server)
   this.menu = [{ category: 'main', name: 'dashboard', id: 'dashboard' }]
   this.widgets = []
