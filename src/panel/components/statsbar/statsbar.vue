@@ -14,31 +14,27 @@
     <template v-else>
       <div class="row">
         <div class="col-6 col-sm-4 col-md-4 col-lg-1 stream-info" @click="saveHighlight">
+          <span class="data" id="uptime">{{ uptime }}</span>
+          <span class="stats">&nbsp;</span>
           <h2>
             <span>{{ translate('uptime') }}</span>
             <small>{{ translate('click-to-highlight') }}</small>
           </h2>
-          <span class="data" id="uptime">{{ uptime }}</span>
-          <span class="stats">&nbsp;</span>
         </div>
 
         <div class="col-6 col-sm-4 col-md-4 col-lg-1 stream-info" v-on:click="toggleViewerShow">
-          <h2>
-            <span>{{ translate('viewers') }}</span>
-            <small>{{ translate('click-to-toggle-display') }}</small>
-          </h2>
           <span class="data">
             <template v-if="!hideStats">{{ currentViewers }}</template>
             <small v-else>{{translate('hidden')}}</small>
           </span>
           <span class="stats">&nbsp;</span>
+          <h2>
+            <span>{{ translate('viewers') }}</span>
+            <small>{{ translate('click-to-toggle-display') }}</small>
+          </h2>
         </div>
 
         <div class="col-6 col-sm-4 col-md-4 col-lg-1 stream-info" v-on:click="toggleViewerShow">
-          <h2>
-            <span>{{ translate('max-viewers') }}</span>
-            <small>{{ translate('click-to-toggle-display') }}</small>
-          </h2>
           <span class="data">
             <template v-if="!hideStats">{{ maxViewers }}</template>
             <small v-else>{{translate('hidden')}}</small>
@@ -58,13 +54,13 @@
             </small>
           </span>
           <span class="stats" v-else>&nbsp;</span>
+          <h2>
+            <span>{{ translate('max-viewers') }}</span>
+            <small>{{ translate('click-to-toggle-display') }}</small>
+          </h2>
         </div>
 
         <div class="col-6 col-sm-4 col-md-4 col-lg-1 stream-info" v-on:click="toggleViewerShow">
-          <h2>
-            <span>{{ translate('new-chatters') }}</span>
-            <small>{{ translate('click-to-toggle-display') }}</small>
-          </h2>
           <span class="data">
             <template v-if="!hideStats">{{ newChatters }}</template>
             <small v-else>{{translate('hidden')}}</small>
@@ -84,10 +80,13 @@
             </small>
           </span>
           <span class="stats" v-else>&nbsp;</span>
+          <h2>
+            <span>{{ translate('new-chatters') }}</span>
+            <small>{{ translate('click-to-toggle-display') }}</small>
+          </h2>
         </div>
 
         <div class="col-6 col-sm-4 col-md-4 col-lg-1 stream-info">
-          <h2>{{ translate('chat-messages') }}</h2>
           <span class="data" v-bind:title="chatMessages">{{ shortenNumber(chatMessages, b_shortenNumber) }}</span>
           <span class="stats">
             <small v-if="b_showAvgDiff && isStreamOnline && chatMessages - averageStats.chatMessages !== 0"
@@ -103,10 +102,10 @@
               </template>
             </small>
           </span>
+          <h2>{{ translate('chat-messages') }}</h2>
         </div>
 
         <div class="col-6 col-sm-4 col-md-4 col-lg-1 stream-info">
-          <h2>{{ translate('views') }}</h2>
           <span class="data" v-bind:title="currentViews">{{ shortenNumber(currentViews, b_shortenNumber) }}</span>
           <span class="stats">
             <small v-if="b_showAvgDiff && isStreamOnline && currentViews - averageStats.currentViews !== 0"
@@ -122,16 +121,16 @@
               </template>
             </small>
           </span>
+          <h2>{{ translate('views') }}</h2>
         </div>
 
         <div class="col-6 col-sm-4 col-md-4 col-lg-1 stream-info">
-          <h2>{{ translate('hosts') }}</h2>
           <span class="data">{{ currentHosts }}</span>
           <span class="stats">&nbsp;</span>
+          <h2>{{ translate('hosts') }}</h2>
         </div>
 
         <div class="col-6 col-sm-4 col-md-4 col-lg-1 stream-info">
-          <h2>{{ translate('followers') }}</h2>
           <span class="data" v-bind:title="currentFollowers">{{ shortenNumber(currentFollowers, b_shortenNumber) }}</span>
           <span class="stats">
             <small v-if="b_showAvgDiff && isStreamOnline && currentFollowers - averageStats.currentFollowers !== 0"
@@ -147,10 +146,10 @@
               </template>
             </small>
           </span>
+          <h2>{{ translate('followers') }}</h2>
         </div>
 
         <div class="col-6 col-sm-4 col-md-4 col-lg-1 stream-info">
-          <h2>{{ translate('subscribers') }}</h2>
           <template v-if="broadcasterType !== ''">
             <span class="data">{{ currentSubscribers }}</span>
             <span class="stats">
@@ -171,10 +170,10 @@
           <template v-else>
             <span class="data text-muted" style="font-size:0.7rem;">{{ translate('not-affiliate-or-partner') }}</span>
           </template>
+          <h2>{{ translate('subscribers') }}</h2>
         </div>
 
         <div class="col-6 col-sm-4 col-md-4 col-lg-1 stream-info">
-          <h2>{{ translate('bits') }}</h2>
           <template v-if="broadcasterType !== ''">
             <span class="data" v-bind:title="currentBits">{{ shortenNumber(currentBits, b_shortenNumber) }}</span>
             <span class="stats">
@@ -195,10 +194,10 @@
           <template v-else>
             <span class="data text-muted" style="font-size:0.7rem;">{{ translate('not-affiliate-or-partner') }}</span>
           </template>
+          <h2>{{ translate('bits') }}</h2>
         </div>
 
         <div class="col-6 col-sm-4 col-md-4 col-lg-1 stream-info">
-          <h2>{{ translate('tips') }}</h2>
           <span class="data">{{ Number(currentTips).toFixed(2) }}</span><span class="data ml-0 pl-0">{{ currency }}</span>
           <span class="stats">
             <small v-if="b_showAvgDiff && isStreamOnline && currentTips - averageStats.currentTips !== 0"
@@ -214,11 +213,11 @@
               </template>
             </small>
           </span>
+          <h2>{{ translate('tips') }}</h2>
         </div>
 
         <div class="col-6 col-sm-4 col-md-4 col-lg-1 stream-info">
-          <h2>{{ translate('watched-time') }}</h2>
-          <span class="data">{{ Number(currentWatched / 1000 / 60 / 60).toFixed(1) }}h</span>
+          <span class="data">{{ Number(currentWatched / 1000 / 60 / 60).toFixed(1) }}</span><span class="data ml-0 pl-0">h</span>
           <span class="stats">
             <small v-if="b_showAvgDiff && isStreamOnline && currentWatched - averageStats.currentWatched !== 0"
                   :class="{
@@ -229,28 +228,25 @@
                   }">
               <template v-if="currentWatched - averageStats.currentWatched !== 0">
                 <fa :icon="currentWatched - averageStats.currentWatched > 0 ? 'caret-up' : 'caret-down'"/>
-                <span>{{difference(averageStats.currentTips, currentTips, false, 'h', 1)}}</span>
+                <span>{{difference(averageStats.currentWatched, currentWatched, false, 'h', 1)}}</span>
               </template>
             </small>
           </span>
+          <h2>{{ translate('watched-time') }}</h2>
         </div>
       </div>
 
       <div class="row">
         <div class="col-12 col-sm-12 col-md-4 col-lg-4 stream-info" @click="showGameAndTitleDlg">
+          <span class="data" v-if="game" :title="game">{{ game }}</span>
+          <span  class="data" v-else>{{ translate('not-available') }}</span>
           <h2>
             <span>{{ translate('game') }}</span>
             <small>{{ translate('click-to-change') }}</small>
           </h2>
-          <span class="data" v-if="game" :title="game">{{ game }}</span>
-          <span  class="data" v-else>{{ translate('not-available') }}</span>
         </div>
 
         <div class="col-12 col-sm-12 col-md-4 col-lg-4 stream-info" @click="showGameAndTitleDlg">
-          <h2>
-            <span>{{ translate('title') }}</span>
-            <small>{{ translate('click-to-change') }}</small>
-          </h2>
           <span class="data" v-if="title" :title="rawStatus" v-html="title"></span>
           <span class="data" v-else>{{ translate('not-available') }}</span>
           <span class="data">
@@ -263,18 +259,22 @@
               {{ tag.name }}
             </span>
           </span>
+          <h2>
+            <span>{{ translate('title') }}</span>
+            <small>{{ translate('click-to-change') }}</small>
+          </h2>
         </div>
 
         <div class="col-12 col-sm-12 col-md-4 col-lg-4 stream-info">
-          <h2>
-            <span>{{ translate('currentsong') }}</span>
-          </h2>
           <span class="data">
             <span v-if="currentSong.length === 0">{{translate('not-available')}}</span>
             <span v-else>
                 {{ currentSong }}
             </span>
           </span>
+          <h2>
+            <span>{{ translate('currentsong') }}</span>
+          </h2>
         </div>
       </div>
     </template>
@@ -455,7 +455,7 @@
     },
     computed: {
       isStreamOnline() {
-        return (this as any).uptime === '00:00:00';
+        return (this as any).uptime !== '00:00:00';
       }
     },
     watch: {

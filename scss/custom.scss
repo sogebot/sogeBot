@@ -27,7 +27,7 @@ body {
 }
 @media (max-width: 900px) {
   body {
-    padding-top: 80px;
+    padding-top: 90px;
   }
   .main-menu {
     position: relative;
@@ -160,11 +160,19 @@ a.active {
   overflow: hidden;
   white-space: nowrap;
   cursor: pointer;
-  padding-top: 6px;
 }
 
 .stream-info > h2 > small {
   display: none;
+}
+
+.stream-info .data {
+  font-size: 1.2rem;
+  font-weight: lighter;
+}
+
+.stream-info .data + .data {
+  font-size: 12px;
 }
 
 .stream-info:hover > h2 > small {
@@ -172,48 +180,19 @@ a.active {
 }
 
 .stream-info h2 {
-  font-size: 12px;
-  font-weight: bold;
+  position:relative;
+  top: -3px;
+  font-size: 10px;
   text-transform: uppercase;
   margin: 0;
 }
 
-.stream-info span.data {
-  color: $gray-700;
-  margin-left: 5px;
-  font-size: small;
-}
-
-.stream-info #diffFollowers {
-  position: absolute;
-  margin-left: 2px;
-}
-
-.stream-info #diffFollowers.up {
-  font-size: 18px;
-  color: $green;
-}
-
-.stream-info #diffFollowers.down {
-  font-size: 18px;
-  color: $red;
+small.stats-up, small.stats-down {
+  font-size: 10px;
 }
 
 small.stats-up {
   vertical-align: super;
-}
-
-small.stats-down{
-  vertical-align: sub;
-}
-
-.stream-info::before {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: 8px;
-    height: 30px;
-    border-left: 1px solid #ddd;
 }
 
 /* WIDGETS */
