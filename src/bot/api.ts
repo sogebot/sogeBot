@@ -1037,6 +1037,10 @@ class API extends Core {
             this.stats.currentBits = 0;
             this.stats.currentTips = 0;
 
+            this.streamStatusChangeSince = new Date(stream.started_at).getTime();
+            this.streamId = stream.id;
+            this.streamType = stream.type;
+
             global.events.fire('stream-started', {});
             global.events.fire('command-send-x-times', { reset: true });
             global.events.fire('keyword-send-x-times', { reset: true });
@@ -1064,11 +1068,6 @@ class API extends Core {
             }
           }
         }
-
-        // Always keep this updated
-        this.streamStatusChangeSince = new Date(stream.started_at).getTime();
-        this.streamId = stream.id;
-        this.streamType = stream.type;
 
         this.curRetries = 0;
         this.saveStreamData(stream);
