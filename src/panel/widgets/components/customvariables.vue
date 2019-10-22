@@ -2,19 +2,21 @@
   div.widget
     b-card(no-body).border-0.h-100
       b-tabs(pills card style="overflow:hidden" v-model="tabIndex").h-100
-        template(v-slot:tabs-start v-if="!popout")
-          li.nav-variable.px-2.grip.text-secondary.align-self-center
-            fa(icon="grip-vertical" fixed-width)
+        template(v-slot:tabs-start)
+          template(v-if="!popout")
+            li.nav-variable.px-2.grip.text-secondary.align-self-center
+              fa(icon="grip-vertical" fixed-width)
           li.nav-item
             b-dropdown(ref="dropdown" boundary="window" no-caret :text="translate('widget-title-customvariables')" variant="outline-primary" toggle-class="border-0")
               b-dropdown-item(@click="state.editation = $state.progress")
                 | Edit variables
-              b-dropdown-item(href="/popout/#customvariables")
-                | Popout
-              b-dropdown-divider
-              b-dropdown-item
-                a(href="#" @click.prevent="$refs.dropdown.hide(); $nextTick(() => EventBus.$emit('remove-widget', 'customvariables'))").text-danger
-                  | Remove <strong>{{translate('widget-title-customvariables')}}</strong> widget
+              template(v-if="!popout")
+                b-dropdown-item(target="_blank" href="/popout/#customvariables")
+                  | Popout
+                b-dropdown-divider
+                b-dropdown-item
+                  a(href="#" @click.prevent="$refs.dropdown.hide(); $nextTick(() => EventBus.$emit('remove-widget', 'customvariables'))").text-danger
+                    | Remove <strong>{{translate('widget-title-customvariables')}}</strong> widget
         b-tab
           template(v-slot:title)
             fa(icon="dollar-sign" fixed-width)

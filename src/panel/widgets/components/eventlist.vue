@@ -2,9 +2,10 @@
   div.widget
     b-card(no-body).border-0.h-100
       b-tabs(pills card style="overflow:hidden").h-100
-        template(v-slot:tabs-start v-if="!popout")
-          li.nav-item.px-2.grip.text-secondary.align-self-center
-            fa(icon="grip-vertical" fixed-width)
+        template(v-slot:tabs-start)
+          template(v-if="!popout")
+            li.nav-item.px-2.grip.text-secondary.align-self-center
+              fa(icon="grip-vertical" fixed-width)
           li.nav-item
             b-dropdown(ref="dropdown" boundary="window" no-caret :text="translate('widget-title-eventlist')" variant="outline-primary" toggle-class="border-0")
               b-dropdown-group(header="Events filtering")
@@ -29,13 +30,14 @@
                       fa(icon="long-arrow-alt-right")
                   b-button(@click="toggle('widgetEventlistTips')" :variant="settings.widgetEventlistTips ? 'success' : 'danger'")
                     fa(icon="dollar-sign")
-              b-dropdown-divider
-              b-dropdown-item(href="/popout/#eventlist")
-                | Popout
-              b-dropdown-divider
-              b-dropdown-item
-                a(href="#" @click.prevent="$refs.dropdown.hide(); $nextTick(() => EventBus.$emit('remove-widget', 'eventlist'))").text-danger
-                  | Remove <strong>{{translate('widget-title-eventlist')}}</strong> widget
+              template(v-if="!popout")
+                b-dropdown-divider
+                b-dropdown-item(target="_blank" href="/popout/#eventlist")
+                  | Popout
+                b-dropdown-divider
+                b-dropdown-item
+                  a(href="#" @click.prevent="$refs.dropdown.hide(); $nextTick(() => EventBus.$emit('remove-widget', 'eventlist'))").text-danger
+                    | Remove <strong>{{translate('widget-title-eventlist')}}</strong> widget
 
         b-tab(active)
           template(v-slot:title)

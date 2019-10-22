@@ -2,9 +2,10 @@
   div.widget
     b-card(no-body).border-0.h-100
       b-tabs(pills card style="overflow:hidden" v-model="tabIndex").h-100
-        template(v-slot:tabs-start v-if="!popout")
-          li(v-if="typeof nodrag === 'undefined'").nav-item.px-2.grip.text-secondary.align-self-center
-            fa(icon="grip-vertical" fixed-width)
+        template(v-slot:tabs-start)
+          template(v-if="!popout")
+            li(v-if="typeof nodrag === 'undefined'").nav-item.px-2.grip.text-secondary.align-self-center
+              fa(icon="grip-vertical" fixed-width)
           li.nav-item
             b-dropdown(ref="dropdown" boundary="window" no-caret :text="translate('widget-title-queue')" variant="outline-primary" toggle-class="border-0")
               b-dropdown-group(header="Eligibility")
@@ -15,13 +16,14 @@
                     | FOLLOWERS
                   b-button(@click="toggle('subscribers')" :variant="eligibilitySubscribers ? 'success' : 'danger'")
                     | SUBSCRIBERS
-              b-dropdown-divider
-              b-dropdown-item(href="/popout/#queue")
-                | Popout
-              b-dropdown-divider
-              b-dropdown-item
-                a(href="#" @click.prevent="$refs.dropdown.hide(); $nextTick(() => EventBus.$emit('remove-widget', 'queue'))").text-danger
-                  | Remove <strong>{{translate('widget-title-queue')}}</strong> widget
+              template(v-if="!popout")
+                b-dropdown-divider
+                b-dropdown-item(target="_blank" href="/popout/#queue")
+                  | Popout
+                b-dropdown-divider
+                b-dropdown-item
+                  a(href="#" @click.prevent="$refs.dropdown.hide(); $nextTick(() => EventBus.$emit('remove-widget', 'queue'))").text-danger
+                    | Remove <strong>{{translate('widget-title-queue')}}</strong> widget
 
         b-tab
           template(v-slot:title)

@@ -2,14 +2,18 @@
   div.widget
     b-card(no-body).border-0.h-100
       b-tabs(pills card style="overflow:hidden").h-100
-        template(v-slot:tabs-start v-if="!popout")
-          li(v-if="typeof nodrag === 'undefined'").nav-item.px-2.grip.text-secondary.align-self-center
-            fa(icon="grip-vertical" fixed-width)
-          li.nav-item
-            b-dropdown(ref="dropdown" boundary="window" no-caret :text="translate('widget-title-bets')" variant="outline-primary" toggle-class="border-0")
-              b-dropdown-item
-                a(href="#" @click.prevent="$refs.dropdown.hide(); $nextTick(() => EventBus.$emit('remove-widget', 'bets'))" class="text-danger")
-                  | Remove <strong>{{translate('widget-title-bets')}}</strong> widget
+        template(v-slot:tabs-start)
+          template(v-if="!popout")
+            li(v-if="typeof nodrag === 'undefined'").nav-item.px-2.grip.text-secondary.align-self-center
+              fa(icon="grip-vertical" fixed-width)
+            li.nav-item
+              b-dropdown(ref="dropdown" boundary="window" no-caret :text="translate('widget-title-bets')" variant="outline-primary" toggle-class="border-0")
+                b-dropdown-item
+                  a(href="#" @click.prevent="$refs.dropdown.hide(); $nextTick(() => EventBus.$emit('remove-widget', 'bets'))" class="text-danger")
+                    | Remove <strong>{{translate('widget-title-bets')}}</strong> widget
+          template(v-else)
+            b-button(variant="outline-primary" :disabled="true").border-0 {{ translate('widget-title-bets') }}
+
         b-tab(active)
           template(v-slot:title)
             fa(:icon='["far", "clock"]' fixed-width)

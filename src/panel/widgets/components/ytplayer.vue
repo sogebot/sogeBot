@@ -2,17 +2,19 @@
   div.widget
     b-card(no-body).border-0.h-100
       b-tabs(pills card style="overflow:hidden" fill content-class="blackbg").h-100
-        template(v-slot:tabs-start v-if="!popout")
-          li(v-if="typeof nodrag === 'undefined'").nav-item.px-2.grip.text-secondary.align-self-center.shrink
-            fa(icon="grip-vertical" fixed-width)
+        template(v-slot:tabs-start)
+          template(v-if="!popout")
+            li(v-if="typeof nodrag === 'undefined'").nav-item.px-2.grip.text-secondary.align-self-center.shrink
+              fa(icon="grip-vertical" fixed-width)
           li.nav-item.shrink
             b-dropdown(ref="dropdown" boundary="window" no-caret :text="translate('widget-title-ytplayer')" variant="outline-primary" toggle-class="border-0")
               b-dropdown-item(@click="nextAndRemoveFromPlaylist")
                 | skip &amp; remove from playlist
-              b-dropdown-divider
-              b-dropdown-item
-                a(href="#" @click.prevent="$refs.dropdown.hide(); $nextTick(() => EventBus.$emit('remove-widget', 'ytplayer'))" class="text-danger")
-                  | Remove <strong>{{translate('widget-title-ytplayer')}}</strong> widget
+              template(v-if="!popout")
+                b-dropdown-divider
+                b-dropdown-item
+                  a(href="#" @click.prevent="$refs.dropdown.hide(); $nextTick(() => EventBus.$emit('remove-widget', 'ytplayer'))" class="text-danger")
+                    | Remove <strong>{{translate('widget-title-ytplayer')}}</strong> widget
 
         b-tab(title-item-class="shrink")
           template(v-slot:title)
