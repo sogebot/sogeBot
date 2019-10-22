@@ -140,17 +140,6 @@ export default {
       clearInterval(interval);
     }
   },
-  mounted: function () {
-    this.$emit('mounted')
-
-    $('#eventlistDropdown').on('show.bs.dropdown', function() {
-      $('body').append($('#eventlistDropdownData .dropdown-force-visible').css({
-        position: 'absolute',
-        left: $('#eventlistDropdownData').offset().left,
-        top: $('#eventlistDropdownData').offset().top + 5
-      }).detach())
-    })
-  },
   created: function () {
     this.state.loading = this.$state.progress
     this.socket.emit('settings', (e, data) => {
