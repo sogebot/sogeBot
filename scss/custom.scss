@@ -1021,9 +1021,11 @@ blockquote {
 
 .eventlist-blockquote {
   font-size: 1rem;
+  font-weight: normal;
   line-height: 1rem;
   margin-bottom: 2px;
-  padding: 0.5rem;
+  padding-top: 0.5rem;
+  padding-left: 0.5rem;
   overflow-wrap: break-word;
 }
 
