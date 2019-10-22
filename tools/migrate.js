@@ -6,7 +6,7 @@ const config = require('../config.json');
 const fs = require('fs');
 const uuidv4 = require('uuid/v4');
 
-const dropFiles = [ 'settings', 'api.max', 'api.current', 'api.new' ];
+const dropFiles = [ 'settings', 'api.max', 'api.current', 'api.new', 'overlays.text' ];
 
 // db
 const Database = require('../dest/databases/database');
@@ -27,6 +27,18 @@ const end = function (updated) {
 };
 
 const migration = {
+  22: async () => {
+    header('Replace overlays.text with registries.text');
+    let updated = 0;
+
+    const items = await global.db.engine.find('overlays.text');
+    for (const item of items) {
+      delete item._id;
+      await global.db.engine.insert('registries.text', item);
+      updated++;
+    }
+    end(updated);
+  },
   21: async () => {
     header('Add order for cmdboard widget');
     let updated = 0;

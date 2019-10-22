@@ -8,7 +8,7 @@ import { getSocket } from 'src/panel/helpers/socket';
 
 @Component({})
 export default class CarouselOverlay extends Vue {
-  socket = getSocket('/overlays/text');
+  socket = getSocket('/registries/text');
   text = '';
   js: any = null;
   css: any = null;

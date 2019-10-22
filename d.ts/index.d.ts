@@ -46,7 +46,6 @@ declare namespace NodeJS {
       goals: import('../src/bot/overlays/goals').Goals;
       polls: import('../src/bot/overlays/polls').Polls;
       stats: import('../src/bot/overlays/stats').Stats;
-      text: import('../src/bot/overlays/text').Text;
     };
     integrations: {
       donationalerts: import('../src/bot/integrations/donationalerts').Donationalerts;
@@ -84,6 +83,7 @@ declare namespace NodeJS {
     panel: any;
     registries: {
       alerts: import('../src/bot/registries/alerts').Alerts;
+      text: import('../src/bot/registries/text').Text;
     };
     systems: {
       alias: import('../src/bot/systems/alias').Alias;

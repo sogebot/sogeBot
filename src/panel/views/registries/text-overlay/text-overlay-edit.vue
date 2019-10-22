@@ -179,7 +179,7 @@ export default class textOverlayEdit extends Vue {
   }
   externalJsInput: string = '';
 
-  socket = getSocket('/overlays/text');
+  socket = getSocket('/registries/text');
 
   state: {
     loaded: boolean,
