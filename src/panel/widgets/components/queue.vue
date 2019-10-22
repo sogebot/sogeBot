@@ -1,136 +1,100 @@
-<template>
-<div class="card widget">
-  <div class="card-header" @contextmenu.prevent="context.open($event, 'queue')">
-    <ul class="nav nav-pills" role="tablist">
-      <li role="presentation" class="nav-item">
-        <a class="active nav-link" href="#queue-users" aria-controls="home" role="tab" data-toggle="tab" title="Queue">
-          <fa icon="users"/>
-          {{ fUsers.length }}
-        </a>
-      </li>
-      <li role="presentation" class="nav-item">
-        <a class="nav-link" href="#queue-main" aria-controls="home" role="tab" data-toggle="tab" title="Queue">
-          <fa icon="hand-pointer"></fa>
-        </a>
-      </li>
-      <li role="presentation" class="nav-item">
-        <button
-          class="btn nav-btn"
-          :class="[ eligibility.all ? 'btn-outline-success' : 'btn-outline-danger' ]"
-          @click="toggle('all')">
-          <fa icon="users" />
-        </button>
-      </li>
-      <li role="presentation" class="nav-item">
-        <button
-          class="btn nav-btn"
-          :class="[ eligibility.followers ? 'btn-outline-success' : 'btn-outline-danger' ]"
-          @click="toggle('followers')">
-          <fa icon="heart" />
-        </button>
-      </li>
-      <li role="presentation" class="nav-item">
-        <button
-          class="btn nav-btn"
-          :class="[ eligibility.subscribers ? 'btn-outline-success' : 'btn-outline-danger' ]"
-          @click="toggle('subscribers')">
-          <fa icon="star" />
-        </button>
-      </li>
-      <li role="presentation" class="nav-item widget-popout" v-if="!popout">
-        <a class="nav-link" title="Popout" target="_blank" href="/popout/#queue">
-          <fa icon="external-link-alt"></fa>
-        </a>
-      </li>
-      <li class="nav-item ml-auto">
-        <h6 class="widget-title">{{translate('widget-title-queue')}}</h6>
-      </li>
-    </ul>
-  </div>
+<template lang="pug">
+  div.widget
+    b-card(no-body).border-0.h-100
+      b-tabs(pills card style="overflow:hidden" v-model="tabIndex").h-100
+        template(v-slot:tabs-start v-if="!popout")
+          li.nav-item.px-2.grip.text-secondary.align-self-center
+            fa(icon="grip-vertical" fixed-width)
+          li.nav-item
+            b-dropdown(ref="dropdown" boundary="window" no-caret :text="translate('widget-title-eventlist')" variant="outline-primary" toggle-class="border-0")
+              b-dropdown-group(header="Eligibility")
+                b-dropdown-form
+                  b-button(@click="toggle('all')" :variant="eligibility.all ? 'success' : 'danger'")
+                    | ALL
+                  b-button(@click="toggle('followers')" :variant="eligibility.followers ? 'success' : 'danger'")
+                    | FOLLOWERS
+                  b-button(@click="toggle('subscribers')" :variant="eligibility.subscribers ? 'success' : 'danger'")
+                    | SUBSCRIBERS
+              b-dropdown-divider
+              b-dropdown-item(href="/popout/#eventlist")
+                | Popout
+              b-dropdown-divider
+              b-dropdown-item
+                a(href="#" @click.prevent="$refs.dropdown.hide(); $nextTick(() => EventBus.$emit('remove-widget', 'eventlist'))").text-danger
+                  | Remove <strong>{{translate('widget-title-eventlist')}}</strong> widget
 
-  <!-- Tab panes -->
-  <div class="card-body">
-    <div class="tab-content">
-      <div role="tabpanel" class="tab-pane active" id="queue-users">
-        <div class="text-center pb-1">
-          <button class="btn btn-sm" :class="[locked ? 'btn-danger' : 'btn-success']" @click="locked = !locked">
-            <fa v-if="locked" icon="lock" fixed-width></fa>
-            <fa v-else icon="lock-open" fixed-width></fa>
-          </button>
-          <template v-if="!multiSelection">
-            <div style="display: inline-block; width: fit-content; position: relative; top: 1px;">
-              <div class="input-group input-group-sm">
-                <input class="form-control" style="width: 60px" v-model="selectCount" />
-                <div class="input-group-append">
-                  <div class="btn-group" role="group">
-                    <button class="btn btn-sm btn-primary" title="Pick" @click="pick(null)">
-                      <fa icon="hand-pointer"></fa>
-                    </button>
-                    <button @click="random = !random" :class="[random ? 'btn-success' : 'btn-danger']" class="btn btn-sm" title="Toggle random">
-                      <fa icon="random"></fa>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </template>
+        b-tab
+          template(v-slot:title)
+            fa(icon='hand-pointer' fixed-width)
+          b-card-text
+            ul.list-group
+              li(
+                v-for="user of picked"
+                :key="user.username"
+                class="list-group-item border-left-0 border-right-0"
+              )
+                strong(style="font-size: 1.3rem") {{ user.username }}
+                div
+                  code(v-if="user.is.follower") FOLLOWER
+                  code(v-if="user.is.subscriber") SUBSCRIBER
 
-          <button v-if="multiSelection" class="btn btn-sm btn-primary" @click="pick(selectedUsers)">Pick {{ selectedUsers.length }}</button>
-          <button @click="multiSelection = !multiSelection; selectedUsers = []" :class="[multiSelection ? 'btn-success' : 'btn-danger']" class="btn btn-sm">Toggle selection</button>
-          <span style="position:relative; top: 3px">
-            <fa icon="eye-slash"></fa>
-            {{ users.length - fUsers.length }}
-          </span>
-          <button class="btn btn-sm btn-danger" @click="clear">Clear</button>
-        </div>
-        <ul class="list-group">
-          <li
-            v-for="user of fUsers"
-            :key="user.username"
-            class="list-group-item border-left-0 border-right-0">
-            <strong style="font-size: 1.3rem">{{ user.username }}</strong>
-            <small>{{ new Date(user.created_at).toLocaleString() }}</small>
-            <div>
-              <code v-if="user.is.follower"> FOLLOWER </code>
-              <code v-if="user.is.subscriber"> SUBSCRIBER </code>
-            </div>
-            <button v-if="!multiSelection" class="btn btn-primary" style="position: absolute; top: 25%; right: 2%;" @click="pick(user.username)">Pick {{user.username}}</button>
-            <button v-else @click="select(user.username)" :class="[selectedUsers.includes(user.username) ? 'btn-success' : 'btn-danger']" class="btn" style="position: absolute; top: 25%; right: 2%;">
-              <fa icon="check" fixed-width v-if="selectedUsers.includes(user.username)"></fa>
-              <fa icon="times" fixed-width v-else></fa>
-            </button>
-          </li>
-        </ul>
-      </div>
-      <div role="tabpanel" class="tab-pane" id="queue-main">
-        <ul class="list-group">
-          <li
-            v-for="user of picked"
-            :key="user.username"
-            class="list-group-item border-left-0 border-right-0">
-            <strong style="font-size: 1.3rem">{{ user.username }}</strong>
-            <div>
-              <code v-if="user.is.follower"> FOLLOWER </code>
-              <code v-if="user.is.subscriber"> SUBSCRIBER </code>
-            </div>
-          </li>
-        </ul>
-      </div> <!-- /MAIN -->
+        b-tab
+          template(v-slot:title)
+            fa(icon='users' fixed-width)
+            | {{ fUsers.length }}
+          b-card-text
+            b-input-group
+              template(v-slot:append)
+                button(@click="locked = !locked" :class="[locked ? 'btn-danger' : 'btn-success']").btn
+                  fa(v-if="locked" icon="lock" fixed-width)
+                  fa(v-else icon="lock-open" fixed-width)
+                template(v-if="!multiSelection")
+                  div(class="btn-group" role="group")
+                    button(class="btn btn-sm btn-primary" title="Pick" @click="pick(null)")
+                      fa(icon="hand-pointer")
+                    button(@click="random = !random" :class="[random ? 'btn-success' : 'btn-danger']" class="btn btn-sm" title="Toggle random")
+                      fa(icon="random")
 
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</div>
+              template(v-if="!multiSelection")
+                b-form-input(style="width: 60px" v-model="selectCount")
+                    div.input-group-append
+                      div(class="btn-group" role="group")
+                        button(class="btn btn-sm btn-primary" title="Pick" @click="pick(null)")
+                          fa(icon="hand-pointer")
+                        button(@click="random = !random" :class="[random ? 'btn-success' : 'btn-danger']" class="btn btn-sm" title="Toggle random")
+                          fa(icon="random")
+
+              template(v-slot:prepend)
+                button(v-if="multiSelection" class="btn btn-sm btn-primary" @click="pick(selectedUsers)") Pick {{ selectedUsers.length }}
+                button(@click="multiSelection = !multiSelection; selectedUsers = []" :class="[multiSelection ? 'btn-success' : 'btn-danger']" class="btn btn-sm") Toggle selection
+                span(style="position:relative; top: 6px")
+                  fa(icon="eye-slash")
+                  | {{ users.length - fUsers.length }}
+                button(class="btn btn-sm btn-danger" @click="clear") Clear
+
+            ul.list-group
+              li(
+                v-for="user of fUsers"
+                :key="user.username"
+                class="list-group-item border-left-0 border-right-0"
+              )
+                strong(style="font-size: 1.3rem") {{ user.username }}
+                small {{ new Date(user.created_at).toLocaleString() }}
+                div
+                  code(v-if="user.is.follower") FOLLOWER
+                  code(v-if="user.is.subscriber") SUBSCRIBER
+                button(v-if="!multiSelection" class="btn btn-primary" style="position: absolute; top: 25%; right: 2%;" @click="pick(user.username)") Pick {{user.username}}
+                button(v-else @click="select(user.username)" :class="[selectedUsers.includes(user.username) ? 'btn-success' : 'btn-danger']" class="btn" style="position: absolute; top: 25%; right: 2%;")
+                  fa(icon="check" fixed-width v-if="selectedUsers.includes(user.username)")
+                  fa(icon="times" fixed-width v-else)
 </template>
 
 <script>
 import { getSocket } from 'src/panel/helpers/socket';
+import { EventBus } from 'src/panel/helpers/event-bus';
 import { debounce } from 'lodash-es';
 export default {
-  props: ['context', 'popout'],
-  mounted: function () {
-    this.$emit('mounted')
-  },
+  props: ['popout'],
   beforeDestroy: function() {
     for(const interval of this.interval) {
       clearInterval(interval);
@@ -192,6 +156,7 @@ export default {
       multiSelection: false,
       random: false,
       selectCount: 1,
+      tabIndex: 1,
       users: [],
       picked: [],
       updated: String(new Date()),
@@ -210,7 +175,7 @@ export default {
         username
       }
       this.socket.emit('pick', data, users => {
-        $('a[href="#queue-main"]').tab('show')
+        this.tabIndex = 0
         this.picked = users
         this.multiSelection = false
         this.selectedUsers = []

@@ -115,7 +115,7 @@ export default {
       })
     }
   },
-  destroy() {
+  beforeDestroy() {
     window.clearInterval(this.interval);
   },
   created: function () {
