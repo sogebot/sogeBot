@@ -3,7 +3,7 @@
     <span class="alert" :class="[className(data.API)]" style="padding:0;" :title="'API ' + title(data.API)">API</span>
     <span class="alert" :class="[className(data.TMI)]" style="padding:0;" :title="'TMI ' + title(data.TMI)">TMI</span>
     <span class="alert" :class="[classNameMod(data.SOC)]" style="padding:0;" :title="'SOC ' + (data.SOC ? 'connected' : 'disconnected')">SOC</span>
-    <span class="alert" :class="[classNameMod(data.MOD)]" style="padding:0;" :title="'Bot is ' + (data.MOD ? ' ': ' ') + 'a MOD.'">MOD</span>
+    <span class="alert" :class="[classNameMod(data.MOD)]" style="padding:0;" :title="'Bot is ' + (data.MOD ? ' ': 'not ') + 'a MOD.'">MOD</span>
     <span class="alert" :class="[classNameResponse(data.RES)]" style="padding:0;" :title="'Average bot response ' + data.RES + 'ms'">{{data.RES}}ms</span>
     <a href="https://github.com/sogehige/SogeBot">GitHub</a> |
     <a href="https://github.com/sogehige/SogeBot/issues">Issues</a> |

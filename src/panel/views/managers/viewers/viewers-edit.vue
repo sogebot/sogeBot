@@ -42,7 +42,7 @@
             <template slot="onHoldTitle">{{translate('dialog.buttons.hold-to-delete')}}</template>
           </hold-button>
           <button type="button" class="btn btn-outline-primary border-light" @click="forceCheckFollowedAt()">
-            <i class="fas fa-sync-alt mr-1 fa-fw" :class="[state.forceCheckFollowedAt ? 'fa-spin' : '']"></i>
+            <fa fixed-width icon="sync-alt" class="mr-1" :spin="state.forceCheckFollowedAt"></fa>
             Force 'followed since' check
           </button>
         </template>
@@ -75,7 +75,7 @@
                   input-class="mx-input border-0"></date-picker>
                 <div class="input-group-append">
                   <button type="button" class="border border-left-0 btn" :class="[viewer.lock.followed_at ? 'btn-secondary border-0' : 'btn-light']" @click="viewer.lock.followed_at = !viewer.lock.followed_at">
-                    <i class="fas" :class="[viewer.lock.followed_at ? 'fa-lock' : 'fa-unlock']"></i>
+                    <fa :icon="[viewer.lock.followed_at ? 'lock' : 'unlock']"></fa>
                   </button>
                 </div>
               </div>
@@ -95,7 +95,7 @@
                   input-class="mx-input border-0"></date-picker>
                 <div class="input-group-append">
                   <button type="button" class="btn border" :class="[viewer.lock.subscribed_at ? 'btn-secondary border-0' : 'btn-light']" @click="viewer.lock.subscribed_at = !viewer.lock.subscribed_at">
-                    <i class="fas" :class="[viewer.lock.subscribed_at ? 'fa-lock' : 'fa-unlock']"></i>
+                    <fa :icon="[viewer.lock.subscribed_at ? 'lock' : 'unlock']"></fa>
                   </button>
                 </div>
               </div>
@@ -150,10 +150,10 @@
                   </td>
                   <td>
                     <template v-if="!bits.editation">
-                      <button data-toggle="dropdown" class="btn btn-block btn-outline-dark border-0 h-100"><i class="fas fa-ellipsis-v"></i></button>
+                      <button data-toggle="dropdown" class="btn btn-block btn-outline-dark border-0 h-100"><fa icon="ellipsis-v"></fa></button>
                       <div class="dropdown-menu p-0">
-                        <button type="button" class="dropdown-item p-2 pl-4 pr-4" style="cursor: pointer" v-on:click="bits.editation = true; pending = true"><i class="fas fa-edit"></i> {{ translate('dialog.buttons.edit') }}</button>
-                        <button type="button" class="dropdown-item p-2 pl-4 pr-4" style="cursor: pointer" v-on:click="removeBits(bits._id)"><i class="fas fa-trash-alt"></i> {{ translate('dialog.buttons.delete') }}</button>
+                        <button type="button" class="dropdown-item p-2 pl-4 pr-4" style="cursor: pointer" v-on:click="bits.editation = true; pending = true"><fa icon="edit"></fa> {{ translate('dialog.buttons.edit') }}</button>
+                        <button type="button" class="dropdown-item p-2 pl-4 pr-4" style="cursor: pointer" v-on:click="removeBits(bits._id)"><fa icon="trash-alt"></fa> {{ translate('dialog.buttons.delete') }}</button>
                       </div>
                     </template>
                     <span v-else>
@@ -166,7 +166,7 @@
                 </tr>
               </table>
               <button type="button" class="btn btn-outline-dark border-0 ml-1 mb-3 small-spaced" @click="pending = true; viewer.stats.bits.push({id: viewer.id, new: true, editation: true, timestamp: Date.now(), amount: 0, message: '', _id: Date.now()})">
-                <i class="fas fa-plus pr-1 fa-fw"></i>
+                <fa class="pr-1" fixed-width icon="plus"></fa>
                 Add bits
               </button>
             </div>
@@ -227,10 +227,10 @@
                     <span v-else>{{ tips.message }}</span>
                   <td>
                     <template v-if="!tips.editation">
-                        <button data-toggle="dropdown" class="btn btn-block btn-outline-dark border-0 h-100"><i class="fas fa-ellipsis-v"></i></button>
+                        <button data-toggle="dropdown" class="btn btn-block btn-outline-dark border-0 h-100"><fa icon="ellipsis-v"></fa></button>
                         <div class="dropdown-menu p-0">
-                          <button type="button" class="dropdown-item p-2 pl-4 pr-4" style="cursor: pointer" v-on:click="tips.editation = true; pending = true"><i class="fas fa-edit"></i> {{ translate('dialog.buttons.edit') }}</button>
-                          <button type="button" class="dropdown-item p-2 pl-4 pr-4" style="cursor: pointer" v-on:click="removeTips(tips._id)"><i class="fas fa-trash-alt"></i> {{ translate('dialog.buttons.delete') }}</button>
+                          <button type="button" class="dropdown-item p-2 pl-4 pr-4" style="cursor: pointer" v-on:click="tips.editation = true; pending = true"><fa icon="edit"></fa> {{ translate('dialog.buttons.edit') }}</button>
+                          <button type="button" class="dropdown-item p-2 pl-4 pr-4" style="cursor: pointer" v-on:click="removeTips(tips._id)"><fa icon="trash-alt"></fa> {{ translate('dialog.buttons.delete') }}</button>
                         </div>
                       </template>
                       <span v-else>
@@ -243,7 +243,7 @@
                 </tr>
               </table>
               <button type="button" class="btn btn-outline-dark border-0 ml-1 mb-3 small-spaced" @click="pending = true; viewer.stats.tips.push({id: viewer.id, new: true, editation: true, timestamp: Date.now(), amount: 0, currency: configuration.currency, message: '', _id: Date.now()})">
-                  <i class="fas fa-plus pr-1 fa-fw"></i>
+                <fa class="pr-1" fixed-width icon="plus"></fa>
                 Add tip
               </button>
             </div>
@@ -254,7 +254,7 @@
               <div class="btn-group d-flex" role="group">
                 <button :disabled="viewer.lock.follower" type="button" class="btn btn-block" v-on:click="viewer.is.follower = !viewer.is.follower" v-bind:class="[ viewer.is.follower ? 'btn-success' : 'btn-danger' ]" aria-hidden="true">Follower</button>
                 <button type="button" class="border border-left-0 btn" :class="[viewer.lock.follower ? 'btn-secondary border-0' : 'btn-light']" @click="viewer.lock.follower = !viewer.lock.follower">
-                  <i class="fas" :class="[viewer.lock.follower ? 'fa-lock' : 'fa-unlock']"></i>
+                  <fa :icon="[viewer.lock.follower ? 'lock' : 'unlock']"></fa>
                 </button>
               </div>
             </div>
@@ -262,7 +262,7 @@
                 <div class="btn-group d-flex" role="group">
                   <button :disabled="viewer.lock.subscriber" type="button" class="btn btn-block" v-on:click="viewer.is.subscriber = !viewer.is.subscriber" v-bind:class="[ viewer.is.subscriber ? 'btn-success' : 'btn-danger' ]" aria-hidden="true">Subscriber</button>
                   <button type="button" class="border border-left-0 btn" :class="[viewer.lock.subscriber ? 'btn-secondary border-0' : 'btn-light']" @click="viewer.lock.subscriber = !viewer.lock.subscriber">
-                    <i class="fas" :class="[viewer.lock.subscriber ? 'fa-lock' : 'fa-unlock']"></i>
+                    <fa :icon="[viewer.lock.subscriber ? 'lock' : 'unlock']"></fa>
                   </button>
                 </div>
             </div>

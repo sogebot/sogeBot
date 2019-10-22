@@ -1,12 +1,4 @@
 import 'moment/min/locales.min';
-import './others/quickStatsApp';
-import './others/changegamedlg';
-import './others/checklist';
-import './others/user';
-import './others/menu';
-import './others/footer';
-import './widgets/dashboard';
-import './widgets/popout';
 
 import BootstrapVue from 'bootstrap-vue';
 import moment from 'moment';
@@ -27,15 +19,17 @@ import {
   faCheck, faCircle as faCircle2, faCircleNotch, faClone, faCode, faCog, faCoins, faCommentAlt,
   faComments, faDollarSign, faDownload, faEdit, faEllipsisH, faEllipsisV, faEquals, faEraser,
   faExclamation, faExclamationCircle, faExternalLinkAlt, faEye, faEyeSlash, faFilter, faFont,
-  faForward, faGem, faGift, faGreaterThanEqual, faHandPointer, faHeadphones, faHeart, faImage,
+  faForward, faGem, faGift, faGreaterThanEqual, faGripVertical, faHandPointer, faHeadphones, faHeart, faImage,
   faInfinity, faLink, faList, faLock, faLockOpen, faLongArrowAltLeft, faLongArrowAltRight, faMinus,
   faMusic, faPause, faPlay, faPlus, faPlusSquare, faPowerOff, faQuestion, faRandom, faSave, faSearch,
   faShareSquare, faSignInAlt, faSignOutAlt, faSlash, faSpinner, faStar, faStarHalf, faStop,
   faSync, faSyncAlt, faTasks, faTerminal, faTh, faThLarge, faThList, faTimes, faToggleOff,
   faToggleOn, faTrash, faTrashAlt, faTrophy, faTv, faUpload, faUser, faUsers, faVial,
-  faVolumeDown, faVolumeUp,
+  faVolumeDown, faVolumeOff, faVolumeUp,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+
+import { get } from 'lodash-es';
 
 import { ButtonStates, states } from './helpers/buttonStates';
 import { setMainLoaded } from './helpers/isAvailableVariable';
@@ -45,16 +39,14 @@ import urlParam from './helpers/urlParam';
 import { getListOf } from './helpers/getListOf';
 import { getConfiguration, getTranslations } from './helpers/socket';
 
-library.add(faImage, faUpload, faCircle2, faCaretRight, faTasks, faCaretDown, faSlash, faFilter, faToggleOn, faToggleOff, faBell, faShareSquare, faExclamationCircle, faQuestion, faVial, faEquals, faGreaterThanEqual, faLongArrowAltLeft, faBan, faPlusSquare, faMusic, faList, faPlay, faPause, faForward, faSpotify, faMoneyBillAlt, faPlus, faSpinner, faGift, faHeadphones, faTh, faDollarSign, faSignInAlt, faSignOutAlt, faUsers, faMusic, faCalendar, faTwitter, faCheck, faMusic, faMusic, faVolumeUp, faVolumeDown, faUsers, faGift, faTrophy, faCog, faExternalLinkAlt, faTrash, faPlus, faSync, faComments, faTwitch, faCircle, faCheckCircle, faLock, faUsers, faUser, faCheck, faTimes, faHeart, faStar, faLockOpen, faHandPointer, faRandom, faEyeSlash, faSignOutAlt, faSignInAlt, faBoxOpen, faEye, faCog, faExternalLinkAlt, faHeart, faTv, faRandom, faGem, faStar, faGift, faDollarSign, faStarHalf, faLongArrowAltRight, faCircleNotch, faCalendar, faDollarSign, faCog, faCode, faAngleUp, faTrashAlt, faAngleDown, faFont, faPlus, faMinus, faDownload, faDollarSign, faTerminal, faCog, faCommentAlt, faUsers, faExternalLinkAlt, faSyncAlt, faClock, faCog, faInfinity, faTrophy, faClone, faGem, faCoins, faExclamation, faStop, faBan, faSpinner, faCheck, faAngleRight, faPlus, faEdit, faEraser, faLink, faTrash, faPlus, faCaretLeft, faExternalLinkAlt, faLink, faSave, faThLarge, faThList, faSearch, faCircleNotch, faCheck, faEllipsisH, faEllipsisV, faPowerOff);
+library.add(faVolumeOff, faGripVertical, faImage, faUpload, faCircle2, faCaretRight, faTasks, faCaretDown, faSlash, faFilter, faToggleOn, faToggleOff, faBell, faShareSquare, faExclamationCircle, faQuestion, faVial, faEquals, faGreaterThanEqual, faLongArrowAltLeft, faBan, faPlusSquare, faMusic, faList, faPlay, faPause, faForward, faSpotify, faMoneyBillAlt, faPlus, faSpinner, faGift, faHeadphones, faTh, faDollarSign, faSignInAlt, faSignOutAlt, faUsers, faMusic, faCalendar, faTwitter, faCheck, faMusic, faMusic, faVolumeUp, faVolumeDown, faUsers, faGift, faTrophy, faCog, faExternalLinkAlt, faTrash, faPlus, faSync, faComments, faTwitch, faCircle, faCheckCircle, faLock, faUsers, faUser, faCheck, faTimes, faHeart, faStar, faLockOpen, faHandPointer, faRandom, faEyeSlash, faSignOutAlt, faSignInAlt, faBoxOpen, faEye, faCog, faExternalLinkAlt, faHeart, faTv, faRandom, faGem, faStar, faGift, faDollarSign, faStarHalf, faLongArrowAltRight, faCircleNotch, faCalendar, faDollarSign, faCog, faCode, faAngleUp, faTrashAlt, faAngleDown, faFont, faPlus, faMinus, faDownload, faDollarSign, faTerminal, faCog, faCommentAlt, faUsers, faExternalLinkAlt, faSyncAlt, faClock, faCog, faInfinity, faTrophy, faClone, faGem, faCoins, faExclamation, faStop, faBan, faSpinner, faCheck, faAngleRight, faPlus, faEdit, faEraser, faLink, faTrash, faPlus, faCaretLeft, faExternalLinkAlt, faLink, faSave, faThLarge, faThList, faSearch, faCircleNotch, faCheck, faEllipsisH, faEllipsisV, faPowerOff);
 Vue.component('fa', FontAwesomeIcon);
 Vue.component('font-awesome-icon', FontAwesomeIcon);
 
 Vue.use(VueMoment, {
   moment, momentTimezone,
 });
-
 Vue.use(BootstrapVue);
-
 Vue.use(Vuelidate);
 Vue.use(LoadScript);
 
@@ -64,14 +56,6 @@ Vue.component('hold-button', () => import('./components/holdButton.vue'));
 Vue.component('button-with-icon', () => import('./components/button.vue'));
 Vue.component('state-button', () => import('./components/stateButton.vue'));
 Vue.component('textarea-with-tags', () => import('./components/textareaWithTags.vue'));
-
-export interface Global {
-  translations: any;
-  configuration: any;
-  isMainLoaded?: boolean;
-}
-
-declare let global: Global;
 
 declare module 'vue/types/vue' {
   interface Vue {
@@ -106,20 +90,29 @@ declare module 'vue/types/vue' {
 
 Vue.use(VueRouter);
 
+declare global {
+  interface Window {
+    token: string | undefined;
+  }
+}
+
 const main = async () => {
   // init prototypes
   Vue.prototype.translate = (v) => translate(v);
   Vue.prototype.urlParam = (v) => urlParam(v);
 
-  Vue.prototype.$loggedUser = await isUserLoggedIn();
-  await isUserCaster(Vue.prototype.$loggedUser.id);
 
-  Vue.prototype.$core = await getListOf('core');
-  Vue.prototype.$systems = await getListOf('systems');
-  Vue.prototype.$integrations = await getListOf('integrations');
+  if (typeof window.token !== 'undefined') {
+    Vue.prototype.$loggedUser = await isUserLoggedIn();
+    await isUserCaster(Vue.prototype.$loggedUser.id);
 
-  await getTranslations();
-  Vue.prototype.configuration = await getConfiguration();
+    Vue.prototype.$core = await getListOf('core');
+    Vue.prototype.$systems = await getListOf('systems');
+    Vue.prototype.$integrations = await getListOf('integrations');
+
+    await getTranslations();
+    Vue.prototype.configuration = await getConfiguration();
+  }
 
   Vue.prototype.$state = ButtonStates;
   setMainLoaded();
@@ -128,7 +121,7 @@ const main = async () => {
     mode: 'hash',
     base: __dirname,
     routes: [
-      { path: '/', name: 'Dashboard', component: () => import('./views/dashboard/stub.vue') },
+      { path: '/', name: 'Dashboard', component: () => import('./views/dashboard/dashboard.vue') },
       { path: '/stats/commandcount', name: 'CommandCountStats', component: () => import('./views/stats/commandcount.vue') },
       { path: '/stats/api', name: 'APIStats', component: () => import('./views/stats/api.vue') },
 
@@ -182,15 +175,105 @@ const main = async () => {
 
   new Vue({
     router,
+    components: {
+      navbar: () => import('./components/navbar/navbar.vue'),
+      statsbar: () => import('./components/statsbar/statsbar.vue'),
+      changegamedialog: () => import('./components/dialog/changegamedialog.vue'),
+      footerbar: () => import('./components/footer.vue'),
+    },
+    data() {
+      const object: {
+        isDropdownHidden: boolean;
+        dropdown: any;
+        dropdownVue: any;
+        token: any;
+      } = {
+        isDropdownHidden: true,
+        dropdown: null,
+        dropdownVue: null,
+        token: window.token,
+      };
+      return object;
+    },
     created() {
-      this.$moment.locale(global.configuration.lang); // set proper moment locale
+      this.$root.$on('bv::dropdown::show', bvEvent => {
+        this.dropdownShow(bvEvent);
+      });
+
+      this.$root.$on('bv::dropdown::hidden', bvEvent => {
+        this.dropdownHide();
+      });
+
+      // set proper moment locale
+      this.$moment.locale(get(Vue, 'prototype.configuration.lang', 'en'));
+
+      // theme load
+      const head = document.getElementsByTagName('head')[0];
+      const link = (document.createElement('link') as any);
+      link.setAttribute('rel', 'stylesheet');
+      link.setAttribute('href',`/dist/css/${get(Vue, 'prototype.configuration.core.ui.theme', 'light')}.css`);
+      head.appendChild(link);
+    },
+    methods: {
+      clickEvent(event) {
+        if ((typeof event.target.className !== 'string' || !event.target.className.includes('dropdown')) && !this.isDropdownHidden) {
+          console.debug('Clicked outside dropdown', event.target);
+          this.dropdownHide();
+        }
+      },
+      dropdownHide() {
+        if (!this.isDropdownHidden) {
+          this.dropdownVue.hide();
+          this.dropdown.remove();
+          this.isDropdownHidden = true;
+        }
+      },
+      dropdownShow(bvEvent, retry = false) {
+        if (!this.isDropdownHidden && !retry) {
+          // try next tick again - wait for cleanup
+          console.debug('waiting to next tick for dropdownShow');
+          this.$nextTick(() => this.dropdownShow(bvEvent, true));
+        } else {
+          this.isDropdownHidden = false;
+          const child = bvEvent.target;
+          this.dropdown = child;
+          this.dropdownVue = bvEvent.vueTarget;
+          child.style.position = 'absolute';
+          child.style['z-index'] = 99999999;
+          child.remove();
+          document.getElementsByTagName('BODY')[0].appendChild(child);
+        }
+      },
     },
     template: `
-      <div id="app">
-        <router-view class="view"></router-view>
+      <div id="app" @click.capture="clickEvent">
+        <template v-if="token">
+          <navbar/>
+          <statsbar/>
+          <changegamedialog/>
+          <router-view class="view pt-3"></router-view>
+          <footerbar/>
+        </template>
+        <template v-else>
+        <div class="alert alert-danger ml-5 mr-5" role="alert">
+          This domain is not set as accessible in your <strong>config.json</strong>. Update your file and restart a bot to propagate changes. Example below:
+        </div>
+        <pre class="alert alert-info ml-5 mr-5" style="font-family: Monospace">
+... config.json ...
+"panel": {
+  "__COMMENT__": "set correctly your domain and to be safe, change your token",
+  "username": "***",
+  "password": "***",
+  "port": ***,
+  "domain": "yourdomain1, ${window.location.host.split(':')[0]}",
+  "token": "***"
+},
+... config.json ...
+            </pre>
+        </template>
       </div>
     `,
-  }).$mount('#pages');
+  }).$mount('#app');
 };
 
 main();

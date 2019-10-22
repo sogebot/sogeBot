@@ -1,77 +1,59 @@
-<template>
-<div class="card widget">
-  <div class="card-header">
-    <ul class="nav nav-pills" role="tablist">
-      <li role="presentation" class="nav-item">
-        <a class="nav-link active" href="#bets-running" aria-controls="home" role="tab" data-toggle="tab" title="Betting">
-          {{ title }}
-          <fa :icon='["far", "clock"]'></fa>
-          <template v-if="timer !== null">{{ timer | formatTime }}</template>
-        </a>
-      </li>
-      <li role="presentation" class="nav-item">
-        <a class="nav-link" href="#bets-settings" aria-controls="home" role="tab" data-toggle="tab" title="Settings">
-          <fa icon='cog'></fa>
-        </a>
-      </li>
-      <li class="nav-item ml-auto">
-        <h6 class="widget-title">{{translate('widget-title-bets')}}</h6>
-      </li>
-    </ul>
-  </div>
+<template lang="pug">
+  div.widget
+    b-card(no-body).border-0.h-100
+      b-tabs(pills card style="overflow:hidden").h-100
+        template(v-slot:tabs-start)
+          template(v-if="!popout")
+            li(v-if="typeof nodrag === 'undefined'").nav-item.px-2.grip.text-secondary.align-self-center
+              fa(icon="grip-vertical" fixed-width)
+            li.nav-item
+              b-dropdown(ref="dropdown" boundary="window" no-caret :text="translate('widget-title-bets')" variant="outline-primary" toggle-class="border-0")
+                b-dropdown-item
+                  a(href="#" @click.prevent="$refs.dropdown.hide(); $nextTick(() => EventBus.$emit('remove-widget', 'bets'))" class="text-danger")
+                    | Remove <strong>{{translate('widget-title-bets')}}</strong> widget
+          template(v-else)
+            b-button(variant="outline-primary" :disabled="true").border-0 {{ translate('widget-title-bets') }}
 
-  <!-- Tab panes -->
-  <div class="card-body">
-    <div class="tab-content">
-      <div role="tabpanel" class="tab-pane active" style="overflow:hidden;" id="bets-running">
-        <template v-if="timer !== null">
-          <div v-for="(option, index) of options" :key="option.name" class="pb-2">
-            <div class="progress" style="height: 35px; cursor: pointer;" @click="close(index)">
-              <div
-                class="progress-bar progress-bar-striped progress-bar-animated"
-                role="progressbar"
-                :style="{width: getBetsPercentage(index)}"
-                style = "font-size: 1rem; text-shadow: 0px 0px 1px black, 0px 0px 2px black, 0px 0px 3px black, 0px 0px 4px black, 0px 0px 5px black, 0px 0px 6px black"
-              >
-                <span class="ml-1 mr-1 text-left">{{ option.name }} ({{getBets(index)}})</span>
-              </div>
-            </div>
-          </div>
-          <div class="pb-2">
-            <button class='btn btn-block btn-danger p-1 text-left' @click="close('refund')">
-              {{translate('refund') | capitalize}}
-            </button>
-          </div>
-        </template>
-        <div v-else class="alert alert-info">No bets are currently running</div>
-      </div> <!-- /BETS -->
-
-      <div role="tabpanel" class="tab-pane" id="bets-settings">
-        <div class="input-group">
-          <div class="input-group-prepend">
-              <span class="input-group-text">{{translate('gain-every-option')}}</span>
-          </div>
-          <input type="text" class="form-control" v-model="betPercentGain">
-          <div class="input-group-append">
-              <span class="input-group-text">%</span>
-          </div>
-        </div>
-      </div> <!-- /SETTINGS -->
-
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</div>
+        b-tab(active)
+          template(v-slot:title)
+            fa(:icon='["far", "clock"]' fixed-width)
+            template(v-if="timer !== null") {{ timer | formatTime }}
+          b-card-text
+            template(v-if="timer !== null")
+              div(v-for="(option, index) of options" :key="option.name").pb-2
+                div(style="height: 35px; cursor: pointer;" @click="close(index)").progress
+                  div(
+                    class="progress-bar progress-bar-striped progress-bar-animated"
+                    role="progressbar"
+                    :style="{width: getBetsPercentage(index)}"
+                    style = "font-size: 1rem; text-shadow: 0px 0px 1px black, 0px 0px 2px black, 0px 0px 3px black, 0px 0px 4px black, 0px 0px 5px black, 0px 0px 6px black"
+                  )
+                    span.ml-1.mr-1.text-left {{ option.name }} ({{ getBets(index) }})
+              div.pb-2
+                button(@click="close('refund')").btn.btn-block.btn-danger.p-1.text-left
+                  | {{ translate('refund') | capitalize }}
+            div(v-else).alert.alert-info No bets are currently running
+        b-tab
+          template v-slot:title
+            fa(icon='cog')
+          b-card-text
+            div.input-group
+              div.input-group-prepend
+                span.input-group-text {{translate('gain-every-option')}}
+              input(type="text" v-model="betPercentGain").form-control
+              div.input-group-append
+                span.input-group-text %
 </template>
 
 <script>
 import { getSocket } from 'src/panel/helpers/socket';
+import { EventBus } from 'src/panel/helpers/event-bus';
+
 export default {
-  mounted: function () {
-    this.$emit('mounted')
-  },
+  props: ['popout', 'nodrag'],
   data: function () {
     return {
+      EventBus,
       socket: getSocket('/systems/bets'),
       betPercentGain: 0,
 

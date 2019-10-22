@@ -43,7 +43,18 @@
             <template v-if="!hideStats">{{ maxViewers }}</template>
             <small v-else>{{translate('hidden')}}</small>
           </span>
-          <span class="stats" v-if="!hideStats" v-html="difference(averageStats.maxViewers, maxViewers)"></span>
+          <span class="stats" v-if="!hideStats">
+            <small v-if="b_showAvgDiff && isStreamOnline && maxViewers - averageStats.maxViewers !== 0"
+                   :class="{
+                     'text-success': maxViewers - averageStats.maxViewers > 0,
+                     'stats-up': maxViewers - averageStats.maxViewers > 0,
+                     'text-danger': maxViewers - averageStats.maxViewers > 0,
+                     'stats-down': maxViewers - averageStats.maxViewers < 0,
+                   }">
+              <fa :icon="maxViewers - averageStats.maxViewers > 0 ? 'caret-up' : 'caret-down'" fixed-width/>
+              {{difference(averageStats.maxViewers, maxViewers)}}}
+            </small>
+          </span>
           <span class="stats" v-else>&nbsp;</span>
         </div>
 
@@ -56,39 +67,94 @@
             <template v-if="!hideStats">{{ newChatters }}</template>
             <small v-else>{{translate('hidden')}}</small>
           </span>
-          <span class="stats" v-if="!hideStats" v-html="difference(averageStats.newChatters, newChatters)"></span>
+          <span class="stats" v-if="!hideStats">
+            <small v-if="b_showAvgDiff && isStreamOnline && newChatters - averageStats.newChatters !== 0"
+                   :class="{
+                     'text-success': newChatters - averageStats.newChatters > 0,
+                     'stats-up': newChatters - averageStats.newChatters > 0,
+                     'text-danger': newChatters - averageStats.newChatters > 0,
+                     'stats-down': newChatters - averageStats.newChatters < 0,
+                   }">
+              <fa :icon="newChatters - averageStats.newChatters > 0 ? 'caret-up' : 'caret-down'" fixed-width/>
+              {{difference(averageStats.newChatters, newChatters)}}}
+            </small>
+          </span>
           <span class="stats" v-else>&nbsp;</span>
         </div>
 
         <div class="col-6 col-sm-4 col-md-4 col-lg-1 stream-info">
           <h2>{{ translate('chat-messages') }}</h2>
           <span class="data" v-bind:title="chatMessages">{{ shortenNumber(chatMessages, b_shortenNumber) }}</span>
-          <span class="stats" v-html="difference(averageStats.chatMessages, chatMessages)"></span>
+          <span class="stats">
+            <small v-if="b_showAvgDiff && isStreamOnline && chatMessages - averageStats.chatMessages !== 0"
+                   :class="{
+                     'text-success': chatMessages - averageStats.chatMessages > 0,
+                     'stats-up': chatMessages - averageStats.chatMessages > 0,
+                     'text-danger': chatMessages - averageStats.chatMessages > 0,
+                     'stats-down': chatMessages - averageStats.chatMessages < 0,
+                   }">
+              <fa :icon="chatMessages - averageStats.chatMessages > 0 ? 'caret-up' : 'caret-down'" fixed-width/>
+              {{difference(averageStats.chatMessages, chatMessages)}}}
+            </small>
+          </span>
         </div>
 
         <div class="col-6 col-sm-4 col-md-4 col-lg-1 stream-info">
           <h2>{{ translate('views') }}</h2>
           <span class="data" v-bind:title="currentViews">{{ shortenNumber(currentViews, b_shortenNumber) }}</span>
-          <span class="stats" v-html="difference(averageStats.currentViews, currentViews)"></span>
+          <span class="stats">
+            <small v-if="b_showAvgDiff && isStreamOnline && currentViews - averageStats.currentViews !== 0"
+                   :class="{
+                     'text-success': currentViews - averageStats.currentViews > 0,
+                     'stats-up': currentViews - averageStats.currentViews > 0,
+                     'text-danger': currentViews - averageStats.currentViews > 0,
+                     'stats-down': currentViews - averageStats.currentViews < 0,
+                   }">
+              <fa :icon="currentViews - averageStats.currentViews > 0 ? 'caret-up' : 'caret-down'" fixed-width/>
+              {{difference(averageStats.currentViews, currentViews)}}}
+            </small>
+          </span>
         </div>
 
         <div class="col-6 col-sm-4 col-md-4 col-lg-1 stream-info">
           <h2>{{ translate('hosts') }}</h2>
           <span class="data">{{ currentHosts }}</span>
-          <span class="stats" id="curHostsChange">&nbsp;</span>
+          <span class="stats">&nbsp;</span>
         </div>
 
         <div class="col-6 col-sm-4 col-md-4 col-lg-1 stream-info">
           <h2>{{ translate('followers') }}</h2>
           <span class="data" v-bind:title="currentFollowers">{{ shortenNumber(currentFollowers, b_shortenNumber) }}</span>
-          <span class="stats" v-html="difference(averageStats.currentFollowers, currentFollowers)"></span>
+          <span class="stats">
+            <small v-if="b_showAvgDiff && isStreamOnline && currentFollowers - averageStats.currentFollowers !== 0"
+                   :class="{
+                     'text-success': currentFollowers - averageStats.currentFollowers > 0,
+                     'stats-up': currentFollowers - averageStats.currentFollowers > 0,
+                     'text-danger': currentFollowers - averageStats.currentFollowers > 0,
+                     'stats-down': currentFollowers - averageStats.currentFollowers < 0,
+                   }">
+              <fa :icon="currentFollowers - averageStats.currentFollowers > 0 ? 'caret-up' : 'caret-down'" fixed-width/>
+              {{difference(averageStats.currentFollowers, currentFollowers)}}}
+            </small>
+          </span>
         </div>
 
         <div class="col-6 col-sm-4 col-md-4 col-lg-1 stream-info">
           <h2>{{ translate('subscribers') }}</h2>
           <template v-if="broadcasterType !== ''">
             <span class="data">{{ currentSubscribers }}</span>
-            <span class="stats" v-html="difference(averageStats.currentSubscribers, currentSubscribers)"></span>
+            <span class="stats">
+              <small v-if="b_showAvgDiff && isStreamOnline && currentSubscribers - averageStats.currentSubscribers !== 0"
+                    :class="{
+                      'text-success': currentSubscribers - averageStats.currentSubscribers > 0,
+                      'stats-up': currentSubscribers - averageStats.currentSubscribers > 0,
+                      'text-danger': currentSubscribers - averageStats.currentSubscribers > 0,
+                      'stats-down': currentSubscribers - averageStats.currentSubscribers < 0,
+                    }">
+                <fa :icon="currentSubscribers - averageStats.currentSubscribers > 0 ? 'caret-up' : 'caret-down'" fixed-width/>
+                {{difference(averageStats.currentSubscribers, currentSubscribers)}}}
+              </small>
+            </span>
           </template>
           <template v-else>
             <span class="data text-muted" style="font-size:0.7rem;">{{ translate('not-affiliate-or-partner') }}</span>
@@ -99,7 +165,18 @@
           <h2>{{ translate('bits') }}</h2>
           <template v-if="broadcasterType !== ''">
             <span class="data" v-bind:title="currentBits">{{ shortenNumber(currentBits, b_shortenNumber) }}</span>
-            <span class="stats" v-html="difference(averageStats.currentBits, currentBits)"></span>
+            <span class="stats">
+              <small v-if="b_showAvgDiff && isStreamOnline && currentBits - averageStats.currentBits !== 0"
+                    :class="{
+                      'text-success': currentBits - averageStats.currentBits > 0,
+                      'stats-up': currentBits - averageStats.currentBits > 0,
+                      'text-danger': currentBits - averageStats.currentBits > 0,
+                      'stats-down': currentBits - averageStats.currentBits < 0,
+                    }">
+                <fa :icon="currentBits - averageStats.currentBits > 0 ? 'caret-up' : 'caret-down'" fixed-width/>
+                {{difference(averageStats.currentBits, currentBits)}}}
+              </small>
+            </span>
           </template>
           <template v-else>
             <span class="data text-muted" style="font-size:0.7rem;">{{ translate('not-affiliate-or-partner') }}</span>
@@ -109,13 +186,35 @@
         <div class="col-6 col-sm-4 col-md-4 col-lg-1 stream-info">
           <h2>{{ translate('tips') }}</h2>
           <span class="data">{{ Number(currentTips).toFixed(2) }}</span><span class="data ml-0 pl-0">{{ currency }}</span>
-          <span class="stats" v-html="difference(averageStats.currentTips, currentTips, false, currency)"></span>
+          <span class="stats">
+            <small v-if="b_showAvgDiff && isStreamOnline && currentTips - averageStats.currentTips !== 0"
+                  :class="{
+                    'text-success': currentTips - averageStats.currentTips > 0,
+                    'stats-up': currentTips - averageStats.currentTips > 0,
+                    'text-danger': currentTips - averageStats.currentTips > 0,
+                    'stats-down': currentTips - averageStats.currentTips < 0,
+                  }">
+              <fa :icon="currentTips - averageStats.currentTips > 0 ? 'caret-up' : 'caret-down'" fixed-width/>
+              {{difference(averageStats.currentTips, currentTips, false, currency)}}}
+            </small>
+          </span>
         </div>
 
         <div class="col-6 col-sm-4 col-md-4 col-lg-1 stream-info">
           <h2>{{ translate('watched-time') }}</h2>
           <span class="data">{{ Number(currentWatched / 1000 / 60 / 60).toFixed(1) }}h</span>
-          <span class="stats" v-html="difference(averageStats.currentWatched / 1000 / 60 / 60, currentWatched / 1000 / 60 / 60, false, 'h', 1)"></span>
+          <span class="stats">
+            <small v-if="b_showAvgDiff && isStreamOnline && currentWatched - averageStats.currentWatched !== 0"
+                  :class="{
+                    'text-success': currentWatched - averageStats.currentWatched > 0,
+                    'stats-up': currentWatched - averageStats.currentWatched > 0,
+                    'text-danger': currentWatched - averageStats.currentWatched > 0,
+                    'stats-down': currentWatched - averageStats.currentWatched < 0,
+                  }">
+              <fa :icon="currentWatched - averageStats.currentWatched > 0 ? 'caret-up' : 'caret-down'" fixed-width/>
+              {{difference(averageStats.currentTips, currentTips, false, 'h', 1)}}}
+            </small>
+          </span>
         </div>
       </div>
 
@@ -167,9 +266,10 @@
 <script lang="ts">
   import Vue from 'vue'
   import { isNil, get } from 'lodash-es'
+  import axios from 'axios';
 
-  import { EventBus } from '../helpers/event-bus';
-  import { getSocket } from '../helpers/socket';
+  import { EventBus } from 'src/panel/helpers/event-bus';
+  import { getSocket } from 'src/panel/helpers/socket';
 
   export default Vue.extend({
     data: function () {
@@ -277,13 +377,13 @@
         this.widthOfMenuUpdate()
       }, 100)
 
-      console.debug('EMIT [getVersion]')
-      this.socket.emit('getVersion')
-      this.socket.once('version', (version) => {
-        this.version = version
-        $.get('https://api.github.com/repos/sogehige/sogebot/releases/latest', (response) => {
+      this.socket.emit('version', async (version) => {
+        this.version =  version;
+        try {
+          const response: any = await axios.get('https://api.github.com/repos/sogehige/sogebot/releases/latest');
           let botVersion = version.replace('-SNAPSHOT', '').split('.')
-          let gitVersion = response.tag_name.split('.')
+          let gitVersion = response.data.tag_name.split('.')
+          console.debug({botVersion, gitVersion});
 
           let isNewer = false
           for (let index in botVersion) {
@@ -302,7 +402,9 @@
           if (isNewer) {
             this.update.version = gitVersion.join('.');
           }
-        })
+        } catch (e) {
+          console.error(e);
+        }
       })
 
 
@@ -326,6 +428,11 @@
         this.rawStatus = data.rawStatus;
         this.game = data.game;
       })
+    },
+    computed: {
+      isStreamOnline() {
+        return (this as any).uptime !== '00:00:00';
+      }
     },
     watch: {
       timestamp() {
@@ -412,7 +519,6 @@
         if (Number.isNaN(Number(current)) || this.uptime === '00:00:00' || !this.b_showAvgDiff) return '' // return nothing if current is not number (hidden, etc)
         else if (number === 0) return ''
         else {
-          let isPositive = current - number >= 0
           let f_difference: number | string = Math.abs(this.b_percentage ? (Math.round((current - number) / number * 1000) / 10) : current - number)
           if (this.b_percentage) {
             f_difference = Number(f_difference).toFixed(1)
@@ -427,13 +533,7 @@
             f_difference = f_difference + postfix
           }
 
-          if (current - number === 0) {
-            return ''
-          } else if (isPositive) {
-            return `<small class="stats-up text-success"><i class="fas fa-caret-up"></i>${f_difference}</small>`
-          } else {
-            return `<small class="stats-down text-danger"><i class="fas fa-caret-down"></i>${f_difference}</small>`
-          }
+         return f_difference;
         }
       },
       toggleViewerShow: function () {

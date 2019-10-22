@@ -47,6 +47,11 @@ import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { isFinite, orderBy } from 'lodash-es';
 import { getSocket } from 'src/panel/helpers/socket';
 
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
+
+library.add(faExclamationTriangle)
+
 @Component({})
 export default class sortableList extends Vue {
   @Prop() readonly value: any;

@@ -29,7 +29,7 @@ class EventList extends Widget {
 
   constructor() {
     super();
-    this.addWidget('eventlist', 'eventlist', 'far fa-calendar');
+    this.addWidget('eventlist', 'widget-title-eventlist', 'far fa-calendar');
   }
 
   public sockets() {

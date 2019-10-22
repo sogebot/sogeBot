@@ -80,6 +80,10 @@ import { Vue, Component } from 'vue-property-decorator';
 import { debounce, orderBy } from 'lodash-es';
 import { getSocket } from 'src/panel/helpers/socket';
 
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
+library.add(faExclamationTriangle)
+
 @Component({
   components: {
     'loading': () => import('../../../components/loading.vue'),

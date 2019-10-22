@@ -85,12 +85,12 @@ function Panel () {
     if (_.isNil(origin)) {
       // file CANNOT be accessed directly
       res.status(401).send('401 Access Denied - This is not a file you are looking for.')
-      return
+      return;
     }
 
     if (origin.match(new RegExp('^((http|https)\\:\\/\\/|)([\\w|-]+\\.)?' + domain))) {
       res.set('Content-Type', 'application/javascript')
-      res.send(`const token="${config.panel.token.trim()}"; const name="${global.oauth.botUsername}"`)
+      res.send(`window.token="${config.panel.token.trim()}"`);
     } else {
       // file CANNOT be accessed from different domain
       res.status(403).send('403 Forbidden - You are looking at wrong castle.')
@@ -405,9 +405,13 @@ function Panel () {
       }
       cb(null, toEmit)
     })
-    socket.on('getVersion', function () {
-      const version = _.get(process, 'env.npm_package_version', 'x.y.z')
-      socket.emit('version', version.replace('SNAPSHOT', gitCommitInfo().shortHash || 'SNAPSHOT'))
+
+    socket.on('name', function (cb) {
+      cb(global.oauth.botUsername);
+    })
+    socket.on('version', function (cb) {
+      const version = _.get(process, 'env.npm_package_version', 'x.y.z');
+      cb(version.replace('SNAPSHOT', gitCommitInfo().shortHash || 'SNAPSHOT'));
     })
 
     socket.on('parser.isRegistered', function (data) {
@@ -479,7 +483,13 @@ Panel.prototype.updateWidgetsInDb = async function (self, widgets, socket) {
 }
 
 Panel.prototype.addWidgetToDb = async function (self, widget, dashboardId, socket) {
- return (await global.db.engine.update('widgets', { id: widget }, { dashboardId, id: widget, position: { x: 0, y: 0 }, size: { width: 4, height: 3 } }))
+  // add widget to bottom left
+  const widgets = await global.db.engine.find('widgets', { dashboardId });
+  let y = 0;
+  for (const widget of widgets) {
+    y = Math.max(y, widget.position.y + widget.size.height);
+  }
+ return (await global.db.engine.update('widgets', { id: widget }, { dashboardId, id: widget, position: { x: 0, y }, size: { width: 4, height: 3 } }))
 }
 
 Panel.prototype.socketListening = function (self, on, fnc) {

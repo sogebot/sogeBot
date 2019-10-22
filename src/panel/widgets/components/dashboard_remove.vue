@@ -1,9 +1,8 @@
-<template>
-<div class="col">
-  <div class="dashboardRemove" @click="remove">
-    <fa icon="trash" /> {{translate('remove-dashboard')}}
-  </div>
-</div>
+<template lang="pug">
+  b-col
+    div(@click="remove").dashboardRemove
+      fa(icon="trash")
+      | {{ translate('remove-dashboard') }}
 </template>
 
 <script>

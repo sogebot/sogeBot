@@ -1,64 +1,69 @@
-<template>
-<div class="card widget">
-  <div class="card-header">
-    <ul class="nav nav-pills" role="tablist">
-      <li role="presentation" class="nav-item">
-        <a class="nav-link active" href="#twitch-main" aria-controls="home" role="tab" data-toggle="tab" title="Twitch Stream Monitor">
-          <fa :icon="['fab', 'twitch']" />
-        </a>
-      </li>
-      <li role="presentation" class="nav-item">
-        <a href="#" class="nav-link" title="Refresh" @click="refresh">
-          <fa icon="sync-alt" v-if="!isRefreshing"/>
-          <fa icon="sync-alt" spin v-else/>
-        </a>
-      </li>
-      <li class="nav-item ml-auto">
-        <h6 class="widget-title">{{ translate('widget-title-monitor') }}</h6>
-      </li>
-    </ul>
-  </div>
+<template lang="pug">
+  div.widget
+    b-card(no-body).border-0.h-100
+      b-tabs(pills card style="overflow:hidden").h-100
+        template(v-slot:tabs-start)
+          template(v-if="!popout")
+            li(v-if="typeof nodrag === 'undefined'").nav-item.px-2.grip.text-secondary.align-self-center
+              fa(icon="grip-vertical" fixed-width)
+            li.nav-item
+              b-dropdown(ref="dropdown" boundary="window" no-caret :text="translate('widget-title-twitch')" variant="outline-primary" toggle-class="border-0")
+                b-dropdown-item(target="_blank" href="/popout/#twitch")
+                  | Popout
+                b-dropdown-divider
+                b-dropdown-item
+                  a(href="#" @click.prevent="$refs.dropdown.hide(); $nextTick(() => EventBus.$emit('remove-widget', 'twitch'))" class="text-danger")
+                    | Remove <strong>{{translate('widget-title-twitch')}}</strong> widget
+          template(v-else)
+            b-button(variant="outline-primary" :disabled="true").border-0 {{ translate('widget-title-twitch') }}
 
-  <div class="card-body">
-    <!-- Tab panes -->
-    <div class="tab-content">
-      <div role="tabpanel" class="tab-pane active" style="overflow:hidden;" id="twitch-main">
-      </div>
-      <!-- /MAIN -->
-    </div>
-  </div>
-</div>
+        b-tab(active)
+          template(v-slot:title)
+            fa(:icon="['fab', 'twitch']")
+          b-card-text.h-100
+            iframe(
+              v-if="show"
+              style="width: 100%; height: 100%"
+              :src="videoUrl"
+              frameborder="0"
+            )
+
+        template(v-slot:tabs-end)
+          b-nav-item(href="#" @click="refresh")
+            fa(icon="sync-alt" v-if="!isRefreshing" fixed-width)
+            fa(icon="sync-alt" spin v-else fixed-width)
 </template>
 
 <script>
 import { getSocket } from 'src/panel/helpers/socket';
+import { EventBus } from 'src/panel/helpers/event-bus';
+
 export default {
+  props: ['popout', 'nodrag'],
   data: function () {
     return {
+      EventBus,
       socket: getSocket('/'),
       room: '',
+      show: true,
       isRefreshing: false
     }
   },
   created: function () {
     this.socket.emit('twitch.sendTwitchVideo')
     this.socket.once('twitchVideo', (room) => {
-      this.room = room
-      $("#twitch-main").append(`<iframe style="width: 100%; height: 100%"
-        src="https://player.twitch.tv/?channel=${room}&autoplay=true&muted=true"
-        frameborder="0">
-      </iframe>`)
+      this.room = room;
     })
   },
+  computed: {
+    videoUrl() {
+      return `https://player.twitch.tv/?channel=${this.room}&autoplay=true&muted=true`
+    }
+  },
   methods: {
-    refresh: function () {
-      this.isRefreshing = true
-      setTimeout(() => (this.isRefreshing = false), 2000)
-      $("#twitch-main").empty()
-      $("#twitch-main").append(`<iframe style="width: 100%; height: 100%"
-        src="https://player.twitch.tv/?channel=${this.room}&autoplay=true&muted=true"
-        frameborder="0">
-      </iframe>`)
+    refresh: function (event) {
+      this.show = false;
+      this.$nextTick(() => this.show = true);
     },
   },
   mounted: function () {

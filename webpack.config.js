@@ -69,6 +69,7 @@ const webpackConfig = {
   optimization,
   entry: {
     main: './src/panel/index.ts',
+    popout: './src/panel/popout.ts',
     overlay: './src/overlay/index.ts',
     login: './src/login/index.ts',
     public: './src/public/index.ts',
@@ -90,7 +91,7 @@ const webpackConfig = {
     new VueLoaderPlugin(),
     new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({
-      filename: '../../popout.html', template: 'src/panel/popout.html', chunks: ['main']
+      filename: '../../popout.html', template: 'src/panel/popout.html', chunks: ['popout']
     }),
     new HtmlWebpackPlugin({
       filename: '../../index.html', template: 'src/panel/index.html', chunks: ['main']

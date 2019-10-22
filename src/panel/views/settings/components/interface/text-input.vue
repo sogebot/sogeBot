@@ -5,7 +5,7 @@
         <template v-if="typeof translatedTitle === 'string'">{{ translatedTitle }}</template>
         <template v-else-if="typeof translatedTitle === 'object'">
           {{ translatedTitle.title }}
-          <small style="cursor: help;" class="textInputTooltip text-info ml-1" data-toggle="tooltip" data-html="true" :title="translatedTitle.help">[?]</small>
+          <small style="cursor: help;" class="text-info ml-1" data-toggle="tooltip" data-html="true" :title="translatedTitle.help">[?]</small>
         </template>
       </span>
     </div>
@@ -28,10 +28,6 @@ export default class textInput extends Vue {
   show: boolean = false;
   currentValue = this.value;
   translatedTitle = this.translate(this.title);
-
-  mounted() {
-    $('.textInputTooltip').tooltip();
-  }
 
   update() {
     if (this.type === 'number') {

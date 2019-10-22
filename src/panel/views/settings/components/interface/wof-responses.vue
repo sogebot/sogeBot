@@ -12,7 +12,7 @@
           v-bind:placeholder="translate('games.wheeloffortune.title.placeholder')"
           v-model="option.title"
           v-on:input="updateOption(index, option.title)">
-        <button v-on:click="removeOption(index)" class="btn btn-danger btn-sm"><i class="fas fa-minus"></i> {{ translate('games.wheeloffortune.remove.option') }}</button>
+        <button v-on:click="removeOption(index)" class="btn btn-danger btn-sm"><fa icon="minus"></fa> {{ translate('games.wheeloffortune.remove.option') }}</button>
       </div>
       <div :key="'wofresponse-2' + index" class="d-flex" style="height: fit-content">
         <div class="input-group-prepend">
@@ -31,7 +31,7 @@
                 v-bind:oid="index"
                 v-on:update="updateResponse"></textarea-with-tags>
               <div class="input-group-append">
-                <button v-on:click="removeResponse(index, index2)" class="btn btn-danger btn-sm"><i class="fas fa-minus"></i> {{ translate('games.wheeloffortune.remove.response') }}</button>
+                <button v-on:click="removeResponse(index, index2)" class="btn btn-danger btn-sm"><fa icon="minus"></fa> {{ translate('games.wheeloffortune.remove.response') }}</button>
               </div>
             </div>
           </template>
@@ -43,11 +43,11 @@
                 v-bind:oid="index"
                 v-on:update="updateResponse"></textarea-with-tags>
           </template>
-          <button v-on:click="addResponse(index)" class="btn btn-success btn-block btn-sm"><i class="fas fa-plus"></i></button>
+          <button v-on:click="addResponse(index)" class="btn btn-success btn-block btn-sm"><fa icon="plus"></fa></button>
         </div>
       </div>
     </template>
-    <button v-on:click="addOption" class="btn btn-success btn-block mt-3"><i class="fas fa-plus"></i> {{ translate('games.wheeloffortune.addOption') }}</button>
+    <button v-on:click="addOption" class="btn btn-success btn-block mt-3"><fa icon="plus"></fa> {{ translate('games.wheeloffortune.addOption') }}</button>
   </div>
 </template>
 

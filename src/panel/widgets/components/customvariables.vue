@@ -1,104 +1,96 @@
-<template>
-<div class="card widget">
-  <div class="card-header">
-    <ul class="nav nav-pills" role="tablist">
-      <li role="presentation" class="nav-item">
-        <a class="nav-link active" href="#customvariables-main" aria-controls="home" role="tab" data-toggle="tab" title="Custom Variables">
-          <fa icon="dollar-sign" />
-        </a>
-      </li>
-      <li role="presentation">
-        <a class="nav-link" href="#customvariables-settings" aria-controls="home" role="tab" data-toggle="tab" title="Settings">
-          <fa icon="cog" />
-        </a>
-      </li>
-      <li class="nav-item ml-auto">
-        <h6 class="widget-title">{{translate('widget-title-customvariables')}}</h6>
-      </li>
-    </ul>
-  </div>
-
-  <!-- Tab panes -->
-  <div class="card-body">
-    <div class="tab-content">
-      <div role="tabpanel" class="tab-pane active" id="customvariables-main">
-        <div v-for="(variable, index) of watchedVariables" :key="index">
-          <div class="input-group" v-bind:class="{ 'pt-1': index != 0 }">
-            <div class="input-group-prepend">
-              <span class="input-group-text">{{ variable.variableName }}</span>
-            </div>
-            <template v-if="variable.type === 'text'">
-              <number-or-text
-                v-bind:id="variable.id"
-                v-bind:value="variable.currentValue"
-                type="text"
-                v-on:update="onUpdate">
-              </number-or-text>
-            </template>
-            <template v-else-if="variable.type ==='eval'">
-              <input type="text" class="form-control" readonly v-bind:value="variable.currentValue">
-              <span class="input-group-text border-left-0"><fa icon="code" /></span>
-            </template>
-            <template v-else-if="variable.type ==='number'">
-              <number-or-text
-                v-bind:id="variable.id"
-                v-bind:value="variable.currentValue"
-                type="number"
-                v-on:update="onUpdate">
-              </number-or-text>
-            </template>
-            <template v-else-if="variable.type ==='options'">
-              <select class="form-control" v-model="variable.currentValue" v-on:change="onUpdate(variable.id, variable.currentValue)">
-                <option
-                  v-for="option of variable.usableOptions.split(',').map((o) => o.trim())"
-                  v-bind:key="option"
-                  v-bind:value="String(option)">
-                  {{ option }}</option>
-              </select>
-            </template>
-          </div>
-        </div>
-      </div>
-      <!-- /MAIN -->
-
-      <div role="tabpanel" class="tab-pane" id="customvariables-settings">
-        <span v-if="nonWatchedVariablesCount > 0">
-          <select class="form-control" v-model="selectedVariable">
-            <option v-bind:value="variable.id" :key="variable.id" v-for="variable of nonWatchedVariables">{{ variable.variableName }}</option>
-          </select>
-          <button class="btn btn-block btn-primary" v-on:click="addToWatch(selectedVariable)">{{ translate('widgets.customvariables.add-variable-into-watchlist') }}</button>
-        </span>
-        <span v-else>
-          <div class="alert alert-warning" v-html="translate('widgets.customvariables.no-custom-variable-found')"></div>
-        </span>
-
-        <span v-if="watched.length > 0">
-          <h6 class="mt-2 mb-0">{{ translate('widgets.customvariables.watchlist') }}</h6>
-          <ul class="list-group list-group-flush">
-            <li class="list-group-item" v-for="(watch, index) of watchedVariables" :key="index">
-              <span class="row">
-                <div class="col-md-2 pt-2" style="line-height: 2rem;">
-                  <button v-if="index !== 0" class="btn btn-block btn-link col-md-2" v-on:click="moveUp(String(watch._id))"><fa icon="angle-up" /></button>
-                </div>
-                <div class="col-md p-2" style="overflow:hidden; line-height: 2rem;">
-                  {{ watch.variableName }}
-                  <button class="btn float-right btn-outline-danger border-0" v-on:click="unWatch(String(watch._id))"><fa icon="trash-alt" /></button>
-                </div>
-                <div class="col-md-2 pt-2" style="line-height: 2rem;">
-                  <button v-if="index !== watchedVariables.length - 1" class="btn btn-block btn-link col-md-2" v-on:click="moveDown(String(watch._id))"><fa icon="angle-down" /></button>
-                </div>
-              </span>
-            </li>
-          </ul>
-        </span>
-      </div>
-      <!-- /SETTINGS -->
-    </div>
-  </div>
-</div>
+<template lang="pug">
+  div.widget
+    b-card(no-body).border-0.h-100
+      b-tabs(pills card style="overflow:hidden" v-model="tabIndex").h-100
+        template(v-slot:tabs-start)
+          template(v-if="!popout")
+            li.nav-variable.px-2.grip.text-secondary.align-self-center
+              fa(icon="grip-vertical" fixed-width)
+          li.nav-item
+            b-dropdown(ref="dropdown" boundary="window" no-caret :text="translate('widget-title-customvariables')" variant="outline-primary" toggle-class="border-0")
+              b-dropdown-item(@click="state.editation = $state.progress")
+                | Edit variables
+              template(v-if="!popout")
+                b-dropdown-item(target="_blank" href="/popout/#customvariables")
+                  | Popout
+                b-dropdown-divider
+                b-dropdown-item
+                  a(href="#" @click.prevent="$refs.dropdown.hide(); $nextTick(() => EventBus.$emit('remove-widget', 'customvariables'))").text-danger
+                    | Remove <strong>{{translate('widget-title-customvariables')}}</strong> widget
+        b-tab
+          template(v-slot:title)
+            fa(icon="dollar-sign" fixed-width)
+          b-card-text
+            loading(v-if="state.loading === $state.progress")
+            template(v-else)
+              div(v-if="state.editation === $state.progress").text-right.pb-2
+                b-button(variant="danger" @click="remove" :disabled="selected.length === 0")
+                  fa(icon="trash-alt")
+                b-button(variant="primary" @click="save")
+                  | Done
+              div(v-for="(variable, index) of watchedVariables" :key="index" @dragenter="dragenter(variable.order, $event)")
+                div(
+                  v-bind:class="{ 'pt-1': index != 0 }"
+                  :ref='"item_" + variable.order'
+                ).input-group
+                  div.input-group-prepend(
+                    :class="{'w-100': state.editation === $state.progress}"
+                  )
+                    span(
+                      v-if="state.editation === $state.progress"
+                      style="cursor: grab;"
+                      @dragstart="dragstart(variable.order, $event)"
+                      @dragend="dragend(variable.order, $event)"
+                      draggable="true"
+                    ).text-secondary.input-group-text
+                      fa(icon="grip-vertical" fixed-width)
+                    span.input-group-text(
+                      @click="state.editation === $state.idle ? undefined : toggle(variable)"
+                      :class="{ 'w-100': state.editation === $state.progress, 'bg-dark': state.editation === $state.progress && selected.includes(variable.id), 'text-light': state.editation === $state.progress && selected.includes(variable.id) }"
+                    )
+                      | {{ variable.variableName }}
+                  template(v-if="variable.type === 'text' && state.editation !== $state.progress")
+                    number-or-text(
+                      v-bind:id="variable.id"
+                      v-bind:value="variable.currentValue"
+                      type="text"
+                      v-on:update="onUpdate"
+                    )
+                  template(v-else-if="variable.type ==='eval' && state.editation !== $state.progress")
+                    input(type="text" readonly v-bind:value="variable.currentValue").form-control
+                    span.input-group-text.border-left-0
+                      fa(icon="code")
+                  template(v-else-if="variable.type ==='number' && state.editation !== $state.progress")
+                    number-or-text(
+                      v-bind:id="variable.id"
+                      v-bind:value="variable.currentValue"
+                      type="number"
+                      v-on:update="onUpdate"
+                    )
+                  template(v-else-if="variable.type ==='options' && state.editation !== $state.progress")
+                    select(v-model="variable.currentValue" v-on:change="onUpdate(variable.id, variable.currentValue)").form-control
+                      option(
+                        v-for="option of variable.usableOptions.split(',').map((o) => o.trim())"
+                        v-bind:key="option"
+                        v-bind:value="String(option)"
+                      )
+                        | {{ option }}
+        b-tab
+          template(v-slot:title)
+            fa(icon="cog" fixed-width)
+          b-card-text
+            span(v-if="nonWatchedVariablesCount > 0")
+              select(v-model="selectedVariable").form-control
+                option(v-bind:value="variable.id" :key="variable.id" v-for="variable of nonWatchedVariables")
+                  | {{ variable.variableName }}
+              button(@click="addToWatch(selectedVariable)").btn.btn-block.btn-primary
+                | {{ translate('widgets.customvariables.add-variable-into-watchlist') }}
+            span(v-else)
+              div(v-html="translate('widgets.customvariables.no-custom-variable-found')").alert.alert-warning
 </template>
 
 <script>
+import { EventBus } from 'src/panel/helpers/event-bus';
 import { getSocket } from 'src/panel/helpers/socket';
 import { isNil, size, orderBy } from 'lodash-es';
 var numberOrTextComponent = {
@@ -128,6 +120,7 @@ var numberOrTextComponent = {
   },
   data: function () {
     return {
+      EventBus,
       showSaveButton: false,
       currentValue: this.value
     }
@@ -151,27 +144,37 @@ var numberOrTextComponent = {
     `
 }
 export default {
+  props: ['popout', 'nodrag'],
   components: {
-    'number-or-text': numberOrTextComponent
+    'number-or-text': numberOrTextComponent,
+    loading: () => import('src/panel/components/loading.vue'),
   },
   data: function () {
     return {
       variables: [],
       watched: [],
+      tabIndex: 0,
+      state: {
+        editation: this.$state.idle,
+        loading: this.$state.progress,
+      },
+      selected: [],
       selectedVariable: null,
-      socket: getSocket('/widgets/customvariables')
+      socket: getSocket('/widgets/customvariables'),
+      draggingItem: null,
       }
   },
-  mounted: function () {
-    this.$emit('mounted')
-  },
-  created: function () {
+  created: async function () {
+    this.state.loading = this.$state.progress;
     this.socket.on('refresh', () => {
       this.refreshVariablesList()
       this.refreshWatchList()
     })
-    this.refreshVariablesList()
-    this.refreshWatchList()
+    await Promise.all([
+      this.refreshVariablesList(),
+      this.refreshWatchList(),
+    ])
+    this.state.loading = this.$state.success;
   },
   computed: {
     watchedVariables: function () {
@@ -191,6 +194,7 @@ export default {
         let filtered = this.watched.filter((o) => o.variableId === variable.id)
         if (filtered.length === 0) nonWatched.push(variable)
       }
+      console.log({nonWatched})
       return nonWatched
     },
     nonWatchedVariablesCount: function () {
@@ -198,52 +202,91 @@ export default {
     }
   },
   watch: {
-    nonWatchedVariables: function () {
-      if (!isNil(this.nonWatchedVariables[0])) this.selectedVariable = this.nonWatchedVariables[0]._id
+    nonWatchedVariables: function (value) {
+      if (!isNil(this.nonWatchedVariables[0])) {
+        this.selectedVariable = this.nonWatchedVariables[0].id
+      }
     }
   },
   methods: {
-    onUpdate: function (_id, value) {
-      this.socket.emit('set.value', { _id, value }, (err) => {
+    onUpdate: function (id, value) {
+      this.socket.emit('set.value', { id, value }, (err) => {
         this.refreshVariablesList()
         this.refreshWatchList()
       })
     },
-    moveUp: function (variableId) {
-      this.socket.emit('move.up', variableId, (err, variableId) => {
-        this.refreshWatchList()
-      })
-    },
-    moveDown: function (variableId) {
-      this.socket.emit('move.down', variableId, (err, variableId) => {
-        this.refreshWatchList()
-      })
-    },
     addToWatch: function (variableId) {
-      if (!isNil(variableId)) {
-        this.socket.emit('add.watch', variableId, (err, variableId) => {
-          this.refreshWatchList()
-        })
+      this.tabIndex = 0;
+      this.watched = [
+        ...this.watched,
+        {
+          variableId: variableId,
+          order: this.watched.length,
+        }
+      ],
+      this.save();
+    },
+    reorder() {
+      for (let i = 0; i < this.watched.length; i++) {
+        this.watched[i].order = i;
       }
     },
-    unWatch: function (variableId) {
-      if (!isNil(variableId)) {
-        this.socket.emit('rm.watch', variableId, (err, variableId) => {
-          this.refreshWatchList()
-        })
-      }
+    remove() {
+      this.watched = this.watched.filter(o => !this.selected.includes(String(o.variableId)))
+      this.selected = [];
+      this.reorder();
+    },
+    save() {
+      this.state.editation = this.$state.idle;
+      this.socket.emit('set', { collection: '_custom.variables.watch', items: this.watched, where: {} })
     },
     refreshVariablesList: function () {
-      this.socket.emit('list.variables', (err, data) => {
-        this.variables = data
-
+      return new Promise((resolve) => {
+        this.socket.emit('list.variables', (err, data) => {
+          this.variables = data
+          resolve()
+        })
       })
     },
     refreshWatchList: function () {
-      this.socket.emit('list.watch', (err, data) => {
-        this.watched = data
+      return new Promise((resolve) => {
+        this.socket.emit('list.watch', (err, data) => {
+          this.watched = data
+          resolve()
+        })
       })
-    }
+    },
+    dragstart(order, e) {
+      this.draggingItem = order;
+      this.$refs['item_' + order][0].style.opacity = 0.5;
+      e.dataTransfer.setData('text/plain', 'dummy');
+    },
+    dragenter(newOrder, e) {
+      const value = this.watched.find(o => o.order === this.draggingItem)
+      const entered = this.watched.find(o => o.order === newOrder)
+      entered.order = this.draggingItem;
+      this.draggingItem = newOrder
+      value.order = this.draggingItem;
+
+      for (let i = 0, length = this.watched.length; i < length; i++) {
+        this.$refs['item_' + this.watched[i].order][0].style.opacity = 1;
+      }
+      this.$refs['item_' + this.draggingItem][0].style.opacity = 0.5;
+
+      this.$forceUpdate()
+    },
+    dragend(order, e) {
+      for (let i = 0, length = this.watched.length; i < length; i++) {
+        this.$refs['item_' + this.watched[i].order][0].style.opacity = 1;
+      }
+    },
+    toggle(item) {
+      if(this.selected.find(o => o === item.id)) {
+        this.selected = this.selected.filter(o => o !== item.id);
+      } else {
+        this.selected.push(item.id);
+      }
+    },
   }
 }
 </script>

@@ -88,7 +88,7 @@
   import Vue from 'vue'
   import { chunk, debounce } from 'lodash-es'
 
-  import { EventBus } from '../helpers/event-bus';
+  import { EventBus } from 'src/panel/helpers/event-bus';
   import { getSocket } from 'src/panel/helpers/socket';
 
   import { ModalPlugin } from 'bootstrap-vue';

@@ -74,43 +74,43 @@
 
         <b-btn-group>
           <button v-if="filter.vips === null" class="btn border-0 btn-outline-dark" @click="filter.vips = true">
-            <i class="fas fa-question fa-fw"></i> <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">vip</strong>
+            <fa icon="question" fixed-width></fa> <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">vip</strong>
           </button>
           <button v-else-if="filter.vips" class="btn border-0 btn-outline-success" @click="filter.vips = false">
-            <i class="fas fa-check fa-fw"></i> <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">vip</strong>
+            <fa icon="check" fixed-width></fa> <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">vip</strong>
           </button>
           <button v-else class="btn border-0 btn-outline-danger" @click="filter.vips = null">
-            <i class="fas fa-exclamation fa-fw"></i> <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">vip</strong>
+            <fa icon="exclamation" fixed-width></fa> <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">vip</strong>
           </button>
 
           <button v-if="filter.active === null" class="btn border-0 btn-outline-dark" @click="filter.active = true">
-            <i class="fas fa-question fa-fw"></i> <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">active</strong>
+            <fa icon="question" fixed-width></fa> <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">active</strong>
           </button>
           <button v-else-if="filter.active" class="btn border-0 btn-outline-success" @click="filter.active = false">
-            <i class="fas fa-check fa-fw"></i> <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">active</strong>
+            <fa icon="check" fixed-width></fa> <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">active</strong>
           </button>
           <button v-else class="btn border-0 btn-outline-danger" @click="filter.active = null">
-            <i class="fas fa-exclamation fa-fw"></i> <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">active</strong>
+            <fa icon="exclamation" fixed-width></fa> <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">active</strong>
           </button>
 
           <button v-if="filter.subscribers === null" class="btn border-0 btn-outline-dark" @click="filter.subscribers = true">
-            <i class="fas fa-question fa-fw"></i> <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">subscribers</strong>
+            <fa icon="question" fixed-width></fa> <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">subscribers</strong>
           </button>
           <button v-else-if="filter.subscribers" class="btn border-0 btn-outline-success" @click="filter.subscribers = false">
-            <i class="fas fa-check fa-fw"></i> <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">subscribers</strong>
+            <fa icon="check" fixed-width></fa> <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">subscribers</strong>
           </button>
           <button v-else class="btn border-0 btn-outline-danger" @click="filter.subscribers = null">
-            <i class="fas fa-exclamation fa-fw"></i> <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">subscriber</strong>
+            <fa icon="exclamation" fixed-width></fa> <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">subscriber</strong>
           </button>
 
           <button v-if="filter.followers === null" class="btn border-0 btn-outline-dark" @click="filter.followers = true">
-            <i class="fas fa-question fa-fw"></i> <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">followers</strong>
+            <fa icon="question" fixed-width></fa> <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">followers</strong>
           </button>
           <button v-else-if="filter.followers" class="btn border-0 btn-outline-success" @click="filter.followers = false">
-            <i class="fas fa-check fa-fw"></i> <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">followers</strong>
+            <fa icon="check" fixed-width></fa> <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">followers</strong>
           </button>
           <button v-else class="btn border-0 btn-outline-danger" @click="filter.followers = null">
-            <i class="fas fa-exclamation fa-fw"></i> <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">follower</strong>
+            <fa icon="exclamation" fixed-width></fa> <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">follower</strong>
           </button>
         </b-btn-group>
       </template>
@@ -133,11 +133,11 @@
           vip
         </b-badge>
         <b-badge :class="[ typeof data.item.is === 'object' && data.item.is.follower ? 'badge-success' : 'badge-danger' ]" style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
-          <i v-if="typeof data.item.lock === 'object' && data.item.lock.follower" class="fas fa-lock"></i>
+          <fa v-if="typeof data.item.lock === 'object' && data.item.lock.follower" :icon="['fas', 'fa-lock']"></fa>
           follower
         </b-badge>
         <b-badge :class="[ typeof data.item.is === 'object' && data.item.is.subscriber ? 'badge-success' : 'badge-danger' ]" style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
-          <i v-if="typeof data.item.lock === 'object' && data.item.lock.subscriber" class="fas fa-lock"></i>
+          <fa v-if="typeof data.item.lock === 'object' && data.item.lock.subscriber" :icon="['fas', 'fa-lock']"></fa>
           subscriber
         </b-badge>
       </template>
@@ -149,13 +149,13 @@
           {{ moment(get(data, 'item.time.message', 0)).format('LLL') }}</div>
         <div v-if="typeof data.item.time === 'object' && data.item.time.follow && typeof data.item.is === 'object' && data.item.is.follower">
           <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
-            <i v-if="get(data, 'item.lock.followed_at')" class="fas fa-lock"></i>
+            <fa v-if="get(data, 'item.lock.followed_at')" :icon="['fas', 'fa-lock']"></fa>
             {{ translate('followed-since') }}:
           </strong>
           {{ moment(get(data, 'item.time.follow', 0)).format('LLL') }}</div>
         <div v-if="typeof data.item.time === 'object' && data.item.time.subscribed_at && typeof data.item.is === 'object' && data.item.is.subscriber">
           <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
-              <i v-if="get(data, 'item.lock.subscribed_at')" class="fas fa-lock"></i>
+              <fa v-if="get(data, 'item.lock.subscribed_at')" :icon="['fas', 'fa-lock']"></fa>
             {{ translate('subscribed-since') }}:
           </strong>
           {{ moment(get(data, 'item.time.subscribed_at', 0)).format('LLL') }}

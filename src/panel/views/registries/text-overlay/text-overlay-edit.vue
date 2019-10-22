@@ -59,13 +59,13 @@
               <div class="input-group mb-3">
                 <input type="text" class="form-control" placeholder="e.g. https://code.jquery.com/jquery-3.3.1.min.js" v-model="externalJsInput">
                 <div class="input-group-append">
-                  <button type="button" class="btn btn-primary" @click="if (externalJsInput) { external.push(externalJsInput); pending = true; } externalJsInput = ''"><i class="fas fa-plus"></i> Add external JS</button>
+                  <button type="button" class="btn btn-primary" @click="if (externalJsInput) { external.push(externalJsInput); pending = true; } externalJsInput = ''"><fa icon="plus"></fa> Add external JS</button>
                 </div>
               </div>
               <ul class="list-group">
                 <li style="padding: 0.1rem 0.5rem" class="list-group-item list-group-item-info d-flex justify-content-between align-items-center" v-for="js of external" :key="js" >
                   {{js}}
-                  <button type="button" class="btn btn-outline-info border-0" @click="removeExternalJS(js); pending = true"><i class="fas fa-times"></i></button>
+                  <button type="button" class="btn btn-outline-info border-0" @click="removeExternalJS(js); pending = true"><fa icon="times"></fa></button>
                 </li>
               </ul>
             </div>

@@ -1,260 +1,198 @@
-<template>
-<div class="card widget">
-  <div class="card-header">
-    <ul class="nav nav-pills" role="tablist">
-      <li role="presentation" class="nav-item">
-        <a class="nav-link" href="#raffles-participants" aria-controls="home" role="tab" data-toggle="tab" title="Participants">
-          <small>{{ participants.length }}</small>
-          <fa icon="users"></fa>
-        </a>
-      </li>
-      <li role="presentation" class="nav-item">
-        <a class="nav-link active" href="#raffles-giveaway" aria-controls="home" role="tab" data-toggle="tab" title="Giveaway">
-          <fa icon="gift"></fa>
-        </a>
-      </li>
-      <li role="presentation" class="nav-item">
-        <a class="nav-link" href="#raffles-winner" aria-controls="home" role="tab" data-toggle="tab" title="Last winner" v-if="winner">
-          <fa icon="trophy"></fa>
-          {{ winner.username }}
-        </a>
-      </li>
-      <li role="presentation" class="nav-item">
-        <a class="nav-link" href="#raffles-settings" aria-controls="home" role="tab" data-toggle="tab" title="Settings">
-          <fa icon="cog"></fa>
-        </a>
-      </li>
-      <li role="presentation" class="nav-item widget-popout">
-        <a class="nav-link" title="Popout" target="_blank" href="/popout/#raffles">
-          <fa icon="external-link-alt"></fa>
-        </a>
-      </li>
-      <li class="nav-item ml-auto">
-        <h6 class="widget-title">{{translate('widget-title-raffles')}}</h6>
-      </li>
-    </ul>
-  </div>
+<template lang="pug">
+  div.widget
+    b-card(no-body).border-0.h-100
+      b-tabs(pills card style="overflow:hidden").h-100
+        template(v-slot:tabs-start)
+          template(v-if="!popout")
+            li(v-if="typeof nodrag === 'undefined'").nav-item.px-2.grip.text-secondary.align-self-center
+              fa(icon="grip-vertical" fixed-width)
+            li.nav-item
+              b-dropdown(ref="dropdown" boundary="window" no-caret :text="translate('widget-title-raffles')" variant="outline-primary" toggle-class="border-0")
+                b-dropdown-item(target="_blank" href="/popout/#raffles")
+                  | Popout
+                b-dropdown-divider
+                b-dropdown-item
+                  a(href="#" @click.prevent="$refs.dropdown.hide(); $nextTick(() => EventBus.$emit('remove-widget', 'raffles'))").text-danger
+                    | Remove <strong>{{translate('widget-title-raffles')}}</strong> widget
+          template(v-else)
+            b-button(variant="outline-primary" :disabled="true").border-0 {{ translate('widget-title-raffles') }}
 
-  <!-- Tab panes -->
-  <div class="card-body">
-    <div class="tab-content">
-      <div role="tabpanel" class="tab-pane" id="raffles-participants">
-        <div class="input-group">
-          <input type="text" class="form-control" :placeholder="translate('placeholder-search')" v-model="search">
-          <span class="input-group-btn">
-            <button class="btn btn-danger" type="button" title="Cancel search" @click="search = ''">
-              <fa icon="trash"></fa>
-            </button>
-          </span>
-        </div>
-        <ul class="list-unstyled p-2">
-          <li v-for="participant of fParticipants" :key="participant._id" style="cursor: pointer" @click="toggleEligibility(participant)">
-            <fa
-              :class="[participant.eligible ? 'text-success': '']"
-              :icon="['far', participant.eligible ? 'check-circle' : 'circle']"></fa>
-            {{ participant.username }}
-          </li>
-          <li class="text-danger">
-            <fa icon="eye-slash"></fa>
-            {{Math.abs(fParticipants.length - participants.length)}} {{translate('hidden')}}
-          </li>
-        </ul>
-      </div>
-      <!-- /PARTICIPANTS -->
+        b-tab(active)
+          template(v-slot:title)
+            small {{ participants.length }}
+            fa(icon="users" fixed-width).ml-1
+          b-card-text
+            div.input-group
+              input(type="text" class="form-control" :placeholder="translate('placeholder-search')" v-model="search")
+              span.input-group-btn
+                button(class="btn btn-danger" type="button" title="Cancel search" @click="search = ''")
+                  fa(icon="trash")
+            ul.list-unstyled.p-2
+              li(v-for="participant of fParticipants" :key="participant._id" style="cursor: pointer" @click="toggleEligibility(participant)")
+                fa(
+                  :class="[participant.eligible ? 'text-success': '']"
+                  :icon="['far', participant.eligible ? 'check-circle' : 'circle']"
+                ).mr-1
+                | {{ participant.username }}
+              li.text-danger
+                fa(icon="eye-slash").mr-1
+                | {{Math.abs(fParticipants.length - participants.length)}} {{translate('hidden')}}
 
-      <div role="tabpanel" class="tab-pane active" id="raffles-giveaway">
-        <div class="input-group">
-          <span class="input-group-btn btn-group">
-            <button class="btn btn-success" type="button"
-              :disabled="keyword.trim().length <= 1 || running"
-              @click="open()">
-                <fa icon="plus" fixed-width></fa>
-            </button>
-            <button class="btn btn-danger" type="button"
-              :disabled="!running"
-              @click="close()">
-                <fa icon="trash" fixed-width></fa>
-            </button>
-          </span>
-          <div class="input-group-prepend">
-              <span class="input-group-text">!</span>
-          </div>
-          <input type="text" class="form-control" :placeholder="translate('placeholder-enter-keyword')" v-model="keyword" :disabled="running">
-          <span class="input-group-btn btn-group">
-            <button type="button" class="btn btn-success" :disabled="!running" @click="socket.emit('pick')">
-              <fa icon="trophy" fixed-width></fa>
-            </button>
-          </span>
-        </div>
+        b-tab
+          template(v-slot:title)
+            fa(icon="gift" fixed-width)
+          b-card-text
+            div.input-group
+              span.input-group-btn.btn-group
+                button(class="btn btn-success" type="button"
+                  :disabled="keyword.trim().length <= 1 || running"
+                  @click="open()"
+                )
+                  fa(icon="plus" fixed-width)
+                button(class="btn btn-danger" type="button"
+                  :disabled="!running"
+                  @click="close()"
+                  )
+                    fa(icon="trash" fixed-width)
+              div.input-group-prepend
+                span.input-group-text !
+              input(type="text" class="form-control" :placeholder="translate('placeholder-enter-keyword')" v-model="keyword" :disabled="running")
+              span.input-group-btn.btn-group
+                button(type="button" class="btn btn-success" :disabled="!running" @click="socket.emit('pick')")
+                  fa(icon="trophy" fixed-width)
 
-        <div class="row pb-1">
-          <div class="col">
-          </div>
-          <div class="w-100"></div>
-          <div class="col text-center">
-            <div class="d-flex">
-            <button type="button" class="btn btn-default btn-label w-100 text-left" disabled="disabled">{{translate('eligible-to-enter')}}</button>
-            <button
-              class="btn d-block border-0 w-100" style="flex-shrink: 2;"
-              :class="[ eligibility.all ? 'btn-outline-success' : 'btn-outline-danger' ]"
-              @click="toggle('all')"
-              :title="translate('everyone')"
-              :disabled="running">
-              <fa icon="users" />
-            </button>
-            <button
-              class="btn d-block border-0 w-100" style="flex-shrink: 2;"
-              :class="[ eligibility.followers ? 'btn-outline-success' : 'btn-outline-danger' ]"
-              @click="toggle('followers')"
-              :title="translate('followers')"
-              :disabled="running">
-              <fa icon="heart" />
-            </button>
-            <button
-              class="btn d-block border-0 w-100" style="flex-shrink: 2;"
-              :class="[ eligibility.subscribers ? 'btn-outline-success' : 'btn-outline-danger' ]"
-              @click="toggle('subscribers')"
-              :title="translate('subscribers')"
-              :disabled="running">
-              <fa icon="star" />
-            </button>
-            </div>
-          </div>
-        </div>
+            div.row.pb-1
+              b-col
+              div.w-100
+              b-col.text-center
+                div.d-flex
+                  button(type="button" class="btn btn-default btn-label w-100 text-left" disabled="disabled") {{translate('eligible-to-enter')}}
+                  button(
+                    class="btn d-block border-0 w-100" style="flex-shrink: 2;"
+                    :class="[ eligibility.all ? 'btn-outline-success' : 'btn-outline-danger' ]"
+                    @click="toggle('all')"
+                    :title="translate('everyone')"
+                    :disabled="running"
+                  )
+                    fa(icon="users")
 
-        <div class="row pb-1">
-          <div class="col">
-            <div class="d-flex">
-              <button type="button" class="btn btn-default btn-label w-100 text-left" disabled="disabled">{{translate('raffle-type')}}</button>
-              <button class="btn d-block w-100"
-                :class="[isTypeKeywords ? 'btn-primary' : 'btn-outline-primary border-0']"
-                @click="isTypeKeywords = true"
-                :disabled="running">
-                {{translate('raffle-type-keywords')}}
-              </button>
-              <button class="btn d-block w-100"
-                :class="[isTypeKeywords ? 'btn-outline-primary border-0' : 'btn-primary']"
-                @click="isTypeKeywords = false"
-                :disabled="running">
-                {{translate('raffle-type-tickets')}}
-              </button>
-            </div>
-          </div>
-        </div>
+                  button(
+                    class="btn d-block border-0 w-100" style="flex-shrink: 2;"
+                    :class="[ eligibility.followers ? 'btn-outline-success' : 'btn-outline-danger' ]"
+                    @click="toggle('followers')"
+                    :title="translate('followers')"
+                    :disabled="running"
+                  )
+                    fa(icon="heart" fixed-width)
 
-        <div class="row" v-if="!isTypeKeywords">
-          <div class="col">
-            <div class="d-flex">
-              <button type="button" class="btn btn-default btn-label w-50 text-left" disabled>{{translate('raffle-tickets-range')}}</button>
-              <div class="w-100">
-                <div class="input-group">
-                  <div class="input-group-prepend">
-                    <span class="input-group-text">min</span>
-                  </div>
-                  <input type="number" v-model="ticketsMin" class="form-control" placeholder="0" id="minTickets" min="0" :disabled="running">
-                </div>
-                <div class="input-group">
-                  <div class="input-group-prepend">
-                      <span class="input-group-text">max</span>
-                  </div>
-                  <input type="number" v-model="ticketsMax" class="form-control" placeholder="100" id="maxTickets" min="0" :disabled="running">
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+                  button(
+                    class="btn d-block border-0 w-100" style="flex-shrink: 2;"
+                    :class="[ eligibility.subscribers ? 'btn-outline-success' : 'btn-outline-danger' ]"
+                    @click="toggle('subscribers')"
+                    :title="translate('subscribers')"
+                    :disabled="running"
+                  )
+                    fa(icon="star" fixed-width)
 
-      <!-- /GIVEAWAY -->
-      <div role="tabpanel" class="tab-pane" id="raffles-winner">
-        <template v-if="winner">
-          <div style="text-align: center">
-            <strong style="font-size: 30px">
-            <fa :icon="['fab', 'twitch']"></fa>
-              {{winner.username}}
-            </strong>
-          </div>
+            div.row.pb-1
+              b-col
+                div.d-flex
+                  button(type="button" class="btn btn-default btn-label w-100 text-left" disabled="disabled") {{translate('raffle-type')}}
+                  button(class="btn d-block w-100"
+                    :class="[isTypeKeywords ? 'btn-primary' : 'btn-outline-primary border-0']"
+                    @click="isTypeKeywords = true"
+                    :disabled="running"
+                  )
+                    | {{translate('raffle-type-keywords')}}
 
-          <div class="text-center">
-            <div class="d-flex">
-              <div class="w-100 btn" style="cursor: initial" :class="[winner.is.follower ? 'text-success' : 'text-danger']">{{translate('follower')}}</div>
-              <div class="w-100 btn" style="cursor: initial" :class="[winner.is.subscriber ? 'text-success' : 'text-danger']">{{translate('subscriber')}}</div>
-              <button type="button" class="btn btn-outline-secondary border-0 btn-block" @click="socket.emit('pick')">
-                <fa icon="sync"></fa>
-                {{translate('roll-again')}}
-              </button>
-            </div>
-          </div>
+                  button(class="btn d-block w-100"
+                    :class="[isTypeKeywords ? 'btn-outline-primary border-0' : 'btn-primary']"
+                    @click="isTypeKeywords = false"
+                    :disabled="running"
+                  )
+                    | {{translate('raffle-type-tickets')}}
 
-          <div class="table-responsive" style="margin-top: 0; padding-left: 10px; padding-right: 10px;">
-            <table class="table table-sm">
-              <thead>
-                <tr>
-                  <td colspan="2" style="vertical-align: bottom; font-size: 18px;">
-                  <fa icon="comments"></fa>
-                  {{translate('messages')}}
-                  </td>
-                </tr>
-              </thead>
-              <tbody style="font-size:10px;">
-                <tr v-for="(message, index) of winnerMessages" :key="index">
-                  <td>{{message.text}}</td>
-                  <td class="text-right"><small class="text-muted">{{ new Date(message.timestamp).toLocaleTimeString()}}</small></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </template>
-      </div>
-      <!-- /WINNER -->
-      <div role="tabpanel" class="tab-pane" id="raffles-settings">
-        <div class="input-group">
-          <div class="input-group-prepend">
-              <span class="input-group-text">{{translate('announce-every')}}</span>
-          </div>
-          <input type="text" class="form-control" v-model="raffleAnnounceInterval">
-          <div class="input-group-append">
-              <span class="input-group-text">{{translate('minutes')}}</span>
-          </div>
-        </div>
+            div(class="row" v-if="!isTypeKeywords")
+              b-col
+                div.d-flex
+                  button(type="button" class="btn btn-default btn-label w-50 text-left" disabled) {{translate('raffle-tickets-range')}}
+                  div.w-100
+                    div.input-group
+                      div.input-group-prepend
+                        span.input-group-text min
+                      input(type="number" v-model="ticketsMin" class="form-control" placeholder="0" id="minTickets" min="0" :disabled="running")
+                    div.input-group
+                      div.input-group-prepend
+                        span.input-group-text max
+                      input(type="number" v-model="ticketsMax" class="form-control" placeholder="100" id="maxTickets" min="0" :disabled="running")
 
-        <div class="input-group mt-2">
-          <div class="input-group-prepend">
-              <span class="input-group-text">{{translate('systems.raffles.widget.subscribers-luck')}}</span>
-          </div>
-          <input type="text" class="form-control" v-model="luck.subscribersPercent">
-          <div class="input-group-append">
-              <span class="input-group-text">%</span>
-          </div>
-        </div>
+        b-tab(v-if="winner")
+          template(v-slot:title)
+            fa(icon="trophy" fixed-width).mr-1
+            | {{ winner.username }}
+          b-card-text
+            template(v-if="winner")
+              div(style="text-align: center")
+                strong(style="font-size: 30px")
+                  fa(:icon="['fab', 'twitch']").mr-1
+                  | {{winner.username}}
 
-        <div class="input-group mt-2">
-          <div class="input-group-prepend">
-              <span class="input-group-text">{{translate('systems.raffles.widget.followers-luck')}}</span>
-          </div>
-          <input type="text" class="form-control" v-model="luck.followersPercent">
-          <div class="input-group-append">
-              <span class="input-group-text">%</span>
-          </div>
-        </div>
-      </div>
-      <!-- /SETTINGS -->
+              div(style="text-align: center")
+                div.d-flex
+                  div(class="w-100 btn" style="cursor: initial" :class="[winner.is.follower ? 'text-success' : 'text-danger']") {{translate('follower')}}
+                  div(class="w-100 btn" style="cursor: initial" :class="[winner.is.subscriber ? 'text-success' : 'text-danger']") {{translate('subscriber')}}
+                  button(type="button" class="btn btn-outline-secondary border-0 btn-block" @click="socket.emit('pick')")
+                    fa(icon="sync").mr-1
+                    | {{translate('roll-again')}}
 
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</div>
+              div(class="table-responsive" style="margin-top: 0; padding-left: 10px; padding-right: 10px;")
+                table.table.table-sm
+                  thead
+                    tr
+                      td(colspan="2" style="vertical-align: bottom; font-size: 18px;")
+                        fa(icon="comments").mr-1
+                        | {{translate('messages')}}
+                  tbody(style="font-size:10px;")
+                    tr(v-for="(message, index) of winnerMessages" :key="index")
+                      td {{message.text}}
+                      td.text-right
+                        small.text-muted {{ new Date(message.timestamp).toLocaleTimeString()}}
+
+        b-tab
+          template(v-slot:title)
+            fa(icon="cog" fixed-width)
+          b-card-text
+            div.input-group
+              div.input-group-prepend
+                span.input-group-text {{translate('announce-every')}}
+              input(type="number" class="form-control" v-model.number="raffleAnnounceInterval")
+              div.input-group-append
+                span.input-group-text {{translate('minutes')}}
+
+            div.input-group.mt-2
+              div.input-group-prepend
+                span.input-group-text {{translate('systems.raffles.widget.subscribers-luck')}}
+              input(type="number" class="form-control" v-model.number="luck.subscribersPercent")
+              div.input-group-append
+                span.input-group-text %
+
+            div.input-group.mt-2
+              div.input-group-prepend
+                span.input-group-text {{translate('systems.raffles.widget.followers-luck')}}
+              input(type="number" class="form-control" v-model.number="luck.followersPercent")
+              div.input-group-append
+                span.input-group-text %
 </template>
 
 <script>
 import { getSocket } from 'src/panel/helpers/socket';
+import { EventBus } from 'src/panel/helpers/event-bus';
 import { orderBy } from 'lodash-es';
 export default {
-  mounted: function () {
-    this.$emit('mounted')
-  },
+  props: ['popout', 'nodrag'],
   data: function () {
     return {
+      EventBus,
       orderBy: orderBy,
       raffleAnnounceInterval: 0,
       luck: {
@@ -297,9 +235,10 @@ export default {
   },
   created: function () {
     this.socket.emit('settings', (err, data) => {
+      console.log({data})
       this.raffleAnnounceInterval = data.raffleAnnounceInterval
-      this.luck.subscribersPercent = data.subscribersPercent
-      this.luck.followersPercent = data.followersPercent
+      this.luck.subscribersPercent = data.luck.subscribersPercent
+      this.luck.followersPercent = data.luck.followersPercent
     })
 
     if (localStorage.getItem('/widget/raffles/eligibility/all')) this.eligibility.all = JSON.parse(localStorage.getItem('/widget/raffles/eligibility/all'))
@@ -330,7 +269,7 @@ export default {
         new Promise((resolve) => {
           this.socket.emit('find', {}, (err, raffles) => {
             const raffle = orderBy(raffles, 'timestamp', 'desc')[0]
-            if (Object.keys(raffle).length > 0) {
+            if (Object.keys(raffle || {}).length > 0) {
               this.running = !raffle.winner
               if (!raffle.winner) {
                 this.keyword = raffle.keyword

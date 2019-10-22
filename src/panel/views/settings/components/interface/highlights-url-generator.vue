@@ -5,7 +5,7 @@
         <template v-if="typeof translatedTitle === 'string'">{{ translatedTitle }}</template>
         <template v-else>
           {{ translatedTitle.title }}
-          <small class="textInputTooltip text-info" data-toggle="tooltip" data-html="true" :title="translatedTitle.help">[?]</small>
+          <small class="text-info" data-toggle="tooltip" data-html="true" :title="translatedTitle.help">[?]</small>
         </template>
       </span>
     </div>
@@ -17,7 +17,7 @@
         <button class="btn" :class="{ 'btn-success': v.clip, 'btn-danger': !v.clip }" @click="v.clip = !v.clip; onChange();">CLIP</button>
         <button class="btn" :class="{ 'btn-success': v.highlight, 'btn-danger': !v.highlight }" @click="v.highlight = !v.highlight; onChange();">HIGHLIGHT</button>
 
-        <button class="btn btn-outline-dark border-0" @click="removeItem(index); onChange()"><i class="fas fa-times"></i></button>
+        <button class="btn btn-outline-dark border-0" @click="removeItem(index); onChange()"><fa icon="times"></fa></button>
       </li>
       <li class="list-group-item">
         <button class="btn btn-success" type="button" @click="currentValues.push({
@@ -25,7 +25,7 @@
           clip: false,
           highlight: false,
         }); onChange();">
-          <i class="fas fa-plus"></i> Generate new url
+          <fa icon="plus"></fa> Generate new url
         </button>
       </li>
     </ul>

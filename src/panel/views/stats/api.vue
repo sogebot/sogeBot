@@ -29,10 +29,7 @@
       </template>
     </panel>
 
-    <div v-if="selectedData.length === 0" class="alert alert-info">
-      <i class="fas fa-circle-notch fa-spin"></i>
-      Waiting for api requests
-    </div>
+    <loading v-if="selectedData.length === 0" slow />
     <template v-else>
       <area-chart :data="graphData"></area-chart>
       <table class="table table-hover">
@@ -77,7 +74,11 @@ Vue.use(Chartkick.use(Chart))
 
 import { getSocket } from 'src/panel/helpers/socket';
 
-@Component({})
+@Component({
+  components: {
+    'loading': () => import('../../components/loading.vue'),
+  }
+})
 export default class apiStats extends Vue {
   socket = getSocket('/');
   moment = moment;

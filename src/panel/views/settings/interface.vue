@@ -178,23 +178,23 @@
           <div class="pl-2 pr-2 pb-4">
             <transition name="fade">
               <div v-show="isDataChanged" class="alert alert-warning" style="cursor: initial">
-                <i class="fas fa-exclamation-circle mr-1"></i>
+                <fa icon="exclamation-circle" class="mr-1"></fa>
                 {{translate('dialog.changesPending')}}
               </div>
             </transition>
             <transition name="fade">
               <div class="alert alert-danger" v-show="error && showError" style="cursor: initial">
-                <i class="fas fa-exclamation-triangle mr-1"></i>
+                <fa icon="exclamation-triangle" class="mr-1"></fa>
                 {{ error }}
               </div>
             </transition>
             <button class="btn btn-block btn-primary" v-on:click="saveSettings" v-if="state.settings === 0">{{ translate('dialog.buttons.saveChanges.idle') }}</button>
             <button disabled="disabled" class="btn btn-block btn-primary" v-on:click="saveSettings" v-if="state.settings === 1">
-              <i class="fas fa-circle-notch fa-spin"></i> {{ translate('dialog.buttons.saveChanges.progress') }}</button>
+              <fa icon="circle-notch" spin></fa> {{ translate('dialog.buttons.saveChanges.progress') }}</button>
             <button disabled="disabled" class="btn btn-block btn-success" v-on:click="saveSettings" v-if="state.settings === 2">
-              <i class="fas fa-check"></i> {{ translate('dialog.buttons.saveChanges.done') }}</button>
+              <fa icon="check"></fa> {{ translate('dialog.buttons.saveChanges.done') }}</button>
             <button disabled="disabled" class="btn btn-block btn-danger" v-on:click="saveSettings" v-if="state.settings === 3">
-              <i class="fas fa-check"></i> {{ translate('dialog.buttons.something-went-wrong') }}</button>
+              <fa icon="check"></fa>anslate('dialog.buttons.something-went-wrong') }}</button>
           </div>
 
             <div class="pl-2 pr-2" v-for="system of list" :key="system.name">
@@ -231,6 +231,11 @@ import { cloneDeep, get, orderBy, pickBy, filter, size } from 'lodash-es';
 import { flatten, unflatten } from 'src/bot/helpers/flatten';
 import { getListOf } from 'src/panel/helpers/getListOf';
 import { getSocket } from 'src/panel/helpers/socket';
+
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
+
+library.add(faExclamationTriangle)
 
 type systemFromIO = { name: string; enabled: boolean; areDependenciesEnabled: boolean; isDisabledByEnv: boolean }
 enum State {

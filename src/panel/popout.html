@@ -11,13 +11,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
   <link href="https://fonts.googleapis.com/css?family=Open+Sans|Poppins|PT+Sans|PT+Sans+Narrow|PT+Mono" rel="stylesheet">
-  <link href="https://use.fontawesome.com/releases/v5.0.6/css/all.css" rel="stylesheet">
   <!-- Latest compiled and minified CSS -->
   <link rel="stylesheet" href="../dist/css/light.css">
-  <!-- Optional theme -->
-  <link rel="stylesheet" href="../dist/css/sortable-theme-bootstrap.css">
-  <link rel="stylesheet" href="../dist/bootstrap-toggle/css/bootstrap-toggle.min.css" />
-  <link rel="stylesheet" href="../dist/bootstrap-slider/css/bootstrap-slider.min.css" />
+
   <script src="/socket.io/socket.io.js"></script>
 
   <style>
@@ -25,68 +21,57 @@
       height: 100%;
     }
 
-    #widget {
+    #app {
       height:100%
     }
 
     .card, .widget {
       border: 0 !important;
     }
+
+    .lds-hourglass {
+      display: inline-block;
+      position: relative;
+      width: 64px;
+      height: 64px;
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+    }
+    .lds-hourglass:after {
+      content: " ";
+      display: block;
+      border-radius: 50%;
+      width: 0;
+      height: 0;
+      margin: 6px;
+      box-sizing: border-box;
+      border: 26px solid #000;
+      border-color: #000 transparent #000 transparent;
+      animation: lds-hourglass 1.2s infinite;
+    }
+    @keyframes lds-hourglass {
+      0% {
+        transform: rotate(0);
+        animation-timing-function: cubic-bezier(0.55, 0.055, 0.675, 0.19);
+      }
+      50% {
+        transform: rotate(900deg);
+        animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+      }
+      100% {
+        transform: rotate(1800deg);
+      }
+    }
   </style>
 </head>
 
 <body style="padding-top: 0; height: 100%; width: 100%">
-  <div id="popout"> </div>
+  <div id="app">
+    <div class="lds-hourglass"></div>
+  </div>
 
-  <!-- jQuery and Popper (necessary for Bootstrap's JavaScript plugins) -->
-  <script src="../dist/jquery/js/jquery.min.js"></script>
-  <script src="../dist/popper.js/js/popper.min.js"></script>
-  <!-- Router -->
-  <script src="../dist/page/js/page.js"></script>
-  <!-- LoDash goodness -->
-  <script src="../dist/lodash/js/lodash.min.js"></script>
-  <!-- Latest compiled and minified JavaScript -->
-  <script src="../dist/bootstrap/js/bootstrap.min.js" crossorigin="anonymous"></script>
-  <script type="text/javascript" src="../dist/bootstrap-toggle/js/bootstrap-toggle.min.js"></script>
-  <script type="text/javascript" src="../dist/bootstrap-slider/js/bootstrap-slider.min.js"></script>
-  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.20.1/moment-with-locales.min.js"></script>
-  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/markdown-it/8.3.1/markdown-it.js"></script>
   <script type="text/javascript" src="/auth/token.js"></script>
-  <script src="/dist/velocity-animate/js/velocity.min.js"></script>
-
-  <script>
-    var socket = io({
-      query: "token=" + token
-    });
-
-    var translations = {}
-    var configuration = {}
-
-    socket.emit('getConfiguration')
-    socket.on('configuration', function (data) {
-      configuration = data
-      moment.locale(data.lang) // set moment locale
-      /* THEME */
-      if (data.core.ui.theme === 'dark') {
-        $('head').append('<link rel="stylesheet" href="../dist/css/dark.css">')
-      } else {
-        $('head').append('<link rel="stylesheet" href="../dist/css/light.css">')
-      }
-    })
-
-    socket.on('lang', function (data) {
-      translations = data
-      let elements = $('[data-lang]')
-      for (let el of elements) {
-        let translation = _.get(translations, $(el).data('lang'), null)
-        if(_.isNil(translation)) {
-          $(el).html(`{${$(el).data('lang')}}`)
-        } else {
-          $(el).html(translation)
-        }
-      }
-    })
-  </script>
 </body>
-
 </html>

@@ -5,7 +5,7 @@
         <template v-if="typeof title === 'string'">{{ title }}</template>
         <template v-else>
           {{ title.title }}
-          <small class="textInputTooltip text-info pl-1" data-toggle="tooltip" data-html="true" :title="title.help">[?]</small>
+          <small class="text-info pl-1" data-toggle="tooltip" data-html="true" :title="title.help">[?]</small>
         </template>
       </span>
     </div>

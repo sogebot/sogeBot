@@ -41,7 +41,7 @@ class Chat extends Widget {
             cb(null, {chatters});
           }
         } catch (e) {
-          cb(e);
+          cb(e.message, {});
         }
       });
     });

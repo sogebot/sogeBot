@@ -12,8 +12,8 @@
       <div class="list-group">
         <button :key="index" v-for="(item, index) of items" type="button" style="padding: 0.25rem 1.25rem" class="list-group-item list-group-item-action" @click="items[index].completed = !items[index].completed; onChange()">
           <span class="pr-1" :class="[item.completed? 'text-success' : 'text-danger']">
-            <template v-if="item.completed"><i class="far fa-check-square"></i></template>
-            <template v-else><i class="far fa-square"></i></template>
+            <fa v-if="item.completed" :icon="['far', 'check-square']"></fa>
+            <fa v-else :icon="['far', 'square']"></fa>
           </span>
           {{ item.text }}
         </button>
@@ -26,8 +26,12 @@
 <script>
 import { getSocket } from 'src/panel/helpers/socket';
 import { debounce } from 'lodash-es';
+
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faCheckSquare, faSquare } from '@fortawesome/free-regular-svg-icons';
+library.add(faCheckSquare, faSquare);
+
 export default {
-  props: ['commons', 'systems'],
   data: function () {
     return {
       bDisplay: false,
@@ -42,7 +46,7 @@ export default {
       else return 'btn-outline-'
     },
     isSystemEnabled: function () {
-      return this.systems.find(o => o.name === 'checklist').enabled
+      return this.$systems.find(o => o.name === 'checklist').enabled
     },
     completed: function () {
       return this.items.filter(o => o.completed).length

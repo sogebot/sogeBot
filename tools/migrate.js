@@ -27,14 +27,25 @@ const end = function (updated) {
 };
 
 const migration = {
+  21: async () => {
+    header('Add order for cmdboard widget');
+    let updated = 0;
+
+    const items = await global.db.engine.find('widgetsCmdBoard');
+    for (const item of items) {
+      await global.db.engine.update('widgetsCmdBoard', { _id: String(item._id) }, { order: updated });
+      updated++;
+    }
+    end(updated);
+  },
   20: async () => {
     header('Add id for carousel overlay');
     let updated = 0;
 
-    const items = await global.db.engine.find('overlays.carouse');
+    const items = await global.db.engine.find('overlays.carousel');
     for (const item of items) {
       const id = uuidv4();
-      await global.db.engine.update('overlays.carouse', { _id: String(item._id) }, { id });
+      await global.db.engine.update('overlays.carousel', { _id: String(item._id) }, { id });
       updated++;
     }
     end(updated);

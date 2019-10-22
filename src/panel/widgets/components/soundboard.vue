@@ -1,63 +1,51 @@
-<template>
-<div class="card widget">
-  <div class="card-header">
-    <ul class="nav nav-pills" role="tablist">
-      <li role="presentation" class="nav-item">
-        <a class="nav-link active" href="#soundboard-main" aria-controls="home" role="tab" data-toggle="tab" title="SoundBoard">
-          <fa icon="music" />
-        </a>
-      </li>
-      <li role="presentation" class="nav-item">
-        <span class="dropdown">
-          <a class="nav-link nav-dropdown" id="dropdownMenuButton" data-boundary="viewPort" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="cursor: pointer; padding: 10px">
-            <fa icon="volume-up" v-if="volume >= 65"></fa>
-            <fa icon="volume-down" v-else-if="volume >= 35"></fa>
-            <fa icon="volume-off" v-else></fa>
-            <small>{{ volume }}%</small>
-          </a>
-          <span class="dropdown-volume-handler">
-            <div class="dropdown-menu dropdown-force-visible" data-allow-focus aria-labelledby="dropdownMenuButton" style="padding:0; margin: 0;">
-              <div class="progress" @click="setVolume" style="height: 1.5rem">
-                <div class="progress-bar" role="progressbar" :style="{ width: volume + '%'}"></div>
-              </div>
-            </div>
-          </span>
-        </span>
-      </li>
-      <li class="nav-item ml-auto">
-        <h6 class="widget-title">{{ translate('widget-title-soundboard') }}</h6>
-      </li>
-    </ul>
-  </div>
+<template lang="pug">
+  div.widget
+    b-card(no-body).border-0.h-100
+      b-tabs(pills card style="overflow:hidden").h-100
+        template(v-slot:tabs-start)
+          template(v-if="!popout")
+            li(v-if="typeof nodrag === 'undefined'").nav-item.px-2.grip.text-secondary.align-self-center
+              fa(icon="grip-vertical" fixed-width)
+          li.nav-item
+            b-dropdown(ref="dropdown" boundary="window" no-caret :text="translate('widget-title-soundboard')" variant="outline-primary" toggle-class="border-0")
+              b-dropdown-form
+                input(type="range" step="1" v-model.number="volume").w-100
+              template(v-if="!popout")
+                b-dropdown-divider
+                b-dropdown-item
+                  a(href="#" @click.prevent="$refs.dropdown.hide(); $nextTick(() => EventBus.$emit('remove-widget', 'soundboard'))" class="text-danger")
+                    | Remove <strong>{{translate('widget-title-soundboard')}}</strong> widget
 
-  <!-- Tab panes -->
-  <div class="card-body">
-    <div class="tab-content">
-      <div role="tabpanel" class="tab-pane active" id="soundboard-main">
-        <div id="soundboard-list" class="row">
-          <div class="col-4" v-for="sound of sounds" :key="sound">
-            <button
-              class="btn btn-outline-dark soundboard-list-group-item"
-              style="border: 0;padding: 0; padding-bottom: 0.4rem;"
-              v-on:click="play(sound)" type="button">
-              {{sound}}
-            </button>
-          </div>
-        </div>
-        <div class="clearfix"></div>
-      </div>
-      <!-- /MAIN -->
-    </div>
-  </div>
-</div>
+        b-tab
+          template(v-slot:title)
+            fa(icon="music" fixed-width)
+          b-card-text
+            b-container
+              b-row(no-gutters)
+                b-col(cols="4" v-for="sound of sounds" :key="sound").px-1.pt-0.pb-1
+                  button(
+                    style="overflow: hidden;"
+                    class="btn btn-outline-secondary border-0 soundboard-list-group-item btn-block"
+                    v-on:click="play(sound)" type="button"
+                  ) {{sound}}
+
+        template(v-slot:tabs-end)
+          b-nav-item
+            fa(icon="volume-up" v-if="volume >= 65")
+            fa(icon="volume-down" v-else-if="volume >= 35")
+            fa(icon="volume-off" v-else)
+            small &nbsp; {{ volume }}%
 </template>
 
 <script>
+import { EventBus } from 'src/panel/helpers/event-bus';
 import { getSocket } from 'src/panel/helpers/socket';
 import { isNil } from 'lodash-es';
 export default {
+  props: ['popout', 'nodrag'],
   data: function () {
     return {
+      EventBus,
       socket: getSocket('/widgets/soundboard'),
       volume: 50,
       audio: null,

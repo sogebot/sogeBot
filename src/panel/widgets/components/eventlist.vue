@@ -1,204 +1,117 @@
-<template>
-<div class="card widget">
-  <div class="card-header">
-    <ul class="nav nav-pills" role="tablist">
-      <li role="presentation" class="nav-item">
-        <a class="nav-link active" href="#eventlist-main" aria-controls="home" role="tab" data-toggle="tab" title="EventList">
-          <fa :icon='["far", "calendar"]'></fa>
-        </a>
-      </li>
-      <li role="presentation" class="nav-item">
-        <span class="dropdown" id="eventlistDropdown">
-          <a class="nav-link nav-dropdown" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="cursor: pointer; padding: 10px">
-            <fa icon="eye"></fa>
-          </a>
-          <span id="eventlistDropdownData">
-            <div class="dropdown-menu dropdown-force-visible" data-allow-focus aria-labelledby="dropdownMenuButton" style="padding:0; margin: 0;">
-              <button
-                class="btn nav-btn"
-                :class="[ settings.widgetEventlistFollows ? 'btn-outline-success' : 'btn-outline-danger' ]"
-                @click="toggle('widgetEventlistFollows')">
-                <font-awesome-layers style="height: 1em; line-height: 0.8em; width: 1em">
-                  <fa icon="heart"></fa>
-                </font-awesome-layers>
-              </button>
-              <button
-                class="btn nav-btn"
-                :class="[ settings.widgetEventlistHosts ? 'btn-outline-success' : 'btn-outline-danger' ]"
-                @click="toggle('widgetEventlistHosts')">
-                <font-awesome-layers style="height: 1em; line-height: 0.8em; width: 1em">
-                  <fa icon="tv"></fa>
-                </font-awesome-layers>
-              </button>
-              <button
-                class="btn nav-btn"
-                :class="[ settings.widgetEventlistRaids ? 'btn-outline-success' : 'btn-outline-danger' ]"
-                @click="toggle('widgetEventlistRaids')">
-                <font-awesome-layers style="height: 1em; line-height: 0.8em; width: 1em">
-                  <fa icon="random"></fa>
-                </font-awesome-layers>
-              </button>
-              <button
-                class="btn nav-btn"
-                :class="[ settings.widgetEventlistCheers ? 'btn-outline-success' : 'btn-outline-danger' ]"
-                @click="toggle('widgetEventlistCheers')">
-                <font-awesome-layers style="height: 1em; line-height: 0.8em; width: 1em">
-                  <fa icon="gem"></fa>
-                </font-awesome-layers>
-              </button>
-              <button
-                class="btn nav-btn"
-                :class="[ settings.widgetEventlistSubs ? 'btn-outline-success' : 'btn-outline-danger' ]"
-                @click="toggle('widgetEventlistSubs')">
-                <font-awesome-layers style="height: 1em; line-height: 0.8em; width: 1em">
-                  <fa icon="star"></fa>
-                </font-awesome-layers>
-              </button>
-              <button
-                class="btn nav-btn"
-                :class="[ settings.widgetEventlistSubgifts ? 'btn-outline-success' : 'btn-outline-danger' ]"
-                @click="toggle('widgetEventlistSubgifts')">
-                <font-awesome-layers style="height: 1em; line-height: 0.8em; width: 1em">
-                  <fa icon="gift"></fa>
-                </font-awesome-layers>
-              </button>
-              <button
-                class="btn nav-btn"
-                :class="[ settings.widgetEventlistSubcommunitygifts ? 'btn-outline-success' : 'btn-outline-danger' ]"
-                @click="toggle('widgetEventlistSubcommunitygifts')">
-                <font-awesome-layers style="height: 1em; line-height: 0.8em; width: 1em">
-                  <fa icon="box-open"></fa>
-                </font-awesome-layers>
-              </button>
-              <button
-                class="btn nav-btn"
-                :class="[ settings.widgetEventlistResubs ? 'btn-outline-success' : 'btn-outline-danger' ]"
-                @click="toggle('widgetEventlistResubs')">
-                <font-awesome-layers style="height: 1em; line-height: 0.8em; width: 1em">
-                  <fa icon="star-half"></fa>
-                  <fa icon="long-arrow-alt-right"></fa>
-                </font-awesome-layers>
-              </button>
-              <button
-                class="btn nav-btn"
-                :class="[ settings.widgetEventlistTips ? 'btn-outline-success' : 'btn-outline-danger' ]"
-                @click="toggle('widgetEventlistTips')">
-                <font-awesome-layers style="height: 1em; line-height: 0.8em; width: 1em">
-                  <fa icon="dollar-sign"></fa>
-                </font-awesome-layers>
-              </button>
-            </div>
-          </span>
-        </span>
-      </li>
-      <li role="presentation">
-        <a class="nav-link" href="#eventlist-settings" aria-controls="home" role="tab" data-toggle="tab" title="Settings">
-          <fa icon="cog"></fa>
-        </a>
-      </li>
-      <li role="presentation" class="nav-item widget-popout" v-if="!popout">
-        <a class="nav-link" title="Popout" target="_blank" href="/popout/#eventlist">
-          <fa icon="external-link-alt"></fa>
-        </a>
-      </li>
-      <li class="nav-item ml-auto">
-        <h6 class="widget-title" >{{translate('eventlist')}}</h6>
-      </li>
-    </ul>
-  </div>
-  <!-- Tab panes -->
-  <div class="card-body">
-    <div class="tab-content">
-      <div role="tabpanel" class="tab-pane active" id="eventlist-main">
-        <div class="list-group" v-if="events">
-          <div
-            v-for="(event, index) of fEvents"
-            :key="index"
-            class="list-group-item"
-            style="border-left: 0; border-right: 0; padding: 0.2rem 1.25rem 0.4rem 1.25rem">
-            <i :title="moment(event.timestamp).format('LLLL')" class="eventlist-text">{{moment(event.timestamp).fromNow()}}</i>
-            <div class="eventlist-username" :style="{'font-size': eventlistSize + 'px'}">
-              <div class="d-flex">
-                <div class="w-100">
-                  <span :title="event.username" style="z-index: 9">{{event.username}}</span>
-                  <span v-html="prepareMessage(event)"></span>
-                </div>
-                <div style="flex-shrink: 15;">
-                  <fa v-if="event.event === 'follow'" icon="heart" :class="[`icon-${event.event}`, 'icon']" />
-                  <fa v-if="event.event === 'host'" icon="tv" :class="[`icon-${event.event}`, 'icon']" />
-                  <fa v-if="event.event === 'raid'" icon="random" :class="[`icon-${event.event}`, 'icon']" />
-                  <fa v-if="event.event === 'sub'" icon="star" :class="[`icon-${event.event}`, 'icon']" />
-                  <fa v-if="event.event === 'subgift'" icon="gift" :class="[`icon-${event.event}`, 'icon']" />
-                  <fa v-if="event.event === 'subcommunitygift'" icon="box-open" :class="[`icon-${event.event}`, 'icon']" />
-                  <font-awesome-layers v-if="event.event === 'resub'" :class="[`icon-${event.event}`, 'icon']">
-                    <fa icon="star-half"></fa>
-                    <fa icon="long-arrow-alt-right"></fa>
-                  </font-awesome-layers>
-                  <fa v-if="event.event === 'cheer'" icon="gem" :class="[`icon-${event.event}`, 'icon']" />
-                  <fa v-if="event.event === 'tip'" icon="dollar-sign" :class="[`icon-${event.event}`, 'icon']" />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="alert alert-primary" role="alert" v-else>
-          <fa icon="circle-notch" spin />
-          <strong>loading data...</strong>
-        </div>
-      </div>
-      <!-- /MAIN -->
+<template lang="pug">
+  div.widget
+    b-card(no-body).border-0.h-100
+      b-tabs(pills card style="overflow:hidden").h-100
+        template(v-slot:tabs-start)
+          template(v-if="!popout")
+            li.nav-item.px-2.grip.text-secondary.align-self-center
+              fa(icon="grip-vertical" fixed-width)
+          li.nav-item
+            b-dropdown(ref="dropdown" boundary="window" no-caret :text="translate('widget-title-eventlist')" variant="outline-primary" toggle-class="border-0")
+              b-dropdown-group(header="Events filtering")
+                b-dropdown-form
+                  b-button(@click="toggle('widgetEventlistFollows')" :variant="settings.widgetEventlistFollows ? 'success' : 'danger'")
+                    fa(icon="heart")
+                  b-button(@click="toggle('widgetEventlistHosts')" :variant="settings.widgetEventlistHosts ? 'success' : 'danger'")
+                    fa(icon="tv")
+                  b-button(@click="toggle('widgetEventlistRaids')" :variant="settings.widgetEventlistRaids ? 'success' : 'danger'")
+                    fa(icon="random")
+                  b-button(@click="toggle('widgetEventlistCheers')" :variant="settings.widgetEventlistCheers ? 'success' : 'danger'")
+                    fa(icon="gem")
+                  b-button(@click="toggle('widgetEventlistSubs')" :variant="settings.widgetEventlistSubs ? 'success' : 'danger'")
+                    fa(icon="star")
+                  b-button(@click="toggle('widgetEventlistSubgifts')" :variant="settings.widgetEventlistSubgifts ? 'success' : 'danger'")
+                    fa(icon="gift")
+                  b-button(@click="toggle('widgetEventlistSubcommunitygifts')" :variant="settings.widgetEventlistSubcommunitygifts ? 'success' : 'danger'")
+                    fa(icon="box-open")
+                  b-button(@click="toggle('widgetEventlistResubs')" :variant="settings.widgetEventlistResubs ? 'success' : 'danger'")
+                    font-awesome-layers
+                      fa(icon="star-half")
+                      fa(icon="long-arrow-alt-right")
+                  b-button(@click="toggle('widgetEventlistTips')" :variant="settings.widgetEventlistTips ? 'success' : 'danger'")
+                    fa(icon="dollar-sign")
+              template(v-if="!popout")
+                b-dropdown-divider
+                b-dropdown-item(target="_blank" href="/popout/#eventlist")
+                  | Popout
+                b-dropdown-divider
+                b-dropdown-item
+                  a(href="#" @click.prevent="$refs.dropdown.hide(); $nextTick(() => EventBus.$emit('remove-widget', 'eventlist'))").text-danger
+                    | Remove <strong>{{translate('widget-title-eventlist')}}</strong> widget
 
-      <div role="tabpanel" class="tab-pane" id="eventlist-settings">
-        <div class="input-group">
-          <div class="input-group-prepend">
-            <span class="input-group-text">{{translate('eventlist-show-number')}}</span>
-          </div>
-          <input type="text" class="form-control" v-model="eventlistShow">
-          <div class="input-group-append">
-            <span class="input-group-text">{{translate('eventlist-show')}}</span>
-          </div>
-        </div>
-        <div class="input-group">
-          <div class="input-group-prepend">
-            <span class="input-group-text">{{translate('followers-size')}}</span>
-          </div>
-          <input type="text" class="form-control" v-model="eventlistSize">
-          <div class="input-group-append">
-            <span class="input-group-text">px</span>
-          </div>
-        </div>
-        <div class="input-group">
-          <div class="input-group-prepend">
-            <span class="input-group-text">{{translate('followers-message-size')}}</span>
-          </div>
-          <input type="text" class="form-control" v-model="eventlistMessageSize">
-          <div class="input-group-append">
-            <span class="input-group-text">px</span>
-          </div>
-        </div>
-        <hold-button class="mt-2 btn btn-danger w-100" icon="eraser" @trigger="cleanup()">
-          <template slot="title">Cleanup</template>
-          <template slot="onHoldTitle">Hold to cleanup</template>
-        </hold-button>
-      </div>
-      <!-- /SETTINGS -->
-    </div>
-  </div>
-</div>
+        b-tab(active)
+          template(v-slot:title)
+            fa(:icon='["far", "calendar"]' fixed-width)
+          b-card-text
+            loading(v-if="state.loading === $state.progress")
+            b-list-group(v-else)
+              b-list-group-item(
+                v-for="(event, index) of fEvents"
+                :key="index"
+                style="border-left: 0; border-right: 0; padding: 0.2rem 1.25rem 0.4rem 1.25rem"
+              )
+                i(:title="moment(event.timestamp).format('LLLL')").eventlist-text
+                  | {{moment(event.timestamp).fromNow()}}
+                div(:style="{'font-size': eventlistSize + 'px'}").eventlist-username
+                  div.d-flex
+                    div.w-100
+                      span(:title="event.username" style="z-index: 9") {{event.username}}
+                      span(v-html="prepareMessage(event)").pl-1
+                    div(style="flex-shrink: 15;")
+                      fa(v-if="event.event === 'follow'" icon="heart" :class="[`icon-${event.event}`, 'icon']")
+                      fa(v-if="event.event === 'host'" icon="tv" :class="[`icon-${event.event}`, 'icon']")
+                      fa(v-if="event.event === 'raid'" icon="random" :class="[`icon-${event.event}`, 'icon']")
+                      fa(v-if="event.event === 'sub'" icon="star" :class="[`icon-${event.event}`, 'icon']")
+                      fa(v-if="event.event === 'subgift'" icon="gift" :class="[`icon-${event.event}`, 'icon']")
+                      fa(v-if="event.event === 'subcommunitygift'" icon="box-open" :class="[`icon-${event.event}`, 'icon']")
+                      font-awesome-layers(v-if="event.event === 'resub'" :class="[`icon-${event.event}`, 'icon']")
+                        fa(icon="star-half")
+                        fa(icon="long-arrow-alt-right")
+                      fa(v-if="event.event === 'cheer'" icon="gem" :class="[`icon-${event.event}`, 'icon']")
+                      fa(v-if="event.event === 'tip'" icon="dollar-sign" :class="[`icon-${event.event}`, 'icon']")
+        b-tab
+          template(v-slot:title)
+            fa(icon="cog" fixed-width)
+          b-card-text
+            div.input-group
+              div.input-group-prepend
+                span.input-group-text {{translate('eventlist-show-number')}}
+              input(type="text" v-model="eventlistShow").form-control
+              div.input-group-append
+                span.input-group-text {{translate('eventlist-show')}}
+            div.input-group
+              div.input-group-prepend
+                span.input-group-text {{translate('followers-size')}}
+              input(type="text" v-model="eventlistSize").form-control
+              div.input-group-append
+                span.input-group-text px
+            div.input-group
+              div.input-group-prepend
+                span.input-group-text {{translate('followers-message-size')}}
+              input(type="text" v-model="eventlistMessageSize").form-control
+              div.input-group-append
+                span.input-group-text px
+            hold-button(icon="eraser" @trigger="cleanup()").mt-2.btn.btn-danger.w-100
+              template(slot="title") Cleanup
+              template(slot="onHoldTitle") Hold to cleanup
 </template>
 
 <script>
 import { getSocket } from 'src/panel/helpers/socket';
+import { EventBus } from 'src/panel/helpers/event-bus';
 import { FontAwesomeLayers } from '@fortawesome/vue-fontawesome'
 import { chunk, debounce, get, isNil } from 'lodash-es';
+import moment from 'moment';
 export default {
-  props: ['popout'],
+  props: ['popout', 'nodrag'],
   components: {
     'font-awesome-layers': FontAwesomeLayers,
     holdButton: () => import('../../components/holdButton.vue'),
+    loading: () => import('src/panel/components/loading.vue'),
   },
   data: function () {
     return {
+      EventBus,
       socket: getSocket('/widgets/eventlist'),
       settings: {
         widgetEventlistFollows: true,
@@ -211,8 +124,11 @@ export default {
         widgetEventlistResubs: true,
         widgetEventlistTips: true,
       },
+      state: {
+        loading: this.$state.progress,
+      },
       update: String(new Date()),
-      events: null,
+      events: [],
       eventlistShow: 0,
       eventlistSize: 0,
       eventlistMessageSize: 0,
@@ -236,6 +152,7 @@ export default {
     })
   },
   created: function () {
+    this.state.loading = this.$state.progress
     this.socket.emit('settings', (e, data) => {
       this.settings = {
         widgetEventlistFollows: isNil(data.widgetEventlistFollows) ? true : data.widgetEventlistFollows,
@@ -257,7 +174,10 @@ export default {
       console.groupEnd()
     })
     this.socket.emit('get') // get initial widget state
-    this.socket.on('update', events => this.events = events)
+    this.socket.on('update', events => {
+      this.state.loading = this.$state.success
+      this.events = events
+    })
 
     // refresh timestamps
     this.interval.push(setInterval(() => this.socket.emit('get'), 60000))

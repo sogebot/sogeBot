@@ -92,8 +92,8 @@ import { Vue, Component } from 'vue-property-decorator';
 import { isNil, orderBy } from 'lodash-es';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faEye, faEyeSlash, faPlay, faStop, faKey } from '@fortawesome/free-solid-svg-icons';
-library.add(faEye, faEyeSlash, faPlay, faKey, faStop);
+import { faEye, faExclamationTriangle, faEyeSlash, faPlay, faStop, faKey } from '@fortawesome/free-solid-svg-icons';
+library.add(faEye, faEyeSlash, faExclamationTriangle, faPlay, faKey, faStop);
 
 import { getSocket } from '../../../helpers/socket';
 

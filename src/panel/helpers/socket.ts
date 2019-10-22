@@ -1,12 +1,17 @@
 import io from 'socket.io-client';
-declare let token: string;
+
+declare global {
+  interface Window {
+    token: string | undefined;
+  }
+}
 import { setTranslations } from './translate';
 
 const sockets: {[namespace: string]: SocketIOClient.Socket} = {};
 
 export function getSocket(namespace: string) {
   if (typeof sockets[namespace] === 'undefined') {
-    sockets[namespace] = io(namespace, { query: 'token=' + token, forceNew: true });
+    sockets[namespace] = io(namespace, { query: 'token=' + window.token, forceNew: true });
   }
   return sockets[namespace];
 }

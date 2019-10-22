@@ -28,7 +28,7 @@ class Text extends Overlay {
           if (!_.isNil(match)) {
             for (const variable of item.text.match(regexp)) {
               const isVariable = await global.customvariables.isVariableSet(variable);
-              let value = `<strong><i class="fas fa-dollar-sign">_${variable.replace('$_', '')}</i></strong>`;
+              let value = `<strong>$_${variable.replace('$_', '')}</strong>`;
               if (isVariable) {
                 value = await global.customvariables.getValueOf(variable);
               }

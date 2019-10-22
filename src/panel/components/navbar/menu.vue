@@ -1,16 +1,17 @@
 <template>
   <perfect-scrollbar class="main-menu" :options="{useBothWheelAxes: true, suppressScrollY: true}">
-    <nav class="nav d-flex justify-content-between" style="width: max-content">
+    <nav id="menu-detach" class="nav d-flex justify-content-between" style="width: max-content">
       <span v-for="category of categories" :key="category">
-        <a href="#" class="nav-link dropdown-toggle text-dark p-1" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-          {{ translate('menu.' + category) }}
-          <span class="caret"></span>
-        </a>
-        <ul class="main-dropdown-menu dropdown-menu dropdown-detach">
-          <li v-for="item of menu.filter(o => o.category === category)" :key="item.id + item.name + item.category" class="nav-item">
-            <a class="nav-link text-dark" :href="'#/' + item.id.replace(/\./g, '/')" :data-page="item.id.replace(/\./g, '/')">{{translate('menu.' + item.name)}}</a>
-          </li>
-        </ul>
+        <b-dropdown variant="light">
+          <template v-slot:button-content>
+            {{ translate('menu.' + category) }}
+          </template>
+          <b-dropdown-item v-for="item of menu.filter(o => o.category === category)"
+                           :key="item.id + item.name + item.category"
+                           :href="'#/' + item.id.replace(/\./g, '/')">
+            {{translate('menu.' + item.name)}}
+          </b-dropdown-item>
+        </b-dropdown>
       </span>
     </nav>
   </perfect-scrollbar>
@@ -20,7 +21,7 @@
 import { Vue, Component } from 'vue-property-decorator';
 import { PerfectScrollbar } from 'vue2-perfect-scrollbar'
 import 'vue2-perfect-scrollbar/dist/vue2-perfect-scrollbar.css'
-import { getSocket } from '../helpers/socket';
+import { getSocket } from 'src/panel/helpers/socket';
 
 @Component({
   components: {
