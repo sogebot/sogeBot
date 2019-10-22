@@ -98,7 +98,7 @@ export default class textOverlayList extends Vue {
     state: { loaded: boolean; } = { loaded: false }
     showMore: string[] = [];
     items: any[] = [];
-    socket = getSocket('/overlays/text');
+    socket = getSocket('/registry/text');
 
     get filtered() {
       if (this.search.length === 0) return this.items

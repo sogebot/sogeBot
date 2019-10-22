@@ -1,25 +1,16 @@
 import * as _ from 'lodash';
 
-import { ui } from '../decorators';
 import Message from '../message';
-import Overlay from './_interface';
+import Registry from './_interface';
 
-class Text extends Overlay {
-  @ui({
-    type: 'link',
-    href: '/overlays/text',
-    class: 'btn btn-primary btn-block',
-    rawText: '/overlays/text',
-    target: '_blank',
-  }, 'links')
-  linkBtn = null;
+class Text extends Registry {
   constructor () {
     super();
     this.addMenu({ category: 'registry', name: 'textoverlay', id: 'registry.textoverlay/list' });
   }
 
   sockets () {
-    global.panel.io.of('/overlays/text').on('connection', (socket) => {
+    global.panel.io.of('/registry/text').on('connection', (socket) => {
       const regexp = new RegExp('\\$_[a-zA-Z0-9_]+', 'g');
       socket.on('get', async (_id, callback) => {
         const item = await global.db.engine.findOne(this.collection.data, { _id });
