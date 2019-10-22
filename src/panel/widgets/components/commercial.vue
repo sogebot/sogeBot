@@ -26,7 +26,7 @@
                 b-form-input(v-model="value" max="180" min="30" step="30" type="range")
               b-col.p-0
                 b-button(size="sm" @click="run").btn-block Run commercial ({{ formatTime() }})
-            hr(v-else).border-primary.shrink-animation(style="border-width: 2px;margin: auto; margin-top: 1em;" :style="{animation: 'shrink-commercial-animation ' + value + 's'}")
+            hr(v-else style="border-width: 2px;margin: auto; margin-top: 1em;" :style="{animation: 'shrink-commercial-animation ' + value + 's'}").border-primary.shrink-animation
 </template>
 
 <script>
