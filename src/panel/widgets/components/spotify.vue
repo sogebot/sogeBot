@@ -1,88 +1,69 @@
-<template>
-<div class="card widget">
-  <div class="card-header" @contextmenu.prevent="context.open($event, 'spotify')">
-    <ul class="nav nav-pills" role="tablist">
-      <li role="presentation" class="nav-item" style="flex-shrink: 0">
-        <hold-button icon="list" class="nav-link btn btn-outline-danger border-0 h-100 pl-1 pr-1" @trigger="cleanupSongRequestList()">
-          <template v-slot:icon>
-            <font-awesome-layers>
-              <fa icon="list" transform="left-3"/>
-              <fa icon="times" transform="shrink-8 down-9 right-9"/>
-            </font-awesome-layers>
-          </template>
-        </hold-button>
-      </li>
-      <li role="presentation" class="nav-item" style="flex-shrink: 0">
-        <a class="nav-link active" href="#spotify-song-requests" aria-controls="home" role="tab" data-toggle="tab" title="Song Requests">
-          <small>{{ requests.length }}</small>
-          <fa icon="list" />
-        </a>
-      </li>
-      <li role="presentation" class="nav-item" style="flex-shrink: 0">
-        <button class="btn nav-btn btn-link" @click="next">
-          <fa icon="forward" />
-        </button>
-      </li>
-      <li role="presentation" class="nav-item" style="flex-shrink: 0">
-        <button :class="[songRequestsEnabled ? 'btn-outline-success' : 'btn-outline-danger']"
-                class="nav-link btn btn-outline-success border-0 h-100 pl-1 pr-1"
-                @click="songRequestsEnabled = !songRequestsEnabled">
-          <fa icon="check" fixed-width v-if="songRequestsEnabled"/>
-          <fa icon="times" fixed-width v-else />
-          {{ command }}
-        </button>
-      </li>
-      <li role="presentation" class="nav-item" style="flex-shrink: 0">
-        <button :class="[continueOnPlaylistAfterRequest ? 'btn-outline-success' : 'btn-outline-danger']"
-                class="nav-link btn btn-outline-success border-0 h-100 pl-1 pr-1"
-                @click="continueOnPlaylistAfterRequest = !continueOnPlaylistAfterRequest">
-          <fa icon="check" fixed-width v-if="continueOnPlaylistAfterRequest"/>
-          <fa icon="times" fixed-width v-else />
-          PLAYLIST
-        </button>
-      </li>
-    </ul>
-  </div>
+<template lang="pug">
+  div.widget
+    b-card(no-body).border-0.h-100
+      b-tabs(pills card style="overflow:hidden").h-100
+        template(v-slot:tabs-start v-if="!popout")
+          li.nav-item.px-2.grip.text-secondary.align-self-center
+            fa(icon="grip-vertical" fixed-width)
+          li.nav-item
+            b-dropdown(ref="dropdown" boundary="window" no-caret :text="translate('widget-title-spotify')" variant="outline-primary" toggle-class="border-0")
+              b-dropdown-item
+                a(href="#" @click.prevent="$refs.dropdown.hide(); $nextTick(() => EventBus.$emit('remove-widget', 'spotify'))" class="text-danger")
+                  | Remove <strong>{{translate('widget-title-spotify')}}</strong> widget
+          li.nav-item
+            hold-button(icon="list" @trigger="cleanupSongRequestList()").btn.btn-outline-danger.border-0.px-1
+              template(v-slot:icon)
+                font-awesome-layers
+                  fa(icon="list" transform="left-3" fixed-width)
+                  fa(icon="times" transform="shrink-8 down-9 right-9" fixed-width)
 
-  <!-- Tab panes -->
-  <div class="card-body">
-    <div class="tab-content">
-      <div role="tabpanel" class="tab-pane active" id="spotify-song-requests">
-        <table class="table table-sm">
-          <tr v-for="(request, index) of requests" :key="index">
-            <td>
-              <hold-button @trigger="removeSongRequest(String(index))" icon="times" class="btn-outline-danger btn-only-icon border-0"></hold-button>
-            </td>
-            <td>{{request.song}}</td>
-            <td>{{request.artist}}</td>
-            <td>{{request.requestBy}}</td>
-          </tr>
-        </table>
-      </div>
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</div>
+        b-tab(active)
+          template(v-slot:title)
+            fa(icon="list" fixed-width)
+          b-card-text
+            table.table.table-sm
+              tr(v-for="(request, index) of requests" :key="index")
+                td
+                  hold-button(@trigger="removeSongRequest(String(index))" icon="times" class="btn-outline-danger btn-only-icon border-0")
+                td {{request.song}}
+                td {{request.artist}}
+                td {{request.requestBy}}
+
+        template(v-slot:tabs-end)
+          li.nav-item
+            button(@click="next").btn.btn-primary
+              fa(icon="forward" fixed-width)
+          li.nav-item
+            button(@click="songRequestsEnabled = !songRequestsEnabled" :class="[songRequestsEnabled ? 'btn-outline-success' : 'btn-outline-danger']").btn.btn-outline-success.border-0
+              fa(icon="check" fixed-width v-if="songRequestsEnabled")
+              fa(icon="times" fixed-width v-else)
+              | {{ command }}
+          li.nav-item
+            button(@click="continueOnPlaylistAfterRequest = !continueOnPlaylistAfterRequest" :class="[continueOnPlaylistAfterRequest ? 'btn-outline-success' : 'btn-outline-danger']").btn.btn-outline-success.border-0
+              fa(icon="check" fixed-width v-if="continueOnPlaylistAfterRequest")
+              fa(icon="times" fixed-width v-else)
+              | PLAYLIST
 </template>
 
 <script>
 import { getSocket } from 'src/panel/helpers/socket';
 import { FontAwesomeLayers } from '@fortawesome/vue-fontawesome'
+import { EventBus } from 'src/panel/helpers/event-bus';
 import { debounce } from 'lodash-es';
-
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faList, faTimes } from '@fortawesome/free-solid-svg-icons';
 library.add(faList, faTimes);
 
 export default {
-  props: ['context'],
+  props: ['popout'],
   components: {
     holdButton: () => import('../../components/holdButton.vue'),
     'font-awesome-layers': FontAwesomeLayers,
   },
   data: function () {
     return {
+      EventBus,
       currentSong: {},
       requests: [],
       command: '!spotify',
