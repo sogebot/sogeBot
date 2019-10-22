@@ -1,5 +1,5 @@
 <template lang="pug">
-  div.widget
+  div.widget(ref="widget")
     b-card(no-body).border-0.h-100
       b-tabs(pills card style="overflow:hidden").h-100
         template(v-slot:tabs-start v-if="!popout")
@@ -35,14 +35,20 @@
               fa(icon="forward" fixed-width)
           li.nav-item
             button(@click="songRequestsEnabled = !songRequestsEnabled" :class="[songRequestsEnabled ? 'btn-outline-success' : 'btn-outline-danger']").btn.btn-outline-success.border-0
-              fa(icon="check" fixed-width v-if="songRequestsEnabled")
-              fa(icon="times" fixed-width v-else)
-              | {{ command }}
+              template(v-if="widgetWidth < 400")
+                | !
+              template(v-else)
+                fa(icon="check" fixed-width v-if="songRequestsEnabled")
+                fa(icon="times" fixed-width v-else)
+                | {{ command }}
           li.nav-item
             button(@click="continueOnPlaylistAfterRequest = !continueOnPlaylistAfterRequest" :class="[continueOnPlaylistAfterRequest ? 'btn-outline-success' : 'btn-outline-danger']").btn.btn-outline-success.border-0
-              fa(icon="check" fixed-width v-if="continueOnPlaylistAfterRequest")
-              fa(icon="times" fixed-width v-else)
-              | PLAYLIST
+              template(v-if="widgetWidth < 400")
+                | P
+              template(v-else)
+                fa(icon="check" fixed-width v-if="continueOnPlaylistAfterRequest")
+                fa(icon="times" fixed-width v-else)
+                | PLAYLIST
 </template>
 
 <script>
@@ -64,6 +70,8 @@ export default {
   data: function () {
     return {
       EventBus,
+      widgetWidth: 200,
+      interval: 0,
       currentSong: {},
       requests: [],
       command: '!spotify',
@@ -107,8 +115,13 @@ export default {
       })
     }
   },
+  destroy() {
+    window.clearInterval(this.interval);
+  },
   created: function () {
-    console.log(this.$parent.$refs)
+    this.interval = window.setInterval(() => {
+      this.widgetWidth = this.$refs['widget'].clientWidth;
+    }, 50)
     this.socket.emit('settings', (err, s) => {
       this.command = s.commands['!spotify'];
       this.songRequestsEnabled = s.songRequests;
@@ -118,11 +131,7 @@ export default {
     })
   },
   mounted: function () {
-    this.$emit('mounted')
+    this.widgetWidth = this.$refs['widget'].clientWidth;
   }
 }
 </script>
-
-<style scoped>
-  .nav { flex-wrap: initial; }
-</style>
