@@ -10,7 +10,7 @@ class Text extends Registry {
   }
 
   sockets () {
-    global.panel.io.of('/registry/text').on('connection', (socket) => {
+    global.panel.io.of('/registries/text').on('connection', (socket) => {
       const regexp = new RegExp('\\$_[a-zA-Z0-9_]+', 'g');
       socket.on('get', async (_id, callback) => {
         const item = await global.db.engine.findOne(this.collection.data, { _id });
