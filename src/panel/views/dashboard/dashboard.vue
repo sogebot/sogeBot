@@ -29,7 +29,7 @@
     <!-- mobile show -->
     <div v-if="windowWidth <= 750">
       <template v-for="dashboard of dashboards">
-        <div v-for="item in sortBy(layout[dashboard.id], (o) => o.y)" class="pl-2 pr-2 pb-2" :key="item.id">
+        <div v-for="item in sortBy(layout[dashboard.id], (o) => o.y)" class="pl-2 pr-2 pb-2" :key="item.id" v-show="dashboard.id === currentDashboard">
           <keep-alive>
             <component :is="item.id" :popout="false" nodrag></component>
           </keep-alive>
