@@ -192,6 +192,7 @@ export default {
   props: ['popout', 'nodrag'],
   data: function () {
     return {
+      EventBus,
       orderBy: orderBy,
       raffleAnnounceInterval: 0,
       luck: {

@@ -152,6 +152,7 @@ export default {
   },
   data: function () {
     return {
+      EventBus,
       eligibilityAll: true,
       eligibilityFollowers: false,
       eligibilitySubscribers: false,
