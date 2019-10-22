@@ -51,8 +51,10 @@
                      'text-danger': maxViewers - averageStats.maxViewers > 0,
                      'stats-down': maxViewers - averageStats.maxViewers < 0,
                    }">
-              <fa :icon="maxViewers - averageStats.maxViewers > 0 ? 'caret-up' : 'caret-down'" fixed-width/>
-              {{difference(averageStats.maxViewers, maxViewers)}}}
+              <template v-if="maxViewers - averageStats.maxViewers !== 0">
+                <fa :icon="maxViewers - averageStats.maxViewers > 0 ? 'caret-up' : 'caret-down'" fixed-width/>
+                {{difference(averageStats.maxViewers, maxViewers)}}
+              </template>
             </small>
           </span>
           <span class="stats" v-else>&nbsp;</span>
@@ -75,8 +77,10 @@
                      'text-danger': newChatters - averageStats.newChatters > 0,
                      'stats-down': newChatters - averageStats.newChatters < 0,
                    }">
-              <fa :icon="newChatters - averageStats.newChatters > 0 ? 'caret-up' : 'caret-down'" fixed-width/>
-              {{difference(averageStats.newChatters, newChatters)}}}
+              <template v-if="newChatters - averageStats.newChatters !== 0">
+                <fa :icon="newChatters - averageStats.newChatters > 0 ? 'caret-up' : 'caret-down'" fixed-width/>
+                {{difference(averageStats.newChatters, newChatters)}}
+              </template>
             </small>
           </span>
           <span class="stats" v-else>&nbsp;</span>
@@ -93,8 +97,10 @@
                      'text-danger': chatMessages - averageStats.chatMessages > 0,
                      'stats-down': chatMessages - averageStats.chatMessages < 0,
                    }">
-              <fa :icon="chatMessages - averageStats.chatMessages > 0 ? 'caret-up' : 'caret-down'" fixed-width/>
-              {{difference(averageStats.chatMessages, chatMessages)}}}
+              <template v-if="chatMessages - averageStats.chatMessages !== 0">
+                <fa :icon="chatMessages - averageStats.chatMessages > 0 ? 'caret-up' : 'caret-down'" fixed-width/>
+                {{difference(averageStats.chatMessages, chatMessages)}}
+              </template>
             </small>
           </span>
         </div>
@@ -110,8 +116,10 @@
                      'text-danger': currentViews - averageStats.currentViews > 0,
                      'stats-down': currentViews - averageStats.currentViews < 0,
                    }">
-              <fa :icon="currentViews - averageStats.currentViews > 0 ? 'caret-up' : 'caret-down'" fixed-width/>
-              {{difference(averageStats.currentViews, currentViews)}}}
+              <template v-if="currentViews - averageStats.currentViews !== 0">
+                <fa :icon="currentViews - averageStats.currentViews > 0 ? 'caret-up' : 'caret-down'" fixed-width/>
+                {{difference(averageStats.currentViews, currentViews)}}
+              </template>
             </small>
           </span>
         </div>
@@ -133,8 +141,10 @@
                      'text-danger': currentFollowers - averageStats.currentFollowers > 0,
                      'stats-down': currentFollowers - averageStats.currentFollowers < 0,
                    }">
-              <fa :icon="currentFollowers - averageStats.currentFollowers > 0 ? 'caret-up' : 'caret-down'" fixed-width/>
-              {{difference(averageStats.currentFollowers, currentFollowers)}}}
+              <template v-if="currentFollowers - averageStats.currentFollowers !== 0">
+                <fa :icon="currentFollowers - averageStats.currentFollowers > 0 ? 'caret-up' : 'caret-down'" fixed-width/>
+                {{difference(averageStats.currentFollowers, currentFollowers)}}
+              </template>
             </small>
           </span>
         </div>
@@ -151,8 +161,10 @@
                       'text-danger': currentSubscribers - averageStats.currentSubscribers > 0,
                       'stats-down': currentSubscribers - averageStats.currentSubscribers < 0,
                     }">
-                <fa :icon="currentSubscribers - averageStats.currentSubscribers > 0 ? 'caret-up' : 'caret-down'" fixed-width/>
-                {{difference(averageStats.currentSubscribers, currentSubscribers)}}}
+                <template v-if="currentSubscribers - averageStats.currentSubscribers !== 0">
+                  <fa :icon="currentSubscribers - averageStats.currentSubscribers > 0 ? 'caret-up' : 'caret-down'" fixed-width/>
+                  {{difference(averageStats.currentSubscribers, currentSubscribers)}}
+                </template>
               </small>
             </span>
           </template>
@@ -173,8 +185,10 @@
                       'text-danger': currentBits - averageStats.currentBits > 0,
                       'stats-down': currentBits - averageStats.currentBits < 0,
                     }">
-                <fa :icon="currentBits - averageStats.currentBits > 0 ? 'caret-up' : 'caret-down'" fixed-width/>
-                {{difference(averageStats.currentBits, currentBits)}}}
+                <template v-if="currentBits - averageStats.currentBits !== 0">
+                  <fa :icon="currentBits - averageStats.currentBits > 0 ? 'caret-up' : 'caret-down'" fixed-width/>
+                  {{difference(averageStats.currentBits, currentBits)}}
+                </template>
               </small>
             </span>
           </template>
@@ -194,8 +208,10 @@
                     'text-danger': currentTips - averageStats.currentTips > 0,
                     'stats-down': currentTips - averageStats.currentTips < 0,
                   }">
-              <fa :icon="currentTips - averageStats.currentTips > 0 ? 'caret-up' : 'caret-down'" fixed-width/>
-              {{difference(averageStats.currentTips, currentTips, false, currency)}}}
+              <template v-if="currentTips - averageStats.currentTips !== 0">
+                <fa :icon="currentTips - averageStats.currentTips > 0 ? 'caret-up' : 'caret-down'" fixed-width/>
+                {{difference(averageStats.currentTips, currentTips, false, currency)}}
+              </template>
             </small>
           </span>
         </div>
@@ -211,8 +227,10 @@
                     'text-danger': currentWatched - averageStats.currentWatched > 0,
                     'stats-down': currentWatched - averageStats.currentWatched < 0,
                   }">
-              <fa :icon="currentWatched - averageStats.currentWatched > 0 ? 'caret-up' : 'caret-down'" fixed-width/>
-              {{difference(averageStats.currentTips, currentTips, false, 'h', 1)}}}
+              <template v-if="currentWatched - averageStats.currentWatched !== 0">
+                <fa :icon="currentWatched - averageStats.currentWatched > 0 ? 'caret-up' : 'caret-down'" fixed-width/>
+                {{difference(averageStats.currentTips, currentTips, false, 'h', 1)}}
+              </template>
             </small>
           </span>
         </div>
@@ -270,6 +288,12 @@
 
   import { EventBus } from 'src/panel/helpers/event-bus';
   import { getSocket } from 'src/panel/helpers/socket';
+
+  import { library } from '@fortawesome/fontawesome-svg-core';
+  import {
+    faCaretDown, faCaretUp
+  } from '@fortawesome/free-solid-svg-icons';
+  library.add(faCaretDown, faCaretUp);
 
   export default Vue.extend({
     data: function () {
@@ -516,11 +540,14 @@
         postfix = postfix || ''
         shorten = typeof shorten === 'undefined' ? true : shorten
         number = number || 0
-        if (Number.isNaN(Number(current)) || this.uptime === '00:00:00' || !this.b_showAvgDiff) return '' // return nothing if current is not number (hidden, etc)
+        if (Number.isNaN(Number(current)) || !isFinite(Number(current)) || this.uptime === '00:00:00' || !this.b_showAvgDiff) return '' // return nothing if current is not number (hidden, etc)
         else if (number === 0) return ''
         else {
           let f_difference: number | string = Math.abs(this.b_percentage ? (Math.round((current - number) / number * 1000) / 10) : current - number)
           if (this.b_percentage) {
+            if (!isFinite(f_difference)) {
+              return '';
+            }
             f_difference = Number(f_difference).toFixed(1)
             f_difference = `${f_difference}%`
           } else {
@@ -532,7 +559,6 @@
             }
             f_difference = f_difference + postfix
           }
-
          return f_difference;
         }
       },
