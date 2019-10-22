@@ -52,17 +52,6 @@ export default {
       sounds: []
     }
   },
-  mounted: function () {
-    this.$emit('mounted')
-
-    $('.dropdown').on('show.bs.dropdown', function() {
-      $('body').append($('.dropdown-force-visible').css({
-        position: 'absolute',
-        left: $('.dropdown-volume-handler').offset().left,
-        top: $('.dropdown-volume-handler').offset().top + 5
-      }).detach())
-    })
-  },
   watch: {
     volume: function (val) {
       localStorage.setItem('/widget/soundboard/volume', JSON.stringify(val))
