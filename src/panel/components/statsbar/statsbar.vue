@@ -467,6 +467,7 @@
           this.chatMessages = 0
           this.newChatters = 0
           this.currentHosts = 0
+          this.currentWatched = 0
         }
       }
     },
