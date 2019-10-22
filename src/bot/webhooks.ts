@@ -303,17 +303,9 @@ class Webhooks {
     if (aEvent.data.length > 0) {
       const stream = aEvent.data[0];
 
-      if (parseInt(stream.user_id, 10) !== parseInt(cid, 10) || Number(stream.id) === Number(global.api.streamId)) {
+      if (parseInt(stream.user_id, 10) !== parseInt(cid, 10)) {
         return;
       }
-
-      // Always keep this updated
-      global.api.streamStatusChangeSince = (new Date(stream.started_at)).getTime();
-      global.api.streamId = stream.id;
-      global.api.streamType = stream.type;
-
-      global.api.stats.currentTitle = stream.title;
-      global.api.stats.currentGame = await global.api.getGameFromId(stream.game_id);
 
       if (Number(global.api.streamId) !== Number(stream.id)) {
         debug('webhooks.stream', 'WEBHOOKS: ' + JSON.stringify(aEvent));
@@ -337,6 +329,14 @@ class Webhooks {
         global.events.fire('keyword-send-x-times', { reset: true });
         global.events.fire('every-x-minutes-of-stream', { reset: true });
       }
+
+      // Always keep this updated
+      global.api.streamStatusChangeSince = (new Date(stream.started_at)).getTime();
+      global.api.streamId = stream.id;
+      global.api.streamType = stream.type;
+
+      global.api.stats.currentTitle = stream.title;
+      global.api.stats.currentGame = await global.api.getGameFromId(stream.game_id);
 
       global.api.curRetries = 0;
       global.api.saveStreamData(stream);
