@@ -26,7 +26,7 @@
         </div>
 
         <div class="text-muted col-sm-1 text-center" style="margin-top: auto; margin-bottom: auto;font-size: 1.5rem">
-          <i class="ml-3 mr-3 fab fa-html5"></i>
+          <fa class="ml-3 mr-3" :icon="['fab', 'fa-html5']"></fa>
         </div>
 
         <div style="word-break: break-all; " class="col-sm-6">

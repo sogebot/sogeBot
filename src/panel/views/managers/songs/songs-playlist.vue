@@ -38,11 +38,11 @@
         {{ data.item.title }}
         <small class="d-block">
           <fa :icon="[ 'far', 'clock' ]"></fa> {{ data.item.length_seconds | formatTime }}
-          <i class="pl-3 fas fa-volume-up"></i> {{ Number(data.item.volume).toFixed(1) }}%
-          <i class="pl-3 fas fa-step-backward"></i>
+          <fa class="pl-3" :icon="['fas', 'fa-volume-up']"></fa> {{ Number(data.item.volume).toFixed(1) }}%
+          <fa class="pl-3" :icon="['fas', 'fa-step-backward']"></fa>
           {{ data.item.startTime | formatTime }} - {{ data.item.endTime | formatTime }}
           <fa icon="step-forward"></fa>
-          <i class="pl-3 fas fa-music"></i> {{ new Date(data.item.lastPlayedAt).toLocaleString() }}
+          <fa class="pl-3" :icon="['fas', 'fa-music']"/> {{ new Date(data.item.lastPlayedAt).toLocaleString() }}
         </small>
       </template>
       <template v-slot:cell(buttons)="data">

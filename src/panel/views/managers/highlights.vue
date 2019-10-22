@@ -29,8 +29,8 @@
                 {{ item.title }}
                 <small class="d-block">
                   <fa :icon="[ 'far', 'clock' ]"></fa> {{ timestampToString(item.timestamp) }}
-                  <i class="pl-2 far fa-calendar-alt"></i> {{ new Date(item.created_at).toLocaleString() }}
-                  <i class="pl-2 fas fa-gamepad"></i> {{ item.game }}
+                  <fa class="pl-2" :icon="['far', 'fa-calendar-alt']"></fa> {{ new Date(item.created_at).toLocaleString() }}
+                  <fa class="pl-2" :icon="['fas', 'fa-gamepad']"></fa> {{ item.game }}
                 </small>
               </div>
             </a>
