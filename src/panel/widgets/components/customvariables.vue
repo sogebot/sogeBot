@@ -142,7 +142,7 @@ var numberOrTextComponent = {
     `
 }
 export default {
-  props: ['popout'],
+  props: ['popout', 'nodrag'],
   components: {
     'number-or-text': numberOrTextComponent,
     loading: () => import('src/panel/components/loading.vue'),

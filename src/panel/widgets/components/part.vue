@@ -3,7 +3,7 @@
     b-card(no-body).border-0.h-100
       b-tabs(pills card style="overflow:hidden").h-100
         template(v-slot:tabs-start v-if="!popout")
-          li.nav-item.px-2.grip.text-secondary.align-self-center
+          li(v-if="typeof nodrag === 'undefined'").nav-item.px-2.grip.text-secondary.align-self-center
             fa(icon="grip-vertical" fixed-width)
           li.nav-item
             b-dropdown(ref="dropdown" boundary="window" no-caret :text="translate('widget-title-part')" variant="outline-primary" toggle-class="border-0")
@@ -22,7 +22,7 @@ import { chunk } from 'lodash-es';
 import { getSocket } from 'src/panel/helpers/socket';
 import { EventBus } from 'src/panel/helpers/event-bus';
 export default {
-  props: ['popout'],
+  props: ['popout', 'nodrag'],
   data: function () {
     return {
       EventBus,

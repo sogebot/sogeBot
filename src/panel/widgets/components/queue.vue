@@ -3,25 +3,25 @@
     b-card(no-body).border-0.h-100
       b-tabs(pills card style="overflow:hidden" v-model="tabIndex").h-100
         template(v-slot:tabs-start v-if="!popout")
-          li.nav-item.px-2.grip.text-secondary.align-self-center
+          li(v-if="typeof nodrag === 'undefined'").nav-item.px-2.grip.text-secondary.align-self-center
             fa(icon="grip-vertical" fixed-width)
           li.nav-item
-            b-dropdown(ref="dropdown" boundary="window" no-caret :text="translate('widget-title-eventlist')" variant="outline-primary" toggle-class="border-0")
+            b-dropdown(ref="dropdown" boundary="window" no-caret :text="translate('widget-title-queue')" variant="outline-primary" toggle-class="border-0")
               b-dropdown-group(header="Eligibility")
                 b-dropdown-form
-                  b-button(@click="toggle('all')" :variant="eligibility.all ? 'success' : 'danger'")
+                  b-button(@click="toggle('all')" :variant="eligibilityAll ? 'success' : 'danger'")
                     | ALL
-                  b-button(@click="toggle('followers')" :variant="eligibility.followers ? 'success' : 'danger'")
+                  b-button(@click="toggle('followers')" :variant="eligibilityFollowers ? 'success' : 'danger'")
                     | FOLLOWERS
-                  b-button(@click="toggle('subscribers')" :variant="eligibility.subscribers ? 'success' : 'danger'")
+                  b-button(@click="toggle('subscribers')" :variant="eligibilitySubscribers ? 'success' : 'danger'")
                     | SUBSCRIBERS
               b-dropdown-divider
-              b-dropdown-item(href="/popout/#eventlist")
+              b-dropdown-item(href="/popout/#queue")
                 | Popout
               b-dropdown-divider
               b-dropdown-item
-                a(href="#" @click.prevent="$refs.dropdown.hide(); $nextTick(() => EventBus.$emit('remove-widget', 'eventlist'))").text-danger
-                  | Remove <strong>{{translate('widget-title-eventlist')}}</strong> widget
+                a(href="#" @click.prevent="$refs.dropdown.hide(); $nextTick(() => EventBus.$emit('remove-widget', 'queue'))").text-danger
+                  | Remove <strong>{{translate('widget-title-queue')}}</strong> widget
 
         b-tab
           template(v-slot:title)
@@ -40,7 +40,7 @@
 
         b-tab
           template(v-slot:title)
-            fa(icon='users' fixed-width)
+            fa(icon='users' fixed-width).mr-1
             | {{ fUsers.length }}
           b-card-text
             b-input-group
@@ -94,7 +94,7 @@ import { getSocket } from 'src/panel/helpers/socket';
 import { EventBus } from 'src/panel/helpers/event-bus';
 import { debounce } from 'lodash-es';
 export default {
-  props: ['popout'],
+  props: ['popout', 'nodrag'],
   beforeDestroy: function() {
     for(const interval of this.interval) {
       clearInterval(interval);
@@ -112,9 +112,9 @@ export default {
       }), 1000)
     )
     this.socket.emit('settings', (err, data) => {
-      this.eligibility.eligibilityAll = data.eligibility.eligibilityAll
-      this.eligibility.eligibilityFollowers = data.eligibility.eligibilityFollowers
-      this.eligibility.eligibilitySubscribers = data.eligibility.eligibilitySubscribers
+      this.eligibilityAll = data.eligibility.eligibilityAll
+      this.eligibilityFollowers = data.eligibility.eligibilityFollowers
+      this.eligibilitySubscribers = data.eligibility.eligibilitySubscribers
     })
     this.socket.emit('get.value', 'locked', (err, locked) => {
       this.locked = locked
@@ -122,11 +122,15 @@ export default {
   },
   watch: {
     locked: function () {
-      this.updated = String(new Date())
+      this.updated = Date.now()
     },
     updated: debounce(function () {
       const data = {
-        eligibility: this.eligibility,
+        eligibility: {
+          eligibilityAll: this.eligibilityAll,
+          eligibilityFollowers: this.eligibilityFollowers,
+          eligibilitySubscribers: this.eligibilitySubscribers,
+        },
       }
       this.socket.emit('settings.update', data, () => {})
       this.socket.emit('set.value', 'locked', this.locked)
@@ -134,23 +138,21 @@ export default {
   },
   computed: {
     fUsers: function () {
-      if (this.eligibility.all) return this.users
+      if (this.eligibilityAll) return this.users
       else {
         let users = this.users
-        if (this.eligibility.followers && this.eligibility.subscribers) users = users.filter(o => o.is.follower || o.is.subscriber)
-        else if (this.eligibility.followers) users = users.filter(o => o.is.follower)
-        else if (this.eligibility.subscribers) users = users.filter(o => o.is.subscriber)
+        if (this.eligibilityFollowers && this.eligibilitySubscribers) users = users.filter(o => o.is.follower || o.is.subscriber)
+        else if (this.eligibilityFollowers) users = users.filter(o => o.is.follower)
+        else if (this.eligibilitySubscribers) users = users.filter(o => o.is.subscriber)
         return users.sort(o => -(new Date(o.created_at).getTime()))
       }
     }
   },
   data: function () {
     return {
-      eligibility: {
-        eligibilityAll: true,
-        eligibilityFollowers: false,
-        eligibilitySubscribers: false
-      },
+      eligibilityAll: true,
+      eligibilityFollowers: false,
+      eligibilitySubscribers: false,
       selectedUsers: [],
       locked: true,
       multiSelection: false,
@@ -159,7 +161,7 @@ export default {
       tabIndex: 1,
       users: [],
       picked: [],
-      updated: String(new Date()),
+      updated: Date.now(),
       socket: getSocket('/systems/queue'),
       interval: [],
     }
@@ -182,9 +184,32 @@ export default {
       })
     },
     toggle: function (pick) {
-      Vue.set(this.eligibility, pick, !this.eligibility[pick])
-      if (!this.eligibility.all && !this.eligibility.followers && !this.eligibility.subscribers) this.eligibility.all = true
-      this.updated = String(new Date())
+      if (pick === 'all') {
+        if (!this.eligibilityAll) {
+          this.eligibilityAll = true;
+          this.eligibilityFollowers = false;
+          this.eligibilitySubscribers = false;
+        } else {
+          this.eligibilityAll = false;
+          this.eligibilityFollowers = true;
+          this.eligibilitySubscribers = true;
+        }
+      }
+      if (pick === 'followers') {
+        this.eligibilityFollowers = !this.eligibilityFollowers;
+      }
+      if (pick === 'subscribers') {
+        this.eligibilitySubscribers = !this.eligibilitySubscribers;
+      }
+
+      if (this.eligibilityFollowers || this.eligibilitySubscribers) {
+        this.eligibilityAll = false;
+      }
+
+      if (!this.eligibilityFollowers && !this.eligibilitySubscribers) {
+        this.eligibilityAll = true;
+      }
+      this.updated = Date.now()
     },
     select: function (username) {
       if (this.selectedUsers.includes(username)) this.selectedUsers = this.selectedUsers.filter(o => o != username)

@@ -3,7 +3,7 @@
     b-card(no-body).border-0.h-100
       b-tabs(pills card style="overflow:hidden" v-model="tabIndex").h-100
         template(v-slot:tabs-start v-if="!popout")
-          li.nav-item.px-2.grip.text-secondary.align-self-center
+          li(v-if="typeof nodrag === 'undefined'").nav-item.px-2.grip.text-secondary.align-self-center
             fa(icon="grip-vertical" fixed-width)
           li.nav-item
             b-dropdown(ref="dropdown" boundary="window" no-caret :text="translate('widget-title-cmdboard')" variant="outline-primary" toggle-class="border-0")
@@ -71,7 +71,7 @@ import { EventBus } from 'src/panel/helpers/event-bus';
 import { orderBy } from 'lodash-es';
 
 export default {
-  props: ['popout'],
+  props: ['popout', 'nodrag'],
   components: {
     loading: () => import('src/panel/components/loading.vue'),
   },

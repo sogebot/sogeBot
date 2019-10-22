@@ -28,11 +28,13 @@
   <div class="widgets pt-1">
     <!-- mobile show -->
     <div v-if="windowWidth <= 750">
-      <div v-for="item in layout" class="pl-2 pr-2 pb-2" :key="item.id">
-        <keep-alive>
-          <component :is="item.id" :popout="false"></component>
-        </keep-alive>
-      </div>
+      <template v-for="dashboard of dashboards">
+        <div v-for="item in sortBy(layout[dashboard.id], (o) => o.y)" class="pl-2 pr-2 pb-2" :key="item.id">
+          <keep-alive>
+            <component :is="item.id" :popout="false" nodrag></component>
+          </keep-alive>
+        </div>
+      </template>
     </div>
     <div v-else>
       <grid-layout
@@ -59,7 +61,7 @@
                     :i="item.i"
                     :key="item.id">
           <keep-alive>
-            <component :is="item.id" :popout="false" :context="$refs['widgets-menu']"></component>
+            <component :is="item.id" :popout="false"></component>
           </keep-alive>
         </grid-item>
       </grid-layout>
@@ -77,7 +79,7 @@
 <script>
 import { EventBus } from 'src/panel/helpers/event-bus';
 import { getSocket } from 'src/panel/helpers/socket';
-import { cloneDeep, orderBy } from 'lodash-es';
+import { cloneDeep, orderBy, sortBy } from 'lodash-es';
 
 import VueGridLayout from 'vue-grid-layout';
 import { vueWindowSizeMixin } from 'vue-window-size';
@@ -107,6 +109,7 @@ export default {
   },
   data: function () {
     return {
+      sortBy,
       items: [],
       dashboards: [],
 
