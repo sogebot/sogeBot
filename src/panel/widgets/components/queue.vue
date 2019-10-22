@@ -67,7 +67,7 @@
               template(v-slot:prepend)
                 button(v-if="multiSelection" class="btn btn-sm btn-primary" @click="pick(selectedUsers)") Pick {{ selectedUsers.length }}
                 button(@click="multiSelection = !multiSelection; selectedUsers = []" :class="[multiSelection ? 'btn-success' : 'btn-danger']" class="btn btn-sm") Toggle selection
-                span(style="position:relative; top: 6px")
+                button(disabled="true").btn.btn-secondary
                   fa(icon="eye-slash")
                   | {{ users.length - fUsers.length }}
                 button(class="btn btn-sm btn-danger" @click="clear") Clear
