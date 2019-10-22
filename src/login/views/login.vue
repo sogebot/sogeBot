@@ -52,7 +52,7 @@ export default class Login extends Vue {
       if (error) {
         this.error = error[0].split('=')[1];
       }
-      const url = hash.match(/url=[a-zA-Z0-9+:\/#]*/)
+      const url = hash.match(/url=[a-zA-Z0-9+:\?\/#]*/)
       if (url) {
         this.popoutUrl = url[0].split('=')[1];
       }
