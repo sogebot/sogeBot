@@ -251,7 +251,7 @@ const main = async () => {
           <navbar/>
           <statsbar/>
           <changegamedialog/>
-          <router-view class="view pt-3"></router-view>
+          <router-view class="view pt-1"></router-view>
           <footerbar/>
         </template>
         <template v-else>
