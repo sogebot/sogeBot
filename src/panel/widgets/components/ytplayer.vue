@@ -37,7 +37,6 @@
             span(style="position:relative; top: 2px;").align-self-center.mx-2
               fa(icon="play" v-if="autoplay")
               fa(icon="pause" v-else)
-            template(v-if="currentSong") {{ currentSong.title }}
           b-card-text.vcenter
             vue-plyr(
               ref="player"
