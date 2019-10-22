@@ -22,7 +22,7 @@ dependencies:
 
 eslint:
 	@echo -ne "\n\t ----- Checking eslint\n"
-	@npx eslint --ext .ts src --quiet
+	npx eslint --ext .ts src --quiet
 
 css:
 	@echo -ne "\n\t ----- Generating CSS themes\n"
