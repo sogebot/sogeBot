@@ -199,23 +199,11 @@ a.active {
   color: $red;
 }
 
-.stream-info span.stats {
-  font-size: small;
-}
-
-.stream-info span.stats i {
-  font-size: smaller;
-}
-
-.stream-info span.stats span.stats-up {
+small.stats-up {
   vertical-align: super;
 }
 
-.stream-info span.stats span.stats-mid {
-  vertical-align: initial;
-}
-
-.stream-info span.stats span.stats-down{
+small.stats-down{
   vertical-align: sub;
 }
 

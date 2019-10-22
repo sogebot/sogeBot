@@ -48,12 +48,12 @@
                    :class="{
                      'text-success': maxViewers - averageStats.maxViewers > 0,
                      'stats-up': maxViewers - averageStats.maxViewers > 0,
-                     'text-danger': maxViewers - averageStats.maxViewers > 0,
+                     'text-danger': maxViewers - averageStats.maxViewers < 0,
                      'stats-down': maxViewers - averageStats.maxViewers < 0,
                    }">
               <template v-if="maxViewers - averageStats.maxViewers !== 0">
-                <fa :icon="maxViewers - averageStats.maxViewers > 0 ? 'caret-up' : 'caret-down'" fixed-width/>
-                {{difference(averageStats.maxViewers, maxViewers)}}
+                <fa :icon="maxViewers - averageStats.maxViewers > 0 ? 'caret-up' : 'caret-down'"/>
+                <span>{{difference(averageStats.maxViewers, maxViewers)}}</span>
               </template>
             </small>
           </span>
@@ -74,12 +74,12 @@
                    :class="{
                      'text-success': newChatters - averageStats.newChatters > 0,
                      'stats-up': newChatters - averageStats.newChatters > 0,
-                     'text-danger': newChatters - averageStats.newChatters > 0,
+                     'text-danger': newChatters - averageStats.newChatters < 0,
                      'stats-down': newChatters - averageStats.newChatters < 0,
                    }">
               <template v-if="newChatters - averageStats.newChatters !== 0">
-                <fa :icon="newChatters - averageStats.newChatters > 0 ? 'caret-up' : 'caret-down'" fixed-width/>
-                {{difference(averageStats.newChatters, newChatters)}}
+                <fa :icon="newChatters - averageStats.newChatters > 0 ? 'caret-up' : 'caret-down'"/>
+                <span>{{difference(averageStats.newChatters, newChatters)}}</span>
               </template>
             </small>
           </span>
@@ -94,12 +94,12 @@
                    :class="{
                      'text-success': chatMessages - averageStats.chatMessages > 0,
                      'stats-up': chatMessages - averageStats.chatMessages > 0,
-                     'text-danger': chatMessages - averageStats.chatMessages > 0,
+                     'text-danger': chatMessages - averageStats.chatMessages < 0,
                      'stats-down': chatMessages - averageStats.chatMessages < 0,
                    }">
               <template v-if="chatMessages - averageStats.chatMessages !== 0">
-                <fa :icon="chatMessages - averageStats.chatMessages > 0 ? 'caret-up' : 'caret-down'" fixed-width/>
-                {{difference(averageStats.chatMessages, chatMessages)}}
+                <fa :icon="chatMessages - averageStats.chatMessages > 0 ? 'caret-up' : 'caret-down'"/>
+                <span>{{difference(averageStats.chatMessages, chatMessages)}}</span>
               </template>
             </small>
           </span>
@@ -113,12 +113,12 @@
                    :class="{
                      'text-success': currentViews - averageStats.currentViews > 0,
                      'stats-up': currentViews - averageStats.currentViews > 0,
-                     'text-danger': currentViews - averageStats.currentViews > 0,
+                     'text-danger': currentViews - averageStats.currentViews < 0,
                      'stats-down': currentViews - averageStats.currentViews < 0,
                    }">
               <template v-if="currentViews - averageStats.currentViews !== 0">
-                <fa :icon="currentViews - averageStats.currentViews > 0 ? 'caret-up' : 'caret-down'" fixed-width/>
-                {{difference(averageStats.currentViews, currentViews)}}
+                <fa :icon="currentViews - averageStats.currentViews > 0 ? 'caret-up' : 'caret-down'"/>
+                <span>{{difference(averageStats.currentViews, currentViews)}}</span>
               </template>
             </small>
           </span>
@@ -138,12 +138,12 @@
                    :class="{
                      'text-success': currentFollowers - averageStats.currentFollowers > 0,
                      'stats-up': currentFollowers - averageStats.currentFollowers > 0,
-                     'text-danger': currentFollowers - averageStats.currentFollowers > 0,
+                     'text-danger': currentFollowers - averageStats.currentFollowers < 0,
                      'stats-down': currentFollowers - averageStats.currentFollowers < 0,
                    }">
               <template v-if="currentFollowers - averageStats.currentFollowers !== 0">
-                <fa :icon="currentFollowers - averageStats.currentFollowers > 0 ? 'caret-up' : 'caret-down'" fixed-width/>
-                {{difference(averageStats.currentFollowers, currentFollowers)}}
+                <fa :icon="currentFollowers - averageStats.currentFollowers > 0 ? 'caret-up' : 'caret-down'"/>
+                <span>{{difference(averageStats.currentFollowers, currentFollowers)}}</span>
               </template>
             </small>
           </span>
@@ -158,12 +158,12 @@
                     :class="{
                       'text-success': currentSubscribers - averageStats.currentSubscribers > 0,
                       'stats-up': currentSubscribers - averageStats.currentSubscribers > 0,
-                      'text-danger': currentSubscribers - averageStats.currentSubscribers > 0,
+                      'text-danger': currentSubscribers - averageStats.currentSubscribers < 0,
                       'stats-down': currentSubscribers - averageStats.currentSubscribers < 0,
                     }">
                 <template v-if="currentSubscribers - averageStats.currentSubscribers !== 0">
-                  <fa :icon="currentSubscribers - averageStats.currentSubscribers > 0 ? 'caret-up' : 'caret-down'" fixed-width/>
-                  {{difference(averageStats.currentSubscribers, currentSubscribers)}}
+                  <fa :icon="currentSubscribers - averageStats.currentSubscribers > 0 ? 'caret-up' : 'caret-down'"/>
+                  <span>{{difference(averageStats.currentSubscribers, currentSubscribers)}}</span>
                 </template>
               </small>
             </span>
@@ -182,12 +182,12 @@
                     :class="{
                       'text-success': currentBits - averageStats.currentBits > 0,
                       'stats-up': currentBits - averageStats.currentBits > 0,
-                      'text-danger': currentBits - averageStats.currentBits > 0,
+                      'text-danger': currentBits - averageStats.currentBits < 0,
                       'stats-down': currentBits - averageStats.currentBits < 0,
                     }">
                 <template v-if="currentBits - averageStats.currentBits !== 0">
-                  <fa :icon="currentBits - averageStats.currentBits > 0 ? 'caret-up' : 'caret-down'" fixed-width/>
-                  {{difference(averageStats.currentBits, currentBits)}}
+                  <fa :icon="currentBits - averageStats.currentBits > 0 ? 'caret-up' : 'caret-down'"/>
+                  <span>{{difference(averageStats.currentBits, currentBits)}}</span>
                 </template>
               </small>
             </span>
@@ -205,12 +205,12 @@
                   :class="{
                     'text-success': currentTips - averageStats.currentTips > 0,
                     'stats-up': currentTips - averageStats.currentTips > 0,
-                    'text-danger': currentTips - averageStats.currentTips > 0,
+                    'text-danger': currentTips - averageStats.currentTips < 0,
                     'stats-down': currentTips - averageStats.currentTips < 0,
                   }">
               <template v-if="currentTips - averageStats.currentTips !== 0">
-                <fa :icon="currentTips - averageStats.currentTips > 0 ? 'caret-up' : 'caret-down'" fixed-width/>
-                {{difference(averageStats.currentTips, currentTips, false, currency)}}
+                <fa :icon="currentTips - averageStats.currentTips > 0 ? 'caret-up' : 'caret-down'"/>
+                <span>{{difference(averageStats.currentTips, currentTips, false, currency)}}</span>
               </template>
             </small>
           </span>
@@ -224,12 +224,12 @@
                   :class="{
                     'text-success': currentWatched - averageStats.currentWatched > 0,
                     'stats-up': currentWatched - averageStats.currentWatched > 0,
-                    'text-danger': currentWatched - averageStats.currentWatched > 0,
+                    'text-danger': currentWatched - averageStats.currentWatched < 0,
                     'stats-down': currentWatched - averageStats.currentWatched < 0,
                   }">
               <template v-if="currentWatched - averageStats.currentWatched !== 0">
-                <fa :icon="currentWatched - averageStats.currentWatched > 0 ? 'caret-up' : 'caret-down'" fixed-width/>
-                {{difference(averageStats.currentTips, currentTips, false, 'h', 1)}}
+                <fa :icon="currentWatched - averageStats.currentWatched > 0 ? 'caret-up' : 'caret-down'"/>
+                <span>{{difference(averageStats.currentTips, currentTips, false, 'h', 1)}}</span>
               </template>
             </small>
           </span>
@@ -455,7 +455,7 @@
     },
     computed: {
       isStreamOnline() {
-        return (this as any).uptime !== '00:00:00';
+        return (this as any).uptime === '00:00:00';
       }
     },
     watch: {
@@ -540,10 +540,11 @@
         postfix = postfix || ''
         shorten = typeof shorten === 'undefined' ? true : shorten
         number = number || 0
-        if (Number.isNaN(Number(current)) || !isFinite(Number(current)) || this.uptime === '00:00:00' || !this.b_showAvgDiff) return '' // return nothing if current is not number (hidden, etc)
+        if (Number.isNaN(Number(current)) || !this.isStreamOnline || !this.b_showAvgDiff) return '' // return nothing if current is not number (hidden, etc)
         else if (number === 0) return ''
         else {
           let f_difference: number | string = Math.abs(this.b_percentage ? (Math.round((current - number) / number * 1000) / 10) : current - number)
+          console.log({f_difference})
           if (this.b_percentage) {
             if (!isFinite(f_difference)) {
               return '';
