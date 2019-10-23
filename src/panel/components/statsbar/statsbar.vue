@@ -228,7 +228,7 @@
                   }">
               <template v-if="currentWatched - averageStats.currentWatched !== 0">
                 <fa :icon="currentWatched - averageStats.currentWatched > 0 ? 'caret-up' : 'caret-down'"/>
-                <span>{{difference(averageStats.currentWatched, currentWatched, false, 'h', 1)}}</span>
+                <span>{{difference(averageStats.currentWatched / 1000 / 60 / 60, currentWatched / 1000 / 60 / 60, false, 'h', 1)}}</span>
               </template>
             </small>
           </span>
