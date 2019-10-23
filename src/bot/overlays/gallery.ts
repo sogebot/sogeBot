@@ -2,6 +2,7 @@ import Overlay from './_interface';
 import uuid from 'uuid/v4';
 import { isMainThread } from 'worker_threads';
 import { isEmpty } from 'lodash';
+import { adminEndpoint } from '../helpers/socket';
 
 class Gallery extends Overlay {
   showInUI = false;
@@ -29,18 +30,16 @@ class Gallery extends Overlay {
   }
 
   sockets () {
-    global.panel.io.of('/overlays/gallery').on('connection', (socket) => {
-      socket.on('upload', async (data, cb) => {
-        const filename = data[0];
-        const filedata = data[1];
-        const matches = filedata.match(/^data:([0-9A-Za-z-+/]+);base64,(.+)$/);
-        if (matches.length !== 3) {
-          return false;
-        }
-        const type = matches[1];
-        const item = await global.db.engine.insert(this.collection.data, { id: uuid(), type, data: filedata, name: filename });
-        cb({ type, id: item.id, name: filename });
-      });
+    adminEndpoint(this.nsp, 'upload', async (data, cb) => {
+      const filename = data[0];
+      const filedata = data[1];
+      const matches = filedata.match(/^data:([0-9A-Za-z-+/]+);base64,(.+)$/);
+      if (matches.length !== 3) {
+        return false;
+      }
+      const type = matches[1];
+      const item = await global.db.engine.insert(this.collection.data, { id: uuid(), type, data: filedata, name: filename });
+      cb({ type, id: item.id, name: filename });
     });
   }
 }

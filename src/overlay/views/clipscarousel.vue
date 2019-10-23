@@ -32,7 +32,7 @@ import { chunk, cloneDeep } from 'lodash-es';
 
 @Component({})
 export default class ClipsCarouselOverlay extends Vue {
-  socket = getSocket('/overlays/clipscarousel');
+  socket = getSocket('/overlays/clipscarousel', true);
   isPlaying = false;
   clips: any[] = [];
   clipsSet: any[] = [];

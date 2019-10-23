@@ -62,7 +62,7 @@ Vue.use(VueMoment, {
 
 @Component({})
 export default class PollsOverlay extends Vue {
-  socket = getSocket('/overlays/polls');
+  socket = getSocket('/overlays/polls', true);
   currentVote: any = {};
   votes: any[] = [];
   lastUpdatedAt = 0;

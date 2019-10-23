@@ -25,7 +25,7 @@ import { getSocket } from 'src/panel/helpers/socket';
   }
 })
 export default class songrequest extends Vue {
-  socket = getSocket('/systems/songs');
+  socket = getSocket('/systems/songs', true);
 
   requests: {
     endTime: number; forceVolume: boolean; lastPlayedAt: number; length_seconds: number;

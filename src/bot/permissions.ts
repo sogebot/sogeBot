@@ -9,6 +9,7 @@ import { permission } from './helpers/permissions';
 import { command, default_permission, settings } from './decorators';
 import { isMainThread } from 'worker_threads';
 import { error } from './helpers/log';
+import { adminEndpoint } from './helpers/socket';
 
 let isWarnedAboutCasters = false;
 
@@ -32,51 +33,44 @@ class Permissions extends Core {
   }
 
   public sockets() {
-    if (this.socket === null) {
-      setTimeout(() => this.sockets(), 100);
-      return;
-    }
-
-    this.socket.on('connection', (socket) => {
-      socket.on('permissions', async (cb) => {
-        cb(await global.db.engine.find(this.collection.data));
-      });
-      socket.on('permission', async (id, cb) => {
-        cb(await global.db.engine.findOne(this.collection.data, { id }));
-      });
-      socket.on('permissions.order', async (data, cb) => {
-        for (const d of data) {
-          await global.db.engine.update(this.collection.data, { id: String(d.id) }, { order: d.order });
-        }
-        cb();
-      });
-      socket.on('test.user', async (opts, cb) => {
-        const userByName = await global.db.engine.findOne('users', { username: opts.value });
-        const userById = await global.db.engine.findOne('users', { id: opts.value });
-        if (typeof userByName.id !== 'undefined') {
-          const status = await this.check(userByName.id, opts.pid);
-          const partial = await this.check(userByName.id, opts.pid, true);
-          cb({
-            status,
-            partial,
-            state: opts.state,
-          });
-        } else if (typeof userById.id !== 'undefined') {
-          const status = await this.check(userById.id, opts.pid);
-          const partial = await this.check(userById.id, opts.pid, true);
-          cb({
-            status,
-            partial,
-            state: opts.state,
-          });
-        } else {
-          cb({
-            status: { access: 2 },
-            partial: { access: 2 },
-            state: opts.state,
-          });
-        }
-      });
+    adminEndpoint(this.nsp, 'permissions', async (cb) => {
+      cb(await global.db.engine.find(this.collection.data));
+    });
+    adminEndpoint(this.nsp, 'permission', async (id, cb) => {
+      cb(await global.db.engine.findOne(this.collection.data, { id }));
+    });
+    adminEndpoint(this.nsp, 'permissions.order', async (data, cb) => {
+      for (const d of data) {
+        await global.db.engine.update(this.collection.data, { id: String(d.id) }, { order: d.order });
+      }
+      cb();
+    });
+    adminEndpoint(this.nsp, 'test.user', async (opts, cb) => {
+      const userByName = await global.db.engine.findOne('users', { username: opts.value });
+      const userById = await global.db.engine.findOne('users', { id: opts.value });
+      if (typeof userByName.id !== 'undefined') {
+        const status = await this.check(userByName.id, opts.pid);
+        const partial = await this.check(userByName.id, opts.pid, true);
+        cb({
+          status,
+          partial,
+          state: opts.state,
+        });
+      } else if (typeof userById.id !== 'undefined') {
+        const status = await this.check(userById.id, opts.pid);
+        const partial = await this.check(userById.id, opts.pid, true);
+        cb({
+          status,
+          partial,
+          state: opts.state,
+        });
+      } else {
+        cb({
+          status: { access: 2 },
+          partial: { access: 2 },
+          state: opts.state,
+        });
+      }
     });
   }
 

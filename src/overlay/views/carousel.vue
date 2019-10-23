@@ -21,7 +21,7 @@ export default class CarouselOverlay extends Vue {
   currentImage: any = null;
   ready = true;
   show = true;
-  socket = getSocket('/overlays/carousel');
+  socket = getSocket('/overlays/carousel', true);
   images: any[] = [];
   interval: any[] = [];
 

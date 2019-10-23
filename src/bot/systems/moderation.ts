@@ -11,6 +11,7 @@ import System from './_interface';
 import { getLocalizedName, prepare, sendMessage, timeout } from '../commons';
 import { timeout as timeoutLog } from '../helpers/log';
 import { isMainThread } from 'worker_threads';
+import { adminEndpoint } from '../helpers/socket';
 
 class Moderation extends System {
   @settings('lists')
@@ -99,20 +100,15 @@ class Moderation extends System {
   }
 
   sockets () {
-    if (this.socket === null) {
-      return setTimeout(() => this.sockets(), 100);
-    }
-    this.socket.on('connection', (socket) => {
-      socket.on('lists.get', async (cb) => {
-        cb(null, {
-          blacklist: this.cListsBlacklist,
-          whitelist: this.cListsWhitelist,
-        });
+    adminEndpoint(this.nsp, 'lists.get', async (cb) => {
+      cb(null, {
+        blacklist: this.cListsBlacklist,
+        whitelist: this.cListsWhitelist,
       });
-      socket.on('lists.set', async (data) => {
-        this.cListsBlacklist = data.blacklist.filter(entry => entry.trim() !== '');
-        this.cListsWhitelist = data.whitelist.filter(entry => entry.trim() !== '');
-      });
+    });
+    adminEndpoint(this.nsp, 'lists.set', async (data) => {
+      this.cListsBlacklist = data.blacklist.filter(entry => entry.trim() !== '');
+      this.cListsWhitelist = data.whitelist.filter(entry => entry.trim() !== '');
     });
   }
 

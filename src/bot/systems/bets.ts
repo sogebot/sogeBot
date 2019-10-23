@@ -7,6 +7,7 @@ import Expects from '../expects';
 import { permission } from '../permissions';
 import System from './_interface';
 import { error, warning } from '../helpers/log';
+import { adminEndpoint } from '../helpers/socket';
 
 const ERROR_NOT_ENOUGH_OPTIONS = 'Expected more parameters';
 const ERROR_ALREADY_OPENED = '1';
@@ -46,19 +47,14 @@ class Bets extends System {
   }
 
   public sockets() {
-    if (this.socket === null) {
-      return setTimeout(() => this.sockets(), 100);
-    }
-    this.socket.on('connection', (socket) => {
-      socket.on('close', async (option) => {
-        const message = '!bet ' + (option === 'refund' ? option : 'close ' + option);
-        global.tmi.message({
-          message: {
-            tags: { username: getOwner() },
-            message,
-          },
-          skip: true,
-        });
+    adminEndpoint(this.nsp, 'close', async (option) => {
+      const message = '!bet ' + (option === 'refund' ? option : 'close ' + option);
+      global.tmi.message({
+        message: {
+          tags: { username: getOwner() },
+          message,
+        },
+        skip: true,
       });
     });
   }

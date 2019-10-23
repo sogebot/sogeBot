@@ -67,7 +67,7 @@ import { getSocket } from 'src/panel/helpers/socket';
 
 @Component({})
 export default class AlertsOverlay extends Vue {
-  socket = getSocket('/overlays/alerts');
+  socket = getSocket('/overlays/alerts', true);
   isPlaying = false;
   alerts: any[] = [];
   interval: any[] = [];

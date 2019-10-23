@@ -22,7 +22,6 @@
 
 ``` bash
 docker run -it --name <name-of-container> \
---env TOKEN=<token> \
 --env MONGOURI=<mongouri> \
 -p <port>:20000 \
 <image>
@@ -36,10 +35,6 @@ docker run -it --name <name-of-container> \
 - Change `<mongouri>` to your mongodb uri connection
 - Change `<version>` to `latest` or release tag (e.g. `9.8.0`)
 - Change `<name-of-container>` to set name of your container
-- Change `<token>` to set your image specific token, if you want to random token, omit whole `--env TOKEN`
-
-- If you serve bot on different than `localhost`, add `--env DOMAIN=<domain>` to
-  enable bot UI on specific domain
 
 - Example full command
 
@@ -47,7 +42,6 @@ docker run -it --name <name-of-container> \
 
 ``` bash
 docker run -it --name sogebot \
---env DOMAIN=my.publicdoma.in \
 --env MONGOURI=mongodb://localhost:27017/sogebot \
 -p 80:20000 docker.pkg.github.com/sogehige/sogebot/release:9.8.0
 ```

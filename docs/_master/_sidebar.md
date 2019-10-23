@@ -7,7 +7,6 @@
   * [Environment variables](_master/configuration/env.md)
   * [Metrics](_master/configuration/metrics.md)
   * [Threads](_master/configuration/threads.md)
-  * [Panel](_master/configuration/panel.md)
   * [Timezone](_master/configuration/timezone.md)
 * Systems
   * [Alias](_master/commands/alias.md)

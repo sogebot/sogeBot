@@ -3,6 +3,7 @@ import { isMainThread } from 'worker_threads';
 import { sendMessage } from '../commons';
 import { command, settings, ui } from '../decorators';
 import Game from './_interface';
+import { publicEndpoint } from '../helpers/socket';
 
 class WheelOfFortune extends Game {
   @ui({
@@ -29,29 +30,23 @@ class WheelOfFortune extends Game {
   }
 
   sockets () {
-    if (this.socket === null) {
-      return setTimeout(() => this.sockets(), 100);
-    }
-
-    this.socket.on('connection', (socket) => {
-      socket.on('win', async (index, username) => {
-        // compensate for slight delay
-        setTimeout(async () => {
-          const userObj = await global.users.getByName(username);
-          for (const response of this.data[index].responses) {
-            if (response.trim().length > 0) {
-              sendMessage(response, {
-                username: userObj.username,
-                displayName: userObj.displayName || userObj.username,
-                userId: userObj.id,
-                emotes: [],
-                badges: {},
-                'message-type': 'chat',
-              });
-            }
+    publicEndpoint(this.nsp, 'win', async (index, username) => {
+      // compensate for slight delay
+      setTimeout(async () => {
+        const userObj = await global.users.getByName(username);
+        for (const response of this.data[index].responses) {
+          if (response.trim().length > 0) {
+            sendMessage(response, {
+              username: userObj.username,
+              displayName: userObj.displayName || userObj.username,
+              userId: userObj.id,
+              emotes: [],
+              badges: {},
+              'message-type': 'chat',
+            });
           }
-        }, 2000);
-      });
+        }
+      }, 2000);
     });
   }
 

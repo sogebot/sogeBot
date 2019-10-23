@@ -1,11 +1,10 @@
 import axios from 'axios';
-import config from '@config';
 import util from 'util';
 import { get, isNil } from 'lodash';
 import { setTimeout } from 'timers';
 
 import { isBot } from './commons';
-import { debug, error, follow, info, start, warning } from './helpers/log';
+import { debug, error, follow, info, start } from './helpers/log';
 import { triggerInterfaceOnFollow } from './helpers/interface/triggers';
 
 class Webhooks {
@@ -16,10 +15,9 @@ class Webhooks {
   timeouts: { [x: string]: NodeJS.Timeout} = {};
   cache: { id: string; type: string; timestamp: number }[] = [];
 
-  constructor () {
+  subscribeAll() {
     this.unsubscribe('follows').then(() => this.subscribe('follows'));
     this.unsubscribe('streams').then(() => this.subscribe('streams'));
-
     this.clearCache();
   }
 
@@ -51,12 +49,10 @@ class Webhooks {
       return;
     }
 
-    // get proper domain
-    const domains = config.panel.domain.split(',').map((o) => o.trim()).filter((o) => o !== 'localhost');
-    if (domains.length === 0) {
+    const domain = global.ui.domain;
+    if (domain.includes('localhost')) {
       return;
     }
-    const domain = domains[0];
 
     const mode = 'unsubscribe';
     const callback = `http://${domain}/webhooks/hub`;
@@ -105,12 +101,10 @@ class Webhooks {
       return;
     }
 
-    // get proper domain
-    const domains = config.panel.domain.split(',').map((o) => o.trim()).filter((o) => o !== 'localhost');
-    if (domains.length === 0) {
-      return warning(`No suitable domain found to use with ${type} webhook ... localhost is not suitable`);
+    const domain = global.ui.domain;
+    if (domain.includes('localhost')) {
+      return;
     }
-    const domain = domains[0];
 
     const leaseSeconds = 864000;
     const mode = 'subscribe';

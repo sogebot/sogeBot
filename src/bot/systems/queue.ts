@@ -5,6 +5,7 @@ import { command, default_permission, settings, shared } from '../decorators';
 import { permission } from '../permissions';
 import System from './_interface';
 import { isMainThread } from 'worker_threads';
+import { adminEndpoint } from '../helpers/socket';
 
 /*
  * !queue                            - gets an info whether queue is opened or closed
@@ -39,27 +40,21 @@ class Queue extends System {
   }
 
   sockets () {
-    if (this.socket === null) {
-      return setTimeout(() => this.sockets(), 100);
-    }
-
-    this.socket.on('connection', (socket) => {
-      socket.on('pick', async (data, cb) => {
-        if (data.username) {
-          const users: any[] = [];
-          if (_.isString(data.username)) {
-            data.username = [data.username];
-          }
-          for (let user of data.username) {
-            user = await global.db.engine.findOne(this.collection.data, { username: user });
-            delete user._id;
-            users.push(user);
-          }
-          cb(null, await this.pickUsers({ sender: getOwner(), users }, data.random));
-        } else {
-          cb(null, await this.pickUsers({ sender: getOwner(), parameters: String(data.count) }, data.random));
+    adminEndpoint(this.nsp, 'pick', async (data, cb) => {
+      if (data.username) {
+        const users: any[] = [];
+        if (_.isString(data.username)) {
+          data.username = [data.username];
         }
-      });
+        for (let user of data.username) {
+          user = await global.db.engine.findOne(this.collection.data, { username: user });
+          delete user._id;
+          users.push(user);
+        }
+        cb(null, await this.pickUsers({ sender: getOwner(), users }, data.random));
+      } else {
+        cb(null, await this.pickUsers({ sender: getOwner(), parameters: String(data.count) }, data.random));
+      }
     });
   }
 

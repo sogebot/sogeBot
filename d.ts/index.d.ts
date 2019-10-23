@@ -110,8 +110,10 @@ declare namespace NodeJS {
       userinfo: import('../src/bot/systems/userinfo').UserInfo;
     };
     users: import('../src/bot/users').Users;
+    ui: import('../src/bot/ui').UI;
     lib: any;
     twitch: import('../src/bot/twitch').Twitch;
+    socket: import('../src/bot/socket').Socket;
     workers: import('../src/bot/workers').Workers;
     permissions: import('../src/bot/permissions').Permissions;
     customvariables: any;

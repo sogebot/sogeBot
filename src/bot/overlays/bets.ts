@@ -3,6 +3,7 @@ import { isMainThread } from 'worker_threads';
 import { ui } from '../decorators';
 import Overlay from './_interface';
 import { error } from '../helpers/log';
+import { publicEndpoint } from '../helpers/socket';
 
 class Bets extends Overlay {
   public modifiedAt: number;
@@ -31,10 +32,8 @@ class Bets extends Overlay {
   }
 
   public sockets() {
-    global.panel.io.of('/overlays/bets').on('connection', (socket) => {
-      socket.on('data', async (callback) => {
-        callback(this.currentBet, this.bets);
-      });
+    publicEndpoint(this.nsp, 'data', async (callback) => {
+      callback(this.currentBet, this.bets);
     });
   }
 

@@ -9,7 +9,7 @@
         button-with-icon(icon="caret-left" href="#/").btn-secondary.btn-reverse {{translate('commons.back')}}
 
     loading(v-if="state.loading !== $state.success")
-    b-table(v-else striped small :items="items" :fields="fields" @row-clicked="linkTo($event)").table-p-0
+    b-table(v-else striped small :items="items" :fields="fields").table-p-0
       template(v-slot:cell(createdAt)="data") {{ data.item.createdAt | moment('LL')}} {{ data.item.createdAt | moment('LTS') }}
 
       template(v-slot:cell(tags)="data")
@@ -27,7 +27,7 @@ import { getSocket } from 'src/panel/helpers/socket';
   }
 })
 export default class playlist extends Vue {
-  socket = getSocket('/systems/quotes');
+  socket = getSocket('/systems/quotes', true);
 
   items: any[] = []
 

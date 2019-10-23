@@ -90,29 +90,20 @@ declare module 'vue/types/vue' {
 
 Vue.use(VueRouter);
 
-declare global {
-  interface Window {
-    token: string | undefined;
-  }
-}
-
 const main = async () => {
   // init prototypes
   Vue.prototype.translate = (v) => translate(v);
   Vue.prototype.urlParam = (v) => urlParam(v);
 
+  Vue.prototype.$loggedUser = await isUserLoggedIn();
+  isUserCaster();
 
-  if (typeof window.token !== 'undefined') {
-    Vue.prototype.$loggedUser = await isUserLoggedIn();
-    await isUserCaster(Vue.prototype.$loggedUser.id);
+  Vue.prototype.$core = await getListOf('core');
+  Vue.prototype.$systems = await getListOf('systems');
+  Vue.prototype.$integrations = await getListOf('integrations');
 
-    Vue.prototype.$core = await getListOf('core');
-    Vue.prototype.$systems = await getListOf('systems');
-    Vue.prototype.$integrations = await getListOf('integrations');
-
-    await getTranslations();
-    Vue.prototype.configuration = await getConfiguration();
-  }
+  await getTranslations();
+  Vue.prototype.configuration = await getConfiguration();
 
   Vue.prototype.$state = ButtonStates;
   setMainLoaded();
@@ -127,14 +118,6 @@ const main = async () => {
 
   new Vue({
     router,
-    data() {
-      const object: {
-        token: any;
-      } = {
-        token: window.token,
-      };
-      return object;
-    },
     created() {
       // set proper moment locale
       this.$moment.locale(get(Vue, 'prototype.configuration.lang', 'en'));
@@ -148,26 +131,7 @@ const main = async () => {
     },
     template: `
     <div id="app" >
-      <template v-if="token">
-        <router-view></router-view>
-      </template>
-      <template v-else>
-      <div class="alert alert-danger ml-5 mr-5 mt-3" role="alert">
-        This domain is not set as accessible in your <strong>config.json</strong>. Update your file and restart a bot to propagate changes. Example below:
-      </div>
-      <pre class="alert alert-info ml-5 mr-5" style="font-family: Monospace">
-... config.json ...
-"panel": {
-"__COMMENT__": "set correctly your domain and to be safe, change your token",
-"username": "***",
-"password": "***",
-"port": ***,
-"domain": "yourdomain1, ${window.location.host.split(':')[0]}",
-"token": "***"
-},
-... config.json ...
-          </pre>
-      </template>
+      <router-view></router-view>
     </div>
   `,
   }).$mount('#app');

@@ -7,6 +7,7 @@ import XRegExp from 'xregexp';
 import Overlay from './_interface';
 import { parser, settings, ui } from '../decorators';
 import { error, info, warning } from '../helpers/log';
+import { adminEndpoint } from '../helpers/socket';
 
 
 class Emotes extends Overlay {
@@ -95,23 +96,21 @@ class Emotes extends Overlay {
   }
 
   sockets () {
-    global.panel.io.of('/overlays/emotes').on('connection', (socket) => {
-      socket.on('removeCache', (cb) => {
-        this.removeCache();
-        cb(null, null);
-      });
-      socket.on('testExplosion', (cb) => {
-        this._testExplosion();
-        cb(null, null);
-      });
-      socket.on('testFireworks', (cb) => {
-        this._testFireworks();
-        cb(null, null);
-      });
-      socket.on('test', (cb) => {
-        this._test();
-        cb(null, null);
-      });
+    adminEndpoint(this.nsp, 'removeCache', (cb) => {
+      this.removeCache();
+      cb(null, null);
+    });
+    adminEndpoint(this.nsp, 'testExplosion', (cb) => {
+      this._testExplosion();
+      cb(null, null);
+    });
+    adminEndpoint(this.nsp, 'testFireworks', (cb) => {
+      this._testFireworks();
+      cb(null, null);
+    });
+    adminEndpoint(this.nsp, 'test', (cb) => {
+      this._test();
+      cb(null, null);
     });
   }
 

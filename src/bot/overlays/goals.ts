@@ -4,6 +4,7 @@ import Overlay from '../overlays/_interface';
 
 import { isMainThread } from 'worker_threads';
 import { onBit, onFollow, onSub, onTip } from '../decorators/on';
+import { publicEndpoint } from '../helpers/socket';
 
 class Goals extends Overlay {
   showInUI = false;
@@ -19,16 +20,10 @@ class Goals extends Overlay {
   }
 
   public async sockets() {
-    if (this.socket === null) {
-      setTimeout(() => this.sockets(), 100);
-      return;
-    }
-    this.socket.on('connection', (socket) => {
-      socket.on('current', async (cb) => {
-        cb(null, {
-          subscribers: global.api.stats.currentSubscribers,
-          followers: global.api.stats.currentFollowers,
-        });
+    publicEndpoint(this.nsp, 'current', async (cb) => {
+      cb(null, {
+        subscribers: global.api.stats.currentSubscribers,
+        followers: global.api.stats.currentFollowers,
       });
     });
   }

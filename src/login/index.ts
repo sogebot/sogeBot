@@ -8,9 +8,6 @@ import { ButtonStates, states } from '../panel/helpers/buttonStates';
 
 import BootstrapVue from 'bootstrap-vue';
 
-import moment from 'moment';
-import momentTimezone from 'moment-timezone';
-import VueMoment from 'vue-moment';
 import urlParam from '../panel/helpers/urlParam';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
@@ -19,14 +16,10 @@ import {
   faCheckCircle, faSkullCrossbones,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { getConfiguration, getTranslations } from 'src/panel/helpers/socket';
 library.add(faCheckCircle, faSkullCrossbones);
 Vue.component('fa', FontAwesomeIcon);
 Vue.component('font-awesome-icon', FontAwesomeIcon);
 
-Vue.use(VueMoment, {
-  moment, momentTimezone,
-});
 Vue.use(VueRouter);
 Vue.use(LoadScript);
 Vue.use(BootstrapVue);
@@ -38,27 +31,16 @@ export interface Global {
   $unloadScript: (script: string) => Promise<void>;
 }
 
-declare let global: Global;
-declare let token: string;
-
 declare module 'vue/types/vue' {
   interface Vue {
-    token: string;
-    configuration: any;
-    $moment?: any;
     urlParam(key: string): string | null;
     $state: states;
   }
 }
 
-const overlays = async () => {
-  await getTranslations();
-  Vue.prototype.configuration = await getConfiguration();
-
+const init = async () => {
   Vue.prototype.translate = (v) => translate(v);
   Vue.prototype.urlParam = (v) => urlParam(v);
-  Vue.prototype.token = token;
-  Vue.prototype.configuration = global.configuration;
   Vue.prototype.$state = ButtonStates;
 
   const router = new VueRouter({
@@ -71,9 +53,6 @@ const overlays = async () => {
 
   new Vue({
     router,
-    created() {
-      this.$moment.locale(global.configuration.lang); // set proper moment locale
-    },
     template: `
       <div id="app">
         <router-view class="view"></router-view>
@@ -82,4 +61,4 @@ const overlays = async () => {
   }).$mount('#login');
 };
 
-overlays();
+init();

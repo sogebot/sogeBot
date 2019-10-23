@@ -79,23 +79,6 @@ function Panel () {
   app.get('/oauth/:page', function (req, res) {
     res.sendFile(path.join(__dirname, '..', 'public', 'oauth-' + req.params.page + '.html'))
   })
-  app.get('/auth/token.js', async function (req, res) {
-    const origin = req.headers.referer ? req.headers.referer.substring(0, req.headers.referer.length - 1) : undefined
-    const domain = config.panel.domain.split(',').map((o) => o.trim()).join('|')
-    if (_.isNil(origin)) {
-      // file CANNOT be accessed directly
-      res.status(401).send('401 Access Denied - This is not a file you are looking for.')
-      return;
-    }
-
-    if (origin.match(new RegExp('^((http|https)\\:\\/\\/|)([\\w|-]+\\.)?' + domain))) {
-      res.set('Content-Type', 'application/javascript')
-      res.send(`window.token="${config.panel.token.trim()}"`);
-    } else {
-      // file CANNOT be accessed from different domain
-      res.status(403).send('403 Forbidden - You are looking at wrong castle.')
-    }
-  })
   app.get('/overlays/:overlay', function (req, res) {
     res.sendFile(path.join(__dirname, '..', 'public', 'overlays.html'))
   })
@@ -129,10 +112,7 @@ function Panel () {
     finally: null
   })
 
-  this.io.use(function (socket, next) {
-    if (config.panel.token.trim() === socket.request._query['token']) next()
-    return false
-  })
+  this.io.use(global.socket.authorize);
 
   var self = this
   this.io.on('connection', function (socket) {
@@ -359,7 +339,7 @@ function Panel () {
     })
     socket.on('core', async (cb) => {
       let toEmit = []
-      for (let system of ['oauth', 'tmi', 'currency', 'ui', 'general', 'twitch']) {
+      for (let system of ['oauth', 'tmi', 'currency', 'ui', 'general', 'twitch', 'socket']) {
         toEmit.push({
           name: system.toLowerCase()
         })

@@ -29,7 +29,7 @@ library.add(faCircle)
   }
 })
 export default class ClipsOverlay extends Vue {
-  socket = getSocket('/overlays/clips');
+  socket = getSocket('/overlays/clips', true);
   isPlaying = false;
   clips: any[] = [];
   settings: any[] = [];

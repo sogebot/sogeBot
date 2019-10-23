@@ -2,6 +2,7 @@
 
 import _ from 'lodash';
 import Widget from './_interface';
+import { adminEndpoint } from '../helpers/socket';
 
 class CustomVariables extends Widget {
   constructor() {
@@ -17,25 +18,20 @@ class CustomVariables extends Widget {
   }
 
   public sockets() {
-    if (this.socket === null) {
-      return setTimeout(() => this.sockets(), 100);
-    }
-    this.socket.on('connection', (socket) => {
-      socket.on('list.variables', async (cb) => {
-        const variables = await global.db.engine.find('custom.variables');
-        cb(null, variables);
-      });
-      socket.on('list.watch', async (cb) => {
-        const variables = await global.db.engine.find('custom.variables.watch');
-        cb(null, _.orderBy(variables, 'order', 'asc'));
-      });
-      socket.on('set.value', async (opts, cb) => {
-        const name = await global.customvariables.isVariableSetById(opts.id);
-        if (name) {
-          await global.customvariables.setValueOf(name, opts.value, { readOnlyBypass: true });
-        }
-        cb(null);
-      });
+    adminEndpoint(this.nsp, 'list.variables', async (cb) => {
+      const variables = await global.db.engine.find('custom.variables');
+      cb(null, variables);
+    });
+    adminEndpoint(this.nsp, 'list.watch', async (cb) => {
+      const variables = await global.db.engine.find('custom.variables.watch');
+      cb(null, _.orderBy(variables, 'order', 'asc'));
+    });
+    adminEndpoint(this.nsp, 'set.value', async (opts, cb) => {
+      const name = await global.customvariables.isVariableSetById(opts.id);
+      if (name) {
+        await global.customvariables.setValueOf(name, opts.value, { readOnlyBypass: true });
+      }
+      cb(null);
     });
   }
 }

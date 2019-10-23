@@ -8,6 +8,7 @@ import { loadingInProgress, permissions as permissionsList } from './decorators'
 import { getFunctionList } from './decorators/on';
 import { permission } from './permissions';
 import { error, info, warning } from './helpers/log';
+import { adminEndpoint } from './helpers/socket';
 
 class Module {
   public dependsOn: string[] = [];
@@ -18,6 +19,10 @@ class Module {
   public settingsPermList: { category: string; key: string }[] = [];
   public on: InterfaceSettings.On;
   public socket: SocketIOClient.Socket | null;
+
+  get nsp(): string {
+    return '/' + this._name + '/' + this.constructor.name.toLowerCase();
+  }
 
   get enabled(): boolean {
     return _.get(this, '_enabled', true);
@@ -168,321 +173,312 @@ class Module {
   }
 
   public _sockets() {
-    if (!isMainThread) {
-      return;
-    }
-
-    clearTimeout(this.timeouts[`${this.constructor.name}.sockets`]);
     if (_.isNil(global.panel)) {
       this.timeouts[`${this.constructor.name}._sockets`] = setTimeout(() => this._sockets(), 1000);
     } else {
-      this.socket = global.panel.io.of('/' + this._name + '/' + this.constructor.name.toLowerCase());
+      this.socket = global.panel.io.of(this.nsp).use(global.socket.authorize);
       this.sockets();
       this.sockets = function() {
-        error('/' + this._name + '/' + this.constructor.name.toLowerCase() + ': Cannot initialize sockets second time');
+        error(this.nsp + ': Cannot initialize sockets second time');
       };
 
-      if (this.socket) {
-        // default socket listeners
-        this.socket.on('connection', (socket) => {
-          socket.on('settings', async (cb) => {
-            cb(null, await this.getAllSettings(), await this.getUI());
-          });
-          socket.on('set.value', async (variable, value, cb) => {
-            this[variable] = value;
-            if (typeof cb === 'function') {
-              cb(null, {variable, value});
-            }
-          });
-          socket.on('get.value', async (variable, cb) => {
-            cb(null, await this[variable]);
-          });
-          socket.on('settings.update', async (data: { [x: string]: any }, cb) => {
-            // flatten and remove category
-            data = flatten(data);
-            const remap: ({ key: string; actual: string; toRemove: string[] } | { key: null; actual: null; toRemove: null })[] = Object.keys(flatten(data)).map(o => {
-              // skip commands, enabled and permissions
-              if (o.startsWith('commands') || o.startsWith('enabled') || o.startsWith('_permissions')) {
-                return {
-                  key: o,
-                  actual: o,
-                  toRemove: [],
-                };
-              }
+      // default socket listeners
+      adminEndpoint(this.nsp, 'settings', async (cb) => {
+        cb(null, await this.getAllSettings(), await this.getUI());
+      });
+      adminEndpoint(this.nsp, 'set.value', async (variable, value, cb) => {
+        this[variable] = value;
+        if (typeof cb === 'function') {
+          cb(null, {variable, value});
+        }
+      });
+      adminEndpoint(this.nsp, 'get.value', async (variable, cb) => {
+        cb(null, await this[variable]);
+      });
+      adminEndpoint(this.nsp, 'settings.update', async (data: { [x: string]: any }, cb) => {
+        // flatten and remove category
+        data = flatten(data);
+        const remap: ({ key: string; actual: string; toRemove: string[] } | { key: null; actual: null; toRemove: null })[] = Object.keys(flatten(data)).map(o => {
+          // skip commands, enabled and permissions
+          if (o.startsWith('commands') || o.startsWith('enabled') || o.startsWith('_permissions')) {
+            return {
+              key: o,
+              actual: o,
+              toRemove: [],
+            };
+          }
 
-              const toRemove: string[] = [];
-              for (const possibleVariable of o.split('.')) {
-                const isVariableFound = this.settingsList.find(o => possibleVariable === o.key);
-                if (isVariableFound) {
-                  return {
-                    key: o,
-                    actual: isVariableFound.key,
-                    toRemove,
-                  };
-                } else {
-                  toRemove.push(possibleVariable);
-                }
-              }
+          const toRemove: string[] = [];
+          for (const possibleVariable of o.split('.')) {
+            const isVariableFound = this.settingsList.find(o => possibleVariable === o.key);
+            if (isVariableFound) {
               return {
-                key: null,
-                actual: null,
-                toRemove: null,
+                key: o,
+                actual: isVariableFound.key,
+                toRemove,
               };
-            });
-
-            for (const { key, actual, toRemove } of remap) {
-              if (key === null || toRemove === null || actual === null) {
-                continue;
-              }
-
-              const joinedToRemove = toRemove.join('.');
-              for (const key of Object.keys(data)) {
-                if (joinedToRemove.length > 0) {
-                  const value = data[key];
-                  data[key.replace(joinedToRemove + '.', '')] = value;
-
-                  if (key.replace(joinedToRemove + '.', '') !== key) {
-                    delete data[key];
-                  }
-                }
-              }
-            }
-            try {
-              for (const [key, value] of Object.entries(unflatten(data))) {
-                if (key === 'enabled' && ['core', 'overlays', 'widgets'].includes(this._name)) {
-                  // ignore enabled if its core, overlay or widgets (we don't want them to be disabled)
-                  continue;
-                } else if (key === '_permissions') {
-                  for (const [command, currentValue] of Object.entries(value as any)) {
-                    const c = this._commands.find((o) => o.name === command);
-                    if (c) {
-                      if (currentValue === c.permission) {
-                        await global.db.engine.remove(global.permissions.collection.commands, { key: c.name });
-                      } else {
-                        await global.db.engine.update(global.permissions.collection.commands, { key: c.name }, { permission: currentValue });
-                      }
-                    }
-                  }
-                } else if (key === 'enabled') {
-                  this.status({ state: value });
-                } else if (key === 'commands') {
-                  for (const [defaultValue, currentValue] of Object.entries(value as any)) {
-                    if (this._commands) {
-                      this.setCommand(defaultValue, currentValue as string);
-                    }
-                  }
-                } else if (key === '__permission_based__') {
-                  for (const vKey of Object.keys(value as any)) {
-                    this['__permission_based__' + vKey] = (value as any)[vKey];
-                  }
-                } else {
-                  this[key] = value;
-                }
-              }
-            } catch (e) {
-              error(e.stack);
-              if (typeof cb === 'function') {
-                setTimeout(() => cb(e.stack), 1000);
-              }
-            }
-
-            if (typeof cb === 'function') {
-              setTimeout(() => cb(null), 1000);
-            }
-          });
-          // difference between set and update is that set will set exact 1:1 values of opts.items
-          // so it will also DELETE additional data
-          socket.on('set', async (opts, cb) => {
-            opts.collection = opts.collection || 'data';
-            opts.items = opts.items || [];
-            if (opts.collection.startsWith('_')) {
-              opts.collection = opts.collection.replace('_', '');
             } else {
-              if (opts.collection === 'settings') {
-                opts.collection = this.collection.settings;
-                opts.where = {
-                  system: this.constructor.name.toLowerCase(),
-                  ...opts.where,
-                };
-              } else {
-                opts.collection = this.collection[opts.collection];
-              }
+              toRemove.push(possibleVariable);
             }
-
-            // get all items by where
-            if (opts.where === null || typeof opts.where === 'undefined') {
-              if (_.isFunction(cb)) {
-                return cb(new Error('Where cannot be empty or explicitely set as {}!'));
-              } else {
-                throw new Error('Where cannot be empty or explicitely set as {}!');
-              }
-            }
-
-            // remove all data
-            await global.db.engine.remove(opts.collection, opts.where);
-            for (const item of opts.items) {
-              delete item._id;
-              await global.db.engine.insert(opts.collection, item);
-            }
-            if (typeof cb === 'function') {
-              cb(null, true);
-            }
-          });
-          socket.on('update', async (opts, cb) => {
-            opts.collection = opts.collection || 'data';
-            if (opts.collection.startsWith('_')) {
-              opts.collection = opts.collection.replace('_', '');
-            } else {
-              if (opts.collection === 'settings') {
-                opts.collection = this.collection.settings;
-                opts.where = {
-                  system: this.constructor.name.toLowerCase(),
-                  ...opts.where,
-                };
-              } else {
-                opts.collection = this.collection[opts.collection];
-              }
-            }
-
-            if (opts.items) {
-              for (const item of opts.items) {
-                let itemFromDb = Object.assign({}, item);
-                const _id = item._id; delete item._id;
-                if (_.isNil(_id) && _.isNil(opts.key)) {
-                  itemFromDb = await global.db.engine.insert(opts.collection, item);
-                } else if (_id) {
-                  await global.db.engine.update(opts.collection, { _id }, item);
-                } else {
-                  await global.db.engine.update(opts.collection, { [opts.key]: item[opts.key] }, item);
-                }
-                if (_.isFunction(cb)) {
-                  cb(null, Object.assign({ _id }, itemFromDb));
-                }
-              }
-            } else {
-              if (_.isFunction(cb)) {
-                cb(null, []);
-              }
-            }
-          });
-          socket.on('insert', async (opts, cb) => {
-            opts.collection = opts.collection || 'data';
-            if (opts.collection.startsWith('_')) {
-              opts.collection = opts.collection.replace('_', '');
-            } else {
-              if (opts.collection === 'settings') {
-                throw Error('You cannot use insert socket with settings collection');
-              } else {
-                opts.collection = this.collection[opts.collection];
-              }
-            }
-
-            if (opts.items) {
-              const created: any[] = [];
-              for (const item of opts.items) {
-                created.push(await global.db.engine.insert(opts.collection, item));
-              }
-              if (_.isFunction(cb)) {
-                cb(null, created);
-              }
-            } else {
-              if (_.isFunction(cb)) {
-                cb(null, []);
-              }
-            }
-          });
-          socket.on('delete', async (opts, cb) => {
-            opts.collection = opts.collection || 'data';
-            if (opts.collection.startsWith('_')) {
-              opts.collection = opts.collection.replace('_', '');
-            } else {
-              if (opts.collection === 'settings') {
-                opts.collection = this.collection.settings;
-                opts.where = {
-                  system: this.constructor.name.toLowerCase(),
-                  ...opts.where,
-                };
-              } else {
-                opts.collection = this.collection[opts.collection];
-              }
-            }
-
-            if (opts._id) {
-              await global.db.engine.remove(opts.collection, { _id: opts._id });
-            } else if (opts.where) {
-              await global.db.engine.remove(opts.collection, opts.where);
-            }
-
-            if (_.isFunction(cb)) {
-              cb(null);
-            }
-          });
-          socket.on('find', async (opts, cb) => {
-            opts.collection = opts.collection || 'data';
-            opts.omit = opts.omit || [];
-            if (opts.collection.startsWith('_')) {
-              opts.collection = opts.collection.replace('_', '');
-            } else {
-              if (opts.collection === 'settings') {
-                opts.collection = this.collection.settings;
-                opts.where = {
-                  system: this.constructor.name.toLowerCase(),
-                  ...opts.where,
-                };
-              } else {
-                opts.collection = this.collection[opts.collection];
-              }
-            }
-
-            opts.where = opts.where || {};
-            if (_.isFunction(cb)) {
-              let items = await global.db.engine.find(opts.collection, opts.where);
-              if (opts.omit.length > 0) {
-                items = items.map((o) => {
-                  for (const omit of opts.omit) {
-                    delete o[omit];
-                  }
-                  return o;
-                });
-              }
-              cb(null, items);
-            } else {
-              throw Error('No callback for find function');
-            }
-          });
-          socket.on('findOne', async (opts, cb) => {
-            opts.collection = opts.collection || 'data';
-            opts.omit = opts.omit || [];
-            if (opts.collection.startsWith('_')) {
-              opts.collection = opts.collection.replace('_', '');
-            } else {
-              if (opts.collection === 'settings') {
-                opts.collection = this.collection.settings;
-                opts.where = {
-                  system: this.constructor.name.toLowerCase(),
-                  ...opts.where,
-                };
-              } else {
-                opts.collection = this.collection[opts.collection];
-              }
-            }
-
-            opts.where = opts.where || {};
-            if (_.isFunction(cb)) {
-              let items = await global.db.engine.findOne(opts.collection, opts.where);
-              if (opts.omit.length > 0) {
-                items = items.map((o) => {
-                  for (const omit of opts.omit) {
-                    delete o[omit];
-                  }
-                  return o;
-                });
-              }
-              cb(null, items);
-            }
-          });
+          }
+          return {
+            key: null,
+            actual: null,
+            toRemove: null,
+          };
         });
-      }
+
+        for (const { key, actual, toRemove } of remap) {
+          if (key === null || toRemove === null || actual === null) {
+            continue;
+          }
+
+          const joinedToRemove = toRemove.join('.');
+          for (const key of Object.keys(data)) {
+            if (joinedToRemove.length > 0) {
+              const value = data[key];
+              data[key.replace(joinedToRemove + '.', '')] = value;
+
+              if (key.replace(joinedToRemove + '.', '') !== key) {
+                delete data[key];
+              }
+            }
+          }
+        }
+        try {
+          for (const [key, value] of Object.entries(unflatten(data))) {
+            if (key === 'enabled' && ['core', 'overlays', 'widgets'].includes(this._name)) {
+              // ignore enabled if its core, overlay or widgets (we don't want them to be disabled)
+              continue;
+            } else if (key === '_permissions') {
+              for (const [command, currentValue] of Object.entries(value as any)) {
+                const c = this._commands.find((o) => o.name === command);
+                if (c) {
+                  if (currentValue === c.permission) {
+                    await global.db.engine.remove(global.permissions.collection.commands, { key: c.name });
+                  } else {
+                    await global.db.engine.update(global.permissions.collection.commands, { key: c.name }, { permission: currentValue });
+                  }
+                }
+              }
+            } else if (key === 'enabled') {
+              this.status({ state: value });
+            } else if (key === 'commands') {
+              for (const [defaultValue, currentValue] of Object.entries(value as any)) {
+                if (this._commands) {
+                  this.setCommand(defaultValue, currentValue as string);
+                }
+              }
+            } else if (key === '__permission_based__') {
+              for (const vKey of Object.keys(value as any)) {
+                this['__permission_based__' + vKey] = (value as any)[vKey];
+              }
+            } else {
+              this[key] = value;
+            }
+          }
+        } catch (e) {
+          error(e.stack);
+          if (typeof cb === 'function') {
+            setTimeout(() => cb(e.stack), 1000);
+          }
+        }
+
+        if (typeof cb === 'function') {
+          setTimeout(() => cb(null), 1000);
+        }
+      });
+      // difference between set and update is that set will set exact 1:1 values of opts.items
+      // so it will also DELETE additional data
+      adminEndpoint(this.nsp, 'set', async (opts, cb) => {
+        opts.collection = opts.collection || 'data';
+        opts.items = opts.items || [];
+        if (opts.collection.startsWith('_')) {
+          opts.collection = opts.collection.replace('_', '');
+        } else {
+          if (opts.collection === 'settings') {
+            opts.collection = this.collection.settings;
+            opts.where = {
+              system: this.constructor.name.toLowerCase(),
+              ...opts.where,
+            };
+          } else {
+            opts.collection = this.collection[opts.collection];
+          }
+        }
+
+        // get all items by where
+        if (opts.where === null || typeof opts.where === 'undefined') {
+          if (_.isFunction(cb)) {
+            return cb(new Error('Where cannot be empty or explicitely set as {}!'));
+          } else {
+            throw new Error('Where cannot be empty or explicitely set as {}!');
+          }
+        }
+
+        // remove all data
+        await global.db.engine.remove(opts.collection, opts.where);
+        for (const item of opts.items) {
+          delete item._id;
+          await global.db.engine.insert(opts.collection, item);
+        }
+        if (typeof cb === 'function') {
+          cb(null, true);
+        }
+      });
+      adminEndpoint(this.nsp, 'update', async (opts, cb) => {
+        opts.collection = opts.collection || 'data';
+        if (opts.collection.startsWith('_')) {
+          opts.collection = opts.collection.replace('_', '');
+        } else {
+          if (opts.collection === 'settings') {
+            opts.collection = this.collection.settings;
+            opts.where = {
+              system: this.constructor.name.toLowerCase(),
+              ...opts.where,
+            };
+          } else {
+            opts.collection = this.collection[opts.collection];
+          }
+        }
+
+        if (opts.items) {
+          for (const item of opts.items) {
+            let itemFromDb = Object.assign({}, item);
+            const _id = item._id; delete item._id;
+            if (_.isNil(_id) && _.isNil(opts.key)) {
+              itemFromDb = await global.db.engine.insert(opts.collection, item);
+            } else if (_id) {
+              await global.db.engine.update(opts.collection, { _id }, item);
+            } else {
+              await global.db.engine.update(opts.collection, { [opts.key]: item[opts.key] }, item);
+            }
+            if (_.isFunction(cb)) {
+              cb(null, Object.assign({ _id }, itemFromDb));
+            }
+          }
+        } else {
+          if (_.isFunction(cb)) {
+            cb(null, []);
+          }
+        }
+      });
+      adminEndpoint(this.nsp, 'insert', async (opts, cb) => {
+        opts.collection = opts.collection || 'data';
+        if (opts.collection.startsWith('_')) {
+          opts.collection = opts.collection.replace('_', '');
+        } else {
+          if (opts.collection === 'settings') {
+            throw Error('You cannot use insert socket with settings collection');
+          } else {
+            opts.collection = this.collection[opts.collection];
+          }
+        }
+
+        if (opts.items) {
+          const created: any[] = [];
+          for (const item of opts.items) {
+            created.push(await global.db.engine.insert(opts.collection, item));
+          }
+          if (_.isFunction(cb)) {
+            cb(null, created);
+          }
+        } else {
+          if (_.isFunction(cb)) {
+            cb(null, []);
+          }
+        }
+      });
+      adminEndpoint(this.nsp, 'delete', async (opts, cb) => {
+        opts.collection = opts.collection || 'data';
+        if (opts.collection.startsWith('_')) {
+          opts.collection = opts.collection.replace('_', '');
+        } else {
+          if (opts.collection === 'settings') {
+            opts.collection = this.collection.settings;
+            opts.where = {
+              system: this.constructor.name.toLowerCase(),
+              ...opts.where,
+            };
+          } else {
+            opts.collection = this.collection[opts.collection];
+          }
+        }
+
+        if (opts._id) {
+          await global.db.engine.remove(opts.collection, { _id: opts._id });
+        } else if (opts.where) {
+          await global.db.engine.remove(opts.collection, opts.where);
+        }
+
+        if (_.isFunction(cb)) {
+          cb(null);
+        }
+      });
+      adminEndpoint(this.nsp, 'find', async (opts, cb) => {
+        opts.collection = opts.collection || 'data';
+        opts.omit = opts.omit || [];
+        if (opts.collection.startsWith('_')) {
+          opts.collection = opts.collection.replace('_', '');
+        } else {
+          if (opts.collection === 'settings') {
+            opts.collection = this.collection.settings;
+            opts.where = {
+              system: this.constructor.name.toLowerCase(),
+              ...opts.where,
+            };
+          } else {
+            opts.collection = this.collection[opts.collection];
+          }
+        }
+
+        opts.where = opts.where || {};
+        if (_.isFunction(cb)) {
+          let items = await global.db.engine.find(opts.collection, opts.where);
+          if (opts.omit.length > 0) {
+            items = items.map((o) => {
+              for (const omit of opts.omit) {
+                delete o[omit];
+              }
+              return o;
+            });
+          }
+          cb(null, items);
+        } else {
+          throw Error('No callback for find function');
+        }
+      });
+      adminEndpoint(this.nsp, 'findOne', async (opts, cb) => {
+        opts.collection = opts.collection || 'data';
+        opts.omit = opts.omit || [];
+        if (opts.collection.startsWith('_')) {
+          opts.collection = opts.collection.replace('_', '');
+        } else {
+          if (opts.collection === 'settings') {
+            opts.collection = this.collection.settings;
+            opts.where = {
+              system: this.constructor.name.toLowerCase(),
+              ...opts.where,
+            };
+          } else {
+            opts.collection = this.collection[opts.collection];
+          }
+        }
+
+        opts.where = opts.where || {};
+        if (_.isFunction(cb)) {
+          let items = await global.db.engine.findOne(opts.collection, opts.where);
+          if (opts.omit.length > 0) {
+            items = items.map((o) => {
+              for (const omit of opts.omit) {
+                delete o[omit];
+              }
+              return o;
+            });
+          }
+          cb(null, items);
+        }
+      });
     }
   }
 

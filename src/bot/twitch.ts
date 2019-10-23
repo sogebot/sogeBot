@@ -11,6 +11,7 @@ import Core from './_interface';
 
 
 import * as configFile from '@config';
+import { adminEndpoint } from './helpers/socket';
 const config = configFile as any;
 config.timezone = config.timezone === 'system' || isNil(config.timezone) ? moment.tz.guess() : config.timezone;
 
@@ -23,17 +24,13 @@ class Twitch extends Core {
 
     if (isMainThread) {
       global.panel.addWidget('twitch', 'widget-title-twitch', 'fab fa-twitch');
-
-      global.panel.registerSockets({
-        self: this,
-        expose: ['sendTwitchVideo'],
-        finally: null,
-      });
     }
   }
 
-  async sendTwitchVideo (self, socket) {
-    socket.emit('twitchVideo', (await global.oauth.broadcasterUsername).toLowerCase());
+  sockets() {
+    adminEndpoint(this.nsp, 'broadcaster', (cb) => {
+      cb((global.oauth.broadcasterUsername).toLowerCase());
+    });
   }
 
   @command('!uptime')

@@ -1,23 +1,19 @@
 import * as _ from 'lodash';
 
-import config from '@config';
-
 import { prepare, sendMessage } from '../commons';
-import { command, default_permission, settings } from '../decorators';
+import { command, default_permission } from '../decorators';
 import Expects from '../expects';
 import { permission } from '../permissions';
 import System from './_interface';
 import uuid from 'uuid/v4';
 import { isMainThread } from 'worker_threads';
+import { publicEndpoint } from '../helpers/socket';
 
 export interface QuoteInterface {
   quotedBy: string; id: string; quote: string; tags: string[]; createdAt: number;
 }
 
 class Quotes extends System {
-  @settings()
-  urlBase: string = config.panel.domain.split(',').map((o) => o.trim())[0];
-
   constructor () {
     super();
 
@@ -26,6 +22,16 @@ class Quotes extends System {
     }
 
     this.addMenu({ category: 'manage', name: 'quotes', id: 'manage/quotes/list' });
+  }
+
+  sockets() {
+    publicEndpoint(this.nsp, 'find', async (_opts, cb) => {
+      const items = await global.db.engine.find(this.collection.data);
+      for (const item of items) {
+        item.quotedBy = await global.users.getNameById(item.quotedBy);
+      }
+      cb(null, items);
+    });
   }
 
   @command('!quote add')
@@ -102,7 +108,7 @@ class Quotes extends System {
 
   @command('!quote list')
   async list (opts) {
-    const urlBase = this.urlBase;
+    const urlBase = global.ui.domain;
     const message = await prepare(
       (['localhost', '127.0.0.1'].includes(urlBase) ? 'systems.quotes.list.is-localhost' : 'systems.quotes.list.ok'),
       { urlBase });

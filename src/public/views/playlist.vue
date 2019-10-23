@@ -25,7 +25,7 @@ import { getSocket } from 'src/panel/helpers/socket';
   }
 })
 export default class playlist extends Vue {
-  socket = getSocket('/systems/songs');
+  socket = getSocket('/systems/songs', true);
 
   playlist: {
     endTime: number; forceVolume: boolean; lastPlayedAt: number; length_seconds: number;

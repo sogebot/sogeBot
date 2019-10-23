@@ -1,5 +1,6 @@
 import { settings } from '../decorators';
 import Widget from './_interface';
+import { adminEndpoint } from '../helpers/socket';
 
 class EventList extends Widget {
   @settings()
@@ -33,17 +34,12 @@ class EventList extends Widget {
   }
 
   public sockets() {
-    if (this.socket === null) {
-      return setTimeout(() => this.sockets(), 100);
-    }
-    this.socket.on('connection', (socket) => {
-      socket.on('get', async () => {
-        this.update();
-      });
+    adminEndpoint(this.nsp, 'get', async () => {
+      this.update();
+    });
 
-      socket.on('cleanup', () => {
-        global.db.engine.remove('widgetsEventList', {});
-      });
+    adminEndpoint(this.nsp, 'cleanup', () => {
+      global.db.engine.remove('widgetsEventList', {});
     });
   }
 

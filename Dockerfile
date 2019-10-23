@@ -2,8 +2,6 @@ FROM node:12.12.0-alpine
 
 ENV LAST_UPDATED 201910151750
 
-ENV DOMAIN localhost
-ENV TOKEN __random__
 ENV DB mongodb
 ENV MONGOURI mongodb://localhost:27017/your-db-name
 ENV NODE_ENV production

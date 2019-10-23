@@ -12,6 +12,7 @@ import { error, info, warning } from './helpers/log';
 import { TMI } from './tmi';
 import { API } from './api';
 import { Twitch } from './twitch';
+import { Socket } from './socket';
 import { Webhooks } from './webhooks';
 import { Users } from './users';
 import { UI } from './ui';
@@ -62,6 +63,7 @@ async function main () {
   if (!global.db.engine.connected || global.cpu !== global.workers.onlineCount) return setTimeout(() => main(), 10)
   try {
     global.general = new (require('./general.js'))()
+    global.socket = new Socket()
     global.ui = new UI()
     global.currency = new Currency()
     global.stats2 = new (require('./stats.js'))()

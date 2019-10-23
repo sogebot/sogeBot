@@ -31,7 +31,7 @@ import { getSocket } from 'src/panel/helpers/socket';
 @Component({})
 export default class BetsOverlay extends Vue {
   isRunning: boolean = false;
-  socket = getSocket('/overlays/bets');
+  socket = getSocket('/overlays/bets', true);
   colors = [ 'blue', 'red', 'orange', 'green', 'purple', 'yellow', 'pink', 'cyan' ];
   currentBet: any = {};
   bets: any[] = [];

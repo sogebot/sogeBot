@@ -9,6 +9,7 @@ import { command, default_permission } from '../decorators';
 import { permission } from '../permissions';
 import System from './_interface';
 import uuid from 'uuid';
+import { adminEndpoint } from '../helpers/socket';
 
 /*
  * !timers                                                                                                                      - gets an info about timers usage
@@ -36,70 +37,64 @@ class Timers extends System {
   }
 
   sockets () {
-    if (this.socket === null) {
-      return setTimeout(() => this.sockets(), 100);
-    }
+    adminEndpoint(this.nsp, 'find.timers', async (callback) => {
+      const [timers, responses] = await Promise.all([
+        global.db.engine.find(this.collection.data),
+        global.db.engine.find(this.collection.responses),
+      ]);
+      callback(null, { timers: timers, responses: responses });
+    });
+    adminEndpoint(this.nsp, 'findOne.timer', async (opts, callback) => {
+      const [timer, responses] = await Promise.all([
+        global.db.engine.findOne(this.collection.data, { id: opts.id }),
+        global.db.engine.find(this.collection.responses, { timerId: opts.id }),
+      ]);
+      callback(null, { timer: timer, responses: responses });
+    });
+    adminEndpoint(this.nsp, 'delete.timer', async (id, callback) => {
+      await Promise.all([
+        global.db.engine.remove(this.collection.data, { id }),
+        global.db.engine.remove(this.collection.responses, { timerId: id }),
+      ]);
+      callback(null);
+    });
+    adminEndpoint(this.nsp, 'update.timer', async (data, callback) => {
+      const name = data.timer.name && data.timer.name.trim().length ? data.timer.name.replace(/ /g, '_') : crypto.createHash('md5').update(new Date().getTime().toString()).digest('hex').slice(0, 5);
+      _.remove(data.responses, (o: any) => o.response.trim().length === 0);
 
-    this.socket.on('connection', (socket) => {
-      socket.on('find.timers', async (callback) => {
-        const [timers, responses] = await Promise.all([
-          global.db.engine.find(this.collection.data),
-          global.db.engine.find(this.collection.responses),
-        ]);
-        callback(null, { timers: timers, responses: responses });
-      });
-      socket.on('findOne.timer', async (opts, callback) => {
-        const [timer, responses] = await Promise.all([
-          global.db.engine.findOne(this.collection.data, { id: opts.id }),
-          global.db.engine.find(this.collection.responses, { timerId: opts.id }),
-        ]);
-        callback(null, { timer: timer, responses: responses });
-      });
-      socket.on('delete.timer', async (id, callback) => {
+      const timer = {
+        id:  data.timer.id || uuid(),
+        name: name,
+        messages: _.toNumber(data.timer.messages),
+        seconds: _.toNumber(data.timer.seconds),
+        enabled: data.timer.enabled,
+        trigger: {
+          messages: 0,
+          timestamp: new Date().getTime(),
+        },
+      };
+      if (_.isNil(data.timer.id)) {
+        await global.db.engine.insert(this.collection.data, timer);
+      } else {
         await Promise.all([
-          global.db.engine.remove(this.collection.data, { id }),
-          global.db.engine.remove(this.collection.responses, { timerId: id }),
+          global.db.engine.update(this.collection.data, { id: timer.id }, timer),
+          global.db.engine.remove(this.collection.responses, { timerId: timer.id }),
         ]);
-        callback(null);
-      });
-      socket.on('update.timer', async (data, callback) => {
-        const name = data.timer.name && data.timer.name.trim().length ? data.timer.name.replace(/ /g, '_') : crypto.createHash('md5').update(new Date().getTime().toString()).digest('hex').slice(0, 5);
-        _.remove(data.responses, (o: any) => o.response.trim().length === 0);
+      }
 
-        const timer = {
-          id:  data.timer.id || uuid(),
-          name: name,
-          messages: _.toNumber(data.timer.messages),
-          seconds: _.toNumber(data.timer.seconds),
-          enabled: data.timer.enabled,
-          trigger: {
-            messages: 0,
-            timestamp: new Date().getTime(),
-          },
-        };
-        if (_.isNil(data.timer.id)) {
-          await global.db.engine.insert(this.collection.data, timer);
-        } else {
-          await Promise.all([
-            global.db.engine.update(this.collection.data, { id: timer.id }, timer),
-            global.db.engine.remove(this.collection.responses, { timerId: timer.id }),
-          ]);
-        }
-
-        const insertArray: any[] = [];
-        for (const response of data.responses) {
-          insertArray.push(global.db.engine.insert(this.collection.responses, {
-            timerId: timer.id,
-            response: response.response,
-            enabled: response.enabled,
-            timestamp: 0,
-          }));
-        }
-        await Promise.all(insertArray);
-        callback(null, {
-          timer: await global.db.engine.findOne(this.collection.data, { id: timer.id }),
-          responses: await global.db.engine.find(this.collection.responses, { timerId: timer.id }),
-        });
+      const insertArray: any[] = [];
+      for (const response of data.responses) {
+        insertArray.push(global.db.engine.insert(this.collection.responses, {
+          timerId: timer.id,
+          response: response.response,
+          enabled: response.enabled,
+          timestamp: 0,
+        }));
+      }
+      await Promise.all(insertArray);
+      callback(null, {
+        timer: await global.db.engine.findOne(this.collection.data, { id: timer.id }),
+        responses: await global.db.engine.find(this.collection.responses, { timerId: timer.id }),
       });
     });
   }

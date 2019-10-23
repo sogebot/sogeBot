@@ -5,10 +5,9 @@ import Overlay from './_interface';
 import { isBot } from '../commons';
 import { ui } from '../decorators';
 import { isMainThread } from 'worker_threads';
+import { publicEndpoint } from '../helpers/socket';
 
 class EventList extends Overlay {
-  socket: any = null;
-
   @ui({
     type: 'link',
     href: '/overlays/eventlist',
@@ -26,22 +25,15 @@ class EventList extends Overlay {
   }
 
   sockets () {
-    global.panel.io.of('/overlays/eventlist').on('connection', (socket) => {
-      this.socket = socket;
-      socket.on('get', () => this.sendDataToOverlay());
-    });
+    publicEndpoint(this.nsp, 'get', () => this.sendDataToOverlay());
   }
 
   async sendDataToOverlay () {
-    if (!this.socket) {
-      return setTimeout(() => this.sendDataToOverlay(), 1000);
-    }
-
     let events = await global.db.engine.find('widgetsEventList');
     events = _.uniqBy(_.orderBy(events, 'timestamp', 'desc'), o =>
       (o.username + (o.event === 'cheer' ? crypto.randomBytes(64).toString('hex') : o.event))
     );
-    this.socket.emit('events', _.chunk(events, 20)[0]);
+    this.emit('events', _.chunk(events, 20)[0]);
   }
 
   async add (data: EventList.Event) {

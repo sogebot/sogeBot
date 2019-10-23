@@ -1,6 +1,7 @@
 import { getTime } from '../commons';
 import { ui } from '../decorators';
 import Overlay from './_interface';
+import { publicEndpoint } from '../helpers/socket';
 
 class Stats extends Overlay {
   @ui({
@@ -13,17 +14,15 @@ class Stats extends Overlay {
   linkBtn = null;
 
   sockets () {
-    global.panel.io.of('/overlays/stats').on('connection', (socket) => {
-      socket.on('get', async (cb) => {
-        const stats = {
-          uptime: getTime(global.api.isStreamOnline ? global.api.streamStatusChangeSince : 0, false),
-          viewers: global.api.stats.currentViewers,
-          followers: global.api.stats.currentFollowers,
-          subscribers: global.api.stats.currentSubscribers,
-          bits: global.api.stats.currentBits,
-        };
-        cb(stats);
-      });
+    publicEndpoint(this.nsp, 'get', async (cb) => {
+      const stats = {
+        uptime: getTime(global.api.isStreamOnline ? global.api.streamStatusChangeSince : 0, false),
+        viewers: global.api.stats.currentViewers,
+        followers: global.api.stats.currentFollowers,
+        subscribers: global.api.stats.currentSubscribers,
+        bits: global.api.stats.currentBits,
+      };
+      cb(stats);
     });
   }
 }
