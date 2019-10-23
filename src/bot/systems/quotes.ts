@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 
 import { prepare, sendMessage } from '../commons';
-import { command, default_permission, settings } from '../decorators';
+import { command, default_permission } from '../decorators';
 import Expects from '../expects';
 import { permission } from '../permissions';
 import System from './_interface';

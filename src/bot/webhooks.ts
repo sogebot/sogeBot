@@ -4,7 +4,7 @@ import { get, isNil } from 'lodash';
 import { setTimeout } from 'timers';
 
 import { isBot } from './commons';
-import { debug, error, follow, info, start, warning } from './helpers/log';
+import { debug, error, follow, info, start } from './helpers/log';
 import { triggerInterfaceOnFollow } from './helpers/interface/triggers';
 
 class Webhooks {
