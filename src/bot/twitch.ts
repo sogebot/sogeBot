@@ -11,7 +11,7 @@ import Core from './_interface';
 
 
 import * as configFile from '@config';
-import { adminEndpoint } from './socket';
+import { adminEndpoint } from './helpers/socket';
 const config = configFile as any;
 config.timezone = config.timezone === 'system' || isNil(config.timezone) ? moment.tz.guess() : config.timezone;
 
@@ -29,7 +29,7 @@ class Twitch extends Core {
 
   sockets() {
     adminEndpoint(this.nsp, 'broadcaster', (cb) => {
-      cb(global.oauth.broadcasterUsername).toLowerCase();
+      cb((global.oauth.broadcasterUsername).toLowerCase());
     });
   }
 

@@ -8,6 +8,7 @@ import { command, default_permission, helper } from '../decorators';
 import System from './_interface';
 import { getOwner, sendMessage } from '../commons';
 import { error } from '../helpers/log';
+import { adminEndpoint } from '../helpers/socket';
 
 /*
  * !commercial                        - gets an info about alias usage
@@ -21,19 +22,13 @@ class Commercial extends System {
   }
 
   sockets() {
-    if (this.socket === null) {
-      return setTimeout(() => this.sockets(), 100);
-    }
-
-    this.socket.on('connection', (socket) => {
-      socket.on('commercial.run', (data) => {
-        global.tmi.message({
-          message: {
-            tags: { username: getOwner() },
-            message: '!commercial ' + data.seconds,
-          },
-          skip: true,
-        });
+    adminEndpoint(this.nsp, 'commercial.run', (data) => {
+      global.tmi.message({
+        message: {
+          tags: { username: getOwner() },
+          message: '!commercial ' + data.seconds,
+        },
+        skip: true,
       });
     });
   }

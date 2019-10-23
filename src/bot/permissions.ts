@@ -9,7 +9,7 @@ import { permission } from './helpers/permissions';
 import { command, default_permission, settings } from './decorators';
 import { isMainThread } from 'worker_threads';
 import { error } from './helpers/log';
-import { adminEndpoint } from './socket';
+import { adminEndpoint } from './helpers/socket';
 
 let isWarnedAboutCasters = false;
 

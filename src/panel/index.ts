@@ -96,17 +96,19 @@ const main = async () => {
   Vue.prototype.urlParam = (v) => urlParam(v);
 
   Vue.prototype.$loggedUser = await isUserLoggedIn();
-  isUserCaster();
+  if (Vue.prototype.$loggedUser !== false) {
+    isUserCaster();
 
-  Vue.prototype.$core = await getListOf('core');
-  Vue.prototype.$systems = await getListOf('systems');
-  Vue.prototype.$integrations = await getListOf('integrations');
+    Vue.prototype.$core = await getListOf('core');
+    Vue.prototype.$systems = await getListOf('systems');
+    Vue.prototype.$integrations = await getListOf('integrations');
 
-  await getTranslations();
-  Vue.prototype.configuration = await getConfiguration();
+    await getTranslations();
+    Vue.prototype.configuration = await getConfiguration();
 
-  Vue.prototype.$state = ButtonStates;
-  setMainLoaded();
+    Vue.prototype.$state = ButtonStates;
+    setMainLoaded();
+  }
 
   const router = new VueRouter({
     mode: 'hash',

@@ -1,7 +1,7 @@
 import glob from 'glob';
 
 import Widget from './_interface';
-import { adminEndpoint } from '../socket';
+import { adminEndpoint } from '../helpers/socket';
 
 class SoundBoard extends Widget {
   constructor() {

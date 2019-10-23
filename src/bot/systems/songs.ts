@@ -12,6 +12,7 @@ import { permission } from '../permissions';
 import System from './_interface';
 import { onChange, onLoad } from '../decorators/on';
 import { error, info } from '../helpers/log';
+import { publicEndpoint, adminEndpoint } from '../helpers/socket';
 
 const defaultApiKey = 'AIzaSyDYevtuLOxbyqBjh17JNZNvSQO854sngK0';
 
@@ -83,6 +84,43 @@ class Songs extends System {
     if (this.socket === null) {
       return setTimeout(() => this.sockets(), 100);
     }
+    publicEndpoint(this.nsp, 'find.playlist', async (where, cb) => {
+      where = where || {};
+      const playlist = await global.db.engine.find(this.collection.playlist, where);
+      for (const i of playlist) {
+        i.volume = await this.getVolume(i);
+        i.forceVolume = i.forceVolume || false;
+      }
+      cb(null, playlist);
+    });
+    adminEndpoint(this.nsp, 'find.ban', async (where, cb) => {
+      where = where || {};
+      cb(null, await global.db.engine.find(this.collection.ban, where));
+    });
+    publicEndpoint(this.nsp, 'find.request', async (where, cb) => {
+      where = where || {};
+      cb(null, _.orderBy(await global.db.engine.find(this.collection.request, where)), ['addedAt'], ['asc']);
+    });
+    adminEndpoint(this.nsp, 'delete.playlist', async (_id, cb) => {
+      await global.db.engine.remove(this.collection.playlist, { _id });
+      cb();
+    });
+    adminEndpoint(this.nsp, 'delete.ban', async (_id, cb) => {
+      await global.db.engine.remove(this.collection.ban, { _id });
+      cb();
+    });
+    adminEndpoint(this.nsp, 'import.ban', async (url, cb) => {
+      cb(null, await this.banSongById({ parameters: this.getIdFromURL(url), sender: null }));
+    });
+    adminEndpoint(this.nsp, 'import.playlist', async (playlist, cb) => {
+      cb(null, await this.importPlaylist({ parameters: playlist, sender: null }));
+    });
+    adminEndpoint(this.nsp, 'import.video', async (url, cb) => {
+      cb(null, await this.addSongToPlaylist({ parameters: url, sender: null }));
+    });
+    adminEndpoint(this.nsp, 'next', async () => {
+      this.sendNextSongID();
+    });
 
     this.socket.on('connection', (socket) => {
       socket.on('disconnect', (reason) => {
@@ -93,43 +131,6 @@ class Songs extends System {
       this.interval[socket.id] = setInterval(async () => {
         socket.emit('isPlaying', (isPlaying) => this.isPlaying[socket.id] = isPlaying);
       }, 1000);
-      socket.on('find.ban', async (where, cb) => {
-        where = where || {};
-        cb(null, await global.db.engine.find(this.collection.ban, where));
-      });
-      socket.on('find.playlist', async (where, cb) => {
-        where = where || {};
-        const playlist = await global.db.engine.find(this.collection.playlist, where);
-        for (const i of playlist) {
-          i.volume = await this.getVolume(i);
-          i.forceVolume = i.forceVolume || false;
-        }
-        cb(null, playlist);
-      });
-      socket.on('find.request', async (where, cb) => {
-        where = where || {};
-        cb(null, _.orderBy(await global.db.engine.find(this.collection.request, where)), ['addedAt'], ['asc']);
-      });
-      socket.on('delete.playlist', async (_id, cb) => {
-        await global.db.engine.remove(this.collection.playlist, { _id });
-        cb();
-      });
-      socket.on('delete.ban', async (_id, cb) => {
-        await global.db.engine.remove(this.collection.ban, { _id });
-        cb();
-      });
-      socket.on('import.ban', async (url, cb) => {
-        cb(null, await this.banSongById({ parameters: this.getIdFromURL(url), sender: null }));
-      });
-      socket.on('import.playlist', async (playlist, cb) => {
-        cb(null, await this.importPlaylist({ parameters: playlist, sender: null }));
-      });
-      socket.on('import.video', async (url, cb) => {
-        cb(null, await this.addSongToPlaylist({ parameters: url, sender: null }));
-      });
-      socket.on('next', async () => {
-        this.sendNextSongID();
-      });
     });
   }
 

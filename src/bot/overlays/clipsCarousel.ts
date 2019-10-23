@@ -1,5 +1,6 @@
 import Overlay from './_interface';
 import { settings, ui } from '../decorators';
+import { publicEndpoint } from '../helpers/socket';
 
 class ClipsCarousel extends Overlay {
   @settings('clips')
@@ -22,13 +23,10 @@ class ClipsCarousel extends Overlay {
   btnLink = null;
 
   sockets () {
-    global.panel.io
-      .of('/' + this._name + '/' + this.constructor.name.toLowerCase(), (socket) => {
-        socket.on('clips', async (cb) => {
-          const clips = await global.api.getTopClips({ period: 'custom', days: this.cClipsCustomPeriodInDays, first: this.cClipsNumOfClips });
-          cb(null, { clips, settings: { timeToNextClip: this.cClipsTimeToNextClip } });
-        });
-      });
+    publicEndpoint(this.nsp, 'clips', async (cb) => {
+      const clips = await global.api.getTopClips({ period: 'custom', days: this.cClipsCustomPeriodInDays, first: this.cClipsNumOfClips });
+      cb(null, { clips, settings: { timeToNextClip: this.cClipsTimeToNextClip } });
+    });
   }
 }
 

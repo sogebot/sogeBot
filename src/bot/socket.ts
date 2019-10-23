@@ -4,6 +4,7 @@ import { MINUTE, SECOND } from './constants';
 import { isMainThread } from 'worker_threads';
 import uuid = require('uuid/v4');
 import { permission } from './helpers/permissions';
+import { endpoints } from './helpers/socket';
 
 type Auth = {
   userId: string;
@@ -15,23 +16,6 @@ type Auth = {
 };
 
 let sockets: Auth[] = [];
-
-const endpoints: {
-  type: 'admin' | 'viewer' | 'public';
-  on: string;
-  nsp: string;
-  callback: Function;
-}[] = [];
-
-const adminEndpoint = (nsp: string, on: string, callback: Function) => {
-  endpoints.push({ nsp, on, callback, type: 'admin' });
-};
-const viewerEndpoint = (nsp: string, on: string, callback: Function) => {
-  endpoints.push({ nsp, on, callback, type: 'viewer' });
-};
-const publicEndpoint = (nsp: string, on: string, callback: Function) => {
-  endpoints.push({ nsp, on, callback, type: 'public' });
-};
 
 class Socket extends Core {
   @settings('connection')
@@ -78,13 +62,17 @@ class Socket extends Core {
       if (auth.type === 'admin') {
         for (const endpoint of endpoints.filter(o => o.type === 'admin' && o.nsp === socket.nsp.name)) {
           if (!Object.keys(socket._events).includes(endpoint.on)) {
-            socket.on(endpoint.on, endpoint.callback);
+            socket.on(endpoint.on, (...args) => {
+              endpoint.callback(...args, socket);
+            })
           }
         }
       }
       for (const endpoint of endpoints.filter(o => o.type === 'viewer' && o.nsp === socket.nsp.name)) {
         if (!Object.keys(socket._events).includes(endpoint.on)) {
-          socket.on(endpoint.on, endpoint.callback);
+          socket.on(endpoint.on, (...args) => {
+            endpoint.callback(...args, socket);
+          })
         }
       }
 
@@ -138,7 +126,9 @@ class Socket extends Core {
 
     for (const endpoint of endpoints.filter(o => o.type === 'public' && o.nsp === socket.nsp.name)) {
       if (!Object.keys(socket._events).includes(endpoint.on)) {
-        socket.on(endpoint.on, endpoint.callback);
+        socket.on(endpoint.on, (...args) => {
+          endpoint.callback(...args, socket);
+        })
       }
     }
   }
@@ -154,4 +144,4 @@ class Socket extends Core {
 }
 
 export default Socket;
-export { adminEndpoint, viewerEndpoint, publicEndpoint, Socket };
+export { Socket };

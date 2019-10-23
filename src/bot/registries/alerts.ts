@@ -2,6 +2,7 @@ import Registry from './_interface';
 import { isMainThread } from 'worker_threads';
 import { generateUsername } from '../helpers/generateUsername';
 import { getLocalizedName } from '../commons';
+import { publicEndpoint } from '../helpers/socket';
 
 class Alerts extends Registry {
   constructor() {
@@ -30,35 +31,29 @@ class Alerts extends Registry {
   }
 
   sockets () {
-    if (this.socket === null) {
-      return setTimeout(() => this.sockets(), 100);
-    }
-
-    this.socket.on('connection', (socket) => {
-      socket.on('isAlertUpdated', async ({updatedAt, id}: { updatedAt: number; id: string }, cb: (isUpdated: boolean, updatedAt: number) => void) => {
-        const alert = await global.db.engine.findOne(this.collection.data, { id });
-        if (typeof alert.id !== 'undefined') {
-          cb(updatedAt < (alert.updatedAt || 0), alert.updatedAt || 0);
-        } else {
-          cb(false, 0);
+    publicEndpoint(this.nsp, 'isAlertUpdated', async ({updatedAt, id}: { updatedAt: number; id: string }, cb: (isUpdated: boolean, updatedAt: number) => void) => {
+      const alert = await global.db.engine.findOne(this.collection.data, { id });
+      if (typeof alert.id !== 'undefined') {
+        cb(updatedAt < (alert.updatedAt || 0), alert.updatedAt || 0);
+      } else {
+        cb(false, 0);
+      }
+    });
+    publicEndpoint(this.nsp, 'clear-media', async () => {
+      const alerts: Registry.Alerts.Alert[] = await global.db.engine.find(this.collection.data);
+      const mediaIds: string[] = [];
+      for (const alert of alerts) {
+        for (const event of Object.keys(alert.alerts)) {
+          alert.alerts[event].map(o => {
+            mediaIds.push(o.imageId);
+            mediaIds.push(o.soundId);
+          });
         }
-      });
-      socket.on('clear-media', async () => {
-        const alerts: Registry.Alerts.Alert[] = await global.db.engine.find(this.collection.data);
-        const mediaIds: string[] = [];
-        for (const alert of alerts) {
-          for (const event of Object.keys(alert.alerts)) {
-            alert.alerts[event].map(o => {
-              mediaIds.push(o.imageId);
-              mediaIds.push(o.soundId);
-            });
-          }
-        }
-        await global.db.engine.remove(this.collection.media, { id: { $nin: mediaIds } });
-      });
-      socket.on('test', async (event: keyof Registry.Alerts.List) => {
-        this.test({ event });
-      });
+      }
+      await global.db.engine.remove(this.collection.media, { id: { $nin: mediaIds } });
+    });
+    publicEndpoint(this.nsp, 'test', async (event: keyof Registry.Alerts.List) => {
+      this.test({ event });
     });
   }
 

@@ -1,6 +1,6 @@
 import { settings } from '../decorators';
 import Widget from './_interface';
-import { adminEndpoint } from '../socket';
+import { adminEndpoint } from '../helpers/socket';
 
 class EventList extends Widget {
   @settings()

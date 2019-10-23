@@ -7,6 +7,7 @@ import { getOwner, prepare, sendMessage } from '../commons';
 import { command, default_permission, parser, settings } from '../decorators';
 import { permission } from '../permissions';
 import System from './_interface';
+import { adminEndpoint } from '../helpers/socket';
 
 const TYPE_NORMAL = 0;
 const TYPE_TICKETS = 1;
@@ -44,20 +45,15 @@ class Raffles extends System {
   }
 
   sockets () {
-    if (this.socket === null) {
-      return global.setTimeout(() => this.sockets(), 100);
-    }
-    this.socket.on('connection', (socket) => {
-      socket.on('pick', async (cb) => {
-        this.pick();
-      });
-      socket.on('open', async (message) => {
-        this.open({ username: getOwner(), parameters: message });
-      });
-      socket.on('close', async () => {
-        global.db.engine.remove(this.collection.data, {});
-        global.db.engine.remove(this.collection.participants, {});
-      });
+    adminEndpoint(this.nsp, 'pick', async (cb) => {
+      this.pick();
+    });
+    adminEndpoint(this.nsp, 'open', async (message) => {
+      this.open({ username: getOwner(), parameters: message });
+    });
+    adminEndpoint(this.nsp, 'close', async () => {
+      global.db.engine.remove(this.collection.data, {});
+      global.db.engine.remove(this.collection.participants, {});
     });
   }
 

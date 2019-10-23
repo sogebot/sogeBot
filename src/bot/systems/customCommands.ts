@@ -14,6 +14,7 @@ import { isMainThread } from 'worker_threads';
 import uuid from 'uuid';
 
 import { chatOut } from '../helpers/log';
+import { adminEndpoint } from '../helpers/socket';
 
 /*
  * !command                                                                 - gets an info about command usage
@@ -41,115 +42,109 @@ class CustomCommands extends System {
   }
 
   sockets () {
-    if (this.socket === null) {
-      return setTimeout(() => this.sockets(), 100);
-    }
+    adminEndpoint(this.nsp, 'find.commands', async (opts, cb) => {
+      opts.collection = opts.collection || 'data';
+      if (opts.collection.startsWith('_')) {
+        opts.collection = opts.collection.replace('_', '');
+      } else {
+        opts.collection = this.collection[opts.collection];
+      }
 
-    this.socket.on('connection', (socket) => {
-      socket.on('find.commands', async (opts, cb) => {
-        opts.collection = opts.collection || 'data';
-        if (opts.collection.startsWith('_')) {
-          opts.collection = opts.collection.replace('_', '');
-        } else {
-          opts.collection = this.collection[opts.collection];
-        }
+      opts.where = opts.where || {};
 
-        opts.where = opts.where || {};
+      const items: (Types.CustomCommands.Command & { responses?: Types.CustomCommands.Response[] })[] = await global.db.engine.find(opts.collection, opts.where);
+      for (const i of items) {
+        i.count = await getCountOfCommandUsage(i.command);
+        i.responses = await global.db.engine.find(this.collection.responses, { cid: i.id });
+      }
+      if (_.isFunction(cb)) {
+        cb(null, items);
+      }
+    });
+    adminEndpoint(this.nsp, 'findOne.command', async (opts, cb) => {
+      opts.collection = opts.collection || 'data';
+      if (opts.collection.startsWith('_')) {
+        opts.collection = opts.collection.replace('_', '');
+      } else {
+        opts.collection = this.collection[opts.collection];
+      }
 
-        const items: (Types.CustomCommands.Command & { responses?: Types.CustomCommands.Response[] })[] = await global.db.engine.find(opts.collection, opts.where);
-        for (const i of items) {
-          i.count = await getCountOfCommandUsage(i.command);
-          i.responses = await global.db.engine.find(this.collection.responses, { cid: i.id });
-        }
-        if (_.isFunction(cb)) {
-          cb(null, items);
-        }
-      });
-      socket.on('findOne.command', async (opts, cb) => {
-        opts.collection = opts.collection || 'data';
-        if (opts.collection.startsWith('_')) {
-          opts.collection = opts.collection.replace('_', '');
-        } else {
-          opts.collection = this.collection[opts.collection];
-        }
+      opts.where = opts.where || {};
 
-        opts.where = opts.where || {};
+      const item: Types.CustomCommands.Command = await global.db.engine.findOne(opts.collection, opts.where);
+      item.count = await getCountOfCommandUsage(item.command);
+      const responses = await global.db.engine.find(this.collection.responses, { cid: item.id });
+      if (_.isFunction(cb)) {
+        cb(null, { responses, ...item });
+      }
+    });
+    adminEndpoint(this.nsp, 'update.command', async (opts, cb) => {
+      opts.collection = opts.collection || 'data';
+      if (opts.collection.startsWith('_')) {
+        opts.collection = opts.collection.replace('_', '');
+      } else {
+        opts.collection = this.collection[opts.collection];
+      }
 
-        const item: Types.CustomCommands.Command = await global.db.engine.findOne(opts.collection, opts.where);
-        item.count = await getCountOfCommandUsage(item.command);
-        const responses = await global.db.engine.find(this.collection.responses, { cid: item.id });
-        if (_.isFunction(cb)) {
-          cb(null, { responses, ...item });
-        }
-      });
-      socket.on('update.command', async (opts, cb) => {
-        opts.collection = opts.collection || 'data';
-        if (opts.collection.startsWith('_')) {
-          opts.collection = opts.collection.replace('_', '');
-        } else {
-          opts.collection = this.collection[opts.collection];
-        }
+      if (opts.items) {
+        for (const item of opts.items) {
+          const id = item.id; delete item._id;
+          const count = item.count; delete item.count;
+          const responses = item.responses; delete item.responses;
 
-        if (opts.items) {
-          for (const item of opts.items) {
-            const id = item.id; delete item._id;
-            const count = item.count; delete item.count;
-            const responses = item.responses; delete item.responses;
+          let itemFromDb = item;
+          if (_.isNil(id)) {
+            itemFromDb = await global.db.engine.insert(opts.collection, item);
+          } else {
+            await global.db.engine.update(opts.collection, { id }, item);
+          }
 
-            let itemFromDb = item;
-            if (_.isNil(id)) {
-              itemFromDb = await global.db.engine.insert(opts.collection, item);
+          // set command count
+          const cCount = await getCountOfCommandUsage(itemFromDb.command);
+          if (count !== cCount && count === 0) {
+            // we assume its always reset (set to 0)
+            await resetCountOfCommandUsage(itemFromDb.command);
+          }
+
+          // update responses
+          const rIds: any[] = [];
+          for (const r of responses) {
+            if (!r.cid) {
+              r.cid = id || String(itemFromDb.id);
+            }
+
+            if (!r._id) {
+              rIds.push(
+                String((await global.db.engine.insert(this.collection.responses, r))._id)
+              );
             } else {
-              await global.db.engine.update(opts.collection, { id }, item);
-            }
-
-            // set command count
-            const cCount = await getCountOfCommandUsage(itemFromDb.command);
-            if (count !== cCount && count === 0) {
-              // we assume its always reset (set to 0)
-              await resetCountOfCommandUsage(itemFromDb.command);
-            }
-
-            // update responses
-            const rIds: any[] = [];
-            for (const r of responses) {
-              if (!r.cid) {
-                r.cid = id || String(itemFromDb.id);
-              }
-
-              if (!r._id) {
-                rIds.push(
-                  String((await global.db.engine.insert(this.collection.responses, r))._id)
-                );
-              } else {
-                const _id = String(r._id); delete r._id;
-                rIds.push(_id);
-                await global.db.engine.update(this.collection.responses, { _id }, r);
-              }
-            }
-
-            itemFromDb.id = id || String(itemFromDb.id);
-
-            // remove responses
-            for (const r of await global.db.engine.find(this.collection.responses, { cid: itemFromDb.id })) {
-              if (!rIds.includes(String(r._id))) {
-                await global.db.engine.remove(this.collection.responses, { _id: String(r._id) });
-              }
-            }
-
-            if (_.isFunction(cb)) {
-              cb(null, {
-                command: itemFromDb,
-                responses: await global.db.engine.find(this.collection.responses, { cid: itemFromDb.id }),
-              });
+              const _id = String(r._id); delete r._id;
+              rIds.push(_id);
+              await global.db.engine.update(this.collection.responses, { _id }, r);
             }
           }
-        } else {
+
+          itemFromDb.id = id || String(itemFromDb.id);
+
+          // remove responses
+          for (const r of await global.db.engine.find(this.collection.responses, { cid: itemFromDb.id })) {
+            if (!rIds.includes(String(r._id))) {
+              await global.db.engine.remove(this.collection.responses, { _id: String(r._id) });
+            }
+          }
+
           if (_.isFunction(cb)) {
-            cb(null, []);
+            cb(null, {
+              command: itemFromDb,
+              responses: await global.db.engine.find(this.collection.responses, { cid: itemFromDb.id }),
+            });
           }
         }
-      });
+      } else {
+        if (_.isFunction(cb)) {
+          cb(null, []);
+        }
+      }
     });
   }
 

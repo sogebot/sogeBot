@@ -11,6 +11,7 @@ import { onChange, onStartup } from '../decorators/on';
 import Expects from '../expects';
 import Integration from './_interface';
 import { debug, error, info, warning } from '../helpers/log';
+import { adminEndpoint } from '../helpers/socket';
 
 /*
  * How to integrate:
@@ -324,78 +325,74 @@ class Spotify extends Integration {
   }
 
   sockets () {
-    const io = global.panel.io.of('/integrations/spotify');
+    adminEndpoint(this.nsp, 'state', async (callback) => {
+      callback(null, this.state);
+    });
+    adminEndpoint(this.nsp, 'skip', async (callback) => {
+      this.skipToNextSong = true;
+      callback(null);
+    });
+    adminEndpoint(this.nsp, 'code', async (token, callback) => {
+      const waitForUsername = () => {
+        return new Promise((resolve, reject) => {
+          const check = async (resolve) => {
+            this.client.getMe()
+              .then((data) => {
+                this.username = data.body.display_name ? data.body.display_name : data.body.id;
+                resolve();
+              }, () => {
+                global.setTimeout(() => {
+                  check(resolve);
+                }, 1000);
+              });
+          };
+          check(resolve);
+        });
+      };
 
-    io.on('connection', (socket) => {
-      socket.on('state', async (callback) => {
-        callback(null, this.state);
-      });
-      socket.on('skip', async (callback) => {
-        this.skipToNextSong = true;
-        callback(null);
-      });
-      socket.on('code', async (token, callback) => {
-        const waitForUsername = () => {
-          return new Promise((resolve, reject) => {
-            const check = async (resolve) => {
-              this.client.getMe()
-                .then((data) => {
-                  this.username = data.body.display_name ? data.body.display_name : data.body.id;
-                  resolve();
-                }, () => {
-                  global.setTimeout(() => {
-                    check(resolve);
-                  }, 1000);
-                });
-            };
-            check(resolve);
-          });
-        };
+      this.currentSong = JSON.stringify({});
+      this.connect({ token });
+      await waitForUsername();
+      callback(null, true);
+    });
+    adminEndpoint(this.nsp, 'revoke', async (cb) => {
+      clearTimeout(this.timeouts.IRefreshToken);
 
-        this.currentSong = JSON.stringify({});
-        this.connect({ token });
-        await waitForUsername();
-        callback(null, true);
-      });
-      socket.on('revoke', async (cb) => {
-        clearTimeout(this.timeouts.IRefreshToken);
+      const username = this.username;
+      this.client.resetAccessToken();
+      this.client.resetRefreshToken();
+      this.userId = null;
+      this._accessToken = null;
+      this._refreshToken = null;
+      this.authenticatedScopes = [];
+      this.username = '';
+      this.currentSong = JSON.stringify({});
 
-        const username = this.username;
-        this.client.resetAccessToken();
-        this.client.resetRefreshToken();
-        this.userId = null;
-        this._accessToken = null;
-        this._refreshToken = null;
-        this.authenticatedScopes = [];
-        this.username = '';
-        this.currentSong = JSON.stringify({});
+      info(chalk.yellow('SPOTIFY: ') + `Access to account ${username} is revoked`);
 
-        info(chalk.yellow('SPOTIFY: ') + `Access to account ${username} is revoked`);
-
-        this.timeouts.IRefreshToken = global.setTimeout(() => this.IRefreshToken(), 60000);
-        cb(null, { do: 'refresh' });
-      });
-      socket.on('authorize', async (cb) => {
-        if (
-          this.clientId === ''
-          || this.clientSecret === ''
-        ) {
-          cb('Cannot authorize! Missing clientId or clientSecret.', null);
-        } else {
-          try {
-            const authorizeURI = this.authorizeURI();
-            if (!authorizeURI) {
-              error('Integration must be enabled to authorize');
-              cb('Integration must enabled to authorize');
-            } else {
-              cb(null, { do: 'redirect', opts: [authorizeURI] });
-            }
-          } catch (e) {
-            error(e.stack);
-            cb(e.stack, null);
+      this.timeouts.IRefreshToken = global.setTimeout(() => this.IRefreshToken(), 60000);
+      cb(null, { do: 'refresh' });
+    });
+    adminEndpoint(this.nsp, 'authorize', async (cb) => {
+      if (
+        this.clientId === ''
+        || this.clientSecret === ''
+      ) {
+        cb('Cannot authorize! Missing clientId or clientSecret.', null);
+      } else {
+        try {
+          const authorizeURI = this.authorizeURI();
+          if (!authorizeURI) {
+            error('Integration must be enabled to authorize');
+            cb('Integration must enabled to authorize');
+          } else {
+            cb(null, { do: 'redirect', opts: [authorizeURI] });
           }
+        } catch (e) {
+          error(e.stack);
+          cb(e.stack, null);
         }
-      });
+      }
     });
   }
 

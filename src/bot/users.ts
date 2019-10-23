@@ -8,7 +8,7 @@ import Core from './_interface';
 import * as commons from './commons';
 import { debug, error, isDebugEnabled } from './helpers/log';
 import { permission } from './helpers/permissions';
-import { adminEndpoint, viewerEndpoint } from './socket';
+import { adminEndpoint, viewerEndpoint } from './helpers/socket';
 
 class Users extends Core {
   uiSortCache: string | null = null;

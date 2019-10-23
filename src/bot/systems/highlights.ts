@@ -10,6 +10,7 @@ import { permission } from '../permissions';
 import System from './_interface';
 import { isMainThread } from 'worker_threads';
 import { error } from '../helpers/log';
+import { adminEndpoint } from '../helpers/socket';
 
 const ERROR_STREAM_NOT_ONLINE = '1';
 const ERROR_MISSING_TOKEN = '2';
@@ -35,21 +36,15 @@ class Highlights extends System {
   }
 
   public sockets() {
-    if (this.socket === null) {
-      return setTimeout(() => this.sockets(), 100);
-    }
-
-    this.socket.on('connection', (socket) => {
-      socket.on('highlight', () => {
-        this.main({ parameters: '', sender: null });
-      });
-      socket.on('list', async (cb) => {
-        cb(null, await global.db.engine.find(this.collection.data));
-      });
-      socket.on('delete', async (_id, cb) => {
-        await global.db.engine.remove(this.collection.data, { _id });
-        cb(null);
-      });
+    adminEndpoint(this.nsp, 'highlight', () => {
+      this.main({ parameters: '', sender: null });
+    });
+    adminEndpoint(this.nsp, 'list', async (cb) => {
+      cb(null, await global.db.engine.find(this.collection.data));
+    });
+    adminEndpoint(this.nsp, 'delete', async (_id, cb) => {
+      await global.db.engine.remove(this.collection.data, { _id });
+      cb(null);
     });
   }
 

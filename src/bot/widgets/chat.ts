@@ -2,7 +2,7 @@ import axios from 'axios';
 
 import { getIgnoreList, sendMessage } from '../commons';
 import Widget from './_interface';
-import { adminEndpoint } from '../socket';
+import { adminEndpoint } from '../helpers/socket';
 
 class Chat extends Widget {
   testme = 'a';

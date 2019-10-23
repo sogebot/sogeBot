@@ -9,8 +9,10 @@ export const isUserLoggedIn = async function () {
     console.log('Redirecting, user is not authenticated');
     if (window.location.href.includes('popout')) {
       window.location.replace(window.location.origin + '/login#error=popout+must+be+logged#url=' + window.location.href);
+      return false
     } else {
       window.location.replace(window.location.origin + '/login');
+      return false
     }
   } else {
     try {

@@ -10,6 +10,7 @@ import { permission } from '../permissions';
 import System from './_interface';
 import * as constants from '../constants';
 import { debug, error } from '../helpers/log';
+import { adminEndpoint } from '../helpers/socket';
 
 class Points extends System {
   @settings('points')
@@ -169,14 +170,8 @@ class Points extends System {
   }
 
   sockets () {
-    if (this.socket === null) {
-      return setTimeout(() => this.sockets(), 100);
-    }
-
-    this.socket.on('connection', (socket) => {
-      socket.on('reset', async () => {
-        global.db.engine.remove('users.points', {});
-      });
+    adminEndpoint(this.nsp, 'reset', async () => {
+      global.db.engine.remove('users.points', {});
     });
   }
 

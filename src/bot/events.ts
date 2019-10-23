@@ -11,7 +11,7 @@ import Message from './message';
 import Parser from './parser';
 import { generateUsername } from './helpers/generateUsername';
 import { error, info, warning } from './helpers/log';
-import { adminEndpoint } from './socket';
+import { adminEndpoint } from './helpers/socket';
 
 class Events extends Core {
   public timeouts: { [x: string]: NodeJS.Timeout } = {};

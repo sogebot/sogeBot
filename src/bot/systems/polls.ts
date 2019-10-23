@@ -9,6 +9,7 @@ import { permission } from '../permissions';
 import System from './_interface';
 import uuid from 'uuid';
 import { warning } from '../helpers/log.js';
+import { adminEndpoint } from '../helpers/socket';
 
 enum ERROR {
   NOT_ENOUGH_OPTIONS,
@@ -50,53 +51,48 @@ class Polls extends System {
   }
 
   public async sockets() {
-    if (this.socket === null) {
-      return setTimeout(() => this.sockets(), 100);
-    }
-    this.socket.on('connection', (socket) => {
-      socket.on('create', async (vote: Poll, cb) => {
-        try {
-          const parameters = `-${vote.type} -title "${vote.title}" ${vote.options.filter((o) => o.trim().length > 0).join(' | ')}`;
-          this.open({
-            command: this.getCommand('!poll open'),
-            parameters,
-            sender: {
-              username: getOwner(),
-              displayName: getOwner(),
-              'message-type': 'chat',
-              userId: '0',
-              emotes: [],
-              badges: {
-                subscriber: 1,
-              },
+    adminEndpoint(this.nsp, 'create', async (vote: Poll, cb) => {
+      try {
+        const parameters = `-${vote.type} -title "${vote.title}" ${vote.options.filter((o) => o.trim().length > 0).join(' | ')}`;
+        this.open({
+          command: this.getCommand('!poll open'),
+          parameters,
+          sender: {
+            username: getOwner(),
+            displayName: getOwner(),
+            'message-type': 'chat',
+            userId: '0',
+            emotes: [],
+            badges: {
+              subscriber: 1,
             },
-          });
-          cb(null, null);
-        } catch (e) {
-          cb(e.stack, null);
-        }
-      });
-      socket.on('close', async (vote: Poll, cb) => {
-        try {
-          this.close({
-            command: this.getCommand('!poll close'),
-            parameters: '',
-            sender: {
-              username: getOwner(),
-              displayName: getOwner(),
-              'message-type': 'chat',
-              userId: '0',
-              emotes: [],
-              badges: {
-                subscriber: 1,
-              },
+          },
+        });
+        cb(null, null);
+      } catch (e) {
+        cb(e.stack, null);
+      }
+    });
+    adminEndpoint(this.nsp, 'close', async (vote: Poll, cb) => {
+      try {
+        this.close({
+          command: this.getCommand('!poll close'),
+          parameters: '',
+          sender: {
+            username: getOwner(),
+            displayName: getOwner(),
+            'message-type': 'chat',
+            userId: '0',
+            emotes: [],
+            badges: {
+              subscriber: 1,
             },
-          });
-          cb(null);
-        } catch (e) {
-          cb(e.stack);
-        }
-      });
+          },
+        });
+        cb(null);
+      } catch (e) {
+        cb(e.stack);
+      }
     });
   }
 

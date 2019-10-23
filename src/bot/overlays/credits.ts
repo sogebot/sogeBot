@@ -2,6 +2,7 @@ import _ from 'lodash';
 
 import Overlay from './_interface';
 import { settings, ui } from '../decorators';
+import { publicEndpoint } from '../helpers/socket';
 
 class Credits extends Overlay {
   @settings('credits')
@@ -92,65 +93,63 @@ class Credits extends Overlay {
   btnLink = null;
 
   sockets () {
-    global.panel.io.of('/overlays/credits').on('connection', (socket) => {
-      socket.on('load', async (cb) => {
-        const when = global.api.isStreamOnline ? global.api.streamStatusChangeSince : _.now() - 5000000000;
-        const timestamp = new Date(when).getTime();
-        let events = await global.db.engine.find('widgetsEventList');
+    publicEndpoint(this.nsp, 'load', async (cb) => {
+      const when = global.api.isStreamOnline ? global.api.streamStatusChangeSince : _.now() - 5000000000;
+      const timestamp = new Date(when).getTime();
+      let events = await global.db.engine.find('widgetsEventList');
 
-        // change tips if neccessary for aggregated events (need same currency)
-        events = events.filter((o) => o.timestamp >= timestamp);
-        for (const event of events) {
-          if (!_.isNil(event.amount) && !_.isNil(event.currency)) {
-            event.amount = this.cCreditsAggregated
-              ? global.currency.exchange(event.amount, event.currency, global.currency.mainCurrency)
-              : event.amount;
-            event.currency = global.currency.symbol(this.cCreditsAggregated ? global.currency.mainCurrency : event.currency);
-          }
+      // change tips if neccessary for aggregated events (need same currency)
+      events = events.filter((o) => o.timestamp >= timestamp);
+      for (const event of events) {
+        if (!_.isNil(event.amount) && !_.isNil(event.currency)) {
+          event.amount = this.cCreditsAggregated
+            ? global.currency.exchange(event.amount, event.currency, global.currency.mainCurrency)
+            : event.amount;
+          event.currency = global.currency.symbol(this.cCreditsAggregated ? global.currency.mainCurrency : event.currency);
         }
+      }
 
-        cb(null, {
-          settings: {
-            clips: {
-              shouldPlay: this.cClipsShouldPlay,
-              volume: this.cClipsVolume,
-            },
-            speed: this.cCreditsSpeed,
-            text: {
-              lastMessage: this.cTextLastMessage,
-              lastSubMessage: this.cTextLastSubMessage,
-              streamBy: this.cTextStreamBy,
-              follow: this.cTextFollow,
-              host: this.cTextHost,
-              raid: this.cTextRaid,
-              cheer: this.cTextCheer,
-              sub: this.cTextSub,
-              resub: this.cTextResub,
-              subgift: this.cTextSubgift,
-              subcommunitygift: this.cTextSubcommunitygift,
-              tip: this.cTextTip,
-            },
-            show: {
-              follow: this.cShowFollowers,
-              host: this.cShowHosts,
-              raid: this.cShowRaids,
-              sub: this.cShowSubscribers,
-              subgift: this.cShowSubgifts,
-              subcommunitygift: this.cShowSubcommunitygifts,
-              resub: this.cShowResubs,
-              cheer: this.cShowCheers,
-              clips: this.cShowClips,
-              tip: this.cShowTips,
-            },
+      cb(null, {
+        settings: {
+          clips: {
+            shouldPlay: this.cClipsShouldPlay,
+            volume: this.cClipsVolume,
           },
-          streamer: global.oauth.broadcasterUsername,
-          game: global.api.stats.currentGame,
-          title: global.api.stats.currentTitle,
-          clips: this.cShowClips ? await global.api.getTopClips({ period: this.cClipsPeriod, days: this.cClipsCustomPeriodInDays, first: this.cClipsNumOfClips }) : [],
-          events: events.filter((o) => o.timestamp >= timestamp),
-          customTexts: this.cCustomTextsValues,
-          social: this.cSocialValues,
-        });
+          speed: this.cCreditsSpeed,
+          text: {
+            lastMessage: this.cTextLastMessage,
+            lastSubMessage: this.cTextLastSubMessage,
+            streamBy: this.cTextStreamBy,
+            follow: this.cTextFollow,
+            host: this.cTextHost,
+            raid: this.cTextRaid,
+            cheer: this.cTextCheer,
+            sub: this.cTextSub,
+            resub: this.cTextResub,
+            subgift: this.cTextSubgift,
+            subcommunitygift: this.cTextSubcommunitygift,
+            tip: this.cTextTip,
+          },
+          show: {
+            follow: this.cShowFollowers,
+            host: this.cShowHosts,
+            raid: this.cShowRaids,
+            sub: this.cShowSubscribers,
+            subgift: this.cShowSubgifts,
+            subcommunitygift: this.cShowSubcommunitygifts,
+            resub: this.cShowResubs,
+            cheer: this.cShowCheers,
+            clips: this.cShowClips,
+            tip: this.cShowTips,
+          },
+        },
+        streamer: global.oauth.broadcasterUsername,
+        game: global.api.stats.currentGame,
+        title: global.api.stats.currentTitle,
+        clips: this.cShowClips ? await global.api.getTopClips({ period: this.cClipsPeriod, days: this.cClipsCustomPeriodInDays, first: this.cClipsNumOfClips }) : [],
+        events: events.filter((o) => o.timestamp >= timestamp),
+        customTexts: this.cCustomTextsValues,
+        social: this.cSocialValues,
       });
     });
   }

@@ -21,8 +21,13 @@ export default class ClipsOverlay extends Vue {
   socket = getSocket('/overlays/eventlist', true);
   events: any[] = [];
   created () {
+    setTimeout(() => this.refresh(), 1000);
+  }
+  refresh() {
+    console.log('refresh')
     this.socket.emit('get')
     this.socket.on('events', (data) => {
+      console.log({data})
       var order = (this.urlParam('order') as "desc" | "asc") || 'desc'
       var display: string | string[] = this.urlParam('display') || 'username,event'; display = display.split(',')
       var ignore: string | string[] = this.urlParam('ignore') || ''; ignore = ignore.split(',')
@@ -45,7 +50,7 @@ export default class ClipsOverlay extends Vue {
       }
       this.events = data
     })
-  }
+}
 }
 </script>
 

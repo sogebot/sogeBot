@@ -2,7 +2,7 @@
 
 import _ from 'lodash';
 import Widget from './_interface';
-import { adminEndpoint } from '../socket';
+import { adminEndpoint } from '../helpers/socket';
 
 class CustomVariables extends Widget {
   constructor() {
