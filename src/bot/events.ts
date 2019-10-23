@@ -11,6 +11,7 @@ import Message from './message';
 import Parser from './parser';
 import { generateUsername } from './helpers/generateUsername';
 import { error, info, warning } from './helpers/log';
+import { adminEndpoint } from './socket';
 
 class Events extends Core {
   public timeouts: { [x: string]: NodeJS.Timeout } = {};
@@ -531,115 +532,113 @@ class Events extends Core {
   }
 
   public sockets() {
-    global.panel.io.of('/core/events').on('connection', (socket) => {
-      socket.on('list.supported.events', (callback) => {
-        callback(null, this.supportedEventsList);
-      });
-      socket.on('list.supported.operations', (callback) => {
-        callback(null, this.supportedOperationsList);
-      });
+    adminEndpoint(this.nsp, 'list.supported.events', (callback) => {
+      callback(null, this.supportedEventsList);
+    });
+    adminEndpoint(this.nsp, 'list.supported.operations', (callback) => {
+      callback(null, this.supportedOperationsList);
+    });
 
-      socket.on('test.event', async (eventId, cb) => {
-        const username = _.sample(['short', 'someFreakingLongUsername', generateUsername()]) || 'short';
-        const recipient = _.sample(['short', 'someFreakingLongUsername', generateUsername()]) || 'short';
-        const months = _.random(0, 99, false);
-        const attributes = {
-          username,
-          is: {
-            moderator: _.random(0, 1, false) === 0,
-            subscriber: _.random(0, 1, false) === 0,
-            broadcaster: _.random(0, 1, false) === 0,
-            bot: _.random(0, 1, false) === 0,
-            owner: _.random(0, 1, false) === 0,
-          },
-          recipient,
-          recipientis: {
-            moderator: _.random(0, 1, false) === 0,
-            subscriber: _.random(0, 1, false) === 0,
-            broadcaster: _.random(0, 1, false) === 0,
-            bot: _.random(0, 1, false) === 0,
-            owner: _.random(0, 1, false) === 0,
-          },
-          subStreakShareEnabled: _.random(0, 1, false) === 0,
-          subStreak: _.random(10, 99, false),
-          subStreakName: getLocalizedName(_.random(10, 99, false), 'core.months'),
-          subCumulativeMonths: _.random(10, 99, false),
-          subCumulativeMonthsName: getLocalizedName(_.random(10, 99, false), 'core.months'),
-          months,
-          tier: _.random(0, 3, false),
-          monthsName: getLocalizedName(months, 'core.months'),
-          message: _.sample(['', 'Lorem Ipsum Dolor Sit Amet']),
-          viewers: _.random(0, 9999, false),
-          autohost: _.random(0, 1, false) === 0,
-          bits: _.random(1, 1000000, false),
-          duration: _.sample([30, 60, 90, 120, 150, 180]),
-          reason: _.sample(['', 'Lorem Ipsum Dolor Sit Amet']),
-          command: '!testcommand',
-          count: _.random(0, 9999, false),
-          method: _.random(0, 1, false) === 0 ? 'Twitch Prime' : '',
-          amount: _.random(0, 9999, true).toFixed(2),
-          currency: _.sample(['CZK', 'USD', 'EUR']),
-          currencyInBot: global.currency.mainCurrency,
-          amountInBotCurrency: _.random(0, 9999, true).toFixed(2),
-        };
-        for (const operation of (await global.db.engine.find('events.operations', { eventId }))) {
-          if (!_.isNil(attributes.is)) {
-            // flatten is
-            const is = attributes.is;
-            _.merge(attributes, flatten({ is }));
-          }
-          if (!_.isNil(attributes.recipientis)) {
-            // flatten recipientis
-            const recipientis = attributes.recipientis;
-            _.merge(attributes, flatten({ recipientis }));
-          }
-          const isOperationSupported = !_.isNil(_.find(this.supportedOperationsList, (o) => o.id === operation.key));
-          if (isOperationSupported) {
-            const foundOp = this.supportedOperationsList.find((o) =>  o.id === operation.key);
-            if (foundOp) {
-              foundOp.fire(operation.definitions, attributes);
-            }
+    adminEndpoint(this.nsp, 'test.event', async (eventId, cb) => {
+      const username = _.sample(['short', 'someFreakingLongUsername', generateUsername()]) || 'short';
+      const recipient = _.sample(['short', 'someFreakingLongUsername', generateUsername()]) || 'short';
+      const months = _.random(0, 99, false);
+      const attributes = {
+        username,
+        is: {
+          moderator: _.random(0, 1, false) === 0,
+          subscriber: _.random(0, 1, false) === 0,
+          broadcaster: _.random(0, 1, false) === 0,
+          bot: _.random(0, 1, false) === 0,
+          owner: _.random(0, 1, false) === 0,
+        },
+        recipient,
+        recipientis: {
+          moderator: _.random(0, 1, false) === 0,
+          subscriber: _.random(0, 1, false) === 0,
+          broadcaster: _.random(0, 1, false) === 0,
+          bot: _.random(0, 1, false) === 0,
+          owner: _.random(0, 1, false) === 0,
+        },
+        subStreakShareEnabled: _.random(0, 1, false) === 0,
+        subStreak: _.random(10, 99, false),
+        subStreakName: getLocalizedName(_.random(10, 99, false), 'core.months'),
+        subCumulativeMonths: _.random(10, 99, false),
+        subCumulativeMonthsName: getLocalizedName(_.random(10, 99, false), 'core.months'),
+        months,
+        tier: _.random(0, 3, false),
+        monthsName: getLocalizedName(months, 'core.months'),
+        message: _.sample(['', 'Lorem Ipsum Dolor Sit Amet']),
+        viewers: _.random(0, 9999, false),
+        autohost: _.random(0, 1, false) === 0,
+        bits: _.random(1, 1000000, false),
+        duration: _.sample([30, 60, 90, 120, 150, 180]),
+        reason: _.sample(['', 'Lorem Ipsum Dolor Sit Amet']),
+        command: '!testcommand',
+        count: _.random(0, 9999, false),
+        method: _.random(0, 1, false) === 0 ? 'Twitch Prime' : '',
+        amount: _.random(0, 9999, true).toFixed(2),
+        currency: _.sample(['CZK', 'USD', 'EUR']),
+        currencyInBot: global.currency.mainCurrency,
+        amountInBotCurrency: _.random(0, 9999, true).toFixed(2),
+      };
+      for (const operation of (await global.db.engine.find('events.operations', { eventId }))) {
+        if (!_.isNil(attributes.is)) {
+          // flatten is
+          const is = attributes.is;
+          _.merge(attributes, flatten({ is }));
+        }
+        if (!_.isNil(attributes.recipientis)) {
+          // flatten recipientis
+          const recipientis = attributes.recipientis;
+          _.merge(attributes, flatten({ recipientis }));
+        }
+        const isOperationSupported = !_.isNil(_.find(this.supportedOperationsList, (o) => o.id === operation.key));
+        if (isOperationSupported) {
+          const foundOp = this.supportedOperationsList.find((o) =>  o.id === operation.key);
+          if (foundOp) {
+            foundOp.fire(operation.definitions, attributes);
           }
         }
+      }
 
-        cb();
+      cb();
+    });
+
+    adminEndpoint(this.nsp, 'save.event', async (opts, cb) => {
+      const { event, operations, filters } = opts;
+
+      // first, remove all event related items
+      await Promise.all([
+        global.db.engine.remove('events', { id: event.id }),
+        global.db.engine.remove('events.filters', { eventId: event.id }),
+        global.db.engine.remove('events.operations', { eventId: event.id }),
+      ]);
+
+      // save event
+      delete event._id;
+      await global.db.engine.insert('events', event);
+
+      // save operations
+      for (const op of operations) {
+        delete op._id;
+        await global.db.engine.insert('events.operations', op);
+      }
+
+      // save filters
+      await global.db.engine.insert('events.filters', {
+        filters, eventId: event.id,
       });
+      cb(null, event.id);
+    });
 
-      socket.on('save.event', async (opts, cb) => {
-        const { event, operations, filters } = opts;
-
-        // first, remove all event related items
-        await Promise.all([
-          global.db.engine.remove('events', { id: event.id }),
-          global.db.engine.remove('events.filters', { eventId: event.id }),
-          global.db.engine.remove('events.operations', { eventId: event.id }),
-        ]);
-
-        // save event
-        delete event._id;
-        await global.db.engine.insert('events', event);
-
-        // save operations
-        for (const op of operations) {
-          delete op._id;
-          await global.db.engine.insert('events.operations', op);
-        }
-
-        // save filters
-        await global.db.engine.insert('events.filters', {
-          filters, eventId: event.id,
-        });
-        cb(null, event.id);
-      });
-
-      socket.on('delete.event', async (eventId, cb) => {
-        await Promise.all([
-          global.db.engine.remove('events', { id: eventId }),
-          global.db.engine.remove('events.filters', { eventId }),
-          global.db.engine.remove('events.operations', { eventId }),
-        ]);
-        cb(null, eventId);
-      });
+    adminEndpoint(this.nsp, 'delete.event', async (eventId, cb) => {
+      await Promise.all([
+        global.db.engine.remove('events', { id: eventId }),
+        global.db.engine.remove('events.filters', { eventId }),
+        global.db.engine.remove('events.operations', { eventId }),
+      ]);
+      cb(null, eventId);
     });
   }
 

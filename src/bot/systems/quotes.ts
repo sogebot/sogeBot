@@ -13,9 +13,6 @@ export interface QuoteInterface {
 }
 
 class Quotes extends System {
-  @settings()
-  urlBase: string = 'localhost';
-
   constructor () {
     super();
 
@@ -100,7 +97,7 @@ class Quotes extends System {
 
   @command('!quote list')
   async list (opts) {
-    const urlBase = this.urlBase;
+    const urlBase = global.ui.domain;
     const message = await prepare(
       (['localhost', '127.0.0.1'].includes(urlBase) ? 'systems.quotes.list.is-localhost' : 'systems.quotes.list.ok'),
       { urlBase });

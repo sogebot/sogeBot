@@ -43,15 +43,14 @@ export default {
   data: function () {
     return {
       EventBus,
-      socket: getSocket('/'),
+      socket: getSocket('/core/twitch'),
       room: '',
       show: true,
       isRefreshing: false
     }
   },
   created: function () {
-    this.socket.emit('twitch.sendTwitchVideo')
-    this.socket.once('twitchVideo', (room) => {
+    this.socket.emit('broadcaster', (room) => {
       this.room = room;
     })
   },

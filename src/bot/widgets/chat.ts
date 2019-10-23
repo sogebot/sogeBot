@@ -14,6 +14,7 @@ class Chat extends Widget {
 
   public sockets() {
     adminEndpoint(this.nsp, 'chat.message.send', async (message) => {
+      console.log(this)
       const userObj = await global.users.getByName(global.oauth.botUsername);
       sendMessage(message, {
         username: userObj.username,
