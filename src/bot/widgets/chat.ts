@@ -14,7 +14,6 @@ class Chat extends Widget {
 
   public sockets() {
     adminEndpoint(this.nsp, 'chat.message.send', async (message) => {
-      console.log(this)
       const userObj = await global.users.getByName(global.oauth.botUsername);
       sendMessage(message, {
         username: userObj.username,
@@ -24,11 +23,11 @@ class Chat extends Widget {
         badges: {},
         'message-type': 'chat',
       }, { force: true });
-    })
+    });
 
     adminEndpoint(this.nsp, 'room', async (cb) => {
       cb(null, global.oauth.generalChannel.toLowerCase());
-    })
+    });
 
     adminEndpoint(this.nsp, 'viewers', async (cb) => {
       try {

@@ -11,12 +11,12 @@ export function getSocket(namespace: string, continueOnUnauthorized = false) {
       if (!authorizeInProgress) {
         const accessToken = localStorage.getItem('accessToken') || '';
         const refreshToken = localStorage.getItem('refreshToken') || '';
-        cb({accessToken, refreshToken})
+        cb({accessToken, refreshToken});
       }
     });
     socket.on('authorized', (cb) => {
       console.debug('AUTHORIZED ACCESS: ' + namespace);
-      console.debug(window.location.href)
+      console.debug(window.location.href);
       localStorage.setItem('accessToken', cb.accessToken);
       localStorage.setItem('refreshToken', cb.refreshToken);
       localStorage.setItem('userType', cb.type);
@@ -33,7 +33,7 @@ export function getSocket(namespace: string, continueOnUnauthorized = false) {
       }
       console.debug(window.location.href);
       console.debug('UNAUTHORIZED ACCESS (OK): ' + namespace);
-    })
+    });
     sockets[namespace] = socket;
   }
   return sockets[namespace];

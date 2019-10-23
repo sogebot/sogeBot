@@ -20,7 +20,7 @@ class Module {
   public socket: SocketIOClient.Socket | null;
 
   get nsp(): string {
-    return '/' + this._name + '/' + this.constructor.name.toLowerCase()
+    return '/' + this._name + '/' + this.constructor.name.toLowerCase();
   }
 
   get enabled(): boolean {

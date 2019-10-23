@@ -7,12 +7,12 @@ import { permission } from './helpers/permissions';
 
 type Auth = {
   userId: string;
-  type: 'admin' | 'viewer' | 'public',
+  type: 'admin' | 'viewer' | 'public';
   accessToken: string | null;
   accessTokenTimestamp: number;
   refreshToken: string;
   refreshTokenTimestamp: number;
-}
+};
 
 let sockets: Auth[] = [];
 
@@ -90,16 +90,16 @@ class Socket extends Core {
 
       // reauth every minute
       setTimeout(() => emitAuthorize(socket), MINUTE);
-    }
+    };
     const emitAuthorize = (socket) => {
-      socket.emit('authorize', (cb: { accessToken: string; refreshToken: string; }) => {
+      socket.emit('authorize', (cb: { accessToken: string; refreshToken: string }) => {
         if (cb.accessToken === '' || cb.refreshToken === '') {
           // we don't have anything
-          return socket.emit('unauthorized')
+          return socket.emit('unauthorized');
         } else {
-          const auth = sockets.find(o => (o.accessToken === cb.accessToken || o.refreshToken === cb.refreshToken) )
+          const auth = sockets.find(o => (o.accessToken === cb.accessToken || o.refreshToken === cb.refreshToken));
           if (!auth) {
-            return socket.emit('unauthorized')
+            return socket.emit('unauthorized');
           } else {
             if (auth.accessToken === cb.accessToken) {
               // update refreshToken timestamp to expire only if not used
@@ -114,7 +114,7 @@ class Socket extends Core {
           }
         }
       });
-    }
+    };
     next();
 
     socket.on('newAuthorization', async (userId, cb) => {
@@ -125,15 +125,15 @@ class Socket extends Core {
         accessTokenTimestamp: Date.now(),
         refreshTokenTimestamp: Date.now(),
         userId,
-        type: 'viewer'
-      }
+        type: 'viewer',
+      };
       if (userPermission === permission.CASTERS) {
-        auth.type = 'admin'
+        auth.type = 'admin';
       }
       sockets.push(auth);
       sendAuthorized(socket, auth);
       cb();
-    })
+    });
     emitAuthorize(socket);
 
     for (const endpoint of endpoints.filter(o => o.type === 'public' && o.nsp === socket.nsp.name)) {

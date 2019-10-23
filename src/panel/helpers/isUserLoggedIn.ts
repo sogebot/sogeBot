@@ -25,11 +25,11 @@ export const isUserLoggedIn = async function () {
       }
 
       // set new authorization if set
-      const newAuthorization = localStorage.getItem('newAuthorization')
+      const newAuthorization = localStorage.getItem('newAuthorization');
       if (newAuthorization !== null) {
         await new Promise((resolve) => {
           getSocket('/', true).emit('newAuthorization', data.id, () => resolve());
-        })
+        });
       }
       localStorage.removeItem('newAuthorization');
 
