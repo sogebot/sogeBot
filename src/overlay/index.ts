@@ -27,11 +27,9 @@ export interface Global {
 }
 
 declare let global: Global;
-declare let token: string;
 
 declare module 'vue/types/vue' {
   interface Vue {
-    token: string;
     configuration: any;
     $moment?: any;
     urlParam(key: string): string | null;
@@ -45,7 +43,6 @@ const overlays = async () => {
 
   Vue.prototype.translate = (v) => translate(v);
   Vue.prototype.urlParam = (v) => urlParam(v);
-  Vue.prototype.token = token;
   Vue.prototype.$state = ButtonStates;
 
   const router = new VueRouter({

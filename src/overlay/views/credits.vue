@@ -44,7 +44,7 @@ library.add(faDeviantart, faDiscord, faFacebook, faGithub, faGoogle, faInstagram
   }
 })
 export default class CreditsOverlay extends Vue {
-  socket = getSocket('/overlays/credits');
+  socket = getSocket('/overlays/credits', true);
   settings: any = {};
   pages: any[] = [];
   clipsPages: any[] = [];

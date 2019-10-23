@@ -103,8 +103,8 @@ let alerts: Registry.Alerts.EmitData[] = [];
   }
 })
 export default class AlertsRegistryOverlays extends Vue {
-  socket = getSocket('/registries/alerts');
-  socketRV = getSocket('/integrations/responsivevoice');
+  socket = getSocket('/registries/alerts', true);
+  socketRV = getSocket('/integrations/responsivevoice', true);
   interval: number[] = [];
   loadedFonts: string[] = [];
   loadedCSS: string[] = [];

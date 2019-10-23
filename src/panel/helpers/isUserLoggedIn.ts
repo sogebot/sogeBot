@@ -1,6 +1,5 @@
 import axios from 'axios';
 import { get } from 'lodash-es';
-import { permission } from 'src/bot/helpers/permissions';
 import { getSocket } from './socket';
 
 export const isUserLoggedIn = async function () {
@@ -24,6 +23,15 @@ export const isUserLoggedIn = async function () {
       if (data === null) {
         throw Error('User must be logged');
       }
+
+      // set new authorization if set
+      const newAuthorization = localStorage.getItem('newAuthorization')
+      if (newAuthorization !== null) {
+        await new Promise((resolve) => {
+          getSocket('/', true).emit('newAuthorization', data.id, () => resolve());
+        })
+      }
+      localStorage.removeItem('newAuthorization');
 
       // save userId to db
       await new Promise((resolve) => {
@@ -55,14 +63,8 @@ export const isUserLoggedIn = async function () {
   }
 };
 
-export const isUserCaster = async function (userId: string) {
-  return new Promise((resolve) => {
-    const socket = getSocket('/core/users');
-    socket.emit('findOne.viewer', { where: { id: userId }}, (err, viewer) => {
-      if (viewer.permission.id !== permission.CASTERS) {
-        window.location.replace(window.location.origin + '/login#error=must+be+caster');
-      }
-      resolve();
-    });
-  });
+export const isUserCaster = function () {
+  if (localStorage.getItem('userType') !== 'admin') {
+    window.location.replace(window.location.origin + '/login#error=must+be+caster');
+  };
 };

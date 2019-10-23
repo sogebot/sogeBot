@@ -19,6 +19,10 @@ class Module {
   public on: InterfaceSettings.On;
   public socket: SocketIOClient.Socket | null;
 
+  get nsp(): string {
+    return '/' + this._name + '/' + this.constructor.name.toLowerCase()
+  }
+
   get enabled(): boolean {
     return _.get(this, '_enabled', true);
   }
@@ -176,10 +180,11 @@ class Module {
     if (_.isNil(global.panel)) {
       this.timeouts[`${this.constructor.name}._sockets`] = setTimeout(() => this._sockets(), 1000);
     } else {
-      this.socket = global.panel.io.of('/' + this._name + '/' + this.constructor.name.toLowerCase());
+      global.panel.io.of(this.nsp).use(global.socket.authorize);
+      this.socket = global.panel.io.of(this.nsp);
       this.sockets();
       this.sockets = function() {
-        error('/' + this._name + '/' + this.constructor.name.toLowerCase() + ': Cannot initialize sockets second time');
+        error(this.nsp + ': Cannot initialize sockets second time');
       };
 
       if (this.socket) {

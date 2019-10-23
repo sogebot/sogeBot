@@ -90,29 +90,20 @@ declare module 'vue/types/vue' {
 
 Vue.use(VueRouter);
 
-declare global {
-  interface Window {
-    token: string | undefined;
-  }
-}
-
 const main = async () => {
   // init prototypes
   Vue.prototype.translate = (v) => translate(v);
   Vue.prototype.urlParam = (v) => urlParam(v);
 
+  Vue.prototype.$loggedUser = await isUserLoggedIn();
+  isUserCaster();
 
-  if (typeof window.token !== 'undefined') {
-    Vue.prototype.$loggedUser = await isUserLoggedIn();
-    await isUserCaster(Vue.prototype.$loggedUser.id);
+  Vue.prototype.$core = await getListOf('core');
+  Vue.prototype.$systems = await getListOf('systems');
+  Vue.prototype.$integrations = await getListOf('integrations');
 
-    Vue.prototype.$core = await getListOf('core');
-    Vue.prototype.$systems = await getListOf('systems');
-    Vue.prototype.$integrations = await getListOf('integrations');
-
-    await getTranslations();
-    Vue.prototype.configuration = await getConfiguration();
-  }
+  await getTranslations();
+  Vue.prototype.configuration = await getConfiguration();
 
   Vue.prototype.$state = ButtonStates;
   setMainLoaded();
@@ -186,12 +177,10 @@ const main = async () => {
         isDropdownHidden: boolean;
         dropdown: any;
         dropdownVue: any;
-        token: any;
       } = {
         isDropdownHidden: true,
         dropdown: null,
         dropdownVue: null,
-        token: window.token,
       };
       return object;
     },
@@ -247,30 +236,11 @@ const main = async () => {
     },
     template: `
       <div id="app" @click.capture="clickEvent">
-        <template v-if="token">
-          <navbar/>
-          <statsbar/>
-          <changegamedialog/>
-          <router-view class="view pt-1"></router-view>
-          <footerbar/>
-        </template>
-        <template v-else>
-        <div class="alert alert-danger ml-5 mr-5" role="alert">
-          This domain is not set as accessible in your <strong>config.json</strong>. Update your file and restart a bot to propagate changes. Example below:
-        </div>
-        <pre class="alert alert-info ml-5 mr-5" style="font-family: Monospace">
-... config.json ...
-"panel": {
-  "__COMMENT__": "set correctly your domain and to be safe, change your token",
-  "username": "***",
-  "password": "***",
-  "port": ***,
-  "domain": "yourdomain1, ${window.location.host.split(':')[0]}",
-  "token": "***"
-},
-... config.json ...
-            </pre>
-        </template>
+        <navbar/>
+        <statsbar/>
+        <changegamedialog/>
+        <router-view class="view pt-1"></router-view>
+        <footerbar/>
       </div>
     `,
   }).$mount('#app');

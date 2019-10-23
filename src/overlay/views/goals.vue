@@ -160,7 +160,7 @@ export default class GoalsOverlay extends Vue {
   group: Goals.Group | null = null;
   goals: Goals.Goal[] = [];
   loadedFonts: string[] = [];
-  socket = getSocket('/overlays/goals');
+  socket = getSocket('/overlays/goals', true);
   lastSwapTime: number = Date.now();
   triggerUpdate: string[] = [];
   cssLoaded: string[] = [];

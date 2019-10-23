@@ -2,6 +2,7 @@ import { getOwner } from '../commons';
 import { settings } from '../decorators';
 import Widget from './_interface';
 import { isMainThread } from 'worker_threads';
+import { adminEndpoint } from '../socket';
 
 class Cmdboard extends Widget {
   @settings()
@@ -19,21 +20,16 @@ class Cmdboard extends Widget {
   }
 
   public sockets() {
-    if (this.socket === null) {
-      return setTimeout(() => this.sockets(), 100);
-    }
-    this.socket.on('connection', (socket) => {
-      socket.on('cmdboard.widget.fetch', async (cb) => {
-        cb(await global.db.engine.find('widgetsCmdBoard'));
-      });
-      socket.on('cmdboard.widget.run', (command) => {
-        global.tmi.message({
-          message: {
-            tags: { username: getOwner() },
-            message: command,
-          },
-          skip: true,
-        });
+    adminEndpoint(this.nsp, 'cmdboard.widget.fetch', async (cb) => {
+      cb(await global.db.engine.find('widgetsCmdBoard'));
+    });
+    adminEndpoint(this.nsp, 'cmdboard.widget.run', (command) => {
+      global.tmi.message({
+        message: {
+          tags: { username: getOwner() },
+          message: command,
+        },
+        skip: true,
       });
     });
   }

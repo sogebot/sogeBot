@@ -48,7 +48,7 @@ library.add(faStar, faGem, faUsers, faClock, faEye)
   }
 })
 export default class StatsOverlay extends Vue {
-  socket = getSocket('/overlays/stats');
+  socket = getSocket('/overlays/stats', true);
   stats: any = {};
   interval: any[] = []
 

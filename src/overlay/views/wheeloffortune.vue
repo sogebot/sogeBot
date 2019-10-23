@@ -29,7 +29,7 @@ library.add(faSortDown)
 })
 export default class WheelOfFortuneOverlay extends Vue {
 
-  socket = getSocket('/games/wheeloffortune');
+  socket = getSocket('/games/wheeloffortune', true);
   username: null | string = null;
   theWheel: any = null;
 

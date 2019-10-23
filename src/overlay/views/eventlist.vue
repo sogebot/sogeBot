@@ -18,7 +18,7 @@ import { chunk, orderBy, filter, includes } from 'lodash-es';
 
 @Component({})
 export default class ClipsOverlay extends Vue {
-  socket = getSocket('/overlays/eventlist');
+  socket = getSocket('/overlays/eventlist', true);
   events: any[] = [];
   created () {
     this.socket.emit('get')

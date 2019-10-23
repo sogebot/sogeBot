@@ -1,5 +1,4 @@
 import axios from 'axios';
-import config from '@config';
 import util from 'util';
 import { get, isNil } from 'lodash';
 import { setTimeout } from 'timers';
@@ -52,7 +51,9 @@ class Webhooks {
     }
 
     // get proper domain
-    const domains = config.panel.domain.split(',').map((o) => o.trim()).filter((o) => o !== 'localhost');
+    // TODO: set manually domain in UI
+    // const domains = config.panel.domain.split(',').map((o) => o.trim()).filter((o) => o !== 'localhost');
+    const domains = [];
     if (domains.length === 0) {
       return;
     }
@@ -106,7 +107,9 @@ class Webhooks {
     }
 
     // get proper domain
-    const domains = config.panel.domain.split(',').map((o) => o.trim()).filter((o) => o !== 'localhost');
+    // TODO: set manually domain in UI
+    // const domains = config.panel.domain.split(',').map((o) => o.trim()).filter((o) => o !== 'localhost');
+    const domains = [];
     if (domains.length === 0) {
       return warning(`No suitable domain found to use with ${type} webhook ... localhost is not suitable`);
     }

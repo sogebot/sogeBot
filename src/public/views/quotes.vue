@@ -27,7 +27,7 @@ import { getSocket } from 'src/panel/helpers/socket';
   }
 })
 export default class playlist extends Vue {
-  socket = getSocket('/systems/quotes');
+  socket = getSocket('/systems/quotes', true);
 
   items: any[] = []
 

@@ -1,6 +1,7 @@
 import glob from 'glob';
 
 import Widget from './_interface';
+import { adminEndpoint } from '../socket';
 
 class SoundBoard extends Widget {
   constructor() {
@@ -9,25 +10,20 @@ class SoundBoard extends Widget {
   }
 
   public sockets() {
-    if (this.socket === null) {
-      return setTimeout(() => this.sockets(), 100);
-    }
-    this.socket.on('connection', (socket) => {
-      socket.on('getSoundBoardSounds', (cb) => {
-        glob('public/dist/soundboard/*.mp3', (err, files) => {
-          if (err) {
-            return cb([]); 
-          }
+    adminEndpoint(this.nsp, 'getSoundBoardSounds', (cb) => {
+      glob('public/dist/soundboard/*.mp3', (err, files) => {
+        if (err) {
+          return cb([]);
+        }
 
-          const sounds: string[] = [];
-          for (const file of files) {
-            const filename = file.split('/').pop();
-            if (filename) {
-              sounds.push(filename.replace('.mp3', ''));
-            }
+        const sounds: string[] = [];
+        for (const file of files) {
+          const filename = file.split('/').pop();
+          if (filename) {
+            sounds.push(filename.replace('.mp3', ''));
           }
-          cb(sounds);
-        });
+        }
+        cb(sounds);
       });
     });
   }

@@ -20,6 +20,10 @@
 
       // save token code to localStorage
       localStorage.setItem('code', code);
+
+      // set it as new authorization
+      localStorage.setItem('newAuthorization', true);
+
       window.location.replace(`${state.popoutUrl || state.url}`);
     } catch (error) {
       console.log({error});

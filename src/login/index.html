@@ -30,12 +30,8 @@
 <body style="padding-top: 0; height: 100%; width: 100%">
   <div id="login"></div>
 
-  <script type="text/javascript" src="/auth/token.js"></script>
-
   <script>
-    var socket = io({
-      query: "token=" + token
-    });
+    var socket = io();
 
     var translations = {}
     var configuration

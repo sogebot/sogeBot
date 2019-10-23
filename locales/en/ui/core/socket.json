@@ -1,0 +1,7 @@
+{
+  "settings": {
+    "purgeAllConnections": "Purge All Authenticated Connection (yours as well)",
+    "accessTokenExpirationTime": "Access Token Expiration Time (seconds)",
+    "refreshTokenExpirationTime": "Refresh Token Expiration Time (seconds)"
+  }
+}

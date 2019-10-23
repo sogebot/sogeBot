@@ -30,7 +30,7 @@ import { every, random, sample } from 'lodash-es';
 @Component({})
 export default class EmotesOverlay extends Vue {
   show = true;
-  socket = getSocket('/overlays/emotes');
+  socket = getSocket('/overlays/emotes', true);
   emotes: any[] = [];
   interval: any[] = [];
 

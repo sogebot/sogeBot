@@ -1,7 +1,5 @@
 import * as _ from 'lodash';
 
-import config from '@config';
-
 import { prepare, sendMessage } from '../commons';
 import { command, default_permission, settings } from '../decorators';
 import Expects from '../expects';
@@ -16,7 +14,7 @@ export interface QuoteInterface {
 
 class Quotes extends System {
   @settings()
-  urlBase: string = config.panel.domain.split(',').map((o) => o.trim())[0];
+  urlBase: string = 'localhost';
 
   constructor () {
     super();
