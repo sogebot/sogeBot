@@ -64,7 +64,7 @@ class Socket extends Core {
           if (!Object.keys(socket._events).includes(endpoint.on)) {
             socket.on(endpoint.on, (...args) => {
               endpoint.callback(...args, socket);
-            })
+            });
           }
         }
       }
@@ -72,7 +72,7 @@ class Socket extends Core {
         if (!Object.keys(socket._events).includes(endpoint.on)) {
           socket.on(endpoint.on, (...args) => {
             endpoint.callback(...args, socket);
-          })
+          });
         }
       }
 
@@ -128,7 +128,7 @@ class Socket extends Core {
       if (!Object.keys(socket._events).includes(endpoint.on)) {
         socket.on(endpoint.on, (...args) => {
           endpoint.callback(...args, socket);
-        })
+        });
       }
     }
   }

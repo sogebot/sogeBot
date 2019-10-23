@@ -15,4 +15,4 @@ const publicEndpoint = (nsp: string, on: string, callback: Function) => {
   endpoints.push({ nsp, on, callback, type: 'public' });
 };
 
-export { endpoints, adminEndpoint, viewerEndpoint, publicEndpoint }
+export { endpoints, adminEndpoint, viewerEndpoint, publicEndpoint };

@@ -12,7 +12,7 @@ import { permission } from '../permissions';
 import System from './_interface';
 import { onChange, onLoad } from '../decorators/on';
 import { error, info } from '../helpers/log';
-import { publicEndpoint, adminEndpoint } from '../helpers/socket';
+import { adminEndpoint, publicEndpoint } from '../helpers/socket';
 
 const defaultApiKey = 'AIzaSyDYevtuLOxbyqBjh17JNZNvSQO854sngK0';
 

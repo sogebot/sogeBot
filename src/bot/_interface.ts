@@ -114,7 +114,6 @@ class Module {
   }
 
   public emit(event: string, ...args: any[]) {
-    console.log(this.socket)
     if (this.socket && isMainThread) {
       this.socket.emit(event, ...args);
     } else if (!isMainThread) {

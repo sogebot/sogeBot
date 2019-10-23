@@ -26,9 +26,9 @@ class Quotes extends System {
 
   sockets() {
     publicEndpoint(this.nsp, 'find', async (_opts, cb) => {
-      let items = await global.db.engine.find(this.collection.data);
+      const items = await global.db.engine.find(this.collection.data);
       for (const item of items) {
-        item.quotedBy = await global.users.getNameById(item.quotedBy)
+        item.quotedBy = await global.users.getNameById(item.quotedBy);
       }
       cb(null, items);
     });
