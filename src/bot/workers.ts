@@ -267,7 +267,9 @@ class Workers {
             if (obj) {
               set(obj, data.path, data.value);
             } else {
-              throw Error(`${data.class} not found`);
+              if (data.class !== 'socket') {
+                throw Error(`${data.class} not found`);
+              }
             }
           } else if (data.system === 'widgets') {
             // widgets are only on master
