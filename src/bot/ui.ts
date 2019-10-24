@@ -38,7 +38,7 @@ class UI extends Core {
 
   sockets() {
     adminEndpoint(this.nsp, 'configuration', async (cb) => {
-      let data: any = {};
+      const data: any = {};
 
       for (const system of ['oauth', 'tmi', 'currency', 'ui', 'general', 'twitch']) {
         if (typeof data.core === 'undefined') {
@@ -84,7 +84,7 @@ class UI extends Core {
     });
 
     publicEndpoint(this.nsp, 'configuration', async (cb) => {
-      let data: any = {};
+      const data: any = {};
 
       for (const system of Object.keys(global.systems).filter(o => !o.startsWith('_'))) {
         if (typeof data.systems === 'undefined') {
