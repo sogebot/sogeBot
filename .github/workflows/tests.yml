@@ -17,9 +17,11 @@ jobs:
       with:
         node-version: 12
     - name: Install eslint and dependencies
-      run: npm install typescript eslint @typescript-eslint/parser @typescript-eslint/eslint-plugin --only=dev
+      run: npm install typescript eslint jsonlint-mod @typescript-eslint/parser @typescript-eslint/eslint-plugin --only=dev
     - name: Run eslint
-      run: npx eslint --ext .ts src --quiet
+      run: make eslint
+    - name: Run jsonlint
+      run: make jsonlint
   nedb:
     name: NeDB tests
     needs: eslint
