@@ -319,15 +319,6 @@ class TMI extends Core {
         if (message.event === 'HOST_ON') {
           if (typeof message.numberOfViewers !== 'undefined') { // may occur on restart bot when hosting
             global.events.fire('hosting', { target: message.username, viewers: message.numberOfViewers });
-            global.registries.alerts.trigger({
-              event: 'hosts',
-              name: message.username,
-              amount: Number(message.numberOfViewers),
-              currency: '',
-              monthsName: '',
-              message: '',
-              autohost: false,
-            });
           }
         }
       });
