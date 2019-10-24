@@ -36,7 +36,7 @@ class UI extends Core {
   subscribeWebhook() {
     if (isMainThread) {
       if (typeof global.webhooks === 'undefined') {
-        setTimeout(() => this.subscribeWebhook(), 1000)
+        setTimeout(() => this.subscribeWebhook(), 1000);
       } else {
         global.webhooks.subscribeAll();
       }
