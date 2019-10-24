@@ -284,7 +284,6 @@
 <script lang="ts">
   import Vue from 'vue'
   import { isNil, get } from 'lodash-es'
-  import axios from 'axios';
 
   import { EventBus } from 'src/panel/helpers/event-bus';
   import { getSocket } from 'src/panel/helpers/socket';
@@ -403,31 +402,44 @@
 
       this.socket.emit('version', async (version) => {
         this.version =  version;
-        try {
-          const response: any = await axios.get('https://api.github.com/repos/sogehige/sogebot/releases/latest');
-          let botVersion = version.replace('-SNAPSHOT', '').split('.')
-          let gitVersion = response.data.tag_name.split('.')
-          console.debug({botVersion, gitVersion});
 
-          let isNewer = false
-          for (let index in botVersion) {
-            botVersion[index] = parseInt(botVersion[index], 10)
-            gitVersion[index] = parseInt(gitVersion[index], 10)
-            if (botVersion[index] < gitVersion[index]) {
-              isNewer = true
-              break
-            } else if (botVersion[index] === gitVersion[index]) continue
-            else {
-              isNewer = false
-              break
+        const { response } = await new Promise(resolve => {
+          const request = new XMLHttpRequest();
+          request.open('GET', 'https://api.github.com/repos/sogehige/sogebot/releases/latest', true);
+
+          request.onload = function() {
+            if (!(this.status >= 200 && this.status < 400)) {
+              console.error('Error getting version from git', this.status, this.response)
             }
+            resolve({ response: JSON.parse(this.response)})
           }
+          request.onerror = function() {
+            console.error('Connection error to github')
+            resolve( { response: {} });
+          };
 
-          if (isNewer) {
-            this.update.version = gitVersion.join('.');
+          request.send();
+        })
+        let botVersion = version.replace('-SNAPSHOT', '').split('.')
+        let gitVersion = response.tag_name.split('.')
+        console.debug({botVersion, gitVersion});
+
+        let isNewer = false
+        for (let index in botVersion) {
+          botVersion[index] = parseInt(botVersion[index], 10)
+          gitVersion[index] = parseInt(gitVersion[index], 10)
+          if (botVersion[index] < gitVersion[index]) {
+            isNewer = true
+            break
+          } else if (botVersion[index] === gitVersion[index]) continue
+          else {
+            isNewer = false
+            break
           }
-        } catch (e) {
-          console.error(e);
+        }
+
+        if (isNewer) {
+          this.update.version = gitVersion.join('.');
         }
       })
 
