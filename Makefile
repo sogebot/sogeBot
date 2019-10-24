@@ -24,6 +24,11 @@ eslint:
 	@echo -ne "\n\t ----- Checking eslint\n"
 	npx eslint --ext .ts src --quiet
 
+jsonlint:
+	@echo -ne "\n\t ----- Checking jsonlint\n"
+	npx jsonlint src/bot/data/config.example.json
+	for a in $$(find ./locales -type f -iname "*.json" -print); do /bin/false; jsonlint $$a;
+
 css:
 	@echo -ne "\n\t ----- Generating CSS themes\n"
 	@npx node-sass --output-style expanded --precision 6 scss/themes/light.scss public/dist/css/light.css
