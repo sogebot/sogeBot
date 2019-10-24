@@ -6,6 +6,7 @@ import config from '@config';
 import { filter, isNil, isString } from 'lodash';
 import moment from 'moment';
 import { getBroadcaster } from './commons';
+import { isMainThread } from 'worker_threads';
 
 class UI extends Core {
   @settings()
@@ -33,7 +34,13 @@ class UI extends Core {
   @onChange('domain')
   @onLoad('domain')
   subscribeWebhook() {
-    global.webhooks.subscribeAll();
+    if (isMainThread) {
+      if (typeof global.webhooks === 'undefined') {
+        setTimeout(() => this.subscribeWebhook(), 1000)
+      } else {
+        global.webhooks.subscribeAll();
+      }
+    }
   }
 
   sockets() {
