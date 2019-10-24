@@ -26,14 +26,5 @@
 </head>
 <body style="padding-top: 0; height: 100%; width: 100%">
   <div id="overlays"></div>
-<script>
-    var socket = io();
-
-    var translations = {}
-    var configuration
-
-    socket.on('lang', (data) => translations = data)
-    socket.emit('getConfiguration', (data) => configuration = data)
-  </script>
 </body>
 </html>

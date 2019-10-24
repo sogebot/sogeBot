@@ -61,19 +61,17 @@ class Socket extends Core {
       socket.emit('authorized', { accessToken: auth.accessToken, refreshToken: auth.refreshToken, type: auth.type });
       if (auth.type === 'admin') {
         for (const endpoint of endpoints.filter(o => o.type === 'admin' && o.nsp === socket.nsp.name)) {
-          if (!Object.keys(socket._events).includes(endpoint.on)) {
-            socket.on(endpoint.on, (...args) => {
-              endpoint.callback(...args, socket);
-            });
-          }
-        }
-      }
-      for (const endpoint of endpoints.filter(o => o.type === 'viewer' && o.nsp === socket.nsp.name)) {
-        if (!Object.keys(socket._events).includes(endpoint.on)) {
+          socket.removeAllListeners(endpoint.on);
           socket.on(endpoint.on, (...args) => {
             endpoint.callback(...args, socket);
           });
         }
+      }
+      for (const endpoint of endpoints.filter(o => o.type === 'viewer' && o.nsp === socket.nsp.name)) {
+        socket.removeAllListeners(endpoint.on);
+        socket.on(endpoint.on, (...args) => {
+          endpoint.callback(...args, socket);
+        });
       }
 
       // reauth every minute
@@ -125,11 +123,10 @@ class Socket extends Core {
     emitAuthorize(socket);
 
     for (const endpoint of endpoints.filter(o => o.type === 'public' && o.nsp === socket.nsp.name)) {
-      if (!Object.keys(socket._events).includes(endpoint.on)) {
-        socket.on(endpoint.on, (...args) => {
-          endpoint.callback(...args, socket);
-        });
-      }
+      socket.removeAllListeners(endpoint.on);
+      socket.on(endpoint.on, (...args) => {
+        endpoint.callback(...args, socket);
+      });
     }
   }
 

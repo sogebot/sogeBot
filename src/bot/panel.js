@@ -10,9 +10,6 @@ const commons = require('./commons')
 const flatten = require('./helpers/flatten')
 const gitCommitInfo = require('git-commit-info');
 
-import {
-  getBroadcaster,
-} from './commons';
 import { error, info } from './helpers/log';
 import uuid from 'uuid'
 
@@ -20,7 +17,6 @@ const Parser = require('./parser')
 
 const config = require('@config')
 
-const moment = require('moment-timezone')
 let app;
 
 function Panel () {
@@ -276,52 +272,6 @@ function Panel () {
         if (value.startsWith('_')) return true
         global.general.setValue({ sender: { username: commons.getOwner() }, parameters: value + ' ' + index, quiet: data._quiet })
       })
-    })
-    socket.on('getConfiguration', async function (cb) {
-      var data = {}
-
-      for (let system of ['oauth', 'tmi', 'currency', 'ui', 'general', 'twitch']) {
-        if (typeof data.core === 'undefined') {
-          data.core = {}
-        }
-        data.core[system] = await global[system].getAllSettings()
-      }
-
-      for (let system of Object.keys(global.systems).filter(o => !o.startsWith('_'))) {
-        if (typeof data.systems === 'undefined') {
-          data.systems = {}
-        }
-        data.systems[system] = await global.systems[system].getAllSettings()
-      }
-
-      for (let system of Object.keys(global.integrations).filter(o => !o.startsWith('_'))) {
-        if (typeof data.integrations === 'undefined') {
-          data.integrations = {}
-        }
-        data.integrations[system] = await global.integrations[system].getAllSettings()
-      }
-
-      for (let system of Object.keys(global.games).filter(o => !o.startsWith('_'))) {
-        if (typeof data.games === 'undefined') {
-          data.games = {}
-        }
-        data.games[system] = await global.games[system].getAllSettings()
-      }
-
-      // currencies
-      data.currency = global.currency.mainCurrency
-      data.currencySymbol = global.currency.symbol(global.currency.mainCurrency)
-
-      // timezone
-      data.timezone = config.timezone === 'system' || _.isNil(config.timezone) ? moment.tz.guess() : config.timezone
-
-      // lang
-      data.lang = global.general.lang;
-
-      data.isCastersSet = _.filter(global.oauth.generalOwners, (o) => _.isString(o) && o.trim().length > 0).length > 0 || getBroadcaster() !== '';
-
-      if (_.isFunction(cb)) cb(data)
-      else socket.emit('configuration', data)
     })
 
     // send enabled systems
