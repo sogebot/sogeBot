@@ -7,7 +7,7 @@
   },
   "panel": {
     "__COMMENT__": "set correctly your domain and to be safe, change your token",
-    "port": 20000,
+    "port": 20000
   },
   "database": {
     "__README__": "https://github.com/sogehige/sogeBot/wiki/Database-configuration",
