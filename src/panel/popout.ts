@@ -96,45 +96,44 @@ const main = async () => {
   Vue.prototype.urlParam = (v) => urlParam(v);
 
   Vue.prototype.$loggedUser = await isUserLoggedIn();
-  isUserCaster();
+  if (Vue.prototype.$loggedUser !== false && isUserCaster()) {
+    await getTranslations();
+    Vue.prototype.configuration = await getConfiguration();
+    Vue.prototype.$core = await getListOf('core');
+    Vue.prototype.$systems = await getListOf('systems');
+    Vue.prototype.$integrations = await getListOf('integrations');
 
-  Vue.prototype.$core = await getListOf('core');
-  Vue.prototype.$systems = await getListOf('systems');
-  Vue.prototype.$integrations = await getListOf('integrations');
+    Vue.prototype.$state = ButtonStates;
+    setMainLoaded();
 
-  await getTranslations();
-  Vue.prototype.configuration = await getConfiguration();
+    const router = new VueRouter({
+      mode: 'hash',
+      base: __dirname,
+      routes: [
+        { path: '/:widget', name: 'Popout', component: () => import('src/panel/views/dashboard/popout.vue') },
+      ],
+    });
 
-  Vue.prototype.$state = ButtonStates;
-  setMainLoaded();
+    new Vue({
+      router,
+      created() {
+        // set proper moment locale
+        this.$moment.locale(get(Vue, 'prototype.configuration.lang', 'en'));
 
-  const router = new VueRouter({
-    mode: 'hash',
-    base: __dirname,
-    routes: [
-      { path: '/:widget', name: 'Popout', component: () => import('src/panel/views/dashboard/popout.vue') },
-    ],
-  });
-
-  new Vue({
-    router,
-    created() {
-      // set proper moment locale
-      this.$moment.locale(get(Vue, 'prototype.configuration.lang', 'en'));
-
-      // theme load
-      const head = document.getElementsByTagName('head')[0];
-      const link = (document.createElement('link') as any);
-      link.setAttribute('rel', 'stylesheet');
-      link.setAttribute('href',`/dist/css/${get(Vue, 'prototype.configuration.core.ui.theme', 'light')}.css`);
-      head.appendChild(link);
-    },
-    template: `
-    <div id="app" >
-      <router-view></router-view>
-    </div>
-  `,
-  }).$mount('#app');
+        // theme load
+        const head = document.getElementsByTagName('head')[0];
+        const link = (document.createElement('link') as any);
+        link.setAttribute('rel', 'stylesheet');
+        link.setAttribute('href',`/dist/css/${get(Vue, 'prototype.configuration.core.ui.theme', 'light')}.css`);
+        head.appendChild(link);
+      },
+      template: `
+      <div id="app" >
+        <router-view></router-view>
+      </div>
+    `,
+    }).$mount('#app');
+  }
 };
 
 main();

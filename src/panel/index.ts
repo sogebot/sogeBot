@@ -96,156 +96,154 @@ const main = async () => {
   Vue.prototype.urlParam = (v) => urlParam(v);
 
   Vue.prototype.$loggedUser = await isUserLoggedIn();
-  if (Vue.prototype.$loggedUser !== false) {
-    isUserCaster();
+  if (Vue.prototype.$loggedUser !== false && isUserCaster()) {
+    await getTranslations();
+    Vue.prototype.configuration = await getConfiguration();
 
     Vue.prototype.$core = await getListOf('core');
     Vue.prototype.$systems = await getListOf('systems');
     Vue.prototype.$integrations = await getListOf('integrations');
 
-    await getTranslations();
-    Vue.prototype.configuration = await getConfiguration();
-
     Vue.prototype.$state = ButtonStates;
     setMainLoaded();
-  }
 
-  const router = new VueRouter({
-    mode: 'hash',
-    base: __dirname,
-    routes: [
-      { path: '/', name: 'Dashboard', component: () => import('./views/dashboard/dashboard.vue') },
-      { path: '/stats/commandcount', name: 'CommandCountStats', component: () => import('./views/stats/commandcount.vue') },
-      { path: '/stats/api', name: 'APIStats', component: () => import('./views/stats/api.vue') },
+    const router = new VueRouter({
+      mode: 'hash',
+      base: __dirname,
+      routes: [
+        { path: '/', name: 'Dashboard', component: () => import('./views/dashboard/dashboard.vue') },
+        { path: '/stats/commandcount', name: 'CommandCountStats', component: () => import('./views/stats/commandcount.vue') },
+        { path: '/stats/api', name: 'APIStats', component: () => import('./views/stats/api.vue') },
 
-      { path: '/manage/alias/', redirect: '/manage/alias/list' },
-      { path: '/manage/alias/list', name: 'aliasManagerList', component: () => import('./views/managers/alias/alias-list.vue') },
-      { path: '/manage/alias/edit/:id?', name: 'aliasManagerEdit', component: () => import('./views/managers/alias/alias-edit.vue') },
-      { path: '/manage/commands/', redirect: '/manage/commands/list' },
-      { path: '/manage/commands/list', name: 'CommandsManagerList', component: () => import('./views/managers/commands/commands-list.vue') },
-      { path: '/manage/commands/edit/:id?', name: 'CommandsManagerEdit', component: () => import('./views/managers/commands/commands-edit.vue') },
-      { path: '/manage/cooldowns/list', name: 'cooldownsManagerList', component: () => import('./views/managers/cooldowns/cooldowns-list.vue') },
-      { path: '/manage/cooldowns/edit/:id?', name: 'cooldownsManagerEdit', component: () => import('./views/managers/cooldowns/cooldowns-edit.vue') },
-      { path: '/manage/highlights', name: 'HighlightsManager', component: () => import('./views/managers/highlights.vue') },
-      { path: '/manage/hltb', name: 'HLTBManager', component: () => import('./views/managers/hltb.vue') },
-      { path: '/manage/polls', name: 'PollsManager', component: () => import('./views/managers/polls.vue') },
-      { path: '/manage/events/', redirect: '/manage/events/list' },
-      { path: '/manage/events/list', name: 'EventsManagerList', component: () => import('./views/managers/events/list.vue') },
-      { path: '/manage/events/edit/:id?', name: 'EventsManagerEdit', component: () => import('./views/managers/events/edit.vue') },
-      { path: '/manage/keywords/', redirect: '/manage/keywords/list' },
-      { path: '/manage/keywords/list', name: 'KeywordsManagerList', component: () => import('./views/managers/keywords/keywords-list.vue') },
-      { path: '/manage/keywords/edit/:id?', name: 'KeywordsManagerEdit', component: () => import('./views/managers/keywords/keywords-edit.vue') },
-      { path: '/manage/price/list', name: 'PriceManagerList', component: () => import('./views/managers/price/price-list.vue') },
-      { path: '/manage/price/edit/:id?', name: 'PriceManagerEdit', component: () => import('./views/managers/price/price-edit.vue') },
-      { path: '/manage/quotes/list', name: 'QuotesManagerList', component: () => import('./views/managers/quotes/quotes-list.vue') },
-      { path: '/manage/quotes/edit/:id?', name: 'QuotesManagerEdit', component: () => import('./views/managers/quotes/quotes-edit.vue') },
-      { path: '/manage/ranks/list', name: 'ranksManagerList', component: () => import('./views/managers/ranks/ranks-list.vue') },
-      { path: '/manage/ranks/edit/:id?', name: 'ranksManagerEdit', component: () => import('./views/managers/ranks/ranks-edit.vue') },
-      { path: '/manage/songs/playlist', name: 'songsManagerPlaylist', component: () => import('./views/managers/songs/songs-playlist.vue') },
-      { path: '/manage/songs/bannedsongs', name: 'songsManagerBannedsongs', component: () => import('./views/managers/songs/songs-bannedsongs.vue') },
-      { path: '/manage/timers/list', name: 'TimersManagerList', component: () => import('./views/managers/timers/timers-list.vue') },
-      { path: '/manage/timers/edit/:id?', name: 'TimersManagerEdit', component: () => import('./views/managers/timers/timers-edit.vue') },
-      { path: '/manage/viewers/list', name: 'viewersManagerList', component: () => import('./views/managers/viewers/viewers-list.vue') },
-      { path: '/manage/viewers/edit/:id?', name: 'viewersManagerEdit', component: () => import('./views/managers/viewers/viewers-edit.vue') },
+        { path: '/manage/alias/', redirect: '/manage/alias/list' },
+        { path: '/manage/alias/list', name: 'aliasManagerList', component: () => import('./views/managers/alias/alias-list.vue') },
+        { path: '/manage/alias/edit/:id?', name: 'aliasManagerEdit', component: () => import('./views/managers/alias/alias-edit.vue') },
+        { path: '/manage/commands/', redirect: '/manage/commands/list' },
+        { path: '/manage/commands/list', name: 'CommandsManagerList', component: () => import('./views/managers/commands/commands-list.vue') },
+        { path: '/manage/commands/edit/:id?', name: 'CommandsManagerEdit', component: () => import('./views/managers/commands/commands-edit.vue') },
+        { path: '/manage/cooldowns/list', name: 'cooldownsManagerList', component: () => import('./views/managers/cooldowns/cooldowns-list.vue') },
+        { path: '/manage/cooldowns/edit/:id?', name: 'cooldownsManagerEdit', component: () => import('./views/managers/cooldowns/cooldowns-edit.vue') },
+        { path: '/manage/highlights', name: 'HighlightsManager', component: () => import('./views/managers/highlights.vue') },
+        { path: '/manage/hltb', name: 'HLTBManager', component: () => import('./views/managers/hltb.vue') },
+        { path: '/manage/polls', name: 'PollsManager', component: () => import('./views/managers/polls.vue') },
+        { path: '/manage/events/', redirect: '/manage/events/list' },
+        { path: '/manage/events/list', name: 'EventsManagerList', component: () => import('./views/managers/events/list.vue') },
+        { path: '/manage/events/edit/:id?', name: 'EventsManagerEdit', component: () => import('./views/managers/events/edit.vue') },
+        { path: '/manage/keywords/', redirect: '/manage/keywords/list' },
+        { path: '/manage/keywords/list', name: 'KeywordsManagerList', component: () => import('./views/managers/keywords/keywords-list.vue') },
+        { path: '/manage/keywords/edit/:id?', name: 'KeywordsManagerEdit', component: () => import('./views/managers/keywords/keywords-edit.vue') },
+        { path: '/manage/price/list', name: 'PriceManagerList', component: () => import('./views/managers/price/price-list.vue') },
+        { path: '/manage/price/edit/:id?', name: 'PriceManagerEdit', component: () => import('./views/managers/price/price-edit.vue') },
+        { path: '/manage/quotes/list', name: 'QuotesManagerList', component: () => import('./views/managers/quotes/quotes-list.vue') },
+        { path: '/manage/quotes/edit/:id?', name: 'QuotesManagerEdit', component: () => import('./views/managers/quotes/quotes-edit.vue') },
+        { path: '/manage/ranks/list', name: 'ranksManagerList', component: () => import('./views/managers/ranks/ranks-list.vue') },
+        { path: '/manage/ranks/edit/:id?', name: 'ranksManagerEdit', component: () => import('./views/managers/ranks/ranks-edit.vue') },
+        { path: '/manage/songs/playlist', name: 'songsManagerPlaylist', component: () => import('./views/managers/songs/songs-playlist.vue') },
+        { path: '/manage/songs/bannedsongs', name: 'songsManagerBannedsongs', component: () => import('./views/managers/songs/songs-bannedsongs.vue') },
+        { path: '/manage/timers/list', name: 'TimersManagerList', component: () => import('./views/managers/timers/timers-list.vue') },
+        { path: '/manage/timers/edit/:id?', name: 'TimersManagerEdit', component: () => import('./views/managers/timers/timers-edit.vue') },
+        { path: '/manage/viewers/list', name: 'viewersManagerList', component: () => import('./views/managers/viewers/viewers-list.vue') },
+        { path: '/manage/viewers/edit/:id?', name: 'viewersManagerEdit', component: () => import('./views/managers/viewers/viewers-edit.vue') },
 
-      { path: '/settings/permissions/:id?', name: 'PermissionsSettings', component: () => import('./views/settings/permissions.vue') },
-      { path: '/settings/translations', name: 'TranslationsSettings', component: () => import('./views/settings/translations.vue') },
-      { path: '/settings/:type/:id?', name: 'InterfaceSettings', component: () => import('./views/settings/interface.vue') },
+        { path: '/settings/permissions/:id?', name: 'PermissionsSettings', component: () => import('./views/settings/permissions.vue') },
+        { path: '/settings/translations', name: 'TranslationsSettings', component: () => import('./views/settings/translations.vue') },
+        { path: '/settings/:type/:id?', name: 'InterfaceSettings', component: () => import('./views/settings/interface.vue') },
 
-      { path: '/registry/alerts/list', name: 'alertsList', component: () => import('./views/registries/alerts/alerts-list.vue') },
-      { path: '/registry/alerts/edit/:id?', name: 'alertsEdit', component: () => import('./views/registries/alerts/alerts-edit.vue') },
-      { path: '/registry/customvariables/list', name: 'CustomVariableList', component: () => import('./views/registries/custom-variables/custom-variables-list.vue') },
-      { path: '/registry/customvariables/edit/:id?', name: 'CustomVariableEdit', component: () => import('./views/registries/custom-variables/custom-variables-edit.vue') },
-      { path: '/registry/carousel/list', name: 'carouselRegistryList', component: () => import('./views/registries/carousel-overlay/carousel-overlay-list.vue') },
-      { path: '/registry/carousel/edit/:id?', name: 'carouselRegistryEdit', component: () => import('./views/registries/carousel-overlay/carousel-overlay-edit.vue') },
-      { path: '/registry/textoverlay/list', name: 'TextOverlayList', component: () => import('./views/registries/text-overlay/text-overlay-list.vue') },
-      { path: '/registry/textoverlay/edit/:id?', name: 'TextOverlayEdit', component: () => import('./views/registries/text-overlay/text-overlay-edit.vue') },
-      { path: '/registry/gallery/list', name: 'galleryRegistryEdit', component: () => import('./views/registries/gallery/gallery-list.vue') },
-      { path: '/registry/goals/list', name: 'GoalsRegistryList', component: () => import('./views/registries/goalsList.vue') },
-      { path: '/registry/goals/edit/:id?', name: 'GoalsRegistryEdit', component: () => import('./views/registries/goalsEdit.vue') },
-    ],
-  });
+        { path: '/registry/alerts/list', name: 'alertsList', component: () => import('./views/registries/alerts/alerts-list.vue') },
+        { path: '/registry/alerts/edit/:id?', name: 'alertsEdit', component: () => import('./views/registries/alerts/alerts-edit.vue') },
+        { path: '/registry/customvariables/list', name: 'CustomVariableList', component: () => import('./views/registries/custom-variables/custom-variables-list.vue') },
+        { path: '/registry/customvariables/edit/:id?', name: 'CustomVariableEdit', component: () => import('./views/registries/custom-variables/custom-variables-edit.vue') },
+        { path: '/registry/carousel/list', name: 'carouselRegistryList', component: () => import('./views/registries/carousel-overlay/carousel-overlay-list.vue') },
+        { path: '/registry/carousel/edit/:id?', name: 'carouselRegistryEdit', component: () => import('./views/registries/carousel-overlay/carousel-overlay-edit.vue') },
+        { path: '/registry/textoverlay/list', name: 'TextOverlayList', component: () => import('./views/registries/text-overlay/text-overlay-list.vue') },
+        { path: '/registry/textoverlay/edit/:id?', name: 'TextOverlayEdit', component: () => import('./views/registries/text-overlay/text-overlay-edit.vue') },
+        { path: '/registry/gallery/list', name: 'galleryRegistryEdit', component: () => import('./views/registries/gallery/gallery-list.vue') },
+        { path: '/registry/goals/list', name: 'GoalsRegistryList', component: () => import('./views/registries/goalsList.vue') },
+        { path: '/registry/goals/edit/:id?', name: 'GoalsRegistryEdit', component: () => import('./views/registries/goalsEdit.vue') },
+      ],
+    });
 
-  new Vue({
-    router,
-    components: {
-      navbar: () => import('./components/navbar/navbar.vue'),
-      statsbar: () => import('./components/statsbar/statsbar.vue'),
-      changegamedialog: () => import('./components/dialog/changegamedialog.vue'),
-      footerbar: () => import('./components/footer.vue'),
-    },
-    data() {
-      const object: {
-        isDropdownHidden: boolean;
-        dropdown: any;
-        dropdownVue: any;
-      } = {
-        isDropdownHidden: true,
-        dropdown: null,
-        dropdownVue: null,
-      };
-      return object;
-    },
-    created() {
-      this.$root.$on('bv::dropdown::show', bvEvent => {
-        this.dropdownShow(bvEvent);
-      });
+    new Vue({
+      router,
+      components: {
+        navbar: () => import('./components/navbar/navbar.vue'),
+        statsbar: () => import('./components/statsbar/statsbar.vue'),
+        changegamedialog: () => import('./components/dialog/changegamedialog.vue'),
+        footerbar: () => import('./components/footer.vue'),
+      },
+      data() {
+        const object: {
+          isDropdownHidden: boolean;
+          dropdown: any;
+          dropdownVue: any;
+        } = {
+          isDropdownHidden: true,
+          dropdown: null,
+          dropdownVue: null,
+        };
+        return object;
+      },
+      created() {
+        this.$root.$on('bv::dropdown::show', bvEvent => {
+          this.dropdownShow(bvEvent);
+        });
 
-      this.$root.$on('bv::dropdown::hidden', bvEvent => {
-        this.dropdownHide();
-      });
-
-      // set proper moment locale
-      this.$moment.locale(get(Vue, 'prototype.configuration.lang', 'en'));
-
-      // theme load
-      const head = document.getElementsByTagName('head')[0];
-      const link = (document.createElement('link') as any);
-      link.setAttribute('rel', 'stylesheet');
-      link.setAttribute('href',`/dist/css/${get(Vue, 'prototype.configuration.core.ui.theme', 'light')}.css`);
-      head.appendChild(link);
-    },
-    methods: {
-      clickEvent(event) {
-        if ((typeof event.target.className !== 'string' || !event.target.className.includes('dropdown')) && !this.isDropdownHidden) {
-          console.debug('Clicked outside dropdown', event.target);
+        this.$root.$on('bv::dropdown::hidden', bvEvent => {
           this.dropdownHide();
-        }
+        });
+
+        // set proper moment locale
+        this.$moment.locale(get(Vue, 'prototype.configuration.lang', 'en'));
+
+        // theme load
+        const head = document.getElementsByTagName('head')[0];
+        const link = (document.createElement('link') as any);
+        link.setAttribute('rel', 'stylesheet');
+        link.setAttribute('href',`/dist/css/${get(Vue, 'prototype.configuration.core.ui.theme', 'light')}.css`);
+        head.appendChild(link);
       },
-      dropdownHide() {
-        if (!this.isDropdownHidden) {
-          this.dropdownVue.hide();
-          this.dropdown.remove();
-          this.isDropdownHidden = true;
-        }
+      methods: {
+        clickEvent(event) {
+          if ((typeof event.target.className !== 'string' || !event.target.className.includes('dropdown')) && !this.isDropdownHidden) {
+            console.debug('Clicked outside dropdown', event.target);
+            this.dropdownHide();
+          }
+        },
+        dropdownHide() {
+          if (!this.isDropdownHidden) {
+            this.dropdownVue.hide();
+            this.dropdown.remove();
+            this.isDropdownHidden = true;
+          }
+        },
+        dropdownShow(bvEvent, retry = false) {
+          if (!this.isDropdownHidden && !retry) {
+            // try next tick again - wait for cleanup
+            console.debug('waiting to next tick for dropdownShow');
+            this.$nextTick(() => this.dropdownShow(bvEvent, true));
+          } else {
+            this.isDropdownHidden = false;
+            const child = bvEvent.target;
+            this.dropdown = child;
+            this.dropdownVue = bvEvent.vueTarget;
+            child.style.position = 'absolute';
+            child.style['z-index'] = 99999999;
+            child.remove();
+            document.getElementsByTagName('BODY')[0].appendChild(child);
+          }
+        },
       },
-      dropdownShow(bvEvent, retry = false) {
-        if (!this.isDropdownHidden && !retry) {
-          // try next tick again - wait for cleanup
-          console.debug('waiting to next tick for dropdownShow');
-          this.$nextTick(() => this.dropdownShow(bvEvent, true));
-        } else {
-          this.isDropdownHidden = false;
-          const child = bvEvent.target;
-          this.dropdown = child;
-          this.dropdownVue = bvEvent.vueTarget;
-          child.style.position = 'absolute';
-          child.style['z-index'] = 99999999;
-          child.remove();
-          document.getElementsByTagName('BODY')[0].appendChild(child);
-        }
-      },
-    },
-    template: `
-      <div id="app" @click.capture="clickEvent">
-        <navbar/>
-        <statsbar/>
-        <changegamedialog/>
-        <router-view class="view pt-1"></router-view>
-        <footerbar/>
-      </div>
-    `,
-  }).$mount('#app');
+      template: `
+        <div id="app" @click.capture="clickEvent">
+          <navbar/>
+          <statsbar/>
+          <changegamedialog/>
+          <router-view class="view pt-1"></router-view>
+          <footerbar/>
+        </div>
+      `,
+    }).$mount('#app');
+  }
 };
 
 main();

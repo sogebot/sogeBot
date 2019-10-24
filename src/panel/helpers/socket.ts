@@ -53,7 +53,7 @@ export const getTranslations = async () => {
 export const getConfiguration = async () => {
   console.debug('Getting configuration');
   return new Promise((resolve) => {
-    getSocket('/', true).emit('getConfiguration', (configuration) => {
+    getSocket('/core/ui', true).emit('configuration', (configuration) => {
       resolve(configuration);
     });
   });

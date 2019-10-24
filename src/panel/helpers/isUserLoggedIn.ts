@@ -69,4 +69,5 @@ export const isUserCaster = function () {
   if (localStorage.getItem('userType') !== 'admin') {
     window.location.replace(window.location.origin + '/login#error=must+be+caster');
   };
+  return localStorage.getItem('userType') !== 'admin';
 };
