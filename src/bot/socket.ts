@@ -2,9 +2,10 @@ import Core from './_interface';
 import { settings, ui } from './decorators';
 import { MINUTE, SECOND } from './constants';
 import { isMainThread } from 'worker_threads';
-import uuid = require('uuid/v4');
+import uuid from 'uuid/v4';
 import { permission } from './helpers/permissions';
 import { endpoints } from './helpers/socket';
+import { onLoad } from './decorators/on';
 
 type Auth = {
   userId: string;
@@ -23,6 +24,12 @@ class Socket extends Core {
 
   @settings('connection')
   refreshTokenExpirationTime = 604800;
+
+  @settings('connection')
+  @ui({
+    type: 'uuid-generator',
+  }, 'connection')
+  socketToken = '';
 
   @ui({
     type: 'btn-emit',
@@ -78,7 +85,22 @@ class Socket extends Core {
       setTimeout(() => emitAuthorize(socket), MINUTE);
     };
     const emitAuthorize = (socket) => {
-      socket.emit('authorize', (cb: { accessToken: string; refreshToken: string }) => {
+      socket.emit('authorize', (cb: { accessToken: string; refreshToken: string; socketToken?: string }) => {
+        if (cb.socketToken) {
+          // check if we have global socket
+          if (cb.accessToken === this.socketToken) {
+            sendAuthorized(socket, {
+              type: 'admin',
+              accessToken: this.socketToken,
+              refreshToken: '',
+              accessTokenTimestamp: 0,
+              refreshTokenTimestamp: 0,
+            });
+            return;
+          }
+          return socket.emit('unauthorized');
+        }
+
         if (cb.accessToken === '' || cb.refreshToken === '') {
           // we don't have anything
           return socket.emit('unauthorized');
@@ -137,6 +159,13 @@ class Socket extends Core {
         cb(null);
       });
     });
+  }
+
+  @onLoad('socketToken')
+  generateSocketTokenIfNeeded() {
+    if (this.socketToken === '') {
+      this.socketToken = uuid();
+    }
   }
 }
 
