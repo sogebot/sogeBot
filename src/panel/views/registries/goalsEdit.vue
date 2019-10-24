@@ -319,7 +319,6 @@ import 'flatpickr/dist/flatpickr.css';
 
 import { getSocket } from 'src/panel/helpers/socket';
 import uuid from 'uuid/v4';
-import axios from 'axios';
 
 export default Vue.extend({
   components: {
@@ -501,7 +500,7 @@ export default Vue.extend({
       this.uiShowGoal = uid
     }
   },
-  mounted: function () {
+  mounted: async function () {
     if (this.$route.params.id) {
       this.socket.emit('findOne', { collection: 'groups', where: { uid: this.$route.params.id }}, (err, d: Goals.Group) => {
         if (Object.keys(d).length === 0) this.$router.push({ name: 'GoalsRegistryList' })
@@ -515,10 +514,26 @@ export default Vue.extend({
         }
       })
     }
-    axios.get('/fonts')
-      .then((r) => {
-        this.fonts = r.data.items.map((o) => o.family)
-      })
+    const { response } = await new Promise(resolve => {
+      const request = new XMLHttpRequest();
+      request.open('GET', '/fonts', true);
+
+      request.onload = function() {
+        if (!(this.status >= 200 && this.status < 400)) {
+          console.error('Something went wrong getting font', this.status, this.response)
+        }
+        resolve({ response: JSON.parse(this.response)})
+      }
+      request.onerror = function() {
+        console.error('Connection error to sogebot')
+        resolve( { response: {} });
+      };
+
+      request.send();
+    })
+    this.fonts = response.items.map((o) => {
+      return { text: o.family, value: o.family }
+    })
   }
 })
 </script>

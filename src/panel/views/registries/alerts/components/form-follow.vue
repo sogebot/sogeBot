@@ -338,8 +338,6 @@ import 'codemirror/lib/codemirror.css';
 import text from 'src/bot/data/templates/alerts.txt';
 import textjs from 'src/bot/data/templates/alerts-js.txt';
 
-import axios from 'axios';
-
 import { Validations } from 'vuelidate-property-decorators';
 import { required, minValue } from 'vuelidate/lib/validators'
 
@@ -385,19 +383,33 @@ export default class AlertsEditFollowForm extends Vue {
     }
   }
 
-  mounted() {
+  async mounted() {
     if (this.data.advancedMode.html === null) {
       this.data.advancedMode.html = text;
     }
     if (this.data.advancedMode.js === null) {
       this.data.advancedMode.js = textjs;
     }
-    axios.get('/fonts')
-      .then((r) => {
-        this.fonts = r.data.items.map((o) => {
-          return { text: o.family, value: o.family }
-        })
-      })
+    const { response } = await new Promise(resolve => {
+      const request = new XMLHttpRequest();
+      request.open('GET', '/fonts', true);
+
+      request.onload = function() {
+        if (!(this.status >= 200 && this.status < 400)) {
+          console.error('Something went wrong getting font', this.status, this.response)
+        }
+        resolve({ response: JSON.parse(this.response)})
+      }
+      request.onerror = function() {
+        console.error('Connection error to sogebot')
+        resolve( { response: {} });
+      };
+
+      request.send();
+    })
+    this.fonts = response.items.map((o) => {
+      return { text: o.family, value: o.family }
+    })
     this.emitValidation();
   }
 }
