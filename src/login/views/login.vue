@@ -3,6 +3,7 @@
     <h4 class="text-danger" v-if="error === 'must+be+caster'">
       <fa icon="skull-crossbones" fixed-width size="4x"/>
       <div>Insufficient permission.</div>
+      <b-btn variant="success" class="mt-3" @click="login">Login</b-btn>
     </h4>
     <h4 class="text-success" v-if="error === 'logged+out'">
       <fa icon="check-circle" fixed-width size="4x"/>
