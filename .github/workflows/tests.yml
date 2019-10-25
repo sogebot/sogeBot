@@ -15,7 +15,7 @@ jobs:
     - name: install node v12
       uses: actions/setup-node@v1
       with:
-        node-version: 12
+        node-version: 13
     - name: Install eslint and dependencies
       run: npm install typescript eslint jsonlint-mod @typescript-eslint/parser @typescript-eslint/eslint-plugin --only=dev
     - name: Run eslint
@@ -32,7 +32,7 @@ jobs:
       if: contains(github.event.commits[0].message, '[skip-tests]') != true && contains(github.event.commits[0].message, '[skip-test]') != true
       uses: actions/setup-node@v1
       with:
-        node-version: 12
+        node-version: 13
     - name: Install all dependencies
       if: contains(github.event.commits[0].message, '[skip-tests]') != true && contains(github.event.commits[0].message, '[skip-test]') != true
       run: make
