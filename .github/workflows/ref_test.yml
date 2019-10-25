@@ -5,8 +5,8 @@ on:
 
 
 env:
-  TAG: format(${{github.ref}}, 'refs/tags/', '')
-  HEAD: format(${{github.ref}}, 'refs/heads/', '')
+  TAG: ${{format(github.ref, 'refs/tags/', '')}}
+  HEAD: ${{format($github.ref, 'refs/heads/', '')}}
 
 jobs:
   eslint:
