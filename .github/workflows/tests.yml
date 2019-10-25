@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
-    - name: install node v12
+    - name: install node v13
       uses: actions/setup-node@v1
       with:
         node-version: 13
@@ -28,7 +28,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
-    - name: install node v12
+    - name: install node v13
       if: contains(github.event.commits[0].message, '[skip-tests]') != true && contains(github.event.commits[0].message, '[skip-test]') != true
       uses: actions/setup-node@v1
       with:
@@ -53,7 +53,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
-    - name: install node v12
+    - name: install node v13
       if: contains(github.event.commits[0].message, '[skip-tests]') != true && contains(github.event.commits[0].message, '[skip-test]') != true
       uses: actions/setup-node@v1
       with:
