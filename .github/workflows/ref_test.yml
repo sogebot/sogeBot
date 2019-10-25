@@ -20,7 +20,4 @@ jobs:
     - name: GITHUB ref
       run: echo '${{github.ref}}'
     - name: GITHUB tag
-      run: export TAG="${TAG/refs\/tags\//}"
-    - name: GITHUB tag2
-      run: echo $TAG
-
+      run: export TAG="${TAG/refs\/tags\//}"; echo $TAG
