@@ -235,12 +235,10 @@ class Moderation extends System {
 
   @parser({ priority: constants.MODERATION })
   async containsLink (opts: ParserOptions) {
-    const [enabled, cLinksIncludeSpaces, timeout, permId] = await Promise.all([
-      this.getPermissionBasedSettingsValue('cLinksEnabled'),
-      this.getPermissionBasedSettingsValue('cLinksIncludeSpaces'),
-      this.getPermissionBasedSettingsValue('cLinksTimeout'),
-      global.permissions.getUserHighestPermission(opts.sender.userId),
-    ]);
+    const enabled = await this.getPermissionBasedSettingsValue('cLinksEnabled');
+    const cLinksIncludeSpaces = await this.getPermissionBasedSettingsValue('cLinksIncludeSpaces');
+    const timeout = await this.getPermissionBasedSettingsValue('cLinksTimeout');
+    const permId = await global.permissions.getUserHighestPermission(opts.sender.userId);
 
     if (permId === null || !enabled[permId]) {
       return true;
@@ -270,14 +268,12 @@ class Moderation extends System {
 
   @parser({ priority: constants.MODERATION })
   async symbols (opts: ParserOptions) {
-    const [enabled, cSymbolsTriggerLength, cSymbolsMaxSymbolsConsecutively, cSymbolsMaxSymbolsPercent, timeout, permId] = await Promise.all([
-      this.getPermissionBasedSettingsValue('cSymbolsEnabled'),
-      this.getPermissionBasedSettingsValue('cSymbolsTriggerLength'),
-      this.getPermissionBasedSettingsValue('cSymbolsMaxSymbolsConsecutively'),
-      this.getPermissionBasedSettingsValue('cSymbolsMaxSymbolsPercent'),
-      this.getPermissionBasedSettingsValue('cSymbolsTimeout'),
-      global.permissions.getUserHighestPermission(opts.sender.userId),
-    ]);
+    const enabled = await this.getPermissionBasedSettingsValue('cSymbolsEnabled');
+    const cSymbolsTriggerLength = await this.getPermissionBasedSettingsValue('cSymbolsTriggerLength');
+    const cSymbolsMaxSymbolsConsecutively = await this.getPermissionBasedSettingsValue('cSymbolsMaxSymbolsConsecutively');
+    const cSymbolsMaxSymbolsPercent = await this.getPermissionBasedSettingsValue('cSymbolsMaxSymbolsPercent');
+    const timeout = await this.getPermissionBasedSettingsValue('cSymbolsTimeout');
+    const permId = await global.permissions.getUserHighestPermission(opts.sender.userId);
 
     if (permId === null || !enabled[permId]) {
       return true;
@@ -314,12 +310,10 @@ class Moderation extends System {
 
   @parser({ priority: constants.MODERATION })
   async longMessage (opts: ParserOptions) {
-    const [enabled, cLongMessageTriggerLength, timeout, permId] = await Promise.all([
-      this.getPermissionBasedSettingsValue('cLongMessageEnabled'),
-      this.getPermissionBasedSettingsValue('cLongMessageTriggerLength'),
-      this.getPermissionBasedSettingsValue('cLongMessageTimeout'),
-      global.permissions.getUserHighestPermission(opts.sender.userId),
-    ]);
+    const enabled = await this.getPermissionBasedSettingsValue('cLongMessageEnabled');
+    const cLongMessageTriggerLength = await this.getPermissionBasedSettingsValue('cLongMessageTriggerLength');
+    const timeout = await this.getPermissionBasedSettingsValue('cLongMessageTimeout');
+    const permId = await global.permissions.getUserHighestPermission(opts.sender.userId);
 
     if (permId === null || !enabled[permId]) {
       return true;
@@ -341,13 +335,11 @@ class Moderation extends System {
 
   @parser({ priority: constants.MODERATION })
   async caps (opts: ParserOptions) {
-    const [enabled, cCapsTriggerLength, cCapsMaxCapsPercent, timeout, permId] = await Promise.all([
-      this.getPermissionBasedSettingsValue('cCapsEnabled'),
-      this.getPermissionBasedSettingsValue('cCapsTriggerLength'),
-      this.getPermissionBasedSettingsValue('cCapsMaxCapsPercent'),
-      this.getPermissionBasedSettingsValue('cCapsTimeout'),
-      global.permissions.getUserHighestPermission(opts.sender.userId),
-    ]);
+    const enabled = await this.getPermissionBasedSettingsValue('cCapsEnabled');
+    const cCapsTriggerLength = await this.getPermissionBasedSettingsValue('cCapsTriggerLength');
+    const cCapsMaxCapsPercent = await this.getPermissionBasedSettingsValue('cCapsMaxCapsPercent');
+    const timeout = await this.getPermissionBasedSettingsValue('cCapsTimeout');
+    const permId = await global.permissions.getUserHighestPermission(opts.sender.userId);
 
     if (permId === null || !enabled[permId]) {
       return true;
@@ -395,13 +387,11 @@ class Moderation extends System {
 
   @parser({ priority: constants.MODERATION })
   async spam (opts: ParserOptions) {
-    const [enabled, cSpamTriggerLength, cSpamMaxLength, timeout, permId] = await Promise.all([
-      this.getPermissionBasedSettingsValue('cSpamEnabled'),
-      this.getPermissionBasedSettingsValue('cSpamTriggerLength'),
-      this.getPermissionBasedSettingsValue('cSpamMaxLength'),
-      this.getPermissionBasedSettingsValue('cSpamTimeout'),
-      global.permissions.getUserHighestPermission(opts.sender.userId),
-    ]);
+    const enabled = await this.getPermissionBasedSettingsValue('cSpamEnabled');
+    const cSpamTriggerLength = await this.getPermissionBasedSettingsValue('cSpamTriggerLength');
+    const cSpamMaxLength = await this.getPermissionBasedSettingsValue('cSpamMaxLength');
+    const timeout = await this.getPermissionBasedSettingsValue('cSpamTimeout');
+    const permId = await global.permissions.getUserHighestPermission(opts.sender.userId);
 
     if (permId === null || !enabled[permId]) {
       return true;
@@ -428,11 +418,9 @@ class Moderation extends System {
 
   @parser({ priority: constants.MODERATION })
   async color (opts: ParserOptions) {
-    const [enabled, timeout, permId] = await Promise.all([
-      this.getPermissionBasedSettingsValue('cColorEnabled'),
-      this.getPermissionBasedSettingsValue('cColorTimeout'),
-      global.permissions.getUserHighestPermission(opts.sender.userId),
-    ]);
+    const enabled = await this.getPermissionBasedSettingsValue('cColorEnabled');
+    const timeout = await this.getPermissionBasedSettingsValue('cColorTimeout');
+    const permId = await global.permissions.getUserHighestPermission(opts.sender.userId);
 
     if (permId === null || !enabled[permId]) {
       return true;
@@ -455,13 +443,11 @@ class Moderation extends System {
       return true;
     }
 
-    const [enabled, cEmotesEmojisAreEmotes, cEmotesMaxCount, timeout, permId] = await Promise.all([
-      this.getPermissionBasedSettingsValue('cEmotesEnabled'),
-      this.getPermissionBasedSettingsValue('cEmotesEmojisAreEmotes'),
-      this.getPermissionBasedSettingsValue('cEmotesMaxCount'),
-      this.getPermissionBasedSettingsValue('cEmotesTimeout'),
-      global.permissions.getUserHighestPermission(opts.sender.userId),
-    ]);
+    const enabled = await this.getPermissionBasedSettingsValue('cEmotesEnabled');
+    const cEmotesEmojisAreEmotes = await this.getPermissionBasedSettingsValue('cEmotesEmojisAreEmotes');
+    const cEmotesMaxCount = await this.getPermissionBasedSettingsValue('cEmotesMaxCount');
+    const timeout = await this.getPermissionBasedSettingsValue('cEmotesTimeout');
+    const permId = await global.permissions.getUserHighestPermission(opts.sender.userId);
 
     if (permId === null || !enabled[permId]) {
       return true;
@@ -488,11 +474,9 @@ class Moderation extends System {
 
   @parser({ priority: constants.MODERATION })
   async blacklist (opts: ParserOptions) {
-    const [enabled, timeout, permId] = await Promise.all([
-      this.getPermissionBasedSettingsValue('cListsEnabled'),
-      this.getPermissionBasedSettingsValue('cListsTimeout'),
-      global.permissions.getUserHighestPermission(opts.sender.userId),
-    ]);
+    const enabled = await this.getPermissionBasedSettingsValue('cListsEnabled');
+    const timeout = await this.getPermissionBasedSettingsValue('cListsTimeout');
+    const permId = await global.permissions.getUserHighestPermission(opts.sender.userId);
 
     if (permId === null || !enabled[permId]) {
       return true;

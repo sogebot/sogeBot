@@ -6,9 +6,6 @@ ENV     ?= production
 all : clean prepare dependencies css ui bot info
 .PHONY : all
 
-docker:
-	docker build -t sogebot:${VERSION} .
-
 info:
 	@echo -ne "\n\t ----- Build ENV: $(ENV)"
 	@echo -ne "\n\t ----- Build commit\n\n"
