@@ -346,6 +346,7 @@ export default class AlertsEdit extends Vue {
       },
       tts: {
         enabled: false,
+        skipUrls: true,
         keepAlertShown: false,
         voice: 'UK English Female',
         volume: 1,

@@ -23,6 +23,7 @@ declare namespace Registry {
       | 'shake2' | 'swing' | 'tada' | 'wave' | 'wobble' | 'wiggle' | 'wiggle2' | 'jello';
     type TTS = {
       enabled: boolean;
+      skipUrls: boolean;
       keepAlertShown: boolean;
       voice: string;
       pitch: number;

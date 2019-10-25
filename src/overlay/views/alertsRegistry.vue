@@ -79,6 +79,7 @@ import JsonViewer from 'vue-json-viewer'
 import { getSocket } from 'src/panel/helpers/socket';
 import VRuntimeTemplate from 'v-runtime-template';
 import { isEqual, get } from 'lodash-es';
+import urlRegex from 'url-regex';
 
 require('../../../scss/letter-animations.css');
 require('animate.css');
@@ -268,7 +269,13 @@ export default class AlertsRegistryOverlays extends Vue {
         }
 
         if (waitingForTTS && (this.$refs.audio as HTMLMediaElement).ended) {
-          this.speak(this.runningAlert.message, this.runningAlert.alert.tts.voice, this.runningAlert.alert.tts.rate, this.runningAlert.alert.tts.pitch, this.runningAlert.alert.tts.volume)
+          let message = this.runningAlert.message + ' google.com, youtube.com, seznam.cz';
+          if (this.runningAlert.alert.tts.skipUrls) {
+            for (const match of message.match(urlRegex({strict: false})) ?? []) {
+              message = message.replace(match, '');
+            }
+          }
+          this.speak(message, this.runningAlert.alert.tts.voice, this.runningAlert.alert.tts.rate, this.runningAlert.alert.tts.pitch, this.runningAlert.alert.tts.volume)
           waitingForTTS = false;
         }
 
