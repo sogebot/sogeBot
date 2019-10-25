@@ -5,7 +5,7 @@ on:
 
 
 env:
-  tag: format(${{github.ref}}, 'refs/tags/', '')
+  TAG: format(${{github.ref}}, 'refs/tags/', '')
 
 jobs:
   eslint:
@@ -20,5 +20,5 @@ jobs:
     - name: GITHUB ref
       run: echo '${{github.ref}}'
     - name: GITHUB tag
-      run: echo '${{tag}}'
+      run: echo '$TAG'
 
