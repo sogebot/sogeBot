@@ -17,9 +17,8 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: 13
+    - name: Get the version
+      id: get_version
+      run: echo ::set-output name=VERSION::${GITHUB_REF#refs/heads/}
     - name: GITHUB ref
-      run: echo '${{github.ref}}'
-    - name: GITHUB tag
-      run: export TAG="${TAG/refs\/tags\//}"; echo $TAG
-    - name: GITHUB head
-      run: export TAG="${TAG/refs\/heads\//}"; echo $TAG
+      run: echo '${{ steps.get_version.outputs.VERSION }}'
