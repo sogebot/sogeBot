@@ -1,6 +1,6 @@
 FROM node:13.0.1-alpine
 
-ENV LAST_UPDATED 201910151750
+ENV LAST_UPDATED 201910251750
 
 ENV DB mongodb
 ENV MONGOURI mongodb://localhost:27017/your-db-name
