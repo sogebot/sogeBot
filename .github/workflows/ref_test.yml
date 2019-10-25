@@ -4,7 +4,8 @@ on:
   push:
 
 
-tag: format(${{github.ref}}, 'refs/tags/', '')
+env:
+  tag: format(${{github.ref}}, 'refs/tags/', '')
 
 jobs:
   eslint:
