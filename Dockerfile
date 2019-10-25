@@ -1,4 +1,4 @@
-FROM node:12.12.0-alpine
+FROM node:13.0.1-alpine
 
 ENV LAST_UPDATED 201910151750
 
