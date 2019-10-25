@@ -27,6 +27,23 @@ const end = function (updated) {
 };
 
 const migration = {
+  23: async () => {
+    header('Add skipUrls to alerts with tts');
+    let updated = 0;
+    const alerts = await global.db.engine.find('registries.alerts');
+    for (let i = 0; i < alerts.length; i++) {
+      for (const event of Object.keys(alerts[i].alerts)) {
+        for (const variant of alerts[i].alerts[event]) {
+          variant.tts.skipUrls = true;
+          updated++;
+        }
+      }
+      delete alerts[i]._id;
+      await global.db.engine.update('registries.alerts', { id: alerts[i].id }, alerts[i]);
+      updated++;
+    }
+    end(updated);
+  },
   22: async () => {
     header('Replace overlays.text with registries.text');
     let updated = 0;

@@ -124,6 +124,7 @@
   "showAutoHost": "Show autohost",
   "voice": "Voice",
   "keepAlertShown": "Alert keeps visible during TTS",
+  "skipUrls": "Skip URLs during TTS",
   "volume": "Volume",
   "rate": "Rate",
   "pitch": "Pitch",

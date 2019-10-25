@@ -17,6 +17,15 @@
           <b-form-group
             label-cols-sm="4"
             label-cols-lg="3"
+            :label-for="'tts-skipUrls' + uuid"
+            :label="translate('registry.alerts.skipUrls')"
+          >
+            <b-form-checkbox v-bind:key="'tts-skipUrls' + uuid" :id="'tts-skipUrls' + uuid" v-model="data.skipUrls" :name="'tts-skipUrls' + uuid" switch></b-form-checkbox>
+          </b-form-group>
+
+          <b-form-group
+            label-cols-sm="4"
+            label-cols-lg="3"
             :label-for="'tts-keepAlertShown' + uuid"
             :label="translate('registry.alerts.keepAlertShown')"
           >
