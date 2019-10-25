@@ -1,0 +1,23 @@
+name: Tests
+
+on:
+  push:
+
+
+tag: format(${{github.ref}}, 'refs/tags/', '')
+
+jobs:
+  eslint:
+    name: ESLint check
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: install node v13
+      uses: actions/setup-node@v1
+      with:
+        node-version: 13
+    - name: GITHUB ref
+      run: echo '${{github.ref}}'
+    - name: GITHUB tag
+      run: echo '${{tag}}'
+
