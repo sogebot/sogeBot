@@ -1,5 +1,5 @@
 import Core from './_interface';
-import { settings, ui, shared } from './decorators';
+import { settings, shared, ui } from './decorators';
 import { MINUTE, SECOND } from './constants';
 import { isMainThread } from 'worker_threads';
 import uuid from 'uuid/v4';
