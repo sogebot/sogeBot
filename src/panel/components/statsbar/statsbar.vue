@@ -557,7 +557,6 @@
         else if (number === 0) return ''
         else {
           let f_difference: number | string = Math.abs(this.b_percentage ? (Math.round((current - number) / number * 1000) / 10) : current - number)
-          console.log({f_difference})
           if (this.b_percentage) {
             if (!isFinite(f_difference)) {
               return '';
