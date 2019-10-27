@@ -67,11 +67,9 @@
       </grid-layout>
     </div>
 
-    <template v-if="currentDashboard === null">
-      <div class="w-100"></div>
-      <widget-create v-bind:dashboardId="currentDashboard" class="pt-4" @addWidget="addWidget"></widget-create>
-    </template>
-    <dashboard-remove v-if="currentDashboard !== null" v-bind:dashboardId="currentDashboard" class="pt-4" @update="currentDashboard = 0" @removeDashboard="removeDashboard"></dashboard-remove>
+    <div class="w-100"></div>
+    <widget-create v-bind:dashboardId="currentDashboard" class="pt-4" @addWidget="addWidget"></widget-create>
+    <dashboard-remove v-if="currentDashboard !== null" v-bind:dashboardId="currentDashboard" class="pt-4" @update="currentDashboard = null" @removeDashboard="removeDashboard"></dashboard-remove>
   </div>
 </div>
 </template>
