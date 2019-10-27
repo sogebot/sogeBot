@@ -145,16 +145,18 @@
                     <strong v-else>{{ Number(bits.amount) }}</strong>
                   </td>
                   <td>
-                    <textarea v-model="bits.message" class="form-control" v-if="bits.editation"></textarea>
+                    <textarea v-model="bits.message" class="form-control" v-if="bits.editation" style="height:38px"></textarea>
                     <span v-else>{{ bits.message }}</span>
                   </td>
-                  <td>
+                  <td class="text-right">
                     <template v-if="!bits.editation">
-                      <button data-toggle="dropdown" class="btn btn-block btn-outline-dark border-0 h-100"><fa icon="ellipsis-v"></fa></button>
-                      <div class="dropdown-menu p-0">
-                        <button type="button" class="dropdown-item p-2 pl-4 pr-4" style="cursor: pointer" v-on:click="bits.editation = true; pending = true"><fa icon="edit"></fa> {{ translate('dialog.buttons.edit') }}</button>
-                        <button type="button" class="dropdown-item p-2 pl-4 pr-4" style="cursor: pointer" v-on:click="removeBits(bits._id)"><fa icon="trash-alt"></fa> {{ translate('dialog.buttons.delete') }}</button>
-                      </div>
+                      <b-dropdown variant="light" toggle-class="text-decoration-none" no-caret>
+                        <template v-slot:button-content>
+                          <fa icon="ellipsis-v"></fa>
+                        </template>
+                        <b-dropdown-item @click="bits.editation = true; pending = true"><fa icon="edit" fixed-width></fa> {{ translate('dialog.buttons.edit') }}</b-dropdown-item>
+                        <b-dropdown-item @click="removeBits(bits._id)"><fa icon="trash-alt" fixed-width></fa> {{ translate('dialog.buttons.delete') }}</b-dropdown-item>
+                      </b-dropdown>
                     </template>
                     <span v-else>
                       <button
@@ -222,23 +224,25 @@
                     <strong v-else>{{ Number(tips.amount).toFixed(2) }}{{ tips.currency }}</strong>
                   <td>
                     <template v-if="tips.editation">
-                      <textarea v-model="tips.message" class="form-control"></textarea>
+                      <textarea v-model="tips.message" class="form-control" style="height:38px"></textarea>
                     </template>
                     <span v-else>{{ tips.message }}</span>
-                  <td>
+                  <td class="text-right">
                     <template v-if="!tips.editation">
-                        <button data-toggle="dropdown" class="btn btn-block btn-outline-dark border-0 h-100"><fa icon="ellipsis-v"></fa></button>
-                        <div class="dropdown-menu p-0">
-                          <button type="button" class="dropdown-item p-2 pl-4 pr-4" style="cursor: pointer" v-on:click="tips.editation = true; pending = true"><fa icon="edit"></fa> {{ translate('dialog.buttons.edit') }}</button>
-                          <button type="button" class="dropdown-item p-2 pl-4 pr-4" style="cursor: pointer" v-on:click="removeTips(tips._id)"><fa icon="trash-alt"></fa> {{ translate('dialog.buttons.delete') }}</button>
-                        </div>
-                      </template>
-                      <span v-else>
-                        <button
-                          type="button"
-                          @click="tips.editation = false"
-                          class="btn btn-block btn-outline-dark border-0 h-100 small-spaced">DONE</button>
-                      </span>
+                      <b-dropdown variant="light" toggle-class="text-decoration-none" no-caret>
+                        <template v-slot:button-content>
+                          <fa icon="ellipsis-v"></fa>
+                        </template>
+                        <b-dropdown-item @click="tips.editation = true; pending = true"><fa icon="edit" fixed-width></fa> {{ translate('dialog.buttons.edit') }}</b-dropdown-item>
+                        <b-dropdown-item @click="removeTips(tips._id)"><fa icon="trash-alt" fixed-width></fa> {{ translate('dialog.buttons.delete') }}</b-dropdown-item>
+                      </b-dropdown>
+                    </template>
+                    <span v-else>
+                      <button
+                        type="button"
+                        @click="tips.editation = false"
+                        class="btn btn-block btn-outline-dark border-0 h-100 small-spaced">DONE</button>
+                    </span>
                   </td>
                 </tr>
               </table>
