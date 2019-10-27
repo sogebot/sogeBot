@@ -5,7 +5,7 @@ import moment from 'moment';
 require('moment-precise-range-plugin'); // moment.preciseDiff
 import { isMainThread } from 'worker_threads';
 import chalk from 'chalk';
-import { chunk, defaults, filter, flatMap, get, includes, isEmpty, isNil, isNull, map } from 'lodash';
+import { defaults, filter, flatMap, get, includes, isEmpty, isNil, isNull, map } from 'lodash';
 
 import * as constants from './constants';
 import Core from './_interface';
@@ -125,7 +125,6 @@ class API extends Core {
       this.interval('getAllStreamTags', constants.HOUR * 12);
 
       global.db.engine.index('cache', [{ index: 'key', unique: true }]);
-      global.db.engine.index('cache.raids', [{ index: 'username', unique: true }]);
       global.db.engine.index('cache.titles', [{ index: 'game' }]);
       global.db.engine.index('api.clips', [{ index: 'clipId', unique: true }]);
       global.db.engine.index('core.api.tags', [{ index: 'tag_id', unique: true }]);
@@ -345,20 +344,6 @@ class API extends Core {
       throw new Error('API can run only on master');
     }
 
-    const sendJoinEvent = async (bulk) => {
-      for (const user of bulk) {
-        await new Promise((resolve) => setTimeout(() => resolve(), 1000));
-        this.isFollower(user.username);
-        global.events.fire('user-joined-channel', { username: user.username });
-      }
-    };
-    const sendPartEvent = async (bulk) => {
-      for (const user of bulk) {
-        await new Promise((resolve) => setTimeout(() => resolve(), 1000));
-        global.events.fire('user-parted-channel', { username: user.username });
-      }
-    };
-
     const url = `https://tmi.twitch.tv/group/user/${getChannel()}/chatters`;
     const needToWait = isNil(global.widgets);
     if (needToWait) {
@@ -386,8 +371,6 @@ class API extends Core {
     const chatters: any[] = flatMap(request.data.chatters);
     this.checkBotModeratorStatus(request.data.chatters.moderators);
 
-    const bulkInsert: any[] = [];
-    const bulkParted: any[] = [];
     const allOnlineUsers = await global.users.getAllOnlineUsernames();
 
     for (const user of allOnlineUsers) {
@@ -395,9 +378,11 @@ class API extends Core {
         // user is no longer in channel
         await global.db.engine.remove('users.online', { username: user });
         if (!isIgnored({ username: user })) {
-          bulkParted.push({ username: user });
+          if (opts.saveToWidget) {
+            global.events.fire('user-parted-channel', { username: user.username });
+          }
           global.widgets.joinpart.send({ username: user, type: 'part' });
-        }
+        };
       }
     }
 
@@ -406,25 +391,18 @@ class API extends Core {
         // even if online, remove ignored user from collection
         await global.db.engine.remove('users.online', { username: chatter });
       } else if (!includes(allOnlineUsers, chatter)) {
-        bulkInsert.push({ username: chatter });
+        if (opts.saveToWidget) {
+          this.isFollower(chatter);
+          global.events.fire('user-joined-channel', { username: chatter });
+        }
+        await global.db.engine.insert('users.online', { username: chatter });
         global.widgets.joinpart.send({ username: chatter, type: 'join' });
       }
     }
+
     // always remove bot from online users
-    global.db.engine.remove('users.online', { username: global.oauth.botUsername });
+    await global.db.engine.remove('users.online', { username: global.oauth.botUsername });
 
-    if (bulkInsert.length > 0) {
-      for (const chunkInsert of chunk(bulkInsert, 100)) {
-        await global.db.engine.insert('users.online', chunkInsert);
-      }
-    }
-
-    if (opts.saveToWidget) {
-      sendPartEvent(bulkParted);
-    }
-    if (opts.saveToWidget) {
-      sendJoinEvent(bulkInsert);
-    }
 
     return { state: true, opts };
   }
@@ -705,13 +683,7 @@ class API extends Core {
       if (global.panel && global.panel.io) {
         global.panel.io.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'getChannelHosts', api: 'tmi', endpoint: url, code: request.status });
       }
-
       this.stats.currentHosts = request.data.hosts.length;
-
-      // save hosts list
-      for (const host of map(request.data.hosts, 'host_login')) {
-        await global.db.engine.update('cache.hosts', { username: host }, { username: host });
-      }
     } catch (e) {
       error(`${url} - ${e.message}`);
       if (global.panel && global.panel.io) {
@@ -719,6 +691,7 @@ class API extends Core {
       }
       return { state: e.response.status === 500 };
     }
+
     return { state: true };
   }
 
@@ -1139,9 +1112,6 @@ class API extends Core {
                 }
               }
             }
-
-            await global.db.engine.remove('cache.hosts', {}); // we dont want to have cached hosts on stream start
-            await global.db.engine.remove('cache.raids', {}); // we dont want to have cached raids on stream start
 
             this.streamId = null;
           }

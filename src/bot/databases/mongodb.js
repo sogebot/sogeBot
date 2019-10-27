@@ -84,7 +84,6 @@ class IMongoDB extends Interface {
         )
         await db.collection('customTranslations').createIndex('key')
         await db.collection('stats').createIndex('whenOnline')
-        await db.collection('cache.hosts').createIndex('username', { unique: true })
       }
     }
     this.connected = true

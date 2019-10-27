@@ -40,8 +40,6 @@ Process: api.max
 Process: api.new
 Process: bets.users
 Process: cache
-Process: cache.hosts
-Process: cache.raids
 Process: cache.titles
 Process: cooldown.viewers
 Process: core.api.games
