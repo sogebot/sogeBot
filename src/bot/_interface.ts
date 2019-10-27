@@ -192,7 +192,7 @@ class Module {
           cb(null, {variable, value});
         }
       });
-      adminEndpoint(this.nsp, 'get.value', async (variable, cb) => {
+      publicEndpoint(this.nsp, 'get.value', async (variable, cb) => {
         cb(null, await this[variable]);
       });
       adminEndpoint(this.nsp, 'settings.update', async (data: { [x: string]: any }, cb) => {
@@ -418,7 +418,7 @@ class Module {
           cb(null);
         }
       });
-      adminEndpoint(this.nsp, 'find', async (opts, cb) => {
+      publicEndpoint(this.nsp, 'find', async (opts, cb) => {
         opts.collection = opts.collection || 'data';
         opts.omit = opts.omit || [];
         if (opts.collection.startsWith('_')) {
@@ -451,7 +451,7 @@ class Module {
           throw Error('No callback for find function');
         }
       });
-      adminEndpoint(this.nsp, 'findOne', async (opts, cb) => {
+      publicEndpoint(this.nsp, 'findOne', async (opts, cb) => {
         opts.collection = opts.collection || 'data';
         opts.omit = opts.omit || [];
         if (opts.collection.startsWith('_')) {
