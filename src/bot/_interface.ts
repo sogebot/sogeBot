@@ -8,7 +8,7 @@ import { loadingInProgress, permissions as permissionsList } from './decorators'
 import { getFunctionList } from './decorators/on';
 import { permission } from './permissions';
 import { error, info, warning } from './helpers/log';
-import { adminEndpoint } from './helpers/socket';
+import { adminEndpoint, publicEndpoint } from './helpers/socket';
 
 class Module {
   public dependsOn: string[] = [];
@@ -325,6 +325,9 @@ class Module {
         if (typeof cb === 'function') {
           cb(null, true);
         }
+      });
+      publicEndpoint(this.nsp, 'update', async (opts, cb) => {
+        cb('User doesn\'t have access to this endpoint', null);
       });
       adminEndpoint(this.nsp, 'update', async (opts, cb) => {
         opts.collection = opts.collection || 'data';
