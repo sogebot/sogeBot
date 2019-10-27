@@ -49,7 +49,7 @@ export const isUserLoggedIn = async function () {
           ],
         }, (err, data) => {
           if (err) {
-            reject(err)
+            reject(err);
           } else {
             resolve();
           }

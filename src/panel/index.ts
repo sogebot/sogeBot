@@ -95,7 +95,6 @@ const main = async () => {
   Vue.prototype.translate = (v) => translate(v);
   Vue.prototype.urlParam = (v) => urlParam(v);
   Vue.prototype.$loggedUser = await isUserLoggedIn();
-  console.log({loggedUser: Vue.prototype.$loggedUser})
   if (Vue.prototype.$loggedUser !== false) {
     await getTranslations();
     Vue.prototype.configuration = await getConfiguration();
