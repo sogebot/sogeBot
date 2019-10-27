@@ -36,7 +36,7 @@ export const isUserLoggedIn = async function () {
       localStorage.removeItem('newAuthorization');
 
       // save userId to db
-      await new Promise((resolve) => {
+      await new Promise((resolve, reject) => {
         const socket = getSocket('/core/users');
         socket.emit('update', {
           collection: '_users',
@@ -48,26 +48,27 @@ export const isUserLoggedIn = async function () {
             },
           ],
         }, (err, data) => {
-          resolve();
+          if (err) {
+            reject(err)
+          } else {
+            resolve();
+          }
         });
       });
       return data;
     } catch(e) {
-      console.log('Redirecting, user code expired');
       console.debug(e);
-      if (window.location.href.includes('popout')) {
-        window.location.replace(window.location.origin + '/login#error=popout+must+be+logged');
+      if (e === 'User doesn\'t have access to this endpoint') {
+        window.location.replace(window.location.origin + '/login#error=must+be+caster');
       } else {
-        window.location.replace(window.location.origin + '/login');
+        console.log('Redirecting, user code expired');
+        if (window.location.href.includes('popout')) {
+          window.location.replace(window.location.origin + '/login#error=popout+must+be+logged');
+        } else {
+          window.location.replace(window.location.origin + '/login');
+        }
       }
       return;
     }
   }
-};
-
-export const isUserCaster = function () {
-  if (localStorage.getItem('userType') !== 'admin') {
-    window.location.replace(window.location.origin + '/login#error=must+be+caster');
-  };
-  return localStorage.getItem('userType') === 'admin';
 };

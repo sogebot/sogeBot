@@ -3,18 +3,20 @@
     <h4 class="text-danger" v-if="error === 'must+be+caster'">
       <fa icon="skull-crossbones" fixed-width size="4x"/>
       <div>Insufficient permission.</div>
-      <b-btn variant="success" class="mt-3" @click="login">Login</b-btn>
+      <b-btn block variant="success" class="mt-3" @click="login">Login</b-btn>
+      <b-btn block variant="primary" @click="publicPage">Public page</b-btn>
     </h4>
     <h4 class="text-success" v-if="error === 'logged+out'">
       <fa icon="check-circle" fixed-width size="4x"/>
       <div>You have successfully logged out.</div>
-      <b-btn variant="success" class="mt-3" @click="login">Login</b-btn>
+      <b-btn block variant="success" class="mt-3" @click="login">Login</b-btn>
+      <b-btn block variant="primary" @click="publicPage">Public page</b-btn>
     </h4>
     <h4 class="text-danger" v-if="error === 'popout+must+be+logged'">
       <fa icon="skull-crossbones" fixed-width size="4x"/>
       <div>Cannot access without login.</div>
-      <b-btn variant="success" class="mt-3" @click="login">Login</b-btn>
-      <b-btn variant="secondary" class="mt-3" @click="goBack">Try again</b-btn>
+      <b-btn block variant="success" class="mt-3" @click="login">Login</b-btn>
+      <b-btn block variant="secondary" @click="goBack">Try again</b-btn>
     </h4>
   </b-container>
 </template>
@@ -35,6 +37,10 @@ export default class Login extends Vue {
     if (this.popoutUrl) {
       window.location.replace(this.popoutUrl)
     }
+  }
+
+  publicPage() {
+    window.location.replace(this.url + '/public/');
   }
 
   login() {

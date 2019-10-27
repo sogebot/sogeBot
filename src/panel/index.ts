@@ -33,7 +33,7 @@ import { get } from 'lodash-es';
 
 import { ButtonStates, states } from './helpers/buttonStates';
 import { setMainLoaded } from './helpers/isAvailableVariable';
-import { isUserCaster, isUserLoggedIn } from './helpers/isUserLoggedIn';
+import { isUserLoggedIn } from './helpers/isUserLoggedIn';
 import translate from './helpers/translate';
 import urlParam from './helpers/urlParam';
 import { getListOf } from './helpers/getListOf';
@@ -94,9 +94,9 @@ const main = async () => {
   // init prototypes
   Vue.prototype.translate = (v) => translate(v);
   Vue.prototype.urlParam = (v) => urlParam(v);
-
   Vue.prototype.$loggedUser = await isUserLoggedIn();
-  if (Vue.prototype.$loggedUser !== false && isUserCaster()) {
+  console.log({loggedUser: Vue.prototype.$loggedUser})
+  if (Vue.prototype.$loggedUser !== false) {
     await getTranslations();
     Vue.prototype.configuration = await getConfiguration();
 
