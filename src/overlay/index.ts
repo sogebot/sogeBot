@@ -26,8 +26,6 @@ export interface Global {
   $unloadScript: (script: string) => Promise<void>;
 }
 
-declare let global: Global;
-
 declare module 'vue/types/vue' {
   interface Vue {
     configuration: any;
@@ -69,7 +67,7 @@ const overlays = async () => {
   new Vue({
     router,
     created() {
-      this.$moment.locale(global.configuration.lang); // set proper moment locale
+      this.$moment.locale(this.configuration.lang); // set proper moment locale
     },
     template: `
       <div id="app">
