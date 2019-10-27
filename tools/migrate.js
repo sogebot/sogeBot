@@ -6,7 +6,7 @@ const config = require('../config.json');
 const fs = require('fs');
 const uuidv4 = require('uuid/v4');
 
-const dropFiles = [ 'settings', 'api.max', 'api.current', 'api.new', 'overlays.text' ];
+const dropFiles = [ 'settings', 'api.max', 'api.current', 'api.new', 'overlays.text', 'cache.hosts', 'cache.raids' ];
 
 // db
 const Database = require('../dest/databases/database');

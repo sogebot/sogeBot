@@ -338,7 +338,6 @@ class TMI extends Core {
         const viewers = message.numberOfViewers || '0';
 
         host(`${username}, viewers: ${viewers}, autohost: ${autohost}`);
-        global.db.engine.update('cache.hosts', { username }, { username });
 
         const data = {
           username: username,
@@ -368,7 +367,6 @@ class TMI extends Core {
   usernotice(message) {
     if (message.event === 'RAID') {
       raid(`${message.parameters.login}, viewers: ${message.parameters.viewerCount}`);
-      global.db.engine.update('cache.raids', { username: message.parameters.login }, { username: message.parameters.login });
 
       const data = {
         username: message.parameters.login,

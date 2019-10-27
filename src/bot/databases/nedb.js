@@ -46,10 +46,6 @@ class INeDB extends Interface {
       this.table[table].persistence.setAutocompactionInterval(60000)
 
       switch (table) {
-        case 'cache.hosts':
-          this.table[table].removeIndex('username')
-          this.table[table].removeIndex('id')
-          break
         case 'customTranslations':
           this.table[table].removeIndex('key')
           break
