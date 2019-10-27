@@ -130,7 +130,7 @@ class Permissions extends Core {
 
     try {
       if (typeof user.id === 'undefined') {
-        throw Error(`User ${userId} doesn't exist`);
+        return { access: permId === permission.VIEWERS, permission: pItem };
       }
       if (typeof pItem.id === 'undefined') {
         throw Error(`Permissions ${permId} doesn't exist`);
