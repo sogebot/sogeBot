@@ -1,5 +1,5 @@
 import Core from './_interface';
-import { settings, ui } from './decorators';
+import { settings, shared, ui } from './decorators';
 import { MINUTE, SECOND } from './constants';
 import { isMainThread } from 'worker_threads';
 import uuid from 'uuid/v4';
@@ -16,9 +16,10 @@ type Auth = {
   refreshTokenTimestamp: number;
 };
 
-let sockets: Auth[] = [];
-
 class Socket extends Core {
+  @shared(true)
+  socketsTokenAuthList: Auth[] = [];
+
   @settings('connection')
   accessTokenExpirationTime = 120;
 
@@ -43,7 +44,7 @@ class Socket extends Core {
 
     if (isMainThread) {
       setInterval(() => {
-        sockets = sockets.filter(socket => {
+        this.socketsTokenAuthList = this.socketsTokenAuthList.filter(socket => {
           const isAccessTokenExpired = socket.accessTokenTimestamp + (this.accessTokenExpirationTime * 1000) < Date.now();
           const isRefreshTokenExpired = socket.refreshTokenTimestamp + (this.refreshTokenExpirationTime * 1000) < Date.now();
           return !(isRefreshTokenExpired && isAccessTokenExpired);
@@ -51,7 +52,7 @@ class Socket extends Core {
       }, MINUTE);
 
       setInterval(() => {
-        sockets = sockets.map(socket => {
+        this.socketsTokenAuthList = this.socketsTokenAuthList.map(socket => {
           const isAccessTokenExpired = socket.accessTokenTimestamp + (this.accessTokenExpirationTime * 1000) < Date.now();
           if (isAccessTokenExpired) {
             // expire token
@@ -105,7 +106,7 @@ class Socket extends Core {
           // we don't have anything
           return socket.emit('unauthorized');
         } else {
-          const auth = sockets.find(o => (o.accessToken === cb.accessToken || o.refreshToken === cb.refreshToken));
+          const auth = global.socket.socketsTokenAuthList.find(o => (o.accessToken === cb.accessToken || o.refreshToken === cb.refreshToken));
           if (!auth) {
             return socket.emit('unauthorized');
           } else {
@@ -138,7 +139,7 @@ class Socket extends Core {
       if (userPermission === permission.CASTERS) {
         auth.type = 'admin';
       }
-      sockets.push(auth);
+      global.socket.socketsTokenAuthList.push(auth);
       sendAuthorized(socket, auth);
       cb();
     });
@@ -155,7 +156,7 @@ class Socket extends Core {
   sockets () {
     global.panel.io.of('/core/socket').on('connection', (socket) => {
       socket.on('purgeAllConnections', (cb) => {
-        sockets = [];
+        this.socketsTokenAuthList = [];
         cb(null);
       });
     });
