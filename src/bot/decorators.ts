@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import { parse, sep as separator } from 'path';
 import { VariableWatcher } from './watchers';
-import { error, debug } from './helpers/log';
+import { debug, error } from './helpers/log';
 import { isMainThread } from 'worker_threads';
 
 export let loadingInProgress: string[] = [];
