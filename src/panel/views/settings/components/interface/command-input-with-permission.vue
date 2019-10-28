@@ -89,10 +89,10 @@ export default class sortableList extends Vue {
     if (currentPermissions === null) {
       return 'light';
     }
-    if (currentPermissions !== null && this.getPermissionName(currentPermissions) !== null) {
+    if (this.getPermissionName(currentPermissions) !== null) {
       return 'dark';
     }
-    if (currentPermissions !== null && this.getPermissionName(currentPermissions) === null) {
+    if (this.getPermissionName(currentPermissions) === null) {
       return 'danger';
     }
   }
