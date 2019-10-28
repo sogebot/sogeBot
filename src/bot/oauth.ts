@@ -287,6 +287,9 @@ class OAuth extends Core {
       }
 
       const request = await axios.post(url + encodeURIComponent(this[type + 'RefreshToken']));
+      if (!request.data.success) {
+        throw new Error(`Token refresh for ${type}: ${request.data.message}`);
+      }
       if (typeof request.data.token !== 'string') {
         throw new Error(`Access token for ${type} was not correctly fetched (not a string)`);
       }
