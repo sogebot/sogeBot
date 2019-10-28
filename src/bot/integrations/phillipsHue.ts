@@ -47,7 +47,7 @@ class PhillipsHue extends Integration {
     super();
 
     setInterval(() => {
-      if (!this.isEnabled()) {
+      if (!this.enabled) {
         return;
       }
       for (let index = 0, length = this.states.length; index < length; index++) {

@@ -1,10 +1,26 @@
 import * as _ from 'lodash';
 import { parse, sep as separator } from 'path';
 import { VariableWatcher } from './watchers';
-import { error } from './helpers/log';
+import { error, debug } from './helpers/log';
+import { isMainThread } from 'worker_threads';
 
 export let loadingInProgress: string[] = [];
 export const permissions: { [command: string]: string | null } = {};
+
+let lastLoadingInProgressCount = 1000;
+
+const interval = setInterval(() => {
+  if(loadingInProgress.length === lastLoadingInProgressCount) {
+    if (loadingInProgress.length > 0) {
+      error('decorators: Loading FAIL (thread: ' + !isMainThread + `)\n${loadingInProgress.join(', ')}`);
+    } else {
+      debug('decorators', 'Loading OK (thread: ' + !isMainThread + ')');
+    }
+    clearInterval(interval);
+  } else {
+    lastLoadingInProgressCount = loadingInProgress.length;
+  }
+}, 10000);
 
 function getNameAndTypeFromStackTrace() {
   const _prepareStackTrace = Error.prepareStackTrace;

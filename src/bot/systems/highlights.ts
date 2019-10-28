@@ -52,7 +52,7 @@ class Highlights extends System {
     const url = req.get('host') + req.originalUrl;
     const settings = this.urls.find((o) => o.url.endsWith(url));
     if (settings) {
-      if (!(await this.isEnabled())) {
+      if (!this.enabled) {
         return res.status(412).send({ error: 'Highlights system is disabled' });
       } else {
         if (!(global.api.isStreamOnline)) {

@@ -162,11 +162,11 @@ class Moderation extends System {
     let ytRegex, clipsRegex, spotifyRegex;
 
     // check if spotify -or- alias of spotify contain open.spotify.com link
-    if (await global.integrations.spotify.isEnabled()) {
+    if (global.integrations.spotify.enabled) {
       // we can assume its first command in array (spotify have only one command)
       const command = (await global.integrations.spotify.commands())[0].command;
       const alias = await global.db.engine.findOne(global.systems.alias.collection.data, { command });
-      if (!_.isEmpty(alias) && alias.enabled && await global.systems.alias.isEnabled()) {
+      if (!_.isEmpty(alias) && alias.enabled && global.systems.alias.enabled) {
         spotifyRegex = new RegExp('^(' + command + '|' + alias.alias + ') \\S+open\\.spotify\\.com\\/track\\/(\\w+)(.*)?', 'gi');
       } else {
         spotifyRegex = new RegExp('^(' + command + ') \\S+open\\.spotify\\.com\\/track\\/(\\w+)(.*)?', 'gi');
@@ -175,10 +175,10 @@ class Moderation extends System {
     }
 
     // check if songrequest -or- alias of songrequest contain youtube link
-    if (await global.systems.songs.isEnabled()) {
+    if (global.systems.songs.enabled) {
       const alias = await global.db.engine.findOne(global.systems.alias.collection.data, { command: '!songrequest' });
       const cmd = global.systems.songs.getCommand('!songrequest');
-      if (!_.isEmpty(alias) && alias.enabled && await global.systems.alias.isEnabled()) {
+      if (!_.isEmpty(alias) && alias.enabled && global.systems.alias.enabled) {
         ytRegex = new RegExp('^(' + cmd + '|' + alias.alias + ') \\S+(?:youtu.be\\/|v\\/|e\\/|u\\/\\w+\\/|embed\\/|v=)([^#&?]*).*', 'gi');
       } else {
         ytRegex =  new RegExp('^(' + cmd + ') \\S+(?:youtu.be\\/|v\\/|e\\/|u\\/\\w+\\/|embed\\/|v=)([^#&?]*).*', 'gi');

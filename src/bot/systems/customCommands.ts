@@ -441,7 +441,7 @@ class CustomCommands extends System {
 
     const $userObject = await global.users.getByName(opts.sender.username);
     let $rank = null;
-    if (global.systems.ranks.isEnabled()) {
+    if (global.systems.ranks.enabled) {
       $rank = await global.systems.ranks.get($userObject);
     }
 

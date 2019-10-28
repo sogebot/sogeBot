@@ -150,7 +150,7 @@ class Raffles extends System {
   async open (opts) {
     const [followers, subscribers] = [opts.parameters.indexOf('followers') >= 0, opts.parameters.indexOf('subscribers') >= 0];
     let type = (opts.parameters.indexOf('-min') >= 0 || opts.parameters.indexOf('-max') >= 0) ? TYPE_TICKETS : TYPE_NORMAL;
-    if (!(await global.systems.points.isEnabled())) {
+    if (!global.systems.points.enabled) {
       type = TYPE_NORMAL;
     } // force normal type if points are disabled
 

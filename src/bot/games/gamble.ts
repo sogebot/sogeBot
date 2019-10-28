@@ -15,7 +15,7 @@ const ERROR_MINIMAL_BET = '3';
  */
 
 class Gamble extends Game {
-  dependsOn = [  'systems.points' ];
+  dependsOn = [ 'systems.points' ];
 
   @settings()
   minimalBet = 0;

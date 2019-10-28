@@ -214,7 +214,7 @@ class UserInfo extends System {
       if (message.includes('$rank')) {
         const idx = message.indexOf('$rank');
         const rank = await global.systems.ranks.get(opts.sender.username);
-        if (await global.systems.ranks.isEnabled() && !_.isNull(rank)) {
+        if (global.systems.ranks.enabled && !_.isNull(rank)) {
           message[idx] = rank;
         } else {
           message.splice(idx, 1);
@@ -229,7 +229,7 @@ class UserInfo extends System {
 
       if (message.includes('$points')) {
         const idx = message.indexOf('$points');
-        if (await global.systems.points.isEnabled()) {
+        if (global.systems.points.enabled) {
           const userPoints = await global.systems.points.getPointsOf(opts.sender.userId);
           message[idx] = userPoints + ' ' + await global.systems.points.getPointsName(userPoints);
         } else {
