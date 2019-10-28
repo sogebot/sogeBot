@@ -10,9 +10,8 @@
       </div>
     </div>
     <div class="input-group-append" v-else>
-      <div class="dropdown">
-        <button class="btn dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown"
-                :class="{'btn-light': currentPermissions === null, 'btn-dark': currentPermissions !== null && getPermissionName(currentPermissions) !== null, 'btn-danger': currentPermissions !== null && getPermissionName(currentPermissions) === null}">
+      <b-dropdown :variant="getVariant(currentPermissions)">
+        <template v-slot:button-content>
           <template v-if="permissionsLoaded">
             <span v-if="getPermissionName(currentPermissions) !== null">{{ getPermissionName(currentPermissions) }}</span>
             <span v-else>
@@ -22,22 +21,23 @@
           <div v-else class="spinner-grow spinner-grow-sm" role="status">
             <span class="sr-only">Loading...</span>
           </div>
-        </button>
-        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="z-index: 9999;">
-          <template v-if="permissionsLoaded">
-            <button
-              v-for="p of permissionsList"
-              class="dropdown-item"
-              @click="currentPermissions = p.id"
-              :key="p.id"
-            >{{getPermissionName(p.id)}}</button>
-            <button
-              class="dropdown-item"
-              @click="currentPermissions = null"
-            >Disabled</button>
-          </template>
-        </div>
-      </div>
+        </template>
+
+        <template v-if="permissionsLoaded">
+          <b-dropdown-item
+            v-for="p of permissionsList"
+            @click="currentPermissions = p.id"
+            :key="p.id"
+          >
+            {{getPermissionName(p.id)}}
+          </b-dropdown-item>
+          <b-dropdown-item
+            @click="currentPermissions = null"
+          >
+            Disabled
+          </b-dropdown-item>
+        </template>
+      </b-dropdown>
     </div>
   </div>
 </template>
@@ -83,6 +83,18 @@ export default class sortableList extends Vue {
       this.permissionsList = orderBy(data, 'order', 'asc');
       this.permissionsLoaded = true;
     });
+  }
+
+  getVariant(currentPermissions) {
+    if (currentPermissions === null) {
+      return 'light';
+    }
+    if (this.getPermissionName(currentPermissions) !== null) {
+      return 'dark';
+    }
+    if (this.getPermissionName(currentPermissions) === null) {
+      return 'danger';
+    }
   }
 
   getPermissionName(id) {
