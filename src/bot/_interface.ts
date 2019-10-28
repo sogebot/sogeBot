@@ -640,7 +640,7 @@ class Module {
   }
 
   public async parsers() {
-    if (!(await this.isEnabled())) {
+    if (!this.enabled) {
       return [];
     }
 
@@ -683,7 +683,7 @@ class Module {
   }
 
   public async rollbacks() {
-    if (!(await this.isEnabled())) {
+    if (!this.enabled) {
       return [];
     }
 
@@ -707,7 +707,7 @@ class Module {
   }
 
   public async commands() {
-    if (await this.isEnabled()) {
+    if (this.enabled) {
       const commands: {
         this: any;
         id: string;
@@ -765,10 +765,6 @@ class Module {
     } else {
       return [];
     }
-  }
-
-  public async isEnabled(): Promise<boolean> {
-    return this.status({ quiet: true });
   }
 
   public async getUI() {

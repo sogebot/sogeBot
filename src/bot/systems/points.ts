@@ -51,7 +51,7 @@ class Points extends System {
 
   async updatePoints () {
     clearTimeout(this.timeouts.updatePoints);
-    if (!(await this.isEnabled())) {
+    if (!this.enabled) {
       this.timeouts.updatePoints = global.setTimeout(() => this.updatePoints(), 5000);
       return;
     }

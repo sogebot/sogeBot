@@ -121,7 +121,7 @@ class Top extends System {
         message = global.translate('systems.top.tips').replace(/\$amount/g, 10);
         break;
       case TYPE.POINTS:
-        if (!global.systems.points.isEnabled()) {
+        if (!global.systems.points.enabled) {
           return;
         }
 

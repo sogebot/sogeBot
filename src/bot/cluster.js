@@ -11,6 +11,7 @@ const { autoLoad } = require('./commons');
 import { API } from './api';
 import { TMI } from './tmi';
 import { Twitch } from './twitch';
+import { Socket } from './socket';
 import { Users } from './users';
 import { UI } from './ui';
 
@@ -24,6 +25,7 @@ function cluster () {
 
   try {
     global.general = new (require('./general'))()
+    global.socket = new Socket()
     global.ui = new UI()
     global.currency = new Currency()
     global.users = new Users()

@@ -82,7 +82,7 @@ class Cooldown extends System {
         key = parsed.command;
       } else {
         // search in custom commands as well
-        if (global.systems.customCommands.isEnabled()) {
+        if (global.systems.customCommands.enabled) {
           let commands: any = await global.db.engine.find(global.systems.customCommands.collection.data);
           commands = _(commands).flatMap().sortBy(o => -o.command.length).value();
           const customparsed = await (new Parser().find(subcommand ? `${command} ${subcommand}` : command, commands));
@@ -209,7 +209,7 @@ class Cooldown extends System {
         key = parsed.command;
       } else {
         // search in custom commands as well
-        if (global.systems.customCommands.isEnabled()) {
+        if (global.systems.customCommands.enabled) {
           let commands = await global.db.engine.find(global.systems.customCommands.collection.data);
           commands = _(commands).flatMap().sortBy(o => -o.command.length).value();
           const customparsed = await ((new Parser()).find(subcommand ? `${command} ${subcommand}` : command, commands));

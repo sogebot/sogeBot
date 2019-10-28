@@ -70,7 +70,7 @@ class Message {
     } else {this.message = this.message.replace(/\$spotifySong/g, global.translate('songs.not-playing'))};
 
 
-    if (await global.systems.songs.isEnabled()
+    if (global.systems.songs.enabled
         && this.message.includes('$ytSong')
         && Object.values(global.systems.songs.isPlaying).find(o => o)) {
       let currentSong = _.get(JSON.parse(await global.systems.songs.currentSong), 'title', global.translate('songs.not-playing'));
@@ -349,7 +349,7 @@ class Message {
     let price = {
       '(price)': async function (filter) {
         let price = 0;
-        if (await global.systems.price.isEnabled()) {
+        if (global.systems.price.enabled) {
           let command = await global.db.engine.findOne(global.systems.price.collection.data, { command: attr.cmd });
           price = _.isEmpty(command) ? 0 : command.price;
         }

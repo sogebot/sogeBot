@@ -46,7 +46,7 @@ class Donationalerts extends Integration {
   async connect () {
     this.disconnect();
 
-    if (this.secretToken.trim() === '' || !(await this.isEnabled())) {
+    if (this.secretToken.trim() === '' || !this.enabled) {
       return;
     }
 

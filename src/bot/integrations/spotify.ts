@@ -204,7 +204,7 @@ class Spotify extends Integration {
   }
 
   async sendSongs () {
-    if (!this.userId || !(await this.isEnabled())) {
+    if (!this.userId || !(this.enabled)) {
       return;
     }
 
@@ -257,7 +257,7 @@ class Spotify extends Integration {
     clearTimeout(this.timeouts.getMe);
 
     try {
-      if ((await this.isEnabled()) && !_.isNil(this.client)) {
+      if ((this.enabled) && !_.isNil(this.client)) {
         const data = await this.client.getMe();
         this.userId = data.body.id;
         this.username = data.body.display_name ? data.body.display_name : data.body.id;
@@ -291,11 +291,11 @@ class Spotify extends Integration {
           artists: data.body.item.artists.map(o => o.name).join(', '),
           uri: data.body.item.uri,
           is_playing: data.body.is_playing,
-          is_enabled: await this.isEnabled(),
+          is_enabled: this.enabled,
         };
       }
       currentSong.is_playing = data.body.is_playing;
-      currentSong.is_enabled = await this.isEnabled();
+      currentSong.is_enabled = this.enabled;
       this.currentSong = JSON.stringify(currentSong);
     } catch (e) {
       this.currentSong = JSON.stringify({});
