@@ -38,6 +38,7 @@ class Scrim extends System {
     super();
 
     if (isMainThread) {
+      this.reminder();
       setInterval(() => this.reminder(), 1000);
     }
   }

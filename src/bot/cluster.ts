@@ -6,7 +6,7 @@ import { isDebugEnabled as debugIsEnabled } from './helpers/log';
 import config from '@config';
 import { chatIn, chatOut, info, whisperIn, whisperOut } from './helpers/log';
 
-export const isMainThread = typeof process.env.CLUSTER !== 'undefined';
+export const isMainThread = typeof process.env.CLUSTER === 'undefined';
 
 const availableSockets: {
   [socketId: string]: {
