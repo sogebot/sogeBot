@@ -27,8 +27,6 @@ const { autoLoad } = require('./commons');
 const constants = require('./constants')
 const config = require('../config.json')
 
-global.workers = new Workers()
-
 global.linesParsed = 0
 global.avgResponse = []
 
