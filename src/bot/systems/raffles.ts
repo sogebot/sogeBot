@@ -1,7 +1,7 @@
 'use strict';
 
 import * as _ from 'lodash';
-import { isMainThread } from 'worker_threads';
+import { isMainThread } from '../cluster';
 
 import { getOwner, prepare, sendMessage } from '../commons';
 import { command, default_permission, parser, settings } from '../decorators';

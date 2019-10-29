@@ -6,7 +6,7 @@ import { prepare, sendMessage } from '../commons';
 import { command, default_permission } from '../decorators';
 import { permission } from '../permissions';
 import System from './_interface';
-import { isMainThread } from 'worker_threads';
+import { isMainThread } from '../cluster';
 import uuid from 'uuid';
 
 /*

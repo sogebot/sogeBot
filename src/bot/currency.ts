@@ -6,7 +6,7 @@ import axios from 'axios';
 import chalk from 'chalk';
 import getSymbolFromCurrency from 'currency-symbol-map';
 import _ from 'lodash';
-import { isMainThread } from 'worker_threads';
+import { isMainThread } from './cluster';
 
 import Core from './_interface';
 import * as constants from './constants';

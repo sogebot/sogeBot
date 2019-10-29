@@ -3,7 +3,7 @@ import chalk from 'chalk';
 import crypto from 'crypto';
 import _ from 'lodash';
 import SpotifyWebApi from 'spotify-web-api-node';
-import { isMainThread } from 'worker_threads';
+import { isMainThread } from '../cluster';
 
 import { prepare, sendMessage } from '../commons';
 import { command, default_permission, settings, shared, ui } from '../decorators';
@@ -475,11 +475,6 @@ class Spotify extends Integration {
     if (!(global.api.isStreamOnline)) {
       return;
     } // don't do anything on offline stream
-    if (!isMainThread) {
-      // we have client connected on master -> send process to master
-      global.workers.sendToMaster({ type: 'call', ns: 'integrations.spotify', fnc: 'main', args: [opts] });
-      return;
-    }
     if (!this.songRequests) {
       return;
     }

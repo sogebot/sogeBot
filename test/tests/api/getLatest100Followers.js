@@ -1,10 +1,4 @@
 /* global describe it before, after */
-const {
-  isMainThread,
-} = require('worker_threads');
-if (!isMainThread) {
-  process.exit();
-}
 
 
 require('../../general.js');

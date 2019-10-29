@@ -7,7 +7,7 @@ import { sendMessage } from './commons';
 import { command, default_permission, settings, ui } from './decorators';
 import { onChange, onLoad } from './decorators/on';
 import { permission } from './permissions';
-import { isMainThread } from 'worker_threads';
+import { isMainThread } from './cluster';
 import { debug, error, warning } from './helpers/log';
 
 class General extends Core {
@@ -33,7 +33,6 @@ class General extends Core {
   @onChange('lang')
   @onLoad('lang')
   public async onLangUpdate() {
-    global.workers.callOnAll({ type: 'call', ns: 'lib.translate', fnc: '_load' });
     await global.lib.translate._load();
     if (isMainThread) {
       warning(global.translate('core.lang-selected'));

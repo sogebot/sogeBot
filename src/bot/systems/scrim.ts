@@ -1,4 +1,4 @@
-import { isMainThread } from 'worker_threads';
+import { isMainThread } from '../cluster';
 
 import { getBotSender, getLocalizedName, getOwner, prepare, round5, sendMessage } from '../commons';
 import * as constants from '../constants';
@@ -38,6 +38,7 @@ class Scrim extends System {
     super();
 
     if (isMainThread) {
+      this.reminder();
       setInterval(() => this.reminder(), 1000);
     }
   }

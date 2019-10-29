@@ -3,7 +3,6 @@ if (Number(process.versions.node.split('.')[0]) < 11) {
   process.exit(1)
 }
 
-import { Workers } from './workers';
 import { Permissions } from './permissions';
 import { Events } from './events';
 import { OAuth } from './oauth';
@@ -18,20 +17,16 @@ import { Users } from './users';
 import { UI } from './ui';
 
 const figlet = require('figlet')
-const os = require('os')
 const util = require('util')
 const _ = require('lodash')
 const chalk = require('chalk')
 const gitCommitInfo = require('git-commit-info');
-const { isMainThread, } = require('worker_threads');
+const { isMainThread, } = require('./cluster');
 const { autoLoad } = require('./commons');
 
 const constants = require('./constants')
 const config = require('../config.json')
 
-global.workers = new Workers()
-
-global.startedClusters = 0
 global.linesParsed = 0
 global.avgResponse = []
 
@@ -42,26 +37,19 @@ global.status = { // TODO: move it?
   'RES': 0
 }
 
-const isNeDB = config.database.type === 'nedb'
-global.cpu = config.threads === 'auto' ? os.cpus().length : parseInt(_.get(config, 'cpu', 1), 10)
-if (config.database.type === 'nedb') global.cpu = 1 // nedb can have only one fork
+import { changelog } from './changelog';
 
-if (!isMainThread) {
-  global.db = new (require('./databases/database'))(isNeDB, isNeDB)
-  require('./cluster.js')
-} else {
-  global.db = new (require('./databases/database'))(!isNeDB, !isNeDB)
-  // spin up forks first
-
-  for (let i = 0; i < global.cpu; i++) {
-    global.workers.newWorker();
-  }
-  main()
-}
+const isNeDB = config.database.type === 'nedb';
+global.db = new (require('./databases/database'))(!isNeDB, !isNeDB)
+main()
 
 async function main () {
-  if (!global.db.engine.connected || global.cpu !== global.workers.onlineCount) return setTimeout(() => main(), 10)
+  if (!global.db.engine.connected) {
+    return setTimeout(() => main(), 10)
+  }
   try {
+    changelog();
+
     global.general = new (require('./general.js'))()
     global.socket = new Socket()
     global.ui = new UI()
@@ -105,7 +93,9 @@ async function main () {
     global.games = await autoLoad('./dest/games/')
     global.integrations = await autoLoad('./dest/integrations/')
 
-    global.panel.expose()
+    if (isMainThread) {
+      global.panel.expose();
+    }
 
     if (process.env.HEAP && process.env.HEAP.toLowerCase() === 'true') {
       warning(chalk.bgRed.bold('HEAP debugging is ENABLED'))

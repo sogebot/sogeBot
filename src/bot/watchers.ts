@@ -1,6 +1,7 @@
 import { cloneDeep, get, isEqual, set } from 'lodash';
-import { isMainThread } from 'worker_threads';
+import { isMainThread } from './cluster';
 import { error } from './helpers/log';
+import { change } from './changelog';
 
 const variables: {
   [x: string]: any;
@@ -23,23 +24,11 @@ export const VariableWatcher = {
   },
   async check() {
     for (const k of Object.keys(variables)) {
-      let value = get(global, k.replace('core.', ''), null);
+      const value = get(global, k.replace('core.', ''), null);
       if (!isEqual(value, variables[k])) {
         const [type, name, variable] = k.split('.');
 
-        if (Array.isArray(value)) {
-          value = [...value]; // we need to retype otherwise we have worker clone error
-        }
-
         variables[k] = value;
-        global.workers.sendToAll({
-          type: 'interface',
-          system: type,
-          class: name,
-          path: variable,
-          value,
-        });
-
         let self: null | any = null;
         if (type === 'core') {
           self = Object.values(global).find((o) => {
@@ -53,6 +42,7 @@ export const VariableWatcher = {
 
         if (isMainThread && self) {
           await global.db.engine.update(self.collection.settings, { system: name.toLowerCase(), key: variable }, { value: variable.startsWith('__permission_based') ? JSON.stringify(value) : value });
+          change(`${type}.${name}.${variable}`);
           if (typeof self.on !== 'undefined'
             && typeof self.on.change !== 'undefined'
             && self.on.change[variable]) {

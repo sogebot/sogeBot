@@ -2,7 +2,7 @@ import * as _ from 'lodash';
 import { parse, sep as separator } from 'path';
 import { VariableWatcher } from './watchers';
 import { debug, error } from './helpers/log';
-import { isMainThread } from 'worker_threads';
+import { isMainThread } from './cluster';
 
 export let loadingInProgress: string[] = [];
 export const permissions: { [command: string]: string | null } = {};

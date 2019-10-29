@@ -2,7 +2,7 @@
 import chalk from 'chalk';
 import _ from 'lodash';
 import Client from 'twitter';
-import { isMainThread } from 'worker_threads';
+import { isMainThread } from '../cluster';
 
 // bot libraries
 import { getOwner } from '../commons';
@@ -71,10 +71,6 @@ class Twitter extends Integration {
   }
 
   public send(text: string): void {
-    if (!isMainThread) {
-      global.workers.sendToMaster({ type: 'call', ns: 'integrations.twitter', fnc: 'send', args: [text] });
-      return;
-    }
     if (this.client === null) {
       throw new Error('Twitter integration is not connected');
     }

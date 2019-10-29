@@ -1,7 +1,6 @@
 import chalk from 'chalk';
 import _ from 'lodash';
 import { HueApi, lightState } from 'node-hue-api';
-import { isMainThread } from 'worker_threads';
 
 import { sendMessage } from '../commons';
 import { command, default_permission, settings } from '../decorators';
@@ -119,10 +118,6 @@ class PhillipsHue extends Integration {
   @command('!hue list')
   @default_permission(permission.CASTERS)
   getLights (opts: CommandOptions) {
-    if (!isMainThread) {
-      global.workers.sendToMaster({ type: 'phillipshue', fnc: 'getLights', sender: opts.sender, text: opts.parameters });
-      return;
-    }
     this.api.lights()
       .then(function (lights) {
         const output: string[] = [];
@@ -140,9 +135,6 @@ class PhillipsHue extends Integration {
   @command('!hue')
   @default_permission(permission.CASTERS)
   hue (opts: CommandOptions) {
-    if (!isMainThread) {
-      return global.workers.sendToMaster({ type: 'call', ns: 'systems.phillipshue', fnc: 'hue', args: [{sender: opts.sender, text: opts.parameters }]});
-    }
     let rgb = this.parseText(opts.parameters, 'rgb', '255,255,255').split(',').map(o => Number(o));
     if (rgb.length < 3) {
       rgb = [255, 255, 255];

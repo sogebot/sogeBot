@@ -4,7 +4,7 @@ import crypto from 'crypto';
 import Overlay from './_interface';
 import { isBot } from '../commons';
 import { ui } from '../decorators';
-import { isMainThread } from 'worker_threads';
+import { isMainThread } from '../cluster';
 import { publicEndpoint } from '../helpers/socket';
 
 class EventList extends Overlay {

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { isMainThread } from 'worker_threads';
+import { isMainThread } from './cluster';
 
 import Core from './_interface';
 import * as constants from './constants';

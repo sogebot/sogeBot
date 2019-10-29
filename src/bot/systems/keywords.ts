@@ -6,7 +6,7 @@ import { command, default_permission, parser } from '../decorators';
 import { permission } from '../permissions';
 import System from './_interface';
 import { isUUID, prepare, sendMessage } from '../commons';
-import { isMainThread } from 'worker_threads';
+import { isMainThread } from '../cluster';
 import XRegExp from 'xregexp';
 import { debug, error } from '../helpers/log';
 

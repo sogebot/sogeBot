@@ -9,7 +9,7 @@
 import chalk from 'chalk';
 import fs from 'fs';
 import { writeHeapSnapshot } from 'v8';
-import { isMainThread } from 'worker_threads';
+import { isMainThread } from './cluster';
 import { info } from './helpers/log';
 
 let _datadir = null;

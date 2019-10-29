@@ -1,7 +1,7 @@
 import chalk from 'chalk';
 import _ from 'lodash';
 import { setTimeout } from 'timers';
-import { isMainThread } from 'worker_threads';
+import { isMainThread } from './cluster';
 
 import { flatten, unflatten } from './helpers/flatten';
 import { loadingInProgress, permissions as permissionsList } from './decorators';
@@ -31,16 +31,7 @@ class Module {
   set enabled(value: boolean) {
     if (!_.isEqual(_.get(this, '_enabled', true), value)) {
       _.set(this, '_enabled', value);
-      // update variable in all workers (only RAM)
-      const proc = {
-        type: 'interface',
-        system: this._name,
-        class: this.constructor.name.toLowerCase(),
-        path: '_enabled',
-        value,
-      };
       global.db.engine.update(this.collection.settings, { system: this.constructor.name.toLowerCase(), key: 'enabled' }, { value });
-      global.workers.sendToAll(proc);
     }
   }
 
@@ -114,10 +105,8 @@ class Module {
   }
 
   public emit(event: string, ...args: any[]) {
-    if (this.socket && isMainThread) {
+    if (this.socket) {
       this.socket.emit(event, ...args);
-    } else if (!isMainThread) {
-      global.workers.sendToMaster({ type: 'emit', system: this._name, class: this.constructor.name, event, args });
     }
   }
 
@@ -846,13 +835,6 @@ class Module {
         c.command = updated;
         await global.db.engine.update(this.collection.settings, { system: this.constructor.name.toLowerCase(), key: 'commands.' + command }, { value: updated });
       }
-      global.workers.sendToAll({
-        type: 'interfaceFnc',
-        fnc: 'loadCommand',
-        system: this._name,
-        class: this.constructor.name.toLowerCase(),
-        args: [ command ],
-      });
     } else {
       warning(`Command ${command} cannot be updated to ${updated}`);
     }

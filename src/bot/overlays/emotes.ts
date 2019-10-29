@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 import * as constants from '../constants';
-import { isMainThread } from 'worker_threads';
+import { isMainThread } from '../cluster';
 import axios from 'axios';
 import XRegExp from 'xregexp';
 

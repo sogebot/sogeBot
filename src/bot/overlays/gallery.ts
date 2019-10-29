@@ -1,6 +1,6 @@
 import Overlay from './_interface';
 import uuid from 'uuid/v4';
-import { isMainThread } from 'worker_threads';
+import { isMainThread } from '../cluster';
 import { isEmpty } from 'lodash';
 import { adminEndpoint } from '../helpers/socket';
 

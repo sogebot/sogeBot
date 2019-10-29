@@ -1,4 +1,4 @@
-import { isMainThread } from 'worker_threads';
+import { isMainThread } from '../cluster';
 
 import { sendMessage } from '../commons';
 import { command, settings, ui } from '../decorators';
@@ -52,11 +52,7 @@ class WheelOfFortune extends Game {
 
   @command('!wof')
   async main (opts) {
-    if (isMainThread) {
-      global.panel.io.of('/games/wheeloffortune').emit('spin', { options: this.data, username: opts.sender.username });
-    } else {
-      global.workers.sendToMaster({ type: 'call', ns: 'games.wheelOfFortune', fnc: 'main', args: [opts] });
-    }
+    global.panel.io.of('/games/wheeloffortune').emit('spin', { options: this.data, username: opts.sender.username });
   }
 }
 

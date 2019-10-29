@@ -3,7 +3,7 @@ import _ from 'lodash';
 import moment from 'moment';
 import safeEval from 'safe-eval';
 import { setTimeout } from 'timers'; // tslint workaround
-import { isMainThread } from 'worker_threads';
+import { isMainThread } from './cluster';
 import Core from './_interface';
 import { flatten } from './helpers/flatten';
 import { getLocalizedName, getOwner, isBot, isBroadcaster, isModerator, isOwner, isSubscriber, isVIP, prepare, sendMessage } from './commons';
@@ -91,10 +91,6 @@ class Events extends Core {
 
   public async fire(eventId, attributes) {
     attributes = _.clone(attributes) || {};
-
-    if (!isMainThread) { // emit process to master
-      return global.workers.sendToMaster({ type: 'call', ns: 'events', fnc: 'fire', args: [eventId, attributes] });
-    }
 
     if (!_.isNil(_.get(attributes, 'username', null))) {
       // add is object

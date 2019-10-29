@@ -8,6 +8,12 @@ const uuidv4 = require('uuid/v4');
 
 const dropFiles = [ 'settings', 'api.max', 'api.current', 'api.new', 'overlays.text', 'cache.hosts', 'cache.raids' ];
 
+const { isMainThread } = require('../dest/cluster');
+
+if (!isMainThread) {
+  process.exit(0);
+}
+
 // db
 const Database = require('../dest/databases/database');
 global.db = new Database(false, true);

@@ -1,6 +1,6 @@
 import { YouTube } from 'better-youtube-api';
 import * as _ from 'lodash';
-import { isMainThread } from 'worker_threads';
+import { isMainThread } from '../cluster';
 import { setInterval } from 'timers';
 import ytsearch from 'youtube-search';
 import ytdl from 'ytdl-core';
@@ -290,10 +290,6 @@ class Songs extends System {
   @command('!skipsong')
   @default_permission(permission.CASTERS)
   async sendNextSongID () {
-    if (!isMainThread) {
-      return global.workers.sendToMaster({ type: 'call', ns: 'systems.songs', fnc: 'sendNextSongID' });
-    }
-
     // check if there are any requests
     if (this.songrequest) {
       let sr = await global.db.engine.find(this.collection.request);

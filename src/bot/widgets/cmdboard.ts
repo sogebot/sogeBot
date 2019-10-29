@@ -1,7 +1,7 @@
 import { getOwner } from '../commons';
 import { settings } from '../decorators';
 import Widget from './_interface';
-import { isMainThread } from 'worker_threads';
+import { isMainThread } from '../cluster';
 import { adminEndpoint } from '../helpers/socket';
 
 class Cmdboard extends Widget {

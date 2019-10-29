@@ -7,7 +7,7 @@ import {
 import { debug, warning } from './helpers/log';
 import { permission } from './helpers/permissions';
 import { command, default_permission, settings } from './decorators';
-import { isMainThread } from 'worker_threads';
+import { isMainThread } from './cluster';
 import { error } from './helpers/log';
 import { adminEndpoint } from './helpers/socket';
 

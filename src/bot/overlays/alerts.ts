@@ -1,5 +1,4 @@
 import { isNil } from 'lodash';
-import { isMainThread } from 'worker_threads';
 
 import { command, default_permission, ui } from '../decorators';
 import Message from '../message';
@@ -23,10 +22,6 @@ class Alerts extends Overlay {
   @command('!alert')
   @default_permission(permission.CASTERS)
   public async overlay(opts: CommandOptions) {
-    if (!isMainThread) {
-      global.workers.sendToMaster({ type: 'call', ns: 'overlays.alerts', fnc: 'overlay', args: [opts] });
-      return;
-    }
     opts.parameters = await new Message(opts.parameters).parse();
 
     let send: {[x: string]: string}[] = [];

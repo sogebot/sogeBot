@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { isMainThread } from 'worker_threads';
+import { isMainThread } from '../cluster';
 
 import { getLocalizedName, getOwner, prepare, sendMessage } from '../commons.js';
 import { command, default_permission, helper, settings } from '../decorators';

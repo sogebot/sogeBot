@@ -1,4 +1,4 @@
-import { isMainThread } from 'worker_threads';
+import { isMainThread } from '../cluster';
 
 import * as constants from '../constants';
 import System from './_interface';

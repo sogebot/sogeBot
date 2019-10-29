@@ -1,7 +1,7 @@
 import moment from 'moment-timezone';
 require('moment-precise-range-plugin');
 
-import { isMainThread } from 'worker_threads';
+import { isMainThread } from './cluster';
 import { filter, intersection, isNil, orderBy, size } from 'lodash';
 
 import { getChannel, getTime, prepare, sendMessage } from './commons';
@@ -119,11 +119,7 @@ class Twitch extends Core {
         .replace(/\$title/g, global.api.stats.currentTitle || 'n/a'), opts.sender);
       return;
     }
-    if (isMainThread) {
-      global.api.setTitleAndGame(opts.sender, { title: opts.parameters });
-    } else {
-      global.workers.sendToMaster({ type: 'call', ns: 'api', fnc: 'setTitleAndGame', args: [opts.sender, { title: opts.parameters }] });
-    }
+    global.api.setTitleAndGame(opts.sender, { title: opts.parameters });
   }
 
   @command('!game')
@@ -140,13 +136,9 @@ class Twitch extends Core {
         .replace(/\$game/g, global.api.stats.currentGame || 'n/a'), opts.sender);
       return;
     }
-    if (isMainThread) {
-      const games = await global.api.sendGameFromTwitch (global.api, null, opts.parameters);
-      if (Array.isArray(games) && games.length > 0) {
-        global.api.setTitleAndGame(opts.sender, { game: games[0] });
-      }
-    } else {
-      global.workers.sendToMaster({ type: 'call', ns: 'twitch', fnc: 'setGame', args: [opts] });
+    const games = await global.api.sendGameFromTwitch (global.api, null, opts.parameters);
+    if (Array.isArray(games) && games.length > 0) {
+      global.api.setTitleAndGame(opts.sender, { game: games[0] });
     }
   }
 }
