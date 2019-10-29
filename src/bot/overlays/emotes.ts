@@ -260,6 +260,7 @@ class Emotes extends Overlay {
 
   async fetchEmotesFFZ () {
     const cid = global.oauth.channelId;
+    const channel = global.oauth.currentChannel;
     this.fetch.ffz = true;
 
     // fetch FFZ emotes
@@ -286,7 +287,11 @@ class Emotes extends Overlay {
         }
         info('EMOTES: Fetched ffz emotes');
       } catch (e) {
-        error(e);
+        if (e.response.status === 404) {
+          warning(`EMOTES: Channel ${channel} not found in ffz`);
+        } else {
+          error(e);
+        }
       }
 
       this.fetch.ffz = false;
@@ -390,10 +395,6 @@ class Emotes extends Overlay {
   async containsEmotes (opts: ParserOptions) {
     if (_.isNil(opts.sender) || !opts.sender.emotes) {
       return true;
-    }
-    if (!isMainThread) {
-      global.workers.sendToMaster({ type: 'call', ns: 'overlays.emotes', fnc: 'containsEmotes', args: [opts] });
-      return;
     }
 
     const parsed: string[] = [];
