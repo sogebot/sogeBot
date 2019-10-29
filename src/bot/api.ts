@@ -15,6 +15,12 @@ import { getBroadcaster, getChannel, isBot, isBroadcaster, isIgnored, sendMessag
 import { triggerInterfaceOnFollow } from './helpers/interface/triggers';
 import { shared } from './decorators';
 
+const setImmediateAwait = () => {
+  return new Promise(resolve => {
+    setTimeout(() => resolve(), 10);
+  });
+};
+
 const limitProxy = {
   get: function (obj, prop) {
     if (typeof obj[prop] === 'undefined') {
@@ -116,11 +122,11 @@ class API extends Core {
       this.interval('getCurrentStreamTags', constants.MINUTE);
       this.interval('updateChannelViewsAndBroadcasterType', constants.MINUTE);
       this.interval('getLatest100Followers', constants.MINUTE);
-      this.interval('getChannelHosts', constants.MINUTE);
+      this.interval('getChannelHosts', 5 * constants.MINUTE);
       this.interval('getChannelSubscribers', 2 * constants.MINUTE);
-      this.interval('getChannelChattersUnofficialAPI', constants.MINUTE);
+      this.interval('getChannelChattersUnofficialAPI', 5 * constants.MINUTE);
       this.interval('getChannelDataOldAPI', constants.MINUTE);
-      this.interval('intervalFollowerUpdate', constants.MINUTE);
+      this.interval('intervalFollowerUpdate', constants.MINUTE * 5);
       this.interval('checkClips', constants.MINUTE);
       this.interval('getAllStreamTags', constants.HOUR * 12);
 
@@ -146,19 +152,13 @@ class API extends Core {
     }
   }
 
-  async timeoutAfterMs (ms) {
-    return new Promise((resolve) => {
-      setTimeout(() => resolve({ state: false }), ms);
-    });
-  }
-
   async setRateLimit (type, limit, remaining, reset) {
     this.calls[type].limit = limit;
     this.calls[type].remaining = remaining;
     this.calls[type].reset = reset;
   }
 
-  async interval (fnc, interval) {
+  async interval (fnc, interval, timeout = 10000) {
     setInterval(async () => {
       if (typeof this.api_timeouts[fnc] === 'undefined') {
         this.api_timeouts[fnc] = { opts: {}, isRunning: false };
@@ -166,12 +166,10 @@ class API extends Core {
 
       if (!this.api_timeouts[fnc].isRunning) {
         this.api_timeouts[fnc].isRunning = true;
+        const started_at = Date.now();
         debug('api.interval', chalk.yellow(fnc + '() ') + 'start');
-        const value = await Promise.race([
-          this[fnc](this.api_timeouts[fnc].opts),
-          this.timeoutAfterMs(10000),
-        ]);
-        debug('api.interval', chalk.yellow(fnc + '() ') + JSON.stringify(value));
+        const value = await this[fnc](this.api_timeouts[fnc].opts);
+        debug('api.interval', chalk.yellow(fnc + '(time: ' + (Date.now() - started_at) + ') ') + JSON.stringify(value));
 
         if (value.disable) {
           return;
@@ -370,6 +368,7 @@ class API extends Core {
     const allOnlineUsers = await global.users.getAllOnlineUsernames();
 
     for (const user of allOnlineUsers) {
+      await setImmediateAwait();
       if (!includes(chatters, user)) {
         // user is no longer in channel
         await global.db.engine.remove('users.online', { username: user });
@@ -383,6 +382,7 @@ class API extends Core {
     }
 
     for (const chatter of chatters) {
+      await setImmediateAwait();
       if (isIgnored({ username: chatter }) || global.oauth.botUsername === chatter) {
         // even if online, remove ignored user from collection
         await global.db.engine.remove('users.online', { username: chatter });
@@ -399,7 +399,6 @@ class API extends Core {
     // always remove bot from online users
     await global.db.engine.remove('users.online', { username: global.oauth.botUsername });
 
-
     return { state: true, opts };
   }
 
@@ -407,7 +406,7 @@ class API extends Core {
    * Checks if bot is moderator and set proper status
    * @param {string[]} mods
    */
-  async checkBotModeratorStatus (mods) {
+  checkBotModeratorStatus (mods) {
     global.status.MOD = mods.map(o => o.toLowerCase()).includes(global.oauth.botUsername);
   }
 
@@ -765,6 +764,8 @@ class API extends Core {
       if (request.status === 200 && !isNil(request.data.data)) {
         // check if user id is in db, not in db load username from API
         for (const f of request.data.data) {
+          await setImmediateAwait(); // throttle down
+
           f.from_name = String(f.from_name).toLowerCase();
           const user = await global.users.getById(f.from_id);
           user.username = f.from_name;
@@ -1495,7 +1496,6 @@ class API extends Core {
   }
 
   async fetchAccountAge (username, id) {
-    /*
     if (!isMainThread) {
       throw new Error('API can run only on master');
     }
@@ -1538,7 +1538,6 @@ class API extends Core {
       return;
     }
     await global.db.engine.update('users', { id }, { username: username, time: { created_at: new Date(request.data.created_at).getTime() } });
-    */
   }
 
   async isFollower (username) {

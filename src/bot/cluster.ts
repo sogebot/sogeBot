@@ -42,10 +42,11 @@ const init = async () => {
     socketIO.on('connection', (socket) => {
       socket.on('clusteredClientChat', (type, username, messageToSend) => clusteredClientChat(type, username, messageToSend));
       socket.on('clusteredClientTimeout', (username, timeMs, reason) => clusteredClientTimeout(username, timeMs, reason));
-      socket.on('clusteredWhisperIn', (message) => whisperIn(message));
-      socket.on('clusteredChatIn', (message) => chatIn(message));
-      socket.on('clusteredWhisperOut', (message) => whisperOut(message));
-      socket.on('clusteredChatOut', (message) => chatOut(message));
+      socket.on('clusteredClientDelete', (senderId) => clusteredClientDelete(senderId));
+      socket.on('clusteredWhisperIn', (message) => clusteredWhisperIn(message));
+      socket.on('clusteredChatIn', (message) => clusteredChatIn(message));
+      socket.on('clusteredWhisperOut', (message) => clusteredWhisperOut(message));
+      socket.on('clusteredChatOut', (message) => clusteredChatOut(message));
       socket.on('clusteredFetchAccountAge', (username, userId) => clusteredFetchAccountAge(username, userId));
 
       socket.on('received:message', (cb) => {
@@ -53,7 +54,7 @@ const init = async () => {
         global.tmi.avgResponse({ value: cb.value, message: cb.message });
       });
 
-      socket.on('disconnected', () => {
+      socket.on('disconnect', () => {
         delete availableSockets[socket.id];
       });
 
@@ -101,6 +102,17 @@ export const clusteredClientChat = (type, username, messageToSend) => {
     global.tmi.client.bot.chat[type](username, messageToSend);
   } else {
     clientIO.emit('clusteredClientChat', type, username, messageToSend);
+  }
+};
+
+export const clusteredClientDelete = (senderId) => {
+  if (isMainThread) {
+    if (debugIsEnabled('tmi')) {
+      return;
+    }
+    global.tmi.delete('bot', senderId);
+  } else {
+    clientIO.emit('clusteredClientDelete', senderId);
   }
 };
 

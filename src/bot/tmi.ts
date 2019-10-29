@@ -793,7 +793,7 @@ class TMI extends Core {
   avgResponse(opts) {
     let avgTime = 0;
     global.avgResponse.push(opts.value);
-    if (opts.value > 1000) {
+    if (opts.value > 5000) {
       warning(`Took ${opts.value}ms to process: ${opts.message}`);
     }
     if (global.avgResponse.length > 100) {
