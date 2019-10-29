@@ -1,4 +1,4 @@
-import { isMainThread, clusteredFetchAccountAge } from './cluster';
+import { clusteredFetchAccountAge, isMainThread } from './cluster';
 import axios from 'axios';
 import { cloneDeep, defaults, filter, get, isEmpty, isNil, set } from 'lodash';
 import { setTimeout } from 'timers';
