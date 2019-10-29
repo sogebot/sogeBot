@@ -33,7 +33,6 @@ class General extends Core {
   @onChange('lang')
   @onLoad('lang')
   public async onLangUpdate() {
-    global.workers.callOnAll({ type: 'call', ns: 'lib.translate', fnc: '_load' });
     await global.lib.translate._load();
     if (isMainThread) {
       warning(global.translate('core.lang-selected'));

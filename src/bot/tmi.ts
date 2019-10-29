@@ -709,28 +709,10 @@ class TMI extends Core {
   }
 
   delete (client: 'broadcaster' | 'bot', msgId: string): void {
-    if (!isMainThread) {
-      global.workers.sendToMaster({
-        type: 'call',
-        ns: 'tmi',
-        fnc: 'delete',
-        args: [client, msgId],
-      });
-    } else {
-      this.client[client].chat.say(getOwner(), '/delete ' + msgId);
-    }
+    this.client[client].chat.say(getOwner(), '/delete ' + msgId);
   }
 
   async message (data) {
-    if (isMainThread && !global.mocha) {
-      return global.workers.sendToWorker({
-        type: 'call',
-        ns: 'tmi',
-        fnc: 'message',
-        args: [data],
-      });
-    }
-
     const sender = data.message.tags;
     const message = data.message.message;
     const skip = data.skip;
@@ -791,11 +773,7 @@ class TMI extends Core {
         // update user based on id not username
         await global.db.engine.update('users', { id: String(sender.userId) }, data);
 
-        if (isMainThread) {
-          global.api.isFollower(sender.username);
-        } else {
-          global.workers.sendToMaster({ type: 'api', fnc: 'isFollower', username: sender.username });
-        }
+        global.api.isFollower(sender.username);
 
         if (global.api.isStreamOnline) {
           global.events.fire('keyword-send-x-times', { username: sender.username, message: message });
@@ -812,14 +790,6 @@ class TMI extends Core {
   }
 
   avgResponse(opts) {
-    if (!isMainThread) {
-      return global.workers.sendToMaster({
-        type: 'call',
-        ns: 'tmi',
-        fnc: 'avgResponse',
-        args: [opts],
-      });
-    }
     let avgTime = 0;
     global.avgResponse.push(opts.value);
     if (opts.value > 1000) {

@@ -255,7 +255,6 @@ class API extends Core {
       this.calls.bot.remaining = request.headers['ratelimit-remaining'];
       // $FlowFixMe error with flow on request.headers
       this.calls.bot.refresh = request.headers['ratelimit-reset'];
-      global.workers.callOnAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', request.headers['ratelimit-limit'], request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] });
 
       if (global.panel && global.panel.io) {
         global.panel.io.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'getUsernameFromTwitch', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining });
@@ -263,7 +262,6 @@ class API extends Core {
       return request.data.data[0].login;
     } catch (e) {
       if (typeof e.response !== 'undefined' && e.response.status === 429) {
-        global.workers.callOnAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', 120, 0, e.response.headers['ratelimit-reset'] ] });
         this.calls.bot.remaining = 0;
         this.calls.bot.refresh = e.response.headers['ratelimit-reset'];
       }
@@ -315,7 +313,6 @@ class API extends Core {
       this.calls.bot.remaining = request.headers['ratelimit-remaining'];
       // $FlowFixMe error with flow on request.headers
       this.calls.bot.refresh = request.headers['ratelimit-reset'];
-      global.workers.callOnAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', request.headers['ratelimit-limit'], request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] });
 
       if (global.panel && global.panel.io) {
         global.panel.io.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'getIdFromTwitch', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining });
@@ -324,7 +321,6 @@ class API extends Core {
       return request.data.data[0].id;
     } catch (e) {
       if (typeof e.response !== 'undefined' && e.response.status === 429) {
-        global.workers.callOnAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', 120, 0, e.response.headers['ratelimit-reset'] ] });
         this.calls.bot.remaining = 0;
         this.calls.bot.refresh = e.response.headers['ratelimit-reset'];
         if (global.panel && global.panel.io) {
@@ -454,7 +450,6 @@ class API extends Core {
       this.calls.bot.remaining = request.headers['ratelimit-remaining'];
       this.calls.bot.refresh = request.headers['ratelimit-reset'];
       this.calls.bot.limit = request.headers['ratelimit-limit'];
-      global.workers.sendToAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', request.headers['ratelimit-limit'], request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] });
 
       if (tags.length === 100) {
         // move to next page
@@ -525,7 +520,6 @@ class API extends Core {
       this.calls.bot.remaining = request.headers['ratelimit-remaining'];
       this.calls.bot.refresh = request.headers['ratelimit-reset'];
       this.calls.bot.limit = request.headers['ratelimit-limit'];
-      global.workers.callOnAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', request.headers['ratelimit-limit'], request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] });
 
       if (subscribers.length === 100) {
         // move to next page
@@ -721,7 +715,6 @@ class API extends Core {
       this.calls.bot.remaining = request.headers['ratelimit-remaining'];
       this.calls.bot.refresh = request.headers['ratelimit-reset'];
       this.calls.bot.limit = request.headers['ratelimit-limit'];
-      global.workers.callOnAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', request.headers['ratelimit-limit'], request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] });
 
       if (request.data.data.length > 0) {
         global.oauth.broadcasterType = request.data.data[0].broadcaster_type;
@@ -729,7 +722,6 @@ class API extends Core {
       }
     } catch (e) {
       if (typeof e.response !== 'undefined' && e.response.status === 429) {
-        global.workers.callOnAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', 120, 0, e.response.headers['ratelimit-reset'] ] });
         this.calls.bot.remaining = 0;
         this.calls.bot.refresh = e.response.headers['ratelimit-reset'];
       }
@@ -765,7 +757,6 @@ class API extends Core {
       this.calls.bot.remaining = request.headers['ratelimit-remaining'];
       this.calls.bot.refresh = request.headers['ratelimit-reset'];
       this.calls.bot.limit = request.headers['ratelimit-limit'];
-      global.workers.callOnAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', request.headers['ratelimit-limit'], request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] });
 
       if (global.panel && global.panel.io) {
         global.panel.io.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'getLatest100Followers', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining });
@@ -822,7 +813,6 @@ class API extends Core {
       quiet = false;
     } catch (e) {
       if (typeof e.response !== 'undefined' && e.response.status === 429) {
-        global.workers.callOnAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', 120, 0, e.response.headers['ratelimit-reset'] ] });
         this.calls.bot.remaining = 0;
         this.calls.bot.refresh = e.response.headers['ratelimit-reset'];
       }
@@ -867,7 +857,6 @@ class API extends Core {
       this.calls.bot.remaining = request.headers['ratelimit-remaining'];
       this.calls.bot.refresh = request.headers['ratelimit-reset'];
       this.calls.bot.limit = request.headers['ratelimit-limit'];
-      global.workers.callOnAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', request.headers['ratelimit-limit'], request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] });
 
       if (isMainThread) {
         if (global.panel && global.panel.io) {
@@ -881,7 +870,6 @@ class API extends Core {
       return name;
     } catch (e) {
       if (typeof e.response !== 'undefined' && e.response.status === 429) {
-        global.workers.callOnAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', 120, 0, e.response.headers['ratelimit-reset'] ] });
         this.calls.bot.remaining = 0;
         this.calls.bot.refresh = e.response.headers['ratelimit-reset'];
       }
@@ -924,7 +912,6 @@ class API extends Core {
       this.calls.bot.remaining = request.headers['ratelimit-remaining'];
       this.calls.bot.refresh = request.headers['ratelimit-reset'];
       this.calls.bot.limit = request.headers['ratelimit-limit'];
-      global.workers.sendToAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', request.headers['ratelimit-limit'], request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] });
 
       if (global.panel && global.panel.io) {
         global.panel.io.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'getCurrentStreamTags', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining });
@@ -976,7 +963,6 @@ class API extends Core {
       this.calls.bot.remaining = request.headers['ratelimit-remaining'];
       this.calls.bot.refresh = request.headers['ratelimit-reset'];
       this.calls.bot.limit = request.headers['ratelimit-limit'];
-      global.workers.callOnAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', request.headers['ratelimit-limit'], request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] });
 
       if (global.panel && global.panel.io) {
         global.panel.io.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'getCurrentStreamData', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining });
@@ -1119,7 +1105,6 @@ class API extends Core {
       }
     } catch (e) {
       if (typeof e.response !== 'undefined' && e.response.status === 429) {
-        global.workers.callOnAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', 120, 0, e.response.headers['ratelimit-reset'] ] });
         this.calls.bot.remaining = 0;
         this.calls.bot.refresh = e.response.headers['ratelimit-reset'];
       }
@@ -1413,7 +1398,6 @@ class API extends Core {
       this.calls.bot.remaining = request.headers['ratelimit-remaining'];
       this.calls.bot.refresh = request.headers['ratelimit-reset'];
       this.calls.bot.limit = request.headers['ratelimit-limit'];
-      global.workers.callOnAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', request.headers['ratelimit-limit'], request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] });
 
       if (global.panel && global.panel.io) {
         global.panel.io.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'checkClips', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining });
@@ -1425,7 +1409,6 @@ class API extends Core {
       }
     } catch (e) {
       if (typeof e.response !== 'undefined' && e.response.status === 429) {
-        global.workers.callOnAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', 120, 0, e.response.headers['ratelimit-reset'] ] });
         this.calls.bot.remaining = 0;
         this.calls.bot.refresh = e.response.headers['ratelimit-reset'];
       }
@@ -1489,14 +1472,12 @@ class API extends Core {
       this.calls.bot.remaining = request.headers['ratelimit-remaining'];
       this.calls.bot.refresh = request.headers['ratelimit-reset'];
       this.calls.bot.limit = request.headers['ratelimit-limit'];
-      global.workers.callOnAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', request.headers['ratelimit-limit'], request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] });
 
       if (global.panel && global.panel.io) {
         global.panel.io.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'createClip', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining });
       }
     } catch (e) {
       if (typeof e.response !== 'undefined' && e.response.status === 429) {
-        global.workers.callOnAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', 120, 0, e.response.headers['ratelimit-reset'] ] });
         this.calls.bot.remaining = 0;
         this.calls.bot.refresh = e.response.headers['ratelimit-reset'];
       }
@@ -1596,14 +1577,12 @@ class API extends Core {
       this.calls.bot.remaining = request.headers['ratelimit-remaining'];
       this.calls.bot.refresh = request.headers['ratelimit-reset'];
       this.calls.bot.limit = request.headers['ratelimit-limit'];
-      global.workers.callOnAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', request.headers['ratelimit-limit'], request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] });
 
       if (global.panel && global.panel.io) {
         global.panel.io.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'isFollowerUpdate', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining });
       }
     } catch (e) {
       if (typeof e.response !== 'undefined' && e.response.status === 429) {
-        global.workers.callOnAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', 120, 0, e.response.headers['ratelimit-reset'] ] });
         this.calls.bot.remaining = 0;
         this.calls.bot.refresh = e.response.headers['ratelimit-reset'];
       }
@@ -1688,7 +1667,6 @@ class API extends Core {
       this.calls.bot.remaining = request.headers['ratelimit-remaining'];
       this.calls.bot.refresh = request.headers['ratelimit-reset'];
       this.calls.bot.limit = request.headers['ratelimit-limit'];
-      global.workers.callOnAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', request.headers['ratelimit-limit'], request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] });
 
       if (global.panel && global.panel.io) {
         global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'createMarker', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining, data: request.data });
@@ -1771,7 +1749,6 @@ class API extends Core {
       this.calls.bot.remaining = request.headers['ratelimit-remaining'];
       this.calls.bot.refresh = request.headers['ratelimit-reset'];
       this.calls.bot.limit = request.headers['ratelimit-limit'];
-      global.workers.callOnAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', request.headers['ratelimit-limit'], request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] });
 
       global.panel.io.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'getClipById', api: 'kraken', endpoint: url, code: request.status, remaining: this.calls.bot.remaining });
       // get mp4 from thumbnail

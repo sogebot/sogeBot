@@ -475,11 +475,6 @@ class Spotify extends Integration {
     if (!(global.api.isStreamOnline)) {
       return;
     } // don't do anything on offline stream
-    if (!isMainThread) {
-      // we have client connected on master -> send process to master
-      global.workers.sendToMaster({ type: 'call', ns: 'integrations.spotify', fnc: 'main', args: [opts] });
-      return;
-    }
     if (!this.songRequests) {
       return;
     }

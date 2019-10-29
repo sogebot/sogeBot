@@ -71,10 +71,6 @@ class Twitter extends Integration {
   }
 
   public send(text: string): void {
-    if (!isMainThread) {
-      global.workers.sendToMaster({ type: 'call', ns: 'integrations.twitter', fnc: 'send', args: [text] });
-      return;
-    }
     if (this.client === null) {
       throw new Error('Twitter integration is not connected');
     }

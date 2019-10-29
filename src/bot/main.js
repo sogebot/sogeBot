@@ -42,25 +42,14 @@ global.status = { // TODO: move it?
   'RES': 0
 }
 
-const isNeDB = config.database.type === 'nedb'
-global.cpu = config.threads === 'auto' ? os.cpus().length : parseInt(_.get(config, 'cpu', 1), 10)
-if (config.database.type === 'nedb') global.cpu = 1 // nedb can have only one fork
-
-if (!isMainThread) {
-  global.db = new (require('./databases/database'))(isNeDB, isNeDB)
-  require('./cluster.js')
-} else {
-  global.db = new (require('./databases/database'))(!isNeDB, !isNeDB)
-  // spin up forks first
-
-  for (let i = 0; i < global.cpu; i++) {
-    global.workers.newWorker();
-  }
-  main()
-}
+const isNeDB = config.database.type === 'nedb';
+global.db = new (require('./databases/database'))(!isNeDB, !isNeDB)
+main()
 
 async function main () {
-  if (!global.db.engine.connected || global.cpu !== global.workers.onlineCount) return setTimeout(() => main(), 10)
+  if (!global.db.engine.connected) {
+    return setTimeout(() => main(), 10)
+  }
   try {
     global.general = new (require('./general.js'))()
     global.socket = new Socket()

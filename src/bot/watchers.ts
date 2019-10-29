@@ -32,14 +32,6 @@ export const VariableWatcher = {
         }
 
         variables[k] = value;
-        global.workers.sendToAll({
-          type: 'interface',
-          system: type,
-          class: name,
-          path: variable,
-          value,
-        });
-
         let self: null | any = null;
         if (type === 'core') {
           self = Object.values(global).find((o) => {

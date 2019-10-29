@@ -114,7 +114,6 @@ declare namespace NodeJS {
     lib: any;
     twitch: import('../src/bot/twitch').Twitch;
     socket: import('../src/bot/socket').Socket;
-    workers: import('../src/bot/workers').Workers;
     permissions: import('../src/bot/permissions').Permissions;
     customvariables: any;
     tmi: import('../src/bot/tmi').TMI;

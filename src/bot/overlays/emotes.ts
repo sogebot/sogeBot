@@ -391,10 +391,6 @@ class Emotes extends Overlay {
     if (_.isNil(opts.sender) || !opts.sender.emotes) {
       return true;
     }
-    if (!isMainThread) {
-      global.workers.sendToMaster({ type: 'call', ns: 'overlays.emotes', fnc: 'containsEmotes', args: [opts] });
-      return;
-    }
 
     const parsed: string[] = [];
     const usedEmotes = {};

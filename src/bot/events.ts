@@ -92,10 +92,6 @@ class Events extends Core {
   public async fire(eventId, attributes) {
     attributes = _.clone(attributes) || {};
 
-    if (!isMainThread) { // emit process to master
-      return global.workers.sendToMaster({ type: 'call', ns: 'events', fnc: 'fire', args: [eventId, attributes] });
-    }
-
     if (!_.isNil(_.get(attributes, 'username', null))) {
       // add is object
       attributes.is = {

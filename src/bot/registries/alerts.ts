@@ -62,11 +62,6 @@ class Alerts extends Registry {
   }
 
   test(opts: { event: keyof Registry.Alerts.List }) {
-    if (!isMainThread) {
-      global.workers.sendToMaster({ type: 'call', ns: 'registries.alerts', fnc: 'test', args: [opts] });
-      return;
-    }
-
     const amount = Math.floor(Math.random() * 1000);
     const messages = [
       'Lorem ipsum dolor sit amet, https://www.google.com',
