@@ -1,10 +1,4 @@
 /* global describe it before */
-const {
-  isMainThread,
-} = require('worker_threads');
-if (!isMainThread) {
-  process.exit();
-}
 
 const { permission } = require('../../../dest/permissions');
 const { getOwner } = require('../../../dest/commons');
