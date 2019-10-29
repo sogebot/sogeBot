@@ -18,6 +18,7 @@ const Parser = require('./parser')
 const config = require('@config')
 
 let app;
+let server;
 
 function Panel () {
   global.db.engine.index('dashboards', [{ index: 'id', unique: true }]);
@@ -28,8 +29,8 @@ function Panel () {
   app.use(bodyParser.json())
   app.use(bodyParser.urlencoded({ extended: true }))
 
-  this.server = http.createServer(app)
-  this.port = process.env.PORT || config.panel.port
+  server = http.createServer(app)
+  this.port = process.env.PORT ?? config.panel.port;
 
   // webhooks integration
   app.post('/webhooks/hub/follows', (req, res) => {
@@ -97,7 +98,7 @@ function Panel () {
     res.sendFile(path.join(__dirname, '..', 'public', 'index.html'))
   })
 
-  this.io = require('socket.io')(this.server)
+  this.io = require('socket.io')(server)
   this.menu = [{ category: 'main', name: 'dashboard', id: 'dashboard' }]
   this.widgets = []
   this.socketListeners = []
@@ -386,12 +387,16 @@ function Panel () {
   })
 }
 
+Panel.prototype.getServer = function () {
+  return server;
+}
+
 Panel.prototype.getApp = function () {
   return app;
 }
 
 Panel.prototype.expose = function () {
-  this.server.listen(global.panel.port, function () {
+  server.listen(global.panel.port, function () {
     info(`WebPanel is available at http://localhost:${global.panel.port}`)
   })
 }

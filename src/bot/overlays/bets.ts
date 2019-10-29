@@ -1,4 +1,4 @@
-import { isMainThread } from 'worker_threads';
+import { isMainThread } from '../cluster';
 
 import { ui } from '../decorators';
 import Overlay from './_interface';

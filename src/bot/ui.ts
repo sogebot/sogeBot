@@ -6,7 +6,7 @@ import config from '@config';
 import { filter, isNil, isString } from 'lodash';
 import moment from 'moment';
 import { getBroadcaster } from './commons';
-import { isMainThread } from 'worker_threads';
+import { isMainThread } from './cluster';
 
 class UI extends Core {
   @settings()

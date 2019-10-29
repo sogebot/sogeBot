@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import chalk from 'chalk';
 import * as constants from '../constants.js';
-import { isMainThread } from 'worker_threads';
+import { isMainThread } from '../cluster';
 
 import Integration from './_interface';
 import { onChange, onStartup } from '../decorators/on.js';

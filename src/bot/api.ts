@@ -3,7 +3,7 @@ import querystring from 'querystring';
 import { setTimeout } from 'timers';
 import moment from 'moment';
 require('moment-precise-range-plugin'); // moment.preciseDiff
-import { isMainThread } from 'worker_threads';
+import { isMainThread } from './cluster';
 import chalk from 'chalk';
 import { defaults, filter, flatMap, get, includes, isEmpty, isNil, isNull, map } from 'lodash';
 
@@ -1495,6 +1495,7 @@ class API extends Core {
   }
 
   async fetchAccountAge (username, id) {
+    /*
     if (!isMainThread) {
       throw new Error('API can run only on master');
     }
@@ -1537,6 +1538,7 @@ class API extends Core {
       return;
     }
     await global.db.engine.update('users', { id }, { username: username, time: { created_at: new Date(request.data.created_at).getTime() } });
+    */
   }
 
   async isFollower (username) {

@@ -2,7 +2,7 @@
 import chalk from 'chalk';
 import _ from 'lodash';
 import Client from 'twitter';
-import { isMainThread } from 'worker_threads';
+import { isMainThread } from '../cluster';
 
 // bot libraries
 import { getOwner } from '../commons';

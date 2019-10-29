@@ -1,4 +1,4 @@
-import { isMainThread } from 'worker_threads';
+import { isMainThread } from '../cluster';
 
 import { sendMessage } from '../commons';
 import { command, settings, ui } from '../decorators';

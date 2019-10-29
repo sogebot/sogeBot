@@ -1,7 +1,7 @@
 import Core from './_interface';
 import { settings, shared, ui } from './decorators';
 import { MINUTE, SECOND } from './constants';
-import { isMainThread } from 'worker_threads';
+import { isMainThread } from './cluster';
 import uuid from 'uuid/v4';
 import { permission } from './helpers/permissions';
 import { endpoints } from './helpers/socket';

@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { isMainThread } from 'worker_threads';
+import { isMainThread } from '../cluster';
 
 import Expects from '../expects.js';
 import Game from './_interface';

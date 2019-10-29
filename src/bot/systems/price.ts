@@ -10,7 +10,7 @@ import { permission } from '../permissions';
 import { command, default_permission, rollback } from '../decorators';
 import { parser } from '../decorators';
 import { isOwner, prepare, sendMessage } from '../commons';
-import { isMainThread } from 'worker_threads';
+import { isMainThread } from '../cluster';
 
 /*
  * !price                     - gets an info about price usage

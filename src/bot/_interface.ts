@@ -1,7 +1,7 @@
 import chalk from 'chalk';
 import _ from 'lodash';
 import { setTimeout } from 'timers';
-import { isMainThread } from 'worker_threads';
+import { isMainThread } from './cluster';
 
 import { flatten, unflatten } from './helpers/flatten';
 import { loadingInProgress, permissions as permissionsList } from './decorators';

@@ -3,7 +3,7 @@ import _ from 'lodash';
 import { command, settings, shared } from '../decorators';
 import Game from './_interface';
 import { getLocalizedName, isBroadcaster, isModerator, prepare, sendMessage, timeout } from '../commons';
-import { isMainThread } from 'worker_threads';
+import { isMainThread } from '../cluster';
 
 /*
  * !fightme [user] - challenge [user] to fight

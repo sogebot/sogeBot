@@ -1,6 +1,5 @@
 import moment from 'moment';
 
-import { isMainThread }  from 'worker_threads';
 import TwitchJs from 'twitch-js';
 import util from 'util';
 import { get, isNil, set } from 'lodash';
@@ -13,10 +12,11 @@ import Core from './_interface';
 import * as constants from './constants';
 import { settings, ui } from './decorators';
 import { globalIgnoreList } from './data/globalIgnoreList';
-import { ban, chatIn, cheer, error, host, info, raid, resub, sub, subcommunitygift, subgift, warning, whisperIn } from './helpers/log';
+import { ban, cheer, error, host, info, raid, resub, sub, subcommunitygift, subgift, warning } from './helpers/log';
 import { triggerInterfaceOnBit, triggerInterfaceOnMessage, triggerInterfaceOnSub } from './helpers/interface/triggers';
 import { isDebugEnabled } from './helpers/log';
 import { getLocalizedName, getOwner, isBot, isIgnored, isOwner, prepare, sendMessage } from './commons';
+import { clusteredChatIn, clusteredWhisperIn, isMainThread, manageMessage } from './cluster';
 
 class TMI extends Core {
   @settings('chat')
@@ -45,14 +45,6 @@ class TMI extends Core {
   broadcasterWarning = false;
 
   ignoreGiftsFromUser: { [x: string]: { count: number; time: Date }} = {};
-
-  constructor () {
-    super();
-
-    if (isMainThread) {
-      global.status.TMI = constants.DISCONNECTED;
-    }
-  }
 
   @command('!ignore add')
   @default_permission(permission.CASTERS)
@@ -712,7 +704,11 @@ class TMI extends Core {
     this.client[client].chat.say(getOwner(), '/delete ' + msgId);
   }
 
-  async message (data) {
+  async message (data, managed = false) {
+    if (!managed && !global.mocha) {
+      return manageMessage(data);
+    }
+
     const sender = data.message.tags;
     const message = data.message.message;
     const skip = data.skip;
@@ -732,9 +728,9 @@ class TMI extends Core {
     if (!skip
         && sender['message-type'] === 'whisper'
         && (global.tmi.whisperListener || isOwner(sender))) {
-      whisperIn(`${message} [${sender.username}]`);
+      clusteredWhisperIn(`${message} [${sender.username}]`);
     } else if (!skip && !isBot(sender.username)) {
-      chatIn(`${message} [${sender.username}]`);
+      clusteredChatIn(`${message} [${sender.username}]`);
     }
 
     const isModerated = await parse.isModerated();
@@ -786,7 +782,12 @@ class TMI extends Core {
       }
       await parse.process();
     }
-    this.avgResponse({ value: parse.time(), message });
+
+    if (isMainThread) {
+      this.avgResponse({ value: parse.time(), message });
+    } else {
+      return { value: parse.time(), message };
+    }
   }
 
   avgResponse(opts) {

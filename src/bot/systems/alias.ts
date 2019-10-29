@@ -10,7 +10,7 @@ import Parser from '../parser';
 import { permission } from '../permissions';
 import System from './_interface';
 import { incrementCountOfCommandUsage } from '../helpers/commands/count';
-import { isMainThread } from 'worker_threads';
+import { isMainThread } from '../cluster';
 import { debug, warning } from '../helpers/log';
 import uuid from 'uuid/v4';
 

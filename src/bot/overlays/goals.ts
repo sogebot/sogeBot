@@ -2,7 +2,7 @@
 
 import Overlay from '../overlays/_interface';
 
-import { isMainThread } from 'worker_threads';
+import { isMainThread } from '../cluster';
 import { onBit, onFollow, onSub, onTip } from '../decorators/on';
 import { publicEndpoint } from '../helpers/socket';
 

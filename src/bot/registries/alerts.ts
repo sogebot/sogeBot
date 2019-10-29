@@ -1,5 +1,5 @@
 import Registry from './_interface';
-import { isMainThread } from 'worker_threads';
+import { isMainThread } from '../cluster';
 import { generateUsername } from '../helpers/generateUsername';
 import { getLocalizedName } from '../commons';
 import { publicEndpoint } from '../helpers/socket';

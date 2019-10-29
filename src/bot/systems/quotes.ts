@@ -6,7 +6,7 @@ import Expects from '../expects';
 import { permission } from '../permissions';
 import System from './_interface';
 import uuid from 'uuid/v4';
-import { isMainThread } from 'worker_threads';
+import { isMainThread } from '../cluster';
 import { publicEndpoint } from '../helpers/socket';
 
 export interface QuoteInterface {

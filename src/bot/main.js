@@ -23,7 +23,7 @@ const util = require('util')
 const _ = require('lodash')
 const chalk = require('chalk')
 const gitCommitInfo = require('git-commit-info');
-const { isMainThread, } = require('worker_threads');
+const { isMainThread, } = require('./cluster');
 const { autoLoad } = require('./commons');
 
 const constants = require('./constants')
@@ -31,7 +31,6 @@ const config = require('../config.json')
 
 global.workers = new Workers()
 
-global.startedClusters = 0
 global.linesParsed = 0
 global.avgResponse = []
 
@@ -42,6 +41,8 @@ global.status = { // TODO: move it?
   'RES': 0
 }
 
+import { changelog } from './changelog';
+
 const isNeDB = config.database.type === 'nedb';
 global.db = new (require('./databases/database'))(!isNeDB, !isNeDB)
 main()
@@ -51,6 +52,8 @@ async function main () {
     return setTimeout(() => main(), 10)
   }
   try {
+    changelog();
+
     global.general = new (require('./general.js'))()
     global.socket = new Socket()
     global.ui = new UI()
@@ -94,7 +97,9 @@ async function main () {
     global.games = await autoLoad('./dest/games/')
     global.integrations = await autoLoad('./dest/integrations/')
 
-    global.panel.expose()
+    if (isMainThread) {
+      global.panel.expose();
+    }
 
     if (process.env.HEAP && process.env.HEAP.toLowerCase() === 'true') {
       warning(chalk.bgRed.bold('HEAP debugging is ENABLED'))

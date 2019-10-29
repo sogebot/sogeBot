@@ -1,6 +1,6 @@
 import { YouTube } from 'better-youtube-api';
 import * as _ from 'lodash';
-import { isMainThread } from 'worker_threads';
+import { isMainThread } from '../cluster';
 import { setInterval } from 'timers';
 import ytsearch from 'youtube-search';
 import ytdl from 'ytdl-core';

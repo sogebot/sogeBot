@@ -3,7 +3,7 @@ import _ from 'lodash';
 import moment from 'moment';
 import safeEval from 'safe-eval';
 import { setTimeout } from 'timers'; // tslint workaround
-import { isMainThread } from 'worker_threads';
+import { isMainThread } from './cluster';
 import Core from './_interface';
 import { flatten } from './helpers/flatten';
 import { getLocalizedName, getOwner, isBot, isBroadcaster, isModerator, isOwner, isSubscriber, isVIP, prepare, sendMessage } from './commons';

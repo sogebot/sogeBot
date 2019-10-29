@@ -83,10 +83,8 @@ class INeDB extends Interface {
     const total = where._total || undefined
 
     delete where._sort; delete where._sum; delete where._total; delete where._group
-    if (_.some(Object.keys(flatten(where)).map(o => o.includes('$regex') || o.includes('$nin')))) {
-      if (Object.keys(flatten(where)).length > 1) {
-        throw Error('Don\'t use $regex, $nin with other search attributes');
-      }
+    if (_.some(Object.keys(flatten(where)).map(o => o.includes('$regex') || o.includes('$nin') || o.includes('$lt') || o.includes('$ne') || o.includes('$gt')))) {
+      // pass
     } else {
       where = flatten(where)
     }
@@ -183,10 +181,8 @@ class INeDB extends Interface {
 
   async remove (table, where) {
     this.on(table); // init table
-    if (_.some(Object.keys(flatten(where)).map(o => o.includes('$regex') | o.includes('$nin')))) {
-      if (Object.keys(flatten(where)).length > 1) {
-        throw Error('Don\'t use $regex, $nin with other search attributes');
-      }
+    if (_.some(Object.keys(flatten(where)).map(o => o.includes('$regex') || o.includes('$nin') || o.includes('$lt') || o.includes('$ne') || o.includes('$gt')))) {
+      // pass
     } else {
       where = flatten(where);
     }

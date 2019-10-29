@@ -1,4 +1,4 @@
-import { isMainThread } from 'worker_threads';
+import { isMainThread, clusteredFetchAccountAge } from './cluster';
 import axios from 'axios';
 import { cloneDeep, defaults, filter, get, isEmpty, isNil, set } from 'lodash';
 import { setTimeout } from 'timers';
@@ -57,7 +57,7 @@ class Users extends Core {
         user._id = user._id.toString();
       } // force retype _id
       if (isNil(user.time.created_at) && !isNil(user.id)) { // this is accessing master (in points) and worker
-        global.api.fetchAccountAge(username, user.id);
+        clusteredFetchAccountAge(username, user.id);
       }
     } catch (e) {
       error(e.stack);
@@ -78,7 +78,7 @@ class Users extends Core {
         user._id = user._id.toString();
       } // force retype _id
       if (isNil(user.time.created_at) && !isNil(user.username)) { // this is accessing master (in points) and worker
-        global.api.fetchAccountAge(user.username, user.id);
+        clusteredFetchAccountAge(user.username, user.id);
       }
     } catch (e) {
       error(e.stack);

@@ -3,7 +3,7 @@ import chalk from 'chalk';
 import crypto from 'crypto';
 import _ from 'lodash';
 import SpotifyWebApi from 'spotify-web-api-node';
-import { isMainThread } from 'worker_threads';
+import { isMainThread } from '../cluster';
 
 import { prepare, sendMessage } from '../commons';
 import { command, default_permission, settings, shared, ui } from '../decorators';

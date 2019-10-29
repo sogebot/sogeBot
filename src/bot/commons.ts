@@ -4,10 +4,11 @@ import moment from 'moment';
 import 'moment-precise-range-plugin';
 import { join, normalize } from 'path';
 
-import { chatOut, debug, isDebugEnabled as debugIsEnabled, whisperOut } from './helpers/log';
+import { debug } from './helpers/log';
 import Message from './message';
 import { globalIgnoreList } from './data/globalIgnoreList';
 import { error } from './helpers/log';
+import { clusteredChatOut, clusteredClientChat, clusteredClientTimeout, clusteredWhisperOut } from './cluster';
 
 export async function autoLoad(directory): Promise<{ [x: string]: any }> {
   const directoryListing = readdirSync(directory);
@@ -142,10 +143,10 @@ export async function sendMessage(messageToSend: string | Promise<string>, sende
         return true;
       }
       if (sender['message-type'] === 'whisper') {
-        whisperOut(`${messageToSend} [${sender.username}]`);
+        clusteredWhisperOut(`${messageToSend} [${sender.username}]`);
         message('whisper', sender.username, messageToSend);
       } else {
-        chatOut(`${messageToSend} [${sender.username}]`);
+        clusteredChatOut(`${messageToSend} [${sender.username}]`);
         if (global.tmi.sendWithMe && !messageToSend.startsWith('/')) {
           message('me', null, messageToSend);
         } else {
@@ -159,9 +160,6 @@ export async function sendMessage(messageToSend: string | Promise<string>, sende
 
 /* TODO: move to tmi */
 export async function message(type, username, messageToSend, retry = true) {
-  if (debugIsEnabled('tmi')) {
-    return;
-  }
   try {
     if (username === null) {
       username = await global.oauth.generalChannel;
@@ -169,7 +167,7 @@ export async function message(type, username, messageToSend, retry = true) {
     if (username === '') {
       error('TMI: channel is not defined, message cannot be sent');
     } else {
-      global.tmi.client.bot.chat[type](username, messageToSend);
+      clusteredClientChat(type, username, messageToSend);
     }
   } catch (e) {
     if (retry) {
@@ -185,7 +183,7 @@ export async function timeout(username, reason, timeMs) {
   if (reason) {
     reason = reason.replace(/\$sender/g, username);
   }
-  global.tmi.client.bot.chat.timeout(global.oauth.generalChannel, username, timeMs, reason);
+  clusteredClientTimeout(username, timeMs, reason);
 }
 
 export function getOwner() {

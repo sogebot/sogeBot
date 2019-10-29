@@ -2,7 +2,7 @@
 
 import crypto from 'crypto';
 import * as _ from 'lodash';
-import { isMainThread } from 'worker_threads';
+import { isMainThread } from '../cluster';
 
 import { getOwner, sendMessage } from '../commons';
 import { command, default_permission } from '../decorators';

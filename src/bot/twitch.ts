@@ -1,7 +1,7 @@
 import moment from 'moment-timezone';
 require('moment-precise-range-plugin');
 
-import { isMainThread } from 'worker_threads';
+import { isMainThread } from './cluster';
 import { filter, intersection, isNil, orderBy, size } from 'lodash';
 
 import { getChannel, getTime, prepare, sendMessage } from './commons';
