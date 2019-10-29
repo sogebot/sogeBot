@@ -18,7 +18,6 @@ import { Users } from './users';
 import { UI } from './ui';
 
 const figlet = require('figlet')
-const os = require('os')
 const util = require('util')
 const _ = require('lodash')
 const chalk = require('chalk')
