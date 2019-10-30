@@ -23,7 +23,7 @@
           <input type="text" class="form-control" v-model="currentValues[index]" readonly="true"/>
         </div>
         <button class="btn btn-outline-dark border-0" @click="toggleItem(index)">
-          <fa :icon="isToggled(index) ? toggleofficon : toggleonicon"></fa>
+          <fa :icon="isToggled(index) ? toggleofficon : toggleonicon" fixed-width></fa>
         </button>
       </li>
     </ul>
