@@ -646,7 +646,7 @@ class API extends Core {
       if (global.panel && global.panel.io) {
         global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'getChannelHosts', api: 'tmi', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack });
       }
-      return { state: e.response.status === 500 };
+      return { state: e.response?.status === 500 };
     }
 
     return { state: true };
