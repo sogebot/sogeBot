@@ -738,7 +738,7 @@ class API extends Core {
           if (!get(user, 'is.follower', false)) {
             if (new Date().getTime() - new Date(f.followed_at).getTime() < 2 * constants.HOUR) {
               if ((get(user, 'time.follow', 0) === 0 || new Date().getTime() - get(user, 'time.follow', 0) > 60000 * 60) && !global.webhooks.existsInCache('follow', user.id)) {
-                global.webhooks.addIdToCache('follow', user.id);
+                global.webhooks.addIdToCache('follow', f.from_id);
                 global.overlays.eventlist.add({
                   type: 'follow',
                   username: user.username,
