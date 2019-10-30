@@ -10,7 +10,6 @@ import { parser } from '../decorators';
 import Expects from '../expects';
 import { getOwner, isBot, isBroadcaster, isModerator, isOwner, isSubscriber, isVIP, message, prepare, sendMessage } from '../commons';
 import { getCountOfCommandUsage, incrementCountOfCommandUsage, resetCountOfCommandUsage } from '../helpers/commands/count';
-import { isMainThread } from '../cluster';
 import uuid from 'uuid';
 
 import { chatOut } from '../helpers/log';
@@ -31,11 +30,7 @@ import { adminEndpoint } from '../helpers/socket';
 class CustomCommands extends System {
   constructor () {
     super();
-
     this.addMenu({ category: 'manage', name: 'customcommands', id: 'manage/commands' });
-
-    if (isMainThread) {
-    }
   }
 
   sockets () {

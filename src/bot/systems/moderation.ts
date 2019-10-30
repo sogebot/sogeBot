@@ -10,7 +10,7 @@ import Message from '../message';
 import System from './_interface';
 import { getLocalizedName, prepare, sendMessage, timeout } from '../commons';
 import { timeout as timeoutLog } from '../helpers/log';
-import { clusteredClientDelete, isMainThread } from '../cluster';
+import { clusteredClientDelete } from '../cluster';
 import { adminEndpoint } from '../helpers/socket';
 
 class Moderation extends System {
