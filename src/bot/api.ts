@@ -135,9 +135,12 @@ class API extends Core {
       this.interval('getAllStreamTags', constants.HOUR * 12);
 
       // free thread_event
-      global.db.engine.remove('thread_event', {
-        event: 'getChannelChattersUnofficialAPI',
-      });
+      getManager()
+        .createQueryBuilder()
+        .delete()
+        .from(ThreadEvent)
+        .where('event = :event', { event: 'getChannelChattersUnofficialAPI' })
+        .execute();
     } else {
       this.calls = {
         bot: {
