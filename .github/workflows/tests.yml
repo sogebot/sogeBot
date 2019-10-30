@@ -22,6 +22,8 @@ jobs:
       run: make eslint
     - name: Run jsonlint
       run: make jsonlint
+    - name: Skip test
+      run: echo '${{github.event.commits[0].message}}'
   nedb:
     name: NeDB tests
     needs: eslint
