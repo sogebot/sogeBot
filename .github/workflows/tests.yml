@@ -12,7 +12,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Skip test
-      run: echo '${{github.event}}'
+      env:
+        GITHUB_CONTEXT: ${{ toJson(github) }}
+      run: echo "$GITHUB_CONTEXT"
   nedb:
     name: NeDB tests
     needs: eslint
