@@ -13,7 +13,7 @@ jobs:
     steps:
     - name: Skip test
       env:
-        GITHUB_CONTEXT: ${{ toJson(github.event) }}
+        GITHUB_CONTEXT: ${{ toJson(github.event.body) }}
       run: echo "$GITHUB_CONTEXT"
   nedb:
     name: NeDB tests
