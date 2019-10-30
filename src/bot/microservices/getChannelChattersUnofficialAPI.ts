@@ -52,16 +52,6 @@ export const getChannelChattersUnofficialAPI = async (): Promise<{ modStatus: bo
       ])
       .execute();
 
-
-
-    const event = await getManager()
-      .createQueryBuilder()
-      .select()
-      .from(ThreadEvent, 'thread')
-      .where('thread.event = :event', { event: 'getChannelChattersUnofficialAPI' })
-      .execute();
-    console.log({event});
-
     const channel: string | undefined = (await global.db.engine.findOne('core.settings', {
       key: 'generalChannel',
       system: 'oauth',

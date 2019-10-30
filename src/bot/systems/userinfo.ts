@@ -6,6 +6,8 @@ import { command, settings, ui } from '../decorators';
 import { onMessage } from '../decorators/on';
 import System from './_interface';
 import { debug, error } from '../helpers/log';
+import { getManager } from 'typeorm';
+import { UsersOnline } from '../entity/usersOnline';
 
 /*
  * !me
@@ -279,14 +281,30 @@ class UserInfo extends System {
   }
 
   @onMessage()
-  public onMessage(opts: onEventMessage) {
+  public async onMessage(opts: onEventMessage) {
     if (!_.isNil(opts.sender) && !_.isNil(opts.sender.userId) && !_.isNil(opts.sender.username)) {
       global.users.setById(opts.sender.userId, {
         username: opts.sender.username,
         time: { message: new Date().getTime() },
         is: { subscriber: typeof opts.sender.badges.subscriber !== 'undefined' },
       });
-      global.db.engine.update('users.online', { username: opts.sender.username }, { username: opts.sender.username });
+
+      const isUserOnline = (await getManager()
+        .createQueryBuilder()
+        .select()
+        .from(UsersOnline, 'user')
+        .where('user.username = :username', { username:opts.sender.username })
+        .execute()).length > 0;
+      if (!isUserOnline) {
+        await getManager()
+        .createQueryBuilder()
+        .insert()
+        .into(UsersOnline)
+        .values([
+          { username: opts.sender.username },
+        ])
+        .execute();
+      }
     }
   }
 }

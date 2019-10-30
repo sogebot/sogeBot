@@ -17,6 +17,8 @@ import { triggerInterfaceOnBit, triggerInterfaceOnMessage, triggerInterfaceOnSub
 import { isDebugEnabled } from './helpers/log';
 import { getLocalizedName, getOwner, isBot, isIgnored, isOwner, prepare, sendMessage } from './commons';
 import { clusteredChatIn, clusteredWhisperIn, isMainThread, manageMessage } from './cluster';
+import { getManager } from 'typeorm';
+import { UsersOnline } from './entity/usersOnline';
 
 class TMI extends Core {
   @settings('chat')
@@ -760,7 +762,22 @@ class TMI extends Core {
         };
 
         // mark user as online
-        await global.db.engine.update('users.online', { username: sender.username }, { username: sender.username });
+        const isUserOnline = (await getManager()
+        .createQueryBuilder()
+        .select()
+        .from(UsersOnline, 'user')
+        .where('user.username = :username', { username: sender.username })
+        .execute()).length > 0;
+        if (!isUserOnline) {
+          await getManager()
+          .createQueryBuilder()
+          .insert()
+          .into(UsersOnline)
+          .values([
+            { username: sender.username },
+          ])
+          .execute();
+        }
 
         if (get(sender, 'badges.subscriber', 0)) {
           set(data, 'stats.tier', 0);

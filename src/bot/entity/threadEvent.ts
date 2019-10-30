@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class ThreadEvent {
@@ -6,5 +6,5 @@ export class ThreadEvent {
   id!: number;
 
   @Column()
-  event!: string
+  event!: string;
 }

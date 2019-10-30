@@ -189,7 +189,12 @@ function Panel () {
     })
     socket.on('leaveBot', async () => {
       global.tmi.part('bot')
-      global.db.engine.remove('users.online', {}) // force all users offline
+      // force all users offline
+      await getManager()
+        .createQueryBuilder()
+        .delete()
+        .from(UsersOnline)
+        .execute();
     })
 
     // custom var

@@ -486,7 +486,7 @@ class Message {
         let onlineFollowers = [];
 
         if (containOnline) {
-          onlineViewers = await global.db.engine.find('users.online');
+          onlineViewers = await getAllOnlineUsernames();
 
           for (let viewer of onlineViewers) {
             let user = await global.db.engine.find('users', { username: viewer.username, is: { subscriber: true } });

@@ -34,8 +34,10 @@ class Users extends Core {
     this.addMenu({ category: 'manage', name: 'viewers', id: 'manage/viewers/list' });
 
     if (isMainThread) {
-      this.updateWatchTime(true);
-      this.updateChatTime();
+      setTimeout(() => {
+        this.updateWatchTime(true);
+        this.updateChatTime();
+      }, 30000);
     }
   }
 
@@ -205,7 +207,11 @@ class Users extends Core {
   async updateWatchTime (isInit = false) {
     if (isInit) {
       // set all users offline on start
-      await global.db.engine.remove('users.online', {});
+      await getManager()
+        .createQueryBuilder()
+        .delete()
+        .from(UsersOnline)
+        .execute();
     }
 
     if (isDebugEnabled('users.watched')) {
@@ -429,7 +435,13 @@ class Users extends Core {
         global.users.getWatchedOf(opts.where.id),
         global.permissions.getUserHighestPermission(opts.where.id),
       ]);
-      const online = await global.db.engine.findOne('users.online', { username: viewer.username });
+
+      const online = await getManager()
+        .createQueryBuilder()
+        .select('user')
+        .from(UsersOnline, 'user')
+        .where('user.username = :username', { username: viewer.username })
+        .getOne();
 
       set(viewer, 'stats.tips', tips);
       set(viewer, 'stats.bits', bits);
@@ -488,7 +500,7 @@ class Users extends Core {
       }
 
       // ONLINE
-      const isOnline = !isEmpty(filter(online, (o) => o.username === viewer.username));
+      const isOnline = typeof online !== 'undefined';
       set(viewer, 'is.online', isOnline);
 
       cb(null, viewer);

@@ -10,6 +10,8 @@ const mathjs = require('mathjs');
 
 import Message from './message';
 import { permission } from './permissions';
+import { getAllOnlineUsernames } from './users';
+import { UsersOnline } from './entity/usersOnline';
 const commons = require('./commons');
 
 class CustomVariables {
@@ -179,7 +181,7 @@ class CustomVariables {
     let onlineFollowers = [];
 
     if (containOnline) {
-      onlineViewers = await global.db.engine.find('users.online');
+      onlineViewers = await getAllOnlineUsernames();
 
       for (let viewer of onlineViewers) {
         let user = await global.db.engine.find('users', { username: viewer.username, is: { subscriber: true } });
@@ -263,11 +265,19 @@ class CustomVariables {
       _current: opts._current,
       user: async (username) => {
         const _user = await global.users.getByName(username);
+
+        const isUserOnline = (await getManager()
+          .createQueryBuilder()
+          .select()
+          .from(UsersOnline, 'user')
+          .where('user.username = :username', { username })
+          .execute()).length > 0;
+
         const userObj = {
           username,
           id: await global.users.getIdByName(username, false),
           is: {
-            online: (await global.db.engine.find('users.online', { username })).length > 0,
+            online: isUserOnline,
             follower: _.get(_user, 'is.follower', false),
             vip: _.get(_user, 'is.vip', false),
             subscriber: _.get(_user, 'is.subscriber', false),
