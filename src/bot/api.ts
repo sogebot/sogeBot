@@ -131,13 +131,6 @@ class API extends Core {
       this.interval('checkClips', constants.MINUTE);
       this.interval('getAllStreamTags', constants.HOUR * 12);
 
-      global.db.engine.index('cache', [{ index: 'key', unique: true }]);
-      global.db.engine.index('cache.titles', [{ index: 'game' }]);
-      global.db.engine.index('api.clips', [{ index: 'clipId', unique: true }]);
-      global.db.engine.index('core.api.tags', [{ index: 'tag_id', unique: true }]);
-      global.db.engine.index('core.api.currentTags', [{ index: 'tag_id', unique: true }]);
-      global.db.engine.index('core.api.games', [{ index: 'id', unique: true }]);
-
       // free thread_event
       global.db.engine.remove('thread_event', {
         event: 'getChannelChattersUnofficialAPI',

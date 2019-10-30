@@ -23,13 +23,6 @@ class Users extends Core {
     this.addMenu({ category: 'manage', name: 'viewers', id: 'manage/viewers/list' });
 
     if (isMainThread) {
-      global.db.engine.index('users.chat', [{ index: 'id' }]);
-      global.db.engine.index('users.tips', [{ index: 'timestamp', unique: true }, { index: 'id' }]);
-      global.db.engine.index('users.bits', [{ index: 'timestamp', unique: true }, { index: 'id' }]);
-      global.db.engine.index('users.points', [{ index: 'id', unique: true }]);
-      global.db.engine.index('users.messages', [{ index: 'id', unique: true }]);
-      global.db.engine.index('users.watched', [{ index: 'id', unique: true }]);
-      global.db.engine.index('users.online', [{ index: 'username' }]);
       this.updateWatchTime(true);
       this.updateChatTime();
     }

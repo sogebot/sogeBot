@@ -2,7 +2,6 @@
 
 import Overlay from '../overlays/_interface';
 
-import { isMainThread } from '../cluster';
 import { onBit, onFollow, onSub, onTip } from '../decorators/on';
 import { publicEndpoint } from '../helpers/socket';
 
@@ -12,11 +11,6 @@ class Goals extends Overlay {
   constructor() {
     super();
     this.addMenu({ category: 'registry', name: 'goals', id: 'registry/goals/list' });
-
-    if (isMainThread) {
-      global.db.engine.index(this.collection.groups, { index: 'uid', unique: true });
-      global.db.engine.index(this.collection.goals, { index: 'uid', unique: true });
-    }
   }
 
   public async sockets() {

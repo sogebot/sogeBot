@@ -10,7 +10,7 @@ import Message from '../message';
 import System from './_interface';
 import { getLocalizedName, prepare, sendMessage, timeout } from '../commons';
 import { timeout as timeoutLog } from '../helpers/log';
-import { clusteredClientDelete, isMainThread } from '../cluster';
+import { clusteredClientDelete } from '../cluster';
 import { adminEndpoint } from '../helpers/socket';
 
 class Moderation extends System {
@@ -88,16 +88,6 @@ class Moderation extends System {
   cWarningsAnnounceTimeouts = true;
   @settings('warnings')
   cWarningsShouldClearChat = true;
-
-  constructor () {
-    super();
-
-    if(isMainThread) {
-      global.db.engine.index(this.collection.messagecooldown, [{ index: 'key', unique: true }]);
-      global.db.engine.index(this.collection.permits, [{ index: 'username' }]);
-      global.db.engine.index(this.collection.warnings, [{ index: 'username' }]);
-    }
-  }
 
   sockets () {
     adminEndpoint(this.nsp, 'lists.get', async (cb) => {

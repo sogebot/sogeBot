@@ -6,7 +6,6 @@ import { command, default_permission, parser } from '../decorators';
 import { permission } from '../permissions';
 import System from './_interface';
 import { isUUID, prepare, sendMessage } from '../commons';
-import { isMainThread } from '../cluster';
 import XRegExp from 'xregexp';
 import { debug, error } from '../helpers/log';
 
@@ -19,13 +18,9 @@ import { debug, error } from '../helpers/log';
  * !keyword list                                - get keywords list
  */
 class Keywords extends System {
-
   constructor() {
     super();
     this.addMenu({ category: 'manage', name: 'keywords', id: 'manage/keywords/list' });
-    if (isMainThread) {
-      global.db.engine.index(this.collection.data, [{ index: 'id', unique: true }, { index: 'keyword' }]);
-    }
   }
 
   @command('!keyword')

@@ -77,7 +77,6 @@ class Emotes extends Overlay {
   constructor () {
     super();
     if (isMainThread) {
-      global.db.engine.index(this.collection.cache, { index: 'code' });
       setTimeout(() => {
         if (!this.fetch.global) {
           this.fetchEmotesGlobal();

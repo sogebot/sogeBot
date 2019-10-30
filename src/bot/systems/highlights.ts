@@ -8,7 +8,6 @@ import { sendMessage } from '../commons';
 import { command, default_permission, settings, ui } from '../decorators';
 import { permission } from '../permissions';
 import System from './_interface';
-import { isMainThread } from '../cluster';
 import { error } from '../helpers/log';
 import { adminEndpoint } from '../helpers/socket';
 
@@ -27,11 +26,6 @@ class Highlights extends System {
 
   constructor() {
     super();
-
-    if(isMainThread) {
-      global.db.engine.index(this.collection.data, [{ index: 'id' }]);
-    }
-
     this.addMenu({ category: 'manage', name: 'highlights', id: 'manage/highlights' });
   }
 

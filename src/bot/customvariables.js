@@ -19,9 +19,6 @@ class CustomVariables {
     if (isMainThread) {
       this.addMenuAndListenersToPanel();
       this.checkIfCacheOrRefresh();
-      global.db.engine.index('custom.variables', [{ index: 'id', unique: true }, { index: 'variableName' }]);
-      global.db.engine.index('custom.variables.watch', [{ index: 'variableId' }]);
-      global.db.engine.index('custom.variables.history', [{ index: 'cvarId' }]);
     }
   }
 

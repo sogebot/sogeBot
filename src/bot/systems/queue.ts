@@ -4,7 +4,6 @@ import { getOwner, prepare, sendMessage } from '../commons';
 import { command, default_permission, settings, shared } from '../decorators';
 import { permission } from '../permissions';
 import System from './_interface';
-import { isMainThread } from '../cluster';
 import { adminEndpoint } from '../helpers/socket';
 
 /*
@@ -30,11 +29,6 @@ class Queue extends System {
 
   constructor () {
     super();
-
-    if(isMainThread) {
-      global.db.engine.index(this.collection.data, [{ index: 'username' }]);
-      global.db.engine.index(this.collection.picked, [{ index: 'username' }]);
-    }
 
     this.addWidget('queue', 'widget-title-queue', 'fas fa-users');
   }

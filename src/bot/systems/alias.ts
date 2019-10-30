@@ -10,7 +10,6 @@ import Parser from '../parser';
 import { permission } from '../permissions';
 import System from './_interface';
 import { incrementCountOfCommandUsage } from '../helpers/commands/count';
-import { isMainThread } from '../cluster';
 import { debug, warning } from '../helpers/log';
 import uuid from 'uuid/v4';
 
@@ -27,10 +26,6 @@ import uuid from 'uuid/v4';
 class Alias extends System {
   constructor () {
     super();
-
-    if(isMainThread) {
-      global.db.engine.index(this.collection.data, [{ index: 'alias' }, { index: 'id', unique: true }]);
-    }
 
     this.addMenu({ category: 'manage', name: 'alias', id: 'manage/alias' });
   }
