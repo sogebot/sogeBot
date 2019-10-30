@@ -125,7 +125,7 @@ class API extends Core {
       this.interval('getLatest100Followers', constants.MINUTE);
       this.interval('getChannelHosts', 5 * constants.MINUTE);
       this.interval('getChannelSubscribers', 2 * constants.MINUTE);
-      this.interval('getChannelChattersUnofficialAPI', constants.MINUTE / 10);
+      this.interval('getChannelChattersUnofficialAPI', 5 * constants.MINUTE);
       this.interval('getChannelDataOldAPI', constants.MINUTE);
       this.interval('intervalFollowerUpdate', constants.MINUTE * 5);
       this.interval('checkClips', constants.MINUTE);
