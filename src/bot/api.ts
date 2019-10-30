@@ -141,7 +141,7 @@ class API extends Core {
       // free thread_event
       global.db.engine.remove('thread_event', {
         event: 'getChannelChattersUnofficialAPI',
-      })
+      });
     } else {
       this.calls = {
         bot: {
@@ -346,7 +346,7 @@ class API extends Core {
 
     const event = await global.db.engine.find('thread_event', {
       event: 'getChannelChattersUnofficialAPI',
-    })
+    });
     if (event.length === 0) {
       const { modStatus, partedUsers, joinedUsers } = await getChannelChattersUnofficialAPI();
 

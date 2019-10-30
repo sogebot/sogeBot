@@ -2,7 +2,8 @@
 import axios from 'axios';
 import { flatMap, includes } from 'lodash';
 import config from '@config';
-import { Worker, parentPort, isMainThread } from 'worker_threads'
+import { isMainThread, parentPort, Worker } from 'worker_threads';
+import Database from '../databases/database';
 
 const setImmediateAwait = () => {
   return new Promise(resolve => {
@@ -10,7 +11,7 @@ const setImmediateAwait = () => {
   });
 };
 
-export const getChannelChattersUnofficialAPI = async (): Promise<{ modStatus: boolean, partedUsers: string[], joinedUsers: string[] }> => {
+export const getChannelChattersUnofficialAPI = async (): Promise<{ modStatus: boolean; partedUsers: string[]; joinedUsers: string[] }> => {
   // spin up worker
   if (isMainThread && config.database.type === 'mongodb') {
     const value = await new Promise((resolve, reject) => {
@@ -18,26 +19,25 @@ export const getChannelChattersUnofficialAPI = async (): Promise<{ modStatus: bo
       worker.on('message', resolve);
       worker.on('error', reject);
       worker.on('exit', (code) => {
-        console.log({code})
-        if (code !== 0)
+        if (code !== 0) {
           reject(new Error(`Worker stopped with exit code ${code}`));
+        }
       });
     });
-    return value as unknown as { modStatus: boolean, partedUsers: string[], joinedUsers: string[] };
+    return value as unknown as { modStatus: boolean; partedUsers: string[]; joinedUsers: string[] };
   }
 
   // connect to db, then we can continue
   if (!isMainThread && config.database.type === 'mongodb') {
     // connect to db
-    const Database = require('../databases/database');
     global.db = new Database(false, true);
 
     await new Promise(resolve => {
       const check = () => {
         if (!global.db.engine.connected) {
-          setTimeout(() => check(), 10)
+          setTimeout(() => check(), 10);
         } else {
-          resolve()
+          resolve();
         }
       };
       check();
@@ -58,15 +58,15 @@ export const getChannelChattersUnofficialAPI = async (): Promise<{ modStatus: bo
       system: 'oauth'
     })).value;
 
-    if (typeof channel === undefined) {
-      throw Error('channel undefined')
+    if (typeof channel === 'undefined') {
+      throw Error('channel undefined');
     }
 
     const url = `https://tmi.twitch.tv/group/user/${channel}/chatters`;
     const request = await axios.get(url);
 
     if (typeof request.data.chatters === 'undefined') {
-      throw Error('chatters undefined')
+      throw Error('chatters undefined');
     }
 
     const chatters: any[] = flatMap(request.data.chatters);
@@ -105,18 +105,18 @@ export const getChannelChattersUnofficialAPI = async (): Promise<{ modStatus: bo
     if (!isMainThread) {
       parentPort?.postMessage({ modStatus, partedUsers, joinedUsers });
     }
-    return { modStatus, partedUsers, joinedUsers }
+    return { modStatus, partedUsers, joinedUsers };
   } catch (e) {
     if (!isMainThread) {
       parentPort?.postMessage({ modStatus: false, partedUsers: [], joinedUsers: [] });
     }
-    return { modStatus: false, partedUsers: [], joinedUsers: [] }
+    return { modStatus: false, partedUsers: [], joinedUsers: [] };
   } finally {
     // free event
     await global.db.engine.remove('thread_event', {
       event: 'getChannelChattersUnofficialAPI',
-    })
-  }
+    });
+  };
 };
 
 if (!isMainThread) {
