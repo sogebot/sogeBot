@@ -24,6 +24,8 @@ jobs:
       run: make eslint
     - name: Run jsonlint
       run: make jsonlint
+    - name: Should run tests?
+      run: echo ${{env.RUN_TESTS}}
   nedb:
     name: NeDB tests
     needs: eslint
