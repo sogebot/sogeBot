@@ -9,6 +9,17 @@ import * as commons from './commons';
 import { debug, error, isDebugEnabled } from './helpers/log';
 import { permission } from './helpers/permissions';
 import { adminEndpoint, viewerEndpoint } from './helpers/socket';
+import { getManager } from 'typeorm';
+import { UsersOnline } from './entity/usersOnline';
+
+
+export const getAllOnlineUsernames = async () => {
+  return (await getManager()
+    .createQueryBuilder()
+    .select()
+    .from(UsersOnline, 'user')
+    .execute()).map(o => o.username);
+};
 
 class Users extends Core {
   uiSortCache: string | null = null;
@@ -117,14 +128,6 @@ class Users extends Core {
     }
   }
 
-  async getAllOnlineUsernames() {
-    return [
-      ...new Set([
-        ...((await global.db.engine.find('users.online')).map(o => o.username)),
-      ]),
-    ];
-  }
-
   async updateChatTime () {
     if (isDebugEnabled('users.chat')) {
       const message = 'chat time update ' + new Date();
@@ -136,7 +139,7 @@ class Users extends Core {
     clearTimeout(this.timeouts.updateChatTime);
     let timeout = constants.MINUTE;
     try {
-      const users = await this.getAllOnlineUsernames();
+      const users = await getAllOnlineUsernames();
       if (users.length === 0) {
         throw Error('No online users.');
       }
@@ -217,7 +220,7 @@ class Users extends Core {
     try {
       // count watching time when stream is online
       if (global.api.isStreamOnline) {
-        const users = await this.getAllOnlineUsernames();
+        const users = await getAllOnlineUsernames();
         if (users.length === 0) {
           throw Error('No online users.');
         }

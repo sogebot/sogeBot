@@ -11,6 +11,7 @@ import System from './_interface';
 import * as constants from '../constants';
 import { debug, error } from '../helpers/log';
 import { adminEndpoint } from '../helpers/socket';
+import { getAllOnlineUsernames } from '../users';
 
 class Points extends System {
   @settings('points')
@@ -66,7 +67,7 @@ class Points extends System {
 
     try {
       const userPromises: Promise<void>[] = [];
-      for (const username of (await global.users.getAllOnlineUsernames())) {
+      for (const username of (await getAllOnlineUsernames())) {
         if (isBot(username)) {
           continue;
         }
@@ -341,7 +342,7 @@ class Points extends System {
     try {
       const points = new Expects(opts.parameters).points({ all: false }).toArray();
 
-      for (const username of (await global.users.getAllOnlineUsernames())) {
+      for (const username of (await getAllOnlineUsernames())) {
         if (isBot(username)) {
           continue;
         }
@@ -368,7 +369,7 @@ class Points extends System {
     try {
       const points = new Expects(opts.parameters).points({ all: false }).toArray()[0];
 
-      for (const username of (await global.users.getAllOnlineUsernames())) {
+      for (const username of (await getAllOnlineUsernames())) {
         if (isBot(username)) {
           continue;
         }

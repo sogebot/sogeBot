@@ -1,19 +1,33 @@
-// import { isMainThread } from 'worker_threads';
 import axios from 'axios';
 import { flatMap, includes } from 'lodash';
 import config from '@config';
 import { isMainThread, parentPort, Worker } from 'worker_threads';
-import Database from '../databases/database';
 
-const setImmediateAwait = () => {
-  return new Promise(resolve => {
-    setTimeout(() => resolve(), 10);
-  });
-};
+import {
+  createConnection,
+  getConnection,
+  getConnectionOptions,
+  getManager,
+} from 'typeorm';
+
+import { UsersOnline } from '../entity/usersOnline';
+import { ThreadEvent } from '../entity/threadEvent';
+import { getAllOnlineUsernames } from '../users';
 
 export const getChannelChattersUnofficialAPI = async (): Promise<{ modStatus: boolean; partedUsers: string[]; joinedUsers: string[] }> => {
+  if (!isMainThread) {
+    const connectionOptions = await getConnectionOptions();
+    createConnection({
+      synchronize: true,
+      logging: false,
+      entities: [__dirname + '/../entity/*.{js,ts}'],
+      ...connectionOptions,
+    });
+  }
+  const connection = await getConnection();
+
   // spin up worker
-  if (isMainThread && config.database.type === 'mongodb') {
+  if (isMainThread && (config.database.type === 'mongodb' && connection.options.type !== 'sqlite')) {
     const value = await new Promise((resolve, reject) => {
       const worker = new Worker(__filename);
       worker.on('message', resolve);
@@ -27,27 +41,26 @@ export const getChannelChattersUnofficialAPI = async (): Promise<{ modStatus: bo
     return value as unknown as { modStatus: boolean; partedUsers: string[]; joinedUsers: string[] };
   }
 
-  // connect to db, then we can continue
-  if (!isMainThread && config.database.type === 'mongodb') {
-    // connect to db
-    global.db = new Database(false, true);
-
-    await new Promise(resolve => {
-      const check = () => {
-        if (!global.db.engine.connected) {
-          setTimeout(() => check(), 10);
-        } else {
-          resolve();
-        }
-      };
-      check();
-    });
-  }
-
   try {
-    await global.db.engine.insert('thread_event', {
-      event: 'getChannelChattersUnofficialAPI',
-    });
+    // lock thread
+    await getManager()
+      .createQueryBuilder()
+      .insert()
+      .into(ThreadEvent)
+      .values([
+        { event: 'getChannelChattersUnofficialAPI' },
+      ])
+      .execute();
+
+
+
+    const event = await getManager()
+      .createQueryBuilder()
+      .select()
+      .from(ThreadEvent, 'thread')
+      .where('thread.event = :event', { event: 'getChannelChattersUnofficialAPI' })
+      .execute();
+    console.log({event});
 
     const channel: string | undefined = (await global.db.engine.findOne('core.settings', {
       key: 'generalChannel',
@@ -72,17 +85,18 @@ export const getChannelChattersUnofficialAPI = async (): Promise<{ modStatus: bo
     const chatters: any[] = flatMap(request.data.chatters);
     const modStatus = request.data.chatters.moderators.map(o => o.toLowerCase()).includes(bot);
 
-    const allOnlineUsers = [
-      ...new Set([
-        ...((await global.db.engine.find('users.online')).map(o => o.username)),
-      ]),
-    ];
+    const allOnlineUsers = await getAllOnlineUsernames();
 
     const partedUsers: string[] = [];
     for (const user of allOnlineUsers) {
       if (!includes(chatters, user) && user !== bot) {
         // user is no longer in channel
-        await global.db.engine.remove('users.online', { username: user });
+        await getManager()
+          .createQueryBuilder()
+          .delete()
+          .from(UsersOnline)
+          .where('username = :username', { username: user })
+          .execute();
         partedUsers.push(user);
       }
     }
@@ -95,13 +109,25 @@ export const getChannelChattersUnofficialAPI = async (): Promise<{ modStatus: bo
     }
 
     // always remove bot from online users
-    await global.db.engine.remove('users.online', { username: bot });
+    await getManager()
+      .createQueryBuilder()
+      .delete()
+      .from(UsersOnline)
+      .where('username = :username', { username: bot })
+      .execute();
 
+    // insert joined online users
     if (joinedUsers.length > 0) {
-      await setImmediateAwait();
-      await global.db.engine.insert('users.online', joinedUsers.map(o => {
-        return { username: o };
-      }));
+      await getManager()
+        .createQueryBuilder()
+        .insert()
+        .into(UsersOnline)
+        .values(
+          joinedUsers.map(o => {
+            return { username: o };
+          }),
+        )
+        .execute();
     }
 
     if (!isMainThread) {
@@ -115,9 +141,12 @@ export const getChannelChattersUnofficialAPI = async (): Promise<{ modStatus: bo
     return { modStatus: false, partedUsers: [], joinedUsers: [] };
   } finally {
     // free event
-    await global.db.engine.remove('thread_event', {
-      event: 'getChannelChattersUnofficialAPI',
-    });
+    await getManager()
+      .createQueryBuilder()
+      .delete()
+      .from(ThreadEvent)
+      .where('event = :event', { event: 'getChannelChattersUnofficialAPI' })
+      .execute();
   };
 };
 

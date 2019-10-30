@@ -16,12 +16,16 @@ import { Webhooks } from './webhooks';
 import { Users } from './users';
 import { UI } from './ui';
 
+import { createConnection, getConnectionOptions } from 'typeorm';
+
+
 const figlet = require('figlet')
 const util = require('util')
 const _ = require('lodash')
 const chalk = require('chalk')
 const gitCommitInfo = require('git-commit-info');
-const { isMainThread, } = require('./cluster');
+const { isMainThread } = require('worker_threads');
+import { isMainThread as isMainClusterThread } from './cluster';
 const { autoLoad } = require('./commons');
 
 const constants = require('./constants')
@@ -40,12 +44,24 @@ global.status = { // TODO: move it?
 import { changelog } from './changelog';
 
 const isNeDB = config.database.type === 'nedb';
-global.db = new (require('./databases/database'))(!isNeDB, !isNeDB)
-main()
+global.db = new (require('./databases/database'))(!isNeDB, !isNeDB);
+
+const connect = async function () {
+  const connectionOptions = await getConnectionOptions();
+  createConnection({
+    synchronize: true,
+    logging: false,
+    entities: [__dirname + '/entity/*.{js,ts}'],
+    ...connectionOptions,
+  });
+};
 
 async function main () {
   if (!global.db.engine.connected) {
     return setTimeout(() => main(), 10)
+  }
+  if (isMainThread) {
+    await connect();
   }
   try {
     changelog();
@@ -93,7 +109,7 @@ async function main () {
     global.games = await autoLoad('./dest/games/')
     global.integrations = await autoLoad('./dest/integrations/')
 
-    if (isMainThread) {
+    if (isMainClusterThread) {
       global.panel.expose();
     }
 
@@ -106,18 +122,19 @@ async function main () {
   })
 }
 
-if (isMainThread) {
-  process.on('unhandledRejection', function (reason, p) {
-    error(`Possibly Unhandled Rejection at: ${util.inspect(p)} reason: ${reason}`)
-  })
 
-  process.on('uncaughtException', (err) => {
-    error(util.inspect(err))
-    error('+------------------------------------------------------------------------------+')
-    error('| BOT HAS UNEXPECTEDLY CRASHED                                                 |')
-    error('| PLEASE CHECK https://github.com/sogehige/SogeBot/wiki/How-to-report-an-issue |')
-    error('| AND ADD logs/sogebot.log file to your report                                 |')
-    error('+------------------------------------------------------------------------------+')
-    process.exit(1)
-  })
-}
+main();
+
+process.on('unhandledRejection', function (reason, p) {
+  error(`Possibly Unhandled Rejection at: ${util.inspect(p)} reason: ${reason}`)
+})
+
+process.on('uncaughtException', (err) => {
+  error(util.inspect(err))
+  error('+------------------------------------------------------------------------------+')
+  error('| BOT HAS UNEXPECTEDLY CRASHED                                                 |')
+  error('| PLEASE CHECK https://github.com/sogehige/SogeBot/wiki/How-to-report-an-issue |')
+  error('| AND ADD logs/sogebot.log file to your report                                 |')
+  error('+------------------------------------------------------------------------------+')
+  process.exit(1)
+})

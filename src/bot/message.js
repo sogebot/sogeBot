@@ -11,6 +11,7 @@ const Entities = require('html-entities').AllHtmlEntities;
 
 import { warning } from './helpers/log';
 import { getCountOfCommandUsage } from './helpers/commands/count';
+import { getAllOnlineUsernames } from './users';
 
 class Message {
   constructor (message) {
@@ -88,7 +89,7 @@ class Message {
 
     let random = {
       '(random.online.viewer)': async function () {
-        const usernames = await global.users.getAllOnlineUsernames();
+        const usernames = await getAllOnlineUsernames();
         const onlineViewers = usernames.filter((username) => {
           const isSender = username === attr.sender.username;
           const isBot = commons.isBot(username);
@@ -99,7 +100,7 @@ class Message {
         return _.sample(onlineViewers);
       },
       '(random.online.follower)': async function () {
-        const usernames = await global.users.getAllOnlineUsernames();
+        const usernames = await getAllOnlineUsernames();
         const onlineViewers = usernames.filter((username) => {
           const isSender = username === attr.sender.username;
           const isBot = commons.isBot(username);
@@ -114,7 +115,7 @@ class Message {
         return _.sample(onlineFollowers);
       },
       '(random.online.subscriber)': async function () {
-        const usernames = await global.users.getAllOnlineUsernames();
+        const usernames = await getAllOnlineUsernames();
         const onlineViewers = usernames.filter((username) => {
           const isSender = username === attr.sender.username;
           const isBot = commons.isBot(username);

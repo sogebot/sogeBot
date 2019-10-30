@@ -12,6 +12,7 @@ import Core from './_interface';
 
 import * as configFile from '@config';
 import { adminEndpoint } from './helpers/socket';
+import { getAllOnlineUsernames } from './users';
 const config = configFile as any;
 config.timezone = config.timezone === 'system' || isNil(config.timezone) ? moment.tz.guess() : config.timezone;
 
@@ -52,7 +53,7 @@ class Twitch extends Core {
   @command('!followers')
   async followers (opts) {
     let events = await global.db.engine.find('widgetsEventList');
-    const onlineViewers = await global.users.getAllOnlineUsernames();
+    const onlineViewers = await getAllOnlineUsernames();
     const followers = (await global.db.engine.find('users', { is: { follower: true } })).map((o) => o.username);
 
     const onlineFollowers = intersection(onlineViewers, followers);
@@ -80,7 +81,7 @@ class Twitch extends Core {
   @command('!subs')
   async subs (opts) {
     let events = await global.db.engine.find('widgetsEventList');
-    const onlineViewers = await global.users.getAllOnlineUsernames();
+    const onlineViewers = await getAllOnlineUsernames();
     const subscribers = (await global.db.engine.find('users', { is: { subscriber: true } })).map((o) => o.username);
 
     const onlineSubscribers = intersection(onlineViewers, subscribers);

@@ -15,6 +15,9 @@ import { getBroadcaster, isBot, isBroadcaster, isIgnored, sendMessage } from './
 import { triggerInterfaceOnFollow } from './helpers/interface/triggers';
 import { shared } from './decorators';
 import { getChannelChattersUnofficialAPI } from './microservices/getChannelChattersUnofficialAPI';
+import { ThreadEvent } from './entity/threadEvent';
+import { getManager } from 'typeorm';
+import { UsersOnline } from './entity/usersOnline';
 
 const setImmediateAwait = () => {
   return new Promise(resolve => {
@@ -125,7 +128,8 @@ class API extends Core {
       this.interval('getLatest100Followers', constants.MINUTE);
       this.interval('getChannelHosts', 5 * constants.MINUTE);
       this.interval('getChannelSubscribers', 2 * constants.MINUTE);
-      this.interval('getChannelChattersUnofficialAPI', 5 * constants.MINUTE);
+//      this.interval('getChannelChattersUnofficialAPI', 5 * constants.MINUTE);
+      this.interval('getChannelChattersUnofficialAPI', constants.MINUTE / 60);
       this.interval('getChannelDataOldAPI', constants.MINUTE);
       this.interval('intervalFollowerUpdate', constants.MINUTE * 5);
       this.interval('checkClips', constants.MINUTE);
@@ -337,9 +341,13 @@ class API extends Core {
       throw new Error('API can run only on master');
     }
 
-    const event = await global.db.engine.find('thread_event', {
-      event: 'getChannelChattersUnofficialAPI',
-    });
+    const event = await getManager()
+      .createQueryBuilder()
+      .select()
+      .from(ThreadEvent, 'thread')
+      .where('thread.event = :event', { event: 'getChannelChattersUnofficialAPI' })
+      .execute();
+
     if (event.length === 0) {
       const { modStatus, partedUsers, joinedUsers } = await getChannelChattersUnofficialAPI();
 
@@ -354,7 +362,12 @@ class API extends Core {
       global.widgets.joinpart.send({ users: joinedUsers, type: 'join' });
       for (const username of joinedUsers) {
         if (isIgnored({ username }) || global.oauth.botUsername === username) {
-          await global.db.engine.remove('users.online', { username });
+          await getManager()
+            .createQueryBuilder()
+            .delete()
+            .from(UsersOnline)
+            .where('username = :username', { username })
+            .execute();
         } else {
           await setImmediateAwait();
           this.isFollower(username);
