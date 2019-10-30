@@ -145,6 +145,18 @@ class Socket extends Core {
     });
     emitAuthorize(socket);
 
+    for (const endpoint of endpoints.filter(o => (o.type === 'admin' || o.type === 'viewer') && o.nsp === socket.nsp.name)) {
+      socket.removeAllListeners(endpoint.on);
+      socket.on(endpoint.on, (...args) => {
+        // search for callback
+        for (const arg of args) {
+          if (typeof arg === 'function') {
+            arg('User doesn\'t have access to this endpoint', null);
+          }
+        }
+      });
+    }
+
     for (const endpoint of endpoints.filter(o => o.type === 'public' && o.nsp === socket.nsp.name)) {
       socket.removeAllListeners(endpoint.on);
       socket.on(endpoint.on, (...args) => {
