@@ -30,4 +30,3 @@ jobs:
           REGISTRY: docker.pkg.github.com
           IMAGE_NAME: "sogehige/sogebot"
           TAG_NAME: release:latest
-
