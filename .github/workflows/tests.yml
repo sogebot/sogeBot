@@ -32,18 +32,18 @@ jobs:
     steps:
     - uses: actions/checkout@master
     - name: install node v13
-      if: RUN_TESTS == true
+      if: env.RUN_TESTS == true
       uses: actions/setup-node@v1
       with:
         node-version: 13
     - name: Install all dependencies
-      if: RUN_TESTS == true
+      if: env.RUN_TESTS == true
       run: make
     - name: Set proper db to use
-      if: RUN_TESTS == true
+      if: env.RUN_TESTS == true
       run: npm run test:config:nedb
     - name: Run mocha
-      if: RUN_TESTS == true
+      if: env.RUN_TESTS == true
       run: npm test
   mongodb:
     name: MongoDB tests
@@ -57,16 +57,16 @@ jobs:
     steps:
     - uses: actions/checkout@master
     - name: install node v13
-      if: RUN_TESTS == true
+      if: env.RUN_TESTS == true
       uses: actions/setup-node@v1
       with:
         node-version: 12
     - name: Install all dependencies
-      if: RUN_TESTS == true
+      if: env.RUN_TESTS == true
       run: make
     - name: Set proper db to use
-      if: RUN_TESTS == true
+      if: env.RUN_TESTS == true
       run: npm run test:config:mongodb
     - name: Run mocha
-      if: RUN_TESTS == true
+      if: env.RUN_TESTS == true
       run: npm test
