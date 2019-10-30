@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Skip test
-      run: echo '${{github.event.commits}}'
+      run: echo '${{github.event}}'
   nedb:
     name: NeDB tests
     needs: eslint
