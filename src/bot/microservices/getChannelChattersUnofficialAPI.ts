@@ -47,15 +47,15 @@ export const getChannelChattersUnofficialAPI = async (): Promise<{ modStatus: bo
   try {
     await global.db.engine.insert('thread_event', {
       event: 'getChannelChattersUnofficialAPI',
-    })
+    });
 
     const channel: string | undefined = (await global.db.engine.findOne('core.settings', {
       key: 'generalChannel',
-      system: 'oauth'
+      system: 'oauth',
     })).value;
     const bot: string | undefined = (await global.db.engine.findOne('core.settings', {
       key: 'botUsername',
-      system: 'oauth'
+      system: 'oauth',
     })).value;
 
     if (typeof channel === 'undefined') {
@@ -78,7 +78,7 @@ export const getChannelChattersUnofficialAPI = async (): Promise<{ modStatus: bo
       ]),
     ];
 
-    const partedUsers: string[] = []
+    const partedUsers: string[] = [];
     for (const user of allOnlineUsers) {
       if (!includes(chatters, user) && user !== bot) {
         // user is no longer in channel
@@ -87,7 +87,7 @@ export const getChannelChattersUnofficialAPI = async (): Promise<{ modStatus: bo
       }
     }
 
-    const joinedUsers: string[] = []
+    const joinedUsers: string[] = [];
     for (const chatter of chatters) {
       if (!includes(allOnlineUsers, chatter) && chatter !== bot) {
         joinedUsers.push(chatter);
@@ -99,7 +99,9 @@ export const getChannelChattersUnofficialAPI = async (): Promise<{ modStatus: bo
 
     if (joinedUsers.length > 0) {
       await setImmediateAwait();
-      await global.db.engine.insert('users.online', joinedUsers.map(o => { return { username: o }}))
+      await global.db.engine.insert('users.online', joinedUsers.map(o => {
+        return { username: o }
+      }));
     }
 
     if (!isMainThread) {
