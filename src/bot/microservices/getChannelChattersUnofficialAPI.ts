@@ -100,7 +100,7 @@ export const getChannelChattersUnofficialAPI = async (): Promise<{ modStatus: bo
     if (joinedUsers.length > 0) {
       await setImmediateAwait();
       await global.db.engine.insert('users.online', joinedUsers.map(o => {
-        return { username: o }
+        return { username: o };
       }));
     }
 
