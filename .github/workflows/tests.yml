@@ -19,7 +19,7 @@ jobs:
     - name: Install eslint and dependencies
       run: echo ${{contains(toJson(github.event.body), '[skip-tests]')}}
     - name: Install eslint and dependencies
-      run: echo "${{toJson(github.event.base)}}"
+      run: echo "${{toJson(github.event)}}"
   nedb:
     env:
       SKIP_TESTS: contains(toJson(github.event.body), '[skip-tests]') != true
