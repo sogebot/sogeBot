@@ -72,7 +72,7 @@ Commit Guidelines
     ```
 
 - If you are updating locales, docs and doesn't fix bugs or add feature, you can
-  add [skip-tests], [no-tests], [skip-travis] to skip functional tests of bot
+  add [skip-tests] to skip functional tests of bot into your Pull Request
 
 - If you still need examples, please view the commit history.
 
