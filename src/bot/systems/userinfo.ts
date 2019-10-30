@@ -22,8 +22,8 @@ class UserInfo extends System {
     type: 'sortable-list',
     values: 'order',
     toggle: '_formatDisabled',
-    toggleOnIcon: 'fa-eye',
-    toggleOffIcon: 'fa-eye-slash',
+    toggleOnIcon: 'eye',
+    toggleOffIcon: 'eye-slash',
   })
   order: string[] = ['$sender', '$rank', '$role', '$watched', '$points', '$messages', '$tips', '$bits'];
 
