@@ -7,7 +7,7 @@ on:
   pull_request:
 
 env:
-  RUN_TESTS: ${contains(github.event.pull_request.body, '[skip-tests]') != true}
+  RUN_TESTS: ${{contains(github.event.pull_request.body, '[skip-tests]') != true}}
 
 jobs:
   eslint:
