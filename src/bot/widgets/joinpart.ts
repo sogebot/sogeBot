@@ -8,7 +8,7 @@ class JoinPart extends Widget {
   }
 
   public send(event) {
-    this.emit('joinpart', { username: event.username, type: event.type });
+    this.emit('joinpart', { users: event.users, type: event.type });
   }
 }
 

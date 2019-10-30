@@ -39,14 +39,19 @@ export default {
   },
   computed: {
     joined: function () {
-      let list = chunk(this.list.filter(o => o.type === 'join').sort(o => -(new Date(o.createdAt).getTime())))[0]
-      return list ? list.map(o => o.username).join(', ') : ''
+      return this.list.map(o => o.username).join(', ')
     }
   },
   created: function () {
     this.socket.on('joinpart', (data) => {
-      data.createdAt = new Date()
-      this.list.push(data)
+      if (data.type === 'join') {
+        for (const username of data.users) {
+          this.list.push({
+            username, createdAt: new Date()
+          })
+        }
+        this.list = chunk(this.list.sort(o => -(new Date(o.createdAt).getTime())), 50)[0]
+      }
     })
   }
 }

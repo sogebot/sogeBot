@@ -5,15 +5,16 @@ import moment from 'moment';
 require('moment-precise-range-plugin'); // moment.preciseDiff
 import { isMainThread } from './cluster';
 import chalk from 'chalk';
-import { defaults, filter, flatMap, get, includes, isEmpty, isNil, isNull, map } from 'lodash';
+import { defaults, filter, get, isEmpty, isNil, isNull, map } from 'lodash';
 
 import * as constants from './constants';
 import Core from './_interface';
 import { debug, error, follow, info, start, stop, unfollow, warning } from './helpers/log';
-import { getBroadcaster, getChannel, isBot, isBroadcaster, isIgnored, sendMessage } from './commons';
+import { getBroadcaster, isBot, isBroadcaster, isIgnored, sendMessage } from './commons';
 
 import { triggerInterfaceOnFollow } from './helpers/interface/triggers';
 import { shared } from './decorators';
+import { getChannelChattersUnofficialAPI } from './microservices/getChannelChattersUnofficialAPI';
 
 const setImmediateAwait = () => {
   return new Promise(resolve => {
@@ -124,7 +125,7 @@ class API extends Core {
       this.interval('getLatest100Followers', constants.MINUTE);
       this.interval('getChannelHosts', 5 * constants.MINUTE);
       this.interval('getChannelSubscribers', 2 * constants.MINUTE);
-      this.interval('getChannelChattersUnofficialAPI', 5 * constants.MINUTE);
+      this.interval('getChannelChattersUnofficialAPI', constants.MINUTE / 10);
       this.interval('getChannelDataOldAPI', constants.MINUTE);
       this.interval('intervalFollowerUpdate', constants.MINUTE * 5);
       this.interval('checkClips', constants.MINUTE);
@@ -136,6 +137,11 @@ class API extends Core {
       global.db.engine.index('core.api.tags', [{ index: 'tag_id', unique: true }]);
       global.db.engine.index('core.api.currentTags', [{ index: 'tag_id', unique: true }]);
       global.db.engine.index('core.api.games', [{ index: 'id', unique: true }]);
+
+      // free thread_event
+      global.db.engine.remove('thread_event', {
+        event: 'getChannelChattersUnofficialAPI',
+      })
     } else {
       this.calls = {
         bot: {
@@ -338,76 +344,34 @@ class API extends Core {
       throw new Error('API can run only on master');
     }
 
-    const url = `https://tmi.twitch.tv/group/user/${getChannel()}/chatters`;
-    const needToWait = isNil(global.widgets);
-    if (needToWait) {
-      return { state: false, opts };
-    }
+    const event = await global.db.engine.find('thread_event', {
+      event: 'getChannelChattersUnofficialAPI',
+    })
+    if (event.length === 0) {
+      const { modStatus, partedUsers, joinedUsers } = await getChannelChattersUnofficialAPI();
 
-    let request;
-    try {
-      request = await axios.get(url);
-      if (global.panel && global.panel.io) {
-        global.panel.io.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'getChannelChattersUnofficialAPI', api: 'unofficial', endpoint: url, code: request.status });
-      }
-      opts.saveToWidget = true;
-    } catch (e) {
-      if (global.panel && global.panel.io) {
-        global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'getChannelChattersUnofficialAPI', api: 'unofficial', endpoint: url, code: e.response.status, data: e.stack });
-      }
-      return { state: false, opts };
-    }
-
-    if (typeof request.data.chatters === 'undefined') {
-      return { state: true };
-    }
-
-    const chatters: any[] = flatMap(request.data.chatters);
-    this.checkBotModeratorStatus(request.data.chatters.moderators);
-
-    const allOnlineUsers = await global.users.getAllOnlineUsernames();
-
-    for (const user of allOnlineUsers) {
-      await setImmediateAwait();
-      if (!includes(chatters, user)) {
-        // user is no longer in channel
-        await global.db.engine.remove('users.online', { username: user });
-        if (!isIgnored({ username: user })) {
-          if (opts.saveToWidget) {
-            global.events.fire('user-parted-channel', { username: user.username });
-          }
-          global.widgets.joinpart.send({ username: user, type: 'part' });
-        };
-      }
-    }
-
-    for (const chatter of chatters) {
-      await setImmediateAwait();
-      if (isIgnored({ username: chatter }) || global.oauth.botUsername === chatter) {
-        // even if online, remove ignored user from collection
-        await global.db.engine.remove('users.online', { username: chatter });
-      } else if (!includes(allOnlineUsers, chatter)) {
-        if (opts.saveToWidget) {
-          this.isFollower(chatter);
-          global.events.fire('user-joined-channel', { username: chatter });
+      global.widgets.joinpart.send({ users: partedUsers, type: 'part' });
+      for (const username of partedUsers) {
+        if (!isIgnored({ username: username })) {
+          await setImmediateAwait();
+          global.events.fire('user-parted-channel', { username });
         }
-        await global.db.engine.insert('users.online', { username: chatter });
-        global.widgets.joinpart.send({ username: chatter, type: 'join' });
       }
+
+      global.widgets.joinpart.send({ users: joinedUsers, type: 'join' });
+      for (const username of joinedUsers) {
+        if (isIgnored({ username }) || global.oauth.botUsername === username) {
+          await global.db.engine.remove('users.online', { username });
+        } else {
+          await setImmediateAwait();
+          this.isFollower(username);
+          global.events.fire('user-joined-channel', { username });
+        }
+      }
+
+      global.status.MOD = modStatus;
     }
-
-    // always remove bot from online users
-    await global.db.engine.remove('users.online', { username: global.oauth.botUsername });
-
     return { state: true, opts };
-  }
-
-  /**
-   * Checks if bot is moderator and set proper status
-   * @param {string[]} mods
-   */
-  checkBotModeratorStatus (mods) {
-    global.status.MOD = mods.map(o => o.toLowerCase()).includes(global.oauth.botUsername);
   }
 
   async getAllStreamTags(opts) {
