@@ -14,11 +14,6 @@ jobs:
     name: ESLint check
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@master
-    - name: install node v13
-      uses: actions/setup-node@v1
-      with:
-        node-version: 13
     - name: Install eslint and dependencies
       run: echo ${{env.RUN_TESTS}}
   nedb:
