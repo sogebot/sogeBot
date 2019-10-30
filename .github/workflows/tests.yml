@@ -17,30 +17,28 @@ jobs:
       with:
         node-version: 13
     - name: Install eslint and dependencies
-      run: npm install typescript eslint jsonlint-mod @typescript-eslint/parser @typescript-eslint/eslint-plugin --only=dev
-    - name: Run eslint
-      run: make eslint
-    - name: Run jsonlint
-      run: make jsonlint
+      run: echo ${{contains(toJson(github.event.body), '[skip-tests]')}}
   nedb:
+    env:
+      SKIP_TESTS: contains(toJson(github.event.body), '[skip-tests]') != true
     name: NeDB tests
     needs: eslint
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
     - name: install node v13
-      if: contains(github.event.body, '[skip-tests]') != true && contains(github.event.body, '[skip-test]') != true
+      if: SKIP_TESTS
       uses: actions/setup-node@v1
       with:
         node-version: 13
     - name: Install all dependencies
-      if: contains(github.event.body, '[skip-tests]') != true && contains(github.event.body, '[skip-test]') != true
+      if: SKIP_TESTS
       run: make
     - name: Set proper db to use
-      if: contains(github.event.body, '[skip-tests]') != true && contains(github.event.body, '[skip-test]') != true
+      if: SKIP_TESTS
       run: npm run test:config:nedb
     - name: Run mocha
-      if: contains(github.event.body, '[skip-tests]') != true && contains(github.event.body, '[skip-test]') != true
+      if: SKIP_TESTS
       run: npm test
   mongodb:
     name: MongoDB tests
