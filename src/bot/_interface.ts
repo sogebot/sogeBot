@@ -134,7 +134,7 @@ class Module {
 
     setInterval(async () => {
       this.areDependenciesEnabled = await this._areDependenciesEnabled;
-    }, 1000)
+    }, 1000);
   }
 
   public sockets() {
