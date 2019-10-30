@@ -315,9 +315,6 @@ class Module {
           cb(null, true);
         }
       });
-      publicEndpoint(this.nsp, 'update', async (opts, cb) => {
-        cb('User doesn\'t have access to this endpoint', null);
-      });
       adminEndpoint(this.nsp, 'update', async (opts, cb) => {
         opts.collection = opts.collection || 'data';
         if (opts.collection.startsWith('_')) {
