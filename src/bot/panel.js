@@ -282,8 +282,8 @@ function Panel () {
         toEmit.push({
           name: system.toLowerCase(),
           enabled: global.systems[system].enabled,
-          areDependenciesEnabled: await global.systems[system]._dependenciesEnabled(),
-          isDisabledByEnv: !_.isNil(process.env.DISABLE) && (process.env.DISABLE.toLowerCase().split(',').includes(system.toLowerCase()) || process.env.DISABLE === '*')
+          areDependenciesEnabled: await global.systems[system].areDependenciesEnabled,
+          isDisabledByEnv: global.systems[system].isDisabledByEnv,
         })
       }
       cb(null, toEmit)
@@ -304,8 +304,8 @@ function Panel () {
         toEmit.push({
           name: system.toLowerCase(),
           enabled: global.integrations[system].enabled,
-          areDependenciesEnabled: await global.integrations[system]._dependenciesEnabled(),
-          isDisabledByEnv: !_.isNil(process.env.DISABLE) && (process.env.DISABLE.toLowerCase().split(',').includes(system.toLowerCase()) || process.env.DISABLE === '*')
+          areDependenciesEnabled: await global.integrations[system].areDependenciesEnabled,
+          isDisabledByEnv: global.integrations[system].isDisabledByEnv,
         })
       }
       cb(null, toEmit)
@@ -317,8 +317,8 @@ function Panel () {
         toEmit.push({
           name: system.toLowerCase(),
           enabled: global.overlays[system].enabled,
-          areDependenciesEnabled: await global.overlays[system]._dependenciesEnabled(),
-          isDisabledByEnv: !_.isNil(process.env.DISABLE) && (process.env.DISABLE.toLowerCase().split(',').includes(system.toLowerCase()) || process.env.DISABLE === '*')
+          areDependenciesEnabled: await global.overlays[system].areDependenciesEnabled,
+          isDisabledByEnv: global.overlays[system].isDisabledByEnv,
         })
       }
       cb(null, toEmit)
@@ -330,8 +330,8 @@ function Panel () {
         toEmit.push({
           name: system.toLowerCase(),
           enabled: global.games[system].enabled,
-          areDependenciesEnabled: await global.games[system]._dependenciesEnabled(),
-          isDisabledByEnv: !_.isNil(process.env.DISABLE) && (process.env.DISABLE.toLowerCase().split(',').includes(system.toLowerCase()) || process.env.DISABLE === '*')
+          areDependenciesEnabled: await global.games[system].areDependenciesEnabled,
+          isDisabledByEnv: global.games[system].isDisabledByEnv,
         })
       }
       cb(null, toEmit)

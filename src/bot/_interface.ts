@@ -20,12 +20,45 @@ class Module {
   public on: InterfaceSettings.On;
   public socket: SocketIOClient.Socket | null;
 
+  get isDisabledByEnv(): boolean {
+    return typeof process.env.DISABLE !== 'undefined'
+      && (process.env.DISABLE.toLowerCase().split(',').includes(this.constructor.name.toLowerCase()) || process.env.DISABLE === '*');
+  };
+
+  areDependenciesEnabled = false;
+  get _areDependenciesEnabled(): Promise<boolean> {
+    return new Promise((resolve) => {
+      const check = async (retry) => {
+        const status: any[] = [];
+        for (const dependency of this.dependsOn) {
+          const dependencyPointer = _.get(global, dependency, null);
+          if (!dependencyPointer || !_.isFunction(dependencyPointer.status)) {
+            if (retry > 0) {
+              setTimeout(() => check(--retry), 10);
+            } else {
+              throw new Error(`[${this.constructor.name}] Dependency error - possibly wrong path`);
+            }
+            return;
+          } else {
+            status.push(await dependencyPointer.status({ quiet: true }));
+          }
+        }
+        resolve(status.length === 0 || _.every(status));
+      };
+      check(1000);
+    });
+  }
+
   get nsp(): string {
     return '/' + this._name + '/' + this.constructor.name.toLowerCase();
   }
 
   get enabled(): boolean {
-    return _.get(this, '_enabled', true);
+    if (this.areDependenciesEnabled && !this.isDisabledByEnv) {
+      return _.get(this, '_enabled', true);
+    } else {
+      return false;
+    }
   }
 
   set enabled(value: boolean) {
@@ -98,6 +131,10 @@ class Module {
         onStartup();
       });
     }, 5000); // slow down little bit to have everything preloaded or in progress of loading
+
+    setInterval(async () => {
+      this.areDependenciesEnabled = await this._areDependenciesEnabled;
+    }, 1000);
   }
 
   public sockets() {
@@ -471,40 +508,14 @@ class Module {
     }
   }
 
-  public async _dependenciesEnabled() {
-    return new Promise((resolve) => {
-      const check = async (retry) => {
-        const status: any[] = [];
-        for (const dependency of this.dependsOn) {
-          const dependencyPointer = _.get(global, dependency, null);
-          if (!dependencyPointer || !_.isFunction(dependencyPointer.status)) {
-            if (retry > 0) {
-              setTimeout(() => check(--retry), 10);
-            } else {
-              throw new Error(`[${this.constructor.name}] Dependency error - possibly wrong path`);
-            }
-            return;
-          } else {
-            status.push(await dependencyPointer.status({ quiet: true }));
-          }
-        }
-        resolve(status.length === 0 || _.every(status));
-      };
-      check(1000);
-    });
-  }
-
   public async status(opts) {
     opts = opts || {};
     if (['core', 'overlays', 'widgets', 'stats', 'registries'].includes(this._name) || (opts.state === null && typeof opts.state !== 'undefined')) {
       return true;
     }
 
-    const areDependenciesEnabled = await this._dependenciesEnabled();
     const isMasterAndStatusOnly = isMainThread && _.isNil(opts.state);
     const isStatusChanged = !_.isNil(opts.state);
-    const isDisabledByEnv = process.env.DISABLE
-      && (process.env.DISABLE.toLowerCase().split(',').includes(this.constructor.name.toLowerCase()) || process.env.DISABLE === '*');
 
     if (isStatusChanged) {
       this.enabled = opts.state;
@@ -512,7 +523,7 @@ class Module {
       opts.state = this.enabled;
     }
 
-    if (!areDependenciesEnabled || isDisabledByEnv) {
+    if (!this.areDependenciesEnabled || this.isDisabledByEnv) {
       opts.state = false;
     } // force disable if dependencies are disabled or disabled by env
 
@@ -531,9 +542,9 @@ class Module {
     }
 
     if ((isMasterAndStatusOnly || isStatusChanged) && !opts.quiet) {
-      if (isDisabledByEnv) {
+      if (this.isDisabledByEnv) {
         info(`${chalk.red('DISABLED BY ENV')}: ${this.constructor.name} (${this._name})`);
-      } else if (areDependenciesEnabled) {
+      } else if (this.areDependenciesEnabled) {
         info(`${opts.state ? chalk.green('ENABLED') : chalk.red('DISABLED')}: ${this.constructor.name} (${this._name})`);
       } else {
         info(`${chalk.red('DISABLED BY DEP')}: ${this.constructor.name} (${this._name})`);

@@ -212,8 +212,8 @@
                 >
                 <template v-if="system.enabled === null"></template>
                 <template v-else-if="system.isDisabledByEnv">DISABLED BY ENV</template>
-                <template v-else-if="system.enabled === false">{{ translate('disabled') }}</template>
                 <template v-else-if="!system.areDependenciesEnabled">DEPENDENCIES DISABLED</template>
+                <template v-else-if="system.enabled === false">{{ translate('disabled') }}</template>
                 <template v-else>{{ translate('enabled') }}</template>
               </small>
               </button>
