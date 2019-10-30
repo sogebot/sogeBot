@@ -12,7 +12,6 @@ class Gallery extends Overlay {
     this.addMenu({ category: 'registry', name: 'gallery', id: 'registry.gallery/list' });
 
     if (isMainThread) {
-      global.db.engine.index(this.collection.data, { index: 'id', unique: true });
       global.panel.getApp().get('/gallery/:id', async (req, res) => {
         const file = await global.db.engine.findOne(this.collection.data, { id: req.params.id });
         if (!isEmpty(file)) {

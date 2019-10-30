@@ -35,9 +35,6 @@ class CustomCommands extends System {
     this.addMenu({ category: 'manage', name: 'customcommands', id: 'manage/commands' });
 
     if (isMainThread) {
-      global.db.engine.index(this.collection.data, { index: 'id', unique: true });
-      global.db.engine.index(this.collection.count, [{ index: 'command', unique: true }]);
-      global.db.engine.index(this.collection.responses, [{ index: 'cid' }]);
     }
   }
 

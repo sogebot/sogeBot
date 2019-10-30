@@ -9,9 +9,6 @@ class Alerts extends Registry {
     super();
     this.addMenu({ category: 'registry', name: 'alerts', id: 'registry/alerts/list' });
     if (isMainThread) {
-      global.db.engine.index(this.collection.data, [{ index: 'id', unique: true }]);
-      // not unique ids as we will be storing chunks
-      global.db.engine.index(this.collection.media, [{ index: 'id', unique: false }]);
       global.panel.getApp().get('/registry/alerts/:mediaid', async (req, res) => {
         const media: Registry.Alerts.AlertMedia[] = await global.db.engine.find(this.collection.media, { id: req.params.mediaid });
         const b64data = media.sort((a,b) => a.chunkNo - b.chunkNo).map(o => o.b64data).join('');

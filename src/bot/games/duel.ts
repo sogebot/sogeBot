@@ -36,7 +36,6 @@ class Duel extends Game {
     super();
     if (isMainThread) {
       this.pickDuelWinner();
-      global.db.engine.index(this.collection.users, [{ index: 'id', unique: true }]);
     }
   }
 

@@ -27,8 +27,6 @@ class HowLongToBeat extends System {
 
   constructor() {
     super();
-
-    global.db.engine.index(this.collection.data, [{ index: 'game', unique: true }]);
     this.addMenu({ category: 'manage', name: 'howlongtobeat', id: 'manage/hltb' });
 
     if (isMainThread) {

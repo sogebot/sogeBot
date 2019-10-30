@@ -6,7 +6,6 @@ import { prepare, sendMessage } from '../commons';
 import { command, default_permission } from '../decorators';
 import { permission } from '../permissions';
 import System from './_interface';
-import { isMainThread } from '../cluster';
 import uuid from 'uuid';
 
 /*
@@ -21,11 +20,6 @@ import uuid from 'uuid';
 class Ranks extends System {
   constructor () {
     super();
-
-    if (isMainThread) {
-      global.db.engine.index(this.collection.data, [{ index: 'hours' }]);
-    }
-
     this.addMenu({ category: 'manage', name: 'ranks', id: 'manage/ranks/list' });
   }
 

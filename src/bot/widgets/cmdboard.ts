@@ -1,7 +1,6 @@
 import { getOwner } from '../commons';
 import { settings } from '../decorators';
 import Widget from './_interface';
-import { isMainThread } from '../cluster';
 import { adminEndpoint } from '../helpers/socket';
 
 class Cmdboard extends Widget {
@@ -12,10 +11,6 @@ class Cmdboard extends Widget {
 
   constructor() {
     super();
-
-    if (isMainThread) {
-      global.db.engine.index('widgetsCmdBoard', { index: 'command' });
-    }
     this.addWidget('cmdboard', 'widget-title-cmdboard', 'fas fa-th');
   }
 

@@ -8,7 +8,6 @@ import Expects from '../expects';
 import Parser from '../parser';
 import { permission } from '../permissions';
 import System from './_interface';
-import { isMainThread } from '../cluster';
 import uuid from 'uuid';
 
 /*
@@ -29,12 +28,6 @@ class Cooldown extends System {
 
   constructor () {
     super();
-
-    if(isMainThread) {
-      global.db.engine.index(this.collection.data, [{ index: 'key' }, { index: 'id', unique: true }]);
-      global.db.engine.index(this.collection.viewers, [{ index: 'username' }]);
-    }
-
     this.addMenu({ category: 'manage', name: 'cooldown', id: 'manage/cooldowns/list' });
   }
 

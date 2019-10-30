@@ -6,7 +6,6 @@ import Expects from '../expects';
 import { permission } from '../permissions';
 import System from './_interface';
 import uuid from 'uuid/v4';
-import { isMainThread } from '../cluster';
 import { publicEndpoint } from '../helpers/socket';
 
 export interface QuoteInterface {
@@ -16,10 +15,6 @@ export interface QuoteInterface {
 class Quotes extends System {
   constructor () {
     super();
-
-    if(isMainThread) {
-      global.db.engine.index(this.collection.data, [{ index: 'id', unique: true }]);
-    }
 
     this.addMenu({ category: 'manage', name: 'quotes', id: 'manage/quotes/list' });
   }

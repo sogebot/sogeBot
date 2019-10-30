@@ -83,9 +83,6 @@ class Events extends Core {
     if (isMainThread) {
       this.addMenu({ category: 'manage', name: 'event-listeners', id: 'manage/events/list' });
       this.fadeOut();
-      global.db.engine.index('events', [{ index: 'id', unique: true }]);
-      global.db.engine.index('events.operations', [{ index: 'eventId' }]);
-      global.db.engine.index('events.filters', [{ index: 'eventId' }]);
     }
   }
 

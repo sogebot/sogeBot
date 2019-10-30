@@ -1,5 +1,3 @@
-import { isMainThread } from '../cluster';
-
 import { sendMessage } from '../commons';
 import { command, settings, ui } from '../decorators';
 import Game from './_interface';
@@ -21,13 +19,6 @@ class WheelOfFortune extends Game {
     title: string;
     responses: string[];
   }[] = [];
-
-  constructor() {
-    super();
-    if(isMainThread) {
-      global.db.engine.index(this.collection.data, [{ index: 'key', unique: true }]);
-    }
-  }
 
   sockets () {
     publicEndpoint(this.nsp, 'win', async (index, username) => {

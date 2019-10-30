@@ -21,9 +21,6 @@ let app;
 let server;
 
 function Panel () {
-  global.db.engine.index('dashboards', [{ index: 'id', unique: true }]);
-  global.db.engine.index('widgets', [{ index: 'dashboardId' }]);
-
   // setup static server
   app = express()
   app.use(bodyParser.json())

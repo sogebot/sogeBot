@@ -111,7 +111,6 @@ class Module {
 
     // prepare proxies for variables
     this._sockets();
-    this._indexDbs();
     setTimeout(() => {
       this.loadVariableValue('enabled').then((value) => {
         const onStartup = () => {
@@ -184,18 +183,6 @@ class Module {
     }
     opts.isHelper = opts.isHelper || false;
     return opts;
-  }
-
-  public async _indexDbs() {
-    if (isMainThread) {
-      clearTimeout(this.timeouts[`${this.constructor.name}._indexDbs`]);
-      if (!global.db.engine.connected) {
-        this.timeouts[`${this.constructor.name}._indexDbs`] = setTimeout(() => this._indexDbs(), 1000);
-      } else {
-        // add indexing to settings
-        global.db.engine.index(this.collection.settings, [{ index: 'key' }, { index: 'system' }]);
-      }
-    }
   }
 
   public _sockets() {

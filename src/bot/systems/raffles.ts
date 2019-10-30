@@ -40,7 +40,6 @@ class Raffles extends System {
 
     if (isMainThread) {
       this.announce();
-      global.db.engine.index(this.collection.participants, [{ index: 'raffle_id' }, { index: 'username' }]);
     }
   }
 

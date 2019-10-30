@@ -89,16 +89,6 @@ class Moderation extends System {
   @settings('warnings')
   cWarningsShouldClearChat = true;
 
-  constructor () {
-    super();
-
-    if(isMainThread) {
-      global.db.engine.index(this.collection.messagecooldown, [{ index: 'key', unique: true }]);
-      global.db.engine.index(this.collection.permits, [{ index: 'username' }]);
-      global.db.engine.index(this.collection.warnings, [{ index: 'username' }]);
-    }
-  }
-
   sockets () {
     adminEndpoint(this.nsp, 'lists.get', async (cb) => {
       cb(null, {

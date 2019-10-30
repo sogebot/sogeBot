@@ -32,8 +32,6 @@ class Queue extends System {
     super();
 
     if(isMainThread) {
-      global.db.engine.index(this.collection.data, [{ index: 'username' }]);
-      global.db.engine.index(this.collection.picked, [{ index: 'username' }]);
     }
 
     this.addWidget('queue', 'widget-title-queue', 'fas fa-users');
