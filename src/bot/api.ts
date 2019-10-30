@@ -270,7 +270,7 @@ class API extends Core {
         this.calls.bot.refresh = e.response.headers['ratelimit-reset'];
       }
       if (global.panel && global.panel.io) {
-        global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'getUsernameFromTwitch', api: 'helix', endpoint: url, code: e.response.status, data: e.stack, remaining: this.calls.bot.remaining });
+        global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'getUsernameFromTwitch', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot.remaining });
       }
     }
     return null;
@@ -328,7 +328,7 @@ class API extends Core {
         this.calls.bot.remaining = 0;
         this.calls.bot.refresh = e.response.headers['ratelimit-reset'];
         if (global.panel && global.panel.io) {
-          global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'getIdFromTwitch', api: 'helix', endpoint: url, code: e.response.status, data: e.stack, remaining: this.calls.bot.remaining });
+          global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'getIdFromTwitch', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot.remaining });
         }
       } else {
         if (global.panel && global.panel.io) {
@@ -421,7 +421,7 @@ class API extends Core {
     } catch (e) {
       error(`${url} - ${e.message}`);
       if (global.panel && global.panel.io) {
-        global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'getChannelSubscribers', api: 'helix', endpoint: url, code: e.response.status || 200, data: e.stack, remaining: this.calls.bot.remaining });
+        global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'getChannelSubscribers', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot.remaining });
       }
     }
     delete opts.count;
@@ -503,7 +503,7 @@ class API extends Core {
       } else {
         error(`${url} - ${e.stack}`);
         if (global.panel && global.panel.io) {
-          global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'getChannelSubscribers', api: 'helix', endpoint: url, code: e.response.status, data: e.stack, remaining: this.calls.bot.remaining });
+          global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'getChannelSubscribers', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot.remaining });
         }
       }
     }
@@ -613,7 +613,7 @@ class API extends Core {
     } catch (e) {
       error(`${url} - ${e.message}`);
       if (global.panel && global.panel.io) {
-        global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'getChannelDataOldAPI', api: 'kraken', endpoint: url, code: e.response.status, data: e.stack });
+        global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'getChannelDataOldAPI', api: 'kraken', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack });
       }
       return { state: false, opts };
     }
@@ -644,7 +644,7 @@ class API extends Core {
     } catch (e) {
       error(`${url} - ${e.message}`);
       if (global.panel && global.panel.io) {
-        global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'getChannelHosts', api: 'tmi', endpoint: url, code: e.response.status, data: e.stack });
+        global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'getChannelHosts', api: 'tmi', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack });
       }
       return { state: e.response.status === 500 };
     }
@@ -691,7 +691,7 @@ class API extends Core {
 
       error(`${url} - ${e.message}`);
       if (global.panel && global.panel.io) {
-        global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'updateChannelViewsAndBroadcasterType', api: 'helix', endpoint: url, code: e.response.status, data: e.stack, remaining: this.calls.bot.remaining });
+        global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'updateChannelViewsAndBroadcasterType', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot.remaining });
       }
     }
     return { state: true };
@@ -785,7 +785,7 @@ class API extends Core {
       quiet = e.errno !== 'ECONNREFUSED' && e.errno !== 'ETIMEDOUT';
       error(`${url} - ${e.message}`);
       if (global.panel && global.panel.io) {
-        global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'getLatest100Followers', api: 'helix', endpoint: url, code: e.response.status, data: e.stack, remaining: this.calls.bot.remaining });
+        global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'getLatest100Followers', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot.remaining });
       }
       return { state: false, opts: quiet };
     }
@@ -843,7 +843,7 @@ class API extends Core {
       error(`API: ${url} - ${e.stack}`);
       if (isMainThread) {
         if (global.panel && global.panel.io) {
-          global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'getGameFromId', api: 'helix', endpoint: url, code: e.response.status, data: e.stack, remaining: this.calls.bot.remaining });
+          global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'getGameFromId', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot.remaining });
         }
       }
       return this.stats.currentGame;
@@ -892,7 +892,7 @@ class API extends Core {
     } catch (e) {
       error(`${url} - ${e.message}`);
       if (global.panel && global.panel.io) {
-        global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'getCurrentStreamTags', api: 'getCurrentStreamTags', endpoint: url, code: e.response.status, data: e.stack, remaining: this.calls.bot.remaining });
+        global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'getCurrentStreamTags', api: 'getCurrentStreamTags', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot.remaining });
       }
       return { state: false, opts };
     }
@@ -1076,7 +1076,7 @@ class API extends Core {
 
       error(`${url} - ${e.message}`);
       if (global.panel && global.panel.io) {
-        global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'getCurrentStreamData', api: 'helix', endpoint: url, code: e.response.status, data: e.stack, remaining: this.calls.bot.remaining });
+        global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'getCurrentStreamData', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot.remaining });
       }
       return { state: false, opts };
     }
@@ -1244,7 +1244,7 @@ class API extends Core {
     } catch (e) {
       error(`API: ${url} - ${e.message}`);
       if (global.panel && global.panel.io) {
-        global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'setTitleAndGame', api: 'kraken', endpoint: url, code: e.response.status, data: e.stack });
+        global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'setTitleAndGame', api: 'kraken', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack });
       }
       return false;
     }
@@ -1305,7 +1305,7 @@ class API extends Core {
     } catch (e) {
       error(`API: ${url} - ${e.stack}`);
       if (global.panel && global.panel.io) {
-        global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'sendGameFromTwitch', api: 'kraken', endpoint: url, code: e.response.status, data: e.stack });
+        global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'sendGameFromTwitch', api: 'kraken', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack });
       }
       return;
     }
@@ -1380,7 +1380,7 @@ class API extends Core {
 
       error(`API: ${url} - ${e.stack}`);
       if (global.panel && global.panel.io) {
-        global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'checkClips', api: 'helix', endpoint: url, code: e.response.status, data: e.stack });
+        global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'checkClips', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack });
       }
     }
     return { state: true };
@@ -1449,7 +1449,7 @@ class API extends Core {
 
       error(`API: ${url} - ${e.stack}`);
       if (global.panel && global.panel.io) {
-        global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'createClip', api: 'helix', endpoint: url, code: e.response.status, data: e.stack });
+        global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'createClip', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack });
       }
       return;
     }
@@ -1496,7 +1496,7 @@ class API extends Core {
       if (logError) {
         error(`API: ${url} - ${e.stack}`);
         if (global.panel && global.panel.io) {
-          global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'fetchAccountAge', api: 'kraken', endpoint: url, code: e.response.status, data: e.stack });
+          global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'fetchAccountAge', api: 'kraken', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack });
         }
       }
       return;
@@ -1554,7 +1554,7 @@ class API extends Core {
 
       error(`API: ${url} - ${e.stack}`);
       if (global.panel && global.panel.io) {
-        global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'isFollowerUpdate', api: 'helix', endpoint: url, code: e.response.status, data: e.stack, remaining: this.calls.bot.remaining });
+        global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'isFollowerUpdate', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot.remaining });
       }
       return null;
     }
@@ -1642,7 +1642,7 @@ class API extends Core {
       }
       error(`API: Marker was not created - ${e.message}`);
       if (global.panel && global.panel.io) {
-        global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'createMarker', api: 'helix', endpoint: url, code: e.response.status, data: e.stack, remaining: this.calls.bot.remaining });
+        global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'createMarker', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot.remaining });
       }
     }
   }
@@ -1725,7 +1725,7 @@ class API extends Core {
     } catch (e) {
       error(`API: ${url} - ${e.stack}`);
       if (global.panel && global.panel.io) {
-        global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'getTopClips', api: 'helix', endpoint: url, code: e.response.status, data: e.stack });
+        global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'getTopClips', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack });
       }
     }
   }
