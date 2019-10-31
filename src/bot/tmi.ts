@@ -711,7 +711,7 @@ class TMI extends Core {
 
     const sender = data.message.tags;
     const message = data.message.message;
-    const skip = data.skip;
+    const skip = data.skip ?? false;
     const quiet = data.quiet;
 
     if (!sender.userId && sender.username) {
@@ -735,7 +735,7 @@ class TMI extends Core {
 
     const isModerated = await parse.isModerated();
     if (!isModerated && !isIgnored(sender)) {
-      if (!skip && isNil(sender.username)) {
+      if (!skip && !isNil(sender.username)) {
         const subCumulativeMonths = function(senderObj) {
           if (typeof senderObj.badgeInfo === 'string' && senderObj.badgeInfo.includes('subscriber')) {
             const match = senderObj.badgeInfo.match(/subscriber\/(\d+)/);
