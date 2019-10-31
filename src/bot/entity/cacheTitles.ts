@@ -1,4 +1,4 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class CacheTitles {
@@ -6,6 +6,7 @@ export class CacheTitles {
   id!: number;
 
   @Column()
+  @Index()
   game!: string;
 
   @Column()

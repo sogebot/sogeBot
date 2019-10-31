@@ -92,7 +92,7 @@ export default class CreditsOverlay extends Vue {
           index: Math.random()
         },
         {
-          image: 'https://static-cdn.jtvnw.net/ttv-boxart/' + encodeURIComponent(opts.game.value) + '-600x840.jpg',
+          image: 'https://static-cdn.jtvnw.net/ttv-boxart/' + encodeURIComponent(opts.game) + '-600x840.jpg',
           type: 'image',
           class: 'image',
           index: Math.random()
@@ -102,7 +102,9 @@ export default class CreditsOverlay extends Vue {
       let currentKey = ''
       let page: any = []
       let withoutPadding = true
-      for (let [key, object] of Object.entries(groupBy(opts.events, 'event'))) {
+      for (let [key, object] of Object.entries(groupBy(opts.events.map(o => {
+        return { ...o, values: JSON.parse(o.values_json) }
+      }), 'event'))) {
         if (!opts.settings.show[key]) continue
         if (key !== currentKey) {
           currentKey = key
@@ -118,13 +120,13 @@ export default class CreditsOverlay extends Vue {
         for (let [username, o] of groupByUsername) {
           let html = username
           if (key === 'cheer') {
-            html = `<strong style="font-size:65%">${o.reduce((a, b) => ({ bits: Number(a.bits) + Number(b.bits) })).bits} bits</strong> <br> ${username}`
+            html = `<strong style="font-size:65%">${o.reduce((a, b) => ({ bits: Number(a.bits) + Number(b.values.bits) })).bits} bits</strong> <br> ${username}`
           } else if (['raid', 'host'].includes(key)) {
-            html = `<strong style="font-size:65%">${o.reduce((a, b) => ({ viewers: Number(a.viewers) + Number(b.viewers) })).viewers} viewers</strong> <br> ${username}`
+            html = `<strong style="font-size:65%">${o.reduce((a, b) => ({ viewers: Number(a.viewers) + Number(b.values.viewers) })).viewers} viewers</strong> <br> ${username}`
           } else if (['resub'].includes(key)) {
-            html = `<strong style="font-size:65%">${o[0].months} months</strong> <br> ${username}`
+            html = `<strong style="font-size:65%">${o[0].values.months} months</strong> <br> ${username}`
           } else if (['tip'].includes(key)) {
-            html = `<strong style="font-size:65%">${Number(o.reduce((a, b) => ({ amount: Number(a.amount) + Number(b.amount) })).amount).toFixed(2)} ${o[0].currency}</strong> <br> ${username}`
+            html = `<strong style="font-size:65%">${Number(o.reduce((a, b) => ({ amount: Number(a.amount) + Number(b.values.amount) })).amount).toFixed(2)} ${o[0].currency}</strong> <br> ${username}`
           }
           page.push({
             text: html,

@@ -37,27 +37,43 @@ class Message {
     const version = _.get(process, 'env.npm_package_version', 'x.y.z');
     this.message = this.message.replace(/\$version/g, version.replace('SNAPSHOT', gitCommitInfo().shortHash || 'SNAPSHOT'));
 
-    let events = _.orderBy(await global.db.engine.find('widgetsEventList'), 'timestamp', 'desc');
-    // latestFollower
-    let latestFollower = _.find(events, (o) => o.event === 'follow');
+    const latestFollower = await getManager().createQueryBuilder()
+      .select('events').from(EventList, 'events')
+      .orderBy('events.timestamp', 'DESC')
+      .where('events.event >= :event', { event: 'follow' })
+      .getOne();
     this.message = this.message.replace(/\$latestFollower/g, !_.isNil(latestFollower) ? latestFollower.username : 'n/a');
 
     // latestSubscriber
-    let latestSubscriber = _.find(events, (o) => ['sub', 'resub', 'subgift'].includes(o.event));
+    const latestSubscriber = await getManager().createQueryBuilder()
+      .select('events').from(EventList, 'events')
+      .orderBy('events.timestamp', 'DESC')
+      .where('events.event >= :event', { event: 'sub' })
+      .orWhere('events.event >= :event', { event: 'resub' })
+      .orWhere('events.event >= :event', { event: 'subgift' })
+      .getOne();
     this.message = this.message.replace(/\$latestSubscriber/g, !_.isNil(latestSubscriber) ? latestSubscriber.username : 'n/a');
 
     // latestTip, latestTipAmount, latestTipCurrency, latestTipMessage
-    let latestTip = _.find(events, (o) => o.event === 'tip');
-    this.message = this.message.replace(/\$latestTipAmount/g, !_.isNil(latestTip) ? parseFloat(latestTip.amount).toFixed(2) : 'n/a');
-    this.message = this.message.replace(/\$latestTipCurrency/g, !_.isNil(latestTip) ? latestTip.currency : 'n/a');
-    this.message = this.message.replace(/\$latestTipMessage/g, !_.isNil(latestTip) ? latestTip.message : 'n/a');
-    this.message = this.message.replace(/\$latestTip/g, !_.isNil(latestTip) ? latestTip.username : 'n/a');
+    const latestTip = await getManager().createQueryBuilder()
+      .select('events').from(EventList, 'events')
+      .orderBy('events.timestamp', 'DESC')
+      .where('events.event >= :event', { event: 'tip' })
+      .getOne();
+    this.message = this.message.replace(/\$latestTipAmount/g, !_.isNil(latestTip) ? parseFloat(JSON.parse(latestTip.values_json).amount).toFixed(2) : 'n/a');
+    this.message = this.message.replace(/\$latestTipCurrency/g, !_.isNil(latestTip) ? JSON.parse(latestTip.values_json).currency : 'n/a');
+    this.message = this.message.replace(/\$latestTipMessage/g, !_.isNil(latestTip) ? JSON.parse(latestTip.values_json).message : 'n/a');
+    this.message = this.message.replace(/\$latestTip/g, !_.isNil(latestTip) ? JSON.parse(latestTip.values_json).username : 'n/a');
 
     // latestCheer, latestCheerAmount, latestCheerCurrency, latestCheerMessage
-    let latestCheer = _.find(events, (o) => o.event === 'cheer');
-    this.message = this.message.replace(/\$latestCheerAmount/g, !_.isNil(latestCheer) ? parseInt(latestCheer.amount, 10) : 'n/a');
-    this.message = this.message.replace(/\$latestCheerMessage/g, !_.isNil(latestCheer) ? latestCheer.message : 'n/a');
-    this.message = this.message.replace(/\$latestCheer/g, !_.isNil(latestCheer) ? latestCheer.username : 'n/a');
+    const latestCheer = await getManager().createQueryBuilder()
+      .select('events').from(EventList, 'events')
+      .orderBy('events.timestamp', 'DESC')
+      .where('events.event >= :event', { event: 'cheer' })
+      .getOne();
+    this.message = this.message.replace(/\$latestCheerAmount/g, !_.isNil(latestCheer) ? parseInt(JSON.parse(latestCheer.values_json).amount, 10) : 'n/a');
+    this.message = this.message.replace(/\$latestCheerMessage/g, !_.isNil(latestCheer) ? JSON.parse(latestCheer.values_json).message : 'n/a');
+    this.message = this.message.replace(/\$latestCheer/g, !_.isNil(latestCheer) ? JSON.parse(latestCheer.values_json).username : 'n/a');
 
     const spotifySong = JSON.parse(global.integrations.spotify.currentSong);
     if (!_.isNil(global.integrations) && !_.isEmpty(spotifySong) && spotifySong.is_playing && spotifySong.is_enabled) {
@@ -269,11 +285,17 @@ class Message {
           return '';
         }
 
-        let tips = (await global.db.engine.find('widgetsEventList', { event: 'tip' })).sort((a, b) => {
-          const aTip = global.currency.exchange(a.amount, a.currency, global.currency.mainCurrency);
-          const bTip = global.currency.exchange(b.amount, b.currency, global.currency.mainCurrency);
-          return bTip - aTip;
-        }, 0);
+        let tips = (await getManager().createQueryBuilder()
+          .select('events').from(EventList, 'events')
+          .orderBy('events.timestamp', 'DESC')
+          .where('events.event >= :event', { event: 'tip' })
+          .getMany())
+
+          .sort((a, b) => {
+            const aTip = global.currency.exchange(a.amount, a.currency, global.currency.mainCurrency);
+            const bTip = global.currency.exchange(b.amount, b.currency, global.currency.mainCurrency);
+            return bTip - aTip;
+          }, 0);
 
         if (match.groups.type === 'stream') {
           const whenOnline = global.api.isStreamOnline ? global.api.streamStatusChangeSince : null;

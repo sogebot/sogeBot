@@ -1,4 +1,5 @@
 {
   "type": "sqlite",
-  "database": "./sogebot.db"
+  "database": "./sogebot.db",
+  "logging": ["error"]
 }

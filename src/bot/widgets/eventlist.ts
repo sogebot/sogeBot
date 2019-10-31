@@ -1,6 +1,7 @@
 import { settings } from '../decorators';
 import Widget from './_interface';
 import { adminEndpoint } from '../helpers/socket';
+import { getManager } from 'typeorm';
 
 class EventList extends Widget {
   @settings()
@@ -39,18 +40,22 @@ class EventList extends Widget {
     });
 
     adminEndpoint(this.nsp, 'cleanup', () => {
-      global.db.engine.remove('widgetsEventList', {});
+      getManager().createQueryBuilder()
+        .delete()
+        .from(EventList)
+        .execute();
     });
   }
 
   public async update() {
     try {
-      const limit = this.widgetEventlistShow;
-      const events = await global.db.engine.find('widgetsEventList', {
-        _sort: 'timestamp',
-        _total: limit,
-      });
-      this.emit('update', events);
+      this.emit('update',
+        await getManager().createQueryBuilder()
+          .select('events').from(EventList, 'events')
+          .orderBy('events.timestamp', 'DESC')
+          .limit(this.widgetEventlistShow)
+          .getMany()
+      );
     } catch (e) {
       this.emit('update', []);
     }

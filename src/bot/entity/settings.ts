@@ -1,4 +1,4 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class Settings {
@@ -6,9 +6,11 @@ export class Settings {
   id!: number;
 
   @Column()
+  @Index()
   namespace!: string;
 
   @Column()
+  @Index()
   key!: string;
 
   @Column()

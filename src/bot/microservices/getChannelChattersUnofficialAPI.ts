@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { flatMap, includes } from 'lodash';
+import { chunk, flatMap, includes } from 'lodash';
 import config from '@config';
 import { isMainThread, parentPort, Worker } from 'worker_threads';
 
@@ -115,16 +115,18 @@ export const getChannelChattersUnofficialAPI = async (): Promise<{ modStatus: bo
 
     // insert joined online users
     if (joinedUsers.length > 0) {
-      await getManager()
-        .createQueryBuilder()
-        .insert()
-        .into(UsersOnline)
-        .values(
-          joinedUsers.map(o => {
-            return { username: o };
-          }),
-        )
-        .execute();
+      for (const _chunk of chunk(joinedUsers, 200)) {
+        await getManager()
+          .createQueryBuilder()
+          .insert()
+          .into(UsersOnline)
+          .values(
+            _chunk.map(o => {
+              return { username: o };
+            }),
+          )
+          .execute();
+      }
     }
 
     if (!isMainThread) {

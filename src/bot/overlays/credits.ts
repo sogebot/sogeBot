@@ -3,6 +3,8 @@ import _ from 'lodash';
 import Overlay from './_interface';
 import { settings, ui } from '../decorators';
 import { publicEndpoint } from '../helpers/socket';
+import { getManager } from 'typeorm';
+import { EventList } from '../entity/eventList';
 
 class Credits extends Overlay {
   @settings('credits')
@@ -96,16 +98,24 @@ class Credits extends Overlay {
     publicEndpoint(this.nsp, 'load', async (cb) => {
       const when = global.api.isStreamOnline ? global.api.streamStatusChangeSince : _.now() - 5000000000;
       const timestamp = new Date(when).getTime();
-      let events = await global.db.engine.find('widgetsEventList');
+      const events: (EventList & { values?: {
+        currency: string; amount: number;
+      };})[] = await getManager().createQueryBuilder()
+        .select('events').from(EventList, 'events')
+        .orderBy('events.timestamp', 'DESC')
+        .where('events.timestamp >= :timestamp', { timestamp })
+        .getMany();
 
       // change tips if neccessary for aggregated events (need same currency)
-      events = events.filter((o) => o.timestamp >= timestamp);
       for (const event of events) {
-        if (!_.isNil(event.amount) && !_.isNil(event.currency)) {
-          event.amount = this.cCreditsAggregated
-            ? global.currency.exchange(event.amount, event.currency, global.currency.mainCurrency)
-            : event.amount;
-          event.currency = global.currency.symbol(this.cCreditsAggregated ? global.currency.mainCurrency : event.currency);
+        event.values = JSON.parse(event.values_json);
+        if (event.values) {
+          if (!_.isNil(event.values.amount) && !_.isNil(event.values.currency)) {
+            event.values.amount = this.cCreditsAggregated
+              ? global.currency.exchange(event.values.amount, event.values.currency, global.currency.mainCurrency)
+              : event.values.amount;
+            event.values.currency = global.currency.symbol(this.cCreditsAggregated ? global.currency.mainCurrency : event.values.currency);
+          }
         }
       }
 
@@ -147,7 +157,7 @@ class Credits extends Overlay {
         game: global.api.stats.currentGame,
         title: global.api.stats.currentTitle,
         clips: this.cShowClips ? await global.api.getTopClips({ period: this.cClipsPeriod, days: this.cClipsCustomPeriodInDays, first: this.cClipsNumOfClips }) : [],
-        events: events.filter((o) => o.timestamp >= timestamp),
+        events: events,
         customTexts: this.cCustomTextsValues,
         social: this.cSocialValues,
       });

@@ -2,7 +2,7 @@ import moment from 'moment-timezone';
 require('moment-precise-range-plugin');
 
 import { isMainThread } from './cluster';
-import { filter, intersection, isNil, orderBy, size } from 'lodash';
+import { filter, intersection, isNil, size } from 'lodash';
 
 import { getChannel, getTime, prepare, sendMessage } from './commons';
 import { command, default_permission, settings } from './decorators';
@@ -13,6 +13,10 @@ import Core from './_interface';
 import * as configFile from '@config';
 import { adminEndpoint } from './helpers/socket';
 import { getAllOnlineUsernames } from './users';
+
+import { getManager } from 'typeorm';
+import { EventList } from './entity/eventList';
+
 const config = configFile as any;
 config.timezone = config.timezone === 'system' || isNil(config.timezone) ? moment.tz.guess() : config.timezone;
 
@@ -52,14 +56,15 @@ class Twitch extends Core {
 
   @command('!followers')
   async followers (opts) {
-    let events = await global.db.engine.find('widgetsEventList');
+    const events = await getManager().createQueryBuilder()
+      .select('events').from(EventList, 'events')
+      .orderBy('events.timestamp', 'DESC')
+      .where('user.event = :event', { event: 'follow' })
+      .getMany();
     const onlineViewers = await getAllOnlineUsernames();
     const followers = (await global.db.engine.find('users', { is: { follower: true } })).map((o) => o.username);
 
     const onlineFollowers = intersection(onlineViewers, followers);
-    events = filter(orderBy(events, 'timestamp', 'desc'), (o) => {
-      return o.event === 'follow';
-    });
     moment.locale(global.general.lang);
 
     let lastFollowAgo = '';
@@ -80,14 +85,18 @@ class Twitch extends Core {
 
   @command('!subs')
   async subs (opts) {
-    let events = await global.db.engine.find('widgetsEventList');
+    const events = await getManager().createQueryBuilder()
+      .select('events').from(EventList, 'events')
+      .orderBy('events.timestamp', 'DESC')
+      .where('user.event = :event', { event: 'sub' })
+      .orWhere('user.event = :event', { event: 'resub' })
+      .orWhere('user.event = :event', { event: 'subgift' })
+      .getMany();
+
     const onlineViewers = await getAllOnlineUsernames();
     const subscribers = (await global.db.engine.find('users', { is: { subscriber: true } })).map((o) => o.username);
 
     const onlineSubscribers = intersection(onlineViewers, subscribers);
-    events = filter(orderBy(events, 'timestamp', 'desc'), (o) => {
-      return o.event === 'sub' || o.event === 'resub' || o.event === 'subgift';
-    });
     moment.locale(global.general.lang);
 
     let lastSubAgo = '';

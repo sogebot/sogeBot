@@ -6,6 +6,9 @@ import { isBot } from '../commons';
 import { ui } from '../decorators';
 import { publicEndpoint } from '../helpers/socket';
 
+import { Brackets, getManager } from 'typeorm';
+import { EventList as EventListEntity } from '../entity/eventList';
+
 class EventList extends Overlay {
   @ui({
     type: 'link',
@@ -17,15 +20,25 @@ class EventList extends Overlay {
   linkBtn = null;
 
   sockets () {
-    publicEndpoint(this.nsp, 'get', () => this.sendDataToOverlay());
-  }
-
-  async sendDataToOverlay () {
-    let events = await global.db.engine.find('widgetsEventList');
-    events = _.uniqBy(_.orderBy(events, 'timestamp', 'desc'), o =>
-      (o.username + (o.event === 'cheer' ? crypto.randomBytes(64).toString('hex') : o.event))
-    );
-    this.emit('events', _.chunk(events, 20)[0]);
+    publicEndpoint(this.nsp, 'getEvents', async (opts: { ignore: string; limit: number }, cb) => {
+      let events = await getManager().createQueryBuilder()
+        .select('events').from(EventListEntity, 'events')
+        .orderBy('events.timestamp', 'DESC')
+        .where(new Brackets(qb => {
+          const ignored = opts.ignore.split(',').map(value => value.trim());
+          for (let i = 0; i < ignored.length; i++) {
+            qb.andWhere(`events.event != :event_${i}`, { ['event_' + i]: ignored[i] });
+          }
+        }))
+        .limit(opts.limit)
+        .getMany();
+      if (events) {
+        events = _.uniqBy(events, o =>
+          (o.username + (o.event === 'cheer' ? crypto.randomBytes(64).toString('hex') : o.event))
+        );
+      }
+      cb(events);
+    })
   }
 
   async add (data: EventList.Event) {
@@ -33,13 +46,24 @@ class EventList extends Overlay {
       return;
     } // don't save event from a bot
 
-    const newEvent = {
-      event: data.type,
-      timestamp: _.now(),
-      ...data,
-    };
-    await global.db.engine.insert('widgetsEventList', newEvent);
-    global.overlays.eventlist.sendDataToOverlay();
+    await getManager().createQueryBuilder()
+      .insert().into(EventListEntity)
+      .values({
+        event: data.type,
+        username: data.username,
+        timestamp: Date.now(),
+        values_json: JSON.stringify(
+          Object.keys(data)
+            .filter(key => !['event', 'username', 'timestamp'].includes(key))
+            .reduce((obj, key) => {
+              return {
+                ...obj,
+                [key]: data[key],
+              };
+            }, {}),
+        ),
+      })
+      .execute();
     global.widgets.eventlist.update();
   }
 }

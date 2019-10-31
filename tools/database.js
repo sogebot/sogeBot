@@ -9,6 +9,9 @@ const availableDbs = ['nedb', 'mongodb'];
 const { createConnection, getConnectionOptions, getManager } = require('typeorm');
 const { CacheTitles } = require('../dest/entity/cacheTitles');
 const { Settings } = require('../dest/entity/settings');
+const { EventList } = require('../dest/entity/eventList');
+
+const _ = require('lodash');
 
 const argv = require('yargs')
   .usage('Usage: $0 --from <database> --to <database> --mongoUri <connectionUri>')
@@ -91,6 +94,36 @@ async function main() {
         ])
         .execute();
     }
+  }
+
+
+  console.log(`Migr: widgetsEventList`);
+  await getManager().createQueryBuilder().delete().from(EventList).execute();
+  const items = (await from.engine.find('widgetsEventList')).map(o => {
+    delete o._id;
+    return {
+      event: o.event,
+      username: o.username,
+      timestamp: Number(o.timestamp),
+      values_json: JSON.stringify(
+        Object.keys(o)
+          .filter(key => !['event', 'username', 'timestamp'].includes(key))
+          .reduce((obj, key) => {
+            return {
+              ...obj,
+              [key]: o[key],
+            };
+          }, {}),
+      ),
+    };
+  });
+  for (const chunk of _.chunk(items, 200)) {
+    await getManager()
+      .createQueryBuilder()
+      .insert()
+      .into(EventList)
+      .values(chunk)
+      .execute();
   }
 
   console.log('Info: Completed');

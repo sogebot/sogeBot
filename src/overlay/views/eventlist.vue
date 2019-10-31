@@ -14,7 +14,7 @@
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
 import { getSocket } from 'src/panel/helpers/socket';
-import { chunk, orderBy, filter, includes } from 'lodash-es';
+import { orderBy } from 'lodash-es';
 
 @Component({})
 export default class ClipsOverlay extends Vue {
@@ -24,29 +24,28 @@ export default class ClipsOverlay extends Vue {
     setTimeout(() => this.refresh(), 1000);
   }
   refresh() {
-    console.log('refresh')
-    this.socket.emit('get')
-    this.socket.on('events', (data) => {
+    this.socket.emit('getEvents', {
+      ignore: this.urlParam('ignore') || '',
+      limit: Number(this.urlParam('count') || 5)
+    }, (data) => {
       console.log({data})
       var order = (this.urlParam('order') as "desc" | "asc") || 'desc'
       var display: string | string[] = this.urlParam('display') || 'username,event'; display = display.split(',')
-      var ignore: string | string[] = this.urlParam('ignore') || ''; ignore = ignore.split(',')
-      var count = Number(this.urlParam('count') || 5)
 
-      console.debug({order, display, ignore, count})
+      console.debug({order, display})
 
-      data = chunk(
-        orderBy(
-          // filter out ignored events
-          filter(data, (o) => !includes(ignore, o.event))
-          , 'timestamp', 'desc'), count)[0] // order by desc first to get chunk of data
       data = orderBy(data, 'timestamp', order) // re-order as set in order
-
       for (let event of data) {
-        if (event.event === 'resub') event.summary = event.subCumulativeMonths + 'x ' + this.translate('overlays-eventlist-resub')
-        else if (event.event === 'cheer') event.summary = event.bits + ' ' + this.translate('overlays-eventlist-cheer')
-        else if (event.event === 'tip') event.summary = event.currency + parseFloat(event.amount).toFixed(2)
-        else event.summary = this.translate('overlays-eventlist-' + event.event)
+        const values = JSON.parse(event.values_json);
+        if (event.event === 'resub') {
+          event.summary = values.subCumulativeMonths + 'x ' + this.translate('overlays-eventlist-resub')
+        } else if (event.event === 'cheer') {
+          event.summary = values.bits + ' ' + this.translate('overlays-eventlist-cheer')
+        } else if (event.event === 'tip') {
+          event.summary = values.currency + parseFloat(values.amount).toFixed(2)
+        } else {
+          event.summary = this.translate('overlays-eventlist-' + event.event)
+        }
       }
       this.events = data
     })
