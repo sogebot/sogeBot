@@ -38,7 +38,7 @@ class EventList extends Overlay {
         );
       }
       cb(events);
-    })
+    });
   }
 
   async add (data: EventList.Event) {

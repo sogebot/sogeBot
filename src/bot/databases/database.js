@@ -10,7 +10,6 @@ import { warning } from '../helpers/log';
 class Database {
   constructor (forceIndexes, forceRemoveIndexes, forceType, forceDb) {
     this.engine = null
-
     if (config.database.type === 'nedb') this.engine = new INeDB(forceIndexes, forceDb)
     else if (config.database.type === 'mongodb') this.engine = new IMongoDB(forceIndexes, forceRemoveIndexes, forceDb)
     else {

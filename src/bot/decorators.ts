@@ -44,10 +44,14 @@ export function ui(opts, category?: string) {
   return (target: object, key: string) => {
     let path = category ? `${category}.${key}` : key;
 
-    const register = (retries = 0) => {
+    const register = async (retries = 0) => {
       const isAvailableModule = type !== 'core' && typeof global[type] !== 'undefined' && typeof global[type][name] !== 'undefined';
       const isAvailableLibrary = type === 'core' && typeof global[name] !== 'undefined';
-      if (!isAvailableLibrary && !isAvailableModule) {
+      let isDbConnected = false;
+      try {
+        isDbConnected = (await getManager()).connection.isConnected;
+      } catch (e) {}
+      if ((!isAvailableLibrary && !isAvailableModule) || !isDbConnected) {
         return setTimeout(() => register(0), 1000);
       }
       try {
@@ -81,10 +85,14 @@ export function settings(category?: string, isReadOnly = false) {
       loadingInProgress.push(`${type}.${name}.${key}`);
     }
 
-    const registerSettings = () => {
+    const registerSettings = async () => {
       const isAvailableModule = type !== 'core' && typeof global[type] !== 'undefined' && typeof global[type][name] !== 'undefined';
       const isAvailableLibrary = type === 'core' && typeof global[name] !== 'undefined';
-      if (!isAvailableLibrary && !isAvailableModule) {
+      let isDbConnected = false;
+      try {
+        isDbConnected = (await getManager()).connection.isConnected;
+      } catch (e) {}
+      if ((!isAvailableLibrary && !isAvailableModule) || !isDbConnected) {
         return setTimeout(() => registerSettings(), 1000);
       }
       try {
@@ -129,10 +137,14 @@ export function permission_settings(category?: string) {
   return (target: object, key: string) => {
     loadingInProgress.push(`${type}.${name}.${key}`);
 
-    const register = () => {
+    const register = async () => {
       const isAvailableModule = type !== 'core' && typeof global[type] !== 'undefined' && typeof global[type][name] !== 'undefined';
       const isAvailableLibrary = type === 'core' && typeof global[name] !== 'undefined';
-      if (!isAvailableLibrary && !isAvailableModule) {
+      let isDbConnected = false;
+      try {
+        isDbConnected = (await getManager()).connection.isConnected;
+      } catch (e) {}
+      if ((!isAvailableLibrary && !isAvailableModule) || !isDbConnected) {
         return setTimeout(() => register(), 1000);
       }
       try {
@@ -176,10 +188,14 @@ export function shared(db = false) {
     if (db) {
       loadingInProgress.push(`${type}.${name}.${key}`);
     }
-    const register = () => {
+    const register = async () => {
       const isAvailableModule = type !== 'core' && typeof global[type] !== 'undefined' && typeof global[type][name] !== 'undefined';
       const isAvailableLibrary = type === 'core' && typeof global[name] !== 'undefined';
-      if (!isAvailableLibrary && !isAvailableModule) {
+      let isDbConnected = false;
+      try {
+        isDbConnected = (await getManager()).connection.isConnected;
+      } catch (e) {}
+      if ((!isAvailableLibrary && !isAvailableModule) || !isDbConnected) {
         return setTimeout(() => register(), 1000);
       }
       try {
@@ -259,7 +275,11 @@ export function rollback() {
 async function registerCommand(opts: string | Command, m) {
   const isAvailableModule = m.type !== 'core' && typeof global[m.type] !== 'undefined' && typeof global[m.type][m.name] !== 'undefined';
   const isAvailableLibrary = m.type === 'core' && typeof global[m.name] !== 'undefined';
-  if (!isAvailableLibrary && !isAvailableModule) {
+  let isDbConnected = false;
+  try {
+    isDbConnected = (await getManager()).connection.isConnected;
+  } catch (e) {}
+  if (((!isAvailableLibrary && !isAvailableModule) || !isDbConnected) || !isDbConnected) {
     return setTimeout(() => registerCommand(opts, m), 1000);
   }
   try {

@@ -96,7 +96,7 @@ class Credits extends Overlay {
 
   sockets () {
     publicEndpoint(this.nsp, 'load', async (cb) => {
-      const when = global.api.isStreamOnline ? global.api.streamStatusChangeSince : _.now() - 5000000000;
+      const when = global.api.isStreamOnline ? global.api.streamStatusChangeSince : _.now() - 50000000000;
       const timestamp = new Date(when).getTime();
       const events: (EventList & { values?: {
         currency: string; amount: number;
@@ -157,7 +157,7 @@ class Credits extends Overlay {
         game: global.api.stats.currentGame,
         title: global.api.stats.currentTitle,
         clips: this.cShowClips ? await global.api.getTopClips({ period: this.cClipsPeriod, days: this.cClipsCustomPeriodInDays, first: this.cClipsNumOfClips }) : [],
-        events: events,
+        events,
         customTexts: this.cCustomTextsValues,
         social: this.cSocialValues,
       });

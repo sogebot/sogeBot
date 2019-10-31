@@ -1,6 +1,5 @@
 'use strict';
 require('module-alias/register');
-global.migration = true;
 
 const fs = require('fs');
 
