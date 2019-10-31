@@ -294,7 +294,7 @@ class CustomCommands extends System {
           param: opts.param,
           cmd: opts.command,
         });
-      }, i * 300);
+      }, i * 750);
     }
   }
 
