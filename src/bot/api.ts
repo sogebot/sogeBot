@@ -134,13 +134,15 @@ class API extends Core {
       this.interval('checkClips', constants.MINUTE);
       this.interval('getAllStreamTags', constants.HOUR * 12);
 
-      // free thread_event
-      getManager()
-        .createQueryBuilder()
-        .delete()
-        .from(ThreadEvent)
-        .where('event = :event', { event: 'getChannelChattersUnofficialAPI' })
-        .execute();
+      setTimeout(() => {
+        // free thread_event
+        getManager()
+          .createQueryBuilder()
+          .delete()
+          .from(ThreadEvent)
+          .where('event = :event', { event: 'getChannelChattersUnofficialAPI' })
+          .execute();
+      }, 30000);
     } else {
       this.calls = {
         bot: {

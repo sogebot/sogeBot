@@ -601,8 +601,6 @@ const runIndexing = async(retry = false) => {
     }
   }
   try {
-    await global.db.engine.index('cache', [{ index: 'key', unique: true }]);
-    await global.db.engine.index('cache.titles', [{ index: 'game' }]);
     await global.db.engine.index('api.clips', [{ index: 'clipId', unique: true }]);
     await global.db.engine.index('core.api.tags', [{ index: 'tag_id', unique: true }]);
     await global.db.engine.index('core.api.currentTags', [{ index: 'tag_id', unique: true }]);
@@ -663,14 +661,6 @@ const runIndexing = async(retry = false) => {
     await global.db.engine.index('systems.queue', [{ index: 'username' }]);
     await global.db.engine.index('systems.queue.picked', [{ index: 'username' }]);
     await global.db.engine.index('systems.quotes', [{ index: 'id', unique: true }]);
-    await global.db.engine.index('customTranslations', [{ index: 'key', unique: true }]);
-    await global.db.engine.index('stats', [{ index: 'whenOnline' }]);
-    await global.db.engine.index('stats', [{ index: 'whenOnline' }]);
-    await global.db.engine.getClient().collection('users').createIndex('username')
-    await global.db.engine.getClient().collection('users').createIndex(
-      { id: 1 },
-      { partialFilterExpression: { id: { $exists: true } }, unique: true },
-    );
   } catch (e) {
     if (!retry) {
       await cleanUsersDuplicates();

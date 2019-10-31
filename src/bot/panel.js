@@ -11,7 +11,9 @@ const flatten = require('./helpers/flatten')
 const gitCommitInfo = require('git-commit-info');
 
 import { error, info } from './helpers/log';
+import { CacheTitles } from './entity/cacheTitles';
 import uuid from 'uuid'
+import { Brackets, getManager } from 'typeorm'
 
 const Parser = require('./parser')
 
@@ -117,53 +119,97 @@ function Panel () {
     })
     // twitch game and title change
     socket.on('getGameFromTwitch', function (game) { global.api.sendGameFromTwitch(global.api, socket, game) })
-    socket.on('getUserTwitchGames', async () => { socket.emit('sendUserTwitchGamesAndTitles', await global.db.engine.find('cache.titles')) })
-    socket.on('deleteUserTwitchGame', async (game) => {
-      let items = await global.db.engine.find('cache.titles', { game })
-      for (let item of items) {
-        await global.db.engine.remove('cache.titles', { _id: String(item._id) })
-      }
-      socket.emit('sendUserTwitchGamesAndTitles', await global.db.engine.find('cache.titles'))
+    socket.on('getUserTwitchGames', async () => {
+      const titles = await getManager()
+        .createQueryBuilder()
+        .select()
+        .from(CacheTitles, 'titles')
+        .execute();
+      socket.emit('sendUserTwitchGamesAndTitles', titles) ;
     })
+    socket.on('deleteUserTwitchGame', async (game) => {
+      await getManager()
+        .createQueryBuilder()
+        .delete()
+        .from(CacheTitles, 'titles')
+        .where('game = :game', { game })
+        .execute();
+      const titles = await getManager()
+        .createQueryBuilder()
+        .select()
+        .from(CacheTitles, 'titles')
+        .execute();
+      socket.emit('sendUserTwitchGamesAndTitles', titles);
+    });
     socket.on('cleanupGameAndTitle', async (data, cb) => {
       // remove empty titles
-      const emptyTitles = data.titles.filter(o => o.title.trim().length === 0);
-      for (const t of emptyTitles) {
-        await global.db.engine.remove('cache.titles', { _id: String(t._id) });
-      }
+      await getManager()
+        .createQueryBuilder()
+        .delete()
+        .from(CacheTitles, 'titles')
+        .where('title = :title', { title: '' })
+        .execute();
 
       // update titles
       const updateTitles = data.titles.filter(o => o.title.trim().length > 0);
       for (const t of updateTitles) {
         if (t.title === data.title && t.game === data.game) {
-          await global.db.engine.update('cache.titles', { _id: String(t._id) }, { title: t.title, timestamp: Date.now() });
+          await getManager()
+            .createQueryBuilder()
+            .update(CacheTitles)
+            .set({ timestamp: Date.now(), title: t.title })
+            .where('id = :id', { id: t.id })
+            .execute();
         } else {
-          await global.db.engine.update('cache.titles', { _id: String(t._id) }, { title: t.title });
+          await getManager()
+            .createQueryBuilder()
+            .update(CacheTitles)
+            .set({ title: t.title })
+            .where('id = :id', { id: t.id })
+            .execute();
         }
       }
 
       // remove removed titles
-      let allTitles = await global.db.engine.find('cache.titles');
+      let allTitles = await getManager()
+        .createQueryBuilder()
+        .select()
+        .from(CacheTitles, 'titles')
+        .execute();
       for (const t of allTitles) {
         const titles = updateTitles.filter(o => o.game === t.game && o.title === t.title);
         if (titles.length === 0) {
           if (t.game !== data.game || t.title !== data.title) { // don't remove current/new title
-            await global.db.engine.remove('cache.titles', { _id: String(t._id) });
+            await getManager()
+              .createQueryBuilder()
+              .delete()
+              .from(CacheTitles, 'titles')
+              .where('id = :id', { id: t.id })
+              .execute();
           }
         }
       }
 
       // remove duplicates
-      allTitles = await global.db.engine.find('cache.titles');
+      allTitles = await getManager()
+        .createQueryBuilder()
+        .select()
+        .from(CacheTitles, 'titles')
+        .execute();
       for (const t of allTitles) {
         const titles = allTitles.filter(o => o.game === t.game && o.title === t.title);
         if (titles.length > 1) {
           // remove title if we have more than one title
           allTitles = allTitles.filter(o => String(o._id) !== String(t._id));
-          await global.db.engine.remove('cache.titles', { _id: String(t._id) });
+          await getManager()
+            .createQueryBuilder()
+            .delete()
+            .from(CacheTitles, 'titles')
+            .where('id = :id', { id: t.id })
+            .execute();
         }
       }
-      cb(null, await global.db.engine.find('cache.titles'));
+      cb(null, allTitles);
     });
     socket.on('updateGameAndTitle', async (data, cb) => {
       const status = await global.api.setTitleAndGame(null, data)
@@ -173,12 +219,26 @@ function Panel () {
         cb(true)
       }
 
-      data.title = data.title.trim()
-      data.game = data.game.trim()
+      data.title = data.title.trim();
+      data.game = data.game.trim();
 
-      let item = await global.db.engine.findOne('cache.titles', { game: data.game, title: data.title.trim() })
-      if (_.isEmpty(item)) {
-        await global.db.engine.insert('cache.titles', { game: data.game, title: data.title, timestamp: Date.now() })
+      const item = await getManager()
+        .createQueryBuilder()
+        .select()
+        .from(CacheTitles, 'titles')
+        .where('game = :game', { game: data.game })
+        .andWhere('title = :title', { title: data.title })
+        .getOne();
+
+      if (!item) {
+        await getManager()
+          .createQueryBuilder()
+          .insert()
+          .into(CacheTitles)
+          .values([
+            { game: data.game, title: data.title, timestamp: Date.now() },
+          ])
+          .execute();
       }
 
       self.sendStreamData(self, global.panel.io) // force dashboard update
