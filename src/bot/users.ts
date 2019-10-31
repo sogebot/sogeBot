@@ -16,7 +16,7 @@ import { UsersOnline } from './entity/usersOnline';
 export const getAllOnlineUsernames = async () => {
   return (await getManager()
     .createQueryBuilder()
-    .select()
+    .select('user')
     .from(UsersOnline, 'user')
     .execute()).map(o => o.username);
 };

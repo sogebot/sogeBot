@@ -13,6 +13,7 @@ import {
 import { UsersOnline } from '../entity/usersOnline';
 import { ThreadEvent } from '../entity/threadEvent';
 import { getAllOnlineUsernames } from '../users';
+import { Settings } from '../entity/settings';
 
 export const getChannelChattersUnofficialAPI = async (): Promise<{ modStatus: boolean; partedUsers: string[]; joinedUsers: string[] }> => {
   if (!isMainThread) {
@@ -52,14 +53,20 @@ export const getChannelChattersUnofficialAPI = async (): Promise<{ modStatus: bo
       ])
       .execute();
 
-    const channel: string | undefined = (await global.db.engine.findOne('core.settings', {
-      key: 'generalChannel',
-      system: 'oauth',
-    })).value;
-    const bot: string | undefined = (await global.db.engine.findOne('core.settings', {
-      key: 'botUsername',
-      system: 'oauth',
-    })).value;
+    const channel = (await getManager()
+      .createQueryBuilder()
+      .select('settings')
+      .from(Settings, 'settings')
+      .where('key = :key', { key: 'generalChannel' })
+      .andWhere('namespace = :namespace', { namespace: '/core/oauth'})
+      .getOne())?.value;
+    const bot = (await getManager()
+      .createQueryBuilder()
+      .select('settings')
+      .from(Settings, 'settings')
+      .where('key = :key', { key: 'botUsername' })
+      .andWhere('namespace = :namespace', { namespace: '/core/oauth'})
+      .getOne())?.value;
 
     if (typeof channel === 'undefined') {
       throw Error('channel undefined');

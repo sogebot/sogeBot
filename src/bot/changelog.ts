@@ -5,6 +5,8 @@
 
 import uuid from 'uuid/v4';
 import { set } from 'lodash';
+import { getManager } from 'typeorm';
+import { Settings } from './entity/settings';
 
 let lastTimestamp = Date.now();
 const threadId = uuid();
@@ -30,11 +32,12 @@ export const changelog = async () => {
       }) as any;
     }
     const variableFromDb
-      = await global.db.engine.findOne(self.collection.settings,
-        { system: name.toLowerCase(), key: variable }
-      );
+     = await getManager().createQueryBuilder().select('settings').from(Settings, 'settings')
+       .where('namespace = :namespace', { namespace: self.nsp })
+       .andWhere('key = :key', { key: variable })
+       .getOne();
     if (variableFromDb) {
-      const value = variable.startsWith('__permission_based') ? JSON.stringify(variableFromDb.value) : variableFromDb.value;
+      const value = JSON.stringify(variableFromDb.value);
       set(global, change.namespace.replace('core.', ''), value);
     }
     lastTimestamp = change.timestamp;

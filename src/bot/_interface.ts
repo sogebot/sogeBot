@@ -10,6 +10,9 @@ import { permission } from './permissions';
 import { error, info, warning } from './helpers/log';
 import { adminEndpoint, publicEndpoint } from './helpers/socket';
 
+import { getManager } from 'typeorm';
+import { Settings } from './entity/settings';
+
 class Module {
   public dependsOn: string[] = [];
   public showInUI = true;
@@ -64,7 +67,13 @@ class Module {
   set enabled(value: boolean) {
     if (!_.isEqual(_.get(this, '_enabled', true), value)) {
       _.set(this, '_enabled', value);
-      global.db.engine.update(this.collection.settings, { system: this.constructor.name.toLowerCase(), key: 'enabled' }, { value });
+      getManager()
+        .createQueryBuilder()
+        .update(Settings)
+        .where('namespace = :namespace', { namespace: this.nsp })
+        .andWhere('key = :key', { key: 'enabled' })
+        .set({ value: JSON.stringify(value) })
+        .execute();
     }
   }
 
@@ -92,6 +101,7 @@ class Module {
     this._name = name;
     this._enabled = enabled;
 
+    //TODO: delete
     this.collection = new Proxy({}, {
       get: (t, n, r) => {
         if (_.isSymbol(n)) {
@@ -147,7 +157,13 @@ class Module {
   }
 
   public async loadVariableValue(key) {
-    const variable = await global.db.engine.findOne(this.collection.settings, { system: this.constructor.name.toLowerCase(), key });
+    const variable = await getManager()
+      .createQueryBuilder()
+      .select('settings')
+      .where('namespace=:namespace', { namespace: this.nsp })
+      .andWhere('key=:key', { key })
+      .from(Settings, 'settings')
+      .getOne();
 
     if (typeof this.on !== 'undefined' && typeof this.on.load !== 'undefined') {
       if (this.on.load[key]) {
@@ -162,8 +178,8 @@ class Module {
     }
 
     try {
-      if (typeof variable.value !== 'undefined') {
-        return key.startsWith('__permission_based') ? JSON.parse(variable.value) : variable.value;
+      if (typeof variable !== 'undefined') {
+        return JSON.parse(variable.value);
       } else {
         return undefined;
       }
@@ -802,11 +818,18 @@ class Module {
   }
 
   protected async loadCommand(command: string): Promise<void> {
-    const cmd = await global.db.engine.findOne(this.collection.settings, { system: this.constructor.name.toLowerCase(), key: 'commands.' + command });
-    if (cmd.value) {
+    const cmd = await getManager()
+      .createQueryBuilder()
+      .select('settings')
+      .where('namespace = :namespace', { namespace: this.nsp })
+      .andWhere('key = :key', { key: 'commands.' + command })
+      .from(Settings, 'settings')
+      .getOne();
+
+    if (cmd) {
       const c = this._commands.find((o) => o.name === command);
       if (c) {
-        c.command = cmd.value;
+        c.command = JSON.parse(cmd.value);
       }
     } else {
       const c = this._commands.find((o) => o.name === command);
@@ -824,11 +847,23 @@ class Module {
     if (c) {
       if (c.name === updated) {
         // default value
-        await global.db.engine.remove(this.collection.settings, { system: this.constructor.name.toLowerCase(), key: 'commands.' + command });
+        await getManager()
+          .createQueryBuilder()
+          .delete()
+          .where('namespace = :namespace', { namespace: this.nsp })
+          .andWhere('key = :key', { key: 'commands.' + command })
+          .from(Settings)
+          .execute();
         delete c.command;
       } else {
         c.command = updated;
-        await global.db.engine.update(this.collection.settings, { system: this.constructor.name.toLowerCase(), key: 'commands.' + command }, { value: updated });
+        await getManager()
+          .createQueryBuilder()
+          .update(Settings)
+          .where('namespace = :namespace', { namespace: this.nsp })
+          .andWhere('key = :key', { key: 'commands.' + command })
+          .set({ value: JSON.stringify(updated) })
+          .execute();
       }
     } else {
       warning(`Command ${command} cannot be updated to ${updated}`);

@@ -2,6 +2,8 @@ import { cloneDeep, get, isEqual, set } from 'lodash';
 import { isMainThread } from './cluster';
 import { error } from './helpers/log';
 import { change } from './changelog';
+import { getManager } from 'typeorm';
+import { Settings } from './entity/settings';
 
 const variables: {
   [x: string]: any;
@@ -41,7 +43,15 @@ export const VariableWatcher = {
         }
 
         if (isMainThread && self) {
-          await global.db.engine.update(self.collection.settings, { system: name.toLowerCase(), key: variable }, { value: variable.startsWith('__permission_based') ? JSON.stringify(value) : value });
+          await getManager()
+            .createQueryBuilder()
+            .update(Settings)
+            .where('key = :key', { key: variable })
+            .andWhere('namespace = :namespace', { namespace: self.nsp })
+            .set({
+              value: JSON.stringify(value),
+            })
+            .execute();
           change(`${type}.${name}.${variable}`);
           if (typeof self.on !== 'undefined'
             && typeof self.on.change !== 'undefined'

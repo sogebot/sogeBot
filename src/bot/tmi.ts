@@ -763,20 +763,20 @@ class TMI extends Core {
 
         // mark user as online
         const isUserOnline = (await getManager()
-        .createQueryBuilder()
-        .select()
-        .from(UsersOnline, 'user')
-        .where('user.username = :username', { username: sender.username })
-        .execute()).length > 0;
+          .createQueryBuilder()
+          .select('user')
+          .from(UsersOnline, 'user')
+          .where('user.username = :username', { username: sender.username })
+          .getMany()).length > 0;
         if (!isUserOnline) {
           await getManager()
-          .createQueryBuilder()
-          .insert()
-          .into(UsersOnline)
-          .values([
-            { username: sender.username },
-          ])
-          .execute();
+            .createQueryBuilder()
+            .insert()
+            .into(UsersOnline)
+            .values([
+              { username: sender.username },
+            ])
+            .execute();
         }
 
         if (get(sender, 'badges.subscriber', 0)) {

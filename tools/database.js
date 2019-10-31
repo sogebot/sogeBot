@@ -8,6 +8,7 @@ const availableDbs = ['nedb', 'mongodb'];
 
 const { createConnection, getConnectionOptions, getManager } = require('typeorm');
 const { CacheTitles } = require('../dest/entity/cacheTitles');
+const { Settings } = require('../dest/entity/settings');
 
 const argv = require('yargs')
   .usage('Usage: $0 --from <database> --to <database> --mongoUri <connectionUri>')
@@ -72,6 +73,24 @@ async function main() {
         { game: item.game, title: item.title, timestamp: Number(item.timestamp || 0) },
       ])
       .execute();
+  }
+
+  await getManager().createQueryBuilder().delete().from(Settings).execute();
+  for (const type of ['core', 'overlays', 'games', 'registries', 'integrations']) {
+    console.log(`Migr: ${type}.settings`);
+    for (const item of await from.engine.find(`${type}.settings`)) {
+      if (item.key.includes('.')) {
+        continue;
+      }
+      await getManager()
+        .createQueryBuilder()
+        .insert()
+        .into(Settings)
+        .values([
+          { namespace: `/${type}/${item.system}`, key: item.key, value: JSON.stringify(item.value) },
+        ])
+        .execute();
+    }
   }
 
   console.log('Info: Completed');

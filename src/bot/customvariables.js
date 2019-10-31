@@ -268,10 +268,10 @@ class CustomVariables {
 
         const isUserOnline = (await getManager()
           .createQueryBuilder()
-          .select()
+          .select('user')
           .from(UsersOnline, 'user')
           .where('user.username = :username', { username })
-          .execute()).length > 0;
+          .getMany()).length > 0;
 
         const userObj = {
           username,

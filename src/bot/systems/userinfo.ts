@@ -291,19 +291,19 @@ class UserInfo extends System {
 
       const isUserOnline = (await getManager()
         .createQueryBuilder()
-        .select()
+        .select('user')
         .from(UsersOnline, 'user')
         .where('user.username = :username', { username:opts.sender.username })
-        .execute()).length > 0;
+        .getMany()).length > 0;
       if (!isUserOnline) {
         await getManager()
-        .createQueryBuilder()
-        .insert()
-        .into(UsersOnline)
-        .values([
-          { username: opts.sender.username },
-        ])
-        .execute();
+          .createQueryBuilder()
+          .insert()
+          .into(UsersOnline)
+          .values([
+            { username: opts.sender.username },
+          ])
+          .execute();
       }
     }
   }

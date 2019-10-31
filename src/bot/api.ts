@@ -347,12 +347,12 @@ class API extends Core {
 
     const event = await getManager()
       .createQueryBuilder()
-      .select()
+      .select('thread')
       .from(ThreadEvent, 'thread')
-      .where('thread.event = :event', { event: 'getChannelChattersUnofficialAPI' })
-      .execute();
+      .where('event = :event', { event: 'getChannelChattersUnofficialAPI' })
+      .getOne();
 
-    if (event.length === 0) {
+    if (typeof event === 'undefined') {
       const { modStatus, partedUsers, joinedUsers } = await getChannelChattersUnofficialAPI();
 
       global.widgets.joinpart.send({ users: partedUsers, type: 'part' });

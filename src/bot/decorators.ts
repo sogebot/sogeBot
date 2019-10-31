@@ -3,6 +3,8 @@ import { parse, sep as separator } from 'path';
 import { VariableWatcher } from './watchers';
 import { debug, error } from './helpers/log';
 import { isMainThread } from './cluster';
+import { getManager } from 'typeorm';
+import { Settings } from './entity/settings';
 
 export let loadingInProgress: string[] = [];
 export const permissions: { [command: string]: string | null } = {};
@@ -186,9 +188,6 @@ export function shared(db = false) {
         VariableWatcher.add(`${type}.${name}.${key}`, defaultValue, false);
         if (db) {
           const loadVariableValue = () => {
-            if (!global.db.engine.connected) {
-              return setTimeout(() => loadVariableValue(), 1000);
-            }
             self.loadVariableValue(key).then((value) => {
               if (typeof value !== 'undefined') {
                 VariableWatcher.add(`${type}.${name}.${key}`, value, false); // rewrite value on var load
@@ -280,11 +279,24 @@ async function registerCommand(opts: string | Command, m) {
     self.settingsList.push({ category: 'commands', key: c.name });
 
     // load command from db
-    const dbc = await global.db.engine.findOne(self.collection.settings, { system: m.name, key: 'commands.' + c.name });
-    if (dbc.value) {
+    const dbc = await getManager()
+      .createQueryBuilder()
+      .select('settings')
+      .from(Settings, 'settings')
+      .where('namespace = :namespace', { namespace: self.nsp })
+      .andWhere('key = :key', { key: 'commands.' + c.name })
+      .getOne();
+    if (dbc) {
+      dbc.value = JSON.parse(dbc.value);
       if (c.name === dbc.value) {
         // remove if default value
-        await global.db.engine.remove(self.collection.settings, { system: m.name, key: 'commands.' + c.name });
+        await getManager()
+          .createQueryBuilder()
+          .delete()
+          .from(Settings)
+          .where('namespace = :namespace', { namespace: self.nsp })
+          .andWhere('key = :key', { key: 'commands.' + c.name })
+          .execute();
       }
       c.command = dbc.value;
     }

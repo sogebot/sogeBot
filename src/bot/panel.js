@@ -122,9 +122,9 @@ function Panel () {
     socket.on('getUserTwitchGames', async () => {
       const titles = await getManager()
         .createQueryBuilder()
-        .select()
+        .select('titles')
         .from(CacheTitles, 'titles')
-        .execute();
+        .getMany();
       socket.emit('sendUserTwitchGamesAndTitles', titles) ;
     })
     socket.on('deleteUserTwitchGame', async (game) => {
@@ -136,9 +136,9 @@ function Panel () {
         .execute();
       const titles = await getManager()
         .createQueryBuilder()
-        .select()
+        .select('titles')
         .from(CacheTitles, 'titles')
-        .execute();
+        .getMany();
       socket.emit('sendUserTwitchGamesAndTitles', titles);
     });
     socket.on('cleanupGameAndTitle', async (data, cb) => {
@@ -173,9 +173,9 @@ function Panel () {
       // remove removed titles
       let allTitles = await getManager()
         .createQueryBuilder()
-        .select()
+        .select('titles')
         .from(CacheTitles, 'titles')
-        .execute();
+        .getMany();
       for (const t of allTitles) {
         const titles = updateTitles.filter(o => o.game === t.game && o.title === t.title);
         if (titles.length === 0) {
@@ -193,9 +193,9 @@ function Panel () {
       // remove duplicates
       allTitles = await getManager()
         .createQueryBuilder()
-        .select()
+        .select('titles')
         .from(CacheTitles, 'titles')
-        .execute();
+        .getMany();
       for (const t of allTitles) {
         const titles = allTitles.filter(o => o.game === t.game && o.title === t.title);
         if (titles.length > 1) {
@@ -216,7 +216,7 @@ function Panel () {
       await global.api.setTags(null, data.tags);
 
       if (!status) { // twitch refused update
-        cb(true)
+        cb(true);
       }
 
       data.title = data.title.trim();
@@ -224,7 +224,7 @@ function Panel () {
 
       const item = await getManager()
         .createQueryBuilder()
-        .select()
+        .select('titles')
         .from(CacheTitles, 'titles')
         .where('game = :game', { game: data.game })
         .andWhere('title = :title', { title: data.title })
