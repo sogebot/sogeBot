@@ -117,6 +117,9 @@ class Interface {
   async drop (table) {
     throw Error('function drop() is not implemented in ' + this.constructor.name)
   }
+  async getClient (table) {
+    throw Error('function getClient() is not implemented in ' + this.constructor.name)
+  }
 }
 
 module.exports = Interface
