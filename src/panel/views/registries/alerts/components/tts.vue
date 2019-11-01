@@ -47,7 +47,7 @@
                 type="range"
                 min="0"
                 max="1"
-                step="0.1"
+                step="0.01"
               ></b-form-input>
               <b-input-group-text slot="append" class="pr-3 pl-3">
                 <div style="width: 3rem;">
