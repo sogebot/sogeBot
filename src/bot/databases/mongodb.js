@@ -56,6 +56,10 @@ class IMongoDB extends Interface {
     }
   }
 
+  getClient() {
+    return this.client.db(this.dbName);
+  }
+
   async connect () {
     this.client = await client.connect(this.mongoUri,
       {
@@ -65,27 +69,6 @@ class IMongoDB extends Interface {
         connectTimeoutMS: 60000,
         useUnifiedTopology: true,
       })
-
-    // create indexes
-    let db = await this.client.db(this.dbName)
-
-    if (this.createIndexes || this.forceRemoveIndexes) {
-      const collections = await db.listCollections().toArray()
-      for (let k of Object.keys(collections)) {
-        await db.collection(collections[k].name).dropIndexes()
-        await db.createCollection(collections[k].name)
-      }
-
-      if (this.createIndexes) {
-        await db.collection('users').createIndex('username')
-        await db.collection('users').createIndex(
-          { id: 1 },
-          { partialFilterExpression: { id: { $exists: true } }, unique: true }
-        )
-        await db.collection('customTranslations').createIndex('key')
-        await db.collection('stats').createIndex('whenOnline')
-      }
-    }
     this.connected = true
   }
 
