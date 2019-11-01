@@ -3,6 +3,8 @@ if (Number(process.versions.node.split('.')[0]) < 11) {
   process.exit(1)
 }
 
+import 'reflect-metadata';
+
 import { Permissions } from './permissions';
 import { Events } from './events';
 import { OAuth } from './oauth';

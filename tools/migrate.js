@@ -593,6 +593,7 @@ const runIndexing = async(retry = false) => {
   // indexing
   console.info(('-').repeat(56));
   console.log('Indexing dbs')
+
   if (config.database.type === 'mongodb') {
     const collections = await global.db.engine.getClient().listCollections().toArray();
     for (const k of Object.keys(collections)) {
@@ -637,7 +638,6 @@ const runIndexing = async(retry = false) => {
     await global.db.engine.index('systems.moderation.warnings', [{ index: 'username' }]);
     await global.db.engine.index('core.commands.count', [{ index: 'timestamp' }, { index: 'command' }]);
     await global.db.engine.index('games.wheeloffortune', [{ index: 'key', unique: true }]);
-    await global.db.engine.index('overlays.emotes.cache', { index: 'code' });
     await global.db.engine.index('systems.raffles.participants', [{ index: 'raffle_id' }, { index: 'username' }]);
     await global.db.engine.index('overlays.gallery', { index: 'id', unique: true });
     await global.db.engine.index('overlays.goals.groups', { index: 'uid', unique: true });

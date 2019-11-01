@@ -81,6 +81,8 @@ import VRuntimeTemplate from 'v-runtime-template';
 import { isEqual, get } from 'lodash-es';
 import urlRegex from 'url-regex';
 
+import { CacheEmotes } from 'src/bot/entity/cacheEmotes';
+
 require('../../../scss/letter-animations.css');
 require('animate.css');
 
@@ -105,6 +107,7 @@ let alerts: Registry.Alerts.EmitData[] = [];
 })
 export default class AlertsRegistryOverlays extends Vue {
   socket = getSocket('/registries/alerts', true);
+  socketEmotes = getSocket('/overlays/emotes', true);
   socketRV = getSocket('/integrations/responsivevoice', true);
   interval: number[] = [];
   loadedFonts: string[] = [];
@@ -124,7 +127,7 @@ export default class AlertsRegistryOverlays extends Vue {
   data: null | Registry.Alerts.Alert = null;
   defaultProfanityList: string[] = [];
   listHappyWords: string[] = [];
-  emotes: Overlay.Emotes.cache[] = [];
+  emotes: CacheEmotes[] = [];
 
   runningAlert: Registry.Alerts.EmitData & {
     animation: string;
@@ -222,7 +225,7 @@ export default class AlertsRegistryOverlays extends Vue {
   }
 
   mounted() {
-    console.log('mounted')
+    console.debug('mounted')
     this.checkResponsiveVoiceAPIKey();
     this.interval.push(window.setInterval(() => {
       if (this.runningAlert) {
@@ -538,7 +541,7 @@ export default class AlertsRegistryOverlays extends Vue {
 
               // load emotes
               await new Promise((done) => {
-                this.socket.emit('find', { collection: '_overlays.emotes.cache' }, (err, data) => {
+                this.socketEmotes.emit('getCache', (data) => {
                   this.emotes = data;
                   console.debug('= Emotes loaded')
                   done();
