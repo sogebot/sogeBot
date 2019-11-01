@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 /* global describe it before */
 
 
@@ -7,8 +8,11 @@ const db = require('../../general.js').db;
 const assert = require('chai').assert;
 const message = require('../../general.js').message;
 
+const { getManager } = require('typeorm');
+const { Quotes } = require('../../../dest/entity/quotes');
+
 // users
-const owner = { username: 'soge__' };
+const owner = { username: 'soge__', userId: 1 };
 
 const tests = [
   { sender: owner, parameters: '', shouldFail: true },
@@ -42,7 +46,11 @@ describe('Quotes - add()', () => {
           await message.isSent('systems.quotes.add.error', owner, { command: '!quote add' });
         });
         it('Database should be empty', async () => {
-          const items = await global.db.engine.find('systems.quotes');
+          const items = await getManager()
+            .createQueryBuilder()
+            .select('quotes')
+            .from(Quotes, 'quotes')
+            .getMany();
           assert.isEmpty(items);
         });
       } else {
@@ -50,7 +58,11 @@ describe('Quotes - add()', () => {
           await message.isSent('systems.quotes.add.ok', owner, { tags: test.tags, quote: test.quote, id });
         });
         it('Database should contain new quote', async () => {
-          const items = await global.db.engine.find('systems.quotes');
+          const items = await getManager()
+            .createQueryBuilder()
+            .select('quotes')
+            .from(Quotes, 'quotes')
+            .getMany();
           assert.isNotEmpty(items);
         });
       }

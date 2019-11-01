@@ -7,8 +7,6 @@
           <small><fa icon="angle-right"/></small>
           {{ translate('menu.quotes') }}
           <template v-if="state.loaded === $state.success && $route.params.id">
-            <small><fa icon="angle-right"/></small>
-            {{item.name}}
             <small class="text-muted text-monospace" style="font-size:0.7rem">{{$route.params.id}}</small>
           </template>
         </span>
@@ -84,7 +82,7 @@ import { required } from 'vuelidate/lib/validators';
 import uuid from 'uuid/v4';
 
 import { getUsernameById } from '../../../helpers/userById';
-import { QuoteInterface } from '../../../../bot/systems/quotes';
+import { Quotes } from '../../../../bot/entity/quotes';
 
 Component.registerHooks([
   'beforeRouteEnter',
@@ -112,7 +110,7 @@ export default class QuotesEdit extends Vue {
   state: { loaded: number; save: number } = { loaded: this.$state.progress, save: this.$state.idle }
   pending: boolean = false;
 
-  item: QuoteInterface = {
+  item: Quotes = {
     id: uuid(),
     createdAt: Date.now(),
     tags: [],
@@ -149,7 +147,7 @@ export default class QuotesEdit extends Vue {
   async mounted() {
     this.state.loaded = this.$state.progress;
     if (this.$route.params.id) {
-      this.socket.emit('findOne', { where: { id: this.$route.params.id } }, async (err, data: QuoteInterface) => {
+      this.socket.emit('getById', this.$route.params.id, async (err, data: Quotes) => {
         console.debug('Loaded', {data});
         this.item = data;
         this.state.loaded = this.$state.success;
@@ -201,7 +199,7 @@ export default class QuotesEdit extends Vue {
 
   async remove () {
     await new Promise(resolve => {
-      this.socket.emit('delete', { where: { id: this.$route.params.id } }, () => {
+      this.socket.emit('deleteById', this.$route.params.id, () => {
         resolve();
       })
     })
@@ -213,7 +211,7 @@ export default class QuotesEdit extends Vue {
     if (!this.$v.$invalid) {
       this.state.save = this.$state.progress;
       console.debug('Saving', this.item);
-      this.socket.emit('update', { key: 'id', items: [this.item] }, (err, data) => {
+      this.socket.emit('setById', this.$route.params.id, this.item, (err, data) => {
         if (err) {
           this.state.save = this.$state.fail;
           return console.error(err);

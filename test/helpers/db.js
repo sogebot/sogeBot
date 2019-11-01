@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 const _ = require('lodash');
 const chalk = require('chalk');
 const variable = require('./variable');
@@ -6,14 +7,29 @@ const { debug } = require('../../dest/helpers/log');
 
 const startup = _.now();
 
+const { getManager } = require('typeorm');
+const { Quotes } = require('../../dest/entity/quotes');
+
+let isDbConnected = false;
+
 module.exports = {
   cleanup: async function () {
     const waitForIt = async (resolve, reject) => {
-      if (_.isNil(global.db) || !global.db.engine.connected || _.isNil(global.systems) || _.now() - startup < 10000) {
-        return setTimeout(() => waitForIt(resolve, reject), 1000);
+      try {
+        isDbConnected = (await getManager()).connection.isConnected;
+      } catch (e) {}
+      if (!isDbConnected || _.isNil(global.db) || !global.db.engine.connected || _.isNil(global.systems) || _.now() - startup < 10000) {
+        return setTimeout(() => waitForIt(resolve, reject), 100);
       }
 
       debug('test', chalk.bgRed('*** Cleaning up collections ***'));
+
+      const entities = [Quotes];
+      for (const entity of entities) {
+        for (const item of (await getManager().createQueryBuilder().select('entity').from(entity, 'entity').getMany())) {
+          await getManager().createQueryBuilder().delete().from(entity).where('id = :id', { id: item.id }).execute();
+        }
+      }
 
       const collections = await global.db.engine.collections();
       for (const c of collections) {

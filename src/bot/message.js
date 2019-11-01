@@ -12,6 +12,8 @@ const Entities = require('html-entities').AllHtmlEntities;
 import { warning } from './helpers/log';
 import { getCountOfCommandUsage } from './helpers/commands/count';
 import { getAllOnlineUsernames } from './users';
+import { getManager } from 'typeorm';
+import { EventList } from './entity/eventList';
 
 class Message {
   constructor (message) {

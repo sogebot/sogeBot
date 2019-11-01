@@ -7,7 +7,7 @@ const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 
 // users
-const owner = { username: 'soge__' };
+const owner = { username: 'soge__', userId: '1' };
 
 const tests = [
   { sender: owner, parameters: '', shouldFail: true, error: 'systems.quotes.show.error.no-parameters' },
@@ -17,11 +17,11 @@ const tests = [
   { sender: owner, parameters: '-tag -id', shouldFail: true, error: 'systems.quotes.show.error.no-parameters' },
   { sender: owner, parameters: '-id -tag', shouldFail: true, error: 'systems.quotes.show.error.no-parameters' },
 
-  { sender: owner, parameters: '-id a', shouldFail: true, error: 'systems.quotes.show.error.no-parameters' },
 
-  { sender: owner, parameters: '-id 1', id: 1, tag: 'general', shouldFail: false, exist: true },
-  { sender: owner, parameters: '-id 1 -tag', id: 1, tag: 'general', shouldFail: false, exist: true },
+  { sender: owner, parameters: '-id $id', id: 1, tag: 'general', shouldFail: false, exist: true },
+  { sender: owner, parameters: '-id $id -tag', id: 1, tag: 'general', shouldFail: false, exist: true },
   { sender: owner, parameters: '-id 2', id: 2, tag: 'general', shouldFail: false, exist: false },
+  { sender: owner, parameters: '-id a', id: 'a', tag: 'general', shouldFail: false, exist: false },
   { sender: owner, parameters: '-id 2 -tag', id: 2, tag: 'general', shouldFail: false, exist: false },
 
   { sender: owner, parameters: '-tag lorem ipsum', id: 1, tag: 'lorem ipsum', shouldFail: false, exist: true },
@@ -34,7 +34,13 @@ describe('Quotes - main()', () => {
       before(async () => {
         await db.cleanup();
         await message.prepare();
-        await global.db.engine.insert('systems.quotes', { id: 1, tags: ['lorem ipsum'], quote: 'Lorem Ipsum', quotedBy: '12345' });
+        await global.db.engine.insert('users', { username: owner.username, id: owner.userId });
+        const quote = await global.systems.quotes.add({ sender: test.sender, parameters: '-tags lorem ipsum -quote Lorem Ipsum', command: '!quote add' });
+        id = quote.id;
+        if (test.id === 1) {
+          test.id = id;
+        }
+        test.parameters = test.parameters.replace('$id', id);
       });
 
       it('Run !quote', async () => {
@@ -47,7 +53,7 @@ describe('Quotes - main()', () => {
       } else {
         if (test.exist) {
           it('Should show quote', async () => {
-            await message.isSent('systems.quotes.show.ok', owner, { id: 1, quotedBy: 'undefined', quote: 'Lorem Ipsum' });
+            await message.isSent('systems.quotes.show.ok', owner, { id, quotedBy: 'soge__', quote: 'Lorem Ipsum' });
           });
         } else {
           it('Should sent not-found message', async () => {

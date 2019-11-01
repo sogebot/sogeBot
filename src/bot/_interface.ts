@@ -444,39 +444,6 @@ class Module {
           cb(null);
         }
       });
-      publicEndpoint(this.nsp, 'find', async (opts, cb) => {
-        opts.collection = opts.collection || 'data';
-        opts.omit = opts.omit || [];
-        if (opts.collection.startsWith('_')) {
-          opts.collection = opts.collection.replace('_', '');
-        } else {
-          if (opts.collection === 'settings') {
-            opts.collection = this.collection.settings;
-            opts.where = {
-              system: this.constructor.name.toLowerCase(),
-              ...opts.where,
-            };
-          } else {
-            opts.collection = this.collection[opts.collection];
-          }
-        }
-
-        opts.where = opts.where || {};
-        if (_.isFunction(cb)) {
-          let items = await global.db.engine.find(opts.collection, opts.where);
-          if (opts.omit.length > 0) {
-            items = items.map((o) => {
-              for (const omit of opts.omit) {
-                delete o[omit];
-              }
-              return o;
-            });
-          }
-          cb(null, items);
-        } else {
-          throw Error('No callback for find function');
-        }
-      });
       publicEndpoint(this.nsp, 'findOne', async (opts, cb) => {
         opts.collection = opts.collection || 'data';
         opts.omit = opts.omit || [];

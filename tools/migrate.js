@@ -660,7 +660,6 @@ const runIndexing = async(retry = false) => {
     await global.db.engine.index('systems.price', [{ index: 'command' }, { index: 'id', unique: true }]);
     await global.db.engine.index('systems.queue', [{ index: 'username' }]);
     await global.db.engine.index('systems.queue.picked', [{ index: 'username' }]);
-    await global.db.engine.index('systems.quotes', [{ index: 'id', unique: true }]);
   } catch (e) {
     if (!retry) {
       await cleanUsersDuplicates();

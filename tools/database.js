@@ -9,6 +9,7 @@ const { createConnection, getConnectionOptions, getManager } = require('typeorm'
 const { CacheTitles } = require('../dest/entity/cacheTitles');
 const { Settings } = require('../dest/entity/settings');
 const { EventList } = require('../dest/entity/eventList');
+const { Quotes } = require('../dest/entity/quotes');
 
 const _ = require('lodash');
 
@@ -49,7 +50,7 @@ const from = new (require('../dest/databases/database'))(false, false, argv.from
 const connect = async function () {
   const connectionOptions = await getConnectionOptions();
   createConnection({
-    synchronize: true,
+    synchronize: true, // force to recreate table!!! careful
     logging: false,
     entities: [__dirname + '/../dest/entity/*.{js,ts}'],
     ...connectionOptions,
@@ -95,10 +96,9 @@ async function main() {
     }
   }
 
-
   console.log(`Migr: widgetsEventList`);
   await getManager().createQueryBuilder().delete().from(EventList).execute();
-  const items = (await from.engine.find('widgetsEventList')).map(o => {
+  let items = (await from.engine.find('widgetsEventList')).map(o => {
     delete o._id;
     return {
       event: o.event,
@@ -121,6 +121,20 @@ async function main() {
       .createQueryBuilder()
       .insert()
       .into(EventList)
+      .values(chunk)
+      .execute();
+  }
+
+  console.log(`Migr: systems.quotes`);
+  await getManager().createQueryBuilder().delete().from(EventList).execute();
+  items = (await from.engine.find('systems.quotes')).map(o => {
+    delete o._id; delete o.id; return o;
+  });
+  for (const chunk of _.chunk(items, 200)) {
+    await getManager()
+      .createQueryBuilder()
+      .insert()
+      .into(Quotes)
       .values(chunk)
       .execute();
   }

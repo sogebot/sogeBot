@@ -5,7 +5,7 @@
   },
   "remove": {
     "ok": "$sender, quote $id was successfully deleted.",
-    "error": "$sender, quote ID is missing or is not a number.",
+    "error": "$sender, quote ID is missing.",
     "not-found": "$sender, quote $id was not found."
   },
   "show": {
