@@ -1,14 +1,24 @@
+import { CommandsCount } from '../../entity/commands';
+import { getRepository } from 'typeorm';
+
 export async function getCountOfCommandUsage (command: string): Promise<number> {
-  const result = await global.db.engine.find('core.commands.count', { command });
-  return result.length;
+  return getRepository(CommandsCount).count({ key: command });
 }
 
 export async function incrementCountOfCommandUsage (command: string): Promise<number> {
-  await global.db.engine.insert('core.commands.count', { command, timestamp: Date.now() });
-  const result = await global.db.engine.find('core.commands.count', { command });
-  return result.length;
+  await getRepository(CommandsCount).insert({ key: command, timestamp: Date.now() });
+  return getCountOfCommandUsage(command);
 }
 
 export async function resetCountOfCommandUsage (command: string): Promise<void> {
-  await global.db.engine.remove('core.commands.count', { command });
+  return getRepository(CommandsCount).clear();
+}
+
+export async function getAllCountOfCommandUsage (): Promise<CommandsCount[]> {
+  return getRepository(CommandsCount)
+    .createQueryBuilder()
+    .select('cnt')
+    .from(CommandsCount, 'cnt')
+    .groupBy('cnt.key')
+    .execute();
 }

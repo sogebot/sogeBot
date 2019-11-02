@@ -45,13 +45,7 @@ class Alias extends System {
 
     adminEndpoint(this.nsp, 'setById', async (id, dataset: AliasEntity, cb) => {
       const item = await getRepository(AliasEntity).findOne({ id }) || new AliasEntity();
-      item.id = dataset.id;
-      item.alias = dataset.alias;
-      item.command = dataset.command;
-      item.enabled = dataset.enabled;
-      item.visible = dataset.visible;
-      item.permission = dataset.permission;
-      await getRepository(AliasEntity).save(item);
+      await getRepository(AliasEntity).save({ ...item, ...dataset});
       cb(null, item);
     });
 

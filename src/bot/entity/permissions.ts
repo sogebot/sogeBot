@@ -26,7 +26,9 @@ export class Permissions {
 export class PermissionFilters {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
-  @ManyToOne(() => Permissions, (permission) => permission.filters)
+  @ManyToOne(() => Permissions, (permission) => permission.filters, {
+    onDelete: 'CASCADE',
+  })
   permission!: Permissions;
   @Column('varchar', { length: 3 })
   comparator!: '<' | '>' | '==' | '<=' | '>=';

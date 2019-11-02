@@ -29,6 +29,9 @@
       {{translate('systems.customcommands.empty')}}
     </b-alert>
     <b-table v-else striped small :items="commandsFiltered" :fields="fields" responsive >
+      <template v-slot:cell(count)="data">
+        {{ count.filter(o => o.key === data.item.command ).length }}
+      </template>
       <template v-slot:cell(response)="data">
         <span v-if="data.item.responses.length === 0" class="text-muted">{{ translate('systems.customcommands.no-responses-set') }}</span>
         <template v-for="(r, i) of orderBy(data.item.responses, 'order', 'asc')">
@@ -38,28 +41,34 @@
             </span>
 
             <span style="display: inline-block">
-              <button data-toggle="dropdown" class="btn btn-outline-dark border-0" style="margin: 0; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px;">
-                <fa class="mr-1" icon="key"/>
-                <span v-if="getPermissionName(r.permission)">{{ getPermissionName(r.permission) }}</span>
-                <span v-else class="text-danger"><fa icon="exclamation-triangle"/> Permission not found</span>
-              </button>
-              <div class="dropdown-menu" aria-labelledby="permissionsMenuButton">
-                <a class="dropdown-item"
-                    style="cursor: pointer"
-                    v-for="p of permissions"
-                    :key="p.id"
-                    @click="updatePermission(data.item.id, r._id, p.id)">{{ getPermissionName(p.id) | capitalize }}</a>
-              </div>
+              <b-dropdown variant="outline-dark" toggle-class="border-0" size="sm">
+                <template v-slot:button-content>
+                  <fa class="mr-1" icon="key"/>
+                  <span v-if="getPermissionName(r.permission)">{{ getPermissionName(r.permission) }}</span>
+                  <span v-else class="text-danger"><fa icon="exclamation-triangle"/> Permission not found</span>
+                </template>
+                <b-dropdown-item v-for="p of permissions"
+                                :key="p.id"
+                                @click="updatePermission(data.item.id, r.id, p.id)">
+                  {{ getPermissionName(p.id) | capitalize }}
+                </b-dropdown-item>
+              </b-dropdown>
             </span>
 
             <span style="display: inline-block">
-              <button data-toggle="dropdown" class="btn btn-outline-dark border-0 h-100 w-100" style="margin: 0; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px;">
-                <fa class="mr-1" :icon="r.stopIfExecuted ? 'stop' : 'play'"/>
-                {{ translate(r.stopIfExecuted ? 'commons.stop-if-executed' : 'commons.continue-if-executed') | capitalize }}</button>
-              <div class="dropdown-menu">
-                <a class="dropdown-item" style="cursor: pointer" v-on:click="updateStopIfExecuted(data.item.id, r._id, true)">{{ translate('commons.stop-if-executed') | capitalize }}</a>
-                <a class="dropdown-item" style="cursor: pointer" v-on:click="updateStopIfExecuted(data.item.id, r._id, false)">{{ translate('commons.continue-if-executed') | capitalize }}</a>
-              </div>
+
+              <b-dropdown variant="outline-dark" toggle-class="border-0" size="sm">
+                <template v-slot:button-content>
+                  <fa class="mr-1" :icon="r.stopIfExecuted ? 'stop' : 'play'"/>
+                  {{ translate(r.stopIfExecuted ? 'commons.stop-if-executed' : 'commons.continue-if-executed') | capitalize }}</button>
+                </template>
+                <b-dropdown-item @click="updateStopIfExecuted(data.item.id, r.id, true)">
+                  {{ translate('commons.stop-if-executed') | capitalize }}
+                </b-dropdown-item>
+                <b-dropdown-item @click="updateStopIfExecuted(data.item.id, r.id, false)">
+                  {{ translate('commons.continue-if-executed') | capitalize }}
+                </b-dropdown-item>
+              </b-dropdown>
             </span>
           </div>
           <text-with-tags :key="10 + i" v-if='r.filter' v-bind:value='r.filter' style="font-size: .8rem;border: 1px dashed #eee; display: inline-block;padding: 0.1rem; padding-left: 0.3rem; padding-right: 0.3rem;"></text-with-tags>
@@ -96,6 +105,7 @@ import { faEye, faExclamationTriangle, faEyeSlash, faPlay, faStop, faKey } from 
 library.add(faEye, faEyeSlash, faExclamationTriangle, faPlay, faKey, faStop);
 
 import { getSocket } from '../../../helpers/socket';
+import { Commands } from '../../../../bot/entity/commands';
 
 @Component({
   components: {
@@ -120,7 +130,10 @@ export default class commandsList extends Vue {
 
   search = '';
 
-  commands: any[] = [];
+  commands: Commands[] = [];
+  count: {
+    count: number; key: string;
+  }[] = []
   permissions: any[] = [];
 
   changed: any[] = [];
@@ -164,13 +177,14 @@ export default class commandsList extends Vue {
   created() {
     this.state.loadingCmd = this.$state.progress;
     this.state.loadingPerm = this.$state.progress;
-    this.psocket.emit('find', {}, (err, data) => {
-      if (err) return console.error(err)
-      this.permissions = orderBy(data, 'order', 'asc');
+    this.psocket.emit('permissions', (data) => {
+      this.permissions = data;
       this.state.loadingPerm = this.$state.success;
     })
-    this.socket.emit('find.commands', {}, (err, items) => {
-      this.commands = orderBy(items, 'command', 'asc');
+    this.socket.emit('commands::getAll', ( commands, count ) => {
+      console.log({commands, count})
+      this.count = count;
+      this.commands = commands;
       this.state.loadingCmd = this.$state.success;
     })
   }
@@ -193,39 +207,32 @@ export default class commandsList extends Vue {
 
   updatePermission (cid, rid, permission) {
     let command = this.commands.filter((o) => o.id === cid)[0]
-    let response = command.responses.filter((o) => o._id === rid)[0]
+    let response = command.responses.filter((o) => o.id === rid)[0]
     response.permission = permission
-    this.socket.emit('update.command', {items: [command]})
+    this.socket.emit('commands::setById', cid, command)
     this.$forceUpdate();
   }
 
   updateStopIfExecuted (cid, rid, stopIfExecuted) {
     let command = this.commands.filter((o) => o.id === cid)[0]
-    let response = command.responses.filter((o) => o._id === rid)[0]
+    let response = command.responses.filter((o) => o.id === rid)[0]
     response.stopIfExecuted = stopIfExecuted
-    this.socket.emit('update.command', {items: [command]})
+    this.socket.emit('commands::setById', cid, command)
     this.$forceUpdate();
   }
 
   async remove(id) {
-    await Promise.all([
-      await new Promise(resolve => {
-        this.socket.emit('delete', { where: { id } }, () => {
-          resolve();
-        })
-      }),
-      await new Promise(resolve => {
-        this.socket.emit('delete', { collection: 'responses', where: { cid: id } }, () => {
-          resolve();
-        })
-      }),
-    ])
+    await new Promise(resolve => {
+      this.socket.emit('commands::deleteById', id, () => {
+        resolve();
+      })
+    })
     this.commands = this.commands.filter((o) => o.id !== id)
     this.$router.push({ name: 'CommandsManagerList' });
   }
 
   sendUpdate (id) {
-    this.socket.emit('update.command', {items: this.commands.filter((o) => o.id === id)})
+    this.socket.emit('commands::setById', id, this.commands.find((o) => o.id === id), () => {});
   }
 }
 </script>

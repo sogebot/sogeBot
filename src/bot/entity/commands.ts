@@ -1,0 +1,49 @@
+import { Column, Entity, Index, ManyToOne,OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+
+@Entity()
+export class Commands {
+  @PrimaryGeneratedColumn('uuid')
+  id!: string;
+  @Column()
+  @Index()
+  command!: string;
+  @Column()
+  enabled!: boolean;
+  @Column()
+  visible!: boolean;
+  @OneToMany(() => CommandsResponses, (response) => response.command, {
+    cascade: true,
+  })
+  responses!: CommandsResponses[];
+};
+
+@Entity()
+export class CommandsResponses {
+  @PrimaryGeneratedColumn('uuid')
+  id!: string;
+  @ManyToOne(() => Commands, (command) => command.responses, {
+    onDelete: 'CASCADE',
+  })
+  command!: Commands;
+  @Column()
+  order!: number;
+  @Column()
+  response!: string;
+  @Column()
+  stopIfExecuted!: boolean;
+  @Column()
+  permission!: string;
+  @Column()
+  filter!: string;
+};
+
+@Entity()
+export class CommandsCount {
+  @PrimaryGeneratedColumn()
+  id!: string;
+  @Column()
+  @Index({ unique: true })
+  key!: string;
+  @Column()
+  timestamp!: number;
+};

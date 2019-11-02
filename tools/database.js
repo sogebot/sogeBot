@@ -7,6 +7,7 @@ const availableDbs = ['nedb', 'mongodb'];
 
 const { createConnection, getConnectionOptions, getManager, getRepository } = require('typeorm');
 const { Alias } = require('../dest/entity/alias');
+const { Commands } = require('../dest/entity/commands');
 const { CacheTitles } = require('../dest/entity/cacheTitles');
 const { Settings } = require('../dest/entity/settings');
 const { EventList } = require('../dest/entity/eventList');
@@ -135,6 +136,29 @@ async function main() {
   if (items.length > 0) {
     for (const chunk of _.chunk(items, 100)) {
       await getRepository(Alias).insert(chunk)
+    }
+  }
+
+  console.log(`Migr: systems.customcommands, systems.customcommands.responses`);
+  await getManager().clear(Commands);
+  items = await from.engine.find('systems.customcommands')
+  for (const item of items) {
+    // add responses
+    const responses = (await from.engine.find('systems.customcommands.responses', { cid: item.id })).map(o => {
+      delete o._id; delete o.id;
+      if (typeof o.filter === 'undefined') {
+        o.filter = '';
+      }
+      return o;
+    });
+    item.responses = responses
+  }
+  items = items.map(o => {
+    delete o._id; delete o.id; delete o.cid; return o;
+  });
+  if (items.length > 0) {
+    for (const chunk of _.chunk(items, 100)) {
+      await getRepository(Commands).save(chunk)
     }
   }
 
