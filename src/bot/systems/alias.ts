@@ -13,6 +13,10 @@ import { incrementCountOfCommandUsage } from '../helpers/commands/count';
 import { debug, warning } from '../helpers/log';
 import uuid from 'uuid/v4';
 
+import { Alias as AliasEntity } from '../entity/alias';
+import { getRepository } from 'typeorm';
+import { adminEndpoint, publicEndpoint } from '../helpers/socket';
+
 /*
  * !alias                                              - gets an info about alias usage
  * !alias add (-p [uuid|name]) -a ![alias] -c ![cmd]   - add alias for specified command
@@ -30,6 +34,33 @@ class Alias extends System {
     this.addMenu({ category: 'manage', name: 'alias', id: 'manage/alias' });
   }
 
+  sockets() {
+    publicEndpoint(this.nsp, 'find', async (_opts, cb) => {
+      cb(null, await getRepository(AliasEntity).find());
+    });
+
+    adminEndpoint(this.nsp, 'getById', async (id, cb) => {
+      cb(null, await getRepository(AliasEntity).findOne({ id }));
+    });
+
+    adminEndpoint(this.nsp, 'setById', async (id, dataset: AliasEntity, cb) => {
+      const item = await getRepository(AliasEntity).findOne({ id }) || new AliasEntity();
+      item.id = dataset.id;
+      item.alias = dataset.alias;
+      item.command = dataset.command;
+      item.enabled = dataset.enabled;
+      item.visible = dataset.visible;
+      item.permission = dataset.permission;
+      await getRepository(AliasEntity).save(item);
+      cb(null, item);
+    });
+
+    adminEndpoint(this.nsp, 'deleteById', async (id, cb) => {
+      await getRepository(AliasEntity).delete({ id });
+      cb(null);
+    });
+  }
+
   @parser()
   async run (opts) {
     const p = new Parser();
@@ -43,7 +74,7 @@ class Alias extends System {
     let cmdArray = opts.message.toLowerCase().split(' ');
     const length = opts.message.toLowerCase().split(' ').length;
     for (let i = 0; i < length; i++) {
-      alias = await global.db.engine.findOne(this.collection.data, { alias: cmdArray.join(' '), enabled: true });
+      alias = await getRepository(AliasEntity).findOne({ alias: cmdArray.join(' '), enabled: true });
       if (!_.isEmpty(alias)) {
         break;
       }
@@ -115,18 +146,20 @@ class Alias extends System {
         throw Error('Alias or Command doesn\'t start with !');
       }
 
-      const pItem: Permissions.Item | null = await global.permissions.get(perm);
+      const pItem = await global.permissions.get(perm);
       if (!pItem) {
         throw Error('Permission ' + perm + ' not found.');
       }
 
-      const item = await global.db.engine.findOne(this.collection.data, { alias });
-      if (_.isEmpty(item)) {
+      const item = await getRepository(AliasEntity).findOne({ alias });
+      if (!item) {
         const message = await prepare('alias.alias-was-not-found', { alias });
         sendMessage(message, opts.sender, opts.attr);
         return false;
       }
-      await global.db.engine.update(this.collection.data, { alias }, { command, permission: pItem.id });
+      item.command = command;
+      item.permission = pItem.id;
+      await getRepository(AliasEntity).save(item);
 
       const message = await prepare('alias.alias-was-edited', { alias, command });
       sendMessage(message, opts.sender, opts.attr);
@@ -149,12 +182,12 @@ class Alias extends System {
         throw Error('Alias or Command doesn\'t start with !');
       }
 
-      const pItem: Permissions.Item | null = await global.permissions.get(perm);
+      const pItem = await global.permissions.get(perm);
       if (!pItem) {
         throw Error('Permission ' + perm + ' not found.');
       }
 
-      const aliasObj: Types.Alias.Item = {
+      const aliasObj: AliasEntity = {
         id: uuid(),
         alias,
         command,
@@ -162,7 +195,7 @@ class Alias extends System {
         visible: true,
         permission: pItem.id,
       };
-      await global.db.engine.insert(this.collection.data, aliasObj);
+      await getRepository(AliasEntity).insert(aliasObj);
       const message = await prepare('alias.alias-was-added', aliasObj);
       sendMessage(message, opts.sender, opts.attr);
     } catch (e) {
@@ -173,7 +206,7 @@ class Alias extends System {
   @command('!alias list')
   @default_permission(permission.CASTERS)
   async list (opts) {
-    const alias = await global.db.engine.find(this.collection.data, { visible: true, enabled: true });
+    const alias = await getRepository(AliasEntity).find({ visible: true, enabled: true });
     const output = (alias.length === 0 ? global.translate('alias.list-is-empty') : global.translate('alias.list-is-not-empty').replace(/\$list/g, (_.map(_.orderBy(alias, 'alias'), 'alias')).join(', ')));
     sendMessage(output, opts.sender, opts.attr);
   }
@@ -190,15 +223,15 @@ class Alias extends System {
         throw Error('Not starting with !');
       }
 
-      const item = await global.db.engine.findOne(this.collection.data, { alias });
-      if (_.isEmpty(item)) {
+      const item = await getRepository(AliasEntity).findOne({ alias });
+      if (!item) {
         const message = await prepare('alias.alias-was-not-found', { alias });
         sendMessage(message, opts.sender, opts.attr);
         return;
       }
-
-      await global.db.engine.update(this.collection.data, { alias }, { enabled: !item.enabled });
-      const message = await prepare(!item.enabled ? 'alias.alias-was-enabled' : 'alias.alias-was-disabled', item);
+      item.enabled = !item.enabled;
+      await getRepository(AliasEntity).save(item);
+      const message = await prepare(item.enabled ? 'alias.alias-was-enabled' : 'alias.alias-was-disabled', item);
       sendMessage(message, opts.sender, opts.attr);
     } catch (e) {
       const message = await prepare('alias.alias-parse-failed');
@@ -218,15 +251,15 @@ class Alias extends System {
         throw Error('Not starting with !');
       }
 
-      const item = await global.db.engine.findOne(this.collection.data, { alias });
-      if (_.isEmpty(item)) {
+      const item = await getRepository(AliasEntity).findOne({ alias });
+      if (!item) {
         const message = await prepare('alias.alias-was-not-found', { alias });
         sendMessage(message, opts.sender, opts.attr);
         return false;
       }
-
-      await global.db.engine.update(this.collection.data, { alias }, { visible: !item.visible });
-      const message = await prepare(!item.visible ? 'alias.alias-was-exposed' : 'alias.alias-was-concealed', item);
+      item.visible = !item.visible;
+      await getRepository(AliasEntity).save(item);
+      const message = await prepare(item.visible ? 'alias.alias-was-exposed' : 'alias.alias-was-concealed', item);
       sendMessage(message, opts.sender, opts.attr);
     } catch (e) {
       const message = await prepare('alias.alias-parse-failed');
@@ -246,12 +279,13 @@ class Alias extends System {
         throw Error('Not starting with !');
       }
 
-      const removed = await global.db.engine.remove(this.collection.data, { alias });
-      if (!removed) {
+      const item = await getRepository(AliasEntity).findOne({ alias });
+      if (!item) {
         const message = await prepare('alias.alias-was-not-found', { alias });
         sendMessage(message, opts.sender, opts.attr);
         return false;
       }
+      await getRepository(AliasEntity).remove(item);
 
       const message = await prepare('alias.alias-was-removed', { alias });
       sendMessage(message, opts.sender, opts.attr);

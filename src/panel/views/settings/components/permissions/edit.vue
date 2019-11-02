@@ -88,6 +88,8 @@
   import { getSocket } from 'src/panel/helpers/socket';
   import { some } from 'lodash-es';
 
+  import { Permissions as PermissionEntity} from 'src/bot/entity/permissions'
+
   export default Vue.extend({
     props: ['update'],
     components: {
@@ -100,7 +102,7 @@
     data() {
       const data: {
         some: any;
-        item: Permissions.Item | null,
+        item: PermissionEntity | null,
         socket: any,
         isPending: boolean,
         isSaving: number,
@@ -155,7 +157,7 @@
       },
       save() {
         this.isSaving = 1
-        this.socket.emit('update', { items: [this.item]}, (err, data) => {
+        this.socket.emit('permission::save', this.item, (err, data) => {
           if (err) {
             this.isSaving = 3
           } else {
@@ -167,12 +169,9 @@
         })
       },
       removePermission() {
-        this.socket.emit('delete', { where: { id: this.$route.params.id }}, (err, deleted) => {
-          if (err) console.error(err)
-          else {
-            this.$emit('delete');
-            this.$router.push({ name: 'PermissionsSettings' })
-          }
+        this.socket.emit('permission::delete', this.$route.params.id, () => {
+          this.$emit('delete');
+          this.$router.push({ name: 'PermissionsSettings' })
         })
       }
     }

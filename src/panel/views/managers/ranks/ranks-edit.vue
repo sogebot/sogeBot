@@ -106,8 +106,6 @@ export default class ranksEdit extends Vue {
     pending: false,
   }
 
-  permissions: Permissions.Item[] = [];
-
   item: Types.Ranks.Item = {
     id: uuid(),
     hours: 0,
@@ -157,23 +155,6 @@ export default class ranksEdit extends Vue {
       this.$router.push({ name: 'ranksManagerList' })
     })
   }
-
-  getPermissionName (id) {
-    if (!id) return 'Disabled'
-    const permission = this.permissions.find((o) => {
-      return o.id === id
-    })
-    if (typeof permission !== 'undefined') {
-      if (permission.name.trim() === '') {
-        return permission.id
-      } else {
-        return permission.name
-      }
-    } else {
-      return null
-    }
-  }
-
 
   save() {
     this.$v.$touch();

@@ -10,8 +10,9 @@ import { permission } from './permissions';
 import { error, info, warning } from './helpers/log';
 import { adminEndpoint, publicEndpoint } from './helpers/socket';
 
-import { getManager } from 'typeorm';
+import { getManager, getRepository } from 'typeorm';
 import { Settings } from './entity/settings';
+import { Permissions as PermissionsEntity } from './entity/permissions';
 
 class Module {
   public dependsOn: string[] = [];
@@ -843,7 +844,13 @@ class Module {
     let permId = permission.VIEWERS;
 
     // get current full list of permissions
-    for (const p of (_.orderBy(await global.db.engine.find(global.permissions.collection.data), 'order', 'desc')) as Permissions.Item[]) {
+    const permissions = await getRepository(PermissionsEntity).find({
+      cache: true,
+      order: {
+        order: 'DESC',
+      },
+    });
+    for (const p of permissions) {
       // set proper value for permId or default value
       if (set_default_values || p.id === permission.VIEWERS) {
         if (p.id === permission.VIEWERS) {

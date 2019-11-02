@@ -5,11 +5,13 @@ const fs = require('fs');
 
 const availableDbs = ['nedb', 'mongodb'];
 
-const { createConnection, getConnectionOptions, getManager } = require('typeorm');
+const { createConnection, getConnectionOptions, getManager, getRepository } = require('typeorm');
+const { Alias } = require('../dest/entity/alias');
 const { CacheTitles } = require('../dest/entity/cacheTitles');
 const { Settings } = require('../dest/entity/settings');
 const { EventList } = require('../dest/entity/eventList');
 const { Quotes } = require('../dest/entity/quotes');
+const { Permissions, PermissionFilters } = require('../dest/entity/permissions');
 
 const _ = require('lodash');
 
@@ -65,40 +67,32 @@ async function main() {
 
   console.log('Info: Databases connections established');
 
+  let items;
   console.log('Migr: cache.titles');
-  await getManager().createQueryBuilder().delete().from(CacheTitles).execute();
-  for (const item of await from.engine.find('cache.titles')) {
-    await getManager()
-      .createQueryBuilder()
-      .insert()
-      .into(CacheTitles)
-      .values([
-        { game: item.game, title: item.title, timestamp: Number(item.timestamp || 0) },
-      ])
-      .execute();
+  await getManager().clear(CacheTitles);
+  items = (await from.engine.find('cache.titles')).map(o => {
+    delete o._id; delete o.id; return {...o, timestamp: Number(o.timestamp || 0) };
+  });
+  if (items.length > 0) {
+    for (const chunk of _.chunk(items, 100)) {
+      await getRepository(CacheTitles).insert(chunk)
+    }
   }
 
-  await getManager().createQueryBuilder().delete().from(Settings).execute();
+  await getManager().clear(Settings);
   for (const type of ['core', 'overlays', 'games', 'registries', 'integrations']) {
     console.log(`Migr: ${type}.settings`);
     for (const item of await from.engine.find(`${type}.settings`)) {
       if (item.key.includes('.')) {
         continue;
       }
-      await getManager()
-        .createQueryBuilder()
-        .insert()
-        .into(Settings)
-        .values([
-          { namespace: `/${type}/${item.system}`, key: item.key, value: JSON.stringify(item.value) },
-        ])
-        .execute();
+      await getRepository(Settings).insert({ namespace: `/${type}/${item.system}`, key: item.key, value: JSON.stringify(item.value) })
     }
   }
 
   console.log(`Migr: widgetsEventList`);
-  await getManager().createQueryBuilder().delete().from(EventList).execute();
-  let items = (await from.engine.find('widgetsEventList')).map(o => {
+  await getManager().clear(EventList);
+  items = (await from.engine.find('widgetsEventList')).map(o => {
     delete o._id;
     return {
       event: o.event,
@@ -116,27 +110,44 @@ async function main() {
       ),
     };
   });
-  for (const chunk of _.chunk(items, 200)) {
-    await getManager()
-      .createQueryBuilder()
-      .insert()
-      .into(EventList)
-      .values(chunk)
-      .execute();
+  if (items.length > 0) {
+    for (const chunk of _.chunk(items, 100)) {
+      await getRepository(EventList).insert(chunk)
+    }
   }
 
   console.log(`Migr: systems.quotes`);
-  await getManager().createQueryBuilder().delete().from(EventList).execute();
+  await getManager().clear(Quotes);
   items = (await from.engine.find('systems.quotes')).map(o => {
     delete o._id; delete o.id; return o;
   });
-  for (const chunk of _.chunk(items, 200)) {
-    await getManager()
-      .createQueryBuilder()
-      .insert()
-      .into(Quotes)
-      .values(chunk)
-      .execute();
+  if (items.length > 0) {
+    for (const chunk of _.chunk(items, 100)) {
+      await getRepository(Quotes).insert(chunk)
+    }
+  }
+
+  console.log(`Migr: systems.alias`);
+  await getManager().clear(Alias);
+  items = (await from.engine.find('systems.alias')).map(o => {
+    delete o._id; delete o.id; return o;
+  });
+  if (items.length > 0) {
+    for (const chunk of _.chunk(items, 100)) {
+      await getRepository(Alias).insert(chunk)
+    }
+  }
+
+  console.log(`Migr: permissions`);
+  await getManager().clear(Permissions);
+  await getManager().clear(PermissionFilters);
+  items = (await from.engine.find('core.permissions')).map(o => {
+    delete o._id; return o;
+  });
+  if (items.length > 0) {
+    for (const chunk of _.chunk(items, 100)) {
+      await getRepository(Permissions).insert(chunk)
+    }
   }
 
   console.log('Info: Completed');

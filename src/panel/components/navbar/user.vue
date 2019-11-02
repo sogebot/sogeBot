@@ -38,6 +38,7 @@
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
 import { getSocket } from 'src/panel/helpers/socket';
+import { Permissions as PermissionEntity} from 'src/bot/entity/permissions'
 
 @Component({
   components: {
@@ -52,7 +53,7 @@ export default class User extends Vue {
   isViewerLoaded: boolean = false;
   viewer: {
     id: number; points: number;
-    permission: Permissions.Item | null;
+    permission: PermissionEntity | null;
     stats: {
       aggregatedTips: number; aggregatedBits: number; messages: number;
     };

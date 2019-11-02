@@ -8,6 +8,7 @@ const { debug } = require('../../dest/helpers/log');
 const startup = _.now();
 
 const { getManager } = require('typeorm');
+const { Alias } = require('../../dest/entity/alias');
 const { Quotes } = require('../../dest/entity/quotes');
 
 let isDbConnected = false;
@@ -24,7 +25,7 @@ module.exports = {
 
       debug('test', chalk.bgRed('*** Cleaning up collections ***'));
 
-      const entities = [Quotes];
+      const entities = [Alias, Quotes];
       for (const entity of entities) {
         for (const item of (await getManager().createQueryBuilder().select('entity').from(entity, 'entity').getMany())) {
           await getManager().createQueryBuilder().delete().from(entity).where('id = :id', { id: item.id }).execute();

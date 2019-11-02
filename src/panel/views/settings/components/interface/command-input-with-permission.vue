@@ -44,7 +44,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
-import { isFinite, orderBy } from 'lodash-es';
+import { isFinite } from 'lodash-es';
 import { getSocket } from 'src/panel/helpers/socket';
 
 import { library } from '@fortawesome/fontawesome-svg-core'
@@ -78,9 +78,8 @@ export default class sortableList extends Vue {
   }
 
   mounted() {
-    this.socket.emit('find', {}, (err, data) => {
-      if (err) {return console.error(err);};
-      this.permissionsList = orderBy(data, 'order', 'asc');
+    this.socket.emit('permissions', (data) => {
+      this.permissionsList = data;
       this.permissionsLoaded = true;
     });
   }

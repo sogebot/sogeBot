@@ -41,6 +41,9 @@
   import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
   library.add(faExclamationTriangle)
 
+  import { Permissions as PermissionEntity} from 'src/bot/entity/permissions'
+  import { permission } from 'src/bot/helpers/permissions';
+
   export default Vue.extend({
     components: {
       panel: () => import('../../components/panel.vue'),
@@ -90,19 +93,27 @@
     },
     methods: {
       addNewPermissionGroup() {
-        this.socket.emit('find', {}, (err, p) => {
-          const order = p.length + 1
-          const id = uuid()
-          this.socket.emit('insert', {items: [{
+        this.socket.emit('permissions', async (p: PermissionEntity[]) => {
+          const id = uuid();
+          const data: PermissionEntity = {
             id,
             name: '',
             isCorePermission: false,
             isWaterfallAllowed: true,
             automation: 'none',
-            order,
+            order: p.length,
             userIds: [],
             filters: [],
-          }]}, (err, created) => {
+          };
+
+          // first we need to set last order for viewers
+          await new Promise(resolve => {
+            this.socket.emit('permission::update::order', permission.VIEWERS, p.length + 1, () => {
+              resolve();
+            });
+          })
+          // then we add new permission before it
+          this.socket.emit('permission::insert', data, () => {
             this.update = Date.now();
             this.$router.push({ name: 'PermissionsSettings', params: { id } })
           })

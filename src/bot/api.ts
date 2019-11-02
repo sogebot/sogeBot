@@ -355,7 +355,9 @@ class API extends Core {
     if (typeof event === 'undefined') {
       const { modStatus, partedUsers, joinedUsers } = await getChannelChattersUnofficialAPI();
 
-      global.widgets.joinpart.send({ users: partedUsers, type: 'part' });
+      if (global.widgets) {
+        global.widgets.joinpart.send({ users: partedUsers, type: 'part' });
+      }
       for (const username of partedUsers) {
         if (!isIgnored({ username: username })) {
           await setImmediateAwait();
@@ -363,7 +365,9 @@ class API extends Core {
         }
       }
 
-      global.widgets.joinpart.send({ users: joinedUsers, type: 'join' });
+      if (global.widgets) {
+        global.widgets.joinpart.send({ users: joinedUsers, type: 'join' });
+      }
       for (const username of joinedUsers) {
         if (isIgnored({ username }) || global.oauth.botUsername === username) {
           await getManager()

@@ -227,10 +227,12 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
-import { cloneDeep, get, orderBy, pickBy, filter, size } from 'lodash-es';
+import { cloneDeep, get, pickBy, filter, size } from 'lodash-es';
 import { flatten, unflatten } from 'src/bot/helpers/flatten';
 import { getListOf } from 'src/panel/helpers/getListOf';
 import { getSocket } from 'src/panel/helpers/socket';
+
+import { Permissions as PermissionEntity } from 'src/bot/entity/permissions';
 
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
@@ -282,7 +284,7 @@ export default class interfaceSettings extends Vue {
   heightOfMenu: string = '0';
   heightOfMenuInterval: number = 0;
 
-  permissions: Permissions.Item[] = [];
+  permissions: PermissionEntity[] = [];
 
   get settingsWithoutPermissions() {
     let withoutPermissions: any = {};
@@ -326,9 +328,8 @@ export default class interfaceSettings extends Vue {
       this.heightOfMenuUpdate()
     }, 1000)
 
-    this.psocket.emit('find', {}, (err, data) => {
-      if (err) return console.error(err)
-      this.permissions = orderBy(data, 'order', 'asc')
+    this.psocket.emit('permissions', (data) => {
+      this.permissions = data
     })
   }
 

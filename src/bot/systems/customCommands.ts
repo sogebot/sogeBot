@@ -174,7 +174,7 @@ class CustomCommands extends System {
       }
 
 
-      const pItem: Permissions.Item | null = await global.permissions.get(userlevel);
+      const pItem = await global.permissions.get(userlevel);
       if (!pItem) {
         throw Error('Permission ' + userlevel + ' not found.');
       }
@@ -215,7 +215,7 @@ class CustomCommands extends System {
         });
       }
 
-      const pItem: Permissions.Item | null = await global.permissions.get(userlevel);
+      const pItem = await global.permissions.get(userlevel);
       if (!pItem) {
         throw Error('Permission ' + userlevel + ' not found.');
       }

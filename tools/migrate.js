@@ -642,11 +642,8 @@ const runIndexing = async(retry = false) => {
     await global.db.engine.index('overlays.gallery', { index: 'id', unique: true });
     await global.db.engine.index('overlays.goals.groups', { index: 'uid', unique: true });
     await global.db.engine.index('overlays.goals.goals', { index: 'uid', unique: true });
-    await global.db.engine.index('core.permissions', [{ index: 'id', unique: true }]);
-    await global.db.engine.index('core.permissions.commands', [{ index: 'key', unique: true }]);
     await global.db.engine.index('registries.alerts', [{ index: 'id', unique: true }]);
     await global.db.engine.index('registries.alerts.media', [{ index: 'id', unique: false }]);
-    await global.db.engine.index('systems.alias', [{ index: 'alias' }, { index: 'id', unique: true }]);
     await global.db.engine.index('systems.cooldown', [{ index: 'key' }, { index: 'id', unique: true }]);
     await global.db.engine.index('systems.cooldown.viewers', [{ index: 'username' }]);
     await global.db.engine.index('systems.customcommands', { index: 'id', unique: true });
