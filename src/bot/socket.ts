@@ -17,6 +17,8 @@ type Auth = {
 };
 
 class Socket extends Core {
+  isSocketsListLoaded = false;
+
   @shared(true)
   socketsTokenAuthList: Auth[] = [];
 
@@ -52,14 +54,16 @@ class Socket extends Core {
       }, MINUTE);
 
       setInterval(() => {
-        this.socketsTokenAuthList = this.socketsTokenAuthList.map(socket => {
-          const isAccessTokenExpired = socket.accessTokenTimestamp + (this.accessTokenExpirationTime * 1000) < Date.now();
-          if (isAccessTokenExpired) {
-            // expire token
-            socket.accessToken = null;
-          }
-          return socket;
-        });
+        if (this.isSocketsListLoaded) {
+          this.socketsTokenAuthList = this.socketsTokenAuthList.map(socket => {
+            const isAccessTokenExpired = socket.accessTokenTimestamp + (this.accessTokenExpirationTime * 1000) < Date.now();
+            if (isAccessTokenExpired) {
+              // expire token
+              socket.accessToken = null;
+            }
+            return socket;
+          });
+        }
       }, 10 * SECOND);
     }
   }
@@ -86,7 +90,19 @@ class Socket extends Core {
       setTimeout(() => emitAuthorize(socket), MINUTE);
     };
     const emitAuthorize = (socket) => {
-      socket.emit('authorize', (cb: { accessToken: string; refreshToken: string; socketToken?: string }) => {
+      socket.emit('authorize', async (cb: { accessToken: string; refreshToken: string; socketToken?: string }) => {
+        await new Promise((resolve) => {
+          const waitForSocketsList = () => {
+            if (global.socket.isSocketsListLoaded) {
+              resolve();
+            } else {
+              setTimeout(() => waitForSocketsList(), 100);
+            }
+          };
+
+          waitForSocketsList();
+        });
+
         if (cb.socketToken) {
           // check if we have global socket
           if (cb.accessToken === this.socketToken) {
@@ -172,6 +188,11 @@ class Socket extends Core {
         cb(null);
       });
     });
+  }
+
+  @onLoad('socketsTokenAuthList')
+  onLoadSocketsTokenAuthList() {
+    this.isSocketsListLoaded = true;
   }
 
   @onLoad('socketToken')
