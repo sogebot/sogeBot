@@ -34,7 +34,7 @@ const tests = {
   ],
 };
 
-describe.only('Bets - open()', () => {
+describe('Bets - open()', () => {
   beforeEach(async () => {
     await db.cleanup();
     await message.prepare();
