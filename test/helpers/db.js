@@ -9,6 +9,8 @@ const startup = _.now();
 
 const { getManager } = require('typeorm');
 const { Alias } = require('../../dest/entity/alias');
+const { Commands, CommandsResponses, CommandsCount } = require('../../dest/entity/commands');
+const { Settings } = require('../../dest/entity/settings');
 const { Quotes } = require('../../dest/entity/quotes');
 
 let isDbConnected = false;
@@ -20,12 +22,12 @@ module.exports = {
         isDbConnected = (await getManager()).connection.isConnected;
       } catch (e) {}
       if (!isDbConnected || _.isNil(global.db) || !global.db.engine.connected || _.isNil(global.systems) || _.now() - startup < 10000) {
-        return setTimeout(() => waitForIt(resolve, reject), 100);
+        return setTimeout(() => waitForIt(resolve, reject), 10);
       }
 
       debug('test', chalk.bgRed('*** Cleaning up collections ***'));
 
-      const entities = [Alias, Quotes];
+      const entities = [Alias, Commands, CommandsResponses, CommandsCount, Quotes, Settings];
       for (const entity of entities) {
         for (const item of (await getManager().createQueryBuilder().select('entity').from(entity, 'entity').getMany())) {
           await getManager().createQueryBuilder().delete().from(entity).where('id = :id', { id: item.id }).execute();

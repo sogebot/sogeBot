@@ -30,7 +30,7 @@
     </b-alert>
     <b-table v-else striped small :items="commandsFiltered" :fields="fields" responsive >
       <template v-slot:cell(count)="data">
-        {{ count.filter(o => o.key === data.item.command ).length }}
+        {{ (count.find(o => o.command === data.item.command) || { count: 0 }).count }}
       </template>
       <template v-slot:cell(response)="data">
         <span v-if="data.item.responses.length === 0" class="text-muted">{{ translate('systems.customcommands.no-responses-set') }}</span>
@@ -56,11 +56,10 @@
             </span>
 
             <span style="display: inline-block">
-
               <b-dropdown variant="outline-dark" toggle-class="border-0" size="sm">
                 <template v-slot:button-content>
                   <fa class="mr-1" :icon="r.stopIfExecuted ? 'stop' : 'play'"/>
-                  {{ translate(r.stopIfExecuted ? 'commons.stop-if-executed' : 'commons.continue-if-executed') | capitalize }}</button>
+                  {{ translate(r.stopIfExecuted ? 'commons.stop-if-executed' : 'commons.continue-if-executed') | capitalize }}
                 </template>
                 <b-dropdown-item @click="updateStopIfExecuted(data.item.id, r.id, true)">
                   {{ translate('commons.stop-if-executed') | capitalize }}
@@ -132,7 +131,7 @@ export default class commandsList extends Vue {
 
   commands: Commands[] = [];
   count: {
-    count: number; key: string;
+    command: string; id: number;
   }[] = []
   permissions: any[] = [];
 
@@ -182,7 +181,7 @@ export default class commandsList extends Vue {
       this.state.loadingPerm = this.$state.success;
     })
     this.socket.emit('commands::getAll', ( commands, count ) => {
-      console.log({commands, count})
+      console.debug({ commands, count })
       this.count = count;
       this.commands = commands;
       this.state.loadingCmd = this.$state.success;

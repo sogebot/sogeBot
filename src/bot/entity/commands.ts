@@ -42,8 +42,8 @@ export class CommandsCount {
   @PrimaryGeneratedColumn()
   id!: string;
   @Column()
-  @Index({ unique: true })
-  key!: string;
+  @Index()
+  command!: string;
   @Column()
   timestamp!: number;
 };

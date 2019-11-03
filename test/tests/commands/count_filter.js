@@ -26,12 +26,13 @@ describe('Custom Commands - count filter', () => {
 
   describe('$count(\'!cmd2\') should be properly parsed', () => {
     it('create command and response with $count variable', async () => {
-      const cmd = await global.db.engine.insert('systems.customcommands', { id: uuid(), command: '!cmd', enabled: true, visible: true });
-      await global.db.engine.insert('systems.customcommands.responses', { cid: cmd.id, filter: '', response: 'Count of !cmd2 is $count(\'!cmd2\') and count of !second $count(\'!second\')', permission: permission.VIEWERS });
+      global.systems.customCommands.add({ sender: owner, parameters: '-c !cmd -r Count of !cmd2 is $count(\'!cmd2\') and count of !second $count(\'!second\')' });
+      await message.isSent('customcmds.command-was-added', owner, { command: '!cmd', sender: owner.username });
     });
 
     it('create command to increment count', async () => {
-      const cmd = await global.db.engine.insert('systems.customcommands', { command: '!cmd2', enabled: true, visible: true });
+      global.systems.customCommands.add({ sender: owner, parameters: '-c !cmd2 -r !uptime' });
+      await message.isSent('customcmds.command-was-added', owner, { command: '!cmd2', sender: owner.username });
     });
 
     it('$count should be 0', async () => {
@@ -56,8 +57,8 @@ describe('Custom Commands - count filter', () => {
 
   describe('$count should be properly parsed', () => {
     it('create command and response with $count variable', async () => {
-      const cmd = await global.db.engine.insert('systems.customcommands', { id: uuid(), command: '!cmd3', enabled: true, visible: true });
-      await global.db.engine.insert('systems.customcommands.responses', { cid: cmd.id, filter: '', response: 'Command usage count: $count', permission: permission.VIEWERS });
+      global.systems.customCommands.add({ sender: owner, parameters: '-c !cmd3 -r Command usage count: $count' });
+      await message.isSent('customcmds.command-was-added', owner, { command: '!cmd3', sender: owner.username });
     });
 
     it('$count should be 1', async () => {

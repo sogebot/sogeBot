@@ -36,6 +36,10 @@ class CustomCommands extends System {
   }
 
   sockets () {
+    adminEndpoint(this.nsp, 'commands::resetCountByCommand', async (command: string, cb) => {
+      await resetCountOfCommandUsage(command);
+      cb(null);
+    });
     adminEndpoint(this.nsp, 'commands::setById', async (id, dataset: Commands, cb) => {
       const item = await getRepository(Commands).findOne({ id }) || new Commands();
       await getRepository(Commands).save({ ...item, ...dataset});
@@ -43,11 +47,6 @@ class CustomCommands extends System {
     });
     adminEndpoint(this.nsp, 'commands::deleteById', async (id, cb) => {
       await getRepository(Commands).delete({ id });
-      /*const item = await getRepository(Commands).findOne({ id });
-      console.log({item});
-      if (item) {
-        await getRepository(Commands).remove(item);
-      }*/
       cb();
     });
     adminEndpoint(this.nsp, 'commands::getAll', async (cb) => {
@@ -55,9 +54,6 @@ class CustomCommands extends System {
         relations: ['responses'],
         order: {
           command: 'ASC',
-          responses: {
-            order: 'ASC',
-          },
         },
       });
       const count = await getAllCountOfCommandUsage();
@@ -67,85 +63,12 @@ class CustomCommands extends System {
       const command = await getRepository(Commands).findOne({
         where: { id },
         relations: ['responses'],
-        order: {
-          responses: {
-            order: 'ASC',
-          },
-        },
       });
       if (!command) {
         cb('Command not found');
       } else {
         const count = await getCountOfCommandUsage(command.command);
         cb(null, command, count);
-      }
-    });
-    adminEndpoint(this.nsp, 'update.command', async (opts, cb) => {
-      opts.collection = opts.collection || 'data';
-      if (opts.collection.startsWith('_')) {
-        opts.collection = opts.collection.replace('_', '');
-      } else {
-        opts.collection = this.collection[opts.collection];
-      }
-
-      if (opts.items) {
-        for (const item of opts.items) {
-          const id = item.id; delete item._id;
-          const count = item.count; delete item.count;
-          const responses = item.responses; delete item.responses;
-
-          let itemFromDb = item;
-          if (_.isNil(id)) {
-            itemFromDb = await global.db.engine.insert(opts.collection, item);
-          } else {
-            await global.db.engine.update(opts.collection, { id }, item);
-          }
-
-          // set command count
-          const cCount = await getCountOfCommandUsage(itemFromDb.command);
-          if (count !== cCount && count === 0) {
-            // we assume its always reset (set to 0)
-            await resetCountOfCommandUsage(itemFromDb.command);
-          }
-
-          // update responses
-          const rIds: any[] = [];
-          for (const r of responses) {
-            if (!r.cid) {
-              r.cid = id || String(itemFromDb.id);
-            }
-
-            if (!r._id) {
-              rIds.push(
-                String((await global.db.engine.insert(this.collection.responses, r))._id)
-              );
-            } else {
-              const _id = String(r._id); delete r._id;
-              rIds.push(_id);
-              await global.db.engine.update(this.collection.responses, { _id }, r);
-            }
-          }
-
-          itemFromDb.id = id || String(itemFromDb.id);
-
-          // remove responses
-          for (const r of await global.db.engine.find(this.collection.responses, { cid: itemFromDb.id })) {
-            if (!rIds.includes(String(r._id))) {
-              await global.db.engine.remove(this.collection.responses, { _id: String(r._id) });
-            }
-          }
-
-          if (_.isFunction(cb)) {
-            cb(null, {
-              command: itemFromDb,
-              responses: await global.db.engine.find(this.collection.responses, { cid: itemFromDb.id }),
-            });
-          }
-        }
-      } else {
-        if (_.isFunction(cb)) {
-          cb(null, []);
-        }
       }
     });
   }
@@ -173,30 +96,33 @@ class CustomCommands extends System {
         throw Error('Command should start with !');
       }
 
-      const cDb = await global.db.engine.findOne(this.collection.data, { command });
-      if (!cDb.id) {
+      const cDb = await getRepository(Commands).findOne({
+        relations: ['responses'],
+        where: {
+          command,
+        },
+      });
+      if (!cDb) {
         return sendMessage(prepare('customcmds.command-was-not-found', { command }), opts.sender, opts.attr);
       }
 
-      const rDb = await global.db.engine.findOne(this.collection.responses, { cid: cDb.id, order: rId - 1 });
-      if (!rDb._id) {
+      const responseDb = cDb.responses.find(o => o.order === (rId - 1));
+      if (!responseDb) {
         return sendMessage(prepare('customcmds.response-was-not-found', { command, response: rId }), opts.sender, opts.attr);
       }
-
 
       const pItem = await global.permissions.get(userlevel);
       if (!pItem) {
         throw Error('Permission ' + userlevel + ' not found.');
       }
 
-      const _id = rDb._id; delete rDb._id;
-      rDb.response = response;
-      rDb.permission = pItem.id;
+      responseDb.response = response;
+      responseDb.permission = pItem.id;
       if (stopIfExecuted) {
-        rDb.stopIfExecuted = stopIfExecuted;
+        responseDb.stopIfExecuted = stopIfExecuted;
       }
 
-      await global.db.engine.update(this.collection.responses, { _id }, rDb);
+      await getRepository(Commands).save(cDb);
       sendMessage(prepare('customcmds.command-was-edited', { command, response }), opts.sender, opts.attr);
     } catch (e) {
       sendMessage(prepare('customcmds.commands-parse-failed'), opts.sender, opts.attr);
@@ -218,11 +144,18 @@ class CustomCommands extends System {
         throw Error('Command should start with !');
       }
 
-      let cDb = await global.db.engine.findOne(this.collection.data, { command });
-      if (!cDb.id) {
-        cDb = await global.db.engine.insert(this.collection.data, {
-          command, enabled: true, visible: true, id: uuid(),
-        });
+      const cDb = await getRepository(Commands).findOne({
+        relations: ['responses'],
+        where: {
+          command,
+        },
+      }) || new Commands();
+      cDb.command = command;
+      cDb.enabled = true;
+      cDb.visible = true;
+      if (typeof cDb.id === 'undefined') {
+        cDb.id = uuid();
+        cDb.responses = [];
       }
 
       const pItem = await global.permissions.get(userlevel);
@@ -230,14 +163,15 @@ class CustomCommands extends System {
         throw Error('Permission ' + userlevel + ' not found.');
       }
 
-      const rDb = await global.db.engine.find(this.collection.responses, { cid: cDb.id });
-      await global.db.engine.insert(this.collection.responses, {
-        cid: cDb.id,
-        order: rDb.length,
-        permission: pItem.id,
-        stopIfExecuted,
-        response,
-      });
+      const new_response = new CommandsResponses();
+      new_response.order = cDb.responses?.length ?? 0;
+      new_response.permission = pItem.id;
+      new_response.stopIfExecuted = stopIfExecuted;
+      new_response.response = response;
+      new_response.filter = '';
+
+      cDb.responses = [...cDb.responses, new_response];
+      await getRepository(Commands).save(cDb);
       sendMessage(prepare('customcmds.command-was-added', { command }), opts.sender, opts.attr);
     } catch (e) {
       sendMessage(prepare('customcmds.commands-parse-failed'), opts.sender, opts.attr);
@@ -255,7 +189,14 @@ class CustomCommands extends System {
     }[] = [];
     const cmdArray = opts.message.toLowerCase().split(' ');
     for (let i = 0, len = opts.message.toLowerCase().split(' ').length; i < len; i++) {
-      const db_commands: Commands[] = await global.db.engine.find(this.collection.data, { command: cmdArray.join(' '), enabled: true });
+      const db_commands: Commands[]
+        = await getRepository(Commands).find({
+          relations: ['responses'],
+          where: {
+            command: cmdArray.join(' '),
+            enabled: true,
+          },
+        });
       for (const command of db_commands) {
         commands.push({
           cmdArray: _.cloneDeep(cmdArray),
@@ -275,8 +216,7 @@ class CustomCommands extends System {
       // remove found command from message to get param
       const param = opts.message.replace(new RegExp('^(' + command.cmdArray.join(' ') + ')', 'i'), '').trim();
       const count = await incrementCountOfCommandUsage(command.command.command);
-      const responses: CommandsResponses[] = await global.db.engine.find(this.collection.responses, { cid: command.command.id });
-      for (const r of _.orderBy(responses, 'order', 'asc')) {
+      for (const r of _.orderBy(command.command.responses, 'order', 'asc')) {
         if ((await global.permissions.check(opts.sender.userId, r.permission)).access
             && await this.checkFilter(opts, r.filter)) {
           if (param.length > 0
@@ -315,35 +255,29 @@ class CustomCommands extends System {
 
     if (!command) {
       // print commands
-      const commands = await global.db.engine.find(this.collection.data, { visible: true, enabled: true });
+      const commands = await getRepository(Commands).find({
+        where: { visible: true, enabled: true },
+      });
       const output = (commands.length === 0 ? global.translate('customcmds.list-is-empty') : global.translate('customcmds.list-is-not-empty').replace(/\$list/g, _.map(_.orderBy(commands, 'command'), 'command').join(', ')));
       sendMessage(output, opts.sender, opts.attr);
     } else {
       // print responses
-      const cid = String((await global.db.engine.findOne(this.collection.data, { command })).id);
-      const responses = _.orderBy((await global.db.engine.find(this.collection.responses, { cid })), 'order', 'asc');
+      const command_with_responses
+        = await getRepository(Commands).findOne({
+          relations: ['responses'],
+          where: { command },
+        });
 
-      if (responses.length === 0) {
+      if (!command_with_responses || command_with_responses.responses.length === 0) {
         sendMessage(prepare('customcmdustomcmds.list-of-responses-is-empty', { command }), opts.sender, opts.attr);
+        return;
       }
-      const permissions = (await global.db.engine.find(global.permissions.collection.data)).map((o) => {
-        return {
-          v: o.id, string: o.name,
-        };
-      });
-      for (const r of responses) {
-        const rPrmsn: any = permissions.find(o => o.v === r.permission);
-        const response = await prepare('customcmds.response', { command, index: ++r.order, response: r.response, after: r.stopIfExecuted ? '_' : 'v', permission: rPrmsn.string });
+      for (const r of _.orderBy(command_with_responses.responses, 'order', 'asc')) {
+        const permission = await global.permissions.get(r.permission);
+        const response = await prepare('customcmds.response', { command, index: ++r.order, response: r.response, after: r.stopIfExecuted ? '_' : 'v', permission: permission?.name ?? 'n/a' });
         chatOut(`${response} [${opts.sender.username}]`);
         message(global.tmi.sendWithMe ? 'me' : 'say', getOwner(), response);
       }
-    }
-  }
-
-  async togglePermission (opts: CommandOptions) {
-    const command = await global.db.engine.findOne(this.collection.data, { command: opts.parameters });
-    if (!_.isEmpty(command)) {
-      await global.db.engine.update(this.collection.data, { id: command.id }, { permission: command.permission === 3 ? 0 : ++command.permission });
     }
   }
 
@@ -356,17 +290,18 @@ class CustomCommands extends System {
       sendMessage(message, opts.sender, opts.attr);
       return false;
     }
-
-    const command = await global.db.engine.findOne(this.collection.data, { command: match.command });
-    if (_.isEmpty(command)) {
+    const command = await getRepository(Commands).findOne({
+      where: { command: match.command },
+    });
+    if (!command) {
       const message = await prepare('customcmds.command-was-not-found', { command: match.command });
       sendMessage(message, opts.sender, opts.attr);
       return false;
     }
+    command.enabled = !command.enabled;
+    await getRepository(Commands).save(command);
 
-    await global.db.engine.update(this.collection.data, { command: match.command }, { enabled: !command.enabled });
-
-    const message = await prepare(!command.enabled ? 'customcmds.command-was-enabled' : 'customcmds.command-was-disabled', { command: command.command });
+    const message = await prepare(command.enabled ? 'customcmds.command-was-enabled' : 'customcmds.command-was-disabled', { command: command.command });
     sendMessage(message, opts.sender, opts.attr);
   }
 
@@ -380,15 +315,18 @@ class CustomCommands extends System {
       return false;
     }
 
-    const command = await global.db.engine.findOne(this.collection.data, { command: match.command });
-    if (_.isEmpty(command)) {
+    const command = await getRepository(Commands).findOne({
+      where: { command: match.command },
+    });
+    if (!command) {
       const message = await prepare('customcmds.command-was-not-found', { command: match.command });
       sendMessage(message, opts.sender, opts.attr);
       return false;
     }
+    command.visible = !command.visible;
+    await getRepository(Commands).save(command);
 
-    await global.db.engine.update(this.collection.data, { command: match.command }, { visible: !command.visible });
-    const message = await prepare(!command.visible ? 'customcmds.command-was-exposed' : 'customcmds.command-was-concealed', { command: command.command });
+    const message = await prepare(command.visible ? 'customcmds.command-was-exposed' : 'customcmds.command-was-concealed', { command: command.command });
     sendMessage(message, opts.sender, opts.attr);
   }
 
@@ -396,39 +334,16 @@ class CustomCommands extends System {
   @default_permission(permission.CASTERS)
   async remove (opts: CommandOptions) {
     try {
-      const [command, response] = new Expects(opts.parameters).command().number({ optional: true }).toArray();
-      let cid = (await global.db.engine.findOne(this.collection.data, { command })).id;
-      if (!cid) {
+      const [command] = new Expects(opts.parameters).command().toArray();
+
+      const command_db = await getRepository(Commands).findOne({
+        where: { command },
+      });
+      if (!command_db) {
         sendMessage(prepare('customcmds.command-was-not-found', { command }), opts.sender, opts.attr);
       } else {
-        cid = String(cid);
-        if (response) {
-          const order = Number(response) - 1;
-          const removed = await global.db.engine.remove(this.collection.responses, { cid, order });
-          if (removed > 0) {
-            sendMessage(prepare('customcmds.response-was-removed', { command, response }), opts.sender, opts.attr);
-
-            // update order
-            const responses = _.orderBy(await global.db.engine.find(this.collection.responses, { cid }), 'order', 'asc');
-            if (responses.length === 0) {
-              // remove command if 0 responses
-              await global.db.engine.remove(this.collection.data, { command });
-            }
-
-            let order = 0;
-            for (const r of responses) {
-              const _id = String(r._id); delete r._id;
-              r.order = order;
-              await global.db.engine.update(this.collection.responses, { _id }, r);
-              order++;
-            }
-          } else {
-            sendMessage(prepare('customcmds.response-was-not-found', { command, response }), opts.sender, opts.attr);
-          }
-        } else {
-          await global.db.engine.remove(this.collection.data, { command });
-          sendMessage(prepare('customcmds.command-was-removed', { command }), opts.sender, opts.attr);
-        }
+        await getRepository(Commands).remove(command_db);
+        sendMessage(prepare('customcmds.command-was-removed', { command }), opts.sender, opts.attr);
       }
     } catch (e) {
       return sendMessage(prepare('customcmds.commands-parse-failed'), opts.sender, opts.attr);

@@ -10,6 +10,9 @@ const assert = require('assert');
 
 const { permission } = require('../../../dest/permissions');
 
+const { getRepository } = require('typeorm');
+const { Commands } = require('../../../dest/entity/commands');
+
 // users
 const owner = { username: 'soge__', userId: Math.random() };
 const user1 = { username: 'user1', userId: Math.random() };
@@ -25,24 +28,39 @@ describe('Custom Commands - run()', () => {
 
   describe('\'!test qwerty\' should trigger correct commands', () => {
     it('create \'!test\' command with $_variable', async () => {
-      const cmd = await global.db.engine.insert('systems.customcommands', { id: uuid(), command: '!test', enabled: true, visible: true });
-      await global.db.engine.insert('systems.customcommands.responses', { cid: cmd.id, filter: '', response: '$_variable', permission: permission.VIEWERS, stopIfExecuted: false, order: 0 });
+      await getRepository(Commands).save({
+        id: uuid(), command: '!test', enabled: true, visible: true, responses: [{
+          filter: '', response: '$_variable', permission: permission.VIEWERS, stopIfExecuted: false, order: 0
+        }]
+      })
     });
     it('create \'!test\' command with $param', async () => {
-      const cmd = await global.db.engine.insert('systems.customcommands', { id: uuid(), command: '!test', enabled: true, visible: true });
-      await global.db.engine.insert('systems.customcommands.responses', { cid: cmd.id, filter: '', response: '$param by !test command with param', permission: permission.VIEWERS, stopIfExecuted: false, order: 0 });
+      await getRepository(Commands).save({
+        id: uuid(), command: '!test', enabled: true, visible: true, responses: [{
+          filter: '', response: '$param by !test command with param', permission: permission.VIEWERS, stopIfExecuted: false, order: 0,
+        }]
+      })
     });
     it('create \'!test\' command without $param', async () => {
-      const cmd = await global.db.engine.insert('systems.customcommands', { id: uuid(), command: '!test', enabled: true, visible: true });
-      await global.db.engine.insert('systems.customcommands.responses', { cid: cmd.id, filter: '', response: 'This should not be triggered', permission: permission.VIEWERS, stopIfExecuted: false, order: 0 });
+      await getRepository(Commands).save({
+        id: uuid(), command: '!test', enabled: true, visible: true, responses: [{
+          filter: '', response: 'This should not be triggered', permission: permission.VIEWERS, stopIfExecuted: false, order: 0,
+        }]
+      })
     });
     it('create \'!test qwerty\' command without $param', async () => {
-      const cmd = await global.db.engine.insert('systems.customcommands', { id: uuid(), command: '!test qwerty', enabled: true, visible: true });
-      await global.db.engine.insert('systems.customcommands.responses', { cid: cmd.id, filter: '', response: 'This should be triggered', permission: permission.VIEWERS, stopIfExecuted: false, order: 0 });
+      await getRepository(Commands).save({
+        id: uuid(), command: '!test qwerty', enabled: true, visible: true, responses: [{
+          filter: '', response: 'This should be triggered', permission: permission.VIEWERS, stopIfExecuted: false, order: 0,
+        }]
+      })
     });
     it('create second \'!test qwerty\' command without $param', async () => {
-      const cmd = await global.db.engine.insert('systems.customcommands', { id: uuid(), command: '!test qwerty', enabled: true, visible: true });
-      await global.db.engine.insert('systems.customcommands.responses', { cid: cmd.id, filter: '', response: 'This should be triggered as well', permission: permission.VIEWERS, stopIfExecuted: false, order: 0 });
+      await getRepository(Commands).save({
+        id: uuid(), command: '!test qwerty', enabled: true, visible: true, responses: [{
+          filter: '', response: 'This should be triggered as well', permission: permission.VIEWERS, stopIfExecuted: false, order: 0,
+        }]
+      })
     });
 
     it('run command by owner', async () => {
@@ -62,7 +80,6 @@ describe('Custom Commands - run()', () => {
       await message.isNotSentRaw('This should not be triggered', user1);
       await message.isNotSentRaw('@user1, $_variable was set to qwerty.', user1);
     });
-
   });
 
   describe('!cmd with username filter', () => {
@@ -70,8 +87,11 @@ describe('Custom Commands - run()', () => {
       await message.prepare();
     })
     it('create command and response with filter', async () => {
-      const cmd = await global.db.engine.insert('systems.customcommands', { id: uuid(), command: '!cmd', enabled: true, visible: true });
-      await global.db.engine.insert('systems.customcommands.responses', { cid: cmd.id, filter: '$sender == "user1"', response: 'Lorem Ipsum', permission: permission.VIEWERS });
+      await getRepository(Commands).save({
+        id: uuid(), command: '!cmd', enabled: true, visible: true, responses: [{
+          filter: '$sender == "user1"', response: 'Lorem Ipsum', permission: permission.VIEWERS, stopIfExecuted: false, order: 0,
+        }]
+      })
     });
 
     it('run command as user not defined in filter', async () => {

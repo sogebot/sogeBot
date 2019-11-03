@@ -632,11 +632,9 @@ const runIndexing = async(retry = false) => {
     await global.db.engine.index('systems.songs.playlist', [{ index: 'videoID', unique: true }]);
     await global.db.engine.index('systems.songs.request', [{ index: 'videoID' }]);
     await global.db.engine.index('systems.ranks', [{ index: 'hours' }]);
-    await global.db.engine.index('widgetsEventList', { index: 'timestamp' });
     await global.db.engine.index('systems.moderation.messagecooldown', [{ index: 'key', unique: true }]);
     await global.db.engine.index('systems.moderation.permits', [{ index: 'username' }]);
     await global.db.engine.index('systems.moderation.warnings', [{ index: 'username' }]);
-    await global.db.engine.index('core.commands.count', [{ index: 'timestamp' }, { index: 'command' }]);
     await global.db.engine.index('games.wheeloffortune', [{ index: 'key', unique: true }]);
     await global.db.engine.index('systems.raffles.participants', [{ index: 'raffle_id' }, { index: 'username' }]);
     await global.db.engine.index('overlays.gallery', { index: 'id', unique: true });
@@ -646,9 +644,6 @@ const runIndexing = async(retry = false) => {
     await global.db.engine.index('registries.alerts.media', [{ index: 'id', unique: false }]);
     await global.db.engine.index('systems.cooldown', [{ index: 'key' }, { index: 'id', unique: true }]);
     await global.db.engine.index('systems.cooldown.viewers', [{ index: 'username' }]);
-    await global.db.engine.index('systems.customcommands', { index: 'id', unique: true });
-    await global.db.engine.index('systems.customcommands.count', [{ index: 'command', unique: true }]);
-    await global.db.engine.index('systems.customcommands.responses', [{ index: 'cid' }]);
     await global.db.engine.index('systems.highlights', [{ index: 'id' }]);
     await global.db.engine.index('systems.howlongtobeat', [{ index: 'game', unique: true }]);
     await global.db.engine.index('systems.keywords', [{ index: 'id', unique: true }, { index: 'keyword' }]);

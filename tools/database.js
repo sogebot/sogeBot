@@ -7,7 +7,7 @@ const availableDbs = ['nedb', 'mongodb'];
 
 const { createConnection, getConnectionOptions, getManager, getRepository } = require('typeorm');
 const { Alias } = require('../dest/entity/alias');
-const { Commands } = require('../dest/entity/commands');
+const { Commands, CommandsCount } = require('../dest/entity/commands');
 const { CacheTitles } = require('../dest/entity/cacheTitles');
 const { Settings } = require('../dest/entity/settings');
 const { EventList } = require('../dest/entity/eventList');
@@ -149,6 +149,9 @@ async function main() {
       if (typeof o.filter === 'undefined') {
         o.filter = '';
       }
+      if (typeof o.stopIfExecuted === 'undefined') {
+        o.stopIfExecuted = false;
+      }
       return o;
     });
     item.responses = responses
@@ -159,6 +162,17 @@ async function main() {
   if (items.length > 0) {
     for (const chunk of _.chunk(items, 100)) {
       await getRepository(Commands).save(chunk)
+    }
+  }
+
+  console.log(`Migr: core.commands.count `);
+  await getManager().clear(CommandsCount);
+  items = (await from.engine.find('core.commands.count')).map(o => {
+    delete o._id; return o;
+  });
+  if (items.length > 0) {
+    for (const chunk of _.chunk(items, 100)) {
+      await getRepository(CommandsCount).insert(chunk)
     }
   }
 

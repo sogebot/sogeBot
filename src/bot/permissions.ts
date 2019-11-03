@@ -170,7 +170,9 @@ class Permissions extends Core {
       // get all higher permissions to check if not partial check only
       if (!partial && pItem.isWaterfallAllowed) {
         const partialPermission = await getRepository(PermissionsEntity).find({
-          order: LessThan(pItem.order),
+          where: {
+            order: LessThan(pItem.order),
+          },
         });
         for (const p of _.orderBy(partialPermission, 'order', 'asc')) {
           const partialCheck = await this.check(userId, p.id, true);
