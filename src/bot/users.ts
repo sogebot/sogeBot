@@ -9,7 +9,7 @@ import * as commons from './commons';
 import { debug, error, isDebugEnabled } from './helpers/log';
 import { permission } from './helpers/permissions';
 import { adminEndpoint, viewerEndpoint } from './helpers/socket';
-import { getManager } from 'typeorm';
+import { getManager, getRepository } from 'typeorm';
 import { UsersOnline } from './entity/usersOnline';
 
 
@@ -436,12 +436,9 @@ class Users extends Core {
         global.permissions.getUserHighestPermission(opts.where.id),
       ]);
 
-      const online = await getManager()
-        .createQueryBuilder()
-        .select('user')
-        .from(UsersOnline, 'user')
-        .where('user.username = :username', { username: viewer.username })
-        .getOne();
+      const online = await getRepository(UsersOnline).findOne({
+        where: { username: viewer.username },
+      });
 
       set(viewer, 'stats.tips', tips);
       set(viewer, 'stats.bits', bits);

@@ -1,15 +1,15 @@
 <template>
   <div>
     <transition name="fade">
-      <div id="bet" v-if="currentBet.title" v-show="isRunning">
+      <div id="bet" v-if="currentBet" v-show="currentBet && !currentBet.isLocked">
         <strong class="title">{{currentBet.title}}</strong>
         <strong class="timer">
           <span style="color: red" v-if="this.timeToEnd < 1">&lt;1min</span>
           <span v-else>{{this.timeToEnd}}min</span>
         </strong>
         <div id="options">
-          <div v-for="(option, index) in currentBet.options" :key="option.name">
-            <div class="title">{{index}} ... {{option.name}}</div>
+          <div v-for="(option, index) in currentBet.options" :key="option">
+            <div class="title">{{index + 1}} ... {{option}}</div>
             <div class="percentage">{{getPercentage(index)}}%</div>
             <div class="bar"
               v-bind:style="{
@@ -27,18 +27,17 @@
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
 import { getSocket } from 'src/panel/helpers/socket';
+import { Bets } from 'src/bot/entity/bets';
 
 @Component({})
 export default class BetsOverlay extends Vue {
-  isRunning: boolean = false;
   socket = getSocket('/overlays/bets', true);
   colors = [ 'blue', 'red', 'orange', 'green', 'purple', 'yellow', 'pink', 'cyan' ];
-  currentBet: any = {};
-  bets: any[] = [];
+  currentBet: Bets | null = null;
 
   get timeToEnd() {
-    if (this.isRunning) {
-      return Math.floor(Math.floor((this.currentBet.end - Date.now()) / 1000) / 60)
+    if (this.currentBet && !this.currentBet.isLocked) {
+      return Math.floor(Math.floor((this.currentBet.endedAt - Date.now()) / 1000) / 60)
     } else {
       return 0;
     }
@@ -49,8 +48,9 @@ export default class BetsOverlay extends Vue {
   }
 
   getPercentage(index) {
-    if (this.bets.length > 0) {
-      return this.bets.filter(o => Number(o.option) === Number(index)).length / (this.bets.length / 100);
+    if (this.currentBet && this.currentBet.participations.length > 0) {
+      return this.currentBet.participations
+        .filter(o => Number(o.optionIdx) === Number(index)).length / (this.currentBet.participations.length / 100);
     } else {
       return 0;
     }
@@ -65,10 +65,9 @@ export default class BetsOverlay extends Vue {
   }
 
   refresh() {
-    this.socket.emit('data', (cb, bets) => {
-      this.bets = bets
-      this.currentBet = cb
-      this.isRunning = typeof this.currentBet.end !== 'undefined' && Math.floor((this.currentBet.end - Date.now()) / 1000) > 0
+    this.socket.emit('data', (currentBet) => {
+      this.currentBet = currentBet ?? null;
+      console.log({currentBet});
       setTimeout(() => this.refresh(), 5000)
     })
   }

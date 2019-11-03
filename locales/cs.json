@@ -815,12 +815,12 @@
     "raffle-winner-is": "Vitezem raffle $keyword se stava $username! Pravdepodobnost vyhry byla $probability%!"
   },
   "bets": {
-      "running": "$sender, sazky jsou jiz otevreny!  Moznosti sazky: $options. Pouzij $command close 0-$maxIndex",
+      "running": "$sender, sazky jsou jiz otevreny!  Moznosti sazky: $options. Pouzij $command close 1-$maxIndex",
       "notRunning": "Zadne sazky nejsou otevreny, pozadej moda o otevreni!",
-      "opened": "Sazka '$title' otevrena! Moznosti sazky: $options. Pouzij $command 0-$maxIndex <pocet bodu> a vyhraj! Zbyva pouze $minutesmin pro vsazeni!",
+      "opened": "Sazka '$title' otevrena! Moznosti sazky: $options. Pouzij $command 1-$maxIndex <pocet bodu> a vyhraj! Zbyva pouze $minutesmin pro vsazeni!",
       "closeNotEnoughOptions": "$sender, pro zavreni sazky musis vybrat viteznou moznost.",
       "notEnoughOptions": "$sender, nove sazky musi mit alespon dve moznosti!",
-      "info": "Sazka '$title' je stale otevrena! Moznosti sazky: $options. Pouzij $command 0-$maxIndex <pocet bodu> a vyhraj! Zbyva pouze $minutesmin pro vsazeni!",
+      "info": "Sazka '$title' je stale otevrena! Moznosti sazky: $options. Pouzij $command 1-$maxIndex <pocet bodu> a vyhraj! Zbyva pouze $minutesmin pro vsazeni!",
       "diffBet": "$sender, uz sis vsadil na $option a nemuzes vsadit na vice moznosti najednou!",
       "undefinedBet": "Promin, $sender, ale tato moznost neexistuje, pouzij $command a zjisti jak na to",
       "betPercentGain": "Sazky se vyplaci $value% za kazdou moznost",
@@ -833,7 +833,7 @@
       "zeroBet": "Ale ale, $sender, nemuzes vsadit 0 $pointsName",
       "lockedInfo": "Sazka '$title' je stale otevrena, ale cas na vsazeni jiz vyprsel!",
       "removed": "Vyprsel cas na vsazeni! Nikdo si nevsadil -> automaticky uzaviram",
-      "error": "Promin, $sender, ale prikaz neni v poradku! Pouzij $command 0-$maxIndex <pocet bodu>. Priklad $command 0 100 vsadi 100 bodu na polozku 0."
+      "error": "Promin, $sender, ale prikaz neni v poradku! Pouzij $command 1-$maxIndex <pocet bodu>. Priklad $command 0 100 vsadi 100 bodu na polozku 0."
   },
   "alias": {
     "alias-parse-failed": "{core.command-parse} !alias",

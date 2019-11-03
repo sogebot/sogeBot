@@ -266,12 +266,9 @@ class CustomVariables {
       user: async (username) => {
         const _user = await global.users.getByName(username);
 
-        const isUserOnline = (await getManager()
-          .createQueryBuilder()
-          .select('user')
-          .from(UsersOnline, 'user')
-          .where('user.username = :username', { username })
-          .getMany()).length > 0;
+        const isUserOnline = typeof (await getRepository(UsersOnline).findOne({
+          where: { username: sender.username },
+        })) !== 'undefined';
 
         const userObj = {
           username,

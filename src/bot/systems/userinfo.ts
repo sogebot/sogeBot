@@ -6,8 +6,6 @@ import { command, settings, ui } from '../decorators';
 import { onMessage } from '../decorators/on';
 import System from './_interface';
 import { debug, error } from '../helpers/log';
-import { getManager } from 'typeorm';
-import { UsersOnline } from '../entity/usersOnline';
 
 /*
  * !me
@@ -288,23 +286,6 @@ class UserInfo extends System {
         time: { message: new Date().getTime() },
         is: { subscriber: typeof opts.sender.badges.subscriber !== 'undefined' },
       });
-
-      const isUserOnline = (await getManager()
-        .createQueryBuilder()
-        .select('user')
-        .from(UsersOnline, 'user')
-        .where('user.username = :username', { username:opts.sender.username })
-        .getMany()).length > 0;
-      if (!isUserOnline) {
-        await getManager()
-          .createQueryBuilder()
-          .insert()
-          .into(UsersOnline)
-          .values([
-            { username: opts.sender.username },
-          ])
-          .execute();
-      }
     }
   }
 }

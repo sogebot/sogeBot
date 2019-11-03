@@ -17,10 +17,10 @@
         b-tab(active)
           template(v-slot:title)
             fa(:icon='["far", "clock"]' fixed-width)
-            template(v-if="timer !== null") {{ timer | formatTime }}
+            template(v-if="!arePointsGiven") {{ timer | formatTime }}
           b-card-text
-            template(v-if="timer !== null")
-              div(v-for="(option, index) of options" :key="option.name").pb-2
+            template(v-if="!arePointsGiven")
+              div(v-for="(option, index) of options" :key="option").pb-2
                 div(style="height: 35px; cursor: pointer;" @click="close(index)").progress
                   div(
                     class="progress-bar progress-bar-striped progress-bar-animated"
@@ -28,7 +28,7 @@
                     :style="{width: getBetsPercentage(index)}"
                     style = "font-size: 1rem; text-shadow: 0px 0px 1px black, 0px 0px 2px black, 0px 0px 3px black, 0px 0px 4px black, 0px 0px 5px black, 0px 0px 6px black"
                   )
-                    span.ml-1.mr-1.text-left {{ option.name }} ({{ getBets(index) }})
+                    span.ml-1.mr-1.text-left {{ option }} ({{ getBets(index) }})
               div.pb-2
                 button(@click="close('refund')").btn.btn-block.btn-danger.p-1.text-left
                   | {{ translate('refund') | capitalize }}
@@ -61,6 +61,7 @@ export default {
       options: [],
       timer: null,
       title: '',
+      arePointsGiven: false,
       interval: [],
     }
   },
@@ -74,23 +75,22 @@ export default {
   },
   created: function () {
     this.interval.push(
-      setInterval(() => this.socket.emit('findOne', { where: { key: 'bets' } }, (err, _current) => {
+      setInterval(() => this.socket.emit('bets::getCurrentBet', (err, _current) => {
         if (err) return console.error(err)
-        this.socket.emit('find', { collection: 'users' }, (err, _bets) => {
-          if (err) return console.error(err)
-          if (Object.keys(_current).length > 0) {
-            this.locked = _current.locked
-            this.options = _current.options
-            this.timer = Number((Number(_current.end) - new Date().getTime()) / 1000).toFixed(0)
-            if (this.timer <= 0) this.timer = 0
-            this.title = _current.title
-          } else {
-            this.title = ''
-            this.timer = null,
-            this.options = []
-          }
-          this.bets = _bets
-        })
+        if (_current) {
+          this.locked = _current.isLocked
+          this.options = _current.options
+          this.timer = Number((Number(_current.endedAt) - new Date().getTime()) / 1000).toFixed(0)
+          if (this.timer <= 0) this.timer = 0
+          this.title = _current.title
+          this.bets = _current.participations
+          this.arePointsGiven = _current.arePointsGiven
+        } else {
+          this.title = ''
+          this.arePointsGiven = true;
+          this.timer = null,
+          this.options = []
+        }
       }), 1000)
     );
     this.socket.emit('settings', (err, settings) => {
@@ -109,11 +109,11 @@ export default {
     getBetsPercentage: function (index) {
       if (this.bets.length === 0) return 0
 
-      let percentage = (100 / this.bets.length) * this.bets.filter(o => Number(o.option) === Number(index)).length + '%'
+      let percentage = (100 / this.bets.length) * this.bets.filter(o => Number(o.optionIdx) === Number(index)).length + '%'
       return percentage === '0%' ? '0' : percentage
     },
     getBets: function (index) {
-      return this.bets.filter(o => Number(o.option) === Number(index)).length
+      return this.bets.filter(o => Number(o.optionIdx) === Number(index)).length
     }
   },
   filters: {
