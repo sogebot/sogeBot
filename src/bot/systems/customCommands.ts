@@ -178,17 +178,13 @@ class CustomCommands extends System {
     }
   }
 
-  @parser({ priority: constants.LOW })
-  async run (opts: ParserOptions) {
-    if (!opts.message.startsWith('!')) {
-      return true;
-    } // do nothing if it is not a command
+  async find(search: string) {
     const commands: {
       command: Commands;
       cmdArray: string[];
     }[] = [];
-    const cmdArray = opts.message.toLowerCase().split(' ');
-    for (let i = 0, len = opts.message.toLowerCase().split(' ').length; i < len; i++) {
+    const cmdArray = search.toLowerCase().split(' ');
+    for (let i = 0, len = search.toLowerCase().split(' ').length; i < len; i++) {
       const db_commands: Commands[]
         = await getRepository(Commands).find({
           relations: ['responses'],
@@ -205,6 +201,17 @@ class CustomCommands extends System {
       }
       cmdArray.pop(); // remove last array item if not found
     }
+    return commands;
+  }
+
+  @parser({ priority: constants.LOW })
+  async run (opts: ParserOptions) {
+    if (!opts.message.startsWith('!')) {
+      return true;
+    } // do nothing if it is not a command
+
+    const commands = await this.find(opts.message);
+
     if (commands.length === 0) {
       return true;
     } // no command was found - return

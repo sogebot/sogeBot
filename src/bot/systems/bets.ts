@@ -11,6 +11,7 @@ import { adminEndpoint } from '../helpers/socket';
 
 import { getRepository } from 'typeorm';
 import { Bets as BetsEntity, BetsParticipations } from '../entity/bets';
+import { isDbConnected } from '../helpers/database';
 
 const ERROR_NOT_ENOUGH_OPTIONS = 'Expected more parameters';
 const ERROR_ALREADY_OPENED = '1';
@@ -71,6 +72,9 @@ class Bets extends System {
   }
 
   public async checkIfBetExpired() {
+    if (!isDbConnected) {
+      return;
+    }
     try {
       const currentBet = await getRepository(BetsEntity).findOne({
         relations: ['participations'],

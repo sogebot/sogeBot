@@ -22,8 +22,8 @@
           <template slot="title">{{translate('dialog.buttons.delete')}}</template>
           <template slot="onHoldTitle">{{translate('dialog.buttons.hold-to-delete')}}</template>
         </hold-button>
-        <button-with-icon :class="[ item.enabled ? 'btn-success' : 'btn-danger' ]" class="btn-shrink btn-reverse" icon="power-off" @click="item.enabled = !item.enabled">
-          {{ translate('dialog.buttons.' + (item.enabled? 'enabled' : 'disabled')) }}
+        <button-with-icon :class="[ item.isEnabled ? 'btn-success' : 'btn-danger' ]" class="btn-shrink btn-reverse" icon="power-off" @click="item.isEnabled = !item.isEnabled">
+          {{ translate('dialog.buttons.' + (item.isEnabled? 'enabled' : 'disabled')) }}
         </button-with-icon>
       </template>
       <template v-slot:right>
@@ -69,22 +69,22 @@
       <b-form-group
         :label="translate('commons.additional-settings')"
       >
-        <button-with-icon :class="[ item.quiet ? 'btn-success' : 'btn-danger' ]" class="btn-reverse" :icon="item.quiet ? 'volume-off' : 'volume-up'" @click="item.quiet = !item.quiet">
-          {{ translate(item.quiet? 'quiet' : 'noisy') | capitalize }}
+        <button-with-icon :class="[ item.isErrorMsgQuiet ? 'btn-success' : 'btn-danger' ]" class="btn-reverse" :icon="item.isErrorMsgQuiet ? 'volume-off' : 'volume-up'" @click="item.isErrorMsgQuiet = !item.isErrorMsgQuiet">
+          {{ translate(item.isErrorMsgQuiet? 'quiet' : 'noisy') | capitalize }}
         </button-with-icon>
-        <button-with-icon :class="[ item.owner ? 'btn-success' : 'btn-danger' ]" class="btn-reverse" :icon="item.owner ? 'check' : 'times'" @click="item.owner = !item.owner">
+        <button-with-icon :class="[ item.isOwnerAffected ? 'btn-success' : 'btn-danger' ]" class="btn-reverse" :icon="item.isOwnerAffected ? 'check' : 'times'" @click="item.isOwnerAffected = !item.isOwnerAffected">
           {{ translate('core.permissions.casters') | capitalize }}
         </button-with-icon>
-        <button-with-icon :class="[ item.moderator ? 'btn-success' : 'btn-danger' ]" class="btn-reverse" :icon="item.moderator ? 'check' : 'times'" @click="item.moderator = !item.moderator">
+        <button-with-icon :class="[ item.isModeratorAffected ? 'btn-success' : 'btn-danger' ]" class="btn-reverse" :icon="item.isModeratorAffected ? 'check' : 'times'" @click="item.isModeratorAffected = !item.isModeratorAffected">
           {{ translate('core.permissions.moderators') | capitalize }}
         </button-with-icon>
-        <button-with-icon :class="[ item.subscriber ? 'btn-success' : 'btn-danger' ]" class="btn-reverse" :icon="item.subscriber ? 'check' : 'times'" @click="item.subscriber = !item.subscriber">
+        <button-with-icon :class="[ item.isSusbcriberAffected ? 'btn-success' : 'btn-danger' ]" class="btn-reverse" :icon="item.isSusbcriberAffected ? 'check' : 'times'" @click="item.isSusbcriberAffected = !item.isSusbcriberAffected">
           {{ translate('core.permissions.subscribers') | capitalize }}
         </button-with-icon>
-        <button-with-icon :class="[ item.follower ? 'btn-success' : 'btn-danger' ]" class="btn-reverse" :icon="item.follower ? 'check' : 'times'" @click="item.follower = !item.follower">
+        <button-with-icon :class="[ item.isFollowerAffected ? 'btn-success' : 'btn-danger' ]" class="btn-reverse" :icon="item.isFollowerAffected ? 'check' : 'times'" @click="item.isFollowerAffected = !item.isFollowerAffected">
           {{ translate('core.permissions.followers') | capitalize }}
         </button-with-icon>
-        <button-with-icon :class="[ item.type === 'global' ? 'btn-primary' : 'btn-secondary' ]" class="btn-reverse" :icon="item.follower ? 'check' : 'times'" @click="item.type = item.type === 'global' ? 'user' : 'global'">
+        <button-with-icon :class="[ item.type === 'global' ? 'btn-primary' : 'btn-secondary' ]" class="btn-reverse" :icon="item.isFollowerAffected ? 'check' : 'times'" @click="item.type = item.type === 'global' ? 'user' : 'global'">
           {{ translate(item.type) | capitalize }}
         </button-with-icon>
       </b-form-group>
@@ -102,6 +102,7 @@ import uuid from 'uuid/v4';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faCheck, faTimes, faVolumeUp, faVolumeOff } from '@fortawesome/free-solid-svg-icons';
+import { Cooldown } from '../../../../bot/entity/cooldown';
 library.add(faVolumeUp, faVolumeOff, faCheck, faTimes);
 
 Component.registerHooks([
@@ -135,18 +136,20 @@ export default class cooldownEdit extends Vue {
     pending: false,
   }
 
-  item: Types.Cooldown.Item = {
+  item: Cooldown = {
     id: uuid(),
     key: '',
     miliseconds: 600000,
     type: 'global',
     timestamp: 0,
-    quiet: false,
-    enabled: true,
-    owner: true,
-    moderator: true,
-    subscriber: true,
-    follower: true,
+    lastTimestamp: 0,
+    isErrorMsgQuiet: false,
+    isEnabled: true,
+    isOwnerAffected: true,
+    isModeratorAffected: true,
+    isSusbcriberAffected: true,
+    isFollowerAffected: true,
+    viewers: [],
   }
 
   get seconds() {
@@ -176,8 +179,10 @@ export default class cooldownEdit extends Vue {
   async mounted() {
     if (this.$route.params.id) {
       await new Promise((resolve, reject) => {
-        this.socket.emit('findOne', { where: { id: this.$route.params.id } }, (err, data: Types.Cooldown.Item) => {
+        this.socket.emit('cooldown::getById', this.$route.params.id, (err, data: Cooldown) => {
+          console.log({data});
           if (err) {
+            this.$router.push({ name: 'cooldownsManagerList' });
             reject(err)
           }
           console.debug('Loaded', data);
@@ -193,11 +198,8 @@ export default class cooldownEdit extends Vue {
   }
 
   del() {
-    this.socket.emit('delete', { where: { id: this.$route.params.id }}, (err, deleted) => {
-      if (err) {
-        return console.error(err);
-      }
-      this.$router.push({ name: 'cooldownManagerList' })
+    this.socket.emit('cooldown::deleteById', this.$route.params.id, () => {
+      this.$router.push({ name: 'cooldownsManagerList' })
     })
   }
 
@@ -206,7 +208,7 @@ export default class cooldownEdit extends Vue {
     if (!this.$v.$invalid) {
       this.state.save = this.$state.progress;
 
-      this.socket.emit('update', { key: 'id', items: [this.item] }, (err, data) => {
+      this.socket.emit('cooldown::save', this.item, (err, data) => {
         if (err) {
           this.state.save = this.$state.fail;
           return console.error(err);

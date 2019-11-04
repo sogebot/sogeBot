@@ -32,25 +32,25 @@
       <template v-slot:cell(miliseconds)="data">
         <span class="font-weight-bold text-primary font-bigger">{{Number(data.item.miliseconds / 60000).toFixed(1)}}</span> {{translate('minutes')}}
       </template>
-      <template v-slot:cell(quiet)="data">
-        {{ data.item.quiet ? translate('commons.yes') : translate('commons.no') }}
+      <template v-slot:cell(isErrorMsgQuiet)="data">
+        {{ data.item.isErrorMsgQuiet ? translate('commons.yes') : translate('commons.no') }}
       </template>
-      <template v-slot:cell(owner)="data">
-        {{ data.item.owner ? translate('commons.yes') : translate('commons.no') }}
+      <template v-slot:cell(isOwnerAffected)="data">
+        {{ data.item.isOwnerAffected ? translate('commons.yes') : translate('commons.no') }}
       </template>
-      <template v-slot:cell(moderator)="data">
-        {{ data.item.moderator ? translate('commons.yes') : translate('commons.no') }}
+      <template v-slot:cell(isModeratorAffected)="data">
+        {{ data.item.isModeratorAffected ? translate('commons.yes') : translate('commons.no') }}
       </template>
-      <template v-slot:cell(subscriber)="data">
-        {{ data.item.subscriber ? translate('commons.yes') : translate('commons.no') }}
+      <template v-slot:cell(isSusbcriberAffected)="data">
+        {{ data.item.isSusbcriberAffected ? translate('commons.yes') : translate('commons.no') }}
       </template>
-      <template v-slot:cell(follower)="data">
-        {{ data.item.follower ? translate('commons.yes') : translate('commons.no') }}
+      <template v-slot:cell(isFollowerAffected)="data">
+        {{ data.item.isFollowerAffected ? translate('commons.yes') : translate('commons.no') }}
       </template>
       <template v-slot:cell(buttons)="data">
         <div class="float-right" style="width: max-content !important;">
-          <button-with-icon :class="[ data.item.enabled ? 'btn-success' : 'btn-danger' ]" class="btn-only-icon btn-reverse" icon="power-off" @click="data.item.enabled = !data.item.enabled; update(data.item)">
-            {{ translate('dialog.buttons.' + (data.item.enabled? 'enabled' : 'disabled')) }}
+          <button-with-icon :class="[ data.item.isEnabled ? 'btn-success' : 'btn-danger' ]" class="btn-only-icon btn-reverse" icon="power-off" @click="data.item.isEnabled = !data.item.isEnabled; update(data.item)">
+            {{ translate('dialog.buttons.' + (data.item.isEnabled? 'enabled' : 'disabled')) }}
           </button-with-icon>
           <button-with-icon class="btn-only-icon btn-primary btn-reverse" icon="edit" v-bind:href="'#/manage/cooldowns/edit/' + data.item.id">
             {{ translate('dialog.buttons.edit') }}
@@ -70,8 +70,9 @@ import { getSocket } from 'src/panel/helpers/socket';
 import { capitalize } from 'src/panel/helpers/capitalize';
 
 import { Vue, Component/*, Watch */ } from 'vue-property-decorator';
-import { orderBy, isNil } from 'lodash-es';
+import { isNil } from 'lodash-es';
 import { escape } from 'xregexp';
+import { Cooldown } from '../../../../bot/entity/cooldown';
 
 @Component({
   components: {
@@ -82,7 +83,7 @@ import { escape } from 'xregexp';
 export default class cooldownList extends Vue {
   socket = getSocket('/systems/cooldown');
 
-  items: Types.Cooldown.Item[] = [];
+  items: Cooldown[] = [];
   search: string = '';
   state: {
     loading: number;
@@ -98,11 +99,11 @@ export default class cooldownList extends Vue {
       sortable: true,
     },
     { key: 'type', label: this.translate('type'), sortable: true, formatter: (value) => this.translate(value) },
-    { key: 'quiet', label: capitalize(this.translate('quiet')), sortable: true },
-    { key: 'owner', label: capitalize(this.translate('core.permissions.casters')), sortable: true },
-    { key: 'moderator', label: capitalize(this.translate('core.permissions.moderators')), sortable: true },
-    { key: 'subscriber', label: capitalize(this.translate('core.permissions.subscribers')), sortable: true },
-    { key: 'follower', label: capitalize(this.translate('core.permissions.followers')), sortable: true },
+    { key: 'isErrorMsgQuiet', label: capitalize(this.translate('quiet')), sortable: true },
+    { key: 'isOwnerAffected', label: capitalize(this.translate('core.permissions.casters')), sortable: true },
+    { key: 'isModeratorAffected', label: capitalize(this.translate('core.permissions.moderators')), sortable: true },
+    { key: 'isSusbcriberAffected', label: capitalize(this.translate('core.permissions.subscribers')), sortable: true },
+    { key: 'isFollowerAffected', label: capitalize(this.translate('core.permissions.followers')), sortable: true },
     { key: 'buttons', label: '' },
   ];
 
@@ -116,9 +117,9 @@ export default class cooldownList extends Vue {
 
   created() {
     this.state.loading = this.$state.progress;
-    this.socket.emit('find', {}, (err, items) => {
+    this.socket.emit('cooldown::getAll', (items) => {
       console.debug('Loaded', items)
-      this.items = orderBy(items, 'key', 'asc');
+      this.items = items;
       this.state.loading = this.$state.success;
     })
   }
@@ -129,13 +130,13 @@ export default class cooldownList extends Vue {
   }
 
   remove(id) {
-   this.socket.emit('delete', { where: { id } }, () => {
+   this.socket.emit('cooldown::deleteById', id, () => {
       this.items = this.items.filter((o) => o.id !== id)
     })
   }
 
   update(item) {
-    this.socket.emit('update', { items: [item] })
+    this.socket.emit('cooldown::save', item , () => {});
   }
 }
 </script>

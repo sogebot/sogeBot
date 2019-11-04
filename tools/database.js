@@ -8,6 +8,7 @@ const availableDbs = ['nedb', 'mongodb'];
 const { createConnection, getConnectionOptions, getManager, getRepository } = require('typeorm');
 const { Alias } = require('../dest/entity/alias');
 const { Commands, CommandsCount } = require('../dest/entity/commands');
+const { Cooldown } = require('../dest/entity/cooldown');
 const { CacheTitles } = require('../dest/entity/cacheTitles');
 const { Settings } = require('../dest/entity/settings');
 const { EventList } = require('../dest/entity/eventList');
@@ -184,6 +185,28 @@ async function main() {
   if (items.length > 0) {
     for (const chunk of _.chunk(items, 100)) {
       await getRepository(Permissions).insert(chunk)
+    }
+  }
+
+  console.log(`Migr: systems.cooldowns`);
+  await getManager().clear(Cooldown);
+  items = (await from.engine.find('systems.cooldown')).map(o => {
+    delete o._id; return {
+      key: o.key,
+      miliseconds: o.miliseconds,
+      type: o.type,
+      timestamp: o.timestamp,
+      isErrorMsgQuiet: o.quiet,
+      isEnabled: o.enabled,
+      isOwnerAffected: o.owner,
+      isModeratorAffected: o.moderator,
+      isSusbcriberAffected: o.subscriber,
+      isFollowerAffected: o.follower,
+    };
+  });
+  if (items.length > 0) {
+    for (const chunk of _.chunk(items, 100)) {
+      await getRepository(Cooldown).save(chunk);
     }
   }
 

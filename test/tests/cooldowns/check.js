@@ -3,6 +3,9 @@
 
 require('../../general.js');
 
+const { getRepository } = require('typeorm');
+const { Cooldown } = require('../../../dest/entity/cooldown');
+
 const assert = require('chai').assert;
 
 const db = require('../../general.js').db;
@@ -15,6 +18,7 @@ const usermod1 = { username: 'usermod1', badges: { moderator: 1 } };
 const subuser1 = { username: 'subuser1', badges: { subscriber: 1 } };
 const testUser = { username: 'test', badges: {} };
 const testUser2 = { username: 'test2', badges: {} };
+
 
 describe('Cooldowns - check()', () => {
   describe('#1969 - commands with special chars should not threadlock check', () => {
@@ -61,20 +65,24 @@ describe('Cooldowns - check()', () => {
     });
 
     it('create command', async () => {
-      const cmd = await global.db.engine.insert('systems.customcommands', { command: '!cmd', enabled: true, visible: true });
-      await global.db.engine.insert('systems.customcommands.responses', { cid: String(cmd._id), filter: '', response: '$param', permission: 1 });
+      global.systems.customCommands.add({ sender: owner, parameters: '-c !cmd -r $param' });
+      await message.isSent('customcmds.command-was-added', owner, { response: '$param', command: '!cmd', sender: owner.username });
     });
 
     it('Add !cmd to cooldown', async () => {
-      await global.db.engine.insert(global.systems.cooldown.collection.data, {
-        'key': '!cmd',
-        'type': 'global',
-        'quiet': true,
-        'owner': true,
-        'enabled': true,
-        'timestamp': 0,
-        'moderator': true,
-        'miliseconds': 60000,
+      await getRepository(Cooldown).save({
+        ...new Cooldown(),
+        key: '!cmd',
+        miliseconds: 60000,
+        type: 'global',
+        timestamp: 0,
+        lastTimestamp: 0,
+        isErrorMsgQuiet: true,
+        isEnabled: true,
+        isOwnerAffected: true,
+        isModeratorAffected: true,
+        isSusbcriberAffected: true,
+        isFollowerAffected: true,
       });
     });
 
@@ -103,15 +111,19 @@ describe('Cooldowns - check()', () => {
     });
 
     it('Add global KonCha to cooldown', async () => {
-      await global.db.engine.insert(global.systems.cooldown.collection.data, {
-        'key': 'KonCha',
-        'type': 'global',
-        'quiet': true,
-        'owner': true,
-        'enabled': true,
-        'timestamp': 0,
-        'moderator': true,
-        'miliseconds': 60000,
+      await getRepository(Cooldown).save({
+        ...new Cooldown(),
+        key: 'KonCha',
+        miliseconds: 60000,
+        type: 'global',
+        timestamp: 0,
+        lastTimestamp: 0,
+        isErrorMsgQuiet: true,
+        isEnabled: true,
+        isOwnerAffected: true,
+        isModeratorAffected: true,
+        isSusbcriberAffected: true,
+        isFollowerAffected: true,
       });
     });
 
@@ -150,17 +162,19 @@ describe('Cooldowns - check()', () => {
     });
 
     it('Add global !followage to cooldown', async () => {
-      await global.db.engine.insert(global.systems.cooldown.collection.data, {
-        'key': '!followage',
-        'type': 'global',
-        'owner': false,
-        'quiet': true,
-        'enabled': true,
-        'follower': true,
-        'moderator': false,
-        'subscriber': true,
-        'miliseconds': 30000,
-        'timestamp': 1544713598872,
+      await getRepository(Cooldown).save({
+        ...new Cooldown(),
+        key: '!followage',
+        miliseconds: 30000,
+        type: 'global',
+        timestamp: 1544713598872,
+        lastTimestamp: 0,
+        isErrorMsgQuiet: true,
+        isEnabled: true,
+        isOwnerAffected: false,
+        isModeratorAffected: false,
+        isSusbcriberAffected: true,
+        isFollowerAffected: true,
       });
     });
 
@@ -201,7 +215,7 @@ describe('Cooldowns - check()', () => {
       global.systems.cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` });
       await message.isSent('cooldowns.cooldown-was-set', owner, { command: command, type: type, seconds: seconds, sender: owner.username });
 
-      const item = await global.db.engine.findOne('systems.cooldown', { key: '!gamble' });
+      const item = await getRepository(Cooldown).findOne({ where: { key: '!gamble' } });
       assert.notEmpty(item);
 
       let isOk = await global.systems.cooldown.check({ sender: testUser, message: '!gamble 10' });
@@ -232,7 +246,7 @@ describe('Cooldowns - check()', () => {
       global.systems.cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` });
       await message.isSent('cooldowns.cooldown-was-set', owner, { command: command, type: type, seconds: seconds, sender: owner.username });
 
-      const item = await global.db.engine.findOne('systems.cooldown', { key: '!test' });
+      const item = await getRepository(Cooldown).findOne({ where: { key: '!test' } });
       assert.notEmpty(item);
 
       let isOk = await global.systems.cooldown.check({ sender: testUser, message: 'Lorem Ipsum !test' });
@@ -257,8 +271,8 @@ describe('Cooldowns - check()', () => {
       global.systems.cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` });
       await message.isSent('cooldowns.cooldown-was-set', owner, { command: command, type: type, seconds: seconds, sender: owner.username });
 
-      const item = await global.db.engine.findOne('systems.cooldown', { key: '!test me' });
-      assert.notEmpty(item);
+      const item = await getRepository(Cooldown).findOne({ where: { key: '!test me' } });
+      assert.isTrue(typeof item !== undefined);
 
       assert.isTrue(await global.systems.cooldown.check({ sender: testUser, message: command }), `'${command}' expected to not fail`);
       assert.isFalse(await global.systems.cooldown.check({ sender: testUser, message: command }), `'${command}' expected to fail`);
@@ -284,8 +298,8 @@ describe('Cooldowns - check()', () => {
       global.systems.cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` });
       await message.isSent('cooldowns.cooldown-was-set', owner, { command: command, type: type, seconds: seconds, sender: owner.username });
 
-      const item = await global.db.engine.findOne('systems.cooldown', { key: '!test' });
-      assert.notEmpty(item);
+      const item = await getRepository(Cooldown).findOne({ where: { key: '!test' } });
+      assert.isTrue(typeof item !== undefined);
 
       let isOk = await global.systems.cooldown.check({ sender: testUser, message: '!test' });
       assert.isTrue(isOk);
@@ -312,8 +326,8 @@ describe('Cooldowns - check()', () => {
       global.systems.cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` });
       await message.isSent('cooldowns.cooldown-was-set', owner, { command: command, type: type, seconds: seconds, sender: owner.username });
 
-      const item = await global.db.engine.findOne('systems.cooldown', { key: '!test' });
-      assert.notEmpty(item);
+      const item = await getRepository(Cooldown).findOne({ where: { key: '!test' } });
+      assert.isTrue(typeof item !== undefined);
 
       let isOk = await global.systems.cooldown.check({ sender: testUser, message: '!test' });
       assert.isTrue(isOk);
@@ -346,8 +360,8 @@ describe('Cooldowns - check()', () => {
       global.systems.cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` });
       await message.isSent('cooldowns.cooldown-was-set', owner, { command: command, type: type, seconds: seconds, sender: owner.username });
 
-      const item = await global.db.engine.findOne('systems.cooldown', { key: 'me' });
-      assert.notEmpty(item);
+      const item = await getRepository(Cooldown).findOne({ where: { key: 'me' } });
+      assert.isTrue(typeof item !== undefined);
 
       let isOk = await global.systems.cooldown.check({ sender: testUser, message: 'me' });
       assert.isTrue(isOk);
@@ -380,8 +394,8 @@ describe('Cooldowns - check()', () => {
       global.systems.cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` });
       await message.isSent('cooldowns.cooldown-was-set', owner, { command: command, type: type, seconds: seconds, sender: owner.username });
 
-      const item = await global.db.engine.findOne('systems.cooldown', { key: 'me' });
-      assert.notEmpty(item);
+      const item = await getRepository(Cooldown).findOne({ where: { key: 'me' } });
+      assert.isTrue(typeof item !== undefined);
 
       let isOk = await global.systems.cooldown.check({ sender: testUser, message: 'me' });
       assert.isTrue(isOk);
