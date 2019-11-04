@@ -2,7 +2,7 @@
 <span id="stats">
   <span class="item viewers">
     <font-awesome-icon icon="eye" />
-    <span>{{ stats.viewers }}</span>
+    <span>{{ stats.uptime === '00:00:00' ? '0' : stats.viewers }}</span>
     <span class="text"></span>
   </span>
 
@@ -14,19 +14,19 @@
 
   <span class="item followers">
     <font-awesome-icon icon="users" />
-    <span>{{ stats.followers }}</span>
+    <span>{{ stats.uptime === '00:00:00' ? '0' : stats.followers }}</span>
     <span class="text"></span>
   </span>
 
   <span class="item subscribers">
     <font-awesome-icon icon="star" />
-    <span>{{ stats.subscribers }}</span>
+    <span>{{ stats.uptime === '00:00:00' ? '0' : stats.subscribers }}</span>
     <span class="text"></span>
   </span>
 
   <span class="item bits">
     <font-awesome-icon icon="gem" />
-    <span>{{ stats.bits }}</span>
+    <span>{{ stats.uptime === '00:00:00' ? '0' : stats.bits }}</span>
     <span class="text"></span>
   </span>
 </span>
