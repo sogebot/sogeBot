@@ -16,13 +16,13 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: 13
-    - name: Install eslint and dependencies
-      run: npm install typescript eslint jsonlint-mod @typescript-eslint/parser @typescript-eslint/eslint-plugin --only=dev
     - name: All test should be run - tests are not containing describe.only
       run: |
           if ! grep -r -l 'describe.only' ./test/; then
             exit 1
           fi;
+    - name: Install eslint and dependencies
+      run: npm install typescript eslint jsonlint-mod @typescript-eslint/parser @typescript-eslint/eslint-plugin --only=dev
     - name: Run eslint
       run: make eslint
     - name: Run jsonlint
