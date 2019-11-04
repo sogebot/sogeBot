@@ -86,7 +86,6 @@ async function test() {
     });
 
     p.on('close', (code) => {
-      console.log({code});
       status = code;
       resolve();
     });

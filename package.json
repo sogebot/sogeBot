@@ -40,7 +40,7 @@
     "moment-timezone": "0.5.27",
     "mongodb": "3.3.3",
     "mongodb-uri": "0.9.7",
-    "mysql": "2.17.1",
+    "mysql2": "2.0.0",
     "nedb": "1.8.0",
     "nedb-promise": "2.0.1",
     "node-hue-api": "3.4.0",
