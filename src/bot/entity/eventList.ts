@@ -12,7 +12,7 @@ export class EventList {
   @Index()
   username!: string;
 
-  @Column()
+  @Column('bigint')
   timestamp!: number;
 
   @Column()

@@ -11,9 +11,9 @@ export class Cooldown {
   miliseconds!: number;
   @Column('varchar', { length: 10 })
   type!: 'global' | 'user';
-  @Column({ default: 0 })
+  @Column('bigint', { default: 0 })
   timestamp!: number;
-  @Column({ default: 0 })
+  @Column('bigint', { default: 0 })
   lastTimestamp!: number;
   @Column()
   isErrorMsgQuiet!: boolean;
@@ -43,8 +43,8 @@ export class CooldownViewer {
   cooldown!: Cooldown;
   @Column()
   username!: string;
-  @Column()
+  @Column('bigint')
   timestamp!: number;
-  @Column()
+  @Column('bigint')
   lastTimestamp!: number;
 };

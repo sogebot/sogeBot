@@ -14,6 +14,6 @@ export class Quotes {
   @Column()
   quotedBy!: string;
 
-  @Column()
+  @Column('bigint')
   createdAt!: number;
 };

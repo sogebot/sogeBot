@@ -44,6 +44,6 @@ export class CommandsCount {
   @Column()
   @Index()
   command!: string;
-  @Column()
+  @Column('bigint')
   timestamp!: number;
 };

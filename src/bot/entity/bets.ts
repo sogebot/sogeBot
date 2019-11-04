@@ -4,10 +4,10 @@ import { Column, Entity, Index, ManyToOne, OneToMany, PrimaryGeneratedColumn } f
 export class Bets {
   @PrimaryGeneratedColumn()
   id!: string;
-  @Column()
+  @Column('bigint')
   @Index()
   createdAt!: number;
-  @Column()
+  @Column('bigint')
   endedAt!: number;
   @Column({ default: false })
   isLocked!: boolean;
@@ -35,9 +35,9 @@ export class BetsParticipations {
   userId!: string;
   @Column()
   username!: string;
-  @Column()
+  @Column('bigint')
   points!: number;
-  @Column()
+  @Column('int')
   optionIdx!: number;
   @ManyToOne(() => Bets, (bet) => bet.participations, {
     onDelete: 'CASCADE',

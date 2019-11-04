@@ -12,6 +12,6 @@ export class CacheTitles {
   @Column()
   title!: string;
 
-  @Column()
+  @Column('bigint')
   timestamp!: number;
 }

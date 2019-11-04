@@ -34,7 +34,7 @@ export class PermissionFilters {
   comparator!: '<' | '>' | '==' | '<=' | '>=';
   @Column('varchar')
   type!: 'points' | 'watched' | 'tips' | 'bits' | 'messages' | 'subtier' | 'subcumulativemonths' | 'substreakmonths';
-  @Column()
+  @Column('bigint')
   value!: number;
 };
 
