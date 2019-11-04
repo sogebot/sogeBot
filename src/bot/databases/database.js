@@ -10,8 +10,8 @@ import { warning } from '../helpers/log';
 class Database {
   constructor (forceIndexes, forceRemoveIndexes, forceType, forceDb) {
     this.engine = null
-    if (config.database.type === 'nedb') this.engine = new INeDB(forceIndexes, forceDb)
-    else if (config.database.type === 'mongodb') this.engine = new IMongoDB(forceIndexes, forceRemoveIndexes, forceDb)
+    if ((config.database.type === 'nedb' && !forceType) || forceType === 'nedb') this.engine = new INeDB(forceIndexes, forceDb)
+    else if ((config.database.type === 'mongodb' && !forceType) || forceType === 'mongodb') this.engine = new IMongoDB(forceIndexes, forceRemoveIndexes, forceDb)
     else {
       warning('No database was selected - fallback to NeDB')
       this.engine = new INeDB(forceIndexes)

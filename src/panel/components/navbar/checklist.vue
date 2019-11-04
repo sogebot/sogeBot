@@ -10,12 +10,12 @@
     </div>
     <div v-bind:class="[bDisplay ? 'd-block' : 'd-none']" style="position: absolute; width:200px; right: 1rem; z-index:9999999">
       <div class="list-group">
-        <button :key="index" v-for="(item, index) of items" type="button" style="padding: 0.25rem 1.25rem" class="list-group-item list-group-item-action" @click="items[index].completed = !items[index].completed; onChange()">
-          <span class="pr-1" :class="[item.completed? 'text-success' : 'text-danger']">
-            <fa v-if="item.completed" :icon="['far', 'check-square']"></fa>
+        <button :key="index" v-for="(item, index) of items" type="button" style="padding: 0.25rem 1.25rem" class="list-group-item list-group-item-action" @click="toggle(item)">
+          <span class="pr-1" :class="[isItemCompleted(item)? 'text-success' : 'text-danger']">
+            <fa v-if="isItemCompleted(item)" :icon="['far', 'check-square']"></fa>
             <fa v-else :icon="['far', 'square']"></fa>
           </span>
-          {{ item.text }}
+          {{ item }}
         </button>
       </div>
       <div class="list-group list-group-item-info text-info p-2">Add new items in <a href="#/settings/systems/checklist">checklist settings</a></div>
@@ -37,6 +37,7 @@ export default {
       bDisplay: false,
       total: 0,
       items: [],
+      checkedItems: [],
       socket: getSocket('/systems/checklist'),
     }
   },
@@ -49,34 +50,38 @@ export default {
       return this.$systems.find(o => o.name === 'checklist').enabled
     },
     completed: function () {
-      return this.items.filter(o => o.completed).length
+      return this.checkedItems.filter(o => o.isCompleted).length
     }
   },
   methods: {
-    onChange: debounce(function () {
-      let items = []
-      for (let item of this.items) {
-        items.push({ value: item.text, completed: item.completed})
+    toggle: function (item) {
+      let checkedItem = this.checkedItems.find(o => o.value === item);
+      if (!checkedItem) {
+        checkedItem = {};
+        checkedItem.isCompleted = true;
+        checkedItem.value = item;
+        this.checkedItems.push(checkedItem);
+      } else {
+        checkedItem.isCompleted = !checkedItem.isCompleted;
       }
-      this.socket.emit('update', { key: 'value', items })
-      }, 1000),
+      this.socket.emit('checklist::save', checkedItem, () => {});
+    },
     toggleDisplay: function () {
       this.bDisplay = !this.bDisplay
     },
     update: function () {
-      this.socket.emit('findOne', { collection: 'settings', where: { key: 'itemsArray' }}, (err, data) => {
-        if (err) return console.error(err)
-        if (typeof data.value !== 'undefined' && data.value.length > 0) {
-          // load complete data
-          this.socket.emit('find', {}, (err, data2) => {
-            this.items = []
-            for (let item of data.value) {
-              const completed = (data2.find(o => o.value === item) || { completed: false }).completed
-              this.items.push({ text: item, completed })
-            }
-          })
-        }
+      this.socket.emit('checklist::getAll', (items, checkedItems) => {
+        this.checkedItems = checkedItems;
+        this.items = items;
       })
+    },
+    isItemCompleted(item) {
+      const checkedItem = this.checkedItems.find(o => o.value === item);
+      if (!checkedItem) {
+        return false;
+      } else {
+        return checkedItem.isCompleted;
+      }
     }
   },
   mounted: function () {

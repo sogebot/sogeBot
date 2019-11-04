@@ -49,7 +49,6 @@ const dbName = {
 };
 
 const from = new (require('../dest/databases/database'))(false, false, argv.from, dbName.from());
-
 const connect = async function () {
   const connectionOptions = await getConnectionOptions();
   createConnection({
@@ -81,13 +80,13 @@ async function main() {
   }
 
   await getManager().clear(Settings);
-  for (const type of ['core', 'overlays', 'games', 'registries', 'integrations']) {
+  for (const type of ['core', 'overlays', 'games', 'registries', 'integrations', 'systems']) {
     console.log(`Migr: ${type}.settings`);
     for (const item of await from.engine.find(`${type}.settings`)) {
-      if (item.key.includes('.')) {
+      if (item.key.includes('.') || typeof item.system === 'undefined') {
         continue;
       }
-      await getRepository(Settings).insert({ namespace: `/${type}/${item.system}`, key: item.key, value: JSON.stringify(item.value) })
+      await getRepository(Settings).insert({ namespace: `/${type}/${item.system}`, key: item.key, value: JSON.stringify(item.value) });
     }
   }
 
@@ -154,7 +153,7 @@ async function main() {
       }
       return o;
     });
-    item.responses = responses
+    item.responses = responses;
   }
   items = items.map(o => {
     delete o._id; delete o.id; delete o.cid; return o;
@@ -172,7 +171,7 @@ async function main() {
   });
   if (items.length > 0) {
     for (const chunk of _.chunk(items, 100)) {
-      await getRepository(CommandsCount).insert(chunk)
+      await getRepository(CommandsCount).insert(chunk);
     }
   }
 
