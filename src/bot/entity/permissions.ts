@@ -44,7 +44,7 @@ export class PermissionCommands {
   id!: string;
   @Index()
   @Column()
-  key!: string;
+  name!: string;
   @Column()
   permission!: string;
 };

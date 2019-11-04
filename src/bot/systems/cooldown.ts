@@ -46,7 +46,7 @@ class Cooldown extends System {
     adminEndpoint(this.nsp, 'cooldown::getAll', async (cb) => {
       const cooldown = await getRepository(CooldownEntity).find({
         order: {
-          key: 'ASC',
+          name: 'ASC',
         },
       });
       cb(cooldown);
@@ -76,7 +76,7 @@ class Cooldown extends System {
 
     let cooldown = await getRepository(CooldownEntity).findOne({
       where: {
-        key: match.command,
+        name: match.command,
         type: match.type as 'global' | 'user',
       },
     });
@@ -95,7 +95,7 @@ class Cooldown extends System {
 
     cooldown = {
       ...cooldown,
-      key: match.command,
+      name: match.command,
       miliseconds: parseInt(match.seconds, 10) * 1000,
       type: (match.type as 'global' | 'user'),
       timestamp: 0,
@@ -124,23 +124,23 @@ class Cooldown extends System {
       .toArray();
 
     if (!_.isNil(command)) { // command
-      let key = subcommand ? `${command} ${subcommand}` : command;
+      let name = subcommand ? `${command} ${subcommand}` : command;
       const parsed = await (new Parser().find(subcommand ? `${command} ${subcommand}` : command, null));
       if (parsed) {
-        key = parsed.command;
+        name = parsed.command;
       } else {
         // search in custom commands as well
         if (global.systems.customCommands.enabled) {
           const foundCommands = await global.systems.customCommands.find(subcommand ? `${command} ${subcommand}` : command);
           if (foundCommands.length > 0) {
-            key = foundCommands[0].command.command;
+            name = foundCommands[0].command.command;
           }
         }
       }
 
-      const cooldown = await getRepository(CooldownEntity).findOne({ where: { key }, relations: ['viewers'] });
+      const cooldown = await getRepository(CooldownEntity).findOne({ where: { name }, relations: ['viewers'] });
       if (!cooldown) { // command is not on cooldown -> recheck with text only
-        const replace = new RegExp(`${XRegExp.escape(key)}`, 'ig');
+        const replace = new RegExp(`${XRegExp.escape(name)}`, 'ig');
         opts.message = opts.message.replace(replace, '');
         if (opts.message.length > 0) {
           return this.check(opts);
@@ -161,7 +161,7 @@ class Cooldown extends System {
 
       data = [];
       _.each(keywords, (keyword) => {
-        const cooldown = _.find(cooldowns, (o) => o.key.toLowerCase() === keyword.keyword.toLowerCase());
+        const cooldown = _.find(cooldowns, (o) => o.name.toLowerCase() === keyword.keyword.toLowerCase());
         if (keyword.enabled && cooldown) {
           data.push(cooldown);
         }
@@ -210,12 +210,12 @@ class Cooldown extends System {
       } else {
         if (!cooldown.isErrorMsgQuiet && this.cooldownNotifyAsWhisper) {
           opts.sender['message-type'] = 'whisper'; // we want to whisp cooldown message
-          const message = await prepare('cooldowns.cooldown-triggered', { command: cooldown.key, seconds: Math.ceil((cooldown.miliseconds - now + timestamp) / 1000) });
+          const message = await prepare('cooldowns.cooldown-triggered', { command: cooldown.name, seconds: Math.ceil((cooldown.miliseconds - now + timestamp) / 1000) });
           await sendMessage(message, opts.sender, opts.attr);
         }
         if (!cooldown.isErrorMsgQuiet && this.cooldownNotifyAsChat) {
           opts.sender['message-type'] = 'chat';
-          const message = await prepare('cooldowns.cooldown-triggered', { command: cooldown.key, seconds: Math.ceil((cooldown.miliseconds - now + timestamp) / 1000) });
+          const message = await prepare('cooldowns.cooldown-triggered', { command: cooldown.name, seconds: Math.ceil((cooldown.miliseconds - now + timestamp) / 1000) });
           await sendMessage(message, opts.sender, opts.attr);
         }
         result = false;
@@ -236,23 +236,23 @@ class Cooldown extends System {
       .toArray();
 
     if (!_.isNil(command)) { // command
-      let key = subcommand ? `${command} ${subcommand}` : command;
+      let name = subcommand ? `${command} ${subcommand}` : command;
       const parsed = await (new Parser().find(subcommand ? `${command} ${subcommand}` : command));
       if (parsed) {
-        key = parsed.command;
+        name = parsed.command;
       } else {
         // search in custom commands as well
         if (global.systems.customCommands.enabled) {
           const foundCommands = await global.systems.customCommands.find(subcommand ? `${command} ${subcommand}` : command);
           if (foundCommands.length > 0) {
-            key = foundCommands[0].command.command;
+            name = foundCommands[0].command.command;
           }
         }
       }
 
-      const cooldown = await getRepository(CooldownEntity).findOne({ where: { key }});
+      const cooldown = await getRepository(CooldownEntity).findOne({ where: { name }});
       if (!cooldown) { // command is not on cooldown -> recheck with text only
-        const replace = new RegExp(`${XRegExp.escape(key)}`, 'ig');
+        const replace = new RegExp(`${XRegExp.escape(name)}`, 'ig');
         opts.message = opts.message.replace(replace, '');
         if (opts.message.length > 0) {
           return this.cooldownRollback(opts);
@@ -273,7 +273,7 @@ class Cooldown extends System {
 
       data = [];
       _.each(keywords, (keyword) => {
-        const cooldown = _.find(cooldowns, (o) => o.key.toLowerCase() === keyword.keyword.toLowerCase());
+        const cooldown = _.find(cooldowns, (o) => o.name.toLowerCase() === keyword.keyword.toLowerCase());
         if (keyword.enabled && cooldown) {
           data.push(cooldown);
         }
@@ -323,7 +323,7 @@ class Cooldown extends System {
     const cooldown = await getRepository(CooldownEntity).findOne({
       relations: ['viewers'],
       where: {
-        key: match.command,
+        name: match.command,
         type: match.type as 'global' | 'user',
       },
     });
@@ -360,7 +360,7 @@ class Cooldown extends System {
       return;
     } // those two are setable only from dashboard
 
-    const message = await prepare(`cooldowns.cooldown-was-${status}${path}`, { command: cooldown.key });
+    const message = await prepare(`cooldowns.cooldown-was-${status}${path}`, { command: cooldown.name });
     sendMessage(message, opts.sender, opts.attr);
   }
 

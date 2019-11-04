@@ -6,7 +6,7 @@ export class Cooldown {
   id!: string;
   @Column()
   @Index({ unique: true })
-  key!: string;
+  name!: string;
   @Column()
   miliseconds!: number;
   @Column('varchar', { length: 10 })

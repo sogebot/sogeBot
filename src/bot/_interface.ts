@@ -72,7 +72,7 @@ class Module {
         .createQueryBuilder()
         .update(Settings)
         .where('namespace = :namespace', { namespace: this.nsp })
-        .andWhere('key = :key', { key: 'enabled' })
+        .andWhere('name = :name', { name: 'enabled' })
         .set({ value: JSON.stringify(value) })
         .execute();
     }
@@ -162,7 +162,7 @@ class Module {
       .createQueryBuilder()
       .select('settings')
       .where('namespace=:namespace', { namespace: this.nsp })
-      .andWhere('key=:key', { key })
+      .andWhere('name=:name', { name: key })
       .from(Settings, 'settings')
       .getOne();
 
@@ -790,7 +790,7 @@ class Module {
       .createQueryBuilder()
       .select('settings')
       .where('namespace = :namespace', { namespace: this.nsp })
-      .andWhere('key = :key', { key: 'commands.' + command })
+      .andWhere('name = :name', { name: 'commands.' + command })
       .from(Settings, 'settings')
       .getOne();
 
@@ -819,7 +819,7 @@ class Module {
           .createQueryBuilder()
           .delete()
           .where('namespace = :namespace', { namespace: this.nsp })
-          .andWhere('key = :key', { key: 'commands.' + command })
+          .andWhere('name = :name', { name: 'commands.' + command })
           .from(Settings)
           .execute();
         delete c.command;
@@ -829,7 +829,7 @@ class Module {
           .createQueryBuilder()
           .update(Settings)
           .where('namespace = :namespace', { namespace: this.nsp })
-          .andWhere('key = :key', { key: 'commands.' + command })
+          .andWhere('name = :name', { name: 'commands.' + command })
           .set({ value: JSON.stringify(updated) })
           .execute();
       }

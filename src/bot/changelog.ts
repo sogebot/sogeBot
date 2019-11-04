@@ -34,7 +34,7 @@ export const changelog = async () => {
     const variableFromDb
      = await getManager().createQueryBuilder().select('settings').from(Settings, 'settings')
        .where('namespace = :namespace', { namespace: self.nsp })
-       .andWhere('key = :key', { key: variable })
+       .andWhere('name = :name', { name: variable })
        .getOne();
     if (variableFromDb) {
       const value = JSON.stringify(variableFromDb.value);

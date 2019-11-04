@@ -92,7 +92,7 @@ export default class cooldownList extends Vue {
   }
 
   fields = [
-    { key: 'key', label: '!' + this.translate('command') + ' ' + this.translate('or') + ' ' + this.translate('keyword'), sortable: true },
+    { key: 'name', label: '!' + this.translate('command') + ' ' + this.translate('or') + ' ' + this.translate('keyword'), sortable: true },
     {
       key: 'miliseconds',
       label: this.translate('cooldown'),
@@ -110,7 +110,7 @@ export default class cooldownList extends Vue {
   get fItems() {
     if (this.search.length === 0) return this.items
     return this.items.filter((o) => {
-      const isSearchInKey = !isNil(o.key.match(new RegExp(escape(this.search), 'ig')))
+      const isSearchInKey = !isNil(o.name.match(new RegExp(escape(this.search), 'ig')))
       return isSearchInKey
     })
   }

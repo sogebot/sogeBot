@@ -57,14 +57,14 @@ export const getChannelChattersUnofficialAPI = async (): Promise<{ modStatus: bo
       .createQueryBuilder()
       .select('settings')
       .from(Settings, 'settings')
-      .where('key = :key', { key: 'generalChannel' })
+      .where('name = :name', { name: 'generalChannel' })
       .andWhere('namespace = :namespace', { namespace: '/core/oauth'})
       .getOne())?.value;
     const bot = (await getManager()
       .createQueryBuilder()
       .select('settings')
       .from(Settings, 'settings')
-      .where('key = :key', { key: 'botUsername' })
+      .where('name = :name', { name: 'botUsername' })
       .andWhere('namespace = :namespace', { namespace: '/core/oauth'})
       .getOne())?.value;
 

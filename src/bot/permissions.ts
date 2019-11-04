@@ -99,7 +99,7 @@ class Permissions extends Core {
   }
 
   public async getCommandPermission(commandArg: string): Promise<string | null | undefined> {
-    const cItem = await getRepository(PermissionCommands).findOne({ key: commandArg });
+    const cItem = await getRepository(PermissionCommands).findOne({ name: commandArg });
     if (cItem) {
       return cItem.permission;
     } else {
@@ -166,7 +166,7 @@ class Permissions extends Core {
       }
 
       // if userId is part of userIds => true
-      if (pItem.userIds.includes(userId)) {
+      if (pItem.userIds.includes(String(userId))) {
         return { access: true, permission: pItem };
       }
 

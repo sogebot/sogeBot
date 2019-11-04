@@ -286,7 +286,7 @@ async function registerCommand(opts: string | Command, m) {
       .select('settings')
       .from(Settings, 'settings')
       .where('namespace = :namespace', { namespace: self.nsp })
-      .andWhere('key = :key', { key: 'commands.' + c.name })
+      .andWhere('name = :name', { name: 'commands.' + c.name })
       .getOne();
     if (dbc) {
       dbc.value = JSON.parse(dbc.value);
@@ -297,7 +297,7 @@ async function registerCommand(opts: string | Command, m) {
           .delete()
           .from(Settings)
           .where('namespace = :namespace', { namespace: self.nsp })
-          .andWhere('key = :key', { key: 'commands.' + c.name })
+          .andWhere('name = :name', { name: 'commands.' + c.name })
           .execute();
       }
       c.command = dbc.value;

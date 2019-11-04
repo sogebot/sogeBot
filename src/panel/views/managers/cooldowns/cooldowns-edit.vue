@@ -8,7 +8,7 @@
           {{ translate('menu.cooldown') }}
           <template v-if="$route.params.id">
             <small><fa icon="angle-right"/></small>
-            {{item.key}}
+            {{item.name}}
             <small class="text-muted text-monospace" style="font-size:0.7rem">{{$route.params.id}}</small>
           </template>
         </span>
@@ -41,14 +41,14 @@
         <b-input-group>
           <b-form-input
             id="name"
-            v-model="item.key"
+            v-model="item.name"
             type="text"
             :placeholder="translate('systems.cooldown.key.placeholder')"
-            @input="$v.item.key.$touch()"
-            :state="$v.item.key.$invalid && $v.item.key.$dirty ? false : null"
+            @input="$v.item.name.$touch()"
+            :state="$v.item.name.$invalid && $v.item.name.$dirty ? false : null"
           ></b-form-input>
         </b-input-group>
-        <b-form-invalid-feedback :state="!($v.item.key.$invalid && $v.item.key.$dirty)">{{ translate('dialog.errors.required') }}</b-form-invalid-feedback>
+        <b-form-invalid-feedback :state="!($v.item.name.$invalid && $v.item.name.$dirty)">{{ translate('dialog.errors.required') }}</b-form-invalid-feedback>
       </b-form-group>
       <b-form-group
         :label="translate('cooldown') + ' (' + this.translate('in-seconds') + ')'"
@@ -138,7 +138,7 @@ export default class cooldownEdit extends Vue {
 
   item: Cooldown = {
     id: uuid(),
-    key: '',
+    name: '',
     miliseconds: 600000,
     type: 'global',
     timestamp: 0,
@@ -164,7 +164,7 @@ export default class cooldownEdit extends Vue {
   @Validations()
   validations = {
     item: {
-      key: {required},
+      name: {required},
       miliseconds: { required, minValue: minValue(10000) }
     }
   }

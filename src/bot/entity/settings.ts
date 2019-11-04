@@ -11,7 +11,7 @@ export class Settings {
 
   @Column()
   @Index()
-  key!: string;
+  name!: string;
 
   @Column()
   value!: string;

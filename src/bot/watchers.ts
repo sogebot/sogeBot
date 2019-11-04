@@ -45,11 +45,11 @@ export const VariableWatcher = {
         if (isMainThread && self) {
           const setting = await getRepository(Settings).findOne({
             where: {
-              key: variable,
+              name: variable,
               namespace: self.nsp,
             },
           }) || new Settings();
-          setting.key = variable;
+          setting.name = variable;
           setting.value =  JSON.stringify(value);
           setting.namespace = self.nsp;
           await getRepository(Settings).save(setting);
