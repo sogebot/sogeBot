@@ -261,7 +261,7 @@ export function rollback() {
 async function registerCommand(opts: string | Command, m) {
   const isAvailableModule = m.type !== 'core' && typeof global[m.type] !== 'undefined' && typeof global[m.type][m.name] !== 'undefined';
   const isAvailableLibrary = m.type === 'core' && typeof global[m.name] !== 'undefined';
-  if (((!isAvailableLibrary && !isAvailableModule) || !isDbConnected) || !isDbConnected) {
+  if ((!isAvailableLibrary && !isAvailableModule) || !isDbConnected) {
     return setTimeout(() => registerCommand(opts, m), 1000);
   }
   try {

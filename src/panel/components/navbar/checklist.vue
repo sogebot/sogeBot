@@ -25,7 +25,6 @@
 
 <script>
 import { getSocket } from 'src/panel/helpers/socket';
-import { debounce } from 'lodash-es';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faCheckSquare, faSquare } from '@fortawesome/free-regular-svg-icons';

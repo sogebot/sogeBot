@@ -13,7 +13,7 @@ const gitCommitInfo = require('git-commit-info');
 import { error, info } from './helpers/log';
 import { CacheTitles } from './entity/cacheTitles';
 import uuid from 'uuid'
-import { Brackets, getManager } from 'typeorm'
+import { getManager } from 'typeorm'
 
 const Parser = require('./parser')
 

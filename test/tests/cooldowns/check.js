@@ -272,7 +272,7 @@ describe('Cooldowns - check()', () => {
       await message.isSent('cooldowns.cooldown-was-set', owner, { command: command, type: type, seconds: seconds, sender: owner.username });
 
       const item = await getRepository(Cooldown).findOne({ where: { key: '!test me' } });
-      assert.isTrue(typeof item !== undefined);
+      assert.isTrue(typeof item !== 'undefined');
 
       assert.isTrue(await global.systems.cooldown.check({ sender: testUser, message: command }), `'${command}' expected to not fail`);
       assert.isFalse(await global.systems.cooldown.check({ sender: testUser, message: command }), `'${command}' expected to fail`);
@@ -299,7 +299,7 @@ describe('Cooldowns - check()', () => {
       await message.isSent('cooldowns.cooldown-was-set', owner, { command: command, type: type, seconds: seconds, sender: owner.username });
 
       const item = await getRepository(Cooldown).findOne({ where: { key: '!test' } });
-      assert.isTrue(typeof item !== undefined);
+      assert.isTrue(typeof item !== 'undefined');
 
       let isOk = await global.systems.cooldown.check({ sender: testUser, message: '!test' });
       assert.isTrue(isOk);
@@ -327,7 +327,7 @@ describe('Cooldowns - check()', () => {
       await message.isSent('cooldowns.cooldown-was-set', owner, { command: command, type: type, seconds: seconds, sender: owner.username });
 
       const item = await getRepository(Cooldown).findOne({ where: { key: '!test' } });
-      assert.isTrue(typeof item !== undefined);
+      assert.isTrue(typeof item !== 'undefined');
 
       let isOk = await global.systems.cooldown.check({ sender: testUser, message: '!test' });
       assert.isTrue(isOk);
@@ -361,7 +361,7 @@ describe('Cooldowns - check()', () => {
       await message.isSent('cooldowns.cooldown-was-set', owner, { command: command, type: type, seconds: seconds, sender: owner.username });
 
       const item = await getRepository(Cooldown).findOne({ where: { key: 'me' } });
-      assert.isTrue(typeof item !== undefined);
+      assert.isTrue(typeof item !== 'undefined');
 
       let isOk = await global.systems.cooldown.check({ sender: testUser, message: 'me' });
       assert.isTrue(isOk);
@@ -395,7 +395,7 @@ describe('Cooldowns - check()', () => {
       await message.isSent('cooldowns.cooldown-was-set', owner, { command: command, type: type, seconds: seconds, sender: owner.username });
 
       const item = await getRepository(Cooldown).findOne({ where: { key: 'me' } });
-      assert.isTrue(typeof item !== undefined);
+      assert.isTrue(typeof item !== 'undefined');
 
       let isOk = await global.systems.cooldown.check({ sender: testUser, message: 'me' });
       assert.isTrue(isOk);
