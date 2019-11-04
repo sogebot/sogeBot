@@ -20,7 +20,7 @@ const botwithchangedname = { username: 'asdsadas', userId: '24900234' };
 const commons = require('../../../dest/commons');
 const { VariableWatcher } = require('../../../dest/watchers');
 
-describe.only('TMI - ignore', () => {
+describe('TMI - ignore', () => {
   before(async () => {
     await db.cleanup();
     await message.prepare();
