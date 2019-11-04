@@ -29,8 +29,8 @@ jobs:
       run: make eslint
     - name: Run jsonlint
       run: make jsonlint
-  nedb:
-    name: NeDB tests
+  sqlite:
+    name: SQLite tests
     if: contains(github.event.pull_request.body, '[skip-tests]') != true
     needs: eslint
     runs-on: ubuntu-latest
@@ -43,25 +43,28 @@ jobs:
     - name: Install all dependencies
       run: make
     - name: Set proper db to use
-      run: npm run test:config:nedb
+      run: npm run test:config:sqlite
     - name: Run mocha
       run: npm test
-  nedb2:
-    name: NeDB tests
+  sqlite2:
+    name: SQLite tests
     if: contains(github.event.pull_request.body, '[skip-tests]') == true
     runs-on: ubuntu-latest
     steps:
     - name: Skipped OK
       run: 'echo "[skip-tests] found"'
-  mongodb:
-    name: MongoDB tests
+  postgres:
+    name: PostgreSQL tests
     if: contains(github.event.pull_request.body, '[skip-tests]') != true
     needs: eslint
     services:
-      mongodb:
-        image: mongo
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
         ports:
-          - 27017:27017
+          - 5432:5432
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
@@ -72,11 +75,11 @@ jobs:
     - name: Install all dependencies
       run: make
     - name: Set proper db to use
-      run: npm run test:config:mongodb
+      run: npm run test:config:postgres
     - name: Run mocha
       run: npm test
-  mongodb2:
-    name: MongoDB tests
+  postgres2:
+    name: PostgreSQL tests
     if: contains(github.event.pull_request.body, '[skip-tests]') == true
     runs-on: ubuntu-latest
     steps:

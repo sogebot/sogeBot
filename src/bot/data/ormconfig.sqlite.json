@@ -1,0 +1,6 @@
+{
+  "type": "sqlite",
+  "database": "./sogebot.db",
+  "logging": ["error"],
+  "cache": true
+}

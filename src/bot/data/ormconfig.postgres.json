@@ -1,0 +1,8 @@
+{
+  "type": "postgres",
+  "host": "localhost",
+  "port": "54320",
+  "database": "sogebot",
+  "logging": ["error"],
+  "cache": true
+}
