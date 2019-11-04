@@ -117,7 +117,7 @@ jobs:
     - name: Skipped OK
       run: 'echo "[skip-tests] found"'
   mssql:
-    name: MySQL/MariaDB tests
+    name: MSSQL tests
     if: contains(github.event.pull_request.body, '[skip-tests]') != true
     needs: eslint
     services:
@@ -142,7 +142,7 @@ jobs:
     - name: Run mocha
       run: npm test
   mssql2:
-    name: MySQL/MariaDB tests
+    name: MSSQL tests
     if: contains(github.event.pull_request.body, '[skip-tests]') == true
     runs-on: ubuntu-latest
     steps:
