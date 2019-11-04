@@ -15,7 +15,7 @@ const testuser3 = { username: 'testuser3', id: Math.floor(Math.random() * 1000) 
 const { getRepository } = require('typeorm');
 const { UsersOnline } = require('../../../dest/entity/usersOnline');
 
-describe.only('lib/twitch - followers()', () => {
+describe('lib/twitch - followers()', () => {
   before(async () => {
     await db.cleanup();
     await message.prepare();
