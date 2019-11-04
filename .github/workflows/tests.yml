@@ -44,6 +44,8 @@ jobs:
       run: make
     - name: Set proper db to use
       run: npm run test:config:sqlite
+    - name: Create sogebot database
+      run: npx typeorm query "CREATE DATABASE sogebot IF NOT EXIST"
     - name: Run mocha
       run: npm test
   sqlite2:
@@ -76,6 +78,8 @@ jobs:
       run: make
     - name: Set proper db to use
       run: npm run test:config:postgres
+    - name: Create sogebot database
+      run: npx typeorm query "CREATE DATABASE sogebot IF NOT EXIST"
     - name: Run mocha
       run: npm test
   postgres2:
@@ -107,6 +111,8 @@ jobs:
       run: make
     - name: Set proper db to use
       run: npm run test:config:mysql
+    - name: Create sogebot database
+      run: npx typeorm query "CREATE DATABASE sogebot IF NOT EXIST"
     - name: Run mocha
       run: npm test
   mysql2:
@@ -139,6 +145,8 @@ jobs:
       run: make
     - name: Set proper db to use
       run: npm run test:config:mssql
+    - name: Create sogebot database
+      run: npx typeorm query "CREATE DATABASE sogebot IF NOT EXIST"
     - name: Run mocha
       run: npm test
   mssql2:
