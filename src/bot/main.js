@@ -50,7 +50,7 @@ global.db = new (require('./databases/database'))(!isNeDB, !isNeDB);
 
 const connect = async function () {
   const connectionOptions = await getConnectionOptions();
-  createConnection({
+  await createConnection({
     logging: false,
     synchronize: true,
     entities: [__dirname + '/entity/*.{js,ts}'],

@@ -10,6 +10,9 @@ const assert = require('assert');
 const { permission } = require('../../../dest/permissions');
 const Parser = require('../../../dest/parser').default;
 
+const { getRepository } = require('typeorm');
+const { Permissions } = require('../../../dest/entity/permissions');
+
 const users = [
   { username: '__owner__', userId: 1, id: 1, stats: { subStreak: 0, subCumulativeMonths: 0 } },
   { username: '__moderator__', userId: 2, id: 2, is: { moderator: true }, badges: { moderator: true }, stats: { subStreak: 0, subCumulativeMonths: 0 } },
@@ -66,8 +69,8 @@ describe('Permissions - check()', () => {
 
   describe(`Permission only for __viewer__ userId`, () => {
     beforeEach(async () => {
-      await global.db.engine.insert(global.permissions.collection.data, {
-        id: '12345',
+      await getRepository(Permissions).save({
+        id: 'bbaac669-923f-4063-99e3-f8004b34dac3',
         name: '__viewer__only',
         order: Object.keys(permission).length + 1,
         isCorePermission: false,
@@ -75,11 +78,11 @@ describe('Permissions - check()', () => {
         automation: 'none',
         userIds: [6],
         filters: [],
-      });
+      })
     });
     for (let j = 0; j < users.length; j++) {
       const user = users[j];
-      const pHash = '12345';
+      const pHash = 'bbaac669-923f-4063-99e3-f8004b34dac3';
       if (user.username === '__viewer__') {
         // have access
         it(`+++ ${users[j].username} should have access to __viewer__only`, async () => {
@@ -98,8 +101,8 @@ describe('Permissions - check()', () => {
 
   describe(`Permission only for user with 100 points (__viewer_points__)`, () => {
     beforeEach(async () => {
-      await global.db.engine.insert(global.permissions.collection.data, {
-        id: '12345',
+      await getRepository(Permissions).save({
+        id: 'bbaac669-923f-4063-99e3-f8004b34dac3',
         name: '__viewer_points__only',
         order: Object.keys(permission).length + 1,
         isCorePermission: false,
@@ -113,7 +116,7 @@ describe('Permissions - check()', () => {
     });
     for (let j = 0; j < users.length; j++) {
       const user = users[j];
-      const pHash = '12345';
+      const pHash = 'bbaac669-923f-4063-99e3-f8004b34dac3';
       if (user.username === '__viewer_points__') {
         // have access
         it(`+++ ${users[j].username} should have access to __viewer_points__only`, async () => {
@@ -132,8 +135,8 @@ describe('Permissions - check()', () => {
 
   describe(`Permission only for user with 100h watched (__viewer_watched__)`, () => {
     beforeEach(async () => {
-      await global.db.engine.insert(global.permissions.collection.data, {
-        id: '12345',
+      await getRepository(Permissions).save({
+        id: 'bbaac669-923f-4063-99e3-f8004b34dac3',
         name: '__viewer_watched__only',
         order: Object.keys(permission).length + 1,
         isCorePermission: false,
@@ -147,7 +150,7 @@ describe('Permissions - check()', () => {
     });
     for (let j = 0; j < users.length; j++) {
       const user = users[j];
-      const pHash = '12345';
+      const pHash = 'bbaac669-923f-4063-99e3-f8004b34dac3';
       if (user.username === '__viewer_watched__') {
         // have access
         it(`+++ ${users[j].username} should have access to __viewer_watched__only`, async () => {
@@ -166,8 +169,8 @@ describe('Permissions - check()', () => {
 
   describe(`Permission only for user with 100 tips (__viewer_tips__)`, () => {
     beforeEach(async () => {
-      await global.db.engine.insert(global.permissions.collection.data, {
-        id: '12345',
+      await getRepository(Permissions).save({
+        id: 'bbaac669-923f-4063-99e3-f8004b34dac3',
         name: '__viewer_tips__only',
         order: Object.keys(permission).length + 1,
         isCorePermission: false,
@@ -181,7 +184,7 @@ describe('Permissions - check()', () => {
     });
     for (let j = 0; j < users.length; j++) {
       const user = users[j];
-      const pHash = '12345';
+      const pHash = 'bbaac669-923f-4063-99e3-f8004b34dac3';
       if (user.username === '__viewer_tips__') {
         // have access
         it(`+++ ${users[j].username} should have access to __viewer_tips__only`, async () => {
@@ -200,8 +203,8 @@ describe('Permissions - check()', () => {
 
   describe(`Permission only for user with 100 bits (__viewer_bits__)`, () => {
     beforeEach(async () => {
-      await global.db.engine.insert(global.permissions.collection.data, {
-        id: '12345',
+      await getRepository(Permissions).save({
+        id: 'bbaac669-923f-4063-99e3-f8004b34dac3',
         name: '__viewer_bits__only',
         order: Object.keys(permission).length + 1,
         isCorePermission: false,
@@ -215,7 +218,7 @@ describe('Permissions - check()', () => {
     });
     for (let j = 0; j < users.length; j++) {
       const user = users[j];
-      const pHash = '12345';
+      const pHash = 'bbaac669-923f-4063-99e3-f8004b34dac3';
       if (user.username === '__viewer_bits__') {
         // have access
         it(`+++ ${users[j].username} should have access to __viewer_bits__only`, async () => {
@@ -234,8 +237,8 @@ describe('Permissions - check()', () => {
 
   describe(`Permission only for user with 100 messages (__viewer_messages__)`, () => {
     beforeEach(async () => {
-      await global.db.engine.insert(global.permissions.collection.data, {
-        id: '12345',
+      await getRepository(Permissions).save({
+        id: 'bbaac669-923f-4063-99e3-f8004b34dac3',
         name: '__viewer_messages__only',
         order: Object.keys(permission).length + 1,
         isCorePermission: false,
@@ -249,7 +252,7 @@ describe('Permissions - check()', () => {
     });
     for (let j = 0; j < users.length; j++) {
       const user = users[j];
-      const pHash = '12345';
+      const pHash = 'bbaac669-923f-4063-99e3-f8004b34dac3';
       if (user.username === '__viewer_messages__') {
         // have access
         it(`+++ ${users[j].username} should have access to __viewer_messages__only`, async () => {
@@ -268,8 +271,8 @@ describe('Permissions - check()', () => {
 
   describe(`Permission only for user with 2 subtier (__viewer_subtier__)`, () => {
     beforeEach(async () => {
-      await global.db.engine.insert(global.permissions.collection.data, {
-        id: '12345',
+      await getRepository(Permissions).save({
+        id: 'bbaac669-923f-4063-99e3-f8004b34dac3',
         name: '__viewer_subtier__only',
         order: Object.keys(permission).length + 1,
         isCorePermission: false,
@@ -283,7 +286,7 @@ describe('Permissions - check()', () => {
     });
     for (let j = 0; j < users.length; j++) {
       const user = users[j];
-      const pHash = '12345';
+      const pHash = 'bbaac669-923f-4063-99e3-f8004b34dac3';
       if (user.username === '__viewer_subtier__') {
         // have access
         it(`+++ ${users[j].username} should have access to __viewer_subtier__only`, async () => {
@@ -302,8 +305,8 @@ describe('Permissions - check()', () => {
 
   describe(`Permission only for user with 2 subcumulativemonths (__viewer_subcumulativemonths__)`, () => {
     beforeEach(async () => {
-      await global.db.engine.insert(global.permissions.collection.data, {
-        id: '12345',
+      await getRepository(Permissions).save({
+        id: 'bbaac669-923f-4063-99e3-f8004b34dac3',
         name: '__viewer_subcumulativemonths__only',
         order: Object.keys(permission).length + 1,
         isCorePermission: false,
@@ -317,7 +320,7 @@ describe('Permissions - check()', () => {
     });
     for (let j = 0; j < users.length; j++) {
       const user = users[j];
-      const pHash = '12345';
+      const pHash = 'bbaac669-923f-4063-99e3-f8004b34dac3';
       if (user.username === '__viewer_subcumulativemonths__') {
         // have access
         it(`+++ ${users[j].username} should have access to __viewer_subcumulativemonths__only`, async () => {
@@ -336,8 +339,8 @@ describe('Permissions - check()', () => {
 
   describe(`Permission only for user with 2 substreakmonths (__viewer_substreakmonths__)`, () => {
     beforeEach(async () => {
-      await global.db.engine.insert(global.permissions.collection.data, {
-        id: '12345',
+      await getRepository(Permissions).save({
+        id: 'bbaac669-923f-4063-99e3-f8004b34dac3',
         name: '__viewer_substreakmonths__only',
         order: Object.keys(permission).length + 1,
         isCorePermission: false,
@@ -351,7 +354,7 @@ describe('Permissions - check()', () => {
     });
     for (let j = 0; j < users.length; j++) {
       const user = users[j];
-      const pHash = '12345';
+      const pHash = 'bbaac669-923f-4063-99e3-f8004b34dac3';
       if (user.username === '__viewer_substreakmonths__') {
         // have access
         it(`+++ ${users[j].username} should have access to __viewer_substreakmonths__only`, async () => {

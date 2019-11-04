@@ -153,12 +153,15 @@ class Permissions extends Core {
       { from: 'users.messages', as: 'messages', foreignField: 'id', localField: 'id' },
       { from: 'users.watched', as: 'watched', foreignField: 'id', localField: 'id' },
     ]);
-    const pItem = (await getRepository(PermissionsEntity).findOne({ id: permId })) as PermissionsEntity;
+    const pItem = (await getRepository(PermissionsEntity).findOne({
+      relations: ['filters'],
+      where: { id: permId },
+    })) as PermissionsEntity;
     try {
       if (typeof user.id === 'undefined') {
         return { access: permId === permission.VIEWERS, permission: pItem };
       }
-      if (typeof pItem.id === 'undefined') {
+      if (!pItem) {
         throw Error(`Permissions ${permId} doesn't exist`);
       }
 
