@@ -85,3 +85,34 @@ jobs:
     steps:
     - name: Skipped OK
       run: 'echo "[skip-tests] found"'
+  mysql:
+    name: MySQL/MariaDB tests
+    if: contains(github.event.pull_request.body, '[skip-tests]') != true
+    needs: eslint
+    services:
+      postgres:
+        image: mysql
+        env:
+          MYSQL_ROOT_PASSWORD: Passw0rd
+        ports:
+          - 3306:3306
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: install node v13
+      uses: actions/setup-node@v1
+      with:
+        node-version: 12
+    - name: Install all dependencies
+      run: make
+    - name: Set proper db to use
+      run: npm run test:config:mysql
+    - name: Run mocha
+      run: npm test
+  mysql2:
+    name: MySQL/MariaDB tests
+    if: contains(github.event.pull_request.body, '[skip-tests]') == true
+    runs-on: ubuntu-latest
+    steps:
+    - name: Skipped OK
+      run: 'echo "[skip-tests] found"'
