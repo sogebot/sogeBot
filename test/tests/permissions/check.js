@@ -64,7 +64,7 @@ describe('Permissions - check()', () => {
     });
   }
 
-  describe.only(`Permission only for __viewer__ userId`, () => {
+  describe(`Permission only for __viewer__ userId`, () => {
     beforeEach(async () => {
       await global.db.engine.insert(global.permissions.collection.data, {
         id: '12345',
