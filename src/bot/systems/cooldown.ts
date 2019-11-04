@@ -74,7 +74,12 @@ class Cooldown extends System {
       return false;
     }
 
-    let cooldown = await getRepository(CooldownEntity).findOne({ where: { key: match.command, type: match.type } });
+    let cooldown = await getRepository(CooldownEntity).findOne({
+      where: {
+        key: match.command,
+        type: match.type as 'global' | 'user',
+      },
+    });
     if (parseInt(match.seconds, 10) === 0) {
       if (cooldown) {
         await getRepository(CooldownEntity).remove(cooldown);
@@ -315,7 +320,13 @@ class Cooldown extends System {
       return false;
     }
 
-    const cooldown = await getRepository(CooldownEntity).findOne({ relations: ['viewers'], where: { key: match.command, type: match.type } });
+    const cooldown = await getRepository(CooldownEntity).findOne({
+      relations: ['viewers'],
+      where: {
+        key: match.command,
+        type: match.type as 'global' | 'user',
+      },
+    });
     if (!cooldown) {
       const message = await prepare('cooldowns.cooldown-not-found', { command: match.command });
       sendMessage(message, opts.sender, opts.attr);
