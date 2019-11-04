@@ -44,8 +44,6 @@ jobs:
       run: make
     - name: Set proper db to use
       run: npm run test:config:sqlite
-    - name: Create sogebot database
-      run: npx typeorm query "CREATE DATABASE sogebot IF NOT EXIST"
     - name: Run mocha
       run: npm test
   sqlite2:
@@ -65,6 +63,7 @@ jobs:
         env:
           POSTGRES_PASSWORD: postgres
           POSTGRES_USER: postgres
+          POSTGRES_DB: sogebot
         ports:
           - 5432:5432
     runs-on: ubuntu-latest
@@ -78,8 +77,6 @@ jobs:
       run: make
     - name: Set proper db to use
       run: npm run test:config:postgres
-    - name: Create sogebot database
-      run: npx typeorm query "CREATE DATABASE sogebot IF NOT EXIST"
     - name: Run mocha
       run: npm test
   postgres2:
@@ -98,6 +95,7 @@ jobs:
         image: mysql
         env:
           MYSQL_ROOT_PASSWORD: Passw0rd
+          MYSQL_DATABASE: sogebot
         ports:
           - 3307:3306
     runs-on: ubuntu-latest
@@ -111,46 +109,10 @@ jobs:
       run: make
     - name: Set proper db to use
       run: npm run test:config:mysql
-    - name: Create sogebot database
-      run: npx typeorm query "CREATE DATABASE sogebot IF NOT EXIST"
     - name: Run mocha
       run: npm test
   mysql2:
     name: MySQL/MariaDB tests
-    if: contains(github.event.pull_request.body, '[skip-tests]') == true
-    runs-on: ubuntu-latest
-    steps:
-    - name: Skipped OK
-      run: 'echo "[skip-tests] found"'
-  mssql:
-    name: MSSQL tests
-    if: contains(github.event.pull_request.body, '[skip-tests]') != true
-    needs: eslint
-    services:
-      mssql:
-        image: mcr.microsoft.com/mssql/server:2017-latest
-        env:
-          ACCEPT_EULA: Y
-          SA_PASSWORD: Passw0rd
-        ports:
-          - 1433:1433
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@master
-    - name: install node v13
-      uses: actions/setup-node@v1
-      with:
-        node-version: 12
-    - name: Install all dependencies
-      run: make
-    - name: Set proper db to use
-      run: npm run test:config:mssql
-    - name: Create sogebot database
-      run: npx typeorm query "CREATE DATABASE sogebot IF NOT EXIST"
-    - name: Run mocha
-      run: npm test
-  mssql2:
-    name: MSSQL tests
     if: contains(github.event.pull_request.body, '[skip-tests]') == true
     runs-on: ubuntu-latest
     steps:
