@@ -2,7 +2,7 @@ import { cloneDeep, get, isEqual, set } from 'lodash';
 import { isMainThread } from './cluster';
 import { error } from './helpers/log';
 import { change } from './changelog';
-import { getManager } from 'typeorm';
+import { getRepository } from 'typeorm';
 import { Settings } from './entity/settings';
 
 const variables: {
@@ -29,6 +29,7 @@ export const VariableWatcher = {
       const value = get(global, k.replace('core.', ''), null);
       if (!isEqual(value, variables[k])) {
         const [type, name, variable] = k.split('.');
+        console.log({value: variables[k], type, name, variable});
 
         variables[k] = value;
         let self: null | any = null;
@@ -43,15 +44,17 @@ export const VariableWatcher = {
         }
 
         if (isMainThread && self) {
-          await getManager()
-            .createQueryBuilder()
-            .update(Settings)
-            .where('key = :key', { key: variable })
-            .andWhere('namespace = :namespace', { namespace: self.nsp })
-            .set({
-              value: JSON.stringify(value),
-            })
-            .execute();
+          const setting = await getRepository(Settings).findOne({
+            where: {
+              key: variable,
+              namespace: self.nsp,
+            },
+          }) || new Settings();
+          setting.key = variable;
+          setting.value =  JSON.stringify(value);
+          setting.namespace = self.nsp;
+          await getRepository(Settings).save(setting);
+
           change(`${type}.${name}.${variable}`);
           if (typeof self.on !== 'undefined'
             && typeof self.on.change !== 'undefined'
