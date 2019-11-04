@@ -79,6 +79,7 @@
     "test": "node tools/runTests.js",
     "test:config:mysql": "cp src/bot/data/config.example.json config.json && cp src/bot/data/ormconfig.mysql.json ormconfig.json",
     "test:config:postgres": "cp src/bot/data/config.example.json config.json && cp src/bot/data/ormconfig.postgres.json ormconfig.json",
+    "test:config:mssql": "cp src/bot/data/config.example.json config.json && cp src/bot/data/ormconfig.mssql.json ormconfig.json",
     "test:config:sqlite": "cp src/bot/data/config.example.json config.json && cp src/bot/data/ormconfig.sqlite.json ormconfig.json",
     "migrate": "node ./tools/migrate && node ./tools/migrate --delete",
     "start": "npm run migrate && cross-env NODE_ENV=production node -r module-alias/register -r source-map-support/register  ./dest/main || true",
