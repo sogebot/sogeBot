@@ -106,7 +106,7 @@ class Translate {
       // we need to search if it is webpanel. or ui.
       // TODO: remove webpanel
       if (!this.get('ui.' + key, false).startsWith('{missing_translation: ')) {
-         'ui.' + key
+        key = 'ui.' + key
       } else if (!this.get('webpanel.' + key, false).startsWith('{missing_translation: ')) {
         key = 'webpanel.' + key
       }
