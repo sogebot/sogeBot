@@ -72,7 +72,7 @@ describe('Cooldowns - check()', () => {
     it('Add !cmd to cooldown', async () => {
       await getRepository(Cooldown).save({
         ...new Cooldown(),
-        key: '!cmd',
+        name: '!cmd',
         miliseconds: 60000,
         type: 'global',
         timestamp: 0,
@@ -113,7 +113,7 @@ describe('Cooldowns - check()', () => {
     it('Add global KonCha to cooldown', async () => {
       await getRepository(Cooldown).save({
         ...new Cooldown(),
-        key: 'KonCha',
+        name: 'KonCha',
         miliseconds: 60000,
         type: 'global',
         timestamp: 0,
@@ -164,7 +164,7 @@ describe('Cooldowns - check()', () => {
     it('Add global !followage to cooldown', async () => {
       await getRepository(Cooldown).save({
         ...new Cooldown(),
-        key: '!followage',
+        name: '!followage',
         miliseconds: 30000,
         type: 'global',
         timestamp: 1544713598872,
@@ -215,7 +215,7 @@ describe('Cooldowns - check()', () => {
       global.systems.cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` });
       await message.isSent('cooldowns.cooldown-was-set', owner, { command: command, type: type, seconds: seconds, sender: owner.username });
 
-      const item = await getRepository(Cooldown).findOne({ where: { key: '!gamble' } });
+      const item = await getRepository(Cooldown).findOne({ where: { name: '!gamble' } });
       assert.notEmpty(item);
 
       let isOk = await global.systems.cooldown.check({ sender: testUser, message: '!gamble 10' });
@@ -246,7 +246,7 @@ describe('Cooldowns - check()', () => {
       global.systems.cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` });
       await message.isSent('cooldowns.cooldown-was-set', owner, { command: command, type: type, seconds: seconds, sender: owner.username });
 
-      const item = await getRepository(Cooldown).findOne({ where: { key: '!test' } });
+      const item = await getRepository(Cooldown).findOne({ where: { name: '!test' } });
       assert.notEmpty(item);
 
       let isOk = await global.systems.cooldown.check({ sender: testUser, message: 'Lorem Ipsum !test' });
@@ -271,7 +271,7 @@ describe('Cooldowns - check()', () => {
       global.systems.cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` });
       await message.isSent('cooldowns.cooldown-was-set', owner, { command: command, type: type, seconds: seconds, sender: owner.username });
 
-      const item = await getRepository(Cooldown).findOne({ where: { key: '!test me' } });
+      const item = await getRepository(Cooldown).findOne({ where: { name: '!test me' } });
       assert.isTrue(typeof item !== 'undefined');
 
       assert.isTrue(await global.systems.cooldown.check({ sender: testUser, message: command }), `'${command}' expected to not fail`);
@@ -298,7 +298,7 @@ describe('Cooldowns - check()', () => {
       global.systems.cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` });
       await message.isSent('cooldowns.cooldown-was-set', owner, { command: command, type: type, seconds: seconds, sender: owner.username });
 
-      const item = await getRepository(Cooldown).findOne({ where: { key: '!test' } });
+      const item = await getRepository(Cooldown).findOne({ where: { name: '!test' } });
       assert.isTrue(typeof item !== 'undefined');
 
       let isOk = await global.systems.cooldown.check({ sender: testUser, message: '!test' });
@@ -326,7 +326,7 @@ describe('Cooldowns - check()', () => {
       global.systems.cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` });
       await message.isSent('cooldowns.cooldown-was-set', owner, { command: command, type: type, seconds: seconds, sender: owner.username });
 
-      const item = await getRepository(Cooldown).findOne({ where: { key: '!test' } });
+      const item = await getRepository(Cooldown).findOne({ where: { name: '!test' } });
       assert.isTrue(typeof item !== 'undefined');
 
       let isOk = await global.systems.cooldown.check({ sender: testUser, message: '!test' });
@@ -360,7 +360,7 @@ describe('Cooldowns - check()', () => {
       global.systems.cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` });
       await message.isSent('cooldowns.cooldown-was-set', owner, { command: command, type: type, seconds: seconds, sender: owner.username });
 
-      const item = await getRepository(Cooldown).findOne({ where: { key: 'me' } });
+      const item = await getRepository(Cooldown).findOne({ where: { name: 'me' } });
       assert.isTrue(typeof item !== 'undefined');
 
       let isOk = await global.systems.cooldown.check({ sender: testUser, message: 'me' });
@@ -394,7 +394,7 @@ describe('Cooldowns - check()', () => {
       global.systems.cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` });
       await message.isSent('cooldowns.cooldown-was-set', owner, { command: command, type: type, seconds: seconds, sender: owner.username });
 
-      const item = await getRepository(Cooldown).findOne({ where: { key: 'me' } });
+      const item = await getRepository(Cooldown).findOne({ where: { name: 'me' } });
       assert.isTrue(typeof item !== 'undefined');
 
       let isOk = await global.systems.cooldown.check({ sender: testUser, message: 'me' });
