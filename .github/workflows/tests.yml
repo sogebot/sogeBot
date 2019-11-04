@@ -95,7 +95,7 @@ jobs:
         env:
           MYSQL_ROOT_PASSWORD: Passw0rd
         ports:
-          - 3306:3307
+          - 3307:3306
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
