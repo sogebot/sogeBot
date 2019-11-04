@@ -18,6 +18,8 @@ jobs:
         node-version: 13
     - name: Install eslint and dependencies
       run: npm install typescript eslint jsonlint-mod @typescript-eslint/parser @typescript-eslint/eslint-plugin --only=dev
+    - name: Check if .only exists in tests
+      run: grep -r -l 'describe.only' ./test/; test $? -eq 1
     - name: Run eslint
       run: make eslint
     - name: Run jsonlint
