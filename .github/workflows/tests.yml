@@ -90,7 +90,7 @@ jobs:
     if: contains(github.event.pull_request.body, '[skip-tests]') != true
     needs: eslint
     services:
-      postgres:
+      mysql:
         image: mysql
         env:
           MYSQL_ROOT_PASSWORD: Passw0rd
@@ -110,6 +110,38 @@ jobs:
     - name: Run mocha
       run: npm test
   mysql2:
+    name: MySQL/MariaDB tests
+    if: contains(github.event.pull_request.body, '[skip-tests]') == true
+    runs-on: ubuntu-latest
+    steps:
+    - name: Skipped OK
+      run: 'echo "[skip-tests] found"'
+  mssql:
+    name: MySQL/MariaDB tests
+    if: contains(github.event.pull_request.body, '[skip-tests]') != true
+    needs: eslint
+    services:
+      mssql:
+        image: mcr.microsoft.com/mssql/server:2017-latest
+        env:
+          ACCEPT_EULA: Y
+          SA_PASSWORD: Passw0rd
+        ports:
+          - 1433:1433
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: install node v13
+      uses: actions/setup-node@v1
+      with:
+        node-version: 12
+    - name: Install all dependencies
+      run: make
+    - name: Set proper db to use
+      run: npm run test:config:mssql
+    - name: Run mocha
+      run: npm test
+  mssql2:
     name: MySQL/MariaDB tests
     if: contains(github.event.pull_request.body, '[skip-tests]') == true
     runs-on: ubuntu-latest

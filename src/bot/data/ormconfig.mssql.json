@@ -1,0 +1,10 @@
+{
+  "type": "mssql",
+  "host": "localhost",
+  "port": "1433",
+  "username": "root",
+  "password": "Passw0rd",
+  "database": "sogebot",
+  "logging": ["error"],
+  "cache": true
+}
