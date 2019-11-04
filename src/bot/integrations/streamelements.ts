@@ -11,7 +11,7 @@ import { triggerInterfaceOnTip } from '../helpers/interface/triggers';
 {
   _id: '5d967959cd89a10ce12818ad',
   channel: '5afbafb0c3a79ebedde18249',
-  type: 'tip',
+  event: 'tip',
   provider: 'twitch',
   createdAt: '2019-10-03T22:42:33.023Z',
   data: {
@@ -107,7 +107,7 @@ class StreamElements extends Integration {
       global.api.stats.currentTips += parseFloat(global.currency.exchange(eventData.data.amount, eventData.data.currency, global.currency.mainCurrency));
     }
     global.overlays.eventlist.add({
-      type: 'tip',
+      event: 'tip',
       amount: eventData.data.amount,
       currency: eventData.data.currency,
       username: username.toLowerCase(),

@@ -76,7 +76,7 @@ class Qiwi extends Integration {
       }
 
       global.overlays.eventlist.add({
-        type: 'tip',
+        event: 'tip',
         amount,
         currency,
         username: username || 'Anonymous',

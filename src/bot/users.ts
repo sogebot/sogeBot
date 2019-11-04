@@ -14,11 +14,7 @@ import { UsersOnline } from './entity/usersOnline';
 
 
 export const getAllOnlineUsernames = async () => {
-  return (await getManager()
-    .createQueryBuilder()
-    .select('user')
-    .from(UsersOnline, 'user')
-    .execute()).map(o => o.username);
+  return (await getRepository(UsersOnline).find()).map(o => o.username);
 };
 
 class Users extends Core {

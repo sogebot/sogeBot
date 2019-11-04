@@ -81,7 +81,7 @@ class Donationalerts extends Integration {
         }
         const additionalData = JSON.parse(data.additional_data);
         global.overlays.eventlist.add({
-          type: 'tip',
+          event: 'tip',
           amount: data.amount,
           currency: data.currency,
           username: data.username.toLowerCase(),

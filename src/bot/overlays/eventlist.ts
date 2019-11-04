@@ -6,7 +6,7 @@ import { isBot } from '../commons';
 import { ui } from '../decorators';
 import { publicEndpoint } from '../helpers/socket';
 
-import { Brackets, getManager } from 'typeorm';
+import { Brackets, getManager, getRepository } from 'typeorm';
 import { EventList as EventListEntity } from '../entity/eventList';
 
 class EventList extends Overlay {
@@ -46,24 +46,21 @@ class EventList extends Overlay {
       return;
     } // don't save event from a bot
 
-    await getManager().createQueryBuilder()
-      .insert().into(EventListEntity)
-      .values({
-        event: data.type,
-        username: data.username,
-        timestamp: Date.now(),
-        values_json: JSON.stringify(
-          Object.keys(data)
-            .filter(key => !['event', 'username', 'timestamp'].includes(key))
-            .reduce((obj, key) => {
-              return {
-                ...obj,
-                [key]: data[key],
-              };
-            }, {}),
-        ),
-      })
-      .execute();
+    const event = new EventListEntity();
+    event.event = data.event;
+    event.username = data.username;
+    event.timestamp = Date.now();
+    event.values_json = JSON.stringify(
+      Object.keys(data)
+        .filter(key => !['event', 'username', 'timestamp'].includes(key))
+        .reduce((obj, key) => {
+          return {
+            ...obj,
+            [key]: data[key],
+          };
+        }, {}),
+    );
+    await getRepository(EventListEntity).save(event);
     global.widgets.eventlist.update();
   }
 }

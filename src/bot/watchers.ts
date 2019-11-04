@@ -29,7 +29,6 @@ export const VariableWatcher = {
       const value = get(global, k.replace('core.', ''), null);
       if (!isEqual(value, variables[k])) {
         const [type, name, variable] = k.split('.');
-        console.log({value: variables[k], type, name, variable});
 
         variables[k] = value;
         let self: null | any = null;

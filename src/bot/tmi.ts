@@ -339,7 +339,7 @@ class TMI extends Core {
           username: username,
           viewers: viewers,
           autohost: autohost,
-          type: 'host',
+          event: 'host',
           timestamp: Date.now(),
         };
 
@@ -367,7 +367,7 @@ class TMI extends Core {
       const data = {
         username: message.parameters.login,
         viewers: message.parameters.viewerCount,
-        type: 'raid',
+        event: 'raid',
         timestamp: Date.now(),
       };
 
@@ -435,7 +435,7 @@ class TMI extends Core {
 
       await global.users.setById(userstate.userId, { username, is: { subscriber: isSubscriber }, time: { subscribed_at: subscribedAt }, stats: { subStreak: 1, subCumulativeMonths, tier } });
       global.overlays.eventlist.add({
-        type: 'sub',
+        event: 'sub',
         tier: String(tier),
         username,
         method: (isNil(method.prime) && method.prime) ? 'Twitch Prime' : '' ,
@@ -496,7 +496,7 @@ class TMI extends Core {
       await global.users.setById(userstate.userId, { username, id: userstate.userId, is: { subscriber: isSubscriber }, time: { subscribed_at }, stats: { subStreak, subCumulativeMonths, tier } });
 
       global.overlays.eventlist.add({
-        type: 'resub',
+        event: 'resub',
         tier: String(tier),
         username,
         subStreakShareEnabled,
@@ -550,7 +550,7 @@ class TMI extends Core {
       }
 
       global.overlays.eventlist.add({
-        type: 'subcommunitygift',
+        event: 'subcommunitygift',
         username,
         count,
         timestamp: Date.now(),
@@ -626,7 +626,7 @@ class TMI extends Core {
       await global.users.setById(user.id, { username: recipient, is: { subscriber: isSubscriber }, time: { subscribed_at: subscribedAt }, stats: { subCumulativeMonths, tier } });
       await global.db.engine.increment('users', { id: user.id }, { stats: { subStreak: 1 }});
       global.overlays.eventlist.add({
-        type: 'subgift',
+        event: 'subgift',
         username: recipient,
         from: username,
         monthsName: getLocalizedName(subCumulativeMonths, 'core.months'),
@@ -662,7 +662,7 @@ class TMI extends Core {
       await global.db.engine.update('users', { id: userId }, { username });
 
       global.overlays.eventlist.add({
-        type: 'cheer',
+        event: 'cheer',
         username,
         bits: userstate.bits,
         message: messageFromUser,

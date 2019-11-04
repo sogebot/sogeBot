@@ -59,7 +59,7 @@ class Twitch extends Core {
     const events = await getManager().createQueryBuilder()
       .select('events').from(EventList, 'events')
       .orderBy('events.timestamp', 'DESC')
-      .where('user.event = :event', { event: 'follow' })
+      .where('events.event = :event', { event: 'follow' })
       .getMany();
     const onlineViewers = await getAllOnlineUsernames();
     const followers = (await global.db.engine.find('users', { is: { follower: true } })).map((o) => o.username);
@@ -88,9 +88,9 @@ class Twitch extends Core {
     const events = await getManager().createQueryBuilder()
       .select('events').from(EventList, 'events')
       .orderBy('events.timestamp', 'DESC')
-      .where('user.event = :event', { event: 'sub' })
-      .orWhere('user.event = :event', { event: 'resub' })
-      .orWhere('user.event = :event', { event: 'subgift' })
+      .where('events.event = :event', { event: 'sub' })
+      .orWhere('events.event = :event2', { event2: 'resub' })
+      .orWhere('events.event = :event3', { event3: 'subgift' })
       .getMany();
 
     const onlineViewers = await getAllOnlineUsernames();

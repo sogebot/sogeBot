@@ -1,6 +1,6 @@
 declare namespace EventList {
   export interface Event {
-    type: string;
+    event: string;
     timestamp: number;
     username: string;
     autohost?: boolean;

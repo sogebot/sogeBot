@@ -233,7 +233,7 @@ class Webhooks {
       if (!get(user, 'is.follower', false) && (get(user, 'time.follow', 0) === 0 || Date.now() - get(user, 'time.follow', 0) > 60000 * 60)) {
         if (!isBot(data.from_name)) {
           global.overlays.eventlist.add({
-            type: 'follow',
+            event: 'follow',
             username: data.from_name,
             timestamp: Date.now(),
           });

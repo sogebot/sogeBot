@@ -83,7 +83,7 @@ class Streamlabs extends Integration {
           }
         }
         global.overlays.eventlist.add({
-          type: 'tip',
+          event: 'tip',
           amount: event.amount,
           currency: event.currency,
           username: event.from.toLowerCase(),
