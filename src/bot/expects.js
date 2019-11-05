@@ -198,7 +198,9 @@ class Expects {
     if (!opts.optional) this.checkText()
 
     let pattern
-    if (opts.type.name === 'Number') pattern = '[0-9]*'
+    if (opts.type === 'uuid') {
+      pattern = '[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}';
+    } else if (opts.type.name === 'Number') pattern = '[0-9]*'
     else if (opts.type.name === 'Boolean') pattern = 'true|false'
     else if (!opts.multi) pattern = '\\S+'
     else pattern = `(?:(?!-[a-zA-Z]).)+${opts.delimiter !== '' ? '?' : ''}` // capture until -something or [^-]*
@@ -211,6 +213,8 @@ class Expects {
     if (!_.isNil(match) && match[opts.name].trim().length !== 0) {
       if (opts.type.name === 'Boolean') {
         this.match.push(opts.type(match[opts.name].trim().toLowerCase() === 'true'))
+      } else if (opts.type === 'uuid') {
+        this.match.push(match[opts.name].trim());
       } else {
         this.match.push(opts.type(match[opts.name].trim()))
       }

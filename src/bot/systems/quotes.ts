@@ -111,7 +111,7 @@ class Quotes extends System {
       if (opts.parameters.length === 0) {
         throw new Error();
       }
-      const id = new Expects(opts.parameters).argument({ type: String, name: 'id' }).toArray()[0];
+      const id = new Expects(opts.parameters).argument({ type: 'uuid', name: 'id' }).toArray()[0];
       let item = await getManager()
         .createQueryBuilder()
         .select('quote')
@@ -156,7 +156,7 @@ class Quotes extends System {
       if (opts.parameters.length === 0) {
         throw new Error();
       }
-      const [id, tag] = new Expects(opts.parameters).argument({ type: String, name: 'id' }).argument({ name: 'tag', multi: true, delimiter: '' }).toArray();
+      const [id, tag] = new Expects(opts.parameters).argument({ type: 'uuid', name: 'id' }).argument({ name: 'tag', multi: true, delimiter: '' }).toArray();
       const quote = await getManager()
         .createQueryBuilder()
         .select('quote')
@@ -194,7 +194,7 @@ class Quotes extends System {
 
   @command('!quote')
   async main (opts) {
-    const [id, tag] = new Expects(opts.parameters).argument({ type: String, name: 'id', optional: true }).argument({ name: 'tag', optional: true, multi: true, delimiter: '' }).toArray();
+    const [id, tag] = new Expects(opts.parameters).argument({ type: 'uuid', name: 'id', optional: true }).argument({ name: 'tag', optional: true, multi: true, delimiter: '' }).toArray();
     if (_.isNil(id) && _.isNil(tag) || id === '-tag') {
       const message = await prepare('systems.quotes.show.error.no-parameters', { command: opts.command });
       return sendMessage(message, opts.sender, opts.attr);

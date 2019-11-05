@@ -141,8 +141,8 @@ async function main() {
   }
 
   console.log(`Migr: systems.customcommands, systems.customcommands.responses`);
-  await getManager().clear(Commands);
-  items = await from.engine.find('systems.customcommands')
+  await getRepository(Commands).query('TRUNCATE "commands" CASCADE');
+  items = await from.engine.find('systems.customcommands');
   for (const item of items) {
     // add responses
     const responses = (await from.engine.find('systems.customcommands.responses', { cid: item.id })).map(o => {
@@ -178,8 +178,7 @@ async function main() {
   }
 
   console.log(`Migr: permissions`);
-  await getManager().clear(Permissions);
-  await getManager().clear(PermissionFilters);
+  await getRepository(Permissions).query('TRUNCATE "permissions" CASCADE');
   items = (await from.engine.find('core.permissions')).map(o => {
     delete o._id; return o;
   });
@@ -190,7 +189,7 @@ async function main() {
   }
 
   console.log(`Migr: systems.cooldowns`);
-  await getManager().clear(Cooldown);
+  await getRepository(Cooldown).query('TRUNCATE "cooldown" CASCADE');
   items = (await from.engine.find('systems.cooldown')).map(o => {
     delete o._id; return {
       name: o.key,
@@ -219,7 +218,7 @@ async function main() {
       timestamp: o.timestamp,
       game: o.game,
       title: o.title,
-      createdAt: o.created_at || (Date.now() - 1000 * 60 * 60 * 24 * 31),
+      createdAt: (new Date(o.created_at)).getTime() || (Date.now() - 1000 * 60 * 60 * 24 * 31),
     };
   });
   if (items.length > 0) {

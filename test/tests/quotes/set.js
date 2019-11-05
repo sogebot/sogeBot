@@ -22,8 +22,8 @@ const tests = [
 
   { sender: owner, parameters: '-id $id -tag ipsum, dolor', id: 1, tags: 'ipsum, dolor', shouldFail: false, exist: true },
   { sender: owner, parameters: '-tag ipsum, dolor -id $id', id: 1, tags: 'ipsum, dolor', shouldFail: false, exist: true },
-  { sender: owner, parameters: '-id 999999999999999 -tag ipsum, dolor', id: 999999999999999, tags: 'ipsum, dolor', shouldFail: false, exist: false },
-  { sender: owner, parameters: '-tag ipsum, dolor -id 999999999999999', id: 999999999999999, tags: 'ipsum, dolor', shouldFail: false, exist: false },
+  { sender: owner, parameters: '-id ca0cfbe4-2cc2-449b-8b9d-67bb34b21701 -tag ipsum, dolor', id: 'ca0cfbe4-2cc2-449b-8b9d-67bb34b21701', tags: 'ipsum, dolor', shouldFail: false, exist: false },
+  { sender: owner, parameters: '-tag ipsum, dolor -id ca0cfbe4-2cc2-449b-8b9d-67bb34b21701', id: 'ca0cfbe4-2cc2-449b-8b9d-67bb34b21701', tags: 'ipsum, dolor', shouldFail: false, exist: false },
 ];
 
 describe('Quotes - set()', () => {
@@ -46,15 +46,6 @@ describe('Quotes - set()', () => {
       if (test.shouldFail) {
         it('Should throw error', async () => {
           await message.isSent('systems.quotes.set.error.no-parameters', owner, { command: '!quote set' });
-        });
-        it('Tags should not be changed', async () => {
-          const item = await getManager()
-            .createQueryBuilder()
-            .select('quote')
-            .from(Quotes, 'quote')
-            .where('id = :id', { id })
-            .getOne();
-          assert.deepEqual(item.tags, ['lorem ipsum']);
         });
       } else {
         if (test.exist) {
