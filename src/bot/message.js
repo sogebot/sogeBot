@@ -12,7 +12,11 @@ const Entities = require('html-entities').AllHtmlEntities;
 import { warning } from './helpers/log';
 import { getCountOfCommandUsage } from './helpers/commands/count';
 import { getAllOnlineUsernames } from './users';
-import { getManager } from 'typeorm';
+import { getManager, getRepository } from 'typeorm';
+
+import { Alias } from './entity/alias';
+import { Commands } from './entity/commands';
+import { Cooldown } from './entity/cooldown';
 import { EventList } from './entity/eventList';
 
 class Message {
@@ -394,9 +398,9 @@ class Message {
         let [system, permission] = filter.replace('(list.', '').replace(')', '').split('.');
 
         let [alias, commands, cooldowns, ranks, prices] = await Promise.all([
-          global.db.engine.find(global.systems.alias.collection.data, { visible: true, enabled: true }),
-          global.db.engine.find(global.systems.customCommands.collection.data, { visible: true, enabled: true }),
-          global.db.engine.find(global.systems.cooldown.collection.data, { enabled: true }),
+          getRepository(Alias).find({ where: { visible: true, enabled: true } }),
+          getRepository(Commands).find({ where: { visible: true, enabled: true } }),
+          getRepository(Cooldown).find({ where: { venabled: true } }),
           global.db.engine.find(global.systems.ranks.collection.data),
           global.db.engine.find(global.systems.price.collection.data, { enabled: true })
         ]);
