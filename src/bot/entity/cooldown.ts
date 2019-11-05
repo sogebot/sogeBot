@@ -12,9 +12,9 @@ export class Cooldown {
   miliseconds!: number;
   @Column('varchar', { length: 10 })
   type!: 'global' | 'user';
-  @Column('int', { default: 0 })
+  @Column('bigint', { transformer: new ColumnNumericTransformer(), default: 0 })
   timestamp!: number;
-  @Column('int', { default: 0 })
+  @Column('bigint', { transformer: new ColumnNumericTransformer(), default: 0 })
   lastTimestamp!: number;
   @Column()
   isErrorMsgQuiet!: boolean;
