@@ -12,6 +12,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
+    - name: All test should be run - tests are not containing describe.only
+      run: |
+          if ! grep -r -l 'describe.only' ./test/; then
+            exit 0
+          else
+            exit 1
+          fi;
     - name: install node v13
       uses: actions/setup-node@v1
       with:
