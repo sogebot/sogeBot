@@ -60,7 +60,6 @@ class TMI extends Core {
           username,
         ]
         )];
-      console.log(global.tmi.ignorelist);
       // update ignore list
       sendMessage(prepare('ignore.user.is.added', { username }), opts.sender);
     } catch (e) {
