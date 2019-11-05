@@ -1,4 +1,5 @@
 import { Column, Entity, Index, ManyToOne,OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { ColumnNumericTransformer } from './_transformer';
 
 @Entity()
 export class Permissions {
@@ -34,7 +35,7 @@ export class PermissionFilters {
   comparator!: '<' | '>' | '==' | '<=' | '>=';
   @Column('varchar')
   type!: 'points' | 'watched' | 'tips' | 'bits' | 'messages' | 'subtier' | 'subcumulativemonths' | 'substreakmonths';
-  @Column('bigint')
+  @Column('bigint', { transformer: new ColumnNumericTransformer() })
   value!: number;
 };
 

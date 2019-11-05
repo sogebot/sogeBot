@@ -1,13 +1,14 @@
 import { Column, Entity, Index, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { ColumnNumericTransformer } from './_transformer';
 
 @Entity()
 export class Bets {
   @PrimaryGeneratedColumn()
   id!: string;
-  @Column('bigint')
+  @Column('bigint', { transformer: new ColumnNumericTransformer() })
   @Index()
   createdAt!: number;
-  @Column('bigint')
+  @Column('bigint', { transformer: new ColumnNumericTransformer() })
   endedAt!: number;
   @Column({ default: false })
   isLocked!: boolean;
@@ -35,9 +36,9 @@ export class BetsParticipations {
   userId!: string;
   @Column()
   username!: string;
-  @Column('bigint')
+  @Column('bigint', { transformer: new ColumnNumericTransformer() })
   points!: number;
-  @Column('int')
+  @Column('bigint', { transformer: new ColumnNumericTransformer() })
   optionIdx!: number;
   @ManyToOne(() => Bets, (bet) => bet.participations, {
     onDelete: 'CASCADE',

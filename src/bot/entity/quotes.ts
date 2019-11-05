@@ -1,4 +1,5 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { ColumnNumericTransformer } from './_transformer';
 
 @Entity()
 export class Quotes {
@@ -14,6 +15,6 @@ export class Quotes {
   @Column()
   quotedBy!: string;
 
-  @Column('bigint')
+  @Column('bigint', { transformer: new ColumnNumericTransformer() })
   createdAt!: number;
 };

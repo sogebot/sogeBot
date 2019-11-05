@@ -1,4 +1,5 @@
 import { Column, Entity, Index, ManyToOne,OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { ColumnNumericTransformer } from './_transformer';
 
 @Entity()
 export class Cooldown {
@@ -11,9 +12,9 @@ export class Cooldown {
   miliseconds!: number;
   @Column('varchar', { length: 10 })
   type!: 'global' | 'user';
-  @Column('bigint', { default: 0 })
+  @Column('int', { default: 0 })
   timestamp!: number;
-  @Column('bigint', { default: 0 })
+  @Column('int', { default: 0 })
   lastTimestamp!: number;
   @Column()
   isErrorMsgQuiet!: boolean;
@@ -43,8 +44,8 @@ export class CooldownViewer {
   cooldown!: Cooldown;
   @Column()
   username!: string;
-  @Column('bigint')
+  @Column('bigint', { transformer: new ColumnNumericTransformer() })
   timestamp!: number;
-  @Column('bigint')
+  @Column('bigint', { transformer: new ColumnNumericTransformer() })
   lastTimestamp!: number;
 };

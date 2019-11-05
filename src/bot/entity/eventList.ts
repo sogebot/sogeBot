@@ -1,4 +1,5 @@
 import { Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
+import { ColumnNumericTransformer } from './_transformer';
 
 @Entity()
 export class EventList {
@@ -12,7 +13,7 @@ export class EventList {
   @Index()
   username!: string;
 
-  @Column('bigint')
+  @Column('bigint', { transformer: new ColumnNumericTransformer() })
   timestamp!: number;
 
   @Column()

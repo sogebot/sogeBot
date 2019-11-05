@@ -1,4 +1,5 @@
 import { Column, Entity, Index, ManyToOne,OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { ColumnNumericTransformer } from './_transformer';
 
 @Entity()
 export class Commands {
@@ -44,6 +45,6 @@ export class CommandsCount {
   @Column()
   @Index()
   command!: string;
-  @Column('bigint')
+  @Column('bigint', { transformer: new ColumnNumericTransformer() })
   timestamp!: number;
 };
