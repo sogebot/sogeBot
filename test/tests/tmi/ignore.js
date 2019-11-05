@@ -76,7 +76,7 @@ describe('TMI - ignore', () => {
       const item = await getRepository(Settings).findOne({
         where: {
           namespace: '/core/tmi',
-          key: 'ignorelist',
+          name: 'ignorelist',
         },
       });
 
@@ -91,7 +91,7 @@ describe('TMI - ignore', () => {
       const item = await getRepository(Settings).findOne({
         where: {
           namespace: '/core/tmi',
-          key: 'ignorelist',
+          name: 'ignorelist',
         },
       });
 
@@ -106,7 +106,7 @@ describe('TMI - ignore', () => {
       const item = await getRepository(Settings).findOne({
         where: {
           namespace: '/core/tmi',
-          key: 'ignorelist',
+          name: 'ignorelist',
         },
       });
 
