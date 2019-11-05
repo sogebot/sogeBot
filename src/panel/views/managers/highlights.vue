@@ -29,7 +29,7 @@
                 {{ item.title }}
                 <small class="d-block">
                   <fa :icon="[ 'far', 'clock' ]"></fa> {{ timestampToString(item.timestamp) }}
-                  <fa class="pl-2" :icon="['far', 'fa-calendar-alt']"></fa> {{ new Date(item.created_at).toLocaleString() }}
+                  <fa class="pl-2" :icon="['far', 'fa-calendar-alt']"></fa> {{ new Date(item.createdAt).toLocaleString() }}
                   <fa class="pl-2" :icon="['fas', 'fa-gamepad']"></fa> {{ item.game }}
                 </small>
               </div>
@@ -37,10 +37,16 @@
           </div>
 
           <div class="col-sm-1 pl-0">
-            <button data-toggle="dropdown" class="btn btn-block btn-outline-dark border-0 h-100"><fa icon="ellipsis-v"></fa></button>
+            <b-dropdown variant="outline-dark" toggle-class="border-0 h-100 w-100" class="h-100 w-100" size="sm" no-caret>
+              <template v-slot:button-content><fa icon="ellipsis-v"></fa></template>
+              <b-dropdown-item @click="deleteItem(item.id)">
+                <fa icon="trash-alt"></fa> {{ translate('delete') }}
+              </b-dropdown-item>
+            </b-dropdown>
+            <!--button data-toggle="dropdown" class="btn btn-block btn-outline-dark border-0 h-100"><fa icon="ellipsis-v"></fa></button>
             <div class="dropdown-menu p-0">
               <button class="dropdown-item p-2 pl-4 pr-4" style="cursor: pointer" v-on:click="deleteItem(item._id)"><fa icon="trash-alt"></fa> {{ translate('delete') }}</button>
-            </div>
+            </div-->
           </div>
         </div>
       </div>
@@ -76,13 +82,13 @@ export default class highlightsList extends Vue {
       })
     }
     return items.sort((a, b) => {
-      return new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime()
+      return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()
     })
   }
 
   created() {
     this.state.loading = this.$state.progress;
-    this.socket.emit('list', (err, items) => {
+    this.socket.emit('highlights::getAll', (err, items) => {
       this.items = items
       this.state.loading = this.$state.success;
     })
@@ -101,8 +107,8 @@ export default class highlightsList extends Vue {
   }
 
   deleteItem(id) {
-    this.socket.emit('delete', {_id: id}, () => {
-      this.items = this.items.filter((o) => o._id !== id)
+    this.socket.emit('highlights::deleteById', id, () => {
+      this.items = this.items.filter((o) => o.id !== id)
     })
   }
 }

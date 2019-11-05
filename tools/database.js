@@ -10,6 +10,7 @@ const { Alias } = require('../dest/entity/alias');
 const { Commands, CommandsCount } = require('../dest/entity/commands');
 const { Cooldown } = require('../dest/entity/cooldown');
 const { CacheTitles } = require('../dest/entity/cacheTitles');
+const { Highlight } = require('../dest/entity/highlight');
 const { Settings } = require('../dest/entity/settings');
 const { EventList } = require('../dest/entity/eventList');
 const { Quotes } = require('../dest/entity/quotes');
@@ -87,7 +88,7 @@ async function main() {
       if (item.key.includes('.') || typeof item.system === 'undefined') {
         continue;
       }
-      await getRepository(Settings).insert({ namespace: `/${type}/${item.system}`, key: item.key, value: JSON.stringify(item.value) });
+      await getRepository(Settings).insert({ namespace: `/${type}/${item.system}`, name: item.key, value: JSON.stringify(item.value) });
     }
   }
 
@@ -192,7 +193,7 @@ async function main() {
   await getManager().clear(Cooldown);
   items = (await from.engine.find('systems.cooldown')).map(o => {
     delete o._id; return {
-      key: o.key,
+      name: o.key,
       miliseconds: o.miliseconds,
       type: o.type,
       timestamp: o.timestamp,
@@ -207,6 +208,23 @@ async function main() {
   if (items.length > 0) {
     for (const chunk of _.chunk(items, 100)) {
       await getRepository(Cooldown).save(chunk);
+    }
+  }
+
+  console.log(`Migr: systems.highlights`);
+  await getManager().clear(Highlight);
+  items = (await from.engine.find('systems.highlights')).map(o => {
+    delete o._id; return {
+      videoId: o.id,
+      timestamp: o.timestamp,
+      game: o.game,
+      title: o.title,
+      createdAt: o.created_at || (Date.now() - 1000 * 60 * 60 * 24 * 31),
+    };
+  });
+  if (items.length > 0) {
+    for (const chunk of _.chunk(items, 100)) {
+      await getRepository(Highlight).save(chunk);
     }
   }
 
