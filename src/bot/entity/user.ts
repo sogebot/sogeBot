@@ -1,4 +1,4 @@
-import { Column, Entity, Index, PrimaryGeneratedColumn, ManyToOne, OneToMany, AfterUpdate, AfterInsert } from 'typeorm';
+import { AfterInsert, AfterUpdate, Column, Entity, Index, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { ColumnNumericTransformer } from './_transformer';
 
 @Entity()
@@ -41,23 +41,20 @@ export class User {
   @Column('bigint', { transformer: new ColumnNumericTransformer(), default: 0 })
   pointsOfflineGivenAt!: number;
   @Column('bigint', { transformer: new ColumnNumericTransformer(), default: 0 })
-  pointsByMessageGivenAt!: number
-  @Column('bigint', { transformer: new ColumnNumericTransformer(), default: 0 })
-  tipsAmount!: number;
+  pointsByMessageGivenAt!: number;
+
   @OneToMany(() => UserTip, (tip) => tip.user, {
     cascade: true,
   })
   tips!: UserTip[];
 
-  @Column('bigint', { transformer: new ColumnNumericTransformer(), default: 0 })
-  bitsAmount!: number;
   @OneToMany(() => UserBit, (bit) => bit.user, {
     cascade: true,
   })
   bits!: UserBit[];
 
   @Column('bigint', { transformer: new ColumnNumericTransformer(), default: 0 })
-  messageAmount!: number;
+  messages!: number;
 };
 
 @Entity()
@@ -80,9 +77,7 @@ export class UserTip {
   tippedAt!: number;
 
   @Column()
-  cacheAmount!: number;
-  @Column()
-  cacheCurrency!: string;
+  sortAmount!: number;
 }
 
 @Entity()
@@ -105,7 +100,7 @@ export class UserBit {
   @AfterInsert()
   @AfterUpdate()
   async recountBitsAmount() {
-    console.log('TODO: recount tips')
-    console.log(this)
+    console.log('TODO: recount tips');
+    console.log(this);
   }
 }

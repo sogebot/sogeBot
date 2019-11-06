@@ -315,8 +315,7 @@ async function main() {
           currency: t.currency,
           message: t.message,
           tippedAt: t.timestamp,
-          cacheAmount: t._amount,
-          cacheCurrency: t._currency,
+          sortAmount: t._amount,
         }
       }),
 
@@ -330,7 +329,7 @@ async function main() {
         }
       }),
 
-      messageAmount: (messages.find(m => m.id === o.id) || { messages: 0 }).messages,
+      messages: (messages.find(m => m.id === o.id) || { messages: 0 }).messages,
     };
   });
   if (items.length > 0) {

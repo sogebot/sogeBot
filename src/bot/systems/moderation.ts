@@ -112,7 +112,7 @@ class Moderation extends System {
       timestamp: LessThan(1000 * 60 * 60),
     });
     const warnings = await getRepository(ModerationWarning).find({ username: sender.username });
-    const silent = this.isSilent(type);
+    const silent = await this.isSilent(type);
 
     text = text.trim();
 
