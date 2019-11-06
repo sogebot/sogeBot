@@ -632,9 +632,6 @@ const runIndexing = async(retry = false) => {
     await global.db.engine.index('systems.songs.playlist', [{ index: 'videoID', unique: true }]);
     await global.db.engine.index('systems.songs.request', [{ index: 'videoID' }]);
     await global.db.engine.index('systems.ranks', [{ index: 'hours' }]);
-    await global.db.engine.index('systems.moderation.messagecooldown', [{ index: 'key', unique: true }]);
-    await global.db.engine.index('systems.moderation.permits', [{ index: 'username' }]);
-    await global.db.engine.index('systems.moderation.warnings', [{ index: 'username' }]);
     await global.db.engine.index('games.wheeloffortune', [{ index: 'key', unique: true }]);
     await global.db.engine.index('systems.raffles.participants', [{ index: 'raffle_id' }, { index: 'username' }]);
     await global.db.engine.index('overlays.gallery', { index: 'id', unique: true });
