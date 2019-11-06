@@ -54,6 +54,7 @@ const connect = async function () {
     logging: false,
     synchronize: true,
     entities: [__dirname + '/entity/*.{js,ts}'],
+    subscribers: [__dirname + '/entity/*.{js,ts}'],
     ...connectionOptions,
   });
 };

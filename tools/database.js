@@ -17,6 +17,7 @@ const { Settings } = require('../dest/entity/settings');
 const { EventList } = require('../dest/entity/eventList');
 const { Quotes } = require('../dest/entity/quotes');
 const { Permissions } = require('../dest/entity/permissions');
+const { User } = require('../dest/entity/user');
 
 const _ = require('lodash');
 
@@ -59,6 +60,7 @@ const connect = async function () {
     synchronize: true,
     logging: false,
     entities: [__dirname + '/../dest/entity/*.{js,ts}'],
+    subscribers: [__dirname + '/../dest/entity/*.{js,ts}'],
     ...connectionOptions,
   });
 };
@@ -267,6 +269,73 @@ async function main() {
   if (items.length > 0) {
     for (const chunk of _.chunk(items, 100)) {
       await getRepository(Keyword).save(chunk);
+    }
+  }
+
+  console.log(`Migr: users, users.tips, users.points, users.message, users.bits`);
+  if (connection.options.type === 'postgres') {
+    await getRepository(User).query('TRUNCATE "user" CASCADE');
+  } else {
+    await getRepository(User).clear();
+  }
+
+  const points = await from.engine.find('users.points');
+  const tips = await from.engine.find('users.tips');
+  const messages = await from.engine.find('users.messages');
+  const bits = await from.engine.find('users.bits');
+
+  items = (await from.engine.find('users')).map(o => {
+    delete o._id; return {
+      userId: o.id,
+
+      isOnline: false,
+      isFollower: _.get(o, 'is.follower', false),
+      isModerator: _.get(o, 'is.moderator', false),
+      isSubscriber: _.get(o, 'is.subscriber', false),
+
+      rank: '',
+      haveCustomRank: false,
+
+      followedAt: _.get(o, 'time.follow', 0),
+      followCheckAt: Date.now(),
+      subscribedAt: _.get(o, 'time.subscribedAt', 0),
+      seenAt: _.get(o, 'time.message', 0),
+      createdAt: _.get(o, 'time.created_at', 0),
+
+      points: (points.find(m => m.id === o.id) || { points: 0 }).points,
+      pointsOnlineGivenAt: Date.now(),
+      pointsOfflineGivenAt: Date.now(),
+      pointsByMessageGivenAt: (messages.find(m => m.id === o.id) || { messages: 0 }).messages,
+
+      tipsAmount: 0,
+      tips: tips.filter(t => t.id === o.id).map(t => {
+        delete t._id;
+        return {
+          amount: t.amount,
+          currency: t.currency,
+          message: t.message,
+          tippedAt: t.timestamp,
+          cacheAmount: t._amount,
+          cacheCurrency: t._currency,
+        }
+      }),
+
+      bitsAmount: 0,
+      bits: bits.filter(t => t.id === o.id).map(t => {
+        delete t._id;
+        return {
+          amount: t.amount,
+          message: t.message,
+          cheeredAt: t.timestamp,
+        }
+      }),
+
+      messageAmount: (messages.find(m => m.id === o.id) || { messages: 0 }).messages,
+    };
+  });
+  if (items.length > 0) {
+    for (const item of items) {
+      await getRepository(User).save(item);
     }
   }
 
