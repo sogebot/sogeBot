@@ -5,16 +5,17 @@ const fs = require('fs');
 
 const availableDbs = ['nedb', 'mongodb'];
 
-const { createConnection, getConnectionOptions, getManager, getRepository } = require('typeorm');
+const { createConnection, getConnection, getConnectionOptions, getManager, getRepository } = require('typeorm');
 const { Alias } = require('../dest/entity/alias');
 const { Commands, CommandsCount } = require('../dest/entity/commands');
 const { Cooldown } = require('../dest/entity/cooldown');
 const { CacheTitles } = require('../dest/entity/cacheTitles');
 const { Highlight } = require('../dest/entity/highlight');
+const { HowLongToBeatGame } = require('../dest/entity/howLongToBeatGame');
 const { Settings } = require('../dest/entity/settings');
 const { EventList } = require('../dest/entity/eventList');
 const { Quotes } = require('../dest/entity/quotes');
-const { Permissions, PermissionFilters } = require('../dest/entity/permissions');
+const { Permissions } = require('../dest/entity/permissions');
 
 const _ = require('lodash');
 
@@ -53,8 +54,8 @@ const dbName = {
 const from = new (require('../dest/databases/database'))(false, false, argv.from, dbName.from());
 const connect = async function () {
   const connectionOptions = await getConnectionOptions();
-  createConnection({
-    synchronize: true, // force to recreate table!!! careful
+  await createConnection({
+    synchronize: true,
     logging: false,
     entities: [__dirname + '/../dest/entity/*.{js,ts}'],
     ...connectionOptions,
@@ -66,6 +67,8 @@ async function main() {
   };
   await connect();
   await new Promise((resolve) => setTimeout(() => resolve(), 1000));
+
+  const connection = await getConnection();
 
   console.log('Info: Databases connections established');
 
@@ -141,7 +144,11 @@ async function main() {
   }
 
   console.log(`Migr: systems.customcommands, systems.customcommands.responses`);
-  await getRepository(Commands).query('TRUNCATE "commands" CASCADE');
+  if (connection.options.type === 'postgres') {
+    await getRepository(Commands).query('TRUNCATE "commands" CASCADE');
+  } else {
+    await getRepository(Commands).clear();
+  }
   items = await from.engine.find('systems.customcommands');
   for (const item of items) {
     // add responses
@@ -162,7 +169,7 @@ async function main() {
   });
   if (items.length > 0) {
     for (const chunk of _.chunk(items, 100)) {
-      await getRepository(Commands).save(chunk)
+      await getRepository(Commands).save(chunk);
     }
   }
 
@@ -178,7 +185,11 @@ async function main() {
   }
 
   console.log(`Migr: permissions`);
-  await getRepository(Permissions).query('TRUNCATE "permissions" CASCADE');
+  if (connection.options.type === 'postgres') {
+    await getRepository(Permissions).query('TRUNCATE "permissions" CASCADE');
+  } else {
+    await getRepository(Permissions).clear();
+  }
   items = (await from.engine.find('core.permissions')).map(o => {
     delete o._id; return o;
   });
@@ -189,7 +200,11 @@ async function main() {
   }
 
   console.log(`Migr: systems.cooldowns`);
-  await getRepository(Cooldown).query('TRUNCATE "cooldown" CASCADE');
+  if (connection.options.type === 'postgres') {
+    await getRepository(Cooldown).query('TRUNCATE "cooldown" CASCADE');
+  } else {
+    await getRepository(Cooldown).clear();
+  }
   items = (await from.engine.find('systems.cooldown')).map(o => {
     delete o._id; return {
       name: o.key,
@@ -224,6 +239,22 @@ async function main() {
   if (items.length > 0) {
     for (const chunk of _.chunk(items, 100)) {
       await getRepository(Highlight).save(chunk);
+    }
+  }
+
+  console.log(`Migr: systems.howlongtobeat`);
+  await getManager().clear(HowLongToBeatGame);
+  items = (await from.engine.find('systems.howlongtobeat')).map(o => {
+    delete o._id; return o;
+  });
+  if (items.length > 0) {
+    // save unique games
+    for (const game of [...new Set(items.map(o => o.game))]) {
+      // remove IRL
+      if (game === 'IRL') {
+        continue;
+      }
+      await getRepository(HowLongToBeatGame).save(items.find(o => o.game === game));
     }
   }
 

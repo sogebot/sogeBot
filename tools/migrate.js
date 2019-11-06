@@ -642,7 +642,6 @@ const runIndexing = async(retry = false) => {
     await global.db.engine.index('overlays.goals.goals', { index: 'uid', unique: true });
     await global.db.engine.index('registries.alerts', [{ index: 'id', unique: true }]);
     await global.db.engine.index('registries.alerts.media', [{ index: 'id', unique: false }]);
-    await global.db.engine.index('systems.howlongtobeat', [{ index: 'game', unique: true }]);
     await global.db.engine.index('systems.keywords', [{ index: 'id', unique: true }, { index: 'keyword' }]);
     await global.db.engine.index('systems.polls.votes', { index: 'vid' });
     await global.db.engine.index('systems.polls', [{ index: 'openedAt' }, { index: 'id', unique: true }]);
