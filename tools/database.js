@@ -12,6 +12,7 @@ const { Cooldown } = require('../dest/entity/cooldown');
 const { CacheTitles } = require('../dest/entity/cacheTitles');
 const { Highlight } = require('../dest/entity/highlight');
 const { HowLongToBeatGame } = require('../dest/entity/howLongToBeatGame');
+const { Keyword } = require('../dest/entity/keyword');
 const { Settings } = require('../dest/entity/settings');
 const { EventList } = require('../dest/entity/eventList');
 const { Quotes } = require('../dest/entity/quotes');
@@ -255,6 +256,17 @@ async function main() {
         continue;
       }
       await getRepository(HowLongToBeatGame).save(items.find(o => o.game === game));
+    }
+  }
+
+  console.log(`Migr: systems.keywords`);
+  await getManager().clear(Keyword);
+  items = (await from.engine.find('systems.keywords')).map(o => {
+    delete o._id; return o;
+  });
+  if (items.length > 0) {
+    for (const chunk of _.chunk(items, 100)) {
+      await getRepository(Keyword).save(chunk);
     }
   }
 

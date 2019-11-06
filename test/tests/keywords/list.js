@@ -5,6 +5,9 @@ const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 const assert = require('assert');
 
+const { getRepository } = require('typeorm');
+const { Keyword } = require('../../../dest/entity/keyword');
+
 // users
 const owner = { username: 'soge__', userId: Math.random() };
 
@@ -46,7 +49,7 @@ describe('Keywords - listing', () => {
         const keyword = await global.systems.keywords.add({ sender: owner, parameters: `-k ${k.keyword} -r ${k.response}` });
         k.id = keyword.id;
         assert.notStrictEqual(k, null);
-        await global.db.engine.update(global.systems.keywords.collection.data, { id: keyword.id }, { enabled: k.enabled });
+        await getRepository(Keyword).update({ id: keyword.id }, { enabled: k.enabled });
       });
     }
 

@@ -1,4 +1,4 @@
-import { Column, Entity, PrimaryGeneratedColumn, Index } from 'typeorm';
+import { Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
 import { ColumnNumericTransformer } from './_transformer';
 
 @Entity()
