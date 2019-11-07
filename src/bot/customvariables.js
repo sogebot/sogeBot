@@ -274,23 +274,18 @@ class CustomVariables {
         game: global.api.stats.currentGame,
         status: global.api.stats.currentTitle,
         currentHosts: global.api.stats.currentHosts,
-        currentWatched: global.api.stats.currentWatchedTime
+        currentWatched: global.api.stats.currentWatchedTime,
       },
       sender,
       param: param,
       _current: opts._current,
       user: async (username) => {
         const _user = await getRepository(User).findOne({ username });
-
-        const isUserOnline = typeof (await getRepository(UsersOnline).findOne({
-          where: { username: sender.username },
-        })) !== 'undefined';
-
         const userObj = {
           username,
           id: await global.users.getIdByName(username, false),
           is: {
-            online: isUserOnline,
+            online: _user.isOnline,
             follower: _.get(_user, 'is.follower', false),
             vip: _.get(_user, 'is.vip', false),
             subscriber: _.get(_user, 'is.subscriber', false),

@@ -13,7 +13,7 @@ const gitCommitInfo = require('git-commit-info');
 import { error, info } from './helpers/log';
 import { CacheTitles } from './entity/cacheTitles';
 import uuid from 'uuid'
-import { getManager } from 'typeorm'
+import { getManager, getRepository } from 'typeorm'
 
 const Parser = require('./parser')
 
@@ -250,11 +250,7 @@ function Panel () {
     socket.on('leaveBot', async () => {
       global.tmi.part('bot')
       // force all users offline
-      await getManager()
-        .createQueryBuilder()
-        .delete()
-        .from(UsersOnline)
-        .execute();
+      await getRepository(User).update({}, { isOnline: false });
     })
 
     // custom var

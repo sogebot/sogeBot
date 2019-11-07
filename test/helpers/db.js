@@ -12,7 +12,6 @@ const { Alias } = require('../../dest/entity/alias');
 const { Cooldown } = require('../../dest/entity/cooldown');
 const { Bets } = require('../../dest/entity/bets');
 const { Commands, CommandsResponses, CommandsCount } = require('../../dest/entity/commands');
-const { UsersOnline } = require('../../dest/entity/usersOnline');
 const { Keyword } = require('../../dest/entity/keyword');
 const { Settings } = require('../../dest/entity/settings');
 const { Quotes } = require('../../dest/entity/quotes');
@@ -32,7 +31,7 @@ module.exports = {
 
       debug('test', chalk.bgRed('*** Cleaning up collections ***'));
 
-      const entities = [Alias, Bets, Commands, CommandsResponses, CommandsCount, Quotes, Settings, Cooldown, UsersOnline, Keyword, User];
+      const entities = [Alias, Bets, Commands, CommandsResponses, CommandsCount, Quotes, Settings, Cooldown, Keyword, User];
       for (const entity of entities) {
         for (const item of (await getManager().createQueryBuilder().select('entity').from(entity, 'entity').getMany())) {
           await getManager().createQueryBuilder().delete().from(entity).where('id = :id', { id: item.id }).execute();
