@@ -3,12 +3,10 @@ import _ from 'lodash';
 import { setTimeout } from 'timers';
 import { isMainThread } from './cluster';
 
-import { flatten, unflatten } from './helpers/flatten';
 import { loadingInProgress, permissions as permissionsList } from './decorators';
 import { getFunctionList } from './decorators/on';
 import { permission } from './permissions';
 import { error, info, warning } from './helpers/log';
-import { adminEndpoint, publicEndpoint } from './helpers/socket';
 
 import { getManager, getRepository } from 'typeorm';
 import { Settings } from './entity/settings';
