@@ -72,7 +72,7 @@ class Streamlabs extends Integration {
           let user = await getRepository(User).findOne({ where: { username: event.from.toLowerCase() }});
           let id;
           if (!user) {
-            id = await global.users.getIdByName(event.from.toLowerCase().toLowerCase(), false);
+            id = await global.users.getIdByName(event.from.toLowerCase().toLowerCase());
             user = await getRepository(User).findOne({ where: { userId: id }});
             if (!user && id) {
               // if we still doesn't have user, we create new
