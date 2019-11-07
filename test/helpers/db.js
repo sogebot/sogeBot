@@ -62,8 +62,9 @@ module.exports = {
       global.oauth.botId = '12345';
       await variable.isEqual('global.oauth.botId', '12345');
 
-      global.oauth.broadcasterUsername = 'broadcaster';
-      await variable.isEqual('global.oauth.broadcasterUsername', 'broadcaster');
+
+      global.oauth.broadcasterId = '54321';
+      await variable.isEqual('global.oauth.broadcasterId', '54321');
 
       resolve();
     };

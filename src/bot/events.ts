@@ -92,22 +92,49 @@ class Events extends Core {
     attributes = _.clone(attributes) || {};
 
     if (!_.isNil(_.get(attributes, 'username', null))) {
+      let user;
+      if (attributes.userId) {
+        user = await getRepository(User).findOne({ userId: attributes.userId });
+      } else {
+        user = await getRepository(User).findOne({ username: attributes.username });
+      }
+
+      if (!user) {
+        user = new User();
+        user.username = attributes.username;
+        if (!attributes.userId) {
+          user.userId = await global.api.getIdFromTwitch(user.username);
+        } else {
+          user.userId = attributes.userId;
+        }
+        await getRepository(User).save(user);
+      }
+
       // add is object
       attributes.is = {
-        moderator: await isModerator(attributes.username),
-        subscriber: await isSubscriber(attributes.username),
-        vip: await isVIP(attributes.username),
+        moderator: await isModerator(user),
+        subscriber: await isSubscriber(user),
+        vip: await isVIP(user),
         broadcaster: isBroadcaster(attributes.username),
         bot: isBot(attributes.username),
         owner: isOwner(attributes.username),
       };
     }
     if (!_.isNil(_.get(attributes, 'recipient', null))) {
+      let  user = await getRepository(User).findOne({ username: attributes.recipient });
+
+      if (!user) {
+        user = new User();
+        user.username = attributes.recipient;
+        user.userId = await global.api.getIdFromTwitch(user.username);
+        await getRepository(User).save(user);
+      }
+
       // add is object
       attributes.recipientis = {
-        moderator: await isModerator(attributes.recipient),
-        subscriber: await isSubscriber(attributes.recipient),
-        vip: await isVIP(attributes.recipient),
+        moderator: await isModerator(user),
+        subscriber: await isSubscriber(user),
+        vip: await isVIP(user),
         broadcaster: isBroadcaster(attributes.recipient),
         bot: isBot(attributes.recipient),
         owner: isOwner(attributes.recipient),
@@ -237,11 +264,11 @@ class Events extends Core {
       const replace = new RegExp(`\\$${key}`, 'g');
       command = command.replace(replace, val);
     }
-    command = await new Message(command).parse({ username: getOwner() });
+    command = await new Message(command).parse({ username: global.oauth.broadcasterUsername });
 
     if (global.mocha) {
       const parse = new Parser({
-        sender: { username: getOwner() },
+        sender: { username: global.oauth.broadcasterUsername, userId: global.oauth.broadcasterId },
         message: command,
         skip: true,
         quiet: _.get(operation, 'isCommandQuiet', false),
@@ -250,7 +277,7 @@ class Events extends Core {
     } else {
       global.tmi.message({
         message: {
-          tags: { username: getOwner() },
+          tags: { username: global.oauth.broadcasterUsername , userId: global.oauth.broadcasterId},
           message: command,
         },
         skip: true,

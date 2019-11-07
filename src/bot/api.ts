@@ -762,7 +762,7 @@ class API extends Core {
                 });
                 if (!quiet && !isBot(user.username)) {
                   follow(user.username);
-                  global.events.fire('follow', { username: user.username });
+                  global.events.fire('follow', { username: user.username, userId: f.from_id });
                   global.registries.alerts.trigger({
                     event: 'follows',
                     name: user.username,
@@ -1599,7 +1599,7 @@ class API extends Core {
           timestamp: Date.now(),
         });
         follow(user.username);
-        global.events.fire('follow', { username: user.username });
+        global.events.fire('follow', { username: user.username, userId: id });
         global.registries.alerts.trigger({
           event: 'follows',
           name: user.username,

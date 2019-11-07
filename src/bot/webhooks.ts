@@ -238,7 +238,7 @@ class Webhooks {
             timestamp: Date.now(),
           });
           follow(data.from_name);
-          global.events.fire('follow', { username: data.from_name, webhooks: true });
+          global.events.fire('follow', { username: data.from_name, userId: data.from_id, webhooks: true });
           global.registries.alerts.trigger({
             event: 'follows',
             name: data.from_name,

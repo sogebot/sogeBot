@@ -9,6 +9,9 @@ const message = require('../../general.js').message;
 const time = require('../../general.js').time;
 const _ = require('lodash');
 
+const { getRepository } = require('typeorm');
+const { User } = require('../../../dest/entity/user');
+
 describe('Events - follow event', () => {
   before(async () => {
     await db.cleanup();
@@ -58,7 +61,7 @@ describe('Events - follow event', () => {
 
     for (const username of ['losslezos', 'rigneir', 'mikasa_hraje', 'foufhs']) {
       it('trigger follow event', async () => {
-        await global.events.fire('follow', { username, webhooks: _.random(1) === 1 });
+        await global.events.fire('follow', { username, userId: Math.random(), webhooks: _.random(1) === 1 });
       });
 
       it('message should be send', async () => {

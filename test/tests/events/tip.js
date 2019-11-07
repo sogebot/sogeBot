@@ -12,6 +12,9 @@ const message = require('../../general.js').message;
 const time = require('../../general.js').time;
 const _ = require('lodash');
 
+const { getRepository } = require('typeorm');
+const { User } = require('../../../dest/entity/user');
+
 describe('Events - tip event', () => {
   before(async () => {
     await db.cleanup();
@@ -65,8 +68,8 @@ describe('Events - tip event', () => {
         });
 
         it('user should have 100 points', async () => {
-          const userId = await global.users.getIdByName(username, true);
-          assert.strict.equal(await global.systems.points.getPointsOf(userId), 100);
+          const user = await getRepository(User).findOne({ username });
+          assert.strict.equal(user.points, 100);
         });
       });
     }

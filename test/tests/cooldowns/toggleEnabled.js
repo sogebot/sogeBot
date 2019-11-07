@@ -7,8 +7,8 @@ const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 
 // users
-const owner = { badges: {}, username: 'soge__' };
-const testUser = { badges: {}, username: 'test' };
+const owner = { userId: Math.random(), badges: {}, username: 'soge__' };
+const testUser = { userId: Math.random(), badges: {}, username: 'test' };
 
 describe('Cooldowns - toggleEnabled()', () => {
   beforeEach(async () => {

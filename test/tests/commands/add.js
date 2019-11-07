@@ -43,7 +43,7 @@ describe('Custom Commands - add()', () => {
     await db.cleanup();
     await message.prepare();
 
-    await getRepository(User).save({ username: user.username, userId: user.userId });
+    await getRepository(User).save({ username: owner.username, userId: owner.userId });
   });
 
   describe('Expected parsed fail', () => {

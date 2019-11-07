@@ -23,7 +23,7 @@ describe('Custom Commands - count filter', () => {
     await db.cleanup();
     await message.prepare();
 
-    await getRepository(User).save({ username: user.username, userId: user.userId });
+    await getRepository(User).save({ username: owner.username, userId: owner.userId });
     await getRepository(User).save({ username: user1.username, userId: user1.userId });
   });
 

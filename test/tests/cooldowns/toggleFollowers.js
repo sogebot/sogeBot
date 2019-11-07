@@ -11,10 +11,10 @@ const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/entity/user');
 
 // users
-const owner = { badges: {}, username: 'soge__' };
-const follower = { badges: {}, username: 'follower', userId: String(_.random(999999, false)), isFollower: true };
-const commonUser = { badges: {}, username: 'user1', userId: String(_.random(999999, false)) };
-const commonUser2 = { badges: {}, username: 'user2', userId: String(_.random(999999, false)) };
+const owner = { userId: Math.random(), badges: {}, username: 'soge__' };
+const follower = { userId: Math.random(), badges: {}, username: 'follower', userId: String(_.random(999999, false)), isFollower: true };
+const commonUser = { userId: Math.random(), badges: {}, username: 'user1', userId: String(_.random(999999, false)) };
+const commonUser2 = { userId: Math.random(), badges: {}, username: 'user2', userId: String(_.random(999999, false)) };
 
 describe('Cooldowns - toggleFollowers()', () => {
   beforeEach(async () => {
