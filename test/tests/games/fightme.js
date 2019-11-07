@@ -6,6 +6,9 @@ require('../../general.js');
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 
+const { getRepository } = require('typeorm');
+const { User } = require('../../../dest/entity/user');
+
 const command = '!fightme';
 
 const tests = [
@@ -58,8 +61,8 @@ describe('game/fightme - !fightme', () => {
         await db.cleanup();
         await message.prepare();
 
-        await global.db.engine.insert('users', { id: '1', username: 'usermod1', is: { moderator: true } });
-        await global.db.engine.insert('users', { id: '2', username: 'usermod2', is: { moderator: true } });
+        await getRepository({ userId: '1', username: 'usermod1', isModerator: true });
+        await getRepository({ userId: '2', username: 'usermod2', isModerator: true });
       });
 
       it('Challenger is starting !fightme', async () => {

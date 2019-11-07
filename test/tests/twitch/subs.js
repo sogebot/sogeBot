@@ -23,7 +23,7 @@ describe('lib/twitch - subs()', () => {
 
   it('Set testuser, testuser2, testuser3 as subs', async () => {
     for (const u of [testuser, testuser2, testuser3]) {
-      await global.db.engine.update('users', { id: u.id }, { username: u.username, is: { subscriber: true } });
+      await getRepository(User).save({ userId: u.id, username: u.username, isSubscriber: true });
     }
   });
 

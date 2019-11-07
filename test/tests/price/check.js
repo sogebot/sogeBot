@@ -59,8 +59,7 @@ describe('Price - check()', () => {
 
   for (const test of tests) {
     it(`${test.user} with ${test.points} points calls ${test.command}, price on ${test.priceOn} set to ${test.price} and should ${test.expected ? 'pass' : 'fail'}`, async () => {
-      await global.db.engine.insert('users', { username: test.user, id: test.userId });
-      await global.db.engine.insert('users.points', { id: test.userId, points: test.points });
+      await getRepository(User).save({ username: user.username, userId: user.userId, points: test.points });
       await global.db.engine.update(global.systems.price.collection.data, { command: test.priceOn }, { command: test.command, price: test.price, enabled: true });
       const haveEnoughPoints = await global.systems.price.check({ sender: { username: test.user, userId: test.userId }, message: test.command });
       assert.isTrue(haveEnoughPoints === test.expected);

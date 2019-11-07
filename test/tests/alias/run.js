@@ -19,8 +19,8 @@ describe('Alias - run()', () => {
     await db.cleanup();
     await message.prepare();
 
+    await getRepository(User).save({ username: owner.username, userId: owner.userId });
     await getRepository(User).save({ username: user.username, userId: user.userId });
-    await getRepository(User).save({ username: user.username, id: user.userId });
   });
 
   it('!a should show correctly command with link (skip is true)', async () => {

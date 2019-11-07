@@ -62,8 +62,8 @@ describe('Gambling - duel', () => {
     });
 
     it('add points for users', async () => {
-      await global.db.engine.insert('users.points', { id: user1.userId, points: 100 });
-      await global.db.engine.insert('users.points', { id: user2.userId, points: 100 });
+      await getRepository({ userId: user1.userId, username: user1.username, points: 100 });
+      await getRepository({ userId: user2.userId, username: user2.username, points: 100 });
     });
 
     it('user 1 is challenging', async () => {

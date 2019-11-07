@@ -159,7 +159,7 @@ describe('Cooldowns - check()', () => {
     });
 
     it('Add usermod1 as moderator', async () => {
-      await global.db.engine.insert('users', { id: '2', username: 'usermod1', is: { moderator: true } });
+      await getRepository(User).save({ username: 'usermod1', userId: 2, isModerator: true });
     });
 
     it('Add global !followage to cooldown', async () => {

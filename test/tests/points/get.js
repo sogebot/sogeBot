@@ -17,8 +17,7 @@ describe('Points - get()', () => {
 
   describe('User with more than safe points should return safe points', () => {
     it('create user with huge amount of points', async () => {
-      await global.db.engine.insert('users', { username: hugePointsUser.username, id: hugePointsUser.userId });
-      await global.db.engine.insert('users.points', { id: hugePointsUser.userId, points: hugePointsUser.points });
+      await getRepository(User).save({ username: hugePointsUser.username, hugePointsUser: user.userId, points: hugePointsUser.points });
     });
 
     it('points should be returned in safe points bounds', async () => {
@@ -33,8 +32,7 @@ describe('Points - get()', () => {
 
   describe('User with less than safe points should return unchanged points', () => {
     it('create user with normal amount of points', async () => {
-      await global.db.engine.insert('users', { username: tinyPointsUser.username, id: tinyPointsUser.userId });
-      await global.db.engine.insert('users.points', { id: tinyPointsUser.userId, points: tinyPointsUser.points });
+      await getRepository(User).save({ username: tinyPointsUser.username, tinyPointsUser: user.userId, points: tinyPointsUser.points });
     });
 
     it('points should be returned in safe points bounds', async () => {

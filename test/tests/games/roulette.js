@@ -29,13 +29,6 @@ describe('game/roulette - !roulette', () => {
       it('Expecting win or lose', async () => {
         await message.isSent(['gambling.roulette.dead', 'gambling.roulette.alive'], test.user);
       });
-
-      it('we are not expecting NaN in users.points', async () => {
-        const points = await global.db.engine.find('users.points');
-        for (let i = 0, length = points.length; i < length; i++) {
-          assert.strict.equal(isNaN(points[i].points), false);
-        }
-      });
     });
   }
 });

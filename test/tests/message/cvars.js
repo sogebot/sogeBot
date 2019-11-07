@@ -12,6 +12,9 @@ const constants = require('../../../dest/constants');
 const assert = require('chai').assert;
 const _ = require('lodash');
 
+const { getRepository } = require('typeorm');
+const { User } = require('../../../dest/entity/user');
+
 // stub
 _.set(global, 'widgets.custom_variables.io.emit', function () {});
 
@@ -123,7 +126,7 @@ describe('Message - cvars filter', async () => {
 
                 for (const user of users) {
                   user.id = user.userId;
-                  await global.db.engine.insert('users', user);
+                  await getRepository(user).save(user);
                 }
               });
               it(`create initial value '${test.initialValue}' of ${test.variable}`, async () => {
@@ -200,8 +203,7 @@ describe('Message - cvars filter', async () => {
                 await msg.prepare();
 
                 for (const user of users) {
-                  user.id = user.userId;
-                  await global.db.engine.insert('users', user);
+                  await getRepository(User).save(user);
                 }
               });
               it(`create initial value '${test.initialValue}' of ${test.variable}`, async () => {

@@ -8,6 +8,9 @@ const message = require('../../general.js').message;
 const _ = require('lodash');
 const assert = require('assert');
 
+const { getRepository } = require('typeorm');
+const { User } = require('../../../dest/entity/user');
+
 const user1 = { username: 'user1', points: 100, userId: String(_.random(999999, false)) };
 const user2 = { username: 'user2', points: 100, userId: String(_.random(999999, false)) };
 
@@ -19,13 +22,11 @@ describe('Points - get()', () => {
     });
 
     it('create user1', async () => {
-      await global.db.engine.insert('users', { username: user1.username, id: user1.userId });
-      await global.db.engine.insert('users.points', { id: user1.userId, points: user1.points });
+      await getRepository(User).save({ username: user1.username, userId: user1.userId, points: user1.points });
     });
 
     it('create user2', async () => {
-      await global.db.engine.insert('users', { username: user2.username, id: user2.userId });
-      await global.db.engine.insert('users.points', { id: user2.userId, points: user2.points });
+      await getRepository(User).save({ username: user2.username, userId: user2.userId, points: user2.points });
     });
 
     it('user1 should have 100 points', async () => {
@@ -45,13 +46,6 @@ describe('Points - get()', () => {
       });
     });
 
-    it('we are not expecting NaN in users.points', async () => {
-      const points = await global.db.engine.find('users.points');
-      for (let i = 0, length = points.length; i < length; i++) {
-        assert.strict.equal(isNaN(points[i].points), false);
-      }
-    });
-
     it('user1 should have 50 points', async () => {
       assert.strict.equal(await global.systems.points.getPointsOf(user1.userId), 50);
     });
@@ -68,13 +62,11 @@ describe('Points - get()', () => {
     });
 
     it('create user1', async () => {
-      await global.db.engine.insert('users', { username: user1.username, id: user1.userId });
-      await global.db.engine.insert('users.points', { id: user1.userId, points: user1.points });
+      await getRepository(User).save({ username: user1.username, userId: user1.userId, points: user1.points });
     });
 
     it('create user2', async () => {
-      await global.db.engine.insert('users', { username: user2.username, id: user2.userId });
-      await global.db.engine.insert('users.points', { id: user2.userId, points: user2.points });
+      await getRepository(User).save({ username: user2.username, userId: user2.userId, points: user2.points });
     });
 
     it('user1 should have 100 points', async () => {
@@ -94,13 +86,6 @@ describe('Points - get()', () => {
       });
     });
 
-    it('we are not expecting NaN in users.points', async () => {
-      const points = await global.db.engine.find('users.points');
-      for (let i = 0, length = points.length; i < length; i++) {
-        assert.strict.equal(isNaN(points[i].points), false);
-      }
-    });
-
     it('user1 should have 100 points', async () => {
       assert.strict.equal(await global.systems.points.getPointsOf(user1.userId), 100);
     });
@@ -117,13 +102,11 @@ describe('Points - get()', () => {
     });
 
     it('create user1', async () => {
-      await global.db.engine.insert('users', { username: user1.username, id: user1.userId });
-      await global.db.engine.insert('users.points', { id: user1.userId, points: user1.points });
+      await getRepository(User).save({ username: user1.username, userId: user1.userId, points: user1.points });
     });
 
     it('create user2', async () => {
-      await global.db.engine.insert('users', { username: user2.username, id: user2.userId });
-      await global.db.engine.insert('users.points', { id: user2.userId, points: user2.points });
+      await getRepository(User).save({ username: user2.username, userId: user2.userId, points: user2.points });
     });
 
     it('user1 should have 100 points', async () => {
@@ -143,13 +126,6 @@ describe('Points - get()', () => {
       });
     });
 
-    it('we are not expecting NaN in users.points', async () => {
-      const points = await global.db.engine.find('users.points');
-      for (let i = 0, length = points.length; i < length; i++) {
-        assert.strict.equal(isNaN(points[i].points), false);
-      }
-    });
-
     it('user1 should have 0 points', async () => {
       assert.strict.equal(await global.systems.points.getPointsOf(user1.userId), 0);
     });
@@ -166,13 +142,11 @@ describe('Points - get()', () => {
     });
 
     it('create user1', async () => {
-      await global.db.engine.insert('users', { username: user1.username, id: user1.userId });
-      await global.db.engine.insert('users.points', { id: user1.userId, points: user1.points });
+      await getRepository(User).save({ username: user1.username, userId: user1.userId, points: user1.points });
     });
 
     it('create user2', async () => {
-      await global.db.engine.insert('users', { username: user2.username, id: user2.userId });
-      await global.db.engine.insert('users.points', { id: user2.userId, points: user2.points });
+      await getRepository(User).save({ username: user2.username, userId: user2.userId, points: user2.points });
     });
 
     it('user1 should have 100 points', async () => {
@@ -188,13 +162,6 @@ describe('Points - get()', () => {
       await message.isSent('points.failed.give', { username: user1.username }, {
         command: '!points give',
       });
-    });
-
-    it('we are not expecting NaN in users.points', async () => {
-      const points = await global.db.engine.find('users.points');
-      for (let i = 0, length = points.length; i < length; i++) {
-        assert.strict.equal(isNaN(points[i].points), false);
-      }
     });
 
     it('user1 should have 100 points', async () => {
@@ -213,13 +180,11 @@ describe('Points - get()', () => {
     });
 
     it('create user1', async () => {
-      await global.db.engine.insert('users', { username: user1.username, id: user1.userId });
-      await global.db.engine.insert('users.points', { id: user1.userId, points: user1.points });
+      await getRepository(User).save({ username: user1.username, userId: user1.userId, points: user1.points });
     });
 
     it('create user2', async () => {
-      await global.db.engine.insert('users', { username: user2.username, id: user2.userId });
-      await global.db.engine.insert('users.points', { id: user2.userId, points: user2.points });
+      await getRepository(User).save({ username: user2.username, userId: user2.userId, points: user2.points });
     });
 
     it('user1 should have 100 points', async () => {
@@ -235,13 +200,6 @@ describe('Points - get()', () => {
       await message.isSent('points.failed.give', { username: user1.username }, {
         command: '!points give',
       });
-    });
-
-    it('we are not expecting NaN in users.points', async () => {
-      const points = await global.db.engine.find('users.points');
-      for (let i = 0, length = points.length; i < length; i++) {
-        assert.strict.equal(isNaN(points[i].points), false);
-      }
     });
 
     it('user1 should have 100 points', async () => {

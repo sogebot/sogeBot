@@ -8,10 +8,13 @@ const assert = require('assert');
 
 const owner = { username: 'soge__' };
 
+const { getRepository } = require('typeorm');
+const { User } = require('../../../dest/entity/user');
+
 async function setUsersOnline(users) {
-  await global.db.engine.remove('users.online', {});
+  await getRepository(User).update({}, { isOnline: false });
   for (const username of users) {
-    await global.db.engine.update('users.online', { username }, { username });
+    await getRepository(User).update({ username }, { isOnline: false });
   }
 }
 
@@ -53,7 +56,7 @@ describe('Message - random filter', () => {
     const users = ['ignoreduser', 'user1'];
     for (const username of users) {
       it('add user ' + username + ' to users list', async () => {
-        await global.db.engine.insert('users', { id: Math.random(), username, is: { follower: true } });
+        await getRepository(User).save({ userId: Math.random(), username, isFollower: true });
       });
     }
 
@@ -81,7 +84,7 @@ describe('Message - random filter', () => {
     const users = ['ignoreduser', 'user1'];
     for (const username of users) {
       it('add user ' + username + ' to users list', async () => {
-        await global.db.engine.insert('users', { id: Math.random(), username, is: { subscriber: true } });
+        await getRepository(User).save({ userIid: Math.random(), username, isSubscriber: true });
       });
     }
 
@@ -110,7 +113,7 @@ describe('Message - random filter', () => {
     const users = ['ignoreduser', 'user1'];
     for (const username of users) {
       it('add user ' + username + ' to users list', async () => {
-        await global.db.engine.insert('users', { id: Math.random(), username });
+        await getRepository(User).save({ userId: Math.random(), username });
       });
     }
 
@@ -137,7 +140,7 @@ describe('Message - random filter', () => {
     const users = ['ignoreduser', 'user1'];
     for (const username of users) {
       it('add user ' + username + ' to users list', async () => {
-        await global.db.engine.insert('users', { id: Math.random(), username, is: { follower: true } });
+        await getRepository(User).save({ userId: Math.random(), username, isFollower: true });
       });
     }
 
@@ -164,7 +167,7 @@ describe('Message - random filter', () => {
     const users = ['ignoreduser', 'user1'];
     for (const username of users) {
       it('add user ' + username + ' to users list', async () => {
-        await global.db.engine.insert('users', { id: Math.random(), username, is: { subscriber: true } });
+        await getRepository(User).save({ userIid: Math.random(), username, isSubscriber: true });
       });
     }
 

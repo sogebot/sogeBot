@@ -10,7 +10,7 @@ const message = require('../../general.js').message;
 // users
 const id = _.random(99999, false);
 const channelId = String(_.random(9999999, false));
-const testuser = { username: 'testuser', id };
+const testuser = { username: 'testuser', userId: id };
 
 describe('libs/webhooks - follower()', () => {
   before(async () => {
@@ -24,7 +24,7 @@ describe('libs/webhooks - follower()', () => {
   });
 
   it('add testuser (id:' + id + ') to db', async () => {
-    await global.db.engine.insert('users', testuser);
+    await getRepository(User).save(testuser);
   });
 
   it('follow event should not be called', async () => {

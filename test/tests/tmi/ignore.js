@@ -20,6 +20,9 @@ const botwithchangedname = { username: 'asdsadas', userId: '24900234' };
 const commons = require('../../../dest/commons');
 const { VariableWatcher } = require('../../../dest/watchers');
 
+const { getRepository } = require('typeorm');
+const { User } = require('../../../dest/entity/user');
+
 describe('TMI - ignore', () => {
   before(async () => {
     await db.cleanup();
@@ -28,9 +31,9 @@ describe('TMI - ignore', () => {
     global.tmi.globalIgnoreListExclude = [];
     global.tmi.ignorelist = [];
 
-    await global.db.engine.insert('users', testuser);
-    await global.db.engine.insert('users', testuser2);
-    await global.db.engine.insert('users', testuser3);
+    await getRepository(User).save(testuser);
+    await getRepository(User).save(testuser2);
+    await getRepository(User).save(testuser3);
   });
 
   beforeEach(async () => {

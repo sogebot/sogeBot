@@ -37,7 +37,7 @@ describe('Raffles - pick()', () => {
     const subs = ['sub1', 'sub2', 'sub3', 'sub4'];
     for (const [id, v] of Object.entries(subs)) {
       it('Add user ' + v + ' to db', async () => {
-        await global.db.engine.insert('users', { id, is: { subscriber: true }, username: v });
+        await getRepository(User).save({ username: v , userId: id, isSubscriber: true });
       });
 
       it('Add user ' + v + ' to raffle', async () => {
@@ -80,9 +80,11 @@ describe('Raffles - pick()', () => {
       });
     });
 
+
+
     it('Create testuser/testuser2 with max points', async () => {
-      await global.db.engine.update('users.points', { id: testuser.userId }, { points: max });
-      await global.db.engine.update('users.points', { id: testuser2.userId }, { points: max });
+      user1 = await getRepository(User).save({ username: testuser.username , userId: testuser.userId, points: max });
+      user2 = await getRepository(User).save({ username: testuser.username , userId: testuser2.userId, points: max });
     });
 
     it('testuser bets max', async () => {
@@ -111,6 +113,8 @@ describe('Raffles - pick()', () => {
   });
 
   describe('Raffle with follower should return winner', () => {
+    let user1, user2;
+
     it('create ticket raffle', async () => {
       global.systems.raffles.open({ sender: owner, parameters: '!winme -min 0 -max ' + max });
       await message.isSent('raffles.announce-ticket-raffle', owner, {
@@ -122,12 +126,8 @@ describe('Raffles - pick()', () => {
     });
 
     it('Create testuser/testuser2 with max points', async () => {
-      await global.db.engine.update('users.points', { id: testuser.userId }, { points: max });
-      await global.db.engine.update('users.points', { id: testuser2.userId }, { points: max });
-    });
-
-    it('Set testuser as follower', async () => {
-      await global.db.engine.update('users', { id: testuser.userId }, { username: testuser.username, is: { follower: true } });
+      user1 = await getRepository(User).save({ isFollower: true, username: testuser.username , userId: testuser.userId, points: max });
+      user2 = await getRepository(User).save({ username: testuser.username , userId: testuser2.userId, points: max });
     });
 
     it('testuser bets 100', async () => {
@@ -167,12 +167,8 @@ describe('Raffles - pick()', () => {
     });
 
     it('Create testuser/testuser2 with max points', async () => {
-      await global.db.engine.update('users.points', { id: testuser.userId }, { points: max });
-      await global.db.engine.update('users.points', { id: testuser2.userId }, { points: max });
-    });
-
-    it('Set testuser as subscriber', async () => {
-      await global.db.engine.update('users', { id: testuser.userId }, { username: testuser.username, is: { subscriber: true } });
+      user1 = await getRepository(User).save({ isSubscriber: true, username: testuser.username , userId: testuser.userId, points: max });
+      user2 = await getRepository(User).save({ username: testuser.username , userId: testuser2.userId, points: max });
     });
 
     it('testuser bets 100', async () => {
@@ -212,16 +208,8 @@ describe('Raffles - pick()', () => {
     });
 
     it('Create testuser/testuser2 with max points', async () => {
-      await global.db.engine.update('users.points', { id: testuser.userId }, { points: max });
-      await global.db.engine.update('users.points', { id: testuser2.userId }, { points: max });
-    });
-
-    it('Set testuser as subscriber', async () => {
-      await global.db.engine.update('users', { id: testuser.userId }, { username: testuser.username, is: { subscriber: true } });
-    });
-
-    it('Set testuser2 as follower', async () => {
-      await global.db.engine.update('users', { id: testuser2.userId }, { username: testuser2.username, is: { follower: true } });
+      user1 = await getRepository(User).save({ isSubscriber: true, username: testuser.username , userId: testuser.userId, points: max });
+      user2 = await getRepository(User).save({ isFollower: true, username: testuser.username , userId: testuser2.userId, points: max });
     });
 
     it('testuser bets 100', async () => {
