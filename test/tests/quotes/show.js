@@ -11,6 +11,7 @@ const { User } = require('../../../dest/entity/user');
 
 // users
 const owner = { username: 'soge__', userId: '1' };
+const user = { username: 'user', userId: '3' };
 
 const tests = [
   { sender: owner, parameters: '', shouldFail: true, error: 'systems.quotes.show.error.no-parameters' },
@@ -37,6 +38,7 @@ describe('Quotes - main()', () => {
         await db.cleanup();
         await message.prepare();
         await getRepository(User).save({ username: user.username, userId: user.userId });
+        await getRepository(User).save({ username: owner.username, userId: owner.userId });
         const quote = await global.systems.quotes.add({ sender: test.sender, parameters: '-tags lorem ipsum -quote Lorem Ipsum', command: '!quote add' });
         id = quote.id;
         if (test.id === 1) {

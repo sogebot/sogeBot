@@ -31,7 +31,7 @@ describe('Parser - case sensitive commands', async () => {
         await db.cleanup();
         await message.prepare();
 
-        await getRepository(User).save({ username: user.username, userId: user.userId });
+        await getRepository(User).save({ username: owner.username, userId: owner.userId });
       });
 
       it(`Run command '${test.test}'`, async () => {

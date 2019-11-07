@@ -30,7 +30,7 @@ class FightMe extends Game {
   @command('!fightme')
   async main (opts) {
     opts.sender['message-type'] = 'chat'; // force responses to chat
-    let user;
+    let user, challenger;
 
     try {
       const username = opts.parameters.trim().match(/^@?([\S]+)$/)[1].toLowerCase();
@@ -47,7 +47,15 @@ class FightMe extends Game {
           user = await getRepository(User).save(user);
         }
       }
-      opts.sender.username = opts.sender.username.toLowerCase();
+
+      challenger = await getRepository(User).findOne({ where: { userId: opts.sender.userId }});
+      if (!challenger) {
+        // if we still doesn't have user, we create new
+        challenger = new User();
+        challenger.userId = opts.sender.userId;
+        challenger.username = opts.sender.username.toLowerCase();
+        challenger = await getRepository(User).save(challenger);
+      }
     } catch (e) {
       sendMessage(global.translate('gambling.fightme.notEnoughOptions'), opts.sender, opts.attr);
       return;
@@ -65,7 +73,7 @@ class FightMe extends Game {
       const winner = _.random(0, 1, false);
       const isMod = {
         user: await isModerator(user),
-        sender: await isModerator(opts.sender.username),
+        sender: await isModerator(challenger),
       };
 
       // vs broadcaster

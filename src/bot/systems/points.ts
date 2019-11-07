@@ -110,14 +110,14 @@ class Points extends System {
         await getRepository(User).save(user);
         return;
       } else {
-        const chat = await global.users.getChatOf(user.id, opts.isOnline);
+        const chat = await global.users.getChatOf(userId, opts.isOnline);
         const userPointsKey = opts.isOnline ? 'pointsOnlineGivenAt' : 'pointsOfflineGivenAt';
         if (interval_calculated !== 0 && ptsPerInterval[permId]  !== 0) {
-          debug('points.update', `${user.username}#${user.id}[${permId}] ${chat} | ${_.get(user, 'time.points', 'n/a')}`);
+          debug('points.update', `${user.username}#${userId}[${permId}] ${chat} | ${_.get(user, 'time.points', 'n/a')}`);
           if (user[userPointsKey] + interval_calculated <= chat) {
             // add points to user[userPointsKey] + interval to user to not overcalculate (this should ensure recursive add points in time)
             const userTimePoints = user[userPointsKey] + interval_calculated;
-            debug('points.update', `${user.username}#${user.id}[${permId}] +${Math.floor(ptsPerInterval)}`);
+            debug('points.update', `${user.username}#${userId}[${permId}] +${Math.floor(ptsPerInterval)}`);
             user.points += ptsPerInterval;
             user[userPointsKey] = userTimePoints;
             await getRepository(User).save(user);
@@ -125,7 +125,7 @@ class Points extends System {
         } else {
           user[userPointsKey] = chat;
           await getRepository(User).save(user);
-          debug('points.update', `${user.username}#${user.id}[${permId}] points disled or interval is 0, settint points time to chat`);
+          debug('points.update', `${user.username}#${userId}[${permId}] points disled or interval is 0, settint points time to chat`);
         }
       }
       resolve();
@@ -176,6 +176,12 @@ class Points extends System {
     adminEndpoint(this.nsp, 'reset', async () => {
       getRepository(User).update({}, { points: 0 });
     });
+  }
+
+  maxSafeInteger(number) {
+    return number <= Number.MAX_SAFE_INTEGER
+      ? number
+      : Number.MAX_SAFE_INTEGER;
   }
 
   async getPointsOf (id) {
@@ -333,9 +339,9 @@ class Points extends System {
       }
 
       const message = await prepare('points.defaults.pointsResponse', {
-        amount: user.points,
+        amount: this.maxSafeInteger(user.points),
         username: username,
-        pointsName: await this.getPointsName(user.points),
+        pointsName: await this.getPointsName(this.maxSafeInteger(user.points)),
       });
       sendMessage(message, opts.sender, opts.attr);
     } catch (err) {

@@ -10,6 +10,9 @@ const message = require('../../general.js').message;
 const time = require('../../general.js').time;
 const _ = require('lodash');
 
+const { getRepository } = require('typeorm');
+const { User } = require('../../../dest/entity/user');
+
 const assert = require('chai').assert;
 
 const owner = { username: 'soge__' };
@@ -76,7 +79,7 @@ describe('Polls - bits', () => {
           await global.tmi.cheer({
             tags: {
               username: user,
-              userId: Number(user),
+              userId: Math.random(),
               bits: 10,
             },
             message: 'Cool I am voting for #vote' + o + ' enjoy!',

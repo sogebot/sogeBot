@@ -8,10 +8,13 @@ const variable = require('../../general.js').variable;
 const { getLocalizedName } = require('../../../dest/commons');
 const time = require('../../general.js').time;
 
+const { getRepository } = require('typeorm');
+const { User } = require('../../../dest/entity/user');
+
 const _ = require('lodash');
 const assert = require('assert');
 
-const owner = { username: 'soge__' };
+const owner = { username: 'soge__', userId: String(_.random(999999, false)) };
 const user1 = { username: 'user1', userId: String(_.random(999999, false)) };
 const user2 = { username: 'user2', userId: String(_.random(999999, false)) };
 const command = '!duel';
@@ -62,8 +65,8 @@ describe('Gambling - duel', () => {
     });
 
     it('add points for users', async () => {
-      await getRepository({ userId: user1.userId, username: user1.username, points: 100 });
-      await getRepository({ userId: user2.userId, username: user2.username, points: 100 });
+      await getRepository(User).save({ userId: user1.userId, username: user1.username, points: 100 });
+      await getRepository(User).save({ userId: user2.userId, username: user2.username, points: 100 });
     });
 
     it('user 1 is challenging', async () => {
@@ -99,7 +102,7 @@ describe('Gambling - duel', () => {
     });
 
     it('winner should be announced', async () => {
-      await message.isSent('gambling.duel.winner', owner, [{
+      await message.isSent('gambling.duel.winner', { username: 'bot'}, [{
         pointsName: await global.systems.points.getPointsName(200),
         points: 200,
         probability: _.round(50, 2),

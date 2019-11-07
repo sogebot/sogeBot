@@ -130,7 +130,7 @@ module.exports = {
             e += ` [${user.username}]`;
           }
           /*
-          console.log(util.inspect(log.chatOut.args))
+          console.dir(log.chatOut.args, { depth: null })
           console.log({ expected: e, user })
           */
           if (log.chatOut.calledWith(e)) {

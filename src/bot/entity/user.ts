@@ -1,12 +1,9 @@
-import { Column, Entity, Index, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, Index, ManyToOne, OneToMany, PrimaryGeneratedColumn, PrimaryColumn } from 'typeorm';
 import { ColumnNumericTransformer } from './_transformer';
 
 @Entity()
 export class User {
-  @PrimaryGeneratedColumn()
-  id!: string;
-  @Column()
-  @Index()
+  @PrimaryColumn()
   userId!: string;
   @Column()
   @Index()

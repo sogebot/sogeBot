@@ -7,7 +7,7 @@ const { debug } = require('../../dest/helpers/log');
 
 const startup = _.now();
 
-const { getManager } = require('typeorm');
+const { getManager, getRepository } = require('typeorm');
 const { Alias } = require('../../dest/entity/alias');
 const { Cooldown } = require('../../dest/entity/cooldown');
 const { Bets } = require('../../dest/entity/bets');
@@ -31,12 +31,13 @@ module.exports = {
 
       debug('test', chalk.bgRed('*** Cleaning up collections ***'));
 
-      const entities = [Alias, Bets, Commands, CommandsResponses, CommandsCount, Quotes, Settings, Cooldown, Keyword, User];
+      const entities = [Alias, Bets, Commands, CommandsResponses, CommandsCount, Quotes, Settings, Cooldown, Keyword];
       for (const entity of entities) {
         for (const item of (await getManager().createQueryBuilder().select('entity').from(entity, 'entity').getMany())) {
           await getManager().createQueryBuilder().delete().from(entity).where('id = :id', { id: item.id }).execute();
         }
       }
+      await getRepository(User).clear(User);
 
       debug('test', chalk.bgRed('*** Cleaned successfully ***'));
 

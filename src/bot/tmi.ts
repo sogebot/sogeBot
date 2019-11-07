@@ -628,7 +628,7 @@ class TMI extends Core {
       subgift(`${recipient}#${recipientId}, from: ${username}, months: ${subCumulativeMonths}`);
 
       // also set subgift count to gifter
-      if (!(isIgnored({username, userId: user.id}))) {
+      if (!(isIgnored({username, userId: user.userId}))) {
         await getRepository(User).increment({ userId: message.tags.userId }, 'giftedSubscribes', 1);
       }
     } catch (e) {

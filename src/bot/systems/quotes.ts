@@ -93,7 +93,6 @@ class Quotes extends System {
         .into(QuotesEntity)
         .values({ tags, quote, quotedBy: opts.sender.userId, createdAt: Date.now() })
         .execute();
-
       const message = await prepare('systems.quotes.add.ok', { id: result.identifiers[0].id, quote, tags: tags.join(', ') });
       sendMessage(message, opts.sender, opts.attr);
       return { id: result.identifiers[0].id, quote, tags };

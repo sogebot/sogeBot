@@ -6,6 +6,9 @@ const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 const _ = require('lodash');
 
+const { getRepository } = require('typeorm');
+const { User } = require('../../../dest/entity/user');
+
 const hugePointsUser = { username: 'hugeuser', points: 99999999999999999999999999999999, userId: String(_.random(999999, false)) };
 const tinyPointsUser = { username: 'tinyuser', points: 100, userId: String(_.random(999999, false)) };
 
@@ -17,7 +20,7 @@ describe('Points - get()', () => {
 
   describe('User with more than safe points should return safe points', () => {
     it('create user with huge amount of points', async () => {
-      await getRepository(User).save({ username: hugePointsUser.username, hugePointsUser: user.userId, points: hugePointsUser.points });
+      await getRepository(User).save({ username: hugePointsUser.username, userId: hugePointsUser.userId, points: hugePointsUser.points });
     });
 
     it('points should be returned in safe points bounds', async () => {
@@ -32,7 +35,7 @@ describe('Points - get()', () => {
 
   describe('User with less than safe points should return unchanged points', () => {
     it('create user with normal amount of points', async () => {
-      await getRepository(User).save({ username: tinyPointsUser.username, tinyPointsUser: user.userId, points: tinyPointsUser.points });
+      await getRepository(User).save({ username: tinyPointsUser.username, userId: tinyPointsUser.userId, points: tinyPointsUser.points });
     });
 
     it('points should be returned in safe points bounds', async () => {

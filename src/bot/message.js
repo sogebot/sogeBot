@@ -115,9 +115,10 @@ class Message {
           .where('username != :botusername', { botusername: global.oauth.botUsername.toLowerCase() })
           .andWhere('username != :broadcasterusername', { broadcasterusername: global.oauth.broadcasterUsername.toLowerCase() })
           .andWhere('isOnline = :isOnline', { isOnline: true })
+          .cache(true)
           .getMany())
           .filter(o => {
-            return commons.isIgnored({ username: o.username, userId: o.userId });
+            return !commons.isIgnored({ username: o.username, userId: o.userId });
           });
         if (viewers.length === 0) {return 'unknown'};
         return _.sample(viewers.map(o => o.username ));
@@ -128,8 +129,9 @@ class Message {
           .andWhere('username != :broadcasterusername', { broadcasterusername: global.oauth.broadcasterUsername.toLowerCase() })
           .andWhere('isFollower = :isFollower', { isFollower: true })
           .andWhere('isOnline = :isOnline', { isOnline: true })
+          .cache(true)
           .getMany()).filter(o => {
-          return commons.isIgnored({ username: o.username, userId: o.userId });
+          return !commons.isIgnored({ username: o.username, userId: o.userId });
         });
         if (followers.length === 0) {return 'unknown'};
         return _.sample(followers.map(o => o.username ));
@@ -140,8 +142,9 @@ class Message {
           .andWhere('username != :broadcasterusername', { broadcasterusername: global.oauth.broadcasterUsername.toLowerCase() })
           .andWhere('isSubscriber = :isSubscriber', { isSubscriber: true })
           .andWhere('isOnline = :isOnline', { isOnline: true })
+          .cache(true)
           .getMany()).filter(o => {
-          return commons.isIgnored({ username: o.username, userId: o.userId });
+          return !commons.isIgnored({ username: o.username, userId: o.userId });
         });
         if (subscribers.length === 0) {return 'unknown'};
         return _.sample(subscribers.map(o => o.username ));
@@ -150,8 +153,9 @@ class Message {
         const viewers = (await getRepository(User).createQueryBuilder('user')
           .where('username != :botusername', { botusername: global.oauth.botUsername.toLowerCase() })
           .andWhere('username != :broadcasterusername', { broadcasterusername: global.oauth.broadcasterUsername.toLowerCase() })
+          .cache(true)
           .getMany()).filter(o => {
-          return commons.isIgnored({ username: o.username, userId: o.userId });
+          return !commons.isIgnored({ username: o.username, userId: o.userId });
         });
         if (viewers.length === 0) {return 'unknown'};
         return _.sample(viewers.map(o => o.username ));
@@ -161,8 +165,9 @@ class Message {
           .where('username != :botusername', { botusername: global.oauth.botUsername.toLowerCase() })
           .andWhere('username != :broadcasterusername', { broadcasterusername: global.oauth.broadcasterUsername.toLowerCase() })
           .andWhere('isFollower = :isFollower', { isFollower: true })
+          .cache(true)
           .getMany()).filter(o => {
-          return commons.isIgnored({ username: o.username, userId: o.userId });
+          return !commons.isIgnored({ username: o.username, userId: o.userId });
         });
         if (followers.length === 0) {return 'unknown'};
         return _.sample(followers.map(o => o.username ));
@@ -172,8 +177,9 @@ class Message {
           .where('username != :botusername', { botusername: global.oauth.botUsername.toLowerCase() })
           .andWhere('username != :broadcasterusername', { broadcasterusername: global.oauth.broadcasterUsername.toLowerCase() })
           .andWhere('isSubscriber = :isSubscriber', { isSubscriber: true })
+          .cache(true)
           .getMany()).filter(o => {
-          return commons.isIgnored({ username: o.username, userId: o.userId });
+          return !commons.isIgnored({ username: o.username, userId: o.userId });
         });
         if (subscribers.length === 0) {return 'unknown'};
         return _.sample(subscribers.map(o => o.username ));

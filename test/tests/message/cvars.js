@@ -125,8 +125,7 @@ describe('Message - cvars filter', async () => {
                 await msg.prepare();
 
                 for (const user of users) {
-                  user.id = user.userId;
-                  await getRepository(user).save(user);
+                  await getRepository(User).save(user);
                 }
               });
               it(`create initial value '${test.initialValue}' of ${test.variable}`, async () => {

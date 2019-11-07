@@ -208,7 +208,7 @@ class API extends Core {
       const user = await getRepository(User).findOne({ username });
       if (user) {
         const isSkipped = user.username === getBroadcaster() || user.username === global.oauth.botUsername;
-        const userHaveId = !isNil(user.id);
+        const userHaveId = !isNil(user.userId);
         if (new Date().getTime() - get(user, 'time.followCheck', 0) <= 1000 * 60 * 60 * 24 || isSkipped || !userHaveId) {
           this.rate_limit_follower_check.delete(user.username);
         }
@@ -532,7 +532,7 @@ class API extends Core {
     for (const user of currentSubscribers) {
       if (!subscribers
         .map((o) => String(o.user_id))
-        .includes(String(user.id))) {
+        .includes(String(user.userId))) {
         // subscriber is not sub anymore -> unsub and set subStreak to 0
         user.isSubscriber = false;
         user.subscribeStreak = 0;
@@ -753,7 +753,7 @@ class API extends Core {
 
           if (!get(user, 'is.follower', false)) {
             if (new Date().getTime() - new Date(f.followed_at).getTime() < 2 * constants.HOUR) {
-              if ((get(user, 'time.follow', 0) === 0 || new Date().getTime() - get(user, 'time.follow', 0) > 60000 * 60) && !global.webhooks.existsInCache('follow', user.id)) {
+              if ((get(user, 'time.follow', 0) === 0 || new Date().getTime() - get(user, 'time.follow', 0) > 60000 * 60) && !global.webhooks.existsInCache('follow', user.userId)) {
                 global.webhooks.addIdToCache('follow', f.from_id);
                 global.overlays.eventlist.add({
                   event: 'follow',

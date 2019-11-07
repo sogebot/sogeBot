@@ -7,6 +7,9 @@ const message = require('../../general.js').message;
 const _ = require('lodash');
 const commons = require('../../../dest/commons');
 
+const { getRepository } = require('typeorm');
+const { User } = require('../../../dest/entity/user');
+
 const assert = require('chai').assert;
 
 const max = Math.floor(Number.MAX_SAFE_INTEGER);
@@ -28,7 +31,7 @@ describe('Raffles - pick()', () => {
 
     it('Create subscribers raffle', async () => {
       global.systems.raffles.open({ sender: owner, parameters: '!winme -for subscribers' });
-      await message.isSent('raffles.announce-raffle', owner, {
+      await message.isSent('raffles.announce-raffle', { username: 'bot' }, {
         keyword: '!winme',
         eligibility: await commons.prepare('raffles.eligibility-subscribers-item'),
       });
@@ -37,7 +40,7 @@ describe('Raffles - pick()', () => {
     const subs = ['sub1', 'sub2', 'sub3', 'sub4'];
     for (const [id, v] of Object.entries(subs)) {
       it('Add user ' + v + ' to db', async () => {
-        await getRepository(User).save({ username: v , userId: id, isSubscriber: true });
+        await getRepository(User).save({ username: v , userId: '100' + id, isSubscriber: true });
       });
 
       it('Add user ' + v + ' to raffle', async () => {
@@ -49,7 +52,7 @@ describe('Raffles - pick()', () => {
     it('pick a winner', async () => {
       await global.systems.raffles.pick({ sender: owner });
 
-      await message.isSent('raffles.raffle-winner-is', owner, [{
+      await message.isSent('raffles.raffle-winner-is', { username: 'bot' }, [{
         username: 'sub1',
         keyword: '!winme',
         probability: 25,
@@ -72,7 +75,7 @@ describe('Raffles - pick()', () => {
   describe('Raffle should return winner', () => {
     it('create ticket raffle', async () => {
       global.systems.raffles.open({ sender: owner, parameters: '!winme -min 0 -max ' + max });
-      await message.isSent('raffles.announce-ticket-raffle', owner, {
+      await message.isSent('raffles.announce-ticket-raffle', { username: 'bot' }, {
         keyword: '!winme',
         eligibility: await commons.prepare('raffles.eligibility-everyone-item'),
         min: 0,
@@ -82,8 +85,10 @@ describe('Raffles - pick()', () => {
 
 
     it('Create testuser/testuser2 with max points', async () => {
+      await getRepository(User).delete({username: testuser.username})
+      await getRepository(User).delete({username: testuser2.username})
       user1 = await getRepository(User).save({ username: testuser.username , userId: testuser.userId, points: max });
-      user2 = await getRepository(User).save({ username: testuser.username , userId: testuser2.userId, points: max });
+      user2 = await getRepository(User).save({ username: testuser2.username , userId: testuser2.userId, points: max });
     });
 
     it('testuser bets max', async () => {
@@ -99,7 +104,7 @@ describe('Raffles - pick()', () => {
     it('pick a winner', async () => {
       await global.systems.raffles.pick({ sender: owner });
 
-      await message.isSent('raffles.raffle-winner-is', owner, [{
+      await message.isSent('raffles.raffle-winner-is', { username: 'bot' }, [{
         username: testuser.username,
         keyword: '!winme',
         probability: 66.67,
@@ -116,7 +121,7 @@ describe('Raffles - pick()', () => {
 
     it('create ticket raffle', async () => {
       global.systems.raffles.open({ sender: owner, parameters: '!winme -min 0 -max ' + max });
-      await message.isSent('raffles.announce-ticket-raffle', owner, {
+      await message.isSent('raffles.announce-ticket-raffle', { username: 'bot' }, {
         keyword: '!winme',
         eligibility: await commons.prepare('raffles.eligibility-everyone-item'),
         min: 0,
@@ -125,8 +130,10 @@ describe('Raffles - pick()', () => {
     });
 
     it('Create testuser/testuser2 with max points', async () => {
+      await getRepository(User).delete({username: testuser.username})
+      await getRepository(User).delete({username: testuser2.username})
       user1 = await getRepository(User).save({ isFollower: true, username: testuser.username , userId: testuser.userId, points: max });
-      user2 = await getRepository(User).save({ username: testuser.username , userId: testuser2.userId, points: max });
+      user2 = await getRepository(User).save({ username: testuser2.username , userId: testuser2.userId, points: max });
     });
 
     it('testuser bets 100', async () => {
@@ -142,7 +149,7 @@ describe('Raffles - pick()', () => {
     it('pick a winner', async () => {
       await global.systems.raffles.pick({ sender: owner });
 
-      await message.isSent('raffles.raffle-winner-is', owner, [{
+      await message.isSent('raffles.raffle-winner-is', { username: 'bot' }, [{
         username: testuser.username,
         keyword: '!winme',
         probability: 54.55,
@@ -157,7 +164,7 @@ describe('Raffles - pick()', () => {
   describe('Raffle with subscriber should return winner', () => {
     it('create ticket raffle', async () => {
       global.systems.raffles.open({ sender: owner, parameters: '!winme -min 0 -max ' + max });
-      await message.isSent('raffles.announce-ticket-raffle', owner, {
+      await message.isSent('raffles.announce-ticket-raffle', { username: 'bot' }, {
         keyword: '!winme',
         eligibility: await commons.prepare('raffles.eligibility-everyone-item'),
         min: 0,
@@ -166,8 +173,10 @@ describe('Raffles - pick()', () => {
     });
 
     it('Create testuser/testuser2 with max points', async () => {
+      await getRepository(User).delete({username: testuser.username})
+      await getRepository(User).delete({username: testuser2.username})
       user1 = await getRepository(User).save({ isSubscriber: true, username: testuser.username , userId: testuser.userId, points: max });
-      user2 = await getRepository(User).save({ username: testuser.username , userId: testuser2.userId, points: max });
+      user2 = await getRepository(User).save({ username: testuser2.username , userId: testuser2.userId, points: max });
     });
 
     it('testuser bets 100', async () => {
@@ -183,7 +192,7 @@ describe('Raffles - pick()', () => {
     it('pick a winner', async () => {
       await global.systems.raffles.pick({ sender: owner });
 
-      await message.isSent('raffles.raffle-winner-is', owner, [{
+      await message.isSent('raffles.raffle-winner-is', { username: 'bot' }, [{
         username: testuser.username,
         keyword: '!winme',
         probability: 60,
@@ -198,7 +207,7 @@ describe('Raffles - pick()', () => {
   describe('Raffle with subscriber and follower should return winner', () => {
     it('create ticket raffle', async () => {
       global.systems.raffles.open({ sender: owner, parameters: '!winme -min 0 -max ' + max });
-      await message.isSent('raffles.announce-ticket-raffle', owner, {
+      await message.isSent('raffles.announce-ticket-raffle', { username: 'bot' }, {
         keyword: '!winme',
         eligibility: await commons.prepare('raffles.eligibility-everyone-item'),
         min: 0,
@@ -207,8 +216,10 @@ describe('Raffles - pick()', () => {
     });
 
     it('Create testuser/testuser2 with max points', async () => {
+      await getRepository(User).delete({username: testuser.username})
+      await getRepository(User).delete({username: testuser2.username})
       user1 = await getRepository(User).save({ isSubscriber: true, username: testuser.username , userId: testuser.userId, points: max });
-      user2 = await getRepository(User).save({ isFollower: true, username: testuser.username , userId: testuser2.userId, points: max });
+      user2 = await getRepository(User).save({ isFollower: true, username: testuser2.username , userId: testuser2.userId, points: max });
     });
 
     it('testuser bets 100', async () => {
@@ -224,7 +235,7 @@ describe('Raffles - pick()', () => {
     it('pick a winner', async () => {
       await global.systems.raffles.pick({ sender: owner });
 
-      await message.isSent('raffles.raffle-winner-is', owner, [{
+      await message.isSent('raffles.raffle-winner-is', { username: 'bot' }, [{
         username: testuser.username,
         keyword: '!winme',
         probability: 55.56,

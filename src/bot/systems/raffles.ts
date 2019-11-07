@@ -279,7 +279,7 @@ class Raffles extends System {
     }
 
     const raffle = await global.db.engine.findOne(this.collection.data, { winner: null });
-    let user = await getRepository(User).findOne({ username: opts.sender.username });
+    let user = await getRepository(User).findOne({ userId: opts.sender.userId });
     if (!user) {
       user = new User();
       user.userId = opts.sender.userId;
@@ -336,7 +336,7 @@ class Raffles extends System {
       raffle_id: raffle._id.toString(),
     };
     if (raffle.type === TYPE_TICKETS && await global.systems.points.getPointsOf(opts.sender.userId) < tickets) {
-      return;
+      return false;;
     } // user doesn't have enough points
 
     if (raffle.followers && raffle.subscribers) {

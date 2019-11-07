@@ -21,9 +21,6 @@ describe('Top - !top messages', () => {
 
   it ('Add 10 users into db and last user will don\'t have any messages', async () => {
     for (let i = 0; i < 10; i++) {
-      if (i === 0) {
-        continue;
-      }
       let user = new User();
       user.userId = Math.floor(Math.random() * 100000);
       user.username = 'user' + i;

@@ -229,7 +229,10 @@ class Users extends Core {
       if (!isNil(IdsToUsername[id])) {
         continue;
       } // skip if already had map
-      IdsToUsername[id] = (await global.db.engine.findOne('users', { id })).username;
+      const user = await getRepository(User).findOne({ userId: id });
+      if (user) {
+        IdsToUsername[id] = user.username;
+      }
     }
     return IdsToUsername;
   }
