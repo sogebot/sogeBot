@@ -1,4 +1,4 @@
-import { AfterInsert, AfterUpdate, Column, Entity, Index, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, Index, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { ColumnNumericTransformer } from './_transformer';
 
 @Entity()
@@ -8,14 +8,23 @@ export class User {
   @Column()
   @Index()
   userId!: string;
+  @Column()
+  @Index()
+  username!: string;
+  @Column({ default: '' })
+  displayname!: string;
+  @Column({ default: '' })
+  profileImageUrl!: string;
 
-  @Column()
+  @Column({ default: false })
   isOnline!: boolean;
-  @Column()
+  @Column({ default: false })
+  isVIP!: boolean;
+  @Column({ default: false })
   isFollower!: boolean;
-  @Column()
+  @Column({ default: false })
   isModerator!: boolean;
-  @Column()
+  @Column({ default: false })
   isSubscriber!: boolean;
 
   @Column({ default: '' })
@@ -35,6 +44,13 @@ export class User {
   createdAt!: number;
 
   @Column('bigint', { transformer: new ColumnNumericTransformer(), default: 0 })
+  watchedTime!: number;
+  @Column('bigint', { transformer: new ColumnNumericTransformer(), default: 0 })
+  chatTimeOnline!: number;
+  @Column('bigint', { transformer: new ColumnNumericTransformer(), default: 0 })
+  chatTimeOffline!: number;
+
+  @Column('bigint', { transformer: new ColumnNumericTransformer(), default: 0 })
   points!: number;
   @Column('bigint', { transformer: new ColumnNumericTransformer(), default: 0 })
   pointsOnlineGivenAt!: number;
@@ -42,6 +58,13 @@ export class User {
   pointsOfflineGivenAt!: number;
   @Column('bigint', { transformer: new ColumnNumericTransformer(), default: 0 })
   pointsByMessageGivenAt!: number;
+
+  @Column({ default: 0 })
+  subscribeTier!: number;
+  @Column({ default: 0 })
+  subscribeCumulativeMonths!: number;
+  @Column({ default: 0 })
+  subscribeStreak!: number;
 
   @OneToMany(() => UserTip, (tip) => tip.user, {
     cascade: true,
@@ -55,6 +78,8 @@ export class User {
 
   @Column('bigint', { transformer: new ColumnNumericTransformer(), default: 0 })
   messages!: number;
+  @Column('bigint', { transformer: new ColumnNumericTransformer(), default: 0 })
+  giftedSubscribes!: number;
 };
 
 @Entity()
@@ -96,11 +121,4 @@ export class UserBit {
   message!: string;
   @Column('bigint', { transformer: new ColumnNumericTransformer(), default: 0 })
   cheeredAt!: number;
-
-  @AfterInsert()
-  @AfterUpdate()
-  async recountBitsAmount() {
-    console.log('TODO: recount tips');
-    console.log(this);
-  }
 }

@@ -5,6 +5,9 @@ import { command, settings } from '../decorators';
 import { prepare, sendMessage } from '../commons';
 import { error } from '../helpers/log';
 
+import { getRepository } from 'typeorm';
+import { User } from '../entity/user';
+
 const ERROR_NOT_ENOUGH_OPTIONS = '0';
 const ERROR_ZERO_BET = '1';
 const ERROR_NOT_ENOUGH_POINTS = '2';
@@ -46,9 +49,9 @@ class Gamble extends Game {
         throw Error(ERROR_MINIMAL_BET);
       }
 
-      await global.db.engine.increment('users.points', { id: opts.sender.userId }, { points: parseInt(points, 10) * -1 });
+      await getRepository(User).decrement({ userId: opts.sender.userId }, 'points', parseInt(points, 10));
       if (_.random(0, 100, false) <= this.chanceToWin) {
-        await global.db.engine.increment('users.points', { id: opts.sender.userId }, { points: parseInt(points, 10) * 2 });
+        await getRepository(User).increment({ userId: opts.sender.userId }, 'points', parseInt(points, 10) * 2);
         const updatedPoints = await global.systems.points.getPointsOf(opts.sender.userId);
         message = await prepare('gambling.gamble.win', {
           pointsName: await global.systems.points.getPointsName(updatedPoints),

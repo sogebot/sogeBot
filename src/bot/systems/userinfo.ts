@@ -6,6 +6,8 @@ import { command, settings, ui } from '../decorators';
 import { onMessage } from '../decorators/on';
 import System from './_interface';
 import { debug, error } from '../helpers/log';
+import { getRepository } from 'typeorm';
+import { User } from '../entity/user';
 
 /*
  * !me
@@ -203,6 +205,17 @@ class UserInfo extends System {
   protected async showMe(opts: CommandOptions) {
     try {
       const message: (string | null)[] = [];
+      const user = await getRepository(User).findOne({
+        relations: ['bits', 'tips'],
+        where: {
+          userId: opts.sender.userId,
+        },
+        cache: true,
+      });
+
+      if (!user) {
+        return;
+      }
 
       // build message
       for (const i of this.order) {
@@ -222,30 +235,27 @@ class UserInfo extends System {
       }
 
       if (message.includes('$watched')) {
-        const watched = await global.users.getWatchedOf(opts.sender.userId);
         const idx = message.indexOf('$watched');
-        message[idx] = (watched / 1000 / 60 / 60).toFixed(1) + 'h';
+        message[idx] = (user.watchedTime / 1000 / 60 / 60).toFixed(1) + 'h';
       }
 
       if (message.includes('$points')) {
         const idx = message.indexOf('$points');
         if (global.systems.points.enabled) {
-          const userPoints = await global.systems.points.getPointsOf(opts.sender.userId);
-          message[idx] = userPoints + ' ' + await global.systems.points.getPointsName(userPoints);
+          message[idx] = user.points + ' ' + await global.systems.points.getPointsName(user.points);
         } else {
           message.splice(idx, 1);
         }
       }
 
       if (message.includes('$messages')) {
-        const msgCount = await global.users.getMessagesOf(opts.sender.userId);
         const idx = message.indexOf('$messages');
-        message[idx] = msgCount + ' ' + getLocalizedName(msgCount, 'core.messages');
+        message[idx] = user.messages + ' ' + getLocalizedName(user.messages, 'core.messages');
       }
 
       if (message.includes('$tips')) {
         const idx = message.indexOf('$tips');
-        const tips = await global.db.engine.find('users.tips', { id: opts.sender.userId });
+        const tips = user.tips;
         const currency = global.currency.mainCurrency;
         let tipAmount = 0;
         for (const t of tips) {
@@ -256,7 +266,7 @@ class UserInfo extends System {
 
       if (message.includes('$bits')) {
         const idx = message.indexOf('$bits');
-        const bits = await global.db.engine.find('users.bits', { id: opts.sender.userId });
+        const bits = user.bits;
         const bitAmount = bits.map(o => Number(o.amount)).reduce((a, b) => a + b, 0);
         message[idx] = `${bitAmount} ${getLocalizedName(bitAmount, 'core.bits')}`;
       }

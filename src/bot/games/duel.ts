@@ -5,6 +5,8 @@ import { getLocalizedName, getOwner, isBroadcaster, isModerator, prepare, sendMe
 import { command, settings, shared } from '../decorators';
 import Game from './_interface';
 import { error } from '../helpers/log';
+import { getRepository } from 'typeorm';
+import { User } from '../entity/user';
 
 const ERROR_NOT_ENOUGH_OPTIONS = '0';
 const ERROR_ZERO_BET = '1';
@@ -91,7 +93,7 @@ class Duel extends Game {
     }, { force: true });
 
     // give user his points
-    await global.db.engine.increment('users.points', { id: winnerUser.id }, { points: parseInt(total, 10) });
+    await getRepository(User).increment({ userId: winnerUser.id }, 'points', parseInt(total, 10));
 
     // reset duel
     await global.db.engine.remove(this.collection.users, {});
@@ -142,7 +144,7 @@ class Duel extends Game {
       const isNewDuelist = _.isEmpty(userFromDB);
       if (!isNewDuelist) {
         await global.db.engine.update(this.collection.users, { _id: String(userFromDB._id) }, { tickets: Number(userFromDB.tickets) + Number(bet) });
-        await global.db.engine.increment('users.points', { id: opts.sender.userId }, { points: parseInt(bet, 10) * -1 });
+        await getRepository(User).decrement({ userId: opts.sender.userId }, 'points', parseInt(bet, 10));
       } else {
         // check if under gambling cooldown
         const cooldown = this.cooldown;
@@ -154,7 +156,7 @@ class Duel extends Game {
             this._cooldown = String(new Date());
           }
           await global.db.engine.insert(this.collection.users, { id: opts.sender.userId, username: opts.sender.username, tickets: Number(bet) });
-          await global.db.engine.increment('users.points', { id: opts.sender.userId }, { points: parseInt(bet, 10) * -1 });
+          await getRepository(User).decrement({ userId: opts.sender.userId }, 'points', parseInt(bet, 10));
         } else {
           message = await prepare('gambling.fightme.cooldown', {
             minutesName: getLocalizedName(Math.round(((cooldown * 1000) - (new Date().getTime() - new Date(this._cooldown).getTime())) / 1000 / 60), 'core.minutes'),

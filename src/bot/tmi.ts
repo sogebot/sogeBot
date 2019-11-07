@@ -2,7 +2,7 @@ import moment from 'moment';
 
 import TwitchJs from 'twitch-js';
 import util from 'util';
-import { get, isNil, set } from 'lodash';
+import { isNil } from 'lodash';
 
 import Parser from './parser';
 import { command, default_permission } from './decorators';
@@ -19,7 +19,7 @@ import { getLocalizedName, getOwner, isBot, isIgnored, isOwner, prepare, sendMes
 import { clusteredChatIn, clusteredWhisperIn, isMainThread, manageMessage } from './cluster';
 
 import { getRepository } from 'typeorm';
-import { UsersOnline } from './entity/usersOnline';
+import { User, UserBit } from './entity/user';
 
 class TMI extends Core {
   @settings('chat')
@@ -623,7 +623,7 @@ class TMI extends Core {
       }
 
       await global.users.setById(user.id, { username: recipient, is: { subscriber: isSubscriber }, time: { subscribed_at: subscribedAt }, stats: { subCumulativeMonths, tier } });
-      await global.db.engine.increment('users', { id: user.id }, { stats: { subStreak: 1 }});
+      await getRepository(User).increment({ userId: user.id }, 'subscribeStreak', 1);
       global.overlays.eventlist.add({
         event: 'subgift',
         username: recipient,
@@ -636,7 +636,7 @@ class TMI extends Core {
 
       // also set subgift count to gifter
       if (!(isIgnored({username, userId: user.id}))) {
-        await global.db.engine.increment('users', { id: message.tags.userId }, { custom: { subgiftCount: 1 } });
+        await getRepository(User).increment({ userId: message.tags.userId }, 'giftedSubscribes', 1);
       }
     } catch (e) {
       error('Error parsing subgift event');
@@ -657,9 +657,6 @@ class TMI extends Core {
         return;
       }
 
-      // update users ID
-      await global.db.engine.update('users', { id: userId }, { username });
-
       global.overlays.eventlist.add({
         event: 'cheer',
         username,
@@ -668,7 +665,23 @@ class TMI extends Core {
         timestamp: Date.now(),
       });
       cheer(`${username}#${userId}, bits: ${userstate.bits}, message: ${messageFromUser}`);
-      global.db.engine.insert('users.bits', { id: userId, amount: Number(userstate.bits), message: messageFromUser, timestamp: Date.now() });
+
+      let user = await getRepository(User).findOne({ where: { userId: userId }});
+      if (!user) {
+        // if we still doesn't have user, we create new
+        user = new User();
+        user.userId = userId;
+        user.username = username.toLowerCase();
+      }
+
+      const newBits = new UserBit();
+      newBits.amount = Number(userstate.bits);
+      newBits.cheeredAt = Date.now();
+      newBits.message = messageFromUser;
+
+      user.bits.push(newBits);
+      await getRepository(User).save(user);
+
       global.events.fire('cheer', { username, bits: userstate.bits, message: messageFromUser });
       global.registries.alerts.trigger({
         event: 'cheers',
@@ -748,33 +761,23 @@ class TMI extends Core {
           }
           return undefined; // undefined will not change any values
         };
-        const user = await global.db.engine.findOne('users', { id: sender.userId });
-        const data = {
-          id: sender.userId,
-          is: {
-            subscriber: (user.lock && user.lock.subscriber ? undefined : typeof sender.badges.subscriber !== 'undefined'),
-            moderator: typeof sender.badges.moderator !== 'undefined',
-            vip: typeof sender.badges.vip !== 'undefined',
+        const user = await getRepository(User).findOne({
+          where: {
+            userId: sender.userId,
           },
-          stats: {
-            subCumulativeMonths: subCumulativeMonths(sender),
-          },
-          username: sender.username,
-        };
+        }) || new User();
+        user.userId = sender.userId;
+        user.username = sender.username;
+        user.isOnline = true;
+        user.isVIP = typeof sender.badges.vip !== 'undefined';
+        user.isFollower = user.isFollower ?? false;
+        user.isModerator = user.isModerator ?? typeof sender.badges.moderator !== 'undefined';
+        user.isSubscriber = user.isSubscriber ?? typeof sender.badges.subscriber !== 'undefined';
+        user.messages = user.messages ?? 0;
+        user.subscribeTier = typeof sender.badges.subscriber !== 'undefined' ? 0 : user.subscribeTier;
+        user.subscribeCumulativeMonths = subCumulativeMonths(sender) || user.subscribeCumulativeMonths;
 
-        // mark user as online
-        const onlineUser = await getRepository(UsersOnline).findOne({
-          where: { username: sender.username },
-        }) || new UsersOnline();
-        onlineUser.username = sender.username;
-        await getRepository(UsersOnline).save(onlineUser);
-
-        if (get(sender, 'badges.subscriber', 0)) {
-          set(data, 'stats.tier', 0);
-        } // unset tier if sender is not subscriber
-
-        // update user based on id not username
-        await global.db.engine.update('users', { id: String(sender.userId) }, data);
+        await getRepository(User).save(user);
 
         global.api.isFollower(sender.username);
 
@@ -783,7 +786,7 @@ class TMI extends Core {
           if (message.startsWith('!')) {
             global.events.fire('command-send-x-times', { username: sender.username, message: message });
           } else if (!message.startsWith('!')) {
-            global.db.engine.increment('users.messages', { id: sender.userId }, { messages: 1 });
+            await getRepository(User).increment({ userId: sender.userId }, 'messages', 1);
           }
         }
       }

@@ -9,12 +9,12 @@ import * as commons from './commons';
 import { debug, error, isDebugEnabled } from './helpers/log';
 import { permission } from './helpers/permissions';
 import { adminEndpoint, viewerEndpoint } from './helpers/socket';
-import { getManager, getRepository } from 'typeorm';
-import { UsersOnline } from './entity/usersOnline';
+import { getRepository } from 'typeorm';
+import { User } from './entity/user';
 
 
 export const getAllOnlineUsernames = async () => {
-  return (await getRepository(UsersOnline).find()).map(o => o.username);
+  return (await getRepository(User).find({ where: { isOnline: true }})).map(o => o.username);
 };
 
 class Users extends Core {
@@ -88,11 +88,6 @@ class Users extends Core {
     return user;
   }
 
-  async getAll (where: Record<string, any>) {
-    where = where || {};
-    return global.db.engine.find('users', where);
-  }
-
   async set (username: string, object: Record<string, any>) {
     if (isNil(username)) {
       return error('username is NULL!\n' + new Error().stack);
@@ -163,7 +158,11 @@ class Users extends Core {
         }
 
         const online = global.api.isStreamOnline;
-        await global.db.engine.increment('users.chat', { id, online }, { chat });
+        if (online) {
+          await getRepository(User).increment({ userId: id }, 'chatTimeOnline', chat);
+        } else {
+          await getRepository(User).increment({ userId: id }, 'chatTimeOffline', chat);
+        }
         debug('users.chat', username + ': ' + (chat / 1000 / 60) + ' minutes added');
         updated.push(username);
         this.chatList[username] = Date.now();
@@ -186,28 +185,28 @@ class Users extends Core {
   }
 
   async getChatOf (id: string, online: boolean): Promise<number> {
+    const user = await getRepository(User).findOne({ where: { userId: id }});
     let chat = 0;
-    for (const item of await global.db.engine.find('users.chat', { id, online })) {
-      const itemPoints = !Number.isNaN(parseInt(get(item, 'chat', 0))) ? get(item, 'chat', 0) : 0;
-      chat = chat + Number(itemPoints);
-    }
-    if (Number(chat) < 0) {
-      chat = 0;
-    }
 
-    return Number(chat) <= Number.MAX_SAFE_INTEGER
-      ? chat
-      : Number.MAX_SAFE_INTEGER;
+    if (user) {
+      if (online) {
+        chat = user.chatTimeOnline;
+      } else {
+        chat = user.chatTimeOffline;
+      }
+
+      return Number(chat) <= Number.MAX_SAFE_INTEGER
+        ? chat
+        : Number.MAX_SAFE_INTEGER;
+    } else {
+      return 0;
+    }
   }
 
   async updateWatchTime (isInit = false) {
     if (isInit) {
       // set all users offline on start
-      await getManager()
-        .createQueryBuilder()
-        .delete()
-        .from(UsersOnline)
-        .execute();
+      await getRepository(User).update({}, { isOnline: false });
     }
 
     if (isDebugEnabled('users.watched')) {
@@ -250,7 +249,7 @@ class Users extends Core {
           if (!isOwner) {
             global.api.stats.currentWatchedTime += watched;
           }
-          await global.db.engine.increment('users.watched', { id }, { watched });
+          await getRepository(User).increment({ userId: id }, 'watchedTime', watched);
           debug('users.watched', username + ': ' + (watched / 1000 / 60) + ' minutes added');
           updated.push(username);
           this.watchedList[username] = Date.now();
@@ -291,18 +290,15 @@ class Users extends Core {
   }
 
   async getMessagesOf (id: string): Promise<number> {
-    let messages = 0;
-    for (const item of await global.db.engine.find('users.messages', { id })) {
-      const itemPoints = !Number.isNaN(parseInt(get(item, 'messages', 0))) ? get(item, 'messages', 0) : 0;
-      messages = messages + Number(itemPoints);
-    }
-    if (Number(messages) < 0) {
-      messages = 0;
-    }
+    const user = await getRepository(User).findOne({ where: { userId: id }});
 
-    return Number(messages) <= Number.MAX_SAFE_INTEGER
-      ? messages
-      : Number.MAX_SAFE_INTEGER;
+    if (user) {
+      return Number(user.messages) <= Number.MAX_SAFE_INTEGER
+        ? user.messages
+        : Number.MAX_SAFE_INTEGER;
+    } else {
+      return 0;
+    }
   }
 
   async getUsernamesFromIds (IdsList: Array<string>) {
@@ -432,8 +428,8 @@ class Users extends Core {
         global.permissions.getUserHighestPermission(opts.where.id),
       ]);
 
-      const online = await getRepository(UsersOnline).findOne({
-        where: { username: viewer.username },
+      const online = await getRepository(User).findOne({
+        where: { username: viewer.username, isOnline: true },
       });
 
       set(viewer, 'stats.tips', tips);

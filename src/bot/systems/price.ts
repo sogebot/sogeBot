@@ -11,6 +11,9 @@ import { command, default_permission, rollback } from '../decorators';
 import { parser } from '../decorators';
 import { isOwner, prepare, sendMessage } from '../commons';
 
+import { getRepository } from 'typeorm';
+import { User } from '../entity/user';
+
 /*
  * !price                     - gets an info about price usage
  * !price set [cmd] [price]   - add notice with specified response
@@ -129,7 +132,7 @@ class Price extends System {
       const message = await prepare('price.user-have-not-enough-points', { amount: removePts, command: `${price.command}`, pointsName: await global.systems.points.getPointsName(removePts) });
       sendMessage(message, opts.sender, opts.attr);
     } else {
-      await global.db.engine.increment('users.points', { id: opts.sender.userId }, { points: (removePts * -1) });
+      await getRepository(User).decrement({ userId: opts.sender.userId }, 'points', removePts);
     }
     return haveEnoughPoints;
   }
@@ -152,7 +155,7 @@ class Price extends System {
     }
 
     const removePts = parseInt(price.price, 10);
-    await global.db.engine.increment('users.points', { id: opts.sender.userId }, { points: removePts });
+    await getRepository(User).increment({ userId: opts.sender.userId }, 'points', removePts);
   }
 }
 

@@ -7,6 +7,9 @@ import { command, settings, shared, ui } from '../decorators';
 import { getLocalizedName, getOwner, sendMessage } from '../commons.js';
 import { warning } from '../helpers/log.js';
 
+import { getRepository } from 'typeorm';
+import { User } from '../entity/user';
+
 class Heist extends Game {
   dependsOn = [ 'systems.points' ];
 
@@ -166,7 +169,7 @@ class Heist extends Game {
         if (isSurvivor) {
           // add points to user
           const points = parseInt((await global.db.engine.findOne(this.collection.users, { username: user.username })).points, 10);
-          await global.db.engine.increment('users.points', { id: user.id }, { points: Number(points * level.payoutMultiplier).toFixed() });
+          await getRepository(User).increment({ userId: user.id }, 'points', Number(points * level.payoutMultiplier).toFixed());
         }
       } else {
         const winners: string[] = [];
@@ -176,7 +179,7 @@ class Heist extends Game {
           if (isSurvivor) {
             // add points to user
             const points = parseInt((await global.db.engine.findOne(this.collection.users, { username: user.username })).points, 10);
-            await global.db.engine.increment('users.points', { id: user.id }, { points: Number(points * level.payoutMultiplier).toFixed() });
+            await getRepository(User).increment({ userId: user.id }, 'points', Number(points * level.payoutMultiplier).toFixed());
             winners.push(user.username);
           }
         }
@@ -302,7 +305,7 @@ class Heist extends Game {
     } // send entryInstruction if command is not ok
 
     await Promise.all([
-      global.db.engine.increment('users.points', { id: opts.sender.userId }, { points: parseInt(points, 10) * -1 }), // remove points from user
+      getRepository(User).decrement({ userId: opts.sender.userId }, 'points', parseInt(points, 10)),
       global.db.engine.update(this.collection.users, { id: opts.sender.userId }, { username: opts.sender.username, points: points }), // add user to heist list
     ]);
 

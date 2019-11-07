@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { chunk, flatMap, includes } from 'lodash';
+import { flatMap, includes } from 'lodash';
 import config from '@config';
 import { isMainThread, parentPort, Worker } from 'worker_threads';
 
@@ -8,12 +8,15 @@ import {
   getConnection,
   getConnectionOptions,
   getManager,
+  getRepository,
 } from 'typeorm';
 
-import { UsersOnline } from '../entity/usersOnline';
+import { User } from '../entity/user';
 import { ThreadEvent } from '../entity/threadEvent';
 import { getAllOnlineUsernames } from '../users';
 import { Settings } from '../entity/settings';
+import { getUserFromTwitch } from './getUserFromTwitch';
+import { error } from '../helpers/log';
 
 export const getChannelChattersUnofficialAPI = async (): Promise<{ modStatus: boolean; partedUsers: string[]; joinedUsers: string[] }> => {
   if (!isMainThread) {
@@ -85,16 +88,11 @@ export const getChannelChattersUnofficialAPI = async (): Promise<{ modStatus: bo
     const allOnlineUsers = await getAllOnlineUsernames();
 
     const partedUsers: string[] = [];
-    for (const user of allOnlineUsers) {
-      if (!includes(chatters, user) && user !== bot) {
+    for (const username of allOnlineUsers) {
+      if (!includes(chatters, username) && username !== bot) {
         // user is no longer in channel
-        await getManager()
-          .createQueryBuilder()
-          .delete()
-          .from(UsersOnline)
-          .where('username = :username', { username: user })
-          .execute();
-        partedUsers.push(user);
+        await getRepository(User).update({ username }, { isOnline: false });
+        partedUsers.push(username);
       }
     }
 
@@ -105,27 +103,28 @@ export const getChannelChattersUnofficialAPI = async (): Promise<{ modStatus: bo
       }
     }
 
-    // always remove bot from online users
-    await getManager()
-      .createQueryBuilder()
-      .delete()
-      .from(UsersOnline)
-      .where('username = :username', { username: bot })
-      .execute();
-
     // insert joined online users
     if (joinedUsers.length > 0) {
-      for (const _chunk of chunk(joinedUsers, 200)) {
-        await getManager()
-          .createQueryBuilder()
-          .insert()
-          .into(UsersOnline)
-          .values(
-            _chunk.map(o => {
-              return { username: o };
-            }),
-          )
-          .execute();
+      for (const username of joinedUsers) {
+        let user = await getRepository(User).findOne({ where: { username }});
+        if (user) {
+          user.isOnline = true;
+          await getRepository(User).save(user);
+        } else {
+          // add new user to db
+          try {
+            const twitchObj = await getUserFromTwitch(username);
+            user = new User();
+            user.userId = twitchObj.id;
+            user.username = twitchObj.login;
+            user.displayname = twitchObj.display_name;
+            user.profileImageUrl = twitchObj.profile_image_url;
+            await getRepository(User).save(user);
+          } catch (e) {
+            error('Something went wrong when getting user data of ' + username);
+            continue;
+          }
+        }
       }
     }
 

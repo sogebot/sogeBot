@@ -12,8 +12,8 @@ import Parser from './parser';
 import { generateUsername } from './helpers/generateUsername';
 import { error, info, warning } from './helpers/log';
 import { adminEndpoint } from './helpers/socket';
-import { getManager } from 'typeorm';
-import { UsersOnline } from './entity/usersOnline';
+import { getRepository } from 'typeorm';
+import { User } from './entity/user';
 
 class Events extends Core {
   public timeouts: { [x: string]: NodeJS.Timeout } = {};
@@ -187,11 +187,7 @@ class Events extends Core {
   public async fireBotWillLeaveChannel(operation, attributes) {
     global.tmi.part('bot');
     // force all users offline
-    await getManager()
-      .createQueryBuilder()
-      .delete()
-      .from(UsersOnline)
-      .execute();
+    await getRepository(User).update({}, { isOnline: false });
   }
 
   public async fireStartCommercial(operation, attributes) {

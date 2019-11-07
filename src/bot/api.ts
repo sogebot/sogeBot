@@ -16,8 +16,9 @@ import { triggerInterfaceOnFollow } from './helpers/interface/triggers';
 import { shared } from './decorators';
 import { getChannelChattersUnofficialAPI } from './microservices/getChannelChattersUnofficialAPI';
 import { ThreadEvent } from './entity/threadEvent';
-import { getManager } from 'typeorm';
-import { UsersOnline } from './entity/usersOnline';
+
+import { getManager, getRepository } from 'typeorm';
+import { User } from './entity/user';
 
 const setImmediateAwait = () => {
   return new Promise(resolve => {
@@ -366,12 +367,7 @@ class API extends Core {
       global.widgets?.joinpart?.send({ users: joinedUsers, type: 'join' });
       for (const username of joinedUsers) {
         if (isIgnored({ username }) || global.oauth.botUsername === username) {
-          await getManager()
-            .createQueryBuilder()
-            .delete()
-            .from(UsersOnline)
-            .where('username = :username', { username })
-            .execute();
+          continue;
         } else {
           await setImmediateAwait();
           this.isFollower(username);
@@ -522,31 +518,34 @@ class API extends Core {
   }
 
   async setSubscribers (subscribers) {
-    const currentSubscribers = await global.db.engine.find('users', { is: { subscriber: true } });
+    const currentSubscribers = await getRepository(User).find({
+      where: {
+        isSubscriber: true,
+      },
+    });
 
     // check if current subscribers are still subs
     for (const user of currentSubscribers) {
-      if (typeof user.lock === 'undefined' || (typeof user.lock !== 'undefined' && !user.lock.subscriber)) {
-        if (!subscribers
-          .map((o) => String(o.user_id))
-          .includes(String(user.id))) {
-          // subscriber is not sub anymore -> unsub and set subStreak to 0
-          await global.db.engine.update('users', { id: user.id }, {  is: { subscriber: false }, stats: { subStreak: 0 } });
-        }
+      if (!subscribers
+        .map((o) => String(o.user_id))
+        .includes(String(user.id))) {
+        // subscriber is not sub anymore -> unsub and set subStreak to 0
+        user.isSubscriber = false;
+        user.subscribeStreak = 0;
+        await getRepository(User).save(user);
       }
     }
 
     // update subscribers tier and set them active
     for (const user of subscribers) {
-      await global.db.engine.update('users', { id: user.user_id }, { username: user.user_name.toLowerCase(), is: { subscriber: true }, stats: { tier: user.tier / 1000 } });
-    }
-
-    // update all subscribed_at
-    const subscribersAfter = await global.db.engine.find('users', { is: { subscriber: true } });
-    for (const user of subscribersAfter) {
-      if (typeof user.time !== 'undefined' && typeof user.time.subscribed_at !== 'undefined') {
-        await global.db.engine.update('users', { _id: String(user._id) }, { time: { subscribed_at: new Date(user.time.subscribed_at).getTime() }});
-      }
+      await getRepository(User).update({
+        userId: user.user_id,
+      },
+      {
+        username: user.user_name.toLowerCase(),
+        isSubscriber: true,
+        subscribeTier: user.tier / 1000,
+      });
     }
   }
 

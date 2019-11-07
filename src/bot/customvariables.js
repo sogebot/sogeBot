@@ -11,7 +11,9 @@ const mathjs = require('mathjs');
 import Message from './message';
 import { permission } from './permissions';
 import { getAllOnlineUsernames } from './users';
-import { UsersOnline } from './entity/usersOnline';
+
+import { getRepository } from 'typeorm';
+import { User } from './entity/user';
 const commons = require('./commons');
 
 class CustomVariables {
@@ -184,13 +186,27 @@ class CustomVariables {
       onlineViewers = await getAllOnlineUsernames();
 
       for (let viewer of onlineViewers) {
-        let user = await global.db.engine.find('users', { username: viewer.username, is: { subscriber: true } });
-        if (!_.isEmpty(user)) {onlineSubscribers.push(user.username)};
+        let user = await getRepository(User).findOne({
+          where: {
+            username: user.username,
+            isSubscriber: true
+          }
+        })
+        if (user) {
+          onlineSubscribers.push(user.username)
+        };
       }
 
       for (let viewer of onlineViewers) {
-        let user = await global.db.engine.find('users', { username: viewer.username, is: { follower: true } });
-        if (!_.isEmpty(user)) {onlineFollowers.push(user.username)};
+        let user = await getRepository(User).findOne({
+          where: {
+            username: user.username,
+            isFollower: true
+          }
+        })
+        if (user) {
+          onlineFollowers.push(user.username)
+        };
       }
     }
 

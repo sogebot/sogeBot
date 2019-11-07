@@ -12,6 +12,8 @@ import * as constants from '../constants';
 import { debug, error } from '../helpers/log';
 import { adminEndpoint } from '../helpers/socket';
 import { getAllOnlineUsernames } from '../users';
+import { getRepository } from 'typeorm';
+import { User } from '../entity/user';
 
 class Points extends System {
   @settings('points')
@@ -177,18 +179,19 @@ class Points extends System {
   }
 
   async getPointsOf (id) {
-    let points = 0;
-    for (const item of await global.db.engine.find('users.points', { id })) {
-      const itemPoints = !_.isNaN(parseInt(_.get(item, 'points', 0))) ? _.get(item, 'points', 0) : 0;
-      points = points + Number(itemPoints);
-    }
-    if (Number(points) < 0) {
-      points = 0;
-    }
+    const user = await getRepository(User).findOne({ where: { userId: id }});
 
-    return points <= Number.MAX_SAFE_INTEGER
-      ? points
-      : Number.MAX_SAFE_INTEGER;
+    if (user) {
+      if (user.points < 0) {
+        user.points = 0;
+        await getRepository(User).save(user);
+      }
+      return user.points <= Number.MAX_SAFE_INTEGER
+        ? user.points
+        : Number.MAX_SAFE_INTEGER;
+    } else {
+      return 0;
+    }
   }
 
   @command('!points set')
@@ -203,8 +206,7 @@ class Points extends System {
       }
 
       if (user.id) {
-        await global.db.engine.remove('users.points', { id: user.id });
-        await global.db.engine.insert('users.points', { id: user.id, points });
+        await getRepository(User).update({ userId: user.id }, { points });
 
         const message = await prepare('points.success.set', {
           amount: points,

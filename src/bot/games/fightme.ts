@@ -4,6 +4,9 @@ import { command, settings, shared } from '../decorators';
 import Game from './_interface';
 import { getLocalizedName, isBroadcaster, isModerator, prepare, sendMessage, timeout } from '../commons';
 
+import { getRepository } from 'typeorm';
+import { User } from '../entity/user';
+
 /*
  * !fightme [user] - challenge [user] to fight
  */
@@ -93,8 +96,8 @@ class FightMe extends Game {
       }
 
       const [winnerWillGet, loserWillLose] = await Promise.all([this.winnerWillGet, this.loserWillLose]);
-      global.db.engine.increment('users.points', { id: winner ? opts.sender.userId : userId }, { points: Math.abs(Number(winnerWillGet)) });
-      global.db.engine.increment('users.points', { id: !winner ? opts.sender.userId : userId }, { points: -Math.abs(Number(loserWillLose)) });
+      await getRepository(User).increment({ userId: winner ? opts.sender.userId : userId }, 'points', Math.abs(Number(winnerWillGet)));
+      await getRepository(User).decrement({ userId: !winner ? opts.sender.userId : userId }, 'points', Math.abs(Number(loserWillLose)));
 
       timeout(winner ? opts.sender.username : username, null, this.timeout);
       sendMessage(prepare('gambling.fightme.winner', {

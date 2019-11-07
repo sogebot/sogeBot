@@ -11,6 +11,7 @@ import { adminEndpoint } from '../helpers/socket';
 
 import { getRepository } from 'typeorm';
 import { Bets as BetsEntity, BetsParticipations } from '../entity/bets';
+import { User } from '../entity/user';
 import { isDbConnected } from '../helpers/database';
 
 const ERROR_NOT_ENOUGH_OPTIONS = 'Expected more parameters';
@@ -241,7 +242,7 @@ class Bets extends System {
         _betOfUser.points = points + _betOfUser.points;
 
         // All OK
-        await global.db.engine.increment('users.points', { id: opts.sender.userId }, { points: points * -1 });
+        await getRepository(User).decrement({ userId: opts.sender.userId }, 'points', points);
         await getRepository(BetsEntity).save(currentBet);
       } else {
         this.info(opts);
@@ -284,7 +285,7 @@ class Bets extends System {
         throw Error(ERROR_NOT_RUNNING);
       }
       for (const user of currentBet.participations) {
-        await global.db.engine.increment('users.points', { id: user.id }, { points: user.points });
+        await getRepository(User).increment({ userId: opts.sender.userId }, 'points', user.points);
       }
       sendMessage(global.translate('bets.refund'), opts.sender, opts.attr);
     } catch (e) {
@@ -328,7 +329,7 @@ class Bets extends System {
       for (const user of currentBet.participations) {
         if (user.optionIdx === index) {
           total += user.points + Math.round((user.points * percentGain));
-          await global.db.engine.increment('users.points', { user: user.id }, { points: user.points + Math.round((user.points * percentGain)) });
+          await getRepository(User).increment({ userId: opts.sender.userId }, 'points', user.points + Math.round((user.points * percentGain)));
         }
       }
 

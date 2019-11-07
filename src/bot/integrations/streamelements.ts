@@ -6,6 +6,8 @@ import { settings, ui } from '../decorators';
 import { onChange, onStartup } from '../decorators/on';
 import { info, tip } from '../helpers/log';
 import { triggerInterfaceOnTip } from '../helpers/interface/triggers';
+import { getRepository } from 'typeorm';
+import { User, UserTip } from '../entity/user.js';
 
 /* example payload (eventData)
 {
@@ -97,23 +99,35 @@ class StreamElements extends Integration {
       return;
     }
 
-    const { username } = eventData.data;
+    const { username, amount, currency, message } = eventData.data;
 
-    const id = await global.users.getIdByName(username.toLowerCase(), false);
-    if (id) {
-      global.db.engine.insert('users.tips', { id, amount: eventData.data.amount, message: eventData.data.message, currency: eventData.data.currency, timestamp: Date.now() });
+    let user = await getRepository(User).findOne({ where: { username: username.toLowerCase() }});
+    let id;
+    if (!user) {
+      id = await global.users.getIdByName(username.toLowerCase(), false);
+      user = await getRepository(User).findOne({ where: { userId: id }});
+      if (!user && id) {
+        // if we still doesn't have user, we create new
+        user = new User();
+        user.userId = id;
+        user.username = username.toLowerCase();
+      }
+    } else {
+      id = user.userId;
     }
-    if (global.api.isStreamOnline) {
-      global.api.stats.currentTips += parseFloat(global.currency.exchange(eventData.data.amount, eventData.data.currency, global.currency.mainCurrency));
+
+    const newTip = new UserTip();
+    newTip.amount = Number(amount);
+    newTip.currency = currency;
+    newTip.sortAmount = global.currency.exchange(Number(amount), currency, 'EUR');
+    newTip.message = message;
+    newTip.tippedAt = Date.now();
+
+    if (user) {
+      user.tips.push(newTip);
+      await getRepository(User).save(user);
     }
-    global.overlays.eventlist.add({
-      event: 'tip',
-      amount: eventData.data.amount,
-      currency: eventData.data.currency,
-      username: username.toLowerCase(),
-      message: eventData.data.message,
-      timestamp: Date.now(),
-    });
+
     tip(`${username.toLowerCase()}${id ? '#' + id : ''}, amount: ${Number(eventData.data.amount).toFixed(2)}${eventData.data.currency}, message: ${eventData.data.message}`);
     global.events.fire('tip', {
       username: username.toLowerCase(),

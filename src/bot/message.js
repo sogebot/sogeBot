@@ -12,12 +12,14 @@ const Entities = require('html-entities').AllHtmlEntities;
 import { warning } from './helpers/log';
 import { getCountOfCommandUsage } from './helpers/commands/count';
 import { getAllOnlineUsernames } from './users';
-import { getManager, getRepository } from 'typeorm';
+import { Any, getManager, getRepository, Not } from 'typeorm';
 
 import { Alias } from './entity/alias';
 import { Commands } from './entity/commands';
 import { Cooldown } from './entity/cooldown';
 import { EventList } from './entity/eventList';
+import { User } from './entity/user';
+import { isFollower } from './commons';
 
 class Message {
   constructor (message) {
@@ -111,78 +113,77 @@ class Message {
 
     let random = {
       '(random.online.viewer)': async function () {
-        const usernames = await getAllOnlineUsernames();
-        const onlineViewers = usernames.filter((username) => {
-          const isSender = username === attr.sender.username;
-          const isBot = commons.isBot(username);
-          const isIgnored = commons.isIgnored({ username });
-          return !isSender && !isBot && !isIgnored;
+        const viewers = (await getRepository(User).find({
+          where: {
+            username: Not(Any([global.oauth.botUsername.toLowerCase(), attr.sender])),
+            isOnline: true,
+          }
+        })).filter(o => {
+          return commons.isIgnored({ username: o.username, userId: o.userId });
         });
-        if (onlineViewers.length === 0) {return 'unknown'};
-        return _.sample(onlineViewers);
+        if (viewers.length === 0) {return 'unknown'};
+        return _.sample(viewers.map(o => o.username ));
       },
       '(random.online.follower)': async function () {
-        const usernames = await getAllOnlineUsernames();
-        const onlineViewers = usernames.filter((username) => {
-          const isSender = username === attr.sender.username;
-          const isBot = commons.isBot(username);
-          const isIgnored = commons.isIgnored({ username });
-          return !isSender && !isBot && !isIgnored;
+        const followers = (await getRepository(User).find({
+          where: {
+            username: Not(Any([global.oauth.botUsername.toLowerCase(), attr.sender])),
+            isFollower: true,
+            isOnline: true,
+          }
+        })).filter(o => {
+          return commons.isIgnored({ username: o.username, userId: o.userId });
         });
-        const followers = _.filter(
-          (await global.db.engine.find('users', { is: { follower: true } })).map((o) => o.username),
-          (o) => o !== attr.sender && o !== global.oauth.botUsername.toLowerCase());
-        let onlineFollowers = _.intersection(onlineViewers, followers);
-        if (onlineFollowers.length === 0) {return 'unknown'};
-        return _.sample(onlineFollowers);
+        if (followers.length === 0) {return 'unknown'};
+        return _.sample(followers.map(o => o.username ));
       },
       '(random.online.subscriber)': async function () {
-        const usernames = await getAllOnlineUsernames();
-        const onlineViewers = usernames.filter((username) => {
-          const isSender = username === attr.sender.username;
-          const isBot = commons.isBot(username);
-          const isIgnored = commons.isIgnored({ username });
-          return !isSender && !isBot && !isIgnored;
+        const subscribers = (await getRepository(User).find({
+          where: {
+            username: Not(Any([global.oauth.botUsername.toLowerCase(), attr.sender])),
+            isSubsrciber: true,
+            isOnline: true,
+          }
+        })).filter(o => {
+          return commons.isIgnored({ username: o.username, userId: o.userId });
         });
-        const subscribers = _.filter(
-          (await global.db.engine.find('users', { is: { subscriber: true } })).map((o) => o.username),
-          (o) => o !== attr.sender && o !== global.oauth.botUsername.toLowerCase());
-        let onlineSubscribers = _.intersection(onlineViewers, subscribers);
-        if (onlineSubscribers.length === 0) {return 'unknown'};
-        return _.sample(onlineSubscribers);
+        if (subscribers.length === 0) {return 'unknown'};
+        return _.sample(subscribers.map(o => o.username ));
       },
       '(random.viewer)': async function () {
-        let viewer = (await global.users.getAll()).map((o) => o.username);
-        viewer = viewer.filter((username) => {
-          const isSender = username === attr.sender.username;
-          const isBot = commons.isBot(username);
-          const isIgnored = commons.isIgnored({ username });
-          return !isSender && !isBot && !isIgnored;
+        const viewers = (await getRepository(User).find({
+          where: {
+            username: Not(Any([global.oauth.botUsername.toLowerCase(), attr.sender])),
+          }
+        })).filter(o => {
+          return commons.isIgnored({ username: o.username, userId: o.userId });
         });
-        if (viewer.length === 0) {return 'unknown'};
-        return _.sample(viewer);
+        if (viewers.length === 0) {return 'unknown'};
+        return _.sample(viewers.map(o => o.username ));
       },
       '(random.follower)': async function () {
-        let follower = (await global.db.engine.find('users', { is: { follower: true } })).map((o) => o.username);
-        follower = follower.filter((username) => {
-          const isSender = username === attr.sender.username;
-          const isBot = commons.isBot(username);
-          const isIgnored = commons.isIgnored({ username });
-          return !isSender && !isBot && !isIgnored;
+        const followers = (await getRepository(User).find({
+          where: {
+            username: Not(Any([global.oauth.botUsername.toLowerCase(), attr.sender])),
+            isFollower: true,
+          }
+        })).filter(o => {
+          return commons.isIgnored({ username: o.username, userId: o.userId });
         });
-        if (follower.length === 0) {return 'unknown'};
-        return _.sample(follower);
+        if (followers.length === 0) {return 'unknown'};
+        return _.sample(followers.map(o => o.username ));
       },
       '(random.subscriber)': async function () {
-        let subscriber = (await global.db.engine.find('users', { is: { subscriber: true } })).map((o) => o.username);
-        subscriber = subscriber.filter((username) => {
-          const isSender = username === attr.sender.username;
-          const isBot = commons.isBot(username);
-          const isIgnored = commons.isIgnored({ username });
-          return !isSender && !isBot && !isIgnored;
+        const subscribers = (await getRepository(User).find({
+          where: {
+            username: Not(Any([global.oauth.botUsername.toLowerCase(), attr.sender])),
+            isSubsrciber: true,
+          }
+        })).filter(o => {
+          return commons.isIgnored({ username: o.username, userId: o.userId });
         });
-        if (subscriber.length === 0) {return 'unknown'};
-        return _.sample(subscriber);
+        if (subscribers.length === 0) {return 'unknown'};
+        return _.sample(subscribers.map(o => o.username ));
       },
       '(random.number-#-to-#)': async function (filter) {
         let numbers = filter.replace('(random.number-', '')
@@ -514,19 +515,18 @@ class Message {
         let onlineFollowers = [];
 
         if (containOnline) {
-          onlineViewers = await getAllOnlineUsernames();
+          const viewers = (await getRepository(User).find({
+            where: {
+              username: Not(Any([global.oauth.botUsername.toLowerCase(), attr.sender])),
+              isOnline: true,
+            }
+          })).filter(o => {
+            return commons.isIgnored({ username: o.username, userId: o.userId });
+          });
 
-          for (let viewer of onlineViewers) {
-            let user = await global.db.engine.find('users', { username: viewer.username, is: { subscriber: true } });
-            if (!_.isEmpty(user)) {onlineSubscribers.push(user.username)};
-          }
-          onlineSubscribers = _.filter(onlineSubscribers, function (o) { return o !== attr.sender.username; });
-
-          for (let viewer of onlineViewers) {
-            let user = await global.db.engine.find('users', { username: viewer.username, is: { follower: true } });
-            if (!_.isEmpty(user)) {onlineFollowers.push(user.username)};
-          }
-          onlineFollowers = _.filter(onlineFollowers, function (o) { return o !== attr.sender.username; });
+          onlineViewers = viewers;
+          onlineSubscribers = viewers.filter(o => o.isSubscriber);
+          onlineFollowers = viewers.filter(o => o.isFollower);
         }
 
         let randomVar = {

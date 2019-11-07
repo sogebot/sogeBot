@@ -4,6 +4,9 @@ import { isBroadcaster, isModerator, sendMessage, timeout } from '../commons';
 import { command, settings } from '../decorators';
 import Game from './_interface';
 
+import { getRepository } from 'typeorm';
+import { User } from '../entity/user';
+
 /*
  * !roulette - 50/50 chance to timeout yourself
  */
@@ -44,7 +47,11 @@ class Roulette extends Game {
       if (!isAlive) {
         timeout(opts.sender.username, null, this.timeout);
       }
-      await global.db.engine.increment('users.points', { id: opts.sender.userId }, { points: isAlive ? Math.abs(Number(this.winnerWillGet)) : -Math.abs(Number(this.loserWillLose)) });
+      if (isAlive) {
+        await getRepository(User).increment({ userId: opts.sender.userId }, 'points', Number(this.winnerWillGet));
+      } else {
+        await getRepository(User).decrement({ userId: opts.sender.userId }, 'points', Number(this.loserWillLose));
+      }
       sendMessage(isAlive ? global.translate('gambling.roulette.alive') : global.translate('gambling.roulette.dead'), opts.sender, opts.attr);
     }, 2000);
   }

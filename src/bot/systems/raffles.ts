@@ -9,6 +9,9 @@ import { permission } from '../permissions';
 import System from './_interface';
 import { adminEndpoint } from '../helpers/socket';
 
+import { getRepository } from 'typeorm';
+import { User } from '../entity/user';
+
 const TYPE_NORMAL = 0;
 const TYPE_TICKETS = 1;
 
@@ -338,7 +341,7 @@ class Raffles extends System {
 
     if (participantUser.eligible) {
       if (raffle.type === TYPE_TICKETS) {
-        await global.db.engine.increment('users.points', { id: opts.sender.userId }, { points: tickets * -1 });
+        await getRepository(User).decrement({ userId: opts.sender.userId }, 'points', tickets);
       }
       await global.db.engine.update(this.collection.participants, { raffle_id: raffle._id.toString(), username: opts.sender.username }, participantUser);
     }

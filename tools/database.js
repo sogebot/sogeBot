@@ -283,10 +283,13 @@ async function main() {
   const tips = await from.engine.find('users.tips');
   const messages = await from.engine.find('users.messages');
   const bits = await from.engine.find('users.bits');
+  const watched = await from.engine.find('users.watched');
+  const chat = await from.engine.find('users.chat');
 
   items = (await from.engine.find('users')).map(o => {
     delete o._id; return {
       userId: o.id,
+      username: o.username,
 
       isOnline: false,
       isFollower: _.get(o, 'is.follower', false),
@@ -301,13 +304,15 @@ async function main() {
       subscribedAt: _.get(o, 'time.subscribedAt', 0),
       seenAt: _.get(o, 'time.message', 0),
       createdAt: _.get(o, 'time.created_at', 0),
+      watchedTime: (watched.find(w => w.id === o.id) || { watched: 0 }).watched,
+      chatTimeOnline: (watched.find(w => w.id === o.id && w.online) || { chat: 0 }).chat,
+      chatTimeOffline: (watched.find(w => w.id === o.id && !w.online) || { chat: 0 }).chat,
 
       points: (points.find(m => m.id === o.id) || { points: 0 }).points,
       pointsOnlineGivenAt: Date.now(),
       pointsOfflineGivenAt: Date.now(),
       pointsByMessageGivenAt: (messages.find(m => m.id === o.id) || { messages: 0 }).messages,
 
-      tipsAmount: 0,
       tips: tips.filter(t => t.id === o.id).map(t => {
         delete t._id;
         return {
@@ -319,7 +324,6 @@ async function main() {
         }
       }),
 
-      bitsAmount: 0,
       bits: bits.filter(t => t.id === o.id).map(t => {
         delete t._id;
         return {
@@ -330,11 +334,16 @@ async function main() {
       }),
 
       messages: (messages.find(m => m.id === o.id) || { messages: 0 }).messages,
+      giftedSubscribes: _.get(o, 'custom.subgiftCount', 0)
     };
   });
   if (items.length > 0) {
     for (const item of items) {
-      await getRepository(User).save(item);
+      try {
+        await getRepository(User).save(item);
+      } catch (e) {
+        throw Error('Error Importing User ' + JSON.stringify(item));
+      }
     }
   }
 
