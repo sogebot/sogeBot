@@ -45,7 +45,7 @@ describe('Events - tip event', () => {
       ]);
 
       for (const user of ['losslezos', 'rigneir', 'mikasa_hraje', 'foufhs']) {
-        await global.db.engine.insert('users', { id: Math.floor(Math.random() * 100000), username: user });
+        await getRepository(User).save({ username: user, userId: Math.floor(Math.random() * 100000) });
       }
     });
 

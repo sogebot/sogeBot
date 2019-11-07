@@ -10,6 +10,9 @@ const Parser = require('../../../dest/parser').default;
 
 const owner = { username: 'soge__', userId: Math.random() };
 
+const { getRepository } = require('typeorm');
+const { User } = require('../../../dest/entity/user');
+
 describe('Parser - case sensitive commands', async () => {
   const tests = [
     {
@@ -28,7 +31,7 @@ describe('Parser - case sensitive commands', async () => {
         await db.cleanup();
         await message.prepare();
 
-        await global.db.engine.insert('users', { username: owner.username, id: owner.userId });
+        await getRepository(User).save({ username: user.username, userId: user.userId });
       });
 
       it(`Run command '${test.test}'`, async () => {

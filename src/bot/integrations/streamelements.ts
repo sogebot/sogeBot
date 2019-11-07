@@ -111,6 +111,7 @@ class StreamElements extends Integration {
         user = new User();
         user.userId = id;
         user.username = username.toLowerCase();
+        user = await getRepository(User).save(user);
       }
     } else {
       id = user.userId;

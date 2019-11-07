@@ -672,6 +672,7 @@ class TMI extends Core {
         user = new User();
         user.userId = userId;
         user.username = username.toLowerCase();
+        user = await getRepository(User).save(user);
       }
 
       const newBits = new UserBit();

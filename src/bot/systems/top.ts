@@ -6,7 +6,7 @@ import { command, default_permission } from '../decorators';
 import { permission } from '../permissions';
 import System from './_interface';
 import { debug } from '../helpers/log';
-import { Any, getRepository, Not } from 'typeorm';
+import { getRepository } from 'typeorm';
 import { User } from '../entity/user';
 
 enum TYPE {
@@ -111,16 +111,13 @@ class Top extends System {
     switch (type) {
       case TYPE.TIME:
         sorted
-          = (await getRepository(User).find({
-            where: {
-              username: Not(Any([global.oauth.botUsername.toLowerCase(), global.oauth.broadcasterUsername.toLowerCase()])),
-            },
-            order: {
-              watchedTime: 'DESC',
-            },
-            take: _total,
-          }))
-            .filter(o => isIgnored({ username: o.username, userId: o.userId }))
+          = (await getRepository(User).createQueryBuilder('user')
+            .where('username != :botusername', { botusername: global.oauth.botUsername.toLowerCase() })
+            .andWhere('username != :broadcasterusername', { broadcasterusername: global.oauth.broadcasterUsername.toLowerCase() })
+            .orderBy('watchedTime', 'DESC')
+            .limit(_total)
+            .getMany())
+            .filter(o => !isIgnored({ username: o.username, userId: o.userId }))
             .map(o => {
               return { username: o.username, value: o.watchedTime };
             });
@@ -135,16 +132,13 @@ class Top extends System {
           return;
         }
         sorted
-          = (await getRepository(User).find({
-            where: {
-              username: Not(Any([global.oauth.botUsername.toLowerCase(), global.oauth.broadcasterUsername.toLowerCase()])),
-            },
-            order: {
-              points: 'DESC',
-            },
-            take: _total,
-          }))
-            .filter(o => isIgnored({ username: o.username, userId: o.userId }))
+         = (await getRepository(User).createQueryBuilder('user')
+            .where('username != :botusername', { botusername: global.oauth.botUsername.toLowerCase() })
+            .andWhere('username != :broadcasterusername', { broadcasterusername: global.oauth.broadcasterUsername.toLowerCase() })
+            .orderBy('points', 'DESC')
+            .limit(_total)
+            .getMany())
+            .filter(o => !isIgnored({ username: o.username, userId: o.userId }))
             .map(o => {
               return { username: o.username, value: o.points };
             });
@@ -152,16 +146,13 @@ class Top extends System {
         break;
       case TYPE.MESSAGES:
         sorted
-          = (await getRepository(User).find({
-            where: {
-              username: Not(Any([global.oauth.botUsername.toLowerCase(), global.oauth.broadcasterUsername.toLowerCase()])),
-            },
-            order: {
-              messages: 'DESC',
-            },
-            take: _total,
-          }))
-            .filter(o => isIgnored({ username: o.username, userId: o.userId }))
+          = (await getRepository(User).createQueryBuilder('user')
+            .where('username != :botusername', { botusername: global.oauth.botUsername.toLowerCase() })
+            .andWhere('username != :broadcasterusername', { broadcasterusername: global.oauth.broadcasterUsername.toLowerCase() })
+            .orderBy('messages', 'DESC')
+            .limit(_total)
+            .getMany())
+            .filter(o => !isIgnored({ username: o.username, userId: o.userId }))
             .map(o => {
               return { username: o.username, value: o.messages };
             });
@@ -169,17 +160,14 @@ class Top extends System {
         break;
       case TYPE.FOLLOWAGE:
         sorted
-          = (await getRepository(User).find({
-            where: {
-              username: Not(Any([global.oauth.botUsername.toLowerCase(), global.oauth.broadcasterUsername.toLowerCase()])),
-              isFollower: true,
-            },
-            order: {
-              followedAt: 'DESC',
-            },
-            take: _total,
-          }))
-            .filter(o => isIgnored({ username: o.username, userId: o.userId }))
+          = (await getRepository(User).createQueryBuilder('user')
+            .where('username != :botusername', { botusername: global.oauth.botUsername.toLowerCase() })
+            .andWhere('username != :broadcasterusername', { broadcasterusername: global.oauth.broadcasterUsername.toLowerCase() })
+            .andWhere('isFollower = :isFollower', { isFollower: true })
+            .orderBy('followedAt', 'ASC')
+            .limit(_total)
+            .getMany())
+            .filter(o => !isIgnored({ username: o.username, userId: o.userId }))
             .map(o => {
               return { username: o.username, value: o.followedAt };
             });
@@ -187,17 +175,14 @@ class Top extends System {
         break;
       case TYPE.SUBAGE:
         sorted
-          = (await getRepository(User).find({
-            where: {
-              username: Not(Any([global.oauth.botUsername.toLowerCase(), global.oauth.broadcasterUsername.toLowerCase()])),
-              isSubscriber: true,
-            },
-            order: {
-              subscribedAt: 'DESC',
-            },
-            take: _total,
-          }))
-            .filter(o => isIgnored({ username: o.username, userId: o.userId }))
+          = (await getRepository(User).createQueryBuilder('user')
+            .where('username != :botusername', { botusername: global.oauth.botUsername.toLowerCase() })
+            .andWhere('username != :broadcasterusername', { broadcasterusername: global.oauth.broadcasterUsername.toLowerCase() })
+            .andWhere('isSubscriber = :isSubscriber', { isSubscriber: true })
+            .orderBy('subscribedAt', 'ASC')
+            .limit(_total)
+            .getMany())
+            .filter(o => !isIgnored({ username: o.username, userId: o.userId }))
             .map(o => {
               return { username: o.username, value: o.subscribedAt };
             });
@@ -209,16 +194,13 @@ class Top extends System {
         break;
       case TYPE.GIFTS:
         sorted
-          = (await getRepository(User).find({
-            where: {
-              username: Not(Any([global.oauth.botUsername.toLowerCase(), global.oauth.broadcasterUsername.toLowerCase()])),
-            },
-            order: {
-              giftedSubscribes: 'DESC',
-            },
-            take: _total,
-          }))
-            .filter(o => isIgnored({ username: o.username, userId: o.userId }))
+          = (await getRepository(User).createQueryBuilder('user')
+            .where('username != :botusername', { botusername: global.oauth.botUsername.toLowerCase() })
+            .andWhere('username != :broadcasterusername', { broadcasterusername: global.oauth.broadcasterUsername.toLowerCase() })
+            .orderBy('giftedSubscribes', 'DESC')
+            .limit(_total)
+            .getMany())
+            .filter(o => !isIgnored({ username: o.username, userId: o.userId }))
             .map(o => {
               return { username: o.username, value: o.giftedSubscribes };
             });
@@ -226,16 +208,13 @@ class Top extends System {
         break;
       case TYPE.SUBMONTHS:
         sorted
-          = (await getRepository(User).find({
-            where: {
-              username: Not(Any([global.oauth.botUsername.toLowerCase(), global.oauth.broadcasterUsername.toLowerCase()])),
-            },
-            order: {
-              subscribeCumulativeMonths: 'DESC',
-            },
-            take: _total,
-          }))
-            .filter(o => isIgnored({ username: o.username, userId: o.userId }))
+          = (await getRepository(User).createQueryBuilder('user')
+            .where('username != :botusername', { botusername: global.oauth.botUsername.toLowerCase() })
+            .andWhere('username != :broadcasterusername', { broadcasterusername: global.oauth.broadcasterUsername.toLowerCase() })
+            .orderBy('subscribeCumulativeMonths', 'DESC')
+            .limit(_total)
+            .getMany())
+            .filter(o => !isIgnored({ username: o.username, userId: o.userId }))
             .map(o => {
               return { username: o.username, value: o.subscribeCumulativeMonths };
             });

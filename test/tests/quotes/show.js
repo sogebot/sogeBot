@@ -6,6 +6,9 @@ require('../../general.js');
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 
+const { getRepository } = require('typeorm');
+const { User } = require('../../../dest/entity/user');
+
 // users
 const owner = { username: 'soge__', userId: '1' };
 
@@ -33,7 +36,7 @@ describe('Quotes - main()', () => {
       before(async () => {
         await db.cleanup();
         await message.prepare();
-        await global.db.engine.insert('users', { username: owner.username, id: owner.userId });
+        await getRepository(User).save({ username: user.username, userId: user.userId });
         const quote = await global.systems.quotes.add({ sender: test.sender, parameters: '-tags lorem ipsum -quote Lorem Ipsum', command: '!quote add' });
         id = quote.id;
         if (test.id === 1) {

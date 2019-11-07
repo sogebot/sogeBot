@@ -9,6 +9,9 @@ const message = require('../../general.js').message;
 const time = require('../../general.js').time;
 const assert = require('assert');
 
+const { getRepository } = require('typeorm');
+const { User } = require('../../../dest/entity/user');
+
 const { permission } = require('../../../dest/permissions');
 
 // users
@@ -20,8 +23,8 @@ describe('Custom Commands - count filter', () => {
     await db.cleanup();
     await message.prepare();
 
-    await global.db.engine.insert('users', { username: owner.username, id: owner.userId });
-    await global.db.engine.insert('users', { username: user1.username, id: user1.userId });
+    await getRepository(User).save({ username: user.username, userId: user.userId });
+    await getRepository(User).save({ username: user1.username, userId: user1.userId });
   });
 
   describe('$count(\'!cmd2\') should be properly parsed', () => {

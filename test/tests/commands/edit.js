@@ -8,6 +8,9 @@ const message = require('../../general.js').message;
 
 const { permission } = require('../../../dest/permissions');
 
+const { getRepository } = require('typeorm');
+const { User } = require('../../../dest/entity/user');
+
 // users
 const owner = { username: 'soge__', userId: Math.random() };
 
@@ -51,7 +54,7 @@ describe('Custom Commands - edit()', () => {
     await db.cleanup();
     await message.prepare();
 
-    await global.db.engine.insert('users', { username: owner.username, id: owner.userId });
+    await getRepository(User).save({ username: user.username, userId: user.userId });
   });
 
   describe('Expected parsed fail', () => {

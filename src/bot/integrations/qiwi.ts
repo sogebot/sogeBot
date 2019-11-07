@@ -72,6 +72,7 @@ class Qiwi extends Integration {
           user = new User();
           user.userId = id;
           user.username = data.username.toLowerCase();
+          user = await getRepository(User).save(user);
         }
       }
 

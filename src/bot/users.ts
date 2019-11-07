@@ -275,18 +275,15 @@ class Users extends Core {
   }
 
   async getWatchedOf (id: string): Promise<number> {
-    let watched = 0;
-    for (const item of await global.db.engine.find('users.watched', { id })) {
-      const itemPoints = !Number.isNaN(parseInt(get(item, 'watched', 0))) ? get(item, 'watched', 0) : 0;
-      watched = watched + Number(itemPoints);
-    }
-    if (Number(watched) < 0) {
-      watched = 0;
-    }
+    const user = await getRepository(User).findOne({ where: { userId: id }});
 
-    return Number(watched) <= Number.MAX_SAFE_INTEGER
-      ? watched
-      : Number.MAX_SAFE_INTEGER;
+    if (user) {
+      return Number(user.watchedTime) <= Number.MAX_SAFE_INTEGER
+        ? user.watchedTime
+        : Number.MAX_SAFE_INTEGER;
+    } else {
+      return 0;
+    }
   }
 
   async getMessagesOf (id: string): Promise<number> {

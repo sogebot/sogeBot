@@ -7,6 +7,9 @@ require('../../general.js');
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 
+const { getRepository } = require('typeorm');
+const { User, UserTip } = require('../../../dest/entity/user');
+
 // users
 const owner = { username: 'soge__' };
 
@@ -18,21 +21,31 @@ describe('Top - !top tips', () => {
 
   it ('Add 10 users into db and last user will don\'t have any tips', async () => {
     for (let i = 0; i < 10; i++) {
-      const id = String(Math.floor(Math.random() * 100000));
-      await global.db.engine.insert('users', {
-        id,
-        username: 'user' + i,
-      });
-      if (i != 0) {
-        await global.db.engine.insert('users.tips', {
-          id, amount: i, _amount: i, currency: 'EUR', _currency: 'EUR', message: 'test', timestamp: Math.random()
-        });
+      let user = new User();
+      user.userId = Math.floor(Math.random() * 100000);
+      user.username = 'user' + i;
+      user = await getRepository(User).save(user);
+
+      if (i === 0) {
+        continue;
       }
+
+      for (let j = 0; j <= i; j++) {
+        const newTips = new UserTip();
+        newTips.amount = j;
+        newTips.sortAmount = j;
+        newTips.currency = 'EUR';
+        newTips.message = 'test';
+        newTips.timestamp = Date.now();
+        user.tips.push(newTips);
+      }
+
+      await getRepository(User).save(user);
     }
   });
 
   it('run !top tips and expect correct output', async () => {
     global.systems.top.tips({ sender: { username: commons.getOwner() } });
-    await message.isSentRaw('Top 10 (tips): 1. @user9 - 9.00€, 2. @user8 - 8.00€, 3. @user7 - 7.00€, 4. @user6 - 6.00€, 5. @user5 - 5.00€, 6. @user4 - 4.00€, 7. @user3 - 3.00€, 8. @user2 - 2.00€, 9. @user1 - 1.00€', owner);
+    await message.isSentRaw('Top 10 (tips): 1. @user9 - 45.00€, 2. @user8 - 36.00€, 3. @user7 - 28.00€, 4. @user6 - 21.00€, 5. @user5 - 15.00€, 6. @user4 - 10.00€, 7. @user3 - 6.00€, 8. @user2 - 3.00€, 9. @user1 - 1.00€', owner);
   });
 });

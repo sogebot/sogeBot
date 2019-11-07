@@ -79,6 +79,7 @@ class Streamlabs extends Integration {
               user = new User();
               user.userId = id;
               user.username = event.from.toLowerCase().toLowerCase();
+              user = await getRepository(User).save(user);
             }
           } else {
             id = user.userId;

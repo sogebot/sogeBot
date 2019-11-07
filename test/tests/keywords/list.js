@@ -8,6 +8,9 @@ const assert = require('assert');
 const { getRepository } = require('typeorm');
 const { Keyword } = require('../../../dest/entity/keyword');
 
+const { getRepository } = require('typeorm');
+const { User } = require('../../../dest/entity/user');
+
 // users
 const owner = { username: 'soge__', userId: Math.random() };
 
@@ -29,7 +32,7 @@ describe('Keywords - listing', () => {
     before(async () => {
       await db.cleanup();
       await message.prepare();
-      await global.db.engine.insert('users', { username: owner.username, id: owner.userId });
+      await getRepository(User).save({ username: user.username, userId: user.userId });
     });
 
     it('Expecting empty list', async () => {

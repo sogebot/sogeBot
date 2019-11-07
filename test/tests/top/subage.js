@@ -1,6 +1,8 @@
 /* global describe it before */
 const commons = require('../../../dest/commons');
 
+const { getRepository } = require('typeorm');
+const { User } = require('../../../dest/entity/user');
 
 require('../../general.js');
 
@@ -21,34 +23,22 @@ describe('Top - !top subage', () => {
 
   it ('Add 10 users into db and last user will don\'t have any subage', async () => {
     for (let i = 0; i < 10; i++) {
-      const id = String(Math.floor(Math.random() * 100000));
-      await global.db.engine.insert('users', {
-        id,
-        username: 'user' + i,
-        is: {
-          subscriber: true,
-          moderator: Math.floor(Math.random()) === 1,
-          follower: Math.floor(Math.random()) === 1,
-        },
-        time: {
-          subscribed_at: Date.now() - (constants.HOUR * i),
-        },
-      });
+      const user = new User();
+      user.userId = Math.floor(Math.random() * 100000);
+      user.username = 'user' + i;
+      user.isSubscriber = true;
+      user.subscribedAt = Date.now() - (constants.HOUR * i);
+      await getRepository(User).save(user);
     }
   });
 
   it ('Add user with long subage but not subscriber', async () => {
-    const id = String(Math.floor(Math.random() * 100000));
-    await global.db.engine.insert('users', {
-      id,
-      username: 'user11',
-      is: {
-        subscriber: false,
-      },
-      time: {
-        subscribed_at: Date.now() - (constants.HOUR * 24 * 30),
-      },
-    });
+    const user = new User();
+    user.userId = Math.floor(Math.random() * 100000);
+    user.username = 'user11';
+    user.isSubscriber = false;
+    user.subscribedAt = Date.now() - (constants.HOUR * 24 * 30);
+    await getRepository(User).save(user);
   });
 
   it('run !top subage and expect correct output', async () => {

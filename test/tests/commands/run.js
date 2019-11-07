@@ -12,6 +12,7 @@ const { permission } = require('../../../dest/permissions');
 
 const { getRepository } = require('typeorm');
 const { Commands } = require('../../../dest/entity/commands');
+const { User } = require('../../../dest/entity/user');
 
 // users
 const owner = { username: 'soge__', userId: Math.random() };
@@ -22,8 +23,8 @@ describe('Custom Commands - run()', () => {
     await db.cleanup();
     message.prepare();
 
-    await global.db.engine.insert('users', { username: owner.username, id: owner.userId });
-    await global.db.engine.insert('users', { username: user1.username, id: user1.userId });
+    await getRepository(User).save({ username: user.username, userId: user.userId });
+    await getRepository(User).save({ username: user1.username, userId: user1.userId });
   });
 
   describe('\'!test qwerty\' should trigger correct commands', () => {

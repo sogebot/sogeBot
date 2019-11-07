@@ -67,12 +67,12 @@ export class User {
   subscribeStreak!: number;
 
   @OneToMany(() => UserTip, (tip) => tip.user, {
-    cascade: true,
+    cascade: true, eager: true,
   })
   tips!: UserTip[];
 
   @OneToMany(() => UserBit, (bit) => bit.user, {
-    cascade: true,
+    cascade: true, eager: true,
   })
   bits!: UserBit[];
 

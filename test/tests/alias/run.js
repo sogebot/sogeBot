@@ -7,6 +7,9 @@ require('../../general.js');
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 
+const { getRepository } = require('typeorm');
+const { User } = require('../../../dest/entity/user');
+
 // users
 const owner = { username: 'soge__', userId: Math.random() };
 const user = { username: 'user', userId: Math.random() };
@@ -16,8 +19,8 @@ describe('Alias - run()', () => {
     await db.cleanup();
     await message.prepare();
 
-    await global.db.engine.insert('users', { username: owner.username, id: owner.userId });
-    await global.db.engine.insert('users', { username: user.username, id: user.userId });
+    await getRepository(User).save({ username: user.username, userId: user.userId });
+    await getRepository(User).save({ username: user.username, id: user.userId });
   });
 
   it('!a should show correctly command with link (skip is true)', async () => {

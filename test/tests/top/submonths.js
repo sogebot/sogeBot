@@ -7,6 +7,9 @@ require('../../general.js');
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 
+const { getRepository } = require('typeorm');
+const { User } = require('../../../dest/entity/user');
+
 // users
 const owner = { username: 'soge__' };
 
@@ -18,14 +21,11 @@ describe('Top - !top submonths', () => {
 
   it ('Add 10 users into db and last user will don\'t have any submonths', async () => {
     for (let i = 0; i < 10; i++) {
-      const id = String(Math.floor(Math.random() * 100000));
-      await global.db.engine.insert('users', {
-        id,
-        username: 'user' + i,
-        stats: {
-          subCumulativeMonths: i * 100,
-        },
-      });
+      let user = new User();
+      user.userId = Math.floor(Math.random() * 100000);
+      user.username = 'user' + i;
+      user.subscribeCumulativeMonths = i * 100;
+      user = await getRepository(User).save(user);
     }
   });
 

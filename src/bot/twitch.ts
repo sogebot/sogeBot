@@ -4,7 +4,7 @@ require('moment-precise-range-plugin');
 import { isMainThread } from './cluster';
 import { isNil } from 'lodash';
 
-import { getChannel, getTime, isIgnored, prepare, sendMessage } from './commons';
+import { getTime, isIgnored, prepare, sendMessage } from './commons';
 import { command, default_permission, settings } from './decorators';
 import { permission } from './permissions';
 import Core from './_interface';
@@ -13,7 +13,7 @@ import Core from './_interface';
 import * as configFile from '@config';
 import { adminEndpoint } from './helpers/socket';
 
-import { Any, getManager, getRepository, Not } from 'typeorm';
+import { getManager, getRepository } from 'typeorm';
 import { EventList } from './entity/eventList';
 
 import { User } from './entity/user';
@@ -62,15 +62,15 @@ class Twitch extends Core {
       .orderBy('events.timestamp', 'DESC')
       .where('events.event = :event', { event: 'follow' })
       .getMany();
-    const onlineFollowers = (await getRepository(User).find({
-      where: {
-        username: Not(Any([global.oauth.botUsername.toLowerCase(), getChannel()])),
-        isFollower: true,
-        isOnline: true,
-      },
-    })).filter(o => {
-      return isIgnored({ username: o.username, userId: o.userId });
-    });
+    const onlineFollowers = (await getRepository(User).createQueryBuilder('user')
+      .where('username != :botusername', { botusername: global.oauth.botUsername.toLowerCase() })
+      .andWhere('username != :broadcasterusername', { broadcasterusername: global.oauth.broadcasterUsername.toLowerCase() })
+      .andWhere('isFollower = :isFollower', { isFollower: true })
+      .andWhere('isOnline = :isOnline', { isOnline: true })
+      .getMany())
+      .filter(o => {
+        return isIgnored({ username: o.username, userId: o.userId });
+      });
     moment.locale(global.general.lang);
 
     let lastFollowAgo = '';
@@ -98,13 +98,12 @@ class Twitch extends Core {
       .orWhere('events.event = :event3', { event3: 'subgift' })
       .getMany();
 
-    const onlineSubscribers = (await getRepository(User).find({
-      where: {
-        username: Not(Any([global.oauth.botUsername.toLowerCase(), getChannel()])),
-        isSubscriber: true,
-        isOnline: true,
-      },
-    })).filter(o => {
+    const onlineSubscribers = (await getRepository(User).createQueryBuilder('user')
+      .where('username != :botusername', { botusername: global.oauth.botUsername.toLowerCase() })
+      .andWhere('username != :broadcasterusername', { broadcasterusername: global.oauth.broadcasterUsername.toLowerCase() })
+      .andWhere('isSubscriber = :isSubscriber', { isSubscriber: true })
+      .andWhere('isOnline = :isOnline', { isOnline: true })
+      .getMany()).filter(o => {
       return isIgnored({ username: o.username, userId: o.userId });
     });
 
