@@ -81,7 +81,6 @@ describe('Raffles - pick()', () => {
     });
 
 
-
     it('Create testuser/testuser2 with max points', async () => {
       user1 = await getRepository(User).save({ username: testuser.username , userId: testuser.userId, points: max });
       user2 = await getRepository(User).save({ username: testuser.username , userId: testuser2.userId, points: max });

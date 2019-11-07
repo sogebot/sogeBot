@@ -7,6 +7,7 @@ const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 
 const { getRepository } = require('typeorm');
+const { User } = require('../../../dest/entity/user');
 const { Settings } = require('../../../dest/entity/settings');
 
 // users
@@ -19,9 +20,6 @@ const botwithchangedname = { username: 'asdsadas', userId: '24900234' };
 
 const commons = require('../../../dest/commons');
 const { VariableWatcher } = require('../../../dest/watchers');
-
-const { getRepository } = require('typeorm');
-const { User } = require('../../../dest/entity/user');
 
 describe('TMI - ignore', () => {
   before(async () => {

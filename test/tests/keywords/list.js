@@ -7,8 +7,6 @@ const assert = require('assert');
 
 const { getRepository } = require('typeorm');
 const { Keyword } = require('../../../dest/entity/keyword');
-
-const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/entity/user');
 
 // users

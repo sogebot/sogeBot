@@ -179,18 +179,18 @@ class CustomVariables {
     }
 
     let onlineViewers = [];
-    let onlineSubscribers = [];
-    let onlineFollowers = [];
+    const onlineSubscribers = [];
+    const onlineFollowers = [];
 
     if (containOnline) {
       onlineViewers = await getAllOnlineUsernames();
 
       for (let viewer of onlineViewers) {
-        let user = await getRepository(User).findOne({
+        const user = await getRepository(User).findOne({
           where: {
-            username: user.username,
-            isSubscriber: true
-          }
+            username: viewer,
+            isSubscriber: true,
+          },
         })
         if (user) {
           onlineSubscribers.push(user.username)
@@ -198,10 +198,10 @@ class CustomVariables {
       }
 
       for (let viewer of onlineViewers) {
-        let user = await getRepository(User).findOne({
+        const user = await getRepository(User).findOne({
           where: {
-            username: user.username,
-            isFollower: true
+            username: viewer,
+            isFollower: true,
           }
         })
         if (user) {
@@ -210,7 +210,7 @@ class CustomVariables {
       }
     }
 
-    let randomVar = {
+    const randomVar = {
       online: {
         viewer: _.sample(_.map(onlineViewers, 'username')),
         follower: _.sample(_.map(onlineFollowers, 'username')),

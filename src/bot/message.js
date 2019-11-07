@@ -18,7 +18,6 @@ import { Commands } from './entity/commands';
 import { Cooldown } from './entity/cooldown';
 import { EventList } from './entity/eventList';
 import { User } from './entity/user';
-import { isFollower } from './commons';
 
 class Message {
   constructor (message) {
