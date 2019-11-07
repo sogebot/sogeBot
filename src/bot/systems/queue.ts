@@ -6,6 +6,9 @@ import { permission } from '../permissions';
 import System from './_interface';
 import { adminEndpoint } from '../helpers/socket';
 
+import { getRepository } from 'typeorm';
+import { User } from '../entity/user';
+
 /*
  * !queue                            - gets an info whether queue is opened or closed
  * !queue open                       - open a queue
@@ -105,17 +108,22 @@ class Queue extends System {
   @command('!queue join')
   async join (opts) {
     if (!(this.locked)) {
-      const user = await global.db.engine.findOne('users', { username: opts.sender.username });
-
+      let user = await getRepository(User).findOne({ userId: opts.sender.userId });
+      if (!user) {
+        user = new User();
+        user.userId = opts.sender.userId;
+        user.username = opts.sender.username;
+        await getRepository(User).save(user);
+      }
       const [all, followers, subscribers] = await Promise.all([this.eligibilityAll, this.eligibilityFollowers, this.eligibilitySubscribers]);
 
       let eligible = false;
       if (!all) {
-        if ((followers && subscribers) && (user.is.follower || user.is.subscriber)) {
+        if ((followers && subscribers) && (user.isFollower || user.isSubscriber)) {
           eligible = true;
-        } else if (followers && user.is.follower) {
+        } else if (followers && user.isFollower) {
           eligible = true;
-        } else if (subscribers && user.is.subscriber) {
+        } else if (subscribers && user.isSubscriber) {
           eligible = true;
         }
       } else {
@@ -123,7 +131,9 @@ class Queue extends System {
       }
 
       if (eligible) {
-        await global.db.engine.update(this.collection.data, { username: opts.sender.username }, { username: opts.sender.username, is: user.is, created_at: String(new Date()) });
+        await global.db.engine.update(this.collection.data, { username: opts.sender.username }, { username: opts.sender.username, is: {
+          follower: user.isFollower, subscriber: user.isSubscriber, moderator: user.isModerator,
+        }, created_at: String(new Date()) });
         sendMessage(global.translate('queue.join.opened'), opts.sender, opts.attr);
       }
     } else {

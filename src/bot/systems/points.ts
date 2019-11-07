@@ -174,7 +174,7 @@ class Points extends System {
 
   sockets () {
     adminEndpoint(this.nsp, 'reset', async () => {
-      global.db.engine.remove('users.points', {});
+      getRepository(User).update({}, { points: 0 });
     });
   }
 
@@ -347,19 +347,9 @@ class Points extends System {
   @default_permission(permission.CASTERS)
   async all (opts: CommandOptions) {
     try {
-      const points = new Expects(opts.parameters).points({ all: false }).toArray();
+      const points = new Expects(opts.parameters).points({ all: false }).toArray()[0];
 
-      for (const username of (await getAllOnlineUsernames())) {
-        if (isBot(username)) {
-          continue;
-        }
-
-        const user = await global.db.engine.findOne('users', { username });
-
-        if (user.id) {
-          await global.db.engine.increment('users.points', { id: user.id }, { points });
-        }
-      }
+      getRepository(User).increment({ isOnline: true }, 'points', points);
       const message = await prepare('points.success.all', {
         amount: points,
         pointsName: await this.getPointsName(points),
@@ -376,16 +366,12 @@ class Points extends System {
     try {
       const points = new Expects(opts.parameters).points({ all: false }).toArray()[0];
 
-      for (const username of (await getAllOnlineUsernames())) {
-        if (isBot(username)) {
+      for (const user of (await getRepository(User).find({ isOnline: true }))) {
+        if (isBot(user.username)) {
           continue;
         }
 
-        const user = await global.db.engine.findOne('users', { username });
-
-        if (user.id) {
-          await global.db.engine.increment('users.points', { id: user.id }, { points: Math.floor(Math.random() * points) });
-        }
+        getRepository(User).increment({ userId: user.userId }, 'points', Math.floor(Math.random() * points));
       }
       const message = await prepare('points.success.rain', {
         amount: points,

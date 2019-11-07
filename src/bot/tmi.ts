@@ -542,8 +542,7 @@ class TMI extends Core {
       const userId = message.tags.userId;
       const count = Number(message.parameters.massGiftCount);
 
-      // save total count, userId
-      await global.db.engine.update('users', { id: userId }, { username, custom: { subgiftCount: Number(message.parameters.senderCount) } });
+      await getRepository(User).increment({ userId }, 'giftedSubscribes', Number(message.parameters.senderCount));
 
       this.ignoreGiftsFromUser[username] = { count, time: new Date() };
 
@@ -582,12 +581,6 @@ class TMI extends Core {
       const recipient = message.parameters.recipientUserName.toLowerCase();
       const recipientId = message.parameters.recipientId;
       const tier = this.getMethod(message).plan / 1000;
-
-
-      // update recipient ID
-      await global.db.engine.update('users', { id: recipientId }, { username: recipient });
-      // update gifter ID
-      await global.db.engine.update('users', { id: message.tags.userId }, { username });
 
       for (const [u, o] of Object.entries(this.ignoreGiftsFromUser)) {
         // $FlowFixMe Incorrect mixed type from value of Object.entries https://github.com/facebook/flow/issues/5838
