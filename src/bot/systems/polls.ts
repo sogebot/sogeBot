@@ -374,14 +374,13 @@ class Polls extends System {
       this.lastTimeRemind = Date.now();
 
       const translations = `systems.polls.opened_${vote.type}`;
-      const userObj = await global.users.getByName(getOwner());
       sendMessage(prepare(translations, {
         title: vote.title,
         command: this.getCommand('!vote'),
       }), {
-        username: userObj.username,
-        displayName: userObj.displayName || userObj.username,
-        userId: userObj.id,
+        username: global.oauth.botUsername,
+        displayName: global.oauth.botUsername,
+        userId: global.oauth.botId,
         emotes: [],
         badges: {},
         'message-type': 'chat',
@@ -390,18 +389,19 @@ class Polls extends System {
         setTimeout(() => {
           if (vote.type === 'normal') {
             sendMessage(this.getCommand('!vote') + ` ${(Number(index) + 1)} => ${vote.options[index]}`, {
-              username: userObj.username,
-              displayName: userObj.displayName || userObj.username,
-              userId: userObj.id,
+              username: global.oauth.botUsername,
+              displayName: global.oauth.botUsername,
+              userId: global.oauth.botId,
               emotes: [],
               badges: {},
               'message-type': 'chat',
             });
           } else {
             sendMessage(`#vote${(Number(index) + 1)} => ${vote.options[index]}`, {
-              username: userObj.username,
-              displayName: userObj.displayName || userObj.username,
-              userId: userObj.id,
+
+              username: global.oauth.botUsername,
+              displayName: global.oauth.botUsername,
+              userId: global.oauth.botId,
               emotes: [],
               badges: {},
               'message-type': 'chat',

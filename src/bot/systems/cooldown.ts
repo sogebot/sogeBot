@@ -11,6 +11,7 @@ import System from './_interface';
 
 import { getRepository } from 'typeorm';
 import { Cooldown as CooldownEntity, CooldownViewer } from '../entity/cooldown';
+import { User } from '../entity/user';
 import { adminEndpoint } from '../helpers/socket';
 
 /*
@@ -171,13 +172,18 @@ class Cooldown extends System {
       return true;
     }
 
-    const user = await global.users.getById(opts.sender.userId);
+    let user = await getRepository(User).findOne({ userId: opts.sender.userId });
+    if (!user) {
+      user = new User();
+      user.userId = opts.sender.userId;
+      user.username = opts.sender.username;
+    }
+    user.isSubscriber = typeof opts.sender.badges.subscriber !== 'undefined';
+    user.isModerator = typeof opts.sender.badges.moderator !== 'undefined';
+    await getRepository(User).save(user);
     let result = false;
-    const isMod = typeof opts.sender.badges.moderator !== 'undefined';
-    const isSubscriber = typeof opts.sender.badges.subscriber !== 'undefined';
-    const isFollower = user.is && user.is.follower ? user.is.follower : false;
     for (const cooldown of data) {
-      if ((isOwner(opts.sender) && !cooldown.isOwnerAffected) || (isMod && !cooldown.isModeratorAffected) || (isSubscriber && !cooldown.isSusbcriberAffected) || (isFollower && !cooldown.isFollowerAffected)) {
+      if ((isOwner(opts.sender) && !cooldown.isOwnerAffected) || (user.isModerator && !cooldown.isModeratorAffected) || (user.isSubscriber && !cooldown.isSusbcriberAffected) || (user.isFollower && !cooldown.isFollowerAffected)) {
         result = true;
         continue;
       }
@@ -283,13 +289,18 @@ class Cooldown extends System {
       return true;
     }
 
-    const user = await global.users.getById(opts.sender.userId);
-    const isMod = typeof opts.sender.badges.moderator !== 'undefined';
-    const isSubscriber = typeof opts.sender.badges.subscriber !== 'undefined';
-    const isFollower = user.is && user.is.follower ? user.is.follower : false;
+    let user = await getRepository(User).findOne({ userId: opts.sender.userId });
+    if (!user) {
+      user = new User();
+      user.userId = opts.sender.userId;
+      user.username = opts.sender.username;
+    }
+    user.isSubscriber = typeof opts.sender.badges.subscriber !== 'undefined';
+    user.isModerator = typeof opts.sender.badges.moderator !== 'undefined';
+    await getRepository(User).save(user);
 
     for (const cooldown of data) {
-      if ((isOwner(opts.sender) && !cooldown.isOwnerAffected) || (isMod && !cooldown.isModeratorAffected) || (isSubscriber && !cooldown.isSusbcriberAffected) || (isFollower && !cooldown.isFollowerAffected)) {
+      if ((isOwner(opts.sender) && !cooldown.isOwnerAffected) || (user.isModerator && !cooldown.isModeratorAffected) || (user.isSubscriber && !cooldown.isSusbcriberAffected) || (user.isFollower && !cooldown.isFollowerAffected)) {
         continue;
       }
 

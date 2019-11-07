@@ -10,6 +10,8 @@ import { globalIgnoreList } from './data/globalIgnoreList';
 import { error } from './helpers/log';
 import { clusteredChatOut, clusteredClientChat, clusteredClientTimeout, clusteredWhisperOut } from './cluster';
 
+import { User } from './entity/user';
+
 export async function autoLoad(directory): Promise<{ [x: string]: any }> {
   const directoryListing = readdirSync(directory);
   const loaded = {};
@@ -251,59 +253,20 @@ export function isBroadcaster(user) {
   }
 }
 
-export async function isModerator(user): Promise<boolean> {
-  try {
-    if (_.isString(user)) {
-      user = await global.users.getByName(user);
-    }
-
-    if (_.has(user, 'is.moderator')) {
-      // from db
-      return user.is.moderator;
-    } else if (_.has(user, 'badges')) {
-      // from message
-      return typeof user.badges.moderator !== 'undefined';
-    } else {
-      return false;
-    }
-  } catch (e) {
-    error(e.stack);
-    return false;
-  }
+export async function isModerator(user: User | undefined): Promise<boolean> {
+  return user?.isModerator ?? false;
 }
 
-export async function isVIP(user) {
-  try {
-    if (_.isString(user)) {
-      user = await global.users.getByName(user);
-    }
-    return !_.isNil(user.is.vip) ? user.is.vip : false;
-  } catch (e) {
-    return false;
-  }
+export async function isVIP(user: User | undefined): Promise<boolean> {
+  return user?.isVIP ?? false;
 }
 
-export async function isFollower(user) {
-  try {
-    if (_.isString(user)) {
-      user = await global.users.getByName(user);
-    }
-    return !_.isNil(user.is.follower) ? user.is.follower : false;
-  } catch (e) {
-    return false;
-  }
+export async function isFollower(user: User | undefined): Promise<boolean> {
+  return user?.isFollower ?? false;
 }
 
-export async function isSubscriber(user) {
-  try {
-    if (_.isString(user)) {
-      user = await global.users.getByName(user);
-    }
-    debug('commons.isSubscriber', JSON.stringify(user));
-    return !_.isNil(user.is.subscriber) ? user.is.subscriber : false;
-  } catch (e) {
-    return false;
-  }
+export async function isSubscriber(user: User | undefined): Promise<boolean> {
+  return user?.isSubscriber ?? false;
 }
 
 export function isBot(user) {

@@ -1,12 +1,12 @@
-import { clusteredFetchAccountAge, isMainThread } from './cluster';
+import { isMainThread } from './cluster';
 import axios from 'axios';
-import { cloneDeep, defaults, filter, get, isEmpty, isNil, set } from 'lodash';
+import { cloneDeep, defaults, filter, get, isNil, set } from 'lodash';
 import { setTimeout } from 'timers';
 
 import * as constants from './constants';
 import Core from './_interface';
 import * as commons from './commons';
-import { debug, error, isDebugEnabled } from './helpers/log';
+import { debug, isDebugEnabled } from './helpers/log';
 import { permission } from './helpers/permissions';
 import { adminEndpoint, viewerEndpoint } from './helpers/socket';
 import { getRepository } from 'typeorm';
@@ -34,81 +34,6 @@ class Users extends Core {
         this.updateWatchTime(true);
         this.updateChatTime();
       }, 30000);
-    }
-  }
-
-  async get (username: string) {
-    console.warn('Deprecated: users.get, use getById or getByName');
-    console.warn(new Error().stack);
-    return this.getByName(username);
-  }
-
-  async getByName (username: string) {
-    username = username.toLowerCase();
-
-    const user = await global.db.engine.findOne('users', { username });
-
-    user.username = get(user, 'username', username).toLowerCase();
-    user.time = get(user, 'time', {});
-    user.is = get(user, 'is', {});
-    user.stats = get(user, 'stats', {});
-    user.custom = get(user, 'custom', {});
-
-    try {
-      if (!isNil(user._id)) {
-        user._id = user._id.toString();
-      } // force retype _id
-      if (isNil(user.time.created_at) && !isNil(user.id)) { // this is accessing master (in points) and worker
-        clusteredFetchAccountAge(username, user.id);
-      }
-    } catch (e) {
-      error(e.stack);
-    }
-    return user;
-  }
-
-  async getById (id: string) {
-    const user = await global.db.engine.findOne('users', { id });
-    user.id = get(user, 'id', id);
-    user.time = get(user, 'time', {});
-    user.is = get(user, 'is', {});
-    user.stats = get(user, 'stats', {});
-    user.custom = get(user, 'custom', {});
-
-    try {
-      if (!isNil(user._id)) {
-        user._id = user._id.toString();
-      } // force retype _id
-      if (isNil(user.time.created_at) && !isNil(user.username)) { // this is accessing master (in points) and worker
-        clusteredFetchAccountAge(user.username, user.id);
-      }
-    } catch (e) {
-      error(e.stack);
-    }
-    return user;
-  }
-
-  async set (username: string, object: Record<string, any>) {
-    if (isNil(username)) {
-      return error('username is NULL!\n' + new Error().stack);
-    }
-
-    username = username.toLowerCase();
-    if (username === global.oauth.botUsername.toLowerCase() || isNil(username)) {
-      return;
-    } // it shouldn't happen, but there can be more than one instance of a bot
-
-    const user = await global.db.engine.findOne('users', { username });
-    object.username = username;
-    if (isEmpty(user)) {
-      const id = await global.api.getIdFromTwitch(username);
-      if (id !== null) {
-        return global.db.engine.update('users', { id }, object);
-      } else {
-        return null;
-      }
-    } else {
-      return global.db.engine.update('users', { id: user.id }, object);
     }
   }
 
@@ -321,16 +246,13 @@ class Users extends Core {
     return username || null;
   }
 
-  async getIdByName (username: string, fetch = true) {
-    let id = (await global.db.engine.findOne('users', { username })).id;
-    if ((typeof id === 'undefined' || id === 'null') && fetch) {
-      id = await global.api.getIdFromTwitch(username);
-      if (id !== null) {
-        // update id with new username
-        await global.db.engine.update('users', { id }, { username });
-      }
+  async getIdByName (username: string) {
+    let user = await getRepository(User).findOne({ username });
+    if (!user) {
+      user = new User();
+      user.userId = await global.api.getIdFromTwitch(username);
     }
-    return id;
+    return user.userId;
   }
 
   sockets () {
@@ -566,13 +488,6 @@ class Users extends Core {
       await global.db.engine.update('users', { id }, viewer);
       cb(null, id);
     });
-  }
-
-  async setById (id: string, object: Record<string, any>) {
-    if (isNil(id)) {
-      return error('id is NULL!\n' + new Error().stack);
-    }
-    return global.db.engine.update('users', { id }, object);
   }
 }
 

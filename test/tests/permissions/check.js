@@ -22,7 +22,7 @@ const users = [
   { username: '__follower__', userId: 5, id: 5, isFollower: true },
   { username: '__viewer__', userId: 6, id: 6 },
   { username: '__viewer_points__', userId: 7, id: 7, points: 100 },
-  { username: '__viewer_watched__', userId: 8, id: 8, watched: 100 * (60 * 60 * 1000 /*hours*/) },
+  { username: '__viewer_watched__', userId: 8, id: 8, watchedTime: 100 * (60 * 60 * 1000 /*hours*/) },
   { username: '__viewer_tips__', userId: 9, id: 9, tips: [{
     currency: 'EUR', amount: 100, sortAmount: 100, timestamp: Math.random(), message: '',
   }] },
@@ -53,13 +53,13 @@ describe('Permissions - check()', () => {
         if (i >= j || (keys[i] === 'VIEWERS' && user.username.includes('viewer'))) {
           // have access
           it(`+++ ${users[j].username} should have access to ${keys[i]}`, async () => {
-            const check = await global.permissions.check(user.id, pHash);
+            const check = await global.permissions.check(user.userId, pHash);
             assert.strictEqual(check.access, true);
           });
         } else {
           // no access
           it(`--- ${users[j].username} should NOT have access to ${keys[i]}`, async () => {
-            const check = await global.permissions.check(user.id, pHash);
+            const check = await global.permissions.check(user.userId, pHash);
             assert.strictEqual(check.access, false);
           });
         }
@@ -86,13 +86,13 @@ describe('Permissions - check()', () => {
       if (user.username === '__viewer__') {
         // have access
         it(`+++ ${users[j].username} should have access to __viewer__only`, async () => {
-          const check = await global.permissions.check(user.id, pHash);
+          const check = await global.permissions.check(user.userId, pHash);
           assert.strictEqual(check.access, true);
         });
       } else {
         // no access
         it(`--- ${users[j].username} should NOT have access to __viewer__only`, async () => {
-          const check = await global.permissions.check(user.id, pHash);
+          const check = await global.permissions.check(user.userId, pHash);
           assert.strictEqual(check.access, false);
         });
       }
@@ -120,13 +120,13 @@ describe('Permissions - check()', () => {
       if (user.username === '__viewer_points__') {
         // have access
         it(`+++ ${users[j].username} should have access to __viewer_points__only`, async () => {
-          const check = await global.permissions.check(user.id, pHash);
+          const check = await global.permissions.check(user.userId, pHash);
           assert.strictEqual(check.access, true);
         });
       } else {
         // no access
         it(`--- ${users[j].username} should NOT have access to __viewer_points__only`, async () => {
-          const check = await global.permissions.check(user.id, pHash);
+          const check = await global.permissions.check(user.userId, pHash);
           assert.strictEqual(check.access, false);
         });
       }
@@ -154,13 +154,13 @@ describe('Permissions - check()', () => {
       if (user.username === '__viewer_watched__') {
         // have access
         it(`+++ ${users[j].username} should have access to __viewer_watched__only`, async () => {
-          const check = await global.permissions.check(user.id, pHash);
+          const check = await global.permissions.check(user.userId, pHash);
           assert.strictEqual(check.access, true);
         });
       } else {
         // no access
         it(`--- ${users[j].username} should NOT have access to __viewer_watched__only`, async () => {
-          const check = await global.permissions.check(user.id, pHash);
+          const check = await global.permissions.check(user.userId, pHash);
           assert.strictEqual(check.access, false);
         });
       }
@@ -188,13 +188,13 @@ describe('Permissions - check()', () => {
       if (user.username === '__viewer_tips__') {
         // have access
         it(`+++ ${users[j].username} should have access to __viewer_tips__only`, async () => {
-          const check = await global.permissions.check(user.id, pHash);
+          const check = await global.permissions.check(user.userId, pHash);
           assert.strictEqual(check.access, true);
         });
       } else {
         // no access
         it(`--- ${users[j].username} should NOT have access to __viewer_tips__only`, async () => {
-          const check = await global.permissions.check(user.id, pHash);
+          const check = await global.permissions.check(user.userId, pHash);
           assert.strictEqual(check.access, false);
         });
       }
@@ -222,13 +222,13 @@ describe('Permissions - check()', () => {
       if (user.username === '__viewer_bits__') {
         // have access
         it(`+++ ${users[j].username} should have access to __viewer_bits__only`, async () => {
-          const check = await global.permissions.check(user.id, pHash);
+          const check = await global.permissions.check(user.userId, pHash);
           assert.strictEqual(check.access, true);
         });
       } else {
         // no access
         it(`--- ${users[j].username} should NOT have access to __viewer_bits__only`, async () => {
-          const check = await global.permissions.check(user.id, pHash);
+          const check = await global.permissions.check(user.userId, pHash);
           assert.strictEqual(check.access, false);
         });
       }
@@ -256,13 +256,13 @@ describe('Permissions - check()', () => {
       if (user.username === '__viewer_messages__') {
         // have access
         it(`+++ ${users[j].username} should have access to __viewer_messages__only`, async () => {
-          const check = await global.permissions.check(user.id, pHash);
+          const check = await global.permissions.check(user.userId, pHash);
           assert.strictEqual(check.access, true);
         });
       } else {
         // no access
         it(`--- ${users[j].username} should NOT have access to __viewer_messages__only`, async () => {
-          const check = await global.permissions.check(user.id, pHash);
+          const check = await global.permissions.check(user.userId, pHash);
           assert.strictEqual(check.access, false);
         });
       }
@@ -290,13 +290,13 @@ describe('Permissions - check()', () => {
       if (user.username === '__viewer_subtier__') {
         // have access
         it(`+++ ${users[j].username} should have access to __viewer_subtier__only`, async () => {
-          const check = await global.permissions.check(user.id, pHash);
+          const check = await global.permissions.check(user.userId, pHash);
           assert.strictEqual(check.access, true);
         });
       } else {
         // no access
         it(`--- ${users[j].username} should NOT have access to __viewer_subtier__only`, async () => {
-          const check = await global.permissions.check(user.id, pHash);
+          const check = await global.permissions.check(user.userId, pHash);
           assert.strictEqual(check.access, false);
         });
       }
@@ -324,13 +324,13 @@ describe('Permissions - check()', () => {
       if (user.username === '__viewer_subcumulativemonths__') {
         // have access
         it(`+++ ${users[j].username} should have access to __viewer_subcumulativemonths__only`, async () => {
-          const check = await global.permissions.check(user.id, pHash);
+          const check = await global.permissions.check(user.userId, pHash);
           assert.strictEqual(check.access, true);
         });
       } else {
         // no access
         it(`--- ${users[j].username} should NOT have access to __viewer_subcumulativemonths__only`, async () => {
-          const check = await global.permissions.check(user.id, pHash);
+          const check = await global.permissions.check(user.userId, pHash);
           assert.strictEqual(check.access, false);
         });
       }
@@ -358,13 +358,13 @@ describe('Permissions - check()', () => {
       if (user.username === '__viewer_substreakmonths__') {
         // have access
         it(`+++ ${users[j].username} should have access to __viewer_substreakmonths__only`, async () => {
-          const check = await global.permissions.check(user.id, pHash);
+          const check = await global.permissions.check(user.userId, pHash);
           assert.strictEqual(check.access, true);
         });
       } else {
         // no access
         it(`--- ${users[j].username} should NOT have access to __viewer_substreakmonths__only`, async () => {
-          const check = await global.permissions.check(user.id, pHash);
+          const check = await global.permissions.check(user.userId, pHash);
           assert.strictEqual(check.access, false);
         });
       }

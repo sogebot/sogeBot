@@ -4,7 +4,7 @@ import crypto from 'crypto';
 import * as _ from 'lodash';
 import { isMainThread } from '../cluster';
 
-import { getOwner, sendMessage } from '../commons';
+import { sendMessage } from '../commons';
 import { command, default_permission } from '../decorators';
 import { permission } from '../permissions';
 import System from './_interface';
@@ -149,11 +149,10 @@ class Timers extends System {
       const response = _.orderBy(responses, 'timestamp', 'asc')[0];
 
       if (!_.isNil(response)) {
-        const userObj = await global.users.getByName(getOwner());
         sendMessage(response.response, {
-          username: userObj.username,
-          displayName: userObj.displayName || userObj.username,
-          userId: userObj.id,
+          username: global.oauth.botUsername,
+          displayName: global.oauth.botUsername,
+          userId: global.oauth.botId,
           emotes: [],
           badges: {},
           'message-type': 'chat',

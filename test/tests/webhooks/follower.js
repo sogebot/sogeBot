@@ -12,6 +12,9 @@ const id = _.random(99999, false);
 const channelId = String(_.random(9999999, false));
 const testuser = { username: 'testuser', userId: id };
 
+const { getRepository } = require('typeorm');
+const { User } = require('../../../dest/entity/user');
+
 describe('libs/webhooks - follower()', () => {
   before(async () => {
     await db.cleanup();

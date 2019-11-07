@@ -49,17 +49,16 @@ class UserInfo extends System {
       username = parsed[0].toLowerCase();
     }
 
-    const isFollowerUpdate = await global.api.isFollowerUpdate({
-      id: await global.users.getIdByName(username),
-    });
+    const id = await global.users.getIdByName(username);
+    const isFollowerUpdate = await global.api.isFollowerUpdate(await getRepository(User).findOne({ userId: id }));
     debug('userinfo.followage', JSON.stringify(isFollowerUpdate));
 
-    const user = await global.users.getByName(username);
-    if (_.isNil(user) || _.isNil(user.time) || _.isNil(user.time.follow) || _.isNil(user.is.follower) || !user.is.follower) {
+    const user = await getRepository(User).findOne({ username });
+    if (!user || !user.isFollower || user.followedAt === 0) {
       sendMessage(prepare('followage.' + (opts.sender.username === username.toLowerCase() ? 'successSameUsername' : 'success') + '.never', { username }), opts.sender, opts.attr);
     } else {
       const units: string[] = ['years', 'months', 'days', 'hours', 'minutes'];
-      const diff = dateDiff(new Date(user.time.follow).getTime(), Date.now());
+      const diff = dateDiff(new Date(user.followedAt).getTime(), Date.now());
 
       const output: string[] = [];
       for (const unit of units) {
@@ -90,12 +89,12 @@ class UserInfo extends System {
       username = parsed[0].toLowerCase();
     }
 
-    const user = await global.users.getByName(username);
-    const subCumulativeMonths = _.get(user, 'stats.subCumulativeMonths', undefined);
+    const user = await getRepository(User).findOne({ username });
+    const subCumulativeMonths = user?.subscribeCumulativeMonths;
     const subStreak = _.get(user, 'stats.subStreak', undefined);
     const localePath = 'subage.' + (opts.sender.username === username.toLowerCase() ? 'successSameUsername' : 'success') + '.';
 
-    if (_.isNil(user) || _.isNil(user.time) || _.isNil(user.time.subscribed_at) || _.isNil(user.is.subscriber) || !user.is.subscriber) {
+    if (!user || !user.isSubscriber || user.subscribedAt === 0) {
       sendMessage(prepare(localePath + (subCumulativeMonths ? 'notNow' : 'never'), {
         username,
         subCumulativeMonths,
@@ -103,7 +102,7 @@ class UserInfo extends System {
       }), opts.sender);
     } else {
       const units: string[] = ['years', 'months', 'days', 'hours', 'minutes'];
-      const diff = dateDiff(new Date(user.time.subscribed_at).getTime(), Date.now());
+      const diff = dateDiff(new Date(user.subscribedAt).getTime(), Date.now());
       const output: string[] = [];
       for (const unit of units) {
         if (diff[unit]) {
@@ -137,12 +136,12 @@ class UserInfo extends System {
       username = parsed[0].toLowerCase();
     }
 
-    const user = await global.users.getByName(username);
-    if (_.isNil(user) || _.isNil(user.time) || _.isNil(user.time.created_at)) {
+    const user = await getRepository(User).findOne({ username });
+    if (!user || user.createdAt === 0) {
       sendMessage(prepare('age.failed', { username }), opts.sender, opts.attr);
     } else {
       const units: string[] = ['years', 'months', 'days', 'hours', 'minutes'];
-      const diff = dateDiff(new Date(user.time.created_at).getTime(), Date.now());
+      const diff = dateDiff(new Date(user.createdAt).getTime(), Date.now());
       const output: string[] = [];
       for (const unit of units) {
         if (diff[unit]) {
@@ -168,14 +167,14 @@ class UserInfo extends System {
         throw new Error();
       }
 
-      const user = await global.users.getByName(parsed[0]);
-      if (_.isNil(user) || _.isNil(user.time) || _.isNil(user.time.message)) {
+      const user = await getRepository(User).findOne({ username: parsed[0] });
+      if (!user || user.seenAt === 0) {
         sendMessage(global.translate('lastseen.success.never').replace(/\$username/g, parsed[0]), opts.sender, opts.attr);
       } else {
         moment.locale(global.lib.translate.lang);
         sendMessage(global.translate('lastseen.success.time')
           .replace(/\$username/g, parsed[0])
-          .replace(/\$when/g, moment(user.time.message).format(this.lastSeenFormat)), opts.sender);
+          .replace(/\$when/g, moment(user.seenAt).format(this.lastSeenFormat)), opts.sender);
       }
     } catch (e) {
       sendMessage(global.translate('lastseen.failed.parse'), opts.sender, opts.attr);
@@ -226,7 +225,7 @@ class UserInfo extends System {
 
       if (message.includes('$rank')) {
         const idx = message.indexOf('$rank');
-        const rank = await global.systems.ranks.get(opts.sender.username);
+        const rank = await global.systems.ranks.get(await getRepository(User).findOne({ userId: opts.sender.userId }));
         if (global.systems.ranks.enabled && !_.isNull(rank)) {
           message[idx] = rank;
         } else {
@@ -291,10 +290,11 @@ class UserInfo extends System {
   @onMessage()
   public async onMessage(opts: onEventMessage) {
     if (!_.isNil(opts.sender) && !_.isNil(opts.sender.userId) && !_.isNil(opts.sender.username)) {
-      global.users.setById(opts.sender.userId, {
-        username: opts.sender.username,
-        time: { message: new Date().getTime() },
-        is: { subscriber: typeof opts.sender.badges.subscriber !== 'undefined' },
+      await getRepository(User).update({
+        userId: opts.sender.userId,
+      }, {
+        seenAt: Date.now(),
+        isSubscriber: typeof opts.sender !== 'undefined',
       });
     }
   }

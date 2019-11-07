@@ -13,6 +13,7 @@ import { adminEndpoint } from './helpers/socket';
 
 import { PermissionCommands, PermissionFilters, Permissions as PermissionsEntity } from './entity/permissions';
 import { getRepository, LessThan } from 'typeorm';
+import { User } from './entity/user';
 
 let isWarnedAboutCasters = false;
 
@@ -144,21 +145,14 @@ class Permissions extends Core {
       const pItem = await getRepository(PermissionsEntity).findOne({ id: permission.CASTERS });
       return { access: true, permission: pItem };
     }
-    const user: User & {
-      tips: User.Tips[]; bits: User.Bits[]; points: User.Points[]; watched: User.Watched[]; messages: User.Messages[];
-    } = await global.db.engine.findOne('users', { id: userId }, [
-      { from: 'users.tips', as: 'tips', foreignField: 'id', localField: 'id' },
-      { from: 'users.bits', as: 'bits', foreignField: 'id', localField: 'id' },
-      { from: 'users.points', as: 'points', foreignField: 'id', localField: 'id' },
-      { from: 'users.messages', as: 'messages', foreignField: 'id', localField: 'id' },
-      { from: 'users.watched', as: 'watched', foreignField: 'id', localField: 'id' },
-    ]);
+
+    const user = await getRepository(User).findOne({ userId });
     const pItem = (await getRepository(PermissionsEntity).findOne({
       relations: ['filters'],
       where: { id: permId },
     })) as PermissionsEntity;
     try {
-      if (typeof user.id === 'undefined') {
+      if (!user) {
         return { access: permId === permission.VIEWERS, permission: pItem };
       }
       if (!pItem) {
@@ -222,9 +216,7 @@ class Permissions extends Core {
   }
 
   protected filters(
-    user: User & {
-      tips: User.Tips[]; bits: User.Bits[]; points: User.Points[]; watched: User.Watched[]; messages: User.Messages[];
-    },
+    user: User,
     filters: PermissionFilters[] = [],
   ): boolean {
     for (const f of filters) {
@@ -234,25 +226,25 @@ class Permissions extends Core {
           amount = user.bits.reduce((a, b) => (a + b.amount), 0);
           break;
         case 'messages':
-          amount = user.messages.reduce((a, b) => (a + b.messages), 0);
+          amount = user.messages;
           break;
         case 'points':
-          amount = user.points.reduce((a, b) => (a + b.points), 0);
+          amount = user.points;
           break;
         case 'subcumulativemonths':
-          amount = user.stats.subCumulativeMonths || 0;
+          amount = user.subscribeCumulativeMonths;
           break;
         case 'substreakmonths':
-          amount = user.stats.subStreak || 0;
+          amount = user.subscribeStreak;
           break;
         case 'subtier':
-          amount = user.stats.tier || 0;
+          amount = user.subscribeTier === 'Prime' ? 1 : Number(user.subscribeTier);
           break;
         case 'tips':
           amount = user.tips.reduce((a, b) => (a + global.currency.exchange(b.amount, b.currency, global.currency.mainCurrency)), 0);
           break;
         case 'watched':
-          amount = user.watched.reduce((a, b) => (a + b.watched), 0) / (60 * 60 * 1000 /*hours*/);
+          amount = user.watchedTime / (60 * 60 * 1000 /*hours*/);
       }
 
       switch (f.comparator) {

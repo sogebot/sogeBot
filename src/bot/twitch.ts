@@ -69,7 +69,7 @@ class Twitch extends Core {
       .andWhere('isOnline = :isOnline', { isOnline: true })
       .getMany())
       .filter(o => {
-        return isIgnored({ username: o.username, userId: o.userId });
+        return !isIgnored({ username: o.username, userId: o.userId });
       });
     moment.locale(global.general.lang);
 
@@ -104,7 +104,7 @@ class Twitch extends Core {
       .andWhere('isSubscriber = :isSubscriber', { isSubscriber: true })
       .andWhere('isOnline = :isOnline', { isOnline: true })
       .getMany()).filter(o => {
-      return isIgnored({ username: o.username, userId: o.userId });
+      return !isIgnored({ username: o.username, userId: o.userId });
     });
 
     moment.locale(global.general.lang);

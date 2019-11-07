@@ -16,6 +16,7 @@ const { UsersOnline } = require('../../dest/entity/usersOnline');
 const { Keyword } = require('../../dest/entity/keyword');
 const { Settings } = require('../../dest/entity/settings');
 const { Quotes } = require('../../dest/entity/quotes');
+const { User } = require('../../dest/entity/user');
 
 let isDbConnected = false;
 
@@ -31,7 +32,7 @@ module.exports = {
 
       debug('test', chalk.bgRed('*** Cleaning up collections ***'));
 
-      const entities = [Alias, Bets, Commands, CommandsResponses, CommandsCount, Quotes, Settings, Cooldown, UsersOnline, Keyword];
+      const entities = [Alias, Bets, Commands, CommandsResponses, CommandsCount, Quotes, Settings, Cooldown, UsersOnline, Keyword, User];
       for (const entity of entities) {
         for (const item of (await getManager().createQueryBuilder().select('entity').from(entity, 'entity').getMany())) {
           await getManager().createQueryBuilder().delete().from(entity).where('id = :id', { id: item.id }).execute();

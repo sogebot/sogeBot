@@ -13,7 +13,7 @@ const testuser2 = { username: 'testuser2', id: Math.floor(Math.random() * 1000) 
 const testuser3 = { username: 'testuser3', id: Math.floor(Math.random() * 1000) };
 
 const { getRepository } = require('typeorm');
-const { UsersOnline } = require('../../../dest/entity/usersOnline');
+const { User } = require('../../../dest/entity/user');
 
 describe('lib/twitch - subs()', () => {
   before(async () => {
@@ -70,9 +70,7 @@ describe('lib/twitch - subs()', () => {
   });
 
   it('Add testuser, testuser2, testuser3 to online users', async () => {
-    for (const u of [testuser, testuser2, testuser3]) {
-      await getRepository(UsersOnline).save({ username: u.username })
-    }
+    await getRepository(User).update({}, { isOnline: true });
   });
 
   it('!subs should return testuser3 and 3 online subs', async () => {

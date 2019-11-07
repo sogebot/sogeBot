@@ -16,6 +16,7 @@ import { chatOut } from '../helpers/log';
 import { adminEndpoint } from '../helpers/socket';
 import { getRepository } from 'typeorm';
 import { Commands, CommandsResponses } from '../entity/commands';
+import { User } from '../entity/user';
 
 /*
  * !command                                                                 - gets an info about command usage
@@ -363,16 +364,22 @@ class CustomCommands extends System {
     }
     const toEval = `(function evaluation () { return ${filter} })()`;
 
-    const $userObject = await global.users.getByName(opts.sender.username);
-    let $rank = null;
+    let $userObject = await getRepository(User).findOne({ userId: opts.sender.userId });
+    if (!$userObject) {
+      $userObject = new User();
+      $userObject.userId = opts.sender.userId;
+      $userObject.username = opts.sender.username;
+      await getRepository(User).save($userObject);
+    }
+    let $rank: string | null = null;
     if (global.systems.ranks.enabled) {
       $rank = await global.systems.ranks.get($userObject);
     }
 
     const $is = {
-      moderator: await isModerator(opts.sender.username),
-      subscriber: await isSubscriber(opts.sender.username),
-      vip: await isVIP(opts.sender.username),
+      moderator: await isModerator($userObject),
+      subscriber: await isSubscriber($userObject),
+      vip: await isVIP($userObject),
       broadcaster: isBroadcaster(opts.sender.username),
       bot: isBot(opts.sender.username),
       owner: isOwner(opts.sender.username),

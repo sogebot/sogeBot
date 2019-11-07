@@ -205,17 +205,21 @@ class API extends Core {
     }
 
     for (const username of this.rate_limit_follower_check) {
-      const user = await global.users.getByName(username);
-      const isSkipped = user.username === getBroadcaster() || user.username === global.oauth.botUsername;
-      const userHaveId = !isNil(user.id);
-      if (new Date().getTime() - get(user, 'time.followCheck', 0) <= 1000 * 60 * 60 * 24 || isSkipped || !userHaveId) {
-        this.rate_limit_follower_check.delete(user.username);
+      const user = await getRepository(User).findOne({ username });
+      if (user) {
+        const isSkipped = user.username === getBroadcaster() || user.username === global.oauth.botUsername;
+        const userHaveId = !isNil(user.id);
+        if (new Date().getTime() - get(user, 'time.followCheck', 0) <= 1000 * 60 * 60 * 24 || isSkipped || !userHaveId) {
+          this.rate_limit_follower_check.delete(user.username);
+        }
       }
     }
     if (this.rate_limit_follower_check.size > 0 && !isNil(global.overlays)) {
-      const user = await global.users.getByName(Array.from(this.rate_limit_follower_check)[0]);
-      this.rate_limit_follower_check.delete(user.username);
-      await this.isFollowerUpdate(user);
+      const user = await getRepository(User).findOne({ username: Array.from(this.rate_limit_follower_check)[0] });
+      if (user) {
+        this.rate_limit_follower_check.delete(user.username);
+        await this.isFollowerUpdate(user);
+      }
     }
     return { state: true };
   }
@@ -544,7 +548,7 @@ class API extends Core {
       {
         username: user.user_name.toLowerCase(),
         isSubscriber: true,
-        subscribeTier: user.tier / 1000,
+        subscribeTier: String(user.tier / 1000),
       });
     }
   }
@@ -740,9 +744,12 @@ class API extends Core {
           await setImmediateAwait(); // throttle down
 
           f.from_name = String(f.from_name).toLowerCase();
-          const user = await global.users.getById(f.from_id);
+          const user = await getRepository(User).findOne({ userId: f.from_id });
+          if (!user) {
+            continue;
+          }
+
           user.username = f.from_name;
-          global.db.engine.update('users', { id: f.from_id }, { username: f.from_name });
 
           if (!get(user, 'is.follower', false)) {
             if (new Date().getTime() - new Date(f.followed_at).getTime() < 2 * constants.HOUR) {
@@ -775,9 +782,9 @@ class API extends Core {
             }
           }
           try {
-            const followedAt = user.lock && user.lock.followed_at ? Number(user.time.follow) : new Date(f.followed_at).getTime();
-            const isFollower = user.lock && user.lock.follower ? user.is.follower : true;
-            global.db.engine.update('users', { id: f.from_id }, { username: f.from_name, is: { follower: isFollower }, time: { followCheck: new Date().getTime(), follow: followedAt } });
+            user.followedAt = new Date(f.followed_at).getTime();
+            user.isFollower = true;
+            await getRepository(User).save(user);
           } catch (e) {
             error(e.stack);
           }
@@ -1510,21 +1517,24 @@ class API extends Core {
       }
       return;
     }
-    await global.db.engine.update('users', { id }, { username: username, time: { created_at: new Date(request.data.created_at).getTime() } });
+    await getRepository(User).update({ userId: id }, { createdAt: new Date(request.data.created_at).getTime() });
   }
 
   async isFollower (username) {
     this.rate_limit_follower_check.add(username);
   }
 
-  async isFollowerUpdate (user) {
-    if (!user.id && !user.userId) {
+  async isFollowerUpdate (user: User | undefined) {
+    if (!user || !user.userId) {
       return;
     }
-    const id = user.id || user.userId;
+    const id = user.userId;
 
     // reload user from db
-    user = await global.users.getById(id);
+    user = {
+      ...user,
+      ...await getRepository(User).findOne({ userId: id }),
+    };
 
     clearTimeout(this.timeouts['isFollowerUpdate-' + id]);
 
@@ -1571,17 +1581,18 @@ class API extends Core {
     if (request.data.total === 0) {
       // not a follower
       // if was follower, fire unfollow event
-      if (user.is.follower) {
+      if (user.isFollower) {
         unfollow(user.username);
         global.events.fire('unfollow', { username: user.username });
       }
-      const followedAt = user.lock && user.lock.followed_at ? Number(user.time.follow) : 0;
-      const isFollower = user.lock && user.lock.follower ? user.is.follower : false;
-      await global.users.setById(id, { username: user.username, is: { follower: isFollower }, time: { followCheck: new Date().getTime(), follow: followedAt } });
-      return { isFollower: false, followedAt: null };
+      user.isFollower = false;
+      user.followedAt = 0;
+      user.followCheckAt = Date.now();
+      await getRepository(User).save(user);
+      return { isFollower: user.isFollower, followedAt: user.followedAt };
     } else {
       // is follower
-      if (!user.is.follower && new Date().getTime() - new Date(request.data.data[0].followed_at).getTime() < 60000 * 60) {
+      if (!user.isFollower && new Date().getTime() - new Date(request.data.data[0].followed_at).getTime() < 60000 * 60) {
         global.overlays.eventlist.add({
           event: 'follow',
           username: user.username,
@@ -1604,10 +1615,12 @@ class API extends Core {
           userId: id,
         });
       }
-      const followedAt = user.lock && user.lock.followed_at ? Number(user.time.follow) : parseInt(moment(request.data.data[0].followed_at).format('x'), 10);
-      const isFollower = user.lock && user.lock.follower ? user.is.follower : true;
-      await global.users.set(user.username, { id, is: { follower: isFollower }, time: { followCheck: new Date().getTime(), follow: followedAt } });
-      return { isFollower, followedAt };
+
+      user.isFollower = true;
+      user.followedAt = Number(moment(request.data.data[0].followed_at).format('x'));
+      user.followCheckAt = Date.now();
+      await getRepository(User).save(user);
+      return { isFollower: user.isFollower, followedAt: user.followedAt };
     }
   }
 

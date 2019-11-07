@@ -155,11 +155,10 @@ class Events extends Core {
     if (cid) { // OK
       if (Boolean(operation.announce) === true) {
         const message = await prepare('api.clips.created', { link: `https://clips.twitch.tv/${cid}` });
-        const userObj = await global.users.getByName(getOwner());
         sendMessage(message, {
-          username: userObj.username,
-          displayName: userObj.displayName || userObj.username,
-          userId: userObj.id,
+          username: global.oauth.botUsername,
+          displayName: global.oauth.botUsername,
+          userId: global.oauth.botId,
           emotes: [],
           badges: {},
           'message-type': 'chat',
@@ -262,7 +261,15 @@ class Events extends Core {
 
   public async fireSendChatMessageOrWhisper(operation, attributes, whisper) {
     const username = _.isNil(attributes.username) ? getOwner() : attributes.username;
-    const userObj = await global.users.getByName(username);
+    let userObj = await getRepository(User).findOne({ username });
+    if (!userObj) {
+      userObj = new User();
+      userObj.userId = await global.api.getIdFromTwitch(username);
+      userObj.username = username;
+      await getRepository(User).save(userObj);
+    }
+
+
     let message = operation.messageToSend;
     const atUsername = global.tmi.showWithAt;
 
@@ -280,8 +287,8 @@ class Events extends Core {
     }
     sendMessage(message, {
       username,
-      displayName: userObj.displayName || username,
-      userId: userObj.id,
+      displayName: userObj.displayname || username,
+      userId: userObj.userId,
       emotes: [],
       badges: {},
       'message-type': (whisper ? 'whisper' : 'chat'),

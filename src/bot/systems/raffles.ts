@@ -118,11 +118,10 @@ class Raffles extends System {
       max: raffle.max,
       eligibility: eligibility.join(', '),
     });
-    const userObj = await global.users.getByName(getOwner());
     sendMessage(message, {
-      username: userObj.username,
-      displayName: userObj.displayName || userObj.username,
-      userId: userObj.id,
+      username: global.oauth.botUsername,
+      displayName: global.oauth.botUsername,
+      userId: global.oauth.botId,
       emotes: [],
       badges: {},
       'message-type': 'chat',
@@ -219,11 +218,10 @@ class Raffles extends System {
       min: minTickets,
       max: maxTickets,
     });
-    const userObj = await global.users.getByName(getOwner());
     sendMessage(message, {
-      username: userObj.username,
-      displayName: userObj.displayName || userObj.username,
-      userId: userObj.id,
+      username: global.oauth.botUsername,
+      displayName: global.oauth.botUsername,
+      userId: global.oauth.botId,
       emotes: [],
       badges: {},
       'message-type': 'chat',
@@ -264,11 +262,10 @@ class Raffles extends System {
       max: raffle.max,
       eligibility: eligibility.join(', '),
     });
-    const userObj = await global.users.getByName(getOwner());
     sendMessage(message, {
-      username: userObj.username,
-      displayName: userObj.displayName || userObj.username,
-      userId: userObj.id,
+      username: global.oauth.botUsername,
+      displayName: global.oauth.botUsername,
+      userId: global.oauth.botId,
       emotes: [],
       badges: {},
       'message-type': 'chat',
@@ -281,7 +278,15 @@ class Raffles extends System {
       return true;
     }
 
-    const [raffle, user] = await Promise.all([global.db.engine.findOne(this.collection.data, { winner: null }), global.users.getByName(opts.sender.username)]);
+    const raffle = await global.db.engine.findOne(this.collection.data, { winner: null });
+    let user = await getRepository(User).findOne({ username: opts.sender.username });
+    if (!user) {
+      user = new User();
+      user.userId = opts.sender.userId;
+      user.username = opts.sender.username;
+      await getRepository(User).save(user);
+    }
+
     if (_.isEmpty(raffle)) {
       return true;
     }
@@ -324,7 +329,10 @@ class Raffles extends System {
       tickets: raffle.type === TYPE_NORMAL ? 1 : newTickets,
       username: opts.sender.username,
       messages: [],
-      is: user.is,
+      is: {
+        follower: user.isFollower,
+        subscriber: user.isSubscriber,
+      },
       raffle_id: raffle._id.toString(),
     };
     if (raffle.type === TYPE_TICKETS && await global.systems.points.getPointsOf(opts.sender.userId) < tickets) {
@@ -332,11 +340,11 @@ class Raffles extends System {
     } // user doesn't have enough points
 
     if (raffle.followers && raffle.subscribers) {
-      participantUser.eligible = (!_.isNil(user.is.follower) && user.is.follower) || (!_.isNil(user.is.subscriber) && user.is.subscriber);
+      participantUser.eligible = user.isFollower || user.isSubscriber;
     } else if (raffle.followers) {
-      participantUser.eligible = !_.isNil(user.is.follower) && user.is.follower;
+      participantUser.eligible = user.isFollower;
     } else if (raffle.subscribers) {
-      participantUser.eligible = !_.isNil(user.is.subscriber) && user.is.subscriber;
+      participantUser.eligible = user.isSubscriber;
     }
 
     if (participantUser.eligible) {
@@ -362,11 +370,10 @@ class Raffles extends System {
     const participants = await global.db.engine.find(this.collection.participants, { raffle_id: raffle._id.toString(), eligible: true });
     if (participants.length === 0) {
       const message = await prepare('raffles.no-participants-to-pick-winner');
-      const userObj = await global.users.getByName(getOwner());
       sendMessage(message, {
-        username: userObj.username,
-        displayName: userObj.displayName || userObj.username,
-        userId: userObj.id,
+        username: global.oauth.botUsername,
+        displayName: global.oauth.botUsername,
+        userId: global.oauth.botId,
         emotes: [],
         badges: {},
         'message-type': 'chat',
@@ -430,11 +437,10 @@ class Raffles extends System {
       keyword: raffle.keyword,
       probability: _.round(probability, 2),
     });
-    const userObj = await global.users.getByName(getOwner());
     sendMessage(message, {
-      username: userObj.username,
-      displayName: userObj.displayName || userObj.username,
-      userId: userObj.id,
+      username: global.oauth.botUsername,
+      displayName: global.oauth.botUsername,
+      userId: global.oauth.botId,
       emotes: [],
       badges: {},
       'message-type': 'chat',

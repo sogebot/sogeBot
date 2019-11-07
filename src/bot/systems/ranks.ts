@@ -8,6 +8,9 @@ import { permission } from '../permissions';
 import System from './_interface';
 import uuid from 'uuid';
 
+import { User } from '../entity/user';
+import { getRepository } from 'typeorm';
+
 /*
  * !rank                       - show user rank
  * !rank add <hours> <rank>    - add <rank> for selected <hours>
@@ -86,8 +89,7 @@ class Ranks extends System {
       return false;
     }
 
-    global.users.set(parsed[1], { custom: { rank: parsed[2].trim() } });
-
+    await getRepository(User).update({ userId: parsed[1] }, { haveCustomRank: true, rank: parsed[2].trim() });
     const message = await prepare('ranks.custom-rank-was-set-to-user', { rank: parsed[2].trim(), username: parsed[1] });
     sendMessage(message, opts.sender, opts.attr);
   }
@@ -103,7 +105,7 @@ class Ranks extends System {
       return false;
     }
 
-    global.users.set(parsed[1], { custom: { rank: null } });
+    await getRepository(User).update({ userId: parsed[1] }, { haveCustomRank: false, rank: '' });
     const message = await prepare('ranks.custom-rank-was-unset-for-user', { username: parsed[1] });
     sendMessage(message, opts.sender, opts.attr);
   }
@@ -177,22 +179,20 @@ class Ranks extends System {
     sendMessage(message, opts.sender, opts.attr);
   }
 
-  async get (user) {
-    if (!_.isObject(user)) {
-      user = await global.users.getByName(user);
-    }
-    if (!_.isNil(user.custom.rank)) {
-      return user.custom.rank;
+  async get (user: User | undefined) {
+    if (!user) {
+      return '';
     }
 
-    const [watched, ranks] = await Promise.all([
-      global.users.getWatchedOf(user.id),
-      global.db.engine.find(this.collection.data),
-    ]);
+    if (user.haveCustomRank) {
+      return user.rank;
+    }
+
+    const ranks = await global.db.engine.find(this.collection.data);
     let rankToReturn = null;
 
     for (const rank of _.orderBy(ranks, 'hours', 'asc')) {
-      if (watched / 1000 / 60 / 60 >= rank.hours) {
+      if (user.watchedTime / 1000 / 60 / 60 >= rank.hours) {
         rankToReturn = rank.value;
       } else {
         break;

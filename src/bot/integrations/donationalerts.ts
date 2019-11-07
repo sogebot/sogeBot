@@ -116,7 +116,7 @@ class Donationalerts extends Integration {
           let user = await getRepository(User).findOne({ where: { username: data.username.toLowerCase() }});
           let id;
           if (!user) {
-            id = await global.users.getIdByName(data.username.toLowerCase(), false);
+            id = await global.users.getIdByName(data.username.toLowerCase());
             user = await getRepository(User).findOne({ where: { userId: id }});
             if (!user && id) {
               // if we still doesn't have user, we create new

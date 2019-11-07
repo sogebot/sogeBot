@@ -59,8 +59,8 @@ export class User {
   @Column('bigint', { transformer: new ColumnNumericTransformer(), default: 0 })
   pointsByMessageGivenAt!: number;
 
-  @Column({ default: 0 })
-  subscribeTier!: number;
+  @Column({ default: '0' })
+  subscribeTier!: string;
   @Column({ default: 0 })
   subscribeCumulativeMonths!: number;
   @Column({ default: 0 })

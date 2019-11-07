@@ -4,7 +4,7 @@ import { isMainThread } from '../cluster';
 import Expects from '../expects.js';
 import Game from './_interface';
 import { command, settings, shared, ui } from '../decorators';
-import { getLocalizedName, getOwner, sendMessage } from '../commons.js';
+import { getLocalizedName, sendMessage } from '../commons.js';
 import { warning } from '../helpers/log.js';
 
 import { getRepository } from 'typeorm';
@@ -124,12 +124,11 @@ class Heist extends Game {
         return; // don't do anything if there is no level
       }
 
-      const userObj = await global.users.getByName(getOwner());
       if (users.length === 0) {
         sendMessage(this.noUser, {
-          username: userObj.username,
-          displayName: userObj.displayName || userObj.username,
-          userId: userObj.id,
+          username: global.oauth.botUsername,
+          displayName: global.oauth.botUsername,
+          userId: global.oauth.botId,
           emotes: [],
           badges: {},
           'message-type': 'chat',
@@ -142,9 +141,9 @@ class Heist extends Game {
       }
 
       sendMessage(started.replace('$bank', level.name), {
-        username: userObj.username,
-        displayName: userObj.displayName || userObj.username,
-        userId: userObj.id,
+        username: global.oauth.botUsername,
+        displayName: global.oauth.botUsername,
+        userId: global.oauth.botId,
         emotes: [],
         badges: {},
         'message-type': 'chat',
@@ -157,9 +156,9 @@ class Heist extends Game {
         const outcome = isSurvivor ? this.singleUserSuccess : this.singleUserFailed;
         global.setTimeout(async () => {
           sendMessage(outcome.replace('$user', (global.tmi.showWithAt ? '@' : '') + user.username), {
-            username: userObj.username,
-            displayName: userObj.displayName || userObj.username,
-            userId: userObj.id,
+            username: global.oauth.botUsername,
+            displayName: global.oauth.botUsername,
+            userId: global.oauth.botId,
             emotes: [],
             badges: {},
             'message-type': 'chat',
@@ -188,9 +187,9 @@ class Heist extends Game {
         const result = _.find(ordered, (o) => o.percentage >= percentage);
         global.setTimeout(async () => {
           sendMessage(_.isNil(result) ? '' : result.message, {
-            username: userObj.username,
-            displayName: userObj.displayName || userObj.username,
-            userId: userObj.id,
+            username: global.oauth.botUsername,
+            displayName: global.oauth.botUsername,
+            userId: global.oauth.botId,
             emotes: [],
             badges: {},
             'message-type': 'chat',
@@ -208,9 +207,9 @@ class Heist extends Game {
               message = message + ' ' + (await global.translate('games.heist.andXMore')).replace('$count', andXMore);
             }
             sendMessage(message, {
-              username: userObj.username,
-              displayName: userObj.displayName || userObj.username,
-              userId: userObj.id,
+              username: global.oauth.botUsername,
+              displayName: global.oauth.botUsername,
+              userId: global.oauth.botId,
               emotes: [],
               badges: {},
               'message-type': 'chat',
@@ -228,11 +227,10 @@ class Heist extends Game {
     // check if cops done patrolling
     if (lastHeistTimestamp !== 0 && _.now() - lastHeistTimestamp >= copsCooldown * 60000) {
       this.lastHeistTimestamp = 0;
-      const userObj = await global.users.getByName(getOwner());
       sendMessage((this.copsCooldown), {
-        username: userObj.username,
-        displayName: userObj.displayName || userObj.username,
-        userId: userObj.id,
+        username: global.oauth.botUsername,
+        displayName: global.oauth.botUsername,
+        userId: global.oauth.botId,
         emotes: [],
         badges: {},
         'message-type': 'chat',

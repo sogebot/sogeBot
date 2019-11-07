@@ -421,18 +421,20 @@ class TMI extends Core {
         return;
       }
 
-      const user = await global.db.engine.findOne('users', { id: userstate.userId });
-      let subscribedAt: undefined | number = Date.now();
-      let isSubscriber: undefined | boolean = true;
-
-      if (user.lock && user.lock.subscribed_at) {
-        subscribedAt = undefined;
-      }
-      if (user.lock && user.lock.subscriber) {
-        isSubscriber = undefined;
+      let user = await getRepository(User).findOne({ userId: userstate.userId });
+      if (!user) {
+        user = new User();
+        user.userId = userstate.userId;
+        user.username = userstate.username;
       }
 
-      await global.users.setById(userstate.userId, { username, is: { subscriber: isSubscriber }, time: { subscribed_at: subscribedAt }, stats: { subStreak: 1, subCumulativeMonths, tier } });
+      user.isSubscriber = true;
+      user.subscribedAt = Date.now();
+      user.subscribeTier = String(tier);
+      user.subscribeCumulativeMonths = subCumulativeMonths;
+      user.subscribeStreak = 0;
+      await getRepository(User).save(user);
+
       global.overlays.eventlist.add({
         event: 'sub',
         tier: String(tier),
@@ -473,26 +475,27 @@ class TMI extends Core {
       const streakMonths = Number(message.parameters.streakMonths);
       const userstate = message.tags;
       const messageFromUser = message.message;
-      const tier = method.prime ? 'Prime' : method.plan / 1000;
+      const tier = method.prime ? 'Prime' : String(method.plan / 1000);
 
       if (isIgnored({username, userId: userstate.userId})) {
         return;
       }
 
-      const user = await global.db.engine.findOne('users', { id: userstate.userId });
-
-      let subscribed_at: undefined | number = subStreakShareEnabled ? Number(moment().subtract(streakMonths, 'months').format('X')) * 1000 : undefined;
       const subStreak = subStreakShareEnabled ? streakMonths : 0;
-      let isSubscriber: undefined | boolean = true;
 
-      if (user.lock && user.lock.subscribed_at) {
-        subscribed_at = undefined;
-      }
-      if (user.lock && user.lock.subscriber) {
-        isSubscriber = undefined;
+      let user = await getRepository(User).findOne({ userId: userstate.userId });
+      if (!user) {
+        user = new User();
+        user.userId = userstate.userId;
+        user.username = userstate.username;
       }
 
-      await global.users.setById(userstate.userId, { username, id: userstate.userId, is: { subscriber: isSubscriber }, time: { subscribed_at }, stats: { subStreak, subCumulativeMonths, tier } });
+      user.isSubscriber = true;
+      user.subscribedAt =  Number(moment().subtract(streakMonths, 'months').format('X')) * 1000;
+      user.subscribeTier = tier;
+      user.subscribeCumulativeMonths = subCumulativeMonths;
+      user.subscribeStreak = subStreak;
+      await getRepository(User).save(user);
 
       global.overlays.eventlist.add({
         event: 'resub',
@@ -607,23 +610,20 @@ class TMI extends Core {
         return;
       }
 
-      const user = await global.db.engine.findOne('users', { id: recipientId });
-      if (!user.id) {
-        user.id = recipientId;
+      let user = await getRepository(User).findOne({ userId: recipientId });
+      if (!user) {
+        user = new User();
+        user.userId = recipientId;
+        user.username = recipient;
       }
 
-      let subscribedAt: undefined | number = Date.now();
-      let isSubscriber: undefined | boolean = true;
+      user.isSubscriber = true;
+      user.subscribedAt = Date.now();
+      user.subscribeTier = String(tier);
+      user.subscribeCumulativeMonths = subCumulativeMonths;
+      user.subscribeStreak += 1;
+      await getRepository(User).save(user);
 
-      if (user.lock && user.lock.subscribed_at) {
-        subscribedAt = undefined;
-      }
-      if (user.lock && user.lock.subscriber) {
-        isSubscriber = undefined;
-      }
-
-      await global.users.setById(user.id, { username: recipient, is: { subscriber: isSubscriber }, time: { subscribed_at: subscribedAt }, stats: { subCumulativeMonths, tier } });
-      await getRepository(User).increment({ userId: user.id }, 'subscribeStreak', 1);
       global.overlays.eventlist.add({
         event: 'subgift',
         username: recipient,
@@ -775,7 +775,7 @@ class TMI extends Core {
         user.isModerator = user.isModerator ?? typeof sender.badges.moderator !== 'undefined';
         user.isSubscriber = user.isSubscriber ?? typeof sender.badges.subscriber !== 'undefined';
         user.messages = user.messages ?? 0;
-        user.subscribeTier = typeof sender.badges.subscriber !== 'undefined' ? 0 : user.subscribeTier;
+        user.subscribeTier = String(typeof sender.badges.subscriber !== 'undefined' ? 0 : user.subscribeTier);
         user.subscribeCumulativeMonths = subCumulativeMonths(sender) || user.subscribeCumulativeMonths;
 
         await getRepository(User).save(user);

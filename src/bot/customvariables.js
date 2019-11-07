@@ -280,7 +280,7 @@ class CustomVariables {
       param: param,
       _current: opts._current,
       user: async (username) => {
-        const _user = await global.users.getByName(username);
+        const _user = await getRepository(User).findOne({ username });
 
         const isUserOnline = typeof (await getRepository(UsersOnline).findOne({
           where: { username: sender.username },

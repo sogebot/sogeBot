@@ -88,21 +88,20 @@ class Bets extends System {
       if (currentBet.endedAt <= Date.now()) {
         currentBet.isLocked = true;
 
-        const userObj = await global.users.getByName(getOwner());
         if (currentBet.participations.length > 0) {
           sendMessage(global.translate('bets.locked'), {
-            username: userObj.username,
-            displayName: userObj.displayName || userObj.username,
-            userId: userObj.id,
+            username: global.oauth.botUsername,
+            displayName: global.oauth.botUsername,
+            userId: global.oauth.botId,
             emotes: [],
             badges: {},
             'message-type': 'chat',
           });
         } else {
           sendMessage(global.translate('bets.removed'), {
-            username: userObj.username,
-            displayName: userObj.displayName || userObj.username,
-            userId: userObj.id,
+            username: global.oauth.botUsername,
+            displayName: global.oauth.botUsername,
+            userId: global.oauth.botId,
             emotes: [],
             badges: {},
             'message-type': 'chat',

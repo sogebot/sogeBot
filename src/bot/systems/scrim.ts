@@ -1,6 +1,6 @@
 import { isMainThread } from '../cluster';
 
-import { getBotSender, getLocalizedName, getOwner, prepare, round5, sendMessage } from '../commons';
+import { getBotSender, getLocalizedName, prepare, round5, sendMessage } from '../commons';
 import * as constants from '../constants';
 import { debug } from '../helpers/log';
 import { command, default_permission, settings, shared } from '../decorators';
@@ -106,13 +106,11 @@ class Scrim extends System {
   public async stop(): Promise<void> {
     this.closingAt = 0;
     this.lastRemindAt = Date.now();
-
-    const userObj = await global.users.getByName(getOwner());
     sendMessage(
       prepare('systems.scrim.stopped'), {
-        username: userObj.username,
-        displayName: userObj.displayName || userObj.username,
-        userId: userObj.id,
+        username: global.oauth.botUsername,
+        displayName: global.oauth.botUsername,
+        userId: global.oauth.botId,
         emotes: [],
         badges: {},
         'message-type': 'chat',

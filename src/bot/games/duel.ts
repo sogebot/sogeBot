@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import { isMainThread } from '../cluster';
 
-import { getLocalizedName, getOwner, isBroadcaster, isModerator, prepare, sendMessage } from '../commons';
+import { getLocalizedName, isBroadcaster, isModerator, prepare, sendMessage } from '../commons';
 import { command, settings, shared } from '../decorators';
 import Game from './_interface';
 import { error } from '../helpers/log';
@@ -82,11 +82,10 @@ class Duel extends Game {
       tickets: winnerUser.tickets,
       winner: winnerUser.username,
     });
-    const userObj = await global.users.getByName(getOwner());
     sendMessage(m, {
-      username: userObj.username,
-      displayName: userObj.displayName || userObj.username,
-      userId: userObj.id,
+      username: global.oauth.botUsername,
+      displayName: global.oauth.botUsername,
+      userId: global.oauth.botId,
       emotes: [],
       badges: {},
       'message-type': 'chat',
