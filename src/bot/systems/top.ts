@@ -110,8 +110,8 @@ class Top extends System {
 
     switch (type) {
       case TYPE.TIME:
-        sorted = (
-          (await getRepository(User).find({
+        sorted
+          = (await getRepository(User).find({
             where: {
               username: Not(Any([global.oauth.botUsername.toLowerCase(), global.oauth.broadcasterUsername.toLowerCase()])),
             },
@@ -120,11 +120,10 @@ class Top extends System {
             },
             take: _total,
           }))
-        )
-          .filter(o => isIgnored({ username: o.username, userId: o.userId }))
-          .map(o => {
-            return { username: o.username, value: o.watchedTime };
-          });
+            .filter(o => isIgnored({ username: o.username, userId: o.userId }))
+            .map(o => {
+              return { username: o.username, value: o.watchedTime };
+            });
         message = global.translate('systems.top.time').replace(/\$amount/g, 10);
         break;
       case TYPE.TIPS:
@@ -135,8 +134,8 @@ class Top extends System {
         if (!global.systems.points.enabled) {
           return;
         }
-        sorted = (
-          (await getRepository(User).find({
+        sorted
+          = (await getRepository(User).find({
             where: {
               username: Not(Any([global.oauth.botUsername.toLowerCase(), global.oauth.broadcasterUsername.toLowerCase()])),
             },
@@ -145,16 +144,15 @@ class Top extends System {
             },
             take: _total,
           }))
-        )
-          .filter(o => isIgnored({ username: o.username, userId: o.userId }))
-          .map(o => {
-            return { username: o.username, value: o.points };
-          });
+            .filter(o => isIgnored({ username: o.username, userId: o.userId }))
+            .map(o => {
+              return { username: o.username, value: o.points };
+            });
         message = global.translate('systems.top.points').replace(/\$amount/g, 10);
         break;
       case TYPE.MESSAGES:
-        sorted = (
-          (await getRepository(User).find({
+        sorted
+          = (await getRepository(User).find({
             where: {
               username: Not(Any([global.oauth.botUsername.toLowerCase(), global.oauth.broadcasterUsername.toLowerCase()])),
             },
@@ -163,16 +161,15 @@ class Top extends System {
             },
             take: _total,
           }))
-        )
-          .filter(o => isIgnored({ username: o.username, userId: o.userId }))
-          .map(o => {
-            return { username: o.username, value: o.messages };
-          });
+            .filter(o => isIgnored({ username: o.username, userId: o.userId }))
+            .map(o => {
+              return { username: o.username, value: o.messages };
+            });
         message = global.translate('systems.top.messages').replace(/\$amount/g, 10);
         break;
       case TYPE.FOLLOWAGE:
-        sorted = (
-          (await getRepository(User).find({
+        sorted
+          = (await getRepository(User).find({
             where: {
               username: Not(Any([global.oauth.botUsername.toLowerCase(), global.oauth.broadcasterUsername.toLowerCase()])),
               isFollower: true,
@@ -182,16 +179,15 @@ class Top extends System {
             },
             take: _total,
           }))
-        )
-          .filter(o => isIgnored({ username: o.username, userId: o.userId }))
-          .map(o => {
-            return { username: o.username, value: o.followedAt };
-          });
+            .filter(o => isIgnored({ username: o.username, userId: o.userId }))
+            .map(o => {
+              return { username: o.username, value: o.followedAt };
+            });
         message = global.translate('systems.top.followage').replace(/\$amount/g, 10);
         break;
       case TYPE.SUBAGE:
-        sorted = (
-          (await getRepository(User).find({
+        sorted
+          = (await getRepository(User).find({
             where: {
               username: Not(Any([global.oauth.botUsername.toLowerCase(), global.oauth.broadcasterUsername.toLowerCase()])),
               isSubscriber: true,
@@ -201,11 +197,10 @@ class Top extends System {
             },
             take: _total,
           }))
-        )
-          .filter(o => isIgnored({ username: o.username, userId: o.userId }))
-          .map(o => {
-            return { username: o.username, value: o.subscribedAt };
-          });
+            .filter(o => isIgnored({ username: o.username, userId: o.userId }))
+            .map(o => {
+              return { username: o.username, value: o.subscribedAt };
+            });
         message = global.translate('systems.top.subage').replace(/\$amount/g, 10);
         break;
       case TYPE.BITS:
@@ -213,8 +208,8 @@ class Top extends System {
         message = global.translate('systems.top.bits').replace(/\$amount/g, 10);
         break;
       case TYPE.GIFTS:
-        sorted = (
-          (await getRepository(User).find({
+        sorted
+          = (await getRepository(User).find({
             where: {
               username: Not(Any([global.oauth.botUsername.toLowerCase(), global.oauth.broadcasterUsername.toLowerCase()])),
             },
@@ -223,16 +218,15 @@ class Top extends System {
             },
             take: _total,
           }))
-        )
-          .filter(o => isIgnored({ username: o.username, userId: o.userId }))
-          .map(o => {
-            return { username: o.username, value: o.giftedSubscribes };
-          });
+            .filter(o => isIgnored({ username: o.username, userId: o.userId }))
+            .map(o => {
+              return { username: o.username, value: o.giftedSubscribes };
+            });
         message = global.translate('systems.top.gifts').replace(/\$amount/g, 10);
         break;
       case TYPE.SUBMONTHS:
-        sorted = (
-          (await getRepository(User).find({
+        sorted
+          = (await getRepository(User).find({
             where: {
               username: Not(Any([global.oauth.botUsername.toLowerCase(), global.oauth.broadcasterUsername.toLowerCase()])),
             },
@@ -241,11 +235,10 @@ class Top extends System {
             },
             take: _total,
           }))
-        )
-          .filter(o => isIgnored({ username: o.username, userId: o.userId }))
-          .map(o => {
-            return { username: o.username, value: o.subscribeCumulativeMonths };
-          });
+            .filter(o => isIgnored({ username: o.username, userId: o.userId }))
+            .map(o => {
+              return { username: o.username, value: o.subscribeCumulativeMonths };
+            });
         message = global.translate('systems.top.submonths').replace(/\$amount/g, 10);
         break;
     }

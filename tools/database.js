@@ -305,8 +305,8 @@ async function main() {
       seenAt: _.get(o, 'time.message', 0),
       createdAt: _.get(o, 'time.created_at', 0),
       watchedTime: (watched.find(w => w.id === o.id) || { watched: 0 }).watched,
-      chatTimeOnline: (watched.find(w => w.id === o.id && w.online) || { chat: 0 }).chat,
-      chatTimeOffline: (watched.find(w => w.id === o.id && !w.online) || { chat: 0 }).chat,
+      chatTimeOnline: (chat.find(w => w.id === o.id && w.online) || { chat: 0 }).chat,
+      chatTimeOffline: (chat.find(w => w.id === o.id && !w.online) || { chat: 0 }).chat,
 
       points: (points.find(m => m.id === o.id) || { points: 0 }).points,
       pointsOnlineGivenAt: Date.now(),
