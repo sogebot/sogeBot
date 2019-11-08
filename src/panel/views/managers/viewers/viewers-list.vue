@@ -133,7 +133,7 @@
           vip
         </b-badge>
         <b-badge :class="[ data.item.isFollower ? 'badge-success' : 'badge-danger' ]" style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
-          <fa v-if="typeof data.item.haveFollowerLock" :icon="['fas', 'fa-lock']"></fa>
+          <fa v-if="data.item.haveFollowerLock" :icon="['fas', 'fa-lock']"></fa>
           follower
         </b-badge>
         <b-badge :class="[ data.item.isSubscriber ? 'badge-success' : 'badge-danger' ]" style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
