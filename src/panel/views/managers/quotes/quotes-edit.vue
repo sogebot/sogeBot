@@ -114,7 +114,7 @@ export default class QuotesEdit extends Vue {
     id: uuid(),
     createdAt: Date.now(),
     tags: [],
-    quotedBy: '',
+    quotedBy: 0,
     quote: '',
   }
 
@@ -141,7 +141,11 @@ export default class QuotesEdit extends Vue {
 
   @Watch('item.quotedBy')
   async watchQuotedBy(id) {
-    this.quotedByName = await getUsernameById(id);
+    if (id === 0) {
+      this.quotedByName = 'n/a';
+    } else {
+      this.quotedByName = await getUsernameById(id);
+    }
   }
 
   async mounted() {
