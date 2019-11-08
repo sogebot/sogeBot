@@ -25,6 +25,7 @@ describe('Top - !top tips', () => {
       user.userId = Math.floor(Math.random() * 100000);
       user.username = 'user' + i;
       user = await getRepository(User).save(user);
+      user.tips = user.tips || [];
 
       if (i === 0) {
         continue;

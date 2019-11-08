@@ -15,8 +15,8 @@ const { Commands } = require('../../../dest/entity/commands');
 const { User } = require('../../../dest/entity/user');
 
 // users
-const owner = { username: 'soge__', userId: Math.random() };
-const user1 = { username: 'user1', userId: Math.random() };
+const owner = { username: 'soge__', userId: Math.floor(Math.random() * 100000) };
+const user1 = { username: 'user1', userId: Math.floor(Math.random() * 100000) };
 
 describe('Custom Commands - run()', () => {
   before(async () => {

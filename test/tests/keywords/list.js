@@ -10,7 +10,7 @@ const { Keyword } = require('../../../dest/entity/keyword');
 const { User } = require('../../../dest/entity/user');
 
 // users
-const owner = { username: 'soge__', userId: Math.random() };
+const owner = { username: 'soge__', userId: Math.floor(Math.random() * 100000) };
 
 const keywords = [
   { keyword: 'slqca', response: 'hptqm', enabled: Math.random() >= 0.5 },

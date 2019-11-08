@@ -13,6 +13,6 @@ export class Settings {
   @Index()
   name!: string;
 
-  @Column()
+  @Column('text')
   value!: string;
 }

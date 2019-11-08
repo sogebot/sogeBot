@@ -428,8 +428,8 @@ class TMI extends Core {
         user.username = userstate.username;
       }
 
-      user.isSubscriber = true;
-      user.subscribedAt = Date.now();
+      user.isSubscriber = user.haveSubscriberLock ? user.isSubscriber : true;
+      user.subscribedAt = user.haveSubscribedAtLock ? user.subscribedAt : Date.now();
       user.subscribeTier = String(tier);
       user.subscribeCumulativeMonths = subCumulativeMonths;
       user.subscribeStreak = 0;
@@ -659,13 +659,14 @@ class TMI extends Core {
       });
       cheer(`${username}#${userId}, bits: ${userstate.bits}, message: ${messageFromUser}`);
 
-      let user = await getRepository(User).findOne({ where: { userId: userId }});
+      let user = await getRepository(User).findOne({ relations: ['bits'], where: { userId: userId }});
       if (!user) {
         // if we still doesn't have user, we create new
         user = new User();
         user.userId = userId;
         user.username = username.toLowerCase();
         user = await getRepository(User).save(user);
+        user.bits = [];
       }
 
       const newBits = new UserBit();

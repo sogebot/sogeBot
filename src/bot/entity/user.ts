@@ -1,10 +1,10 @@
 import { Column, Entity, Index, ManyToOne, OneToMany, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
-import { ColumnNumericTransformer } from './_transformer';
+import { ColumnNumericTransformer, SafeNumberTransformer } from './_transformer';
 
 @Entity()
 export class User {
   @PrimaryColumn()
-  userId!: string;
+  userId!: number;
   @Column()
   @Index()
   username!: string;
@@ -23,6 +23,15 @@ export class User {
   isModerator!: boolean;
   @Column({ default: false })
   isSubscriber!: boolean;
+
+  @Column({ default: false })
+  haveSubscriberLock!: boolean;
+  @Column({ default: false })
+  haveFollowerLock!: boolean;
+  @Column({ default: false })
+  haveSubscribedAtLock!: boolean;
+  @Column({ default: false })
+  haveFollowedAtLock!: boolean;
 
   @Column({ default: '' })
   rank!: string;
@@ -47,7 +56,7 @@ export class User {
   @Column('bigint', { transformer: new ColumnNumericTransformer(), default: 0 })
   chatTimeOffline!: number;
 
-  @Column('bigint', { transformer: new ColumnNumericTransformer(), default: 0 })
+  @Column('bigint', { transformer: new SafeNumberTransformer(), default: 0 })
   points!: number;
   @Column('bigint', { transformer: new ColumnNumericTransformer(), default: 0 })
   pointsOnlineGivenAt!: number;

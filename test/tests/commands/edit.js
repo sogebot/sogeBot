@@ -12,7 +12,7 @@ const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/entity/user');
 
 // users
-const owner = { username: 'soge__', userId: Math.random() };
+const owner = { username: 'soge__', userId: Math.floor(Math.random() * 100000) };
 
 const parseFailedTests = [
   { permission: null, command: null, rid: null, response: null },

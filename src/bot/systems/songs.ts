@@ -365,7 +365,7 @@ class Songs extends System {
     sendMessage(message, {
       username: global.oauth.botUsername,
       displayName: global.oauth.botUsername,
-      userId: global.oauth.botId,
+      userId: Number(global.oauth.botId),
       emotes: [],
       badges: {},
       'message-type': 'chat',
@@ -388,7 +388,7 @@ class Songs extends System {
     sendMessage(message, {
       username: global.oauth.botUsername,
       displayName: global.oauth.botUsername,
-      userId: global.oauth.botId,
+      userId: Number(global.oauth.botId),
       emotes: [],
       badges: {},
       'message-type': 'chat',
@@ -405,7 +405,7 @@ class Songs extends System {
       sendMessage(global.translate('songs.noCurrentSong'), {
         username: global.oauth.botUsername,
         displayName: global.oauth.botUsername,
-        userId: global.oauth.botId,
+        userId: Number(global.oauth.botId),
         emotes: [],
         badges: {},
         'message-type': 'chat',
@@ -426,7 +426,7 @@ class Songs extends System {
     sendMessage(global.translate('core.usage') + ': !playlist add <youtubeid> | !playlist remove <youtubeid> | !playlist ban <youtubeid> | !playlist random on/off | !playlist steal', {
       username: global.oauth.botUsername,
       displayName: global.oauth.botUsername,
-      userId: global.oauth.botId,
+      userId: Number(global.oauth.botId),
       emotes: [],
       badges: {},
       'message-type': 'chat',

@@ -63,10 +63,10 @@ class Twitch extends Core {
       .where('events.event = :event', { event: 'follow' })
       .getMany();
     const onlineFollowers = (await getRepository(User).createQueryBuilder('user')
-      .where('username != :botusername', { botusername: global.oauth.botUsername.toLowerCase() })
-      .andWhere('username != :broadcasterusername', { broadcasterusername: global.oauth.broadcasterUsername.toLowerCase() })
-      .andWhere('isFollower = :isFollower', { isFollower: true })
-      .andWhere('isOnline = :isOnline', { isOnline: true })
+      .where('user.username != :botusername', { botusername: global.oauth.botUsername.toLowerCase() })
+      .andWhere('user.username != :broadcasterusername', { broadcasterusername: global.oauth.broadcasterUsername.toLowerCase() })
+      .andWhere('user.isFollower = :isFollower', { isFollower: true })
+      .andWhere('user.isOnline = :isOnline', { isOnline: true })
       .getMany())
       .filter(o => {
         return !isIgnored({ username: o.username, userId: o.userId });
@@ -99,10 +99,10 @@ class Twitch extends Core {
       .getMany();
 
     const onlineSubscribers = (await getRepository(User).createQueryBuilder('user')
-      .where('username != :botusername', { botusername: global.oauth.botUsername.toLowerCase() })
-      .andWhere('username != :broadcasterusername', { broadcasterusername: global.oauth.broadcasterUsername.toLowerCase() })
-      .andWhere('isSubscriber = :isSubscriber', { isSubscriber: true })
-      .andWhere('isOnline = :isOnline', { isOnline: true })
+      .where('user.username != :botusername', { botusername: global.oauth.botUsername.toLowerCase() })
+      .andWhere('user.username != :broadcasterusername', { broadcasterusername: global.oauth.broadcasterUsername.toLowerCase() })
+      .andWhere('user.isSubscriber = :isSubscriber', { isSubscriber: true })
+      .andWhere('user.isOnline = :isOnline', { isOnline: true })
       .getMany()).filter(o => {
       return !isIgnored({ username: o.username, userId: o.userId });
     });

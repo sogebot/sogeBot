@@ -86,7 +86,7 @@ describe('Polls - normal', () => {
     it(`10 users will vote for option 1 and another 10 for option 2`, async () => {
       for (const o of [1,2]) {
         for (let i = 0; i < 10; i++) {
-          await getRepository(User).save({ userId: Math.random(), username: 'user' + [o, i].join('') })
+          await getRepository(User).save({ userId: Math.floor(Math.random() * 100000), username: 'user' + [o, i].join('') })
           const user = 'user' + [o, i].join('');
           await global.systems.polls.main({ sender: { username: user }, parameters: String(o) });
 

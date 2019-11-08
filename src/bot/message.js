@@ -112,9 +112,9 @@ class Message {
     const random = {
       '(random.online.viewer)': async function () {
         const viewers = (await getRepository(User).createQueryBuilder('user')
-          .where('username != :botusername', { botusername: global.oauth.botUsername.toLowerCase() })
-          .andWhere('username != :broadcasterusername', { broadcasterusername: global.oauth.broadcasterUsername.toLowerCase() })
-          .andWhere('isOnline = :isOnline', { isOnline: true })
+          .where('user.username != :botusername', { botusername: global.oauth.botUsername.toLowerCase() })
+          .andWhere('user.username != :broadcasterusername', { broadcasterusername: global.oauth.broadcasterUsername.toLowerCase() })
+          .andWhere('user.isOnline = :isOnline', { isOnline: true })
           .cache(true)
           .getMany())
           .filter(o => {
@@ -125,10 +125,10 @@ class Message {
       },
       '(random.online.follower)': async function () {
         const followers = (await getRepository(User).createQueryBuilder('user')
-          .where('username != :botusername', { botusername: global.oauth.botUsername.toLowerCase() })
-          .andWhere('username != :broadcasterusername', { broadcasterusername: global.oauth.broadcasterUsername.toLowerCase() })
-          .andWhere('isFollower = :isFollower', { isFollower: true })
-          .andWhere('isOnline = :isOnline', { isOnline: true })
+          .where('user.username != :botusername', { botusername: global.oauth.botUsername.toLowerCase() })
+          .andWhere('user.username != :broadcasterusername', { broadcasterusername: global.oauth.broadcasterUsername.toLowerCase() })
+          .andWhere('user.isFollower = :isFollower', { isFollower: true })
+          .andWhere('user.isOnline = :isOnline', { isOnline: true })
           .cache(true)
           .getMany()).filter(o => {
           return !commons.isIgnored({ username: o.username, userId: o.userId });
@@ -138,10 +138,10 @@ class Message {
       },
       '(random.online.subscriber)': async function () {
         const subscribers = (await getRepository(User).createQueryBuilder('user')
-          .where('username != :botusername', { botusername: global.oauth.botUsername.toLowerCase() })
-          .andWhere('username != :broadcasterusername', { broadcasterusername: global.oauth.broadcasterUsername.toLowerCase() })
-          .andWhere('isSubscriber = :isSubscriber', { isSubscriber: true })
-          .andWhere('isOnline = :isOnline', { isOnline: true })
+          .where('user.username != :botusername', { botusername: global.oauth.botUsername.toLowerCase() })
+          .andWhere('user.username != :broadcasterusername', { broadcasterusername: global.oauth.broadcasterUsername.toLowerCase() })
+          .andWhere('user.isSubscriber = :isSubscriber', { isSubscriber: true })
+          .andWhere('user.isOnline = :isOnline', { isOnline: true })
           .cache(true)
           .getMany()).filter(o => {
           return !commons.isIgnored({ username: o.username, userId: o.userId });
@@ -151,8 +151,8 @@ class Message {
       },
       '(random.viewer)': async function () {
         const viewers = (await getRepository(User).createQueryBuilder('user')
-          .where('username != :botusername', { botusername: global.oauth.botUsername.toLowerCase() })
-          .andWhere('username != :broadcasterusername', { broadcasterusername: global.oauth.broadcasterUsername.toLowerCase() })
+          .where('user.username != :botusername', { botusername: global.oauth.botUsername.toLowerCase() })
+          .andWhere('user.username != :broadcasterusername', { broadcasterusername: global.oauth.broadcasterUsername.toLowerCase() })
           .cache(true)
           .getMany()).filter(o => {
           return !commons.isIgnored({ username: o.username, userId: o.userId });
@@ -162,9 +162,9 @@ class Message {
       },
       '(random.follower)': async function () {
         const followers = (await getRepository(User).createQueryBuilder('user')
-          .where('username != :botusername', { botusername: global.oauth.botUsername.toLowerCase() })
-          .andWhere('username != :broadcasterusername', { broadcasterusername: global.oauth.broadcasterUsername.toLowerCase() })
-          .andWhere('isFollower = :isFollower', { isFollower: true })
+          .where('user.username != :botusername', { botusername: global.oauth.botUsername.toLowerCase() })
+          .andWhere('user.username != :broadcasterusername', { broadcasterusername: global.oauth.broadcasterUsername.toLowerCase() })
+          .andWhere('user.isFollower = :isFollower', { isFollower: true })
           .cache(true)
           .getMany()).filter(o => {
           return !commons.isIgnored({ username: o.username, userId: o.userId });
@@ -174,9 +174,9 @@ class Message {
       },
       '(random.subscriber)': async function () {
         const subscribers = (await getRepository(User).createQueryBuilder('user')
-          .where('username != :botusername', { botusername: global.oauth.botUsername.toLowerCase() })
-          .andWhere('username != :broadcasterusername', { broadcasterusername: global.oauth.broadcasterUsername.toLowerCase() })
-          .andWhere('isSubscriber = :isSubscriber', { isSubscriber: true })
+          .where('user.username != :botusername', { botusername: global.oauth.botUsername.toLowerCase() })
+          .andWhere('user.username != :broadcasterusername', { broadcasterusername: global.oauth.broadcasterUsername.toLowerCase() })
+          .andWhere('user.isSubscriber = :isSubscriber', { isSubscriber: true })
           .cache(true)
           .getMany()).filter(o => {
           return !commons.isIgnored({ username: o.username, userId: o.userId });
@@ -515,9 +515,9 @@ class Message {
 
         if (containOnline) {
           const viewers = (await getRepository(User).createQueryBuilder('user')
-            .where('username != :botusername', { botusername: global.oauth.botUsername.toLowerCase() })
-            .andWhere('username != :broadcasterusername', { broadcasterusername: global.oauth.broadcasterUsername.toLowerCase() })
-            .andWhere('isOnline = :isOnline', { isOnline: true })
+            .where('user.username != :botusername', { botusername: global.oauth.botUsername.toLowerCase() })
+            .andWhere('user.username != :broadcasterusername', { broadcasterusername: global.oauth.broadcasterUsername.toLowerCase() })
+            .andWhere('user.isOnline = :isOnline', { isOnline: true })
             .getMany()).filter(o => {
             return commons.isIgnored({ username: o.username, userId: o.userId });
           });

@@ -1,6 +1,5 @@
 import axios from 'axios';
 import { flatMap, includes } from 'lodash';
-import config from '@config';
 import { isMainThread, parentPort, Worker } from 'worker_threads';
 
 import {
@@ -32,7 +31,7 @@ export const getChannelChattersUnofficialAPI = async (): Promise<{ modStatus: bo
   const connection = await getConnection();
 
   // spin up worker
-  if (isMainThread && (config.database.type === 'mongodb' && connection.options.type !== 'sqlite')) {
+  if (isMainThread && connection.options.type !== 'sqlite') {
     const value = await new Promise((resolve, reject) => {
       const worker = new Worker(__filename);
       worker.on('message', resolve);
@@ -119,7 +118,7 @@ export const getChannelChattersUnofficialAPI = async (): Promise<{ modStatus: bo
           try {
             const twitchObj = await getUserFromTwitch(username);
             user = new User();
-            user.userId = twitchObj.id;
+            user.userId = Number(twitchObj.id);
             user.username = twitchObj.login;
             user.displayname = twitchObj.display_name;
             user.profileImageUrl = twitchObj.profile_image_url;

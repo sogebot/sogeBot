@@ -79,7 +79,7 @@ describe('Polls - bits', () => {
           await global.tmi.cheer({
             tags: {
               username: user,
-              userId: Math.random(),
+              userId: Math.floor(Math.random() * 100000),
               bits: 10,
             },
             message: 'Cool I am voting for #vote' + o + ' enjoy!',

@@ -112,9 +112,9 @@ class Top extends System {
       case TYPE.TIME:
         sorted
           = (await getRepository(User).createQueryBuilder('user')
-            .where('username != :botusername', { botusername: global.oauth.botUsername.toLowerCase() })
-            .andWhere('username != :broadcasterusername', { broadcasterusername: global.oauth.broadcasterUsername.toLowerCase() })
-            .orderBy('watchedTime', 'DESC')
+            .where('user.username != :botusername', { botusername: global.oauth.botUsername.toLowerCase() })
+            .andWhere('user.username != :broadcasterusername', { broadcasterusername: global.oauth.broadcasterUsername.toLowerCase() })
+            .orderBy('user.watchedTime', 'DESC')
             .limit(_total)
             .getMany())
             .filter(o => !isIgnored({ username: o.username, userId: o.userId }))
@@ -124,7 +124,7 @@ class Top extends System {
         message = global.translate('systems.top.time').replace(/\$amount/g, 10);
         break;
       case TYPE.TIPS:
-        sorted = await getRepository(User).query(`SELECT user.username, SUM(user_tip.sortAmount) as value FROM user INNER JOIN user_tip ON user.userId = user_tip.userUserId WHERE user.username != '${global.oauth.botUsername.toLowerCase()}' AND user.username != '${global.oauth.broadcasterUsername.toLowerCase()}' GROUP BY user.userId ORDER BY value DESC LIMIT ${_total}; `);
+        sorted = await getRepository(User).query(`SELECT "user"."username", SUM("user_tip"."sortAmount") as value FROM "user" INNER JOIN "user_tip" ON "user"."userId" = "user_tip"."userUserId" WHERE "user"."username" != '${global.oauth.botUsername.toLowerCase()}' AND "user"."username" != '${global.oauth.broadcasterUsername.toLowerCase()}' GROUP BY "user"."userId" ORDER BY value DESC LIMIT ${_total}; `);
         message = global.translate('systems.top.tips').replace(/\$amount/g, 10);
         break;
       case TYPE.POINTS:
@@ -133,9 +133,9 @@ class Top extends System {
         }
         sorted
          = (await getRepository(User).createQueryBuilder('user')
-            .where('username != :botusername', { botusername: global.oauth.botUsername.toLowerCase() })
-            .andWhere('username != :broadcasterusername', { broadcasterusername: global.oauth.broadcasterUsername.toLowerCase() })
-            .orderBy('points', 'DESC')
+            .where('user.username != :botusername', { botusername: global.oauth.botUsername.toLowerCase() })
+            .andWhere('user.username != :broadcasterusername', { broadcasterusername: global.oauth.broadcasterUsername.toLowerCase() })
+            .orderBy('user.points', 'DESC')
             .limit(_total)
             .getMany())
             .filter(o => !isIgnored({ username: o.username, userId: o.userId }))
@@ -147,9 +147,9 @@ class Top extends System {
       case TYPE.MESSAGES:
         sorted
           = (await getRepository(User).createQueryBuilder('user')
-            .where('username != :botusername', { botusername: global.oauth.botUsername.toLowerCase() })
-            .andWhere('username != :broadcasterusername', { broadcasterusername: global.oauth.broadcasterUsername.toLowerCase() })
-            .orderBy('messages', 'DESC')
+            .where('user.username != :botusername', { botusername: global.oauth.botUsername.toLowerCase() })
+            .andWhere('user.username != :broadcasterusername', { broadcasterusername: global.oauth.broadcasterUsername.toLowerCase() })
+            .orderBy('user.messages', 'DESC')
             .limit(_total)
             .getMany())
             .filter(o => !isIgnored({ username: o.username, userId: o.userId }))
@@ -161,10 +161,10 @@ class Top extends System {
       case TYPE.FOLLOWAGE:
         sorted
           = (await getRepository(User).createQueryBuilder('user')
-            .where('username != :botusername', { botusername: global.oauth.botUsername.toLowerCase() })
-            .andWhere('username != :broadcasterusername', { broadcasterusername: global.oauth.broadcasterUsername.toLowerCase() })
-            .andWhere('isFollower = :isFollower', { isFollower: true })
-            .orderBy('followedAt', 'ASC')
+            .where('user.username != :botusername', { botusername: global.oauth.botUsername.toLowerCase() })
+            .andWhere('user.username != :broadcasterusername', { broadcasterusername: global.oauth.broadcasterUsername.toLowerCase() })
+            .andWhere('user.isFollower = :isFollower', { isFollower: true })
+            .orderBy('user.followedAt', 'ASC')
             .limit(_total)
             .getMany())
             .filter(o => !isIgnored({ username: o.username, userId: o.userId }))
@@ -176,10 +176,10 @@ class Top extends System {
       case TYPE.SUBAGE:
         sorted
           = (await getRepository(User).createQueryBuilder('user')
-            .where('username != :botusername', { botusername: global.oauth.botUsername.toLowerCase() })
-            .andWhere('username != :broadcasterusername', { broadcasterusername: global.oauth.broadcasterUsername.toLowerCase() })
-            .andWhere('isSubscriber = :isSubscriber', { isSubscriber: true })
-            .orderBy('subscribedAt', 'ASC')
+            .where('user.username != :botusername', { botusername: global.oauth.botUsername.toLowerCase() })
+            .andWhere('user.username != :broadcasterusername', { broadcasterusername: global.oauth.broadcasterUsername.toLowerCase() })
+            .andWhere('user.isSubscriber = :isSubscriber', { isSubscriber: true })
+            .orderBy('user.subscribedAt', 'ASC')
             .limit(_total)
             .getMany())
             .filter(o => !isIgnored({ username: o.username, userId: o.userId }))
@@ -189,15 +189,15 @@ class Top extends System {
         message = global.translate('systems.top.subage').replace(/\$amount/g, 10);
         break;
       case TYPE.BITS:
-        sorted = await getRepository(User).query(`SELECT user.username, SUM(user_bit.amount) as value FROM user INNER JOIN user_bit ON user.userId = user_bit.userUserId WHERE user.username != '${global.oauth.botUsername.toLowerCase()}' AND user.username != '${global.oauth.broadcasterUsername.toLowerCase()}' GROUP BY user.userId ORDER BY value DESC LIMIT ${_total}; `);
+        sorted = await getRepository(User).query(`SELECT "user"."username", SUM("user_bit"."amount") as value FROM "user" INNER JOIN user_bit ON "user"."userId" = "user_bit"."userUserId" WHERE "user"."username" != '${global.oauth.botUsername.toLowerCase()}' AND "user"."username" != '${global.oauth.broadcasterUsername.toLowerCase()}' GROUP BY "user"."userId" ORDER BY value DESC LIMIT ${_total}; `);
         message = global.translate('systems.top.bits').replace(/\$amount/g, 10);
         break;
       case TYPE.GIFTS:
         sorted
           = (await getRepository(User).createQueryBuilder('user')
-            .where('username != :botusername', { botusername: global.oauth.botUsername.toLowerCase() })
-            .andWhere('username != :broadcasterusername', { broadcasterusername: global.oauth.broadcasterUsername.toLowerCase() })
-            .orderBy('giftedSubscribes', 'DESC')
+            .where('user.username != :botusername', { botusername: global.oauth.botUsername.toLowerCase() })
+            .andWhere('user.username != :broadcasterusername', { broadcasterusername: global.oauth.broadcasterUsername.toLowerCase() })
+            .orderBy('user.giftedSubscribes', 'DESC')
             .limit(_total)
             .getMany())
             .filter(o => !isIgnored({ username: o.username, userId: o.userId }))
@@ -209,9 +209,9 @@ class Top extends System {
       case TYPE.SUBMONTHS:
         sorted
           = (await getRepository(User).createQueryBuilder('user')
-            .where('username != :botusername', { botusername: global.oauth.botUsername.toLowerCase() })
-            .andWhere('username != :broadcasterusername', { broadcasterusername: global.oauth.broadcasterUsername.toLowerCase() })
-            .orderBy('subscribeCumulativeMonths', 'DESC')
+            .where('user.username != :botusername', { botusername: global.oauth.botUsername.toLowerCase() })
+            .andWhere('user.username != :broadcasterusername', { broadcasterusername: global.oauth.broadcasterUsername.toLowerCase() })
+            .orderBy('user.subscribeCumulativeMonths', 'DESC')
             .limit(_total)
             .getMany())
             .filter(o => !isIgnored({ username: o.username, userId: o.userId }))

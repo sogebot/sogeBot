@@ -135,7 +135,7 @@ declare namespace NodeJS {
 interface Sender {
   username: string;
   displayName: string;
-  userId: string;
+  userId: number;
   'message-type': 'chat' | 'whisper' | 'action';
   emotes: { id: number; start: number; end: number }[];
   badges: {
@@ -166,13 +166,13 @@ interface Parser {
 
 type onEventSub = {
   username: string;
-  userId: string;
+  userId: number;
   subCumulativeMonths: number;
 };
 
 type onEventFollow = {
   username: string;
-  userId: string;
+  userId: number;
 };
 
 type onEventTip = {

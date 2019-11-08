@@ -44,7 +44,7 @@ export function getGlobalIgnoreList() {
     });
 }
 
-export function isIgnored(sender: { username: string | null; userId?: string }) {
+export function isIgnored(sender: { username: string | null; userId?: number }) {
   if (sender.username === null) {
     return false; // null can be bot from dashboard or event
   }
@@ -209,9 +209,9 @@ export function getBot() {
 
 export function getBotID() {
   try {
-    return global.oauth.botId;
+    return Number(global.oauth.botId);
   } catch (e) {
-    return '';
+    return 0;
   }
 }
 

@@ -13,7 +13,7 @@ export class Quotes {
   quote!: string;
 
   @Column()
-  quotedBy!: string;
+  quotedBy!: number;
 
   @Column('bigint', { transformer: new ColumnNumericTransformer() })
   createdAt!: number;

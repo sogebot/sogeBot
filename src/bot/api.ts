@@ -530,7 +530,7 @@ class API extends Core {
 
     // check if current subscribers are still subs
     for (const user of currentSubscribers) {
-      if (!subscribers
+      if (!user.haveSubscriberLock && !subscribers
         .map((o) => String(o.user_id))
         .includes(String(user.userId))) {
         // subscriber is not sub anymore -> unsub and set subStreak to 0
@@ -783,9 +783,9 @@ class API extends Core {
             }
           }
           try {
-            user.followedAt = new Date(f.followed_at).getTime();
+            user.followedAt = user.haveFollowedAtLock ? user.followedAt : new Date(f.followed_at).getTime();
+            user.isFollower = user.haveFollowerLock? user.isFollower : true;
             user.followCheckAt = Date.now();
-            user.isFollower = true;
             await getRepository(User).save(user);
           } catch (e) {
             error(e.stack);
@@ -1587,8 +1587,9 @@ class API extends Core {
         unfollow(user.username);
         global.events.fire('unfollow', { username: user.username });
       }
-      user.isFollower = false;
-      user.followedAt = 0;
+
+      user.followedAt = user.haveFollowedAtLock ? user.followedAt : 0;
+      user.isFollower = user.haveFollowerLock? user.isFollower : false;
       user.followCheckAt = Date.now();
       await getRepository(User).save(user);
       return { isFollower: user.isFollower, followedAt: user.followedAt };
@@ -1618,8 +1619,9 @@ class API extends Core {
         });
       }
 
-      user.isFollower = true;
-      user.followedAt = Number(moment(request.data.data[0].followed_at).format('x'));
+
+      user.followedAt = user.haveFollowedAtLock ? user.followedAt : Number(moment(request.data.data[0].followed_at).format('x'));
+      user.isFollower = user.haveFollowerLock? user.isFollower : true;
       user.followCheckAt = Date.now();
       await getRepository(User).save(user);
       return { isFollower: user.isFollower, followedAt: user.followedAt };

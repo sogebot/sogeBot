@@ -7,8 +7,8 @@ const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 
 // users
-const owner = { userId: Math.random(), badges: {}, username: 'soge__' };
-const subscriber = { userId: Math.random(), badges: { subscriber: 1 }, username: 'sub1'};
+const owner = { userId: Math.floor(Math.random() * 100000), badges: {}, username: 'soge__' };
+const subscriber = { userId: Math.floor(Math.random() * 100000), badges: { subscriber: 1 }, username: 'sub1'};
 
 describe('Cooldowns - toggleSubscribers()', () => {
   beforeEach(async () => {

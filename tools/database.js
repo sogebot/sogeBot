@@ -296,6 +296,11 @@ async function main() {
       isModerator: _.get(o, 'is.moderator', false),
       isSubscriber: _.get(o, 'is.subscriber', false),
 
+      haveSubscriberLock: _.get(o, 'lock.subscriber', false),
+      haveFollowerLock: _.get(o, 'lock.follower', false),
+      haveSubscribedAtLock: _.get(o, 'lock.subscribed_at', false),
+      haveFollowedAtLock: _.get(o, 'lock.followed_at', false),
+
       rank: '',
       haveCustomRank: false,
 

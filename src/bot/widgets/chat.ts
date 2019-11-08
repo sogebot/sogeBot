@@ -17,7 +17,7 @@ class Chat extends Widget {
       sendMessage(message, {
         username: global.oauth.botUsername,
         displayName: global.oauth.botUsername,
-        userId: global.oauth.botId,
+        userId: Number(global.oauth.botId),
         emotes: [],
         badges: {},
         'message-type': 'chat',

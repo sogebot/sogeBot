@@ -4,6 +4,7 @@ const chalk = require('chalk');
 const variable = require('./variable');
 
 const { debug } = require('../../dest/helpers/log');
+const waitMs = require('./time').waitMs;
 
 const startup = _.now();
 
@@ -11,11 +12,11 @@ const { getManager, getRepository } = require('typeorm');
 const { Alias } = require('../../dest/entity/alias');
 const { Cooldown } = require('../../dest/entity/cooldown');
 const { Bets } = require('../../dest/entity/bets');
-const { Commands, CommandsResponses, CommandsCount } = require('../../dest/entity/commands');
+const { Commands, CommandsCount } = require('../../dest/entity/commands');
 const { Keyword } = require('../../dest/entity/keyword');
 const { Settings } = require('../../dest/entity/settings');
 const { Quotes } = require('../../dest/entity/quotes');
-const { User, UserBit, UserTip } = require('../../dest/entity/user');
+const { User } = require('../../dest/entity/user');
 const { ModerationPermit } = require('../../dest/entity/moderation')
 
 let isDbConnected = false;
@@ -31,12 +32,19 @@ module.exports = {
       }
 
       debug('test', chalk.bgRed('*** Cleaning up collections ***'));
+      await waitMs(400); // wait ittle bit for transactions to be done
 
-      const entities = [User, ModerationPermit, Alias, Bets, Commands, CommandsResponses, CommandsCount, Quotes, Settings, Cooldown, Keyword];
+      const entities = [User, ModerationPermit, Alias, Bets, Commands, CommandsCount, Quotes, Settings, Cooldown, Keyword];
       for (const entity of entities) {
-        const items = await getRepository(entity).find();
-        for (const item of items) {
-          await getRepository(entity).remove(item);
+        if ((await getManager()).connection.options.type === 'postgres') {
+          const metadata = (await getManager()).connection.getMetadata(entity);
+          await getRepository(entity).query(`TRUNCATE "${metadata.tableName}" CASCADE`);
+        } else {
+          await getRepository(entity).clear();
+        }
+        if ((await getRepository(entity).find()).length > 0) {
+          throw Error('DB is not cleared! ' + entity.name);
+          process.exit()
         }
       }
 

@@ -59,7 +59,7 @@ class Polls extends System {
             username: getOwner(),
             displayName: getOwner(),
             'message-type': 'chat',
-            userId: '0',
+            userId: 0,
             emotes: [],
             badges: {
               subscriber: 1,
@@ -80,7 +80,7 @@ class Polls extends System {
             username: getOwner(),
             displayName: getOwner(),
             'message-type': 'chat',
-            userId: '0',
+            userId: 0,
             emotes: [],
             badges: {
               subscriber: 1,
@@ -380,7 +380,7 @@ class Polls extends System {
       }), {
         username: global.oauth.botUsername,
         displayName: global.oauth.botUsername,
-        userId: global.oauth.botId,
+        userId: Number(global.oauth.botId),
         emotes: [],
         badges: {},
         'message-type': 'chat',
@@ -391,7 +391,7 @@ class Polls extends System {
             sendMessage(this.getCommand('!vote') + ` ${(Number(index) + 1)} => ${vote.options[index]}`, {
               username: global.oauth.botUsername,
               displayName: global.oauth.botUsername,
-              userId: global.oauth.botId,
+              userId: Number(global.oauth.botId),
               emotes: [],
               badges: {},
               'message-type': 'chat',
@@ -401,7 +401,7 @@ class Polls extends System {
 
               username: global.oauth.botUsername,
               displayName: global.oauth.botUsername,
-              userId: global.oauth.botId,
+              userId: Number(global.oauth.botId),
               emotes: [],
               badges: {},
               'message-type': 'chat',

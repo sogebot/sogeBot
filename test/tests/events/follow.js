@@ -61,7 +61,7 @@ describe('Events - follow event', () => {
 
     for (const username of ['losslezos', 'rigneir', 'mikasa_hraje', 'foufhs']) {
       it('trigger follow event', async () => {
-        await global.events.fire('follow', { username, userId: Math.random(), webhooks: _.random(1) === 1 });
+        await global.events.fire('follow', { username, userId: Math.floor(Math.random() * 100000), webhooks: _.random(1) === 1 });
       });
 
       it('message should be send', async () => {

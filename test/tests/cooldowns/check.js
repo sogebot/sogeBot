@@ -14,11 +14,11 @@ const message = require('../../general.js').message;
 const variable = require('../../general.js').variable;
 
 // users
-const owner = { userId: Math.random(), username: 'soge__', badges: {} };
-const usermod1 = { userId: Math.random(), username: 'usermod1', badges: { moderator: 1 } };
-const subuser1 = { userId: Math.random(), username: 'subuser1', badges: { subscriber: 1 } };
-const testUser = { userId: Math.random(), username: 'test', badges: {} };
-const testUser2 = { userId: Math.random(), username: 'test2', badges: {} };
+const owner = { userId: Math.floor(Math.random() * 100000), username: 'soge__', badges: {} };
+const usermod1 = { userId: Math.floor(Math.random() * 100000), username: 'usermod1', badges: { moderator: 1 } };
+const subuser1 = { userId: Math.floor(Math.random() * 100000), username: 'subuser1', badges: { subscriber: 1 } };
+const testUser = { userId: Math.floor(Math.random() * 100000), username: 'test', badges: {} };
+const testUser2 = { userId: Math.floor(Math.random() * 100000), username: 'test2', badges: {} };
 
 
 describe('Cooldowns - check()', () => {

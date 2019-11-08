@@ -227,7 +227,7 @@ class Webhooks {
       this.addIdToCache('follow', data.from_id);
 
       const user = await getRepository(User).findOne({ userId: data.from_id }) ?? new User();
-      user.userId = String(data.from_id);
+      user.userId = Number(data.from_id);
       user.username = data.from_name.toLowerCase();
 
       if (!user.isFollower && (user.followedAt === 0 || Date.now() - user.followedAt > 60000 * 60)) {
@@ -256,8 +256,8 @@ class Webhooks {
         }
       }
 
-      user.isFollower = true;
-      user.followedAt = Date.now();
+      user.isFollower = user.haveFollowerLock? user.isFollower : true;
+      user.followedAt = user.haveFollowedAtLock ? user.followedAt : Date.now();
       user.followCheckAt = Date.now();
       await getRepository(User).save(user, { });
     } catch (e) {

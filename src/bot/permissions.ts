@@ -123,7 +123,7 @@ class Permissions extends Core {
     return pItem;
   }
 
-  public async getUserHighestPermission(userId: string): Promise<null | string> {
+  public async getUserHighestPermission(userId: number): Promise<null | string> {
     const permissions = await getRepository(PermissionsEntity).find({
       cache: true,
       order: {
@@ -138,7 +138,7 @@ class Permissions extends Core {
     return null;
   }
 
-  public async check(userId: string, permId: string, partial = false): Promise<{access: boolean; permission: PermissionsEntity | undefined}> {
+  public async check(userId: number, permId: string, partial = false): Promise<{access: boolean; permission: PermissionsEntity | undefined}> {
     if (_.filter(global.oauth.generalOwners, (o) => _.isString(o) && o.trim().length > 0).length === 0 && getBroadcaster() === '' && !isWarnedAboutCasters) {
       isWarnedAboutCasters = true;
       warning('Owners or broadcaster oauth is not set, all users are treated as CASTERS!!!');

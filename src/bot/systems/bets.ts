@@ -92,7 +92,7 @@ class Bets extends System {
           sendMessage(global.translate('bets.locked'), {
             username: global.oauth.botUsername,
             displayName: global.oauth.botUsername,
-            userId: global.oauth.botId,
+            userId: Number(global.oauth.botId),
             emotes: [],
             badges: {},
             'message-type': 'chat',
@@ -101,7 +101,7 @@ class Bets extends System {
           sendMessage(global.translate('bets.removed'), {
             username: global.oauth.botUsername,
             displayName: global.oauth.botUsername,
-            userId: global.oauth.botId,
+            userId: Number(global.oauth.botId),
             emotes: [],
             badges: {},
             'message-type': 'chat',

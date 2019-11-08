@@ -37,7 +37,7 @@ class Users extends Core {
     }
   }
 
-  async checkNewChatter (id: string, username: string) {
+  async checkNewChatter (id: number, username: string) {
     const watched = await this.getWatchedOf(id);
     // add user as a new chatter in a stream
     if (watched === 0 && !this.newChattersList.includes(username)) {
@@ -109,7 +109,7 @@ class Users extends Core {
     this.timeouts.updateChatTime = setTimeout(() => this.updateChatTime(), timeout);
   }
 
-  async getChatOf (id: string, online: boolean): Promise<number> {
+  async getChatOf (id: number, online: boolean): Promise<number> {
     const user = await getRepository(User).findOne({ where: { userId: id }});
     let chat = 0;
 
@@ -199,7 +199,7 @@ class Users extends Core {
     this.timeouts.updateWatchTime = setTimeout(() => this.updateWatchTime(), timeout);
   }
 
-  async getWatchedOf (id: string): Promise<number> {
+  async getWatchedOf (id: number): Promise<number> {
     const user = await getRepository(User).findOne({ where: { userId: id }});
 
     if (user) {
@@ -211,7 +211,7 @@ class Users extends Core {
     }
   }
 
-  async getMessagesOf (id: string): Promise<number> {
+  async getMessagesOf (id: number): Promise<number> {
     const user = await getRepository(User).findOne({ where: { userId: id }});
 
     if (user) {
@@ -223,7 +223,7 @@ class Users extends Core {
     }
   }
 
-  async getUsernamesFromIds (IdsList: Array<string>) {
+  async getUsernamesFromIds (IdsList: Array<number>) {
     const IdsToUsername = {};
     for (const id of IdsList) {
       if (!isNil(IdsToUsername[id])) {
@@ -237,7 +237,7 @@ class Users extends Core {
     return IdsToUsername;
   }
 
-  async getNameById (id: string) {
+  async getNameById (id: number) {
     let username = (await global.db.engine.findOne('users', { id })).username;
 
     if (typeof username === 'undefined' || username === null) {

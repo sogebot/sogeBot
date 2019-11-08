@@ -128,7 +128,7 @@ class Heist extends Game {
         sendMessage(this.noUser, {
           username: global.oauth.botUsername,
           displayName: global.oauth.botUsername,
-          userId: global.oauth.botId,
+          userId: Number(global.oauth.botId),
           emotes: [],
           badges: {},
           'message-type': 'chat',
@@ -143,7 +143,7 @@ class Heist extends Game {
       sendMessage(started.replace('$bank', level.name), {
         username: global.oauth.botUsername,
         displayName: global.oauth.botUsername,
-        userId: global.oauth.botId,
+        userId: Number(global.oauth.botId),
         emotes: [],
         badges: {},
         'message-type': 'chat',
@@ -158,7 +158,7 @@ class Heist extends Game {
           sendMessage(outcome.replace('$user', (global.tmi.showWithAt ? '@' : '') + user.username), {
             username: global.oauth.botUsername,
             displayName: global.oauth.botUsername,
-            userId: global.oauth.botId,
+            userId: Number(global.oauth.botId),
             emotes: [],
             badges: {},
             'message-type': 'chat',
@@ -189,7 +189,7 @@ class Heist extends Game {
           sendMessage(_.isNil(result) ? '' : result.message, {
             username: global.oauth.botUsername,
             displayName: global.oauth.botUsername,
-            userId: global.oauth.botId,
+            userId: Number(global.oauth.botId),
             emotes: [],
             badges: {},
             'message-type': 'chat',
@@ -209,7 +209,7 @@ class Heist extends Game {
             sendMessage(message, {
               username: global.oauth.botUsername,
               displayName: global.oauth.botUsername,
-              userId: global.oauth.botId,
+              userId: Number(global.oauth.botId),
               emotes: [],
               badges: {},
               'message-type': 'chat',
@@ -230,7 +230,7 @@ class Heist extends Game {
       sendMessage((this.copsCooldown), {
         username: global.oauth.botUsername,
         displayName: global.oauth.botUsername,
-        userId: global.oauth.botId,
+        userId: Number(global.oauth.botId),
         emotes: [],
         badges: {},
         'message-type': 'chat',

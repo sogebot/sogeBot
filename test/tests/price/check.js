@@ -12,8 +12,8 @@ const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/entity/user');
 
 // users
-const owner = { userId: Math.random(), username: 'soge__' };
-const user = { userId: Math.random(), username: 'testuser' };
+const owner = { userId: Math.floor(Math.random() * 100000), username: 'soge__' };
+const user = { userId: Math.floor(Math.random() * 100000), username: 'testuser' };
 
 const tests = [
   {

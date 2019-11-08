@@ -11,8 +11,8 @@ const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/entity/user');
 
 // users
-const owner = { username: 'soge__', userId: Math.random() };
-const user = { username: 'user', userId: Math.random() };
+const owner = { username: 'soge__', userId: Math.floor(Math.random() * 100000) };
+const user = { username: 'user', userId: Math.floor(Math.random() * 100000) };
 
 describe('Alias - run()', () => {
   beforeEach(async () => {

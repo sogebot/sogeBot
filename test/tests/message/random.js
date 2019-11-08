@@ -6,9 +6,9 @@ const msg = require('../../general.js').message;
 const Message = require('../../../dest/message').default;
 const assert = require('assert');
 
-const owner = { userId: Math.random(), username: 'soge__' };
-const ignoredUser = { userId: Math.random(), username: 'ignoreduser' };
-const user = { userId: Math.random(), username: 'user1' };
+const owner = { userId: Math.floor(Math.random() * 100000), username: 'soge__' };
+const ignoredUser = { userId: Math.floor(Math.random() * 100000), username: 'ignoreduser' };
+const user = { userId: Math.floor(Math.random() * 100000), username: 'user1' };
 
 const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/entity/user');
@@ -68,7 +68,7 @@ describe('Message - random filter', () => {
     const users = ['ignoreduser', 'user1'];
     for (const username of users) {
       it('add user ' + username + ' to users list', async () => {
-        await getRepository(User).save({ userId: Math.random(), username, isFollower: true });
+        await getRepository(User).save({ userId: Math.floor(Math.random() * 100000), username, isFollower: true });
       });
     }
 
@@ -101,7 +101,7 @@ describe('Message - random filter', () => {
     const users = ['ignoreduser', 'user1'];
     for (const username of users) {
       it('add user ' + username + ' to users list', async () => {
-        await getRepository(User).save({ userId: Math.random(), username, isSubscriber: true });
+        await getRepository(User).save({ userId: Math.floor(Math.random() * 100000), username, isSubscriber: true });
       });
     }
 
@@ -135,7 +135,7 @@ describe('Message - random filter', () => {
     const users = ['ignoreduser', 'user1'];
     for (const username of users) {
       it('add user ' + username + ' to users list', async () => {
-        await getRepository(User).save({ userId: Math.random(), username });
+        await getRepository(User).save({ userId: Math.floor(Math.random() * 100000), username });
       });
     }
 
@@ -167,7 +167,7 @@ describe('Message - random filter', () => {
     const users = ['ignoreduser', 'user1'];
     for (const username of users) {
       it('add user ' + username + ' to users list', async () => {
-        await getRepository(User).save({ userId: Math.random(), username, isFollower: true });
+        await getRepository(User).save({ userId: Math.floor(Math.random() * 100000), username, isFollower: true });
       });
     }
 
@@ -199,7 +199,7 @@ describe('Message - random filter', () => {
     const users = ['ignoreduser', 'user1'];
     for (const username of users) {
       it('add user ' + username + ' to users list', async () => {
-        await getRepository(User).save({ userId: Math.random(), username, isSubscriber: true });
+        await getRepository(User).save({ userId: Math.floor(Math.random() * 100000), username, isSubscriber: true });
       });
     }
 

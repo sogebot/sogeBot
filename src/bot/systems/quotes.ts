@@ -24,8 +24,8 @@ class Quotes extends System {
         .select('quote')
         .from(QuotesEntity, 'quote')
         .getMany();
-      for (const item of items) {
-        item.quotedBy = await global.users.getNameById(item.quotedBy);
+      for (const item of (items as any[])) {
+        item.quotedByName = await global.users.getNameById(item.quotedBy);
       }
       cb(null, items);
     });

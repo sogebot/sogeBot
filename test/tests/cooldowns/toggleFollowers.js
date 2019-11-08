@@ -11,7 +11,7 @@ const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/entity/user');
 
 // users
-const owner = { userId: Math.random(), badges: {}, username: 'soge__' };
+const owner = { userId: Math.floor(Math.random() * 100000), badges: {}, username: 'soge__' };
 const follower = { badges: {}, username: 'follower', userId: String(_.random(999999, false)), isFollower: true };
 const commonUser = { badges: {}, username: 'user1', userId: String(_.random(999999, false)) };
 const commonUser2 = { badges: {}, username: 'user2', userId: String(_.random(999999, false)) };
