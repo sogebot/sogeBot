@@ -16,6 +16,7 @@ const { Keyword } = require('../../dest/entity/keyword');
 const { Settings } = require('../../dest/entity/settings');
 const { Quotes } = require('../../dest/entity/quotes');
 const { User } = require('../../dest/entity/user');
+const { ModerationPermit } = require('../../dest/entity/moderation')
 
 let isDbConnected = false;
 
@@ -38,6 +39,7 @@ module.exports = {
         }
       }
       await getRepository(User).clear(User);
+      await getRepository(ModerationPermit).clear(User);
 
       debug('test', chalk.bgRed('*** Cleaned successfully ***'));
 

@@ -744,16 +744,17 @@ class API extends Core {
           await setImmediateAwait(); // throttle down
 
           f.from_name = String(f.from_name).toLowerCase();
-          const user = await getRepository(User).findOne({ userId: f.from_id });
+          let user = await getRepository(User).findOne({ userId: f.from_id });
           if (!user) {
-            continue;
+            user = new User();
+            user.userId = f.from_id;
+            user.username = f.from_name;
+            user = await getRepository(User).save(user);
           }
 
-          user.username = f.from_name;
-
-          if (!get(user, 'is.follower', false)) {
+          if (!user.isFollower) {
             if (new Date().getTime() - new Date(f.followed_at).getTime() < 2 * constants.HOUR) {
-              if ((get(user, 'time.follow', 0) === 0 || new Date().getTime() - get(user, 'time.follow', 0) > 60000 * 60) && !global.webhooks.existsInCache('follow', user.userId)) {
+              if (user.followedAt === 0 || new Date().getTime() - user.followedAt > 60000 * 60 && !global.webhooks.existsInCache('follow', user.userId)) {
                 global.webhooks.addIdToCache('follow', f.from_id);
                 global.overlays.eventlist.add({
                   event: 'follow',
@@ -783,6 +784,7 @@ class API extends Core {
           }
           try {
             user.followedAt = new Date(f.followed_at).getTime();
+            user.followCheckAt = Date.now();
             user.isFollower = true;
             await getRepository(User).save(user);
           } catch (e) {

@@ -101,7 +101,7 @@ describe('Message - random filter', () => {
     const users = ['ignoreduser', 'user1'];
     for (const username of users) {
       it('add user ' + username + ' to users list', async () => {
-        await getRepository(User).save({ userIid: Math.random(), username, isSubscriber: true });
+        await getRepository(User).save({ userId: Math.random(), username, isSubscriber: true });
       });
     }
 
@@ -199,7 +199,7 @@ describe('Message - random filter', () => {
     const users = ['ignoreduser', 'user1'];
     for (const username of users) {
       it('add user ' + username + ' to users list', async () => {
-        await getRepository(User).save({ userIid: Math.random(), username, isSubscriber: true });
+        await getRepository(User).save({ userId: Math.random(), username, isSubscriber: true });
       });
     }
 
