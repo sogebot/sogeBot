@@ -38,8 +38,13 @@ module.exports = {
           await getManager().createQueryBuilder().delete().from(entity).where('id = :id', { id: item.id }).execute();
         }
       }
-      await getRepository(User).clear(User);
-      await getRepository(ModerationPermit).clear(User);
+      if (connection.options.type === 'postgres') {
+        await getRepository(User).query('TRUNCATE "users" CASCADE');
+        await getRepository(ModerationPermit).query('TRUNCATE "moderation_permit" CASCADE');
+      } else {
+        await getRepository(User).clear();
+        await getRepository(ModerationPermit).clear(User);
+      }
 
       debug('test', chalk.bgRed('*** Cleaned successfully ***'));
 
