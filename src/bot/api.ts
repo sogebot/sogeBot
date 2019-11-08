@@ -744,6 +744,7 @@ class API extends Core {
           await setImmediateAwait(); // throttle down
 
           f.from_name = String(f.from_name).toLowerCase();
+          f.from_id = Number(f.from_id);
           let user = await getRepository(User).findOne({ userId: f.from_id });
           if (!user) {
             user = new User();

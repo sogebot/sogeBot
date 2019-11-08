@@ -42,8 +42,8 @@ describe('API - getLatest100Followers()', () => {
     });
 
     it('follow events should have correct usernames', async () => {
-      assert(global.events.fire.calledWith('follow', { username: 'testfollow', userId: '111' }));
-      assert(global.events.fire.calledWith('follow', { username: 'testfollow2', userId: '222' }));
+      assert(global.events.fire.calledWith('follow', { username: 'testfollow', userId: 111 }));
+      assert(global.events.fire.calledWith('follow', { username: 'testfollow2', userId: 222 }));
     });
 
     it('second call should be properly parsed', async () => {
@@ -56,8 +56,8 @@ describe('API - getLatest100Followers()', () => {
     });
 
     it('follow events should have correct usernames', async () => {
-      assert(global.events.fire.calledWith('follow', { username: 'testfollow', userId: '111' }));
-      assert(global.events.fire.calledWith('follow', { username: 'testfollow2', userId: '222' }));
+      assert(global.events.fire.calledWith('follow', { username: 'testfollow', userId: 111 }));
+      assert(global.events.fire.calledWith('follow', { username: 'testfollow2', userId: 222 }));
     });
   });
 });

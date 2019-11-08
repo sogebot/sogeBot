@@ -38,9 +38,9 @@ describe('libs/webhooks - follower()', () => {
     for (let i = 0; i < 5; i++) {
       await global.webhooks.follower({
         data: {
-          from_id: id,
+          from_id: String(id),
           from_name: 'testuser',
-          to_id: global.oauth.channelId,
+          to_id: String(global.oauth.channelId),
           to_name: 'channeluser',
         },
       });
@@ -59,9 +59,9 @@ describe('libs/webhooks - follower()', () => {
     for (let i = 0; i < 5; i++) {
       await global.webhooks.follower({
         data: {
-          from_id: 3,
+          from_id: '3',
           from_name: 'testuser',
-          to_id: 2,
+          to_id: '2',
           to_name: 'channeluser',
         },
       });

@@ -207,6 +207,8 @@ class Webhooks {
     try {
       const cid = global.oauth.channelId;
       const data = aEvent.data;
+      data.from_id = Number(data.from_id);
+
       if (Object.keys(cid).length === 0) {
         setTimeout(() => this.follower(aEvent), 10);
       } // wait until channelId is set
