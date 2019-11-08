@@ -289,11 +289,12 @@ export default class viewersList extends Vue {
   @Watch('sort')
   @Watch('sortDesc')
   @Watch('filter', { deep: true })
+  @Watch('search')
   refresh() {
     this.state.loading = this.$state.progress;
     this.socket.emit('find.viewers', { page: (this.currentPage - 1), order: {
       orderBy: this.sort, sortOrder: this.sortDesc ? 'DESC' : 'ASC'
-    }, filter: this.filter }, (items, count) => {
+    }, filter: this.filter, search: this.search.length > 0 ? this.search : undefined }, (items, count) => {
       this.items = items;
       this.count = count;
       this.state.loading = this.$state.success;

@@ -9,7 +9,7 @@ import * as commons from './commons';
 import { debug, isDebugEnabled } from './helpers/log';
 import { permission } from './helpers/permissions';
 import { adminEndpoint, viewerEndpoint } from './helpers/socket';
-import { getRepository } from 'typeorm';
+import { getRepository, Brackets } from 'typeorm';
 import { User, UserBit, UserTip } from './entity/user';
 
 
@@ -282,7 +282,7 @@ class Users extends Core {
     adminEndpoint(this.nsp, 'getNameById', async (id, cb) => {
       cb(await this.getNameById(id));
     });
-    adminEndpoint(this.nsp, 'find.viewers', async (opts: { filter?: { subscribers: null | boolean; followers: null | boolean; active: null | boolean; vips: null | boolean }; page: number; order?: { orderBy: string; sortOrder: 'ASC' | 'DESC' } }, cb) => {
+    adminEndpoint(this.nsp, 'find.viewers', async (opts: { search?: string; filter?: { subscribers: null | boolean; followers: null | boolean; active: null | boolean; vips: null | boolean }; page: number; order?: { orderBy: string; sortOrder: 'ASC' | 'DESC' } }, cb) => {
       opts.page = opts.page ?? 0;
 
       const query = getRepository(User).createQueryBuilder('user')
@@ -314,6 +314,13 @@ class Users extends Core {
         if (opts.filter.active !== null) {
           query.andWhere('"user"."isOnline" = :isOnline', { isOnline: opts.filter.active });
         }
+      }
+
+      if (typeof opts.search !== 'undefined') {
+        query.andWhere(new Brackets(w => {
+          w.where('"user"."username" like :like', { like: `%${opts.search}%` });
+          w.orWhere('CAST("user"."userId" AS TEXT) like :like', { like: `%${opts.search}%` });
+        }));
       }
 
       const viewers = await query.getRawMany();
