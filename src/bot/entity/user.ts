@@ -98,7 +98,7 @@ export class UserTip {
   })
   user!: User;
 
-  @Column()
+  @Column('float')
   amount!: number;
   @Column()
   currency!: string;
@@ -107,7 +107,7 @@ export class UserTip {
   @Column('bigint', { transformer: new ColumnNumericTransformer(), default: 0 })
   tippedAt!: number;
 
-  @Column()
+  @Column('float')
   sortAmount!: number;
 }
 
@@ -121,7 +121,7 @@ export class UserBit {
   })
   user!: User;
 
-  @Column()
+  @Column('bigint', { transformer: new ColumnNumericTransformer() })
   amount!: number;
   @Column({ default: '' })
   message!: string;

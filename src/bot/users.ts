@@ -1,6 +1,6 @@
 import { isMainThread } from './cluster';
 import axios from 'axios';
-import { cloneDeep, defaults, filter, get, isNil, set } from 'lodash';
+import { cloneDeep, isNil, set } from 'lodash';
 import { setTimeout } from 'timers';
 
 import * as constants from './constants';
@@ -10,7 +10,7 @@ import { debug, isDebugEnabled } from './helpers/log';
 import { permission } from './helpers/permissions';
 import { adminEndpoint, viewerEndpoint } from './helpers/socket';
 import { getRepository } from 'typeorm';
-import { User } from './entity/user';
+import { User, UserBit, UserTip } from './entity/user';
 
 
 export const getAllOnlineUsernames = async () => {
@@ -259,60 +259,72 @@ class Users extends Core {
   }
 
   sockets () {
+    adminEndpoint(this.nsp, 'viewers::resetPointsAll', async (cb) => {
+      await getRepository(User).update({}, { points: 0 });
+      cb();
+    });
+    adminEndpoint(this.nsp, 'viewers::resetMessagesAll', async (cb) => {
+      await getRepository(User).update({}, { messages: 0 });
+      cb();
+    });
+    adminEndpoint(this.nsp, 'viewers::resetWatchedTimeAll', async (cb) => {
+      await getRepository(User).update({}, { watchedTime: 0 });
+      cb();
+    });
+    adminEndpoint(this.nsp, 'viewers::resetBitsAll', async (cb) => {
+      await getRepository(UserBit).clear();
+      cb();
+    });
+    adminEndpoint(this.nsp, 'viewers::resetTipsAll', async (cb) => {
+      await getRepository(UserTip).clear();
+      cb();
+    });
     adminEndpoint(this.nsp, 'getNameById', async (id, cb) => {
       cb(await this.getNameById(id));
     });
-    adminEndpoint(this.nsp, 'search', async(opts, cb) => {
-      const regexp = new RegExp(opts.search, 'i');
-      const usersById = await global.db.engine.find('users', { id: { $regex: regexp } });
-      const usersByName = await global.db.engine.find('users', { username: { $regex: regexp } });
-      cb({
-        results: [
-          ...usersById,
-          ...usersByName,
-        ],
-        state: opts.state,
-      });
-    });
-    adminEndpoint(this.nsp, 'find.viewers', async (opts, cb) => {
-      opts = defaults(opts, { filter: null, show: { subscribers: null, followers: null, active: null, vips: null } });
-      opts.page--; // we are counting index from 0
+    adminEndpoint(this.nsp, 'find.viewers', async (opts: { filter?: { subscribers: null | boolean; followers: null | boolean; active: null | boolean; vips: null | boolean }; page: number; order?: { orderBy: string; sortOrder: 'ASC' | 'DESC' } }, cb) => {
+      opts.page = opts.page ?? 0;
 
-      let viewers = await global.db.engine.find('users', { }, [
-        { from: 'users.tips', as: 'tips', foreignField: 'id', localField: 'id' },
-        { from: 'users.bits', as: 'bits', foreignField: 'id', localField: 'id' },
-        { from: 'users.points', as: 'points', foreignField: 'id', localField: 'id' },
-        { from: 'users.messages', as: 'messages', foreignField: 'id', localField: 'id' },
-        { from: 'users.online', as: 'online', foreignField: 'username', localField: 'username' },
-        { from: 'users.watched', as: 'watched', foreignField: 'id', localField: 'id' },
-      ]);
+      const query = getRepository(User).createQueryBuilder('user')
+        .orderBy(opts.order?.orderBy ?? 'user.username' , opts.order?.sortOrder ?? 'ASC')
+        .select('COALESCE(SUM("user_bit"."amount"), 0)', 'sumBits')
+        .addSelect('COALESCE(SUM("user_tip"."sortAmount"), 0)', 'sumTips')
+        .addSelect('"user".*')
+        .offset(opts.page * 25)
+        .limit(25)
+        .leftJoin(UserBit, 'user_bit', '"user_bit"."userUserId" = "user"."userId"')
+        .leftJoin(UserTip, 'user_tip', '"user_tip"."userUserId" = "user"."userId"')
+        .groupBy('user.userId');
 
-      for (const v of viewers) {
-        set(v, 'stats.tips', v.tips.map((o) => global.currency.exchange(o.amount, o.currency, global.currency.mainCurrency)).reduce((a, b) => a + b, 0));
-        set(v, 'stats.bits', v.bits.map((o) => Number(o.amount)).reduce((a, b) => a + b, 0));
-        set(v, 'custom.currency', global.currency.mainCurrency);
-        set(v, 'points', (v.points[0] || { points: 0 }).points);
-        set(v, 'messages', (v.messages[0] || { messages: 0 }).messages);
-        set(v, 'time.watched', (v.watched[0] || { watched: 0 }).watched);
+      if (typeof opts.order !== 'undefined') {
+        opts.order.orderBy = opts.order.orderBy.split('.').map(o => `"${o}"`).join('.');
+        query.orderBy({ [opts.order.orderBy]: opts.order.sortOrder });
       }
 
-      // filter users
-      if (!isNil(opts.filter)) {
-        viewers = filter(viewers, (o) => o.username && o.username.toLowerCase().startsWith(opts.filter.toLowerCase().trim()));
+      if (typeof opts.filter !== 'undefined') {
+        if (opts.filter.subscribers !== null) {
+          query.andWhere('"user"."isSubscriber" = :isSubscriber', { isSubscriber: opts.filter.subscribers });
+        }
+        if (opts.filter.followers !== null) {
+          query.andWhere('"user"."isFollower" = :isFollower', { isFollower: opts.filter.followers });
+        }
+        if (opts.filter.vips !== null) {
+          query.andWhere('"user"."isVIP" = :isVIP', { isVIP: opts.filter.vips });
+        }
+        if (opts.filter.active !== null) {
+          query.andWhere('"user"."isOnline" = :isOnline', { isOnline: opts.filter.active });
+        }
       }
-      if (!isNil(opts.show.subscribers)) {
-        viewers = filter(viewers, (o) => get(o, 'is.subscriber', false) === opts.show.subscribers);
+
+      const viewers = await query.getRawMany();
+      const count = await query.getCount();
+
+      for (const viewer of viewers) {
+        // recount sumTips to bot currency
+        viewer.sumTips = await global.currency.exchange(viewer.sumTips, 'EUR', global.currency.mainCurrency);
       }
-      if (!isNil(opts.show.followers)) {
-        viewers = filter(viewers, (o) => get(o, 'is.follower', false) === opts.show.followers);
-      }
-      if (!isNil(opts.show.vips)) {
-        viewers = filter(viewers, (o) => get(o, 'is.vip', false) === opts.show.vips);
-      }
-      if (!isNil(opts.show.active)) {
-        viewers = filter(viewers, (o) => o.online.length > 0);
-      }
-      cb(viewers);
+
+      cb(viewers, count);
     });
     adminEndpoint(this.nsp, 'followedAt.viewer', async (id, cb) => {
       try {

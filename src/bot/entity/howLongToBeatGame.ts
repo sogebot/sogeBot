@@ -18,9 +18,9 @@ export class HowLongToBeatGame {
   timeToBeatMain!: number;
   @Column('bigint', { transformer: new ColumnNumericTransformer(), default: 0 })
   timeToBeatCompletionist!: number;
-  @Column('bigint', { transformer: new ColumnNumericTransformer(), default: 0 })
+  @Column('float', { transformer: new ColumnNumericTransformer(), default: 0 })
   gameplayMain!: number;
-  @Column('bigint', { transformer: new ColumnNumericTransformer(), default: 0 })
+  @Column('float', { transformer: new ColumnNumericTransformer(), default: 0 })
   gameplayCompletionist!: number;
   @Column()
   imageUrl!: string;

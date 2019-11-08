@@ -8,7 +8,7 @@ import { endpoints } from './helpers/socket';
 import { onLoad } from './decorators/on';
 
 type Auth = {
-  userId: string;
+  userId: number;
   type: 'admin' | 'viewer' | 'public';
   accessToken: string | null;
   accessTokenTimestamp: number;
