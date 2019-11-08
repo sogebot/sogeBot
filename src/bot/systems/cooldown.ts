@@ -105,7 +105,7 @@ class Cooldown extends System {
       isEnabled: true,
       isOwnerAffected: false,
       isModeratorAffected: false,
-      isSusbcriberAffected: true,
+      isSubscriberAffected: true,
       isFollowerAffected: true,
     };
     await getRepository(CooldownEntity).save(cooldown);
@@ -183,7 +183,7 @@ class Cooldown extends System {
     await getRepository(User).save(user);
     let result = false;
     for (const cooldown of data) {
-      if ((isOwner(opts.sender) && !cooldown.isOwnerAffected) || (user.isModerator && !cooldown.isModeratorAffected) || (user.isSubscriber && !cooldown.isSusbcriberAffected) || (user.isFollower && !cooldown.isFollowerAffected)) {
+      if ((isOwner(opts.sender) && !cooldown.isOwnerAffected) || (user.isModerator && !cooldown.isModeratorAffected) || (user.isSubscriber && !cooldown.isSubscriberAffected) || (user.isFollower && !cooldown.isFollowerAffected)) {
         result = true;
         continue;
       }
@@ -300,7 +300,7 @@ class Cooldown extends System {
     await getRepository(User).save(user);
 
     for (const cooldown of data) {
-      if ((isOwner(opts.sender) && !cooldown.isOwnerAffected) || (user.isModerator && !cooldown.isModeratorAffected) || (user.isSubscriber && !cooldown.isSusbcriberAffected) || (user.isFollower && !cooldown.isFollowerAffected)) {
+      if ((isOwner(opts.sender) && !cooldown.isOwnerAffected) || (user.isModerator && !cooldown.isModeratorAffected) || (user.isSubscriber && !cooldown.isSubscriberAffected) || (user.isFollower && !cooldown.isFollowerAffected)) {
         continue;
       }
 
@@ -361,7 +361,7 @@ class Cooldown extends System {
     if (type === 'isOwnerAffected') {
       path = '-for-owners';
     }
-    if (type === 'isSusbcriberAffected') {
+    if (type === 'isSubscriberAffected') {
       path = '-for-subscribers';
     }
     if (type === 'isFollowerAffected') {
@@ -396,7 +396,7 @@ class Cooldown extends System {
   @command('!cooldown toggle subscribers')
   @default_permission(permission.CASTERS)
   async toggleSubscribers (opts: Record<string, any>) {
-    await this.toggle(opts, 'isSusbcriberAffected');
+    await this.toggle(opts, 'isSubscriberAffected');
   }
 
   @command('!cooldown toggle followers')

@@ -142,18 +142,18 @@
         </b-badge>
       </template>
       <template v-slot:cell(date)="data">
-        <div v-if="data.item.seenAt !== '0'">
+        <div v-if="Number(data.item.seenAt) !== 0">
           <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
             {{ translate('last-seen') }}:
           </strong>
           {{ moment(Number(data.item.seenAt)).format('LLL') }}</div>
-        <div v-if="data.item.isFollower && data.item.followedAt !== '0'">
+        <div v-if="data.item.isFollower && Number(data.item.followedAt) !== 0">
           <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
             <fa v-if="data.item.haveFollowedAtLock" :icon="['fas', 'fa-lock']"></fa>
             {{ translate('followed-since') }}:
           </strong>
           {{ moment(Number(data.item.followedAt)).format('LLL') }}</div>
-        <div v-if="data.item.isSubscriber && data.item.subscribedAt !== '0'">
+        <div v-if="data.item.isSubscriber && Number(data.item.subscribedAt) !== 0">
           <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
             <fa v-if="data.item.haveSubscribedAtLock" :icon="['fas', 'fa-lock']"></fa>
             {{ translate('subscribed-since') }}:

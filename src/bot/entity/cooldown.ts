@@ -25,7 +25,7 @@ export class Cooldown {
   @Column()
   isModeratorAffected!: boolean;
   @Column()
-  isSusbcriberAffected!: boolean;
+  isSubscriberAffected!: boolean;
   @Column()
   isFollowerAffected!: boolean;
   @OneToMany(() => CooldownViewer, (v) => v.cooldown, {

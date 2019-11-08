@@ -41,8 +41,8 @@
       <template v-slot:cell(isModeratorAffected)="data">
         {{ data.item.isModeratorAffected ? translate('commons.yes') : translate('commons.no') }}
       </template>
-      <template v-slot:cell(isSusbcriberAffected)="data">
-        {{ data.item.isSusbcriberAffected ? translate('commons.yes') : translate('commons.no') }}
+      <template v-slot:cell(isSubscriberAffected)="data">
+        {{ data.item.isSubscriberAffected ? translate('commons.yes') : translate('commons.no') }}
       </template>
       <template v-slot:cell(isFollowerAffected)="data">
         {{ data.item.isFollowerAffected ? translate('commons.yes') : translate('commons.no') }}
@@ -102,7 +102,7 @@ export default class cooldownList extends Vue {
     { key: 'isErrorMsgQuiet', label: capitalize(this.translate('quiet')), sortable: true },
     { key: 'isOwnerAffected', label: capitalize(this.translate('core.permissions.casters')), sortable: true },
     { key: 'isModeratorAffected', label: capitalize(this.translate('core.permissions.moderators')), sortable: true },
-    { key: 'isSusbcriberAffected', label: capitalize(this.translate('core.permissions.subscribers')), sortable: true },
+    { key: 'isSubscriberAffected', label: capitalize(this.translate('core.permissions.subscribers')), sortable: true },
     { key: 'isFollowerAffected', label: capitalize(this.translate('core.permissions.followers')), sortable: true },
     { key: 'buttons', label: '' },
   ];

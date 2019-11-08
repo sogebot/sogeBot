@@ -71,6 +71,8 @@ export class User {
   subscribeCumulativeMonths!: number;
   @Column({ default: 0 })
   subscribeStreak!: number;
+  @Column('bigint', { transformer: new ColumnNumericTransformer(), default: 0 })
+  giftedSubscribes!: number;
 
   @OneToMany(() => UserTip, (tip) => tip.user, {
     cascade: true, eager: true,
@@ -84,8 +86,6 @@ export class User {
 
   @Column('bigint', { transformer: new ColumnNumericTransformer(), default: 0 })
   messages!: number;
-  @Column('bigint', { transformer: new ColumnNumericTransformer(), default: 0 })
-  giftedSubscribes!: number;
 };
 
 @Entity()

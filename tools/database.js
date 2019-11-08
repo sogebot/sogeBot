@@ -216,10 +216,10 @@ async function main() {
       timestamp: o.timestamp,
       isErrorMsgQuiet: o.quiet,
       isEnabled: o.enabled,
-      isOwnerAffected: o.owner,
-      isModeratorAffected: o.moderator,
-      isSusbcriberAffected: o.subscriber,
-      isFollowerAffected: o.follower,
+      isOwnerAffected: o.owner || false,
+      isModeratorAffected: o.moderator || false,
+      isSubscriberAffected: o.subscriber || false,
+      isFollowerAffected: o.follower || false,
     };
   });
   if (items.length > 0) {
@@ -343,9 +343,9 @@ async function main() {
     };
   });
   if (items.length > 0) {
-    for (const item of items) {
+    for (const chunk of _.chunk(items, 100)) {
       try {
-        await getRepository(User).save(item);
+        await getRepository(User).save(chunk);
       } catch (e) {
         throw Error('Error Importing User ' + JSON.stringify(item));
       }

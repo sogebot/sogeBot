@@ -1,15 +1,15 @@
 import { isMainThread } from './cluster';
 import axios from 'axios';
-import { cloneDeep, isNil, set } from 'lodash';
+import { isNil } from 'lodash';
 import { setTimeout } from 'timers';
 
 import * as constants from './constants';
 import Core from './_interface';
 import * as commons from './commons';
-import { debug, isDebugEnabled } from './helpers/log';
 import { permission } from './helpers/permissions';
+import { debug, error, isDebugEnabled } from './helpers/log';
 import { adminEndpoint, viewerEndpoint } from './helpers/socket';
-import { getRepository, Brackets } from 'typeorm';
+import { Brackets, getRepository } from 'typeorm';
 import { User, UserBit, UserTip } from './entity/user';
 
 
@@ -279,6 +279,27 @@ class Users extends Core {
       await getRepository(UserTip).clear();
       cb();
     });
+    adminEndpoint(this.nsp, 'viewers::save', async (viewer: User, cb) => {
+      try {
+        // recount sortAmount
+        for (const tip of viewer.tips) {
+          tip.sortAmount = global.currency.exchange(Number(tip.amount), tip.currency, 'EUR');
+        }
+        await getRepository(User).save(viewer);
+        cb();
+      } catch (e) {
+        error(e);
+        cb(e);
+      }
+    });
+    adminEndpoint(this.nsp, 'viewers::remove', async (viewer: User, cb) => {
+      try {
+        await getRepository(User).remove(viewer);
+      } catch (e) {
+        error(e);
+        cb(e);
+      }
+    });
     adminEndpoint(this.nsp, 'getNameById', async (id, cb) => {
       cb(await this.getNameById(id));
     });
@@ -333,7 +354,7 @@ class Users extends Core {
 
       cb(viewers, count);
     });
-    adminEndpoint(this.nsp, 'followedAt.viewer', async (id, cb) => {
+    adminEndpoint(this.nsp, 'viewers::followedAt', async (id, cb) => {
       try {
         const cid = global.oauth.channelId;
         const url = `https://api.twitch.tv/helix/users/follows?from_id=${id}&to_id=${cid}`;
@@ -358,157 +379,38 @@ class Users extends Core {
         cb(e.stack, null);
       }
     });
-    viewerEndpoint(this.nsp, 'findOne.viewer', async (opts, cb) => {
-      const [viewer, tips, bits, points, messages, watched, permId] = await Promise.all([
-        global.db.engine.findOne('users', { id: opts.where.id }),
-        global.db.engine.find('users.tips', { id: opts.where.id }),
-        global.db.engine.find('users.bits', { id: opts.where.id }),
-        global.systems.points.getPointsOf(opts.where.id),
-        global.users.getMessagesOf(opts.where.id),
-        global.users.getWatchedOf(opts.where.id),
-        global.permissions.getUserHighestPermission(opts.where.id),
-      ]);
-
-      const online = await getRepository(User).findOne({
-        where: { username: viewer.username, isOnline: true },
+    viewerEndpoint(this.nsp, 'viewers::findOne', async (userId, cb) => {
+      const viewer = await getRepository(User).findOne({
+        relations: ['tips', 'bits'],
+        where: { userId },
       });
 
-      set(viewer, 'stats.tips', tips);
-      set(viewer, 'stats.bits', bits);
-      set(viewer, 'stats.aggregatedTips', tips.map((o) => global.currency.exchange(o.amount, o.currency, global.currency.mainCurrency)).reduce((a, b) => a + b, 0));
-      set(viewer, 'stats.aggregatedBits', bits.map((o) => Number(o.amount)).reduce((a, b) => a + b, 0));
-      set(viewer, 'custom.currency', global.currency.mainCurrency);
-      set(viewer, 'stats.messages', messages);
-      set(viewer, 'points', points);
-      set(viewer, 'time.watched', watched);
+      if (viewer) {
+        const aggregatedTips = viewer.tips.map((o) => global.currency.exchange(o.amount, o.currency, global.currency.mainCurrency)).reduce((a, b) => a + b, 0);
+        const aggregatedBits = viewer.bits.map((o) => Number(o.amount)).reduce((a, b) => a + b, 0);
 
-      if (!viewer.lock) {
-        viewer.lock = {
-          follower: false,
-          subscriber: false,
-          followed_at: false,
-          subscribed_at: false,
-        };
+        const permId = await global.permissions.getUserHighestPermission(userId);
+        let permissionGroup;
+        if (permId) {
+          permissionGroup = await global.permissions.get(permId);
+        } else {
+          permissionGroup = permission.VIEWERS;
+        }
+
+        cb({...viewer, aggregatedBits, aggregatedTips, permission: permissionGroup});
       } else {
-        if (typeof viewer.lock.follower === 'undefined' || viewer.lock.follower === null) {
-          viewer.lock.follower = false;
-        }
-        if (typeof viewer.lock.subscriber === 'undefined' || viewer.lock.subscriber === null) {
-          viewer.lock.subscriber = false;
-        }
-        if (typeof viewer.lock.followed_at === 'undefined' || viewer.lock.followed_at === null) {
-          viewer.lock.followed_at = false;
-        }
-        if (typeof viewer.lock.subscribed_at === 'undefined' || viewer.lock.subscribed_at === null) {
-          viewer.lock.subscribed_at = false;
-        }
+        cb();
       }
-
-      if (!viewer.is) {
-        viewer.is = {
-          follower: false,
-          subscriber: false,
-          vip: false,
-        };
-      } else {
-        if (typeof viewer.is.follower === 'undefined' || viewer.is.follower === null) {
-          viewer.is.follower = false;
-        }
-        if (typeof viewer.is.subscriber === 'undefined' || viewer.is.subscriber === null) {
-          viewer.is.subscriber = false;
-        }
-        if (typeof viewer.is.vip === 'undefined' || viewer.is.vip === null) {
-          viewer.is.vip = false;
-        }
-      }
-
-      // PERMISSION
-      if (permId) {
-        viewer.permission = await global.permissions.get(permId);
-      } else {
-        viewer.permission = permission.VIEWERS;
-      }
-
-      // ONLINE
-      const isOnline = typeof online !== 'undefined';
-      set(viewer, 'is.online', isOnline);
-
-      cb(null, viewer);
     });
-    adminEndpoint(this.nsp, 'delete.viewer', async (opts, cb) => {
-      const id = opts._id;
-      await global.db.engine.remove('users.points', { id });
-      await global.db.engine.remove('users.messages', { id });
-      await global.db.engine.remove('users.watched', { id });
-      await global.db.engine.remove('users.bits', { id });
-      await global.db.engine.remove('users.tips', { id });
-      await global.db.engine.remove('users', { id });
+    adminEndpoint(this.nsp, 'delete.viewer', async (userId, cb) => {
+      const viewer = await getRepository(User).findOne({ userId });
+      if (viewer) {
+        await getRepository(User).remove(viewer);
+      }
       cb(null);
     });
     adminEndpoint(this.nsp, 'update.viewer', async (opts, cb) => {
-      const id = opts.items[0]._id;
-      const viewer = opts.items[0].viewer; delete viewer._id;
-
-      // update user points
-      await global.db.engine.update('users.points', { id }, { points: isNaN(Number(viewer.points)) ? 0 : Number(viewer.points) });
-      delete viewer.points;
-
-      // update messages
-      await global.db.engine.update('users.messages', { id }, { messages: isNaN(Number(viewer.stats.messages)) ? 0 : Number(viewer.stats.messages) });
-      delete viewer.stats.messages;
-
-      // update watch time
-      await global.db.engine.update('users.watched', { id }, { watched: isNaN(Number(viewer.time.watched)) ? 0 : Number(viewer.time.watched) });
-      delete viewer.time.watched;
-
-      const bits = cloneDeep(viewer.stats.bits);
-      const newBitsIds: string[] = [];
-      for (const b of bits) {
-        delete b.editation;
-        b.amount = Number(b.amount); // force retype amount to be sure we really have number (ui is sending string)
-        if (b.new) {
-          delete b.new; delete b._id;
-          const bit = await global.db.engine.insert('users.bits', b);
-          newBitsIds.push(String(bit._id));
-        } else {
-          delete b.new;
-          const _id = String(b._id); delete b._id;
-          await global.db.engine.update('users.bits', { _id }, b);
-        }
-      }
-      for (const t of (await global.db.engine.find('users.bits', { id }))) {
-        if (!viewer.stats.bits.map(p => String(p._id)).includes(String(t._id)) && !newBitsIds.includes(String(t._id))) {
-          await global.db.engine.remove('users.bits', { _id: String(t._id) });
-        }
-      }
-      delete viewer.stats.bits;
-
-      const tips = cloneDeep(viewer.stats.tips);
-      const newTipsIds: string[] = [];
-      for (const b of tips) {
-        delete b.editation;
-        b.tips = Number(b.tips); // force retype amount to be sure we really have number (ui is sending string)
-        if (b.new) {
-          delete b.new; delete b._id;
-          b._amount = global.currency.exchange(Number(b.amount), b.currency, 'EUR'); // recounting amount to EUR to have simplified ordering
-          b._currency = 'EUR'; // we are forcing _currency to have simplified ordering
-          const tip = await global.db.engine.insert('users.tips', b);
-          newTipsIds.push(String(tip._id));
-        } else {
-          delete b.new;
-          const _id = String(b._id); delete b._id;
-          await global.db.engine.update('users.tips', { _id }, b);
-        }
-      }
-      for (const t of (await global.db.engine.find('users.tips', { id }))) {
-        if (!viewer.stats.tips.map(p => String(p._id)).includes(String(t._id)) && !newTipsIds.includes(String(t._id))) {
-          await global.db.engine.remove('users.tips', { _id: String(t._id) });
-        }
-      }
-      delete viewer.stats.tips;
-
-      await global.db.engine.update('users', { id }, viewer);
-      cb(null, id);
+      cb(null);
     });
   }
 }

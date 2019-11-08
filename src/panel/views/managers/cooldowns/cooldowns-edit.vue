@@ -78,7 +78,7 @@
         <button-with-icon :class="[ item.isModeratorAffected ? 'btn-success' : 'btn-danger' ]" class="btn-reverse" :icon="item.isModeratorAffected ? 'check' : 'times'" @click="item.isModeratorAffected = !item.isModeratorAffected">
           {{ translate('core.permissions.moderators') | capitalize }}
         </button-with-icon>
-        <button-with-icon :class="[ item.isSusbcriberAffected ? 'btn-success' : 'btn-danger' ]" class="btn-reverse" :icon="item.isSusbcriberAffected ? 'check' : 'times'" @click="item.isSusbcriberAffected = !item.isSusbcriberAffected">
+        <button-with-icon :class="[ item.isSubscriberAffected ? 'btn-success' : 'btn-danger' ]" class="btn-reverse" :icon="item.isSubscriberAffected ? 'check' : 'times'" @click="item.isSubscriberAffected = !item.isSubscriberAffected">
           {{ translate('core.permissions.subscribers') | capitalize }}
         </button-with-icon>
         <button-with-icon :class="[ item.isFollowerAffected ? 'btn-success' : 'btn-danger' ]" class="btn-reverse" :icon="item.isFollowerAffected ? 'check' : 'times'" @click="item.isFollowerAffected = !item.isFollowerAffected">
@@ -147,7 +147,7 @@ export default class cooldownEdit extends Vue {
     isEnabled: true,
     isOwnerAffected: true,
     isModeratorAffected: true,
-    isSusbcriberAffected: true,
+    isSubscriberAffected: true,
     isFollowerAffected: true,
     viewers: [],
   }

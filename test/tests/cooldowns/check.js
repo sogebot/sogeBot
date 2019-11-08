@@ -82,7 +82,7 @@ describe('Cooldowns - check()', () => {
         isEnabled: true,
         isOwnerAffected: true,
         isModeratorAffected: true,
-        isSusbcriberAffected: true,
+        isSubscriberAffected: true,
         isFollowerAffected: true,
       });
     });
@@ -123,7 +123,7 @@ describe('Cooldowns - check()', () => {
         isEnabled: true,
         isOwnerAffected: true,
         isModeratorAffected: true,
-        isSusbcriberAffected: true,
+        isSubscriberAffected: true,
         isFollowerAffected: true,
       });
     });
@@ -174,7 +174,7 @@ describe('Cooldowns - check()', () => {
         isEnabled: true,
         isOwnerAffected: false,
         isModeratorAffected: false,
-        isSusbcriberAffected: true,
+        isSubscriberAffected: true,
         isFollowerAffected: true,
       });
     });
