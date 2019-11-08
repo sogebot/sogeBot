@@ -21,7 +21,7 @@ async function setUsersOnline(users) {
 }
 
 describe('Message - random filter', () => {
-  describe.only('(random.online.viewer) should exclude ignored user', () => {
+  describe('(random.online.viewer) should exclude ignored user', () => {
     before(async () => {
       await db.cleanup();
       await msg.prepare();
