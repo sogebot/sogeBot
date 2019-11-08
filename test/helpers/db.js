@@ -43,8 +43,8 @@ module.exports = {
           await getRepository(entity).clear();
         }
         if ((await getRepository(entity).find()).length > 0) {
-          throw Error('DB is not cleared! ' + entity.name);
-          process.exit()
+          console.error('DB is not cleared! ' + entity.name);
+          process.exit(1);
         }
       }
 
