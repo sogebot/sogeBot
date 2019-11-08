@@ -38,7 +38,7 @@ module.exports = {
           await getManager().createQueryBuilder().delete().from(entity).where('id = :id', { id: item.id }).execute();
         }
       }
-      if (connection.options.type === 'postgres') {
+      if ((await getManager()).connection.options.type === 'postgres') {
         await getRepository(User).query('TRUNCATE "users" CASCADE');
         await getRepository(ModerationPermit).query('TRUNCATE "moderation_permit" CASCADE');
       } else {
