@@ -32,9 +32,12 @@ module.exports = {
 
       debug('test', chalk.bgRed('*** Cleaning up collections ***'));
 
-      const entities = [UserBit, UserTip, User, ModerationPermit, Alias, Bets, Commands, CommandsResponses, CommandsCount, Quotes, Settings, Cooldown, Keyword];
+      const entities = [User, ModerationPermit, Alias, Bets, Commands, CommandsResponses, CommandsCount, Quotes, Settings, Cooldown, Keyword];
       for (const entity of entities) {
-        await getRepository(entity).clear();
+        const items = await getRepository(entity).find();
+        for (const item of items) {
+          await getRepository(entity).remove(item);
+        }
       }
 
       debug('test', chalk.bgRed('*** Cleaned successfully ***'));
