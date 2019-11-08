@@ -400,7 +400,7 @@ class Message {
         let [alias, commands, cooldowns, ranks, prices] = await Promise.all([
           getRepository(Alias).find({ where: { visible: true, enabled: true } }),
           getRepository(Commands).find({ where: { visible: true, enabled: true } }),
-          getRepository(Cooldown).find({ where: { venabled: true } }),
+          getRepository(Cooldown).find({ where: { enabled: true } }),
           global.db.engine.find(global.systems.ranks.collection.data),
           global.db.engine.find(global.systems.price.collection.data, { enabled: true })
         ]);
