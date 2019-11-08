@@ -33,7 +33,7 @@ export class BetsParticipations {
   id!: string;
   @Column()
   @Index()
-  userId!: string;
+  userId!: number;
   @Column()
   username!: string;
   @Column('bigint', { transformer: new ColumnNumericTransformer() })

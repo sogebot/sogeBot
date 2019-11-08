@@ -424,7 +424,7 @@ class TMI extends Core {
       let user = await getRepository(User).findOne({ userId: userstate.userId });
       if (!user) {
         user = new User();
-        user.userId = userstate.userId;
+        user.userId = Number(userstate.userId);
         user.username = userstate.username;
       }
 
@@ -486,7 +486,7 @@ class TMI extends Core {
       let user = await getRepository(User).findOne({ userId: userstate.userId });
       if (!user) {
         user = new User();
-        user.userId = userstate.userId;
+        user.userId = Number(userstate.userId);
         user.username = userstate.username;
       }
 
@@ -606,7 +606,7 @@ class TMI extends Core {
       let user = await getRepository(User).findOne({ userId: recipientId });
       if (!user) {
         user = new User();
-        user.userId = recipientId;
+        user.userId = Number(recipientId);
         user.username = recipient;
       }
 
@@ -663,7 +663,7 @@ class TMI extends Core {
       if (!user) {
         // if we still doesn't have user, we create new
         user = new User();
-        user.userId = userId;
+        user.userId = Number(userId);
         user.username = username.toLowerCase();
         user = await getRepository(User).save(user);
         user.bits = [];
@@ -761,7 +761,7 @@ class TMI extends Core {
             userId: sender.userId,
           },
         }) || new User();
-        user.userId = sender.userId;
+        user.userId = Number(sender.userId);
         user.username = sender.username;
         user.isOnline = true;
         user.isVIP = typeof sender.badges.vip !== 'undefined';

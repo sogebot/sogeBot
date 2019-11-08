@@ -31,7 +31,7 @@ class WheelOfFortune extends Game {
 
         if (!user) {
           user = new User();
-          user.userId = await global.api.getIdFromTwitch(username);
+          user.userId = Number(await global.api.getIdFromTwitch(username));
           user.username = username;
           await getRepository(User).save(user);
         }

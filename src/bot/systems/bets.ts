@@ -231,7 +231,7 @@ class Bets extends System {
         if (!_betOfUser) {
           _betOfUser = new BetsParticipations();
           _betOfUser.username = opts.sender.username;
-          _betOfUser.userId = opts.sender.userId;
+          _betOfUser.userId = Number(opts.sender.userId);
           _betOfUser.optionIdx = index;
           _betOfUser.points = 0;
           currentBet.participations.push(_betOfUser);

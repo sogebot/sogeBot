@@ -103,9 +103,9 @@ class Events extends Core {
         user = new User();
         user.username = attributes.username;
         if (!attributes.userId) {
-          user.userId = await global.api.getIdFromTwitch(user.username);
+          user.userId = Number(await global.api.getIdFromTwitch(user.username));
         } else {
-          user.userId = attributes.userId;
+          user.userId = Number(attributes.userId);
         }
         await getRepository(User).save(user);
       }
@@ -126,7 +126,7 @@ class Events extends Core {
       if (!user) {
         user = new User();
         user.username = attributes.recipient;
-        user.userId = await global.api.getIdFromTwitch(user.username);
+        user.userId = Number(await global.api.getIdFromTwitch(user.username));
         await getRepository(User).save(user);
       }
 

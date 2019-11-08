@@ -253,7 +253,7 @@ class Users extends Core {
     let user = await getRepository(User).findOne({ username });
     if (!user) {
       user = new User();
-      user.userId = await global.api.getIdFromTwitch(username);
+      user.userId = Number(await global.api.getIdFromTwitch(username));
     }
     return user.userId;
   }

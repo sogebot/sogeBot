@@ -102,7 +102,7 @@ class Points extends System {
       let user = await getRepository(User).findOne({ username });
       if (!user) {
         user = new User();
-        user.userId = await global.api.getIdFromTwitch(username);
+        user.userId = Number(await global.api.getIdFromTwitch(username));
         user.username = username;
         user.points = 0;
         user.pointsOfflineGivenAt = Date.now();
@@ -237,7 +237,7 @@ class Points extends System {
 
       if (!guser) {
         guser = new User();
-        guser.userId = await global.api.getIdFromTwitch(username);
+        guser.userId = Number(await global.api.getIdFromTwitch(username));
         guser.username = username;
         guser.points = 0;
       }
@@ -332,7 +332,7 @@ class Points extends System {
 
       if (!user) {
         user = new User();
-        user.userId = await global.api.getIdFromTwitch(username);
+        user.userId = Number(await global.api.getIdFromTwitch(username));
         user.username = username;
         user.points = 0;
         await getRepository(User).save(user);
@@ -399,7 +399,7 @@ class Points extends System {
 
       if (!user) {
         user = new User();
-        user.userId = await global.api.getIdFromTwitch(username);
+        user.userId = Number(await global.api.getIdFromTwitch(username));
         user.username = username;
         user.points = points;
       } else {
@@ -427,7 +427,7 @@ class Points extends System {
       let user = await getRepository(User).findOne({ username });
       if (!user) {
         user = new User();
-        user.userId = await global.api.getIdFromTwitch(username);
+        user.userId = Number(await global.api.getIdFromTwitch(username));
         user.username = username;
         user.points = 0;
       } else {

@@ -109,7 +109,7 @@ class StreamElements extends Integration {
       if (!user && id) {
         // if we still doesn't have user, we create new
         user = new User();
-        user.userId = id;
+        user.userId = Number(id);
         user.username = username.toLowerCase();
         user = await getRepository(User).save(user);
       }

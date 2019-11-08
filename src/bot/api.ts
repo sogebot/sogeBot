@@ -748,7 +748,7 @@ class API extends Core {
           let user = await getRepository(User).findOne({ userId: f.from_id });
           if (!user) {
             user = new User();
-            user.userId = f.from_id;
+            user.userId = Number(f.from_id);
             user.username = f.from_name;
             user = await getRepository(User).save(user);
           }

@@ -111,7 +111,7 @@ class Queue extends System {
       let user = await getRepository(User).findOne({ userId: opts.sender.userId });
       if (!user) {
         user = new User();
-        user.userId = opts.sender.userId;
+        user.userId = Number(opts.sender.userId);
         user.username = opts.sender.username;
         await getRepository(User).save(user);
       }
