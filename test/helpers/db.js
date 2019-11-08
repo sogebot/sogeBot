@@ -15,7 +15,7 @@ const { Commands, CommandsResponses, CommandsCount } = require('../../dest/entit
 const { Keyword } = require('../../dest/entity/keyword');
 const { Settings } = require('../../dest/entity/settings');
 const { Quotes } = require('../../dest/entity/quotes');
-const { User } = require('../../dest/entity/user');
+const { User, UserBit, UserTip } = require('../../dest/entity/user');
 const { ModerationPermit } = require('../../dest/entity/moderation')
 
 let isDbConnected = false;
@@ -32,18 +32,9 @@ module.exports = {
 
       debug('test', chalk.bgRed('*** Cleaning up collections ***'));
 
-      const entities = [Alias, Bets, Commands, CommandsResponses, CommandsCount, Quotes, Settings, Cooldown, Keyword];
+      const entities = [UserBit, UserTip, User, ModerationPermit, Alias, Bets, Commands, CommandsResponses, CommandsCount, Quotes, Settings, Cooldown, Keyword];
       for (const entity of entities) {
-        for (const item of (await getManager().createQueryBuilder().select('entity').from(entity, 'entity').getMany())) {
-          await getManager().createQueryBuilder().delete().from(entity).where('id = :id', { id: item.id }).execute();
-        }
-      }
-      if ((await getManager()).connection.options.type === 'postgres') {
-        await getRepository(User).query('TRUNCATE "users" CASCADE');
-        await getRepository(ModerationPermit).query('TRUNCATE "moderation_permit" CASCADE');
-      } else {
-        await getRepository(User).clear();
-        await getRepository(ModerationPermit).clear(User);
+        await getRepository(entity).clear();
       }
 
       debug('test', chalk.bgRed('*** Cleaned successfully ***'));
