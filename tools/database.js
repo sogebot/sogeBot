@@ -18,6 +18,7 @@ const { EventList } = require('../dest/entity/eventList');
 const { Quotes } = require('../dest/entity/quotes');
 const { Permissions } = require('../dest/entity/permissions');
 const { User } = require('../dest/entity/user');
+const { Price } = require('../dest/entity/price');
 
 const _ = require('lodash');
 
@@ -344,11 +345,23 @@ async function main() {
   });
   if (items.length > 0) {
     for (const chunk of _.chunk(items, 100)) {
+      console.log('.')
       try {
         await getRepository(User).save(chunk);
       } catch (e) {
         throw Error('Error Importing User ' + JSON.stringify(item));
       }
+    }
+  }
+
+  console.log(`Migr: systems.price`);
+  await getManager().clear(Keyword);
+  items = (await from.engine.find('systems.price')).map(o => {
+    delete o._id; return o;
+  });
+  if (items.length > 0) {
+    for (const chunk of _.chunk(items, 100)) {
+      await getRepository(Price).save(chunk);
     }
   }
 
