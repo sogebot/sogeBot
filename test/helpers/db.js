@@ -11,8 +11,8 @@ const startup = _.now();
 const { getManager, getRepository } = require('typeorm');
 const { Alias } = require('../../dest/entity/alias');
 const { Cooldown } = require('../../dest/entity/cooldown');
-const { Bets } = require('../../dest/entity/bets');
-const { Commands, CommandsCount, CommandsResponses } = require('../../dest/entity/commands');
+const { Bets, BetsParticipations } = require('../../dest/entity/bets');
+const { Commands, CommandsCount } = require('../../dest/entity/commands');
 const { Keyword } = require('../../dest/entity/keyword');
 const { Settings } = require('../../dest/entity/settings');
 const { Quotes } = require('../../dest/entity/quotes');
@@ -21,43 +21,6 @@ const { ModerationPermit } = require('../../dest/entity/moderation')
 const { Price } = require('../../dest/entity/price')
 
 let isDbConnected = false;
-
-const clearEntitiesUntilDone = async (entities) => {
-  return new Promise(resolve => {
-    removeEntity = async () => {
-      let idx = []
-      let removeIdx = []
-      for (const [index, entity] of Object.entries(entities)) {
-        try {
-          await getRepository(entity).clear();
-          debug('test', chalk.bgRed(`*** Cleaned ${entity} ***`));
-          idx.push(index)
-        } catch(e) {
-          removeIdx.push(index)
-          // move entity to end
-          entities.push(entity);
-        }
-      }
-
-      // remove cleared entities
-      idx.forEach(val => {
-        entities.splice(val, 1);
-      });
-
-      removeIdx.forEach(val => {
-        entities.splice(val, 1);
-      });
-
-      if (entities.length > 0) {
-        debug('test', chalk.bgRed(`*** Trying again on  ${entities.join(', ')} ***`));
-        removeEntity();
-      } else {
-        resolve();
-      }
-    }
-    removeEntity();
-  })
-}
 
 module.exports = {
   cleanup: async function () {
@@ -72,8 +35,28 @@ module.exports = {
       debug('test', chalk.bgRed('*** Cleaning up collections ***'));
       await waitMs(400); // wait ittle bit for transactions to be done
 
-      const entities = [UserTip, UserBit, CommandsResponses, User, ModerationPermit, Alias, Bets, Commands, CommandsCount, Quotes, Settings, Cooldown, Keyword, Price];
-      await clearEntitiesUntilDone(entities);
+      const entities = [BetsParticipations, UserTip, UserBit, CommandsResponses, User, ModerationPermit, Alias, Bets, Commands, CommandsCount, Quotes, Settings, Cooldown, Keyword, Price];
+      if (['postgres', 'mysql'].includes((await getManager()).connection.options.type)) {
+        await getManager().transaction(async transactionalEntityManager => {
+          if (['mysql'].includes((await getManager()).connection.options.type)) {
+            transactionalEntityManager.query('SET FOREIGN_KEY_CHECKS=0;');
+          }
+          for (const entity of entities) {
+            if (['mysql'].includes((await getManager()).connection.options.type)) {
+              await transactionalEntityManager.query(`TRUNCATE "${metadata.tableName}"`);
+            } else {
+              await transactionalEntityManager.query(`TRUNCATE "${metadata.tableName}" CASCADE`);
+            }
+          }
+          if (['mysql'].includes((await getManager()).connection.options.type)) {
+            transactionalEntityManager.query('SET FOREIGN_KEY_CHECKS=1;');
+          }
+        });
+      } else {
+        for (const entity of entities) {
+          await getRepository(entity).clear();
+        }
+      }
 
       debug('test', chalk.bgRed('*** Cleaned successfully ***'));
 
@@ -103,7 +86,7 @@ module.exports = {
       global.oauth.broadcasterId = '54321';
       await variable.isEqual('global.oauth.broadcasterId', '54321');
 
-      global.tmi.ignorelist = [];
+      global.tmi.ignorelist = []
 
       resolve();
     };
