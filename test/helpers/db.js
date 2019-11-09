@@ -39,7 +39,7 @@ module.exports = {
       if (['postgres', 'mysql'].includes((await getManager()).connection.options.type)) {
         await getManager().transaction(async transactionalEntityManager => {
           if (['mysql'].includes((await getManager()).connection.options.type)) {
-            transactionalEntityManager.query('SET FOREIGN_KEY_CHECKS=0;');
+            await transactionalEntityManager.query('SET FOREIGN_KEY_CHECKS=0;');
           }
           for (const entity of entities) {
             if (['mysql'].includes((await getManager()).connection.options.type)) {
@@ -49,7 +49,7 @@ module.exports = {
             }
           }
           if (['mysql'].includes((await getManager()).connection.options.type)) {
-            transactionalEntityManager.query('SET FOREIGN_KEY_CHECKS=1;');
+            await transactionalEntityManager.query('SET FOREIGN_KEY_CHECKS=1;');
           }
         });
       } else {
