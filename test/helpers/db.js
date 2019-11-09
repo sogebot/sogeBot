@@ -18,6 +18,7 @@ const { Settings } = require('../../dest/entity/settings');
 const { Quotes } = require('../../dest/entity/quotes');
 const { User } = require('../../dest/entity/user');
 const { ModerationPermit } = require('../../dest/entity/moderation')
+const { Price } = require('../../dest/entity/price')
 
 let isDbConnected = false;
 
@@ -34,7 +35,7 @@ module.exports = {
       debug('test', chalk.bgRed('*** Cleaning up collections ***'));
       await waitMs(400); // wait ittle bit for transactions to be done
 
-      const entities = [User, ModerationPermit, Alias, Bets, Commands, CommandsCount, Quotes, Settings, Cooldown, Keyword];
+      const entities = [User, ModerationPermit, Alias, Bets, Commands, CommandsCount, Quotes, Settings, Cooldown, Keyword, Price];
       for (const entity of entities) {
         if ((await getManager()).connection.options.type === 'postgres') {
           const metadata = (await getManager()).connection.getMetadata(entity);

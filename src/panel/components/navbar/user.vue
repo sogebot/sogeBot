@@ -115,9 +115,13 @@ export default class User extends Vue {
       return setTimeout(() => this.refreshViewer(), 100);
     }
     this.socket.emit('viewers::findOne', this.$loggedUser.id, (viewer) => {
-      console.log('Logged in as', viewer);
-      this.viewer = viewer;
-      this.isViewerLoaded = true;
+      if (viewer) {
+        console.log('Logged in as', viewer);
+        this.viewer = viewer;
+        this.isViewerLoaded = true;
+      } else {
+        console.error('Cannot find user data, try to write something in chat to load data')
+      }
     })
   }
 }
