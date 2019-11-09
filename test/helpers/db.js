@@ -35,9 +35,13 @@ module.exports = {
       debug('test', chalk.bgRed('*** Cleaning up collections ***'));
       await waitMs(400); // wait ittle bit for transactions to be done
 
+      if (['mysql'].includes((await getManager()).connection.options.type)) {
+        getRepository(User).query('SET FOREIGN_KEY_CHECKS=0;');
+      }
+
       const entities = [User, ModerationPermit, Alias, Bets, Commands, CommandsCount, Quotes, Settings, Cooldown, Keyword, Price];
       for (const entity of entities) {
-        if (['postgres', 'mysql'].includes((await getManager()).connection.options.type)) {
+        if (['postgres'].includes((await getManager()).connection.options.type)) {
           const metadata = (await getManager()).connection.getMetadata(entity);
           await getRepository(entity).query(`TRUNCATE "${metadata.tableName}" CASCADE`);
         } else {
@@ -47,6 +51,10 @@ module.exports = {
           console.error('DB is not cleared! ' + entity.name);
           process.exit(1);
         }
+      }
+
+      if (['mysql'].includes((await getManager()).connection.options.type)) {
+        getRepository(User).query('SET FOREIGN_KEY_CHECKS=1;');
       }
 
       debug('test', chalk.bgRed('*** Cleaned successfully ***'));
