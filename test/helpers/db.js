@@ -37,7 +37,7 @@ module.exports = {
 
       const entities = [User, ModerationPermit, Alias, Bets, Commands, CommandsCount, Quotes, Settings, Cooldown, Keyword, Price];
       for (const entity of entities) {
-        if ((await getManager()).connection.options.type === 'postgres') {
+        if (['postgres', 'mysql'].includes((await getManager()).connection.options.type)) {
           const metadata = (await getManager()).connection.getMetadata(entity);
           await getRepository(entity).query(`TRUNCATE "${metadata.tableName}" CASCADE`);
         } else {
