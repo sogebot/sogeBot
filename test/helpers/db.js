@@ -37,11 +37,16 @@ module.exports = {
 
       const entities = [BetsParticipations, UserTip, UserBit, CommandsResponses, User, ModerationPermit, Alias, Bets, Commands, CommandsCount, Quotes, Settings, Cooldown, Keyword, Price];
       if (['postgres', 'mysql'].includes((await getManager()).connection.options.type)) {
+        const metadatas = [];
+        for (const entity of entities) {
+          metadatas.push((await getManager()).connection.getMetadata(entity));
+        }
+
         await getManager().transaction(async transactionalEntityManager => {
           if (['mysql'].includes((await getManager()).connection.options.type)) {
             await transactionalEntityManager.query('SET FOREIGN_KEY_CHECKS=0;');
           }
-          for (const entity of entities) {
+          for (const metadata of metadatas) {
             if (['mysql'].includes((await getManager()).connection.options.type)) {
               await transactionalEntityManager.query(`TRUNCATE "${metadata.tableName}"`);
             } else {
