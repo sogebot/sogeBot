@@ -32,7 +32,7 @@ export async function autoLoad(directory): Promise<{ [x: string]: any }> {
 
 export function getIgnoreList() {
   return global.tmi.ignorelist.map((o) => {
-    return o.trim().toLowerCase();
+    return typeof o === 'string' ? o.trim().toLowerCase() : o;
   });
 }
 

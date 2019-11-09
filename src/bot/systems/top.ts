@@ -124,7 +124,10 @@ class Top extends System {
         message = global.translate('systems.top.time').replace(/\$amount/g, 10);
         break;
       case TYPE.TIPS:
-        sorted = await getRepository(User).query(`SELECT "user"."username", SUM("user_tip"."sortAmount") as value FROM "user" INNER JOIN "user_tip" ON "user"."userId" = "user_tip"."userUserId" WHERE "user"."username" != '${global.oauth.botUsername.toLowerCase()}' AND "user"."username" != '${global.oauth.broadcasterUsername.toLowerCase()}' GROUP BY "user"."userId" ORDER BY value DESC LIMIT ${_total}; `);
+        sorted
+          = (await getRepository(User)
+            .query(`SELECT "user"."userId", "user"."username", SUM("user_tip"."sortAmount") as value FROM "user" INNER JOIN "user_tip" ON "user"."userId" = "user_tip"."userUserId" WHERE "user"."username" != '${global.oauth.botUsername.toLowerCase()}' AND "user"."username" != '${global.oauth.broadcasterUsername.toLowerCase()}' GROUP BY "user"."userId" ORDER BY value DESC LIMIT ${_total}; `)
+          ).filter(o => !isIgnored({ username: o.username, userId: o.userId }));
         message = global.translate('systems.top.tips').replace(/\$amount/g, 10);
         break;
       case TYPE.POINTS:
@@ -189,7 +192,10 @@ class Top extends System {
         message = global.translate('systems.top.subage').replace(/\$amount/g, 10);
         break;
       case TYPE.BITS:
-        sorted = await getRepository(User).query(`SELECT "user"."username", SUM("user_bit"."amount") as value FROM "user" INNER JOIN user_bit ON "user"."userId" = "user_bit"."userUserId" WHERE "user"."username" != '${global.oauth.botUsername.toLowerCase()}' AND "user"."username" != '${global.oauth.broadcasterUsername.toLowerCase()}' GROUP BY "user"."userId" ORDER BY value DESC LIMIT ${_total}; `);
+        sorted
+        = (await getRepository(User)
+            .query(`SELECT "user"."userId", "user"."username", SUM("user_bit"."amount") as value FROM "user" INNER JOIN user_bit ON "user"."userId" = "user_bit"."userUserId" WHERE "user"."username" != '${global.oauth.botUsername.toLowerCase()}' AND "user"."username" != '${global.oauth.broadcasterUsername.toLowerCase()}' GROUP BY "user"."userId" ORDER BY value DESC LIMIT ${_total}; `)
+          ).filter(o => !isIgnored({ username: o.username, userId: o.userId }));
         message = global.translate('systems.top.bits').replace(/\$amount/g, 10);
         break;
       case TYPE.GIFTS:

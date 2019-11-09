@@ -33,4 +33,14 @@ describe('Top - !top messages', () => {
     global.systems.top.messages({ sender: { username: commons.getOwner() } });
     await message.isSentRaw('Top 10 (messages): 1. @user9 - 9, 2. @user8 - 8, 3. @user7 - 7, 4. @user6 - 6, 5. @user5 - 5, 6. @user4 - 4, 7. @user3 - 3, 8. @user2 - 2, 9. @user1 - 1, 10. @user0 - 0', owner);
   });
+
+  it('add user1 to ignore list', async () => {
+    global.tmi.ignoreAdd({ sender: owner, parameters: 'user0' });
+    await message.isSent('ignore.user.is.added', owner, { username: 'user0' });
+  });
+
+  it('run !top messages and expect correct output', async () => {
+    global.systems.top.messages({ sender: { username: commons.getOwner() } });
+    await message.isSentRaw('Top 10 (messages): 1. @user9 - 9, 2. @user8 - 8, 3. @user7 - 7, 4. @user6 - 6, 5. @user5 - 5, 6. @user4 - 4, 7. @user3 - 3, 8. @user2 - 2, 9. @user1 - 1', owner);
+  });
 });
