@@ -7,7 +7,7 @@ import { permission } from '../permissions';
 import System from './_interface';
 import { debug } from '../helpers/log';
 import { getRepository } from 'typeorm';
-import { User } from '../entity/user';
+import { User, UserBit, UserTip } from '../entity/user';
 
 enum TYPE {
   TIME,
@@ -125,8 +125,15 @@ class Top extends System {
         break;
       case TYPE.TIPS:
         sorted
-          = (await getRepository(User)
-            .query(`SELECT "user"."userId", "user"."username", SUM("user_tip"."sortAmount") as value FROM "user" INNER JOIN "user_tip" ON "user"."userId" = "user_tip"."userUserId" WHERE "user"."username" != '${global.oauth.botUsername.toLowerCase()}' AND "user"."username" != '${global.oauth.broadcasterUsername.toLowerCase()}' GROUP BY "user"."userId" ORDER BY value DESC LIMIT ${_total}; `)
+         = (await getRepository(User).createQueryBuilder('user')
+            .orderBy('value', 'DESC')
+            .addSelect('COALESCE(SUM(user_tip.sortAmount), 0)', 'value')
+            .addSelect('user.username')
+            .limit(_total)
+            .where('user.username != :botusername', { botusername: global.oauth.botUsername.toLowerCase() })
+            .innerJoin(UserTip, 'user_tip', 'user_tip.userUserId = user.userId')
+            .groupBy('user.userId')
+            .getRawMany()
           ).filter(o => !isIgnored({ username: o.username, userId: o.userId }));
         message = global.translate('systems.top.tips').replace(/\$amount/g, 10);
         break;
@@ -193,8 +200,15 @@ class Top extends System {
         break;
       case TYPE.BITS:
         sorted
-        = (await getRepository(User)
-            .query(`SELECT "user"."userId", "user"."username", SUM("user_bit"."amount") as value FROM "user" INNER JOIN user_bit ON "user"."userId" = "user_bit"."userUserId" WHERE "user"."username" != '${global.oauth.botUsername.toLowerCase()}' AND "user"."username" != '${global.oauth.broadcasterUsername.toLowerCase()}' GROUP BY "user"."userId" ORDER BY value DESC LIMIT ${_total}; `)
+         = (await getRepository(User).createQueryBuilder('user')
+            .orderBy('value', 'DESC')
+            .addSelect('COALESCE(SUM(user_bit.amount), 0)', 'value')
+            .addSelect('user.username')
+            .limit(_total)
+            .andWhere('user.username != :broadcasterusername', { broadcasterusername: global.oauth.broadcasterUsername.toLowerCase() })
+            .innerJoin(UserBit, 'user_bit', '"user_bit"."userUserId" = "user"."userId"')
+            .groupBy('user.userId')
+            .getRawMany()
           ).filter(o => !isIgnored({ username: o.username, userId: o.userId }));
         message = global.translate('systems.top.bits').replace(/\$amount/g, 10);
         break;
