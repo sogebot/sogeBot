@@ -1,6 +1,10 @@
 {
-  "type": "sqlite",
-  "database": "./sogebot.db",
+  "type": "mysql",
+  "host": "localhost",
+  "port": "3307",
+  "username": "root",
+  "password": "Passw0rd",
+  "database": "sogebot",
   "logging": ["error"],
   "cache": true
 }

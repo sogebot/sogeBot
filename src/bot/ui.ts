@@ -1,3 +1,5 @@
+import 'module-alias/register';
+
 import Core from './_interface';
 import { settings, ui } from './decorators';
 import { onChange, onLoad } from './decorators/on';

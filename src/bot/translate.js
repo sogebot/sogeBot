@@ -2,6 +2,8 @@
 
 'use strict'
 
+require('module-alias/register');
+
 var glob = require('glob')
 var fs = require('fs')
 var _ = require('lodash')

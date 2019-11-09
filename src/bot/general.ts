@@ -1,3 +1,5 @@
+import 'module-alias/register';
+
 import config from '@config';
 import { readdirSync } from 'fs';
 import gitCommitInfo from 'git-commit-info';

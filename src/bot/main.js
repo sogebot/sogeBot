@@ -4,6 +4,7 @@ if (Number(process.versions.node.split('.')[0]) < 11) {
 }
 
 import 'reflect-metadata';
+import 'module-alias/register';
 
 import { Permissions } from './permissions';
 import { Events } from './events';
