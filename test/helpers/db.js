@@ -48,7 +48,7 @@ module.exports = {
           }
           for (const metadata of metadatas) {
             if (['mysql'].includes((await getManager()).connection.options.type)) {
-              await transactionalEntityManager.query(`TRUNCATE "${metadata.tableName}"`);
+              await transactionalEntityManager.query(`TRUNCATE TABLE "${metadata.tableName}"`);
             } else {
               await transactionalEntityManager.query(`TRUNCATE "${metadata.tableName}" CASCADE`);
             }
