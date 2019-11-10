@@ -6,7 +6,7 @@ import { command, default_permission } from '../decorators';
 import { permission } from '../permissions';
 import System from './_interface';
 import { debug } from '../helpers/log';
-import { getRepository } from 'typeorm';
+import { getConnection, getRepository } from 'typeorm';
 import { User, UserBit, UserTip } from '../entity/user';
 
 enum TYPE {
@@ -108,6 +108,7 @@ class Top extends System {
 
     moment.locale(global.lib.translate.lang);
 
+    const connection = await getConnection();
     switch (type) {
       case TYPE.TIME:
         sorted
@@ -124,6 +125,7 @@ class Top extends System {
         message = global.translate('systems.top.time').replace(/\$amount/g, 10);
         break;
       case TYPE.TIPS:
+        const joinTip = connection.options.type === 'postgres' ? '"user_tip"."userUserId" = "user"."userId"' : 'user_tip.userUserId = user.userId'
         sorted
          = (await getRepository(User).createQueryBuilder('user')
             .orderBy('value', 'DESC')
@@ -131,7 +133,7 @@ class Top extends System {
             .addSelect('user.username')
             .limit(_total)
             .where('user.username != :botusername', { botusername: global.oauth.botUsername.toLowerCase() })
-            .innerJoin(UserTip, 'user_tip', 'user_tip.userUserId = user.userId')
+            .innerJoin(UserTip, 'user_tip', joinTip)
             .groupBy('user.userId')
             .getRawMany()
           ).filter(o => !isIgnored({ username: o.username, userId: o.userId }));
@@ -199,6 +201,7 @@ class Top extends System {
         message = global.translate('systems.top.subage').replace(/\$amount/g, 10);
         break;
       case TYPE.BITS:
+        const joinBit = connection.options.type === 'postgres' ? '"user_bit"."userUserId" = "user"."userId"' : 'user_bit.userUserId = user.userId'
         sorted
          = (await getRepository(User).createQueryBuilder('user')
             .orderBy('value', 'DESC')
@@ -206,7 +209,7 @@ class Top extends System {
             .addSelect('user.username')
             .limit(_total)
             .andWhere('user.username != :broadcasterusername', { broadcasterusername: global.oauth.broadcasterUsername.toLowerCase() })
-            .innerJoin(UserBit, 'user_bit', '"user_bit"."userUserId" = "user"."userId"')
+            .innerJoin(UserBit, 'user_bit', joinBit)
             .groupBy('user.userId')
             .getRawMany()
           ).filter(o => !isIgnored({ username: o.username, userId: o.userId }));

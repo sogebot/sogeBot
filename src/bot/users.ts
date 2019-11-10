@@ -9,13 +9,9 @@ import * as commons from './commons';
 import { permission } from './helpers/permissions';
 import { debug, error, isDebugEnabled } from './helpers/log';
 import { adminEndpoint, viewerEndpoint } from './helpers/socket';
-import { Brackets, getRepository } from 'typeorm';
+import { Brackets, getConnection, getRepository } from 'typeorm';
 import { User, UserBit, UserTip } from './entity/user';
-
-
-export const getAllOnlineUsernames = async () => {
-  return (await getRepository(User).find({ where: { isOnline: true }})).map(o => o.username);
-};
+import { getAllOnlineUsernames } from './helpers/getAllOnlineUsernames';
 
 class Users extends Core {
   uiSortCache: string | null = null;
@@ -304,36 +300,53 @@ class Users extends Core {
       cb(await this.getNameById(id));
     });
     adminEndpoint(this.nsp, 'find.viewers', async (opts: { search?: string; filter?: { subscribers: null | boolean; followers: null | boolean; active: null | boolean; vips: null | boolean }; page: number; order?: { orderBy: string; sortOrder: 'ASC' | 'DESC' } }, cb) => {
+      const connection = await getConnection();
       opts.page = opts.page ?? 0;
 
-      const query = getRepository(User).createQueryBuilder('user')
-        .orderBy(opts.order?.orderBy ?? 'user.username' , opts.order?.sortOrder ?? 'ASC')
-        .select('COALESCE(SUM("user_bit"."amount"), 0)', 'sumBits')
-        .addSelect('COALESCE(SUM("user_tip"."sortAmount"), 0)', 'sumTips')
-        .addSelect('"user".*')
-        .offset(opts.page * 25)
-        .limit(25)
-        .leftJoin(UserBit, 'user_bit', '"user_bit"."userUserId" = "user"."userId"')
-        .leftJoin(UserTip, 'user_tip', '"user_tip"."userUserId" = "user"."userId"')
-        .groupBy('user.userId');
+      let query;
+      if (connection.options.type === 'postgres') {
+        query = getRepository(User).createQueryBuilder('user')
+          .orderBy(opts.order?.orderBy ?? 'user.username' , opts.order?.sortOrder ?? 'ASC')
+          .select('COALESCE(SUM("user_bit"."amount"), 0)', 'sumBits')
+          .addSelect('COALESCE(SUM("user_tip"."sortAmount"), 0)', 'sumTips')
+          .addSelect('"user".*')
+          .offset(opts.page * 25)
+          .limit(25)
+          .leftJoin(UserBit, 'user_bit', '"user_bit"."userUserId" = "user"."userId"')
+          .leftJoin(UserTip, 'user_tip', '"user_tip"."userUserId" = "user"."userId"')
+          .groupBy('user.userId');
+      } else {
+        query = getRepository(User).createQueryBuilder('user')
+          .orderBy(opts.order?.orderBy ?? 'user.username' , opts.order?.sortOrder ?? 'ASC')
+          .select('COALESCE(SUM(user_bit.amount), 0)', 'sumBits')
+          .addSelect('COALESCE(SUM(user_tip.sortAmount), 0)', 'sumTips')
+          .addSelect('user.*')
+          .offset(opts.page * 25)
+          .limit(25)
+          .leftJoin(UserBit, 'user_bit', 'user_bit.userUserId = user.userId')
+          .leftJoin(UserTip, 'user_tip', 'user_tip.userUserId = user.userId')
+          .groupBy('user.userId');
+      }
 
       if (typeof opts.order !== 'undefined') {
-        opts.order.orderBy = opts.order.orderBy.split('.').map(o => `"${o}"`).join('.');
+        if (connection.options.type === 'postgres') {
+          opts.order.orderBy = opts.order.orderBy.split('.').map(o => `"${o}"`).join('.');
+        }
         query.orderBy({ [opts.order.orderBy]: opts.order.sortOrder });
       }
 
       if (typeof opts.filter !== 'undefined') {
         if (opts.filter.subscribers !== null) {
-          query.andWhere('"user"."isSubscriber" = :isSubscriber', { isSubscriber: opts.filter.subscribers });
+          query.andWhere('user.isSubscriber = :isSubscriber', { isSubscriber: opts.filter.subscribers });
         }
         if (opts.filter.followers !== null) {
-          query.andWhere('"user"."isFollower" = :isFollower', { isFollower: opts.filter.followers });
+          query.andWhere('user.isFollower = :isFollower', { isFollower: opts.filter.followers });
         }
         if (opts.filter.vips !== null) {
-          query.andWhere('"user"."isVIP" = :isVIP', { isVIP: opts.filter.vips });
+          query.andWhere('user.isVIP = :isVIP', { isVIP: opts.filter.vips });
         }
         if (opts.filter.active !== null) {
-          query.andWhere('"user"."isOnline" = :isOnline', { isOnline: opts.filter.active });
+          query.andWhere('user.isOnline = :isOnline', { isOnline: opts.filter.active });
         }
       }
 

@@ -10,9 +10,9 @@ import { permission } from '../permissions';
 import System from './_interface';
 import { debug, error } from '../helpers/log';
 import { adminEndpoint } from '../helpers/socket';
-import { getAllOnlineUsernames } from '../users';
 import { getRepository } from 'typeorm';
 import { User } from '../entity/user';
+import { getAllOnlineUsernames } from '../helpers/getAllOnlineUsernames';
 
 class Points extends System {
   @settings('points')

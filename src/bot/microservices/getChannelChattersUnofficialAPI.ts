@@ -12,16 +12,15 @@ import {
 
 import { User } from '../entity/user';
 import { ThreadEvent } from '../entity/threadEvent';
-import { getAllOnlineUsernames } from '../users';
+import { getAllOnlineUsernames } from '../helpers/getAllOnlineUsernames';
 import { Settings } from '../entity/settings';
 import { getUserFromTwitch } from './getUserFromTwitch';
-import { error } from '../helpers/log';
 import { clusteredFetchAccountAge } from '../cluster';
 
 export const getChannelChattersUnofficialAPI = async (): Promise<{ modStatus: boolean; partedUsers: string[]; joinedUsers: string[] }> => {
   if (!isMainThread) {
     const connectionOptions = await getConnectionOptions();
-    createConnection({
+    await createConnection({
       synchronize: true,
       logging: false,
       entities: [__dirname + '/../entity/*.{js,ts}'],
@@ -125,7 +124,7 @@ export const getChannelChattersUnofficialAPI = async (): Promise<{ modStatus: bo
             clusteredFetchAccountAge(user.username, user.userId);
             await getRepository(User).save(user);
           } catch (e) {
-            error('Something went wrong when getting user data of ' + username);
+            console.error('Something went wrong when getting user data of ' + username);
             continue;
           }
         }
