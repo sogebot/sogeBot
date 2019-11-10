@@ -125,7 +125,7 @@ class Top extends System {
         message = global.translate('systems.top.time').replace(/\$amount/g, 10);
         break;
       case TYPE.TIPS:
-        const joinTip = connection.options.type === 'postgres' ? '"user_tip"."userUserId" = "user"."userId"' : 'user_tip.userUserId = user.userId'
+        const joinTip = connection.options.type === 'postgres' ? '"user_tip"."userUserId" = "user"."userId"' : 'user_tip.userUserId = user.userId';
         sorted
          = (await getRepository(User).createQueryBuilder('user')
             .orderBy('value', 'DESC')
@@ -201,7 +201,7 @@ class Top extends System {
         message = global.translate('systems.top.subage').replace(/\$amount/g, 10);
         break;
       case TYPE.BITS:
-        const joinBit = connection.options.type === 'postgres' ? '"user_bit"."userUserId" = "user"."userId"' : 'user_bit.userUserId = user.userId'
+        const joinBit = connection.options.type === 'postgres' ? '"user_bit"."userUserId" = "user"."userId"' : 'user_bit.userUserId = user.userId';
         sorted
          = (await getRepository(User).createQueryBuilder('user')
             .orderBy('value', 'DESC')

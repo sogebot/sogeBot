@@ -10,7 +10,7 @@ const mathjs = require('mathjs');
 
 import Message from './message';
 import { permission } from './permissions';
-import { getAllOnlineUsernames } from './users';
+import { getAllOnlineUsernames } from './helpers/getAllOnlineUsernames';
 
 import { getRepository } from 'typeorm';
 import { User } from './entity/user';
