@@ -1,6 +1,5 @@
 'use strict';
 
-import crypto from 'crypto';
 import * as _ from 'lodash';
 import { isMainThread } from '../cluster';
 
@@ -8,8 +7,10 @@ import { sendMessage } from '../commons';
 import { command, default_permission } from '../decorators';
 import { permission } from '../permissions';
 import System from './_interface';
-import uuid from 'uuid';
 import { adminEndpoint } from '../helpers/socket';
+
+import { getRepository } from 'typeorm';
+import { Timer, TimerResponse } from '../entity/timer';
 
 /*
  * !timers                                                                                                                      - gets an info about timers usage
@@ -35,70 +36,40 @@ class Timers extends System {
   }
 
   sockets () {
-    adminEndpoint(this.nsp, 'find.timers', async (callback) => {
-      const [timers, responses] = await Promise.all([
-        global.db.engine.find(this.collection.data),
-        global.db.engine.find(this.collection.responses),
-      ]);
-      callback(null, { timers: timers, responses: responses });
+    adminEndpoint(this.nsp, 'timers::getAll', async (callback) => {
+      const timers = await getRepository(Timer).find({
+        relations: ['messages'],
+      });
+      callback(null, timers);
     });
-    adminEndpoint(this.nsp, 'findOne.timer', async (opts, callback) => {
-      const [timer, responses] = await Promise.all([
-        global.db.engine.findOne(this.collection.data, { id: opts.id }),
-        global.db.engine.find(this.collection.responses, { timerId: opts.id }),
-      ]);
-      callback(null, { timer: timer, responses: responses });
+    adminEndpoint(this.nsp, 'timers::getOne', async (id, callback) => {
+      const timer = await getRepository(Timer).findOne({
+        relations: ['messages'],
+        where: {
+          id,
+        },
+      });
+      callback(null, timer);
     });
-    adminEndpoint(this.nsp, 'delete.timer', async (id, callback) => {
-      await Promise.all([
-        global.db.engine.remove(this.collection.data, { id }),
-        global.db.engine.remove(this.collection.responses, { timerId: id }),
-      ]);
+    adminEndpoint(this.nsp, 'timers::remove', async (id, callback) => {
+      const timer = await getRepository(Timer).findOne({
+        where: {
+          id,
+        },
+      });
+      if (timer) {
+        await getRepository(Timer).remove(timer);
+      }
       callback(null);
     });
-    adminEndpoint(this.nsp, 'update.timer', async (data, callback) => {
-      const name = data.timer.name && data.timer.name.trim().length ? data.timer.name.replace(/ /g, '_') : crypto.createHash('md5').update(new Date().getTime().toString()).digest('hex').slice(0, 5);
-      _.remove(data.responses, (o: any) => o.response.trim().length === 0);
-
-      const timer = {
-        id:  data.timer.id || uuid(),
-        name: name,
-        messages: _.toNumber(data.timer.messages),
-        seconds: _.toNumber(data.timer.seconds),
-        enabled: data.timer.enabled,
-        trigger: {
-          messages: 0,
-          timestamp: new Date().getTime(),
-        },
-      };
-      if (_.isNil(data.timer.id)) {
-        await global.db.engine.insert(this.collection.data, timer);
-      } else {
-        await Promise.all([
-          global.db.engine.update(this.collection.data, { id: timer.id }, timer),
-          global.db.engine.remove(this.collection.responses, { timerId: timer.id }),
-        ]);
+    adminEndpoint(this.nsp, 'timers::save', async (data, callback) => {
+      try {
+        data = await getRepository(Timer).save(data);
+        callback(null, data);
+      } catch (e) {
+        callback(e);
       }
-
-      const insertArray: any[] = [];
-      for (const response of data.responses) {
-        insertArray.push(global.db.engine.insert(this.collection.responses, {
-          timerId: timer.id,
-          response: response.response,
-          enabled: response.enabled,
-          timestamp: 0,
-        }));
-      }
-      await Promise.all(insertArray);
-      callback(null, {
-        timer: await global.db.engine.findOne(this.collection.data, { id: timer.id }),
-        responses: await global.db.engine.find(this.collection.responses, { timerId: timer.id }),
-      });
     });
-  }
-
-  async send (self, socket) {
-    socket.emit(this.collection.data, { timers: await global.db.engine.find(this.collection.data), responses: await global.db.engine.find(this.collection.responses) });
   }
 
   @command('!timers')
@@ -126,9 +97,13 @@ class Timers extends System {
   }
 
   async init () {
-    const timers = await global.db.engine.find(this.collection.data);
+    const timers = await getRepository(Timer).find({
+      relations: ['messages'],
+    });
     for (const timer of timers) {
-      await global.db.engine.update(this.collection.data, { id: timer.id }, { trigger: { messages: 0, timestamp: new Date().getTime() } });
+      timer.triggeredAtMessages = 0;
+      timer.triggeredAtTimestamp = Date.now();
+      await getRepository(Timer).save(timer);
     }
     this.check();
   }
@@ -136,19 +111,21 @@ class Timers extends System {
   async check () {
     clearTimeout(this.timeouts.timersCheck);
 
-    const timers = await global.db.engine.find(this.collection.data, { enabled: true });
+    const timers = await getRepository(Timer).find({
+      relations: ['messages'],
+      where: { isEnabled: true },
+    });
     for (const timer of timers) {
-      if (timer.messages > 0 && timer.trigger.messages - global.linesParsed + timer.messages > 0) {
+      if (timer.triggerEveryMessage > 0 && timer.triggeredAtMessages - global.linesParsed + timer.triggerEveryMessage > 0) {
         continue;
       } // not ready to trigger with messages
-      if (timer.seconds > 0 && new Date().getTime() - timer.trigger.timestamp < timer.seconds * 1000) {
+      if (timer.triggerEverySecond > 0 && new Date().getTime() - timer.triggeredAtTimestamp < timer.triggerEverySecond * 1000) {
         continue;
       } // not ready to trigger with seconds
 
-      const responses = await global.db.engine.find(this.collection.responses, { timerId: timer.id, enabled: true });
-      const response = _.orderBy(responses, 'timestamp', 'asc')[0];
+      const response = _.orderBy(timer.messages, 'timestamp', 'asc')[0];
 
-      if (!_.isNil(response)) {
+      if (response) {
         sendMessage(response.response, {
           username: global.oauth.botUsername,
           displayName: global.oauth.botUsername,
@@ -157,9 +134,12 @@ class Timers extends System {
           badges: {},
           'message-type': 'chat',
         });
-        await global.db.engine.update(this.collection.responses, { id: response.id }, { timestamp: new Date().getTime() });
+        response.timestamp = Date.now();
+        await getRepository(TimerResponse).save(response);
       }
-      await global.db.engine.update(this.collection.data, { id: timer.id }, { trigger: { messages: global.linesParsed, timestamp: new Date().getTime() } });
+      timer.triggeredAtMessages = global.linesParsed;
+      timer.triggeredAtTimestamp = Date.now();
+      await getRepository(Timer).save(timer);
     }
     this.timeouts.timersCheck = global.setTimeout(() => this.check(), 1000); // this will run check 1s after full check is correctly done
   }
@@ -172,7 +152,7 @@ class Timers extends System {
       if (_.isNil(name)) {
         return;
       }
-      await global.db.engine.update(this.collection.data, { name: data.id }, { name: name[0] });
+      await getRepository(Timer).update({ name: data.id }, { name: name[0] });
     }
   }
 
@@ -180,7 +160,7 @@ class Timers extends System {
     if (data.value.length === 0) {
       await self.rm(self, null, `-id ${data.id}`);
     } else {
-      global.db.engine.update(this.collection.responses, { id: data.id }, { response: data.value });
+      await getRepository(TimerResponse).update({ id: data.id }, { response: data.value });
     }
   }
 
@@ -206,7 +186,20 @@ class Timers extends System {
       sendMessage(global.translate('timers.cannot-set-messages-and-seconds-0'), opts.sender, opts.attr);
       return false;
     }
-    await global.db.engine.update(this.collection.data, { name: name }, { name: name, messages: messages, seconds: seconds, enabled: true, trigger: { messages: global.linesParsed, timestamp: new Date().getTime() } });
+    let timer = await getRepository(Timer).findOne({
+      relations: ['messages'],
+      where: { name },
+    });
+    if (!timer) {
+      timer = new Timer();
+    }
+    timer.name = name;
+    timer.triggerEveryMessage = messages;
+    timer.triggerEverySecond = seconds;
+    timer.isEnabled = true;
+    timer.triggeredAtMessages = global.linesParsed;
+    timer.triggeredAtTimestamp = Date.now();
+    await getRepository(Timer).save(timer);
     sendMessage(global.translate('timers.timer-was-set')
       .replace(/\$name/g, name)
       .replace(/\$messages/g, messages)
@@ -226,14 +219,13 @@ class Timers extends System {
       name = name[1];
     }
 
-    const timer = await global.db.engine.findOne(this.collection.data, { name: name });
-    if (_.isEmpty(timer)) {
+    const timer = await getRepository(Timer).findOne({ name: name });
+    if (!timer) {
       sendMessage(global.translate('timers.timer-not-found').replace(/\$name/g, name), opts.sender, opts.attr);
       return false;
     }
 
-    await global.db.engine.remove(this.collection.data, { name: name });
-    await global.db.engine.remove(this.collection.responses, { timerId: timer.id });
+    await getRepository(Timer).remove(timer);
     sendMessage(global.translate('timers.timer-deleted')
       .replace(/\$name/g, name), opts.sender);
   }
@@ -251,7 +243,7 @@ class Timers extends System {
       id = id[1];
     }
 
-    await global.db.engine.remove(this.collection.responses, { id: id });
+    await getRepository(TimerResponse).delete({ id });
     sendMessage(global.translate('timers.response-deleted')
       .replace(/\$id/g, id), opts.sender);
   }
@@ -276,19 +268,23 @@ class Timers extends System {
     } else {
       response = response[1];
     }
-    const timer = await global.db.engine.findOne(this.collection.data, { name: name });
-    if (_.isEmpty(timer)) {
+    const timer = await getRepository(Timer).findOne({
+      relations: ['messages'],
+      where: { name },
+    });
+    if (!timer) {
       sendMessage(global.translate('timers.timer-not-found')
         .replace(/\$name/g, name), opts.sender);
       return false;
     }
 
-    const item = await global.db.engine.insert(this.collection.responses, {
-      response,
-      timestamp: new Date().getTime(),
-      enabled: true,
-      timerId: timer.id,
-    });
+    const message = new TimerResponse();
+    message.isEnabled = true;
+    message.timestamp = Date.now();
+    message.response = response;
+    message.timer = timer;
+    const item = await getRepository(TimerResponse).save(message);
+
     sendMessage(global.translate('timers.response-was-added')
       .replace(/\$id/g, item.id)
       .replace(/\$name/g, name)
@@ -302,23 +298,25 @@ class Timers extends System {
     let name = opts.parameters.match(/-name ([\S]+)/);
 
     if (_.isNil(name)) {
-      const timers = await global.db.engine.find(this.collection.data);
-      sendMessage(global.translate('timers.timers-list').replace(/\$list/g, _.map(_.orderBy(timers, 'name'), (o) => (o.enabled ? '⚫' : '⚪') + ' ' + o.name).join(', ')), opts.sender, opts.attr);
+      const timers = await getRepository(Timer).find();
+      sendMessage(global.translate('timers.timers-list').replace(/\$list/g, _.map(_.orderBy(timers, 'name'), (o) => (o.isEnabled ? '⚫' : '⚪') + ' ' + o.name).join(', ')), opts.sender, opts.attr);
       return true;
     } else {
       name = name[1];
     }
 
-    const timer = await global.db.engine.findOne(this.collection.data, { name: name });
-    if (_.isEmpty(timer)) {
+    const timer = await getRepository(Timer).findOne({
+      relations: ['messages'],
+      where: { name },
+    });
+    if (!timer) {
       sendMessage(global.translate('timers.timer-not-found')
         .replace(/\$name/g, name), opts.sender);
       return false;
     }
-    const responses = await global.db.engine.find(this.collection.responses, { timerId: timer.id });
     await sendMessage(global.translate('timers.responses-list').replace(/\$name/g, name), opts.sender, opts.attr);
-    for (const response of responses) {
-      await sendMessage((response.enabled ? '⚫ ' : '⚪ ') + `${String(response._id)} - ${response.response}`, opts.sender, opts.attr);
+    for (const response of timer.messages) {
+      await sendMessage((response.isEnabled ? '⚫ ' : '⚪ ') + `${response.id} - ${response.response}`, opts.sender, opts.attr);
     }
     return true;
   }
@@ -327,7 +325,7 @@ class Timers extends System {
   @default_permission(permission.CASTERS)
   async toggle (opts) {
     // -name [name-of-timer] or -id [id-of-response]
-    let id = opts.parameters.match(/-id ([a-zA-Z0-9]+)/);
+    let id = opts.parameters.match(/-id ([a-zA-Z0-9\-]+)/);
     let name = opts.parameters.match(/-name ([\S]+)/);
 
     if ((_.isNil(id) && _.isNil(name)) || (!_.isNil(id) && !_.isNil(name))) {
@@ -337,28 +335,30 @@ class Timers extends System {
 
     if (!_.isNil(id)) {
       id = id[1];
-      const response = await global.db.engine.findOne(this.collection.responses, { _id: id });
-      if (_.isEmpty(response)) {
+      const response = await getRepository(TimerResponse).findOne({ id });
+      if (!response) {
         sendMessage(global.translate('timers.response-not-found').replace(/\$id/g, id), opts.sender, opts.attr);
         return false;
       }
 
-      await global.db.engine.update(this.collection.responses, { _id: id }, { enabled: !response.enabled });
-      sendMessage(global.translate(!response.enabled ? 'timers.response-enabled' : 'timers.response-disabled')
+      response.isEnabled = !response.isEnabled;
+      await getRepository(TimerResponse).save(response);
+      sendMessage(global.translate(response.isEnabled ? 'timers.response-enabled' : 'timers.response-disabled')
         .replace(/\$id/g, id), opts.sender);
       return true;
     }
 
     if (!_.isNil(name)) {
       name = name[1];
-      const timer = await global.db.engine.findOne(this.collection.data, { name: name });
-      if (_.isEmpty(timer)) {
+      const timer = await getRepository(Timer).findOne({ name: name });
+      if (!timer) {
         sendMessage(global.translate('timers.timer-not-found').replace(/\$name/g, name), opts.sender, opts.attr);
         return false;
       }
 
-      await global.db.engine.update(this.collection.data, { name: name }, { enabled: !timer.enabled });
-      sendMessage(global.translate(!timer.enabled ? 'timers.timer-enabled' : 'timers.timer-disabled')
+      timer.isEnabled = !timer.isEnabled;
+      await getRepository(Timer).save(timer);
+      sendMessage(global.translate(timer.isEnabled ? 'timers.timer-enabled' : 'timers.timer-disabled')
         .replace(/\$name/g, name), opts.sender);
       return true;
     }

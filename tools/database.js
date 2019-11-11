@@ -21,6 +21,7 @@ const { User } = require('../dest/entity/user');
 const { Price } = require('../dest/entity/price');
 const { Rank } = require('../dest/entity/rank');
 const { SongPlaylist, SongBan } = require('../dest/entity/song');
+const { Timer, TimerResponse } = require('../dest/entity/timer');
 
 const _ = require('lodash');
 
@@ -104,7 +105,6 @@ async function main() {
   console.log(`Migr: widgetsEventList`);
   await getManager().clear(EventList);
   items = (await from.engine.find('widgetsEventList')).map(o => {
-    delete o._id;
     return {
       event: o.event,
       username: o.username,
@@ -234,7 +234,7 @@ async function main() {
   console.log(`Migr: systems.highlights`);
   await getManager().clear(Highlight);
   items = (await from.engine.find('systems.highlights')).map(o => {
-    delete o._id; return {
+    return {
       videoId: o.id,
       timestamp: o.timestamp,
       game: o.game,
@@ -290,7 +290,7 @@ async function main() {
   const chat = await from.engine.find('users.chat');
 
   items = (await from.engine.find('users')).map(o => {
-    delete o._id; return {
+    return {
       userId: o.id,
       username: o.username,
 
@@ -322,7 +322,6 @@ async function main() {
       pointsByMessageGivenAt: (messages.find(m => m.id === o.id) || { messages: 0 }).messages,
 
       tips: tips.filter(t => t.id === o.id).map(t => {
-        delete t._id;
         return {
           amount: t.amount,
           currency: t.currency,
@@ -333,7 +332,6 @@ async function main() {
       }),
 
       bits: bits.filter(t => t.id === o.id).map(t => {
-        delete t._id;
         return {
           amount: t.amount,
           message: t.message,
@@ -347,7 +345,7 @@ async function main() {
   });
   if (items.length > 0) {
     for (const chunk of _.chunk(items, 100)) {
-      console.log('.')
+      console.log('.');
       try {
         await getRepository(User).save(chunk);
       } catch (e) {
@@ -414,6 +412,36 @@ async function main() {
   if (items.length > 0) {
     for (const chunk of _.chunk(items, 100)) {
       await getRepository(SongBan).save(chunk);
+    }
+  }
+
+  console.log(`Migr: systems.timers, systems.timers.responses`);
+  await getManager().clear(TimerResponse);
+  await getManager().clear(Timer);
+
+  const responses = await from.engine.find('systems.timers.responses');
+  items = (await from.engine.find('systems.timers')).map(o => {
+    return {
+      name: o.name,
+      triggerEveryMessage: o.messages,
+      triggerEverySecond: o.seconds,
+      triggeredAtTimestamp: o.trigger.seconds || Date.now(),
+      triggeredAtMessages: o.trigger.messages,
+      isEnabled: o.enabled,
+      messages: responses
+        .filter(f => String(o.id) === String(f.timerId))
+        .map(f => {
+          return {
+            timestamp: f.timestamp,
+            isEnabled: f.enabled,
+            response: f.response,
+          };
+        }),
+    };
+  });
+  if (items.length > 0) {
+    for (const chunk of _.chunk(items, 100)) {
+      await getRepository(Timer).save(chunk);
     }
   }
 

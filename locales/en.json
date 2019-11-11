@@ -85,7 +85,7 @@
           "edit": "Edit timer"
         },
         "placeholders": {
-          "name": "Set name of your timer, can contain only these characters a-zA-Z0-9_, if empty, name will be generated",
+          "name": "Set name of your timer, can contain only these characters a-zA-Z0-9_",
           "messages": "Trigger timer each X messages",
           "seconds": "Trigger timer each X seconds"
         },

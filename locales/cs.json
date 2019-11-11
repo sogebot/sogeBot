@@ -91,7 +91,7 @@
           "edit": "Upravit časovač"
         },
         "placeholders": {
-          "name": "Nastavte jméno časovače, může obsahovat pouze tyto znaky a-zA-Z0-9_ (pokud je prázdné, jméno se vygeneruje)",
+          "name": "Nastavte jméno časovače, může obsahovat pouze tyto znaky a-zA-Z0-9_",
           "messages": "Spustit každých x zpráv",
           "seconds": "Spustit každých x vteřin"
         },
