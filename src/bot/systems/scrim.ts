@@ -7,6 +7,8 @@ import { command, default_permission, settings, shared } from '../decorators';
 import Expects from '../expects.js';
 import { permission } from '../permissions';
 import System from './_interface';
+import { getRepository } from 'typeorm';
+import { ScrimMatchId } from '../entity/scrimMatchId';
 
 enum ERROR {
   ALREADY_OPENED,
@@ -68,7 +70,7 @@ class Scrim extends System {
       this.isCooldownOnly = isCooldownOnly;
 
       this.lastRemindAt = now;
-      await global.db.engine.remove(this.collection.matchIds, {});
+      await getRepository(ScrimMatchId).clear();
 
       sendMessage(
         prepare('systems.scrim.countdown', {
@@ -92,7 +94,13 @@ class Scrim extends System {
         this.currentMatches();
       } else {
         const [matchId] = new Expects(opts.parameters).everything({name: 'matchId'}).toArray();
-        await global.db.engine.update(this.collection.matchIds, { username: opts.sender.username }, { matchId });
+        let scrimMatchId = await getRepository(ScrimMatchId).findOne({ username: opts.sender.username});
+        if (!scrimMatchId) {
+          scrimMatchId = new ScrimMatchId();
+          scrimMatchId.username = opts.sender.username;
+        }
+        scrimMatchId.matchId = matchId;
+        await getRepository(ScrimMatchId).save(scrimMatchId);
       }
     } catch (e) {
       if (isNaN(Number(e.message))) {
@@ -164,7 +172,7 @@ class Scrim extends System {
     const matches: {
       [x: string]: string[];
     } = {};
-    const matchIdsFromDb = await global.db.engine.find(this.collection.matchIds);
+    const matchIdsFromDb = await getRepository(ScrimMatchId).find();
     for (const d of matchIdsFromDb) {
       const id = d.matchId;
       if (typeof matches[id] === 'undefined') {

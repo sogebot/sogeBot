@@ -20,6 +20,7 @@ const { Permissions } = require('../dest/entity/permissions');
 const { User } = require('../dest/entity/user');
 const { Price } = require('../dest/entity/price');
 const { Rank } = require('../dest/entity/rank');
+const { SongPlaylist, SongBan } = require('../dest/entity/song');
 
 const _ = require('lodash');
 
@@ -377,6 +378,42 @@ async function main() {
   if (items.length > 0) {
     for (const chunk of _.chunk(items, 100)) {
       await getRepository(Rank).save(chunk);
+    }
+  }
+
+  console.log(`Migr: systems.songs.playlist`);
+  await getManager().clear(SongPlaylist);
+  items = (await from.engine.find('systems.songs.playlist')).map(o => {
+    return {
+      seed: 1,
+      title: o.title,
+      videoId: o.videoID,
+      endTime: o.endTime || o.length_seconds,
+      startTime: o.startTime || 0,
+      length: o.length_seconds,
+      loudness: o.loudness || -15,
+      lastPlayedAt: o.lastPlayedAt,
+      forceVolume: o.forceVolume || false,
+      volume: o.volume || 25,
+    };
+  });
+  if (items.length > 0) {
+    for (const chunk of _.chunk(items, 100)) {
+      await getRepository(SongPlaylist).save(chunk);
+    }
+  }
+
+  console.log(`Migr: systems.songs.ban`);
+  await getManager().clear(SongBan);
+  items = (await from.engine.find('systems.songs.ban')).map(o => {
+    return {
+      title: o.title,
+      videoId: o.videoId,
+    };
+  });
+  if (items.length > 0) {
+    for (const chunk of _.chunk(items, 100)) {
+      await getRepository(SongBan).save(chunk);
     }
   }
 
