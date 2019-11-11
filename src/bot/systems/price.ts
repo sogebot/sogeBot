@@ -192,13 +192,13 @@ class Price extends System {
     ) {
       return true;
     }
-    const price = await global.db.engine.findOne(this.collection.data, { command: parsed[1], enabled: true });
+    const price = await getRepository(PriceEntity).findOne({ command: parsed[1], enabled: true });
 
-    if (_.isEmpty(price)) { // no price set
+    if (!price) { // no price set
       return true;
     }
 
-    const removePts = parseInt(price.price, 10);
+    const removePts = price.price;
     await getRepository(User).increment({ userId: opts.sender.userId }, 'points', removePts);
   }
 }

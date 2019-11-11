@@ -13,6 +13,7 @@ import { getRepository } from 'typeorm';
 import { Cooldown as CooldownEntity, CooldownViewer } from '../entity/cooldown';
 import { User } from '../entity/user';
 import { adminEndpoint } from '../helpers/socket';
+import { Keyword } from '../entity/keyword';
 
 /*
  * !cooldown [keyword|!command] [global|user] [seconds] [true/false] - set cooldown for keyword or !command - 0 for disable, true/false set quiet mode
@@ -152,8 +153,8 @@ class Cooldown extends System {
       data = [cooldown];
     } else { // text
       let [keywords, cooldowns] = await Promise.all([
-        global.db.engine.find(global.systems.keywords.collection.data),
-        await getRepository(CooldownEntity).find({ relations: ['viewers'] }),
+        getRepository(Keyword).find(),
+        getRepository(CooldownEntity).find({ relations: ['viewers'] }),
       ]);
 
       keywords = _.filter(keywords, function (o) {
@@ -269,8 +270,8 @@ class Cooldown extends System {
       data = [cooldown];
     } else { // text
       let [keywords, cooldowns] = await Promise.all([
-        global.db.engine.find(global.systems.keywords.collection.data),
-        await getRepository(CooldownEntity).find({ relations: ['viewers'] }),
+        getRepository(Keyword).find(),
+        getRepository(CooldownEntity).find({ relations: ['viewers'] }),
       ]);
 
       keywords = _.filter(keywords, function (o) {

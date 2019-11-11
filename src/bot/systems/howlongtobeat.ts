@@ -76,7 +76,7 @@ class HowLongToBeat extends System {
 
     if (gameToInc.gameplayMain > 0) {
       // sve only if we have numbers from hltb (possible MP game)
-      await global.db.engine.update(this.collection.data, { game: gameToInc.game }, gameToInc);
+      await getRepository(HowLongToBeatGame).save(gameToInc);
     }
   }
 

@@ -157,7 +157,7 @@
 
 <script lang="ts">
   import Vue from 'vue'
-  import { chunk, cloneDeep, isNil, orderBy } from 'lodash-es'
+  import { chunk, cloneDeep, isNil } from 'lodash-es'
 
   import moment from 'moment'
   import VueMoment from 'vue-moment'
@@ -167,6 +167,8 @@
   require('moment/locale/ru')
 
   import { getSocket } from 'src/panel/helpers/socket';
+  import { Poll } from 'src/bot/entity/poll';
+
   import uuid from 'uuid'
 
   Vue.use(VueMoment, {
@@ -181,9 +183,8 @@
       const object: {
         chunk: any,
         socket: any,
-        votes: Array<Poll | 'new'>,
-        votings: Array<Vote>,
-        newVote: Poll
+        votes: Array<Poll>,
+        newVote: Poll,
         currentTime: any,
         isMounted: Boolean,
         domWidth: number,
@@ -193,18 +194,10 @@
         chunk: chunk,
         socket: getSocket('/systems/polls'),
         votes: [],
-        votings: [],
+        newVote: new Poll(),
         currentTime: 0,
         isMounted: false,
         domWidth: 0,
-        newVote: {
-          id: uuid(),
-          type: 'normal',
-          title: '',
-          isOpened: true,
-          options: ['', '', '', '', ''],
-          openedAt: Date.now()
-        },
         interval: 0,
         search: '',
       }
@@ -262,14 +255,9 @@
     },
     methods: {
       refresh: function () {
-        this.socket.emit('find', {}, (err, data) => {
-          if (err) return console.error(err)
-          this.votes = orderBy(data, 'openedAt', 'desc')
-          this.votes.unshift('new')
-        })
-        this.socket.emit('find', { collection: 'votes' }, (err, data) => {
-          if (err) return console.error(err)
-          this.votings = data
+        this.socket.emit('polls::getAll', (data) =>  {
+          console.debug('Loaded', data);
+          this.votes = data
         })
       },
       create: function () {
@@ -281,14 +269,13 @@
             if (err) return console.error(err)
             else {
               this.refresh();
-              this.newVote = {
-                id: uuid(),
-                type: 'normal',
-                title: '',
-                isOpened: true,
-                options: ['', '', '', '', ''],
-                openedAt: Date.now()
-              }
+              this.newVote = new Poll();
+              this.newVote.id = uuid();
+              this.newVote.type = 'normal';
+              this.newVote.title = '';
+              this.newVote.isOpened = true;
+              this.newVote.options = ['', '', '', '', ''];
+              this.newVote.openedAt = Date.now();
             }
           })
       },
@@ -296,7 +283,7 @@
         const vote = this.votes.find(o => typeof o !== 'string' && o.id === vid);
         if (typeof vote === 'object') {
           let newVote = cloneDeep(vote)
-          delete newVote._id; newVote.id = uuid();
+          newVote.id = uuid();
 
           for (let i = 0, length = newVote.options.length; i < 5 - length; i++) {
             newVote.options.push('')
@@ -317,9 +304,11 @@
       },
       totalVotes: function (vid) {
         let totalVotes = 0
-        const filtered = this.votings.filter(o => o.vid === vid)
-        for (let i = 0, length = filtered.length; i < length; i++) {
-          totalVotes += filtered[i].votes
+        const votes = this.votes.find(o => o.id === vid);
+        if (votes) {
+          for (let i = 0, length = votes.votes.length; i < length; i++) {
+            totalVotes += votes.votes[i].votes
+          }
         }
         return totalVotes
       },
@@ -332,12 +321,14 @@
         }
       },
       getPercentage: function (vid, index, toFixed) {
-        let votes = 0
-        const filtered = this.votings.filter(o => o.vid === vid)
-        for (let i = 0, length = filtered.length; i < length; i++) {
-          if (filtered[i].option === index) votes += filtered[i].votes
+        let numOfVotes = 0
+        const votes = this.votes.find(o => o.id === vid);
+        if (votes) {
+          for (let i = 0, length = votes.votes.length; i < length; i++) {
+            if (votes.votes[i].option === index) numOfVotes += votes.votes[i].votes
+          }
         }
-        return Number((100 / this.totalVotes(vid)) * votes || 0).toFixed(toFixed || 0);
+        return Number((100 / this.totalVotes(vid)) * numOfVotes || 0).toFixed(toFixed || 0);
       },
     }
   })

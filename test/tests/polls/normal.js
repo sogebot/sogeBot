@@ -11,11 +11,12 @@ const time = require('../../general.js').time;
 const _ = require('lodash');
 
 const { getRepository } = require('typeorm');
+const { Poll, PollVote } = require('../../../dest/entity/poll');
 const { User } = require('../../../dest/entity/user');
 
 const assert = require('chai').assert;
 
-const owner = { username: 'soge__' };
+const owner = { username: 'soge__', userId: Math.floor(Math.random() * 10000) };
 
 describe('Polls - normal', () => {
   before(async () => {
@@ -48,8 +49,7 @@ describe('Polls - normal', () => {
       assert.isFalse(await global.systems.polls.open({ sender: owner, parameters: '-title "Lorem Ipsum2?" Lorem2 | Ipsum2 | Dolor Sit2' }));
     });
     it('Voting should be correctly in db', async () => {
-      const cVote = await global.db.engine.findOne(global.systems.polls.collection.data, { isOpened: true });
-      assert.isNotEmpty(cVote);
+      const cVote = await getRepository(Poll).findOne({ isOpened: true });
       assert.deepEqual(cVote.type, 'normal');
       assert.deepEqual(cVote.options, ['Lorem', 'Ipsum', 'Dolor Sit']);
       assert.equal(cVote.title, 'Lorem Ipsum?');
@@ -67,19 +67,18 @@ describe('Polls - normal', () => {
     });
     it(`User ${owner.username} will vote for option 0 - should fail`, async () => {
       await global.systems.polls.main({ sender: owner, parameters: '0' });
-      const vote = await global.db.engine.findOne(global.systems.polls.collection.votes, { votedBy: owner.username, vid });
-      assert.isEmpty(vote);
+      const vote = await getRepository(PollVote).findOne({ votedBy: owner.username });
+      assert.isUndefined(vote);
     });
     it(`User ${owner.username} will vote for option 4 - should fail`, async () => {
       await global.systems.polls.main({ sender: owner, parameters: '4' });
-      const vote = await global.db.engine.findOne(global.systems.polls.collection.votes, { votedBy: owner.username, vid });
-      assert.isEmpty(vote);
+      const vote = await getRepository(PollVote).findOne({ votedBy: owner.username });
+      assert.isUndefined(vote);
     });
     for (const o of [1,2,3]) {
       it(`User ${owner.username} will vote for option ${o} - should be saved in db`, async () => {
         await global.systems.polls.main({ sender: owner, parameters: String(o) });
-        const vote = await global.db.engine.findOne(global.systems.polls.collection.votes, { votedBy: owner.username, vid });
-        assert.isNotEmpty(vote, 'Expected ' + JSON.stringify({ votedBy: owner.username, vid }) + ' to be found in db');
+        const vote = await getRepository(PollVote).findOne({ votedBy: owner.username });
         assert.equal(vote.option, o - 1);
       });
     }
@@ -92,8 +91,7 @@ describe('Polls - normal', () => {
 
           await until(async (setError) => {
             try {
-              const vote = await global.db.engine.findOne(global.systems.polls.collection.votes, { votedBy: user, vid });
-              assert.isNotEmpty(vote, 'Expected ' + JSON.stringify({ votedBy: user, vid }) + ' to be found in db');
+              const vote = await getRepository(PollVote).findOne({ votedBy: user });
               assert.equal(vote.option, o - 1);
               return true;
             } catch (err) {
