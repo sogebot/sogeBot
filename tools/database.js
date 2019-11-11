@@ -19,6 +19,7 @@ const { Quotes } = require('../dest/entity/quotes');
 const { Permissions } = require('../dest/entity/permissions');
 const { User } = require('../dest/entity/user');
 const { Price } = require('../dest/entity/price');
+const { Rank } = require('../dest/entity/rank');
 
 const _ = require('lodash');
 
@@ -362,6 +363,20 @@ async function main() {
   if (items.length > 0) {
     for (const chunk of _.chunk(items, 100)) {
       await getRepository(Price).save(chunk);
+    }
+  }
+
+  console.log(`Migr: systems.ranks`);
+  await getManager().clear(Rank);
+  items = (await from.engine.find('systems.ranks')).map(o => {
+    delete o._id; return {
+      hours: o.hours,
+      rank: o.value,
+    };
+  });
+  if (items.length > 0) {
+    for (const chunk of _.chunk(items, 100)) {
+      await getRepository(Rank).save(chunk);
     }
   }
 
