@@ -52,8 +52,9 @@ import { getSocket } from 'src/panel/helpers/socket';
 import { capitalize } from 'src/panel/helpers/capitalize';
 
 import { Vue, Component/*, Watch */ } from 'vue-property-decorator';
-import { orderBy, isNil } from 'lodash-es';
+import { isNil } from 'lodash-es';
 import { escape } from 'xregexp';
+import { Rank } from 'src/bot/entity/rank';
 
 @Component({
   components: {
@@ -64,7 +65,7 @@ import { escape } from 'xregexp';
 export default class ranksList extends Vue {
   socket = getSocket('/systems/ranks');
 
-  items: Types.Ranks.Item[] = [];
+  items: Rank[] = [];
   search: string = '';
   state: {
     loading: number;
@@ -74,7 +75,7 @@ export default class ranksList extends Vue {
 
   fields = [
     { key: 'hours', label: capitalize(this.translate('hours')), sortable: true },
-    { key: 'value', label: this.translate('rank'), sortable: true },
+    { key: 'rank', label: this.translate('rank'), sortable: true },
     { key: 'buttons', label: '' },
   ];
 
@@ -82,16 +83,16 @@ export default class ranksList extends Vue {
     if (this.search.length === 0) return this.items
     return this.items.filter((o) => {
       const isSearchInHours = !isNil(String(o.hours).match(new RegExp(escape(this.search), 'ig')))
-      const isSearchInValue = !isNil(o.value.match(new RegExp(escape(this.search), 'ig')))
+      const isSearchInValue = !isNil(o.rank.match(new RegExp(escape(this.search), 'ig')))
       return isSearchInHours || isSearchInValue
     })
   }
 
   created() {
     this.state.loading = this.$state.progress;
-    this.socket.emit('find', {}, (err, items) => {
+    this.socket.emit('ranks::getAll', (items) => {
       console.debug('Loaded', items)
-      this.items = orderBy(items, 'hours', 'asc');
+      this.items = items;
       this.state.loading = this.$state.success;
     })
   }
@@ -102,13 +103,13 @@ export default class ranksList extends Vue {
   }
 
   remove(id) {
-   this.socket.emit('delete', { where: { id } }, () => {
-      this.items = this.items.filter((o) => o.id !== id)
+   this.socket.emit('ranks::remove', id, () => {
+      this.items = this.items.filter((o) => o.id !== id);
     })
   }
 
   update(item) {
-    this.socket.emit('update', { items: [item] })
+    this.socket.emit('ranks::save', item, () => {});
   }
 }
 </script>
