@@ -71,19 +71,19 @@ class Permissions extends Core {
       cb();
     });
     adminEndpoint(this.nsp, 'test.user', async (opts, cb) => {
-      const userByName = await global.db.engine.findOne('users', { username: opts.value });
-      const userById = await global.db.engine.findOne('users', { id: opts.value });
-      if (typeof userByName.id !== 'undefined') {
-        const status = await this.check(userByName.id, opts.pid);
-        const partial = await this.check(userByName.id, opts.pid, true);
+      const userByName = await getRepository(User).findOne({ username: opts.value });
+      const userById = await getRepository(User).findOne({ userId: Number(opts.value) });
+      if (userByName) {
+        const status = await this.check(userByName.userId, opts.pid);
+        const partial = await this.check(userByName.userId, opts.pid, true);
         cb({
           status,
           partial,
           state: opts.state,
         });
-      } else if (typeof userById.id !== 'undefined') {
-        const status = await this.check(userById.id, opts.pid);
-        const partial = await this.check(userById.id, opts.pid, true);
+      } else if (userById) {
+        const status = await this.check(userById.userId, opts.pid);
+        const partial = await this.check(userById.userId, opts.pid, true);
         cb({
           status,
           partial,

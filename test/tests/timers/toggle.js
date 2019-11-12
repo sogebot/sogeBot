@@ -39,12 +39,12 @@ describe('Timers - toggle()', () => {
 
   it('-id something -name something', async () => {
     global.systems.timers.toggle({ sender: owner, parameters: '-id something -name something' });
-    await message.isSent('timers.id-or-name-must-be-defined', owner, { sender: owner.username });
+    await message.isSent('timers.timer-not-found', owner, { name: 'something', sender: owner.username });
   });
 
   it('-id unknown', async () => {
     global.systems.timers.toggle({ sender: owner, parameters: '-id unknown' });
-    await message.isSent('timers.response-not-found', owner, { id: 'unknown', sender: owner.username });
+    await message.isSent('timers.id-or-name-must-be-defined', owner, { sender: owner.username });
   });
 
   it('-id response_id', async () => {

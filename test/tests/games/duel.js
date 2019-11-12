@@ -131,7 +131,7 @@ describe('Gambling - duel', () => {
       global.games.duel._timestamp = Number(new Date());
 
       for (const username of ['testuser', 'testuser2', 'testuser3', 'testuser4', 'testuser5']) {
-        const tickets = Math.floor(Number.MAX_SAFE_INTEGER / 10);
+        const tickets = Math.floor(Number.MAX_SAFE_INTEGER / 10000000);
         await getRepository(Duel).save({ username, tickets: tickets });
       }
     });

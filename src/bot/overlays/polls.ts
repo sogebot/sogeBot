@@ -2,6 +2,9 @@ import Overlay from './_interface';
 import { settings, ui } from '../decorators';
 import { publicEndpoint } from '../helpers/socket';
 
+import { getRepository } from 'typeorm';
+import { Poll } from '../entity/poll';
+
 class Polls extends Overlay {
   @settings('display')
   @ui({ type: 'selector', values: ['light', 'dark', 'Soge\'s green']  })
@@ -29,8 +32,10 @@ class Polls extends Overlay {
       cb(this.getCommand['!vote']);
     });
     publicEndpoint(this.nsp, 'data', async (callback) => {
-      const currentVote: Poll = await global.db.engine.findOne(global.systems.polls.collection.data, { isOpened: true });
-      const votes: Vote[] = await global.db.engine.find(global.systems.polls.collection.votes, { vid: String(currentVote._id) });
+      const currentVote = await getRepository(Poll).findOne({
+        relations: ['votes'],
+        where: { isOpened: true },
+      });
       const settings = {
         display: {
           align: this.cDisplayAlign,
@@ -39,7 +44,7 @@ class Polls extends Overlay {
           inactivityTime: this.cDisplayInactivityTime,
         },
       };
-      callback(currentVote, votes, settings);
+      callback(currentVote, currentVote?.votes, settings);
     });
   }
 }

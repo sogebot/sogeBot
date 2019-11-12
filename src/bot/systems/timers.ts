@@ -11,6 +11,7 @@ import { adminEndpoint } from '../helpers/socket';
 
 import { getRepository } from 'typeorm';
 import { Timer, TimerResponse } from '../entity/timer';
+import Expects from '../expects';
 
 /*
  * !timers                                                                                                                      - gets an info about timers usage
@@ -234,18 +235,15 @@ class Timers extends System {
   @default_permission(permission.CASTERS)
   async rm (opts) {
     // -id [id-of-response]
-    let id = opts.parameters.match(/-id ([a-zA-Z0-9]+)/);
-
-    if (_.isNil(id)) {
+    try {
+      const id = new Expects(opts.parameters).argument({ type: 'uuid', name: 'id' }).toArray()[0];
+      await getRepository(TimerResponse).delete({ id });
+      sendMessage(global.translate('timers.response-deleted')
+        .replace(/\$id/g, id), opts.sender);
+    } catch (e) {
       sendMessage(global.translate('timers.id-must-be-defined'), opts.sender, opts.attr);
       return false;
-    } else {
-      id = id[1];
     }
-
-    await getRepository(TimerResponse).delete({ id });
-    sendMessage(global.translate('timers.response-deleted')
-      .replace(/\$id/g, id), opts.sender);
   }
 
   @command('!timers add')
@@ -325,8 +323,10 @@ class Timers extends System {
   @default_permission(permission.CASTERS)
   async toggle (opts) {
     // -name [name-of-timer] or -id [id-of-response]
-    let id = opts.parameters.match(/-id ([a-zA-Z0-9\-]+)/);
-    let name = opts.parameters.match(/-name ([\S]+)/);
+    const [id, name] = new Expects(opts.parameters)
+      .argument({ type: 'uuid', name: 'id', optional: true })
+      .argument({ type: String, name: 'name', optional: true })
+      .toArray();
 
     if ((_.isNil(id) && _.isNil(name)) || (!_.isNil(id) && !_.isNil(name))) {
       sendMessage(global.translate('timers.id-or-name-must-be-defined'), opts.sender, opts.attr);
@@ -334,7 +334,6 @@ class Timers extends System {
     }
 
     if (!_.isNil(id)) {
-      id = id[1];
       const response = await getRepository(TimerResponse).findOne({ id });
       if (!response) {
         sendMessage(global.translate('timers.response-not-found').replace(/\$id/g, id), opts.sender, opts.attr);
@@ -349,7 +348,6 @@ class Timers extends System {
     }
 
     if (!_.isNil(name)) {
-      name = name[1];
       const timer = await getRepository(Timer).findOne({ name: name });
       if (!timer) {
         sendMessage(global.translate('timers.timer-not-found').replace(/\$name/g, name), opts.sender, opts.attr);

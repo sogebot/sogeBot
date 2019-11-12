@@ -10,7 +10,7 @@ import { error, info, warning } from '../helpers/log';
 import { adminEndpoint, publicEndpoint } from '../helpers/socket';
 
 import { getManager, getRepository } from 'typeorm';
-import { CacheEmotes} from '../entity/cacheEmotes';
+import { CacheEmotes } from '../entity/cacheEmotes';
 import uuid from 'uuid';
 
 
@@ -468,7 +468,7 @@ class Emotes extends Overlay {
         emotesArray.push(this.simpleEmotes[emotes[i]] + this.cEmotesSize + '.0');
       } else {
         try {
-          const items = await global.db.engine.find(this.collection.cache, { code: emotes[i] });
+          const items = await getRepository(CacheEmotes).find({ code: emotes[i] });
           if (!_.isEmpty(items)) {
             emotesArray.push(items[0].urls[this.cEmotesSize]);
           }

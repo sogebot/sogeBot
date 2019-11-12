@@ -14,7 +14,7 @@ import { getCountOfCommandUsage } from './helpers/commands/count';
 import { getManager, getRepository } from 'typeorm';
 
 import { Alias } from './entity/alias';
-import { Commands } from './entity/commands';
+import { Commands, CommandsResponses } from './entity/commands';
 import { Cooldown } from './entity/cooldown';
 import { EventList } from './entity/eventList';
 import { User } from './entity/user';
@@ -414,7 +414,10 @@ class Message {
             return _.size(alias) === 0 ? ' ' : (_.map(alias, 'alias')).sort().join(', ');
           case 'command':
             if (permission) {
-              const responses = await global.db.engine.find(global.systems.customCommands.collection.responses);
+              const commands = await getRepository(Commands).find({
+                relations: ['responses'],
+              });
+              const responses = commands.map(o => o.responses).flat();
               const _permission = await global.permissions.get(permission);
               if (_permission) {
                 const commandIds = responses.filter((o) => o.permission === _permission.id).map((o) => o.cid);
@@ -426,8 +429,10 @@ class Message {
             return _.size(commands) === 0 ? ' ' : (_.map(commands, (o) => o.command.replace('!', ''))).sort().join(', ');
           case '!command':
             if (permission) {
-              const responses = await global.db.engine.find(global.systems.customCommands.collection.responses);
-              const _permission = await global.permissions.get(permission);
+              const commands = await getRepository(Commands).find({
+                relations: ['responses'],
+              });
+              const responses = commands.map(o => o.responses).flat();              const _permission = await global.permissions.get(permission);
               if (_permission) {
                 const commandIds = responses.filter((o) => o.permission === _permission.id).map((o) => o.cid);
                 commands = commands.filter((o) => commandIds.includes(String(o._id)));

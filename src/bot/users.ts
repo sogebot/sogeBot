@@ -233,16 +233,15 @@ class Users extends Core {
     return IdsToUsername;
   }
 
-  async getNameById (id: number) {
-    let username = (await global.db.engine.findOne('users', { id })).username;
-
-    if (typeof username === 'undefined' || username === null) {
-      username = await global.api.getUsernameFromTwitch(id);
-      if (username) {
-        global.db.engine.update('users', { id }, { username });
-      }
+  async getNameById (userId: number) {
+    let user = await getRepository(User).findOne({ userId });
+    if (!user) {
+      user = new User();
+      user.userId = userId;
+      user.username = await global.api.getUsernameFromTwitch(userId);
+      await getRepository(User).save(user);
     }
-    return username || null;
+    return user.username;
   }
 
   async getIdByName (username: string) {
@@ -250,6 +249,8 @@ class Users extends Core {
     if (!user) {
       user = new User();
       user.userId = Number(await global.api.getIdFromTwitch(username));
+      user.username = username;
+      await getRepository(User).save(user);
     }
     return user.userId;
   }
