@@ -13,7 +13,8 @@ const gitCommitInfo = require('git-commit-info');
 import { error, info } from './helpers/log';
 import { CacheTitles } from './entity/cacheTitles';
 import uuid from 'uuid'
-import { getManager, getRepository } from 'typeorm'
+import { getManager, getRepository } from 'typeorm';
+import { Dashboard, Widget } from './entity/dashboard';
 
 const Parser = require('./parser')
 
@@ -111,8 +112,15 @@ function Panel () {
   this.io.use(global.socket.authorize);
 
   var self = this
-  this.io.on('connection', function (socket) {
-    // check auth
+  this.io.on('connection', async function (socket) {
+    // create main dashboard if needed;
+    await getRepository(Dashboard).save({
+      id: 'c287b750-b620-4017-8b3e-e48757ddaa83', // constant ID
+      name: 'Main',
+      createdAt: 0,
+    })
+
+
     socket.on('metrics.translations', function (key) { global.lib.translate.addMetrics(key, true) })
     socket.on('getCachedTags', async (cb) => {
       cb(await global.db.engine.find('core.api.tags'))
@@ -292,39 +300,69 @@ function Panel () {
     })
 
     socket.on('getWidgetList', async (cb) => {
-      let widgets = await global.db.engine.find('widgets')
-      let dashboards = await global.db.engine.find('dashboards')
-      if (_.isEmpty(widgets)) cb(self.widgets)
-      else {
-        var sendWidgets = []
-        _.each(self.widgets, function (widget) {
-          if (!_.includes(_.map(widgets, 'id'), widget.id)) {
-            sendWidgets.push(widget)
-          }
-        })
-        cb(sendWidgets, dashboards)
+      const dashboards = await getRepository(Dashboard).find({
+        relations: ['widgets'],
+      });
+      let widgetList = [];
+      for (const dashboard of dashboards) {
+        widgetList = [
+          ...widgetList,
+          ...dashboard.widgets.map(o => o.name),
+        ];
       }
-    })
+
+      const sendWidgets = [];
+      for(const widget of self.widgets) {
+        if (!widgetList.includes(widget.id)) {
+          sendWidgets.push(widget);
+        }
+      }
+      cb(sendWidgets, dashboards);
+    });
 
     socket.on('getWidgets', async (cb) => {
-      let widgets = await global.db.engine.find('widgets')
-      let dashboards = await global.db.engine.find('dashboards')
-      cb(widgets, dashboards)
-    })
+      const dashboards = await getRepository(Dashboard).find({
+        relations: ['widgets'],
+        order: {
+          createdAt: 'ASC',
+        },
+      });
+      cb(dashboards);
+    });
 
     socket.on('createDashboard', async (name, cb) => {
-      cb(await global.db.engine.insert('dashboards', { name, createdAt: Date.now(), id: uuid() }))
-    })
+      cb(await getRepository(Dashboard).save({ name, createdAt: Date.now(), id: uuid() }));
+    });
 
     socket.on('removeDashboard', async (id) => {
-      await global.db.engine.remove('dashboards', { id })
-      await global.db.engine.remove('widgets', { dashboardId: id })
-    })
+      if (id !== 'c287b750-b620-4017-8b3e-e48757ddaa83') {
+        await getRepository(Widget).delete({ dashboardId: id });
+        await getRepository(Dashboard).delete({ id });
+      }
+    });
 
-    socket.on('addWidget', async function (widget, dashboardId, cb) {
-      cb(await self.addWidgetToDb(self, widget, dashboardId, socket));
+    socket.on('addWidget', async function (widgetName, id, cb) {
+      // add widget to bottom left
+      const dashboard = await getRepository(Dashboard).findOne({
+        relations: ['widgets'],
+        where: { id } ,
+      });
+      let y = 0;
+      for (const w of dashboard.widgets) {
+        y = Math.max(y, w.positionY + w.height);
+      }
+      const widget = new Widget();
+      widget.name = widgetName;
+      widget.positionX = 0;
+      widget.positionY = y;
+      widget.width = 4;
+      widget.height = 3;
+      dashboard.widgets.push(widget);
+      cb(await getRepository(Dashboard).save(dashboard));
     })
-    socket.on('updateWidgets', function (widgets) { self.updateWidgetsInDb(self, widgets, socket) })
+    socket.on('updateWidgets', async (dashboards) => {
+      await getRepository(Dashboard).save(dashboards);
+    });
     socket.on('connection_status', cb => { cb(global.status) });
     socket.on('saveConfiguration', function (data) {
       _.each(data, async function (index, value) {
@@ -466,24 +504,6 @@ Panel.prototype.addMenu = function (menu) {
 }
 
 Panel.prototype.addWidget = function (id, name, icon) { this.widgets.push({ id: id, name: name, icon: icon }) }
-
-
-Panel.prototype.updateWidgetsInDb = async function (self, widgets, socket) {
-  await global.db.engine.remove('widgets', {}) // remove widgets
-  for (let widget of widgets) {
-    global.db.engine.update('widgets', { id: widget.id }, { id: widget.id, dashboardId: widget.dashboardId, position: { x: widget.position.x, y: widget.position.y }, size: { width: widget.size.width, height: widget.size.height } })
-  }
-}
-
-Panel.prototype.addWidgetToDb = async function (self, widget, dashboardId, socket) {
-  // add widget to bottom left
-  const widgets = await global.db.engine.find('widgets', { dashboardId });
-  let y = 0;
-  for (const widget of widgets) {
-    y = Math.max(y, widget.position.y + widget.size.height);
-  }
- return (await global.db.engine.update('widgets', { id: widget }, { dashboardId, id: widget, position: { x: 0, y }, size: { width: 4, height: 3 } }))
-}
 
 Panel.prototype.socketListening = function (self, on, fnc) {
   this.socketListeners.push({ self: self, on: on, fnc: fnc })

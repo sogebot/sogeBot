@@ -42,9 +42,8 @@ export default {
   },
   methods: {
     add: function (widgetId) {
-      this.socket.emit('addWidget', widgetId, this.dashboardId, (widget) => {
-        console.log({widget})
-        this.$emit('addWidget', { widget, dashboardId: this.dashboardId })
+      this.socket.emit('addWidget', widgetId, this.dashboardId, () => {
+        this.$emit('addWidget')
       })
       this.state = 0
     },

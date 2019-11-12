@@ -1,6 +1,5 @@
 import 'module-alias/register';
 
-import config from '@config';
 import { readdirSync } from 'fs';
 import gitCommitInfo from 'git-commit-info';
 import { get, isBoolean, isFinite, isNil, isNumber, isString, map, set } from 'lodash';
@@ -11,6 +10,8 @@ import { onChange, onLoad } from './decorators/on';
 import { permission } from './permissions';
 import { isMainThread } from './cluster';
 import { debug, error, warning } from './helpers/log';
+import { getConnection, getRepository } from 'typeorm';
+import Widget from './widgets/_interface';
 
 class General extends Core {
   @settings('general')
@@ -48,7 +49,8 @@ class General extends Core {
   @command('!_debug')
   @default_permission(permission.CASTERS)
   public async debug() {
-    const widgets = await global.db.engine.find('widgets');
+    const widgets = await getRepository(Widget).find();
+    const connection = await getConnection();
 
     const oauth = {
       broadcaster: global.oauth.broadcasterUsername !== '',
@@ -84,7 +86,7 @@ class General extends Core {
     debug('*', '======= COPY DEBUG MESSAGE FROM HERE =======');
     debug('*', `GENERAL      | OS: ${process.env.npm_config_user_agent}`);
     debug('*', `             | Bot version: ${version.replace('SNAPSHOT', gitCommitInfo().shortHash || 'SNAPSHOT')}`);
-    debug('*', `             | DB: ${config.database.type}`);
+    debug('*', `             | DB: ${connection.options.type}`);
     debug('*', `             | Threads: ${global.cpu}`);
     debug('*', `             | HEAP: ${Number(process.memoryUsage().heapUsed / 1048576).toFixed(2)} MB`);
     debug('*', `             | Uptime: ${Math.trunc(process.uptime())} seconds`);

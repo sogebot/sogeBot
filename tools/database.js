@@ -22,6 +22,7 @@ const { Price } = require('../dest/entity/price');
 const { Rank } = require('../dest/entity/rank');
 const { SongPlaylist, SongBan } = require('../dest/entity/song');
 const { Timer, TimerResponse } = require('../dest/entity/timer');
+const { Dashboard, Widget } = require('../dest/entity/dashboard');
 
 const _ = require('lodash');
 
@@ -442,6 +443,50 @@ async function main() {
   if (items.length > 0) {
     for (const chunk of _.chunk(items, 100)) {
       await getRepository(Timer).save(chunk);
+    }
+  }
+
+  console.log(`Migr: dashboards, widgets`);
+  await getManager().clear(Widget);
+  await getManager().clear(Dashboard);
+
+  const widgets = await from.engine.find('widgets');
+  items = (await from.engine.find('dashboards')).map(o => {
+    return {
+      name: o.name,
+      createdAt: o.createdAt,
+      widgets: widgets
+        .filter(f => String(o.id) === String(f.dashboardId))
+        .map(f => {
+          return {
+            name: f.id,
+            positionX: f.position.x,
+            positionY: f.position.y,
+            height: f.size.height,
+            width: f.size.width,
+          };
+        }),
+    };
+  });
+  items.push({
+    id: 'c287b750-b620-4017-8b3e-e48757ddaa83', // constant ID
+    name: 'Main',
+    createdAt: 0,
+    widgets: widgets
+      .filter(f => f.dashboardId === null)
+      .map(f => {
+        return {
+          name: f.id,
+          positionX: f.position.x,
+          positionY: f.position.y,
+          height: f.size.height,
+          width: f.size.width,
+        };
+      }),
+  });
+  if (items.length > 0) {
+    for (const chunk of _.chunk(items, 100)) {
+      await getRepository(Dashboard).save(chunk);
     }
   }
 
