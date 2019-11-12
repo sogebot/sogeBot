@@ -2,6 +2,7 @@ import _ from 'lodash';
 
 import { command, settings, shared } from '../decorators';
 import Game from './_interface';
+import { MINUTE } from '../constants';
 import { getLocalizedName, isBroadcaster, isModerator, prepare, sendMessage, timeout } from '../commons';
 
 import { getRepository } from 'typeorm';
@@ -10,6 +11,14 @@ import { User } from '../entity/user';
 /*
  * !fightme [user] - challenge [user] to fight
  */
+
+let fightMeChallenges: {
+  challenger: string; opponent: string; removeAt: number;
+}[] = [];
+
+setInterval(() => {
+  fightMeChallenges = fightMeChallenges.filter(o => o.removeAt <= Date.now());
+}, MINUTE / 2);
 
 class FightMe extends Game {
   @shared()
@@ -67,9 +76,11 @@ class FightMe extends Game {
     }
 
     // check if you are challenged by user
-    const challenge = await global.db.engine.findOne(this.collection.users, { key: '_users', user: user.username, challenging: opts.sender.username });
-    const isChallenged = !_.isEmpty(challenge);
-    if (isChallenged) {
+    const challenge = fightMeChallenges.find(challenge => {
+      return challenge.opponent === opts.sender.username
+        && challenge.challenger === user.username;
+    });
+    if (challenge) {
       const winner = _.random(0, 1, false);
       const isMod = {
         user: await isModerator(user),
@@ -88,7 +99,10 @@ class FightMe extends Game {
         if (!isBroadcasterModCheck) {
           timeout(isBroadcaster(opts.sender) ? user.username : opts.sender.username, null, this.timeout);
         }
-        global.db.engine.remove(this.collection.users, { _id: challenge._id.toString() });
+        fightMeChallenges = fightMeChallenges.filter(challenge => {
+          return !(challenge.opponent === opts.sender.username
+            && challenge.challenger === user.username);
+        });
         return;
       }
 
@@ -97,7 +111,10 @@ class FightMe extends Game {
         sendMessage(
           prepare('gambling.fightme.bothModerators', { challenger: user.username }),
           opts.sender);
-        global.db.engine.remove(this.collection.users, { _id: challenge._id.toString() });
+        fightMeChallenges = fightMeChallenges.filter(challenge => {
+          return !(challenge.opponent === opts.sender.username
+            && challenge.challenger === user.username);
+        });
         return;
       }
 
@@ -110,7 +127,10 @@ class FightMe extends Game {
           }),
           opts.sender);
         timeout(isMod.sender ? user.username : opts.sender.username, null, this.timeout);
-        global.db.engine.remove(this.collection.users, { _id: challenge._id.toString() });
+        fightMeChallenges = fightMeChallenges.filter(challenge => {
+          return !(challenge.opponent === opts.sender.username
+            && challenge.challenger === user.username);
+        });
         return;
       }
 
@@ -124,7 +144,10 @@ class FightMe extends Game {
         winner: winner ? user.username : opts.sender.username,
         loser: winner ? opts.sender.username : user.username,
       }), opts.sender, opts.attr);
-      global.db.engine.remove(this.collection.users, { _id: challenge._id.toString() });
+      fightMeChallenges = fightMeChallenges.filter(challenge => {
+        return !(challenge.opponent === opts.sender.username
+          && challenge.challenger === user.username);
+      });
     } else {
       // check if under gambling cooldown
       const cooldown = this.cooldown;
@@ -144,9 +167,16 @@ class FightMe extends Game {
         this._cooldown = String(new Date());
       }
 
-      const isAlreadyChallenged = !_.isEmpty(await global.db.engine.findOne(this.collection.users, { key: '_users', user: opts.sender.username, challenging: user.username }));
+      const isAlreadyChallenged = fightMeChallenges.find(challenge => {
+        return challenge.challenger === opts.sender.username
+          && challenge.opponent === user.username;
+      });
       if (!isAlreadyChallenged) {
-        await global.db.engine.insert(this.collection.users, { key: '_users', user: opts.sender.username, challenging: user.username });
+        fightMeChallenges.push({
+          challenger: opts.sender.username,
+          opponent: user.username,
+          removeAt: Date.now() + (2 * MINUTE),
+        });
       }
       const message = prepare('gambling.fightme.challenge', { username: user.username, sender: opts.sender.username, command: opts.command });
       sendMessage(message, opts.sender, opts.attr);

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 /* global describe it before */
 
 require('../../general.js');
@@ -6,10 +7,10 @@ const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 const variable = require('../../general.js').variable;
 const { getLocalizedName } = require('../../../dest/commons');
-const time = require('../../general.js').time;
 
 const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/entity/user');
+const { Duel } = require('../../../dest/entity/duel');
 
 const _ = require('lodash');
 const assert = require('assert');
@@ -37,9 +38,9 @@ describe('Gambling - duel', () => {
 
     it('Add 200 points to duel bank', async () => {
       for (let i = 0; i < 200; i++) {
-        await global.db.engine.insert(global.games.duel.collection.users, { tickets: 1, user: 'user' + i, id: i });
+        await getRepository(Duel).save({ tickets: 1, username: 'user' + i, id: i });
       }
-      const items = await global.db.engine.find(global.games.duel.collection.users);
+      const items = await getRepository(Duel).find();
       assert.equal(items.length, 200);
     });
 
@@ -129,9 +130,9 @@ describe('Gambling - duel', () => {
     it('create duel', async () => {
       global.games.duel._timestamp = Number(new Date());
 
-      for (const user of ['testuser', 'testuser2', 'testuser3', 'testuser4', 'testuser5']) {
+      for (const username of ['testuser', 'testuser2', 'testuser3', 'testuser4', 'testuser5']) {
         const tickets = Math.floor(Number.MAX_SAFE_INTEGER / 10);
-        await global.db.engine.update(`${global.games.duel.collection.users}`, { key: '_users' }, { user: user, tickets: tickets });
+        await getRepository(Duel).save({ username, tickets: tickets });
       }
     });
 

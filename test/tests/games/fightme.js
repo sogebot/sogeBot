@@ -13,43 +13,43 @@ const command = '!fightme';
 
 const tests = [
   {
-    challenger: { userId: '3', username: 'user1' },
+    challenger: { userId: 3, username: 'user1' },
     challenging: { username: '' },
     expected: 'gambling.fightme.notEnoughOptions',
   },
   {
-    challenger: { userId: '3', username: 'user1' },
-    challenging: { userId: '3', username: 'user1' },
+    challenger: { userId: 3, username: 'user1' },
+    challenging: { userId: 3, username: 'user1' },
     expected: 'gambling.fightme.cannotFightWithYourself',
   },
   {
-    challenger: { userId: '3', username: 'user1' },
-    challenging: { userId: '4', username: 'user2' },
+    challenger: { userId: 3, username: 'user1' },
+    challenging: { userId: 4, username: 'user2' },
     expected: 'gambling.fightme.winner',
   },
   {
-    challenger: { userId: '5', username: 'broadcaster' },
-    challenging: { userId: '3', username: 'user1' },
+    challenger: { userId: 5, username: 'broadcaster' },
+    challenging: { userId: 3, username: 'user1' },
     expected: 'gambling.fightme.broadcaster',
   },
   {
-    challenger: { userId: '3', username: 'user1' },
-    challenging: { userId: '5', username: 'broadcaster' },
+    challenger: { userId: 3, username: 'user1' },
+    challenging: { userId: 5, username: 'broadcaster' },
     expected: 'gambling.fightme.broadcaster',
   },
   {
-    challenger: { userId: '1', username: 'usermod1' },
-    challenging: { userId: '4', username: 'user2' },
+    challenger: { userId: 1, username: 'usermod1' },
+    challenging: { userId: 4, username: 'user2' },
     expected: 'gambling.fightme.oneModerator',
   },
   {
-    challenger: { userId: '3', username: 'user1' },
-    challenging: { userId: '2', username: 'usermod2' },
+    challenger: { userId: 3, username: 'user1' },
+    challenging: { userId: 2, username: 'usermod2' },
     expected: 'gambling.fightme.oneModerator',
   },
   {
-    challenger: { userId: '1', username: 'usermod1' },
-    challenging: { userId: '2', username: 'usermod2' },
+    challenger: { userId: 1, username: 'usermod1' },
+    challenging: { userId: 2, username: 'usermod2' },
     expected: 'gambling.fightme.bothModerators',
   },
 ];
@@ -61,11 +61,11 @@ describe('game/fightme - !fightme', () => {
         await db.cleanup();
         await message.prepare();
 
-        await getRepository(User).save({ userId: '1', username: 'usermod1', isModerator: true });
-        await getRepository(User).save({ userId: '2', username: 'usermod2', isModerator: true });
-        await getRepository(User).save({ userId: '3', username: 'user1' });
-        await getRepository(User).save({ userId: '4', username: 'user2' });
-        await getRepository(User).save({ userId: '5', username: 'broadcaster' });
+        await getRepository(User).save({ userId: 1, username: 'usermod1', isModerator: true });
+        await getRepository(User).save({ userId: 2, username: 'usermod2', isModerator: true });
+        await getRepository(User).save({ userId: 3, username: 'user1' });
+        await getRepository(User).save({ userId: 4, username: 'user2' });
+        await getRepository(User).save({ userId: 5, username: 'broadcaster' });
       });
 
       it('Challenger is starting !fightme', async () => {
