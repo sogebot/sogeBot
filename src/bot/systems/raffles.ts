@@ -292,9 +292,7 @@ class Raffles extends System {
     }
 
     if (!raffle) {
-      const message = await prepare('no-raffle-is-currently-running');
-      sendMessage(message, opts.sender, opts.attr);
-      return false;
+      return true;
     }
 
     const isStartingWithRaffleKeyword = opts.message.toLowerCase().startsWith(raffle.keyword.toLowerCase());

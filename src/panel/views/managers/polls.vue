@@ -59,12 +59,12 @@
               </div>
 
               <div class="card-footer">
-                <button type="button" class="btn btn-block btn-success" style="white-space: normal;" :disabled="!atLeastTwoOptions || newVote.title.trim().length === 0" @click="create()">
+                <button type="button" class="btn btn-block btn-success" style="white-space: normal;" :disabled="!atLeastTwoOptions() || newVote.title.trim().length === 0" @click="create()">
                   <fa icon='plus'></fa>
                   <template v-if="newVote.title.trim().length === 0">
                     {{ translate('systems.polls.cannotCreateWithoutTitle')}}
                   </template>
-                  <template v-else-if="!atLeastTwoOptions">
+                  <template v-else-if="!atLeastTwoOptions()">
                     {{ translate('systems.polls.cannotCreateIfEmpty')}}
                   </template>
                   <template v-else>
@@ -99,7 +99,7 @@
 
               <div class="options"
                 v-for="(option, index) in vote.options"
-                :key="option"
+                :key="vote.id + option + index"
                 :class="[index === 0 ? 'first' : '', index === vote.options.length - 1 ? 'last': '']">
                 <div class="d-flex" style="width:100%">
                   <div class="w-100">{{option}}</div>
@@ -148,7 +148,7 @@
 
         <!-- add empty cards -->
         <template v-if="chunkVotes.length !== itemsPerPage">
-          <div class="card" style="visibility: hidden" v-for="i in itemsPerPage - (chunkVotes.length % itemsPerPage)" v-bind:key="i"></div>
+          <div class="card" style="visibility: hidden" v-for="i in itemsPerPage - (chunkVotes.length % itemsPerPage)" v-bind:key="'item' + i"></div>
         </template>
       </div>
     </template>
@@ -206,6 +206,16 @@
     beforeDestroy: function () {
       clearInterval(this.interval)
     },
+    created() {
+      this.newVote.id = uuid();
+      this.newVote.type = 'normal';
+      this.newVote.title = '';
+      this.newVote.isOpened = true;
+      this.newVote.openedAt = Date.now();
+      this.newVote.closedAt = 0;
+      this.newVote.options = ['', '', '', '', ''];
+      this.newVote.votes = [];
+    },
     mounted: function () {
       this.$moment.locale(this.configuration.lang)
       this.currentTime = Date.now()
@@ -222,8 +232,11 @@
     },
     computed: {
       filteredVotes: function (): Array<Poll | 'new'> {
-        if (this.search.trim().length === 0) return this.votes;
-          return this.votes.filter((o) => {
+        const votes: Array<'new' | Poll> = [
+          'new', ...this.votes,
+        ];
+        if (this.search.trim().length === 0) return votes;
+          return votes.filter((o) => {
             if (typeof o !== 'string') {
             const isSearchInKeyword = !isNil(o.title.match(new RegExp(this.search, 'ig')))
             const isOpened = o.isOpened === true
@@ -245,15 +258,15 @@
         const running = this.votes.find(o => typeof o !== 'string' && o.isOpened);
         return typeof running !== 'undefined';
       },
+    },
+    methods: {
       atLeastTwoOptions: function (): Boolean {
         let options = 0
         for (let i = 0; i < this.newVote.options.length; i++) {
           if (this.newVote.options[i].trim().length > 0) options++
         }
         return options >= 2
-      }
-    },
-    methods: {
+      },
       refresh: function () {
         this.socket.emit('polls::getAll', (data) =>  {
           console.debug('Loaded', data);
