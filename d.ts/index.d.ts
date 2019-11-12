@@ -115,7 +115,7 @@ declare namespace NodeJS {
     twitch: import('../src/bot/twitch').Twitch;
     socket: import('../src/bot/socket').Socket;
     permissions: import('../src/bot/permissions').Permissions;
-    customvariables: any;
+    customvariables: import('../src/bot/customvariables').CustomVariables;
     tmi: import('../src/bot/tmi').TMI;
     events: import('../src/bot/events').Events;
     webhooks: import('../src/bot/webhooks').Webhooks;

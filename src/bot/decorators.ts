@@ -100,7 +100,7 @@ export function settings(category?: string, isReadOnly = false) {
         if (!isReadOnly) {
           // load variable from db
           const loadVariableValue = () => {
-            if (!global.db.engine.connected) {
+            if (!isDbConnected) {
               return setTimeout(() => loadVariableValue(), 1000);
             }
             self.loadVariableValue(key).then((value) => {
@@ -148,7 +148,7 @@ export function permission_settings(category?: string) {
 
         // load variable from db
         const loadVariableValue = () => {
-          if (!global.db.engine.connected) {
+          if (!isDbConnected) {
             return setTimeout(() => loadVariableValue(), 1000);
           }
           self.loadVariableValue('__permission_based__' + key).then((value: { [permissionId: string]: string }) => {

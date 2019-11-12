@@ -1,39 +1,38 @@
-'use strict';
 
-const _ = require('lodash');
-const safeEval = require('safe-eval');
-const axios = require('axios');
-const {
-  isMainThread
-} = require('worker_threads');
-const mathjs = require('mathjs');
+
+import safeEval from 'safe-eval';
+import axios from 'axios';
+import mathjs from 'mathjs';
+import _ from 'lodash';
+import { filter, get, isNil, map, sample } from 'lodash';
 
 import Message from './message';
 import { permission } from './permissions';
 import { getAllOnlineUsernames } from './helpers/getAllOnlineUsernames';
+import { getOwnerAsSender, getTime, isModerator, prepare, sendMessage } from './commons';
 
 import { getRepository } from 'typeorm';
 import { User } from './entity/user';
-const commons = require('./commons');
+import { Variable } from './entity/variable';
 
 class CustomVariables {
-  constructor () {
-    this.timeouts = {};
+  timeouts: {
+    [x: string]: NodeJS.Timeout;
+  } = {};
 
-    if (isMainThread) {
-      this.addMenuAndListenersToPanel();
-      this.checkIfCacheOrRefresh();
-    }
+  constructor () {
+    this.addMenuAndListenersToPanel();
+    this.checkIfCacheOrRefresh();
   }
 
   async getURL(req, res) {
     try {
       const variable = (await global.db.engine.find('custom.variables'))
         .find(variable => {
-          return _.get(variable, 'urls', []).find(url => url.id === req.params.id)
+          return get(variable, 'urls', []).find(url => url.id === req.params.id);
         });
       if (variable) {
-        if (_.get(variable.urls.find(url => url.id === req.params.id), 'access.GET', false)) {
+        if (get(variable.urls.find(url => url.id === req.params.id), 'access.GET', false)) {
           return res.status(200).send({ value: await this.getValueOf(variable.variableName) });
         } else {
           return res.status(403).send({ error: 'This endpoint is not enabled for GET', code: 403 });
@@ -51,27 +50,27 @@ class CustomVariables {
     try {
       const variable = (await global.db.engine.find('custom.variables'))
         .find(variable => {
-          return _.get(variable, 'urls', []).find(url => url.id === req.params.id)
+          return get(variable, 'urls', []).find(url => url.id === req.params.id);
         });
       if (variable) {
-        if (_.get(variable.urls.find(url => url.id === req.params.id), 'access.POST', false)) {
+        if (get(variable.urls.find(url => url.id === req.params.id), 'access.POST', false)) {
           const value = await this.setValueOf(variable.variableName, req.body.value, {});
 
           if (value.isOk) {
-            if (_.get(variable.urls.find(url => url.id === req.params.id), 'showResponse', false)) {
+            if (get(variable.urls.find(url => url.id === req.params.id), 'showResponse', false)) {
               if (value.updated.responseType === 0) {
-                commons.sendMessage(
-                  commons.prepare('filters.setVariable', { value: state.updated.setValue, variable: variable }),
-                  commons.getOwner(), { skip: true, quiet: _.get(attr, 'quiet', false) }
+                sendMessage(
+                  prepare('filters.setVariable', { value: value.updated.currentValue, variable: variable }),
+                  getOwnerAsSender(), { skip: true, quiet: false }
                 );
               } else if (value.updated.responseType === 1) {
-                commons.sendMessage(
-                  value.updated.responseText.replace('$value', value.updated.setValue),
-                  commons.getOwner(), { skip: true, quiet: _.get(attr, 'quiet', false) }
+                sendMessage(
+                  value.updated.responseText.replace('$value', value.updated.currentValue),
+                  getOwnerAsSender(), { skip: true, quiet: false }
                 );
               }
             }
-            return res.status(200).send({ oldValue: variable.currentValue, value: value.updated.setValue });
+            return res.status(200).send({ oldValue: variable.currentValue, value: value.updated.currentValue });
           } else {
             return res.status(400).send({ error: 'This value is not applicable for this endpoint', code: 400 });
           }
@@ -90,7 +89,7 @@ class CustomVariables {
   async addMenuAndListenersToPanel () {
     clearTimeout(this.timeouts[`${this.constructor.name}.addMenuAndListenersToPanel`]);
 
-    if (_.isNil(global.panel)) {
+    if (isNil(global.panel)) {
       this.timeouts[`${this.constructor.name}.addMenuAndListenersToPanel`] = setTimeout(() => this.addMenuAndListenersToPanel(), 1000);
     } else {
       global.panel.addMenu({ category: 'registry', name: 'custom-variables', id: 'registry.customVariables/list' });
@@ -103,7 +102,7 @@ class CustomVariables {
 
     io.on('connection', (socket) => {
       socket.on('list.variables', async (cb) => {
-        let variables = await global.db.engine.find('custom.variables');
+        const variables = await global.db.engine.find('custom.variables');
         cb(null, variables);
       });
       socket.on('run.script', async (id, cb) => {
@@ -141,12 +140,12 @@ class CustomVariables {
       });
       socket.on('save', async (data, cb) => {
         try {
-          if (!_.isNil(data.id)) {
+          if (isNil(data.id)) {
             await global.db.engine.update('custom.variables', { id: data.id }, data);
             this.updateWidgetAndTitle(data.variableName);
             cb(null, data.id);
           } else {
-            let item = await global.db.engine.insert('custom.variables', data);
+            const item = await global.db.engine.insert('custom.variables', data);
             this.updateWidgetAndTitle(data.variableName);
             cb(null, item.id);
           }
@@ -158,67 +157,67 @@ class CustomVariables {
   }
 
   async runScript (script, opts) {
-    let sender = !_.isNil(opts.sender) ? opts.sender : null;
-    let param = !_.isNil(opts.param) ? opts.param : null;
+    let sender = isNil(opts.sender) ? opts.sender : null;
+    const param = isNil(opts.param) ? opts.param : null;
 
     if (typeof sender === 'string') {
       sender = {
         username: sender,
-        userId: await global.users.getIdByName(sender)
+        userId: await global.users.getIdByName(sender),
       };
     }
 
     // we need to check +1 variables, as they are part of commentary
-    const containUsers = !_.isNil(script.match(/users/g)) && script.match(/users/g).length > 1;
-    const containRandom = !_.isNil(script.replace(/Math\.random|_\.random/g, '').match(/random/g));
-    const containOnline = !_.isNil(script.match(/online/g));
+    const containUsers = isNil(script.match(/users/g)) && script.match(/users/g).length > 1;
+    const containRandom = isNil(script.replace(/Math\.random|_\.random/g, '').match(/random/g));
+    const containOnline = isNil(script.match(/online/g));
 
-    let users = [];
+    let users: User[] = [];
     if (containUsers || containRandom) {
-      users = await global.users.getAll();
+      users = await getRepository(User).find();
     }
 
-    let onlineViewers = [];
-    const onlineSubscribers = [];
-    const onlineFollowers = [];
+    let onlineViewers: string[] = [];
+    const onlineSubscribers: string[] = [];
+    const onlineFollowers: string[] = [];
 
     if (containOnline) {
       onlineViewers = await getAllOnlineUsernames();
 
-      for (let viewer of onlineViewers) {
+      for (const viewer of onlineViewers) {
         const user = await getRepository(User).findOne({
           where: {
             username: viewer,
             isSubscriber: true,
           },
-        })
+        });
         if (user) {
-          onlineSubscribers.push(user.username)
+          onlineSubscribers.push(user.username);
         };
       }
 
-      for (let viewer of onlineViewers) {
+      for (const viewer of onlineViewers) {
         const user = await getRepository(User).findOne({
           where: {
             username: viewer,
             isFollower: true,
-          }
-        })
+          },
+        });
         if (user) {
-          onlineFollowers.push(user.username)
+          onlineFollowers.push(user.username);
         };
       }
     }
 
     const randomVar = {
       online: {
-        viewer: _.sample(_.map(onlineViewers, 'username')),
-        follower: _.sample(_.map(onlineFollowers, 'username')),
-        subscriber: _.sample(_.map(onlineSubscribers, 'username'))
+        viewer: sample(map(onlineViewers, 'username')),
+        follower: sample(map(onlineFollowers, 'username')),
+        subscriber: sample(map(onlineSubscribers, 'username')),
       },
-      viewer: _.sample(_.map(users, 'username')),
-      follower: _.sample(_.map(_.filter(users, (o) => _.get(o, 'is.follower', false)), 'username')),
-      subscriber: _.sample(_.map(_.filter(users, (o) => _.get(o, 'is.subscriber', false)), 'username'))
+      viewer: sample(map(users, 'username')),
+      follower: sample(map(filter(users, (o) => get(o, 'is.follower', false)), 'username')),
+      subscriber: sample(map(filter(users, (o) => get(o, 'is.subscriber', false)), 'username')),
     };
 
     // get custom variables
@@ -231,8 +230,8 @@ class CustomVariables {
     // update globals and replace theirs values
     script = (await new Message(script).global({ escape: '\'' }));
 
-    let toEval = `(async function evaluation () {  ${script} })()`;
-    let context = {
+    const toEval = `(async function evaluation () {  ${script} })()`;
+    const context = {
       url: async (url, opts) => {
         if (typeof opts === 'undefined') {
           opts = {
@@ -260,7 +259,7 @@ class CustomVariables {
       users: users,
       random: randomVar,
       stream: {
-        uptime: commons.getTime(global.api.isStreamOnline ? global.api.streamStatusChangeSince : null, false),
+        uptime: getTime(global.api.isStreamOnline ? global.api.streamStatusChangeSince : null, false),
         currentViewers: global.api.stats.currentViewers,
         currentSubscribers: global.api.stats.currentSubscribers,
         currentBits: global.api.stats.currentBits,
@@ -283,14 +282,14 @@ class CustomVariables {
         const _user = await getRepository(User).findOne({ username });
         const userObj = {
           username,
-          id: await global.users.getIdByName(username, false),
+          id: await global.users.getIdByName(username),
           is: {
-            online: _user.isOnline,
-            follower: _.get(_user, 'is.follower', false),
-            vip: _.get(_user, 'is.vip', false),
-            subscriber: _.get(_user, 'is.subscriber', false),
-            mod: await commons.isModerator(username)
-          }
+            online: _user?.isOnline ?? false,
+            follower: get(_user, 'is.follower', false),
+            vip: get(_user, 'is.vip', false),
+            subscriber: get(_user, 'is.subscriber', false),
+            mod: await isModerator(username),
+          },
         };
         return userObj;
       },
@@ -300,26 +299,28 @@ class CustomVariables {
   }
 
   async isVariableSet (variableName) {
-    let item = await global.db.engine.findOne('custom.variables', { variableName });
-    return !_.isEmpty(item) ? item.id : null;
+    return await getRepository(Variable).findOne({ variableName });
   }
 
   async isVariableSetById (id) {
-    let item = await global.db.engine.findOne('custom.variables', { id });
-    return !_.isEmpty(item) ? String(item.variableName) : null;
+    return await getRepository(Variable).findOne({ id });
   }
 
-  async getValueOf (variableName, opts) {
-    if (!variableName.startsWith('$_')) {variableName = `$_${variableName}`};
-    let item = await global.db.engine.findOne('custom.variables', { variableName });
-    if (_.isEmpty(item)) {return ''}; // return empty if variable doesn't exist
+  async getValueOf (variableName, opts?: any) {
+    if (!variableName.startsWith('$_')) {
+      variableName = `$_${variableName}`;
+    };
+    const item = await getRepository(Variable).findOne({ variableName });
+    if (!item) {
+      return '';
+    }; // return empty if variable doesn't exist
 
     if (item.type === 'eval' && Number(item.runEvery) === 0) {
       item.currentValue = await this.runScript(item.evalValue, {
         _current: item.currentValue,
-        ...opts
+        ...opts,
       });
-      await global.db.engine.update('custom.variables', { variableName }, { currentValue: item.currentValue, runAt: Date.now() });
+      await getRepository(Variable).save(item);
     }
 
     return item.currentValue;
@@ -331,41 +332,47 @@ class CustomVariables {
    * { updated, isOK }
    */
   async setValueOf (variableName, currentValue, opts) {
-    let item = await global.db.engine.findOne('custom.variables', { variableName });
+    let item = await getRepository(Variable).findOne({ variableName });
     let isOk = true;
     let isEval = false;
     let oldValue = null;
 
-    opts.sender = _.isNil(opts.sender) ? null : opts.sender;
-    opts.readOnlyBypass = _.isNil(opts.readOnlyBypass) ? false : opts.readOnlyBypass;
+    opts.sender = isNil(opts.sender) ? null : opts.sender;
+    opts.readOnlyBypass = isNil(opts.readOnlyBypass) ? false : opts.readOnlyBypass;
     // add simple text variable, if not existing
-    if (_.isEmpty(item)) {
-      item = await global.db.engine.update('custom.variables', { variableName }, { variableName, currentValue, type: 'text', responseType: 0, permission: permission.MODERATORS });
+    if (!item) {
+      item = new Variable();
+      item.variableName = variableName;
+      item.currentValue = currentValue;
+      item.responseType = 0;
+      item.type = 'text';
+      item.permission = permission.MODERATORS;
+      await getRepository(Variable).save(item);
     } else {
       // set item permission to owner if missing
       item.permission = typeof item.permission === 'undefined' ? permission.CASTERS : item.permission;
       if (typeof opts.sender === 'string') {
         opts.sender = {
           username: opts.sender,
-          userId: await global.users.getIdByName(opts.sender)
+          userId: await global.users.getIdByName(opts.sender),
         };
       }
-      const permissionsAreValid = _.isNil(opts.sender) || (await global.permissions.check(opts.sender.userId, item.permission)).access;
+      const permissionsAreValid = isNil(opts.sender) || (await global.permissions.check(opts.sender.userId, item.permission)).access;
       if ((item.readOnly && !opts.readOnlyBypass) || !permissionsAreValid) {
         isOk = false;
       } else {
         oldValue = item.currentValue;
         if (item.type === 'number') {
           if (['+', '-'].includes(currentValue)) {
-            currentValue = mathjs.eval(`${item.currentValue} ${currentValue} 1`);
+            currentValue = mathjs.evaluate(`${item.currentValue} ${currentValue} 1`);
           } else {
-            const isNumber = _.isFinite(Number(currentValue));
+            const isNumber = isFinite(Number(currentValue));
             isOk = isNumber;
             currentValue = isNumber ? Number(currentValue) : item.currentValue;
           }
         } else if (item.type === 'options') {
           // check if is in usableOptions
-          let isUsableOption = item.usableOptions.split(',').map((o) => o.trim()).includes(currentValue);
+          const isUsableOption = item.usableOptions.map((o) => o.trim()).includes(currentValue);
           isOk = isUsableOption;
           currentValue = isUsableOption ? currentValue : item.currentValue;
         } else if (item.type === 'eval') {
@@ -374,15 +381,16 @@ class CustomVariables {
           isEval = true;
         }
         // do update only on non-eval variables
-        if (item.type !== 'eval' && isOk) {item = await global.db.engine.update('custom.variables', { variableName }, { currentValue })};
+        if (item.type !== 'eval' && isOk) {
+          item = await getRepository(Variable).save(item);
+        };
       }
     }
 
-    item.setValue = item.currentValue;
     if (isOk) {
       this.updateWidgetAndTitle(variableName);
       if (!isEval) {
-        this.addChangeToHistory({ sender: _.get(opts, 'sender.username', null), item, oldValue });
+        this.addChangeToHistory({ sender: get(opts, 'sender.username', null), item, oldValue });
         item.currentValue = ''; // be silent if parsed correctly
       }
     }
@@ -395,14 +403,14 @@ class CustomVariables {
 
   async checkIfCacheOrRefresh () {
     clearTimeout(this.timeouts[`${this.constructor.name}.checkIfCacheOrRefresh`]);
-    let items = await global.db.engine.find('custom.variables', { type: 'eval' });
+    const items = await global.db.engine.find('custom.variables', { type: 'eval' });
 
-    for (let item of items) {
+    for (const item of items) {
       try {
-        item.runAt = _.isNil(item.runAt) ? 0 : item.runAt;
+        item.runAt = isNil(item.runAt) ? 0 : item.runAt;
         const shouldRun = item.runEvery > 0 && Date.now() - new Date(item.runAt).getTime() >= item.runEvery;
         if (shouldRun) {
-          let newValue = await this.runScript(item.evalValue, { _current: item.currentValue });
+          const newValue = await this.runScript(item.evalValue, { _current: item.currentValue });
           await global.db.engine.update('custom.variables', { id: item.id }, { runAt: Date.now(), currentValue: newValue });
           await this.updateWidgetAndTitle(item.variableName);
         }
@@ -411,23 +419,20 @@ class CustomVariables {
     this.timeouts[`${this.constructor.name}.checkIfCacheOrRefresh`] = setTimeout(() => this.checkIfCacheOrRefresh(), 1000);
   }
 
-  async updateWidgetAndTitle (variable) {
-    if (!isMainThread) {
-      global.workers.sendToMaster({ type: 'widget_custom_variables', emit: 'refresh' });
-    } else if (!_.isNil(global.widgets.custom_variables.socket)) {global.widgets.custom_variables.socket.emit('refresh')}; // send update to widget
+  async updateWidgetAndTitle (variable = null) {
+    if (global.widgets?.custom_variables.socket) {
+      global.widgets?.custom_variables.socket.emit('refresh');
+    }; // send update to widget
 
-    if (!_.isNil(variable)) {
+    if (isNil(variable)) {
       const regexp = new RegExp(`\\${variable}`, 'ig');
 
       if (global.api.rawStatus.match(regexp)) {
-        if (!isMainThread) {
-          global.workers.sendToMaster({ type: 'call', ns: 'api', fnc: 'setTitleAndGame', args: [null] });
-        } else {
-          global.api.setTitleAndGame(null);
-        }
+        global.api.setTitleAndGame(null, null);
       }
     }
   }
 }
 
-module.exports = CustomVariables;
+export default CustomVariables;
+export { CustomVariables };

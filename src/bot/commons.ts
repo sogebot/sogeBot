@@ -188,6 +188,19 @@ export async function timeout(username, reason, timeMs) {
   clusteredClientTimeout(username, timeMs, reason);
 }
 
+export function getOwnerAsSender(): Sender {
+  return {
+    username: getOwner(),
+    displayName: getOwner(),
+    userId: 0,
+    emotes: [],
+    badges: {
+      subscriber: 1,
+    },
+    'message-type': 'chat',
+  };
+}
+
 export function getOwner() {
   try {
     return global.oauth.generalOwners[0].trim();

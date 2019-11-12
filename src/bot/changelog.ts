@@ -5,18 +5,25 @@
 
 import uuid from 'uuid/v4';
 import { set } from 'lodash';
-import { getManager } from 'typeorm';
+
+import { getManager, getRepository, LessThan, MoreThan, Not } from 'typeorm';
 import { Settings } from './entity/settings';
+import { Changelog } from './entity/changelog';
 
 let lastTimestamp = Date.now();
 const threadId = uuid();
 
 export const change = ((namespace) => {
-  global.db.engine.insert('changelog', { namespace, timestamp: Date.now(), threadId });
+  getRepository(Changelog).save({ namespace, timestamp: Date.now(), threadId });
 });
 
 export const changelog = async () => {
-  const changes = await global.db.engine.find('changelog', { timestamp: { $gt: lastTimestamp }, threadId: { $ne: threadId } });
+  const changes = await getRepository(Changelog).find({
+    where: {
+      timestamp: MoreThan(lastTimestamp),
+      threadId: Not(threadId),
+    },
+  });
   for (const change of changes.sort((a, b) => a.timestamp - b.timestamp )) {
     let self: null | any = null;
 
@@ -46,5 +53,7 @@ export const changelog = async () => {
 };
 
 setInterval(() => {
-  global.db.engine.remove('changelog', { timestamp: { $lt: Date.now() - 60000 } });
+  getRepository(Changelog).delete({
+    timestamp: LessThan(Date.now() - 60000),
+  });
 }, 60000);
