@@ -421,7 +421,7 @@ class Message {
               const _permission = await global.permissions.get(permission);
               if (_permission) {
                 const commandIds = responses.filter((o) => o.permission === _permission.id).map((o) => o.cid);
-                commands = commands.filter((o) => commandIds.includes(String(o._id)));
+                commands = commands.filter((o) => commandIds.includes(o.id));
               } else {
                 commands = [];
               }
@@ -435,7 +435,7 @@ class Message {
               const responses = commands.map(o => o.responses).flat();              const _permission = await global.permissions.get(permission);
               if (_permission) {
                 const commandIds = responses.filter((o) => o.permission === _permission.id).map((o) => o.cid);
-                commands = commands.filter((o) => commandIds.includes(String(o._id)));
+                commands = commands.filter((o) => commandIds.includes(o.id));
               } else {
                 commands = [];
               }
