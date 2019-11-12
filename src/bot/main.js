@@ -18,6 +18,7 @@ import { Socket } from './socket';
 import { Webhooks } from './webhooks';
 import { Users } from './users';
 import { UI } from './ui';
+import { CustomVariables } from './customvariables';
 
 import { createConnection, getConnectionOptions } from 'typeorm';
 
@@ -78,7 +79,7 @@ async function main () {
     global.users = new Users();
 
     global.events = new Events();
-    global.customvariables = new (require('./customvariables.js'))()
+    global.customvariables = new CustomVariables();
 
     global.panel = new (require('./panel'))()
     global.twitch = new Twitch()

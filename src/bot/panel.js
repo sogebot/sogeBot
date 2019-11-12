@@ -15,6 +15,7 @@ import { CacheTitles } from './entity/cacheTitles';
 import uuid from 'uuid'
 import { getManager, getRepository } from 'typeorm';
 import { Dashboard, Widget } from './entity/dashboard';
+import { Translation } from './entity/translation'
 
 const Parser = require('./parser')
 
@@ -293,9 +294,9 @@ function Panel () {
       socket.emit('lang', lang)
     })
     socket.on('responses.revert', async function (data, callback) {
-      _.remove(global.lib.translate.custom, function (o) { return o.key === data.key })
-      await global.db.engine.remove('customTranslations', { key: data.key })
-      let translate = global.translate(data.key)
+      _.remove(global.lib.translate.custom, function (o) { return o.name === data.name })
+      await getRepository(Translation).delete({ name: data.name })
+      let translate = global.translate(data.name)
       callback(translate)
     })
 

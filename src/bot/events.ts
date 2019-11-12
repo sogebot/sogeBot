@@ -14,6 +14,7 @@ import { error, info, warning } from './helpers/log';
 import { adminEndpoint } from './helpers/socket';
 import { getRepository } from 'typeorm';
 import { User } from './entity/user';
+import { Variable } from './entity/variable';
 
 class Events extends Core {
   public timeouts: { [x: string]: NodeJS.Timeout } = {};
@@ -511,7 +512,7 @@ class Events extends Core {
     }
 
     // get custom variables
-    const customVariablesDb = await global.db.engine.find('custom.variables');
+    const customVariablesDb = await getRepository(Variable).find();
     const customVariables = {};
     for (const cvar of customVariablesDb) {
       customVariables[cvar.variableName] = cvar.currentValue;

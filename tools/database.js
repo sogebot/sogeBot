@@ -23,6 +23,8 @@ const { Rank } = require('../dest/entity/rank');
 const { SongPlaylist, SongBan } = require('../dest/entity/song');
 const { Timer, TimerResponse } = require('../dest/entity/timer');
 const { Dashboard, Widget } = require('../dest/entity/dashboard');
+const { Variable, VariableHistory, VaraibleWatch } = require('../dest/entity/variable');
+const { Translation } = require('../dest/entity/translation');
 
 const _ = require('lodash');
 
@@ -88,6 +90,7 @@ async function main() {
   });
   if (items.length > 0) {
     for (const chunk of _.chunk(items, 100)) {
+      process.stdout.write('.')
       await getRepository(CacheTitles).insert(chunk)
     }
   }
@@ -124,6 +127,7 @@ async function main() {
   });
   if (items.length > 0) {
     for (const chunk of _.chunk(items, 100)) {
+      process.stdout.write('.')
       await getRepository(EventList).insert(chunk)
     }
   }
@@ -135,6 +139,7 @@ async function main() {
   });
   if (items.length > 0) {
     for (const chunk of _.chunk(items, 100)) {
+      process.stdout.write('.')
       await getRepository(Quotes).insert(chunk)
     }
   }
@@ -146,6 +151,7 @@ async function main() {
   });
   if (items.length > 0) {
     for (const chunk of _.chunk(items, 100)) {
+      process.stdout.write('.')
       await getRepository(Alias).insert(chunk)
     }
   }
@@ -176,6 +182,7 @@ async function main() {
   });
   if (items.length > 0) {
     for (const chunk of _.chunk(items, 100)) {
+      process.stdout.write('.')
       await getRepository(Commands).save(chunk);
     }
   }
@@ -187,6 +194,7 @@ async function main() {
   });
   if (items.length > 0) {
     for (const chunk of _.chunk(items, 100)) {
+      process.stdout.write('.')
       await getRepository(CommandsCount).insert(chunk);
     }
   }
@@ -202,6 +210,7 @@ async function main() {
   });
   if (items.length > 0) {
     for (const chunk of _.chunk(items, 100)) {
+      process.stdout.write('.')
       await getRepository(Permissions).insert(chunk)
     }
   }
@@ -228,6 +237,7 @@ async function main() {
   });
   if (items.length > 0) {
     for (const chunk of _.chunk(items, 100)) {
+      process.stdout.write('.')
       await getRepository(Cooldown).save(chunk);
     }
   }
@@ -245,6 +255,7 @@ async function main() {
   });
   if (items.length > 0) {
     for (const chunk of _.chunk(items, 100)) {
+      process.stdout.write('.')
       await getRepository(Highlight).save(chunk);
     }
   }
@@ -272,6 +283,7 @@ async function main() {
   });
   if (items.length > 0) {
     for (const chunk of _.chunk(items, 100)) {
+      process.stdout.write('.')
       await getRepository(Keyword).save(chunk);
     }
   }
@@ -346,7 +358,7 @@ async function main() {
   });
   if (items.length > 0) {
     for (const chunk of _.chunk(items, 100)) {
-      console.log('.');
+      process.stdout.write('.');
       try {
         await getRepository(User).save(chunk);
       } catch (e) {
@@ -362,6 +374,7 @@ async function main() {
   });
   if (items.length > 0) {
     for (const chunk of _.chunk(items, 100)) {
+      process.stdout.write('.')
       await getRepository(Price).save(chunk);
     }
   }
@@ -376,6 +389,7 @@ async function main() {
   });
   if (items.length > 0) {
     for (const chunk of _.chunk(items, 100)) {
+      process.stdout.write('.')
       await getRepository(Rank).save(chunk);
     }
   }
@@ -398,6 +412,7 @@ async function main() {
   });
   if (items.length > 0) {
     for (const chunk of _.chunk(items, 100)) {
+      process.stdout.write('.')
       await getRepository(SongPlaylist).save(chunk);
     }
   }
@@ -412,6 +427,7 @@ async function main() {
   });
   if (items.length > 0) {
     for (const chunk of _.chunk(items, 100)) {
+      process.stdout.write('.')
       await getRepository(SongBan).save(chunk);
     }
   }
@@ -442,6 +458,7 @@ async function main() {
   });
   if (items.length > 0) {
     for (const chunk of _.chunk(items, 100)) {
+      process.stdout.write('.')
       await getRepository(Timer).save(chunk);
     }
   }
@@ -486,7 +503,72 @@ async function main() {
   });
   if (items.length > 0) {
     for (const chunk of _.chunk(items, 100)) {
+      process.stdout.write('.')
       await getRepository(Dashboard).save(chunk);
+    }
+  }
+
+  console.log(`Migr: custom.variables, custom.variables.history`);
+  await getManager().clear(VariableHistory);
+  await getManager().clear(Variable);
+  const history = (await from.engine.find('custom.variables.history'))
+  items = (await from.engine.find('custom.variables')).map(o => {
+    return {
+      id: o.id,
+      variableName: o.variableName,
+      type: o.type,
+      runEvery: Number(o.runEvery),
+      currentValue: o.currentValue,
+      description: o.description,
+      evalValue: o.evalValue,
+      runEveryTypeValue: o.runEveryTypeValue,
+      responseType: o.responseType,
+      runEveryType: o.runEveryType,
+      runEvery: o.runEvery,
+      responseText: o.responseText,
+      permission: o.permission,
+      readOnly: o.readOnly,
+      usableOptions: o.usableOptions.split(',').map(o => o.trim()),
+      runAt: o.runAt,
+      history: history.filter(h => h.cvarId === o.id)
+        .map(hm => {
+          return {
+            userId: hm.sender ? hm.sender.userId : 0,
+            username: hm.sender ? hm.sender.username : 'n/a',
+            oldValue: hm.oldValue,
+            currentValue: hm.currentValue,
+            changedAt: new Date(hm.timestamp).getTime(),
+          }
+        }),
+      urls: o.urls ? o.urls.map(u => {
+        return {
+          id: u.id,
+          GET: u.access.GET,
+          POST: u.access.POST,
+          showResponse: u.showResponse
+        }
+      }) : [],
+    };
+  });
+  if (items.length > 0) {
+    for (const chunk of _.chunk(items, 100)) {
+      process.stdout.write('.')
+      await getRepository(Variable).save(chunk);
+    }
+  }
+
+  console.log(`Migr: customTranslations`);
+  await getManager().clear(Translation);
+  items = (await from.engine.find('customTranslations')).map(o => {
+    return {
+      name: o.key,
+      value: o.value,
+    };
+  });
+  if (items.length > 0) {
+    for (const chunk of _.chunk(items, 100)) {
+      process.stdout.write('.')
+      await getRepository(Translation).save(chunk);
     }
   }
 

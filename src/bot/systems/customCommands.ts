@@ -17,6 +17,7 @@ import { adminEndpoint } from '../helpers/socket';
 import { getRepository } from 'typeorm';
 import { Commands, CommandsResponses } from '../entity/commands';
 import { User } from '../entity/user';
+import { Variable } from '../entity/variable';
 
 /*
  * !command                                                                 - gets an info about command usage
@@ -386,7 +387,7 @@ class CustomCommands extends System {
     };
 
     // get custom variables
-    const customVariablesDb = await global.db.engine.find('custom.variables');
+    const customVariablesDb = await getRepository(Variable).find();
     const customVariables = {};
     for (const cvar of customVariablesDb) {
       customVariables[cvar.variableName] = cvar.currentValue;

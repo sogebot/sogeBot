@@ -19,8 +19,8 @@
     <loading v-if="!state.loaded /* State.DONE */" />
     <b-table v-else :fields="fields" :items="filteredVariables">
       <template v-slot:cell(description)="data">
-        <small v-bind:class="{ 'text-muted': !data.value || data.value.length === 0 }">
-          {{ data.value && data.value.length !== 0 ? data.value : translate('not-available') }}
+        <small v-bind:class="{ 'text-muted': data.value.length === 0 }">
+          {{ data.value.length !== 0 ? data.value : translate('not-available') }}
         </small>
       </template>
       <template v-slot:cell(type)="data">
@@ -29,8 +29,8 @@
         </div>
       </template>
       <template v-slot:cell(currentValue)="data">
-        <small v-bind:class="{ 'text-muted': !data.value || data.value.length === 0 }">
-          {{ data.value && data.value.length !== 0 ? data.value : translate('not-available') }}
+        <small v-bind:class="{ 'text-muted': !data.value.length === 0 }">
+          {{ data.value.length !== 0 ? data.value : translate('not-available') }}
         </small>
       </template>
       <template v-slot:cell(additional-info)="data">
@@ -48,7 +48,7 @@
         </span>
         <span v-if="data.item.type === 'options'">
           <strong>{{ translate('registry.customvariables.usableOptions.name') }}:</strong>
-          {{ data.item.usableOptions }}
+          {{ data.item.usableOptions.join(', ') }}
         </span>
         <div v-if="data.item.readOnly">
           <strong>{{ translate('registry.customvariables.isReadOnly') | capitalize }}</strong>
@@ -137,8 +137,7 @@ export default class customVariablesList extends Vue {
     // _.throttle), visit: https://lodash.com/docs#debounce
     this.debouncedRunScript = debounce(this.runScript, 1000)
 
-    this.psocket.emit('find', {}, (err, data) => {
-      if (err) return console.error(err)
+    this.psocket.emit('permissions', (data) => {
       this.permissions = orderBy(data, 'order', 'asc')
     })
   }

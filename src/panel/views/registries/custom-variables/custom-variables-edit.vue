@@ -113,8 +113,8 @@
         <b-list-group>
           <b-list-group-item v-for="url of urls" :key="url.id" class="p-0 d-flex">
             <b-button-group size="sm" class="btn-block" style="flex-basis: 0;">
-              <b-button :variant="url.access.GET ? 'success' : 'danger'" @click="url.access.GET = !url.access.GET">GET</b-button>
-              <b-button :variant="url.access.POST ? 'success' : 'danger'" @click="url.access.POST = !url.access.POST">POST</b-button>
+              <b-button :variant="url.GET ? 'success' : 'danger'" @click="url.GET = !url.GET">GET</b-button>
+              <b-button :variant="url.POST ? 'success' : 'danger'" @click="url.POST = !url.POST">POST</b-button>
               <b-button :variant="url.showResponse ? 'success' : 'danger'" @click="url.showResponse = !url.showResponse">{{ translate('registry.customvariables.response.show') }}</b-button>
             </b-button-group>
             <div class="w-100 p-2">{{origin}}/customvariables/{{url.id}}</div>
@@ -268,10 +268,10 @@
       >
         <b-table class="hide-headers" :fields="['time', 'sender', 'newValue']" :items="history" borderless small>
           <template v-slot:cell(time)="data">
-            {{data.item.timestamp | moment('LL')}} {{ data.item.timestamp | moment('LTS') }}
+            {{data.item.changedAt | moment('LL')}} {{ data.item.changedAt | moment('LTS') }}
           </template>
           <template v-slot:cell(sender)="data">
-            {{ data.value ? data.value : 'Dashboard'}}
+            {{ data.item.username !== 'n/a' ? data.item.username : 'Dashboard'}}
           </template>
           <template v-slot:cell(newValue)="data">
             {{ data.item.currentValue }}
@@ -361,7 +361,7 @@ export default class customVariablesEdit extends Vue {
   usableOptions: string = '';
   readOnly: boolean = false;
   permission: string | null = null;
-  urls: { id: string; showResponse: boolean; access: { GET: boolean; POST: boolean }}[] = [];
+  urls: { id: string; showResponse: boolean; GET: boolean; POST: boolean }[] = [];
 
   evalValue: string = evalDefault;
   evalError: string | null = null
@@ -386,8 +386,7 @@ export default class customVariablesEdit extends Vue {
     this.state.loaded = false;
     await Promise.all([
       new Promise(resolve => {
-        this.psocket.emit('find', {}, (err, data) => {
-          if (err) return console.error(err)
+        this.psocket.emit('permissions', (data) => {
           this.permissions = orderBy(data, 'order', 'asc')
 
           if (!this.$route.params.id) {
@@ -401,24 +400,20 @@ export default class customVariablesEdit extends Vue {
       new Promise(resolve => {
         if (this.$route.params.id) {
           this.socket.emit('load', this.$route.params.id, (data) => {
-            this.variableName = data.variable.variableName;
-            this.description = data.variable.description;
-            this.currentValue = data.variable.currentValue;
-            this.usableOptions = data.variable.usableOptions;
-            this.evalValue = data.variable.type === 'eval' ? data.variable.evalValue : evalDefault;
-            this.selectedRunEvery = data.variable.runEveryType;
-            this.runEveryX = data.variable.runEvery / data.variable.runEveryTypeValue || 1;
-            this.selectedType = data.variable.type;
-            this.responseType = data.variable.responseType;
-            this.responseText = data.variable.responseText;
-            this.urls = data.variable.urls || [];
-            this.permission = data.variable.permission || 0;
-            this.readOnly = data.variable.readOnly || false;
-            for (let h of data.history) {
-              // change timestamp to milliseconds
-              h.timestamp = new Date(h.timestamp).getTime();
-            }
-            this.history = chunk(orderBy(data.history, 'timestamp', 'desc'), 15)[0] || [];
+            this.variableName = data.variableName;
+            this.description = data.description;
+            this.currentValue = data.currentValue;
+            this.usableOptions = data.usableOptions.map(o => o.trim()).join(', ');
+            this.evalValue = data.type === 'eval' ? data.evalValue : evalDefault;
+            this.selectedRunEvery = data.runEveryType;
+            this.runEveryX = data.runEvery / data.runEveryTypeValue || 1;
+            this.selectedType = data.type;
+            this.responseType = data.responseType;
+            this.responseText = data.responseText;
+            this.urls = data.urls || [];
+            this.permission = data.permission || 0;
+            this.readOnly = data.readOnly || false;
+            this.history = chunk(orderBy(data.history, 'changedAt', 'desc'), 15)[0] || [];
             resolve();
           })
         } else {
@@ -511,7 +506,8 @@ export default class customVariablesEdit extends Vue {
     this.urls.push({
       id: uuid(),
       showResponse: false,
-      access: { GET: false, POST: false }
+      GET: false,
+      POST: false,
     });
   }
 

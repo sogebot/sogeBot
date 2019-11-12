@@ -1,5 +1,5 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-import { ColumnNumericTransformer } from '../../../dest/entity/_transformer';
+import { ColumnNumericTransformer } from './_transformer';
 
 @Entity()
 export class Changelog {

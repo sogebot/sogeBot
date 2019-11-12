@@ -1,8 +1,9 @@
 'use strict';
 
-import _ from 'lodash';
 import Widget from './_interface';
 import { adminEndpoint } from '../helpers/socket';
+import { getRepository } from 'typeorm';
+import { Variable, VariableWatch } from '../entity/variable';
 
 class CustomVariables extends Widget {
   constructor() {
@@ -19,12 +20,16 @@ class CustomVariables extends Widget {
 
   public sockets() {
     adminEndpoint(this.nsp, 'list.variables', async (cb) => {
-      const variables = await global.db.engine.find('custom.variables');
+      const variables = await getRepository(Variable).find();
       cb(null, variables);
     });
     adminEndpoint(this.nsp, 'list.watch', async (cb) => {
-      const variables = await global.db.engine.find('custom.variables.watch');
-      cb(null, _.orderBy(variables, 'order', 'asc'));
+      const variables = await getRepository(VariableWatch).find({
+        order: {
+          order: 'ASC',
+        },
+      });
+      cb(null, variables);
     });
     adminEndpoint(this.nsp, 'set.value', async (opts, cb) => {
       const name = await global.customvariables.isVariableSetById(opts.id);

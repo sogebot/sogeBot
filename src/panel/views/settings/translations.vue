@@ -34,9 +34,9 @@
           <b-form-group style="margin:0 !important">
             <b-input-group>
               <b-form-input
-                :id="data.item.key"
+                :id="data.item.name"
                 v-model="data.item.current"
-                @input="updateTranslation(data.item.key, data.item.current)"
+                @input="updateTranslation(data.item.name, data.item.current, data.item.default)"
                 type="text"
               ></b-form-input>
               <b-input-group-append v-if="data.item.current !== data.item.default">
@@ -61,7 +61,7 @@ import { isNil } from 'lodash-es';
   }
 })
 export default class translations extends Vue {
-  items: { key: string, current: string, default: string }[] = [];
+  items: { name: string, current: string, default: string }[] = [];
   search: string = '';
 
   currentPage = 0
@@ -69,7 +69,7 @@ export default class translations extends Vue {
 
   fields = [
     {
-      key: 'key',
+      key: 'name',
       label: this.translate('integrations.responsivevoice.settings.key.title'),
       sortable: true,
       thStyle: "width: 375px",
@@ -94,14 +94,18 @@ export default class translations extends Vue {
     return this.fItems.length;
   }
 
-  revertTranslation(key) {
-    this.socket.emit('responses.revert', { key }, (orig) => {
-      console.log('Reverted', key, orig)
+  revertTranslation(name) {
+    this.socket.emit('responses.revert', { name }, (orig) => {
+      console.log('Reverted', name, orig)
     })
   }
 
-  updateTranslation(key, value) {
-    this.socket.emit('responses.set', { key, value })
+  updateTranslation(name, value, defaultValue) {
+    if (value === defaultValue) {
+      this.revertTranslation(name);
+    } else {
+      this.socket.emit('responses.set', { name, value })
+    }
   }
 
   created() {
@@ -114,15 +118,15 @@ export default class translations extends Vue {
             console.debug(`${o[0]} have missing translation`)
           }
           return {
-            key: o[0] as string,
+            name: o[0] as string,
             current: (o[1] as any).current as string,
             default: (o[1] as any).default as string,
           };
         })
-        .filter(o => !o.key.startsWith('webpanel') && !o.key.startsWith('ui'))
+        .filter(o => !o.name.startsWith('webpanel') && !o.name.startsWith('ui'))
         .sort((a, b) => {
-          var keyA = a.key.toUpperCase(); // ignore upper and lowercase
-          var keyB = b.key.toUpperCase(); // ignore upper and lowercase
+          var keyA = a.name.toUpperCase(); // ignore upper and lowercase
+          var keyB = b.name.toUpperCase(); // ignore upper and lowercase
           if (keyA < keyB) {
             return -1;
           }
@@ -140,7 +144,7 @@ export default class translations extends Vue {
   get fItems() {
     if (this.search.length === 0) return this.items
     return this.items.filter((o) => {
-      const isSearchInKey = !isNil(o.key.match(new RegExp(this.search, 'ig')))
+      const isSearchInKey = !isNil(o.name.match(new RegExp(this.search, 'ig')))
       return isSearchInKey
     })
   }

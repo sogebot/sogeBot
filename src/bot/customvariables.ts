@@ -4,6 +4,7 @@ import safeEval from 'safe-eval';
 import axios from 'axios';
 import mathjs from 'mathjs';
 import _ from 'lodash';
+import { setTimeout } from 'timers';
 import { filter, get, isNil, map, sample } from 'lodash';
 
 import Message from './message';
@@ -13,7 +14,7 @@ import { getOwnerAsSender, getTime, isModerator, prepare, sendMessage } from './
 
 import { getRepository } from 'typeorm';
 import { User } from './entity/user';
-import { Variable } from './entity/variable';
+import { Variable, VariableHistory, VariableWatch } from './entity/variable';
 
 class CustomVariables {
   timeouts: {
@@ -27,12 +28,14 @@ class CustomVariables {
 
   async getURL(req, res) {
     try {
-      const variable = (await global.db.engine.find('custom.variables'))
+      const variable = (await getRepository(Variable).find({
+        relations: ['urls'],
+      }))
         .find(variable => {
-          return get(variable, 'urls', []).find(url => url.id === req.params.id);
+          return variable.urls.find(url => url.id === req.params.id);
         });
       if (variable) {
-        if (get(variable.urls.find(url => url.id === req.params.id), 'access.GET', false)) {
+        if (variable.urls.find(url => url.id === req.params.id)?.GET) {
           return res.status(200).send({ value: await this.getValueOf(variable.variableName) });
         } else {
           return res.status(403).send({ error: 'This endpoint is not enabled for GET', code: 403 });
@@ -48,16 +51,18 @@ class CustomVariables {
 
   async postURL(req, res) {
     try {
-      const variable = (await global.db.engine.find('custom.variables'))
+      const variable = (await getRepository(Variable).find({
+        relations: ['urls'],
+      }))
         .find(variable => {
-          return get(variable, 'urls', []).find(url => url.id === req.params.id);
+          return variable.urls.find(url => url.id === req.params.id);
         });
       if (variable) {
-        if (get(variable.urls.find(url => url.id === req.params.id), 'access.POST', false)) {
+        if (variable.urls.find(url => url.id === req.params.id)?.POST) {
           const value = await this.setValueOf(variable.variableName, req.body.value, {});
 
           if (value.isOk) {
-            if (get(variable.urls.find(url => url.id === req.params.id), 'showResponse', false)) {
+            if (variable.urls.find(url => url.id === req.params.id)?.showResponse) {
               if (value.updated.responseType === 0) {
                 sendMessage(
                   prepare('filters.setVariable', { value: value.updated.currentValue, variable: variable }),
@@ -102,14 +107,19 @@ class CustomVariables {
 
     io.on('connection', (socket) => {
       socket.on('list.variables', async (cb) => {
-        const variables = await global.db.engine.find('custom.variables');
+        const variables = await getRepository(Variable).find();
         cb(null, variables);
       });
       socket.on('run.script', async (id, cb) => {
         let item;
         try {
-          item = await global.db.engine.findOne('custom.variables', { id });
-          item = await global.db.engine.update('custom.variables', { id }, { currentValue: await this.runScript(item.evalValue, { _current: item.currentValue }), runAt: Date.now() });
+          const item = await getRepository(Variable).findOne({ id });
+          if (!item) {
+            throw new Error('Variable not found');
+          }
+          item.currentValue = await this.runScript(item.evalValue, { _current: item.currentValue });
+          item.runAt = Date.now();
+          cb(null, await getRepository(Variable).save(item));
         } catch (e) {
           cb(e.stack, null);
         }
@@ -125,32 +135,30 @@ class CustomVariables {
         cb(null, returnedValue);
       });
       socket.on('isUnique', async ({ variable, id }, cb) => {
-        cb(null, (await global.db.engine.find('custom.variables', { variableName: String(variable) })).filter(o => o.id !== id).length === 0);
+        cb(null, (await getRepository(Variable).find({ variableName: String(variable) })).filter(o => o.id !== id).length === 0);
       });
       socket.on('delete', async (id, cb) => {
-        await global.db.engine.remove('custom.variables', { id });
-        await global.db.engine.remove('custom.variables.watch', { variableId: id }); // force unwatch
-        this.updateWidgetAndTitle();
+        const item = await getRepository(Variable).findOne({ id });
+        if (item) {
+          await getRepository(Variable).remove(item);
+          await getRepository(VariableWatch).delete({ variableId: id });
+          this.updateWidgetAndTitle();
+        }
         cb();
       });
       socket.on('load', async (id, cb) => {
-        const variable = await global.db.engine.findOne('custom.variables', { id });
-        const history = await global.db.engine.find('custom.variables.history', { cvarId: id });
-        cb({variable, history});
+        cb(await getRepository(Variable).findOne({
+          relations: ['history', 'urls'],
+          where: { id },
+        }));
       });
-      socket.on('save', async (data, cb) => {
+      socket.on('save', async (item: Variable, cb) => {
         try {
-          if (isNil(data.id)) {
-            await global.db.engine.update('custom.variables', { id: data.id }, data);
-            this.updateWidgetAndTitle(data.variableName);
-            cb(null, data.id);
-          } else {
-            const item = await global.db.engine.insert('custom.variables', data);
-            this.updateWidgetAndTitle(data.variableName);
-            cb(null, item.id);
-          }
+          await getRepository(Variable).save(item);
+          this.updateWidgetAndTitle(item.variableName);
+          cb(null, item.id);
         } catch (e) {
-          cb(e.stack, data.id);
+          cb(e.stack, item.id);
         }
       });
     });
@@ -221,7 +229,7 @@ class CustomVariables {
     };
 
     // get custom variables
-    const customVariablesDb = await global.db.engine.find('custom.variables');
+    const customVariablesDb = await getRepository(Variable).find();
     const customVariables = {};
     for (const cvar of customVariablesDb) {
       customVariables[cvar.variableName] = cvar.currentValue;
@@ -398,12 +406,25 @@ class CustomVariables {
   }
 
   async addChangeToHistory(opts) {
-    await global.db.engine.insert('custom.variables.history', { cvarId: opts.item.id, sender: opts.sender, oldValue: opts.oldValue, currentValue: opts.item.currentValue, timestamp: String(new Date())});
+    const variable = await getRepository(Variable).findOne({
+      relations: ['history'],
+      where: { id: opts.item.id },
+    });
+    if (variable) {
+      const history = new VariableHistory();
+      history.username = opts.sender.username;
+      history.userId = opts.sender.userId;
+      history.oldValue = opts.oldValue;
+      history.currentValue = opts.item.currentValue;
+      history.changedAt = Date.now();
+      variable.history.push(history);
+      await getRepository(Variable).save(variable);
+    }
   }
 
   async checkIfCacheOrRefresh () {
     clearTimeout(this.timeouts[`${this.constructor.name}.checkIfCacheOrRefresh`]);
-    const items = await global.db.engine.find('custom.variables', { type: 'eval' });
+    const items = await getRepository(Variable).find({ type: 'eval' });
 
     for (const item of items) {
       try {
@@ -411,7 +432,9 @@ class CustomVariables {
         const shouldRun = item.runEvery > 0 && Date.now() - new Date(item.runAt).getTime() >= item.runEvery;
         if (shouldRun) {
           const newValue = await this.runScript(item.evalValue, { _current: item.currentValue });
-          await global.db.engine.update('custom.variables', { id: item.id }, { runAt: Date.now(), currentValue: newValue });
+          item.runAt = Date.now();
+          item.currentValue = newValue;
+          await getRepository(Variable).save(item);
           await this.updateWidgetAndTitle(item.variableName);
         }
       } catch (e) {} // silence errors
@@ -419,7 +442,7 @@ class CustomVariables {
     this.timeouts[`${this.constructor.name}.checkIfCacheOrRefresh`] = setTimeout(() => this.checkIfCacheOrRefresh(), 1000);
   }
 
-  async updateWidgetAndTitle (variable = null) {
+  async updateWidgetAndTitle (variable: string | null = null) {
     if (global.widgets?.custom_variables.socket) {
       global.widgets?.custom_variables.socket.emit('refresh');
     }; // send update to widget
