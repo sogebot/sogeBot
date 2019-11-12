@@ -18,6 +18,8 @@ import { Commands } from './entity/commands';
 import { Cooldown } from './entity/cooldown';
 import { EventList } from './entity/eventList';
 import { User } from './entity/user';
+import Price from './systems/price';
+import { Rank } from './entity/rank';
 
 class Message {
   constructor (message) {
@@ -216,13 +218,13 @@ class Message {
           if (state.updated.responseType === 0) {
             // default
             if (state.isOk && !state.isEval) {
-              let msg = await commons.prepare('filters.setVariable', { value: state.updated.setValue, variable: variable });
+              let msg = await commons.prepare('filters.setVariable', { value: state.setValue, variable: variable });
               commons.sendMessage(msg, attr.sender, { skip: true, quiet: _.get(attr, 'quiet', false) });
             }
             return state.updated.currentValue;
           } else if (state.updated.responseType === 1) {
             // custom
-            commons.sendMessage(state.updated.responseText.replace('$value', state.updated.setValue), attr.sender, { skip: true, quiet: _.get(attr, 'quiet', false) });
+            commons.sendMessage(state.updated.responseText.replace('$value', state.setValue), attr.sender, { skip: true, quiet: _.get(attr, 'quiet', false) });
             return '';
           } else {
             // command
@@ -379,8 +381,8 @@ class Message {
       '(price)': async function (filter) {
         let price = 0;
         if (global.systems.price.enabled) {
-          let command = await global.db.engine.findOne(global.systems.price.collection.data, { command: attr.cmd });
-          price = _.isEmpty(command) ? 0 : command.price;
+          let command = await getRepository(Price).findOne({ command: attr.cmd });
+          price = command?.price ?? 0;
         }
         return [price, await global.systems.points.getPointsName(price)].join(' ');
       }
@@ -401,8 +403,8 @@ class Message {
           getRepository(Alias).find({ where: { visible: true, enabled: true } }),
           getRepository(Commands).find({ where: { visible: true, enabled: true } }),
           getRepository(Cooldown).find({ where: { enabled: true } }),
-          global.db.engine.find(global.systems.ranks.collection.data),
-          global.db.engine.find(global.systems.price.collection.data, { enabled: true })
+          getRepository(Rank).find(),
+          getRepository(Price).find({ where: { enabled: true } })
         ]);
 
         switch (system) {

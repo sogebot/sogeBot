@@ -5,7 +5,6 @@
   * [Color](_master/configuration/color.md)
   * [Database](_master/configuration/database.md)
   * [Environment variables](_master/configuration/env.md)
-  * [Metrics](_master/configuration/metrics.md)
   * [Timezone](_master/configuration/timezone.md)
 * Systems
   * [Alias](_master/commands/alias.md)

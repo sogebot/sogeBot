@@ -2,7 +2,6 @@
 
 import safeEval from 'safe-eval';
 import axios from 'axios';
-import mathjs from 'mathjs';
 import _ from 'lodash';
 import { setTimeout } from 'timers';
 import { filter, get, isNil, map, sample } from 'lodash';
@@ -351,11 +350,10 @@ class CustomVariables {
     if (!item) {
       item = new Variable();
       item.variableName = variableName;
-      item.currentValue = currentValue;
+      item.currentValue = String(currentValue);
       item.responseType = 0;
       item.type = 'text';
       item.permission = permission.MODERATORS;
-      await getRepository(Variable).save(item);
     } else {
       // set item permission to owner if missing
       item.permission = typeof item.permission === 'undefined' ? permission.CASTERS : item.permission;
@@ -372,37 +370,46 @@ class CustomVariables {
         oldValue = item.currentValue;
         if (item.type === 'number') {
           if (['+', '-'].includes(currentValue)) {
-            currentValue = mathjs.evaluate(`${item.currentValue} ${currentValue} 1`);
+            if (currentValue === '+') {
+              item.currentValue++;
+            } else {
+              item.currentValue--;
+            }
+            isOk = true;
           } else {
             const isNumber = isFinite(Number(currentValue));
             isOk = isNumber;
-            currentValue = isNumber ? Number(currentValue) : item.currentValue;
+            item.currentValue = isNumber ? Number(currentValue) : item.currentValue;
           }
         } else if (item.type === 'options') {
           // check if is in usableOptions
           const isUsableOption = item.usableOptions.map((o) => o.trim()).includes(currentValue);
           isOk = isUsableOption;
-          currentValue = isUsableOption ? currentValue : item.currentValue;
+          item.currentValue = isUsableOption ? currentValue : item.currentValue;
         } else if (item.type === 'eval') {
           opts.param = currentValue;
           item.currentValue = await this.getValueOf(variableName, opts);
           isEval = true;
+        } else if (item.type === 'text') {
+          item.currentValue = String(item.currentValue);
+          isOk = true;
         }
-        // do update only on non-eval variables
-        if (item.type !== 'eval' && isOk) {
-          item = await getRepository(Variable).save(item);
-        };
       }
     }
+    // do update only on non-eval variables
+    if (item.type !== 'eval' && isOk) {
+      item = await getRepository(Variable).save(item);
+    };
 
+    const setValue = item.currentValue;
     if (isOk) {
       this.updateWidgetAndTitle(variableName);
       if (!isEval) {
-        this.addChangeToHistory({ sender: get(opts, 'sender.username', null), item, oldValue });
+        this.addChangeToHistory({ sender: opts.sender, item, oldValue });
         item.currentValue = ''; // be silent if parsed correctly
       }
     }
-    return { updated: item, isOk, isEval };
+    return { updated: item, setValue, isOk, isEval };
   }
 
   async addChangeToHistory(opts) {

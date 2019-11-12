@@ -9,9 +9,7 @@ var fs = require('fs')
 var _ = require('lodash')
 const { flatten } = require('./helpers/flatten');
 
-const config = require('@config')
 const axios = require('axios')
-const chalk = require('chalk')
 
 import { info, warning } from './helpers/log';
 import { getRepository } from 'typeorm';

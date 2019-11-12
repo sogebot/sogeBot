@@ -29,7 +29,7 @@
         </div>
       </template>
       <template v-slot:cell(currentValue)="data">
-        <small v-bind:class="{ 'text-muted': !data.value.length === 0 }">
+        <small v-bind:class="{ 'text-muted': data.value.length === 0 }">
           {{ data.value.length !== 0 ? data.value : translate('not-available') }}
         </small>
       </template>

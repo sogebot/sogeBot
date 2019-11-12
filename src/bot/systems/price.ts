@@ -6,7 +6,7 @@ import * as _ from 'lodash';
 import Parser from '../parser';
 import System from './_interface';
 import * as constants from '../constants';
-import { permission } from '../permissions';
+import { permission } from '../helpers/permissions';
 import { command, default_permission, rollback } from '../decorators';
 import { parser } from '../decorators';
 import { isOwner, prepare, sendMessage } from '../commons';
