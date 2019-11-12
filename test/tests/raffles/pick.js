@@ -12,7 +12,7 @@ const { User } = require('../../../dest/entity/user');
 
 const assert = require('chai').assert;
 
-const max = Math.floor(Number.MAX_SAFE_INTEGER);
+const max = Math.floor(Number.MAX_SAFE_INTEGER / 10000000);
 
 const owner = { username: 'soge__', userId: String(_.random(999999, false)) };
 const testuser = { username: 'testuser', userId: String(_.random(999999, false)) };

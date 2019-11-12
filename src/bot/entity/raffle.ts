@@ -12,9 +12,9 @@ export class Raffle {
   @Column()
   @Index()
   keyword!: string;
-  @Column()
+  @Column('bigint', { transformer: new ColumnNumericTransformer(), default: 0 })
   minTickets!: number;
-  @Column()
+  @Column('bigint', { transformer: new ColumnNumericTransformer(), default: 0 })
   maxTickets!: number;
   @Column()
   type!: number;

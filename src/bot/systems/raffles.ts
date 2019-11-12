@@ -282,7 +282,10 @@ class Raffles extends System {
       return true;
     }
 
-    const raffle = await getRepository(Raffle).findOne({ winner: null });
+    const raffle = await getRepository(Raffle).findOne({
+      relations: ['participants'],
+      where: { winner: null },
+    });
     let user = await getRepository(User).findOne({ userId: opts.sender.userId });
     if (!user) {
       user = new User();
@@ -310,12 +313,7 @@ class Raffles extends System {
       tickets = 0;
     }
 
-    let participant = await getRepository(RaffleParticipant).findOne({
-      where: {
-        raffle,
-        username: opts.sender.username,
-      },
-    });
+    let participant = raffle.participants.find(o => o.username === opts.sender.username);
     let curTickets = 0;
     if (participant) {
       curTickets = participant.tickets;

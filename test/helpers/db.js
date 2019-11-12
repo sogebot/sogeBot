@@ -18,6 +18,7 @@ const { Settings } = require('../../dest/entity/settings');
 const { Quotes } = require('../../dest/entity/quotes');
 const { User, UserTip, UserBit } = require('../../dest/entity/user');
 const { ModerationPermit } = require('../../dest/entity/moderation');
+const { Raffle } = require('../../dest/entity/raffle');
 const { Price } = require('../../dest/entity/price');
 const { Timer, TimerResponse } = require('../../dest/entity/timer');
 const { Poll, PollVote } = require('../../dest/entity/poll');
@@ -38,7 +39,7 @@ module.exports = {
       debug('test', chalk.bgRed('*** Cleaning up collections ***'));
       await waitMs(400); // wait ittle bit for transactions to be done
 
-      const entities = [Duel, PollVote, Poll, TimerResponse, Timer, BetsParticipations, UserTip, UserBit, CommandsResponses, User, ModerationPermit, Alias, Bets, Commands, CommandsCount, Quotes, Settings, Cooldown, Keyword, Price];
+      const entities = [Raffle, Duel, PollVote, Poll, TimerResponse, Timer, BetsParticipations, UserTip, UserBit, CommandsResponses, User, ModerationPermit, Alias, Bets, Commands, CommandsCount, Quotes, Settings, Cooldown, Keyword, Price];
       if (['postgres', 'mysql'].includes((await getManager()).connection.options.type)) {
         const metadatas = [];
         for (const entity of entities) {
