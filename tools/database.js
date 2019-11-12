@@ -93,6 +93,7 @@ async function main() {
       process.stdout.write('.')
       await getRepository(CacheTitles).insert(chunk)
     }
+    console.log();
   }
 
   await getManager().clear(Settings);
@@ -130,6 +131,7 @@ async function main() {
       process.stdout.write('.')
       await getRepository(EventList).insert(chunk)
     }
+    console.log();
   }
 
   console.log(`Migr: systems.quotes`);
@@ -142,6 +144,7 @@ async function main() {
       process.stdout.write('.')
       await getRepository(Quotes).insert(chunk)
     }
+    console.log();
   }
 
   console.log(`Migr: systems.alias`);
@@ -154,6 +157,7 @@ async function main() {
       process.stdout.write('.')
       await getRepository(Alias).insert(chunk)
     }
+    console.log();
   }
 
   console.log(`Migr: systems.customcommands, systems.customcommands.responses`);
@@ -185,6 +189,7 @@ async function main() {
       process.stdout.write('.')
       await getRepository(Commands).save(chunk);
     }
+    console.log();
   }
 
   console.log(`Migr: core.commands.count `);
@@ -197,6 +202,7 @@ async function main() {
       process.stdout.write('.')
       await getRepository(CommandsCount).insert(chunk);
     }
+    console.log();
   }
 
   console.log(`Migr: permissions`);
@@ -213,6 +219,7 @@ async function main() {
       process.stdout.write('.')
       await getRepository(Permissions).insert(chunk)
     }
+    console.log();
   }
 
   console.log(`Migr: systems.cooldowns`);
@@ -240,6 +247,7 @@ async function main() {
       process.stdout.write('.')
       await getRepository(Cooldown).save(chunk);
     }
+    console.log();
   }
 
   console.log(`Migr: systems.highlights`);
@@ -258,6 +266,7 @@ async function main() {
       process.stdout.write('.')
       await getRepository(Highlight).save(chunk);
     }
+    console.log();
   }
 
   console.log(`Migr: systems.howlongtobeat`);
@@ -286,6 +295,7 @@ async function main() {
       process.stdout.write('.')
       await getRepository(Keyword).save(chunk);
     }
+    console.log();
   }
 
   console.log(`Migr: users, users.tips, users.points, users.message, users.bits`);
@@ -365,6 +375,7 @@ async function main() {
         throw Error('Error Importing User ' + JSON.stringify(item));
       }
     }
+    console.log();
   }
 
   console.log(`Migr: systems.price`);
@@ -377,6 +388,7 @@ async function main() {
       process.stdout.write('.')
       await getRepository(Price).save(chunk);
     }
+    console.log();
   }
 
   console.log(`Migr: systems.ranks`);
@@ -392,6 +404,7 @@ async function main() {
       process.stdout.write('.')
       await getRepository(Rank).save(chunk);
     }
+    console.log();
   }
 
   console.log(`Migr: systems.songs.playlist`);
@@ -415,6 +428,7 @@ async function main() {
       process.stdout.write('.')
       await getRepository(SongPlaylist).save(chunk);
     }
+    console.log();
   }
 
   console.log(`Migr: systems.songs.ban`);
@@ -430,6 +444,7 @@ async function main() {
       process.stdout.write('.')
       await getRepository(SongBan).save(chunk);
     }
+    console.log();
   }
 
   console.log(`Migr: systems.timers, systems.timers.responses`);
@@ -461,6 +476,7 @@ async function main() {
       process.stdout.write('.')
       await getRepository(Timer).save(chunk);
     }
+    console.log();
   }
 
   console.log(`Migr: dashboards, widgets`);
@@ -506,6 +522,7 @@ async function main() {
       process.stdout.write('.')
       await getRepository(Dashboard).save(chunk);
     }
+    console.log();
   }
 
   console.log(`Migr: custom.variables, custom.variables.history`);
@@ -555,6 +572,7 @@ async function main() {
       process.stdout.write('.')
       await getRepository(Variable).save(chunk);
     }
+    console.log();
   }
 
   console.log(`Migr: customTranslations`);
@@ -570,6 +588,7 @@ async function main() {
       process.stdout.write('.')
       await getRepository(Translation).save(chunk);
     }
+    console.log();
   }
 
   console.log('Info: Completed');
