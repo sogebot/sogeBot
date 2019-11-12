@@ -77,7 +77,7 @@
 <script>
 import { EventBus } from 'src/panel/helpers/event-bus';
 import { getSocket } from 'src/panel/helpers/socket';
-import { cloneDeep, orderBy, sortBy } from 'lodash-es';
+import { sortBy } from 'lodash-es';
 
 import VueGridLayout from 'vue-grid-layout';
 import { vueWindowSizeMixin } from 'vue-window-size';
