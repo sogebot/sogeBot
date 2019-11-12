@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 /* global describe it before */
 
 
@@ -6,6 +7,7 @@ require('../../general.js');
 const { getRepository } = require('typeorm');
 const { Cooldown } = require('../../../dest/entity/cooldown');
 const { User } = require('../../../dest/entity/user');
+const { Keyword } = require('../../../dest/entity/keyword');
 
 const assert = require('chai').assert;
 
@@ -129,10 +131,11 @@ describe('Cooldowns - check()', () => {
     });
 
     it('Add koncha to keywords', async () => {
-      await global.db.engine.insert(global.systems.keywords.collection.data, {
-        'keyword': 'koncha',
-        'response': '$sender KonCha',
-        'enabled': true,
+      await getRepository(Keyword).save({
+        ...new Keyword(),
+        keyword: 'koncha',
+        response: '$sender KonCha',
+        enabled: true,
       });
     });
 
@@ -351,10 +354,11 @@ describe('Cooldowns - check()', () => {
     });
 
     it('test', async () => {
-      await global.db.engine.insert(global.systems.keywords.collection.data, {
-        'keyword': 'me',
-        'response': '(!me)',
-        'enabled': true,
+      await getRepository(Keyword).save({
+        ...new Keyword(),
+        keyword: 'me',
+        response: '(!me)',
+        enabled: true,
       });
 
       const [command, type, seconds, quiet] = ['me', 'user', '60', true];
@@ -385,10 +389,11 @@ describe('Cooldowns - check()', () => {
     });
 
     it('test', async () => {
-      await global.db.engine.insert(global.systems.keywords.collection.data, {
-        'keyword': 'me',
-        'response': '(!me)',
-        'enabled': true,
+      await getRepository(Keyword).save({
+        ...new Keyword(),
+        keyword: 'me',
+        response: '(!me)',
+        enabled: true,
       });
 
       const [command, type, seconds, quiet] = ['me', 'global', '60', true];
