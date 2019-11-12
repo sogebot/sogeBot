@@ -401,7 +401,7 @@ class Message {
 
         let [alias, commands, cooldowns, ranks, prices] = await Promise.all([
           getRepository(Alias).find({ where: { visible: true, enabled: true } }),
-          getRepository(Commands).find({ where: { visible: true, enabled: true } }),
+          getRepository(Commands).find({ relations: ['responses'], where: { visible: true, enabled: true } }),
           getRepository(Cooldown).find({ where: { enabled: true } }),
           getRepository(Rank).find(),
           getRepository(Price).find({ where: { enabled: true } })
@@ -414,9 +414,6 @@ class Message {
             return _.size(alias) === 0 ? ' ' : (_.map(alias, 'alias')).sort().join(', ');
           case 'command':
             if (permission) {
-              let commands = await getRepository(Commands).find({
-                relations: ['responses'],
-              });
               const responses = commands.map(o => o.responses).flat();
               const _permission = await global.permissions.get(permission);
               if (_permission) {
@@ -429,10 +426,8 @@ class Message {
             return _.size(commands) === 0 ? ' ' : (_.map(commands, (o) => o.command.replace('!', ''))).sort().join(', ');
           case '!command':
             if (permission) {
-              let commands = await getRepository(Commands).find({
-                relations: ['responses'],
-              });
-              const responses = commands.map(o => o.responses).flat();              const _permission = await global.permissions.get(permission);
+              const responses = commands.map(o => o.responses).flat();
+              const _permission = await global.permissions.get(permission);
               if (_permission) {
                 const commandIds = responses.filter((o) => o.permission === _permission.id).map((o) => o.cid);
                 commands = commands.filter((o) => commandIds.includes(o.id));
