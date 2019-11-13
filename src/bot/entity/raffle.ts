@@ -36,6 +36,7 @@ export class RaffleParticipant {
   id!: number;
   @ManyToOne(() => Raffle, (r) => r.participants, {
     onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
   })
   raffle!: Raffle;
   @Column()
@@ -64,6 +65,7 @@ export class RaffleParticipantMessage {
   text!: string;
   @ManyToOne(() => RaffleParticipant, (r) => r.messages, {
     onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
   })
   participant!: RaffleParticipant;
 }

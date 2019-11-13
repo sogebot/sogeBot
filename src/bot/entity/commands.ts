@@ -24,6 +24,7 @@ export class CommandsResponses {
   id!: string;
   @ManyToOne(() => Commands, (command) => command.responses, {
     onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
   })
   command!: Commands;
   @Column()

@@ -1,5 +1,5 @@
 <template>
-  <div class="container-fluid" ref="window">
+  <div class="container-flid" ref="window">
     <div class="row">
       <div class="col-12">
         <span class="title text-default mb-2">
@@ -83,7 +83,7 @@
           </div>
         </div>
 
-        <div class="container-fluid">
+        <div class="container-flid">
           <div class="card-deck pl-3 pr-3 justify-content-end">
             <div class="card col-2 p-0 m-0" style="max-height: fit-content;">
               <div class="card-header">{{translate('registry.goals.goals')}}</div>
@@ -92,10 +92,10 @@
                   <button
                     type="button"
                     class="list-group-item list-group-item-action"
-                    :class="{ active: uiShowGoal === goal.uid }"
-                    @click="uiShowGoal = goal.uid"
-                    v-for="goal of goals"
-                    :key="goal.uid">
+                    :class="{ active: uiShowGoal === goal.id }"
+                    @click="uiShowGoal = goal.id"
+                    v-for="goal of group.goals"
+                    :key="goal.id">
                     <i v-if="goal.name === ''">
                       &nbsp;
                     </i>
@@ -184,21 +184,21 @@
                       <button type="button" class="btn" @click="customShow = 'js'" :class="[customShow === 'js' ? 'btn-dark' : 'btn-outline-dark']">JS</button>
                     </div>
                     <div class="col-md-12" v-if="currentGoal.display ==='custom'">
-                      <codemirror style="font-size: 1.1em;" v-if="customShow === 'html'" class="w-100" v-model="currentGoal.customization.html" :options="{
+                      <codemirror style="font-size: 1.1em;" v-if="customShow === 'html'" class="w-100" v-model="currentGoal.customizationHtml" :options="{
                         tabSize: 4,
                         mode: 'text/html',
                         theme: 'base16-' + configuration.core.ui.theme,
                         lineNumbers: true,
                         line: true,
                       }"></codemirror>
-                      <codemirror style="font-size: 1.1em;" v-if="customShow === 'js'" class="w-100" v-model="currentGoal.customization.js" :options="{
+                      <codemirror style="font-size: 1.1em;" v-if="customShow === 'js'" class="w-100" v-model="currentGoal.customizationJs" :options="{
                         tabSize: 4,
                         mode: 'text/javascript',
                         theme: 'base16-' + configuration.core.ui.theme,
                         lineNumbers: true,
                         line: true,
                       }"></codemirror>
-                      <codemirror style="font-size: 1.1em;" v-if="customShow === 'css'" class="w-100"  v-model="currentGoal.customization.css" :options="{
+                      <codemirror style="font-size: 1.1em;" v-if="customShow === 'css'" class="w-100"  v-model="currentGoal.customizationCss" :options="{
                         tabSize: 4,
                         mode: 'text/css',
                         theme: 'base16-' + configuration.core.ui.theme,
@@ -214,8 +214,8 @@
                   <div class="card-body">
                     <div class="form-group col-md-12">
                       <label for="font_selector">{{ translate('registry.goals.input.fonts.title') }}</label>
-                      <select class="form-control" v-model="currentGoal.customization.font.family">
-                        <option v-for="font of fonts" :value="font" :key="font">{{font}}</option>
+                      <select class="form-control" v-model="currentGoal.customizationFont.family">
+                        <option v-for="font of fonts" :value="font.text" :key="font.text">{{font.text}}</option>
                       </select>
                       <small class="form-text text-muted" v-html="translate('registry.goals.input.fonts.help')"></small>
                     </div>
@@ -223,14 +223,14 @@
                     <div class="row pl-3 pr-3">
                       <div class="form-group col-md-3">
                         <label for="fonts_size_input">{{ translate('registry.goals.input.fontSize.title') }}</label>
-                        <input v-model="currentGoal.customization.font.size" type="number" min="1" class="form-control" id="fonts_size_input">
+                        <input v-model="currentGoal.customizationFont.size" type="number" min="1" class="form-control" id="fonts_size_input">
                         <small class="form-text text-muted">{{ translate('registry.goals.input.fontSize.help') }}</small>
                         <div class="invalid-feedback"></div>
                       </div>
 
                       <div class="form-group col-md-3">
                         <label for="fonts_borderPx_input">{{ translate('registry.goals.input.borderPx.title') }}</label>
-                        <input v-model="currentGoal.customization.font.borderPx" type="number" min="0" class="form-control" id="fonts_borderPx_input">
+                        <input v-model="currentGoal.customizationFont.borderPx" type="number" min="0" class="form-control" id="fonts_borderPx_input">
                         <small class="form-text text-muted">{{ translate('registry.goals.input.borderPx.help') }}</small>
                         <div class="invalid-feedback"></div>
                       </div>
@@ -238,14 +238,14 @@
                       <div class="form-group col-md-6">
                         <div class="row pl-3 pr-3">
                           <label class="w-100" for="fonts_color_input">{{ translate('registry.goals.input.color.title') }}</label>
-                          <input type="text" class="form-control col-10" id="fonts_color_input" v-model="currentGoal.customization.font.color">
-                          <input type="color" class="form-control col-2" v-model="currentGoal.customization.font.color">
+                          <input type="text" class="form-control col-10" id="fonts_color_input" v-model="currentGoal.customizationFont.color">
+                          <input type="color" class="form-control col-2" v-model="currentGoal.customizationFont.color">
                         </div>
 
                         <div class="row pl-3 pr-3 pt-2">
                           <label class="w-100" for="fonts_color_input">{{ translate('registry.goals.input.borderColor.title') }}</label>
-                          <input type="text" class="form-control col-10" id="fonts_borderColor_input" v-model="currentGoal.customization.font.borderColor">
-                          <input type="color" class="form-control col-2" v-model="currentGoal.customization.font.borderColor">
+                          <input type="text" class="form-control col-10" id="fonts_borderColor_input" v-model="currentGoal.customizationFont.borderColor">
+                          <input type="color" class="form-control col-2" v-model="currentGoal.customizationFont.borderColor">
                         </div>
                       </div>
                     </div>
@@ -258,13 +258,13 @@
                     <div class="row pl-3 pr-3">
                       <div class="form-group col-md-3">
                         <label class="w-100" for="bar_borderPx_input">{{ translate('registry.goals.input.borderPx.title') }}</label>
-                        <input v-model="currentGoal.customization.bar.borderPx" type="text" class="form-control" id="bar_borderPx_input">
+                        <input v-model="currentGoal.customizationBar.borderPx" type="text" class="form-control" id="bar_borderPx_input">
                         <small class="form-text text-muted">{{ translate('registry.goals.input.borderPx.help') }}</small>
                         <div class="invalid-feedback"></div>
                       </div>
                       <div class="form-group col-md-3">
                         <label class="w-100" for="bar_height_input">{{ translate('registry.goals.input.barHeight.title') }}</label>
-                        <input v-model="currentGoal.customization.bar.height" type="number" min="1" class="form-control" id="bar_height_input">
+                        <input v-model="currentGoal.customizationBar.height" type="number" min="1" class="form-control" id="bar_height_input">
                         <small class="form-text text-muted">{{ translate('registry.goals.input.barHeight.help') }}</small>
                         <div class="invalid-feedback"></div>
                       </div>
@@ -272,20 +272,20 @@
                       <div class="form-group col-md-6">
                         <div class="row pl-3 pr-3">
                           <label class="w-100" for="bar_color_input">{{ translate('registry.goals.input.color.title') }}</label>
-                          <input type="text" class="form-control col-10" id="bar_color_input" v-model="currentGoal.customization.bar.color">
-                          <input type="color" class="form-control col-2" v-model="currentGoal.customization.bar.color">
+                          <input type="text" class="form-control col-10" id="bar_color_input" v-model="currentGoal.customizationBar.color">
+                          <input type="color" class="form-control col-2" v-model="currentGoal.customizationBar.color">
                         </div>
 
                         <div class="row pl-3 pr-3 pt-2">
                           <label class="w-100" for="bar_color_input">{{ translate('registry.goals.input.borderColor.title') }}</label>
-                          <input type="text" class="form-control col-10" id="bar_borderColor_input" v-model="currentGoal.customization.bar.borderColor">
-                          <input type="color" class="form-control col-2" v-model="currentGoal.customization.bar.borderColor">
+                          <input type="text" class="form-control col-10" id="bar_borderColor_input" v-model="currentGoal.customizationBar.borderColor">
+                          <input type="color" class="form-control col-2" v-model="currentGoal.customizationBar.borderColor">
                         </div>
 
                         <div class="row pl-3 pr-3 pt-2">
                           <label class="w-100" for="bar_color_input">{{ translate('registry.goals.input.backgroundColor.title') }}</label>
-                          <input type="text" class="form-control col-10" id="bar_backgroundColor_input" v-model="currentGoal.customization.bar.backgroundColor">
-                          <input type="color" class="form-control col-2" v-model="currentGoal.customization.bar.backgroundColor">
+                          <input type="text" class="form-control col-10" id="bar_backgroundColor_input" v-model="currentGoal.customizationBar.backgroundColor">
+                          <input type="color" class="form-control col-2" v-model="currentGoal.customizationBar.backgroundColor">
                         </div>
                       </div>
                     </div>
@@ -319,11 +319,12 @@ import 'flatpickr/dist/flatpickr.css';
 
 import { getSocket } from 'src/panel/helpers/socket';
 import uuid from 'uuid/v4';
+import { Goal, GoalGroup } from '../../../../bot/entity/goal';
 
 export default Vue.extend({
   components: {
-    panel: () => import('../../components/panel.vue'),
-    holdButton: () => import('../../components/holdButton.vue'),
+    panel: () => import('../../../components/panel.vue'),
+    holdButton: () => import('../../../components/holdButton.vue'),
     datetime: VueFlatPickr,
     codemirror
   },
@@ -332,8 +333,7 @@ export default Vue.extend({
       socket: any,
       search: string,
       groupId: string,
-      group: Goals.Group,
-      goals: Goals.Goal[],
+      group: GoalGroup,
       fonts: string[],
       uiShowGoal: string,
       typeOpts: ['followers', 'currentFollowers', 'currentSubscribers', 'subscribers', 'tips', 'bits'],
@@ -349,15 +349,15 @@ export default Vue.extend({
       socket: getSocket('/overlays/goals'),
       search: '',
       groupId: uuid(),
-      goals: [],
       group: {
-        uid: this.$route.params.id,
+        id: this.$route.params.id,
         name: '',
         createdAt: Date.now(),
         display: {
           type: 'multi',
           spaceBetweenGoalsInPx: 10,
-        }
+        },
+        goals: [],
       },
       fonts: [],
       uiShowGoal: '',
@@ -380,9 +380,9 @@ export default Vue.extend({
   },
   computed: {
     isEditation: function (): boolean { return this.$route.params.id !== null },
-    currentGoal: function (): Goals.Goal | null {
+    currentGoal: function (): Goal | null {
       if (this.uiShowGoal === '') return null
-      else return this.goals.find((o) => o.uid === this.uiShowGoal) || null
+      else return this.group.goals.find((o) => o.id === this.uiShowGoal) || null
     }
   },
   watch: {
@@ -404,91 +404,90 @@ export default Vue.extend({
   },
   methods: {
     del: function () {
-      this.socket.emit('delete', { collection: 'groups', where: { uid: String(this.groupId) } }, (err, d) => {
-        this.socket.emit('delete', { collection: 'goals', where: { groupId: String(this.groupId) } }, (err, d) => {
-          this.$router.push({ name: 'GoalsRegistryList' })
-        })
+      this.socket.emit('goals::remove', this.group, (err) => {
+        if (err) {
+          console.error(err);
+        } else {
+          this.$router.push({ name: 'GoalsRegistryList' });
+        }
       })
     },
     save: function () {
       this.state.save = 1
       this.$forceUpdate();
 
-      this.group.uid = this.groupId
+      this.group.id = this.groupId
       if (this.group.name.trim().length === 0) {
         this.group.name = [...Array(10)].map(() => Math.random().toString(36)[3]).join('')
       }
 
-      this.socket.emit('update', { collection: 'groups', items: [this.group], key: 'uid' }, (err, d) => {
-        for (let goal of this.goals) {
-          goal.currentAmount = Number(goal.currentAmount)
-        }
-        this.socket.emit('set', { collection: 'goals', items: this.goals, where: { groupId: this.groupId } }, (err) => {
+      this.socket.emit('goals::save', this.group, (err) => {
+        if (err) {
+          console.error(err);
+        } else {
           this.state.save = 2
-          this.$router.push({ name: 'GoalsRegistryEdit', params: { id: String(d.uid) } })
-          setTimeout(() => {
-            this.state.save = 0;
-          }, 1000)
-        })
+        }
+        this.$router.push({ name: 'GoalsRegistryEdit', params: { id: this.group.id } })
+        setTimeout(() => {
+          this.state.save = 0;
+        }, 1000)
       })
     },
-    removeGoal: function (uid) {
-      this.goals = this.goals.filter((o) => o.uid !== uid)
+    removeGoal: function (id) {
+      this.group.goals = this.group.goals.filter((o) => o.id !== id)
     },
     addGoal: function () {
-      const uid = uuid()
-      this.goals.push({
-        uid,
-        groupId: this.groupId,
+      const id = uuid()
+      const goal = new Goal();
+      this.group.goals.push({
+        ...goal,
+        id,
         name: '',
         type: 'followers',
 
         display: 'full',
 
-        customization: {
-          bar: {
-            color: '#00aa00',
-            backgroundColor: '#e9ecef',
-            borderColor: '#000000',
-            borderPx: 0,
-            height: 50,
-          },
-          font: {
-            family: 'PT Sans',
-            color: '#ffffff',
-            size: 20,
-            borderColor: '#000000',
-            borderPx: 1
-          },
-          html: '\n\t<!-- ' +
-                  '\n\t\tAll html objects will be wrapped in the #wrap div' +
-                  '\n\t\tBootstrap classes are available' +
-                  '\n\t\tAvailable variables:' +
-		                '\n\t\t\t$name - name of goal ; $type - type of goal ; $goalAmount - total amount' +
-		                '\n\t\t\t$currentAmount - current amount ; $percentageAmount - how much is achieved ; $endAfter - when goal ends' +
-                '\n\t-->' +
-                '\n' +
-                '\n\t<div class="row no-gutters">' +
-                  '\n\t\t<div class="col-4 text-left text-nowrap pl-2 pr-2">$name</div>' +
-                  '\n\t\t<div class="col-4 text-nowrap text-center">$currentAmount</div>' +
-                  '\n\t\t<div class="col-4 text-nowrap text-right pr-2">$goalAmount</div>' +
-                '\n\t</div>' +
-                '\n' +
-                '\n\t<div class="progress">' +
-                  '\n\t\t<div class="progress-bar" role="progressbar" style="width: $percentageAmount%" aria-valuenow="$percentageAmount" aria-valuemin="0" aria-valuemax="$goalAmount"></div>' +
-                '\n\t</div>' +
-                '\n',
-          js: '\n\tfunction onChange(currentAmount) {' +
-                  '\n\t\tconsole.log(\'new value is \' + currentAmount);' +
-               '\n\t}' +
-               '\n',
-          css: '\n\t/* All html objects will be wrapped in the #wrap div */' +
-               '\n\n\t#wrap .progress-bar {' +
-                 '\n\t\tbackground: black;' +
-               '\n\t}' +
-                '\n'
+        customizationBar: {
+          color: '#00aa00',
+          backgroundColor: '#e9ecef',
+          borderColor: '#000000',
+          borderPx: 0,
+          height: 50,
         },
-
+        customizationFont: {
+          family: 'PT Sans',
+          color: '#ffffff',
+          size: 20,
+          borderColor: '#000000',
+          borderPx: 1
+        },
+        customizationHtml: '\n\t<!-- ' +
+                '\n\t\tAll html objects will be wrapped in the #wrap div' +
+                '\n\t\tBootstrap classes are available' +
+                '\n\t\tAvailable variables:' +
+                  '\n\t\t\t$name - name of goal ; $type - type of goal ; $goalAmount - total amount' +
+                  '\n\t\t\t$currentAmount - current amount ; $percentageAmount - how much is achieved ; $endAfter - when goal ends' +
+              '\n\t-->' +
+              '\n' +
+              '\n\t<div class="row no-gutters">' +
+                '\n\t\t<div class="col-4 text-left text-nowrap pl-2 pr-2">$name</div>' +
+                '\n\t\t<div class="col-4 text-nowrap text-center">$currentAmount</div>' +
+                '\n\t\t<div class="col-4 text-nowrap text-right pr-2">$goalAmount</div>' +
+              '\n\t</div>' +
+              '\n' +
+              '\n\t<div class="progress">' +
+                '\n\t\t<div class="progress-bar" role="progressbar" style="width: $percentageAmount%" aria-valuenow="$percentageAmount" aria-valuemin="0" aria-valuemax="$goalAmount"></div>' +
+              '\n\t</div>' +
+              '\n',
+        customizationJs: '\n\tfunction onChange(currentAmount) {' +
+                '\n\t\tconsole.log(\'new value is \' + currentAmount);' +
+              '\n\t}' +
+              '\n',
+        customizationCss: '\n\t/* All html objects will be wrapped in the #wrap div */' +
+              '\n\n\t#wrap .progress-bar {' +
+                '\n\t\tbackground: black;' +
+              '\n\t}' +
+              '\n',
         timestamp: Date.now(),
         goalAmount: 1000,
         currentAmount: 0,
@@ -497,20 +496,22 @@ export default Vue.extend({
         countBitsAsTips: false,
       })
 
-      this.uiShowGoal = uid
+      this.uiShowGoal = id
     }
   },
   mounted: async function () {
     if (this.$route.params.id) {
-      this.socket.emit('findOne', { collection: 'groups', where: { uid: this.$route.params.id }}, (err, d: Goals.Group) => {
+      this.socket.emit('goals::getOne', this.$route.params.id, (err, d: GoalGroup) => {
+        if (err) {
+          console.error(err);
+          return;
+        }
         if (Object.keys(d).length === 0) this.$router.push({ name: 'GoalsRegistryList' })
-        this.groupId = String(d.uid)
+        this.groupId = String(d.id)
         this.group = d
-      })
-      this.socket.emit('find', { collection: 'goals', where: { groupId: this.$route.params.id }}, (err, d: Goals.Goal[]) => {
-        this.goals = d
-        if (this.uiShowGoal === '' && this.goals.length > 0) {
-          this.uiShowGoal = this.goals[0].uid;
+
+        if (this.uiShowGoal === '' && this.group.goals.length > 0) {
+          this.uiShowGoal = this.group.goals[0].id;
         }
       })
     }

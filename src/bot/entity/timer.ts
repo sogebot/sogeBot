@@ -35,6 +35,7 @@ export class TimerResponse {
   response!: string;
   @ManyToOne(() => Timer, (timer) => timer.messages, {
     onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
   })
   timer!: Timer;
 }

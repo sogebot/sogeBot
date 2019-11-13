@@ -3,7 +3,9 @@
 import Overlay from '../overlays/_interface';
 
 import { onBit, onFollow, onSub, onTip } from '../decorators/on';
-import { publicEndpoint } from '../helpers/socket';
+import { adminEndpoint, publicEndpoint } from '../helpers/socket';
+import { Goal, GoalGroup } from '../entity/goal';
+import { getRepository, IsNull } from 'typeorm';
 
 class Goals extends Overlay {
   showInUI = false;
@@ -14,7 +16,47 @@ class Goals extends Overlay {
   }
 
   public async sockets() {
-    publicEndpoint(this.nsp, 'current', async (cb) => {
+    adminEndpoint(this.nsp, 'goals::remove', async (item: GoalGroup, cb) => {
+      try {
+        await getRepository(GoalGroup).remove(item);
+        cb(null);
+      } catch (e) {
+        cb(e);
+      }
+    });
+    adminEndpoint(this.nsp, 'goals::save', async (item: GoalGroup, cb) => {
+      try {
+        item = await getRepository(GoalGroup).save(item);
+        // we need to delete id NULL as typeorm is not deleting but flagging as NULL
+        getRepository(Goal).delete({ groupId: IsNull() });
+        cb(null, item);
+      } catch (e) {
+        cb(e, item);
+      }
+    });
+    adminEndpoint(this.nsp, 'goals::getAll', async (cb) => {
+      try {
+        const items = await getRepository(GoalGroup).find({
+          relations: ['goals'],
+        });
+        cb(null, items);
+      } catch (e) {
+        cb(e, []);
+      }
+    });
+
+    publicEndpoint(this.nsp, 'goals::getOne', async (id, cb) => {
+      try {
+        const item = await getRepository(GoalGroup).findOne({
+          relations: ['goals'],
+          where: { id },
+        });
+        cb(null, item);
+      } catch (e) {
+        cb(e, null);
+      }
+    });
+    publicEndpoint(this.nsp, 'goals::current', async (cb) => {
       cb(null, {
         subscribers: global.api.stats.currentSubscribers,
         followers: global.api.stats.currentFollowers,
@@ -24,55 +66,50 @@ class Goals extends Overlay {
 
   @onBit()
   public async onBit(bit: onEventBit) {
-    const goals: Goals.Goal[] = await global.db.engine.find(this.collection.goals, { type: 'bits' });
+    const goals: Goal[] = await getRepository(Goal).find({ type: 'bits' });
     for (const goal of goals) {
-      const uid = String(goal.uid);
       if (new Date(goal.endAfter).getTime() >= new Date().getTime() || goal.endAfterIgnore) {
-        await global.db.engine.incrementOne(this.collection.goals, { uid }, { currentAmount: bit.amount });
+        await getRepository(Goal).increment({ id: goal.id }, 'currentAmount', bit.amount);
       }
     }
 
     // tips with tracking bits
-    const tipsGoals: Goals.Goal[] = await global.db.engine.find(this.collection.goals, { type: 'tips', countBitsAsTips: true });
+    const tipsGoals: Goal[] = await getRepository(Goal).find({ type: 'tips', countBitsAsTips: true });
     for (const goal of tipsGoals) {
-      const uid = String(goal.uid);
       if (new Date(goal.endAfter).getTime() >= new Date().getTime() || goal.endAfterIgnore) {
         const amount = parseFloat(global.currency.exchange(bit.amount / 100, 'USD', global.currency.mainCurrency));
-        await global.db.engine.incrementOne(this.collection.goals, { uid }, { currentAmount: amount });
+        await getRepository(Goal).increment({ id: goal.id }, 'currentAmount', amount);
       }
     }
   }
 
   @onTip()
   public async onTip(tip: onEventTip) {
-    const goals: Goals.Goal[] = await global.db.engine.find(this.collection.goals, { type: 'tips' });
+    const goals: Goal[] = await getRepository(Goal).find({ type: 'tips' });
     for (const goal of goals) {
-      const uid = String(goal.uid);
-      const currentAmount = Number(global.currency.exchange(tip.amount, tip.currency, global.currency.mainCurrency));
+      const amount = Number(global.currency.exchange(tip.amount, tip.currency, global.currency.mainCurrency));
       if (new Date(goal.endAfter).getTime() >= new Date().getTime() || goal.endAfterIgnore) {
-        await global.db.engine.incrementOne(this.collection.goals, { uid }, { currentAmount });
+        await getRepository(Goal).increment({ id: goal.id }, 'currentAmount', amount);
       }
     }
   }
 
   @onFollow()
   public async onFollow() {
-    const goals: Goals.Goal[] = await global.db.engine.find(this.collection.goals, { type: 'followers' });
+    const goals: Goal[] = await getRepository(Goal).find({ type: 'followers' });
     for (const goal of goals) {
-      const uid = String(goal.uid);
       if (new Date(goal.endAfter).getTime() >= new Date().getTime() || goal.endAfterIgnore) {
-        await global.db.engine.incrementOne(this.collection.goals, { uid }, { currentAmount: 1 });
+        await getRepository(Goal).increment({ id: goal.id }, 'currentAmount', 1);
       }
     }
   }
 
   @onSub()
   public async onSub() {
-    const goals: Goals.Goal[] = await global.db.engine.find(this.collection.goals, { type: 'subscribers' });
+    const goals: Goal[] = await getRepository(Goal).find({ type: 'subscribers' });
     for (const goal of goals) {
-      const uid = String(goal.uid);
       if (new Date(goal.endAfter).getTime() >= new Date().getTime() || goal.endAfterIgnore) {
-        await global.db.engine.incrementOne(this.collection.goals, { uid }, { currentAmount: 1 });
+        await getRepository(Goal).increment({ id: goal.id }, 'currentAmount', 1);
       }
     }
   }

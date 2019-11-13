@@ -31,6 +31,7 @@ export class EventOperation {
   id!: string;
   @ManyToOne(() => Event, (table) => table.operations, {
     onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
   })
   event!: Event;
 

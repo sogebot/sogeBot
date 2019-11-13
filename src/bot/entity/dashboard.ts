@@ -22,6 +22,7 @@ export class Widget {
   id!: string;
   @ManyToOne(() => Dashboard, (c) => c.widgets, {
     onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
   })
   dashboard!: Dashboard;
 

@@ -29,6 +29,7 @@ export class PermissionFilters {
   id!: string;
   @ManyToOne(() => Permissions, (permission) => permission.filters, {
     onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
   })
   permission!: Permissions;
   @Column('varchar', { length: 3 })

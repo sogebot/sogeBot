@@ -17,9 +17,9 @@
     </panel>
 
     <div class="card-deck" v-for="(chunk, index) of chunk(orderBy(groupsFiltered, 'createdAt', 'desc'), itemsPerPage)" :key="index">
-      <div class="card mb-2 p-0" :class="['col-' + (12 / itemsPerPage)]" v-for="group of chunk" :key="group.uid">
+      <div class="card mb-2 p-0" :class="['col-' + (12 / itemsPerPage)]" v-for="group of chunk" :key="group.id">
         <div class="card-header">
-          <strong>{{group.name}}</strong> <small class="text-muted">{{group.uid}}</small>
+          <strong>{{group.name}}</strong> <small class="text-muted">{{group.id}}</small>
         </div>
         <div class="card-body">
           <dl class="row">
@@ -35,7 +35,7 @@
             </template>
           </dl>
           <ul class="list-group list-group-flush border-top-0">
-            <li v-for="goal of filter(goals, (o) => o.groupId === group.uid)" :key="goal.uid" class="list-group-item">
+            <li v-for="goal of group.goals" :key="goal.id" class="list-group-item">
               <dl class="row">
                 <h5 class="col-12">{{goal.name}}</h5>
                 <dt class="col-6">{{translate('registry.goals.input.type.title')}}</dt>
@@ -50,27 +50,27 @@
                 <dt class="col-6">{{translate('registry.goals.input.endAfter.title')}}</dt>
                 <dd class="col-6">
                   <fa icon="infinity" fixed-width v-if="goal.endAfterIgnore"></fa>
-                  <template v-else>{{goal.endAfter}}</template>
+                  <template v-else>{{new Date(goal.endAfter).toLocaleString()}}</template>
                 </dd>
               </dl>
             </li>
           </ul>
         </div>
         <div class="card-footer text-right">
-          <hold-button class="btn-danger btn-only-icon" @trigger="removeGoal(group.uid)" icon="trash">
+          <hold-button class="btn-danger btn-only-icon" @trigger="removeGoal(group)" icon="trash">
             <template slot="title">{{translate('dialog.buttons.delete')}}</template>
             <template slot="onHoldTitle">{{translate('dialog.buttons.hold-to-delete')}}</template>
           </hold-button>
           <button-with-icon
-            :text="'/overlays/goals/' + group.uid"
-            :href="'/overlays/goals/' + group.uid"
+            :text="'/overlays/goals/' + group.id"
+            :href="'/overlays/goals/' + group.id"
             class="btn-dark btn-only-icon"
             icon="link"
             target="_blank"
             />
           <button-with-icon
             :text="translate('dialog.buttons.edit')"
-            :href="'#/registry/goals/edit/' + group.uid"
+            :href="'#/registry/goals/edit/' + group.id"
             class="btn-primary btn-only-icon"
             icon="edit"
             />
@@ -90,17 +90,17 @@
   import { chunk, filter, orderBy } from 'lodash-es';
 
   import { getSocket } from 'src/panel/helpers/socket';
+import { GoalGroup } from '../../../../bot/entity/goal';
 
   export default Vue.extend({
     components: {
-      panel: () => import('../../components/panel.vue'),
-      holdButton: () => import('../../components/holdButton.vue'),
-      'button-with-icon': () => import('../../components/button.vue'),
+      panel: () => import('../../../components/panel.vue'),
+      holdButton: () => import('../../../components/holdButton.vue'),
+      'button-with-icon': () => import('../../../components/button.vue'),
     },
     data: function () {
       const object: {
-        groups: Goals.Group[],
-        goals: Goals.Goal[],
+        groups: GoalGroup[],
         socket: any,
         search: string,
         currentTime: any,
@@ -114,7 +114,6 @@
         socket: getSocket('/overlays/goals'),
         search: '',
         groups: [],
-        goals: [],
         currentTime: 0,
         domWidth: 0,
         interval: 0,
@@ -126,8 +125,8 @@
       return object
     },
     computed: {
-      groupsFiltered: function (): Goals.Group[] {
-        return this.groups.filter((o: Goals.Group) => {
+      groupsFiltered: function (): GoalGroup[] {
+        return this.groups.filter((o: GoalGroup) => {
           return o.name.includes(this.search)
         })
       },
@@ -149,24 +148,27 @@
         this.currentTime = Date.now()
       }, 1000)
 
-      this.socket.emit('find', { collection: 'groups' }, (err: Error, groups: Goals.Group[]) => {
-        this.groups = groups
-      });
-      this.socket.emit('find', { collection: 'goals' }, (err: Error, goals: Goals.Goal[]) => {
-        this.goals = goals
-      });
+      this.socket.emit('goals::getAll', (err: Error, items: GoalGroup[]) => {
+        if (err) {
+          console.error(err);
+        } else {
+          console.debug('Loaded', items);
+          this.groups = items;
+        }
+      })
     },
     beforeDestroy: function () {
       clearInterval(this.interval)
     },
     methods: {
-      removeGoal: function (uid) {
-        console.debug(' => Removing', uid)
+      removeGoal: function (group) {
+        console.debug(' => Removing', group.id)
 
-        this.socket.emit('delete', { collection: 'groups', where: { uid }}, (err, d) => {
-          this.socket.emit('delete', { collection: 'goals', where: { groupId: uid } }, (err, d) => {
-            this.groups = this.groups.filter(o => o.uid != uid)
-          })
+        this.socket.emit('goals::remove', group, (err) => {
+          if (err) {
+            console.error(err);
+          } else {
+            this.groups = this.groups.filter(o => o.id != group.id)          }
         })
       }
     }

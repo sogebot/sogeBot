@@ -50,6 +50,7 @@ export class VariableHistory {
   id!: number;
   @ManyToOne(() => Variable, (variable) => variable.history, {
     onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
   })
   variable!: Variable;
 
@@ -71,6 +72,7 @@ export class VariableURL {
   id!: string;
   @ManyToOne(() => Variable, (variable) => variable.urls, {
     onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
   })
   variable!: Variable;
 

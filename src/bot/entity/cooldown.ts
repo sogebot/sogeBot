@@ -40,6 +40,7 @@ export class CooldownViewer {
   id!: string;
   @ManyToOne(() => Cooldown, (c) => c.viewers, {
     onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
   })
   cooldown!: Cooldown;
   @Column()

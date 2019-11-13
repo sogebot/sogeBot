@@ -95,6 +95,7 @@ export class UserTip {
 
   @ManyToOne(() => User, (user) => user.tips, {
     onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
   })
   user!: User;
 
@@ -118,6 +119,7 @@ export class UserBit {
 
   @ManyToOne(() => User, (user) => user.bits, {
     onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
   })
   user!: User;
 

@@ -29,6 +29,7 @@ export class PollVote {
   id!: string;
   @ManyToOne(() => Poll, (poll) => poll.votes, {
     onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
   })
   poll!: Poll;
   @Column()

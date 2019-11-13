@@ -42,6 +42,7 @@ export class BetsParticipations {
   optionIdx!: number;
   @ManyToOne(() => Bets, (bet) => bet.participations, {
     onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
   })
   bet!: Bets;
 }

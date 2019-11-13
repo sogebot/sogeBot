@@ -27,6 +27,7 @@ const { Dashboard, Widget } = require('../dest/entity/dashboard');
 const { Variable, VariableHistory } = require('../dest/entity/variable');
 const { Translation } = require('../dest/entity/translation');
 const { Event, EventOperation } = require('../dest/entity/event');
+const { Goal, GoalGroup } = require('../dest/entity/goal');
 
 const _ = require('lodash');
 
@@ -618,6 +619,42 @@ async function main() {
     for (const chunk of _.chunk(items, 100)) {
       process.stdout.write('.')
       await getRepository(Event).save(chunk);
+    }
+    console.log();
+  }
+
+  console.log(`Migr: overlays.goals.groups`);
+  await getManager().clear(Goal);
+  await getManager().clear(GoalGroup);
+  const goals = await from.engine.find('overlays.goals.goals');
+  items = (await from.engine.find('overlays.goals.groups'))
+    .map(o => {
+      return {
+        id: o.uid,
+        name: o.name,
+        createdAt: o.createdAt,
+        display: o.display,
+        goals: goals.filter(f => f.groupId === o.uid)
+          .map(f => {
+            return {
+              ...f,
+              id: f.uid,
+              countBitsAsTips: f.countBitsAsTips || false,
+              endAfterIgnore: f.endAfterIgnore || false,
+              endAfter: f.endAfter,
+              customizationBar: f.customization.bar,
+              customizationFont: f.customization.font,
+              customizationHtml: f.customization.html,
+              customizationJs: f.customization.js,
+              customizationCss: f.customization.css,
+            };
+          }),
+      };
+    });
+  if (items.length > 0) {
+    for (const chunk of _.chunk(items, 100)) {
+      process.stdout.write('.')
+      await getRepository(GoalGroup).save(chunk);
     }
     console.log();
   }
