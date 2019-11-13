@@ -6,5 +6,6 @@
   "password": "Passw0rd",
   "database": "sogebot",
   "logging": ["error"],
-  "cache": true
+  "cache": true,
+  "charset": "UTF8_GENERAL_CI"
 }

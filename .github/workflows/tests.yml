@@ -98,6 +98,7 @@ jobs:
           MYSQL_DATABASE: sogebot
         ports:
           - 3307:3306
+        options: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
