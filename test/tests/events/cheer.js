@@ -14,6 +14,7 @@ const _ = require('lodash');
 
 const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/entity/user');
+const { Event } = require('../../../dest/entity/event');
 
 describe('Events - cheer event', () => {
   before(async () => {
@@ -23,29 +24,23 @@ describe('Events - cheer event', () => {
 
   describe('#1699 - Cheer event is not waiting for user to save id', function () {
     before(async function () {
-      const id = uuidv4();
-      await Promise.all([
-        global.db.engine.insert('events', {
-          id,
-          key: 'cheer',
-          name: 'Cheer alert',
-          enabled: true,
-          triggered: {},
-          definitions: {},
-        }),
-        global.db.engine.insert('events.filters', {
-          filters: '',
-          eventId: id,
-        }),
-        global.db.engine.insert('events.operations', {
-          key: 'run-command',
-          eventId: id,
-          definitions: {
-            isCommandQuiet: true,
-            commandToRun: '!points add $username (math.$bits*10)',
-          },
-        }),
-      ]);
+      const event = new Event();
+      event.id = uuidv4();
+      event.name = 'cheer';
+      event.givenName = 'Cheer alert';
+      event.triggered = {};
+      event.definitions = {};
+      event.filter = '';
+      event.isEnabled = true;
+      event.operations = [{
+        name: 'run-command',
+        definitions: {
+          isCommandQuiet: true,
+          commandToRun: '!points add $username (math.$bits*10)',
+        },
+      }];
+      await getRepository(Event).save(event);
+
     });
 
     for (const username of ['losslezos', 'rigneir', 'mikasa_hraje', 'foufhs']) {

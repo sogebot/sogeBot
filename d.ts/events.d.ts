@@ -32,7 +32,7 @@ declare namespace Events {
   }
 
   type OperationDefinitions = {
-    [x: string]: string | boolean
+    [x: string]: string | boolean | number;
   }
 
   type Attributes = {

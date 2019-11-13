@@ -12,16 +12,18 @@ import Parser from './parser';
 import { generateUsername } from './helpers/generateUsername';
 import { error, info, warning } from './helpers/log';
 import { adminEndpoint } from './helpers/socket';
+
 import { getRepository } from 'typeorm';
 import { User } from './entity/user';
 import { Variable } from './entity/variable';
+import { Event } from './entity/event';
 
 class Events extends Core {
   public timeouts: { [x: string]: NodeJS.Timeout } = {};
   public supportedEventsList: {
     id: string;
     variables?: string[];
-    check?: (event: any, attributes: any) => Promise<boolean>;
+    check?: (event: Event, attributes: any) => Promise<boolean>;
     definitions?: {
       [x: string]: any;
     };
@@ -145,22 +147,27 @@ class Events extends Core {
       return this.reset(eventId);
     }
 
-    const events = await global.db.engine.find('events', { key: eventId, enabled: true });
+    const events = await getRepository(Event).find({
+      relations: ['operations'],
+      where: {
+        name: eventId,
+        isEnabled: true,
+      },
+    });
 
     for (const event of events) {
-      const id = event.id;
       const [shouldRunByFilter, shouldRunByDefinition] = await Promise.all([
-        this.checkFilter(id, attributes),
+        this.checkFilter(event, attributes),
         this.checkDefinition(_.clone(event), attributes),
       ]);
       if ((!shouldRunByFilter || !shouldRunByDefinition)) {
         continue;
       }
 
-      for (const operation of (await global.db.engine.find('events.operations', { eventId: id }))) {
-        const isOperationSupported = !_.isNil(_.find(this.supportedOperationsList, (o) => o.id === operation.key));
+      for (const operation of event.operations) {
+        const isOperationSupported = !_.isNil(_.find(this.supportedOperationsList, (o) => o.id === operation.name));
         if (isOperationSupported) {
-          const foundOp = this.supportedOperationsList.find((o) =>  o.id === operation.key);
+          const foundOp = this.supportedOperationsList.find((o) =>  o.id === operation.name);
           if (foundOp) {
             foundOp.fire(operation.definitions, attributes);
           }
@@ -171,10 +178,9 @@ class Events extends Core {
 
   // set triggered attribute to empty object
   public async reset(eventId) {
-    const events = await global.db.engine.find('events', { key: eventId });
-    for (const event of events) {
+    for (const event of await getRepository(Event).find({ name: eventId })) {
       event.triggered = {};
-      await global.db.engine.update('events', { id: event.id }, event);
+      await getRepository(Event).save(event);
     }
   }
 
@@ -380,65 +386,65 @@ class Events extends Core {
     }
   }
 
-  public async everyXMinutesOfStream(event, attributes) {
+  public async everyXMinutesOfStream(event: Event, attributes) {
     // set to Date.now() because 0 will trigger event immediatelly after stream start
     const shouldSave = _.get(event, 'triggered.runEveryXMinutes', 0) === 0 || typeof _.get(event, 'triggered.runEveryXMinutes', 0) !== 'number';
     event.triggered.runEveryXMinutes = _.get(event, 'triggered.runEveryXMinutes', Date.now());
 
-    const shouldTrigger = _.now() - new Date(event.triggered.runEveryXMinutes).getTime() >= event.definitions.runEveryXMinutes * 60 * 1000;
+    const shouldTrigger = Date.now() - new Date(event.triggered.runEveryXMinutes).getTime() >= Number(event.definitions.runEveryXMinutes) * 60 * 1000;
     if (shouldTrigger || shouldSave) {
       event.triggered.runEveryXMinutes = Date.now();
-      await global.db.engine.update('events', { id: event.id }, event);
+      await getRepository(Event).save(event);
     }
     return shouldTrigger;
   }
 
-  public async checkRaid(event, attributes) {
-    event.definitions.viewersAtLeast = parseInt(event.definitions.viewersAtLeast, 10); // force Integer
+  public async checkRaid(event: Event, attributes) {
+    event.definitions.viewersAtLeast = Number(event.definitions.viewersAtLeast); // force Integer
     const shouldTrigger = (attributes.viewers >= event.definitions.viewersAtLeast);
     return shouldTrigger;
   }
 
-  public async checkHosted(event, attributes) {
-    event.definitions.viewersAtLeast = parseInt(event.definitions.viewersAtLeast, 10); // force Integer
+  public async checkHosted(event: Event, attributes) {
+    event.definitions.viewersAtLeast = Number(event.definitions.viewersAtLeast); // force Integer
     const shouldTrigger = (attributes.viewers >= event.definitions.viewersAtLeast)
-                        && ((!attributes.autohost && event.definitions.ignoreAutohost) || !event.definitions.ignoreAutohost);
+                        && ((!attributes.autohost && event.definitions.ignoreAutohost as boolean) || !(event.definitions.ignoreAutohost as boolean));
     return shouldTrigger;
   }
 
-  public async checkStreamIsRunningXMinutes(event, attributes) {
+  public async checkStreamIsRunningXMinutes(event: Event, attributes) {
     if (!global.api.isStreamOnline) {
       return false;
     }
     event.triggered.runAfterXMinutes = _.get(event, 'triggered.runAfterXMinutes', 0);
     const shouldTrigger = event.triggered.runAfterXMinutes === 0
-                          && Number(moment.utc().format('X')) - Number(moment.utc(global.api.streamStatusChangeSince).format('X')) > event.definitions.runAfterXMinutes * 60;
+                          && Number(moment.utc().format('X')) - Number(moment.utc(global.api.streamStatusChangeSince).format('X')) > Number(event.definitions.runAfterXMinutes) * 60;
     if (shouldTrigger) {
       event.triggered.runAfterXMinutes = event.definitions.runAfterXMinutes;
-      await global.db.engine.update('events', { id: event.id }, event);
+      await getRepository(Event).save(event);
     }
     return shouldTrigger;
   }
 
-  public async checkNumberOfViewersIsAtLeast(event, attributes) {
+  public async checkNumberOfViewersIsAtLeast(event: Event, attributes) {
     event.triggered.runInterval = _.get(event, 'triggered.runInterval', 0);
 
-    event.definitions.runInterval = parseInt(event.definitions.runInterval, 10); // force Integer
-    event.definitions.viewersAtLeast = parseInt(event.definitions.viewersAtLeast, 10); // force Integer
+    event.definitions.runInterval = Number(event.definitions.runInterval); // force Integer
+    event.definitions.viewersAtLeast = Number(event.definitions.viewersAtLeast); // force Integer
 
     const viewers = global.api.stats.currentViewers;
 
     const shouldTrigger = viewers >= event.definitions.viewersAtLeast
-                        && ((event.definitions.runInterval > 0 && _.now() - event.triggered.runInterval >= event.definitions.runInterval * 1000)
+                        && ((event.definitions.runInterval > 0 && Date.now() - event.triggered.runInterval >= event.definitions.runInterval * 1000)
                         || (event.definitions.runInterval === 0 && event.triggered.runInterval === 0));
     if (shouldTrigger) {
-      event.triggered.runInterval = _.now();
-      await global.db.engine.update('events', { id: event.id }, event);
+      event.triggered.runInterval = Date.now();
+      await getRepository(Event).save(event);
     }
     return shouldTrigger;
   }
 
-  public async checkCommandSendXTimes(event, attributes) {
+  public async checkCommandSendXTimes(event: Event, attributes) {
     const regexp = new RegExp(`^${event.definitions.commandToWatch}\\s`, 'i');
 
     let shouldTrigger = false;
@@ -447,24 +453,24 @@ class Events extends Core {
       event.triggered.runEveryXCommands = _.get(event, 'triggered.runEveryXCommands', 0);
       event.triggered.runInterval = _.get(event, 'triggered.runInterval', 0);
 
-      event.definitions.runInterval = parseInt(event.definitions.runInterval, 10); // force Integer
-      event.triggered.runInterval = parseInt(event.triggered.runInterval, 10); // force Integer
+      event.definitions.runInterval = Number(event.definitions.runInterval); // force Integer
+      event.triggered.runInterval = Number(event.triggered.runInterval); // force Integer
 
       event.triggered.runEveryXCommands++;
       shouldTrigger
         = event.triggered.runEveryXCommands >= event.definitions.runEveryXCommands
-        && ((event.definitions.runInterval > 0 && _.now() - event.triggered.runInterval >= event.definitions.runInterval * 1000)
+        && ((event.definitions.runInterval > 0 && Date.now() - event.triggered.runInterval >= event.definitions.runInterval * 1000)
         || (event.definitions.runInterval === 0 && event.triggered.runInterval === 0));
       if (shouldTrigger) {
-        event.triggered.runInterval = _.now();
+        event.triggered.runInterval = Date.now();
         event.triggered.runEveryXCommands = 0;
       }
-      await global.db.engine.update('events', { id: event.id }, event);
+      await getRepository(Event).save(event);
     }
     return shouldTrigger;
   }
 
-  public async checkKeywordSendXTimes(event, attributes) {
+  public async checkKeywordSendXTimes(event: Event, attributes) {
     const regexp = new RegExp(`${event.definitions.keywordToWatch}`, 'gi');
 
     let shouldTrigger = false;
@@ -474,8 +480,8 @@ class Events extends Core {
       event.triggered.runEveryXKeywords = _.get(event, 'triggered.runEveryXKeywords', 0);
       event.triggered.runInterval = _.get(event, 'triggered.runInterval', 0);
 
-      event.definitions.runInterval = parseInt(event.definitions.runInterval, 10); // force Integer
-      event.triggered.runInterval = parseInt(event.triggered.runInterval, 10); // force Integer
+      event.definitions.runInterval = Number(event.definitions.runInterval); // force Integer
+      event.triggered.runInterval = Number(event.triggered.runInterval); // force Integer
 
       if (event.definitions.resetCountEachMessage) {
         event.triggered.runEveryXKeywords = 0;
@@ -486,28 +492,27 @@ class Events extends Core {
 
       shouldTrigger
         = event.triggered.runEveryXKeywords >= event.definitions.runEveryXKeywords
-        && ((event.definitions.runInterval > 0 && _.now() - event.triggered.runInterval >= event.definitions.runInterval * 1000)
+        && ((event.definitions.runInterval > 0 && Date.now() - event.triggered.runInterval >= event.definitions.runInterval * 1000)
         || (event.definitions.runInterval === 0 && event.triggered.runInterval === 0));
       if (shouldTrigger) {
-        event.triggered.runInterval = _.now();
+        event.triggered.runInterval = Date.now();
         event.triggered.runEveryXKeywords = 0;
       }
-      await global.db.engine.update('events', { id: event.id }, event);
+      await getRepository(Event).save(event);
     }
     return shouldTrigger;
   }
 
-  public async checkDefinition(event, attributes) {
-    const foundEvent = this.supportedEventsList.find((o) => o.id === event.key);
+  public async checkDefinition(event: Event, attributes) {
+    const foundEvent = this.supportedEventsList.find((o) => o.id === event.name);
     if (!foundEvent || !foundEvent.check) {
       return true;
     }
     return foundEvent.check(event, attributes);
   }
 
-  public async checkFilter(eventId, attributes) {
-    const filter = (await global.db.engine.findOne('events.filters', { eventId })).filters;
-    if (typeof filter === 'undefined' || filter.trim().length === 0) {
+  public async checkFilter(event: Event, attributes) {
+    if (event.filter.trim().length === 0) {
       return true;
     }
 
@@ -518,7 +523,7 @@ class Events extends Core {
       customVariables[cvar.variableName] = cvar.currentValue;
     }
 
-    const toEval = `(function evaluation () { return ${filter} })()`;
+    const toEval = `(function evaluation () { return ${event.filter} })()`;
     const context = {
       _,
       $username: _.get(attributes, 'username', null),
@@ -563,6 +568,18 @@ class Events extends Core {
   }
 
   public sockets() {
+    adminEndpoint(this.nsp, 'events::getAll', async (cb) => {
+      cb(await getRepository(Event).find({
+        relations: ['operations'],
+      }));
+    });
+    adminEndpoint(this.nsp, 'events::getOne', async (eventId: string, cb) => {
+      const event = await getRepository(Event).findOne({
+        relations: ['operations'],
+        where: { id: eventId },
+      });
+      cb(event);
+    });
     adminEndpoint(this.nsp, 'list.supported.events', (callback) => {
       callback(null, this.supportedEventsList);
     });
@@ -613,22 +630,29 @@ class Events extends Core {
         currencyInBot: global.currency.mainCurrency,
         amountInBotCurrency: _.random(0, 9999, true).toFixed(2),
       };
-      for (const operation of (await global.db.engine.find('events.operations', { eventId }))) {
-        if (!_.isNil(attributes.is)) {
-          // flatten is
-          const is = attributes.is;
-          _.merge(attributes, flatten({ is }));
-        }
-        if (!_.isNil(attributes.recipientis)) {
-          // flatten recipientis
-          const recipientis = attributes.recipientis;
-          _.merge(attributes, flatten({ recipientis }));
-        }
-        const isOperationSupported = !_.isNil(_.find(this.supportedOperationsList, (o) => o.id === operation.key));
-        if (isOperationSupported) {
-          const foundOp = this.supportedOperationsList.find((o) =>  o.id === operation.key);
-          if (foundOp) {
-            foundOp.fire(operation.definitions, attributes);
+
+      const event = await getRepository(Event).findOne({
+        relations: ['operations'],
+        where: { id: eventId },
+      });
+      if (event) {
+        for (const operation of event.operations) {
+          if (!_.isNil(attributes.is)) {
+            // flatten is
+            const is = attributes.is;
+            _.merge(attributes, flatten({ is }));
+          }
+          if (!_.isNil(attributes.recipientis)) {
+            // flatten recipientis
+            const recipientis = attributes.recipientis;
+            _.merge(attributes, flatten({ recipientis }));
+          }
+          const isOperationSupported = !_.isNil(_.find(this.supportedOperationsList, (o) => o.id === operation.name));
+          if (isOperationSupported) {
+            const foundOp = this.supportedOperationsList.find((o) =>  o.id === operation.name);
+            if (foundOp) {
+              foundOp.fire(operation.definitions, attributes);
+            }
           }
         }
       }
@@ -636,67 +660,56 @@ class Events extends Core {
       cb();
     });
 
-    adminEndpoint(this.nsp, 'save.event', async (opts, cb) => {
-      const { event, operations, filters } = opts;
-
-      // first, remove all event related items
-      await Promise.all([
-        global.db.engine.remove('events', { id: event.id }),
-        global.db.engine.remove('events.filters', { eventId: event.id }),
-        global.db.engine.remove('events.operations', { eventId: event.id }),
-      ]);
-
-      // save event
-      delete event._id;
-      await global.db.engine.insert('events', event);
-
-      // save operations
-      for (const op of operations) {
-        delete op._id;
-        await global.db.engine.insert('events.operations', op);
+    adminEndpoint(this.nsp, 'events::save', async (event: Event, cb) => {
+      try {
+        event.operations = event.operations.filter(o => o.name !== 'do-nothing');
+        await getRepository(Event).save(event);
+        cb(null, event);
+      } catch (e) {
+        cb(e, event);
       }
-
-      // save filters
-      await global.db.engine.insert('events.filters', {
-        filters, eventId: event.id,
-      });
-      cb(null, event.id);
     });
 
-    adminEndpoint(this.nsp, 'delete.event', async (eventId, cb) => {
-      await Promise.all([
-        global.db.engine.remove('events', { id: eventId }),
-        global.db.engine.remove('events.filters', { eventId }),
-        global.db.engine.remove('events.operations', { eventId }),
-      ]);
-      cb(null, eventId);
+    adminEndpoint(this.nsp, 'events::remove', async (event: Event, cb) => {
+      await getRepository(Event).remove(event);
+      cb(null);
     });
   }
 
   protected async fadeOut() {
     try {
-      const commands = await global.db.engine.find('events', { key: 'command-send-x-times' });
-      const keywords = await global.db.engine.find('events', { key: 'keyword-send-x-times' });
-      for (const event of _.merge(commands, keywords)) {
+      const events = await getRepository(Event)
+        .createQueryBuilder('event')
+        .where('event.name = :event1', { event1: 'command-send-x-times' })
+        .orWhere('event.name = :event2', { event2: 'keyword-send-x-times '})
+        .getMany();
+      for (const event of events) {
         if (_.isNil(_.get(event, 'triggered.fadeOutInterval', null))) {
           // fadeOutInterval init
-          await global.db.engine.update('events', { id: event.id }, { triggered: { fadeOutInterval: _.now() } });
+          event.triggered.fadeOutInterval = Date.now();
+          await getRepository(Event).save(event);
         } else {
-          if (_.now() - event.triggered.fadeOutInterval >= event.definitions.fadeOutInterval * 1000) {
+          if (Date.now() - event.triggered.fadeOutInterval >= Number(event.definitions.fadeOutInterval) * 1000) {
             // fade out commands
-            if (event.key === 'command-send-x-times') {
+            if (event.name === 'command-send-x-times') {
               if (!_.isNil(_.get(event, 'triggered.runEveryXCommands', null))) {
                 if (event.triggered.runEveryXCommands <= 0) {
                   continue;
                 }
-                await global.db.engine.update('events', { id: event.id }, { triggered: { fadeOutInterval: _.now(), runEveryXCommands: event.triggered.runEveryXCommands - event.definitions.fadeOutXCommands } });
+
+                event.triggered.fadeOutInterval = Date.now();
+                event.triggered.runEveryXCommands = event.triggered.runEveryXCommands - Number(event.definitions.fadeOutXCommands);
+                await getRepository(Event).save(event);
               }
-            } else if (event.key === 'keyword-send-x-times') {
+            } else if (event.name === 'keyword-send-x-times') {
               if (!_.isNil(_.get(event, 'triggered.runEveryXKeywords', null))) {
                 if (event.triggered.runEveryXKeywords <= 0) {
                   continue;
                 }
-                await global.db.engine.update('events', { id: event.id }, { triggered: { fadeOutInterval: _.now(), runEveryXKeywords: event.triggered.runEveryXKeywords - event.definitions.fadeOutXKeywords } });
+
+                event.triggered.fadeOutInterval = Date.now();
+                event.triggered.runEveryXKeywords = event.triggered.runEveryXKeywords - Number(event.definitions.fadeOutXKeywords);
+                await getRepository(Event).save(event);
               }
             }
           }

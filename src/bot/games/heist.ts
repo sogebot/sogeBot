@@ -9,6 +9,7 @@ import { warning } from '../helpers/log.js';
 
 import { getRepository } from 'typeorm';
 import { User } from '../entity/user';
+import { HeistUser } from '../entity/heist';
 
 class Heist extends Game {
   dependsOn = [ 'systems.points' ];
@@ -116,8 +117,8 @@ class Heist extends Game {
     const levels = _.orderBy(this.levelsValues, 'maxUsers', 'asc');
 
     // check if heist is finished
-    if (!_.isNil(startedAt) && _.now() - startedAt > (entryCooldown * 1000) + 10000) {
-      const users = await global.db.engine.find(this.collection.users);
+    if (!_.isNil(startedAt) && Date.now() - startedAt > (entryCooldown * 1000) + 10000) {
+      const users = await getRepository(HeistUser).find();
       const level = _.find(levels, (o) => o.maxUsers >= users.length || _.isNil(o.maxUsers)); // find appropriate level or max level
 
       if (!level) {
@@ -135,7 +136,7 @@ class Heist extends Game {
         });
         // cleanup
         this.startedAt = null;
-        await global.db.engine.remove(this.collection.users, {});
+        await getRepository(HeistUser).clear();
         this.timeouts.iCheckFinished = global.setTimeout(() => this.iCheckFinished(), 10000);
         return;
       }
@@ -167,8 +168,7 @@ class Heist extends Game {
 
         if (isSurvivor) {
           // add points to user
-          const points = parseInt((await global.db.engine.findOne(this.collection.users, { username: user.username })).points, 10);
-          await getRepository(User).increment({ userId: user.id }, 'points', Number(points * level.payoutMultiplier).toFixed());
+          await getRepository(User).increment({ userId: user.userId }, 'points', Math.floor(user.points * level.payoutMultiplier));
         }
       } else {
         const winners: string[] = [];
@@ -177,8 +177,7 @@ class Heist extends Game {
 
           if (isSurvivor) {
             // add points to user
-            const points = parseInt((await global.db.engine.findOne(this.collection.users, { username: user.username })).points, 10);
-            await getRepository(User).increment({ userId: user.id }, 'points', Number(points * level.payoutMultiplier).toFixed());
+            await getRepository(User).increment({ userId: user.userId }, 'points', Math.floor(user.points * level.payoutMultiplier));
             winners.push(user.username);
           }
         }
@@ -220,12 +219,12 @@ class Heist extends Game {
 
       // cleanup
       this.startedAt = null;
-      this.lastHeistTimestamp = _.now();
-      await global.db.engine.remove(this.collection.users, {});
+      this.lastHeistTimestamp = Date.now();
+      await getRepository(HeistUser).clear();
     }
 
     // check if cops done patrolling
-    if (lastHeistTimestamp !== 0 && _.now() - lastHeistTimestamp >= copsCooldown * 60000) {
+    if (lastHeistTimestamp !== 0 && Date.now() - lastHeistTimestamp >= copsCooldown * 60000) {
       this.lastHeistTimestamp = 0;
       sendMessage((this.copsCooldown), {
         username: global.oauth.botUsername,
@@ -251,10 +250,10 @@ class Heist extends Game {
     const levels = _.orderBy(this.levelsValues, 'maxUsers', 'asc');
 
     // is cops patrolling?
-    if (_.now() - lastHeistTimestamp < copsCooldown * 60000) {
-      const minutesLeft = Number(copsCooldown - (_.now() - lastHeistTimestamp) / 60000).toFixed(1);
-      if (_.now() - (this.lastAnnouncedCops) >= 60000) {
-        this.lastAnnouncedCops = _.now();
+    if (Date.now() - lastHeistTimestamp < copsCooldown * 60000) {
+      const minutesLeft = Number(copsCooldown - (Date.now() - lastHeistTimestamp) / 60000).toFixed(1);
+      if (Date.now() - (this.lastAnnouncedCops) >= 60000) {
+        this.lastAnnouncedCops = Date.now();
         sendMessage(
           (this.copsOnPatrol)
             .replace('$cooldown', minutesLeft + ' ' + getLocalizedName(minutesLeft, 'core.minutes')), opts.sender, opts.attr);
@@ -265,17 +264,16 @@ class Heist extends Game {
     let newHeist = false;
     if (this.startedAt === null) { // new heist
       newHeist = true;
-      this.startedAt = _.now(); // set startedAt
-      await global.db.engine.update(this.collection.data, { key: 'startedAt' }, { value: this.startedAt });
-      if (_.now() - (this.lastAnnouncedStart) >= 60000) {
-        this.lastAnnouncedStart = _.now();
+      this.startedAt = Date.now(); // set startedAt
+      if (Date.now() - (this.lastAnnouncedStart) >= 60000) {
+        this.lastAnnouncedStart = Date.now();
         sendMessage((await global.translate('games.heist.entryMessage')).replace('$command', opts.command), opts.sender);
       }
     }
 
     // is heist in progress?
-    if (!newHeist && _.now() - this.startedAt > entryCooldown * 1000 && _.now() - (this.lastAnnouncedHeistInProgress) >= 60000) {
-      this.lastAnnouncedHeistInProgress = _.now();
+    if (!newHeist && Date.now() - this.startedAt > entryCooldown * 1000 && Date.now() - (this.lastAnnouncedHeistInProgress) >= 60000) {
+      this.lastAnnouncedHeistInProgress = Date.now();
       sendMessage(
         (await global.translate('games.heist.lateEntryMessage')).replace('$command', opts.command), opts.sender, opts.attr);
       return;
@@ -304,11 +302,11 @@ class Heist extends Game {
 
     await Promise.all([
       getRepository(User).decrement({ userId: opts.sender.userId }, 'points', parseInt(points, 10)),
-      global.db.engine.update(this.collection.users, { id: opts.sender.userId }, { username: opts.sender.username, points: points }), // add user to heist list
+      getRepository(HeistUser).save({ userId: opts.sender.userId, username: opts.sender.username, points: parseInt(points, 10)}), // add user to heist list
     ]);
 
     // check how many users are in heist
-    const users = await global.db.engine.find(this.collection.users);
+    const users = await getRepository(HeistUser).find();
     const level = _.find(levels, (o) => o.maxUsers >= users.length || _.isNil(o.maxUsers));
     if (level) {
       const nextLevel = _.find(levels, (o) => {

@@ -6,8 +6,6 @@ const variable = require('./variable');
 const { debug } = require('../../dest/helpers/log');
 const waitMs = require('./time').waitMs;
 
-const startup = _.now();
-
 const { getManager, getRepository } = require('typeorm');
 const { Alias } = require('../../dest/entity/alias');
 const { Cooldown } = require('../../dest/entity/cooldown');
@@ -24,8 +22,7 @@ const { Timer, TimerResponse } = require('../../dest/entity/timer');
 const { Poll, PollVote } = require('../../dest/entity/poll');
 const { Duel } = require('../../dest/entity/duel');
 const { Variable, VariableHistory, VariableURL } = require('../../dest/entity/variable');
-
-let isDbConnected = false;
+const { Event, EventOperation } = require('../../dest/entity/event');
 
 module.exports = {
   cleanup: async function () {
@@ -33,14 +30,14 @@ module.exports = {
       try {
         isDbConnected = (await getManager()).connection.isConnected;
       } catch (e) {}
-      if (!isDbConnected || _.isNil(global.db) || !global.db.engine.connected || _.isNil(global.systems) || _.now() - startup < 10000) {
-        return setTimeout(() => waitForIt(resolve, reject), 10);
+      if (!isDbConnected || _.isNil(global.db) || _.isNil(global.systems)) {
+        return setTimeout(() => waitForIt(resolve, reject), 5000);
       }
 
       debug('test', chalk.bgRed('*** Cleaning up collections ***'));
       await waitMs(400); // wait ittle bit for transactions to be done
 
-      const entities = [Variable, VariableHistory, VariableURL, Raffle, Duel, PollVote, Poll, TimerResponse, Timer, BetsParticipations, UserTip, UserBit, CommandsResponses, User, ModerationPermit, Alias, Bets, Commands, CommandsCount, Quotes, Settings, Cooldown, Keyword, Price];
+      const entities = [Event, EventOperation, Variable, VariableHistory, VariableURL, Raffle, Duel, PollVote, Poll, TimerResponse, Timer, BetsParticipations, UserTip, UserBit, CommandsResponses, User, ModerationPermit, Alias, Bets, Commands, CommandsCount, Quotes, Settings, Cooldown, Keyword, Price];
       if (['postgres', 'mysql'].includes((await getManager()).connection.options.type)) {
         const metadatas = [];
         for (const entity of entities) {

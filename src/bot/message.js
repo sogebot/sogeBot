@@ -476,7 +476,7 @@ class Message {
             );
           }
         }
-        return mathjs.eval(toEvaluate);
+        return mathjs.evaluate(toEvaluate);
       }
     };
     let evaluate = {

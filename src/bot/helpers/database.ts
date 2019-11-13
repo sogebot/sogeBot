@@ -7,7 +7,7 @@ async function setIsDbConnected () {
     isDbConnected = (await getManager()).connection.isConnected;
   } catch (e) {}
   if (!isDbConnected) {
-    setTimeout(() => setIsDbConnected(), 100);
+    setTimeout(() => setIsDbConnected(), 1000);
   }
 }
 setIsDbConnected();

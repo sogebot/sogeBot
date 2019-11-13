@@ -673,9 +673,8 @@ class TMI extends Core {
       newBits.amount = Number(userstate.bits);
       newBits.cheeredAt = Date.now();
       newBits.message = messageFromUser;
-
       user.bits.push(newBits);
-      await getRepository(User).save(user);
+      getRepository(User).save(user);
 
       global.events.fire('cheer', { username, bits: userstate.bits, message: messageFromUser });
       global.registries.alerts.trigger({

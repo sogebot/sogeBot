@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 /* global describe it before */
 
 
@@ -10,10 +11,10 @@ const assert = require('assert');
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 const time = require('../../general.js').time;
-const _ = require('lodash');
 
 const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/entity/user');
+const { Event } = require('../../../dest/entity/event');
 
 describe('Events - tip event', () => {
   before(async () => {
@@ -23,29 +24,22 @@ describe('Events - tip event', () => {
 
   describe('#2219 - Give points on tip not working', function () {
     before(async function () {
-      const id = uuidv4();
-      await Promise.all([
-        global.db.engine.insert('events', {
-          id,
-          key: 'tip',
-          name: 'Tip alert',
-          enabled: true,
-          triggered: {},
-          definitions: {},
-        }),
-        global.db.engine.insert('events.filters', {
-          filters: '',
-          eventId: id,
-        }),
-        global.db.engine.insert('events.operations', {
-          key: 'run-command',
-          eventId: id,
-          definitions: {
-            isCommandQuiet: true,
-            commandToRun: '!points add $username (math.$amount*10)',
-          },
-        }),
-      ]);
+      const event = new Event();
+      event.id = uuidv4();
+      event.name = 'tip';
+      event.givenName = 'Tip alert';
+      event.triggered = {};
+      event.definitions = {};
+      event.filter = '';
+      event.isEnabled = true;
+      event.operations = [{
+        name: 'run-command',
+        definitions: {
+          isCommandQuiet: true,
+          commandToRun: '!points add $username (math.$amount*10)',
+        },
+      }];
+      await getRepository(Event).save(event);
 
       for (const user of ['losslezos', 'rigneir', 'mikasa_hraje', 'foufhs']) {
         await getRepository(User).save({ username: user, userId: Math.floor(Math.random() * 100000) });

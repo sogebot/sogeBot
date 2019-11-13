@@ -50,15 +50,15 @@
             :key="event.id">
           <div class="card-body pt-0 ">
             <small class="text-muted text-monospace" style="text-transform: initial; font-size: 0.5rem;">{{ event.id }}</small>
-            <h5 class="card-title">{{ event.name }} <small class="text-muted" style="text-transform: initial;">{{ event.key }}</small></h5>
+            <h5 class="card-title">{{ event.givenName }} <small class="text-muted" style="text-transform: initial;">{{ event.key }}</small></h5>
 
-            <div class="btn btn-secondary btn-with-icon btn-shrink btn-reverse" :title="getFiltersOfEvent(event.id)">
+            <div class="btn btn-secondary btn-with-icon btn-shrink btn-reverse" :title="event.filter">
               <div style="display: flex">
-                <div class="text" v-if="getFiltersOfEvent(event.id).length > 0">
-                  {{ getFiltersOfEvent(event.id) }}
+                <div class="text" v-if="event.filter.length > 0">
+                  {{ event.filter }}
                 </div>
                 <div class="btn-icon">
-                  <font-awesome-layers v-if="getFiltersOfEvent(event.id).length === 0">
+                  <font-awesome-layers v-if="event.filter.length === 0">
                     <fa icon="slash" :mask="['fas', 'filter']" />
                     <fa icon="slash" transform="down-2 left-2"/>
                   </font-awesome-layers>
@@ -84,14 +84,14 @@
 
             <button-with-icon
               v-if="isOperationShown(event.id)"
-              :text="translate('events.dialog.operations') + ' (' + getOperationsOfEvent(event.id).length + ')'"
+              :text="translate('events.dialog.operations') + ' (' + event.operations.length + ')'"
               @click="toggleOperationShow(event.id)"
               class="btn-dark btn-shrink btn-reverse"
               icon="tasks"
               />
             <button-with-icon
               v-else
-              :text="translate('events.dialog.operations') + ' (' + getOperationsOfEvent(event.id).length + ')'"
+              :text="translate('events.dialog.operations') + ' (' + event.operations.length + ')'"
               @click="toggleOperationShow(event.id)"
               class="btn-light btn-shrink btn-reverse"
               icon="tasks"
@@ -109,9 +109,9 @@
 
             <div v-if="isOperationShown(event.id)">
               <h6 class="text-muted">{{translate('events.dialog.operations')}}</h6>
-              <template v-for="operation of getOperationsOfEvent(event.id)">
-                <strong :key="event.id + operation.key + '4'" class="text-uppercase text-narrow">{{translate(operation.key)}}</strong>
-                <dl class="row" :key="event.id + operation.key + '5'" style="font-size:0.8rem;">
+              <template v-for="operation of event.operations">
+                <strong :key="event.id + operation.name + '4'" class="text-uppercase text-narrow">{{translate(operation.name)}}</strong>
+                <dl class="row" :key="event.id + operation.name + '5'" style="font-size:0.8rem;">
                 <template v-for="key of Object.keys(operation.definitions)">
                   <dt class="col-sm-6" :key="event.id + key + '2'">{{translate('events.definitions.' + key + '.label')}}</dt>
                   <dd class="col-sm-6" :key="event.id + key + '3'">{{operation.definitions[key]}}</dd>
@@ -122,16 +122,16 @@
           </div>
           <div class="card-footer text-right">
             <button-with-icon
-              v-if="event.enabled"
+              v-if="event.isEnabled"
               :text="translate('dialog.buttons.enabled')"
-              @click="event.enabled = false; sendUpdate(event);"
+              @click="event.isEnabled = false; sendUpdate(event);"
               class="btn-success btn-shrink"
               icon="toggle-on"
               />
             <button-with-icon
               v-else
               :text="translate('dialog.buttons.disabled')"
-              @click="event.enabled = true; sendUpdate(event);"
+              @click="event.isEnabled = true; sendUpdate(event);"
               class="btn-danger btn-shrink"
               icon="toggle-off"
               />
@@ -149,7 +149,7 @@
               icon="edit"
               />
 
-            <hold-button class="btn-danger btn-shrink" @trigger="deleteEvent(event.id)" icon="trash">
+            <hold-button class="btn-danger btn-shrink" @trigger="deleteEvent(event)" icon="trash">
               <template slot="title">{{translate('dialog.buttons.delete')}}</template>
               <template slot="onHoldTitle">{{translate('dialog.buttons.hold-to-delete')}}</template>
             </hold-button>
@@ -167,6 +167,8 @@
 
   import { getSocket } from '../../../helpers/socket';
 
+  import { Event } from 'src/bot/entity/event';
+
   export default Vue.extend({
     components: {
       'font-awesome-layers': FontAwesomeLayers,
@@ -174,9 +176,7 @@
     data: function () {
       const object: {
         socket: any,
-        events: Events.Event[],
-        filters: Events.Filter[],
-        operations: Events.Operation[],
+        events: Event[],
         search: string,
         showOperationsOfEvent: string[],
         showSettingsOfEvent: string[],
@@ -189,8 +189,6 @@
       } = {
         socket: getSocket('/core/events'),
         events: [],
-        filters: [],
-        operations: [],
         search: '',
         showOperationsOfEvent: [],
         showSettingsOfEvent: [],
@@ -204,7 +202,7 @@
       return object
     },
     computed: {
-      filteredEvents(): Events.Event[] {
+      filteredEvents(): Event[] {
         let events = this.events
         if (this.search.trim() !== '') {
           events = this.events.filter((o) => {
@@ -225,22 +223,10 @@
       },
     },
     mounted() {
-      this.socket.emit('find', { collection: '_events' }, (err, data: Events.Event[]) => {
-        if (err) return console.error(err);
+      this.socket.emit('events::getAll', (data: Event[]) => {
         this.events = data;
-
-        this.socket.emit('find', { collection: '_events.operations' }, (err, data: Events.Operation[]) => {
-          if (err) return console.error(err);
-          this.operations = data;
-
-          this.socket.emit('find', { collection: '_events.filters' }, (err, data: Events.Filter[]) => {
-            if (err) return console.error(err);
-            this.filters = data;
-
-            this.state.loading = this.$state.idle;
-          })
-        })
-      })
+        this.state.loading = this.$state.idle;
+      });
     },
     methods: {
       beforeEnter: function (el) {
@@ -265,12 +251,9 @@
           TweenMax.to(el, 1, { opacity: 0, height: 0, onComplete: done })
         }, delay)
       },
-      deleteEvent(id) {
-        this.socket.emit('delete.event', id, (err, eventId) => {
-          if (err) {
-            return console.error(err);
-          }
-          this.events = this.events.filter((o) => o.id !== eventId)
+      deleteEvent(event) {
+        this.socket.emit('events::remove', event, () => {
+          this.events = this.events.filter((o) => o.id !== event.id)
         })
       },
       triggerTest(id) {
@@ -283,15 +266,7 @@
         });
       },
       sendUpdate(event) {
-        this.socket.emit('update', { collection: '_events', items: [event] })
-      },
-      getOperationsOfEvent(id) {
-        return this.operations.filter((o) => o.eventId === id)
-      },
-      getFiltersOfEvent(id) {
-        return this.filters.filter((o) => o.eventId === id).map((o => {
-          return o.filters
-        })).join(' ');
+        this.socket.emit('events::save', event, () => {})
       },
       isSettingsShown(id) {
         return this.showSettingsOfEvent.includes(id)

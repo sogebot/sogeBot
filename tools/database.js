@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 'use strict';
 require('module-alias/register');
 
@@ -23,8 +24,9 @@ const { Rank } = require('../dest/entity/rank');
 const { SongPlaylist, SongBan } = require('../dest/entity/song');
 const { Timer, TimerResponse } = require('../dest/entity/timer');
 const { Dashboard, Widget } = require('../dest/entity/dashboard');
-const { Variable, VariableHistory, VaraibleWatch } = require('../dest/entity/variable');
+const { Variable, VariableHistory } = require('../dest/entity/variable');
 const { Translation } = require('../dest/entity/translation');
+const { Event, EventOperation } = require('../dest/entity/event');
 
 const _ = require('lodash');
 
@@ -586,6 +588,36 @@ async function main() {
     for (const chunk of _.chunk(items, 100)) {
       process.stdout.write('.')
       await getRepository(Translation).save(chunk);
+    }
+    console.log();
+  }
+
+  console.log(`Migr: events`);
+  await getManager().clear(EventOperation);
+  await getManager().clear(Event);
+  const operations = await from.engine.find('events.operations');
+  items = (await from.engine.find('events'))
+    .map(o => {
+      return {
+        name: o.key,
+        givenName: o.name,
+        isEnabled: o.enabled,
+        triggered: o.triggered,
+        definitions: o.definitions,
+        filter: o.filter || '',
+        operations: operations.filter(f => f.eventId === o.id)
+          .map(f => {
+            return {
+              name: f.key,
+              definitions: f.definitions,
+            };
+          }),
+      };
+    });
+  if (items.length > 0) {
+    for (const chunk of _.chunk(items, 100)) {
+      process.stdout.write('.')
+      await getRepository(Event).save(chunk);
     }
     console.log();
   }

@@ -62,9 +62,6 @@ const connect = async function () {
 };
 
 async function main () {
-  if (!global.db.engine.connected) {
-    return setTimeout(() => main(), 10)
-  }
   if (isMainThread) {
     await connect();
   }
