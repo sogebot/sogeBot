@@ -67,11 +67,6 @@ module.exports = {
 
       debug('test', chalk.bgRed('*** Cleaned successfully ***'));
 
-
-      const collections = await global.db.engine.collections();
-      for (const c of collections) {
-        await global.db.engine.remove(c, {});
-      }
       await global.permissions.ensurePreservedPermissionsInDb(); // re-do core permissions
 
       global.oauth.generalChannel = 'soge__';

@@ -135,8 +135,9 @@ describe('Message - cvars filter', async () => {
                   readOnly: false,
                   currentValue: test.initialValue,
                   type: test.type, responseType: 0,
-                  permission: permission[p] ,
+                  permission: permission[p],
                   evalValue: '',
+                  usableOptions: [],
                 });
               });
               it(`parse '${test.command}' with params`, async () => {
@@ -222,6 +223,7 @@ describe('Message - cvars filter', async () => {
                   responseType: 0,
                   permission: permission[p],
                   evalValue: '',
+                  usableOptions: [],
                 });
               });
               it(`parse '${test.command}' with params`, async () => {
