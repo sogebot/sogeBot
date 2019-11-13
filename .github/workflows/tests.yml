@@ -90,17 +90,17 @@ jobs:
     name: MySQL/MariaDB tests
     if: contains(github.event.pull_request.body, '[skip-tests]') != true
     needs: eslint
-    services:
-      mysql:
-        image: mysql:5.7
-        env:
-          MYSQL_ROOT_PASSWORD: Passw0rd
-          MYSQL_DATABASE: sogebot
-        ports:
-          - 3307:3306
-        options: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     runs-on: ubuntu-latest
     steps:
+    - uses: mirromutth/mysql-action@v1.1
+      with:
+        host port: 3307 # Optional, default value is 3306. The port of host
+        container port: 3307 # Optional, default value is 3306. The port of container
+        character set server: 'utf8' # Optional, default value is 'utf8mb4'. The '--character-set-server' option for mysqld
+        collation server: 'utf8_general_ci' # Optional, default value is 'utf8mb4_general_ci'. The '--collation-server' option for mysqld
+        mysql version: '5.7' # Optional, default value is "latest". The version of the MySQL
+        mysql database: 'sogebot' # Optional, default value is "test". The specified database which will be create
+        mysql root password: 'Passw0rd' # Required if "mysql user" is empty, default is empty. The root superuser password
     - uses: actions/checkout@master
     - name: install node v13
       uses: actions/setup-node@v1
