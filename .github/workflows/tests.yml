@@ -110,7 +110,7 @@ jobs:
     - name: Set proper db to use
       run: npm run test:config:mysql
     - name: Update port 3307->3306
-      run: sed 's/3307/3306/g' ormconfig.json > ormconfig.json
+      run: sed 's/3307/3306/g' ormconfig.json > ormconfig.updated.json; mv ormconfig.updated.json ormconfig.json
     - name: Run mocha
       run: npm test
   mysql2:
