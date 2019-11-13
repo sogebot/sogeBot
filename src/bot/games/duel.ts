@@ -65,7 +65,7 @@ class Duel extends Game {
     }
 
     let winner = _.random(0, total, false);
-    let winnerUser;
+    let winnerUser: DuelEntity | undefined;
     for (const user of users) {
       winner = winner - user.tickets;
       if (winner <= 0) { // winner tickets are <= 0 , we have winner
@@ -74,33 +74,35 @@ class Duel extends Game {
       }
     }
 
-    const probability = winnerUser.tickets / (total / 100);
+    if (winnerUser) {
+      const probability = winnerUser.tickets / (total / 100);
 
-    const m = await prepare(_.size(users) === 1 ? 'gambling.duel.noContestant' : 'gambling.duel.winner', {
-      pointsName: await global.systems.points.getPointsName(total),
-      points: total,
-      probability: _.round(probability, 2),
-      ticketsName: await global.systems.points.getPointsName(winnerUser.tickets),
-      tickets: winnerUser.tickets,
-      winner: winnerUser.username,
-    });
-    sendMessage(m, {
-      username: global.oauth.botUsername,
-      displayName: global.oauth.botUsername,
-      userId: Number(global.oauth.botId),
-      emotes: [],
-      badges: {},
-      'message-type': 'chat',
-    }, { force: true });
+      const m = await prepare(_.size(users) === 1 ? 'gambling.duel.noContestant' : 'gambling.duel.winner', {
+        pointsName: await global.systems.points.getPointsName(total),
+        points: total,
+        probability: _.round(probability, 2),
+        ticketsName: await global.systems.points.getPointsName(winnerUser.tickets),
+        tickets: winnerUser.tickets,
+        winner: winnerUser.username,
+      });
+      sendMessage(m, {
+        username: global.oauth.botUsername,
+        displayName: global.oauth.botUsername,
+        userId: Number(global.oauth.botId),
+        emotes: [],
+        badges: {},
+        'message-type': 'chat',
+      }, { force: true });
 
-    // give user his points
-    await getRepository(User).increment({ userId: winnerUser.id }, 'points', total);
+      // give user his points
+      await getRepository(User).increment({ userId: winnerUser.id }, 'points', total);
 
-    // reset duel
-    await getRepository(DuelEntity).clear();
-    this._timestamp = 0;
+      // reset duel
+      await getRepository(DuelEntity).clear();
+      this._timestamp = 0;
 
-    this.timeouts.pickDuelWinner = global.setTimeout(() => this.pickDuelWinner(), 30000);
+      this.timeouts.pickDuelWinner = global.setTimeout(() => this.pickDuelWinner(), 30000);
+    }
   }
 
   @command('!duel bank')

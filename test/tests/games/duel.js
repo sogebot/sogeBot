@@ -130,9 +130,9 @@ describe('Gambling - duel', () => {
     it('create duel', async () => {
       global.games.duel._timestamp = Number(new Date());
 
-      for (const username of ['testuser', 'testuser2', 'testuser3', 'testuser4', 'testuser5']) {
+      for (const [id, username] of Object.entries(['testuser', 'testuser2', 'testuser3', 'testuser4', 'testuser5'])) {
         const tickets = Math.floor(Number.MAX_SAFE_INTEGER / 10000000);
-        await getRepository(Duel).save({ username, tickets: tickets });
+        await getRepository(Duel).save({ id: Number(id), username, tickets: tickets });
       }
     });
 
