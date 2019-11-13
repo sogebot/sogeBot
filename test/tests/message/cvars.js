@@ -130,7 +130,14 @@ describe('Message - cvars filter', async () => {
                 }
               });
               it(`create initial value '${test.initialValue}' of ${test.variable}`, async () => {
-                await getRepository(Variable).save({ variableName: test.variable, readOnly: false, currentValue: test.initialValue, type: test.type, responseType: 0, permission: permission[p] });
+                await getRepository(Variable).save({
+                  variableName: test.variable,
+                  readOnly: false,
+                  currentValue: test.initialValue,
+                  type: test.type, responseType: 0,
+                  permission: permission[p] ,
+                  evalValue: '',
+                });
               });
               it(`parse '${test.command}' with params`, async () => {
                 message = await new Message(test.command).parse({
@@ -207,7 +214,15 @@ describe('Message - cvars filter', async () => {
                 }
               });
               it(`create initial value '${test.initialValue}' of ${test.variable}`, async () => {
-                await getRepository(Variable).save({ variableName: test.variable, readOnly: true, currentValue: test.initialValue, type: test.type, responseType: 0, permission: permission[p] });
+                await getRepository(Variable).save({
+                  variableName: test.variable,
+                  readOnly: true,
+                  currentValue: test.initialValue,
+                  type: test.type,
+                  responseType: 0,
+                  permission: permission[p],
+                  evalValue: '',
+                });
               });
               it(`parse '${test.command}' with params`, async () => {
                 message = await new Message(test.command).parse({

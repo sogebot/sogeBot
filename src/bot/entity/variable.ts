@@ -22,7 +22,7 @@ export class Variable {
   type!: 'eval' | 'number' | 'options' | 'text';
   @Column('simple-json')
   currentValue!: any;
-  @Column('text', { default: '' })
+  @Column('text')
   evalValue!: string;
   @Column({ default: 60000 })
   runEveryTypeValue!: number;
@@ -38,7 +38,7 @@ export class Variable {
   permission!: string;
   @Column({ default: false })
   readOnly!: boolean;
-  @Column('simple-array', { default: '' })
+  @Column('simple-array')
   usableOptions!: string[];
   @Column('bigint', { transformer: new ColumnNumericTransformer(), default: 0 })
   runAt!: number;
