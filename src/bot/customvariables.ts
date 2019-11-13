@@ -116,7 +116,6 @@ class CustomVariables {
           if (!item) {
             throw new Error('Variable not found');
           }
-          item.evalValue = '';
           item.currentValue = await this.runScript(item.evalValue, { _current: item.currentValue });
           item.runAt = Date.now();
           cb(null, await getRepository(Variable).save(item));
@@ -353,6 +352,8 @@ class CustomVariables {
       item.variableName = variableName;
       item.currentValue = String(currentValue);
       item.responseType = 0;
+      item.evalValue = '';
+      item.usableOptions = [];
       item.type = 'text';
       item.permission = permission.MODERATORS;
     } else {
