@@ -10,7 +10,7 @@ import { error, info, warning } from './helpers/log';
 
 import { getManager, getRepository } from 'typeorm';
 import { Settings } from './entity/settings';
-import { Permissions as PermissionsEntity } from './entity/permissions';
+import { PermissionCommands, Permissions as PermissionsEntity } from './entity/permissions';
 import { adminEndpoint, publicEndpoint } from './helpers/socket';
 
 class Module {
@@ -340,12 +340,12 @@ class Module {
     if (this._commands.length > 0) {
       promisedSettings._permissions = {};
       for (const command of this._commands) {
-        const key = typeof command === 'string' ? command : command.name;
-        const pItem = await global.db.engine.findOne(global.permissions.collection.commands, { key });
-        if (!_.isEmpty(pItem)) {
-          promisedSettings._permissions[key] = pItem.permission;
+        const name = typeof command === 'string' ? command : command.name;
+        const pItem = await getRepository(PermissionCommands).findOne({ name });
+        if (pItem) {
+          promisedSettings._permissions[name] = pItem.permission;
         } else {
-          promisedSettings._permissions[key] = command.permission;
+          promisedSettings._permissions[name] = command.permission;
         }
       }
     }

@@ -123,7 +123,7 @@ export default class aliasList extends Vue {
       this.permissions = data;
       this.state.loadingPrm = this.$state.success;
     })
-    this.socket.emit('find', {}, (err, items) => {
+    this.socket.emit('alias:getAll', (err, items) => {
       this.items = orderBy(items, 'alias', 'asc');
       this.state.loadingAls = this.$state.success;
     })

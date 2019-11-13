@@ -118,7 +118,7 @@ export default class quotesList extends Vue {
   socket = getSocket('/systems/quotes');
 
   created() {
-    this.socket.emit('find', {}, async (err, items: Quotes[]) => {
+    this.socket.emit('quotes:getAll', {}, async (err, items: Quotes[]) => {
       this.quotesFromDb = items
       this.state.loading = this.$state.success;
     })

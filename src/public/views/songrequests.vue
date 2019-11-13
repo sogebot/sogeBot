@@ -58,7 +58,7 @@ export default class songrequest extends Vue {
   mounted() {
     this.state.loading.requests = this.$state.progress;
     setInterval(() => {
-      this.socket.emit('find.request', {}, (err, items) => {
+      this.socket.emit('songs::getAllRequests', {}, (err, items) => {
         console.debug('Loaded', {requests: items})
         this.requests = items
         this.state.loading.requests = this.$state.success;

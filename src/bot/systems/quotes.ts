@@ -18,7 +18,7 @@ class Quotes extends System {
   }
 
   sockets() {
-    publicEndpoint(this.nsp, 'find', async (_opts, cb) => {
+    publicEndpoint(this.nsp, 'quotes:getAll', async (_opts, cb) => {
       const items = await getManager()
         .createQueryBuilder()
         .select('quote')

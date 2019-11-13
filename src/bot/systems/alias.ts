@@ -35,7 +35,7 @@ class Alias extends System {
   }
 
   sockets() {
-    publicEndpoint(this.nsp, 'find', async (_opts, cb) => {
+    publicEndpoint(this.nsp, 'alias:getAll', async (cb) => {
       cb(null, await getRepository(AliasEntity).find());
     });
 

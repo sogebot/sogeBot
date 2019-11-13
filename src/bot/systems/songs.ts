@@ -105,11 +105,11 @@ class Songs extends System {
     adminEndpoint(this.nsp, 'songs::save', async (item: SongPlaylist, cb) => {
       cb(null, await getRepository(SongPlaylist).save(item));
     });
-    adminEndpoint(this.nsp, 'find.ban', async (where, cb) => {
+    adminEndpoint(this.nsp, 'songs::getAllBanned', async (where, cb) => {
       where = where || {};
       cb(null, await getRepository(SongBan).find(where));
     });
-    publicEndpoint(this.nsp, 'find.request', async (where, cb) => {
+    publicEndpoint(this.nsp, 'songs::getAllRequests', async (where, cb) => {
       where = where || {};
       cb(null, await getRepository(SongRequest).find({
         ...where,

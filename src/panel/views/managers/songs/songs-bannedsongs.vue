@@ -98,7 +98,7 @@ export default class playlist extends Vue {
 
   refreshBanlist() {
     this.state.loading = this.$state.progress;
-    this.socket.emit('find.ban', {}, (err, items) => {
+    this.socket.emit('songs::getAllBanned', {}, (err, items) => {
       this.items = items
       this.state.loading = this.$state.success;
     })

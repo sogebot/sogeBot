@@ -38,16 +38,10 @@ export const isUserLoggedIn = async function () {
       // save userId to db
       await new Promise((resolve, reject) => {
         const socket = getSocket('/core/users');
-        socket.emit('update', {
-          collection: '_users',
-          key: 'id',
-          items: [
-            {
-              id: data.id,
-              username: data.login,
-            },
-          ],
-        }, (err, data) => {
+        socket.emit('viewers::updateId', {
+          userId: Number(data.id),
+          username: data.login,
+        }, (err) => {
           if (err) {
             reject(err);
           } else {
