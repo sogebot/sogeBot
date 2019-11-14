@@ -29,6 +29,7 @@ const { Translation } = require('../dest/entity/translation');
 const { Event, EventOperation } = require('../dest/entity/event');
 const { Goal, GoalGroup } = require('../dest/entity/goal');
 const { TwitchClips, TwitchStats } = require('../dest/entity/twitch');
+const { Carousel } = require('../dest/entity/carousel');
 
 const _ = require('lodash');
 
@@ -61,7 +62,7 @@ const dbName = {
     } else {
       return null;
     };
-  }
+  },
 };
 
 const from = new (require('../dest/databases/database'))(false, false, argv.from, dbName.from());
@@ -94,8 +95,8 @@ async function main() {
   });
   if (items.length > 0) {
     for (const chunk of _.chunk(items, 100)) {
-      process.stdout.write('.')
-      await getRepository(CacheTitles).insert(chunk)
+      process.stdout.write('.');
+      await getRepository(CacheTitles).insert(chunk);
     }
     console.log();
   }
@@ -132,8 +133,8 @@ async function main() {
   });
   if (items.length > 0) {
     for (const chunk of _.chunk(items, 100)) {
-      process.stdout.write('.')
-      await getRepository(EventList).insert(chunk)
+      process.stdout.write('.');
+      await getRepository(EventList).insert(chunk);
     }
     console.log();
   }
@@ -145,8 +146,8 @@ async function main() {
   });
   if (items.length > 0) {
     for (const chunk of _.chunk(items, 100)) {
-      process.stdout.write('.')
-      await getRepository(Quotes).insert(chunk)
+      process.stdout.write('.');
+      await getRepository(Quotes).insert(chunk);
     }
     console.log();
   }
@@ -158,8 +159,8 @@ async function main() {
   });
   if (items.length > 0) {
     for (const chunk of _.chunk(items, 100)) {
-      process.stdout.write('.')
-      await getRepository(Alias).insert(chunk)
+      process.stdout.write('.');
+      await getRepository(Alias).insert(chunk);
     }
     console.log();
   }
@@ -190,7 +191,7 @@ async function main() {
   });
   if (items.length > 0) {
     for (const chunk of _.chunk(items, 100)) {
-      process.stdout.write('.')
+      process.stdout.write('.');
       await getRepository(Commands).save(chunk);
     }
     console.log();
@@ -203,7 +204,7 @@ async function main() {
   });
   if (items.length > 0) {
     for (const chunk of _.chunk(items, 100)) {
-      process.stdout.write('.')
+      process.stdout.write('.');
       await getRepository(CommandsCount).insert(chunk);
     }
     console.log();
@@ -220,8 +221,8 @@ async function main() {
   });
   if (items.length > 0) {
     for (const chunk of _.chunk(items, 100)) {
-      process.stdout.write('.')
-      await getRepository(Permissions).insert(chunk)
+      process.stdout.write('.');
+      await getRepository(Permissions).insert(chunk);
     }
     console.log();
   }
@@ -248,7 +249,7 @@ async function main() {
   });
   if (items.length > 0) {
     for (const chunk of _.chunk(items, 100)) {
-      process.stdout.write('.')
+      process.stdout.write('.');
       await getRepository(Cooldown).save(chunk);
     }
     console.log();
@@ -267,7 +268,7 @@ async function main() {
   });
   if (items.length > 0) {
     for (const chunk of _.chunk(items, 100)) {
-      process.stdout.write('.')
+      process.stdout.write('.');
       await getRepository(Highlight).save(chunk);
     }
     console.log();
@@ -296,7 +297,7 @@ async function main() {
   });
   if (items.length > 0) {
     for (const chunk of _.chunk(items, 100)) {
-      process.stdout.write('.')
+      process.stdout.write('.');
       await getRepository(Keyword).save(chunk);
     }
     console.log();
@@ -355,7 +356,7 @@ async function main() {
           message: t.message,
           tippedAt: t.timestamp,
           sortAmount: t._amount,
-        }
+        };
       }),
 
       bits: bits.filter(t => t.id === o.id).map(t => {
@@ -363,11 +364,11 @@ async function main() {
           amount: t.amount,
           message: t.message,
           cheeredAt: t.timestamp,
-        }
+        };
       }),
 
       messages: (messages.find(m => m.id === o.id) || { messages: 0 }).messages,
-      giftedSubscribes: _.get(o, 'custom.subgiftCount', 0)
+      giftedSubscribes: _.get(o, 'custom.subgiftCount', 0),
     };
   });
   if (items.length > 0) {
@@ -389,7 +390,7 @@ async function main() {
   });
   if (items.length > 0) {
     for (const chunk of _.chunk(items, 100)) {
-      process.stdout.write('.')
+      process.stdout.write('.');
       await getRepository(Price).save(chunk);
     }
     console.log();
@@ -405,7 +406,7 @@ async function main() {
   });
   if (items.length > 0) {
     for (const chunk of _.chunk(items, 100)) {
-      process.stdout.write('.')
+      process.stdout.write('.');
       await getRepository(Rank).save(chunk);
     }
     console.log();
@@ -429,7 +430,7 @@ async function main() {
   });
   if (items.length > 0) {
     for (const chunk of _.chunk(items, 100)) {
-      process.stdout.write('.')
+      process.stdout.write('.');
       await getRepository(SongPlaylist).save(chunk);
     }
     console.log();
@@ -445,7 +446,7 @@ async function main() {
   });
   if (items.length > 0) {
     for (const chunk of _.chunk(items, 100)) {
-      process.stdout.write('.')
+      process.stdout.write('.');
       await getRepository(SongBan).save(chunk);
     }
     console.log();
@@ -477,7 +478,7 @@ async function main() {
   });
   if (items.length > 0) {
     for (const chunk of _.chunk(items, 100)) {
-      process.stdout.write('.')
+      process.stdout.write('.');
       await getRepository(Timer).save(chunk);
     }
     console.log();
@@ -523,7 +524,7 @@ async function main() {
   });
   if (items.length > 0) {
     for (const chunk of _.chunk(items, 100)) {
-      process.stdout.write('.')
+      process.stdout.write('.');
       await getRepository(Dashboard).save(chunk);
     }
     console.log();
@@ -532,7 +533,7 @@ async function main() {
   console.log(`Migr: custom.variables, custom.variables.history`);
   await getManager().clear(VariableHistory);
   await getManager().clear(Variable);
-  const history = (await from.engine.find('custom.variables.history'))
+  const history = (await from.engine.find('custom.variables.history'));
   items = (await from.engine.find('custom.variables')).map(o => {
     return {
       id: o.id,
@@ -558,21 +559,21 @@ async function main() {
             oldValue: hm.oldValue,
             currentValue: hm.currentValue,
             changedAt: new Date(hm.timestamp).getTime(),
-          }
+          };
         }),
       urls: o.urls ? o.urls.map(u => {
         return {
           id: u.id,
           GET: u.access.GET,
           POST: u.access.POST,
-          showResponse: u.showResponse
-        }
+          showResponse: u.showResponse,
+        };
       }) : [],
     };
   });
   if (items.length > 0) {
     for (const chunk of _.chunk(items, 100)) {
-      process.stdout.write('.')
+      process.stdout.write('.');
       await getRepository(Variable).save(chunk);
     }
     console.log();
@@ -588,7 +589,7 @@ async function main() {
   });
   if (items.length > 0) {
     for (const chunk of _.chunk(items, 100)) {
-      process.stdout.write('.')
+      process.stdout.write('.');
       await getRepository(Translation).save(chunk);
     }
     console.log();
@@ -618,7 +619,7 @@ async function main() {
     });
   if (items.length > 0) {
     for (const chunk of _.chunk(items, 100)) {
-      process.stdout.write('.')
+      process.stdout.write('.');
       await getRepository(Event).save(chunk);
     }
     console.log();
@@ -654,7 +655,7 @@ async function main() {
     });
   if (items.length > 0) {
     for (const chunk of _.chunk(items, 100)) {
-      process.stdout.write('.')
+      process.stdout.write('.');
       await getRepository(GoalGroup).save(chunk);
     }
     console.log();
@@ -677,11 +678,11 @@ async function main() {
         currentHosts: o.currentHosts || 0,
         newChatters: o.newChatters || 0,
         currentWatched: o.currentWatched || 0,
-      }
+      };
     });
   if (items.length > 0) {
     for (const chunk of _.chunk(items, 100)) {
-      process.stdout.write('.')
+      process.stdout.write('.');
       await getRepository(TwitchStats).save(chunk);
     }
     console.log();
@@ -695,8 +696,19 @@ async function main() {
     });
   if (items.length > 0) {
     for (const chunk of _.chunk(items, 100)) {
-      process.stdout.write('.')
+      process.stdout.write('.');
       await getRepository(TwitchClips).save(chunk);
+    }
+    console.log();
+  }
+
+  console.log(`Migr: overlays.carousel`);
+  await getManager().clear(Carousel);
+  items = await from.engine.find('overlays.carousel');
+  if (items.length > 0) {
+    for (const chunk of _.chunk(items, 100)) {
+      process.stdout.write('.');
+      await getRepository(Carousel).save(chunk);
     }
     console.log();
   }

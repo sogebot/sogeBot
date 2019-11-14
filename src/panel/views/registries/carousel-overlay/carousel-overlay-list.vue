@@ -74,6 +74,7 @@ import { faCircleNotch, faUpload, faLongArrowAltUp, faLongArrowAltDown } from '@
 library.add(faCircleNotch, faUpload, faLongArrowAltUp, faLongArrowAltDown);
 
 import { getSocket } from 'src/panel/helpers/socket';
+import { Carousel } from '../../../../bot/entity/carousel';
 
 @Component({
   components: {
@@ -89,7 +90,7 @@ export default class carouselOverlayList extends Vue {
     { key: 'buttons', label: '' },
   ];
 
-  items: Types.Carousel.Item[] = []
+  items: Carousel[] = []
 
   state: {
     loading: number;
@@ -107,7 +108,7 @@ export default class carouselOverlayList extends Vue {
 
   refresh() {
     this.state.loading = this.$state.progress;
-    this.socket.emit('find', {}, (err, items) => {
+    this.socket.emit('carousel::getAll', (items) => {
       this.items = items;
       this.state.loading = this.$state.success;
     })
@@ -129,7 +130,7 @@ export default class carouselOverlayList extends Vue {
       }
       return o
     })
-    this.socket.emit('update', { items: this.items });
+    this.socket.emit('carousel::save', this.items, () => {});
   }
 
   moveDown(order) {
@@ -141,7 +142,7 @@ export default class carouselOverlayList extends Vue {
       }
       return o
     })
-    this.socket.emit('update', { items: this.items });
+    this.socket.emit('carousel::save', this.items, () => {});
   }
 
   filesChange(files) {
@@ -152,7 +153,7 @@ export default class carouselOverlayList extends Vue {
     for (let i = 0, l = files.length; i < l; i++) {
       const reader = new FileReader()
       reader.onload = ((e: any )=> {
-        this.socket.emit('upload', e.target.result, (image) => {
+        this.socket.emit('carousel::insert', e.target.result, (image) => {
           this.uploadedFiles++
           this.items.push(image)
         })
@@ -167,7 +168,7 @@ export default class carouselOverlayList extends Vue {
   }
 
   remove(item) {
-    this.socket.emit('delete.image', item.id, () => {
+    this.socket.emit('carousel::remove', item.id, () => {
       this.refresh();
     });
   }

@@ -1,9 +1,10 @@
-import * as _ from 'lodash';
-
 import Overlay from './_interface';
 import { ui } from '../decorators';
 import uuid from 'uuid/v4';
-import { adminEndpoint } from '../helpers/socket';
+import { adminEndpoint, publicEndpoint } from '../helpers/socket';
+
+import { getRepository } from 'typeorm';
+import { Carousel as CarouselEntity } from '../entity/carousel';
 
 class Carousel extends Overlay {
   @ui({
@@ -21,17 +22,36 @@ class Carousel extends Overlay {
   }
 
   sockets () {
-    adminEndpoint(this.nsp, 'delete.image', async (id, cb) => {
-      await global.db.engine.remove('overlays.carousel', { id });
+    publicEndpoint(this.nsp, 'carousel::getOne', async (id: string, cb) => {
+      cb(await getRepository(CarouselEntity).findOne({ id }));
+    });
+    publicEndpoint(this.nsp, 'carousel::getAll', async (cb) => {
+      cb(await getRepository(CarouselEntity).find({
+        order: {
+          order: 'ASC',
+        },
+      }));
+    });
+    adminEndpoint(this.nsp, 'carousel::save', async (items: CarouselEntity[], cb) => {
+      cb(await getRepository(CarouselEntity).save(items));
+    });
+
+    adminEndpoint(this.nsp, 'carousel::remove', async (id, cb) => {
+      await getRepository(CarouselEntity).delete({ id });
       // force reorder
-      const images = _.orderBy(await global.db.engine.find('overlays.carousel'), 'order', 'asc');
+      const images = await getRepository(CarouselEntity).find({
+        order: {
+          order: 'ASC',
+        },
+      });
       for (let order = 0; order < images.length; order++) {
-        await global.db.engine.update('overlays.carousel', { id: images[order].id }, { order });
+        images[order].order = 0;
       }
+      await getRepository(CarouselEntity).save(images);
       cb();
     });
 
-    adminEndpoint(this.nsp, 'upload', async (data, cb) => {
+    adminEndpoint(this.nsp, 'carousel::insert', async (data, cb) => {
       const matches = data.match(/^data:([A-Za-z-+/]+);base64,(.+)$/);
       if (matches.length !== 3) {
         return false;
@@ -40,26 +60,25 @@ class Carousel extends Overlay {
       const type = matches[1];
       const base64 = matches[2];
 
-      const order = (await global.db.engine.find('overlays.carousel')).length;
-      const image = await global.db.engine.insert('overlays.carousel',
-        {
-          id: uuid(),
-          type,
-          base64,
-          // timers in ms
-          waitBefore: 0,
-          waitAfter: 0,
-          duration: 5000,
-          // animation
-          animationInDuration: 1000,
-          animationIn: 'fadeIn',
-          animationOutDuration: 1000,
-          animationOut: 'fadeOut',
-          // order
-          order,
-          // showOnlyOncePerStream
-          showOnlyOncePerStream: false,
-        });
+      const order = await getRepository(CarouselEntity).count();
+      const image = await getRepository(CarouselEntity).save({
+        id: uuid(),
+        type,
+        base64,
+        // timers in ms
+        waitBefore: 0,
+        waitAfter: 0,
+        duration: 5000,
+        // animation
+        animationInDuration: 1000,
+        animationIn: 'fadeIn',
+        animationOutDuration: 1000,
+        animationOut: 'fadeOut',
+        // order
+        order,
+        // showOnlyOncePerStream
+        showOnlyOncePerStream: false,
+      });
       cb(image);
     });
   }
