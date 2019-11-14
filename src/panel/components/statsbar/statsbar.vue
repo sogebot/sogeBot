@@ -283,7 +283,7 @@
 
 <script lang="ts">
   import Vue from 'vue'
-  import { isNil, get } from 'lodash-es'
+  import { isNil } from 'lodash-es'
 
   import { EventBus } from 'src/panel/helpers/event-bus';
   import { getSocket } from 'src/panel/helpers/socket';
@@ -533,11 +533,9 @@
         this.highlightsSocket.emit('highlight')
       },
       filterTags (is_auto) {
-        return this.tags.filter(o => o.is_auto === is_auto).map((o) => {
-          const lang = get(this.configuration, 'lang', 'en')
-          const localekey  = Object.keys(o.localization_names).find((l) => l.includes(lang))
-          if (localekey) {
-            return { name: o.localization_names[localekey], is_auto: o.is_auto }
+        return this.tags.filter(o => !!o.is_auto === is_auto).map((o) => {
+          return {
+            name: o.value, is_auto: !!o.is_auto
           }
         }).sort((a, b) => {
           if ((a || { name: ''}).name < (b || { name: ''}).name)  { //sort string ascending

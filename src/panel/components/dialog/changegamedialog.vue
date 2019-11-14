@@ -120,8 +120,12 @@
         draggingGame: string | null,
         draggingEnter: number,
         draggingTimestamp: number,
-        currentTags: any[],
-        cachedTags: any[],
+        currentTags: string[],
+        cachedTags: {
+          tag_id: string;
+          locale: string;
+          value: string;
+        }[],
 
         saveState: -1 | 0 | 1 | 2;
         show: boolean;
@@ -242,20 +246,20 @@
         }
       },
       searchForTags(value) {
-        this.searchForTagsOpts = this.cachedTags.map(o => {
-          const localization = Object.keys(o.localization_names).find(p => p.includes(this.configuration.lang))
-          return o.localization_names[localization || 'en-us']
-        }).filter(o => {
-          return o.toLowerCase().includes(value) && !this.currentTags.includes(o)
-        }).sort((a, b) => {
-          if ((a || { name: ''}).name < (b || { name: ''}).name)  { //sort string ascending
-            return -1;
-          }
-          if ((a || { name: ''}).name > (b || { name: ''}).name) {
-            return 1;
-          }
-          return 0; //default return value (no sorting)
-        });
+        this.searchForTagsOpts = Array.from(new Set(this.cachedTags
+          .map(o => o.value)
+          .filter(o => {
+            return o && o.toLowerCase().includes(value) && !this.currentTags.includes(o)
+          }).sort((a, b) => {
+            if (a < b)  { //sort string ascending
+              return -1;
+            }
+            if (a > b) {
+              return 1;
+            }
+            return 0; //default return value (no sorting)
+          })
+        ));
       }
     },
     computed: {
@@ -314,11 +318,11 @@
         if (!this.currentGame) {
           this.currentGame = data.game;
           this.currentTitle = data.status;
-          this.currentTags = data.tags.filter(o => !o.is_auto).map(o => {
-            const localization = Object.keys(o.localization_names).find(p => p.includes(this.configuration.lang))
-            return o.localization_names[localization || 'en-us']
-          });
+          this.currentTags = data.tags.filter(o => o.is_current === 1 && o.is_auto === 0).map(o => {
+            return o.value;
+          })
         }
+        console.log(this.currentTags)
       });
 
       EventBus.$on('show-game_and_title_dlg', () => {

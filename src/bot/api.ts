@@ -17,8 +17,9 @@ import { shared } from './decorators';
 import { getChannelChattersUnofficialAPI } from './microservices/getChannelChattersUnofficialAPI';
 import { ThreadEvent } from './entity/threadEvent';
 
-import { getManager, getRepository } from 'typeorm';
+import { getManager, getRepository, IsNull, Not } from 'typeorm';
 import { User } from './entity/user';
+import { TwitchTag, TwitchTagLocalizationDescription, TwitchTagLocalizationName } from './entity/twitch';
 
 const setImmediateAwait = () => {
   return new Promise(resolve => {
@@ -398,7 +399,7 @@ class API extends Core {
     const notEnoughAPICalls = this.calls.bot.remaining <= 30 && this.calls.bot.refresh > Date.now() / 1000;
 
     if (needToWait || notEnoughAPICalls) {
-      delete opts.count;
+      delete opts.cursor;
       return { state: false, opts };
     }
 
@@ -412,8 +413,26 @@ class API extends Core {
       const tags = request.data.data;
 
       for(const tag of tags) {
-        await global.db.engine.update('core.api.tags', { tag_id: tag.tag_id }, tag);
+        await getRepository(TwitchTag).save({
+          ...new TwitchTag(),
+          tag_id: tag.tag_id,
+          is_auto: tag.is_auto,
+          localization_names: Object.keys(tag.localization_names).map(key => {
+            return {
+              locale: key,
+              value: tag.localization_names[key],
+            };
+          }),
+          localization_descriptions: Object.keys(tag.localization_descriptions).map(key => {
+            return {
+              locale: key,
+              value: tag.localization_descriptions[key],
+            };
+          }),
+        });
       }
+      await getRepository(TwitchTagLocalizationDescription).delete({ tagId: IsNull() });
+      await getRepository(TwitchTagLocalizationName).delete({ tagId: IsNull() });
 
       if (global.panel && global.panel.io) {
         global.panel.io.emit('api.stats', { data: tags, timestamp: Date.now(), call: 'getAllStreamTags', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining });
@@ -426,7 +445,7 @@ class API extends Core {
 
       if (tags.length === 100) {
         // move to next page
-        this.getAllStreamTags({ cursor: request.data.pagination.cursor });
+        return this.getAllStreamTags({ cursor: request.data.pagination.cursor });
       }
     } catch (e) {
       error(`${url} - ${e.message}`);
@@ -434,7 +453,7 @@ class API extends Core {
         global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'getChannelSubscribers', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot.remaining });
       }
     }
-    delete opts.count;
+    delete opts.cursor;
     return { state: true, opts };
 
   }
@@ -496,7 +515,7 @@ class API extends Core {
 
       if (subscribers.length === 100) {
         // move to next page
-        this.getChannelSubscribers({ cursor: request.data.pagination.cursor, count: subscribers.length + opts.count, subscribers });
+        return this.getChannelSubscribers({ cursor: request.data.pagination.cursor, count: subscribers.length + opts.count, subscribers });
       } else {
         this.stats.currentSubscribers = subscribers.length + opts.count;
         this.setSubscribers(opts.subscribers.filter(o => !isBroadcaster(o.user_name) && !isBot(o.user_name)));
@@ -903,9 +922,9 @@ class API extends Core {
 
       if (request.status === 200 && !isNil(request.data.data[0])) {
         const tags = request.data.data;
-        await global.db.engine.remove('core.api.currentTags', {});
+        await getRepository(TwitchTag).update({}, { is_current: false });
         for (const tag of tags) {
-          await global.db.engine.update('core.api.currentTags', { tag_id: tag.tag_id }, tag);
+          await getRepository(TwitchTag).update({ tag_id: tag.tag_id }, { is_current: true });
         }
       }
     } catch (e) {
@@ -1172,30 +1191,33 @@ class API extends Core {
     }
 
     try {
-      const tags = (await global.db.engine.find('core.api.tags'))
-        .filter(o => {
-          const localization = Object.keys(o.localization_names).find(p => p.includes(global.general.lang));
-          return tagsArg.includes(o.localization_names[localization || '']);
+      const tag_ids: string[] = [];
+      for (const tag of tagsArg) {
+        const name = await getRepository(TwitchTagLocalizationName).findOne({
+          where: {
+            value: tag,
+            tagId: Not(IsNull()),
+          },
         });
+        if (name && name.tagId) {
+          tag_ids.push(name.tagId);
+        }
+      }
+
       const request = await axios({
         method: 'put',
         url,
         data: {
-          tag_ids: tags.map(o => {
-            return o.tag_id;
-          }),
+          tag_ids,
         },
         headers: {
           'Authorization': 'Bearer ' + token,
           'Content-Type': 'application/json',
         },
       });
-      await global.db.engine.remove('core.api.currentTags', { is_auto: false });
-      if (tags.length > 0) {
-        await global.db.engine.insert('core.api.currentTags', tags.map(o => {
-          delete o._id;
-          return o;
-        }));
+      await getRepository(TwitchTag).update({ is_auto: false }, { is_current: false });
+      for (const tag_id of tag_ids) {
+        await getRepository(TwitchTag).update({ tag_id }, { is_current: true });
       }
       if (global.panel && global.panel.io) {
         global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'setTags', api: 'helix', endpoint: url, code: request.status, data: request.data });

@@ -16,6 +16,7 @@ import uuid from 'uuid'
 import { getManager, getRepository } from 'typeorm';
 import { Dashboard, Widget } from './entity/dashboard';
 import { Translation } from './entity/translation'
+import { TwitchTag, TwitchTagLocalizationName } from './entity/twitch'
 
 const Parser = require('./parser')
 
@@ -123,9 +124,34 @@ function Panel () {
 
 
     socket.on('metrics.translations', function (key) { global.lib.translate.addMetrics(key, true) })
+
     socket.on('getCachedTags', async (cb) => {
-      cb(await global.db.engine.find('core.api.tags'))
-    })
+      let query = getRepository(TwitchTag)
+        .createQueryBuilder('tags')
+        .select('names.locale', 'locale')
+        .addSelect('names.value', 'value')
+        .addSelect('tags.tag_id', 'tag_id')
+        .addSelect('tags.is_auto', 'is_auto')
+        .addSelect('tags.is_current', 'is_current')
+        .leftJoinAndSelect(TwitchTagLocalizationName, 'names', `"names"."tagId" = "tag_id" AND "names"."locale" like "%${global.general.lang}%"`);
+
+      let results = await query.execute();
+      if (results.length > 0) {
+        cb(results);
+      } else {
+        // if we don';t have results with our selected locale => reload with en-us
+        query = getRepository(TwitchTag)
+          .createQueryBuilder('tags')
+          .select('names.locale', 'locale')
+          .addSelect('names.value', 'value')
+          .addSelect('tags.tag_id', 'tag_id')
+          .addSelect('tags.is_auto', 'is_auto')
+          .addSelect('tags.is_current', 'is_current')
+          .leftJoinAndSelect(TwitchTagLocalizationName, 'names', `"names"."tagId" = "tag_id" AND "names"."locale" = "en-us"`);
+        results = await query.execute();
+      }
+      cb(results);
+    });
     // twitch game and title change
     socket.on('getGameFromTwitch', function (game) { global.api.sendGameFromTwitch(global.api, socket, game) })
     socket.on('getUserTwitchGames', async () => {
@@ -533,7 +559,32 @@ Panel.prototype.sendStreamData = async function (self, socket) {
       spotifyCurrentSong = null;
     }
 
-    var data = {
+    let tagQuery = getRepository(TwitchTag)
+      .createQueryBuilder('tags')
+      .select('names.locale', 'locale')
+      .addSelect('names.value', 'value')
+      .addSelect('tags.tag_id', 'tag_id')
+      .addSelect('tags.is_auto', 'is_auto')
+      .addSelect('tags.is_current', 'is_current')
+      .where('is_current = True')
+      .leftJoinAndSelect(TwitchTagLocalizationName, 'names', `"names"."tagId" = "tag_id" AND "names"."locale" like "%${global.general.lang}%"`);
+
+    let tagResults = await tagQuery.execute();
+    if (tagResults.length === 0) {
+      // if we don';t have results with our selected locale => reload with en-us
+      tagQuery = getRepository(TwitchTag)
+        .createQueryBuilder('tags')
+        .select('names.locale', 'locale')
+        .addSelect('names.value', 'value')
+        .addSelect('tags.tag_id', 'tag_id')
+        .addSelect('tags.is_auto', 'is_auto')
+        .addSelect('tags.is_current', 'is_current')
+        .where('is_current = True')
+        .leftJoinAndSelect(TwitchTagLocalizationName, 'names', `"names"."tagId" = "tag_id" AND "names"."locale" = "en-us"`);
+      tagResults = await tagQuery.execute();
+    }
+
+    const data = {
       broadcasterType: global.oauth.broadcasterType,
       uptime: commons.getTime(global.api.isStreamOnline ? global.api.streamStatusChangeSince : null, false),
       currentViewers: global.api.stats.currentViewers,
@@ -552,7 +603,7 @@ Panel.prototype.sendStreamData = async function (self, socket) {
       currentSong: ytCurrentSong || spotifyCurrentSong || global.translate('songs.not-playing'),
       currentHosts: global.api.stats.currentHosts,
       currentWatched: global.api.stats.currentWatchedTime,
-      tags: await global.db.engine.find('core.api.currentTags'),
+      tags: tagResults,
     }
     socket.emit('stats', data)
   } catch (e) {
