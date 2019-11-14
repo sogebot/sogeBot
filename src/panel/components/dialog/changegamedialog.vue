@@ -322,7 +322,6 @@
             return o.value;
           })
         }
-        console.log(this.currentTags)
       });
 
       EventBus.$on('show-game_and_title_dlg', () => {

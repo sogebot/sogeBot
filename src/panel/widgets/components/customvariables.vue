@@ -194,7 +194,6 @@ export default {
         let filtered = this.watched.filter((o) => o.variableId === variable.id)
         if (filtered.length === 0) nonWatched.push(variable)
       }
-      console.log({nonWatched})
       return nonWatched
     },
     nonWatchedVariablesCount: function () {

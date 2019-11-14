@@ -147,7 +147,6 @@ export default {
           i++;
         }
       }
-      console.log({layout});
       this.layout = layout;
     },
     removeWidget(name) {

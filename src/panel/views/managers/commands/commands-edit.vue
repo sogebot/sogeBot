@@ -326,7 +326,6 @@ export default class CommandsEdit extends Vue {
           resolve()
         });
       });
-      console.log('b')
       await new Promise((resolve, reject) => {
         if (this.count === 0) {
           console.debug('Resetting count');
