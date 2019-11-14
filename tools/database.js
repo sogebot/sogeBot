@@ -30,6 +30,7 @@ const { Event, EventOperation } = require('../dest/entity/event');
 const { Goal, GoalGroup } = require('../dest/entity/goal');
 const { TwitchClips, TwitchStats } = require('../dest/entity/twitch');
 const { Carousel } = require('../dest/entity/carousel');
+const { Gallery } = require('../dest/entity/gallery');
 
 const _ = require('lodash');
 
@@ -709,6 +710,17 @@ async function main() {
     for (const chunk of _.chunk(items, 100)) {
       process.stdout.write('.');
       await getRepository(Carousel).save(chunk);
+    }
+    console.log();
+  }
+
+  console.log(`Migr: overlays.gallery`);
+  await getManager().clear(Gallery);
+  items = await from.engine.find('overlays.gallery');
+  if (items.length > 0) {
+    for (const chunk of _.chunk(items, 100)) {
+      process.stdout.write('.');
+      await getRepository(Gallery).save(chunk);
     }
     console.log();
   }

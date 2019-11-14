@@ -114,7 +114,8 @@ export default class galleryRegistryEdit extends Vue {
 
   mounted() {
     this.state.loading = this.$state.progress;
-    this.socket.emit('find', { omit: ['data'] }, (err, items) => {
+    this.socket.emit('gallery::getAll', (err, items) => {
+      console.debug('Loaded', items);
       this.items = items
       this.state.loading = this.$state.success;
     })
@@ -157,8 +158,12 @@ export default class galleryRegistryEdit extends Vue {
   }
 
   remove(id) {
-    this.socket.emit('delete', { where: { id } }, () => {
-      this.items = this.items.filter(o => o.id != id)
+    this.socket.emit('gallery::delete', id, (err) => {
+      if (err) {
+        console.error(err);
+      } else {
+        this.items = this.items.filter(o => o.id != id)
+      }
     })
   }
 
@@ -170,7 +175,7 @@ export default class galleryRegistryEdit extends Vue {
     for (let i = 0, l = files.length; i < l; i++) {
       const reader = new FileReader()
       reader.onload = ((e: any) => {
-        this.socket.emit('upload', [files[i].name, e.target.result], (item) => {
+        this.socket.emit('gallery::upload', [files[i].name, e.target.result], (item) => {
           this.uploadedFiles++
           this.items.push(item)
         })
