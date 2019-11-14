@@ -2,7 +2,7 @@
 var _ = require('lodash')
 
 const { TwitchStats } = require('./entity/twitch');
-const { getRepository, LessThan } = require('typeorm');
+const { getRepository } = require('typeorm');
 const { error } = require('./helpers/log');
 
 function Stats () {
