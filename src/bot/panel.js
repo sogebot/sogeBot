@@ -493,6 +493,7 @@ function Panel () {
             ' widget=' + listener.self.constructor.name + ' on=' + listener.on)
         }
         try { await listener.fnc(listener.self, self.io, data) } catch (e) {
+          error(e)
           error('Error on ' + listener.on + ' listener')
         }
         if (listener.finally && listener.finally !== listener.fnc) listener.finally(listener.self, self.io)

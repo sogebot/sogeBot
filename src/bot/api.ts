@@ -5,7 +5,7 @@ import moment from 'moment';
 require('moment-precise-range-plugin'); // moment.preciseDiff
 import { isMainThread } from './cluster';
 import chalk from 'chalk';
-import { defaults, filter, get, isEmpty, isNil, isNull, map } from 'lodash';
+import { defaults, filter, get, isNil, isNull, map } from 'lodash';
 
 import * as constants from './constants';
 import Core from './_interface';
@@ -19,7 +19,8 @@ import { ThreadEvent } from './entity/threadEvent';
 
 import { getManager, getRepository, IsNull, Not } from 'typeorm';
 import { User } from './entity/user';
-import { TwitchTag, TwitchTagLocalizationDescription, TwitchTagLocalizationName } from './entity/twitch';
+import { TwitchClips, TwitchTag, TwitchTagLocalizationDescription, TwitchTagLocalizationName } from './entity/twitch';
+import { CacheGames } from './entity/cacheGames';
 
 const setImmediateAwait = () => {
   return new Promise(resolve => {
@@ -838,10 +839,10 @@ class API extends Core {
       return '';
     } // return empty game if gid is empty
 
-    const gameFromDb = await global.db.engine.findOne('core.api.games', { id });
+    const gameFromDb = await getRepository(CacheGames).findOne({ id });
 
     // check if id is cached
-    if (!isEmpty(gameFromDb)) {
+    if (gameFromDb) {
       return gameFromDb.name;
     }
 
@@ -869,7 +870,7 @@ class API extends Core {
 
       // add id->game to cache
       const name = request.data.data[0].name;
-      await global.db.engine.insert('core.api.games', { id, name });
+      await getRepository(CacheGames).save({ id, name });
       return name;
     } catch (e) {
       if (typeof e.response !== 'undefined' && e.response.status === 429) {
@@ -1374,11 +1375,11 @@ class API extends Core {
       return { state: false };
     }
 
-    let notCheckedClips = (await global.db.engine.find('api.clips', { isChecked: false }));
+    let notCheckedClips = (await getRepository(TwitchClips).find({ isChecked: false }));
 
     // remove clips which failed
     for (const clip of filter(notCheckedClips, (o) => new Date(o.shouldBeCheckedAt).getTime() < new Date().getTime())) {
-      await global.db.engine.remove('api.clips', { _id: String(clip._id) });
+      await getRepository(TwitchClips).remove(clip);
     }
     notCheckedClips = filter(notCheckedClips, (o) => new Date(o.shouldBeCheckedAt).getTime() >= new Date().getTime());
     const url = `https://api.twitch.tv/helix/clips?id=${notCheckedClips.map((o) => o.clipId).join(',')}`;
@@ -1411,7 +1412,7 @@ class API extends Core {
 
       for (const clip of request.data.data) {
         // clip found in twitch api
-        await global.db.engine.update('api.clips', { clipId: clip.id }, { isChecked: true });
+        await getRepository(TwitchClips).update({ clipId: clip.id }, { isChecked: true });
       }
     } catch (e) {
       if (typeof e.response !== 'undefined' && e.response.status === 429) {
@@ -1438,8 +1439,8 @@ class API extends Core {
 
     const isClipChecked = async function (id) {
       const check = async (resolve, reject) => {
-        const clip = await global.db.engine.findOne('api.clips', { clipId: id });
-        if (isEmpty(clip)) {
+        const clip = await getRepository(TwitchClips).findOne({ clipId: id });
+        if (!clip) {
           resolve(false);
         } else if (clip.isChecked) {
           resolve(true);
@@ -1495,8 +1496,7 @@ class API extends Core {
       return;
     }
     const clipId = request.data.data[0].id;
-    const timestamp = new Date();
-    await global.db.engine.insert('api.clips', { clipId: clipId, isChecked: false, shouldBeCheckedAt: new Date(timestamp.getTime() + 120 * 1000) });
+    await getRepository(TwitchClips).save({ clipId: clipId, isChecked: false, shouldBeCheckedAt: Date.now() + 120 * 1000 });
     return (await isClipChecked(clipId)) ? clipId : null;
   }
 

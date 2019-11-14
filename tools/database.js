@@ -28,6 +28,7 @@ const { Variable, VariableHistory } = require('../dest/entity/variable');
 const { Translation } = require('../dest/entity/translation');
 const { Event, EventOperation } = require('../dest/entity/event');
 const { Goal, GoalGroup } = require('../dest/entity/goal');
+const { TwitchClips, TwitchStats } = require('../dest/entity/twitch');
 
 const _ = require('lodash');
 
@@ -655,6 +656,47 @@ async function main() {
     for (const chunk of _.chunk(items, 100)) {
       process.stdout.write('.')
       await getRepository(GoalGroup).save(chunk);
+    }
+    console.log();
+  }
+
+  console.log(`Migr: stats`);
+  await getManager().clear(TwitchStats);
+  items = (await from.engine.find('stats'))
+    .map(o => {
+      return {
+        whenOnline: new Date(o.whenOnline).getTime(),
+        currentViewers: o.currentViewers || 0,
+        currentSubscribers: o.currentSubscribers || 0,
+        currentBits: o.currentBits || 0,
+        currentTips: o.currentTips || 0,
+        chatMessages: o.chatMessages || 0,
+        currentFollowers: o.currentFollowers || 0,
+        currentViews: o.currentViews || 0,
+        maxViewers: o.maxViewers || 0,
+        currentHosts: o.currentHosts || 0,
+        newChatters: o.newChatters || 0,
+        currentWatched: o.currentWatched || 0,
+      }
+    });
+  if (items.length > 0) {
+    for (const chunk of _.chunk(items, 100)) {
+      process.stdout.write('.')
+      await getRepository(TwitchStats).save(chunk);
+    }
+    console.log();
+  }
+
+  console.log(`Migr: api.clips`);
+  await getManager().clear(TwitchClips);
+  items = (await from.engine.find('api.clips'))
+    .map(o => {
+      o.shouldBeCheckedAt = new Date(o.shouldBeCheckedAt).getTime(); return o;
+    });
+  if (items.length > 0) {
+    for (const chunk of _.chunk(items, 100)) {
+      process.stdout.write('.')
+      await getRepository(TwitchClips).save(chunk);
     }
     console.log();
   }

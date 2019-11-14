@@ -1,4 +1,5 @@
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryColumn, PrimaryGeneratedColumn, Index } from 'typeorm';
+import { Column, Entity, Index, JoinColumn, ManyToOne, OneToMany, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
+import { ColumnNumericTransformer } from './_transformer';
 
 // Cache mirror from tags endpoint
 /* {
@@ -112,4 +113,57 @@ export class TwitchTagLocalizationDescription {
   @Column({ name: 'tagId', nullable: true })
   @Index()
   tagId!: string | null;
+}
+
+@Entity()
+export class TwitchStats {
+  @Column('bigint', {
+    transformer: new ColumnNumericTransformer(),
+    primary: true,
+  })
+  whenOnline!: number;
+
+  @Column({ default: 0 })
+  currentViewers!: number;
+  @Column({ default: 0 })
+  currentSubscribers!: number;
+  @Column('bigint', {
+    transformer: new ColumnNumericTransformer(),
+  })
+  currentBits!: number;
+  @Column('bigint', {
+    transformer: new ColumnNumericTransformer(),
+  })
+  currentTips!: number;
+  @Column('bigint', {
+    transformer: new ColumnNumericTransformer(),
+  })
+  chatMessages!: number;
+  @Column({ default: 0 })
+  currentFollowers!: number;
+  @Column({ default: 0 })
+  currentViews!: number;
+  @Column({ default: 0 })
+  maxViewers!: number;
+  @Column({ default: 0 })
+  currentHosts!: number;
+  @Column({ default: 0 })
+  newChatters!: number;
+  @Column('bigint', {
+    transformer: new ColumnNumericTransformer(),
+  })
+  currentWatched!: number;
+}
+
+@Entity()
+export class TwitchClips {
+  @PrimaryColumn()
+  clipId!: string;
+
+  @Column()
+  isChecked!: boolean;
+  @Column('bigint', {
+    transformer: new ColumnNumericTransformer(),
+  })
+  shouldBeCheckedAt!: number;
 }
