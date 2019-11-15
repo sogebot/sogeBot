@@ -171,8 +171,6 @@ async function main() {
   await connect();
   await new Promise((resolve) => setTimeout(() => resolve(), 1000));
 
-  const connection = await getConnection();
-
   console.log('Info: Databases connections established');
 
   let items;
