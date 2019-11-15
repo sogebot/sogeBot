@@ -47,9 +47,6 @@ global.status = { // TODO: move it?
 
 import { changelog } from './changelog';
 
-const isNeDB = config.database.type === 'nedb';
-global.db = new (require('./databases/database'))(!isNeDB, !isNeDB);
-
 const connect = async function () {
   const connectionOptions = await getConnectionOptions();
   await createConnection({
