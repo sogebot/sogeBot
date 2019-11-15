@@ -46,7 +46,8 @@ release:
 pack:
 	@echo -ne "\n\t ----- Packing into sogeBot-$(VERSION).zip\n"
 	@cp ./src/bot/data/config.example.json ./
-	@npx bestzip sogeBot-$(VERSION).zip .npmrc npm-shrinkwrap.json config.example.json dest/ locales/ public/ LICENSE package.json docs/ AUTHORS tools/ bin/ bat/ fonts.json
+	@cp ./src/bot/data/ormconfig*.json ./
+	@npx bestzip sogeBot-$(VERSION).zip .npmrc ormconfig*.json npm-shrinkwrap.json config.example.json dest/ locales/ public/ LICENSE package.json docs/ AUTHORS tools/ bin/ bat/ fonts.json
 
 prepare:
 	@echo -ne "\n\t ----- Cleaning up node_modules\n"

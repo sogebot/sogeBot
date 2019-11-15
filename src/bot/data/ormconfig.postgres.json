@@ -6,5 +6,21 @@
   "password": "postgres",
   "database": "sogebot",
   "logging": ["error"],
-  "cache": true
+  "cache": true,
+  "synchronize": false,
+  "migrationsRun": true,
+  "entities": [
+    "dest/database/entity/*.js"
+  ],
+  "migrations": [
+    "dest/database/migration/postgres/*.js"
+  ],
+  "subscribers": [
+    "dest/database/subscriber/*.js"
+  ],
+  "cli": {
+    "entitiesDir": "src/bot/database/entity",
+    "migrationsDir": "src/bot/database/migration/postgres",
+    "subscribersDir": "src/bot/database/entity"
+  }
 }

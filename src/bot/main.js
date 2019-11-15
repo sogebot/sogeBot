@@ -49,10 +49,6 @@ import { changelog } from './changelog';
 const connect = async function () {
   const connectionOptions = await getConnectionOptions();
   await createConnection({
-    logging: false,
-    synchronize: true,
-    entities: [__dirname + '/database/entity/*.{js,ts}'],
-    subscribers: [__dirname + '/database/entity/*.{js,ts}'],
     ...connectionOptions,
   });
 };
