@@ -70,8 +70,8 @@
                   template(v-else-if="variable.type ==='options' && state.editation !== $state.progress")
                     select(v-model="variable.currentValue" v-on:change="onUpdate(variable.id, variable.currentValue)").form-control
                       option(
-                        v-for="option of variable.usableOptions.split(',').map((o) => o.trim())"
-                        v-bind:key="option"
+                        v-for="option of variable.usableOptions.map((o) => o.trim())"
+                       v-bind:key="option"
                         v-bind:value="String(option)"
                       )
                         | {{ option }}
@@ -209,7 +209,7 @@ export default {
   },
   methods: {
     onUpdate: function (id, value) {
-      this.socket.emit('set.value', { id, value }, (err) => {
+      this.socket.emit('watched::setValue', { id, value }, (err) => {
         this.refreshVariablesList()
         this.refreshWatchList()
       })
@@ -237,11 +237,12 @@ export default {
     },
     save() {
       this.state.editation = this.$state.idle;
-      this.socket.emit('set', { collection: '_custom.variables.watch', items: this.watched, where: {} })
+      this.socket.emit('watched::save', this.watched, () => {})
     },
     refreshVariablesList: function () {
       return new Promise((resolve) => {
         this.socket.emit('list.variables', (err, data) => {
+          console.log('Loaded', data);
           this.variables = data
           resolve()
         })

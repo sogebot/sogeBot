@@ -342,7 +342,7 @@ class CustomVariables {
     let item = await getRepository(Variable).findOne({ variableName });
     let isOk = true;
     let isEval = false;
-    let oldValue = null;
+    let oldValue: null | string = null;
 
     opts.sender = isNil(opts.sender) ? null : opts.sender;
     opts.readOnlyBypass = isNil(opts.readOnlyBypass) ? false : opts.readOnlyBypass;
@@ -373,15 +373,15 @@ class CustomVariables {
         if (item.type === 'number') {
           if (['+', '-'].includes(currentValue)) {
             if (currentValue === '+') {
-              item.currentValue++;
+              item.currentValue = String(Number(item.currentValue) + 1);
             } else {
-              item.currentValue--;
+              item.currentValue = String(Number(item.currentValue) - 1);
             }
             isOk = true;
           } else {
             const isNumber = isFinite(Number(currentValue));
             isOk = isNumber;
-            item.currentValue = isNumber ? Number(currentValue) : item.currentValue;
+            item.currentValue = isNumber ? currentValue : item.currentValue;
           }
         } else if (item.type === 'options') {
           // check if is in usableOptions
@@ -421,8 +421,8 @@ class CustomVariables {
     });
     if (variable) {
       const history = new VariableHistory();
-      history.username = opts.sender.username;
-      history.userId = opts.sender.userId;
+      history.username = opts.sender?.username ?? 'n/a';
+      history.userId = opts.sender?.userId ?? 0;
       history.oldValue = opts.oldValue;
       history.currentValue = opts.item.currentValue;
       history.changedAt = Date.now();

@@ -346,7 +346,7 @@ class Events extends Core {
     if (!_.isFinite(parseInt(currentValue, 10))) {
       currentValue = numberToIncrement;
     } else {
-      currentValue = parseInt(currentValue, 10) - parseInt(numberToIncrement, 10);
+      currentValue = String(parseInt(currentValue, 10) - parseInt(numberToIncrement, 10));
     }
     await global.customvariables.setValueOf(customVariableName, currentValue, {});
 
@@ -369,9 +369,9 @@ class Events extends Core {
     // check if value is number
     let currentValue = await global.customvariables.getValueOf('$_' + customVariableName);
     if (!_.isFinite(parseInt(currentValue, 10))) {
-      currentValue = numberToDecrement * -1;
+      currentValue = String(numberToDecrement * -1);
     } else {
-      currentValue = parseInt(currentValue, 10) - parseInt(numberToDecrement, 10);
+      currentValue = String(parseInt(currentValue, 10) - parseInt(numberToDecrement, 10));
     }
     await global.customvariables.setValueOf(customVariableName, currentValue, {});
 

@@ -26,7 +26,7 @@ const { Rank } = require('../dest/entity/rank');
 const { SongPlaylist, SongBan } = require('../dest/entity/song');
 const { Timer, TimerResponse } = require('../dest/entity/timer');
 const { Dashboard, Widget } = require('../dest/entity/dashboard');
-const { Variable, VariableHistory } = require('../dest/entity/variable');
+const { Variable, VariableHistory, VariableWatch } = require('../dest/entity/variable');
 const { Translation } = require('../dest/entity/translation');
 const { Event, EventOperation } = require('../dest/entity/event');
 const { Goal, GoalGroup } = require('../dest/entity/goal');
@@ -907,6 +907,17 @@ async function main() {
     for (const chunk of _.chunk(items, 100)) {
       process.stdout.write('.');
       await getRepository(CommandsBoard).save(chunk);
+    }
+    console.log();
+  }
+
+  console.log(`Migr: custom.variables.watch`);
+  await getManager().clear(VariableWatch);
+  items = await from.find('custom.variables.watch');
+  if (items.length > 0) {
+    for (const chunk of _.chunk(items, 100)) {
+      process.stdout.write('.');
+      await getRepository(VariableWatch).save(chunk);
     }
     console.log();
   }

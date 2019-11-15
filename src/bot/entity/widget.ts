@@ -1,4 +1,5 @@
 import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { ColumnNumericTransformer } from './_transformer';
 
 @Entity()
 export class WidgetSocial {
@@ -17,4 +18,6 @@ export class WidgetSocial {
   displayname!: string;
   @Column()
   url!: string;
+  @Column('bigint', { transformer: new ColumnNumericTransformer(), default: 0 })
+  timestamp!: number;
 }

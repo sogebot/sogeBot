@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, ManyToOne,OneToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToOne,OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { ColumnNumericTransformer } from './_transformer';
 
 @Entity()
@@ -20,8 +20,8 @@ export class Variable {
   description!: string;
   @Column()
   type!: 'eval' | 'number' | 'options' | 'text';
-  @Column('simple-json')
-  currentValue!: any;
+  @Column()
+  currentValue!: string;
   @Column('text')
   evalValue!: string;
   @Column({ default: 60000 })
@@ -58,8 +58,8 @@ export class VariableHistory {
   userId!: number;
   @Column({ default: 'n/a' })
   username!: string;
-  @Column('simple-json')
-  currentValue!: any;
+  @Column()
+  currentValue!: string;
   @Column('simple-json')
   oldValue!: any;
   @Column('bigint', { transformer: new ColumnNumericTransformer(), default: 0 })
@@ -86,14 +86,10 @@ export class VariableURL {
 
 @Entity()
 export class VariableWatch {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryGeneratedColumn()
   id!: string;
 
-  @OneToOne(type => Variable)
-  @JoinColumn({ name: 'variable_id' })
-  variable!: Variable;
-
-  @Column({ name: 'variable_id' })
+  @Column()
   variableId!: string;
 
   @Column()
