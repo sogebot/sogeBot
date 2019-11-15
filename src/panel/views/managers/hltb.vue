@@ -86,7 +86,7 @@
   require('moment/locale/ru')
 
   import { getSocket } from '../../helpers/socket';
-import { HowLongToBeatGame } from '../../../bot/entity/howLongToBeatGame';
+import { HowLongToBeatGame } from 'src/bot/database/entity/howLongToBeatGame';
 
   Vue.use(VueMoment, {
       moment, momentTimezone

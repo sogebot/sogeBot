@@ -41,7 +41,7 @@
   import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
   library.add(faExclamationTriangle)
 
-  import { Permissions as PermissionEntity} from 'src/bot/entity/permissions'
+  import { Permissions as PermissionEntity} from 'src/bot/database/entity/permissions'
   import { permission } from 'src/bot/helpers/permissions';
 
   export default Vue.extend({

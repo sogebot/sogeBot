@@ -11,7 +11,7 @@ import { info, tip } from '../helpers/log.js';
 import { triggerInterfaceOnTip } from '../helpers/interface/triggers.js';
 
 import { getRepository } from 'typeorm';
-import { User, UserTip } from '../entity/user.js';
+import { User, UserTip } from '../database/entity/user';
 
 class Donationalerts extends Integration {
   socket: SocketIOClient.Socket | null = null;

@@ -8,7 +8,7 @@ import Expects from '../expects.js';
 import { permission } from '../permissions';
 import System from './_interface';
 import { getRepository } from 'typeorm';
-import { ScrimMatchId } from '../entity/scrimMatchId';
+import { ScrimMatchId } from '../database/entity/scrimMatchId';
 
 enum ERROR {
   ALREADY_OPENED,

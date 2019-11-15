@@ -6,7 +6,7 @@ import { prepare, sendMessage } from '../commons';
 import { error } from '../helpers/log';
 
 import { getRepository } from 'typeorm';
-import { User } from '../entity/user';
+import { User } from '../database/entity/user';
 
 const ERROR_NOT_ENOUGH_OPTIONS = '0';
 const ERROR_ZERO_BET = '1';

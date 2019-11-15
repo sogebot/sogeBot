@@ -16,9 +16,9 @@ import * as configFile from '@config';
 import { adminEndpoint } from './helpers/socket';
 
 import { getManager, getRepository } from 'typeorm';
-import { EventList } from './entity/eventList';
+import { EventList } from './database/entity/eventList';
 
-import { User } from './entity/user';
+import { User } from './database/entity/user';
 
 const config = configFile as any;
 config.timezone = config.timezone === 'system' || isNil(config.timezone) ? moment.tz.guess() : config.timezone;

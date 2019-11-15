@@ -167,7 +167,7 @@
 
   import { getSocket } from '../../../helpers/socket';
 
-  import { Event } from 'src/bot/entity/event';
+  import { Event } from 'src/bot/database/entity/event';
 
   export default Vue.extend({
     components: {

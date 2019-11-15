@@ -3,7 +3,7 @@ import { isMainThread } from './cluster';
 import { error } from './helpers/log';
 import { change } from './changelog';
 import { getRepository } from 'typeorm';
-import { Settings } from './entity/settings';
+import { Settings } from './database/entity/settings';
 
 const variables: {
   [x: string]: any;

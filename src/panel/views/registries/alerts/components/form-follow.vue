@@ -327,7 +327,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, PropSync, Watch } from 'vue-property-decorator';
-import { CommonSettings } from 'src/bot/entity/alert';
+import { CommonSettings } from 'src/bot/database/entity/alert';
 
 import { codemirror } from 'vue-codemirror';
 import 'codemirror/mode/javascript/javascript.js';

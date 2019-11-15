@@ -15,9 +15,9 @@ import uuid from 'uuid';
 import { chatOut } from '../helpers/log';
 import { adminEndpoint } from '../helpers/socket';
 import { getRepository } from 'typeorm';
-import { Commands, CommandsResponses } from '../entity/commands';
-import { User } from '../entity/user';
-import { Variable } from '../entity/variable';
+import { Commands, CommandsResponses } from '../database/entity/commands';
+import { User } from '../database/entity/user';
+import { Variable } from '../database/entity/variable';
 
 /*
  * !command                                                                 - gets an info about command usage

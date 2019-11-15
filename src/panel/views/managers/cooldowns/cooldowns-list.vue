@@ -72,7 +72,7 @@ import { capitalize } from 'src/panel/helpers/capitalize';
 import { Vue, Component/*, Watch */ } from 'vue-property-decorator';
 import { isNil } from 'lodash-es';
 import { escape } from 'xregexp';
-import { Cooldown } from '../../../../bot/entity/cooldown';
+import { Cooldown } from 'src/bot/database/entity/cooldown';
 
 @Component({
   components: {

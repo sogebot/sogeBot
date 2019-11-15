@@ -7,7 +7,7 @@ import { error, tip } from '../helpers/log';
 import Integration from './_interface';
 import { getRepository } from 'typeorm';
 
-import { User, UserTip } from '../entity/user.js';
+import { User, UserTip } from '../database/entity/user';
 
 class Qiwi extends Integration {
   interval: any = null;

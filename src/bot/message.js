@@ -13,13 +13,13 @@ import { warning } from './helpers/log';
 import { getCountOfCommandUsage } from './helpers/commands/count';
 import { getManager, getRepository } from 'typeorm';
 
-import { Alias } from './entity/alias';
-import { Commands } from './entity/commands';
-import { Cooldown } from './entity/cooldown';
-import { EventList } from './entity/eventList';
-import { User } from './entity/user';
+import { Alias } from './database/entity/alias';
+import { Commands } from './database/entity/commands';
+import { Cooldown } from './database/entity/cooldown';
+import { EventList } from './database/entity/eventList';
+import { User } from './database/entity/user';
 import Price from './systems/price';
-import { Rank } from './entity/rank';
+import { Rank } from './database/entity/rank';
 
 class Message {
   constructor (message) {

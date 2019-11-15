@@ -132,7 +132,7 @@
 <script lang="ts">
 import { Vue, Component, Watch } from 'vue-property-decorator';
 import { getSocket } from 'src/panel/helpers/socket';
-import { Carousel } from 'src/bot/entity/carousel';
+import { Carousel } from 'src/bot/database/entity/carousel';
 
 import { Validations } from 'vuelidate-property-decorators';
 import { required, minValue } from 'vuelidate/lib/validators'

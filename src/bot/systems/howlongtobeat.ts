@@ -9,7 +9,7 @@ import Expects from '../expects';
 import { prepare, sendMessage } from '../commons';
 
 import { getRepository } from 'typeorm';
-import { HowLongToBeatGame } from '../entity/howLongToBeatGame';
+import { HowLongToBeatGame } from '../database/entity/howLongToBeatGame';
 import { adminEndpoint } from '../helpers/socket';
 
 class HowLongToBeat extends System {

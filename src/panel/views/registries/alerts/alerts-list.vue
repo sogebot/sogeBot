@@ -84,7 +84,7 @@
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
 import { getSocket } from 'src/panel/helpers/socket';
-import { Alert } from '../../../../bot/entity/alert';
+import { Alert } from 'src/bot/database/entity/alert';
 
 @Component({
   components: {

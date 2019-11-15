@@ -84,8 +84,8 @@ import { Vue, Component, Watch } from 'vue-property-decorator';
 import { getSocket } from 'src/panel/helpers/socket';
 import { permission } from 'src/bot/helpers/permissions'
 
-import { Alias as AliasEntity } from 'src/bot/entity/alias';
-import { Permissions as PermissionsEntity } from 'src/bot/entity/permissions';
+import { Alias as AliasEntity } from 'src/bot/database/entity/alias';
+import { Permissions as PermissionsEntity } from 'src/bot/database/entity/permissions';
 
 import { Validations } from 'vuelidate-property-decorators';
 import { required } from 'vuelidate/lib/validators'

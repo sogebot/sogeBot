@@ -7,8 +7,8 @@ import System from './_interface';
 import { adminEndpoint } from '../helpers/socket';
 
 import { getRepository } from 'typeorm';
-import { User } from '../entity/user';
-import { Queue as QueueEntity } from '../entity/queue';
+import { User } from '../database/entity/user';
+import { Queue as QueueEntity } from '../database/entity/queue';
 
 /*
  * !queue                            - gets an info whether queue is opened or closed

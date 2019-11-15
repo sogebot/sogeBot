@@ -10,7 +10,7 @@ import { permission } from './helpers/permissions';
 import { debug, error, isDebugEnabled } from './helpers/log';
 import { adminEndpoint, viewerEndpoint } from './helpers/socket';
 import { Brackets, getConnection, getRepository } from 'typeorm';
-import { User, UserBit, UserTip } from './entity/user';
+import { User, UserBit, UserTip } from './database/entity/user';
 import { getAllOnlineUsernames } from './helpers/getAllOnlineUsernames';
 
 class Users extends Core {

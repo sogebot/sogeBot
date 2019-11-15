@@ -1,5 +1,5 @@
 import { getRepository } from 'typeorm';
-import { Settings } from '../entity/settings';
+import { Settings } from '../database/entity/settings';
 import axios from 'axios';
 
 export const getUserFromTwitch = async (username)  => {

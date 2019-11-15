@@ -4,7 +4,7 @@ import Overlay from '../overlays/_interface';
 
 import { onBit, onFollow, onSub, onTip } from '../decorators/on';
 import { adminEndpoint, publicEndpoint } from '../helpers/socket';
-import { Goal, GoalGroup } from '../entity/goal';
+import { Goal, GoalGroup } from '../database/entity/goal';
 import { getRepository, IsNull } from 'typeorm';
 
 class Goals extends Overlay {

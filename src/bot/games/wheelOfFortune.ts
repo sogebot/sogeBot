@@ -4,7 +4,7 @@ import Game from './_interface';
 import { publicEndpoint } from '../helpers/socket';
 
 import { getRepository } from 'typeorm';
-import { User } from '../entity/user';
+import { User } from '../database/entity/user';
 
 class WheelOfFortune extends Game {
   @ui({

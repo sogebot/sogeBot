@@ -12,8 +12,8 @@ import { settings, ui } from '../decorators';
 import { onChange, onStartup } from '../decorators/on';
 import { info } from '../helpers/log';
 import { getRepository } from 'typeorm';
-import { Event } from '../entity/event';
-import { WidgetSocial } from '../entity/widget';
+import { Event } from '../database/entity/event';
+import { WidgetSocial } from '../database/entity/widget';
 
 class Twitter extends Integration {
   public watchedStreams: {

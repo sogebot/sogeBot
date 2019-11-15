@@ -1,7 +1,7 @@
 import Stats from './_interface';
 import { adminEndpoint } from '../helpers/socket';
 import { getRepository } from 'typeorm';
-import { CommandsCount } from '../entity/commands';
+import { CommandsCount } from '../database/entity/commands';
 
 class CommandCount extends Stats {
   constructor() {

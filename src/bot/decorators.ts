@@ -4,7 +4,7 @@ import { VariableWatcher } from './watchers';
 import { debug, error } from './helpers/log';
 import { isMainThread } from './cluster';
 import { getManager } from 'typeorm';
-import { Settings } from './entity/settings';
+import { Settings } from './database/entity/settings';
 import { isDbConnected } from './helpers/database';
 
 export let loadingInProgress: string[] = [];

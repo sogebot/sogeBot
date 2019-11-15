@@ -55,7 +55,7 @@ import uuid from 'uuid/v4';
 import { getSocket } from '../helpers/socket';
 
 import AudioVisual from 'vue-audio-visual'
-import { AlertMedia } from '../../bot/entity/alert';
+import { AlertMedia } from 'src/bot/database/entity/alert';
 Vue.use(AudioVisual)
 
 @Component({

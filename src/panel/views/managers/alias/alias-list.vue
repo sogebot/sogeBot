@@ -62,8 +62,8 @@
 <script lang="ts">
 import { getSocket } from 'src/panel/helpers/socket';
 
-import { Alias as AliasEntity } from 'src/bot/entity/alias';
-import { Permissions as PermissionsEntity } from 'src/bot/entity/permissions';
+import { Alias as AliasEntity } from 'src/bot/database/entity/alias';
+import { Permissions as PermissionsEntity } from 'src/bot/database/entity/permissions';
 
 import { Vue, Component/*, Watch */ } from 'vue-property-decorator';
 import { orderBy, isNil } from 'lodash-es';

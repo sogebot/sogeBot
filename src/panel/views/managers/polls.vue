@@ -167,7 +167,7 @@
   require('moment/locale/ru')
 
   import { getSocket } from 'src/panel/helpers/socket';
-  import { Poll } from 'src/bot/entity/poll';
+  import { Poll } from 'src/bot/database/entity/poll';
 
   import uuid from 'uuid'
 

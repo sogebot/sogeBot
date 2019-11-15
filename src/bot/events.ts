@@ -14,9 +14,9 @@ import { error, info, warning } from './helpers/log';
 import { adminEndpoint } from './helpers/socket';
 
 import { getRepository } from 'typeorm';
-import { User } from './entity/user';
-import { Variable } from './entity/variable';
-import { Event } from './entity/event';
+import { User } from './database/entity/user';
+import { Variable } from './database/entity/variable';
+import { Event } from './database/entity/event';
 
 class Events extends Core {
   public timeouts: { [x: string]: NodeJS.Timeout } = {};

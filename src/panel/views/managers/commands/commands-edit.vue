@@ -144,7 +144,7 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import { faExclamationTriangle, faPlay, faStop, faKey, faSortUp, faSortDown } from '@fortawesome/free-solid-svg-icons';
 library.add(faExclamationTriangle, faPlay, faKey, faStop, faSortUp, faSortDown);
 
-import { Commands } from '../../../../bot/entity/commands';
+import { Commands } from 'src/bot/database/entity/commands';
 import { getSocket } from '../../../helpers/socket';
 
 Component.registerHooks([

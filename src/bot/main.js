@@ -52,8 +52,8 @@ const connect = async function () {
   await createConnection({
     logging: false,
     synchronize: true,
-    entities: [__dirname + '/entity/*.{js,ts}'],
-    subscribers: [__dirname + '/entity/*.{js,ts}'],
+    entities: [__dirname + '/database/entity/*.{js,ts}'],
+    subscribers: [__dirname + '/database/entity/*.{js,ts}'],
     ...connectionOptions,
   });
 };

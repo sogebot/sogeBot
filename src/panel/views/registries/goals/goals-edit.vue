@@ -319,7 +319,7 @@ import 'flatpickr/dist/flatpickr.css';
 
 import { getSocket } from 'src/panel/helpers/socket';
 import uuid from 'uuid/v4';
-import { Goal, GoalGroup } from '../../../../bot/entity/goal';
+import { Goal, GoalGroup } from 'src/bot/database/entity/goal';
 
 export default Vue.extend({
   components: {

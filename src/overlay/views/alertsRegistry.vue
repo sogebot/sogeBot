@@ -81,8 +81,8 @@ import VRuntimeTemplate from 'v-runtime-template';
 import { isEqual, get } from 'lodash-es';
 import urlRegex from 'url-regex';
 
-import { CacheEmotes } from 'src/bot/entity/cacheEmotes';
-import { EmitData, Alert, AlertFollow, AlertSub, AlertSubgift, AlertHost, AlertRaid, AlertTip, AlertCheer, AlertResub } from '../../bot/entity/alert';
+import { CacheEmotes } from 'src/bot/database/entity/cacheEmotes';
+import { EmitData, Alert, AlertFollow, AlertSub, AlertSubgift, AlertHost, AlertRaid, AlertTip, AlertCheer, AlertResub } from 'src/bot/database/entity/alert';
 
 require('../../../scss/letter-animations.css');
 require('animate.css');

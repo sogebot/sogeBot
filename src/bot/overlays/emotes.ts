@@ -10,7 +10,7 @@ import { error, info, warning } from '../helpers/log';
 import { adminEndpoint, publicEndpoint } from '../helpers/socket';
 
 import { getManager, getRepository } from 'typeorm';
-import { CacheEmotes } from '../entity/cacheEmotes';
+import { CacheEmotes } from '../database/entity/cacheEmotes';
 import uuid from 'uuid';
 
 

@@ -290,7 +290,7 @@ import { getSocket } from 'src/panel/helpers/socket';
 import { orderBy, remove, xor } from 'lodash';
 import DatePicker from 'vue2-datepicker';
 import moment from 'moment';
-import { User } from '../../../../bot/entity/user';
+import { User } from 'src/bot/database/entity/user';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import {

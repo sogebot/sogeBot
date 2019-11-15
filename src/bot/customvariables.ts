@@ -12,8 +12,8 @@ import { getAllOnlineUsernames } from './helpers/getAllOnlineUsernames';
 import { getOwnerAsSender, getTime, isModerator, prepare, sendMessage } from './commons';
 
 import { getRepository } from 'typeorm';
-import { User } from './entity/user';
-import { Variable, VariableHistory, VariableWatch } from './entity/variable';
+import { User } from './database/entity/user';
+import { Variable, VariableHistory, VariableWatch } from './database/entity/variable';
 
 class CustomVariables {
   timeouts: {

@@ -19,7 +19,7 @@ import { getLocalizedName, getOwner, isBot, isIgnored, isOwner, prepare, sendMes
 import { clusteredChatIn, clusteredWhisperIn, isMainThread, manageMessage } from './cluster';
 
 import { getRepository } from 'typeorm';
-import { User, UserBit } from './entity/user';
+import { User, UserBit } from './database/entity/user';
 
 class TMI extends Core {
   @settings('chat')

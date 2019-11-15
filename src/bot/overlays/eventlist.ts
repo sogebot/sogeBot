@@ -7,7 +7,7 @@ import { ui } from '../decorators';
 import { publicEndpoint } from '../helpers/socket';
 
 import { Brackets, getManager, getRepository } from 'typeorm';
-import { EventList as EventListEntity } from '../entity/eventList';
+import { EventList as EventListEntity } from '../database/entity/eventList';
 
 class EventList extends Overlay {
   @ui({

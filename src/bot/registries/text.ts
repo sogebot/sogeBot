@@ -3,7 +3,7 @@ import Registry from './_interface';
 import { adminEndpoint, publicEndpoint } from '../helpers/socket';
 
 import { getRepository } from 'typeorm';
-import { Text as TextEntity } from '../entity/text';
+import { Text as TextEntity } from '../database/entity/text';
 
 class Text extends Registry {
   constructor () {

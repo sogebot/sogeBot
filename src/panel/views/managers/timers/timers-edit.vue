@@ -124,7 +124,7 @@ import { getSocket } from 'src/panel/helpers/socket';
 import { Validations } from 'vuelidate-property-decorators';
 import { required } from 'vuelidate/lib/validators';
 
-import { Timer, TimerResponse } from 'src/bot/entity/timer';
+import { Timer, TimerResponse } from 'src/bot/database/entity/timer';
 
 import uuid from 'uuid/v4';
 

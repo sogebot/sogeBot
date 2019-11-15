@@ -3,7 +3,7 @@ import { onChange, onStreamEnd } from '../decorators/on';
 import System from './_interface';
 
 import { getRepository } from 'typeorm';
-import { Checklist as ChecklistEntity } from '../entity/checklist';
+import { Checklist as ChecklistEntity } from '../database/entity/checklist';
 import { adminEndpoint } from '../helpers/socket';
 
 class Checklist extends System {

@@ -3,7 +3,7 @@
 import Widget from './_interface';
 import { adminEndpoint } from '../helpers/socket';
 import { getRepository } from 'typeorm';
-import { Variable, VariableWatch } from '../entity/variable';
+import { Variable, VariableWatch } from '../database/entity/variable';
 
 class CustomVariables extends Widget {
   constructor() {

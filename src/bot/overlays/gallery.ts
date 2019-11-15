@@ -4,7 +4,7 @@ import { isMainThread } from '../cluster';
 import { adminEndpoint } from '../helpers/socket';
 
 import { getRepository } from 'typeorm';
-import { Gallery as GalleryEntity } from '../entity/gallery';
+import { Gallery as GalleryEntity } from '../database/entity/gallery';
 
 class Gallery extends Overlay {
   showInUI = false;

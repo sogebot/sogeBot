@@ -54,7 +54,7 @@ import { capitalize } from 'src/panel/helpers/capitalize';
 import { Vue, Component/*, Watch */ } from 'vue-property-decorator';
 import { isNil } from 'lodash-es';
 import { escape } from 'xregexp';
-import { Rank } from 'src/bot/entity/rank';
+import { Rank } from 'src/bot/database/entity/rank';
 
 @Component({
   components: {

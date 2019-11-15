@@ -12,7 +12,7 @@ import { warning } from '../helpers/log.js';
 import { adminEndpoint } from '../helpers/socket';
 
 import { getRepository } from 'typeorm';
-import { Poll, PollVote } from '../entity/poll';
+import { Poll, PollVote } from '../database/entity/poll';
 
 enum ERROR {
   NOT_ENOUGH_OPTIONS,

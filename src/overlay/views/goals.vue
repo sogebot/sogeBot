@@ -153,7 +153,7 @@ Vue.use(VueMoment, {
 })
 
 import { TweenLite } from 'gsap/TweenMax'
-import { GoalGroup } from '../../bot/entity/goal';
+import { GoalGroup } from 'src/bot/database/entity/goal';
 
 @Component({})
 export default class GoalsOverlay extends Vue {

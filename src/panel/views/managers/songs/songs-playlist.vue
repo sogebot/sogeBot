@@ -117,7 +117,7 @@
 import { getSocket } from 'src/panel/helpers/socket';
 
 import { Vue, Component, Watch } from 'vue-property-decorator';
-import { SongPlaylist } from '../../../../bot/entity/song';
+import { SongPlaylist } from 'src/bot/database/entity/song';
 
 @Component({
   components: {

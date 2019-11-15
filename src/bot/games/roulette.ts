@@ -5,7 +5,7 @@ import { command, settings } from '../decorators';
 import Game from './_interface';
 
 import { getRepository } from 'typeorm';
-import { User } from '../entity/user';
+import { User } from '../database/entity/user';
 
 /*
  * !roulette - 50/50 chance to timeout yourself

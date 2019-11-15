@@ -9,8 +9,8 @@ import { permission } from './permissions';
 import { error, info, warning } from './helpers/log';
 
 import { getManager, getRepository } from 'typeorm';
-import { Settings } from './entity/settings';
-import { PermissionCommands, Permissions as PermissionsEntity } from './entity/permissions';
+import { Settings } from './database/entity/settings';
+import { PermissionCommands, Permissions as PermissionsEntity } from './database/entity/permissions';
 import { adminEndpoint, publicEndpoint } from './helpers/socket';
 import { flatten, unflatten } from './helpers/flatten';
 

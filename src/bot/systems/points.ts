@@ -11,7 +11,7 @@ import System from './_interface';
 import { debug, error } from '../helpers/log';
 import { adminEndpoint } from '../helpers/socket';
 import { getRepository } from 'typeorm';
-import { User } from '../entity/user';
+import { User } from '../database/entity/user';
 import { getAllOnlineUsernames } from '../helpers/getAllOnlineUsernames';
 
 class Points extends System {

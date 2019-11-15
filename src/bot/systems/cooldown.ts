@@ -10,10 +10,10 @@ import { permission } from '../permissions';
 import System from './_interface';
 
 import { getRepository } from 'typeorm';
-import { Cooldown as CooldownEntity, CooldownViewer } from '../entity/cooldown';
-import { User } from '../entity/user';
+import { Cooldown as CooldownEntity, CooldownViewer } from '../database/entity/cooldown';
+import { User } from '../database/entity/user';
 import { adminEndpoint } from '../helpers/socket';
-import { Keyword } from '../entity/keyword';
+import { Keyword } from '../database/entity/keyword';
 
 /*
  * !cooldown [keyword|!command] [global|user] [seconds] [true/false] - set cooldown for keyword or !command - 0 for disable, true/false set quiet mode

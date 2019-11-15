@@ -1,4 +1,4 @@
-import { User } from '../entity/user';
+import { User } from '../database/entity/user';
 import { getRepository } from 'typeorm';
 
 export const getAllOnlineUsernames = async () => {

@@ -12,7 +12,7 @@ import { error } from '../helpers/log';
 import { adminEndpoint } from '../helpers/socket';
 
 import { getRepository } from 'typeorm';
-import { Highlight } from '../entity/highlight';
+import { Highlight } from '../database/entity/highlight';
 
 const ERROR_STREAM_NOT_ONLINE = '1';
 const ERROR_MISSING_TOKEN = '2';

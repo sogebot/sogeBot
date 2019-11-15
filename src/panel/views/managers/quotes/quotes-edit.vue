@@ -82,7 +82,7 @@ import { required } from 'vuelidate/lib/validators';
 import uuid from 'uuid/v4';
 
 import { getUsernameById } from '../../../helpers/userById';
-import { Quotes } from '../../../../bot/entity/quotes';
+import { Quotes } from 'src/bot/database/entity/quotes';
 
 Component.registerHooks([
   'beforeRouteEnter',

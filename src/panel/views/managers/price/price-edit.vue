@@ -76,7 +76,7 @@
 import { Vue, Component, Watch } from 'vue-property-decorator';
 import { getSocket } from 'src/panel/helpers/socket';
 
-import { Price } from 'src/bot/entity/price';
+import { Price } from 'src/bot/database/entity/price';
 
 import { Validations } from 'vuelidate-property-decorators';
 import { required, minValue } from 'vuelidate/lib/validators';

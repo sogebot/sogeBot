@@ -7,8 +7,8 @@ import uuid from 'uuid/v4';
 import { set } from 'lodash';
 
 import { getManager, getRepository, LessThan, MoreThan, Not } from 'typeorm';
-import { Settings } from './entity/settings';
-import { Changelog } from './entity/changelog';
+import { Settings } from './database/entity/settings';
+import { Changelog } from './database/entity/changelog';
 
 let lastTimestamp = Date.now();
 const threadId = uuid();

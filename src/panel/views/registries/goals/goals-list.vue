@@ -90,7 +90,7 @@
   import { chunk, filter, orderBy } from 'lodash-es';
 
   import { getSocket } from 'src/panel/helpers/socket';
-import { GoalGroup } from '../../../../bot/entity/goal';
+import { GoalGroup } from 'src/bot/database/entity/goal';
 
   export default Vue.extend({
     components: {

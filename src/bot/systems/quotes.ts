@@ -8,7 +8,7 @@ import System from './_interface';
 import { adminEndpoint, publicEndpoint } from '../helpers/socket';
 import { getManager } from 'typeorm';
 
-import { Quotes as QuotesEntity } from '../entity/quotes';
+import { Quotes as QuotesEntity } from '../database/entity/quotes';
 
 class Quotes extends System {
   constructor () {

@@ -8,8 +8,8 @@ import { getLocalizedName, sendMessage } from '../commons.js';
 import { warning } from '../helpers/log.js';
 
 import { getRepository } from 'typeorm';
-import { User } from '../entity/user';
-import { HeistUser } from '../entity/heist';
+import { User } from '../database/entity/user';
+import { HeistUser } from '../database/entity/heist';
 
 class Heist extends Game {
   dependsOn = [ 'systems.points' ];

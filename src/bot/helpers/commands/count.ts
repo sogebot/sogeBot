@@ -1,4 +1,4 @@
-import { CommandsCount } from '../../entity/commands';
+import { CommandsCount } from '../../database/entity/commands';
 import { getRepository } from 'typeorm';
 
 export async function getCountOfCommandUsage (command: string): Promise<number> {

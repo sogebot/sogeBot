@@ -12,10 +12,10 @@ import { getLocalizedName, prepare, sendMessage, timeout } from '../commons';
 import { timeout as timeoutLog } from '../helpers/log';
 import { clusteredClientDelete } from '../cluster';
 import { adminEndpoint } from '../helpers/socket';
-import { Alias } from '../entity/alias';
+import { Alias } from '../database/entity/alias';
 
 import { getRepository, LessThan } from 'typeorm';
-import { ModerationMessageCooldown, ModerationPermit, ModerationWarning } from '../entity/moderation';
+import { ModerationMessageCooldown, ModerationPermit, ModerationWarning } from '../database/entity/moderation';
 
 class Moderation extends System {
   @settings('lists')

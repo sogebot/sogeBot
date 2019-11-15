@@ -55,7 +55,7 @@ import { Vue, Component } from 'vue-property-decorator';
 import { isNil } from 'lodash-es';
 import { getSocket } from 'src/panel/helpers/socket';
 
-import { Timer } from 'src/bot/entity/timer';
+import { Timer } from 'src/bot/database/entity/timer';
 
 @Component({
   components: {

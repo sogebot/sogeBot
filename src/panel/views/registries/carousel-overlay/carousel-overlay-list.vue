@@ -74,7 +74,7 @@ import { faCircleNotch, faUpload, faLongArrowAltUp, faLongArrowAltDown } from '@
 library.add(faCircleNotch, faUpload, faLongArrowAltUp, faLongArrowAltDown);
 
 import { getSocket } from 'src/panel/helpers/socket';
-import { Carousel } from '../../../../bot/entity/carousel';
+import { Carousel } from 'src/bot/database/entity/carousel';
 
 @Component({
   components: {

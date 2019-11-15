@@ -13,7 +13,7 @@ import { incrementCountOfCommandUsage } from '../helpers/commands/count';
 import { debug, warning } from '../helpers/log';
 import uuid from 'uuid/v4';
 
-import { Alias as AliasEntity } from '../entity/alias';
+import { Alias as AliasEntity } from '../database/entity/alias';
 import { getRepository } from 'typeorm';
 import { adminEndpoint, publicEndpoint } from '../helpers/socket';
 

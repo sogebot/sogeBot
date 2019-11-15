@@ -27,7 +27,7 @@
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
 import { getSocket } from 'src/panel/helpers/socket';
-import { Bets } from 'src/bot/entity/bets';
+import { Bets } from 'src/bot/database/entity/bets';
 
 @Component({})
 export default class BetsOverlay extends Vue {

@@ -2,7 +2,7 @@ import Widget from './_interface';
 import { publicEndpoint } from '../helpers/socket';
 
 import { getRepository } from 'typeorm';
-import { WidgetSocial } from '../entity/widget';
+import { WidgetSocial } from '../database/entity/widget';
 
 class Social extends Widget {
   constructor() {

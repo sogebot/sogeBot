@@ -102,7 +102,7 @@ import uuid from 'uuid/v4';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faCheck, faTimes, faVolumeUp, faVolumeOff } from '@fortawesome/free-solid-svg-icons';
-import { Cooldown } from '../../../../bot/entity/cooldown';
+import { Cooldown } from 'src/bot/database/entity/cooldown';
 library.add(faVolumeUp, faVolumeOff, faCheck, faTimes);
 
 Component.registerHooks([

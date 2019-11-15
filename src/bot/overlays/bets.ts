@@ -3,7 +3,7 @@ import Overlay from './_interface';
 import { publicEndpoint } from '../helpers/socket';
 
 import { getRepository } from 'typeorm';
-import { Bets as BetsEntity } from '../entity/bets';
+import { Bets as BetsEntity } from '../database/entity/bets';
 
 class Bets extends Overlay {
 

@@ -55,7 +55,7 @@ import { getSocket } from 'src/panel/helpers/socket';
 import { Vue, Component/*, Watch */ } from 'vue-property-decorator';
 import { isNil } from 'lodash-es';
 import { escape } from 'xregexp';
-import { SongBan } from '../../../../bot/entity/song';
+import { SongBan } from 'src/bot/database/entity/song';
 
 @Component({
   components: {

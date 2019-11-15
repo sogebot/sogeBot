@@ -9,7 +9,7 @@ import { info, tip } from '../helpers/log';
 import { triggerInterfaceOnTip } from '../helpers/interface/triggers';
 
 import { getRepository } from 'typeorm';
-import { User, UserTip } from '../entity/user.js';
+import { User, UserTip } from '../database/entity/user';
 
 class Streamlabs extends Integration {
   socket: SocketIOClient.Socket | null = null;

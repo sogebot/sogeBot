@@ -11,12 +11,12 @@ const flatten = require('./helpers/flatten')
 const gitCommitInfo = require('git-commit-info');
 
 import { error, info } from './helpers/log';
-import { CacheTitles } from './entity/cacheTitles';
+import { CacheTitles } from './database/entity/cacheTitles';
 import uuid from 'uuid'
 import { getManager, getRepository } from 'typeorm';
-import { Dashboard, Widget } from './entity/dashboard';
-import { Translation } from './entity/translation'
-import { TwitchTag, TwitchTagLocalizationName } from './entity/twitch'
+import { Dashboard, Widget } from './database/entity/dashboard';
+import { Translation } from './database/entity/translation'
+import { TwitchTag, TwitchTagLocalizationName } from './database/entity/twitch'
 
 const Parser = require('./parser')
 

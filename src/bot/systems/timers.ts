@@ -10,7 +10,7 @@ import System from './_interface';
 import { adminEndpoint } from '../helpers/socket';
 
 import { getRepository } from 'typeorm';
-import { Timer, TimerResponse } from '../entity/timer';
+import { Timer, TimerResponse } from '../database/entity/timer';
 import Expects from '../expects';
 
 /*

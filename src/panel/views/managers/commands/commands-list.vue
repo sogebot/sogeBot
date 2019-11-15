@@ -104,7 +104,7 @@ import { faEye, faExclamationTriangle, faEyeSlash, faPlay, faStop, faKey } from 
 library.add(faEye, faEyeSlash, faExclamationTriangle, faPlay, faKey, faStop);
 
 import { getSocket } from '../../../helpers/socket';
-import { Commands } from '../../../../bot/entity/commands';
+import { Commands } from 'src/bot/database/entity/commands';
 
 @Component({
   components: {

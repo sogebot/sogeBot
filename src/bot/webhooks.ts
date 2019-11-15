@@ -7,7 +7,7 @@ import { isBot } from './commons';
 import { debug, error, follow, info, start } from './helpers/log';
 import { triggerInterfaceOnFollow } from './helpers/interface/triggers';
 import { getRepository } from 'typeorm';
-import { User } from './entity/user';
+import { User } from './database/entity/user';
 
 class Webhooks {
   enabled = {

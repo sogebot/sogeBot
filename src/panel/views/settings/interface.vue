@@ -232,7 +232,7 @@ import { flatten, unflatten } from 'src/bot/helpers/flatten';
 import { getListOf } from 'src/panel/helpers/getListOf';
 import { getSocket } from 'src/panel/helpers/socket';
 
-import { Permissions as PermissionEntity } from 'src/bot/entity/permissions';
+import { Permissions as PermissionEntity } from 'src/bot/database/entity/permissions';
 
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';

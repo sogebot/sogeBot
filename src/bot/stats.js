@@ -1,7 +1,7 @@
 'use strict'
 var _ = require('lodash')
 
-const { TwitchStats } = require('./entity/twitch');
+const { TwitchStats } = require('./database/entity/twitch');
 const { getRepository } = require('typeorm');
 const { error } = require('./helpers/log');
 

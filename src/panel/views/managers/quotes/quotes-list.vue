@@ -71,7 +71,7 @@
 
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
-import { Quotes } from '../../../../bot/entity/quotes';
+import { Quotes } from 'src/bot/database/entity/quotes';
 import { getSocket } from 'src/panel/helpers/socket';
 import { orderBy, uniq, xor, flatten } from 'lodash-es';
 

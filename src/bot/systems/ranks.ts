@@ -7,9 +7,9 @@ import { command, default_permission } from '../decorators';
 import { permission } from '../permissions';
 import System from './_interface';
 
-import { User } from '../entity/user';
+import { User } from '../database/entity/user';
 import { getRepository } from 'typeorm';
-import { Rank } from '../entity/rank';
+import { Rank } from '../database/entity/rank';
 import { adminEndpoint } from '../helpers/socket';
 
 /*

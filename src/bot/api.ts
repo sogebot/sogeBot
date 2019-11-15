@@ -15,12 +15,12 @@ import { getBroadcaster, isBot, isBroadcaster, isIgnored, sendMessage } from './
 import { triggerInterfaceOnFollow } from './helpers/interface/triggers';
 import { shared } from './decorators';
 import { getChannelChattersUnofficialAPI } from './microservices/getChannelChattersUnofficialAPI';
-import { ThreadEvent } from './entity/threadEvent';
+import { ThreadEvent } from './database/entity/threadEvent';
 
 import { getManager, getRepository, IsNull, Not } from 'typeorm';
-import { User } from './entity/user';
-import { TwitchClips, TwitchTag, TwitchTagLocalizationDescription, TwitchTagLocalizationName } from './entity/twitch';
-import { CacheGames } from './entity/cacheGames';
+import { User } from './database/entity/user';
+import { TwitchClips, TwitchTag, TwitchTagLocalizationDescription, TwitchTagLocalizationName } from './database/entity/twitch';
+import { CacheGames } from './database/entity/cacheGames';
 
 const setImmediateAwait = () => {
   return new Promise(resolve => {

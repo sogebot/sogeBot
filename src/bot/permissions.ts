@@ -11,9 +11,9 @@ import { isMainThread } from './cluster';
 import { error } from './helpers/log';
 import { adminEndpoint } from './helpers/socket';
 
-import { PermissionCommands, PermissionFilters, Permissions as PermissionsEntity } from './entity/permissions';
+import { PermissionCommands, PermissionFilters, Permissions as PermissionsEntity } from './database/entity/permissions';
 import { getRepository, LessThan } from 'typeorm';
-import { User } from './entity/user';
+import { User } from './database/entity/user';
 
 let isWarnedAboutCasters = false;
 

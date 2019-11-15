@@ -10,10 +10,10 @@ import {
   getRepository,
 } from 'typeorm';
 
-import { User } from '../entity/user';
-import { ThreadEvent } from '../entity/threadEvent';
+import { User } from '../database/entity/user';
+import { ThreadEvent } from '../database/entity/threadEvent';
 import { getAllOnlineUsernames } from '../helpers/getAllOnlineUsernames';
-import { Settings } from '../entity/settings';
+import { Settings } from '../database/entity/settings';
 import { getUserFromTwitch } from './getUserFromTwitch';
 import { clusteredFetchAccountAge } from '../cluster';
 

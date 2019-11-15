@@ -3,7 +3,7 @@ import { settings, ui } from '../decorators';
 import { publicEndpoint } from '../helpers/socket';
 
 import { getRepository } from 'typeorm';
-import { Poll } from '../entity/poll';
+import { Poll } from '../database/entity/poll';
 
 class Polls extends Overlay {
   @settings('display')

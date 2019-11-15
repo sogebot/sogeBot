@@ -116,7 +116,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, PropSync } from 'vue-property-decorator';
-import { CommonSettings } from '../../../../../bot/entity/alert';
+import { CommonSettings } from 'src/bot/database/entity/alert';
 
 declare global {
   interface Window {

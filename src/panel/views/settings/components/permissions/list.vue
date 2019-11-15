@@ -51,7 +51,7 @@
   import { getSocket } from 'src/panel/helpers/socket';
   import { orderBy } from 'lodash-es';
 
-  import { Permissions as PermissionEntity} from 'src/bot/entity/permissions'
+  import { Permissions as PermissionEntity} from 'src/bot/database/entity/permissions'
 
   export default Vue.extend({
     props: ['update'],

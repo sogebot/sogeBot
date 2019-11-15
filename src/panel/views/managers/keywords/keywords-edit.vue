@@ -74,7 +74,7 @@ import { Validate } from 'vuelidate-property-decorators';
 import { required } from 'vuelidate/lib/validators'
 
 import uuid from 'uuid/v4';
-import { Keyword } from '../../../../bot/entity/keyword';
+import { Keyword } from 'src/bot/database/entity/keyword';
 
 @Component({
   components: {

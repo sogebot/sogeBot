@@ -14,7 +14,7 @@ import { onChange, onLoad } from '../decorators/on';
 import { error, info } from '../helpers/log';
 import { adminEndpoint, publicEndpoint } from '../helpers/socket';
 import { Brackets, getRepository } from 'typeorm';
-import { SongBan, SongPlaylist, SongRequest } from '../entity/song';
+import { SongBan, SongPlaylist, SongRequest } from '../database/entity/song';
 
 const defaultApiKey = 'AIzaSyDYevtuLOxbyqBjh17JNZNvSQO854sngK0';
 

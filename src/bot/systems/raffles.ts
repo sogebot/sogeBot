@@ -10,8 +10,8 @@ import System from './_interface';
 import { adminEndpoint } from '../helpers/socket';
 
 import { getRepository } from 'typeorm';
-import { User } from '../entity/user';
-import { Raffle, RaffleParticipant, RaffleParticipantMessage } from '../entity/raffle';
+import { User } from '../database/entity/user';
+import { Raffle, RaffleParticipant, RaffleParticipantMessage } from '../database/entity/raffle';
 import { warning } from '../helpers/log';
 
 const TYPE_NORMAL = 0;

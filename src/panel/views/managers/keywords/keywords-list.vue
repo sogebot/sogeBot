@@ -51,7 +51,7 @@
 import { Vue, Component/*, Watch */ } from 'vue-property-decorator';
 import { getSocket } from 'src/panel/helpers/socket';
 
-import { Keyword } from 'src/bot/entity/keyword';
+import { Keyword } from 'src/bot/database/entity/keyword';
 
 @Component({
   components: {

@@ -7,7 +7,7 @@ export class Gallery {
 
   @Column()
   type!: string;
-  @Column('blob')
+  @Column('text')
   data!: string;
   @Column()
   name!: string;

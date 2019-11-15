@@ -12,8 +12,8 @@ import { parser } from '../decorators';
 import { isOwner, prepare, sendMessage } from '../commons';
 
 import { getRepository } from 'typeorm';
-import { User } from '../entity/user';
-import { Price as PriceEntity } from '../entity/price';
+import { User } from '../database/entity/user';
+import { Price as PriceEntity } from '../database/entity/price';
 import { adminEndpoint } from '../helpers/socket';
 import { error } from '../helpers/log';
 

@@ -168,7 +168,7 @@ export class AlertMedia {
   @Index()
   id!: string;
 
-  @Column('blob')
+  @Column('text')
   b64data!: string;
   @Column()
   chunkNo!: number;

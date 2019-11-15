@@ -38,7 +38,7 @@
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
 import { getSocket } from 'src/panel/helpers/socket';
-import { Permissions as PermissionEntity} from 'src/bot/entity/permissions'
+import { Permissions as PermissionEntity} from 'src/bot/database/entity/permissions'
 
 @Component({
   components: {

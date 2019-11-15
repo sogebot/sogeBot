@@ -157,7 +157,7 @@
 <script lang="ts">
 import { Vue, Component, Watch } from 'vue-property-decorator';
 import { getSocket } from 'src/panel/helpers/socket';
-import { Alert, CommonSettings } from 'src/bot/entity/alert';
+import { Alert, CommonSettings } from 'src/bot/database/entity/alert';
 
 import { remove, every } from 'lodash-es';
 

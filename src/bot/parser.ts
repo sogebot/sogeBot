@@ -4,7 +4,7 @@ import { sendMessage } from './commons';
 import { debug, error } from './helpers/log';
 import { incrementCountOfCommandUsage } from './helpers/commands/count';
 import { getRepository } from 'typeorm';
-import { PermissionCommands } from './entity/permissions';
+import { PermissionCommands } from './database/entity/permissions';
 
 class Parser {
   started_at = Date.now();

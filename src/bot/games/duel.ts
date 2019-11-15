@@ -7,8 +7,8 @@ import Game from './_interface';
 import { error } from '../helpers/log';
 
 import { getRepository } from 'typeorm';
-import { User } from '../entity/user';
-import { Duel as DuelEntity } from '../entity/duel';
+import { User } from '../database/entity/user';
+import { Duel as DuelEntity } from '../database/entity/duel';
 
 const ERROR_NOT_ENOUGH_OPTIONS = '0';
 const ERROR_ZERO_BET = '1';

@@ -4,7 +4,7 @@ import Overlay from './_interface';
 import { settings, ui } from '../decorators';
 import { publicEndpoint } from '../helpers/socket';
 import { getManager } from 'typeorm';
-import { EventList } from '../entity/eventList';
+import { EventList } from '../database/entity/eventList';
 
 class Credits extends Overlay {
   @settings('credits')

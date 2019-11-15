@@ -11,7 +11,7 @@ const { flatten } = require('./helpers/flatten');
 
 import { warning } from './helpers/log';
 import { getRepository } from 'typeorm';
-import { Translation } from './entity/translation';
+import { Translation } from './database/entity/translation';
 
 class Translate {
   custom = [];

@@ -8,7 +8,7 @@ import { isUUID, prepare, sendMessage } from '../commons';
 import XRegExp from 'xregexp';
 import { debug, error } from '../helpers/log';
 
-import { Keyword } from '../entity/keyword';
+import { Keyword } from '../database/entity/keyword';
 import { getRepository } from 'typeorm';
 import { adminEndpoint } from '../helpers/socket';
 

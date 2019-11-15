@@ -7,7 +7,7 @@ import { permission } from '../permissions';
 import System from './_interface';
 import { debug } from '../helpers/log';
 import { getConnection, getRepository } from 'typeorm';
-import { User, UserBit, UserTip } from '../entity/user';
+import { User, UserBit, UserTip } from '../database/entity/user';
 
 enum TYPE {
   TIME,

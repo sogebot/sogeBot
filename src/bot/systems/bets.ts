@@ -10,8 +10,8 @@ import { error, warning } from '../helpers/log';
 import { adminEndpoint } from '../helpers/socket';
 
 import { getRepository } from 'typeorm';
-import { Bets as BetsEntity, BetsParticipations } from '../entity/bets';
-import { User } from '../entity/user';
+import { Bets as BetsEntity, BetsParticipations } from '../database/entity/bets';
+import { User } from '../database/entity/user';
 import { isDbConnected } from '../helpers/database';
 
 const ERROR_NOT_ENOUGH_OPTIONS = 'Expected more parameters';

@@ -7,7 +7,7 @@ import { onMessage } from '../decorators/on';
 import System from './_interface';
 import { debug, error } from '../helpers/log';
 import { getRepository } from 'typeorm';
-import { User } from '../entity/user';
+import { User } from '../database/entity/user';
 
 /*
  * !me

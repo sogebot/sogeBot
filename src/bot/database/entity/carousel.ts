@@ -29,6 +29,6 @@ export class Carousel {
   @Column()
   showOnlyOncePerStream!: boolean;
 
-  @Column('blob')
+  @Column('text')
   base64!: string;
 }

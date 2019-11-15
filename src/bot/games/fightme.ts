@@ -6,7 +6,7 @@ import { MINUTE } from '../constants';
 import { getLocalizedName, isBroadcaster, isModerator, prepare, sendMessage, timeout } from '../commons';
 
 import { getRepository } from 'typeorm';
-import { User } from '../entity/user';
+import { User } from '../database/entity/user';
 
 /*
  * !fightme [user] - challenge [user] to fight

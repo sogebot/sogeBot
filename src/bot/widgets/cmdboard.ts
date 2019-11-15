@@ -3,7 +3,7 @@ import { settings } from '../decorators';
 import Widget from './_interface';
 import { adminEndpoint } from '../helpers/socket';
 import { getRepository } from 'typeorm';
-import { CommandsBoard } from '../entity/commands';
+import { CommandsBoard } from '../database/entity/commands';
 
 class Cmdboard extends Widget {
   @settings()

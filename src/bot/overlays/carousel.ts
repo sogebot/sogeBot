@@ -4,7 +4,7 @@ import uuid from 'uuid/v4';
 import { adminEndpoint, publicEndpoint } from '../helpers/socket';
 
 import { getRepository } from 'typeorm';
-import { Carousel as CarouselEntity } from '../entity/carousel';
+import { Carousel as CarouselEntity } from '../database/entity/carousel';
 
 class Carousel extends Overlay {
   @ui({
