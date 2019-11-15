@@ -16,6 +16,7 @@ const { Highlight } = require('../dest/entity/highlight');
 const { HowLongToBeatGame } = require('../dest/entity/howLongToBeatGame');
 const { Keyword } = require('../dest/entity/keyword');
 const { Settings } = require('../dest/entity/settings');
+const { PermissionCommands } = require('../dest/entity/permissions');
 const { EventList } = require('../dest/entity/eventList');
 const { Quotes } = require('../dest/entity/quotes');
 const { Permissions } = require('../dest/entity/permissions');
@@ -201,6 +202,33 @@ async function main() {
       }
       await getRepository(Settings).insert({ namespace: `/${type}/${item.system}`, name: item.key, value: JSON.stringify(item.value) });
     }
+  }
+
+  console.log(`Migr: core.permissions.commands`);
+  await getManager().clear(PermissionCommands);
+  items = await from.find('core.permissions.commands');
+  items.map(o => {
+    o.name = o.key;
+    delete o.key;
+    return o;
+  });
+  if (items.length > 0) {
+    for (const chunk of _.chunk(items, 100)) {
+      process.stdout.write('.');
+      await getRepository(PermissionCommands).save(chunk);
+    }
+    console.log();
+  }
+
+  console.log(`Migr: core.permissions`);
+  await getManager().clear(Permissions);
+  items = await from.find('core.permissions');
+  if (items.length > 0) {
+    for (const chunk of _.chunk(items, 100)) {
+      process.stdout.write('.');
+      await getRepository(Permissions).save(chunk);
+    }
+    console.log();
   }
 
   console.log(`Migr: widgetsEventList`);

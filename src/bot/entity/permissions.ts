@@ -47,6 +47,6 @@ export class PermissionCommands {
   @Index()
   @Column()
   name!: string;
-  @Column()
-  permission!: string;
+  @Column('varchar', { nullable: true, length: 36 })
+  permission!: string | null;
 };

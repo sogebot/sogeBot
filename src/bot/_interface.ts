@@ -12,6 +12,7 @@ import { getManager, getRepository } from 'typeorm';
 import { Settings } from './entity/settings';
 import { PermissionCommands, Permissions as PermissionsEntity } from './entity/permissions';
 import { adminEndpoint, publicEndpoint } from './helpers/socket';
+import { flatten, unflatten } from './helpers/flatten';
 
 class Module {
   public dependsOn: string[] = [];
@@ -215,6 +216,103 @@ class Module {
       adminEndpoint(this.nsp, 'settings', async (cb) => {
         cb(null, await this.getAllSettings(), await this.getUI());
       });
+      adminEndpoint(this.nsp, 'settings.update', async (data: { [x: string]: any }, cb) => {
+        // flatten and remove category
+        data = flatten(data);
+        const remap: ({ key: string; actual: string; toRemove: string[] } | { key: null; actual: null; toRemove: null })[] = Object.keys(flatten(data)).map(o => {
+          // skip commands, enabled and permissions
+          if (o.startsWith('commands') || o.startsWith('enabled') || o.startsWith('_permissions')) {
+            return {
+              key: o,
+              actual: o,
+              toRemove: [],
+            };
+          }
+
+          const toRemove: string[] = [];
+          for (const possibleVariable of o.split('.')) {
+            const isVariableFound = this.settingsList.find(o => possibleVariable === o.key);
+            if (isVariableFound) {
+              return {
+                key: o,
+                actual: isVariableFound.key,
+                toRemove,
+              };
+            } else {
+              toRemove.push(possibleVariable);
+            }
+          }
+          return {
+            key: null,
+            actual: null,
+            toRemove: null,
+          };
+        });
+
+        for (const { key, actual, toRemove } of remap) {
+          if (key === null || toRemove === null || actual === null) {
+            continue;
+          }
+
+          const joinedToRemove = toRemove.join('.');
+          for (const key of Object.keys(data)) {
+            if (joinedToRemove.length > 0) {
+              const value = data[key];
+              data[key.replace(joinedToRemove + '.', '')] = value;
+
+              if (key.replace(joinedToRemove + '.', '') !== key) {
+                delete data[key];
+              }
+            }
+          }
+        }
+        try {
+          for (const [key, value] of Object.entries(unflatten(data))) {
+            if (key === 'enabled' && ['core', 'overlays', 'widgets'].includes(this._name)) {
+              // ignore enabled if its core, overlay or widgets (we don't want them to be disabled)
+              continue;
+            } else if (key === '_permissions') {
+              for (const [command, currentValue] of Object.entries(value as any)) {
+                const c = this._commands.find((o) => o.name === command);
+                if (c) {
+                  if (currentValue === c.permission) {
+                    await getRepository(PermissionCommands).delete({ name: c.name });
+                  } else {
+                    const permCmd = await getRepository(PermissionCommands).findOne({ name: c.name }) || new PermissionCommands();
+                    permCmd.name = c.name;
+                    permCmd.permission = currentValue as string;
+                    await getRepository(PermissionCommands).save(permCmd);
+                  }
+                }
+              }
+            } else if (key === 'enabled') {
+              this.status({ state: value });
+            } else if (key === 'commands') {
+              for (const [defaultValue, currentValue] of Object.entries(value as any)) {
+                if (this._commands) {
+                  this.setCommand(defaultValue, currentValue as string);
+                }
+              }
+            } else if (key === '__permission_based__') {
+              for (const vKey of Object.keys(value as any)) {
+                this['__permission_based__' + vKey] = (value as any)[vKey];
+              }
+            } else {
+              this[key] = value;
+            }
+          }
+        } catch (e) {
+          error(e.stack);
+          if (typeof cb === 'function') {
+            setTimeout(() => cb(e.stack), 1000);
+          }
+        }
+
+        if (typeof cb === 'function') {
+          setTimeout(() => cb(null), 1000);
+        }
+      });
+
       adminEndpoint(this.nsp, 'set.value', async (variable, value, cb) => {
         this[variable] = value;
         if (typeof cb === 'function') {

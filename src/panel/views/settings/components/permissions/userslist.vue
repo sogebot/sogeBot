@@ -26,11 +26,11 @@
         <button type="button"
                 class="btn col-4"
                 v-for="user of chunk(searchData, 15)[searchPage]"
-                :class="[!currentIds.includes(user.id) ? 'btn-light' : 'btn-dark']"
+                :class="[!currentIds.includes(user.userId) ? 'btn-light' : 'btn-dark']"
                 :key="user.username"
-                @click="toggleUser(user.username, user.id)">
+                @click="toggleUser(user.username, user.userId)">
           <span v-html="user.username.replace(testUsername, '<strong>' + testUsername + '</strong>')"></span>
-          <small class="text-muted" v-html="user.id.replace(testUsername, '<strong>' + testUsername + '</strong>')"></small>
+          <small class="text-muted" v-html="String(user.userId).replace(testUsername, '<strong>' + testUsername + '</strong>')"></small>
         </button>
       </div>
       <div class="d-flex">
@@ -70,10 +70,10 @@
       const data: {
         chunk: any,
         usersSocket: any,
-        currentIds: string[],
+        currentIds: number[],
         currentUsers: {
           username: string,
-          id: string,
+          id: number,
         }[],
         users: any[],
         testUsername: string,
@@ -100,12 +100,13 @@
       return data;
     },
     mounted() {
+      this.currentIds = this.currentIds.map(o => Number(o));
+
       for (const id of this.currentIds) {
         if (!this.currentUsers.find(o => o.id === id)) {
-          this.usersSocket.emit('findOne', { collection: '_users', where: { id } }, (e, r) => {
-            if (e) return console.error(e);
+          this.usersSocket.emit('getNameById', id, (username) => {
             this.currentUsers.push({
-              id: r.id, username: r.username
+              id, username
             });
           });
         }
@@ -136,10 +137,11 @@
            this.searchData = [];
         } else {
           this.testUsername = val;
-          this.usersSocket.emit('search', { search: val, state }, (r) => {
-            if (r.state === this.stateSearch) {
+          console.log({val})
+          this.usersSocket.emit('find.viewers', { search: val, state }, (r, c, state) => {
+            if (state === this.stateSearch) {
               // expecting this data
-              this.searchData = r.results;
+              this.searchData = r;
               this.searchPage = 0;
               this.isSearching = false;
             }

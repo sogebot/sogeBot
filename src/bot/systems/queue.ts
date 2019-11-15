@@ -40,7 +40,20 @@ class Queue extends System {
   }
 
   sockets () {
-    adminEndpoint(this.nsp, 'pick', async (data, cb) => {
+    adminEndpoint(this.nsp, 'queue::getAllPicked', async(cb) => {
+      cb(this.pickedUsers);
+    });
+    adminEndpoint(this.nsp, 'queue::getAll', async(cb) => {
+      cb(
+        await getRepository(QueueEntity).find(),
+      );
+    });
+    adminEndpoint(this.nsp, 'queue::clear', async(cb) => {
+      cb(
+        await getRepository(QueueEntity).clear(),
+      );
+    });
+    adminEndpoint(this.nsp, 'queue::pick', async (data, cb) => {
       if (data.username) {
         const users: any[] = [];
         if (_.isString(data.username)) {

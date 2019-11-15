@@ -109,7 +109,6 @@ export default {
   created: function () {
       this.socket.emit('cmdboard::getAll', (items) => {
         this.items = items
-        console.debug({items})
         this.state.loading = this.$state.success;
       })
       this.socket.emit('settings', (err, data) => {

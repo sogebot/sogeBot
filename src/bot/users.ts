@@ -308,7 +308,7 @@ class Users extends Core {
     adminEndpoint(this.nsp, 'getNameById', async (id, cb) => {
       cb(await this.getNameById(id));
     });
-    adminEndpoint(this.nsp, 'find.viewers', async (opts: { search?: string; filter?: { subscribers: null | boolean; followers: null | boolean; active: null | boolean; vips: null | boolean }; page: number; order?: { orderBy: string; sortOrder: 'ASC' | 'DESC' } }, cb) => {
+    adminEndpoint(this.nsp, 'find.viewers', async (opts: { state?: any; search?: string; filter?: { subscribers: null | boolean; followers: null | boolean; active: null | boolean; vips: null | boolean }; page: number; order?: { orderBy: string; sortOrder: 'ASC' | 'DESC' } }, cb) => {
       const connection = await getConnection();
       opts.page = opts.page ?? 0;
 
@@ -374,7 +374,7 @@ class Users extends Core {
         viewer.sumTips = await global.currency.exchange(viewer.sumTips, 'EUR', global.currency.mainCurrency);
       }
 
-      cb(viewers, count);
+      cb(viewers, count, opts.state);
     });
     adminEndpoint(this.nsp, 'viewers::followedAt', async (id, cb) => {
       try {

@@ -49,13 +49,33 @@ class Raffles extends System {
   }
 
   sockets () {
-    adminEndpoint(this.nsp, 'pick', async (cb) => {
+    adminEndpoint(this.nsp, 'raffle::getWinner', async (username: string, cb) => {
+      cb(
+        await getRepository(User).findOne({username}),
+      );
+    });
+    adminEndpoint(this.nsp, 'raffle::updateParticipant', async (participant: RaffleParticipant, cb) => {
+      cb(
+        await getRepository(RaffleParticipant).save(participant),
+      );
+    });
+    adminEndpoint(this.nsp, 'raffle:getLatest', async (cb) => {
+      cb(
+        await getRepository(Raffle).findOne({
+          relations: ['participants', 'participants.messages'],
+          order: {
+            timestamp: 'DESC',
+          },
+        }),
+      );
+    });
+    adminEndpoint(this.nsp, 'raffle::pick', async (cb) => {
       this.pick();
     });
-    adminEndpoint(this.nsp, 'open', async (message) => {
+    adminEndpoint(this.nsp, 'raffle::open', async (message) => {
       this.open({ username: getOwner(), parameters: message });
     });
-    adminEndpoint(this.nsp, 'close', async () => {
+    adminEndpoint(this.nsp, 'raffle::close', async () => {
       await getRepository(Raffle).update({ isClosed: false }, { isClosed: true });
     });
   }
@@ -187,7 +207,7 @@ class Raffles extends System {
     keyword = keyword[1];
 
     // check if raffle running
-    const raffle = await getRepository(Raffle).findOne({ winner: null });
+    const raffle = await getRepository(Raffle).findOne({ winner: null, isClosed: false });
     if (raffle) {
       const message = await prepare('raffles.raffle-is-already-running', { keyword: raffle.keyword });
       sendMessage(message, opts.sender, opts.attr);

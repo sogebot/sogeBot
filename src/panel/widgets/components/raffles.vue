@@ -30,8 +30,8 @@
             ul.list-unstyled.p-2
               li(v-for="participant of fParticipants" :key="participant._id" style="cursor: pointer" @click="toggleEligibility(participant)")
                 fa(
-                  :class="[participant.eligible ? 'text-success': '']"
-                  :icon="['far', participant.eligible ? 'check-circle' : 'circle']"
+                  :class="[participant.isEligible ? 'text-success': '']"
+                  :icon="['far', participant.isEligible ? 'check-circle' : 'circle']"
                 ).mr-1
                 | {{ participant.username }}
               li.text-danger
@@ -58,7 +58,7 @@
                 span.input-group-text !
               input(type="text" class="form-control" :placeholder="translate('placeholder-enter-keyword')" v-model="keyword" :disabled="running")
               span.input-group-btn.btn-group
-                button(type="button" class="btn btn-success" :disabled="!running" @click="socket.emit('pick')")
+                button(type="button" class="btn btn-success" :disabled="!running" @click="socket.emit('raffle::pick')")
                   fa(icon="trophy" fixed-width)
 
             div.row.pb-1
@@ -139,9 +139,9 @@
 
               div(style="text-align: center")
                 div.d-flex
-                  div(class="w-100 btn" style="cursor: initial" :class="[winner.is.follower ? 'text-success' : 'text-danger']") {{translate('follower')}}
-                  div(class="w-100 btn" style="cursor: initial" :class="[winner.is.subscriber ? 'text-success' : 'text-danger']") {{translate('subscriber')}}
-                  button(type="button" class="btn btn-outline-secondary border-0 btn-block" @click="socket.emit('pick')")
+                  div(class="w-100 btn" style="cursor: initial" :class="[winner.isFollower ? 'text-success' : 'text-danger']") {{translate('follower')}}
+                  div(class="w-100 btn" style="cursor: initial" :class="[winner.isSubscriber ? 'text-success' : 'text-danger']") {{translate('subscriber')}}
+                  button(type="button" class="btn btn-outline-secondary border-0 btn-block" @click="socket.emit('raffle::pick')")
                     fa(icon="sync").mr-1
                     | {{translate('roll-again')}}
 
@@ -229,13 +229,12 @@ export default {
     },
     winnerMessages: function () {
       if (this.winner) {
-        return this.participants.filter(o => o.username === this.winner.username)[0].messages
+        return this.participants.find(o => o.username === this.winner.username).messages
       } else return []
     }
   },
   created: function () {
     this.socket.emit('settings', (err, data) => {
-      console.log({data})
       this.raffleAnnounceInterval = data.raffleAnnounceInterval
       this.luck.subscribersPercent = data.luck.subscribersPercent
       this.luck.followersPercent = data.luck.followersPercent
@@ -267,16 +266,24 @@ export default {
     refresh: async function () {
       await Promise.all([
         new Promise((resolve) => {
-          this.socket.emit('find', {}, (err, raffles) => {
-            const raffle = orderBy(raffles, 'timestamp', 'desc')[0]
-            if (Object.keys(raffle || {}).length > 0) {
-              this.running = !raffle.winner
+          this.socket.emit('raffle:getLatest', (raffle) => {
+            if (raffle) {
+              this.participants = raffle.participants;
+              this.running = !raffle.isClosed;
+
               if (!raffle.winner) {
+                this.winner = null
+              } else {
+                if (this.winner === null) {
+                  this.socket.emit('raffle::getWinner', raffle.winner, (user) => this.winner = user)
+                }
+              }
+
+              if (this.running) {
                 this.keyword = raffle.keyword
                 this.isTypeKeywords = raffle.type === 0
                 this.ticketsMax = raffle.max
                 this.ticketsMin = raffle.min
-                this.winner = null
 
                 // set eligibility
                 if (!raffle.subscribers && !raffle.followers) {
@@ -288,28 +295,18 @@ export default {
                   this.toggle('followers')
                   this.toggle('subscribers')
                 }
-              } else {
-                if (this.winner === null) {
-                  this.socket.emit('findOne', { collection: '_users', where: {username: raffle.winner}}, (err, user) => this.winner = user)
-                }
               }
             }
             resolve()
           })
         }),
-        new Promise((resolve) => {
-          this.socket.emit('find', { collection: 'participants' }, (err, data) => {
-            this.participants = data
-            resolve()
-          })
-        })
       ])
 
       setTimeout(() => this.refresh(), 1000)
     },
     toggleEligibility: function (participant) {
-      this.socket.emit('update', { collection: 'participants', items: [{_id: String(participant._id), eligible: !participant.eligible}] })
-      participant.eligible = !participant.eligible
+      participant.isEligible = !participant.isEligible;
+      this.socket.emit('raffle::updateParticipant', participant, () => {});
     },
     toggle: function (pick) {
       Vue.set(this.eligibility, pick, !this.eligibility[pick])
@@ -337,10 +334,10 @@ export default {
       console.group('raffles open()')
       console.debug('out: ', out.join(' '))
       console.groupEnd()
-      this.socket.emit('open', out.join(' '))
+      this.socket.emit('raffle::open', out.join(' '))
     },
     close: function () {
-      this.socket.emit('close')
+      this.socket.emit('raffle::close')
       this.running = false
     }
   }

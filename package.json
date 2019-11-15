@@ -61,7 +61,7 @@
     "terminal-kit": "1.31.4",
     "twitch-js": "2.0.0-beta.30",
     "twitter": "1.7.1",
-    "typeorm": "0.3.0-alpha.24",
+    "typeorm": "0.2.20",
     "url-join": "4.0.1",
     "uuid": "3.3.3",
     "velocity-animate": "1.5.2",
