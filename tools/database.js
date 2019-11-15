@@ -8,33 +8,33 @@ const availableDbs = ['nedb', 'mongodb'];
 const uuid = require('uuid/v4');
 
 const { createConnection, getConnection, getConnectionOptions, getManager, getRepository } = require('typeorm');
-const { Alias } = require('../dest/entity/alias');
-const { Commands, CommandsCount, CommandsBoard } = require('../dest/entity/commands');
-const { Cooldown } = require('../dest/entity/cooldown');
-const { CacheTitles } = require('../dest/entity/cacheTitles');
-const { Highlight } = require('../dest/entity/highlight');
-const { HowLongToBeatGame } = require('../dest/entity/howLongToBeatGame');
-const { Keyword } = require('../dest/entity/keyword');
-const { Settings } = require('../dest/entity/settings');
-const { PermissionCommands } = require('../dest/entity/permissions');
-const { EventList } = require('../dest/entity/eventList');
-const { Quotes } = require('../dest/entity/quotes');
-const { Permissions } = require('../dest/entity/permissions');
-const { User } = require('../dest/entity/user');
-const { Price } = require('../dest/entity/price');
-const { Rank } = require('../dest/entity/rank');
-const { SongPlaylist, SongBan } = require('../dest/entity/song');
-const { Timer, TimerResponse } = require('../dest/entity/timer');
-const { Dashboard, Widget } = require('../dest/entity/dashboard');
-const { Variable, VariableHistory, VariableWatch } = require('../dest/entity/variable');
-const { Translation } = require('../dest/entity/translation');
-const { Event, EventOperation } = require('../dest/entity/event');
-const { Goal, GoalGroup } = require('../dest/entity/goal');
-const { TwitchClips, TwitchStats } = require('../dest/entity/twitch');
-const { Carousel } = require('../dest/entity/carousel');
-const { Gallery } = require('../dest/entity/gallery');
-const { Alert, AlertMedia } = require('../dest/entity/alert');
-const { Text } = require('../dest/entity/text');
+const { Alias } = require('../dest/database/entity/alias');
+const { Commands, CommandsCount, CommandsBoard } = require('../dest/database/entity/commands');
+const { Cooldown } = require('../dest/database/entity/cooldown');
+const { CacheTitles } = require('../dest/database/entity/cacheTitles');
+const { Highlight } = require('../dest/database/entity/highlight');
+const { HowLongToBeatGame } = require('../dest/database/entity/howLongToBeatGame');
+const { Keyword } = require('../dest/database/entity/keyword');
+const { Settings } = require('../dest/database/entity/settings');
+const { PermissionCommands } = require('../dest/database/entity/permissions');
+const { EventList } = require('../dest/database/entity/eventList');
+const { Quotes } = require('../dest/database/entity/quotes');
+const { Permissions } = require('../dest/database/entity/permissions');
+const { User } = require('../dest/database/entity/user');
+const { Price } = require('../dest/database/entity/price');
+const { Rank } = require('../dest/database/entity/rank');
+const { SongPlaylist, SongBan } = require('../dest/database/entity/song');
+const { Timer, TimerResponse } = require('../dest/database/entity/timer');
+const { Dashboard, Widget } = require('../dest/database/entity/dashboard');
+const { Variable, VariableHistory, VariableWatch } = require('../dest/database/entity/variable');
+const { Translation } = require('../dest/database/entity/translation');
+const { Event, EventOperation } = require('../dest/database/entity/event');
+const { Goal, GoalGroup } = require('../dest/database/entity/goal');
+const { TwitchClips, TwitchStats } = require('../dest/database/entity/twitch');
+const { Carousel } = require('../dest/database/entity/carousel');
+const { Gallery } = require('../dest/database/entity/gallery');
+const { Alert, AlertMedia } = require('../dest/database/entity/alert');
+const { Text } = require('../dest/database/entity/text');
 
 const Datastore = require('nedb');
 const mongodbUri = require('mongodb-uri');
@@ -161,10 +161,6 @@ if (argv.from === 'nedb') {
 const connect = async function () {
   const connectionOptions = await getConnectionOptions();
   await createConnection({
-    synchronize: true,
-    logging: false,
-    entities: [__dirname + '/../dest/entity/*.{js,ts}'],
-    subscribers: [__dirname + '/../dest/entity/*.{js,ts}'],
     ...connectionOptions,
   });
 };
