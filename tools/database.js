@@ -161,8 +161,6 @@ const connect = async function () {
   const connectionOptions = await getConnectionOptions();
   await createConnection({
     ...connectionOptions,
-    synchronize: true,
-    migrationsRun: false,
   });
 };
 async function main() {
