@@ -53,7 +53,7 @@ Stats.prototype.getLatestStats = async function (self, socket) {
       .createQueryBuilder('stats')
       .offset(1)
       .where('stats.whenOnline > :whenOnline', { whenOnline: Date.now() - (1000 * 60 * 60 * 24 * 31) })
-      .orderBy('whenOnline', 'DESC')
+      .orderBy('stats.whenOnline', 'DESC')
       .getMany();
     let stats = {
       currentViewers: 0,
