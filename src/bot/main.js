@@ -33,7 +33,6 @@ import { isMainThread as isMainClusterThread } from './cluster';
 const { autoLoad } = require('./commons');
 
 const constants = require('./constants')
-const config = require('../config.json')
 
 global.linesParsed = 0
 global.avgResponse = []
