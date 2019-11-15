@@ -133,7 +133,8 @@ function Panel () {
         .addSelect('tags.tag_id', 'tag_id')
         .addSelect('tags.is_auto', 'is_auto')
         .addSelect('tags.is_current', 'is_current')
-        .leftJoinAndSelect(TwitchTagLocalizationName, 'names', `"names"."tagId" = "tag_id" AND "names"."locale" like "%${global.general.lang}%"`);
+        .leftJoinAndSelect(TwitchTagLocalizationName, 'names', `"names"."tagId" = "tag_id" AND "names"."locale" like :tag`)
+        .setParameter("tag", '%' + global.general.lang +'%');
 
       let results = await query.execute();
       if (results.length > 0) {
@@ -147,7 +148,8 @@ function Panel () {
           .addSelect('tags.tag_id', 'tag_id')
           .addSelect('tags.is_auto', 'is_auto')
           .addSelect('tags.is_current', 'is_current')
-          .leftJoinAndSelect(TwitchTagLocalizationName, 'names', `"names"."tagId" = "tag_id" AND "names"."locale" = "en-us"`);
+          .leftJoinAndSelect(TwitchTagLocalizationName, 'names', `"names"."tagId" = "tag_id" AND "names"."locale" = :tag`)
+          .setParameter("tag", 'en-us');
         results = await query.execute();
       }
       cb(results);
@@ -567,8 +569,9 @@ Panel.prototype.sendStreamData = async function (self, socket) {
       .addSelect('tags.tag_id', 'tag_id')
       .addSelect('tags.is_auto', 'is_auto')
       .addSelect('tags.is_current', 'is_current')
-      .where('is_current = True')
-      .leftJoinAndSelect(TwitchTagLocalizationName, 'names', `"names"."tagId" = "tag_id" AND "names"."locale" like "%${global.general.lang}%"`);
+      .where('tags.is_current = True')
+      .leftJoinAndSelect(TwitchTagLocalizationName, 'names', `"names"."tagId" = "tag_id" AND "names"."locale" like :tag`)
+      .setParameter("tag", '%' + global.general.lang +'%');
 
     let tagResults = await tagQuery.execute();
     if (tagResults.length === 0) {
@@ -580,8 +583,9 @@ Panel.prototype.sendStreamData = async function (self, socket) {
         .addSelect('tags.tag_id', 'tag_id')
         .addSelect('tags.is_auto', 'is_auto')
         .addSelect('tags.is_current', 'is_current')
-        .where('is_current = True')
-        .leftJoinAndSelect(TwitchTagLocalizationName, 'names', `"names"."tagId" = "tag_id" AND "names"."locale" = "en-us"`);
+        .where('tags.is_current = True')
+        .leftJoinAndSelect(TwitchTagLocalizationName, 'names', `"names"."tagId" = "tag_id" AND "names"."locale" = :tag`)
+        .setParameter("tag", 'en-us');
       tagResults = await tagQuery.execute();
     }
 
