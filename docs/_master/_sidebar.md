@@ -50,6 +50,3 @@
 * Integrations
   * [Twitter](_master/integrations/twitter.md)
   * [Spotify](_master/integrations/spotify.md)
-* Tools
-  * [Users cleanup](_master/tools/users-cleanup.md)
-  * [Database migration](_master/tools/database.md)
