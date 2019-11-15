@@ -13,8 +13,8 @@ const time = require('../../general.js').time;
 const _ = require('lodash');
 
 const { getRepository } = require('typeorm');
-const { User } = require('../../../dest/entity/user');
-const { Event } = require('../../../dest/entity/event');
+const { User } = require('../../../dest/database/entity/user');
+const { Event } = require('../../../dest/database/entity/event');
 
 describe('Events - cheer event', () => {
   before(async () => {

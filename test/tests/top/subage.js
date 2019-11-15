@@ -2,7 +2,7 @@
 const commons = require('../../../dest/commons');
 
 const { getRepository } = require('typeorm');
-const { User } = require('../../../dest/entity/user');
+const { User } = require('../../../dest/database/entity/user');
 
 require('../../general.js');
 

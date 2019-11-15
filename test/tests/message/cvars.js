@@ -13,8 +13,8 @@ const assert = require('chai').assert;
 const _ = require('lodash');
 
 const { getRepository } = require('typeorm');
-const { User } = require('../../../dest/entity/user');
-const { Variable } = require('../../../dest/entity/variable');
+const { User } = require('../../../dest/database/entity/user');
+const { Variable } = require('../../../dest/database/entity/variable');
 
 // stub
 _.set(global, 'widgets.custom_variables.io.emit', function () {});

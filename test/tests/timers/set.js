@@ -8,7 +8,7 @@ const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 
 const { getRepository } = require('typeorm');
-const { Timer } = require('../../../dest/entity/timer');
+const { Timer } = require('../../../dest/database/entity/timer');
 
 // users
 const owner = { username: 'soge__' };

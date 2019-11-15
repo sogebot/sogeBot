@@ -11,7 +11,7 @@ const Parser = require('../../../dest/parser').default;
 const owner = { username: 'soge__', userId: Math.floor(Math.random() * 100000) };
 
 const { getRepository } = require('typeorm');
-const { User } = require('../../../dest/entity/user');
+const { User } = require('../../../dest/database/entity/user');
 
 describe('Parser - case sensitive commands', async () => {
   const tests = [

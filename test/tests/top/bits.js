@@ -8,7 +8,7 @@ const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 
 const { getRepository } = require('typeorm');
-const { User, UserBit } = require('../../../dest/entity/user');
+const { User, UserBit } = require('../../../dest/database/entity/user');
 
 // users
 const owner = { username: 'soge__' };

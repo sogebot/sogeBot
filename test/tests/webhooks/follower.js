@@ -13,7 +13,7 @@ const channelId = String(_.random(9999999, false));
 const testuser = { username: 'testuser', userId: id };
 
 const { getRepository } = require('typeorm');
-const { User } = require('../../../dest/entity/user');
+const { User } = require('../../../dest/database/entity/user');
 
 describe('libs/webhooks - follower()', () => {
   before(async () => {

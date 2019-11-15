@@ -11,7 +11,7 @@ const ignoredUser = { userId: Math.floor(Math.random() * 100000), username: 'ign
 const user = { userId: Math.floor(Math.random() * 100000), username: 'user1' };
 
 const { getRepository } = require('typeorm');
-const { User } = require('../../../dest/entity/user');
+const { User } = require('../../../dest/database/entity/user');
 
 async function setUsersOnline(users) {
   await getRepository(User).update({}, { isOnline: false });

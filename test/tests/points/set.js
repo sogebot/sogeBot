@@ -7,7 +7,7 @@ const message = require('../../general.js').message;
 const _ = require('lodash');
 
 const { getRepository } = require('typeorm');
-const { User } = require('../../../dest/entity/user');
+const { User } = require('../../../dest/database/entity/user');
 
 const user = { username: 'oneuser', userId: String(_.random(999999, false)) };
 

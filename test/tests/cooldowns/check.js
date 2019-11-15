@@ -5,9 +5,9 @@
 require('../../general.js');
 
 const { getRepository } = require('typeorm');
-const { Cooldown } = require('../../../dest/entity/cooldown');
-const { User } = require('../../../dest/entity/user');
-const { Keyword } = require('../../../dest/entity/keyword');
+const { Cooldown } = require('../../../dest/database/entity/cooldown');
+const { User } = require('../../../dest/database/entity/user');
+const { Keyword } = require('../../../dest/database/entity/keyword');
 
 const assert = require('chai').assert;
 

@@ -10,7 +10,7 @@ const message = require('../../general.js').message;
 const time = require('../../general.js').time;
 
 const { getRepository } = require('typeorm');
-const { Poll, PollVote } = require('../../../dest/entity/poll');
+const { Poll, PollVote } = require('../../../dest/database/entity/poll');
 
 const assert = require('chai').assert;
 

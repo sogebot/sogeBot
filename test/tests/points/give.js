@@ -9,7 +9,7 @@ const _ = require('lodash');
 const assert = require('assert');
 
 const { getRepository } = require('typeorm');
-const { User } = require('../../../dest/entity/user');
+const { User } = require('../../../dest/database/entity/user');
 
 const user1 = { username: 'user1', points: 100, userId: String(_.random(999999, false)) };
 const user2 = { username: 'user2', points: 100, userId: String(_.random(999999, false)) };

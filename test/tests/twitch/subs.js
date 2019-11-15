@@ -13,7 +13,7 @@ const testuser2 = { username: 'testuser2', id: Math.floor(Math.random() * 1000) 
 const testuser3 = { username: 'testuser3', id: Math.floor(Math.random() * 1000) };
 
 const { getRepository } = require('typeorm');
-const { User } = require('../../../dest/entity/user');
+const { User } = require('../../../dest/database/entity/user');
 
 describe('lib/twitch - subs()', () => {
   before(async () => {

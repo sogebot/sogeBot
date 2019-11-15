@@ -9,8 +9,8 @@ const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 
 const { getRepository } = require('typeorm');
-const { User } = require('../../../dest/entity/user');
-const { Price } = require('../../../dest/entity/price');
+const { User } = require('../../../dest/database/entity/user');
+const { Price } = require('../../../dest/database/entity/price');
 
 // users
 const owner = { userId: Math.floor(Math.random() * 100000), username: 'soge__' };

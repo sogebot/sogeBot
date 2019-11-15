@@ -8,7 +8,7 @@ const message = require('../../general.js').message;
 const owner = { username: 'soge__' };
 
 const { getRepository } = require('typeorm');
-const { Timer, TimerResponse } = require('../../../dest/entity/timer');
+const { Timer, TimerResponse } = require('../../../dest/database/entity/timer');
 
 describe('Timers - toggle()', () => {
   beforeEach(async () => {

@@ -9,8 +9,8 @@ const variable = require('../../general.js').variable;
 const { getLocalizedName } = require('../../../dest/commons');
 
 const { getRepository } = require('typeorm');
-const { User } = require('../../../dest/entity/user');
-const { Duel } = require('../../../dest/entity/duel');
+const { User } = require('../../../dest/database/entity/user');
+const { Duel } = require('../../../dest/database/entity/duel');
 
 const _ = require('lodash');
 const assert = require('assert');

@@ -9,7 +9,7 @@ const assert = require('chai').assert;
 const message = require('../../general.js').message;
 
 const { getManager } = require('typeorm');
-const { Quotes } = require('../../../dest/entity/quotes');
+const { Quotes } = require('../../../dest/database/entity/quotes');
 
 // users
 const owner = { username: 'soge__', userId: 1 };

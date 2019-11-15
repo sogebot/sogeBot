@@ -11,8 +11,8 @@ const assert = require('assert');
 const { permission } = require('../../../dest/permissions');
 
 const { getRepository } = require('typeorm');
-const { Commands } = require('../../../dest/entity/commands');
-const { User } = require('../../../dest/entity/user');
+const { Commands } = require('../../../dest/database/entity/commands');
+const { User } = require('../../../dest/database/entity/user');
 
 // users
 const owner = { username: 'soge__', userId: Math.floor(Math.random() * 100000) };

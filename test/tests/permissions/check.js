@@ -11,8 +11,8 @@ const { permission } = require('../../../dest/permissions');
 const Parser = require('../../../dest/parser').default;
 
 const { getRepository } = require('typeorm');
-const { Permissions } = require('../../../dest/entity/permissions');
-const { User } = require('../../../dest/entity/user');
+const { Permissions } = require('../../../dest/database/entity/permissions');
+const { User } = require('../../../dest/database/entity/user');
 
 const users = [
   { username: '__owner__', userId: 1, id: 1 },

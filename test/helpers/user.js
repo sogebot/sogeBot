@@ -1,5 +1,5 @@
 const { getRepository } = require('typeorm');
-const { User } = require('../../dest/entity/user')
+const { User } = require('../../dest/database/entity/user')
 
 const viewer = {
   userId: 1,

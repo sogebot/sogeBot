@@ -12,8 +12,8 @@ const time = require('../../general.js').time;
 const _ = require('lodash');
 
 const { getRepository } = require('typeorm');
-const { User } = require('../../../dest/entity/user');
-const { Poll, PollVote } = require('../../../dest/entity/poll');
+const { User } = require('../../../dest/database/entity/user');
+const { Poll, PollVote } = require('../../../dest/database/entity/poll');
 
 const assert = require('chai').assert;
 

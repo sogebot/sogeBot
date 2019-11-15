@@ -9,7 +9,7 @@ const message = require('../../general.js').message;
 const constants = require('../../../dest/constants');
 
 const { getRepository } = require('typeorm');
-const { User } = require('../../../dest/entity/user');
+const { User } = require('../../../dest/database/entity/user');
 
 // users
 const owner = { username: 'soge__' };

@@ -7,7 +7,7 @@ const message = require('../../general.js').message;
 const _ = require('lodash');
 
 const { getRepository } = require('typeorm');
-const { Bets } = require('../../../dest/entity/bets');
+const { Bets } = require('../../../dest/database/entity/bets');
 
 // users
 const owner = { username: 'soge__' };

@@ -11,7 +11,7 @@ const constants = require('../../../dest/constants');
 const moment = require('moment-timezone');
 
 const { getRepository } = require('typeorm');
-const { User } = require('../../../dest/entity/user');
+const { User } = require('../../../dest/database/entity/user');
 
 // users
 const owner = { username: 'soge__' };

@@ -6,8 +6,8 @@ const message = require('../../general.js').message;
 const assert = require('assert');
 
 const { getRepository } = require('typeorm');
-const { Keyword } = require('../../../dest/entity/keyword');
-const { User } = require('../../../dest/entity/user');
+const { Keyword } = require('../../../dest/database/entity/keyword');
+const { User } = require('../../../dest/database/entity/user');
 
 // users
 const owner = { username: 'soge__', userId: Math.floor(Math.random() * 100000) };
