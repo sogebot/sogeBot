@@ -23,21 +23,28 @@ const { Poll, PollVote } = require('../../dest/database/entity/poll');
 const { Duel } = require('../../dest/database/entity/duel');
 const { Variable, VariableHistory, VariableURL } = require('../../dest/database/entity/variable');
 const { Event, EventOperation } = require('../../dest/database/entity/event');
+const { PermissionCommands } = require('../../dest/database/entity/permissions');
+
+let justStarted = true;
 
 module.exports = {
   cleanup: async function () {
     const waitForIt = async (resolve, reject) => {
       try {
         isDbConnected = (await getManager()).connection.isConnected;
+        if (justStarted) {
+          await waitMs(5000);
+          justStarted = false;
+        }
       } catch (e) {}
-      if (!isDbConnected || _.isNil(global.db) || _.isNil(global.systems)) {
-        return setTimeout(() => waitForIt(resolve, reject), 5000);
+      if (!isDbConnected || _.isNil(global.systems)) {
+        return setTimeout(() => waitForIt(resolve, reject), 1000);
       }
 
       debug('test', chalk.bgRed('*** Cleaning up collections ***'));
       await waitMs(400); // wait ittle bit for transactions to be done
 
-      const entities = [Event, EventOperation, Variable, VariableHistory, VariableURL, Raffle, Duel, PollVote, Poll, TimerResponse, Timer, BetsParticipations, UserTip, UserBit, CommandsResponses, User, ModerationPermit, Alias, Bets, Commands, CommandsCount, Quotes, Settings, Cooldown, Keyword, Price];
+      const entities = [PermissionCommands, Event, EventOperation, Variable, VariableHistory, VariableURL, Raffle, Duel, PollVote, Poll, TimerResponse, Timer, BetsParticipations, UserTip, UserBit, CommandsResponses, User, ModerationPermit, Alias, Bets, Commands, CommandsCount, Quotes, Settings, Cooldown, Keyword, Price];
       if (['postgres', 'mysql'].includes((await getManager()).connection.options.type)) {
         const metadatas = [];
         for (const entity of entities) {
@@ -93,6 +100,7 @@ module.exports = {
       resolve();
     };
     return new Promise((resolve, reject) => {
+      debug('test', chalk.bgRed('cleanup init'));
       waitForIt(resolve, reject);
     });
   },

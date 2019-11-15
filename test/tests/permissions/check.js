@@ -11,7 +11,7 @@ const { permission } = require('../../../dest/permissions');
 const Parser = require('../../../dest/parser').default;
 
 const { getRepository } = require('typeorm');
-const { Permissions } = require('../../../dest/database/entity/permissions');
+const { Permissions, PermissionCommands } = require('../../../dest/database/entity/permissions');
 const { User } = require('../../../dest/database/entity/user');
 
 const users = [
@@ -371,18 +371,73 @@ describe('Permissions - check()', () => {
     }
   });
 
-  describe(`Disabled !uptime command should not work`, () => {
+  describe(`Enabled !me command should work`, () => {
     beforeEach(async () => {
-      await global.db.engine.insert(global.permissions.collection.commands, {
-        key: '!uptime',
+      await getRepository(PermissionCommands).clear();
+    });
+    for (let j = 0; j < users.length; j++) {
+      it (`--- ${users[j].username} should trigger command !me`, async () => {
+        const parse = new Parser({ sender: users[j], message: '!me', skip: false, quiet: false });
+        await parse.process();
+
+        let hours = '0.0';
+        let points = '0';
+        let messages = '0';
+        let tips = '0.00';
+        let bits = '0'
+        if (users[j].username === '__viewer_points__') {
+          points = '100';
+        }
+        if (users[j].username === '__viewer_watched__') {
+          hours = '100.0';
+        }
+        if (users[j].username === '__viewer_tips__') {
+          tips = '100.00';
+        }
+        if (users[j].username === '__viewer_bits__') {
+          bits = '100';
+        }
+        if (users[j].username === '__viewer_messages__') {
+          messages = '100';
+        }
+        await message.isSentRaw(`@${users[j].username} | ${hours}h | ${points} points | ${messages} messages | ${tips}€ | ${bits} bits`, users[j], 1000);
+      });
+    }
+  });
+
+  describe(`Disabled !me command should not work`, () => {
+    beforeEach(async () => {
+      await getRepository(PermissionCommands).save({
+        name: '!me',
         permission: null,
       });
     });
     for (let j = 0; j < users.length; j++) {
-      it (`--- ${users[j].username} should NOT trigger disabled command !uptime`, async () => {
-        const parse = new Parser({ sender: users[j], message: '!uptime', skip: false, quiet: false });
+      it (`--- ${users[j].username} should NOT trigger disabled command !me`, async () => {
+        const parse = new Parser({ sender: users[j], message: '!me', skip: false, quiet: false });
         await parse.process();
-        await message.isNotSentRaw('Stream is currently offline for', users[j], 1000);
+
+        let hours = '0.0';
+        let points = '0';
+        let messages = '0';
+        let tips = '0.00';
+        let bits = '0'
+        if (users[j].username === '__viewer_points__') {
+          points = '100';
+        }
+        if (users[j].username === '__viewer_watched__') {
+          hours = '100.0';
+        }
+        if (users[j].username === '__viewer_tips__') {
+          tips = '100.00';
+        }
+        if (users[j].username === '__viewer_bits__') {
+          bits = '100';
+        }
+        if (users[j].username === '__viewer_messages__') {
+          messages = '100';
+        }
+        await message.isNotSentRaw(`@${users[j].username} | ${hours}h | ${points} points | ${messages} messages | ${tips}€ | ${bits} bits`, users[j], 1000);
       });
     }
   });
