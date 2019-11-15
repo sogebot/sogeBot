@@ -16,10 +16,9 @@ const { Highlight } = require('../dest/database/entity/highlight');
 const { HowLongToBeatGame } = require('../dest/database/entity/howLongToBeatGame');
 const { Keyword } = require('../dest/database/entity/keyword');
 const { Settings } = require('../dest/database/entity/settings');
-const { PermissionCommands } = require('../dest/database/entity/permissions');
 const { EventList } = require('../dest/database/entity/eventList');
 const { Quotes } = require('../dest/database/entity/quotes');
-const { Permissions } = require('../dest/database/entity/permissions');
+const { Permissions, PermissionCommands } = require('../dest/database/entity/permissions');
 const { User } = require('../dest/database/entity/user');
 const { Price } = require('../dest/database/entity/price');
 const { Rank } = require('../dest/database/entity/rank');
@@ -216,17 +215,6 @@ async function main() {
     console.log();
   }
 
-  console.log(`Migr: core.permissions`);
-  await getManager().clear(Permissions);
-  items = await from.find('core.permissions');
-  if (items.length > 0) {
-    for (const chunk of _.chunk(items, 100)) {
-      process.stdout.write('.');
-      await getRepository(Permissions).save(chunk);
-    }
-    console.log();
-  }
-
   console.log(`Migr: widgetsEventList`);
   await getManager().clear(EventList);
   items = (await from.find('widgetsEventList')).map(o => {
@@ -325,7 +313,7 @@ async function main() {
     console.log();
   }
 
-  console.log(`Migr: permissions`);
+  console.log(`Migr: core.permissions`);
   if (connection.options.type === 'postgres') {
     await getRepository(Permissions).query('TRUNCATE "permissions" CASCADE');
   } else {
@@ -337,7 +325,7 @@ async function main() {
   if (items.length > 0) {
     for (const chunk of _.chunk(items, 100)) {
       process.stdout.write('.');
-      await getRepository(Permissions).insert(chunk);
+      await getRepository(Permissions).save(chunk);
     }
     console.log();
   }
