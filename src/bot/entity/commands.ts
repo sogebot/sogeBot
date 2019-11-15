@@ -49,3 +49,18 @@ export class CommandsCount {
   @Column('bigint', { transformer: new ColumnNumericTransformer() })
   timestamp!: number;
 };
+
+@Entity()
+export class CommandsBoard {
+  @PrimaryGeneratedColumn('uuid')
+  id!: string;
+
+  @Column()
+  order!: number;
+  @Column()
+  text!: string;
+  @Column()
+  command!: string;
+
+
+}

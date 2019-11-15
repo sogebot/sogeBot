@@ -2,6 +2,8 @@ import { getOwner } from '../commons';
 import { settings } from '../decorators';
 import Widget from './_interface';
 import { adminEndpoint } from '../helpers/socket';
+import { getRepository } from 'typeorm';
+import { CommandsBoard } from '../entity/commands';
 
 class Cmdboard extends Widget {
   @settings()
@@ -15,10 +17,16 @@ class Cmdboard extends Widget {
   }
 
   public sockets() {
-    adminEndpoint(this.nsp, 'cmdboard.widget.fetch', async (cb) => {
-      cb(await global.db.engine.find('widgetsCmdBoard'));
+    adminEndpoint(this.nsp, 'cmdboard::getAll', async (cb) => {
+      cb(await getRepository(CommandsBoard).find());
     });
-    adminEndpoint(this.nsp, 'cmdboard.widget.run', (command) => {
+    adminEndpoint(this.nsp, 'cmdboard::save', async (items: CommandsBoard[], cb) => {
+      cb(await getRepository(CommandsBoard).save(items));
+    });
+    adminEndpoint(this.nsp, 'cmdboard::remove', async (item: CommandsBoard, cb) => {
+      cb(await getRepository(CommandsBoard).remove(item));
+    });
+    adminEndpoint(this.nsp, 'cmdboard::run', (command) => {
       global.tmi.message({
         message: {
           tags: { username: getOwner() },

@@ -116,6 +116,8 @@ import 'codemirror/lib/codemirror.css';
 import { Validate } from 'vuelidate-property-decorators';
 import { required } from 'vuelidate/lib/validators'
 
+import uuid from 'uuid/v4';
+
 @Component({
   components: {
     'loading': () => import('../../../components/loading.vue'),
@@ -133,7 +135,7 @@ export default class textOverlayEdit extends Vue {
   error: any = null;
   pending: boolean = false;
 
-  id: string | null = null;
+  id: string = uuid();
   @Validate({ required })
   name: string = '';
   html: string = '<!-- you can also use html here, global filters and custom variables are also available -->\n\n';
@@ -197,7 +199,7 @@ export default class textOverlayEdit extends Vue {
     // load up from db
     if (this.$route.params.id) {
       this.id = this.$route.params.id
-      this.socket.emit('findOne', { collection: 'data', where: { _id: this.$route.params.id } }, (err, data) => {
+      this.socket.emit('text::getOne', this.$route.params.id, (data) => {
         this.name = data.name
         this.html = data.text
         this.js = data.js
@@ -211,7 +213,14 @@ export default class textOverlayEdit extends Vue {
 
   async remove () {
     await new Promise(resolve => {
-      this.socket.emit('delete', {collection: 'data', _id: this.id}, (err) => {
+      this.socket.emit('text::remove', {
+        id: this.id,
+        name: this.name,
+        text: this.html,
+        js: this.js,
+        css: this.css,
+        external: this.external
+      }, () => {
         resolve();
       })
     })
@@ -223,24 +232,21 @@ export default class textOverlayEdit extends Vue {
     if (!this.$v.$invalid) {
       this.state.save = 1;
       const data = {
-        _id: this.id,
+        id: this.id,
         name: this.name,
         text: this.html,
         js: this.js,
         css: this.css,
         external: this.external
       }
-      this.socket.emit('update', {collection: 'data', items: [data]}, (err, data) => {
+      this.socket.emit('text::save', data, (err, data) => {
         if (err) {
           console.error(err)
           return this.state.save = 3
         }
         this.state.save = 2
         this.pending = false
-        if (this.id === null) {
-          this.id = String(data._id)
-          this.$router.push({ name: 'TextOverlayEdit', params: { id: this.id } });
-        }
+        this.$router.push({ name: 'TextOverlayEdit', params: { id: this.id } });
         setTimeout(() => this.state.save = 0, 1000)
       });
     } else {

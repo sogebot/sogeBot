@@ -9,7 +9,7 @@ const uuid = require('uuid/v4');
 
 const { createConnection, getConnection, getConnectionOptions, getManager, getRepository } = require('typeorm');
 const { Alias } = require('../dest/entity/alias');
-const { Commands, CommandsCount } = require('../dest/entity/commands');
+const { Commands, CommandsCount, CommandsBoard } = require('../dest/entity/commands');
 const { Cooldown } = require('../dest/entity/cooldown');
 const { CacheTitles } = require('../dest/entity/cacheTitles');
 const { Highlight } = require('../dest/entity/highlight');
@@ -33,6 +33,11 @@ const { TwitchClips, TwitchStats } = require('../dest/entity/twitch');
 const { Carousel } = require('../dest/entity/carousel');
 const { Gallery } = require('../dest/entity/gallery');
 const { Alert, AlertMedia } = require('../dest/entity/alert');
+const { Text } = require('../dest/entity/text');
+
+const Datastore = require('nedb');
+const mongodbUri = require('mongodb-uri');
+const client = require('mongodb').MongoClient;
 
 const _ = require('lodash');
 
@@ -68,7 +73,90 @@ const dbName = {
   },
 };
 
-const from = new (require('../dest/databases/database'))(false, false, argv.from, dbName.from());
+
+class INeDB {
+  constructor () {
+    this.connected = true; // slow down for proper load
+
+    if (!fs.existsSync('./db')) {
+      fs.mkdirSync('./db');
+    }
+    if (!fs.existsSync('./db/nedb')) {
+      fs.mkdirSync('./db/nedb');
+    }
+    this.table = {};
+  }
+
+  on (table) {
+    if (_.isNil(this.table[table])) {
+      this.table[table] = new Datastore({ filename: './db/nedb/' + table + '.db', autoload: true });
+      this.table[table].persistence.setAutocompactionInterval(60000);
+    }
+    return this.table[table];
+  }
+
+  async find (table) {
+    this.on(table); // init table
+
+    return new Promise((resolve, reject) => {
+      this.on(table).find({}, async (err, items) => {
+        if (err) {
+          error(err.message);
+          error(util.inspect({ type: 'find', table, where }));
+        }
+        resolve(items || []);
+      });
+    });
+  }
+}
+
+class IMongoDB {
+  constructor (mongoUri) {
+    this.connected = false;
+    this.client = null;
+
+    this.mongoUri = mongoUri;
+    this.dbName = mongodbUri.parse(this.mongoUri).database;
+
+    this.connect();
+  }
+
+  getClient() {
+    return this.client.db(this.dbName);
+  }
+
+  async connect () {
+    this.client = await client.connect(this.mongoUri,
+      {
+        useNewUrlParser: true,
+        reconnectTries: Number.MAX_VALUE,
+        connectTimeoutMS: 60000,
+        useUnifiedTopology: true,
+      });
+    this.connected = true;
+  }
+
+  async find (table) {
+    try {
+      const db = this.client.db(this.dbName);
+      const items = await db.collection(table).find({});
+      return items.toArray();
+    } catch (e) {
+      error(e.stack);
+      if (e.message.match(/EPIPE/g)) {
+        error('Something went wrong with mongodb instance (EPIPE error)');
+        process.exit();
+      }
+    }
+  }
+}
+
+let from;
+if (argv.from === 'nedb') {
+  from = new INeDB();
+} else {
+  from = new IMongoDB(dbName.from());
+}
 const connect = async function () {
   const connectionOptions = await getConnectionOptions();
   await createConnection({
@@ -80,7 +168,7 @@ const connect = async function () {
   });
 };
 async function main() {
-  if (!from.engine.connected) {
+  if (!from.connected) {
     return setTimeout(() => main(), 1000);
   };
   await connect();
@@ -93,7 +181,7 @@ async function main() {
   let items;
   console.log('Migr: cache.titles');
   await getManager().clear(CacheTitles);
-  items = (await from.engine.find('cache.titles')).map(o => {
+  items = (await from.find('cache.titles')).map(o => {
     delete o._id; delete o.id; return {...o, timestamp: Number(o.timestamp || 0) };
   });
   if (items.length > 0) {
@@ -107,7 +195,7 @@ async function main() {
   await getManager().clear(Settings);
   for (const type of ['core', 'overlays', 'games', 'registries', 'integrations', 'systems']) {
     console.log(`Migr: ${type}.settings`);
-    for (const item of await from.engine.find(`${type}.settings`)) {
+    for (const item of await from.find(`${type}.settings`)) {
       if (item.key.includes('.') || typeof item.system === 'undefined') {
         continue;
       }
@@ -117,7 +205,7 @@ async function main() {
 
   console.log(`Migr: widgetsEventList`);
   await getManager().clear(EventList);
-  items = (await from.engine.find('widgetsEventList')).map(o => {
+  items = (await from.find('widgetsEventList')).map(o => {
     return {
       event: o.event,
       username: o.username,
@@ -144,7 +232,7 @@ async function main() {
 
   console.log(`Migr: systems.quotes`);
   await getManager().clear(Quotes);
-  items = (await from.engine.find('systems.quotes')).map(o => {
+  items = (await from.find('systems.quotes')).map(o => {
     delete o._id; delete o.id; return o;
   });
   if (items.length > 0) {
@@ -157,7 +245,7 @@ async function main() {
 
   console.log(`Migr: systems.alias`);
   await getManager().clear(Alias);
-  items = (await from.engine.find('systems.alias')).map(o => {
+  items = (await from.find('systems.alias')).map(o => {
     delete o._id; delete o.id; return o;
   });
   if (items.length > 0) {
@@ -174,10 +262,10 @@ async function main() {
   } else {
     await getRepository(Commands).clear();
   }
-  items = await from.engine.find('systems.customcommands');
+  items = await from.find('systems.customcommands');
   for (const item of items) {
     // add responses
-    const responses = (await from.engine.find('systems.customcommands.responses', { cid: item.id })).map(o => {
+    const responses = (await from.find('systems.customcommands.responses', { cid: item.id })).map(o => {
       delete o._id; delete o.id;
       if (typeof o.filter === 'undefined') {
         o.filter = '';
@@ -202,7 +290,7 @@ async function main() {
 
   console.log(`Migr: core.commands.count `);
   await getManager().clear(CommandsCount);
-  items = (await from.engine.find('core.commands.count')).map(o => {
+  items = (await from.find('core.commands.count')).map(o => {
     delete o._id; return o;
   });
   if (items.length > 0) {
@@ -219,7 +307,7 @@ async function main() {
   } else {
     await getRepository(Permissions).clear();
   }
-  items = (await from.engine.find('core.permissions')).map(o => {
+  items = (await from.find('core.permissions')).map(o => {
     delete o._id; return o;
   });
   if (items.length > 0) {
@@ -236,7 +324,7 @@ async function main() {
   } else {
     await getRepository(Cooldown).clear();
   }
-  items = (await from.engine.find('systems.cooldown')).map(o => {
+  items = (await from.find('systems.cooldown')).map(o => {
     delete o._id; return {
       name: o.key,
       miliseconds: o.miliseconds,
@@ -260,7 +348,7 @@ async function main() {
 
   console.log(`Migr: systems.highlights`);
   await getManager().clear(Highlight);
-  items = (await from.engine.find('systems.highlights')).map(o => {
+  items = (await from.find('systems.highlights')).map(o => {
     return {
       videoId: o.id,
       timestamp: o.timestamp,
@@ -279,7 +367,7 @@ async function main() {
 
   console.log(`Migr: systems.howlongtobeat`);
   await getManager().clear(HowLongToBeatGame);
-  items = (await from.engine.find('systems.howlongtobeat')).map(o => {
+  items = (await from.find('systems.howlongtobeat')).map(o => {
     delete o._id; return o;
   });
   if (items.length > 0) {
@@ -295,7 +383,7 @@ async function main() {
 
   console.log(`Migr: systems.keywords`);
   await getManager().clear(Keyword);
-  items = (await from.engine.find('systems.keywords')).map(o => {
+  items = (await from.find('systems.keywords')).map(o => {
     delete o._id; return o;
   });
   if (items.length > 0) {
@@ -313,14 +401,14 @@ async function main() {
     await getRepository(User).clear();
   }
 
-  const points = await from.engine.find('users.points');
-  const tips = await from.engine.find('users.tips');
-  const messages = await from.engine.find('users.messages');
-  const bits = await from.engine.find('users.bits');
-  const watched = await from.engine.find('users.watched');
-  const chat = await from.engine.find('users.chat');
+  const points = await from.find('users.points');
+  const tips = await from.find('users.tips');
+  const messages = await from.find('users.messages');
+  const bits = await from.find('users.bits');
+  const watched = await from.find('users.watched');
+  const chat = await from.find('users.chat');
 
-  items = (await from.engine.find('users')).map(o => {
+  items = (await from.find('users')).map(o => {
     return {
       userId: o.id,
       username: o.username,
@@ -388,7 +476,7 @@ async function main() {
 
   console.log(`Migr: systems.price`);
   await getManager().clear(Keyword);
-  items = (await from.engine.find('systems.price')).map(o => {
+  items = (await from.find('systems.price')).map(o => {
     delete o._id; return o;
   });
   if (items.length > 0) {
@@ -401,7 +489,7 @@ async function main() {
 
   console.log(`Migr: systems.ranks`);
   await getManager().clear(Rank);
-  items = (await from.engine.find('systems.ranks')).map(o => {
+  items = (await from.find('systems.ranks')).map(o => {
     delete o._id; return {
       hours: o.hours,
       rank: o.value,
@@ -417,7 +505,7 @@ async function main() {
 
   console.log(`Migr: systems.songs.playlist`);
   await getManager().clear(SongPlaylist);
-  items = (await from.engine.find('systems.songs.playlist')).map(o => {
+  items = (await from.find('systems.songs.playlist')).map(o => {
     return {
       seed: 1,
       title: o.title,
@@ -441,7 +529,7 @@ async function main() {
 
   console.log(`Migr: systems.songs.ban`);
   await getManager().clear(SongBan);
-  items = (await from.engine.find('systems.songs.ban')).map(o => {
+  items = (await from.find('systems.songs.ban')).map(o => {
     return {
       title: o.title,
       videoId: o.videoId,
@@ -459,8 +547,8 @@ async function main() {
   await getManager().clear(TimerResponse);
   await getManager().clear(Timer);
 
-  const responses = await from.engine.find('systems.timers.responses');
-  items = (await from.engine.find('systems.timers')).map(o => {
+  const responses = await from.find('systems.timers.responses');
+  items = (await from.find('systems.timers')).map(o => {
     return {
       name: o.name,
       triggerEveryMessage: o.messages,
@@ -491,8 +579,8 @@ async function main() {
   await getManager().clear(Widget);
   await getManager().clear(Dashboard);
 
-  const widgets = await from.engine.find('widgets');
-  items = (await from.engine.find('dashboards')).map(o => {
+  const widgets = await from.find('widgets');
+  items = (await from.find('dashboards')).map(o => {
     return {
       name: o.name,
       createdAt: o.createdAt,
@@ -536,8 +624,8 @@ async function main() {
   console.log(`Migr: custom.variables, custom.variables.history`);
   await getManager().clear(VariableHistory);
   await getManager().clear(Variable);
-  const history = (await from.engine.find('custom.variables.history'));
-  items = (await from.engine.find('custom.variables')).map(o => {
+  const history = (await from.find('custom.variables.history'));
+  items = (await from.find('custom.variables')).map(o => {
     return {
       id: o.id,
       variableName: o.variableName,
@@ -584,7 +672,7 @@ async function main() {
 
   console.log(`Migr: customTranslations`);
   await getManager().clear(Translation);
-  items = (await from.engine.find('customTranslations')).map(o => {
+  items = (await from.find('customTranslations')).map(o => {
     return {
       name: o.key,
       value: o.value,
@@ -601,8 +689,8 @@ async function main() {
   console.log(`Migr: events`);
   await getManager().clear(EventOperation);
   await getManager().clear(Event);
-  const operations = await from.engine.find('events.operations');
-  items = (await from.engine.find('events'))
+  const operations = await from.find('events.operations');
+  items = (await from.find('events'))
     .map(o => {
       return {
         name: o.key,
@@ -631,8 +719,8 @@ async function main() {
   console.log(`Migr: overlays.goals.groups`);
   await getManager().clear(Goal);
   await getManager().clear(GoalGroup);
-  const goals = await from.engine.find('overlays.goals.goals');
-  items = (await from.engine.find('overlays.goals.groups'))
+  const goals = await from.find('overlays.goals.goals');
+  items = (await from.find('overlays.goals.groups'))
     .map(o => {
       return {
         id: o.uid,
@@ -666,7 +754,7 @@ async function main() {
 
   console.log(`Migr: stats`);
   await getManager().clear(TwitchStats);
-  items = (await from.engine.find('stats'))
+  items = (await from.find('stats'))
     .map(o => {
       return {
         whenOnline: new Date(o.whenOnline).getTime(),
@@ -693,7 +781,7 @@ async function main() {
 
   console.log(`Migr: api.clips`);
   await getManager().clear(TwitchClips);
-  items = (await from.engine.find('api.clips'))
+  items = (await from.find('api.clips'))
     .map(o => {
       o.shouldBeCheckedAt = new Date(o.shouldBeCheckedAt).getTime(); return o;
     });
@@ -707,7 +795,7 @@ async function main() {
 
   console.log(`Migr: overlays.carousel`);
   await getManager().clear(Carousel);
-  items = await from.engine.find('overlays.carousel');
+  items = await from.find('overlays.carousel');
   if (items.length > 0) {
     for (const chunk of _.chunk(items, 100)) {
       process.stdout.write('.');
@@ -718,11 +806,11 @@ async function main() {
 
   console.log(`Migr: overlays.gallery`);
   await getManager().clear(Gallery);
-  items = await from.engine.find('overlays.gallery');
+  items = await from.find('overlays.gallery');
   items.map(o => {
     o.name = o.name || uuid();
     return o;
-  })
+  });
   if (items.length > 0) {
     for (const chunk of _.chunk(items, 100)) {
       process.stdout.write('.');
@@ -733,7 +821,7 @@ async function main() {
 
   console.log(`Migr: registries.alerts`);
   await getManager().clear(Alert);
-  items = await from.engine.find('registries.alerts');
+  items = await from.find('registries.alerts');
   items.map(o => {
     o.cheers = o.alerts.cheers;
     o.follows = o.alerts.follows;
@@ -745,7 +833,7 @@ async function main() {
     o.tips = o.alerts.tips;
     delete o.alerts;
     return o;
-  })
+  });
   if (items.length > 0) {
     for (const chunk of _.chunk(items, 100)) {
       process.stdout.write('.');
@@ -756,7 +844,7 @@ async function main() {
 
   console.log(`Migr: registries.alerts.media`);
   await getManager().clear(AlertMedia);
-  items = await from.engine.find('registries.alerts.media');
+  items = await from.find('registries.alerts.media');
   items.map(o => {
     o.chunkNo = o.chunk;
     return o;
@@ -768,6 +856,33 @@ async function main() {
     }
     console.log();
   }
+
+  console.log(`Migr: registries.text`);
+  await getManager().clear(Text);
+  items = await from.find('registries.text');
+  items.map(o => {
+    o.external = o.external || [];
+    return o;
+  });
+  if (items.length > 0) {
+    for (const chunk of _.chunk(items, 100)) {
+      process.stdout.write('.');
+      await getRepository(Text).save(chunk);
+    }
+    console.log();
+  }
+
+  console.log(`Migr: widgetsCmdBoard`);
+  await getManager().clear(CommandsBoard);
+  items = await from.find('widgetsCmdBoard');
+  if (items.length > 0) {
+    for (const chunk of _.chunk(items, 100)) {
+      process.stdout.write('.');
+      await getRepository(CommandsBoard).save(chunk);
+    }
+    console.log();
+  }
+
   console.log('Info: Completed');
   process.exit();
 };

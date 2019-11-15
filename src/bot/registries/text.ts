@@ -1,8 +1,9 @@
-import * as _ from 'lodash';
-
 import Message from '../message';
 import Registry from './_interface';
-import { publicEndpoint } from '../helpers/socket';
+import { adminEndpoint, publicEndpoint } from '../helpers/socket';
+
+import { getRepository } from 'typeorm';
+import { Text as TextEntity } from '../entity/text';
 
 class Text extends Registry {
   constructor () {
@@ -12,23 +13,41 @@ class Text extends Registry {
 
   sockets () {
     const regexp = new RegExp('\\$_[a-zA-Z0-9_]+', 'g');
-    publicEndpoint(this.nsp, 'get', async (_id, callback) => {
-      const item = await global.db.engine.findOne(this.collection.data, { _id });
-      if (item.text) {
-        const match = item.text.match(regexp);
-        if (!_.isNil(match)) {
-          for (const variable of item.text.match(regexp)) {
-            const isVariable = await global.customvariables.isVariableSet(variable);
-            let value = `<strong>$_${variable.replace('$_', '')}</strong>`;
-            if (isVariable) {
-              value = await global.customvariables.getValueOf(variable);
-            }
-            item.text = item.text.replace(new RegExp(`\\${variable}`, 'g'), value);
+
+    adminEndpoint(this.nsp, 'text::remove', async(item: TextEntity, cb) => {
+      await getRepository(TextEntity).remove(item);
+      cb();
+    });
+    adminEndpoint(this.nsp, 'text::getAll', async(cb) => {
+      cb(
+        await getRepository(TextEntity).find(),
+      );
+    });
+    adminEndpoint(this.nsp, 'text::save', async(item: TextEntity, cb) => {
+      try {
+        cb(
+          null,
+          await getRepository(TextEntity).save(item),
+        );
+      } catch (e) {
+        cb(e, null);
+      }
+    });
+    publicEndpoint(this.nsp, 'text::getOne', async (id, callback) => {
+      const item = await getRepository(TextEntity).findOne({ id });
+      if (item) {
+        for (const variable of item.text.match(regexp) || []) {
+          const isVariable = await global.customvariables.isVariableSet(variable);
+          let value = `<strong>$_${variable.replace('$_', '')}</strong>`;
+          if (isVariable) {
+            value = await global.customvariables.getValueOf(variable);
           }
+          item.text = item.text.replace(new RegExp(`\\${variable}`, 'g'), value);
         }
         item.text = await new Message(item.text).parse();
+        callback(item);
       }
-      callback({ html: item.text, css: item.css, js: item.js, external: item.external });
+      callback(null);
     });
   }
 }
