@@ -5,6 +5,7 @@ require('module-alias/register');
 const fs = require('fs');
 
 const availableDbs = ['nedb', 'mongodb'];
+const uuid = require('uuid/v4');
 
 const { createConnection, getConnection, getConnectionOptions, getManager, getRepository } = require('typeorm');
 const { Alias } = require('../dest/entity/alias');
@@ -31,6 +32,7 @@ const { Goal, GoalGroup } = require('../dest/entity/goal');
 const { TwitchClips, TwitchStats } = require('../dest/entity/twitch');
 const { Carousel } = require('../dest/entity/carousel');
 const { Gallery } = require('../dest/entity/gallery');
+const { Alert, AlertMedia } = require('../dest/entity/alert');
 
 const _ = require('lodash');
 
@@ -717,6 +719,10 @@ async function main() {
   console.log(`Migr: overlays.gallery`);
   await getManager().clear(Gallery);
   items = await from.engine.find('overlays.gallery');
+  items.map(o => {
+    o.name = o.name || uuid();
+    return o;
+  })
   if (items.length > 0) {
     for (const chunk of _.chunk(items, 100)) {
       process.stdout.write('.');
@@ -725,6 +731,43 @@ async function main() {
     console.log();
   }
 
+  console.log(`Migr: registries.alerts`);
+  await getManager().clear(Alert);
+  items = await from.engine.find('registries.alerts');
+  items.map(o => {
+    o.cheers = o.alerts.cheers;
+    o.follows = o.alerts.follows;
+    o.hosts = o.alerts.hosts;
+    o.raids = o.alerts.raids;
+    o.resubs = o.alerts.resubs;
+    o.subgifts = o.alerts.subgifts;
+    o.subs = o.alerts.subs;
+    o.tips = o.alerts.tips;
+    delete o.alerts;
+    return o;
+  })
+  if (items.length > 0) {
+    for (const chunk of _.chunk(items, 100)) {
+      process.stdout.write('.');
+      await getRepository(Alert).save(chunk);
+    }
+    console.log();
+  }
+
+  console.log(`Migr: registries.alerts.media`);
+  await getManager().clear(AlertMedia);
+  items = await from.engine.find('registries.alerts.media');
+  items.map(o => {
+    o.chunkNo = o.chunk;
+    return o;
+  });
+  if (items.length > 0) {
+    for (const chunk of _.chunk(items, 100)) {
+      process.stdout.write('.');
+      await getRepository(AlertMedia).save(chunk);
+    }
+    console.log();
+  }
   console.log('Info: Completed');
   process.exit();
 };

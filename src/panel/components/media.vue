@@ -55,6 +55,7 @@ import uuid from 'uuid/v4';
 import { getSocket } from '../helpers/socket';
 
 import AudioVisual from 'vue-audio-visual'
+import { AlertMedia } from '../../bot/entity/alert';
 Vue.use(AudioVisual)
 
 @Component({
@@ -90,7 +91,7 @@ export default class MediaForm extends Vue {
 
   created() {
     this.io = getSocket(this.socket);
-    this.io.emit('find', { collection: 'media', where: { id: this.id } }, (err, data: Registry.Alerts.AlertMedia[]) => {
+    this.io.emit('alerts::getOneMedia', this.id, (err, data: AlertMedia[]) => {
       console.log({data})
       this.b64data = data.sort((a,b) => a.chunkNo - b.chunkNo).map(o => o.b64data).join('');
     });
@@ -134,10 +135,7 @@ export default class MediaForm extends Vue {
               chunkNo: i
             }
             console.log('Uploading chunk#' + i, chunk)
-            this.io.emit('insert', {
-              collection: 'media',
-              items:[chunk]
-            }, (err, data) => {
+            this.io.emit('alerts::saveMedia', [chunk], (err, data) => {
               if (err) {
                 console.error(err)
                 reject();
@@ -167,7 +165,7 @@ export default class MediaForm extends Vue {
 
   removeMedia() {
     this.b64data = ''
-    this.io.emit('delete', { collection: 'media', where: { id: this.id }})
+    this.io.emit('alerts::deleteMedia', this.id, () => {})
   }
 }
 </script>

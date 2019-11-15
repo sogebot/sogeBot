@@ -82,6 +82,7 @@ import { isEqual, get } from 'lodash-es';
 import urlRegex from 'url-regex';
 
 import { CacheEmotes } from 'src/bot/entity/cacheEmotes';
+import { EmitData, Alert, AlertFollow, AlertSub, AlertSubgift, AlertHost, AlertRaid, AlertTip, AlertCheer, AlertResub } from '../../bot/entity/alert';
 
 require('../../../scss/letter-animations.css');
 require('animate.css');
@@ -96,7 +97,7 @@ let waitingForTTS = false;
 let isTTSPlaying = false;
 let cleanupAlert = false;
 
-let alerts: Registry.Alerts.EmitData[] = [];
+let alerts: EmitData[] = [];
 
 @Component({
   components: {
@@ -124,12 +125,12 @@ export default class AlertsRegistryOverlays extends Vue {
 
   id: null | string = null;
   updatedAt: number = -1; // force initial load
-  data: null | Registry.Alerts.Alert = null;
+  data: null | Alert = null;
   defaultProfanityList: string[] = [];
   listHappyWords: string[] = [];
   emotes: CacheEmotes[] = [];
 
-  runningAlert: Registry.Alerts.EmitData & {
+  runningAlert: EmitData & {
     animation: string;
     animationText: string;
     isShowingText: boolean;
@@ -138,7 +139,8 @@ export default class AlertsRegistryOverlays extends Vue {
     hideAt: number;
     showTextAt: number;
     showAt: number;
-    alert: Registry.Alerts.CommonSettings | Registry.Alerts.Host | Registry.Alerts.Cheer | Registry.Alerts.Resub } | null = null;
+    alert: AlertFollow | AlertSub | AlertSubgift | AlertHost | AlertRaid | AlertTip | AlertCheer | AlertResub;
+  } | null = null;
 
   beforeDestroyed() {
     for (const interval of this.interval) {
@@ -293,11 +295,11 @@ export default class AlertsRegistryOverlays extends Vue {
       if (this.runningAlert === null && alerts.length > 0) {
         const emitData = alerts.shift()
         if (emitData && this.data) {
-          let possibleAlerts = this.data.alerts[emitData.event];
+          let possibleAlerts = this.data[emitData.event];
 
           // remove if autohost and autohosts are disabled for alert
           if (emitData.event === 'hosts' && emitData.autohost) {
-            possibleAlerts = (possibleAlerts as Registry.Alerts.Host[]).filter(o => o.showAutoHost)
+            possibleAlerts = (possibleAlerts as AlertHost[]).filter(o => o.showAutoHost)
           }
 
           if (possibleAlerts.length > 0) {
@@ -316,7 +318,7 @@ export default class AlertsRegistryOverlays extends Vue {
             });
 
             // search for random variants
-            let possibleAlertsWithRandomCount: (Registry.Alerts.CommonSettings | Registry.Alerts.Host | Registry.Alerts.Cheer | Registry.Alerts.Resub)[] = [];
+            let possibleAlertsWithRandomCount: (AlertFollow | AlertSub | AlertSubgift | AlertHost | AlertRaid | AlertTip | AlertCheer | AlertResub)[] = [];
             for (const alert of possibleAlerts) {
               if (!alert.enabled) {
                 continue;
@@ -463,7 +465,7 @@ export default class AlertsRegistryOverlays extends Vue {
     this.id = this.$route.params.id
     this.refreshAlert();
 
-    this.socket.on('alert', (data: Registry.Alerts.EmitData) => {
+    this.socket.on('alert', (data: EmitData) => {
       console.debug('Incoming alert', data);
 
       // checking for vulgarities
@@ -497,7 +499,7 @@ export default class AlertsRegistryOverlays extends Vue {
         console.debug('Alert is updating')
         this.updatedAt = updatedAt;
         await new Promise((resolve) => {
-          this.socket.emit('findOne', { where: { id: this.id }}, async (err, data: Registry.Alerts.Alert) => {
+          this.socket.emit('alerts::getOne', this.id, async (data: Alert) => {
             if (this.runningAlert !== null) {
               return; // skip any changes if alert in progress
             }
@@ -526,15 +528,22 @@ export default class AlertsRegistryOverlays extends Vue {
               const head = document.getElementsByTagName('head')[0]
               const style = document.createElement('style')
               style.type = 'text/css';
-              for (const lists of Object.values(data.alerts)) {
-                for (const event of lists) {
-                  if (!this.loadedFonts.includes(event.font.family)) {
-                    console.debug('Loading font', event.font.family)
-                    this.loadedFonts.push(event.font.family)
-                    const font = event.font.family.replace(/ /g, '+')
-                    const css = "@import url('https://fonts.googleapis.com/css?family=" + font + "');"
-                    style.appendChild(document.createTextNode(css));
-                  }
+              for (const event of [
+                ...data.cheers,
+                ...data.follows,
+                ...data.hosts,
+                ...data.raids,
+                ...data.resubs,
+                ...data.subgifts,
+                ...data.subs,
+                ...data.tips,
+              ]) {
+                if (!this.loadedFonts.includes(event.font.family)) {
+                  console.debug('Loading font', event.font.family)
+                  this.loadedFonts.push(event.font.family)
+                  const font = event.font.family.replace(/ /g, '+')
+                  const css = "@import url('https://fonts.googleapis.com/css?family=" + font + "');"
+                  style.appendChild(document.createTextNode(css));
                 }
               }
               head.appendChild(style);

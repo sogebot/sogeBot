@@ -116,6 +116,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, PropSync } from 'vue-property-decorator';
+import { CommonSettings } from '../../../../../bot/entity/alert';
 
 declare global {
   interface Window {
@@ -128,7 +129,7 @@ declare global {
   }
 })
 export default class TTS extends Vue {
-  @PropSync('tts') readonly data !: Registry.Alerts.TTS;
+  @PropSync('tts') readonly data !: CommonSettings["tts"];
   @Prop() readonly uuid !: string;
 
   text = "This is test donation message :)";
