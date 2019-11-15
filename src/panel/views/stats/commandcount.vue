@@ -233,7 +233,7 @@
       },
       totalInInterval(command: string, interval: number): number {
         return this.commandsUsage.filter(o => {
-          const isCorrectCommand = o.command === command;;
+          const isCorrectCommand = o.command === command;
           const isInInterval = Date.now() - interval <= o.timestamp;
           return isCorrectCommand && isInInterval;
         }).length;

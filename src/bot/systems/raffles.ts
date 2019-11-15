@@ -357,7 +357,7 @@ class Raffles extends System {
     participant.isSubscriber = user.isSubscriber;
 
     if (raffle.type === TYPE_TICKETS && await global.systems.points.getPointsOf(opts.sender.userId) < tickets) {
-      return false;;
+      return false;
     } // user doesn't have enough points
 
     if (raffle.forFollowers && raffle.forSubscribers && participant.isEligible) {

@@ -68,7 +68,7 @@ class Cooldown extends System {
   @command('!cooldown')
   @default_permission(permission.CASTERS)
   async main (opts: Record<string, any>) {
-    const match = XRegExp.exec(opts.parameters, constants.COOLDOWN_REGEXP_SET) as unknown as { [x: string]: string } | null;;
+    const match = XRegExp.exec(opts.parameters, constants.COOLDOWN_REGEXP_SET) as unknown as { [x: string]: string } | null;
 
     if (_.isNil(match)) {
       const message = await prepare('cooldowns.cooldown-parse-failed');

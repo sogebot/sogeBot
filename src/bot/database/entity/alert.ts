@@ -46,10 +46,10 @@ export abstract class CommonSettings {
   | 'rotateOutDownLeft' | 'rotateOutDownRight' | 'rotateOutUpLeft'
   | 'rotateOutUpRight' | 'slideOutDown' | 'slideOutLeft' | 'slideOutRight'
   | 'slideOutUp' | 'zoomOut' | 'zoomOutDown' | 'zoomOutLeft' | 'zoomOutRight'
-  | 'zoomOutUp' | 'rollOut';;
+  | 'zoomOutUp' | 'rollOut';
   @Column()
   animationText!: 'none' | 'baffle' | 'bounce' | 'bounce2' | 'flip' | 'flash' | 'pulse2' | 'rubberBand'
-  | 'shake2' | 'swing' | 'tada' | 'wave' | 'wobble' | 'wiggle' | 'wiggle2' | 'jello';;
+  | 'shake2' | 'swing' | 'tada' | 'wave' | 'wobble' | 'wiggle' | 'wiggle2' | 'jello';
   @Column('simple-json')
   animationTextOptions!: {
     speed: number | 'slower' | 'slow' | 'fast' | 'faster';
