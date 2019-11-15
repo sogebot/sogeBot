@@ -9,7 +9,7 @@ const _ = require('lodash');
 const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/database/entity/user');
 
-const user = { username: 'oneuser', userId: String(_.random(999999, false)) };
+const user = { username: 'oneuser', userId: Number(_.random(999999, false)) };
 
 describe('Points - set()', () => {
   before(async () => {

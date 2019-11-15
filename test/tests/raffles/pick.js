@@ -9,19 +9,44 @@ const commons = require('../../../dest/commons');
 
 const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/database/entity/user');
+const { Raffle } = require('../../../dest/database/entity/raffle');
 
 const assert = require('chai').assert;
 
 const max = Math.floor(Number.MAX_SAFE_INTEGER / 10000000);
 
-const owner = { username: 'soge__', userId: String(_.random(999999, false)) };
-const testuser = { username: 'testuser', userId: String(_.random(999999, false)) };
-const testuser2 = { username: 'testuser2', userId: String(_.random(999999, false)) };
+const owner = { username: 'soge__', userId: Number(_.random(999999, false)) };
+const testuser = { username: 'testuser', userId: Number(_.random(999999, false)) };
+const testuser2 = { username: 'testuser2', userId: Number(_.random(999999, false)) };
 
 describe('Raffles - pick()', () => {
   before(async () => {
     await db.cleanup();
     await message.prepare();
+  });
+
+  describe('Empty raffle with pick should be closed', () => {
+    it('create ticket raffle', async () => {
+      global.systems.raffles.open({ sender: owner, parameters: '!winme -min 0 -max ' + max });
+      await message.isSent('raffles.announce-ticket-raffle', { username: 'bot' }, {
+        keyword: '!winme',
+        eligibility: await commons.prepare('raffles.eligibility-everyone-item'),
+        min: 0,
+        max: max,
+      });
+    });
+
+    it('pick a winner', async () => {
+      await global.systems.raffles.pick({ sender: owner });
+      const raffle = await getRepository(Raffle).findOne({
+        order: {
+          timestamp: 'DESC'
+        }
+      })
+      await message.isSent('raffles.no-participants-to-pick-winner', { username: 'bot' })
+      assert.isTrue(raffle.isClosed);
+      assert.isNull(raffle.winner);
+    });
   });
 
   describe('#1318 - 4 subs should have 25% win', () => {
@@ -40,11 +65,11 @@ describe('Raffles - pick()', () => {
     const subs = ['sub1', 'sub2', 'sub3', 'sub4'];
     for (const [id, v] of Object.entries(subs)) {
       it('Add user ' + v + ' to db', async () => {
-        await getRepository(User).save({ username: v , userId: '100' + id, isSubscriber: true });
+        await getRepository(User).save({ username: v , userId: Number('100' + id), isSubscriber: true });
       });
 
       it('Add user ' + v + ' to raffle', async () => {
-        const a = await global.systems.raffles.participate({ sender: { username: v }, message: '!winme' });
+        const a = await global.systems.raffles.participate({ sender: { username: v, userId: Number('100' + id) }, message: '!winme' });
         assert.isTrue(a);
       });
     }

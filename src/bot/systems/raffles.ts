@@ -164,7 +164,7 @@ class Raffles extends System {
   @command('!raffle remove')
   @default_permission(permission.CASTERS)
   async remove (self) {
-    const raffle = await getRepository(Raffle).findOne({ winner: null });
+    const raffle = await getRepository(Raffle).findOne({ winner: null, isClosed: false });
     if (!raffle) {
       return;
     }
@@ -222,6 +222,7 @@ class Raffles extends System {
       maxTickets,
       type: type,
       winner: null,
+      isClosed: false,
       timestamp: Date.now(),
     });
 
@@ -256,7 +257,7 @@ class Raffles extends System {
 
   @command('!raffle')
   async main (opts) {
-    const raffle = await getRepository(Raffle).findOne({ winner: null });
+    const raffle = await getRepository(Raffle).findOne({ winner: null, isClosed: false });
 
     if (!raffle) {
       const message = await prepare('raffles.no-raffle-is-currently-running');
@@ -304,7 +305,7 @@ class Raffles extends System {
 
     const raffle = await getRepository(Raffle).findOne({
       relations: ['participants'],
-      where: { winner: null },
+      where: { winner: null, isClosed: false },
     });
     let user = await getRepository(User).findOne({ userId: opts.sender.userId });
     if (!user) {
@@ -400,6 +401,13 @@ class Raffles extends System {
         badges: {},
         'message-type': 'chat',
       });
+
+      // close raffle on pick
+      raffle.isClosed = true;
+      raffle.timestamp = Date.now();
+      await Promise.all([
+        getRepository(Raffle).save(raffle),
+      ]);
       return true;
     }
 
@@ -451,6 +459,7 @@ class Raffles extends System {
     if (winner) {
       winner.isEligible = false;
       raffle.winner = winner.username;
+      raffle.isClosed = true;
       raffle.timestamp = Date.now();
       await Promise.all([
         getRepository(RaffleParticipant).save(winner),
@@ -471,6 +480,12 @@ class Raffles extends System {
         'message-type': 'chat',
       });
     } else {
+      // close raffle on pick
+      raffle.isClosed = true;
+      raffle.timestamp = Date.now();
+      await Promise.all([
+        getRepository(Raffle).save(raffle),
+      ]);
       warning('No winner found in raffle');
     }
   }

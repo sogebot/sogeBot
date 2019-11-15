@@ -15,9 +15,9 @@ const { Duel } = require('../../../dest/database/entity/duel');
 const _ = require('lodash');
 const assert = require('assert');
 
-const owner = { username: 'soge__', userId: String(_.random(999999, false)) };
-const user1 = { username: 'user1', userId: String(_.random(999999, false)) };
-const user2 = { username: 'user2', userId: String(_.random(999999, false)) };
+const owner = { username: 'soge__', userId: Number(_.random(999999, false)) };
+const user1 = { username: 'user1', userId: Number(_.random(999999, false)) };
+const user2 = { username: 'user2', userId: Number(_.random(999999, false)) };
 const command = '!duel';
 
 describe('Gambling - duel', () => {

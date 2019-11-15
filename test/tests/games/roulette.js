@@ -10,7 +10,7 @@ const _ = require('lodash');
 
 const tests = [
   {
-    user: { username: 'user1', userId: String(_.random(999999, false)) },
+    user: { username: 'user1', userId: Number(_.random(999999, false)) },
   },
 ];
 
