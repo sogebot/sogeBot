@@ -131,7 +131,7 @@ export class TwitchStats {
     transformer: new ColumnNumericTransformer(),
   })
   currentBits!: number;
-  @Column('bigint', {
+  @Column('float', {
     transformer: new ColumnNumericTransformer(),
   })
   currentTips!: number;

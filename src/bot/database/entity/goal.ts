@@ -52,9 +52,9 @@ export class Goal {
 
   @Column('bigint', { transformer: new ColumnNumericTransformer(), default: 0 })
   timestamp!: number;
-  @Column('bigint', { transformer: new ColumnNumericTransformer(), default: 0 })
+  @Column('float', { transformer: new ColumnNumericTransformer(), default: 0 })
   goalAmount!: number;
-  @Column('bigint', { transformer: new ColumnNumericTransformer(), default: 0 })
+  @Column('float', { transformer: new ColumnNumericTransformer(), default: 0 })
   currentAmount!: number;
   @Column()
   endAfter!: string;

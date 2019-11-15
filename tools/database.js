@@ -162,6 +162,7 @@ const connect = async function () {
   await createConnection({
     ...connectionOptions,
     synchronize: true,
+    migrationsRun: false,
   });
 };
 async function main() {
@@ -603,10 +604,10 @@ async function main() {
       currentValue: o.currentValue,
       description: o.description,
       evalValue: o.evalValue,
-      responseType: o.responseType,
-      runEveryTypeValue: o.runEveryTypeValue,
-      runEveryType: o.runEveryType,
-      runEvery: o.runEvery,
+      responseType: o.responseType || 0,
+      runEveryTypeValue: o.runEveryTypeValue || 0,
+      runEveryType: o.runEveryType || 0,
+      runEvery: o.runEvery || 0,
       responseText: o.responseText,
       permission: o.permission,
       readOnly: o.readOnly,
