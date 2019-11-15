@@ -161,6 +161,7 @@ const connect = async function () {
   const connectionOptions = await getConnectionOptions();
   await createConnection({
     ...connectionOptions,
+    synchronize: true,
   });
 };
 async function main() {
@@ -176,7 +177,6 @@ async function main() {
 
   let items;
   console.log('Migr: cache.titles');
-  await getManager().clear(CacheTitles);
   items = (await from.find('cache.titles')).map(o => {
     delete o._id; delete o.id; return {...o, timestamp: Number(o.timestamp || 0) };
   });
@@ -188,7 +188,6 @@ async function main() {
     console.log();
   }
 
-  await getManager().clear(Settings);
   for (const type of ['core', 'overlays', 'games', 'registries', 'integrations', 'systems']) {
     console.log(`Migr: ${type}.settings`);
     for (const item of await from.find(`${type}.settings`)) {
@@ -200,7 +199,6 @@ async function main() {
   }
 
   console.log(`Migr: core.permissions.commands`);
-  await getManager().clear(PermissionCommands);
   items = await from.find('core.permissions.commands');
   items.map(o => {
     o.name = o.key;
@@ -216,7 +214,6 @@ async function main() {
   }
 
   console.log(`Migr: widgetsEventList`);
-  await getManager().clear(EventList);
   items = (await from.find('widgetsEventList')).map(o => {
     return {
       event: o.event,
@@ -243,7 +240,6 @@ async function main() {
   }
 
   console.log(`Migr: systems.quotes`);
-  await getManager().clear(Quotes);
   items = (await from.find('systems.quotes')).map(o => {
     delete o._id; delete o.id; return o;
   });
@@ -256,7 +252,6 @@ async function main() {
   }
 
   console.log(`Migr: systems.alias`);
-  await getManager().clear(Alias);
   items = (await from.find('systems.alias')).map(o => {
     delete o._id; delete o.id; return o;
   });
@@ -269,11 +264,6 @@ async function main() {
   }
 
   console.log(`Migr: systems.customcommands, systems.customcommands.responses`);
-  if (connection.options.type === 'postgres') {
-    await getRepository(Commands).query('TRUNCATE "commands" CASCADE');
-  } else {
-    await getRepository(Commands).clear();
-  }
   items = await from.find('systems.customcommands');
   for (const item of items) {
     // add responses
@@ -301,7 +291,6 @@ async function main() {
   }
 
   console.log(`Migr: core.commands.count `);
-  await getManager().clear(CommandsCount);
   items = (await from.find('core.commands.count')).map(o => {
     delete o._id; return o;
   });
@@ -314,11 +303,6 @@ async function main() {
   }
 
   console.log(`Migr: core.permissions`);
-  if (connection.options.type === 'postgres') {
-    await getRepository(Permissions).query('TRUNCATE "permissions" CASCADE');
-  } else {
-    await getRepository(Permissions).clear();
-  }
   items = (await from.find('core.permissions')).map(o => {
     delete o._id; return o;
   });
@@ -331,11 +315,6 @@ async function main() {
   }
 
   console.log(`Migr: systems.cooldowns`);
-  if (connection.options.type === 'postgres') {
-    await getRepository(Cooldown).query('TRUNCATE "cooldown" CASCADE');
-  } else {
-    await getRepository(Cooldown).clear();
-  }
   items = (await from.find('systems.cooldown')).map(o => {
     delete o._id; return {
       name: o.key,
@@ -359,7 +338,6 @@ async function main() {
   }
 
   console.log(`Migr: systems.highlights`);
-  await getManager().clear(Highlight);
   items = (await from.find('systems.highlights')).map(o => {
     return {
       videoId: o.id,
@@ -378,7 +356,6 @@ async function main() {
   }
 
   console.log(`Migr: systems.howlongtobeat`);
-  await getManager().clear(HowLongToBeatGame);
   items = (await from.find('systems.howlongtobeat')).map(o => {
     delete o._id; return o;
   });
@@ -394,7 +371,6 @@ async function main() {
   }
 
   console.log(`Migr: systems.keywords`);
-  await getManager().clear(Keyword);
   items = (await from.find('systems.keywords')).map(o => {
     delete o._id; return o;
   });
@@ -407,12 +383,6 @@ async function main() {
   }
 
   console.log(`Migr: users, users.tips, users.points, users.message, users.bits`);
-  if (connection.options.type === 'postgres') {
-    await getRepository(User).query('TRUNCATE "user" CASCADE');
-  } else {
-    await getRepository(User).clear();
-  }
-
   const points = await from.find('users.points');
   const tips = await from.find('users.tips');
   const messages = await from.find('users.messages');
@@ -487,7 +457,6 @@ async function main() {
   }
 
   console.log(`Migr: systems.price`);
-  await getManager().clear(Keyword);
   items = (await from.find('systems.price')).map(o => {
     delete o._id; return o;
   });
@@ -500,7 +469,6 @@ async function main() {
   }
 
   console.log(`Migr: systems.ranks`);
-  await getManager().clear(Rank);
   items = (await from.find('systems.ranks')).map(o => {
     delete o._id; return {
       hours: o.hours,
@@ -516,7 +484,6 @@ async function main() {
   }
 
   console.log(`Migr: systems.songs.playlist`);
-  await getManager().clear(SongPlaylist);
   items = (await from.find('systems.songs.playlist')).map(o => {
     return {
       seed: 1,
@@ -540,7 +507,6 @@ async function main() {
   }
 
   console.log(`Migr: systems.songs.ban`);
-  await getManager().clear(SongBan);
   items = (await from.find('systems.songs.ban')).map(o => {
     return {
       title: o.title,
@@ -556,8 +522,6 @@ async function main() {
   }
 
   console.log(`Migr: systems.timers, systems.timers.responses`);
-  await getManager().clear(TimerResponse);
-  await getManager().clear(Timer);
 
   const responses = await from.find('systems.timers.responses');
   items = (await from.find('systems.timers')).map(o => {
@@ -588,8 +552,6 @@ async function main() {
   }
 
   console.log(`Migr: dashboards, widgets`);
-  await getManager().clear(Widget);
-  await getManager().clear(Dashboard);
 
   const widgets = await from.find('widgets');
   items = (await from.find('dashboards')).map(o => {
@@ -634,8 +596,6 @@ async function main() {
   }
 
   console.log(`Migr: custom.variables, custom.variables.history`);
-  await getManager().clear(VariableHistory);
-  await getManager().clear(Variable);
   const history = (await from.find('custom.variables.history'));
   items = (await from.find('custom.variables')).map(o => {
     return {
@@ -683,7 +643,6 @@ async function main() {
   }
 
   console.log(`Migr: customTranslations`);
-  await getManager().clear(Translation);
   items = (await from.find('customTranslations')).map(o => {
     return {
       name: o.key,
@@ -699,8 +658,6 @@ async function main() {
   }
 
   console.log(`Migr: events`);
-  await getManager().clear(EventOperation);
-  await getManager().clear(Event);
   const operations = await from.find('events.operations');
   items = (await from.find('events'))
     .map(o => {
@@ -729,8 +686,6 @@ async function main() {
   }
 
   console.log(`Migr: overlays.goals.groups`);
-  await getManager().clear(Goal);
-  await getManager().clear(GoalGroup);
   const goals = await from.find('overlays.goals.goals');
   items = (await from.find('overlays.goals.groups'))
     .map(o => {
@@ -765,7 +720,6 @@ async function main() {
   }
 
   console.log(`Migr: stats`);
-  await getManager().clear(TwitchStats);
   items = (await from.find('stats'))
     .map(o => {
       return {
@@ -792,7 +746,6 @@ async function main() {
   }
 
   console.log(`Migr: api.clips`);
-  await getManager().clear(TwitchClips);
   items = (await from.find('api.clips'))
     .map(o => {
       o.shouldBeCheckedAt = new Date(o.shouldBeCheckedAt).getTime(); return o;
@@ -806,7 +759,6 @@ async function main() {
   }
 
   console.log(`Migr: overlays.carousel`);
-  await getManager().clear(Carousel);
   items = await from.find('overlays.carousel');
   if (items.length > 0) {
     for (const chunk of _.chunk(items, 100)) {
@@ -817,7 +769,6 @@ async function main() {
   }
 
   console.log(`Migr: overlays.gallery`);
-  await getManager().clear(Gallery);
   items = await from.find('overlays.gallery');
   items.map(o => {
     o.name = o.name || uuid();
@@ -832,7 +783,6 @@ async function main() {
   }
 
   console.log(`Migr: registries.alerts`);
-  await getManager().clear(Alert);
   items = await from.find('registries.alerts');
   items.map(o => {
     o.cheers = o.alerts.cheers;
@@ -855,7 +805,6 @@ async function main() {
   }
 
   console.log(`Migr: registries.alerts.media`);
-  await getManager().clear(AlertMedia);
   items = await from.find('registries.alerts.media');
   items.map(o => {
     o.chunkNo = o.chunk;
@@ -870,7 +819,6 @@ async function main() {
   }
 
   console.log(`Migr: registries.text`);
-  await getManager().clear(Text);
   items = await from.find('registries.text');
   items.map(o => {
     o.external = o.external || [];
@@ -885,7 +833,6 @@ async function main() {
   }
 
   console.log(`Migr: widgetsCmdBoard`);
-  await getManager().clear(CommandsBoard);
   items = await from.find('widgetsCmdBoard');
   if (items.length > 0) {
     for (const chunk of _.chunk(items, 100)) {
@@ -896,7 +843,6 @@ async function main() {
   }
 
   console.log(`Migr: custom.variables.watch`);
-  await getManager().clear(VariableWatch);
   items = await from.find('custom.variables.watch');
   if (items.length > 0) {
     for (const chunk of _.chunk(items, 100)) {
