@@ -13,7 +13,7 @@ const gitCommitInfo = require('git-commit-info');
 import { error, info } from './helpers/log';
 import { CacheTitles } from './database/entity/cacheTitles';
 import uuid from 'uuid'
-import { getManager, getRepository } from 'typeorm';
+import { getConnection, getManager, getRepository } from 'typeorm';
 import { Dashboard, Widget } from './database/entity/dashboard';
 import { Translation } from './database/entity/translation'
 import { TwitchTag, TwitchTagLocalizationName } from './database/entity/twitch'
@@ -126,6 +126,8 @@ function Panel () {
     socket.on('metrics.translations', function (key) { global.lib.translate.addMetrics(key, true) })
 
     socket.on('getCachedTags', async (cb) => {
+      const connection = await getConnection();
+      const joinQuery = connection.options.type === 'postgres' ? '"names"."tagId" = "tag_id" AND "names"."locale"' : 'names.tagId = tag_id AND names.locale';
       let query = getRepository(TwitchTag)
         .createQueryBuilder('tags')
         .select('names.locale', 'locale')
@@ -133,7 +135,7 @@ function Panel () {
         .addSelect('tags.tag_id', 'tag_id')
         .addSelect('tags.is_auto', 'is_auto')
         .addSelect('tags.is_current', 'is_current')
-        .leftJoinAndSelect(TwitchTagLocalizationName, 'names', `"names"."tagId" = "tag_id" AND "names"."locale" like :tag`)
+        .leftJoinAndSelect(TwitchTagLocalizationName, 'names', `${joinQuery} like :tag`)
         .setParameter("tag", '%' + global.general.lang +'%');
 
       let results = await query.execute();
@@ -148,7 +150,7 @@ function Panel () {
           .addSelect('tags.tag_id', 'tag_id')
           .addSelect('tags.is_auto', 'is_auto')
           .addSelect('tags.is_current', 'is_current')
-          .leftJoinAndSelect(TwitchTagLocalizationName, 'names', `"names"."tagId" = "tag_id" AND "names"."locale" = :tag`)
+          .leftJoinAndSelect(TwitchTagLocalizationName, 'names', `${joinQuery} = :tag`)
           .setParameter("tag", 'en-us');
         results = await query.execute();
       }
@@ -562,6 +564,8 @@ Panel.prototype.sendStreamData = async function (self, socket) {
       spotifyCurrentSong = null;
     }
 
+    const connection = await getConnection();
+    const joinQuery = connection.options.type === 'postgres' ? '"names"."tagId" = "tag_id" AND "names"."locale"' : 'names.tagId = tag_id AND names.locale';
     let tagQuery = getRepository(TwitchTag)
       .createQueryBuilder('tags')
       .select('names.locale', 'locale')
@@ -570,7 +574,7 @@ Panel.prototype.sendStreamData = async function (self, socket) {
       .addSelect('tags.is_auto', 'is_auto')
       .addSelect('tags.is_current', 'is_current')
       .where('tags.is_current = True')
-      .leftJoinAndSelect(TwitchTagLocalizationName, 'names', `"names"."tagId" = "tag_id" AND "names"."locale" like :tag`)
+      .leftJoinAndSelect(TwitchTagLocalizationName, 'names', `${joinQuery} like :tag`)
       .setParameter("tag", '%' + global.general.lang +'%');
 
     let tagResults = await tagQuery.execute();
@@ -584,7 +588,7 @@ Panel.prototype.sendStreamData = async function (self, socket) {
         .addSelect('tags.is_auto', 'is_auto')
         .addSelect('tags.is_current', 'is_current')
         .where('tags.is_current = True')
-        .leftJoinAndSelect(TwitchTagLocalizationName, 'names', `"names"."tagId" = "tag_id" AND "names"."locale" = :tag`)
+        .leftJoinAndSelect(TwitchTagLocalizationName, 'names', `${joinQuery} = :tag`)
         .setParameter("tag", 'en-us');
       tagResults = await tagQuery.execute();
     }

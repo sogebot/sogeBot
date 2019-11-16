@@ -52,6 +52,7 @@ Stats.prototype.getLatestStats = async function (self, socket) {
     const statsFromDb = await getRepository(TwitchStats)
       .createQueryBuilder('stats')
       .offset(1)
+      .limit(Number.MAX_SAFE_INTEGER)
       .where('stats.whenOnline > :whenOnline', { whenOnline: Date.now() - (1000 * 60 * 60 * 24 * 31) })
       .orderBy('stats.whenOnline', 'DESC')
       .getMany();
