@@ -391,7 +391,7 @@ async function main() {
 
   items = (await from.find('users')).map(o => {
     return {
-      userId: o.id,
+      userId: Number(o.id),
       username: o.username,
 
       isOnline: false,
@@ -407,11 +407,11 @@ async function main() {
       rank: '',
       haveCustomRank: false,
 
-      followedAt: new Date(_.get(o, 'time.follow', 0)).getTime(),
+      followedAt: new Date(_.get(o, 'time.follow', 0)).getTime() || 0,
       followCheckAt: Date.now(),
-      subscribedAt: new Date(_.get(o, 'time.subscribedAt', 0)).getTime(),
-      seenAt: new Date(_.get(o, 'time.message', 0)).getTime(),
-      createdAt: new Date(_.get(o, 'time.created_at', 0)).getTime(),
+      subscribedAt: new Date(_.get(o, 'time.subscribedAt', 0)).getTime() || 0,
+      seenAt: new Date(_.get(o, 'time.message', 0)).getTime() || 0,
+      createdAt: new Date(_.get(o, 'time.created_at', 0)).getTime() || 0,
       watchedTime: (watched.find(w => w.id === o.id) || { watched: 0 }).watched,
       chatTimeOnline: (chat.find(w => w.id === o.id && w.online) || { chat: 0 }).chat,
       chatTimeOffline: (chat.find(w => w.id === o.id && !w.online) || { chat: 0 }).chat,
@@ -440,16 +440,18 @@ async function main() {
       }),
 
       messages: (messages.find(m => m.id === o.id) || { messages: 0 }).messages,
-      giftedSubscribes: _.get(o, 'custom.subgiftCount', 0),
+      giftedSubscribes: _.get(o, 'custom.subgiftCount', 0) || 0,
     };
-  });
+  }).filter(o => !isNaN(o.userId) && o.userId !== null && typeof o.userId !== 'undefined');
   if (items.length > 0) {
-    for (const chunk of _.chunk(items, 100)) {
+    for (let i = 0, chunk = _.chunk(items, 200); i < chunk.length; i++) {
       process.stdout.write('.');
       try {
-        await getRepository(User).save(chunk);
+        await getRepository(User).save(chunk[i]);
       } catch (e) {
-        throw Error('Error Importing User ' + JSON.stringify(item));
+        console.log(chunk[i])
+        console.log(i)
+        throw Error('Error Importing User');
       }
     }
     console.log();
@@ -806,13 +808,21 @@ async function main() {
   console.log(`Migr: registries.alerts.media`);
   items = await from.find('registries.alerts.media');
   items.map(o => {
-    o.chunkNo = o.chunk;
+    o.chunkNo = o.chunk || 0;
     return o;
   });
   if (items.length > 0) {
-    for (const chunk of _.chunk(items, 100)) {
+    for (let i = 0, chunk = _.chunk(items, 1); i < chunk.length; i++) {
       process.stdout.write('.');
-      await getRepository(AlertMedia).save(chunk);
+      try {
+        await getRepository(AlertMedia).save(chunk[i]);
+      } catch (e) {
+        delete chunk[i].b64data;
+        console.log(chunk[i])
+        console.log(i)
+        throw Error('Error media import')
+
+      }
     }
     console.log();
   }
