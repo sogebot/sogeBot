@@ -101,7 +101,7 @@ export class TwitchTagLocalizationDescription {
 
   @Column()
   locale!: string;
-  @Column()
+  @Column('text')
   value!: string;
 
   @ManyToOne(() => TwitchTag, (entity) => entity.localization_descriptions, {
