@@ -12,6 +12,8 @@ db/
 *.db
 report
 tsconfig.tsbuildinfo
+ormconfig.json
+sogebot.db*
 
 public/dist/*
 public/custom/*
