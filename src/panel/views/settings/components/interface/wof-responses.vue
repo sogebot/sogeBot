@@ -22,27 +22,15 @@
           </span>
         </div>
         <div class="d-block w-100 p-0 border-0" style="height: fit-content">
-          <template v-if="option.responses.length > 1">
-            <div class="d-flex" v-for="(response, index2) of option.responses" :key="'wofresponse-3' + index2">
-              <textarea-with-tags
-                v-bind:placeholder="translate('games.wheeloffortune.responses.placeholder')"
-                v-bind:value="response"
-                v-bind:rid="index2"
-                v-bind:oid="index"
-                v-on:update="updateResponse"></textarea-with-tags>
-              <div class="input-group-append">
-                <button v-on:click="removeResponse(index, index2)" class="btn btn-danger btn-sm"><fa icon="minus"></fa> {{ translate('games.wheeloffortune.remove.response') }}</button>
-              </div>
+          <div class="d-flex" v-for="(response, index2) of option.responses" :key="'wofresponse-3' + index2">
+            <textarea
+              class="w-100"
+              v-bind:placeholder="translate('games.wheeloffortune.responses.placeholder')"
+              v-model="option.responses[index2]"></textarea>
+            <div class="input-group-append">
+              <button v-if="option.responses.length > 1" v-on:click="removeResponse(index, index2)" class="btn btn-danger btn-sm"><fa icon="minus"></fa> {{ translate('games.wheeloffortune.remove.response') }}</button>
             </div>
-          </template>
-          <template v-if="option.responses.length <= 1">
-              <textarea-with-tags
-                v-bind:placeholder="translate('games.wheeloffortune.responses.placeholder')"
-                v-bind:value="option.responses[0]"
-                rid="0"
-                v-bind:oid="index"
-                v-on:update="updateResponse"></textarea-with-tags>
-          </template>
+          </div>
           <button v-on:click="addResponse(index)" class="btn btn-success btn-block btn-sm"><fa icon="plus"></fa></button>
         </div>
       </div>
@@ -69,6 +57,7 @@ export default class wofResponses extends Vue {
     this.$emit('update', { value: this.w_options });
   }
   updateOption(index, value) {
+    index = Number(index);
     let option = this.w_options[index];
     option.title = value;
     Vue.set(this.w_options, index, option);
@@ -81,11 +70,6 @@ export default class wofResponses extends Vue {
   }
   addResponse(oid) {
     this.w_options[oid].responses.push('');
-  }
-  updateResponse(opts) {
-    let option = this.w_options[opts.oid];
-    option.responses[opts.rid] = opts.value;
-    Vue.set(this.w_options, opts.oid, option);
   }
   removeResponse(oid, rid) {
     let option = this.w_options[oid];
