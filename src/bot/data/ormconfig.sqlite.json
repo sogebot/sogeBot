@@ -15,8 +15,8 @@
     "dest/database/subscriber/*.js"
   ],
   "cli": {
-    "entitiesDir": "src/bot/database/entity/*.ts",
-    "migrationsDir": "src/bot/database/migration/sqlite/*.ts",
-    "subscribersDir": "src/bot/database/entity/*.ts"
+    "entitiesDir": "src/bot/database/entity/",
+    "migrationsDir": "src/bot/database/migration/sqlite/",
+    "subscribersDir": "src/bot/database/entity/"
   }
 }

@@ -103,7 +103,7 @@ export class UserTip {
   amount!: number;
   @Column()
   currency!: string;
-  @Column({ default: '' })
+  @Column('text', { default: '' })
   message!: string;
   @Column('bigint', { transformer: new ColumnNumericTransformer(), default: 0 })
   tippedAt!: number;
@@ -125,7 +125,7 @@ export class UserBit {
 
   @Column('bigint', { transformer: new ColumnNumericTransformer() })
   amount!: number;
-  @Column({ default: '' })
+  @Column('text', { default: '' })
   message!: string;
   @Column('bigint', { transformer: new ColumnNumericTransformer(), default: 0 })
   cheeredAt!: number;

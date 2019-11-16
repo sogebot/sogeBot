@@ -444,7 +444,7 @@ async function main() {
     };
   }).filter(o => !isNaN(o.userId) && o.userId !== null && typeof o.userId !== 'undefined');
   if (items.length > 0) {
-    for (let i = 0, chunk = _.chunk(items, 200); i < chunk.length; i++) {
+    for (let i = 0, chunk = _.chunk(items, 100); i < chunk.length; i++) {
       process.stdout.write('.');
       try {
         await getRepository(User).save(chunk[i]);
