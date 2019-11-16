@@ -264,7 +264,7 @@ async function main() {
   items = await from.find('systems.customcommands');
   for (const item of items) {
     // add responses
-    const responses = (await from.find('systems.customcommands.responses', { cid: item.id })).map(o => {
+    const responses = (await from.find('systems.customcommands.responses')).map(o => {
       delete o._id; delete o.id;
       if (typeof o.filter === 'undefined') {
         o.filter = '';
@@ -273,7 +273,11 @@ async function main() {
         o.stopIfExecuted = false;
       }
       return o;
+    }).filter(o => {
+      return o.cid === item.id
     });
+    console.log({item})
+    console.log({responses})
     item.responses = responses;
   }
   items = items.map(o => {
