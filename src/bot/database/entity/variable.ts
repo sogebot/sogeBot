@@ -20,7 +20,7 @@ export class Variable {
   description!: string;
   @Column()
   type!: 'eval' | 'number' | 'options' | 'text';
-  @Column()
+  @Column({ nullable: true })
   currentValue!: string;
   @Column('text')
   evalValue!: string;
