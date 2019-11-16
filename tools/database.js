@@ -188,7 +188,7 @@ async function main() {
   for (const type of ['core', 'overlays', 'games', 'registries', 'integrations', 'systems']) {
     console.log(`Migr: ${type}.settings`);
     for (const item of await from.find(`${type}.settings`)) {
-      if (item.key.includes('.') || typeof item.system === 'undefined') {
+      if ( typeof item.system === 'undefined') {
         continue;
       }
       await getRepository(Settings).insert({ namespace: `/${type}/${item.system}`, name: item.key, value: JSON.stringify(item.value) });
