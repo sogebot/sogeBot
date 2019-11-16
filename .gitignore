@@ -1,5 +1,4 @@
 node_modules
-flow-typed/npm
 heap
 heap-*.csv
 logs/*

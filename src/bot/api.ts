@@ -261,11 +261,8 @@ class API extends Core {
       });
 
       // save remaining api calls
-      // $FlowFixMe error with flow on request.headers
       this.calls.bot.limit = request.headers['ratelimit-limit'];
-      // $FlowFixMe error with flow on request.headers
       this.calls.bot.remaining = request.headers['ratelimit-remaining'];
-      // $FlowFixMe error with flow on request.headers
       this.calls.bot.refresh = request.headers['ratelimit-reset'];
 
       if (global.panel && global.panel.io) {
@@ -319,11 +316,8 @@ class API extends Core {
       });
 
       // save remaining api calls
-      // $FlowFixMe error with flow on request.headers
       this.calls.bot.limit = request.headers['ratelimit-limit'];
-      // $FlowFixMe error with flow on request.headers
       this.calls.bot.remaining = request.headers['ratelimit-remaining'];
-      // $FlowFixMe error with flow on request.headers
       this.calls.bot.refresh = request.headers['ratelimit-reset'];
 
       if (global.panel && global.panel.io) {
