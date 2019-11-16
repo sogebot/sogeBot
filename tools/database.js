@@ -610,11 +610,11 @@ async function main() {
       runEveryTypeValue: o.runEveryTypeValue || 0,
       runEveryType: o.runEveryType || 0,
       runEvery: o.runEvery || 0,
-      responseText: o.responseText,
+      responseText: o.responseText || '',
       permission: o.permission,
       readOnly: o.readOnly,
       usableOptions: o.usableOptions.split(',').map(o => o.trim()),
-      runAt: o.runAt,
+      runAt: Date.now(),
       history: history.filter(h => h.cvarId === o.id)
         .map(hm => {
           return {
@@ -636,9 +636,15 @@ async function main() {
     };
   });
   if (items.length > 0) {
-    for (const chunk of _.chunk(items, 100)) {
+    for (let i = 0, chunk = _.chunk(items, 1); i < chunk.length; i++) {
       process.stdout.write('.');
-      await getRepository(Variable).save(chunk);
+      try {
+        await getRepository(Variable).save(chunk[i]);
+      } catch (e) {
+        console.log(chunk[i])
+        console.log(i)
+        throw Error('Error variable import')
+      }
     }
     console.log();
   }
@@ -720,32 +726,6 @@ async function main() {
     console.log();
   }
 
-  console.log(`Migr: stats`);
-  items = (await from.find('stats'))
-    .map(o => {
-      return {
-        whenOnline: new Date(o.whenOnline).getTime(),
-        currentViewers: o.currentViewers || 0,
-        currentSubscribers: o.currentSubscribers || 0,
-        currentBits: o.currentBits || 0,
-        currentTips: o.currentTips || 0,
-        chatMessages: o.chatMessages || 0,
-        currentFollowers: o.currentFollowers || 0,
-        currentViews: o.currentViews || 0,
-        maxViewers: o.maxViewers || 0,
-        currentHosts: o.currentHosts || 0,
-        newChatters: o.newChatters || 0,
-        currentWatched: o.currentWatched || 0,
-      };
-    });
-  if (items.length > 0) {
-    for (const chunk of _.chunk(items, 100)) {
-      process.stdout.write('.');
-      await getRepository(TwitchStats).save(chunk);
-    }
-    console.log();
-  }
-
   console.log(`Migr: api.clips`);
   items = (await from.find('api.clips'))
     .map(o => {
@@ -821,7 +801,6 @@ async function main() {
         console.log(chunk[i])
         console.log(i)
         throw Error('Error media import')
-
       }
     }
     console.log();
