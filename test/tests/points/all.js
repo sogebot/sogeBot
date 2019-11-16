@@ -47,9 +47,9 @@ describe('Points - all()', () => {
     it('!points get should return 100 for user1', async () => {
       await global.systems.points.get({ sender: user1, parameters: '' });
       await message.isSent('points.defaults.pointsResponse', user1, {
-        amount: Math.floor(0),
+        amount: Math.floor(100),
         username: user1.username,
-        pointsName: await global.systems.points.getPointsName(Math.floor(0)),
+        pointsName: await global.systems.points.getPointsName(Math.floor(100)),
       });
     });
 
