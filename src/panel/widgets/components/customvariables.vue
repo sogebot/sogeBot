@@ -120,7 +120,6 @@ var numberOrTextComponent = {
   },
   data: function () {
     return {
-      EventBus,
       showSaveButton: false,
       currentValue: this.value
     }
@@ -151,6 +150,7 @@ export default {
   },
   data: function () {
     return {
+      EventBus,
       variables: [],
       watched: [],
       tabIndex: 0,
