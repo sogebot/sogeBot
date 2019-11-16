@@ -276,8 +276,6 @@ async function main() {
     }).filter(o => {
       return o.cid === item.id
     });
-    console.log({item})
-    console.log({responses})
     item.responses = responses;
   }
   items = items.map(o => {
