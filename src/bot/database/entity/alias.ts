@@ -7,7 +7,7 @@ export class Alias {
   @Column()
   @Index()
   alias!: string;
-  @Column()
+  @Column('text')
   @Index()
   command!: string;
   @Column()
