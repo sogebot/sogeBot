@@ -29,9 +29,9 @@
     <!-- mobile show -->
     <div v-if="windowWidth <= 750">
       <template v-for="dashboard of dashboards">
-        <div v-for="item in sortBy(layout[dashboard.id], (o) => o.y)" class="pl-2 pr-2 pb-2" :key="item.id" v-show="dashboard.id === currentDashboard">
+        <div v-for="item in sortBy(layout[dashboard.id], (o) => o.y)" class="pl-2 pr-2 pb-2" :key="'widget' + item.name" v-show="dashboard.id === currentDashboard">
           <keep-alive>
-            <component :is="item.id" :popout="false" nodrag :style="{ height: String(item.h * 50) + 'px'}"></component>
+            <component :is="item.name" :popout="false" nodrag :style="{ height: String(item.h * 50) + 'px'}"></component>
           </keep-alive>
         </div>
       </template>
@@ -59,9 +59,9 @@
                     :w="item.w"
                     :h="item.h"
                     :i="item.i"
-                    :key="item.id">
+                    :key="'widget2' + item.name">
           <keep-alive>
-            <component :is="item.id" :popout="false"></component>
+            <component :is="item.name" :popout="false"></component>
           </keep-alive>
         </grid-item>
       </grid-layout>
@@ -69,7 +69,7 @@
 
     <div class="w-100"></div>
     <widget-create v-bind:dashboardId="currentDashboard" class="pt-4" @addWidget="addWidget"></widget-create>
-    <dashboard-remove v-if="currentDashboard !== null" v-bind:dashboardId="currentDashboard" class="pt-4" @update="currentDashboard = null" @removeDashboard="removeDashboard"></dashboard-remove>
+    <dashboard-remove v-if="currentDashboard !== 'c287b750-b620-4017-8b3e-e48757ddaa83'" v-bind:dashboardId="currentDashboard" class="pt-4" @update="currentDashboard = 'c287b750-b620-4017-8b3e-e48757ddaa83'" @removeDashboard="removeDashboard"></dashboard-remove>
   </div>
 </div>
 </template>
@@ -77,7 +77,7 @@
 <script>
 import { EventBus } from 'src/panel/helpers/event-bus';
 import { getSocket } from 'src/panel/helpers/socket';
-import { cloneDeep, orderBy, sortBy } from 'lodash-es';
+import { sortBy } from 'lodash-es';
 
 import VueGridLayout from 'vue-grid-layout';
 import { vueWindowSizeMixin } from 'vue-window-size';
@@ -113,7 +113,7 @@ export default {
 
       dashboardName: '',
       addDashboard: false,
-      currentDashboard: null,
+      currentDashboard: 'c287b750-b620-4017-8b3e-e48757ddaa83',
       show: true,
       isLoaded: false,
       layout: {'null': []},
@@ -122,19 +122,8 @@ export default {
   },
   created() {
     this.isLoaded = false;
-    this.socket.emit('getWidgets', (items, dashboards) => {
-      this.items = orderBy(items, 'id', 'asc');
-      for (const item of this.items) {
-        if (typeof item.dashboardId === 'undefined') {
-          item.dashboardId = null;
-        }
-      }
-      dashboards.push({
-        createdAt: 0,
-        name: 'Main',
-        id: null,
-      });
-      this.dashboards = orderBy(dashboards, 'createdAt', 'asc');
+    this.socket.emit('getWidgets', (dashboards) => {
+      this.dashboards = dashboards;
       this.refreshWidgets();
       this.isLoaded = true;
     });
@@ -145,67 +134,54 @@ export default {
   },
   methods: {
     refreshWidgets() {
-      const layout = {'null': []};
+      const layout = {};
       for (const dashboard of this.dashboards) {
         if (typeof layout[dashboard.id] === 'undefined') {
-          layout[dashboard.id] = []
+          layout[dashboard.id] = [];
+        }
+        let i = 0;
+        for(const widget of dashboard.widgets) {
+          layout[dashboard.id].push({
+            i, x: Number(widget.positionX), y: Number(widget.positionY), w: Number(widget.width), h: Number(widget.height), name: widget.name
+          });
+          i++;
         }
       }
       this.layout = layout;
-
-      let i = 0;
-      for(const widget of this.items) {
-        this.layout[widget.dashboardId].push({
-          i, x: Number(widget.position.x), y: Number(widget.position.y), w: Number(widget.size.width), h: Number(widget.size.height), id: widget.id
-        });
-        i++;
-      }
     },
-    removeWidget(id) {
-      this.items = this.items.filter(o => o.id !== id);
-      this.layout = {};
-      let i = 0;
-      for(const widget of this.items) {
-        if (typeof this.layout[widget.dashboardId] === 'undefined') {
-          this.layout[widget.dashboardId] = []
-        }
-        this.layout[widget.dashboardId].push({
-          i, x: Number(widget.position.x), y: Number(widget.position.y), w: Number(widget.size.width), h: Number(widget.size.height), id: widget.id
-        });
-        i++;
+    removeWidget(name) {
+      for (const dashboard of this.dashboards) {
+        dashboard.widgets = dashboard.widgets.filter(o => o.name !== name);
       }
-      this.socket.emit('updateWidgets', this.items)
+      this.socket.emit('updateWidgets', this.dashboards)
+      this.refreshWidgets();
     },
     updateLayout(layout) {
-        // remove current dashboard widgets
-        this.items = [
-          ...this.items.filter(o => o.dashboardId !== this.currentDashboard),
-          ...layout.map(o => {
-            return {
-              position: { x: o.x, y: o.y },
-              size: { width: o.w, height: o.h },
-              dashboardId: this.currentDashboard,
-              id: o.id,
-            }
-          }
-        )]
-        this.socket.emit('updateWidgets', this.items)
+      for (const dashboard of this.dashboards) {
+        dashboard.widgets = this.layout[dashboard.id].map(o => {
+          return {
+            positionX: o.x,
+            positionY: o.y,
+            width: o.w,
+            height: o.h,
+            name: o.name,
+          };
+        });
+      };
+      this.socket.emit('updateWidgets', this.dashboards)
     },
     removeDashboard: function (dashboardId) {
       this.dashboards = this.dashboards.filter(o => String(o.id) !== dashboardId)
-      this.currentDashboard = null
+      this.currentDashboard = 'c287b750-b620-4017-8b3e-e48757ddaa83'
+      this.socket.emit('updateWidgets', this.dashboards)
       this.refreshWidgets();
     },
-    addWidget: function (event) {
-      event.dashboardId = String(event.dashboardId)
-      const dashboard = cloneDeep(this.dashboards.find(o => String(o.id) === event.dashboardId))
-      this.dashboards = this.dashboards.filter(o => String(o.id) !== event.dashboardId)
-      this.$nextTick(() => {
-        this.dashboards.push(dashboard)
-        this.dashboards = orderBy(this.dashboards, 'createdAt', 'asc')
-        this.items.push(event.widget)
+    addWidget: function () {
+      this.socket.emit('getWidgets', (dashboards) => {
+        this.dashboards = dashboards;
         this.refreshWidgets();
-      })
+        this.isLoaded = true;
+      });
     },
     createDashboard: function () {
       this.socket.emit('createDashboard', this.dashboardName, (created) => {

@@ -25,17 +25,17 @@
     <b-alert show variant="danger" v-else-if="state.loading === $state.success && filtered.length === 0 && search.length > 0">
       <fa icon="search"/> <span v-html="translate('systems.timers.emptyAfterSearch').replace('$search', search)"/>
     </b-alert>
-    <b-alert show v-else-if="state.loading === $state.success && items.timers.length === 0">
+    <b-alert show v-else-if="state.loading === $state.success && items.length === 0">
       {{translate('systems.timers.empty')}}
     </b-alert>
     <b-table v-else :fields="fields" :items="filtered" hover small style="cursor: pointer;" @row-clicked="linkTo($event)">
       <template v-slot:cell(responses)="data">
-        <div><span class="font-weight-bold text-primary font-bigger">{{ items.responses.filter(o => o.timerId === data.item.id).length }}</span></div>
+        <div><span class="font-weight-bold text-primary font-bigger">{{ data.item.messages.length }}</span></div>
       </template>
       <template v-slot:cell(buttons)="data">
         <div class="text-right">
-          <button-with-icon :class="[ data.item.enabled ? 'btn-success' : 'btn-danger' ]" class="btn-only-icon btn-reverse" icon="power-off" @click="data.item.enabled = !data.item.enabled; update(data.item)">
-            {{ translate('dialog.buttons.' + (data.item.enabled? 'enabled' : 'disabled')) }}
+          <button-with-icon :class="[ data.item.isEnabled ? 'btn-success' : 'btn-danger' ]" class="btn-only-icon btn-reverse" icon="power-off" @click="data.item.isEnabled = !data.item.isEnabled; update(data.item)">
+            {{ translate('dialog.buttons.' + (data.item.isEnabled? 'enabled' : 'disabled')) }}
           </button-with-icon>
           <button-with-icon class="btn-only-icon btn-primary btn-reverse" icon="edit" v-bind:href="'#/manage/timers/edit/' + data.item.id">
             {{ translate('dialog.buttons.edit') }}
@@ -52,8 +52,10 @@
 
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
-import { isNil, orderBy } from 'lodash-es';
+import { isNil } from 'lodash-es';
 import { getSocket } from 'src/panel/helpers/socket';
+
+import { Timer } from 'src/bot/database/entity/timer';
 
 @Component({
   components: {
@@ -63,21 +65,21 @@ import { getSocket } from 'src/panel/helpers/socket';
 export default class timersList extends Vue {
   socket = getSocket('/systems/timers')
   search: string = '';
-  items: any = { timers: [], responses: [] };
+  items: Timer[] = [];
   state: { loading: number; } = { loading: this.$state.progress }
 
   fields = [
     { key: 'name', label: this.translate('timers.dialog.name'), sortable: true },
     // virtual attributes
-    { key: 'messages', label: this.translate('messages'), sortable: true, tdClass: 'font-weight-bold text-primary font-bigger' },
-    { key: 'seconds', label: this.capitalize(this.translate('seconds')), sortable: true, tdClass: 'font-weight-bold text-primary font-bigger' },
+    { key: 'triggerEveryMessage', label: this.translate('messages'), sortable: true, tdClass: 'font-weight-bold text-primary font-bigger' },
+    { key: 'triggerEverySecond', label: this.capitalize(this.translate('seconds')), sortable: true, tdClass: 'font-weight-bold text-primary font-bigger' },
     { key: 'responses', label: this.translate('timers.dialog.responses') },
     { key: 'buttons', label: '' },
   ];
 
   get filtered() {
-    if (this.search.length === 0) return this.items.timers
-    return this.items.timers.filter((o) => {
+    if (this.search.length === 0) return this.items
+    return this.items.filter((o) => {
       const isSearchInName = !isNil(o.name.match(new RegExp(this.search, 'ig')))
       return isSearchInName
     })
@@ -91,20 +93,19 @@ export default class timersList extends Vue {
 
   created() {
     this.state.loading = this.$state.progress;
-    this.socket.emit('find.timers', (err, items) => {
-      this.items.timers = orderBy(items.timers, 'name', 'asc')
-      this.items.responses = items.responses
+    this.socket.emit('timers::getAll', (err, items: Timer[]) => {
+      this.items = items
       this.state.loading = this.$state.success;
     })
   }
 
   update(item) {
-    this.socket.emit('update', { items: [item] });
+    this.socket.emit('timers::save', item, () => {});
   }
 
   del(id) {
-    this.socket.emit('delete.timer', id, () => {
-      this.items.timers = this.items.timers.filter((o) => o.id !== id)
+    this.socket.emit('timers::remove', id, () => {
+      this.items = this.items.filter((o) => o.id !== id)
     })
   }
 

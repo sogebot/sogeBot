@@ -62,6 +62,9 @@
 <script lang="ts">
 import { getSocket } from 'src/panel/helpers/socket';
 
+import { Alias as AliasEntity } from 'src/bot/database/entity/alias';
+import { Permissions as PermissionsEntity } from 'src/bot/database/entity/permissions';
+
 import { Vue, Component/*, Watch */ } from 'vue-property-decorator';
 import { orderBy, isNil } from 'lodash-es';
 import { escape } from 'xregexp';
@@ -80,8 +83,8 @@ export default class aliasList extends Vue {
   socket = getSocket('/systems/alias');
   psocket = getSocket('/core/permissions')
 
-  items: Types.Alias.Item[] = [];
-  permissions: Permissions.Item[] = [];
+  items: AliasEntity[] = [];
+  permissions: PermissionsEntity[] = [];
   search: string = '';
   state: {
     loadingAls: number;
@@ -116,12 +119,11 @@ export default class aliasList extends Vue {
   created() {
     this.state.loadingAls = this.$state.progress;
     this.state.loadingPrm = this.$state.progress;
-    this.psocket.emit('find', {}, (err, data) => {
-      if (err) return console.error(err)
-      this.permissions = orderBy(data, 'order', 'asc');
+    this.psocket.emit('permissions', (data) => {
+      this.permissions = data;
       this.state.loadingPrm = this.$state.success;
     })
-    this.socket.emit('find', {}, (err, items) => {
+    this.socket.emit('alias:getAll', (err, items) => {
       this.items = orderBy(items, 'alias', 'asc');
       this.state.loadingAls = this.$state.success;
     })
@@ -146,7 +148,7 @@ export default class aliasList extends Vue {
   updatePermission (id, permission) {
     let item = this.items.filter((o) => o.id === id)[0]
     item.permission = permission
-    this.socket.emit('update', {items: [item]})
+    this.socket.emit('setById', item.id, item, () => {})
     this.$forceUpdate();
   }
 
@@ -156,13 +158,13 @@ export default class aliasList extends Vue {
   }
 
   remove(id) {
-   this.socket.emit('delete', { where: { id } }, () => {
+   this.socket.emit('deleteById', id, () => {
       this.items = this.items.filter((o) => o.id !== id)
     })
   }
 
   update(item) {
-    this.socket.emit('update', { items: [item] })
+    this.socket.emit('setById', item.id, item, () => {})
   }
 }
 </script>

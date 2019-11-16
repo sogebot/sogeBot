@@ -6,7 +6,7 @@ const message = require('../../general.js').message;
 const assert = require('assert');
 
 // users
-const owner = { username: 'soge__' };
+const owner = { userId: Math.floor(Math.random() * 100000), username: 'soge__' };
 
 function randomString() {
   return Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5);

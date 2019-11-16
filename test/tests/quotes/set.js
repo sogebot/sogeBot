@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 /* global describe it before */
 
 
@@ -7,19 +8,22 @@ const db = require('../../general.js').db;
 const assert = require('chai').assert;
 const message = require('../../general.js').message;
 
+const { getManager } = require('typeorm');
+const { Quotes } = require('../../../dest/database/entity/quotes');
+
 // users
-const owner = { username: 'soge__' };
+const owner = { username: 'soge__', userId: 1 };
 
 const tests = [
   { sender: owner, parameters: '', shouldFail: true },
   { sender: owner, parameters: '-id', shouldFail: true },
   { sender: owner, parameters: '-id a', shouldFail: true },
-  { sender: owner, parameters: '-id 1 -tag', shouldFail: true },
+  { sender: owner, parameters: '-id $id -tag', shouldFail: true },
 
-  { sender: owner, parameters: '-id 1 -tag ipsum, dolor', id: 1, tags: 'ipsum, dolor', shouldFail: false, exist: true },
-  { sender: owner, parameters: '-tag ipsum, dolor -id 1', id: 1, tags: 'ipsum, dolor', shouldFail: false, exist: true },
-  { sender: owner, parameters: '-id 2 -tag ipsum, dolor', id: 2, tags: 'ipsum, dolor', shouldFail: false, exist: false },
-  { sender: owner, parameters: '-tag ipsum, dolor -id 2', id: 2, tags: 'ipsum, dolor', shouldFail: false, exist: false },
+  { sender: owner, parameters: '-id $id -tag ipsum, dolor', id: 1, tags: 'ipsum, dolor', shouldFail: false, exist: true },
+  { sender: owner, parameters: '-tag ipsum, dolor -id $id', id: 1, tags: 'ipsum, dolor', shouldFail: false, exist: true },
+  { sender: owner, parameters: '-id ca0cfbe4-2cc2-449b-8b9d-67bb34b21701 -tag ipsum, dolor', id: 'ca0cfbe4-2cc2-449b-8b9d-67bb34b21701', tags: 'ipsum, dolor', shouldFail: false, exist: false },
+  { sender: owner, parameters: '-tag ipsum, dolor -id ca0cfbe4-2cc2-449b-8b9d-67bb34b21701', id: 'ca0cfbe4-2cc2-449b-8b9d-67bb34b21701', tags: 'ipsum, dolor', shouldFail: false, exist: false },
 ];
 
 describe('Quotes - set()', () => {
@@ -28,7 +32,12 @@ describe('Quotes - set()', () => {
       before(async () => {
         await db.cleanup();
         await message.prepare();
-        await global.db.engine.insert('systems.quotes', { id: 1, tags: ['lorem ipsum'], quote: 'Lorem Ipsum', quotedBy: '12345' });
+        const quote = await global.systems.quotes.add({ sender: test.sender, parameters: '-tags lorem ipsum -quote Lorem Ipsum', command: '!quote add' });
+        id = quote.id;
+        if (test.id === 1) {
+          test.id = id;
+        }
+        test.parameters = test.parameters.replace('$id', id);
       });
 
       it('Run !quote set', async () => {
@@ -38,17 +47,18 @@ describe('Quotes - set()', () => {
         it('Should throw error', async () => {
           await message.isSent('systems.quotes.set.error.no-parameters', owner, { command: '!quote set' });
         });
-        it('Tags should not be changed', async () => {
-          const item = await global.db.engine.findOne('systems.quotes', { id: 1 });
-          assert.deepEqual(item.tags, ['lorem ipsum']);
-        });
       } else {
         if (test.exist) {
           it('Should sent success message', async () => {
             await message.isSent('systems.quotes.set.ok', owner, { id: test.id, tags: test.tags });
           });
           it('Tags should be changed', async () => {
-            const item = await global.db.engine.findOne('systems.quotes', { id: test.id });
+            const item = await getManager()
+              .createQueryBuilder()
+              .select('quote')
+              .from(Quotes, 'quote')
+              .where('id = :id', { id: test.id })
+              .getOne();
             assert.deepEqual(item.tags, test.tags.split(',').map((o) => o.trim()));
           });
         } else {
@@ -56,8 +66,13 @@ describe('Quotes - set()', () => {
             await message.isSent('systems.quotes.set.error.not-found-by-id', owner, { id: test.id });
           });
           it('Quote should not be created', async () => {
-            const item = await global.db.engine.findOne('systems.quotes', { id: test.id });
-            assert.isEmpty(item);
+            const item = await getManager()
+              .createQueryBuilder()
+              .select('quote')
+              .from(Quotes, 'quote')
+              .where('id = :id', { id: test.id })
+              .getOne();
+            assert.isUndefined(item);
           });
         }
       }

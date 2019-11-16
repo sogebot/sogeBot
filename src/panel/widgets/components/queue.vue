@@ -104,12 +104,12 @@ export default {
   },
   created: function () {
     this.interval.push(
-      setInterval(() => this.socket.emit('find', { collection: 'picked' }, (err, users) => {
+      setInterval(() => this.socket.emit('queue::getAllPicked', (users) => {
         this.picked = users
       }), 1000)
     );
     this.interval.push(
-      setInterval(() => this.socket.emit('find', {}, (err, users) => {
+      setInterval(() => this.socket.emit('queue::getAll', (users) => {
         this.users = users
       }), 1000)
     )
@@ -171,7 +171,7 @@ export default {
   },
   methods: {
     clear: function () {
-      this.socket.emit('delete', { where: {}})
+      this.socket.emit('queue::clear', () => {})
     },
     pick: function (username) {
       const data = {
@@ -179,7 +179,7 @@ export default {
         count: this.selectCount,
         username
       }
-      this.socket.emit('pick', data, users => {
+      this.socket.emit('queue::pick', data, users => {
         this.tabIndex = 0
         this.picked = users
         this.multiSelection = false

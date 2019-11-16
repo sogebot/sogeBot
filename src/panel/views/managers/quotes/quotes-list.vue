@@ -71,11 +71,10 @@
 
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
-import { QuoteInterface } from '../../../../bot/systems/quotes';
+import { Quotes } from 'src/bot/database/entity/quotes';
 import { getSocket } from 'src/panel/helpers/socket';
 import { orderBy, uniq, xor, flatten } from 'lodash-es';
 
-import { getUsernameById } from '../../../helpers/userById';
 
 
 @Component({
@@ -91,7 +90,7 @@ import { getUsernameById } from '../../../helpers/userById';
   }
 })
 export default class quotesList extends Vue {
-  quotesFromDb: QuoteInterface[] = [];
+  quotesFromDb: Quotes[] = [];
   filteredTags: string[] = [];
   changed: string[] = [];
   isDataChanged = false;
@@ -119,10 +118,7 @@ export default class quotesList extends Vue {
   socket = getSocket('/systems/quotes');
 
   created() {
-    this.socket.emit('find', {}, async (err, items: QuoteInterface[]) => {
-      for(const item of items) {
-        item.quotedBy = await getUsernameById(item.quotedBy);
-      }
+    this.socket.emit('quotes:getAll', {}, async (err, items: Quotes[]) => {
       this.quotesFromDb = items
       this.state.loading = this.$state.success;
     })
@@ -133,7 +129,7 @@ export default class quotesList extends Vue {
   };
 
   get quotes() {
-    let quotesFilteredBySearch: QuoteInterface[] = []
+    let quotesFilteredBySearch: Quotes[] = []
     if (this.search.trim().length > 0) {
       for (let quote of this.quotesFromDb) {
         if (quote.quote.toLowerCase().includes(this.search)) {
@@ -143,10 +139,9 @@ export default class quotesList extends Vue {
      } else {
        quotesFilteredBySearch = this.quotesFromDb;
      }
-
     if (this.filteredTags.length === 0) return quotesFilteredBySearch
     else {
-      let quotesFilteredByTags: QuoteInterface[] = []
+      let quotesFilteredByTags: Quotes[] = []
       for (let quote of quotesFilteredBySearch) {
         for (let tag of quote.tags) {
           if (this.filteredTags.includes(tag)) {
@@ -169,8 +164,9 @@ export default class quotesList extends Vue {
   }
 
   deleteQuote(id) {
-    this.quotesFromDb = this.quotes.filter((o) => o.id !== id)
-    this.socket.emit('delete', {id})
+    this.socket.emit('deleteById', id, () => {
+      this.quotesFromDb = this.quotes.filter((o) => o.id !== id)
+    })
   }
 
   linkTo(item) {

@@ -3,12 +3,16 @@ import _ from 'lodash';
 import { setTimeout } from 'timers';
 import { isMainThread } from './cluster';
 
-import { flatten, unflatten } from './helpers/flatten';
 import { loadingInProgress, permissions as permissionsList } from './decorators';
 import { getFunctionList } from './decorators/on';
 import { permission } from './permissions';
 import { error, info, warning } from './helpers/log';
+
+import { getManager, getRepository } from 'typeorm';
+import { Settings } from './database/entity/settings';
+import { PermissionCommands, Permissions as PermissionsEntity } from './database/entity/permissions';
 import { adminEndpoint, publicEndpoint } from './helpers/socket';
+import { flatten, unflatten } from './helpers/flatten';
 
 class Module {
   public dependsOn: string[] = [];
@@ -64,7 +68,13 @@ class Module {
   set enabled(value: boolean) {
     if (!_.isEqual(_.get(this, '_enabled', true), value)) {
       _.set(this, '_enabled', value);
-      global.db.engine.update(this.collection.settings, { system: this.constructor.name.toLowerCase(), key: 'enabled' }, { value });
+      getManager()
+        .createQueryBuilder()
+        .update(Settings)
+        .where('namespace = :namespace', { namespace: this.nsp })
+        .andWhere('name = :name', { name: 'enabled' })
+        .set({ value: JSON.stringify(value) })
+        .execute();
     }
   }
 
@@ -92,6 +102,7 @@ class Module {
     this._name = name;
     this._enabled = enabled;
 
+    //TODO: delete
     this.collection = new Proxy({}, {
       get: (t, n, r) => {
         if (_.isSymbol(n)) {
@@ -147,7 +158,13 @@ class Module {
   }
 
   public async loadVariableValue(key) {
-    const variable = await global.db.engine.findOne(this.collection.settings, { system: this.constructor.name.toLowerCase(), key });
+    const variable = await getManager()
+      .createQueryBuilder()
+      .select('settings')
+      .where('namespace=:namespace', { namespace: this.nsp })
+      .andWhere('name=:name', { name: key })
+      .from(Settings, 'settings')
+      .getOne();
 
     if (typeof this.on !== 'undefined' && typeof this.on.load !== 'undefined') {
       if (this.on.load[key]) {
@@ -162,8 +179,8 @@ class Module {
     }
 
     try {
-      if (typeof variable.value !== 'undefined') {
-        return key.startsWith('__permission_based') ? JSON.parse(variable.value) : variable.value;
+      if (typeof variable !== 'undefined') {
+        return JSON.parse(variable.value);
       } else {
         return undefined;
       }
@@ -198,15 +215,6 @@ class Module {
       // default socket listeners
       adminEndpoint(this.nsp, 'settings', async (cb) => {
         cb(null, await this.getAllSettings(), await this.getUI());
-      });
-      adminEndpoint(this.nsp, 'set.value', async (variable, value, cb) => {
-        this[variable] = value;
-        if (typeof cb === 'function') {
-          cb(null, {variable, value});
-        }
-      });
-      publicEndpoint(this.nsp, 'get.value', async (variable, cb) => {
-        cb(null, await this[variable]);
       });
       adminEndpoint(this.nsp, 'settings.update', async (data: { [x: string]: any }, cb) => {
         // flatten and remove category
@@ -268,9 +276,12 @@ class Module {
                 const c = this._commands.find((o) => o.name === command);
                 if (c) {
                   if (currentValue === c.permission) {
-                    await global.db.engine.remove(global.permissions.collection.commands, { key: c.name });
+                    await getRepository(PermissionCommands).delete({ name: c.name });
                   } else {
-                    await global.db.engine.update(global.permissions.collection.commands, { key: c.name }, { permission: currentValue });
+                    const permCmd = await getRepository(PermissionCommands).findOne({ name: c.name }) || new PermissionCommands();
+                    permCmd.name = c.name;
+                    permCmd.permission = currentValue as string;
+                    await getRepository(PermissionCommands).save(permCmd);
                   }
                 }
               }
@@ -301,196 +312,15 @@ class Module {
           setTimeout(() => cb(null), 1000);
         }
       });
-      // difference between set and update is that set will set exact 1:1 values of opts.items
-      // so it will also DELETE additional data
-      adminEndpoint(this.nsp, 'set', async (opts, cb) => {
-        opts.collection = opts.collection || 'data';
-        opts.items = opts.items || [];
-        if (opts.collection.startsWith('_')) {
-          opts.collection = opts.collection.replace('_', '');
-        } else {
-          if (opts.collection === 'settings') {
-            opts.collection = this.collection.settings;
-            opts.where = {
-              system: this.constructor.name.toLowerCase(),
-              ...opts.where,
-            };
-          } else {
-            opts.collection = this.collection[opts.collection];
-          }
-        }
 
-        // get all items by where
-        if (opts.where === null || typeof opts.where === 'undefined') {
-          if (_.isFunction(cb)) {
-            return cb(new Error('Where cannot be empty or explicitely set as {}!'));
-          } else {
-            throw new Error('Where cannot be empty or explicitely set as {}!');
-          }
-        }
-
-        // remove all data
-        await global.db.engine.remove(opts.collection, opts.where);
-        for (const item of opts.items) {
-          delete item._id;
-          await global.db.engine.insert(opts.collection, item);
-        }
+      adminEndpoint(this.nsp, 'set.value', async (variable, value, cb) => {
+        this[variable] = value;
         if (typeof cb === 'function') {
-          cb(null, true);
+          cb(null, {variable, value});
         }
       });
-      adminEndpoint(this.nsp, 'update', async (opts, cb) => {
-        opts.collection = opts.collection || 'data';
-        if (opts.collection.startsWith('_')) {
-          opts.collection = opts.collection.replace('_', '');
-        } else {
-          if (opts.collection === 'settings') {
-            opts.collection = this.collection.settings;
-            opts.where = {
-              system: this.constructor.name.toLowerCase(),
-              ...opts.where,
-            };
-          } else {
-            opts.collection = this.collection[opts.collection];
-          }
-        }
-
-        if (opts.items) {
-          for (const item of opts.items) {
-            let itemFromDb = Object.assign({}, item);
-            const _id = item._id; delete item._id;
-            if (_.isNil(_id) && _.isNil(opts.key)) {
-              itemFromDb = await global.db.engine.insert(opts.collection, item);
-            } else if (_id) {
-              await global.db.engine.update(opts.collection, { _id }, item);
-            } else {
-              await global.db.engine.update(opts.collection, { [opts.key]: item[opts.key] }, item);
-            }
-            if (_.isFunction(cb)) {
-              cb(null, Object.assign({ _id }, itemFromDb));
-            }
-          }
-        } else {
-          if (_.isFunction(cb)) {
-            cb(null, []);
-          }
-        }
-      });
-      adminEndpoint(this.nsp, 'insert', async (opts, cb) => {
-        opts.collection = opts.collection || 'data';
-        if (opts.collection.startsWith('_')) {
-          opts.collection = opts.collection.replace('_', '');
-        } else {
-          if (opts.collection === 'settings') {
-            throw Error('You cannot use insert socket with settings collection');
-          } else {
-            opts.collection = this.collection[opts.collection];
-          }
-        }
-
-        if (opts.items) {
-          const created: any[] = [];
-          for (const item of opts.items) {
-            created.push(await global.db.engine.insert(opts.collection, item));
-          }
-          if (_.isFunction(cb)) {
-            cb(null, created);
-          }
-        } else {
-          if (_.isFunction(cb)) {
-            cb(null, []);
-          }
-        }
-      });
-      adminEndpoint(this.nsp, 'delete', async (opts, cb) => {
-        opts.collection = opts.collection || 'data';
-        if (opts.collection.startsWith('_')) {
-          opts.collection = opts.collection.replace('_', '');
-        } else {
-          if (opts.collection === 'settings') {
-            opts.collection = this.collection.settings;
-            opts.where = {
-              system: this.constructor.name.toLowerCase(),
-              ...opts.where,
-            };
-          } else {
-            opts.collection = this.collection[opts.collection];
-          }
-        }
-
-        if (opts._id) {
-          await global.db.engine.remove(opts.collection, { _id: opts._id });
-        } else if (opts.where) {
-          await global.db.engine.remove(opts.collection, opts.where);
-        }
-
-        if (_.isFunction(cb)) {
-          cb(null);
-        }
-      });
-      publicEndpoint(this.nsp, 'find', async (opts, cb) => {
-        opts.collection = opts.collection || 'data';
-        opts.omit = opts.omit || [];
-        if (opts.collection.startsWith('_')) {
-          opts.collection = opts.collection.replace('_', '');
-        } else {
-          if (opts.collection === 'settings') {
-            opts.collection = this.collection.settings;
-            opts.where = {
-              system: this.constructor.name.toLowerCase(),
-              ...opts.where,
-            };
-          } else {
-            opts.collection = this.collection[opts.collection];
-          }
-        }
-
-        opts.where = opts.where || {};
-        if (_.isFunction(cb)) {
-          let items = await global.db.engine.find(opts.collection, opts.where);
-          if (opts.omit.length > 0) {
-            items = items.map((o) => {
-              for (const omit of opts.omit) {
-                delete o[omit];
-              }
-              return o;
-            });
-          }
-          cb(null, items);
-        } else {
-          throw Error('No callback for find function');
-        }
-      });
-      publicEndpoint(this.nsp, 'findOne', async (opts, cb) => {
-        opts.collection = opts.collection || 'data';
-        opts.omit = opts.omit || [];
-        if (opts.collection.startsWith('_')) {
-          opts.collection = opts.collection.replace('_', '');
-        } else {
-          if (opts.collection === 'settings') {
-            opts.collection = this.collection.settings;
-            opts.where = {
-              system: this.constructor.name.toLowerCase(),
-              ...opts.where,
-            };
-          } else {
-            opts.collection = this.collection[opts.collection];
-          }
-        }
-
-        opts.where = opts.where || {};
-        if (_.isFunction(cb)) {
-          let items = await global.db.engine.findOne(opts.collection, opts.where);
-          if (opts.omit.length > 0) {
-            items = items.map((o) => {
-              for (const omit of opts.omit) {
-                delete o[omit];
-              }
-              return o;
-            });
-          }
-          cb(null, items);
-        }
+      publicEndpoint(this.nsp, 'get.value', async (variable, cb) => {
+        cb(null, await this[variable]);
       });
     }
   }
@@ -608,12 +438,12 @@ class Module {
     if (this._commands.length > 0) {
       promisedSettings._permissions = {};
       for (const command of this._commands) {
-        const key = typeof command === 'string' ? command : command.name;
-        const pItem = await global.db.engine.findOne(global.permissions.collection.commands, { key });
-        if (!_.isEmpty(pItem)) {
-          promisedSettings._permissions[key] = pItem.permission;
+        const name = typeof command === 'string' ? command : command.name;
+        const pItem = await getRepository(PermissionCommands).findOne({ name });
+        if (pItem) {
+          promisedSettings._permissions[name] = pItem.permission;
         } else {
-          promisedSettings._permissions[key] = command.permission;
+          promisedSettings._permissions[name] = command.permission;
         }
       }
     }
@@ -802,11 +632,18 @@ class Module {
   }
 
   protected async loadCommand(command: string): Promise<void> {
-    const cmd = await global.db.engine.findOne(this.collection.settings, { system: this.constructor.name.toLowerCase(), key: 'commands.' + command });
-    if (cmd.value) {
+    const cmd = await getManager()
+      .createQueryBuilder()
+      .select('settings')
+      .where('namespace = :namespace', { namespace: this.nsp })
+      .andWhere('name = :name', { name: 'commands.' + command })
+      .from(Settings, 'settings')
+      .getOne();
+
+    if (cmd) {
       const c = this._commands.find((o) => o.name === command);
       if (c) {
-        c.command = cmd.value;
+        c.command = JSON.parse(cmd.value);
       }
     } else {
       const c = this._commands.find((o) => o.name === command);
@@ -824,11 +661,23 @@ class Module {
     if (c) {
       if (c.name === updated) {
         // default value
-        await global.db.engine.remove(this.collection.settings, { system: this.constructor.name.toLowerCase(), key: 'commands.' + command });
+        await getManager()
+          .createQueryBuilder()
+          .delete()
+          .where('namespace = :namespace', { namespace: this.nsp })
+          .andWhere('name = :name', { name: 'commands.' + command })
+          .from(Settings)
+          .execute();
         delete c.command;
       } else {
         c.command = updated;
-        await global.db.engine.update(this.collection.settings, { system: this.constructor.name.toLowerCase(), key: 'commands.' + command }, { value: updated });
+        await getManager()
+          .createQueryBuilder()
+          .update(Settings)
+          .where('namespace = :namespace', { namespace: this.nsp })
+          .andWhere('name = :name', { name: 'commands.' + command })
+          .set({ value: JSON.stringify(updated) })
+          .execute();
       }
     } else {
       warning(`Command ${command} cannot be updated to ${updated}`);
@@ -841,7 +690,13 @@ class Module {
     let permId = permission.VIEWERS;
 
     // get current full list of permissions
-    for (const p of (_.orderBy(await global.db.engine.find(global.permissions.collection.data), 'order', 'desc')) as Permissions.Item[]) {
+    const permissions = await getRepository(PermissionsEntity).find({
+      cache: true,
+      order: {
+        order: 'DESC',
+      },
+    });
+    for (const p of permissions) {
       // set proper value for permId or default value
       if (set_default_values || p.id === permission.VIEWERS) {
         if (p.id === permission.VIEWERS) {

@@ -7,7 +7,7 @@ const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 
 // users
-const owner = { username: 'soge__', badges: {} };
+const owner = { userId: Math.floor(Math.random() * 100000), username: 'soge__', badges: {} };
 
 describe('Cooldowns - toggleOwners()', () => {
   beforeEach(async () => {

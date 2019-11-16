@@ -84,6 +84,9 @@ import { Vue, Component, Watch } from 'vue-property-decorator';
 import { getSocket } from 'src/panel/helpers/socket';
 import { permission } from 'src/bot/helpers/permissions'
 
+import { Alias as AliasEntity } from 'src/bot/database/entity/alias';
+import { Permissions as PermissionsEntity } from 'src/bot/database/entity/permissions';
+
 import { Validations } from 'vuelidate-property-decorators';
 import { required } from 'vuelidate/lib/validators'
 import { orderBy } from 'lodash-es'
@@ -126,9 +129,9 @@ export default class aliasEdit extends Vue {
     pending: false,
   }
 
-  permissions: Permissions.Item[] = [];
+  permissions: PermissionsEntity[] = [];
 
-  item: Types.Alias.Item = {
+  item: AliasEntity = {
     id: uuid(),
     alias: '',
     command: '',
@@ -154,11 +157,8 @@ export default class aliasEdit extends Vue {
   }
 
   async mounted() {
-    await new Promise((resolve, reject) => {
-      this.psocket.emit('find', {}, (err, data) => {
-      if (err) {
-        reject(err)
-      }
+    await new Promise((resolve) => {
+      this.psocket.emit('permissions', (data) => {
       this.permissions = orderBy(data, 'order', 'asc');
       resolve()
       })
@@ -166,7 +166,7 @@ export default class aliasEdit extends Vue {
 
     if (this.$route.params.id) {
       await new Promise((resolve, reject) => {
-        this.socket.emit('findOne', { where: { id: this.$route.params.id } }, (err, data: Types.Alias.Item) => {
+        this.socket.emit('getById', this.$route.params.id, (err, data: AliasEntity) => {
           if (err) {
             reject(err)
           }
@@ -183,7 +183,7 @@ export default class aliasEdit extends Vue {
   }
 
   del() {
-    this.socket.emit('delete', { where: { id: this.$route.params.id }}, (err, deleted) => {
+    this.socket.emit('deleteById', this.$route.params.id, (err) => {
       if (err) {
         return console.error(err);
       }
@@ -213,7 +213,7 @@ export default class aliasEdit extends Vue {
     if (!this.$v.$invalid) {
       this.state.save = this.$state.progress;
 
-      this.socket.emit('update', { key: 'id', items: [this.item] }, (err, data) => {
+      this.socket.emit('setById', this.$route.params.id, this.item, (err, data) => {
         if (err) {
           this.state.save = this.$state.fail;
           return console.error(err);

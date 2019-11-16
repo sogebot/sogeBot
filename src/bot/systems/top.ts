@@ -1,11 +1,13 @@
 import _ from 'lodash';
 import moment from 'moment-timezone';
 
-import { getChannel, getIgnoreList, getLocalizedName, isIgnored, sendMessage } from '../commons';
+import { getIgnoreList, getLocalizedName, isIgnored, sendMessage } from '../commons';
 import { command, default_permission } from '../decorators';
 import { permission } from '../permissions';
 import System from './_interface';
 import { debug } from '../helpers/log';
+import { getConnection, getRepository } from 'typeorm';
+import { User, UserBit, UserTip } from '../database/entity/user';
 
 enum TYPE {
   TIME,
@@ -102,91 +104,149 @@ class Top extends System {
     const type = opts.parameters;
 
     // count ignored users
-    const _total = 10 + getIgnoreList().length + 2; // 2 for bot and broadcaster
+    const _total = 10 + getIgnoreList().length;
 
     moment.locale(global.lib.translate.lang);
 
+    const connection = await getConnection();
     switch (type) {
       case TYPE.TIME:
-        sorted = [];
-        for (const user of (await global.db.engine.find('users.watched', { _sort: 'watched', _sum: 'watched', _total, _group: 'id' }))) {
-          sorted.push({ username: await global.users.getNameById(user._id), value: user.watched });
-        }
+        sorted
+          = (await getRepository(User).createQueryBuilder('user')
+            .where('user.username != :botusername', { botusername: global.oauth.botUsername.toLowerCase() })
+            .andWhere('user.username != :broadcasterusername', { broadcasterusername: global.oauth.broadcasterUsername.toLowerCase() })
+            .orderBy('user.watchedTime', 'DESC')
+            .limit(_total)
+            .getMany())
+            .filter(o => !isIgnored({ username: o.username, userId: o.userId }))
+            .map(o => {
+              return { username: o.username, value: o.watchedTime };
+            });
         message = global.translate('systems.top.time').replace(/\$amount/g, 10);
         break;
       case TYPE.TIPS:
-        for (const tip of (await global.db.engine.find('users.tips', { _sort: '_amount', _sum: '_amount', _total, _group: 'id' }))) {
-          sorted.push({ username: await global.users.getNameById(tip._id), value: global.currency.exchange(Number(tip._amount), 'EUR' /* we know that _currency is EUR */, global.currency.mainCurrency) });
-        }
+        const joinTip = connection.options.type === 'postgres' ? '"user_tip"."userUserId" = "user"."userId"' : 'user_tip.userUserId = user.userId';
+        sorted
+         = (await getRepository(User).createQueryBuilder('user')
+            .orderBy('value', 'DESC')
+            .addSelect('COALESCE(SUM(user_tip.sortAmount), 0)', 'value')
+            .addSelect('user.username')
+            .limit(_total)
+            .where('user.username != :botusername', { botusername: global.oauth.botUsername.toLowerCase() })
+            .innerJoin(UserTip, 'user_tip', joinTip)
+            .groupBy('user.userId')
+            .getRawMany()
+          ).filter(o => !isIgnored({ username: o.username, userId: o.userId }));
         message = global.translate('systems.top.tips').replace(/\$amount/g, 10);
         break;
       case TYPE.POINTS:
         if (!global.systems.points.enabled) {
           return;
         }
-
-        sorted = [];
-        for (const user of (await global.db.engine.find('users.points', { _sort: 'points', _sum: 'points', _total, _group: 'id' }))) {
-          sorted.push({ username: await global.users.getNameById(user._id), value: user.points });
-        }
+        sorted
+         = (await getRepository(User).createQueryBuilder('user')
+            .where('user.username != :botusername', { botusername: global.oauth.botUsername.toLowerCase() })
+            .andWhere('user.username != :broadcasterusername', { broadcasterusername: global.oauth.broadcasterUsername.toLowerCase() })
+            .orderBy('user.points', 'DESC')
+            .limit(_total)
+            .getMany())
+            .filter(o => !isIgnored({ username: o.username, userId: o.userId }))
+            .map(o => {
+              return { username: o.username, value: o.points };
+            });
         message = global.translate('systems.top.points').replace(/\$amount/g, 10);
         break;
       case TYPE.MESSAGES:
-        sorted = [];
-        for (const user of (await global.db.engine.find('users.messages', { _sort: 'messages', _sum: 'messages', _total, _group: 'id' }))) {
-          sorted.push({ username: await global.users.getNameById(user._id), value: user.messages });
-        }
+        sorted
+          = (await getRepository(User).createQueryBuilder('user')
+            .where('user.username != :botusername', { botusername: global.oauth.botUsername.toLowerCase() })
+            .andWhere('user.username != :broadcasterusername', { broadcasterusername: global.oauth.broadcasterUsername.toLowerCase() })
+            .orderBy('user.messages', 'DESC')
+            .limit(_total)
+            .getMany())
+            .filter(o => !isIgnored({ username: o.username, userId: o.userId }))
+            .map(o => {
+              return { username: o.username, value: o.messages };
+            });
         message = global.translate('systems.top.messages').replace(/\$amount/g, 10);
         break;
       case TYPE.FOLLOWAGE:
-        sorted = [];
-        for (const user of (await global.db.engine.find('users', { is: { follower: true }, _sort: '-time.follow', _total }))) {
-          sorted.push({ username: user.username, value: user.time.follow });
-        }
+        sorted
+          = (await getRepository(User).createQueryBuilder('user')
+            .where('user.username != :botusername', { botusername: global.oauth.botUsername.toLowerCase() })
+            .andWhere('user.username != :broadcasterusername', { broadcasterusername: global.oauth.broadcasterUsername.toLowerCase() })
+            .andWhere('user.isFollower = :isFollower', { isFollower: true })
+            .orderBy('user.followedAt', 'ASC')
+            .limit(_total)
+            .getMany())
+            .filter(o => !isIgnored({ username: o.username, userId: o.userId }))
+            .map(o => {
+              return { username: o.username, value: o.followedAt };
+            });
         message = global.translate('systems.top.followage').replace(/\$amount/g, 10);
         break;
       case TYPE.SUBAGE:
-        sorted = [];
-        for (const user of (await global.db.engine.find('users', { is: { subscriber: true }, _sort: '-time.subscribed_at', _total }))) {
-          sorted.push({ username: user.username, value: user.time.subscribed_at });
-        }
+        sorted
+          = (await getRepository(User).createQueryBuilder('user')
+            .where('user.username != :botusername', { botusername: global.oauth.botUsername.toLowerCase() })
+            .andWhere('user.username != :broadcasterusername', { broadcasterusername: global.oauth.broadcasterUsername.toLowerCase() })
+            .andWhere('user.isSubscriber = :isSubscriber', { isSubscriber: true })
+            .orderBy('user.subscribedAt', 'ASC')
+            .limit(_total)
+            .getMany())
+            .filter(o => !isIgnored({ username: o.username, userId: o.userId }))
+            .map(o => {
+              return { username: o.username, value: o.subscribedAt };
+            });
         message = global.translate('systems.top.subage').replace(/\$amount/g, 10);
         break;
       case TYPE.BITS:
-        sorted = [];
-        for (const user of (await global.db.engine.find('users.bits', { _sort: 'amount', _sum: 'amount', _total, _group: 'id' }))) {
-          sorted.push({ username: await global.users.getNameById(user._id), value: user.amount });
-        }
+        const joinBit = connection.options.type === 'postgres' ? '"user_bit"."userUserId" = "user"."userId"' : 'user_bit.userUserId = user.userId';
+        sorted
+         = (await getRepository(User).createQueryBuilder('user')
+            .orderBy('value', 'DESC')
+            .addSelect('COALESCE(SUM(user_bit.amount), 0)', 'value')
+            .addSelect('user.username')
+            .limit(_total)
+            .andWhere('user.username != :broadcasterusername', { broadcasterusername: global.oauth.broadcasterUsername.toLowerCase() })
+            .innerJoin(UserBit, 'user_bit', joinBit)
+            .groupBy('user.userId')
+            .getRawMany()
+          ).filter(o => !isIgnored({ username: o.username, userId: o.userId }));
         message = global.translate('systems.top.bits').replace(/\$amount/g, 10);
         break;
       case TYPE.GIFTS:
-        sorted = [];
-        for (const user of (await global.db.engine.find('users', { _sort: 'custom.subgiftCount', _total }))) {
-          sorted.push({ username: user.username, value: user.custom.subgiftCount });
-        }
+        sorted
+          = (await getRepository(User).createQueryBuilder('user')
+            .where('user.username != :botusername', { botusername: global.oauth.botUsername.toLowerCase() })
+            .andWhere('user.username != :broadcasterusername', { broadcasterusername: global.oauth.broadcasterUsername.toLowerCase() })
+            .orderBy('user.giftedSubscribes', 'DESC')
+            .limit(_total)
+            .getMany())
+            .filter(o => !isIgnored({ username: o.username, userId: o.userId }))
+            .map(o => {
+              return { username: o.username, value: o.giftedSubscribes };
+            });
         message = global.translate('systems.top.gifts').replace(/\$amount/g, 10);
         break;
       case TYPE.SUBMONTHS:
-        sorted = [];
-        for (const user of (await global.db.engine.find('users', { _sort: 'stats.subCumulativeMonths', _total }))) {
-          sorted.push({ username: user.username, value: user.stats.subCumulativeMonths });
-        }
+        sorted
+          = (await getRepository(User).createQueryBuilder('user')
+            .where('user.username != :botusername', { botusername: global.oauth.botUsername.toLowerCase() })
+            .andWhere('user.username != :broadcasterusername', { broadcasterusername: global.oauth.broadcasterUsername.toLowerCase() })
+            .orderBy('user.subscribeCumulativeMonths', 'DESC')
+            .limit(_total)
+            .getMany())
+            .filter(o => !isIgnored({ username: o.username, userId: o.userId }))
+            .map(o => {
+              return { username: o.username, value: o.subscribeCumulativeMonths };
+            });
         message = global.translate('systems.top.submonths').replace(/\$amount/g, 10);
         break;
     }
 
     if (sorted.length > 0) {
       // remove ignored users
-      const ignored: string[] = [];
-      for (const user of sorted) {
-        if (isIgnored({ username: user.username })) {
-          ignored.push(user.username);
-        }
-      }
-
-      _.remove(sorted, (o) => _.includes(ignored, o.username));
-      // remove broadcaster and bot accounts
-      _.remove(sorted, (o) => _.includes([getChannel(), global.oauth.botUsername.toLowerCase()], o.username));
       sorted = _.chunk(sorted, 10)[0];
 
       for (const user of sorted) {

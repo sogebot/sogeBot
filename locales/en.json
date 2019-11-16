@@ -85,7 +85,7 @@
           "edit": "Edit timer"
         },
         "placeholders": {
-          "name": "Set name of your timer, can contain only these characters a-zA-Z0-9_, if empty, name will be generated",
+          "name": "Set name of your timer, can contain only these characters a-zA-Z0-9_",
           "messages": "Trigger timer each X messages",
           "seconds": "Trigger timer each X seconds"
         },
@@ -805,12 +805,12 @@
     "raffle-winner-is": "Winner of raffle $keyword is $username! Win probability was $probability%!"
   },
   "bets": {
-      "running": "$sender, bet is already opened! Bet options: $options. Use $command close 0-$maxIndex",
+      "running": "$sender, bet is already opened! Bet options: $options. Use $command close 1-$maxIndex",
       "notRunning": "No bet is currently opened, ask mods to open it!",
-      "opened": "New bet '$title' is opened! Bet options: $options. Use $command 0-$maxIndex <amount> to win! You have only $minutesmin to bet!",
+      "opened": "New bet '$title' is opened! Bet options: $options. Use $command 1-$maxIndex <amount> to win! You have only $minutesmin to bet!",
       "closeNotEnoughOptions": "$sender, you need to select winning option for bet close.",
       "notEnoughOptions": "$sender, new bets needs at least 2 options!",
-      "info": "Bet '$title' is still opened! Bet options: $options. Use $command 0-$maxIndex <amount> to win! You have only $minutesmin to bet!",
+      "info": "Bet '$title' is still opened! Bet options: $options. Use $command 1-$maxIndex <amount> to win! You have only $minutesmin to bet!",
       "diffBet": "$sender, you already made a bet on $option and you cannot bet to different option!",
       "undefinedBet": "Sorry, $sender, but this bet option doesn't exist, use $command to check usage",
       "betPercentGain": "Bet percent gain per option was set to $value%",
@@ -823,7 +823,7 @@
       "zeroBet": "Oh boy, $sender, you cannot bet 0 $pointsName",
       "lockedInfo": "Bet '$title' is still opened, but time for betting is up!",
       "removed": "Betting time is up! No bets were sent -> automatically closing",
-      "error": "Sorry, $sender, this command is not correct! Use $command 0-$maxIndex <amount>. E.g. $command 0 100 will bet 100 points to item 0."
+      "error": "Sorry, $sender, this command is not correct! Use $command 1-$maxIndex <amount>. E.g. $command 0 100 will bet 100 points to item 0."
   },
   "alias": {
     "alias-parse-failed": "{core.command-parse} !alias",

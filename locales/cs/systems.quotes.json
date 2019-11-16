@@ -5,7 +5,7 @@
   },
   "remove": {
     "ok": "$sender, citace $id byla úspěšně smazána.",
-    "error": "$sender, ID citace chybí nebo není číslo.",
+    "error": "$sender, ID citace chybí.",
     "not-found": "$sender, citace $id nebyla nalezena."
   },
   "show": {

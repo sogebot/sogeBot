@@ -8,9 +8,11 @@ import { command, default_permission, parser, permission_settings, settings } fr
 import Expects from '../expects';
 import { permission } from '../permissions';
 import System from './_interface';
-import * as constants from '../constants';
 import { debug, error } from '../helpers/log';
 import { adminEndpoint } from '../helpers/socket';
+import { getRepository } from 'typeorm';
+import { User } from '../database/entity/user';
+import { getAllOnlineUsernames } from '../helpers/getAllOnlineUsernames';
 
 class Points extends System {
   @settings('points')
@@ -66,7 +68,7 @@ class Points extends System {
 
     try {
       const userPromises: Promise<void>[] = [];
-      for (const username of (await global.users.getAllOnlineUsernames())) {
+      for (const username of (await getAllOnlineUsernames())) {
         if (isBot(username)) {
           continue;
         }
@@ -97,33 +99,34 @@ class Points extends System {
       const interval_calculated = opts.isOnline ? opts.interval[permId] * 60 * 1000 : opts.offlineInterval[permId]  * 60 * 1000;
       const ptsPerInterval = opts.isOnline ? opts.perInterval[permId]  : opts.perOfflineInterval[permId] ;
 
-      const user = await global.db.engine.findOne('users', { username });
-      if (_.isEmpty(user)) {
-        user.id = await global.api.getIdFromTwitch(username);
-      }
-      if (user.id) {
-        const chat = await global.users.getChatOf(user.id, opts.isOnline);
-        const userPointsKey = opts.isOnline ? 'pointsOnline' : 'pointsOffline';
+      let user = await getRepository(User).findOne({ username });
+      if (!user) {
+        user = new User();
+        user.userId = Number(await global.api.getIdFromTwitch(username));
+        user.username = username;
+        user.points = 0;
+        user.pointsOfflineGivenAt = Date.now();
+        user.pointsOnlineGivenAt = Date.now();
+        await getRepository(User).save(user);
+        return;
+      } else {
+        const chat = await global.users.getChatOf(userId, opts.isOnline);
+        const userPointsKey = opts.isOnline ? 'pointsOnlineGivenAt' : 'pointsOfflineGivenAt';
         if (interval_calculated !== 0 && ptsPerInterval[permId]  !== 0) {
-          debug('points.update', `${user.username}#${user.id}[${permId}] ${chat} | ${_.get(user, 'time.points', 'n/a')}`);
-          _.set(user, 'time.' + userPointsKey, _.get(user, 'time.' + userPointsKey, chat));
-
-          if (user.time[userPointsKey] + interval_calculated <= chat) {
-            // add points to user.time[userPointsKey] + interval to user to not overcalculate (this should ensure recursive add points in time)
-            const userTimePoints = user.time[userPointsKey] + interval_calculated;
-            debug('points.update', `${user.username}#${user.id}[${permId}] +${Math.floor(ptsPerInterval)}`);
-            await global.db.engine.increment('users.points', { id: user.id }, { points: ptsPerInterval });
-            await global.db.engine.update('users', { id: user.id }, { id: user.id, username, time: { [userPointsKey]: userTimePoints } });
-          } else {
-            await global.db.engine.update('users', { id: user.id }, { id: user.id, username, time: { [userPointsKey]: user.time[userPointsKey] } });
-            debug('points.update', `${user.username}#${user.id}[${permId}] need another ${Number.parseFloat(String(Math.abs((chat - user.time[userPointsKey] - interval_calculated) / constants.MINUTE))).toFixed(2)} minutes to count`);
+          debug('points.update', `${user.username}#${userId}[${permId}] ${chat} | ${_.get(user, 'time.points', 'n/a')}`);
+          if (user[userPointsKey] + interval_calculated <= chat) {
+            // add points to user[userPointsKey] + interval to user to not overcalculate (this should ensure recursive add points in time)
+            const userTimePoints = user[userPointsKey] + interval_calculated;
+            debug('points.update', `${user.username}#${userId}[${permId}] +${Math.floor(ptsPerInterval)}`);
+            user.points += ptsPerInterval;
+            user[userPointsKey] = userTimePoints;
+            await getRepository(User).save(user);
           }
         } else {
-          debug('points.update', `${user.username}#${user.id}[${permId}] points disled or interval is 0, settint points time to chat`);
-          await global.db.engine.update('users', { id: user.id }, { id: user.id, username, time: { [userPointsKey]: chat } });
+          user[userPointsKey] = chat;
+          await getRepository(User).save(user);
+          debug('points.update', `${user.username}#${userId}[${permId}] points disled or interval is 0, settint points time to chat`);
         }
-      } else {
-        debug('points.update', `${username} doesn't have id`);
       }
       resolve();
     });
@@ -156,38 +159,45 @@ class Points extends System {
       return;
     }
 
-    const [user, userMessages] = await Promise.all([
-      global.users.getById(opts.sender.userId),
-      global.users.getMessagesOf(opts.sender.userId),
-    ]);
-    const lastMessageCount = _.isNil(user.custom.lastMessagePoints) ? 0 : user.custom.lastMessagePoints;
+    const user = await getRepository(User).findOne({ userId: opts.sender.userId });
+    if (!user) {
+      return true;
+    }
 
-    if (lastMessageCount + interval_calculated <= userMessages) {
-      await global.db.engine.increment('users.points', { id: opts.sender.userId }, { points: ptsPerInterval });
-      await global.db.engine.update('users', { id: opts.sender.userId }, { custom: { lastMessagePoints: userMessages } });
+    if (user.pointsByMessageGivenAt + interval_calculated <= user.messages) {
+      user.points += ptsPerInterval;
+      user.pointsByMessageGivenAt = user.messages;
+      await getRepository(User).save(user);
     }
     return true;
   }
 
   sockets () {
     adminEndpoint(this.nsp, 'reset', async () => {
-      global.db.engine.remove('users.points', {});
+      getRepository(User).update({}, { points: 0 });
     });
   }
 
-  async getPointsOf (id) {
-    let points = 0;
-    for (const item of await global.db.engine.find('users.points', { id })) {
-      const itemPoints = !_.isNaN(parseInt(_.get(item, 'points', 0))) ? _.get(item, 'points', 0) : 0;
-      points = points + Number(itemPoints);
-    }
-    if (Number(points) < 0) {
-      points = 0;
-    }
-
-    return points <= Number.MAX_SAFE_INTEGER
-      ? points
+  maxSafeInteger(number) {
+    return number <= Number.MAX_SAFE_INTEGER
+      ? number
       : Number.MAX_SAFE_INTEGER;
+  }
+
+  async getPointsOf (id) {
+    const user = await getRepository(User).findOne({ where: { userId: id }});
+
+    if (user) {
+      if (user.points < 0) {
+        user.points = 0;
+        await getRepository(User).save(user);
+      }
+      return user.points <= Number.MAX_SAFE_INTEGER
+        ? user.points
+        : Number.MAX_SAFE_INTEGER;
+    } else {
+      return 0;
+    }
   }
 
   @command('!points set')
@@ -196,24 +206,14 @@ class Points extends System {
     try {
       const [username, points] = new Expects(opts.parameters).username().points({ all: false }).toArray();
 
-      const user = await global.users.getByName(username);
-      if (!user.id) {
-        user.id = await global.api.getIdFromTwitch(username);
-      }
+      await getRepository(User).update({ username }, { points });
 
-      if (user.id) {
-        await global.db.engine.remove('users.points', { id: user.id });
-        await global.db.engine.insert('users.points', { id: user.id, points });
-
-        const message = await prepare('points.success.set', {
-          amount: points,
-          username,
-          pointsName: await this.getPointsName(points),
-        });
-        sendMessage(message, opts.sender, opts.attr);
-      } else {
-        throw new Error('User doesn\'t have ID');
-      }
+      const message = await prepare('points.success.set', {
+        amount: points,
+        username,
+        pointsName: await this.getPointsName(points),
+      });
+      sendMessage(message, opts.sender, opts.attr);
     } catch (err) {
       error(err);
       sendMessage(global.translate('points.failed.set').replace('$command', opts.command), opts.sender, opts.attr);
@@ -228,12 +228,21 @@ class Points extends System {
         return;
       }
 
-      const availablePoints = await this.getPointsOf(opts.sender.userId);
-      const guser = await global.users.getByName(username);
+      let guser = await getRepository(User).findOne({ username });
+      const sender = await getRepository(User).findOne({ userId: opts.sender.userId });
 
-      if (!guser.id) {
-        guser.id = await global.api.getIdFromTwitch(username);
+      if (!sender) {
+        throw new Error('Sender was not found in DB!');
       }
+
+      if (!guser) {
+        guser = new User();
+        guser.userId = Number(await global.api.getIdFromTwitch(username));
+        guser.username = username;
+        guser.points = 0;
+      }
+
+      const availablePoints = sender.points;
 
       if (points !== 'all' && availablePoints < points) {
         const message = await prepare('points.failed.giveNotEnough'.replace('$command', opts.command), {
@@ -243,8 +252,9 @@ class Points extends System {
         });
         sendMessage(message, opts.sender, opts.attr);
       } else if (points === 'all') {
-        await global.db.engine.update('users.points', { id: opts.sender.userId }, { points: 0 });
-        await global.db.engine.increment('users.points', { id: guser.id }, { points: availablePoints });
+        guser.points = guser.points + availablePoints;
+        sender.points = 0;
+        await getRepository(User).save([guser, sender]);
         const message = await prepare('points.success.give', {
           amount: availablePoints,
           username,
@@ -252,8 +262,9 @@ class Points extends System {
         });
         sendMessage(message, opts.sender, opts.attr);
       } else {
-        await global.db.engine.increment('users.points', { id: opts.sender.userId }, { points: (parseInt(points, 10) * -1) });
-        await global.db.engine.increment('users.points', { id: guser.id }, { points: parseInt(points, 10) });
+        guser.points = guser.points + points;
+        sender.points = sender.points - points;
+        await getRepository(User).save([guser, sender]);
         const message = await prepare('points.success.give', {
           amount: points,
           username,
@@ -317,17 +328,20 @@ class Points extends System {
   async get (opts: CommandOptions) {
     try {
       const [username] = new Expects(opts.parameters).username({ optional: true, default: opts.sender.username }).toArray();
-      const user = await global.users.getByName(username);
+      let user = await getRepository(User).findOne({ username });
 
-      if (!user.id) {
-        user.id = await global.api.getIdFromTwitch(username);
+      if (!user) {
+        user = new User();
+        user.userId = Number(await global.api.getIdFromTwitch(username));
+        user.username = username;
+        user.points = 0;
+        await getRepository(User).save(user);
       }
 
-      const points = await this.getPointsOf(user.id);
       const message = await prepare('points.defaults.pointsResponse', {
-        amount: points,
+        amount: this.maxSafeInteger(user.points),
         username: username,
-        pointsName: await this.getPointsName(points),
+        pointsName: await this.getPointsName(this.maxSafeInteger(user.points)),
       });
       sendMessage(message, opts.sender, opts.attr);
     } catch (err) {
@@ -339,19 +353,9 @@ class Points extends System {
   @default_permission(permission.CASTERS)
   async all (opts: CommandOptions) {
     try {
-      const points = new Expects(opts.parameters).points({ all: false }).toArray();
+      const points = new Expects(opts.parameters).points({ all: false }).toArray()[0];
 
-      for (const username of (await global.users.getAllOnlineUsernames())) {
-        if (isBot(username)) {
-          continue;
-        }
-
-        const user = await global.db.engine.findOne('users', { username });
-
-        if (user.id) {
-          await global.db.engine.increment('users.points', { id: user.id }, { points });
-        }
-      }
+      getRepository(User).increment({ isOnline: true }, 'points', points);
       const message = await prepare('points.success.all', {
         amount: points,
         pointsName: await this.getPointsName(points),
@@ -368,16 +372,12 @@ class Points extends System {
     try {
       const points = new Expects(opts.parameters).points({ all: false }).toArray()[0];
 
-      for (const username of (await global.users.getAllOnlineUsernames())) {
-        if (isBot(username)) {
+      for (const user of (await getRepository(User).find({ isOnline: true }))) {
+        if (isBot(user.username)) {
           continue;
         }
 
-        const user = await global.db.engine.findOne('users', { username });
-
-        if (user.id) {
-          await global.db.engine.increment('users.points', { id: user.id }, { points: Math.floor(Math.random() * points) });
-        }
+        getRepository(User).increment({ userId: user.userId }, 'points', Math.floor(Math.random() * points));
       }
       const message = await prepare('points.success.rain', {
         amount: points,
@@ -394,15 +394,18 @@ class Points extends System {
   async add (opts: CommandOptions) {
     try {
       const [username, points] = new Expects(opts.parameters).username().points({ all: false }).toArray();
-      const user = await global.db.engine.findOne('users', { username });
-      if (user.id) {
-        await global.db.engine.increment('users.points', { id: user.id }, { points: points });
+
+      let user = await getRepository(User).findOne({ username });
+
+      if (!user) {
+        user = new User();
+        user.userId = Number(await global.api.getIdFromTwitch(username));
+        user.username = username;
+        user.points = points;
       } else {
-        user.id = await global.users.getIdByName(username, true);
-        if (!user.id) {
-          throw new Error('User doesn\'t have ID');
-        }
+        user.points += points;
       }
+      await getRepository(User).save(user);
 
       const message = await prepare('points.success.add', {
         amount: points,
@@ -420,29 +423,30 @@ class Points extends System {
   async remove (opts: CommandOptions) {
     try {
       const [username, points] = new Expects(opts.parameters).username().points({ all: true }).toArray();
-      const user = await global.db.engine.findOne('users', { username });
 
-      if (!user.id) {
-        user.id = await global.api.getIdFromTwitch(username);
-      }
-
-      if (user.id) {
-        if (points === 'all') {
-          await global.db.engine.remove('users.points', { id: user.id });
-        } else {
-          const availablePoints = await this.getPointsOf(user.id);
-          await global.db.engine.increment('users.points', { id: user.id }, { points: -Math.min(points, availablePoints) });
-        }
-
-        const message = await prepare('points.success.remove', {
-          amount: points,
-          username: username,
-          pointsName: await this.getPointsName(points === 'all' ? 0 : points),
-        });
-        sendMessage(message, opts.sender, opts.attr);
+      let user = await getRepository(User).findOne({ username });
+      if (!user) {
+        user = new User();
+        user.userId = Number(await global.api.getIdFromTwitch(username));
+        user.username = username;
+        user.points = 0;
       } else {
-        throw new Error('User doesn\'t have ID');
+        user.points = Math.max(user.points - points, 0);
       }
+
+      if (points === 'all') {
+        user.points = 0;
+      } else {
+        user.points = Math.max(user.points - points, 0);
+      }
+      await getRepository(User).save(user);
+
+      const message = await prepare('points.success.remove', {
+        amount: points,
+        username: username,
+        pointsName: await this.getPointsName(points === 'all' ? 0 : points),
+      });
+      sendMessage(message, opts.sender, opts.attr);
     } catch (err) {
       sendMessage(global.translate('points.failed.remove').replace('$command', opts.command), opts.sender, opts.attr);
     }

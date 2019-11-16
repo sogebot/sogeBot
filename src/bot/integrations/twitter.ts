@@ -11,6 +11,9 @@ import Integration from './_interface';
 import { settings, ui } from '../decorators';
 import { onChange, onStartup } from '../decorators/on';
 import { info } from '../helpers/log';
+import { getRepository } from 'typeorm';
+import { Event } from '../database/entity/event';
+import { WidgetSocial } from '../database/entity/widget';
 
 class Twitter extends Integration {
   public watchedStreams: {
@@ -97,7 +100,7 @@ class Twitter extends Integration {
             displayname: tweet.user.name,
             url: `https://twitter.com/${tweet.user.screen_name}/status/${tweet.id_str}`,
           };
-          global.db.engine.insert(global.widgets.social.collection.data, data);
+          getRepository(WidgetSocial).save(data);
           global.events.fire('tweet-post-with-hashtag', { tweet: data });
         });
 
@@ -137,7 +140,7 @@ class Twitter extends Integration {
       // do nothing if client is not defined
       return;
     }
-    const events = await global.db.engine.find('events', { key: 'tweet-post-with-hashtag' });
+    const events = await getRepository(Event).find({ name: 'tweet-post-with-hashtag' });
     const hashtagsToWatch = events.map((o) => {
       return o.definitions.hashtag;
     });
@@ -154,7 +157,7 @@ class Twitter extends Integration {
 
     for (const hash of hashtagsToWatch) {
       // enable rest of hashed
-      this.enableStreamForHash(hash);
+      this.enableStreamForHash(hash as string);
     }
   }
 

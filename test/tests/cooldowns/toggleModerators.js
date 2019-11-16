@@ -7,8 +7,8 @@ const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 
 // users
-const owner = { badges: {}, username: 'soge__' };
-const mod = { badges: {}, username: 'mod' };
+const owner = { userId: Math.floor(Math.random() * 100000), badges: {}, username: 'soge__' };
+const mod = { userId: Math.floor(Math.random() * 100000), badges: {}, username: 'mod' };
 
 describe('Cooldowns - toggleModerators()', () => {
   beforeEach(async () => {

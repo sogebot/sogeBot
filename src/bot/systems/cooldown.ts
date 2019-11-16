@@ -8,7 +8,12 @@ import Expects from '../expects';
 import Parser from '../parser';
 import { permission } from '../permissions';
 import System from './_interface';
-import uuid from 'uuid';
+
+import { getRepository } from 'typeorm';
+import { Cooldown as CooldownEntity, CooldownViewer } from '../database/entity/cooldown';
+import { User } from '../database/entity/user';
+import { adminEndpoint } from '../helpers/socket';
+import { Keyword } from '../database/entity/keyword';
 
 /*
  * !cooldown [keyword|!command] [global|user] [seconds] [true/false] - set cooldown for keyword or !command - 0 for disable, true/false set quiet mode
@@ -31,10 +36,39 @@ class Cooldown extends System {
     this.addMenu({ category: 'manage', name: 'cooldown', id: 'manage/cooldowns/list' });
   }
 
+  sockets () {
+    adminEndpoint(this.nsp, 'cooldown::save', async (dataset: CooldownEntity, cb) => {
+      const item = await getRepository(CooldownEntity).save(dataset);
+      cb(null, item);
+    });
+    adminEndpoint(this.nsp, 'cooldown::deleteById', async (id, cb) => {
+      await getRepository(CooldownEntity).delete({ id });
+      cb();
+    });
+    adminEndpoint(this.nsp, 'cooldown::getAll', async (cb) => {
+      const cooldown = await getRepository(CooldownEntity).find({
+        order: {
+          name: 'ASC',
+        },
+      });
+      cb(cooldown);
+    });
+    adminEndpoint(this.nsp, 'cooldown::getById', async (id, cb) => {
+      const cooldown = await getRepository(CooldownEntity).findOne({
+        where: { id },
+      });
+      if (!cooldown) {
+        cb('Cooldown not found');
+      } else {
+        cb(null, cooldown);
+      }
+    });
+  }
+
   @command('!cooldown')
   @default_permission(permission.CASTERS)
   async main (opts: Record<string, any>) {
-    const match = XRegExp.exec(opts.parameters, constants.COOLDOWN_REGEXP_SET) as unknown as { [x: string]: string } | null;;
+    const match = XRegExp.exec(opts.parameters, constants.COOLDOWN_REGEXP_SET) as unknown as { [x: string]: string } | null;
 
     if (_.isNil(match)) {
       const message = await prepare('cooldowns.cooldown-parse-failed');
@@ -42,19 +76,40 @@ class Cooldown extends System {
       return false;
     }
 
+    let cooldown = await getRepository(CooldownEntity).findOne({
+      where: {
+        name: match.command,
+        type: match.type as 'global' | 'user',
+      },
+    });
     if (parseInt(match.seconds, 10) === 0) {
-      await global.db.engine.remove(this.collection.data, { key: match.command, type: match.type });
+      if (cooldown) {
+        await getRepository(CooldownEntity).remove(cooldown);
+      }
       const message = await prepare('cooldowns.cooldown-was-unset', { type: match.type, command: match.command });
       sendMessage(message, opts.sender, opts.attr);
       return;
     }
 
-    const cooldown = await global.db.engine.findOne(this.collection.data, { key: match.command, type: match.type });
-    if (_.isEmpty(cooldown)) {
-      await global.db.engine.update(this.collection.data, { key: match.command, type: match.type }, { id: uuid(), miliseconds: parseInt(match.seconds, 10) * 1000, type: match.type, timestamp: 0, quiet: _.isNil(match.quiet) ? false : match.quiet, enabled: true, owner: false, moderator: false, subscriber: true, follower: true });
-    } else {
-      await global.db.engine.update(this.collection.data, { key: match.command, type: match.type }, { id: uuid(), miliseconds: parseInt(match.seconds, 10) * 1000 });
+    if (!cooldown) {
+      cooldown = new CooldownEntity();
     }
+
+    cooldown = {
+      ...cooldown,
+      name: match.command,
+      miliseconds: parseInt(match.seconds, 10) * 1000,
+      type: (match.type as 'global' | 'user'),
+      timestamp: 0,
+      lastTimestamp: 0,
+      isErrorMsgQuiet: _.isNil(match.quiet) ? false : !!match.quiet,
+      isEnabled: true,
+      isOwnerAffected: false,
+      isModeratorAffected: false,
+      isSubscriberAffected: true,
+      isFollowerAffected: true,
+    };
+    await getRepository(CooldownEntity).save(cooldown);
 
     const message = await prepare('cooldowns.cooldown-was-set', { seconds: match.seconds, type: match.type, command: match.command });
     sendMessage(message, opts.sender, opts.attr);
@@ -62,32 +117,32 @@ class Cooldown extends System {
 
   @parser({ priority: constants.HIGH })
   async check (opts: Record<string, any>) {
-    let data, viewer, timestamp, now;
+    let data: CooldownEntity[];
+    let viewer: CooldownViewer | undefined;
+    let timestamp, now;
     const [command, subcommand] = new Expects(opts.message)
       .command({ optional: true })
       .string({ optional: true })
       .toArray();
 
     if (!_.isNil(command)) { // command
-      let key = subcommand ? `${command} ${subcommand}` : command;
+      let name = subcommand ? `${command} ${subcommand}` : command;
       const parsed = await (new Parser().find(subcommand ? `${command} ${subcommand}` : command, null));
       if (parsed) {
-        key = parsed.command;
+        name = parsed.command;
       } else {
         // search in custom commands as well
         if (global.systems.customCommands.enabled) {
-          let commands: any = await global.db.engine.find(global.systems.customCommands.collection.data);
-          commands = _(commands).flatMap().sortBy(o => -o.command.length).value();
-          const customparsed = await (new Parser().find(subcommand ? `${command} ${subcommand}` : command, commands));
-          if (customparsed) {
-            key = customparsed.command;
+          const foundCommands = await global.systems.customCommands.find(subcommand ? `${command} ${subcommand}` : command);
+          if (foundCommands.length > 0) {
+            name = foundCommands[0].command.command;
           }
         }
       }
 
-      const cooldown = await global.db.engine.findOne(this.collection.data, { key });
-      if (_.isEmpty(cooldown)) { // command is not on cooldown -> recheck with text only
-        const replace = new RegExp(`${XRegExp.escape(key)}`, 'ig');
+      const cooldown = await getRepository(CooldownEntity).findOne({ where: { name }, relations: ['viewers'] });
+      if (!cooldown) { // command is not on cooldown -> recheck with text only
+        const replace = new RegExp(`${XRegExp.escape(name)}`, 'ig');
         opts.message = opts.message.replace(replace, '');
         if (opts.message.length > 0) {
           return this.check(opts);
@@ -95,21 +150,12 @@ class Cooldown extends System {
           return true;
         }
       }
-      data = [{
-        key: cooldown.key,
-        miliseconds: cooldown.miliseconds,
-        type: cooldown.type,
-        lastTimestamp: cooldown.lastTimestamp,
-        timestamp: cooldown.timestamp,
-        quiet: typeof cooldown.quiet === 'undefined' ? true : cooldown.quiet,
-        enabled: typeof cooldown.enabled === 'undefined' ? true : cooldown.enabled,
-        moderator: typeof cooldown.moderator === 'undefined' ? true : cooldown.moderator,
-        subscriber: typeof cooldown.subscriber === 'undefined' ? true : cooldown.subscriber,
-        follower: typeof cooldown.follower === 'undefined' ? true : cooldown.follower,
-        owner: typeof cooldown.owner === 'undefined' ? true : cooldown.owner,
-      }];
+      data = [cooldown];
     } else { // text
-      let [keywords, cooldowns] = await Promise.all([global.db.engine.find(global.systems.keywords.collection.data), global.db.engine.find(this.collection.data)]);
+      let [keywords, cooldowns] = await Promise.all([
+        getRepository(Keyword).find(),
+        getRepository(CooldownEntity).find({ relations: ['viewers'] }),
+      ]);
 
       keywords = _.filter(keywords, function (o) {
         return opts.message.toLowerCase().search(new RegExp('^(?!\\!)(?:^|\\s).*(' + _.escapeRegExp(o.keyword.toLowerCase()) + ')(?=\\s|$|\\?|\\!|\\.|\\,)', 'gi')) >= 0;
@@ -117,66 +163,66 @@ class Cooldown extends System {
 
       data = [];
       _.each(keywords, (keyword) => {
-        const cooldown = _.find(cooldowns, (o) => o.key.toLowerCase() === keyword.keyword.toLowerCase());
-        if (keyword.enabled && !_.isEmpty(cooldown)) {
-          data.push({
-            id: cooldown.id,
-            key: cooldown.key,
-            miliseconds: cooldown.miliseconds,
-            type: cooldown.type,
-            lastTimestamp: cooldown.lastTimestamp,
-            timestamp: cooldown.timestamp,
-            quiet: typeof cooldown.quiet === 'undefined' ? true : cooldown.quiet,
-            enabled: typeof cooldown.enabled === 'undefined' ? true : cooldown.enabled,
-            moderator: typeof cooldown.moderator === 'undefined' ? true : cooldown.moderator,
-            subscriber: typeof cooldown.subscriber === 'undefined' ? true : cooldown.subscriber,
-            follower: typeof cooldown.follower === 'undefined' ? true : cooldown.follower,
-            owner: typeof cooldown.owner === 'undefined' ? true : cooldown.owner,
-          });
+        const cooldown = _.find(cooldowns, (o) => o.name.toLowerCase() === keyword.keyword.toLowerCase());
+        if (keyword.enabled && cooldown) {
+          data.push(cooldown);
         }
       });
     }
-    if (!_.some(data, { enabled: true })) { // parse ok if all cooldowns are disabled
+    if (!_.some(data, { isEnabled: true })) { // parse ok if all cooldowns are disabled
       return true;
     }
 
-    const user = await global.users.getById(opts.sender.userId);
+    let user = await getRepository(User).findOne({ userId: opts.sender.userId });
+    if (!user) {
+      user = new User();
+      user.userId = Number(opts.sender.userId);
+      user.username = opts.sender.username;
+    }
+    user.isSubscriber = typeof opts.sender.badges.subscriber !== 'undefined';
+    user.isModerator = typeof opts.sender.badges.moderator !== 'undefined';
+    await getRepository(User).save(user);
     let result = false;
-    const isMod = typeof opts.sender.badges.moderator !== 'undefined';
-    const isSubscriber = typeof opts.sender.badges.subscriber !== 'undefined';
-    const isFollower = user.is && user.is.follower ? user.is.follower : false;
-
     for (const cooldown of data) {
-      if ((isOwner(opts.sender) && !cooldown.owner) || (isMod && !cooldown.moderator) || (isSubscriber && !cooldown.subscriber) || (isFollower && !cooldown.follower)) {
+      if ((isOwner(opts.sender) && !cooldown.isOwnerAffected) || (user.isModerator && !cooldown.isModeratorAffected) || (user.isSubscriber && !cooldown.isSubscriberAffected) || (user.isFollower && !cooldown.isFollowerAffected)) {
         result = true;
         continue;
       }
 
-      viewer = await global.db.engine.findOne(this.collection.viewers, { username: opts.sender.username, key: cooldown.key });
+      viewer = cooldown.viewers.find(o => o.username === opts.sender.username);
       if (cooldown.type === 'global') {
-        timestamp = cooldown.timestamp || 0;
+        timestamp = cooldown.timestamp ?? 0;
       } else {
-        timestamp = _.isNil(viewer.timestamp) ? 0 : viewer.timestamp;
+        timestamp = viewer?.timestamp ?? 0;
       }
-      now = new Date().getTime();
+      now = Date.now();
 
       if (now - timestamp >= cooldown.miliseconds) {
         if (cooldown.type === 'global') {
-          await global.db.engine.update(this.collection.data, { key: cooldown.key, type: 'global' }, { lastTimestamp: timestamp, timestamp: now, key: cooldown.key, type: 'global' });
+          cooldown.lastTimestamp = timestamp;
+          cooldown.timestamp = now;
         } else {
-          await global.db.engine.update(this.collection.viewers, { username: opts.sender.username, key: cooldown.key }, { lastTimestamp: timestamp, timestamp: now });
+          let viewer = cooldown.viewers.find(o => o.username === opts.sender.username);
+          if (!viewer) {
+            viewer = new CooldownViewer();
+            cooldown.viewers.push(viewer);
+          }
+          viewer.username = opts.sender.username;
+          viewer.lastTimestamp = timestamp;
+          viewer.timestamp = now;
         }
+        await getRepository(CooldownEntity).save(cooldown);
         result = true;
         continue;
       } else {
-        if (!cooldown.quiet && this.cooldownNotifyAsWhisper) {
+        if (!cooldown.isErrorMsgQuiet && this.cooldownNotifyAsWhisper) {
           opts.sender['message-type'] = 'whisper'; // we want to whisp cooldown message
-          const message = await prepare('cooldowns.cooldown-triggered', { command: cooldown.key, seconds: Math.ceil((cooldown.miliseconds - now + timestamp) / 1000) });
+          const message = await prepare('cooldowns.cooldown-triggered', { command: cooldown.name, seconds: Math.ceil((cooldown.miliseconds - now + timestamp) / 1000) });
           await sendMessage(message, opts.sender, opts.attr);
         }
-        if (!cooldown.quiet && this.cooldownNotifyAsChat) {
+        if (!cooldown.isErrorMsgQuiet && this.cooldownNotifyAsChat) {
           opts.sender['message-type'] = 'chat';
-          const message = await prepare('cooldowns.cooldown-triggered', { command: cooldown.key, seconds: Math.ceil((cooldown.miliseconds - now + timestamp) / 1000) });
+          const message = await prepare('cooldowns.cooldown-triggered', { command: cooldown.name, seconds: Math.ceil((cooldown.miliseconds - now + timestamp) / 1000) });
           await sendMessage(message, opts.sender, opts.attr);
         }
         result = false;
@@ -189,32 +235,31 @@ class Cooldown extends System {
   @rollback()
   async cooldownRollback (opts: Record<string, any>) {
     // TODO: redundant duplicated code (search of cooldown), should be unified for check and cooldownRollback
-    let data, viewer;
+    let data: CooldownEntity[];
+
     const [command, subcommand] = new Expects(opts.message)
       .command({ optional: true })
       .string({ optional: true })
       .toArray();
 
     if (!_.isNil(command)) { // command
-      let key = subcommand ? `${command} ${subcommand}` : command;
+      let name = subcommand ? `${command} ${subcommand}` : command;
       const parsed = await (new Parser().find(subcommand ? `${command} ${subcommand}` : command));
       if (parsed) {
-        key = parsed.command;
+        name = parsed.command;
       } else {
         // search in custom commands as well
         if (global.systems.customCommands.enabled) {
-          let commands = await global.db.engine.find(global.systems.customCommands.collection.data);
-          commands = _(commands).flatMap().sortBy(o => -o.command.length).value();
-          const customparsed = await ((new Parser()).find(subcommand ? `${command} ${subcommand}` : command, commands));
-          if (customparsed) {
-            key = customparsed.command;
+          const foundCommands = await global.systems.customCommands.find(subcommand ? `${command} ${subcommand}` : command);
+          if (foundCommands.length > 0) {
+            name = foundCommands[0].command.command;
           }
         }
       }
 
-      const cooldown = await global.db.engine.findOne(this.collection.data, { key });
-      if (_.isEmpty(cooldown)) { // command is not on cooldown -> recheck with text only
-        const replace = new RegExp(`${XRegExp.escape(key)}`, 'ig');
+      const cooldown = await getRepository(CooldownEntity).findOne({ where: { name }});
+      if (!cooldown) { // command is not on cooldown -> recheck with text only
+        const replace = new RegExp(`${XRegExp.escape(name)}`, 'ig');
         opts.message = opts.message.replace(replace, '');
         if (opts.message.length > 0) {
           return this.cooldownRollback(opts);
@@ -222,21 +267,12 @@ class Cooldown extends System {
           return true;
         }
       }
-      data = [{
-        key: cooldown.key,
-        miliseconds: cooldown.miliseconds,
-        type: cooldown.type,
-        lastTimestamp: cooldown.lastTimestamp,
-        timestamp: cooldown.timestamp,
-        quiet: typeof cooldown.quiet === 'undefined' ? true : cooldown.quiet,
-        enabled: typeof cooldown.enabled === 'undefined' ? true : cooldown.enabled,
-        moderator: typeof cooldown.moderator === 'undefined' ? true : cooldown.moderator,
-        subscriber: typeof cooldown.subscriber === 'undefined' ? true : cooldown.subscriber,
-        follower: typeof cooldown.follower === 'undefined' ? true : cooldown.follower,
-        owner: typeof cooldown.owner === 'undefined' ? true : cooldown.owner,
-      }];
+      data = [cooldown];
     } else { // text
-      let [keywords, cooldowns] = await Promise.all([global.db.engine.find(global.systems.keywords.collection.data), global.db.engine.find(this.collection.data)]);
+      let [keywords, cooldowns] = await Promise.all([
+        getRepository(Keyword).find(),
+        getRepository(CooldownEntity).find({ relations: ['viewers'] }),
+      ]);
 
       keywords = _.filter(keywords, function (o) {
         return opts.message.toLowerCase().search(new RegExp('^(?!\\!)(?:^|\\s).*(' + _.escapeRegExp(o.keyword.toLowerCase()) + ')(?=\\s|$|\\?|\\!|\\.|\\,)', 'gi')) >= 0;
@@ -244,46 +280,46 @@ class Cooldown extends System {
 
       data = [];
       _.each(keywords, (keyword) => {
-        const cooldown = _.find(cooldowns, (o) => o.key.toLowerCase() === keyword.keyword.toLowerCase());
-        if (keyword.enabled && !_.isEmpty(cooldown)) {
-          data.push({
-            key: cooldown.key,
-            miliseconds: cooldown.miliseconds,
-            type: cooldown.type,
-            lastTimestamp: cooldown.lastTimestamp,
-            timestamp: cooldown.timestamp,
-            quiet: typeof cooldown.quiet === 'undefined' ? true : cooldown.quiet,
-            enabled: typeof cooldown.enabled === 'undefined' ? true : cooldown.enabled,
-            moderator: typeof cooldown.moderator === 'undefined' ? true : cooldown.moderator,
-            subscriber: typeof cooldown.subscriber === 'undefined' ? true : cooldown.subscriber,
-            follower: typeof cooldown.follower === 'undefined' ? true : cooldown.follower,
-            owner: typeof cooldown.owner === 'undefined' ? true : cooldown.owner,
-          });
+        const cooldown = _.find(cooldowns, (o) => o.name.toLowerCase() === keyword.keyword.toLowerCase());
+        if (keyword.enabled && cooldown) {
+          data.push(cooldown);
         }
       });
     }
-    if (!_.some(data, { enabled: true })) { // parse ok if all cooldowns are disabled
+    if (!_.some(data, { isEnabled: true })) { // parse ok if all cooldowns are disabled
       return true;
     }
 
-    const user = await global.users.getById(opts.sender.userId);
-    const isMod = typeof opts.sender.badges.moderator !== 'undefined';
-    const isSubscriber = typeof opts.sender.badges.subscriber !== 'undefined';
-    const isFollower = user.is && user.is.follower ? user.is.follower : false;
+    let user = await getRepository(User).findOne({ userId: opts.sender.userId });
+    if (!user) {
+      user = new User();
+      user.userId = Number(opts.sender.userId);
+      user.username = opts.sender.username;
+    }
+    user.isSubscriber = typeof opts.sender.badges.subscriber !== 'undefined';
+    user.isModerator = typeof opts.sender.badges.moderator !== 'undefined';
+    await getRepository(User).save(user);
 
     for (const cooldown of data) {
-      if ((isOwner(opts.sender) && !cooldown.owner) || (isMod && !cooldown.moderator) || (isSubscriber && !cooldown.subscriber) || (isFollower && !cooldown.follower)) {
+      if ((isOwner(opts.sender) && !cooldown.isOwnerAffected) || (user.isModerator && !cooldown.isModeratorAffected) || (user.isSubscriber && !cooldown.isSubscriberAffected) || (user.isFollower && !cooldown.isFollowerAffected)) {
         continue;
       }
 
-      viewer = await global.db.engine.findOne(this.collection.viewers, { username: opts.sender.username, key: cooldown.key });
-
-      // rollback to lastTimestamp
       if (cooldown.type === 'global') {
-        await global.db.engine.update(this.collection.data, { key: cooldown.key, type: 'global' }, { lastTimestamp: cooldown.lastTimestamp, timestamp: cooldown.lastTimestamp, key: cooldown.key, type: 'global' });
+        cooldown.lastTimestamp = cooldown.lastTimestamp ?? 0;
+        cooldown.timestamp = cooldown.lastTimestamp ?? 0;
       } else {
-        await global.db.engine.update(this.collection.viewers, { username: opts.sender.username, key: cooldown.key }, { lastTimestamp: viewer.lastTimestamp, timestamp: viewer.lastTimestamp });
+        let viewer = cooldown.viewers.find(o => o.username === opts.sender.username);
+        if (!viewer) {
+          viewer = new CooldownViewer();
+          cooldown.viewers.push(viewer);
+        }
+        viewer.username = opts.sender.username;
+        viewer.lastTimestamp = viewer.lastTimestamp ?? 0;
+        viewer.timestamp = viewer.lastTimestamp ?? 0;
       }
+      // rollback to lastTimestamp
+      await getRepository(CooldownEntity).save(cooldown);
     }
   }
 
@@ -296,8 +332,14 @@ class Cooldown extends System {
       return false;
     }
 
-    const cooldown = await global.db.engine.findOne(this.collection.data, { key: match.command, type: match.type });
-    if (_.isEmpty(cooldown)) {
+    const cooldown = await getRepository(CooldownEntity).findOne({
+      relations: ['viewers'],
+      where: {
+        name: match.command,
+        type: match.type as 'global' | 'user',
+      },
+    });
+    if (!cooldown) {
       const message = await prepare('cooldowns.cooldown-not-found', { command: match.command });
       sendMessage(message, opts.sender, opts.attr);
       return false;
@@ -309,64 +351,63 @@ class Cooldown extends System {
       cooldown[type] = !cooldown[type];
     }
 
-    delete cooldown._id;
-    await global.db.engine.update(this.collection.data, { key: match.command, type: match.type }, cooldown);
+    await getRepository(CooldownEntity).save(cooldown);
 
     let path = '';
     const status = cooldown[type] ? 'enabled' : 'disabled';
 
-    if (type === 'moderator') {
+    if (type === 'isModeratorAffected') {
       path = '-for-moderators';
     }
-    if (type === 'owner') {
+    if (type === 'isOwnerAffected') {
       path = '-for-owners';
     }
-    if (type === 'subscriber') {
+    if (type === 'isSubscriberAffected') {
       path = '-for-subscribers';
     }
-    if (type === 'follower') {
+    if (type === 'isFollowerAffected') {
       path = '-for-followers';
     }
-    if (type === 'quiet' || type === 'type') {
+    if (type === 'isErrorMsgQuiet' || type === 'type') {
       return;
     } // those two are setable only from dashboard
 
-    const message = await prepare(`cooldowns.cooldown-was-${status}${path}`, { command: cooldown.key });
+    const message = await prepare(`cooldowns.cooldown-was-${status}${path}`, { command: cooldown.name });
     sendMessage(message, opts.sender, opts.attr);
   }
 
   @command('!cooldown toggle enabled')
   @default_permission(permission.CASTERS)
   async toggleEnabled (opts: Record<string, any>) {
-    await this.toggle(opts, 'enabled');
+    await this.toggle(opts, 'isEnabled');
   }
 
   @command('!cooldown toggle moderators')
   @default_permission(permission.CASTERS)
   async toggleModerators (opts: Record<string, any>) {
-    await this.toggle(opts, 'moderator');
+    await this.toggle(opts, 'isModeratorAffected');
   }
 
   @command('!cooldown toggle owners')
   @default_permission(permission.CASTERS)
   async toggleOwners (opts: Record<string, any>) {
-    await this.toggle(opts, 'owner');
+    await this.toggle(opts, 'isOwnerAffected');
   }
 
   @command('!cooldown toggle subscribers')
   @default_permission(permission.CASTERS)
   async toggleSubscribers (opts: Record<string, any>) {
-    await this.toggle(opts, 'subscriber');
+    await this.toggle(opts, 'isSubscriberAffected');
   }
 
   @command('!cooldown toggle followers')
   @default_permission(permission.CASTERS)
   async toggleFollowers (opts: Record<string, any>) {
-    await this.toggle(opts, 'follower');
+    await this.toggle(opts, 'isFollowerAffected');
   }
 
   async toggleNotify (opts: Record<string, any>) {
-    await this.toggle(opts, 'quiet');
+    await this.toggle(opts, 'isErrorMsgQuiet');
   }
   async toggleType (opts: Record<string, any>) {
     await this.toggle(opts, 'type');

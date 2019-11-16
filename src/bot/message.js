@@ -11,6 +11,15 @@ const Entities = require('html-entities').AllHtmlEntities;
 
 import { warning } from './helpers/log';
 import { getCountOfCommandUsage } from './helpers/commands/count';
+import { getManager, getRepository } from 'typeorm';
+
+import { Alias } from './database/entity/alias';
+import { Commands } from './database/entity/commands';
+import { Cooldown } from './database/entity/cooldown';
+import { EventList } from './database/entity/eventList';
+import { User } from './database/entity/user';
+import Price from './systems/price';
+import { Rank } from './database/entity/rank';
 
 class Message {
   constructor (message) {
@@ -36,27 +45,43 @@ class Message {
     const version = _.get(process, 'env.npm_package_version', 'x.y.z');
     this.message = this.message.replace(/\$version/g, version.replace('SNAPSHOT', gitCommitInfo().shortHash || 'SNAPSHOT'));
 
-    let events = _.orderBy(await global.db.engine.find('widgetsEventList'), 'timestamp', 'desc');
-    // latestFollower
-    let latestFollower = _.find(events, (o) => o.event === 'follow');
+    const latestFollower = await getManager().createQueryBuilder()
+      .select('events').from(EventList, 'events')
+      .orderBy('events.timestamp', 'DESC')
+      .where('events.event >= :event', { event: 'follow' })
+      .getOne();
     this.message = this.message.replace(/\$latestFollower/g, !_.isNil(latestFollower) ? latestFollower.username : 'n/a');
 
     // latestSubscriber
-    let latestSubscriber = _.find(events, (o) => ['sub', 'resub', 'subgift'].includes(o.event));
+    const latestSubscriber = await getManager().createQueryBuilder()
+      .select('events').from(EventList, 'events')
+      .orderBy('events.timestamp', 'DESC')
+      .where('events.event >= :event', { event: 'sub' })
+      .orWhere('events.event >= :event', { event: 'resub' })
+      .orWhere('events.event >= :event', { event: 'subgift' })
+      .getOne();
     this.message = this.message.replace(/\$latestSubscriber/g, !_.isNil(latestSubscriber) ? latestSubscriber.username : 'n/a');
 
     // latestTip, latestTipAmount, latestTipCurrency, latestTipMessage
-    let latestTip = _.find(events, (o) => o.event === 'tip');
-    this.message = this.message.replace(/\$latestTipAmount/g, !_.isNil(latestTip) ? parseFloat(latestTip.amount).toFixed(2) : 'n/a');
-    this.message = this.message.replace(/\$latestTipCurrency/g, !_.isNil(latestTip) ? latestTip.currency : 'n/a');
-    this.message = this.message.replace(/\$latestTipMessage/g, !_.isNil(latestTip) ? latestTip.message : 'n/a');
-    this.message = this.message.replace(/\$latestTip/g, !_.isNil(latestTip) ? latestTip.username : 'n/a');
+    const latestTip = await getManager().createQueryBuilder()
+      .select('events').from(EventList, 'events')
+      .orderBy('events.timestamp', 'DESC')
+      .where('events.event >= :event', { event: 'tip' })
+      .getOne();
+    this.message = this.message.replace(/\$latestTipAmount/g, !_.isNil(latestTip) ? parseFloat(JSON.parse(latestTip.values_json).amount).toFixed(2) : 'n/a');
+    this.message = this.message.replace(/\$latestTipCurrency/g, !_.isNil(latestTip) ? JSON.parse(latestTip.values_json).currency : 'n/a');
+    this.message = this.message.replace(/\$latestTipMessage/g, !_.isNil(latestTip) ? JSON.parse(latestTip.values_json).message : 'n/a');
+    this.message = this.message.replace(/\$latestTip/g, !_.isNil(latestTip) ? JSON.parse(latestTip.values_json).username : 'n/a');
 
     // latestCheer, latestCheerAmount, latestCheerCurrency, latestCheerMessage
-    let latestCheer = _.find(events, (o) => o.event === 'cheer');
-    this.message = this.message.replace(/\$latestCheerAmount/g, !_.isNil(latestCheer) ? parseInt(latestCheer.amount, 10) : 'n/a');
-    this.message = this.message.replace(/\$latestCheerMessage/g, !_.isNil(latestCheer) ? latestCheer.message : 'n/a');
-    this.message = this.message.replace(/\$latestCheer/g, !_.isNil(latestCheer) ? latestCheer.username : 'n/a');
+    const latestCheer = await getManager().createQueryBuilder()
+      .select('events').from(EventList, 'events')
+      .orderBy('events.timestamp', 'DESC')
+      .where('events.event >= :event', { event: 'cheer' })
+      .getOne();
+    this.message = this.message.replace(/\$latestCheerAmount/g, !_.isNil(latestCheer) ? parseInt(JSON.parse(latestCheer.values_json).amount, 10) : 'n/a');
+    this.message = this.message.replace(/\$latestCheerMessage/g, !_.isNil(latestCheer) ? JSON.parse(latestCheer.values_json).message : 'n/a');
+    this.message = this.message.replace(/\$latestCheer/g, !_.isNil(latestCheer) ? JSON.parse(latestCheer.values_json).username : 'n/a');
 
     const spotifySong = JSON.parse(global.integrations.spotify.currentSong);
     if (!_.isNil(global.integrations) && !_.isEmpty(spotifySong) && spotifySong.is_playing && spotifySong.is_enabled) {
@@ -86,80 +111,80 @@ class Message {
   async parse (attr) {
     this.message = await this.message; // if is promise
 
-    let random = {
+    const random = {
       '(random.online.viewer)': async function () {
-        const usernames = await global.users.getAllOnlineUsernames();
-        const onlineViewers = usernames.filter((username) => {
-          const isSender = username === attr.sender.username;
-          const isBot = commons.isBot(username);
-          const isIgnored = commons.isIgnored({ username });
-          return !isSender && !isBot && !isIgnored;
-        });
-        if (onlineViewers.length === 0) {return 'unknown'};
-        return _.sample(onlineViewers);
+        const viewers = (await getRepository(User).createQueryBuilder('user')
+          .where('user.username != :botusername', { botusername: global.oauth.botUsername.toLowerCase() })
+          .andWhere('user.username != :broadcasterusername', { broadcasterusername: global.oauth.broadcasterUsername.toLowerCase() })
+          .andWhere('user.isOnline = :isOnline', { isOnline: true })
+          .cache(true)
+          .getMany())
+          .filter(o => {
+            return !commons.isIgnored({ username: o.username, userId: o.userId });
+          });
+        if (viewers.length === 0) {return 'unknown'};
+        return _.sample(viewers.map(o => o.username ));
       },
       '(random.online.follower)': async function () {
-        const usernames = await global.users.getAllOnlineUsernames();
-        const onlineViewers = usernames.filter((username) => {
-          const isSender = username === attr.sender.username;
-          const isBot = commons.isBot(username);
-          const isIgnored = commons.isIgnored({ username });
-          return !isSender && !isBot && !isIgnored;
+        const followers = (await getRepository(User).createQueryBuilder('user')
+          .where('user.username != :botusername', { botusername: global.oauth.botUsername.toLowerCase() })
+          .andWhere('user.username != :broadcasterusername', { broadcasterusername: global.oauth.broadcasterUsername.toLowerCase() })
+          .andWhere('user.isFollower = :isFollower', { isFollower: true })
+          .andWhere('user.isOnline = :isOnline', { isOnline: true })
+          .cache(true)
+          .getMany()).filter(o => {
+          return !commons.isIgnored({ username: o.username, userId: o.userId });
         });
-        const followers = _.filter(
-          (await global.db.engine.find('users', { is: { follower: true } })).map((o) => o.username),
-          (o) => o !== attr.sender && o !== global.oauth.botUsername.toLowerCase());
-        let onlineFollowers = _.intersection(onlineViewers, followers);
-        if (onlineFollowers.length === 0) {return 'unknown'};
-        return _.sample(onlineFollowers);
+        if (followers.length === 0) {return 'unknown'};
+        return _.sample(followers.map(o => o.username ));
       },
       '(random.online.subscriber)': async function () {
-        const usernames = await global.users.getAllOnlineUsernames();
-        const onlineViewers = usernames.filter((username) => {
-          const isSender = username === attr.sender.username;
-          const isBot = commons.isBot(username);
-          const isIgnored = commons.isIgnored({ username });
-          return !isSender && !isBot && !isIgnored;
+        const subscribers = (await getRepository(User).createQueryBuilder('user')
+          .where('user.username != :botusername', { botusername: global.oauth.botUsername.toLowerCase() })
+          .andWhere('user.username != :broadcasterusername', { broadcasterusername: global.oauth.broadcasterUsername.toLowerCase() })
+          .andWhere('user.isSubscriber = :isSubscriber', { isSubscriber: true })
+          .andWhere('user.isOnline = :isOnline', { isOnline: true })
+          .cache(true)
+          .getMany()).filter(o => {
+          return !commons.isIgnored({ username: o.username, userId: o.userId });
         });
-        const subscribers = _.filter(
-          (await global.db.engine.find('users', { is: { subscriber: true } })).map((o) => o.username),
-          (o) => o !== attr.sender && o !== global.oauth.botUsername.toLowerCase());
-        let onlineSubscribers = _.intersection(onlineViewers, subscribers);
-        if (onlineSubscribers.length === 0) {return 'unknown'};
-        return _.sample(onlineSubscribers);
+        if (subscribers.length === 0) {return 'unknown'};
+        return _.sample(subscribers.map(o => o.username ));
       },
       '(random.viewer)': async function () {
-        let viewer = (await global.users.getAll()).map((o) => o.username);
-        viewer = viewer.filter((username) => {
-          const isSender = username === attr.sender.username;
-          const isBot = commons.isBot(username);
-          const isIgnored = commons.isIgnored({ username });
-          return !isSender && !isBot && !isIgnored;
+        const viewers = (await getRepository(User).createQueryBuilder('user')
+          .where('user.username != :botusername', { botusername: global.oauth.botUsername.toLowerCase() })
+          .andWhere('user.username != :broadcasterusername', { broadcasterusername: global.oauth.broadcasterUsername.toLowerCase() })
+          .cache(true)
+          .getMany()).filter(o => {
+          return !commons.isIgnored({ username: o.username, userId: o.userId });
         });
-        if (viewer.length === 0) {return 'unknown'};
-        return _.sample(viewer);
+        if (viewers.length === 0) {return 'unknown'};
+        return _.sample(viewers.map(o => o.username ));
       },
       '(random.follower)': async function () {
-        let follower = (await global.db.engine.find('users', { is: { follower: true } })).map((o) => o.username);
-        follower = follower.filter((username) => {
-          const isSender = username === attr.sender.username;
-          const isBot = commons.isBot(username);
-          const isIgnored = commons.isIgnored({ username });
-          return !isSender && !isBot && !isIgnored;
+        const followers = (await getRepository(User).createQueryBuilder('user')
+          .where('user.username != :botusername', { botusername: global.oauth.botUsername.toLowerCase() })
+          .andWhere('user.username != :broadcasterusername', { broadcasterusername: global.oauth.broadcasterUsername.toLowerCase() })
+          .andWhere('user.isFollower = :isFollower', { isFollower: true })
+          .cache(true)
+          .getMany()).filter(o => {
+          return !commons.isIgnored({ username: o.username, userId: o.userId });
         });
-        if (follower.length === 0) {return 'unknown'};
-        return _.sample(follower);
+        if (followers.length === 0) {return 'unknown'};
+        return _.sample(followers.map(o => o.username ));
       },
       '(random.subscriber)': async function () {
-        let subscriber = (await global.db.engine.find('users', { is: { subscriber: true } })).map((o) => o.username);
-        subscriber = subscriber.filter((username) => {
-          const isSender = username === attr.sender.username;
-          const isBot = commons.isBot(username);
-          const isIgnored = commons.isIgnored({ username });
-          return !isSender && !isBot && !isIgnored;
+        const subscribers = (await getRepository(User).createQueryBuilder('user')
+          .where('user.username != :botusername', { botusername: global.oauth.botUsername.toLowerCase() })
+          .andWhere('user.username != :broadcasterusername', { broadcasterusername: global.oauth.broadcasterUsername.toLowerCase() })
+          .andWhere('user.isSubscriber = :isSubscriber', { isSubscriber: true })
+          .cache(true)
+          .getMany()).filter(o => {
+          return !commons.isIgnored({ username: o.username, userId: o.userId });
         });
-        if (subscriber.length === 0) {return 'unknown'};
-        return _.sample(subscriber);
+        if (subscribers.length === 0) {return 'unknown'};
+        return _.sample(subscribers.map(o => o.username ));
       },
       '(random.number-#-to-#)': async function (filter) {
         let numbers = filter.replace('(random.number-', '')
@@ -193,13 +218,13 @@ class Message {
           if (state.updated.responseType === 0) {
             // default
             if (state.isOk && !state.isEval) {
-              let msg = await commons.prepare('filters.setVariable', { value: state.updated.setValue, variable: variable });
+              let msg = await commons.prepare('filters.setVariable', { value: state.setValue, variable: variable });
               commons.sendMessage(msg, attr.sender, { skip: true, quiet: _.get(attr, 'quiet', false) });
             }
             return state.updated.currentValue;
           } else if (state.updated.responseType === 1) {
             // custom
-            commons.sendMessage(state.updated.responseText.replace('$value', state.updated.setValue), attr.sender, { skip: true, quiet: _.get(attr, 'quiet', false) });
+            commons.sendMessage(state.updated.responseText.replace('$value', state.setValue), attr.sender, { skip: true, quiet: _.get(attr, 'quiet', false) });
             return '';
           } else {
             // command
@@ -268,11 +293,17 @@ class Message {
           return '';
         }
 
-        let tips = (await global.db.engine.find('widgetsEventList', { event: 'tip' })).sort((a, b) => {
-          const aTip = global.currency.exchange(a.amount, a.currency, global.currency.mainCurrency);
-          const bTip = global.currency.exchange(b.amount, b.currency, global.currency.mainCurrency);
-          return bTip - aTip;
-        }, 0);
+        let tips = (await getManager().createQueryBuilder()
+          .select('events').from(EventList, 'events')
+          .orderBy('events.timestamp', 'DESC')
+          .where('events.event >= :event', { event: 'tip' })
+          .getMany())
+
+          .sort((a, b) => {
+            const aTip = global.currency.exchange(a.amount, a.currency, global.currency.mainCurrency);
+            const bTip = global.currency.exchange(b.amount, b.currency, global.currency.mainCurrency);
+            return bTip - aTip;
+          }, 0);
 
         if (match.groups.type === 'stream') {
           const whenOnline = global.api.isStreamOnline ? global.api.streamStatusChangeSince : null;
@@ -350,8 +381,8 @@ class Message {
       '(price)': async function (filter) {
         let price = 0;
         if (global.systems.price.enabled) {
-          let command = await global.db.engine.findOne(global.systems.price.collection.data, { command: attr.cmd });
-          price = _.isEmpty(command) ? 0 : command.price;
+          let command = await getRepository(Price).findOne({ command: attr.cmd });
+          price = command?.price ?? 0;
         }
         return [price, await global.systems.points.getPointsName(price)].join(' ');
       }
@@ -369,11 +400,11 @@ class Message {
         let [system, permission] = filter.replace('(list.', '').replace(')', '').split('.');
 
         let [alias, commands, cooldowns, ranks, prices] = await Promise.all([
-          global.db.engine.find(global.systems.alias.collection.data, { visible: true, enabled: true }),
-          global.db.engine.find(global.systems.customCommands.collection.data, { visible: true, enabled: true }),
-          global.db.engine.find(global.systems.cooldown.collection.data, { enabled: true }),
-          global.db.engine.find(global.systems.ranks.collection.data),
-          global.db.engine.find(global.systems.price.collection.data, { enabled: true })
+          getRepository(Alias).find({ where: { visible: true, enabled: true } }),
+          getRepository(Commands).find({ relations: ['responses'], where: { visible: true, enabled: true } }),
+          getRepository(Cooldown).find({ where: { enabled: true } }),
+          getRepository(Rank).find(),
+          getRepository(Price).find({ where: { enabled: true } })
         ]);
 
         switch (system) {
@@ -383,11 +414,11 @@ class Message {
             return _.size(alias) === 0 ? ' ' : (_.map(alias, 'alias')).sort().join(', ');
           case 'command':
             if (permission) {
-              const responses = await global.db.engine.find(global.systems.customCommands.collection.responses);
+              const responses = commands.map(o => o.responses).flat();
               const _permission = await global.permissions.get(permission);
               if (_permission) {
                 const commandIds = responses.filter((o) => o.permission === _permission.id).map((o) => o.cid);
-                commands = commands.filter((o) => commandIds.includes(String(o._id)));
+                commands = commands.filter((o) => commandIds.includes(o.id));
               } else {
                 commands = [];
               }
@@ -395,11 +426,11 @@ class Message {
             return _.size(commands) === 0 ? ' ' : (_.map(commands, (o) => o.command.replace('!', ''))).sort().join(', ');
           case '!command':
             if (permission) {
-              const responses = await global.db.engine.find(global.systems.customCommands.collection.responses);
+              const responses = commands.map(o => o.responses).flat();
               const _permission = await global.permissions.get(permission);
               if (_permission) {
                 const commandIds = responses.filter((o) => o.permission === _permission.id).map((o) => o.cid);
-                commands = commands.filter((o) => commandIds.includes(String(o._id)));
+                commands = commands.filter((o) => commandIds.includes(o.id));
               } else {
                 commands = [];
               }
@@ -445,7 +476,7 @@ class Message {
             );
           }
         }
-        return mathjs.eval(toEvaluate);
+        return mathjs.evaluate(toEvaluate);
       }
     };
     let evaluate = {
@@ -485,19 +516,17 @@ class Message {
         let onlineFollowers = [];
 
         if (containOnline) {
-          onlineViewers = await global.db.engine.find('users.online');
+          const viewers = (await getRepository(User).createQueryBuilder('user')
+            .where('user.username != :botusername', { botusername: global.oauth.botUsername.toLowerCase() })
+            .andWhere('user.username != :broadcasterusername', { broadcasterusername: global.oauth.broadcasterUsername.toLowerCase() })
+            .andWhere('user.isOnline = :isOnline', { isOnline: true })
+            .getMany()).filter(o => {
+            return commons.isIgnored({ username: o.username, userId: o.userId });
+          });
 
-          for (let viewer of onlineViewers) {
-            let user = await global.db.engine.find('users', { username: viewer.username, is: { subscriber: true } });
-            if (!_.isEmpty(user)) {onlineSubscribers.push(user.username)};
-          }
-          onlineSubscribers = _.filter(onlineSubscribers, function (o) { return o !== attr.sender.username; });
-
-          for (let viewer of onlineViewers) {
-            let user = await global.db.engine.find('users', { username: viewer.username, is: { follower: true } });
-            if (!_.isEmpty(user)) {onlineFollowers.push(user.username)};
-          }
-          onlineFollowers = _.filter(onlineFollowers, function (o) { return o !== attr.sender.username; });
+          onlineViewers = viewers;
+          onlineSubscribers = viewers.filter(o => o.isSubscriber);
+          onlineFollowers = viewers.filter(o => o.isFollower);
         }
 
         let randomVar = {

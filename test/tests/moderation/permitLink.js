@@ -24,13 +24,13 @@ describe('systems/moderation - permitLink()', () => {
         await message.isSent('moderation.permit-parse-failed', owner);
       });
     });
-    describe('parsing \'!permit [username] 1000\'', function () {
+    describe('parsing \'!permit [username] 100\'', function () {
       it('should send success message', async function () {
-        global.systems.moderation.permitLink({ sender: owner, parameters: '__viewer__ 1000' });
-        await message.isSent('moderation.user-have-link-permit', owner, { username: '__viewer__', count: 1000, link: commons.getLocalizedName(1000, 'core.links') });
+        global.systems.moderation.permitLink({ sender: owner, parameters: '__viewer__ 100' });
+        await message.isSent('moderation.user-have-link-permit', owner, { username: '__viewer__', count: 100, link: commons.getLocalizedName(100, 'core.links') });
       });
-      it('should not timeout user 1000 messages', async () => {
-        for (let i = 0; i < 1000; i++) {
+      it('should not timeout user 100 messages', async () => {
+        for (let i = 0; i < 100; i++) {
           assert.isTrue(await global.systems.moderation.containsLink({ sender: user.viewer, message: 'http://www.google.com' }));
         }
       });

@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { Request, Response } from 'express';
-import { isNil, orderBy } from 'lodash';
+import { isNil } from 'lodash';
 import moment from 'moment';
 import 'moment-precise-range-plugin';
 
@@ -10,6 +10,9 @@ import { permission } from '../permissions';
 import System from './_interface';
 import { error } from '../helpers/log';
 import { adminEndpoint } from '../helpers/socket';
+
+import { getRepository } from 'typeorm';
+import { Highlight } from '../database/entity/highlight';
 
 const ERROR_STREAM_NOT_ONLINE = '1';
 const ERROR_MISSING_TOKEN = '2';
@@ -33,11 +36,11 @@ class Highlights extends System {
     adminEndpoint(this.nsp, 'highlight', () => {
       this.main({ parameters: '', sender: null });
     });
-    adminEndpoint(this.nsp, 'list', async (cb) => {
-      cb(null, await global.db.engine.find(this.collection.data));
+    adminEndpoint(this.nsp, 'highlights::getAll', async (cb) => {
+      cb(null, await getRepository(Highlight).find({ order: { createdAt: 'DESC' } }));
     });
-    adminEndpoint(this.nsp, 'delete', async (_id, cb) => {
-      await global.db.engine.remove(this.collection.data, { _id });
+    adminEndpoint(this.nsp, 'highlights::deleteById', async (id, cb) => {
+      await getRepository(Highlight).delete({ id });
       cb(null);
     });
   }
@@ -95,13 +98,12 @@ class Highlights extends System {
       global.api.calls.bot.refresh = request.headers['ratelimit-reset'];
 
       const timestamp = moment.preciseDiff(moment.utc(), moment.utc(global.api.streamStatusChangeSince), true);
-      const highlight = {
-        id: request.data.data[0].id,
-        timestamp: { hours: timestamp.hours, minutes: timestamp.minutes, seconds: timestamp.seconds },
-        game: global.api.stats.currentGame || 'n/a',
-        title: global.api.stats.currentTitle || 'n/a',
-        created_at: Date.now(),
-      };
+      const highlight = new Highlight();
+      highlight.videoId = request.data.data[0].id;
+      highlight.timestamp = { hours: timestamp.hours, minutes: timestamp.minutes, seconds: timestamp.seconds };
+      highlight.game = global.api.stats.currentGame || 'n/a';
+      highlight.title = global.api.stats.currentTitle || 'n/a';
+      highlight.createdAt = Date.now();
 
       global.panel.io.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'highlights', api: 'helix', endpoint: url, code: request.status, remaining: global.api.calls.bot.remaining });
 
@@ -122,31 +124,33 @@ class Highlights extends System {
     }
   }
 
-  public async add(highlight, timestamp, sender) {
+  public async add(highlight: Highlight, timestamp, sender) {
     global.api.createMarker();
     sendMessage(global.translate('highlights.saved')
       .replace(/\$hours/g, (timestamp.hours < 10) ? '0' + timestamp.hours : timestamp.hours)
       .replace(/\$minutes/g, (timestamp.minutes < 10) ? '0' + timestamp.minutes : timestamp.minutes)
       .replace(/\$seconds/g, (timestamp.seconds < 10) ? '0' + timestamp.seconds : timestamp.seconds), sender);
 
-    global.db.engine.insert(this.collection.data, highlight);
+    getRepository(Highlight).insert(highlight);
   }
 
   @command('!highlight list')
   @default_permission(permission.CASTERS)
   public async list(opts) {
-    let highlights: any[] = await global.db.engine.find(this.collection.data);
-    const sortedHighlights = orderBy(highlights, 'id', 'desc');
-    const latestStreamId = sortedHighlights.length > 0 ? sortedHighlights[0].id : null;
+    const sortedHighlights = await getRepository(Highlight).find({
+      order: {
+        createdAt: 'DESC',
+      },
+    });
+    const latestStreamId = sortedHighlights.length > 0 ? sortedHighlights[0].videoId : null;
 
     if (isNil(latestStreamId)) {
       sendMessage(global.translate('highlights.list.empty'), opts.sender, opts.attr);
       return;
     }
-    highlights = highlights.filter((o) => o.id === latestStreamId);
     const list: string[] = [];
 
-    for (const highlight of highlights) {
+    for (const highlight of sortedHighlights.filter((o) => o.videoId === latestStreamId)) {
       list.push(highlight.timestamp.hours + 'h'
         + highlight.timestamp.minutes + 'm'
         + highlight.timestamp.seconds + 's');

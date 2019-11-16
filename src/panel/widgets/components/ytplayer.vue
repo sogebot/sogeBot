@@ -183,7 +183,7 @@ export default {
     })
 
     this.interval.push(setInterval(() => {
-      this.socket.emit('find.request', {}, (err, items) => {
+      this.socket.emit('songs::getAllRequests', {}, (err, items) => {
         if (!isEqual(this.requests, items)) {
           if (this.currentSong === null && this.autoplay) {
             this.next();

@@ -115,7 +115,7 @@ declare namespace NodeJS {
     twitch: import('../src/bot/twitch').Twitch;
     socket: import('../src/bot/socket').Socket;
     permissions: import('../src/bot/permissions').Permissions;
-    customvariables: any;
+    customvariables: import('../src/bot/customvariables').CustomVariables;
     tmi: import('../src/bot/tmi').TMI;
     events: import('../src/bot/events').Events;
     webhooks: import('../src/bot/webhooks').Webhooks;
@@ -135,7 +135,7 @@ declare namespace NodeJS {
 interface Sender {
   username: string;
   displayName: string;
-  userId: string;
+  userId: number;
   'message-type': 'chat' | 'whisper' | 'action';
   emotes: { id: number; start: number; end: number }[];
   badges: {
@@ -166,13 +166,13 @@ interface Parser {
 
 type onEventSub = {
   username: string;
-  userId: string;
+  userId: number;
   subCumulativeMonths: number;
 };
 
 type onEventFollow = {
   username: string;
-  userId: string;
+  userId: number;
 };
 
 type onEventTip = {

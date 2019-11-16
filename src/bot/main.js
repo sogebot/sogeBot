@@ -3,6 +3,9 @@ if (Number(process.versions.node.split('.')[0]) < 11) {
   process.exit(1)
 }
 
+import 'reflect-metadata';
+import 'module-alias/register';
+
 import { Permissions } from './permissions';
 import { Events } from './events';
 import { OAuth } from './oauth';
@@ -15,17 +18,21 @@ import { Socket } from './socket';
 import { Webhooks } from './webhooks';
 import { Users } from './users';
 import { UI } from './ui';
+import { CustomVariables } from './customvariables';
+
+import { createConnection, getConnectionOptions } from 'typeorm';
+
 
 const figlet = require('figlet')
 const util = require('util')
 const _ = require('lodash')
 const chalk = require('chalk')
 const gitCommitInfo = require('git-commit-info');
-const { isMainThread, } = require('./cluster');
+const { isMainThread } = require('worker_threads');
+import { isMainThread as isMainClusterThread } from './cluster';
 const { autoLoad } = require('./commons');
 
 const constants = require('./constants')
-const config = require('../config.json')
 
 global.linesParsed = 0
 global.avgResponse = []
@@ -39,13 +46,16 @@ global.status = { // TODO: move it?
 
 import { changelog } from './changelog';
 
-const isNeDB = config.database.type === 'nedb';
-global.db = new (require('./databases/database'))(!isNeDB, !isNeDB)
-main()
+const connect = async function () {
+  const connectionOptions = await getConnectionOptions();
+  await createConnection({
+    ...connectionOptions,
+  });
+};
 
 async function main () {
-  if (!global.db.engine.connected) {
-    return setTimeout(() => main(), 10)
+  if (isMainThread) {
+    await connect();
   }
   try {
     changelog();
@@ -58,7 +68,7 @@ async function main () {
     global.users = new Users();
 
     global.events = new Events();
-    global.customvariables = new (require('./customvariables.js'))()
+    global.customvariables = new CustomVariables();
 
     global.panel = new (require('./panel'))()
     global.twitch = new Twitch()
@@ -93,7 +103,7 @@ async function main () {
     global.games = await autoLoad('./dest/games/')
     global.integrations = await autoLoad('./dest/integrations/')
 
-    if (isMainThread) {
+    if (isMainClusterThread) {
       global.panel.expose();
     }
 
@@ -106,18 +116,19 @@ async function main () {
   })
 }
 
-if (isMainThread) {
-  process.on('unhandledRejection', function (reason, p) {
-    error(`Possibly Unhandled Rejection at: ${util.inspect(p)} reason: ${reason}`)
-  })
 
-  process.on('uncaughtException', (err) => {
-    error(util.inspect(err))
-    error('+------------------------------------------------------------------------------+')
-    error('| BOT HAS UNEXPECTEDLY CRASHED                                                 |')
-    error('| PLEASE CHECK https://github.com/sogehige/SogeBot/wiki/How-to-report-an-issue |')
-    error('| AND ADD logs/sogebot.log file to your report                                 |')
-    error('+------------------------------------------------------------------------------+')
-    process.exit(1)
-  })
-}
+main();
+
+process.on('unhandledRejection', function (reason, p) {
+  error(`Possibly Unhandled Rejection at: ${util.inspect(p)} reason: ${reason}`)
+})
+
+process.on('uncaughtException', (err) => {
+  error(util.inspect(err))
+  error('+------------------------------------------------------------------------------+')
+  error('| BOT HAS UNEXPECTEDLY CRASHED                                                 |')
+  error('| PLEASE CHECK https://github.com/sogehige/SogeBot/wiki/How-to-report-an-issue |')
+  error('| AND ADD logs/sogebot.log file to your report                                 |')
+  error('+------------------------------------------------------------------------------+')
+  process.exit(1)
+})

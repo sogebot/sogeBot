@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 /* global describe it before */
 
 
@@ -10,7 +11,10 @@ const assert = require('assert');
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 const time = require('../../general.js').time;
-const _ = require('lodash');
+
+const { getRepository } = require('typeorm');
+const { User } = require('../../../dest/database/entity/user');
+const { Event } = require('../../../dest/database/entity/event');
 
 describe('Events - tip event', () => {
   before(async () => {
@@ -20,32 +24,25 @@ describe('Events - tip event', () => {
 
   describe('#2219 - Give points on tip not working', function () {
     before(async function () {
-      const id = uuidv4();
-      await Promise.all([
-        global.db.engine.insert('events', {
-          id,
-          key: 'tip',
-          name: 'Tip alert',
-          enabled: true,
-          triggered: {},
-          definitions: {},
-        }),
-        global.db.engine.insert('events.filters', {
-          filters: '',
-          eventId: id,
-        }),
-        global.db.engine.insert('events.operations', {
-          key: 'run-command',
-          eventId: id,
-          definitions: {
-            isCommandQuiet: true,
-            commandToRun: '!points add $username (math.$amount*10)',
-          },
-        }),
-      ]);
+      const event = new Event();
+      event.id = uuidv4();
+      event.name = 'tip';
+      event.givenName = 'Tip alert';
+      event.triggered = {};
+      event.definitions = {};
+      event.filter = '';
+      event.isEnabled = true;
+      event.operations = [{
+        name: 'run-command',
+        definitions: {
+          isCommandQuiet: true,
+          commandToRun: '!points add $username (math.$amount*10)',
+        },
+      }];
+      await getRepository(Event).save(event);
 
       for (const user of ['losslezos', 'rigneir', 'mikasa_hraje', 'foufhs']) {
-        await global.db.engine.insert('users', { id: Math.floor(Math.random() * 100000), username: user });
+        await getRepository(User).save({ username: user, userId: Math.floor(Math.random() * 100000) });
       }
     });
 
@@ -53,7 +50,7 @@ describe('Events - tip event', () => {
       describe(username + ' tip event', () => {
         it('trigger tip event for 10 EUR - ' + username, async () => {
           log.tip(`${username}, amount: 10.00EUR, message: Ahoj jak je`);
-          global.events.fire('tip', { username: username, amount: 10.00, message: 'Ahoj jak je', currency: 'EUR' });
+          global.events.fire('tip', { userId: Math.floor(Math.random * 100000), username: username, amount: 10.00, message: 'Ahoj jak je', currency: 'EUR' });
         });
 
         it('wait 1s', async () => {
@@ -65,8 +62,8 @@ describe('Events - tip event', () => {
         });
 
         it('user should have 100 points', async () => {
-          const userId = await global.users.getIdByName(username, true);
-          assert.strict.equal(await global.systems.points.getPointsOf(userId), 100);
+          const user = await getRepository(User).findOne({ username });
+          assert.strict.equal(user.points, 100);
         });
       });
     }

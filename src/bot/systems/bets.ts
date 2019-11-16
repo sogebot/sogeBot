@@ -9,6 +9,11 @@ import System from './_interface';
 import { error, warning } from '../helpers/log';
 import { adminEndpoint } from '../helpers/socket';
 
+import { getRepository } from 'typeorm';
+import { Bets as BetsEntity, BetsParticipations } from '../database/entity/bets';
+import { User } from '../database/entity/user';
+import { isDbConnected } from '../helpers/database';
+
 const ERROR_NOT_ENOUGH_OPTIONS = 'Expected more parameters';
 const ERROR_ALREADY_OPENED = '1';
 const ERROR_ZERO_BET = '2';
@@ -46,7 +51,15 @@ class Bets extends System {
     this.addWidget('bets', 'widget-title-bets', 'far fa-money-bill-alt');
   }
 
-  public sockets() {
+  sockets() {
+    adminEndpoint(this.nsp, 'bets::getCurrentBet', async (cb) => {
+      const currentBet = await getRepository(BetsEntity).findOne({
+        relations: ['participations'],
+        order: { createdAt: 'DESC' },
+      });
+      cb(null, currentBet);
+    });
+
     adminEndpoint(this.nsp, 'close', async (option) => {
       const message = '!bet ' + (option === 'refund' ? option : 'close ' + option);
       global.tmi.message({
@@ -60,39 +73,40 @@ class Bets extends System {
   }
 
   public async checkIfBetExpired() {
+    if (!isDbConnected) {
+      return;
+    }
     try {
-      const currentBet = await global.db.engine.findOne(this.collection.data, { key: 'bets' });
-      if (_.isEmpty(currentBet) || currentBet.locked) {
+      const currentBet = await getRepository(BetsEntity).findOne({
+        relations: ['participations'],
+        order: { createdAt: 'DESC' },
+      });
+      if (!currentBet || currentBet.isLocked) {
         throw Error(ERROR_NOT_RUNNING);
       }
 
-      const isExpired = currentBet.end <= new Date().getTime();
-      if (isExpired) {
-        currentBet.locked = true;
+      if (currentBet.endedAt <= Date.now()) {
+        currentBet.isLocked = true;
 
-        const _bets = await global.db.engine.find(this.collection.users);
-        const userObj = await global.users.getByName(getOwner());
-        if (_bets.length > 0) {
+        if (currentBet.participations.length > 0) {
           sendMessage(global.translate('bets.locked'), {
-            username: userObj.username,
-            displayName: userObj.displayName || userObj.username,
-            userId: userObj.id,
+            username: global.oauth.botUsername,
+            displayName: global.oauth.botUsername,
+            userId: Number(global.oauth.botId),
             emotes: [],
             badges: {},
             'message-type': 'chat',
           });
-          const _id = currentBet._id.toString(); delete currentBet._id;
-          await global.db.engine.update(this.collection.data, { _id }, currentBet);
         } else {
           sendMessage(global.translate('bets.removed'), {
-            username: userObj.username,
-            displayName: userObj.displayName || userObj.username,
-            userId: userObj.id,
+            username: global.oauth.botUsername,
+            displayName: global.oauth.botUsername,
+            userId: Number(global.oauth.botId),
             emotes: [],
             badges: {},
             'message-type': 'chat',
           });
-          await global.db.engine.remove(this.collection.data, { key: 'bets' });
+          await getRepository(BetsEntity).save(currentBet);
         }
       }
     } catch (e) {
@@ -110,9 +124,12 @@ class Bets extends System {
   @command('!bet open')
   @default_permission(permission.MODERATORS)
   public async open(opts) {
-    const currentBet = await global.db.engine.findOne(this.collection.data, { key: 'bets' });
+    const currentBet = await getRepository(BetsEntity).findOne({
+      relations: ['participations'],
+      order: { createdAt: 'DESC' },
+    });
     try {
-      if (!_.isEmpty(currentBet)) {
+      if (currentBet && !currentBet.isLocked) {
         throw new Error(ERROR_ALREADY_OPENED);
       }
 
@@ -125,18 +142,19 @@ class Bets extends System {
         throw new Error(ERROR_NOT_ENOUGH_OPTIONS);
       }
 
-      const bet = { title, locked: false, options: [], key: 'bets', end: new Date().getTime() + timeout * 1000 * 60 };
-      for (const i of Object.keys(options)) {
-        bet.options[i] = { name: options[i] };
-      }
+      const bet = new BetsEntity();
+      bet.createdAt = Date.now();
+      bet.endedAt = Date.now() + (timeout * 1000 * 60);
+      bet.title = title;
+      bet.options = options;
+      await getRepository(BetsEntity).save(bet);
 
-      await global.db.engine.insert(this.collection.data, bet);
       sendMessage(await prepare('bets.opened', {
         username: getOwner(),
         title,
         maxIndex: String(options.length - 1),
         minutes: timeout,
-        options: options.map((v, i) => `${i}. '${v}'`).join(', '),
+        options: options.map((v, i) => `${i+1}. '${v}'`).join(', '),
         command: this.getCommand('!bet'),
       }), opts.sender);
     } catch (e) {
@@ -148,8 +166,8 @@ class Bets extends System {
           sendMessage(
             prepare('bets.running', {
               command: this.getCommand('!bet'),
-              maxIndex: String(currentBet.options.length - 1),
-              options: currentBet.options.map((v, i) => `${i}. '${v.name}'`).join(', '),
+              maxIndex: String((currentBet as BetsEntity).options.length),
+              options: (currentBet as BetsEntity).options.map((v, i) => `${i+1}. '${v}'`).join(', '),
             }), opts.sender);
           break;
         default:
@@ -160,28 +178,35 @@ class Bets extends System {
   }
 
   public async info(opts) {
-    const currentBet = await global.db.engine.findOne(this.collection.data, { key: 'bets' });
-    if (_.isEmpty(currentBet)) {
+    const currentBet = await getRepository(BetsEntity).findOne({
+      relations: ['participations'],
+      order: { createdAt: 'DESC' },
+    });
+    if (!currentBet) {
       sendMessage(global.translate('bets.notRunning'), opts.sender, opts.attr);
     } else {
-      sendMessage(await prepare(currentBet.locked ? 'bets.lockedInfo' : 'bets.info', {
+      sendMessage(await prepare(currentBet.isLocked ? 'bets.lockedInfo' : 'bets.info', {
         command: opts.command,
         title: currentBet.title,
-        maxIndex: String(currentBet.options.length - 1),
-        options: currentBet.options.map((v, i) => `${i}. '${v.name}'`).join(', '),
-        minutes: Number((currentBet.end - new Date().getTime()) / 1000 / 60).toFixed(1) }), opts.sender);
+        maxIndex: String(currentBet.options.length),
+        options: currentBet.options.map((v, i) => `${i+1}. '${v}'`).join(', '),
+        minutes: Number((currentBet.endedAt - Date.now()) / 1000 / 60).toFixed(1) }), opts.sender);
     }
   }
 
   public async participate(opts) {
-    const currentBet = await global.db.engine.findOne(this.collection.data, { key: 'bets' });
+    const currentBet = await getRepository(BetsEntity).findOne({
+      relations: ['participations'],
+      order: { createdAt: 'DESC' },
+    });
 
     try {
       // tslint:disable-next-line:prefer-const
       let [index, points] = new Expects(opts.parameters).number({ optional: true }).points({ optional: true }).toArray();
+      index--;
       if (!_.isNil(points) && !_.isNil(index)) {
         const pointsOfUser = await global.systems.points.getPointsOf(opts.sender.userId);
-        const _betOfUser = await global.db.engine.findOne(this.collection.users, { id: opts.sender.userId });
+        let _betOfUser = currentBet?.participations.find(o => o.userId === opts.sender.userId);
 
         if (points === 'all' || points > pointsOfUser) {
           points = pointsOfUser;
@@ -190,26 +215,34 @@ class Bets extends System {
         if (points === 0) {
           throw Error(ERROR_ZERO_BET);
         }
-        if (_.isEmpty(currentBet)) {
+        if (!currentBet) {
           throw Error(ERROR_NOT_RUNNING);
         }
         if (_.isNil(currentBet.options[index])) {
           throw Error(ERROR_UNDEFINED_BET);
         }
-        if (currentBet.locked) {
+        if (currentBet.isLocked) {
           throw Error(ERROR_IS_LOCKED);
         }
-        if (!_.isEmpty(_betOfUser) && _betOfUser.option !== index) {
+        if (_betOfUser && _betOfUser.optionIdx !== index) {
           throw Error(ERROR_DIFF_BET);
         }
 
-        if (_.isEmpty(_betOfUser)) {
+        if (!_betOfUser) {
+          _betOfUser = new BetsParticipations();
+          _betOfUser.username = opts.sender.username;
+          _betOfUser.userId = Number(opts.sender.userId);
+          _betOfUser.optionIdx = index;
           _betOfUser.points = 0;
+          currentBet.participations.push(_betOfUser);
         }
 
+        // add points
+        _betOfUser.points = points + _betOfUser.points;
+
         // All OK
-        await global.db.engine.increment('users.points', { id: opts.sender.userId }, { points: points * -1 });
-        await global.db.engine.update(this.collection.users, { id: opts.sender.userId }, { username: opts.sender.username, points: points + _betOfUser.points, option: index });
+        await getRepository(User).decrement({ userId: opts.sender.userId }, 'points', points);
+        await getRepository(BetsEntity).save(currentBet);
       } else {
         this.info(opts);
       }
@@ -229,12 +262,12 @@ class Bets extends System {
           sendMessage(global.translate('bets.timeUpBet'), opts.sender, opts.attr);
           break;
         case ERROR_DIFF_BET:
-          const result = _.pickBy(currentBet.bets, (v, k) => Object.keys(v).includes(opts.sender.username));
-          sendMessage(global.translate('bets.diffBet').replace(/\$option/g, Object.keys(result)[0]), opts.sender, opts.attr);
+          const result = (currentBet as BetsEntity).participations.find(o => o.userId === opts.sender.userId);
+          sendMessage(global.translate('bets.diffBet').replace(/\$option/g, result?.optionIdx), opts.sender, opts.attr);
           break;
         default:
           warning(e.stack);
-          sendMessage((await prepare('bets.error', { command: opts.command })).replace(/\$maxIndex/g, String(currentBet.options.length - 1)), opts.sender, opts.attr);
+          sendMessage((await prepare('bets.error', { command: opts.command })).replace(/\$maxIndex/g, String((currentBet as BetsEntity).options.length)), opts.sender, opts.attr);
       }
     }
   }
@@ -242,14 +275,17 @@ class Bets extends System {
   @command('!bet refund')
   @default_permission(permission.MODERATORS)
   public async refund(opts) {
+    const currentBet = await getRepository(BetsEntity).findOne({
+      relations: ['participations'],
+      order: { createdAt: 'DESC' },
+    });
     try {
-      if (_.isEmpty(await global.db.engine.findOne(this.collection.data, { key: 'bets' }))) {
+      if (!currentBet || (currentBet.isLocked && currentBet.arePointsGiven)) {
         throw Error(ERROR_NOT_RUNNING);
       }
-      for (const user of await global.db.engine.find(this.collection.users)) {
-        await global.db.engine.increment('users.points', { id: user.id }, { points: parseInt(user.points, 10) });
+      for (const user of currentBet.participations) {
+        await getRepository(User).increment({ userId: opts.sender.userId }, 'points', user.points);
       }
-      await global.db.engine.remove(this.collection.users, {});
       sendMessage(global.translate('bets.refund'), opts.sender, opts.attr);
     } catch (e) {
       switch (e.message) {
@@ -261,18 +297,25 @@ class Bets extends System {
           sendMessage(global.translate('core.error'), opts.sender, opts.attr);
       }
     } finally {
-      await global.db.engine.remove(this.collection.data, { key: 'bets' });
+      if (currentBet) {
+        currentBet.arePointsGiven = true;
+        currentBet.isLocked = true;
+        await getRepository(BetsEntity).save(currentBet);
+      }
     }
   }
 
   @command('!bet close')
   @default_permission(permission.MODERATORS)
   public async close(opts) {
-    const currentBet = await global.db.engine.findOne(this.collection.data, { key: 'bets' });
+    const currentBet = await getRepository(BetsEntity).findOne({
+      relations: ['participations'],
+      order: { createdAt: 'DESC' },
+    });
     try {
       const index = new Expects(opts.parameters).number().toArray()[0];
 
-      if (_.isEmpty(currentBet)) {
+      if (!currentBet || currentBet.arePointsGiven) {
         throw Error(ERROR_NOT_RUNNING);
       }
       if (_.isNil(currentBet.options[index])) {
@@ -281,22 +324,23 @@ class Bets extends System {
 
       const percentGain = (currentBet.options.length * this.betPercentGain) / 100;
 
-      const users = await global.db.engine.find(this.collection.users);
       let total = 0;
-      for (const user of users) {
-        await global.db.engine.remove(this.collection.users, { _id: String(user._id) });
-        if (user.option === index) {
-          total += Math.round((parseInt(user.points, 10) * percentGain));
-          await global.db.engine.increment('users.points', { user: user.id }, { points: Math.round((parseInt(user.points, 10) * percentGain)) });
+      for (const user of currentBet.participations) {
+        if (user.optionIdx === index) {
+          total += user.points + Math.round((user.points * percentGain));
+          await getRepository(User).increment({ userId: opts.sender.userId }, 'points', user.points + Math.round((user.points * percentGain)));
         }
       }
 
       sendMessage(global.translate('bets.closed')
-        .replace(/\$option/g, currentBet.options[index].name)
-        .replace(/\$amount/g, _.filter(users, (o) => o.option === index).length)
+        .replace(/\$option/g, currentBet.options[index])
+        .replace(/\$amount/g, currentBet.participations.filter((o) => o.optionIdx === index).length)
         .replace(/\$pointsName/g, await global.systems.points.getPointsName(total))
         .replace(/\$points/g, total), opts.sender);
-      await global.db.engine.remove(this.collection.data, { _id: currentBet._id.toString() });
+
+      currentBet.arePointsGiven = true;
+      currentBet.isLocked = true;
+      await getRepository(BetsEntity).save(currentBet);
     } catch (e) {
       switch (e.message) {
         case ERROR_NOT_ENOUGH_OPTIONS:

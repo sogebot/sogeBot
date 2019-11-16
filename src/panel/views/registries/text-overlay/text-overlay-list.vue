@@ -17,7 +17,7 @@
     </panel>
 
     <loading v-if="!state.loaded /* State.DONE */" />
-    <div v-else-if="filtered.length > 0" class="card" v-for="(item, index) of filtered" v-bind:class="{ 'mt-3': index !== 0 }" v-bind:key="String(item._id)">
+    <div v-else-if="filtered.length > 0" class="card" v-for="(item, index) of filtered" v-bind:class="{ 'mt-3': index !== 0 }" v-bind:key="String(item.id)">
       <div class="card-body row">
         <div class="col-sm-5">
           <div style="margin: 0; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 3px;">{{translate('name')}}</div>
@@ -26,7 +26,7 @@
         </div>
 
         <div class="text-muted col-sm-1 text-center" style="margin-top: auto; margin-bottom: auto;font-size: 1.5rem">
-          <fa class="ml-3 mr-3" :icon="['fab', 'fa-html5']"></fa>
+          <fa class="ml-3 mr-3" :icon="['fab', 'html5']"></fa>
         </div>
 
         <div style="word-break: break-all; " class="col-sm-6">
@@ -37,29 +37,29 @@
           </div>
 
           <div v-if="typeof item.text !== 'undefined' && item.text.length > 0 && item.show === 'html'">
-            <prism language="html" style="font-size:12px;">{{ showMore.includes(item._id) ? item.text : less(item.text, 'html') }}</prism>
+            <prism language="html" style="font-size:12px;">{{ showMore.includes(item.id) ? item.text : less(item.text, 'html') }}</prism>
           </div>
 
           <div v-if="typeof item.css !== 'undefined' && item.css.length > 0 && item.show === 'css'">
-            <prism language="css" style="font-size:12px;">{{ showMore.includes(item._id) ? item.css : less(item.css, 'css') }}</prism>
+            <prism language="css" style="font-size:12px;">{{ showMore.includes(item.id) ? item.css : less(item.css, 'css') }}</prism>
           </div>
 
           <div v-if="typeof item.css !== 'undefined' && item.js.length > 0 && item.show === 'js'">
-            <prism language="javascript" style="font-size:12px;">{{ showMore.includes(item._id) ? item.js : less(item.js, 'js') }}</prism>
+            <prism language="javascript" style="font-size:12px;">{{ showMore.includes(item.id) ? item.js : less(item.js, 'js') }}</prism>
           </div>
         </div>
       </div>
 
       <div class="card-body border-top p-0 text-right">
         <div class="btn-group" role="group">
-          <button class="btn btn-outline-dark p-3 border-0" @click="toggleShowMore(item._id)">
-            <fa class="mr-1" :icon="[!showMore.includes(item._id) ? 'ellipsis-h' : 'ellipsis-v']"></fa> {{ !showMore.includes(item._id) ? translate('commons.show-more') : translate('commons.show-less') }}</button>
-          <a v-bind:href="'/overlays/text?id='+ item._id" class="btn btn-outline-dark p-3 border-0" target="_blank"><fa icon="link"></fa> /overlays/text?id={{ item._id }}</a>
-          <button @click="goTo(item._id)" class="btn btn-outline-dark p-3 border-0">
+          <button class="btn btn-outline-dark p-3 border-0" @click="toggleShowMore(item.id)">
+            <fa class="mr-1" :icon="!showMore.includes(item.id) ? 'ellipsis-h' : 'ellipsis-v'"></fa> {{ !showMore.includes(item.id) ? translate('commons.show-more') : translate('commons.show-less') }}</button>
+          <a v-bind:href="'/overlays/text?id='+ item.id" class="btn btn-outline-dark p-3 border-0" target="_blank"><fa icon="link"></fa> /overlays/text?id={{ item.id }}</a>
+          <button @click="goTo(item.id)" class="btn btn-outline-dark p-3 border-0">
             <fa icon="pencil-alt" class="mr-1"></fa>
             {{ translate('dialog.buttons.edit') }}</button>
           <hold-button class="btn-outline-dark border-0 btn-reverse"
-            @trigger="remove(item._id)">
+            @trigger="remove(item)">
             <template slot="title"><fa icon="trash" fixed-width/> {{translate('dialog.buttons.delete')}}</template>
             <template slot="onHoldTitle"><fa icon="trash" fixed-width/> {{translate('dialog.buttons.hold-to-delete')}}</template>
           </hold-button>
@@ -74,6 +74,11 @@ import { Vue, Component } from 'vue-property-decorator';
 import { isNil, orderBy } from 'lodash-es';
 import Prism from 'vue-prism-component'
 import { getSocket } from 'src/panel/helpers/socket';
+
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faPencilAlt, faEllipsisH, faEllipsisV } from '@fortawesome/free-solid-svg-icons';
+import { faHtml5 } from '@fortawesome/free-brands-svg-icons';
+library.add(faPencilAlt, faHtml5, faEllipsisH, faEllipsisV);
 
 import 'prismjs'
 import 'prismjs/themes/prism.css'
@@ -111,7 +116,7 @@ export default class textOverlayList extends Vue {
 
     created() {
       this.state.loaded = false;
-      this.socket.emit('find', { collection: 'data' }, (err, items) => {
+      this.socket.emit('text::getAll', (items) => {
         this.items = orderBy(items, 'name', 'asc')
         this.items.map(o => { o.show = 'html'; return o })
         this.state.loaded = true;
@@ -142,9 +147,9 @@ export default class textOverlayList extends Vue {
       }
     }
 
-    remove(_id) {
-      this.socket.emit('delete', { _id }, () => {
-        this.items = this.items.filter(o => o._id != _id)
+    remove(item) {
+      this.socket.emit('text::remove', item, () => {
+        this.items = this.items.filter(o => o.id != item.id)
       })
     }
 

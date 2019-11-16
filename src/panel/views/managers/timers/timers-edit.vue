@@ -8,7 +8,7 @@
           {{ translate('menu.timers') }}
           <template v-if="$route.params.id">
             <small><fa icon="angle-right"/></small>
-            {{item.timer.name}}
+            {{item.name}}
             <small class="text-muted text-monospace" style="font-size:0.7rem">{{$route.params.id}}</small>
           </template>
         </span>
@@ -22,8 +22,8 @@
           <template slot="title">{{translate('dialog.buttons.delete')}}</template>
           <template slot="onHoldTitle">{{translate('dialog.buttons.hold-to-delete')}}</template>
         </hold-button>
-        <button-with-icon :class="[ item.timer.enabled ? 'btn-success' : 'btn-danger' ]" class="btn-reverse" icon="power-off" @click="item.timer.enabled = !item.timer.enabled">
-          {{ translate('dialog.buttons.' + (item.timer.enabled? 'enabled' : 'disabled')) }}
+        <button-with-icon :class="[ item.isEnabled ? 'btn-success' : 'btn-danger' ]" class="btn-reverse" icon="power-off" @click="item.isEnabled = !item.isEnabled">
+          {{ translate('dialog.buttons.' + (item.isEnabled? 'enabled' : 'disabled')) }}
         </button-with-icon>
       </template>
       <template v-slot:right>
@@ -42,14 +42,14 @@
         <b-input-group>
           <b-form-input
             id="name"
-            v-model="item.timer.name"
+            v-model="item.name"
             type="text"
             :placeholder="translate('timers.dialog.placeholders.name')"
-            @input="$v.item.timer.$touch()"
-            :state="$v.item.timer.name.$invalid && $v.item.timer.name.$dirty ? false : null"
+            @input="$v.item.$touch()"
+            :state="$v.item.name.$invalid && $v.item.name.$dirty ? false : null"
           ></b-form-input>
         </b-input-group>
-        <b-form-invalid-feedback :state="!($v.item.timer.name.$invalid && $v.item.timer.name.$dirty)">{{ translate('timers.errors.timer_name_must_be_compliant') }}</b-form-invalid-feedback>
+        <b-form-invalid-feedback :state="!($v.item.name.$invalid && $v.item.name.$dirty)">{{ translate('timers.errors.timer_name_must_be_compliant') }}</b-form-invalid-feedback>
       </b-form-group>
 
       <b-row>
@@ -62,11 +62,11 @@
             <b-input-group>
               <b-form-input
                 id="messages"
-                v-model="item.timer.messages"
+                v-model="item.triggerEveryMessage"
                 type="number"
                 min="0"
                 :placeholder="translate('timers.dialog.placeholders.messages')"
-                @input="$v.item.timer.$touch()"
+                @input="$v.item.$touch()"
               ></b-form-input>
             </b-input-group>
         </b-form-group>
@@ -80,11 +80,11 @@
           <b-input-group>
             <b-form-input
               id="seconds"
-              v-model="item.timer.seconds"
+              v-model="item.triggerEverySecond"
               type="number"
               min="0"
               :placeholder="translate('timers.dialog.placeholders.seconds')"
-              @input="$v.item.timer.$touch()"
+              @input="$v.item.$touch()"
             ></b-form-input>
             </b-input-group>
           </b-form-group>
@@ -93,14 +93,15 @@
 
       <b-form-group>
         <label>{{translate('timers.dialog.responses')}}</label>
-        <b-input-group v-for="(response, index) of item.responses" :key="index" class="pb-1">
+        <b-input-group v-for="(response, index) of item.messages" :key="index" class="pb-1">
           <b-input-group-prepend>
-            <b-button @click="response.enabled = !response.enabled" :variant="response.enabled ? 'success' : 'danger'">
-              {{ response.enabled ? translate('enabled') : translate('disabled') }}
+            <b-button @click="response.isEnabled = !response.isEnabled" :variant="response.isEnabled ? 'success' : 'danger'">
+              {{ response.isEnabled ? translate('enabled') : translate('disabled') }}
             </b-button>
           </b-input-group-prepend>
 
           <textarea-with-tags
+            class="w-50"
             :value.sync="response.response"
             v-bind:filters="['global']"
             v-bind:placeholder="''"
@@ -121,6 +122,9 @@ import { Vue, Component, Watch } from 'vue-property-decorator';
 import { getSocket } from 'src/panel/helpers/socket';
 
 import { Validations } from 'vuelidate-property-decorators';
+import { required } from 'vuelidate/lib/validators';
+
+import { Timer, TimerResponse } from 'src/bot/database/entity/timer';
 
 import uuid from 'uuid/v4';
 
@@ -160,31 +164,22 @@ export default class timerssEdit extends Vue {
     pending: false,
   }
 
-  item: {
-    timer: Types.Timers.Timer;
-    responses: Types.Timers.Response[];
-  } = {
-    timer: {
-      id: uuid(),
-      name: '',
-      messages: 0,
-      seconds: 0,
-      enabled: true,
-      trigger: {
-        messages: 0,
-        timestamp: Date.now(),
-      }
-    },
-    responses: [],
+  item: Timer = {
+    id: uuid(),
+    name: '',
+    triggerEveryMessage: 0,
+    triggerEverySecond: 0,
+    isEnabled: true,
+    triggeredAtTimestamp: Date.now(),
+    triggeredAtMessages: 0,
+    messages: [],
   }
 
 
   @Validations()
   validations = {
     item: {
-      timer: {
-        name: { mustBeCompliant },
-      }
+      name: { mustBeCompliant, required },
     }
   }
 
@@ -196,26 +191,25 @@ export default class timerssEdit extends Vue {
   }
 
   addResponse() {
-    this.item.responses.push({
-      timerId: this.item.timer.id,
-      timestamp: Date.now(),
-      enabled: true,
-      response: '',
-    })
+    const response = new TimerResponse();
+    response.id = uuid();
+    response.timestamp = Date.now();
+    response.isEnabled = true;
+    response.response = '';
+    this.item.messages.push(response);
   }
 
   delResponse(index) {
-    this.item.responses.splice(index, 1);
+    this.item.messages.splice(index, 1);
   }
 
   async mounted() {
     if (this.$route.params.id) {
       await new Promise((resolve, reject) => {
-        this.socket.emit('findOne.timer', { id: this.$route.params.id }, (err, data) => {
+        this.socket.emit('timers::getOne', this.$route.params.id, (err, data) => {
         if (err) {
           reject(err)
         }
-        console.log({data})
         this.item = data;
         resolve()
         })
@@ -228,7 +222,7 @@ export default class timerssEdit extends Vue {
   }
 
   del() {
-    this.socket.emit('delete.timer', this.$route.params.id, (err, deleted) => {
+    this.socket.emit('timers::Remove', this.$route.params.id, (err) => {
       if (err) {
         return console.error(err);
       }
@@ -241,7 +235,7 @@ export default class timerssEdit extends Vue {
     if (!this.$v.$invalid) {
       this.state.save = this.$state.progress;
 
-      this.socket.emit('update.timer', this.item, (err, data) => {
+      this.socket.emit('timers::save', this.item, (err, data) => {
         if (err) {
           this.state.save = this.$state.fail;
           return console.error(err);
@@ -251,7 +245,7 @@ export default class timerssEdit extends Vue {
         this.item = data;
         this.$nextTick(() => {
           this.state.pending = false;
-          this.$router.push({ name: 'TimersManagerEdit', params: { id: String(this.item.timer.id) } })
+          this.$router.push({ name: 'TimersManagerEdit', params: { id: String(this.item.id) } })
         })
         setTimeout(() => {
           this.state.save = this.$state.idle;

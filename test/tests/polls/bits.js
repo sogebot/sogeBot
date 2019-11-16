@@ -8,11 +8,13 @@ const until = require('test-until');
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 const time = require('../../general.js').time;
-const _ = require('lodash');
+
+const { getRepository } = require('typeorm');
+const { Poll, PollVote } = require('../../../dest/database/entity/poll');
 
 const assert = require('chai').assert;
 
-const owner = { username: 'soge__' };
+const owner = { username: 'soge__', userId: Math.floor(Math.random() * 10000) };
 
 describe('Polls - bits', () => {
   before(async () => {
@@ -45,8 +47,7 @@ describe('Polls - bits', () => {
       assert.isFalse(await global.systems.polls.open({ sender: owner, parameters: '-bits -title "Lorem Ipsum2?" Lorem2 | Ipsum2 | Dolor Sit2' }));
     });
     it('Voting should be correctly in db', async () => {
-      const cVote = await global.db.engine.findOne(global.systems.polls.collection.data, { isOpened: true });
-      assert.isNotEmpty(cVote);
+      const cVote = await getRepository(Poll).findOne({ isOpened: true });
       assert.deepEqual(cVote.options, ['Lorem', 'Ipsum', 'Dolor Sit']);
       assert.deepEqual(cVote.type, 'bits');
       assert.equal(cVote.title, 'Lorem Ipsum?');
@@ -65,8 +66,8 @@ describe('Polls - bits', () => {
     for (const o of [0,1,2,3,4]) {
       it(`User ${owner.username} will vote for option ${o} - should fail`, async () => {
         await global.systems.polls.main({ sender: owner, parameters: String(o) });
-        const vote = await global.db.engine.findOne(global.systems.polls.collection.votes, { votedBy: owner.username, vid });
-        assert.isEmpty(vote, 'Expected ' + JSON.stringify({ votedBy: owner.username, vid }) + ' to not be found in db');
+        const vote = await getRepository(PollVote).findOne({ votedBy: owner.username });
+        assert.isUndefined(vote, 'Expected ' + JSON.stringify({ votedBy: owner.username, vid }) + ' to not be found in db');
       });
     }
     it(`10 users will vote through bits for option 1 and another 10 for option 2`, async () => {
@@ -76,7 +77,7 @@ describe('Polls - bits', () => {
           await global.tmi.cheer({
             tags: {
               username: user,
-              userId: Number(user),
+              userId: Math.floor(Math.random() * 100000),
               bits: 10,
             },
             message: 'Cool I am voting for #vote' + o + ' enjoy!',
@@ -84,8 +85,8 @@ describe('Polls - bits', () => {
 
           await until(async (setError) => {
             try {
-              const vote = await global.db.engine.findOne(global.systems.polls.collection.votes, { votedBy: user, vid });
-              assert.isNotEmpty(vote, 'Expected ' + JSON.stringify({ votedBy: user, vid }) + ' to be found in db');
+              const vote = await getRepository(PollVote).findOne({ votedBy: user });
+              assert.isTrue(typeof vote !== 'undefined', 'Expected ' + JSON.stringify({ votedBy: user, vid }) + ' to be found in db');
               assert.equal(vote.option, o - 1);
               return true;
             } catch (err) {

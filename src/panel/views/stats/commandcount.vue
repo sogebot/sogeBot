@@ -233,7 +233,7 @@
       },
       totalInInterval(command: string, interval: number): number {
         return this.commandsUsage.filter(o => {
-          const isCorrectCommand = o.command === command;;
+          const isCorrectCommand = o.command === command;
           const isInInterval = Date.now() - interval <= o.timestamp;
           return isCorrectCommand && isInInterval;
         }).length;
@@ -247,12 +247,8 @@
         this.showChartCommands = JSON.parse(localStorage.getItem('/stats/commandcount/showChartCommands') || '[]')
       }
 
-      this.socket.emit('find', { collection: '_core.commands.count' }, (err, val) => {
-        if (err) {
-          return console.error(err)
-        } else {
-          this.commandsUsage = val;
-        }
+      this.socket.emit('commands::count', (val) => {
+        this.commandsUsage = val;
       })
     }
   })

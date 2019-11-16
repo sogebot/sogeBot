@@ -282,7 +282,7 @@ describe('Scrim - full workflow', () => {
       it('Add ' + user + ' to match with id ' + matchId, async () => {
         global.systems.scrim.match({
           parameters: matchId,
-          sender: { username: user },
+          sender: { username: user, userId: Math.floor(Math.random() * 100000) },
         });
       });
     }

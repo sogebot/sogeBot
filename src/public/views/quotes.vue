@@ -48,7 +48,7 @@ export default class playlist extends Vue {
 
   mounted() {
     this.state.loading = this.$state.progress;
-    this.socket.emit('find', {}, (err, items) => {
+    this.socket.emit('quotes:getAll', {}, (err, items) => {
       console.debug('Loaded', {items})
       this.items = items
       this.state.loading = this.$state.success;

@@ -10,17 +10,17 @@
           <div style="position: absolute;right: 1rem;">
             <b-img :src="$loggedUser.profile_image_url" rounded="circle" alt="Circle image" style="width:70px;"></b-img>
           </div>
-          <div class="col-12" style="justify-content: center; display: flex; flex-direction: column;">
+          <div v-if="viewer" class="col-12" style="justify-content: center; display: flex; flex-direction: column;">
             <div><strong style="font-size: 1.2rem">{{$loggedUser.login}}</strong> <small class="text-muted">({{$loggedUser.id}})</small></div>
             <div style="font-size: 0.8rem" class="text-secondary">
               <span v-for="k of viewerIs" :key="k"> {{k}} </span>
             </div>
             <div v-if="viewer.permission"><strong style="font-size: 0.9rem" class="text-muted">{{translate('group')}}:</strong>  {{viewer.permission.name}}</div>
             <div><strong style="font-size: 0.9rem" class="text-muted">{{translate('points')}}:</strong>  {{viewer.points}}</div>
-            <div><strong style="font-size: 0.9rem" class="text-muted">{{translate('messages')}}:</strong>  {{viewer.stats.messages}}</div>
-            <div><strong style="font-size: 0.9rem" class="text-muted">{{translate('watched-time')}}:</strong>  {{Math.floor(viewer.time.watched / 1000 / 60 / 60).toFixed(1)}}h</div>
-            <div><strong style="font-size: 0.9rem" class="text-muted">{{translate('bits')}}:</strong>  {{viewer.stats.aggregatedBits}}</div>
-            <div><strong style="font-size: 0.9rem" class="text-muted">{{translate('tips')}}:</strong>  {{viewer.stats.aggregatedTips}} {{viewer.custom.currency}}</div>
+            <div><strong style="font-size: 0.9rem" class="text-muted">{{translate('messages')}}:</strong>  {{viewer.messages}}</div>
+            <div><strong style="font-size: 0.9rem" class="text-muted">{{translate('watched-time')}}:</strong>  {{Math.floor(viewer.watchedTime / 1000 / 60 / 60).toFixed(1)}}h</div>
+            <div><strong style="font-size: 0.9rem" class="text-muted">{{translate('bits')}}:</strong>  {{viewer.aggregatedBits}}</div>
+            <div><strong style="font-size: 0.9rem" class="text-muted">{{translate('tips')}}:</strong>  {{viewer.aggregatedTips}} {{configuration.currency}}</div>
           </div>
         </div>
         <b-button variant="danger" class="float-right" @click="logout">
@@ -38,6 +38,7 @@
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
 import { getSocket } from 'src/panel/helpers/socket';
+import { Permissions as PermissionEntity} from 'src/bot/database/entity/permissions'
 
 @Component({
   components: {
@@ -52,7 +53,7 @@ export default class User extends Vue {
   isViewerLoaded: boolean = false;
   viewer: {
     id: number; points: number;
-    permission: Permissions.Item | null;
+    permission: PermissionEntity | null;
     stats: {
       aggregatedTips: number; aggregatedBits: number; messages: number;
     };
@@ -89,8 +90,8 @@ export default class User extends Vue {
 
   get viewerIs(): string[] {
     let status: string[] = [];
-    for (const key of Object.keys(this.viewer.is)) {
-      if (this.viewer.is[key]) {
+    for (const key of ['isFollower', 'isSubscriber', 'isVIP']) {
+      if (this.viewer && this.viewer[key]) {
         status.push(key);
       }
     }
@@ -113,9 +114,14 @@ export default class User extends Vue {
     if (typeof this.$loggedUser === 'undefined') {
       return setTimeout(() => this.refreshViewer(), 100);
     }
-    this.socket.emit('findOne.viewer', { where: { id: this.$loggedUser.id }}, (err, viewer) => {
-      this.viewer = viewer;
-      this.isViewerLoaded = true;
+    this.socket.emit('viewers::findOne', this.$loggedUser.id, (viewer) => {
+      if (viewer) {
+        console.log('Logged in as', viewer);
+        this.viewer = viewer;
+        this.isViewerLoaded = true;
+      } else {
+        console.error('Cannot find user data, try to write something in chat to load data')
+      }
     })
   }
 }

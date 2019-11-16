@@ -8,7 +8,7 @@
           {{ translate('menu.ranks') }}
           <template v-if="$route.params.id">
             <small><fa icon="angle-right"/></small>
-            {{item.value}}
+            {{item.rank}}
             <small class="text-muted text-monospace" style="font-size:0.7rem">{{$route.params.id}}</small>
           </template>
         </span>
@@ -38,13 +38,13 @@
         <b-input-group>
           <b-form-input
             id="name"
-            v-model="item.value"
+            v-model="item.rank"
             type="text"
-            @input="$v.item.value.$touch()"
-            :state="$v.item.value.$invalid && $v.item.value.$dirty ? false : null"
+            @input="$v.item.rank.$touch()"
+            :state="$v.item.rank.$invalid && $v.item.rank.$dirty ? false : null"
           ></b-form-input>
         </b-input-group>
-        <b-form-invalid-feedback :state="!($v.item.value.$invalid && $v.item.value.$dirty)">{{ translate('dialog.errors.required') }}</b-form-invalid-feedback>
+        <b-form-invalid-feedback :state="!($v.item.rank.$invalid && $v.item.rank.$dirty)">{{ translate('dialog.errors.required') }}</b-form-invalid-feedback>
       </b-form-group>
 
       <b-form-group
@@ -74,6 +74,7 @@ import { Validations } from 'vuelidate-property-decorators';
 import { required, minValue } from 'vuelidate/lib/validators'
 
 import uuid from 'uuid/v4';
+import { Rank } from 'src/bot/database/entity/rank';
 
 Component.registerHooks([
   'beforeRouteEnter',
@@ -106,19 +107,17 @@ export default class ranksEdit extends Vue {
     pending: false,
   }
 
-  permissions: Permissions.Item[] = [];
-
-  item: Types.Ranks.Item = {
+  item: Rank = {
     id: uuid(),
     hours: 0,
-    value: '',
+    rank: '',
   }
 
 
   @Validations()
   validations = {
     item: {
-      value: {required},
+      rank: {required},
       hours: {required, minValue: minValue(0)},
     }
   }
@@ -132,13 +131,10 @@ export default class ranksEdit extends Vue {
 
   async mounted() {
     if (this.$route.params.id) {
-      await new Promise((resolve, reject) => {
-        this.socket.emit('findOne', { where: { id: this.$route.params.id } }, (err, data: Types.Ranks.Item) => {
-          if (err) {
-            reject(err)
-          }
-
-          this.item = data
+      await new Promise(resolve => {
+        this.socket.emit('ranks::getOne', this.$route.params.id, (data: Rank) => {
+          console.debug('Loaded', data);
+          this.item = data;
           resolve();
         })
       })
@@ -150,45 +146,25 @@ export default class ranksEdit extends Vue {
   }
 
   del() {
-    this.socket.emit('delete', { where: { id: this.$route.params.id }}, (err, deleted) => {
-      if (err) {
-        return console.error(err);
-      }
+    this.socket.emit('ranks::remove', this.$route.params.id, () => {
       this.$router.push({ name: 'ranksManagerList' })
     })
   }
-
-  getPermissionName (id) {
-    if (!id) return 'Disabled'
-    const permission = this.permissions.find((o) => {
-      return o.id === id
-    })
-    if (typeof permission !== 'undefined') {
-      if (permission.name.trim() === '') {
-        return permission.id
-      } else {
-        return permission.name
-      }
-    } else {
-      return null
-    }
-  }
-
 
   save() {
     this.$v.$touch();
     if (!this.$v.$invalid) {
       this.state.save = this.$state.progress;
 
-      this.socket.emit('update', { key: 'id', items: [this.item] }, (err, data) => {
+      this.socket.emit('ranks::save', this.item, (err, data) => {
         if (err) {
           this.state.save = this.$state.fail;
-          return console.error(err);
+          console.error(err);
+        } else {
+          this.state.save = this.$state.success;
+          this.state.pending = false;
+          this.$router.push({ name: 'ranksManagerEdit', params: { id: String(data.id) } })
         }
-
-        this.state.save = this.$state.success;
-        this.state.pending = false;
-        this.$router.push({ name: 'ranksManagerEdit', params: { id: String(data.id) } })
         setTimeout(() => {
           this.state.save = this.$state.idle;
         }, 1000)

@@ -1,3 +1,4 @@
+import 'module-alias/register';
 import io from 'socket.io';
 import ioClient from 'socket.io-client';
 import http from 'http';

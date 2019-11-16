@@ -11,6 +11,15 @@
     </b-row>
 
     <panel search @search="search = $event">
+      <template v-slot:right>
+        <b-pagination
+          class="m-0"
+          v-model="currentPage"
+          :total-rows="count"
+          :per-page="perPage"
+          aria-controls="my-table"
+        ></b-pagination>
+      </template>
       <template v-slot:left>
         <b-form inline @submit="addSongOrPlaylist">
           <b-input-group>
@@ -32,12 +41,12 @@
     <loading v-if="state.loading !== $state.success"/>
     <b-table v-else striped small :items="fItems" :fields="fields" class="table-p-0" hover @row-clicked="linkTo($event)">
       <template v-slot:cell(thumbnail)="data">
-        <img class="float-left pr-3" v-bind:src="generateThumbnail(data.item.videoID)">
+        <img class="float-left pr-3" v-bind:src="generateThumbnail(data.item.videoId)">
       </template>
       <template v-slot:cell(title)="data">
         {{ data.item.title }}
         <small class="d-block">
-          <fa :icon="[ 'far', 'clock' ]"></fa> {{ data.item.length_seconds | formatTime }}
+          <fa :icon="[ 'far', 'clock' ]"></fa> {{ data.item.length | formatTime }}
           <fa class="pl-3" :icon="['fas', 'fa-volume-up']"></fa> {{ Number(data.item.volume).toFixed(1) }}%
           <fa class="pl-3" :icon="['fas', 'fa-step-backward']"></fa>
           {{ data.item.startTime | formatTime }} - {{ data.item.endTime | formatTime }}
@@ -50,7 +59,7 @@
           <button-with-icon class="btn-only-icon btn-primary btn-reverse" icon="edit" @click="data.toggleDetails">
             {{ translate('dialog.buttons.edit') }}
           </button-with-icon>
-          <hold-button @trigger="deleteItem(data.item._id)" icon="trash" class="btn-danger btn-reverse btn-only-icon">
+          <hold-button @trigger="deleteItem(data.item.videoId)" icon="trash" class="btn-danger btn-reverse btn-only-icon">
             <template slot="title">{{translate('dialog.buttons.delete')}}</template>
             <template slot="onHoldTitle">{{translate('dialog.buttons.hold-to-delete')}}</template>
           </hold-button>
@@ -83,7 +92,7 @@
           <div class="form-group col-md-6">
             <label style="margin: 0px 0px 3px; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px;">{{ translate('systems.songs.endTime') }}</label>
             <div class="input-group">
-              <input v-model="data.item.endTime" type="number" class="form-control" :min="Number(data.item.startTime) + 1" :max="data.item.length_seconds">
+              <input v-model="data.item.endTime" type="number" class="form-control" :min="Number(data.item.startTime) + 1" :max="data.item.length">
               <div class="input-group-append">
                 <div class="input-group-text">{{translate('systems.songs.seconds')}}</div>
               </div>
@@ -93,7 +102,7 @@
           <div class="form-group text-right col-md-12">
             <button type="button" class="btn btn-secondary" @click="data.toggleDetails">{{translate('events.dialog.close')}}</button>
 
-            <button v-if="state.save === 0" type="button" class="btn btn-primary" v-on:click="updateItem(data.item._id)">{{ translate('dialog.buttons.saveChanges.idle') }}</button>
+            <button v-if="state.save === 0" type="button" class="btn btn-primary" v-on:click="updateItem(data.item.videoId)">{{ translate('dialog.buttons.saveChanges.idle') }}</button>
             <button v-if="state.save === 1" disabled="disabled" type="button" class="btn btn-primary"><fa icon="circle-notch" spin></fa> {{ translate('dialog.buttons.saveChanges.progress') }}</button>
             <button v-if="state.save === 2" disabled="disabled" type="button" class="btn btn-success"><fa icon="check"></fa> {{ translate('dialog.buttons.saveChanges.done') }}</button>
             <button v-if="state.save === 3" disabled="disabled" type="button" class="btn btn-danger"><fa icon="exclamation"></fa> {{ translate('dialog.buttons.something-went-wrong') }}</button>
@@ -107,9 +116,8 @@
 <script lang="ts">
 import { getSocket } from 'src/panel/helpers/socket';
 
-import { Vue, Component/*, Watch */ } from 'vue-property-decorator';
-import { isNil } from 'lodash-es';
-import { escape } from 'xregexp';
+import { Vue, Component, Watch } from 'vue-property-decorator';
+import { SongPlaylist } from 'src/bot/database/entity/song';
 
 @Component({
   components: {
@@ -132,11 +140,7 @@ import { escape } from 'xregexp';
 export default class playlist extends Vue {
   socket = getSocket('/systems/songs');
 
-  items: {
-    endTime: number; forceVolume: boolean; lastPlayedAt: number; length_seconds: number;
-    loudness: number; seed: number; startTime: number; title: string; videoID: string;
-    volume: number; _id: string;
-  }[] = [];
+  items: SongPlaylist[] = [];
   search: string = '';
   toAdd: string = '';
   importInfo: string = '';
@@ -156,24 +160,27 @@ export default class playlist extends Vue {
     { key: 'buttons', label: '' },
   ];
 
+  currentPage = 1;
+  perPage = 25;
+  count: number = 0;
+
   get fItems() {
-    if (this.search.length === 0) return this.items
-    return this.items.filter((o) => {
-      const isSearchInTitle = !isNil(o.title.match(new RegExp(escape(this.search), 'ig')))
-      return isSearchInTitle
-    })
+    return this.items
   }
 
   created() {
     this.refreshPlaylist()
   }
 
+  @Watch('currentPage')
+  @Watch('search')
   refreshPlaylist() {
     this.state.loading = this.$state.progress;
-    this.socket.emit('find.playlist', {}, (err, items) => {
+    this.socket.emit('find.playlist', { page: (this.currentPage - 1), search: this.search }, (items, count) => {
+      this.count = count;
       for (let item of items) {
         item.startTime = item.startTime ? item.startTime : 0
-        item.endTime = item.endTime ? item.endTime : item.length_seconds
+        item.endTime = item.endTime ? item.endTime : item.length
       }
       this.items = items
       this.state.loading = this.$state.success;
@@ -207,15 +214,15 @@ export default class playlist extends Vue {
     }, 5000)
   }
 
-  updateItem(_id) {
+  updateItem(videoId) {
     this.state.save = 1
 
-    let item = this.items.find((o) => o._id === _id)
+    let item = this.items.find((o) => o.videoId === videoId)
     if (item) {
       item.volume = Number(item.volume)
       item.startTime = Number(item.startTime)
       item.endTime = Number(item.endTime)
-      this.socket.emit('update', {collection: 'playlist', items: [item]}, (err) => {
+      this.socket.emit('songs::save', item, (err) => {
         if (err) {
           console.error(err)
           return this.state.save = 3
@@ -230,13 +237,13 @@ export default class playlist extends Vue {
 
   deleteItem(id) {
     this.socket.emit('delete.playlist', id, () => {
-      this.items = this.items.filter((o) => o._id !== id)
+      this.items = this.items.filter((o) => o.videoId !== id)
     })
   }
 
   linkTo(item) {
-    console.debug('Clicked', item.videoID);
-    window.location.href = `http://youtu.be/${item.videoID}`;
+    console.debug('Clicked', item.videoId);
+    window.location.href = `http://youtu.be/${item.videoId}`;
   }
 }
 </script>
@@ -246,6 +253,6 @@ export default class playlist extends Vue {
   padding: 0 !important;
 }
 .fitThumbnail {
-  width: 100px;;
+  width: 100px;
 }
 </style>

@@ -8,6 +8,9 @@ import { onChange, onStartup } from '../decorators/on';
 import { info, tip } from '../helpers/log';
 import { triggerInterfaceOnTip } from '../helpers/interface/triggers';
 
+import { getRepository } from 'typeorm';
+import { User, UserTip } from '../database/entity/user';
+
 class Streamlabs extends Integration {
   socket: SocketIOClient.Socket | null = null;
 
@@ -66,31 +69,47 @@ class Streamlabs extends Integration {
     if (eventData.type === 'donation') {
       for (const event of eventData.message) {
         if (!event.isTest) {
-          const id = await global.users.getIdByName(event.from.toLowerCase(), false);
-          if (id) {
-            global.db.engine.insert('users.tips', {
-              id,
-              amount: Number(event.amount),
-              currency: event.currency,
-              _amount: global.currency.exchange(Number(event.amount), event.currency, 'EUR'), // recounting amount to EUR to have simplified ordering
-              _currency: 'EUR', // we are forcing _currency to have simplified ordering
-              message: event.message,
-              timestamp: _.now(),
-            });
+          let user = await getRepository(User).findOne({ where: { username: event.from.toLowerCase() }});
+          let id;
+          if (!user) {
+            id = await global.users.getIdByName(event.from.toLowerCase().toLowerCase());
+            user = await getRepository(User).findOne({ where: { userId: id }});
+            if (!user && id) {
+              // if we still doesn't have user, we create new
+              user = new User();
+              user.userId = Number(id);
+              user.username = event.from.toLowerCase().toLowerCase();
+              user = await getRepository(User).save(user);
+            }
+          } else {
+            id = user.userId;
           }
+
+          const newTip = new UserTip();
+          newTip.amount = Number(event.amount);
+          newTip.currency = event.currency;
+          newTip.sortAmount = global.currency.exchange(Number(event.amount), event.currency, 'EUR');
+          newTip.message = event.message;
+          newTip.tippedAt = Date.now();
+
+          if (user) {
+            user.tips.push(newTip);
+            await getRepository(User).save(user);
+          }
+
           if (global.api.isStreamOnline) {
             global.api.stats.currentTips += parseFloat(global.currency.exchange(event.amount, event.currency, global.currency.mainCurrency));
           }
+          tip(`${event.from.toLowerCase()}${id ? '#' + id : ''}, amount: ${Number(event.amount).toFixed(2)}${event.currency}, message: ${event.message}`);
         }
         global.overlays.eventlist.add({
-          type: 'tip',
+          event: 'tip',
           amount: event.amount,
           currency: event.currency,
           username: event.from.toLowerCase(),
           message: event.message,
           timestamp: Date.now(),
         });
-        tip(`${event.from.toLowerCase()}, amount: ${Number(event.amount).toFixed(2)}${event.currency}, message: ${event.message}`);
         global.events.fire('tip', {
           username: event.from.toLowerCase(),
           amount: parseFloat(event.amount).toFixed(2),

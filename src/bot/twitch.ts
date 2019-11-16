@@ -1,10 +1,12 @@
+import 'module-alias/register';
+
 import moment from 'moment-timezone';
 require('moment-precise-range-plugin');
 
 import { isMainThread } from './cluster';
-import { filter, intersection, isNil, orderBy, size } from 'lodash';
+import { isNil } from 'lodash';
 
-import { getChannel, getTime, prepare, sendMessage } from './commons';
+import { getTime, isIgnored, prepare, sendMessage } from './commons';
 import { command, default_permission, settings } from './decorators';
 import { permission } from './permissions';
 import Core from './_interface';
@@ -12,6 +14,12 @@ import Core from './_interface';
 
 import * as configFile from '@config';
 import { adminEndpoint } from './helpers/socket';
+
+import { getManager, getRepository } from 'typeorm';
+import { EventList } from './database/entity/eventList';
+
+import { User } from './database/entity/user';
+
 const config = configFile as any;
 config.timezone = config.timezone === 'system' || isNil(config.timezone) ? moment.tz.guess() : config.timezone;
 
@@ -51,19 +59,24 @@ class Twitch extends Core {
 
   @command('!followers')
   async followers (opts) {
-    let events = await global.db.engine.find('widgetsEventList');
-    const onlineViewers = await global.users.getAllOnlineUsernames();
-    const followers = (await global.db.engine.find('users', { is: { follower: true } })).map((o) => o.username);
-
-    const onlineFollowers = intersection(onlineViewers, followers);
-    events = filter(orderBy(events, 'timestamp', 'desc'), (o) => {
-      return o.event === 'follow';
-    });
+    const events = await getManager().createQueryBuilder()
+      .select('events').from(EventList, 'events')
+      .orderBy('events.timestamp', 'DESC')
+      .where('events.event = :event', { event: 'follow' })
+      .getMany();
+    const onlineFollowers = (await getRepository(User).createQueryBuilder('user')
+      .where('user.username != :botusername', { botusername: global.oauth.botUsername.toLowerCase() })
+      .andWhere('user.username != :broadcasterusername', { broadcasterusername: global.oauth.broadcasterUsername.toLowerCase() })
+      .andWhere('user.isFollower = :isFollower', { isFollower: true })
+      .andWhere('user.isOnline = :isOnline', { isOnline: true })
+      .getMany())
+      .filter(o => {
+        return !isIgnored({ username: o.username, userId: o.userId });
+      });
     moment.locale(global.general.lang);
 
     let lastFollowAgo = '';
     let lastFollowUsername = 'n/a';
-    const onlineFollowersCount = size(filter(onlineFollowers, (o) => o !== global.oauth.botUsername.toLowerCase() && o !== getChannel())); // except bot and user
     if (events.length > 0) {
       lastFollowUsername = events[0].username;
       lastFollowAgo = moment(events[0].timestamp).fromNow();
@@ -72,26 +85,34 @@ class Twitch extends Core {
     const message = await prepare('followers', {
       lastFollowAgo: lastFollowAgo,
       lastFollowUsername: lastFollowUsername,
-      onlineFollowersCount: onlineFollowersCount,
+      onlineFollowersCount: onlineFollowers.length,
     });
     sendMessage(message, opts.sender);
   }
 
   @command('!subs')
   async subs (opts) {
-    let events = await global.db.engine.find('widgetsEventList');
-    const onlineViewers = await global.users.getAllOnlineUsernames();
-    const subscribers = (await global.db.engine.find('users', { is: { subscriber: true } })).map((o) => o.username);
+    const events = await getManager().createQueryBuilder()
+      .select('events').from(EventList, 'events')
+      .orderBy('events.timestamp', 'DESC')
+      .where('events.event = :event', { event: 'sub' })
+      .orWhere('events.event = :event2', { event2: 'resub' })
+      .orWhere('events.event = :event3', { event3: 'subgift' })
+      .getMany();
 
-    const onlineSubscribers = intersection(onlineViewers, subscribers);
-    events = filter(orderBy(events, 'timestamp', 'desc'), (o) => {
-      return o.event === 'sub' || o.event === 'resub' || o.event === 'subgift';
+    const onlineSubscribers = (await getRepository(User).createQueryBuilder('user')
+      .where('user.username != :botusername', { botusername: global.oauth.botUsername.toLowerCase() })
+      .andWhere('user.username != :broadcasterusername', { broadcasterusername: global.oauth.broadcasterUsername.toLowerCase() })
+      .andWhere('user.isSubscriber = :isSubscriber', { isSubscriber: true })
+      .andWhere('user.isOnline = :isOnline', { isOnline: true })
+      .getMany()).filter(o => {
+      return !isIgnored({ username: o.username, userId: o.userId });
     });
+
     moment.locale(global.general.lang);
 
     let lastSubAgo = '';
     let lastSubUsername = 'n/a';
-    const onlineSubCount = size(filter(onlineSubscribers, (o) => o !== getChannel() && o !== global.oauth.botUsername.toLowerCase())); // except bot and user
     if (events.length > 0) {
       lastSubUsername = events[0].username;
       lastSubAgo = moment(events[0].timestamp).fromNow();
@@ -100,7 +121,7 @@ class Twitch extends Core {
     const message = await prepare('subs', {
       lastSubAgo: lastSubAgo,
       lastSubUsername: lastSubUsername,
-      onlineSubCount: onlineSubCount,
+      onlineSubCount: onlineSubscribers.length,
     });
     sendMessage(message, opts.sender);
   }

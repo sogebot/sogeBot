@@ -29,8 +29,8 @@ jobs:
       run: make eslint
     - name: Run jsonlint
       run: make jsonlint
-  nedb:
-    name: NeDB tests
+  sqlite:
+    name: SQLite tests
     if: contains(github.event.pull_request.body, '[skip-tests]') != true
     needs: eslint
     runs-on: ubuntu-latest
@@ -43,25 +43,29 @@ jobs:
     - name: Install all dependencies
       run: make
     - name: Set proper db to use
-      run: npm run test:config:nedb
+      run: npm run test:config:sqlite
     - name: Run mocha
       run: npm test
-  nedb2:
-    name: NeDB tests
+  sqlite2:
+    name: SQLite tests
     if: contains(github.event.pull_request.body, '[skip-tests]') == true
     runs-on: ubuntu-latest
     steps:
     - name: Skipped OK
       run: 'echo "[skip-tests] found"'
-  mongodb:
-    name: MongoDB tests
+  postgres:
+    name: PostgreSQL tests
     if: contains(github.event.pull_request.body, '[skip-tests]') != true
     needs: eslint
     services:
-      mongodb:
-        image: mongo
+      postgres:
+        image: postgres:11.5
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
+          POSTGRES_DB: sogebot
         ports:
-          - 27017:27017
+          - 5432:5432
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
@@ -72,11 +76,46 @@ jobs:
     - name: Install all dependencies
       run: make
     - name: Set proper db to use
-      run: npm run test:config:mongodb
+      run: npm run test:config:postgres
     - name: Run mocha
       run: npm test
-  mongodb2:
-    name: MongoDB tests
+  postgres2:
+    name: PostgreSQL tests
+    if: contains(github.event.pull_request.body, '[skip-tests]') == true
+    runs-on: ubuntu-latest
+    steps:
+    - name: Skipped OK
+      run: 'echo "[skip-tests] found"'
+  mysql:
+    name: MySQL/MariaDB tests
+    if: contains(github.event.pull_request.body, '[skip-tests]') != true
+    needs: eslint
+    runs-on: ubuntu-latest
+    steps:
+    - name: Shutdown Ubuntu MySQL (SUDO)
+      run: sudo service mysql stop # Shutdown the Default MySQL, "sudo" is necessary, please not remove it
+    - uses: mirromutth/mysql-action@v1.1
+      with:
+        host port: 3306 # Optional, default value is 3306. The port of host
+        container port: 3306 # Optional, default value is 3306. The port of container
+        character set server: 'utf8' # Optional, default value is 'utf8mb4'. The '--character-set-server' option for mysqld
+        collation server: 'utf8_general_ci' # Optional, default value is 'utf8mb4_general_ci'. The '--collation-server' option for mysqld
+        mysql version: '5.7' # Optional, default value is "latest". The version of the MySQL
+        mysql database: 'sogebot' # Optional, default value is "test". The specified database which will be create
+        mysql root password: 'Passw0rd' # Required if "mysql user" is empty, default is empty. The root superuser password
+    - uses: actions/checkout@master
+    - name: install node v13
+      uses: actions/setup-node@v1
+      with:
+        node-version: 12
+    - name: Install all dependencies
+      run: make
+    - name: Set proper db to use
+      run: npm run test:config:mysql
+    - name: Run mocha
+      run: npm test
+  mysql2:
+    name: MySQL/MariaDB tests
     if: contains(github.event.pull_request.body, '[skip-tests]') == true
     runs-on: ubuntu-latest
     steps:

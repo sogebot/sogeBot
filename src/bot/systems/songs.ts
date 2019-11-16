@@ -13,6 +13,8 @@ import System from './_interface';
 import { onChange, onLoad } from '../decorators/on';
 import { error, info } from '../helpers/log';
 import { adminEndpoint, publicEndpoint } from '../helpers/socket';
+import { Brackets, getRepository } from 'typeorm';
+import { SongBan, SongPlaylist, SongRequest } from '../database/entity/song';
 
 const defaultApiKey = 'AIzaSyDYevtuLOxbyqBjh17JNZNvSQO854sngK0';
 
@@ -80,29 +82,48 @@ class Songs extends System {
     if (this.socket === null) {
       return setTimeout(() => this.sockets(), 100);
     }
-    publicEndpoint(this.nsp, 'find.playlist', async (where, cb) => {
-      where = where || {};
-      const playlist = await global.db.engine.find(this.collection.playlist, where);
+    publicEndpoint(this.nsp, 'find.playlist', async (opts: { page?: number; search?: string }, cb) => {
+      opts.page = opts.page ?? 0;
+      const query = getRepository(SongPlaylist).createQueryBuilder('playlist')
+        .offset(opts.page * 25)
+        .limit(25);
+
+      if (typeof opts.search !== 'undefined') {
+        query.andWhere(new Brackets(w => {
+          w.where('"playlist"."videoId" like :like', { like: `%${opts.search}%` });
+          w.orWhere('"playlist"."title" like :like', { like: `%${opts.search}%` });
+        }));
+      }
+
+      const [playlist, count] = await query.getManyAndCount();
       for (const i of playlist) {
         i.volume = await this.getVolume(i);
         i.forceVolume = i.forceVolume || false;
       }
-      cb(null, playlist);
+      cb(playlist, count);
     });
-    adminEndpoint(this.nsp, 'find.ban', async (where, cb) => {
+    adminEndpoint(this.nsp, 'songs::save', async (item: SongPlaylist, cb) => {
+      cb(null, await getRepository(SongPlaylist).save(item));
+    });
+    adminEndpoint(this.nsp, 'songs::getAllBanned', async (where, cb) => {
       where = where || {};
-      cb(null, await global.db.engine.find(this.collection.ban, where));
+      cb(null, await getRepository(SongBan).find(where));
     });
-    publicEndpoint(this.nsp, 'find.request', async (where, cb) => {
+    publicEndpoint(this.nsp, 'songs::getAllRequests', async (where, cb) => {
       where = where || {};
-      cb(null, _.orderBy(await global.db.engine.find(this.collection.request, where)), ['addedAt'], ['asc']);
+      cb(null, await getRepository(SongRequest).find({
+        ...where,
+        order: {
+          addedAt: 'ASC',
+        },
+      }));
     });
-    adminEndpoint(this.nsp, 'delete.playlist', async (_id, cb) => {
-      await global.db.engine.remove(this.collection.playlist, { _id });
+    adminEndpoint(this.nsp, 'delete.playlist', async (videoId, cb) => {
+      await getRepository(SongPlaylist).delete({ videoId });
       cb();
     });
-    adminEndpoint(this.nsp, 'delete.ban', async (_id, cb) => {
-      await global.db.engine.remove(this.collection.ban, { _id });
+    adminEndpoint(this.nsp, 'delete.ban', async (videoId, cb) => {
+      await getRepository(SongBan).delete({ videoId });
       cb();
     });
     adminEndpoint(this.nsp, 'import.ban', async (url, cb) => {
@@ -138,7 +159,7 @@ class Songs extends System {
   }
 
   async getMeanLoudness () {
-    const playlist = await global.db.engine.find(this.collection.playlist);
+    const playlist = await getRepository(SongPlaylist).find();
     if (_.isEmpty(playlist)) {
       this.meanLoudness = -15;
       return -15;
@@ -149,7 +170,7 @@ class Songs extends System {
       if (_.isNil(item.loudness)) {
         loudness = loudness + -15;
       } else {
-        loudness = loudness + parseFloat(item.loudness);
+        loudness = loudness + item.loudness;
       }
     }
     this.meanLoudness = loudness / playlist.length;
@@ -178,8 +199,13 @@ class Songs extends System {
     socket.emit('newVolume', volume);
   }
 
-  setTrim (socket, data) {
-    global.db.engine.update(this.collection.playlist, { videoID: data.id }, { startTime: data.lowValue, endTime: data.highValue });
+  async setTrim (socket, data) {
+    const song = await getRepository(SongPlaylist).findOne({videoId: data.id});
+    if (song) {
+      song.startTime = data.lowValue;
+      song.endTime = data.highValue;
+      await getRepository(SongPlaylist).save(song);
+    }
   }
 
   @command('!bansong')
@@ -194,36 +220,35 @@ class Songs extends System {
       return;
     }
 
-    const update = await global.db.engine.update(this.collection.ban, { videoId: currentSong.videoID }, { videoId: currentSong.videoID, title: currentSong.title });
-    if (update.length > 0) {
-      const message = await prepare('songs.song-was-banned', { name: currentSong.title });
-      sendMessage(message, opts.sender, opts.attr);
+    await getRepository(SongBan).save({ videoId: currentSong.videoID, title: currentSong.title });
+    const message = await prepare('songs.song-was-banned', { name: currentSong.title });
+    sendMessage(message, opts.sender, opts.attr);
 
-      // send timeouts to all users who requested song
-      const request = (await global.db.engine.find(this.collection.request, { videoID: opts.parameters })).map(o => o.username);
-      if (currentSong.videoID === opts.parameters) {
-        request.push(currentSong.username);
-      }
-      for (const user of request) {
-        timeout(user, global.translate('songs.song-was-banned-timeout-message'), 300);
-      }
-
-      await Promise.all([global.db.engine.remove(this.collection.playlist, { videoID: currentSong.videoID }), global.db.engine.remove(this.collection.request, { videoID: currentSong.videoID })]);
-
-      this.getMeanLoudness();
-      this.sendNextSongID();
-      this.refreshPlaylistVolume();
+    // send timeouts to all users who requested song
+    const request = (await getRepository(SongRequest).find({ videoId: opts.parameters })).map(o => o.username);
+    if (currentSong.videoID === opts.parameters) {
+      request.push(currentSong.username);
     }
+    for (const user of request) {
+      timeout(user, global.translate('songs.song-was-banned-timeout-message'), 300);
+    }
+
+    await Promise.all([
+      getRepository(SongPlaylist).delete({ videoId: currentSong.videoID }),
+      getRepository(SongRequest).delete({ videoId: currentSong.videoID }),
+    ]);
+
+    this.getMeanLoudness();
+    this.sendNextSongID();
+    this.refreshPlaylistVolume();
   }
 
   @onChange('calculateVolumeByLoudness')
   async refreshPlaylistVolume () {
-    const playlist = await global.db.engine.find(this.collection.playlist);
+    const playlist = await getRepository(SongPlaylist).find();
     for (const item of playlist) {
-      if (_.isNil(item.loudness)) {
-        await global.db.engine.update(this.collection.playlist, { _id: String(item._id) }, { loudness: -15 });
-      }
       item.volume = await this.getVolume(item);
+      await getRepository(SongPlaylist).save(item);
     }
   }
 
@@ -240,7 +265,7 @@ class Songs extends System {
               sendMessage(global.translate('songs.bannedSong').replace(/\$title/g, videoInfo.title), opts.sender, opts.attr);
 
               // send timeouts to all users who requested song
-              const request = (await global.db.engine.find(this.collection.request, { videoID: opts.parameters })).map(o => o.username);
+              const request = (await getRepository(SongRequest).find({ videoId: opts.parameters })).map(o => o.username);
               const currentSong = JSON.parse(this.currentSong);
               if (currentSong.videoID === opts.parameters) {
                 request.push(currentSong.username);
@@ -250,9 +275,9 @@ class Songs extends System {
               }
 
               await Promise.all([
-                global.db.engine.update(this.collection.ban, { videoId: opts.parameters }, { videoId: opts.parameters, title: videoInfo.title }),
-                global.db.engine.remove(this.collection.playlist, { videoID: opts.parameters }),
-                global.db.engine.remove(this.collection.request, { videoID: opts.parameters }),
+                getRepository(SongBan).save({ videoId: opts.parameters, title: videoInfo.title }),
+                getRepository(SongPlaylist).delete({ videoId: opts.parameters }),
+                getRepository(SongRequest).delete({ videoId: opts.parameters }),
               ]);
             };
             resolve();
@@ -275,8 +300,8 @@ class Songs extends System {
   @command('!unbansong')
   @default_permission(permission.CASTERS)
   async unbanSong (opts) {
-    const removed = await global.db.engine.remove(this.collection.ban, { videoId: opts.parameters });
-    if (removed > 0) {
+    const removed = await getRepository(SongBan).delete({ videoId: opts.parameters });
+    if ((removed.affected || 0) > 0) {
       sendMessage(global.translate('songs.song-was-unbanned'), opts.sender, opts.attr);
     } else {
       sendMessage(global.translate('songs.song-was-not-banned'), opts.sender, opts.attr);
@@ -288,10 +313,13 @@ class Songs extends System {
   async sendNextSongID () {
     // check if there are any requests
     if (this.songrequest) {
-      let sr = await global.db.engine.find(this.collection.request);
-      sr = _.head(_.orderBy(sr, ['addedAt'], ['asc']));
-      if (!_.isNil(sr)) {
-        const currentSong = sr;
+      const sr = await getRepository(SongRequest).findOne({
+        order: {
+          addedAt: 'ASC',
+        },
+      });
+      if (sr) {
+        const currentSong: any = sr;
         currentSong.volume = await this.getVolume(currentSong);
         currentSong.type = 'songrequests';
         this.currentSong = JSON.stringify(currentSong);
@@ -302,21 +330,21 @@ class Songs extends System {
         if (this.socket) {
           this.socket.emit('videoID', currentSong);
         }
-        await global.db.engine.remove(this.collection.request, { videoID: sr.videoID });
+        await getRepository(SongRequest).delete({ videoId: sr.videoId });
         return;
       }
     }
 
     // get song from playlist
     if (this.playlist) {
-      let pl = await global.db.engine.find(this.collection.playlist);
-      if (_.isEmpty(pl)) {
+      const order: any = this.shuffle ? { seed: 'ASC' } : { lastPlayedAt: 'ASC' };
+      const pl = await getRepository(SongPlaylist).findOne({ order });
+      if (!pl) {
         if (this.socket) {
           this.socket.emit('videoID', null); // send null and skip to next empty song
         }
         return; // don't do anything if no songs in playlist
       }
-      pl = _.head(_.orderBy(pl, [(this.shuffle ? 'seed' : 'lastPlayedAt')], ['asc']));
 
       // shuffled song is played again
       if (this.shuffle && pl.seed === 1) {
@@ -325,8 +353,10 @@ class Songs extends System {
         return;
       }
 
-      await global.db.engine.update(this.collection.playlist, { _id: pl._id.toString() }, { seed: 1, lastPlayedAt: new Date().getTime() });
-      const currentSong = pl;
+      pl.seed = 1;
+      pl.lastPlayedAt = Date.now();
+      await getRepository(SongPlaylist).save(pl);
+      const currentSong: any = pl;
       currentSong.volume = await this.getVolume(currentSong);
       currentSong.username = getBot();
       currentSong.type = 'playlist';
@@ -362,11 +392,10 @@ class Songs extends System {
       }
     }
     const message = await prepare(translation, { name: currentSong.title, username: currentSong.username });
-    const userObj = await global.users.getByName(global.oauth.broadcasterUsername);
     sendMessage(message, {
-      username: userObj.username,
-      displayName: userObj.displayName || userObj.username,
-      userId: userObj.id,
+      username: global.oauth.botUsername,
+      displayName: global.oauth.botUsername,
+      userId: Number(global.oauth.botId),
       emotes: [],
       badges: {},
       'message-type': 'chat',
@@ -386,11 +415,10 @@ class Songs extends System {
       return;
     }
     const message = await prepare(translation, { name: currentSong.title, username: currentSong.username });
-    const userObj = await global.users.getByName(global.oauth.broadcasterUsername);
     sendMessage(message, {
-      username: userObj.username,
-      displayName: userObj.displayName || userObj.username,
-      userId: userObj.id,
+      username: global.oauth.botUsername,
+      displayName: global.oauth.botUsername,
+      userId: Number(global.oauth.botId),
       emotes: [],
       badges: {},
       'message-type': 'chat',
@@ -404,11 +432,10 @@ class Songs extends System {
       const currentSong = JSON.parse(this.currentSong);
       this.addSongToPlaylist({ sender: null, parameters: currentSong.videoID });
     } catch (err) {
-      const userObj = await global.users.getByName(global.oauth.broadcasterUsername);
       sendMessage(global.translate('songs.noCurrentSong'), {
-        username: userObj.username,
-        displayName: userObj.displayName || userObj.username,
-        userId: userObj.id,
+        username: global.oauth.botUsername,
+        displayName: global.oauth.botUsername,
+        userId: Number(global.oauth.botId),
         emotes: [],
         badges: {},
         'message-type': 'chat',
@@ -417,20 +444,20 @@ class Songs extends System {
   }
 
   async createRandomSeeds () {
-    const playlist = await global.db.engine.find(this.collection.playlist);
+    const playlist = await getRepository(SongPlaylist).find();
     for (const item of playlist) {
-      global.db.engine.update(this.collection.playlist, { _id: item._id.toString() }, { seed: Math.random() });
+      item.seed = Math.random();
+      await getRepository(SongPlaylist).save(item);
     }
   }
 
   @command('!playlist')
   @default_permission(permission.CASTERS)
   async help () {
-    const userObj = await global.users.getByName(global.oauth.broadcasterUsername);
     sendMessage(global.translate('core.usage') + ': !playlist add <youtubeid> | !playlist remove <youtubeid> | !playlist ban <youtubeid> | !playlist random on/off | !playlist steal', {
-      username: userObj.username,
-      displayName: userObj.displayName || userObj.username,
-      userId: userObj.id,
+      username: global.oauth.botUsername,
+      displayName: global.oauth.botUsername,
+      userId: Number(global.oauth.botId),
       emotes: [],
       badges: {},
       'message-type': 'chat',
@@ -467,8 +494,8 @@ class Songs extends System {
     }
 
     // is song banned?
-    const ban = await global.db.engine.findOne(this.collection.ban, { videoID: videoID });
-    if (!_.isEmpty(ban)) {
+    const ban = await getRepository(SongBan).findOne({ videoId: videoID });
+    if (ban) {
       sendMessage(global.translate('songs.song-is-banned'), opts.sender, opts.attr);
       return;
     }
@@ -492,7 +519,14 @@ class Songs extends System {
       } else if (Number(videoInfo.length_seconds) / 60 > this.duration) {
         sendMessage(global.translate('songs.song-is-too-long'), opts.sender, opts.attr);
       } else {
-        global.db.engine.update(this.collection.request, { addedAt: new Date().getTime() }, { videoID: videoID, title: videoInfo.title, addedAt: new Date().getTime(), loudness: videoInfo.loudness, length_seconds: videoInfo.length_seconds, username: opts.sender.username });
+        getRepository(SongRequest).save({
+          videoId: videoID,
+          title: videoInfo.title,
+          addedAt: Date.now(),
+          loudness: Number(videoInfo.loudness ?? -15),
+          length: Number(videoInfo.length_seconds),
+          username: opts.sender.username,
+        });
         const message = await prepare('songs.song-was-added-to-queue', { name: videoInfo.title });
         sendMessage(message, opts.sender, opts.attr);
         this.getMeanLoudness();
@@ -502,10 +536,12 @@ class Songs extends System {
 
   @command('!wrongsong')
   async removeSongFromQueue (opts) {
-    let sr = await global.db.engine.find(this.collection.request, { username: opts.sender.username });
-    sr = _.head(_.orderBy(sr, ['addedAt'], ['desc']));
-    if (!_.isNil(sr)) {
-      await global.db.engine.remove(this.collection.request, { username: opts.sender.username, _id: sr._id.toString() });
+    const sr = await getRepository(SongRequest).findOne({
+      where: { username: opts.sender.username },
+      order: { addedAt: 'DESC' },
+    });
+    if (sr) {
+      getRepository(SongRequest).remove(sr);
       const m = await prepare('songs.song-was-removed-from-queue', { name: sr.title });
       sendMessage(m, opts.sender, opts.attr);
       this.getMeanLoudness();
@@ -526,8 +562,8 @@ class Songs extends System {
     let imported = 0;
     let done = 0;
 
-    const idsFromDB = (await global.db.engine.find(this.collection.playlist)).map(o => o.videoID);
-    const banFromDb = (await global.db.engine.find(this.collection.ban)).map(o => o.videoID);
+    const idsFromDB = (await getRepository(SongPlaylist).find()).map(o => o.videoId);
+    const banFromDb = (await getRepository(SongBan).find()).map(o => o.videoId);
 
     if (idsFromDB.includes(id)) {
       info(`=> Skipped ${id} - Already in playlist`);
@@ -542,7 +578,17 @@ class Songs extends System {
           return error(`=> Skipped ${id} - ${err.message}`);
         } else if (!_.isNil(videoInfo) && !_.isNil(videoInfo.title)) {
           info(`=> Imported ${id} - ${videoInfo.title}`);
-          global.db.engine.update(this.collection.playlist, { videoID: id }, { videoID: id, title: videoInfo.title, loudness: videoInfo.loudness, length_seconds: videoInfo.length_seconds, lastPlayedAt: new Date().getTime(), seed: 1 });
+          getRepository(SongPlaylist).save({
+            videoId: id,
+            title: videoInfo.title,
+            loudness: Number(videoInfo.loudness ?? -15),
+            length: Number(videoInfo.length_seconds),
+            lastPlayedAt: Date.now(),
+            seed: 1,
+            volume: 20,
+            startTime: 0,
+            endTime: Number(videoInfo.length_seconds),
+          });
           imported++;
         }
       });
@@ -577,9 +623,9 @@ class Songs extends System {
     }
     const videoID = opts.parameters;
 
-    const song = await global.db.engine.findOne(this.collection.playlist, { videoID: videoID });
-    if (!_.isEmpty(song)) {
-      await global.db.engine.remove(this.collection.playlist, { videoID: videoID });
+    const song = await getRepository(SongPlaylist).findOne({ videoId: videoID });
+    if (song) {
+      getRepository(SongPlaylist).delete({ videoId: videoID });
       const message = await prepare('songs.song-was-removed-from-playlist', { name: song.title });
       sendMessage(message, opts.sender, opts.attr);
     } else {
@@ -616,8 +662,8 @@ class Songs extends System {
       let imported = 0;
       let done = 0;
 
-      const idsFromDB = (await global.db.engine.find(this.collection.playlist)).map(o => o.videoID);
-      const banFromDb = (await global.db.engine.find(this.collection.ban)).map(o => o.videoID);
+      const idsFromDB = (await getRepository(SongPlaylist).find()).map(o => o.videoId);
+      const banFromDb = (await getRepository(SongBan).find()).map(o => o.videoId);
 
       for (const id of ids) {
         if (idsFromDB.includes(id)) {
@@ -633,7 +679,17 @@ class Songs extends System {
               return error(`=> Skipped ${id} - ${err.message}`);
             } else if (!_.isNil(videoInfo) && !_.isNil(videoInfo.title)) {
               info(`=> Imported ${id} - ${videoInfo.title}`);
-              global.db.engine.update(this.collection.playlist, { videoID: id }, { videoID: id, title: videoInfo.title, loudness: videoInfo.loudness, length_seconds: videoInfo.length_seconds, lastPlayedAt: new Date().getTime(), seed: 1 });
+              await getRepository(SongPlaylist).save({
+                videoId: id,
+                title: videoInfo.title,
+                loudness: Number(videoInfo.loudness ?? - 15),
+                length: Number(videoInfo.length_seconds),
+                lastPlayedAt: Date.now(),
+                seed: 1,
+                volume: 20,
+                startTime: 0,
+                endTime: Number(videoInfo.length_seconds),
+              });
               imported++;
             }
           });

@@ -6,12 +6,14 @@ import { settings, ui } from '../decorators';
 import { onChange, onStartup } from '../decorators/on';
 import { info, tip } from '../helpers/log';
 import { triggerInterfaceOnTip } from '../helpers/interface/triggers';
+import { getRepository } from 'typeorm';
+import { User, UserTip } from '../database/entity/user';
 
 /* example payload (eventData)
 {
   _id: '5d967959cd89a10ce12818ad',
   channel: '5afbafb0c3a79ebedde18249',
-  type: 'tip',
+  event: 'tip',
   provider: 'twitch',
   createdAt: '2019-10-03T22:42:33.023Z',
   data: {
@@ -97,23 +99,36 @@ class StreamElements extends Integration {
       return;
     }
 
-    const { username } = eventData.data;
+    const { username, amount, currency, message } = eventData.data;
 
-    const id = await global.users.getIdByName(username.toLowerCase(), false);
-    if (id) {
-      global.db.engine.insert('users.tips', { id, amount: eventData.data.amount, message: eventData.data.message, currency: eventData.data.currency, timestamp: Date.now() });
+    let user = await getRepository(User).findOne({ where: { username: username.toLowerCase() }});
+    let id;
+    if (!user) {
+      id = await global.users.getIdByName(username.toLowerCase());
+      user = await getRepository(User).findOne({ where: { userId: id }});
+      if (!user && id) {
+        // if we still doesn't have user, we create new
+        user = new User();
+        user.userId = Number(id);
+        user.username = username.toLowerCase();
+        user = await getRepository(User).save(user);
+      }
+    } else {
+      id = user.userId;
     }
-    if (global.api.isStreamOnline) {
-      global.api.stats.currentTips += parseFloat(global.currency.exchange(eventData.data.amount, eventData.data.currency, global.currency.mainCurrency));
+
+    const newTip = new UserTip();
+    newTip.amount = Number(amount);
+    newTip.currency = currency;
+    newTip.sortAmount = global.currency.exchange(Number(amount), currency, 'EUR');
+    newTip.message = message;
+    newTip.tippedAt = Date.now();
+
+    if (user) {
+      user.tips.push(newTip);
+      await getRepository(User).save(user);
     }
-    global.overlays.eventlist.add({
-      type: 'tip',
-      amount: eventData.data.amount,
-      currency: eventData.data.currency,
-      username: username.toLowerCase(),
-      message: eventData.data.message,
-      timestamp: Date.now(),
-    });
+
     tip(`${username.toLowerCase()}${id ? '#' + id : ''}, amount: ${Number(eventData.data.amount).toFixed(2)}${eventData.data.currency}, message: ${eventData.data.message}`);
     global.events.fire('tip', {
       username: username.toLowerCase(),

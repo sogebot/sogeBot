@@ -28,7 +28,7 @@
     <b-alert show v-else-if="state.loading === 2 && items.length === 0">
       {{translate('systems.price.empty')}}
     </b-alert>
-    <b-table v-else striped small :items="fItems" :fields="fields">
+    <b-table hover v-else striped small :items="fItems" :fields="fields" @row-clicked="linkTo($event)">
       <template v-slot:cell(buttons)="data">
         <div class="text-right">
           <button-with-icon :class="[ data.item.enabled ? 'btn-success' : 'btn-danger' ]" class="btn-only-icon btn-reverse" icon="power-off" @click="data.item.enabled = !data.item.enabled; update(data.item)">
@@ -49,7 +49,7 @@
 
 <script lang="ts">
 import { Vue, Component/*, Watch */ } from 'vue-property-decorator';
-import { isNil, orderBy } from 'lodash-es';
+import { isNil } from 'lodash-es';
 import { getSocket } from 'src/panel/helpers/socket';
 
 @Component({
@@ -93,16 +93,15 @@ export default class priceList extends Vue {
 
   refresh() {
     this.state.loading = this.$state.progress;
-    this.socket.emit('find', {}, (err, items) => {
-      this.items = orderBy(items, 'price', 'asc')
+    this.socket.emit('price::getAll', (items) => {
+      this.items = items;
       console.debug({ items })
       this.state.loading = this.$state.success;
     })
   }
 
   update(item) {
-    delete item._id;
-    this.socket.emit('update', { key: 'id', items: [item] }, (err, data) => {
+    this.socket.emit('price::save', item, (err) => {
       if (err) {
         return console.error(err);
       }
@@ -110,12 +109,16 @@ export default class priceList extends Vue {
   }
 
   del(id) {
-    this.socket.emit('delete', { where: { id }}, (err, deleted) => {
+    this.socket.emit('price::delete', id, (err) => {
       if (err) {
         return console.error(err);
       }
       this.refresh();
     })
+  }
+  linkTo(item) {
+    console.debug('Clicked', item.id);
+    this.$router.push({ name: 'PriceManagerEdit', params: { id: item.id } });
   }
 }
 </script>

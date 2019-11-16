@@ -39,7 +39,7 @@
       </template>
       <template v-slot:cell(buttons)="data">
         <div class="float-right pr-2" style="width: max-content !important;">
-          <hold-button @trigger="deleteItem(data.item._id)" icon="trash" class="btn-danger btn-reverse btn-only-icon">
+          <hold-button @trigger="deleteItem(data.item.videoId)" icon="trash" class="btn-danger btn-reverse btn-only-icon">
             <template slot="title">{{translate('dialog.buttons.delete')}}</template>
             <template slot="onHoldTitle">{{translate('dialog.buttons.hold-to-delete')}}</template>
           </hold-button>
@@ -55,6 +55,7 @@ import { getSocket } from 'src/panel/helpers/socket';
 import { Vue, Component/*, Watch */ } from 'vue-property-decorator';
 import { isNil } from 'lodash-es';
 import { escape } from 'xregexp';
+import { SongBan } from 'src/bot/database/entity/song';
 
 @Component({
   components: {
@@ -65,11 +66,7 @@ import { escape } from 'xregexp';
 export default class playlist extends Vue {
   socket = getSocket('/systems/songs');
 
-  items: {
-    endTime: number; forceVolume: boolean; lastPlayedAt: number; length_seconds: number;
-    loudness: number; seed: number; startTime: number; title: string; videoId: string;
-    volume: number; _id: string;
-  }[] = [];
+  items: SongBan[] = [];
   search: string = '';
   toAdd: string = '';
   importInfo: string = '';
@@ -101,7 +98,7 @@ export default class playlist extends Vue {
 
   refreshBanlist() {
     this.state.loading = this.$state.progress;
-    this.socket.emit('find.ban', {}, (err, items) => {
+    this.socket.emit('songs::getAllBanned', {}, (err, items) => {
       this.items = items
       this.state.loading = this.$state.success;
     })
@@ -113,7 +110,7 @@ export default class playlist extends Vue {
 
   deleteItem(id) {
     this.socket.emit('delete.ban', id, () => {
-      this.items = this.items.filter((o) => o._id !== id)
+      this.items = this.items.filter((o) => o.videoId !== id)
     })
   }
 
@@ -152,6 +149,6 @@ export default class playlist extends Vue {
   padding: 0 !important;
 }
 .fitThumbnail {
-  width: 100px;;
+  width: 100px;
 }
 </style>

@@ -6,6 +6,8 @@ import { command, settings, ui } from '../decorators';
 import { onMessage } from '../decorators/on';
 import System from './_interface';
 import { debug, error } from '../helpers/log';
+import { getRepository } from 'typeorm';
+import { User } from '../database/entity/user';
 
 /*
  * !me
@@ -47,17 +49,16 @@ class UserInfo extends System {
       username = parsed[0].toLowerCase();
     }
 
-    const isFollowerUpdate = await global.api.isFollowerUpdate({
-      id: await global.users.getIdByName(username),
-    });
+    const id = await global.users.getIdByName(username);
+    const isFollowerUpdate = await global.api.isFollowerUpdate(await getRepository(User).findOne({ userId: id }));
     debug('userinfo.followage', JSON.stringify(isFollowerUpdate));
 
-    const user = await global.users.getByName(username);
-    if (_.isNil(user) || _.isNil(user.time) || _.isNil(user.time.follow) || _.isNil(user.is.follower) || !user.is.follower) {
+    const user = await getRepository(User).findOne({ username });
+    if (!user || !user.isFollower || user.followedAt === 0) {
       sendMessage(prepare('followage.' + (opts.sender.username === username.toLowerCase() ? 'successSameUsername' : 'success') + '.never', { username }), opts.sender, opts.attr);
     } else {
       const units: string[] = ['years', 'months', 'days', 'hours', 'minutes'];
-      const diff = dateDiff(new Date(user.time.follow).getTime(), Date.now());
+      const diff = dateDiff(new Date(user.followedAt).getTime(), Date.now());
 
       const output: string[] = [];
       for (const unit of units) {
@@ -88,12 +89,12 @@ class UserInfo extends System {
       username = parsed[0].toLowerCase();
     }
 
-    const user = await global.users.getByName(username);
-    const subCumulativeMonths = _.get(user, 'stats.subCumulativeMonths', undefined);
+    const user = await getRepository(User).findOne({ username });
+    const subCumulativeMonths = user?.subscribeCumulativeMonths;
     const subStreak = _.get(user, 'stats.subStreak', undefined);
     const localePath = 'subage.' + (opts.sender.username === username.toLowerCase() ? 'successSameUsername' : 'success') + '.';
 
-    if (_.isNil(user) || _.isNil(user.time) || _.isNil(user.time.subscribed_at) || _.isNil(user.is.subscriber) || !user.is.subscriber) {
+    if (!user || !user.isSubscriber || user.subscribedAt === 0) {
       sendMessage(prepare(localePath + (subCumulativeMonths ? 'notNow' : 'never'), {
         username,
         subCumulativeMonths,
@@ -101,7 +102,7 @@ class UserInfo extends System {
       }), opts.sender);
     } else {
       const units: string[] = ['years', 'months', 'days', 'hours', 'minutes'];
-      const diff = dateDiff(new Date(user.time.subscribed_at).getTime(), Date.now());
+      const diff = dateDiff(new Date(user.subscribedAt).getTime(), Date.now());
       const output: string[] = [];
       for (const unit of units) {
         if (diff[unit]) {
@@ -135,12 +136,12 @@ class UserInfo extends System {
       username = parsed[0].toLowerCase();
     }
 
-    const user = await global.users.getByName(username);
-    if (_.isNil(user) || _.isNil(user.time) || _.isNil(user.time.created_at)) {
+    const user = await getRepository(User).findOne({ username });
+    if (!user || user.createdAt === 0) {
       sendMessage(prepare('age.failed', { username }), opts.sender, opts.attr);
     } else {
       const units: string[] = ['years', 'months', 'days', 'hours', 'minutes'];
-      const diff = dateDiff(new Date(user.time.created_at).getTime(), Date.now());
+      const diff = dateDiff(new Date(user.createdAt).getTime(), Date.now());
       const output: string[] = [];
       for (const unit of units) {
         if (diff[unit]) {
@@ -166,14 +167,14 @@ class UserInfo extends System {
         throw new Error();
       }
 
-      const user = await global.users.getByName(parsed[0]);
-      if (_.isNil(user) || _.isNil(user.time) || _.isNil(user.time.message)) {
+      const user = await getRepository(User).findOne({ username: parsed[0] });
+      if (!user || user.seenAt === 0) {
         sendMessage(global.translate('lastseen.success.never').replace(/\$username/g, parsed[0]), opts.sender, opts.attr);
       } else {
         moment.locale(global.lib.translate.lang);
         sendMessage(global.translate('lastseen.success.time')
           .replace(/\$username/g, parsed[0])
-          .replace(/\$when/g, moment(user.time.message).format(this.lastSeenFormat)), opts.sender);
+          .replace(/\$when/g, moment(user.seenAt).format(this.lastSeenFormat)), opts.sender);
       }
     } catch (e) {
       sendMessage(global.translate('lastseen.failed.parse'), opts.sender, opts.attr);
@@ -203,6 +204,17 @@ class UserInfo extends System {
   protected async showMe(opts: CommandOptions) {
     try {
       const message: (string | null)[] = [];
+      const user = await getRepository(User).findOne({
+        relations: ['bits', 'tips'],
+        where: {
+          userId: opts.sender.userId,
+        },
+        cache: true,
+      });
+
+      if (!user) {
+        return;
+      }
 
       // build message
       for (const i of this.order) {
@@ -213,7 +225,7 @@ class UserInfo extends System {
 
       if (message.includes('$rank')) {
         const idx = message.indexOf('$rank');
-        const rank = await global.systems.ranks.get(opts.sender.username);
+        const rank = await global.systems.ranks.get(await getRepository(User).findOne({ userId: opts.sender.userId }));
         if (global.systems.ranks.enabled && !_.isNull(rank)) {
           message[idx] = rank;
         } else {
@@ -222,30 +234,27 @@ class UserInfo extends System {
       }
 
       if (message.includes('$watched')) {
-        const watched = await global.users.getWatchedOf(opts.sender.userId);
         const idx = message.indexOf('$watched');
-        message[idx] = (watched / 1000 / 60 / 60).toFixed(1) + 'h';
+        message[idx] = (user.watchedTime / 1000 / 60 / 60).toFixed(1) + 'h';
       }
 
       if (message.includes('$points')) {
         const idx = message.indexOf('$points');
         if (global.systems.points.enabled) {
-          const userPoints = await global.systems.points.getPointsOf(opts.sender.userId);
-          message[idx] = userPoints + ' ' + await global.systems.points.getPointsName(userPoints);
+          message[idx] = user.points + ' ' + await global.systems.points.getPointsName(user.points);
         } else {
           message.splice(idx, 1);
         }
       }
 
       if (message.includes('$messages')) {
-        const msgCount = await global.users.getMessagesOf(opts.sender.userId);
         const idx = message.indexOf('$messages');
-        message[idx] = msgCount + ' ' + getLocalizedName(msgCount, 'core.messages');
+        message[idx] = user.messages + ' ' + getLocalizedName(user.messages, 'core.messages');
       }
 
       if (message.includes('$tips')) {
         const idx = message.indexOf('$tips');
-        const tips = await global.db.engine.find('users.tips', { id: opts.sender.userId });
+        const tips = user.tips;
         const currency = global.currency.mainCurrency;
         let tipAmount = 0;
         for (const t of tips) {
@@ -256,7 +265,7 @@ class UserInfo extends System {
 
       if (message.includes('$bits')) {
         const idx = message.indexOf('$bits');
-        const bits = await global.db.engine.find('users.bits', { id: opts.sender.userId });
+        const bits = user.bits;
         const bitAmount = bits.map(o => Number(o.amount)).reduce((a, b) => a + b, 0);
         message[idx] = `${bitAmount} ${getLocalizedName(bitAmount, 'core.bits')}`;
       }
@@ -279,14 +288,14 @@ class UserInfo extends System {
   }
 
   @onMessage()
-  public onMessage(opts: onEventMessage) {
+  public async onMessage(opts: onEventMessage) {
     if (!_.isNil(opts.sender) && !_.isNil(opts.sender.userId) && !_.isNil(opts.sender.username)) {
-      global.users.setById(opts.sender.userId, {
-        username: opts.sender.username,
-        time: { message: new Date().getTime() },
-        is: { subscriber: typeof opts.sender.badges.subscriber !== 'undefined' },
+      await getRepository(User).update({
+        userId: opts.sender.userId,
+      }, {
+        seenAt: Date.now(),
+        isSubscriber: typeof opts.sender !== 'undefined',
       });
-      global.db.engine.update('users.online', { username: opts.sender.username }, { username: opts.sender.username });
     }
   }
 }

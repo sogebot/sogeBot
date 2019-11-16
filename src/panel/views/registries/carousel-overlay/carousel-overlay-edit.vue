@@ -132,6 +132,7 @@
 <script lang="ts">
 import { Vue, Component, Watch } from 'vue-property-decorator';
 import { getSocket } from 'src/panel/helpers/socket';
+import { Carousel } from 'src/bot/database/entity/carousel';
 
 import { Validations } from 'vuelidate-property-decorators';
 import { required, minValue } from 'vuelidate/lib/validators'
@@ -150,7 +151,7 @@ Component.registerHooks([
 export default class carouselOverlayEdit extends Vue {
   socket = getSocket('/overlays/carousel');
 
-  item: Types.Carousel.Item = {
+  item: Carousel = {
     id: '',
     type: '',
     base64: '',
@@ -215,12 +216,7 @@ export default class carouselOverlayEdit extends Vue {
     if (!this.$v.$invalid) {
       this.state.save = this.$state.progress;
 
-      this.socket.emit('update', { key: 'id', items: [this.item] }, (err, data) => {
-        if (err) {
-          this.state.save = this.$state.fail;
-          return console.error(err);
-        }
-
+      this.socket.emit('carousel::save', this.item, (data) => {
         this.state.save = this.$state.success;
         this.state.pending = false;
         this.$router.push({ name: 'carouselRegistryEdit', params: { id: String(data.id) } })
@@ -232,14 +228,14 @@ export default class carouselOverlayEdit extends Vue {
   }
 
   del() {
-    this.socket.emit('delete.image', this.item.id, () => {
-      this.$router.push({ name: 'cooldownManagerList' })
+    this.socket.emit('carousel::remove', this.item.id, () => {
+      this.$router.push({ name: 'carouselRegistryList' })
     })
   }
 
   created() {
     this.state.loading = this.$state.progress;
-    this.socket.emit('findOne', { where: { id: this.$route.params.id }}, (err, item) => {
+    this.socket.emit('carousel::getOne', this.$route.params.id, (item) => {
       this.item = item;
       this.$nextTick(() => {
         this.state.loading = this.$state.success;

@@ -10,7 +10,10 @@ const message = require('../../general.js').message;
 // users
 const id = _.random(99999, false);
 const channelId = String(_.random(9999999, false));
-const testuser = { username: 'testuser', id };
+const testuser = { username: 'testuser', userId: id };
+
+const { getRepository } = require('typeorm');
+const { User } = require('../../../dest/database/entity/user');
 
 describe('libs/webhooks - follower()', () => {
   before(async () => {
@@ -24,7 +27,7 @@ describe('libs/webhooks - follower()', () => {
   });
 
   it('add testuser (id:' + id + ') to db', async () => {
-    await global.db.engine.insert('users', testuser);
+    await getRepository(User).save(testuser);
   });
 
   it('follow event should not be called', async () => {
@@ -35,9 +38,9 @@ describe('libs/webhooks - follower()', () => {
     for (let i = 0; i < 5; i++) {
       await global.webhooks.follower({
         data: {
-          from_id: id,
+          from_id: String(id),
           from_name: 'testuser',
-          to_id: global.oauth.channelId,
+          to_id: String(global.oauth.channelId),
           to_name: 'channeluser',
         },
       });
@@ -56,9 +59,9 @@ describe('libs/webhooks - follower()', () => {
     for (let i = 0; i < 5; i++) {
       await global.webhooks.follower({
         data: {
-          from_id: 3,
+          from_id: '3',
           from_name: 'testuser',
-          to_id: 2,
+          to_id: '2',
           to_name: 'channeluser',
         },
       });

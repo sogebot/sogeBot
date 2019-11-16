@@ -21,9 +21,6 @@
       "url": "mongodb://localhost:27017/your-db-name"
     }
   },
-  "metrics": {
-    "translations": true
-  },
   "debug": {
     "__COMMENT__": "DON'T ENABLE THIS UNTIL YOU KNOW WHAT YOU ARE DOING!",
     "all": false,

@@ -2,7 +2,10 @@ import Registry from './_interface';
 import { isMainThread } from '../cluster';
 import { generateUsername } from '../helpers/generateUsername';
 import { getLocalizedName } from '../commons';
-import { publicEndpoint } from '../helpers/socket';
+import { adminEndpoint, publicEndpoint } from '../helpers/socket';
+
+import { getRepository, In, IsNull, Not } from 'typeorm';
+import { Alert, AlertCheer, AlertFollow, AlertHost, AlertMedia, AlertRaid, AlertResub, AlertSub, AlertSubgift, AlertTip, EmitData } from '../database/entity/alert';
 
 class Alerts extends Registry {
   constructor() {
@@ -10,7 +13,7 @@ class Alerts extends Registry {
     this.addMenu({ category: 'registry', name: 'alerts', id: 'registry/alerts/list' });
     if (isMainThread) {
       global.panel.getApp().get('/registry/alerts/:mediaid', async (req, res) => {
-        const media: Registry.Alerts.AlertMedia[] = await global.db.engine.find(this.collection.media, { id: req.params.mediaid });
+        const media = await getRepository(AlertMedia).find({ id: req.params.mediaid });
         const b64data = media.sort((a,b) => a.chunkNo - b.chunkNo).map(o => o.b64data).join('');
         if (b64data.trim().length === 0) {
           res.send(404);
@@ -29,36 +32,116 @@ class Alerts extends Registry {
 
   sockets () {
     publicEndpoint(this.nsp, 'isAlertUpdated', async ({updatedAt, id}: { updatedAt: number; id: string }, cb: (isUpdated: boolean, updatedAt: number) => void) => {
-      const alert = await global.db.engine.findOne(this.collection.data, { id });
-      if (typeof alert.id !== 'undefined') {
+      const alert = await getRepository(Alert).findOne({ id });
+      if (alert) {
         cb(updatedAt < (alert.updatedAt || 0), alert.updatedAt || 0);
       } else {
         cb(false, 0);
       }
     });
-    publicEndpoint(this.nsp, 'clear-media', async () => {
-      const alerts: Registry.Alerts.Alert[] = await global.db.engine.find(this.collection.data);
+
+
+    adminEndpoint(this.nsp, 'alerts::deleteMedia', async (id: string, cb) => {
+      cb(
+        await getRepository(AlertMedia).delete({ id })
+      );
+    });
+    adminEndpoint(this.nsp, 'alerts::saveMedia', async (items: AlertMedia, cb) => {
+      try {
+        cb(
+          null,
+          await getRepository(AlertMedia).save(items)
+        );
+      } catch (e) {
+        cb(e, null);
+      }
+    });
+    adminEndpoint(this.nsp, 'alerts::getOneMedia', async (id: string, cb) => {
+      try {
+        cb(
+          null,
+          await getRepository(AlertMedia).find({ id })
+        );
+
+      } catch (e) {
+        cb(null, []);
+      }
+    });
+    adminEndpoint(this.nsp, 'alerts::save', async (item: Alert, cb) => {
+      try {
+        cb(
+          null,
+          await getRepository(Alert).save(item)
+        );
+      } catch (e) {
+        cb(e, null);
+      }
+    });
+    adminEndpoint(this.nsp, 'alerts::getOne', async (id: string, cb) => {
+      cb(
+        await getRepository(Alert).findOne({
+          where: { id },
+          relations: ['cheers', 'follows', 'hosts', 'raids', 'resubs', 'subgifts', 'subs', 'tips'],
+        })
+      );
+    });
+    adminEndpoint(this.nsp, 'alerts::getAll', async (cb) => {
+      cb(
+        await getRepository(Alert).find({
+          relations: ['cheers', 'follows', 'hosts', 'raids', 'resubs', 'subgifts', 'subs', 'tips'],
+        })
+      );
+    });
+    adminEndpoint(this.nsp, 'alerts::delete', async (item: Alert, cb) => {
+      try {
+        await getRepository(Alert).remove(item);
+        await getRepository(AlertFollow).delete({ alertId: IsNull() });
+        await getRepository(AlertSub).delete({ alertId: IsNull() });
+        await getRepository(AlertSubgift).delete({ alertId: IsNull() });
+        await getRepository(AlertHost).delete({ alertId: IsNull() });
+        await getRepository(AlertRaid).delete({ alertId: IsNull() });
+        await getRepository(AlertTip).delete({ alertId: IsNull() });
+        await getRepository(AlertCheer).delete({ alertId: IsNull() });
+        await getRepository(AlertResub).delete({ alertId: IsNull() });
+        cb();
+      } catch (e) {
+        cb(e);
+      }
+    });
+    adminEndpoint(this.nsp, 'clear-media', async () => {
+      const alerts = await getRepository(Alert).find({
+        relations: ['cheers', 'follows', 'hosts', 'raids', 'resubs', 'subgifts', 'subs', 'tips'],
+      });
       const mediaIds: string[] = [];
       for (const alert of alerts) {
-        for (const event of Object.keys(alert.alerts)) {
-          alert.alerts[event].map(o => {
-            mediaIds.push(o.imageId);
-            mediaIds.push(o.soundId);
-          });
+        for (const event of [
+          ...alert.cheers,
+          ...alert.follows,
+          ...alert.hosts,
+          ...alert.raids,
+          ...alert.resubs,
+          ...alert.subgifts,
+          ...alert.subs,
+          ...alert.tips,
+        ]) {
+          mediaIds.push(event.imageId);
+          mediaIds.push(event.soundId);
         }
       }
-      await global.db.engine.remove(this.collection.media, { id: { $nin: mediaIds } });
+      await getRepository(AlertMedia).delete({
+        id: Not(In(mediaIds)),
+      });
     });
-    publicEndpoint(this.nsp, 'test', async (event: keyof Registry.Alerts.List) => {
+    publicEndpoint(this.nsp, 'test', async (event: keyof Omit<Alert, 'id' | 'updatedAt' | 'name' |'alertDelayInMs' | 'profanityFilterType' | 'loadStandardProfanityList' | 'customProfanityList'>) => {
       this.test({ event });
     });
   }
 
-  trigger(opts: Registry.Alerts.EmitData) {
+  trigger(opts: EmitData) {
     global.panel.io.of('/registries/alerts').emit('alert', opts);
   }
 
-  test(opts: { event: keyof Registry.Alerts.List }) {
+  test(opts: { event: keyof Omit<Alert, 'id' | 'updatedAt' | 'name' |'alertDelayInMs' | 'profanityFilterType' | 'loadStandardProfanityList' | 'customProfanityList'> }) {
     const amount = Math.floor(Math.random() * 1000);
     const messages = [
       'Lorem ipsum dolor sit amet, https://www.google.com',
@@ -68,7 +151,7 @@ class Alerts extends Registry {
       'Lorem ipsum dolor sit amet',
       '',*/
     ];
-    const data: Registry.Alerts.EmitData = {
+    const data: EmitData = {
       name: generateUsername(),
       amount,
       currency: global.currency.mainCurrency,

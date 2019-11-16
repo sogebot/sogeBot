@@ -5,8 +5,12 @@ const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 const assert = require('assert');
 
+const { getRepository } = require('typeorm');
+const { Keyword } = require('../../../dest/database/entity/keyword');
+const { User } = require('../../../dest/database/entity/user');
+
 // users
-const owner = { username: 'soge__', userId: Math.random() };
+const owner = { username: 'soge__', userId: Math.floor(Math.random() * 100000) };
 
 const keywords = [
   { keyword: 'slqca', response: 'hptqm', enabled: Math.random() >= 0.5 },
@@ -26,7 +30,7 @@ describe('Keywords - listing', () => {
     before(async () => {
       await db.cleanup();
       await message.prepare();
-      await global.db.engine.insert('users', { username: owner.username, id: owner.userId });
+      await getRepository(User).save({ username: owner.username, userId: owner.userId });
     });
 
     it('Expecting empty list', async () => {
@@ -46,7 +50,7 @@ describe('Keywords - listing', () => {
         const keyword = await global.systems.keywords.add({ sender: owner, parameters: `-k ${k.keyword} -r ${k.response}` });
         k.id = keyword.id;
         assert.notStrictEqual(k, null);
-        await global.db.engine.update(global.systems.keywords.collection.data, { id: keyword.id }, { enabled: k.enabled });
+        await getRepository(Keyword).update({ id: keyword.id }, { enabled: k.enabled });
       });
     }
 

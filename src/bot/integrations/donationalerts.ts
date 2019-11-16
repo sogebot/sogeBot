@@ -10,6 +10,9 @@ import { ui } from '../decorators.js';
 import { info, tip } from '../helpers/log.js';
 import { triggerInterfaceOnTip } from '../helpers/interface/triggers.js';
 
+import { getRepository } from 'typeorm';
+import { User, UserTip } from '../database/entity/user';
+
 class Donationalerts extends Integration {
   socket: SocketIOClient.Socket | null = null;
 
@@ -81,7 +84,7 @@ class Donationalerts extends Integration {
         }
         const additionalData = JSON.parse(data.additional_data);
         global.overlays.eventlist.add({
-          type: 'tip',
+          event: 'tip',
           amount: data.amount,
           currency: data.currency,
           username: data.username.toLowerCase(),
@@ -91,7 +94,6 @@ class Donationalerts extends Integration {
           timestamp: Date.now(),
         });
 
-        tip(`${data.username.toLowerCase()}, amount: ${Number(data.amount).toFixed(2)}${data.currency}, message: ${data.message}`);
         global.events.fire('tip', {
           username: data.username.toLowerCase(),
           amount: parseFloat(data.amount).toFixed(2),
@@ -111,18 +113,36 @@ class Donationalerts extends Integration {
         });
 
         if (!data._is_test_alert) {
-          const id = await global.users.getIdByName(data.username.toLowerCase(), false);
-          if (id) {
-            global.db.engine.insert('users.tips', {
-              id,
-              amount: Number(data.amount),
-              currency: data.currency,
-              _amount: global.currency.exchange(Number(data.amount), data.currency, 'EUR'), // recounting amount to EUR to have simplified ordering
-              _currency: 'EUR', // we are forcing _currency to have simplified ordering
-              message: data.message,
-              timestamp: _.now(),
-            });
+          let user = await getRepository(User).findOne({ where: { username: data.username.toLowerCase() }});
+          let id;
+          if (!user) {
+            id = await global.users.getIdByName(data.username.toLowerCase());
+            user = await getRepository(User).findOne({ where: { userId: id }});
+            if (!user && id) {
+              // if we still doesn't have user, we create new
+              user = new User();
+              user.userId = Number(id);
+              user.username = data.username.toLowerCase();
+              user = await getRepository(User).save(user);
+            }
+          } else {
+            id = user.userId;
           }
+
+          const newTip = new UserTip();
+          newTip.amount = Number(data.amount);
+          newTip.currency = data.currency;
+          newTip.sortAmount = global.currency.exchange(Number(data.amount), data.currency, 'EUR');
+          newTip.message = data.message;
+          newTip.tippedAt = Date.now();
+
+          if (user) {
+            user.tips.push(newTip);
+            await getRepository(User).save(user);
+          }
+
+          tip(`${data.username.toLowerCase()}${id ? '#' + id : ''}, amount: ${Number(data.amount).toFixed(2)}${data.currency}, message: ${data.message}`);
+
           if (global.api.isStreamOnline) {
             global.api.stats.currentTips += parseFloat(global.currency.exchange(data.amount, data.currency, global.currency.mainCurrency));
           }

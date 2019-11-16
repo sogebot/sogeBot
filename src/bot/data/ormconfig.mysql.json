@@ -1,0 +1,27 @@
+{
+  "type": "mysql",
+  "host": "localhost",
+  "port": "3306",
+  "username": "root",
+  "password": "Passw0rd",
+  "database": "sogebot",
+  "logging": ["error"],
+  "cache": true,
+  "charset": "UTF8_GENERAL_CI",
+  "synchronize": false,
+  "migrationsRun": true,
+  "entities": [
+    "dest/database/entity/*.js"
+  ],
+  "migrations": [
+    "dest/database/migration/mysql/*.js"
+  ],
+  "subscribers": [
+    "dest/database/subscriber/*.js"
+  ],
+  "cli": {
+    "entitiesDir": "src/bot/database/entity",
+    "migrationsDir": "src/bot/database/migration/mysql",
+    "subscribersDir": "src/bot/database/entity"
+  }
+}

@@ -34,13 +34,13 @@
       {{ translate('change-title') }} <small>{{ translate('for') }} {{ currentGame }}</small>
     </h5>
     <div v-for="(title, index) of titles" :key="index">
-      <b-input-group @mousedown="selectedTitle = typeof title._id === 'undefined' ? (index === 0 ? 'current' : 'new') : title._id">
+      <b-input-group @mousedown="selectedTitle = typeof title.id === 'undefined' ? (index === 0 ? 'current' : 'new') : title.id">
         <b-input-group-prepend is-text>
-          <b-form-radio plain v-model="selectedTitle" name="selectedTitle" :value="typeof title._id === 'undefined' ? (index === 0 ? 'current' : 'new') : title._id"></b-form-radio>
+          <b-form-radio plain v-model="selectedTitle" name="selectedTitle" :value="typeof title.id === 'undefined' ? (index === 0 ? 'current' : 'new') : title.id"></b-form-radio>
         </b-input-group-prepend>
-        <b-form-input :placeholder="['current', 'new'].includes(title._id) ? translate('create-and-use-a-new-title') : ''" v-if="title._id === 'new'" v-model="newTitle"></b-form-input>
-        <b-form-input :placeholder="['current', 'new'].includes(title._id) ? translate('create-and-use-a-new-title') : ''" v-else v-model="title.title" :disabled="typeof title._id === 'undefined' && index === 0"></b-form-input>
-        <button slot="append" v-if="!['current', 'new'].includes(title._id) && index !== 0" class="btn btn-danger" @click="deleteTitle(title._id)">
+        <b-form-input :placeholder="['current', 'new'].includes(title.id) ? translate('create-and-use-a-new-title') : ''" v-if="title.id === 'new'" v-model="newTitle"></b-form-input>
+        <b-form-input :placeholder="['current', 'new'].includes(title.id) ? translate('create-and-use-a-new-title') : ''" v-else v-model="title.title" :disabled="typeof title.id === 'undefined' && index === 0"></b-form-input>
+        <button slot="append" v-if="!['current', 'new'].includes(title.id) && index !== 0" class="btn btn-danger" @click="deleteTitle(title.id)">
           <font-awesome-icon icon="trash"/>
         </button>
       </b-input-group>
@@ -106,7 +106,7 @@
         data: {
           game: string,
           title: string,
-          _id: string,
+          id: string,
         }[],
         currentGame: null | string,
         currentTitle: string,
@@ -120,8 +120,12 @@
         draggingGame: string | null,
         draggingEnter: number,
         draggingTimestamp: number,
-        currentTags: any[],
-        cachedTags: any[],
+        currentTags: string[],
+        cachedTags: {
+          tag_id: string;
+          locale: string;
+          value: string;
+        }[],
 
         saveState: -1 | 0 | 1 | 2;
         show: boolean;
@@ -161,7 +165,7 @@
     },
     methods: {
       deleteTitle(id) {
-        this.data = this.data.filter(o => o._id !== id);
+        this.data = this.data.filter(o => o.id !== id);
         this.selectedTitle = 'current';
       },
       init() {
@@ -183,7 +187,7 @@
         } else if (this.selectedTitle === 'new') {
           title = this.newTitle
         } else {
-          title = (this.data.find(o => String(o._id) === this.selectedTitle) || { title: '' }).title
+          title = (this.data.find(o => o.id === this.selectedTitle) || { title: '' }).title
         }
         console.debug('EMIT [updateGameAndTitle]', {
           game: this.currentGame,
@@ -242,20 +246,20 @@
         }
       },
       searchForTags(value) {
-        this.searchForTagsOpts = this.cachedTags.map(o => {
-          const localization = Object.keys(o.localization_names).find(p => p.includes(this.configuration.lang))
-          return o.localization_names[localization || 'en-us']
-        }).filter(o => {
-          return o.toLowerCase().includes(value) && !this.currentTags.includes(o)
-        }).sort((a, b) => {
-          if ((a || { name: ''}).name < (b || { name: ''}).name)  { //sort string ascending
-            return -1;
-          }
-          if ((a || { name: ''}).name > (b || { name: ''}).name) {
-            return 1;
-          }
-          return 0; //default return value (no sorting)
-        });
+        this.searchForTagsOpts = Array.from(new Set(this.cachedTags
+          .map(o => o.value)
+          .filter(o => {
+            return o && o.toLowerCase().includes(value) && !this.currentTags.includes(o)
+          }).sort((a, b) => {
+            if (a < b)  { //sort string ascending
+              return -1;
+            }
+            if (a > b) {
+              return 1;
+            }
+            return 0; //default return value (no sorting)
+          })
+        ));
       }
     },
     computed: {
@@ -264,7 +268,7 @@
         return [
           { game: (this as any).currentGame, title: (this as any).currentTitle },
           ...(this as any).data.filter(o => o.game === (this as any).currentGame),
-          { game: (this as any).currentGame, title: '', _id: 'new' }
+          { game: (this as any).currentGame, title: '', id: 'new' }
           ]
       },
       games() {
@@ -314,10 +318,9 @@
         if (!this.currentGame) {
           this.currentGame = data.game;
           this.currentTitle = data.status;
-          this.currentTags = data.tags.filter(o => !o.is_auto).map(o => {
-            const localization = Object.keys(o.localization_names).find(p => p.includes(this.configuration.lang))
-            return o.localization_names[localization || 'en-us']
-          });
+          this.currentTags = data.tags.filter(o => o.is_current === 1 && o.is_auto === 0).map(o => {
+            return o.value;
+          })
         }
       });
 

@@ -5,7 +5,7 @@ import moment from 'moment';
 require('moment-precise-range-plugin'); // moment.preciseDiff
 import { isMainThread } from './cluster';
 import chalk from 'chalk';
-import { defaults, filter, get, isEmpty, isNil, isNull, map } from 'lodash';
+import { defaults, filter, get, isNil, isNull, map } from 'lodash';
 
 import * as constants from './constants';
 import Core from './_interface';
@@ -15,6 +15,12 @@ import { getBroadcaster, isBot, isBroadcaster, isIgnored, sendMessage } from './
 import { triggerInterfaceOnFollow } from './helpers/interface/triggers';
 import { shared } from './decorators';
 import { getChannelChattersUnofficialAPI } from './microservices/getChannelChattersUnofficialAPI';
+import { ThreadEvent } from './database/entity/threadEvent';
+
+import { getManager, getRepository, IsNull, Not } from 'typeorm';
+import { User } from './database/entity/user';
+import { TwitchClips, TwitchTag, TwitchTagLocalizationDescription, TwitchTagLocalizationName } from './database/entity/twitch';
+import { CacheGames } from './database/entity/cacheGames';
 
 const setImmediateAwait = () => {
   return new Promise(resolve => {
@@ -131,10 +137,15 @@ class API extends Core {
       this.interval('checkClips', constants.MINUTE);
       this.interval('getAllStreamTags', constants.HOUR * 12);
 
-      // free thread_event
-      global.db.engine.remove('thread_event', {
-        event: 'getChannelChattersUnofficialAPI',
-      });
+      setTimeout(() => {
+        // free thread_event
+        getManager()
+          .createQueryBuilder()
+          .delete()
+          .from(ThreadEvent)
+          .where('event = :event', { event: 'getChannelChattersUnofficialAPI' })
+          .execute();
+      }, 30000);
     } else {
       this.calls = {
         bot: {
@@ -196,17 +207,21 @@ class API extends Core {
     }
 
     for (const username of this.rate_limit_follower_check) {
-      const user = await global.users.getByName(username);
-      const isSkipped = user.username === getBroadcaster() || user.username === global.oauth.botUsername;
-      const userHaveId = !isNil(user.id);
-      if (new Date().getTime() - get(user, 'time.followCheck', 0) <= 1000 * 60 * 60 * 24 || isSkipped || !userHaveId) {
-        this.rate_limit_follower_check.delete(user.username);
+      const user = await getRepository(User).findOne({ username });
+      if (user) {
+        const isSkipped = user.username === getBroadcaster() || user.username === global.oauth.botUsername;
+        const userHaveId = !isNil(user.userId);
+        if (new Date().getTime() - get(user, 'time.followCheck', 0) <= 1000 * 60 * 60 * 24 || isSkipped || !userHaveId) {
+          this.rate_limit_follower_check.delete(user.username);
+        }
       }
     }
     if (this.rate_limit_follower_check.size > 0 && !isNil(global.overlays)) {
-      const user = await global.users.getByName(Array.from(this.rate_limit_follower_check)[0]);
-      this.rate_limit_follower_check.delete(user.username);
-      await this.isFollowerUpdate(user);
+      const user = await getRepository(User).findOne({ username: Array.from(this.rate_limit_follower_check)[0] });
+      if (user) {
+        this.rate_limit_follower_check.delete(user.username);
+        await this.isFollowerUpdate(user);
+      }
     }
     return { state: true };
   }
@@ -337,13 +352,17 @@ class API extends Core {
       throw new Error('API can run only on master');
     }
 
-    const event = await global.db.engine.find('thread_event', {
-      event: 'getChannelChattersUnofficialAPI',
-    });
-    if (event.length === 0) {
+    const event = await getManager()
+      .createQueryBuilder()
+      .select('thread')
+      .from(ThreadEvent, 'thread')
+      .where('event = :event', { event: 'getChannelChattersUnofficialAPI' })
+      .getOne();
+
+    if (typeof event === 'undefined') {
       const { modStatus, partedUsers, joinedUsers } = await getChannelChattersUnofficialAPI();
 
-      global.widgets.joinpart.send({ users: partedUsers, type: 'part' });
+      global.widgets?.joinpart?.send({ users: partedUsers, type: 'part' });
       for (const username of partedUsers) {
         if (!isIgnored({ username: username })) {
           await setImmediateAwait();
@@ -351,10 +370,10 @@ class API extends Core {
         }
       }
 
-      global.widgets.joinpart.send({ users: joinedUsers, type: 'join' });
+      global.widgets?.joinpart?.send({ users: joinedUsers, type: 'join' });
       for (const username of joinedUsers) {
         if (isIgnored({ username }) || global.oauth.botUsername === username) {
-          await global.db.engine.remove('users.online', { username });
+          continue;
         } else {
           await setImmediateAwait();
           this.isFollower(username);
@@ -381,7 +400,7 @@ class API extends Core {
     const notEnoughAPICalls = this.calls.bot.remaining <= 30 && this.calls.bot.refresh > Date.now() / 1000;
 
     if (needToWait || notEnoughAPICalls) {
-      delete opts.count;
+      delete opts.cursor;
       return { state: false, opts };
     }
 
@@ -395,8 +414,26 @@ class API extends Core {
       const tags = request.data.data;
 
       for(const tag of tags) {
-        await global.db.engine.update('core.api.tags', { tag_id: tag.tag_id }, tag);
+        await getRepository(TwitchTag).save({
+          ...new TwitchTag(),
+          tag_id: tag.tag_id,
+          is_auto: tag.is_auto,
+          localization_names: Object.keys(tag.localization_names).map(key => {
+            return {
+              locale: key,
+              value: tag.localization_names[key],
+            };
+          }),
+          localization_descriptions: Object.keys(tag.localization_descriptions).map(key => {
+            return {
+              locale: key,
+              value: tag.localization_descriptions[key],
+            };
+          }),
+        });
       }
+      await getRepository(TwitchTagLocalizationDescription).delete({ tagId: IsNull() });
+      await getRepository(TwitchTagLocalizationName).delete({ tagId: IsNull() });
 
       if (global.panel && global.panel.io) {
         global.panel.io.emit('api.stats', { data: tags, timestamp: Date.now(), call: 'getAllStreamTags', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining });
@@ -409,7 +446,7 @@ class API extends Core {
 
       if (tags.length === 100) {
         // move to next page
-        this.getAllStreamTags({ cursor: request.data.pagination.cursor });
+        return this.getAllStreamTags({ cursor: request.data.pagination.cursor });
       }
     } catch (e) {
       error(`${url} - ${e.message}`);
@@ -417,7 +454,7 @@ class API extends Core {
         global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'getChannelSubscribers', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot.remaining });
       }
     }
-    delete opts.count;
+    delete opts.cursor;
     return { state: true, opts };
 
   }
@@ -479,7 +516,7 @@ class API extends Core {
 
       if (subscribers.length === 100) {
         // move to next page
-        this.getChannelSubscribers({ cursor: request.data.pagination.cursor, count: subscribers.length + opts.count, subscribers });
+        return this.getChannelSubscribers({ cursor: request.data.pagination.cursor, count: subscribers.length + opts.count, subscribers });
       } else {
         this.stats.currentSubscribers = subscribers.length + opts.count;
         this.setSubscribers(opts.subscribers.filter(o => !isBroadcaster(o.user_name) && !isBot(o.user_name)));
@@ -505,31 +542,34 @@ class API extends Core {
   }
 
   async setSubscribers (subscribers) {
-    const currentSubscribers = await global.db.engine.find('users', { is: { subscriber: true } });
+    const currentSubscribers = await getRepository(User).find({
+      where: {
+        isSubscriber: true,
+      },
+    });
 
     // check if current subscribers are still subs
     for (const user of currentSubscribers) {
-      if (typeof user.lock === 'undefined' || (typeof user.lock !== 'undefined' && !user.lock.subscriber)) {
-        if (!subscribers
-          .map((o) => String(o.user_id))
-          .includes(String(user.id))) {
-          // subscriber is not sub anymore -> unsub and set subStreak to 0
-          await global.db.engine.update('users', { id: user.id }, {  is: { subscriber: false }, stats: { subStreak: 0 } });
-        }
+      if (!user.haveSubscriberLock && !subscribers
+        .map((o) => String(o.user_id))
+        .includes(String(user.userId))) {
+        // subscriber is not sub anymore -> unsub and set subStreak to 0
+        user.isSubscriber = false;
+        user.subscribeStreak = 0;
+        await getRepository(User).save(user);
       }
     }
 
     // update subscribers tier and set them active
     for (const user of subscribers) {
-      await global.db.engine.update('users', { id: user.user_id }, { username: user.user_name.toLowerCase(), is: { subscriber: true }, stats: { tier: user.tier / 1000 } });
-    }
-
-    // update all subscribed_at
-    const subscribersAfter = await global.db.engine.find('users', { is: { subscriber: true } });
-    for (const user of subscribersAfter) {
-      if (typeof user.time !== 'undefined' && typeof user.time.subscribed_at !== 'undefined') {
-        await global.db.engine.update('users', { _id: String(user._id) }, { time: { subscribed_at: new Date(user.time.subscribed_at).getTime() }});
-      }
+      await getRepository(User).update({
+        userId: user.user_id,
+      },
+      {
+        username: user.user_name.toLowerCase(),
+        isSubscriber: true,
+        subscribeTier: String(user.tier / 1000),
+      });
     }
   }
 
@@ -724,22 +764,27 @@ class API extends Core {
           await setImmediateAwait(); // throttle down
 
           f.from_name = String(f.from_name).toLowerCase();
-          const user = await global.users.getById(f.from_id);
-          user.username = f.from_name;
-          global.db.engine.update('users', { id: f.from_id }, { username: f.from_name });
+          f.from_id = Number(f.from_id);
+          let user = await getRepository(User).findOne({ userId: f.from_id });
+          if (!user) {
+            user = new User();
+            user.userId = Number(f.from_id);
+            user.username = f.from_name;
+            user = await getRepository(User).save(user);
+          }
 
-          if (!get(user, 'is.follower', false)) {
+          if (!user.isFollower) {
             if (new Date().getTime() - new Date(f.followed_at).getTime() < 2 * constants.HOUR) {
-              if ((get(user, 'time.follow', 0) === 0 || new Date().getTime() - get(user, 'time.follow', 0) > 60000 * 60) && !global.webhooks.existsInCache('follow', user.id)) {
+              if (user.followedAt === 0 || new Date().getTime() - user.followedAt > 60000 * 60 && !global.webhooks.existsInCache('follow', user.userId)) {
                 global.webhooks.addIdToCache('follow', f.from_id);
                 global.overlays.eventlist.add({
-                  type: 'follow',
+                  event: 'follow',
                   username: user.username,
                   timestamp: Date.now(),
                 });
                 if (!quiet && !isBot(user.username)) {
                   follow(user.username);
-                  global.events.fire('follow', { username: user.username });
+                  global.events.fire('follow', { username: user.username, userId: f.from_id });
                   global.registries.alerts.trigger({
                     event: 'follows',
                     name: user.username,
@@ -759,9 +804,10 @@ class API extends Core {
             }
           }
           try {
-            const followedAt = user.lock && user.lock.followed_at ? Number(user.time.follow) : new Date(f.followed_at).getTime();
-            const isFollower = user.lock && user.lock.follower ? user.is.follower : true;
-            global.db.engine.update('users', { id: f.from_id }, { username: f.from_name, is: { follower: isFollower }, time: { followCheck: new Date().getTime(), follow: followedAt } });
+            user.followedAt = user.haveFollowedAtLock ? user.followedAt : new Date(f.followed_at).getTime();
+            user.isFollower = user.haveFollowerLock? user.isFollower : true;
+            user.followCheckAt = Date.now();
+            await getRepository(User).save(user);
           } catch (e) {
             error(e.stack);
           }
@@ -793,10 +839,10 @@ class API extends Core {
       return '';
     } // return empty game if gid is empty
 
-    const gameFromDb = await global.db.engine.findOne('core.api.games', { id });
+    const gameFromDb = await getRepository(CacheGames).findOne({ id });
 
     // check if id is cached
-    if (!isEmpty(gameFromDb)) {
+    if (gameFromDb) {
       return gameFromDb.name;
     }
 
@@ -824,7 +870,7 @@ class API extends Core {
 
       // add id->game to cache
       const name = request.data.data[0].name;
-      await global.db.engine.insert('core.api.games', { id, name });
+      await getRepository(CacheGames).save({ id, name });
       return name;
     } catch (e) {
       if (typeof e.response !== 'undefined' && e.response.status === 429) {
@@ -877,9 +923,9 @@ class API extends Core {
 
       if (request.status === 200 && !isNil(request.data.data[0])) {
         const tags = request.data.data;
-        await global.db.engine.remove('core.api.currentTags', {});
+        await getRepository(TwitchTag).update({}, { is_current: false });
         for (const tag of tags) {
-          await global.db.engine.update('core.api.currentTags', { tag_id: tag.tag_id }, tag);
+          await getRepository(TwitchTag).update({ tag_id: tag.tag_id }, { is_current: true });
         }
       }
     } catch (e) {
@@ -1146,30 +1192,33 @@ class API extends Core {
     }
 
     try {
-      const tags = (await global.db.engine.find('core.api.tags'))
-        .filter(o => {
-          const localization = Object.keys(o.localization_names).find(p => p.includes(global.general.lang));
-          return tagsArg.includes(o.localization_names[localization || '']);
+      const tag_ids: string[] = [];
+      for (const tag of tagsArg) {
+        const name = await getRepository(TwitchTagLocalizationName).findOne({
+          where: {
+            value: tag,
+            tagId: Not(IsNull()),
+          },
         });
+        if (name && name.tagId) {
+          tag_ids.push(name.tagId);
+        }
+      }
+
       const request = await axios({
         method: 'put',
         url,
         data: {
-          tag_ids: tags.map(o => {
-            return o.tag_id;
-          }),
+          tag_ids,
         },
         headers: {
           'Authorization': 'Bearer ' + token,
           'Content-Type': 'application/json',
         },
       });
-      await global.db.engine.remove('core.api.currentTags', { is_auto: false });
-      if (tags.length > 0) {
-        await global.db.engine.insert('core.api.currentTags', tags.map(o => {
-          delete o._id;
-          return o;
-        }));
+      await getRepository(TwitchTag).update({ is_auto: false }, { is_current: false });
+      for (const tag_id of tag_ids) {
+        await getRepository(TwitchTag).update({ tag_id }, { is_current: true });
       }
       if (global.panel && global.panel.io) {
         global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'setTags', api: 'helix', endpoint: url, code: request.status, data: request.data });
@@ -1326,11 +1375,11 @@ class API extends Core {
       return { state: false };
     }
 
-    let notCheckedClips = (await global.db.engine.find('api.clips', { isChecked: false }));
+    let notCheckedClips = (await getRepository(TwitchClips).find({ isChecked: false }));
 
     // remove clips which failed
     for (const clip of filter(notCheckedClips, (o) => new Date(o.shouldBeCheckedAt).getTime() < new Date().getTime())) {
-      await global.db.engine.remove('api.clips', { _id: String(clip._id) });
+      await getRepository(TwitchClips).remove(clip);
     }
     notCheckedClips = filter(notCheckedClips, (o) => new Date(o.shouldBeCheckedAt).getTime() >= new Date().getTime());
     const url = `https://api.twitch.tv/helix/clips?id=${notCheckedClips.map((o) => o.clipId).join(',')}`;
@@ -1363,7 +1412,7 @@ class API extends Core {
 
       for (const clip of request.data.data) {
         // clip found in twitch api
-        await global.db.engine.update('api.clips', { clipId: clip.id }, { isChecked: true });
+        await getRepository(TwitchClips).update({ clipId: clip.id }, { isChecked: true });
       }
     } catch (e) {
       if (typeof e.response !== 'undefined' && e.response.status === 429) {
@@ -1390,8 +1439,8 @@ class API extends Core {
 
     const isClipChecked = async function (id) {
       const check = async (resolve, reject) => {
-        const clip = await global.db.engine.findOne('api.clips', { clipId: id });
-        if (isEmpty(clip)) {
+        const clip = await getRepository(TwitchClips).findOne({ clipId: id });
+        if (!clip) {
           resolve(false);
         } else if (clip.isChecked) {
           resolve(true);
@@ -1447,8 +1496,7 @@ class API extends Core {
       return;
     }
     const clipId = request.data.data[0].id;
-    const timestamp = new Date();
-    await global.db.engine.insert('api.clips', { clipId: clipId, isChecked: false, shouldBeCheckedAt: new Date(timestamp.getTime() + 120 * 1000) });
+    await getRepository(TwitchClips).save({ clipId: clipId, isChecked: false, shouldBeCheckedAt: Date.now() + 120 * 1000 });
     return (await isClipChecked(clipId)) ? clipId : null;
   }
 
@@ -1494,21 +1542,24 @@ class API extends Core {
       }
       return;
     }
-    await global.db.engine.update('users', { id }, { username: username, time: { created_at: new Date(request.data.created_at).getTime() } });
+    await getRepository(User).update({ userId: id }, { createdAt: new Date(request.data.created_at).getTime() });
   }
 
   async isFollower (username) {
     this.rate_limit_follower_check.add(username);
   }
 
-  async isFollowerUpdate (user) {
-    if (!user.id && !user.userId) {
+  async isFollowerUpdate (user: User | undefined) {
+    if (!user || !user.userId) {
       return;
     }
-    const id = user.id || user.userId;
+    const id = user.userId;
 
     // reload user from db
-    user = await global.users.getById(id);
+    user = {
+      ...user,
+      ...await getRepository(User).findOne({ userId: id }),
+    };
 
     clearTimeout(this.timeouts['isFollowerUpdate-' + id]);
 
@@ -1555,24 +1606,26 @@ class API extends Core {
     if (request.data.total === 0) {
       // not a follower
       // if was follower, fire unfollow event
-      if (user.is.follower) {
+      if (user.isFollower) {
         unfollow(user.username);
         global.events.fire('unfollow', { username: user.username });
       }
-      const followedAt = user.lock && user.lock.followed_at ? Number(user.time.follow) : 0;
-      const isFollower = user.lock && user.lock.follower ? user.is.follower : false;
-      await global.users.setById(id, { username: user.username, is: { follower: isFollower }, time: { followCheck: new Date().getTime(), follow: followedAt } });
-      return { isFollower: false, followedAt: null };
+
+      user.followedAt = user.haveFollowedAtLock ? user.followedAt : 0;
+      user.isFollower = user.haveFollowerLock? user.isFollower : false;
+      user.followCheckAt = Date.now();
+      await getRepository(User).save(user);
+      return { isFollower: user.isFollower, followedAt: user.followedAt };
     } else {
       // is follower
-      if (!user.is.follower && new Date().getTime() - new Date(request.data.data[0].followed_at).getTime() < 60000 * 60) {
+      if (!user.isFollower && new Date().getTime() - new Date(request.data.data[0].followed_at).getTime() < 60000 * 60) {
         global.overlays.eventlist.add({
-          type: 'follow',
+          event: 'follow',
           username: user.username,
           timestamp: Date.now(),
         });
         follow(user.username);
-        global.events.fire('follow', { username: user.username });
+        global.events.fire('follow', { username: user.username, userId: id });
         global.registries.alerts.trigger({
           event: 'follows',
           name: user.username,
@@ -1588,10 +1641,13 @@ class API extends Core {
           userId: id,
         });
       }
-      const followedAt = user.lock && user.lock.followed_at ? Number(user.time.follow) : parseInt(moment(request.data.data[0].followed_at).format('x'), 10);
-      const isFollower = user.lock && user.lock.follower ? user.is.follower : true;
-      await global.users.set(user.username, { id, is: { follower: isFollower }, time: { followCheck: new Date().getTime(), follow: followedAt } });
-      return { isFollower, followedAt };
+
+
+      user.followedAt = user.haveFollowedAtLock ? user.followedAt : Number(moment(request.data.data[0].followed_at).format('x'));
+      user.isFollower = user.haveFollowerLock? user.isFollower : true;
+      user.followCheckAt = Date.now();
+      await getRepository(User).save(user);
+      return { isFollower: user.isFollower, followedAt: user.followedAt };
     }
   }
 

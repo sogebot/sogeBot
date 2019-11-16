@@ -1,10 +1,14 @@
 import _ from 'lodash';
 import { isMainThread } from '../cluster';
 
-import { getLocalizedName, getOwner, isBroadcaster, isModerator, prepare, sendMessage } from '../commons';
+import { getLocalizedName, isBroadcaster, isModerator, prepare, sendMessage } from '../commons';
 import { command, settings, shared } from '../decorators';
 import Game from './_interface';
 import { error } from '../helpers/log';
+
+import { getRepository } from 'typeorm';
+import { User } from '../database/entity/user';
+import { Duel as DuelEntity } from '../database/entity/duel';
 
 const ERROR_NOT_ENOUGH_OPTIONS = '0';
 const ERROR_ZERO_BET = '1';
@@ -43,7 +47,7 @@ class Duel extends Game {
     clearTimeout(this.timeouts.pickDuelWinner);
 
     const [users, timestamp, duelDuration] = await Promise.all([
-      global.db.engine.find(this.collection.users),
+      getRepository(DuelEntity).find(),
       this._timestamp,
       this.duration,
     ]);
@@ -55,13 +59,13 @@ class Duel extends Game {
     }
 
     if (total === 0 && new Date().getTime() - timestamp >= 1000 * 60 * duelDuration) {
-      await global.db.engine.remove(this.collection.users, {});
+      await getRepository(DuelEntity).clear();
       this._timestamp = 0;
       return;
     }
 
     let winner = _.random(0, total, false);
-    let winnerUser;
+    let winnerUser: DuelEntity | undefined;
     for (const user of users) {
       winner = winner - user.tickets;
       if (winner <= 0) { // winner tickets are <= 0 , we have winner
@@ -70,39 +74,40 @@ class Duel extends Game {
       }
     }
 
-    const probability = winnerUser.tickets / (total / 100);
+    if (winnerUser) {
+      const probability = winnerUser.tickets / (total / 100);
 
-    const m = await prepare(_.size(users) === 1 ? 'gambling.duel.noContestant' : 'gambling.duel.winner', {
-      pointsName: await global.systems.points.getPointsName(total),
-      points: total,
-      probability: _.round(probability, 2),
-      ticketsName: await global.systems.points.getPointsName(winnerUser.tickets),
-      tickets: winnerUser.tickets,
-      winner: winnerUser.username,
-    });
-    const userObj = await global.users.getByName(getOwner());
-    sendMessage(m, {
-      username: userObj.username,
-      displayName: userObj.displayName || userObj.username,
-      userId: userObj.id,
-      emotes: [],
-      badges: {},
-      'message-type': 'chat',
-    }, { force: true });
+      const m = await prepare(_.size(users) === 1 ? 'gambling.duel.noContestant' : 'gambling.duel.winner', {
+        pointsName: await global.systems.points.getPointsName(total),
+        points: total,
+        probability: _.round(probability, 2),
+        ticketsName: await global.systems.points.getPointsName(winnerUser.tickets),
+        tickets: winnerUser.tickets,
+        winner: winnerUser.username,
+      });
+      sendMessage(m, {
+        username: global.oauth.botUsername,
+        displayName: global.oauth.botUsername,
+        userId: Number(global.oauth.botId),
+        emotes: [],
+        badges: {},
+        'message-type': 'chat',
+      }, { force: true });
 
-    // give user his points
-    await global.db.engine.increment('users.points', { id: winnerUser.id }, { points: parseInt(total, 10) });
+      // give user his points
+      await getRepository(User).increment({ userId: winnerUser.id }, 'points', total);
 
-    // reset duel
-    await global.db.engine.remove(this.collection.users, {});
-    this._timestamp = 0;
+      // reset duel
+      await getRepository(DuelEntity).clear();
+      this._timestamp = 0;
 
-    this.timeouts.pickDuelWinner = global.setTimeout(() => this.pickDuelWinner(), 30000);
+      this.timeouts.pickDuelWinner = global.setTimeout(() => this.pickDuelWinner(), 30000);
+    }
   }
 
   @command('!duel bank')
   async bank (opts) {
-    const users = await global.db.engine.find(this.collection.users);
+    const users = await getRepository(DuelEntity).find();
     const bank = users.map((o) => o.tickets).reduce((a, b) => a + b, 0);
 
     sendMessage(
@@ -138,11 +143,12 @@ class Duel extends Game {
       }
 
       // check if user is already in duel and add points
-      const userFromDB = await global.db.engine.findOne(this.collection.users, { id: opts.sender.userId });
-      const isNewDuelist = _.isEmpty(userFromDB);
-      if (!isNewDuelist) {
-        await global.db.engine.update(this.collection.users, { _id: String(userFromDB._id) }, { tickets: Number(userFromDB.tickets) + Number(bet) });
-        await global.db.engine.increment('users.points', { id: opts.sender.userId }, { points: parseInt(bet, 10) * -1 });
+      const userFromDB = await getRepository(DuelEntity).findOne({ id: opts.sender.userId });
+      const isNewDuelist = !userFromDB;
+      if (userFromDB) {
+        userFromDB.tickets = Number(userFromDB.tickets) + Number(bet);
+        await getRepository(DuelEntity).save(userFromDB);
+        await getRepository(User).decrement({ userId: opts.sender.userId }, 'points', parseInt(bet, 10));
       } else {
         // check if under gambling cooldown
         const cooldown = this.cooldown;
@@ -153,8 +159,13 @@ class Duel extends Game {
           if (!(this.bypassCooldownByOwnerAndMods && (isMod || isBroadcaster(opts.sender)))) {
             this._cooldown = String(new Date());
           }
-          await global.db.engine.insert(this.collection.users, { id: opts.sender.userId, username: opts.sender.username, tickets: Number(bet) });
-          await global.db.engine.increment('users.points', { id: opts.sender.userId }, { points: parseInt(bet, 10) * -1 });
+          await getRepository(DuelEntity).save({
+            ...new DuelEntity(),
+            id: opts.sender.userId,
+            username: opts.sender.username,
+            tickets: Number(bet),
+          });
+          await getRepository(User).decrement({ userId: opts.sender.userId }, 'points', parseInt(bet, 10));
         } else {
           message = await prepare('gambling.fightme.cooldown', {
             minutesName: getLocalizedName(Math.round(((cooldown * 1000) - (new Date().getTime() - new Date(this._cooldown).getTime())) / 1000 / 60), 'core.minutes'),
@@ -176,7 +187,7 @@ class Duel extends Game {
         sendMessage(message, opts.sender, opts.attr);
       }
 
-      const tickets = (await global.db.engine.findOne(this.collection.users, { id: opts.sender.userId })).tickets;
+      const tickets = (await getRepository(DuelEntity).findOne({ id: opts.sender.userId }))?.tickets ?? 0;
       global.setTimeout(async () => {
         message = await prepare(isNewDuelist ? 'gambling.duel.joined' : 'gambling.duel.added', {
           pointsName: await global.systems.points.getPointsName(tickets),

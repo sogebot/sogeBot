@@ -7,9 +7,12 @@ import { onBit, onMessage, onTip } from '../decorators/on';
 import Expects from '../expects.js';
 import { permission } from '../permissions';
 import System from './_interface';
-import uuid from 'uuid';
+
 import { warning } from '../helpers/log.js';
 import { adminEndpoint } from '../helpers/socket';
+
+import { getRepository } from 'typeorm';
+import { Poll, PollVote } from '../database/entity/poll';
 
 enum ERROR {
   NOT_ENOUGH_OPTIONS,
@@ -49,6 +52,14 @@ class Polls extends System {
   }
 
   public async sockets() {
+    adminEndpoint(this.nsp, 'polls::getAll', async (cb) => {
+      cb(await getRepository(Poll).find({
+        relations: ['votes'],
+        order: {
+          openedAt: 'DESC',
+        },
+      }));
+    });
     adminEndpoint(this.nsp, 'create', async (vote: Poll, cb) => {
       try {
         const parameters = `-${vote.type} -title "${vote.title}" ${vote.options.filter((o) => o.trim().length > 0).join(' | ')}`;
@@ -59,7 +70,7 @@ class Polls extends System {
             username: getOwner(),
             displayName: getOwner(),
             'message-type': 'chat',
-            userId: '0',
+            userId: 0,
             emotes: [],
             badges: {
               subscriber: 1,
@@ -80,7 +91,7 @@ class Polls extends System {
             username: getOwner(),
             displayName: getOwner(),
             'message-type': 'chat',
-            userId: '0',
+            userId: 0,
             emotes: [],
             badges: {
               subscriber: 1,
@@ -97,24 +108,28 @@ class Polls extends System {
   @command('!poll close')
   @default_permission(permission.MODERATORS)
   public async close(opts: CommandOptions): Promise<boolean> {
-    const cVote: Poll = await global.db.engine.findOne(this.collection.data, { isOpened: true });
+    const cVote = await getRepository(Poll).findOne({
+      relations: ['votes'],
+      where: { isOpened: true },
+    });
 
     try {
-      if (_.isEmpty(cVote)) {
+      if (!cVote) {
         throw new Error(String(ERROR.ALREADY_CLOSED));
       } else {
-        const votes: Vote[] = await global.db.engine.find(this.collection.votes, { vid: cVote.id });
-        await global.db.engine.update(this.collection.data, { id: cVote.id }, { isOpened: false, closedAt: Date.now() });
+        cVote.isOpened = false;
+        cVote.closedAt = Date.now();
+        await getRepository(Poll).save(cVote);
 
         const count = {};
         let _total = 0;
-        for (let i = 0, length = votes.length; i < length; i++) {
-          if (!count[votes[i].option]) {
-            count[votes[i].option] = votes[i].votes;
+        for (let i = 0, length = cVote.votes.length; i < length; i++) {
+          if (!count[cVote.votes[i].option]) {
+            count[cVote.votes[i].option] = cVote.votes[i].votes;
           } else {
-            count[votes[i].option] = count[votes[i].option] + votes[i].votes;
+            count[cVote.votes[i].option] = count[cVote.votes[i].option] + cVote.votes[i].votes;
           }
-          _total = _total + votes[i].votes;
+          _total = _total + cVote.votes[i].votes;
         }
         // get vote status
         sendMessage(prepare('systems.polls.status_closed', {
@@ -149,10 +164,10 @@ class Polls extends System {
   @command('!poll open')
   @default_permission(permission.MODERATORS)
   public async open(opts: CommandOptions): Promise<boolean> {
-    const cVote: Poll = await global.db.engine.findOne(this.collection.data, { isOpened: true });
+    const cVote = await getRepository(Poll).findOne({ isOpened: true });
 
     try {
-      if (!_.isEmpty(cVote)) {
+      if (cVote) {
         throw new Error(String(ERROR.ALREADY_OPENED));
       }
 
@@ -165,8 +180,13 @@ class Polls extends System {
         throw new Error(String(ERROR.NOT_ENOUGH_OPTIONS));
       }
 
-      const voting: Poll = { type, title, isOpened: true, options, openedAt: Date.now(), id: uuid() };
-      await global.db.engine.insert(this.collection.data, voting);
+      const voting = new Poll();
+      voting.title = title;
+      voting.isOpened = true;
+      voting.options = options;
+      voting.type = type;
+      voting.openedAt = Date.now();
+      await getRepository(Poll).save(voting);
 
       const translations = `systems.polls.opened_${type}`;
       sendMessage(prepare(translations, {
@@ -191,6 +211,9 @@ class Polls extends System {
           sendMessage(global.translate('voting.notEnoughOptions'), opts.sender, opts.attr);
           break;
         case String(ERROR.ALREADY_OPENED):
+          if (!cVote) {
+            return false;
+          }
           const translations = 'systems.polls.opened' + (cVote.type.length > 0 ? `_${cVote.type}` : '');
           sendMessage(prepare(translations, {
             title: cVote.title,
@@ -217,22 +240,23 @@ class Polls extends System {
   @command('!vote')
   @helper()
   public async main(opts: CommandOptions): Promise<void> {
-    const cVote: Poll = await global.db.engine.findOne(this.collection.data, { isOpened: true });
+    const cVote = await getRepository(Poll).findOne({
+      relations: ['votes'],
+      where: { isOpened: true },
+    });
     let index: number;
 
     try {
-      if (opts.parameters.length === 0 && !_.isEmpty(cVote)) {
-        const votes: Vote[] = await global.db.engine.find(this.collection.votes, { vid: cVote.id });
-
+      if (opts.parameters.length === 0 && cVote) {
         const count = {};
         let _total = 0;
-        for (let i = 0, length = votes.length; i < length; i++) {
-          if (!count[votes[i].option]) {
-            count[votes[i].option] = votes[i].votes;
+        for (let i = 0, length = cVote.votes.length; i < length; i++) {
+          if (!count[cVote.votes[i].option]) {
+            count[cVote.votes[i].option] = cVote.votes[i].votes;
           } else {
-            count[votes[i].option] = count[votes[i].option] + votes[i].votes;
+            count[cVote.votes[i].option] = count[cVote.votes[i].option] + cVote.votes[i].votes;
           }
-          _total = _total + votes[i].votes;
+          _total = _total + cVote.votes[i].votes;
         }
         // get vote status
         sendMessage(prepare('systems.polls.status', {
@@ -253,7 +277,7 @@ class Polls extends System {
           }, 100 * (Number(i) + 1));
         }
 
-      } else if (_.isEmpty(cVote)) {
+      } else if (!cVote) {
         throw new Error(String(ERROR.NO_VOTING_IN_PROGRESS));
       } else if (cVote.type === 'normal') {
         // we expects number
@@ -264,13 +288,18 @@ class Polls extends System {
         if (cVote.options.length < index + 1 || index < 0) {
           throw new Error(String(ERROR.INVALID_VOTE));
         } else {
-          const vote: Vote = {
-            vid: cVote.id,
-            votedBy: opts.sender ? opts.sender.username : 'n/a',
-            votes: 1,
-            option: index,
-          };
-          await global.db.engine.update(this.collection.votes, { vid: vote.vid, votedBy: vote.votedBy }, vote);
+          let vote = cVote.votes.find(o => o.votedBy === opts.sender.username);
+          if (vote) {
+            vote.option = index;
+            await getRepository(Poll).save(cVote);
+          } else {
+            vote = new PollVote();
+            vote.poll = cVote;
+            vote.votedBy = opts.sender.username;
+            vote.votes = 1;
+            vote.option = index;
+            await getRepository(PollVote).save(vote);
+          }
         }
       } else {
         throw new Error(String(ERROR.INVALID_VOTE_TYPE));
@@ -289,21 +318,20 @@ class Polls extends System {
 
   @onBit()
   protected async parseBit(opts: { username: string; amount: number; message: string }): Promise<void> {
-    const cVote: Poll = await global.db.engine.findOne(this.collection.data, { isOpened: true });
+    const cVote = await getRepository(Poll).findOne({ isOpened: true });
 
-    if (!_.isEmpty(cVote) && cVote.type === 'bits') {
+    if (cVote && cVote.type === 'bits') {
       for (let i = cVote.options.length; i > 0; i--) {
         // we are going downwards because we are checking include and 1 === 10
         if (opts.message.includes('#vote' + i)) {
           // vote found
-          const vote: Vote = {
-            vid: cVote.id,
-            votedBy: opts.username,
-            votes: opts.amount,
-            option: i - 1,
-          };
+          const vote = new PollVote();
+          vote.poll = cVote;
+          vote.option = i - 1;
+          vote.votes = opts.amount;
+          vote.votedBy = opts.username;
           // no update as we will not switch vote option as in normal vote
-          await global.db.engine.insert(this.collection.votes, vote);
+          await getRepository(PollVote).save(vote);
           break;
         }
       }
@@ -312,21 +340,20 @@ class Polls extends System {
 
   @onTip()
   protected async parseTip(opts: { username: string; amount: number; message: string; currency: string }): Promise<void> {
-    const cVote: Poll = await global.db.engine.findOne(this.collection.data, { isOpened: true });
+    const cVote = await getRepository(Poll).findOne({ isOpened: true });
 
-    if (!_.isEmpty(cVote) && cVote.type === 'tips') {
+    if (cVote && cVote.type === 'tips') {
       for (let i = cVote.options.length; i > 0; i--) {
         // we are going downwards because we are checking include and 1 === 10
         if (opts.message.includes('#vote' + i)) {
           // vote found
-          const vote: Vote = {
-            vid: cVote.id,
-            votedBy: opts.username,
-            votes: Number(global.currency.exchange(opts.amount, opts.currency, global.currency.mainCurrency)),
-            option: i - 1,
-          };
+          const vote = new PollVote();
+          vote.poll = cVote;
+          vote.option = i - 1;
+          vote.votes = Number(global.currency.exchange(opts.amount, opts.currency, global.currency.mainCurrency));
+          vote.votedBy = opts.username;
           // no update as we will not switch vote option as in normal vote
-          await global.db.engine.insert(this.collection.votes, vote);
+          await getRepository(PollVote).save(vote);
           break;
         }
       }
@@ -339,10 +366,10 @@ class Polls extends System {
   }
 
   private async reminder() {
-    const vote: Poll = await global.db.engine.findOne(this.collection.data, { isOpened: true });
+    const vote = await getRepository(Poll).findOne({ isOpened: true });
     const shouldRemind = { messages: false, time: false };
 
-    if (this.everyXMessages === 0 && this.everyXSeconds === 0 || _.isEmpty(vote)) {
+    if (this.everyXMessages === 0 && this.everyXSeconds === 0 || !vote) {
       this.lastMessageRemind = this.currentMessages;
       this.lastTimeRemind = 0;
       return; // reminder is disabled
@@ -374,14 +401,13 @@ class Polls extends System {
       this.lastTimeRemind = Date.now();
 
       const translations = `systems.polls.opened_${vote.type}`;
-      const userObj = await global.users.getByName(getOwner());
       sendMessage(prepare(translations, {
         title: vote.title,
         command: this.getCommand('!vote'),
       }), {
-        username: userObj.username,
-        displayName: userObj.displayName || userObj.username,
-        userId: userObj.id,
+        username: global.oauth.botUsername,
+        displayName: global.oauth.botUsername,
+        userId: Number(global.oauth.botId),
         emotes: [],
         badges: {},
         'message-type': 'chat',
@@ -390,18 +416,19 @@ class Polls extends System {
         setTimeout(() => {
           if (vote.type === 'normal') {
             sendMessage(this.getCommand('!vote') + ` ${(Number(index) + 1)} => ${vote.options[index]}`, {
-              username: userObj.username,
-              displayName: userObj.displayName || userObj.username,
-              userId: userObj.id,
+              username: global.oauth.botUsername,
+              displayName: global.oauth.botUsername,
+              userId: Number(global.oauth.botId),
               emotes: [],
               badges: {},
               'message-type': 'chat',
             });
           } else {
             sendMessage(`#vote${(Number(index) + 1)} => ${vote.options[index]}`, {
-              username: userObj.username,
-              displayName: userObj.displayName || userObj.username,
-              userId: userObj.id,
+
+              username: global.oauth.botUsername,
+              displayName: global.oauth.botUsername,
+              userId: Number(global.oauth.botId),
               emotes: [],
               badges: {},
               'message-type': 'chat',

@@ -7,7 +7,11 @@ import XRegExp from 'xregexp';
 import Overlay from './_interface';
 import { parser, settings, ui } from '../decorators';
 import { error, info, warning } from '../helpers/log';
-import { adminEndpoint } from '../helpers/socket';
+import { adminEndpoint, publicEndpoint } from '../helpers/socket';
+
+import { getManager, getRepository } from 'typeorm';
+import { CacheEmotes } from '../database/entity/cacheEmotes';
+import uuid from 'uuid';
 
 
 class Emotes extends Overlay {
@@ -95,6 +99,9 @@ class Emotes extends Overlay {
   }
 
   sockets () {
+    publicEndpoint(this.nsp, 'getCache', async (cb) => {
+      cb(await getRepository(CacheEmotes).find());
+    });
     adminEndpoint(this.nsp, 'removeCache', (cb) => {
       this.removeCache();
       cb(null, null);
@@ -118,7 +125,7 @@ class Emotes extends Overlay {
     this.lastSubscriberEmoteChk = 0;
     this.lastFFZEmoteChk = 0;
     this.lastBTTVEmoteChk = 0;
-    await global.db.engine.remove(this.collection.cache, {});
+    await getManager().clear(CacheEmotes);
 
     if (!this.fetch.global) {
       this.fetchEmotesGlobal();
@@ -149,18 +156,15 @@ class Emotes extends Overlay {
           const request = await axios.get('https://api.twitchemotes.com/api/v4/channels/' + cid);
           const emotes = request.data.emotes;
           for (let j = 0, length2 = emotes.length; j < length2; j++) {
-            await global.db.engine.update(this.collection.cache,
-              {
-                code: emotes[j].code,
-                type: 'twitch',
-              },
-              {
-                urls: {
-                  '1': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emotes[j].id + '/1.0',
-                  '2': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emotes[j].id + '/2.0',
-                  '3': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emotes[j].id + '/3.0',
-                },
-              });
+            const cachedEmote = (await getRepository(CacheEmotes).findOne({ code: emotes[j].code, type: 'twitch' })) || new CacheEmotes();
+            cachedEmote.code = emotes[j].code;
+            cachedEmote.type = 'twitch';
+            cachedEmote.urls = {
+              '1': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emotes[j].id + '/1.0',
+              '2': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emotes[j].id + '/2.0',
+              '3': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emotes[j].id + '/3.0',
+            };
+            await getRepository(CacheEmotes).save(cachedEmote);
           }
           info(`EMOTES: Fetched channel ${cid} emotes`);
         } catch (e) {
@@ -191,18 +195,15 @@ class Emotes extends Overlay {
           if (emotes[i].id < 15) {
             continue;
           } // skip simple emotes
-          await global.db.engine.update(this.collection.cache,
-            {
-              code: emotes[i].code,
-              type: 'twitch',
-            },
-            {
-              urls: {
-                '1': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emotes[i].id + '/1.0',
-                '2': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emotes[i].id + '/2.0',
-                '3': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emotes[i].id + '/3.0',
-              },
-            });
+          const cachedEmote = (await getRepository(CacheEmotes).findOne({ code: emotes[i].code, type: 'twitch' })) || new CacheEmotes();
+          cachedEmote.code = emotes[i].code;
+          cachedEmote.type = 'twitch';
+          cachedEmote.urls = {
+            '1': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emotes[i].id + '/1.0',
+            '2': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emotes[i].id + '/2.0',
+            '3': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emotes[i].id + '/3.0',
+          };
+          await getRepository(CacheEmotes).save(cachedEmote);
         }
         info('EMOTES: Fetched global emotes');
       } catch (e) {
@@ -229,18 +230,15 @@ class Emotes extends Overlay {
           const request = await axios.get('https://api.twitchemotes.com/api/v4/channels/' + cid);
           const emotes = request.data.emotes;
           for (let j = 0, length2 = emotes.length; j < length2; j++) {
-            await global.db.engine.update(this.collection.cache,
-              {
-                code: emotes[j].code,
-                type: 'twitch',
-              },
-              {
-                urls: {
-                  '1': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emotes[j].id + '/1.0',
-                  '2': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emotes[j].id + '/2.0',
-                  '3': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emotes[j].id + '/3.0',
-                },
-              });
+            const cachedEmote = (await getRepository(CacheEmotes).findOne({ code: emotes[j].code, type: 'twitch' })) || new CacheEmotes();
+            cachedEmote.code = emotes[j].code;
+            cachedEmote.type = 'twitch';
+            cachedEmote.urls = {
+              '1': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emotes[j].id + '/1.0',
+              '2': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emotes[j].id + '/2.0',
+              '3': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emotes[j].id + '/3.0',
+            };
+            await getRepository(CacheEmotes).save(cachedEmote);
           }
           info(`EMOTES: Fetched channel ${cid} emotes`);
         } catch (e) {
@@ -275,14 +273,11 @@ class Emotes extends Overlay {
         for (let i = 0, length = emotes.length; i < length; i++) {
           // change 4x to 3x, to be same as Twitch and BTTV
           emotes[i].urls['3'] = emotes[i].urls['4']; delete emotes[i].urls['4'];
-          await global.db.engine.update(this.collection.cache,
-            {
-              code: emotes[i].name,
-              type: 'ffz',
-            },
-            {
-              urls: emotes[i].urls,
-            });
+          const cachedEmote = (await getRepository(CacheEmotes).findOne({ code: emotes[i].code, type: 'twitch' })) || new CacheEmotes();
+          cachedEmote.code = emotes[i].name;
+          cachedEmote.type = 'ffz';
+          cachedEmote.urls = emotes[i].urls;
+          await getRepository(CacheEmotes).save(cachedEmote);
         }
         info('EMOTES: Fetched ffz emotes');
       } catch (e) {
@@ -312,19 +307,15 @@ class Emotes extends Overlay {
         const emotes = request.data.emotes;
 
         for (let i = 0, length = emotes.length; i < length; i++) {
-          await global.db.engine.update(this.collection.cache,
-            {
-              code: emotes[i].code,
-              type: 'bttv',
-            },
-            {
-              urls: {
-                '1': urlTemplate.replace('{{id}}', emotes[i].id).replace('{{image}}', '1x'),
-                '2': urlTemplate.replace('{{id}}', emotes[i].id).replace('{{image}}', '2x'),
-                '3': urlTemplate.replace('{{id}}', emotes[i].id).replace('{{image}}', '3x'),
-              },
-
-            });
+          const cachedEmote = (await getRepository(CacheEmotes).findOne({ code: emotes[i].code, type: 'twitch' })) || new CacheEmotes();
+          cachedEmote.code = emotes[i].code;
+          cachedEmote.type = 'bttv';
+          cachedEmote.urls = {
+            '1': urlTemplate.replace('{{id}}', emotes[i].id).replace('{{image}}', '1x'),
+            '2': urlTemplate.replace('{{id}}', emotes[i].id).replace('{{image}}', '2x'),
+            '3': urlTemplate.replace('{{id}}', emotes[i].id).replace('{{image}}', '3x'),
+          };
+          await getRepository(CacheEmotes).save(cachedEmote);
         }
         info('EMOTES: Fetched bttv emotes');
       } catch (e) {
@@ -399,11 +390,12 @@ class Emotes extends Overlay {
     const parsed: string[] = [];
     const usedEmotes = {};
 
-    const cache: Overlay.Emotes.cache[] = await global.db.engine.find(this.collection.cache);
+    const cache = await getRepository(CacheEmotes).find();
 
     // add simple emotes
     for (const code of Object.keys(this.simpleEmotes)) {
       cache.push({
+        id: uuid(),
         type: 'twitch',
         code,
         urls: {
@@ -424,7 +416,8 @@ class Emotes extends Overlay {
       if (cache.find((o) => o.code === opts.message.slice(emote.start, emote.end+1))) {
         continue;
       }
-      const data: Overlay.Emotes.cache = {
+      const data: CacheEmotes = {
+        id: uuid(),
         type: 'twitch',
         code: opts.message.slice(emote.start, emote.end+1),
         urls: {
@@ -437,14 +430,7 @@ class Emotes extends Overlay {
       cache.push(data);
 
       // update emotes in cache
-      global.db.engine.update(this.collection.cache,
-        {
-          code: data.code,
-          type: 'twitch',
-        },
-        {
-          urls: data.urls,
-        });
+      await getRepository(CacheEmotes).save(data);
     }
 
     for (let j = 0, jl = cache.length; j < jl; j++) {
@@ -482,7 +468,7 @@ class Emotes extends Overlay {
         emotesArray.push(this.simpleEmotes[emotes[i]] + this.cEmotesSize + '.0');
       } else {
         try {
-          const items = await global.db.engine.find(this.collection.cache, { code: emotes[i] });
+          const items = await getRepository(CacheEmotes).find({ code: emotes[i] });
           if (!_.isEmpty(items)) {
             emotesArray.push(items[0].urls[this.cEmotesSize]);
           }

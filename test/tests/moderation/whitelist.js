@@ -177,7 +177,6 @@ describe('systems/moderation - whitelist()', () => {
     for (const text of _.get(test, 'should.return.changed', [])) {
       it(`pattern '${pattern}' should change '${text}'`, async () => {
         global.systems.moderation.cListsWhitelist = [pattern];
-        await variable.isEqual('systems.moderation.cListsWhitelist', [pattern]);
         const result = await global.systems.moderation.whitelist(text, '0efd7b1c-e460-4167-8e06-8aaf2c170311');
         assert.isTrue(text !== result);
       });
@@ -185,7 +184,6 @@ describe('systems/moderation - whitelist()', () => {
     for (const text of _.get(test, 'should.return.same', [])) {
       it(`pattern '${pattern}' should not change '${text}'`, async () => {
         global.systems.moderation.cListsWhitelist = [pattern];
-        await variable.isEqual('systems.moderation.cListsWhitelist', [pattern]);
         const result = await global.systems.moderation.whitelist(text, '0efd7b1c-e460-4167-8e06-8aaf2c170311');
         assert.isTrue(text === result);
       });

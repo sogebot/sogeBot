@@ -3,6 +3,8 @@ import * as constants from './constants';
 import { sendMessage } from './commons';
 import { debug, error } from './helpers/log';
 import { incrementCountOfCommandUsage } from './helpers/commands/count';
+import { getRepository } from 'typeorm';
+import { PermissionCommands } from './database/entity/permissions';
 
 class Parser {
   started_at = Date.now();
@@ -200,8 +202,8 @@ class Parser {
     }
     commands = _(await Promise.all(commands)).flatMap().sortBy(o => -o.command.length).value();
     for (const command of commands) {
-      const permission = await global.db.engine.findOne(global.permissions.collection.commands, { key: command.id });
-      if (!_.isEmpty(permission)) {
+      const permission = await getRepository(PermissionCommands).findOne({ name: command.id });
+      if (permission) {
         command.permission = permission.permission;
       }; // change to custom permission
     }

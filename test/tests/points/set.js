@@ -6,7 +6,10 @@ const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 const _ = require('lodash');
 
-const user = { username: 'oneuser', userId: String(_.random(999999, false)) };
+const { getRepository } = require('typeorm');
+const { User } = require('../../../dest/database/entity/user');
+
+const user = { username: 'oneuser', userId: Number(_.random(999999, false)) };
 
 describe('Points - set()', () => {
   before(async () => {
@@ -16,7 +19,7 @@ describe('Points - set()', () => {
 
   describe('Points should be correctly set, not added', () => {
     it('create user', async () => {
-      await global.db.engine.insert('users', { username: user.username, id: user.userId });
+      await getRepository(User).save({ username: user.username, userId: user.userId });
     });
 
     it('!points get should return 0', async () => {

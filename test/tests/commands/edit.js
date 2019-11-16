@@ -8,8 +8,11 @@ const message = require('../../general.js').message;
 
 const { permission } = require('../../../dest/permissions');
 
+const { getRepository } = require('typeorm');
+const { User } = require('../../../dest/database/entity/user');
+
 // users
-const owner = { username: 'soge__', userId: Math.random() };
+const owner = { username: 'soge__', userId: Math.floor(Math.random() * 100000) };
 
 const parseFailedTests = [
   { permission: null, command: null, rid: null, response: null },
@@ -51,7 +54,7 @@ describe('Custom Commands - edit()', () => {
     await db.cleanup();
     await message.prepare();
 
-    await global.db.engine.insert('users', { username: owner.username, id: owner.userId });
+    await getRepository(User).save({ username: owner.username, userId: owner.userId });
   });
 
   describe('Expected parsed fail', () => {

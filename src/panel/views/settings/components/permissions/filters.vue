@@ -55,7 +55,7 @@
     props: ['filters'],
     data() {
       const data: {
-        cFilters: Permissions.Filter[],
+        cFilters: any[],
       } = {
         cFilters: this.filters,
       }

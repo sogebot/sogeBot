@@ -12,6 +12,9 @@ const testuser = { username: 'testuser', id: Math.floor(Math.random() * 1000) };
 const testuser2 = { username: 'testuser2', id: Math.floor(Math.random() * 1000) };
 const testuser3 = { username: 'testuser3', id: Math.floor(Math.random() * 1000) };
 
+const { getRepository } = require('typeorm');
+const { User } = require('../../../dest/database/entity/user');
+
 describe('lib/twitch - subs()', () => {
   before(async () => {
     await db.cleanup();
@@ -20,14 +23,14 @@ describe('lib/twitch - subs()', () => {
 
   it('Set testuser, testuser2, testuser3 as subs', async () => {
     for (const u of [testuser, testuser2, testuser3]) {
-      await global.db.engine.update('users', { id: u.id }, { username: u.username, is: { subscriber: true } });
+      await getRepository(User).save({ userId: u.id, username: u.username, isSubscriber: true });
     }
   });
 
   it('add testuser to event', async () => {
     await time.waitMs(100);
     await global.overlays.eventlist.add({
-      type: 'sub',
+      event: 'sub',
       username: 'testuser',
     });
   });
@@ -35,16 +38,15 @@ describe('lib/twitch - subs()', () => {
   it('add testuser2 to event', async () => {
     await time.waitMs(100);
     await global.overlays.eventlist.add({
-      type: 'sub',
+      event: 'sub',
       username: 'testuser2',
     });
   });
 
   it('!subs should return testuser2', async () => {
-    const fromDb = await global.db.engine.findOne('widgetsEventList', { 'username': 'testuser2', type: 'sub' });
     global.twitch.subs({ sender: testuser });
     await message.isSent('subs', testuser, {
-      lastSubAgo: moment(fromDb.timestamp).fromNow(),
+      lastSubAgo: 'a few seconds ago',
       lastSubUsername: testuser2.username,
       onlineSubCount: 0,
     });
@@ -53,32 +55,28 @@ describe('lib/twitch - subs()', () => {
   it('add testuser3 to events', async () => {
     await time.waitMs(100);
     await global.overlays.eventlist.add({
-      type: 'sub',
+      event: 'sub',
       username: 'testuser3',
     });
   });
 
   it('!subs should return testuser3', async () => {
-    const fromDb = await global.db.engine.findOne('widgetsEventList', { 'username': 'testuser3', type: 'sub' });
     global.twitch.subs({ sender: testuser });
     await message.isSent('subs', testuser, {
-      lastSubAgo: moment(fromDb.timestamp).fromNow(),
+      lastSubAgo: 'a few seconds ago',
       lastSubUsername: testuser3.username,
       onlineSubCount: 0,
     });
   });
 
   it('Add testuser, testuser2, testuser3 to online users', async () => {
-    for (const u of [testuser, testuser2, testuser3]) {
-      await global.db.engine.insert('users.online', { username: u.username });
-    }
+    await getRepository(User).update({}, { isOnline: true });
   });
 
   it('!subs should return testuser3 and 3 online subs', async () => {
-    const fromDb = await global.db.engine.findOne('widgetsEventList', { 'username': 'testuser3', type: 'sub' });
     global.twitch.subs({ sender: testuser });
     await message.isSent('subs', testuser, {
-      lastSubAgo: moment(fromDb.timestamp).fromNow(),
+      lastSubAgo: 'a few seconds ago',
       lastSubUsername: testuser3.username,
       onlineSubCount: 3,
     });

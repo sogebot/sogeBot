@@ -3,6 +3,9 @@ import { parse, sep as separator } from 'path';
 import { VariableWatcher } from './watchers';
 import { debug, error } from './helpers/log';
 import { isMainThread } from './cluster';
+import { getManager } from 'typeorm';
+import { Settings } from './database/entity/settings';
+import { isDbConnected } from './helpers/database';
 
 export let loadingInProgress: string[] = [];
 export const permissions: { [command: string]: string | null } = {};
@@ -42,10 +45,11 @@ export function ui(opts, category?: string) {
   return (target: object, key: string) => {
     let path = category ? `${category}.${key}` : key;
 
-    const register = (retries = 0) => {
+    const register = async (retries = 0) => {
       const isAvailableModule = type !== 'core' && typeof global[type] !== 'undefined' && typeof global[type][name] !== 'undefined';
       const isAvailableLibrary = type === 'core' && typeof global[name] !== 'undefined';
-      if (!isAvailableLibrary && !isAvailableModule) {
+
+      if ((!isAvailableLibrary && !isAvailableModule) || !isDbConnected) {
         return setTimeout(() => register(0), 1000);
       }
       try {
@@ -79,10 +83,10 @@ export function settings(category?: string, isReadOnly = false) {
       loadingInProgress.push(`${type}.${name}.${key}`);
     }
 
-    const registerSettings = () => {
+    const registerSettings = async () => {
       const isAvailableModule = type !== 'core' && typeof global[type] !== 'undefined' && typeof global[type][name] !== 'undefined';
       const isAvailableLibrary = type === 'core' && typeof global[name] !== 'undefined';
-      if (!isAvailableLibrary && !isAvailableModule) {
+      if ((!isAvailableLibrary && !isAvailableModule) || !isDbConnected) {
         return setTimeout(() => registerSettings(), 1000);
       }
       try {
@@ -96,7 +100,7 @@ export function settings(category?: string, isReadOnly = false) {
         if (!isReadOnly) {
           // load variable from db
           const loadVariableValue = () => {
-            if (!global.db.engine.connected) {
+            if (!isDbConnected) {
               return setTimeout(() => loadVariableValue(), 1000);
             }
             self.loadVariableValue(key).then((value) => {
@@ -127,10 +131,10 @@ export function permission_settings(category?: string) {
   return (target: object, key: string) => {
     loadingInProgress.push(`${type}.${name}.${key}`);
 
-    const register = () => {
+    const register = async () => {
       const isAvailableModule = type !== 'core' && typeof global[type] !== 'undefined' && typeof global[type][name] !== 'undefined';
       const isAvailableLibrary = type === 'core' && typeof global[name] !== 'undefined';
-      if (!isAvailableLibrary && !isAvailableModule) {
+      if ((!isAvailableLibrary && !isAvailableModule) || !isDbConnected) {
         return setTimeout(() => register(), 1000);
       }
       try {
@@ -144,7 +148,7 @@ export function permission_settings(category?: string) {
 
         // load variable from db
         const loadVariableValue = () => {
-          if (!global.db.engine.connected) {
+          if (!isDbConnected) {
             return setTimeout(() => loadVariableValue(), 1000);
           }
           self.loadVariableValue('__permission_based__' + key).then((value: { [permissionId: string]: string }) => {
@@ -174,10 +178,10 @@ export function shared(db = false) {
     if (db) {
       loadingInProgress.push(`${type}.${name}.${key}`);
     }
-    const register = () => {
+    const register = async () => {
       const isAvailableModule = type !== 'core' && typeof global[type] !== 'undefined' && typeof global[type][name] !== 'undefined';
       const isAvailableLibrary = type === 'core' && typeof global[name] !== 'undefined';
-      if (!isAvailableLibrary && !isAvailableModule) {
+      if ((!isAvailableLibrary && !isAvailableModule) || !isDbConnected) {
         return setTimeout(() => register(), 1000);
       }
       try {
@@ -186,9 +190,6 @@ export function shared(db = false) {
         VariableWatcher.add(`${type}.${name}.${key}`, defaultValue, false);
         if (db) {
           const loadVariableValue = () => {
-            if (!global.db.engine.connected) {
-              return setTimeout(() => loadVariableValue(), 1000);
-            }
             self.loadVariableValue(key).then((value) => {
               if (typeof value !== 'undefined') {
                 VariableWatcher.add(`${type}.${name}.${key}`, value, false); // rewrite value on var load
@@ -260,7 +261,7 @@ export function rollback() {
 async function registerCommand(opts: string | Command, m) {
   const isAvailableModule = m.type !== 'core' && typeof global[m.type] !== 'undefined' && typeof global[m.type][m.name] !== 'undefined';
   const isAvailableLibrary = m.type === 'core' && typeof global[m.name] !== 'undefined';
-  if (!isAvailableLibrary && !isAvailableModule) {
+  if ((!isAvailableLibrary && !isAvailableModule) || !isDbConnected) {
     return setTimeout(() => registerCommand(opts, m), 1000);
   }
   try {
@@ -280,11 +281,24 @@ async function registerCommand(opts: string | Command, m) {
     self.settingsList.push({ category: 'commands', key: c.name });
 
     // load command from db
-    const dbc = await global.db.engine.findOne(self.collection.settings, { system: m.name, key: 'commands.' + c.name });
-    if (dbc.value) {
+    const dbc = await getManager()
+      .createQueryBuilder()
+      .select('settings')
+      .from(Settings, 'settings')
+      .where('namespace = :namespace', { namespace: self.nsp })
+      .andWhere('name = :name', { name: 'commands.' + c.name })
+      .getOne();
+    if (dbc) {
+      dbc.value = JSON.parse(dbc.value);
       if (c.name === dbc.value) {
         // remove if default value
-        await global.db.engine.remove(self.collection.settings, { system: m.name, key: 'commands.' + c.name });
+        await getManager()
+          .createQueryBuilder()
+          .delete()
+          .from(Settings)
+          .where('namespace = :namespace', { namespace: self.nsp })
+          .andWhere('name = :name', { name: 'commands.' + c.name })
+          .execute();
       }
       c.command = dbc.value;
     }

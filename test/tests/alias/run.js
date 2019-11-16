@@ -7,17 +7,20 @@ require('../../general.js');
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 
+const { getRepository } = require('typeorm');
+const { User } = require('../../../dest/database/entity/user');
+
 // users
-const owner = { username: 'soge__', userId: Math.random() };
-const user = { username: 'user', userId: Math.random() };
+const owner = { username: 'soge__', userId: Math.floor(Math.random() * 100000) };
+const user = { username: 'user', userId: Math.floor(Math.random() * 100000) };
 
 describe('Alias - run()', () => {
   beforeEach(async () => {
     await db.cleanup();
     await message.prepare();
 
-    await global.db.engine.insert('users', { username: owner.username, id: owner.userId });
-    await global.db.engine.insert('users', { username: user.username, id: user.userId });
+    await getRepository(User).save({ username: owner.username, userId: owner.userId });
+    await getRepository(User).save({ username: user.username, userId: user.userId });
   });
 
   it('!a should show correctly command with link (skip is true)', async () => {

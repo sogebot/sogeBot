@@ -11,7 +11,12 @@ const flatten = require('./helpers/flatten')
 const gitCommitInfo = require('git-commit-info');
 
 import { error, info } from './helpers/log';
+import { CacheTitles } from './database/entity/cacheTitles';
 import uuid from 'uuid'
+import { getManager, getRepository } from 'typeorm';
+import { Dashboard, Widget } from './database/entity/dashboard';
+import { Translation } from './database/entity/translation'
+import { TwitchTag, TwitchTagLocalizationName } from './database/entity/twitch'
 
 const Parser = require('./parser')
 
@@ -109,76 +114,168 @@ function Panel () {
   this.io.use(global.socket.authorize);
 
   var self = this
-  this.io.on('connection', function (socket) {
-    // check auth
-    socket.on('metrics.translations', function (key) { global.lib.translate.addMetrics(key, true) })
-    socket.on('getCachedTags', async (cb) => {
-      cb(await global.db.engine.find('core.api.tags'))
+  this.io.on('connection', async function (socket) {
+    // create main dashboard if needed;
+    await getRepository(Dashboard).save({
+      id: 'c287b750-b620-4017-8b3e-e48757ddaa83', // constant ID
+      name: 'Main',
+      createdAt: 0,
     })
+
+
+    socket.on('metrics.translations', function (key) { global.lib.translate.addMetrics(key, true) })
+
+    socket.on('getCachedTags', async (cb) => {
+      let query = getRepository(TwitchTag)
+        .createQueryBuilder('tags')
+        .select('names.locale', 'locale')
+        .addSelect('names.value', 'value')
+        .addSelect('tags.tag_id', 'tag_id')
+        .addSelect('tags.is_auto', 'is_auto')
+        .addSelect('tags.is_current', 'is_current')
+        .leftJoinAndSelect(TwitchTagLocalizationName, 'names', `"names"."tagId" = "tag_id" AND "names"."locale" like :tag`)
+        .setParameter("tag", '%' + global.general.lang +'%');
+
+      let results = await query.execute();
+      if (results.length > 0) {
+        cb(results);
+      } else {
+        // if we don';t have results with our selected locale => reload with en-us
+        query = getRepository(TwitchTag)
+          .createQueryBuilder('tags')
+          .select('names.locale', 'locale')
+          .addSelect('names.value', 'value')
+          .addSelect('tags.tag_id', 'tag_id')
+          .addSelect('tags.is_auto', 'is_auto')
+          .addSelect('tags.is_current', 'is_current')
+          .leftJoinAndSelect(TwitchTagLocalizationName, 'names', `"names"."tagId" = "tag_id" AND "names"."locale" = :tag`)
+          .setParameter("tag", 'en-us');
+        results = await query.execute();
+      }
+      cb(results);
+    });
     // twitch game and title change
     socket.on('getGameFromTwitch', function (game) { global.api.sendGameFromTwitch(global.api, socket, game) })
-    socket.on('getUserTwitchGames', async () => { socket.emit('sendUserTwitchGamesAndTitles', await global.db.engine.find('cache.titles')) })
-    socket.on('deleteUserTwitchGame', async (game) => {
-      let items = await global.db.engine.find('cache.titles', { game })
-      for (let item of items) {
-        await global.db.engine.remove('cache.titles', { _id: String(item._id) })
-      }
-      socket.emit('sendUserTwitchGamesAndTitles', await global.db.engine.find('cache.titles'))
+    socket.on('getUserTwitchGames', async () => {
+      const titles = await getManager()
+        .createQueryBuilder()
+        .select('titles')
+        .from(CacheTitles, 'titles')
+        .getMany();
+      socket.emit('sendUserTwitchGamesAndTitles', titles) ;
     })
+    socket.on('deleteUserTwitchGame', async (game) => {
+      await getManager()
+        .createQueryBuilder()
+        .delete()
+        .from(CacheTitles, 'titles')
+        .where('game = :game', { game })
+        .execute();
+      const titles = await getManager()
+        .createQueryBuilder()
+        .select('titles')
+        .from(CacheTitles, 'titles')
+        .getMany();
+      socket.emit('sendUserTwitchGamesAndTitles', titles);
+    });
     socket.on('cleanupGameAndTitle', async (data, cb) => {
       // remove empty titles
-      const emptyTitles = data.titles.filter(o => o.title.trim().length === 0);
-      for (const t of emptyTitles) {
-        await global.db.engine.remove('cache.titles', { _id: String(t._id) });
-      }
+      await getManager()
+        .createQueryBuilder()
+        .delete()
+        .from(CacheTitles, 'titles')
+        .where('title = :title', { title: '' })
+        .execute();
 
       // update titles
       const updateTitles = data.titles.filter(o => o.title.trim().length > 0);
       for (const t of updateTitles) {
         if (t.title === data.title && t.game === data.game) {
-          await global.db.engine.update('cache.titles', { _id: String(t._id) }, { title: t.title, timestamp: Date.now() });
+          await getManager()
+            .createQueryBuilder()
+            .update(CacheTitles)
+            .set({ timestamp: Date.now(), title: t.title })
+            .where('id = :id', { id: t.id })
+            .execute();
         } else {
-          await global.db.engine.update('cache.titles', { _id: String(t._id) }, { title: t.title });
+          await getManager()
+            .createQueryBuilder()
+            .update(CacheTitles)
+            .set({ title: t.title })
+            .where('id = :id', { id: t.id })
+            .execute();
         }
       }
 
       // remove removed titles
-      let allTitles = await global.db.engine.find('cache.titles');
+      let allTitles = await getManager()
+        .createQueryBuilder()
+        .select('titles')
+        .from(CacheTitles, 'titles')
+        .getMany();
       for (const t of allTitles) {
         const titles = updateTitles.filter(o => o.game === t.game && o.title === t.title);
         if (titles.length === 0) {
           if (t.game !== data.game || t.title !== data.title) { // don't remove current/new title
-            await global.db.engine.remove('cache.titles', { _id: String(t._id) });
+            await getManager()
+              .createQueryBuilder()
+              .delete()
+              .from(CacheTitles, 'titles')
+              .where('id = :id', { id: t.id })
+              .execute();
           }
         }
       }
 
       // remove duplicates
-      allTitles = await global.db.engine.find('cache.titles');
+      allTitles = await getManager()
+        .createQueryBuilder()
+        .select('titles')
+        .from(CacheTitles, 'titles')
+        .getMany();
       for (const t of allTitles) {
         const titles = allTitles.filter(o => o.game === t.game && o.title === t.title);
         if (titles.length > 1) {
           // remove title if we have more than one title
           allTitles = allTitles.filter(o => String(o._id) !== String(t._id));
-          await global.db.engine.remove('cache.titles', { _id: String(t._id) });
+          await getManager()
+            .createQueryBuilder()
+            .delete()
+            .from(CacheTitles, 'titles')
+            .where('id = :id', { id: t.id })
+            .execute();
         }
       }
-      cb(null, await global.db.engine.find('cache.titles'));
+      cb(null, allTitles);
     });
     socket.on('updateGameAndTitle', async (data, cb) => {
       const status = await global.api.setTitleAndGame(null, data)
       await global.api.setTags(null, data.tags);
 
       if (!status) { // twitch refused update
-        cb(true)
+        cb(true);
       }
 
-      data.title = data.title.trim()
-      data.game = data.game.trim()
+      data.title = data.title.trim();
+      data.game = data.game.trim();
 
-      let item = await global.db.engine.findOne('cache.titles', { game: data.game, title: data.title.trim() })
-      if (_.isEmpty(item)) {
-        await global.db.engine.insert('cache.titles', { game: data.game, title: data.title, timestamp: Date.now() })
+      const item = await getManager()
+        .createQueryBuilder()
+        .select('titles')
+        .from(CacheTitles, 'titles')
+        .where('game = :game', { game: data.game })
+        .andWhere('title = :title', { title: data.title })
+        .getOne();
+
+      if (!item) {
+        await getManager()
+          .createQueryBuilder()
+          .insert()
+          .into(CacheTitles)
+          .values([
+            { game: data.game, title: data.title, timestamp: Date.now() },
+          ])
+          .execute();
       }
 
       self.sendStreamData(self, global.panel.io) // force dashboard update
@@ -189,7 +286,8 @@ function Panel () {
     })
     socket.on('leaveBot', async () => {
       global.tmi.part('bot')
-      global.db.engine.remove('users.online', {}) // force all users offline
+      // force all users offline
+      await getRepository(User).update({}, { isOnline: false });
     })
 
     // custom var
@@ -224,46 +322,76 @@ function Panel () {
       socket.emit('lang', lang)
     })
     socket.on('responses.revert', async function (data, callback) {
-      _.remove(global.lib.translate.custom, function (o) { return o.key === data.key })
-      await global.db.engine.remove('customTranslations', { key: data.key })
-      let translate = global.translate(data.key)
+      _.remove(global.lib.translate.custom, function (o) { return o.name === data.name })
+      await getRepository(Translation).delete({ name: data.name })
+      let translate = global.translate(data.name)
       callback(translate)
     })
 
     socket.on('getWidgetList', async (cb) => {
-      let widgets = await global.db.engine.find('widgets')
-      let dashboards = await global.db.engine.find('dashboards')
-      if (_.isEmpty(widgets)) cb(self.widgets)
-      else {
-        var sendWidgets = []
-        _.each(self.widgets, function (widget) {
-          if (!_.includes(_.map(widgets, 'id'), widget.id)) {
-            sendWidgets.push(widget)
-          }
-        })
-        cb(sendWidgets, dashboards)
+      const dashboards = await getRepository(Dashboard).find({
+        relations: ['widgets'],
+      });
+      let widgetList = [];
+      for (const dashboard of dashboards) {
+        widgetList = [
+          ...widgetList,
+          ...dashboard.widgets.map(o => o.name),
+        ];
       }
-    })
+
+      const sendWidgets = [];
+      for(const widget of self.widgets) {
+        if (!widgetList.includes(widget.id)) {
+          sendWidgets.push(widget);
+        }
+      }
+      cb(sendWidgets, dashboards);
+    });
 
     socket.on('getWidgets', async (cb) => {
-      let widgets = await global.db.engine.find('widgets')
-      let dashboards = await global.db.engine.find('dashboards')
-      cb(widgets, dashboards)
-    })
+      const dashboards = await getRepository(Dashboard).find({
+        relations: ['widgets'],
+        order: {
+          createdAt: 'ASC',
+        },
+      });
+      cb(dashboards);
+    });
 
     socket.on('createDashboard', async (name, cb) => {
-      cb(await global.db.engine.insert('dashboards', { name, createdAt: Date.now(), id: uuid() }))
-    })
+      cb(await getRepository(Dashboard).save({ name, createdAt: Date.now(), id: uuid() }));
+    });
 
     socket.on('removeDashboard', async (id) => {
-      await global.db.engine.remove('dashboards', { id })
-      await global.db.engine.remove('widgets', { dashboardId: id })
-    })
+      if (id !== 'c287b750-b620-4017-8b3e-e48757ddaa83') {
+        await getRepository(Widget).delete({ dashboardId: id });
+        await getRepository(Dashboard).delete({ id });
+      }
+    });
 
-    socket.on('addWidget', async function (widget, dashboardId, cb) {
-      cb(await self.addWidgetToDb(self, widget, dashboardId, socket));
+    socket.on('addWidget', async function (widgetName, id, cb) {
+      // add widget to bottom left
+      const dashboard = await getRepository(Dashboard).findOne({
+        relations: ['widgets'],
+        where: { id } ,
+      });
+      let y = 0;
+      for (const w of dashboard.widgets) {
+        y = Math.max(y, w.positionY + w.height);
+      }
+      const widget = new Widget();
+      widget.name = widgetName;
+      widget.positionX = 0;
+      widget.positionY = y;
+      widget.width = 4;
+      widget.height = 3;
+      dashboard.widgets.push(widget);
+      cb(await getRepository(Dashboard).save(dashboard));
     })
-    socket.on('updateWidgets', function (widgets) { self.updateWidgetsInDb(self, widgets, socket) })
+    socket.on('updateWidgets', async (dashboards) => {
+      await getRepository(Dashboard).save(dashboards);
+    });
     socket.on('connection_status', cb => { cb(global.status) });
     socket.on('saveConfiguration', function (data) {
       _.each(data, async function (index, value) {
@@ -367,6 +495,7 @@ function Panel () {
             ' widget=' + listener.self.constructor.name + ' on=' + listener.on)
         }
         try { await listener.fnc(listener.self, self.io, data) } catch (e) {
+          error(e)
           error('Error on ' + listener.on + ' listener')
         }
         if (listener.finally && listener.finally !== listener.fnc) listener.finally(listener.self, self.io)
@@ -406,24 +535,6 @@ Panel.prototype.addMenu = function (menu) {
 
 Panel.prototype.addWidget = function (id, name, icon) { this.widgets.push({ id: id, name: name, icon: icon }) }
 
-
-Panel.prototype.updateWidgetsInDb = async function (self, widgets, socket) {
-  await global.db.engine.remove('widgets', {}) // remove widgets
-  for (let widget of widgets) {
-    global.db.engine.update('widgets', { id: widget.id }, { id: widget.id, dashboardId: widget.dashboardId, position: { x: widget.position.x, y: widget.position.y }, size: { width: widget.size.width, height: widget.size.height } })
-  }
-}
-
-Panel.prototype.addWidgetToDb = async function (self, widget, dashboardId, socket) {
-  // add widget to bottom left
-  const widgets = await global.db.engine.find('widgets', { dashboardId });
-  let y = 0;
-  for (const widget of widgets) {
-    y = Math.max(y, widget.position.y + widget.size.height);
-  }
- return (await global.db.engine.update('widgets', { id: widget }, { dashboardId, id: widget, position: { x: 0, y }, size: { width: 4, height: 3 } }))
-}
-
 Panel.prototype.socketListening = function (self, on, fnc) {
   this.socketListeners.push({ self: self, on: on, fnc: fnc })
 }
@@ -451,7 +562,34 @@ Panel.prototype.sendStreamData = async function (self, socket) {
       spotifyCurrentSong = null;
     }
 
-    var data = {
+    let tagQuery = getRepository(TwitchTag)
+      .createQueryBuilder('tags')
+      .select('names.locale', 'locale')
+      .addSelect('names.value', 'value')
+      .addSelect('tags.tag_id', 'tag_id')
+      .addSelect('tags.is_auto', 'is_auto')
+      .addSelect('tags.is_current', 'is_current')
+      .where('tags.is_current = True')
+      .leftJoinAndSelect(TwitchTagLocalizationName, 'names', `"names"."tagId" = "tag_id" AND "names"."locale" like :tag`)
+      .setParameter("tag", '%' + global.general.lang +'%');
+
+    let tagResults = await tagQuery.execute();
+    if (tagResults.length === 0) {
+      // if we don';t have results with our selected locale => reload with en-us
+      tagQuery = getRepository(TwitchTag)
+        .createQueryBuilder('tags')
+        .select('names.locale', 'locale')
+        .addSelect('names.value', 'value')
+        .addSelect('tags.tag_id', 'tag_id')
+        .addSelect('tags.is_auto', 'is_auto')
+        .addSelect('tags.is_current', 'is_current')
+        .where('tags.is_current = True')
+        .leftJoinAndSelect(TwitchTagLocalizationName, 'names', `"names"."tagId" = "tag_id" AND "names"."locale" = :tag`)
+        .setParameter("tag", 'en-us');
+      tagResults = await tagQuery.execute();
+    }
+
+    const data = {
       broadcasterType: global.oauth.broadcasterType,
       uptime: commons.getTime(global.api.isStreamOnline ? global.api.streamStatusChangeSince : null, false),
       currentViewers: global.api.stats.currentViewers,
@@ -470,7 +608,7 @@ Panel.prototype.sendStreamData = async function (self, socket) {
       currentSong: ytCurrentSong || spotifyCurrentSong || global.translate('songs.not-playing'),
       currentHosts: global.api.stats.currentHosts,
       currentWatched: global.api.stats.currentWatchedTime,
-      tags: await global.db.engine.find('core.api.currentTags'),
+      tags: tagResults,
     }
     socket.emit('stats', data)
   } catch (e) {

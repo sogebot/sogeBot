@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 /* global describe it before */
 
 require('../../general.js');
@@ -6,14 +7,17 @@ const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 const variable = require('../../general.js').variable;
 const { getLocalizedName } = require('../../../dest/commons');
-const time = require('../../general.js').time;
+
+const { getRepository } = require('typeorm');
+const { User } = require('../../../dest/database/entity/user');
+const { Duel } = require('../../../dest/database/entity/duel');
 
 const _ = require('lodash');
 const assert = require('assert');
 
-const owner = { username: 'soge__' };
-const user1 = { username: 'user1', userId: String(_.random(999999, false)) };
-const user2 = { username: 'user2', userId: String(_.random(999999, false)) };
+const owner = { username: 'soge__', userId: Number(_.random(999999, false)) };
+const user1 = { username: 'user1', userId: Number(_.random(999999, false)) };
+const user2 = { username: 'user2', userId: Number(_.random(999999, false)) };
 const command = '!duel';
 
 describe('Gambling - duel', () => {
@@ -34,9 +38,9 @@ describe('Gambling - duel', () => {
 
     it('Add 200 points to duel bank', async () => {
       for (let i = 0; i < 200; i++) {
-        await global.db.engine.insert(global.games.duel.collection.users, { tickets: 1, user: 'user' + i, id: i });
+        await getRepository(Duel).save({ tickets: 1, username: 'user' + i, id: i });
       }
-      const items = await global.db.engine.find(global.games.duel.collection.users);
+      const items = await getRepository(Duel).find();
       assert.equal(items.length, 200);
     });
 
@@ -62,8 +66,8 @@ describe('Gambling - duel', () => {
     });
 
     it('add points for users', async () => {
-      await global.db.engine.insert('users.points', { id: user1.userId, points: 100 });
-      await global.db.engine.insert('users.points', { id: user2.userId, points: 100 });
+      await getRepository(User).save({ userId: user1.userId, username: user1.username, points: 100 });
+      await getRepository(User).save({ userId: user2.userId, username: user2.username, points: 100 });
     });
 
     it('user 1 is challenging', async () => {
@@ -99,7 +103,7 @@ describe('Gambling - duel', () => {
     });
 
     it('winner should be announced', async () => {
-      await message.isSent('gambling.duel.winner', owner, [{
+      await message.isSent('gambling.duel.winner', { username: 'bot'}, [{
         pointsName: await global.systems.points.getPointsName(200),
         points: 200,
         probability: _.round(50, 2),
@@ -126,9 +130,9 @@ describe('Gambling - duel', () => {
     it('create duel', async () => {
       global.games.duel._timestamp = Number(new Date());
 
-      for (const user of ['testuser', 'testuser2', 'testuser3', 'testuser4', 'testuser5']) {
-        const tickets = Math.floor(Number.MAX_SAFE_INTEGER / 10);
-        await global.db.engine.update(`${global.games.duel.collection.users}`, { key: '_users' }, { user: user, tickets: tickets });
+      for (const [id, username] of Object.entries(['testuser', 'testuser2', 'testuser3', 'testuser4', 'testuser5'])) {
+        const tickets = Math.floor(Number.MAX_SAFE_INTEGER / 10000000);
+        await getRepository(Duel).save({ id: Number(id), username, tickets: tickets });
       }
     });
 

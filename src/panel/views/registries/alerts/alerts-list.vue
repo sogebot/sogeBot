@@ -34,29 +34,29 @@
     </b-alert>
     <b-table v-else :fields="fields" :items="filtered" hover small style="cursor: pointer;" @row-clicked="linkTo($event)">
       <template v-slot:cell(additional-info)="data">
-        <span :class="{'text-primary': data.item.alerts.follows.length > 0, 'text-muted': data.item.alerts.follows.length === 0}">
-          FOLLOW<span v-if="data.item.alerts.follows.length > 0">({{data.item.alerts.follows.length}})</span>
+        <span :class="{'text-primary': data.item.follows.length > 0, 'text-muted': data.item.follows.length === 0}">
+          FOLLOW<span v-if="data.item.follows.length > 0">({{data.item.follows.length}})</span>
         </span>
-        <span :class="{'text-primary': data.item.alerts.hosts.length > 0, 'text-muted': data.item.alerts.hosts.length === 0}">
-          HOSTS<span v-if="data.item.alerts.hosts.length > 0">({{data.item.alerts.hosts.length}})</span>
+        <span :class="{'text-primary': data.item.hosts.length > 0, 'text-muted': data.item.hosts.length === 0}">
+          HOSTS<span v-if="data.item.hosts.length > 0">({{data.item.hosts.length}})</span>
         </span>
-        <span :class="{'text-primary': data.item.alerts.raids.length > 0, 'text-muted': data.item.alerts.raids.length === 0}">
-          RAID<span v-if="data.item.alerts.raids.length > 0">({{data.item.alerts.raids.length}})</span>
+        <span :class="{'text-primary': data.item.raids.length > 0, 'text-muted': data.item.raids.length === 0}">
+          RAID<span v-if="data.item.raids.length > 0">({{data.item.raids.length}})</span>
         </span>
-        <span :class="{'text-primary': data.item.alerts.cheers.length > 0, 'text-muted': data.item.alerts.cheers.length === 0}">
-          CHEERS<span v-if="data.item.alerts.cheers.length > 0">({{data.item.alerts.cheers.length}})</span>
+        <span :class="{'text-primary': data.item.cheers.length > 0, 'text-muted': data.item.cheers.length === 0}">
+          CHEERS<span v-if="data.item.cheers.length > 0">({{data.item.cheers.length}})</span>
         </span>
-        <span :class="{'text-primary': data.item.alerts.subs.length > 0, 'text-muted': data.item.alerts.subs.length === 0}">
-          SUBS<span v-if="data.item.alerts.subs.length > 0">({{data.item.alerts.subs.length}})</span>
+        <span :class="{'text-primary': data.item.subs.length > 0, 'text-muted': data.item.subs.length === 0}">
+          SUBS<span v-if="data.item.subs.length > 0">({{data.item.subs.length}})</span>
         </span>
-        <span :class="{'text-primary': data.item.alerts.subs.length > 0, 'text-muted': data.item.alerts.resubs.length === 0}">
-          RESUBS<span v-if="data.item.alerts.resubs.length > 0">({{data.item.alerts.resubs.length}})</span>
+        <span :class="{'text-primary': data.item.subs.length > 0, 'text-muted': data.item.resubs.length === 0}">
+          RESUBS<span v-if="data.item.resubs.length > 0">({{data.item.resubs.length}})</span>
         </span>
-        <span :class="{'text-primary': data.item.alerts.subs.length > 0, 'text-muted': data.item.alerts.subgifts.length === 0}">
-          SUBGIFTS<span v-if="data.item.alerts.subgifts.length > 0">({{data.item.alerts.subgifts.length}})</span>
+        <span :class="{'text-primary': data.item.subs.length > 0, 'text-muted': data.item.subgifts.length === 0}">
+          SUBGIFTS<span v-if="data.item.subgifts.length > 0">({{data.item.subgifts.length}})</span>
         </span>
-        <span :class="{'text-primary': data.item.alerts.tips.length > 0, 'text-muted': data.item.alerts.tips.length === 0}">
-          TIPS<span v-if="data.item.alerts.tips.length > 0">({{data.item.alerts.tips.length}})</span>
+        <span :class="{'text-primary': data.item.tips.length > 0, 'text-muted': data.item.tips.length === 0}">
+          TIPS<span v-if="data.item.tips.length > 0">({{data.item.tips.length}})</span>
         </span>
       </template>
       <template v-slot:cell(buttons)="data">
@@ -71,7 +71,7 @@
           <button-with-icon class="btn-only-icon btn-primary btn-reverse" icon="edit" v-bind:href="'#/registry/alerts/edit/' + data.item.id">
             {{ translate('dialog.buttons.edit') }}
           </button-with-icon>
-          <hold-button @trigger="del(data.item.id)" icon="trash" class="btn-danger btn-reverse btn-only-icon">
+          <hold-button @trigger="del(data.item)" icon="trash" class="btn-danger btn-reverse btn-only-icon">
             <template slot="title">{{translate('dialog.buttons.delete')}}</template>
             <template slot="onHoldTitle">{{translate('dialog.buttons.hold-to-delete')}}</template>
           </hold-button>
@@ -84,6 +84,7 @@
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
 import { getSocket } from 'src/panel/helpers/socket';
+import { Alert } from 'src/bot/database/entity/alert';
 
 @Component({
   components: {
@@ -107,12 +108,12 @@ export default class customVariablesList extends Vue {
     { key: 'buttons', label: '' },
   ];
 
-  items: Registry.Alerts.Alert[] = [];
+  items: Alert[] = [];
   search: string = '';
 
   state: { loaded: number; } = { loaded: this.$state.progress }
 
-  get filtered(): Registry.Alerts.Alert[] {
+  get filtered(): Alert[] {
     let items = this.items
     if (this.search.trim() !== '') {
       items = this.items.filter((o) => {
@@ -137,8 +138,8 @@ export default class customVariablesList extends Vue {
     this.$router.push({ name: 'alertsEdit', params: { id: item.id } });
   }
 
-  del(id) {
-    this.socket.emit('delete', { where: { id }}, (err, deleted) => {
+  del(item) {
+    this.socket.emit('alerts::delete', item, (err) => {
       if (err) {
         return console.error(err);
       }
@@ -148,8 +149,8 @@ export default class customVariablesList extends Vue {
 
   refresh() {
     this.state.loaded = this.$state.progress;
-    this.socket.emit('find', {}, (err, data: Registry.Alerts.Alert[]) => {
-      if (err) return console.error(err);
+    this.socket.emit('alerts::getAll', (data: Alert[]) => {
+      console.debug('Loaded', data)
       this.items = data;
       this.state.loaded = this.$state.success;
     })

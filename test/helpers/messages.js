@@ -88,7 +88,7 @@ module.exports = {
         return true;
       } catch (err) {
         return setError(
-          '\nExpected message: "' + JSON.stringify(expected) + '"\nActual message:   "' + (!_.isNil(log.warning.lastCall) ? log.warning.lastCall.args[0] : '') + '"');
+          '\nExpected message:\t"' + JSON.stringify(expected) + '"\nActual message:\t"' + (!_.isNil(log.warning.lastCall) ? log.warning.lastCall.args[0] : '') + '"');
       }
     }, 5000);
   },
@@ -130,7 +130,7 @@ module.exports = {
             e += ` [${user.username}]`;
           }
           /*
-          console.log(util.inspect(log.chatOut.args))
+          console.dir(log.chatOut.args, { depth: null })
           console.log({ expected: e, user })
           */
           if (log.chatOut.calledWith(e)) {
@@ -143,7 +143,7 @@ module.exports = {
       } catch (err) {
         return setError(
           '\nExpected message:\t"' + expected
-          + '\nActual message:\t"' + log.chatOut.args.join('\n\t\t') + '"'
+          + '\nActual message:\t\t"' + log.chatOut.args.join('\n\t\t') + '"'
         );
       }
     }, wait || 5000);

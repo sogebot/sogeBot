@@ -6,6 +6,10 @@ require('../../general.js');
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 
+const { getRepository } = require('typeorm');
+const { User } = require('../../../dest/database/entity/user');
+const { Settings } = require('../../../dest/database/entity/settings');
+
 // users
 const owner = { username: 'soge__' };
 const testuser = { username: 'testuser', userId: '1' };
@@ -25,9 +29,9 @@ describe('TMI - ignore', () => {
     global.tmi.globalIgnoreListExclude = [];
     global.tmi.ignorelist = [];
 
-    await global.db.engine.insert('users', testuser);
-    await global.db.engine.insert('users', testuser2);
-    await global.db.engine.insert('users', testuser3);
+    await getRepository(User).save(testuser);
+    await getRepository(User).save(testuser2);
+    await getRepository(User).save(testuser3);
   });
 
   beforeEach(async () => {
@@ -69,31 +73,47 @@ describe('TMI - ignore', () => {
 
     it('testuser should be in ignore list', async () => {
       global.tmi.ignoreCheck({ sender: owner, parameters: 'testuser' });
-      const item = await global.db.engine.findOne('core.settings', { system: 'tmi', key: 'ignorelist' });
+
+      const item = await getRepository(Settings).findOne({
+        where: {
+          namespace: '/core/tmi',
+          name: 'ignorelist',
+        },
+      });
 
       await message.isSent('ignore.user.is.ignored', owner, testuser);
       assert.isTrue(await commons.isIgnored(testuser));
-      assert.isNotEmpty(item);
+      assert.isTrue(typeof item !== 'undefined');
       assert.include(item.value, 'testuser');
     });
 
     it('@testuser2 should be in ignore list', async () => {
       global.tmi.ignoreCheck({ sender: owner, parameters: '@testuser2' });
-      const item = await global.db.engine.findOne('core.settings', { system: 'tmi', key: 'ignorelist' });
+      const item = await getRepository(Settings).findOne({
+        where: {
+          namespace: '/core/tmi',
+          name: 'ignorelist',
+        },
+      });
 
       await message.isSent('ignore.user.is.ignored', owner, testuser2);
       assert.isTrue(await commons.isIgnored(testuser2));
-      assert.isNotEmpty(item);
+      assert.isTrue(typeof item !== 'undefined');
       assert.include(item.value, 'testuser2');
     });
 
     it('testuser3 should not be in ignore list', async () => {
       global.tmi.ignoreCheck({ sender: owner, parameters: 'testuser3' });
-      const item = await global.db.engine.findOne('core.settings', { system: 'tmi', key: 'ignorelist' });
+      const item = await getRepository(Settings).findOne({
+        where: {
+          namespace: '/core/tmi',
+          name: 'ignorelist',
+        },
+      });
 
       await message.isSent('ignore.user.is.not.ignored', owner, testuser3);
       assert.isFalse(await commons.isIgnored(testuser3));
-      assert.isNotEmpty(item);
+      assert.isTrue(typeof item !== 'undefined');
       assert.notInclude(item.value, 'testuser3');
 
     });

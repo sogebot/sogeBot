@@ -46,7 +46,6 @@
 <script lang="ts">
 import { EventBus } from 'src/panel/helpers/event-bus';
 import Vue from 'vue'
-import { chunk, orderBy } from 'lodash-es'
 import { getSocket } from 'src/panel/helpers/socket';
 export default Vue.extend({
   props: ['popout', 'nodrag'],
@@ -83,8 +82,8 @@ export default Vue.extend({
   },
   methods: {
     load() {
-      this.socket.emit('find', {}, (err, d) => {
-        this.items = chunk(orderBy(d, 'timestamp', 'desc'), 50)[0];
+      this.socket.emit('social::getAll', { limit: 50 }, (d) => {
+        this.items = d;
         this.state.loading = this.$state.success;
       })
     }

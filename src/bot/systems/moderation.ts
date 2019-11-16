@@ -12,6 +12,10 @@ import { getLocalizedName, prepare, sendMessage, timeout } from '../commons';
 import { timeout as timeoutLog } from '../helpers/log';
 import { clusteredClientDelete } from '../cluster';
 import { adminEndpoint } from '../helpers/socket';
+import { Alias } from '../database/entity/alias';
+
+import { getRepository, LessThan } from 'typeorm';
+import { ModerationMessageCooldown, ModerationPermit, ModerationWarning } from '../database/entity/moderation';
 
 class Moderation extends System {
   @settings('lists')
@@ -103,21 +107,14 @@ class Moderation extends System {
   }
 
   async timeoutUser (sender, text, warning, msg, time, type) {
-    let [warnings, silent] = await Promise.all([
-      global.db.engine.find(global.systems.moderation.collection.warnings, { username: sender.username }),
-      this.isSilent(type),
-    ]);
-    text = text.trim();
-
     // cleanup warnings
-    let wasCleaned = false;
-    for (const warning of _.filter(warnings, (o) => _.now() - o.timestamp > 1000 * 60 * 60)) {
-      await global.db.engine.remove(global.systems.moderation.collection.warnings, { _id: warning._id.toString() });
-      wasCleaned = true;
-    }
-    if (wasCleaned) {
-      warnings = await global.db.engine.find(global.systems.moderation.collection.warnings, { username: sender.username });
-    }
+    await getRepository(ModerationWarning).delete({
+      timestamp: LessThan(1000 * 60 * 60),
+    });
+    const warnings = await getRepository(ModerationWarning).find({ username: sender.username });
+    const silent = await this.isSilent(type);
+
+    text = text.trim();
 
     if (this.cWarningsAllowedCount === 0) {
       msg = await new Message(msg.replace(/\$count/g, -1)).parse();
@@ -131,9 +128,9 @@ class Moderation extends System {
       msg = await new Message(warning.replace(/\$count/g, this.cWarningsAllowedCount - warnings.length)).parse();
       timeoutLog(`${sender.username} [${type}] ${time}s timeout | ${text}`);
       timeout(sender.username, msg, time);
-      await global.db.engine.remove(global.systems.moderation.collection.warnings, { username: sender.username });
+      await getRepository(ModerationWarning).delete({ username: sender.username });
     } else {
-      await global.db.engine.insert(global.systems.moderation.collection.warnings, { username: sender.username, timestamp: _.now() });
+      await getRepository(ModerationWarning).insert({ username: sender.username, timestamp: Date.now() });
       const warningsLeft = this.cWarningsAllowedCount - warnings.length;
       warning = await new Message(warning.replace(/\$count/g, warningsLeft < 0 ? 0 : warningsLeft)).parse();
       if (this.cWarningsShouldClearChat) {
@@ -155,8 +152,8 @@ class Moderation extends System {
     if (global.integrations.spotify.enabled) {
       // we can assume its first command in array (spotify have only one command)
       const command = (await global.integrations.spotify.commands())[0].command;
-      const alias = await global.db.engine.findOne(global.systems.alias.collection.data, { command });
-      if (!_.isEmpty(alias) && alias.enabled && global.systems.alias.enabled) {
+      const alias = await getRepository(Alias).findOne({ where: { command } });
+      if (alias && alias.enabled && global.systems.alias.enabled) {
         spotifyRegex = new RegExp('^(' + command + '|' + alias.alias + ') \\S+open\\.spotify\\.com\\/track\\/(\\w+)(.*)?', 'gi');
       } else {
         spotifyRegex = new RegExp('^(' + command + ') \\S+open\\.spotify\\.com\\/track\\/(\\w+)(.*)?', 'gi');
@@ -166,9 +163,9 @@ class Moderation extends System {
 
     // check if songrequest -or- alias of songrequest contain youtube link
     if (global.systems.songs.enabled) {
-      const alias = await global.db.engine.findOne(global.systems.alias.collection.data, { command: '!songrequest' });
+      const alias = await getRepository(Alias).findOne({ where: { command: '!songrequest' } });
       const cmd = global.systems.songs.getCommand('!songrequest');
-      if (!_.isEmpty(alias) && alias.enabled && global.systems.alias.enabled) {
+      if (alias && alias.enabled && global.systems.alias.enabled) {
         ytRegex = new RegExp('^(' + cmd + '|' + alias.alias + ') \\S+(?:youtu.be\\/|v\\/|e\\/|u\\/\\w+\\/|embed\\/|v=)([^#&?]*).*', 'gi');
       } else {
         ytRegex =  new RegExp('^(' + cmd + ') \\S+(?:youtu.be\\/|v\\/|e\\/|u\\/\\w+\\/|embed\\/|v=)([^#&?]*).*', 'gi');
@@ -213,7 +210,7 @@ class Moderation extends System {
       }
 
       for (let i = 0; i < count; i++) {
-        await global.db.engine.insert(this.collection.permits, { username: parsed[1].toLowerCase() });
+        await getRepository(ModerationPermit).insert({ username: parsed[1].toLowerCase() });
       }
 
       const m = await prepare('moderation.user-have-link-permit', { username: parsed[1].toLowerCase(), link: getLocalizedName(count, 'core.links'), count: count });
@@ -240,9 +237,9 @@ class Moderation extends System {
       : /[a-zA-Z0-9]+([a-zA-Z0-9-]+)?\.(aero|bet|biz|com|coop|edu|gov|info|int|mil|museum|name|net|org|shop|ac|ad|ae|af|ag|ai|al|am|an|ao|aq|ar|as|at|au|aw|az|ba|bb|bd|be|bf|bg|bh|bi|bj|bm|bn|bo|br|bs|bt|bv|bw|by|bz|ca|cc|cd|cf|cg|ch|ci|ck|cl|cm|cn|co|cr|cs|cu|cv|cx|cy|cz|de|dj|dk|dm|do|dz|ec|ee|eg|eh|er|es|et|fi|fj|fk|fm|fo|fr|ga|gb|gd|ge|gf|gg|gh|gi|gl|gm|gn|gp|gq|gr|gs|gt|gu|gw|gy|hk|hm|hn|hr|ht|hu|id|ie|il|im|in|io|iq|ir|is|it|je|jm|jo|jp|ke|kg|kh|ki|km|kn|kp|kr|kw|ky|kz|la|lb|lc|li|lk|lr|ls|lt|lu|lv|ly|ma|mc|md|me|mg|mh|mk|ml|mm|mn|mo|money|mp|mq|mr|ms|mt|mu|mv|mw|mx|my|mz|na|nc|ne|nf|ng|ni|nl|no|np|nr|nu|nz|om|pa|pe|pf|pg|ph|pk|pl|pm|pn|pr|ps|pt|pw|py|qa|re|ro|ru|rw|sa|sb|sc|sd|se|sg|sh|si|sj|sk|sl|sm|sn|so|sr|st|su|sv|sy|sz|tc|td|tf|tg|th|tj|tk|tm|tn|to|tp|tr|tt|tv|tw|tz|ua|ug|uk|um|us|uy|uz|va|vc|ve|vg|vi|vn|vu|wf|ws|ye|yt|yu|za|zm|zr|zw)\b/ig;
 
     if (whitelisted.search(urlRegex) >= 0) {
-      const permit = await global.db.engine.findOne(this.collection.permits, { username: opts.sender.username });
-      if (!_.isEmpty(permit)) {
-        await global.db.engine.remove(this.collection.permits, { _id: permit._id.toString() });
+      const permit = await getRepository(ModerationPermit).findOne({ username: opts.sender.username });
+      if (permit) {
+        await getRepository(ModerationPermit).remove(permit);
         return true;
       } else {
         this.timeoutUser(opts.sender, whitelisted,
@@ -491,9 +488,12 @@ class Moderation extends System {
   }
 
   async isSilent (name) {
-    const item = await global.db.engine.findOne(this.collection.messagecooldown, { key: name });
-    if (_.isEmpty(item) || (_.now() - item.value) >= 60000) {
-      await global.db.engine.update(this.collection.messagecooldown, { key: name }, { value: _.now() });
+    let item = await getRepository(ModerationMessageCooldown).findOne({ name });
+    if (!item || (Date.now() - item.timestamp) >= 60000) {
+      item = item || new ModerationMessageCooldown();
+      item.name = name;
+      item.timestamp = Date.now();
+      await getRepository(ModerationMessageCooldown).save(item);
       return false;
     }
     return true;

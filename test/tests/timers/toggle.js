@@ -2,19 +2,34 @@
 require('../../general.js');
 
 const db = require('../../general.js').db;
-const uuid = require('uuid/v4');
 const message = require('../../general.js').message;
 
 // users
 const owner = { username: 'soge__' };
 
+const { getRepository } = require('typeorm');
+const { Timer, TimerResponse } = require('../../../dest/database/entity/timer');
+
 describe('Timers - toggle()', () => {
   beforeEach(async () => {
     await db.cleanup();
     await message.prepare();
-    const id = uuid();
-    await global.db.engine.insert(global.systems.timers.collection.data, { id, name: 'test', messages: 0, seconds: 60, enabled: true, trigger: { messages: global.linesParsed, timestamp: new Date().getTime() } });
-    await global.db.engine.insert(global.systems.timers.collection.responses, { response: 'Lorem Ipsum', timerId: id, enabled: true });
+
+    let timer = new Timer();
+    timer.name = 'test';
+    timer.triggerEveryMessage = 0;
+    timer.triggerEverySecond = 60;
+    timer.isEnabled = true;
+    timer.triggeredAtTimestamp = Date.now();
+    timer.triggeredAtMessage = global.linesParsed;
+    timer = await getRepository(Timer).save(timer);
+
+    const response = new TimerResponse();
+    response.response = 'Lorem Ipsum';
+    response.timestamp = Date.now();
+    response.isEnabled = true;
+    response.timer = timer;
+    await getRepository(TimerResponse).save(response);
   });
 
   it('', async () => {
@@ -24,21 +39,21 @@ describe('Timers - toggle()', () => {
 
   it('-id something -name something', async () => {
     global.systems.timers.toggle({ sender: owner, parameters: '-id something -name something' });
-    await message.isSent('timers.id-or-name-must-be-defined', owner, { sender: owner.username });
+    await message.isSent('timers.timer-not-found', owner, { name: 'something', sender: owner.username });
   });
 
   it('-id unknown', async () => {
     global.systems.timers.toggle({ sender: owner, parameters: '-id unknown' });
-    await message.isSent('timers.response-not-found', owner, { id: 'unknown', sender: owner.username });
+    await message.isSent('timers.id-or-name-must-be-defined', owner, { sender: owner.username });
   });
 
   it('-id response_id', async () => {
-    const response = await global.db.engine.findOne(global.systems.timers.collection.responses, { response: 'Lorem Ipsum' });
-    global.systems.timers.toggle({ sender: owner, parameters: '-id ' + response._id });
-    await message.isSent('timers.response-disabled', owner, { id: response._id, sender: owner.username });
+    const response = await getRepository(TimerResponse).findOne({ response: 'Lorem Ipsum' });
+    global.systems.timers.toggle({ sender: owner, parameters: '-id ' + response.id });
+    await message.isSent('timers.response-disabled', owner, { id: response.id, sender: owner.username });
 
-    global.systems.timers.toggle({ sender: owner, parameters: '-id ' + response._id });
-    await message.isSent('timers.response-enabled', owner, { id: response._id, sender: owner.username });
+    global.systems.timers.toggle({ sender: owner, parameters: '-id ' + response.id });
+    await message.isSent('timers.response-enabled', owner, { id: response.id, sender: owner.username });
   });
 
   it('-name unknown', async () => {

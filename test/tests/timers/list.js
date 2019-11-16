@@ -8,14 +8,46 @@ const message = require('../../general.js').message;
 // users
 const owner = { username: 'soge__' };
 
+const { getRepository } = require('typeorm');
+const { Timer, TimerResponse } = require('../../../dest/database/entity/timer');
+
 describe('Timers - list()', () => {
   beforeEach(async () => {
     await db.cleanup();
     await message.prepare();
-    await global.db.engine.insert(global.systems.timers.collection.data, { id: uuid(), name: 'test', messages: 0, seconds: 60, enabled: true, trigger: { messages: global.linesParsed, timestamp: new Date().getTime() } });
-    const timer = await global.db.engine.insert(global.systems.timers.collection.data, { id: uuid(), name: 'test2', messages: 0, seconds: 60, enabled: false, trigger: { messages: global.linesParsed, timestamp: new Date().getTime() } });
-    await global.db.engine.insert(global.systems.timers.collection.responses, { response: 'Lorem Ipsum', timerId: timer.id, enabled: true });
-    await global.db.engine.insert(global.systems.timers.collection.responses, { response: 'Lorem Ipsum 2', timerId: timer.id, enabled: false });
+
+    const timer = new Timer();
+    timer.name = 'test';
+    timer.triggerEveryMessage = 0;
+    timer.triggerEverySecond = 60;
+    timer.isEnabled = true;
+    timer.triggeredAtTimestamp = Date.now();
+    timer.triggeredAtMessage = global.linesParsed;
+    await getRepository(Timer).save(timer);
+
+    let timer2 = new Timer();
+    timer2.name = 'test2';
+    timer2.triggerEveryMessage = 0;
+    timer2.triggerEverySecond = 60;
+    timer2.isEnabled = false;
+    timer2.triggeredAtTimestamp = Date.now();
+    timer2.triggeredAtMessage = global.linesParsed;
+    timer2.responses = [];
+    timer2 = await getRepository(Timer).save(timer2);
+
+    const response = new TimerResponse();
+    response.response = 'Lorem Ipsum';
+    response.timestamp = Date.now();
+    response.isEnabled = true;
+    response.timer = timer2;
+    await getRepository(TimerResponse).save(response);
+
+    const response2 = new TimerResponse();
+    response2.response = 'Lorem Ipsum 2';
+    response2.timestamp = Date.now();
+    response2.isEnabled = false;
+    response2.timer = timer2;
+    await getRepository(TimerResponse).save(response2);
   });
 
   it('', async () => {
@@ -31,15 +63,15 @@ describe('Timers - list()', () => {
   it('-name test2', async () => {
     global.systems.timers.list({ sender: owner, parameters: '-name test2' });
 
-    const response1 = await global.db.engine.findOne(global.systems.timers.collection.responses, { response: 'Lorem Ipsum' });
-    const response2 = await global.db.engine.findOne(global.systems.timers.collection.responses, { response: 'Lorem Ipsum 2' });
+    const response1 = await getRepository(TimerResponse).findOne({ response: 'Lorem Ipsum' });
+    const response2 = await getRepository(TimerResponse).findOne({ response: 'Lorem Ipsum 2' });
 
     await message.isSent('timers.responses-list', owner, { name: 'test2', sender: owner.username });
     await message.isSentRaw([
-      `⚫ ${response1._id} - ${response1.response}`,
-      `⚪ ${response2._id} - ${response2.response}`], owner, { name: 'test2', sender: owner.username });
+      `⚫ ${response1.id} - ${response1.response}`,
+      `⚪ ${response2.id} - ${response2.response}`], owner, { name: 'test2', sender: owner.username });
     await message.isSentRaw([
-      `⚫ ${response1._id} - ${response1.response}`,
-      `⚪ ${response2._id} - ${response2.response}`], owner, { name: 'test2', sender: owner.username });
+      `⚫ ${response1.id} - ${response1.response}`,
+      `⚪ ${response2.id} - ${response2.response}`], owner, { name: 'test2', sender: owner.username });
   });
 });

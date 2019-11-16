@@ -1,6 +1,6 @@
 <template>
 <div class="w-100 h-100" v-if="group">
-  <template v-for="(goal, index) of goals">
+  <template v-for="(goal, index) of group.goals">
     <transition
       @before-enter="beforeEnter"
       @enter="doEnterAnimation"
@@ -8,32 +8,32 @@
       :css="false"
       :key="index">
       <b-progress
-        v-if="goal.display === 'simple' && (goals.length === 1 || show === index || group.display.type === 'multi')"
-        :height="goal.customization.bar.height + 'px'"
+        v-if="goal.display === 'simple' && (group.goals.length === 1 || show === index || group.display.type === 'multi')"
+        :height="goal.customizationBar.height + 'px'"
         :max="Number(goal.goalAmount)"
         style="border-radius: 0;"
         class="w-100"
         :class="{ disabled: isDisabled(index), 'position-absolute': group.display.type !== 'multi' }"
         :style="{
-          border: goal.customization.bar.borderPx + 'px solid ' + goal.customization.bar.borderColor,
-          'background-color': goal.customization.bar.backgroundColor ,
-          'font-family': getFontFamilyCSS(goal.customization.font.family),
-          'margin-top': index !== 0 && goals.length > 0 && group.display.type === 'multi' ? group.display.spaceBetweenGoalsInPx + 'px' : '0px',
+          border: goal.customizationBar.borderPx + 'px solid ' + goal.customizationBar.borderColor,
+          'background-color': goal.customizationBar.backgroundColor ,
+          'font-family': getFontFamilyCSS(goal.customizationFont.family),
+          'margin-top': index !== 0 && group.goals.length > 0 && group.display.type === 'multi' ? group.display.spaceBetweenGoalsInPx + 'px' : '0px',
         }">
         <b-progress-bar
           :value="Number(goal.currentAmount)"
           :style="{
-            'background-color': goal.customization.bar.color
+            'background-color': goal.customizationBar.color
           }"></b-progress-bar>
         <div class="row no-gutters"
           :style="{
             'position': 'absolute',
-            'height': (goal.customization.bar.height - (goal.customization.bar.borderPx * 2)) + 'px',
-            'line-height': (goal.customization.bar.height - (goal.customization.bar.borderPx * 2)) + 'px',
+            'height': (goal.customizationBar.height - (goal.customizationBar.borderPx * 2)) + 'px',
+            'line-height': (goal.customizationBar.height - (goal.customizationBar.borderPx * 2)) + 'px',
             'width': '100%',
-            'color': goal.customization.font.color,
-            'font-size': goal.customization.font.size + 'px',
-            'text-shadow': textStrokeGenerator(goal.customization.font.borderPx, goal.customization.font.borderColor)
+            'color': goal.customizationFont.color,
+            'font-size': goal.customizationFont.size + 'px',
+            'text-shadow': textStrokeGenerator(goal.customizationFont.borderPx, goal.customizationFont.borderColor)
           }">
           <div class="col-4 text-left text-nowrap pl-2 pr-2">{{ goal.name }}</div>
           <div class="col-4 text-nowrap text-center">
@@ -53,42 +53,42 @@
         :class="{ disabled: isDisabled(index), 'position-absolute': group.display.type !== 'multi' }"
         style="width: 100%"
         :style="{
-          'padding-top': index !== 0 && goals.length > 0 && group.display.type === 'multi' ? group.display.spaceBetweenGoalsInPx + 'px' : '0px',
+          'padding-top': index !== 0 && group.goals.length > 0 && group.display.type === 'multi' ? group.display.spaceBetweenGoalsInPx + 'px' : '0px',
         }"
-        v-else-if="goal.display === 'full' && (goals.length === 1 || group.display.type === 'multi' || show === index)">
+        v-else-if="goal.display === 'full' && (group.goals.length === 1 || group.display.type === 'multi' || show === index)">
         <div class="row no-gutters"
           :style="{
-            'color': goal.customization.font.color,
-            'font-size': goal.customization.font.size + 'px',
-            'text-shadow': textStrokeGenerator(goal.customization.font.borderPx, goal.customization.font.borderColor)
+            'color': goal.customizationFont.color,
+            'font-size': goal.customizationFont.size + 'px',
+            'text-shadow': textStrokeGenerator(goal.customizationFont.borderPx, goal.customizationFont.borderColor)
           }">
           <div class="col text-center text-truncate pl-2 pr-2">{{ goal.name }}</div>
         </div>
         <b-progress
-          :height="goal.customization.bar.height + 'px'"
+          :height="goal.customizationBar.height + 'px'"
           :max="goal.goalAmount"
           style="border-radius: 0;"
           class="w-100"
           :class="{ disabled: isDisabled(index) }"
           :style="{
-            border: goal.customization.bar.borderPx + 'px solid ' + goal.customization.bar.borderColor,
-            'background-color': goal.customization.bar.backgroundColor,
-            'font-family': getFontFamilyCSS(goal.customization.font.family)
+            border: goal.customizationBar.borderPx + 'px solid ' + goal.customizationBar.borderColor,
+            'background-color': goal.customizationBar.backgroundColor,
+            'font-family': getFontFamilyCSS(goal.customizationFont.family)
           }">
           <b-progress-bar
             :value="Number(goal.currentAmount)"
             :style="{
-              'background-color': goal.customization.bar.color
+              'background-color': goal.customizationBar.color
             }"></b-progress-bar>
           <div class="row no-gutters"
             :style="{
               'position': 'absolute',
-              'height': (goal.customization.bar.height - (goal.customization.bar.borderPx * 2)) + 'px',
-              'line-height': (goal.customization.bar.height - (goal.customization.bar.borderPx * 2)) + 'px',
+              'height': (goal.customizationBar.height - (goal.customizationBar.borderPx * 2)) + 'px',
+              'line-height': (goal.customizationBar.height - (goal.customizationBar.borderPx * 2)) + 'px',
               'width': '100%',
-              'color': goal.customization.font.color,
-              'font-size': goal.customization.font.size + 'px',
-              'text-shadow': textStrokeGenerator(goal.customization.font.borderPx, goal.customization.font.borderColor)
+              'color': goal.customizationFont.color,
+              'font-size': goal.customizationFont.size + 'px',
+              'text-shadow': textStrokeGenerator(goal.customizationFont.borderPx, goal.customizationFont.borderColor)
             }">
             <div class="col text-center">
               <template v-if="goal.type === 'tips'">
@@ -101,9 +101,9 @@
         <div class="row no-gutters"
           :style="{
             'width': '100%',
-            'color': goal.customization.font.color,
-            'font-size': goal.customization.font.size + 'px',
-            'text-shadow': textStrokeGenerator(goal.customization.font.borderPx, goal.customization.font.borderColor)
+            'color': goal.customizationFont.color,
+            'font-size': goal.customizationFont.size + 'px',
+            'text-shadow': textStrokeGenerator(goal.customizationFont.borderPx, goal.customizationFont.borderColor)
           }">
           <div class="col text-left pl-2">
             <template v-if="goal.type === 'tips'">
@@ -123,10 +123,10 @@
         </div>
       </div>
       <div
-        v-else-if="goal.display === 'custom' && (goals.length === 1 || group.display.type === 'multi' || show === index)"
+        v-else-if="goal.display === 'custom' && (group.goals.length === 1 || group.display.type === 'multi' || show === index)"
         class="wrap"
-        :id="'wrap-' + goal.uid"
-        v-html="goal.customization.html"></div>
+        :id="'wrap-' + goal.id"
+        v-html="goal.customizationHtml"></div>
     </transition>
   </template>
 </div>
@@ -153,12 +153,12 @@ Vue.use(VueMoment, {
 })
 
 import { TweenLite } from 'gsap/TweenMax'
+import { GoalGroup } from 'src/bot/database/entity/goal';
 
 @Component({})
 export default class GoalsOverlay extends Vue {
   show: number = -1;
-  group: Goals.Group | null = null;
-  goals: Goals.Goal[] = [];
+  group: GoalGroup | null = null;
   loadedFonts: string[] = [];
   socket = getSocket('/overlays/goals', true);
   lastSwapTime: number = Date.now();
@@ -185,7 +185,7 @@ export default class GoalsOverlay extends Vue {
       if (this.group.display.type === 'fade') {
         if (this.lastSwapTime + Number(this.group.display.durationMs) < Date.now()) {
           this.lastSwapTime = Date.now() + Number(this.group.display.animationInMs) + Number(this.group.display.animationOutMs)
-          if (typeof this.goals[this.show + 1] === 'undefined') this.show = 0
+          if (typeof this.group.goals[this.show + 1] === 'undefined') this.show = 0
           else this.show = this.show + 1
         }
       }
@@ -223,7 +223,7 @@ export default class GoalsOverlay extends Vue {
   isDisabled(idx) {
     if (this.group === null) return false;
 
-    const goal = this.goals[idx]
+    const goal = this.group.goals[idx]
     return new Date(goal.endAfter).getTime() <= new Date().getTime() && !goal.endAfterIgnore
   }
 
@@ -253,105 +253,100 @@ export default class GoalsOverlay extends Vue {
   }
 
   refresh () {
-    const uid = window.location.href.split('/')[window.location.href.split('/').length - 1]
-    if (uid) {
-      this.socket.emit('current', (err, current: { subscribers: number, followers: number }) => {
+    const id = window.location.href.split('/')[window.location.href.split('/').length - 1]
+    if (id) {
+      this.socket.emit('goals::current', (err, current: { subscribers: number, followers: number }) => {
         if (err) return console.error(err)
         this.current = current
       })
-      this.socket.emit('findOne', { collection: 'groups', where: { uid }}, (err, cb: Goals.Group | null) => {
+      this.socket.emit('goals::getOne', id, (err, cb: GoalGroup | undefined) => {
         if (err) return console.error(err)
-        this.group = cb
-      })
+        this.group = cb || null;
 
-      this.socket.emit('find', { collection: 'goals', where: { groupId: uid }}, (err, goals: Goals.Goal[]) => {
-        if (err) return console.error(err)
-
-      // run check first
-      if (this.goals.length > 0) {
-        for (const goal of this.goals) {
-          let _goal = find(this.goals, (o) => o.uid === goal.uid)
-          if (typeof _goal !== 'undefined') {
-            if (Number(_goal.currentAmount) !== Number(goal.currentAmount)) {
-              console.debug(_goal.currentAmount + ' => ' + goal.currentAmount)
-              this.triggerUpdate.push(goal.uid)
+        if (this.group) {
+          if (this.group.goals.length > 0) {
+            for (const goal of this.group.goals) {
+              let _goal = find(this.group.goals, (o) => o.id === goal.id)
+              if (typeof _goal !== 'undefined') {
+                if (Number(_goal.currentAmount) !== Number(goal.currentAmount)) {
+                  console.debug(_goal.currentAmount + ' => ' + goal.currentAmount)
+                  this.triggerUpdate.push(goal.id)
+                }
+              }
             }
           }
-        }
-      }
 
-      this.goals = goals
+          // update currentAmount for current types
+          for (const goal of this.group.goals) {
+            if (goal.type === 'currentFollowers') {
+              if (goal.currentAmount !== this.current.followers) this.triggerUpdate.push(goal.id)
+              goal.currentAmount = this.current.followers
+            }
+            if (goal.type === 'currentSubscribers') {
+              if (goal.currentAmount !== this.current.subscribers) this.triggerUpdate.push(goal.id)
+              goal.currentAmount = this.current.subscribers
+            }
+          }
 
-      // update currentAmount for current types
-      for (const goal of this.goals) {
-        if (goal.type === 'currentFollowers') {
-          if (goal.currentAmount !== this.current.followers) this.triggerUpdate.push(goal.uid)
-          goal.currentAmount = this.current.followers
-        }
-        if (goal.type === 'currentSubscribers') {
-          if (goal.currentAmount !== this.current.subscribers) this.triggerUpdate.push(goal.uid)
-          goal.currentAmount = this.current.subscribers
-        }
-      }
+          // add css import
+          for (const goal of this.group.goals) {
+            if (!this.cssLoaded.includes(goal.id)) {
+              this.cssLoaded.push(goal.id);
+              const head = document.getElementsByTagName('head')[0]
+              const style = document.createElement('style')
+              style.type = 'text/css';
+              if (!this.loadedFonts.includes(goal.customizationCss)) {
+                this.loadedFonts.push(goal.customizationCss)
+                const css = goal.customizationCss
+                  .replace(/\#wrap/g, '#wrap-' + goal.id) // replace .wrap with only this goal wrap
+                style.appendChild(document.createTextNode(css));
+              }
+              head.appendChild(style);
+            }
+          }
 
-      // add css import
-      for (const goal of this.goals) {
-        if (!this.cssLoaded.includes(goal.uid)) {
-          this.cssLoaded.push(goal.uid);
+          // add fonts import
           const head = document.getElementsByTagName('head')[0]
           const style = document.createElement('style')
           style.type = 'text/css';
-          if (!this.loadedFonts.includes(goal.customization.css)) {
-            this.loadedFonts.push(goal.customization.css)
-            const css = goal.customization.css
-              .replace(/\#wrap/g, '#wrap-' + goal.uid) // replace .wrap with only this goal wrap
-            style.appendChild(document.createTextNode(css));
+
+          for (const goal of this.group.goals) {
+            if (!this.loadedFonts.includes(goal.customizationFont.family)) {
+              this.loadedFonts.push(goal.customizationFont.family)
+              const font = goal.customizationFont.family.replace(/ /g, '+')
+              const css = "@import url('https://fonts.googleapis.com/css?family=" + font + "');"
+              style.appendChild(document.createTextNode(css));
+            }
           }
           head.appendChild(style);
-        }
-      }
 
-      // add fonts import
-      const head = document.getElementsByTagName('head')[0]
-      const style = document.createElement('style')
-      style.type = 'text/css';
+          // if custom html update all variables
+          for (const goal of this.group.goals) {
+            if (goal.display === 'custom') {
+              goal.customizationHtml = goal.customizationHtml
+                .replace(/\$name/g, goal.name)
+                .replace(/\$type/g, goal.type)
+                .replace(/\$goalAmount/g, String(goal.goalAmount))
+                .replace(/\$currentAmount/g, String(goal.currentAmount))
+                .replace(/\$percentageAmount/g, Number((100 / goal.goalAmount) * goal.currentAmount).toFixed())
+                .replace(/\$endAfter/g, new Date(goal.endAfter).toISOString())
+            }
 
-      for (const goal of this.goals) {
-        if (!this.loadedFonts.includes(goal.customization.font.family)) {
-          this.loadedFonts.push(goal.customization.font.family)
-          const font = goal.customization.font.family.replace(/ /g, '+')
-          const css = "@import url('https://fonts.googleapis.com/css?family=" + font + "');"
-          style.appendChild(document.createTextNode(css));
-        }
-      }
-      head.appendChild(style);
+            // trigger onUpdate on nextTick
+            this.$nextTick(() => {
+              if (this.triggerUpdate.includes(goal.id)) {
+                const idx = this.triggerUpdate.indexOf(goal.id);
+                this.triggerUpdate.splice(idx, 1);
 
-      // if custom html update all variables
-      for (const goal of this.goals) {
-        if (goal.display === 'custom') {
-          goal.customization.html = goal.customization.html
-            .replace(/\$name/g, goal.name)
-            .replace(/\$type/g, goal.type)
-            .replace(/\$goalAmount/g, String(goal.goalAmount))
-            .replace(/\$currentAmount/g, String(goal.currentAmount))
-            .replace(/\$percentageAmount/g, Number((100 / goal.goalAmount) * goal.currentAmount).toFixed())
-            .replace(/\$endAfter/g, goal.endAfter)
-        }
-
-        // trigger onUpdate on nextTick
-        this.$nextTick(() => {
-          if (this.triggerUpdate.includes(goal.uid)) {
-            const idx = this.triggerUpdate.indexOf(goal.uid);
-            this.triggerUpdate.splice(idx, 1);
-
-            console.debug('onUpdate : ' + goal.uid)
-            let toEval = `(function evaluation () { ${goal.customization.js}; onChange(${goal.currentAmount}) })()`
-            safeEval(toEval)
+                console.debug('onUpdate : ' + goal.id)
+                let toEval = `(function evaluation () { ${goal.customizationJs}; onChange(${goal.currentAmount}) })()`
+                safeEval(toEval)
+              }
+            })
           }
-        })
-      }
 
-        this.$nextTick(() => { if (this.show === -1) this.show = 0; })
+          this.$nextTick(() => { if (this.show === -1) this.show = 0; })
+        }
       })
     } else {
       console.error('Missing id param in url')

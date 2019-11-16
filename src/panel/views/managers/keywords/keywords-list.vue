@@ -28,7 +28,7 @@
     <b-alert show v-else-if="state.loading === 2 && items.length === 0">
       {{translate('systems.keywords.empty')}}
     </b-alert>
-    <b-table v-else striped small :items="fItems" :fields="fields">
+    <b-table v-else striped small hover :items="fItems" :fields="fields" @row-clicked="linkTo($event)">
       <template v-slot:cell(buttons)="data">
         <div class="text-right">
           <button-with-icon :class="[ data.item.enabled ? 'btn-success' : 'btn-danger' ]" class="btn-only-icon btn-reverse" icon="power-off" @click="data.item.enabled = !data.item.enabled; update(data.item)">
@@ -51,6 +51,8 @@
 import { Vue, Component/*, Watch */ } from 'vue-property-decorator';
 import { getSocket } from 'src/panel/helpers/socket';
 
+import { Keyword } from 'src/bot/database/entity/keyword';
+
 @Component({
   components: {
     'loading': () => import('../../../components/loading.vue'),
@@ -59,7 +61,7 @@ import { getSocket } from 'src/panel/helpers/socket';
 export default class keywordsList extends Vue {
   socket = getSocket('/systems/keywords');
 
-  items: Types.Keywords.Item[] = [];
+  items: Keyword[] = [];
   search: string = '';
   state: {
     loading: number;
@@ -74,7 +76,7 @@ export default class keywordsList extends Vue {
   ];
 
 
-  get fItems(): Types.Keywords.Item[] {
+  get fItems(): Keyword[] {
     let items = this.items
     if (this.search.trim() !== '') {
       items = this.items.filter((o) => {
@@ -99,29 +101,25 @@ export default class keywordsList extends Vue {
 
   refresh() {
     this.state.loading = this.$state.progress;
-    this.socket.emit('find', {}, (err, data: Types.Keywords.Item[]) => {
-      if (err) return console.error(err);
+    this.socket.emit('keywords::getAll', (data: Keyword[]) => {
       this.items = data;
       this.state.loading = this.$state.success;
     })
   }
 
   del(id) {
-    this.socket.emit('delete', { where: { id }}, (err, deleted) => {
-      if (err) {
-        return console.error(err);
-      }
+    this.socket.emit('keywords::deleteById', id, () => {
       this.refresh();
     })
   }
 
-  update(keyword: Types.Keywords.Item) {
-    delete keyword._id;
-    this.socket.emit('update', { key: 'id', items: [keyword] }, (err, data) => {
-      if (err) {
-        return console.error(err);
-      }
-    });
+  update(keyword: Keyword) {
+    this.socket.emit('keywords::save', keyword, () => {});
+  }
+
+  linkTo(item) {
+    console.debug('Clicked', item.id);
+    this.$router.push({ name: 'KeywordsManagerEdit', params: { id: item.id } });
   }
 }
 </script>

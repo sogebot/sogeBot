@@ -225,19 +225,21 @@ export default {
       if (event.event === 'resub' && !event.subStreakShareEnabled) {
         t = this.translate(`eventlist-events.resubWithoutStreak`);
       }
-      t = t.replace('$formatted_amount', '<strong style="font-size: 1rem">' + get(event, 'currency', '$') + parseFloat(get(event, 'amount', '0')).toFixed(2) + '</strong>')
-      t = t.replace('$viewers', '<strong style="font-size: 1rem">' + get(event, 'viewers', '0') + '</strong>')
-      t = t.replace('$tier', `${this.translate('tier')} <strong style="font-size: 1rem">${get(event, 'tier', 'n/a')}</strong>`)
-      t = t.replace('$username', get(event, 'from', 'n/a'))
-      t = t.replace('$subCumulativeMonthsName', get(event, 'subCumulativeMonthsName', 'months'))
-      t = t.replace('$subCumulativeMonths', '<strong style="font-size: 1rem">' + get(event, 'subCumulativeMonths', '0') + '</strong>')
-      t = t.replace('$subStreakName', get(event, 'subStreakName', 'months'))
-      t = t.replace('$subStreak', '<strong style="font-size: 1rem">' + get(event, 'subStreak', '0') + '</strong>')
-      t = t.replace('$bits', '<strong style="font-size: 1rem">' + get(event, 'bits', '0') + '</strong>')
+
+      const values = JSON.parse(event.values_json)
+      t = t.replace('$formatted_amount', '<strong style="font-size: 1rem">' + get(values, 'currency', '$') + parseFloat(get(values, 'amount', '0')).toFixed(2) + '</strong>')
+      t = t.replace('$viewers', '<strong style="font-size: 1rem">' + get(values, 'viewers', '0') + '</strong>')
+      t = t.replace('$tier', `${this.translate('tier')} <strong style="font-size: 1rem">${get(values, 'tier', 'n/a')}</strong>`)
+      t = t.replace('$username', get(values, 'from', 'n/a'))
+      t = t.replace('$subCumulativeMonthsName', get(values, 'subCumulativeMonthsName', 'months'))
+      t = t.replace('$subCumulativeMonths', '<strong style="font-size: 1rem">' + get(values, 'subCumulativeMonths', '0') + '</strong>')
+      t = t.replace('$subStreakName', get(values, 'subStreakName', 'months'))
+      t = t.replace('$subStreak', '<strong style="font-size: 1rem">' + get(values, 'subStreak', '0') + '</strong>')
+      t = t.replace('$bits', '<strong style="font-size: 1rem">' + get(values, 'bits', '0') + '</strong>')
 
       let output = `<span style="font-size:0.7rem; font-weight: normal">${t}</span>`
-      if (event.song_url && event.song_title) output += `<div style="font-size: 0.7rem"><strong>${this.translate('song-request')}:</strong> <a href="${event.song_url}">${event.song_title}</a></div>`
-      if (event.message) output += `<div class="eventlist-blockquote" style="font-size: ${this.eventlistMessageSize}px">${event.message.replace(/(\w{10})/g, '$1<wbr>')}</div>` // will force new line for long texts
+      if (values.song_url && values.song_title) output += `<div style="font-size: 0.7rem"><strong>${this.translate('song-request')}:</strong> <a href="${values.song_url}">${values.song_title}</a></div>`
+      if (values.message) output += `<div class="eventlist-blockquote" style="font-size: ${this.eventlistMessageSize}px">${values.message.replace(/(\w{10})/g, '$1<wbr>')}</div>` // will force new line for long texts
 
       return output
     },

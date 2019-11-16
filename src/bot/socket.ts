@@ -8,7 +8,7 @@ import { endpoints } from './helpers/socket';
 import { onLoad } from './decorators/on';
 
 type Auth = {
-  userId: string;
+  userId: number;
   type: 'admin' | 'viewer' | 'public';
   accessToken: string | null;
   accessTokenTimestamp: number;
@@ -70,7 +70,6 @@ class Socket extends Core {
 
   authorize(socket, next) {
     const sendAuthorized = (socket, auth) => {
-      socket.emit('authorized', { accessToken: auth.accessToken, refreshToken: auth.refreshToken, type: auth.type });
       if (auth.type === 'admin') {
         for (const endpoint of endpoints.filter(o => o.type === 'admin' && o.nsp === socket.nsp.name)) {
           socket.removeAllListeners(endpoint.on);
@@ -85,6 +84,7 @@ class Socket extends Core {
           endpoint.callback(...args, socket);
         });
       }
+      socket.emit('authorized', { accessToken: auth.accessToken, refreshToken: auth.refreshToken, type: auth.type });
 
       // reauth every minute
       setTimeout(() => emitAuthorize(socket), MINUTE);

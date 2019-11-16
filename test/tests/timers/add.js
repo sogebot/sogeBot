@@ -1,12 +1,14 @@
 /* global describe it beforeEach */
 
 
-const uuid = require('uuid/v4');
 const assert = require('chai').assert;
 require('../../general.js');
 
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
+
+const { getRepository } = require('typeorm');
+const { Timer, TimerResponse } = require('../../../dest/database/entity/timer');
 
 // users
 const owner = { username: 'soge__' };
@@ -15,7 +17,15 @@ describe('Timers - add()', () => {
   beforeEach(async () => {
     await db.cleanup();
     await message.prepare();
-    await global.db.engine.insert(global.systems.timers.collection.data, { id: uuid(), name: 'test', messages: 0, seconds: 60, enabled: true, trigger: { messages: global.linesParsed, timestamp: new Date().getTime() } });
+
+    const timer = new Timer();
+    timer.name = 'test';
+    timer.triggerEveryMessage = 0;
+    timer.triggerEverySecond = 60;
+    timer.isEnabled = true;
+    timer.triggeredAtTimestamp = Date.now();
+    timer.triggeredAtMessage = global.linesParsed;
+    await getRepository(Timer).save(timer);
   });
 
   it('', async () => {
@@ -36,8 +46,8 @@ describe('Timers - add()', () => {
   it('-name test -response "Lorem Ipsum"', async () => {
     await global.systems.timers.add({ sender: owner, parameters: '-name test -response "Lorem Ipsum"' });
 
-    const item = await global.db.engine.findOne(global.systems.timers.collection.responses, { response: 'Lorem Ipsum' });
-    assert.notEmpty(item);
+    const item = await getRepository(TimerResponse).findOne({ response: 'Lorem Ipsum' });
+    assert.isTrue(typeof item !== 'undefined');
 
     await message.isSent('timers.response-was-added', owner, { id: item.id, name: 'test', response: 'Lorem Ipsum', sender: owner.username });
   });

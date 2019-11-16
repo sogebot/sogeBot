@@ -22,7 +22,7 @@
           <template slot="title">{{translate('dialog.buttons.delete')}}</template>
           <template slot="onHoldTitle">{{translate('dialog.buttons.hold-to-delete')}}</template>
         </hold-button>
-        <button-with-icon :class="[ item.enabled ? 'btn-success' : 'btn-danger' ]" class="btn-reverse" icon="power-off" @click="item.timer.enabled = !item.timer.enabled">
+        <button-with-icon :class="[ item.enabled ? 'btn-success' : 'btn-danger' ]" class="btn-reverse" icon="power-off" @click="item.enabled = !item.enabled">
           {{ translate('dialog.buttons.' + (item.enabled? 'enabled' : 'disabled')) }}
         </button-with-icon>
       </template>
@@ -76,6 +76,8 @@
 import { Vue, Component, Watch } from 'vue-property-decorator';
 import { getSocket } from 'src/panel/helpers/socket';
 
+import { Price } from 'src/bot/database/entity/price';
+
 import { Validations } from 'vuelidate-property-decorators';
 import { required, minValue } from 'vuelidate/lib/validators';
 
@@ -106,10 +108,8 @@ export default class priceEdit extends Vue {
     pending: false,
   }
 
-  item: {
-    id: string; command: string; price: number;
-  } = {
-    id: uuid(), command: '', price: 1,
+  item: Price = {
+    id: uuid(), command: '', price: 1, enabled: true
   }
 
 
@@ -131,10 +131,7 @@ export default class priceEdit extends Vue {
   async mounted() {
     if (this.$route.params.id) {
       await new Promise((resolve, reject) => {
-        this.socket.emit('findOne', { where: { id: this.$route.params.id } }, (err, data) => {
-        if (err) {
-          reject(err)
-        }
+        this.socket.emit('price::getOne', this.$route.params.id, (data) => {
         console.debug({price_data: data})
         this.item = data;
         resolve()
@@ -148,7 +145,7 @@ export default class priceEdit extends Vue {
   }
 
   del() {
-    this.socket.emit('delete', { where: { id: this.$route.params.id } }, (err, deleted) => {
+    this.socket.emit('price::delete', this.$route.params.id, (err) => {
       if (err) {
         return console.error(err);
       }
@@ -161,14 +158,13 @@ export default class priceEdit extends Vue {
     if (!this.$v.$invalid) {
       this.state.save = this.$state.progress;
 
-      this.socket.emit('update', { items: [this.item] }, (err, data) => {
+      this.socket.emit('price::save', this.item, (err) => {
         if (err) {
           this.state.save = this.$state.fail;
           return console.error(err);
         }
 
         this.state.save = this.$state.success;
-        this.item = data;
         this.$nextTick(() => {
           this.state.pending = false;
           this.$router.push({ name: 'PriceManagerEdit', params: { id: String(this.item.id) } })

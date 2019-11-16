@@ -2,6 +2,8 @@ import { cloneDeep, get, isEqual, set } from 'lodash';
 import { isMainThread } from './cluster';
 import { error } from './helpers/log';
 import { change } from './changelog';
+import { getRepository } from 'typeorm';
+import { Settings } from './database/entity/settings';
 
 const variables: {
   [x: string]: any;
@@ -41,7 +43,17 @@ export const VariableWatcher = {
         }
 
         if (isMainThread && self) {
-          await global.db.engine.update(self.collection.settings, { system: name.toLowerCase(), key: variable }, { value: variable.startsWith('__permission_based') ? JSON.stringify(value) : value });
+          const setting = await getRepository(Settings).findOne({
+            where: {
+              name: variable,
+              namespace: self.nsp,
+            },
+          }) || new Settings();
+          setting.name = variable;
+          setting.value =  JSON.stringify(value);
+          setting.namespace = self.nsp;
+          await getRepository(Settings).save(setting);
+
           change(`${type}.${name}.${variable}`);
           if (typeof self.on !== 'undefined'
             && typeof self.on.change !== 'undefined'

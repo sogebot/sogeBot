@@ -61,7 +61,7 @@ export default class CarouselOverlay extends Vue {
 
   refresh () {
     if (this.urlParam('id')) {
-      this.socket.emit('get', this.urlParam('id'), (cb) => {
+      this.socket.emit('text::getOne', this.urlParam('id'), (cb) => {
         if (!this.external) {
           if (cb.external) {
             for (let link of cb.external) {
@@ -74,7 +74,7 @@ export default class CarouselOverlay extends Vue {
         }
 
         setTimeout(() => {
-          this.text = cb.html
+          this.text = cb.text
           this.$nextTick(() => {
             if (!this.js && cb.js) this.js = cb.js
             if (!this.css && cb.css) this.css = cb.css

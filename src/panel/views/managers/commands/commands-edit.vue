@@ -8,7 +8,7 @@
           {{ translate('menu.customcommands') }}
           <template v-if="state.loadedCmd === $state.success && state.loadedPerm === $state.success && $route.params.id">
             <small><fa icon="angle-right"/></small>
-            !{{item.command}}
+            {{item.command}}
             <small class="text-muted text-monospace" style="font-size:0.7rem">{{$route.params.id}}</small>
           </template>
         </span>
@@ -35,7 +35,7 @@
         :label="translate('systems.customcommands.command.name')"
         label-for="name"
       >
-        <b-input-group prepend="!">
+        <b-input-group>
           <b-form-input
             id="name"
             v-model="item.command"
@@ -62,51 +62,59 @@
             v-on:update="response.filter = $event"
             v-bind:filters="['sender', 'is.moderator', 'is.subscriber', 'is.vip', 'is.follower', 'is.broadcaster', 'is.bot', 'is.owner', 'rank', 'game', 'title', 'views', 'followers', 'hosts', 'subscribers']"></textarea-with-tags>
           <div class="h-auto w-auto" style="flex-shrink: 0;">
-            <button data-toggle="dropdown" class="btn btn-outline-dark border-0 h-100 w-100" style="margin: 0; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px;">
-              <fa icon="key" class="mr-1" aria-hidden="true"></fa>
-              <span v-if="getPermissionName(response.permission)">{{ getPermissionName(response.permission) }}</span>
-              <span v-else class="text-danger"><fa icon="exclamation-triangle"/> Permission not found</span>
-            </button>
-            <div class="dropdown-menu" aria-labelledby="permissionsMenuButton">
-              <a class="dropdown-item"
-                  style="cursor: pointer"
-                  v-for="p of permissions"
-                  :key="p.id"
-                  @click="response.permission = p.id; pending = true;">{{ getPermissionName(p.id) | capitalize }}</a>
-            </div>
+            <b-dropdown variant="outline-dark" toggle-class="border-0 h-auto w-auto" class="h-100">
+              <template v-slot:button-content>
+                <fa class="mr-1" icon="key"/>
+                <span v-if="getPermissionName(response.permission)">{{ getPermissionName(response.permission) }}</span>
+                <span v-else class="text-danger"><fa icon="exclamation-triangle"/> Permission not found</span>
+              </template>
+              <b-dropdown-item v-for="p of permissions"
+                              :key="p.id"
+                              @click="response.permission = p.id; pending = true;">
+                {{ getPermissionName(p.id) | capitalize }}
+              </b-dropdown-item>
+            </b-dropdown>
           </div>
           <div class="h-auto w-auto" style="flex-shrink: 0;">
-            <button data-toggle="dropdown" class="btn btn-outline-dark border-0 h-100 w-100" style="margin: 0; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px;">
-              <fa class="mr-1" :icon="[response.stopIfExecuted ? 'stop' : 'play']" aria-hidden="true"></fa>
-              {{ translate(response.stopIfExecuted ? 'commons.stop-if-executed' : 'commons.continue-if-executed') | capitalize }}</button>
-            <div class="dropdown-menu">
-              <a class="dropdown-item" style="cursor: pointer" v-on:click="response.stopIfExecuted = true; pending = true">{{ translate('commons.stop-if-executed') | capitalize }}</a>
-              <a class="dropdown-item" style="cursor: pointer" v-on:click="response.stopIfExecuted = false; pending = true">{{ translate('commons.continue-if-executed') | capitalize }}</a>
-            </div>
+            <b-dropdown variant="outline-dark" toggle-class="border-0 h-auto w-auto" class="h-100">
+              <template v-slot:button-content>
+                <fa class="mr-1" :icon="response.stopIfExecuted ? 'stop' : 'play'"/>
+                {{ translate(response.stopIfExecuted ? 'commons.stop-if-executed' : 'commons.continue-if-executed') | capitalize }}
+              </template>
+              <b-dropdown-item @click="response.stopIfExecuted = true; pending = true">
+                {{ translate('commons.stop-if-executed') | capitalize }}
+              </b-dropdown-item>
+              <b-dropdown-item @click="response.stopIfExecuted = false; pending = true">
+                {{ translate('commons.continue-if-executed') | capitalize }}
+              </b-dropdown-item>
+            </b-dropdown>
           </div>
 
           <div class="h-auto w-auto" style="flex-shrink: 0;">
-            <button v-if="item.responses.length > 1" data-toggle="dropdown" class="btn btn-block btn-outline-dark border-0 h-100 w-100">
-              <fa icon="ellipsis-v"></fa>
-            </button>
-            <div class="dropdown-menu p-0">
-              <button v-if="i !== 0" class="dropdown-item p-2 pl-4 pr-4" style="cursor: pointer" type="button" @click="moveUpResponse(response.order)">
-                <fa icon="sort-up" fixed-width></fa> {{ translate('commons.moveUp') | capitalize }}</button>
-              <button v-if="i !== item.responses.length - 1" class="dropdown-item p-2 pl-4 pr-4" style="cursor: pointer" type="button" @click="moveDownResponse(response.order)">
-                <fa icon="sort-down" fixed-width></fa> {{ translate('commons.moveDown') | capitalize }}</button>
-              <button class="dropdown-item p-2 pl-4 pr-4 text-danger" style="cursor: pointer" type="button" @click="deleteResponse(response.order)">
-                <fa icon="trash-alt" fixed-width></fa> {{ translate('delete') }}</button>
-            </div>
+            <b-dropdown variant="outline-dark" toggle-class="border-0 h-auto w-auto" class="h-100" no-caret>
+              <template v-slot:button-content>
+                <fa icon="ellipsis-v"></fa>
+              </template>
+              <b-dropdown-item v-if="i !== 0" @click="moveUpResponse(response.order)">
+                <fa icon="sort-up" fixed-width></fa> {{ translate('commons.moveUp') | capitalize }}
+              </b-dropdown-item>
+              <b-dropdown-item v-if="i !== item.responses.length - 1" @click="moveDownResponse(response.order)">
+                <fa icon="sort-down" fixed-width></fa> {{ translate('commons.moveDown') | capitalize }}
+              </b-dropdown-item>
+              <b-dropdown-item @click="deleteResponse(response.order)">
+                <fa icon="trash-alt" fixed-width></fa> {{ translate('delete') }}
+              </b-dropdown-item>
+            </b-dropdown>
           </div>
         </div>
-        <button class="btn btn-primary btn-block mt-2" type="button" @click="item.responses.push({ filter: '', order: item.responses.length, response: '', permission: orderBy(permissions, 'order', 'asc').pop().id })">{{ translate('systems.customcommands.addResponse') }}</button>
+        <button class="btn btn-primary btn-block mt-2" type="button" @click="item.responses.push({ filter: '', order: item.responses.length, response: '', stopIfExecuted: false, permission: orderBy(permissions, 'order', 'asc').pop().id })">{{ translate('systems.customcommands.addResponse') }}</button>
       </b-form-group>
 
       <b-form-group>
         <b-row>
           <b-col>
             <label>{{ translate('count') }}</label>
-            <input type="number" class="form-control" v-model="item.count" readonly="true">
+            <input type="number" class="form-control" v-model="count" readonly="true">
             <button type="button" class="btn btn-block btn-danger" @click="resetCount">{{ translate('commons.reset') | capitalize }}</button>
           </b-col>
           <b-col>
@@ -128,14 +136,15 @@ import { Vue, Component, Watch } from 'vue-property-decorator';
 import { orderBy } from  'lodash-es'
 
 import { Validations } from 'vuelidate-property-decorators';
-import { required } from 'vuelidate/lib/validators';
+import { required, minLength } from 'vuelidate/lib/validators';
 
 import uuid from 'uuid/v4';
 
-import { library } from '@fortawesome/fontawesome-svg-core'
-import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
-library.add(faExclamationTriangle)
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faExclamationTriangle, faPlay, faStop, faKey, faSortUp, faSortDown } from '@fortawesome/free-solid-svg-icons';
+library.add(faExclamationTriangle, faPlay, faKey, faStop, faSortUp, faSortDown);
 
+import { Commands } from 'src/bot/database/entity/commands';
 import { getSocket } from '../../../helpers/socket';
 
 Component.registerHooks([
@@ -161,14 +170,14 @@ export default class CommandsEdit extends Vue {
   orderBy = orderBy;
 
 
-  item: Types.CustomCommands.Command & { responses: Types.CustomCommands.Response[] } = {
+  item: Commands = {
     id: uuid(),
     command: '',
     enabled: true,
     visible: true,
     responses: [],
-    count: 0,
   }
+  count: number = 0;
   permissions: any[] = [];
 
   psocket = getSocket('/core/permissions');
@@ -187,7 +196,11 @@ export default class CommandsEdit extends Vue {
   @Validations()
   validations = {
     item: {
-      command: {required},
+      command: {
+        required,
+        sw: (value) => value.startsWith('!'),
+        minLength: minLength(2),
+      },
     }
   }
 
@@ -225,21 +238,20 @@ export default class CommandsEdit extends Vue {
   }
 
   created() {
-    this.psocket.emit('find', {}, (err, data) => {
-      if (err) return console.error(err)
-      this.permissions = orderBy(data, 'order', 'asc')
+    this.psocket.emit('permissions', (data) => {
+      this.permissions = data
       this.state.loadedPerm = this.$state.success;
     });
 
     if (this.$route.params.id) {
-      this.socket.emit('findOne.command', { where: { id: this.$route.params.id } }, (err, data: Types.CustomCommands.Command & { responses: Types.CustomCommands.Response[] }) => {
-        data.command = data.command.replace('!', '');
+      this.socket.emit('commands::getById', this.$route.params.id, (err, data: Commands, count: number) => {
         console.debug('Loaded', {data})
         // add empty filter if undefined
         for (let i = 0, length = data.responses.length; i < length; i++) {
           if (!data.responses[i].filter) data.responses[i].filter = ''
         }
-        this.item = data
+        this.item = data;
+        this.count = count;
         this.$nextTick(() => { this.pending = false })
         this.state.loadedCmd = this.$state.success;
       })
@@ -290,59 +302,44 @@ export default class CommandsEdit extends Vue {
   }
 
   resetCount() {
-    this.item.count = 0
+    this.count = 0
     this.pending = true
   }
 
   async remove() {
-    await Promise.all([
-      await new Promise(resolve => {
-        this.socket.emit('delete', { where: { id: this.$route.params.id } }, () => {
-          resolve();
-        })
-      }),
-      await new Promise(resolve => {
-        this.socket.emit('delete', { collection: 'responses', where: { cid: this.$route.params.id } }, () => {
-          resolve();
-        })
-      }),
-    ])
-    this.$router.push({ name: 'CommandsManagerList' });
+    this.socket.emit('commands::deleteById', this.$route.params.id, () => {
+      this.$router.push({ name: 'CommandsManagerList' });
+    });
   }
 
   async save() {
     this.$v.$touch();
     if (!this.$v.$invalid) {
       this.state.save = this.$state.progress;
-      await Promise.all([
-        new Promise(resolve => {
-          const command: Types.CustomCommands.Command = (({responses, ...keys}) => ({...keys}))(this.item);
-          command.command = '!' + command.command;
-          console.debug('Saving command', command);
-          this.socket.emit('update', { key: 'id', items: [command] }, (err, data) => {
-            if (err) {
-              this.state.save = this.$state.fail;
-              return console.error(err);
-            }
-            resolve()
-          });
-        }),
-        new Promise(resolve => {
-          const responses: Types.CustomCommands.Response[] = this.item.responses.map(o => { return { cid: this.item.id, ...o} });
-          console.debug('Saving responses', responses);
-          if (responses.length > 0) {
-            this.socket.emit('set', { collection: 'responses', where: { cid: this.item.id }, items: responses }, (err) => {
-              if (err) {
-                this.state.save = this.$state.fail;
-                return console.error(err);
-              }
-              resolve()
-            });
-          } else {
-            resolve()
+      await new Promise((resolve, reject) => {
+        console.debug('Saving command', this.item);
+        this.socket.emit('commands::setById', this.item.id, this.item, (err, data) => {
+          if (err) {
+            this.state.save = this.$state.fail;
+            reject(console.error(err));
           }
-        })
-      ])
+          resolve()
+        });
+      });
+      await new Promise((resolve, reject) => {
+        if (this.count === 0) {
+          console.debug('Resetting count');
+          this.socket.emit('commands::resetCountByCommand', this.item.command, (err) => {
+          if (err) {
+            this.state.save = this.$state.fail;
+            reject(console.error(err));
+          }
+          resolve()
+        });
+        } else {
+          resolve()
+        }
+      })
 
       this.state.save = this.$state.success;
       this.pending = false;

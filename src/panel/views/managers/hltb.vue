@@ -8,7 +8,7 @@
           {{ translate('menu.howlongtobeat') }}
         </span>
       </b-col>
-      <b-col v-if="!$systems.find(o => o.name === 'hltb').enabled" style=" text-align: right;">
+      <b-col v-if="!$systems.find(o => o.name === 'howlongtobeat').enabled" style=" text-align: right;">
         <b-alert show variant="danger" style="padding: .5rem; margin: 0; display: inline-block;">
           <fa icon="exclamation-circle" fixed-width/> {{ translate('this-system-is-disabled') }}
         </b-alert>
@@ -25,14 +25,14 @@
               <img class="max" :src="game.imageUrl" v-bind:key="String(game.game)"/>
               <h5 class="centered" style="text-transform: inherit;">{{ game.game }}</h5>
               <div class="btn-group w-100" role="group" aria-label="Basic example">
-                <button @click="game.isFinishedMain = !game.isFinishedMain; update('isFinishedMain', game.isFinishedMain, game.game);" class="btn btn-sm" :class="{ 'btn-success': game.isFinishedMain, 'btn-danger': !game.isFinishedMain }">
+                <button @click="game.isFinishedMain = !game.isFinishedMain; update(game);" class="btn btn-sm" :class="{ 'btn-success': game.isFinishedMain, 'btn-danger': !game.isFinishedMain }">
                   <fa icon="check" fixed-width v-if="game.isFinishedMain"/>
                   <fa icon="ban" fixed-width v-else/>
                   Main
                   <small v-if="game.isFinishedMain">(done)</small>
                 </button>
 
-                <button @click="game.isFinishedCompletionist = !game.isFinishedCompletionist; update('isFinishedCompletionist', game.isFinishedCompletionist, game.game);"  class="btn btn-sm" :class="{ 'btn-success': game.isFinishedCompletionist, 'btn-danger': !game.isFinishedCompletionist }">
+                <button @click="game.isFinishedCompletionist = !game.isFinishedCompletionist; update(game);"  class="btn btn-sm" :class="{ 'btn-success': game.isFinishedCompletionist, 'btn-danger': !game.isFinishedCompletionist }">
                   <fa icon="check" fixed-width v-if="game.isFinishedCompletionist"/>
                   <fa icon="ban" fixed-width v-else/>
                   Completionist
@@ -51,8 +51,8 @@
                     {{ ((getHours(game.timeToBeatMain) / game.gameplayMain) * 100).toFixed(2) }}<small class="small">%</small>
                   </span>
                 </dd>
-                <dt class="col-6">Completionist</dt>
-                <dd class="col-6">
+                <dt class="col-6" v-if="game.gameplayCompletionist !== 0">Completionist</dt>
+                <dd class="col-6" v-if="game.gameplayCompletionist !== 0">
                   <fa icon="spinner" spin v-if="!game.isFinishedCompletionist" class="text-info"/>
                   <fa icon="check" class="text-success" v-else/>
                   {{ getHours(game.timeToBeatCompletionist).toFixed(1) }}<small class="small">h</small> / {{ game.gameplayCompletionist }}<small class="small">h</small>
@@ -76,7 +76,7 @@
 
 <script lang="ts">
   import Vue from 'vue'
-  import { chunk, orderBy } from 'lodash-es';
+  import { chunk } from 'lodash-es';
 
   import moment from 'moment'
   import VueMoment from 'vue-moment'
@@ -86,6 +86,7 @@
   require('moment/locale/ru')
 
   import { getSocket } from '../../helpers/socket';
+import { HowLongToBeatGame } from 'src/bot/database/entity/howLongToBeatGame';
 
   Vue.use(VueMoment, {
       moment, momentTimezone
@@ -101,7 +102,7 @@
         socket: any,
         itemsPerLine: number,
         interval: number,
-        games: import('../../../bot/systems/howlongtobeat').Game[],
+        games: HowLongToBeatGame[],
         domWidth: number,
       } = {
         chunk: chunk,
@@ -120,9 +121,8 @@
       this.interval = window.setInterval(() => {
         this.domWidth = (this.$refs['window'] as HTMLElement).clientWidth
       }, 100)
-      this.socket.emit('find', {}, (err, data) => {
-        if (err) return console.error(err)
-        this.games = orderBy(data, 'startedAt', 'desc')
+      this.socket.emit('hltb::getAll', { order: { startedAt: 'DESC' } }, (data) => {
+        this.games = data;
       })
     },
     watch: {
@@ -137,8 +137,8 @@
       }
     },
     methods: {
-      update(attr: string, value: boolean, game: string) {
-        this.socket.emit('update', { collection: 'data', key: 'game', items: [{ game, [attr]: value}]})
+      update(game: HowLongToBeatGame) {
+        this.socket.emit('hltb::save', game, () => {});
       },
       getHours(time: number): number {
         return Number(time / 1000 / 60 / 60)
@@ -167,5 +167,6 @@
 
 img.max {
   max-height: 250px;
+  max-width: inherit;
 }
 </style>

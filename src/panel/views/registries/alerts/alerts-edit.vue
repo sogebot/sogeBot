@@ -74,7 +74,7 @@
             min="0"
             max="30000"
             step="500"
-            :placeholder="translate('registry.alerts.alertDelayInMs.placeholder')"
+            :placeholder="translate('AlertDelayInMs.placeholder')"
           ></b-form-input>
           <b-input-group-text slot="append" class="pr-3 pl-3">
             <div style="width: 3rem;">
@@ -116,7 +116,7 @@
         <b-tab v-for="event in supportedEvents" :key="'event-tab-' + event" :title="translate('registry.alerts.event.' + event)">
           <b-card no-body>
             <b-tabs card vertical pills content-class="col-9" nav-wrapper-class="col-3" nav-class="p-0">
-              <b-tab :active="idx === 0" v-for="(alert, idx) of item.alerts[event]" :key="event + idx">
+              <b-tab :active="idx === 0" v-for="(alert, idx) of item[event]" :key="event + idx">
                 <template v-slot:title>
                   <fa icon="exclamation-circle" v-if="!isValid[event][idx]" class="text-danger"/>
                   <fa :icon="['far', 'check-circle']" v-else-if="alert.enabled"/>
@@ -157,6 +157,8 @@
 <script lang="ts">
 import { Vue, Component, Watch } from 'vue-property-decorator';
 import { getSocket } from 'src/panel/helpers/socket';
+import { Alert, CommonSettings } from 'src/bot/database/entity/alert';
+
 import { remove, every } from 'lodash-es';
 
 import defaultImage from '!!base64-loader!./media/cow01.gif';
@@ -200,7 +202,7 @@ export default class AlertsEdit extends Vue {
   supportedEvents: string[] = ['follows', 'cheers', 'subs', 'resubs', 'subgifts',  'tips', 'hosts', 'raids']
   selectedTabIndex: number = 0;
 
-  item: Registry.Alerts.Alert = {
+  item: Alert = {
     id: uuid(),
     updatedAt: Date.now(),
     name: '',
@@ -212,16 +214,15 @@ export default class AlertsEdit extends Vue {
       ru: false,
     },
     customProfanityList: '',
-    alerts: {
-      follows: [],
-      hosts: [],
-      raids: [],
-      cheers: [],
-      subs: [],
-      tips: [],
-      resubs: [],
-      subgifts: [],
-    },
+
+    follows: [],
+    hosts: [],
+    raids: [],
+    cheers: [],
+    subs: [],
+    tips: [],
+    resubs: [],
+    subgifts: [],
   }
 
   isValid: {
@@ -271,7 +272,7 @@ export default class AlertsEdit extends Vue {
   async mounted() {
     this.state.loaded = this.$state.progress;
     if (this.$route.params.id) {
-      this.socket.emit('findOne', { where: { id: this.$route.params.id } }, (err, data: Registry.Alerts.Alert) => {
+      this.socket.emit('alerts::getOne', this.$route.params.id, (data: Alert) => {
         console.debug('Loaded', {data});
         this.item = data;
         this.state.loaded = this.$state.success;
@@ -318,8 +319,10 @@ export default class AlertsEdit extends Vue {
   }
 
   newAlert() {
-    const _default: Omit<Registry.Alerts.CommonSettings, "messageTemplate">  = {
-      uuid: uuid(),
+    const _default: CommonSettings = {
+      messageTemplate: '',
+
+      id: uuid(),
       title: '',
       variantCondition: 'random',
       variantAmount: 2,
@@ -361,25 +364,25 @@ export default class AlertsEdit extends Vue {
         weight: 800,
         color: '#ffffff',
         highlightcolor: '#00ff00',
-      },
-    };
-
+      }
+    }
 
     // save default media
-    this.socket.emit('update', { collection: 'media', key: 'id', items: [
-      { id: _default.imageId, b64data: 'data:image/gif;base64,' + defaultImage },
-      { id: _default.soundId, b64data: 'data:audio/mp3;base64,' + defaultAudio },
-    ] }, () => {
+    this.socket.emit('alerts::saveMedia', [
+      { id: _default.imageId, b64data: 'data:image/gif;base64,' + defaultImage, chunkNo: 0 },
+      { id: _default.soundId, b64data: 'data:audio/mp3;base64,' + defaultAudio, chunkNo: 0 },
+    ], () => {
       this.isValid[this.supportedEvents[this.selectedTabIndex]].push(true);
       switch(this.supportedEvents[this.selectedTabIndex]) {
         case 'follows':
-          this.item.alerts.follows.push({
-            messageTemplate: '{name} is now following!',
+          this.item.follows.push({
             ..._default,
+            messageTemplate: '{name} is now following!',
           })
           break;
         case 'cheers':
-          this.item.alerts.cheers.push({
+          this.item.cheers.push({
+            ..._default,
             messageTemplate: '{name} cheered! x{amount}',
             message: {
               minAmountToShow: 0,
@@ -395,23 +398,23 @@ export default class AlertsEdit extends Vue {
                 color: '#ffffff',
               },
             },
-            ..._default,
           })
           break;
         case 'subgifts':
-          this.item.alerts.subgifts.push({
-            messageTemplate: '{name} just gifted {amount} subscribes!',
+          this.item.subgifts.push({
             ..._default,
+            messageTemplate: '{name} just gifted {amount} subscribes!',
           })
           break;
         case 'subs':
-          this.item.alerts.subs.push({
-            messageTemplate: '{name} just subscribed!',
+          this.item.subs.push({
             ..._default,
+            messageTemplate: '{name} just subscribed!',
           })
           break;
         case 'resubs':
-          this.item.alerts.resubs.push({
+          this.item.resubs.push({
+            ..._default,
             messageTemplate: '{name} just resubscribed! {amount} {monthsName}',
             message: {
               allowEmotes: {
@@ -426,11 +429,11 @@ export default class AlertsEdit extends Vue {
                 color: '#ffffff',
               },
             },
-            ..._default,
           })
           break;
         case 'tips':
-          this.item.alerts.tips.push({
+          this.item.tips.push({
+            ..._default,
             messageTemplate: '{name} donated {amount}{currency}!',
             message: {
               minAmountToShow: 0,
@@ -446,30 +449,29 @@ export default class AlertsEdit extends Vue {
                 color: '#ffffff',
               },
             },
-            ..._default,
           })
           break;
         case 'hosts':
-          this.item.alerts.hosts.push({
+          this.item.hosts.push({
+            ..._default,
             showAutoHost: false,
             messageTemplate: '{name} is now hosting my stream with {amount} viewers!',
-            ..._default,
           })
           break;
         case 'raids':
-          this.item.alerts.raids.push({
+          this.item.raids.push({
+            ..._default,
             showAutoHost: false,
             messageTemplate: '{name} is raiding with a party of {amount} raiders!',
-            ..._default,
           })
           break;
       }
     });
   }
 
-  deleteVariant(event, uuid) {
-    console.debug('Removing', event, uuid);
-    remove(this.item.alerts[event], (o: Registry.Alerts.CommonSettings) => o.uuid === uuid);
+  deleteVariant(event, id) {
+    console.debug('Removing', event, id);
+    remove(this.item[event], (o: CommonSettings) => o.id === id);
     this.$forceUpdate();
   }
 
@@ -488,7 +490,7 @@ export default class AlertsEdit extends Vue {
       this.state.save = this.$state.progress;
       this.item.updatedAt = Date.now(); // save updateAt
       console.debug('Saving', this.item);
-      this.socket.emit('update', { key: 'id', items: [this.item] }, (err, data) => {
+      this.socket.emit('alerts::save', this.item, (err, data) => {
         if (err) {
           this.state.save = this.$state.fail;
           return console.error(err);

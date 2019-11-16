@@ -3,10 +3,10 @@
     <b-form-group
       label-cols-sm="4"
       label-cols-lg="3"
-      :label-for="'enabled' + data.uuid"
+      :label-for="'enabled' + data.id"
       :label="translate('registry.alerts.enabled')"
     >
-      <b-form-checkbox v-bind:key="'enabled' + data.uuid" :id="'enabled' + data.uuid" v-model="data.enabled" :name="'enabled' + data.uuid" switch></b-form-checkbox>
+      <b-form-checkbox v-bind:key="'enabled' + data.id" :id="'enabled' + data.id" v-model="data.enabled" :name="'enabled' + data.id" switch></b-form-checkbox>
     </b-form-group>
 
     <b-form-group
@@ -172,10 +172,10 @@
     <b-form-group
       label-cols-sm="4"
       label-cols-lg="3"
-      :label-for="'enableAdvancedMode' + data.uuid"
+      :label-for="'enableAdvancedMode' + data.id"
       :label="translate('registry.alerts.enableAdvancedMode')"
     >
-      <b-form-checkbox v-bind:key="'enableAdvancedMode' + data.uuid" :id="'enableAdvancedMode' + data.uuid" v-model="data.enableAdvancedMode" :name="'enableAdvancedMode' + data.uuid" switch></b-form-checkbox>
+      <b-form-checkbox v-bind:key="'enableAdvancedMode' + data.id" :id="'enableAdvancedMode' + data.id" v-model="data.enableAdvancedMode" :name="'enableAdvancedMode' + data.id" switch></b-form-checkbox>
     </b-form-group>
 
     <div class="btn-group col-md-12 p-0" role="group" v-if="data.enableAdvancedMode">
@@ -183,7 +183,7 @@
       <button type="button" class="btn" @click="customShow = 'css'" :class="[customShow === 'css' ? 'btn-dark' : 'btn-outline-dark']">CSS</button>
       <button type="button" class="btn" @click="customShow = 'js'" :class="[customShow === 'js' ? 'btn-dark' : 'btn-outline-dark']">JS</button>
     </div>
-    <div class="col-md-12 p-0 pb-2" v-if="data.enableAdvancedMode" :key="customShow + data.uuid + 'advancedMode'">
+    <div class="col-md-12 p-0 pb-2" v-if="data.enableAdvancedMode" :key="customShow + data.id + 'advancedMode'">
       <codemirror style="font-size: 0.8em;" v-if="customShow === 'html'" class="w-100" v-model="data.advancedMode.html" :options="{
         tabSize: 4,
         mode: 'text/html',
@@ -318,7 +318,7 @@
       </b-collapse>
     </b-card>
 
-    <hold-button @trigger="$emit('delete', data.uuid)" icon="trash" class="btn-danger btn-block btn-reverse mt-3">
+    <hold-button @trigger="$emit('delete', data.id)" icon="trash" class="btn-danger btn-block btn-reverse mt-3">
       <template slot="title">{{translate('dialog.buttons.delete')}}</template>
       <template slot="onHoldTitle">{{translate('dialog.buttons.hold-to-delete')}}</template>
     </hold-button>
@@ -327,6 +327,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, PropSync, Watch } from 'vue-property-decorator';
+import { CommonSettings } from 'src/bot/database/entity/alert';
 
 import { codemirror } from 'vue-codemirror';
 import 'codemirror/mode/javascript/javascript.js';
@@ -354,7 +355,7 @@ import { required, minValue } from 'vuelidate/lib/validators'
   }
 })
 export default class AlertsEditFollowForm extends Vue {
-  @PropSync('alert') data !: Registry.Alerts.CommonSettings
+  @PropSync('alert') data !: CommonSettings
   @Prop() readonly index !: number
 
   customShow: 'html' | 'css' | 'js' = 'html';

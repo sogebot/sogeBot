@@ -6,6 +6,10 @@ import { permission } from '../permissions';
 import System from './_interface';
 import { adminEndpoint } from '../helpers/socket';
 
+import { getRepository } from 'typeorm';
+import { User } from '../database/entity/user';
+import { Queue as QueueEntity } from '../database/entity/queue';
+
 /*
  * !queue                            - gets an info whether queue is opened or closed
  * !queue open                       - open a queue
@@ -27,6 +31,8 @@ class Queue extends System {
   @settings('eligibility')
   eligibilitySubscribers = true;
 
+  pickedUsers: QueueEntity[] = [];
+
   constructor () {
     super();
 
@@ -34,15 +40,27 @@ class Queue extends System {
   }
 
   sockets () {
-    adminEndpoint(this.nsp, 'pick', async (data, cb) => {
+    adminEndpoint(this.nsp, 'queue::getAllPicked', async(cb) => {
+      cb(this.pickedUsers);
+    });
+    adminEndpoint(this.nsp, 'queue::getAll', async(cb) => {
+      cb(
+        await getRepository(QueueEntity).find(),
+      );
+    });
+    adminEndpoint(this.nsp, 'queue::clear', async(cb) => {
+      cb(
+        await getRepository(QueueEntity).clear(),
+      );
+    });
+    adminEndpoint(this.nsp, 'queue::pick', async (data, cb) => {
       if (data.username) {
         const users: any[] = [];
         if (_.isString(data.username)) {
           data.username = [data.username];
         }
         for (let user of data.username) {
-          user = await global.db.engine.findOne(this.collection.data, { username: user });
-          delete user._id;
+          user = await getRepository(QueueEntity).findOne({ username: user });
           users.push(user);
         }
         cb(null, await this.pickUsers({ sender: getOwner(), users }, data.random));
@@ -54,26 +72,25 @@ class Queue extends System {
 
   async getUsers (opts) {
     opts = opts || { amount: 1 };
-    let users = await global.db.engine.find(this.collection.data);
+    let users = await getRepository(QueueEntity).find();
 
     if (opts.random) {
       users = users.sort(() => Math.random());
     } else {
-      users = users.sort(o => -(new Date(o.created_at).getTime()));
+      users = users.sort(o => -(new Date(o.createdAt).getTime()));
     }
 
-    const toReturn: any[] = [];
+    const toReturn: QueueEntity[] = [];
     let i = 0;
     for (const user of users) {
-      const isNotFollowerEligible = !user.is.follower && (this.eligibilityFollowers);
-      const isNotSubscriberEligible = !user.is.subscriber && (this.eligibilitySubscribers);
+      const isNotFollowerEligible = !user.isFollower && (this.eligibilityFollowers);
+      const isNotSubscriberEligible = !user.isSubscriber && (this.eligibilitySubscribers);
       if (isNotFollowerEligible && isNotSubscriberEligible) {
         continue;
       }
 
       if (i < opts.amount) {
-        await global.db.engine.remove(this.collection.data, { _id: String(user._id) });
-        delete user._id;
+        await getRepository(QueueEntity).remove(user);
         toReturn.push(user);
       } else {
         break;
@@ -105,17 +122,22 @@ class Queue extends System {
   @command('!queue join')
   async join (opts) {
     if (!(this.locked)) {
-      const user = await global.db.engine.findOne('users', { username: opts.sender.username });
-
+      let user = await getRepository(User).findOne({ userId: opts.sender.userId });
+      if (!user) {
+        user = new User();
+        user.userId = Number(opts.sender.userId);
+        user.username = opts.sender.username;
+        await getRepository(User).save(user);
+      }
       const [all, followers, subscribers] = await Promise.all([this.eligibilityAll, this.eligibilityFollowers, this.eligibilitySubscribers]);
 
       let eligible = false;
       if (!all) {
-        if ((followers && subscribers) && (user.is.follower || user.is.subscriber)) {
+        if ((followers && subscribers) && (user.isFollower || user.isSubscriber)) {
           eligible = true;
-        } else if (followers && user.is.follower) {
+        } else if (followers && user.isFollower) {
           eligible = true;
-        } else if (subscribers && user.is.subscriber) {
+        } else if (subscribers && user.isSubscriber) {
           eligible = true;
         }
       } else {
@@ -123,7 +145,16 @@ class Queue extends System {
       }
 
       if (eligible) {
-        await global.db.engine.update(this.collection.data, { username: opts.sender.username }, { username: opts.sender.username, is: user.is, created_at: String(new Date()) });
+        let queuedUser = await getRepository(QueueEntity).findOne({ username: opts.sender.username });
+        if (!queuedUser) {
+          queuedUser = new QueueEntity();
+          queuedUser.username = opts.sender.username;
+        }
+        queuedUser.isFollower = user.isFollower;
+        queuedUser.isSubscriber = user.isSubscriber;
+        queuedUser.isModerator = user.isModerator;
+        queuedUser.createdAt = Date.now();
+        await getRepository(QueueEntity).save(queuedUser);
         sendMessage(global.translate('queue.join.opened'), opts.sender, opts.attr);
       }
     } else {
@@ -134,8 +165,8 @@ class Queue extends System {
   @command('!queue clear')
   @default_permission(permission.CASTERS)
   clear (opts) {
-    global.db.engine.remove(this.collection.data, {});
-    global.db.engine.remove(this.collection.picked, {});
+    getRepository(QueueEntity).delete({});
+    this.pickedUsers = [];
     sendMessage(global.translate('queue.clear'), opts.sender, opts.attr);
   }
 
@@ -160,13 +191,13 @@ class Queue extends System {
     } else {
       users = opts.users;
       for (const user of users) {
-        await global.db.engine.remove(this.collection.data, { username: user.username });
+        await getRepository(QueueEntity).delete({ username: user.username });
       }
     }
 
-    await global.db.engine.remove(this.collection.picked, {});
+    this.pickedUsers = [];
     for (const user of users) {
-      await global.db.engine.update(this.collection.picked, { username: user.username }, user);
+      this.pickedUsers.push(user);
     }
 
     const atUsername = global.tmi.showWithAt;
@@ -190,13 +221,13 @@ class Queue extends System {
   @command('!queue list')
   @default_permission(permission.CASTERS)
   async list (opts) {
-    let [atUsername, users] = await Promise.all([
+    const [atUsername, users] = await Promise.all([
       global.tmi.showWithAt,
-      global.db.engine.find(this.collection.data),
+      getRepository(QueueEntity).find(),
     ]);
-    users = users.map(o => atUsername ? `@${o.username}` : o).join(', ');
+    const queueList = users.map(o => atUsername ? `@${o.username}` : o).join(', ');
     sendMessage(
-      await prepare('queue.list', { users }), opts.sender
+      await prepare('queue.list', { users: queueList }), opts.sender
     );
   }
 }

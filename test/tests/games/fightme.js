@@ -6,47 +6,50 @@ require('../../general.js');
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 
+const { getRepository } = require('typeorm');
+const { User } = require('../../../dest/database/entity/user');
+
 const command = '!fightme';
 
 const tests = [
   {
-    challenger: { username: 'user1' },
+    challenger: { userId: 3, username: 'user1' },
     challenging: { username: '' },
     expected: 'gambling.fightme.notEnoughOptions',
   },
   {
-    challenger: { username: 'user1' },
-    challenging: { username: 'user1' },
+    challenger: { userId: 3, username: 'user1' },
+    challenging: { userId: 3, username: 'user1' },
     expected: 'gambling.fightme.cannotFightWithYourself',
   },
   {
-    challenger: { username: 'user1' },
-    challenging: { username: 'user2' },
+    challenger: { userId: 3, username: 'user1' },
+    challenging: { userId: 4, username: 'user2' },
     expected: 'gambling.fightme.winner',
   },
   {
-    challenger: { username: 'broadcaster' },
-    challenging: { username: 'user1' },
+    challenger: { userId: 5, username: 'broadcaster' },
+    challenging: { userId: 3, username: 'user1' },
     expected: 'gambling.fightme.broadcaster',
   },
   {
-    challenger: { username: 'user1' },
-    challenging: { username: 'broadcaster' },
+    challenger: { userId: 3, username: 'user1' },
+    challenging: { userId: 5, username: 'broadcaster' },
     expected: 'gambling.fightme.broadcaster',
   },
   {
-    challenger: { username: 'usermod1' },
-    challenging: { username: 'user2' },
+    challenger: { userId: 1, username: 'usermod1' },
+    challenging: { userId: 4, username: 'user2' },
     expected: 'gambling.fightme.oneModerator',
   },
   {
-    challenger: { username: 'user1' },
-    challenging: { username: 'usermod2' },
+    challenger: { userId: 3, username: 'user1' },
+    challenging: { userId: 2, username: 'usermod2' },
     expected: 'gambling.fightme.oneModerator',
   },
   {
-    challenger: { username: 'usermod1' },
-    challenging: { username: 'usermod2' },
+    challenger: { userId: 1, username: 'usermod1' },
+    challenging: { userId: 2, username: 'usermod2' },
     expected: 'gambling.fightme.bothModerators',
   },
 ];
@@ -58,8 +61,11 @@ describe('game/fightme - !fightme', () => {
         await db.cleanup();
         await message.prepare();
 
-        await global.db.engine.insert('users', { id: '1', username: 'usermod1', is: { moderator: true } });
-        await global.db.engine.insert('users', { id: '2', username: 'usermod2', is: { moderator: true } });
+        await getRepository(User).save({ userId: 1, username: 'usermod1', isModerator: true });
+        await getRepository(User).save({ userId: 2, username: 'usermod2', isModerator: true });
+        await getRepository(User).save({ userId: 3, username: 'user1' });
+        await getRepository(User).save({ userId: 4, username: 'user2' });
+        await getRepository(User).save({ userId: 5, username: 'broadcaster' });
       });
 
       it('Challenger is starting !fightme', async () => {

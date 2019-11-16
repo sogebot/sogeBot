@@ -7,23 +7,22 @@ const _ = require('lodash');
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 
+const { getRepository } = require('typeorm');
+const { User } = require('../../../dest/database/entity/user');
+
 // users
-const owner = { badges: {}, username: 'soge__' };
-const follower = { badges: {}, username: 'follower', userId: String(_.random(999999, false)), is: { follower: true } };
-const commonUser = { badges: {}, username: 'user1', userId: String(_.random(999999, false)) };
-const commonUser2 = { badges: {}, username: 'user2', userId: String(_.random(999999, false)), is: { follower: false } };
+const owner = { userId: Math.floor(Math.random() * 100000), badges: {}, username: 'soge__' };
+const follower = { badges: {}, username: 'follower', userId: Number(_.random(999999, false)), isFollower: true };
+const commonUser = { badges: {}, username: 'user1', userId: Number(_.random(999999, false)) };
+const commonUser2 = { badges: {}, username: 'user2', userId: Number(_.random(999999, false)) };
 
 describe('Cooldowns - toggleFollowers()', () => {
   beforeEach(async () => {
     await db.cleanup();
     await message.prepare();
-
-    follower.id = follower.userId;
-    commonUser.id = commonUser.userId;
-    commonUser2.id = commonUser2.userId;
-    await global.db.engine.insert('users', follower);
-    await global.db.engine.insert('users', commonUser);
-    await global.db.engine.insert('users', commonUser2);
+    await getRepository(User).save(follower);
+    await getRepository(User).save(commonUser);
+    await getRepository(User).save(commonUser2);
   });
 
   it('incorrect toggle', async () => {

@@ -74,6 +74,7 @@ import { Validate } from 'vuelidate-property-decorators';
 import { required } from 'vuelidate/lib/validators'
 
 import uuid from 'uuid/v4';
+import { Keyword } from 'src/bot/database/entity/keyword';
 
 @Component({
   components: {
@@ -111,7 +112,7 @@ export default class keywordsEdit extends Vue {
 
   mounted() {
     if (this.$route.params.id) {
-      this.socket.emit('findOne', { where: { id: this.$route.params.id } }, (err, data: Types.Keywords.Item) => {
+      this.socket.emit('keywords::getById', this.$route.params.id, (err, data: Keyword) => {
         if (err) {
           return console.error(err)
         }
@@ -131,10 +132,7 @@ export default class keywordsEdit extends Vue {
   }
 
   del() {
-    this.socket.emit('delete', { where: { id: this.$route.params.id }}, (err, deleted) => {
-      if (err) {
-        return console.error(err);
-      }
+    this.socket.emit('keywords::deleteById', this.$route.params.id, () => {
       this.$router.push({ name: 'KeywordsManagerList' })
     })
   }
@@ -142,7 +140,7 @@ export default class keywordsEdit extends Vue {
   save() {
     this.$v.$touch();
     if (!this.$v.$invalid) {
-      const keyword: Types.Keywords.Item = {
+      const keyword: Keyword = {
         id: this.id,
         keyword: this.keyword,
         response: this.response,
@@ -150,7 +148,7 @@ export default class keywordsEdit extends Vue {
       }
       this.state.save = this.$state.progress;
 
-      this.socket.emit('update', { key: 'id', items: [keyword] }, (err, data) => {
+      this.socket.emit('keywords::save', keyword, (err, data) => {
         if (err) {
           this.state.save = this.$state.fail;
           return console.error(err);

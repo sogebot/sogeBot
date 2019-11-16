@@ -14,11 +14,10 @@ class Chat extends Widget {
 
   public sockets() {
     adminEndpoint(this.nsp, 'chat.message.send', async (message) => {
-      const userObj = await global.users.getByName(global.oauth.botUsername);
       sendMessage(message, {
-        username: userObj.username,
-        displayName: userObj.displayName || userObj.username,
-        userId: userObj.id,
+        username: global.oauth.botUsername,
+        displayName: global.oauth.botUsername,
+        userId: Number(global.oauth.botId),
         emotes: [],
         badges: {},
         'message-type': 'chat',

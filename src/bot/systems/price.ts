@@ -6,10 +6,16 @@ import * as _ from 'lodash';
 import Parser from '../parser';
 import System from './_interface';
 import * as constants from '../constants';
-import { permission } from '../permissions';
+import { permission } from '../helpers/permissions';
 import { command, default_permission, rollback } from '../decorators';
 import { parser } from '../decorators';
 import { isOwner, prepare, sendMessage } from '../commons';
+
+import { getRepository } from 'typeorm';
+import { User } from '../database/entity/user';
+import { Price as PriceEntity } from '../database/entity/price';
+import { adminEndpoint } from '../helpers/socket';
+import { error } from '../helpers/log';
 
 /*
  * !price                     - gets an info about price usage
@@ -25,6 +31,40 @@ class Price extends System {
   constructor () {
     super();
     this.addMenu({ category: 'manage', name: 'price', id: 'manage/price/list' });
+  }
+
+  sockets() {
+    adminEndpoint(this.nsp, 'price::getAll', async (cb) => {
+      cb(await getRepository(PriceEntity).find({
+        order: {
+          price: 'ASC',
+        },
+      }));
+    });
+
+    adminEndpoint(this.nsp, 'price::getOne', async (id, cb) => {
+      cb(await getRepository(PriceEntity).findOne({ id }));
+    });
+
+    adminEndpoint(this.nsp, 'price::save', async (price: PriceEntity, cb) => {
+      try {
+        await getRepository(PriceEntity).save(price);
+        cb(null);
+      } catch (e) {
+        error(e);
+        cb(e);
+      }
+    });
+
+    adminEndpoint(this.nsp, 'price::delete', async (id: string, cb) => {
+      try {
+        await getRepository(PriceEntity).delete({ id });
+        cb(null);
+      } catch (e) {
+        error(e);
+        cb(e);
+      }
+    });
   }
 
   @command('!price')
@@ -44,14 +84,20 @@ class Price extends System {
       return false;
     }
 
-    const [command, price] = parsed.slice(1);
-    if (parseInt(price, 10) === 0) {
+    const [command, argPrice] = parsed.slice(1);
+    if (parseInt(argPrice, 10) === 0) {
       this.unset(opts);
       return false;
     }
 
-    await global.db.engine.update(this.collection.data, { command: command }, { command: command, price: parseInt(price, 10), enabled: true });
-    const message = await prepare('price.price-was-set', { command, amount: parseInt(price, 10), pointsName: await global.systems.points.getPointsName(price) });
+    let price = await getRepository(PriceEntity).findOne({ command });
+    if (!price) {
+      price = new PriceEntity();
+      price.command = command;
+      price.price = argPrice;
+    }
+    await getRepository(PriceEntity).save(price);
+    const message = await prepare('price.price-was-set', { command, amount: parseInt(argPrice, 10), pointsName: await global.systems.points.getPointsName(price) });
     sendMessage(message, opts.sender, opts.attr);
   }
 
@@ -67,7 +113,7 @@ class Price extends System {
     }
 
     const command = parsed[1];
-    await global.db.engine.remove(this.collection.data, { command: command });
+    await getRepository(PriceEntity).delete({ command });
     const message = await prepare('price.price-was-unset', { command });
     sendMessage(message, opts.sender, opts.attr);
   }
@@ -84,14 +130,15 @@ class Price extends System {
     }
 
     const command = parsed[1];
-    const price = await global.db.engine.findOne(this.collection.data, { command: command });
-    if (_.isEmpty(price)) {
+    const price = await getRepository(PriceEntity).findOne({ command });
+    if (!price) {
       const message = await prepare('price.price-was-not-found', { command });
       sendMessage(message, opts.sender, opts.attr);
       return false;
     }
 
-    await global.db.engine.update(this.collection.data, { command: command }, { enabled: !price.enabled });
+    price.enabled = !price.enabled;
+    await getRepository(PriceEntity).save(price);
     const message = await prepare(!price.enabled ? 'price.price-was-enabled' : 'price.price-was-disabled', { command });
     sendMessage(message, opts.sender, opts.attr);
   }
@@ -99,7 +146,7 @@ class Price extends System {
   @command('!price list')
   @default_permission(permission.CASTERS)
   async list (opts) {
-    const prices = await global.db.engine.find(this.collection.data);
+    const prices = await getRepository(PriceEntity).find();
     const output = (prices.length === 0 ? global.translate('price.list-is-empty') : global.translate('price.list-is-not-empty').replace(/\$list/g, (_.map(_.orderBy(prices, 'command'), (o) => {
       return `${o.command} - ${o.price}`;
     })).join(', ')));
@@ -117,19 +164,19 @@ class Price extends System {
     ) {
       return true;
     }
-    const price = await global.db.engine.findOne(this.collection.data, { command: parsed[1], enabled: true });
 
-    if (_.isEmpty(price)) { // no price set
+    const price = await getRepository(PriceEntity).findOne({ command: parsed[1], enabled: true });
+    if (!price) { // no price set
       return true;
     }
     const availablePts = await global.systems.points.getPointsOf(opts.sender.userId);
-    const removePts = parseInt(price.price, 10);
+    const removePts = price.price;
     const haveEnoughPoints = availablePts >= removePts;
     if (!haveEnoughPoints) {
       const message = await prepare('price.user-have-not-enough-points', { amount: removePts, command: `${price.command}`, pointsName: await global.systems.points.getPointsName(removePts) });
       sendMessage(message, opts.sender, opts.attr);
     } else {
-      await global.db.engine.increment('users.points', { id: opts.sender.userId }, { points: (removePts * -1) });
+      await getRepository(User).decrement({ userId: opts.sender.userId }, 'points', removePts);
     }
     return haveEnoughPoints;
   }
@@ -145,14 +192,14 @@ class Price extends System {
     ) {
       return true;
     }
-    const price = await global.db.engine.findOne(this.collection.data, { command: parsed[1], enabled: true });
+    const price = await getRepository(PriceEntity).findOne({ command: parsed[1], enabled: true });
 
-    if (_.isEmpty(price)) { // no price set
+    if (!price) { // no price set
       return true;
     }
 
-    const removePts = parseInt(price.price, 10);
-    await global.db.engine.increment('users.points', { id: opts.sender.userId }, { points: removePts });
+    const removePts = price.price;
+    await getRepository(User).increment({ userId: opts.sender.userId }, 'points', removePts);
   }
 }
 

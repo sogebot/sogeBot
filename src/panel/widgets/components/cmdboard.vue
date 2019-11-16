@@ -30,12 +30,12 @@
                   | Done
               div.list-group
                 b-row.px-2
-                  b-col(v-for="item of orderBy(items, 'order')" :key="item._id" cols="6").p-1
+                  b-col(v-for="item of orderBy(items, 'order')" :key="item.id" cols="6").p-1
                     button(
                       style="text-overflow: ellipsis;"
                       @dragenter="dragenter(item.order, $event)"
                       @click="state.editation === $state.idle ? emit(item) : toggle(item)"
-                      :class="{'list-group-item-danger': state.editation === $state.progress && selected.includes(item._id) }"
+                      :class="{'list-group-item-danger': state.editation === $state.progress && selected.includes(item.id) }"
                       :ref='"item_" + item.order'
                       :data-name="item.text"
                       :title="item.command"
@@ -107,9 +107,8 @@ export default {
     }
   },
   created: function () {
-      this.socket.emit('find', { collection: '_widgetsCmdBoard' }, (err, items) => {
+      this.socket.emit('cmdboard::getAll', (items) => {
         this.items = items
-        console.debug({items})
         this.state.loading = this.$state.success;
       })
       this.socket.emit('settings', (err, data) => {
@@ -120,10 +119,10 @@ export default {
   },
   methods: {
     toggle(item) {
-      if(this.selected.find(o => o === item._id)) {
-        this.selected = this.selected.filter(o => o !== item._id);
+      if(this.selected.find(o => o === item.id)) {
+        this.selected = this.selected.filter(o => o !== item.id);
       } else {
-        this.selected.push(item._id);
+        this.selected.push(item.id);
       }
     },
     reorder() {
@@ -132,28 +131,26 @@ export default {
       }
     },
     remove() {
-      this.items = this.items.filter(o => !this.selected.includes(String(o._id)))
+      this.socket.emit('cmdboard::remove', this.items.filter(o => this.selected.includes(String(o.id))), () => {});
+      this.items = this.items.filter(o => !this.selected.includes(String(o.id)))
       this.selected = [];
       this.reorder();
     },
     save() {
       this.state.editation = this.$state.idle;
       console.debug('saving', { items: Array(...this.items) })
-      this.socket.emit('set', { collection: '_widgetsCmdBoard', items: this.items, where: {} })
+      this.socket.emit('cmdboard::save', this.items, () => {})
     },
     emit: function (item) {
-      this.socket.emit('cmdboard.widget.run', item.command)
+      this.socket.emit('cmdboard::run', item.command)
     },
     add: function () {
       this.tabIndex = 0;
-      this.socket.emit('insert', {
-        collection: '_widgetsCmdBoard',
-        items: [{
+      this.socket.emit('cmdboard::save', [{
           text: this.name,
           command: this.command,
           order: this.items.length,
-        }],
-      }, (err, items) => {
+        }], (items) => {
         this.items = [...this.items, ...items]
       })
       this.name = ''

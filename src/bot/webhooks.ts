@@ -6,6 +6,8 @@ import { setTimeout } from 'timers';
 import { isBot } from './commons';
 import { debug, error, follow, info, start } from './helpers/log';
 import { triggerInterfaceOnFollow } from './helpers/interface/triggers';
+import { getRepository } from 'typeorm';
+import { User } from './database/entity/user';
 
 class Webhooks {
   enabled = {
@@ -205,6 +207,8 @@ class Webhooks {
     try {
       const cid = global.oauth.channelId;
       const data = aEvent.data;
+      data.from_id = Number(data.from_id);
+
       if (Object.keys(cid).length === 0) {
         setTimeout(() => this.follower(aEvent), 10);
       } // wait until channelId is set
@@ -224,21 +228,19 @@ class Webhooks {
       // add to cache
       this.addIdToCache('follow', data.from_id);
 
-      const user = await global.users.getById(data.from_id);
+      const user = await getRepository(User).findOne({ userId: data.from_id }) ?? new User();
+      user.userId = Number(data.from_id);
+      user.username = data.from_name.toLowerCase();
 
-      data.from_name = String(data.from_name).toLowerCase();
-      user.username = data.from_name;
-      global.db.engine.update('users', { id: data.from_id }, { username: data.from_name });
-
-      if (!get(user, 'is.follower', false) && (get(user, 'time.follow', 0) === 0 || Date.now() - get(user, 'time.follow', 0) > 60000 * 60)) {
+      if (!user.isFollower && (user.followedAt === 0 || Date.now() - user.followedAt > 60000 * 60)) {
         if (!isBot(data.from_name)) {
           global.overlays.eventlist.add({
-            type: 'follow',
+            event: 'follow',
             username: data.from_name,
             timestamp: Date.now(),
           });
           follow(data.from_name);
-          global.events.fire('follow', { username: data.from_name, webhooks: true });
+          global.events.fire('follow', { username: data.from_name, userId: data.from_id, webhooks: true });
           global.registries.alerts.trigger({
             event: 'follows',
             name: data.from_name,
@@ -256,13 +258,10 @@ class Webhooks {
         }
       }
 
-      if (!get(user, 'is.follower', false)) {
-        global.db.engine.update('users', { id: data.from_id }, { username: data.from_name, time: { followCheck: new Date().getTime() } });
-      } else {
-        const followedAt = user.lock && user.lock.followed_at ? Number(user.time.follow) : Date.now();
-        const isFollower = user.lock && user.lock.follower ? user.is.follower : true;
-        global.db.engine.update('users', { id: data.from_id }, { username: data.from_name, is: { follower: isFollower }, time: { followCheck: new Date().getTime(), follow: followedAt } });
-      }
+      user.isFollower = user.haveFollowerLock? user.isFollower : true;
+      user.followedAt = user.haveFollowedAtLock ? user.followedAt : Date.now();
+      user.followCheckAt = Date.now();
+      await getRepository(User).save(user, { });
     } catch (e) {
       error(e.stack);
       error(util.inspect(aEvent));

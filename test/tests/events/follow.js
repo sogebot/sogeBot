@@ -9,6 +9,10 @@ const message = require('../../general.js').message;
 const time = require('../../general.js').time;
 const _ = require('lodash');
 
+const { getRepository } = require('typeorm');
+const { User } = require('../../../dest/database/entity/user');
+const { Event } = require('../../../dest/database/entity/event');
+
 describe('Events - follow event', () => {
   before(async () => {
     await db.cleanup();
@@ -17,48 +21,37 @@ describe('Events - follow event', () => {
 
   describe('#1370 - Second follow event didn\'t trigger event ', function () {
     before(async function () {
-      const id = uuidv4();
-      await Promise.all([
-        global.db.engine.insert('events', {
-          id,
-          key: 'follow',
-          name: 'Follow alert',
-          enabled: true,
-          triggered: {},
-          definitions: {},
-        }),
-        global.db.engine.insert('events.filters', {
-          filters: '',
-          eventId: id,
-        }),
-        global.db.engine.insert('events.operations', {
-          key: 'emote-explosion',
-          eventId: id,
-          definitions: {
-            emotesToExplode: 'purpleHeart <3',
-          },
-        }),
-        global.db.engine.insert('events.operations', {
-          key: 'run-command',
-          eventId: id,
-          definitions: {
-            commandToRun: '!duel',
-            isCommandQuiet: true,
-          },
-        }),
-        global.db.engine.insert('events.operations', {
-          key: 'send-chat-message',
-          eventId: id,
-          definitions: {
-            messageToSend: 'Diky za follow, $username!',
-          },
-        }),
-      ]);
+      const event = new Event();
+      event.id = uuidv4();
+      event.name = 'follow';
+      event.givenName = 'Follow alert';
+      event.triggered = {};
+      event.definitions = {};
+      event.filter = '';
+      event.isEnabled = true;
+      event.operations = [{
+        name: 'emote-explosion',
+        definitions: {
+          emotesToExplode: 'purpleHeart <3',
+        },
+      }, {
+        name: 'run-command',
+        definitions: {
+          commandToRun: '!duel',
+          isCommandQuiet: true,
+        },
+      }, {
+        name: 'send-chat-message',
+        definitions: {
+          messageToSend: 'Diky za follow, $username!',
+        },
+      }];
+      await getRepository(Event).save(event);
     });
 
     for (const username of ['losslezos', 'rigneir', 'mikasa_hraje', 'foufhs']) {
       it('trigger follow event', async () => {
-        await global.events.fire('follow', { username, webhooks: _.random(1) === 1 });
+        await global.events.fire('follow', { username, userId: Math.floor(Math.random() * 100000), webhooks: _.random(1) === 1 });
       });
 
       it('message should be send', async () => {

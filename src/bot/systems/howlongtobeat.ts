@@ -8,18 +8,9 @@ import { HowLongToBeatService /*, HowLongToBeatEntry */ } from 'howlongtobeat';
 import Expects from '../expects';
 import { prepare, sendMessage } from '../commons';
 
-export interface Game {
-  _id?: string;
-  game: string;
-  startedAt: number;
-  isFinishedMain: boolean;
-  isFinishedCompletionist: boolean;
-  timeToBeatMain: number;
-  timeToBeatCompletionist: number;
-  gameplayMain: number;
-  gameplayCompletionist: number;
-  imageUrl: string;
-}
+import { getRepository } from 'typeorm';
+import { HowLongToBeatGame } from '../database/entity/howLongToBeatGame';
+import { adminEndpoint } from '../helpers/socket';
 
 class HowLongToBeat extends System {
   interval: number = constants.SECOND * 15;
@@ -38,18 +29,27 @@ class HowLongToBeat extends System {
     }
   }
 
+  sockets() {
+    adminEndpoint(this.nsp, 'hltb::getAll', async (opts, cb) => {
+      cb(await getRepository(HowLongToBeatGame).find({...opts}));
+    });
+    adminEndpoint(this.nsp, 'hltb::save', async (dataset: HowLongToBeatGame, cb) => {
+      const item = await getRepository(HowLongToBeatGame).save(dataset);
+      cb(null, item);
+    });
+  }
+
   async addToGameTimestamp() {
     if (!global.api.stats.currentGame) {
       return; // skip if we don't have game
     }
 
-    if (global.api.stats.currentGame.trim().length === 0) {
+    if (global.api.stats.currentGame.trim().length === 0 || global.api.stats.currentGame.trim() === 'IRL') {
       return; // skip if we have empty game
     }
 
-    let gameToInc: Game = await global.db.engine.findOne(this.collection.data, { game: global.api.stats.currentGame });
-    if (typeof gameToInc._id !== 'undefined') {
-      delete gameToInc._id;
+    let gameToInc = await getRepository(HowLongToBeatGame).findOne({ where: { game: global.api.stats.currentGame } });
+    if (gameToInc) {
       if (!gameToInc.isFinishedMain) {
         gameToInc.timeToBeatMain += this.interval;
       }
@@ -59,7 +59,9 @@ class HowLongToBeat extends System {
     } else {
       const gamesFromHltb = await this.hltbService.search(global.api.stats.currentGame);
       const gameFromHltb = gamesFromHltb.length > 0 ? gamesFromHltb[0] : null;
+      gameToInc = new HowLongToBeatGame();
       gameToInc = {
+        ...gameToInc,
         game: global.api.stats.currentGame,
         gameplayMain: (gameFromHltb || { gameplayMain: 0 }).gameplayMain,
         gameplayCompletionist: (gameFromHltb || { gameplayMain: 0 }).gameplayCompletionist,
@@ -74,7 +76,7 @@ class HowLongToBeat extends System {
 
     if (gameToInc.gameplayMain > 0) {
       // sve only if we have numbers from hltb (possible MP game)
-      await global.db.engine.update(this.collection.data, { game: gameToInc.game }, gameToInc);
+      await getRepository(HowLongToBeatGame).save(gameToInc);
     }
   }
 
@@ -92,8 +94,8 @@ class HowLongToBeat extends System {
         game = global.api.stats.currentGame;
       }
     }
-    const gameToShow: Game = await global.db.engine.findOne(this.collection.data, { game });
-    if (!gameToShow || typeof gameToShow._id === 'undefined') {
+    const gameToShow = await getRepository(HowLongToBeatGame).findOne({ where: { game } });
+    if (!gameToShow) {
       await sendMessage(prepare('systems.howlongtobeat.error', { game }), opts.sender, opts.attr);
       return;
     }

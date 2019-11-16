@@ -78,6 +78,6 @@ export default class playlist extends Vue {
   padding: 0 !important;
 }
 .fitThumbnail {
-  width: 100px;;
+  width: 100px;
 }
 </style>

@@ -1,3 +1,6 @@
+const { getRepository } = require('typeorm');
+const { User } = require('../../dest/database/entity/user')
+
 const viewer = {
   userId: 1,
   username: '__viewer__',
@@ -7,7 +10,7 @@ const viewer = {
 
 module.exports = {
   prepare: async () => {
-    await global.db.engine.update('users', { id: 1 }, viewer);
+    await getRepository(User).save(viewer);
   },
   viewer,
 };

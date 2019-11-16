@@ -6,7 +6,11 @@ import { prepare, sendMessage } from '../commons';
 import { command, default_permission } from '../decorators';
 import { permission } from '../permissions';
 import System from './_interface';
-import uuid from 'uuid';
+
+import { User } from '../database/entity/user';
+import { getRepository } from 'typeorm';
+import { Rank } from '../database/entity/rank';
+import { adminEndpoint } from '../helpers/socket';
 
 /*
  * !rank                       - show user rank
@@ -23,6 +27,31 @@ class Ranks extends System {
     this.addMenu({ category: 'manage', name: 'ranks', id: 'manage/ranks/list' });
   }
 
+  sockets () {
+    adminEndpoint(this.nsp, 'ranks::getAll', async (cb) => {
+      cb(await getRepository(Rank).find({
+        order: {
+          hours: 'ASC',
+        },
+      }));
+    });
+    adminEndpoint(this.nsp, 'ranks::getOne', async (id, cb) => {
+      cb(await getRepository(Rank).findOne(id));
+    });
+    adminEndpoint(this.nsp, 'ranks::remove', async (id, cb) => {
+      await getRepository(Rank).delete(id);
+      cb();
+    });
+    adminEndpoint(this.nsp, 'ranks::save', async (item: Rank, cb) => {
+      try {
+        await getRepository(Rank).save(item);
+        cb(null, item);
+      } catch (e) {
+        cb(e, item);
+      }
+    });
+  }
+
   @command('!rank add')
   @default_permission(permission.CASTERS)
   async add (opts) {
@@ -34,18 +63,17 @@ class Ranks extends System {
       return false;
     }
 
-    const values = {
-      id: uuid(),
-      hours: parseInt(parsed[1], 10),
-      value: parsed[2],
-    };
 
-    const ranks = await global.db.engine.find(this.collection.data, { hours: values.hours });
-    if (ranks.length === 0) {
-      global.db.engine.insert(this.collection.data, values);
+    const hours = parseInt(parsed[1], 10);
+    const rank = await getRepository(Rank).findOne({ hours });
+    if (!rank) {
+      const newRank = new Rank();
+      newRank.hours = hours;
+      newRank.rank = parsed[2];
+      await getRepository(Rank).save(newRank);
     }
 
-    const message = await prepare(ranks.length === 0 ? 'ranks.rank-was-added' : 'ranks.ranks-already-exist', { rank: values.value, hours: values.hours });
+    const message = await prepare(!rank ? 'ranks.rank-was-added' : 'ranks.ranks-already-exist', { rank: parsed[2], hours });
     sendMessage(message, opts.sender, opts.attr);
   }
 
@@ -63,14 +91,15 @@ class Ranks extends System {
     const hours = parsed[1];
     const rank = parsed[2];
 
-    const item = await global.db.engine.findOne(this.collection.data, { hours: parseInt(hours, 10) });
-    if (_.isEmpty(item)) {
+    const item = await getRepository(Rank).findOne({ hours: parseInt(hours, 10) });
+    if (!item) {
       const message = await prepare('ranks.rank-was-not-found', { hours: hours });
       sendMessage(message, opts.sender, opts.attr);
       return false;
     }
 
-    await global.db.engine.update(this.collection.data, { hours: parseInt(hours, 10) }, { value: rank });
+    item.rank = rank;
+    await getRepository(Rank).save(item);
     const message = await prepare('ranks.rank-was-edited', { hours: parseInt(hours, 10), rank: rank });
     sendMessage(message, opts.sender, opts.attr);
   }
@@ -86,8 +115,7 @@ class Ranks extends System {
       return false;
     }
 
-    global.users.set(parsed[1], { custom: { rank: parsed[2].trim() } });
-
+    await getRepository(User).update({ userId: parsed[1] }, { haveCustomRank: true, rank: parsed[2].trim() });
     const message = await prepare('ranks.custom-rank-was-set-to-user', { rank: parsed[2].trim(), username: parsed[1] });
     sendMessage(message, opts.sender, opts.attr);
   }
@@ -103,7 +131,7 @@ class Ranks extends System {
       return false;
     }
 
-    global.users.set(parsed[1], { custom: { rank: null } });
+    await getRepository(User).update({ userId: parsed[1] }, { haveCustomRank: false, rank: '' });
     const message = await prepare('ranks.custom-rank-was-unset-for-user', { username: parsed[1] });
     sendMessage(message, opts.sender, opts.attr);
   }
@@ -117,9 +145,9 @@ class Ranks extends System {
   @command('!rank list')
   @default_permission(permission.CASTERS)
   async list (opts) {
-    const ranks = await global.db.engine.find(this.collection.data);
+    const ranks = await getRepository(Rank).find();
     const output = await prepare(ranks.length === 0 ? 'ranks.list-is-empty' : 'ranks.list-is-not-empty', { list: _.map(_.orderBy(ranks, 'hours', 'asc'), function (l) {
-      return l.hours + 'h - ' + l.value;
+      return l.hours + 'h - ' + l.rank;
     }).join(', ') });
     sendMessage(output, opts.sender, opts.attr);
   }
@@ -135,7 +163,7 @@ class Ranks extends System {
     }
 
     const hours = parseInt(parsed[1], 10);
-    const removed = await global.db.engine.remove(this.collection.data, { hours: hours });
+    const removed = await getRepository(Rank).delete({ hours: hours });
 
     const message = await prepare(removed ? 'ranks.rank-was-removed' : 'ranks.rank-was-not-found', { hours: hours });
     sendMessage(message, opts.sender, opts.attr);
@@ -146,10 +174,15 @@ class Ranks extends System {
     const watched = await global.users.getWatchedOf(opts.sender.userId);
     const rank = await this.get(opts.sender.username);
 
-    const [ranks, current] = await Promise.all([global.db.engine.find(this.collection.data), global.db.engine.findOne(this.collection.data, { value: rank })]);
+    const ranks = await getRepository(Rank).find({
+      order: {
+        hours: 'DESC',
+      },
+    });
+    const current = ranks.find(o => o.rank === rank);
 
-    let nextRank: null | { hours: number; value: string } = null;
-    for (const _rank of _.orderBy(ranks, 'hours', 'desc')) {
+    let nextRank: null | { hours: number; rank: string } = null;
+    for (const _rank of ranks) {
       if (_rank.hours > watched / 1000 / 60 / 60) {
         nextRank = _rank;
       } else {
@@ -157,7 +190,7 @@ class Ranks extends System {
       }
     }
 
-    if (_.isNil(rank)) {
+    if (_.isNil(rank) || !current) {
       const message = await prepare('ranks.user-dont-have-rank');
       sendMessage(message, opts.sender, opts.attr);
       return true;
@@ -168,7 +201,7 @@ class Ranks extends System {
       const toNextRankWatched = watched / 1000 / 60 / 60 - current.hours;
       const toWatch = (toNextRank - toNextRankWatched);
       const percentage = 100 - (((toWatch) / toNextRank) * 100);
-      const message = await prepare('ranks.show-rank-with-next-rank', { rank: rank, nextrank: `${nextRank.value} ${percentage.toFixed(1)}% (${toWatch.toFixed(1)}h)` });
+      const message = await prepare('ranks.show-rank-with-next-rank', { rank: rank, nextrank: `${nextRank.rank} ${percentage.toFixed(1)}% (${toWatch.toFixed(1)}h)` });
       sendMessage(message, opts.sender, opts.attr);
       return true;
     }
@@ -177,23 +210,25 @@ class Ranks extends System {
     sendMessage(message, opts.sender, opts.attr);
   }
 
-  async get (user) {
-    if (!_.isObject(user)) {
-      user = await global.users.getByName(user);
-    }
-    if (!_.isNil(user.custom.rank)) {
-      return user.custom.rank;
+  async get (user: User | undefined) {
+    if (!user) {
+      return '';
     }
 
-    const [watched, ranks] = await Promise.all([
-      global.users.getWatchedOf(user.id),
-      global.db.engine.find(this.collection.data),
-    ]);
-    let rankToReturn = null;
+    if (user.haveCustomRank) {
+      return user.rank;
+    }
 
-    for (const rank of _.orderBy(ranks, 'hours', 'asc')) {
-      if (watched / 1000 / 60 / 60 >= rank.hours) {
-        rankToReturn = rank.value;
+    const ranks = await getRepository(Rank).find({
+      order: {
+        hours: 'ASC',
+      },
+    });
+    let rankToReturn: null | string = null;
+
+    for (const rank of ranks) {
+      if (user.watchedTime / 1000 / 60 / 60 >= rank.hours) {
+        rankToReturn = rank.rank;
       } else {
         break;
       }

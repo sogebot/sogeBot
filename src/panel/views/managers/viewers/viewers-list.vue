@@ -15,33 +15,33 @@
         <b-dropdown no-caret variant="primary">
           <template v-slot:button-content>
             <span class="dropdown-icon">
-              <template v-if="sort === 'username'">{{ translate('username') }}</template>
-              <template v-if="sort === 'sort.message'">{{ translate('last-seen') }}</template>
-              <template v-if="sort === 'sort.watched'">{{ translate('watched-time') }}</template>
-              <template v-if="sort === 'sort.follow'">{{ translate('followed-since') }}</template>
-              <template v-if="sort === 'sort.subscribed_at'">{{ translate('subscribed-since') }}</template>
-              <template v-if="sort === 'points'">{{ translate('points') }}</template>
-              <template v-if="sort === 'messages'">{{ translate('messages') }}</template>
-              <template v-if="sort === 'stats.tips'">{{ translate('tips') }}</template>
-              <template v-if="sort === 'stats.bits'">{{ translate('bits') }}</template>
-              <template v-if="sort === 'custom.subgiftCount'">{{ translate('subgifts') }}</template>
-              <template v-if="sort === 'stats.subCumulativeMonths'">{{ translate('subCumulativeMonths') }}</template>
-              <template v-if="sort === 'stats.subStreak'">{{ translate('subStreak') }}</template>
+              <template v-if="sort === 'user.username'">{{ translate('username') }}</template>
+              <template v-if="sort === 'user.seenAt'">{{ translate('last-seen') }}</template>
+              <template v-if="sort === 'user.watchedTime'">{{ translate('watched-time') }}</template>
+              <template v-if="sort === 'user.followedAt'">{{ translate('followed-since') }}</template>
+              <template v-if="sort === 'user.subscribedAt'">{{ translate('subscribed-since') }}</template>
+              <template v-if="sort === 'user.points'">{{ translate('points') }}</template>
+              <template v-if="sort === 'user.messages'">{{ translate('messages') }}</template>
+              <template v-if="sort === 'sumTips'">{{ translate('tips') }}</template>
+              <template v-if="sort === 'sumBits'">{{ translate('bits') }}</template>
+              <template v-if="sort === 'user.giftedSubscribes'">{{ translate('subgifts') }}</template>
+              <template v-if="sort === 'user.subscribeCumulativeMonths'">{{ translate('subCumulativeMonths') }}</template>
+              <template v-if="sort === 'user.subscribeStreak'">{{ translate('subStreak') }}</template>
               <fa icon="sort-down" fixed-width></fa>
             </span>
           </template>
-          <b-dropdown-item @click="sort = 'username'; sortDesc = false">{{ translate('username') }}</b-dropdown-item>
-          <b-dropdown-item @click="sort = 'sort.message'; sortDesc = true">{{ translate('last-seen') }}</b-dropdown-item>
-          <b-dropdown-item @click="sort = 'sort.watched'; sortDesc = true">{{ translate('watched-time') }}</b-dropdown-item>
-          <b-dropdown-item @click="sort = 'sort.follow'; sortDesc = true">{{ translate('followed-since') }}</b-dropdown-item>
-          <b-dropdown-item @click="sort = 'sort.subscribed_at'; sortDesc = true">{{ translate('subscribed-since') }}</b-dropdown-item>
-          <b-dropdown-item @click="sort = 'points'; sortDesc = true">{{ translate('points') }}</b-dropdown-item>
-          <b-dropdown-item @click="sort = 'messages'; sortDesc = true">{{ translate('messages') }}</b-dropdown-item>
-          <b-dropdown-item @click="sort = 'stats.tips'; sortDesc = true">{{ translate('tips') }}</b-dropdown-item>
-          <b-dropdown-item @click="sort = 'stats.bits'; sortDesc = true">{{ translate('bits') }}</b-dropdown-item>
-          <b-dropdown-item @click="sort = 'custom.subgiftCount'; sortDesc = true">{{ translate('subgifts') }}</b-dropdown-item>
-          <b-dropdown-item @click="sort = 'stats.subCumulativeMonths'; sortDesc = true">{{ translate('subCumulativeMonths') }}</b-dropdown-item>
-          <b-dropdown-item @click="sort = 'stats.subStreak'; sortDesc = true">{{ translate('subStreak') }}</b-dropdown-item>
+          <b-dropdown-item @click="sort = 'user.username'; sortDesc = false">{{ translate('username') }}</b-dropdown-item>
+          <b-dropdown-item @click="sort = 'user.seenAt'; sortDesc = true">{{ translate('last-seen') }}</b-dropdown-item>
+          <b-dropdown-item @click="sort = 'user.watchedTime'; sortDesc = true">{{ translate('watched-time') }}</b-dropdown-item>
+          <b-dropdown-item @click="sort = 'user.followedAt'; sortDesc = true">{{ translate('followed-since') }}</b-dropdown-item>
+          <b-dropdown-item @click="sort = 'user.subscribedAt'; sortDesc = true">{{ translate('subscribed-since') }}</b-dropdown-item>
+          <b-dropdown-item @click="sort = 'user.points'; sortDesc = true">{{ translate('points') }}</b-dropdown-item>
+          <b-dropdown-item @click="sort = 'user.messages'; sortDesc = true">{{ translate('messages') }}</b-dropdown-item>
+          <b-dropdown-item @click="sort = 'sumTips'; sortDesc = true">{{ translate('tips') }}</b-dropdown-item>
+          <b-dropdown-item @click="sort = 'sumBits'; sortDesc = true">{{ translate('bits') }}</b-dropdown-item>
+          <b-dropdown-item @click="sort = 'user.giftedSubscribes'; sortDesc = true">{{ translate('subgifts') }}</b-dropdown-item>
+          <b-dropdown-item @click="sort = 'user.subscribeCumulativeMonths'; sortDesc = true">{{ translate('subCumulativeMonths') }}</b-dropdown-item>
+          <b-dropdown-item @click="sort = 'user.subscribeStreak'; sortDesc = true">{{ translate('subStreak') }}</b-dropdown-item>
         </b-dropdown>
 
         <b-button variant="primary" @click="sortDesc = !sortDesc">
@@ -121,44 +121,44 @@
       v-else
       hover striped small
       style="cursor: pointer;"
-      :fields="fields" :items="fItems" :per-page="perPage" :current-page="currentPage"
+      :fields="fields" :items="fItems"
       @row-clicked="linkTo($event)"
       :sort-by.sync="sort" :sort-desc.sync="sortDesc">
       <template v-slot:cell(username)="data">
         <div class="text-primary font-bigger">{{ data.item.username }}</div>
-        <b-badge :class="[ data.item.online.length > 0 ? 'badge-success' : 'badge-danger' ]" style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
+        <b-badge :class="[ data.item.isOnline ? 'badge-success' : 'badge-danger' ]" style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
           active
         </b-badge>
-        <b-badge :class="[ typeof data.item.is === 'object' && data.item.is.vip ? 'badge-success' : 'badge-danger' ]" style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
+        <b-badge :class="[ data.item.isVIP ? 'badge-success' : 'badge-danger' ]" style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
           vip
         </b-badge>
-        <b-badge :class="[ typeof data.item.is === 'object' && data.item.is.follower ? 'badge-success' : 'badge-danger' ]" style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
-          <fa v-if="typeof data.item.lock === 'object' && data.item.lock.follower" :icon="['fas', 'fa-lock']"></fa>
+        <b-badge :class="[ data.item.isFollower ? 'badge-success' : 'badge-danger' ]" style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
+          <fa v-if="data.item.haveFollowerLock" :icon="['fas', 'fa-lock']"></fa>
           follower
         </b-badge>
-        <b-badge :class="[ typeof data.item.is === 'object' && data.item.is.subscriber ? 'badge-success' : 'badge-danger' ]" style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
-          <fa v-if="typeof data.item.lock === 'object' && data.item.lock.subscriber" :icon="['fas', 'fa-lock']"></fa>
+        <b-badge :class="[ data.item.isSubscriber ? 'badge-success' : 'badge-danger' ]" style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
+          <fa v-if="data.item.haveSubscriberLock" :icon="['fas', 'fa-lock']"></fa>
           subscriber
         </b-badge>
       </template>
       <template v-slot:cell(date)="data">
-        <div v-if="typeof data.item.time === 'object' && data.item.time.message">
+        <div v-if="Number(data.item.seenAt) !== 0">
           <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
             {{ translate('last-seen') }}:
           </strong>
-          {{ moment(get(data, 'item.time.message', 0)).format('LLL') }}</div>
-        <div v-if="typeof data.item.time === 'object' && data.item.time.follow && typeof data.item.is === 'object' && data.item.is.follower">
+          {{ moment(Number(data.item.seenAt)).format('LLL') }}</div>
+        <div v-if="data.item.isFollower && Number(data.item.followedAt) !== 0">
           <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
-            <fa v-if="get(data, 'item.lock.followed_at')" :icon="['fas', 'fa-lock']"></fa>
+            <fa v-if="data.item.haveFollowedAtLock" :icon="['fas', 'fa-lock']"></fa>
             {{ translate('followed-since') }}:
           </strong>
-          {{ moment(get(data, 'item.time.follow', 0)).format('LLL') }}</div>
-        <div v-if="typeof data.item.time === 'object' && data.item.time.subscribed_at && typeof data.item.is === 'object' && data.item.is.subscriber">
+          {{ moment(Number(data.item.followedAt)).format('LLL') }}</div>
+        <div v-if="data.item.isSubscriber && Number(data.item.subscribedAt) !== 0">
           <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
-              <fa v-if="get(data, 'item.lock.subscribed_at')" :icon="['fas', 'fa-lock']"></fa>
+            <fa v-if="data.item.haveSubscribedAtLock" :icon="['fas', 'fa-lock']"></fa>
             {{ translate('subscribed-since') }}:
           </strong>
-          {{ moment(get(data, 'item.time.subscribed_at', 0)).format('LLL') }}
+          {{ moment(Number(data.item.subscribedAt)).format('LLL') }}
         </div>
       </template>
       <template v-slot:cell(stats)="data">
@@ -166,7 +166,7 @@
           <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
             {{ translate('messages') }}:
           </strong>
-          {{ get(data, 'item.messages', 0) }}
+          {{ data.item.messages }}
         </div>
         <div>
           <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
@@ -178,13 +178,13 @@
           <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
             {{ translate('watched-time') }}:
           </strong>
-          {{ (get(data, 'item.time.watched', 0) / 1000 / 60 / 60).toFixed(1) }}h
+          {{ (data.item.watchedTime / 1000 / 60 / 60).toFixed(1) }}h
         </div>
         <div>
           <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
             {{ translate('tips') }}:
           </strong>
-          {{ Number(data.item.stats.tips).toFixed(2) }}{{ data.item.custom.currency }}
+          {{ Number(data.item.sumTips).toFixed(2) }}{{ configuration.currency }}
         </div>
       </template>
       <template v-slot:cell(stats2)="data">
@@ -192,31 +192,31 @@
           <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
             {{ translate('bits') }}:
           </strong>
-          {{ data.item.stats.bits }}
+          {{ data.item.sumBits }}
         </div>
-        <div v-if="typeof data.item.is === 'object' && data.item.is.subscriber && data.item.stats.tier">
+        <div v-if="data.item.isSubscriber">
           <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
             {{ translate('tier') }}:
           </strong>
-          {{ data.item.stats.tier }}
+          {{ data.item.subscribeTier }}
         </div>
         <div>
           <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
             {{ translate('subgifts') }}:
           </strong>
-          {{ get(data, 'item.custom.subgiftCount', 0) }}
+          {{ data.item.giftedSubscribes }}
         </div>
         <div>
           <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
             {{ translate('subStreak') }}:
           </strong>
-          {{ get(data, 'item.stats.subStreak', 0) }}
+          {{ data.item.subscribeStreak }}
         </div>
         <div>
           <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
             {{ translate('subCumulativeMonths') }}:
           </strong>
-          {{ get(data, 'item.stats.subCumulativeMonths', 0) }}
+          {{ data.item.subscribeCumulativeMonths }}
         </div>
       </template>
     </b-table>
@@ -224,9 +224,9 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator';
+import { Vue, Component, Watch } from 'vue-property-decorator';
 import { getSocket } from 'src/panel/helpers/socket';
-import { isNil, escapeRegExp, get } from 'lodash-es';
+import { get } from 'lodash-es';
 import { capitalize } from 'src/panel/helpers/capitalize';
 import moment from 'moment';
 
@@ -248,6 +248,7 @@ export default class viewersList extends Vue {
   socket = getSocket('/core/users');
 
   items: any[] = []
+  count: number = 0;
   search: string = '';
 
   state: {
@@ -257,10 +258,10 @@ export default class viewersList extends Vue {
   }
 
   currentPage = 1;
-  perPage = 30;
+  perPage = 25;
 
   sortDesc = false;
-  sort = 'username';
+  sort = 'user.username';
 
   filter: any = {
     followers: null,
@@ -277,91 +278,74 @@ export default class viewersList extends Vue {
   ]
 
   get rows() {
-    return this.items.length;
+    return this.count;
   }
 
   get fItems() {
-    return this.items.filter((o) => {
-      if (!o.username) o.username = ''
-      const isSearchInUsername = this.search.length === 0 ? true : !isNil(o.username.match(new RegExp(escapeRegExp(this.search), 'ig')))
+    return this.items;
+  }
 
-      let isActive = true
-      if (!isNil(this.filter.active)) {
-        if (this.filter.active) {
-          isActive = o.online.length > 0
-        } else {
-          isActive = o.online.length === 0
-        }
-      }
-
-      let isVIP = true
-      if (!isNil(this.filter.vips)) {
-        if (this.filter.vips) {
-          isVIP = typeof o.is === 'object' && o.is.vip === true
-        } else {
-          isVIP = typeof o.is !== 'object' || o.is.vip === false
-        }
-      }
-
-      let isFollower = true
-      if (!isNil(this.filter.followers)) {
-        if (this.filter.followers) {
-          isFollower = typeof o.is === 'object' && o.is.follower === true
-        } else {
-          isFollower = typeof o.is !== 'object' || o.is.follower === false
-        }
-      }
-
-      let isSubscriber = true
-      if (!isNil(this.filter.subscribers)) {
-        if (this.filter.subscribers) {
-          isSubscriber = typeof o.is === 'object' && o.is.subscriber === true
-        } else {
-          isSubscriber = typeof o.is !== 'object' || o.is.subscriber === false
-        }
-      }
-      return isSearchInUsername && isActive && isVIP && isFollower && isSubscriber
+  @Watch('currentPage')
+  @Watch('sort')
+  @Watch('sortDesc')
+  @Watch('filter', { deep: true })
+  @Watch('search')
+  refresh() {
+    this.state.loading = this.$state.progress;
+    this.socket.emit('find.viewers', { page: (this.currentPage - 1), order: {
+      orderBy: this.sort, sortOrder: this.sortDesc ? 'DESC' : 'ASC'
+    }, filter: this.filter, search: this.search.length > 0 ? this.search : undefined }, (items, count) => {
+      this.items = items;
+      this.count = count;
+      this.state.loading = this.$state.success;
+      console.timeEnd('find.viewers');
     })
   }
 
   created() {
     console.time('find.viewers');
     this.state.loading = this.$state.progress;
-    this.socket.emit('find.viewers', {}, (items) => {
-      this.items = items
+    this.socket.emit('find.viewers', { page: 0 }, (items, count) => {
+      this.items = items;
+      this.count = count;
       this.state.loading = this.$state.success;
       console.timeEnd('find.viewers');
     })
   }
 
   resetPoints() {
-    for (let item of this.items) item.points = 0
-    this.socket.emit('delete', { where: {}, collection: '_users.points' })
+    this.socket.emit('viewers::resetPointsAll', () => {
+      this.refresh();
+    })
   }
 
   resetWatchedTime() {
-    for (let item of this.items) item.time.watched = 0
-    this.socket.emit('delete', { where: {}, collection: '_users.watched' })
+    this.socket.emit('viewers::resetWatchedTimeAll', () => {
+      this.refresh();
+    })
   }
 
   resetMessages() {
-    for (let item of this.items) item.stats.messages = 0
-    this.socket.emit('delete', { where: {}, collection: '_users.messages' })
+    this.socket.emit('viewers::resetMessagesAll', () => {
+      this.refresh();
+    })
   }
 
   resetBits() {
-    for (let item of this.items) item.stats.bits = 0
-    this.socket.emit('delete', { where: {}, collection: '_users.bits' })
+    this.socket.emit('viewers::resetBitsAll', () => {
+      this.refresh();
+    })
   }
 
   resetTips() {
-    for (let item of this.items) item.stats.tips = 0
-    this.socket.emit('delete', { where: {}, collection: '_users.tips' })
+    this.socket.emit('viewers::resetTipsAll', () => {
+      this.refresh();
+    })
   }
 
   linkTo(item) {
-    console.debug('Clicked', item.id);
-    this.$router.push({ name: 'viewersManagerEdit', params: { id: item.id } });
+    console.debug('Clicked', item.userId);
+    this.$router.push({ name: 'viewersManagerEdit', params: { id: item.userId } });
   }
 }
 </script>
