@@ -16,6 +16,6 @@ export class EventList {
   @Column('bigint', { transformer: new ColumnNumericTransformer() })
   timestamp!: number;
 
-  @Column()
+  @Column('text')
   values_json!: string;
 }
