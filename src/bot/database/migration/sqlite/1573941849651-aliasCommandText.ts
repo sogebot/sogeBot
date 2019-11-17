@@ -18,7 +18,6 @@ export class aliasCommandText1573941849651 implements MigrationInterface {
     await queryRunner.query(`INSERT INTO "temporary_alias"("id", "alias", "command", "enabled", "visible", "permission") SELECT "id", "alias", "command", "enabled", "visible", "permission" FROM "alias"`, undefined);
     await queryRunner.query(`DROP TABLE "alias"`, undefined);
     await queryRunner.query(`ALTER TABLE "temporary_alias" RENAME TO "alias"`, undefined);
-    await queryRunner.query(`CREATE INDEX "IDX_ed5fcb69444dcb0abf0a71053b" ON "alias" ("command") `, undefined);
     await queryRunner.query(`CREATE INDEX "IDX_6a8a594f0a5546f8082b0c405c" ON "alias" ("alias") `, undefined);
   }
 
