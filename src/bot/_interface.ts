@@ -68,13 +68,18 @@ class Module {
   set enabled(value: boolean) {
     if (!_.isEqual(_.get(this, '_enabled', true), value)) {
       _.set(this, '_enabled', value);
-      getManager()
-        .createQueryBuilder()
-        .update(Settings)
-        .where('namespace = :namespace', { namespace: this.nsp })
-        .andWhere('name = :name', { name: 'enabled' })
-        .set({ value: JSON.stringify(value) })
-        .execute();
+      getRepository(Settings).findOne({
+        where: {
+          namespace: this.nsp,
+          value: JSON.stringify(value),
+        },
+      }).then(data => {
+        data = data || new Settings();
+        data.namespace = this.nsp;
+        data.name = 'enabled';
+        data.value = JSON.stringify(value);
+        getRepository(Settings).save(data);
+      });
     }
   }
 
