@@ -762,6 +762,9 @@ class TMI extends Core {
         }) || new User();
         user.userId = Number(sender.userId);
         user.username = sender.username;
+        if (!user.isOnline) {
+          global.widgets.joinpart.send({ users: [sender.username], type: 'join' });
+        }
         user.isOnline = true;
         user.isVIP = typeof sender.badges.vip !== 'undefined';
         user.isFollower = user.isFollower ?? false;
