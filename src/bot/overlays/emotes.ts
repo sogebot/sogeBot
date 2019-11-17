@@ -383,7 +383,7 @@ class Emotes extends Overlay {
 
   @parser({ priority: constants.LOW, fireAndForget: true })
   async containsEmotes (opts: ParserOptions) {
-    if (_.isNil(opts.sender) || !opts.sender.emotes) {
+    if (_.isNil(opts.sender) || !Array.isArray(opts.sender.emotes)) {
       return true;
     }
 
