@@ -28,7 +28,6 @@ export default class ClipsOverlay extends Vue {
       ignore: this.urlParam('ignore') || '',
       limit: Number(this.urlParam('count') || 5)
     }, (data) => {
-      console.log({data})
       var order = (this.urlParam('order') as "desc" | "asc") || 'desc'
       var display: string | string[] = this.urlParam('display') || 'username,event'; display = display.split(',')
 
@@ -48,6 +47,7 @@ export default class ClipsOverlay extends Vue {
         }
       }
       this.events = data
+      setTimeout(() => this.refresh(), 5000);
     })
 }
 }
