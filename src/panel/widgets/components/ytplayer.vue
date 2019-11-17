@@ -24,7 +24,7 @@
             table.table.table-sm
               tr(v-for="(request, index) of requests" :key="index")
                 td
-                  hold-button(@trigger="removeSongRequest(String(request._id))" :icon="'times'" class="btn-outline-danger border-0")
+                  hold-button(@trigger="removeSongRequest(String(request.id))" :icon="'times'" class="btn-outline-danger border-0")
                 td {{request.title}}
                 td {{request.username}}
                 td.pr-4 {{request.length_seconds | formatTime}}
@@ -47,11 +47,11 @@
               @timeupdate="videoTimeUpdated"
               @ended="videoEnded"
               :options='{ controls: ["volume", "progress", "current-time", "restart", "mute"], fullscreen: { enabled: false }, clickToPlay: false }'
-              :key="(currentSong || { videoID: ''}).videoID"
+              :key="(currentSong || { videoId: ''}).videoId"
             )
               div(
                 data-plyr-provider="youtube"
-                :data-plyr-embed-id="(currentSong || { videoID: ''}).videoID"
+                :data-plyr-embed-id="(currentSong || { videoId: ''}).videoId"
               )
 </template>
 
@@ -94,10 +94,10 @@ export default {
     }
   },
   methods: {
-    removeSongRequest(_id) {
-      console.log('Removing => ' + _id)
-      this.requests = this.requests.filter((o) => String(o._id) !== _id)
-      this.socket.emit('delete', { collection: 'request', where: { _id } })
+    removeSongRequest(id) {
+      console.log('Removing => ' + id)
+      this.requests = this.requests.filter((o) => String(o.id) !== id)
+      this.socket.emit('songs::removeRequest', id, () => {})
     },
     videoEnded: function (event) {
       console.debug('[YTPLAYER.ended] - autoplay ', this.autoplay)
@@ -115,7 +115,7 @@ export default {
     },
     nextAndRemoveFromPlaylist() {
       if (this.currentSong) {
-        this.socket.emit('delete.playlist', this.currentSong._id);
+        this.socket.emit('delete.playlist', this.currentSong.id);
         this.next()
       }
     },
@@ -144,7 +144,7 @@ export default {
         return
       }
 
-      if (retry > 10 && this.currentSong && this.currentSong.videoID !== item.videoID) {
+      if (retry > 10 && this.currentSong && this.currentSong.videoId !== item.videoId) {
         return;
       } else {
         this.currentSong = item

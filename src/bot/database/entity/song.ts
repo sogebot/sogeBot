@@ -1,4 +1,4 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Column, Entity, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
 import { ColumnNumericTransformer } from './_transformer';
 
 @Entity()
@@ -27,7 +27,9 @@ export class SongPlaylist {
 
 @Entity()
 export class SongRequest {
-  @PrimaryColumn()
+  @PrimaryGeneratedColumn('uuid')
+  id!: string;
+  @Column()
   videoId!: string;
   @Column('bigint', { transformer: new ColumnNumericTransformer(), default: 0 })
   addedAt!: number;
