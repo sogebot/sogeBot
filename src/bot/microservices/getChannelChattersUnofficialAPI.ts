@@ -21,9 +21,6 @@ export const getChannelChattersUnofficialAPI = async (): Promise<{ modStatus: bo
   if (!isMainThread) {
     const connectionOptions = await getConnectionOptions();
     await createConnection({
-      synchronize: true,
-      logging: false,
-      entities: [__dirname + '/../entity/*.{js,ts}'],
       ...connectionOptions,
     });
   }
