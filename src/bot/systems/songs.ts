@@ -109,6 +109,9 @@ class Songs extends System {
       where = where || {};
       cb(null, await getRepository(SongBan).find(where));
     });
+    adminEndpoint(this.nsp, 'songs::removeRequest', async (id: string, cb) => {
+      cb(null, await getRepository(SongRequest).delete({id}));
+    });
     publicEndpoint(this.nsp, 'songs::getAllRequests', async (where, cb) => {
       where = where || {};
       cb(null, await getRepository(SongRequest).find({
