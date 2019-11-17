@@ -4,7 +4,6 @@ export class multipleSongRequestWithSameVideoId1573997722003 implements Migratio
   name = 'multipleSongRequestWithSameVideoId1573997722003';
 
   public async up(queryRunner: QueryRunner): Promise<any> {
-    await queryRunner.query(`DROP INDEX "IDX_ed5fcb69444dcb0abf0a71053b"`, undefined);
     await queryRunner.query(`CREATE TABLE "temporary_song_request" ("videoId" varchar NOT NULL, "addedAt" bigint NOT NULL DEFAULT (0), "title" varchar NOT NULL, "loudness" float NOT NULL, "length" integer NOT NULL, "username" varchar NOT NULL, "id" varchar NOT NULL, PRIMARY KEY ("videoId", "id"))`, undefined);
     await queryRunner.query(`INSERT INTO "temporary_song_request"("videoId", "addedAt", "title", "loudness", "length", "username") SELECT "videoId", "addedAt", "title", "loudness", "length", "username" FROM "song_request"`, undefined);
     await queryRunner.query(`DROP TABLE "song_request"`, undefined);
