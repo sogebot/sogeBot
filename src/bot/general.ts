@@ -68,7 +68,7 @@ class General extends Core {
       for (const system of Object.keys(global[category]).filter((o) => !o.startsWith('_'))) {
         const [enabled, areDependenciesEnabled, isDisabledByEnv] = await Promise.all([
           global[category][system].enabled,
-          global[category][system]._dependenciesEnabled(),
+          global[category][system].areDependenciesEnabled,
           !isNil(process.env.DISABLE) && (process.env.DISABLE.toLowerCase().split(',').includes(system.toLowerCase()) || process.env.DISABLE === '*'),
         ]);
         if (!enabled) {
@@ -87,7 +87,6 @@ class General extends Core {
     debug('*', `GENERAL      | OS: ${process.env.npm_config_user_agent}`);
     debug('*', `             | Bot version: ${version.replace('SNAPSHOT', gitCommitInfo().shortHash || 'SNAPSHOT')}`);
     debug('*', `             | DB: ${connection.options.type}`);
-    debug('*', `             | Threads: ${global.cpu}`);
     debug('*', `             | HEAP: ${Number(process.memoryUsage().heapUsed / 1048576).toFixed(2)} MB`);
     debug('*', `             | Uptime: ${Math.trunc(process.uptime())} seconds`);
     debug('*', `             | Language: ${lang}`);
@@ -95,7 +94,7 @@ class General extends Core {
     debug('*', `SYSTEMS      | ${enabledSystems.systems.join(', ')}`);
     debug('*', `GAMES        | ${enabledSystems.games.join(', ')}`);
     debug('*', `INTEGRATIONS | ${enabledSystems.integrations.join(', ')}`);
-    debug('*', `WIDGETS      | ${map(widgets, 'id').join(', ')}`);
+    debug('*', `WIDGETS      | ${map(widgets, 'name').join(', ')}`);
     debug('*', `OAUTH        | BOT ${oauth.bot} | BROADCASTER ${oauth.broadcaster}`);
     debug('*', '======= END OF DEBUG MESSAGE =======');
   }
