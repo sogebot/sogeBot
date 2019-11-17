@@ -8,7 +8,6 @@ export class Alias {
   @Index()
   alias!: string;
   @Column('text')
-  @Index()
   command!: string;
   @Column()
   enabled!: boolean;
