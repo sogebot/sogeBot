@@ -341,7 +341,7 @@ class CustomVariables {
     let item = await getRepository(Variable).findOne({ variableName });
     let isOk = true;
     let isEval = false;
-    let oldValue: null | string = null;
+    let oldValue = '';
 
     opts.sender = isNil(opts.sender) ? null : opts.sender;
     opts.readOnlyBypass = isNil(opts.readOnlyBypass) ? false : opts.readOnlyBypass;
