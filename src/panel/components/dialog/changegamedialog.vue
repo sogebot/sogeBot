@@ -168,7 +168,6 @@
     },
     watch: {
       windowWidth(width) {
-        console.log({width})
         let thumbnailsPerPage = 6;
         if (width < 304) {
           thumbnailsPerPage = 1;
