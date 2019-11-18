@@ -6,55 +6,35 @@
 - **HDD**: Minimum 500MB
 - Twitch bot account
 
-!> You need **separate** account for your bot, bot **won't**  work on your broadcaster account
+!> You need **separate** account for your bot, bot **won't** work on your
+   broadcaster account
 
 ## Docker
 
 ### Docker prerequisites
 
-- **Docker**, **MongoDB**
+- **Docker**, Any of the [supported repositories](http://sogehige.github.io/sogeBot/#/configuration/database)
 
 ### Instalation
 
-!> Only mongodb is currently available for docker installation
+!> If you want to use **SQLite**, be sure to use `./shared/sogebot.db` path to
+   your db file, so you have an access outside of docker.
 
-- Startup docker with sogebot
 
-``` bash
-docker run -it --name <name-of-container> \
---env MONGOURI=<mongouri> \
--p <port>:20000 \
-<image>
-```
+!> Note that **localhost** is accessing docker localhost. You need to use full
+   IP address for your database connections.
 
-- Change `<image>` to one of these
-  - Unstable latest nightly: `docker.pkg.github.com/sogehige/sogebot/nightly`
-  - Latest release: `docker.pkg.github.com/sogehige/sogebot/release`
-  - Specific release of bot (e.g. 9.8.0): `docker.pkg.github.com/sogehige/sogebot/release:9.8.0`
-- Change `<port>` to port on where bot should be served
-- Change `<mongouri>` to your mongodb uri connection
-- Change `<version>` to `latest` or release tag (e.g. `9.8.0`)
-- Change `<name-of-container>` to set name of your container
-
-- Example full command
-
-!> When using non-specific image for latest version, use `docker pull <image>` to update your local image
-
-``` bash
-docker run -it --name sogebot \
---env MONGOURI=mongodb://localhost:27017/sogebot \
--p 80:20000 docker.pkg.github.com/sogehige/sogebot/release:9.8.0
-```
-
-!> If you are using localhost mongodb, be sure that you can access mongodb server by HOST IP (e.g. 172.17.0.1).
-   Example of error `(node:38) UnhandledPromiseRejectionWarning: MongoNetworkError: failed to connect to server [172.17.0.1:27017] on first connect [Error: connect ECONNREFUSED 172.17.0.1:27017`
-
-!> If you are using dockerized mongodb, be sure to add `--bind_ip_all`
-   to your mongodb docker container
-
-``` bash
-docker run -it --hostname mongodb --name=mongodb --net=bridge --expose=27017 mongo --bind_ip_all
-```
+1. Download `Docker Compose` files
+    - From GIT: `git clone git@github.com:sogehige/sogeBot-docker.git`
+    - Without GIT as [ZIP](https://github.com/sogehige/sogeBot-docker/archive/master.zip)
+2. Configure properly ormconfig.json in `conf/` directory
+    - You can find examples at [our GitHub repository](https://github.com/sogehige/sogeBot/tree/master/src/bot/data)
+3. Download bot images with `docker compose`
+    - Release version: `docker-compose pull`
+    - Nightly version: `docker-compose -f docker-compose-nightly.yml pull`
+4. Startup your bot (add -d if you want to detach process)
+    - Release version: `docker-compose up`
+    - Nightly version: `docker-compose -f docker-compose-nightly.yml up`
 
 ## From zipfile
 
