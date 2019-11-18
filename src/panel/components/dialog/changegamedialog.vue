@@ -168,7 +168,7 @@
     },
     watch: {
       windowWidth(width) {
-        let thumbnailsPerPage = 6;
+        let thumbnailsPerPage;
         if (width < 304) {
           thumbnailsPerPage = 1;
         } else if (width < 393) {
@@ -207,7 +207,13 @@
         this.selectedTitle = 'current';
       }
     },
+    beforeDestroy() {
+     window.removeEventListener('resize', this._resizeListener)
+    },
     methods: {
+      _resizeListener() {
+        this.windowWidth = window.innerWidth;
+      },
       deleteTitle(id) {
         this.data = this.data.filter(o => o.id !== id);
         this.selectedTitle = 'current';
@@ -356,9 +362,7 @@
     },
     mounted() {
       this.windowWidth = window.innerWidth;
-      window.addEventListener('resize', () => {
-        this.windowWidth = window.innerWidth;
-      });
+      window.addEventListener('resize', this._resizeListener);
 
       this.init();
       this.socket.on('sendGameFromTwitch', (data) => this.searchForGameOpts = data);
