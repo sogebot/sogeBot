@@ -1,27 +1,31 @@
 
 <template>
-  <b-modal size="lg" :title="translate('change-game')" no-fade v-model="show">
+  <b-modal size="w-90" :title="translate('change-game')" no-fade v-model="show" ref="modalWindow">
     <div class="d-flex text-center" v-if="games.length > 0" @dragleave="dragleave" @dragenter="dragenter">
       <button class="btn btn-lg btn-block btn-outline-dark border-0 p-3" style="width: fit-content;flex: max-content;" @click="carouselPage--;" :disabled="carouselPage === 0">
         <font-awesome-icon icon="caret-left"></font-awesome-icon>
       </button>
 
       <div class="w-100 d-flex" style="flex-wrap: wrap;justify-content: center;">
-        <img v-for="game of chunk(this.games, 6)[carouselPage]"
+        <img v-for="game of chunk(this.games, thumbnailsPerPage)[carouselPage]"
             draggable="true"
-            style="width: 15%; margin-top: 0.55rem !important;"
+            style="margin-top: 0.55rem !important;"
+            :style="{
+              width: (90 / thumbnailsPerPage) + '%',
+              'border-bottom': '0.3rem solid',
+              'border-color': game !== currentGame ? 'transparent !important' : undefined
+            }"
             @dragstart="dragstart(game)"
             @dragend="dragend(game)"
             class="m-1 border-warning"
             :key="game"
             :src="'https://static-cdn.jtvnw.net/ttv-boxart/' + encodeURIComponent(game) + '-100x140.jpg'"
             :title="game"
-            :style="{ 'border-bottom': '0.3rem solid', 'border-color': game !== currentGame ? 'transparent !important' : undefined }"
             @click="manuallySelected = true; currentGame = game"/>
         <div @dragleave="dragleave"
              class="m-1"
              style="width: 15%; height: 1px;pointer-events: none"
-             v-for="index in (6 - chunk(this.games, 6)[carouselPage].length)" :key="index"></div>
+             v-for="index in (thumbnailsPerPage - chunk(this.games, thumbnailsPerPage)[carouselPage].length)" :key="index"></div>
       </div>
 
       <button class="btn btn-lg  btn-block btn-outline-dark border-0 p-3" style="width: fit-content;flex: max-content;" @click="carouselPage++;" :disabled="(carouselPage + 1) === chunk(this.games, 6).length">
@@ -130,6 +134,9 @@
         saveState: -1 | 0 | 1 | 2;
         show: boolean;
 
+        windowWidth: number;
+        thumbnailsPerPage: number;
+
         socket: SocketIOClient.Socket;
       } = {
         chunk: chunk,
@@ -151,11 +158,49 @@
 
         saveState: 0,
         show: false,
+
+        windowWidth: 0,
+        thumbnailsPerPage: 6,
+
         socket: getSocket('/'),
       }
       return object
     },
     watch: {
+      windowWidth(width) {
+        console.log({width})
+        let thumbnailsPerPage = 6;
+        if (width < 304) {
+          thumbnailsPerPage = 1;
+        } else if (width < 393) {
+          thumbnailsPerPage = 2;
+        } else if (width < 481) {
+          thumbnailsPerPage = 3;
+        } else if (width < 570) {
+          thumbnailsPerPage = 4;
+        } else if (width < 700) {
+          thumbnailsPerPage = 5;
+        } else if (width < 800) {
+          thumbnailsPerPage = 6;
+        } else if (width < 900) {
+          thumbnailsPerPage = 7;
+        } else if (width < 1000) {
+          thumbnailsPerPage = 8;
+        } else if (width < 1100) {
+          thumbnailsPerPage = 9;
+        } else if (width < 1200) {
+          thumbnailsPerPage = 10;
+        } else if (width < 1300) {
+          thumbnailsPerPage = 11;
+        } else if (width < 1400) {
+          thumbnailsPerPage = 12;
+        } else if (width < 1500) {
+          thumbnailsPerPage = 13;
+        } else {
+          thumbnailsPerPage = 14;
+        }
+        this.thumbnailsPerPage = thumbnailsPerPage;
+      },
       show() {
         this.init()
       },
@@ -311,6 +356,11 @@
       this.searchForGame = debounce(this.searchForGame, 500);
     },
     mounted() {
+      this.windowWidth = window.innerWidth;
+      window.addEventListener('resize', () => {
+        this.windowWidth = window.innerWidth;
+      });
+
       this.init();
       this.socket.on('sendGameFromTwitch', (data) => this.searchForGameOpts = data);
       this.socket.on('sendUserTwitchGamesAndTitles', (data) => { this.data = data });
