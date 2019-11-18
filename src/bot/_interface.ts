@@ -71,13 +71,13 @@ class Module {
       getRepository(Settings).findOne({
         where: {
           namespace: this.nsp,
-          value: JSON.stringify(value),
+          value: value,
         },
       }).then(data => {
         data = data || new Settings();
         data.namespace = this.nsp;
         data.name = 'enabled';
-        data.value = JSON.stringify(value);
+        data.value = value;
         getRepository(Settings).save(data);
       });
     }
@@ -185,7 +185,7 @@ class Module {
 
     try {
       if (typeof variable !== 'undefined') {
-        return JSON.parse(variable.value);
+        return variable.value;
       } else {
         return undefined;
       }
@@ -648,7 +648,7 @@ class Module {
     if (cmd) {
       const c = this._commands.find((o) => o.name === command);
       if (c) {
-        c.command = JSON.parse(cmd.value);
+        c.command = cmd.value;
       }
     } else {
       const c = this._commands.find((o) => o.name === command);
@@ -676,13 +676,16 @@ class Module {
         delete c.command;
       } else {
         c.command = updated;
-        await getManager()
-          .createQueryBuilder()
-          .update(Settings)
-          .where('namespace = :namespace', { namespace: this.nsp })
-          .andWhere('name = :name', { name: 'commands.' + command })
-          .set({ value: JSON.stringify(updated) })
-          .execute();
+        const dbCommand = await getRepository(Settings).findOne({
+          where: {
+            namespace: this.nsp,
+            name: 'commands.' + command,
+          },
+        }) || new Settings();
+        dbCommand.namespace = this.nsp;
+        dbCommand.name = 'commands.' + command;
+        dbCommand.value = updated;
+        await getRepository(Settings).save(dbCommand);
       }
     } else {
       warning(`Command ${command} cannot be updated to ${updated}`);
