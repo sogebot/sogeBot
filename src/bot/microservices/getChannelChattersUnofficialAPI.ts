@@ -52,16 +52,11 @@ export const getChannelChattersUnofficialAPI = async (): Promise<{ modStatus: bo
       ])
       .execute();
 
-    let channel = (await getRepository(Settings).findOne({ name: 'generalChannel' }))?.value;
-    let bot = (await getRepository(Settings).findOne({ name: 'botUsername' }))?.value;
+    const channel = (await getRepository(Settings).findOne({ name: 'generalChannel' }))?.value;
+    const bot = (await getRepository(Settings).findOne({ name: 'botUsername' }))?.value;
 
     if (typeof channel === 'undefined') {
       throw Error('channel undefined');
-    } else {
-      channel = JSON.parse(channel);
-    }
-    if (bot) {
-      bot = JSON.parse(bot);
     }
 
     const url = `https://tmi.twitch.tv/group/user/${channel}/chatters`;

@@ -13,6 +13,6 @@ export class Settings {
   @Index()
   name!: string;
 
-  @Column('text')
-  value!: string;
+  @Column('simple-json')
+  value!: any;
 }

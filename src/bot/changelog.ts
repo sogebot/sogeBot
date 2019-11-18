@@ -6,7 +6,7 @@
 import uuid from 'uuid/v4';
 import { set } from 'lodash';
 
-import { getManager, getRepository, LessThan, MoreThan, Not } from 'typeorm';
+import { getRepository, LessThan, MoreThan, Not } from 'typeorm';
 import { Settings } from './database/entity/settings';
 import { Changelog } from './database/entity/changelog';
 
@@ -39,13 +39,12 @@ export const changelog = async () => {
       }) as any;
     }
     const variableFromDb
-     = await getManager().createQueryBuilder().select('settings').from(Settings, 'settings')
-       .where('namespace = :namespace', { namespace: self.nsp })
-       .andWhere('name = :name', { name: variable })
-       .getOne();
+     = await getRepository(Settings).findOne({
+       namespace: self.nsp,
+       name: variable,
+     });
     if (variableFromDb) {
-      const value = JSON.stringify(variableFromDb.value);
-      set(global, change.namespace.replace('core.', ''), value);
+      set(global, change.namespace.replace('core.', ''), variableFromDb.value);
     }
     lastTimestamp = change.timestamp;
   }
