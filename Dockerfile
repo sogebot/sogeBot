@@ -2,14 +2,14 @@ FROM node:13.0.1-alpine
 
 ENV LAST_UPDATED 201910251134
 
-ENV DB mongodb
-ENV MONGOURI mongodb://localhost:27017/your-db-name
 ENV NODE_ENV production
 ENV ENV production
 
 RUN apk add --no-cache make
 RUN apk add --no-cache bash
 RUN apk add --no-cache git
+RUN apk add --no-cache python
+RUN apk add --no-cache build-base
 
 # Copy source code
 COPY . /app
