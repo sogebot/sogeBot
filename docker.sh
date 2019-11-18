@@ -1,7 +1,7 @@
 #!/bin/bash
 cd /app
 
-$FILE= ./conf/ormconfig.json
+$FILE=./conf/ormconfig.json
 if test -f "$FILE"; then
   cp $FILE ./ormconfig.json
   npm start
