@@ -26,7 +26,8 @@ export const VariableWatcher = {
   },
   async check() {
     for (const k of Object.keys(variables)) {
-      const value = get(global, k.replace('core.', ''), null);
+      const value = cloneDeep(get(global, k.replace('core.', ''), null));
+
       if (!isEqual(value, variables[k])) {
         const [type, name, variable] = k.split('.');
 
@@ -61,7 +62,7 @@ export const VariableWatcher = {
             // run on.change functions only on master
             for (const fnc of self.on.change[variable]) {
               if (typeof self[fnc] === 'function') {
-                self[fnc](variable, value);
+                self[fnc](variable, cloneDeep(value));
               } else {
                 error(`${fnc}() is not function in ${self._name}/${self.constructor.name.toLowerCase()}`);
               }
