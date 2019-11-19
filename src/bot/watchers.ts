@@ -50,7 +50,7 @@ export const VariableWatcher = {
             },
           }) || new Settings();
           setting.name = variable;
-          setting.value =  value;
+          setting.value =  JSON.stringify(value);
           setting.namespace = self.nsp;
           await getRepository(Settings).save(setting);
 

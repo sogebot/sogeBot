@@ -289,7 +289,7 @@ async function registerCommand(opts: string | Command, m) {
       .andWhere('name = :name', { name: 'commands.' + c.name })
       .getOne();
     if (dbc) {
-      dbc.value = dbc.value;
+      dbc.value = JSON.parse(dbc.value);
       if (c.name === dbc.value) {
         // remove if default value
         await getManager()
