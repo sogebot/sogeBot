@@ -228,10 +228,8 @@ class CustomCommands extends System {
       const count = await incrementCountOfCommandUsage(command.command.command);
       for (const r of _.orderBy(command.command.responses, 'order', 'asc')) {
 
-        if (opts.sender) {
-          if (typeof getfromViewersCache(opts.sender.userId, r.permission) === 'undefined') {
-            addToViewersCache(opts.sender.userId, r.permission, (await global.permissions.check(opts.sender.userId, r.permission, false)).access);
-          }
+        if (typeof getfromViewersCache(opts.sender.userId, r.permission) === 'undefined') {
+          addToViewersCache(opts.sender.userId, r.permission, (await global.permissions.check(opts.sender.userId, r.permission, false)).access);
         }
 
         if (getfromViewersCache(opts.sender.userId, r.permission)
