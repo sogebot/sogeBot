@@ -2,9 +2,11 @@
 
 import * as _ from 'lodash';
 import { isMainThread } from '../cluster';
+import * as cronparser from 'cron-parser';
+import cron from 'node-cron';
 
 import { isBot, prepare, sendMessage } from '../commons';
-import { command, default_permission, parser, permission_settings, settings } from '../decorators';
+import { command, default_permission, parser, permission_settings, settings, ui } from '../decorators';
 import Expects from '../expects';
 import { permission } from '../permissions';
 import System from './_interface';
@@ -13,8 +15,21 @@ import { adminEndpoint } from '../helpers/socket';
 import { getRepository } from 'typeorm';
 import { User } from '../database/entity/user';
 import { getAllOnlineUsernames } from '../helpers/getAllOnlineUsernames';
+import { onChange, onLoad } from '../decorators/on';
 
 class Points extends System {
+  cronTask: any = null;
+  isLoaded: string[] = [];
+
+  @settings('reset')
+  isPointResetIntervalEnabled = false;
+  @settings('reset')
+  @ui({
+    'type': 'cron',
+    'emit': 'parseCron',
+  })
+  resetIntervalCron = '0 12 1 * *';
+
   @settings('points')
   name = 'point|points'; // default is <singular>|<plural> | in some languages can be set with custom <singular>|<x:multi>|<plural> where x <= 10
 
@@ -42,12 +57,37 @@ class Points extends System {
   @permission_settings('points')
   perMessageOfflineInterval = 0;
 
-
   constructor () {
     super();
 
     if (isMainThread) {
       this.updatePoints();
+    }
+  }
+
+  @onLoad('resetIntervalCron')
+  @onLoad('isPointResetIntervalEnabled')
+  initCron(key: string) {
+    this.isLoaded.push(key);
+    if (this.isLoaded.length === 2) {
+      if (this.resetIntervalCron) {
+        this.cronTask = cron.schedule(this.resetIntervalCron, () =>  {
+          getRepository(User).update({}, { points: 0 });
+        });
+      }
+    }
+  }
+
+  @onChange('resetIntervalCron')
+  @onChange('isPointResetIntervalEnabled')
+  resetCron() {
+    if (this.cronTask) {
+      this.cronTask.destroy();
+    }
+    if (this.resetIntervalCron) {
+      this.cronTask = cron.schedule(this.resetIntervalCron, () =>  {
+        getRepository(User).update({}, { points: 0 });
+      });
     }
   }
 
@@ -173,6 +213,20 @@ class Points extends System {
   }
 
   sockets () {
+    adminEndpoint(this.nsp, 'parseCron', (cron, cb) => {
+      try {
+        const interval = cronparser.parseExpression(cron);
+        // get 5 dates
+        const intervals: number[] = [];
+        for (let i = 0; i < 5; i++) {
+          intervals.push(new Date(interval.next().toISOString()).getTime());
+        }
+        cb(null, intervals);
+      } catch (e) {
+        cb(e, []);
+      }
+    });
+
     adminEndpoint(this.nsp, 'reset', async () => {
       getRepository(User).update({}, { points: 0 });
     });
