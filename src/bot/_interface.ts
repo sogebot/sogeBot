@@ -17,7 +17,6 @@ import { flatten, unflatten } from './helpers/flatten';
 class Module {
   public dependsOn: string[] = [];
   public showInUI = true;
-  public collection: { [x: string]: string };
   public timeouts: { [x: string]: NodeJS.Timeout } = {};
   public settingsList: { category: string; key: string }[] = [];
   public settingsPermList: { category: string; key: string }[] = [];
