@@ -13,7 +13,7 @@ import { isMainThread } from './cluster';
 import { info } from './helpers/log';
 
 let _datadir = null;
-let nextMBThreshold = 100;
+let nextMBThreshold = process.env.HEAP;
 let memMBlast = 0;
 let heapTaken = 0;
 let csvfilePath = '';
@@ -26,8 +26,8 @@ let csvfilePath = '';
 module.exports.init = (datadir) => {
   _datadir = datadir;
   csvfilePath = datadir + '/heap-' + (isMainThread ? 'master' : 'cluster') + '.csv';
-  fs.writeFileSync(csvfilePath, 'memory, timestamp\n');
-  setInterval(tickHeapDump, 1000);
+  fs.writeFileSync(csvfilePath, 'timestamp | memory\n');
+  setInterval(tickHeapDump, 10000);
 };
 
 /**
@@ -48,7 +48,7 @@ function heapDump() {
   }
   const memMB = process.memoryUsage().heapUsed / 1048576;
 
-  fs.appendFileSync(csvfilePath, `${memMB}, ${Date.now()}\n`);
+  fs.appendFileSync(csvfilePath, `${Date.now()} | ${String(memMB).replace('.', ',')}\n`);
 
   info(chalk.bgRed((isMainThread ? 'Master' : 'Cluster')
     + ' # Current mem usage: ' + memMB

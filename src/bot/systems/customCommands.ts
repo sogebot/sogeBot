@@ -18,6 +18,7 @@ import { getRepository } from 'typeorm';
 import { Commands, CommandsResponses } from '../database/entity/commands';
 import { User } from '../database/entity/user';
 import { Variable } from '../database/entity/variable';
+import { addToViewersCache, getfromViewersCache } from '../helpers/permissions';
 
 /*
  * !command                                                                 - gets an info about command usage
@@ -226,7 +227,14 @@ class CustomCommands extends System {
       const param = opts.message.replace(new RegExp('^(' + command.cmdArray.join(' ') + ')', 'i'), '').trim();
       const count = await incrementCountOfCommandUsage(command.command.command);
       for (const r of _.orderBy(command.command.responses, 'order', 'asc')) {
-        if ((await global.permissions.check(opts.sender.userId, r.permission)).access
+
+        if (opts.sender) {
+          if (typeof getfromViewersCache(opts.sender.userId, r.permission) === 'undefined') {
+            addToViewersCache(opts.sender.userId, r.permission, (await global.permissions.check(opts.sender.userId, r.permission, false)).access);
+          }
+        }
+
+        if (getfromViewersCache(opts.sender.userId, r.permission)
             && await this.checkFilter(opts, r.filter)) {
           if (param.length > 0
             && !(r.response.includes('$param')

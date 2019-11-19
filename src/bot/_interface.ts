@@ -24,8 +24,10 @@ class Module {
   public socket: SocketIOClient.Socket | null;
 
   get isDisabledByEnv(): boolean {
+    const isDisableIgnored = typeof process.env.ENABLE !== 'undefined' && process.env.ENABLE.toLowerCase().split(',').includes(this.constructor.name.toLowerCase());
     return typeof process.env.DISABLE !== 'undefined'
-      && (process.env.DISABLE.toLowerCase().split(',').includes(this.constructor.name.toLowerCase()) || process.env.DISABLE === '*');
+      && (process.env.DISABLE.toLowerCase().split(',').includes(this.constructor.name.toLowerCase()) || process.env.DISABLE === '*')
+      && !isDisableIgnored;
   };
 
   areDependenciesEnabled = false;

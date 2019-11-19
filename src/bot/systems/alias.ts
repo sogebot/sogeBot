@@ -16,6 +16,7 @@ import uuid from 'uuid/v4';
 import { Alias as AliasEntity } from '../database/entity/alias';
 import { getRepository } from 'typeorm';
 import { adminEndpoint, publicEndpoint } from '../helpers/socket';
+import { addToViewersCache, getfromViewersCache } from '../helpers/permissions';
 
 /*
  * !alias                                              - gets an info about alias usage
@@ -101,20 +102,25 @@ class Alias extends System {
       if (alias.command === alias.alias) {
         warning(`Cannot run alias ${alias.alias}, because it exec ${alias.command}`);
         return false;
-      } else if ((await global.permissions.check(opts.sender.userId, alias.permission)).access) {
-        // parse variables
-        const message = await new Message(opts.message.replace(replace, `${alias.command}`)).parse({
-          sender: opts.sender,
-        });
-        debug('alias.process', message);
-        global.tmi.message({
-          message: {
-            tags: opts.sender,
-            message,
-          }, skip: true });
-        incrementCountOfCommandUsage(alias.alias);
       } else {
-        return false;
+        if (typeof getfromViewersCache(opts.sender.userId, alias.permission) === 'undefined') {
+          addToViewersCache(opts.sender.userId, alias.permission, (await global.permissions.check(opts.sender.userId, alias.permission, false)).access);
+        }
+        if (getfromViewersCache(opts.sender.userId, alias.permission)) {
+          // parse variables
+          const message = await new Message(opts.message.replace(replace, `${alias.command}`)).parse({
+            sender: opts.sender,
+          });
+          debug('alias.process', message);
+          global.tmi.message({
+            message: {
+              tags: opts.sender,
+              message,
+            }, skip: true });
+          incrementCountOfCommandUsage(alias.alias);
+        } else {
+          return false;
+        }
       }
     }
     return true;

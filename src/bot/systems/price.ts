@@ -156,12 +156,11 @@ class Price extends System {
   @parser({ priority: constants.HIGH })
   async check (opts) {
     const parsed = opts.message.match(/^(![\S]+)/);
+    if (!parsed || isOwner(opts.sender)) {
+      return true; // skip if not command or user is owner
+    }
     const helpers = (await (new Parser()).getCommandsList()).filter(o => o.isHelper).map(o => o.command);
-    if (
-      _.isNil(parsed)
-      || isOwner(opts.sender)
-      || helpers.includes(opts.message)
-    ) {
+    if (helpers.includes(opts.message)) {
       return true;
     }
 

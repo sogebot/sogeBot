@@ -425,7 +425,7 @@ class TMI extends Core {
       if (!user) {
         user = new User();
         user.userId = Number(userstate.userId);
-        user.username = userstate.username;
+        user.username = username;
       }
 
       user.isSubscriber = user.haveSubscriberLock ? user.isSubscriber : true;
@@ -487,7 +487,7 @@ class TMI extends Core {
       if (!user) {
         user = new User();
         user.userId = Number(userstate.userId);
-        user.username = userstate.username;
+        user.username = username;
       }
 
       user.isSubscriber = true;
@@ -641,12 +641,12 @@ class TMI extends Core {
   async cheer (message: Record<string, any>) {
     try {
       const username = message.tags.username;
-      const userId = message.tags.userId;
+      const userId = Number(message.tags.userId);
       const userstate = message.tags;
       // remove <string>X or <string>X from message, but exclude from remove #<string>X
       const messageFromUser = message.message.replace(/(?<!#)(\b\w+[\d]+\b)/g, '').trim();
 
-      if (isIgnored({username: userstate.username, userId: userstate.userId})) {
+      if (isIgnored({username, userId})) {
         return;
       }
 

@@ -5,6 +5,7 @@ import { debug, error } from './helpers/log';
 import { incrementCountOfCommandUsage } from './helpers/commands/count';
 import { getRepository } from 'typeorm';
 import { PermissionCommands } from './database/entity/permissions';
+import { addToViewersCache, getfromViewersCache } from './helpers/permissions';
 
 class Parser {
   started_at = Date.now();
@@ -63,10 +64,16 @@ class Parser {
       if (parser.priority === constants.MODERATION) {
         continue;
       }; // skip moderation parsers
+
+      if (this.sender) {
+        if (typeof getfromViewersCache(this.sender.userId, parser.permission) === 'undefined') {
+          addToViewersCache(this.sender.userId, parser.permission, (await global.permissions.check(this.sender.userId, parser.permission, false)).access);
+        }
+      }
       if (
         _.isNil(this.sender) // if user is null -> we are running command through a bot
         || this.skip
-        || (await global.permissions.check(this.sender.userId, parser.permission, false)).access
+        || getfromViewersCache(this.sender.userId, parser.permission)
       ) {
         const opts = {
           sender: this.sender,
@@ -74,7 +81,7 @@ class Parser {
           skip: this.skip,
         };
 
-        debug('parser.process', 'Processing ' + parser.name + ' (fireAndForget: ' + parser.fireAndForget + ')');
+        const time = Date.now();
         if (parser.fireAndForget) {
           parser.fnc.apply(parser.this, [opts]);
         } else {
@@ -98,6 +105,9 @@ class Parser {
           } else {
             this.successfullParserRuns.push({name: parser.name, opts }); // need to save opts for permission rollback
           }
+        }
+        if (Date.now() - time > 500) {
+          debug('parser.time', 'Processing ' + parser.name + ' (fireAndForget: ' + parser.fireAndForget + ') took ' + ((Date.now() - time) / 1000));
         }
       }
     }
@@ -221,10 +231,17 @@ class Parser {
     if (command.permission === null) {
       return;
     }; // command is disabled
+
+    if (this.sender) {
+      if (typeof getfromViewersCache(this.sender.userId, command.permission) === 'undefined') {
+        addToViewersCache(this.sender.userId, command.permission, (await global.permissions.check(this.sender.userId, command.permission, false)).access);
+      }
+    }
+
     if (
       _.isNil(this.sender) // if user is null -> we are running command through a bot
       || this.skip
-      || (await global.permissions.check(this.sender.userId, command.permission, false)).access
+      || getfromViewersCache(this.sender.userId, command.permission)
     ) {
       const text = message.trim().replace(new RegExp('^(' + command.command + ')', 'i'), '').trim();
       const opts = {
