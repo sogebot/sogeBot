@@ -11,7 +11,7 @@
     loading(v-if="state.loading.playlist !== $state.success")
     b-table(v-else striped small :items="playlist" :fields="fields" @row-clicked="linkTo($event)").table-p-0
       template(v-slot:cell(thumbnail)="data")
-        img(v-bind:src="generateThumbnail(data.item.videoID)").float-left.pr-3
+        img(v-bind:src="generateThumbnail(data.item.videoId)").float-left.pr-3
 </template>
 
 <script lang="ts">
@@ -29,7 +29,7 @@ export default class playlist extends Vue {
 
   playlist: {
     endTime: number; forceVolume: boolean; lastPlayedAt: number; length_seconds: number;
-    loudness: number; seed: number; startTime: number; title: string; videoID: string;
+    loudness: number; seed: number; startTime: number; title: string; videoId: string;
     volume: number; _id: string;
   }[] = [];
 
@@ -51,7 +51,7 @@ export default class playlist extends Vue {
 
   mounted() {
     this.state.loading.playlist = this.$state.progress;
-    this.socket.emit('find.playlist', {}, (err, items) => {
+    this.socket.emit('find.playlist', {}, (items, count) => {
       console.debug('Loaded', {playlist: items})
       for (let item of items) {
         item.startTime = item.startTime ? item.startTime : 0
@@ -67,8 +67,8 @@ export default class playlist extends Vue {
   }
 
   linkTo(item) {
-    console.debug('Clicked', item.videoID);
-    window.location.href = `http://youtu.be/${item.videoID}`;
+    console.debug('Clicked', item.videoId);
+    window.location.href = `http://youtu.be/${item.videoId}`;
   }
 }
   </script>
