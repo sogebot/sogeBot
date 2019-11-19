@@ -107,24 +107,6 @@ class Module {
     this._name = name;
     this._enabled = enabled;
 
-    //TODO: delete
-    this.collection = new Proxy({}, {
-      get: (t, n, r) => {
-        if (_.isSymbol(n)) {
-          return undefined;
-        }
-        let collection = '';
-        if (n === 'data') {
-          collection = `${this._name}.${this.constructor.name.toLowerCase()}`;
-        } else if (n === 'settings') {
-          collection = `${this._name}.settings`;
-        } else {
-          collection = `${this._name}.${this.constructor.name.toLowerCase()}.${String(n)}`;
-        }
-        return collection;
-      },
-    });
-
     // prepare proxies for variables
     this._sockets();
     setTimeout(() => {
