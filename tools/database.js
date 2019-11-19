@@ -191,7 +191,10 @@ async function main() {
       if ( typeof item.system === 'undefined') {
         continue;
       }
-      await getRepository(Settings).insert({ namespace: `/${type}/${item.system}`, name: item.key, value: JSON.stringify(item.value) });
+      if (`/${type}/${item.system}` !== '/core/socket'
+        && item.key !== 'socketsTokenAuthList') {
+        await getRepository(Settings).insert({ namespace: `/${type}/${item.system}`, name: item.key, value: JSON.stringify(item.value) });
+      }
     }
   }
 

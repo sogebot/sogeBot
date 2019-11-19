@@ -17,7 +17,6 @@ import { flatten, unflatten } from './helpers/flatten';
 class Module {
   public dependsOn: string[] = [];
   public showInUI = true;
-  public collection: { [x: string]: string };
   public timeouts: { [x: string]: NodeJS.Timeout } = {};
   public settingsList: { category: string; key: string }[] = [];
   public settingsPermList: { category: string; key: string }[] = [];
@@ -106,24 +105,6 @@ class Module {
     this._ui = {};
     this._name = name;
     this._enabled = enabled;
-
-    //TODO: delete
-    this.collection = new Proxy({}, {
-      get: (t, n, r) => {
-        if (_.isSymbol(n)) {
-          return undefined;
-        }
-        let collection = '';
-        if (n === 'data') {
-          collection = `${this._name}.${this.constructor.name.toLowerCase()}`;
-        } else if (n === 'settings') {
-          collection = `${this._name}.settings`;
-        } else {
-          collection = `${this._name}.${this.constructor.name.toLowerCase()}.${String(n)}`;
-        }
-        return collection;
-      },
-    });
 
     // prepare proxies for variables
     this._sockets();
