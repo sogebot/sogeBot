@@ -34,7 +34,7 @@ export const getUserFromTwitch = async (username)  => {
 
   const request = await axios.get(url, {
     headers: {
-      'Authorization': 'Bearer ' + token,
+      'Authorization': 'Bearer ' + JSON.parse(token.value),
     },
   });
 
