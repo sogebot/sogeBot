@@ -5,7 +5,7 @@ import {
   getBroadcaster, isBot, isBroadcaster, isFollower, isModerator, isOwner, isSubscriber, isVIP, prepare, sendMessage,
 } from './commons';
 import { debug, warning } from './helpers/log';
-import { permission } from './helpers/permissions';
+import { cleanViewersCache, permission } from './helpers/permissions';
 import { command, default_permission, settings } from './decorators';
 import { isMainThread } from './cluster';
 import { error } from './helpers/log';
@@ -35,22 +35,27 @@ class Permissions extends Core {
 
   public sockets() {
     adminEndpoint(this.nsp, 'permission::insert', async (data: PermissionsEntity, cb) => {
+      cleanViewersCache();
       await getRepository(PermissionsEntity).insert(data);
       cb();
     });
     adminEndpoint(this.nsp, 'permission::update::order', async (id: string, order: number, cb) => {
+      cleanViewersCache();
       await getRepository(PermissionsEntity).update({ id }, { order });
       cb();
     });
     adminEndpoint(this.nsp, 'permission::save', async (data: PermissionsEntity, cb) => {
+      cleanViewersCache();
       await getRepository(PermissionsEntity).save(data);
       cb();
     });
     adminEndpoint(this.nsp, 'permission::delete', async (id: string, cb) => {
+      cleanViewersCache();
       await getRepository(PermissionsEntity).delete({ id });
       cb();
     });
     adminEndpoint(this.nsp, 'permissions', async (cb) => {
+      cleanViewersCache();
       cb(await getRepository(PermissionsEntity).find({
         relations: ['filters'],
         order: {
@@ -62,6 +67,7 @@ class Permissions extends Core {
       cb(await getRepository(PermissionsEntity).findOne({id}, { relations: ['filters'] }));
     });
     adminEndpoint(this.nsp, 'permissions.order', async (data, cb) => {
+      cleanViewersCache();
       for (const d of data) {
         await getRepository(PermissionsEntity)
           .createQueryBuilder().update()
@@ -146,7 +152,9 @@ class Permissions extends Core {
       return { access: true, permission: pItem };
     }
 
-    const user = await getRepository(User).findOne({ userId });
+    const user = await getRepository(User).findOne({
+      where: { userId },
+    });
     const pItem = (await getRepository(PermissionsEntity).findOne({
       relations: ['filters'],
       where: { id: permId },

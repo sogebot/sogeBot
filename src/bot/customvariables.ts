@@ -14,6 +14,7 @@ import { getOwnerAsSender, getTime, isModerator, prepare, sendMessage } from './
 import { getRepository } from 'typeorm';
 import { User } from './database/entity/user';
 import { Variable, VariableHistory, VariableWatch } from './database/entity/variable';
+import { addToViewersCache, getfromViewersCache } from './helpers/permissions';
 
 class CustomVariables {
   timeouts: {
@@ -364,7 +365,13 @@ class CustomVariables {
           userId: await global.users.getIdByName(opts.sender),
         };
       }
-      const permissionsAreValid = isNil(opts.sender) || (await global.permissions.check(opts.sender.userId, item.permission)).access;
+
+      if (opts.sender) {
+        if (typeof getfromViewersCache(opts.sender.userId, item.permission) === 'undefined') {
+          addToViewersCache(opts.sender.userId, item.permission, (await global.permissions.check(opts.sender.userId, item.permission, false)).access);
+        }
+      }
+      const permissionsAreValid = isNil(opts.sender) || getfromViewersCache(opts.sender.userId, item.permission);
       if ((item.readOnly && !opts.readOnlyBypass) || !permissionsAreValid) {
         isOk = false;
       } else {

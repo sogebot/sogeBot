@@ -6,3 +6,29 @@ export const permission = Object.freeze({
   FOLLOWERS: 'c168a63b-aded-4a90-978f-ed357e95b0d2',
   VIEWERS: '0efd7b1c-e460-4167-8e06-8aaf2c170311',
 });
+
+export let cachedViewers: {
+  [userId: number]: {
+    [permId: string]: boolean;
+  };
+} = {};
+
+export const cleanViewersCache = () => {
+  cachedViewers = {};
+};
+
+export const getfromViewersCache = (userId: number, permId: string) => {
+  const permList = cachedViewers[userId];
+  if (permList) {
+    return permList[permId];
+  } else {
+    return undefined;
+  }
+};
+
+export const addToViewersCache = (userId: number, permId: string, haveAccess: boolean) => {
+  if (typeof cachedViewers[userId] === 'undefined') {
+    cachedViewers[userId] = {};
+  }
+  cachedViewers[userId][permId] = haveAccess;
+};
