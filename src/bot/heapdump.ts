@@ -13,7 +13,7 @@ import { isMainThread } from './cluster';
 import { info } from './helpers/log';
 
 let _datadir = null;
-let nextMBThreshold = process.env.HEAP;
+let nextMBThreshold: string | number | undefined = process.env.HEAP;
 let memMBlast = 0;
 let heapTaken = 0;
 let csvfilePath = '';
@@ -56,11 +56,14 @@ function heapDump() {
     + ', change: ' + (memMB - memMBlast)
     + ', threshold: ' + nextMBThreshold));
   memMBlast = memMB;
-  if (memMB > nextMBThreshold) {
-    heapTaken = 2 * 60; // wait more before next heap (making heap may cause enxt heap to be too high)
-    nextMBThreshold = memMB + 25;
-    info('Taking snapshot - ' + (isMainThread ? 'Master' : 'Cluster'));
-    saveHeapSnapshot(_datadir);
+  if (Number(nextMBThreshold) >= 100) {
+    nextMBThreshold = Number(nextMBThreshold);
+    if (memMB > nextMBThreshold) {
+      heapTaken = 2 * 60; // wait more before next heap (making heap may cause enxt heap to be too high)
+      nextMBThreshold = memMB + 25;
+      info('Taking snapshot - ' + (isMainThread ? 'Master' : 'Cluster'));
+      saveHeapSnapshot(_datadir);
+    }
   }
 }
 
