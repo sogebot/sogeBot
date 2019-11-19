@@ -647,23 +647,22 @@ class Module {
     if (c) {
       if (c.name === updated) {
         // default value
-        await getManager()
-          .createQueryBuilder()
-          .delete()
-          .where('namespace = :namespace', { namespace: this.nsp })
-          .andWhere('name = :name', { name: 'commands.' + command })
-          .from(Settings)
-          .execute();
+        await getRepository(Settings).delete({
+          namespace: this.nsp,
+          name: 'commands.' + command,
+        });
         delete c.command;
       } else {
         c.command = updated;
-        await getManager()
-          .createQueryBuilder()
-          .update(Settings)
-          .where('namespace = :namespace', { namespace: this.nsp })
-          .andWhere('name = :name', { name: 'commands.' + command })
-          .set({ value: JSON.stringify(updated) })
-          .execute();
+        const dbCommand = await getRepository(Settings).findOne({
+          where: {
+            namespace: this.nsp,
+            name: 'commands.' + command,
+          },
+        }) || new Settings();
+        dbCommand.namespace = this.nsp;
+        dbCommand.name = 'commands.' + command;
+        dbCommand.value = JSON.stringify(updated);
       }
     } else {
       warning(`Command ${command} cannot be updated to ${updated}`);
