@@ -215,46 +215,6 @@ class Emotes extends Overlay {
     this.fetch.global = false;
   }
 
-  async fetchEmotesSubsribers () {
-    const cid = global.oauth.channelId;
-    this.fetch.channel = true;
-
-    if (cid && global.oauth.broadcasterType !== null && (Date.now() - this.lastSubscriberEmoteChk > 1000 * 60 * 60 * 24 * 7 || this.lastChannelChk !== cid)) {
-      if (global.oauth.broadcasterType === '') {
-        info(`EMOTES: Skipping fetching of ${cid} emotes - not subscriber/affiliate`);
-      } else {
-        info(`EMOTES: Fetching channel ${cid} emotes`);
-        this.lastSubscriberEmoteChk = Date.now();
-        this.lastChannelChk = cid;
-        try {
-          const request = await axios.get('https://api.twitchemotes.com/api/v4/channels/' + cid);
-          const emotes = request.data.emotes;
-          for (let j = 0, length2 = emotes.length; j < length2; j++) {
-            const cachedEmote = (await getRepository(CacheEmotes).findOne({ code: emotes[j].code, type: 'twitch' })) || new CacheEmotes();
-            cachedEmote.code = emotes[j].code;
-            cachedEmote.type = 'twitch';
-            cachedEmote.urls = {
-              '1': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emotes[j].id + '/1.0',
-              '2': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emotes[j].id + '/2.0',
-              '3': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emotes[j].id + '/3.0',
-            };
-            await getRepository(CacheEmotes).save(cachedEmote);
-          }
-          info(`EMOTES: Fetched channel ${cid} emotes`);
-        } catch (e) {
-          if (String(e).includes('404')) {
-            error(`EMOTES: Error fetching channel ${cid} emotes. Your channel was not found on twitchemotes.com. Add your channel at https://twitchemotes.com/contact/tip`);
-          } else {
-            error(e);
-            error(e.stack);
-          }
-        }
-      }
-
-      this.fetch.channel = false;
-    }
-  }
-
   async fetchEmotesFFZ () {
     const cid = global.oauth.channelId;
     const channel = global.oauth.currentChannel;
