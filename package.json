@@ -72,7 +72,7 @@
     "xregexp": "4.2.4",
     "yargs": "14.2.0",
     "youtube-search": "1.1.4",
-    "ytdl-core": "1.0.0",
+    "ytdl-core": "1.0.1",
     "ytpl": "0.1.17"
   },
   "scripts": {
