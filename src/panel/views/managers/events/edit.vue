@@ -57,6 +57,7 @@
                   <option v-for="key of supported.events.map((o) => o.id)" :value="key" :key="key">{{translate(key)}}</option>
                 </select>
               </div>
+              {{ Object.keys(event.definitions) }}
               <div class="form-group col-md-12" v-for="defKey of Object.keys(event.definitions)" :key="defKey">
                 <label for="type_selector">{{ translate("events.definitions." + defKey + ".label") }}</label>
                 <template v-if="typeof event.definitions[defKey] === 'boolean'">
@@ -324,7 +325,7 @@
           this.watchEventChange = false;
           this.$set(this.event, 'definitions', {}) // reload definitions
 
-          const defaultEvent = this.supported.events.find((o) => o.id === val)
+          const defaultEvent = this.supported.events.find((o) => o.id === val.name)
           if (defaultEvent) {
             if (defaultEvent.definitions) {
               this.$set(this.event, 'definitions', defaultEvent.definitions)
@@ -436,7 +437,6 @@
             return 0; //default return value (no sorting)
           })
         );
-
         if (!this.$route.params.id) {
           // set first event if we are in create mode
           this.event.name = this.supported.events[0].id
