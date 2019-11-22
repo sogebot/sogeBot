@@ -776,7 +776,7 @@ class TMI extends Core {
 
         await getRepository(User).save(user);
 
-        global.api.isFollower(sender.username);
+        global.api.followerUpdatePreCheck(sender.username);
 
         if (global.api.isStreamOnline) {
           global.events.fire('keyword-send-x-times', { username: sender.username, message: message });

@@ -110,19 +110,17 @@ async function main () {
     if (process.env.HEAP) {
       warning(chalk.bgRed.bold('HEAP debugging is ENABLED'));
       setTimeout(() => require('./heapdump.js').init('heap/'), 120000);
-      //setTimeout(() => require('./heapdump.js').init('heap/'), 120000)
     }
 
     global.tmi = new TMI();
   })
 }
 
-
 main();
 
 process.on('unhandledRejection', function (reason, p) {
   error(`Possibly Unhandled Rejection at: ${util.inspect(p)} reason: ${reason}`)
-})
+});
 
 process.on('uncaughtException', (err) => {
   error(util.inspect(err))
@@ -132,4 +130,4 @@ process.on('uncaughtException', (err) => {
   error('| AND ADD logs/sogebot.log file to your report                                 |')
   error('+------------------------------------------------------------------------------+')
   process.exit(1)
-})
+});

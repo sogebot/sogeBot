@@ -13,10 +13,10 @@ import { isMainThread } from './cluster';
 import { info } from './helpers/log';
 
 let _datadir = null;
-let nextMBThreshold: string | number | undefined = process.env.HEAP;
 let memMBlast = 0;
-let heapTaken = 0;
+let heapCountdown = 12;
 let csvfilePath = '';
+let memoryList: number[] = [];
 
 /**
  * Init and scheule heap dump runs
@@ -25,9 +25,10 @@ let csvfilePath = '';
  */
 module.exports.init = (datadir) => {
   _datadir = datadir;
-  csvfilePath = datadir + '/heap-' + (isMainThread ? 'master' : 'cluster') + '.csv';
-  fs.writeFileSync(csvfilePath, 'timestamp | memory\n');
-  setInterval(tickHeapDump, 10000);
+  csvfilePath = datadir + '/heap'  + Date.now() + '.csv';
+  fs.writeFileSync(csvfilePath, 'timestamp\tavgMemory\tchange\n');
+  setInterval(tickMemory, 1000);
+  setInterval(tickHeapDump, 5 * 60000);
 };
 
 /**
@@ -39,31 +40,36 @@ function tickHeapDump() {
   });
 }
 
+function tickMemory() {
+  memoryList.push(process.memoryUsage().heapUsed / 1048576);
+}
+
+
+const arrAvg = arr => arr.reduce((a,b) => a + b, 0) / arr.length;
+
 /**
  * Creates a heap dump if the currently memory threshold is exceeded
  */
 function heapDump() {
-  if (heapTaken > 0) {
-    return --heapTaken;
-  }
-  const memMB = process.memoryUsage().heapUsed / 1048576;
+  const memMB = arrAvg(memoryList);
+  memoryList = [];
 
-  fs.appendFileSync(csvfilePath, `${Date.now()} | ${String(memMB).replace('.', ',')}\n`);
+  const memory = String(memMB).replace('.', ',');
+  const change = memMB - memMBlast;
 
-  info(chalk.bgRed((isMainThread ? 'Master' : 'Cluster')
-    + ' # Current mem usage: ' + memMB
-    + ', last mem usage: ' + memMBlast
-    + ', change: ' + (memMB - memMBlast)
-    + ', threshold: ' + nextMBThreshold));
+  fs.appendFileSync(csvfilePath, `${String(new Date())}\t${memory}\t${String(change).replace('.', ',')}\n`);
+
+  info(chalk.bgRed((global.api.isStreamOnline ? 'Online' : 'Offline')
+    + ' # Current avg mem usage: ' + memMB
+    + ', last avg mem usage: ' + memMBlast
+    + ', change: ' + change));
   memMBlast = memMB;
-  if (Number(nextMBThreshold) >= 100) {
-    nextMBThreshold = Number(nextMBThreshold);
-    if (memMB > nextMBThreshold) {
-      heapTaken = 2 * 60; // wait more before next heap (making heap may cause enxt heap to be too high)
-      nextMBThreshold = memMB + 25;
-      info('Taking snapshot - ' + (isMainThread ? 'Master' : 'Cluster'));
-      saveHeapSnapshot(_datadir);
-    }
+
+  heapCountdown--;
+  if (change > 20 || heapCountdown === 0) {
+    heapCountdown = 12;
+    info('Taking snapshot - ' + (global.api.isStreamOnline ? 'Online' : 'Offline'));
+    saveHeapSnapshot(_datadir);
   }
 }
 

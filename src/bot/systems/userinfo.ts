@@ -91,7 +91,7 @@ class UserInfo extends System {
 
     const user = await getRepository(User).findOne({ username });
     const subCumulativeMonths = user?.subscribeCumulativeMonths;
-    const subStreak = _.get(user, 'stats.subStreak', undefined);
+    const subStreak = user?.subscribeStreak;
     const localePath = 'subage.' + (opts.sender.username === username.toLowerCase() ? 'successSameUsername' : 'success') + '.';
 
     if (!user || !user.isSubscriber || user.subscribedAt === 0) {
