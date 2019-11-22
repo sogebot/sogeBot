@@ -222,7 +222,9 @@ class Spotify extends Integration {
       this.originalUri = song.uri;
     }
 
-    //if (!(global.api.isStreamOnline)) return // don't do anything on offline stream
+    if (!(global.api.isStreamOnline)) {
+      return; // don't do anything on offline stream
+    }
 
     if (this.skipToNextSong) {
       if (song.is_playing) {
