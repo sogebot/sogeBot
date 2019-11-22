@@ -509,9 +509,11 @@ class API extends Core {
       opts.noAffiliateOrPartnerWarningSent = false;
       opts.notCorrectOauthWarningSent = false;
     } catch (e) {
-      if ((e.message.includes('403') || e.message.includes('401')) && !opts.notCorrectOauthWarningSent) {
-        opts.notCorrectOauthWarningSent = true;
-        warning('Broadcaster have not correct oauth, will not check subs');
+      if ((e.message === '403 Forbidden' || e.message === 'Request failed with status code 401')) {
+        if (!opts.notCorrectOauthWarningSent) {
+          opts.notCorrectOauthWarningSent = true;
+          warning('Broadcaster have not correct oauth, will not check subs');
+        }
         this.stats.currentSubscribers = 0;
       } else {
         error(`${url} - ${e.stack}`);
