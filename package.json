@@ -139,6 +139,7 @@
     "@types/yargs": "13.0.3",
     "@typescript-eslint/eslint-plugin": "2.6.1",
     "@typescript-eslint/parser": "2.6.1",
+    "@vue/composition-api": "0.3.2",
     "animate.css": "3.7.2",
     "axios-mock-adapter": "1.17.0",
     "base64-loader": "1.0.0",

@@ -73,6 +73,7 @@ const webpackConfig = {
     overlay: './src/overlay/index.ts',
     login: './src/login/index.ts',
     public: './src/public/index.ts',
+    spotify: './src/oauth/spotify.ts',
   },
   resolve: {
     extensions: ['.ts', '.js', '.vue', '.json'],
@@ -109,7 +110,7 @@ const webpackConfig = {
       filename: '../../oauth.html', template: 'src/oauth/index.html', chunks: []
     }),
     new HtmlWebpackPlugin({
-      filename: '../../oauth-spotify.html', template: 'src/oauth/spotify.html', chunks: []
+      filename: '../../oauth-spotify.html', template: 'src/oauth/spotify.html', chunks: ['spotify']
     })
   ],
   module: {
