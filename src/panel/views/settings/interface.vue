@@ -260,6 +260,7 @@ enum State {
     'loading': () => import('../../components/loading.vue'),
     'number-input': () => import('./components/interface/number-input.vue'),
     'selector': () => import('./components/interface/selector.vue'),
+    'socket-list': () => import('./components/interface/socket-list.vue'),
     'sortable-list': () => import('./components/interface/sortable-list.vue'),
     'text-input': () => import('./components/interface/text-input.vue'),
     'textarea-from-array': () => import('./components/interface/textarea-from-array.vue'),
