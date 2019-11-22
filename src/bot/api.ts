@@ -99,7 +99,6 @@ class API extends Core {
     bot: new Proxy({}, limitProxy),
     broadcaster: new Proxy({}, limitProxy),
   };
-  rate_limit_follower_check: Set<string> = new Set();
   chatMessagesAtStart = global.linesParsed;
   maxRetries = 3;
   curRetries = 0;
@@ -133,7 +132,6 @@ class API extends Core {
       this.interval('getChannelSubscribers', 2 * constants.MINUTE);
       this.interval('getChannelChattersUnofficialAPI', 5 * constants.MINUTE);
       this.interval('getChannelDataOldAPI', constants.MINUTE);
-      this.interval('intervalFollowerUpdate', constants.MINUTE * 5);
       this.interval('checkClips', constants.MINUTE);
       this.interval('getAllStreamTags', constants.HOUR * 12);
 
@@ -201,29 +199,20 @@ class API extends Core {
     }, 1000);
   }
 
-  async intervalFollowerUpdate () {
+  async followerUpdatePreCheck (username: string) {
     if (!isMainThread) {
       throw new Error('API can run only on master');
     }
 
-    for (const username of this.rate_limit_follower_check) {
-      const user = await getRepository(User).findOne({ username });
-      if (user) {
-        const isSkipped = user.username === getBroadcaster() || user.username === global.oauth.botUsername;
-        const userHaveId = !isNil(user.userId);
-        if (new Date().getTime() - get(user, 'time.followCheck', 0) <= 1000 * 60 * 60 * 24 || isSkipped || !userHaveId) {
-          this.rate_limit_follower_check.delete(user.username);
-        }
+    const user = await getRepository(User).findOne({ username });
+    if (user) {
+      const isSkipped = user.username === getBroadcaster() || user.username === global.oauth.botUsername;
+      const userHaveId = !isNil(user.userId);
+      if (new Date().getTime() - user.followCheckAt <= constants.DAY || isSkipped || !userHaveId) {
+        return;
       }
+      await this.isFollowerUpdate(user);
     }
-    if (this.rate_limit_follower_check.size > 0 && !isNil(global.overlays)) {
-      const user = await getRepository(User).findOne({ username: Array.from(this.rate_limit_follower_check)[0] });
-      if (user) {
-        this.rate_limit_follower_check.delete(user.username);
-        await this.isFollowerUpdate(user);
-      }
-    }
-    return { state: true };
   }
 
   async getUsernameFromTwitch (id) {
@@ -370,7 +359,7 @@ class API extends Core {
           continue;
         } else {
           await setImmediateAwait();
-          this.isFollower(username);
+          this.followerUpdatePreCheck(username);
           global.events.fire('user-joined-channel', { username });
         }
       }
@@ -520,7 +509,7 @@ class API extends Core {
       opts.noAffiliateOrPartnerWarningSent = false;
       opts.notCorrectOauthWarningSent = false;
     } catch (e) {
-      if (e.message === '403 Forbidden' && !opts.notCorrectOauthWarningSent) {
+      if ((e.message.includes('403') || e.message.includes('401')) && !opts.notCorrectOauthWarningSent) {
         opts.notCorrectOauthWarningSent = true;
         warning('Broadcaster have not correct oauth, will not check subs');
         this.stats.currentSubscribers = 0;
@@ -1537,10 +1526,6 @@ class API extends Core {
       return;
     }
     await getRepository(User).update({ userId: id }, { createdAt: new Date(request.data.created_at).getTime() });
-  }
-
-  async isFollower (username) {
-    this.rate_limit_follower_check.add(username);
   }
 
   async isFollowerUpdate (user: User | undefined) {

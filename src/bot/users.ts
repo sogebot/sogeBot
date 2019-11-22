@@ -3,22 +3,16 @@ import axios from 'axios';
 import { isNil } from 'lodash';
 import { setTimeout } from 'timers';
 
-import * as constants from './constants';
 import Core from './_interface';
-import * as commons from './commons';
 import { permission } from './helpers/permissions';
-import { debug, error, isDebugEnabled } from './helpers/log';
+import { error } from './helpers/log';
 import { adminEndpoint, viewerEndpoint } from './helpers/socket';
 import { Brackets, getConnection, getRepository } from 'typeorm';
 import { User, UserBit, UserTip } from './database/entity/user';
-import { getAllOnlineUsernames } from './helpers/getAllOnlineUsernames';
 
 class Users extends Core {
   uiSortCache: string | null = null;
   uiSortCacheViewers: Array<any> = [];
-  newChattersList: Array<string> = [];
-  chatList: { [x: string]: number } = {};
-  watchedList: { [x: string]: number } = {};
 
   constructor () {
     super();
@@ -28,81 +22,8 @@ class Users extends Core {
     if (isMainThread) {
       setTimeout(() => {
         this.updateWatchTime(true);
-        this.updateChatTime();
       }, 30000);
     }
-  }
-
-  async checkNewChatter (id: number, username: string) {
-    const watched = await this.getWatchedOf(id);
-    // add user as a new chatter in a stream
-    if (watched === 0 && !this.newChattersList.includes(username)) {
-      global.api.stats.newChatters += 1;
-      this.newChattersList.push(username.toLowerCase());
-    }
-  }
-
-  async updateChatTime () {
-    if (isDebugEnabled('users.chat')) {
-      const message = 'chat time update ' + new Date();
-      debug('users.chat', Array(message.length + 1).join('='));
-      debug('users.chat', message);
-      debug('users.chat', Array(message.length + 1).join('='));
-    }
-
-    clearTimeout(this.timeouts.updateChatTime);
-    let timeout = constants.MINUTE;
-    try {
-      const users = await getAllOnlineUsernames();
-      if (users.length === 0) {
-        throw Error('No online users.');
-      }
-      const updated: any[] = [];
-      for (const username of users) {
-        const isIgnored = commons.isIgnored({username});
-        const isBot = commons.isBot(username);
-        const isNewUser = typeof this.chatList[username] === 'undefined';
-
-        if (isIgnored || isBot) {
-          continue;
-        }
-
-        const chat = isNewUser ? 0 : Date.now() - this.chatList[username];
-        const id = await global.users.getIdByName(username);
-        if (!id) {
-          debug('users.chat', 'error: cannot get id of ' + username);
-          continue;
-        }
-
-        if (isNewUser) {
-          this.checkNewChatter(id, username);
-        }
-
-        const online = global.api.isStreamOnline;
-        if (online) {
-          await getRepository(User).increment({ userId: id }, 'chatTimeOnline', chat);
-        } else {
-          await getRepository(User).increment({ userId: id }, 'chatTimeOffline', chat);
-        }
-        debug('users.chat', username + ': ' + (chat / 1000 / 60) + ' minutes added');
-        updated.push(username);
-        this.chatList[username] = Date.now();
-      }
-
-      // remove offline users from chat list
-      for (const u of Object.entries(this.chatList)) {
-        if (!updated.includes(u[0])) {
-          debug('users.chat', u[0] + ': removed from online list');
-          delete this.chatList[u[0]];
-        }
-      }
-    } catch (e) {
-      debug('users.chat', e.message);
-      this.chatList = {};
-      global.users.newChattersList = [];
-      timeout = 1000;
-    }
-    this.timeouts.updateChatTime = setTimeout(() => this.updateChatTime(), timeout);
   }
 
   async getChatOf (id: number, online: boolean): Promise<number> {
@@ -125,74 +46,34 @@ class Users extends Core {
   }
 
   async updateWatchTime (isInit = false) {
+    const interval = 30000;
+
     if (isInit) {
       // set all users offline on start
       await getRepository(User).update({}, { isOnline: false });
-    }
+    } else {
 
-    if (isDebugEnabled('users.watched')) {
-      const message = 'Watched time update ' + new Date();
-      debug('users.watched', Array(message.length + 1).join('='));
-      debug('users.watched', message);
-      debug('users.watched', Array(message.length + 1).join('='));
-    }
+      // get new users
+      const newChatters = await getRepository(User).find({ isOnline: true, watchedTime: 0 });
+      global.api.stats.newChatters += newChatters.length;
 
-    clearTimeout(this.timeouts.updateWatchTime);
-    let timeout = constants.MINUTE * 5;
-    try {
-      // count watching time when stream is online
       if (global.api.isStreamOnline) {
-        const users = await getAllOnlineUsernames();
-        if (users.length === 0) {
-          throw Error('No online users.');
-        }
-        const updated: string[] = [];
-        for (const username of users) {
-          const isIgnored = commons.isIgnored({username});
-          const isBot = commons.isBot(username);
-          const isOwner = commons.isOwner(username);
-          const isNewUser = typeof this.watchedList[username] === 'undefined';
+        const incrementedUsers = await getRepository(User).increment({ isOnline: true }, 'watchedTime', interval);
+        // chatTimeOnline + chatTimeOffline is solely use for points distribution
+        await getRepository(User).increment({ isOnline: true }, 'chatTimeOnline', interval);
 
-          if (isIgnored || isBot) {
-            continue;
-          }
-
-          const watched = isNewUser ? 0 : Date.now() - this.watchedList[username];
-          const id = await global.users.getIdByName(username);
-          if (!id) {
-            debug('users.watched', 'error: cannot get id of ' + username);
-            continue;
-          }
-
-          if (isNewUser) {
-            this.checkNewChatter(id, username);
-          }
-          if (!isOwner) {
-            global.api.stats.currentWatchedTime += watched;
-          }
-          await getRepository(User).increment({ userId: id }, 'watchedTime', watched);
-          debug('users.watched', username + ': ' + (watched / 1000 / 60) + ' minutes added');
-          updated.push(username);
-          this.watchedList[username] = Date.now();
-        }
-
-        // remove offline users from watched list
-        for (const u of Object.entries(this.watchedList)) {
-          if (!updated.includes(u[0])) {
-            debug('users.watched', u[0] + ': removed from online list');
-            delete this.watchedList[u[0]];
-          }
+        if (typeof incrementedUsers.affected === 'undefined') {
+          const users = await getRepository(User).find({ isOnline: true });
+          global.api.stats.currentWatchedTime += users.length * interval;
+        } else {
+          global.api.stats.currentWatchedTime += incrementedUsers.affected * interval;
         }
       } else {
-        throw Error('Stream offline, watch time is not counting, retrying');
+        await getRepository(User).increment({ isOnline: true }, 'chatTimeOffline', interval);
       }
-    } catch (e) {
-      debug('users.watched', e.message);
-      this.watchedList = {};
-      global.users.newChattersList = [];
-      timeout = 1000;
     }
-    this.timeouts.updateWatchTime = setTimeout(() => this.updateWatchTime(), timeout);
+
+    setTimeout(() => this.updateWatchTime(), interval);
   }
 
   async getWatchedOf (id: number): Promise<number> {
