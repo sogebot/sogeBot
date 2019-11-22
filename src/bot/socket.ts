@@ -4,10 +4,10 @@ import { MINUTE, SECOND } from './constants';
 import { isMainThread } from './cluster';
 import uuid from 'uuid/v4';
 import { permission } from './helpers/permissions';
-import { endpoints } from './helpers/socket';
+import { adminEndpoint, endpoints } from './helpers/socket';
 import { onLoad } from './decorators/on';
 
-import { getRepository, LessThanOrEqual } from 'typeorm';
+import { Brackets, getRepository, LessThanOrEqual } from 'typeorm';
 import { Socket as SocketEntity } from './database/entity/socket';
 
 class Socket extends Core {
@@ -29,6 +29,10 @@ class Socket extends Core {
     emit: 'purgeAllConnections',
   }, 'connection')
   purgeAllConnections = null;
+  @ui({
+    type: 'socket-list',
+  }, 'connection')
+  socketsList = null;
 
   constructor() {
     super();
@@ -37,14 +41,14 @@ class Socket extends Core {
       setInterval(() => {
         // remove expired tokens
         getRepository(SocketEntity).delete({
-          refreshTokenTimestamp: LessThanOrEqual(this.refreshTokenExpirationTime * 1000 - Date.now()),
+          refreshTokenTimestamp: LessThanOrEqual(Date.now()),
         });
       }, MINUTE);
 
       setInterval(() => {
         // expire access token
         getRepository(SocketEntity).update({
-          accessTokenTimestamp: LessThanOrEqual(this.accessTokenExpirationTime * 1000 - Date.now()),
+          accessTokenTimestamp: LessThanOrEqual(Date.now()),
         }, {
           accessToken: null,
         });
@@ -97,7 +101,10 @@ class Socket extends Core {
           return socket.emit('unauthorized');
         } else {
           const auth = await getRepository(SocketEntity).createQueryBuilder('socket')
-            .where('socket.accessToken = :accessToken', { accessToken: cb.accessToken })
+            .where(new Brackets(w => {
+              w.where('socket.accessToken = :accessToken', { accessToken: cb.accessToken });
+              w.orWhere('socket.accessToken is NULL');
+            }))
             .andWhere('socket.refreshToken = :refreshToken', { refreshToken: cb.refreshToken })
             .getOne();
           if (!auth) {
@@ -105,13 +112,13 @@ class Socket extends Core {
           } else {
             if (auth.accessToken === cb.accessToken) {
               // update refreshToken timestamp to expire only if not used
-              auth.refreshTokenTimestamp = Date.now();
+              auth.refreshTokenTimestamp = Date.now() + (global.socket.refreshTokenExpirationTime * 1000);
               await getRepository(SocketEntity).save(auth);
               sendAuthorized(socket, auth);
             } else {
               auth.accessToken = uuid();
-              auth.accessTokenTimestamp = Date.now();
-              auth.refreshTokenTimestamp = Date.now();
+              auth.accessTokenTimestamp = Date.now() + (global.socket.accessTokenExpirationTime * 1000);
+              auth.refreshTokenTimestamp = Date.now() + (global.socket.refreshTokenExpirationTime * 1000);
               await getRepository(SocketEntity).save(auth);
               sendAuthorized(socket, auth);
             }
@@ -131,8 +138,8 @@ class Socket extends Core {
       const auth = new SocketEntity();
       auth.accessToken = uuid();
       auth.refreshToken = uuid();
-      auth.accessTokenTimestamp = Date.now();
-      auth.refreshTokenTimestamp = Date.now();
+      auth.accessTokenTimestamp = Date.now() + (global.socket.accessTokenExpirationTime * 1000);
+      auth.refreshTokenTimestamp = Date.now() + (global.socket.refreshTokenExpirationTime * 1000);
       auth.userId = Number(userId);
       auth.type = 'viewer';
       haveViewerPrivileges = Authorized.Authorized;
@@ -218,11 +225,15 @@ class Socket extends Core {
   }
 
   sockets () {
-    global.panel.io.of('/core/socket').on('connection', (socket) => {
-      socket.on('purgeAllConnections', (cb) => {
-        getRepository(SocketEntity).clear();
-        cb(null);
-      });
+    adminEndpoint(this.nsp, 'purgeAllConnections', (cb) => {
+      getRepository(SocketEntity).clear();
+      cb(null);
+    });
+    adminEndpoint(this.nsp, 'listConnections', async (cb) => {
+      cb(null, await getRepository(SocketEntity).find());
+    });
+    adminEndpoint(this.nsp, 'removeConnection', async (item: SocketEntity, cb) => {
+      cb(null, await getRepository(SocketEntity).remove(item));
     });
   }
 
