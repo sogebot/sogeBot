@@ -30,7 +30,6 @@ global.status = { // TODO: move it?
 
 import { changelog } from './changelog';
 import { autoLoad } from './commons';
-import panel from './panel';
 import chalk from 'chalk';
 
 const connect = async function () {
@@ -44,7 +43,7 @@ async function main () {
   if (isMainThread) {
     await connect();
   }
-  let translate;
+  let translate, panel;
   try {
     changelog();
 
@@ -57,7 +56,7 @@ async function main () {
     require('./users');
     require('./events');
     require('./customvariables');
-    require('./panel');
+    panel = require('./panel');
     require('./twitch');
     require('./permissions');
     translate = require('./translate');
@@ -76,7 +75,7 @@ async function main () {
     verticalLayout: 'default',
   }));
   info('Bot is starting up');
-  translate._load().then(async () => {
+  translate.default._load().then(async () => {
     await autoLoad('./dest/stats/');
     await autoLoad('./dest/registries/');
     await autoLoad('./dest/systems/');
@@ -86,7 +85,7 @@ async function main () {
     await autoLoad('./dest/integrations/');
 
     if (isMainThread) {
-      panel.expose();
+      panel.default.expose();
     }
 
     if (process.env.HEAP) {

@@ -1,9 +1,10 @@
+import Core from './_interface';
+
 import { isMainThread } from './cluster';
 import axios from 'axios';
 import { isNil } from 'lodash';
 import { setTimeout } from 'timers';
 
-import Core from './_interface';
 import { permission } from './helpers/permissions';
 import { error } from './helpers/log';
 import { adminEndpoint, viewerEndpoint } from './helpers/socket';

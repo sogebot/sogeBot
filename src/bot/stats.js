@@ -4,6 +4,7 @@ var _ = require('lodash')
 const { TwitchStats } = require('./database/entity/twitch');
 const { getRepository } = require('typeorm');
 const { error } = require('./helpers/log');
+const panel = require('./panel');
 
 function Stats () {
   this.latestTimestamp = 0
@@ -12,7 +13,7 @@ function Stats () {
 
 Stats.prototype.sockets = function () {
   if (_.isNil(panel)) return setTimeout(() => this.sockets(), 10)
-  panel.socketListening(this, 'getLatestStats', this.getLatestStats)
+  panel.default.socketListening(this, 'getLatestStats', this.getLatestStats)
 }
 
 Stats.prototype.save = async function (data) {

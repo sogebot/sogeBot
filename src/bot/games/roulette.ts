@@ -7,13 +7,14 @@ import Game from './_interface';
 import { getRepository } from 'typeorm';
 import { User } from '../database/entity/user';
 import { translate } from '../translate';
+import points from '../systems/points';
 
 /*
  * !roulette - 50/50 chance to timeout yourself
  */
 
 class Roulette extends Game {
-  dependsOn = ['systems.points'];
+  dependsOn = [ points ];
 
   @settings()
   timeout = 10;

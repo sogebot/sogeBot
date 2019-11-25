@@ -20,7 +20,7 @@ import currency from '../currency';
 import alerts from '../registries/alerts.js';
 
 class Donationalerts extends Integration {
-  socket: SocketIOClient.Socket | null = null;
+  socketToDonationAlerts: SocketIOClient.Socket | null = null;
 
   @settings()
   @ui({ type: 'text-input', secret: true })
@@ -45,9 +45,9 @@ class Donationalerts extends Integration {
   }
 
   async disconnect () {
-    if (this.socket !== null) {
-      this.socket.removeAllListeners();
-      this.socket.disconnect();
+    if (this.socketToDonationAlerts !== null) {
+      this.socketToDonationAlerts.removeAllListeners();
+      this.socketToDonationAlerts.disconnect();
     }
   }
 
@@ -59,7 +59,7 @@ class Donationalerts extends Integration {
       return;
     }
 
-    this.socket = require('socket.io-client').connect('wss://socket.donationalerts.ru:443',
+    this.socketToDonationAlerts = require('socket.io-client').connect('wss://socket.donationalerts.ru:443',
       {
         reconnection: true,
         reconnectionDelay: 1000,
@@ -67,23 +67,23 @@ class Donationalerts extends Integration {
         reconnectionAttempts: Infinity,
       });
 
-    if (this.socket !== null) {
-      this.socket.on('connect', () => {
-        if (this.socket !== null) {
-          this.socket.emit('add-user', { token: this.secretToken, type: 'minor' });
+    if (this.socketToDonationAlerts !== null) {
+      this.socketToDonationAlerts.on('connect', () => {
+        if (this.socketToDonationAlerts !== null) {
+          this.socketToDonationAlerts.emit('add-user', { token: this.secretToken, type: 'minor' });
         }
         info(chalk.yellow('DONATIONALERTS.RU:') + ' Successfully connected socket to service');
       });
-      this.socket.on('reconnect_attempt', () => {
+      this.socketToDonationAlerts.on('reconnect_attempt', () => {
         info(chalk.yellow('DONATIONALERTS.RU:') + ' Trying to reconnect to service');
       });
-      this.socket.on('disconnect', () => {
+      this.socketToDonationAlerts.on('disconnect', () => {
         info(chalk.yellow('DONATIONALERTS.RU:') + ' Socket disconnected from service');
         this.disconnect();
-        this.socket = null;
+        this.socketToDonationAlerts = null;
       });
 
-      this.socket.off('donation').on('donation', async (data) => {
+      this.socketToDonationAlerts.off('donation').on('donation', async (data) => {
         data = JSON.parse(data);
         if (parseInt(data.alert_type, 10) !== 1) {
           return;

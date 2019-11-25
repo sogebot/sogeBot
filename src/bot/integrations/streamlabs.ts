@@ -18,7 +18,7 @@ import eventlist from '../overlays/eventlist';
 import alerts from '../registries/alerts';
 
 class Streamlabs extends Integration {
-  socket: SocketIOClient.Socket | null = null;
+  socketToStreamlabs: SocketIOClient.Socket | null = null;
 
   @settings()
   @ui({ type: 'text-input', secret: true })
@@ -35,9 +35,9 @@ class Streamlabs extends Integration {
   }
 
   async disconnect () {
-    if (this.socket !== null) {
-      this.socket.removeAllListeners();
-      this.socket.disconnect();
+    if (this.socketToStreamlabs !== null) {
+      this.socketToStreamlabs.removeAllListeners();
+      this.socketToStreamlabs.disconnect();
     }
   }
 
@@ -49,24 +49,24 @@ class Streamlabs extends Integration {
       return;
     }
 
-    this.socket = io.connect('https://sockets.streamlabs.com?token=' + this.socketToken);
+    this.socketToStreamlabs = io.connect('https://sockets.streamlabs.com?token=' + this.socketToken);
 
-    this.socket.on('reconnect_attempt', () => {
+    this.socketToStreamlabs.on('reconnect_attempt', () => {
       info(chalk.yellow('STREAMLABS:') + ' Trying to reconnect to service');
     });
 
-    this.socket.on('connect', () => {
+    this.socketToStreamlabs.on('connect', () => {
       info(chalk.yellow('STREAMLABS:') + ' Successfully connected socket to service');
     });
 
-    this.socket.on('disconnect', () => {
+    this.socketToStreamlabs.on('disconnect', () => {
       info(chalk.yellow('STREAMLABS:') + ' Socket disconnected from service');
-      if (this.socket) {
-        this.socket.open();
+      if (this.socketToStreamlabs) {
+        this.socketToStreamlabs.open();
       }
     });
 
-    this.socket.on('event', async (eventData) => {
+    this.socketToStreamlabs.on('event', async (eventData) => {
       this.parse(eventData);
     });
   }

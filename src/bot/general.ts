@@ -11,7 +11,7 @@ import { permission } from './helpers/permissions';
 import { isMainThread } from './cluster';
 import { debug, error, warning } from './helpers/log';
 import { getConnection, getRepository } from 'typeorm';
-import Widget from './widgets/_interface';
+import { Widget } from './database/entity/dashboard';
 import oauth from './oauth';
 import translateLib, { translate } from './translate';
 import tmi from './tmi';

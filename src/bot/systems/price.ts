@@ -28,7 +28,7 @@ import points from './points';
  */
 
 class Price extends System {
-  public dependsOn: string[] = ['systems.points'];
+  public dependsOn = [ points ];
 
   constructor () {
     super();

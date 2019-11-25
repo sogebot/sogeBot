@@ -247,3 +247,4 @@ class Socket extends Core {
 }
 
 export default new Socket();
+export { Socket };

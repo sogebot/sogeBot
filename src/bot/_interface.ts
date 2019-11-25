@@ -13,11 +13,12 @@ import { Settings } from './database/entity/settings';
 import { PermissionCommands, Permissions as PermissionsEntity } from './database/entity/permissions';
 import { adminEndpoint, publicEndpoint } from './helpers/socket';
 import { flatten, unflatten } from './helpers/flatten';
-import socket from './socket';
-import panel from './panel';
+
+let socket: import('./socket').Socket | any = null;
+let panel: null | any = null;
 
 class Module {
-  public dependsOn: string[] = [];
+  public dependsOn: any[] = [];
   public showInUI = true;
   public timeouts: { [x: string]: NodeJS.Timeout } = {};
   public settingsList: { category: string; key: string }[] = [];
@@ -38,8 +39,7 @@ class Module {
       const check = async (retry) => {
         const status: any[] = [];
         for (const dependency of this.dependsOn) {
-          const dependencyPointer = _.get(global, dependency, null);
-          if (!dependencyPointer || !_.isFunction(dependencyPointer.status)) {
+          if (!dependency || !_.isFunction(dependency.status)) {
             if (retry > 0) {
               setTimeout(() => check(--retry), 10);
             } else {
@@ -47,7 +47,7 @@ class Module {
             }
             return;
           } else {
-            status.push(await dependencyPointer.status({ quiet: true }));
+            status.push(await dependency.status({ quiet: true }));
           }
         }
         resolve(status.length === 0 || _.every(status));
@@ -130,6 +130,10 @@ class Module {
         };
         onStartup();
       });
+
+      // require panel/socket
+      socket = (require('./socket')).default;
+      panel = (require('./panel')).default;
     }, 5000); // slow down little bit to have everything preloaded or in progress of loading
 
     setInterval(async () => {
@@ -193,7 +197,7 @@ class Module {
   }
 
   public _sockets() {
-    if (_.isNil(panel)) {
+    if (panel === null || socket === null) {
       this.timeouts[`${this.constructor.name}._sockets`] = setTimeout(() => this._sockets(), 1000);
     } else {
       this.socket = panel.io.of(this.nsp).use(socket.authorize);

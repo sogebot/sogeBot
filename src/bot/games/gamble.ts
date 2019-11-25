@@ -8,6 +8,7 @@ import { error } from '../helpers/log';
 import { getRepository } from 'typeorm';
 import { User } from '../database/entity/user';
 import { translate } from '../translate';
+import points from '../systems/points';
 
 const ERROR_NOT_ENOUGH_OPTIONS = '0';
 const ERROR_ZERO_BET = '1';
@@ -19,7 +20,7 @@ const ERROR_MINIMAL_BET = '3';
  */
 
 class Gamble extends Game {
-  dependsOn = [ 'systems.points' ];
+  dependsOn = [ points ];
 
   @settings()
   minimalBet = 0;

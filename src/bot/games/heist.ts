@@ -13,9 +13,10 @@ import { HeistUser } from '../database/entity/heist';
 import oauth from '../oauth';
 import { translate } from '../translate';
 import tmi from '../tmi';
+import points from '../systems/points';
 
 class Heist extends Game {
-  dependsOn = [ 'systems.points' ];
+  dependsOn = [ points ];
 
   @shared()
   startedAt: null | number = null;

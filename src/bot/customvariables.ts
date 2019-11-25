@@ -1,5 +1,3 @@
-
-
 import safeEval from 'safe-eval';
 import axios from 'axios';
 import _ from 'lodash';
@@ -21,6 +19,7 @@ import permissions from './permissions';
 import panel from './panel';
 import custom_variables from './widgets/custom_variables';
 import currency from './currency';
+import { isDbConnected } from './helpers/database';
 
 class CustomVariables {
   timeouts: {
@@ -444,6 +443,10 @@ class CustomVariables {
   }
 
   async checkIfCacheOrRefresh () {
+    if (!isDbConnected) {
+      return setTimeout(() => this.checkIfCacheOrRefresh(), 1000);
+    }
+
     clearTimeout(this.timeouts[`${this.constructor.name}.checkIfCacheOrRefresh`]);
     const items = await getRepository(Variable).find({ type: 'eval' });
 

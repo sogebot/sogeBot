@@ -280,7 +280,7 @@ function Panel () {
           .execute();
       }
 
-      self.sendStreamData(self, panel.io) // force dashboard update
+      self.sendStreamData(self, this.io) // force dashboard update
       cb(null)
     })
     socket.on('joinBot', async () => {
@@ -524,10 +524,10 @@ Panel.prototype.getApp = function () {
 }
 
 Panel.prototype.expose = function () {
-  server.listen(panel.port, function () {
-    info(`WebPanel is available at http://localhost:${panel.port}`)
-  })
-}
+  server.listen(this.port, () => {
+    info(`WebPanel is available at http://localhost:${this.port}`)
+  });
+};
 
 Panel.prototype.addMenu = function (menu) {
   if (!this.menu.find(o => o.id === menu.id)) {

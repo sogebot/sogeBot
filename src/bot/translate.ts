@@ -13,6 +13,9 @@ import { Translation } from './database/entity/translation';
 import panel from './panel';
 import general from './general';
 
+let translate_class: any = null;
+let translate: any = null;
+
 class Translate {
   custom: any[] = [];
   translations: any = {};
@@ -65,16 +68,16 @@ class Translate {
   }
 
   translate (text, orig = false) {
-    if (_.isUndefined(this.translations[this.lang]) && !_.isUndefined(text)) {
-      return '{missing_translation: ' + this.lang + '.' + String(text) + '}';
+    if (_.isUndefined(translate_class.translations[translate_class.lang]) && !_.isUndefined(text)) {
+      return '{missing_translation: ' + translate_class.lang + '.' + String(text) + '}';
     } else if (typeof text === 'object') {
-      const t = this.translations[this.lang][text.root];
-      for (const c of this.custom) {
+      const t = translate_class.translations[translate_class.lang][text.root];
+      for (const c of translate_class.custom) {
         t[c.name.replace(`${text.root}.`, '')] = c.value;
       }
       return t;
     } else if (typeof text !== 'undefined') {
-      return this.get(text, orig);
+      return translate_class.get(text, orig);
     }
     return null;
   }
@@ -100,8 +103,8 @@ class Translate {
   }
 }
 
-const translate_class = new Translate();
-const translate = translate_class.translate;
+translate_class = new Translate();
+translate = translate_class.translate;
 export default translate_class;
 export { translate };
 

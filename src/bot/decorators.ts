@@ -46,15 +46,16 @@ export function ui(opts, category?: string) {
     let path = category ? `${category}.${key}` : key;
 
     const register = async (retries = 0) => {
-      const isAvailableModule = type !== 'core' && typeof global[type] !== 'undefined' && typeof global[type][name] !== 'undefined';
-      const isAvailableLibrary = type === 'core' && typeof global[name] !== 'undefined';
-
-      if ((!isAvailableLibrary && !isAvailableModule) || !isDbConnected) {
+      if (!isDbConnected) {
         return setTimeout(() => register(0), 1000);
       }
       try {
-        const self = type === 'core' ? global[name] : global[type][name];
-
+        let self;
+        if (type === 'core') {
+          self = (require('./' + name)).default;
+        } else {
+          self = (require('./' + type + '/' + name)).default;
+        }
         // get category from settingsList
         if (!category) {
           const s = self.settingsList.find(o => o.key === path);
@@ -84,13 +85,16 @@ export function settings(category?: string, isReadOnly = false) {
     }
 
     const registerSettings = async () => {
-      const isAvailableModule = type !== 'core' && typeof global[type] !== 'undefined' && typeof global[type][name] !== 'undefined';
-      const isAvailableLibrary = type === 'core' && typeof global[name] !== 'undefined';
-      if ((!isAvailableLibrary && !isAvailableModule) || !isDbConnected) {
+      let self;
+      if (type === 'core') {
+        self = (require('./' + name)).default;
+      } else {
+        self = (require('./' + type + '/' + name)).default;
+      }
+      if (!isDbConnected) {
         return setTimeout(() => registerSettings(), 1000);
       }
       try {
-        const self = type === 'core' ? global[name] : global[type][name];
         if (category === key) {
           throw Error(`Category and variable name cannot be same - ${type}.${name}.${key} in category ${category}`);
         }
@@ -132,13 +136,16 @@ export function permission_settings(category?: string) {
     loadingInProgress.push(`${type}.${name}.${key}`);
 
     const register = async () => {
-      const isAvailableModule = type !== 'core' && typeof global[type] !== 'undefined' && typeof global[type][name] !== 'undefined';
-      const isAvailableLibrary = type === 'core' && typeof global[name] !== 'undefined';
-      if ((!isAvailableLibrary && !isAvailableModule) || !isDbConnected) {
+      if (!isDbConnected) {
         return setTimeout(() => register(), 1000);
       }
       try {
-        const self = type === 'core' ? global[name] : global[type][name];
+        let self;
+        if (type === 'core') {
+          self = (require('./' + name)).default;
+        } else {
+          self = (require('./' + type + '/' + name)).default;
+        }
         if (category === key) {
           throw Error(`Category and variable name cannot be same - ${type}.${name}.${key} in category ${category}`);
         }
@@ -179,13 +186,16 @@ export function shared(db = false) {
       loadingInProgress.push(`${type}.${name}.${key}`);
     }
     const register = async () => {
-      const isAvailableModule = type !== 'core' && typeof global[type] !== 'undefined' && typeof global[type][name] !== 'undefined';
-      const isAvailableLibrary = type === 'core' && typeof global[name] !== 'undefined';
-      if ((!isAvailableLibrary && !isAvailableModule) || !isDbConnected) {
+      if (!isDbConnected) {
         return setTimeout(() => register(), 1000);
       }
       try {
-        const self = type === 'core' ? global[name] : global[type][name];
+        let self;
+        if (type === 'core') {
+          self = (require('./' + name)).default;
+        } else {
+          self = (require('./' + type + '/' + name)).default;
+        }
         const defaultValue = self[key];
         VariableWatcher.add(`${type}.${name}.${key}`, defaultValue, false);
         if (db) {
@@ -259,13 +269,16 @@ export function rollback() {
 }
 
 async function registerCommand(opts: string | Command, m) {
-  const isAvailableModule = m.type !== 'core' && typeof global[m.type] !== 'undefined' && typeof global[m.type][m.name] !== 'undefined';
-  const isAvailableLibrary = m.type === 'core' && typeof global[m.name] !== 'undefined';
-  if ((!isAvailableLibrary && !isAvailableModule) || !isDbConnected) {
+  if (!isDbConnected) {
     return setTimeout(() => registerCommand(opts, m), 1000);
   }
   try {
-    const self = m.type === 'core' ? global[m.name] : global[m.type][m.name];
+    let self;
+    if (m.type === 'core') {
+      self = (require('./' + m.name)).default;
+    } else {
+      self = (require('./' + m.type + '/' + m.name)).default;
+    }
     if (typeof opts === 'string') {
       opts = {
         name: opts,

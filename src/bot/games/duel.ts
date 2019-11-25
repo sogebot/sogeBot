@@ -23,7 +23,7 @@ const ERROR_MINIMAL_BET = '3';
  */
 
 class Duel extends Game {
-  dependsOn = [ 'systems.points' ];
+  dependsOn = [ points ];
 
   @shared()
   _timestamp = 0;

@@ -1,4 +1,5 @@
 'use strict';
+import Core from './_interface';
 
 import axios from 'axios';
 import chalk from 'chalk';
@@ -6,7 +7,6 @@ import getSymbolFromCurrency from 'currency-symbol-map';
 import _ from 'lodash';
 import { isMainThread } from './cluster';
 
-import Core from './_interface';
 import * as constants from './constants';
 import { settings, shared, ui } from './decorators';
 import { error, info, warning } from './helpers/log';

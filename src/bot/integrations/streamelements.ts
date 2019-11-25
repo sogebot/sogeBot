@@ -31,7 +31,7 @@ import alerts from '../registries/alerts';
   updatedAt: '2019-10-03T22:42:33.023Z'
 } */
 class StreamElements extends Integration {
-  socket: SocketIOClient.Socket | null = null;
+  socketToStreamElements: SocketIOClient.Socket | null = null;
 
   @settings()
   @ui({ type: 'text-input', secret: true })
@@ -48,9 +48,9 @@ class StreamElements extends Integration {
   }
 
   async disconnect () {
-    if (this.socket !== null) {
-      this.socket.removeAllListeners();
-      this.socket.disconnect();
+    if (this.socketToStreamElements !== null) {
+      this.socketToStreamElements.removeAllListeners();
+      this.socketToStreamElements.disconnect();
     }
   }
 
@@ -62,7 +62,7 @@ class StreamElements extends Integration {
       return;
     }
 
-    this.socket = io.connect('https://realtime.streamelements.com', {
+    this.socketToStreamElements = io.connect('https://realtime.streamelements.com', {
       reconnection: true,
       reconnectionDelay: 1000,
       reconnectionDelayMax: 5000,
@@ -70,29 +70,29 @@ class StreamElements extends Integration {
       transports: ['websocket'],
     });
 
-    this.socket.on('reconnect_attempt', () => {
+    this.socketToStreamElements.on('reconnect_attempt', () => {
       info(chalk.yellow('STREAMELEMENTS:') + ' Trying to reconnect to service');
     });
 
-    this.socket.on('connect', () => {
+    this.socketToStreamElements.on('connect', () => {
       info(chalk.yellow('STREAMELEMENTS:') + ' Successfully connected socket to service');
-      if (this.socket !== null) {
-        this.socket.emit('authenticate', { method: 'jwt', token: this.jwtToken });
+      if (this.socketToStreamElements !== null) {
+        this.socketToStreamElements.emit('authenticate', { method: 'jwt', token: this.jwtToken });
       }
     });
 
-    this.socket.on('authenticated', () => {
+    this.socketToStreamElements.on('authenticated', () => {
       info(chalk.yellow('STREAMELEMENTS:') + ' Successfully authenticated on service');
     });
 
-    this.socket.on('disconnect', () => {
+    this.socketToStreamElements.on('disconnect', () => {
       info(chalk.yellow('STREAMELEMENTS:') + ' Socket disconnected from service');
-      if (this.socket) {
-        this.socket.open();
+      if (this.socketToStreamElements) {
+        this.socketToStreamElements.open();
       }
     });
 
-    this.socket.on('event', async (eventData) => {
+    this.socketToStreamElements.on('event', async (eventData) => {
       this.parse(eventData);
     });
   }

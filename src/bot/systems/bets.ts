@@ -39,7 +39,7 @@ const ERROR_NOT_OPTION = '7';
  */
 
 class Bets extends System {
-  public dependsOn: string[] = ['systems.points'];
+  public dependsOn = [ points ];
 
   @settings()
   @ui({ type: 'number-input', step: 1, min: 0, max: 100 })

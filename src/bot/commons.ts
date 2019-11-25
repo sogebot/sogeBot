@@ -5,7 +5,6 @@ import 'moment-precise-range-plugin';
 import { join, normalize } from 'path';
 
 import { debug } from './helpers/log';
-import Message from './message';
 import { globalIgnoreList } from './data/globalIgnoreList';
 import { error } from './helpers/log';
 import { clusteredChatOut, clusteredClientChat, clusteredClientTimeout, clusteredWhisperOut } from './cluster';
@@ -25,7 +24,7 @@ export async function autoLoad(directory): Promise<{ [x: string]: any }> {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const imported = require(normalize(join(process.cwd(), directory, file)));
     if (typeof imported.default !== 'undefined') {
-      loaded[file.split('.')[0]] = new imported.default(); // remap default to root object
+      loaded[file.split('.')[0]] = imported.default; // remap default to root object
     } else {
       loaded[file.split('.')[0]] = imported;
     }
@@ -130,6 +129,7 @@ export async function sendMessage(messageToSend: string | Promise<string>, sende
   }
 
   if (!attr.skip) {
+    const Message = new (require('./message'));
     messageToSend = await new Message(messageToSend).parse(attr) as string;
   }
   if (messageToSend.length === 0) {
