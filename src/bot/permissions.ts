@@ -15,6 +15,7 @@ import { PermissionCommands, PermissionFilters, Permissions as PermissionsEntity
 import { getRepository, LessThan } from 'typeorm';
 import { User } from './database/entity/user';
 import oauth from './oauth';
+import currency from './currency';
 
 let isWarnedAboutCasters = false;
 
@@ -250,7 +251,7 @@ class Permissions extends Core {
           amount = user.subscribeTier === 'Prime' ? 1 : Number(user.subscribeTier);
           break;
         case 'tips':
-          amount = user.tips.reduce((a, b) => (a + global.currency.exchange(b.amount, b.currency, global.currency.mainCurrency)), 0);
+          amount = user.tips.reduce((a, b) => (a + currency.exchange(b.amount, b.currency, currency.mainCurrency)), 0);
           break;
         case 'watched':
           amount = user.watchedTime / (60 * 60 * 1000 /*hours*/);

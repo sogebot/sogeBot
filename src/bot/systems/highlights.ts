@@ -164,5 +164,4 @@ class Highlights extends System {
   }
 }
 
-export default Highlights;
-export { Highlights };
+export default new Highlights();

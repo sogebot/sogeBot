@@ -11,6 +11,7 @@ import { getRepository } from 'typeorm';
 import { ScrimMatchId } from '../database/entity/scrimMatchId';
 import oauth from '../oauth';
 import { translate } from '../translate';
+import tmi from '../tmi';
 
 enum ERROR {
   ALREADY_OPENED,
@@ -170,7 +171,7 @@ class Scrim extends System {
   }
 
   private async currentMatches() {
-    const atUsername = global.tmi.showWithAt;
+    const atUsername = tmi.showWithAt;
     const matches: {
       [x: string]: string[];
     } = {};
@@ -234,5 +235,4 @@ class Scrim extends System {
   }
 }
 
-export default Scrim;
-export { Scrim };
+export default new Scrim();

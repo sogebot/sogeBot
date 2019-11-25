@@ -186,5 +186,4 @@ class FightMe extends Game {
   }
 }
 
-export default FightMe;
-export { FightMe };
+export default new FightMe();

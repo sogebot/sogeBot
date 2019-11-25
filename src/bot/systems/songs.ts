@@ -659,7 +659,7 @@ class Songs extends System {
     if (opts.parameters.length < 1) {
       return;
     }
-    const ids = await global.systems.songs.getSongsIdsFromPlaylist(opts.parameters);
+    const ids = await this.getSongsIdsFromPlaylist(opts.parameters);
 
     if (ids.length === 0) {
       sendMessage(await prepare('songs.playlist-is-empty'), opts.sender, opts.attr);
@@ -724,5 +724,4 @@ class Songs extends System {
   }
 }
 
-export default Songs;
-export { Songs };
+export default new Songs();

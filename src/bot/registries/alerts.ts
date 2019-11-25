@@ -7,6 +7,7 @@ import { adminEndpoint, publicEndpoint } from '../helpers/socket';
 import { getRepository, In, IsNull, Not } from 'typeorm';
 import { Alert, AlertCheer, AlertFollow, AlertHost, AlertMedia, AlertRaid, AlertResub, AlertSub, AlertSubgift, AlertTip, EmitData } from '../database/entity/alert';
 import panel from '../panel';
+import currency from '../currency';
 
 class Alerts extends Registry {
   constructor() {
@@ -155,7 +156,7 @@ class Alerts extends Registry {
     const data: EmitData = {
       name: generateUsername(),
       amount,
-      currency: global.currency.mainCurrency,
+      currency: currency.mainCurrency,
       monthsName: getLocalizedName(amount, 'core.months'),
       event: opts.event,
       autohost: true,
@@ -168,5 +169,4 @@ class Alerts extends Registry {
   }
 }
 
-export default Alerts;
-export { Alerts };
+export default new Alerts();

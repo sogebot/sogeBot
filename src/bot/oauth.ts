@@ -7,6 +7,7 @@ import { settings, shared, ui } from './decorators';
 import { onChange } from './decorators/on';
 import { error, info, warning } from './helpers/log';
 import api from './api';
+import tmi from './tmi';
 
 class OAuth extends Core {
   private toWait = 10;
@@ -125,7 +126,7 @@ class OAuth extends Core {
     if (!isMainThread || global.mocha) {
       return;
     }
-    if (typeof api === 'undefined' || typeof global.tmi === 'undefined') {
+    if (typeof api === 'undefined' || typeof tmi === 'undefined') {
       return setTimeout(() => this.getChannelId(), 1000);
     }
     clearTimeout(this.timeouts.getChannelId);
@@ -138,8 +139,8 @@ class OAuth extends Core {
         this.currentChannel = this.generalChannel;
         this.channelId = cid;
         info('Channel ID set to ' + cid);
-        global.tmi.reconnect('bot');
-        global.tmi.reconnect('broadcaster');
+        tmi.reconnect('bot');
+        tmi.reconnect('broadcaster');
         api.updateChannelViewsAndBroadcasterType();
         this.toWait = 10;
       } else {
@@ -233,7 +234,7 @@ class OAuth extends Core {
 
       const cache = this.cache[type];
       if (cache !== '' && cache !== request.data.login + request.data.scopes.join(',')) {
-        global.tmi.reconnect(type); // force TMI reconnect
+        tmi.reconnect(type); // force TMI reconnect
         this.cache[type] = request.data.login + request.data.scopes.join(',');
       }
 

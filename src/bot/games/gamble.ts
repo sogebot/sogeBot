@@ -37,7 +37,7 @@ class Gamble extends Game {
         throw Error(ERROR_NOT_ENOUGH_OPTIONS);
       }
 
-      const pointsOfUser = await global.systems.points.getPointsOf(opts.sender.userId);
+      const pointsOfUser = await points.getPointsOf(opts.sender.userId);
       points = parsed[1] === 'all' ? pointsOfUser : parsed[1];
 
       if (parseInt(points, 10) === 0) {
@@ -53,16 +53,16 @@ class Gamble extends Game {
       await getRepository(User).decrement({ userId: opts.sender.userId }, 'points', parseInt(points, 10));
       if (_.random(0, 100, false) <= this.chanceToWin) {
         await getRepository(User).increment({ userId: opts.sender.userId }, 'points', parseInt(points, 10) * 2);
-        const updatedPoints = await global.systems.points.getPointsOf(opts.sender.userId);
+        const updatedPoints = await points.getPointsOf(opts.sender.userId);
         message = await prepare('gambling.gamble.win', {
-          pointsName: await global.systems.points.getPointsName(updatedPoints),
+          pointsName: await points.getPointsName(updatedPoints),
           points: updatedPoints,
         });
         sendMessage(message, opts.sender, opts.attr);
       } else {
         message = await prepare('gambling.gamble.lose', {
-          pointsName: await global.systems.points.getPointsName(await global.systems.points.getPointsOf(opts.sender.userId)),
-          points: await global.systems.points.getPointsOf(opts.sender.userId),
+          pointsName: await points.getPointsName(await points.getPointsOf(opts.sender.userId)),
+          points: await points.getPointsOf(opts.sender.userId),
         });
         sendMessage(message, opts.sender, opts.attr);
       }
@@ -70,7 +70,7 @@ class Gamble extends Game {
       switch (e.message) {
         case ERROR_ZERO_BET:
           message = await prepare('gambling.gamble.zeroBet', {
-            pointsName: await global.systems.points.getPointsName(0),
+            pointsName: await points.getPointsName(0),
           });
           sendMessage(message, opts.sender, opts.attr);
           break;
@@ -79,7 +79,7 @@ class Gamble extends Game {
           break;
         case ERROR_NOT_ENOUGH_POINTS:
           message = await prepare('gambling.gamble.notEnoughPoints', {
-            pointsName: await global.systems.points.getPointsName(points),
+            pointsName: await points.getPointsName(points),
             points: points,
           });
           sendMessage(message, opts.sender, opts.attr);
@@ -87,7 +87,7 @@ class Gamble extends Game {
         case ERROR_MINIMAL_BET:
           points = this.minimalBet;
           message = await prepare('gambling.gamble.lowerThanMinimalBet', {
-            pointsName: await global.systems.points.getPointsName(points),
+            pointsName: await points.getPointsName(points),
             points: points,
           });
           sendMessage(message, opts.sender, opts.attr);
@@ -100,5 +100,4 @@ class Gamble extends Game {
   }
 }
 
-export default Gamble;
-export { Gamble };
+export default new Gamble();

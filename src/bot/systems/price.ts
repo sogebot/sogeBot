@@ -17,6 +17,7 @@ import { Price as PriceEntity } from '../database/entity/price';
 import { adminEndpoint } from '../helpers/socket';
 import { error } from '../helpers/log';
 import { translate } from '../translate';
+import points from './points';
 
 /*
  * !price                     - gets an info about price usage
@@ -98,7 +99,7 @@ class Price extends System {
       price.price = argPrice;
     }
     await getRepository(PriceEntity).save(price);
-    const message = await prepare('price.price-was-set', { command, amount: parseInt(argPrice, 10), pointsName: await global.systems.points.getPointsName(price) });
+    const message = await prepare('price.price-was-set', { command, amount: parseInt(argPrice, 10), pointsName: await points.getPointsName(price) });
     sendMessage(message, opts.sender, opts.attr);
   }
 
@@ -169,11 +170,11 @@ class Price extends System {
     if (!price) { // no price set
       return true;
     }
-    const availablePts = await global.systems.points.getPointsOf(opts.sender.userId);
+    const availablePts = await points.getPointsOf(opts.sender.userId);
     const removePts = price.price;
     const haveEnoughPoints = availablePts >= removePts;
     if (!haveEnoughPoints) {
-      const message = await prepare('price.user-have-not-enough-points', { amount: removePts, command: `${price.command}`, pointsName: await global.systems.points.getPointsName(removePts) });
+      const message = await prepare('price.user-have-not-enough-points', { amount: removePts, command: `${price.command}`, pointsName: await points.getPointsName(removePts) });
       sendMessage(message, opts.sender, opts.attr);
     } else {
       await getRepository(User).decrement({ userId: opts.sender.userId }, 'points', removePts);
@@ -203,5 +204,4 @@ class Price extends System {
   }
 }
 
-export default Price;
-export { Price };
+export default new Price();

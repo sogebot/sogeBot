@@ -49,5 +49,4 @@ class Polls extends Overlay {
   }
 }
 
-export default Polls;
-export { Polls };
+export default new Polls();

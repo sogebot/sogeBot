@@ -22,6 +22,11 @@ import oauth from './oauth';
 import events from './events';
 import customvariables from './customvariables';
 import panel from './panel';
+import clips from './overlays/clips';
+import tmi from './tmi';
+import emotes from './overlays/emotes';
+import custom_variables from './widgets/custom_variables';
+import currency from './currency';
 
 class Events extends Core {
   public timeouts: { [x: string]: NodeJS.Timeout } = {};
@@ -214,7 +219,7 @@ class Events extends Core {
   public async fireCreateAClipAndPlayReplay(operation, attributes) {
     const cid = await events.fireCreateAClip(operation, attributes);
     if (cid) { // clip created ok
-      global.overlays.clips.showClip(cid);
+      clips.showClip(cid);
     }
   }
 
@@ -223,7 +228,7 @@ class Events extends Core {
   }
 
   public async fireBotWillLeaveChannel(operation, attributes) {
-    global.tmi.part('bot');
+    tmi.part('bot');
     // force all users offline
     await getRepository(User).update({}, { isOnline: false });
   }
@@ -250,11 +255,11 @@ class Events extends Core {
   }
 
   public async fireEmoteExplosion(operation, attributes) {
-    global.overlays.emotes.explode(operation.emotesToExplode.split(' '));
+    emotes.explode(operation.emotesToExplode.split(' '));
   }
 
   public async fireEmoteFirework(operation, attributes) {
-    global.overlays.emotes.firework(operation.emotesToFirework.split(' '));
+    emotes.firework(operation.emotesToFirework.split(' '));
   }
 
   public async firePlaySound(operation, attributes) {
@@ -287,7 +292,7 @@ class Events extends Core {
       });
       await parse.process();
     } else {
-      global.tmi.message({
+      tmi.message({
         message: {
           tags: { username: oauth.broadcasterUsername , userId: oauth.broadcasterId},
           message: command,
@@ -310,7 +315,7 @@ class Events extends Core {
 
 
     let message = operation.messageToSend;
-    const atUsername = global.tmi.showWithAt;
+    const atUsername = tmi.showWithAt;
 
     attributes = flatten(attributes);
     for (const key of Object.keys(attributes).sort((a, b) => a.length - b.length)) {
@@ -356,8 +361,8 @@ class Events extends Core {
     await customvariables.setValueOf(customVariableName, currentValue, {});
 
     // Update widgets and titles
-    if (global.widgets.custom_variables.socket) {
-      global.widgets.custom_variables.socket.emit('refresh');
+    if (custom_variables.socket) {
+      custom_variables.socket.emit('refresh');
     }
 
     const regexp = new RegExp(`\\$_${customVariableName}`, 'ig');
@@ -381,8 +386,8 @@ class Events extends Core {
     await customvariables.setValueOf(customVariableName, currentValue, {});
 
     // Update widgets and titles
-    if (global.widgets.custom_variables.socket) {
-      global.widgets.custom_variables.socket.emit('refresh');
+    if (custom_variables.socket) {
+      custom_variables.socket.emit('refresh');
     }
     const regexp = new RegExp(`\\$_${customVariableName}`, 'ig');
     const title = api.rawStatus;
@@ -632,7 +637,7 @@ class Events extends Core {
         method: _.random(0, 1, false) === 0 ? 'Twitch Prime' : '',
         amount: _.random(0, 9999, true).toFixed(2),
         currency: _.sample(['CZK', 'USD', 'EUR']),
-        currencyInBot: global.currency.mainCurrency,
+        currencyInBot: currency.mainCurrency,
         amountInBotCurrency: _.random(0, 9999, true).toFixed(2),
       };
 

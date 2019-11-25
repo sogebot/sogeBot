@@ -28,5 +28,4 @@ class Stats extends Overlay {
   }
 }
 
-export default Stats;
-export { Stats };
+export default new Stats();

@@ -58,6 +58,5 @@ class Roulette extends Game {
   }
 }
 
-export default Roulette;
-export { Roulette };
+export default new Roulette();
 

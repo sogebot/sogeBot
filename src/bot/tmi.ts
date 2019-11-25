@@ -20,10 +20,15 @@ import { clusteredChatIn, clusteredWhisperIn, isMainThread, manageMessage } from
 
 import { getRepository } from 'typeorm';
 import { User, UserBit } from './database/entity/user';
+
 import events from './events';
 import api from './api';
 import users from './users';
 import oauth from './oauth';
+import joinpart from './widgets/joinpart';
+import tmi from './tmi';
+import alerts from './registries/alerts';
+import eventlist from './overlays/eventlist';
 
 class TMI extends Core {
   @settings('chat')
@@ -58,9 +63,9 @@ class TMI extends Core {
   async ignoreAdd (opts: Record<string, any>) {
     try {
       const username = new Expects(opts.parameters).username().toArray()[0].toLowerCase();
-      global.tmi.ignorelist = [
+      tmi.ignorelist = [
         ...new Set([
-          ...global.tmi.ignorelist,
+          ...tmi.ignorelist,
           username,
         ]
         )];
@@ -76,7 +81,7 @@ class TMI extends Core {
   async ignoreRm (opts: Record<string, any>) {
     try {
       const username = new Expects(opts.parameters).username().toArray()[0].toLowerCase();
-      global.tmi.ignorelist = global.tmi.ignorelist.filter(o => o !== username);
+      tmi.ignorelist = tmi.ignorelist.filter(o => o !== username);
       // update ignore list
       sendMessage(prepare('ignore.user.is.removed', { username }), opts.sender);
     } catch (e) {
@@ -192,7 +197,7 @@ class TMI extends Core {
       info(`TMI: ${type} is disconnected`);
       global.status.TMI = constants.DISCONNECTED;
       // go through all systems and trigger on.partChannel
-      for (const [/* type */, systems] of Object.entries({
+      /*for (const [/* type /, systems] of Object.entries({
         systems: global.systems,
         games: global.games,
         overlays: global.overlays,
@@ -209,13 +214,13 @@ class TMI extends Core {
             }
           }
         }
-      }
+      }*/
     });
     this.client[type].chat.on('RECONNECT', async (message) => {
       info(`TMI: ${type} is reconnecting`);
       global.status.TMI = constants.RECONNECTING;
       // go through all systems and trigger on.reconnectChannel
-      for (const [/* type */, systems] of Object.entries({
+      /*for (const [/* type, systems] of Object.entries({
         systems: global.systems,
         games: global.games,
         overlays: global.overlays,
@@ -232,13 +237,14 @@ class TMI extends Core {
             }
           }
         }
-      }
+      }*/
     });
     this.client[type].chat.on('CONNECTED', async (message) => {
       info(`TMI: ${type} is connected`);
       global.status.TMI = constants.CONNECTED;
       // go through all systems and trigger on.joinChannel
-      for (const [/* type */, systems] of Object.entries({
+      // TODO: rewrite triggers
+      /*for (const [type, systems] of Object.entries({
         systems: global.systems,
         games: global.games,
         overlays: global.overlays,
@@ -255,7 +261,7 @@ class TMI extends Core {
             }
           }
         }
-      }
+      }*/
     });
 
     if (type === 'bot') {
@@ -264,7 +270,7 @@ class TMI extends Core {
 
         if (!isBot(message.tags.username) || !message.isSelf) {
           message.tags['message-type'] = 'whisper';
-          global.tmi.message({message});
+          tmi.message({message});
           global.linesParsed++;
         }
       });
@@ -280,7 +286,7 @@ class TMI extends Core {
           } else {
             // strip message from ACTION
             message.message = message.message.replace('\u0001ACTION ', '').replace('\u0001', '');
-            global.tmi.message({message});
+            tmi.message({message});
             global.linesParsed++;
             triggerInterfaceOnMessage({
               sender: message.tags,
@@ -346,9 +352,9 @@ class TMI extends Core {
           timestamp: Date.now(),
         };
 
-        global.overlays.eventlist.add(data);
+        eventlist.add(data);
         events.fire('hosted', data);
-        global.registries.alerts.trigger({
+        alerts.trigger({
           event: 'hosts',
           name: username,
           amount: Number(viewers),
@@ -374,9 +380,9 @@ class TMI extends Core {
         timestamp: Date.now(),
       };
 
-      global.overlays.eventlist.add(data);
+      eventlist.add(data);
       events.fire('raid', data);
-      global.registries.alerts.trigger({
+      alerts.trigger({
         event: 'raids',
         name: message.parameters.login,
         amount: Number(message.parameters.viewerCount),
@@ -439,7 +445,7 @@ class TMI extends Core {
       user.subscribeStreak = 0;
       await getRepository(User).save(user);
 
-      global.overlays.eventlist.add({
+      eventlist.add({
         event: 'sub',
         tier: String(tier),
         username,
@@ -448,7 +454,7 @@ class TMI extends Core {
       });
       sub(`${username}#${userstate.userId}, tier: ${tier}`);
       events.fire('subscription', { username: username, method: (isNil(method.prime) && method.prime) ? 'Twitch Prime' : '', subCumulativeMonths, tier });
-      global.registries.alerts.trigger({
+      alerts.trigger({
         event: 'subs',
         name: username,
         amount: 0,
@@ -501,7 +507,7 @@ class TMI extends Core {
       user.subscribeStreak = subStreak;
       await getRepository(User).save(user);
 
-      global.overlays.eventlist.add({
+      eventlist.add({
         event: 'resub',
         tier: String(tier),
         username,
@@ -524,7 +530,7 @@ class TMI extends Core {
         subCumulativeMonthsName: getLocalizedName(subCumulativeMonths, 'core.months'),
         message: messageFromUser,
       });
-      global.registries.alerts.trigger({
+      alerts.trigger({
         event: 'resubs',
         name: username,
         amount: Number(subCumulativeMonths),
@@ -554,7 +560,7 @@ class TMI extends Core {
         return;
       }
 
-      global.overlays.eventlist.add({
+      eventlist.add({
         event: 'subcommunitygift',
         username,
         count,
@@ -562,7 +568,7 @@ class TMI extends Core {
       });
       events.fire('subcommunitygift', { username, count });
       subcommunitygift(`${username}#${userId}, to ${count} viewers`);
-      global.registries.alerts.trigger({
+      alerts.trigger({
         event: 'subgifts',
         name: username,
         amount: Number(count),
@@ -621,7 +627,7 @@ class TMI extends Core {
       user.subscribeStreak += 1;
       await getRepository(User).save(user);
 
-      global.overlays.eventlist.add({
+      eventlist.add({
         event: 'subgift',
         username: recipient,
         from: username,
@@ -654,7 +660,7 @@ class TMI extends Core {
         return;
       }
 
-      global.overlays.eventlist.add({
+      eventlist.add({
         event: 'cheer',
         username,
         bits: userstate.bits,
@@ -681,7 +687,7 @@ class TMI extends Core {
       getRepository(User).save(user);
 
       events.fire('cheer', { username, bits: userstate.bits, message: messageFromUser });
-      global.registries.alerts.trigger({
+      alerts.trigger({
         event: 'cheers',
         name: username,
         amount: Number(userstate.bits),
@@ -741,7 +747,7 @@ class TMI extends Core {
 
     if (!skip
         && sender['message-type'] === 'whisper'
-        && (global.tmi.whisperListener || isOwner(sender))) {
+        && (tmi.whisperListener || isOwner(sender))) {
       clusteredWhisperIn(`${message} [${sender.username}]`);
     } else if (!skip && !isBot(sender.username)) {
       clusteredChatIn(`${message} [${sender.username}]`);
@@ -767,7 +773,7 @@ class TMI extends Core {
         user.userId = Number(sender.userId);
         user.username = sender.username;
         if (!user.isOnline) {
-          global.widgets.joinpart.send({ users: [sender.username], type: 'join' });
+          joinpart.send({ users: [sender.username], type: 'join' });
         }
         user.isOnline = true;
         user.isVIP = typeof sender.badges.vip !== 'undefined';
@@ -817,5 +823,4 @@ class TMI extends Core {
   }
 }
 
-export default TMI;
-export { TMI };
+export default new TMI();

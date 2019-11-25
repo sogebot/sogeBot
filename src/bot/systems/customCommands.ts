@@ -22,6 +22,8 @@ import { addToViewersCache, getfromViewersCache } from '../helpers/permissions';
 import api from '../api';
 import permissions from '../permissions';
 import { translate } from '../translate';
+import tmi from '../tmi';
+import ranks from './ranks';
 
 /*
  * !command                                                                 - gets an info about command usage
@@ -294,7 +296,7 @@ class CustomCommands extends System {
         const permission = await permissions.get(r.permission);
         const response = await prepare('customcmds.response', { command, index: ++r.order, response: r.response, after: r.stopIfExecuted ? '_' : 'v', permission: permission?.name ?? 'n/a' });
         chatOut(`${response} [${opts.sender.username}]`);
-        message(global.tmi.sendWithMe ? 'me' : 'say', getOwner(), response);
+        message(tmi.sendWithMe ? 'me' : 'say', getOwner(), response);
       }
     }
   }
@@ -382,8 +384,8 @@ class CustomCommands extends System {
       await getRepository(User).save($userObject);
     }
     let $rank: string | null = null;
-    if (global.systems.ranks.enabled) {
-      $rank = await global.systems.ranks.get($userObject);
+    if (ranks.enabled) {
+      $rank = await ranks.get($userObject);
     }
 
     const $is = {
@@ -427,5 +429,4 @@ class CustomCommands extends System {
   }
 }
 
-export default CustomCommands;
-export { CustomCommands };
+export default new CustomCommands();

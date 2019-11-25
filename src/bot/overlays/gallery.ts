@@ -64,5 +64,4 @@ class Gallery extends Overlay {
   }
 }
 
-export default Gallery;
-export { Gallery };
+export default new Gallery();

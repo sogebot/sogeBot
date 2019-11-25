@@ -14,6 +14,7 @@ import { getConnection, getRepository } from 'typeorm';
 import Widget from './widgets/_interface';
 import oauth from './oauth';
 import translateLib, { translate } from './translate';
+import tmi from './tmi';
 
 class General extends Core {
   @settings('general')
@@ -60,7 +61,7 @@ class General extends Core {
     };
 
     const lang = this.lang;
-    const mute = global.tmi.mute;
+    const mute = tmi.mute;
 
     const enabledSystems: any = {};
     for (const category of ['systems', 'games', 'integrations']) {

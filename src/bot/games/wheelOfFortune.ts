@@ -59,5 +59,4 @@ class WheelOfFortune extends Game {
   }
 }
 
-export default WheelOfFortune;
-export { WheelOfFortune };
+export default new WheelOfFortune();

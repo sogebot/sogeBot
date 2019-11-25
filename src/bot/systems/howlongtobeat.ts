@@ -117,5 +117,4 @@ class HowLongToBeat extends System {
   }
 }
 
-export default HowLongToBeat;
-export { HowLongToBeat };
+export default new HowLongToBeat();

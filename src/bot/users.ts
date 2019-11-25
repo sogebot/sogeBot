@@ -12,6 +12,7 @@ import { User, UserBit, UserTip } from './database/entity/user';
 import permissions from './permissions';
 import oauth from './oauth';
 import api from './api';
+import currency from './currency';
 
 class Users extends Core {
   uiSortCache: string | null = null;
@@ -172,7 +173,7 @@ class Users extends Core {
       try {
         // recount sortAmount
         for (const tip of viewer.tips) {
-          tip.sortAmount = global.currency.exchange(Number(tip.amount), tip.currency, 'EUR');
+          tip.sortAmount = currency.exchange(Number(tip.amount), tip.currency, 'EUR');
         }
         await getRepository(User).save(viewer);
         cb();
@@ -255,7 +256,7 @@ class Users extends Core {
 
       for (const viewer of viewers) {
         // recount sumTips to bot currency
-        viewer.sumTips = await global.currency.exchange(viewer.sumTips, 'EUR', global.currency.mainCurrency);
+        viewer.sumTips = await currency.exchange(viewer.sumTips, 'EUR', currency.mainCurrency);
       }
 
       cb(viewers, count, opts.state);
@@ -292,7 +293,7 @@ class Users extends Core {
       });
 
       if (viewer) {
-        const aggregatedTips = viewer.tips.map((o) => global.currency.exchange(o.amount, o.currency, global.currency.mainCurrency)).reduce((a, b) => a + b, 0);
+        const aggregatedTips = viewer.tips.map((o) => currency.exchange(o.amount, o.currency, currency.mainCurrency)).reduce((a, b) => a + b, 0);
         const aggregatedBits = viewer.bits.map((o) => Number(o.amount)).reduce((a, b) => a + b, 0);
 
         const permId = await permissions.getUserHighestPermission(userId);

@@ -10,5 +10,4 @@ class ResponsiveVoice extends Integration {
   key = '';
 }
 
-export default ResponsiveVoice;
-export { ResponsiveVoice };
+export default new ResponsiveVoice();

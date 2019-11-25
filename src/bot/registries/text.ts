@@ -53,5 +53,4 @@ class Text extends Registry {
   }
 }
 
-export default Text;
-export { Text };
+export default new Text();

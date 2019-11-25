@@ -11,6 +11,7 @@ import { warning } from './helpers/log';
 import { getRepository } from 'typeorm';
 import { Translation } from './database/entity/translation';
 import panel from './panel';
+import general from './general';
 
 class Translate {
   custom: any[] = [];
@@ -24,7 +25,7 @@ class Translate {
   async _load () {
     this.custom = await getRepository(Translation).find();
     return new Promise(async (resolve, reject) => {
-      this.lang = global.general.lang;
+      this.lang = general.lang;
       glob('./locales/**', (err, files) => {
         if (err) {
           reject(err);

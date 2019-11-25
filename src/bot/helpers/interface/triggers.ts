@@ -24,6 +24,7 @@ export function triggerInterfaceOnBit(opts: Omit<onEventTip, 'currency'>) {
 function trigger(opts: onEventMessage | onEventSub | onEventBit | onEventTip | onEventFollow) {
   const on_trigger = getFunctionNameFromStackTrace().replace('triggerInterfaceOn', '').toLowerCase();
   debug('trigger', `event ${on_trigger}`);
+  /*
   for (const system of [
     ...Object.values(global.systems),
     ...Object.values(global.games),
@@ -42,4 +43,5 @@ function trigger(opts: onEventMessage | onEventSub | onEventBit | onEventTip | o
       }
     }
   }
+  */
 }

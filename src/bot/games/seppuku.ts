@@ -29,6 +29,5 @@ class Seppuku extends Game {
   }
 }
 
-export default Seppuku;
-export { Seppuku };
+export default new Seppuku();
 

@@ -239,5 +239,4 @@ class Ranks extends System {
   }
 }
 
-export default Ranks;
-export { Ranks };
+export default new Ranks();

@@ -11,6 +11,8 @@ import { User, UserTip } from '../database/entity/user';
 import users from '../users.js';
 import api from '../api.js';
 import events from '../events.js';
+import alerts from '../registries/alerts.js';
+import eventlist from '../overlays/eventlist.js';
 
 class Qiwi extends Integration {
   interval: any = null;
@@ -82,7 +84,7 @@ class Qiwi extends Integration {
       const newTip = new UserTip();
       newTip.amount = Number(amount);
       newTip.currency = currency;
-      newTip.sortAmount = global.currency.exchange(Number(amount), currency, 'EUR');
+      newTip.sortAmount = currency.exchange(Number(amount), currency, 'EUR');
       newTip.message = message;
       newTip.tippedAt = Date.now();
 
@@ -92,10 +94,10 @@ class Qiwi extends Integration {
       }
 
       if (api.isStreamOnline) {
-        api.stats.currentTips += parseFloat(global.currency.exchange(amount, currency, global.currency.mainCurrency));
+        api.stats.currentTips += parseFloat(currency.exchange(amount, currency, currency.mainCurrency));
       }
 
-      global.overlays.eventlist.add({
+      eventlist.add({
         event: 'tip',
         amount,
         currency,
@@ -110,12 +112,12 @@ class Qiwi extends Integration {
         username: username || 'Anonymous',
         amount,
         currency,
-        amountInBotCurrency: parseFloat(global.currency.exchange(amount, currency, global.currency.mainCurrency)).toFixed(2),
-        currencyInBot: global.currency.mainCurrency,
+        amountInBotCurrency: parseFloat(currency.exchange(amount, currency, currency.mainCurrency)).toFixed(2),
+        currencyInBot: currency.mainCurrency,
         message,
       });
 
-      global.registries.alerts.trigger({
+      alerts.trigger({
         event: 'tips',
         name: username || 'Anonymous',
         amount,
@@ -138,5 +140,4 @@ class Qiwi extends Integration {
   }
 }
 
-export default Qiwi;
-export { Qiwi };
+export default new Qiwi();

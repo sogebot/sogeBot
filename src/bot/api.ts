@@ -27,6 +27,10 @@ import twitch from './twitch';
 import customvariables from './customvariables';
 import { translate } from './translate';
 import panel from './panel';
+import joinpart from './widgets/joinpart';
+import webhooks from './webhooks';
+import alerts from './registries/alerts';
+import eventlist from './overlays/eventlist';
 
 const setImmediateAwait = () => {
   return new Promise(resolve => {
@@ -351,7 +355,7 @@ class API extends Core {
     if (typeof event === 'undefined') {
       const { modStatus, partedUsers, joinedUsers } = await getChannelChattersUnofficialAPI();
 
-      global.widgets.joinpart.send({ users: partedUsers, type: 'part' });
+      joinpart.send({ users: partedUsers, type: 'part' });
       for (const username of partedUsers) {
         if (!isIgnored({ username: username })) {
           await setImmediateAwait();
@@ -359,7 +363,7 @@ class API extends Core {
         }
       }
 
-      global.widgets.joinpart.send({ users: joinedUsers, type: 'join' });
+      joinpart.send({ users: joinedUsers, type: 'join' });
       for (const username of joinedUsers) {
         if (isIgnored({ username }) || oauth.botUsername === username) {
           continue;
@@ -385,7 +389,7 @@ class API extends Core {
     }
 
     const token = oauth.botAccessToken;
-    const needToWait = isNil(global.overlays) || token === '';
+    const needToWait = token === '';
     const notEnoughAPICalls = this.calls.bot.remaining <= 30 && this.calls.bot.refresh > Date.now() / 1000;
 
     if (needToWait || notEnoughAPICalls) {
@@ -464,7 +468,7 @@ class API extends Core {
     } // start at -1 because owner is subbed as well
 
     const token = oauth.broadcasterAccessToken;
-    const needToWait = isNil(cid) || cid === '' || isNil(global.overlays) || token === '';
+    const needToWait = isNil(cid) || cid === '' || token === '';
     const notEnoughAPICalls = this.calls.bot.remaining <= 30 && this.calls.bot.refresh > Date.now() / 1000;
 
     if (needToWait || notEnoughAPICalls || oauth.broadcasterType === '') {
@@ -573,7 +577,7 @@ class API extends Core {
     const url = `https://api.twitch.tv/kraken/channels/${cid}`;
 
     const token = await oauth.botAccessToken;
-    const needToWait = isNil(cid) || cid === '' || isNil(global.overlays) || token === '';
+    const needToWait = isNil(cid) || cid === '' || token === '';
     if (needToWait) {
       return { state: false, opts };
     }
@@ -681,7 +685,7 @@ class API extends Core {
     const url = `https://api.twitch.tv/helix/users/?id=${cid}`;
 
     const token = await oauth.botAccessToken;
-    const needToWait = isNil(cid) || cid === '' || isNil(global.overlays) || token === '';
+    const needToWait = isNil(cid) || cid === '' || token === '';
     const notEnoughAPICalls = this.calls.bot.remaining <= 30 && this.calls.bot.refresh > Date.now() / 1000;
     if (needToWait || notEnoughAPICalls) {
       return { state: false };
@@ -725,7 +729,7 @@ class API extends Core {
     const cid = oauth.channelId;
     const url = `https://api.twitch.tv/helix/users/follows?to_id=${cid}&first=100`;
     const token = await oauth.botAccessToken;
-    const needToWait = isNil(cid) || cid === '' || isNil(global.overlays) || token === '';
+    const needToWait = isNil(cid) || cid === '' || token === '';
     const notEnoughAPICalls = this.calls.bot.remaining <= 30 && this.calls.bot.refresh > Date.now() / 1000;
 
     if (needToWait || notEnoughAPICalls) {
@@ -766,9 +770,9 @@ class API extends Core {
 
           if (!user.isFollower) {
             if (new Date().getTime() - new Date(f.followed_at).getTime() < 2 * constants.HOUR) {
-              if (user.followedAt === 0 || new Date().getTime() - user.followedAt > 60000 * 60 && !global.webhooks.existsInCache('follow', user.userId)) {
-                global.webhooks.addIdToCache('follow', f.from_id);
-                global.overlays.eventlist.add({
+              if (user.followedAt === 0 || new Date().getTime() - user.followedAt > 60000 * 60 && !webhooks.existsInCache('follow', user.userId)) {
+                webhooks.addIdToCache('follow', f.from_id);
+                eventlist.add({
                   event: 'follow',
                   username: user.username,
                   timestamp: Date.now(),
@@ -776,7 +780,7 @@ class API extends Core {
                 if (!quiet && !isBot(user.username)) {
                   follow(user.username);
                   events.fire('follow', { username: user.username, userId: f.from_id });
-                  global.registries.alerts.trigger({
+                  alerts.trigger({
                     event: 'follows',
                     name: user.username,
                     amount: 0,
@@ -889,7 +893,7 @@ class API extends Core {
     const url = `https://api.twitch.tv/helix/streams/tags?broadcaster_id=${cid}`;
 
     const token = await oauth.botAccessToken;
-    const needToWait = isNil(cid) || cid === '' || isNil(global.overlays) || token === '';
+    const needToWait = isNil(cid) || cid === '' || token === '';
     const notEnoughAPICalls = this.calls.bot.remaining <= 30 && this.calls.bot.refresh > Date.now() / 1000;
     if (needToWait || notEnoughAPICalls) {
       return { state: false, opts };
@@ -938,7 +942,7 @@ class API extends Core {
     const url = `https://api.twitch.tv/helix/streams?user_id=${cid}`;
 
     const token = await oauth.botAccessToken;
-    const needToWait = isNil(cid) || cid === '' || isNil(global.overlays) || token === '';
+    const needToWait = isNil(cid) || cid === '' || token === '';
     const notEnoughAPICalls = this.calls.bot.remaining <= 30 && this.calls.bot.refresh > Date.now() / 1000;
     if (needToWait || notEnoughAPICalls) {
       return { state: false, opts };
@@ -977,7 +981,7 @@ class API extends Core {
         if (!this.isStreamOnline || this.streamType !== stream.type) {
           this.chatMessagesAtStart = global.linesParsed;
 
-          if (!global.webhooks.enabled.streams && Number(this.streamId) !== Number(stream.id)) {
+          if (!webhooks.enabled.streams && Number(this.streamId) !== Number(stream.id)) {
             debug('api.stream', 'API: ' + JSON.stringify(stream));
             start(
               `id: ${stream.id} | startedAt: ${stream.started_at} | title: ${stream.title} | game: ${await this.getGameFromId(stream.game_id)} | type: ${stream.type} | channel ID: ${cid}`
@@ -1002,7 +1006,7 @@ class API extends Core {
             justStarted = true;
 
             // go through all systems and trigger on.streamStart
-            for (const [/* type */, systems] of Object.entries({
+            /*for (const [/* type *, systems] of Object.entries({
               systems: global.systems,
               games: global.games,
               overlays: global.overlays,
@@ -1019,7 +1023,7 @@ class API extends Core {
                   }
                 }
               }
-            }
+            }*/
           }
         }
 
@@ -1075,7 +1079,7 @@ class API extends Core {
             events.fire('number-of-viewers-is-at-least-x', { reset: true });
 
             // go through all systems and trigger on.streamEnd
-            for (const [, systems] of Object.entries({
+            /*for (const [, systems] of Object.entries({
               systems: global.systems,
               games: global.games,
               overlays: global.overlays,
@@ -1092,7 +1096,7 @@ class API extends Core {
                   }
                 }
               }
-            }
+            }*/
 
             this.streamId = null;
           }
@@ -1176,7 +1180,7 @@ class API extends Core {
     const url = `https://api.twitch.tv/helix/streams/tags?broadcaster_id=${cid}`;
 
     const token = await oauth.botAccessToken;
-    const needToWait = isNil(cid) || cid === '' || isNil(global.overlays) || token === '';
+    const needToWait = isNil(cid) || cid === '' || token === '';
     if (needToWait) {
       setTimeout(() => this.setTags(sender, tagsArg), 1000);
       return;
@@ -1235,7 +1239,7 @@ class API extends Core {
     const url = `https://api.twitch.tv/kraken/channels/${cid}`;
 
     const token = await oauth.botAccessToken;
-    const needToWait = isNil(cid) || cid === '' || isNil(global.overlays) || token === '';
+    const needToWait = isNil(cid) || cid === '' || token === '';
     if (needToWait) {
       setTimeout(() => this.setTitleAndGame(sender, args), 1000);
       return;
@@ -1449,7 +1453,7 @@ class API extends Core {
     const url = `https://api.twitch.tv/helix/clips?broadcaster_id=${cid}`;
 
     const token = await oauth.botAccessToken;
-    const needToWait = isNil(cid) || cid === '' || isNil(global.overlays) || token === '';
+    const needToWait = isNil(cid) || cid === '' || token === '';
     const notEnoughAPICalls = this.calls.bot.remaining <= 30 && this.calls.bot.refresh > Date.now() / 1000;
     if (needToWait || notEnoughAPICalls) {
       setTimeout(() => this.createClip(opts), 1000);
@@ -1554,7 +1558,7 @@ class API extends Core {
     const url = `https://api.twitch.tv/helix/users/follows?from_id=${id}&to_id=${cid}`;
 
     const token = await oauth.botAccessToken;
-    const needToWait = isNil(cid) || cid === '' || (isNil(global.overlays) && isMainThread) || token === '';
+    const needToWait = isNil(cid) || cid === '' || isMainThread || token === '';
     const notEnoughAPICalls = this.calls.bot.remaining <= 40 && this.calls.bot.refresh > Date.now() / 1000;
     if (needToWait || notEnoughAPICalls) {
       this.timeouts['isFollowerUpdate-' + id] = setTimeout(() => this.isFollowerUpdate(user), 1000);
@@ -1606,14 +1610,14 @@ class API extends Core {
     } else {
       // is follower
       if (!user.isFollower && new Date().getTime() - new Date(request.data.data[0].followed_at).getTime() < 60000 * 60) {
-        global.overlays.eventlist.add({
+        eventlist.add({
           event: 'follow',
           username: user.username,
           timestamp: Date.now(),
         });
         follow(user.username);
         events.fire('follow', { username: user.username, userId: id });
-        global.registries.alerts.trigger({
+        alerts.trigger({
           event: 'follows',
           name: user.username,
           amount: 0,

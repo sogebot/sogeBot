@@ -13,6 +13,7 @@ import { clusteredChatOut, clusteredClientChat, clusteredClientTimeout, clustere
 import { User } from './database/entity/user';
 import oauth from './oauth';
 import { translate } from './translate';
+import tmi from './tmi';
 
 export async function autoLoad(directory): Promise<{ [x: string]: any }> {
   const directoryListing = readdirSync(directory);
@@ -33,14 +34,14 @@ export async function autoLoad(directory): Promise<{ [x: string]: any }> {
 }
 
 export function getIgnoreList() {
-  return global.tmi.ignorelist.map((o) => {
+  return tmi.ignorelist.map((o) => {
     return typeof o === 'string' ? o.trim().toLowerCase() : o;
   });
 }
 
 export function getGlobalIgnoreList() {
   return Object.keys(globalIgnoreList)
-    .filter(o => !global.tmi.globalIgnoreListExclude.includes(o))
+    .filter(o => !tmi.globalIgnoreListExclude.includes(o))
     .map(o => {
       return { id: o, ...globalIgnoreList[o] };
     });
@@ -75,9 +76,9 @@ export async function prepare(toTranslate: string, attr?: {[x: string]: any }): 
     let value = attr[key];
     if (['username', 'who', 'winner', 'sender', 'loser'].includes(key)) {
       if (typeof value.username !== 'undefined') {
-        value = global.tmi.showWithAt ? `@${value.username}` : value.username;
+        value = tmi.showWithAt ? `@${value.username}` : value.username;
       } else {
-        value = global.tmi.showWithAt ? `@${value}` : value;
+        value = tmi.showWithAt ? `@${value}` : value;
       }
     }
     msg = msg.replace(new RegExp('[$]' + key, 'g'), value);
@@ -141,8 +142,8 @@ export async function sendMessage(messageToSend: string | Promise<string>, sende
   } // we don't want to reply on bot commands
 
   if (sender) {
-    messageToSend = !_.isNil(sender.username) ? messageToSend.replace(/\$sender/g, (global.tmi.showWithAt ? '@' : '') + sender.username) : messageToSend;
-    if (!global.tmi.mute || attr.force) {
+    messageToSend = !_.isNil(sender.username) ? messageToSend.replace(/\$sender/g, (tmi.showWithAt ? '@' : '') + sender.username) : messageToSend;
+    if (!tmi.mute || attr.force) {
       if ((!_.isNil(attr.quiet) && attr.quiet)) {
         return true;
       }
@@ -151,7 +152,7 @@ export async function sendMessage(messageToSend: string | Promise<string>, sende
         message('whisper', sender.username, messageToSend);
       } else {
         clusteredChatOut(`${messageToSend} [${sender.username}]`);
-        if (global.tmi.sendWithMe && !messageToSend.startsWith('/')) {
+        if (tmi.sendWithMe && !messageToSend.startsWith('/')) {
           message('me', null, messageToSend);
         } else {
           message('say', null, messageToSend);

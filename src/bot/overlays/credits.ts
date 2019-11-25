@@ -7,6 +7,7 @@ import { getManager } from 'typeorm';
 import { EventList } from '../database/entity/eventList';
 import api from '../api';
 import oauth from '../oauth';
+import currency from '../currency';
 
 class Credits extends Overlay {
   @settings('credits')
@@ -114,9 +115,9 @@ class Credits extends Overlay {
         if (event.values) {
           if (!_.isNil(event.values.amount) && !_.isNil(event.values.currency)) {
             event.values.amount = this.cCreditsAggregated
-              ? global.currency.exchange(event.values.amount, event.values.currency, global.currency.mainCurrency)
+              ? currency.exchange(event.values.amount, event.values.currency, currency.mainCurrency)
               : event.values.amount;
-            event.values.currency = global.currency.symbol(this.cCreditsAggregated ? global.currency.mainCurrency : event.values.currency);
+            event.values.currency = currency.symbol(this.cCreditsAggregated ? currency.mainCurrency : event.values.currency);
           }
         }
       }
@@ -167,5 +168,4 @@ class Credits extends Overlay {
   }
 }
 
-export default Credits;
-export { Credits };
+export default new Credits();

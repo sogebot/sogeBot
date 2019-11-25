@@ -41,5 +41,4 @@ class Clips extends Overlay {
   }
 }
 
-export default Clips;
-export { Clips };
+export default new Clips();

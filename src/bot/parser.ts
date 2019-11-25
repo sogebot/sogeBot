@@ -11,6 +11,9 @@ import events from './events';
 import users from './users';
 import twitch from './twitch';
 import { translate } from './translate';
+import currency from './currency';
+import general from './general';
+import tmi from './tmi';
 
 class Parser {
   started_at = Date.now();
@@ -123,14 +126,15 @@ class Parser {
 
   populateList () {
     const list = [
-      global.currency,
+      currency,
       events,
       users,
       permissions,
       twitch,
-      global.general,
-      global.tmi,
+      general,
+      tmi,
     ];
+    /*
     for (const system of Object.entries(global.systems)) {
       list.push(system[1]);
     }
@@ -143,6 +147,7 @@ class Parser {
     for (const integration of Object.entries(global.integrations)) {
       list.push(integration[1]);
     }
+    */
     return list;
   }
 

@@ -11,6 +11,7 @@ import { User } from '../database/entity/user';
 import { Duel as DuelEntity } from '../database/entity/duel';
 import oauth from '../oauth';
 import { translate } from '../translate';
+import points from '../systems/points';
 
 const ERROR_NOT_ENOUGH_OPTIONS = '0';
 const ERROR_ZERO_BET = '1';
@@ -80,10 +81,10 @@ class Duel extends Game {
       const probability = winnerUser.tickets / (total / 100);
 
       const m = await prepare(_.size(users) === 1 ? 'gambling.duel.noContestant' : 'gambling.duel.winner', {
-        pointsName: await global.systems.points.getPointsName(total),
+        pointsName: await points.getPointsName(total),
         points: total,
         probability: _.round(probability, 2),
-        ticketsName: await global.systems.points.getPointsName(winnerUser.tickets),
+        ticketsName: await points.getPointsName(winnerUser.tickets),
         tickets: winnerUser.tickets,
         winner: winnerUser.username,
       });
@@ -116,7 +117,7 @@ class Duel extends Game {
       prepare('gambling.duel.bank', {
         command: this.getCommand('!duel'),
         points: bank,
-        pointsName: await global.systems.points.getPointsName(bank),
+        pointsName: await points.getPointsName(bank),
       }), opts.sender);
   }
 
@@ -131,13 +132,13 @@ class Duel extends Game {
         throw Error(ERROR_NOT_ENOUGH_OPTIONS);
       }
 
-      const points = await global.systems.points.getPointsOf(opts.sender.userId);
-      bet = parsed[1] === 'all' ? points : parsed[1];
+      const pointsOfUser = await points.getPointsOf(opts.sender.userId);
+      bet = parsed[1] === 'all' ? pointsOfUser : parsed[1];
 
-      if (points === 0) {
+      if (pointsOfUser === 0) {
         throw Error(ERROR_ZERO_BET);
       }
-      if (points < bet) {
+      if (pointsOfUser < bet) {
         throw Error(ERROR_NOT_ENOUGH_POINTS);
       }
       if (bet < (this.minimalBet)) {
@@ -192,7 +193,7 @@ class Duel extends Game {
       const tickets = (await getRepository(DuelEntity).findOne({ id: opts.sender.userId }))?.tickets ?? 0;
       global.setTimeout(async () => {
         message = await prepare(isNewDuelist ? 'gambling.duel.joined' : 'gambling.duel.added', {
-          pointsName: await global.systems.points.getPointsName(tickets),
+          pointsName: await points.getPointsName(tickets),
           points: tickets,
         });
         sendMessage(message, opts.sender, opts.attr);
@@ -205,13 +206,13 @@ class Duel extends Game {
           break;
         case ERROR_ZERO_BET:
           message = await prepare('gambling.duel.zeroBet', {
-            pointsName: await global.systems.points.getPointsName(0),
+            pointsName: await points.getPointsName(0),
           });
           sendMessage(message, opts.sender, opts.attr);
           break;
         case ERROR_NOT_ENOUGH_POINTS:
           message = await prepare('gambling.duel.notEnoughPoints', {
-            pointsName: await global.systems.points.getPointsName(bet),
+            pointsName: await points.getPointsName(bet),
             points: bet,
           });
           sendMessage(message, opts.sender, opts.attr);
@@ -219,7 +220,7 @@ class Duel extends Game {
         case ERROR_MINIMAL_BET:
           bet = this.minimalBet;
           message = await prepare('gambling.duel.lowerThanMinimalBet', {
-            pointsName: await global.systems.points.getPointsName(bet),
+            pointsName: await points.getPointsName(bet),
             points: bet,
             command: opts.command,
           });
@@ -233,5 +234,4 @@ class Duel extends Game {
   }
 }
 
-export default Duel;
-export { Duel };
+export default new Duel();

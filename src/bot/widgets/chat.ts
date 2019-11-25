@@ -46,5 +46,4 @@ class Chat extends Widget {
   }
 }
 
-export default Chat;
-export { Chat };
+export default new Chat();

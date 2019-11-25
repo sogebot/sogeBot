@@ -31,5 +31,4 @@ class ClipsCarousel extends Overlay {
   }
 }
 
-export default ClipsCarousel;
-export { ClipsCarousel };
+export default new ClipsCarousel();

@@ -19,6 +19,8 @@ import users from './users';
 import api from './api';
 import permissions from './permissions';
 import panel from './panel';
+import custom_variables from './widgets/custom_variables';
+import currency from './currency';
 
 class CustomVariables {
   timeouts: {
@@ -275,7 +277,7 @@ class CustomVariables {
         currentSubscribers: api.stats.currentSubscribers,
         currentBits: api.stats.currentBits,
         currentTips: api.stats.currentTips,
-        currency: global.currency.symbol(global.currency.mainCurrency),
+        currency: currency.symbol(currency.mainCurrency),
         chatMessages: (api.isStreamOnline) ? global.linesParsed - api.chatMessagesAtStart : 0,
         currentFollowers: api.stats.currentFollowers,
         currentViews: api.stats.currentViews,
@@ -462,8 +464,8 @@ class CustomVariables {
   }
 
   async updateWidgetAndTitle (variable: string | null = null) {
-    if (global.widgets?.custom_variables.socket) {
-      global.widgets?.custom_variables.socket.emit('refresh');
+    if (custom_variables.socket) {
+      custom_variables.socket.emit('refresh');
     }; // send update to widget
 
     if (isNil(variable)) {

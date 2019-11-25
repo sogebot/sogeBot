@@ -10,6 +10,7 @@ import { getRepository } from 'typeorm';
 import { User } from '../database/entity/user';
 import { Queue as QueueEntity } from '../database/entity/queue';
 import { translate } from '../translate';
+import tmi from '../tmi';
 
 /*
  * !queue                            - gets an info whether queue is opened or closed
@@ -201,7 +202,7 @@ class Queue extends System {
       this.pickedUsers.push(user);
     }
 
-    const atUsername = global.tmi.showWithAt;
+    const atUsername = tmi.showWithAt;
 
     let msg;
     switch (users.length) {
@@ -223,7 +224,7 @@ class Queue extends System {
   @default_permission(permission.CASTERS)
   async list (opts) {
     const [atUsername, users] = await Promise.all([
-      global.tmi.showWithAt,
+      tmi.showWithAt,
       getRepository(QueueEntity).find(),
     ]);
     const queueList = users.map(o => atUsername ? `@${o.username}` : o).join(', ');
@@ -233,5 +234,4 @@ class Queue extends System {
   }
 }
 
-export default Queue;
-export { Queue };
+export default new Queue();

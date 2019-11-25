@@ -53,7 +53,7 @@ function Panel () {
 
   // highlights system
   app.get('/highlights/:id', (req, res) => {
-    global.systems.highlights.url(req, res)
+    highlights.url(req, res)
   })
 
   // customvariables system
@@ -284,10 +284,10 @@ function Panel () {
       cb(null)
     })
     socket.on('joinBot', async () => {
-      global.tmi.join('bot', global.tmi.channel)
+      tmi.join('bot', tmi.channel)
     })
     socket.on('leaveBot', async () => {
-      global.tmi.part('bot')
+      tmi.part('bot')
       // force all users offline
       await getRepository(User).update({}, { isOnline: false });
     })
@@ -552,15 +552,15 @@ Panel.prototype.registerSockets = util.deprecate(function (options) {
 Panel.prototype.sendStreamData = async function (self, socket) {
   try {
     if (typeof global.systems === 'undefined'
-        || typeof global.systems.songs === 'undefined'
+        || typeof songs === 'undefined'
         || typeof global.integrations === 'undefined'
-        || typeof global.integrations.spotify === 'undefined') {
+        || typeof spotify === 'undefined') {
       return
     }
 
-    const ytCurrentSong = Object.values(global.systems.songs.isPlaying).find(o => o) ? _.get(JSON.parse(global.systems.songs.currentSong), 'title', null) : null;
-    let spotifyCurrentSong = _.get(JSON.parse(global.integrations.spotify.currentSong), 'song', '') + ' - ' + _.get(JSON.parse(global.integrations.spotify.currentSong), 'artist', '');
-    if (spotifyCurrentSong.trim().length === 1 /* '-' */  || !_.get(JSON.parse(global.integrations.spotify.currentSong), 'is_playing', false)) {
+    const ytCurrentSong = Object.values(songs.isPlaying).find(o => o) ? _.get(JSON.parse(songs.currentSong), 'title', null) : null;
+    let spotifyCurrentSong = _.get(JSON.parse(spotify.currentSong), 'song', '') + ' - ' + _.get(JSON.parse(spotify.currentSong), 'artist', '');
+    if (spotifyCurrentSong.trim().length === 1 /* '-' */  || !_.get(JSON.parse(spotify.currentSong), 'is_playing', false)) {
       spotifyCurrentSong = null;
     }
 
@@ -600,7 +600,7 @@ Panel.prototype.sendStreamData = async function (self, socket) {
       currentSubscribers: api.stats.currentSubscribers,
       currentBits: api.stats.currentBits,
       currentTips: api.stats.currentTips,
-      currency: global.currency.symbol(global.currency.mainCurrency),
+      currency: currency.symbol(currency.mainCurrency),
       chatMessages: api.isStreamOnline ? global.linesParsed - api.chatMessagesAtStart : 0,
       currentFollowers: api.stats.currentFollowers,
       currentViews: api.stats.currentViews,

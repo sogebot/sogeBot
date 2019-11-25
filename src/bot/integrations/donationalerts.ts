@@ -15,6 +15,9 @@ import { User, UserTip } from '../database/entity/user';
 import api from '../api.js';
 import events from '../events.js';
 import users from '../users.js';
+import eventlist from '../overlays/eventlist.js';
+import currency from '../currency';
+import alerts from '../registries/alerts.js';
 
 class Donationalerts extends Integration {
   socket: SocketIOClient.Socket | null = null;
@@ -86,7 +89,7 @@ class Donationalerts extends Integration {
           return;
         }
         const additionalData = JSON.parse(data.additional_data);
-        global.overlays.eventlist.add({
+        eventlist.add({
           event: 'tip',
           amount: data.amount,
           currency: data.currency,
@@ -101,11 +104,11 @@ class Donationalerts extends Integration {
           username: data.username.toLowerCase(),
           amount: parseFloat(data.amount).toFixed(2),
           currency: data.currency,
-          amountInBotCurrency: parseFloat(global.currency.exchange(data.amount, data.currency, global.currency.mainCurrency)).toFixed(2),
-          currencyInBot: global.currency.mainCurrency,
+          amountInBotCurrency: Number(currency.exchange(data.amount, data.currency, currency.mainCurrency)).toFixed(2),
+          currencyInBot: currency.mainCurrency,
           message: data.message,
         });
-        global.registries.alerts.trigger({
+        alerts.trigger({
           event: 'tips',
           name: data.username.toLowerCase(),
           amount: Number(parseFloat(data.amount).toFixed(2)),
@@ -135,7 +138,7 @@ class Donationalerts extends Integration {
           const newTip = new UserTip();
           newTip.amount = Number(data.amount);
           newTip.currency = data.currency;
-          newTip.sortAmount = global.currency.exchange(Number(data.amount), data.currency, 'EUR');
+          newTip.sortAmount = currency.exchange(Number(data.amount), data.currency, 'EUR');
           newTip.message = data.message;
           newTip.tippedAt = Date.now();
 
@@ -147,7 +150,7 @@ class Donationalerts extends Integration {
           tip(`${data.username.toLowerCase()}${id ? '#' + id : ''}, amount: ${Number(data.amount).toFixed(2)}${data.currency}, message: ${data.message}`);
 
           if (api.isStreamOnline) {
-            api.stats.currentTips += parseFloat(global.currency.exchange(data.amount, data.currency, global.currency.mainCurrency));
+            api.stats.currentTips += Number(currency.exchange(data.amount, data.currency, currency.mainCurrency));
           }
         }
 
@@ -163,5 +166,4 @@ class Donationalerts extends Integration {
   }
 }
 
-export default Donationalerts;
-export { Donationalerts };
+export default new Donationalerts();

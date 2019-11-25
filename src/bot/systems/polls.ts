@@ -15,6 +15,7 @@ import { getRepository } from 'typeorm';
 import { Poll, PollVote } from '../database/entity/poll';
 import oauth from '../oauth';
 import { translate } from '../translate';
+import currency from '../currency';
 
 enum ERROR {
   NOT_ENOUGH_OPTIONS,
@@ -352,7 +353,7 @@ class Polls extends System {
           const vote = new PollVote();
           vote.poll = cVote;
           vote.option = i - 1;
-          vote.votes = Number(global.currency.exchange(opts.amount, opts.currency, global.currency.mainCurrency));
+          vote.votes = Number(currency.exchange(opts.amount, opts.currency, currency.mainCurrency));
           vote.votedBy = opts.username;
           // no update as we will not switch vote option as in normal vote
           await getRepository(PollVote).save(vote);
@@ -442,5 +443,4 @@ class Polls extends System {
   }
 }
 
-export default Polls;
-export { Polls };
+export default new Polls();

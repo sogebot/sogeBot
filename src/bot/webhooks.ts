@@ -12,6 +12,8 @@ import api from './api';
 import events from './events';
 import oauth from './oauth';
 import ui from './ui';
+import alerts from './registries/alerts';
+import eventlist from './overlays/eventlist';
 
 class Webhooks {
   enabled = {
@@ -238,14 +240,14 @@ class Webhooks {
 
       if (!user.isFollower && (user.followedAt === 0 || Date.now() - user.followedAt > 60000 * 60)) {
         if (!isBot(data.from_name)) {
-          global.overlays.eventlist.add({
+          eventlist.add({
             event: 'follow',
             username: data.from_name,
             timestamp: Date.now(),
           });
           follow(data.from_name);
           events.fire('follow', { username: data.from_name, userId: data.from_id, webhooks: true });
-          global.registries.alerts.trigger({
+          alerts.trigger({
             event: 'follows',
             name: data.from_name,
             amount: 0,
@@ -346,5 +348,4 @@ class Webhooks {
   }
 }
 
-export default Webhooks;
-export { Webhooks };
+export default new Webhooks();

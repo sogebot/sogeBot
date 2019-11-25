@@ -13,6 +13,9 @@ import { User, UserTip } from '../database/entity/user';
 import users from '../users';
 import api from '../api';
 import events from '../events';
+import currency from '../currency';
+import eventlist from '../overlays/eventlist';
+import alerts from '../registries/alerts';
 
 class Streamlabs extends Integration {
   socket: SocketIOClient.Socket | null = null;
@@ -91,7 +94,7 @@ class Streamlabs extends Integration {
           const newTip = new UserTip();
           newTip.amount = Number(event.amount);
           newTip.currency = event.currency;
-          newTip.sortAmount = global.currency.exchange(Number(event.amount), event.currency, 'EUR');
+          newTip.sortAmount = currency.exchange(Number(event.amount), event.currency, 'EUR');
           newTip.message = event.message;
           newTip.tippedAt = Date.now();
 
@@ -101,11 +104,11 @@ class Streamlabs extends Integration {
           }
 
           if (api.isStreamOnline) {
-            api.stats.currentTips += parseFloat(global.currency.exchange(event.amount, event.currency, global.currency.mainCurrency));
+            api.stats.currentTips += Number(currency.exchange(event.amount, event.currency, currency.mainCurrency));
           }
           tip(`${event.from.toLowerCase()}${id ? '#' + id : ''}, amount: ${Number(event.amount).toFixed(2)}${event.currency}, message: ${event.message}`);
         }
-        global.overlays.eventlist.add({
+        eventlist.add({
           event: 'tip',
           amount: event.amount,
           currency: event.currency,
@@ -117,11 +120,11 @@ class Streamlabs extends Integration {
           username: event.from.toLowerCase(),
           amount: parseFloat(event.amount).toFixed(2),
           currency: event.currency,
-          amountInBotCurrency: parseFloat(global.currency.exchange(event.amount, event.currency, global.currency.mainCurrency)).toFixed(2),
-          currencyInBot: global.currency.mainCurrency,
+          amountInBotCurrency: Number(currency.exchange(event.amount, event.currency, currency.mainCurrency)).toFixed(2),
+          currencyInBot: currency.mainCurrency,
           message: event.message,
         });
-        global.registries.alerts.trigger({
+        alerts.trigger({
           event: 'tips',
           name: event.from.toLowerCase(),
           amount: Number(parseFloat(event.amount).toFixed(2)),
@@ -143,5 +146,4 @@ class Streamlabs extends Integration {
   }
 }
 
-export default Streamlabs;
-export { Streamlabs };
+export default new Streamlabs();

@@ -6,7 +6,7 @@ if (Number(process.versions.node.split('.')[0]) < 11) {
 import 'reflect-metadata';
 import 'module-alias/register';
 
-import { error, info } from './helpers/log';
+import { error, info, warning } from './helpers/log';
 
 import { createConnection, getConnectionOptions } from 'typeorm';
 
@@ -29,6 +29,9 @@ global.status = { // TODO: move it?
 };
 
 import { changelog } from './changelog';
+import { autoLoad } from './commons';
+import panel from './panel';
+import chalk from 'chalk';
 
 const connect = async function () {
   const connectionOptions = await getConnectionOptions();
@@ -41,6 +44,7 @@ async function main () {
   if (isMainThread) {
     await connect();
   }
+  let translate;
   try {
     changelog();
 
@@ -56,7 +60,7 @@ async function main () {
     require('./panel');
     require('./twitch');
     require('./permissions');
-    require('./translate');
+    translate = require('./translate');
     require('./oauth');
     require('./webhooks');
     require('./api');
@@ -72,15 +76,14 @@ async function main () {
     verticalLayout: 'default',
   }));
   info('Bot is starting up');
-/*
-  global.lib.translate._load().then(async () => {
-    global.stats = await autoLoad('./dest/stats/');
-    global.registries = await autoLoad('./dest/registries/');
-    global.systems = await autoLoad('./dest/systems/');
-    global.widgets = await autoLoad('./dest/widgets/');
-    global.overlays = await autoLoad('./dest/overlays/');
-    global.games = await autoLoad('./dest/games/');
-    global.integrations = await autoLoad('./dest/integrations/');
+  translate._load().then(async () => {
+    await autoLoad('./dest/stats/');
+    await autoLoad('./dest/registries/');
+    await autoLoad('./dest/systems/');
+    await autoLoad('./dest/widgets/');
+    await autoLoad('./dest/overlays/');
+    await autoLoad('./dest/games/');
+    await autoLoad('./dest/integrations/');
 
     if (isMainThread) {
       panel.expose();
@@ -91,9 +94,9 @@ async function main () {
       setTimeout(() => require('./heapdump.js').init('heap/'), 120000);
     }
 
-    global.tmi = new TMI();
+    // load tmi last
+    require('./tmi');
   });
-  */
 }
 
 main();

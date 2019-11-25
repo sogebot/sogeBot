@@ -12,6 +12,7 @@ import { User } from '../database/entity/user';
 import { HeistUser } from '../database/entity/heist';
 import oauth from '../oauth';
 import { translate } from '../translate';
+import tmi from '../tmi';
 
 class Heist extends Game {
   dependsOn = [ 'systems.points' ];
@@ -158,7 +159,7 @@ class Heist extends Game {
         const user = users[0];
         const outcome = isSurvivor ? this.singleUserSuccess : this.singleUserFailed;
         global.setTimeout(async () => {
-          sendMessage(outcome.replace('$user', (global.tmi.showWithAt ? '@' : '') + user.username), {
+          sendMessage(outcome.replace('$user', (tmi.showWithAt ? '@' : '') + user.username), {
             username: oauth.botUsername,
             displayName: oauth.botUsername,
             userId: Number(oauth.botId),
@@ -203,7 +204,7 @@ class Heist extends Game {
             const andXMore = _.flatten(winners).length;
 
             let message = await translate('games.heist.results');
-            message = message.replace('$users', winnersList.map((o) => (global.tmi.showWithAt ? '@' : '') + o).join(', '));
+            message = message.replace('$users', winnersList.map((o) => (tmi.showWithAt ? '@' : '') + o).join(', '));
             if (andXMore > 0) {
               message = message + ' ' + (await translate('games.heist.andXMore')).replace('$count', andXMore);
             }
@@ -293,8 +294,8 @@ class Heist extends Game {
       return;
     }
 
-    points = points === 'all' && !_.isNil(await global.systems.points.getPointsOf(opts.sender.userId)) ? await global.systems.points.getPointsOf(opts.sender.userId) : parseInt(points, 10); // set all points
-    points = points > await global.systems.points.getPointsOf(opts.sender.userId) ? await global.systems.points.getPointsOf(opts.sender.userId) : points; // bet only user points
+    points = points === 'all' && !_.isNil(await points.getPointsOf(opts.sender.userId)) ? await points.getPointsOf(opts.sender.userId) : parseInt(points, 10); // set all points
+    points = points > await points.getPointsOf(opts.sender.userId) ? await points.getPointsOf(opts.sender.userId) : points; // bet only user points
 
     if (points === 0 || _.isNil(points) || _.isNaN(points)) {
       sendMessage(
@@ -334,5 +335,4 @@ class Heist extends Game {
   }
 }
 
-export default Heist;
-export { Heist };
+export default new Heist();

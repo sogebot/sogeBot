@@ -245,5 +245,4 @@ class Quotes extends System {
   }
 }
 
-export default Quotes;
-export { Quotes };
+export default new Quotes();

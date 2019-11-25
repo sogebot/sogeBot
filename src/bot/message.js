@@ -83,10 +83,10 @@ class Message {
     this.message = this.message.replace(/\$latestCheerMessage/g, !_.isNil(latestCheer) ? JSON.parse(latestCheer.values_json).message : 'n/a');
     this.message = this.message.replace(/\$latestCheer/g, !_.isNil(latestCheer) ? JSON.parse(latestCheer.values_json).username : 'n/a');
 
-    const spotifySong = JSON.parse(global.integrations.spotify.currentSong);
+    const spotifySong = JSON.parse(spotify.currentSong);
     if (!_.isNil(global.integrations) && !_.isEmpty(spotifySong) && spotifySong.is_playing && spotifySong.is_enabled) {
       // load spotify format
-      const format = global.integrations.spotify.format;
+      const format = spotify.format;
       if (opts.escape) {
         spotifySong.song = spotifySong.song.replace(new RegExp(opts.escape, 'g'), `\\${opts.escape}`);
         spotifySong.artist = spotifySong.artist.replace(new RegExp(opts.escape, 'g'), `\\${opts.escape}`);
@@ -95,10 +95,10 @@ class Message {
     } else {this.message = this.message.replace(/\$spotifySong/g, translate('songs.not-playing'))};
 
 
-    if (global.systems.songs.enabled
+    if (songs.enabled
         && this.message.includes('$ytSong')
-        && Object.values(global.systems.songs.isPlaying).find(o => o)) {
-      let currentSong = _.get(JSON.parse(await global.systems.songs.currentSong), 'title', translate('songs.not-playing'));
+        && Object.values(songs.isPlaying).find(o => o)) {
+      let currentSong = _.get(JSON.parse(await songs.currentSong), 'title', translate('songs.not-playing'));
       if (opts.escape) {
         currentSong = currentSong.replace(new RegExp(opts.escape, 'g'), `\\${opts.escape}`);
       }
@@ -256,13 +256,13 @@ class Message {
         if (typeof attr.param !== 'undefined') {
           attr.param = attr.param.replace('@', '');
           if (attr.param.length > 0) {
-            if (global.tmi.showWithAt) {
+            if (tmi.showWithAt) {
               attr.param = '@' + attr.param;
             }
             return attr.param;
           }
         }
-        return (global.tmi.showWithAt ? '@' : '') + attr.sender.username;
+        return (tmi.showWithAt ? '@' : '') + attr.sender.username;
       },
       '$param': async function (filter) {
         if (!_.isUndefined(attr.param) && attr.param.length !== 0) {return attr.param};
@@ -300,8 +300,8 @@ class Message {
           .getMany())
 
           .sort((a, b) => {
-            const aTip = global.currency.exchange(a.amount, a.currency, global.currency.mainCurrency);
-            const bTip = global.currency.exchange(b.amount, b.currency, global.currency.mainCurrency);
+            const aTip = currency.exchange(a.amount, a.currency, currency.mainCurrency);
+            const bTip = currency.exchange(b.amount, b.currency, currency.mainCurrency);
             return bTip - aTip;
           }, 0);
 
@@ -349,9 +349,9 @@ class Message {
         let cmd = filter
           .replace('!', '') // replace first !
           .replace(/\(|\)/g, '')
-          .replace(/\$sender/g, (global.tmi.showWithAt ? '@' : '') + attr.sender.username)
+          .replace(/\$sender/g, (tmi.showWithAt ? '@' : '') + attr.sender.username)
           .replace(/\$param/g, attr.param);
-        global.tmi.message({
+        tmi.message({
           message: {
             tags: attr.sender,
             message: cmd,
@@ -364,9 +364,9 @@ class Message {
       '(!#)': async function (filter) {
         let cmd = filter
           .replace(/\(|\)/g, '')
-          .replace(/\$sender/g, (global.tmi.showWithAt ? '@' : '') + attr.sender.username)
+          .replace(/\$sender/g, (tmi.showWithAt ? '@' : '') + attr.sender.username)
           .replace(/\$param/g, attr.param);
-        global.tmi.message({
+        tmi.message({
           message: {
             tags: attr.sender,
             message: cmd,
@@ -380,11 +380,11 @@ class Message {
     let price = {
       '(price)': async function (filter) {
         let price = 0;
-        if (global.systems.price.enabled) {
+        if (price.enabled) {
           let command = await getRepository(Price).findOne({ command: attr.cmd });
           price = command?.price ?? 0;
         }
-        return [price, await global.systems.points.getPointsName(price)].join(' ');
+        return [price, await points.getPointsName(price)].join(' ');
       }
     };
     let online = {
@@ -445,7 +445,7 @@ class Message {
           case 'price':
             list = (await Promise.all(
               _.map(prices, async (o) => {
-                return `${o.command} (${o.price}${await global.systems.points.getPointsName(o.price)})`;
+                return `${o.command} (${o.price}${await points.getPointsName(o.price)})`;
               })
             )).join(', ');
             return list.length > 0 ? list : ' ';
@@ -547,7 +547,7 @@ class Message {
           users: users,
           is: is,
           random: randomVar,
-          sender: global.tmi.showWithAt ? `@${attr.sender.username}` : `${attr.sender.username}`,
+          sender: tmi.showWithAt ? `@${attr.sender.username}` : `${attr.sender.username}`,
           param: _.isNil(attr.param) ? null : attr.param
         };
 
@@ -669,9 +669,9 @@ class Message {
       for (let [key, value] of Object.entries(attr)) {
         if (_.includes(['sender'], key)) {
           if (typeof value.username !== 'undefined') {
-            value = global.tmi.showWithAt ? `@${value.username}` : value.username;
+            value = tmi.showWithAt ? `@${value.username}` : value.username;
           } else {
-            value = global.tmi.showWithAt ? `@${value}` : value;
+            value = tmi.showWithAt ? `@${value}` : value;
           }
         }
         this.message = this.message.replace(new RegExp('[$]' + key, 'g'), value);

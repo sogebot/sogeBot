@@ -19,6 +19,7 @@ import { adminEndpoint, publicEndpoint } from '../helpers/socket';
 import { addToViewersCache, getfromViewersCache } from '../helpers/permissions';
 import permissions from '../permissions';
 import { translate } from '../translate';
+import tmi from '../tmi';
 
 /*
  * !alias                                              - gets an info about alias usage
@@ -114,7 +115,7 @@ class Alias extends System {
             sender: opts.sender,
           });
           debug('alias.process', message);
-          global.tmi.message({
+          tmi.message({
             message: {
               tags: opts.sender,
               message,
@@ -298,5 +299,4 @@ class Alias extends System {
   }
 }
 
-export default Alias;
-export { Alias };
+export default new Alias();

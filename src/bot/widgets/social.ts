@@ -24,5 +24,4 @@ class Social extends Widget {
   }
 }
 
-export default Social;
-export { Social };
+export default new Social();

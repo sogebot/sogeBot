@@ -10,6 +10,9 @@ import { getConnection, getRepository } from 'typeorm';
 import { User, UserBit, UserTip } from '../database/entity/user';
 import translateLib, { translate } from '../translate';
 import oauth from '../oauth';
+import points from './points';
+import tmi from '../tmi';
+import currency from '../currency';
 
 enum TYPE {
   TIME,
@@ -142,7 +145,7 @@ class Top extends System {
         message = translate('systems.top.tips').replace(/\$amount/g, 10);
         break;
       case TYPE.POINTS:
-        if (!global.systems.points.enabled) {
+        if (!points.enabled) {
           return;
         }
         sorted
@@ -252,7 +255,7 @@ class Top extends System {
       sorted = _.chunk(sorted, 10)[0];
 
       for (const user of sorted) {
-        message += (i + 1) + '. ' + (global.tmi.showWithAt ? '@' : '') + (user.username || 'unknown') + ' - ';
+        message += (i + 1) + '. ' + (tmi.showWithAt ? '@' : '') + (user.username || 'unknown') + ' - ';
         switch (type) {
           case TYPE.TIME:
             message += (user.value / 1000 / 60 / 60).toFixed(1) + 'h';
@@ -261,10 +264,10 @@ class Top extends System {
             message += [user.value, getLocalizedName(user.value, 'core.months')].join(' ');
             break;
           case TYPE.TIPS:
-            message += Number(user.value).toFixed(2) + global.currency.symbol(global.currency.mainCurrency);
+            message += Number(user.value).toFixed(2) + currency.symbol(currency.mainCurrency);
             break;
           case TYPE.POINTS:
-            message += user.value + ' ' + await global.systems.points.getPointsName(user.value);
+            message += user.value + ' ' + await points.getPointsName(user.value);
             break;
           case TYPE.MESSAGES:
           case TYPE.BITS:
@@ -289,5 +292,4 @@ class Top extends System {
   }
 }
 
-export default Top;
-export { Top };
+export default new Top();

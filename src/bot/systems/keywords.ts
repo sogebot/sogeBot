@@ -288,5 +288,4 @@ class Keywords extends System {
   }
 }
 
-export default Keywords;
-export { Keywords };
+export default new Keywords();

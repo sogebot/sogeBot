@@ -443,5 +443,4 @@ class Emotes extends Overlay {
   }
 }
 
-export default Emotes;
-export { Emotes };
+export default new Emotes();

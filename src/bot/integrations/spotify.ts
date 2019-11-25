@@ -22,6 +22,8 @@ import api from '../api';
  * 3. Authorize your user through UI
  */
 
+let _spotify: any = null;
+
 class Spotify extends Integration {
   client: any = null;
   retry: { IRefreshToken: number } = { IRefreshToken: 0 };
@@ -90,7 +92,7 @@ class Spotify extends Integration {
   @ui({
     type: 'btn-emit',
     class: 'btn btn-primary btn-block mt-1 mb-1',
-    if: () => global.integrations.spotify.username.length === 0,
+    if: () => _spotify.username.length === 0,
     emit: 'authorize',
   }, 'connection')
   authorizeBtn = null;
@@ -98,7 +100,7 @@ class Spotify extends Integration {
   @ui({
     type: 'btn-emit',
     class: 'btn btn-primary btn-block mt-1 mb-1',
-    if: () => global.integrations.spotify.username.length > 0,
+    if: () => _spotify.username.length > 0,
     emit: 'revoke',
   }, 'connection')
   revokeBtn = null;
@@ -548,5 +550,5 @@ class Spotify extends Integration {
   }
 }
 
-export default Spotify;
-export { Spotify };
+_spotify = new Spotify();
+export default _spotify;

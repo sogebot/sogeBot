@@ -14,6 +14,7 @@ import { Cooldown as CooldownEntity, CooldownViewer } from '../database/entity/c
 import { User } from '../database/entity/user';
 import { adminEndpoint } from '../helpers/socket';
 import { Keyword } from '../database/entity/keyword';
+import customCommands from './customCommands';
 
 /*
  * !cooldown [keyword|!command] [global|user] [seconds] [true/false] - set cooldown for keyword or !command - 0 for disable, true/false set quiet mode
@@ -132,8 +133,8 @@ class Cooldown extends System {
         name = parsed.command;
       } else {
         // search in custom commands as well
-        if (global.systems.customCommands.enabled) {
-          const foundCommands = await global.systems.customCommands.find(subcommand ? `${command} ${subcommand}` : command);
+        if (customCommands.enabled) {
+          const foundCommands = await customCommands.find(subcommand ? `${command} ${subcommand}` : command);
           if (foundCommands.length > 0) {
             name = foundCommands[0].command.command;
           }
@@ -249,8 +250,8 @@ class Cooldown extends System {
         name = parsed.command;
       } else {
         // search in custom commands as well
-        if (global.systems.customCommands.enabled) {
-          const foundCommands = await global.systems.customCommands.find(subcommand ? `${command} ${subcommand}` : command);
+        if (customCommands.enabled) {
+          const foundCommands = await customCommands.find(subcommand ? `${command} ${subcommand}` : command);
           if (foundCommands.length > 0) {
             name = foundCommands[0].command.command;
           }
@@ -414,5 +415,4 @@ class Cooldown extends System {
   }
 }
 
-export default Cooldown;
-export { Cooldown };
+export default new Cooldown();

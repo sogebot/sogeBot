@@ -365,5 +365,4 @@ class Timers extends System {
   }
 }
 
-export default Timers;
-export { Timers };
+export default new Timers();

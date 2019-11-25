@@ -71,7 +71,7 @@ class Twitter extends Integration {
       message = message.replace(replace, val);
     }
     message = await new Message(message).parse();
-    global.integrations.twitter.send(message);
+    this.send(message);
   }
 
   public send(text: string): void {
@@ -199,5 +199,4 @@ class Twitter extends Integration {
   }
 }
 
-export default Twitter;
-export { Twitter };
+export default new Twitter();

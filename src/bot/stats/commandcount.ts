@@ -16,5 +16,4 @@ class CommandCount extends Stats {
   }
 }
 
-export default CommandCount;
-export { CommandCount };
+export default new CommandCount();

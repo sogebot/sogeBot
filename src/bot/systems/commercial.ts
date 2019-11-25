@@ -12,6 +12,7 @@ import { adminEndpoint } from '../helpers/socket';
 import oauth from '../oauth';
 import events from '../events';
 import panel from '../panel';
+import tmi from '../tmi';
 
 /*
  * !commercial                        - gets an info about alias usage
@@ -26,7 +27,7 @@ class Commercial extends System {
 
   sockets() {
     adminEndpoint(this.nsp, 'commercial.run', (data) => {
-      global.tmi.message({
+      tmi.message({
         message: {
           tags: { username: getOwner() },
           message: '!commercial ' + data.seconds,
@@ -95,5 +96,4 @@ class Commercial extends System {
   }
 }
 
-export default Commercial;
-export { Commercial };
+export default new Commercial();

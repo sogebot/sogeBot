@@ -15,6 +15,8 @@ import { User } from '../database/entity/user';
 import { isDbConnected } from '../helpers/database';
 import oauth from '../oauth';
 import { translate } from '../translate';
+import tmi from '../tmi';
+import points from './points';
 
 const ERROR_NOT_ENOUGH_OPTIONS = 'Expected more parameters';
 const ERROR_ALREADY_OPENED = '1';
@@ -64,7 +66,7 @@ class Bets extends System {
 
     adminEndpoint(this.nsp, 'close', async (option) => {
       const message = '!bet ' + (option === 'refund' ? option : 'close ' + option);
-      global.tmi.message({
+      tmi.message({
         message: {
           tags: { username: getOwner() },
           message,
@@ -207,7 +209,7 @@ class Bets extends System {
       let [index, points] = new Expects(opts.parameters).number({ optional: true }).points({ optional: true }).toArray();
       index--;
       if (!_.isNil(points) && !_.isNil(index)) {
-        const pointsOfUser = await global.systems.points.getPointsOf(opts.sender.userId);
+        const pointsOfUser = await points.getPointsOf(opts.sender.userId);
         let _betOfUser = currentBet?.participations.find(o => o.userId === opts.sender.userId);
 
         if (points === 'all' || points > pointsOfUser) {
@@ -252,7 +254,7 @@ class Bets extends System {
       switch (e.message) {
         case ERROR_ZERO_BET:
           sendMessage(translate('bets.zeroBet')
-            .replace(/\$pointsName/g, await global.systems.points.getPointsName(0)), opts.sender);
+            .replace(/\$pointsName/g, await points.getPointsName(0)), opts.sender);
           break;
         case ERROR_NOT_RUNNING:
           sendMessage(translate('bets.notRunning'), opts.sender, opts.attr);
@@ -337,7 +339,7 @@ class Bets extends System {
       sendMessage(translate('bets.closed')
         .replace(/\$option/g, currentBet.options[index])
         .replace(/\$amount/g, currentBet.participations.filter((o) => o.optionIdx === index).length)
-        .replace(/\$pointsName/g, await global.systems.points.getPointsName(total))
+        .replace(/\$pointsName/g, await points.getPointsName(total))
         .replace(/\$points/g, total), opts.sender);
 
       currentBet.arePointsGiven = true;
@@ -373,5 +375,4 @@ class Bets extends System {
   }
 }
 
-export default Bets;
-export { Bets };
+export default new Bets();

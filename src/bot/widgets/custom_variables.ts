@@ -49,5 +49,4 @@ class CustomVariables extends Widget {
   }
 }
 
-export default CustomVariables;
-export { CustomVariables };
+export default new CustomVariables();

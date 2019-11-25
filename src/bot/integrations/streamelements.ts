@@ -10,6 +10,7 @@ import { getRepository } from 'typeorm';
 import { User, UserTip } from '../database/entity/user';
 import users from '../users';
 import events from '../events';
+import alerts from '../registries/alerts';
 
 /* example payload (eventData)
 {
@@ -122,7 +123,7 @@ class StreamElements extends Integration {
     const newTip = new UserTip();
     newTip.amount = Number(amount);
     newTip.currency = currency;
-    newTip.sortAmount = global.currency.exchange(Number(amount), currency, 'EUR');
+    newTip.sortAmount = currency.exchange(Number(amount), currency, 'EUR');
     newTip.message = message;
     newTip.tippedAt = Date.now();
 
@@ -136,11 +137,11 @@ class StreamElements extends Integration {
       username: username.toLowerCase(),
       amount: parseFloat(eventData.data.amount).toFixed(2),
       currency: eventData.data.currency,
-      amountInBotCurrency: parseFloat(global.currency.exchange(eventData.data.amount, eventData.data.currency, global.currency.mainCurrency)).toFixed(2),
-      currencyInBot: global.currency.mainCurrency,
+      amountInBotCurrency: parseFloat(currency.exchange(eventData.data.amount, eventData.data.currency, currency.mainCurrency)).toFixed(2),
+      currencyInBot: currency.mainCurrency,
       message: eventData.data.message,
     });
-    global.registries.alerts.trigger({
+    alerts.trigger({
       event: 'tips',
       name: username.toLowerCase(),
       amount: Number(parseFloat(eventData.data.amount).toFixed(2)),
@@ -160,5 +161,4 @@ class StreamElements extends Integration {
   }
 }
 
-export default StreamElements;
-export { StreamElements };
+export default new StreamElements();

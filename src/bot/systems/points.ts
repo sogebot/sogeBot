@@ -516,5 +516,4 @@ class Points extends System {
   }
 }
 
-export default Points;
-export { Points };
+export default new Points();

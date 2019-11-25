@@ -33,5 +33,4 @@ class Checklist extends System {
   }
 }
 
-export default Checklist;
-export { Checklist };
+export default new Checklist();

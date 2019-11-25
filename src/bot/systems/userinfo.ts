@@ -13,6 +13,9 @@ import users from '../users';
 import api from '../api';
 import { translate } from '../translate';
 import translateLib from '../translate';
+import currency from '../currency';
+import ranks from './ranks';
+import points from './points';
 
 /*
  * !me
@@ -230,8 +233,8 @@ class UserInfo extends System {
 
       if (message.includes('$rank')) {
         const idx = message.indexOf('$rank');
-        const rank = await global.systems.ranks.get(await getRepository(User).findOne({ userId: opts.sender.userId }));
-        if (global.systems.ranks.enabled && !_.isNull(rank)) {
+        const rank = await ranks.get(await getRepository(User).findOne({ userId: opts.sender.userId }));
+        if (ranks.enabled && !_.isNull(rank)) {
           message[idx] = rank;
         } else {
           message.splice(idx, 1);
@@ -245,8 +248,8 @@ class UserInfo extends System {
 
       if (message.includes('$points')) {
         const idx = message.indexOf('$points');
-        if (global.systems.points.enabled) {
-          message[idx] = user.points + ' ' + await global.systems.points.getPointsName(user.points);
+        if (points.enabled) {
+          message[idx] = user.points + ' ' + await points.getPointsName(user.points);
         } else {
           message.splice(idx, 1);
         }
@@ -260,12 +263,11 @@ class UserInfo extends System {
       if (message.includes('$tips')) {
         const idx = message.indexOf('$tips');
         const tips = user.tips;
-        const currency = global.currency.mainCurrency;
         let tipAmount = 0;
         for (const t of tips) {
-          tipAmount += global.currency.exchange(Number(t.amount), t.currency, currency);
+          tipAmount += currency.exchange(Number(t.amount), t.currency, currency.mainCurrency);
         }
-        message[idx] = `${Number(tipAmount).toFixed(2)}${global.currency.symbol(currency)}`;
+        message[idx] = `${Number(tipAmount).toFixed(2)}${currency.symbol(currency.mainCurrency)}`;
       }
 
       if (message.includes('$bits')) {
@@ -305,5 +307,4 @@ class UserInfo extends System {
   }
 }
 
-export default UserInfo;
-export { UserInfo };
+export default new UserInfo();

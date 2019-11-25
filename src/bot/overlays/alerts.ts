@@ -61,5 +61,4 @@ class Alerts extends Overlay {
   }
 }
 
-export default Alerts;
-export { Alerts };
+export default new Alerts();

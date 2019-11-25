@@ -18,6 +18,8 @@ import { getRepository, LessThan } from 'typeorm';
 import { ModerationMessageCooldown, ModerationPermit, ModerationWarning } from '../database/entity/moderation';
 import permissions from '../permissions';
 import { translate } from '../translate';
+import spotify from '../integrations/spotify';
+import songs from './songs';
 
 class Moderation extends System {
   @settings('lists')
@@ -151,11 +153,11 @@ class Moderation extends System {
     let ytRegex, clipsRegex, spotifyRegex;
 
     // check if spotify -or- alias of spotify contain open.spotify.com link
-    if (global.integrations.spotify.enabled) {
+    if (spotify.enabled) {
       // we can assume its first command in array (spotify have only one command)
-      const command = (await global.integrations.spotify.commands())[0].command;
+      const command = (await spotify.commands())[0].command;
       const alias = await getRepository(Alias).findOne({ where: { command } });
-      if (alias && alias.enabled && global.systems.alias.enabled) {
+      if (alias && alias.enabled && alias.enabled) {
         spotifyRegex = new RegExp('^(' + command + '|' + alias.alias + ') \\S+open\\.spotify\\.com\\/track\\/(\\w+)(.*)?', 'gi');
       } else {
         spotifyRegex = new RegExp('^(' + command + ') \\S+open\\.spotify\\.com\\/track\\/(\\w+)(.*)?', 'gi');
@@ -164,10 +166,10 @@ class Moderation extends System {
     }
 
     // check if songrequest -or- alias of songrequest contain youtube link
-    if (global.systems.songs.enabled) {
+    if (songs.enabled) {
       const alias = await getRepository(Alias).findOne({ where: { command: '!songrequest' } });
-      const cmd = global.systems.songs.getCommand('!songrequest');
-      if (alias && alias.enabled && global.systems.alias.enabled) {
+      const cmd = songs.getCommand('!songrequest');
+      if (alias && alias.enabled && alias.enabled) {
         ytRegex = new RegExp('^(' + cmd + '|' + alias.alias + ') \\S+(?:youtu.be\\/|v\\/|e\\/|u\\/\\w+\\/|embed\\/|v=)([^#&?]*).*', 'gi');
       } else {
         ytRegex =  new RegExp('^(' + cmd + ') \\S+(?:youtu.be\\/|v\\/|e\\/|u\\/\\w+\\/|embed\\/|v=)([^#&?]*).*', 'gi');
@@ -502,5 +504,4 @@ class Moderation extends System {
   }
 }
 
-export default Moderation;
-export { Moderation };
+export default new Moderation();
