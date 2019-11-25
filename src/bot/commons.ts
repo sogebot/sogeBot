@@ -129,7 +129,7 @@ export async function sendMessage(messageToSend: string | Promise<string>, sende
   }
 
   if (!attr.skip) {
-    const Message = new (require('./message')).default;
+    const Message = (require('./message')).default;
     messageToSend = await new Message(messageToSend).parse(attr) as string;
   }
   if (messageToSend.length === 0) {
