@@ -7,11 +7,13 @@ import Core from './_interface';
 import { sendMessage } from './commons';
 import { command, default_permission, settings, ui } from './decorators';
 import { onChange, onLoad } from './decorators/on';
-import { permission } from './permissions';
+import { permission } from './helpers/permissions';
 import { isMainThread } from './cluster';
 import { debug, error, warning } from './helpers/log';
 import { getConnection, getRepository } from 'typeorm';
 import Widget from './widgets/_interface';
+import oauth from './oauth';
+import translateLib, { translate } from './translate';
 
 class General extends Core {
   @settings('general')
@@ -36,14 +38,14 @@ class General extends Core {
   @onChange('lang')
   @onLoad('lang')
   public async onLangUpdate() {
-    await global.lib.translate._load();
+    await translateLib._load();
     if (isMainThread) {
-      warning(global.translate('core.lang-selected'));
+      warning(translate('core.lang-selected'));
     }
   }
 
   public async onLangLoad() {
-    await global.lib.translate._load();
+    await translateLib._load();
   }
 
   @command('!_debug')
@@ -52,9 +54,9 @@ class General extends Core {
     const widgets = await getRepository(Widget).find();
     const connection = await getConnection();
 
-    const oauth = {
-      broadcaster: global.oauth.broadcasterUsername !== '',
-      bot: global.oauth.botUsername !== '',
+    const oauthInfo = {
+      broadcaster: oauth.broadcasterUsername !== '',
+      bot: oauth.botUsername !== '',
     };
 
     const lang = this.lang;
@@ -95,7 +97,7 @@ class General extends Core {
     debug('*', `GAMES        | ${enabledSystems.games.join(', ')}`);
     debug('*', `INTEGRATIONS | ${enabledSystems.integrations.join(', ')}`);
     debug('*', `WIDGETS      | ${map(widgets, 'name').join(', ')}`);
-    debug('*', `OAUTH        | BOT ${oauth.bot} | BROADCASTER ${oauth.broadcaster}`);
+    debug('*', `OAUTH        | BOT ${oauthInfo.bot} | BROADCASTER ${oauthInfo.broadcaster}`);
     debug('*', '======= END OF DEBUG MESSAGE =======');
   }
 
@@ -159,4 +161,4 @@ class General extends Core {
   }
 }
 
-module.exports = General;
+export default new General();

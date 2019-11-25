@@ -11,6 +11,7 @@ import fs from 'fs';
 import { writeHeapSnapshot } from 'v8';
 import { isMainThread } from './cluster';
 import { info } from './helpers/log';
+import api from './api';
 
 let _datadir = null;
 let memMBlast = 0;
@@ -59,7 +60,7 @@ function heapDump() {
 
   fs.appendFileSync(csvfilePath, `${String(new Date())}\t${memory}\t${String(change).replace('.', ',')}\n`);
 
-  info(chalk.bgRed((global.api.isStreamOnline ? 'Online' : 'Offline')
+  info(chalk.bgRed((api.isStreamOnline ? 'Online' : 'Offline')
     + ' # Current avg mem usage: ' + memMB
     + ', last avg mem usage: ' + memMBlast
     + ', change: ' + change));
@@ -68,7 +69,7 @@ function heapDump() {
   heapCountdown--;
   if (change > 20 || heapCountdown === 0) {
     heapCountdown = 12;
-    info('Taking snapshot - ' + (global.api.isStreamOnline ? 'Online' : 'Offline'));
+    info('Taking snapshot - ' + (api.isStreamOnline ? 'Online' : 'Offline'));
     saveHeapSnapshot(_datadir);
   }
 }

@@ -6,6 +6,7 @@ import { onBit, onFollow, onSub, onTip } from '../decorators/on';
 import { adminEndpoint, publicEndpoint } from '../helpers/socket';
 import { Goal, GoalGroup } from '../database/entity/goal';
 import { getRepository, IsNull } from 'typeorm';
+import api from '../api';
 
 class Goals extends Overlay {
   showInUI = false;
@@ -58,8 +59,8 @@ class Goals extends Overlay {
     });
     publicEndpoint(this.nsp, 'goals::current', async (cb) => {
       cb(null, {
-        subscribers: global.api.stats.currentSubscribers,
-        followers: global.api.stats.currentFollowers,
+        subscribers: api.stats.currentSubscribers,
+        followers: api.stats.currentFollowers,
       });
     });
   }

@@ -14,6 +14,7 @@ import { info } from '../helpers/log';
 import { getRepository } from 'typeorm';
 import { Event } from '../database/entity/event';
 import { WidgetSocial } from '../database/entity/widget';
+import events from '../events';
 
 class Twitter extends Integration {
   public watchedStreams: {
@@ -47,13 +48,13 @@ class Twitter extends Integration {
   }
 
   public addEvent() {
-    if (typeof global.events === 'undefined') {
+    if (typeof events === 'undefined') {
       setTimeout(() => this.addEvent(), 1000);
     } else {
-      global.events.supportedEventsList.push(
+      events.supportedEventsList.push(
         { id: 'tweet-post-with-hashtag', variables: [ 'tweet.text', 'tweet.username', 'tweet.displayname', 'tweet.url' ], definitions: { hashtag: '' }, check: this.eventHaveCorrectHashtag },
       );
-      global.events.supportedOperationsList.push(
+      events.supportedOperationsList.push(
         { id: 'send-twitter-message', definitions: { messageToSend: '' }, fire: this.fireSendTwitterMessage },
       );
     }
@@ -101,7 +102,7 @@ class Twitter extends Integration {
             url: `https://twitter.com/${tweet.user.screen_name}/status/${tweet.id_str}`,
           };
           getRepository(WidgetSocial).save(data);
-          global.events.fire('tweet-post-with-hashtag', { tweet: data });
+          events.fire('tweet-post-with-hashtag', { tweet: data });
         });
 
         stream.on('error', (error) => {

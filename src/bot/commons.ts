@@ -11,6 +11,8 @@ import { error } from './helpers/log';
 import { clusteredChatOut, clusteredClientChat, clusteredClientTimeout, clusteredWhisperOut } from './cluster';
 
 import { User } from './database/entity/user';
+import oauth from './oauth';
+import { translate } from './translate';
 
 export async function autoLoad(directory): Promise<{ [x: string]: any }> {
   const directoryListing = readdirSync(directory);
@@ -66,9 +68,9 @@ export function isIgnored(sender: { username: string | null; userId?: number }) 
  * @param translate Translation key
  * @param attr Attributes to replace { 'replaceKey': 'value' }
  */
-export async function prepare(translate: string, attr?: {[x: string]: any }): Promise<string> {
+export async function prepare(toTranslate: string, attr?: {[x: string]: any }): Promise<string> {
   attr = attr || {};
-  let msg = global.translate(translate);
+  let msg = translate(toTranslate);
   for (const key of Object.keys(attr).sort((a, b) => b.length - a.length)) {
     let value = attr[key];
     if (['username', 'who', 'winner', 'sender', 'loser'].includes(key)) {
@@ -164,7 +166,7 @@ export async function sendMessage(messageToSend: string | Promise<string>, sende
 export async function message(type, username, messageToSend, retry = true) {
   try {
     if (username === null) {
-      username = await global.oauth.generalChannel;
+      username = await oauth.generalChannel;
     }
     if (username === '') {
       error('TMI: channel is not defined, message cannot be sent');
@@ -203,18 +205,18 @@ export function getOwnerAsSender(): Sender {
 
 export function getOwner() {
   try {
-    return global.oauth.generalOwners[0].trim();
+    return oauth.generalOwners[0].trim();
   } catch (e) {
     return '';
   }
 }
 export function getOwners() {
-  return global.oauth.generalOwners;
+  return oauth.generalOwners;
 }
 
 export function getBot() {
   try {
-    return global.oauth.botUsername.toLowerCase().trim();
+    return oauth.botUsername.toLowerCase().trim();
   } catch (e) {
     return '';
   }
@@ -222,7 +224,7 @@ export function getBot() {
 
 export function getBotID() {
   try {
-    return Number(global.oauth.botId);
+    return Number(oauth.botId);
   } catch (e) {
     return 0;
   }
@@ -241,7 +243,7 @@ export function getBotSender(): Sender {
 
 export function getChannel() {
   try {
-    return global.oauth.generalChannel.toLowerCase().trim();
+    return oauth.generalChannel.toLowerCase().trim();
   } catch (e) {
     return '';
   }
@@ -249,7 +251,7 @@ export function getChannel() {
 
 export function getBroadcaster() {
   try {
-    return global.oauth.broadcasterUsername.toLowerCase().trim();
+    return oauth.broadcasterUsername.toLowerCase().trim();
   } catch (e) {
     return '';
   }
@@ -260,7 +262,7 @@ export function isBroadcaster(user) {
     if (_.isString(user)) {
       user = { username: user };
     }
-    return global.oauth.broadcasterUsername.toLowerCase().trim() === user.username.toLowerCase().trim();
+    return oauth.broadcasterUsername.toLowerCase().trim() === user.username.toLowerCase().trim();
   } catch (e) {
     return false;
   }
@@ -287,8 +289,8 @@ export function isBot(user) {
     if (_.isString(user)) {
       user = { username: user };
     }
-    if (global.oauth.botUsername) {
-      return global.oauth.botUsername.toLowerCase().trim() === user.username.toLowerCase().trim();
+    if (oauth.botUsername) {
+      return oauth.botUsername.toLowerCase().trim() === user.username.toLowerCase().trim();
     } else {
       return false;
     }
@@ -302,8 +304,8 @@ export function isOwner(user) {
     if (_.isString(user)) {
       user = { username: user };
     }
-    if (global.oauth.generalOwners) {
-      const owners = _.map(_.filter(global.oauth.generalOwners, _.isString), (owner) => {
+    if (oauth.generalOwners) {
+      const owners = _.map(_.filter(oauth.generalOwners, _.isString), (owner) => {
         return _.trim(owner.toLowerCase());
       });
       return _.includes(owners, user.username.toLowerCase().trim());
@@ -320,7 +322,7 @@ export function getLocalizedName(number, translation): string {
   let multi;
   let xmulti;
   let name;
-  const names = global.translate(translation).split('|').map(Function.prototype.call, String.prototype.trim);
+  const names = translate(translation).split('|').map(Function.prototype.call, String.prototype.trim);
   number = parseInt(number, 10);
 
   switch (names.length) {

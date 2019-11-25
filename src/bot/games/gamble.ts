@@ -7,6 +7,7 @@ import { error } from '../helpers/log';
 
 import { getRepository } from 'typeorm';
 import { User } from '../database/entity/user';
+import { translate } from '../translate';
 
 const ERROR_NOT_ENOUGH_OPTIONS = '0';
 const ERROR_ZERO_BET = '1';
@@ -74,7 +75,7 @@ class Gamble extends Game {
           sendMessage(message, opts.sender, opts.attr);
           break;
         case ERROR_NOT_ENOUGH_OPTIONS:
-          sendMessage(global.translate('gambling.gamble.notEnoughOptions'), opts.sender, opts.attr);
+          sendMessage(translate('gambling.gamble.notEnoughOptions'), opts.sender, opts.attr);
           break;
         case ERROR_NOT_ENOUGH_POINTS:
           message = await prepare('gambling.gamble.notEnoughPoints', {
@@ -93,7 +94,7 @@ class Gamble extends Game {
           break;
         default:
           error(e.stack);
-          sendMessage(global.translate('core.error'), opts.sender, opts.attr);
+          sendMessage(translate('core.error'), opts.sender, opts.attr);
       }
     }
   }

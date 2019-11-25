@@ -16,6 +16,7 @@ import { User } from '../database/entity/user';
 import { Price as PriceEntity } from '../database/entity/price';
 import { adminEndpoint } from '../helpers/socket';
 import { error } from '../helpers/log';
+import { translate } from '../translate';
 
 /*
  * !price                     - gets an info about price usage
@@ -70,7 +71,7 @@ class Price extends System {
   @command('!price')
   @default_permission(permission.CASTERS)
   main (opts) {
-    sendMessage(global.translate('core.usage') + ': !price set <cmd> <price> | !price unset <cmd> | !price list | !price toggle <cmd>', opts.sender, opts.attr);
+    sendMessage(translate('core.usage') + ': !price set <cmd> <price> | !price unset <cmd> | !price list | !price toggle <cmd>', opts.sender, opts.attr);
   }
 
   @command('!price set')
@@ -147,7 +148,7 @@ class Price extends System {
   @default_permission(permission.CASTERS)
   async list (opts) {
     const prices = await getRepository(PriceEntity).find();
-    const output = (prices.length === 0 ? global.translate('price.list-is-empty') : global.translate('price.list-is-not-empty').replace(/\$list/g, (_.map(_.orderBy(prices, 'command'), (o) => {
+    const output = (prices.length === 0 ? translate('price.list-is-empty') : translate('price.list-is-not-empty').replace(/\$list/g, (_.map(_.orderBy(prices, 'command'), (o) => {
       return `${o.command} - ${o.price}`;
     })).join(', ')));
     sendMessage(output, opts.sender, opts.attr);

@@ -8,6 +8,9 @@ import Integration from './_interface';
 import { getRepository } from 'typeorm';
 
 import { User, UserTip } from '../database/entity/user';
+import users from '../users.js';
+import api from '../api.js';
+import events from '../events.js';
 
 class Qiwi extends Integration {
   interval: any = null;
@@ -65,7 +68,7 @@ class Qiwi extends Integration {
       let user = await getRepository(User).findOne({ where: { username }});
       let id;
       if (!user) {
-        id = await global.users.getIdByName(username);
+        id = await users.getIdByName(username);
         user = await getRepository(User).findOne({ where: { userId: id }});
         if (!user && id && username) {
           // if we still doesn't have user, we create new
@@ -88,8 +91,8 @@ class Qiwi extends Integration {
         await getRepository(User).save(user);
       }
 
-      if (global.api.isStreamOnline) {
-        global.api.stats.currentTips += parseFloat(global.currency.exchange(amount, currency, global.currency.mainCurrency));
+      if (api.isStreamOnline) {
+        api.stats.currentTips += parseFloat(global.currency.exchange(amount, currency, global.currency.mainCurrency));
       }
 
       global.overlays.eventlist.add({
@@ -103,7 +106,7 @@ class Qiwi extends Integration {
 
       tip(`${username ? username : 'Anonymous'}${id ? '#' + id : ''}, amount: ${Number(amount).toFixed(2)}${DONATION_CURRENCY}, ${message ? 'message: ' + message : ''}`);
 
-      global.events.fire('tip', {
+      events.fire('tip', {
         username: username || 'Anonymous',
         amount,
         currency,

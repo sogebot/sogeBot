@@ -3,7 +3,7 @@ import XRegExp from 'xregexp';
 import safeEval from 'safe-eval';
 
 import { command, default_permission, helper } from '../decorators';
-import { permission } from '../permissions';
+import { permission } from '../helpers/permissions';
 import System from './_interface';
 import * as constants from '../constants';
 import { parser } from '../decorators';
@@ -19,6 +19,9 @@ import { Commands, CommandsResponses } from '../database/entity/commands';
 import { User } from '../database/entity/user';
 import { Variable } from '../database/entity/variable';
 import { addToViewersCache, getfromViewersCache } from '../helpers/permissions';
+import api from '../api';
+import permissions from '../permissions';
+import { translate } from '../translate';
 
 /*
  * !command                                                                 - gets an info about command usage
@@ -80,7 +83,7 @@ class CustomCommands extends System {
   @default_permission(permission.CASTERS)
   @helper()
   main (opts: CommandOptions) {
-    sendMessage(global.translate('core.usage') + ': !command add (-p [uuid|name]) (-s=true|false) <!cmd> <response> | !command edit (-p [uuid|name]) (-s=true|false) <!cmd> <number> <response> | !command remove <!command> | !command remove <!command> <number> | !command list | !command list <!command>', opts.sender, opts.attr);
+    sendMessage(translate('core.usage') + ': !command add (-p [uuid|name]) (-s=true|false) <!cmd> <response> | !command edit (-p [uuid|name]) (-s=true|false) <!cmd> <number> <response> | !command remove <!command> | !command remove <!command> <number> | !command list | !command list <!command>', opts.sender, opts.attr);
   }
 
   @command('!command edit')
@@ -114,7 +117,7 @@ class CustomCommands extends System {
         return sendMessage(prepare('customcmds.response-was-not-found', { command, response: rId }), opts.sender, opts.attr);
       }
 
-      const pItem = await global.permissions.get(userlevel);
+      const pItem = await permissions.get(userlevel);
       if (!pItem) {
         throw Error('Permission ' + userlevel + ' not found.');
       }
@@ -161,7 +164,7 @@ class CustomCommands extends System {
         cDb.responses = [];
       }
 
-      const pItem = await global.permissions.get(userlevel);
+      const pItem = await permissions.get(userlevel);
       if (!pItem) {
         throw Error('Permission ' + userlevel + ' not found.');
       }
@@ -229,7 +232,7 @@ class CustomCommands extends System {
       for (const r of _.orderBy(command.command.responses, 'order', 'asc')) {
 
         if (typeof getfromViewersCache(opts.sender.userId, r.permission) === 'undefined') {
-          addToViewersCache(opts.sender.userId, r.permission, (await global.permissions.check(opts.sender.userId, r.permission, false)).access);
+          addToViewersCache(opts.sender.userId, r.permission, (await permissions.check(opts.sender.userId, r.permission, false)).access);
         }
 
         if (getfromViewersCache(opts.sender.userId, r.permission)
@@ -273,7 +276,7 @@ class CustomCommands extends System {
       const commands = await getRepository(Commands).find({
         where: { visible: true, enabled: true },
       });
-      const output = (commands.length === 0 ? global.translate('customcmds.list-is-empty') : global.translate('customcmds.list-is-not-empty').replace(/\$list/g, _.map(_.orderBy(commands, 'command'), 'command').join(', ')));
+      const output = (commands.length === 0 ? translate('customcmds.list-is-empty') : translate('customcmds.list-is-not-empty').replace(/\$list/g, _.map(_.orderBy(commands, 'command'), 'command').join(', ')));
       sendMessage(output, opts.sender, opts.attr);
     } else {
       // print responses
@@ -288,7 +291,7 @@ class CustomCommands extends System {
         return;
       }
       for (const r of _.orderBy(command_with_responses.responses, 'order', 'asc')) {
-        const permission = await global.permissions.get(r.permission);
+        const permission = await permissions.get(r.permission);
         const response = await prepare('customcmds.response', { command, index: ++r.order, response: r.response, after: r.stopIfExecuted ? '_' : 'v', permission: permission?.name ?? 'n/a' });
         chatOut(`${response} [${opts.sender.username}]`);
         message(global.tmi.sendWithMe ? 'me' : 'say', getOwner(), response);
@@ -405,12 +408,12 @@ class CustomCommands extends System {
       $is,
       $rank,
       // add global variables
-      $game: global.api.stats.currentGame || 'n/a',
-      $title: global.api.stats.currentTitle || 'n/a',
-      $views: global.api.stats.currentViews,
-      $followers: global.api.stats.currentFollowers,
-      $hosts: global.api.stats.currentHosts,
-      $subscribers: global.api.stats.currentSubscribers,
+      $game: api.stats.currentGame || 'n/a',
+      $title: api.stats.currentTitle || 'n/a',
+      $views: api.stats.currentViews,
+      $followers: api.stats.currentFollowers,
+      $hosts: api.stats.currentHosts,
+      $subscribers: api.stats.currentSubscribers,
       ...customVariables,
     };
     let result = false;

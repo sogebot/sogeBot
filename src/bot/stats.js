@@ -11,8 +11,8 @@ function Stats () {
 }
 
 Stats.prototype.sockets = function () {
-  if (_.isNil(global.panel)) return setTimeout(() => this.sockets(), 10)
-  global.panel.socketListening(this, 'getLatestStats', this.getLatestStats)
+  if (_.isNil(panel)) return setTimeout(() => this.sockets(), 10)
+  panel.socketListening(this, 'getLatestStats', this.getLatestStats)
 }
 
 Stats.prototype.save = async function (data) {
@@ -104,4 +104,4 @@ Stats.prototype.getLatestStats = async function (self, socket) {
   }
 }
 
-module.exports = Stats
+module.exports = new Stats();

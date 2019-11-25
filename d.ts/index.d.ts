@@ -57,7 +57,6 @@ declare namespace NodeJS {
     };
     cache: any;
     client: any;
-    api: import('../src/bot/api').API;
     mocha: boolean;
     configuration: any;
     cpu: any;
@@ -109,15 +108,7 @@ declare namespace NodeJS {
       top: import('../src/bot/systems/top').Top;
       userinfo: import('../src/bot/systems/userinfo').UserInfo;
     };
-    users: import('../src/bot/users').Users;
-    ui: import('../src/bot/ui').UI;
-    lib: any;
-    twitch: import('../src/bot/twitch').Twitch;
-    socket: import('../src/bot/socket').Socket;
-    permissions: import('../src/bot/permissions').Permissions;
-    customvariables: import('../src/bot/customvariables').CustomVariables;
     tmi: import('../src/bot/tmi').TMI;
-    events: import('../src/bot/events').Events;
     webhooks: import('../src/bot/webhooks').Webhooks;
     widgets: {
       chat: import('../src/bot/widgets/chat').Chat;
@@ -128,7 +119,6 @@ declare namespace NodeJS {
       social: import('../src/bot/widgets/social').Social;
       soundboard: import('../src/bot/widgets/soundboard').SoundBoard;
     };
-    oauth: import('../src/bot/oauth').OAuth;
   }
 }
 

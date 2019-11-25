@@ -3,12 +3,15 @@
 import axios from 'axios';
 import * as _ from 'lodash';
 
-import { permission } from '../permissions';
+import { permission } from '../helpers/permissions';
 import { command, default_permission, helper } from '../decorators';
 import System from './_interface';
 import { getOwner, sendMessage } from '../commons';
 import { error } from '../helpers/log';
 import { adminEndpoint } from '../helpers/socket';
+import oauth from '../oauth';
+import events from '../events';
+import panel from '../panel';
 
 /*
  * !commercial                        - gets an info about alias usage
@@ -53,12 +56,12 @@ class Commercial extends System {
       return;
     }
 
-    const cid = global.oauth.channelId;
+    const cid = oauth.channelId;
     // check if duration is correct (30, 60, 90, 120, 150, 180)
     if (_.includes([30, 60, 90, 120, 150, 180], commercial.duration)) {
       const url = `https://api.twitch.tv/kraken/channels/${cid}/commercial`;
 
-      const token = await global.oauth.botAccessToken;
+      const token = await oauth.botAccessToken;
       if (token === '') {
         return;
       }
@@ -75,15 +78,15 @@ class Commercial extends System {
           },
         });
 
-        global.events.fire('commercial', { duration: commercial.duration });
-        global.client.commercial(await global.oauth.broadcasterUsername, commercial.duration);
+        events.fire('commercial', { duration: commercial.duration });
+        global.client.commercial(await oauth.broadcasterUsername, commercial.duration);
         if (!_.isNil(commercial.message)) {
           sendMessage(commercial.message, opts.sender, opts.attr);
         }
       } catch (e) {
         error(`API: ${url} - ${e.stack}`);
-        if (global.panel && global.panel.io) {
-          global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'commercial', api: 'kraken', endpoint: url, code: e.response.status, data: e.stack });
+        if (panel && panel.io) {
+          panel.io.emit('api.stats', { timestamp: Date.now(), call: 'commercial', api: 'kraken', endpoint: url, code: e.response.status, data: e.stack });
         }
       }
     } else {

@@ -1,6 +1,7 @@
 import Overlay from './_interface';
 import { settings, ui } from '../decorators';
 import { publicEndpoint } from '../helpers/socket';
+import api from '../api';
 
 class ClipsCarousel extends Overlay {
   @settings('clips')
@@ -24,7 +25,7 @@ class ClipsCarousel extends Overlay {
 
   sockets () {
     publicEndpoint(this.nsp, 'clips', async (cb) => {
-      const clips = await global.api.getTopClips({ period: 'custom', days: this.cClipsCustomPeriodInDays, first: this.cClipsNumOfClips });
+      const clips = await api.getTopClips({ period: 'custom', days: this.cClipsCustomPeriodInDays, first: this.cClipsNumOfClips });
       cb(null, { clips, settings: { timeToNextClip: this.cClipsTimeToNextClip } });
     });
   }

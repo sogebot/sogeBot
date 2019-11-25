@@ -6,13 +6,14 @@ import { adminEndpoint, publicEndpoint } from '../helpers/socket';
 
 import { getRepository, In, IsNull, Not } from 'typeorm';
 import { Alert, AlertCheer, AlertFollow, AlertHost, AlertMedia, AlertRaid, AlertResub, AlertSub, AlertSubgift, AlertTip, EmitData } from '../database/entity/alert';
+import panel from '../panel';
 
 class Alerts extends Registry {
   constructor() {
     super();
     this.addMenu({ category: 'registry', name: 'alerts', id: 'registry/alerts/list' });
     if (isMainThread) {
-      global.panel.getApp().get('/registry/alerts/:mediaid', async (req, res) => {
+      panel.getApp().get('/registry/alerts/:mediaid', async (req, res) => {
         const media = await getRepository(AlertMedia).find({ id: req.params.mediaid });
         const b64data = media.sort((a,b) => a.chunkNo - b.chunkNo).map(o => o.b64data).join('');
         if (b64data.trim().length === 0) {
@@ -138,7 +139,7 @@ class Alerts extends Registry {
   }
 
   trigger(opts: EmitData) {
-    global.panel.io.of('/registries/alerts').emit('alert', opts);
+    panel.io.of('/registries/alerts').emit('alert', opts);
   }
 
   test(opts: { event: keyof Omit<Alert, 'id' | 'updatedAt' | 'name' |'alertDelayInMs' | 'profanityFilterType' | 'loadStandardProfanityList' | 'customProfanityList'> }) {

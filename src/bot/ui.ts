@@ -9,6 +9,7 @@ import { filter, isNil, isString } from 'lodash';
 import moment from 'moment';
 import { getBroadcaster } from './commons';
 import { isMainThread } from './cluster';
+import oauth from './oauth';
 
 class UI extends Core {
   @settings()
@@ -87,7 +88,7 @@ class UI extends Core {
       // lang
       data.lang = global.general.lang;
 
-      data.isCastersSet = filter(global.oauth.generalOwners, (o) => isString(o) && o.trim().length > 0).length > 0 || getBroadcaster() !== '';
+      data.isCastersSet = filter(oauth.generalOwners, (o) => isString(o) && o.trim().length > 0).length > 0 || getBroadcaster() !== '';
 
       cb(data);
     });
@@ -124,5 +125,4 @@ class UI extends Core {
   }
 }
 
-export default UI;
-export { UI };
+export default new UI();

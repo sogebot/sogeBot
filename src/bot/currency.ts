@@ -93,4 +93,4 @@ class Currency extends Core {
   }
 }
 
-export { Currency };
+export default new Currency();

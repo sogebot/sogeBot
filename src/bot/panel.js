@@ -18,8 +18,8 @@ import { Dashboard, Widget } from './database/entity/dashboard';
 import { Translation } from './database/entity/translation'
 import { TwitchTag, TwitchTagLocalizationName } from './database/entity/twitch'
 
+const socket = require('./socket');
 const Parser = require('./parser')
-
 const config = require('@config')
 
 let app;
@@ -58,10 +58,10 @@ function Panel () {
 
   // customvariables system
   app.get('/customvariables/:id', (req, res) => {
-    global.customvariables.getURL(req, res)
+    customvariables.getURL(req, res)
   })
   app.post('/customvariables/:id', (req, res) => {
-    global.customvariables.postURL(req, res)
+    customvariables.postURL(req, res)
   })
 
   // static routing
@@ -111,7 +111,7 @@ function Panel () {
     finally: null
   })
 
-  this.io.use(global.socket.authorize);
+  this.io.use(socket.authorize);
 
   var self = this
   this.io.on('connection', async function (socket) {
@@ -157,7 +157,7 @@ function Panel () {
       cb(results);
     });
     // twitch game and title change
-    socket.on('getGameFromTwitch', function (game) { global.api.sendGameFromTwitch(global.api, socket, game) })
+    socket.on('getGameFromTwitch', function (game) { api.sendGameFromTwitch(api, socket, game) })
     socket.on('getUserTwitchGames', async () => {
       const titles = await getManager()
         .createQueryBuilder()
@@ -251,8 +251,8 @@ function Panel () {
       cb(null, allTitles);
     });
     socket.on('updateGameAndTitle', async (data, cb) => {
-      const status = await global.api.setTitleAndGame(null, data)
-      await global.api.setTags(null, data.tags);
+      const status = await api.setTitleAndGame(null, data)
+      await api.setTags(null, data.tags);
 
       if (!status) { // twitch refused update
         cb(true);
@@ -280,7 +280,7 @@ function Panel () {
           .execute();
       }
 
-      self.sendStreamData(self, global.panel.io) // force dashboard update
+      self.sendStreamData(self, panel.io) // force dashboard update
       cb(null)
     })
     socket.on('joinBot', async () => {
@@ -294,9 +294,9 @@ function Panel () {
 
     // custom var
     socket.on('custom.variable.value', async (variable, cb) => {
-      let value = global.translate('webpanel.not-available')
-      let isVariableSet = await global.customvariables.isVariableSet(variable)
-      if (isVariableSet) value = await global.customvariables.getValueOf(variable)
+      let value = translate('webpanel.not-available')
+      let isVariableSet = await customvariables.isVariableSet(variable)
+      if (isVariableSet) value = await customvariables.getValueOf(variable)
       cb(null, value)
     })
 
@@ -305,8 +305,8 @@ function Panel () {
       _.each(responses, function (value, key) {
         let _at = !_.isNil(at) ? at + '.' + key : key
         responses[key] = {} // remap to obj
-        responses[key].default = global.translate(_at, true)
-        responses[key].current = global.translate(_at)
+        responses[key].default = translate(_at, true)
+        responses[key].current = translate(_at)
       })
       callback(responses)
     })
@@ -318,15 +318,15 @@ function Panel () {
       let lang = {}
       _.merge(
         lang,
-        global.translate({ root: 'webpanel' }),
-        global.translate({ root: 'ui' }) // add ui root -> slowly refactoring to new name
+        translate({ root: 'webpanel' }),
+        translate({ root: 'ui' }) // add ui root -> slowly refactoring to new name
       )
       socket.emit('lang', lang)
     })
     socket.on('responses.revert', async function (data, callback) {
       _.remove(global.lib.translate.custom, function (o) { return o.name === data.name })
       await getRepository(Translation).delete({ name: data.name })
-      let translate = global.translate(data.name)
+      let translate = translate(data.name)
       callback(translate)
     })
 
@@ -465,7 +465,7 @@ function Panel () {
     })
 
     socket.on('name', function (cb) {
-      cb(global.oauth.botUsername);
+      cb(oauth.botUsername);
     })
     socket.on('version', function (cb) {
       const version = _.get(process, 'env.npm_package_version', 'x.y.z');
@@ -484,8 +484,8 @@ function Panel () {
       let lang = {}
       _.merge(
         lang,
-        global.translate({ root: 'webpanel' }),
-        global.translate({ root: 'ui' }) // add ui root -> slowly refactoring to new name
+        translate({ root: 'webpanel' }),
+        translate({ root: 'ui' }) // add ui root -> slowly refactoring to new name
       )
       cb(lang);
     })
@@ -508,8 +508,8 @@ function Panel () {
     let lang = {}
     _.merge(
       lang,
-      global.translate({ root: 'webpanel' }),
-      global.translate({ root: 'ui' }) // add ui root -> slowly refactoring to new name
+      translate({ root: 'webpanel' }),
+      translate({ root: 'ui' }) // add ui root -> slowly refactoring to new name
     )
     socket.emit('lang', lang)
   })
@@ -524,8 +524,8 @@ Panel.prototype.getApp = function () {
 }
 
 Panel.prototype.expose = function () {
-  server.listen(global.panel.port, function () {
-    info(`WebPanel is available at http://localhost:${global.panel.port}`)
+  server.listen(panel.port, function () {
+    info(`WebPanel is available at http://localhost:${panel.port}`)
   })
 }
 
@@ -594,24 +594,24 @@ Panel.prototype.sendStreamData = async function (self, socket) {
     }
 
     const data = {
-      broadcasterType: global.oauth.broadcasterType,
-      uptime: commons.getTime(global.api.isStreamOnline ? global.api.streamStatusChangeSince : null, false),
-      currentViewers: global.api.stats.currentViewers,
-      currentSubscribers: global.api.stats.currentSubscribers,
-      currentBits: global.api.stats.currentBits,
-      currentTips: global.api.stats.currentTips,
+      broadcasterType: oauth.broadcasterType,
+      uptime: commons.getTime(api.isStreamOnline ? api.streamStatusChangeSince : null, false),
+      currentViewers: api.stats.currentViewers,
+      currentSubscribers: api.stats.currentSubscribers,
+      currentBits: api.stats.currentBits,
+      currentTips: api.stats.currentTips,
       currency: global.currency.symbol(global.currency.mainCurrency),
-      chatMessages: global.api.isStreamOnline ? global.linesParsed - global.api.chatMessagesAtStart : 0,
-      currentFollowers: global.api.stats.currentFollowers,
-      currentViews: global.api.stats.currentViews,
-      maxViewers: global.api.stats.maxViewers,
-      newChatters: global.api.stats.newChatters,
-      game: global.api.stats.currentGame,
-      status: global.api.stats.currentTitle,
-      rawStatus: global.api.rawStatus,
-      currentSong: ytCurrentSong || spotifyCurrentSong || global.translate('songs.not-playing'),
-      currentHosts: global.api.stats.currentHosts,
-      currentWatched: global.api.stats.currentWatchedTime,
+      chatMessages: api.isStreamOnline ? global.linesParsed - api.chatMessagesAtStart : 0,
+      currentFollowers: api.stats.currentFollowers,
+      currentViews: api.stats.currentViews,
+      maxViewers: api.stats.maxViewers,
+      newChatters: api.stats.newChatters,
+      game: api.stats.currentGame,
+      status: api.stats.currentTitle,
+      rawStatus: api.rawStatus,
+      currentSong: ytCurrentSong || spotifyCurrentSong || translate('songs.not-playing'),
+      currentHosts: api.stats.currentHosts,
+      currentWatched: api.stats.currentWatchedTime,
       tags: tagResults,
     }
     socket.emit('stats', data)
@@ -620,4 +620,4 @@ Panel.prototype.sendStreamData = async function (self, socket) {
   }
 }
 
-module.exports = Panel
+export default new Panel();

@@ -6,6 +6,9 @@ import http from 'http';
 import { isDebugEnabled as debugIsEnabled } from './helpers/log';
 import config from '@config';
 import { chatIn, chatOut, info, whisperIn, whisperOut } from './helpers/log';
+import oauth from './oauth';
+import api from './api';
+import panel from './panel';
 
 export const isMainThread = typeof process.env.CLUSTER === 'undefined';
 
@@ -21,7 +24,7 @@ let lastSocketIdx = 0;
 let socketIO, clientIO;
 
 const init = async () => {
-  if (typeof global.panel === 'undefined') {
+  if (typeof panel === 'undefined') {
     setTimeout(() => {
       init();
     }, 1000);
@@ -119,7 +122,7 @@ export const clusteredClientDelete = (senderId) => {
 
 export const clusteredClientTimeout = (username, timeMs, reason) => {
   if (isMainThread) {
-    global.tmi.client.bot.chat.timeout(global.oauth.generalChannel, username, timeMs, reason);
+    global.tmi.client.bot.chat.timeout(oauth.generalChannel, username, timeMs, reason);
   } else {
     clientIO.emit('clusteredClientTimeout', username, timeMs, reason);
   }
@@ -155,7 +158,7 @@ export const clusteredChatOut = (message) => {
 
 export const clusteredFetchAccountAge = (username, userId) => {
   if (isMainThread) {
-    global.api.fetchAccountAge(username, userId);
+    api.fetchAccountAge(username, userId);
   } else {
     clientIO.emit('clusteredFetchAccountAge', username, userId);
   }

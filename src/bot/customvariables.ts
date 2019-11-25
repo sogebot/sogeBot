@@ -7,7 +7,7 @@ import { setTimeout } from 'timers';
 import { filter, get, isNil, map, sample } from 'lodash';
 
 import Message from './message';
-import { permission } from './permissions';
+import { permission } from './helpers/permissions';
 import { getAllOnlineUsernames } from './helpers/getAllOnlineUsernames';
 import { getOwnerAsSender, getTime, isModerator, prepare, sendMessage } from './commons';
 
@@ -15,6 +15,10 @@ import { getRepository } from 'typeorm';
 import { User } from './database/entity/user';
 import { Variable, VariableHistory, VariableWatch } from './database/entity/variable';
 import { addToViewersCache, getfromViewersCache } from './helpers/permissions';
+import users from './users';
+import api from './api';
+import permissions from './permissions';
+import panel from './panel';
 
 class CustomVariables {
   timeouts: {
@@ -94,16 +98,16 @@ class CustomVariables {
   async addMenuAndListenersToPanel () {
     clearTimeout(this.timeouts[`${this.constructor.name}.addMenuAndListenersToPanel`]);
 
-    if (isNil(global.panel)) {
+    if (isNil(panel)) {
       this.timeouts[`${this.constructor.name}.addMenuAndListenersToPanel`] = setTimeout(() => this.addMenuAndListenersToPanel(), 1000);
     } else {
-      global.panel.addMenu({ category: 'registry', name: 'custom-variables', id: 'registry.customVariables/list' });
+      panel.addMenu({ category: 'registry', name: 'custom-variables', id: 'registry.customVariables/list' });
       this.sockets();
     }
   }
 
   sockets () {
-    const io = global.panel.io.of('/registry/customVariables');
+    const io = panel.io.of('/registry/customVariables');
 
     io.on('connection', (socket) => {
       socket.on('list.variables', async (cb) => {
@@ -171,7 +175,7 @@ class CustomVariables {
     if (typeof sender === 'string') {
       sender = {
         username: sender,
-        userId: await global.users.getIdByName(sender),
+        userId: await users.getIdByName(sender),
       };
     }
     // we need to check +1 variables, as they are part of commentary
@@ -179,9 +183,9 @@ class CustomVariables {
     const containRandom = isNil(script.replace(/Math\.random|_\.random/g, '').match(/random/g));
     const containOnline = isNil(script.match(/online/g));
 
-    let users: User[] = [];
+    let usersList: User[] = [];
     if (containUsers || containRandom) {
-      users = await getRepository(User).find();
+      usersList = await getRepository(User).find();
     }
 
     let onlineViewers: string[] = [];
@@ -222,9 +226,9 @@ class CustomVariables {
         follower: sample(map(onlineFollowers, 'username')),
         subscriber: sample(map(onlineSubscribers, 'username')),
       },
-      viewer: sample(map(users, 'username')),
-      follower: sample(map(filter(users, (o) => get(o, 'is.follower', false)), 'username')),
-      subscriber: sample(map(filter(users, (o) => get(o, 'is.subscriber', false)), 'username')),
+      viewer: sample(map(usersList, 'username')),
+      follower: sample(map(filter(usersList, (o) => get(o, 'is.follower', false)), 'username')),
+      subscriber: sample(map(filter(usersList, (o) => get(o, 'is.subscriber', false)), 'username')),
     };
 
     // get custom variables
@@ -266,21 +270,21 @@ class CustomVariables {
       users: users,
       random: randomVar,
       stream: {
-        uptime: getTime(global.api.isStreamOnline ? global.api.streamStatusChangeSince : null, false),
-        currentViewers: global.api.stats.currentViewers,
-        currentSubscribers: global.api.stats.currentSubscribers,
-        currentBits: global.api.stats.currentBits,
-        currentTips: global.api.stats.currentTips,
+        uptime: getTime(api.isStreamOnline ? api.streamStatusChangeSince : null, false),
+        currentViewers: api.stats.currentViewers,
+        currentSubscribers: api.stats.currentSubscribers,
+        currentBits: api.stats.currentBits,
+        currentTips: api.stats.currentTips,
         currency: global.currency.symbol(global.currency.mainCurrency),
-        chatMessages: (global.api.isStreamOnline) ? global.linesParsed - global.api.chatMessagesAtStart : 0,
-        currentFollowers: global.api.stats.currentFollowers,
-        currentViews: global.api.stats.currentViews,
-        maxViewers: global.api.stats.maxViewers,
-        newChatters: global.api.stats.newChatters,
-        game: global.api.stats.currentGame,
-        status: global.api.stats.currentTitle,
-        currentHosts: global.api.stats.currentHosts,
-        currentWatched: global.api.stats.currentWatchedTime,
+        chatMessages: (api.isStreamOnline) ? global.linesParsed - api.chatMessagesAtStart : 0,
+        currentFollowers: api.stats.currentFollowers,
+        currentViews: api.stats.currentViews,
+        maxViewers: api.stats.maxViewers,
+        newChatters: api.stats.newChatters,
+        game: api.stats.currentGame,
+        status: api.stats.currentTitle,
+        currentHosts: api.stats.currentHosts,
+        currentWatched: api.stats.currentWatchedTime,
       },
       sender,
       param: param,
@@ -289,7 +293,7 @@ class CustomVariables {
         const _user = await getRepository(User).findOne({ username });
         const userObj = {
           username,
-          id: await global.users.getIdByName(username),
+          id: await users.getIdByName(username),
           is: {
             online: _user?.isOnline ?? false,
             follower: get(_user, 'is.follower', false),
@@ -362,13 +366,13 @@ class CustomVariables {
       if (typeof opts.sender === 'string') {
         opts.sender = {
           username: opts.sender,
-          userId: await global.users.getIdByName(opts.sender),
+          userId: await users.getIdByName(opts.sender),
         };
       }
 
       if (opts.sender) {
         if (typeof getfromViewersCache(opts.sender.userId, item.permission) === 'undefined') {
-          addToViewersCache(opts.sender.userId, item.permission, (await global.permissions.check(opts.sender.userId, item.permission, false)).access);
+          addToViewersCache(opts.sender.userId, item.permission, (await permissions.check(opts.sender.userId, item.permission, false)).access);
         }
       }
       const permissionsAreValid = isNil(opts.sender) || getfromViewersCache(opts.sender.userId, item.permission);
@@ -465,12 +469,11 @@ class CustomVariables {
     if (isNil(variable)) {
       const regexp = new RegExp(`\\${variable}`, 'ig');
 
-      if (global.api.rawStatus.match(regexp)) {
-        global.api.setTitleAndGame(null, null);
+      if (api.rawStatus.match(regexp)) {
+        api.setTitleAndGame(null, null);
       }
     }
   }
 }
 
-export default CustomVariables;
-export { CustomVariables };
+export default new CustomVariables();

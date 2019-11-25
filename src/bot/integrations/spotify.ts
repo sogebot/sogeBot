@@ -12,6 +12,7 @@ import Expects from '../expects';
 import Integration from './_interface';
 import { debug, error, info, warning } from '../helpers/log';
 import { adminEndpoint } from '../helpers/socket';
+import api from '../api';
 
 /*
  * How to integrate:
@@ -222,7 +223,7 @@ class Spotify extends Integration {
       this.originalUri = song.uri;
     }
 
-    if (!(global.api.isStreamOnline)) {
+    if (!(api.isStreamOnline)) {
       return; // don't do anything on offline stream
     }
 
@@ -279,7 +280,7 @@ class Spotify extends Integration {
     clearTimeout(this.timeouts.ICurrentSong);
 
     try {
-      if (!this.fetchCurrentSongWhenOffline && !(global.api.isStreamOnline)) {
+      if (!this.fetchCurrentSongWhenOffline && !(api.isStreamOnline)) {
         throw Error('Stream is offline');
       }
       const data = await this.client.getMyCurrentPlayingTrack();
@@ -474,7 +475,7 @@ class Spotify extends Integration {
   @command('!spotify')
   @default_permission(null)
   async main (opts: CommandOptions) {
-    if (!(global.api.isStreamOnline)) {
+    if (!(api.isStreamOnline)) {
       return;
     } // don't do anything on offline stream
     if (!this.songRequests) {

@@ -6,7 +6,7 @@ import { isNil } from 'lodash';
 
 import Parser from './parser';
 import { command, default_permission } from './decorators';
-import { permission } from './permissions';
+import { permission } from './helpers/permissions';
 import Expects from './expects';
 import Core from './_interface';
 import * as constants from './constants';
@@ -20,6 +20,10 @@ import { clusteredChatIn, clusteredWhisperIn, isMainThread, manageMessage } from
 
 import { getRepository } from 'typeorm';
 import { User, UserBit } from './database/entity/user';
+import events from './events';
+import api from './api';
+import users from './users';
+import oauth from './oauth';
 
 class TMI extends Core {
   @settings('chat')
@@ -94,9 +98,9 @@ class TMI extends Core {
   async initClient (type: string) {
     clearTimeout(this.timeouts[`initClient.${type}`]);
     const [token, username, channel] = await Promise.all([
-      global.oauth[type + 'AccessToken'],
-      global.oauth[type + 'Username'],
-      global.oauth.generalChannel,
+      oauth[type + 'AccessToken'],
+      oauth[type + 'Username'],
+      oauth.generalChannel,
     ]);
 
     try {
@@ -108,7 +112,7 @@ class TMI extends Core {
         token,
         username,
         log,
-        onAuthenticationFailure: () => global.oauth.refreshAccessToken(type).then(token => token),
+        onAuthenticationFailure: () => oauth.refreshAccessToken(type).then(token => token),
       });
       this.loadListeners(type);
       await this.client[type].chat.connect();
@@ -132,16 +136,16 @@ class TMI extends Core {
         throw Error('TMI: cannot reconnect, connection is not established');
       }
       const [token, username, channel] = await Promise.all([
-        global.oauth[type + 'AccessToken'],
-        global.oauth[type + 'Username'],
-        global.oauth.generalChannel,
+        oauth[type + 'AccessToken'],
+        oauth[type + 'Username'],
+        oauth.generalChannel,
       ]);
 
       if (this.channel !== channel) {
         info(`TMI: ${type} is reconnecting`);
 
         await this.client[type].chat.part(this.channel);
-        await this.client[type].chat.reconnect({ token, username, onAuthenticationFailure: () => global.oauth.refreshAccessToken(type).then(token => token) });
+        await this.client[type].chat.reconnect({ token, username, onAuthenticationFailure: () => oauth.refreshAccessToken(type).then(token => token) });
 
         await this.join(type, channel);
       }
@@ -285,7 +289,7 @@ class TMI extends Core {
             });
 
             if (message.tags['message-type'] === 'action') {
-              global.events.fire('action', { username: message.tags.username.toLowerCase() });
+              events.fire('action', { username: message.tags.username.toLowerCase() });
             }
           }
         } else {
@@ -301,19 +305,19 @@ class TMI extends Core {
 
           if (typeof duration === 'undefined') {
             ban(`${username}, reason: ${reason}`);
-            global.events.fire('ban', { username: username, reason: reason });
+            events.fire('ban', { username: username, reason: reason });
           } else {
-            global.events.fire('timeout', { username, reason, duration });
+            events.fire('timeout', { username, reason, duration });
           }
         } else {
-          global.events.fire('clearchat', {});
+          events.fire('clearchat', {});
         }
       });
 
       this.client[type].chat.on('HOSTTARGET', message => {
         if (message.event === 'HOST_ON') {
           if (typeof message.numberOfViewers !== 'undefined') { // may occur on restart bot when hosting
-            global.events.fire('hosting', { target: message.username, viewers: message.numberOfViewers });
+            events.fire('hosting', { target: message.username, viewers: message.numberOfViewers });
           }
         }
       });
@@ -343,7 +347,7 @@ class TMI extends Core {
         };
 
         global.overlays.eventlist.add(data);
-        global.events.fire('hosted', data);
+        events.fire('hosted', data);
         global.registries.alerts.trigger({
           event: 'hosts',
           name: username,
@@ -371,7 +375,7 @@ class TMI extends Core {
       };
 
       global.overlays.eventlist.add(data);
-      global.events.fire('raid', data);
+      events.fire('raid', data);
       global.registries.alerts.trigger({
         event: 'raids',
         name: message.parameters.login,
@@ -395,9 +399,9 @@ class TMI extends Core {
         /*
         Workaround for https://github.com/sogehige/sogeBot/issues/2581
         TODO: update for tmi-js
-        if (!global.users.newChattersList.includes(message.tags.login.toLowerCase())) {
-          global.users.newChattersList.push(message.tags.login.toLowerCase())
-          global.api.stats.newChatters += 1;
+        if (!users.newChattersList.includes(message.tags.login.toLowerCase())) {
+          users.newChattersList.push(message.tags.login.toLowerCase())
+          api.stats.newChatters += 1;
         }
         */
       } else {
@@ -443,7 +447,7 @@ class TMI extends Core {
         timestamp: Date.now(),
       });
       sub(`${username}#${userstate.userId}, tier: ${tier}`);
-      global.events.fire('subscription', { username: username, method: (isNil(method.prime) && method.prime) ? 'Twitch Prime' : '', subCumulativeMonths, tier });
+      events.fire('subscription', { username: username, method: (isNil(method.prime) && method.prime) ? 'Twitch Prime' : '', subCumulativeMonths, tier });
       global.registries.alerts.trigger({
         event: 'subs',
         name: username,
@@ -510,7 +514,7 @@ class TMI extends Core {
         timestamp: Date.now(),
       });
       resub(`${username}#${userstate.userId}, streak share: ${subStreakShareEnabled}, streak: ${subStreak}, months: ${subCumulativeMonths}, message: ${messageFromUser}, tier: ${tier}`);
-      global.events.fire('resub', {
+      events.fire('resub', {
         username,
         tier,
         subStreakShareEnabled,
@@ -556,7 +560,7 @@ class TMI extends Core {
         count,
         timestamp: Date.now(),
       });
-      global.events.fire('subcommunitygift', { username, count });
+      events.fire('subcommunitygift', { username, count });
       subcommunitygift(`${username}#${userId}, to ${count} viewers`);
       global.registries.alerts.trigger({
         event: 'subgifts',
@@ -592,7 +596,7 @@ class TMI extends Core {
       if (typeof this.ignoreGiftsFromUser[username] !== 'undefined' && this.ignoreGiftsFromUser[username].count !== 0) {
         this.ignoreGiftsFromUser[username].count--;
       } else {
-        global.events.fire('subgift', { username: username, recipient: recipient, tier });
+        events.fire('subgift', { username: username, recipient: recipient, tier });
         triggerInterfaceOnSub({
           username: recipient,
           userId: recipientId,
@@ -676,7 +680,7 @@ class TMI extends Core {
       user.bits.push(newBits);
       getRepository(User).save(user);
 
-      global.events.fire('cheer', { username, bits: userstate.bits, message: messageFromUser });
+      events.fire('cheer', { username, bits: userstate.bits, message: messageFromUser });
       global.registries.alerts.trigger({
         event: 'cheers',
         name: username,
@@ -686,8 +690,8 @@ class TMI extends Core {
         message: messageFromUser,
         autohost: false,
       });
-      if (global.api.isStreamOnline) {
-        global.api.stats.currentBits += parseInt(userstate.bits, 10);
+      if (api.isStreamOnline) {
+        api.stats.currentBits += parseInt(userstate.bits, 10);
       }
 
       triggerInterfaceOnBit({
@@ -726,7 +730,7 @@ class TMI extends Core {
 
     if (!sender.userId && sender.username) {
       // this can happen if we are sending commands from dashboards etc.
-      sender.userId = await global.users.getIdByName(sender.username);
+      sender.userId = await users.getIdByName(sender.username);
     }
 
     if (typeof sender.badges === 'undefined') {
@@ -776,12 +780,12 @@ class TMI extends Core {
 
         await getRepository(User).save(user);
 
-        global.api.followerUpdatePreCheck(sender.username);
+        api.followerUpdatePreCheck(sender.username);
 
-        if (global.api.isStreamOnline) {
-          global.events.fire('keyword-send-x-times', { username: sender.username, message: message });
+        if (api.isStreamOnline) {
+          events.fire('keyword-send-x-times', { username: sender.username, message: message });
           if (message.startsWith('!')) {
-            global.events.fire('command-send-x-times', { username: sender.username, message: message });
+            events.fire('command-send-x-times', { username: sender.username, message: message });
           } else if (!message.startsWith('!')) {
             await getRepository(User).increment({ userId: sender.userId }, 'messages', 1);
           }

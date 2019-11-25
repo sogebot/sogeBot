@@ -8,13 +8,15 @@ import ytpl from 'ytpl';
 
 import { getBot, prepare, sendMessage, timeout } from '../commons';
 import { command, default_permission, settings, shared, ui } from '../decorators';
-import { permission } from '../permissions';
+import { permission } from '../helpers/permissions';
 import System from './_interface';
 import { onChange, onLoad } from '../decorators/on';
 import { error, info } from '../helpers/log';
 import { adminEndpoint, publicEndpoint } from '../helpers/socket';
 import { Brackets, getRepository } from 'typeorm';
 import { SongBan, SongPlaylist, SongRequest } from '../database/entity/song';
+import oauth from '../oauth';
+import { translate } from '../translate';
 
 const defaultApiKey = 'AIzaSyDYevtuLOxbyqBjh17JNZNvSQO854sngK0';
 
@@ -233,7 +235,7 @@ class Songs extends System {
       request.push(currentSong.username);
     }
     for (const user of request) {
-      timeout(user, global.translate('songs.song-was-banned-timeout-message'), 300);
+      timeout(user, translate('songs.song-was-banned-timeout-message'), 300);
     }
 
     await Promise.all([
@@ -265,7 +267,7 @@ class Songs extends System {
               error(err);
             } else if (!_.isNil(videoInfo) && !_.isNil(videoInfo.title)) {
               banned++;
-              sendMessage(global.translate('songs.bannedSong').replace(/\$title/g, videoInfo.title), opts.sender, opts.attr);
+              sendMessage(translate('songs.bannedSong').replace(/\$title/g, videoInfo.title), opts.sender, opts.attr);
 
               // send timeouts to all users who requested song
               const request = (await getRepository(SongRequest).find({ videoId: opts.parameters })).map(o => o.username);
@@ -274,7 +276,7 @@ class Songs extends System {
                 request.push(currentSong.username);
               }
               for (const user of request) {
-                timeout(user, global.translate('songs.bannedSongTimeout'), 300);
+                timeout(user, translate('songs.bannedSongTimeout'), 300);
               }
 
               await Promise.all([
@@ -305,9 +307,9 @@ class Songs extends System {
   async unbanSong (opts) {
     const removed = await getRepository(SongBan).delete({ videoId: opts.parameters });
     if ((removed.affected || 0) > 0) {
-      sendMessage(global.translate('songs.song-was-unbanned'), opts.sender, opts.attr);
+      sendMessage(translate('songs.song-was-unbanned'), opts.sender, opts.attr);
     } else {
-      sendMessage(global.translate('songs.song-was-not-banned'), opts.sender, opts.attr);
+      sendMessage(translate('songs.song-was-not-banned'), opts.sender, opts.attr);
     }
   }
 
@@ -396,9 +398,9 @@ class Songs extends System {
     }
     const message = await prepare(translation, { name: currentSong.title, username: currentSong.username });
     sendMessage(message, {
-      username: global.oauth.botUsername,
-      displayName: global.oauth.botUsername,
-      userId: Number(global.oauth.botId),
+      username: oauth.botUsername,
+      displayName: oauth.botUsername,
+      userId: Number(oauth.botId),
       emotes: [],
       badges: {},
       'message-type': 'chat',
@@ -419,9 +421,9 @@ class Songs extends System {
     }
     const message = await prepare(translation, { name: currentSong.title, username: currentSong.username });
     sendMessage(message, {
-      username: global.oauth.botUsername,
-      displayName: global.oauth.botUsername,
-      userId: Number(global.oauth.botId),
+      username: oauth.botUsername,
+      displayName: oauth.botUsername,
+      userId: Number(oauth.botId),
       emotes: [],
       badges: {},
       'message-type': 'chat',
@@ -435,10 +437,10 @@ class Songs extends System {
       const currentSong = JSON.parse(this.currentSong);
       this.addSongToPlaylist({ sender: null, parameters: currentSong.videoID });
     } catch (err) {
-      sendMessage(global.translate('songs.noCurrentSong'), {
-        username: global.oauth.botUsername,
-        displayName: global.oauth.botUsername,
-        userId: Number(global.oauth.botId),
+      sendMessage(translate('songs.noCurrentSong'), {
+        username: oauth.botUsername,
+        displayName: oauth.botUsername,
+        userId: Number(oauth.botId),
         emotes: [],
         badges: {},
         'message-type': 'chat',
@@ -457,10 +459,10 @@ class Songs extends System {
   @command('!playlist')
   @default_permission(permission.CASTERS)
   async help () {
-    sendMessage(global.translate('core.usage') + ': !playlist add <youtubeid> | !playlist remove <youtubeid> | !playlist ban <youtubeid> | !playlist random on/off | !playlist steal', {
-      username: global.oauth.botUsername,
-      displayName: global.oauth.botUsername,
-      userId: Number(global.oauth.botId),
+    sendMessage(translate('core.usage') + ': !playlist add <youtubeid> | !playlist remove <youtubeid> | !playlist ban <youtubeid> | !playlist random on/off | !playlist steal', {
+      username: oauth.botUsername,
+      displayName: oauth.botUsername,
+      userId: Number(oauth.botId),
       emotes: [],
       badges: {},
       'message-type': 'chat',
@@ -471,9 +473,9 @@ class Songs extends System {
   async addSongToQueue (opts) {
     if (opts.parameters.length < 1 || !this.songrequest) {
       if (this.songrequest) {
-        sendMessage(global.translate('core.usage') + ': !songrequest <video-id|video-url|search-string>', opts.sender, opts.attr);
+        sendMessage(translate('core.usage') + ': !songrequest <video-id|video-url|search-string>', opts.sender, opts.attr);
       } else {
-        sendMessage('$sender, ' + global.translate('core.settings.songs.songrequest.false'), opts.sender, opts.attr);
+        sendMessage('$sender, ' + translate('core.settings.songs.songrequest.false'), opts.sender, opts.attr);
       }
       return;
     }
@@ -499,7 +501,7 @@ class Songs extends System {
     // is song banned?
     const ban = await getRepository(SongBan).findOne({ videoId: videoID });
     if (ban) {
-      sendMessage(global.translate('songs.song-is-banned'), opts.sender, opts.attr);
+      sendMessage(translate('songs.song-is-banned'), opts.sender, opts.attr);
       return;
     }
 
@@ -508,7 +510,7 @@ class Songs extends System {
       try {
         const video = await this.youtubeApi.getVideo(videoID);
         if (video.data.snippet.categoryId !== '10') {
-          return sendMessage(global.translate('songs.incorrect-category'), opts.sender, opts.attr);
+          return sendMessage(translate('songs.incorrect-category'), opts.sender, opts.attr);
         }
       } catch (e) {}
     }
@@ -518,9 +520,9 @@ class Songs extends System {
         return error(err);
       }
       if (_.isUndefined(videoInfo) || _.isUndefined(videoInfo.title) || _.isNull(videoInfo.title)) {
-        sendMessage(global.translate('songs.song-was-not-found'), opts.sender, opts.attr);
+        sendMessage(translate('songs.song-was-not-found'), opts.sender, opts.attr);
       } else if (Number(videoInfo.length_seconds) / 60 > this.duration) {
-        sendMessage(global.translate('songs.song-is-too-long'), opts.sender, opts.attr);
+        sendMessage(translate('songs.song-is-too-long'), opts.sender, opts.attr);
       } else {
         getRepository(SongRequest).save({
           videoId: videoID,
@@ -632,7 +634,7 @@ class Songs extends System {
       const message = await prepare('songs.song-was-removed-from-playlist', { name: song.title });
       sendMessage(message, opts.sender, opts.attr);
     } else {
-      sendMessage(global.translate('songs.song-was-not-found'), opts.sender, opts.attr);
+      sendMessage(translate('songs.song-was-not-found'), opts.sender, opts.attr);
     }
   }
 

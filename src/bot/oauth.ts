@@ -6,6 +6,7 @@ import * as constants from './constants';
 import { settings, shared, ui } from './decorators';
 import { onChange } from './decorators/on';
 import { error, info, warning } from './helpers/log';
+import api from './api';
 
 class OAuth extends Core {
   private toWait = 10;
@@ -124,7 +125,7 @@ class OAuth extends Core {
     if (!isMainThread || global.mocha) {
       return;
     }
-    if (typeof global.api === 'undefined' || typeof global.tmi === 'undefined') {
+    if (typeof api === 'undefined' || typeof global.tmi === 'undefined') {
       return setTimeout(() => this.getChannelId(), 1000);
     }
     clearTimeout(this.timeouts.getChannelId);
@@ -132,14 +133,14 @@ class OAuth extends Core {
     let timeout = 1000;
 
     if (this.currentChannel !== this.generalChannel && this.generalChannel !== '') {
-      const cid = await global.api.getIdFromTwitch(this.generalChannel, true);
+      const cid = await api.getIdFromTwitch(this.generalChannel, true);
       if (typeof cid !== 'undefined' && cid !== null) {
         this.currentChannel = this.generalChannel;
         this.channelId = cid;
         info('Channel ID set to ' + cid);
         global.tmi.reconnect('bot');
         global.tmi.reconnect('broadcaster');
-        global.api.updateChannelViewsAndBroadcasterType();
+        api.updateChannelViewsAndBroadcasterType();
         this.toWait = 10;
       } else {
         error(`Cannot get channel ID of ${this.generalChannel} - waiting ${this.toWait.toFixed()}s`);
@@ -321,4 +322,4 @@ class OAuth extends Core {
   }
 }
 
-export { OAuth };
+export default new OAuth();

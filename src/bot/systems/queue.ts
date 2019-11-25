@@ -2,13 +2,14 @@ import * as _ from 'lodash';
 
 import { getOwner, prepare, sendMessage } from '../commons';
 import { command, default_permission, settings, shared } from '../decorators';
-import { permission } from '../permissions';
+import { permission } from '../helpers/permissions';
 import System from './_interface';
 import { adminEndpoint } from '../helpers/socket';
 
 import { getRepository } from 'typeorm';
 import { User } from '../database/entity/user';
 import { Queue as QueueEntity } from '../database/entity/queue';
+import { translate } from '../translate';
 
 /*
  * !queue                            - gets an info whether queue is opened or closed
@@ -102,21 +103,21 @@ class Queue extends System {
 
   @command('!queue')
   main (opts) {
-    sendMessage(global.translate(this.locked ? 'queue.info.closed' : 'queue.info.opened'), opts.sender, opts.attr);
+    sendMessage(translate(this.locked ? 'queue.info.closed' : 'queue.info.opened'), opts.sender, opts.attr);
   }
 
   @command('!queue open')
   @default_permission(permission.CASTERS)
   open (opts) {
     this.locked = false;
-    sendMessage(global.translate('queue.open'), opts.sender, opts.attr);
+    sendMessage(translate('queue.open'), opts.sender, opts.attr);
   }
 
   @command('!queue close')
   @default_permission(permission.CASTERS)
   close (opts) {
     this.locked = true;
-    sendMessage(global.translate('queue.close'), opts.sender, opts.attr);
+    sendMessage(translate('queue.close'), opts.sender, opts.attr);
   }
 
   @command('!queue join')
@@ -155,10 +156,10 @@ class Queue extends System {
         queuedUser.isModerator = user.isModerator;
         queuedUser.createdAt = Date.now();
         await getRepository(QueueEntity).save(queuedUser);
-        sendMessage(global.translate('queue.join.opened'), opts.sender, opts.attr);
+        sendMessage(translate('queue.join.opened'), opts.sender, opts.attr);
       }
     } else {
-      sendMessage(global.translate('queue.join.closed'), opts.sender, opts.attr);
+      sendMessage(translate('queue.join.closed'), opts.sender, opts.attr);
     }
   }
 
@@ -167,7 +168,7 @@ class Queue extends System {
   clear (opts) {
     getRepository(QueueEntity).delete({});
     this.pickedUsers = [];
-    sendMessage(global.translate('queue.clear'), opts.sender, opts.attr);
+    sendMessage(translate('queue.clear'), opts.sender, opts.attr);
   }
 
   @command('!queue random')
@@ -205,13 +206,13 @@ class Queue extends System {
     let msg;
     switch (users.length) {
       case 0:
-        msg = global.translate('queue.picked.none');
+        msg = translate('queue.picked.none');
         break;
       case 1:
-        msg = global.translate('queue.picked.single');
+        msg = translate('queue.picked.single');
         break;
       default:
-        msg = global.translate('queue.picked.multi');
+        msg = translate('queue.picked.multi');
     }
 
     sendMessage(msg.replace(/\$users/g, users.map(o => atUsername ? `@${o.username}` : o.username).join(', ')), opts.sender, opts.attr);

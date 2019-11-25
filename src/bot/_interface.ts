@@ -5,7 +5,7 @@ import { isMainThread } from './cluster';
 
 import { loadingInProgress, permissions as permissionsList } from './decorators';
 import { getFunctionList } from './decorators/on';
-import { permission } from './permissions';
+import { permission } from './helpers/permissions';
 import { error, info, warning } from './helpers/log';
 
 import { getManager, getRepository } from 'typeorm';
@@ -13,6 +13,8 @@ import { Settings } from './database/entity/settings';
 import { PermissionCommands, Permissions as PermissionsEntity } from './database/entity/permissions';
 import { adminEndpoint, publicEndpoint } from './helpers/socket';
 import { flatten, unflatten } from './helpers/flatten';
+import socket from './socket';
+import panel from './panel';
 
 class Module {
   public dependsOn: string[] = [];
@@ -21,7 +23,7 @@ class Module {
   public settingsList: { category: string; key: string }[] = [];
   public settingsPermList: { category: string; key: string }[] = [];
   public on: InterfaceSettings.On;
-  public socket: SocketIOClient.Socket | null;
+  public socket: any = null;
 
   get isDisabledByEnv(): boolean {
     const isDisableIgnored = typeof process.env.ENABLE !== 'undefined' && process.env.ENABLE.toLowerCase().split(',').includes(this.constructor.name.toLowerCase());
@@ -191,10 +193,10 @@ class Module {
   }
 
   public _sockets() {
-    if (_.isNil(global.panel)) {
+    if (_.isNil(panel)) {
       this.timeouts[`${this.constructor.name}._sockets`] = setTimeout(() => this._sockets(), 1000);
     } else {
-      this.socket = global.panel.io.of(this.nsp).use(global.socket.authorize);
+      this.socket = panel.io.of(this.nsp).use(socket.authorize);
       this.sockets();
       this.sockets = function() {
         error(this.nsp + ': Cannot initialize sockets second time');
@@ -363,10 +365,10 @@ class Module {
     if (isMainThread) {
       clearTimeout(this.timeouts[`${this.constructor.name}.${opts.id}.addMenu`]);
 
-      if (_.isNil(global.panel)) {
+      if (_.isNil(panel)) {
         this.timeouts[`${this.constructor.name}.${opts.id}.addMenu`] = setTimeout(() => this.addMenu(opts), 1000);
       } else {
-        global.panel.addMenu(opts);
+        panel.addMenu(opts);
       }
     }
   }
@@ -375,10 +377,10 @@ class Module {
     if (isMainThread) {
       clearTimeout(this.timeouts[`${this.constructor.name}.${opts[0]}.addWidget`]);
 
-      if (_.isNil(global.panel)) {
+      if (_.isNil(panel)) {
         this.timeouts[`${this.constructor.name}.${opts[0]}.addWidget`] = setTimeout(() => this.addWidget(opts), 1000);
       } else {
-        global.panel.addWidget(opts[0], opts[1], opts[2]);
+        panel.addWidget(opts[0], opts[1], opts[2]);
       }
     }
   }
@@ -707,3 +709,4 @@ class Module {
 }
 
 export default Module;
+export { Module };

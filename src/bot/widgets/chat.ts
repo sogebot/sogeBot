@@ -3,6 +3,7 @@ import axios from 'axios';
 import { getIgnoreList, sendMessage } from '../commons';
 import Widget from './_interface';
 import { adminEndpoint } from '../helpers/socket';
+import OAuth from '../oauth';
 
 class Chat extends Widget {
   testme = 'a';
@@ -15,9 +16,9 @@ class Chat extends Widget {
   public sockets() {
     adminEndpoint(this.nsp, 'chat.message.send', async (message) => {
       sendMessage(message, {
-        username: global.oauth.botUsername,
-        displayName: global.oauth.botUsername,
-        userId: Number(global.oauth.botId),
+        username: OAuth.botUsername,
+        displayName: OAuth.botUsername,
+        userId: Number(OAuth.botId),
         emotes: [],
         badges: {},
         'message-type': 'chat',
@@ -25,12 +26,12 @@ class Chat extends Widget {
     });
 
     adminEndpoint(this.nsp, 'room', async (cb) => {
-      cb(null, global.oauth.generalChannel.toLowerCase());
+      cb(null, OAuth.generalChannel.toLowerCase());
     });
 
     adminEndpoint(this.nsp, 'viewers', async (cb) => {
       try {
-        const url = `https://tmi.twitch.tv/group/user/${(await global.oauth.generalChannel).toLowerCase()}/chatters`;
+        const url = `https://tmi.twitch.tv/group/user/${(await OAuth.generalChannel).toLowerCase()}/chatters`;
         const response = await axios.get(url);
 
         if (response.status === 200) {

@@ -10,6 +10,9 @@ import { triggerInterfaceOnTip } from '../helpers/interface/triggers';
 
 import { getRepository } from 'typeorm';
 import { User, UserTip } from '../database/entity/user';
+import users from '../users';
+import api from '../api';
+import events from '../events';
 
 class Streamlabs extends Integration {
   socket: SocketIOClient.Socket | null = null;
@@ -72,7 +75,7 @@ class Streamlabs extends Integration {
           let user = await getRepository(User).findOne({ where: { username: event.from.toLowerCase() }});
           let id;
           if (!user) {
-            id = await global.users.getIdByName(event.from.toLowerCase().toLowerCase());
+            id = await users.getIdByName(event.from.toLowerCase().toLowerCase());
             user = await getRepository(User).findOne({ where: { userId: id }});
             if (!user && id) {
               // if we still doesn't have user, we create new
@@ -97,8 +100,8 @@ class Streamlabs extends Integration {
             await getRepository(User).save(user);
           }
 
-          if (global.api.isStreamOnline) {
-            global.api.stats.currentTips += parseFloat(global.currency.exchange(event.amount, event.currency, global.currency.mainCurrency));
+          if (api.isStreamOnline) {
+            api.stats.currentTips += parseFloat(global.currency.exchange(event.amount, event.currency, global.currency.mainCurrency));
           }
           tip(`${event.from.toLowerCase()}${id ? '#' + id : ''}, amount: ${Number(event.amount).toFixed(2)}${event.currency}, message: ${event.message}`);
         }
@@ -110,7 +113,7 @@ class Streamlabs extends Integration {
           message: event.message,
           timestamp: Date.now(),
         });
-        global.events.fire('tip', {
+        events.fire('tip', {
           username: event.from.toLowerCase(),
           amount: parseFloat(event.amount).toFixed(2),
           currency: event.currency,

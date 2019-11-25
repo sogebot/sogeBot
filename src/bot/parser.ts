@@ -6,6 +6,11 @@ import { incrementCountOfCommandUsage } from './helpers/commands/count';
 import { getRepository } from 'typeorm';
 import { PermissionCommands } from './database/entity/permissions';
 import { addToViewersCache, getfromViewersCache } from './helpers/permissions';
+import permissions from './permissions';
+import events from './events';
+import users from './users';
+import twitch from './twitch';
+import { translate } from './translate';
 
 class Parser {
   started_at = Date.now();
@@ -67,7 +72,7 @@ class Parser {
 
       if (this.sender) {
         if (typeof getfromViewersCache(this.sender.userId, parser.permission) === 'undefined') {
-          addToViewersCache(this.sender.userId, parser.permission, (await global.permissions.check(this.sender.userId, parser.permission, false)).access);
+          addToViewersCache(this.sender.userId, parser.permission, (await permissions.check(this.sender.userId, parser.permission, false)).access);
         }
       }
       if (
@@ -119,10 +124,10 @@ class Parser {
   populateList () {
     const list = [
       global.currency,
-      global.events,
-      global.users,
-      global.permissions,
-      global.twitch,
+      events,
+      users,
+      permissions,
+      twitch,
       global.general,
       global.tmi,
     ];
@@ -193,7 +198,7 @@ class Parser {
       debug('parser.find', JSON.stringify({command: item.command, isStartingWith}));
 
       if (isStartingWith && (onlyParams.length === 0 || (onlyParams.length > 0 && onlyParams[0] === ' '))) {
-        const customPermission = await global.permissions.getCommandPermission(item.id);
+        const customPermission = await permissions.getCommandPermission(item.id);
         if (typeof customPermission !== 'undefined') {
           item.permission = customPermission;
         }
@@ -234,7 +239,7 @@ class Parser {
 
     if (this.sender) {
       if (typeof getfromViewersCache(this.sender.userId, command.permission) === 'undefined') {
-        addToViewersCache(this.sender.userId, command.permission, (await global.permissions.check(this.sender.userId, command.permission, false)).access);
+        addToViewersCache(this.sender.userId, command.permission, (await permissions.check(this.sender.userId, command.permission, false)).access);
       }
     }
 
@@ -267,7 +272,7 @@ class Parser {
     } else {
       // user doesn't have permissions for command
       sender['message-type'] = 'whisper';
-      sendMessage(global.translate('permissions.without-permission').replace(/\$command/g, message), sender, {});
+      sendMessage(translate('permissions.without-permission').replace(/\$command/g, message), sender, {});
 
       // do all rollbacks when permission failed
       const rollbacks = await this.rollbacks();

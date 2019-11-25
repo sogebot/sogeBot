@@ -8,6 +8,8 @@ import { info, tip } from '../helpers/log';
 import { triggerInterfaceOnTip } from '../helpers/interface/triggers';
 import { getRepository } from 'typeorm';
 import { User, UserTip } from '../database/entity/user';
+import users from '../users';
+import events from '../events';
 
 /* example payload (eventData)
 {
@@ -104,7 +106,7 @@ class StreamElements extends Integration {
     let user = await getRepository(User).findOne({ where: { username: username.toLowerCase() }});
     let id;
     if (!user) {
-      id = await global.users.getIdByName(username.toLowerCase());
+      id = await users.getIdByName(username.toLowerCase());
       user = await getRepository(User).findOne({ where: { userId: id }});
       if (!user && id) {
         // if we still doesn't have user, we create new
@@ -130,7 +132,7 @@ class StreamElements extends Integration {
     }
 
     tip(`${username.toLowerCase()}${id ? '#' + id : ''}, amount: ${Number(eventData.data.amount).toFixed(2)}${eventData.data.currency}, message: ${eventData.data.message}`);
-    global.events.fire('tip', {
+    events.fire('tip', {
       username: username.toLowerCase(),
       amount: parseFloat(eventData.data.amount).toFixed(2),
       currency: eventData.data.currency,

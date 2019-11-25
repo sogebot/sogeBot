@@ -12,6 +12,9 @@ import { triggerInterfaceOnTip } from '../helpers/interface/triggers.js';
 
 import { getRepository } from 'typeorm';
 import { User, UserTip } from '../database/entity/user';
+import api from '../api.js';
+import events from '../events.js';
+import users from '../users.js';
 
 class Donationalerts extends Integration {
   socket: SocketIOClient.Socket | null = null;
@@ -94,7 +97,7 @@ class Donationalerts extends Integration {
           timestamp: Date.now(),
         });
 
-        global.events.fire('tip', {
+        events.fire('tip', {
           username: data.username.toLowerCase(),
           amount: parseFloat(data.amount).toFixed(2),
           currency: data.currency,
@@ -116,7 +119,7 @@ class Donationalerts extends Integration {
           let user = await getRepository(User).findOne({ where: { username: data.username.toLowerCase() }});
           let id;
           if (!user) {
-            id = await global.users.getIdByName(data.username.toLowerCase());
+            id = await users.getIdByName(data.username.toLowerCase());
             user = await getRepository(User).findOne({ where: { userId: id }});
             if (!user && id) {
               // if we still doesn't have user, we create new
@@ -143,8 +146,8 @@ class Donationalerts extends Integration {
 
           tip(`${data.username.toLowerCase()}${id ? '#' + id : ''}, amount: ${Number(data.amount).toFixed(2)}${data.currency}, message: ${data.message}`);
 
-          if (global.api.isStreamOnline) {
-            global.api.stats.currentTips += parseFloat(global.currency.exchange(data.amount, data.currency, global.currency.mainCurrency));
+          if (api.isStreamOnline) {
+            api.stats.currentTips += parseFloat(global.currency.exchange(data.amount, data.currency, global.currency.mainCurrency));
           }
         }
 

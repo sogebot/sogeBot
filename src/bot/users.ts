@@ -9,6 +9,9 @@ import { error } from './helpers/log';
 import { adminEndpoint, viewerEndpoint } from './helpers/socket';
 import { Brackets, getConnection, getRepository } from 'typeorm';
 import { User, UserBit, UserTip } from './database/entity/user';
+import permissions from './permissions';
+import oauth from './oauth';
+import api from './api';
 
 class Users extends Core {
   uiSortCache: string | null = null;
@@ -55,18 +58,18 @@ class Users extends Core {
 
       // get new users
       const newChatters = await getRepository(User).find({ isOnline: true, watchedTime: 0 });
-      global.api.stats.newChatters += newChatters.length;
+      api.stats.newChatters += newChatters.length;
 
-      if (global.api.isStreamOnline) {
+      if (api.isStreamOnline) {
         const incrementedUsers = await getRepository(User).increment({ isOnline: true }, 'watchedTime', interval);
         // chatTimeOnline + chatTimeOffline is solely use for points distribution
         await getRepository(User).increment({ isOnline: true }, 'chatTimeOnline', interval);
 
         if (typeof incrementedUsers.affected === 'undefined') {
           const users = await getRepository(User).find({ isOnline: true });
-          global.api.stats.currentWatchedTime += users.length * interval;
+          api.stats.currentWatchedTime += users.length * interval;
         } else {
-          global.api.stats.currentWatchedTime += incrementedUsers.affected * interval;
+          api.stats.currentWatchedTime += incrementedUsers.affected * interval;
         }
       } else {
         await getRepository(User).increment({ isOnline: true }, 'chatTimeOffline', interval);
@@ -119,7 +122,7 @@ class Users extends Core {
     if (!user) {
       user = new User();
       user.userId = userId;
-      user.username = await global.api.getUsernameFromTwitch(userId);
+      user.username = await api.getUsernameFromTwitch(userId);
       await getRepository(User).save(user);
     }
     return user.username;
@@ -129,7 +132,7 @@ class Users extends Core {
     let user = await getRepository(User).findOne({ username });
     if (!user) {
       user = new User();
-      user.userId = Number(await global.api.getIdFromTwitch(username));
+      user.userId = Number(await api.getIdFromTwitch(username));
       user.username = username;
       await getRepository(User).save(user);
     }
@@ -259,10 +262,10 @@ class Users extends Core {
     });
     adminEndpoint(this.nsp, 'viewers::followedAt', async (id, cb) => {
       try {
-        const cid = global.oauth.channelId;
+        const cid = oauth.channelId;
         const url = `https://api.twitch.tv/helix/users/follows?from_id=${id}&to_id=${cid}`;
 
-        const token = global.oauth.botAccessToken;
+        const token = oauth.botAccessToken;
         if (token === '') {
           cb(new Error('no token available'), null);
         }
@@ -292,10 +295,10 @@ class Users extends Core {
         const aggregatedTips = viewer.tips.map((o) => global.currency.exchange(o.amount, o.currency, global.currency.mainCurrency)).reduce((a, b) => a + b, 0);
         const aggregatedBits = viewer.bits.map((o) => Number(o.amount)).reduce((a, b) => a + b, 0);
 
-        const permId = await global.permissions.getUserHighestPermission(userId);
+        const permId = await permissions.getUserHighestPermission(userId);
         let permissionGroup;
         if (permId) {
-          permissionGroup = await global.permissions.get(permId);
+          permissionGroup = await permissions.get(permId);
         } else {
           permissionGroup = permission.VIEWERS;
         }
@@ -318,5 +321,4 @@ class Users extends Core {
   }
 }
 
-export default Users;
-export { Users };
+export default new Users();

@@ -6,7 +6,7 @@ import * as constants from '../constants';
 import { command, default_permission, parser, rollback, settings } from '../decorators';
 import Expects from '../expects';
 import Parser from '../parser';
-import { permission } from '../permissions';
+import { permission } from '../helpers/permissions';
 import System from './_interface';
 
 import { getRepository } from 'typeorm';

@@ -10,6 +10,8 @@ import { warning } from '../helpers/log.js';
 import { getRepository } from 'typeorm';
 import { User } from '../database/entity/user';
 import { HeistUser } from '../database/entity/heist';
+import oauth from '../oauth';
+import { translate } from '../translate';
 
 class Heist extends Game {
   dependsOn = [ 'systems.points' ];
@@ -35,61 +37,61 @@ class Heist extends Game {
   entryCooldownInSeconds = 120;
 
   @settings('notifications')
-  started: string = global.translate('games.heist.started');
+  started: string = translate('games.heist.started');
   @settings('notifications')
-  nextLevelMessage: string = global.translate('games.heist.levelMessage');
+  nextLevelMessage: string = translate('games.heist.levelMessage');
   @settings('notifications')
-  maxLevelMessage: string = global.translate('games.heist.maxLevelMessage');
+  maxLevelMessage: string = translate('games.heist.maxLevelMessage');
   @settings('notifications')
-  copsOnPatrol: string = global.translate('games.heist.copsOnPatrol');
+  copsOnPatrol: string = translate('games.heist.copsOnPatrol');
   @settings('notifications')
-  copsCooldown: string = global.translate('games.heist.copsCooldownMessage');
+  copsCooldown: string = translate('games.heist.copsCooldownMessage');
 
   @settings('results')
-  singleUserSuccess: string = global.translate('games.heist.singleUserSuccess');
+  singleUserSuccess: string = translate('games.heist.singleUserSuccess');
   @settings('results')
-  singleUserFailed: string = global.translate('games.heist.singleUserFailed');
+  singleUserFailed: string = translate('games.heist.singleUserFailed');
   @settings('results')
-  noUser: string = global.translate('games.heist.noUser');
+  noUser: string = translate('games.heist.noUser');
   @settings('results')
   @ui({ type: 'heist-results' }, 'results')
   resultsValues: { percentage: number; message: string} [] = [
-    { percentage: 0, message: global.translate('games.heist.result.0') },
-    { percentage: 33, message: global.translate('games.heist.result.33') },
-    { percentage: 50, message: global.translate('games.heist.result.50') },
-    { percentage: 99, message: global.translate('games.heist.result.99') },
-    { percentage: 100, message: global.translate('games.heist.result.100') },
+    { percentage: 0, message: translate('games.heist.result.0') },
+    { percentage: 33, message: translate('games.heist.result.33') },
+    { percentage: 50, message: translate('games.heist.result.50') },
+    { percentage: 99, message: translate('games.heist.result.99') },
+    { percentage: 100, message: translate('games.heist.result.100') },
   ];
 
   @settings('levels')
   @ui({ type: 'heist-levels' }, 'levels')
   levelsValues: { name: string; winPercentage: number; payoutMultiplier: number; maxUsers: number }[] = [
     {
-      'name': global.translate('games.heist.levels.bankVan'),
+      'name': translate('games.heist.levels.bankVan'),
       'winPercentage': 60,
       'payoutMultiplier': 1.5,
       'maxUsers': 5,
     },
     {
-      'name': global.translate('games.heist.levels.cityBank'),
+      'name': translate('games.heist.levels.cityBank'),
       'winPercentage': 46,
       'payoutMultiplier': 1.7,
       'maxUsers': 10,
     },
     {
-      'name': global.translate('games.heist.levels.stateBank'),
+      'name': translate('games.heist.levels.stateBank'),
       'winPercentage': 40,
       'payoutMultiplier': 1.9,
       'maxUsers': 20,
     },
     {
-      'name': global.translate('games.heist.levels.nationalReserve'),
+      'name': translate('games.heist.levels.nationalReserve'),
       'winPercentage': 35,
       'payoutMultiplier': 2.1,
       'maxUsers': 30,
     },
     {
-      'name': global.translate('games.heist.levels.federalReserve'),
+      'name': translate('games.heist.levels.federalReserve'),
       'winPercentage': 31,
       'payoutMultiplier': 2.5,
       'maxUsers': 1000,
@@ -127,9 +129,9 @@ class Heist extends Game {
 
       if (users.length === 0) {
         sendMessage(this.noUser, {
-          username: global.oauth.botUsername,
-          displayName: global.oauth.botUsername,
-          userId: Number(global.oauth.botId),
+          username: oauth.botUsername,
+          displayName: oauth.botUsername,
+          userId: Number(oauth.botId),
           emotes: [],
           badges: {},
           'message-type': 'chat',
@@ -142,9 +144,9 @@ class Heist extends Game {
       }
 
       sendMessage(started.replace('$bank', level.name), {
-        username: global.oauth.botUsername,
-        displayName: global.oauth.botUsername,
-        userId: Number(global.oauth.botId),
+        username: oauth.botUsername,
+        displayName: oauth.botUsername,
+        userId: Number(oauth.botId),
         emotes: [],
         badges: {},
         'message-type': 'chat',
@@ -157,9 +159,9 @@ class Heist extends Game {
         const outcome = isSurvivor ? this.singleUserSuccess : this.singleUserFailed;
         global.setTimeout(async () => {
           sendMessage(outcome.replace('$user', (global.tmi.showWithAt ? '@' : '') + user.username), {
-            username: global.oauth.botUsername,
-            displayName: global.oauth.botUsername,
-            userId: Number(global.oauth.botId),
+            username: oauth.botUsername,
+            displayName: oauth.botUsername,
+            userId: Number(oauth.botId),
             emotes: [],
             badges: {},
             'message-type': 'chat',
@@ -186,9 +188,9 @@ class Heist extends Game {
         const result = _.find(ordered, (o) => o.percentage >= percentage);
         global.setTimeout(async () => {
           sendMessage(_.isNil(result) ? '' : result.message, {
-            username: global.oauth.botUsername,
-            displayName: global.oauth.botUsername,
-            userId: Number(global.oauth.botId),
+            username: oauth.botUsername,
+            displayName: oauth.botUsername,
+            userId: Number(oauth.botId),
             emotes: [],
             badges: {},
             'message-type': 'chat',
@@ -200,15 +202,15 @@ class Heist extends Game {
             const winnersList = chunk.shift() || [];
             const andXMore = _.flatten(winners).length;
 
-            let message = await global.translate('games.heist.results');
+            let message = await translate('games.heist.results');
             message = message.replace('$users', winnersList.map((o) => (global.tmi.showWithAt ? '@' : '') + o).join(', '));
             if (andXMore > 0) {
-              message = message + ' ' + (await global.translate('games.heist.andXMore')).replace('$count', andXMore);
+              message = message + ' ' + (await translate('games.heist.andXMore')).replace('$count', andXMore);
             }
             sendMessage(message, {
-              username: global.oauth.botUsername,
-              displayName: global.oauth.botUsername,
-              userId: Number(global.oauth.botId),
+              username: oauth.botUsername,
+              displayName: oauth.botUsername,
+              userId: Number(oauth.botId),
               emotes: [],
               badges: {},
               'message-type': 'chat',
@@ -227,9 +229,9 @@ class Heist extends Game {
     if (lastHeistTimestamp !== 0 && Date.now() - lastHeistTimestamp >= copsCooldown * 60000) {
       this.lastHeistTimestamp = 0;
       sendMessage((this.copsCooldown), {
-        username: global.oauth.botUsername,
-        displayName: global.oauth.botUsername,
-        userId: Number(global.oauth.botId),
+        username: oauth.botUsername,
+        displayName: oauth.botUsername,
+        userId: Number(oauth.botId),
         emotes: [],
         badges: {},
         'message-type': 'chat',
@@ -267,7 +269,7 @@ class Heist extends Game {
       this.startedAt = Date.now(); // set startedAt
       if (Date.now() - (this.lastAnnouncedStart) >= 60000) {
         this.lastAnnouncedStart = Date.now();
-        sendMessage((await global.translate('games.heist.entryMessage')).replace('$command', opts.command), opts.sender);
+        sendMessage((await translate('games.heist.entryMessage')).replace('$command', opts.command), opts.sender);
       }
     }
 
@@ -275,7 +277,7 @@ class Heist extends Game {
     if (!newHeist && Date.now() - this.startedAt > entryCooldown * 1000 && Date.now() - (this.lastAnnouncedHeistInProgress) >= 60000) {
       this.lastAnnouncedHeistInProgress = Date.now();
       sendMessage(
-        (await global.translate('games.heist.lateEntryMessage')).replace('$command', opts.command), opts.sender, opts.attr);
+        (await translate('games.heist.lateEntryMessage')).replace('$command', opts.command), opts.sender, opts.attr);
       return;
     }
 
@@ -285,7 +287,7 @@ class Heist extends Game {
     } catch (e) {
       if (!newHeist) {
         sendMessage(
-          (await global.translate('games.heist.entryInstruction')).replace('$command', opts.command), opts.sender, opts.attr);
+          (await translate('games.heist.entryInstruction')).replace('$command', opts.command), opts.sender, opts.attr);
         warning(`${opts.command} ${e.message}`);
       }
       return;
@@ -296,7 +298,7 @@ class Heist extends Game {
 
     if (points === 0 || _.isNil(points) || _.isNaN(points)) {
       sendMessage(
-        (await global.translate('games.heist.entryInstruction')).replace('$command', opts.command), opts.sender, opts.attr);
+        (await translate('games.heist.entryInstruction')).replace('$command', opts.command), opts.sender, opts.attr);
       return;
     } // send entryInstruction if command is not ok
 

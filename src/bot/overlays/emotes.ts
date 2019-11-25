@@ -12,6 +12,8 @@ import { adminEndpoint, publicEndpoint } from '../helpers/socket';
 import { getManager, getRepository } from 'typeorm';
 import { CacheEmotes } from '../database/entity/cacheEmotes';
 import uuid from 'uuid';
+import oauth from '../oauth';
+import panel from '../panel';
 
 
 class Emotes extends Overlay {
@@ -142,11 +144,11 @@ class Emotes extends Overlay {
   }
 
   async fetchEmotesChannel () {
-    const cid = global.oauth.channelId;
+    const cid = oauth.channelId;
     this.fetch.channel = true;
 
-    if (cid && global.oauth.broadcasterType !== null && (Date.now() - this.lastSubscriberEmoteChk > 1000 * 60 * 60 * 24 * 7 || this.lastChannelChk !== cid)) {
-      if (global.oauth.broadcasterType === '') {
+    if (cid && oauth.broadcasterType !== null && (Date.now() - this.lastSubscriberEmoteChk > 1000 * 60 * 60 * 24 * 7 || this.lastChannelChk !== cid)) {
+      if (oauth.broadcasterType === '') {
         info(`EMOTES: Skipping fetching of ${cid} emotes - not subscriber/affiliate`);
       } else {
         info(`EMOTES: Fetching channel ${cid} emotes`);
@@ -216,8 +218,8 @@ class Emotes extends Overlay {
   }
 
   async fetchEmotesFFZ () {
-    const cid = global.oauth.channelId;
-    const channel = global.oauth.currentChannel;
+    const cid = oauth.channelId;
+    const channel = oauth.currentChannel;
     this.fetch.ffz = true;
 
     // fetch FFZ emotes
@@ -253,7 +255,7 @@ class Emotes extends Overlay {
   }
 
   async fetchEmotesBTTV () {
-    const channel = global.oauth.currentChannel;
+    const channel = oauth.currentChannel;
     this.fetch.bttv = true;
 
     // fetch BTTV emotes
@@ -299,7 +301,7 @@ class Emotes extends Overlay {
   }
 
   async _test () {
-    global.panel.io.of('/overlays/emotes').emit('emote', {
+    panel.io.of('/overlays/emotes').emit('emote', {
       url: 'https://static-cdn.jtvnw.net/emoticons/v1/9/' + this.cEmotesSize + '.0',
       settings: {
         emotes: {
@@ -312,7 +314,7 @@ class Emotes extends Overlay {
 
   async firework (data: string[]) {
     const emotes = await this.parseEmotes(data);
-    global.panel.io.of('/overlays/emotes').emit('emote.firework', {
+    panel.io.of('/overlays/emotes').emit('emote.firework', {
       emotes,
       settings: {
         emotes: {
@@ -328,7 +330,7 @@ class Emotes extends Overlay {
 
   async explode (data: string[]) {
     const emotes = await this.parseEmotes(data);
-    global.panel.io.of('/overlays/emotes').emit('emote.explode', {
+    panel.io.of('/overlays/emotes').emit('emote.explode', {
       emotes,
       settings: {
         emotes: {
@@ -406,7 +408,7 @@ class Emotes extends Overlay {
 
     const emotes = _.shuffle(parsed);
     for (let i = 0; i < this.cEmotesMaxEmotesPerMessage && i < emotes.length; i++) {
-      global.panel.io.of('/overlays/emotes').emit('emote', {
+      panel.io.of('/overlays/emotes').emit('emote', {
         url: usedEmotes[emotes[i]].urls[String(this.cEmotesSize)],
         settings: {
           emotes: {

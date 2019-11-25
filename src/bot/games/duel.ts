@@ -9,6 +9,8 @@ import { error } from '../helpers/log';
 import { getRepository } from 'typeorm';
 import { User } from '../database/entity/user';
 import { Duel as DuelEntity } from '../database/entity/duel';
+import oauth from '../oauth';
+import { translate } from '../translate';
 
 const ERROR_NOT_ENOUGH_OPTIONS = '0';
 const ERROR_ZERO_BET = '1';
@@ -86,9 +88,9 @@ class Duel extends Game {
         winner: winnerUser.username,
       });
       sendMessage(m, {
-        username: global.oauth.botUsername,
-        displayName: global.oauth.botUsername,
-        userId: Number(global.oauth.botId),
+        username: oauth.botUsername,
+        displayName: oauth.botUsername,
+        userId: Number(oauth.botId),
         emotes: [],
         badges: {},
         'message-type': 'chat',
@@ -199,7 +201,7 @@ class Duel extends Game {
     } catch (e) {
       switch (e.message) {
         case ERROR_NOT_ENOUGH_OPTIONS:
-          sendMessage(global.translate('gambling.duel.notEnoughOptions'), opts.sender, opts.attr);
+          sendMessage(translate('gambling.duel.notEnoughOptions'), opts.sender, opts.attr);
           break;
         case ERROR_ZERO_BET:
           message = await prepare('gambling.duel.zeroBet', {
@@ -225,7 +227,7 @@ class Duel extends Game {
           break;
         default:
           error(e.stack);
-          sendMessage(global.translate('core.error'), opts.sender, opts.attr);
+          sendMessage(translate('core.error'), opts.sender, opts.attr);
       }
     }
   }

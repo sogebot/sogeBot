@@ -5,6 +5,8 @@ import { settings, ui } from '../decorators';
 import { publicEndpoint } from '../helpers/socket';
 import { getManager } from 'typeorm';
 import { EventList } from '../database/entity/eventList';
+import api from '../api';
+import oauth from '../oauth';
 
 class Credits extends Overlay {
   @settings('credits')
@@ -96,7 +98,7 @@ class Credits extends Overlay {
 
   sockets () {
     publicEndpoint(this.nsp, 'load', async (cb) => {
-      const when = global.api.isStreamOnline ? global.api.streamStatusChangeSince : _.now() - 50000000000;
+      const when = api.isStreamOnline ? api.streamStatusChangeSince : _.now() - 50000000000;
       const timestamp = new Date(when).getTime();
       const events: (EventList & { values?: {
         currency: string; amount: number;
@@ -153,10 +155,10 @@ class Credits extends Overlay {
             tip: this.cShowTips,
           },
         },
-        streamer: global.oauth.broadcasterUsername,
-        game: global.api.stats.currentGame,
-        title: global.api.stats.currentTitle,
-        clips: this.cShowClips ? await global.api.getTopClips({ period: this.cClipsPeriod, days: this.cClipsCustomPeriodInDays, first: this.cClipsNumOfClips }) : [],
+        streamer: oauth.broadcasterUsername,
+        game: api.stats.currentGame,
+        title: api.stats.currentTitle,
+        clips: this.cShowClips ? await api.getTopClips({ period: this.cClipsPeriod, days: this.cClipsCustomPeriodInDays, first: this.cClipsNumOfClips }) : [],
         events,
         customTexts: this.cCustomTextsValues,
         social: this.cSocialValues,
