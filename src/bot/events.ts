@@ -25,8 +25,9 @@ import panel from './panel';
 import clips from './overlays/clips';
 import tmi from './tmi';
 import emotes from './overlays/emotes';
-import custom_variables from './widgets/custom_variables';
+import custom_variables from './widgets/customvariables';
 import currency from './currency';
+import { isDbConnected } from './helpers/database';
 
 class Events extends Core {
   public timeouts: { [x: string]: NodeJS.Timeout } = {};
@@ -687,6 +688,11 @@ class Events extends Core {
   }
 
   protected async fadeOut() {
+    if (!isDbConnected) {
+      setTimeout(() => this.fadeOut, 10);
+      return;
+    }
+
     try {
       const events = await getRepository(Event)
         .createQueryBuilder('event')

@@ -17,7 +17,7 @@ import users from './users';
 import api from './api';
 import permissions from './permissions';
 import panel from './panel';
-import custom_variables from './widgets/custom_variables';
+import custom_variables from './widgets/customvariables';
 import currency from './currency';
 import { isDbConnected } from './helpers/database';
 

@@ -84,6 +84,7 @@ class Parser {
         || this.skip
         || getfromViewersCache(this.sender.userId, parser.permission)
       ) {
+        debug('parser.process', 'Processing ' + parser.name + ' (fireAndForget: ' + parser.fireAndForget + ')');
         const opts = {
           sender: this.sender,
           message: this.message.trim(),
@@ -116,8 +117,10 @@ class Parser {
           }
         }
         if (Date.now() - time > 500) {
-          debug('parser.time', 'Processing ' + parser.name + ' (fireAndForget: ' + parser.fireAndForget + ') took ' + ((Date.now() - time) / 1000));
+          debug('parser.time', 'Processed ' + parser.name + ' (fireAndForget: ' + parser.fireAndForget + ') took ' + ((Date.now() - time) / 1000));
         }
+      } else {
+        debug('parser.process', 'Skipped ' + parser.name + ' (fireAndForget: ' + parser.fireAndForget + ')');
       }
     }
     if (this.isCommand) {
@@ -136,12 +139,12 @@ class Parser {
       tmi,
     ];
     for (const dir of ['systems', 'games', 'overlays', 'integrations']) {
-      for (let system of glob.sync('./' + dir + '/*')) {
+      for (let system of glob.sync(__dirname + '/' + dir + '/*')) {
+        system = system.split('/' + dir + '/')[1].replace('.js', '');
         if (system.startsWith('_')) {
           continue;
         }
-        system = system.replace('./' + dir + '/', '').replace('.js', '');
-        self = (require('./' + dir + '/' + system.toLowerCase())).default;
+        const self = (require('./' + dir + '/' + system.toLowerCase())).default;
         list.push(self);
       }
     }

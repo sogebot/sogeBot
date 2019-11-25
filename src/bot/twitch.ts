@@ -23,7 +23,6 @@ import api from './api';
 import oauth from './oauth';
 import { translate } from './translate';
 import general from './general';
-import panel from './panel';
 
 const config = configFile as any;
 config.timezone = config.timezone === 'system' || isNil(config.timezone) ? moment.tz.guess() : config.timezone;
@@ -36,7 +35,7 @@ class Twitch extends Core {
     super();
 
     if (isMainThread) {
-      panel.addWidget('twitch', 'widget-title-twitch', 'fab fa-twitch');
+      this.addWidget('twitch', 'widget-title-twitch', 'fab fa-twitch');
     }
   }
 

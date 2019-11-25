@@ -379,7 +379,7 @@ class Module {
       clearTimeout(this.timeouts[`${this.constructor.name}.${opts[0]}.addWidget`]);
 
       if (_.isNil(panel)) {
-        this.timeouts[`${this.constructor.name}.${opts[0]}.addWidget`] = setTimeout(() => this.addWidget(opts), 1000);
+        this.timeouts[`${this.constructor.name}.${opts[0]}.addWidget`] = setTimeout(() => this.addWidget(...opts), 1000);
       } else {
         panel.addWidget(opts[0], opts[1], opts[2]);
       }

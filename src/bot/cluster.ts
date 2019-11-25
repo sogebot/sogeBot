@@ -1,3 +1,5 @@
+export const isMainThread = typeof process.env.CLUSTER === 'undefined';
+
 import 'module-alias/register';
 import io from 'socket.io';
 import ioClient from 'socket.io-client';
@@ -10,8 +12,6 @@ import oauth from './oauth';
 import api from './api';
 import panel from './panel';
 import tmi from './tmi';
-
-export const isMainThread = typeof process.env.CLUSTER === 'undefined';
 
 const availableSockets: {
   [socketId: string]: {

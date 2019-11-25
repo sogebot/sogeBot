@@ -23,7 +23,7 @@ const interval = setInterval(() => {
   } else {
     lastLoadingInProgressCount = loadingInProgress.length;
   }
-}, 10000);
+}, 5000);
 
 function getNameAndTypeFromStackTrace() {
   const _prepareStackTrace = Error.prepareStackTrace;
@@ -63,13 +63,13 @@ export function ui(opts, category?: string) {
             path = s.category? s.category + '.' + path : path;
           } else {
             if (retries < 500) { // try to wait to settings to be registered
-              return setTimeout(() => register(retries++), 10);
+              return setTimeout(() => register(++retries), 10);
             }
           }
         }
         _.set(self, '_ui.' + path, opts);
       } catch (e) {
-        console.log(e);
+        error(e);
       }
     };
     register();
@@ -98,7 +98,6 @@ export function settings(category?: string, isReadOnly = false) {
         if (category === key) {
           throw Error(`Category and variable name cannot be same - ${type}.${name}.${key} in category ${category}`);
         }
-
         VariableWatcher.add(`${type}.${name}.${key}`, self[key], isReadOnly);
 
         if (!isReadOnly) {
@@ -344,7 +343,7 @@ function registerHelper(m, retry = 0) {
         error('Command with function ' + m.fnc + ' not found!');
       }
     }
-  }, 10000);
+  }, 5000);
 }
 
 function registerRollback(m) {
@@ -361,7 +360,7 @@ function registerRollback(m) {
     } catch (e) {
       error(e.stack);
     }
-  }, 10000);
+  }, 5000);
 }
 
 function registerParser(opts, m) {
@@ -383,5 +382,5 @@ function registerParser(opts, m) {
     } catch (e) {
       error(e.stack);
     }
-  }, 10000);
+  }, 5000);
 }

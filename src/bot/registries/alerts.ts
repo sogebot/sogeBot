@@ -14,21 +14,24 @@ class Alerts extends Registry {
     super();
     this.addMenu({ category: 'registry', name: 'alerts', id: 'registry/alerts/list' });
     if (isMainThread) {
-      panel.getApp().get('/registry/alerts/:mediaid', async (req, res) => {
-        const media = await getRepository(AlertMedia).find({ id: req.params.mediaid });
-        const b64data = media.sort((a,b) => a.chunkNo - b.chunkNo).map(o => o.b64data).join('');
-        if (b64data.trim().length === 0) {
-          res.send(404);
-        } else {
-          const match = (b64data.match(/^data:\w+\/\w+;base64,/) || [ 'data:image/gif;base64,' ])[0];
-          const data = Buffer.from(b64data.replace(/^data:\w+\/\w+;base64,/, ''), 'base64');
-          res.writeHead(200, {
-            'Content-Type': match.replace('data:', '').replace(';base64,', ''),
-            'Content-Length': data.length,
-          });
-          res.end(data);
-        }
-      });
+      // wait for panel start
+      setTimeout(() => {
+        panel.getApp().get('/registry/alerts/:mediaid', async (req, res) => {
+          const media = await getRepository(AlertMedia).find({ id: req.params.mediaid });
+          const b64data = media.sort((a,b) => a.chunkNo - b.chunkNo).map(o => o.b64data).join('');
+          if (b64data.trim().length === 0) {
+            res.send(404);
+          } else {
+            const match = (b64data.match(/^data:\w+\/\w+;base64,/) || [ 'data:image/gif;base64,' ])[0];
+            const data = Buffer.from(b64data.replace(/^data:\w+\/\w+;base64,/, ''), 'base64');
+            res.writeHead(200, {
+              'Content-Type': match.replace('data:', '').replace(';base64,', ''),
+              'Content-Length': data.length,
+            });
+            res.end(data);
+          }
+        });
+      }, 1000);
     }
   }
 

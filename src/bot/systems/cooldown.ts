@@ -14,7 +14,7 @@ import { Cooldown as CooldownEntity, CooldownViewer } from '../database/entity/c
 import { User } from '../database/entity/user';
 import { adminEndpoint } from '../helpers/socket';
 import { Keyword } from '../database/entity/keyword';
-import customCommands from './customCommands';
+import customCommands from './customcommands';
 
 /*
  * !cooldown [keyword|!command] [global|user] [seconds] [true/false] - set cooldown for keyword or !command - 0 for disable, true/false set quiet mode

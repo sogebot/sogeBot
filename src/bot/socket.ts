@@ -11,6 +11,8 @@ import { Brackets, getRepository, LessThanOrEqual } from 'typeorm';
 import { Socket as SocketEntity } from './database/entity/socket';
 import permissions from './permissions';
 
+let _self: any = null;
+
 class Socket extends Core {
   @settings('connection')
   accessTokenExpirationTime = 120;
@@ -113,13 +115,13 @@ class Socket extends Core {
           } else {
             if (auth.accessToken === cb.accessToken) {
               // update refreshToken timestamp to expire only if not used
-              auth.refreshTokenTimestamp = Date.now() + (socket.refreshTokenExpirationTime * 1000);
+              auth.refreshTokenTimestamp = Date.now() + (_self.refreshTokenExpirationTime * 1000);
               await getRepository(SocketEntity).save(auth);
               sendAuthorized(socket, auth);
             } else {
               auth.accessToken = uuid();
-              auth.accessTokenTimestamp = Date.now() + (socket.accessTokenExpirationTime * 1000);
-              auth.refreshTokenTimestamp = Date.now() + (socket.refreshTokenExpirationTime * 1000);
+              auth.accessTokenTimestamp = Date.now() + (_self.accessTokenExpirationTime * 1000);
+              auth.refreshTokenTimestamp = Date.now() + (_self.refreshTokenExpirationTime * 1000);
               await getRepository(SocketEntity).save(auth);
               sendAuthorized(socket, auth);
             }
@@ -139,8 +141,8 @@ class Socket extends Core {
       const auth = new SocketEntity();
       auth.accessToken = uuid();
       auth.refreshToken = uuid();
-      auth.accessTokenTimestamp = Date.now() + (socket.accessTokenExpirationTime * 1000);
-      auth.refreshTokenTimestamp = Date.now() + (socket.refreshTokenExpirationTime * 1000);
+      auth.accessTokenTimestamp = Date.now() + (_self.accessTokenExpirationTime * 1000);
+      auth.refreshTokenTimestamp = Date.now() + (_self.refreshTokenExpirationTime * 1000);
       auth.userId = Number(userId);
       auth.type = 'viewer';
       haveViewerPrivileges = Authorized.Authorized;
@@ -246,5 +248,6 @@ class Socket extends Core {
   }
 }
 
-export default new Socket();
+_self = new Socket();
+export default _self;
 export { Socket };

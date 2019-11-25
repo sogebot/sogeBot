@@ -9,6 +9,7 @@ const util = require('util')
 const commons = require('./commons')
 const flatten = require('./helpers/flatten')
 const gitCommitInfo = require('git-commit-info');
+import { adminEndpoint } from './helpers/socket';
 import glob from 'glob';
 
 import { error, info } from './helpers/log';
@@ -23,7 +24,13 @@ const socket = require('./socket');
 const Parser = require('./parser')
 const webhooks = require('./webhooks')
 const general = require('./general')
-const translate = require('./translate')
+import translateLib, { translate } from './translate';
+import api from './api';
+import currency from './currency';
+import oauth from './oauth';
+import songs from './systems/songs';
+import spotify from './integrations/spotify';
+import { adminEndpoint } from './helpers/socket';
 const config = require('@config')
 
 let app;
@@ -107,18 +114,15 @@ function Panel () {
   this.io = require('socket.io')(server)
   this.menu = [{ category: 'main', name: 'dashboard', id: 'dashboard' }]
   this.widgets = []
-  this.socketListeners = []
 
-  this.registerSockets({
-    self: this,
-    expose: ['sendStreamData'],
-    finally: null
-  })
+  setTimeout(() => {
+    adminEndpoint('/', 'panel.sendStreamData', this.sendStreamData);
+  }, 5000)
 
-  this.io.use(socket.authorize);
+  this.io.use(socket.default.authorize);
 
   var self = this
-  this.io.on('connection', async function (socket) {
+  this.io.on('connection', async (socket) => {
     // create main dashboard if needed;
     await getRepository(Dashboard).save({
       id: 'c287b750-b620-4017-8b3e-e48757ddaa83', // constant ID
@@ -280,8 +284,6 @@ function Panel () {
           ])
           .execute();
       }
-
-      self.sendStreamData(self, this.io) // force dashboard update
       cb(null)
     })
     socket.on('joinBot', async () => {
@@ -302,7 +304,7 @@ function Panel () {
     })
 
     socket.on('responses.get', async function (at, callback) {
-      const responses = flatten.flatten(!_.isNil(at) ? translate.translations[general.lang][at] : translate.translations[general.lang])
+      const responses = flatten.flatten(!_.isNil(at) ? translateLib.translations[general.lang][at] : translateLib.translations[general.lang])
       _.each(responses, function (value, key) {
         let _at = !_.isNil(at) ? at + '.' + key : key
         responses[key] = {} // remap to obj
@@ -344,7 +346,7 @@ function Panel () {
       }
 
       const sendWidgets = [];
-      for(const widget of self.widgets) {
+      for(const widget of this.widgets) {
         if (!widgetList.includes(widget.id)) {
           sendWidgets.push(widget);
         }
@@ -406,11 +408,11 @@ function Panel () {
     // send enabled systems
     socket.on('systems', async (cb) => {
       const toEmit = [];
-      for (let system of glob.sync('./systems/*')) {
+      for (let system of glob.sync(__dirname + '/systems/*')) {
+        system = system.split('/systems/')[1].replace('.js', '');
         if (system.startsWith('_')) {
           continue;
         }
-        system = system.replace('./systems/', '').replace('.js', '');
         self = (require('./systems/' + system.toLowerCase())).default;
         toEmit.push({
           name: system.toLowerCase(),
@@ -432,11 +434,11 @@ function Panel () {
     })
     socket.on('integrations', async (cb) => {
       const toEmit = [];
-      for (let system of glob.sync('./integrations/*')) {
+      for (let system of glob.sync(__dirname + '/integrations/*')) {
+        system = system.split('/integrations/')[1].replace('.js', '');
         if (system.startsWith('_')) {
           continue;
         }
-        system = system.replace('./integrations/', '').replace('.js', '');
         self = (require('./integrations/' + system.toLowerCase())).default;
         if (!self.showInUI) {
           continue;
@@ -452,11 +454,11 @@ function Panel () {
     });
     socket.on('overlays', async (cb) => {
       const toEmit = [];
-      for (let system of glob.sync('./overlays/*')) {
+      for (let system of glob.sync(__dirname + '/overlays/*')) {
+        system = system.split('/overlays/')[1].replace('.js', '');
         if (system.startsWith('_')) {
           continue;
         }
-        system = system.replace('./overlays/', '').replace('.js', '');
         self = (require('./overlays/' + system.toLowerCase())).default;
         if (!self.showInUI) {
           continue;
@@ -472,11 +474,11 @@ function Panel () {
     });
     socket.on('games', async (cb) => {
       const toEmit = [];
-      for (let system of glob.sync('./games/*')) {
+      for (let system of glob.sync(__dirname + '/games/*')) {
+        system = system.split('/games/')[1].replace('.js', '');
         if (system.startsWith('_')) {
           continue;
         }
-        system = system.replace('./games/', '').replace('.js', '');
         self = (require('./games/' + system.toLowerCase())).default;
         if (!self.showInUI) {
           continue;
@@ -504,7 +506,7 @@ function Panel () {
     })
 
     socket.on('menu', (cb) => {
-      cb(self.menu);
+      cb(this.menu);
     });
 
     socket.on('translations', (cb) => {
@@ -515,20 +517,6 @@ function Panel () {
         translate({ root: 'ui' }) // add ui root -> slowly refactoring to new name
       )
       cb(lang);
-    })
-
-    _.each(self.socketListeners, function (listener) {
-      socket.on(listener.on, async function (data) {
-        if (typeof listener.fnc !== 'function') {
-          throw new Error('Function for this listener is undefined' +
-            ' widget=' + listener.self.constructor.name + ' on=' + listener.on)
-        }
-        try { await listener.fnc(listener.self, self.io, data) } catch (e) {
-          error(e)
-          error('Error on ' + listener.on + ' listener')
-        }
-        if (listener.finally && listener.finally !== listener.fnc) listener.finally(listener.self, self.io)
-      })
     })
 
     // send webpanel translations
@@ -564,19 +552,7 @@ Panel.prototype.addMenu = function (menu) {
 
 Panel.prototype.addWidget = function (id, name, icon) { this.widgets.push({ id: id, name: name, icon: icon }) }
 
-Panel.prototype.socketListening = function (self, on, fnc) {
-  this.socketListeners.push({ self: self, on: on, fnc: fnc })
-}
-
-Panel.prototype.registerSockets = util.deprecate(function (options) {
-  const name = options.self.constructor.name.toLowerCase()
-  for (let fnc of options.expose) {
-    if (!_.isFunction(options.self[fnc])) error(`Function ${fnc} of ${options.self.constructor.name} is undefined`)
-    else this.socketListeners.push({ self: options.self, on: `${name}.${fnc}`, fnc: options.self[fnc], finally: options.finally })
-  }
-}, 'registerSockets() is deprecated. Use socket from system interface directly.')
-
-Panel.prototype.sendStreamData = async function (self, socket) {
+Panel.prototype.sendStreamData = async function (cb) {
   try {
     const ytCurrentSong = Object.values(songs.isPlaying).find(o => o) ? _.get(JSON.parse(songs.currentSong), 'title', null) : null;
     let spotifyCurrentSong = _.get(JSON.parse(spotify.currentSong), 'song', '') + ' - ' + _.get(JSON.parse(spotify.currentSong), 'artist', '');
@@ -634,7 +610,7 @@ Panel.prototype.sendStreamData = async function (self, socket) {
       currentWatched: api.stats.currentWatchedTime,
       tags: tagResults,
     }
-    socket.emit('stats', data)
+    cb(data)
   } catch (e) {
     error(e.stack);
   }

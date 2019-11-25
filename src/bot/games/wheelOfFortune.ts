@@ -15,7 +15,7 @@ class WheelOfFortune extends Game {
     class: 'btn btn-primary btn-block',
     rawText: '/overlays/wheeloffortune (500x55)',
     target: '_blank',
-  })
+  }, 'links')
   btnLink = null;
 
   @settings('options')

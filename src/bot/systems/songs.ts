@@ -62,11 +62,13 @@ class Songs extends System {
     super();
 
     if (isMainThread) {
-      this.getMeanLoudness();
+      setTimeout(() => {
+        this.getMeanLoudness();
 
-      this.addMenu({ category: 'manage', name: 'playlist', id: 'manage/songs/playlist' });
-      this.addMenu({ category: 'manage', name: 'bannedsongs', id: 'manage/songs/bannedsongs' });
-      this.addWidget('ytplayer', 'widget-title-ytplayer', 'fas fa-headphones');
+        this.addMenu({ category: 'manage', name: 'playlist', id: 'manage/songs/playlist' });
+        this.addMenu({ category: 'manage', name: 'bannedsongs', id: 'manage/songs/bannedsongs' });
+        this.addWidget('ytplayer', 'widget-title-ytplayer', 'fas fa-headphones');
+      }, 10000);
     }
   }
 
