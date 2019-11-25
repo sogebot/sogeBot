@@ -31,6 +31,8 @@ import joinpart from './widgets/joinpart';
 import webhooks from './webhooks';
 import alerts from './registries/alerts';
 import eventlist from './overlays/eventlist';
+import stats from './stats';
+import { getFunctionList } from './decorators/on';
 
 const setImmediateAwait = () => {
   return new Promise(resolve => {
@@ -1005,25 +1007,9 @@ class API extends Core {
             events.fire('every-x-minutes-of-stream', { reset: true });
             justStarted = true;
 
-            // go through all systems and trigger on.streamStart
-            /*for (const [/* type *, systems] of Object.entries({
-              systems: global.systems,
-              games: global.games,
-              overlays: global.overlays,
-              widgets: global.widgets,
-              integrations: global.integrations,
-            })) {
-              for (const [name, system] of Object.entries(systems)) {
-                if (name.startsWith('_') || typeof system.on === 'undefined') {
-                  continue;
-                }
-                if (Array.isArray(system.on.streamStart)) {
-                  for (const fnc of system.on.streamStart) {
-                    system[fnc]();
-                  }
-                }
-              }
-            }*/
+            for (const event of getFunctionList('streamStart')) {
+              this[event.fName]();
+            }
           }
         }
 
@@ -1078,25 +1064,9 @@ class API extends Core {
             events.fire('stream-is-running-x-minutes', { reset: true });
             events.fire('number-of-viewers-is-at-least-x', { reset: true });
 
-            // go through all systems and trigger on.streamEnd
-            /*for (const [, systems] of Object.entries({
-              systems: global.systems,
-              games: global.games,
-              overlays: global.overlays,
-              widgets: global.widgets,
-              integrations: global.integrations,
-            })) {
-              for (const [name, system] of Object.entries(systems)) {
-                if (name.startsWith('_') || typeof system.on === 'undefined') {
-                  continue;
-                }
-                if (Array.isArray(system.on.streamEnd)) {
-                  for (const fnc of system.on.streamEnd) {
-                    system[fnc]();
-                  }
-                }
-              }
-            }*/
+            for (const event of getFunctionList('streamEnd')) {
+              this[event.fName]();
+            }
 
             this.streamId = null;
           }
@@ -1127,7 +1097,7 @@ class API extends Core {
       this.stats.maxViewers = stream.viewer_count;
     }
 
-    global.stats2.save({
+    stats.save({
       timestamp: new Date().getTime(),
       whenOnline: this.isStreamOnline ? this.streamStatusChangeSince : null,
       currentViewers: this.stats.currentViewers,

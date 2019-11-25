@@ -222,7 +222,7 @@ export function parser(opts?: {
   fireAndForget?: boolean;
   permission?: string;
   priority?: number;
-  dependsOn?: string[];
+  dependsOn?: import('./_interface').Module[];
 }) {
   opts = opts || {};
   const { name, type } = getNameAndTypeFromStackTrace();
@@ -322,11 +322,13 @@ async function registerCommand(opts: string | Command, m) {
 }
 
 function registerHelper(m, retry = 0) {
-  if (!global[m.type] || !global[m.type][m.name]) {
-    return setTimeout(() => registerHelper(m), 10);
-  }
   try {
-    const self = global[m.type][m.name];
+    let self;
+    if (m.type === 'core') {
+      self = (require('./' + m.name)).default;
+    } else {
+      self = (require('./' + m.type + '/' + m.name)).default;
+    }
     // find command with function
     const c = self._commands.find((o) => o.fnc === m.fnc);
     if (!c) {
@@ -344,12 +346,13 @@ function registerHelper(m, retry = 0) {
 }
 
 function registerRollback(m) {
-  if (!global[m.type] || !global[m.type][m.name]) {
-    return setTimeout(() => registerRollback(m), 10);
-  }
   try {
-    const self = global[m.type][m.name];
-    self._rollback.push({
+    let self;
+    if (m.type === 'core') {
+      self = (require('./' + m.name)).default;
+    } else {
+      self = (require('./' + m.type + '/' + m.name)).default;
+    }    self._rollback.push({
       name: m.fnc,
     });
   } catch (e) {
@@ -358,12 +361,13 @@ function registerRollback(m) {
 }
 
 function registerParser(opts, m) {
-  if (!global[m.type] || !global[m.type][m.name]) {
-    return setTimeout(() => registerParser(opts, m), 10);
-  }
   try {
-    const self = global[m.type][m.name];
-    self._parsers.push({
+    let self;
+    if (m.type === 'core') {
+      self = (require('./' + m.name)).default;
+    } else {
+      self = (require('./' + m.type + '/' + m.name)).default;
+    }    self._parsers.push({
       name: m.fnc,
       permission: opts.permission,
       priority: opts.priority,

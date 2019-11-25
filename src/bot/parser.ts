@@ -14,6 +14,7 @@ import { translate } from './translate';
 import currency from './currency';
 import general from './general';
 import tmi from './tmi';
+import glob from 'glob';
 
 class Parser {
   started_at = Date.now();
@@ -125,7 +126,7 @@ class Parser {
   }
 
   populateList () {
-    const list = [
+    const list: any = [
       currency,
       events,
       users,
@@ -134,20 +135,16 @@ class Parser {
       general,
       tmi,
     ];
-    /*
-    for (const system of Object.entries(global.systems)) {
-      list.push(system[1]);
+    for (const dir of ['systems', 'games', 'overlays', 'integrations']) {
+      for (let system of glob.sync('./' + dir + '/*')) {
+        if (system.startsWith('_')) {
+          continue;
+        }
+        system = system.replace('./' + dir + '/', '').replace('.js', '');
+        self = (require('./' + dir + '/' + system.toLowerCase())).default;
+        list.push(self);
+      }
     }
-    for (const overlay of Object.entries(global.overlays)) {
-      list.push(overlay[1]);
-    }
-    for (const game of Object.entries(global.games)) {
-      list.push(game[1]);
-    }
-    for (const integration of Object.entries(global.integrations)) {
-      list.push(integration[1]);
-    }
-    */
     return list;
   }
 

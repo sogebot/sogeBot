@@ -84,7 +84,7 @@ class Message {
     this.message = this.message.replace(/\$latestCheer/g, !_.isNil(latestCheer) ? JSON.parse(latestCheer.values_json).username : 'n/a');
 
     const spotifySong = JSON.parse(spotify.currentSong);
-    if (!_.isNil(global.integrations) && !_.isEmpty(spotifySong) && spotifySong.is_playing && spotifySong.is_enabled) {
+    if (!_.isEmpty(spotifySong) && spotifySong.is_playing && spotifySong.is_enabled) {
       // load spotify format
       const format = spotify.format;
       if (opts.escape) {

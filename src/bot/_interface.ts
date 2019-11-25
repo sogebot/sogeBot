@@ -18,7 +18,7 @@ let socket: import('./socket').Socket | any = null;
 let panel: null | any = null;
 
 class Module {
-  public dependsOn: any[] = [];
+  public dependsOn: Module[] = [];
   public showInUI = true;
   public timeouts: { [x: string]: NodeJS.Timeout } = {};
   public settingsList: { category: string; key: string }[] = [];
@@ -123,8 +123,8 @@ class Module {
           this.status({ state: this._enabled, quiet: !isMainThread });
           if (isMainThread) {
             const path = this._name === 'core' ? this.constructor.name.toLowerCase() : `${this._name}.${this.constructor.name.toLowerCase()}`;
-            for (const fnc of getFunctionList('startup', path)) {
-              this[fnc]('enabled', value);
+            for (const event of getFunctionList('startup', path)) {
+              this[event.fName]('enabled', value);
             }
           };
         };
@@ -319,8 +319,7 @@ class Module {
     }
   }
 
-  public async status(opts) {
-    opts = opts || {};
+  public async status(opts: any = {}) {
     if (['core', 'overlays', 'widgets', 'stats', 'registries'].includes(this._name) || (opts.state === null && typeof opts.state !== 'undefined')) {
       return true;
     }
@@ -340,14 +339,12 @@ class Module {
 
     // on.change handler on enabled
     if (isMainThread && isStatusChanged) {
-      if (this.on && this.on.change && this.on.change.enabled) {
-        // run on.change functions only on master
-        for (const fnc of this.on.change.enabled) {
-          if (typeof this[fnc] === 'function') {
-            this[fnc]('enabled', opts.state);
-          } else {
-            error(`${fnc}() is not function in ${this._name}/${this.constructor.name.toLowerCase()}`);
-          }
+      const path = this._name === 'core' ? this.constructor.name.toLowerCase() : `${this._name}.${this.constructor.name.toLowerCase()}`;
+      for (const event of getFunctionList('change', path + '.enabled')) {
+        if (typeof this[event.fName] === 'function') {
+          this[event.fName]('enabled', opts.state);
+        } else {
+          error(`${event.fName}() is not function in ${this._name}/${this.constructor.name.toLowerCase()}`);
         }
       }
     }
@@ -470,9 +467,8 @@ class Module {
 
       if (typeof parser.dependsOn !== 'undefined') {
         for (const dependency of parser.dependsOn) {
-          const dependencyPointer = _.get(global, dependency, null);
           // skip parser if dependency is not enabled
-          if (!dependencyPointer || !_.isFunction(dependencyPointer.status) || !(await dependencyPointer.status())) {
+          if (!_.isFunction(dependency.status) || !(await dependency.status())) {
             continue;
           }
         }
@@ -548,9 +544,8 @@ class Module {
 
         if (command.dependsOn) {
           for (const dependency of command.dependsOn) {
-            const dependencyPointer = _.get(global, dependency, null);
             // skip command if dependency is not enabled
-            if (!dependencyPointer || !_.isFunction(dependencyPointer.status) || !(await dependencyPointer.status())) {
+            if (!_.isFunction(dependency.status) || !(await dependency.status())) {
               continue;
             }
           }

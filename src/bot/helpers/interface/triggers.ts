@@ -1,5 +1,6 @@
 import { getFunctionNameFromStackTrace } from '../stacktrace';
 import { debug } from '../log';
+import { getFunctionList } from '../../decorators/on';
 
 export function triggerInterfaceOnMessage(opts: onEventMessage) {
   trigger(opts);
@@ -22,26 +23,20 @@ export function triggerInterfaceOnBit(opts: Omit<onEventTip, 'currency'>) {
 }
 
 function trigger(opts: onEventMessage | onEventSub | onEventBit | onEventTip | onEventFollow) {
-  const on_trigger = getFunctionNameFromStackTrace().replace('triggerInterfaceOn', '').toLowerCase();
+  const on_trigger: 'bit' | 'tip' | 'sub' | 'follow' | 'message' = getFunctionNameFromStackTrace().replace('triggerInterfaceOn', '').toLowerCase() as any;
   debug('trigger', `event ${on_trigger}`);
-  /*
-  for (const system of [
-    ...Object.values(global.systems),
-    ...Object.values(global.games),
-    ...Object.values(global.overlays),
-    ...Object.values(global.widgets),
-    ...Object.values(global.integrations),
-    ...Object.values(global.registries),
-  ]) {
-    if (system.constructor.name.startsWith('_') || typeof system.on === 'undefined') {
-      continue;
+
+  for (const event of getFunctionList(on_trigger)) {
+    let self;
+    if (event.path.startsWith('core')) {
+      self = (require(`./${event.path.split('.')[1]}`)).default;
+    } else {
+      self = (require(`./${event.path.split('.')[0]}/${event.path.split('.')[1]}`)).default;
     }
-    if (Array.isArray(system.on[on_trigger])) {
-      for (const fnc of system.on[on_trigger]) {
-        debug('trigger', `event ${on_trigger} => ${system.constructor.name}`);
-        system[fnc](opts);
-      }
+
+    if (typeof self[event.fName] === 'function') {
+      debug('trigger', `event ${on_trigger} => ${self.constructor.name}`);
+      self[event.fName](opts);
     }
   }
-  */
 }

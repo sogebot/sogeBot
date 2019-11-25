@@ -2,7 +2,7 @@ import 'module-alias/register';
 
 import { readdirSync } from 'fs';
 import gitCommitInfo from 'git-commit-info';
-import { get, isBoolean, isFinite, isNil, isNumber, isString, map, set } from 'lodash';
+import { get, isBoolean, isFinite, isNil, isNumber, isString, map } from 'lodash';
 import Core from './_interface';
 import { sendMessage } from './commons';
 import { command, default_permission, settings, ui } from './decorators';
@@ -112,25 +112,33 @@ class General extends Core {
     if (!pointer) {
       return sendMessage(`$sender, settings does not exists`, opts.sender, opts.attr);
     }
-    const currentValue = await get(global, pointer, undefined);
+
+    let self;
+    if (pointer.startsWith('core')) {
+      self = (require(`./${pointer.split('.')[1]}`)).default;
+    } else {
+      self = (require(`./${pointer.split('.')[0]}/${pointer.split('.')[1]}`)).default;
+    }
+
+    const currentValue = self[pointer.split('.')[2]];
     if (typeof currentValue !== 'undefined') {
       if (isBoolean(currentValue)) {
         newValue = newValue.toLowerCase().trim();
         if (['true', 'false'].includes(newValue)) {
-          set(global, pointer, newValue === 'true');
+          self[pointer.split('.')[2]] = newValue === 'true';
           sendMessage(`$sender, ${pointer} set to ${newValue}`, opts.sender, opts.attr);
         } else {
           sendMessage('$sender, !set error: bool is expected', opts.sender, opts.attr);
         }
       } else if (isNumber(currentValue)) {
         if (isFinite(Number(newValue))) {
-          set(global, pointer, Number(newValue));
+          self[pointer.split('.')[2]] = Number(newValue);
           sendMessage(`$sender, ${pointer} set to ${newValue}`, opts.sender, opts.attr);
         } else {
           sendMessage('$sender, !set error: number is expected', opts.sender, opts.attr);
         }
       } else if (isString(currentValue)) {
-        set(global, pointer, newValue);
+        self[pointer.split('.')[2]] = newValue;
         sendMessage(`$sender, ${pointer} set to '${newValue}'`, opts.sender, opts.attr);
       } else {
         sendMessage(`$sender, ${pointer} is not supported settings to change`, opts.sender, opts.attr);

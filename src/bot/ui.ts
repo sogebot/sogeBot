@@ -13,6 +13,7 @@ import oauth from './oauth';
 import general from './general';
 import currency from './currency';
 import webhooks from './webhooks';
+import glob from 'glob';
 
 class UI extends Core {
   @settings()
@@ -57,30 +58,19 @@ class UI extends Core {
         if (typeof data.core === 'undefined') {
           data.core = {};
         }
-        data.core[system] = await global[system].getAllSettings();
+        const self = (require('./' + system.toLowerCase())).default;
+        data.core[system] = await self.getAllSettings();
       }
-      /*
-      for (const system of Object.keys(global.systems).filter(o => !o.startsWith('_'))) {
-        if (typeof data.systems === 'undefined') {
-          data.systems = {};
+      for (const dir of ['systems', 'games', 'overlays', 'integrations']) {
+        for (let system of glob.sync('./' + dir + '/*')) {
+          if (system.startsWith('_')) {
+            continue;
+          }
+          system = system.replace('./' + dir + '/', '').replace('.js', '');
+          const self = (require('./' + dir + '/' + system.toLowerCase())).default;
+          data[dir][system] = await self.getAllSettings();
         }
-        data.systems[system] = await global.systems[system].getAllSettings();
       }
-
-      for (const system of Object.keys(global.integrations).filter(o => !o.startsWith('_'))) {
-        if (typeof data.integrations === 'undefined') {
-          data.integrations = {};
-        }
-        data.integrations[system] = await global.integrations[system].getAllSettings();
-      }
-
-      for (const system of Object.keys(global.games).filter(o => !o.startsWith('_'))) {
-        if (typeof data.games === 'undefined') {
-          data.games = {};
-        }
-        data.games[system] = await global.games[system].getAllSettings();
-      }
-*/
       // currencies
       data.currency = currency.mainCurrency;
       data.currencySymbol = currency.symbol(currency.mainCurrency);
@@ -98,21 +88,17 @@ class UI extends Core {
 
     publicEndpoint(this.nsp, 'configuration', async (cb) => {
       const data: any = {};
-      /*
-      for (const system of Object.keys(global.systems).filter(o => !o.startsWith('_'))) {
-        if (typeof data.systems === 'undefined') {
-          data.systems = {};
-        }
-        data.systems[system] = await global.systems[system].getAllSettings();
-      }
 
-      for (const system of Object.keys(global.games).filter(o => !o.startsWith('_'))) {
-        if (typeof data.games === 'undefined') {
-          data.games = {};
+      for (const dir of ['systems', 'games']) {
+        for (let system of glob.sync('./' + dir + '/*')) {
+          if (system.startsWith('_')) {
+            continue;
+          }
+          system = system.replace('./' + dir + '/', '').replace('.js', '');
+          const self = (require('./' + dir + '/' + system.toLowerCase())).default;
+          data[dir][system] = await self.getAllSettings();
         }
-        data.games[system] = await global.games[system].getAllSettings();
       }
-      */
 
       // currencies
       data.currency = currency.mainCurrency;

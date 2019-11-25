@@ -9,6 +9,7 @@ const util = require('util')
 const commons = require('./commons')
 const flatten = require('./helpers/flatten')
 const gitCommitInfo = require('git-commit-info');
+import glob from 'glob';
 
 import { error, info } from './helpers/log';
 import { CacheTitles } from './database/entity/cacheTitles';
@@ -20,6 +21,9 @@ import { TwitchTag, TwitchTagLocalizationName } from './database/entity/twitch'
 
 const socket = require('./socket');
 const Parser = require('./parser')
+const webhooks = require('./webhooks')
+const general = require('./general')
+const translate = require('./translate')
 const config = require('@config')
 
 let app;
@@ -36,19 +40,19 @@ function Panel () {
 
   // webhooks integration
   app.post('/webhooks/hub/follows', (req, res) => {
-    global.webhooks.follower(req.body)
+    webhooks.follower(req.body)
     res.sendStatus(200)
   })
   app.post('/webhooks/hub/streams', (req, res) => {
-    global.webhooks.stream(req.body)
+    webhooks.stream(req.body)
     res.sendStatus(200)
   })
 
   app.get('/webhooks/hub/follows', (req, res) => {
-    global.webhooks.challenge(req, res)
+    webhooks.challenge(req, res)
   })
   app.get('/webhooks/hub/streams', (req, res) => {
-    global.webhooks.challenge(req, res)
+    webhooks.challenge(req, res)
   })
 
   // highlights system
@@ -122,9 +126,6 @@ function Panel () {
       createdAt: 0,
     })
 
-
-    socket.on('metrics.translations', function (key) { global.lib.translate.addMetrics(key, true) })
-
     socket.on('getCachedTags', async (cb) => {
       const connection = await getConnection();
       const joinQuery = connection.options.type === 'postgres' ? '"names"."tagId" = "tag_id" AND "names"."locale"' : 'names.tagId = tag_id AND names.locale';
@@ -136,7 +137,7 @@ function Panel () {
         .addSelect('tags.is_auto', 'is_auto')
         .addSelect('tags.is_current', 'is_current')
         .leftJoinAndSelect(TwitchTagLocalizationName, 'names', `${joinQuery} like :tag`)
-        .setParameter("tag", '%' + global.general.lang +'%');
+        .setParameter('tag', '%' + general.lang +'%');
 
       let results = await query.execute();
       if (results.length > 0) {
@@ -151,7 +152,7 @@ function Panel () {
           .addSelect('tags.is_auto', 'is_auto')
           .addSelect('tags.is_current', 'is_current')
           .leftJoinAndSelect(TwitchTagLocalizationName, 'names', `${joinQuery} = :tag`)
-          .setParameter("tag", 'en-us');
+          .setParameter('tag', 'en-us');
         results = await query.execute();
       }
       cb(results);
@@ -301,7 +302,7 @@ function Panel () {
     })
 
     socket.on('responses.get', async function (at, callback) {
-      const responses = flatten.flatten(!_.isNil(at) ? global.lib.translate.translations[global.general.lang][at] : global.lib.translate.translations[global.general.lang])
+      const responses = flatten.flatten(!_.isNil(at) ? translate.translations[general.lang][at] : translate.translations[general.lang])
       _.each(responses, function (value, key) {
         let _at = !_.isNil(at) ? at + '.' + key : key
         responses[key] = {} // remap to obj
@@ -311,9 +312,9 @@ function Panel () {
       callback(responses)
     })
     socket.on('responses.set', function (data) {
-      _.remove(global.lib.translate.custom, function (o) { return o.key === data.key })
-      global.lib.translate.custom.push(data)
-      global.lib.translate._save()
+      _.remove(translate.custom, function (o) { return o.key === data.key })
+      translate.custom.push(data)
+      translate._save()
 
       let lang = {}
       _.merge(
@@ -324,7 +325,7 @@ function Panel () {
       socket.emit('lang', lang)
     })
     socket.on('responses.revert', async function (data, callback) {
-      _.remove(global.lib.translate.custom, function (o) { return o.name === data.name })
+      _.remove(translate.custom, function (o) { return o.name === data.name })
       await getRepository(Translation).delete({ name: data.name })
       let translate = translate(data.name)
       callback(translate)
@@ -398,71 +399,97 @@ function Panel () {
     socket.on('saveConfiguration', function (data) {
       _.each(data, async function (index, value) {
         if (value.startsWith('_')) return true
-        global.general.setValue({ sender: { username: commons.getOwner() }, parameters: value + ' ' + index, quiet: data._quiet })
+        general.setValue({ sender: { username: commons.getOwner() }, parameters: value + ' ' + index, quiet: data._quiet })
       })
     })
 
     // send enabled systems
     socket.on('systems', async (cb) => {
-      let toEmit = []
-      for (let system of Object.keys(global.systems).filter(o => !o.startsWith('_'))) {
+      const toEmit = [];
+      for (let system of glob.sync('./systems/*')) {
+        if (system.startsWith('_')) {
+          continue;
+        }
+        system = system.replace('./systems/', '').replace('.js', '');
+        self = (require('./systems/' + system.toLowerCase())).default;
         toEmit.push({
           name: system.toLowerCase(),
-          enabled: global.systems[system].enabled,
-          areDependenciesEnabled: await global.systems[system].areDependenciesEnabled,
-          isDisabledByEnv: global.systems[system].isDisabledByEnv,
-        })
+          enabled: self.enabled,
+          areDependenciesEnabled: await self.areDependenciesEnabled,
+          isDisabledByEnv: self.isDisabledByEnv,
+        });
       }
-      cb(null, toEmit)
-    })
+      cb(null, toEmit);
+    });
     socket.on('core', async (cb) => {
-      let toEmit = []
-      for (let system of ['oauth', 'tmi', 'currency', 'ui', 'general', 'twitch', 'socket']) {
+      const toEmit = [];
+      for (const system of ['oauth', 'tmi', 'currency', 'ui', 'general', 'twitch', 'socket']) {
         toEmit.push({
           name: system.toLowerCase()
-        })
-      }
-      cb(null, toEmit)
+        });
+      };
+      cb(null, toEmit);
     })
     socket.on('integrations', async (cb) => {
-      let toEmit = []
-      for (let system of Object.keys(global.integrations).filter(o => !o.startsWith('_'))) {
-        if (!global.integrations[system].showInUI) continue
+      const toEmit = [];
+      for (let system of glob.sync('./integrations/*')) {
+        if (system.startsWith('_')) {
+          continue;
+        }
+        system = system.replace('./integrations/', '').replace('.js', '');
+        self = (require('./integrations/' + system.toLowerCase())).default;
+        if (!self.showInUI) {
+          continue;
+        }
         toEmit.push({
           name: system.toLowerCase(),
-          enabled: global.integrations[system].enabled,
-          areDependenciesEnabled: await global.integrations[system].areDependenciesEnabled,
-          isDisabledByEnv: global.integrations[system].isDisabledByEnv,
-        })
+          enabled: self.enabled,
+          areDependenciesEnabled: await self.areDependenciesEnabled,
+          isDisabledByEnv: self.isDisabledByEnv,
+        });
       }
-      cb(null, toEmit)
-    })
+      cb(null, toEmit);
+    });
     socket.on('overlays', async (cb) => {
-      let toEmit = []
-      for (let system of Object.keys(global.overlays).filter(o => !o.startsWith('_'))) {
-        if (!global.overlays[system].showInUI) continue
+      const toEmit = [];
+      for (let system of glob.sync('./overlays/*')) {
+        if (system.startsWith('_')) {
+          continue;
+        }
+        system = system.replace('./overlays/', '').replace('.js', '');
+        self = (require('./overlays/' + system.toLowerCase())).default;
+        if (!self.showInUI) {
+          continue;
+        }
         toEmit.push({
           name: system.toLowerCase(),
-          enabled: global.overlays[system].enabled,
-          areDependenciesEnabled: await global.overlays[system].areDependenciesEnabled,
-          isDisabledByEnv: global.overlays[system].isDisabledByEnv,
-        })
+          enabled: self.enabled,
+          areDependenciesEnabled: await self.areDependenciesEnabled,
+          isDisabledByEnv: self.isDisabledByEnv,
+        });
       }
-      cb(null, toEmit)
-    })
+      cb(null, toEmit);
+    });
     socket.on('games', async (cb) => {
-      let toEmit = []
-      for (let system of Object.keys(global.games).filter(o => !o.startsWith('_'))) {
-        if (!global.games[system].showInUI) continue
+      const toEmit = [];
+      for (let system of glob.sync('./games/*')) {
+        if (system.startsWith('_')) {
+          continue;
+        }
+        system = system.replace('./games/', '').replace('.js', '');
+        self = (require('./games/' + system.toLowerCase())).default;
+        if (!self.showInUI) {
+          continue;
+        }
         toEmit.push({
           name: system.toLowerCase(),
-          enabled: global.games[system].enabled,
-          areDependenciesEnabled: await global.games[system].areDependenciesEnabled,
-          isDisabledByEnv: global.games[system].isDisabledByEnv,
-        })
+          enabled: self.enabled,
+          areDependenciesEnabled: await self.areDependenciesEnabled,
+          isDisabledByEnv: self.isDisabledByEnv,
+        });
       }
-      cb(null, toEmit)
-    })
+      cb(null, toEmit);
+    });
 
     socket.on('name', function (cb) {
       cb(oauth.botUsername);
@@ -551,13 +578,6 @@ Panel.prototype.registerSockets = util.deprecate(function (options) {
 
 Panel.prototype.sendStreamData = async function (self, socket) {
   try {
-    if (typeof global.systems === 'undefined'
-        || typeof songs === 'undefined'
-        || typeof global.integrations === 'undefined'
-        || typeof spotify === 'undefined') {
-      return
-    }
-
     const ytCurrentSong = Object.values(songs.isPlaying).find(o => o) ? _.get(JSON.parse(songs.currentSong), 'title', null) : null;
     let spotifyCurrentSong = _.get(JSON.parse(spotify.currentSong), 'song', '') + ' - ' + _.get(JSON.parse(spotify.currentSong), 'artist', '');
     if (spotifyCurrentSong.trim().length === 1 /* '-' */  || !_.get(JSON.parse(spotify.currentSong), 'is_playing', false)) {
@@ -575,7 +595,7 @@ Panel.prototype.sendStreamData = async function (self, socket) {
       .addSelect('tags.is_current', 'is_current')
       .where('tags.is_current = True')
       .leftJoinAndSelect(TwitchTagLocalizationName, 'names', `${joinQuery} like :tag`)
-      .setParameter("tag", '%' + global.general.lang +'%');
+      .setParameter('tag', '%' + general.lang +'%');
 
     let tagResults = await tagQuery.execute();
     if (tagResults.length === 0) {
@@ -589,7 +609,7 @@ Panel.prototype.sendStreamData = async function (self, socket) {
         .addSelect('tags.is_current', 'is_current')
         .where('tags.is_current = True')
         .leftJoinAndSelect(TwitchTagLocalizationName, 'names', `${joinQuery} = :tag`)
-        .setParameter("tag", 'en-us');
+        .setParameter('tag', 'en-us');
       tagResults = await tagQuery.execute();
     }
 

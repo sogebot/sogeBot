@@ -39,7 +39,6 @@ declare namespace NodeJS {
     configuration: any;
     cpu: any;
     db: any;
-    stats2: any;
   }
 }
 
@@ -63,7 +62,7 @@ interface Command {
   fnc?: string;
   isHelper?: boolean;
   permission?: string | null;
-  dependsOn?: string[];
+  dependsOn?: import('../src/bot/_interface').Module[];
 }
 
 interface Parser {
@@ -72,7 +71,7 @@ interface Parser {
   permission?: string;
   priority?: number;
   fireAndForget?: boolean;
-  dependsOn?: string[];
+  dependsOn?: import('../src/bot/_interface').Module[];
 }
 
 type onEventSub = {
