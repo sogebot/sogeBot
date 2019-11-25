@@ -29,9 +29,9 @@ function trigger(opts: onEventMessage | onEventSub | onEventBit | onEventTip | o
   for (const event of getFunctionList(on_trigger)) {
     let self;
     if (event.path.startsWith('core')) {
-      self = (require(`./${event.path.split('.')[1]}`)).default;
+      self = (require(`../../${event.path.split('.')[1]}`)).default;
     } else {
-      self = (require(`./${event.path.split('.')[0]}/${event.path.split('.')[1]}`)).default;
+      self = (require(`../../${event.path.split('.')[0]}/${event.path.split('.')[1]}`)).default;
     }
 
     if (typeof self[event.fName] === 'function') {

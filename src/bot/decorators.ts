@@ -322,59 +322,66 @@ async function registerCommand(opts: string | Command, m) {
 }
 
 function registerHelper(m, retry = 0) {
-  try {
-    let self;
-    if (m.type === 'core') {
-      self = (require('./' + m.name)).default;
-    } else {
-      self = (require('./' + m.type + '/' + m.name)).default;
+  setTimeout(() => {
+    try {
+      let self;
+      if (m.type === 'core') {
+        self = (require('./' + m.name)).default;
+      } else {
+        self = (require('./' + m.type + '/' + m.name)).default;
+      }
+      // find command with function
+      const c = self._commands.find((o) => o.fnc === m.fnc);
+      if (!c) {
+        throw Error();
+      } else {
+        c.isHelper = true;
+      }
+    } catch (e) {
+      if (retry < 100) {
+        return setTimeout(() => registerHelper(m, retry++), 10);
+      } else {
+        error('Command with function ' + m.fnc + ' not found!');
+      }
     }
-    // find command with function
-    const c = self._commands.find((o) => o.fnc === m.fnc);
-    if (!c) {
-      throw Error();
-    } else {
-      c.isHelper = true;
-    }
-  } catch (e) {
-    if (retry < 100) {
-      return setTimeout(() => registerHelper(m, retry++), 10);
-    } else {
-      error('Command with function ' + m.fnc + ' not found!');
-    }
-  }
+  }, 10000);
 }
 
 function registerRollback(m) {
-  try {
-    let self;
-    if (m.type === 'core') {
-      self = (require('./' + m.name)).default;
-    } else {
-      self = (require('./' + m.type + '/' + m.name)).default;
-    }    self._rollback.push({
-      name: m.fnc,
-    });
-  } catch (e) {
-    error(e.stack);
-  }
+  setTimeout(() => {
+    try {
+      let self;
+      if (m.type === 'core') {
+        self = (require('./' + m.name)).default;
+      } else {
+        self = (require('./' + m.type + '/' + m.name)).default;
+      }    self._rollback.push({
+        name: m.fnc,
+      });
+    } catch (e) {
+      error(e.stack);
+    }
+  }, 10000);
 }
 
 function registerParser(opts, m) {
-  try {
-    let self;
-    if (m.type === 'core') {
-      self = (require('./' + m.name)).default;
-    } else {
-      self = (require('./' + m.type + '/' + m.name)).default;
-    }    self._parsers.push({
-      name: m.fnc,
-      permission: opts.permission,
-      priority: opts.priority,
-      dependsOn: opts.dependsOn,
-      fireAndForget: opts.fireAndForget,
-    });
-  } catch (e) {
-    error(e.stack);
-  }
+  setTimeout(() => {
+    try {
+      let self;
+      if (m.type === 'core') {
+        self = (require('./' + m.name)).default;
+      } else {
+        self = (require('./' + m.type + '/' + m.name)).default;
+      }
+      self._parsers.push({
+        name: m.fnc,
+        permission: opts.permission,
+        priority: opts.priority,
+        dependsOn: opts.dependsOn,
+        fireAndForget: opts.fireAndForget,
+      });
+    } catch (e) {
+      error(e.stack);
+    }
+  }, 10000);
 }
