@@ -22,6 +22,8 @@ import Price from './systems/price';
 import { Rank } from './database/entity/rank';
 
 import api from './api';
+import spotify from './integrations/spotify';
+import songs from './systems/songs';
 
 class Message {
   constructor (message) {
