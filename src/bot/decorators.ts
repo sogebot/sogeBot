@@ -72,7 +72,9 @@ export function ui(opts, category?: string) {
         error(e);
       }
     };
-    register();
+    setTimeout(() => {
+      register();
+    }, 10000);
   };
 }
 
@@ -173,7 +175,9 @@ export function permission_settings(category?: string) {
         console.log(e);
       }
     };
-    register();
+    setTimeout(() => {
+      register();
+    }, 10000);
   };
 }
 
@@ -213,7 +217,9 @@ export function shared(db = false) {
         console.log(e);
       }
     };
-    register();
+    setTimeout(() => {
+      register();
+    }, 10000);
   };
 }
 
