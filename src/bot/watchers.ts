@@ -18,7 +18,7 @@ setInterval(() => {
   if (isDbConnected) {
     VariableWatcher.check();
   }
-}, 1000);
+}, 30000);
 
 export const VariableWatcher = {
   add(key: string, value: any, isReadOnly: boolean) {
