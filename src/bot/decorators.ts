@@ -23,7 +23,7 @@ const interval = setInterval(() => {
   } else {
     lastLoadingInProgressCount = loadingInProgress.length;
   }
-}, 5000);
+}, 10000);
 
 function getNameAndTypeFromStackTrace() {
   const _prepareStackTrace = Error.prepareStackTrace;
@@ -125,7 +125,9 @@ export function settings(category?: string, isReadOnly = false) {
         console.log(e);
       }
     };
-    registerSettings();
+    setTimeout(() => {
+      registerSettings();
+    }, 10000);
   };
 }
 
