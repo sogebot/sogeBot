@@ -5,6 +5,7 @@ import { change } from './changelog';
 import { getRepository } from 'typeorm';
 import { Settings } from './database/entity/settings';
 import { getFunctionList } from './decorators/on';
+import { isDbConnected } from './helpers/database';
 
 const variables: {
   [x: string]: any;
@@ -14,7 +15,9 @@ const readonly: {
 } = {};
 
 setInterval(() => {
-  VariableWatcher.check();
+  if (isDbConnected) {
+    VariableWatcher.check();
+  }
 }, 1000);
 
 export const VariableWatcher = {
