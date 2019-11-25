@@ -22,6 +22,7 @@ import Price from './systems/price';
 import { Rank } from './database/entity/rank';
 
 import api from './api';
+import tmi from './tmi';
 import spotify from './integrations/spotify';
 import songs from './systems/songs';
 import { translate } from './translate';
