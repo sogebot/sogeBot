@@ -21,6 +21,8 @@ import { User } from './database/entity/user';
 import Price from './systems/price';
 import { Rank } from './database/entity/rank';
 
+import api from './api';
+
 class Message {
   constructor (message) {
     this.message = Entities.decode(message);
