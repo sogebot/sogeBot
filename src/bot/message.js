@@ -24,6 +24,7 @@ import { Rank } from './database/entity/rank';
 import api from './api';
 import spotify from './integrations/spotify';
 import songs from './systems/songs';
+import { translate } from './translate';
 
 class Message {
   constructor (message) {
