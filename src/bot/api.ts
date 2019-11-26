@@ -1516,19 +1516,13 @@ class API extends Core {
     }
     const id = user.userId;
 
-    // reload user from db
-    user = {
-      ...user,
-      ...await getRepository(User).findOne({ userId: id }),
-    };
-
     clearTimeout(this.timeouts['isFollowerUpdate-' + id]);
 
     const cid = oauth.channelId;
     const url = `https://api.twitch.tv/helix/users/follows?from_id=${id}&to_id=${cid}`;
 
     const token = await oauth.botAccessToken;
-    const needToWait = isNil(cid) || cid === '' || isMainThread || token === '';
+    const needToWait = isNil(cid) || cid === '' || token === '';
     const notEnoughAPICalls = this.calls.bot.remaining <= 40 && this.calls.bot.refresh > Date.now() / 1000;
     if (needToWait || notEnoughAPICalls) {
       this.timeouts['isFollowerUpdate-' + id] = setTimeout(() => this.isFollowerUpdate(user), 1000);
@@ -1572,10 +1566,12 @@ class API extends Core {
         events.fire('unfollow', { username: user.username });
       }
 
-      user.followedAt = user.haveFollowedAtLock ? user.followedAt : 0;
-      user.isFollower = user.haveFollowerLock? user.isFollower : false;
-      user.followCheckAt = Date.now();
-      await getRepository(User).save(user);
+      await getRepository(User).update({ userId: user.userId },
+        {
+          followedAt: user.haveFollowedAtLock ? user.followedAt : 0,
+          isFollower: user.haveFollowerLock? user.isFollower : false,
+          followCheckAt: Date.now(),
+        });
       return { isFollower: user.isFollower, followedAt: user.followedAt };
     } else {
       // is follower
@@ -1603,11 +1599,12 @@ class API extends Core {
         });
       }
 
-
-      user.followedAt = user.haveFollowedAtLock ? user.followedAt : Number(moment(request.data.data[0].followed_at).format('x'));
-      user.isFollower = user.haveFollowerLock? user.isFollower : true;
-      user.followCheckAt = Date.now();
-      await getRepository(User).save(user);
+      await getRepository(User).update({ userId: user.userId },
+        {
+          followedAt: user.haveFollowedAtLock ? user.followedAt : Number(moment(request.data.data[0].followed_at).format('x')),
+          isFollower: user.haveFollowerLock? user.isFollower : true,
+          followCheckAt: Date.now(),
+        });
       return { isFollower: user.isFollower, followedAt: user.followedAt };
     }
   }
