@@ -5,7 +5,6 @@ const bodyParser = require('body-parser')
 var http = require('http')
 var path = require('path')
 var _ = require('lodash')
-const util = require('util')
 const commons = require('./commons')
 const flatten = require('./helpers/flatten')
 const gitCommitInfo = require('git-commit-info');
@@ -329,8 +328,7 @@ function Panel () {
     socket.on('responses.revert', async function (data, callback) {
       _.remove(translate.custom, function (o) { return o.name === data.name })
       await getRepository(Translation).delete({ name: data.name })
-      let translate = translate(data.name)
-      callback(translate)
+      callback(translate(data.name))
     })
 
     socket.on('getWidgetList', async (cb) => {

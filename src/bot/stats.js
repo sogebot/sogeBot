@@ -4,7 +4,6 @@ var _ = require('lodash')
 const { TwitchStats } = require('./database/entity/twitch');
 const { getRepository } = require('typeorm');
 const { error } = require('./helpers/log');
-const panel = require('./panel');
 import { adminEndpoint } from './helpers/socket';
 
 let _self = null;
