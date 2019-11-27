@@ -1,5 +1,5 @@
 if (Number(process.versions.node.split('.')[0]) < 11) {
-  console.log('Upgrade your version of NodeJs! You need at least NodeJs 11.0.0, https://nodejs.org/en/. Current version is ' + process.versions.node);
+  process.stdout.write('Upgrade your version of NodeJs! You need at least NodeJs 11.0.0, https://nodejs.org/en/. Current version is ' + process.versions.node + '\n');
   process.exit(1);
 }
 
@@ -57,7 +57,7 @@ async function main () {
   }
 
   const version = _.get(process, 'env.npm_package_version', 'x.y.z');
-  console.log(figlet.textSync('sogeBot ' + version.replace('SNAPSHOT', gitCommitInfo().shortHash || 'SNAPSHOT'), {
+  process.stdout.write(figlet.textSync('sogeBot ' + version.replace('SNAPSHOT', gitCommitInfo().shortHash || 'SNAPSHOT'), {
     font: 'ANSI Shadow',
     horizontalLayout: 'default',
     verticalLayout: 'default',

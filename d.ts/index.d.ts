@@ -23,6 +23,12 @@ declare module '*.mp3' {
   export default content;
 }
 
+declare namespace NodeJS {
+  export interface Global {
+    mocha: boolean;
+  }
+}
+
 interface Sender {
   username: string;
   displayName: string;

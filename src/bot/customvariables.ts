@@ -20,6 +20,7 @@ import panel from './panel';
 import custom_variables from './widgets/customvariables';
 import currency from './currency';
 import { isDbConnected } from './helpers/database';
+import { linesParsed } from './helpers/parser';
 
 class CustomVariables {
   timeouts: {

@@ -122,7 +122,7 @@ export function settings(category?: string, isReadOnly = false) {
         // add variable to settingsList
         self.settingsList.push({ category, key });
       } catch (e) {
-        console.log(e);
+        process.stderr.write(JSON.stringify(e) + '\n');
       }
     };
     setTimeout(() => {
@@ -174,7 +174,7 @@ export function permission_settings(category?: string) {
         // add variable to settingsPermList
         self.settingsPermList.push({ category, key });
       } catch (e) {
-        console.log(e);
+        process.stderr.write(JSON.stringify(e) + '\n');
       }
     };
     setTimeout(() => {
@@ -216,7 +216,7 @@ export function shared(db = false) {
           setTimeout(() => loadVariableValue(), 5000);
         }
       } catch (e) {
-        console.log(e);
+        process.stderr.write(JSON.stringify(e) + '\n');
       }
     };
     setTimeout(() => {

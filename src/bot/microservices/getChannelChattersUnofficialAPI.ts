@@ -114,7 +114,7 @@ export const getChannelChattersUnofficialAPI = async (): Promise<{ modStatus: bo
             clusteredFetchAccountAge(user.username, user.userId);
             await getRepository(User).save(user);
           } catch (e) {
-            console.error('Something went wrong when getting user data of ' + username);
+            process.stderr.write('Something went wrong when getting user data of ' + username + '\n');
             continue;
           }
         }

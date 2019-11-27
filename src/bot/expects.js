@@ -32,8 +32,8 @@ class Expects {
   }
 
   check (text) {
-    console.warn('Calling deprecated function check(), set in constructor directly')
-    console.warn(new Error().stack)
+    process.stdout.write('Calling deprecated function check(), set in constructor directly\n');
+    process.stdout.write(new Error().stack + '\n');
     this.originalText = text
     this.text = text
     return this

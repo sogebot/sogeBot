@@ -93,7 +93,7 @@ function log(message: string | object) {
   const level = getFunctionNameFromStackTrace();
   if (Levels[level] <= Levels[logLevel]) {
     const formattedMessage = format(Levels[level], message);
-    console.log(formattedMessage);
+    process.stdout.write(formattedMessage + '\n');
     logFile.write(stripAnsi(formattedMessage) + os.EOL);
   }
 }
@@ -106,7 +106,7 @@ export function debug(category: string, message: string | object) {
   }
   if (isDebugEnabled(category) || category == '*') {
     const formattedMessage = format(Levels.debug, message, category);
-    console.log(formattedMessage);
+    process.stdout.write(formattedMessage + '\n');
     logFile.write(formattedMessage + os.EOL);
   }
 }

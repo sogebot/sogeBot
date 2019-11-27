@@ -14,6 +14,7 @@ import oauth from './oauth';
 import ui from './ui';
 import alerts from './registries/alerts';
 import eventlist from './overlays/eventlist';
+import { linesParsed } from './helpers/parser';
 
 class Webhooks {
   enabled = {
