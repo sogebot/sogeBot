@@ -15,6 +15,7 @@ import { Widget } from './database/entity/dashboard';
 import oauth from './oauth';
 import translateLib, { translate } from './translate';
 import tmi from './tmi';
+import glob from 'glob';
 
 class General extends Core {
   @settings('general')
@@ -65,26 +66,32 @@ class General extends Core {
 
     const enabledSystems: any = {};
     for (const category of ['systems', 'games', 'integrations']) {
-      if (isNil(enabledSystems[category])) {
-        enabledSystems[category] = [];
-      }
-      for (const system of Object.keys(global[category]).filter((o) => !o.startsWith('_'))) {
-        const [enabled, areDependenciesEnabled, isDisabledByEnv] = await Promise.all([
-          global[category][system].enabled,
-          global[category][system].areDependenciesEnabled,
-          !isNil(process.env.DISABLE) && (process.env.DISABLE.toLowerCase().split(',').includes(system.toLowerCase()) || process.env.DISABLE === '*'),
-        ]);
-        if (!enabled) {
-          enabledSystems[category].push('-' + system);
-        } else if (!areDependenciesEnabled) {
-          enabledSystems[category].push('-dep-' + system);
-        } else if (isDisabledByEnv) {
-          enabledSystems[category].push('-env-' + system);
-        } else {
-          enabledSystems[category].push(system);
+      enabledSystems[category] = enabledSystems[category] ?? [];
+
+      for (const category of ['systems', 'games', 'integrations']) {
+        for (let system of glob.sync(__dirname + '/' + category + '/*')) {
+          system = system.split('/' + category + '/')[1].replace('.js', '');
+          if (system.startsWith('_')) {
+            continue;
+          }
+          const self = (require('./' + category + '/' + system.toLowerCase())).default;
+          const enabled = self.enabled;
+          const areDependenciesEnabled = self.areDependenciesEnabled;
+          const isDisabledByEnv = !isNil(process.env.DISABLE) && (process.env.DISABLE.toLowerCase().split(',').includes(system.toLowerCase()) || process.env.DISABLE === '*');
+
+          if (!enabled) {
+            enabledSystems[category].push('-' + system);
+          } else if (!areDependenciesEnabled) {
+            enabledSystems[category].push('-dep-' + system);
+          } else if (isDisabledByEnv) {
+            enabledSystems[category].push('-env-' + system);
+          } else {
+            enabledSystems[category].push(system);
+          }
         }
       }
     }
+
     const version = get(process, 'env.npm_package_version', 'x.y.z');
     debug('*', '======= COPY DEBUG MESSAGE FROM HERE =======');
     debug('*', `GENERAL      | OS: ${process.env.npm_config_user_agent}`);
@@ -159,11 +166,21 @@ class General extends Core {
         throw new Error('Not supported');
       }
 
-      if (isNil(global[type + 's'][name])) {
-        throw new Error(`Not found - ${type}s - ${name}`);
+      let found = false;
+      for (let system of glob.sync(__dirname + '/' + type + 's' + '/' + name + '*')) {
+        system = system.split('/' + type + 's' + '/')[1].replace('.js', '');
+        if (system.startsWith('_')) {
+          continue;
+        }
+        const self = (require('./' + type + 's' + '/' + system.toLowerCase())).default;
+        self.status({ state: opts.enable });
+        found = true;
+        break;
       }
 
-      global[type][name].status({ state: opts.enable });
+      if (!found) {
+        throw new Error(`Not found - ${type}s - ${name}`);
+      }
     } catch (e) {
       error(e.message);
     }
