@@ -33,7 +33,7 @@ import alerts from './registries/alerts';
 import eventlist from './overlays/eventlist';
 import stats from './stats';
 import { getFunctionList } from './decorators/on';
-import { setStatus, linesParsed } from './helpers/parser';
+import { linesParsed, setStatus } from './helpers/parser';
 
 const setImmediateAwait = () => {
   return new Promise(resolve => {
