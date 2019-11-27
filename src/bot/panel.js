@@ -30,7 +30,6 @@ import currency from './currency';
 import oauth from './oauth';
 import songs from './systems/songs';
 import spotify from './integrations/spotify';
-import { adminEndpoint } from './helpers/socket';
 import { status as statusObj, linesParsed } from './helpers/parser';
 const config = require('@config')
 

@@ -20,6 +20,7 @@ import permissions from '../permissions';
 import { translate } from '../translate';
 import spotify from '../integrations/spotify';
 import songs from './songs';
+import aliasSystem from './alias';
 
 class Moderation extends System {
   @settings('lists')
@@ -157,7 +158,7 @@ class Moderation extends System {
       // we can assume its first command in array (spotify have only one command)
       const command = (await spotify.commands())[0].command;
       const alias = await getRepository(Alias).findOne({ where: { command } });
-      if (alias && alias.enabled && alias.enabled) {
+      if (alias && alias.enabled && aliasSystem.enabled) {
         spotifyRegex = new RegExp('^(' + command + '|' + alias.alias + ') \\S+open\\.spotify\\.com\\/track\\/(\\w+)(.*)?', 'gi');
       } else {
         spotifyRegex = new RegExp('^(' + command + ') \\S+open\\.spotify\\.com\\/track\\/(\\w+)(.*)?', 'gi');
@@ -169,7 +170,7 @@ class Moderation extends System {
     if (songs.enabled) {
       const alias = await getRepository(Alias).findOne({ where: { command: '!songrequest' } });
       const cmd = songs.getCommand('!songrequest');
-      if (alias && alias.enabled && alias.enabled) {
+      if (alias && alias.enabled && aliasSystem.enabled) {
         ytRegex = new RegExp('^(' + cmd + '|' + alias.alias + ') \\S+(?:youtu.be\\/|v\\/|e\\/|u\\/\\w+\\/|embed\\/|v=)([^#&?]*).*', 'gi');
       } else {
         ytRegex =  new RegExp('^(' + cmd + ') \\S+(?:youtu.be\\/|v\\/|e\\/|u\\/\\w+\\/|embed\\/|v=)([^#&?]*).*', 'gi');
