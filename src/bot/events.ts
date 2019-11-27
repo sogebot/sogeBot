@@ -225,7 +225,7 @@ class Events extends Core {
   }
 
   public async fireBotWillJoinChannel(operation, attributes) {
-    global.client.join('#' + await oauth.broadcasterUsername);
+    tmi.client.join('#' + await oauth.broadcasterUsername);
   }
 
   public async fireBotWillLeaveChannel(operation, attributes) {

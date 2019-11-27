@@ -277,7 +277,7 @@ class CustomVariables {
         currentBits: api.stats.currentBits,
         currentTips: api.stats.currentTips,
         currency: currency.symbol(currency.mainCurrency),
-        chatMessages: (api.isStreamOnline) ? global.linesParsed - api.chatMessagesAtStart : 0,
+        chatMessages: (api.isStreamOnline) ? linesParsed - api.chatMessagesAtStart : 0,
         currentFollowers: api.stats.currentFollowers,
         currentViews: api.stats.currentViews,
         maxViewers: api.stats.maxViewers,

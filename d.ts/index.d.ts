@@ -23,25 +23,6 @@ declare module '*.mp3' {
   export default content;
 }
 
-declare namespace NodeJS {
-  export interface Global {
-    linesParsed: number;
-    avgResponse: number[];
-    status: {
-      API: 0 | 1 | 2 | 3;
-      MOD: boolean;
-      TMI: 0 | 1 | 2 | 3;
-      RES: number;
-    };
-    cache: any;
-    client: any;
-    mocha: boolean;
-    configuration: any;
-    cpu: any;
-    db: any;
-  }
-}
-
 interface Sender {
   username: string;
   displayName: string;

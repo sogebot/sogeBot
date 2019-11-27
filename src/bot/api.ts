@@ -33,6 +33,7 @@ import alerts from './registries/alerts';
 import eventlist from './overlays/eventlist';
 import stats from './stats';
 import { getFunctionList } from './decorators/on';
+import { setStatus } from './helpers/parser';
 
 const setImmediateAwait = () => {
   return new Promise(resolve => {
@@ -111,7 +112,7 @@ class API extends Core {
     bot: new Proxy({}, limitProxy),
     broadcaster: new Proxy({}, limitProxy),
   };
-  chatMessagesAtStart = global.linesParsed;
+  chatMessagesAtStart = linesParsed;
   maxRetries = 3;
   curRetries = 0;
   streamType = 'live';
@@ -376,7 +377,7 @@ class API extends Core {
         }
       }
 
-      global.status.MOD = modStatus;
+      setStatus('MOD', modStatus);
     }
     return { state: true, opts };
   }
@@ -958,7 +959,7 @@ class API extends Core {
         },
       });
 
-      global.status.API = request.status === 200 ? constants.CONNECTED : constants.DISCONNECTED;
+      setStatus('API', request.status === 200 ? constants.CONNECTED : constants.DISCONNECTED);
 
       // save remaining api calls
       this.calls.bot.remaining = request.headers['ratelimit-remaining'];
@@ -981,7 +982,7 @@ class API extends Core {
           this.streamStatusChangeSince = (new Date(stream.started_at)).getTime();
         }
         if (!this.isStreamOnline || this.streamType !== stream.type) {
-          this.chatMessagesAtStart = global.linesParsed;
+          this.chatMessagesAtStart = linesParsed;
 
           if (!webhooks.enabled.streams && Number(this.streamId) !== Number(stream.id)) {
             debug('api.stream', 'API: ' + JSON.stringify(stream));
@@ -1105,7 +1106,7 @@ class API extends Core {
       currentFollowers: this.stats.currentFollowers,
       currentBits: this.stats.currentBits,
       currentTips: this.stats.currentTips,
-      chatMessages: global.linesParsed - this.chatMessagesAtStart,
+      chatMessages: linesParsed - this.chatMessagesAtStart,
       currentViews: this.stats.currentViews,
       maxViewers: this.stats.maxViewers,
       newChatters: this.stats.newChatters,

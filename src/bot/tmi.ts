@@ -12,7 +12,7 @@ import Core from './_interface';
 import * as constants from './constants';
 import { settings, ui } from './decorators';
 import { globalIgnoreList } from './data/globalIgnoreList';
-import { ban, cheer, error, host, info, raid, resub, sub, subcommunitygift, subgift, warning } from './helpers/log';
+import { ban, cheer, error, host, info, raid, resub, sub, subcommunitygift, subgift } from './helpers/log';
 import { triggerInterfaceOnBit, triggerInterfaceOnMessage, triggerInterfaceOnSub } from './helpers/interface/triggers';
 import { isDebugEnabled } from './helpers/log';
 import { getLocalizedName, getOwner, isBot, isIgnored, isOwner, prepare, sendMessage } from './commons';
@@ -30,6 +30,7 @@ import tmi from './tmi';
 import alerts from './registries/alerts';
 import eventlist from './overlays/eventlist';
 import { getFunctionList } from './decorators/on';
+import { avgResponse, linesParsedIncrement, setStatus } from './helpers/parser';
 
 class TMI extends Core {
   @settings('chat')
@@ -196,21 +197,21 @@ class TMI extends Core {
     // common for bot and broadcaster
     this.client[type].chat.on('DISCONNECT', async (message) => {
       info(`TMI: ${type} is disconnected`);
-      global.status.TMI = constants.DISCONNECTED;
+      setStatus('TMI', constants.DISCONNECTED);
       for (const event of getFunctionList('partChannel')) {
         this[event.fName]();
       }
     });
     this.client[type].chat.on('RECONNECT', async (message) => {
       info(`TMI: ${type} is reconnecting`);
-      global.status.TMI = constants.RECONNECTING;
+      setStatus('TMI', constants.RECONNECTING);
       for (const event of getFunctionList('reconnectChannel')) {
         this[event.fName]();
       }
     });
     this.client[type].chat.on('CONNECTED', async (message) => {
       info(`TMI: ${type} is connected`);
-      global.status.TMI = constants.CONNECTED;
+      setStatus('TMI', constants.CONNECTED);
       for (const event of getFunctionList('joinChannel')) {
         this[event.fName]();
       }
@@ -223,7 +224,7 @@ class TMI extends Core {
         if (!isBot(message.tags.username) || !message.isSelf) {
           message.tags['message-type'] = 'whisper';
           tmi.message({message});
-          global.linesParsed++;
+          linesParsedIncrement();
         }
       });
 
@@ -239,7 +240,7 @@ class TMI extends Core {
             // strip message from ACTION
             message.message = message.message.replace('\u0001ACTION ', '').replace('\u0001', '');
             tmi.message({message});
-            global.linesParsed++;
+            linesParsedIncrement();
             triggerInterfaceOnMessage({
               sender: message.tags,
               message: message.message,
@@ -251,7 +252,7 @@ class TMI extends Core {
             }
           }
         } else {
-          global.status.MOD = typeof message.tags.badges.moderator !== 'undefined';
+          setStatus('MOD', typeof message.tags.badges.moderator !== 'undefined');
         }
       });
 
@@ -753,25 +754,10 @@ class TMI extends Core {
     }
 
     if (isMainThread) {
-      this.avgResponse({ value: parse.time(), message });
+      avgResponse({ value: parse.time(), message });
     } else {
       return { value: parse.time(), message };
     }
-  }
-
-  avgResponse(opts) {
-    let avgTime = 0;
-    global.avgResponse.push(opts.value);
-    if (opts.value > 5000) {
-      warning(`Took ${opts.value}ms to process: ${opts.message}`);
-    }
-    if (global.avgResponse.length > 100) {
-      global.avgResponse.shift();
-    }
-    for (const time of global.avgResponse) {
-      avgTime += time;
-    }
-    global.status.RES = Number((avgTime / global.avgResponse.length).toFixed(0));
   }
 }
 

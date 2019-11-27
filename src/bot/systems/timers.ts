@@ -14,6 +14,7 @@ import { Timer, TimerResponse } from '../database/entity/timer';
 import Expects from '../expects';
 import oauth from '../oauth';
 import { translate } from '../translate';
+import { linesParsed } from '../helpers/parser';
 
 /*
  * !timers                                                                                                                      - gets an info about timers usage
@@ -119,7 +120,7 @@ class Timers extends System {
       where: { isEnabled: true },
     });
     for (const timer of timers) {
-      if (timer.triggerEveryMessage > 0 && timer.triggeredAtMessages - global.linesParsed + timer.triggerEveryMessage > 0) {
+      if (timer.triggerEveryMessage > 0 && timer.triggeredAtMessages - linesParsed + timer.triggerEveryMessage > 0) {
         continue;
       } // not ready to trigger with messages
       if (timer.triggerEverySecond > 0 && new Date().getTime() - timer.triggeredAtTimestamp < timer.triggerEverySecond * 1000) {
@@ -140,7 +141,7 @@ class Timers extends System {
         response.timestamp = Date.now();
         await getRepository(TimerResponse).save(response);
       }
-      timer.triggeredAtMessages = global.linesParsed;
+      timer.triggeredAtMessages = linesParsed;
       timer.triggeredAtTimestamp = Date.now();
       await getRepository(Timer).save(timer);
     }
@@ -200,7 +201,7 @@ class Timers extends System {
     timer.triggerEveryMessage = messages;
     timer.triggerEverySecond = seconds;
     timer.isEnabled = true;
-    timer.triggeredAtMessages = global.linesParsed;
+    timer.triggeredAtMessages = linesParsed;
     timer.triggeredAtTimestamp = Date.now();
     await getRepository(Timer).save(timer);
     sendMessage(translate('timers.timer-was-set')

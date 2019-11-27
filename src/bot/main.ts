@@ -16,18 +16,6 @@ import _ from 'lodash';
 import gitCommitInfo from 'git-commit-info';
 import { isMainThread } from './cluster';
 
-import * as constants from './constants';
-
-global.linesParsed = 0;
-global.avgResponse = [];
-
-global.status = { // TODO: move it?
-  'TMI': constants.DISCONNECTED,
-  'API': constants.DISCONNECTED,
-  'MOD': false,
-  'RES': 0,
-};
-
 import { changelog } from './changelog';
 import { autoLoad } from './commons';
 import chalk from 'chalk';

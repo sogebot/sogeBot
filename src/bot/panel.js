@@ -31,6 +31,7 @@ import oauth from './oauth';
 import songs from './systems/songs';
 import spotify from './integrations/spotify';
 import { adminEndpoint } from './helpers/socket';
+import { status as statusObj, linesParsed } from './helpers/parser';
 const config = require('@config')
 
 let app;
@@ -397,7 +398,7 @@ function Panel () {
     socket.on('updateWidgets', async (dashboards) => {
       await getRepository(Dashboard).save(dashboards);
     });
-    socket.on('connection_status', cb => { cb(global.status) });
+    socket.on('connection_status', cb => { cb(statusObj) });
     socket.on('saveConfiguration', function (data) {
       _.each(data, async function (index, value) {
         if (value.startsWith('_')) return true
@@ -597,7 +598,7 @@ Panel.prototype.sendStreamData = async function (cb) {
       currentBits: api.stats.currentBits,
       currentTips: api.stats.currentTips,
       currency: currency.symbol(currency.mainCurrency),
-      chatMessages: api.isStreamOnline ? global.linesParsed - api.chatMessagesAtStart : 0,
+      chatMessages: api.isStreamOnline ? linesParsed - api.chatMessagesAtStart : 0,
       currentFollowers: api.stats.currentFollowers,
       currentViews: api.stats.currentViews,
       maxViewers: api.stats.maxViewers,

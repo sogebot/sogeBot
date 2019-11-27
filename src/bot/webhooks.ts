@@ -321,7 +321,7 @@ class Webhooks {
         api.stats.currentTips = 0;
 
         api.isStreamOnline = true;
-        api.chatMessagesAtStart = global.linesParsed;
+        api.chatMessagesAtStart = linesParsed;
 
         events.fire('stream-started', {});
         events.fire('command-send-x-times', { reset: true });

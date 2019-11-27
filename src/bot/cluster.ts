@@ -12,6 +12,7 @@ import oauth from './oauth';
 import api from './api';
 import panel from './panel';
 import tmi from './tmi';
+import { avgResponse } from './helpers/parser';
 
 const availableSockets: {
   [socketId: string]: {
@@ -56,7 +57,7 @@ const init = async () => {
 
       socket.on('received:message', (cb) => {
         // cb is average time
-        tmi.avgResponse({ value: cb.value, message: cb.message });
+        avgResponse({ value: cb.value, message: cb.message });
       });
 
       socket.on('disconnect', () => {

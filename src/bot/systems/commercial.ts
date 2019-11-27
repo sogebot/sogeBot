@@ -80,7 +80,7 @@ class Commercial extends System {
         });
 
         events.fire('commercial', { duration: commercial.duration });
-        global.client.commercial(await oauth.broadcasterUsername, commercial.duration);
+        tmi.client.commercial(await oauth.broadcasterUsername, commercial.duration);
         if (!_.isNil(commercial.message)) {
           sendMessage(commercial.message, opts.sender, opts.attr);
         }

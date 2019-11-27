@@ -8,6 +8,7 @@ import { onChange } from './decorators/on';
 import { error, info, warning } from './helpers/log';
 import api from './api';
 import tmi from './tmi';
+import { setStatus } from './helpers/parser';
 
 class OAuth extends Core {
   private toWait = 10;
@@ -238,7 +239,7 @@ class OAuth extends Core {
         this.cache[type] = request.data.login + request.data.scopes.join(',');
       }
 
-      global.status.API = request.status === 200 ? constants.CONNECTED : constants.DISCONNECTED;
+      setStatus('API', request.status === 200 ? constants.CONNECTED : constants.DISCONNECTED);
 
       this.toWait = 10;
       this.getChannelId();
