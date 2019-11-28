@@ -9,6 +9,8 @@ const _ = require('lodash');
 const { getRepository } = require('typeorm');
 const { Bets } = require('../../../dest/database/entity/bets');
 
+const bets = (require('../../../dest/systems/bets')).default;
+
 // users
 const owner = { username: 'soge__' };
 
@@ -43,7 +45,7 @@ describe('Bets - open()', () => {
   for (const [s, ta] of Object.entries(tests)) {
     for (const t of ta) {
       it((s ? 'OK' : 'NG') + ' - ' + t.input, async () => {
-        await global.systems.bets.open({ sender: owner, parameters: t.input });
+        await bets.open({ sender: owner, parameters: t.input });
 
         const currentBet = await getRepository(Bets).findOne({
           relations: ['participations'],

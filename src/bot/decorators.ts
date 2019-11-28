@@ -46,15 +46,16 @@ export function ui(opts, category?: string) {
     let path = category ? `${category}.${key}` : key;
 
     const register = async (retries = 0) => {
-      const isAvailableModule = type !== 'core' && typeof global[type] !== 'undefined' && typeof global[type][name] !== 'undefined';
-      const isAvailableLibrary = type === 'core' && typeof global[name] !== 'undefined';
-
-      if ((!isAvailableLibrary && !isAvailableModule) || !isDbConnected) {
+      if (!isDbConnected) {
         return setTimeout(() => register(0), 1000);
       }
       try {
-        const self = type === 'core' ? global[name] : global[type][name];
-
+        let self;
+        if (type === 'core') {
+          self = (require('./' + name)).default;
+        } else {
+          self = (require('./' + type + '/' + name)).default;
+        }
         // get category from settingsList
         if (!category) {
           const s = self.settingsList.find(o => o.key === path);
@@ -62,16 +63,18 @@ export function ui(opts, category?: string) {
             path = s.category? s.category + '.' + path : path;
           } else {
             if (retries < 500) { // try to wait to settings to be registered
-              return setTimeout(() => register(retries++), 10);
+              return setTimeout(() => register(++retries), 10);
             }
           }
         }
         _.set(self, '_ui.' + path, opts);
       } catch (e) {
-        console.log(e);
+        error(e);
       }
     };
-    register();
+    setTimeout(() => {
+      register();
+    }, 10000);
   };
 }
 
@@ -84,17 +87,19 @@ export function settings(category?: string, isReadOnly = false) {
     }
 
     const registerSettings = async () => {
-      const isAvailableModule = type !== 'core' && typeof global[type] !== 'undefined' && typeof global[type][name] !== 'undefined';
-      const isAvailableLibrary = type === 'core' && typeof global[name] !== 'undefined';
-      if ((!isAvailableLibrary && !isAvailableModule) || !isDbConnected) {
+      let self;
+      if (type === 'core') {
+        self = (require('./' + name)).default;
+      } else {
+        self = (require('./' + type + '/' + name)).default;
+      }
+      if (!isDbConnected) {
         return setTimeout(() => registerSettings(), 1000);
       }
       try {
-        const self = type === 'core' ? global[name] : global[type][name];
         if (category === key) {
           throw Error(`Category and variable name cannot be same - ${type}.${name}.${key} in category ${category}`);
         }
-
         VariableWatcher.add(`${type}.${name}.${key}`, self[key], isReadOnly);
 
         if (!isReadOnly) {
@@ -117,10 +122,12 @@ export function settings(category?: string, isReadOnly = false) {
         // add variable to settingsList
         self.settingsList.push({ category, key });
       } catch (e) {
-        console.log(e);
+        process.stderr.write(JSON.stringify(e) + '\n');
       }
     };
-    registerSettings();
+    setTimeout(() => {
+      registerSettings();
+    }, 10000);
   };
 }
 
@@ -132,13 +139,16 @@ export function permission_settings(category?: string) {
     loadingInProgress.push(`${type}.${name}.${key}`);
 
     const register = async () => {
-      const isAvailableModule = type !== 'core' && typeof global[type] !== 'undefined' && typeof global[type][name] !== 'undefined';
-      const isAvailableLibrary = type === 'core' && typeof global[name] !== 'undefined';
-      if ((!isAvailableLibrary && !isAvailableModule) || !isDbConnected) {
+      if (!isDbConnected) {
         return setTimeout(() => register(), 1000);
       }
       try {
-        const self = type === 'core' ? global[name] : global[type][name];
+        let self;
+        if (type === 'core') {
+          self = (require('./' + name)).default;
+        } else {
+          self = (require('./' + type + '/' + name)).default;
+        }
         if (category === key) {
           throw Error(`Category and variable name cannot be same - ${type}.${name}.${key} in category ${category}`);
         }
@@ -164,10 +174,12 @@ export function permission_settings(category?: string) {
         // add variable to settingsPermList
         self.settingsPermList.push({ category, key });
       } catch (e) {
-        console.log(e);
+        process.stderr.write(JSON.stringify(e) + '\n');
       }
     };
-    register();
+    setTimeout(() => {
+      register();
+    }, 10000);
   };
 }
 
@@ -179,13 +191,16 @@ export function shared(db = false) {
       loadingInProgress.push(`${type}.${name}.${key}`);
     }
     const register = async () => {
-      const isAvailableModule = type !== 'core' && typeof global[type] !== 'undefined' && typeof global[type][name] !== 'undefined';
-      const isAvailableLibrary = type === 'core' && typeof global[name] !== 'undefined';
-      if ((!isAvailableLibrary && !isAvailableModule) || !isDbConnected) {
+      if (!isDbConnected) {
         return setTimeout(() => register(), 1000);
       }
       try {
-        const self = type === 'core' ? global[name] : global[type][name];
+        let self;
+        if (type === 'core') {
+          self = (require('./' + name)).default;
+        } else {
+          self = (require('./' + type + '/' + name)).default;
+        }
         const defaultValue = self[key];
         VariableWatcher.add(`${type}.${name}.${key}`, defaultValue, false);
         if (db) {
@@ -201,10 +216,12 @@ export function shared(db = false) {
           setTimeout(() => loadVariableValue(), 5000);
         }
       } catch (e) {
-        console.log(e);
+        process.stderr.write(JSON.stringify(e) + '\n');
       }
     };
-    register();
+    setTimeout(() => {
+      register();
+    }, 10000);
   };
 }
 
@@ -212,7 +229,7 @@ export function parser(opts?: {
   fireAndForget?: boolean;
   permission?: string;
   priority?: number;
-  dependsOn?: string[];
+  dependsOn?: import('./_interface').Module[];
 }) {
   opts = opts || {};
   const { name, type } = getNameAndTypeFromStackTrace();
@@ -259,13 +276,16 @@ export function rollback() {
 }
 
 async function registerCommand(opts: string | Command, m) {
-  const isAvailableModule = m.type !== 'core' && typeof global[m.type] !== 'undefined' && typeof global[m.type][m.name] !== 'undefined';
-  const isAvailableLibrary = m.type === 'core' && typeof global[m.name] !== 'undefined';
-  if ((!isAvailableLibrary && !isAvailableModule) || !isDbConnected) {
+  if (!isDbConnected) {
     return setTimeout(() => registerCommand(opts, m), 1000);
   }
+  let self;
   try {
-    const self = m.type === 'core' ? global[m.name] : global[m.type][m.name];
+    if (m.type === 'core') {
+      self = (require('./' + m.name)).default;
+    } else {
+      self = (require('./' + m.type + '/' + m.name)).default;
+    }
     if (typeof opts === 'string') {
       opts = {
         name: opts,
@@ -304,60 +324,72 @@ async function registerCommand(opts: string | Command, m) {
     }
     self._commands.push(c);
   } catch (e) {
+    error(JSON.stringify({isDbConnected, opts, m}));
     error(e);
   }
 }
 
 function registerHelper(m, retry = 0) {
-  if (!global[m.type] || !global[m.type][m.name]) {
-    return setTimeout(() => registerHelper(m), 10);
-  }
-  try {
-    const self = global[m.type][m.name];
-    // find command with function
-    const c = self._commands.find((o) => o.fnc === m.fnc);
-    if (!c) {
-      throw Error();
-    } else {
-      c.isHelper = true;
+  setTimeout(() => {
+    try {
+      let self;
+      if (m.type === 'core') {
+        self = (require('./' + m.name)).default;
+      } else {
+        self = (require('./' + m.type + '/' + m.name)).default;
+      }
+      // find command with function
+      const c = self._commands.find((o) => o.fnc === m.fnc);
+      if (!c) {
+        throw Error();
+      } else {
+        c.isHelper = true;
+      }
+    } catch (e) {
+      if (retry < 100) {
+        return setTimeout(() => registerHelper(m, retry++), 10);
+      } else {
+        error('Command with function ' + m.fnc + ' not found!');
+      }
     }
-  } catch (e) {
-    if (retry < 100) {
-      return setTimeout(() => registerHelper(m, retry++), 10);
-    } else {
-      error('Command with function ' + m.fnc + ' not found!');
-    }
-  }
+  }, 5000);
 }
 
 function registerRollback(m) {
-  if (!global[m.type] || !global[m.type][m.name]) {
-    return setTimeout(() => registerRollback(m), 10);
-  }
-  try {
-    const self = global[m.type][m.name];
-    self._rollback.push({
-      name: m.fnc,
-    });
-  } catch (e) {
-    error(e.stack);
-  }
+  setTimeout(() => {
+    try {
+      let self;
+      if (m.type === 'core') {
+        self = (require('./' + m.name)).default;
+      } else {
+        self = (require('./' + m.type + '/' + m.name)).default;
+      }    self._rollback.push({
+        name: m.fnc,
+      });
+    } catch (e) {
+      error(e.stack);
+    }
+  }, 5000);
 }
 
 function registerParser(opts, m) {
-  if (!global[m.type] || !global[m.type][m.name]) {
-    return setTimeout(() => registerParser(opts, m), 10);
-  }
-  try {
-    const self = global[m.type][m.name];
-    self._parsers.push({
-      name: m.fnc,
-      permission: opts.permission,
-      priority: opts.priority,
-      dependsOn: opts.dependsOn,
-      fireAndForget: opts.fireAndForget,
-    });
-  } catch (e) {
-    error(e.stack);
-  }
+  setTimeout(() => {
+    try {
+      let self;
+      if (m.type === 'core') {
+        self = (require('./' + m.name)).default;
+      } else {
+        self = (require('./' + m.type + '/' + m.name)).default;
+      }
+      self._parsers.push({
+        name: m.fnc,
+        permission: opts.permission,
+        priority: opts.priority,
+        dependsOn: opts.dependsOn,
+        fireAndForget: opts.fireAndForget,
+      });
+    } catch (e) {
+      error(e.stack);
+    }
+  }, 5000);
 }

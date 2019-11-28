@@ -1,3 +1,5 @@
+export const isMainThread = typeof process.env.CLUSTER === 'undefined';
+
 import 'module-alias/register';
 import io from 'socket.io';
 import ioClient from 'socket.io-client';
@@ -6,8 +8,11 @@ import http from 'http';
 import { isDebugEnabled as debugIsEnabled } from './helpers/log';
 import config from '@config';
 import { chatIn, chatOut, info, whisperIn, whisperOut } from './helpers/log';
-
-export const isMainThread = typeof process.env.CLUSTER === 'undefined';
+import oauth from './oauth';
+import api from './api';
+import panel from './panel';
+import tmi from './tmi';
+import { avgResponse } from './helpers/parser';
 
 const availableSockets: {
   [socketId: string]: {
@@ -21,7 +26,7 @@ let lastSocketIdx = 0;
 let socketIO, clientIO;
 
 const init = async () => {
-  if (typeof global.panel === 'undefined') {
+  if (typeof panel === 'undefined') {
     setTimeout(() => {
       init();
     }, 1000);
@@ -52,7 +57,7 @@ const init = async () => {
 
       socket.on('received:message', (cb) => {
         // cb is average time
-        global.tmi.avgResponse({ value: cb.value, message: cb.message });
+        avgResponse({ value: cb.value, message: cb.message });
       });
 
       socket.on('disconnect', () => {
@@ -73,7 +78,7 @@ const init = async () => {
     });
 
     clientIO.on('send:message', async (data) => {
-      clientIO.emit('received:message', await global.tmi.message(data, true));
+      clientIO.emit('received:message', await tmi.message(data, true));
     });
   }
 };
@@ -89,7 +94,7 @@ export const manageMessage = async (data) => {
   const selectedSocket = sockets[lastSocketIdx];
 
   if (selectedSocket === 'main') {
-    global.tmi.message(data, true);
+    tmi.message(data, true);
   } else {
     socketIO.to(selectedSocket).emit('send:message', data);
   }
@@ -100,7 +105,7 @@ export const clusteredClientChat = (type, username, messageToSend) => {
     if (debugIsEnabled('tmi')) {
       return;
     }
-    global.tmi.client.bot.chat[type](username, messageToSend);
+    tmi.client.bot.chat[type](username, messageToSend);
   } else {
     clientIO.emit('clusteredClientChat', type, username, messageToSend);
   }
@@ -111,7 +116,7 @@ export const clusteredClientDelete = (senderId) => {
     if (debugIsEnabled('tmi')) {
       return;
     }
-    global.tmi.delete('bot', senderId);
+    tmi.delete('bot', senderId);
   } else {
     clientIO.emit('clusteredClientDelete', senderId);
   }
@@ -119,7 +124,7 @@ export const clusteredClientDelete = (senderId) => {
 
 export const clusteredClientTimeout = (username, timeMs, reason) => {
   if (isMainThread) {
-    global.tmi.client.bot.chat.timeout(global.oauth.generalChannel, username, timeMs, reason);
+    tmi.client.bot.chat.timeout(oauth.generalChannel, username, timeMs, reason);
   } else {
     clientIO.emit('clusteredClientTimeout', username, timeMs, reason);
   }
@@ -155,7 +160,7 @@ export const clusteredChatOut = (message) => {
 
 export const clusteredFetchAccountAge = (username, userId) => {
   if (isMainThread) {
-    global.api.fetchAccountAge(username, userId);
+    api.fetchAccountAge(username, userId);
   } else {
     clientIO.emit('clusteredFetchAccountAge', username, userId);
   }

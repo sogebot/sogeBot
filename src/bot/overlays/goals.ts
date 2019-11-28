@@ -6,6 +6,8 @@ import { onBit, onFollow, onSub, onTip } from '../decorators/on';
 import { adminEndpoint, publicEndpoint } from '../helpers/socket';
 import { Goal, GoalGroup } from '../database/entity/goal';
 import { getRepository, IsNull } from 'typeorm';
+import api from '../api';
+import currency from '../currency';
 
 class Goals extends Overlay {
   showInUI = false;
@@ -58,8 +60,8 @@ class Goals extends Overlay {
     });
     publicEndpoint(this.nsp, 'goals::current', async (cb) => {
       cb(null, {
-        subscribers: global.api.stats.currentSubscribers,
-        followers: global.api.stats.currentFollowers,
+        subscribers: api.stats.currentSubscribers,
+        followers: api.stats.currentFollowers,
       });
     });
   }
@@ -77,7 +79,7 @@ class Goals extends Overlay {
     const tipsGoals: Goal[] = await getRepository(Goal).find({ type: 'tips', countBitsAsTips: true });
     for (const goal of tipsGoals) {
       if (new Date(goal.endAfter).getTime() >= new Date().getTime() || goal.endAfterIgnore) {
-        const amount = parseFloat(global.currency.exchange(bit.amount / 100, 'USD', global.currency.mainCurrency));
+        const amount = Number(currency.exchange(bit.amount / 100, 'USD', currency.mainCurrency));
         await getRepository(Goal).increment({ id: goal.id }, 'currentAmount', amount);
       }
     }
@@ -87,7 +89,7 @@ class Goals extends Overlay {
   public async onTip(tip: onEventTip) {
     const goals: Goal[] = await getRepository(Goal).find({ type: 'tips' });
     for (const goal of goals) {
-      const amount = Number(global.currency.exchange(tip.amount, tip.currency, global.currency.mainCurrency));
+      const amount = Number(currency.exchange(tip.amount, tip.currency, currency.mainCurrency));
       if (new Date(goal.endAfter).getTime() >= new Date().getTime() || goal.endAfterIgnore) {
         await getRepository(Goal).increment({ id: goal.id }, 'currentAmount', amount);
       }
@@ -115,5 +117,4 @@ class Goals extends Overlay {
   }
 }
 
-export default Goals;
-export { Goals };
+export default new Goals();

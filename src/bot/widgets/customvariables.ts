@@ -4,6 +4,7 @@ import Widget from './_interface';
 import { adminEndpoint } from '../helpers/socket';
 import { getRepository } from 'typeorm';
 import { Variable, VariableWatch } from '../database/entity/variable';
+import customvariables from '../customvariables';
 
 class CustomVariables extends Widget {
   constructor() {
@@ -37,9 +38,9 @@ class CustomVariables extends Widget {
       cb(null, variables);
     });
     adminEndpoint(this.nsp, 'watched::setValue', async (opts, cb) => {
-      const variable = await global.customvariables.isVariableSetById(opts.id);
+      const variable = await customvariables.isVariableSetById(opts.id);
       if (variable) {
-        await global.customvariables.setValueOf(variable.variableName, opts.value, {
+        await customvariables.setValueOf(variable.variableName, opts.value, {
           readOnlyBypass: true,
         });
       }
@@ -48,5 +49,4 @@ class CustomVariables extends Widget {
   }
 }
 
-export default CustomVariables;
-export { CustomVariables };
+export default new CustomVariables();

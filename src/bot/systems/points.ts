@@ -8,7 +8,7 @@ import cron from 'node-cron';
 import { isBot, prepare, sendMessage } from '../commons';
 import { command, default_permission, parser, permission_settings, settings, ui } from '../decorators';
 import Expects from '../expects';
-import { permission } from '../permissions';
+import { permission } from '../helpers/permissions';
 import System from './_interface';
 import { debug, error } from '../helpers/log';
 import { adminEndpoint } from '../helpers/socket';
@@ -16,6 +16,10 @@ import { getRepository } from 'typeorm';
 import { User } from '../database/entity/user';
 import { getAllOnlineUsernames } from '../helpers/getAllOnlineUsernames';
 import { onChange, onLoad } from '../decorators/on';
+import permissions from '../permissions';
+import api from '../api';
+import users from '../users';
+import { translate } from '../translate';
 
 class Points extends System {
   cronTask: any = null;
@@ -103,7 +107,7 @@ class Points extends System {
       this.getPermissionBasedSettingsValue('offlineInterval'),
       this.getPermissionBasedSettingsValue('perInterval'),
       this.getPermissionBasedSettingsValue('perOfflineInterval'),
-      global.api.isStreamOnline,
+      api.isStreamOnline,
     ]);
 
     try {
@@ -125,13 +129,13 @@ class Points extends System {
 
   private async processPoints(username: string, opts: {interval: {[permissionId: string]: any}; offlineInterval: {[permissionId: string]: any}; perInterval: {[permissionId: string]: any}; perOfflineInterval: {[permissionId: string]: any}; isOnline: boolean}): Promise<void> {
     return new Promise(async (resolve) => {
-      const userId = await global.users.getIdByName(username);
+      const userId = await users.getIdByName(username);
       if (!userId) {
         return resolve(); // skip without id
       }
 
       // get user max permission
-      const permId = await global.permissions.getUserHighestPermission(userId);
+      const permId = await permissions.getUserHighestPermission(userId);
       if (!permId) {
         return resolve(); // skip without id
       }
@@ -142,7 +146,7 @@ class Points extends System {
       let user = await getRepository(User).findOne({ username });
       if (!user) {
         user = new User();
-        user.userId = Number(await global.api.getIdFromTwitch(username));
+        user.userId = Number(await api.getIdFromTwitch(username));
         user.username = username;
         user.points = 0;
         user.pointsOfflineGivenAt = Date.now();
@@ -150,7 +154,7 @@ class Points extends System {
         await getRepository(User).save(user);
         return;
       } else {
-        const chat = await global.users.getChatOf(userId, opts.isOnline);
+        const chat = await users.getChatOf(userId, opts.isOnline);
         const userPointsKey = opts.isOnline ? 'pointsOnlineGivenAt' : 'pointsOfflineGivenAt';
         if (interval_calculated !== 0 && ptsPerInterval[permId]  !== 0) {
           debug('points.update', `${user.username}#${userId}[${permId}] ${chat} | ${user[userPointsKey]}`);
@@ -183,11 +187,11 @@ class Points extends System {
       this.getPermissionBasedSettingsValue('messageInterval'),
       this.getPermissionBasedSettingsValue('perMessageOfflineInterval'),
       this.getPermissionBasedSettingsValue('messageOfflineInterval'),
-      global.api.isStreamOnline,
+      api.isStreamOnline,
     ]);
 
     // get user max permission
-    const permId = await global.permissions.getUserHighestPermission(opts.sender.userId);
+    const permId = await permissions.getUserHighestPermission(opts.sender.userId);
     if (!permId) {
       return true; // skip without permission
     }
@@ -270,7 +274,7 @@ class Points extends System {
       sendMessage(message, opts.sender, opts.attr);
     } catch (err) {
       error(err);
-      sendMessage(global.translate('points.failed.set').replace('$command', opts.command), opts.sender, opts.attr);
+      sendMessage(translate('points.failed.set').replace('$command', opts.command), opts.sender, opts.attr);
     }
   }
 
@@ -291,7 +295,7 @@ class Points extends System {
 
       if (!guser) {
         guser = new User();
-        guser.userId = Number(await global.api.getIdFromTwitch(username));
+        guser.userId = Number(await api.getIdFromTwitch(username));
         guser.username = username;
         guser.points = 0;
       }
@@ -327,7 +331,7 @@ class Points extends System {
         sendMessage(message, opts.sender, opts.attr);
       }
     } catch (err) {
-      sendMessage(global.translate('points.failed.give').replace('$command', opts.command), opts.sender, opts.attr);
+      sendMessage(translate('points.failed.give').replace('$command', opts.command), opts.sender, opts.attr);
     }
   }
 
@@ -386,7 +390,7 @@ class Points extends System {
 
       if (!user) {
         user = new User();
-        user.userId = Number(await global.api.getIdFromTwitch(username));
+        user.userId = Number(await api.getIdFromTwitch(username));
         user.username = username;
         user.points = 0;
         await getRepository(User).save(user);
@@ -399,7 +403,7 @@ class Points extends System {
       });
       sendMessage(message, opts.sender, opts.attr);
     } catch (err) {
-      sendMessage(global.translate('points.failed.get').replace('$command', opts.command), opts.sender, opts.attr);
+      sendMessage(translate('points.failed.get').replace('$command', opts.command), opts.sender, opts.attr);
     }
   }
 
@@ -416,7 +420,7 @@ class Points extends System {
       });
       sendMessage(message, opts.sender, opts.attr);
     } catch (err) {
-      sendMessage(global.translate('points.failed.all').replace('$command', opts.command), opts.sender, opts.attr);
+      sendMessage(translate('points.failed.all').replace('$command', opts.command), opts.sender, opts.attr);
     }
   }
 
@@ -439,7 +443,7 @@ class Points extends System {
       });
       sendMessage(message, opts.sender, opts.attr);
     } catch (err) {
-      sendMessage(global.translate('points.failed.rain').replace('$command', opts.command), opts.sender, opts.attr);
+      sendMessage(translate('points.failed.rain').replace('$command', opts.command), opts.sender, opts.attr);
     }
   }
 
@@ -453,7 +457,7 @@ class Points extends System {
 
       if (!user) {
         user = new User();
-        user.userId = Number(await global.api.getIdFromTwitch(username));
+        user.userId = Number(await api.getIdFromTwitch(username));
         user.username = username;
         user.points = points;
       } else {
@@ -468,7 +472,7 @@ class Points extends System {
       });
       sendMessage(message, opts.sender, opts.attr);
     } catch (err) {
-      sendMessage(global.translate('points.failed.add').replace('$command', opts.command), opts.sender, opts.attr);
+      sendMessage(translate('points.failed.add').replace('$command', opts.command), opts.sender, opts.attr);
     }
   }
 
@@ -481,7 +485,7 @@ class Points extends System {
       let user = await getRepository(User).findOne({ username });
       if (!user) {
         user = new User();
-        user.userId = Number(await global.api.getIdFromTwitch(username));
+        user.userId = Number(await api.getIdFromTwitch(username));
         user.username = username;
         user.points = 0;
       } else {
@@ -502,7 +506,7 @@ class Points extends System {
       });
       sendMessage(message, opts.sender, opts.attr);
     } catch (err) {
-      sendMessage(global.translate('points.failed.remove').replace('$command', opts.command), opts.sender, opts.attr);
+      sendMessage(translate('points.failed.remove').replace('$command', opts.command), opts.sender, opts.attr);
     }
   }
 
@@ -512,5 +516,4 @@ class Points extends System {
   }
 }
 
-export default Points;
-export { Points };
+export default new Points();

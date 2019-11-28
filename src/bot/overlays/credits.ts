@@ -5,6 +5,9 @@ import { settings, ui } from '../decorators';
 import { publicEndpoint } from '../helpers/socket';
 import { getManager } from 'typeorm';
 import { EventList } from '../database/entity/eventList';
+import api from '../api';
+import oauth from '../oauth';
+import currency from '../currency';
 
 class Credits extends Overlay {
   @settings('credits')
@@ -96,7 +99,7 @@ class Credits extends Overlay {
 
   sockets () {
     publicEndpoint(this.nsp, 'load', async (cb) => {
-      const when = global.api.isStreamOnline ? global.api.streamStatusChangeSince : _.now() - 50000000000;
+      const when = api.isStreamOnline ? api.streamStatusChangeSince : _.now() - 50000000000;
       const timestamp = new Date(when).getTime();
       const events: (EventList & { values?: {
         currency: string; amount: number;
@@ -112,9 +115,9 @@ class Credits extends Overlay {
         if (event.values) {
           if (!_.isNil(event.values.amount) && !_.isNil(event.values.currency)) {
             event.values.amount = this.cCreditsAggregated
-              ? global.currency.exchange(event.values.amount, event.values.currency, global.currency.mainCurrency)
+              ? currency.exchange(event.values.amount, event.values.currency, currency.mainCurrency)
               : event.values.amount;
-            event.values.currency = global.currency.symbol(this.cCreditsAggregated ? global.currency.mainCurrency : event.values.currency);
+            event.values.currency = currency.symbol(this.cCreditsAggregated ? currency.mainCurrency : event.values.currency);
           }
         }
       }
@@ -153,10 +156,10 @@ class Credits extends Overlay {
             tip: this.cShowTips,
           },
         },
-        streamer: global.oauth.broadcasterUsername,
-        game: global.api.stats.currentGame,
-        title: global.api.stats.currentTitle,
-        clips: this.cShowClips ? await global.api.getTopClips({ period: this.cClipsPeriod, days: this.cClipsCustomPeriodInDays, first: this.cClipsNumOfClips }) : [],
+        streamer: oauth.broadcasterUsername,
+        game: api.stats.currentGame,
+        title: api.stats.currentTitle,
+        clips: this.cShowClips ? await api.getTopClips({ period: this.cClipsPeriod, days: this.cClipsCustomPeriodInDays, first: this.cClipsNumOfClips }) : [],
         events,
         customTexts: this.cCustomTextsValues,
         social: this.cSocialValues,
@@ -165,5 +168,4 @@ class Credits extends Overlay {
   }
 }
 
-export default Credits;
-export { Credits };
+export default new Credits();

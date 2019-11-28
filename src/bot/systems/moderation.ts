@@ -4,7 +4,7 @@ import XRegExp from 'xregexp';
 import emojiRegex from 'emoji-regex';
 
 import * as constants from '../constants';
-import { permission } from '../permissions';
+import { permission } from '../helpers/permissions';
 import { command, default_permission, parser, permission_settings, settings } from '../decorators';
 import Message from '../message';
 import System from './_interface';
@@ -16,6 +16,11 @@ import { Alias } from '../database/entity/alias';
 
 import { getRepository, LessThan } from 'typeorm';
 import { ModerationMessageCooldown, ModerationPermit, ModerationWarning } from '../database/entity/moderation';
+import permissions from '../permissions';
+import { translate } from '../translate';
+import spotify from '../integrations/spotify';
+import songs from './songs';
+import aliasSystem from './alias';
 
 class Moderation extends System {
   @settings('lists')
@@ -149,11 +154,11 @@ class Moderation extends System {
     let ytRegex, clipsRegex, spotifyRegex;
 
     // check if spotify -or- alias of spotify contain open.spotify.com link
-    if (global.integrations.spotify.enabled) {
+    if (spotify.enabled) {
       // we can assume its first command in array (spotify have only one command)
-      const command = (await global.integrations.spotify.commands())[0].command;
+      const command = (await spotify.commands())[0].command;
       const alias = await getRepository(Alias).findOne({ where: { command } });
-      if (alias && alias.enabled && global.systems.alias.enabled) {
+      if (alias && alias.enabled && aliasSystem.enabled) {
         spotifyRegex = new RegExp('^(' + command + '|' + alias.alias + ') \\S+open\\.spotify\\.com\\/track\\/(\\w+)(.*)?', 'gi');
       } else {
         spotifyRegex = new RegExp('^(' + command + ') \\S+open\\.spotify\\.com\\/track\\/(\\w+)(.*)?', 'gi');
@@ -162,10 +167,10 @@ class Moderation extends System {
     }
 
     // check if songrequest -or- alias of songrequest contain youtube link
-    if (global.systems.songs.enabled) {
+    if (songs.enabled) {
       const alias = await getRepository(Alias).findOne({ where: { command: '!songrequest' } });
-      const cmd = global.systems.songs.getCommand('!songrequest');
-      if (alias && alias.enabled && global.systems.alias.enabled) {
+      const cmd = songs.getCommand('!songrequest');
+      if (alias && alias.enabled && aliasSystem.enabled) {
         ytRegex = new RegExp('^(' + cmd + '|' + alias.alias + ') \\S+(?:youtu.be\\/|v\\/|e\\/|u\\/\\w+\\/|embed\\/|v=)([^#&?]*).*', 'gi');
       } else {
         ytRegex =  new RegExp('^(' + cmd + ') \\S+(?:youtu.be\\/|v\\/|e\\/|u\\/\\w+\\/|embed\\/|v=)([^#&?]*).*', 'gi');
@@ -216,7 +221,7 @@ class Moderation extends System {
       const m = await prepare('moderation.user-have-link-permit', { username: parsed[1].toLowerCase(), link: getLocalizedName(count, 'core.links'), count: count });
       sendMessage(m, opts.sender, opts.attr);
     } catch (e) {
-      sendMessage(global.translate('moderation.permit-parse-failed'), opts.sender, opts.attr);
+      sendMessage(translate('moderation.permit-parse-failed'), opts.sender, opts.attr);
     }
   }
 
@@ -225,7 +230,7 @@ class Moderation extends System {
     const enabled = await this.getPermissionBasedSettingsValue('cLinksEnabled');
     const cLinksIncludeSpaces = await this.getPermissionBasedSettingsValue('cLinksIncludeSpaces');
     const timeout = await this.getPermissionBasedSettingsValue('cLinksTimeout');
-    const permId = await global.permissions.getUserHighestPermission(opts.sender.userId);
+    const permId = await permissions.getUserHighestPermission(opts.sender.userId);
 
     if (permId === null || !enabled[permId]) {
       return true;
@@ -243,8 +248,8 @@ class Moderation extends System {
         return true;
       } else {
         this.timeoutUser(opts.sender, whitelisted,
-          global.translate('moderation.user-is-warned-about-links'),
-          global.translate('moderation.user-have-timeout-for-links'),
+          translate('moderation.user-is-warned-about-links'),
+          translate('moderation.user-have-timeout-for-links'),
           timeout[permId], 'links');
         return false;
       }
@@ -260,7 +265,7 @@ class Moderation extends System {
     const cSymbolsMaxSymbolsConsecutively = await this.getPermissionBasedSettingsValue('cSymbolsMaxSymbolsConsecutively');
     const cSymbolsMaxSymbolsPercent = await this.getPermissionBasedSettingsValue('cSymbolsMaxSymbolsPercent');
     const timeout = await this.getPermissionBasedSettingsValue('cSymbolsTimeout');
-    const permId = await global.permissions.getUserHighestPermission(opts.sender.userId);
+    const permId = await permissions.getUserHighestPermission(opts.sender.userId);
 
     if (permId === null || !enabled[permId]) {
       return true;
@@ -280,8 +285,8 @@ class Moderation extends System {
         const symbols = out[item];
         if (symbols.length >= cSymbolsMaxSymbolsConsecutively[permId]) {
           this.timeoutUser(opts.sender, opts.message,
-            global.translate('moderation.user-is-warned-about-symbols'),
-            global.translate('moderation.user-have-timeout-for-symbols'),
+            translate('moderation.user-is-warned-about-symbols'),
+            translate('moderation.user-have-timeout-for-symbols'),
             timeout[permId], 'symbols');
           return false;
         }
@@ -289,7 +294,7 @@ class Moderation extends System {
       }
     }
     if (Math.ceil(symbolsLength / (msgLength / 100)) >= cSymbolsMaxSymbolsPercent[permId]) {
-      this.timeoutUser(opts.sender, opts.message, global.translate('moderation.user-is-warned-about-symbols'), global.translate('moderation.symbols'), timeout[permId], 'symbols');
+      this.timeoutUser(opts.sender, opts.message, translate('moderation.user-is-warned-about-symbols'), translate('moderation.symbols'), timeout[permId], 'symbols');
       return false;
     }
     return true;
@@ -300,7 +305,7 @@ class Moderation extends System {
     const enabled = await this.getPermissionBasedSettingsValue('cLongMessageEnabled');
     const cLongMessageTriggerLength = await this.getPermissionBasedSettingsValue('cLongMessageTriggerLength');
     const timeout = await this.getPermissionBasedSettingsValue('cLongMessageTimeout');
-    const permId = await global.permissions.getUserHighestPermission(opts.sender.userId);
+    const permId = await permissions.getUserHighestPermission(opts.sender.userId);
 
     if (permId === null || !enabled[permId]) {
       return true;
@@ -313,8 +318,8 @@ class Moderation extends System {
       return true;
     } else {
       this.timeoutUser(opts.sender, opts.message,
-        global.translate('moderation.user-is-warned-about-long-message'),
-        global.translate('moderation.user-have-timeout-for-long-message'),
+        translate('moderation.user-is-warned-about-long-message'),
+        translate('moderation.user-have-timeout-for-long-message'),
         timeout[permId], 'longmessage');
       return false;
     }
@@ -326,7 +331,7 @@ class Moderation extends System {
     const cCapsTriggerLength = await this.getPermissionBasedSettingsValue('cCapsTriggerLength');
     const cCapsMaxCapsPercent = await this.getPermissionBasedSettingsValue('cCapsMaxCapsPercent');
     const timeout = await this.getPermissionBasedSettingsValue('cCapsTimeout');
-    const permId = await global.permissions.getUserHighestPermission(opts.sender.userId);
+    const permId = await permissions.getUserHighestPermission(opts.sender.userId);
 
     if (permId === null || !enabled[permId]) {
       return true;
@@ -364,8 +369,8 @@ class Moderation extends System {
     }
     if (Math.ceil(capsLength / (msgLength / 100)) >= cCapsMaxCapsPercent[permId]) {
       this.timeoutUser(opts.sender, opts.message,
-        global.translate('moderation.user-is-warned-about-caps'),
-        global.translate('moderation.user-have-timeout-for-caps'),
+        translate('moderation.user-is-warned-about-caps'),
+        translate('moderation.user-have-timeout-for-caps'),
         timeout[permId], 'caps');
       return false;
     }
@@ -378,7 +383,7 @@ class Moderation extends System {
     const cSpamTriggerLength = await this.getPermissionBasedSettingsValue('cSpamTriggerLength');
     const cSpamMaxLength = await this.getPermissionBasedSettingsValue('cSpamMaxLength');
     const timeout = await this.getPermissionBasedSettingsValue('cSpamTimeout');
-    const permId = await global.permissions.getUserHighestPermission(opts.sender.userId);
+    const permId = await permissions.getUserHighestPermission(opts.sender.userId);
 
     if (permId === null || !enabled[permId]) {
       return true;
@@ -394,8 +399,8 @@ class Moderation extends System {
     for (const item in out) {
       if (out.hasOwnProperty(item) && out[item].length >= cSpamMaxLength[permId]) {
         this.timeoutUser(opts.sender, opts.message,
-          global.translate('moderation.user-have-timeout-for-spam'),
-          global.translate('moderation.user-is-warned-about-spam'),
+          translate('moderation.user-have-timeout-for-spam'),
+          translate('moderation.user-is-warned-about-spam'),
           timeout[permId], 'spam');
         return false;
       }
@@ -407,7 +412,7 @@ class Moderation extends System {
   async color (opts: ParserOptions) {
     const enabled = await this.getPermissionBasedSettingsValue('cColorEnabled');
     const timeout = await this.getPermissionBasedSettingsValue('cColorTimeout');
-    const permId = await global.permissions.getUserHighestPermission(opts.sender.userId);
+    const permId = await permissions.getUserHighestPermission(opts.sender.userId);
 
     if (permId === null || !enabled[permId]) {
       return true;
@@ -415,8 +420,8 @@ class Moderation extends System {
 
     if (opts.sender['message-type'] === 'action') {
       this.timeoutUser(opts.sender, opts.message,
-        global.translate('moderation.user-is-warned-about-color'),
-        global.translate('moderation.user-have-timeout-for-color'),
+        translate('moderation.user-is-warned-about-color'),
+        translate('moderation.user-have-timeout-for-color'),
         timeout[permId], 'color');
       return false;
     } else {
@@ -434,7 +439,7 @@ class Moderation extends System {
     const cEmotesEmojisAreEmotes = await this.getPermissionBasedSettingsValue('cEmotesEmojisAreEmotes');
     const cEmotesMaxCount = await this.getPermissionBasedSettingsValue('cEmotesMaxCount');
     const timeout = await this.getPermissionBasedSettingsValue('cEmotesTimeout');
-    const permId = await global.permissions.getUserHighestPermission(opts.sender.userId);
+    const permId = await permissions.getUserHighestPermission(opts.sender.userId);
 
     if (permId === null || !enabled[permId]) {
       return true;
@@ -450,8 +455,8 @@ class Moderation extends System {
 
     if (count > cEmotesMaxCount[permId]) {
       this.timeoutUser(opts.sender, opts.message,
-        global.translate('moderation.user-is-warned-about-emotes'),
-        global.translate('moderation.user-have-timeout-for-emotes'),
+        translate('moderation.user-is-warned-about-emotes'),
+        translate('moderation.user-have-timeout-for-emotes'),
         timeout[permId], 'emotes');
       return false;
     } else {
@@ -463,7 +468,7 @@ class Moderation extends System {
   async blacklist (opts: ParserOptions) {
     const enabled = await this.getPermissionBasedSettingsValue('cListsEnabled');
     const timeout = await this.getPermissionBasedSettingsValue('cListsTimeout');
-    const permId = await global.permissions.getUserHighestPermission(opts.sender.userId);
+    const permId = await permissions.getUserHighestPermission(opts.sender.userId);
 
     if (permId === null || !enabled[permId]) {
       return true;
@@ -477,8 +482,8 @@ class Moderation extends System {
         if (XRegExp.exec(` ${opts.message} `, regexp)) {
           isOK = false;
           this.timeoutUser(opts.sender, opts.message,
-            global.translate('moderation.user-is-warned-about-blacklist'),
-            global.translate('moderation.user-have-timeout-for-blacklist'),
+            translate('moderation.user-is-warned-about-blacklist'),
+            translate('moderation.user-have-timeout-for-blacklist'),
             timeout[permId], 'blacklist');
           break;
         }
@@ -500,5 +505,4 @@ class Moderation extends System {
   }
 }
 
-export default Moderation;
-export { Moderation };
+export default new Moderation();

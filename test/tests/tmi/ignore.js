@@ -10,6 +10,8 @@ const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/database/entity/user');
 const { Settings } = require('../../../dest/database/entity/settings');
 
+const tmi = (require('../../../dest/tmi')).default;
+
 // users
 const owner = { username: 'soge__' };
 const testuser = { username: 'testuser', userId: '1' };
@@ -26,8 +28,8 @@ describe('TMI - ignore', () => {
     await db.cleanup();
     await message.prepare();
 
-    global.tmi.globalIgnoreListExclude = [];
-    global.tmi.ignorelist = [];
+    tmi.globalIgnoreListExclude = [];
+    tmi.ignorelist = [];
 
     await getRepository(User).save(testuser);
     await getRepository(User).save(testuser2);
@@ -48,7 +50,7 @@ describe('TMI - ignore', () => {
     });
 
     it ('exclude botwithchangedname from ignore list', async () => {
-      global.tmi.globalIgnoreListExclude = [botwithchangedname.userId];
+      tmi.globalIgnoreListExclude = [botwithchangedname.userId];
     });
 
     it ('botwithchangedname should not be ignored anymore', async () => {
@@ -62,17 +64,17 @@ describe('TMI - ignore', () => {
     });
 
     it('add testuser to ignore list', async () => {
-      global.tmi.ignoreAdd({ sender: owner, parameters: 'testuser' });
+      tmi.ignoreAdd({ sender: owner, parameters: 'testuser' });
       await message.isSent('ignore.user.is.added', owner, testuser);
     });
 
     it('add @testuser2 to ignore list', async () => {
-      global.tmi.ignoreAdd({ sender: owner, parameters: '@testuser2' });
+      tmi.ignoreAdd({ sender: owner, parameters: '@testuser2' });
       await message.isSent('ignore.user.is.added', owner, testuser2);
     });
 
     it('testuser should be in ignore list', async () => {
-      global.tmi.ignoreCheck({ sender: owner, parameters: 'testuser' });
+      tmi.ignoreCheck({ sender: owner, parameters: 'testuser' });
 
       const item = await getRepository(Settings).findOne({
         where: {
@@ -88,7 +90,7 @@ describe('TMI - ignore', () => {
     });
 
     it('@testuser2 should be in ignore list', async () => {
-      global.tmi.ignoreCheck({ sender: owner, parameters: '@testuser2' });
+      tmi.ignoreCheck({ sender: owner, parameters: '@testuser2' });
       const item = await getRepository(Settings).findOne({
         where: {
           namespace: '/core/tmi',
@@ -103,7 +105,7 @@ describe('TMI - ignore', () => {
     });
 
     it('testuser3 should not be in ignore list', async () => {
-      global.tmi.ignoreCheck({ sender: owner, parameters: 'testuser3' });
+      tmi.ignoreCheck({ sender: owner, parameters: 'testuser3' });
       const item = await getRepository(Settings).findOne({
         where: {
           namespace: '/core/tmi',
@@ -119,18 +121,18 @@ describe('TMI - ignore', () => {
     });
 
     it('remove testuser from ignore list', async () => {
-      global.tmi.ignoreRm({ sender: owner, parameters: 'testuser' });
+      tmi.ignoreRm({ sender: owner, parameters: 'testuser' });
       await message.isSent('ignore.user.is.removed', owner, testuser);
     });
 
     it('testuser should not be in ignore list', async () => {
-      global.tmi.ignoreCheck({ sender: owner, parameters: 'testuser' });
+      tmi.ignoreCheck({ sender: owner, parameters: 'testuser' });
       await message.isSent('ignore.user.is.not.ignored', owner, testuser);
       assert.isFalse(await commons.isIgnored(testuser));
     });
 
     it('add testuser by id to ignore list', async () => {
-      global.tmi.ignorelist = [ testuser.userId ];
+      tmi.ignorelist = [ testuser.userId ];
     });
 
     it('user should be ignored by id', async () => {

@@ -8,6 +8,14 @@ import System from './_interface';
 import { debug, error } from '../helpers/log';
 import { getRepository } from 'typeorm';
 import { User } from '../database/entity/user';
+import permissions from '../permissions';
+import users from '../users';
+import api from '../api';
+import { translate } from '../translate';
+import translateLib from '../translate';
+import currency from '../currency';
+import ranks from './ranks';
+import points from './points';
 
 /*
  * !me
@@ -49,8 +57,8 @@ class UserInfo extends System {
       username = parsed[0].toLowerCase();
     }
 
-    const id = await global.users.getIdByName(username);
-    const isFollowerUpdate = await global.api.isFollowerUpdate(await getRepository(User).findOne({ userId: id }));
+    const id = await users.getIdByName(username);
+    const isFollowerUpdate = await api.isFollowerUpdate(await getRepository(User).findOne({ userId: id }));
     debug('userinfo.followage', JSON.stringify(isFollowerUpdate));
 
     const user = await getRepository(User).findOne({ username });
@@ -169,15 +177,15 @@ class UserInfo extends System {
 
       const user = await getRepository(User).findOne({ username: parsed[0] });
       if (!user || user.seenAt === 0) {
-        sendMessage(global.translate('lastseen.success.never').replace(/\$username/g, parsed[0]), opts.sender, opts.attr);
+        sendMessage(translate('lastseen.success.never').replace(/\$username/g, parsed[0]), opts.sender, opts.attr);
       } else {
-        moment.locale(global.lib.translate.lang);
-        sendMessage(global.translate('lastseen.success.time')
+        moment.locale(translateLib.lang);
+        sendMessage(translate('lastseen.success.time')
           .replace(/\$username/g, parsed[0])
           .replace(/\$when/g, moment(user.seenAt).format(this.lastSeenFormat)), opts.sender);
       }
     } catch (e) {
-      sendMessage(global.translate('lastseen.failed.parse'), opts.sender, opts.attr);
+      sendMessage(translate('lastseen.failed.parse'), opts.sender, opts.attr);
     }
   }
 
@@ -191,12 +199,12 @@ class UserInfo extends System {
 
       if (parsed) {
         username = parsed[0].toLowerCase();
-        id = await global.users.getIdByName(username);
+        id = await users.getIdByName(username);
       }
-      const time = id ? Number((await global.users.getWatchedOf(id) / (60 * 60 * 1000))).toFixed(1) : 0;
+      const time = id ? Number((await users.getWatchedOf(id) / (60 * 60 * 1000))).toFixed(1) : 0;
       sendMessage(prepare('watched.success.time', { time: String(time), username }), opts.sender, opts.attr);
     } catch (e) {
-      sendMessage(global.translate('watched.failed.parse'), opts.sender, opts.attr);
+      sendMessage(translate('watched.failed.parse'), opts.sender, opts.attr);
     }
   }
 
@@ -225,8 +233,8 @@ class UserInfo extends System {
 
       if (message.includes('$rank')) {
         const idx = message.indexOf('$rank');
-        const rank = await global.systems.ranks.get(await getRepository(User).findOne({ userId: opts.sender.userId }));
-        if (global.systems.ranks.enabled && !_.isNull(rank)) {
+        const rank = await ranks.get(await getRepository(User).findOne({ userId: opts.sender.userId }));
+        if (ranks.enabled && !_.isNull(rank)) {
           message[idx] = rank;
         } else {
           message.splice(idx, 1);
@@ -240,8 +248,8 @@ class UserInfo extends System {
 
       if (message.includes('$points')) {
         const idx = message.indexOf('$points');
-        if (global.systems.points.enabled) {
-          message[idx] = user.points + ' ' + await global.systems.points.getPointsName(user.points);
+        if (points.enabled) {
+          message[idx] = user.points + ' ' + await points.getPointsName(user.points);
         } else {
           message.splice(idx, 1);
         }
@@ -255,12 +263,11 @@ class UserInfo extends System {
       if (message.includes('$tips')) {
         const idx = message.indexOf('$tips');
         const tips = user.tips;
-        const currency = global.currency.mainCurrency;
         let tipAmount = 0;
         for (const t of tips) {
-          tipAmount += global.currency.exchange(Number(t.amount), t.currency, currency);
+          tipAmount += currency.exchange(Number(t.amount), t.currency, currency.mainCurrency);
         }
-        message[idx] = `${Number(tipAmount).toFixed(2)}${global.currency.symbol(currency)}`;
+        message[idx] = `${Number(tipAmount).toFixed(2)}${currency.symbol(currency.mainCurrency)}`;
       }
 
       if (message.includes('$bits')) {
@@ -273,9 +280,9 @@ class UserInfo extends System {
       if (message.includes('$role')) {
         const idx = message.indexOf('$role');
         message[idx] = null;
-        const permId = await global.permissions.getUserHighestPermission(opts.sender.userId);
+        const permId = await permissions.getUserHighestPermission(opts.sender.userId);
         if (permId) {
-          const pItem = await global.permissions.get(permId);
+          const pItem = await permissions.get(permId);
           if (pItem) {
             message[idx] = pItem.name;
           }
@@ -300,5 +307,4 @@ class UserInfo extends System {
   }
 }
 
-export default UserInfo;
-export { UserInfo };
+export default new UserInfo();

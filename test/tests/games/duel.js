@@ -12,6 +12,9 @@ const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/database/entity/user');
 const { Duel } = require('../../../dest/database/entity/duel');
 
+const duel = (require('../../../dest/games/duel')).default;
+const points = (require('../../../dest/systems/points')).default;
+
 const _ = require('lodash');
 const assert = require('assert');
 
@@ -28,9 +31,9 @@ describe('Gambling - duel', () => {
     });
 
     it('Bank should be empty at start', async () => {
-      global.games.duel.bank({ sender: user1 });
+      duel.bank({ sender: user1 });
       await message.isSent('gambling.duel.bank', user1, {
-        pointsName: await global.systems.points.getPointsName(0),
+        pointsName: await points.getPointsName(0),
         points: 0,
         command: '!duel',
       });
@@ -45,9 +48,9 @@ describe('Gambling - duel', () => {
     });
 
     it('Bank should have 200 tickets', async () => {
-      global.games.duel.bank({ sender: user1 });
+      duel.bank({ sender: user1 });
       await message.isSent('gambling.duel.bank', user1, {
-        pointsName: await global.systems.points.getPointsName(200),
+        pointsName: await points.getPointsName(200),
         points: 200,
         command: '!duel',
       });
@@ -61,8 +64,7 @@ describe('Gambling - duel', () => {
     });
 
     it('set duel timestamp to 0 to force new duel', async () => {
-      global.games.duel._timestamp = 0;
-      await variable.isEqual('global.games.duel._timestamp', 0);
+      duel._timestamp = 0;
     });
 
     it('add points for users', async () => {
@@ -71,22 +73,22 @@ describe('Gambling - duel', () => {
     });
 
     it('user 1 is challenging', async () => {
-      await global.games.duel.main({ sender: user1, parameters: 'all', command });
+      await duel.main({ sender: user1, parameters: 'all', command });
       await message.isSent('gambling.duel.new', user1, {
-        minutesName: getLocalizedName(await global.games.duel.duration, 'core.minutes'),
-        minutes: await global.games.duel.duration,
+        minutesName: getLocalizedName(await duel.duration, 'core.minutes'),
+        minutes: await duel.duration,
         command,
       });
       await message.isSent('gambling.duel.joined', user1, {
-        pointsName: await global.systems.points.getPointsName(100),
+        pointsName: await points.getPointsName(100),
         points: 100,
       });
     });
 
     it('user 2 is added to duel', async () => {
-      await global.games.duel.main({ sender: user2, parameters: 'all', command });
+      await duel.main({ sender: user2, parameters: 'all', command });
       await message.isSent('gambling.duel.joined', user2, {
-        pointsName: await global.systems.points.getPointsName(100),
+        pointsName: await points.getPointsName(100),
         points: 100,
         command,
       });
@@ -94,27 +96,26 @@ describe('Gambling - duel', () => {
 
     it('set duel timestamp to force duel to end', async () => {
       // cannot set as 0 - duel is then ignored
-      global.games.duel._timestamp = 1;
-      await variable.isEqual('global.games.duel._timestamp', 1);
+      duel._timestamp = 1;
     });
 
     it('call pickDuelWinner()', () => {
-      global.games.duel.pickDuelWinner();
+      duel.pickDuelWinner();
     });
 
     it('winner should be announced', async () => {
       await message.isSent('gambling.duel.winner', { username: 'bot'}, [{
-        pointsName: await global.systems.points.getPointsName(200),
+        pointsName: await points.getPointsName(200),
         points: 200,
         probability: _.round(50, 2),
-        ticketsName: await global.systems.points.getPointsName(100),
+        ticketsName: await points.getPointsName(100),
         tickets: 100,
         winner: user1.username,
       }, {
-        pointsName: await global.systems.points.getPointsName(200),
+        pointsName: await points.getPointsName(200),
         points: 200,
         probability: _.round(50, 2),
-        ticketsName: await global.systems.points.getPointsName(100),
+        ticketsName: await points.getPointsName(100),
         tickets: 100,
         winner: user2.username,
       }]);
@@ -128,7 +129,7 @@ describe('Gambling - duel', () => {
     });
 
     it('create duel', async () => {
-      global.games.duel._timestamp = Number(new Date());
+      duel._timestamp = Number(new Date());
 
       for (const [id, username] of Object.entries(['testuser', 'testuser2', 'testuser3', 'testuser4', 'testuser5'])) {
         const tickets = Math.floor(Number.MAX_SAFE_INTEGER / 10000000);
@@ -137,7 +138,7 @@ describe('Gambling - duel', () => {
     });
 
     it('pick winner - bot should not crash', async () => {
-      await global.games.duel.pickDuelWinner(global.systems.gambling);
+      await duel.pickDuelWinner();
     });
   });
 });

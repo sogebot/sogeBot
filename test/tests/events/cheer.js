@@ -12,6 +12,8 @@ const message = require('../../general.js').message;
 const time = require('../../general.js').time;
 const _ = require('lodash');
 
+const tmi = (require('../../../dest/tmi')).default;
+
 const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/database/entity/user');
 const { Event } = require('../../../dest/database/entity/event');
@@ -47,7 +49,7 @@ describe('Events - cheer event', () => {
       const userId = Math.floor(Math.random() * 10000);
       describe(username + ' cheer event', () => {
         it('trigger cheer event for 1 bit - ' + username, async () => {
-          await global.tmi.cheer({
+          await tmi.cheer({
             tags: {
               username,
               userId,

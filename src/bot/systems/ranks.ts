@@ -4,13 +4,15 @@ import * as _ from 'lodash';
 
 import { prepare, sendMessage } from '../commons';
 import { command, default_permission } from '../decorators';
-import { permission } from '../permissions';
+import { permission } from '../helpers/permissions';
 import System from './_interface';
 
 import { User } from '../database/entity/user';
 import { getRepository } from 'typeorm';
 import { Rank } from '../database/entity/rank';
 import { adminEndpoint } from '../helpers/socket';
+import users from '../users';
+import { translate } from '../translate';
 
 /*
  * !rank                       - show user rank
@@ -139,7 +141,7 @@ class Ranks extends System {
   @command('!rank help')
   @default_permission(permission.CASTERS)
   help (opts) {
-    sendMessage(global.translate('core.usage') + ': !rank add <hours> <rank> | !rank edit <hours> <rank> | !rank remove <hour> | !rank list | !rank set <username> <rank> | !rank unset <username>', opts.sender, opts.attr);
+    sendMessage(translate('core.usage') + ': !rank add <hours> <rank> | !rank edit <hours> <rank> | !rank remove <hour> | !rank list | !rank set <username> <rank> | !rank unset <username>', opts.sender, opts.attr);
   }
 
   @command('!rank list')
@@ -171,7 +173,7 @@ class Ranks extends System {
 
   @command('!rank')
   async main (opts) {
-    const watched = await global.users.getWatchedOf(opts.sender.userId);
+    const watched = await users.getWatchedOf(opts.sender.userId);
     const rank = await this.get(opts.sender.username);
 
     const ranks = await getRepository(Rank).find({
@@ -237,5 +239,4 @@ class Ranks extends System {
   }
 }
 
-export default Ranks;
-export { Ranks };
+export default new Ranks();

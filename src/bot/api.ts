@@ -21,6 +21,19 @@ import { getManager, getRepository, IsNull, Not } from 'typeorm';
 import { User } from './database/entity/user';
 import { TwitchClips, TwitchTag, TwitchTagLocalizationDescription, TwitchTagLocalizationName } from './database/entity/twitch';
 import { CacheGames } from './database/entity/cacheGames';
+import oauth from './oauth';
+import events from './events';
+import twitch from './twitch';
+import customvariables from './customvariables';
+import { translate } from './translate';
+import panel from './panel';
+import joinpart from './widgets/joinpart';
+import webhooks from './webhooks';
+import alerts from './registries/alerts';
+import eventlist from './overlays/eventlist';
+import stats from './stats';
+import { getFunctionList } from './decorators/on';
+import { linesParsed, setStatus } from './helpers/parser';
 
 const setImmediateAwait = () => {
   return new Promise(resolve => {
@@ -99,7 +112,7 @@ class API extends Core {
     bot: new Proxy({}, limitProxy),
     broadcaster: new Proxy({}, limitProxy),
   };
-  chatMessagesAtStart = global.linesParsed;
+  chatMessagesAtStart = linesParsed;
   maxRetries = 3;
   curRetries = 0;
   streamType = 'live';
@@ -206,7 +219,7 @@ class API extends Core {
 
     const user = await getRepository(User).findOne({ username });
     if (user) {
-      const isSkipped = user.username === getBroadcaster() || user.username === global.oauth.botUsername;
+      const isSkipped = user.username === getBroadcaster() || user.username === oauth.botUsername;
       const userHaveId = !isNil(user.userId);
       if (new Date().getTime() - user.followCheckAt <= constants.DAY || isSkipped || !userHaveId) {
         return;
@@ -235,7 +248,7 @@ class API extends Core {
       }
     */
 
-    const token = await global.oauth.botAccessToken;
+    const token = await oauth.botAccessToken;
     const needToWait = token === '';
     const notEnoughAPICalls = this.calls.bot.remaining <= 30 && this.calls.bot.refresh > Date.now() / 1000;
     if ((needToWait || notEnoughAPICalls)) {
@@ -254,8 +267,8 @@ class API extends Core {
       this.calls.bot.remaining = request.headers['ratelimit-remaining'];
       this.calls.bot.refresh = request.headers['ratelimit-reset'];
 
-      if (global.panel && global.panel.io) {
-        global.panel.io.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'getUsernameFromTwitch', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining });
+      if (panel && panel.io) {
+        panel.io.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'getUsernameFromTwitch', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining });
       }
       return request.data.data[0].login;
     } catch (e) {
@@ -263,8 +276,8 @@ class API extends Core {
         this.calls.bot.remaining = 0;
         this.calls.bot.refresh = e.response.headers['ratelimit-reset'];
       }
-      if (global.panel && global.panel.io) {
-        global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'getUsernameFromTwitch', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot.remaining });
+      if (panel && panel.io) {
+        panel.io.emit('api.stats', { timestamp: Date.now(), call: 'getUsernameFromTwitch', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot.remaining });
       }
     }
     return null;
@@ -290,7 +303,7 @@ class API extends Core {
       }
     */
 
-    const token = global.oauth.botAccessToken;
+    const token = oauth.botAccessToken;
     const needToWait = token === '';
     const notEnoughAPICalls = this.calls.bot.remaining <= 30 && this.calls.bot.refresh > Date.now() / 1000;
     if ((needToWait || notEnoughAPICalls) && !isChannelId) {
@@ -309,8 +322,8 @@ class API extends Core {
       this.calls.bot.remaining = request.headers['ratelimit-remaining'];
       this.calls.bot.refresh = request.headers['ratelimit-reset'];
 
-      if (global.panel && global.panel.io) {
-        global.panel.io.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'getIdFromTwitch', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining });
+      if (panel && panel.io) {
+        panel.io.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'getIdFromTwitch', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining });
       }
 
       return request.data.data[0].id;
@@ -318,12 +331,12 @@ class API extends Core {
       if (typeof e.response !== 'undefined' && e.response.status === 429) {
         this.calls.bot.remaining = 0;
         this.calls.bot.refresh = e.response.headers['ratelimit-reset'];
-        if (global.panel && global.panel.io) {
-          global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'getIdFromTwitch', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot.remaining });
+        if (panel && panel.io) {
+          panel.io.emit('api.stats', { timestamp: Date.now(), call: 'getIdFromTwitch', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot.remaining });
         }
       } else {
-        if (global.panel && global.panel.io) {
-          global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'getIdFromTwitch', api: 'helix', endpoint: url, code: 'n/a', data: e.stack, remaining: this.calls.bot.remaining });
+        if (panel && panel.io) {
+          panel.io.emit('api.stats', { timestamp: Date.now(), call: 'getIdFromTwitch', api: 'helix', endpoint: url, code: 'n/a', data: e.stack, remaining: this.calls.bot.remaining });
         }
       }
     }
@@ -345,26 +358,26 @@ class API extends Core {
     if (typeof event === 'undefined') {
       const { modStatus, partedUsers, joinedUsers } = await getChannelChattersUnofficialAPI();
 
-      global.widgets.joinpart.send({ users: partedUsers, type: 'part' });
+      joinpart.send({ users: partedUsers, type: 'part' });
       for (const username of partedUsers) {
         if (!isIgnored({ username: username })) {
           await setImmediateAwait();
-          global.events.fire('user-parted-channel', { username });
+          events.fire('user-parted-channel', { username });
         }
       }
 
-      global.widgets.joinpart.send({ users: joinedUsers, type: 'join' });
+      joinpart.send({ users: joinedUsers, type: 'join' });
       for (const username of joinedUsers) {
-        if (isIgnored({ username }) || global.oauth.botUsername === username) {
+        if (isIgnored({ username }) || oauth.botUsername === username) {
           continue;
         } else {
           await setImmediateAwait();
           this.followerUpdatePreCheck(username);
-          global.events.fire('user-joined-channel', { username });
+          events.fire('user-joined-channel', { username });
         }
       }
 
-      global.status.MOD = modStatus;
+      setStatus('MOD', modStatus);
     }
     return { state: true, opts };
   }
@@ -378,8 +391,8 @@ class API extends Core {
       url += '&after=' + opts.cursor;
     }
 
-    const token = global.oauth.botAccessToken;
-    const needToWait = isNil(global.overlays) || token === '';
+    const token = oauth.botAccessToken;
+    const needToWait = token === '';
     const notEnoughAPICalls = this.calls.bot.remaining <= 30 && this.calls.bot.refresh > Date.now() / 1000;
 
     if (needToWait || notEnoughAPICalls) {
@@ -418,8 +431,8 @@ class API extends Core {
       await getRepository(TwitchTagLocalizationDescription).delete({ tagId: IsNull() });
       await getRepository(TwitchTagLocalizationName).delete({ tagId: IsNull() });
 
-      if (global.panel && global.panel.io) {
-        global.panel.io.emit('api.stats', { data: tags, timestamp: Date.now(), call: 'getAllStreamTags', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining });
+      if (panel && panel.io) {
+        panel.io.emit('api.stats', { data: tags, timestamp: Date.now(), call: 'getAllStreamTags', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining });
       }
 
       // save remaining api calls
@@ -433,8 +446,8 @@ class API extends Core {
       }
     } catch (e) {
       error(`${url} - ${e.message}`);
-      if (global.panel && global.panel.io) {
-        global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'getChannelSubscribers', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot.remaining });
+      if (panel && panel.io) {
+        panel.io.emit('api.stats', { timestamp: Date.now(), call: 'getChannelSubscribers', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot.remaining });
       }
     }
     delete opts.cursor;
@@ -448,7 +461,7 @@ class API extends Core {
     }
     opts = opts || {};
 
-    const cid = global.oauth.channelId;
+    const cid = oauth.channelId;
     let url = `https://api.twitch.tv/helix/subscriptions?broadcaster_id=${cid}&first=100`;
     if (opts.cursor) {
       url += '&after=' + opts.cursor;
@@ -457,15 +470,15 @@ class API extends Core {
       opts.count = -1;
     } // start at -1 because owner is subbed as well
 
-    const token = global.oauth.broadcasterAccessToken;
-    const needToWait = isNil(cid) || cid === '' || isNil(global.overlays) || token === '';
+    const token = oauth.broadcasterAccessToken;
+    const needToWait = isNil(cid) || cid === '' || token === '';
     const notEnoughAPICalls = this.calls.bot.remaining <= 30 && this.calls.bot.refresh > Date.now() / 1000;
 
-    if (needToWait || notEnoughAPICalls || global.oauth.broadcasterType === '') {
-      if (global.oauth.broadcasterType === '') {
+    if (needToWait || notEnoughAPICalls || oauth.broadcasterType === '') {
+      if (oauth.broadcasterType === '') {
         if (!opts.noAffiliateOrPartnerWarningSent) {
           warning('Broadcaster is not affiliate/partner, will not check subs');
-          global.api.stats.currentSubscribers = 0;
+          this.stats.currentSubscribers = 0;
         }
         delete opts.count;
         return { state: false, opts: { ...opts, noAffiliateOrPartnerWarningSent: true } };
@@ -488,8 +501,8 @@ class API extends Core {
         opts.subscribers = subscribers;
       }
 
-      if (global.panel && global.panel.io) {
-        global.panel.io.emit('api.stats', { data: subscribers, timestamp: Date.now(), call: 'getChannelSubscribers', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining });
+      if (panel && panel.io) {
+        panel.io.emit('api.stats', { data: subscribers, timestamp: Date.now(), call: 'getChannelSubscribers', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining });
       }
 
       // save remaining api calls
@@ -517,8 +530,8 @@ class API extends Core {
         this.stats.currentSubscribers = 0;
       } else {
         error(`${url} - ${e.stack}`);
-        if (global.panel && global.panel.io) {
-          global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'getChannelSubscribers', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot.remaining });
+        if (panel && panel.io) {
+          panel.io.emit('api.stats', { timestamp: Date.now(), call: 'getChannelSubscribers', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot.remaining });
         }
       }
     }
@@ -563,11 +576,11 @@ class API extends Core {
       throw new Error('API can run only on master');
     }
 
-    const cid = global.oauth.channelId;
+    const cid = oauth.channelId;
     const url = `https://api.twitch.tv/kraken/channels/${cid}`;
 
-    const token = await global.oauth.botAccessToken;
-    const needToWait = isNil(cid) || cid === '' || isNil(global.overlays) || token === '';
+    const token = await oauth.botAccessToken;
+    const needToWait = isNil(cid) || cid === '' || token === '';
     if (needToWait) {
       return { state: false, opts };
     }
@@ -585,8 +598,8 @@ class API extends Core {
           'Authorization': 'OAuth ' + token,
         },
       });
-      if (global.panel && global.panel.io) {
-        global.panel.io.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'getChannelDataOldAPI', api: 'kraken', endpoint: url, code: request.status });
+      if (panel && panel.io) {
+        panel.io.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'getChannelDataOldAPI', api: 'kraken', endpoint: url, code: request.status });
       }
 
       if (!this.gameOrTitleChangedManually) {
@@ -598,12 +611,12 @@ class API extends Core {
           return { state: true, opts };
         } else if (request.data.status !== status && !opts.forceUpdate) {
           // check if status is same as updated status
-          const numOfRetries = global.twitch.isTitleForced ? 1 : 15;
+          const numOfRetries = twitch.isTitleForced ? 1 : 15;
           if (this.retries.getChannelDataOldAPI >= numOfRetries) {
             this.retries.getChannelDataOldAPI = 0;
 
             // if we want title to be forced
-            if (global.twitch.isTitleForced) {
+            if (twitch.isTitleForced) {
               const game = this.gameCache;
               info(`Title/game force enabled => ${game} | ${rawStatus}`);
               this.setTitleAndGame(null, { });
@@ -630,8 +643,8 @@ class API extends Core {
       }
     } catch (e) {
       error(`${url} - ${e.message}`);
-      if (global.panel && global.panel.io) {
-        global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'getChannelDataOldAPI', api: 'kraken', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack });
+      if (panel && panel.io) {
+        panel.io.emit('api.stats', { timestamp: Date.now(), call: 'getChannelDataOldAPI', api: 'kraken', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack });
       }
       return { state: false, opts };
     }
@@ -645,7 +658,7 @@ class API extends Core {
       throw new Error('API can run only on master');
     }
 
-    const cid = global.oauth.channelId;
+    const cid = oauth.channelId;
 
     if (isNil(cid) || cid === '') {
       return { state: false };
@@ -655,14 +668,14 @@ class API extends Core {
     const url = `http://tmi.twitch.tv/hosts?include_logins=1&target=${cid}`;
     try {
       request = await axios.get(url);
-      if (global.panel && global.panel.io) {
-        global.panel.io.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'getChannelHosts', api: 'tmi', endpoint: url, code: request.status });
+      if (panel && panel.io) {
+        panel.io.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'getChannelHosts', api: 'tmi', endpoint: url, code: request.status });
       }
       this.stats.currentHosts = request.data.hosts.length;
     } catch (e) {
       error(`${url} - ${e.message}`);
-      if (global.panel && global.panel.io) {
-        global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'getChannelHosts', api: 'tmi', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack });
+      if (panel && panel.io) {
+        panel.io.emit('api.stats', { timestamp: Date.now(), call: 'getChannelHosts', api: 'tmi', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack });
       }
       return { state: e.response?.status === 500 };
     }
@@ -671,11 +684,11 @@ class API extends Core {
   }
 
   async updateChannelViewsAndBroadcasterType () {
-    const cid = global.oauth.channelId;
+    const cid = oauth.channelId;
     const url = `https://api.twitch.tv/helix/users/?id=${cid}`;
 
-    const token = await global.oauth.botAccessToken;
-    const needToWait = isNil(cid) || cid === '' || isNil(global.overlays) || token === '';
+    const token = await oauth.botAccessToken;
+    const needToWait = isNil(cid) || cid === '' || token === '';
     const notEnoughAPICalls = this.calls.bot.remaining <= 30 && this.calls.bot.refresh > Date.now() / 1000;
     if (needToWait || notEnoughAPICalls) {
       return { state: false };
@@ -688,8 +701,8 @@ class API extends Core {
           'Authorization': 'Bearer ' + token,
         },
       });
-      if (global.panel && global.panel.io) {
-        global.panel.io.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'updateChannelViewsAndBroadcasterType', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining });
+      if (panel && panel.io) {
+        panel.io.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'updateChannelViewsAndBroadcasterType', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining });
       }
 
       // save remaining api calls
@@ -698,7 +711,7 @@ class API extends Core {
       this.calls.bot.limit = request.headers['ratelimit-limit'];
 
       if (request.data.data.length > 0) {
-        global.oauth.broadcasterType = request.data.data[0].broadcaster_type;
+        oauth.broadcasterType = request.data.data[0].broadcaster_type;
         this.stats.currentViews = request.data.data[0].view_count;
       }
     } catch (e) {
@@ -708,18 +721,18 @@ class API extends Core {
       }
 
       error(`${url} - ${e.message}`);
-      if (global.panel && global.panel.io) {
-        global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'updateChannelViewsAndBroadcasterType', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot.remaining });
+      if (panel && panel.io) {
+        panel.io.emit('api.stats', { timestamp: Date.now(), call: 'updateChannelViewsAndBroadcasterType', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot.remaining });
       }
     }
     return { state: true };
   }
 
   async getLatest100Followers (quiet) {
-    const cid = global.oauth.channelId;
+    const cid = oauth.channelId;
     const url = `https://api.twitch.tv/helix/users/follows?to_id=${cid}&first=100`;
-    const token = await global.oauth.botAccessToken;
-    const needToWait = isNil(cid) || cid === '' || isNil(global.overlays) || token === '';
+    const token = await oauth.botAccessToken;
+    const needToWait = isNil(cid) || cid === '' || token === '';
     const notEnoughAPICalls = this.calls.bot.remaining <= 30 && this.calls.bot.refresh > Date.now() / 1000;
 
     if (needToWait || notEnoughAPICalls) {
@@ -739,8 +752,8 @@ class API extends Core {
       this.calls.bot.refresh = request.headers['ratelimit-reset'];
       this.calls.bot.limit = request.headers['ratelimit-limit'];
 
-      if (global.panel && global.panel.io) {
-        global.panel.io.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'getLatest100Followers', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining });
+      if (panel && panel.io) {
+        panel.io.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'getLatest100Followers', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining });
       }
 
       if (request.status === 200 && !isNil(request.data.data)) {
@@ -760,17 +773,17 @@ class API extends Core {
 
           if (!user.isFollower) {
             if (new Date().getTime() - new Date(f.followed_at).getTime() < 2 * constants.HOUR) {
-              if (user.followedAt === 0 || new Date().getTime() - user.followedAt > 60000 * 60 && !global.webhooks.existsInCache('follow', user.userId)) {
-                global.webhooks.addIdToCache('follow', f.from_id);
-                global.overlays.eventlist.add({
+              if (user.followedAt === 0 || new Date().getTime() - user.followedAt > 60000 * 60 && !webhooks.existsInCache('follow', user.userId)) {
+                webhooks.addIdToCache('follow', f.from_id);
+                eventlist.add({
                   event: 'follow',
                   username: user.username,
                   timestamp: Date.now(),
                 });
                 if (!quiet && !isBot(user.username)) {
                   follow(user.username);
-                  global.events.fire('follow', { username: user.username, userId: f.from_id });
-                  global.registries.alerts.trigger({
+                  events.fire('follow', { username: user.username, userId: f.from_id });
+                  alerts.trigger({
                     event: 'follows',
                     name: user.username,
                     amount: 0,
@@ -808,8 +821,8 @@ class API extends Core {
 
       quiet = e.errno !== 'ECONNREFUSED' && e.errno !== 'ETIMEDOUT';
       error(`${url} - ${e.message}`);
-      if (global.panel && global.panel.io) {
-        global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'getLatest100Followers', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot.remaining });
+      if (panel && panel.io) {
+        panel.io.emit('api.stats', { timestamp: Date.now(), call: 'getLatest100Followers', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot.remaining });
       }
       return { state: false, opts: quiet };
     }
@@ -832,7 +845,7 @@ class API extends Core {
     }
 
     try {
-      const token = await global.oauth.botAccessToken;
+      const token = await oauth.botAccessToken;
       if (token === '') {
         throw new Error('token not available');
       }
@@ -848,8 +861,8 @@ class API extends Core {
       this.calls.bot.limit = request.headers['ratelimit-limit'];
 
       if (isMainThread) {
-        if (global.panel && global.panel.io) {
-          global.panel.io.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'getGameFromId', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining });
+        if (panel && panel.io) {
+          panel.io.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'getGameFromId', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining });
         }
       }
 
@@ -866,8 +879,8 @@ class API extends Core {
       warning(`Couldn't find name of game for gid ${id} - fallback to ${this.stats.currentGame}`);
       error(`API: ${url} - ${e.stack}`);
       if (isMainThread) {
-        if (global.panel && global.panel.io) {
-          global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'getGameFromId', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot.remaining });
+        if (panel && panel.io) {
+          panel.io.emit('api.stats', { timestamp: Date.now(), call: 'getGameFromId', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot.remaining });
         }
       }
       return this.stats.currentGame;
@@ -879,11 +892,11 @@ class API extends Core {
       throw new Error('API can run only on master');
     }
 
-    const cid = global.oauth.channelId;
+    const cid = oauth.channelId;
     const url = `https://api.twitch.tv/helix/streams/tags?broadcaster_id=${cid}`;
 
-    const token = await global.oauth.botAccessToken;
-    const needToWait = isNil(cid) || cid === '' || isNil(global.overlays) || token === '';
+    const token = await oauth.botAccessToken;
+    const needToWait = isNil(cid) || cid === '' || token === '';
     const notEnoughAPICalls = this.calls.bot.remaining <= 30 && this.calls.bot.refresh > Date.now() / 1000;
     if (needToWait || notEnoughAPICalls) {
       return { state: false, opts };
@@ -902,8 +915,8 @@ class API extends Core {
       this.calls.bot.refresh = request.headers['ratelimit-reset'];
       this.calls.bot.limit = request.headers['ratelimit-limit'];
 
-      if (global.panel && global.panel.io) {
-        global.panel.io.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'getCurrentStreamTags', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining });
+      if (panel && panel.io) {
+        panel.io.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'getCurrentStreamTags', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining });
       }
 
       if (request.status === 200 && !isNil(request.data.data[0])) {
@@ -915,8 +928,8 @@ class API extends Core {
       }
     } catch (e) {
       error(`${url} - ${e.message}`);
-      if (global.panel && global.panel.io) {
-        global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'getCurrentStreamTags', api: 'getCurrentStreamTags', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot.remaining });
+      if (panel && panel.io) {
+        panel.io.emit('api.stats', { timestamp: Date.now(), call: 'getCurrentStreamTags', api: 'getCurrentStreamTags', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot.remaining });
       }
       return { state: false, opts };
     }
@@ -928,11 +941,11 @@ class API extends Core {
       throw new Error('API can run only on master');
     }
 
-    const cid = global.oauth.channelId;
+    const cid = oauth.channelId;
     const url = `https://api.twitch.tv/helix/streams?user_id=${cid}`;
 
-    const token = await global.oauth.botAccessToken;
-    const needToWait = isNil(cid) || cid === '' || isNil(global.overlays) || token === '';
+    const token = await oauth.botAccessToken;
+    const needToWait = isNil(cid) || cid === '' || token === '';
     const notEnoughAPICalls = this.calls.bot.remaining <= 30 && this.calls.bot.refresh > Date.now() / 1000;
     if (needToWait || notEnoughAPICalls) {
       return { state: false, opts };
@@ -946,15 +959,15 @@ class API extends Core {
         },
       });
 
-      global.status.API = request.status === 200 ? constants.CONNECTED : constants.DISCONNECTED;
+      setStatus('API', request.status === 200 ? constants.CONNECTED : constants.DISCONNECTED);
 
       // save remaining api calls
       this.calls.bot.remaining = request.headers['ratelimit-remaining'];
       this.calls.bot.refresh = request.headers['ratelimit-reset'];
       this.calls.bot.limit = request.headers['ratelimit-limit'];
 
-      if (global.panel && global.panel.io) {
-        global.panel.io.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'getCurrentStreamData', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining });
+      if (panel && panel.io) {
+        panel.io.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'getCurrentStreamData', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining });
       }
 
       let justStarted = false;
@@ -969,9 +982,9 @@ class API extends Core {
           this.streamStatusChangeSince = (new Date(stream.started_at)).getTime();
         }
         if (!this.isStreamOnline || this.streamType !== stream.type) {
-          this.chatMessagesAtStart = global.linesParsed;
+          this.chatMessagesAtStart = linesParsed;
 
-          if (!global.webhooks.enabled.streams && Number(this.streamId) !== Number(stream.id)) {
+          if (!webhooks.enabled.streams && Number(this.streamId) !== Number(stream.id)) {
             debug('api.stream', 'API: ' + JSON.stringify(stream));
             start(
               `id: ${stream.id} | startedAt: ${stream.started_at} | title: ${stream.title} | game: ${await this.getGameFromId(stream.game_id)} | type: ${stream.type} | channel ID: ${cid}`
@@ -989,30 +1002,14 @@ class API extends Core {
             this.streamId = stream.id;
             this.streamType = stream.type;
 
-            global.events.fire('stream-started', {});
-            global.events.fire('command-send-x-times', { reset: true });
-            global.events.fire('keyword-send-x-times', { reset: true });
-            global.events.fire('every-x-minutes-of-stream', { reset: true });
+            events.fire('stream-started', {});
+            events.fire('command-send-x-times', { reset: true });
+            events.fire('keyword-send-x-times', { reset: true });
+            events.fire('every-x-minutes-of-stream', { reset: true });
             justStarted = true;
 
-            // go through all systems and trigger on.streamStart
-            for (const [/* type */, systems] of Object.entries({
-              systems: global.systems,
-              games: global.games,
-              overlays: global.overlays,
-              widgets: global.widgets,
-              integrations: global.integrations,
-            })) {
-              for (const [name, system] of Object.entries(systems)) {
-                if (name.startsWith('_') || typeof system.on === 'undefined') {
-                  continue;
-                }
-                if (Array.isArray(system.on.streamStart)) {
-                  for (const fnc of system.on.streamStart) {
-                    system[fnc]();
-                  }
-                }
-              }
+            for (const event of getFunctionList('streamStart')) {
+              this[event.fName]();
             }
           }
         }
@@ -1023,9 +1020,9 @@ class API extends Core {
 
         if (!justStarted) {
           // don't run events on first check
-          global.events.fire('number-of-viewers-is-at-least-x', {});
-          global.events.fire('stream-is-running-x-minutes', {});
-          global.events.fire('every-x-minutes-of-stream', {});
+          events.fire('number-of-viewers-is-at-least-x', {});
+          events.fire('stream-is-running-x-minutes', {});
+          events.fire('every-x-minutes-of-stream', {});
         }
 
         if (!this.gameOrTitleChangedManually) {
@@ -1064,28 +1061,12 @@ class API extends Core {
             this.streamStatusChangeSince = Date.now();
             this.isStreamOnline = false;
             this.curRetries = 0;
-            global.events.fire('stream-stopped', {});
-            global.events.fire('stream-is-running-x-minutes', { reset: true });
-            global.events.fire('number-of-viewers-is-at-least-x', { reset: true });
+            events.fire('stream-stopped', {});
+            events.fire('stream-is-running-x-minutes', { reset: true });
+            events.fire('number-of-viewers-is-at-least-x', { reset: true });
 
-            // go through all systems and trigger on.streamEnd
-            for (const [, systems] of Object.entries({
-              systems: global.systems,
-              games: global.games,
-              overlays: global.overlays,
-              widgets: global.widgets,
-              integrations: global.integrations,
-            })) {
-              for (const [name, system] of Object.entries(systems)) {
-                if (name.startsWith('_') || typeof system.on === 'undefined') {
-                  continue;
-                }
-                if (Array.isArray(system.on.streamEnd)) {
-                  for (const fnc of system.on.streamEnd) {
-                    system[fnc]();
-                  }
-                }
-              }
+            for (const event of getFunctionList('streamEnd')) {
+              this[event.fName]();
             }
 
             this.streamId = null;
@@ -1099,8 +1080,8 @@ class API extends Core {
       }
 
       error(`${url} - ${e.message}`);
-      if (global.panel && global.panel.io) {
-        global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'getCurrentStreamData', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot.remaining });
+      if (panel && panel.io) {
+        panel.io.emit('api.stats', { timestamp: Date.now(), call: 'getCurrentStreamData', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot.remaining });
       }
       return { state: false, opts };
     }
@@ -1117,15 +1098,15 @@ class API extends Core {
       this.stats.maxViewers = stream.viewer_count;
     }
 
-    global.stats2.save({
+    stats.save({
       timestamp: new Date().getTime(),
-      whenOnline: global.api.isStreamOnline ? global.api.streamStatusChangeSince : null,
+      whenOnline: this.isStreamOnline ? this.streamStatusChangeSince : null,
       currentViewers: this.stats.currentViewers,
       currentSubscribers: this.stats.currentSubscribers,
       currentFollowers: this.stats.currentFollowers,
       currentBits: this.stats.currentBits,
       currentTips: this.stats.currentTips,
-      chatMessages: global.linesParsed - this.chatMessagesAtStart,
+      chatMessages: linesParsed - this.chatMessagesAtStart,
       currentViews: this.stats.currentViews,
       maxViewers: this.stats.maxViewers,
       newChatters: this.stats.newChatters,
@@ -1151,10 +1132,10 @@ class API extends Core {
     if (!isNil(match)) {
       for (const variable of title.match(regexp)) {
         let value;
-        if (await global.customvariables.isVariableSet(variable)) {
-          value = await global.customvariables.getValueOf(variable);
+        if (await customvariables.isVariableSet(variable)) {
+          value = await customvariables.getValueOf(variable);
         } else {
-          value = global.translate('webpanel.not-available');
+          value = translate('webpanel.not-available');
         }
         title = title.replace(new RegExp(`\\${variable}`, 'g'), value);
       }
@@ -1166,11 +1147,11 @@ class API extends Core {
     if (!isMainThread) {
       throw new Error('API can run only on master');
     }
-    const cid = global.oauth.channelId;
+    const cid = oauth.channelId;
     const url = `https://api.twitch.tv/helix/streams/tags?broadcaster_id=${cid}`;
 
-    const token = await global.oauth.botAccessToken;
-    const needToWait = isNil(cid) || cid === '' || isNil(global.overlays) || token === '';
+    const token = await oauth.botAccessToken;
+    const needToWait = isNil(cid) || cid === '' || token === '';
     if (needToWait) {
       setTimeout(() => this.setTags(sender, tagsArg), 1000);
       return;
@@ -1205,13 +1186,13 @@ class API extends Core {
       for (const tag_id of tag_ids) {
         await getRepository(TwitchTag).update({ tag_id }, { is_current: true });
       }
-      if (global.panel && global.panel.io) {
-        global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'setTags', api: 'helix', endpoint: url, code: request.status, data: request.data });
+      if (panel && panel.io) {
+        panel.io.emit('api.stats', { timestamp: Date.now(), call: 'setTags', api: 'helix', endpoint: url, code: request.status, data: request.data });
       }
     } catch (e) {
       error(`API: ${url} - ${e.message}`);
-      if (global.panel && global.panel.io) {
-        global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'setTags', api: 'helix', endpoint: url, code: get(e, 'response.status', '500'), data: e.stack });
+      if (panel && panel.io) {
+        panel.io.emit('api.stats', { timestamp: Date.now(), call: 'setTags', api: 'helix', endpoint: url, code: get(e, 'response.status', '500'), data: e.stack });
       }
       return false;
     }
@@ -1225,11 +1206,11 @@ class API extends Core {
     }
 
     args = defaults(args, { title: null }, { game: null });
-    const cid = global.oauth.channelId;
+    const cid = oauth.channelId;
     const url = `https://api.twitch.tv/kraken/channels/${cid}`;
 
-    const token = await global.oauth.botAccessToken;
-    const needToWait = isNil(cid) || cid === '' || isNil(global.overlays) || token === '';
+    const token = await oauth.botAccessToken;
+    const needToWait = isNil(cid) || cid === '' || token === '';
     if (needToWait) {
       setTimeout(() => this.setTitleAndGame(sender, args), 1000);
       return;
@@ -1265,13 +1246,13 @@ class API extends Core {
           'Authorization': 'OAuth ' + token,
         },
       });
-      if (global.panel && global.panel.io) {
-        global.panel.io.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'setTitleAndGame', api: 'kraken', endpoint: url, code: request.status });
+      if (panel && panel.io) {
+        panel.io.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'setTitleAndGame', api: 'kraken', endpoint: url, code: request.status });
       }
     } catch (e) {
       error(`API: ${url} - ${e.message}`);
-      if (global.panel && global.panel.io) {
-        global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'setTitleAndGame', api: 'kraken', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack });
+      if (panel && panel.io) {
+        panel.io.emit('api.stats', { timestamp: Date.now(), call: 'setTitleAndGame', api: 'kraken', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack });
       }
       return false;
     }
@@ -1281,23 +1262,23 @@ class API extends Core {
       if (!isNil(args.game)) {
         response.game = isNil(response.game) ? '' : response.game;
         if (response.game.trim() === args.game.trim()) {
-          sendMessage(global.translate('game.change.success')
+          sendMessage(translate('game.change.success')
             .replace(/\$game/g, response.game), sender);
-          global.events.fire('game-changed', { oldGame: this.stats.currentGame, game: response.game });
+          events.fire('game-changed', { oldGame: this.stats.currentGame, game: response.game });
           this.stats.currentGame = response.game;
         } else {
-          sendMessage(global.translate('game.change.failed')
+          sendMessage(translate('game.change.failed')
             .replace(/\$game/g, this.stats.currentGame), sender);
         }
       }
 
       if (!isNull(args.title)) {
         if (response.status.trim() === status.trim()) {
-          sendMessage(global.translate('title.change.success')
+          sendMessage(translate('title.change.success')
             .replace(/\$title/g, response.status), sender);
           this.stats.currentTitle = response.status;
         } else {
-          sendMessage(global.translate('title.change.failed')
+          sendMessage(translate('title.change.failed')
             .replace(/\$title/g, this.stats.currentTitle), sender);
         }
       }
@@ -1313,7 +1294,7 @@ class API extends Core {
     }
     const url = `https://api.twitch.tv/kraken/search/games?query=${encodeURIComponent(game)}&type=suggest`;
 
-    const token = await global.oauth.botAccessToken;
+    const token = await oauth.botAccessToken;
     if (token === '') {
       return;
     }
@@ -1326,13 +1307,13 @@ class API extends Core {
           'Authorization': 'OAuth ' + token,
         },
       });
-      if (global.panel && global.panel.io) {
-        global.panel.io.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'sendGameFromTwitch', api: 'kraken', endpoint: url, code: request.status });
+      if (panel && panel.io) {
+        panel.io.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'sendGameFromTwitch', api: 'kraken', endpoint: url, code: request.status });
       }
     } catch (e) {
       error(`API: ${url} - ${e.stack}`);
-      if (global.panel && global.panel.io) {
-        global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'sendGameFromTwitch', api: 'kraken', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack });
+      if (panel && panel.io) {
+        panel.io.emit('api.stats', { timestamp: Date.now(), call: 'sendGameFromTwitch', api: 'kraken', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack });
       }
       return;
     }
@@ -1355,7 +1336,7 @@ class API extends Core {
       throw new Error('API can run only on master');
     }
 
-    const token = global.oauth.botAccessToken;
+    const token = oauth.botAccessToken;
     if (token === '') {
       return { state: false };
     }
@@ -1391,8 +1372,8 @@ class API extends Core {
       this.calls.bot.refresh = request.headers['ratelimit-reset'];
       this.calls.bot.limit = request.headers['ratelimit-limit'];
 
-      if (global.panel && global.panel.io) {
-        global.panel.io.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'checkClips', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining });
+      if (panel && panel.io) {
+        panel.io.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'checkClips', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining });
       }
 
       for (const clip of request.data.data) {
@@ -1406,8 +1387,8 @@ class API extends Core {
       }
 
       error(`API: ${url} - ${e.stack}`);
-      if (global.panel && global.panel.io) {
-        global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'checkClips', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack });
+      if (panel && panel.io) {
+        panel.io.emit('api.stats', { timestamp: Date.now(), call: 'checkClips', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack });
       }
     }
     return { state: true };
@@ -1439,11 +1420,11 @@ class API extends Core {
 
     defaults(opts, { hasDelay: true });
 
-    const cid = global.oauth.channelId;
+    const cid = oauth.channelId;
     const url = `https://api.twitch.tv/helix/clips?broadcaster_id=${cid}`;
 
-    const token = await global.oauth.botAccessToken;
-    const needToWait = isNil(cid) || cid === '' || isNil(global.overlays) || token === '';
+    const token = await oauth.botAccessToken;
+    const needToWait = isNil(cid) || cid === '' || token === '';
     const notEnoughAPICalls = this.calls.bot.remaining <= 30 && this.calls.bot.refresh > Date.now() / 1000;
     if (needToWait || notEnoughAPICalls) {
       setTimeout(() => this.createClip(opts), 1000);
@@ -1465,8 +1446,8 @@ class API extends Core {
       this.calls.bot.refresh = request.headers['ratelimit-reset'];
       this.calls.bot.limit = request.headers['ratelimit-limit'];
 
-      if (global.panel && global.panel.io) {
-        global.panel.io.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'createClip', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining });
+      if (panel && panel.io) {
+        panel.io.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'createClip', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining });
       }
     } catch (e) {
       if (typeof e.response !== 'undefined' && e.response.status === 429) {
@@ -1475,8 +1456,8 @@ class API extends Core {
       }
 
       error(`API: ${url} - ${e.stack}`);
-      if (global.panel && global.panel.io) {
-        global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'createClip', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack });
+      if (panel && panel.io) {
+        panel.io.emit('api.stats', { timestamp: Date.now(), call: 'createClip', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack });
       }
       return;
     }
@@ -1491,7 +1472,7 @@ class API extends Core {
     }
     const url = `https://api.twitch.tv/kraken/users/${id}`;
 
-    const token = await global.oauth.botAccessToken;
+    const token = await oauth.botAccessToken;
     if (token === '') {
       return;
     }
@@ -1504,8 +1485,8 @@ class API extends Core {
           'Authorization': 'OAuth ' + token,
         },
       });
-      if (global.panel && global.panel.io) {
-        global.panel.io.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'fetchAccountAge', api: 'kraken', endpoint: url, code: request.status });
+      if (panel && panel.io) {
+        panel.io.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'fetchAccountAge', api: 'kraken', endpoint: url, code: request.status });
       }
     } catch (e) {
       if (e.errno === 'ECONNRESET' || e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT') {
@@ -1521,8 +1502,8 @@ class API extends Core {
 
       if (logError) {
         error(`API: ${url} - ${e.stack}`);
-        if (global.panel && global.panel.io) {
-          global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'fetchAccountAge', api: 'kraken', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack });
+        if (panel && panel.io) {
+          panel.io.emit('api.stats', { timestamp: Date.now(), call: 'fetchAccountAge', api: 'kraken', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack });
         }
       }
       return;
@@ -1536,19 +1517,13 @@ class API extends Core {
     }
     const id = user.userId;
 
-    // reload user from db
-    user = {
-      ...user,
-      ...await getRepository(User).findOne({ userId: id }),
-    };
-
     clearTimeout(this.timeouts['isFollowerUpdate-' + id]);
 
-    const cid = global.oauth.channelId;
+    const cid = oauth.channelId;
     const url = `https://api.twitch.tv/helix/users/follows?from_id=${id}&to_id=${cid}`;
 
-    const token = await global.oauth.botAccessToken;
-    const needToWait = isNil(cid) || cid === '' || (isNil(global.overlays) && isMainThread) || token === '';
+    const token = await oauth.botAccessToken;
+    const needToWait = isNil(cid) || cid === '' || token === '';
     const notEnoughAPICalls = this.calls.bot.remaining <= 40 && this.calls.bot.refresh > Date.now() / 1000;
     if (needToWait || notEnoughAPICalls) {
       this.timeouts['isFollowerUpdate-' + id] = setTimeout(() => this.isFollowerUpdate(user), 1000);
@@ -1568,8 +1543,8 @@ class API extends Core {
       this.calls.bot.refresh = request.headers['ratelimit-reset'];
       this.calls.bot.limit = request.headers['ratelimit-limit'];
 
-      if (global.panel && global.panel.io) {
-        global.panel.io.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'isFollowerUpdate', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining });
+      if (panel && panel.io) {
+        panel.io.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'isFollowerUpdate', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining });
       }
     } catch (e) {
       if (typeof e.response !== 'undefined' && e.response.status === 429) {
@@ -1578,8 +1553,8 @@ class API extends Core {
       }
 
       error(`API: ${url} - ${e.stack}`);
-      if (global.panel && global.panel.io) {
-        global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'isFollowerUpdate', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot.remaining });
+      if (panel && panel.io) {
+        panel.io.emit('api.stats', { timestamp: Date.now(), call: 'isFollowerUpdate', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot.remaining });
       }
       return null;
     }
@@ -1589,25 +1564,27 @@ class API extends Core {
       // if was follower, fire unfollow event
       if (user.isFollower) {
         unfollow(user.username);
-        global.events.fire('unfollow', { username: user.username });
+        events.fire('unfollow', { username: user.username });
       }
 
-      user.followedAt = user.haveFollowedAtLock ? user.followedAt : 0;
-      user.isFollower = user.haveFollowerLock? user.isFollower : false;
-      user.followCheckAt = Date.now();
-      await getRepository(User).save(user);
+      await getRepository(User).update({ userId: user.userId },
+        {
+          followedAt: user.haveFollowedAtLock ? user.followedAt : 0,
+          isFollower: user.haveFollowerLock? user.isFollower : false,
+          followCheckAt: Date.now(),
+        });
       return { isFollower: user.isFollower, followedAt: user.followedAt };
     } else {
       // is follower
       if (!user.isFollower && new Date().getTime() - new Date(request.data.data[0].followed_at).getTime() < 60000 * 60) {
-        global.overlays.eventlist.add({
+        eventlist.add({
           event: 'follow',
           username: user.username,
           timestamp: Date.now(),
         });
         follow(user.username);
-        global.events.fire('follow', { username: user.username, userId: id });
-        global.registries.alerts.trigger({
+        events.fire('follow', { username: user.username, userId: id });
+        alerts.trigger({
           event: 'follows',
           name: user.username,
           amount: 0,
@@ -1623,18 +1600,19 @@ class API extends Core {
         });
       }
 
-
-      user.followedAt = user.haveFollowedAtLock ? user.followedAt : Number(moment(request.data.data[0].followed_at).format('x'));
-      user.isFollower = user.haveFollowerLock? user.isFollower : true;
-      user.followCheckAt = Date.now();
-      await getRepository(User).save(user);
+      await getRepository(User).update({ userId: user.userId },
+        {
+          followedAt: user.haveFollowedAtLock ? user.followedAt : Number(moment(request.data.data[0].followed_at).format('x')),
+          isFollower: user.haveFollowerLock? user.isFollower : true,
+          followCheckAt: Date.now(),
+        });
       return { isFollower: user.isFollower, followedAt: user.followedAt };
     }
   }
 
   async createMarker () {
-    const token = global.oauth.botAccessToken;
-    const cid = global.oauth.channelId;
+    const token = oauth.botAccessToken;
+    const cid = oauth.channelId;
 
     const url = 'https://api.twitch.tv/helix/streams/markers';
     try {
@@ -1663,16 +1641,16 @@ class API extends Core {
       this.calls.bot.refresh = request.headers['ratelimit-reset'];
       this.calls.bot.limit = request.headers['ratelimit-limit'];
 
-      if (global.panel && global.panel.io) {
-        global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'createMarker', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining, data: request.data });
+      if (panel && panel.io) {
+        panel.io.emit('api.stats', { timestamp: Date.now(), call: 'createMarker', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining, data: request.data });
       }
     } catch (e) {
       if (e.errno === 'ECONNRESET' || e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT') {
         return this.createMarker();
       }
       error(`API: Marker was not created - ${e.message}`);
-      if (global.panel && global.panel.io) {
-        global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'createMarker', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot.remaining });
+      if (panel && panel.io) {
+        panel.io.emit('api.stats', { timestamp: Date.now(), call: 'createMarker', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot.remaining });
       }
     }
   }
@@ -1680,7 +1658,7 @@ class API extends Core {
   async getClipById (id) {
     const url = `https://api.twitch.tv/helix/clips/?id=${id}`;
 
-    const token = await global.oauth.botAccessToken;
+    const token = await oauth.botAccessToken;
     if (token === '') {
       return null;
     }
@@ -1693,18 +1671,18 @@ class API extends Core {
           'Authorization': 'Bearer ' + token,
         },
       });
-      global.panel.io.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'getClipById', api: 'kraken', endpoint: url, code: request.status, remaining: this.calls.bot.remaining });
+      panel.io.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'getClipById', api: 'kraken', endpoint: url, code: request.status, remaining: this.calls.bot.remaining });
       return request.data;
     } catch (e) {
       error(`${url} - ${e.message}`);
-      global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'getClipById', api: 'kraken', endpoint: url, code: `${e.status} ${get(e, 'body.message', e.statusText)}`, remaining: this.calls.bot.remaining });
+      panel.io.emit('api.stats', { timestamp: Date.now(), call: 'getClipById', api: 'kraken', endpoint: url, code: `${e.status} ${get(e, 'body.message', e.statusText)}`, remaining: this.calls.bot.remaining });
       return null;
     }
   }
 
   async getTopClips (opts) {
-    let url = 'https://api.twitch.tv/helix/clips?broadcaster_id=' + global.oauth.channelId;
-    const token = global.oauth.botAccessToken;
+    let url = 'https://api.twitch.tv/helix/clips?broadcaster_id=' + oauth.channelId;
+    const token = oauth.botAccessToken;
     try {
       if (token === '') {
         throw Error('No broadcaster access token');
@@ -1745,7 +1723,7 @@ class API extends Core {
       this.calls.bot.refresh = request.headers['ratelimit-reset'];
       this.calls.bot.limit = request.headers['ratelimit-limit'];
 
-      global.panel.io.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'getClipById', api: 'kraken', endpoint: url, code: request.status, remaining: this.calls.bot.remaining });
+      panel.io.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'getClipById', api: 'kraken', endpoint: url, code: request.status, remaining: this.calls.bot.remaining });
       // get mp4 from thumbnail
       for (const c of request.data.data) {
         c.mp4 = c.thumbnail_url.replace('-preview-480x272.jpg', '.mp4');
@@ -1754,12 +1732,11 @@ class API extends Core {
       return request.data.data;
     } catch (e) {
       error(`API: ${url} - ${e.stack}`);
-      if (global.panel && global.panel.io) {
-        global.panel.io.emit('api.stats', { timestamp: Date.now(), call: 'getTopClips', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack });
+      if (panel && panel.io) {
+        panel.io.emit('api.stats', { timestamp: Date.now(), call: 'getTopClips', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack });
       }
     }
   }
 }
 
-export default API;
-export { API };
+export default new API();

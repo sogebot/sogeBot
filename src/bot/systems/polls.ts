@@ -5,7 +5,7 @@ import { getLocalizedName, getOwner, prepare, sendMessage } from '../commons.js'
 import { command, default_permission, helper, settings } from '../decorators';
 import { onBit, onMessage, onTip } from '../decorators/on';
 import Expects from '../expects.js';
-import { permission } from '../permissions';
+import { permission } from '../helpers/permissions';
 import System from './_interface';
 
 import { warning } from '../helpers/log.js';
@@ -13,6 +13,9 @@ import { adminEndpoint } from '../helpers/socket';
 
 import { getRepository } from 'typeorm';
 import { Poll, PollVote } from '../database/entity/poll';
+import oauth from '../oauth';
+import { translate } from '../translate';
+import currency from '../currency';
 
 enum ERROR {
   NOT_ENOUGH_OPTIONS,
@@ -153,7 +156,7 @@ class Polls extends System {
     } catch (e) {
       switch (e.message) {
         case String(ERROR.ALREADY_CLOSED):
-          sendMessage(global.translate('systems.polls.notInProgress'), opts.sender, opts.attr);
+          sendMessage(translate('systems.polls.notInProgress'), opts.sender, opts.attr);
           break;
       }
       return false;
@@ -208,7 +211,7 @@ class Polls extends System {
     } catch (e) {
       switch (e.message) {
         case String(ERROR.NOT_ENOUGH_OPTIONS):
-          sendMessage(global.translate('voting.notEnoughOptions'), opts.sender, opts.attr);
+          sendMessage(translate('voting.notEnoughOptions'), opts.sender, opts.attr);
           break;
         case String(ERROR.ALREADY_OPENED):
           if (!cVote) {
@@ -231,7 +234,7 @@ class Polls extends System {
           break;
         default:
           warning(e.stack);
-          sendMessage(global.translate('core.error'), opts.sender, opts.attr);
+          sendMessage(translate('core.error'), opts.sender, opts.attr);
       }
       return false;
     }
@@ -350,7 +353,7 @@ class Polls extends System {
           const vote = new PollVote();
           vote.poll = cVote;
           vote.option = i - 1;
-          vote.votes = Number(global.currency.exchange(opts.amount, opts.currency, global.currency.mainCurrency));
+          vote.votes = Number(currency.exchange(opts.amount, opts.currency, currency.mainCurrency));
           vote.votedBy = opts.username;
           // no update as we will not switch vote option as in normal vote
           await getRepository(PollVote).save(vote);
@@ -405,9 +408,9 @@ class Polls extends System {
         title: vote.title,
         command: this.getCommand('!vote'),
       }), {
-        username: global.oauth.botUsername,
-        displayName: global.oauth.botUsername,
-        userId: Number(global.oauth.botId),
+        username: oauth.botUsername,
+        displayName: oauth.botUsername,
+        userId: Number(oauth.botId),
         emotes: [],
         badges: {},
         'message-type': 'chat',
@@ -416,9 +419,9 @@ class Polls extends System {
         setTimeout(() => {
           if (vote.type === 'normal') {
             sendMessage(this.getCommand('!vote') + ` ${(Number(index) + 1)} => ${vote.options[index]}`, {
-              username: global.oauth.botUsername,
-              displayName: global.oauth.botUsername,
-              userId: Number(global.oauth.botId),
+              username: oauth.botUsername,
+              displayName: oauth.botUsername,
+              userId: Number(oauth.botId),
               emotes: [],
               badges: {},
               'message-type': 'chat',
@@ -426,9 +429,9 @@ class Polls extends System {
           } else {
             sendMessage(`#vote${(Number(index) + 1)} => ${vote.options[index]}`, {
 
-              username: global.oauth.botUsername,
-              displayName: global.oauth.botUsername,
-              userId: Number(global.oauth.botId),
+              username: oauth.botUsername,
+              displayName: oauth.botUsername,
+              userId: Number(oauth.botId),
               emotes: [],
               badges: {},
               'message-type': 'chat',
@@ -440,5 +443,4 @@ class Polls extends System {
   }
 }
 
-export default Polls;
-export { Polls };
+export default new Polls();

@@ -5,6 +5,10 @@ const db = require('../../general.js').db;
 const uuid = require('uuid/v4');
 const message = require('../../general.js').message;
 
+const timers = (require('../../../dest/systems/timers')).default;
+
+const { linesParsed } = require('../../../dest/helpers/parser');
+
 // users
 const owner = { username: 'soge__' };
 
@@ -22,7 +26,7 @@ describe('Timers - list()', () => {
     timer.triggerEverySecond = 60;
     timer.isEnabled = true;
     timer.triggeredAtTimestamp = Date.now();
-    timer.triggeredAtMessage = global.linesParsed;
+    timer.triggeredAtMessage = linesParsed;
     await getRepository(Timer).save(timer);
 
     let timer2 = new Timer();
@@ -31,7 +35,7 @@ describe('Timers - list()', () => {
     timer2.triggerEverySecond = 60;
     timer2.isEnabled = false;
     timer2.triggeredAtTimestamp = Date.now();
-    timer2.triggeredAtMessage = global.linesParsed;
+    timer2.triggeredAtMessage = linesParsed;
     timer2.responses = [];
     timer2 = await getRepository(Timer).save(timer2);
 
@@ -51,17 +55,17 @@ describe('Timers - list()', () => {
   });
 
   it('', async () => {
-    global.systems.timers.list({ sender: owner, parameters: '' });
+    timers.list({ sender: owner, parameters: '' });
     await message.isSentRaw(`@${owner.username}, timers list: ⚫ test, ⚪ test2`, owner);
   });
 
   it('-name unknown', async () => {
-    global.systems.timers.list({ sender: owner, parameters: '-name unknown' });
+    timers.list({ sender: owner, parameters: '-name unknown' });
     await message.isSent('timers.timer-not-found', owner, { name: 'unknown', sender: owner.username });
   });
 
   it('-name test2', async () => {
-    global.systems.timers.list({ sender: owner, parameters: '-name test2' });
+    timers.list({ sender: owner, parameters: '-name test2' });
 
     const response1 = await getRepository(TimerResponse).findOne({ response: 'Lorem Ipsum' });
     const response2 = await getRepository(TimerResponse).findOne({ response: 'Lorem Ipsum 2' });

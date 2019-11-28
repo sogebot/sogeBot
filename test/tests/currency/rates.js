@@ -3,6 +3,7 @@
 
 require('../../general.js');
 
+const currency = (require('../../../dest/currency')).default;
 const assert = require('chai').assert;
 
 describe('Currency - rates check', () => {
@@ -43,21 +44,21 @@ describe('Currency - rates check', () => {
   };
 
   before(async () => {
-    global.currency.rates = rates;
+    currency.rates = rates;
   });
 
   describe('rates should be correctly calculated between each other', () => {
     for (const base of Object.keys(rates)) {
       before(() => {
-        global.currency.base = base;
+        currency.base = base;
       });
       it(`Checking if all rates are correctly computed with '${base}' as base`, async () => {
         for (const to of Object.keys(rates)) {
           for (const from of Object.keys(rates)) {
             if (from === to) {
-              assert.strictEqual(global.currency.exchange(1, from, to), 1);
+              assert.strictEqual(currency.exchange(1, from, to), 1);
             } else {
-              assert.notEqual(global.currency.exchange(1, from, to), 1);
+              assert.notEqual(currency.exchange(1, from, to), 1);
             }
           }
         }

@@ -5,7 +5,7 @@ import { isMainThread } from '../cluster';
 
 import { getOwner, prepare, sendMessage } from '../commons';
 import { command, default_permission, parser, settings } from '../decorators';
-import { permission } from '../permissions';
+import { permission } from '../helpers/permissions';
 import System from './_interface';
 import { adminEndpoint } from '../helpers/socket';
 
@@ -13,6 +13,10 @@ import { getRepository } from 'typeorm';
 import { User } from '../database/entity/user';
 import { Raffle, RaffleParticipant, RaffleParticipantMessage } from '../database/entity/raffle';
 import { warning } from '../helpers/log';
+import api from '../api';
+import oauth from '../oauth';
+import points from './points';
+import { isDbConnected } from '../helpers/database';
 
 const TYPE_NORMAL = 0;
 const TYPE_TICKETS = 1;
@@ -119,8 +123,13 @@ class Raffles extends System {
 
   async announce () {
     clearTimeout(this.timeouts.raffleAnnounce);
+    if (!isDbConnected) {
+      this.timeouts.raffleAnnounce = global.setTimeout(() => this.announce(), 1000);
+      return;
+    }
+
     const raffle = await getRepository(Raffle).findOne({ winner: null });
-    if (!(global.api.isStreamOnline) || !raffle || new Date().getTime() - new Date(this.lastAnnounce).getTime() < (this.raffleAnnounceInterval * 60 * 1000)) {
+    if (!(api.isStreamOnline) || !raffle || new Date().getTime() - new Date(this.lastAnnounce).getTime() < (this.raffleAnnounceInterval * 60 * 1000)) {
       this.timeouts.raffleAnnounce = global.setTimeout(() => this.announce(), 60000);
       return;
     }
@@ -150,9 +159,9 @@ class Raffles extends System {
       eligibility: eligibility.join(', '),
     });
     sendMessage(message, {
-      username: global.oauth.botUsername,
-      displayName: global.oauth.botUsername,
-      userId: Number(global.oauth.botId),
+      username: oauth.botUsername,
+      displayName: oauth.botUsername,
+      userId: Number(oauth.botId),
       emotes: [],
       badges: {},
       'message-type': 'chat',
@@ -178,7 +187,7 @@ class Raffles extends System {
   async open (opts) {
     const [followers, subscribers] = [opts.parameters.indexOf('followers') >= 0, opts.parameters.indexOf('subscribers') >= 0];
     let type = (opts.parameters.indexOf('-min') >= 0 || opts.parameters.indexOf('-max') >= 0) ? TYPE_TICKETS : TYPE_NORMAL;
-    if (!global.systems.points.enabled) {
+    if (!points.enabled) {
       type = TYPE_NORMAL;
     } // force normal type if points are disabled
 
@@ -244,9 +253,9 @@ class Raffles extends System {
       max: maxTickets,
     });
     sendMessage(message, {
-      username: global.oauth.botUsername,
-      displayName: global.oauth.botUsername,
-      userId: Number(global.oauth.botId),
+      username: oauth.botUsername,
+      displayName: oauth.botUsername,
+      userId: Number(oauth.botId),
       emotes: [],
       badges: {},
       'message-type': 'chat',
@@ -288,9 +297,9 @@ class Raffles extends System {
       eligibility: eligibility.join(', '),
     });
     sendMessage(message, {
-      username: global.oauth.botUsername,
-      displayName: global.oauth.botUsername,
-      userId: Number(global.oauth.botId),
+      username: oauth.botUsername,
+      displayName: oauth.botUsername,
+      userId: Number(oauth.botId),
       emotes: [],
       badges: {},
       'message-type': 'chat',
@@ -325,7 +334,7 @@ class Raffles extends System {
     }
 
     opts.message = opts.message.toString().replace(raffle.keyword, '');
-    let tickets = opts.message.trim() === 'all' && !_.isNil(await global.systems.points.getPointsOf(opts.sender.userId)) ? await global.systems.points.getPointsOf(opts.sender.userId) : parseInt(opts.message.trim(), 10);
+    let tickets = opts.message.trim() === 'all' && !_.isNil(await points.getPointsOf(opts.sender.userId)) ? await points.getPointsOf(opts.sender.userId) : parseInt(opts.message.trim(), 10);
 
     if ((!_.isFinite(tickets) || tickets <= 0 || tickets > raffle.maxTickets || tickets < raffle.minTickets) && raffle.type === TYPE_TICKETS) {
       return false;
@@ -357,7 +366,7 @@ class Raffles extends System {
     participant.isFollower = user.isFollower;
     participant.isSubscriber = user.isSubscriber;
 
-    if (raffle.type === TYPE_TICKETS && await global.systems.points.getPointsOf(opts.sender.userId) < tickets) {
+    if (raffle.type === TYPE_TICKETS && await points.getPointsOf(opts.sender.userId) < tickets) {
       return false;
     } // user doesn't have enough points
 
@@ -394,9 +403,9 @@ class Raffles extends System {
     if (raffle.participants.length === 0) {
       const message = await prepare('raffles.no-participants-to-pick-winner');
       sendMessage(message, {
-        username: global.oauth.botUsername,
-        displayName: global.oauth.botUsername,
-        userId: Number(global.oauth.botId),
+        username: oauth.botUsername,
+        displayName: oauth.botUsername,
+        userId: Number(oauth.botId),
         emotes: [],
         badges: {},
         'message-type': 'chat',
@@ -472,9 +481,9 @@ class Raffles extends System {
         probability: _.round(probability, 2),
       });
       sendMessage(message, {
-        username: global.oauth.botUsername,
-        displayName: global.oauth.botUsername,
-        userId: Number(global.oauth.botId),
+        username: oauth.botUsername,
+        displayName: oauth.botUsername,
+        userId: Number(oauth.botId),
         emotes: [],
         badges: {},
         'message-type': 'chat',
@@ -491,5 +500,4 @@ class Raffles extends System {
   }
 }
 
-export default Raffles;
-export { Raffles };
+export default new Raffles();

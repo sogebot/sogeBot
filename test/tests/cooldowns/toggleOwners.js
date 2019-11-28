@@ -6,6 +6,8 @@ const assert = require('chai').assert;
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 
+const cooldown = (require('../../../dest/systems/cooldown')).default;
+
 // users
 const owner = { userId: Math.floor(Math.random() * 100000), username: 'soge__', badges: {} };
 
@@ -17,26 +19,26 @@ describe('Cooldowns - toggleOwners()', () => {
 
   it('incorrect toggle', async () => {
     const [command, type, seconds, quiet] = ['!me', 'user', '60', true];
-    global.systems.cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` });
+    cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` });
     await message.isSent('cooldowns.cooldown-was-set', owner, { command: command, type: type, seconds: seconds, sender: owner.username });
 
-    global.systems.cooldown.toggleOwners({ sender: owner, parameters: command });
+    cooldown.toggleOwners({ sender: owner, parameters: command });
     await message.isSent('cooldowns.cooldown-parse-failed', owner, { sender: owner.username });
   });
 
   it('correct toggle', async () => {
     const [command, type, seconds, quiet] = ['!me', 'user', '60', true];
-    global.systems.cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` });
+    cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` });
     await message.isSent('cooldowns.cooldown-was-set', owner, { command: command, type: type, seconds: seconds, sender: owner.username });
 
-    global.systems.cooldown.toggleOwners({ sender: owner, parameters: `${command} ${type}` });
+    cooldown.toggleOwners({ sender: owner, parameters: `${command} ${type}` });
     await message.isSent('cooldowns.cooldown-was-enabled-for-owners', owner, { command: command, sender: owner.username });
-    let isOk = await global.systems.cooldown.check({ sender: owner, message: '!me' });
+    let isOk = await cooldown.check({ sender: owner, message: '!me' });
     assert.isTrue(isOk);
-    isOk = await global.systems.cooldown.check({ sender: owner, message: '!me' });
+    isOk = await cooldown.check({ sender: owner, message: '!me' });
     assert.isFalse(isOk);
 
-    global.systems.cooldown.toggleOwners({ sender: owner, parameters: `${command} ${type}` });
+    cooldown.toggleOwners({ sender: owner, parameters: `${command} ${type}` });
     await message.isSent('cooldowns.cooldown-was-disabled-for-owners', owner, { command: command, sender: owner.username });
   });
 });

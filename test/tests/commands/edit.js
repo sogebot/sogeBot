@@ -6,7 +6,8 @@ const _ = require('lodash');
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 
-const { permission } = require('../../../dest/permissions');
+const customcommands = (require('../../../dest/systems/customcommands')).default;
+const { permission } = require('../../../dest/helpers/permissions');
 
 const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/database/entity/user');
@@ -60,7 +61,7 @@ describe('Custom Commands - edit()', () => {
   describe('Expected parsed fail', () => {
     for (const t of parseFailedTests) {
       it(generateCommand(t), async () => {
-        global.systems.customCommands.edit({ sender: owner, parameters: generateCommand(t) });
+        customcommands.edit({ sender: owner, parameters: generateCommand(t) });
         await message.isSent('customcmds.commands-parse-failed', owner, { sender: owner.username });
       });
     }
@@ -69,7 +70,7 @@ describe('Custom Commands - edit()', () => {
   describe('Expected command not found', () => {
     for (const t of unknownCommandTests) {
       it(generateCommand(t), async () => {
-        global.systems.customCommands.edit({ sender: owner, parameters: generateCommand(t) });
+        customcommands.edit({ sender: owner, parameters: generateCommand(t) });
         await message.isSent('customcmds.command-was-not-found', owner, { command: t.command, sender: owner.username });
       });
     }
@@ -79,10 +80,10 @@ describe('Custom Commands - edit()', () => {
     for (const t of unknownResponseTests) {
       it(generateCommand(t), async () => {
         const add = _.cloneDeep(t); delete add.rid;
-        global.systems.customCommands.add({ sender: owner, parameters: generateCommand(add) });
+        customcommands.add({ sender: owner, parameters: generateCommand(add) });
         await message.isSent('customcmds.command-was-added', owner, { command: t.command, response: t.response, sender: owner.username });
 
-        global.systems.customCommands.edit({ sender: owner, parameters: generateCommand(t) });
+        customcommands.edit({ sender: owner, parameters: generateCommand(t) });
         await message.isSent('customcmds.response-was-not-found', owner, { command: t.command, response: t.rid, sender: owner.username });
       });
     }
@@ -92,32 +93,32 @@ describe('Custom Commands - edit()', () => {
     for (const t of successTests) {
       it(generateCommand(t), async () => {
         const add = _.cloneDeep(t); delete add.rid;
-        global.systems.customCommands.add({ sender: owner, parameters: generateCommand(add) });
+        customcommands.add({ sender: owner, parameters: generateCommand(add) });
         await message.isSent('customcmds.command-was-added', owner, { command: t.command, response: t.response, sender: owner.username });
 
-        global.systems.customCommands.run({ sender: owner, message: t.command });
+        customcommands.run({ sender: owner, message: t.command });
         await message.isSentRaw(t.response, owner);
 
         const edit = _.cloneDeep(t);
         edit.response = edit.edit;
-        global.systems.customCommands.edit({ sender: owner, parameters: generateCommand(edit) });
+        customcommands.edit({ sender: owner, parameters: generateCommand(edit) });
         await message.isSent('customcmds.command-was-edited', owner, { command: t.command, response: t.edit, sender: owner.username });
 
-        global.systems.customCommands.run({ sender: owner, message: t.command });
+        customcommands.run({ sender: owner, message: t.command });
         await message.isSentRaw(t.edit, owner);
       });
     }
     it('!a Lorem Ipsum -> !a Ipsum Lorem', async () => {
-      global.systems.customCommands.add({ sender: owner, parameters: '-c !a -r Lorem Ipsum' });
+      customcommands.add({ sender: owner, parameters: '-c !a -r Lorem Ipsum' });
       await message.isSent('customcmds.command-was-added', owner, { command: '!a', response: 'Lorem Ipsum', sender: owner.username });
 
-      global.systems.customCommands.run({ sender: owner, message: '!a' });
+      customcommands.run({ sender: owner, message: '!a' });
       await message.isSentRaw('Lorem Ipsum', owner);
 
-      global.systems.customCommands.edit({ sender: owner, parameters: '-c !a -rid 1 -r Ipsum Lorem' });
+      customcommands.edit({ sender: owner, parameters: '-c !a -rid 1 -r Ipsum Lorem' });
       await message.isSent('customcmds.command-was-edited', owner, { command: '!a', response: 'Ipsum Lorem', sender: owner.username });
 
-      global.systems.customCommands.run({ sender: owner, message: '!a' });
+      customcommands.run({ sender: owner, message: '!a' });
       await message.isSentRaw('Ipsum Lorem', owner);
     });
   });

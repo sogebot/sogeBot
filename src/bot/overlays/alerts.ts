@@ -2,8 +2,9 @@ import { isNil } from 'lodash';
 
 import { command, default_permission, ui } from '../decorators';
 import Message from '../message';
-import { permission } from '../permissions';
+import { permission } from '../helpers/permissions';
 import Overlay from './_interface';
+import api from '../api';
 
 class Alerts extends Overlay {
   @ui({
@@ -46,9 +47,9 @@ class Alerts extends Overlay {
       // load clip from api
         let clip: { data: any } = { data: [] };
         if (!isNil(object.id)) {
-          clip = await global.api.getClipById(object.id);
+          clip = await api.getClipById(object.id);
         } else if (!isNil(object.url)) {
-          clip = await global.api.getClipById(object.url.split('/').pop());
+          clip = await api.getClipById(object.url.split('/').pop());
         }
         for (const c of clip.data) {
           object.url = c.thumbnail_url.replace('-preview-480x272.jpg', '.mp4');
@@ -60,5 +61,4 @@ class Alerts extends Overlay {
   }
 }
 
-export default Alerts;
-export { Alerts };
+export default new Alerts();

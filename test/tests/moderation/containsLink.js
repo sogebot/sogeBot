@@ -9,6 +9,8 @@ const message = require('../../general.js').message;
 const user = require('../../general.js').user;
 const assert = require('chai').assert;
 
+const moderation = (require('../../../dest/systems/moderation')).default;
+
 const tests = {
   'clips': [
     'clips.twitch.tv/TolerantExquisiteDuckOneHand',
@@ -65,10 +67,8 @@ describe('systems/moderation - containsLink()', () => {
       await message.prepare();
       await user.prepare();
 
-      global.systems.moderation.cLinksIncludeSpaces = true;
-      await variable.isEqual('systems.moderation.cLinksIncludeSpaces', true);
-      global.systems.moderation.cLinksIncludeClips = true;
-      await variable.isEqual('systems.moderation.cLinksIncludeClips', true);
+      moderation.cLinksIncludeSpaces = true;
+      moderation.cLinksIncludeClips = true;
     });
 
     for (const [type, listOfTests] of Object.entries(tests)) {
@@ -77,7 +77,7 @@ describe('systems/moderation - containsLink()', () => {
         for (const protocol of protocols) {
           for (const test of listOfTests) {
             it(`link '${protocol}${test}' should timeout`, async () => {
-              assert.isFalse(await global.systems.moderation.containsLink({ sender: user.viewer, message: protocol + test }));
+              assert.isFalse(await moderation.containsLink({ sender: user.viewer, message: protocol + test }));
             });
           }
         }
@@ -88,7 +88,7 @@ describe('systems/moderation - containsLink()', () => {
         for (const protocol of protocols) {
           for (const test of listOfTests) {
             it(`clip '${protocol}${test}' should timeout`, async () => {
-              assert.isFalse(await global.systems.moderation.containsLink({ sender: user.viewer, message: protocol + test }));
+              assert.isFalse(await moderation.containsLink({ sender: user.viewer, message: protocol + test }));
             });
           }
         }
@@ -97,7 +97,7 @@ describe('systems/moderation - containsLink()', () => {
       if (type === 'texts') {
         for (const test of listOfTests) {
           it(`text '${test}' should not timeout`, async () => {
-            assert.isTrue(await global.systems.moderation.containsLink({ sender: user.viewer, message: test }));
+            assert.isTrue(await moderation.containsLink({ sender: user.viewer, message: test }));
           });
         }
       }
@@ -109,10 +109,8 @@ describe('systems/moderation - containsLink()', () => {
       await message.prepare();
       await user.prepare();
 
-      global.systems.moderation.cLinksIncludeSpaces = true;
-      await variable.isEqual('systems.moderation.cLinksIncludeSpaces', true);
-      global.systems.moderation.cLinksIncludeClips = false;
-      await variable.isEqual('systems.moderation.cLinksIncludeClips', false);
+      moderation.cLinksIncludeSpaces = true;
+      moderation.cLinksIncludeClips = false;
     });
 
     for (const [type, listOfTests] of Object.entries(tests)) {
@@ -121,7 +119,7 @@ describe('systems/moderation - containsLink()', () => {
         for (const protocol of protocols) {
           for (const test of listOfTests) {
             it(`link '${protocol}${test}' should timeout`, async () => {
-              assert.isFalse(await global.systems.moderation.containsLink({ sender: user.viewer, message: protocol + test }));
+              assert.isFalse(await moderation.containsLink({ sender: user.viewer, message: protocol + test }));
             });
           }
         }
@@ -132,7 +130,7 @@ describe('systems/moderation - containsLink()', () => {
         for (const protocol of protocols) {
           for (const test of listOfTests) {
             it(`clip '${protocol}${test}' should not timeout`, async () => {
-              assert.isTrue(await global.systems.moderation.containsLink({ sender: user.viewer, message: protocol + test }));
+              assert.isTrue(await moderation.containsLink({ sender: user.viewer, message: protocol + test }));
             });
           }
         }
@@ -141,7 +139,7 @@ describe('systems/moderation - containsLink()', () => {
       if (type === 'texts') {
         for (const test of listOfTests) {
           it(`text '${test}' should not timeout`, async () => {
-            assert.isTrue(await global.systems.moderation.containsLink({ sender: user.viewer, message: test }));
+            assert.isTrue(await moderation.containsLink({ sender: user.viewer, message: test }));
           });
         }
       }
@@ -153,10 +151,8 @@ describe('systems/moderation - containsLink()', () => {
       await message.prepare();
       await user.prepare();
 
-      global.systems.moderation.cLinksIncludeSpaces = false;
-      await variable.isEqual('systems.moderation.cLinksIncludeSpaces', false);
-      global.systems.moderation.cLinksIncludeClips = true;
-      await variable.isEqual('systems.moderation.cLinksIncludeClips', true);
+      moderation.cLinksIncludeSpaces = false;
+      moderation.cLinksIncludeClips = true;
     });
 
     for (const [type, listOfTests] of Object.entries(tests)) {
@@ -166,11 +162,11 @@ describe('systems/moderation - containsLink()', () => {
           for (const test of listOfTests) {
             if (test.indexOf(' ') > -1 && test.toLowerCase().indexOf('www. ') === -1) { // even if moderationLinksWithSpaces is false - www. google.com should be timeouted
               it(`link '${protocol}${test}' should not timeout`, async () => {
-                assert.isTrue(await global.systems.moderation.containsLink({ sender: user.viewer, message: protocol + test }));
+                assert.isTrue(await moderation.containsLink({ sender: user.viewer, message: protocol + test }));
               });
             } else {
               it(`link '${protocol}${test}' should timeout`, async () => {
-                assert.isFalse(await global.systems.moderation.containsLink({ sender: user.viewer, message: protocol + test }));
+                assert.isFalse(await moderation.containsLink({ sender: user.viewer, message: protocol + test }));
               });
             }
           }
@@ -182,7 +178,7 @@ describe('systems/moderation - containsLink()', () => {
         for (const protocol of protocols) {
           for (const test of listOfTests) {
             it(`clip '${protocol}${test}' should timeout`, async () => {
-              assert.isFalse(await global.systems.moderation.containsLink({ sender: user.viewer, message: test }));
+              assert.isFalse(await moderation.containsLink({ sender: user.viewer, message: test }));
             });
           }
         }
@@ -191,7 +187,7 @@ describe('systems/moderation - containsLink()', () => {
       if (type === 'texts') {
         for (const test of listOfTests) {
           it(`text '${test}' should not timeout`, async () => {
-            assert.isTrue(await global.systems.moderation.containsLink({ sender: user.viewer, message: test }));
+            assert.isTrue(await moderation.containsLink({ sender: user.viewer, message: test }));
           });
         }
       }

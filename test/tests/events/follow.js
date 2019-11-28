@@ -13,6 +13,8 @@ const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/database/entity/user');
 const { Event } = require('../../../dest/database/entity/event');
 
+const events = (require('../../../dest/events')).default;
+
 describe('Events - follow event', () => {
   before(async () => {
     await db.cleanup();
@@ -51,7 +53,7 @@ describe('Events - follow event', () => {
 
     for (const username of ['losslezos', 'rigneir', 'mikasa_hraje', 'foufhs']) {
       it('trigger follow event', async () => {
-        await global.events.fire('follow', { username, userId: Math.floor(Math.random() * 100000), webhooks: _.random(1) === 1 });
+        await events.fire('follow', { username, userId: Math.floor(Math.random() * 100000), webhooks: _.random(1) === 1 });
       });
 
       it('message should be send', async () => {

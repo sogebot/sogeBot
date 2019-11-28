@@ -7,6 +7,9 @@ require('../../general.js');
 const db = require('../../general.js').db;
 const variable = require('../../general.js').variable;
 const message = require('../../general.js').message;
+const alias = (require('../../../dest/systems/alias')).default;
+const moderation = (require('../../../dest/systems/moderation')).default;
+const songs = (require('../../../dest/systems/songs')).default;
 
 // users
 const owner = { username: 'soge__' };
@@ -169,22 +172,22 @@ describe('systems/moderation - whitelist()', () => {
     await db.cleanup();
     await message.prepare();
 
-    global.systems.alias.add({ sender: owner, parameters: '-a !sr -c !songrequest' });
+    alias.add({ sender: owner, parameters: '-a !sr -c !songrequest' });
     await message.isSent('alias.alias-was-added', owner, { alias: '!sr', command: '!songrequest', sender: owner.username });
   });
 
   for (const [pattern, test] of Object.entries(tests)) {
     for (const text of _.get(test, 'should.return.changed', [])) {
       it(`pattern '${pattern}' should change '${text}'`, async () => {
-        global.systems.moderation.cListsWhitelist = [pattern];
-        const result = await global.systems.moderation.whitelist(text, '0efd7b1c-e460-4167-8e06-8aaf2c170311');
+        moderation.cListsWhitelist = [pattern];
+        const result = await moderation.whitelist(text, '0efd7b1c-e460-4167-8e06-8aaf2c170311');
         assert.isTrue(text !== result);
       });
     }
     for (const text of _.get(test, 'should.return.same', [])) {
       it(`pattern '${pattern}' should not change '${text}'`, async () => {
-        global.systems.moderation.cListsWhitelist = [pattern];
-        const result = await global.systems.moderation.whitelist(text, '0efd7b1c-e460-4167-8e06-8aaf2c170311');
+        moderation.cListsWhitelist = [pattern];
+        const result = await moderation.whitelist(text, '0efd7b1c-e460-4167-8e06-8aaf2c170311');
         assert.isTrue(text === result);
       });
     }
@@ -192,12 +195,12 @@ describe('systems/moderation - whitelist()', () => {
 
   describe(`#2392 - changed !songrequest => !zahrej should be whitelisted`, () => {
     it('change command from !songrequest => !zahrej', async () => {
-      await global.systems.songs.setCommand('!songrequest', '!zahrej');
+      await songs.setCommand('!songrequest', '!zahrej');
     });
 
     it('!zahrej command should be whitelisted', async () => {
       const text = '!zahrej https://youtu.be/HmZYgqBp1gI';
-      const result = await global.systems.moderation.whitelist(text, '0efd7b1c-e460-4167-8e06-8aaf2c170311');
+      const result = await moderation.whitelist(text, '0efd7b1c-e460-4167-8e06-8aaf2c170311');
       assert.isTrue(text !== result);
     });
   });

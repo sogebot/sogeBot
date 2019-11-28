@@ -2,6 +2,7 @@ import { getTime } from '../commons';
 import { ui } from '../decorators';
 import Overlay from './_interface';
 import { publicEndpoint } from '../helpers/socket';
+import api from '../api';
 
 class Stats extends Overlay {
   @ui({
@@ -16,16 +17,15 @@ class Stats extends Overlay {
   sockets () {
     publicEndpoint(this.nsp, 'get', async (cb) => {
       const stats = {
-        uptime: getTime(global.api.isStreamOnline ? global.api.streamStatusChangeSince : 0, false),
-        viewers: global.api.stats.currentViewers,
-        followers: global.api.stats.currentFollowers,
-        subscribers: global.api.stats.currentSubscribers,
-        bits: global.api.stats.currentBits,
+        uptime: getTime(api.isStreamOnline ? api.streamStatusChangeSince : 0, false),
+        viewers: api.stats.currentViewers,
+        followers: api.stats.currentFollowers,
+        subscribers: api.stats.currentSubscribers,
+        bits: api.stats.currentBits,
       };
       cb(stats);
     });
   }
 }
 
-export default Stats;
-export { Stats };
+export default new Stats();

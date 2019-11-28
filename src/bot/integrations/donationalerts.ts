@@ -12,9 +12,15 @@ import { triggerInterfaceOnTip } from '../helpers/interface/triggers.js';
 
 import { getRepository } from 'typeorm';
 import { User, UserTip } from '../database/entity/user';
+import api from '../api.js';
+import events from '../events.js';
+import users from '../users.js';
+import eventlist from '../overlays/eventlist.js';
+import currency from '../currency';
+import alerts from '../registries/alerts.js';
 
 class Donationalerts extends Integration {
-  socket: SocketIOClient.Socket | null = null;
+  socketToDonationAlerts: SocketIOClient.Socket | null = null;
 
   @settings()
   @ui({ type: 'text-input', secret: true })
@@ -39,9 +45,9 @@ class Donationalerts extends Integration {
   }
 
   async disconnect () {
-    if (this.socket !== null) {
-      this.socket.removeAllListeners();
-      this.socket.disconnect();
+    if (this.socketToDonationAlerts !== null) {
+      this.socketToDonationAlerts.removeAllListeners();
+      this.socketToDonationAlerts.disconnect();
     }
   }
 
@@ -53,7 +59,7 @@ class Donationalerts extends Integration {
       return;
     }
 
-    this.socket = require('socket.io-client').connect('wss://socket.donationalerts.ru:443',
+    this.socketToDonationAlerts = require('socket.io-client').connect('wss://socket.donationalerts.ru:443',
       {
         reconnection: true,
         reconnectionDelay: 1000,
@@ -61,29 +67,29 @@ class Donationalerts extends Integration {
         reconnectionAttempts: Infinity,
       });
 
-    if (this.socket !== null) {
-      this.socket.on('connect', () => {
-        if (this.socket !== null) {
-          this.socket.emit('add-user', { token: this.secretToken, type: 'minor' });
+    if (this.socketToDonationAlerts !== null) {
+      this.socketToDonationAlerts.on('connect', () => {
+        if (this.socketToDonationAlerts !== null) {
+          this.socketToDonationAlerts.emit('add-user', { token: this.secretToken, type: 'minor' });
         }
         info(chalk.yellow('DONATIONALERTS.RU:') + ' Successfully connected socket to service');
       });
-      this.socket.on('reconnect_attempt', () => {
+      this.socketToDonationAlerts.on('reconnect_attempt', () => {
         info(chalk.yellow('DONATIONALERTS.RU:') + ' Trying to reconnect to service');
       });
-      this.socket.on('disconnect', () => {
+      this.socketToDonationAlerts.on('disconnect', () => {
         info(chalk.yellow('DONATIONALERTS.RU:') + ' Socket disconnected from service');
         this.disconnect();
-        this.socket = null;
+        this.socketToDonationAlerts = null;
       });
 
-      this.socket.off('donation').on('donation', async (data) => {
+      this.socketToDonationAlerts.off('donation').on('donation', async (data) => {
         data = JSON.parse(data);
         if (parseInt(data.alert_type, 10) !== 1) {
           return;
         }
         const additionalData = JSON.parse(data.additional_data);
-        global.overlays.eventlist.add({
+        eventlist.add({
           event: 'tip',
           amount: data.amount,
           currency: data.currency,
@@ -94,15 +100,15 @@ class Donationalerts extends Integration {
           timestamp: Date.now(),
         });
 
-        global.events.fire('tip', {
+        events.fire('tip', {
           username: data.username.toLowerCase(),
           amount: parseFloat(data.amount).toFixed(2),
           currency: data.currency,
-          amountInBotCurrency: parseFloat(global.currency.exchange(data.amount, data.currency, global.currency.mainCurrency)).toFixed(2),
-          currencyInBot: global.currency.mainCurrency,
+          amountInBotCurrency: Number(currency.exchange(data.amount, data.currency, currency.mainCurrency)).toFixed(2),
+          currencyInBot: currency.mainCurrency,
           message: data.message,
         });
-        global.registries.alerts.trigger({
+        alerts.trigger({
           event: 'tips',
           name: data.username.toLowerCase(),
           amount: Number(parseFloat(data.amount).toFixed(2)),
@@ -116,7 +122,7 @@ class Donationalerts extends Integration {
           let user = await getRepository(User).findOne({ where: { username: data.username.toLowerCase() }});
           let id;
           if (!user) {
-            id = await global.users.getIdByName(data.username.toLowerCase());
+            id = await users.getIdByName(data.username.toLowerCase());
             user = await getRepository(User).findOne({ where: { userId: id }});
             if (!user && id) {
               // if we still doesn't have user, we create new
@@ -132,7 +138,7 @@ class Donationalerts extends Integration {
           const newTip = new UserTip();
           newTip.amount = Number(data.amount);
           newTip.currency = data.currency;
-          newTip.sortAmount = global.currency.exchange(Number(data.amount), data.currency, 'EUR');
+          newTip.sortAmount = currency.exchange(Number(data.amount), data.currency, 'EUR');
           newTip.message = data.message;
           newTip.tippedAt = Date.now();
 
@@ -143,8 +149,8 @@ class Donationalerts extends Integration {
 
           tip(`${data.username.toLowerCase()}${id ? '#' + id : ''}, amount: ${Number(data.amount).toFixed(2)}${data.currency}, message: ${data.message}`);
 
-          if (global.api.isStreamOnline) {
-            global.api.stats.currentTips += parseFloat(global.currency.exchange(data.amount, data.currency, global.currency.mainCurrency));
+          if (api.isStreamOnline) {
+            api.stats.currentTips += Number(currency.exchange(data.amount, data.currency, currency.mainCurrency));
           }
         }
 
@@ -160,5 +166,4 @@ class Donationalerts extends Integration {
   }
 }
 
-export default Donationalerts;
-export { Donationalerts };
+export default new Donationalerts();

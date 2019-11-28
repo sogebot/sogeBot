@@ -9,6 +9,8 @@ const _ = require('lodash');
 const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/database/entity/user');
 
+const points = (require('../../../dest/systems/points')).default;
+
 const hugePointsUser = { username: 'hugeuser', points: 99999999999999999999999999999999, userId: Number(_.random(999999, false)) };
 const tinyPointsUser = { username: 'tinyuser', points: 100, userId: Number(_.random(999999, false)) };
 
@@ -24,11 +26,11 @@ describe('Points - get()', () => {
     });
 
     it('points should be returned in safe points bounds', async () => {
-      await global.systems.points.get({ sender: hugePointsUser, parameters: '' });
+      await points.get({ sender: hugePointsUser, parameters: '' });
       await message.isSent('points.defaults.pointsResponse', { username: hugePointsUser.username }, {
         amount: Math.floor(Number.MAX_SAFE_INTEGER),
         username: hugePointsUser.username,
-        pointsName: await global.systems.points.getPointsName(Math.floor(Number.MAX_SAFE_INTEGER)),
+        pointsName: await points.getPointsName(Math.floor(Number.MAX_SAFE_INTEGER)),
       });
     });
   });
@@ -39,11 +41,11 @@ describe('Points - get()', () => {
     });
 
     it('points should be returned in safe points bounds', async () => {
-      await global.systems.points.get({ sender: tinyPointsUser, parameters: '' });
+      await points.get({ sender: tinyPointsUser, parameters: '' });
       await message.isSent('points.defaults.pointsResponse', { username: tinyPointsUser.username }, {
         amount: 100,
         username: tinyPointsUser.username,
-        pointsName: await global.systems.points.getPointsName(100),
+        pointsName: await points.getPointsName(100),
       });
     });
   });

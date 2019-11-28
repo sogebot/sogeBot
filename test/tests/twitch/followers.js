@@ -15,6 +15,9 @@ const testuser3 = { username: 'testuser3', id: Math.floor(Math.random() * 1000) 
 const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/database/entity/user');
 
+const twitch = (require('../../../dest/twitch')).default;
+const eventlist = (require('../../../dest/overlays/eventlist')).default;
+
 describe('lib/twitch - followers()', () => {
   before(async () => {
     await db.cleanup();
@@ -29,7 +32,7 @@ describe('lib/twitch - followers()', () => {
 
   it('add testuser to event', async () => {
     await time.waitMs(100);
-    await global.overlays.eventlist.add({
+    await eventlist.add({
       event: 'follow',
       username: 'testuser',
     });
@@ -37,14 +40,14 @@ describe('lib/twitch - followers()', () => {
 
   it('add testuser2 to event', async () => {
     await time.waitMs(100);
-    await global.overlays.eventlist.add({
+    await eventlist.add({
       event: 'follow',
       username: 'testuser2',
     });
   });
 
   it('!followers should return testuser2', async () => {
-    global.twitch.followers({ sender: testuser });
+    twitch.followers({ sender: testuser });
     await message.isSent('followers', testuser, {
       lastFollowAgo: 'a few seconds ago',
       lastFollowUsername: testuser2.username,
@@ -54,14 +57,14 @@ describe('lib/twitch - followers()', () => {
 
   it('add testuser3 to events', async () => {
     await time.waitMs(100);
-    await global.overlays.eventlist.add({
+    await eventlist.add({
       event: 'follow',
       username: 'testuser3',
     });
   });
 
   it('!followers should return testuser3', async () => {
-    global.twitch.followers({ sender: testuser });
+    twitch.followers({ sender: testuser });
     await message.isSent('followers', testuser, {
       lastFollowAgo: 'a few seconds ago',
       lastFollowUsername: testuser3.username,
@@ -74,7 +77,7 @@ describe('lib/twitch - followers()', () => {
   });
 
   it('!followers should return testuser3 and 3 online followers', async () => {
-    global.twitch.followers({ sender: testuser });
+    twitch.followers({ sender: testuser });
     await message.isSent('followers', testuser, {
       lastFollowAgo: 'a few seconds ago',
       lastFollowUsername: testuser3.username,

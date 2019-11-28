@@ -5,7 +5,7 @@ import { isMainThread } from './cluster';
 
 import { loadingInProgress, permissions as permissionsList } from './decorators';
 import { getFunctionList } from './decorators/on';
-import { permission } from './permissions';
+import { permission } from './helpers/permissions';
 import { error, info, warning } from './helpers/log';
 
 import { getManager, getRepository } from 'typeorm';
@@ -14,14 +14,17 @@ import { PermissionCommands, Permissions as PermissionsEntity } from './database
 import { adminEndpoint, publicEndpoint } from './helpers/socket';
 import { flatten, unflatten } from './helpers/flatten';
 
+let socket: import('./socket').Socket | any = null;
+let panel: null | any = null;
+
 class Module {
-  public dependsOn: string[] = [];
+  public dependsOn: Module[] = [];
   public showInUI = true;
   public timeouts: { [x: string]: NodeJS.Timeout } = {};
   public settingsList: { category: string; key: string }[] = [];
   public settingsPermList: { category: string; key: string }[] = [];
   public on: InterfaceSettings.On;
-  public socket: SocketIOClient.Socket | null;
+  public socket: any = null;
 
   get isDisabledByEnv(): boolean {
     const isDisableIgnored = typeof process.env.ENABLE !== 'undefined' && process.env.ENABLE.toLowerCase().split(',').includes(this.constructor.name.toLowerCase());
@@ -36,8 +39,7 @@ class Module {
       const check = async (retry) => {
         const status: any[] = [];
         for (const dependency of this.dependsOn) {
-          const dependencyPointer = _.get(global, dependency, null);
-          if (!dependencyPointer || !_.isFunction(dependencyPointer.status)) {
+          if (!dependency || !_.isFunction(dependency.status)) {
             if (retry > 0) {
               setTimeout(() => check(--retry), 10);
             } else {
@@ -45,7 +47,7 @@ class Module {
             }
             return;
           } else {
-            status.push(await dependencyPointer.status({ quiet: true }));
+            status.push(await dependency.status({ quiet: true }));
           }
         }
         resolve(status.length === 0 || _.every(status));
@@ -121,13 +123,17 @@ class Module {
           this.status({ state: this._enabled, quiet: !isMainThread });
           if (isMainThread) {
             const path = this._name === 'core' ? this.constructor.name.toLowerCase() : `${this._name}.${this.constructor.name.toLowerCase()}`;
-            for (const fnc of getFunctionList('startup', path)) {
-              this[fnc]('enabled', value);
+            for (const event of getFunctionList('startup', path)) {
+              this[event.fName]('enabled', value);
             }
           };
         };
         onStartup();
       });
+
+      // require panel/socket
+      socket = (require('./socket')).default;
+      panel = (require('./panel')).default;
     }, 5000); // slow down little bit to have everything preloaded or in progress of loading
 
     setInterval(async () => {
@@ -191,10 +197,10 @@ class Module {
   }
 
   public _sockets() {
-    if (_.isNil(global.panel)) {
+    if (panel === null || socket === null) {
       this.timeouts[`${this.constructor.name}._sockets`] = setTimeout(() => this._sockets(), 1000);
     } else {
-      this.socket = global.panel.io.of(this.nsp).use(global.socket.authorize);
+      this.socket = panel.io.of(this.nsp).use(socket.authorize);
       this.sockets();
       this.sockets = function() {
         error(this.nsp + ': Cannot initialize sockets second time');
@@ -313,8 +319,7 @@ class Module {
     }
   }
 
-  public async status(opts) {
-    opts = opts || {};
+  public async status(opts: any = {}) {
     if (['core', 'overlays', 'widgets', 'stats', 'registries'].includes(this._name) || (opts.state === null && typeof opts.state !== 'undefined')) {
       return true;
     }
@@ -334,14 +339,12 @@ class Module {
 
     // on.change handler on enabled
     if (isMainThread && isStatusChanged) {
-      if (this.on && this.on.change && this.on.change.enabled) {
-        // run on.change functions only on master
-        for (const fnc of this.on.change.enabled) {
-          if (typeof this[fnc] === 'function') {
-            this[fnc]('enabled', opts.state);
-          } else {
-            error(`${fnc}() is not function in ${this._name}/${this.constructor.name.toLowerCase()}`);
-          }
+      const path = this._name === 'core' ? this.constructor.name.toLowerCase() : `${this._name}.${this.constructor.name.toLowerCase()}`;
+      for (const event of getFunctionList('change', path + '.enabled')) {
+        if (typeof this[event.fName] === 'function') {
+          this[event.fName]('enabled', opts.state);
+        } else {
+          error(`${event.fName}() is not function in ${this._name}/${this.constructor.name.toLowerCase()}`);
         }
       }
     }
@@ -363,10 +366,10 @@ class Module {
     if (isMainThread) {
       clearTimeout(this.timeouts[`${this.constructor.name}.${opts.id}.addMenu`]);
 
-      if (_.isNil(global.panel)) {
+      if (_.isNil(panel)) {
         this.timeouts[`${this.constructor.name}.${opts.id}.addMenu`] = setTimeout(() => this.addMenu(opts), 1000);
       } else {
-        global.panel.addMenu(opts);
+        panel.addMenu(opts);
       }
     }
   }
@@ -375,10 +378,10 @@ class Module {
     if (isMainThread) {
       clearTimeout(this.timeouts[`${this.constructor.name}.${opts[0]}.addWidget`]);
 
-      if (_.isNil(global.panel)) {
-        this.timeouts[`${this.constructor.name}.${opts[0]}.addWidget`] = setTimeout(() => this.addWidget(opts), 1000);
+      if (_.isNil(panel)) {
+        this.timeouts[`${this.constructor.name}.${opts[0]}.addWidget`] = setTimeout(() => this.addWidget(...opts), 1000);
       } else {
-        global.panel.addWidget(opts[0], opts[1], opts[2]);
+        panel.addWidget(opts[0], opts[1], opts[2]);
       }
     }
   }
@@ -464,9 +467,8 @@ class Module {
 
       if (typeof parser.dependsOn !== 'undefined') {
         for (const dependency of parser.dependsOn) {
-          const dependencyPointer = _.get(global, dependency, null);
           // skip parser if dependency is not enabled
-          if (!dependencyPointer || !_.isFunction(dependencyPointer.status) || !(await dependencyPointer.status())) {
+          if (!_.isFunction(dependency.status) || !(await dependency.status())) {
             continue;
           }
         }
@@ -542,9 +544,8 @@ class Module {
 
         if (command.dependsOn) {
           for (const dependency of command.dependsOn) {
-            const dependencyPointer = _.get(global, dependency, null);
             // skip command if dependency is not enabled
-            if (!dependencyPointer || !_.isFunction(dependencyPointer.status) || !(await dependencyPointer.status())) {
+            if (!_.isFunction(dependency.status) || !(await dependency.status())) {
               continue;
             }
           }
@@ -707,3 +708,4 @@ class Module {
 }
 
 export default Module;
+export { Module };

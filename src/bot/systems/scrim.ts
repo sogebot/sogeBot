@@ -5,10 +5,13 @@ import * as constants from '../constants';
 import { debug } from '../helpers/log';
 import { command, default_permission, settings, shared } from '../decorators';
 import Expects from '../expects.js';
-import { permission } from '../permissions';
+import { permission } from '../helpers/permissions';
 import System from './_interface';
 import { getRepository } from 'typeorm';
 import { ScrimMatchId } from '../database/entity/scrimMatchId';
+import oauth from '../oauth';
+import { translate } from '../translate';
+import tmi from '../tmi';
 
 enum ERROR {
   ALREADY_OPENED,
@@ -116,9 +119,9 @@ class Scrim extends System {
     this.lastRemindAt = Date.now();
     sendMessage(
       prepare('systems.scrim.stopped'), {
-        username: global.oauth.botUsername,
-        displayName: global.oauth.botUsername,
-        userId: Number(global.oauth.botId),
+        username: oauth.botUsername,
+        displayName: oauth.botUsername,
+        userId: Number(oauth.botId),
         emotes: [],
         badges: {},
         'message-type': 'chat',
@@ -168,7 +171,7 @@ class Scrim extends System {
   }
 
   private async currentMatches() {
-    const atUsername = global.tmi.showWithAt;
+    const atUsername = tmi.showWithAt;
     const matches: {
       [x: string]: string[];
     } = {};
@@ -186,7 +189,7 @@ class Scrim extends System {
     }
     sendMessage(
       prepare('systems.scrim.currentMatches', {
-        matches: output.length === 0 ? '<' + global.translate('core.empty') + '>' : output.join(' | '),
+        matches: output.length === 0 ? '<' + translate('core.empty') + '>' : output.join(' | '),
       }),
       getBotSender(),
     );
@@ -232,5 +235,4 @@ class Scrim extends System {
   }
 }
 
-export default Scrim;
-export { Scrim };
+export default new Scrim();

@@ -29,5 +29,4 @@ class SoundBoard extends Widget {
   }
 }
 
-export default SoundBoard;
-export { SoundBoard };
+export default new SoundBoard();

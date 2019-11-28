@@ -6,13 +6,15 @@ import Game from './_interface';
 
 import { getRepository } from 'typeorm';
 import { User } from '../database/entity/user';
+import { translate } from '../translate';
+import points from '../systems/points';
 
 /*
  * !roulette - 50/50 chance to timeout yourself
  */
 
 class Roulette extends Game {
-  dependsOn = ['systems.points'];
+  dependsOn = [ points ];
 
   @settings()
   timeout = 10;
@@ -32,14 +34,14 @@ class Roulette extends Game {
       isModerator(opts.sender),
     ]);
 
-    sendMessage(global.translate('gambling.roulette.trigger'), opts.sender, opts.attr);
+    sendMessage(translate('gambling.roulette.trigger'), opts.sender, opts.attr);
     if (isBroadcaster(opts.sender)) {
-      setTimeout(() => sendMessage(global.translate('gambling.roulette.broadcaster'), opts.sender), 2000, opts.attr);
+      setTimeout(() => sendMessage(translate('gambling.roulette.broadcaster'), opts.sender), 2000, opts.attr);
       return;
     }
 
     if (isMod) {
-      setTimeout(() => sendMessage(global.translate('gambling.roulette.mod'), opts.sender), 2000, opts.attr);
+      setTimeout(() => sendMessage(translate('gambling.roulette.mod'), opts.sender), 2000, opts.attr);
       return;
     }
 
@@ -52,11 +54,10 @@ class Roulette extends Game {
       } else {
         await getRepository(User).decrement({ userId: opts.sender.userId }, 'points', Number(this.loserWillLose));
       }
-      sendMessage(isAlive ? global.translate('gambling.roulette.alive') : global.translate('gambling.roulette.dead'), opts.sender, opts.attr);
+      sendMessage(isAlive ? translate('gambling.roulette.alive') : translate('gambling.roulette.dead'), opts.sender, opts.attr);
     }, 2000);
   }
 }
 
-export default Roulette;
-export { Roulette };
+export default new Roulette();
 

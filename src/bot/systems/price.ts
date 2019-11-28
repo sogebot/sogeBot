@@ -16,6 +16,8 @@ import { User } from '../database/entity/user';
 import { Price as PriceEntity } from '../database/entity/price';
 import { adminEndpoint } from '../helpers/socket';
 import { error } from '../helpers/log';
+import { translate } from '../translate';
+import points from './points';
 
 /*
  * !price                     - gets an info about price usage
@@ -26,7 +28,7 @@ import { error } from '../helpers/log';
  */
 
 class Price extends System {
-  public dependsOn: string[] = ['systems.points'];
+  public dependsOn = [ points ];
 
   constructor () {
     super();
@@ -70,7 +72,7 @@ class Price extends System {
   @command('!price')
   @default_permission(permission.CASTERS)
   main (opts) {
-    sendMessage(global.translate('core.usage') + ': !price set <cmd> <price> | !price unset <cmd> | !price list | !price toggle <cmd>', opts.sender, opts.attr);
+    sendMessage(translate('core.usage') + ': !price set <cmd> <price> | !price unset <cmd> | !price list | !price toggle <cmd>', opts.sender, opts.attr);
   }
 
   @command('!price set')
@@ -97,7 +99,7 @@ class Price extends System {
       price.price = argPrice;
     }
     await getRepository(PriceEntity).save(price);
-    const message = await prepare('price.price-was-set', { command, amount: parseInt(argPrice, 10), pointsName: await global.systems.points.getPointsName(price) });
+    const message = await prepare('price.price-was-set', { command, amount: parseInt(argPrice, 10), pointsName: await points.getPointsName(price) });
     sendMessage(message, opts.sender, opts.attr);
   }
 
@@ -147,7 +149,7 @@ class Price extends System {
   @default_permission(permission.CASTERS)
   async list (opts) {
     const prices = await getRepository(PriceEntity).find();
-    const output = (prices.length === 0 ? global.translate('price.list-is-empty') : global.translate('price.list-is-not-empty').replace(/\$list/g, (_.map(_.orderBy(prices, 'command'), (o) => {
+    const output = (prices.length === 0 ? translate('price.list-is-empty') : translate('price.list-is-not-empty').replace(/\$list/g, (_.map(_.orderBy(prices, 'command'), (o) => {
       return `${o.command} - ${o.price}`;
     })).join(', ')));
     sendMessage(output, opts.sender, opts.attr);
@@ -168,11 +170,11 @@ class Price extends System {
     if (!price) { // no price set
       return true;
     }
-    const availablePts = await global.systems.points.getPointsOf(opts.sender.userId);
+    const availablePts = await points.getPointsOf(opts.sender.userId);
     const removePts = price.price;
     const haveEnoughPoints = availablePts >= removePts;
     if (!haveEnoughPoints) {
-      const message = await prepare('price.user-have-not-enough-points', { amount: removePts, command: `${price.command}`, pointsName: await global.systems.points.getPointsName(removePts) });
+      const message = await prepare('price.user-have-not-enough-points', { amount: removePts, command: `${price.command}`, pointsName: await points.getPointsName(removePts) });
       sendMessage(message, opts.sender, opts.attr);
     } else {
       await getRepository(User).decrement({ userId: opts.sender.userId }, 'points', removePts);
@@ -202,5 +204,4 @@ class Price extends System {
   }
 }
 
-export default Price;
-export { Price };
+export default new Price();

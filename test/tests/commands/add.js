@@ -5,10 +5,12 @@ const db = require('../../general.js').db;
 const assert = require('chai').assert;
 const message = require('../../general.js').message;
 
-const { permission } = require('../../../dest/permissions');
+const { permission } = require('../../../dest/helpers/permissions');
 
 const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/database/entity/user');
+
+const customcommands = (require('../../../dest/systems/customcommands')).default;
 
 // users
 const owner = { username: 'soge__', userId: Math.floor(Math.random() * 100000) };
@@ -49,7 +51,7 @@ describe('Custom Commands - add()', () => {
   describe('Expected parsed fail', () => {
     for (const t of failedTests) {
       it(generateCommand(t), async () => {
-        global.systems.customCommands.add({ sender: owner, parameters: generateCommand(t) });
+        customcommands.add({ sender: owner, parameters: generateCommand(t) });
         await message.isSent('customcmds.commands-parse-failed', owner, { sender: owner.username });
       });
     }
@@ -58,19 +60,19 @@ describe('Custom Commands - add()', () => {
   describe('Expected to pass', () => {
     for (const t of successTests) {
       it(generateCommand(t), async () => {
-        global.systems.customCommands.add({ sender: owner, parameters: generateCommand(t) });
+        customcommands.add({ sender: owner, parameters: generateCommand(t) });
         await message.isSent('customcmds.command-was-added', owner, { response: t.response, command: t.command, sender: owner.username });
 
-        global.systems.customCommands.run({ sender: owner, message: t.command });
+        customcommands.run({ sender: owner, message: t.command });
         await message.isSentRaw(t.response, owner);
       });
     }
 
     it('2x - !a Lorem Ipsum', async () => {
-      global.systems.customCommands.add({ sender: owner, parameters: '-c !a -r Lorem Ipsum' });
+      customcommands.add({ sender: owner, parameters: '-c !a -r Lorem Ipsum' });
       await message.isSent('customcmds.command-was-added', owner, { response: 'Lorem Ipsum', command: '!a', sender: owner.username });
 
-      global.systems.customCommands.add({ sender: owner, parameters: '-c !a -r Lorem Ipsum' });
+      customcommands.add({ sender: owner, parameters: '-c !a -r Lorem Ipsum' });
       await message.isSent('customcmds.command-was-added', owner, { response: 'Lorem Ipsum', command: '!a', sender: owner.username });
     });
   });

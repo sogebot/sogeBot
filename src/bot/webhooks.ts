@@ -8,6 +8,13 @@ import { debug, error, follow, info, start } from './helpers/log';
 import { triggerInterfaceOnFollow } from './helpers/interface/triggers';
 import { getRepository } from 'typeorm';
 import { User } from './database/entity/user';
+import api from './api';
+import events from './events';
+import oauth from './oauth';
+import ui from './ui';
+import alerts from './registries/alerts';
+import eventlist from './overlays/eventlist';
+import { linesParsed } from './helpers/parser';
 
 class Webhooks {
   enabled = {
@@ -44,14 +51,14 @@ class Webhooks {
   async unsubscribe (type) {
     clearTimeout(this.timeouts[`unsubscribe-${type}`]);
 
-    const cid = global.oauth.channelId;
-    const clientId = await global.oauth.clientId;
+    const cid = oauth.channelId;
+    const clientId = await oauth.clientId;
     if (cid === '' || clientId === '') {
       this.timeouts[`unsubscribe-${type}`] = setTimeout(() => this.subscribe(type), 1000);
       return;
     }
 
-    const domain = global.ui.domain;
+    const domain = ui.domain;
     if (domain.includes('localhost')) {
       return;
     }
@@ -96,14 +103,14 @@ class Webhooks {
   async subscribe (type) {
     clearTimeout(this.timeouts[`subscribe-${type}`]);
 
-    const cid = global.oauth.channelId;
-    const clientId = await global.oauth.clientId;
+    const cid = oauth.channelId;
+    const clientId = await oauth.clientId;
     if (cid === '' || clientId === '') {
       this.timeouts[`subscribe-${type}`] = setTimeout(() => this.subscribe(type), 1000);
       return;
     }
 
-    const domain = global.ui.domain;
+    const domain = ui.domain;
     if (domain.includes('localhost')) {
       return;
     }
@@ -166,7 +173,7 @@ class Webhooks {
 
   async event (aEvent, res) {
     // somehow stream doesn't have a topic
-    if (get(aEvent, 'topic', null) === `https://api.twitch.tv/helix/users/follows?first=1&to_id=${global.oauth.channelId}`) {
+    if (get(aEvent, 'topic', null) === `https://api.twitch.tv/helix/users/follows?first=1&to_id=${oauth.channelId}`) {
       this.follower(aEvent);
     } else if (get(!isNil(aEvent.data[0]) ? aEvent.data[0] : {}, 'type', null) === 'live') {
       this.stream(aEvent);
@@ -176,7 +183,7 @@ class Webhooks {
   }
 
   async challenge (req, res) {
-    const cid = global.oauth.channelId;
+    const cid = oauth.channelId;
     // set webhooks enabled
     switch (req.query['hub.topic']) {
       case `https://api.twitch.tv/helix/users/follows?first=1&to_id=${cid}`:
@@ -205,7 +212,7 @@ class Webhooks {
   */
   async follower (aEvent) {
     try {
-      const cid = global.oauth.channelId;
+      const cid = oauth.channelId;
       const data = aEvent.data;
       data.from_id = Number(data.from_id);
 
@@ -234,14 +241,14 @@ class Webhooks {
 
       if (!user.isFollower && (user.followedAt === 0 || Date.now() - user.followedAt > 60000 * 60)) {
         if (!isBot(data.from_name)) {
-          global.overlays.eventlist.add({
+          eventlist.add({
             event: 'follow',
             username: data.from_name,
             timestamp: Date.now(),
           });
           follow(data.from_name);
-          global.events.fire('follow', { username: data.from_name, userId: data.from_id, webhooks: true });
-          global.registries.alerts.trigger({
+          events.fire('follow', { username: data.from_name, userId: data.from_id, webhooks: true });
+          alerts.trigger({
             event: 'follows',
             name: data.from_name,
             amount: 0,
@@ -287,7 +294,7 @@ class Webhooks {
     }
   */
   async stream (aEvent) {
-    const cid = global.oauth.channelId;
+    const cid = oauth.channelId;
     if (cid === '') {
       setTimeout(() => this.stream(aEvent), 1000);
     } // wait until channelId is set
@@ -300,47 +307,46 @@ class Webhooks {
         return;
       }
 
-      if (Number(global.api.streamId) !== Number(stream.id)) {
+      if (Number(api.streamId) !== Number(stream.id)) {
         debug('webhooks.stream', 'WEBHOOKS: ' + JSON.stringify(aEvent));
         start(
-          `id: ${stream.id} | webhooks | startedAt: ${stream.started_at} | title: ${stream.title} | game: ${await global.api.getGameFromId(stream.game_id)} | type: ${stream.type} | channel ID: ${cid}`
+          `id: ${stream.id} | webhooks | startedAt: ${stream.started_at} | title: ${stream.title} | game: ${await api.getGameFromId(stream.game_id)} | type: ${stream.type} | channel ID: ${cid}`
         );
 
         // reset quick stats on stream start
-        global.api.stats.currentWatchedTime = 0;
-        global.api.stats.maxViewers = 0;
-        global.api.stats.newChatters = 0;
-        global.api.stats.currentViewers = 0;
-        global.api.stats.currentBits = 0;
-        global.api.stats.currentTips = 0;
+        api.stats.currentWatchedTime = 0;
+        api.stats.maxViewers = 0;
+        api.stats.newChatters = 0;
+        api.stats.currentViewers = 0;
+        api.stats.currentBits = 0;
+        api.stats.currentTips = 0;
 
-        global.api.isStreamOnline = true;
-        global.api.chatMessagesAtStart = global.linesParsed;
+        api.isStreamOnline = true;
+        api.chatMessagesAtStart = linesParsed;
 
-        global.events.fire('stream-started', {});
-        global.events.fire('command-send-x-times', { reset: true });
-        global.events.fire('keyword-send-x-times', { reset: true });
-        global.events.fire('every-x-minutes-of-stream', { reset: true });
+        events.fire('stream-started', {});
+        events.fire('command-send-x-times', { reset: true });
+        events.fire('keyword-send-x-times', { reset: true });
+        events.fire('every-x-minutes-of-stream', { reset: true });
       }
 
       // Always keep this updated
-      global.api.streamStatusChangeSince = (new Date(stream.started_at)).getTime();
-      global.api.streamId = stream.id;
-      global.api.streamType = stream.type;
+      api.streamStatusChangeSince = (new Date(stream.started_at)).getTime();
+      api.streamId = stream.id;
+      api.streamType = stream.type;
 
-      global.api.stats.currentTitle = stream.title;
-      global.api.stats.currentGame = await global.api.getGameFromId(stream.game_id);
+      api.stats.currentTitle = stream.title;
+      api.stats.currentGame = await api.getGameFromId(stream.game_id);
 
-      global.api.curRetries = 0;
-      global.api.saveStreamData(stream);
-      global.api.streamId = stream.id;
-      global.api.streamType = stream.type;
+      api.curRetries = 0;
+      api.saveStreamData(stream);
+      api.streamId = stream.id;
+      api.streamType = stream.type;
     } else {
       // stream is offline - add curRetry + 1
-      global.api.curRetries = global.api.curRetries + 1;
+      api.curRetries = api.curRetries + 1;
     }
   }
 }
 
-export default Webhooks;
-export { Webhooks };
+export default new Webhooks();

@@ -11,6 +11,8 @@ const message = require('../../general.js').message;
 const { getManager } = require('typeorm');
 const { Quotes } = require('../../../dest/database/entity/quotes');
 
+const quotes = (require('../../../dest/systems/quotes')).default;
+
 // users
 const owner = { username: 'soge__', userId: 1 };
 
@@ -38,7 +40,7 @@ describe('Quotes - add()', () => {
       });
 
       it('Run !quote add', async () => {
-        const quote = await global.systems.quotes.add({ sender: test.sender, parameters: test.parameters, command: '!quote add' });
+        const quote = await quotes.add({ sender: test.sender, parameters: test.parameters, command: '!quote add' });
         id = quote.id;
       });
       if (test.shouldFail) {

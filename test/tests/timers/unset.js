@@ -8,9 +8,12 @@ const uuid = require('uuid/v4');
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 
+const timers = (require('../../../dest/systems/timers')).default;
+
 const { getRepository } = require('typeorm');
 const { Timer } = require('../../../dest/database/entity/timer');
 
+const { linesParsed } = require('../../../dest/helpers/parser');
 // users
 const owner = { username: 'soge__' };
 
@@ -25,23 +28,23 @@ describe('Timers - unset()', () => {
     timer.triggerEverySecond = 60;
     timer.isEnabled = true;
     timer.triggeredAtTimestamp = Date.now();
-    timer.triggeredAtMessage = global.linesParsed;
+    timer.triggeredAtMessage = linesParsed;
     await getRepository(Timer).save(timer);
   });
 
   it('', async () => {
-    global.systems.timers.unset({ sender: owner, parameters: '' });
+    timers.unset({ sender: owner, parameters: '' });
     await message.isSent('timers.name-must-be-defined', owner, { name: 'unknown', sender: owner.username });
   });
   it('-name test', async () => {
-    global.systems.timers.unset({ sender: owner, parameters: '-name test' });
+    timers.unset({ sender: owner, parameters: '-name test' });
     await message.isSent('timers.timer-deleted', owner, { name: 'test', sender: owner.username });
 
     const item = await getRepository(Timer).findOne({ name: 'test' });
     assert.isUndefined(item);
   });
   it('-name nonexistent', async () => {
-    global.systems.timers.unset({ sender: owner, parameters: '-name nonexistent' });
+    timers.unset({ sender: owner, parameters: '-name nonexistent' });
     await message.isSent('timers.timer-not-found', owner, { name: 'nonexistent', sender: owner.username });
 
     const item = await getRepository(Timer).findOne({ name: 'test' });

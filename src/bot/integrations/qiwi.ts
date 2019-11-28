@@ -8,6 +8,11 @@ import Integration from './_interface';
 import { getRepository } from 'typeorm';
 
 import { User, UserTip } from '../database/entity/user';
+import users from '../users.js';
+import api from '../api.js';
+import events from '../events.js';
+import alerts from '../registries/alerts.js';
+import eventlist from '../overlays/eventlist.js';
 
 class Qiwi extends Integration {
   interval: any = null;
@@ -65,7 +70,7 @@ class Qiwi extends Integration {
       let user = await getRepository(User).findOne({ where: { username }});
       let id;
       if (!user) {
-        id = await global.users.getIdByName(username);
+        id = await users.getIdByName(username);
         user = await getRepository(User).findOne({ where: { userId: id }});
         if (!user && id && username) {
           // if we still doesn't have user, we create new
@@ -79,7 +84,7 @@ class Qiwi extends Integration {
       const newTip = new UserTip();
       newTip.amount = Number(amount);
       newTip.currency = currency;
-      newTip.sortAmount = global.currency.exchange(Number(amount), currency, 'EUR');
+      newTip.sortAmount = currency.exchange(Number(amount), currency, 'EUR');
       newTip.message = message;
       newTip.tippedAt = Date.now();
 
@@ -88,11 +93,11 @@ class Qiwi extends Integration {
         await getRepository(User).save(user);
       }
 
-      if (global.api.isStreamOnline) {
-        global.api.stats.currentTips += parseFloat(global.currency.exchange(amount, currency, global.currency.mainCurrency));
+      if (api.isStreamOnline) {
+        api.stats.currentTips += parseFloat(currency.exchange(amount, currency, currency.mainCurrency));
       }
 
-      global.overlays.eventlist.add({
+      eventlist.add({
         event: 'tip',
         amount,
         currency,
@@ -103,16 +108,16 @@ class Qiwi extends Integration {
 
       tip(`${username ? username : 'Anonymous'}${id ? '#' + id : ''}, amount: ${Number(amount).toFixed(2)}${DONATION_CURRENCY}, ${message ? 'message: ' + message : ''}`);
 
-      global.events.fire('tip', {
+      events.fire('tip', {
         username: username || 'Anonymous',
         amount,
         currency,
-        amountInBotCurrency: parseFloat(global.currency.exchange(amount, currency, global.currency.mainCurrency)).toFixed(2),
-        currencyInBot: global.currency.mainCurrency,
+        amountInBotCurrency: parseFloat(currency.exchange(amount, currency, currency.mainCurrency)).toFixed(2),
+        currencyInBot: currency.mainCurrency,
         message,
       });
 
-      global.registries.alerts.trigger({
+      alerts.trigger({
         event: 'tips',
         name: username || 'Anonymous',
         amount,
@@ -135,5 +140,4 @@ class Qiwi extends Integration {
   }
 }
 
-export default Qiwi;
-export { Qiwi };
+export default new Qiwi();

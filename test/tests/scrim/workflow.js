@@ -8,6 +8,10 @@ const db = require('../../general.js').db;
 const variable = require('../../general.js').variable;
 const message = require('../../general.js').message;
 
+const scrim = (require('../../../dest/systems/scrim')).default;
+
+const { translate } = require('../../../dest/translate');
+
 // users
 const owner = { username: 'soge__' };
 
@@ -17,12 +21,11 @@ describe('Scrim - full workflow', () => {
       await db.cleanup();
       await message.prepare();
 
-      global.systems.scrim.waitForMatchIdsInSeconds = 10;
-      await variable.isEqual('global.systems.scrim.waitForMatchIdsInSeconds', 10);
+      scrim.waitForMatchIdsInSeconds = 10;
     });
 
     it('Create cooldown only scrim for 1 minute', async () => {
-      global.systems.scrim.main({ sender: owner, parameters: '-c duo 1' });
+      scrim.main({ sender: owner, parameters: '-c duo 1' });
     });
 
     it('Expecting 1 minute message cooldown', async () => {
@@ -93,14 +96,14 @@ describe('Scrim - full workflow', () => {
 
     it('NOT expecting empty message list', async () => {
       await message.isNotSent('systems.scrim.currentMatches', commons.getBot(), {
-        matches: '<' + global.translate('core.empty') + '>',
+        matches: '<' + translate('core.empty') + '>',
       }, 19000);
     });
 
     it('Check match list by command', async () => {
-      global.systems.scrim.match({ sender: { username: 'test' }, parameters: '' });
+      scrim.match({ sender: { username: 'test' }, parameters: '' });
       await message.isSent('systems.scrim.currentMatches', commons.getBot(), {
-        matches: '<' + global.translate('core.empty') + '>',
+        matches: '<' + translate('core.empty') + '>',
       }, 19000);
     });
   });
@@ -110,12 +113,11 @@ describe('Scrim - full workflow', () => {
       await db.cleanup();
       await message.prepare();
 
-      global.systems.scrim.waitForMatchIdsInSeconds = 10;
-      await variable.isEqual('global.systems.scrim.waitForMatchIdsInSeconds', 10);
+      scrim.waitForMatchIdsInSeconds = 10;
     });
 
     it('Create scrim for 1 minute', async () => {
-      global.systems.scrim.main({ sender: owner, parameters: 'duo 1' });
+      scrim.main({ sender: owner, parameters: 'duo 1' });
     });
 
     it('Expecting 1 minute message cooldown', async () => {
@@ -186,14 +188,14 @@ describe('Scrim - full workflow', () => {
 
     it('Expecting empty message list', async () => {
       await message.isSent('systems.scrim.currentMatches', commons.getBot(), {
-        matches: '<' + global.translate('core.empty') + '>',
+        matches: '<' + translate('core.empty') + '>',
       }, 19000);
     });
 
     it('Check match list by command', async () => {
-      global.systems.scrim.match({ sender: { username: 'test' }, parameters: '' });
+      scrim.match({ sender: { username: 'test' }, parameters: '' });
       await message.isSent('systems.scrim.currentMatches', commons.getBot(), {
-        matches: '<' + global.translate('core.empty') + '>',
+        matches: '<' + translate('core.empty') + '>',
       }, 19000);
     });
   });
@@ -203,12 +205,11 @@ describe('Scrim - full workflow', () => {
       await db.cleanup();
       await message.prepare();
 
-      global.systems.scrim.waitForMatchIdsInSeconds = 10;
-      await variable.isEqual('global.systems.scrim.waitForMatchIdsInSeconds', 10);
+      scrim.waitForMatchIdsInSeconds = 10;
     });
 
     it('Create scrim for 1 minute', async () => {
-      global.systems.scrim.main({ sender: owner, parameters: 'duo 1' });
+      scrim.main({ sender: owner, parameters: 'duo 1' });
     });
 
     it('Expecting 1 minute message cooldown', async () => {
@@ -280,7 +281,7 @@ describe('Scrim - full workflow', () => {
     for (const user of ['user1', 'user2', 'user3']) {
       const matchId = 'ABC';
       it('Add ' + user + ' to match with id ' + matchId, async () => {
-        global.systems.scrim.match({
+        scrim.match({
           parameters: matchId,
           sender: { username: user, userId: Math.floor(Math.random() * 100000) },
         });
@@ -288,7 +289,7 @@ describe('Scrim - full workflow', () => {
     }
 
     it('Add user4 to match with id ABD', async () => {
-      global.systems.scrim.match({
+      scrim.match({
         parameters: 'ABD',
         sender: { username: 'user4' },
       });
@@ -312,7 +313,7 @@ describe('Scrim - full workflow', () => {
     });
 
     it('Check match list by command', async () => {
-      global.systems.scrim.match({ sender: { username: 'test' }, parameters: '' });
+      scrim.match({ sender: { username: 'test' }, parameters: '' });
       await message.isSent('systems.scrim.currentMatches', commons.getBot(), [
         { matches: 'ABC - @user1, @user2, @user3 | ABD - @user4' },
         { matches: 'ABC - @user1, @user3, @user2 | ABD - @user4' },

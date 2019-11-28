@@ -2,7 +2,7 @@ import uuidv4 from 'uuid/v4';
 import Expects from '../expects';
 import Message from '../message';
 import { command, default_permission, parser } from '../decorators';
-import { permission } from '../permissions';
+import { permission } from '../helpers/permissions';
 import System from './_interface';
 import { isUUID, prepare, sendMessage } from '../commons';
 import XRegExp from 'xregexp';
@@ -11,6 +11,7 @@ import { debug, error } from '../helpers/log';
 import { Keyword } from '../database/entity/keyword';
 import { getRepository } from 'typeorm';
 import { adminEndpoint } from '../helpers/socket';
+import { translate } from '../translate';
 
 /*
  * !keyword                                     - gets an info about keyword usage
@@ -66,7 +67,7 @@ class Keywords extends System {
     if ((process.env?.npm_package_version ?? 'x.y.z-SNAPSHOT').includes('SNAPSHOT')) {
       url = 'http://sogehige.github.io/sogeBot/#/_master/commands/keywords';
     }
-    sendMessage(global.translate('core.usage') + ' => ' + url, opts.sender);
+    sendMessage(translate('core.usage') + ' => ' + url, opts.sender);
   }
 
   /**
@@ -287,5 +288,4 @@ class Keywords extends System {
   }
 }
 
-export default Keywords;
-export { Keywords };
+export default new Keywords();

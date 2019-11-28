@@ -25,110 +25,7 @@ declare module '*.mp3' {
 
 declare namespace NodeJS {
   export interface Global {
-    linesParsed: number;
-    avgResponse: number[];
-    status: {
-      API: 0 | 1 | 2 | 3;
-      MOD: boolean;
-      TMI: 0 | 1 | 2 | 3;
-      RES: number;
-    };
-    overlays: {
-      alerts: import('../src/bot/overlays/alerts').Alerts;
-      bets: import('../src/bot/overlays/bets').Bets;
-      carousel: import('../src/bot/overlays/carousel').Carousel;
-      clips: import('../src/bot/overlays/clips').Clips;
-      clipsCarousel: import('../src/bot/overlays/clipsCarousel').ClipsCarousel;
-      credits: import('../src/bot/overlays/credits').Credits;
-      emotes: import('../src/bot/overlays/emotes').Emotes;
-      eventlist: import('../src/bot/overlays/eventlist').EventList;
-      gallery: import('../src/bot/overlays/gallery').Gallery;
-      goals: import('../src/bot/overlays/goals').Goals;
-      polls: import('../src/bot/overlays/polls').Polls;
-      stats: import('../src/bot/overlays/stats').Stats;
-    };
-    integrations: {
-      donationalerts: import('../src/bot/integrations/donationalerts').Donationalerts;
-      phillipshue: import('../src/bot/integrations/phillipsHue').PhillipsHue;
-      spotify: import('../src/bot/integrations/spotify').Spotify;
-      responsivevoice: import('../src/bot/integrations/responsiveVoice').ResponsiveVoice;
-      streamlabs: import('../src/bot/integrations/streamlabs').Streamlabs;
-      twitter: import('../src/bot/integrations/twitter').Twitter;
-    };
-    cache: any;
-    client: any;
-    api: import('../src/bot/api').API;
     mocha: boolean;
-    configuration: any;
-    cpu: any;
-    db: any;
-    stats2: any;
-    games: {
-      duel: import('../src/bot/games/duel').Duel;
-      fightme: import('../src/bot/games/fightme').FightMe;
-      gamble: import('../src/bot/games/gamble').Gamble;
-      heist: import('../src/bot/games/heist').Heist;
-      roulette: import('../src/bot/games/roulette').Roulette;
-      seppuku: import('../src/bot/games/seppuku').Seppuku;
-      wheelOfFortune: import('../src/bot/games/wheelOfFortune').WheelOfFortune;
-    };
-    logs: {
-      commandcount: import('../src/bot/stats/commandcount').CommandCount;
-    };
-    general: any;
-    bot: any;
-    translate: any;
-    log: any;
-    currency: any;
-    panel: any;
-    registries: {
-      alerts: import('../src/bot/registries/alerts').Alerts;
-      text: import('../src/bot/registries/text').Text;
-    };
-    systems: {
-      alias: import('../src/bot/systems/alias').Alias;
-      bets: import('../src/bot/systems/bets').Bets;
-      checklist: import('../src/bot/systems/checklist').Checklist;
-      commercial: import('../src/bot/systems/commercial').Commercial;
-      cooldown: import('../src/bot/systems/cooldown').Cooldown;
-      customCommands: import('../src/bot/systems/customCommands').CustomCommands;
-      highlights: import('../src/bot/systems/highlights').Highlights;
-      howlongtobeat: import('../src/bot/systems/howlongtobeat').HowLongToBeat;
-      keywords: import('../src/bot/systems/keywords').Keywords;
-      moderation: import('../src/bot/systems/moderation').Moderation;
-      points: import('../src/bot/systems/points').Points;
-      polls: import('../src/bot/systems/polls').Polls;
-      price: import('../src/bot/systems/price').Price;
-      queue: import('../src/bot/systems/queue').Queue;
-      quotes: import('../src/bot/systems/quotes').Quotes;
-      raffles: import('../src/bot/systems/raffles').Raffles;
-      ranks: import('../src/bot/systems/ranks').Ranks;
-      scrim: import('../src/bot/systems/scrim').Scrim;
-      songs: import('../src/bot/systems/songs').Songs;
-      timers: import('../src/bot/systems/timers').Timers;
-      top: import('../src/bot/systems/top').Top;
-      userinfo: import('../src/bot/systems/userinfo').UserInfo;
-    };
-    users: import('../src/bot/users').Users;
-    ui: import('../src/bot/ui').UI;
-    lib: any;
-    twitch: import('../src/bot/twitch').Twitch;
-    socket: import('../src/bot/socket').Socket;
-    permissions: import('../src/bot/permissions').Permissions;
-    customvariables: import('../src/bot/customvariables').CustomVariables;
-    tmi: import('../src/bot/tmi').TMI;
-    events: import('../src/bot/events').Events;
-    webhooks: import('../src/bot/webhooks').Webhooks;
-    widgets: {
-      chat: import('../src/bot/widgets/chat').Chat;
-      cmdboard: import('../src/bot/widgets/cmdboard').Cmdboard;
-      custom_variables: import('../src/bot/widgets/custom_variables').CustomVariables;
-      eventlist: import('../src/bot/widgets/eventlist').EventList;
-      joinpart: import('../src/bot/widgets/joinpart').JoinPart;
-      social: import('../src/bot/widgets/social').Social;
-      soundboard: import('../src/bot/widgets/soundboard').SoundBoard;
-    };
-    oauth: import('../src/bot/oauth').OAuth;
   }
 }
 
@@ -152,7 +49,7 @@ interface Command {
   fnc?: string;
   isHelper?: boolean;
   permission?: string | null;
-  dependsOn?: string[];
+  dependsOn?: import('../src/bot/_interface').Module[];
 }
 
 interface Parser {
@@ -161,7 +58,7 @@ interface Parser {
   permission?: string;
   priority?: number;
   fireAndForget?: boolean;
-  dependsOn?: string[];
+  dependsOn?: import('../src/bot/_interface').Module[];
 }
 
 type onEventSub = {

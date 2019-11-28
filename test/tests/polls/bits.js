@@ -9,6 +9,9 @@ const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 const time = require('../../general.js').time;
 
+const polls = (require('../../../dest/systems/polls')).default;
+const tmi = (require('../../../dest/tmi')).default;
+
 const { getRepository } = require('typeorm');
 const { Poll, PollVote } = require('../../../dest/database/entity/poll');
 
@@ -25,26 +28,26 @@ describe('Polls - bits', () => {
 
   describe('Close not opened voting', () => {
     it('Close voting should fail', async () => {
-      assert.isNotTrue(await global.systems.polls.close({ sender: owner }));
+      assert.isNotTrue(await polls.close({ sender: owner }));
     });
   });
 
   describe('Close opened voting', () => {
     it('Open new voting', async () => {
-      assert.isTrue(await global.systems.polls.open({ sender: owner, parameters: '-bits -title "Lorem Ipsum test?" Lorem | Ipsum | Dolor Sit' }));
+      assert.isTrue(await polls.open({ sender: owner, parameters: '-bits -title "Lorem Ipsum test?" Lorem | Ipsum | Dolor Sit' }));
     });
     it('Close voting', async () => {
-      assert.isTrue(await global.systems.polls.close({ sender: owner }));
+      assert.isTrue(await polls.close({ sender: owner }));
     });
   });
 
   describe('Voting full workflow', () => {
     let vid = null;
     it('Open new voting', async () => {
-      assert.isTrue(await global.systems.polls.open({ sender: owner, parameters: '-bits -title "Lorem Ipsum?" Lorem | Ipsum | Dolor Sit' }));
+      assert.isTrue(await polls.open({ sender: owner, parameters: '-bits -title "Lorem Ipsum?" Lorem | Ipsum | Dolor Sit' }));
     });
     it('Open another voting should fail', async () => {
-      assert.isFalse(await global.systems.polls.open({ sender: owner, parameters: '-bits -title "Lorem Ipsum2?" Lorem2 | Ipsum2 | Dolor Sit2' }));
+      assert.isFalse(await polls.open({ sender: owner, parameters: '-bits -title "Lorem Ipsum2?" Lorem2 | Ipsum2 | Dolor Sit2' }));
     });
     it('Voting should be correctly in db', async () => {
       const cVote = await getRepository(Poll).findOne({ isOpened: true });
@@ -57,7 +60,7 @@ describe('Polls - bits', () => {
       await time.waitMs(1000);
       await message.prepare();
 
-      await global.systems.polls.main({ sender: owner, parameters: ''  });
+      await polls.main({ sender: owner, parameters: ''  });
       await message.isSent('systems.polls.status', owner, { title: 'Lorem Ipsum?' });
       await message.isSentRaw(`#vote1 - Lorem - 0 ${commons.getLocalizedName(0, 'systems.polls.votes')}, 0.00%`, owner);
       await message.isSentRaw(`#vote2 - Ipsum - 0 ${commons.getLocalizedName(0, 'systems.polls.votes')}, 0.00%`, owner);
@@ -65,7 +68,7 @@ describe('Polls - bits', () => {
     });
     for (const o of [0,1,2,3,4]) {
       it(`User ${owner.username} will vote for option ${o} - should fail`, async () => {
-        await global.systems.polls.main({ sender: owner, parameters: String(o) });
+        await polls.main({ sender: owner, parameters: String(o) });
         const vote = await getRepository(PollVote).findOne({ votedBy: owner.username });
         assert.isUndefined(vote, 'Expected ' + JSON.stringify({ votedBy: owner.username, vid }) + ' to not be found in db');
       });
@@ -74,7 +77,7 @@ describe('Polls - bits', () => {
       for (const o of [1,2]) {
         for (let i = 0; i < 10; i++) {
           const user = 'user' + [o, i].join('');
-          await global.tmi.cheer({
+          await tmi.cheer({
             tags: {
               username: user,
               userId: Math.floor(Math.random() * 100000),
@@ -101,7 +104,7 @@ describe('Polls - bits', () => {
       await time.waitMs(1000);
       await message.prepare();
 
-      await global.systems.polls.main({ sender: owner, parameters: ''  });
+      await polls.main({ sender: owner, parameters: ''  });
       await message.isSent('systems.polls.status', owner, { title: 'Lorem Ipsum?' });
       await message.isSentRaw(`#vote1 - Lorem - 100 ${commons.getLocalizedName(100, 'systems.polls.votes')}, 50.00%`, owner);
       await message.isSentRaw(`#vote2 - Ipsum - 100 ${commons.getLocalizedName(100, 'systems.polls.votes')}, 50.00%`, owner);
@@ -112,7 +115,7 @@ describe('Polls - bits', () => {
       await time.waitMs(1000);
       await message.prepare();
 
-      assert.isTrue(await global.systems.polls.close({ sender: owner }));
+      assert.isTrue(await polls.close({ sender: owner }));
       await message.isSent('systems.polls.status_closed', owner, { title: 'Lorem Ipsum?' });
       await message.isSentRaw(`#vote1 - Lorem - 100 ${commons.getLocalizedName(100, 'systems.polls.votes')}, 50.00%`, owner);
       await message.isSentRaw(`#vote2 - Ipsum - 100 ${commons.getLocalizedName(100, 'systems.polls.votes')}, 50.00%`, owner);
@@ -123,7 +126,7 @@ describe('Polls - bits', () => {
       await time.waitMs(1000);
       await message.prepare();
 
-      await global.systems.polls.main({ sender: owner, parameters: ''  });
+      await polls.main({ sender: owner, parameters: ''  });
       await message.isSent('systems.polls.notInProgress', owner);
     });
 
@@ -132,7 +135,7 @@ describe('Polls - bits', () => {
       await message.prepare();
 
       const user = Math.random();
-      await global.systems.polls.main({ sender: { username: user }, parameters: '1' });
+      await polls.main({ sender: { username: user }, parameters: '1' });
       await message.isSent('systems.polls.notInProgress', { username: user });
     });
   });

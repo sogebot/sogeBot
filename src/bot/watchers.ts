@@ -1,9 +1,11 @@
-import { cloneDeep, get, isEqual, set } from 'lodash';
+import { cloneDeep, get, isEqual } from 'lodash';
 import { isMainThread } from './cluster';
 import { error } from './helpers/log';
 import { change } from './changelog';
 import { getRepository } from 'typeorm';
 import { Settings } from './database/entity/settings';
+import { getFunctionList } from './decorators/on';
+import { isDbConnected } from './helpers/database';
 
 const variables: {
   [x: string]: any;
@@ -13,8 +15,10 @@ const readonly: {
 } = {};
 
 setInterval(() => {
-  VariableWatcher.check();
-}, 1000);
+  if (isDbConnected) {
+    VariableWatcher.check();
+  }
+}, 30000);
 
 export const VariableWatcher = {
   add(key: string, value: any, isReadOnly: boolean) {
@@ -26,21 +30,27 @@ export const VariableWatcher = {
   },
   async check() {
     for (const k of Object.keys(variables)) {
-      const value = cloneDeep(get(global, k.replace('core.', ''), null));
+      let checkedModule;
 
+      if (k.startsWith('core')) {
+        checkedModule = (require(`./${k.split('.')[1]}`)).default;
+      } else {
+        checkedModule = (require(`./${k.split('.')[0]}/${k.split('.')[1]}`)).default;
+      }
+      const variable = k.split('.').slice(2).join('.');
+      const value = cloneDeep(get(checkedModule, variable, undefined));
+      if (typeof value === 'undefined') {
+        throw new Error('Value not found, check your code!!! ' + JSON.stringify({k, variable, value}));
+      }
       if (!isEqual(value, variables[k])) {
         const [type, name, variable] = k.split('.');
 
         variables[k] = value;
-        let self: null | any = null;
+        let self;
         if (type === 'core') {
-          self = Object.values(global).find((o) => {
-            return typeof o !== 'undefined' && o.constructor.name.toLowerCase() === name.toLowerCase();
-          });
+          self = (require('./' + name)).default;
         } else {
-          self = Object.values(global[type]).find((o: any) => {
-            return typeof o !== 'undefined' && o.constructor.name.toLowerCase() === name.toLowerCase();
-          }) as any;
+          self = (require('./' + type + '/' + name)).default;
         }
 
         if (isMainThread && self) {
@@ -56,27 +66,30 @@ export const VariableWatcher = {
           await getRepository(Settings).save(setting);
 
           change(`${type}.${name}.${variable}`);
-          if (typeof self.on !== 'undefined'
-            && typeof self.on.change !== 'undefined'
-            && self.on.change[variable]) {
-            // run on.change functions only on master
-            for (const fnc of self.on.change[variable]) {
-              if (typeof self[fnc] === 'function') {
-                self[fnc](variable, cloneDeep(value));
-              } else {
-                error(`${fnc}() is not function in ${self._name}/${self.constructor.name.toLowerCase()}`);
-              }
+          for (const event of getFunctionList('change', `${type}.${name}.${variable}`)) {
+            if (typeof self[event.fName] === 'function') {
+              self[event.fName](variable, cloneDeep(value));
+            } else {
+              error(`${event.fName}() is not function in ${self._name}/${self.constructor.name.toLowerCase()}`);
             }
           }
         }
       }
-    }
-    for (const k of Object.keys(readonly)) {
-      const value = get(global, k.replace('core.', ''), null);
-      if (!isEqual(value, readonly[k])) {
-        const [type, name, variable] = k.split('.');
-        error(`Cannot change read-only variable, forcing initial value for ${type}.${name}.${variable}`);
-        set(global, k.replace('core.', ''), readonly[k]);
+      for (const k of Object.keys(readonly)) {
+        let checkedModule;
+
+        if (k.startsWith('core')) {
+          checkedModule = (require(`./${k.split('.')[1]}`)).default;
+        } else {
+          checkedModule = (require(`./${k.split('.')[0]}/${k.split('.')[1]}`)).default;
+        }
+        const variable = k.split('.').slice(2).join('.');
+        const value = cloneDeep(get(checkedModule, variable, null));
+        if (!isEqual(value, readonly[k])) {
+          const [type, name, variable] = k.split('.');
+          error(`Cannot change read-only variable, forcing initial value for ${type}.${name}.${variable}`);
+          checkedModule[variable] = readonly[k];
+        }
       }
     }
   },

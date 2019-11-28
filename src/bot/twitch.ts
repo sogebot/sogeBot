@@ -8,7 +8,7 @@ import { isNil } from 'lodash';
 
 import { getTime, isIgnored, prepare, sendMessage } from './commons';
 import { command, default_permission, settings } from './decorators';
-import { permission } from './permissions';
+import { permission } from './helpers/permissions';
 import Core from './_interface';
 
 
@@ -19,6 +19,10 @@ import { getManager, getRepository } from 'typeorm';
 import { EventList } from './database/entity/eventList';
 
 import { User } from './database/entity/user';
+import api from './api';
+import oauth from './oauth';
+import { translate } from './translate';
+import general from './general';
 
 const config = configFile as any;
 config.timezone = config.timezone === 'system' || isNil(config.timezone) ? moment.tz.guess() : config.timezone;
@@ -31,20 +35,20 @@ class Twitch extends Core {
     super();
 
     if (isMainThread) {
-      global.panel.addWidget('twitch', 'widget-title-twitch', 'fab fa-twitch');
+      this.addWidget('twitch', 'widget-title-twitch', 'fab fa-twitch');
     }
   }
 
   sockets() {
     adminEndpoint(this.nsp, 'broadcaster', (cb) => {
-      cb((global.oauth.broadcasterUsername).toLowerCase());
+      cb((oauth.broadcasterUsername).toLowerCase());
     });
   }
 
   @command('!uptime')
   async uptime (opts) {
-    const time = getTime(global.api.streamStatusChangeSince, true) as any;
-    sendMessage(global.translate(global.api.isStreamOnline ? 'uptime.online' : 'uptime.offline')
+    const time = getTime(api.streamStatusChangeSince, true) as any;
+    sendMessage(translate(api.isStreamOnline ? 'uptime.online' : 'uptime.offline')
       .replace(/\$days/g, time.days)
       .replace(/\$hours/g, time.hours)
       .replace(/\$minutes/g, time.minutes)
@@ -65,15 +69,15 @@ class Twitch extends Core {
       .where('events.event = :event', { event: 'follow' })
       .getMany();
     const onlineFollowers = (await getRepository(User).createQueryBuilder('user')
-      .where('user.username != :botusername', { botusername: global.oauth.botUsername.toLowerCase() })
-      .andWhere('user.username != :broadcasterusername', { broadcasterusername: global.oauth.broadcasterUsername.toLowerCase() })
+      .where('user.username != :botusername', { botusername: oauth.botUsername.toLowerCase() })
+      .andWhere('user.username != :broadcasterusername', { broadcasterusername: oauth.broadcasterUsername.toLowerCase() })
       .andWhere('user.isFollower = :isFollower', { isFollower: true })
       .andWhere('user.isOnline = :isOnline', { isOnline: true })
       .getMany())
       .filter(o => {
         return !isIgnored({ username: o.username, userId: o.userId });
       });
-    moment.locale(global.general.lang);
+    moment.locale(general.lang);
 
     let lastFollowAgo = '';
     let lastFollowUsername = 'n/a';
@@ -101,15 +105,15 @@ class Twitch extends Core {
       .getMany();
 
     const onlineSubscribers = (await getRepository(User).createQueryBuilder('user')
-      .where('user.username != :botusername', { botusername: global.oauth.botUsername.toLowerCase() })
-      .andWhere('user.username != :broadcasterusername', { broadcasterusername: global.oauth.broadcasterUsername.toLowerCase() })
+      .where('user.username != :botusername', { botusername: oauth.botUsername.toLowerCase() })
+      .andWhere('user.username != :broadcasterusername', { broadcasterusername: oauth.broadcasterUsername.toLowerCase() })
       .andWhere('user.isSubscriber = :isSubscriber', { isSubscriber: true })
       .andWhere('user.isOnline = :isOnline', { isOnline: true })
       .getMany()).filter(o => {
       return !isIgnored({ username: o.username, userId: o.userId });
     });
 
-    moment.locale(global.general.lang);
+    moment.locale(general.lang);
 
     let lastSubAgo = '';
     let lastSubUsername = 'n/a';
@@ -128,41 +132,40 @@ class Twitch extends Core {
 
   @command('!title')
   async getTitle (opts) {
-    sendMessage(global.translate('title.current')
-      .replace(/\$title/g, global.api.stats.currentTitle || 'n/a'), opts.sender);
+    sendMessage(translate('title.current')
+      .replace(/\$title/g, api.stats.currentTitle || 'n/a'), opts.sender);
   }
 
   @command('!title set')
   @default_permission(permission.CASTERS)
   async setTitle (opts) {
     if (opts.parameters.length === 0) {
-      sendMessage(global.translate('title.current')
-        .replace(/\$title/g, global.api.stats.currentTitle || 'n/a'), opts.sender);
+      sendMessage(translate('title.current')
+        .replace(/\$title/g, api.stats.currentTitle || 'n/a'), opts.sender);
       return;
     }
-    global.api.setTitleAndGame(opts.sender, { title: opts.parameters });
+    api.setTitleAndGame(opts.sender, { title: opts.parameters });
   }
 
   @command('!game')
   async getGame (opts) {
-    sendMessage(global.translate('game.current')
-      .replace(/\$game/g, global.api.stats.currentGame || 'n/a'), opts.sender);
+    sendMessage(translate('game.current')
+      .replace(/\$game/g, api.stats.currentGame || 'n/a'), opts.sender);
   }
 
   @command('!game set')
   @default_permission(permission.CASTERS)
   async setGame (opts) {
     if (opts.parameters.length === 0) {
-      sendMessage(global.translate('game.current')
-        .replace(/\$game/g, global.api.stats.currentGame || 'n/a'), opts.sender);
+      sendMessage(translate('game.current')
+        .replace(/\$game/g, api.stats.currentGame || 'n/a'), opts.sender);
       return;
     }
-    const games = await global.api.sendGameFromTwitch (global.api, null, opts.parameters);
+    const games = await api.sendGameFromTwitch (api, null, opts.parameters);
     if (Array.isArray(games) && games.length > 0) {
-      global.api.setTitleAndGame(opts.sender, { game: games[0] });
+      api.setTitleAndGame(opts.sender, { game: games[0] });
     }
   }
 }
 
-export default Twitch;
-export { Twitch };
+export default new Twitch();

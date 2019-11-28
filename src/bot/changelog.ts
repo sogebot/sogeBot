@@ -4,7 +4,6 @@
  */
 
 import uuid from 'uuid/v4';
-import { set } from 'lodash';
 
 import { getManager, getRepository, LessThan, MoreThan, Not } from 'typeorm';
 import { Settings } from './database/entity/settings';
@@ -30,14 +29,11 @@ export const changelog = async () => {
     const [type, name, variable] = change.namespace.split('.');
 
     if (type === 'core') {
-      self = Object.values(global).find((o) => {
-        return typeof o !== 'undefined' && o.constructor.name.toLowerCase() === name.toLowerCase();
-      });
+      self = (require('./' + name.toLowerCase())).default;
     } else {
-      self = Object.values(global[type]).find((o: any) => {
-        return typeof o !== 'undefined' && o.constructor.name.toLowerCase() === name.toLowerCase();
-      }) as any;
+      self = (require('./' + type + '/' + name.toLowerCase())).default;
     }
+
     const variableFromDb
      = await getManager().createQueryBuilder().select('settings').from(Settings, 'settings')
        .where('namespace = :namespace', { namespace: self.nsp })
@@ -45,7 +41,13 @@ export const changelog = async () => {
        .getOne();
     if (variableFromDb) {
       const value = JSON.stringify(variableFromDb.value);
-      set(global, change.namespace.replace('core.', ''), value);
+      let self;
+      if (change.namespace.startsWith('core')) {
+        self = (require(`./${change.namespace.split('.')[1]}`)).default;
+      } else {
+        self = (require(`./${change.namespace.split('.')[0]}/${change.namespace.split('.')[1]}`)).default;
+      }
+      self[change.namespace.split('.')[2]] = value;
     }
     lastTimestamp = change.timestamp;
   }

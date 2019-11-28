@@ -5,13 +5,17 @@ import { isMainThread } from '../cluster';
 
 import { sendMessage } from '../commons';
 import { command, default_permission } from '../decorators';
-import { permission } from '../permissions';
+import { permission } from '../helpers/permissions';
 import System from './_interface';
 import { adminEndpoint } from '../helpers/socket';
 
 import { getRepository } from 'typeorm';
 import { Timer, TimerResponse } from '../database/entity/timer';
 import Expects from '../expects';
+import oauth from '../oauth';
+import { translate } from '../translate';
+import { linesParsed } from '../helpers/parser';
+import { isDbConnected } from '../helpers/database';
 
 /*
  * !timers                                                                                                                      - gets an info about timers usage
@@ -85,7 +89,7 @@ class Timers extends System {
       this.getCommand('!timers toggle'),
       this.getCommand('!timers list'),
     ];
-    sendMessage('╔ ' + global.translate('core.usage'), opts.sender, opts.attr);
+    sendMessage('╔ ' + translate('core.usage'), opts.sender, opts.attr);
     sendMessage(`║ ${main} - gets an info about timers usage`, opts.sender, opts.attr);
     sendMessage(`║ ${set} -name [name-of-timer] -messages [num-of-msgs-to-trigger|default:0] -seconds [trigger-every-x-seconds|default:60] - add new timer`, opts.sender, opts.attr);
     sendMessage(`║ ${unset} -name [name-of-timer] - remove timer`, opts.sender, opts.attr);
@@ -98,6 +102,10 @@ class Timers extends System {
   }
 
   async init () {
+    if (!isDbConnected) {
+      setTimeout(() => this.init(), 1000);
+      return;
+    }
     const timers = await getRepository(Timer).find({
       relations: ['messages'],
     });
@@ -117,7 +125,7 @@ class Timers extends System {
       where: { isEnabled: true },
     });
     for (const timer of timers) {
-      if (timer.triggerEveryMessage > 0 && timer.triggeredAtMessages - global.linesParsed + timer.triggerEveryMessage > 0) {
+      if (timer.triggerEveryMessage > 0 && timer.triggeredAtMessages - linesParsed + timer.triggerEveryMessage > 0) {
         continue;
       } // not ready to trigger with messages
       if (timer.triggerEverySecond > 0 && new Date().getTime() - timer.triggeredAtTimestamp < timer.triggerEverySecond * 1000) {
@@ -128,9 +136,9 @@ class Timers extends System {
 
       if (response) {
         sendMessage(response.response, {
-          username: global.oauth.botUsername,
-          displayName: global.oauth.botUsername,
-          userId: Number(global.oauth.botId),
+          username: oauth.botUsername,
+          displayName: oauth.botUsername,
+          userId: Number(oauth.botId),
           emotes: [],
           badges: {},
           'message-type': 'chat',
@@ -138,7 +146,7 @@ class Timers extends System {
         response.timestamp = Date.now();
         await getRepository(TimerResponse).save(response);
       }
-      timer.triggeredAtMessages = global.linesParsed;
+      timer.triggeredAtMessages = linesParsed;
       timer.triggeredAtTimestamp = Date.now();
       await getRepository(Timer).save(timer);
     }
@@ -174,7 +182,7 @@ class Timers extends System {
     let seconds = opts.parameters.match(/-seconds ([0-9]+)/);
 
     if (_.isNil(name)) {
-      sendMessage(global.translate('timers.name-must-be-defined'), opts.sender, opts.attr);
+      sendMessage(translate('timers.name-must-be-defined'), opts.sender, opts.attr);
       return false;
     } else {
       name = name[1];
@@ -184,7 +192,7 @@ class Timers extends System {
     seconds = _.isNil(seconds) ? 60 : parseInt(seconds[1], 10);
 
     if (messages === 0 && seconds === 0) {
-      sendMessage(global.translate('timers.cannot-set-messages-and-seconds-0'), opts.sender, opts.attr);
+      sendMessage(translate('timers.cannot-set-messages-and-seconds-0'), opts.sender, opts.attr);
       return false;
     }
     let timer = await getRepository(Timer).findOne({
@@ -198,10 +206,10 @@ class Timers extends System {
     timer.triggerEveryMessage = messages;
     timer.triggerEverySecond = seconds;
     timer.isEnabled = true;
-    timer.triggeredAtMessages = global.linesParsed;
+    timer.triggeredAtMessages = linesParsed;
     timer.triggeredAtTimestamp = Date.now();
     await getRepository(Timer).save(timer);
-    sendMessage(global.translate('timers.timer-was-set')
+    sendMessage(translate('timers.timer-was-set')
       .replace(/\$name/g, name)
       .replace(/\$messages/g, messages)
       .replace(/\$seconds/g, seconds), opts.sender);
@@ -214,7 +222,7 @@ class Timers extends System {
     let name = opts.parameters.match(/-name ([\S]+)/);
 
     if (_.isNil(name)) {
-      sendMessage(global.translate('timers.name-must-be-defined'), opts.sender, opts.attr);
+      sendMessage(translate('timers.name-must-be-defined'), opts.sender, opts.attr);
       return false;
     } else {
       name = name[1];
@@ -222,12 +230,12 @@ class Timers extends System {
 
     const timer = await getRepository(Timer).findOne({ name: name });
     if (!timer) {
-      sendMessage(global.translate('timers.timer-not-found').replace(/\$name/g, name), opts.sender, opts.attr);
+      sendMessage(translate('timers.timer-not-found').replace(/\$name/g, name), opts.sender, opts.attr);
       return false;
     }
 
     await getRepository(Timer).remove(timer);
-    sendMessage(global.translate('timers.timer-deleted')
+    sendMessage(translate('timers.timer-deleted')
       .replace(/\$name/g, name), opts.sender);
   }
 
@@ -238,10 +246,10 @@ class Timers extends System {
     try {
       const id = new Expects(opts.parameters).argument({ type: 'uuid', name: 'id' }).toArray()[0];
       await getRepository(TimerResponse).delete({ id });
-      sendMessage(global.translate('timers.response-deleted')
+      sendMessage(translate('timers.response-deleted')
         .replace(/\$id/g, id), opts.sender);
     } catch (e) {
-      sendMessage(global.translate('timers.id-must-be-defined'), opts.sender, opts.attr);
+      sendMessage(translate('timers.id-must-be-defined'), opts.sender, opts.attr);
       return false;
     }
   }
@@ -254,14 +262,14 @@ class Timers extends System {
     let response = opts.parameters.match(/-response ['"](.+)['"]/);
 
     if (_.isNil(name)) {
-      sendMessage(global.translate('timers.name-must-be-defined'), opts.sender, opts.attr);
+      sendMessage(translate('timers.name-must-be-defined'), opts.sender, opts.attr);
       return false;
     } else {
       name = name[1];
     }
 
     if (_.isNil(response)) {
-      sendMessage(global.translate('timers.response-must-be-defined'), opts.sender, opts.attr);
+      sendMessage(translate('timers.response-must-be-defined'), opts.sender, opts.attr);
       return false;
     } else {
       response = response[1];
@@ -271,7 +279,7 @@ class Timers extends System {
       where: { name },
     });
     if (!timer) {
-      sendMessage(global.translate('timers.timer-not-found')
+      sendMessage(translate('timers.timer-not-found')
         .replace(/\$name/g, name), opts.sender);
       return false;
     }
@@ -283,7 +291,7 @@ class Timers extends System {
     message.timer = timer;
     const item = await getRepository(TimerResponse).save(message);
 
-    sendMessage(global.translate('timers.response-was-added')
+    sendMessage(translate('timers.response-was-added')
       .replace(/\$id/g, item.id)
       .replace(/\$name/g, name)
       .replace(/\$response/g, response), opts.sender);
@@ -297,7 +305,7 @@ class Timers extends System {
 
     if (_.isNil(name)) {
       const timers = await getRepository(Timer).find();
-      sendMessage(global.translate('timers.timers-list').replace(/\$list/g, _.map(_.orderBy(timers, 'name'), (o) => (o.isEnabled ? '⚫' : '⚪') + ' ' + o.name).join(', ')), opts.sender, opts.attr);
+      sendMessage(translate('timers.timers-list').replace(/\$list/g, _.map(_.orderBy(timers, 'name'), (o) => (o.isEnabled ? '⚫' : '⚪') + ' ' + o.name).join(', ')), opts.sender, opts.attr);
       return true;
     } else {
       name = name[1];
@@ -308,11 +316,11 @@ class Timers extends System {
       where: { name },
     });
     if (!timer) {
-      sendMessage(global.translate('timers.timer-not-found')
+      sendMessage(translate('timers.timer-not-found')
         .replace(/\$name/g, name), opts.sender);
       return false;
     }
-    await sendMessage(global.translate('timers.responses-list').replace(/\$name/g, name), opts.sender, opts.attr);
+    await sendMessage(translate('timers.responses-list').replace(/\$name/g, name), opts.sender, opts.attr);
     for (const response of timer.messages) {
       await sendMessage((response.isEnabled ? '⚫ ' : '⚪ ') + `${response.id} - ${response.response}`, opts.sender, opts.attr);
     }
@@ -329,20 +337,20 @@ class Timers extends System {
       .toArray();
 
     if ((_.isNil(id) && _.isNil(name)) || (!_.isNil(id) && !_.isNil(name))) {
-      sendMessage(global.translate('timers.id-or-name-must-be-defined'), opts.sender, opts.attr);
+      sendMessage(translate('timers.id-or-name-must-be-defined'), opts.sender, opts.attr);
       return false;
     }
 
     if (!_.isNil(id)) {
       const response = await getRepository(TimerResponse).findOne({ id });
       if (!response) {
-        sendMessage(global.translate('timers.response-not-found').replace(/\$id/g, id), opts.sender, opts.attr);
+        sendMessage(translate('timers.response-not-found').replace(/\$id/g, id), opts.sender, opts.attr);
         return false;
       }
 
       response.isEnabled = !response.isEnabled;
       await getRepository(TimerResponse).save(response);
-      sendMessage(global.translate(response.isEnabled ? 'timers.response-enabled' : 'timers.response-disabled')
+      sendMessage(translate(response.isEnabled ? 'timers.response-enabled' : 'timers.response-disabled')
         .replace(/\$id/g, id), opts.sender);
       return true;
     }
@@ -350,18 +358,17 @@ class Timers extends System {
     if (!_.isNil(name)) {
       const timer = await getRepository(Timer).findOne({ name: name });
       if (!timer) {
-        sendMessage(global.translate('timers.timer-not-found').replace(/\$name/g, name), opts.sender, opts.attr);
+        sendMessage(translate('timers.timer-not-found').replace(/\$name/g, name), opts.sender, opts.attr);
         return false;
       }
 
       timer.isEnabled = !timer.isEnabled;
       await getRepository(Timer).save(timer);
-      sendMessage(global.translate(timer.isEnabled ? 'timers.timer-enabled' : 'timers.timer-disabled')
+      sendMessage(translate(timer.isEnabled ? 'timers.timer-enabled' : 'timers.timer-disabled')
         .replace(/\$name/g, name), opts.sender);
       return true;
     }
   }
 }
 
-export default Timers;
-export { Timers };
+export default new Timers();

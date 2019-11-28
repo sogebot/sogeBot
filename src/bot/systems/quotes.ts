@@ -3,12 +3,14 @@ import * as _ from 'lodash';
 import { prepare, sendMessage } from '../commons';
 import { command, default_permission } from '../decorators';
 import Expects from '../expects';
-import { permission } from '../permissions';
+import { permission } from '../helpers/permissions';
 import System from './_interface';
 import { adminEndpoint, publicEndpoint } from '../helpers/socket';
 import { getManager } from 'typeorm';
 
 import { Quotes as QuotesEntity } from '../database/entity/quotes';
+import users from '../users';
+import ui from '../ui';
 
 class Quotes extends System {
   constructor () {
@@ -25,7 +27,7 @@ class Quotes extends System {
         .from(QuotesEntity, 'quote')
         .getMany();
       for (const item of (items as any[])) {
-        item.quotedByName = await global.users.getNameById(item.quotedBy);
+        item.quotedByName = await users.getNameById(item.quotedBy);
       }
       cb(null, items);
     });
@@ -184,7 +186,7 @@ class Quotes extends System {
 
   @command('!quote list')
   async list (opts) {
-    const urlBase = global.ui.domain;
+    const urlBase = ui.domain;
     const message = await prepare(
       (['localhost', '127.0.0.1'].includes(urlBase) ? 'systems.quotes.list.is-localhost' : 'systems.quotes.list.ok'),
       { urlBase });
@@ -207,7 +209,7 @@ class Quotes extends System {
         .where('id = :id', { id })
         .getOne();
       if (!_.isEmpty(quote) && typeof quote !== 'undefined') {
-        const quotedBy = (await global.users.getUsernamesFromIds([quote.quotedBy]))[quote.quotedBy];
+        const quotedBy = (await users.getUsernamesFromIds([quote.quotedBy]))[quote.quotedBy];
         const message = await prepare('systems.quotes.show.ok', { quote: quote.quote, id: quote.id, quotedBy });
         sendMessage(message, opts.sender, opts.attr);
       } else {
@@ -231,7 +233,7 @@ class Quotes extends System {
       if (quotesWithTags.length > 0) {
         const quote = _.sample(quotesWithTags);
         if (typeof quote !== 'undefined') {
-          const quotedBy = (await global.users.getUsernamesFromIds([quote.quotedBy]))[quote.quotedBy];
+          const quotedBy = (await users.getUsernamesFromIds([quote.quotedBy]))[quote.quotedBy];
           const message = await prepare('systems.quotes.show.ok', { quote: quote.quote, id: quote.id, quotedBy });
           sendMessage(message, opts.sender, opts.attr);
         }
@@ -243,5 +245,4 @@ class Quotes extends System {
   }
 }
 
-export default Quotes;
-export { Quotes };
+export default new Quotes();

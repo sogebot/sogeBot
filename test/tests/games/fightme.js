@@ -9,6 +9,8 @@ const message = require('../../general.js').message;
 const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/database/entity/user');
 
+const fightme = (require('../../../dest/games/fightme')).default;
+
 const command = '!fightme';
 
 const tests = [
@@ -69,7 +71,7 @@ describe('game/fightme - !fightme', () => {
       });
 
       it('Challenger is starting !fightme', async () => {
-        global.games.fightme.main({ command, sender: test.challenger, parameters: test.challenging.username });
+        fightme.main({ command, sender: test.challenger, parameters: test.challenging.username });
       });
       if (test.challenging.username.length === 0 || test.challenging.username === test.challenger.username) {
         it(`Expecting ${test.expected}`, async () => {
@@ -80,7 +82,7 @@ describe('game/fightme - !fightme', () => {
           await message.isSent('gambling.fightme.challenge', test.challenger, { username: test.challenging.username, command });
         });
         it('Challenged user is responding !fightme', async () => {
-          global.games.fightme.main({ command, sender: test.challenging, parameters: test.challenger.username });
+          fightme.main({ command, sender: test.challenging, parameters: test.challenger.username });
         });
         it(`Expecting ${test.expected}`, async () => {
           await message.isSent(test.expected, test.challenging, [

@@ -7,6 +7,8 @@ import { getLocalizedName, isBroadcaster, isModerator, prepare, sendMessage, tim
 
 import { getRepository } from 'typeorm';
 import { User } from '../database/entity/user';
+import users from '../users';
+import { translate } from '../translate';
 
 /*
  * !fightme [user] - challenge [user] to fight
@@ -46,7 +48,7 @@ class FightMe extends Game {
 
       user = await getRepository(User).findOne({ where: { username: username.toLowerCase() }});
       if (!user) {
-        const id = await global.users.getIdByName(username.toLowerCase());
+        const id = await users.getIdByName(username.toLowerCase());
         user = await getRepository(User).findOne({ where: { userId: id }});
         if (!user && id) {
           // if we still doesn't have user, we create new
@@ -66,12 +68,12 @@ class FightMe extends Game {
         challenger = await getRepository(User).save(challenger);
       }
     } catch (e) {
-      sendMessage(global.translate('gambling.fightme.notEnoughOptions'), opts.sender, opts.attr);
+      sendMessage(translate('gambling.fightme.notEnoughOptions'), opts.sender, opts.attr);
       return;
     }
 
     if (opts.sender.username === user.username) {
-      sendMessage(global.translate('gambling.fightme.cannotFightWithYourself'), opts.sender, opts.attr);
+      sendMessage(translate('gambling.fightme.cannotFightWithYourself'), opts.sender, opts.attr);
       return;
     }
 
@@ -184,5 +186,4 @@ class FightMe extends Game {
   }
 }
 
-export default FightMe;
-export { FightMe };
+export default new FightMe();

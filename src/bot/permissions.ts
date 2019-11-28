@@ -14,6 +14,8 @@ import { adminEndpoint } from './helpers/socket';
 import { PermissionCommands, PermissionFilters, Permissions as PermissionsEntity } from './database/entity/permissions';
 import { getRepository, LessThan } from 'typeorm';
 import { User } from './database/entity/user';
+import oauth from './oauth';
+import currency from './currency';
 
 let isWarnedAboutCasters = false;
 
@@ -145,7 +147,7 @@ class Permissions extends Core {
   }
 
   public async check(userId: number, permId: string, partial = false): Promise<{access: boolean; permission: PermissionsEntity | undefined}> {
-    if (_.filter(global.oauth.generalOwners, (o) => _.isString(o) && o.trim().length > 0).length === 0 && getBroadcaster() === '' && !isWarnedAboutCasters) {
+    if (_.filter(oauth.generalOwners, (o) => _.isString(o) && o.trim().length > 0).length === 0 && getBroadcaster() === '' && !isWarnedAboutCasters) {
       isWarnedAboutCasters = true;
       warning('Owners or broadcaster oauth is not set, all users are treated as CASTERS!!!');
       const pItem = await getRepository(PermissionsEntity).findOne({ id: permission.CASTERS });
@@ -193,7 +195,7 @@ class Permissions extends Core {
           shouldProceed = true;
           break;
         case 'casters':
-          if (_.filter(global.oauth.generalOwners, _.isString).length === 0 && getBroadcaster() === '') {
+          if (_.filter(oauth.generalOwners, _.isString).length === 0 && getBroadcaster() === '') {
             shouldProceed = true;
           } else {
             shouldProceed = isBot(user) || isBroadcaster(user) || isOwner(user);
@@ -249,7 +251,7 @@ class Permissions extends Core {
           amount = user.subscribeTier === 'Prime' ? 1 : Number(user.subscribeTier);
           break;
         case 'tips':
-          amount = user.tips.reduce((a, b) => (a + global.currency.exchange(b.amount, b.currency, global.currency.mainCurrency)), 0);
+          amount = user.tips.reduce((a, b) => (a + currency.exchange(b.amount, b.currency, currency.mainCurrency)), 0);
           break;
         case 'watched':
           amount = user.watchedTime / (60 * 60 * 1000 /*hours*/);
@@ -303,7 +305,7 @@ class Permissions extends Core {
     }
   }
 
-  private async ensurePreservedPermissionsInDb(): Promise<void> {
+  public async ensurePreservedPermissionsInDb(): Promise<void> {
     let p;
     try {
       p = await getRepository(PermissionsEntity).find();
@@ -399,4 +401,4 @@ class Permissions extends Core {
   }
 }
 
-export { permission, Permissions };
+export default new Permissions();

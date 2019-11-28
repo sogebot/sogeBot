@@ -21,6 +21,15 @@ import { User } from './database/entity/user';
 import Price from './systems/price';
 import { Rank } from './database/entity/rank';
 
+import oauth from './oauth';
+import api from './api';
+import tmi from './tmi';
+import customvariables from './customvariables';
+import spotify from './integrations/spotify';
+import songs from './systems/songs';
+import { translate } from './translate';
+
+
 class Message {
   constructor (message) {
     this.message = Entities.decode(message);
@@ -28,14 +37,14 @@ class Message {
 
   async global (opts) {
     let variables = {
-      game: global.api.stats.currentGame,
-      viewers: global.api.stats.currentViewers,
-      views: global.api.stats.currentViews,
-      followers: global.api.stats.currentFollowers,
-      hosts: global.api.stats.currentHosts,
-      subscribers: global.api.stats.currentSubscribers,
-      bits: global.api.stats.currentBits,
-      title: global.api.stats.currentTitle
+      game: api.stats.currentGame,
+      viewers: api.stats.currentViewers,
+      views: api.stats.currentViews,
+      followers: api.stats.currentFollowers,
+      hosts: api.stats.currentHosts,
+      subscribers: api.stats.currentSubscribers,
+      bits: api.stats.currentBits,
+      title: api.stats.currentTitle
     };
     for (let variable of Object.keys(variables)) {
       const regexp = new RegExp(`\\$${variable}`, 'g');
@@ -83,27 +92,27 @@ class Message {
     this.message = this.message.replace(/\$latestCheerMessage/g, !_.isNil(latestCheer) ? JSON.parse(latestCheer.values_json).message : 'n/a');
     this.message = this.message.replace(/\$latestCheer/g, !_.isNil(latestCheer) ? JSON.parse(latestCheer.values_json).username : 'n/a');
 
-    const spotifySong = JSON.parse(global.integrations.spotify.currentSong);
-    if (!_.isNil(global.integrations) && !_.isEmpty(spotifySong) && spotifySong.is_playing && spotifySong.is_enabled) {
+    const spotifySong = JSON.parse(spotify.currentSong);
+    if (!_.isEmpty(spotifySong) && spotifySong.is_playing && spotifySong.is_enabled) {
       // load spotify format
-      const format = global.integrations.spotify.format;
+      const format = spotify.format;
       if (opts.escape) {
         spotifySong.song = spotifySong.song.replace(new RegExp(opts.escape, 'g'), `\\${opts.escape}`);
         spotifySong.artist = spotifySong.artist.replace(new RegExp(opts.escape, 'g'), `\\${opts.escape}`);
       }
       this.message = this.message.replace(/\$spotifySong/g, format.replace(/\$song/g, spotifySong.song).replace(/\$artist/g, spotifySong.artist));
-    } else {this.message = this.message.replace(/\$spotifySong/g, global.translate('songs.not-playing'))};
+    } else {this.message = this.message.replace(/\$spotifySong/g, translate('songs.not-playing'))};
 
 
-    if (global.systems.songs.enabled
+    if (songs.enabled
         && this.message.includes('$ytSong')
-        && Object.values(global.systems.songs.isPlaying).find(o => o)) {
-      let currentSong = _.get(JSON.parse(await global.systems.songs.currentSong), 'title', global.translate('songs.not-playing'));
+        && Object.values(songs.isPlaying).find(o => o)) {
+      let currentSong = _.get(JSON.parse(await songs.currentSong), 'title', translate('songs.not-playing'));
       if (opts.escape) {
         currentSong = currentSong.replace(new RegExp(opts.escape, 'g'), `\\${opts.escape}`);
       }
       this.message = this.message.replace(/\$ytSong/g, currentSong);
-    } else {this.message = this.message.replace(/\$ytSong/g, global.translate('songs.not-playing'))};
+    } else {this.message = this.message.replace(/\$ytSong/g, translate('songs.not-playing'))};
 
     return Entities.decode(this.message);
   }
@@ -114,8 +123,8 @@ class Message {
     const random = {
       '(random.online.viewer)': async function () {
         const viewers = (await getRepository(User).createQueryBuilder('user')
-          .where('user.username != :botusername', { botusername: global.oauth.botUsername.toLowerCase() })
-          .andWhere('user.username != :broadcasterusername', { broadcasterusername: global.oauth.broadcasterUsername.toLowerCase() })
+          .where('user.username != :botusername', { botusername: oauth.botUsername.toLowerCase() })
+          .andWhere('user.username != :broadcasterusername', { broadcasterusername: oauth.broadcasterUsername.toLowerCase() })
           .andWhere('user.isOnline = :isOnline', { isOnline: true })
           .cache(true)
           .getMany())
@@ -127,8 +136,8 @@ class Message {
       },
       '(random.online.follower)': async function () {
         const followers = (await getRepository(User).createQueryBuilder('user')
-          .where('user.username != :botusername', { botusername: global.oauth.botUsername.toLowerCase() })
-          .andWhere('user.username != :broadcasterusername', { broadcasterusername: global.oauth.broadcasterUsername.toLowerCase() })
+          .where('user.username != :botusername', { botusername: oauth.botUsername.toLowerCase() })
+          .andWhere('user.username != :broadcasterusername', { broadcasterusername: oauth.broadcasterUsername.toLowerCase() })
           .andWhere('user.isFollower = :isFollower', { isFollower: true })
           .andWhere('user.isOnline = :isOnline', { isOnline: true })
           .cache(true)
@@ -140,8 +149,8 @@ class Message {
       },
       '(random.online.subscriber)': async function () {
         const subscribers = (await getRepository(User).createQueryBuilder('user')
-          .where('user.username != :botusername', { botusername: global.oauth.botUsername.toLowerCase() })
-          .andWhere('user.username != :broadcasterusername', { broadcasterusername: global.oauth.broadcasterUsername.toLowerCase() })
+          .where('user.username != :botusername', { botusername: oauth.botUsername.toLowerCase() })
+          .andWhere('user.username != :broadcasterusername', { broadcasterusername: oauth.broadcasterUsername.toLowerCase() })
           .andWhere('user.isSubscriber = :isSubscriber', { isSubscriber: true })
           .andWhere('user.isOnline = :isOnline', { isOnline: true })
           .cache(true)
@@ -153,8 +162,8 @@ class Message {
       },
       '(random.viewer)': async function () {
         const viewers = (await getRepository(User).createQueryBuilder('user')
-          .where('user.username != :botusername', { botusername: global.oauth.botUsername.toLowerCase() })
-          .andWhere('user.username != :broadcasterusername', { broadcasterusername: global.oauth.broadcasterUsername.toLowerCase() })
+          .where('user.username != :botusername', { botusername: oauth.botUsername.toLowerCase() })
+          .andWhere('user.username != :broadcasterusername', { broadcasterusername: oauth.broadcasterUsername.toLowerCase() })
           .cache(true)
           .getMany()).filter(o => {
           return !commons.isIgnored({ username: o.username, userId: o.userId });
@@ -164,8 +173,8 @@ class Message {
       },
       '(random.follower)': async function () {
         const followers = (await getRepository(User).createQueryBuilder('user')
-          .where('user.username != :botusername', { botusername: global.oauth.botUsername.toLowerCase() })
-          .andWhere('user.username != :broadcasterusername', { broadcasterusername: global.oauth.broadcasterUsername.toLowerCase() })
+          .where('user.username != :botusername', { botusername: oauth.botUsername.toLowerCase() })
+          .andWhere('user.username != :broadcasterusername', { broadcasterusername: oauth.broadcasterUsername.toLowerCase() })
           .andWhere('user.isFollower = :isFollower', { isFollower: true })
           .cache(true)
           .getMany()).filter(o => {
@@ -176,8 +185,8 @@ class Message {
       },
       '(random.subscriber)': async function () {
         const subscribers = (await getRepository(User).createQueryBuilder('user')
-          .where('user.username != :botusername', { botusername: global.oauth.botUsername.toLowerCase() })
-          .andWhere('user.username != :broadcasterusername', { broadcasterusername: global.oauth.broadcasterUsername.toLowerCase() })
+          .where('user.username != :botusername', { botusername: oauth.botUsername.toLowerCase() })
+          .andWhere('user.username != :broadcasterusername', { broadcasterusername: oauth.broadcasterUsername.toLowerCase() })
           .andWhere('user.isSubscriber = :isSubscriber', { isSubscriber: true })
           .cache(true)
           .getMany()).filter(o => {
@@ -214,7 +223,7 @@ class Message {
     let custom = {
       '$_#': async (variable) => {
         if (!_.isNil(attr.param) && attr.param.length !== 0) {
-          let state = await global.customvariables.setValueOf(variable, attr.param, { sender: attr.sender });
+          let state = await customvariables.setValueOf(variable, attr.param, { sender: attr.sender });
           if (state.updated.responseType === 0) {
             // default
             if (state.isOk && !state.isEval) {
@@ -231,22 +240,22 @@ class Message {
             return state.updated.currentValue;
           }
         }
-        return global.customvariables.getValueOf(variable, { sender: attr.sender, param: attr.param });
+        return customvariables.getValueOf(variable, { sender: attr.sender, param: attr.param });
       },
       // force quiet variable set
       '$!_#': async (variable) => {
         variable = variable.replace('$!_', '$_');
         if (!_.isNil(attr.param) && attr.param.length !== 0) {
-          let state = await global.customvariables.setValueOf(variable, attr.param, { sender: attr.sender });
+          let state = await customvariables.setValueOf(variable, attr.param, { sender: attr.sender });
           return state.updated.currentValue;
         }
-        return global.customvariables.getValueOf(variable, { sender: attr.sender, param: attr.param });
+        return customvariables.getValueOf(variable, { sender: attr.sender, param: attr.param });
       },
       // force full quiet variable
       '$!!_#': async (variable) => {
         variable = variable.replace('$!!_', '$_');
         if (!_.isNil(attr.param) && attr.param.length !== 0) {
-          await global.customvariables.setValueOf(variable, attr.param, { sender: attr.sender });
+          await customvariables.setValueOf(variable, attr.param, { sender: attr.sender });
         }
         return '';
       }
@@ -256,13 +265,13 @@ class Message {
         if (typeof attr.param !== 'undefined') {
           attr.param = attr.param.replace('@', '');
           if (attr.param.length > 0) {
-            if (global.tmi.showWithAt) {
+            if (tmi.showWithAt) {
               attr.param = '@' + attr.param;
             }
             return attr.param;
           }
         }
-        return (global.tmi.showWithAt ? '@' : '') + attr.sender.username;
+        return (tmi.showWithAt ? '@' : '') + attr.sender.username;
       },
       '$param': async function (filter) {
         if (!_.isUndefined(attr.param) && attr.param.length !== 0) {return attr.param};
@@ -300,13 +309,13 @@ class Message {
           .getMany())
 
           .sort((a, b) => {
-            const aTip = global.currency.exchange(a.amount, a.currency, global.currency.mainCurrency);
-            const bTip = global.currency.exchange(b.amount, b.currency, global.currency.mainCurrency);
+            const aTip = currency.exchange(a.amount, a.currency, currency.mainCurrency);
+            const bTip = currency.exchange(b.amount, b.currency, currency.mainCurrency);
             return bTip - aTip;
           }, 0);
 
         if (match.groups.type === 'stream') {
-          const whenOnline = global.api.isStreamOnline ? global.api.streamStatusChangeSince : null;
+          const whenOnline = api.isStreamOnline ? api.streamStatusChangeSince : null;
           if (whenOnline) {
             tips = tips.filter((o) => o.timestamp >= (new Date(whenOnline)).getTime());
           } else {
@@ -324,10 +333,10 @@ class Message {
         return '';
       },
       '(game)': async function (filter) {
-        return global.api.stats.currentGame || 'n/a';
+        return api.stats.currentGame || 'n/a';
       },
       '(status)': async function (filter) {
-        return global.api.stats.currentTitle || 'n/a';
+        return api.stats.currentTitle || 'n/a';
       }
     };
     let command = {
@@ -349,9 +358,9 @@ class Message {
         let cmd = filter
           .replace('!', '') // replace first !
           .replace(/\(|\)/g, '')
-          .replace(/\$sender/g, (global.tmi.showWithAt ? '@' : '') + attr.sender.username)
+          .replace(/\$sender/g, (tmi.showWithAt ? '@' : '') + attr.sender.username)
           .replace(/\$param/g, attr.param);
-        global.tmi.message({
+        tmi.message({
           message: {
             tags: attr.sender,
             message: cmd,
@@ -364,9 +373,9 @@ class Message {
       '(!#)': async function (filter) {
         let cmd = filter
           .replace(/\(|\)/g, '')
-          .replace(/\$sender/g, (global.tmi.showWithAt ? '@' : '') + attr.sender.username)
+          .replace(/\$sender/g, (tmi.showWithAt ? '@' : '') + attr.sender.username)
           .replace(/\$param/g, attr.param);
-        global.tmi.message({
+        tmi.message({
           message: {
             tags: attr.sender,
             message: cmd,
@@ -380,19 +389,19 @@ class Message {
     let price = {
       '(price)': async function (filter) {
         let price = 0;
-        if (global.systems.price.enabled) {
+        if (price.enabled) {
           let command = await getRepository(Price).findOne({ command: attr.cmd });
           price = command?.price ?? 0;
         }
-        return [price, await global.systems.points.getPointsName(price)].join(' ');
+        return [price, await points.getPointsName(price)].join(' ');
       }
     };
     let online = {
       '(onlineonly)': async function (filter) {
-        return global.api.isStreamOnline;
+        return api.isStreamOnline;
       },
       '(offlineonly)': async function (filter) {
-        return !(global.api.isStreamOnline);
+        return !(api.isStreamOnline);
       }
     };
     let list = {
@@ -415,7 +424,7 @@ class Message {
           case 'command':
             if (permission) {
               const responses = commands.map(o => o.responses).flat();
-              const _permission = await global.permissions.get(permission);
+              const _permission = await permissions.get(permission);
               if (_permission) {
                 const commandIds = responses.filter((o) => o.permission === _permission.id).map((o) => o.cid);
                 commands = commands.filter((o) => commandIds.includes(o.id));
@@ -427,7 +436,7 @@ class Message {
           case '!command':
             if (permission) {
               const responses = commands.map(o => o.responses).flat();
-              const _permission = await global.permissions.get(permission);
+              const _permission = await permissions.get(permission);
               if (_permission) {
                 const commandIds = responses.filter((o) => o.permission === _permission.id).map((o) => o.cid);
                 commands = commands.filter((o) => commandIds.includes(o.id));
@@ -445,7 +454,7 @@ class Message {
           case 'price':
             list = (await Promise.all(
               _.map(prices, async (o) => {
-                return `${o.command} (${o.price}${await global.systems.points.getPointsName(o.price)})`;
+                return `${o.command} (${o.price}${await points.getPointsName(o.price)})`;
               })
             )).join(', ');
             return list.length > 0 ? list : ' ';
@@ -469,7 +478,7 @@ class Message {
         let match = toEvaluate.match(regexp);
         if (match) {
           for (let variable of match) {
-            const currentValue = await global.customvariables.getValueOf(variable);
+            const currentValue = await customvariables.getValueOf(variable);
             toEvaluate = toEvaluate.replace(
               variable,
               isNaN(Number(currentValue)) ? 0 : currentValue
@@ -507,9 +516,9 @@ class Message {
 
         let users = [];
         if (containUsers || containRandom) {
-          users = await global.users.getAll();
+          users = await users.getAll();
         }
-        let user = await global.users.get(attr.sender.username);
+        let user = await users.get(attr.sender.username);
 
         let onlineViewers = [];
         let onlineSubscribers = [];
@@ -517,8 +526,8 @@ class Message {
 
         if (containOnline) {
           const viewers = (await getRepository(User).createQueryBuilder('user')
-            .where('user.username != :botusername', { botusername: global.oauth.botUsername.toLowerCase() })
-            .andWhere('user.username != :broadcasterusername', { broadcasterusername: global.oauth.broadcasterUsername.toLowerCase() })
+            .where('user.username != :botusername', { botusername: oauth.botUsername.toLowerCase() })
+            .andWhere('user.username != :broadcasterusername', { broadcasterusername: oauth.broadcasterUsername.toLowerCase() })
             .andWhere('user.isOnline = :isOnline', { isOnline: true })
             .getMany()).filter(o => {
             return commons.isIgnored({ username: o.username, userId: o.userId });
@@ -547,7 +556,7 @@ class Message {
           users: users,
           is: is,
           random: randomVar,
-          sender: global.tmi.showWithAt ? `@${attr.sender.username}` : `${attr.sender.username}`,
+          sender: tmi.showWithAt ? `@${attr.sender.username}` : `${attr.sender.username}`,
           param: _.isNil(attr.param) ? null : attr.param
         };
 
@@ -583,7 +592,7 @@ class Message {
       '(stream|#|game)': async function (filter) {
         const channel = filter.replace('(stream|', '').replace('|game)', '');
 
-        const token = await global.oauth.botAccessToken;
+        const token = await oauth.botAccessToken;
         if (token === '') {return 'n/a'};
 
         try {
@@ -599,13 +608,13 @@ class Message {
               'Authorization': 'Bearer ' + token
             }
           });
-          return global.api.getGameFromId(request.data.data[0].game_id);
+          return api.getGameFromId(request.data.data[0].game_id);
         } catch (e) { return 'n/a'; } // return nothing on error
       },
       '(stream|#|title)': async function (filter) {
         const channel = filter.replace('(stream|', '').replace('|title)', '');
 
-        const token = await global.oauth.botAccessToken;
+        const token = await oauth.botAccessToken;
         if (token === '') {return 'n/a'};
 
         try {
@@ -623,15 +632,15 @@ class Message {
             }
           });
           // save remaining api calls
-          global.api.calls.bot.remaining = request.headers['ratelimit-remaining'];
-          global.api.calls.bot.refresh = request.headers['ratelimit-reset'];
+          api.calls.bot.remaining = request.headers['ratelimit-remaining'];
+          api.calls.bot.refresh = request.headers['ratelimit-reset'];
           return request.data.data[0].title;
         } catch (e) { return 'n/a'; } // return nothing on error
       },
       '(stream|#|viewers)': async function (filter) {
         const channel = filter.replace('(stream|', '').replace('|viewers)', '');
 
-        const token = await global.oauth.botAccessToken;
+        const token = await oauth.botAccessToken;
         if (token === '') {return '0'};
 
         try {
@@ -648,8 +657,8 @@ class Message {
             }
           });
           // save remaining api calls
-          global.api.calls.bot.remaining = request.headers['ratelimit-remaining'];
-          global.api.calls.bot.refresh = request.headers['ratelimit-reset'];
+          api.calls.bot.remaining = request.headers['ratelimit-remaining'];
+          api.calls.bot.refresh = request.headers['ratelimit-reset'];
           return request.data.data[0].viewer_count;
         } catch (e) { return '0'; } // return nothing on error
       }
@@ -669,9 +678,9 @@ class Message {
       for (let [key, value] of Object.entries(attr)) {
         if (_.includes(['sender'], key)) {
           if (typeof value.username !== 'undefined') {
-            value = global.tmi.showWithAt ? `@${value.username}` : value.username;
+            value = tmi.showWithAt ? `@${value.username}` : value.username;
           } else {
-            value = global.tmi.showWithAt ? `@${value}` : value;
+            value = tmi.showWithAt ? `@${value}` : value;
           }
         }
         this.message = this.message.replace(new RegExp('[$]' + key, 'g'), value);
@@ -697,7 +706,7 @@ class Message {
       let url = rMessage[1].replace(/&amp;/g, '&');
       let response = await axios.get(url);
       if (response.status !== 200) {
-        return global.translate('core.api.error');
+        return translate('core.api.error');
       }
 
       // search for api datas in this.message
@@ -720,7 +729,7 @@ class Message {
               path = path[id];
             }
           });
-          this.message = this.message.replace(tag, !_.isNil(path) ? path : global.translate('core.api.not-available'));
+          this.message = this.message.replace(tag, !_.isNil(path) ? path : translate('core.api.not-available'));
         }
       }
     }

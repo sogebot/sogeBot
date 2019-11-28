@@ -444,16 +444,8 @@
       })
 
 
-      this.socket.emit('getLatestStats')
-      this.socket.emit('panel.sendStreamData')
-
-      setInterval(() => {
-        this.socket.emit('getLatestStats')
-        this.socket.emit('panel.sendStreamData')
-      }, 1000)
-
-      this.socket.on('latestStats', (data) => { this.averageStats = data })
-      this.socket.on('stats', async (data) => {
+      this.socket.emit('getLatestStats', (data) => { this.averageStats = data });
+      this.socket.emit('panel.sendStreamData', async (data) => {
         for (let [key, value] of Object.entries(data)) {
           this[key] = value // populate data
         }
@@ -463,7 +455,22 @@
         this.title = await this.generateTitle(data.status, data.rawStatus);
         this.rawStatus = data.rawStatus;
         this.game = data.game;
-      })
+      });
+
+      setInterval(() => {
+      this.socket.emit('getLatestStats', (data) => { this.averageStats = data });
+      this.socket.emit('panel.sendStreamData', async (data) => {
+        for (let [key, value] of Object.entries(data)) {
+          this[key] = value // populate data
+        }
+        this.timestamp = Date.now()
+        this.isLoaded = true
+
+        this.title = await this.generateTitle(data.status, data.rawStatus);
+        this.rawStatus = data.rawStatus;
+        this.game = data.game;
+      });
+      }, 1000)
     },
     computed: {
       isStreamOnline() {

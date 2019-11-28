@@ -5,10 +5,11 @@ const bodyParser = require('body-parser')
 var http = require('http')
 var path = require('path')
 var _ = require('lodash')
-const util = require('util')
 const commons = require('./commons')
 const flatten = require('./helpers/flatten')
 const gitCommitInfo = require('git-commit-info');
+import { adminEndpoint } from './helpers/socket';
+import glob from 'glob';
 
 import { error, info } from './helpers/log';
 import { CacheTitles } from './database/entity/cacheTitles';
@@ -18,8 +19,17 @@ import { Dashboard, Widget } from './database/entity/dashboard';
 import { Translation } from './database/entity/translation'
 import { TwitchTag, TwitchTagLocalizationName } from './database/entity/twitch'
 
+const socket = require('./socket');
 const Parser = require('./parser')
-
+const webhooks = require('./webhooks')
+const general = require('./general')
+import translateLib, { translate } from './translate';
+import api from './api';
+import currency from './currency';
+import oauth from './oauth';
+import songs from './systems/songs';
+import spotify from './integrations/spotify';
+import { status as statusObj, linesParsed } from './helpers/parser';
 const config = require('@config')
 
 let app;
@@ -36,32 +46,32 @@ function Panel () {
 
   // webhooks integration
   app.post('/webhooks/hub/follows', (req, res) => {
-    global.webhooks.follower(req.body)
+    webhooks.follower(req.body)
     res.sendStatus(200)
   })
   app.post('/webhooks/hub/streams', (req, res) => {
-    global.webhooks.stream(req.body)
+    webhooks.stream(req.body)
     res.sendStatus(200)
   })
 
   app.get('/webhooks/hub/follows', (req, res) => {
-    global.webhooks.challenge(req, res)
+    webhooks.challenge(req, res)
   })
   app.get('/webhooks/hub/streams', (req, res) => {
-    global.webhooks.challenge(req, res)
+    webhooks.challenge(req, res)
   })
 
   // highlights system
   app.get('/highlights/:id', (req, res) => {
-    global.systems.highlights.url(req, res)
+    highlights.url(req, res)
   })
 
   // customvariables system
   app.get('/customvariables/:id', (req, res) => {
-    global.customvariables.getURL(req, res)
+    customvariables.getURL(req, res)
   })
   app.post('/customvariables/:id', (req, res) => {
-    global.customvariables.postURL(req, res)
+    customvariables.postURL(req, res)
   })
 
   // static routing
@@ -103,27 +113,21 @@ function Panel () {
   this.io = require('socket.io')(server)
   this.menu = [{ category: 'main', name: 'dashboard', id: 'dashboard' }]
   this.widgets = []
-  this.socketListeners = []
 
-  this.registerSockets({
-    self: this,
-    expose: ['sendStreamData'],
-    finally: null
-  })
+  setTimeout(() => {
+    adminEndpoint('/', 'panel.sendStreamData', this.sendStreamData);
+  }, 5000)
 
-  this.io.use(global.socket.authorize);
+  this.io.use(socket.default.authorize);
 
   var self = this
-  this.io.on('connection', async function (socket) {
+  this.io.on('connection', async (socket) => {
     // create main dashboard if needed;
     await getRepository(Dashboard).save({
       id: 'c287b750-b620-4017-8b3e-e48757ddaa83', // constant ID
       name: 'Main',
       createdAt: 0,
     })
-
-
-    socket.on('metrics.translations', function (key) { global.lib.translate.addMetrics(key, true) })
 
     socket.on('getCachedTags', async (cb) => {
       const connection = await getConnection();
@@ -136,7 +140,7 @@ function Panel () {
         .addSelect('tags.is_auto', 'is_auto')
         .addSelect('tags.is_current', 'is_current')
         .leftJoinAndSelect(TwitchTagLocalizationName, 'names', `${joinQuery} like :tag`)
-        .setParameter("tag", '%' + global.general.lang +'%');
+        .setParameter('tag', '%' + general.lang +'%');
 
       let results = await query.execute();
       if (results.length > 0) {
@@ -151,13 +155,13 @@ function Panel () {
           .addSelect('tags.is_auto', 'is_auto')
           .addSelect('tags.is_current', 'is_current')
           .leftJoinAndSelect(TwitchTagLocalizationName, 'names', `${joinQuery} = :tag`)
-          .setParameter("tag", 'en-us');
+          .setParameter('tag', 'en-us');
         results = await query.execute();
       }
       cb(results);
     });
     // twitch game and title change
-    socket.on('getGameFromTwitch', function (game) { global.api.sendGameFromTwitch(global.api, socket, game) })
+    socket.on('getGameFromTwitch', function (game) { api.sendGameFromTwitch(api, socket, game) })
     socket.on('getUserTwitchGames', async () => {
       const titles = await getManager()
         .createQueryBuilder()
@@ -251,8 +255,8 @@ function Panel () {
       cb(null, allTitles);
     });
     socket.on('updateGameAndTitle', async (data, cb) => {
-      const status = await global.api.setTitleAndGame(null, data)
-      await global.api.setTags(null, data.tags);
+      const status = await api.setTitleAndGame(null, data)
+      await api.setTags(null, data.tags);
 
       if (!status) { // twitch refused update
         cb(true);
@@ -279,55 +283,52 @@ function Panel () {
           ])
           .execute();
       }
-
-      self.sendStreamData(self, global.panel.io) // force dashboard update
       cb(null)
     })
     socket.on('joinBot', async () => {
-      global.tmi.join('bot', global.tmi.channel)
+      tmi.join('bot', tmi.channel)
     })
     socket.on('leaveBot', async () => {
-      global.tmi.part('bot')
+      tmi.part('bot')
       // force all users offline
       await getRepository(User).update({}, { isOnline: false });
     })
 
     // custom var
     socket.on('custom.variable.value', async (variable, cb) => {
-      let value = global.translate('webpanel.not-available')
-      let isVariableSet = await global.customvariables.isVariableSet(variable)
-      if (isVariableSet) value = await global.customvariables.getValueOf(variable)
+      let value = translate('webpanel.not-available')
+      let isVariableSet = await customvariables.isVariableSet(variable)
+      if (isVariableSet) value = await customvariables.getValueOf(variable)
       cb(null, value)
     })
 
     socket.on('responses.get', async function (at, callback) {
-      const responses = flatten.flatten(!_.isNil(at) ? global.lib.translate.translations[global.general.lang][at] : global.lib.translate.translations[global.general.lang])
+      const responses = flatten.flatten(!_.isNil(at) ? translateLib.translations[general.lang][at] : translateLib.translations[general.lang])
       _.each(responses, function (value, key) {
         let _at = !_.isNil(at) ? at + '.' + key : key
         responses[key] = {} // remap to obj
-        responses[key].default = global.translate(_at, true)
-        responses[key].current = global.translate(_at)
+        responses[key].default = translate(_at, true)
+        responses[key].current = translate(_at)
       })
       callback(responses)
     })
     socket.on('responses.set', function (data) {
-      _.remove(global.lib.translate.custom, function (o) { return o.key === data.key })
-      global.lib.translate.custom.push(data)
-      global.lib.translate._save()
+      _.remove(translate.custom, function (o) { return o.key === data.key })
+      translate.custom.push(data)
+      translate._save()
 
       let lang = {}
       _.merge(
         lang,
-        global.translate({ root: 'webpanel' }),
-        global.translate({ root: 'ui' }) // add ui root -> slowly refactoring to new name
+        translate({ root: 'webpanel' }),
+        translate({ root: 'ui' }) // add ui root -> slowly refactoring to new name
       )
       socket.emit('lang', lang)
     })
     socket.on('responses.revert', async function (data, callback) {
-      _.remove(global.lib.translate.custom, function (o) { return o.name === data.name })
+      _.remove(translate.custom, function (o) { return o.name === data.name })
       await getRepository(Translation).delete({ name: data.name })
-      let translate = global.translate(data.name)
-      callback(translate)
+      callback(translate(data.name))
     })
 
     socket.on('getWidgetList', async (cb) => {
@@ -343,7 +344,7 @@ function Panel () {
       }
 
       const sendWidgets = [];
-      for(const widget of self.widgets) {
+      for(const widget of this.widgets) {
         if (!widgetList.includes(widget.id)) {
           sendWidgets.push(widget);
         }
@@ -394,78 +395,104 @@ function Panel () {
     socket.on('updateWidgets', async (dashboards) => {
       await getRepository(Dashboard).save(dashboards);
     });
-    socket.on('connection_status', cb => { cb(global.status) });
+    socket.on('connection_status', cb => { cb(statusObj) });
     socket.on('saveConfiguration', function (data) {
       _.each(data, async function (index, value) {
         if (value.startsWith('_')) return true
-        global.general.setValue({ sender: { username: commons.getOwner() }, parameters: value + ' ' + index, quiet: data._quiet })
+        general.setValue({ sender: { username: commons.getOwner() }, parameters: value + ' ' + index, quiet: data._quiet })
       })
     })
 
     // send enabled systems
     socket.on('systems', async (cb) => {
-      let toEmit = []
-      for (let system of Object.keys(global.systems).filter(o => !o.startsWith('_'))) {
+      const toEmit = [];
+      for (let system of glob.sync(__dirname + '/systems/*')) {
+        system = system.split('/systems/')[1].replace('.js', '');
+        if (system.startsWith('_')) {
+          continue;
+        }
+        self = (require('./systems/' + system.toLowerCase())).default;
         toEmit.push({
           name: system.toLowerCase(),
-          enabled: global.systems[system].enabled,
-          areDependenciesEnabled: await global.systems[system].areDependenciesEnabled,
-          isDisabledByEnv: global.systems[system].isDisabledByEnv,
-        })
+          enabled: self.enabled,
+          areDependenciesEnabled: await self.areDependenciesEnabled,
+          isDisabledByEnv: self.isDisabledByEnv,
+        });
       }
-      cb(null, toEmit)
-    })
+      cb(null, toEmit);
+    });
     socket.on('core', async (cb) => {
-      let toEmit = []
-      for (let system of ['oauth', 'tmi', 'currency', 'ui', 'general', 'twitch', 'socket']) {
+      const toEmit = [];
+      for (const system of ['oauth', 'tmi', 'currency', 'ui', 'general', 'twitch', 'socket']) {
         toEmit.push({
           name: system.toLowerCase()
-        })
-      }
-      cb(null, toEmit)
+        });
+      };
+      cb(null, toEmit);
     })
     socket.on('integrations', async (cb) => {
-      let toEmit = []
-      for (let system of Object.keys(global.integrations).filter(o => !o.startsWith('_'))) {
-        if (!global.integrations[system].showInUI) continue
+      const toEmit = [];
+      for (let system of glob.sync(__dirname + '/integrations/*')) {
+        system = system.split('/integrations/')[1].replace('.js', '');
+        if (system.startsWith('_')) {
+          continue;
+        }
+        self = (require('./integrations/' + system.toLowerCase())).default;
+        if (!self.showInUI) {
+          continue;
+        }
         toEmit.push({
           name: system.toLowerCase(),
-          enabled: global.integrations[system].enabled,
-          areDependenciesEnabled: await global.integrations[system].areDependenciesEnabled,
-          isDisabledByEnv: global.integrations[system].isDisabledByEnv,
-        })
+          enabled: self.enabled,
+          areDependenciesEnabled: await self.areDependenciesEnabled,
+          isDisabledByEnv: self.isDisabledByEnv,
+        });
       }
-      cb(null, toEmit)
-    })
+      cb(null, toEmit);
+    });
     socket.on('overlays', async (cb) => {
-      let toEmit = []
-      for (let system of Object.keys(global.overlays).filter(o => !o.startsWith('_'))) {
-        if (!global.overlays[system].showInUI) continue
+      const toEmit = [];
+      for (let system of glob.sync(__dirname + '/overlays/*')) {
+        system = system.split('/overlays/')[1].replace('.js', '');
+        if (system.startsWith('_')) {
+          continue;
+        }
+        self = (require('./overlays/' + system.toLowerCase())).default;
+        if (!self.showInUI) {
+          continue;
+        }
         toEmit.push({
           name: system.toLowerCase(),
-          enabled: global.overlays[system].enabled,
-          areDependenciesEnabled: await global.overlays[system].areDependenciesEnabled,
-          isDisabledByEnv: global.overlays[system].isDisabledByEnv,
-        })
+          enabled: self.enabled,
+          areDependenciesEnabled: await self.areDependenciesEnabled,
+          isDisabledByEnv: self.isDisabledByEnv,
+        });
       }
-      cb(null, toEmit)
-    })
+      cb(null, toEmit);
+    });
     socket.on('games', async (cb) => {
-      let toEmit = []
-      for (let system of Object.keys(global.games).filter(o => !o.startsWith('_'))) {
-        if (!global.games[system].showInUI) continue
+      const toEmit = [];
+      for (let system of glob.sync(__dirname + '/games/*')) {
+        system = system.split('/games/')[1].replace('.js', '');
+        if (system.startsWith('_')) {
+          continue;
+        }
+        self = (require('./games/' + system.toLowerCase())).default;
+        if (!self.showInUI) {
+          continue;
+        }
         toEmit.push({
           name: system.toLowerCase(),
-          enabled: global.games[system].enabled,
-          areDependenciesEnabled: await global.games[system].areDependenciesEnabled,
-          isDisabledByEnv: global.games[system].isDisabledByEnv,
-        })
+          enabled: self.enabled,
+          areDependenciesEnabled: await self.areDependenciesEnabled,
+          isDisabledByEnv: self.isDisabledByEnv,
+        });
       }
-      cb(null, toEmit)
-    })
+      cb(null, toEmit);
+    });
 
     socket.on('name', function (cb) {
-      cb(global.oauth.botUsername);
+      cb(oauth.botUsername);
     })
     socket.on('version', function (cb) {
       const version = _.get(process, 'env.npm_package_version', 'x.y.z');
@@ -477,39 +504,25 @@ function Panel () {
     })
 
     socket.on('menu', (cb) => {
-      cb(self.menu);
+      cb(this.menu);
     });
 
     socket.on('translations', (cb) => {
       let lang = {}
       _.merge(
         lang,
-        global.translate({ root: 'webpanel' }),
-        global.translate({ root: 'ui' }) // add ui root -> slowly refactoring to new name
+        translate({ root: 'webpanel' }),
+        translate({ root: 'ui' }) // add ui root -> slowly refactoring to new name
       )
       cb(lang);
-    })
-
-    _.each(self.socketListeners, function (listener) {
-      socket.on(listener.on, async function (data) {
-        if (typeof listener.fnc !== 'function') {
-          throw new Error('Function for this listener is undefined' +
-            ' widget=' + listener.self.constructor.name + ' on=' + listener.on)
-        }
-        try { await listener.fnc(listener.self, self.io, data) } catch (e) {
-          error(e)
-          error('Error on ' + listener.on + ' listener')
-        }
-        if (listener.finally && listener.finally !== listener.fnc) listener.finally(listener.self, self.io)
-      })
     })
 
     // send webpanel translations
     let lang = {}
     _.merge(
       lang,
-      global.translate({ root: 'webpanel' }),
-      global.translate({ root: 'ui' }) // add ui root -> slowly refactoring to new name
+      translate({ root: 'webpanel' }),
+      translate({ root: 'ui' }) // add ui root -> slowly refactoring to new name
     )
     socket.emit('lang', lang)
   })
@@ -524,10 +537,10 @@ Panel.prototype.getApp = function () {
 }
 
 Panel.prototype.expose = function () {
-  server.listen(global.panel.port, function () {
-    info(`WebPanel is available at http://localhost:${global.panel.port}`)
-  })
-}
+  server.listen(this.port, () => {
+    info(`WebPanel is available at http://localhost:${this.port}`)
+  });
+};
 
 Panel.prototype.addMenu = function (menu) {
   if (!this.menu.find(o => o.id === menu.id)) {
@@ -537,30 +550,11 @@ Panel.prototype.addMenu = function (menu) {
 
 Panel.prototype.addWidget = function (id, name, icon) { this.widgets.push({ id: id, name: name, icon: icon }) }
 
-Panel.prototype.socketListening = function (self, on, fnc) {
-  this.socketListeners.push({ self: self, on: on, fnc: fnc })
-}
-
-Panel.prototype.registerSockets = util.deprecate(function (options) {
-  const name = options.self.constructor.name.toLowerCase()
-  for (let fnc of options.expose) {
-    if (!_.isFunction(options.self[fnc])) error(`Function ${fnc} of ${options.self.constructor.name} is undefined`)
-    else this.socketListeners.push({ self: options.self, on: `${name}.${fnc}`, fnc: options.self[fnc], finally: options.finally })
-  }
-}, 'registerSockets() is deprecated. Use socket from system interface directly.')
-
-Panel.prototype.sendStreamData = async function (self, socket) {
+Panel.prototype.sendStreamData = async function (cb) {
   try {
-    if (typeof global.systems === 'undefined'
-        || typeof global.systems.songs === 'undefined'
-        || typeof global.integrations === 'undefined'
-        || typeof global.integrations.spotify === 'undefined') {
-      return
-    }
-
-    const ytCurrentSong = Object.values(global.systems.songs.isPlaying).find(o => o) ? _.get(JSON.parse(global.systems.songs.currentSong), 'title', null) : null;
-    let spotifyCurrentSong = _.get(JSON.parse(global.integrations.spotify.currentSong), 'song', '') + ' - ' + _.get(JSON.parse(global.integrations.spotify.currentSong), 'artist', '');
-    if (spotifyCurrentSong.trim().length === 1 /* '-' */  || !_.get(JSON.parse(global.integrations.spotify.currentSong), 'is_playing', false)) {
+    const ytCurrentSong = Object.values(songs.isPlaying).find(o => o) ? _.get(JSON.parse(songs.currentSong), 'title', null) : null;
+    let spotifyCurrentSong = _.get(JSON.parse(spotify.currentSong), 'song', '') + ' - ' + _.get(JSON.parse(spotify.currentSong), 'artist', '');
+    if (spotifyCurrentSong.trim().length === 1 /* '-' */  || !_.get(JSON.parse(spotify.currentSong), 'is_playing', false)) {
       spotifyCurrentSong = null;
     }
 
@@ -575,7 +569,7 @@ Panel.prototype.sendStreamData = async function (self, socket) {
       .addSelect('tags.is_current', 'is_current')
       .where('tags.is_current = True')
       .leftJoinAndSelect(TwitchTagLocalizationName, 'names', `${joinQuery} like :tag`)
-      .setParameter("tag", '%' + global.general.lang +'%');
+      .setParameter('tag', '%' + general.lang +'%');
 
     let tagResults = await tagQuery.execute();
     if (tagResults.length === 0) {
@@ -589,35 +583,35 @@ Panel.prototype.sendStreamData = async function (self, socket) {
         .addSelect('tags.is_current', 'is_current')
         .where('tags.is_current = True')
         .leftJoinAndSelect(TwitchTagLocalizationName, 'names', `${joinQuery} = :tag`)
-        .setParameter("tag", 'en-us');
+        .setParameter('tag', 'en-us');
       tagResults = await tagQuery.execute();
     }
 
     const data = {
-      broadcasterType: global.oauth.broadcasterType,
-      uptime: commons.getTime(global.api.isStreamOnline ? global.api.streamStatusChangeSince : null, false),
-      currentViewers: global.api.stats.currentViewers,
-      currentSubscribers: global.api.stats.currentSubscribers,
-      currentBits: global.api.stats.currentBits,
-      currentTips: global.api.stats.currentTips,
-      currency: global.currency.symbol(global.currency.mainCurrency),
-      chatMessages: global.api.isStreamOnline ? global.linesParsed - global.api.chatMessagesAtStart : 0,
-      currentFollowers: global.api.stats.currentFollowers,
-      currentViews: global.api.stats.currentViews,
-      maxViewers: global.api.stats.maxViewers,
-      newChatters: global.api.stats.newChatters,
-      game: global.api.stats.currentGame,
-      status: global.api.stats.currentTitle,
-      rawStatus: global.api.rawStatus,
-      currentSong: ytCurrentSong || spotifyCurrentSong || global.translate('songs.not-playing'),
-      currentHosts: global.api.stats.currentHosts,
-      currentWatched: global.api.stats.currentWatchedTime,
+      broadcasterType: oauth.broadcasterType,
+      uptime: commons.getTime(api.isStreamOnline ? api.streamStatusChangeSince : null, false),
+      currentViewers: api.stats.currentViewers,
+      currentSubscribers: api.stats.currentSubscribers,
+      currentBits: api.stats.currentBits,
+      currentTips: api.stats.currentTips,
+      currency: currency.symbol(currency.mainCurrency),
+      chatMessages: api.isStreamOnline ? linesParsed - api.chatMessagesAtStart : 0,
+      currentFollowers: api.stats.currentFollowers,
+      currentViews: api.stats.currentViews,
+      maxViewers: api.stats.maxViewers,
+      newChatters: api.stats.newChatters,
+      game: api.stats.currentGame,
+      status: api.stats.currentTitle,
+      rawStatus: api.rawStatus,
+      currentSong: ytCurrentSong || spotifyCurrentSong || translate('songs.not-playing'),
+      currentHosts: api.stats.currentHosts,
+      currentWatched: api.stats.currentWatchedTime,
       tags: tagResults,
     }
-    socket.emit('stats', data)
+    cb(data)
   } catch (e) {
     error(e.stack);
   }
 }
 
-module.exports = Panel
+export default new Panel();

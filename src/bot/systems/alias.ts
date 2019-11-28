@@ -7,7 +7,7 @@ import { command, default_permission, parser } from '../decorators';
 import Expects from '../expects';
 import Message from '../message';
 import Parser from '../parser';
-import { permission } from '../permissions';
+import { permission } from '../helpers/permissions';
 import System from './_interface';
 import { incrementCountOfCommandUsage } from '../helpers/commands/count';
 import { debug, warning } from '../helpers/log';
@@ -17,6 +17,9 @@ import { Alias as AliasEntity } from '../database/entity/alias';
 import { getRepository } from 'typeorm';
 import { adminEndpoint, publicEndpoint } from '../helpers/socket';
 import { addToViewersCache, getfromViewersCache } from '../helpers/permissions';
+import permissions from '../permissions';
+import { translate } from '../translate';
+import tmi from '../tmi';
 
 /*
  * !alias                                              - gets an info about alias usage
@@ -104,7 +107,7 @@ class Alias extends System {
         return false;
       } else {
         if (typeof getfromViewersCache(opts.sender.userId, alias.permission) === 'undefined') {
-          addToViewersCache(opts.sender.userId, alias.permission, (await global.permissions.check(opts.sender.userId, alias.permission, false)).access);
+          addToViewersCache(opts.sender.userId, alias.permission, (await permissions.check(opts.sender.userId, alias.permission, false)).access);
         }
         if (getfromViewersCache(opts.sender.userId, alias.permission)) {
           // parse variables
@@ -112,7 +115,7 @@ class Alias extends System {
             sender: opts.sender,
           });
           debug('alias.process', message);
-          global.tmi.message({
+          tmi.message({
             message: {
               tags: opts.sender,
               message,
@@ -129,7 +132,7 @@ class Alias extends System {
   @command('!alias')
   @default_permission(permission.CASTERS)
   main (opts) {
-    sendMessage(global.translate('core.usage') + ': !alias add -p [uuid|name] <!alias> <!command> | !alias edit -p [uuid|name] <!alias> <!command> | !alias remove <!alias> | !alias list | !alias toggle <!alias> | !alias toggle-visibility <!alias>', opts.sender, opts.attr);
+    sendMessage(translate('core.usage') + ': !alias add -p [uuid|name] <!alias> <!command> | !alias edit -p [uuid|name] <!alias> <!command> | !alias remove <!alias> | !alias list | !alias toggle <!alias> | !alias toggle-visibility <!alias>', opts.sender, opts.attr);
   }
 
   @command('!alias edit')
@@ -146,7 +149,7 @@ class Alias extends System {
         throw Error('Alias or Command doesn\'t start with !');
       }
 
-      const pItem = await global.permissions.get(perm);
+      const pItem = await permissions.get(perm);
       if (!pItem) {
         throw Error('Permission ' + perm + ' not found.');
       }
@@ -182,7 +185,7 @@ class Alias extends System {
         throw Error('Alias or Command doesn\'t start with !');
       }
 
-      const pItem = await global.permissions.get(perm);
+      const pItem = await permissions.get(perm);
       if (!pItem) {
         throw Error('Permission ' + perm + ' not found.');
       }
@@ -207,7 +210,7 @@ class Alias extends System {
   @default_permission(permission.CASTERS)
   async list (opts) {
     const alias = await getRepository(AliasEntity).find({ visible: true, enabled: true });
-    const output = (alias.length === 0 ? global.translate('alias.list-is-empty') : global.translate('alias.list-is-not-empty').replace(/\$list/g, (_.map(_.orderBy(alias, 'alias'), 'alias')).join(', ')));
+    const output = (alias.length === 0 ? translate('alias.list-is-empty') : translate('alias.list-is-not-empty').replace(/\$list/g, (_.map(_.orderBy(alias, 'alias'), 'alias')).join(', ')));
     sendMessage(output, opts.sender, opts.attr);
   }
 
@@ -296,5 +299,4 @@ class Alias extends System {
   }
 }
 
-export default Alias;
-export { Alias };
+export default new Alias();

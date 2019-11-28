@@ -15,6 +15,9 @@ const testuser3 = { username: 'testuser3', id: Math.floor(Math.random() * 1000) 
 const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/database/entity/user');
 
+const twitch = (require('../../../dest/twitch')).default;
+const eventlist = (require('../../../dest/overlays/eventlist')).default;
+
 describe('lib/twitch - subs()', () => {
   before(async () => {
     await db.cleanup();
@@ -29,7 +32,7 @@ describe('lib/twitch - subs()', () => {
 
   it('add testuser to event', async () => {
     await time.waitMs(100);
-    await global.overlays.eventlist.add({
+    await eventlist.add({
       event: 'sub',
       username: 'testuser',
     });
@@ -37,14 +40,14 @@ describe('lib/twitch - subs()', () => {
 
   it('add testuser2 to event', async () => {
     await time.waitMs(100);
-    await global.overlays.eventlist.add({
+    await eventlist.add({
       event: 'sub',
       username: 'testuser2',
     });
   });
 
   it('!subs should return testuser2', async () => {
-    global.twitch.subs({ sender: testuser });
+    twitch.subs({ sender: testuser });
     await message.isSent('subs', testuser, {
       lastSubAgo: 'a few seconds ago',
       lastSubUsername: testuser2.username,
@@ -54,14 +57,14 @@ describe('lib/twitch - subs()', () => {
 
   it('add testuser3 to events', async () => {
     await time.waitMs(100);
-    await global.overlays.eventlist.add({
+    await eventlist.add({
       event: 'sub',
       username: 'testuser3',
     });
   });
 
   it('!subs should return testuser3', async () => {
-    global.twitch.subs({ sender: testuser });
+    twitch.subs({ sender: testuser });
     await message.isSent('subs', testuser, {
       lastSubAgo: 'a few seconds ago',
       lastSubUsername: testuser3.username,
@@ -74,7 +77,7 @@ describe('lib/twitch - subs()', () => {
   });
 
   it('!subs should return testuser3 and 3 online subs', async () => {
-    global.twitch.subs({ sender: testuser });
+    twitch.subs({ sender: testuser });
     await message.isSent('subs', testuser, {
       lastSubAgo: 'a few seconds ago',
       lastSubUsername: testuser3.username,

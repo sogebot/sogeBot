@@ -8,6 +8,7 @@ import { publicEndpoint } from '../helpers/socket';
 
 import { Brackets, getManager, getRepository } from 'typeorm';
 import { EventList as EventListEntity } from '../database/entity/eventList';
+import eventlist from '../widgets/eventlist';
 
 class EventList extends Overlay {
   @ui({
@@ -61,9 +62,8 @@ class EventList extends Overlay {
         }, {}),
     );
     await getRepository(EventListEntity).save(event);
-    global.widgets.eventlist.update();
+    eventlist.update();
   }
 }
 
-export default EventList;
-export { EventList };
+export default new EventList();

@@ -12,5 +12,4 @@ class JoinPart extends Widget {
   }
 }
 
-export default JoinPart;
-export { JoinPart };
+export default new JoinPart();

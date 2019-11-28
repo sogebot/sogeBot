@@ -12,6 +12,7 @@ import Expects from '../expects';
 import Integration from './_interface';
 import { debug, error, info, warning } from '../helpers/log';
 import { adminEndpoint } from '../helpers/socket';
+import api from '../api';
 
 /*
  * How to integrate:
@@ -20,6 +21,8 @@ import { adminEndpoint } from '../helpers/socket';
  * 2. Update your clientId, clientSecret, redirectURI in Integrations UI
  * 3. Authorize your user through UI
  */
+
+let _spotify: any = null;
 
 class Spotify extends Integration {
   client: any = null;
@@ -89,7 +92,7 @@ class Spotify extends Integration {
   @ui({
     type: 'btn-emit',
     class: 'btn btn-primary btn-block mt-1 mb-1',
-    if: () => global.integrations.spotify.username.length === 0,
+    if: () => _spotify.username.length === 0,
     emit: 'authorize',
   }, 'connection')
   authorizeBtn = null;
@@ -97,7 +100,7 @@ class Spotify extends Integration {
   @ui({
     type: 'btn-emit',
     class: 'btn btn-primary btn-block mt-1 mb-1',
-    if: () => global.integrations.spotify.username.length > 0,
+    if: () => _spotify.username.length > 0,
     emit: 'revoke',
   }, 'connection')
   revokeBtn = null;
@@ -222,7 +225,7 @@ class Spotify extends Integration {
       this.originalUri = song.uri;
     }
 
-    if (!(global.api.isStreamOnline)) {
+    if (!(api.isStreamOnline)) {
       return; // don't do anything on offline stream
     }
 
@@ -279,7 +282,7 @@ class Spotify extends Integration {
     clearTimeout(this.timeouts.ICurrentSong);
 
     try {
-      if (!this.fetchCurrentSongWhenOffline && !(global.api.isStreamOnline)) {
+      if (!this.fetchCurrentSongWhenOffline && !(api.isStreamOnline)) {
         throw Error('Stream is offline');
       }
       const data = await this.client.getMyCurrentPlayingTrack();
@@ -474,7 +477,7 @@ class Spotify extends Integration {
   @command('!spotify')
   @default_permission(null)
   async main (opts: CommandOptions) {
-    if (!(global.api.isStreamOnline)) {
+    if (!(api.isStreamOnline)) {
       return;
     } // don't do anything on offline stream
     if (!this.songRequests) {
@@ -547,5 +550,5 @@ class Spotify extends Integration {
   }
 }
 
-export default Spotify;
-export { Spotify };
+_spotify = new Spotify();
+export default _spotify;

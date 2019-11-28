@@ -8,6 +8,9 @@ import { info, tip } from '../helpers/log';
 import { triggerInterfaceOnTip } from '../helpers/interface/triggers';
 import { getRepository } from 'typeorm';
 import { User, UserTip } from '../database/entity/user';
+import users from '../users';
+import events from '../events';
+import alerts from '../registries/alerts';
 
 /* example payload (eventData)
 {
@@ -28,7 +31,7 @@ import { User, UserTip } from '../database/entity/user';
   updatedAt: '2019-10-03T22:42:33.023Z'
 } */
 class StreamElements extends Integration {
-  socket: SocketIOClient.Socket | null = null;
+  socketToStreamElements: SocketIOClient.Socket | null = null;
 
   @settings()
   @ui({ type: 'text-input', secret: true })
@@ -45,9 +48,9 @@ class StreamElements extends Integration {
   }
 
   async disconnect () {
-    if (this.socket !== null) {
-      this.socket.removeAllListeners();
-      this.socket.disconnect();
+    if (this.socketToStreamElements !== null) {
+      this.socketToStreamElements.removeAllListeners();
+      this.socketToStreamElements.disconnect();
     }
   }
 
@@ -59,7 +62,7 @@ class StreamElements extends Integration {
       return;
     }
 
-    this.socket = io.connect('https://realtime.streamelements.com', {
+    this.socketToStreamElements = io.connect('https://realtime.streamelements.com', {
       reconnection: true,
       reconnectionDelay: 1000,
       reconnectionDelayMax: 5000,
@@ -67,29 +70,29 @@ class StreamElements extends Integration {
       transports: ['websocket'],
     });
 
-    this.socket.on('reconnect_attempt', () => {
+    this.socketToStreamElements.on('reconnect_attempt', () => {
       info(chalk.yellow('STREAMELEMENTS:') + ' Trying to reconnect to service');
     });
 
-    this.socket.on('connect', () => {
+    this.socketToStreamElements.on('connect', () => {
       info(chalk.yellow('STREAMELEMENTS:') + ' Successfully connected socket to service');
-      if (this.socket !== null) {
-        this.socket.emit('authenticate', { method: 'jwt', token: this.jwtToken });
+      if (this.socketToStreamElements !== null) {
+        this.socketToStreamElements.emit('authenticate', { method: 'jwt', token: this.jwtToken });
       }
     });
 
-    this.socket.on('authenticated', () => {
+    this.socketToStreamElements.on('authenticated', () => {
       info(chalk.yellow('STREAMELEMENTS:') + ' Successfully authenticated on service');
     });
 
-    this.socket.on('disconnect', () => {
+    this.socketToStreamElements.on('disconnect', () => {
       info(chalk.yellow('STREAMELEMENTS:') + ' Socket disconnected from service');
-      if (this.socket) {
-        this.socket.open();
+      if (this.socketToStreamElements) {
+        this.socketToStreamElements.open();
       }
     });
 
-    this.socket.on('event', async (eventData) => {
+    this.socketToStreamElements.on('event', async (eventData) => {
       this.parse(eventData);
     });
   }
@@ -104,7 +107,7 @@ class StreamElements extends Integration {
     let user = await getRepository(User).findOne({ where: { username: username.toLowerCase() }});
     let id;
     if (!user) {
-      id = await global.users.getIdByName(username.toLowerCase());
+      id = await users.getIdByName(username.toLowerCase());
       user = await getRepository(User).findOne({ where: { userId: id }});
       if (!user && id) {
         // if we still doesn't have user, we create new
@@ -120,7 +123,7 @@ class StreamElements extends Integration {
     const newTip = new UserTip();
     newTip.amount = Number(amount);
     newTip.currency = currency;
-    newTip.sortAmount = global.currency.exchange(Number(amount), currency, 'EUR');
+    newTip.sortAmount = currency.exchange(Number(amount), currency, 'EUR');
     newTip.message = message;
     newTip.tippedAt = Date.now();
 
@@ -130,15 +133,15 @@ class StreamElements extends Integration {
     }
 
     tip(`${username.toLowerCase()}${id ? '#' + id : ''}, amount: ${Number(eventData.data.amount).toFixed(2)}${eventData.data.currency}, message: ${eventData.data.message}`);
-    global.events.fire('tip', {
+    events.fire('tip', {
       username: username.toLowerCase(),
       amount: parseFloat(eventData.data.amount).toFixed(2),
       currency: eventData.data.currency,
-      amountInBotCurrency: parseFloat(global.currency.exchange(eventData.data.amount, eventData.data.currency, global.currency.mainCurrency)).toFixed(2),
-      currencyInBot: global.currency.mainCurrency,
+      amountInBotCurrency: parseFloat(currency.exchange(eventData.data.amount, eventData.data.currency, currency.mainCurrency)).toFixed(2),
+      currencyInBot: currency.mainCurrency,
       message: eventData.data.message,
     });
-    global.registries.alerts.trigger({
+    alerts.trigger({
       event: 'tips',
       name: username.toLowerCase(),
       amount: Number(parseFloat(eventData.data.amount).toFixed(2)),
@@ -158,5 +161,4 @@ class StreamElements extends Integration {
   }
 }
 
-export default StreamElements;
-export { StreamElements };
+export default new StreamElements();

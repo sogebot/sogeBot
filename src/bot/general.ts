@@ -2,16 +2,20 @@ import 'module-alias/register';
 
 import { readdirSync } from 'fs';
 import gitCommitInfo from 'git-commit-info';
-import { get, isBoolean, isFinite, isNil, isNumber, isString, map, set } from 'lodash';
+import { get, isBoolean, isFinite, isNil, isNumber, isString, map } from 'lodash';
 import Core from './_interface';
 import { sendMessage } from './commons';
 import { command, default_permission, settings, ui } from './decorators';
 import { onChange, onLoad } from './decorators/on';
-import { permission } from './permissions';
+import { permission } from './helpers/permissions';
 import { isMainThread } from './cluster';
 import { debug, error, warning } from './helpers/log';
 import { getConnection, getRepository } from 'typeorm';
-import Widget from './widgets/_interface';
+import { Widget } from './database/entity/dashboard';
+import oauth from './oauth';
+import translateLib, { translate } from './translate';
+import tmi from './tmi';
+import glob from 'glob';
 
 class General extends Core {
   @settings('general')
@@ -36,14 +40,14 @@ class General extends Core {
   @onChange('lang')
   @onLoad('lang')
   public async onLangUpdate() {
-    await global.lib.translate._load();
+    await translateLib._load();
     if (isMainThread) {
-      warning(global.translate('core.lang-selected'));
+      warning(translate('core.lang-selected'));
     }
   }
 
   public async onLangLoad() {
-    await global.lib.translate._load();
+    await translateLib._load();
   }
 
   @command('!_debug')
@@ -52,36 +56,42 @@ class General extends Core {
     const widgets = await getRepository(Widget).find();
     const connection = await getConnection();
 
-    const oauth = {
-      broadcaster: global.oauth.broadcasterUsername !== '',
-      bot: global.oauth.botUsername !== '',
+    const oauthInfo = {
+      broadcaster: oauth.broadcasterUsername !== '',
+      bot: oauth.botUsername !== '',
     };
 
     const lang = this.lang;
-    const mute = global.tmi.mute;
+    const mute = tmi.mute;
 
     const enabledSystems: any = {};
     for (const category of ['systems', 'games', 'integrations']) {
-      if (isNil(enabledSystems[category])) {
-        enabledSystems[category] = [];
-      }
-      for (const system of Object.keys(global[category]).filter((o) => !o.startsWith('_'))) {
-        const [enabled, areDependenciesEnabled, isDisabledByEnv] = await Promise.all([
-          global[category][system].enabled,
-          global[category][system].areDependenciesEnabled,
-          !isNil(process.env.DISABLE) && (process.env.DISABLE.toLowerCase().split(',').includes(system.toLowerCase()) || process.env.DISABLE === '*'),
-        ]);
-        if (!enabled) {
-          enabledSystems[category].push('-' + system);
-        } else if (!areDependenciesEnabled) {
-          enabledSystems[category].push('-dep-' + system);
-        } else if (isDisabledByEnv) {
-          enabledSystems[category].push('-env-' + system);
-        } else {
-          enabledSystems[category].push(system);
+      enabledSystems[category] = enabledSystems[category] ?? [];
+
+      for (const category of ['systems', 'games', 'integrations']) {
+        for (let system of glob.sync(__dirname + '/' + category + '/*')) {
+          system = system.split('/' + category + '/')[1].replace('.js', '');
+          if (system.startsWith('_')) {
+            continue;
+          }
+          const self = (require('./' + category + '/' + system.toLowerCase())).default;
+          const enabled = self.enabled;
+          const areDependenciesEnabled = self.areDependenciesEnabled;
+          const isDisabledByEnv = !isNil(process.env.DISABLE) && (process.env.DISABLE.toLowerCase().split(',').includes(system.toLowerCase()) || process.env.DISABLE === '*');
+
+          if (!enabled) {
+            enabledSystems[category].push('-' + system);
+          } else if (!areDependenciesEnabled) {
+            enabledSystems[category].push('-dep-' + system);
+          } else if (isDisabledByEnv) {
+            enabledSystems[category].push('-env-' + system);
+          } else {
+            enabledSystems[category].push(system);
+          }
         }
       }
     }
+
     const version = get(process, 'env.npm_package_version', 'x.y.z');
     debug('*', '======= COPY DEBUG MESSAGE FROM HERE =======');
     debug('*', `GENERAL      | OS: ${process.env.npm_config_user_agent}`);
@@ -95,7 +105,7 @@ class General extends Core {
     debug('*', `GAMES        | ${enabledSystems.games.join(', ')}`);
     debug('*', `INTEGRATIONS | ${enabledSystems.integrations.join(', ')}`);
     debug('*', `WIDGETS      | ${map(widgets, 'name').join(', ')}`);
-    debug('*', `OAUTH        | BOT ${oauth.bot} | BROADCASTER ${oauth.broadcaster}`);
+    debug('*', `OAUTH        | BOT ${oauthInfo.bot} | BROADCASTER ${oauthInfo.broadcaster}`);
     debug('*', '======= END OF DEBUG MESSAGE =======');
   }
 
@@ -109,25 +119,33 @@ class General extends Core {
     if (!pointer) {
       return sendMessage(`$sender, settings does not exists`, opts.sender, opts.attr);
     }
-    const currentValue = await get(global, pointer, undefined);
+
+    let self;
+    if (pointer.startsWith('core')) {
+      self = (require(`./${pointer.split('.')[1]}`)).default;
+    } else {
+      self = (require(`./${pointer.split('.')[0]}/${pointer.split('.')[1]}`)).default;
+    }
+
+    const currentValue = self[pointer.split('.')[2]];
     if (typeof currentValue !== 'undefined') {
       if (isBoolean(currentValue)) {
         newValue = newValue.toLowerCase().trim();
         if (['true', 'false'].includes(newValue)) {
-          set(global, pointer, newValue === 'true');
+          self[pointer.split('.')[2]] = newValue === 'true';
           sendMessage(`$sender, ${pointer} set to ${newValue}`, opts.sender, opts.attr);
         } else {
           sendMessage('$sender, !set error: bool is expected', opts.sender, opts.attr);
         }
       } else if (isNumber(currentValue)) {
         if (isFinite(Number(newValue))) {
-          set(global, pointer, Number(newValue));
+          self[pointer.split('.')[2]] = Number(newValue);
           sendMessage(`$sender, ${pointer} set to ${newValue}`, opts.sender, opts.attr);
         } else {
           sendMessage('$sender, !set error: number is expected', opts.sender, opts.attr);
         }
       } else if (isString(currentValue)) {
-        set(global, pointer, newValue);
+        self[pointer.split('.')[2]] = newValue;
         sendMessage(`$sender, ${pointer} set to '${newValue}'`, opts.sender, opts.attr);
       } else {
         sendMessage(`$sender, ${pointer} is not supported settings to change`, opts.sender, opts.attr);
@@ -148,15 +166,25 @@ class General extends Core {
         throw new Error('Not supported');
       }
 
-      if (isNil(global[type + 's'][name])) {
-        throw new Error(`Not found - ${type}s - ${name}`);
+      let found = false;
+      for (let system of glob.sync(__dirname + '/' + type + 's' + '/' + name + '*')) {
+        system = system.split('/' + type + 's' + '/')[1].replace('.js', '');
+        if (system.startsWith('_')) {
+          continue;
+        }
+        const self = (require('./' + type + 's' + '/' + system.toLowerCase())).default;
+        self.status({ state: opts.enable });
+        found = true;
+        break;
       }
 
-      global[type][name].status({ state: opts.enable });
+      if (!found) {
+        throw new Error(`Not found - ${type}s - ${name}`);
+      }
     } catch (e) {
       error(e.message);
     }
   }
 }
 
-module.exports = General;
+export default new General();

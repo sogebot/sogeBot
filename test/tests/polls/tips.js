@@ -15,6 +15,10 @@ const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/database/entity/user');
 const { Poll, PollVote } = require('../../../dest/database/entity/poll');
 
+const currency = (require('../../../dest/currency')).default;
+const polls = (require('../../../dest/systems/polls')).default;
+const streamlabs = (require('../../../dest/integrations/streamlabs')).default;
+
 const assert = require('chai').assert;
 
 const owner = { username: 'soge__', userId: Math.floor(Math.random() * 10000) };
@@ -25,32 +29,31 @@ describe('Polls - tips', () => {
     await time.waitMs(1000);
     await message.prepare();
 
-    global.currency.mainCurrency = 'EUR';
-    await variable.isEqual('global.currency.mainCurrency', 'EUR');
+    currency.mainCurrency = 'EUR';
   });
 
   describe('Close not opened voting', () => {
     it('Close voting should fail', async () => {
-      assert.isNotTrue(await global.systems.polls.close({ sender: owner }));
+      assert.isNotTrue(await polls.close({ sender: owner }));
     });
   });
 
   describe('Close opened voting', () => {
     it('Open new voting', async () => {
-      assert.isTrue(await global.systems.polls.open({ sender: owner, parameters: '-tips -title "Lorem Ipsum test?" Lorem | Ipsum | Dolor Sit' }));
+      assert.isTrue(await polls.open({ sender: owner, parameters: '-tips -title "Lorem Ipsum test?" Lorem | Ipsum | Dolor Sit' }));
     });
     it('Close voting', async () => {
-      assert.isTrue(await global.systems.polls.close({ sender: owner }));
+      assert.isTrue(await polls.close({ sender: owner }));
     });
   });
 
   describe('Voting full workflow', () => {
     let vid = null;
     it('Open new voting', async () => {
-      assert.isTrue(await global.systems.polls.open({ sender: owner, parameters: '-tips -title "Lorem Ipsum?" Lorem | Ipsum | Dolor Sit' }));
+      assert.isTrue(await polls.open({ sender: owner, parameters: '-tips -title "Lorem Ipsum?" Lorem | Ipsum | Dolor Sit' }));
     });
     it('Open another voting should fail', async () => {
-      assert.isFalse(await global.systems.polls.open({ sender: owner, parameters: '-tips -title "Lorem Ipsum2?" Lorem2 | Ipsum2 | Dolor Sit2' }));
+      assert.isFalse(await polls.open({ sender: owner, parameters: '-tips -title "Lorem Ipsum2?" Lorem2 | Ipsum2 | Dolor Sit2' }));
     });
     it('Voting should be correctly in db', async () => {
       const cVote = await getRepository(Poll).findOne({ isOpened: true });
@@ -63,7 +66,7 @@ describe('Polls - tips', () => {
       await time.waitMs(1000);
       await message.prepare();
 
-      await global.systems.polls.main({ sender: owner, parameters: ''  });
+      await polls.main({ sender: owner, parameters: ''  });
       await message.isSent('systems.polls.status', owner, { title: 'Lorem Ipsum?' });
       await message.isSentRaw(`#vote1 - Lorem - 0.00 ${commons.getLocalizedName(0, 'systems.polls.votes')}, 0.00%`, owner);
       await message.isSentRaw(`#vote2 - Ipsum - 0.00 ${commons.getLocalizedName(0, 'systems.polls.votes')}, 0.00%`, owner);
@@ -71,7 +74,7 @@ describe('Polls - tips', () => {
     });
     for (const o of [0,1,2,3,4]) {
       it(`User ${owner.username} will vote for option ${o} - should fail`, async () => {
-        await global.systems.polls.main({ sender: owner, parameters: String(o) });
+        await polls.main({ sender: owner, parameters: String(o) });
         const vote = await getRepository(PollVote).findOne({ votedBy: owner.username });
         assert.isUndefined(vote, 'Expected ' + JSON.stringify({ votedBy: owner.username, vid }) + ' to not be found in db');
       });
@@ -81,7 +84,7 @@ describe('Polls - tips', () => {
         for (let i = 0; i < 10; i++) {
           await getRepository(User).save({ userId: Math.floor(Math.random() * 100000), username: 'user' + [o, i].join('') })
           const user = 'user' + [o, i].join('');
-          await global.integrations.streamlabs.parse({
+          await streamlabs.parse({
             type: 'donation',
             message: [{
               isTest: true,
@@ -109,7 +112,7 @@ describe('Polls - tips', () => {
       await time.waitMs(1000);
       await message.prepare();
 
-      await global.systems.polls.main({ sender: owner, parameters: ''  });
+      await polls.main({ sender: owner, parameters: ''  });
       await message.isSent('systems.polls.status', owner, { title: 'Lorem Ipsum?' });
       await message.isSentRaw(`#vote1 - Lorem - 100.00 ${commons.getLocalizedName(100, 'systems.polls.votes')}, 50.00%`, owner);
       await message.isSentRaw(`#vote2 - Ipsum - 100.00 ${commons.getLocalizedName(100, 'systems.polls.votes')}, 50.00%`, owner);
@@ -120,7 +123,7 @@ describe('Polls - tips', () => {
       await time.waitMs(1000);
       await message.prepare();
 
-      assert.isTrue(await global.systems.polls.close({ sender: owner }));
+      assert.isTrue(await polls.close({ sender: owner }));
       await message.isSent('systems.polls.status_closed', owner, { title: 'Lorem Ipsum?' });
       await message.isSentRaw(`#vote1 - Lorem - 100.00 ${commons.getLocalizedName(100, 'systems.polls.votes')}, 50.00%`, owner);
       await message.isSentRaw(`#vote2 - Ipsum - 100.00 ${commons.getLocalizedName(100, 'systems.polls.votes')}, 50.00%`, owner);
@@ -131,7 +134,7 @@ describe('Polls - tips', () => {
       await time.waitMs(1000);
       await message.prepare();
 
-      await global.systems.polls.main({ sender: owner, parameters: ''  });
+      await polls.main({ sender: owner, parameters: ''  });
       await message.isSent('systems.polls.notInProgress', owner);
     });
 
@@ -140,7 +143,7 @@ describe('Polls - tips', () => {
       await message.prepare();
 
       const user = Math.random();
-      await global.systems.polls.main({ sender: { username: user }, parameters: '1' });
+      await polls.main({ sender: { username: user }, parameters: '1' });
       await message.isSent('systems.polls.notInProgress', { username: user });
     });
   });

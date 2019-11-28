@@ -62,5 +62,4 @@ class EventList extends Widget {
   }
 }
 
-export default EventList;
-export { EventList };
+export default new EventList();

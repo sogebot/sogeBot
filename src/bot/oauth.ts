@@ -6,6 +6,9 @@ import * as constants from './constants';
 import { settings, shared, ui } from './decorators';
 import { onChange } from './decorators/on';
 import { error, info, warning } from './helpers/log';
+import api from './api';
+import tmi from './tmi';
+import { setStatus } from './helpers/parser';
 
 class OAuth extends Core {
   private toWait = 10;
@@ -124,7 +127,7 @@ class OAuth extends Core {
     if (!isMainThread || global.mocha) {
       return;
     }
-    if (typeof global.api === 'undefined' || typeof global.tmi === 'undefined') {
+    if (typeof api === 'undefined' || typeof tmi === 'undefined') {
       return setTimeout(() => this.getChannelId(), 1000);
     }
     clearTimeout(this.timeouts.getChannelId);
@@ -132,14 +135,14 @@ class OAuth extends Core {
     let timeout = 1000;
 
     if (this.currentChannel !== this.generalChannel && this.generalChannel !== '') {
-      const cid = await global.api.getIdFromTwitch(this.generalChannel, true);
+      const cid = await api.getIdFromTwitch(this.generalChannel, true);
       if (typeof cid !== 'undefined' && cid !== null) {
         this.currentChannel = this.generalChannel;
         this.channelId = cid;
         info('Channel ID set to ' + cid);
-        global.tmi.reconnect('bot');
-        global.tmi.reconnect('broadcaster');
-        global.api.updateChannelViewsAndBroadcasterType();
+        tmi.reconnect('bot');
+        tmi.reconnect('broadcaster');
+        api.updateChannelViewsAndBroadcasterType();
         this.toWait = 10;
       } else {
         error(`Cannot get channel ID of ${this.generalChannel} - waiting ${this.toWait.toFixed()}s`);
@@ -232,17 +235,17 @@ class OAuth extends Core {
 
       const cache = this.cache[type];
       if (cache !== '' && cache !== request.data.login + request.data.scopes.join(',')) {
-        global.tmi.reconnect(type); // force TMI reconnect
+        tmi.reconnect(type); // force TMI reconnect
         this.cache[type] = request.data.login + request.data.scopes.join(',');
       }
 
-      global.status.API = request.status === 200 ? constants.CONNECTED : constants.DISCONNECTED;
+      setStatus('API', request.status === 200 ? constants.CONNECTED : constants.DISCONNECTED);
 
       this.toWait = 10;
       this.getChannelId();
     } catch (e) {
       if (!e.message.includes('no access token')) {
-        console.error(e);
+        process.stderr.write(JSON.stringify(e) + '\n');
       }
       status = false;
       if ((this[type + 'RefreshToken']) !== '') {
@@ -321,4 +324,4 @@ class OAuth extends Core {
   }
 }
 
-export { OAuth };
+export default new OAuth();

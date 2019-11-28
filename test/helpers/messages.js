@@ -8,6 +8,8 @@ const { prepare } = require('../../dest/commons');
 let eventSpy;
 
 const log = require('../../dest/helpers/log');
+const events = (require('../../dest/events')).default
+const tmi = (require('../../dest/tmi')).default
 
 
 module.exports = {
@@ -17,9 +19,9 @@ module.exports = {
     if (eventSpy) {
       eventSpy.restore();
     }
-    eventSpy = sinon.spy(global.events, 'fire');
+    eventSpy = sinon.spy(events, 'fire');
 
-    global.tmi.client = {
+    tmi.client = {
       bot: {
         chat: {
           say: function () { },

@@ -4,6 +4,7 @@ import { adminEndpoint, publicEndpoint } from '../helpers/socket';
 
 import { getRepository } from 'typeorm';
 import { Text as TextEntity } from '../database/entity/text';
+import customvariables from '../customvariables';
 
 class Text extends Registry {
   constructor () {
@@ -37,10 +38,10 @@ class Text extends Registry {
       const item = await getRepository(TextEntity).findOne({ id });
       if (item) {
         for (const variable of item.text.match(regexp) || []) {
-          const isVariable = await global.customvariables.isVariableSet(variable);
+          const isVariable = await customvariables.isVariableSet(variable);
           let value = `<strong>$_${variable.replace('$_', '')}</strong>`;
           if (isVariable) {
-            value = await global.customvariables.getValueOf(variable);
+            value = await customvariables.getValueOf(variable);
           }
           item.text = item.text.replace(new RegExp(`\\${variable}`, 'g'), value);
         }
@@ -52,5 +53,4 @@ class Text extends Registry {
   }
 }
 
-export default Text;
-export { Text };
+export default new Text();

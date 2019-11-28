@@ -1,6 +1,6 @@
 /* global describe it before */
 
-const { permission } = require('../../../dest/permissions');
+const { permission } = require('../../../dest/helpers/permissions');
 const { getOwner } = require('../../../dest/commons');
 
 require('../../general.js');

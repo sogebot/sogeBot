@@ -84,5 +84,4 @@ class Carousel extends Overlay {
   }
 }
 
-export default Carousel;
-export { Carousel };
+export default new Carousel();

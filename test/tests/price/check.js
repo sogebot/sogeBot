@@ -12,6 +12,8 @@ const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/database/entity/user');
 const { Price } = require('../../../dest/database/entity/price');
 
+const price = (require('../../../dest/systems/price')).default;
+
 // users
 const owner = { userId: Math.floor(Math.random() * 100000), username: 'soge__' };
 const user = { userId: Math.floor(Math.random() * 100000), username: 'testuser' };
@@ -67,7 +69,7 @@ describe('Price - check()', () => {
     it(`${test.user} with ${test.points} points calls ${test.command}, price on ${test.priceOn} set to ${test.price} and should ${test.expected ? 'pass' : 'fail'}`, async () => {
       await getRepository(User).update({ userId: user.userId }, { points: test.points });
       await getRepository(Price).save({ command: test.command, price: test.price });
-      const haveEnoughPoints = await global.systems.price.check({ sender: { username: test.user, userId: test.userId }, message: test.command });
+      const haveEnoughPoints = await price.check({ sender: { username: test.user, userId: test.userId }, message: test.command });
       assert.isTrue(haveEnoughPoints === test.expected);
     });
   }

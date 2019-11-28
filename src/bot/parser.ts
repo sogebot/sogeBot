@@ -6,6 +6,15 @@ import { incrementCountOfCommandUsage } from './helpers/commands/count';
 import { getRepository } from 'typeorm';
 import { PermissionCommands } from './database/entity/permissions';
 import { addToViewersCache, getfromViewersCache } from './helpers/permissions';
+import permissions from './permissions';
+import events from './events';
+import users from './users';
+import twitch from './twitch';
+import { translate } from './translate';
+import currency from './currency';
+import general from './general';
+import tmi from './tmi';
+import glob from 'glob';
 
 class Parser {
   started_at = Date.now();
@@ -67,7 +76,7 @@ class Parser {
 
       if (this.sender) {
         if (typeof getfromViewersCache(this.sender.userId, parser.permission) === 'undefined') {
-          addToViewersCache(this.sender.userId, parser.permission, (await global.permissions.check(this.sender.userId, parser.permission, false)).access);
+          addToViewersCache(this.sender.userId, parser.permission, (await permissions.check(this.sender.userId, parser.permission, false)).access);
         }
       }
       if (
@@ -75,6 +84,7 @@ class Parser {
         || this.skip
         || getfromViewersCache(this.sender.userId, parser.permission)
       ) {
+        debug('parser.process', 'Processing ' + parser.name + ' (fireAndForget: ' + parser.fireAndForget + ')');
         const opts = {
           sender: this.sender,
           message: this.message.trim(),
@@ -107,8 +117,10 @@ class Parser {
           }
         }
         if (Date.now() - time > 500) {
-          debug('parser.time', 'Processing ' + parser.name + ' (fireAndForget: ' + parser.fireAndForget + ') took ' + ((Date.now() - time) / 1000));
+          debug('parser.time', 'Processed ' + parser.name + ' (fireAndForget: ' + parser.fireAndForget + ') took ' + ((Date.now() - time) / 1000));
         }
+      } else {
+        debug('parser.process', 'Skipped ' + parser.name + ' (fireAndForget: ' + parser.fireAndForget + ')');
       }
     }
     if (this.isCommand) {
@@ -117,26 +129,24 @@ class Parser {
   }
 
   populateList () {
-    const list = [
-      global.currency,
-      global.events,
-      global.users,
-      global.permissions,
-      global.twitch,
-      global.general,
-      global.tmi,
+    const list: any = [
+      currency,
+      events,
+      users,
+      permissions,
+      twitch,
+      general,
+      tmi,
     ];
-    for (const system of Object.entries(global.systems)) {
-      list.push(system[1]);
-    }
-    for (const overlay of Object.entries(global.overlays)) {
-      list.push(overlay[1]);
-    }
-    for (const game of Object.entries(global.games)) {
-      list.push(game[1]);
-    }
-    for (const integration of Object.entries(global.integrations)) {
-      list.push(integration[1]);
+    for (const dir of ['systems', 'games', 'overlays', 'integrations']) {
+      for (let system of glob.sync(__dirname + '/' + dir + '/*')) {
+        system = system.split('/' + dir + '/')[1].replace('.js', '');
+        if (system.startsWith('_')) {
+          continue;
+        }
+        const self = (require('./' + dir + '/' + system.toLowerCase())).default;
+        list.push(self);
+      }
     }
     return list;
   }
@@ -193,7 +203,7 @@ class Parser {
       debug('parser.find', JSON.stringify({command: item.command, isStartingWith}));
 
       if (isStartingWith && (onlyParams.length === 0 || (onlyParams.length > 0 && onlyParams[0] === ' '))) {
-        const customPermission = await global.permissions.getCommandPermission(item.id);
+        const customPermission = await permissions.getCommandPermission(item.id);
         if (typeof customPermission !== 'undefined') {
           item.permission = customPermission;
         }
@@ -234,7 +244,7 @@ class Parser {
 
     if (this.sender) {
       if (typeof getfromViewersCache(this.sender.userId, command.permission) === 'undefined') {
-        addToViewersCache(this.sender.userId, command.permission, (await global.permissions.check(this.sender.userId, command.permission, false)).access);
+        addToViewersCache(this.sender.userId, command.permission, (await permissions.check(this.sender.userId, command.permission, false)).access);
       }
     }
 
@@ -267,7 +277,7 @@ class Parser {
     } else {
       // user doesn't have permissions for command
       sender['message-type'] = 'whisper';
-      sendMessage(global.translate('permissions.without-permission').replace(/\$command/g, message), sender, {});
+      sendMessage(translate('permissions.without-permission').replace(/\$command/g, message), sender, {});
 
       // do all rollbacks when permission failed
       const rollbacks = await this.rollbacks();

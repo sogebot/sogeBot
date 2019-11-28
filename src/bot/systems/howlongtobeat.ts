@@ -3,7 +3,7 @@ import { isMainThread } from '../cluster';
 import * as constants from '../constants';
 import System from './_interface';
 import { command, default_permission } from '../decorators';
-import { permission } from '../permissions';
+import { permission } from '../helpers/permissions';
 import { HowLongToBeatService /*, HowLongToBeatEntry */ } from 'howlongtobeat';
 import Expects from '../expects';
 import { prepare, sendMessage } from '../commons';
@@ -11,6 +11,7 @@ import { prepare, sendMessage } from '../commons';
 import { getRepository } from 'typeorm';
 import { HowLongToBeatGame } from '../database/entity/howLongToBeatGame';
 import { adminEndpoint } from '../helpers/socket';
+import api from '../api';
 
 class HowLongToBeat extends System {
   interval: number = constants.SECOND * 15;
@@ -22,7 +23,7 @@ class HowLongToBeat extends System {
 
     if (isMainThread) {
       setInterval(async () => {
-        if (global.api.isStreamOnline) {
+        if (api.isStreamOnline) {
           this.addToGameTimestamp();
         }
       }, this.interval);
@@ -40,15 +41,15 @@ class HowLongToBeat extends System {
   }
 
   async addToGameTimestamp() {
-    if (!global.api.stats.currentGame) {
+    if (!api.stats.currentGame) {
       return; // skip if we don't have game
     }
 
-    if (global.api.stats.currentGame.trim().length === 0 || global.api.stats.currentGame.trim() === 'IRL') {
+    if (api.stats.currentGame.trim().length === 0 || api.stats.currentGame.trim() === 'IRL') {
       return; // skip if we have empty game
     }
 
-    let gameToInc = await getRepository(HowLongToBeatGame).findOne({ where: { game: global.api.stats.currentGame } });
+    let gameToInc = await getRepository(HowLongToBeatGame).findOne({ where: { game: api.stats.currentGame } });
     if (gameToInc) {
       if (!gameToInc.isFinishedMain) {
         gameToInc.timeToBeatMain += this.interval;
@@ -57,12 +58,12 @@ class HowLongToBeat extends System {
         gameToInc.timeToBeatCompletionist += this.interval;
       }
     } else {
-      const gamesFromHltb = await this.hltbService.search(global.api.stats.currentGame);
+      const gamesFromHltb = await this.hltbService.search(api.stats.currentGame);
       const gameFromHltb = gamesFromHltb.length > 0 ? gamesFromHltb[0] : null;
       gameToInc = new HowLongToBeatGame();
       gameToInc = {
         ...gameToInc,
-        game: global.api.stats.currentGame,
+        game: api.stats.currentGame,
         gameplayMain: (gameFromHltb || { gameplayMain: 0 }).gameplayMain,
         gameplayCompletionist: (gameFromHltb || { gameplayMain: 0 }).gameplayCompletionist,
         isFinishedMain: false,
@@ -88,10 +89,10 @@ class HowLongToBeat extends System {
       .toArray();
 
     if (!game) {
-      if (!global.api.stats.currentGame) {
+      if (!api.stats.currentGame) {
         return; // skip if we don't have game
       } else {
-        game = global.api.stats.currentGame;
+        game = api.stats.currentGame;
       }
     }
     const gameToShow = await getRepository(HowLongToBeatGame).findOne({ where: { game } });
@@ -116,5 +117,4 @@ class HowLongToBeat extends System {
   }
 }
 
-export default HowLongToBeat;
-export { HowLongToBeat };
+export default new HowLongToBeat();

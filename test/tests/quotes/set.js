@@ -11,6 +11,8 @@ const message = require('../../general.js').message;
 const { getManager } = require('typeorm');
 const { Quotes } = require('../../../dest/database/entity/quotes');
 
+const quotes = (require('../../../dest/systems/quotes')).default;
+
 // users
 const owner = { username: 'soge__', userId: 1 };
 
@@ -32,7 +34,7 @@ describe('Quotes - set()', () => {
       before(async () => {
         await db.cleanup();
         await message.prepare();
-        const quote = await global.systems.quotes.add({ sender: test.sender, parameters: '-tags lorem ipsum -quote Lorem Ipsum', command: '!quote add' });
+        const quote = await quotes.add({ sender: test.sender, parameters: '-tags lorem ipsum -quote Lorem Ipsum', command: '!quote add' });
         id = quote.id;
         if (test.id === 1) {
           test.id = id;
@@ -41,7 +43,7 @@ describe('Quotes - set()', () => {
       });
 
       it('Run !quote set', async () => {
-        global.systems.quotes.set({ sender: test.sender, parameters: test.parameters, command: '!quote set' });
+        quotes.set({ sender: test.sender, parameters: test.parameters, command: '!quote set' });
       });
       if (test.shouldFail) {
         it('Should throw error', async () => {

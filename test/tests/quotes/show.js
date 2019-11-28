@@ -9,6 +9,8 @@ const message = require('../../general.js').message;
 const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/database/entity/user');
 
+const quotes = (require('../../../dest/systems/quotes')).default;
+
 // users
 const owner = { username: 'soge__', userId: '1' };
 const user = { username: 'user', userId: '3' };
@@ -39,7 +41,7 @@ describe('Quotes - main()', () => {
         await message.prepare();
         await getRepository(User).save({ username: user.username, userId: user.userId });
         await getRepository(User).save({ username: owner.username, userId: owner.userId });
-        const quote = await global.systems.quotes.add({ sender: test.sender, parameters: '-tags lorem ipsum -quote Lorem Ipsum', command: '!quote add' });
+        const quote = await quotes.add({ sender: test.sender, parameters: '-tags lorem ipsum -quote Lorem Ipsum', command: '!quote add' });
         id = quote.id;
         if (test.id === 1) {
           test.id = id;
@@ -48,7 +50,7 @@ describe('Quotes - main()', () => {
       });
 
       it('Run !quote', async () => {
-        global.systems.quotes.main({ sender: test.sender, parameters: test.parameters, command: '!quote' });
+        quotes.main({ sender: test.sender, parameters: test.parameters, command: '!quote' });
       });
       if (test.shouldFail) {
         it('Should throw error', async () => {

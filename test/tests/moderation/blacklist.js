@@ -11,6 +11,8 @@ const user = require('../../general.js').user;
 const _ = require('lodash');
 const assert = require('chai').assert;
 
+const moderation = (require('../../../dest/systems/moderation')).default;
+
 const tests = {
   'test': {
     'should.return.false': [
@@ -104,17 +106,15 @@ describe('systems/moderation - blacklist()', () => {
   for (const [pattern, test] of Object.entries(tests)) {
     for (const text of _.get(test, 'should.return.true', [])) {
       it(`pattern '${pattern}' should ignore '${text}'`, async () => {
-        global.systems.moderation.cListsBlacklist = [pattern];
-        await variable.isEqual('systems.moderation.cListsBlacklist', [pattern]);
-        const result = await global.systems.moderation.blacklist({ sender: user.viewer, message: text });
+        moderation.cListsBlacklist = [pattern];
+        const result = await moderation.blacklist({ sender: user.viewer, message: text });
         assert.isTrue(result);
       });
     }
     for (const text of _.get(test, 'should.return.false', [])) {
       it(`pattern '${pattern}' should timeout on '${text}'`, async () => {
-        global.systems.moderation.cListsBlacklist = [pattern];
-        await variable.isEqual('systems.moderation.cListsBlacklist', [pattern]);
-        const result = await global.systems.moderation.blacklist({ sender: user.viewer, message: text });
+        moderation.cListsBlacklist = [pattern];
+        const result = await moderation.blacklist({ sender: user.viewer, message: text });
         assert.isFalse(result);
       });
     }

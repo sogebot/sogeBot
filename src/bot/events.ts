@@ -17,6 +17,17 @@ import { getRepository } from 'typeorm';
 import { User } from './database/entity/user';
 import { Variable } from './database/entity/variable';
 import { Event } from './database/entity/event';
+import api from './api';
+import oauth from './oauth';
+import events from './events';
+import customvariables from './customvariables';
+import panel from './panel';
+import clips from './overlays/clips';
+import tmi from './tmi';
+import emotes from './overlays/emotes';
+import custom_variables from './widgets/customvariables';
+import currency from './currency';
+import { isDbConnected } from './helpers/database';
 
 class Events extends Core {
   public timeouts: { [x: string]: NodeJS.Timeout } = {};
@@ -106,7 +117,7 @@ class Events extends Core {
         user = new User();
         user.username = attributes.username;
         if (!attributes.userId) {
-          user.userId = Number(await global.api.getIdFromTwitch(user.username));
+          user.userId = Number(await api.getIdFromTwitch(user.username));
         } else {
           user.userId = Number(attributes.userId);
         }
@@ -129,7 +140,7 @@ class Events extends Core {
       if (!user) {
         user = new User();
         user.username = attributes.recipient;
-        user.userId = Number(await global.api.getIdFromTwitch(user.username));
+        user.userId = Number(await api.getIdFromTwitch(user.username));
         await getRepository(User).save(user);
       }
 
@@ -185,14 +196,14 @@ class Events extends Core {
   }
 
   public async fireCreateAClip(operation, attributes) {
-    const cid = await global.api.createClip({ hasDelay: operation.hasDelay });
+    const cid = await api.createClip({ hasDelay: operation.hasDelay });
     if (cid) { // OK
       if (Boolean(operation.announce) === true) {
         const message = await prepare('api.clips.created', { link: `https://clips.twitch.tv/${cid}` });
         sendMessage(message, {
-          username: global.oauth.botUsername,
-          displayName: global.oauth.botUsername,
-          userId: Number(global.oauth.botId),
+          username: oauth.botUsername,
+          displayName: oauth.botUsername,
+          userId: Number(oauth.botId),
           emotes: [],
           badges: {},
           'message-type': 'chat',
@@ -207,27 +218,27 @@ class Events extends Core {
   }
 
   public async fireCreateAClipAndPlayReplay(operation, attributes) {
-    const cid = await global.events.fireCreateAClip(operation, attributes);
+    const cid = await events.fireCreateAClip(operation, attributes);
     if (cid) { // clip created ok
-      global.overlays.clips.showClip(cid);
+      clips.showClip(cid);
     }
   }
 
   public async fireBotWillJoinChannel(operation, attributes) {
-    global.client.join('#' + await global.oauth.broadcasterUsername);
+    tmi.client.join('#' + await oauth.broadcasterUsername);
   }
 
   public async fireBotWillLeaveChannel(operation, attributes) {
-    global.tmi.part('bot');
+    tmi.part('bot');
     // force all users offline
     await getRepository(User).update({}, { isOnline: false });
   }
 
   public async fireStartCommercial(operation, attributes) {
-    const cid = global.oauth.channelId;
+    const cid = oauth.channelId;
     const url = `https://api.twitch.tv/kraken/channels/${cid}/commercial`;
 
-    const token = await global.oauth.botAccessToken;
+    const token = await oauth.botAccessToken;
     if (token === '') {
       return;
     }
@@ -245,11 +256,11 @@ class Events extends Core {
   }
 
   public async fireEmoteExplosion(operation, attributes) {
-    global.overlays.emotes.explode(operation.emotesToExplode.split(' '));
+    emotes.explode(operation.emotesToExplode.split(' '));
   }
 
   public async fireEmoteFirework(operation, attributes) {
-    global.overlays.emotes.firework(operation.emotesToFirework.split(' '));
+    emotes.firework(operation.emotesToFirework.split(' '));
   }
 
   public async firePlaySound(operation, attributes) {
@@ -258,7 +269,7 @@ class Events extends Core {
     if (!_.includes(sound, 'http')) {
       sound = 'dist/soundboard/' + sound + '.mp3';
     }
-    global.panel.io.emit('play-sound', sound);
+    panel.io.emit('play-sound', sound);
   }
 
   public async fireRunCommand(operation, attributes) {
@@ -271,20 +282,20 @@ class Events extends Core {
       const replace = new RegExp(`\\$${key}`, 'g');
       command = command.replace(replace, val);
     }
-    command = await new Message(command).parse({ username: global.oauth.broadcasterUsername });
+    command = await new Message(command).parse({ username: oauth.broadcasterUsername });
 
     if (global.mocha) {
       const parse = new Parser({
-        sender: { username: global.oauth.broadcasterUsername, userId: global.oauth.broadcasterId },
+        sender: { username: oauth.broadcasterUsername, userId: oauth.broadcasterId },
         message: command,
         skip: true,
         quiet: _.get(operation, 'isCommandQuiet', false),
       });
       await parse.process();
     } else {
-      global.tmi.message({
+      tmi.message({
         message: {
-          tags: { username: global.oauth.broadcasterUsername , userId: global.oauth.broadcasterId},
+          tags: { username: oauth.broadcasterUsername , userId: oauth.broadcasterId},
           message: command,
         },
         skip: true,
@@ -298,14 +309,14 @@ class Events extends Core {
     let userObj = await getRepository(User).findOne({ username });
     if (!userObj) {
       userObj = new User();
-      userObj.userId = await global.api.getIdFromTwitch(username);
+      userObj.userId = await api.getIdFromTwitch(username);
       userObj.username = username;
       await getRepository(User).save(userObj);
     }
 
 
     let message = operation.messageToSend;
-    const atUsername = global.tmi.showWithAt;
+    const atUsername = tmi.showWithAt;
 
     attributes = flatten(attributes);
     for (const key of Object.keys(attributes).sort((a, b) => a.length - b.length)) {
@@ -330,11 +341,11 @@ class Events extends Core {
   }
 
   public async fireSendWhisper(operation, attributes) {
-    global.events.fireSendChatMessageOrWhisper(operation, attributes, true);
+    events.fireSendChatMessageOrWhisper(operation, attributes, true);
   }
 
   public async fireSendChatMessage(operation, attributes) {
-    global.events.fireSendChatMessageOrWhisper(operation, attributes, false);
+    events.fireSendChatMessageOrWhisper(operation, attributes, false);
   }
 
   public async fireIncrementCustomVariable(operation, attributes) {
@@ -342,23 +353,23 @@ class Events extends Core {
     const numberToIncrement = operation.numberToIncrement;
 
     // check if value is number
-    let currentValue = await global.customvariables.getValueOf('$_' + customVariableName);
+    let currentValue = await customvariables.getValueOf('$_' + customVariableName);
     if (!_.isFinite(parseInt(currentValue, 10))) {
       currentValue = numberToIncrement;
     } else {
       currentValue = String(parseInt(currentValue, 10) - parseInt(numberToIncrement, 10));
     }
-    await global.customvariables.setValueOf(customVariableName, currentValue, {});
+    await customvariables.setValueOf(customVariableName, currentValue, {});
 
     // Update widgets and titles
-    if (global.widgets.custom_variables.socket) {
-      global.widgets.custom_variables.socket.emit('refresh');
+    if (custom_variables.socket) {
+      custom_variables.socket.emit('refresh');
     }
 
     const regexp = new RegExp(`\\$_${customVariableName}`, 'ig');
-    const title = global.api.rawStatus;
+    const title = api.rawStatus;
     if (title.match(regexp)) {
-      global.api.setTitleAndGame(null, {});
+      api.setTitleAndGame(null, {});
     }
   }
 
@@ -367,22 +378,22 @@ class Events extends Core {
     const numberToDecrement = operation.numberToDecrement;
 
     // check if value is number
-    let currentValue = await global.customvariables.getValueOf('$_' + customVariableName);
+    let currentValue = await customvariables.getValueOf('$_' + customVariableName);
     if (!_.isFinite(parseInt(currentValue, 10))) {
       currentValue = String(numberToDecrement * -1);
     } else {
       currentValue = String(parseInt(currentValue, 10) - parseInt(numberToDecrement, 10));
     }
-    await global.customvariables.setValueOf(customVariableName, currentValue, {});
+    await customvariables.setValueOf(customVariableName, currentValue, {});
 
     // Update widgets and titles
-    if (global.widgets.custom_variables.socket) {
-      global.widgets.custom_variables.socket.emit('refresh');
+    if (custom_variables.socket) {
+      custom_variables.socket.emit('refresh');
     }
     const regexp = new RegExp(`\\$_${customVariableName}`, 'ig');
-    const title = global.api.rawStatus;
+    const title = api.rawStatus;
     if (title.match(regexp)) {
-      global.api.setTitleAndGame(null, {});
+      api.setTitleAndGame(null, {});
     }
   }
 
@@ -413,12 +424,12 @@ class Events extends Core {
   }
 
   public async checkStreamIsRunningXMinutes(event: Event, attributes) {
-    if (!global.api.isStreamOnline) {
+    if (!api.isStreamOnline) {
       return false;
     }
     event.triggered.runAfterXMinutes = _.get(event, 'triggered.runAfterXMinutes', 0);
     const shouldTrigger = event.triggered.runAfterXMinutes === 0
-                          && Number(moment.utc().format('X')) - Number(moment.utc(global.api.streamStatusChangeSince).format('X')) > Number(event.definitions.runAfterXMinutes) * 60;
+                          && Number(moment.utc().format('X')) - Number(moment.utc(api.streamStatusChangeSince).format('X')) > Number(event.definitions.runAfterXMinutes) * 60;
     if (shouldTrigger) {
       event.triggered.runAfterXMinutes = event.definitions.runAfterXMinutes;
       await getRepository(Event).save(event);
@@ -432,7 +443,7 @@ class Events extends Core {
     event.definitions.runInterval = Number(event.definitions.runInterval); // force Integer
     event.definitions.viewersAtLeast = Number(event.definitions.viewersAtLeast); // force Integer
 
-    const viewers = global.api.stats.currentViewers;
+    const viewers = api.stats.currentViewers;
 
     const shouldTrigger = viewers >= event.definitions.viewersAtLeast
                         && ((event.definitions.runInterval > 0 && Date.now() - event.triggered.runInterval >= event.definitions.runInterval * 1000)
@@ -549,12 +560,12 @@ class Events extends Core {
       $autohost: _.get(attributes, 'autohost', null),
       $duration: _.get(attributes, 'duration', null),
       // add global variables
-      $game: global.api.stats.currentGame,
-      $title: global.api.stats.currentTitle,
-      $views: global.api.stats.currentViews,
-      $followers: global.api.stats.currentFollowers,
-      $hosts: global.api.stats.currentHosts,
-      $subscribers: global.api.stats.currentSubscribers,
+      $game: api.stats.currentGame,
+      $title: api.stats.currentTitle,
+      $views: api.stats.currentViews,
+      $followers: api.stats.currentFollowers,
+      $hosts: api.stats.currentHosts,
+      $subscribers: api.stats.currentSubscribers,
       ...customVariables,
     };
     let result = false;
@@ -627,7 +638,7 @@ class Events extends Core {
         method: _.random(0, 1, false) === 0 ? 'Twitch Prime' : '',
         amount: _.random(0, 9999, true).toFixed(2),
         currency: _.sample(['CZK', 'USD', 'EUR']),
-        currencyInBot: global.currency.mainCurrency,
+        currencyInBot: currency.mainCurrency,
         amountInBotCurrency: _.random(0, 9999, true).toFixed(2),
       };
 
@@ -677,6 +688,11 @@ class Events extends Core {
   }
 
   protected async fadeOut() {
+    if (!isDbConnected) {
+      setTimeout(() => this.fadeOut, 10);
+      return;
+    }
+
     try {
       const events = await getRepository(Event)
         .createQueryBuilder('event')
@@ -724,4 +740,4 @@ class Events extends Core {
   }
 }
 
-export { Events };
+export default new Events();

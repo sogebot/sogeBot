@@ -4,6 +4,7 @@ import Widget from './_interface';
 import { adminEndpoint } from '../helpers/socket';
 import { getRepository } from 'typeorm';
 import { CommandsBoard } from '../database/entity/commands';
+import tmi from '../tmi';
 
 class Cmdboard extends Widget {
   @settings()
@@ -27,7 +28,7 @@ class Cmdboard extends Widget {
       cb(await getRepository(CommandsBoard).remove(item));
     });
     adminEndpoint(this.nsp, 'cmdboard::run', (command) => {
-      global.tmi.message({
+      tmi.message({
         message: {
           tags: { username: getOwner() },
           message: command,
@@ -38,5 +39,4 @@ class Cmdboard extends Widget {
   }
 }
 
-export default Cmdboard;
-export { Cmdboard };
+export default new Cmdboard();

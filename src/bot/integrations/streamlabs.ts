@@ -10,9 +10,15 @@ import { triggerInterfaceOnTip } from '../helpers/interface/triggers';
 
 import { getRepository } from 'typeorm';
 import { User, UserTip } from '../database/entity/user';
+import users from '../users';
+import api from '../api';
+import events from '../events';
+import currency from '../currency';
+import eventlist from '../overlays/eventlist';
+import alerts from '../registries/alerts';
 
 class Streamlabs extends Integration {
-  socket: SocketIOClient.Socket | null = null;
+  socketToStreamlabs: SocketIOClient.Socket | null = null;
 
   @settings()
   @ui({ type: 'text-input', secret: true })
@@ -29,9 +35,9 @@ class Streamlabs extends Integration {
   }
 
   async disconnect () {
-    if (this.socket !== null) {
-      this.socket.removeAllListeners();
-      this.socket.disconnect();
+    if (this.socketToStreamlabs !== null) {
+      this.socketToStreamlabs.removeAllListeners();
+      this.socketToStreamlabs.disconnect();
     }
   }
 
@@ -43,24 +49,24 @@ class Streamlabs extends Integration {
       return;
     }
 
-    this.socket = io.connect('https://sockets.streamlabs.com?token=' + this.socketToken);
+    this.socketToStreamlabs = io.connect('https://sockets.streamlabs.com?token=' + this.socketToken);
 
-    this.socket.on('reconnect_attempt', () => {
+    this.socketToStreamlabs.on('reconnect_attempt', () => {
       info(chalk.yellow('STREAMLABS:') + ' Trying to reconnect to service');
     });
 
-    this.socket.on('connect', () => {
+    this.socketToStreamlabs.on('connect', () => {
       info(chalk.yellow('STREAMLABS:') + ' Successfully connected socket to service');
     });
 
-    this.socket.on('disconnect', () => {
+    this.socketToStreamlabs.on('disconnect', () => {
       info(chalk.yellow('STREAMLABS:') + ' Socket disconnected from service');
-      if (this.socket) {
-        this.socket.open();
+      if (this.socketToStreamlabs) {
+        this.socketToStreamlabs.open();
       }
     });
 
-    this.socket.on('event', async (eventData) => {
+    this.socketToStreamlabs.on('event', async (eventData) => {
       this.parse(eventData);
     });
   }
@@ -72,7 +78,7 @@ class Streamlabs extends Integration {
           let user = await getRepository(User).findOne({ where: { username: event.from.toLowerCase() }});
           let id;
           if (!user) {
-            id = await global.users.getIdByName(event.from.toLowerCase().toLowerCase());
+            id = await users.getIdByName(event.from.toLowerCase().toLowerCase());
             user = await getRepository(User).findOne({ where: { userId: id }});
             if (!user && id) {
               // if we still doesn't have user, we create new
@@ -88,7 +94,7 @@ class Streamlabs extends Integration {
           const newTip = new UserTip();
           newTip.amount = Number(event.amount);
           newTip.currency = event.currency;
-          newTip.sortAmount = global.currency.exchange(Number(event.amount), event.currency, 'EUR');
+          newTip.sortAmount = currency.exchange(Number(event.amount), event.currency, 'EUR');
           newTip.message = event.message;
           newTip.tippedAt = Date.now();
 
@@ -97,12 +103,12 @@ class Streamlabs extends Integration {
             await getRepository(User).save(user);
           }
 
-          if (global.api.isStreamOnline) {
-            global.api.stats.currentTips += parseFloat(global.currency.exchange(event.amount, event.currency, global.currency.mainCurrency));
+          if (api.isStreamOnline) {
+            api.stats.currentTips += Number(currency.exchange(event.amount, event.currency, currency.mainCurrency));
           }
           tip(`${event.from.toLowerCase()}${id ? '#' + id : ''}, amount: ${Number(event.amount).toFixed(2)}${event.currency}, message: ${event.message}`);
         }
-        global.overlays.eventlist.add({
+        eventlist.add({
           event: 'tip',
           amount: event.amount,
           currency: event.currency,
@@ -110,15 +116,15 @@ class Streamlabs extends Integration {
           message: event.message,
           timestamp: Date.now(),
         });
-        global.events.fire('tip', {
+        events.fire('tip', {
           username: event.from.toLowerCase(),
           amount: parseFloat(event.amount).toFixed(2),
           currency: event.currency,
-          amountInBotCurrency: parseFloat(global.currency.exchange(event.amount, event.currency, global.currency.mainCurrency)).toFixed(2),
-          currencyInBot: global.currency.mainCurrency,
+          amountInBotCurrency: Number(currency.exchange(event.amount, event.currency, currency.mainCurrency)).toFixed(2),
+          currencyInBot: currency.mainCurrency,
           message: event.message,
         });
-        global.registries.alerts.trigger({
+        alerts.trigger({
           event: 'tips',
           name: event.from.toLowerCase(),
           amount: Number(parseFloat(event.amount).toFixed(2)),
@@ -140,5 +146,4 @@ class Streamlabs extends Integration {
   }
 }
 
-export default Streamlabs;
-export { Streamlabs };
+export default new Streamlabs();

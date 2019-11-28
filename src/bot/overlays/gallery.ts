@@ -5,6 +5,7 @@ import { adminEndpoint } from '../helpers/socket';
 
 import { getRepository } from 'typeorm';
 import { Gallery as GalleryEntity } from '../database/entity/gallery';
+import panel from '../panel';
 
 class Gallery extends Overlay {
   showInUI = false;
@@ -14,7 +15,7 @@ class Gallery extends Overlay {
     this.addMenu({ category: 'registry', name: 'gallery', id: 'registry.gallery/list' });
 
     if (isMainThread) {
-      global.panel.getApp().get('/gallery/:id', async (req, res) => {
+      panel.getApp().get('/gallery/:id', async (req, res) => {
         const file = await getRepository(GalleryEntity).findOne({ id: req.params.id });
         if (file) {
           const data = Buffer.from(file.data.split(',')[1], 'base64');
@@ -63,5 +64,4 @@ class Gallery extends Overlay {
   }
 }
 
-export default Gallery;
-export { Gallery };
+export default new Gallery();

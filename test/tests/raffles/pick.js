@@ -11,6 +11,8 @@ const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/database/entity/user');
 const { Raffle } = require('../../../dest/database/entity/raffle');
 
+const raffles = (require('../../../dest/systems/raffles')).default;
+
 const assert = require('chai').assert;
 
 const max = Math.floor(Number.MAX_SAFE_INTEGER / 10000000);
@@ -27,7 +29,7 @@ describe('Raffles - pick()', () => {
 
   describe('Empty raffle with pick should be closed', () => {
     it('create ticket raffle', async () => {
-      global.systems.raffles.open({ sender: owner, parameters: '!winme -min 0 -max ' + max });
+      raffles.open({ sender: owner, parameters: '!winme -min 0 -max ' + max });
       await message.isSent('raffles.announce-ticket-raffle', { username: 'bot' }, {
         keyword: '!winme',
         eligibility: await commons.prepare('raffles.eligibility-everyone-item'),
@@ -37,7 +39,7 @@ describe('Raffles - pick()', () => {
     });
 
     it('pick a winner', async () => {
-      await global.systems.raffles.pick({ sender: owner });
+      await raffles.pick({ sender: owner });
       const raffle = await getRepository(Raffle).findOne({
         order: {
           timestamp: 'DESC'
@@ -51,11 +53,11 @@ describe('Raffles - pick()', () => {
 
   describe('#1318 - 4 subs should have 25% win', () => {
     it('Set subscribers luck to 150%', async () => {
-      global.systems.raffles.subscribersPercent = 150;
+      raffles.subscribersPercent = 150;
     });
 
     it('Create subscribers raffle', async () => {
-      global.systems.raffles.open({ sender: owner, parameters: '!winme -for subscribers' });
+      raffles.open({ sender: owner, parameters: '!winme -for subscribers' });
       await message.isSent('raffles.announce-raffle', { username: 'bot' }, {
         keyword: '!winme',
         eligibility: await commons.prepare('raffles.eligibility-subscribers-item'),
@@ -69,13 +71,13 @@ describe('Raffles - pick()', () => {
       });
 
       it('Add user ' + v + ' to raffle', async () => {
-        const a = await global.systems.raffles.participate({ sender: { username: v, userId: Number('100' + id) }, message: '!winme' });
+        const a = await raffles.participate({ sender: { username: v, userId: Number('100' + id) }, message: '!winme' });
         assert.isTrue(a);
       });
     }
 
     it('pick a winner', async () => {
-      await global.systems.raffles.pick({ sender: owner });
+      await raffles.pick({ sender: owner });
 
       await message.isSent('raffles.raffle-winner-is', { username: 'bot' }, [{
         username: 'sub1',
@@ -99,7 +101,7 @@ describe('Raffles - pick()', () => {
 
   describe('Raffle should return winner', () => {
     it('create ticket raffle', async () => {
-      global.systems.raffles.open({ sender: owner, parameters: '!winme -min 0 -max ' + max });
+      raffles.open({ sender: owner, parameters: '!winme -min 0 -max ' + max });
       await message.isSent('raffles.announce-ticket-raffle', { username: 'bot' }, {
         keyword: '!winme',
         eligibility: await commons.prepare('raffles.eligibility-everyone-item'),
@@ -117,17 +119,17 @@ describe('Raffles - pick()', () => {
     });
 
     it('testuser bets max', async () => {
-      const a = await global.systems.raffles.participate({ sender: testuser, message: `!winme ${max}` });
+      const a = await raffles.participate({ sender: testuser, message: `!winme ${max}` });
       assert.isTrue(a);
     });
 
     it('testuser2 bets half of max', async () => {
-      const a = await global.systems.raffles.participate({ sender: testuser2, message: `!winme ${max / 2}` });
+      const a = await raffles.participate({ sender: testuser2, message: `!winme ${max / 2}` });
       assert.isTrue(a);
     });
 
     it('pick a winner', async () => {
-      await global.systems.raffles.pick({ sender: owner });
+      await raffles.pick({ sender: owner });
 
       await message.isSent('raffles.raffle-winner-is', { username: 'bot' }, [{
         username: testuser.username,
@@ -145,7 +147,7 @@ describe('Raffles - pick()', () => {
     let user1, user2;
 
     it('create ticket raffle', async () => {
-      global.systems.raffles.open({ sender: owner, parameters: '!winme -min 0 -max ' + max });
+      raffles.open({ sender: owner, parameters: '!winme -min 0 -max ' + max });
       await message.isSent('raffles.announce-ticket-raffle', { username: 'bot' }, {
         keyword: '!winme',
         eligibility: await commons.prepare('raffles.eligibility-everyone-item'),
@@ -162,17 +164,17 @@ describe('Raffles - pick()', () => {
     });
 
     it('testuser bets 100', async () => {
-      const a = await global.systems.raffles.participate({ sender: testuser, message: '!winme 100' });
+      const a = await raffles.participate({ sender: testuser, message: '!winme 100' });
       assert.isTrue(a);
     });
 
     it('testuser2 bets 100', async () => {
-      const a = await global.systems.raffles.participate({ sender: testuser2, message: '!winme 100' });
+      const a = await raffles.participate({ sender: testuser2, message: '!winme 100' });
       assert.isTrue(a);
     });
 
     it('pick a winner', async () => {
-      await global.systems.raffles.pick({ sender: owner });
+      await raffles.pick({ sender: owner });
 
       await message.isSent('raffles.raffle-winner-is', { username: 'bot' }, [{
         username: testuser.username,
@@ -188,7 +190,7 @@ describe('Raffles - pick()', () => {
 
   describe('Raffle with subscriber should return winner', () => {
     it('create ticket raffle', async () => {
-      global.systems.raffles.open({ sender: owner, parameters: '!winme -min 0 -max ' + max });
+      raffles.open({ sender: owner, parameters: '!winme -min 0 -max ' + max });
       await message.isSent('raffles.announce-ticket-raffle', { username: 'bot' }, {
         keyword: '!winme',
         eligibility: await commons.prepare('raffles.eligibility-everyone-item'),
@@ -205,17 +207,17 @@ describe('Raffles - pick()', () => {
     });
 
     it('testuser bets 100', async () => {
-      const a = await global.systems.raffles.participate({ sender: testuser, message: '!winme 100' });
+      const a = await raffles.participate({ sender: testuser, message: '!winme 100' });
       assert.isTrue(a);
     });
 
     it('testuser2 bets 100', async () => {
-      const a = await global.systems.raffles.participate({ sender: testuser2, message: '!winme 100' });
+      const a = await raffles.participate({ sender: testuser2, message: '!winme 100' });
       assert.isTrue(a);
     });
 
     it('pick a winner', async () => {
-      await global.systems.raffles.pick({ sender: owner });
+      await raffles.pick({ sender: owner });
 
       await message.isSent('raffles.raffle-winner-is', { username: 'bot' }, [{
         username: testuser.username,
@@ -231,7 +233,7 @@ describe('Raffles - pick()', () => {
 
   describe('Raffle with subscriber and follower should return winner', () => {
     it('create ticket raffle', async () => {
-      global.systems.raffles.open({ sender: owner, parameters: '!winme -min 0 -max ' + max });
+      raffles.open({ sender: owner, parameters: '!winme -min 0 -max ' + max });
       await message.isSent('raffles.announce-ticket-raffle', { username: 'bot' }, {
         keyword: '!winme',
         eligibility: await commons.prepare('raffles.eligibility-everyone-item'),
@@ -248,17 +250,17 @@ describe('Raffles - pick()', () => {
     });
 
     it('testuser bets 100', async () => {
-      const a = await global.systems.raffles.participate({ sender: testuser, message: '!winme 100' });
+      const a = await raffles.participate({ sender: testuser, message: '!winme 100' });
       assert.isTrue(a);
     });
 
     it('testuser2 bets 100', async () => {
-      const a = await global.systems.raffles.participate({ sender: testuser2, message: '!winme 100' });
+      const a = await raffles.participate({ sender: testuser2, message: '!winme 100' });
       assert.isTrue(a);
     });
 
     it('pick a winner', async () => {
-      await global.systems.raffles.pick({ sender: owner });
+      await raffles.pick({ sender: owner });
 
       await message.isSent('raffles.raffle-winner-is', { username: 'bot' }, [{
         username: testuser.username,

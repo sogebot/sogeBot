@@ -5,6 +5,8 @@ import { publicEndpoint } from '../helpers/socket';
 
 import { getRepository } from 'typeorm';
 import { User } from '../database/entity/user';
+import api from '../api';
+import panel from '../panel';
 
 class WheelOfFortune extends Game {
   @ui({
@@ -13,7 +15,7 @@ class WheelOfFortune extends Game {
     class: 'btn btn-primary btn-block',
     rawText: '/overlays/wheeloffortune (500x55)',
     target: '_blank',
-  })
+  }, 'links')
   btnLink = null;
 
   @settings('options')
@@ -31,7 +33,7 @@ class WheelOfFortune extends Game {
 
         if (!user) {
           user = new User();
-          user.userId = Number(await global.api.getIdFromTwitch(username));
+          user.userId = Number(await api.getIdFromTwitch(username));
           user.username = username;
           await getRepository(User).save(user);
         }
@@ -53,9 +55,8 @@ class WheelOfFortune extends Game {
 
   @command('!wof')
   async main (opts) {
-    global.panel.io.of('/games/wheeloffortune').emit('spin', { options: this.data, username: opts.sender.username });
+    panel.io.of('/games/wheeloffortune').emit('spin', { options: this.data, username: opts.sender.username });
   }
 }
 
-export default WheelOfFortune;
-export { WheelOfFortune };
+export default new WheelOfFortune();

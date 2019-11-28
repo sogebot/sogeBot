@@ -3,11 +3,16 @@ import moment from 'moment-timezone';
 
 import { getIgnoreList, getLocalizedName, isIgnored, sendMessage } from '../commons';
 import { command, default_permission } from '../decorators';
-import { permission } from '../permissions';
+import { permission } from '../helpers/permissions';
 import System from './_interface';
 import { debug } from '../helpers/log';
 import { getConnection, getRepository } from 'typeorm';
 import { User, UserBit, UserTip } from '../database/entity/user';
+import translateLib, { translate } from '../translate';
+import oauth from '../oauth';
+import points from './points';
+import tmi from '../tmi';
+import currency from '../currency';
 
 enum TYPE {
   TIME,
@@ -106,15 +111,15 @@ class Top extends System {
     // count ignored users
     const _total = 10 + getIgnoreList().length;
 
-    moment.locale(global.lib.translate.lang);
+    moment.locale(translateLib.lang);
 
     const connection = await getConnection();
     switch (type) {
       case TYPE.TIME:
         sorted
           = (await getRepository(User).createQueryBuilder('user')
-            .where('user.username != :botusername', { botusername: global.oauth.botUsername.toLowerCase() })
-            .andWhere('user.username != :broadcasterusername', { broadcasterusername: global.oauth.broadcasterUsername.toLowerCase() })
+            .where('user.username != :botusername', { botusername: oauth.botUsername.toLowerCase() })
+            .andWhere('user.username != :broadcasterusername', { broadcasterusername: oauth.broadcasterUsername.toLowerCase() })
             .orderBy('user.watchedTime', 'DESC')
             .limit(_total)
             .getMany())
@@ -122,7 +127,7 @@ class Top extends System {
             .map(o => {
               return { username: o.username, value: o.watchedTime };
             });
-        message = global.translate('systems.top.time').replace(/\$amount/g, 10);
+        message = translate('systems.top.time').replace(/\$amount/g, 10);
         break;
       case TYPE.TIPS:
         const joinTip = connection.options.type === 'postgres' ? '"user_tip"."userUserId" = "user"."userId"' : 'user_tip.userUserId = user.userId';
@@ -132,21 +137,21 @@ class Top extends System {
             .addSelect('COALESCE(SUM(user_tip.sortAmount), 0)', 'value')
             .addSelect('user.username')
             .limit(_total)
-            .where('user.username != :botusername', { botusername: global.oauth.botUsername.toLowerCase() })
+            .where('user.username != :botusername', { botusername: oauth.botUsername.toLowerCase() })
             .innerJoin(UserTip, 'user_tip', joinTip)
             .groupBy('user.userId')
             .getRawMany()
           ).filter(o => !isIgnored({ username: o.username, userId: o.userId }));
-        message = global.translate('systems.top.tips').replace(/\$amount/g, 10);
+        message = translate('systems.top.tips').replace(/\$amount/g, 10);
         break;
       case TYPE.POINTS:
-        if (!global.systems.points.enabled) {
+        if (!points.enabled) {
           return;
         }
         sorted
          = (await getRepository(User).createQueryBuilder('user')
-            .where('user.username != :botusername', { botusername: global.oauth.botUsername.toLowerCase() })
-            .andWhere('user.username != :broadcasterusername', { broadcasterusername: global.oauth.broadcasterUsername.toLowerCase() })
+            .where('user.username != :botusername', { botusername: oauth.botUsername.toLowerCase() })
+            .andWhere('user.username != :broadcasterusername', { broadcasterusername: oauth.broadcasterUsername.toLowerCase() })
             .orderBy('user.points', 'DESC')
             .limit(_total)
             .getMany())
@@ -154,13 +159,13 @@ class Top extends System {
             .map(o => {
               return { username: o.username, value: o.points };
             });
-        message = global.translate('systems.top.points').replace(/\$amount/g, 10);
+        message = translate('systems.top.points').replace(/\$amount/g, 10);
         break;
       case TYPE.MESSAGES:
         sorted
           = (await getRepository(User).createQueryBuilder('user')
-            .where('user.username != :botusername', { botusername: global.oauth.botUsername.toLowerCase() })
-            .andWhere('user.username != :broadcasterusername', { broadcasterusername: global.oauth.broadcasterUsername.toLowerCase() })
+            .where('user.username != :botusername', { botusername: oauth.botUsername.toLowerCase() })
+            .andWhere('user.username != :broadcasterusername', { broadcasterusername: oauth.broadcasterUsername.toLowerCase() })
             .orderBy('user.messages', 'DESC')
             .limit(_total)
             .getMany())
@@ -168,13 +173,13 @@ class Top extends System {
             .map(o => {
               return { username: o.username, value: o.messages };
             });
-        message = global.translate('systems.top.messages').replace(/\$amount/g, 10);
+        message = translate('systems.top.messages').replace(/\$amount/g, 10);
         break;
       case TYPE.FOLLOWAGE:
         sorted
           = (await getRepository(User).createQueryBuilder('user')
-            .where('user.username != :botusername', { botusername: global.oauth.botUsername.toLowerCase() })
-            .andWhere('user.username != :broadcasterusername', { broadcasterusername: global.oauth.broadcasterUsername.toLowerCase() })
+            .where('user.username != :botusername', { botusername: oauth.botUsername.toLowerCase() })
+            .andWhere('user.username != :broadcasterusername', { broadcasterusername: oauth.broadcasterUsername.toLowerCase() })
             .andWhere('user.isFollower = :isFollower', { isFollower: true })
             .orderBy('user.followedAt', 'ASC')
             .limit(_total)
@@ -183,13 +188,13 @@ class Top extends System {
             .map(o => {
               return { username: o.username, value: o.followedAt };
             });
-        message = global.translate('systems.top.followage').replace(/\$amount/g, 10);
+        message = translate('systems.top.followage').replace(/\$amount/g, 10);
         break;
       case TYPE.SUBAGE:
         sorted
           = (await getRepository(User).createQueryBuilder('user')
-            .where('user.username != :botusername', { botusername: global.oauth.botUsername.toLowerCase() })
-            .andWhere('user.username != :broadcasterusername', { broadcasterusername: global.oauth.broadcasterUsername.toLowerCase() })
+            .where('user.username != :botusername', { botusername: oauth.botUsername.toLowerCase() })
+            .andWhere('user.username != :broadcasterusername', { broadcasterusername: oauth.broadcasterUsername.toLowerCase() })
             .andWhere('user.isSubscriber = :isSubscriber', { isSubscriber: true })
             .orderBy('user.subscribedAt', 'ASC')
             .limit(_total)
@@ -198,7 +203,7 @@ class Top extends System {
             .map(o => {
               return { username: o.username, value: o.subscribedAt };
             });
-        message = global.translate('systems.top.subage').replace(/\$amount/g, 10);
+        message = translate('systems.top.subage').replace(/\$amount/g, 10);
         break;
       case TYPE.BITS:
         const joinBit = connection.options.type === 'postgres' ? '"user_bit"."userUserId" = "user"."userId"' : 'user_bit.userUserId = user.userId';
@@ -208,18 +213,18 @@ class Top extends System {
             .addSelect('COALESCE(SUM(user_bit.amount), 0)', 'value')
             .addSelect('user.username')
             .limit(_total)
-            .andWhere('user.username != :broadcasterusername', { broadcasterusername: global.oauth.broadcasterUsername.toLowerCase() })
+            .andWhere('user.username != :broadcasterusername', { broadcasterusername: oauth.broadcasterUsername.toLowerCase() })
             .innerJoin(UserBit, 'user_bit', joinBit)
             .groupBy('user.userId')
             .getRawMany()
           ).filter(o => !isIgnored({ username: o.username, userId: o.userId }));
-        message = global.translate('systems.top.bits').replace(/\$amount/g, 10);
+        message = translate('systems.top.bits').replace(/\$amount/g, 10);
         break;
       case TYPE.GIFTS:
         sorted
           = (await getRepository(User).createQueryBuilder('user')
-            .where('user.username != :botusername', { botusername: global.oauth.botUsername.toLowerCase() })
-            .andWhere('user.username != :broadcasterusername', { broadcasterusername: global.oauth.broadcasterUsername.toLowerCase() })
+            .where('user.username != :botusername', { botusername: oauth.botUsername.toLowerCase() })
+            .andWhere('user.username != :broadcasterusername', { broadcasterusername: oauth.broadcasterUsername.toLowerCase() })
             .orderBy('user.giftedSubscribes', 'DESC')
             .limit(_total)
             .getMany())
@@ -227,13 +232,13 @@ class Top extends System {
             .map(o => {
               return { username: o.username, value: o.giftedSubscribes };
             });
-        message = global.translate('systems.top.gifts').replace(/\$amount/g, 10);
+        message = translate('systems.top.gifts').replace(/\$amount/g, 10);
         break;
       case TYPE.SUBMONTHS:
         sorted
           = (await getRepository(User).createQueryBuilder('user')
-            .where('user.username != :botusername', { botusername: global.oauth.botUsername.toLowerCase() })
-            .andWhere('user.username != :broadcasterusername', { broadcasterusername: global.oauth.broadcasterUsername.toLowerCase() })
+            .where('user.username != :botusername', { botusername: oauth.botUsername.toLowerCase() })
+            .andWhere('user.username != :broadcasterusername', { broadcasterusername: oauth.broadcasterUsername.toLowerCase() })
             .orderBy('user.subscribeCumulativeMonths', 'DESC')
             .limit(_total)
             .getMany())
@@ -241,7 +246,7 @@ class Top extends System {
             .map(o => {
               return { username: o.username, value: o.subscribeCumulativeMonths };
             });
-        message = global.translate('systems.top.submonths').replace(/\$amount/g, 10);
+        message = translate('systems.top.submonths').replace(/\$amount/g, 10);
         break;
     }
 
@@ -250,7 +255,7 @@ class Top extends System {
       sorted = _.chunk(sorted, 10)[0];
 
       for (const user of sorted) {
-        message += (i + 1) + '. ' + (global.tmi.showWithAt ? '@' : '') + (user.username || 'unknown') + ' - ';
+        message += (i + 1) + '. ' + (tmi.showWithAt ? '@' : '') + (user.username || 'unknown') + ' - ';
         switch (type) {
           case TYPE.TIME:
             message += (user.value / 1000 / 60 / 60).toFixed(1) + 'h';
@@ -259,10 +264,10 @@ class Top extends System {
             message += [user.value, getLocalizedName(user.value, 'core.months')].join(' ');
             break;
           case TYPE.TIPS:
-            message += Number(user.value).toFixed(2) + global.currency.symbol(global.currency.mainCurrency);
+            message += Number(user.value).toFixed(2) + currency.symbol(currency.mainCurrency);
             break;
           case TYPE.POINTS:
-            message += user.value + ' ' + await global.systems.points.getPointsName(user.value);
+            message += user.value + ' ' + await points.getPointsName(user.value);
             break;
           case TYPE.MESSAGES:
           case TYPE.BITS:
@@ -287,5 +292,4 @@ class Top extends System {
   }
 }
 
-export default Top;
-export { Top };
+export default new Top();

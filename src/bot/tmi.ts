@@ -6,13 +6,13 @@ import { isNil } from 'lodash';
 
 import Parser from './parser';
 import { command, default_permission } from './decorators';
-import { permission } from './permissions';
+import { permission } from './helpers/permissions';
 import Expects from './expects';
 import Core from './_interface';
 import * as constants from './constants';
 import { settings, ui } from './decorators';
 import { globalIgnoreList } from './data/globalIgnoreList';
-import { ban, cheer, error, host, info, raid, resub, sub, subcommunitygift, subgift, warning } from './helpers/log';
+import { ban, cheer, error, host, info, raid, resub, sub, subcommunitygift, subgift } from './helpers/log';
 import { triggerInterfaceOnBit, triggerInterfaceOnMessage, triggerInterfaceOnSub } from './helpers/interface/triggers';
 import { isDebugEnabled } from './helpers/log';
 import { getLocalizedName, getOwner, isBot, isIgnored, isOwner, prepare, sendMessage } from './commons';
@@ -20,6 +20,17 @@ import { clusteredChatIn, clusteredWhisperIn, isMainThread, manageMessage } from
 
 import { getRepository } from 'typeorm';
 import { User, UserBit } from './database/entity/user';
+
+import events from './events';
+import api from './api';
+import users from './users';
+import oauth from './oauth';
+import joinpart from './widgets/joinpart';
+import tmi from './tmi';
+import alerts from './registries/alerts';
+import eventlist from './overlays/eventlist';
+import { getFunctionList } from './decorators/on';
+import { avgResponse, linesParsedIncrement, setStatus } from './helpers/parser';
 
 class TMI extends Core {
   @settings('chat')
@@ -54,9 +65,9 @@ class TMI extends Core {
   async ignoreAdd (opts: Record<string, any>) {
     try {
       const username = new Expects(opts.parameters).username().toArray()[0].toLowerCase();
-      global.tmi.ignorelist = [
+      tmi.ignorelist = [
         ...new Set([
-          ...global.tmi.ignorelist,
+          ...tmi.ignorelist,
           username,
         ]
         )];
@@ -72,7 +83,7 @@ class TMI extends Core {
   async ignoreRm (opts: Record<string, any>) {
     try {
       const username = new Expects(opts.parameters).username().toArray()[0].toLowerCase();
-      global.tmi.ignorelist = global.tmi.ignorelist.filter(o => o !== username);
+      tmi.ignorelist = tmi.ignorelist.filter(o => o !== username);
       // update ignore list
       sendMessage(prepare('ignore.user.is.removed', { username }), opts.sender);
     } catch (e) {
@@ -94,9 +105,9 @@ class TMI extends Core {
   async initClient (type: string) {
     clearTimeout(this.timeouts[`initClient.${type}`]);
     const [token, username, channel] = await Promise.all([
-      global.oauth[type + 'AccessToken'],
-      global.oauth[type + 'Username'],
-      global.oauth.generalChannel,
+      oauth[type + 'AccessToken'],
+      oauth[type + 'Username'],
+      oauth.generalChannel,
     ]);
 
     try {
@@ -108,7 +119,7 @@ class TMI extends Core {
         token,
         username,
         log,
-        onAuthenticationFailure: () => global.oauth.refreshAccessToken(type).then(token => token),
+        onAuthenticationFailure: () => oauth.refreshAccessToken(type).then(token => token),
       });
       this.loadListeners(type);
       await this.client[type].chat.connect();
@@ -132,16 +143,16 @@ class TMI extends Core {
         throw Error('TMI: cannot reconnect, connection is not established');
       }
       const [token, username, channel] = await Promise.all([
-        global.oauth[type + 'AccessToken'],
-        global.oauth[type + 'Username'],
-        global.oauth.generalChannel,
+        oauth[type + 'AccessToken'],
+        oauth[type + 'Username'],
+        oauth.generalChannel,
       ]);
 
       if (this.channel !== channel) {
         info(`TMI: ${type} is reconnecting`);
 
         await this.client[type].chat.part(this.channel);
-        await this.client[type].chat.reconnect({ token, username, onAuthenticationFailure: () => global.oauth.refreshAccessToken(type).then(token => token) });
+        await this.client[type].chat.reconnect({ token, username, onAuthenticationFailure: () => oauth.refreshAccessToken(type).then(token => token) });
 
         await this.join(type, channel);
       }
@@ -186,71 +197,23 @@ class TMI extends Core {
     // common for bot and broadcaster
     this.client[type].chat.on('DISCONNECT', async (message) => {
       info(`TMI: ${type} is disconnected`);
-      global.status.TMI = constants.DISCONNECTED;
-      // go through all systems and trigger on.partChannel
-      for (const [/* type */, systems] of Object.entries({
-        systems: global.systems,
-        games: global.games,
-        overlays: global.overlays,
-        widgets: global.widgets,
-        integrations: global.integrations,
-      })) {
-        for (const [name, system] of Object.entries(systems)) {
-          if (name.startsWith('_') || typeof system.on === 'undefined') {
-            continue;
-          }
-          if (Array.isArray(system.on.partChannel)) {
-            for (const fnc of system.on.partChannel) {
-              system[fnc]();
-            }
-          }
-        }
+      setStatus('TMI', constants.DISCONNECTED);
+      for (const event of getFunctionList('partChannel')) {
+        this[event.fName]();
       }
     });
     this.client[type].chat.on('RECONNECT', async (message) => {
       info(`TMI: ${type} is reconnecting`);
-      global.status.TMI = constants.RECONNECTING;
-      // go through all systems and trigger on.reconnectChannel
-      for (const [/* type */, systems] of Object.entries({
-        systems: global.systems,
-        games: global.games,
-        overlays: global.overlays,
-        widgets: global.widgets,
-        integrations: global.integrations,
-      })) {
-        for (const [name, system] of Object.entries(systems)) {
-          if (name.startsWith('_') || typeof system.on === 'undefined') {
-            continue;
-          }
-          if (Array.isArray(system.on.reconnectChannel)) {
-            for (const fnc of system.on.reconnectChannel) {
-              system[fnc]();
-            }
-          }
-        }
+      setStatus('TMI', constants.RECONNECTING);
+      for (const event of getFunctionList('reconnectChannel')) {
+        this[event.fName]();
       }
     });
     this.client[type].chat.on('CONNECTED', async (message) => {
       info(`TMI: ${type} is connected`);
-      global.status.TMI = constants.CONNECTED;
-      // go through all systems and trigger on.joinChannel
-      for (const [/* type */, systems] of Object.entries({
-        systems: global.systems,
-        games: global.games,
-        overlays: global.overlays,
-        widgets: global.widgets,
-        integrations: global.integrations,
-      })) {
-        for (const [name, system] of Object.entries(systems)) {
-          if (name.startsWith('_') || typeof system.on === 'undefined') {
-            continue;
-          }
-          if (Array.isArray(system.on.joinChannel)) {
-            for (const fnc of system.on.joinChannel) {
-              system[fnc]();
-            }
-          }
-        }
+      setStatus('TMI', constants.CONNECTED);
+      for (const event of getFunctionList('joinChannel')) {
+        this[event.fName]();
       }
     });
 
@@ -260,8 +223,8 @@ class TMI extends Core {
 
         if (!isBot(message.tags.username) || !message.isSelf) {
           message.tags['message-type'] = 'whisper';
-          global.tmi.message({message});
-          global.linesParsed++;
+          tmi.message({message});
+          linesParsedIncrement();
         }
       });
 
@@ -276,8 +239,8 @@ class TMI extends Core {
           } else {
             // strip message from ACTION
             message.message = message.message.replace('\u0001ACTION ', '').replace('\u0001', '');
-            global.tmi.message({message});
-            global.linesParsed++;
+            tmi.message({message});
+            linesParsedIncrement();
             triggerInterfaceOnMessage({
               sender: message.tags,
               message: message.message,
@@ -285,11 +248,11 @@ class TMI extends Core {
             });
 
             if (message.tags['message-type'] === 'action') {
-              global.events.fire('action', { username: message.tags.username.toLowerCase() });
+              events.fire('action', { username: message.tags.username.toLowerCase() });
             }
           }
         } else {
-          global.status.MOD = typeof message.tags.badges.moderator !== 'undefined';
+          setStatus('MOD', typeof message.tags.badges.moderator !== 'undefined');
         }
       });
 
@@ -301,19 +264,19 @@ class TMI extends Core {
 
           if (typeof duration === 'undefined') {
             ban(`${username}, reason: ${reason}`);
-            global.events.fire('ban', { username: username, reason: reason });
+            events.fire('ban', { username: username, reason: reason });
           } else {
-            global.events.fire('timeout', { username, reason, duration });
+            events.fire('timeout', { username, reason, duration });
           }
         } else {
-          global.events.fire('clearchat', {});
+          events.fire('clearchat', {});
         }
       });
 
       this.client[type].chat.on('HOSTTARGET', message => {
         if (message.event === 'HOST_ON') {
           if (typeof message.numberOfViewers !== 'undefined') { // may occur on restart bot when hosting
-            global.events.fire('hosting', { target: message.username, viewers: message.numberOfViewers });
+            events.fire('hosting', { target: message.username, viewers: message.numberOfViewers });
           }
         }
       });
@@ -342,9 +305,9 @@ class TMI extends Core {
           timestamp: Date.now(),
         };
 
-        global.overlays.eventlist.add(data);
-        global.events.fire('hosted', data);
-        global.registries.alerts.trigger({
+        eventlist.add(data);
+        events.fire('hosted', data);
+        alerts.trigger({
           event: 'hosts',
           name: username,
           amount: Number(viewers),
@@ -370,9 +333,9 @@ class TMI extends Core {
         timestamp: Date.now(),
       };
 
-      global.overlays.eventlist.add(data);
-      global.events.fire('raid', data);
-      global.registries.alerts.trigger({
+      eventlist.add(data);
+      events.fire('raid', data);
+      alerts.trigger({
         event: 'raids',
         name: message.parameters.login,
         amount: Number(message.parameters.viewerCount),
@@ -395,9 +358,9 @@ class TMI extends Core {
         /*
         Workaround for https://github.com/sogehige/sogeBot/issues/2581
         TODO: update for tmi-js
-        if (!global.users.newChattersList.includes(message.tags.login.toLowerCase())) {
-          global.users.newChattersList.push(message.tags.login.toLowerCase())
-          global.api.stats.newChatters += 1;
+        if (!users.newChattersList.includes(message.tags.login.toLowerCase())) {
+          users.newChattersList.push(message.tags.login.toLowerCase())
+          api.stats.newChatters += 1;
         }
         */
       } else {
@@ -435,7 +398,7 @@ class TMI extends Core {
       user.subscribeStreak = 0;
       await getRepository(User).save(user);
 
-      global.overlays.eventlist.add({
+      eventlist.add({
         event: 'sub',
         tier: String(tier),
         username,
@@ -443,8 +406,8 @@ class TMI extends Core {
         timestamp: Date.now(),
       });
       sub(`${username}#${userstate.userId}, tier: ${tier}`);
-      global.events.fire('subscription', { username: username, method: (isNil(method.prime) && method.prime) ? 'Twitch Prime' : '', subCumulativeMonths, tier });
-      global.registries.alerts.trigger({
+      events.fire('subscription', { username: username, method: (isNil(method.prime) && method.prime) ? 'Twitch Prime' : '', subCumulativeMonths, tier });
+      alerts.trigger({
         event: 'subs',
         name: username,
         amount: 0,
@@ -497,7 +460,7 @@ class TMI extends Core {
       user.subscribeStreak = subStreak;
       await getRepository(User).save(user);
 
-      global.overlays.eventlist.add({
+      eventlist.add({
         event: 'resub',
         tier: String(tier),
         username,
@@ -510,7 +473,7 @@ class TMI extends Core {
         timestamp: Date.now(),
       });
       resub(`${username}#${userstate.userId}, streak share: ${subStreakShareEnabled}, streak: ${subStreak}, months: ${subCumulativeMonths}, message: ${messageFromUser}, tier: ${tier}`);
-      global.events.fire('resub', {
+      events.fire('resub', {
         username,
         tier,
         subStreakShareEnabled,
@@ -520,7 +483,7 @@ class TMI extends Core {
         subCumulativeMonthsName: getLocalizedName(subCumulativeMonths, 'core.months'),
         message: messageFromUser,
       });
-      global.registries.alerts.trigger({
+      alerts.trigger({
         event: 'resubs',
         name: username,
         amount: Number(subCumulativeMonths),
@@ -550,15 +513,15 @@ class TMI extends Core {
         return;
       }
 
-      global.overlays.eventlist.add({
+      eventlist.add({
         event: 'subcommunitygift',
         username,
         count,
         timestamp: Date.now(),
       });
-      global.events.fire('subcommunitygift', { username, count });
+      events.fire('subcommunitygift', { username, count });
       subcommunitygift(`${username}#${userId}, to ${count} viewers`);
-      global.registries.alerts.trigger({
+      alerts.trigger({
         event: 'subgifts',
         name: username,
         amount: Number(count),
@@ -592,7 +555,7 @@ class TMI extends Core {
       if (typeof this.ignoreGiftsFromUser[username] !== 'undefined' && this.ignoreGiftsFromUser[username].count !== 0) {
         this.ignoreGiftsFromUser[username].count--;
       } else {
-        global.events.fire('subgift', { username: username, recipient: recipient, tier });
+        events.fire('subgift', { username: username, recipient: recipient, tier });
         triggerInterfaceOnSub({
           username: recipient,
           userId: recipientId,
@@ -617,7 +580,7 @@ class TMI extends Core {
       user.subscribeStreak += 1;
       await getRepository(User).save(user);
 
-      global.overlays.eventlist.add({
+      eventlist.add({
         event: 'subgift',
         username: recipient,
         from: username,
@@ -650,7 +613,7 @@ class TMI extends Core {
         return;
       }
 
-      global.overlays.eventlist.add({
+      eventlist.add({
         event: 'cheer',
         username,
         bits: userstate.bits,
@@ -676,8 +639,8 @@ class TMI extends Core {
       user.bits.push(newBits);
       getRepository(User).save(user);
 
-      global.events.fire('cheer', { username, bits: userstate.bits, message: messageFromUser });
-      global.registries.alerts.trigger({
+      events.fire('cheer', { username, bits: userstate.bits, message: messageFromUser });
+      alerts.trigger({
         event: 'cheers',
         name: username,
         amount: Number(userstate.bits),
@@ -686,8 +649,8 @@ class TMI extends Core {
         message: messageFromUser,
         autohost: false,
       });
-      if (global.api.isStreamOnline) {
-        global.api.stats.currentBits += parseInt(userstate.bits, 10);
+      if (api.isStreamOnline) {
+        api.stats.currentBits += parseInt(userstate.bits, 10);
       }
 
       triggerInterfaceOnBit({
@@ -726,7 +689,7 @@ class TMI extends Core {
 
     if (!sender.userId && sender.username) {
       // this can happen if we are sending commands from dashboards etc.
-      sender.userId = await global.users.getIdByName(sender.username);
+      sender.userId = await users.getIdByName(sender.username);
     }
 
     if (typeof sender.badges === 'undefined') {
@@ -737,7 +700,7 @@ class TMI extends Core {
 
     if (!skip
         && sender['message-type'] === 'whisper'
-        && (global.tmi.whisperListener || isOwner(sender))) {
+        && (tmi.whisperListener || isOwner(sender))) {
       clusteredWhisperIn(`${message} [${sender.username}]`);
     } else if (!skip && !isBot(sender.username)) {
       clusteredChatIn(`${message} [${sender.username}]`);
@@ -763,7 +726,7 @@ class TMI extends Core {
         user.userId = Number(sender.userId);
         user.username = sender.username;
         if (!user.isOnline) {
-          global.widgets.joinpart.send({ users: [sender.username], type: 'join' });
+          joinpart.send({ users: [sender.username], type: 'join' });
         }
         user.isOnline = true;
         user.isVIP = typeof sender.badges.vip !== 'undefined';
@@ -776,12 +739,12 @@ class TMI extends Core {
 
         await getRepository(User).save(user);
 
-        global.api.followerUpdatePreCheck(sender.username);
+        api.followerUpdatePreCheck(sender.username);
 
-        if (global.api.isStreamOnline) {
-          global.events.fire('keyword-send-x-times', { username: sender.username, message: message });
+        if (api.isStreamOnline) {
+          events.fire('keyword-send-x-times', { username: sender.username, message: message });
           if (message.startsWith('!')) {
-            global.events.fire('command-send-x-times', { username: sender.username, message: message });
+            events.fire('command-send-x-times', { username: sender.username, message: message });
           } else if (!message.startsWith('!')) {
             await getRepository(User).increment({ userId: sender.userId }, 'messages', 1);
           }
@@ -791,27 +754,11 @@ class TMI extends Core {
     }
 
     if (isMainThread) {
-      this.avgResponse({ value: parse.time(), message });
+      avgResponse({ value: parse.time(), message });
     } else {
       return { value: parse.time(), message };
     }
   }
-
-  avgResponse(opts) {
-    let avgTime = 0;
-    global.avgResponse.push(opts.value);
-    if (opts.value > 5000) {
-      warning(`Took ${opts.value}ms to process: ${opts.message}`);
-    }
-    if (global.avgResponse.length > 100) {
-      global.avgResponse.shift();
-    }
-    for (const time of global.avgResponse) {
-      avgTime += time;
-    }
-    global.status.RES = Number((avgTime / global.avgResponse.length).toFixed(0));
-  }
 }
 
-export default TMI;
-export { TMI };
+export default new TMI();

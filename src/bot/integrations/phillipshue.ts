@@ -5,9 +5,10 @@ import { HueApi, lightState } from 'node-hue-api';
 import { sendMessage } from '../commons';
 import { command, default_permission, settings } from '../decorators';
 import { onChange, onStartup } from '../decorators/on';
-import { permission } from '../permissions';
+import { permission } from '../helpers/permissions';
 import Integration from './_interface';
 import { error, info } from '../helpers/log';
+import { translate } from '../translate';
 
 interface State {
   rgb: number[];
@@ -124,7 +125,7 @@ class PhillipsHue extends Integration {
         _.each(lights.lights, function (light) {
           output.push('id: ' + light.id + ', name: \'' + light.name + '\'');
         });
-        sendMessage(global.translate('phillipsHue.list') + output.join(' | '), opts.sender, opts.attr);
+        sendMessage(translate('phillipsHue.list') + output.join(' | '), opts.sender, opts.attr);
       })
       .fail(function (err) {
         error(err);
@@ -166,5 +167,4 @@ class PhillipsHue extends Integration {
   }
 }
 
-export default PhillipsHue;
-export { PhillipsHue };
+export default new PhillipsHue();

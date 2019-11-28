@@ -8,6 +8,8 @@ const message = require('../../general.js').message;
 const assert = require('assert');
 const _ = require('lodash');
 
+const roulette = (require('../../../dest/games/roulette')).default;
+
 const tests = [
   {
     user: { username: 'user1', userId: Number(_.random(999999, false)) },
@@ -23,7 +25,7 @@ describe('game/roulette - !roulette', () => {
       });
 
       it(`${test.user.username} starts roulette`, async () => {
-        global.games.roulette.main({ sender: test.user });
+        roulette.main({ sender: test.user });
       });
 
       it('Expecting win or lose', async () => {

@@ -1,5 +1,7 @@
 import Overlay from './_interface';
 import { settings, ui } from '../decorators';
+import api from '../api';
+import panel from '../panel';
 
 class Clips extends Overlay {
   @ui({
@@ -21,12 +23,12 @@ class Clips extends Overlay {
   cClipsLabel = true;
 
   async showClip (clipId: string) {
-    const clips = (await global.api.getClipById(clipId)).data || [];
+    const clips = (await api.getClipById(clipId)).data || [];
     for (const c of clips) {
       c.mp4 = c.thumbnail_url.replace('-preview-480x272.jpg', '.mp4');
     }
 
-    global.panel.io
+    panel.io
       .of('/' + this._name + '/' + this.constructor.name.toLowerCase())
       .emit('clips', {
         clips,
@@ -39,5 +41,4 @@ class Clips extends Overlay {
   }
 }
 
-export default Clips;
-export { Clips };
+export default new Clips();

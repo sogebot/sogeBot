@@ -28,5 +28,4 @@ class Bets extends Overlay {
   }
 }
 
-export default Bets;
-export { Bets };
+export default new Bets();

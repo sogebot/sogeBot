@@ -8,11 +8,13 @@ const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 const assert = require('assert');
 
-const { permission } = require('../../../dest/permissions');
+const { permission } = require('../../../dest/helpers/permissions');
 
 const { getRepository } = require('typeorm');
 const { Commands } = require('../../../dest/database/entity/commands');
 const { User } = require('../../../dest/database/entity/user');
+
+const customcommands = (require('../../../dest/systems/customcommands')).default;
 
 // users
 const owner = { username: 'soge__', userId: Math.floor(Math.random() * 100000) };
@@ -65,7 +67,7 @@ describe('Custom Commands - run()', () => {
     });
 
     it('run command by owner', async () => {
-      await global.systems.customCommands.run({ sender: owner, message: '!test qwerty' });
+      await customcommands.run({ sender: owner, message: '!test qwerty' });
       await message.isSentRaw('qwerty by !test command with param', owner);
       await message.isSentRaw('@soge__, $_variable was set to qwerty.', owner);
       await message.isSentRaw('This should be triggered', owner);
@@ -74,7 +76,7 @@ describe('Custom Commands - run()', () => {
     });
 
     it('run command by viewer', async () => {
-      await global.systems.customCommands.run({ sender: user1, message: '!test qwerty' });
+      await customcommands.run({ sender: user1, message: '!test qwerty' });
       await message.isSentRaw('This should be triggered', user1);
       await message.isSentRaw('This should be triggered as well', user1);
       await message.isSentRaw('qwerty by !test command with param', user1);
@@ -96,46 +98,46 @@ describe('Custom Commands - run()', () => {
     });
 
     it('run command as user not defined in filter', async () => {
-      global.systems.customCommands.run({ sender: owner, message: '!cmd' });
+      customcommands.run({ sender: owner, message: '!cmd' });
       await message.isNotSentRaw('Lorem Ipsum', owner);
     });
 
     it('run command as user defined in filter', async () => {
-      global.systems.customCommands.run({ sender: user1, message: '!cmd' });
+      customcommands.run({ sender: user1, message: '!cmd' });
       await message.isSentRaw('Lorem Ipsum', user1);
     });
   });
 
   it('!a will show Lorem Ipsum', async () => {
-    global.systems.customCommands.add({ sender: owner, parameters: '-c !a -r Lorem Ipsum' });
+    customcommands.add({ sender: owner, parameters: '-c !a -r Lorem Ipsum' });
     await message.isSent('customcmds.command-was-added', owner, { command: '!a', response: 'Lorem Ipsum', sender: owner.username });
 
-    global.systems.customCommands.run({ sender: owner, message: '!a' });
+    customcommands.run({ sender: owner, message: '!a' });
     await message.isSentRaw('Lorem Ipsum', owner);
 
-    global.systems.customCommands.remove({ sender: owner, parameters: '!a' });
+    customcommands.remove({ sender: owner, parameters: '!a' });
     await message.isSent('customcmds.command-was-removed', owner, { command: '!a', sender: owner.username });
   });
 
   it('!한글 will show Lorem Ipsum', async () => {
-    global.systems.customCommands.add({ sender: owner, parameters: '-c !한글 -r Lorem Ipsum' });
+    customcommands.add({ sender: owner, parameters: '-c !한글 -r Lorem Ipsum' });
     await message.isSent('customcmds.command-was-added', owner, { command: '!한글', response: 'Lorem Ipsum', sender: owner.username });
 
-    global.systems.customCommands.run({ sender: owner, message: '!한글' });
+    customcommands.run({ sender: owner, message: '!한글' });
     await message.isSentRaw('Lorem Ipsum', owner);
 
-    global.systems.customCommands.remove({ sender: owner, parameters: '!한글' });
+    customcommands.remove({ sender: owner, parameters: '!한글' });
     await message.isSent('customcmds.command-was-removed', owner, { command: '!한글', sender: owner.username });
   });
 
   it('!русский will show Lorem Ipsum', async () => {
-    global.systems.customCommands.add({ sender: owner, parameters: '-c !русский -r Lorem Ipsum' });
+    customcommands.add({ sender: owner, parameters: '-c !русский -r Lorem Ipsum' });
     await message.isSent('customcmds.command-was-added', owner, { command: '!русский', response: 'Lorem Ipsum', sender: owner.username });
 
-    global.systems.customCommands.run({ sender: owner, message: '!русский' });
+    customcommands.run({ sender: owner, message: '!русский' });
     await message.isSentRaw('Lorem Ipsum', owner);
 
-    global.systems.customCommands.remove({ sender: owner, parameters: '!русский' });
+    customcommands.remove({ sender: owner, parameters: '!русский' });
     await message.isSent('customcmds.command-was-removed', owner, { command: '!русский', sender: owner.username });
   });
 });

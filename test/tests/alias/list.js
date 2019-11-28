@@ -3,6 +3,7 @@ require('../../general.js');
 
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
+const alias = (require('../../../dest/systems/alias')).default;
 
 // users
 const owner = { username: 'soge__' };
@@ -14,18 +15,18 @@ describe('Alias - list()', () => {
   });
 
   it('empty list', async () => {
-    global.systems.alias.list({ sender: owner, parameters: '' });
+    alias.list({ sender: owner, parameters: '' });
     await message.isSent('alias.list-is-empty', owner, { sender: owner.username });
   });
 
   it('populated list', async () => {
-    global.systems.alias.add({ sender: owner, parameters: '-a !a -c !me' });
+    alias.add({ sender: owner, parameters: '-a !a -c !me' });
     await message.isSent('alias.alias-was-added', owner, { alias: '!a', command: '!me', sender: owner.username });
 
-    global.systems.alias.add({ sender: owner, parameters: '-a !b -c !me' });
+    alias.add({ sender: owner, parameters: '-a !b -c !me' });
     await message.isSent('alias.alias-was-added', owner, { alias: '!b', command: '!me', sender: owner.username });
 
-    global.systems.alias.list({ sender: owner, parameters: '' });
+    alias.list({ sender: owner, parameters: '' });
     await message.isSent('alias.list-is-not-empty', owner, { list: '!a, !b', sender: owner.username });
   });
 });
