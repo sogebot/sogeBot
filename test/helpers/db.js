@@ -1,7 +1,5 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-const _ = require('lodash');
 const chalk = require('chalk');
-const variable = require('./variable');
 
 const { debug } = require('../../dest/helpers/log');
 const waitMs = require('./time').waitMs;
