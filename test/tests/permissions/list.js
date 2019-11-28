@@ -5,6 +5,8 @@ require('../../general.js');
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 
+const permissions = (require('../../../dest/permissions')).default;
+
 // users
 const owner = { username: 'soge__' };
 
@@ -15,7 +17,7 @@ describe('Permissions - list()', () => {
   });
 
   it('Permission list should be correct', async () => {
-    global.permissions.list({ sender: owner, parameters: '' });
+    permissions.list({ sender: owner, parameters: '' });
     await message.isSent('core.permissions.list', owner);
     await message.isSentRaw('≥ | Casters | 4300ed23-dca0-4ed9-8014-f5f2f7af55a9', owner);
     await message.isSentRaw('≥ | Moderators | b38c5adb-e912-47e3-937a-89fabd12393a', owner);

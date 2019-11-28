@@ -4,8 +4,12 @@ require('../../general.js');
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 
+const { linesParsed } = require('../../../dest/helpers/parser');
+
 // users
 const owner = { username: 'soge__' };
+
+const timers = (require('../../../dest/systems/timers')).default;
 
 const { getRepository } = require('typeorm');
 const { Timer, TimerResponse } = require('../../../dest/database/entity/timer');
@@ -21,7 +25,7 @@ describe('Timers - toggle()', () => {
     timer.triggerEverySecond = 60;
     timer.isEnabled = true;
     timer.triggeredAtTimestamp = Date.now();
-    timer.triggeredAtMessage = global.linesParsed;
+    timer.triggeredAtMessage = linesParsed;
     timer = await getRepository(Timer).save(timer);
 
     const response = new TimerResponse();
@@ -33,39 +37,39 @@ describe('Timers - toggle()', () => {
   });
 
   it('', async () => {
-    global.systems.timers.toggle({ sender: owner, parameters: '' });
+    timers.toggle({ sender: owner, parameters: '' });
     await message.isSent('timers.id-or-name-must-be-defined', owner, { sender: owner.username });
   });
 
   it('-id something -name something', async () => {
-    global.systems.timers.toggle({ sender: owner, parameters: '-id something -name something' });
+    timers.toggle({ sender: owner, parameters: '-id something -name something' });
     await message.isSent('timers.timer-not-found', owner, { name: 'something', sender: owner.username });
   });
 
   it('-id unknown', async () => {
-    global.systems.timers.toggle({ sender: owner, parameters: '-id unknown' });
+    timers.toggle({ sender: owner, parameters: '-id unknown' });
     await message.isSent('timers.id-or-name-must-be-defined', owner, { sender: owner.username });
   });
 
   it('-id response_id', async () => {
     const response = await getRepository(TimerResponse).findOne({ response: 'Lorem Ipsum' });
-    global.systems.timers.toggle({ sender: owner, parameters: '-id ' + response.id });
+    timers.toggle({ sender: owner, parameters: '-id ' + response.id });
     await message.isSent('timers.response-disabled', owner, { id: response.id, sender: owner.username });
 
-    global.systems.timers.toggle({ sender: owner, parameters: '-id ' + response.id });
+    timers.toggle({ sender: owner, parameters: '-id ' + response.id });
     await message.isSent('timers.response-enabled', owner, { id: response.id, sender: owner.username });
   });
 
   it('-name unknown', async () => {
-    global.systems.timers.toggle({ sender: owner, parameters: '-name unknown' });
+    timers.toggle({ sender: owner, parameters: '-name unknown' });
     await message.isSent('timers.timer-not-found', owner, { name: 'unknown', sender: owner.username });
   });
 
   it('-name test', async () => {
-    global.systems.timers.toggle({ sender: owner, parameters: '-name test' });
+    timers.toggle({ sender: owner, parameters: '-name test' });
     await message.isSent('timers.timer-disabled', owner, { name: 'test', sender: owner.username });
 
-    global.systems.timers.toggle({ sender: owner, parameters: '-name test' });
+    timers.toggle({ sender: owner, parameters: '-name test' });
     await message.isSent('timers.timer-enabled', owner, { name: 'test', sender: owner.username });
   });
 });

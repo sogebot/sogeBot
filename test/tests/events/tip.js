@@ -16,6 +16,8 @@ const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/database/entity/user');
 const { Event } = require('../../../dest/database/entity/event');
 
+const events = (require('../../../dest/events')).default;
+
 describe('Events - tip event', () => {
   before(async () => {
     await db.cleanup();
@@ -50,7 +52,7 @@ describe('Events - tip event', () => {
       describe(username + ' tip event', () => {
         it('trigger tip event for 10 EUR - ' + username, async () => {
           log.tip(`${username}, amount: 10.00EUR, message: Ahoj jak je`);
-          global.events.fire('tip', { userId: Math.floor(Math.random * 100000), username: username, amount: 10.00, message: 'Ahoj jak je', currency: 'EUR' });
+          events.fire('tip', { userId: Math.floor(Math.random * 100000), username: username, amount: 10.00, message: 'Ahoj jak je', currency: 'EUR' });
         });
 
         it('wait 1s', async () => {

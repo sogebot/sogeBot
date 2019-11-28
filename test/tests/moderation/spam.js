@@ -9,6 +9,8 @@ const message = require('../../general.js').message;
 const user = require('../../general.js').user;
 const assert = require('chai').assert;
 
+const moderation = (require('../../../dest/systems/moderation')).default;
+
 const tests = {
   'timeout': [
     'Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum',
@@ -26,19 +28,18 @@ describe('systems/moderation - Spam()', () => {
       await db.cleanup();
       await message.prepare();
       await user.prepare();
-      global.systems.moderation.cSpamEnabled = false;
-      await variable.isEqual('systems.moderation.cSpamEnabled', false);
+      moderation.cSpamEnabled = false;
     });
 
     for (const test of tests.timeout) {
       it(`message '${test}' should not timeout`, async () => {
-        assert.isTrue(await global.systems.moderation.spam({ sender: user.viewer, message: test }));
+        assert.isTrue(await moderation.spam({ sender: user.viewer, message: test }));
       });
     }
 
     for (const test of tests.ok) {
       it(`message '${test}' should not timeout`, async () => {
-        assert.isTrue(await global.systems.moderation.spam({ sender: user.viewer, message: test }));
+        assert.isTrue(await moderation.spam({ sender: user.viewer, message: test }));
       });
     }
   });
@@ -47,19 +48,18 @@ describe('systems/moderation - Spam()', () => {
       await db.cleanup();
       await message.prepare();
       await user.prepare();
-      global.systems.moderation.cSpamEnabled = true;
-      await variable.isEqual('systems.moderation.cSpamEnabled', true);
+      moderation.cSpamEnabled = true;
     });
 
     for (const test of tests.timeout) {
       it(`message '${test}' should timeout`, async () => {
-        assert.isFalse(await global.systems.moderation.spam({ sender: user.viewer, message: test }));
+        assert.isFalse(await moderation.spam({ sender: user.viewer, message: test }));
       });
     }
 
     for (const test of tests.ok) {
       it(`message '${test}' should not timeout`, async () => {
-        assert.isTrue(await global.systems.moderation.spam({ sender: user.viewer, message: test }));
+        assert.isTrue(await moderation.spam({ sender: user.viewer, message: test }));
       });
     }
   });

@@ -13,7 +13,10 @@ const assert = require('chai').assert;
 
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
-const variable = require('../../general.js').variable;
+
+const cooldown = (require('../../../dest/systems/cooldown')).default;
+const customcommands = (require('../../../dest/systems/customcommands')).default;
+const gamble = (require('../../../dest/games/gamble')).default;
 
 // users
 const owner = { userId: Math.floor(Math.random() * 100000), username: 'soge__', badges: {} };
@@ -31,32 +34,32 @@ describe('Cooldowns - check()', () => {
     });
 
     it('Command !_debug should pass', async () => {
-      const isOk = await global.systems.cooldown.check({ sender: testUser, message: '!_debug' });
+      const isOk = await cooldown.check({ sender: testUser, message: '!_debug' });
       assert.isTrue(isOk);
     });
 
     it('Command !$debug should pass', async () => {
-      const isOk = await global.systems.cooldown.check({ sender: testUser, message: '!$debug' });
+      const isOk = await cooldown.check({ sender: testUser, message: '!$debug' });
       assert.isTrue(isOk);
     });
 
     it('Command `!_debug test` should pass', async () => {
-      const isOk = await global.systems.cooldown.check({ sender: testUser, message: '!_debug test' });
+      const isOk = await cooldown.check({ sender: testUser, message: '!_debug test' });
       assert.isTrue(isOk);
     });
 
     it('Command `!$debug test` should pass', async () => {
-      const isOk = await global.systems.cooldown.check({ sender: testUser, message: '!$debug test' });
+      const isOk = await cooldown.check({ sender: testUser, message: '!$debug test' });
       assert.isTrue(isOk);
     });
 
     it('Command `!_debug te$st` should pass', async () => {
-      const isOk = await global.systems.cooldown.check({ sender: testUser, message: '!_debug te$st' });
+      const isOk = await cooldown.check({ sender: testUser, message: '!_debug te$st' });
       assert.isTrue(isOk);
     });
 
     it('Command `!$debug te$st` should pass', async () => {
-      const isOk = await global.systems.cooldown.check({ sender: testUser, message: '!$debug te$st' });
+      const isOk = await cooldown.check({ sender: testUser, message: '!$debug te$st' });
       assert.isTrue(isOk);
     });
   });
@@ -68,7 +71,7 @@ describe('Cooldowns - check()', () => {
     });
 
     it('create command', async () => {
-      global.systems.customCommands.add({ sender: owner, parameters: '-c !cmd -r $param' });
+      customcommands.add({ sender: owner, parameters: '-c !cmd -r $param' });
       await message.isSent('customcmds.command-was-added', owner, { response: '$param', command: '!cmd', sender: owner.username });
     });
 
@@ -90,12 +93,12 @@ describe('Cooldowns - check()', () => {
     });
 
     it('First user should PASS', async () => {
-      const isOk = await global.systems.cooldown.check({ sender: testUser, message: '!cmd (*)' });
+      const isOk = await cooldown.check({ sender: testUser, message: '!cmd (*)' });
       assert.isTrue(isOk);
     });
 
     it('Second user should FAIL', async () => {
-      const isOk = await global.systems.cooldown.check({ sender: testUser2, message: '!cmd (*)' });
+      const isOk = await cooldown.check({ sender: testUser2, message: '!cmd (*)' });
       assert.isFalse(isOk);
     });
   });
@@ -105,8 +108,7 @@ describe('Cooldowns - check()', () => {
       await db.cleanup();
       await message.prepare();
 
-      global.games.gamble.enabled = true;
-      await variable.isEqual('global.games.gamble.enabled', true);
+      gamble.enabled = true;
     });
 
     it('Add usermod1 as moderator', async () => {
@@ -140,13 +142,13 @@ describe('Cooldowns - check()', () => {
     });
 
     it('First user should PASS', async () => {
-      const isOk = await global.systems.cooldown.check({ sender: testUser, message: 'KonCha' });
+      const isOk = await cooldown.check({ sender: testUser, message: 'KonCha' });
       assert.isTrue(isOk);
     });
 
     for (const user of [testUser, testUser2, owner, usermod1, subuser1]) {
       it('Other users should FAIL', async () => {
-        const isOk = await global.systems.cooldown.check({ sender: user, message: 'koncha' });
+        const isOk = await cooldown.check({ sender: user, message: 'koncha' });
         assert.isFalse(isOk);
       });
     }
@@ -157,8 +159,7 @@ describe('Cooldowns - check()', () => {
       await db.cleanup();
       await message.prepare();
 
-      global.games.gamble.enabled = true;
-      await variable.isEqual('global.games.gamble.enabled', true);
+      gamble.enabled = true;
     });
 
     it('Add usermod1 as moderator', async () => {
@@ -183,23 +184,23 @@ describe('Cooldowns - check()', () => {
     });
 
     it('First user should PASS', async () => {
-      const isOk = await global.systems.cooldown.check({ sender: testUser, message: '!followage' });
+      const isOk = await cooldown.check({ sender: testUser, message: '!followage' });
       assert.isTrue(isOk);
     });
 
     it('Owner user should PASS', async () => {
-      const isOk = await global.systems.cooldown.check({ sender: owner, message: '!followage' });
+      const isOk = await cooldown.check({ sender: owner, message: '!followage' });
       assert.isTrue(isOk);
     });
 
     it('Moderator user should PASS', async () => {
-      const isOk = await global.systems.cooldown.check({ sender: usermod1, message: '!followage' });
+      const isOk = await cooldown.check({ sender: usermod1, message: '!followage' });
       assert.isTrue(isOk);
     });
 
     for (const user of [testUser, testUser2, subuser1]) {
       it('Other users should FAIL', async () => {
-        const isOk = await global.systems.cooldown.check({ sender: user, message: '!followage' });
+        const isOk = await cooldown.check({ sender: user, message: '!followage' });
         assert.isFalse(isOk);
       });
     }
@@ -210,28 +211,27 @@ describe('Cooldowns - check()', () => {
       await db.cleanup();
       await message.prepare();
 
-      global.games.gamble.enabled = true;
-      await variable.isEqual('global.games.gamble.enabled', true);
+      gamble.enabled = true;
     });
 
     it('test', async () => {
       const [command, type, seconds, quiet] = ['!gamble', 'user', '300', true];
-      global.systems.cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` });
+      cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` });
       await message.isSent('cooldowns.cooldown-was-set', owner, { command: command, type: type, seconds: seconds, sender: owner.username });
 
       const item = await getRepository(Cooldown).findOne({ where: { name: '!gamble' } });
       assert.notEmpty(item);
 
-      let isOk = await global.systems.cooldown.check({ sender: testUser, message: '!gamble 10' });
+      let isOk = await cooldown.check({ sender: testUser, message: '!gamble 10' });
       assert.isTrue(isOk);
 
-      isOk = await global.systems.cooldown.check({ sender: testUser, message: '!gamble 15' });
+      isOk = await cooldown.check({ sender: testUser, message: '!gamble 15' });
       assert.isFalse(isOk); // second should fail
 
-      isOk = await global.systems.cooldown.check({ sender: testUser2, message: '!gamble 20' });
+      isOk = await cooldown.check({ sender: testUser2, message: '!gamble 20' });
       assert.isTrue(isOk);
 
-      isOk = await global.systems.cooldown.check({ sender: testUser2, message: '!gamble 25' });
+      isOk = await cooldown.check({ sender: testUser2, message: '!gamble 25' });
       assert.isFalse(isOk); // second should fail
     });
   });
@@ -241,22 +241,21 @@ describe('Cooldowns - check()', () => {
       await db.cleanup();
       await message.prepare();
 
-      global.games.gamble.enabled = true;
-      await variable.isEqual('global.games.gamble.enabled', true);
+      gamble.enabled = true;
     });
 
     it('test', async () => {
       const [command, type, seconds, quiet] = ['!test', 'user', '60', true];
-      global.systems.cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` });
+      cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` });
       await message.isSent('cooldowns.cooldown-was-set', owner, { command: command, type: type, seconds: seconds, sender: owner.username });
 
       const item = await getRepository(Cooldown).findOne({ where: { name: '!test' } });
       assert.notEmpty(item);
 
-      let isOk = await global.systems.cooldown.check({ sender: testUser, message: 'Lorem Ipsum !test' });
+      let isOk = await cooldown.check({ sender: testUser, message: 'Lorem Ipsum !test' });
       assert.isTrue(isOk);
 
-      isOk = await global.systems.cooldown.check({ sender: testUser, message: 'Lorem Ipsum !test' });
+      isOk = await cooldown.check({ sender: testUser, message: 'Lorem Ipsum !test' });
       assert.isTrue(isOk); // second should fail
     });
   });
@@ -266,25 +265,24 @@ describe('Cooldowns - check()', () => {
       await db.cleanup();
       await message.prepare();
 
-      global.games.gamble.enabled = true;
-      await variable.isEqual('global.games.gamble.enabled', true);
+      gamble.enabled = true;
     });
 
     it('test', async () => {
       const [command, type, seconds, quiet] = ['!test me', 'user', '60', true];
-      global.systems.cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` });
+      cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` });
       await message.isSent('cooldowns.cooldown-was-set', owner, { command: command, type: type, seconds: seconds, sender: owner.username });
 
       const item = await getRepository(Cooldown).findOne({ where: { name: '!test me' } });
       assert.isTrue(typeof item !== 'undefined');
 
-      assert.isTrue(await global.systems.cooldown.check({ sender: testUser, message: command }), `'${command}' expected to not fail`);
-      assert.isFalse(await global.systems.cooldown.check({ sender: testUser, message: command }), `'${command}' expected to fail`);
-      assert.isTrue(await global.systems.cooldown.check({ sender: testUser2, message: command }), `'${command}' expected to not fail`);
+      assert.isTrue(await cooldown.check({ sender: testUser, message: command }), `'${command}' expected to not fail`);
+      assert.isFalse(await cooldown.check({ sender: testUser, message: command }), `'${command}' expected to fail`);
+      assert.isTrue(await cooldown.check({ sender: testUser2, message: command }), `'${command}' expected to not fail`);
 
-      assert.isTrue(await global.systems.cooldown.check({ sender: testUser, message: '!test' }));
-      assert.isTrue(await global.systems.cooldown.check({ sender: testUser, message: '!test' }));
-      assert.isTrue(await global.systems.cooldown.check({ sender: testUser2, message: '!test' }));
+      assert.isTrue(await cooldown.check({ sender: testUser, message: '!test' }));
+      assert.isTrue(await cooldown.check({ sender: testUser, message: '!test' }));
+      assert.isTrue(await cooldown.check({ sender: testUser2, message: '!test' }));
     });
   });
 
@@ -293,25 +291,24 @@ describe('Cooldowns - check()', () => {
       await db.cleanup();
       await message.prepare();
 
-      global.games.gamble.enabled = true;
-      await variable.isEqual('global.games.gamble.enabled', true);
+      gamble.enabled = true;
     });
 
     it('test', async () => {
       const [command, type, seconds, quiet] = ['!test', 'user', '60', true];
-      global.systems.cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` });
+      cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` });
       await message.isSent('cooldowns.cooldown-was-set', owner, { command: command, type: type, seconds: seconds, sender: owner.username });
 
       const item = await getRepository(Cooldown).findOne({ where: { name: '!test' } });
       assert.isTrue(typeof item !== 'undefined');
 
-      let isOk = await global.systems.cooldown.check({ sender: testUser, message: '!test' });
+      let isOk = await cooldown.check({ sender: testUser, message: '!test' });
       assert.isTrue(isOk);
 
-      isOk = await global.systems.cooldown.check({ sender: testUser, message: '!test' });
+      isOk = await cooldown.check({ sender: testUser, message: '!test' });
       assert.isFalse(isOk); // second should fail
 
-      isOk = await global.systems.cooldown.check({ sender: testUser2, message: '!test' });
+      isOk = await cooldown.check({ sender: testUser2, message: '!test' });
       assert.isTrue(isOk);
     });
   });
@@ -321,25 +318,24 @@ describe('Cooldowns - check()', () => {
       await db.cleanup();
       await message.prepare();
 
-      global.games.gamble.enabled = true;
-      await variable.isEqual('global.games.gamble.enabled', true);
+      gamble.enabled = true;
     });
 
     it('test', async () => {
       const [command, type, seconds, quiet] = ['!test', 'global', '60', true];
-      global.systems.cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` });
+      cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` });
       await message.isSent('cooldowns.cooldown-was-set', owner, { command: command, type: type, seconds: seconds, sender: owner.username });
 
       const item = await getRepository(Cooldown).findOne({ where: { name: '!test' } });
       assert.isTrue(typeof item !== 'undefined');
 
-      let isOk = await global.systems.cooldown.check({ sender: testUser, message: '!test' });
+      let isOk = await cooldown.check({ sender: testUser, message: '!test' });
       assert.isTrue(isOk);
 
-      isOk = await global.systems.cooldown.check({ sender: testUser, message: '!test' });
+      isOk = await cooldown.check({ sender: testUser, message: '!test' });
       assert.isFalse(isOk); // second should fail
 
-      isOk = await global.systems.cooldown.check({ sender: testUser2, message: '!test' });
+      isOk = await cooldown.check({ sender: testUser2, message: '!test' });
       assert.isFalse(isOk); // another user should fail as well
     });
   });
@@ -349,8 +345,7 @@ describe('Cooldowns - check()', () => {
       await db.cleanup();
       await message.prepare();
 
-      global.games.gamble.enabled = true;
-      await variable.isEqual('global.games.gamble.enabled', true);
+      gamble.enabled = true;
     });
 
     it('test', async () => {
@@ -362,19 +357,19 @@ describe('Cooldowns - check()', () => {
       });
 
       const [command, type, seconds, quiet] = ['me', 'user', '60', true];
-      global.systems.cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` });
+      cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` });
       await message.isSent('cooldowns.cooldown-was-set', owner, { command: command, type: type, seconds: seconds, sender: owner.username });
 
       const item = await getRepository(Cooldown).findOne({ where: { name: 'me' } });
       assert.isTrue(typeof item !== 'undefined');
 
-      let isOk = await global.systems.cooldown.check({ sender: testUser, message: 'me' });
+      let isOk = await cooldown.check({ sender: testUser, message: 'me' });
       assert.isTrue(isOk);
 
-      isOk = await global.systems.cooldown.check({ sender: testUser, message: 'me' });
+      isOk = await cooldown.check({ sender: testUser, message: 'me' });
       assert.isFalse(isOk); // second should fail
 
-      isOk = await global.systems.cooldown.check({ sender: testUser2, message: 'me' });
+      isOk = await cooldown.check({ sender: testUser2, message: 'me' });
       assert.isTrue(isOk);
     });
   });
@@ -384,8 +379,7 @@ describe('Cooldowns - check()', () => {
       await db.cleanup();
       await message.prepare();
 
-      global.games.gamble.enabled = true;
-      await variable.isEqual('global.games.gamble.enabled', true);
+      gamble.enabled = true;
     });
 
     it('test', async () => {
@@ -397,19 +391,19 @@ describe('Cooldowns - check()', () => {
       });
 
       const [command, type, seconds, quiet] = ['me', 'global', '60', true];
-      global.systems.cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` });
+      cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` });
       await message.isSent('cooldowns.cooldown-was-set', owner, { command: command, type: type, seconds: seconds, sender: owner.username });
 
       const item = await getRepository(Cooldown).findOne({ where: { name: 'me' } });
       assert.isTrue(typeof item !== 'undefined');
 
-      let isOk = await global.systems.cooldown.check({ sender: testUser, message: 'me' });
+      let isOk = await cooldown.check({ sender: testUser, message: 'me' });
       assert.isTrue(isOk);
 
-      isOk = await global.systems.cooldown.check({ sender: testUser, message: 'me' });
+      isOk = await cooldown.check({ sender: testUser, message: 'me' });
       assert.isFalse(isOk); // second should fail
 
-      isOk = await global.systems.cooldown.check({ sender: testUser2, message: 'me' });
+      isOk = await cooldown.check({ sender: testUser2, message: 'me' });
       assert.isFalse(isOk); // another user should fail as well
     });
   });

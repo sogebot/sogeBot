@@ -10,6 +10,9 @@ const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 const constants = require('../../../dest/constants');
 
+const top = (require('../../../dest/systems/top')).default;
+const tmi = (require('../../../dest/tmi')).default;
+
 const moment = require('moment-timezone');
 
 // users
@@ -42,7 +45,7 @@ describe('Top - !top subage', () => {
   });
 
   it('run !top subage and expect correct output', async () => {
-    global.systems.top.subage({ sender: { username: commons.getOwner() } });
+    top.subage({ sender: { username: commons.getOwner() } });
     const dates = [];
     for (let i = 0; i < 10; i++) {
       dates.push(`${moment.utc(Date.now() - (constants.HOUR * i)).format('L')} (${moment.utc(Date.now() - (constants.HOUR * i)).fromNow()})`);
@@ -51,12 +54,12 @@ describe('Top - !top subage', () => {
   });
 
   it('add user1 to ignore list', async () => {
-    global.tmi.ignoreAdd({ sender: owner, parameters: 'user0' });
+    tmi.ignoreAdd({ sender: owner, parameters: 'user0' });
     await message.isSent('ignore.user.is.added', owner, { username: 'user0' });
   });
 
   it('run !top subage and expect correct output', async () => {
-    global.systems.top.subage({ sender: { username: commons.getOwner() } });
+    top.subage({ sender: { username: commons.getOwner() } });
     const dates = [];
     for (let i = 0; i < 10; i++) {
       dates.push(`${moment.utc(Date.now() - (constants.HOUR * i)).format('L')} (${moment.utc(Date.now() - (constants.HOUR * i)).fromNow()})`);

@@ -16,6 +16,7 @@ import { warning } from '../helpers/log';
 import api from '../api';
 import oauth from '../oauth';
 import points from './points';
+import { isDbConnected } from '../helpers/database';
 
 const TYPE_NORMAL = 0;
 const TYPE_TICKETS = 1;
@@ -122,6 +123,11 @@ class Raffles extends System {
 
   async announce () {
     clearTimeout(this.timeouts.raffleAnnounce);
+    if (!isDbConnected) {
+      this.timeouts.raffleAnnounce = global.setTimeout(() => this.announce(), 1000);
+      return;
+    }
+
     const raffle = await getRepository(Raffle).findOne({ winner: null });
     if (!(api.isStreamOnline) || !raffle || new Date().getTime() - new Date(this.lastAnnounce).getTime() < (this.raffleAnnounceInterval * 60 * 1000)) {
       this.timeouts.raffleAnnounce = global.setTimeout(() => this.announce(), 60000);

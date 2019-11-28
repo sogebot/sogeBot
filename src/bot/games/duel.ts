@@ -12,6 +12,7 @@ import { Duel as DuelEntity } from '../database/entity/duel';
 import oauth from '../oauth';
 import { translate } from '../translate';
 import points from '../systems/points';
+import { isDbConnected } from '../helpers/database';
 
 const ERROR_NOT_ENOUGH_OPTIONS = '0';
 const ERROR_ZERO_BET = '1';
@@ -48,6 +49,11 @@ class Duel extends Game {
 
   async pickDuelWinner () {
     clearTimeout(this.timeouts.pickDuelWinner);
+
+    if (!isDbConnected) {
+      this.timeouts.pickDuelWinner = global.setTimeout(() => this.pickDuelWinner(), 1000);
+      return;
+    }
 
     const [users, timestamp, duelDuration] = await Promise.all([
       getRepository(DuelEntity).find(),

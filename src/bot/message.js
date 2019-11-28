@@ -21,11 +21,14 @@ import { User } from './database/entity/user';
 import Price from './systems/price';
 import { Rank } from './database/entity/rank';
 
+import oauth from './oauth';
 import api from './api';
 import tmi from './tmi';
+import customvariables from './customvariables';
 import spotify from './integrations/spotify';
 import songs from './systems/songs';
 import { translate } from './translate';
+
 
 class Message {
   constructor (message) {

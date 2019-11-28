@@ -279,8 +279,8 @@ async function registerCommand(opts: string | Command, m) {
   if (!isDbConnected) {
     return setTimeout(() => registerCommand(opts, m), 1000);
   }
+  let self;
   try {
-    let self;
     if (m.type === 'core') {
       self = (require('./' + m.name)).default;
     } else {
@@ -324,7 +324,7 @@ async function registerCommand(opts: string | Command, m) {
     }
     self._commands.push(c);
   } catch (e) {
-    error(JSON.stringify({opts, m}));
+    error(JSON.stringify({isDbConnected, opts, m}));
     error(e);
   }
 }

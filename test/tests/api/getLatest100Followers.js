@@ -11,53 +11,54 @@ const sinon = require('sinon');
 const axios = require('axios');
 const assert = require('assert');
 
+const oauth = (require('../../../dest/oauth')).default;
+const api = (require('../../../dest/api')).default;
+const events = (require('../../../dest/events')).default;
+
 describe('API - getLatest100Followers()', () => {
   before(async () => {
     await db.cleanup();
     await message.prepare();
 
-    global.oauth.channelId = '12345';
-    await variable.isEqual('global.oauth.channelId', '12345');
-    global.oauth.botAccessToken = 'foobar';
-    await variable.isEqual('global.oauth.botAccessToken', 'foobar');
-    global.oauth.botUsername = '__bot_username__';
-    await variable.isEqual('global.oauth.botUsername', '__bot_username__');
+    oauth.channelId = '12345';
+    oauth.botAccessToken = 'foobar';
+    oauth.botUsername = '__bot_username__';
   });
 
   after(() => {
-    global.oauth.channelId = '';
-    global.oauth.botAccessToken = '';
+    oauth.channelId = '';
+    oauth.botAccessToken = '';
   });
 
   describe('Example data', () => {
     // we are using mock https://api.twitch.tv/helix/users/follows?to_id=12345&first=100
 
     it('should be properly parsed', async () => {
-      const status = await global.api.getLatest100Followers(false);
+      const status = await api.getLatest100Followers(false);
       assert(status.state, 'getLatest100Followers() unexpectedly failed');
     });
 
     it('should be two follow events', async () => {
-      assert(global.events.fire.callCount === 2);
+      assert(events.fire.callCount === 2);
     });
 
     it('follow events should have correct usernames', async () => {
-      assert(global.events.fire.calledWith('follow', { username: 'testfollow', userId: 111 }));
-      assert(global.events.fire.calledWith('follow', { username: 'testfollow2', userId: 222 }));
+      assert(events.fire.calledWith('follow', { username: 'testfollow', userId: 111 }));
+      assert(events.fire.calledWith('follow', { username: 'testfollow2', userId: 222 }));
     });
 
     it('second call should be properly parsed', async () => {
-      const status = await global.api.getLatest100Followers(false);
+      const status = await api.getLatest100Followers(false);
       assert(status.state, 'getLatest100Followers() unexpectedly failed');
     });
 
     it('should be two follow events, expecting no change', async () => {
-      assert(global.events.fire.callCount === 2);
+      assert(events.fire.callCount === 2);
     });
 
     it('follow events should have correct usernames', async () => {
-      assert(global.events.fire.calledWith('follow', { username: 'testfollow', userId: 111 }));
-      assert(global.events.fire.calledWith('follow', { username: 'testfollow2', userId: 222 }));
+      assert(events.fire.calledWith('follow', { username: 'testfollow', userId: 111 }));
+      assert(events.fire.calledWith('follow', { username: 'testfollow2', userId: 222 }));
     });
   });
 });

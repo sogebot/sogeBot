@@ -11,6 +11,8 @@ const assert = require('assert');
 const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/database/entity/user');
 
+const points = (require('../../../dest/systems/points')).default;
+
 const user1 = { username: 'user1', points: 100, userId: Number(_.random(999999, false)) };
 const user2 = { username: 'user2', points: 100, userId: Number(_.random(999999, false)) };
 
@@ -30,28 +32,28 @@ describe('Points - get()', () => {
     });
 
     it('user1 should have 100 points', async () => {
-      assert.strict.equal(await global.systems.points.getPointsOf(user1.userId), 100);
+      assert.strict.equal(await points.getPointsOf(user1.userId), 100);
     });
 
     it('user2 should have 100 points', async () => {
-      assert.strict.equal(await global.systems.points.getPointsOf(user2.userId), 100);
+      assert.strict.equal(await points.getPointsOf(user2.userId), 100);
     });
 
     it('user1 send 50 points', async () => {
-      await global.systems.points.give({ sender: user1, parameters: 'user2 50' });
+      await points.give({ sender: user1, parameters: 'user2 50' });
       await message.isSent('points.success.give', { username: user1.username }, {
         amount: 50,
         username: user2.username,
-        pointsName: await global.systems.points.getPointsName(50),
+        pointsName: await points.getPointsName(50),
       });
     });
 
     it('user1 should have 50 points', async () => {
-      assert.strict.equal(await global.systems.points.getPointsOf(user1.userId), 50);
+      assert.strict.equal(await points.getPointsOf(user1.userId), 50);
     });
 
     it('user2 should have 150 points', async () => {
-      assert.strict.equal(await global.systems.points.getPointsOf(user2.userId), 150);
+      assert.strict.equal(await points.getPointsOf(user2.userId), 150);
     });
   });
 
@@ -70,28 +72,28 @@ describe('Points - get()', () => {
     });
 
     it('user1 should have 100 points', async () => {
-      assert.strict.equal(await global.systems.points.getPointsOf(user1.userId), 100);
+      assert.strict.equal(await points.getPointsOf(user1.userId), 100);
     });
 
     it('user2 should have 100 points', async () => {
-      assert.strict.equal(await global.systems.points.getPointsOf(user2.userId), 100);
+      assert.strict.equal(await points.getPointsOf(user2.userId), 100);
     });
 
     it('user1 send 150 points', async () => {
-      await global.systems.points.give({ sender: user1, parameters: 'user2 150' });
+      await points.give({ sender: user1, parameters: 'user2 150' });
       await message.isSent('points.failed.giveNotEnough', { username: user1.username }, {
         amount: 150,
         username: user2.username,
-        pointsName: await global.systems.points.getPointsName(150),
+        pointsName: await points.getPointsName(150),
       });
     });
 
     it('user1 should have 100 points', async () => {
-      assert.strict.equal(await global.systems.points.getPointsOf(user1.userId), 100);
+      assert.strict.equal(await points.getPointsOf(user1.userId), 100);
     });
 
     it('user2 should have 100 points', async () => {
-      assert.strict.equal(await global.systems.points.getPointsOf(user2.userId), 100);
+      assert.strict.equal(await points.getPointsOf(user2.userId), 100);
     });
   });
 
@@ -110,28 +112,28 @@ describe('Points - get()', () => {
     });
 
     it('user1 should have 100 points', async () => {
-      assert.strict.equal(await global.systems.points.getPointsOf(user1.userId), 100);
+      assert.strict.equal(await points.getPointsOf(user1.userId), 100);
     });
 
     it('user2 should have 100 points', async () => {
-      assert.strict.equal(await global.systems.points.getPointsOf(user2.userId), 100);
+      assert.strict.equal(await points.getPointsOf(user2.userId), 100);
     });
 
     it('user1 send all points', async () => {
-      await global.systems.points.give({ sender: user1, parameters: 'user2 all' });
+      await points.give({ sender: user1, parameters: 'user2 all' });
       await message.isSent('points.success.give', { username: user1.username }, {
         amount: 100,
         username: user2.username,
-        pointsName: await global.systems.points.getPointsName(100),
+        pointsName: await points.getPointsName(100),
       });
     });
 
     it('user1 should have 0 points', async () => {
-      assert.strict.equal(await global.systems.points.getPointsOf(user1.userId), 0);
+      assert.strict.equal(await points.getPointsOf(user1.userId), 0);
     });
 
     it('user2 should have 200 points', async () => {
-      assert.strict.equal(await global.systems.points.getPointsOf(user2.userId), 200);
+      assert.strict.equal(await points.getPointsOf(user2.userId), 200);
     });
   });
 
@@ -150,26 +152,26 @@ describe('Points - get()', () => {
     });
 
     it('user1 should have 100 points', async () => {
-      assert.strict.equal(await global.systems.points.getPointsOf(user1.userId), 100);
+      assert.strict.equal(await points.getPointsOf(user1.userId), 100);
     });
 
     it('user2 should have 100 points', async () => {
-      assert.strict.equal(await global.systems.points.getPointsOf(user2.userId), 100);
+      assert.strict.equal(await points.getPointsOf(user2.userId), 100);
     });
 
     it('user1 send wrong command', async () => {
-      await global.systems.points.give({ sender: user1, parameters: 'user2', command: '!points give' });
+      await points.give({ sender: user1, parameters: 'user2', command: '!points give' });
       await message.isSent('points.failed.give', { username: user1.username }, {
         command: '!points give',
       });
     });
 
     it('user1 should have 100 points', async () => {
-      assert.strict.equal(await global.systems.points.getPointsOf(user1.userId), 100);
+      assert.strict.equal(await points.getPointsOf(user1.userId), 100);
     });
 
     it('user2 should have 100 points', async () => {
-      assert.strict.equal(await global.systems.points.getPointsOf(user2.userId), 100);
+      assert.strict.equal(await points.getPointsOf(user2.userId), 100);
     });
   });
 
@@ -188,26 +190,26 @@ describe('Points - get()', () => {
     });
 
     it('user1 should have 100 points', async () => {
-      assert.strict.equal(await global.systems.points.getPointsOf(user1.userId), 100);
+      assert.strict.equal(await points.getPointsOf(user1.userId), 100);
     });
 
     it('user2 should have 100 points', async () => {
-      assert.strict.equal(await global.systems.points.getPointsOf(user2.userId), 100);
+      assert.strict.equal(await points.getPointsOf(user2.userId), 100);
     });
 
     it('user1 send wrong string points', async () => {
-      await global.systems.points.give({ sender: user1, parameters: 'user2 something', command: '!points give' });
+      await points.give({ sender: user1, parameters: 'user2 something', command: '!points give' });
       await message.isSent('points.failed.give', { username: user1.username }, {
         command: '!points give',
       });
     });
 
     it('user1 should have 100 points', async () => {
-      assert.strict.equal(await global.systems.points.getPointsOf(user1.userId), 100);
+      assert.strict.equal(await points.getPointsOf(user1.userId), 100);
     });
 
     it('user2 should have 100 points', async () => {
-      assert.strict.equal(await global.systems.points.getPointsOf(user2.userId), 100);
+      assert.strict.equal(await points.getPointsOf(user2.userId), 100);
     });
   });
 });

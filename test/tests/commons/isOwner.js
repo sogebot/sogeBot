@@ -6,6 +6,9 @@ const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 const variable = require('../../general.js').variable;
 
+
+const oauth = (require('../../../dest/oauth')).default;
+
 const { isOwner } = require('../../../dest/commons');
 
 const assert = require('chai').assert;
@@ -18,8 +21,7 @@ describe('lib/commons - isOwner()', () => {
     await db.cleanup();
     await message.prepare();
 
-    global.oauth.generalOwners = ['soge__'];
-    variable.isEqual('global.oauth.generalOwners', ['soge__']);
+    oauth.generalOwners = ['soge__'];
   });
 
   it('should be returned as owner', async () => {

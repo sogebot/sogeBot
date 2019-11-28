@@ -15,6 +15,7 @@ import Expects from '../expects';
 import oauth from '../oauth';
 import { translate } from '../translate';
 import { linesParsed } from '../helpers/parser';
+import { isDbConnected } from '../helpers/database';
 
 /*
  * !timers                                                                                                                      - gets an info about timers usage
@@ -101,6 +102,10 @@ class Timers extends System {
   }
 
   async init () {
+    if (!isDbConnected) {
+      setTimeout(() => this.init(), 1000);
+      return;
+    }
     const timers = await getRepository(Timer).find({
       relations: ['messages'],
     });

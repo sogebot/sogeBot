@@ -10,4 +10,6 @@ async function setIsDbConnected () {
     setTimeout(() => setIsDbConnected(), 1000);
   }
 }
-setIsDbConnected();
+setTimeout(() => {
+  setIsDbConnected();
+}, 5000);

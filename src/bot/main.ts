@@ -62,6 +62,7 @@ async function main () {
     horizontalLayout: 'default',
     verticalLayout: 'default',
   }));
+  process.stdout.write('\n\n\n');
   info('Bot is starting up');
   translate.default._load().then(async () => {
     await autoLoad('./dest/stats/');

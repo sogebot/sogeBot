@@ -9,6 +9,8 @@ const message = require('../../general.js').message;
 const user = require('../../general.js').user;
 const assert = require('chai').assert;
 
+const moderation = (require('../../../dest/systems/moderation')).default;
+
 const tests = {
   'timeout': [
     '!@#$%^&*()(*&^%$#@#$%^&*)',
@@ -26,19 +28,18 @@ describe('systems/moderation - symbols()', () => {
       await db.cleanup();
       await message.prepare();
       await user.prepare();
-      global.systems.moderation.cSymbolsEnabled = false;
-      await variable.isEqual('systems.moderation.cSymbolsEnabled', false);
+      moderation.cSymbolsEnabled = false;
     });
 
     for (const test of tests.timeout) {
       it(`symbols '${test}' should not timeout`, async () => {
-        assert.isTrue(await global.systems.moderation.symbols({ sender: user.viewer, message: test }));
+        assert.isTrue(await moderation.symbols({ sender: user.viewer, message: test }));
       });
     }
 
     for (const test of tests.ok) {
       it(`symbols '${test}' should not timeout`, async () => {
-        assert.isTrue(await global.systems.moderation.symbols({ sender: user.viewer, message: test }));
+        assert.isTrue(await moderation.symbols({ sender: user.viewer, message: test }));
       });
     }
   });
@@ -47,19 +48,18 @@ describe('systems/moderation - symbols()', () => {
       await db.cleanup();
       await message.prepare();
       await user.prepare();
-      global.systems.moderation.cSymbolsEnabled = true;
-      await variable.isEqual('systems.moderation.cSymbolsEnabled', true);
+      moderation.cSymbolsEnabled = true;
     });
 
     for (const test of tests.timeout) {
       it(`symbols '${test}' should timeout`, async () => {
-        assert.isFalse(await global.systems.moderation.symbols({ sender: user.viewer, message: test }));
+        assert.isFalse(await moderation.symbols({ sender: user.viewer, message: test }));
       });
     }
 
     for (const test of tests.ok) {
       it(`symbols '${test}' should not timeout`, async () => {
-        assert.isTrue(await global.systems.moderation.symbols({ sender: user.viewer, message: test }));
+        assert.isTrue(await moderation.symbols({ sender: user.viewer, message: test }));
       });
     }
   });

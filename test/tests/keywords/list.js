@@ -5,6 +5,8 @@ const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 const assert = require('assert');
 
+const keywords = (require('../../../dest/systems/keywords')).default;
+
 const { getRepository } = require('typeorm');
 const { Keyword } = require('../../../dest/database/entity/keyword');
 const { User } = require('../../../dest/database/entity/user');
@@ -12,7 +14,7 @@ const { User } = require('../../../dest/database/entity/user');
 // users
 const owner = { username: 'soge__', userId: Math.floor(Math.random() * 100000) };
 
-const keywords = [
+const keywordsList = [
   { keyword: 'slqca', response: 'hptqm', enabled: Math.random() >= 0.5 },
   { keyword: 'urfiu', response: 'mtcjt', enabled: Math.random() >= 0.5 },
   { keyword: 'frqzw', response: 'lordw', enabled: Math.random() >= 0.5 },
@@ -34,7 +36,7 @@ describe('Keywords - listing', () => {
     });
 
     it('Expecting empty list', async () => {
-      await global.systems.keywords.list({ sender: owner, parameters: '' });
+      await keywords.list({ sender: owner, parameters: '' });
       await message.isSent('keywords.list-is-empty', owner);
     });
   });
@@ -45,9 +47,9 @@ describe('Keywords - listing', () => {
       await message.prepare();
     });
 
-    for(const k of keywords) {
+    for(const k of keywordsList) {
       it (`Creating random keyword | ${k.keyword} | ${k.response}`, async () => {
-        const keyword = await global.systems.keywords.add({ sender: owner, parameters: `-k ${k.keyword} -r ${k.response}` });
+        const keyword = await keywords.add({ sender: owner, parameters: `-k ${k.keyword} -r ${k.response}` });
         k.id = keyword.id;
         assert.notStrictEqual(k, null);
         await getRepository(Keyword).update({ id: keyword.id }, { enabled: k.enabled });
@@ -55,14 +57,14 @@ describe('Keywords - listing', () => {
     }
 
     it('Trigger list command', async () => {
-      await global.systems.keywords.list({ sender: owner, parameters: '' });
+      await keywords.list({ sender: owner, parameters: '' });
     })
 
     it('List not empty', async () => {
       await message.isSent('keywords.list-is-not-empty', owner);
     })
 
-    for(const k of keywords) {
+    for(const k of keywordsList) {
       it(`List populated by ${k.keyword} | ${k.response}`, async () => {
         await message.isSentRaw(`${k.enabled ? '🗹' : '☐'} ${k.id} | ${k.keyword} | ${k.response}`, owner, 5000);
       });

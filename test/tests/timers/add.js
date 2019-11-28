@@ -7,8 +7,12 @@ require('../../general.js');
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 
+const timers = (require('../../../dest/systems/timers')).default;
+
 const { getRepository } = require('typeorm');
 const { Timer, TimerResponse } = require('../../../dest/database/entity/timer');
+
+const { linesParsed } = require('../../../dest/helpers/parser');
 
 // users
 const owner = { username: 'soge__' };
@@ -24,27 +28,27 @@ describe('Timers - add()', () => {
     timer.triggerEverySecond = 60;
     timer.isEnabled = true;
     timer.triggeredAtTimestamp = Date.now();
-    timer.triggeredAtMessage = global.linesParsed;
+    timer.triggeredAtMessage = linesParsed;
     await getRepository(Timer).save(timer);
   });
 
   it('', async () => {
-    global.systems.timers.add({ sender: owner, parameters: '' });
+    timers.add({ sender: owner, parameters: '' });
     await message.isSent('timers.name-must-be-defined', owner, { sender: owner.username });
   });
 
   it('-name test', async () => {
-    global.systems.timers.add({ sender: owner, parameters: '-name test' });
+    timers.add({ sender: owner, parameters: '-name test' });
     await message.isSent('timers.response-must-be-defined', owner, { sender: owner.username });
   });
 
   it('-name unknown -response "Lorem Ipsum"', async () => {
-    global.systems.timers.add({ sender: owner, parameters: '-name unknown -response "Lorem Ipsum"' });
+    timers.add({ sender: owner, parameters: '-name unknown -response "Lorem Ipsum"' });
     await message.isSent('timers.timer-not-found', owner, { name: 'unknown', sender: owner.username });
   });
 
   it('-name test -response "Lorem Ipsum"', async () => {
-    await global.systems.timers.add({ sender: owner, parameters: '-name test -response "Lorem Ipsum"' });
+    await timers.add({ sender: owner, parameters: '-name test -response "Lorem Ipsum"' });
 
     const item = await getRepository(TimerResponse).findOne({ response: 'Lorem Ipsum' });
     assert.isTrue(typeof item !== 'undefined');

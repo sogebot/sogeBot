@@ -9,6 +9,8 @@ const message = require('../../general.js').message;
 const user = require('../../general.js').user;
 const assert = require('chai').assert;
 
+const moderation = (require('../../../dest/systems/moderation')).default;
+
 const tests = {
   'timeout': [
     { message: 'AAAAAAAAAAAAAAAAAAAAAA', sender: user.viewer },
@@ -30,38 +32,36 @@ describe('systems/moderation - Caps()', () => {
       await db.cleanup();
       await message.prepare();
       await user.prepare();
-      global.systems.moderation.cCapsEnabled = false;
-      await variable.isEqual('global.systems.moderation.cCapsEnabled', false);
+      moderation.cCapsEnabled = false;
     });
 
     for (const test of tests.timeout) {
       it(`message '${test.message}' should not timeout`, async () => {
-        assert.isTrue(await global.systems.moderation.caps({ sender: test.sender, message: test.message }));
+        assert.isTrue(await moderation.caps({ sender: test.sender, message: test.message }));
       });
     }
 
     for (const test of tests.ok) {
       it(`message '${test.message}' should not timeout`, async () => {
-        assert.isTrue(await global.systems.moderation.caps({ sender: test.sender, message: test.message }));
+        assert.isTrue(await moderation.caps({ sender: test.sender, message: test.message }));
       });
     }
   });
   describe('moderationCaps=true', async () => {
     before(async () => {
       await message.prepare();
-      global.systems.moderation.cCapsEnabled = true;
-      await variable.isEqual('global.systems.moderation.cCapsEnabled', true);
+      moderation.cCapsEnabled = true;
     });
 
     for (const test of tests.timeout) {
       it(`message '${test.message}' should timeout`, async () => {
-        assert.isFalse(await global.systems.moderation.caps({ sender: test.sender, message: test.message }));
+        assert.isFalse(await moderation.caps({ sender: test.sender, message: test.message }));
       });
     }
 
     for (const test of tests.ok) {
       it(`message '${test.message}' should not timeout`, async () => {
-        assert.isTrue(await global.systems.moderation.caps({ sender: test.sender, message: test.message }));
+        assert.isTrue(await moderation.caps({ sender: test.sender, message: test.message }));
       });
     }
   });

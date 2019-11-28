@@ -9,6 +9,9 @@ const message = require('../../general.js').message;
 const { getRepository } = require('typeorm');
 const { User } = require('../../../dest/database/entity/user');
 
+const top = (require('../../../dest/systems/top')).default;
+const tmi = (require('../../../dest/tmi')).default;
+
 // users
 const owner = { username: 'soge__' };
 
@@ -29,17 +32,17 @@ describe('Top - !top gifts', () => {
   });
 
   it('run !top gifts and expect correct output', async () => {
-    global.systems.top.gifts({ sender: { username: commons.getOwner() } });
+    top.gifts({ sender: { username: commons.getOwner() } });
     await message.isSentRaw('Top 10 (subgifts): 1. @user9 - 900, 2. @user8 - 800, 3. @user7 - 700, 4. @user6 - 600, 5. @user5 - 500, 6. @user4 - 400, 7. @user3 - 300, 8. @user2 - 200, 9. @user1 - 100, 10. @user0 - 0', owner);
   });
 
   it('add user1 to ignore list', async () => {
-    global.tmi.ignoreAdd({ sender: owner, parameters: 'user0' });
+    tmi.ignoreAdd({ sender: owner, parameters: 'user0' });
     await message.isSent('ignore.user.is.added', owner, { username: 'user0' });
   });
 
   it('run !top gifts and expect correct output', async () => {
-    global.systems.top.gifts({ sender: { username: commons.getOwner() } });
+    top.gifts({ sender: { username: commons.getOwner() } });
     await message.isSentRaw('Top 10 (subgifts): 1. @user9 - 900, 2. @user8 - 800, 3. @user7 - 700, 4. @user6 - 600, 5. @user5 - 500, 6. @user4 - 400, 7. @user3 - 300, 8. @user2 - 200, 9. @user1 - 100', owner);
   });
 });
