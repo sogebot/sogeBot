@@ -324,6 +324,7 @@ async function registerCommand(opts: string | Command, m) {
     }
     self._commands.push(c);
   } catch (e) {
+    error(JSON.stringify({opts, m}));
     error(e);
   }
 }

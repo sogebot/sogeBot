@@ -4,7 +4,8 @@ require('../../general.js');
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 
-const { permission } = require('../../../dest/permissions');
+const { permission } = require('../../../dest/helpers/permissions');
+const alias = (require('../../../dest/systems/alias')).default;
 
 // users
 const owner = { username: 'soge__' };
@@ -46,7 +47,7 @@ describe('Alias - add()', () => {
   describe('Expected parsed fail', () => {
     for (const t of failedTests) {
       it(generateCommand(t), async () => {
-        global.systems.alias.add({ sender: owner, parameters: generateCommand(t) });
+        alias.add({ sender: owner, parameters: generateCommand(t) });
         await message.isSent('alias.alias-parse-failed', owner, { sender: owner.username });
       });
     }
@@ -55,16 +56,16 @@ describe('Alias - add()', () => {
   describe('Expected to pass', () => {
     for (const t of successTests) {
       it(generateCommand(t), async () => {
-        global.systems.alias.add({ sender: owner, parameters: generateCommand(t) });
+        alias.add({ sender: owner, parameters: generateCommand(t) });
         await message.isSent('alias.alias-was-added', owner, { alias: t.alias, command: t.command, sender: owner.username });
       });
     }
 
     it('2x - -a !a -c !me', async () => {
-      global.systems.alias.add({ sender: owner, parameters: '-a !a -c !me' });
+      alias.add({ sender: owner, parameters: '-a !a -c !me' });
       await message.isSent('alias.alias-was-added', owner, { alias: '!a', command: '!me', sender: owner.username });
 
-      global.systems.alias.add({ sender: owner, parameters: '-a !a -c !me' });
+      alias.add({ sender: owner, parameters: '-a !a -c !me' });
       await message.isSent('alias.alias-was-added', owner, { alias: '!a', command: '!me', sender: owner.username });
     });
   });

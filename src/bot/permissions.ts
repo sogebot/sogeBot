@@ -305,7 +305,7 @@ class Permissions extends Core {
     }
   }
 
-  private async ensurePreservedPermissionsInDb(): Promise<void> {
+  public async ensurePreservedPermissionsInDb(): Promise<void> {
     let p;
     try {
       p = await getRepository(PermissionsEntity).find();

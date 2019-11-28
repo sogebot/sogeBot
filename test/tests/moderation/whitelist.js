@@ -7,6 +7,7 @@ require('../../general.js');
 const db = require('../../general.js').db;
 const variable = require('../../general.js').variable;
 const message = require('../../general.js').message;
+const alias = (require('../../../dest/systems/alias')).default;
 
 // users
 const owner = { username: 'soge__' };
@@ -169,7 +170,7 @@ describe('systems/moderation - whitelist()', () => {
     await db.cleanup();
     await message.prepare();
 
-    global.systems.alias.add({ sender: owner, parameters: '-a !sr -c !songrequest' });
+    .add({ sender: owner, parameters: '-a !sr -c !songrequest' });
     await message.isSent('alias.alias-was-added', owner, { alias: '!sr', command: '!songrequest', sender: owner.username });
   });
 

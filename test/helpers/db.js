@@ -25,6 +25,11 @@ const { Variable, VariableHistory, VariableURL } = require('../../dest/database/
 const { Event, EventOperation } = require('../../dest/database/entity/event');
 const { PermissionCommands } = require('../../dest/database/entity/permissions');
 
+const oauth = (require('../../dest/oauth')).default;
+const tmi = (require('../../dest/tmi')).default;
+const permissions = (require('../../dest/permissions')).default;
+
+
 let justStarted = true;
 
 module.exports = {
@@ -37,7 +42,7 @@ module.exports = {
           justStarted = false;
         }
       } catch (e) {}
-      if (!isDbConnected || _.isNil(global.systems)) {
+      if (!isDbConnected) {
         return setTimeout(() => waitForIt(resolve, reject), 1000);
       }
 
@@ -74,28 +79,16 @@ module.exports = {
 
       debug('test', chalk.bgRed('*** Cleaned successfully ***'));
 
-      await global.permissions.ensurePreservedPermissionsInDb(); // re-do core permissions
+      await permissions.ensurePreservedPermissionsInDb(); // re-do core permissions
 
-      global.oauth.generalChannel = 'soge__';
-      await variable.isEqual('global.oauth.generalChannel', 'soge__');
+      oauth.generalChannel = 'soge__';
+      oauth.generalOwners = ['soge__', '__owner__'];
+      oauth.broadcasterUsername = 'broadcaster';
+      oauth.botUsername = 'bot';
+      oauth.botId = '12345';
 
-      global.oauth.generalOwners = ['soge__', '__owner__'];
-      await variable.isEqual('global.oauth.generalOwners', ['soge__', '__owner__']);
-
-      global.oauth.broadcasterUsername = 'broadcaster';
-      await variable.isEqual('global.oauth.broadcasterUsername', 'broadcaster');
-
-      global.oauth.botUsername = 'bot';
-      await variable.isEqual('global.oauth.botUsername', 'bot');
-
-      global.oauth.botId = '12345';
-      await variable.isEqual('global.oauth.botId', '12345');
-
-
-      global.oauth.broadcasterId = '54321';
-      await variable.isEqual('global.oauth.broadcasterId', '54321');
-
-      global.tmi.ignorelist = []
+      oauth.broadcasterId = '54321';
+      tmi.ignorelist = [];
 
       resolve();
     };
