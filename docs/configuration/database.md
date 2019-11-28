@@ -1,25 +1,24 @@
-## NeDB
+!> TypeORM is supporting various databases, below are listed **only** supported databases
+   by sogeBot.
 
-This is default db to use with a bot
+!> Update **!!! ONLY !!!** your connection informations
 
-```
-  "database": {
-    "__README__": "https://github.com/sogehige/sogeBot/wiki/Database-configuration",
-    "type": "nedb"
-  }
-```
+## How to configure your database
 
+1. Select from your supported database and pick proper ormconfig.json
+   from root folder
+2. Update your connection options, see
+   [TypeORM Connection Options](https://typeorm.io/#/connection-options)
+   for detailed information.
+3. **DON'T UPDATE ANY OTHER INFORMATIONS (LIKE MIGRATION, ENTITIES),
+   OTHERWISE DATABASE WON'T WORK**
+4. ???
+5. Working bot
 
-## MongoDB
+## Supported databases
 
-To enable MongoDB in a bot, you need to change this lines in yourt config.json
-
-```
-  "database": {
-    "__README__": "https://github.com/sogehige/sogeBot/wiki/Database-configuration",
-    "type": "mongodb",
-    "mongodb": {
-      "url": "mongodb://url-to-mongodb-instance:27017/your-mongo-db"
-    }
-  }
-```
+- SQLite(**default**)
+- PostgreSQL 11.5
+- MySQL 5.7
+  - you need to set `character-set-server=utf8`
+    and `collation-server=utf8_general_ci`

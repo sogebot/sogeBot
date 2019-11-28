@@ -5,8 +5,6 @@
   * [Color](/configuration/color.md)
   * [Database](/configuration/database.md)
   * [Environment variables](/configuration/env.md)
-  * [Metrics](/configuration/metrics.md)
-  * [Threads](/configuration/threads.md)
   * [Timezone](/configuration/timezone.md)
 * Systems
   * [Alias](/commands/alias.md)
@@ -52,6 +50,3 @@
 * Integrations
   * [Twitter](/integrations/twitter.md)
   * [Spotify](/integrations/spotify.md)
-* Tools
-  * [Users cleanup](/tools/users-cleanup.md)
-  * [Database migration](/tools/database.md)
