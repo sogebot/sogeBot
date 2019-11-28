@@ -25,64 +25,65 @@ let lastSocketIdx = 0;
 
 let socketIO, clientIO;
 
-const init = async () => {
-  if (typeof panel === 'undefined') {
-    setTimeout(() => {
-      init();
-    }, 1000);
-    return;
-  }
-  if (isMainThread) {
-    const server = http.createServer();
+export const init = async () => {
+  if (config.cluster.enabled === 'true') {
+    if (typeof panel === 'undefined') {
+      setTimeout(() => {
+        init();
+      }, 1000);
+      return;
+    }
+    if (isMainThread) {
+      const server = http.createServer();
 
-    socketIO = io(server);
-    server.listen(config.cluster.port);
+      socketIO = io(server);
+      server.listen(config.cluster.port);
 
-    socketIO.use(function (socket, next) {
-      if (config.cluster.id.trim() === socket.request._query.id) {
-        next();
-      }
-      return false;
-    });
-
-    socketIO.on('connection', (socket) => {
-      socket.on('clusteredClientChat', (type, username, messageToSend) => clusteredClientChat(type, username, messageToSend));
-      socket.on('clusteredClientTimeout', (username, timeMs, reason) => clusteredClientTimeout(username, timeMs, reason));
-      socket.on('clusteredClientDelete', (senderId) => clusteredClientDelete(senderId));
-      socket.on('clusteredWhisperIn', (message) => clusteredWhisperIn(message));
-      socket.on('clusteredChatIn', (message) => clusteredChatIn(message));
-      socket.on('clusteredWhisperOut', (message) => clusteredWhisperOut(message));
-      socket.on('clusteredChatOut', (message) => clusteredChatOut(message));
-      socket.on('clusteredFetchAccountAge', (username, userId) => clusteredFetchAccountAge(username, userId));
-
-      socket.on('received:message', (cb) => {
-        // cb is average time
-        avgResponse({ value: cb.value, message: cb.message });
+      socketIO.use(function (socket, next) {
+        if (config.cluster.id.trim() === socket.request._query.id) {
+          next();
+        }
+        return false;
       });
 
-      socket.on('disconnect', () => {
-        delete availableSockets[socket.id];
+      socketIO.on('connection', (socket) => {
+        socket.on('clusteredClientChat', (type, username, messageToSend) => clusteredClientChat(type, username, messageToSend));
+        socket.on('clusteredClientTimeout', (username, timeMs, reason) => clusteredClientTimeout(username, timeMs, reason));
+        socket.on('clusteredClientDelete', (senderId) => clusteredClientDelete(senderId));
+        socket.on('clusteredWhisperIn', (message) => clusteredWhisperIn(message));
+        socket.on('clusteredChatIn', (message) => clusteredChatIn(message));
+        socket.on('clusteredWhisperOut', (message) => clusteredWhisperOut(message));
+        socket.on('clusteredChatOut', (message) => clusteredChatOut(message));
+        socket.on('clusteredFetchAccountAge', (username, userId) => clusteredFetchAccountAge(username, userId));
+
+        socket.on('received:message', (cb) => {
+          // cb is average time
+          avgResponse({ value: cb.value, message: cb.message });
+        });
+
+        socket.on('disconnect', () => {
+          delete availableSockets[socket.id];
+        });
+
+        availableSockets[socket.id] = {
+          timestamp: Date.now(),
+          isAlive: true,
+        };
+      });
+    } else {
+      info('Clustered mode: you will see only messages handled by this node');
+      clientIO = ioClient.connect(config.cluster.mainThreadUrl + ':' + config.cluster.port, {
+        query: {
+          id: config.cluster.id,
+        },
       });
 
-      availableSockets[socket.id] = {
-        timestamp: Date.now(),
-        isAlive: true,
-      };
-    });
-  } else {
-    info('Clustered mode: you will see only messages handled by this node');
-    clientIO = ioClient.connect(config.cluster.mainThreadUrl + ':' + config.cluster.port, {
-      query: {
-        id: config.cluster.id,
-      },
-    });
-
-    clientIO.on('send:message', async (data) => {
-      clientIO.emit('received:message', await tmi.message(data, true));
-    });
-  }
-};
-init();
+      clientIO.on('send:message', async (data) => {
+        clientIO.emit('received:message', await tmi.message(data, true));
+      });
+    }
+  };
+}
 
 export const manageMessage = async (data) => {
   // randomly select from available sockets + master

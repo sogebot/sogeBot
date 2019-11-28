@@ -2,6 +2,7 @@
   "__README__": "https://github.com/sogehige/SogeBot/wiki/Install-and-Upgrade",
   "timezone": "system",
   "cluster": {
+    "enabled": "false",
     "id": "e77f8113-5be4-474e-a603-b435d839ab00",
     "mainThreadUrl": "http://localhost",
     "port": "30000"
