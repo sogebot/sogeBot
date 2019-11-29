@@ -116,9 +116,7 @@ class Parser {
             this.successfullParserRuns.push({name: parser.name, opts }); // need to save opts for permission rollback
           }
         }
-        if (Date.now() - time > 500) {
-          debug('parser.time', 'Processed ' + parser.name + ' (fireAndForget: ' + parser.fireAndForget + ') took ' + ((Date.now() - time) / 1000));
-        }
+        debug('parser.time', 'Processed ' + parser.name + ' (fireAndForget: ' + parser.fireAndForget + ') took ' + ((Date.now() - time) / 1000));
       } else {
         debug('parser.process', 'Skipped ' + parser.name + ' (fireAndForget: ' + parser.fireAndForget + ')');
       }
