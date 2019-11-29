@@ -6,7 +6,7 @@ import {
 } from './commons';
 import { debug, warning } from './helpers/log';
 import { cleanViewersCache, permission } from './helpers/permissions';
-import { command, default_permission, settings, areDecoratorsLoaded } from './decorators';
+import { areDecoratorsLoaded, command, default_permission, settings } from './decorators';
 import { isMainThread } from './cluster';
 import { error } from './helpers/log';
 import { adminEndpoint } from './helpers/socket';
