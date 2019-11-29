@@ -6,7 +6,7 @@ import {
 } from './commons';
 import { debug, warning } from './helpers/log';
 import { cleanViewersCache, permission } from './helpers/permissions';
-import { command, default_permission, settings } from './decorators';
+import { command, default_permission, settings, areDecoratorsLoaded } from './decorators';
 import { isMainThread } from './cluster';
 import { error } from './helpers/log';
 import { adminEndpoint } from './helpers/socket';
@@ -147,6 +147,20 @@ class Permissions extends Core {
   }
 
   public async check(userId: number, permId: string, partial = false): Promise<{access: boolean; permission: PermissionsEntity | undefined}> {
+    if (!areDecoratorsLoaded) {
+      await new Promise((resolve) => {
+        const check = () => {
+          // wait for all data to be loaded
+          if (areDecoratorsLoaded) {
+            resolve();
+          } else {
+            setTimeout(() => check(), 10);
+          }
+        };
+        check();
+      });
+    }
+
     if (_.filter(oauth.generalOwners, (o) => _.isString(o) && o.trim().length > 0).length === 0 && getBroadcaster() === '' && !isWarnedAboutCasters) {
       isWarnedAboutCasters = true;
       warning('Owners or broadcaster oauth is not set, all users are treated as CASTERS!!!');

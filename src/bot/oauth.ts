@@ -3,7 +3,7 @@ import { isMainThread } from './cluster';
 
 import Core from './_interface';
 import * as constants from './constants';
-import { settings, shared, ui } from './decorators';
+import { areDecoratorsLoaded, settings, shared, ui } from './decorators';
 import { onChange } from './decorators/on';
 import { error, info, warning } from './helpers/log';
 import api from './api';
@@ -127,7 +127,7 @@ class OAuth extends Core {
     if (!isMainThread || global.mocha) {
       return;
     }
-    if (typeof api === 'undefined' || typeof tmi === 'undefined') {
+    if (!areDecoratorsLoaded) {
       return setTimeout(() => this.getChannelId(), 1000);
     }
     clearTimeout(this.timeouts.getChannelId);
