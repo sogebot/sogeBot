@@ -16,6 +16,7 @@ import { getAllOnlineUsernames } from '../helpers/getAllOnlineUsernames';
 import { Settings } from '../database/entity/settings';
 import { getUserFromTwitch } from './getUserFromTwitch';
 import { clusteredFetchAccountAge } from '../cluster';
+import { debug } from '../helpers/log';
 
 export const getChannelChattersUnofficialAPI = async (): Promise<{ modStatus: boolean; partedUsers: string[]; joinedUsers: string[] }> => {
   if (!isMainThread) {
@@ -33,6 +34,7 @@ export const getChannelChattersUnofficialAPI = async (): Promise<{ modStatus: bo
       worker.on('message', resolve);
       worker.on('error', reject);
       worker.on('exit', (code) => {
+        debug('microservice', 'exit::getChannelChattersUnofficialAPI with code ' + code);
         if (code !== 0) {
           reject(new Error(`Worker stopped with exit code ${code}`));
         }
@@ -41,6 +43,7 @@ export const getChannelChattersUnofficialAPI = async (): Promise<{ modStatus: bo
     return value as unknown as { modStatus: boolean; partedUsers: string[]; joinedUsers: string[] };
   }
 
+  debug('microservice', 'start::getChannelChattersUnofficialAPI');
   try {
     // lock thread
     await getManager()
@@ -138,6 +141,10 @@ export const getChannelChattersUnofficialAPI = async (): Promise<{ modStatus: bo
       .from(ThreadEvent)
       .where('event = :event', { event: 'getChannelChattersUnofficialAPI' })
       .execute();
+    if (!isMainThread) {
+      debug('microservice', 'kill::getChannelChattersUnofficialAPI');
+      process.exit(0);
+    }
   };
 };
 
