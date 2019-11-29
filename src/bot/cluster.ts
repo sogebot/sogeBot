@@ -83,7 +83,7 @@ export const init = async () => {
       });
     }
   };
-}
+};
 
 export const manageMessage = async (data) => {
   // randomly select from available sockets + master
