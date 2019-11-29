@@ -12,6 +12,7 @@ import { getRepository } from 'typeorm';
 import { Translation } from './database/entity/translation';
 import panel from './panel';
 import general from './general';
+import { areDecoratorsLoaded } from './decorators';
 
 let translate_class: any = null;
 let translate: any = null;
@@ -28,32 +29,40 @@ class Translate {
   async _load () {
     this.custom = await getRepository(Translation).find();
     return new Promise(async (resolve, reject) => {
-      this.lang = general.lang;
-      glob('./locales/**', (err, files) => {
-        if (err) {
-          reject(err);
+      const load = () => {
+        if (!areDecoratorsLoaded) {
+          // waiting for full load
+          setTimeout(() => load(), 10);
+          return;
         }
-        for (const f of files) {
-          if (!f.endsWith('.json')) {
-            continue;
+        this.lang = general.lang;
+        glob('./locales/**', (err, files) => {
+          if (err) {
+            reject(err);
           }
-          const withoutLocales = f.replace('./locales/', '').replace('.json', '');
-          _.set(this.translations, withoutLocales.split('/').join('.'), JSON.parse(fs.readFileSync(f, 'utf8')));
-        }
-        if (_.isNil(this.translations[this.lang])) {
-          warning(`Language ${this.lang} not found - fallback to en`);
-          this.lang = 'en';
-        }
+          for (const f of files) {
+            if (!f.endsWith('.json')) {
+              continue;
+            }
+            const withoutLocales = f.replace('./locales/', '').replace('.json', '');
+            _.set(this.translations, withoutLocales.split('/').join('.'), JSON.parse(fs.readFileSync(f, 'utf8')));
+          }
+          if (_.isNil(this.translations[this.lang])) {
+            warning(`Language ${this.lang} not found - fallback to en`);
+            this.lang = 'en';
+          }
 
-        for (const c of this.custom) {
-          if (_.isNil(flatten(this.translations[this.lang])[c.name])) {
-            // remove if lang doesn't exist anymore
-            getRepository(Translation).delete({ name: c.name });
-            this.custom = _.remove(this.custom, (i) => i.name === c.name);
+          for (const c of this.custom) {
+            if (_.isNil(flatten(this.translations[this.lang])[c.name])) {
+              // remove if lang doesn't exist anymore
+              getRepository(Translation).delete({ name: c.name });
+              this.custom = _.remove(this.custom, (i) => i.name === c.name);
+            }
           }
-        }
-        resolve();
-      });
+          resolve();
+        });
+      };
+      load();
     });
   }
 

@@ -8,21 +8,29 @@ import { Settings } from './database/entity/settings';
 import { isDbConnected } from './helpers/database';
 
 export let loadingInProgress: string[] = [];
+export let areDecoratorsLoaded = false;
 export const permissions: { [command: string]: string | null } = {};
 
 let lastLoadingInProgressCount = 1000;
+let lastLoadingRetryCount = 100;
 
-const interval = setInterval(() => {
-  if(loadingInProgress.length === lastLoadingInProgressCount) {
-    if (loadingInProgress.length > 0) {
-      error('decorators: Loading FAIL (thread: ' + !isMainThread + `)\n${loadingInProgress.join(', ')}`);
+setTimeout(() => {
+  const interval = setInterval(() => {
+    if(loadingInProgress.length === lastLoadingInProgressCount) {
+      if (loadingInProgress.length > 0) {
+        lastLoadingRetryCount--;
+        if (lastLoadingRetryCount === 0) {
+          error('decorators: Loading FAIL (thread: ' + !isMainThread + `)\n${loadingInProgress.join(', ')}`);
+        }
+      } else {
+        debug('decorators', 'Loading OK (thread: ' + !isMainThread + ')');
+        areDecoratorsLoaded = true;
+        clearInterval(interval);
+      }
     } else {
-      debug('decorators', 'Loading OK (thread: ' + !isMainThread + ')');
+      lastLoadingInProgressCount = loadingInProgress.length;
     }
-    clearInterval(interval);
-  } else {
-    lastLoadingInProgressCount = loadingInProgress.length;
-  }
+  }, 100);
 }, 10000);
 
 function getNameAndTypeFromStackTrace() {
@@ -292,7 +300,13 @@ async function registerCommand(opts: string | Command, m) {
       };
     }
     opts.fnc = m.fnc; // force function to decorated function
-    const c = self.prepareCommand(opts);
+    let c;
+    try {
+      c = self.prepareCommand(opts);
+    } catch (e) {
+      setTimeout(() => registerCommand(opts, m), 10);
+      return;
+    }
 
     if (typeof self._commands === 'undefined') {
       self._commands = [];
