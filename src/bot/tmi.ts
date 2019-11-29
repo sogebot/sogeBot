@@ -437,7 +437,7 @@ class TMI extends Core {
       const subStreakShareEnabled = Number(message.parameters.shouldShareStreak) !== 0;
       const streakMonths = Number(message.parameters.streakMonths);
       const userstate = message.tags;
-      const messageFromUser = message.message;
+      const messageFromUser: string = message.message ?? '';
       const tier = method.prime ? 'Prime' : String(method.plan / 1000);
 
       if (isIgnored({username, userId: userstate.userId})) {
