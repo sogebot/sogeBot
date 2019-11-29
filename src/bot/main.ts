@@ -14,7 +14,7 @@ import figlet from 'figlet';
 import util from 'util';
 import _ from 'lodash';
 import gitCommitInfo from 'git-commit-info';
-import { isMainThread } from './cluster';
+import { init as clusterInit, isMainThread } from './cluster';
 
 import { changelog } from './changelog';
 import { autoLoad } from './commons';
@@ -33,6 +33,7 @@ async function main () {
   }
   let translate, panel;
   try {
+    clusterInit();
     changelog();
 
     // Initialize all core singletons
