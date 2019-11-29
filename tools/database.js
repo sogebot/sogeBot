@@ -614,7 +614,7 @@ async function main() {
       runEveryType: o.runEveryType || 0,
       runEvery: o.runEvery || 0,
       responseText: o.responseText || '',
-      permission: o.permission,
+      permission: o.permission || 'b38c5adb-e912-47e3-937a-89fabd12393a',
       readOnly: o.readOnly,
       usableOptions: o.usableOptions.split(',').map(o => o.trim()),
       runAt: Date.now(),
