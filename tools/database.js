@@ -428,7 +428,7 @@ async function main() {
         return {
           amount: t.amount,
           currency: t.currency,
-          message: t.message,
+          message: t.message || '',
           tippedAt: t.timestamp,
           sortAmount: t._amount,
         };
@@ -437,7 +437,7 @@ async function main() {
       bits: bits.filter(t => t.id === o.id).map(t => {
         return {
           amount: t.amount,
-          message: t.message,
+          message: t.message || '',
           cheeredAt: t.timestamp,
         };
       }),
