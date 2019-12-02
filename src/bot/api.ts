@@ -1009,7 +1009,11 @@ class API extends Core {
             justStarted = true;
 
             for (const event of getFunctionList('streamStart')) {
-              this[event.fName]();
+              if (typeof this[event.fName]) {
+                this[event.fName]();
+              } else {
+                throw new Error(`!!! Event ${event.path} don't have function ${event.fName} !!!`);
+              }
             }
           }
         }
