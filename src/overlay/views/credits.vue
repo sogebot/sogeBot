@@ -1,7 +1,6 @@
 <template>
 <div>
   <pre class="debug" v-if="urlParam('debug')">
-<button @click="stopAnimation">Stop Animation</button>
 settings: {{ settings }}
 currentPage: {{ currentPage }}
 clipsPages: {{ clipsPages }}
@@ -28,7 +27,7 @@ current: {{ current }}
 
 <script lang="ts">
 import { Vue, Component, Watch } from 'vue-property-decorator';
-import { TweenMax, TweenLite, Power0, Sine } from 'gsap/TweenMax';
+import { gsap } from 'gsap';
 import { groupBy } from 'lodash-es';
 import { getSocket } from 'src/panel/helpers/socket';
 
@@ -274,9 +273,9 @@ export default class CreditsOverlay extends Vue {
             // set endPos to 0 if last page (so we see last page)
             const endPos = this.pages[this.currentPage + 1] ? -((this.$refs.page as HTMLElement).clientHeight + 100) : 0
             const duration = (window.innerHeight + (-endPos)) * this.settings.speed
-            TweenLite.to((this.$refs.page as HTMLElement), duration / 1000, {
+            gsap.to((this.$refs.page as HTMLElement), duration / 1000, {
               top: endPos,
-              ease: endPos === 0 ? Sine.easeOut : Power0.easeNone,
+              ease: endPos === 0 ? 'sine.out' : 'none',
               onComplete: () => {
                 this.isEnded = true
               }
@@ -285,9 +284,9 @@ export default class CreditsOverlay extends Vue {
             // clip page
             const duration1 = window.innerHeight * this.settings.speed
             const duration2 = ((this.$refs.page as HTMLElement).clientHeight + 100) * this.settings.speed
-            TweenLite.to((this.$refs.page as HTMLElement), duration1 / 1000, {
+            gsap.to((this.$refs.page as HTMLElement), duration1 / 1000, {
               top: 0,
-              ease: Sine.easeOut,
+              ease: 'sine.out',
               onComplete: () => {
                 // play clip
                 const video = this.$refs.video[0]
@@ -296,18 +295,18 @@ export default class CreditsOverlay extends Vue {
                 if (this.settings.clips.shouldPlay) {
                   video.play()
                   video.onended = () => {
-                    TweenLite.to((this.$refs.page as HTMLElement), duration2 / 1000, {
+                    gsap.to((this.$refs.page as HTMLElement), duration2 / 1000, {
                       top: -((this.$refs.page as HTMLElement).clientHeight + 100),
-                      ease: Sine.easeIn,
+                      ease: 'sine.in',
                       onComplete: () => {
                         this.isEnded = true
                       }
                     })
                   }
                 } else {
-                  TweenLite.to((this.$refs.page as HTMLElement), duration2 / 1000, {
+                  gsap.to((this.$refs.page as HTMLElement), duration2 / 1000, {
                     top: -((this.$refs.page as HTMLElement).clientHeight + 100),
-                    ease: Power0.easeNone,
+                    ease: 'none',
                     onComplete: () => {
                       this.isEnded = true
                     }
@@ -319,10 +318,6 @@ export default class CreditsOverlay extends Vue {
         })
       }
     }, 10)
-  }
-
-  stopAnimation () {
-    TweenMax.killAll()
   }
 }
 </script>

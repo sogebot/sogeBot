@@ -13,7 +13,7 @@
 
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
-import { TweenLite } from 'gsap/TweenMax'
+import { gsap } from 'gsap'
 import { getSocket } from 'src/panel/helpers/socket';
 
 @Component({})
@@ -81,7 +81,8 @@ export default class CarouselOverlay extends Vue {
     }
 
     return new Promise((resolve, reject) => {
-      TweenLite.to(this.$refs[this.images[this.currentImage].id], this.images[this.currentImage].animationInDuration / 1000, {
+      gsap.to(this.$refs[this.images[this.currentImage].id], {
+        duration: this.images[this.currentImage].animationInDuration / 1000,
         ...animation,
         onComplete: () => {
           resolve()
@@ -112,7 +113,8 @@ export default class CarouselOverlay extends Vue {
     }
 
     return new Promise((resolve, reject) => {
-      TweenLite.to(this.$refs[this.images[this.currentImage].id], this.images[this.currentImage].animationOutDuration / 1000, {
+      gsap.to(this.$refs[this.images[this.currentImage].id], {
+        duration: this.images[this.currentImage].animationOutDuration / 1000,
         ...animation,
         onComplete: () => {
           resolve()

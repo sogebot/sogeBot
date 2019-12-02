@@ -23,7 +23,7 @@
 
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
-import { TweenLite } from 'gsap/TweenMax'
+import { gsap } from 'gsap'
 import { getSocket } from 'src/panel/helpers/socket';
 import { every, random, sample } from 'lodash-es';
 
@@ -92,7 +92,8 @@ export default class EmotesOverlay extends Vue {
       }
     }
 
-    TweenLite.to(el, this.emotes.find(o => o.id === id).animation.time / 1000, {
+    gsap.to(el, {
+      duration: this.emotes.find(o => o.id === id).animation.time / 1000,
       ...animation,
       onComplete: () => {
         this.emotes.find(o => o.id === id).animation.finished = true

@@ -26,7 +26,7 @@ nextOffset: {{ nextOffset }}
 <script lang="ts">
 
 import { Vue, Component, Watch } from 'vue-property-decorator';
-import { TweenMax } from 'gsap/TweenMax'
+import { gsap } from 'gsap'
 import { getSocket } from 'src/panel/helpers/socket';
 import { chunk, cloneDeep } from 'lodash-es';
 
@@ -74,7 +74,7 @@ export default class ClipsCarouselOverlay extends Vue {
       this.getClipsSet()
       this.$nextTick(() => {
         // center to second clip
-        this.moveToNextClip(true)
+        this.moveToNextClip()
 
         setInterval(() => {
           this.moveToNextClip()
@@ -148,22 +148,27 @@ export default class ClipsCarouselOverlay extends Vue {
     if (this.offset === 0) this.offset = this.$refs.clips[1].offsetLeft - (window.innerWidth / 4)
 
     const clips = [...(this.$refs.clips as HTMLElement[])]
-    TweenMax.to(this.$refs.carousel, 1, { left: -this.nextOffset + 'px' })
+    gsap.to(this.$refs.carousel, { duration: 1, left: -this.nextOffset + 'px' })
 
     for (let i = 0; i < 4; i++) {
+      let opacity = 0.5;
+      let filter = 'grayscale(1)';
       if (this.$refs.clips[i].getAttribute("id") === String(this.nextClip.index)) {
-        TweenMax.to(clips[i], 1, { opacity: 1, filter: 'grayscale(0)' })
-      } else {
-        TweenMax.to(clips[i], 1, { opacity: 0.5, filter: 'grayscale(1)' })
+        opacity = 1;
+        filter = 'grayscale(0)';
       }
-    }
-    setTimeout(() => {
-      if (!withoutChange) this.currentClip++
-      this.$nextTick(() => {
-        // on next tick we need to set proper opacities to 0.5
-        TweenMax.killAll() // we need to kill tweens as it skip to incorrect videos
+      gsap.to(clips[i], { duration: 1, opacity, filter, onComplete: () => {
+          if (!withoutChange) {
+            withoutChange = true;
+            this.currentClip++
+          }
+          this.$nextTick(() => {
+            // on next tick we need to set proper opacities to 0.5
+            gsap.killTweensOf(clips[i]) // we need to kill tweens as it skip to incorrect videos
+          })
+        }
       })
-    }, 1000)
+    }
   }
 }
 </script>

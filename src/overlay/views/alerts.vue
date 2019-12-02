@@ -62,7 +62,7 @@ finished: {{ (getCurrentAlertList() || []).filter(o => o.finished) }}
 
 <script lang="ts">
 import { Vue, Component, Watch } from 'vue-property-decorator';
-import { TweenLite } from 'gsap/TweenMax'
+import { gsap } from 'gsap'
 import { getSocket } from 'src/panel/helpers/socket';
 
 @Component({})
@@ -270,7 +270,8 @@ export default class AlertsOverlay extends Vue {
   }
 
   doEnterAnimation (el, done) {
-    TweenLite.to(el, (this.getCurrentAlertList()[el.dataset.index].duration || 1000) / 1000, {
+    gsap.to(el, {
+      duration: (this.getCurrentAlertList()[el.dataset.index].duration || 1000) / 1000,
       opacity: 1,
       onComplete: () => {
         done()
@@ -279,7 +280,8 @@ export default class AlertsOverlay extends Vue {
   }
 
   doLeaveAnimation (el, done) {
-    TweenLite.to(el, (this.getCurrentAlertList()[el.dataset.index].duration || 1000) / 1000, {
+    gsap.to(el, {
+      duration: (this.getCurrentAlertList()[el.dataset.index].duration || 1000) / 1000,
       opacity: 0,
       onComplete: () => {
         done()

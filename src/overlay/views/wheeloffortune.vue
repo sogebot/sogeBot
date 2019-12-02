@@ -14,7 +14,7 @@ import { Vue, Component } from 'vue-property-decorator';
 import Winwheel from 'winwheel'
 import { getSocket } from 'src/panel/helpers/socket';
 
-import { TweenLite } from 'gsap/TweenMax'
+import { gsap } from 'gsap'
 
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faSortDown } from '@fortawesome/free-solid-svg-icons'
@@ -41,8 +41,8 @@ export default class WheelOfFortuneOverlay extends Vue {
         segments.push({'fillStyle': this.getRandomColor(), 'text': option.title})
       }
 
-      TweenLite.to(this.$refs["pointer"], 1.5, { opacity: 1 })
-      TweenLite.to(this.$refs["canvas"], 1.5, { opacity: 1 })
+      gsap.to(this.$refs["pointer"], { duration: 1.5, opacity: 1 })
+      gsap.to(this.$refs["canvas"], { duration: 1.5, opacity: 1 })
 
       this.theWheel = new Winwheel({
         'numSegments'  : opts.options.length, // Number of segments
@@ -89,8 +89,8 @@ export default class WheelOfFortuneOverlay extends Vue {
 
     setTimeout(() => {
       this.socket.emit('win', winningSegmentNumber - 1, this.username)
-      TweenLite.to(this.$refs["pointer"], 1.5, { opacity: 0 })
-      TweenLite.to(this.$refs["canvas"], 1.5, { opacity: 0 })
+      gsap.to(this.$refs["pointer"], { duration: 1.5, opacity: 0 })
+      gsap.to(this.$refs["canvas"], { duration: 1.5, opacity: 0 })
     }, 1000)
   }
 }
