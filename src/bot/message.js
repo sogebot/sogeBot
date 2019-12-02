@@ -18,7 +18,7 @@ import { Commands } from './database/entity/commands';
 import { Cooldown } from './database/entity/cooldown';
 import { EventList } from './database/entity/eventList';
 import { User } from './database/entity/user';
-import Price from './systems/price';
+import { Price } from './database/entity/price';
 import { Rank } from './database/entity/rank';
 
 import oauth from './oauth';
@@ -448,8 +448,8 @@ class Message {
           case 'cooldown':
             list = _.map(cooldowns, function (o, k) {
               const time = o.miliseconds;
-              return o.key + ': ' + (parseInt(time, 10) / 1000) + 's';
-            }).join(', ');
+              return o.name + ': ' + (parseInt(time, 10) / 1000) + 's';
+            }).sort().join(', ');
             return list.length > 0 ? list : ' ';
           case 'price':
             list = (await Promise.all(
@@ -460,7 +460,7 @@ class Message {
             return list.length > 0 ? list : ' ';
           case 'ranks':
             list = _.map(_.orderBy(ranks, 'hours', 'asc'), (o) => {
-              return `${o.value} (${o.hours}h)`;
+              return `${o.rank} (${o.hours}h)`;
             }).join(', ');
             return list.length > 0 ? list : ' ';
           default:
