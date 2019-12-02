@@ -229,6 +229,19 @@
           this.cachedTags = data.filter(o => !o.is_auto);
         })
         this.socket.emit('getUserTwitchGames');
+
+        this.socket.emit('panel.sendStreamData', (data) => {
+          console.groupCollapsed('changegamedialog::panel.sendStreamData')
+          console.log(data)
+          console.groupEnd();
+          if (!this.currentGame) {
+            this.currentGame = data.game;
+            this.currentTitle = data.status;
+            this.currentTags = data.tags.filter(o => o.is_current === 1 && o.is_auto === 0).map(o => {
+              return o.value;
+            })
+          }
+        });
       },
       handleOk() {
         let title
@@ -367,15 +380,6 @@
       this.init();
       this.socket.on('sendGameFromTwitch', (data) => this.searchForGameOpts = data);
       this.socket.on('sendUserTwitchGamesAndTitles', (data) => { this.data = data });
-      this.socket.on('stats', (data) => {
-        if (!this.currentGame) {
-          this.currentGame = data.game;
-          this.currentTitle = data.status;
-          this.currentTags = data.tags.filter(o => o.is_current === 1 && o.is_auto === 0).map(o => {
-            return o.value;
-          })
-        }
-      });
 
       EventBus.$on('show-game_and_title_dlg', () => {
         this.init();
