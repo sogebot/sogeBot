@@ -6,7 +6,7 @@ var http = require('http')
 var path = require('path')
 var _ = require('lodash')
 const commons = require('./commons')
-const flatten = require('./helpers/flatten')
+const { flatten } = require('./helpers/flatten')
 const gitCommitInfo = require('git-commit-info');
 import { adminEndpoint } from './helpers/socket';
 import glob from 'glob';
@@ -19,17 +19,17 @@ import { Dashboard, Widget } from './database/entity/dashboard';
 import { Translation } from './database/entity/translation'
 import { TwitchTag, TwitchTagLocalizationName } from './database/entity/twitch'
 
-const socket = require('./socket');
-const Parser = require('./parser')
-const webhooks = require('./webhooks')
-const general = require('./general')
+import socket from './socket';
+import Parser from './parser';
+import webhooks from './webhooks';
+import general from './general';
 import translateLib, { translate } from './translate';
 import api from './api';
 import currency from './currency';
 import oauth from './oauth';
 import songs from './systems/songs';
 import spotify from './integrations/spotify';
-import { status as statusObj, linesParsed } from './helpers/parser';
+import { linesParsed, status as statusObj } from './helpers/parser';
 const config = require('@config')
 
 let app;
@@ -118,7 +118,7 @@ function Panel () {
     adminEndpoint('/', 'panel.sendStreamData', this.sendStreamData);
   }, 5000)
 
-  this.io.use(socket.default.authorize);
+  this.io.use(socket.authorize);
 
   var self = this
   this.io.on('connection', async (socket) => {
@@ -303,7 +303,7 @@ function Panel () {
     })
 
     socket.on('responses.get', async function (at, callback) {
-      const responses = flatten.flatten(!_.isNil(at) ? translateLib.translations[general.lang][at] : translateLib.translations[general.lang])
+      const responses = flatten(!_.isNil(at) ? translateLib.translations[general.lang][at] : translateLib.translations[general.lang])
       _.each(responses, function (value, key) {
         let _at = !_.isNil(at) ? at + '.' + key : key
         responses[key] = {} // remap to obj
