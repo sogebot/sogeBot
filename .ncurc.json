@@ -2,6 +2,7 @@
   "upgrade": true,
   "reject": [
     "vue-plyr",
-    "plyr"
+    "plyr",
+    "core-js"
   ]
 }
