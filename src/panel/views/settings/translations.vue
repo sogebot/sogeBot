@@ -111,6 +111,9 @@ export default class translations extends Vue {
   created() {
     this.state.loading = this.$state.progress;
     this.socket.emit('responses.get', null, (data) => {
+      console.groupCollapsed('translations::responses.get')
+      console.log(data);
+      console.groupEnd();
       this.items = Object
         .entries(data)
         .map(o => {
