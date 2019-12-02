@@ -10,6 +10,7 @@ import { onLoad } from './decorators/on';
 import { Brackets, getRepository, LessThanOrEqual } from 'typeorm';
 import { Socket as SocketEntity } from './database/entity/socket';
 import permissions from './permissions';
+import { debug } from './helpers/log';
 
 let _self: any = null;
 
@@ -108,21 +109,24 @@ class Socket extends Core {
               w.where('socket.accessToken = :accessToken', { accessToken: cb.accessToken });
               w.orWhere('socket.accessToken is NULL');
             }))
-            .andWhere('socket.refreshToken = :refreshToken', { refreshToken: cb.refreshToken })
+            .orWhere('socket.refreshToken = :refreshToken', { refreshToken: cb.refreshToken })
             .getOne();
           if (!auth) {
+            debug('sockets', `Sockets NG - ${cb.accessToken}, ${cb.refreshToken}`);
             return socket.emit('unauthorized');
           } else {
             if (auth.accessToken === cb.accessToken) {
               // update refreshToken timestamp to expire only if not used
               auth.refreshTokenTimestamp = Date.now() + (_self.refreshTokenExpirationTime * 1000);
               await getRepository(SocketEntity).save(auth);
+              debug('sockets', `Sockets OK - ${cb.accessToken}, ${cb.refreshToken}`);
               sendAuthorized(socket, auth);
             } else {
               auth.accessToken = uuid();
               auth.accessTokenTimestamp = Date.now() + (_self.accessTokenExpirationTime * 1000);
               auth.refreshTokenTimestamp = Date.now() + (_self.refreshTokenExpirationTime * 1000);
               await getRepository(SocketEntity).save(auth);
+              debug('sockets', `Access token refreshed from ${cb.accessToken} to ${auth.accessToken}`);
               sendAuthorized(socket, auth);
             }
             if (auth.type === 'admin') {
