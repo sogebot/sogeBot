@@ -48,7 +48,7 @@ module.exports = {
       debug('test', chalk.bgRed('*** Cleaning up collections ***'));
       await waitMs(400); // wait ittle bit for transactions to be done
 
-      const entities = [Ranks, PermissionCommands, Event, EventOperation, Variable, VariableHistory, VariableURL, Raffle, Duel, PollVote, Poll, TimerResponse, Timer, BetsParticipations, UserTip, UserBit, CommandsResponses, User, ModerationPermit, Alias, Bets, Commands, CommandsCount, Quotes, Settings, Cooldown, Keyword, Price];
+      const entities = [Rank, PermissionCommands, Event, EventOperation, Variable, VariableHistory, VariableURL, Raffle, Duel, PollVote, Poll, TimerResponse, Timer, BetsParticipations, UserTip, UserBit, CommandsResponses, User, ModerationPermit, Alias, Bets, Commands, CommandsCount, Quotes, Settings, Cooldown, Keyword, Price];
       if (['postgres', 'mysql'].includes((await getManager()).connection.options.type)) {
         const metadatas = [];
         for (const entity of entities) {
