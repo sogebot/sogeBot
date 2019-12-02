@@ -449,7 +449,7 @@ class Message {
             list = _.map(cooldowns, function (o, k) {
               const time = o.miliseconds;
               return o.name + ': ' + (parseInt(time, 10) / 1000) + 's';
-            }).join(', ');
+            }).sort().join(', ');
             return list.length > 0 ? list : ' ';
           case 'price':
             list = (await Promise.all(
