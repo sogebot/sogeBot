@@ -12,7 +12,7 @@
     "dest/database/migration/sqlite/*.js"
   ],
   "subscribers": [
-    "dest/database/subscriber/*.js"
+    "dest/database/entity/*.js"
   ],
   "cli": {
     "entitiesDir": "src/bot/database/entity/",

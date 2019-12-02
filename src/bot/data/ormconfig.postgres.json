@@ -16,7 +16,7 @@
     "dest/database/migration/postgres/*.js"
   ],
   "subscribers": [
-    "dest/database/subscriber/*.js"
+    "dest/database/entity/*.js"
   ],
   "cli": {
     "entitiesDir": "src/bot/database/entity",
