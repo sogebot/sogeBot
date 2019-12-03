@@ -152,7 +152,7 @@ Vue.use(VueMoment, {
     moment, momentTimezone
 })
 
-import { TweenLite } from 'gsap/TweenMax'
+import { gsap } from 'gsap'
 import { GoalGroup } from 'src/bot/database/entity/goal';
 
 @Component({})
@@ -199,7 +199,8 @@ export default class GoalsOverlay extends Vue {
   doEnterAnimation (el, done) {
     if (this.group === null) return
     if (this.group.display.type === 'fade') {
-      TweenLite.to(el, (this.group.display.animationInMs || 1000) / 1000, {
+      gsap.to(el, {
+        duration: (this.group.display.animationInMs || 1000) / 1000,
         opacity: 1,
         onComplete: () => {
           done()
@@ -211,7 +212,8 @@ export default class GoalsOverlay extends Vue {
   doLeaveAnimation (el, done) {
     if (this.group === null) return
     if (this.group.display.type === 'fade') {
-      TweenLite.to(el, (this.group.display.animationOutMs || 1000) / 1000, {
+      gsap.to(el, {
+        duration: (this.group.display.animationOutMs || 1000) / 1000,
         opacity: 0,
         onComplete: () => {
           done()

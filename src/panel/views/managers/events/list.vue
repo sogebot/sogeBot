@@ -163,7 +163,7 @@
 <script lang="ts">
   import Vue from 'vue'
   import { FontAwesomeLayers } from '@fortawesome/vue-fontawesome'
-  import { TweenMax } from 'gsap/TweenMax'
+  import { gsap } from 'gsap'
 
   import { getSocket } from '../../../helpers/socket';
 
@@ -236,7 +236,7 @@
       enter: function (el, done) {
         var delay = el.dataset.index * 150
         setTimeout(() => {
-          TweenMax.to(el, 1, { opacity: 1, height: this.heightOfElement[el.dataset.id] || '100%', onComplete: () => {
+          gsap.to(el, { duration: 1, opacity: 1, height: this.heightOfElement[el.dataset.id] || '100%', onComplete: () => {
             if (!this.heightOfElement[el.dataset.id]) {
               el.style.height = null; // reset to null if not defined
             }
@@ -248,7 +248,7 @@
         this.heightOfElement[el.dataset.id] = el.getBoundingClientRect().height + 'px'
         var delay = el.dataset.index * 150
         setTimeout(() => {
-          TweenMax.to(el, 1, { opacity: 0, height: 0, onComplete: done })
+          gsap.to(el, { duration: 1, opacity: 0, height: 0, onComplete: done })
         }, delay)
       },
       deleteEvent(event) {

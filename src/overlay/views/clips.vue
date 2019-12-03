@@ -14,7 +14,7 @@
 
 <script lang="ts">
 import { Vue, Component, Watch } from 'vue-property-decorator';
-import { TweenMax } from 'gsap/TweenMax'
+import { gsap } from 'gsap'
 import { getSocket } from 'src/panel/helpers/socket';
 
 import { library } from '@fortawesome/fontawesome-svg-core'
@@ -69,7 +69,7 @@ export default class ClipsOverlay extends Vue {
       video.play()
 
       this.$nextTick(function () {
-        if (this.getPlayingSettings().label && this.$refs['label']) TweenMax.fromTo(this.$refs['label'], 1, { opacity: 0 }, { opacity: 1, yoyo: true, repeat:-1} )
+        if (this.getPlayingSettings().label && this.$refs['label']) gsap.fromTo(this.$refs['label'], { duration: 1, opacity: 0 }, { opacity: 1, yoyo: true, repeat:-1} )
       })
     }
   }
