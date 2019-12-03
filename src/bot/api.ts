@@ -850,7 +850,7 @@ class API extends Core {
     if (opts.cursor) {
       url += '&after=' + opts.cursor;
     } else {
-      debug('api.getChannelFollowers', 'started')
+      debug('api.getChannelFollowers', 'started');
     }
 
     let request;
@@ -871,7 +871,7 @@ class API extends Core {
       }
 
       if (request.status === 200 && !isNil(request.data.data)) {
-        const followers = request.data.data
+        const followers = request.data.data;
         if (opts.followers) {
           opts.followers = [...followers, ...opts.followers];
         } else {
