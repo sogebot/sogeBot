@@ -1,0 +1,8 @@
+{
+  "addRandomizer": "Add Randomizer",
+  "form": {
+    "name": "Name",
+    "command": "Command",
+    "permission": "Command permission"
+  }
+}

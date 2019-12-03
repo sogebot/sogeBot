@@ -18,7 +18,7 @@
     <panel>
       <template v-slot:left>
         <button-with-icon class="btn-secondary btn-reverse" icon="caret-left" href="#/manage/alias/list">{{translate('commons.back')}}</button-with-icon>
-        <hold-button :if="$route.params.id || null" @trigger="del()" icon="trash" class="btn-danger">
+        <hold-button v-if="$route.params.id || null" @trigger="del()" icon="trash" class="btn-danger">
           <template slot="title">{{translate('dialog.buttons.delete')}}</template>
           <template slot="onHoldTitle">{{translate('dialog.buttons.hold-to-delete')}}</template>
         </hold-button>

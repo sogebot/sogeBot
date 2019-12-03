@@ -35,6 +35,7 @@ css:
 	@echo -ne "\n\t ----- Generating CSS themes\n"
 	@npx node-sass --output-style expanded --precision 6 scss/themes/light.scss public/dist/css/light.css
 	@npx node-sass --output-style expanded --precision 6 scss/themes/dark.scss public/dist/css/dark.css
+	@npx postcss public/dist/css/*.css --use autoprefixer -d public/dist/css/
 
 ui:
 	@echo -ne "\n\t ----- Bundling with webpack\n"
