@@ -882,11 +882,6 @@ class API extends Core {
           panel.io.emit('api.stats', { data: followers, timestamp: Date.now(), call: 'getChannelFollowers', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining });
         }
 
-        // save remaining api calls
-        this.calls.bot.remaining = request.headers['ratelimit-remaining'];
-        this.calls.bot.refresh = request.headers['ratelimit-reset'];
-        this.calls.bot.limit = request.headers['ratelimit-limit'];
-
         debug('api.getChannelFollowers', `Followers loaded: ${opts.followers.length}, cursor: ${request.data.pagination.cursor}`);
         debug('api.getChannelFollowers', `Followers list: \n\t${followers.map(o => o.from_name)}`);
 
