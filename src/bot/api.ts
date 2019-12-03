@@ -141,6 +141,7 @@ class API extends Core {
       this.interval('getCurrentStreamTags', constants.MINUTE);
       this.interval('updateChannelViewsAndBroadcasterType', constants.MINUTE);
       this.interval('getLatest100Followers', constants.MINUTE);
+      this.interval('getChannelFollowers', constants.DAY);
       this.interval('getChannelHosts', 5 * constants.MINUTE);
       this.interval('getChannelSubscribers', 2 * constants.MINUTE);
       this.interval('getChannelChattersUnofficialAPI', 5 * constants.MINUTE);
@@ -179,7 +180,7 @@ class API extends Core {
     this.calls[type].reset = reset;
   }
 
-  async interval (fnc, interval, timeout = 10000) {
+  async interval (fnc, interval) {
     setInterval(async () => {
       if (typeof this.api_timeouts[fnc] === 'undefined') {
         this.api_timeouts[fnc] = { opts: {}, isRunning: false };
@@ -472,7 +473,7 @@ class API extends Core {
 
     const token = oauth.broadcasterAccessToken;
     const needToWait = isNil(cid) || cid === '' || token === '';
-    const notEnoughAPICalls = this.calls.bot.remaining <= 30 && this.calls.bot.refresh > Date.now() / 1000;
+    const notEnoughAPICalls = this.calls.broadcaster.remaining <= 30 && this.calls.broadcaster.refresh > Date.now() / 1000;
 
     if (needToWait || notEnoughAPICalls || oauth.broadcasterType === '') {
       if (oauth.broadcasterType === '') {
@@ -506,13 +507,13 @@ class API extends Core {
       }
 
       // save remaining api calls
-      this.calls.bot.remaining = request.headers['ratelimit-remaining'];
-      this.calls.bot.refresh = request.headers['ratelimit-reset'];
-      this.calls.bot.limit = request.headers['ratelimit-limit'];
+      this.calls.broadcaster.remaining = request.headers['ratelimit-remaining'];
+      this.calls.broadcaster.refresh = request.headers['ratelimit-reset'];
+      this.calls.broadcaster.limit = request.headers['ratelimit-limit'];
 
       if (subscribers.length === 100) {
         // move to next page
-        return this.getChannelSubscribers({ cursor: request.data.pagination.cursor, count: subscribers.length + opts.count, subscribers });
+        return this.getChannelSubscribers({ cursor: request.data.pagination.cursor, count: opts.subscribers.length + opts.count, subscribers: opts.subscribers });
       } else {
         this.stats.currentSubscribers = subscribers.length + opts.count;
         this.setSubscribers(opts.subscribers.filter(o => !isBroadcaster(o.user_name) && !isBot(o.user_name)));
@@ -827,6 +828,140 @@ class API extends Core {
       return { state: false, opts: quiet };
     }
     return { state: true, opts: quiet };
+  }
+
+  async getChannelFollowers (opts) {
+    if (!isMainThread) {
+      throw new Error('API can run only on master');
+    }
+    opts = opts || {};
+
+    const cid = oauth.channelId;
+
+    const token = await oauth.botAccessToken;
+    const needToWait = isNil(cid) || cid === '' || token === '';
+    const notEnoughAPICalls = this.calls.bot.remaining <= 30 && this.calls.bot.refresh > Date.now() / 1000;
+
+    if (needToWait || notEnoughAPICalls) {
+      return { state: false, opts };
+    }
+
+    let url = `https://api.twitch.tv/helix/users/follows?to_id=${cid}&first=100`;
+    if (opts.cursor) {
+      url += '&after=' + opts.cursor;
+    } else {
+      debug('api.getChannelFollowers', 'started')
+    }
+
+    let request;
+    try {
+      request = await axios.get(url, {
+        headers: {
+          'Authorization': 'Bearer ' + token,
+        },
+      });
+
+      // save remaining api calls
+      this.calls.bot.remaining = request.headers['ratelimit-remaining'];
+      this.calls.bot.refresh = request.headers['ratelimit-reset'];
+      this.calls.bot.limit = request.headers['ratelimit-limit'];
+
+      if (panel && panel.io) {
+        panel.io.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'getChannelFollowers', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining });
+      }
+
+      if (request.status === 200 && !isNil(request.data.data)) {
+        const followers = request.data.data
+        if (opts.followers) {
+          opts.followers = [...followers, ...opts.followers];
+        } else {
+          opts.followers = followers;
+        }
+
+        if (panel && panel.io) {
+          panel.io.emit('api.stats', { data: followers, timestamp: Date.now(), call: 'getChannelFollowers', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining });
+        }
+
+        // save remaining api calls
+        this.calls.bot.remaining = request.headers['ratelimit-remaining'];
+        this.calls.bot.refresh = request.headers['ratelimit-reset'];
+        this.calls.bot.limit = request.headers['ratelimit-limit'];
+
+        debug('api.getChannelFollowers', `Followers loaded: ${opts.followers.length}, cursor: ${request.data.pagination.cursor}`);
+        debug('api.getChannelFollowers', `Followers list: \n\t${followers.map(o => o.from_name)}`);
+
+        if (followers.length === 100) {
+          // move to next page
+          return this.getChannelFollowers({ cursor: request.data.pagination.cursor, count: opts.followers.length + opts.count, followers: opts.followers });
+        } else {
+          // check if user id is in db, not in db load username from API
+          for (const f of opts.followers) {
+            await setImmediateAwait(); // throttle down
+
+            f.from_name = String(f.from_name).toLowerCase();
+            f.from_id = Number(f.from_id);
+            let user = await getRepository(User).findOne({ userId: f.from_id });
+            if (!user) {
+              user = new User();
+              user.userId = Number(f.from_id);
+              user.username = f.from_name;
+              user = await getRepository(User).save(user);
+            }
+
+            if (!user.isFollower) {
+              if (new Date().getTime() - new Date(f.followed_at).getTime() < 2 * constants.HOUR) {
+                if (user.followedAt === 0 || new Date().getTime() - user.followedAt > 60000 * 60 && !webhooks.existsInCache('follow', user.userId)) {
+                  webhooks.addIdToCache('follow', f.from_id);
+                  eventlist.add({
+                    event: 'follow',
+                    username: user.username,
+                    timestamp: Date.now(),
+                  });
+                  if (!isBot(user.username)) {
+                    follow(user.username);
+                    events.fire('follow', { username: user.username, userId: f.from_id });
+                    alerts.trigger({
+                      event: 'follows',
+                      name: user.username,
+                      amount: 0,
+                      currency: '',
+                      monthsName: '',
+                      message: '',
+                      autohost: false,
+                    });
+
+                    triggerInterfaceOnFollow({
+                      username: user.username,
+                      userId: f.from_id,
+                    });
+                  }
+                }
+              }
+            }
+            try {
+              user.followedAt = user.haveFollowedAtLock ? user.followedAt : new Date(f.followed_at).getTime();
+              user.isFollower = user.haveFollowerLock? user.isFollower : true;
+              user.followCheckAt = Date.now();
+              await getRepository(User).save(user);
+            } catch (e) {
+              error(e.stack);
+            }
+          }
+        }
+      }
+    } catch (e) {
+      if (typeof e.response !== 'undefined' && e.response.status === 429) {
+        this.calls.bot.remaining = 0;
+        this.calls.bot.refresh = e.response.headers['ratelimit-reset'];
+      }
+
+      error(`${url} - ${e.stack}`);
+      if (panel && panel.io) {
+        panel.io.emit('api.stats', { timestamp: Date.now(), call: 'getChannelFollowers', api: 'helix', endpoint: url, code: e.response?.status ?? 'n/a', data: e.stack, remaining: this.calls.bot.remaining });
+      }
+    }
+    delete opts.count;
+    return { state: true, opts };
   }
 
   async getGameFromId (id) {
