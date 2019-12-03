@@ -155,8 +155,10 @@
     "file-loader": "5.0.2",
     "gsap": "3.0.1",
     "html-webpack-plugin": "4.0.0-beta.8",
+    "husky": "3.1.0",
     "image-webpack-loader": "6.0.0",
     "jsonlint-mod": "1.7.5",
+    "lint-staged": "9.5.0",
     "locate-path": "5.0.0",
     "lodash-es": "4.17.15",
     "minimist": "1.2.0",
@@ -204,6 +206,17 @@
     "webpack-cli": "3.3.10",
     "weekstart": "1.0.1",
     "winwheel": "1.0.1"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.ts": [
+      "eslint --fix",
+      "git add"
+    ]
   },
   "browser": {
     "vue": "vue/dist/vue.common.js"
