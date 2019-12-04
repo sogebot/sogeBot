@@ -1,8 +1,16 @@
 {
   "addRandomizer": "Add Randomizer",
   "form": {
-    "name": "Name",
-    "command": "Command",
-    "permission": "Command permission"
+    "name": "Název",
+    "command": "Příkaz",
+    "permission": "Oprávnění příkazu",
+    "simple": "Jednoduchý výběr",
+    "wheelOfFortune": "Kolo štěstí",
+    "type": "Typ",
+    "options": "Možnosti",
+    "optionsAreEmpty": "Možnosti jsou zatím prázdné.",
+    "color": "Barva",
+    "numOfDuplicates": "Počet duplikátů",
+    "minimalSpacing": "Minimální rozestup"
   }
 }

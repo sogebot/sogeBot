@@ -1,195 +1,212 @@
-<template>
-  <b-container fluid ref="window">
-    <b-row>
-      <b-col>
-        <span class="title text-default mb-2">
-          {{ translate('menu.registry') }}
-          <small><fa icon="angle-right"/></small>
-          {{ translate('menu.randomizer') }}
-          <template v-if="$route.params.id">
-            <small><fa icon="angle-right"/></small>
-            {{item.name}}
-            <small class="text-muted text-monospace" style="font-size:0.7rem">{{$route.params.id}}</small>
-          </template>
-        </span>
-      </b-col>
-    </b-row>
+<template lang="pug">
+  b-container(fluid ref="window")
+    b-row
+      b-col
+        span.title.text-default.mb-2
+          | {{ translate('menu.registry') }}
+          small.px-2
+            fa(icon="angle-right")
+          | {{ translate('menu.randomizer') }}
+          template(v-if="$route.params.id")
+            small.px-2
+              fa(icon="angle-right")
+            | {{item.name}}
+            small.text-muted.text-monospace.font-smaller.px-2
+              | {{$route.params.id}}
 
-    <panel>
-      <template v-slot:left>
-        <button-with-icon class="btn-secondary btn-reverse" icon="caret-left" href="#/registry/randomizer/list">{{translate('commons.back')}}</button-with-icon>
-        <hold-button v-if="$route.params.id" @trigger="del()" icon="trash" class="btn-danger">
-          <template slot="title">{{translate('dialog.buttons.delete')}}</template>
-          <template slot="onHoldTitle">{{translate('dialog.buttons.hold-to-delete')}}</template>
-        </hold-button>
-      </template>
-      <template v-slot:right>
-        <b-alert show variant="info" v-if="pending" v-html="translate('dialog.changesPending')" class="mr-2 p-2 mb-0"></b-alert>
-        <state-button @click="save()" text="saveChanges" class="btn-shrink" :state="state.save" :invalid="!!$v.$invalid && !!$v.$dirty"/>
-      </template>
-    </panel>
+    panel
+      template(v-slot:left)
+        button-with-icon(icon="caret-left" href="#/registry/randomizer/list").btn-secondary.btn-reverse {{ translate('commons.back') }}
+        hold-button(v-if="$route.params.id" @trigger="del()" icon="trash").btn-danger
+          template(slot="title") {{translate('dialog.buttons.delete')}}
+          template(slot="onHoldTitle") {{translate('dialog.buttons.hold-to-delete')}}
+      template(v-slot:right)
+        button-with-icon(
+          v-if="$route.params.id && state.loading === $state.success"
+          @click="toggleVisibility"
+          :class="{ 'btn-success': isShown, 'btn-danger': !isShown }"
+          :icon="!isShown ? 'eye-slash' : 'eye'"
+        ).btn-only-icon
+        button-with-icon(
+          v-if="$route.params.id && state.loading === $state.success"
+          text="/overlays/randomizer"
+          href="/overlays/randomizer"
+          class="btn-dark mr-2 ml-0"
+          icon="link"
+          target="_blank"
+        )
+        b-alert(show variant="info" v-if="pending" v-html="translate('dialog.changesPending')").mr-2.p-2.mb-0
+        state-button(@click="save()" text="saveChanges" :state="state.save" :invalid="!!$v.$invalid && !!$v.$dirty").btn-shrink
 
-    <loading v-if="state.loading !== $state.success"/>
-    <b-form v-else>
-      <b-form-group
+    loading(v-if="state.loading !== $state.success")
+    b-form(v-else)
+      b-form-group(
         :label="translate('registry.randomizer.form.name')"
         label-for="name"
-      >
-        <b-input-group>
-          <b-form-input
+      _)
+        b-input-group
+          b-form-input(
             id="name"
             v-model.trim="item.name"
             type="text"
             @input="$v.item.name.$touch()"
             :state="$v.item.name.$invalid && $v.item.name.$dirty ? false : null"
-          ></b-form-input>
-        </b-input-group>
-        <b-form-invalid-feedback :state="!($v.item.name.$invalid && $v.item.name.$dirty)">{{ translate('dialog.errors.required') }}</b-form-invalid-feedback>
-      </b-form-group>
-      <b-form-group>
-        <b-row>
-          <b-col>
-            <label for="command">{{ translate('registry.randomizer.form.command') }}</label>
-            <b-input-group>
-              <b-form-input
+          )
+        b-form-invalid-feedback(:state="!($v.item.name.$invalid && $v.item.name.$dirty)") {{ translate('dialog.errors.required') }}
+      b-form-group
+        b-row
+          b-col
+            label(for="command") {{ translate('registry.randomizer.form.command') }}
+            b-input-group
+              b-form-input(
                 id="command"
                 v-model.trim="item.command"
                 type="text"
                 @input="$v.item.command.$touch()"
                 :state="$v.item.command.$invalid && $v.item.command.$dirty ? false : null"
-              ></b-form-input>
-            </b-input-group>
-            <b-form-invalid-feedback :state="!($v.item.command.$invalid && $v.item.command.$dirty)">
-              <template v-if="!$v.item.command.sw">
-                {{ translate('errors.command_must_start_with_!') }}
-              </template>
-              <template v-else-if="!$v.item.command.minLength">
-                {{ translate('errors.minLength_of_value_is').replace('$value', 2) }}
-              </template>
-              <template v-else>
-                {{ translate('dialog.errors.required') }}
-              </template>
-            </b-form-invalid-feedback>
-          </b-col>
-          <b-col>
-            <label for="permission_select">{{ translate('registry.randomizer.form.permission') }}</label>
-            <b-input-group>
-              <b-form-select v-model="item.permissionId" :state="$v.item.permissionId.$invalid && $v.item.permissionId.$dirty ? false : null" id="permission_select">
-                <option v-if="!getPermissionName(item.permissionId)" :key="item.permissionId" :value="item.permissionId" disabled> --- Permission not found ---</option>
-                <option v-for="p of permissions" :key="p.id" :value="p.id">{{ getPermissionName(p.id) | capitalize }}</option>
-              </b-form-select>
-              <b-form-invalid-feedback :state="!($v.item.permissionId.$invalid && $v.item.permissionId.$dirty)">
-                {{ translate('errors.permission_must_exist') }}
-              </b-form-invalid-feedback>
-            </b-input-group>
-          </b-col>
-        </b-row>
-      </b-form-group>
+              )
+            b-form-invalid-feedback(:state="!($v.item.command.$invalid && $v.item.command.$dirty)")
+              template(v-if="!$v.item.command.sw") {{ translate('errors.command_must_start_with_!') }}
+              template(v-else-if="!$v.item.command.minLength") {{ translate('errors.minLength_of_value_is').replace('$value', 2) }}
+              template(v-else) {{ translate('dialog.errors.required') }}
+          b-col
+            label(for="permission_select") {{ translate('registry.randomizer.form.permission') }}
+            b-input-group
+              b-form-select(v-model="item.permissionId" :state="$v.item.permissionId.$invalid && $v.item.permissionId.$dirty ? false : null" id="permission_select")
+                option(v-if="!getPermissionName(item.permissionId)" :key="item.permissionId" :value="item.permissionId" disabled) --- Permission not found ---
+                option(v-for="p of permissions" :key="p.id" :value="p.id") {{ getPermissionName(p.id) | capitalize }}
+              b-form-invalid-feedback(:state="!($v.item.permissionId.$invalid && $v.item.permissionId.$dirty)")
+                | {{ translate('errors.permission_must_exist') }}
+      b-form-group
+        label(for="type_selector") {{ translate('registry.randomizer.form.type') }}
+        b-form-select(v-model="item.type" id="type_selector")
+          option(value="simple" key="simple") {{translate('registry.randomizer.form.simple')}}
+          option(value="wheelOfFortune" key="wheelOfFortune") {{translate('registry.randomizer.form.wheelOfFortune')}}
 
-      <b-card :header="translate('registry.goals.fontSettings')"
-      >
-        <b-card-text>
-          <b-form-group>
-            <label for="font_selector">{{ translate('registry.goals.input.fonts.title') }}</label>
-            <b-form-select v-model="item.customizationFont.family" id="font_selector">
-              <option v-for="font of fonts" :value="font.text" :key="font.text">{{font.text}}</option>
-            </b-form-select>
-            <small class="form-text text-muted" v-html="translate('registry.goals.input.fonts.help')"></small>
-          </b-form-group>
+      b-card(:header="translate('registry.goals.fontSettings')")
+        b-card-text
+          b-form-group
+            label(for="font_selector") {{ translate('registry.goals.input.fonts.title') }}
+            b-form-select(v-model="item.customizationFont.family" id="font_selector")
+              option(v-for="font of fonts" :value="font.text" :key="font.text") {{font.text}}
+            small(v-html="translate('registry.goals.input.fonts.help')").form-text.text-muted
 
-          <b-row class="py-3">
-            <b-col cols="3">
-              <b-form-group>
-                <label for="fonts_size_input">{{ translate('registry.goals.input.fontSize.title') }}</label>
-                <b-input
+          b-row.py-3
+            b-col(cols="3")
+              b-form-group
+                label(for="fonts_size_input") {{ translate('registry.goals.input.fontSize.title') }}
+                b-input(
                   v-model.number="item.customizationFont.size"
                   type="number" :min="1" id="fonts_size_input"
                   @input="$v.item.customizationFont.size.$touch()"
                   :state="$v.item.customizationFont.size.$invalid && $v.item.customizationFont.size.$dirty ? false : null"
-                />
-                <small class="form-text text-muted">{{ translate('registry.goals.input.fontSize.help') }}</small>
-                <b-form-invalid-feedback :state="!($v.item.customizationFont.size.$invalid && $v.item.customizationFont.size.$dirty)">
-                  <template v-if="!$v.item.customizationFont.size.minValue">
-                    {{ translate('errors.minValue_of_value_is').replace('$value', 1) }}
-                  </template>
-                  <template v-else>
-                    {{ translate('dialog.errors.required') }}
-                  </template>
-                </b-form-invalid-feedback>
-              </b-form-group>
-            </b-col>
+                )
+                small.form-text.text-muted {{ translate('registry.goals.input.fontSize.help') }}
+                b-form-invalid-feedback(:state="!($v.item.customizationFont.size.$invalid && $v.item.customizationFont.size.$dirty)")
+                  template(v-if="!$v.item.customizationFont.size.minValue")
+                    | {{ translate('errors.minValue_of_value_is').replace('$value', 1) }}
+                  template(v-else)
+                    | {{ translate('dialog.errors.required') }}
 
-            <b-col cols="3">
-              <b-form-group>
-                <label for="fonts_borderPx_input">{{ translate('registry.goals.input.borderPx.title') }}</label>
-                <b-input
+            b-col(cols="3")
+              b-form-group
+                label(for="fonts_borderPx_input") {{ translate('registry.goals.input.borderPx.title') }}
+                b-input(
                   v-model.number="item.customizationFont.borderPx"
                   type="number" :min="0" id="fonts_borderPx_input"
                   @input="$v.item.customizationFont.borderPx.$touch()"
                   :state="$v.item.customizationFont.borderPx.$invalid && $v.item.customizationFont.borderPx.$dirty ? false : null"
-                />
-                <small class="form-text text-muted">{{ translate('registry.goals.input.borderPx.help') }}</small>
-                <b-form-invalid-feedback :state="!($v.item.customizationFont.borderPx.$invalid && $v.item.customizationFont.borderPx.$dirty)">
-                  <template v-if="!$v.item.customizationFont.borderPx.minValue">
-                    {{ translate('errors.minValue_of_value_is').replace('$value', 0) }}
-                  </template>
-                  <template v-else>
-                    {{ translate('dialog.errors.required') }}
-                  </template>
-                </b-form-invalid-feedback>
-              </b-form-group>
-            </b-col>
+                )
+                small.form-text.text-muted {{ translate('registry.goals.input.borderPx.help') }}
+                b-form-invalid-feedback(:state="!($v.item.customizationFont.borderPx.$invalid && $v.item.customizationFont.borderPx.$dirty)")
+                  template(v-if="!$v.item.customizationFont.borderPx.minValue")
+                    | {{ translate('errors.minValue_of_value_is').replace('$value', 0) }}
+                  template(v-else)
+                    | {{ translate('dialog.errors.required') }}
 
-            <b-col cols="6">
-              <b-form-group>
-                <b-row class="pl-3 pr-3">
-                  <label class="w-100" for="fonts_color_input">{{ translate('registry.goals.input.color.title') }}</label>
-                  <b-input
+            b-col(cols="6")
+              b-form-group
+                b-row.pl-3
+                  label(for="fonts_color_input").w-100 {{ translate('registry.goals.input.color.title') }}
+                  b-input(
                     class="col-10"
                     v-model.trim="item.customizationFont.color"
                     type="text"
                     @input="$v.item.customizationFont.color.$touch()"
                     :state="$v.item.customizationFont.color.$invalid && $v.item.customizationFont.color.$dirty ? false : null"
-                  />
-                  <b-input
+                  )
+                  b-input(
                     class="col-2"
                     v-model.trim="item.customizationFont.color"
                     type="color" id="fonts_color_input"
                     @input="$v.item.customizationFont.color.$touch()"
                     :state="$v.item.customizationFont.color.$invalid && $v.item.customizationFont.color.$dirty ? false : null"
-                  />
-                  <b-form-invalid-feedback :state="!($v.item.customizationFont.color.$invalid && $v.item.customizationFont.color.$dirty)">
-                    {{ translate('errors.invalid_format') }}
-                  </b-form-invalid-feedback>
-                </b-row>
+                  )
+                  b-form-invalid-feedback( :state="!($v.item.customizationFont.color.$invalid && $v.item.customizationFont.color.$dirty)")
+                    | {{ translate('errors.invalid_format') }}
 
-                <b-row class="pl-3 pr-3 pt-2">
-                  <label class="w-100" for="fonts_border_color_input">{{ translate('registry.goals.input.borderColor.title') }}</label>
-                  <b-input
+                b-row.pl-3
+                  label(for="fonts_border_color_input").w-100 {{ translate('registry.goals.input.borderColor.title') }}
+                  b-input(
                     class="col-10"
                     v-model.trim="item.customizationFont.borderColor"
                     type="text"
                     @input="$v.item.customizationFont.borderColor.$touch()"
                     :state="$v.item.customizationFont.borderColor.$invalid && $v.item.customizationFont.borderColor.$dirty ? false : null"
-                  />
-                  <b-input
+                  )
+                  b-input(
                     class="col-2"
                     v-model.trim="item.customizationFont.borderColor"
                     type="color" id="fonts_border_color_input"
                     @input="$v.item.customizationFont.borderColor.$touch()"
                     :state="$v.item.customizationFont.borderColor.$invalid && $v.item.customizationFont.borderColor.$dirty ? false : null"
-                  />
-                  <b-form-invalid-feedback :state="!($v.item.customizationFont.borderColor.$invalid && $v.item.customizationFont.borderColor.$dirty)">
-                    {{ translate('errors.invalid_format') }}
-                  </b-form-invalid-feedback>
-                </b-row>
-              </b-form-group>
-            </b-col>
-          </b-row>
-        </b-card-text>
-      </b-card>
-    </b-form>
-  </b-container>
+                  )
+                  b-form-invalid-feedback( :state="!($v.item.customizationFont.borderColor.$invalid && $v.item.customizationFont.borderColor.$dirty)")
+                    | {{ translate('errors.invalid_format') }}
+
+      b-card(no-body).mt-2.mb-5
+        b-card-header
+          | {{ translate('registry.randomizer.form.options') }}
+          b-button(variant="success" style="position: absolute; right: 0; top: 0; height: 3rem;" @click="addOption")
+            fa(icon="plus" fixed-width)
+        b-card-text
+          b-table(striped small hover :items="item.items" :fields="fields" show-empty).m-0
+            template(v-slot:empty="scope")
+              b-alert(show).h-100.m-0.text-center {{translate('registry.randomizer.form.optionsAreEmpty')}}
+            template(v-slot:cell(name)="data")
+              b-input(
+                v-model.trim="data.item.name"
+                type="text"
+              )
+            template(v-slot:cell(color)="data")
+              b-row.m-0
+                b-input(
+                  class="col-10"
+                  v-model.trim="data.item.color"
+                  type="text"
+                )
+                b-input(
+                  class="col-2"
+                  v-model.trim="data.item.color"
+                  type="color"
+                )
+            template(v-slot:cell(numOfDuplicates)="data")
+              b-input(
+                v-model.number="data.item.numOfDuplicates"
+                type="number"
+                min="1"
+              )
+            template(v-slot:cell(minimalSpacing)="data")
+              b-input(
+                v-model.number="data.item.minimalSpacing"
+                type="number"
+                min="0"
+              )
+            template(v-slot:cell(buttons)="data")
+              div(style="width: max-content !important;").float-right
+                hold-button(@trigger="rmOption(data.item.id)" icon="trash").btn-danger.btn-reverse.btn-only-icon
+                  template(slot="title") {{translate('dialog.buttons.delete')}}
+                  template(slot="onHoldTitle") {{translate('dialog.buttons.hold-to-delete')}}
 </template>
 
 <script lang="ts">
@@ -199,9 +216,10 @@ import { Validations } from 'vuelidate-property-decorators';
 import { required, minLength, minValue } from 'vuelidate/lib/validators';
 
 import { getSocket } from 'src/panel/helpers/socket';
-import { Randomizer } from 'src/bot/database/entity/randomizer';
+import { Randomizer, RandomizerItem } from 'src/bot/database/entity/randomizer';
 import uuid from 'uuid/v4';
 import { permission } from 'src/bot/helpers/permissions';
+import { getRandomColor } from 'src/panel/helpers/color';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
@@ -227,7 +245,15 @@ Component.registerHooks([
 })
 export default class randomizerEdit extends Vue {
   psocket: SocketIOClient.Socket = getSocket('/core/permissions');
-  socket: SocketIOClient.Socket =  getSocket('/registry/randomizer');
+  socket: SocketIOClient.Socket =  getSocket('/registries/randomizer');
+
+  fields = [
+    { key: 'name', label: this.translate('registry.randomizer.form.name') },
+    { key: 'color', label: this.translate('registry.randomizer.form.color') },
+    { key: 'numOfDuplicates', label: this.translate('registry.randomizer.form.numOfDuplicates') },
+    { key: 'minimalSpacing', label: this.translate('registry.randomizer.form.minimalSpacing') },
+    { key: 'buttons', label: '' },
+  ];
 
   state: {
     loading: number; save: number;
@@ -240,6 +266,7 @@ export default class randomizerEdit extends Vue {
   fonts: { text: string, value: string }[] = [];
 
   permissions: {id: string; name: string;}[] = [];
+  isShown = false;
   item: Randomizer = {
     id: uuid(),
     name: '',
@@ -340,6 +367,20 @@ export default class randomizerEdit extends Vue {
     }
   }
 
+  addOption() {
+    const option = new RandomizerItem();
+    option.id = uuid();
+    option.name = '';
+    option.color = getRandomColor();
+    option.numOfDuplicates = 1;
+    option.minimalSpacing = 1;
+    this.item.items.push(option)
+  }
+
+  rmOption(id) {
+    this.item.items = this.item.items.filter(o => o.id !== id);
+  }
+
   del() {
     this.socket.emit('randomizer::remove', this.item, (err) => {
       if (err) {
@@ -350,10 +391,33 @@ export default class randomizerEdit extends Vue {
     })
   }
 
-  save() {
+  toggleVisibility() {
+    this.isShown = !this.isShown;
+    if(this.isShown) {
+      this.socket.emit('randomizer::showById', this.item.id, () => {});
+    } else {
+      this.socket.emit('randomizer::hideAll', () => {});
+    }
+
+  }
+
+  async save() {
     this.$v.$touch();
     if (!this.$v.$invalid) {
       this.state.save = this.$state.progress;
+      await new Promise((resolve, reject) => {
+        console.debug('Saving randomizer', this.item);
+        this.socket.emit('randomizer::save', this.item, (err, data) => {
+          if (err) {
+            this.state.save = this.$state.fail;
+            reject(console.error(err));
+          }
+          this.pending = false;
+          this.$router.push({ name: 'RandomizerRegistryEdit', params: { id: this.item.id } }).catch(err => {})
+          this.state.save = this.$state.success;
+          resolve()
+        });
+      });
     }
     setTimeout(() => {
       this.state.save = this.$state.idle;
@@ -372,6 +436,7 @@ export default class randomizerEdit extends Vue {
             }
             if (Object.keys(d).length === 0) this.$router.push({ name: 'RandomizerRegistryList' })
             this.item = d;
+            this.isShown = d.isShown;
             this.$route.params.id = d.id;
             done()
           })

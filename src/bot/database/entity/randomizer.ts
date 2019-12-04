@@ -49,13 +49,9 @@ export class RandomizerItem {
 
   @Column()
   name!: string;
-  @Column('boolean', { default: true })
-  randomColor!: boolean;
   @Column('varchar', { length: '9', nullable: true }) // length 9: #123456aa (if we support alpha in future)
   color!: string;
 
-  @Column('int', { default: 100 })
-  chanceWeight!: number; // chance weight of item in %
   @Column('int', { default: 1 })
   numOfDuplicates!: number; // number of duplicates
   @Column('int', { default: 1 })

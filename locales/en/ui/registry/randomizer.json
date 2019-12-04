@@ -1,3 +1,16 @@
 {
-  "addRandomizer": "Add Randomizer"
+  "addRandomizer": "Add Randomizer",
+  "form": {
+    "name": "Name",
+    "command": "Command",
+    "permission": "Command permission",
+    "simple": "Simple",
+    "wheelOfFortune": "Wheel of Fortune",
+    "type": "Type",
+    "options": "Options",
+    "optionsAreEmpty": "Options are empty.",
+    "color": "Color",
+    "numOfDuplicates": "No. of duplicates",
+    "minimalSpacing": "Minimal spacing"
+  }
 }
