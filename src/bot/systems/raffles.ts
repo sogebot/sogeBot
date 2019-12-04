@@ -128,7 +128,7 @@ class Raffles extends System {
       return;
     }
 
-    const raffle = await getRepository(Raffle).findOne({ winner: null });
+    const raffle = await getRepository(Raffle).findOne({ winner: null, isClosed: false });
     if (!(api.isStreamOnline) || !raffle || new Date().getTime() - new Date(this.lastAnnounce).getTime() < (this.raffleAnnounceInterval * 60 * 1000)) {
       this.timeouts.raffleAnnounce = global.setTimeout(() => this.announce(), 60000);
       return;
