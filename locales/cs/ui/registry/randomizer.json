@@ -11,6 +11,9 @@
     "optionsAreEmpty": "Možnosti jsou zatím prázdné.",
     "color": "Barva",
     "numOfDuplicates": "Počet duplikátů",
-    "minimalSpacing": "Minimální rozestup"
+    "minimalSpacing": "Minimální rozestup",
+    "groupUp": "Seskupit",
+    "ungroup": "Rozdělit",
+    "groupedWithOptionAbove": "Seskupeno s předchozí možností"
   }
 }

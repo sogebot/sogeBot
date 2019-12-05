@@ -11,6 +11,9 @@
     "optionsAreEmpty": "Options are empty.",
     "color": "Color",
     "numOfDuplicates": "No. of duplicates",
-    "minimalSpacing": "Minimal spacing"
+    "minimalSpacing": "Minimal spacing",
+    "groupUp": "Group Up",
+    "ungroup": "Ungroup",
+    "groupedWithOptionAbove": "Grouped with option above"
   }
 }

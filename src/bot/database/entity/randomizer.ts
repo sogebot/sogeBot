@@ -47,6 +47,14 @@ export class RandomizerItem {
   @Index()
   randomizerId!: string | null;
 
+  /*
+   * This should hlp with grouping things like Bancrupcy, WIN, Bancrupcy, to always appear beside
+   */
+  @Column('varchar', { nullable: true })
+  groupId!: string | null; // Will be used to group items together
+  @Column('int', { default: 0 })
+  groupOrder!: number; // order in group
+
   @Column()
   name!: string;
   @Column('varchar', { length: '9', nullable: true }) // length 9: #123456aa (if we support alpha in future)

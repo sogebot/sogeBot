@@ -126,7 +126,7 @@
 
             b-col(cols="6")
               b-form-group
-                b-row.pl-3
+                b-row.px-3
                   label(for="fonts_color_input").w-100 {{ translate('registry.goals.input.color.title') }}
                   b-input(
                     class="col-10"
@@ -145,7 +145,7 @@
                   b-form-invalid-feedback( :state="!($v.item.customizationFont.color.$invalid && $v.item.customizationFont.color.$dirty)")
                     | {{ translate('errors.invalid_format') }}
 
-                b-row.pl-3
+                b-row.px-3
                   label(for="fonts_border_color_input").w-100 {{ translate('registry.goals.input.borderColor.title') }}
                   b-input(
                     class="col-10"
@@ -192,18 +192,29 @@
                 )
             template(v-slot:cell(numOfDuplicates)="data")
               b-input(
+                v-if="!data.item.groupId"
                 v-model.number="data.item.numOfDuplicates"
                 type="number"
                 min="1"
               )
+              small(v-else)
+                | {{ translate('registry.randomizer.form.groupedWithOptionAbove') }}
             template(v-slot:cell(minimalSpacing)="data")
               b-input(
+                v-if="!data.item.groupId"
                 v-model.number="data.item.minimalSpacing"
                 type="number"
                 min="0"
               )
+              small(v-else)
+                | {{ translate('registry.randomizer.form.groupedWithOptionAbove') }}
             template(v-slot:cell(buttons)="data")
               div(style="width: max-content !important;").float-right
+                template(v-if="data.index > 0")
+                  b-button(variant="dark" v-if="!data.item.groupId" @click="data.item.groupId = item.items[data.index - 1].id")
+                    | {{ translate('registry.randomizer.form.groupUp') }}
+                  b-button(variant="light" v-else @click="data.item.groupId = null")
+                    | {{ translate('registry.randomizer.form.ungroup') }}
                 hold-button(@trigger="rmOption(data.item.id)" icon="trash").btn-danger.btn-reverse.btn-only-icon
                   template(slot="title") {{translate('dialog.buttons.delete')}}
                   template(slot="onHoldTitle") {{translate('dialog.buttons.hold-to-delete')}}
@@ -374,11 +385,15 @@ export default class randomizerEdit extends Vue {
     option.color = getRandomColor();
     option.numOfDuplicates = 1;
     option.minimalSpacing = 1;
+    option.groupId = null;
     this.item.items.push(option)
   }
 
   rmOption(id) {
     this.item.items = this.item.items.filter(o => o.id !== id);
+    for (const item of this.item.items.filter(o => o.groupId !== id)) {
+      item.groupId = null;
+    }
   }
 
   del() {
