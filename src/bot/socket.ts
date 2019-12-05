@@ -7,7 +7,7 @@ import { permission } from './helpers/permissions';
 import { adminEndpoint, endpoints } from './helpers/socket';
 import { onLoad } from './decorators/on';
 
-import { Brackets, getRepository, LessThanOrEqual } from 'typeorm';
+import { getRepository, LessThanOrEqual } from 'typeorm';
 import { Socket as SocketEntity } from './database/entity/socket';
 import permissions from './permissions';
 import { debug } from './helpers/log';
@@ -109,7 +109,7 @@ class Socket extends Core {
             auth = await getRepository(SocketEntity).findOne({ accessToken: cb.token });
             if (!auth) {
               debug('sockets', `Incorrect access token - ${cb.token}, asking for refresh token`);
-              return socket.emit('refreshToken', async (cb: { userId: number, token: string }) => {
+              return socket.emit('refreshToken', async (cb: { userId: number; token: string }) => {
                 auth = await getRepository(SocketEntity).findOne({ userId: cb.userId, refreshToken: cb.token });
                 if (!auth) {
                   debug('sockets', `Incorrect refresh token for userId - ${cb.token}, ${cb.userId}`);

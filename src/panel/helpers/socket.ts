@@ -20,8 +20,8 @@ export function getSocket(namespace: string, continueOnUnauthorized = false) {
       const token = localStorage.getItem('refreshToken') || '';
       const userId = localStorage.getItem('userId') || 0;
       const type = 'refresh';
-      cb({token, type, userId})
-    })
+      cb({token, type, userId});
+    });
     socket.on('authorized', (cb) => {
       console.debug(`AUTHORIZED ACCESS(${cb.type}): ${namespace}`);
       localStorage.setItem('accessToken', cb.accessToken);
