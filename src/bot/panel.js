@@ -25,6 +25,7 @@ import webhooks from './webhooks';
 import general from './general';
 import translateLib, { translate } from './translate';
 import api from './api';
+import tmi from './tmi';
 import currency from './currency';
 import oauth from './oauth';
 import songs from './systems/songs';
