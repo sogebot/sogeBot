@@ -18,7 +18,7 @@ setInterval(() => {
   if (isDbConnected) {
     VariableWatcher.check();
   }
-}, 30000);
+}, 1000);
 
 export const VariableWatcher = {
   add(key: string, value: any, isReadOnly: boolean) {
@@ -65,8 +65,9 @@ export const VariableWatcher = {
           setting.namespace = self.nsp;
           await getRepository(Settings).save(setting);
 
-          change(`${type}.${name}.${variable}`);
-          for (const event of getFunctionList('change', `${type}.${name}.${variable}`)) {
+          const path = type === 'core' ? `${name}.${variable}` : `${type}.${name}.${variable}`;
+          change(path);
+          for (const event of getFunctionList('change', path)) {
             if (typeof self[event.fName] === 'function') {
               self[event.fName](variable, cloneDeep(value));
             } else {
