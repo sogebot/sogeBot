@@ -76,10 +76,10 @@ class Socket extends Core {
       setTimeout(() => emitAuthorize(socket), MINUTE);
     };
     const emitAuthorize = (socket) => {
-      socket.emit('authorize', async (cb: { accessToken: string; refreshToken: string; socketToken?: string }) => {
-        if (cb.socketToken) {
+      socket.emit('authorize', async (cb: { token: string; type: 'socket' | 'access' }) => {
+        if (cb.type === 'socket') {
           // check if we have global socket
-          if (cb.accessToken === this.socketToken) {
+          if (cb.token === this.socketToken) {
             haveAdminPrivileges = Authorized.Authorized;
             haveViewerPrivileges = Authorized.Authorized;
             sendAuthorized(socket, {
@@ -98,43 +98,52 @@ class Socket extends Core {
           return socket.emit('unauthorized');
         }
 
-        if (cb.accessToken === '' || cb.refreshToken === '') {
+        if (cb.token === '' || !cb.token) {
           // we don't have anything
           haveAdminPrivileges = Authorized.NotAuthorized;
           haveViewerPrivileges = Authorized.NotAuthorized;
           return socket.emit('unauthorized');
         } else {
-          const auth = await getRepository(SocketEntity).createQueryBuilder('socket')
-            .where(new Brackets(w => {
-              w.where('socket.accessToken = :accessToken', { accessToken: cb.accessToken });
-              w.orWhere('socket.accessToken is NULL');
-            }))
-            .orWhere('socket.refreshToken = :refreshToken', { refreshToken: cb.refreshToken })
-            .getOne();
-          if (!auth) {
-            debug('sockets', `Sockets NG - ${cb.accessToken}, ${cb.refreshToken}`);
-            return socket.emit('unauthorized');
-          } else {
-            if (auth.accessToken === cb.accessToken) {
+          let auth;
+          if (cb.type === 'access') {
+            auth = await getRepository(SocketEntity).findOne({ accessToken: cb.token });
+            if (!auth) {
+              debug('sockets', `Incorrect access token - ${cb.token}, asking for refresh token`);
+              return socket.emit('refreshToken', async (cb: { userId: number, token: string }) => {
+                auth = await getRepository(SocketEntity).findOne({ userId: cb.userId, refreshToken: cb.token });
+                if (!auth) {
+                  debug('sockets', `Incorrect refresh token for userId - ${cb.token}, ${cb.userId}`);
+                  return socket.emit('unauthorized');
+                } else {
+                  auth.accessToken = uuid();
+                  auth.accessTokenTimestamp = Date.now() + (_self.accessTokenExpirationTime * 1000);
+                  auth.refreshTokenTimestamp = Date.now() + (_self.refreshTokenExpirationTime * 1000);
+                  await getRepository(SocketEntity).save(auth);
+                  debug('sockets', `Login OK by refresh token - ${cb.token}, access token set to ${auth.accessToken}`);
+                  sendAuthorized(socket, auth);
+
+                  if (auth.type === 'admin') {
+                    haveAdminPrivileges = Authorized.Authorized;
+                  } else {
+                    haveAdminPrivileges = Authorized.NotAuthorized;
+                  }
+                  haveViewerPrivileges = Authorized.Authorized;
+                }
+              });
+            } else {
               // update refreshToken timestamp to expire only if not used
               auth.refreshTokenTimestamp = Date.now() + (_self.refreshTokenExpirationTime * 1000);
               await getRepository(SocketEntity).save(auth);
-              debug('sockets', `Sockets OK - ${cb.accessToken}, ${cb.refreshToken}`);
+              debug('sockets', `Login OK by access token - ${cb.token}`);
               sendAuthorized(socket, auth);
-            } else {
-              auth.accessToken = uuid();
-              auth.accessTokenTimestamp = Date.now() + (_self.accessTokenExpirationTime * 1000);
-              auth.refreshTokenTimestamp = Date.now() + (_self.refreshTokenExpirationTime * 1000);
-              await getRepository(SocketEntity).save(auth);
-              debug('sockets', `Access token refreshed from ${cb.accessToken} to ${auth.accessToken}`);
-              sendAuthorized(socket, auth);
+
+              if (auth.type === 'admin') {
+                haveAdminPrivileges = Authorized.Authorized;
+              } else {
+                haveAdminPrivileges = Authorized.NotAuthorized;
+              }
+              haveViewerPrivileges = Authorized.Authorized;
             }
-            if (auth.type === 'admin') {
-              haveAdminPrivileges = Authorized.Authorized;
-            } else {
-              haveAdminPrivileges = Authorized.NotAuthorized;
-            }
-            haveViewerPrivileges = Authorized.Authorized;
           }
         }
       });

@@ -23,8 +23,10 @@ export const isUserLoggedIn = async function () {
       });
       const data = get(axiosData, 'data.data[0]', null);
       if (data === null) {
+        localStorage.removeItem('userId');
         throw Error('User must be logged');
       }
+      localStorage.setItem('userId', data.id);
 
       // set new authorization if set
       const newAuthorization = localStorage.getItem('newAuthorization');

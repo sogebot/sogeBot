@@ -9,19 +9,29 @@ export function getSocket(namespace: string, continueOnUnauthorized = false) {
     const socket = io(namespace, { forceNew: true });
     socket.on('authorize', (cb) => {
       if (!authorizeInProgress) {
-        const accessToken = localStorage.getItem('accessToken') || '';
-        const refreshToken = localStorage.getItem('refreshToken') || '';
-        cb({accessToken, refreshToken});
+        // we are sending access token here
+        const token = localStorage.getItem('accessToken') || '';
+        cb({token, type: 'access'});
       }
     });
+
+    // we didn't have correct accessToken -> refreshToken
+    socket.on('refreshToken', (cb) => {
+      const token = localStorage.getItem('refreshToken') || '';
+      const userId = localStorage.getItem('userId') || 0;
+      const type = 'refresh';
+      cb({token, type, userId})
+    })
     socket.on('authorized', (cb) => {
-      console.debug('AUTHORIZED ACCESS: ' + namespace);
-      console.debug(window.location.href);
+      console.debug(`AUTHORIZED ACCESS(${cb.type}): ${namespace}`);
       localStorage.setItem('accessToken', cb.accessToken);
       localStorage.setItem('refreshToken', cb.refreshToken);
       localStorage.setItem('userType', cb.type);
     });
     socket.on('unauthorized', (cb) => {
+      localStorage.setItem('accessToken', '');
+      localStorage.setItem('refreshToken', '');
+      localStorage.setItem('userType', 'unauthorized');
       if (!continueOnUnauthorized) {
         console.debug(window.location.href);
         console.debug('UNAUTHORIZED ACCESS: ' + namespace);
