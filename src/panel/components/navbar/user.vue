@@ -92,7 +92,7 @@ export default class User extends Vue {
     let status: string[] = [];
     for (const key of ['isFollower', 'isSubscriber', 'isVIP']) {
       if (this.viewer && this.viewer[key]) {
-        status.push(key);
+        status.push(key.replace('is', ''));
       }
     }
     return status;

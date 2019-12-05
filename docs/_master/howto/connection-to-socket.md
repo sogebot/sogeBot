@@ -9,13 +9,13 @@
 import io from 'socket.io-client';
 
 const namespace = "/"
-const socketToken = '<your-socket-token-here>';
+const token = '<your-socket-token-here>';
 
 const socket = io(namespace, { forceNew: true });
 
 // send correct token
 socket.on('authorize', (cb) => {
-  cb({socketToken})
+  cb({token, type: 'socket'});
 });
 
 socket.on('authorized', (cb) => {
