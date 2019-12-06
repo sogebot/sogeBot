@@ -45,12 +45,22 @@ export default {
   created: function () {
     this.socket.on('joinpart', (data) => {
       if (data.type === 'join') {
-        for (const username of data.users) {
-          this.list.push({
-            username, createdAt: new Date()
-          })
+        for (const [ index, username ] of Object.entries(data.users)) {
+          if (!this.list.find(o => o.username === username)) {
+            this.list.push({
+              username, createdAt: Date.now() + Number(index)
+            })
+          }
         }
-        this.list = chunk(this.list.sort(o => -(new Date(o.createdAt).getTime())), 50)[0]
+        this.list = chunk(this.list.sort((a, b) => {
+          if (a.createdAt > b.createdAt) {
+            return -1
+          }
+          if (a.createdAt < b.createdAt) {
+            return 1
+          }
+          return 0
+        }), 50)[0]
       }
     })
   }
