@@ -18,7 +18,7 @@
           template(v-slot:title)
             fa(icon="sign-in-alt" fixed-width)
           b-card-text.h-100
-            | {{ joined }}
+            | {{ list.map(o => o.username).join(', ') }}
 </template>
 
 <script>
@@ -32,11 +32,6 @@ export default {
       EventBus,
       socket: getSocket('/widgets/joinpart'),
       list: []
-    }
-  },
-  computed: {
-    joined: function () {
-      return this.list.map(o => o.username).join(', ')
     }
   },
   mounted: function () {

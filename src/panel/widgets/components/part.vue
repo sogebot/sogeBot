@@ -17,7 +17,7 @@
           template(v-slot:title)
             fa(icon="sign-out-alt" fixed-width)
           b-card-text.h-100
-            | {{ parted }}
+            | {{ list.map(o => o.username).join(', ') }}
 </template>
 
 <script>
@@ -31,11 +31,6 @@ export default {
       EventBus,
       socket: getSocket('/widgets/joinpart'),
       list: []
-    }
-  },
-  computed: {
-    parted: function () {
-      return this.list.map(o => o.username).join(', ');
     }
   },
   mounted: function () {
