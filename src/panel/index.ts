@@ -103,6 +103,12 @@ const main = async () => {
     Vue.prototype.$systems = await getListOf('systems');
     Vue.prototype.$integrations = await getListOf('integrations');
 
+    console.debug({
+      core: Vue.prototype.$core,
+      systems: Vue.prototype.$systems,
+      integrations: Vue.prototype.$integrations,
+    })
+
     Vue.prototype.$state = ButtonStates;
     setMainLoaded();
 
