@@ -408,6 +408,7 @@ function Panel () {
     socket.on('systems', async (cb) => {
       const toEmit = [];
       for (let system of glob.sync(__dirname + '/systems/*')) {
+        console.log({system})
         system = system.split('/systems/')[1].replace('.js', '');
         if (system.startsWith('_')) {
           continue;
