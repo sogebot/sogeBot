@@ -57,7 +57,7 @@ export default class App extends Vue {
             return 1
           }
           return 0
-        }), 50)[0]
+        }), 50)[0] || []
       }
     })
   }
