@@ -33,15 +33,13 @@ export default {
       list: []
     }
   },
-  mounted: function () {
-    this.$emit('mounted')
-  },
   computed: {
     parted: function () {
       return this.list.map(o => o.username).join(', ');
     }
   },
-  created: function () {
+  mounted: function () {
+    this.$emit('mounted')
     this.socket.on('joinpart', (data) => {
       if (data.type === 'part') {
         for (const [ index, username ] of Object.entries(data.users)) {

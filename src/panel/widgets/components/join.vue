@@ -34,15 +34,13 @@ export default {
       list: []
     }
   },
-  mounted: function () {
-    this.$emit('mounted')
-  },
   computed: {
     joined: function () {
       return this.list.map(o => o.username).join(', ')
     }
   },
-  created: function () {
+  mounted: function () {
+    this.$emit('mounted')
     this.socket.on('joinpart', (data) => {
       if (data.type === 'join') {
         for (const [ index, username ] of Object.entries(data.users)) {
