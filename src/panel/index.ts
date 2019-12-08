@@ -107,7 +107,7 @@ const main = async () => {
       core: Vue.prototype.$core,
       systems: Vue.prototype.$systems,
       integrations: Vue.prototype.$integrations,
-    })
+    });
 
     Vue.prototype.$state = ButtonStates;
     setMainLoaded();
