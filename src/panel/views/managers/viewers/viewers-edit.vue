@@ -63,16 +63,11 @@
             <div class="form-group col">
               <label>{{ translate('followed-since') }}</label>
               <div class="input-group">
-                <date-picker
-                  class="form-control p-0"
+                <datetime
+                  v-model="viewer.followedAt"
+                  :config="dateTimePickerConfig"
                   :disabled="viewer.haveFollowedAtLock"
-                  v-model="followedAt"
-                  :first-day-of-week="1"
-                  :not-after="new Date().getTime()"
-                  format="HH:mm:ss, YYYY-MM-DD"
-                  lang="en"
-                  type="datetime"
-                  input-class="mx-input border-0"></date-picker>
+                  class="form-control"/>
                 <div class="input-group-append">
                   <button type="button" class="border border-left-0 btn" :class="[viewer.haveFollowedAtLock ? 'btn-secondary border-0' : 'btn-light']" @click="viewer.haveFollowedAtLock = !viewer.haveFollowedAtLock">
                     <fa :icon="viewer.haveFollowedAtLock ? 'lock' : 'unlock'"></fa>
@@ -83,16 +78,11 @@
             <div class="form-group col">
               <label>{{ translate('subscribed-since') }}</label>
               <div class="input-group">
-                <date-picker
-                  class="form-control p-0"
+                <datetime
+                  v-model="viewer.subscribedAt"
+                  :config="dateTimePickerConfig"
                   :disabled="viewer.haveSubscribedAtLock"
-                  v-model="subscribedAt"
-                  :first-day-of-week="1"
-                  :not-after="new Date().getTime()"
-                  format="HH:mm:ss, YYYY-MM-DD"
-                  lang="en"
-                  type="datetime"
-                  input-class="mx-input border-0"></date-picker>
+                  class="form-control"/>
                 <div class="input-group-append">
                   <button type="button" class="btn border" :class="[viewer.haveSubscribedAtLock ? 'btn-secondary border-0' : 'btn-light']" @click="viewer.haveSubscribedAtLock = !viewer.haveSubscribedAtLock">
                     <fa :icon="viewer.haveSubscribedAtLock ? 'lock' : 'unlock'"></fa>
@@ -288,7 +278,10 @@
 import { Vue, Component, Watch } from 'vue-property-decorator';
 import { getSocket } from 'src/panel/helpers/socket';
 import { orderBy, remove, xor } from 'lodash';
-import DatePicker from 'vue2-datepicker';
+
+import VueFlatPickr from 'vue-flatpickr-component';
+import 'flatpickr/dist/flatpickr.css';
+
 import moment from 'moment';
 import { User } from 'src/bot/database/entity/user';
 
@@ -307,7 +300,7 @@ Component.registerHooks([
 @Component({
   components: {
     'loading': () => import('../../../components/loading.vue'),
-    'date-picker': DatePicker,
+    datetime: VueFlatPickr,
   }
 })
 export default class viewersEdit extends Vue {
@@ -322,6 +315,12 @@ export default class viewersEdit extends Vue {
 
   editingTipsIds: number[] = [];
   editingBitsIds: number[] = [];
+
+  dateTimePickerConfig = {
+    enableTime: true,
+    enableSeconds: true,
+    maxDate: Date.now()
+  }
 
   state: {
     loading: number;
