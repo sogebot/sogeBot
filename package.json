@@ -212,7 +212,6 @@
     "vue-style-loader": "4.1.2",
     "vue-template-compiler": "2.6.10",
     "vue-window-size": "0.2.5",
-    "vue2-datepicker": "3.2.0",
     "vue2-perfect-scrollbar": "1.2.4",
     "vuelidate": "0.7.4",
     "vuelidate-property-decorators": "1.0.28",
