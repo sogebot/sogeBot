@@ -60,7 +60,6 @@ Vue.component('textarea-with-tags', () => import('./components/textareaWithTags.
 declare module 'vue/types/vue' {
   interface Vue {
     configuration: any;
-    $moment?: any;
     $loadScript: (script: string) => Promise<void>;
     $unloadScript: (script: string) => Promise<void>;
     $state: states;

@@ -29,7 +29,6 @@ export interface Global {
 declare module 'vue/types/vue' {
   interface Vue {
     configuration: any;
-    $moment?: any;
     urlParam(key: string): string | null;
     $state: states;
   }
