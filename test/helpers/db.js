@@ -27,6 +27,7 @@ const { PermissionCommands } = require('../../dest/database/entity/permissions')
 const oauth = (require('../../dest/oauth')).default;
 const tmi = (require('../../dest/tmi')).default;
 const permissions = (require('../../dest/permissions')).default;
+const translation = (require('../../dest/translate')).default;
 
 
 let justStarted = true;
@@ -41,7 +42,7 @@ module.exports = {
           justStarted = false;
         }
       } catch (e) {}
-      if (!isDbConnected) {
+      if (!isDbConnected || !translation.isLoaded) {
         return setTimeout(() => waitForIt(resolve, reject), 1000);
       }
 

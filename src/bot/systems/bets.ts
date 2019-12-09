@@ -156,7 +156,7 @@ class Bets extends System {
       sendMessage(await prepare('bets.opened', {
         username: getOwner(),
         title,
-        maxIndex: String(options.length - 1),
+        maxIndex: options.length,
         minutes: timeout,
         options: options.map((v, i) => `${i+1}. '${v}'`).join(', '),
         command: this.getCommand('!bet'),
@@ -206,17 +206,17 @@ class Bets extends System {
 
     try {
       // tslint:disable-next-line:prefer-const
-      let [index, points] = new Expects(opts.parameters).number({ optional: true }).points({ optional: true }).toArray();
+      let [index, tickets] = new Expects(opts.parameters).number({ optional: true }).points({ optional: true }).toArray();
       index--;
-      if (!_.isNil(points) && !_.isNil(index)) {
+      if (!_.isNil(tickets) && !_.isNil(index)) {
         const pointsOfUser = await points.getPointsOf(opts.sender.userId);
         let _betOfUser = currentBet?.participations.find(o => o.userId === opts.sender.userId);
 
-        if (points === 'all' || points > pointsOfUser) {
-          points = pointsOfUser;
+        if (tickets === 'all' || tickets > pointsOfUser) {
+          tickets = pointsOfUser;
         }
 
-        if (points === 0) {
+        if (tickets === 0) {
           throw Error(ERROR_ZERO_BET);
         }
         if (!currentBet) {
@@ -242,10 +242,10 @@ class Bets extends System {
         }
 
         // add points
-        _betOfUser.points = points + _betOfUser.points;
+        _betOfUser.points = tickets + _betOfUser.points;
 
         // All OK
-        await getRepository(User).decrement({ userId: opts.sender.userId }, 'points', points);
+        await getRepository(User).decrement({ userId: opts.sender.userId }, 'points', tickets);
         await getRepository(BetsEntity).save(currentBet);
       } else {
         this.info(opts);

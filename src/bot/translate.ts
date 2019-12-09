@@ -21,6 +21,7 @@ class Translate {
   custom: any[] = [];
   translations: any = {};
   lang = 'en';
+  isLoaded = false;
 
   constructor () {
     panel.addMenu({ category: 'settings', name: 'translations', id: 'settings/translations' });
@@ -59,6 +60,7 @@ class Translate {
               this.custom = _.remove(this.custom, (i) => i.name === c.name);
             }
           }
+          this.isLoaded = true; // used for mocha tests
           resolve();
         });
       };
