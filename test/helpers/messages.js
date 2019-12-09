@@ -128,6 +128,10 @@ module.exports = {
       try {
         let isCorrectlyCalled = false;
         for (let e of expected) {
+          if (e.includes('missing_translation')) {
+            setError('Missing translations! ' + e);
+            return false;
+          }
           if (user.username) {
             e += ` [${user.username}]`;
           }
@@ -144,8 +148,8 @@ module.exports = {
         return true;
       } catch (err) {
         return setError(
-          '\nExpected message:\t"' + expected
-          + '\nActual message:\t\t"' + log.chatOut.args.join('\n\t\t') + '"'
+          '\nExpected message:\t"' + expected + '"'
+          + '\nActual message:\t\t"' + log.chatOut.args.join('\n\t\t\t') + '"'
         );
       }
     }, wait || 5000);
