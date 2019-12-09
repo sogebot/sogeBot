@@ -17,31 +17,29 @@
           template(v-slot:title)
             fa(icon="sign-out-alt" fixed-width)
           b-card-text.h-100
-            | {{ parted }}
+            | {{ list.map(o => o.username).join(', ') }}
 </template>
 
-<script>
-import { chunk } from 'lodash-es';
+<script lang="ts">
+import { Vue, Component } from 'vue-property-decorator';
 import { getSocket } from 'src/panel/helpers/socket';
 import { EventBus } from 'src/panel/helpers/event-bus';
-export default {
-  props: ['popout', 'nodrag'],
-  data: function () {
-    return {
-      EventBus,
-      socket: getSocket('/widgets/joinpart'),
-      list: []
-    }
-  },
-  mounted: function () {
+
+import { chunk } from 'lodash-es';
+
+@Component({
+  props: {
+    popout: Boolean,
+    nodrag: Boolean,
+  }
+})
+export default class App extends Vue {
+  EventBus = EventBus;
+  socket = getSocket('/widgets/joinpart');
+  list: any[] = [];
+
+  mounted() {
     this.$emit('mounted')
-  },
-  computed: {
-    parted: function () {
-      return this.list.map(o => o.username).join(', ');
-    }
-  },
-  created: function () {
     this.socket.on('joinpart', (data) => {
       if (data.type === 'part') {
         for (const [ index, username ] of Object.entries(data.users)) {
@@ -59,7 +57,7 @@ export default {
             return 1
           }
           return 0
-        }), 50)[0]
+        }), 50)[0] || []
       }
     })
   }
