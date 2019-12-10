@@ -191,7 +191,7 @@ class OAuth extends Core {
         "user_id": "<authorized user ID>"
       }
     */
-  public async validateOAuth(type: string) {
+  public async validateOAuth(type: 'bot' | 'broadcaster') {
     if (!isMainThread || global.mocha) {
       return;
     }
@@ -276,7 +276,7 @@ class OAuth extends Core {
         "scope": "viewing_activity_read"
       }
     */
-  public async refreshAccessToken(type: string) {
+  public async refreshAccessToken(type: 'bot' | 'broadcaster') {
     if (!isMainThread) {
       return;
     }

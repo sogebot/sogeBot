@@ -15,11 +15,12 @@ import currency from './currency';
 import general from './general';
 import tmi from './tmi';
 import glob from 'glob';
+import { UserStateTags } from 'twitch-js';
 
 class Parser {
   started_at = Date.now();
   message = '';
-  sender: Sender | null = null;
+  sender: Partial<UserStateTags> | null = null;
   skip = false;
   quiet = false;
   successfullParserRuns: any[] = [];

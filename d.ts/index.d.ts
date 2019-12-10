@@ -1,47 +1,4 @@
-declare module '*.vue' {
-  import Vue from 'vue';
-  export default Vue;
-}
-
-declare module '*.txt' {
-  const content: string;
-  export default content;
-}
-
-declare module '*.gif' {
-  const content: string;
-  export default content;
-}
-
-declare module '*.png' {
-  const content: string;
-  export default content;
-}
-
-declare module '*.mp3' {
-  const content: string;
-  export default content;
-}
-
-declare namespace NodeJS {
-  export interface Global {
-    mocha: boolean;
-  }
-}
-
-interface Sender {
-  username: string;
-  displayName: string;
-  userId: number;
-  'message-type': 'chat' | 'whisper' | 'action';
-  emotes: { id: number; start: number; end: number }[];
-  badges: {
-    subscriber?: undefined | number;
-    premium?: undefined | number;
-    globalMod? : undefined | number;
-    moderator? : undefined | number;
-  };
-}
+import { UserStateTags } from './twitchjs';
 
 interface Command {
   name: string;
@@ -88,7 +45,7 @@ type onEventBit = {
 };
 
 type onEventMessage = {
-  sender: Sender | null;
+  sender: Partial<UserStateTags> | null;
   message: string;
   timestamp: number;
 };
@@ -183,7 +140,7 @@ interface UIHighlightsUrlGenerator {
 }
 
 interface CommandOptions {
-  sender: Sender;
+  sender: Partial<UserStateTags>;
   command: string;
   parameters: string;
   attr?: {
@@ -193,7 +150,7 @@ interface CommandOptions {
 }
 
 interface ParserOptions {
-  sender: Sender;
+  sender: Partial<UserStateTags>;
   message: string;
   skip: boolean;
 }
