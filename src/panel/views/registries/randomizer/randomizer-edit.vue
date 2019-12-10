@@ -164,7 +164,7 @@
                   b-form-invalid-feedback( :state="!($v.item.customizationFont.borderColor.$invalid && $v.item.customizationFont.borderColor.$dirty)")
                     | {{ translate('errors.invalid_format') }}
 
-      b-card(no-body).mt-2.mb-5
+      b-card(no-body).mt-2
         b-card-header
           | {{ translate('registry.randomizer.form.options') }}
           b-button(variant="success" style="position: absolute; right: 0; top: 0; height: 3rem;" @click="addOption")
@@ -218,6 +218,18 @@
                 hold-button(@trigger="rmOption(data.item.id)" icon="trash").btn-danger.btn-reverse.btn-only-icon
                   template(slot="title") {{translate('dialog.buttons.delete')}}
                   template(slot="onHoldTitle") {{translate('dialog.buttons.hold-to-delete')}}
+
+      b-card(no-body).mt-2.mb-5
+        b-card-header
+          | {{ translate('registry.randomizer.form.generatedOptionsPreview') }}
+        b-card-text(style="overflow: auto;")
+          b-list-group(horizontal="md")
+            b-list-group-item(
+              v-for="(item, index) of generateItems(item.items)"
+              :key="index + item.id"
+              v-bind:style="{ color: getContrastColor(item.color), 'background-color': item.color, 'min-width': 'fit-content' }"
+            )
+              | {{ item.name }}
 </template>
 
 <script lang="ts">
@@ -225,12 +237,13 @@ import { Vue, Component, Watch } from 'vue-property-decorator';
 
 import { Validations } from 'vuelidate-property-decorators';
 import { required, minLength, minValue } from 'vuelidate/lib/validators';
+import { cloneDeep, isEqual } from 'lodash-es';
 
 import { getSocket } from 'src/panel/helpers/socket';
 import { Randomizer, RandomizerItem } from 'src/bot/database/entity/randomizer';
 import uuid from 'uuid/v4';
 import { permission } from 'src/bot/helpers/permissions';
-import { getRandomColor } from 'src/panel/helpers/color';
+import { getRandomColor, getContrastColor } from 'src/panel/helpers/color';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
@@ -255,6 +268,7 @@ Component.registerHooks([
   }
 })
 export default class randomizerEdit extends Vue {
+  getContrastColor = getContrastColor;
   psocket: SocketIOClient.Socket = getSocket('/core/permissions');
   socket: SocketIOClient.Socket =  getSocket('/registries/randomizer');
 
@@ -327,6 +341,50 @@ export default class randomizerEdit extends Vue {
         }
       }
     }
+  }
+
+  generateItems(items: RandomizerItem[], generatedItems: RandomizerItem[] = []) {
+    const beforeItems = cloneDeep(items);
+    items = cloneDeep(items);
+    items = items.filter(o => o.numOfDuplicates > 0);
+
+
+    const countGroupItems = (item: RandomizerItem, count = 0) => {
+      const child = items.find(o => o.groupId === item.id);
+      if (child) {
+        return countGroupItems(child, count + 1);
+      } else {
+        return count;
+      }
+    }
+    const haveMinimalSpacing = (item: RandomizerItem) => {
+      let lastIdx = generatedItems.map(o => o.name).lastIndexOf(item.name);
+      const currentIdx = generatedItems.length;
+      return lastIdx === -1 || lastIdx + item.minimalSpacing + countGroupItems(item) < currentIdx
+    }
+    const addGroupItems = (item: RandomizerItem, generatedItems: RandomizerItem[]) => {
+      const child = items.find(o => o.groupId === item.id);
+      if (child) {
+        generatedItems.push(child);
+        addGroupItems(child, generatedItems);
+      }
+    }
+
+    for (const item of items) {
+
+      if (item.numOfDuplicates > 0 && haveMinimalSpacing(item) && !item.groupId /* is not grouped or is parent of group */) {
+        generatedItems.push(item);
+        item.numOfDuplicates--;
+        addGroupItems(item, generatedItems);
+      }
+    }
+
+    // run next iteration if some items are still there and that any change was made
+    // so we don't have infinite loop when e.g. minimalspacing is not satisfied
+    if (items.filter(o => o.numOfDuplicates > 0).length > 0 && !isEqual(items.filter(o => o.numOfDuplicates > 0), beforeItems)) {
+      this.generateItems(items, generatedItems);
+    }
+    return generatedItems;
   }
 
   @Watch('item', { deep: true })
@@ -413,7 +471,6 @@ export default class randomizerEdit extends Vue {
     } else {
       this.socket.emit('randomizer::hideAll', () => {});
     }
-
   }
 
   async save() {

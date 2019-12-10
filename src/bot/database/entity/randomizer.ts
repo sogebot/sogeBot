@@ -52,8 +52,6 @@ export class RandomizerItem {
    */
   @Column('varchar', { nullable: true })
   groupId!: string | null; // Will be used to group items together
-  @Column('int', { default: 0 })
-  groupOrder!: number; // order in group
 
   @Column()
   name!: string;

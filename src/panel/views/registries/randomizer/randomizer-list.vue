@@ -1,24 +1,45 @@
-<template>
-  <div class="container-fluid" ref="window">
-    <div class="row">
-      <div class="col-12">
-        <span class="title text-default mb-2">
-          {{ translate('menu.registry') }}
-          <small><fa icon="angle-right"/></small>
-          {{ translate('menu.randomizer') }}
-        </span>
-      </div>
-    </div>
+<template lang="pug">
+  b-container(fluid ref="window")
+    b-row
+      b-col
+        span.title.text-default.mb-2
+          | {{ translate('menu.registry') }}
+          small.px-2
+            fa(icon="angle-right")
+          | {{ translate('menu.randomizer') }}
 
-    <panel search @search="search = $event">
-      <template v-slot:left>
-        <button-with-icon class="btn-primary btn-reverse" icon="plus" href="#/registry/randomizer/edit">{{translate('registry.randomizer.addRandomizer')}}</button-with-icon>
-      </template>
-    </panel>
+    panel
+      template(v-slot:left)
+        button-with-icon(icon="plus" href="#/registry/randomizer/edit").btn-primary.btn-reverse {{ translate('registry.randomizer.addRandomizer') }}
+      template(v-slot:right)
+        button-with-icon(
+          text="/overlays/randomizer"
+          href="/overlays/randomizer"
+          class="btn-dark mr-2 ml-0"
+          icon="link"
+          target="_blank"
+        )
 
-    <loading v-if="!state.loaded /* State.DONE */" />
-    <b-table v-else :fields="fields" :items="filteredVariables">
-    </b-table>
+    loading(v-if="state.loading !== $state.success")
+    b-table(v-else :fields="fields" :items="filteredItems" hover striped small @row-clicked="linkTo($event)")
+      template(v-slot:cell(permissionId)="data")
+        span(v-if="getPermissionName(data.item.permissionId)") {{ getPermissionName(data.item.permissionId) }}
+        span(v-else class="text-danger")
+          fa(icon="exclamation-triangle") Permission not found
+      template(v-slot:cell(options)="data")
+        | {{ Array.from(new Set(data.item.items.map(o => o.name))).join(', ') }}
+      template(v-slot:cell(buttons)="data")
+        div(style="width: max-content !important;").float-right
+          button-with-icon(
+            @click="toggleVisibility(data.item)"
+            :class="{ 'btn-success': data.item.isShown, 'btn-danger': !data.item.isShown }"
+            :icon="!data.item.isShown ? 'eye-slash' : 'eye'"
+          ).btn-only-icon
+          button-with-icon(icon="edit" v-bind:href="'#/registry/randomizer/edit/' + data.item.id").btn-only-icon.btn-primary.btn-reverse
+            | {{ translate('dialog.buttons.edit') }}
+          hold-button(@trigger="remove(data.item)" icon="trash").btn-danger.btn-reverse.btn-only-icon
+            template(slot="title") {{translate('dialog.buttons.delete')}}
+            template(slot="onHoldTitle") {{translate('dialog.buttons.hold-to-delete')}}
   </div>
 </template>
 
@@ -39,15 +60,14 @@ library.add(faExclamationTriangle)
 })
 export default class randomizerList extends Vue {
   psocket: SocketIOClient.Socket = getSocket('/core/permissions');
-  socket: SocketIOClient.Socket =  getSocket('/registry/randomizer');
+  socket: SocketIOClient.Socket =  getSocket('/registries/randomizer');
 
   fields = [
-    { key: 'command', label: 'command', sortable: true },
-    { key: 'permissionId', label: 'permissionId', sortable: true },
-    { key: 'name', label: 'name', sortable: true },
-    { key: 'type', label: 'type', sortable: true },
+    { key: 'name', label: this.translate('registry.randomizer.form.name'), sortable: true },
+    { key: 'command', label: this.translate('registry.randomizer.form.command'), sortable: true },
+    { key: 'permissionId', label: this.translate('registry.randomizer.form.permission') },
     // virtual attributes
-    { key: 'additional-info', label: this.translate('registry.customvariables.additional-info') },
+    { key: 'options', label: this.translate('registry.randomizer.form.options') },
     { key: 'buttons', label: '' },
   ];
 
@@ -55,18 +75,69 @@ export default class randomizerList extends Vue {
   permissions: {id: string; name: string;}[] = [];
   search: string = '';
 
-  state: { loaded: boolean; } = { loaded: false }
+  state: {
+    loading: number;
+  } = {
+    loading: this.$state.idle,
+  };
 
   get filteredItems() {
     return this.items;
   }
 
+  toggleVisibility(item) {
+    item.isShown = !item.isShown;
+    if(item.isShown) {
+      this.socket.emit('randomizer::showById', item.id, () => {
+        this.refresh();
+      });
+    } else {
+      this.socket.emit('randomizer::hideAll', () => {
+        this.refresh();
+      });
+    }
+  }
+
   mounted() {
-    this.state.loaded = false;
-    this.socket.emit('randomizer::getAll', (err, data) => {
-      this.items = data;
-      this.state.loaded = true;
+    this.state.loading = this.$state.progress;
+    this.refresh();
+  }
+
+  async refresh() {
+    await Promise.all([
+      new Promise(async(done) => {
+        this.psocket.emit('permissions', (data) => {
+          this.permissions = data
+          done();
+        });
+      }),
+      new Promise(async(done) => {
+        this.socket.emit('randomizer::getAll', (data) => {
+          console.groupCollapsed('randomizer::getAll')
+          console.debug(data);
+          console.groupEnd;
+          this.items = data;
+          done();
+        })
+      })
+    ])
+
+    this.state.loading = this.$state.success;
+  }
+
+  remove(item) {
+    this.socket.emit('randomizer::remove', item, (err) => {
+      if (err) {
+        console.error(err);
+      } else {
+        this.refresh();
+      }
     })
+  }
+
+  linkTo(item) {
+    console.debug('Clicked', item.id);
+    this.$router.push({ name: 'RandomizerRegistryEdit', params: { id: item.id } });
   }
 
   getPermissionName(id) {
