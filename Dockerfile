@@ -1,11 +1,12 @@
 FROM node:13.3.0-alpine
 
-ENV LAST_UPDATED 2019-12-11-1225
+ENV LAST_UPDATED 2019-12-11-1235
 
 ENV NODE_ENV production
 ENV ENV production
 
 RUN apk add --no-cache autoconf
+RUN apk add --no-cache automake
 RUN apk add --no-cache make
 RUN apk add --no-cache bash
 RUN apk add --no-cache git
