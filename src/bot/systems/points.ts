@@ -520,7 +520,7 @@ class Points extends System {
     await getRepository(User).createQueryBuilder()
       .update(User)
       .set({ points: 0 })
-      .where('user.points < 0')
+      .where('points < 0')
       .execute();
   }
 }
