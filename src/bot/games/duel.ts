@@ -157,7 +157,7 @@ class Duel extends Game {
       if (userFromDB) {
         userFromDB.tickets = Number(userFromDB.tickets) + Number(bet);
         await getRepository(DuelEntity).save(userFromDB);
-        await getRepository(User).decrement({ userId: opts.sender.userId }, 'points', parseInt(bet, 10));
+        await points.decrement({ userId: opts.sender.userId }, parseInt(bet, 10));
       } else {
         // check if under gambling cooldown
         const cooldown = this.cooldown;
@@ -174,7 +174,7 @@ class Duel extends Game {
             username: opts.sender.username,
             tickets: Number(bet),
           });
-          await getRepository(User).decrement({ userId: opts.sender.userId }, 'points', parseInt(bet, 10));
+          await points.decrement({ userId: opts.sender.userId }, parseInt(bet, 10));
         } else {
           message = await prepare('gambling.fightme.cooldown', {
             minutesName: getLocalizedName(Math.round(((cooldown * 1000) - (new Date().getTime() - new Date(this._cooldown).getTime())) / 1000 / 60), 'core.minutes'),

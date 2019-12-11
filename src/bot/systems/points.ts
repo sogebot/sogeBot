@@ -12,7 +12,7 @@ import { permission } from '../helpers/permissions';
 import System from './_interface';
 import { debug, error } from '../helpers/log';
 import { adminEndpoint } from '../helpers/socket';
-import { getRepository } from 'typeorm';
+import { FindConditions, getRepository } from 'typeorm';
 import { User } from '../database/entity/user';
 import { getAllOnlineUsernames } from '../helpers/getAllOnlineUsernames';
 import { onChange, onLoad } from '../decorators/on';
@@ -513,6 +513,15 @@ class Points extends System {
   @command('!points')
   main (opts: CommandOptions) {
     this.get(opts);
+  }
+
+  async decrement(where: Readonly<FindConditions<User>>, points: number) {
+    await getRepository(User).decrement(where, 'points', points);
+    await getRepository(User).createQueryBuilder()
+      .update(User)
+      .set({ points: 0 })
+      .where('user.points < 0')
+      .execute();
   }
 }
 

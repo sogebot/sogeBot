@@ -25,10 +25,10 @@ class Roulette extends Game {
   loserWillLose = 0;
 
   @command('!roulette')
-  async main (opts) {
+  async main (opts): Promise<boolean> {
     opts.sender['message-type'] = 'chat'; // force responses to chat
 
-    const isAlive = _.random(0, 1, false);
+    const isAlive = !!_.random(0, 1, false);
 
     const [isMod] = await Promise.all([
       isModerator(opts.sender),
@@ -37,12 +37,12 @@ class Roulette extends Game {
     sendMessage(translate('gambling.roulette.trigger'), opts.sender, opts.attr);
     if (isBroadcaster(opts.sender)) {
       setTimeout(() => sendMessage(translate('gambling.roulette.broadcaster'), opts.sender), 2000, opts.attr);
-      return;
+      return true;
     }
 
     if (isMod) {
       setTimeout(() => sendMessage(translate('gambling.roulette.mod'), opts.sender), 2000, opts.attr);
-      return;
+      return true;
     }
 
     setTimeout(async () => {
@@ -52,10 +52,11 @@ class Roulette extends Game {
       if (isAlive) {
         await getRepository(User).increment({ userId: opts.sender.userId }, 'points', Number(this.winnerWillGet));
       } else {
-        await getRepository(User).decrement({ userId: opts.sender.userId }, 'points', Number(this.loserWillLose));
+        await points.decrement({ userId: opts.sender.userId }, Number(this.loserWillLose));
       }
       sendMessage(isAlive ? translate('gambling.roulette.alive') : translate('gambling.roulette.dead'), opts.sender, opts.attr);
     }, 2000);
+    return isAlive;
   }
 }
 

@@ -380,7 +380,7 @@ class Raffles extends System {
 
     if (participant.isEligible) {
       if (raffle.type === TYPE_TICKETS) {
-        await getRepository(User).decrement({ userId: opts.sender.userId }, 'points', tickets);
+        await points.decrement({ userId: opts.sender.userId }, tickets);
       }
       await getRepository(RaffleParticipant).save(participant);
     }
