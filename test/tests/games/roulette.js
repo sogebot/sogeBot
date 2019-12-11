@@ -38,7 +38,7 @@ describe('game/roulette - !roulette', () => {
     });
   }
 
-  describe.only('/t/seppuku-and-roulette-points-can-be-negated/36', async () => {
+  describe('/t/seppuku-and-roulette-points-can-be-negated/36', async () => {
     before(async () => {
       await db.cleanup();
       await message.prepare();
