@@ -12,13 +12,14 @@
     "noImplicitThis": true,
     "noUnusedLocals": true,
     "moduleResolution": "node",
-    "lib": ["es2018", "dom"],
+    "lib": ["es6", "dom"],
     "declaration": false,
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "noResolve": false,
+    "skipLibCheck": false,
     "baseUrl": "./",
     "paths": {
       "@config": ["config.json", "src/bot/data/config.example.json"]

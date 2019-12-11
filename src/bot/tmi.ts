@@ -1,6 +1,7 @@
 import moment from 'moment';
 
-import TwitchJs from 'twitch-js';
+import TwitchJs, { HostTargetMessage, Message, PrivateMessages, UserStateTags } from 'twitch-js';
+
 import util from 'util';
 import { isNil } from 'lodash';
 
@@ -54,7 +55,13 @@ class TMI extends Core {
 
   channel = '';
   timeouts: Record<string, any> = {};
-  client: Record<string, any> = {};
+  client: {
+    bot: TwitchJs | null;
+    broadcaster: TwitchJs | null;
+  } = {
+    bot: null,
+    broadcaster: null,
+  };
   lastWorker = '';
   broadcasterWarning = false;
 
@@ -102,7 +109,7 @@ class TMI extends Core {
     } catch (e) {}
   }
 
-  async initClient (type: string) {
+  async initClient (type: 'bot' | 'broadcaster') {
     clearTimeout(this.timeouts[`initClient.${type}`]);
     const [token, username, channel] = await Promise.all([
       oauth[type + 'AccessToken'],
@@ -114,7 +121,7 @@ class TMI extends Core {
       if (token === '' || username === '' || channel === '') {
         throw Error(`${type} - token, username or channel expected`);
       }
-      const log = isDebugEnabled('tmi.client') ? null : { level: 0 };
+      const log = isDebugEnabled('tmi.client') ? { level: 'debug' } : { level: 'silent' };
       this.client[type] = new TwitchJs({
         token,
         username,
@@ -122,7 +129,7 @@ class TMI extends Core {
         onAuthenticationFailure: () => oauth.refreshAccessToken(type).then(token => token),
       });
       this.loadListeners(type);
-      await this.client[type].chat.connect();
+      await (this.client[type] as TwitchJs).chat.connect();
       await this.join(type, channel);
     } catch (e) {
       if (type === 'broadcaster' && !this.broadcasterWarning) {
@@ -137,7 +144,7 @@ class TMI extends Core {
   /* will connect/reconnect bot and broadcaster
    * this is called from oauth when channel is changed or initialized
    */
-  async reconnect (type: string) {
+  async reconnect (type: 'bot' | 'broadcaster') {
     try {
       if (typeof this.client[type] === 'undefined') {
         throw Error('TMI: cannot reconnect, connection is not established');
@@ -151,8 +158,8 @@ class TMI extends Core {
       if (this.channel !== channel) {
         info(`TMI: ${type} is reconnecting`);
 
-        await this.client[type].chat.part(this.channel);
-        await this.client[type].chat.reconnect({ token, username, onAuthenticationFailure: () => oauth.refreshAccessToken(type).then(token => token) });
+        await this.client[type]?.chat.part(this.channel);
+        await this.client[type]?.chat.reconnect({ token, username, onAuthenticationFailure: () => oauth.refreshAccessToken(type).then(token => token) });
 
         await this.join(type, channel);
       }
@@ -161,25 +168,25 @@ class TMI extends Core {
     }
   }
 
-  async join (type: string, channel: string) {
+  async join (type: 'bot' | 'broadcaster', channel: string) {
     if (typeof this.client[type] === 'undefined') {
       info(`TMI: ${type} oauth is not properly set, cannot join`);
     } else {
       if (channel === '') {
         info(`TMI: ${type} is not properly set, cannot join empty channel`);
       } else {
-        await this.client[type].chat.join(channel);
+        await (this.client[type] as TwitchJs).chat.join(channel);
         info(`TMI: ${type} joined channel ${channel}`);
         this.channel = channel;
       }
     }
   }
 
-  async part (type: string) {
+  async part (type: 'bot' | 'broadcaster') {
     if (typeof this.client[type] === 'undefined') {
       info(`TMI: ${type} is not connected in any channel`);
     } else {
-      await this.client[type].chat.part(this.channel);
+      await (this.client[type] as TwitchJs).chat.part(this.channel);
       info(`TMI: ${type} parted channel ${this.channel}`);
     }
   }
@@ -193,23 +200,23 @@ class TMI extends Core {
     }
   }
 
-  loadListeners (type: string) {
+  loadListeners (type: 'bot' | 'broadcaster') {
     // common for bot and broadcaster
-    this.client[type].chat.on('DISCONNECT', async (message) => {
+    (this.client[type] as TwitchJs).chat.on('DISCONNECT', async (message) => {
       info(`TMI: ${type} is disconnected`);
       setStatus('TMI', constants.DISCONNECTED);
       for (const event of getFunctionList('partChannel')) {
         this[event.fName]();
       }
     });
-    this.client[type].chat.on('RECONNECT', async (message) => {
+    (this.client[type] as TwitchJs).chat.on('RECONNECT', async (message) => {
       info(`TMI: ${type} is reconnecting`);
       setStatus('TMI', constants.RECONNECTING);
       for (const event of getFunctionList('reconnectChannel')) {
         this[event.fName]();
       }
     });
-    this.client[type].chat.on('CONNECTED', async (message) => {
+    (this.client[type] as TwitchJs).chat.on('CONNECTED', async (message) => {
       info(`TMI: ${type} is connected`);
       setStatus('TMI', constants.CONNECTED);
       for (const event of getFunctionList('joinChannel')) {
@@ -218,7 +225,8 @@ class TMI extends Core {
     });
 
     if (type === 'bot') {
-      this.client[type].chat.on('WHISPER', async (message) => {
+      (this.client[type] as TwitchJs).chat.on('WHISPER', async (message) => {
+        message = message as Message;
         message.tags.username = this.getUsernameFromRaw(message._raw);
 
         if (!isBot(message.tags.username) || !message.isSelf) {
@@ -228,8 +236,8 @@ class TMI extends Core {
         }
       });
 
-      this.client[type].chat.on('PRIVMSG', async (message) => {
-        message.tags.username = this.getUsernameFromRaw(message._raw);
+      (this.client[type] as TwitchJs).chat.on('PRIVMSG', async (message: PrivateMessages & { tags: { username?: string | null }}) => {
+        message.tags.username = this.getUsernameFromRaw(message._raw) || message.tags.displayName;
 
         if (!isBot(message.tags.username) || !message.isSelf) {
           message.tags['message-type'] = message.message.startsWith('\u0001ACTION') ? 'action' : 'say'; // backward compatibility for /me moderation
@@ -248,15 +256,15 @@ class TMI extends Core {
             });
 
             if (message.tags['message-type'] === 'action') {
-              events.fire('action', { username: message.tags.username.toLowerCase() });
+              events.fire('action', { username: message.tags.username?.toLowerCase() });
             }
           }
         } else {
-          setStatus('MOD', typeof message.tags.badges.moderator !== 'undefined');
+          setStatus('MOD', typeof (message.tags as UserStateTags).badges.moderator !== 'undefined');
         }
       });
 
-      this.client[type].chat.on('CLEARCHAT', message => {
+      (this.client[type] as TwitchJs).chat.on('CLEARCHAT', message => {
         if (message.event === 'USER_BANNED') {
           const duration = message.tags.banDuration;
           const reason = message.tags.banReason;
@@ -273,7 +281,7 @@ class TMI extends Core {
         }
       });
 
-      this.client[type].chat.on('HOSTTARGET', message => {
+      (this.client[type] as TwitchJs).chat.on('HOSTTARGET', message => {
         if (message.event === 'HOST_ON') {
           if (typeof message.numberOfViewers !== 'undefined') { // may occur on restart bot when hosting
             events.fire('hosting', { target: message.username, viewers: message.numberOfViewers });
@@ -281,19 +289,20 @@ class TMI extends Core {
         }
       });
 
-      this.client[type].chat.on('USERNOTICE', message => {
+      (this.client[type] as TwitchJs).chat.on('USERNOTICE', message => {
         this.usernotice(message);
       });
 
-      this.client[type].chat.on('NOTICE', message => {
+      (this.client[type] as TwitchJs).chat.on('NOTICE', message => {
         info(message.message);
       });
     } else if (type === 'broadcaster') {
-      this.client[type].chat.on('PRIVMSG/HOSTED', async (message) => {
+      (this.client[type] as TwitchJs).chat.on('PRIVMSG/HOSTED', async (message) => {
+        message = message as HostTargetMessage;
         // Someone is hosting the channel and the message contains how many viewers..
         const username = message.message.split(' ')[0].replace(':', '').toLowerCase();
         const autohost = message.message.includes('auto');
-        const viewers = message.numberOfViewers || '0';
+        const viewers = (message as HostTargetMessage).numberOfViewers || 0;
 
         host(`${username}, viewers: ${viewers}, autohost: ${autohost}`);
 
@@ -674,7 +683,7 @@ class TMI extends Core {
   }
 
   delete (client: 'broadcaster' | 'bot', msgId: string): void {
-    this.client[client].chat.say(getOwner(), '/delete ' + msgId);
+    this.client[client]?.chat.say(getOwner(), '/delete ' + msgId);
   }
 
   async message (data, managed = false) {

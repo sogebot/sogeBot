@@ -106,7 +106,7 @@ export const clusteredClientChat = (type, username, messageToSend) => {
     if (debugIsEnabled('tmi')) {
       return;
     }
-    tmi.client.bot.chat[type](username, messageToSend);
+    tmi.client.bot?.chat[type](username, messageToSend);
   } else {
     clientIO.emit('clusteredClientChat', type, username, messageToSend);
   }
@@ -125,7 +125,7 @@ export const clusteredClientDelete = (senderId) => {
 
 export const clusteredClientTimeout = (username, timeMs, reason) => {
   if (isMainThread) {
-    tmi.client.bot.chat.timeout(oauth.generalChannel, username, timeMs, reason);
+    tmi.client.bot?.chat.timeout(oauth.generalChannel, username, timeMs, reason);
   } else {
     clientIO.emit('clusteredClientTimeout', username, timeMs, reason);
   }

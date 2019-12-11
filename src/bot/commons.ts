@@ -13,6 +13,7 @@ import { User } from './database/entity/user';
 import oauth from './oauth';
 import { translate } from './translate';
 import tmi from './tmi';
+import { UserStateTags } from 'twitch-js';
 
 export async function autoLoad(directory): Promise<{ [x: string]: any }> {
   const directoryListing = readdirSync(directory);
@@ -111,8 +112,8 @@ export function getTime(time, isChat) {
   }
 }
 
-export async function sendMessage(messageToSend: string | Promise<string>, sender: Sender | null, attr?: {
-  sender?: Sender;
+export async function sendMessage(messageToSend: string | Promise<string>, sender: Partial<UserStateTags> | null, attr?: {
+  sender?: Partial<UserStateTags>;
   quiet?: boolean;
   skip?: boolean;
   force?: boolean;
@@ -191,7 +192,7 @@ export async function timeout(username, reason, timeMs) {
   clusteredClientTimeout(username, timeMs, reason);
 }
 
-export function getOwnerAsSender(): Sender {
+export function getOwnerAsSender(): Readonly<UserStateTags> {
   return {
     username: getOwner(),
     displayName: getOwner(),
@@ -201,6 +202,9 @@ export function getOwnerAsSender(): Sender {
       subscriber: 1,
     },
     'message-type': 'chat',
+    color: '#000000',
+    userType: 'empty',
+    emoteSets: [],
   };
 }
 
@@ -230,8 +234,7 @@ export function getBotID() {
     return 0;
   }
 }
-
-export function getBotSender(): Sender {
+export function getBotSender(): Readonly<UserStateTags> {
   return {
     username: getBot(),
     displayName: getBot(),
@@ -239,6 +242,9 @@ export function getBotSender(): Sender {
     emotes: [],
     badges: {},
     'message-type': 'chat',
+    color: '#000000',
+    userType: 'empty',
+    emoteSets: [],
   };
 }
 

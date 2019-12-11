@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import { isMainThread } from '../cluster';
 
-import { getLocalizedName, getOwner, prepare, sendMessage } from '../commons.js';
+import { getLocalizedName, getOwnerAsSender, prepare, sendMessage } from '../commons.js';
 import { command, default_permission, helper, settings } from '../decorators';
 import { onBit, onMessage, onTip } from '../decorators/on';
 import Expects from '../expects.js';
@@ -69,16 +69,7 @@ class Polls extends System {
         this.open({
           command: this.getCommand('!poll open'),
           parameters,
-          sender: {
-            username: getOwner(),
-            displayName: getOwner(),
-            'message-type': 'chat',
-            userId: 0,
-            emotes: [],
-            badges: {
-              subscriber: 1,
-            },
-          },
+          sender: getOwnerAsSender(),
         });
         cb(null, null);
       } catch (e) {
@@ -90,16 +81,7 @@ class Polls extends System {
         this.close({
           command: this.getCommand('!poll close'),
           parameters: '',
-          sender: {
-            username: getOwner(),
-            displayName: getOwner(),
-            'message-type': 'chat',
-            userId: 0,
-            emotes: [],
-            badges: {
-              subscriber: 1,
-            },
-          },
+          sender: getOwnerAsSender(),
         });
         cb(null);
       } catch (e) {

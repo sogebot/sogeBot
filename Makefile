@@ -3,7 +3,7 @@ SHELL   := /bin/bash
 VERSION := `node -pe "require('./package.json').version"`
 ENV     ?= production
 
-all : clean prepare dependencies css ui bot info
+all : clean prepare dependencies patch css ui bot info
 .PHONY : all
 
 info:
@@ -16,6 +16,11 @@ dependencies:
 	@npm install --production
 	@echo -ne "\n\t ----- Installation of development dependencies\n"
 	@npm install --only=dev
+
+patch:
+	@echo -ne "\n\t ----- Going through node_modules patches\n"
+	# How to create node_modules patch: https://opensource.christmas/2019/4
+	patch --forward node_modules/twitch-js/types/index.d.ts < patches/twitch-js-types.patch
 
 eslint:
 	@echo -ne "\n\t ----- Checking eslint\n"
