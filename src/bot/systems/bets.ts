@@ -245,7 +245,7 @@ class Bets extends System {
         _betOfUser.points = tickets + _betOfUser.points;
 
         // All OK
-        await getRepository(User).decrement({ userId: opts.sender.userId }, 'points', tickets);
+        await points.decrement({ userId: opts.sender.userId }, tickets);
         await getRepository(BetsEntity).save(currentBet);
       } else {
         this.info(opts);

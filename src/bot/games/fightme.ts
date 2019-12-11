@@ -9,6 +9,7 @@ import { getRepository } from 'typeorm';
 import { User } from '../database/entity/user';
 import users from '../users';
 import { translate } from '../translate';
+import points from '../systems/points';
 
 /*
  * !fightme [user] - challenge [user] to fight
@@ -138,7 +139,7 @@ class FightMe extends Game {
 
       const [winnerWillGet, loserWillLose] = await Promise.all([this.winnerWillGet, this.loserWillLose]);
       await getRepository(User).increment({ userId: winner ? opts.sender.userId : user.userId }, 'points', Math.abs(Number(winnerWillGet)));
-      await getRepository(User).decrement({ userId: !winner ? opts.sender.userId : user.userId }, 'points', Math.abs(Number(loserWillLose)));
+      await points.decrement({ userId: !winner ? opts.sender.userId : user.userId }, Math.abs(Number(loserWillLose)));
 
       timeout(winner ? opts.sender.username : user.username, null, this.timeout);
       sendMessage(prepare('gambling.fightme.winner', {

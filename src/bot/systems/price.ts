@@ -177,7 +177,7 @@ class Price extends System {
       const message = await prepare('price.user-have-not-enough-points', { amount: removePts, command: `${price.command}`, pointsName: await points.getPointsName(removePts) });
       sendMessage(message, opts.sender, opts.attr);
     } else {
-      await getRepository(User).decrement({ userId: opts.sender.userId }, 'points', removePts);
+      await points.decrement({ userId: opts.sender.userId }, removePts);
     }
     return haveEnoughPoints;
   }
