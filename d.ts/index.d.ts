@@ -1,4 +1,4 @@
-import { UserStateTags } from './twitchjs';
+type UserStateTags = import('twitch-js').UserStateTags;
 
 interface Command {
   name: string;
@@ -140,7 +140,7 @@ interface UIHighlightsUrlGenerator {
 }
 
 interface CommandOptions {
-  sender: Partial<UserStateTags>;
+  sender: UserStateTags;
   command: string;
   parameters: string;
   attr?: {
@@ -150,7 +150,7 @@ interface CommandOptions {
 }
 
 interface ParserOptions {
-  sender: Partial<UserStateTags>;
+  sender: UserStateTags;
   message: string;
   skip: boolean;
 }

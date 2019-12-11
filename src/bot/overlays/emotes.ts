@@ -371,7 +371,7 @@ class Emotes extends Overlay {
     // add emotes from twitch which are not maybe in cache (other partner emotes etc)
     for (const emote of opts.sender.emotes) {
       // don't include simple emoted (id 1-14)
-      if (emote.id < 15) {
+      if (Number(emote.id) < 15) {
         continue;
       }
       // if emote is already in cache, continue
