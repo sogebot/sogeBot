@@ -192,7 +192,7 @@ export async function timeout(username, reason, timeMs) {
   clusteredClientTimeout(username, timeMs, reason);
 }
 
-export function getOwnerAsSender(): Partial<UserStateTags> {
+export function getOwnerAsSender(): Readonly<UserStateTags> {
   return {
     username: getOwner(),
     displayName: getOwner(),
@@ -202,6 +202,9 @@ export function getOwnerAsSender(): Partial<UserStateTags> {
       subscriber: 1,
     },
     'message-type': 'chat',
+    color: '#000000',
+    userType: 'empty',
+    emoteSets: [],
   };
 }
 
@@ -231,8 +234,7 @@ export function getBotID() {
     return 0;
   }
 }
-
-export function getBotSender(): Partial<UserStateTags> {
+export function getBotSender(): Readonly<UserStateTags> {
   return {
     username: getBot(),
     displayName: getBot(),
@@ -240,6 +242,9 @@ export function getBotSender(): Partial<UserStateTags> {
     emotes: [],
     badges: {},
     'message-type': 'chat',
+    color: '#000000',
+    userType: 'empty',
+    emoteSets: [],
   };
 }
 
