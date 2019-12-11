@@ -881,7 +881,14 @@
     "success": {
       "set": "$username ma nyni nastaveno $amount $pointsName",
       "give": "$sender prave dal svych $amount $pointsName uzivateli $username",
-      "all": "Vsichni online uzivatele prave ziskali $amount $pointsName!",
+      "online": {
+        "positive": "Vsichni online uzivatele prave ziskali $amount $pointsName!",
+        "negative": "Vsem online uzivatelum prave bylo odebrano $amount $pointsName!"
+      },
+      "all": {
+        "positive": "Vsichni uzivatele prave ziskali $amount $pointsName!",
+        "negative": "Vsem uzivatelum prave bylo odebrano $amount $pointsName!"
+      },
       "rain": "Jen at prsi! Vsichni online uzivatele prave ziskali az $amount $pointsName!",
       "add": "$username ziskal $amount $pointsName!",
       "remove": "A jeje, $amount $pointsName bylo odebrano uzivateli $username!"
@@ -891,6 +898,7 @@
       "give": "{core.command-parse} $command [username] [amount]",
       "giveNotEnough": "Promin, $sender, ale nemas $amount $pointsName abys je daroval uzivateli $username",
       "get": "{core.command-parse} $command [username]",
+      "online": "{core.command-parse} $command [amount]",
       "all": "{core.command-parse} $command [amount]",
       "rain": "{core.command-parse} $command [amount]",
       "add": "{core.command-parse} $command [username] [amount]",
