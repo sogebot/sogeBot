@@ -1,6 +1,6 @@
 FROM node:13.3.0-alpine
 
-ENV LAST_UPDATED 2019-12-11-1235
+ENV LAST_UPDATED 2019-12-11-1243
 
 ENV NODE_ENV production
 ENV ENV production
@@ -12,6 +12,7 @@ RUN apk add --no-cache bash
 RUN apk add --no-cache git
 RUN apk add --no-cache python
 RUN apk add --no-cache build-base
+RUN apk add --no-cache zlib zlib-dev
 
 # Copy source code
 COPY . /app
