@@ -38,9 +38,18 @@ if (argv._[0] === 'cli') {
 
     const body = spawnSync('git', ['log', commit, '-n', '1', '--pretty=format:%B']);
     const fixesRegexp = /(Fixes|Closes|Fixed|Closed)\s(\#\d*)/gmi;
+    const fixesRegexpForum = /(Fixes|Closes|Fixed|Closed)\s(.*)/gmi;
     let fixes = []
     if (body.stdout.toString().match(fixesRegexp)) {
       fixes = body.stdout.toString().match(fixesRegexp)
+    } else if (body.stdout.toString().match(fixesRegexpForum)) {
+      const text = body.stdout.toString().match(fixesRegexpForum)[0]
+      const link = text.split(' ')[1];
+      const number = link.match(/\d*$/)[0];
+
+      fixes = [
+        `Fixes [community#${number}](${link})`
+      ]
     }
 
     return { commit, message: o.slice(i+1).trim(), fixes };
