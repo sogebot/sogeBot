@@ -4,10 +4,8 @@
     - add [number] points to specified [username]
 - !points remove [username] [number]
     - remove [number] points to specified [username]
-- !points online [number]
-    - give or take [number] points to all **online** users
 - !points all [number]
-    - give or take [number] points to all users
+    - add [number] points to all **online** users
 - !points set [username] [number]
     - set [number] points to specified [username]
 - !points get [username]
