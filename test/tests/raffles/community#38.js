@@ -52,6 +52,27 @@ describe('/t/raffle-everyone-can-join-even-raffle-runned-for-subscribers/38', ()
     });
   }
 
+  const followers = ['follower1', 'follower2'];
+  for (const [id, v] of Object.entries(followers)) {
+    it('Add user ' + v + ' to db', async () => {
+      await getRepository(User).save({ username: v , userId: Number('100' + id), isFollower: true });
+    });
+
+    it('Add user ' + v + ' to raffle should fail', async () => {
+      const a = await raffles.participate({ sender: { username: v, userId: Number('100' + id) }, message: '!winme' });
+      assert.isFalse(a);
+    });
+
+    it('User should not be in raffle', async () => {
+      const raffle = await getRepository(Raffle).findOne({
+        relations: ['participants'],
+        where: { winner: null, isClosed: false },
+      });
+
+      assert(typeof raffle.participants.find(o => o.username === v) === 'undefined');
+    });
+  }
+
   const subs = ['sub1', 'sub2'];
   for (const [id, v] of Object.entries(subs)) {
     it('Add user ' + v + ' to db', async () => {
