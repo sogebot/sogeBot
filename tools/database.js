@@ -161,6 +161,17 @@ const connect = async function () {
   const connectionOptions = await getConnectionOptions();
   await createConnection({
     ...connectionOptions,
+    synchronize: false,
+    migrationsRun: true,
+    entities: [
+      path.join(__dirname, '..', 'dest', 'database', 'entity/*.js'),
+    ],
+    migrations: [
+      path.join(__dirname, '..', 'dest', 'database', 'migration', connectionOptions.type, '*.js'),
+    ],
+    subscribers: [
+      path.join(__dirname, '..', 'dest', 'database', 'entity/*.js')
+    ],
   });
 };
 async function main() {

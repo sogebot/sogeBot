@@ -8,17 +8,6 @@
   "logging": ["error"],
   "cache": true,
   "charset": "UTF8_GENERAL_CI",
-  "synchronize": false,
-  "migrationsRun": true,
-  "entities": [
-    "dest/database/entity/*.js"
-  ],
-  "migrations": [
-    "dest/database/migration/mysql/*.js"
-  ],
-  "subscribers": [
-    "dest/database/entity/*.js"
-  ],
   "cli": {
     "entitiesDir": "src/bot/database/entity",
     "migrationsDir": "src/bot/database/migration/mysql",
