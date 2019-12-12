@@ -871,7 +871,14 @@
     "success": {
       "set": "$username was set to $amount $pointsName",
       "give": "$sender just gave his $amount $pointsName to $username",
-      "all": "All online users just received $amount $pointsName!",
+      "online": {
+        "positive": "All online users just received $amount $pointsName!",
+        "negative": "All online users just lost $amount $pointsName!"
+      },
+      "all": {
+        "positive": "All users just received $amount $pointsName!",
+        "negative": "All users just lost $amount $pointsName!"
+      },
       "rain": "Make it rain! All online users just received up to $amount $pointsName!",
       "add": "$username just received $amount $pointsName!",
       "remove": "Ouch, $amount $pointsName was removed from $username!"
@@ -881,6 +888,7 @@
       "give": "{core.command-parse} $command [username] [amount]",
       "giveNotEnough": "Sorry, $sender, you don't have $amount $pointsName to give it to $username",
       "get": "{core.command-parse} $command [username]",
+      "online": "{core.command-parse} $command [amount]",
       "all": "{core.command-parse} $command [amount]",
       "rain": "{core.command-parse} $command [amount]",
       "add": "{core.command-parse} $command [username] [amount]",

@@ -15,6 +15,13 @@ const owner = { userId: Math.floor(Math.random() * 100000), username: 'soge__' }
 const user1 = { userId: Math.floor(Math.random() * 100000), username: 'user1', points: 100 };
 const user2 = { userId: Math.floor(Math.random() * 100000), username: 'user2' };
 
+async function setUsersOnline(users) {
+  await getRepository(User).update({}, { isOnline: false });
+  for (const username of users) {
+    await getRepository(User).update({ username }, { isOnline: true });
+  }
+}
+
 describe('Points - all()', () => {
   before(async () => {
     await db.cleanup();
@@ -26,6 +33,10 @@ describe('Points - all()', () => {
   });
 
   describe('Points should be correctly given', () => {
+    it('set users online', async () => {
+      await setUsersOnline(['soge__', 'user1', 'user2']);
+    });
+
     it('!points get should return 0 for owner', async () => {
       await points.get({ sender: owner, parameters: '' });
       await message.isSent('points.defaults.pointsResponse', owner, {

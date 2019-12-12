@@ -64,21 +64,20 @@ class Expects {
 
   points (opts) {
     opts = opts || {}
-    _.defaults(opts, { optional: false, all: false })
+    _.defaults(opts, { optional: false, all: false, negative: false })
     if (!opts.optional) this.checkText()
 
     let regexp
-    if (opts.all) regexp = XRegExp('(?<points> all|[0-9]+ )', 'ix')
-    else regexp = XRegExp('(?<points> [0-9]+ )', 'ix')
+    if (opts.all) regexp = XRegExp('(?<points> all|-?[0-9]+ )', 'ix')
+    else regexp = XRegExp('(?<points> -?[0-9]+ )', 'ix')
     const match = XRegExp.exec(this.text, regexp)
-
     if (!_.isNil(match)) {
       if (match.points === 'all') {
         this.match.push(match.points)
       } else {
         this.match.push(parseInt(
           Number(match.points) <= Number.MAX_SAFE_INTEGER
-            ? match.points
+            ? (opts.negative ? match.points : Math.abs(match.points))
             : Number.MAX_SAFE_INTEGER, 10)) // return only max safe
       }
       this.text = this.text.replace(match.points, '') // remove from text matched pattern

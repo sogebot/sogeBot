@@ -16,7 +16,7 @@ const points = (require('../../../dest/systems/points')).default;
 const user1 = { username: 'user1', points: 100, userId: Number(_.random(999999, false)) };
 const user2 = { username: 'user2', points: 100, userId: Number(_.random(999999, false)) };
 
-describe('Points - get()', () => {
+describe('Points - give()', () => {
   describe('user1 will give 50 points to user2', () => {
     before(async () => {
       await db.cleanup();

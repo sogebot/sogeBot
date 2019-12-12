@@ -407,17 +407,55 @@ class Points extends System {
     }
   }
 
+  @command('!points online')
+  @default_permission(permission.CASTERS)
+  async online (opts: CommandOptions) {
+    try {
+      let points = new Expects(opts.parameters).points({ all: false, negative: true }).toArray()[0];
+
+      let message: string;
+      if (points >= 0) {
+        await getRepository(User).increment({}, 'points', points);
+        message = await prepare('points.success.online.positive', {
+          amount: points,
+          pointsName: await this.getPointsName(points),
+        });
+      } else {
+        points = Math.abs(points);
+        await this.decrement({}, points);
+        message = await prepare('points.success.online.negative', {
+          amount: -points,
+          pointsName: await this.getPointsName(points),
+        });
+      };
+
+      sendMessage(message, opts.sender, opts.attr);
+    } catch (err) {
+      sendMessage(translate('points.failed.online').replace('$command', opts.command), opts.sender, opts.attr);
+    }
+  }
+
   @command('!points all')
   @default_permission(permission.CASTERS)
   async all (opts: CommandOptions) {
     try {
-      const points = new Expects(opts.parameters).points({ all: false }).toArray()[0];
+      let points: number = new Expects(opts.parameters).points({ all: false, negative: true }).toArray()[0];
+      let message: string;
+      if (points >= 0) {
+        await getRepository(User).increment({}, 'points', points);
+        message = await prepare('points.success.all.positive', {
+          amount: points,
+          pointsName: await this.getPointsName(points),
+        });
+      } else {
+        points = Math.abs(points);
+        await this.decrement({}, points);
+        message = await prepare('points.success.all.negative', {
+          amount: -points,
+          pointsName: await this.getPointsName(points),
+        });
+      };
 
-      getRepository(User).increment({ isOnline: true }, 'points', points);
-      const message = await prepare('points.success.all', {
-        amount: points,
-        pointsName: await this.getPointsName(points),
-      });
       sendMessage(message, opts.sender, opts.attr);
     } catch (err) {
       sendMessage(translate('points.failed.all').replace('$command', opts.command), opts.sender, opts.attr);
