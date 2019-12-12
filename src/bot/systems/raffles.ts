@@ -383,8 +383,10 @@ class Raffles extends System {
         await points.decrement({ userId: opts.sender.userId }, tickets);
       }
       await getRepository(RaffleParticipant).save(participant);
+      return true;
+    } else {
+      return false;
     }
-    return true;
   }
 
   @command('!raffle pick')
