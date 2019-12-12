@@ -11,7 +11,7 @@
     loading(v-if="state.loading.requests !== $state.success")
     b-table(v-else striped small :items="requests" :fields="fields" @row-clicked="linkTo($event)").table-p-0
       template(v-slot:cell(thumbnail)="data")
-        img(v-bind:src="generateThumbnail(data.item.videoID)").float-left.pr-3
+        img(v-bind:src="generateThumbnail(data.item.videoId)").float-left.pr-3
 </template>
 
 <script lang="ts">
