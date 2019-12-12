@@ -6,7 +6,7 @@ if (Number(process.versions.node.split('.')[0]) < 11) {
 import 'reflect-metadata';
 import 'module-alias/register';
 
-import { error, info, warning } from './helpers/log';
+import { debug, error, info, warning } from './helpers/log';
 
 import { createConnection, getConnectionOptions } from 'typeorm';
 
@@ -23,6 +23,7 @@ import twitch from './twitch';
 
 const connect = async function () {
   const connectionOptions = await getConnectionOptions();
+  debug('connection', { connectionOptions });
   await createConnection({
     ...connectionOptions,
   });
