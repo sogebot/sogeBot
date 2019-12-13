@@ -51,7 +51,7 @@ class Gamble extends Game {
         throw Error(ERROR_MINIMAL_BET);
       }
 
-      await points.decrement({ userId: opts.sender.userId }, parseInt(points, 10));
+      await pointsSystem.decrement({ userId: opts.sender.userId }, parseInt(points, 10));
       if (_.random(0, 100, false) <= this.chanceToWin) {
         await getRepository(User).increment({ userId: opts.sender.userId }, 'points', parseInt(points, 10) * 2);
         const updatedPoints = await pointsSystem.getPointsOf(opts.sender.userId);
@@ -68,6 +68,7 @@ class Gamble extends Game {
         sendMessage(message, opts.sender, opts.attr);
       }
     } catch (e) {
+      console.log({e})
       switch (e.message) {
         case ERROR_ZERO_BET:
           message = await prepare('gambling.gamble.zeroBet', {
