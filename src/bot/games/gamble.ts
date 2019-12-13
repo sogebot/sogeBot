@@ -68,7 +68,6 @@ class Gamble extends Game {
         sendMessage(message, opts.sender, opts.attr);
       }
     } catch (e) {
-      console.log({e})
       switch (e.message) {
         case ERROR_ZERO_BET:
           message = await prepare('gambling.gamble.zeroBet', {
