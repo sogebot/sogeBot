@@ -230,6 +230,10 @@
     "*.ts": [
       "eslint --fix",
       "git add"
+    ],
+    "*.json": [
+      "jsonlint",
+      "git add"
     ]
   },
   "browser": {
