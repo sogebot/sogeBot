@@ -12,7 +12,6 @@ import { createConnection, getConnectionOptions } from 'typeorm';
 
 import figlet from 'figlet';
 import util from 'util';
-import path from 'path';
 import _ from 'lodash';
 import gitCommitInfo from 'git-commit-info';
 import { init as clusterInit, isMainThread } from './cluster';
@@ -29,15 +28,6 @@ const connect = async function () {
     ...connectionOptions,
     synchronize: false,
     migrationsRun: true,
-    entities: [
-      path.join(__dirname, 'database', 'entity/*.js'),
-    ],
-    migrations: [
-      path.join(__dirname, 'database', 'migration', connectionOptions.type, '*.js'),
-    ],
-    subscribers: [
-      path.join(__dirname, 'database', 'entity/*.js'),
-    ],
   });
 };
 
