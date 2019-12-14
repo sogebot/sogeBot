@@ -7,6 +7,15 @@
   "database": "sogebot",
   "logging": ["error"],
   "cache": true,
+  "entities": [
+    "dest/database/entity/*.js"
+  ],
+  "migrations": [
+    "dest/database/migration/postgres/*.js"
+  ],
+  "subscribers": [
+    "dest/database/entity/*.js"
+  ],
   "cli": {
     "entitiesDir": "src/bot/database/entity",
     "migrationsDir": "src/bot/database/migration/postgres",

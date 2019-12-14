@@ -3,6 +3,15 @@
   "database": "./sogebot.db",
   "logging": ["error"],
   "cache": true,
+  "entities": [
+    "dest/database/entity/*.js"
+  ],
+  "migrations": [
+    "dest/database/migration/sqlite/*.js"
+  ],
+  "subscribers": [
+    "dest/database/entity/*.js"
+  ],
   "cli": {
     "entitiesDir": "src/bot/database/entity/",
     "migrationsDir": "src/bot/database/migration/sqlite/",
