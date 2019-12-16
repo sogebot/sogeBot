@@ -129,7 +129,16 @@
 
               <table class="table table-sm ml-2 mr-2" v-if="viewer.bits.length !== 0">
                 <tr v-for="(bits, index) of viewer.bits" :key="bits.cheeredAt">
-                  <td scope="row">{{ moment(bits.cheeredAt).format('LLL') }}</td>
+                  <td scope="row">
+                    <datetime
+                      v-if="editingBitsIds.includes(index)"
+                      v-model="bits.cheeredAt"
+                      :config="dateTimePickerConfigBitsTips"
+                      class="form-control w-auto"/>
+                    <template v-else>
+                      {{ moment(bits.cheeredAt).format('LLL') }}
+                    </template>
+                  </td>
                   <td>
                     <input type="number" min="0" v-model="bits.amount" v-if="editingBitsIds.includes(index)" class="form-control">
                     <strong v-else>{{ Number(bits.amount) }}</strong>
@@ -171,7 +180,16 @@
 
               <table class="table table-sm ml-2 mr-2" v-if="viewer.tips.length !== 0">
                 <tr v-for="(tips, index) of viewer.tips" :key="tips.tippedAt">
-                  <td scope="row">{{ moment(tips.tippedAt).format('LLL') }}</td>
+                  <td scope="row">
+                    <datetime
+                      v-if="editingTipsIds.includes(index)"
+                      v-model="tips.tippedAt"
+                      :config="dateTimePickerConfigBitsTips"
+                      class="form-control w-auto"/>
+                    <template v-else>
+                      {{ moment(tips.tippedAt).format('LLL') }}
+                    </template>
+                  </td>
                   <td>
                     <div class="d-flex">
                       <template v-if="editingTipsIds.includes(index)">
@@ -322,6 +340,12 @@ export default class viewersEdit extends Vue {
     maxDate: Date.now()
   }
 
+  dateTimePickerConfigBitsTips = {
+    defaultDate: Date.now(),
+    enableTime: true,
+    enableSeconds: true,
+  }
+
   state: {
     loading: number;
     save: number;
@@ -392,6 +416,27 @@ export default class viewersEdit extends Vue {
 
   @Watch('viewer', { deep: true })
   setPending() { this.state.pending = true; }
+
+  @Watch('viewer.bits', { deep: true })
+  _watchBits(val, old) {
+    if (this.viewer) {
+      this.state.pending = true;
+      for (const v of val) {
+        v.cheeredAt = (new Date(v.cheeredAt)).getTime()
+      }
+    }
+  }
+
+  @Watch('viewer.tips', { deep: true })
+  _watchTips(val, old) {
+    if (this.viewer) {
+      this.state.pending = true;
+      for (const v of val) {
+        console.log({v})
+        v.tippedAt = (new Date(v.tippedAt)).getTime()
+      }
+    }
+  }
 
   @Watch('viewer.followedAt')
   _watchTimeFollow(val, old) {
