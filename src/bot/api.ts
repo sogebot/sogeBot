@@ -6,6 +6,7 @@ require('moment-precise-range-plugin'); // moment.preciseDiff
 import { isMainThread } from './cluster';
 import chalk from 'chalk';
 import { defaults, filter, get, isNil, isNull, map } from 'lodash';
+import path from 'path';
 
 import * as constants from './constants';
 import Core from './_interface';
@@ -1139,11 +1140,9 @@ class API extends Core {
             justStarted = true;
 
             for (const event of getFunctionList('streamStart')) {
-              if (typeof this[event.fName] === 'function') {
-                this[event.fName]();
-              } else {
-                throw new Error(`!!! Event ${event.path} don't have function ${event.fName} !!!`);
-              }
+              const pathToModule = path.join(__dirname, ...event.path.split('.'));
+              const self = (require(pathToModule)).default;
+              self[event.fName]();
             }
           }
         }
@@ -1200,7 +1199,9 @@ class API extends Core {
             events.fire('number-of-viewers-is-at-least-x', { reset: true });
 
             for (const event of getFunctionList('streamEnd')) {
-              this[event.fName]();
+              const pathToModule = path.join(__dirname, ...event.path.split('.'));
+              const self = (require(pathToModule)).default;
+              self[event.fName]();
             }
 
             this.streamId = null;
