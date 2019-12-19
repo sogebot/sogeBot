@@ -163,15 +163,6 @@ const connect = async function () {
     ...connectionOptions,
     synchronize: false,
     migrationsRun: true,
-    entities: [
-      path.join(__dirname, '..', 'dest', 'database', 'entity/*.js'),
-    ],
-    migrations: [
-      path.join(__dirname, '..', 'dest', 'database', 'migration', connectionOptions.type, '*.js'),
-    ],
-    subscribers: [
-      path.join(__dirname, '..', 'dest', 'database', 'entity/*.js')
-    ],
   });
 };
 async function main() {
