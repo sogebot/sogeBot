@@ -105,11 +105,11 @@ export class initialize1573837107520 implements MigrationInterface {
     await queryRunner.query('ALTER TABLE `user_bit` ADD CONSTRAINT `FK_cca96526faa532e7d20a0f775b0` FOREIGN KEY (`userUserId`) REFERENCES `user`(`userId`) ON DELETE CASCADE ON UPDATE CASCADE', undefined);
     await queryRunner.query('ALTER TABLE `variable_history` ADD CONSTRAINT `FK_94d39c77652e9c332751a0cee02` FOREIGN KEY (`variableId`) REFERENCES `variable`(`id`) ON DELETE CASCADE ON UPDATE CASCADE', undefined);
     await queryRunner.query('ALTER TABLE `variable_url` ADD CONSTRAINT `FK_806e97dff1efce7f8872b6d4500` FOREIGN KEY (`variableId`) REFERENCES `variable`(`id`) ON DELETE CASCADE ON UPDATE CASCADE', undefined);
-    await queryRunner.query('CREATE TABLE `sogebot`.`query-result-cache` (`id` int NOT NULL AUTO_INCREMENT, `identifier` varchar(255) NULL, `time` bigint NOT NULL, `duration` int NOT NULL, `query` text NOT NULL, `result` text NOT NULL, PRIMARY KEY (`id`)) ENGINE=InnoDB', undefined);
+    await queryRunner.query('CREATE TABLE `query-result-cache` (`id` int NOT NULL AUTO_INCREMENT, `identifier` varchar(255) NULL, `time` bigint NOT NULL, `duration` int NOT NULL, `query` text NOT NULL, `result` text NOT NULL, PRIMARY KEY (`id`)) ENGINE=InnoDB', undefined);
   }
 
   public async down(queryRunner: QueryRunner): Promise<any> {
-    await queryRunner.query('DROP TABLE `sogebot`.`query-result-cache`', undefined);
+    await queryRunner.query('DROP TABLE `query-result-cache`', undefined);
     await queryRunner.query('ALTER TABLE `variable_url` DROP FOREIGN KEY `FK_806e97dff1efce7f8872b6d4500`', undefined);
     await queryRunner.query('ALTER TABLE `variable_history` DROP FOREIGN KEY `FK_94d39c77652e9c332751a0cee02`', undefined);
     await queryRunner.query('ALTER TABLE `user_bit` DROP FOREIGN KEY `FK_cca96526faa532e7d20a0f775b0`', undefined);
