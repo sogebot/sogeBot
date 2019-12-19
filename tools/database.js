@@ -816,6 +816,7 @@ async function main() {
   items.map(o => {
     o.external = o.external || [];
     o.css = o.css || '';
+    o.js = o.js || '';
     return o;
   });
   if (items.length > 0) {
