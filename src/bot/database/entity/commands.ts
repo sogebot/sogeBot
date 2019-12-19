@@ -29,7 +29,7 @@ export class CommandsResponses {
   command!: Commands;
   @Column()
   order!: number;
-  @Column()
+  @Column('text')
   response!: string;
   @Column()
   stopIfExecuted!: boolean;
