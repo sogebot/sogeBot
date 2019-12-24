@@ -172,7 +172,7 @@ class CustomCommands extends System {
       }
 
       const new_response = new CommandsResponses();
-      new_response.order = cDb.responses?.length ?? 0;
+      new_response.order = cDb.responses.length;
       new_response.permission = pItem.id;
       new_response.stopIfExecuted = stopIfExecuted;
       new_response.response = response;
