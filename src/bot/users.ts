@@ -289,7 +289,6 @@ class Users extends Core {
     });
     viewerEndpoint(this.nsp, 'viewers::findOne', async (userId, cb) => {
       const viewer = await getRepository(User).findOne({
-        relations: ['tips', 'bits'],
         where: { userId },
       });
 

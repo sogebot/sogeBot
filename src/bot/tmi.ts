@@ -631,7 +631,7 @@ class TMI extends Core {
       });
       cheer(`${username}#${userId}, bits: ${userstate.bits}, message: ${messageFromUser}`);
 
-      let user = await getRepository(User).findOne({ relations: ['bits'], where: { userId: userId }});
+      let user = await getRepository(User).findOne({ where: { userId: userId }});
       if (!user) {
         // if we still doesn't have user, we create new
         user = new User();
