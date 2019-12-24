@@ -19,7 +19,6 @@ import { init as clusterInit, isMainThread } from './cluster';
 import { changelog } from './changelog';
 import { autoLoad } from './commons';
 import chalk from 'chalk';
-import twitch from './twitch';
 
 const connect = async function () {
   const connectionOptions = await getConnectionOptions();
@@ -107,7 +106,3 @@ process.on('uncaughtException', (err) => {
   error('+------------------------------------------------------------------------------+');
   process.exit(1);
 });
-
-setInterval(() => {
-  twitch.uptime({});
-}, 10000);

@@ -209,11 +209,10 @@ class UserInfo extends System {
   }
 
   @command('!me')
-  protected async showMe(opts: CommandOptions) {
+  async showMe(opts: CommandOptions) {
     try {
       const message: (string | null)[] = [];
       const user = await getRepository(User).findOne({
-        relations: ['bits', 'tips'],
         where: {
           userId: opts.sender.userId,
         },
