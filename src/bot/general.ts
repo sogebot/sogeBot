@@ -64,30 +64,32 @@ class General extends Core {
     const lang = this.lang;
     const mute = tmi.mute;
 
-    const enabledSystems: any = {};
+    const enabledSystems: {
+      systems: string[];
+      games: string[];
+      integrations: string[];
+    } = {
+      systems: [], games: [], integrations: [],
+    };
     for (const category of ['systems', 'games', 'integrations']) {
-      enabledSystems[category] = enabledSystems[category] ?? [];
+      for (let system of glob.sync(__dirname + '/' + category + '/*')) {
+        system = system.split('/' + category + '/')[1].replace('.js', '');
+        if (system.startsWith('_')) {
+          continue;
+        }
+        const self = (require('./' + category + '/' + system.toLowerCase())).default;
+        const enabled = self.enabled;
+        const areDependenciesEnabled = self.areDependenciesEnabled;
+        const isDisabledByEnv = !isNil(process.env.DISABLE) && (process.env.DISABLE.toLowerCase().split(',').includes(system.toLowerCase()) || process.env.DISABLE === '*');
 
-      for (const category of ['systems', 'games', 'integrations']) {
-        for (let system of glob.sync(__dirname + '/' + category + '/*')) {
-          system = system.split('/' + category + '/')[1].replace('.js', '');
-          if (system.startsWith('_')) {
-            continue;
-          }
-          const self = (require('./' + category + '/' + system.toLowerCase())).default;
-          const enabled = self.enabled;
-          const areDependenciesEnabled = self.areDependenciesEnabled;
-          const isDisabledByEnv = !isNil(process.env.DISABLE) && (process.env.DISABLE.toLowerCase().split(',').includes(system.toLowerCase()) || process.env.DISABLE === '*');
-
-          if (!enabled) {
-            enabledSystems[category].push('-' + system);
-          } else if (!areDependenciesEnabled) {
-            enabledSystems[category].push('-dep-' + system);
-          } else if (isDisabledByEnv) {
-            enabledSystems[category].push('-env-' + system);
-          } else {
-            enabledSystems[category].push(system);
-          }
+        if (!enabled) {
+          enabledSystems[category].push('-' + system);
+        } else if (!areDependenciesEnabled) {
+          enabledSystems[category].push('-dep-' + system);
+        } else if (isDisabledByEnv) {
+          enabledSystems[category].push('-env-' + system);
+        } else {
+          enabledSystems[category].push(system);
         }
       }
     }
