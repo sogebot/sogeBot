@@ -48,10 +48,12 @@ class CustomCommands extends System {
       await resetCountOfCommandUsage(command);
       cb(null);
     });
-    adminEndpoint(this.nsp, 'commands::setById', async (id, dataset: Commands, cb) => {
+    adminEndpoint(this.nsp, 'commands::setById', async (id, dataset: Commands, cb: Function | SocketIOClient.Socket) => {
       const item = await getRepository(Commands).findOne({ id }) || new Commands();
       await getRepository(Commands).save({ ...item, ...dataset});
-      cb(null, item);
+      if (typeof cb === 'function') {
+        cb(null, item);
+      }
     });
     adminEndpoint(this.nsp, 'commands::deleteById', async (id, cb) => {
       await getRepository(Commands).delete({ id });
