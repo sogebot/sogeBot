@@ -54,16 +54,16 @@ export const VariableWatcher = {
         }
 
         if (isMainThread && self) {
-          const setting = await getRepository(Settings).findOne({
+          const savedSetting = await getRepository(Settings).findOne({
             where: {
               name: variable,
               namespace: self.nsp,
             },
-          }) || new Settings();
-          setting.name = variable;
-          setting.value =  JSON.stringify(value);
-          setting.namespace = self.nsp;
-          await getRepository(Settings).save(setting);
+          });
+          await getRepository(Settings).save({
+            ...savedSetting,
+            value: JSON.stringify(value),
+          });
 
           const path = type === 'core' ? `${name}.${variable}` : `${type}.${name}.${variable}`;
           change(path);
