@@ -77,20 +77,12 @@ class Module {
           value: JSON.stringify(value),
         },
       }).then(data => {
-        if (!data) {
-          getRepository(Settings).save({
-            name: 'enabled',
-            value: JSON.stringify(value),
-            namespace: this.nsp,
-          });
-        } else {
-          getRepository(Settings).save({
-            ...data,
-            name: 'enabled',
-            value: JSON.stringify(value),
-            namespace: this.nsp,
-          });
-        }
+        getRepository(Settings).save({
+          ...data,
+          name: 'enabled',
+          value: JSON.stringify(value),
+          namespace: this.nsp,
+        });
       });
     }
   }
