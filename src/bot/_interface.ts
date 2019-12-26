@@ -664,6 +664,8 @@ class Module {
         });
         await getRepository(Settings).save({
           ...savedCommand,
+          namespace: this.nsp,
+          name: 'commands.' + command,
           value: JSON.stringify(updated),
         });
       }
