@@ -3,7 +3,7 @@ import { parse, sep as separator } from 'path';
 import { VariableWatcher } from './watchers';
 import { debug, error } from './helpers/log';
 import { isMainThread } from './cluster';
-import { getManager } from 'typeorm';
+import { getRepository } from 'typeorm';
 import { Settings } from './database/entity/settings';
 import { isDbConnected } from './helpers/database';
 
@@ -315,10 +315,9 @@ async function registerCommand(opts: string | Command, m) {
     self.settingsList.push({ category: 'commands', key: c.name });
 
     // load command from db
-    const dbc = await getManager()
-      .createQueryBuilder()
+    const dbc = await getRepository(Settings)
+      .createQueryBuilder('settings')
       .select('settings')
-      .from(Settings, 'settings')
       .where('namespace = :namespace', { namespace: self.nsp })
       .andWhere('name = :name', { name: 'commands.' + c.name })
       .getOne();
@@ -326,10 +325,9 @@ async function registerCommand(opts: string | Command, m) {
       dbc.value = JSON.parse(dbc.value);
       if (c.name === dbc.value) {
         // remove if default value
-        await getManager()
-          .createQueryBuilder()
+        await getRepository(Settings)
+          .createQueryBuilder('settings')
           .delete()
-          .from(Settings)
           .where('namespace = :namespace', { namespace: self.nsp })
           .andWhere('name = :name', { name: 'commands.' + c.name })
           .execute();

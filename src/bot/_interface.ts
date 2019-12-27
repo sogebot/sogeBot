@@ -8,7 +8,7 @@ import { getFunctionList } from './decorators/on';
 import { permission } from './helpers/permissions';
 import { error, info, warning } from './helpers/log';
 
-import { getManager, getRepository } from 'typeorm';
+import { getRepository } from 'typeorm';
 import { Settings } from './database/entity/settings';
 import { PermissionCommands, Permissions as PermissionsEntity } from './database/entity/permissions';
 import { adminEndpoint, publicEndpoint } from './helpers/socket';
@@ -77,11 +77,12 @@ class Module {
           value: JSON.stringify(value),
         },
       }).then(data => {
-        data = data || new Settings();
-        data.namespace = this.nsp;
-        data.name = 'enabled';
-        data.value = JSON.stringify(value);
-        getRepository(Settings).save(data);
+        getRepository(Settings).save({
+          ...data,
+          name: 'enabled',
+          value: JSON.stringify(value),
+          namespace: this.nsp,
+        });
       });
     }
   }
@@ -152,12 +153,11 @@ class Module {
   }
 
   public async loadVariableValue(key) {
-    const variable = await getManager()
-      .createQueryBuilder()
+    const variable = await getRepository(Settings)
+      .createQueryBuilder('settings')
       .select('settings')
       .where('namespace=:namespace', { namespace: this.nsp })
       .andWhere('name=:name', { name: key })
-      .from(Settings, 'settings')
       .getOne();
 
     if (typeof this.on !== 'undefined' && typeof this.on.load !== 'undefined') {
@@ -621,12 +621,11 @@ class Module {
   }
 
   protected async loadCommand(command: string): Promise<void> {
-    const cmd = await getManager()
-      .createQueryBuilder()
+    const cmd = await getRepository(Settings)
+      .createQueryBuilder('settings')
       .select('settings')
       .where('namespace = :namespace', { namespace: this.nsp })
       .andWhere('name = :name', { name: 'commands.' + command })
-      .from(Settings, 'settings')
       .getOne();
 
     if (cmd) {
@@ -657,15 +656,18 @@ class Module {
         delete c.command;
       } else {
         c.command = updated;
-        const dbCommand = await getRepository(Settings).findOne({
+        const savedCommand = await getRepository(Settings).findOne({
           where: {
             namespace: this.nsp,
             name: 'commands.' + command,
           },
-        }) || new Settings();
-        dbCommand.namespace = this.nsp;
-        dbCommand.name = 'commands.' + command;
-        dbCommand.value = JSON.stringify(updated);
+        });
+        await getRepository(Settings).save({
+          ...savedCommand,
+          namespace: this.nsp,
+          name: 'commands.' + command,
+          value: JSON.stringify(updated),
+        });
       }
     } else {
       warning(`Command ${command} cannot be updated to ${updated}`);

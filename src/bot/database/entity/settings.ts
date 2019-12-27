@@ -1,18 +1,37 @@
-import { Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
+import { EntitySchema } from 'typeorm';
 
-@Entity()
-export class Settings {
-  @PrimaryGeneratedColumn()
-  id!: number;
-
-  @Column()
-  @Index()
-  namespace!: string;
-
-  @Column()
-  @Index()
-  name!: string;
-
-  @Column('text')
-  value!: string;
+export interface SettingsInterface {
+  id: number;
+  namespace: string;
+  name: string;
+  value: string;
 }
+
+export const Settings = new EntitySchema<SettingsInterface>({
+  name: 'settings',
+  columns: {
+    id: {
+      type: Number,
+      primary: true,
+      generated: true,
+    },
+    namespace: {
+      type: String,
+    },
+    name: {
+      type: String,
+    },
+    value: {
+      type: 'text',
+    },
+  },
+  indices: [
+    {
+      name: 'IDX_d8a83b9ffce680092c8dfee37d',
+      columns: [ 'namespace' ],
+    }, {
+      name: 'IDX_ca7857276d2a30f4dcfa0e42cd',
+      columns: [ 'name' ],
+    },
+  ],
+});

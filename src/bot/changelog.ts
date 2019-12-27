@@ -5,7 +5,7 @@
 
 import uuid from 'uuid/v4';
 
-import { getManager, getRepository, LessThan, MoreThan, Not } from 'typeorm';
+import { getRepository, LessThan, MoreThan, Not } from 'typeorm';
 import { Settings } from './database/entity/settings';
 import { Changelog } from './database/entity/changelog';
 
@@ -35,7 +35,7 @@ export const changelog = async () => {
     }
 
     const variableFromDb
-     = await getManager().createQueryBuilder().select('settings').from(Settings, 'settings')
+     = await getRepository(Settings).createQueryBuilder('settings').select('settings')
        .where('namespace = :namespace', { namespace: self.nsp })
        .andWhere('name = :name', { name: variable })
        .getOne();
