@@ -62,6 +62,8 @@ export const VariableWatcher = {
           });
           await getRepository(Settings).save({
             ...savedSetting,
+            name: variable,
+            namespace: self.nsp,
             value: JSON.stringify(value),
           });
 
