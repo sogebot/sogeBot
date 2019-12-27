@@ -79,12 +79,12 @@ class Socket extends Core {
       socket.emit('authorize', async (cb: { token: string; type: 'socket' | 'access' }) => {
         if (cb.type === 'socket') {
           // check if we have global socket
-          if (cb.token === this.socketToken) {
+          if (cb.token === _self.socketToken) {
             haveAdminPrivileges = Authorized.Authorized;
             haveViewerPrivileges = Authorized.Authorized;
             sendAuthorized(socket, {
               type: 'admin',
-              accessToken: this.socketToken,
+              accessToken: _self.socketToken,
               refreshToken: '',
               accessTokenTimestamp: 0,
               refreshTokenTimestamp: 0,
