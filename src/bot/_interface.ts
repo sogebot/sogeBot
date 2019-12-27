@@ -160,16 +160,9 @@ class Module {
       .andWhere('name=:name', { name: key })
       .getOne();
 
-    if (typeof this.on !== 'undefined' && typeof this.on.load !== 'undefined') {
-      if (this.on.load[key]) {
-        for (const fnc of this.on.load[key]) {
-          if (typeof this[fnc] === 'function') {
-            this[fnc](key, _.get(this, key));
-          } else {
-            error(`${fnc}() is not function in ${this._name}/${this.constructor.name.toLowerCase()}`);
-          }
-        }
-      }
+    const path = this._name === 'core' ? this.constructor.name.toLowerCase() : `${this._name}.${this.constructor.name.toLowerCase()}`;
+    for (const event of getFunctionList('load', `${path}.${key}` )) {
+      this[event.fName]();
     }
 
     try {
