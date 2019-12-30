@@ -12,7 +12,7 @@ import { adminEndpoint } from '../helpers/socket';
 import { getRepository } from 'typeorm';
 import { User } from '../database/entity/user';
 import { Raffle, RaffleParticipant, RaffleParticipantMessage } from '../database/entity/raffle';
-import { warning } from '../helpers/log';
+import { debug, warning } from '../helpers/log';
 import api from '../api';
 import oauth from '../oauth';
 import points from './points';
@@ -382,6 +382,12 @@ class Raffles extends System {
       if (raffle.type === TYPE_TICKETS) {
         await points.decrement({ userId: opts.sender.userId }, tickets);
       }
+      debug('raffle', '------------------------------------------------------------------------------------------------');
+      debug('raffle', `Eligible user ${opts.sender.username}#${opts.sender.userId} for raffle ${raffle.id}`);
+      debug('raffle', opts.sender);
+      debug('raffle', participant);
+      debug('raffle', user);
+      debug('raffle', '------------------------------------------------------------------------------------------------');
       await getRepository(RaffleParticipant).save(participant);
       return true;
     } else {
