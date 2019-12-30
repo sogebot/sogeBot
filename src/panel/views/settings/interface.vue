@@ -19,26 +19,27 @@
               <template v-for="(currentValue, defaultValue) of value">
                 <div v-if="typeof value === 'object' && !defaultValue.startsWith('_')" class="p-0 pl-2 pr-2 " :key="$route.params.type + '.' + $route.params.id + '.settings.' + defaultValue">
                   <template v-if="typeof ui[category] !== 'undefined' && typeof ui[category][defaultValue] !== 'undefined'">
-                    <sortable-list
-                      v-if="ui[category][defaultValue].type === 'sortable-list'"
-                      :values="value[ui[category][defaultValue].values]"
-                      :toggle="value[ui[category][defaultValue].toggle]"
-                      :toggleonicon="ui[category][defaultValue].toggleOnIcon"
-                      :toggleofficon="ui[category][defaultValue].toggleOffIcon"
-                      :title="$route.params.type + '.' + $route.params.id + '.settings.' + defaultValue"
-                      @update="value[ui[category][defaultValue].toggle] = $event.toggle; value[defaultValue] = $event.value; triggerDataChange()"
-                      class="pt-1 pb-1"></sortable-list>
-                    <highlights-url-generator
-                      v-else-if="ui[category][defaultValue].type === 'highlights-url-generator'"
-                      :values="currentValue"
-                      :title="$route.params.type + '.' + $route.params.id + '.settings.' + defaultValue"
-                      v-on:update="value[defaultValue] = $event; triggerDataChange()"
-                    />
-                    <a v-else-if="ui[category][defaultValue].type === 'link'" :href="ui[category][defaultValue].href" class="mt-1 mb-1" :class="ui[category][defaultValue].class" :target="ui[category][defaultValue].target">
-                      <template v-if="ui[category][defaultValue].rawText">{{ ui[category][defaultValue].rawText }}</template>
-                      <template v-else>{{ translate(ui[category][defaultValue].text) }}</template>
-                    </a>
-                    <component
+                    <template v-if="ui[category][defaultValue].showIf ? showIfCheck(ui[category][defaultValue].showIf) : true">
+                      <sortable-list
+                        v-if="ui[category][defaultValue].type === 'sortable-list'"
+                        :values="value[ui[category][defaultValue].values]"
+                        :toggle="value[ui[category][defaultValue].toggle]"
+                        :toggleonicon="ui[category][defaultValue].toggleOnIcon"
+                        :toggleofficon="ui[category][defaultValue].toggleOffIcon"
+                        :title="$route.params.type + '.' + $route.params.id + '.settings.' + defaultValue"
+                        @update="value[ui[category][defaultValue].toggle] = $event.toggle; value[defaultValue] = $event.value; triggerDataChange()"
+                        class="pt-1 pb-1"></sortable-list>
+                      <highlights-url-generator
+                        v-else-if="ui[category][defaultValue].type === 'highlights-url-generator'"
+                        :values="currentValue"
+                        :title="$route.params.type + '.' + $route.params.id + '.settings.' + defaultValue"
+                        v-on:update="value[defaultValue] = $event; triggerDataChange()"
+                      />
+                      <a v-else-if="ui[category][defaultValue].type === 'link'" :href="ui[category][defaultValue].href" class="mt-1 mb-1" :class="ui[category][defaultValue].class" :target="ui[category][defaultValue].target">
+                        <template v-if="ui[category][defaultValue].rawText">{{ ui[category][defaultValue].rawText }}</template>
+                        <template v-else>{{ translate(ui[category][defaultValue].text) }}</template>
+                      </a>
+                      <component
                       v-else
                       :is="ui[category][defaultValue].type"
                       :readonly="ui[category][defaultValue].readOnly"
@@ -54,6 +55,7 @@
                       :title="$route.params.type + '.' + $route.params.id + '.settings.' + defaultValue"
                       :current="value[ui[category][defaultValue].current]"
                       class="pt-1 pb-1"></component>
+                    </template>
                   </template>
                   <template v-else>
                     <command-input-with-permission
@@ -368,6 +370,23 @@ export default class interfaceSettings extends Vue {
         'border-left-width': '5px !important',
         'border-color': 'transparent'
       }
+  }
+
+  showIfCheck(toCheck) {
+    let shouldBeShown = true;
+    const flattenSettings = flatten(this.settings);
+    for (const [key, value] of Object.entries(toCheck)) {
+      const settingsKey = Object.keys(flattenSettings).find((flattenKey) => {
+        return flattenKey.includes(key)
+      })
+      if (settingsKey) {
+        if (flattenSettings[settingsKey] !== value) {
+          shouldBeShown = false;
+          break;
+        }
+      }
+    }
+    return shouldBeShown;
   }
 
   setSelected(system) {

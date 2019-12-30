@@ -38,6 +38,30 @@ class OAuth extends Core {
   @settings('general')
   public generalOwners: string[] = [];
 
+  @settings('general')
+  @ui({ type: 'selector', values: ['simple', 'advanced'] })
+  settingsType = 'simple';
+
+  @settings('general')
+  @ui({
+    type: 'text-input',
+    secret: true,
+    showIf: {
+      settingsType: 'advanced',
+    },
+  })
+  manualClientId = '';
+
+  @settings('general')
+  @ui({
+    type: 'text-input',
+    secret: true,
+    showIf: {
+      settingsType: 'advanced',
+    },
+  })
+  manualClientSecret = '';
+
   @settings('broadcaster')
   @ui({ type: 'text-input', secret: true })
   public broadcasterAccessToken = '';
@@ -324,4 +348,5 @@ class OAuth extends Core {
   }
 }
 
-export default new OAuth();
+const _class = new OAuth();
+export default _class;
