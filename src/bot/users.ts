@@ -258,6 +258,7 @@ class Users extends Core {
       for (const viewer of viewers) {
         // recount sumTips to bot currency
         viewer.sumTips = await currency.exchange(viewer.sumTips, 'EUR', currency.mainCurrency);
+
       }
 
       cb(viewers, count, opts.state);
