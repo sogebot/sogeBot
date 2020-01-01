@@ -10,8 +10,13 @@ import { isMainThread } from './cluster';
 import * as constants from './constants';
 import { settings, shared, ui } from './decorators';
 import { error, info, warning } from './helpers/log';
+import { getRepository } from 'typeorm';
+import { UserTip } from './database/entity/user';
+import { onLoad } from './decorators/on';
 
 class Currency extends Core {
+  mainCurrencyLoaded = false;
+
   @settings('currency')
   @ui({
     type: 'selector',
@@ -66,6 +71,11 @@ class Currency extends Core {
     }
   }
 
+  @onLoad('mainCurrency')
+  setMainCurrencyLoaded() {
+    this.mainCurrencyLoaded = true;
+  }
+
   public async updateRates() {
     clearTimeout(this.timeouts.updateRates);
 
@@ -84,6 +94,20 @@ class Currency extends Core {
         this.rates[code] = Number((rate.replace(',', '.') / count).toFixed(3));
       }
       info(chalk.yellow('CURRENCY:') + ' fetched rates');
+
+      await new Promise((resolve) => {
+        const wait = () => {
+          if (this.mainCurrencyLoaded) {
+            resolve();
+          } else {
+            setTimeout(() => wait(), 10);
+          }
+        };
+        wait();
+      });
+      for (const tip of await getRepository(UserTip).find({ where: { currency: this.mainCurrency }})) {
+        getRepository(UserTip).update({ id: tip.id }, { sortAmount: this.exchange(Number(tip.amount), tip.currency, 'EUR') });
+      }
     } catch (e) {
       error(e.stack);
       refresh = constants.SECOND;
