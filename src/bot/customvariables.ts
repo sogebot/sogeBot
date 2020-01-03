@@ -445,7 +445,7 @@ class CustomVariables {
     }
     return { updated: {
       ...item,
-      currentValue: isEval ? setValue : '', // be silent if parsed correctly
+      currentValue: isOk && !isEval ? '' : setValue, // be silent if parsed correctly eval
     }, setValue, isOk, isEval };
   }
 
