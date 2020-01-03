@@ -76,13 +76,11 @@ export const Variable = new EntitySchema<Required<VariableInterface>>({
     history: {
       type: 'one-to-many',
       target: 'variable_history',
-      cascade: true,
       inverseSide: 'variable',
     },
     urls: {
       type: 'one-to-many',
       target: 'variable_url',
-      cascade: true,
       inverseSide: 'variable',
     },
   },
@@ -127,6 +125,8 @@ export const VariableHistory = new EntitySchema<VariableHistoryInterface>({
       type: 'many-to-one',
       target: 'variable',
       inverseSide: 'history',
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
     },
   },
 });
@@ -161,6 +161,8 @@ export const VariableURL = new EntitySchema<VariableURLInterface>({
       type: 'many-to-one',
       target: 'variable',
       inverseSide: 'urls',
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
     },
   },
 });
