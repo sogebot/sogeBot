@@ -3,7 +3,7 @@
 import Widget from './_interface';
 import { adminEndpoint } from '../helpers/socket';
 import { getRepository } from 'typeorm';
-import { Variable, VariableWatch } from '../database/entity/variable';
+import { Variable, VariableWatch, VariableWatchInterface } from '../database/entity/variable';
 import customvariables from '../customvariables';
 
 class CustomVariables extends Widget {
@@ -20,7 +20,7 @@ class CustomVariables extends Widget {
   }
 
   public sockets() {
-    adminEndpoint(this.nsp, 'watched::save', async (items: VariableWatch[], cb) => {
+    adminEndpoint(this.nsp, 'watched::save', async (items: VariableWatchInterface[], cb) => {
       await getRepository(VariableWatch).delete({});
       const variables = await getRepository(VariableWatch).save(items);
       cb(null, variables);

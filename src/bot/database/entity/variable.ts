@@ -1,97 +1,189 @@
-import { Column, Entity, ManyToOne,OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { EntitySchema } from 'typeorm';
 import { ColumnNumericTransformer } from './_transformer';
 
-@Entity()
-export class Variable {
-  @PrimaryGeneratedColumn('uuid')
-  id!: string;
-  @OneToMany(() => VariableHistory, (v) => v.variable, {
-    cascade: true,
-  })
-  history!: VariableHistory[];
-  @OneToMany(() => VariableURL, (v) => v.variable, {
-    cascade: true,
-  })
-  urls!: VariableURL[];
+export interface VariableInterface {
+  id?: string;
+  history?: VariableHistoryInterface[];
+  urls?: VariableURLInterface[];
+  variableName: string; description?: string; type: 'eval' | 'number' | 'options' | 'text';
+  currentValue: string; evalValue: string; runEveryTypeValue?: number;
+  runEveryType?: 'isUsed' | string; runEvery?: number; responseType: number; responseText?: string;
+  permission: string; readOnly?: boolean; usableOptions: string[]; runAt?: number;
 
-  @Column()
-  variableName!: string;
-  @Column({ default: '' })
-  description!: string;
-  @Column()
-  type!: 'eval' | 'number' | 'options' | 'text';
-  @Column({ nullable: true })
-  currentValue!: string;
-  @Column('text')
-  evalValue!: string;
-  @Column({ default: 60000 })
-  runEveryTypeValue!: number;
-  @Column({ default: 'isUsed' })
-  runEveryType!: string;
-  @Column({ default: 60000 })
-  runEvery!: number;
-  @Column()
-  responseType!: number;
-  @Column({ default: '' })
-  responseText!: string;
-  @Column()
-  permission!: string;
-  @Column({ default: false })
-  readOnly!: boolean;
-  @Column('simple-array')
-  usableOptions!: string[];
-  @Column('bigint', { transformer: new ColumnNumericTransformer(), default: 0 })
-  runAt!: number;
-};
-
-@Entity()
-export class VariableHistory {
-  @PrimaryGeneratedColumn()
-  id!: number;
-  @ManyToOne(() => Variable, (variable) => variable.history, {
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
-  })
-  variable!: Variable;
-
-  @Column({ default: 0 })
-  userId!: number;
-  @Column({ default: 'n/a' })
-  username!: string;
-  @Column()
-  currentValue!: string;
-  @Column('simple-json')
-  oldValue!: any;
-  @Column('bigint', { transformer: new ColumnNumericTransformer(), default: 0 })
-  changedAt!: number;
 }
 
-@Entity()
-export class VariableURL {
-  @PrimaryGeneratedColumn('uuid')
-  id!: string;
-  @ManyToOne(() => Variable, (variable) => variable.urls, {
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
-  })
-  variable!: Variable;
+export const Variable = new EntitySchema<Readonly<Required<VariableInterface>>>({
+  name: 'variable',
+  columns: {
+    id: {
+      type: 'uuid',
+      primary: true,
+      generated: 'uuid',
+    },
+    variableName: {
+      type: String,
+    },
+    description: {
+      type: String,
+      default: '',
+    },
+    type: {
+      type: String,
+    },
+    currentValue: {
+      type: String,
+      nullable: true,
+    },
+    evalValue: {
+      type: 'text',
+    },
+    runEveryTypeValue: {
+      type: Number,
+      default: 60000,
+    },
+    runEveryType: {
+      type: String,
+      default: 'isUsed',
+    },
+    runEvery: {
+      type: Number,
+      default: 60000,
+    },
+    responseType: {
+      type: Number,
+    },
+    responseText: {
+      type: String,
+      default: '',
+    },
+    permission: {
+      type: String,
+    },
+    readOnly: {
+      type: Boolean,
+      default: false,
+    },
+    usableOptions: {
+      type: 'simple-array',
+    },
+    runAt: {
+      type: 'bigint',
+      transformer: new ColumnNumericTransformer(),
+      default: 0,
+    },
+  },
+  relations: {
+    history: {
+      type: 'one-to-many',
+      target: 'variable_history',
+      inverseSide: 'variable',
+    },
+    urls: {
+      type: 'one-to-many',
+      target: 'variable_url',
+      inverseSide: 'variable',
+    },
+  },
+});
 
-  @Column({ default: false })
-  GET!: boolean;
-  @Column({ default: false })
-  POST!: boolean;
-  @Column({ default: false })
-  showResponse!: boolean;
+export interface VariableHistoryInterface {
+  id?: string; variable?: VariableInterface;
+  userId: number; username: string;
+  currentValue: string; oldValue: any; changedAt: number;
 }
 
-@Entity()
-export class VariableWatch {
-  @PrimaryGeneratedColumn()
-  id!: string;
+export const VariableHistory = new EntitySchema<Readonly<VariableHistoryInterface>>({
+  name: 'variable_history',
+  columns: {
+    id: {
+      type: Number,
+      primary: true,
+      generated: 'rowid',
+    },
+    userId: {
+      type: Number,
+      default: 0,
+    },
+    username: {
+      type: String,
+      default: 'n/a',
+    },
+    currentValue: {
+      type: String,
+    },
+    oldValue: {
+      type: 'simple-json',
+    },
+    changedAt: {
+      type: 'bigint',
+      transformer: new ColumnNumericTransformer(),
+      default: 0,
+    },
+  },
+  relations: {
+    variable: {
+      type: 'many-to-one',
+      target: 'variable',
+      inverseSide: 'history',
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+    },
+  },
+});
 
-  @Column()
-  variableId!: string;
-
-  @Column()
-  order!: number;
+export interface VariableURLInterface {
+  id: string; GET: boolean; POST: boolean; showResponse: boolean; variable: VariableInterface;
 }
+
+export const VariableURL = new EntitySchema<Readonly<VariableURLInterface>>({
+  name: 'variable_url',
+  columns: {
+    id: {
+      type: String,
+      primary: true,
+      generated: 'uuid',
+    },
+    GET: {
+      type: Boolean,
+      default: false,
+    },
+    POST: {
+      type: Boolean,
+      default: false,
+    },
+    showResponse: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  relations: {
+    variable: {
+      type: 'many-to-one',
+      target: 'variable',
+      inverseSide: 'urls',
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+    },
+  },
+});
+
+export interface VariableWatchInterface {
+  id: string; variableId: string; order: number;
+}
+
+export const VariableWatch = new EntitySchema<Readonly<VariableWatchInterface>>({
+  name: 'variable_watch',
+  columns: {
+    id: {
+      type: Number,
+      primary: true,
+      generated: 'rowid',
+    },
+    variableId: {
+      type: String,
+    },
+    order: {
+      type: Number,
+    },
+  },
+});

@@ -11,7 +11,7 @@ import { getOwnerAsSender, getTime, isModerator, prepare, sendMessage } from './
 
 import { getRepository } from 'typeorm';
 import { User } from './database/entity/user';
-import { Variable, VariableHistory, VariableWatch } from './database/entity/variable';
+import { Variable, VariableInterface, VariableWatch } from './database/entity/variable';
 import { addToViewersCache, getfromViewersCache } from './helpers/permissions';
 import users from './users';
 import api from './api';
@@ -123,9 +123,11 @@ class CustomVariables {
           if (!item) {
             throw new Error('Variable not found');
           }
-          item.currentValue = await this.runScript(item.evalValue, { _current: item.currentValue });
-          item.runAt = Date.now();
-          cb(null, await getRepository(Variable).save(item));
+          const newCurrentValue = await this.runScript(item.evalValue, { _current: item.currentValue });
+          const runAt = Date.now();
+          cb(null, await getRepository(Variable).save({
+            ...item, currentValue: newCurrentValue, runAt,
+          }));
         } catch (e) {
           cb(e.stack, null);
         }
@@ -158,7 +160,7 @@ class CustomVariables {
           where: { id },
         }));
       });
-      socket.on('save', async (item: Variable, cb) => {
+      socket.on('save', async (item: VariableInterface, cb) => {
         try {
           await getRepository(Variable).save(item);
           this.updateWidgetAndTitle(item.variableName);
@@ -328,15 +330,18 @@ class CustomVariables {
       return '';
     }; // return empty if variable doesn't exist
 
+    let currentValue = item.currentValue;
     if (item.type === 'eval' && Number(item.runEvery) === 0) {
-      item.currentValue = await this.runScript(item.evalValue, {
+      currentValue = await this.runScript(item.evalValue, {
         _current: item.currentValue,
         ...opts,
       });
-      await getRepository(Variable).save(item);
+      await getRepository(Variable).save({
+        ...item, currentValue,
+      });
     }
 
-    return item.currentValue;
+    return currentValue;
   }
 
   /* Sets value of variable with proper checks
@@ -344,27 +349,40 @@ class CustomVariables {
    * @return object
    * { updated, isOK }
    */
-  async setValueOf (variableName, currentValue, opts) {
-    let item = await getRepository(Variable).findOne({ variableName });
+  async setValueOf (variable: string | Readonly<VariableInterface>, currentValue, opts) {
+    const item = typeof variable === 'string'
+      ? await getRepository(Variable).findOne({ variableName: variable })
+      : { ...variable };
     let isOk = true;
     let isEval = false;
-    let oldValue = '';
+    const itemOldValue = item?.currentValue;
+    let itemCurrentValue = item?.currentValue;
 
     opts.sender = isNil(opts.sender) ? null : opts.sender;
     opts.readOnlyBypass = isNil(opts.readOnlyBypass) ? false : opts.readOnlyBypass;
     // add simple text variable, if not existing
     if (!item) {
-      item = new Variable();
-      item.variableName = variableName;
-      item.currentValue = String(currentValue);
-      item.responseType = 0;
-      item.evalValue = '';
-      item.usableOptions = [];
-      item.type = 'text';
-      item.permission = permission.MODERATORS;
+      const newItem: VariableInterface = {
+        variableName: variable as string,
+        currentValue: String(currentValue),
+        responseType: 0,
+        evalValue: '',
+        description: '',
+        responseText: '',
+        usableOptions: [],
+        type: 'text',
+        permission: permission.MODERATORS,
+      };
+      return this.setValueOf(newItem, currentValue, opts);
     } else {
-      // set item permission to owner if missing
-      item.permission = typeof item.permission === 'undefined' ? permission.CASTERS : item.permission;
+      if (typeof item.permission === 'undefined') {
+        // set item permission to owner if missing
+        return this.setValueOf({
+          permission: permission.CASTERS,
+          ...item,
+        }, currentValue, opts);
+      }
+
       if (typeof opts.sender === 'string') {
         opts.sender = {
           username: opts.sender,
@@ -381,64 +399,69 @@ class CustomVariables {
       if ((item.readOnly && !opts.readOnlyBypass) || !permissionsAreValid) {
         isOk = false;
       } else {
-        oldValue = item.currentValue;
         if (item.type === 'number') {
           if (['+', '-'].includes(currentValue)) {
             if (currentValue === '+') {
-              item.currentValue = String(Number(item.currentValue) + 1);
+              itemCurrentValue = String(Number(itemCurrentValue) + 1);
             } else {
-              item.currentValue = String(Number(item.currentValue) - 1);
+              itemCurrentValue = String(Number(itemCurrentValue) - 1);
             }
             isOk = true;
           } else {
             const isNumber = isFinite(Number(currentValue));
             isOk = isNumber;
-            item.currentValue = isNumber ? currentValue : item.currentValue;
+            itemCurrentValue = isNumber ? currentValue : itemCurrentValue;
           }
         } else if (item.type === 'options') {
           // check if is in usableOptions
           const isUsableOption = item.usableOptions.map((o) => o.trim()).includes(currentValue);
           isOk = isUsableOption;
-          item.currentValue = isUsableOption ? currentValue : item.currentValue;
+          itemCurrentValue = isUsableOption ? currentValue : itemCurrentValue;
         } else if (item.type === 'eval') {
           opts.param = currentValue;
-          item.currentValue = await this.getValueOf(variableName, opts);
+          itemCurrentValue = await this.getValueOf(item.variableName, opts);
           isEval = true;
         } else if (item.type === 'text') {
-          item.currentValue = String(item.currentValue);
+          itemCurrentValue = String(itemCurrentValue);
           isOk = true;
         }
       }
     }
+
     // do update only on non-eval variables
     if (item.type !== 'eval' && isOk) {
-      item = await getRepository(Variable).save(item);
+      await getRepository(Variable).save({
+        ...item,
+        currentValue: itemCurrentValue,
+      });
     };
 
-    const setValue = item.currentValue;
+    const setValue = itemCurrentValue;
     if (isOk) {
-      this.updateWidgetAndTitle(variableName);
+      this.updateWidgetAndTitle(item.variableName);
       if (!isEval) {
-        this.addChangeToHistory({ sender: opts.sender, item, oldValue });
-        item.currentValue = ''; // be silent if parsed correctly
+        this.addChangeToHistory({ sender: opts.sender, item, oldValue: itemOldValue });
       }
     }
-    return { updated: item, setValue, isOk, isEval };
+    return { updated: {
+      ...item,
+      currentValue: isOk && !isEval ? '' : setValue, // be silent if parsed correctly eval
+    }, setValue, isOk, isEval };
   }
 
-  async addChangeToHistory(opts) {
+  async addChangeToHistory(opts: { sender: any; item: VariableInterface; oldValue: any }) {
     const variable = await getRepository(Variable).findOne({
       relations: ['history'],
       where: { id: opts.item.id },
     });
     if (variable) {
-      const history = new VariableHistory();
-      history.username = opts.sender?.username ?? 'n/a';
-      history.userId = opts.sender?.userId ?? 0;
-      history.oldValue = opts.oldValue;
-      history.currentValue = opts.item.currentValue;
-      history.changedAt = Date.now();
-      variable.history.push(history);
+      variable.history.push({
+        username: opts.sender?.username ?? 'n/a',
+        userId: opts.sender?.userId ?? 0,
+        oldValue: opts.oldValue,
+        currentValue: opts.item.currentValue,
+        changedAt: Date.now(),
+      });
       await getRepository(Variable).save(variable);
     }
   }
@@ -451,7 +474,7 @@ class CustomVariables {
     clearTimeout(this.timeouts[`${this.constructor.name}.checkIfCacheOrRefresh`]);
     const items = await getRepository(Variable).find({ type: 'eval' });
 
-    for (const item of items) {
+    for (const item of items as Required<VariableInterface>[]) {
       try {
         item.runAt = isNil(item.runAt) ? 0 : item.runAt;
         const shouldRun = item.runEvery > 0 && Date.now() - new Date(item.runAt).getTime() >= item.runEvery;
