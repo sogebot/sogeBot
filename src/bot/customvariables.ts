@@ -123,9 +123,11 @@ class CustomVariables {
           if (!item) {
             throw new Error('Variable not found');
           }
-          item.currentValue = await this.runScript(item.evalValue, { _current: item.currentValue });
-          item.runAt = Date.now();
-          cb(null, await getRepository(Variable).save(item));
+          const newCurrentValue = await this.runScript(item.evalValue, { _current: item.currentValue });
+          const runAt = Date.now();
+          cb(null, await getRepository(Variable).save({
+            ...item, currentValue: newCurrentValue, runAt,
+          }));
         } catch (e) {
           cb(e.stack, null);
         }
@@ -328,15 +330,18 @@ class CustomVariables {
       return '';
     }; // return empty if variable doesn't exist
 
+    let currentValue = item.currentValue;
     if (item.type === 'eval' && Number(item.runEvery) === 0) {
-      item.currentValue = await this.runScript(item.evalValue, {
+      currentValue = await this.runScript(item.evalValue, {
         _current: item.currentValue,
         ...opts,
       });
-      await getRepository(Variable).save(item);
+      await getRepository(Variable).save({
+        ...item, currentValue,
+      });
     }
 
-    return item.currentValue;
+    return currentValue;
   }
 
   /* Sets value of variable with proper checks

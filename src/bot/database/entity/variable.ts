@@ -12,7 +12,7 @@ export interface VariableInterface {
 
 }
 
-export const Variable = new EntitySchema<Required<VariableInterface>>({
+export const Variable = new EntitySchema<Readonly<Required<VariableInterface>>>({
   name: 'variable',
   columns: {
     id: {
@@ -92,7 +92,7 @@ export interface VariableHistoryInterface {
   currentValue: string; oldValue: any; changedAt: number;
 }
 
-export const VariableHistory = new EntitySchema<VariableHistoryInterface>({
+export const VariableHistory = new EntitySchema<Readonly<VariableHistoryInterface>>({
   name: 'variable_history',
   columns: {
     id: {
@@ -135,7 +135,7 @@ export interface VariableURLInterface {
   id: string; GET: boolean; POST: boolean; showResponse: boolean; variable: VariableInterface;
 }
 
-export const VariableURL = new EntitySchema<VariableURLInterface>({
+export const VariableURL = new EntitySchema<Readonly<VariableURLInterface>>({
   name: 'variable_url',
   columns: {
     id: {
@@ -171,7 +171,7 @@ export interface VariableWatchInterface {
   id: string; variableId: string; order: number;
 }
 
-export const VariableWatch = new EntitySchema<VariableWatchInterface>({
+export const VariableWatch = new EntitySchema<Readonly<VariableWatchInterface>>({
   name: 'variable_watch',
   columns: {
     id: {
