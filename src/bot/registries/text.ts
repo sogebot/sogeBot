@@ -41,7 +41,7 @@ class Text extends Registry {
           const isVariable = await customvariables.isVariableSet(variable);
           let value = `<strong>$_${variable.replace('$_', '')}</strong>`;
           if (isVariable) {
-            value = await customvariables.getValueOf(variable);
+            value = await customvariables.getValueOf(variable) || '';
           }
           item.text = item.text.replace(new RegExp(`\\${variable}`, 'g'), value);
         }
