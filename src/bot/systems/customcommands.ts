@@ -378,12 +378,13 @@ class CustomCommands extends System {
     }
     const toEval = `(function evaluation () { return ${filter} })()`;
 
-    let $userObject = await getRepository(User).findOne({ userId: opts.sender.userId });
+    const $userObject = await getRepository(User).findOne({ userId: opts.sender.userId });
     if (!$userObject) {
-      $userObject = new User();
-      $userObject.userId = opts.sender.userId;
-      $userObject.username = opts.sender.username;
-      await getRepository(User).save($userObject);
+      await getRepository(User).save({
+        userId: opts.sender.userId,
+        username: opts.sender.username,
+      });
+      return this.checkFilter(opts, filter);
     }
     let $rank: string | null = null;
     if (ranks.enabled) {

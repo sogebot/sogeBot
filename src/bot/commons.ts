@@ -9,7 +9,7 @@ import { globalIgnoreList } from './data/globalIgnoreList';
 import { error } from './helpers/log';
 import { clusteredChatOut, clusteredClientChat, clusteredClientTimeout, clusteredWhisperOut } from './cluster';
 
-import { User } from './database/entity/user';
+import { UserInterface } from './database/entity/user';
 import oauth from './oauth';
 import { translate } from './translate';
 import tmi from './tmi';
@@ -275,19 +275,19 @@ export function isBroadcaster(user) {
   }
 }
 
-export async function isModerator(user: User | undefined): Promise<boolean> {
+export async function isModerator(user: UserInterface | undefined): Promise<boolean> {
   return user?.isModerator ?? false;
 }
 
-export async function isVIP(user: User | undefined): Promise<boolean> {
+export async function isVIP(user: UserInterface | undefined): Promise<boolean> {
   return user?.isVIP ?? false;
 }
 
-export async function isFollower(user: User | undefined): Promise<boolean> {
+export async function isFollower(user: UserInterface | undefined): Promise<boolean> {
   return user?.isFollower ?? false;
 }
 
-export async function isSubscriber(user: User | undefined): Promise<boolean> {
+export async function isSubscriber(user: UserInterface | undefined): Promise<boolean> {
   return user?.isSubscriber ?? false;
 }
 
