@@ -9,7 +9,7 @@ import { permission } from './helpers/permissions';
 import { error } from './helpers/log';
 import { adminEndpoint, viewerEndpoint } from './helpers/socket';
 import { Brackets, getConnection, getRepository } from 'typeorm';
-import { User, UserBit, UserTip } from './database/entity/user';
+import { User, UserBit, UserInterface, UserTip } from './database/entity/user';
 import permissions from './permissions';
 import oauth from './oauth';
 import api from './api';
@@ -120,23 +120,25 @@ class Users extends Core {
   }
 
   async getNameById (userId: number) {
-    let user = await getRepository(User).findOne({ userId });
+    const user = await getRepository(User).findOne({ userId });
     if (!user) {
-      user = new User();
-      user.userId = userId;
-      user.username = await api.getUsernameFromTwitch(userId);
-      await getRepository(User).save(user);
+      const savedUser = await getRepository(User).save({
+        userId,
+        username: await api.getUsernameFromTwitch(userId),
+      });
+      return savedUser.username;
     }
     return user.username;
   }
 
   async getIdByName (username: string) {
-    let user = await getRepository(User).findOne({ username });
+    const user = await getRepository(User).findOne({ username });
     if (!user) {
-      user = new User();
-      user.userId = Number(await api.getIdFromTwitch(username));
-      user.username = username;
-      await getRepository(User).save(user);
+      const savedUser = await getRepository(User).save({
+        userId: Number(await api.getIdFromTwitch(username)),
+        username,
+      });
+      return savedUser.userId;
     }
     return user.userId;
   }
@@ -170,7 +172,7 @@ class Users extends Core {
       await getRepository(UserTip).clear();
       cb();
     });
-    adminEndpoint(this.nsp, 'viewers::save', async (viewer: User, cb) => {
+    adminEndpoint(this.nsp, 'viewers::save', async (viewer: UserInterface, cb) => {
       try {
         // recount sortAmount
         for (const tip of viewer.tips) {
@@ -183,7 +185,7 @@ class Users extends Core {
         cb(e);
       }
     });
-    adminEndpoint(this.nsp, 'viewers::remove', async (viewer: User, cb) => {
+    adminEndpoint(this.nsp, 'viewers::remove', async (viewer: Required<UserInterface>, cb) => {
       try {
         await getRepository(User).remove(viewer);
       } catch (e) {
@@ -207,8 +209,8 @@ class Users extends Core {
           .addSelect('"user".*')
           .offset(opts.page * 25)
           .limit(25)
-          .leftJoin(UserBit, 'user_bit', '"user_bit"."userUserId" = "user"."userId"')
-          .leftJoin(UserTip, 'user_tip', '"user_tip"."userUserId" = "user"."userId"')
+          .leftJoin('user_bit', 'user_bit', '"user_bit"."userUserId" = "user"."userId"')
+          .leftJoin('user_tip', 'user_tip', '"user_tip"."userUserId" = "user"."userId"')
           .groupBy('user.userId');
       } else {
         query = getRepository(User).createQueryBuilder('user')
@@ -218,8 +220,8 @@ class Users extends Core {
           .addSelect('user.*')
           .offset(opts.page * 25)
           .limit(25)
-          .leftJoin(UserBit, 'user_bit', 'user_bit.userUserId = user.userId')
-          .leftJoin(UserTip, 'user_tip', 'user_tip.userUserId = user.userId')
+          .leftJoin('user_bit', 'user_bit', 'user_bit.userUserId = user.userId')
+          .leftJoin('user_tip', 'user_tip', 'user_tip.userUserId = user.userId')
           .groupBy('user.userId');
       }
 

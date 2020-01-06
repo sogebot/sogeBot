@@ -7,7 +7,7 @@ import { permission } from '../helpers/permissions';
 import System from './_interface';
 import { debug } from '../helpers/log';
 import { getConnection, getRepository } from 'typeorm';
-import { User, UserBit, UserTip } from '../database/entity/user';
+import { User } from '../database/entity/user';
 import translateLib, { translate } from '../translate';
 import oauth from '../oauth';
 import points from './points';
@@ -138,7 +138,7 @@ class Top extends System {
             .addSelect('user.username')
             .limit(_total)
             .where('user.username != :botusername', { botusername: oauth.botUsername.toLowerCase() })
-            .innerJoin(UserTip, 'user_tip', joinTip)
+            .innerJoin('user_tip', 'user_tip', joinTip)
             .groupBy('user.userId')
             .getRawMany()
           ).filter(o => !isIgnored({ username: o.username, userId: o.userId }));
@@ -214,7 +214,7 @@ class Top extends System {
             .addSelect('user.username')
             .limit(_total)
             .andWhere('user.username != :broadcasterusername', { broadcasterusername: oauth.broadcasterUsername.toLowerCase() })
-            .innerJoin(UserBit, 'user_bit', joinBit)
+            .innerJoin('user_bit', 'user_bit', joinBit)
             .groupBy('user.userId')
             .getRawMany()
           ).filter(o => !isIgnored({ username: o.username, userId: o.userId }));

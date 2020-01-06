@@ -19,7 +19,7 @@ import { getChannelChattersUnofficialAPI } from './microservices/getChannelChatt
 import { ThreadEvent } from './database/entity/threadEvent';
 
 import { getManager, getRepository, IsNull, Not } from 'typeorm';
-import { User } from './database/entity/user';
+import { User, UserInterface } from './database/entity/user';
 import { TwitchClips, TwitchTag, TwitchTagLocalizationDescription, TwitchTagLocalizationName } from './database/entity/twitch';
 import { CacheGames } from './database/entity/cacheGames';
 import oauth from './oauth';
@@ -554,9 +554,11 @@ class API extends Core {
         .map((o) => String(o.user_id))
         .includes(String(user.userId))) {
         // subscriber is not sub anymore -> unsub and set subStreak to 0
-        user.isSubscriber = false;
-        user.subscribeStreak = 0;
-        await getRepository(User).save(user);
+        await getRepository(User).save({
+          ...user,
+          isSubscriber: false,
+          subscribeStreak: 0,
+        });
       }
     }
 
@@ -1646,7 +1648,7 @@ class API extends Core {
     await getRepository(User).update({ userId: id }, { createdAt: new Date(request.data.created_at).getTime() });
   }
 
-  async isFollowerUpdate (user: User | undefined) {
+  async isFollowerUpdate (user: UserInterface | undefined) {
     if (!user || !user.userId) {
       return;
     }
