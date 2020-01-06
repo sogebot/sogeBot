@@ -68,6 +68,47 @@ const limitProxy = {
   },
 };
 
+const processFollowerState = async (user: Required<UserInterface>, f: any, quiet = false) => {
+  if (!user.isFollower) {
+    if (new Date().getTime() - new Date(f.followed_at).getTime() < 2 * constants.HOUR) {
+      if (user.followedAt === 0 || new Date().getTime() - user.followedAt > 60000 * 60 && !webhooks.existsInCache('follow', user.userId)) {
+        webhooks.addIdToCache('follow', user.userId);
+        eventlist.add({
+          event: 'follow',
+          username: user.username,
+          timestamp: Date.now(),
+        });
+        if (!quiet && !isBot(user.username)) {
+          follow(user.username);
+          events.fire('follow', { username: user.username, userId: user.userId });
+          alerts.trigger({
+            event: 'follows',
+            name: user.username,
+            amount: 0,
+            currency: '',
+            monthsName: '',
+            message: '',
+            autohost: false,
+          });
+
+          triggerInterfaceOnFollow({
+            username: user.username,
+            userId: user.userId,
+          });
+        }
+      }
+    }
+  }
+  try {
+    user.followedAt = user.haveFollowedAtLock ? user.followedAt : new Date(f.followed_at).getTime();
+    user.isFollower = user.haveFollowerLock? user.isFollower : true;
+    user.followCheckAt = Date.now();
+    await getRepository(User).save(user);
+  } catch (e) {
+    error(e.stack);
+  }
+};
+
 class API extends Core {
   @shared(true)
   stats: {
@@ -767,51 +808,14 @@ class API extends Core {
 
           f.from_name = String(f.from_name).toLowerCase();
           f.from_id = Number(f.from_id);
-          let user = await getRepository(User).findOne({ userId: f.from_id });
+          const user = await getRepository(User).findOne({ userId: f.from_id });
           if (!user) {
-            user = new User();
-            user.userId = Number(f.from_id);
-            user.username = f.from_name;
-            user = await getRepository(User).save(user);
-          }
-
-          if (!user.isFollower) {
-            if (new Date().getTime() - new Date(f.followed_at).getTime() < 2 * constants.HOUR) {
-              if (user.followedAt === 0 || new Date().getTime() - user.followedAt > 60000 * 60 && !webhooks.existsInCache('follow', user.userId)) {
-                webhooks.addIdToCache('follow', f.from_id);
-                eventlist.add({
-                  event: 'follow',
-                  username: user.username,
-                  timestamp: Date.now(),
-                });
-                if (!quiet && !isBot(user.username)) {
-                  follow(user.username);
-                  events.fire('follow', { username: user.username, userId: f.from_id });
-                  alerts.trigger({
-                    event: 'follows',
-                    name: user.username,
-                    amount: 0,
-                    currency: '',
-                    monthsName: '',
-                    message: '',
-                    autohost: false,
-                  });
-
-                  triggerInterfaceOnFollow({
-                    username: user.username,
-                    userId: f.from_id,
-                  });
-                }
-              }
-            }
-          }
-          try {
-            user.followedAt = user.haveFollowedAtLock ? user.followedAt : new Date(f.followed_at).getTime();
-            user.isFollower = user.haveFollowerLock? user.isFollower : true;
-            user.followCheckAt = Date.now();
-            await getRepository(User).save(user);
-          } catch (e) {
-            error(e.stack);
+            await processFollowerState(await getRepository(User).save({
+              userId: Number(f.from_id),
+              username: f.from_name,
+            }), f, quiet);
+          } else {
+            await processFollowerState(user, f, quiet);
           }
         }
       }
@@ -895,54 +899,16 @@ class API extends Core {
           // check if user id is in db, not in db load username from API
           for (const f of opts.followers) {
             await setImmediateAwait(); // throttle down
-
             f.from_name = String(f.from_name).toLowerCase();
             f.from_id = Number(f.from_id);
-            let user = await getRepository(User).findOne({ userId: f.from_id });
+            const user = await getRepository(User).findOne({ userId: f.from_id });
             if (!user) {
-              user = new User();
-              user.userId = Number(f.from_id);
-              user.username = f.from_name;
-              user = await getRepository(User).save(user);
-            }
-
-            if (!user.isFollower) {
-              if (new Date().getTime() - new Date(f.followed_at).getTime() < 2 * constants.HOUR) {
-                if (user.followedAt === 0 || new Date().getTime() - user.followedAt > 60000 * 60 && !webhooks.existsInCache('follow', user.userId)) {
-                  webhooks.addIdToCache('follow', f.from_id);
-                  eventlist.add({
-                    event: 'follow',
-                    username: user.username,
-                    timestamp: Date.now(),
-                  });
-                  if (!isBot(user.username)) {
-                    follow(user.username);
-                    events.fire('follow', { username: user.username, userId: f.from_id });
-                    alerts.trigger({
-                      event: 'follows',
-                      name: user.username,
-                      amount: 0,
-                      currency: '',
-                      monthsName: '',
-                      message: '',
-                      autohost: false,
-                    });
-
-                    triggerInterfaceOnFollow({
-                      username: user.username,
-                      userId: f.from_id,
-                    });
-                  }
-                }
-              }
-            }
-            try {
-              user.followedAt = user.haveFollowedAtLock ? user.followedAt : new Date(f.followed_at).getTime();
-              user.isFollower = user.haveFollowerLock? user.isFollower : true;
-              user.followCheckAt = Date.now();
-              await getRepository(User).save(user);
-            } catch (e) {
-              error(e.stack);
+              await processFollowerState(await getRepository(User).save({
+                userId: Number(f.from_id),
+                username: f.from_name,
+              }), f);
+            } else {
+              await processFollowerState(user, f);
             }
           }
         }
