@@ -12,7 +12,7 @@ export interface WidgetSocialInterface {
   timestamp: number;
 }
 
-export const WidgetSocial = new EntitySchema<WidgetSocialInterface>({
+export const WidgetSocial = new EntitySchema<Readonly<Required<WidgetSocialInterface>>>({
   name: 'widget_social',
   columns: {
     id: {
