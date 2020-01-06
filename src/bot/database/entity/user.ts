@@ -13,11 +13,11 @@ export interface UserInterface {
 }
 
 export interface UserTipInterface {
-  id?: string; user: UserInterface; amount: number; currency: string; message?: string; tippedAt?: number; sortAmount: number;
+  id?: string; user?: UserInterface; amount: number; currency: string; message?: string; tippedAt?: number; sortAmount: number;
 }
 
 export interface UserBitInterface {
-  id?: string; user: UserInterface; amount: number; message?: string; cheeredAt?: number;
+  id?: string; user?: UserInterface; amount: number; message?: string; cheeredAt?: number;
 }
 
 export const User = new EntitySchema<Readonly<Required<UserInterface>>>({

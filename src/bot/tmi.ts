@@ -20,7 +20,7 @@ import { getLocalizedName, getOwner, isBot, isIgnored, isOwner, prepare, sendMes
 import { clusteredChatIn, clusteredWhisperIn, isMainThread, manageMessage } from './cluster';
 
 import { getRepository } from 'typeorm';
-import { User, UserBit } from './database/entity/user';
+import { User, UserBitInterface } from './database/entity/user';
 
 import events from './events';
 import api from './api';
@@ -393,19 +393,21 @@ class TMI extends Core {
         return;
       }
 
-      let user = await getRepository(User).findOne({ userId: userstate.userId });
+      const user = await getRepository(User).findOne({ userId: userstate.userId });
       if (!user) {
-        user = new User();
-        user.userId = Number(userstate.userId);
-        user.username = username;
+        await getRepository(User).save({ userId: Number(userstate.userId), username });
+        this.subscription(message);
+        return;
       }
 
-      user.isSubscriber = user.haveSubscriberLock ? user.isSubscriber : true;
-      user.subscribedAt = user.haveSubscribedAtLock ? user.subscribedAt : Date.now();
-      user.subscribeTier = String(tier);
-      user.subscribeCumulativeMonths = subCumulativeMonths;
-      user.subscribeStreak = 0;
-      await getRepository(User).save(user);
+      await getRepository(User).save({
+        ...user,
+        isSubscriber: user.haveSubscriberLock ? user.isSubscriber : true,
+        subscribedAt: user.haveSubscribedAtLock ? user.subscribedAt : Date.now(),
+        subscribeTier: String(tier),
+        subscribeCumulativeMonths: subCumulativeMonths,
+        subscribeStreak: 0,
+      });
 
       eventlist.add({
         event: 'sub',
@@ -455,19 +457,21 @@ class TMI extends Core {
 
       const subStreak = subStreakShareEnabled ? streakMonths : 0;
 
-      let user = await getRepository(User).findOne({ userId: userstate.userId });
+      const user = await getRepository(User).findOne({ userId: userstate.userId });
       if (!user) {
-        user = new User();
-        user.userId = Number(userstate.userId);
-        user.username = username;
+        await getRepository(User).save({ userId: Number(userstate.userId), username });
+        this.resub(message);
+        return;
       }
 
-      user.isSubscriber = true;
-      user.subscribedAt =  Number(moment().subtract(streakMonths, 'months').format('X')) * 1000;
-      user.subscribeTier = tier;
-      user.subscribeCumulativeMonths = subCumulativeMonths;
-      user.subscribeStreak = subStreak;
-      await getRepository(User).save(user);
+      await getRepository(User).save({
+        ...user,
+        isSubscriber: true,
+        subscribedAt:  Number(moment().subtract(streakMonths, 'months').format('X')) * 1000,
+        subscribeTier: tier,
+        subscribeCumulativeMonths: subCumulativeMonths,
+        subscribeStreak: subStreak,
+      });
 
       eventlist.add({
         event: 'resub',
@@ -575,19 +579,21 @@ class TMI extends Core {
         return;
       }
 
-      let user = await getRepository(User).findOne({ userId: recipientId });
+      const user = await getRepository(User).findOne({ userId: recipientId });
       if (!user) {
-        user = new User();
-        user.userId = Number(recipientId);
-        user.username = recipient;
+        await getRepository(User).save({ userId: Number(recipientId), username });
+        this.subscription(message);
+        return;
       }
 
-      user.isSubscriber = true;
-      user.subscribedAt = Date.now();
-      user.subscribeTier = String(tier);
-      user.subscribeCumulativeMonths = subCumulativeMonths;
-      user.subscribeStreak += 1;
-      await getRepository(User).save(user);
+      await getRepository(User).save({
+        ...user,
+        isSubscriber: true,
+        subscribedAt: Date.now(),
+        subscribeTier: String(tier),
+        subscribeCumulativeMonths: subCumulativeMonths,
+        subscribeStreak: user.subscribeStreak + 1,
+      });
 
       eventlist.add({
         event: 'subgift',
@@ -622,6 +628,14 @@ class TMI extends Core {
         return;
       }
 
+      const user = await getRepository(User).findOne({ where: { userId: userId }});
+      if (!user) {
+        // if we still doesn't have user, we create new
+        await getRepository(User).save({ userId: Number(userstate.userId), username });
+        this.cheer(message);
+        return;
+      }
+
       eventlist.add({
         event: 'cheer',
         username,
@@ -631,20 +645,11 @@ class TMI extends Core {
       });
       cheer(`${username}#${userId}, bits: ${userstate.bits}, message: ${messageFromUser}`);
 
-      let user = await getRepository(User).findOne({ where: { userId: userId }});
-      if (!user) {
-        // if we still doesn't have user, we create new
-        user = new User();
-        user.userId = Number(userId);
-        user.username = username.toLowerCase();
-        user = await getRepository(User).save(user);
-        user.bits = [];
-      }
-
-      const newBits = new UserBit();
-      newBits.amount = Number(userstate.bits);
-      newBits.cheeredAt = Date.now();
-      newBits.message = messageFromUser;
+      const newBits: UserBitInterface = {
+        amount: Number(userstate.bits),
+        cheeredAt: Date.now(),
+        message: messageFromUser,
+      };
       user.bits.push(newBits);
       getRepository(User).save(user);
 
@@ -731,22 +736,36 @@ class TMI extends Core {
           where: {
             userId: sender.userId,
           },
-        }) || new User();
-        user.userId = Number(sender.userId);
-        user.username = sender.username;
-        if (!user.isOnline) {
-          joinpart.send({ users: [sender.username], type: 'join' });
-        }
-        user.isOnline = true;
-        user.isVIP = typeof sender.badges.vip !== 'undefined';
-        user.isFollower = user.isFollower ?? false;
-        user.isModerator = user.isModerator ?? typeof sender.badges.moderator !== 'undefined';
-        user.isSubscriber = user.isSubscriber ?? typeof sender.badges.subscriber !== 'undefined';
-        user.messages = user.messages ?? 0;
-        user.subscribeTier = String(typeof sender.badges.subscriber !== 'undefined' ? 0 : user.subscribeTier);
-        user.subscribeCumulativeMonths = subCumulativeMonths(sender) || user.subscribeCumulativeMonths;
+        });
 
-        await getRepository(User).save(user);
+        if (user) {
+          if (!user.isOnline) {
+            joinpart.send({ users: [sender.username], type: 'join' });
+          }
+          await getRepository(User).save({
+            ...user,
+            username: sender.username,
+            userId: Number(sender.userId),
+            isOnline: true,
+            isVIP: typeof sender.badges.vip !== 'undefined',
+            isFollower: user.isFollower ?? false,
+            isModerator: user.isModerator ?? typeof sender.badges.moderator !== 'undefined',
+            isSubscriber: user.isSubscriber ?? typeof sender.badges.subscriber !== 'undefined',
+            messages: user.messages ?? 0,
+            subscribeTier: String(typeof sender.badges.subscriber !== 'undefined' ? 0 : user.subscribeTier),
+            subscribeCumulativeMonths: subCumulativeMonths(sender) || user.subscribeCumulativeMonths,
+          });
+        } else {
+          joinpart.send({ users: [sender.username], type: 'join' });
+          await getRepository(User).save({
+            username: sender.username,
+            userId: Number(sender.userId),
+            isOnline: true,
+            isVIP: typeof sender.badges.vip !== 'undefined',
+            isModerator: typeof sender.badges.moderator !== 'undefined',
+            isSubscriber: typeof sender.badges.subscriber !== 'undefined',
+          });
+        }
 
         api.followerUpdatePreCheck(sender.username);
 
