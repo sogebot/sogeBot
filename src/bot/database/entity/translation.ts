@@ -1,9 +1,13 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { EntitySchema } from 'typeorm';
 
-@Entity()
-export class Translation {
-  @Column()
-  value!: string;
-  @PrimaryColumn()
-  name!: string;
+export interface TranslationInterface {
+  value: string; name: string;
 }
+
+export const Translation = new EntitySchema<Readonly<Required<TranslationInterface>>>({
+  name: 'translation',
+  columns: {
+    name: { type: String, primary: true },
+    value: { type: String },
+  },
+});
