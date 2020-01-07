@@ -3,7 +3,7 @@ import Registry from './_interface';
 import { adminEndpoint, publicEndpoint } from '../helpers/socket';
 
 import { getRepository } from 'typeorm';
-import { Text as TextEntity } from '../database/entity/text';
+import { Text as TextEntity, TextInterface } from '../database/entity/text';
 import customvariables from '../customvariables';
 
 class Text extends Registry {
@@ -15,7 +15,7 @@ class Text extends Registry {
   sockets () {
     const regexp = new RegExp('\\$_[a-zA-Z0-9_]+', 'g');
 
-    adminEndpoint(this.nsp, 'text::remove', async(item: TextEntity, cb) => {
+    adminEndpoint(this.nsp, 'text::remove', async(item: Required<TextInterface>, cb) => {
       await getRepository(TextEntity).remove(item);
       cb();
     });
@@ -24,7 +24,7 @@ class Text extends Registry {
         await getRepository(TextEntity).find(),
       );
     });
-    adminEndpoint(this.nsp, 'text::save', async(item: TextEntity, cb) => {
+    adminEndpoint(this.nsp, 'text::save', async(item: TextInterface, cb) => {
       try {
         cb(
           null,
@@ -36,6 +36,7 @@ class Text extends Registry {
     });
     publicEndpoint(this.nsp, 'text::getOne', async (id, callback) => {
       const item = await getRepository(TextEntity).findOne({ id });
+      let text = '';
       if (item) {
         for (const variable of item.text.match(regexp) || []) {
           const isVariable = await customvariables.isVariableSet(variable);
@@ -43,10 +44,10 @@ class Text extends Registry {
           if (isVariable) {
             value = await customvariables.getValueOf(variable) || '';
           }
-          item.text = item.text.replace(new RegExp(`\\${variable}`, 'g'), value);
+          text = item.text.replace(new RegExp(`\\${variable}`, 'g'), value);
         }
-        item.text = await new Message(item.text).parse();
-        callback(item);
+        text = await new Message(item.text).parse();
+        callback({...item, text});
       }
       callback(null);
     });

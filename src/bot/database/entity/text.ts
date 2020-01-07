@@ -1,17 +1,22 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { EntitySchema } from 'typeorm';
 
-@Entity()
-export class Text {
-  @PrimaryGeneratedColumn('uuid')
-  id!: string;
-  @Column()
-  name!: string;
-  @Column('text')
-  text!: string;
-  @Column('text')
-  css!: string;
-  @Column('text')
-  js!: string;
-  @Column('simple-array')
-  external!: string[];
-};
+export interface TextInterface {
+  id?: string;
+  name: string;
+  text: string;
+  css: string;
+  js: string;
+  external: string[];
+}
+
+export const Text = new EntitySchema<Readonly<Required<TextInterface>>>({
+  name: 'text',
+  columns: {
+    id: { type: String, primary: true, generated: 'uuid' },
+    name: { type: String },
+    text: { type: 'text' },
+    css: { type: 'text' },
+    js: { type: 'text' },
+    external: { type: 'simple-array' },
+  },
+});
