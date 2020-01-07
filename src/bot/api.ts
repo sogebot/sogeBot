@@ -454,7 +454,6 @@ class API extends Core {
 
       for(const tag of tags) {
         await getRepository(TwitchTag).save({
-          ...new TwitchTag(),
           tag_id: tag.tag_id,
           is_auto: tag.is_auto,
           localization_names: Object.keys(tag.localization_names).map(key => {
