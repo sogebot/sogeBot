@@ -19,21 +19,21 @@ describe('Timers - toggle()', () => {
     await db.cleanup();
     await message.prepare();
 
-    let timer = new Timer();
-    timer.name = 'test';
-    timer.triggerEveryMessage = 0;
-    timer.triggerEverySecond = 60;
-    timer.isEnabled = true;
-    timer.triggeredAtTimestamp = Date.now();
-    timer.triggeredAtMessage = linesParsed;
-    timer = await getRepository(Timer).save(timer);
+    const timer = await getRepository(Timer).save({
+      name: 'test',
+      triggerEveryMessage: 0,
+      triggerEverySecond: 60,
+      isEnabled: true,
+      triggeredAtTimestamp: Date.now(),
+      triggeredAtMessage: linesParsed,
+    });
 
-    const response = new TimerResponse();
-    response.response = 'Lorem Ipsum';
-    response.timestamp = Date.now();
-    response.isEnabled = true;
-    response.timer = timer;
-    await getRepository(TimerResponse).save(response);
+    await getRepository(TimerResponse).save({
+      response: 'Lorem Ipsum',
+      timestamp: Date.now(),
+      isEnabled: true,
+      timer: timer,
+    });
   });
 
   it('', async () => {

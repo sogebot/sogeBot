@@ -110,9 +110,7 @@ class Timers extends System {
       relations: ['messages'],
     });
     for (const timer of timers) {
-      timer.triggeredAtMessages = 0;
-      timer.triggeredAtTimestamp = Date.now();
-      await getRepository(Timer).save(timer);
+      await getRepository(Timer).save({ ...timer, triggeredAtMessages: 0, triggeredAtTimestamp: Date.now() });
     }
     this.check();
   }
@@ -146,9 +144,7 @@ class Timers extends System {
         response.timestamp = Date.now();
         await getRepository(TimerResponse).save(response);
       }
-      timer.triggeredAtMessages = linesParsed;
-      timer.triggeredAtTimestamp = Date.now();
-      await getRepository(Timer).save(timer);
+      await getRepository(Timer).save({ ...timer, triggeredAtMessages: linesParsed, triggeredAtTimestamp: Date.now() });
     }
     this.timeouts.timersCheck = global.setTimeout(() => this.check(), 1000); // this will run check 1s after full check is correctly done
   }
@@ -195,20 +191,19 @@ class Timers extends System {
       sendMessage(translate('timers.cannot-set-messages-and-seconds-0'), opts.sender, opts.attr);
       return false;
     }
-    let timer = await getRepository(Timer).findOne({
+    const timer = await getRepository(Timer).findOne({
       relations: ['messages'],
       where: { name },
     });
-    if (!timer) {
-      timer = new Timer();
-    }
-    timer.name = name;
-    timer.triggerEveryMessage = messages;
-    timer.triggerEverySecond = seconds;
-    timer.isEnabled = true;
-    timer.triggeredAtMessages = linesParsed;
-    timer.triggeredAtTimestamp = Date.now();
-    await getRepository(Timer).save(timer);
+    await getRepository(Timer).save({
+      ...timer,
+      name: name,
+      triggerEveryMessage: messages,
+      triggerEverySecond: seconds,
+      isEnabled: true,
+      triggeredAtMessages: linesParsed,
+      triggeredAtTimestamp: Date.now(),
+    });
     sendMessage(translate('timers.timer-was-set')
       .replace(/\$name/g, name)
       .replace(/\$messages/g, messages)
@@ -284,12 +279,12 @@ class Timers extends System {
       return false;
     }
 
-    const message = new TimerResponse();
-    message.isEnabled = true;
-    message.timestamp = Date.now();
-    message.response = response;
-    message.timer = timer;
-    const item = await getRepository(TimerResponse).save(message);
+    const item = await getRepository(TimerResponse).save({
+      isEnabled: true,
+      timestamp: Date.now(),
+      response: response,
+      timer: timer,
+    });
 
     sendMessage(translate('timers.response-was-added')
       .replace(/\$id/g, item.id)
@@ -348,9 +343,8 @@ class Timers extends System {
         return false;
       }
 
-      response.isEnabled = !response.isEnabled;
-      await getRepository(TimerResponse).save(response);
-      sendMessage(translate(response.isEnabled ? 'timers.response-enabled' : 'timers.response-disabled')
+      await getRepository(TimerResponse).save({ ...response, isEnabled: !response.isEnabled });
+      sendMessage(translate(!response.isEnabled ? 'timers.response-enabled' : 'timers.response-disabled')
         .replace(/\$id/g, id), opts.sender);
       return true;
     }
@@ -362,9 +356,8 @@ class Timers extends System {
         return false;
       }
 
-      timer.isEnabled = !timer.isEnabled;
-      await getRepository(Timer).save(timer);
-      sendMessage(translate(timer.isEnabled ? 'timers.timer-enabled' : 'timers.timer-disabled')
+      await getRepository(Timer).save({ ...timer, isEnabled: !timer.isEnabled });
+      sendMessage(translate(!timer.isEnabled ? 'timers.timer-enabled' : 'timers.timer-disabled')
         .replace(/\$name/g, name), opts.sender);
       return true;
     }

@@ -20,38 +20,36 @@ describe('Timers - list()', () => {
     await db.cleanup();
     await message.prepare();
 
-    const timer = new Timer();
-    timer.name = 'test';
-    timer.triggerEveryMessage = 0;
-    timer.triggerEverySecond = 60;
-    timer.isEnabled = true;
-    timer.triggeredAtTimestamp = Date.now();
-    timer.triggeredAtMessage = linesParsed;
-    await getRepository(Timer).save(timer);
+    await getRepository(Timer).save({
+      name: 'test',
+      triggerEveryMessage: 0,
+      triggerEverySecond: 60,
+      isEnabled: true,
+      triggeredAtTimestamp: Date.now(),
+      triggeredAtMessage: linesParsed,
+    });
 
-    let timer2 = new Timer();
-    timer2.name = 'test2';
-    timer2.triggerEveryMessage = 0;
-    timer2.triggerEverySecond = 60;
-    timer2.isEnabled = false;
-    timer2.triggeredAtTimestamp = Date.now();
-    timer2.triggeredAtMessage = linesParsed;
-    timer2.responses = [];
-    timer2 = await getRepository(Timer).save(timer2);
+    const timer2 = await getRepository(Timer).save({
+      name: 'test2',
+      triggerEveryMessage: 0,
+      triggerEverySecond: 60,
+      isEnabled: false,
+      triggeredAtTimestamp: Date.now(),
+      triggeredAtMessage: linesParsed,
+    });
 
-    const response = new TimerResponse();
-    response.response = 'Lorem Ipsum';
-    response.timestamp = Date.now();
-    response.isEnabled = true;
-    response.timer = timer2;
-    await getRepository(TimerResponse).save(response);
-
-    const response2 = new TimerResponse();
-    response2.response = 'Lorem Ipsum 2';
-    response2.timestamp = Date.now();
-    response2.isEnabled = false;
-    response2.timer = timer2;
-    await getRepository(TimerResponse).save(response2);
+    await getRepository(TimerResponse).save({
+      response: 'Lorem Ipsum',
+      timestamp: Date.now(),
+      isEnabled: true,
+      timer: timer2,
+    });
+    await getRepository(TimerResponse).save({
+      response: 'Lorem Ipsum 2',
+      timestamp: Date.now(),
+      isEnabled: false,
+      timer: timer2,
+    });
   });
 
   it('', async () => {

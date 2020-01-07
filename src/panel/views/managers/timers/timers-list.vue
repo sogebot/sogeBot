@@ -55,7 +55,7 @@ import { Vue, Component } from 'vue-property-decorator';
 import { isNil } from 'lodash-es';
 import { getSocket } from 'src/panel/helpers/socket';
 
-import { Timer } from 'src/bot/database/entity/timer';
+import { TimerInterface } from 'src/bot/database/entity/timer';
 
 @Component({
   components: {
@@ -65,7 +65,7 @@ import { Timer } from 'src/bot/database/entity/timer';
 export default class timersList extends Vue {
   socket = getSocket('/systems/timers')
   search: string = '';
-  items: Timer[] = [];
+  items: TimerInterface[] = [];
   state: { loading: number; } = { loading: this.$state.progress }
 
   fields = [
@@ -93,7 +93,7 @@ export default class timersList extends Vue {
 
   created() {
     this.state.loading = this.$state.progress;
-    this.socket.emit('timers::getAll', (err, items: Timer[]) => {
+    this.socket.emit('timers::getAll', (err, items: TimerInterface[]) => {
       this.items = items
       this.state.loading = this.$state.success;
     })

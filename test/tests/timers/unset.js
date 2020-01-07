@@ -22,14 +22,14 @@ describe('Timers - unset()', () => {
     await db.cleanup();
     await message.prepare();
 
-    const timer = new Timer();
-    timer.name = 'test';
-    timer.triggerEveryMessage = 0;
-    timer.triggerEverySecond = 60;
-    timer.isEnabled = true;
-    timer.triggeredAtTimestamp = Date.now();
-    timer.triggeredAtMessage = linesParsed;
-    await getRepository(Timer).save(timer);
+    await getRepository(Timer).save({
+      name: 'test',
+      triggerEveryMessage: 0,
+      triggerEverySecond: 60,
+      isEnabled: true,
+      triggeredAtTimestamp: Date.now(),
+      triggeredAtMessage: linesParsed,
+    });
   });
 
   it('', async () => {
