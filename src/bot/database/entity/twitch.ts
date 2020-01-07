@@ -1,4 +1,4 @@
-import { Column, Entity, Index, JoinColumn, ManyToOne, OneToMany, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
+import { EntitySchema } from 'typeorm';
 import { ColumnNumericTransformer } from './_transformer';
 
 // Cache mirror from tags endpoint
@@ -53,117 +53,133 @@ import { ColumnNumericTransformer } from './_transformer';
     }
 */
 
-@Entity()
-export class TwitchTag {
-  @PrimaryColumn()
-  tag_id!: string;
-  @Column()
-  is_auto!: boolean;
-  @Column({ default: false })
-  is_current!: boolean;
-
-  @OneToMany(() => TwitchTagLocalizationName, (entity) => entity.tag, {
-    cascade: true,
-  })
-  localization_names!: TwitchTagLocalizationName[];
-
-  @OneToMany(() => TwitchTagLocalizationDescription, (entity) => entity.tag, {
-    cascade: true,
-  })
-  localization_descriptions!: TwitchTagLocalizationDescription[];
-};
-
-@Entity()
-export class TwitchTagLocalizationName {
-  @PrimaryGeneratedColumn('uuid')
-  id!: string;
-
-  @Column()
-  locale!: string;
-  @Column()
-  value!: string;
-
-  @ManyToOne(() => TwitchTag, (entity) => entity.localization_names, {
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
-  })
-  @JoinColumn({ name: 'tagId' })
-  tag!: TwitchTag;
-  @Column({ name: 'tagId', nullable: true })
-  @Index()
-  tagId!: string | null;
+export interface TwitchTagInterface {
+  tag_id: string; is_auto: boolean; is_current?: boolean;
+  localization_names: TwitchTagLocalizationInterface[];
+  localization_descriptions: TwitchTagLocalizationInterface[];
 }
 
-@Entity()
-export class TwitchTagLocalizationDescription {
-  @PrimaryGeneratedColumn('uuid')
-  id!: string;
-
-  @Column()
-  locale!: string;
-  @Column('text')
-  value!: string;
-
-  @ManyToOne(() => TwitchTag, (entity) => entity.localization_descriptions, {
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
-  })
-  @JoinColumn({ name: 'tagId' })
-  tag!: TwitchTag;
-  @Column({ name: 'tagId', nullable: true })
-  @Index()
-  tagId!: string | null;
+export interface TwitchTagLocalizationInterface {
+  id?: string; locale: string; value: string; tag: TwitchTagInterface; tagId: string | null;
 }
 
-@Entity()
-export class TwitchStats {
-  @Column('bigint', {
-    transformer: new ColumnNumericTransformer(),
-    primary: true,
-  })
-  whenOnline!: number;
-
-  @Column({ default: 0 })
-  currentViewers!: number;
-  @Column({ default: 0 })
-  currentSubscribers!: number;
-  @Column('bigint', {
-    transformer: new ColumnNumericTransformer(),
-  })
-  currentBits!: number;
-  @Column('float', {
-    transformer: new ColumnNumericTransformer(),
-  })
-  currentTips!: number;
-  @Column('bigint', {
-    transformer: new ColumnNumericTransformer(),
-  })
-  chatMessages!: number;
-  @Column({ default: 0 })
-  currentFollowers!: number;
-  @Column({ default: 0 })
-  currentViews!: number;
-  @Column({ default: 0 })
-  maxViewers!: number;
-  @Column({ default: 0 })
-  currentHosts!: number;
-  @Column({ default: 0 })
-  newChatters!: number;
-  @Column('bigint', {
-    transformer: new ColumnNumericTransformer(),
-  })
-  currentWatched!: number;
+export interface TwitchStatsInterface {
+  whenOnline: number;
+  currentViewers?: number;
+  currentSubscribers?: number;
+  currentBits: number;
+  currentTips: number;
+  chatMessages: number;
+  currentFollowers?: number;
+  currentViews?: number;
+  maxViewers?: number;
+  currentHosts?: number;
+  newChatters?: number;
+  currentWatched: number;
 }
 
-@Entity()
-export class TwitchClips {
-  @PrimaryColumn()
-  clipId!: string;
-
-  @Column()
-  isChecked!: boolean;
-  @Column('bigint', {
-    transformer: new ColumnNumericTransformer(),
-  })
-  shouldBeCheckedAt!: number;
+export interface TwitchClipsInterface {
+  clipId: string; isChecked: boolean; shouldBeCheckedAt: number;
 }
+
+export const TwitchTag = new EntitySchema<Readonly<Required<TwitchTagInterface>>>({
+  name: 'twitch_tag',
+  columns: {
+    tag_id: { type: String, primary: true },
+    is_auto: { type: Boolean },
+    is_current: { type: Boolean, default: false },
+  },
+  relations: {
+    localization_names: {
+      type: 'one-to-many',
+      target: 'twitch_tag_localization_name',
+      inverseSide: 'tag',
+      cascade: true,
+    },
+    localization_descriptions: {
+      type: 'one-to-many',
+      target: 'twitch_tag_localization_description',
+      inverseSide: 'tag',
+      cascade: true,
+    },
+  },
+});
+
+export const TwitchTagLocalizationName = new EntitySchema<Readonly<Required<TwitchTagLocalizationInterface>>>({
+  name: 'twitch_tag_localization_name',
+  columns: {
+    id: { type: String, generated: 'uuid', primary: true },
+    locale: { type: String },
+    value: { type: String },
+    tagId: { type: String, nullable: true, name: 'tagId' },
+  },
+  relations: {
+    tag: {
+      type: 'many-to-one',
+      target: 'twitch_tag',
+      joinColumn: { name: 'tagId' },
+      inverseSide: 'localization_names',
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+    },
+  },
+  indices: [
+    {
+      name: 'IDX_dcf417a56c907f3a6788476047',
+      columns: [ 'tagId' ],
+    },
+  ],
+});
+
+export const TwitchTagLocalizationDescription = new EntitySchema<Readonly<Required<TwitchTagLocalizationInterface>>>({
+  name: 'twitch_tag_localization_description',
+  columns: {
+    id: { type: String, generated: 'uuid', primary: true },
+    locale: { type: String },
+    value: { type: 'text' },
+    tagId: { type: String, nullable: true, name: 'tagId' },
+  },
+  relations: {
+    tag: {
+      type: 'many-to-one',
+      target: 'twitch_tag',
+      joinColumn: { name: 'tagId' },
+      inverseSide: 'localization_names',
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+    },
+  },
+  indices: [
+    {
+      name: 'IDX_4d8108fc3e8dcbe5c112f53dd3',
+      columns: [ 'tagId' ],
+    },
+  ],
+});
+
+export const TwitchStats = new EntitySchema<Readonly<Required<TwitchStatsInterface>>>({
+  name: 'twitch_stats',
+  columns: {
+    whenOnline: { type: 'bigint', transformer: new ColumnNumericTransformer(), primary: true },
+    currentViewers: { type: Number, default: 0 },
+    currentSubscribers: { type: Number, default: 0 },
+    chatMessages: { type: 'bigint' },
+    currentFollowers: { type: Number, default: 0 },
+    currentViews: { type: Number, default: 0 },
+    maxViewers: { type: Number, default: 0 },
+    currentHosts: { type: Number, default: 0 },
+    newChatters: { type: Number, default: 0 },
+    currentBits: { type: 'bigint', transformer: new ColumnNumericTransformer() },
+    currentTips: { type: 'float', transformer: new ColumnNumericTransformer() },
+    currentWatched: { type: 'bigint', transformer: new ColumnNumericTransformer() },
+  },
+});
+
+export const TwitchClips = new EntitySchema<Readonly<Required<TwitchClipsInterface>>>({
+  name: 'twitch_clips',
+  columns: {
+    clipId: { type: String, primary: true },
+    isChecked: { type: Boolean },
+    shouldBeCheckedAt: { type: 'bigint', transformer: new ColumnNumericTransformer() },
+  },
+});
