@@ -391,13 +391,7 @@ class API extends Core {
       throw new Error('API can run only on master');
     }
 
-    const event = await getManager()
-      .createQueryBuilder()
-      .select('thread')
-      .from(ThreadEvent, 'thread')
-      .where('event = :event', { event: 'getChannelChattersUnofficialAPI' })
-      .getOne();
-
+    const event = await getRepository(ThreadEvent).findOne({ event: 'getChannelChattersUnofficialAPI' });
     if (typeof event === 'undefined') {
       const { modStatus, partedUsers, joinedUsers } = await getChannelChattersUnofficialAPI();
 
