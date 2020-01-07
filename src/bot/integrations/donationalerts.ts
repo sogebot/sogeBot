@@ -11,7 +11,7 @@ import { info, tip } from '../helpers/log.js';
 import { triggerInterfaceOnTip } from '../helpers/interface/triggers.js';
 
 import { getRepository } from 'typeorm';
-import { User, UserTip } from '../database/entity/user';
+import { User, UserTipInterface } from '../database/entity/user';
 import api from '../api.js';
 import events from '../events.js';
 import users from '../users.js';
@@ -119,35 +119,35 @@ class Donationalerts extends Integration {
         });
 
         if (!data._is_test_alert) {
-          let user = await getRepository(User).findOne({ where: { username: data.username.toLowerCase() }});
-          let id;
-          if (!user) {
-            id = await users.getIdByName(data.username.toLowerCase());
-            user = await getRepository(User).findOne({ where: { userId: id }});
-            if (!user && id) {
-              // if we still doesn't have user, we create new
-              user = new User();
-              user.userId = Number(id);
-              user.username = data.username.toLowerCase();
-              user = await getRepository(User).save(user);
+          const getUser = async (username, id) => {
+            const userByUsername = await getRepository(User).findOne({ where: { username: username.toLowerCase() }});
+            if (userByUsername) {
+              return userByUsername;
             }
-          } else {
-            id = user.userId;
-          }
 
-          const newTip = new UserTip();
-          newTip.amount = Number(data.amount);
-          newTip.currency = data.currency;
-          newTip.sortAmount = currency.exchange(Number(data.amount), data.currency, 'EUR');
-          newTip.message = data.message;
-          newTip.tippedAt = Date.now();
+            const user = await getRepository(User).findOne({ where: { userId: id }});
+            if (user) {
+              return user;
+            } else {
+              return getRepository(User).save({
+                userId: Number(id),
+                username: username.toLowerCase(),
+              });
+            }
+          };
 
-          if (user) {
-            user.tips.push(newTip);
-            await getRepository(User).save(user);
-          }
+          const user = await getUser(data.usename, await users.getIdByName(data.username.toLowerCase()));
+          const newTip: UserTipInterface = {
+            amount: Number(data.amount),
+            currency: data.currency,
+            sortAmount: currency.exchange(Number(data.amount), data.currency, 'EUR'),
+            message: data.message,
+            tippedAt: Date.now(),
+          };
+          user.tips.push(newTip);
+          getRepository(User).save(user);
 
-          tip(`${data.username.toLowerCase()}${id ? '#' + id : ''}, amount: ${Number(data.amount).toFixed(2)}${data.currency}, message: ${data.message}`);
+          tip(`${data.username.toLowerCase()}${user.userId ? '#' + user.userId : ''}, amount: ${Number(data.amount).toFixed(2)}${data.currency}, message: ${data.message}`);
 
           if (api.isStreamOnline) {
             api.stats.currentTips += Number(currency.exchange(data.amount, data.currency, currency.mainCurrency));
