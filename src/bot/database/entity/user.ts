@@ -65,8 +65,8 @@ export const User = new EntitySchema<Readonly<Required<UserInterface>>>({
     haveFollowedAtLock: {
       type: Boolean, default: false,
     },
-    rank: { type: String },
-    haveCustomRank: { type: Boolean },
+    rank: { type: String, default: '' },
+    haveCustomRank: { type: Boolean, default: false },
     followedAt: { type: 'bigint', default: 0, transformer: new ColumnNumericTransformer() },
     followCheckAt: { type: 'bigint', default: 0, transformer: new ColumnNumericTransformer() },
     subscribedAt: { type: 'bigint', default: 0, transformer: new ColumnNumericTransformer() },
@@ -94,14 +94,14 @@ export const User = new EntitySchema<Readonly<Required<UserInterface>>>({
   relations: {
     bits: {
       type: 'one-to-many',
-      target: 'user_bits',
+      target: 'user_bit',
       inverseSide: 'user',
       eager: true,
       cascade: true,
     },
     tips: {
       type: 'one-to-many',
-      target: 'user_tips',
+      target: 'user_tip',
       inverseSide: 'user',
       eager: true,
       cascade: true,
@@ -110,7 +110,7 @@ export const User = new EntitySchema<Readonly<Required<UserInterface>>>({
 });
 
 export const UserTip = new EntitySchema<Readonly<Required<UserTipInterface>>>({
-  name: 'user',
+  name: 'user_tip',
   columns: {
     id: {
       type: Number,
@@ -135,7 +135,7 @@ export const UserTip = new EntitySchema<Readonly<Required<UserTipInterface>>>({
 });
 
 export const UserBit = new EntitySchema<Readonly<Required<UserBitInterface>>>({
-  name: 'user',
+  name: 'user_bit',
   columns: {
     id: {
       type: Number,
