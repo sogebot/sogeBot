@@ -136,7 +136,7 @@ class Donationalerts extends Integration {
             }
           };
 
-          const user = await getUser(data.usename, await users.getIdByName(data.username.toLowerCase()));
+          const user = await getUser(data.username, await users.getIdByName(data.username.toLowerCase()));
           const newTip: UserTipInterface = {
             amount: Number(data.amount),
             currency: data.currency,
