@@ -98,19 +98,20 @@ class Qiwi extends Integration {
         user.tips.push(newTip);
         getRepository(User).save(user);
 
-        if (api.isStreamOnline) {
-          api.stats.currentTips += parseFloat(currency.exchange(amount, currency, currency.mainCurrency));
-        }
-
-        eventlist.add({
-          event: 'tip',
-          amount,
-          currency,
-          username: username || 'Anonymous',
-          message,
-          timestamp: Date.now(),
-        });
       }
+
+      if (api.isStreamOnline) {
+        api.stats.currentTips += parseFloat(currency.exchange(amount, currency, currency.mainCurrency));
+      }
+
+      eventlist.add({
+        event: 'tip',
+        amount,
+        currency,
+        username: username || 'Anonymous',
+        message,
+        timestamp: Date.now(),
+      });
 
       tip(`${username ? username : 'Anonymous'}${id ? '#' + id : ''}, amount: ${Number(amount).toFixed(2)}${DONATION_CURRENCY}, ${message ? 'message: ' + message : ''}`);
 

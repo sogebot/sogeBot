@@ -52,7 +52,7 @@ class WheelOfFortune extends Game {
   sockets () {
     publicEndpoint(this.nsp, 'win', async (index, username) => {
       // compensate for slight delay
-      setTimeout(processWinEndpoint(index, username), 2000);
+      setTimeout(() => processWinEndpoint(index, username), 2000);
     });
   }
 
