@@ -344,7 +344,7 @@ class Timers extends System {
       }
 
       await getRepository(TimerResponse).save({ ...response, isEnabled: !response.isEnabled });
-      sendMessage(translate(response.isEnabled ? 'timers.response-enabled' : 'timers.response-disabled')
+      sendMessage(translate(!response.isEnabled ? 'timers.response-enabled' : 'timers.response-disabled')
         .replace(/\$id/g, id), opts.sender);
       return true;
     }
@@ -357,7 +357,7 @@ class Timers extends System {
       }
 
       await getRepository(Timer).save({ ...timer, isEnabled: !timer.isEnabled });
-      sendMessage(translate(timer.isEnabled ? 'timers.timer-enabled' : 'timers.timer-disabled')
+      sendMessage(translate(!timer.isEnabled ? 'timers.timer-enabled' : 'timers.timer-disabled')
         .replace(/\$name/g, name), opts.sender);
       return true;
     }
