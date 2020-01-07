@@ -13,7 +13,7 @@ import System from './_interface';
 import { debug, error } from '../helpers/log';
 import { adminEndpoint } from '../helpers/socket';
 import { FindConditions, getRepository } from 'typeorm';
-import { User } from '../database/entity/user';
+import { User, UserInterface } from '../database/entity/user';
 import { getAllOnlineUsernames } from '../helpers/getAllOnlineUsernames';
 import { onChange, onLoad } from '../decorators/on';
 import permissions from '../permissions';
@@ -564,7 +564,7 @@ class Points extends System {
     this.get(opts);
   }
 
-  async decrement(where: Readonly<FindConditions<User>>, points: number) {
+  async decrement(where: FindConditions<Readonly<Required<UserInterface>>>, points: number) {
     await getRepository(User).decrement(where, 'points', points);
     await getRepository(User).createQueryBuilder()
       .update(User)

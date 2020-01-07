@@ -316,16 +316,18 @@ class Raffles extends System {
       relations: ['participants'],
       where: { winner: null, isClosed: false },
     });
-    let user = await getRepository(User).findOne({ userId: opts.sender.userId });
-    if (!user) {
-      user = new User();
-      user.userId = Number(opts.sender.userId);
-      user.username = opts.sender.username;
-      await getRepository(User).save(user);
-    }
 
     if (!raffle) {
       return true;
+    }
+
+    const user = await getRepository(User).findOne({ userId: opts.sender.userId });
+    if (!user) {
+      await getRepository(User).save({
+        userId: Number(opts.sender.userId),
+        username: opts.sender.username,
+      });
+      return this.participate(opts);
     }
 
     const isStartingWithRaffleKeyword = opts.message.toLowerCase().startsWith(raffle.keyword.toLowerCase());
