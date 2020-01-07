@@ -124,7 +124,7 @@ import { getSocket } from 'src/panel/helpers/socket';
 import { Validations } from 'vuelidate-property-decorators';
 import { required } from 'vuelidate/lib/validators';
 
-import { Timer, TimerResponse } from 'src/bot/database/entity/timer';
+import { TimerInterface, TimerResponseInterface } from 'src/bot/database/entity/timer';
 
 import uuid from 'uuid/v4';
 
@@ -164,7 +164,7 @@ export default class timerssEdit extends Vue {
     pending: false,
   }
 
-  item: Timer = {
+  item: TimerInterface = {
     id: uuid(),
     name: '',
     triggerEveryMessage: 0,
@@ -191,11 +191,12 @@ export default class timerssEdit extends Vue {
   }
 
   addResponse() {
-    const response = new TimerResponse();
-    response.id = uuid();
-    response.timestamp = Date.now();
-    response.isEnabled = true;
-    response.response = '';
+    const response: TimerResponseInterface = {
+      id: uuid(),
+      timestamp: Date.now(),
+      isEnabled: true,
+      response: '',
+    };
     this.item.messages.push(response);
   }
 
