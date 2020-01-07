@@ -24,11 +24,11 @@ describe('Top - !top points', () => {
 
   it ('Add 10 users into db and last user will don\'t have any points', async () => {
     for (let i = 0; i < 10; i++) {
-      let user = new User();
-      user.userId = Math.floor(Math.random() * 100000);
-      user.username = 'user' + i;
-      user.points = i * 15;
-      user = await getRepository(User).save(user);
+      user = await getRepository(User).save({
+        userId: Math.floor(Math.random() * 100000),
+        username: 'user' + i,
+        points: i * 15,
+      });
     }
   });
 

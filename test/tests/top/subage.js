@@ -26,22 +26,22 @@ describe('Top - !top subage', () => {
 
   it ('Add 10 users into db and last user will don\'t have any subage', async () => {
     for (let i = 0; i < 10; i++) {
-      const user = new User();
-      user.userId = Math.floor(Math.random() * 100000);
-      user.username = 'user' + i;
-      user.isSubscriber = true;
-      user.subscribedAt = Date.now() - (constants.HOUR * i);
-      await getRepository(User).save(user);
+      await getRepository(User).save({
+        userId: Math.floor(Math.random() * 100000),
+        username: 'user' + i,
+        isSubscriber: true,
+        subscribedAt: Date.now() - (constants.HOUR * i),
+      });
     }
   });
 
   it ('Add user with long subage but not subscriber', async () => {
-    const user = new User();
-    user.userId = Math.floor(Math.random() * 100000);
-    user.username = 'user11';
-    user.isSubscriber = false;
-    user.subscribedAt = Date.now() - (constants.HOUR * 24 * 30);
-    await getRepository(User).save(user);
+    await getRepository(User).save({
+      userId: Math.floor(Math.random() * 100000),
+      username: 'user11',
+      isSubscriber: false,
+      subscribedAt: Date.now() - (constants.HOUR * 24 * 30),
+    });
   });
 
   it('run !top subage and expect correct output', async () => {

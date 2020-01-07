@@ -24,24 +24,23 @@ describe('Top - !top tips', () => {
 
   it ('Add 10 users into db and last user will don\'t have any tips', async () => {
     for (let i = 0; i < 10; i++) {
-      let user = new User();
-      user.userId = Math.floor(Math.random() * 100000);
-      user.username = 'user' + i;
-      user = await getRepository(User).save(user);
-      user.tips = user.tips || [];
+      const user = {
+        tips: [],
+        ...await getRepository(User).save({ userId: Math.floor(Math.random() * 100000), username: 'user' + i }),
+      };
 
       if (i === 0) {
         continue;
       }
 
       for (let j = 0; j <= i; j++) {
-        const newTips = new UserTip();
-        newTips.amount = j;
-        newTips.sortAmount = j;
-        newTips.currency = 'EUR';
-        newTips.message = 'test';
-        newTips.timestamp = Date.now();
-        user.tips.push(newTips);
+        user.tips.push({
+          amount: j,
+          sortAmount: j,
+          currency: 'EUR',
+          message: 'test',
+          timestamp: Date.now(),
+        });
       }
 
       await getRepository(User).save(user);

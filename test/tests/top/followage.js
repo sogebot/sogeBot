@@ -27,22 +27,22 @@ describe('Top - !top followage', () => {
 
   it ('Add 10 users into db and last user will don\'t have any followage', async () => {
     for (let i = 0; i < 10; i++) {
-      const user = new User();
-      user.userId = Math.floor(Math.random() * 100000);
-      user.username = 'user' + i;
-      user.isFollower = true;
-      user.followedAt = Date.now() - (constants.HOUR * i);
-      await getRepository(User).save(user);
+      await getRepository(User).save({
+        userId: Math.floor(Math.random() * 100000),
+        username: 'user' + i,
+        isFollower: true,
+        followedAt: Date.now() - (constants.HOUR * i),
+      });
     }
   });
 
   it ('Add user with long followage but not follower', async () => {
-    const user = new User();
-    user.userId = Math.floor(Math.random() * 100000);
-    user.username = 'user11';
-    user.isFollower = false;
-    user.followedAt = Date.now() - (constants.HOUR * 24 * 30);
-    await getRepository(User).save(user);
+    await getRepository(User).save({
+      userId: Math.floor(Math.random() * 100000),
+      username: 'user11',
+      isFollower: false,
+      followedAt: Date.now() - (constants.HOUR * 24 * 30),
+    });
   });
 
   it('run !top followage and expect correct output', async () => {

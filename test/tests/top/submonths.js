@@ -24,11 +24,11 @@ describe('Top - !top submonths', () => {
 
   it ('Add 10 users into db and last user will don\'t have any submonths', async () => {
     for (let i = 0; i < 10; i++) {
-      let user = new User();
-      user.userId = Math.floor(Math.random() * 100000);
-      user.username = 'user' + i;
-      user.subscribeCumulativeMonths = i * 100;
-      user = await getRepository(User).save(user);
+      await getRepository(User).save({
+        userId: Math.floor(Math.random() * 100000),
+        username: 'user' + i,
+        subscribeCumulativeMonths: i * 100,
+      });
     }
   });
 
