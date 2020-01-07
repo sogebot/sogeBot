@@ -8,6 +8,30 @@ import { User } from '../database/entity/user';
 import api from '../api';
 import panel from '../panel';
 
+const processWinEndpoint = async (index: number, username: string) => {
+  const user = await getRepository(User).findOne({ username });
+  if (!user) {
+    await getRepository(User).save({
+      userId: Number(await api.getIdFromTwitch(username)),
+      username,
+    });
+    return processWinEndpoint(index, username);
+  }
+
+  for (const response of _self.data[index].responses) {
+    if (response.trim().length > 0) {
+      sendMessage(response, {
+        username: user.username,
+        displayName: user.displayname || user.username,
+        userId: user.userId,
+        emotes: [],
+        badges: {},
+        'message-type': 'chat',
+      });
+    }
+  }
+};
+
 class WheelOfFortune extends Game {
   @ui({
     type: 'link',
@@ -28,28 +52,7 @@ class WheelOfFortune extends Game {
   sockets () {
     publicEndpoint(this.nsp, 'win', async (index, username) => {
       // compensate for slight delay
-      setTimeout(async () => {
-        let user = await getRepository(User).findOne({ username });
-
-        if (!user) {
-          user = new User();
-          user.userId = Number(await api.getIdFromTwitch(username));
-          user.username = username;
-          await getRepository(User).save(user);
-        }
-        for (const response of this.data[index].responses) {
-          if (response.trim().length > 0) {
-            sendMessage(response, {
-              username: user.username,
-              displayName: user.displayname || user.username,
-              userId: user.userId,
-              emotes: [],
-              badges: {},
-              'message-type': 'chat',
-            });
-          }
-        }
-      }, 2000);
+      setTimeout(() => processWinEndpoint(index, username), 2000);
     });
   }
 
@@ -59,4 +62,7 @@ class WheelOfFortune extends Game {
   }
 }
 
-export default new WheelOfFortune();
+
+const _self = new WheelOfFortune();
+export default _self;
+export { WheelOfFortune };

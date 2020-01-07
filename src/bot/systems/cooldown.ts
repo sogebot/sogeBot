@@ -174,15 +174,13 @@ class Cooldown extends System {
       return true;
     }
 
-    let user = await getRepository(User).findOne({ userId: opts.sender.userId });
-    if (!user) {
-      user = new User();
-      user.userId = Number(opts.sender.userId);
-      user.username = opts.sender.username;
-    }
-    user.isSubscriber = typeof opts.sender.badges.subscriber !== 'undefined';
-    user.isModerator = typeof opts.sender.badges.moderator !== 'undefined';
-    await getRepository(User).save(user);
+    const user = await getRepository(User).save({
+      ...(await getRepository(User).findOne({ userId: opts.sender.userId })),
+      userId: Number(opts.sender.userId),
+      username: opts.sender.username,
+      isSubscriber: typeof opts.sender.badges.subscriber !== 'undefined',
+      isModerator: typeof opts.sender.badges.moderator !== 'undefined',
+    });
     let result = false;
     for (const cooldown of data) {
       if ((isOwner(opts.sender) && !cooldown.isOwnerAffected) || (user.isModerator && !cooldown.isModeratorAffected) || (user.isSubscriber && !cooldown.isSubscriberAffected) || (user.isFollower && !cooldown.isFollowerAffected)) {
@@ -291,15 +289,13 @@ class Cooldown extends System {
       return true;
     }
 
-    let user = await getRepository(User).findOne({ userId: opts.sender.userId });
-    if (!user) {
-      user = new User();
-      user.userId = Number(opts.sender.userId);
-      user.username = opts.sender.username;
-    }
-    user.isSubscriber = typeof opts.sender.badges.subscriber !== 'undefined';
-    user.isModerator = typeof opts.sender.badges.moderator !== 'undefined';
-    await getRepository(User).save(user);
+    const user = await getRepository(User).save({
+      ...(await getRepository(User).findOne({ userId: opts.sender.userId })),
+      userId: Number(opts.sender.userId),
+      username: opts.sender.username,
+      isSubscriber: typeof opts.sender.badges.subscriber !== 'undefined',
+      isModerator: typeof opts.sender.badges.moderator !== 'undefined',
+    });
 
     for (const cooldown of data) {
       if ((isOwner(opts.sender) && !cooldown.isOwnerAffected) || (user.isModerator && !cooldown.isModeratorAffected) || (user.isSubscriber && !cooldown.isSubscriberAffected) || (user.isFollower && !cooldown.isFollowerAffected)) {

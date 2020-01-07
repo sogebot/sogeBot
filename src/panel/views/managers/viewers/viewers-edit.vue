@@ -301,7 +301,7 @@ import VueFlatPickr from 'vue-flatpickr-component';
 import 'flatpickr/dist/flatpickr.css';
 
 import moment from 'moment';
-import { User } from 'src/bot/database/entity/user';
+import { UserInterface } from 'src/bot/database/entity/user';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import {
@@ -328,7 +328,7 @@ export default class viewersEdit extends Vue {
 
   socket = getSocket('/core/users');
 
-  viewer: User | null = null;
+  viewer: UserInterface | null = null;
   watchedTime: any = null;
 
   editingTipsIds: number[] = [];

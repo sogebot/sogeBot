@@ -9,7 +9,6 @@ export interface VariableInterface {
   currentValue: string; evalValue: string; runEveryTypeValue?: number;
   runEveryType?: 'isUsed' | string; runEvery?: number; responseType: number; responseText?: string;
   permission: string; readOnly?: boolean; usableOptions: string[]; runAt?: number;
-
 }
 
 export const Variable = new EntitySchema<Readonly<Required<VariableInterface>>>({

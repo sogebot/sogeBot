@@ -23,11 +23,11 @@ describe('Top - !top gifts', () => {
 
   it ('Add 10 users into db and last user will don\'t have any gifts', async () => {
     for (let i = 0; i < 10; i++) {
-      let user = new User();
-      user.userId = Math.floor(Math.random() * 100000);
-      user.username = 'user' + i;
-      user.giftedSubscribes = i * 100;
-      user = await getRepository(User).save(user);
+      await getRepository(User).save({
+        userId: Math.floor(Math.random() * 100000),
+        username: 'user' + i,
+        giftedSubscribes: i * 100,
+      });
     }
   });
 

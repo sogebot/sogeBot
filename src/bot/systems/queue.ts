@@ -124,12 +124,13 @@ class Queue extends System {
   @command('!queue join')
   async join (opts) {
     if (!(this.locked)) {
-      let user = await getRepository(User).findOne({ userId: opts.sender.userId });
+      const user = await getRepository(User).findOne({ userId: opts.sender.userId });
       if (!user) {
-        user = new User();
-        user.userId = Number(opts.sender.userId);
-        user.username = opts.sender.username;
-        await getRepository(User).save(user);
+        await getRepository(User).save({
+          userId: Number(opts.sender.userId),
+          username: opts.sender.username,
+        });
+        return this.join(opts);
       }
       const [all, followers, subscribers] = await Promise.all([this.eligibilityAll, this.eligibilityFollowers, this.eligibilitySubscribers]);
 

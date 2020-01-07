@@ -13,7 +13,7 @@ import { adminEndpoint } from './helpers/socket';
 
 import { PermissionCommands, PermissionFilters, Permissions as PermissionsEntity } from './database/entity/permissions';
 import { getRepository, LessThan } from 'typeorm';
-import { User } from './database/entity/user';
+import { User, UserInterface } from './database/entity/user';
 import oauth from './oauth';
 import currency from './currency';
 
@@ -240,7 +240,7 @@ class Permissions extends Core {
   }
 
   protected filters(
-    user: User,
+    user: Required<UserInterface>,
     filters: PermissionFilters[] = [],
   ): boolean {
     for (const f of filters) {

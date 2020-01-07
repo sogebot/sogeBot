@@ -7,7 +7,7 @@ import { onChange, onStartup } from '../decorators/on';
 import { info, tip } from '../helpers/log';
 import { triggerInterfaceOnTip } from '../helpers/interface/triggers';
 import { getRepository } from 'typeorm';
-import { User, UserTip } from '../database/entity/user';
+import { User, UserTipInterface } from '../database/entity/user';
 import users from '../users';
 import events from '../events';
 import alerts from '../registries/alerts';
@@ -104,35 +104,35 @@ class StreamElements extends Integration {
 
     const { username, amount, currency, message } = eventData.data;
 
-    let user = await getRepository(User).findOne({ where: { username: username.toLowerCase() }});
-    let id;
-    if (!user) {
-      id = await users.getIdByName(username.toLowerCase());
-      user = await getRepository(User).findOne({ where: { userId: id }});
-      if (!user && id) {
-        // if we still doesn't have user, we create new
-        user = new User();
-        user.userId = Number(id);
-        user.username = username.toLowerCase();
-        user = await getRepository(User).save(user);
+    const getUser = async (username, id) => {
+      const userByUsername = await getRepository(User).findOne({ where: { username: username.toLowerCase() }});
+      if (userByUsername) {
+        return userByUsername;
       }
-    } else {
-      id = user.userId;
-    }
 
-    const newTip = new UserTip();
-    newTip.amount = Number(amount);
-    newTip.currency = currency;
-    newTip.sortAmount = currency.exchange(Number(amount), currency, 'EUR');
-    newTip.message = message;
-    newTip.tippedAt = Date.now();
+      const user = await getRepository(User).findOne({ where: { userId: id }});
+      if (user) {
+        return user;
+      } else {
+        return getRepository(User).save({
+          userId: Number(id),
+          username: username.toLowerCase(),
+        });
+      }
+    };
 
-    if (user) {
-      user.tips.push(newTip);
-      await getRepository(User).save(user);
-    }
+    const user = await getUser(username, await users.getIdByName(username.toLowerCase()));
+    const newTip: UserTipInterface = {
+      amount: Number(amount),
+      currency: currency,
+      sortAmount: currency.exchange(Number(amount), currency, 'EUR'),
+      message: message,
+      tippedAt: Date.now(),
+    };
+    user.tips.push(newTip);
+    getRepository(User).save(user);
 
-    tip(`${username.toLowerCase()}${id ? '#' + id : ''}, amount: ${Number(eventData.data.amount).toFixed(2)}${eventData.data.currency}, message: ${eventData.data.message}`);
+    tip(`${username.toLowerCase()}${user.userId ? '#' + user.userId : ''}, amount: ${Number(eventData.data.amount).toFixed(2)}${eventData.data.currency}, message: ${eventData.data.message}`);
     events.fire('tip', {
       username: username.toLowerCase(),
       amount: parseFloat(eventData.data.amount).toFixed(2),

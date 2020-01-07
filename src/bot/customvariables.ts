@@ -10,7 +10,7 @@ import { getAllOnlineUsernames } from './helpers/getAllOnlineUsernames';
 import { getOwnerAsSender, getTime, isModerator, prepare, sendMessage } from './commons';
 
 import { getRepository } from 'typeorm';
-import { User } from './database/entity/user';
+import { User, UserInterface } from './database/entity/user';
 import { Variable, VariableInterface, VariableWatch } from './database/entity/variable';
 import { addToViewersCache, getfromViewersCache } from './helpers/permissions';
 import users from './users';
@@ -187,7 +187,7 @@ class CustomVariables {
     const containRandom = isNil(script.replace(/Math\.random|_\.random/g, '').match(/random/g));
     const containOnline = isNil(script.match(/online/g));
 
-    let usersList: User[] = [];
+    let usersList: UserInterface[] = [];
     if (containUsers || containRandom) {
       usersList = await getRepository(User).find();
     }

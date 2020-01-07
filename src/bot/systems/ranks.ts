@@ -7,7 +7,7 @@ import { command, default_permission } from '../decorators';
 import { permission } from '../helpers/permissions';
 import System from './_interface';
 
-import { User } from '../database/entity/user';
+import { User, UserInterface } from '../database/entity/user';
 import { getRepository } from 'typeorm';
 import { Rank } from '../database/entity/rank';
 import { adminEndpoint } from '../helpers/socket';
@@ -212,7 +212,7 @@ class Ranks extends System {
     sendMessage(message, opts.sender, opts.attr);
   }
 
-  async get (user: User | undefined) {
+  async get (user: Required<UserInterface> | undefined) {
     if (!user) {
       return '';
     }

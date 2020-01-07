@@ -1,132 +1,158 @@
-import { Column, Entity, Index, ManyToOne, OneToMany, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
+import { EntitySchema } from 'typeorm';
 import { ColumnNumericTransformer, SafeNumberTransformer } from './_transformer';
 
-@Entity()
-export class User {
-  @PrimaryColumn()
-  userId!: number;
-  @Column()
-  @Index()
-  username!: string;
-  @Column({ default: '' })
-  displayname!: string;
-  @Column({ default: '' })
-  profileImageUrl!: string;
-
-  @Column({ default: false })
-  isOnline!: boolean;
-  @Column({ default: false })
-  isVIP!: boolean;
-  @Column({ default: false })
-  isFollower!: boolean;
-  @Column({ default: false })
-  isModerator!: boolean;
-  @Column({ default: false })
-  isSubscriber!: boolean;
-
-  @Column({ default: false })
-  haveSubscriberLock!: boolean;
-  @Column({ default: false })
-  haveFollowerLock!: boolean;
-  @Column({ default: false })
-  haveSubscribedAtLock!: boolean;
-  @Column({ default: false })
-  haveFollowedAtLock!: boolean;
-
-  @Column({ default: '' })
-  rank!: string;
-  @Column({ default: false})
-  haveCustomRank!: boolean;
-
-  @Column('bigint', { transformer: new ColumnNumericTransformer(), default: 0 })
-  followedAt!: number;
-  @Column('bigint', { transformer: new ColumnNumericTransformer(), default: 0 })
-  followCheckAt!: number;
-  @Column('bigint', { transformer: new ColumnNumericTransformer(), default: 0 })
-  subscribedAt!: number;
-  @Column('bigint', { transformer: new ColumnNumericTransformer(), default: 0 })
-  seenAt!: number;
-  @Column('bigint', { transformer: new ColumnNumericTransformer(), default: 0 })
-  createdAt!: number;
-
-  @Column('bigint', { transformer: new ColumnNumericTransformer(), default: 0 })
-  watchedTime!: number;
-  @Column('bigint', { transformer: new ColumnNumericTransformer(), default: 0 })
-  chatTimeOnline!: number;
-  @Column('bigint', { transformer: new ColumnNumericTransformer(), default: 0 })
-  chatTimeOffline!: number;
-
-  @Column('bigint', { transformer: new SafeNumberTransformer(), default: 0 })
-  points!: number;
-  @Column('bigint', { transformer: new ColumnNumericTransformer(), default: 0 })
-  pointsOnlineGivenAt!: number;
-  @Column('bigint', { transformer: new ColumnNumericTransformer(), default: 0 })
-  pointsOfflineGivenAt!: number;
-  @Column('bigint', { transformer: new ColumnNumericTransformer(), default: 0 })
-  pointsByMessageGivenAt!: number;
-
-  @Column({ default: '0' })
-  subscribeTier!: string;
-  @Column({ default: 0 })
-  subscribeCumulativeMonths!: number;
-  @Column({ default: 0 })
-  subscribeStreak!: number;
-  @Column('bigint', { transformer: new ColumnNumericTransformer(), default: 0 })
-  giftedSubscribes!: number;
-
-  @OneToMany(() => UserTip, (tip) => tip.user, {
-    cascade: true, eager: true,
-  })
-  tips!: UserTip[];
-
-  @OneToMany(() => UserBit, (bit) => bit.user, {
-    cascade: true, eager: true,
-  })
-  bits!: UserBit[];
-
-  @Column('bigint', { transformer: new ColumnNumericTransformer(), default: 0 })
-  messages!: number;
-};
-
-@Entity()
-export class UserTip {
-  @PrimaryGeneratedColumn()
-  id!: string;
-
-  @ManyToOne(() => User, (user) => user.tips, {
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
-  })
-  user!: User;
-
-  @Column('float')
-  amount!: number;
-  @Column()
-  currency!: string;
-  @Column('text', { default: '' })
-  message!: string;
-  @Column('bigint', { transformer: new ColumnNumericTransformer(), default: 0 })
-  tippedAt!: number;
-
-  @Column('float')
-  sortAmount!: number;
+export interface UserInterface {
+  id?: string; userId: number; username: string; displayname?: string; profileImageUrl?: string;
+  isOnline?: boolean; isVIP?: boolean; isFollower?: boolean; isModerator?: boolean; isSubscriber?: boolean;
+  haveSubscriberLock?: boolean; haveFollowerLock?: boolean; haveSubscribedAtLock?: boolean; haveFollowedAtLock?: boolean; rank?: string; haveCustomRank?: boolean;
+  followedAt?: number; followCheckAt?: number; subscribedAt?: number; seenAt?: number; createdAt?: number;
+  watchedTime?: number; chatTimeOnline?: number; chatTimeOffline?: number;
+  points?: number; pointsOnlineGivenAt?: number; pointsOfflineGivenAt?: number; pointsByMessageGivenAt?: number;
+  subscribeTier?: string; subscribeCumulativeMonths?: number; subscribeStreak?: number; giftedSubscribes?: number;
+  tips: UserTipInterface[]; bits: UserBitInterface[]; messages?: number;
 }
 
-@Entity()
-export class UserBit {
-  @PrimaryGeneratedColumn()
-  id!: string;
-
-  @ManyToOne(() => User, (user) => user.bits, {
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
-  })
-  user!: User;
-
-  @Column('bigint', { transformer: new ColumnNumericTransformer() })
-  amount!: number;
-  @Column('text', { default: '' })
-  message!: string;
-  @Column('bigint', { transformer: new ColumnNumericTransformer(), default: 0 })
-  cheeredAt!: number;
+export interface UserTipInterface {
+  id?: string; user?: UserInterface; amount: number; currency: string; message?: string; tippedAt?: number; sortAmount: number;
 }
+
+export interface UserBitInterface {
+  id?: string; user?: UserInterface; amount: number; message?: string; cheeredAt?: number;
+}
+
+export const User = new EntitySchema<Readonly<Required<UserInterface>>>({
+  name: 'user',
+  columns: {
+    userId: {
+      type: Number,
+      primary: true,
+    },
+    username: {
+      type: String,
+    },
+    displayname: {
+      type: String,
+      default: '',
+    },
+    profileImageUrl: {
+      type: String,
+      default: '',
+    },
+    isOnline: {
+      type: Boolean, default: false,
+    },
+    isVIP: {
+      type: Boolean, default: false,
+    },
+    isFollower: {
+      type: Boolean, default: false,
+    },
+    isModerator: {
+      type: Boolean, default: false,
+    },
+    isSubscriber: {
+      type: Boolean, default: false,
+    },
+    haveSubscriberLock: {
+      type: Boolean, default: false,
+    },
+    haveFollowerLock: {
+      type: Boolean, default: false,
+    },
+    haveSubscribedAtLock: {
+      type: Boolean, default: false,
+    },
+    haveFollowedAtLock: {
+      type: Boolean, default: false,
+    },
+    rank: { type: String, default: '' },
+    haveCustomRank: { type: Boolean, default: false },
+    followedAt: { type: 'bigint', default: 0, transformer: new ColumnNumericTransformer() },
+    followCheckAt: { type: 'bigint', default: 0, transformer: new ColumnNumericTransformer() },
+    subscribedAt: { type: 'bigint', default: 0, transformer: new ColumnNumericTransformer() },
+    seenAt: { type: 'bigint', default: 0, transformer: new ColumnNumericTransformer() },
+    createdAt: { type: 'bigint', default: 0, transformer: new ColumnNumericTransformer() },
+    watchedTime: { type: 'bigint', default: 0, transformer: new ColumnNumericTransformer() },
+    chatTimeOnline: { type: 'bigint', default: 0, transformer: new ColumnNumericTransformer() },
+    chatTimeOffline: { type: 'bigint', default: 0, transformer: new ColumnNumericTransformer() },
+    points: { type: 'bigint', default: 0, transformer: new SafeNumberTransformer() },
+    pointsOnlineGivenAt: { type: 'bigint', default: 0, transformer: new ColumnNumericTransformer() },
+    pointsOfflineGivenAt: { type: 'bigint', default: 0, transformer: new ColumnNumericTransformer() },
+    pointsByMessageGivenAt: { type: 'bigint', default: 0, transformer: new ColumnNumericTransformer() },
+    subscribeTier: { type: String, default: '0' },
+    subscribeCumulativeMonths: { type: Number, default: 0 },
+    subscribeStreak: { type: Number, default: 0 },
+    giftedSubscribes: { type: 'bigint', default: 0, transformer: new ColumnNumericTransformer() },
+    messages: { type: 'bigint', default: 0, transformer: new ColumnNumericTransformer() },
+  },
+  indices: [
+    {
+      name: 'IDX_78a916df40e02a9deb1c4b75ed',
+      columns: [ 'username' ],
+    },
+  ],
+  relations: {
+    bits: {
+      type: 'one-to-many',
+      target: 'user_bit',
+      inverseSide: 'user',
+      eager: true,
+      cascade: true,
+    },
+    tips: {
+      type: 'one-to-many',
+      target: 'user_tip',
+      inverseSide: 'user',
+      eager: true,
+      cascade: true,
+    },
+  },
+});
+
+export const UserTip = new EntitySchema<Readonly<Required<UserTipInterface>>>({
+  name: 'user_tip',
+  columns: {
+    id: {
+      type: Number,
+      primary: true,
+      generated: 'rowid',
+    },
+    amount: { type: 'float' },
+    sortAmount: { type: 'float' },
+    currency: { type: String },
+    message: { type: 'text', default: '' },
+    tippedAt: { type: 'bigint', default: 0, transformer: new ColumnNumericTransformer() },
+  },
+  relations: {
+    user: {
+      type: 'many-to-one',
+      target: 'user',
+      inverseSide: 'tips',
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+    },
+  },
+});
+
+export const UserBit = new EntitySchema<Readonly<Required<UserBitInterface>>>({
+  name: 'user_bit',
+  columns: {
+    id: {
+      type: Number,
+      primary: true,
+      generated: 'rowid',
+    },
+    amount: { type: 'bigint', transformer: new ColumnNumericTransformer() },
+    message: { type: 'text', default: '' },
+    cheeredAt: { type: 'bigint', default: 0, transformer: new ColumnNumericTransformer() },
+  },
+  relations: {
+    user: {
+      type: 'many-to-one',
+      target: 'user',
+      inverseSide: 'bits',
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+    },
+  },
+});

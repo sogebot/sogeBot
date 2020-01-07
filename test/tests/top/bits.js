@@ -25,22 +25,21 @@ describe('Top - !top bits', () => {
 
   it ('Add 10 users into db and last user will don\'t have any bits', async () => {
     for (let i = 0; i < 10; i++) {
-      let user = new User();
-      user.userId = Math.floor(Math.random() * 100000);
-      user.username = 'user' + i;
-      user = await getRepository(User).save(user);
-      user.bits = user.bits || [];
+      const user = {
+        bits: [],
+        ...await getRepository(User).save({ userId: Math.floor(Math.random() * 100000), username: 'user' + i }),
+      };
 
       if (i === 0) {
         continue;
       }
 
       for (let j = 0; j <= i; j++) {
-        const newBits = new UserBit();
-        newBits.amount = j;
-        newBits.cheeredAt = Date.now();
-        newBits.message = '';
-        user.bits.push(newBits);
+        user.bits.push({
+          amount: j,
+          cheeredAt: Date.now(),
+          message: '',
+        });
       }
 
       await getRepository(User).save(user);

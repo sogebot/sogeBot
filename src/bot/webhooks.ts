@@ -210,7 +210,7 @@ class Webhooks {
       }
   }
   */
-  async follower (aEvent) {
+  async follower (aEvent, skipCacheCheck = false) {
     try {
       const cid = oauth.channelId;
       const data = aEvent.data;
@@ -228,16 +228,24 @@ class Webhooks {
       }
 
       // is in webhooks cache
-      if (this.existsInCache('follow', data.from_id)) {
-        return;
+      if (!skipCacheCheck) {
+        if (this.existsInCache('follow', data.from_id)) {
+          return;
+        }
+
+        // add to cache
+        this.addIdToCache('follow', data.from_id);
       }
 
-      // add to cache
-      this.addIdToCache('follow', data.from_id);
-
-      const user = await getRepository(User).findOne({ userId: data.from_id }) ?? new User();
-      user.userId = Number(data.from_id);
-      user.username = data.from_name.toLowerCase();
+      const user = await getRepository(User).findOne({ userId: data.from_id });
+      if (!user) {
+        await getRepository(User).save({
+          userId: Number(data.from_id),
+          username: data.from_name.toLowerCase(),
+        });
+        this.follower(aEvent, true);
+        return;
+      }
 
       if (!user.isFollower && (user.followedAt === 0 || Date.now() - user.followedAt > 60000 * 60)) {
         if (!isBot(data.from_name)) {
@@ -265,10 +273,12 @@ class Webhooks {
         }
       }
 
-      user.isFollower = user.haveFollowerLock? user.isFollower : true;
-      user.followedAt = user.haveFollowedAtLock ? user.followedAt : Date.now();
-      user.followCheckAt = Date.now();
-      await getRepository(User).save(user, { });
+      await getRepository(User).save({
+        ...user,
+        isFollower: user.haveFollowerLock? user.isFollower : true,
+        followedAt: user.haveFollowedAtLock ? user.followedAt : Date.now(),
+        followCheckAt: Date.now(),
+      });
     } catch (e) {
       error(e.stack);
       error(util.inspect(aEvent));

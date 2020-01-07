@@ -7,7 +7,7 @@ import { error, tip } from '../helpers/log';
 import Integration from './_interface';
 import { getRepository } from 'typeorm';
 
-import { User, UserTip } from '../database/entity/user';
+import { User, UserTipInterface } from '../database/entity/user';
 import users from '../users.js';
 import api from '../api.js';
 import events from '../events.js';
@@ -67,30 +67,37 @@ class Qiwi extends Integration {
       const amount = Number(DONATION_AMOUNT);
       const currency = DONATION_CURRENCY;
 
-      let user = await getRepository(User).findOne({ where: { username }});
-      let id;
-      if (!user) {
-        id = await users.getIdByName(username);
-        user = await getRepository(User).findOne({ where: { userId: id }});
-        if (!user && id && username) {
-          // if we still doesn't have user, we create new
-          user = new User();
-          user.userId = Number(id);
-          user.username = data.username.toLowerCase();
-          user = await getRepository(User).save(user);
+      const getUser = async (username, id) => {
+        const userByUsername = await getRepository(User).findOne({ where: { username: username.toLowerCase() }});
+        if (userByUsername) {
+          return userByUsername;
         }
-      }
 
-      const newTip = new UserTip();
-      newTip.amount = Number(amount);
-      newTip.currency = currency;
-      newTip.sortAmount = currency.exchange(Number(amount), currency, 'EUR');
-      newTip.message = message;
-      newTip.tippedAt = Date.now();
+        const user = await getRepository(User).findOne({ where: { userId: id }});
+        if (user) {
+          return user;
+        } else {
+          return getRepository(User).save({
+            userId: Number(id),
+            username: username.toLowerCase(),
+          });
+        }
+      };
 
-      if (user) {
+      let id: number | null = null;
+      if (username) {
+        const user = await getUser(username, await users.getIdByName(username.toLowerCase()));
+        id = user.userId;
+        const newTip: UserTipInterface = {
+          amount: Number(amount),
+          currency: currency,
+          sortAmount: currency.exchange(Number(amount), currency, 'EUR'),
+          message: message,
+          tippedAt: Date.now(),
+        };
         user.tips.push(newTip);
-        await getRepository(User).save(user);
+        getRepository(User).save(user);
+
       }
 
       if (api.isStreamOnline) {

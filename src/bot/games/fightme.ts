@@ -53,20 +53,20 @@ class FightMe extends Game {
         user = await getRepository(User).findOne({ where: { userId: id }});
         if (!user && id) {
           // if we still doesn't have user, we create new
-          user = new User();
-          user.userId = Number(id);
-          user.username = username.toLowerCase();
-          user = await getRepository(User).save(user);
+          await getRepository(User).save({
+            userId: Number(id), usenrame: username.toLowerCase(),
+          });
         }
+        return this.main(opts);
       }
 
       challenger = await getRepository(User).findOne({ where: { userId: opts.sender.userId }});
       if (!challenger) {
         // if we still doesn't have user, we create new
-        challenger = new User();
-        challenger.userId = opts.sender.userId;
-        challenger.username = opts.sender.username.toLowerCase();
-        challenger = await getRepository(User).save(challenger);
+        await getRepository(User).save({
+          userId: opts.sender.userId, usenrame: opts.sender.username.toLowerCase(),
+        });
+        return this.main(opts);
       }
     } catch (e) {
       sendMessage(translate('gambling.fightme.notEnoughOptions'), opts.sender, opts.attr);
