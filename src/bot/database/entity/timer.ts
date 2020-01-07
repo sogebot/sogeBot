@@ -46,7 +46,7 @@ export const TimerResponse = new EntitySchema<Readonly<Required<TimerResponseInt
   columns: {
     id: { type: String, primary: true, generated: 'uuid' },
     timestamp: { type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0 },
-    isEnabled: { type: Number, default: true },
+    isEnabled: { type: Boolean, default: true },
     response: { type: 'text' },
   },
   relations: {
