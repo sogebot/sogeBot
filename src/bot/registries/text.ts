@@ -38,15 +38,16 @@ class Text extends Registry {
       const item = await getRepository(TextEntity).findOne({ id });
       let text = '';
       if (item) {
+        text = item.text;
         for (const variable of item.text.match(regexp) || []) {
           const isVariable = await customvariables.isVariableSet(variable);
           let value = `<strong>$_${variable.replace('$_', '')}</strong>`;
           if (isVariable) {
             value = await customvariables.getValueOf(variable) || '';
           }
-          text = item.text.replace(new RegExp(`\\${variable}`, 'g'), value);
+          text = text.replace(new RegExp(`\\${variable}`, 'g'), value);
         }
-        text = await new Message(item.text).parse();
+        text = await new Message(text).parse();
         callback({...item, text});
       }
       callback(null);
