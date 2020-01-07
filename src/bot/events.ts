@@ -106,22 +106,16 @@ class Events extends Core {
     attributes = _.clone(attributes) || {};
 
     if (!_.isNil(_.get(attributes, 'username', null))) {
-      let user;
-      if (attributes.userId) {
-        user = await getRepository(User).findOne({ userId: attributes.userId });
-      } else {
-        user = await getRepository(User).findOne({ username: attributes.username });
-      }
+      const user = attributes.userId
+        ? await getRepository(User).findOne({ userId: attributes.userId })
+        : await getRepository(User).findOne({ username: attributes.username });
 
       if (!user) {
-        user = new User();
-        user.username = attributes.username;
-        if (!attributes.userId) {
-          user.userId = Number(await api.getIdFromTwitch(user.username));
-        } else {
-          user.userId = Number(attributes.userId);
-        }
-        await getRepository(User).save(user);
+        await getRepository(User).save({
+          userId: Number(attributes.userId ? attributes.userId : await api.getIdFromTwitch(attributes.username)),
+          username: attributes.username,
+        });
+        return this.fire(eventId, attributes);
       }
 
       // add is object
@@ -135,13 +129,13 @@ class Events extends Core {
       };
     }
     if (!_.isNil(_.get(attributes, 'recipient', null))) {
-      let  user = await getRepository(User).findOne({ username: attributes.recipient });
-
+      const user = await getRepository(User).findOne({ username: attributes.recipient });
       if (!user) {
-        user = new User();
-        user.username = attributes.recipient;
-        user.userId = Number(await api.getIdFromTwitch(user.username));
-        await getRepository(User).save(user);
+        await getRepository(User).save({
+          userId: Number(await api.getIdFromTwitch(attributes.recipient)),
+          username: attributes.recipient,
+        });
+        return this.fire(eventId, attributes);
       }
 
       // add is object
@@ -306,14 +300,14 @@ class Events extends Core {
 
   public async fireSendChatMessageOrWhisper(operation, attributes, whisper) {
     const username = _.isNil(attributes.username) ? getOwner() : attributes.username;
-    let userObj = await getRepository(User).findOne({ username });
+    const userObj = await getRepository(User).findOne({ username });
     if (!userObj) {
-      userObj = new User();
-      userObj.userId = await api.getIdFromTwitch(username);
-      userObj.username = username;
-      await getRepository(User).save(userObj);
+      await getRepository(User).save({
+        userId: await api.getIdFromTwitch(username),
+        username,
+      });
+      return this.fireSendChatMessageOrWhisper(operation, attributes, whisper);
     }
-
 
     let message = operation.messageToSend;
     const atUsername = tmi.showWithAt;
