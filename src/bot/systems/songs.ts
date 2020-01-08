@@ -14,7 +14,7 @@ import { onChange, onLoad } from '../decorators/on';
 import { error, info } from '../helpers/log';
 import { adminEndpoint, publicEndpoint } from '../helpers/socket';
 import { Brackets, getRepository } from 'typeorm';
-import { SongBan, SongPlaylist, SongRequest } from '../database/entity/song';
+import { SongBan, SongPlaylist, SongPlaylistInterface, SongRequest } from '../database/entity/song';
 import oauth from '../oauth';
 import { translate } from '../translate';
 
@@ -100,13 +100,15 @@ class Songs extends System {
       }
 
       const [playlist, count] = await query.getManyAndCount();
-      for (const i of playlist) {
-        i.volume = await this.getVolume(i);
-        i.forceVolume = i.forceVolume || false;
-      }
-      cb(playlist, count);
+      cb(await Promise.all(playlist.map(async (pl) => {
+        return {
+          ...pl,
+          volume: await this.getVolume(pl),
+          forceVolume: pl.forceVolume || false,
+        };
+      })), count);
     });
-    adminEndpoint(this.nsp, 'songs::save', async (item: SongPlaylist, cb) => {
+    adminEndpoint(this.nsp, 'songs::save', async (item: SongPlaylistInterface, cb) => {
       cb(null, await getRepository(SongPlaylist).save(item));
     });
     adminEndpoint(this.nsp, 'songs::getAllBanned', async (where, cb) => {
@@ -209,9 +211,7 @@ class Songs extends System {
   async setTrim (socket, data) {
     const song = await getRepository(SongPlaylist).findOne({videoId: data.id});
     if (song) {
-      song.startTime = data.lowValue;
-      song.endTime = data.highValue;
-      await getRepository(SongPlaylist).save(song);
+      await getRepository(SongPlaylist).save({...song, startTime: data.lowValue, endTime: data.highValue});
     }
   }
 
@@ -254,8 +254,7 @@ class Songs extends System {
   async refreshPlaylistVolume () {
     const playlist = await getRepository(SongPlaylist).find();
     for (const item of playlist) {
-      item.volume = await this.getVolume(item);
-      await getRepository(SongPlaylist).save(item);
+      await getRepository(SongPlaylist).save({...item, volume: await this.getVolume(item)});
     }
   }
 
@@ -360,13 +359,13 @@ class Songs extends System {
         return;
       }
 
-      pl.seed = 1;
-      pl.lastPlayedAt = Date.now();
-      await getRepository(SongPlaylist).save(pl);
-      const currentSong: any = pl;
-      currentSong.volume = await this.getVolume(currentSong);
-      currentSong.username = getBot();
-      currentSong.type = 'playlist';
+      const updatedItem = await getRepository(SongPlaylist).save({...pl, seed: 1, lastPlayedAt: Date.now() });
+      const currentSong = {
+        ...updatedItem,
+        volume: await this.getVolume(updatedItem),
+        username: getBot(),
+        type: 'playlist',
+      };
       this.currentSong = JSON.stringify(currentSong);
 
       if (this.notify) {
@@ -453,8 +452,7 @@ class Songs extends System {
   async createRandomSeeds () {
     const playlist = await getRepository(SongPlaylist).find();
     for (const item of playlist) {
-      item.seed = Math.random();
-      await getRepository(SongPlaylist).save(item);
+      await getRepository(SongPlaylist).save({...item, seed: Math.random()});
     }
   }
 
