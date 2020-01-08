@@ -54,7 +54,7 @@ import { capitalize } from 'src/panel/helpers/capitalize';
 import { Vue, Component/*, Watch */ } from 'vue-property-decorator';
 import { isNil } from 'lodash-es';
 import { escape } from 'xregexp';
-import { Rank } from 'src/bot/database/entity/rank';
+import { RankInterface } from 'src/bot/database/entity/rank';
 
 @Component({
   components: {
@@ -65,7 +65,7 @@ import { Rank } from 'src/bot/database/entity/rank';
 export default class ranksList extends Vue {
   socket = getSocket('/systems/ranks');
 
-  items: Rank[] = [];
+  items: RankInterface[] = [];
   search: string = '';
   state: {
     loading: number;
