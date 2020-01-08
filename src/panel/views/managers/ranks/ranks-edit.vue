@@ -74,7 +74,7 @@ import { Validations } from 'vuelidate-property-decorators';
 import { required, minValue } from 'vuelidate/lib/validators'
 
 import uuid from 'uuid/v4';
-import { Rank } from 'src/bot/database/entity/rank';
+import { RankInterface } from 'src/bot/database/entity/rank';
 
 Component.registerHooks([
   'beforeRouteEnter',
@@ -107,7 +107,7 @@ export default class ranksEdit extends Vue {
     pending: false,
   }
 
-  item: Rank = {
+  item: RankInterface = {
     id: uuid(),
     hours: 0,
     rank: '',
@@ -132,7 +132,7 @@ export default class ranksEdit extends Vue {
   async mounted() {
     if (this.$route.params.id) {
       await new Promise(resolve => {
-        this.socket.emit('ranks::getOne', this.$route.params.id, (data: Rank) => {
+        this.socket.emit('ranks::getOne', this.$route.params.id, (data: RankInterface) => {
           console.debug('Loaded', data);
           this.item = data;
           resolve();

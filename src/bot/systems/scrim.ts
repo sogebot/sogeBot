@@ -97,13 +97,12 @@ class Scrim extends System {
         this.currentMatches();
       } else {
         const [matchId] = new Expects(opts.parameters).everything({name: 'matchId'}).toArray();
-        let scrimMatchId = await getRepository(ScrimMatchId).findOne({ username: opts.sender.username});
-        if (!scrimMatchId) {
-          scrimMatchId = new ScrimMatchId();
-          scrimMatchId.username = opts.sender.username;
-        }
-        scrimMatchId.matchId = matchId;
-        await getRepository(ScrimMatchId).save(scrimMatchId);
+        const scrimMatchId = await getRepository(ScrimMatchId).findOne({ username: opts.sender.username});
+        await getRepository(ScrimMatchId).save({
+          ...scrimMatchId,
+          username: opts.sender.username,
+          matchId,
+        });
       }
     } catch (e) {
       if (isNaN(Number(e.message))) {
