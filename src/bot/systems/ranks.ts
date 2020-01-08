@@ -9,7 +9,7 @@ import System from './_interface';
 
 import { User, UserInterface } from '../database/entity/user';
 import { getRepository } from 'typeorm';
-import { Rank } from '../database/entity/rank';
+import { Rank, RankInterface } from '../database/entity/rank';
 import { adminEndpoint } from '../helpers/socket';
 import users from '../users';
 import { translate } from '../translate';
@@ -44,7 +44,7 @@ class Ranks extends System {
       await getRepository(Rank).delete(id);
       cb();
     });
-    adminEndpoint(this.nsp, 'ranks::save', async (item: Rank, cb) => {
+    adminEndpoint(this.nsp, 'ranks::save', async (item: Required<RankInterface>, cb) => {
       try {
         await getRepository(Rank).save(item);
         cb(null, item);
@@ -69,10 +69,9 @@ class Ranks extends System {
     const hours = parseInt(parsed[1], 10);
     const rank = await getRepository(Rank).findOne({ hours });
     if (!rank) {
-      const newRank = new Rank();
-      newRank.hours = hours;
-      newRank.rank = parsed[2];
-      await getRepository(Rank).save(newRank);
+      await getRepository(Rank).save({
+        hours, rank: parsed[2],
+      });
     }
 
     const message = await prepare(!rank ? 'ranks.rank-was-added' : 'ranks.ranks-already-exist', { rank: parsed[2], hours });
@@ -100,8 +99,9 @@ class Ranks extends System {
       return false;
     }
 
-    item.rank = rank;
-    await getRepository(Rank).save(item);
+    await getRepository(Rank).save({
+      ...item, rank,
+    });
     const message = await prepare('ranks.rank-was-edited', { hours: parseInt(hours, 10), rank: rank });
     sendMessage(message, opts.sender, opts.attr);
   }
