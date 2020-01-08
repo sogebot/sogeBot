@@ -60,7 +60,7 @@ export const SongRequest = new EntitySchema<Readonly<Required<SongRequestInterfa
 export const SongBan = new EntitySchema<Readonly<Required<SongBanInterface>>>({
   name: 'song_ban',
   columns: {
-    videoId: { type: String },
+    videoId: { type: String, primary: true },
     title: { type: String },
   },
 });
