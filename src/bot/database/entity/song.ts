@@ -1,52 +1,66 @@
-import { Column, Entity, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
+import { EntitySchema } from 'typeorm';
 import { ColumnNumericTransformer } from './_transformer';
 
-@Entity()
-export class SongPlaylist {
-  @PrimaryColumn()
-  videoId!: string;
-  @Column('bigint', { transformer: new ColumnNumericTransformer(), default: 0 })
-  lastPlayedAt!: number;
-  @Column('float')
-  seed!: number;
-  @Column()
-  title!: string;
-  @Column('float')
-  loudness!: number;
-  @Column()
-  length!: number;
-  @Column({ default: false })
-  forceVolume!: boolean;
-  @Column()
-  volume!: number;
-  @Column()
-  startTime!: number;
-  @Column()
-  endTime!: number;
-};
+export interface SongPlaylistInterface {
+  videoId: string;
+  lastPlayedAt?: number;
+  seed: number;
+  title: string;
+  loudness: number;
+  length: number;
+  forceVolume?: boolean;
+  volume: number;
+  startTime: number;
+  endTime: number;
+}
 
-@Entity()
-export class SongRequest {
-  @PrimaryGeneratedColumn('uuid')
-  id!: string;
-  @Column()
-  videoId!: string;
-  @Column('bigint', { transformer: new ColumnNumericTransformer(), default: 0 })
-  addedAt!: number;
-  @Column()
-  title!: string;
-  @Column('float')
-  loudness!: number;
-  @Column()
-  length!: number;
-  @Column()
-  username!: string;
-};
+export interface SongRequestInterface {
+  id?: string;
+  videoId: string;
+  addedAt?: number;
+  title: string;
+  loudness: number;
+  length: number;
+  username: string;
+}
+export interface SongBanInterface {
+  videoId: string;
+  title: string;
+}
 
-@Entity()
-export class SongBan {
-  @PrimaryColumn()
-  videoId!: string;
-  @Column()
-  title!: string;
-};
+export const SongPlaylist = new EntitySchema<Readonly<Required<SongPlaylistInterface>>>({
+  name: 'song_playlist',
+  columns: {
+    videoId: { type: String, primary: true },
+    lastPlayedAt: { type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0 },
+    seed: { type: 'float' },
+    title: { type: String },
+    loudness: { type: 'float' },
+    length: { type: Number },
+    volume: { type: Number },
+    startTime: { type: Number },
+    endTime: { type: Number },
+    forceVolume: { type: Boolean, default: false },
+  },
+});
+
+export const SongRequest = new EntitySchema<Readonly<Required<SongRequestInterface>>>({
+  name: 'song_request',
+  columns: {
+    id: { type: String, primary: true, generated: 'uuid' },
+    videoId: { type: String },
+    addedAt: { type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0 },
+    title: { type: String },
+    loudness: { type: 'float' },
+    length: { type: Number },
+    username: { type: String },
+  },
+});
+
+export const SongBan = new EntitySchema<Readonly<Required<SongBanInterface>>>({
+  name: 'song_ban',
+  columns: {
+    videoId: { type: String },
+    title: { type: String },
+  },
+});

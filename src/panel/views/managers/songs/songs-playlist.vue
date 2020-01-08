@@ -117,7 +117,7 @@
 import { getSocket } from 'src/panel/helpers/socket';
 
 import { Vue, Component, Watch } from 'vue-property-decorator';
-import { SongPlaylist } from 'src/bot/database/entity/song';
+import { SongPlaylistInterface } from 'src/bot/database/entity/song';
 
 @Component({
   components: {
@@ -140,7 +140,7 @@ import { SongPlaylist } from 'src/bot/database/entity/song';
 export default class playlist extends Vue {
   socket = getSocket('/systems/songs');
 
-  items: SongPlaylist[] = [];
+  items: SongPlaylistInterface[] = [];
   search: string = '';
   toAdd: string = '';
   importInfo: string = '';

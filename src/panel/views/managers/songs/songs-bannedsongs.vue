@@ -55,7 +55,7 @@ import { getSocket } from 'src/panel/helpers/socket';
 import { Vue, Component/*, Watch */ } from 'vue-property-decorator';
 import { isNil } from 'lodash-es';
 import { escape } from 'xregexp';
-import { SongBan } from 'src/bot/database/entity/song';
+import { SongBanInterface } from 'src/bot/database/entity/song';
 
 @Component({
   components: {
@@ -66,7 +66,7 @@ import { SongBan } from 'src/bot/database/entity/song';
 export default class playlist extends Vue {
   socket = getSocket('/systems/songs');
 
-  items: SongBan[] = [];
+  items: SongBanInterface[] = [];
   search: string = '';
   toAdd: string = '';
   importInfo: string = '';
