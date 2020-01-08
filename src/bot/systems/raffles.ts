@@ -11,7 +11,7 @@ import { adminEndpoint } from '../helpers/socket';
 
 import { getRepository } from 'typeorm';
 import { User } from '../database/entity/user';
-import { Raffle, RaffleParticipant, RaffleParticipantMessage } from '../database/entity/raffle';
+import { Raffle, RaffleParticipant, RaffleParticipantInterface, RaffleParticipantMessageInterface } from '../database/entity/raffle';
 import { debug, warning } from '../helpers/log';
 import api from '../api';
 import oauth from '../oauth';
@@ -58,7 +58,7 @@ class Raffles extends System {
         await getRepository(User).findOne({username}),
       );
     });
-    adminEndpoint(this.nsp, 'raffle::updateParticipant', async (participant: RaffleParticipant, cb) => {
+    adminEndpoint(this.nsp, 'raffle::updateParticipant', async (participant: RaffleParticipantInterface, cb) => {
       cb(
         await getRepository(RaffleParticipant).save(participant),
       );
@@ -111,9 +111,10 @@ class Raffles extends System {
         },
       });
       if (winner) {
-        const message = new RaffleParticipantMessage();
-        message.timestamp = Date.now();
-        message.text = opts.message;
+        const message: RaffleParticipantMessageInterface = {
+          timestamp: Date.now(),
+          text: opts.message,
+        };
         winner.messages.push(message);
         await getRepository(RaffleParticipant).save(winner);
       };
@@ -345,7 +346,7 @@ class Raffles extends System {
       tickets = 0;
     }
 
-    let participant = raffle.participants.find(o => o.username === opts.sender.username);
+    const participant = raffle.participants.find(o => o.username === opts.sender.username);
     let curTickets = 0;
     if (participant) {
       curTickets = participant.tickets;
@@ -357,40 +358,40 @@ class Raffles extends System {
     }
     tickets = newTickets - curTickets;
 
-    if (!participant) {
-      participant = new RaffleParticipant();
-      participant.raffle = raffle;
-      participant.isEligible = true;
-      participant.username = opts.sender.username;
-    }
-    participant.tickets = raffle.type === TYPE_NORMAL ? 1 : newTickets;
-    participant.messages = [];
-    participant.isFollower = user.isFollower;
-    participant.isSubscriber = user.isSubscriber;
+    const selectedParticipant = {
+      ...participant,
+      raffle,
+      isEligible: participant?.isEligible ?? true,
+      username: opts.sender.username,
+      tickets: raffle.type === TYPE_NORMAL ? 1 : newTickets,
+      messages: [],
+      isFollower: user.isFollower,
+      isSubscriber: user.isSubscriber,
+    };
 
     if (raffle.type === TYPE_TICKETS && await points.getPointsOf(opts.sender.userId) < tickets) {
       return false;
     } // user doesn't have enough points
 
-    if (raffle.forFollowers && raffle.forSubscribers && participant.isEligible) {
-      participant.isEligible = user.isFollower || user.isSubscriber;
-    } else if (raffle.forFollowers && participant.isEligible) {
-      participant.isEligible = user.isFollower;
-    } else if (raffle.forSubscribers && participant.isEligible) {
-      participant.isEligible = user.isSubscriber;
+    if (raffle.forFollowers && raffle.forSubscribers && selectedParticipant.isEligible) {
+      selectedParticipant.isEligible = user.isFollower || user.isSubscriber;
+    } else if (raffle.forFollowers && selectedParticipant.isEligible) {
+      selectedParticipant.isEligible = user.isFollower;
+    } else if (raffle.forSubscribers && selectedParticipant.isEligible) {
+      selectedParticipant.isEligible = user.isSubscriber;
     }
 
-    if (participant.isEligible) {
+    if (selectedParticipant.isEligible) {
       if (raffle.type === TYPE_TICKETS) {
         await points.decrement({ userId: opts.sender.userId }, tickets);
       }
       debug('raffle', '------------------------------------------------------------------------------------------------');
       debug('raffle', `Eligible user ${opts.sender.username}#${opts.sender.userId} for raffle ${raffle.id}`);
       debug('raffle', opts.sender);
-      debug('raffle', participant);
+      debug('raffle', selectedParticipant);
       debug('raffle', user);
       debug('raffle', '------------------------------------------------------------------------------------------------');
-      await getRepository(RaffleParticipant).save(participant);
+      await getRepository(RaffleParticipant).save(selectedParticipant);
       return true;
     } else {
       return false;
@@ -422,11 +423,7 @@ class Raffles extends System {
       });
 
       // close raffle on pick
-      raffle.isClosed = true;
-      raffle.timestamp = Date.now();
-      await Promise.all([
-        getRepository(Raffle).save(raffle),
-      ]);
+      await getRepository(Raffle).save({...raffle, isClosed: true, timestamp: Date.now()});
       return true;
     }
 
@@ -445,7 +442,7 @@ class Raffles extends System {
     }
 
     let winNumber = _.random(0, _total - 1, false);
-    let winner: RaffleParticipant | null = null;
+    let winner: Readonly<RaffleParticipantInterface> | null = null;
     for (const participant of _.filter(raffle.participants, (o) => o.isEligible)) {
       let tickets = participant.tickets;
 
@@ -476,13 +473,9 @@ class Raffles extends System {
 
     // uneligible winner (don't want to pick second time same user if repick)
     if (winner) {
-      winner.isEligible = false;
-      raffle.winner = winner.username;
-      raffle.isClosed = true;
-      raffle.timestamp = Date.now();
       await Promise.all([
-        getRepository(RaffleParticipant).save(winner),
-        getRepository(Raffle).save(raffle),
+        getRepository(RaffleParticipant).save({...winner, isEligible: false }),
+        getRepository(Raffle).save({...raffle, winner: winner.username, isClosed: true, timestamp: Date.now()}),
       ]);
 
       const message = await prepare('raffles.raffle-winner-is', {
@@ -500,11 +493,7 @@ class Raffles extends System {
       });
     } else {
       // close raffle on pick
-      raffle.isClosed = true;
-      raffle.timestamp = Date.now();
-      await Promise.all([
-        getRepository(Raffle).save(raffle),
-      ]);
+      await getRepository(Raffle).save({...raffle, isClosed: true, timestamp: Date.now()}),
       warning('No winner found in raffle');
     }
   }
