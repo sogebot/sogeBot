@@ -49,12 +49,12 @@ export const Raffle = new EntitySchema<Readonly<Required<RaffleInterface>>>({
 
   },
   indices: [
-    { name: 'IDX_35e3ff88225eef1d85c951e229', columns: ['keyword'] },
+    { name: 'IDX_e83facaeb8fbe8b8ce9577209a', columns: ['keyword'] },
   ],
   relations: {
     participants: {
       type: 'one-to-many',
-      target: 'raffle_participants',
+      target: 'raffle_participant',
       inverseSide: 'raffle',
       cascade: true,
     },
@@ -81,7 +81,7 @@ export const RaffleParticipant = new EntitySchema<Readonly<Required<RafflePartic
     },
     messages: {
       type: 'one-to-many',
-      target: 'raffle_participant_messages',
+      target: 'raffle_participant_message',
       inverseSide: 'participant',
       cascade: true,
     },
