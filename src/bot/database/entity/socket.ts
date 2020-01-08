@@ -1,23 +1,25 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { EntitySchema } from 'typeorm';
 import { ColumnNumericTransformer } from './_transformer';
 
-@Entity()
-export class Socket {
-  @PrimaryGeneratedColumn('uuid')
-  id!: string;
+export interface SocketInterface {
+  id?: string;
+  userId: number;
+  type: 'admin' | 'viewer' | 'public';
+  accessToken: string | null;
+  refreshToken: string;
+  accessTokenTimestamp?: number;
+  refreshTokenTimestamp?: number;
+}
 
-  @Column()
-  userId!: number;
-  @Column('varchar', { length: 10 })
-  type!: 'admin' | 'viewer' | 'public';
-
-  @Column('varchar', { nullable: true, length: 36 })
-  accessToken!: string | null;
-  @Column('varchar', { nullable: true, length: 36 })
-  refreshToken!: string;
-
-  @Column('bigint', { transformer: new ColumnNumericTransformer(), default: 0 })
-  accessTokenTimestamp!: number;
-  @Column('bigint', { transformer: new ColumnNumericTransformer(), default: 0 })
-  refreshTokenTimestamp!: number;
-};
+export const Socket = new EntitySchema<Readonly<Required<SocketInterface>>>({
+  name: 'socket',
+  columns: {
+    id: { type: String, primary: true, generated: 'uuid' },
+    userId: { type: Number },
+    type: { type: 'varchar', length: 10 },
+    accessToken: { type: 'varchar', length: 36, nullable: true },
+    refreshToken: { type: 'varchar', length: 36, nullable: true },
+    accessTokenTimestamp: { type: 'bigint', default: 0, transformer: new ColumnNumericTransformer() },
+    refreshTokenTimestamp: { type: 'bigint', default: 0, transformer: new ColumnNumericTransformer() },
+  },
+});

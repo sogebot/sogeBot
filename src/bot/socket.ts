@@ -8,7 +8,7 @@ import { adminEndpoint, endpoints } from './helpers/socket';
 import { onLoad } from './decorators/on';
 
 import { getRepository, LessThanOrEqual } from 'typeorm';
-import { Socket as SocketEntity } from './database/entity/socket';
+import { Socket as SocketEntity, SocketInterface } from './database/entity/socket';
 import permissions from './permissions';
 import { debug } from './helpers/log';
 
@@ -151,17 +151,17 @@ class Socket extends Core {
 
     socket.on('newAuthorization', async (userId, cb) => {
       const userPermission = await permissions.getUserHighestPermission(userId);
-      const auth = new SocketEntity();
-      auth.accessToken = uuid();
-      auth.refreshToken = uuid();
-      auth.accessTokenTimestamp = Date.now() + (_self.accessTokenExpirationTime * 1000);
-      auth.refreshTokenTimestamp = Date.now() + (_self.refreshTokenExpirationTime * 1000);
-      auth.userId = Number(userId);
-      auth.type = 'viewer';
+      const auth: Readonly<SocketInterface> = {
+        accessToken: uuid(),
+        refreshToken: uuid(),
+        accessTokenTimestamp: Date.now() + (_self.accessTokenExpirationTime * 1000),
+        refreshTokenTimestamp: Date.now() + (_self.refreshTokenExpirationTime * 1000),
+        userId: Number(userId),
+        type: userPermission === permission.CASTERS ? 'admin' : 'viewer',
+      };
       haveViewerPrivileges = Authorized.Authorized;
       if (userPermission === permission.CASTERS) {
         haveAdminPrivileges = Authorized.Authorized;
-        auth.type = 'admin';
       } else {
         haveAdminPrivileges = Authorized.NotAuthorized;
       }
@@ -248,7 +248,7 @@ class Socket extends Core {
     adminEndpoint(this.nsp, 'listConnections', async (cb) => {
       cb(null, await getRepository(SocketEntity).find());
     });
-    adminEndpoint(this.nsp, 'removeConnection', async (item: SocketEntity, cb) => {
+    adminEndpoint(this.nsp, 'removeConnection', async (item: Required<SocketInterface>, cb) => {
       cb(null, await getRepository(SocketEntity).remove(item));
     });
   }
