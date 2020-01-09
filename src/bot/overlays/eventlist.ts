@@ -6,7 +6,7 @@ import { isBot } from '../commons';
 import { ui } from '../decorators';
 import { publicEndpoint } from '../helpers/socket';
 
-import { Brackets, getManager, getRepository } from 'typeorm';
+import { Brackets, getRepository } from 'typeorm';
 import { EventList as EventListEntity } from '../database/entity/eventList';
 import eventlist from '../widgets/eventlist';
 
@@ -22,8 +22,9 @@ class EventList extends Overlay {
 
   sockets () {
     publicEndpoint(this.nsp, 'getEvents', async (opts: { ignore: string; limit: number }, cb) => {
-      let events = await getManager().createQueryBuilder()
-        .select('events').from(EventListEntity, 'events')
+      let events = await getRepository(EventListEntity)
+        .createQueryBuilder('events')
+        .select('events')
         .orderBy('events.timestamp', 'DESC')
         .where(new Brackets(qb => {
           const ignored = opts.ignore.split(',').map(value => value.trim());
@@ -47,21 +48,21 @@ class EventList extends Overlay {
       return;
     } // don't save event from a bot
 
-    const event = new EventListEntity();
-    event.event = data.event;
-    event.username = data.username;
-    event.timestamp = Date.now();
-    event.values_json = JSON.stringify(
-      Object.keys(data)
-        .filter(key => !['event', 'username', 'timestamp'].includes(key))
-        .reduce((obj, key) => {
-          return {
-            ...obj,
-            [key]: data[key],
-          };
-        }, {}),
-    );
-    await getRepository(EventListEntity).save(event);
+    await getRepository(EventListEntity).save({
+      event: data.event,
+      username: data.username,
+      timestamp: Date.now(),
+      values_json: JSON.stringify(
+        Object.keys(data)
+          .filter(key => !['event', 'username', 'timestamp'].includes(key))
+          .reduce((obj, key) => {
+            return {
+              ...obj,
+              [key]: data[key],
+            };
+          }, {}),
+      ),
+    });
     eventlist.update();
   }
 }
