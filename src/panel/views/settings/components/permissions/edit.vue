@@ -88,7 +88,7 @@
   import { getSocket } from 'src/panel/helpers/socket';
   import { some } from 'lodash-es';
 
-  import { Permissions as PermissionEntity} from 'src/bot/database/entity/permissions'
+  import { PermissionsInterface } from 'src/bot/database/entity/permissions'
 
   export default Vue.extend({
     props: ['update'],
@@ -102,7 +102,7 @@
     data() {
       const data: {
         some: any;
-        item: PermissionEntity | null,
+        item: PermissionsInterface | null,
         socket: any,
         isPending: boolean,
         isSaving: number,

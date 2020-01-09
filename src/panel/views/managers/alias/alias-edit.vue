@@ -85,7 +85,7 @@ import { getSocket } from 'src/panel/helpers/socket';
 import { permission } from 'src/bot/helpers/permissions'
 
 import { Alias as AliasEntity } from 'src/bot/database/entity/alias';
-import { Permissions as PermissionsEntity } from 'src/bot/database/entity/permissions';
+import { PermissionsInterface } from 'src/bot/database/entity/permissions';
 
 import { Validations } from 'vuelidate-property-decorators';
 import { required } from 'vuelidate/lib/validators'
@@ -129,7 +129,7 @@ export default class aliasEdit extends Vue {
     pending: false,
   }
 
-  permissions: PermissionsEntity[] = [];
+  permissions: PermissionsInterface[] = [];
 
   item: AliasEntity = {
     id: uuid(),

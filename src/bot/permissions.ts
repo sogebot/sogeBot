@@ -11,7 +11,7 @@ import { isMainThread } from './cluster';
 import { error } from './helpers/log';
 import { adminEndpoint } from './helpers/socket';
 
-import { PermissionCommands, PermissionFilters, Permissions as PermissionsEntity } from './database/entity/permissions';
+import { PermissionCommands, PermissionFiltersInterface, Permissions as PermissionsEntity, PermissionsInterface } from './database/entity/permissions';
 import { getRepository, LessThan } from 'typeorm';
 import { User, UserInterface } from './database/entity/user';
 import oauth from './oauth';
@@ -36,7 +36,7 @@ class Permissions extends Core {
   }
 
   public sockets() {
-    adminEndpoint(this.nsp, 'permission::insert', async (data: PermissionsEntity, cb) => {
+    adminEndpoint(this.nsp, 'permission::insert', async (data: Required<PermissionsInterface>, cb) => {
       cleanViewersCache();
       await getRepository(PermissionsEntity).insert(data);
       cb();
@@ -46,7 +46,7 @@ class Permissions extends Core {
       await getRepository(PermissionsEntity).update({ id }, { order });
       cb();
     });
-    adminEndpoint(this.nsp, 'permission::save', async (data: PermissionsEntity, cb) => {
+    adminEndpoint(this.nsp, 'permission::save', async (data: Required<PermissionsInterface>, cb) => {
       cleanViewersCache();
       await getRepository(PermissionsEntity).save(data);
       cb();
@@ -116,19 +116,16 @@ class Permissions extends Core {
     }
   }
 
-  public async get(identifier: string): Promise<PermissionsEntity | undefined> {
+  public async get(identifier: string): Promise<PermissionsInterface | undefined> {
     const uuidRegex = /([0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12})/;
-    let pItem: PermissionsEntity | undefined;
     if (identifier.search(uuidRegex) >= 0) {
-      pItem = await getRepository(PermissionsEntity).findOne({ id: identifier });
+      return getRepository(PermissionsEntity).findOne({ id: identifier });
     } else {
-      const pItems: PermissionsEntity[] = await getRepository(PermissionsEntity).find();
       // get first name-like
-      pItem = pItems.find((o) => {
+      return (await getRepository(PermissionsEntity).find()).find((o) => {
         return o.name.toLowerCase() === identifier.toLowerCase();
       }) || undefined;
     }
-    return pItem;
   }
 
   public async getUserHighestPermission(userId: number): Promise<null | string> {
@@ -146,7 +143,7 @@ class Permissions extends Core {
     return null;
   }
 
-  public async check(userId: number, permId: string, partial = false): Promise<{access: boolean; permission: PermissionsEntity | undefined}> {
+  public async check(userId: number, permId: string, partial = false): Promise<{access: boolean; permission: PermissionsInterface | undefined}> {
     if (!areDecoratorsLoaded) {
       await new Promise((resolve) => {
         const check = () => {
@@ -174,7 +171,7 @@ class Permissions extends Core {
     const pItem = (await getRepository(PermissionsEntity).findOne({
       relations: ['filters'],
       where: { id: permId },
-    })) as PermissionsEntity;
+    })) as PermissionsInterface;
     try {
       if (!user) {
         return { access: permId === permission.VIEWERS, permission: pItem };
@@ -241,7 +238,7 @@ class Permissions extends Core {
 
   protected filters(
     user: Required<UserInterface>,
-    filters: PermissionFilters[] = [],
+    filters: PermissionFiltersInterface[] = [],
   ): boolean {
     for (const f of filters) {
       let amount = 0;

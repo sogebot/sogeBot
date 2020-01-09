@@ -127,7 +127,7 @@ class CustomCommands extends System {
       }
 
       responseDb.response = response;
-      responseDb.permission = pItem.id;
+      responseDb.permission = pItem.id ?? permission.VIEWERS;
       if (stopIfExecuted) {
         responseDb.stopIfExecuted = stopIfExecuted;
       }
@@ -175,7 +175,7 @@ class CustomCommands extends System {
 
       const new_response = new CommandsResponses();
       new_response.order = cDb.responses.length;
-      new_response.permission = pItem.id;
+      new_response.permission = pItem.id ?? permission.VIEWERS;
       new_response.stopIfExecuted = stopIfExecuted;
       new_response.response = response;
       new_response.filter = '';

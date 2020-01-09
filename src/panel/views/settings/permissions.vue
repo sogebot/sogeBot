@@ -41,7 +41,7 @@
   import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
   library.add(faExclamationTriangle)
 
-  import { Permissions as PermissionEntity} from 'src/bot/database/entity/permissions'
+  import { PermissionsInterface } from 'src/bot/database/entity/permissions'
   import { permission } from 'src/bot/helpers/permissions';
 
   export default Vue.extend({
@@ -93,9 +93,9 @@
     },
     methods: {
       addNewPermissionGroup() {
-        this.socket.emit('permissions', async (p: PermissionEntity[]) => {
+        this.socket.emit('permissions', async (p: PermissionsInterface[]) => {
           const id = uuid();
-          const data: PermissionEntity = {
+          const data: PermissionsInterface = {
             id,
             name: '',
             isCorePermission: false,

@@ -161,7 +161,7 @@ class Alias extends System {
         return false;
       }
       item.command = command;
-      item.permission = pItem.id;
+      item.permission = pItem.id ?? permission.VIEWERS;
       await getRepository(AliasEntity).save(item);
 
       const message = await prepare('alias.alias-was-edited', { alias, command });
@@ -196,7 +196,7 @@ class Alias extends System {
         command,
         enabled: true,
         visible: true,
-        permission: pItem.id,
+        permission: pItem.id ?? permission.VIEWERS,
       };
       await getRepository(AliasEntity).insert(aliasObj);
       const message = await prepare('alias.alias-was-added', aliasObj);
