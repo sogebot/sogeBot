@@ -1,9 +1,13 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 /* global describe it beforeEach */
 require('../../general.js');
 
 const db = require('../../general.js').db;
 const message = require('../../general.js').message;
 const assert = require('assert');
+
+const { getRepository } = require('typeorm');
+const { User } = require('../../../dest/database/entity/user');
 
 const keywords = (require('../../../dest/systems/keywords')).default;
 
@@ -89,7 +93,6 @@ const successTests = [
       { type: 'run', triggers: ['Lorem ipsum dolor sit amet nevim co dal psat ahoj jak je ty vole?', 'ahoj', 'ahojda', 'ahoj jak je', 'jak je ahoj', 'sorry jako'], '-triggers': [] },
       { type: 'remove' },
       { type: 'run', triggers: [], '-triggers': ['Lorem ipsum dolor sit amet nevim co dal psat ahoj jak je ty vole?', 'ahoj', 'ahojda', 'ahoj jak je', 'jak je ahoj', 'sorry jako'] },
-
     ],
   },
 ];
@@ -114,6 +117,7 @@ describe('Keywords - basic worflow (add, run, edit)', () => {
       describe(generateCommand(test), () => {
         before(async () => {
           await db.cleanup();
+          await getRepository(User).save(owner);
         });
         beforeEach(async () => {
           await message.prepare();

@@ -37,7 +37,9 @@ async function retest() {
         });
 
         p.on('close', (code) => {
-          status = code;
+          if (status === 0) {
+            status = code;
+          }
           if (code !== 0) {
             console.log('------------------------------------------------------------------------------')
             console.log('\t=> Failed ' + suite + ' tests')

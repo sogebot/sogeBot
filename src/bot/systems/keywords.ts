@@ -282,6 +282,7 @@ class Keywords extends System {
 
     for (const k of keywords) {
       const message = await (new Message(k.response).parse({ sender: opts.sender }));
+      debug('keywords.run', {k, message});
       sendMessage(message, opts.sender);
     }
     return true;

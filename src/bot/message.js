@@ -27,6 +27,7 @@ import tmi from './tmi';
 import customvariables from './customvariables';
 import spotify from './integrations/spotify';
 import songs from './systems/songs';
+import Parser from './parser';
 import { translate } from './translate';
 
 
@@ -355,34 +356,22 @@ class Message {
         return '0';
       },
       '(!!#)': async function (filter) {
-        let cmd = filter
+        const cmd = filter
           .replace('!', '') // replace first !
           .replace(/\(|\)/g, '')
           .replace(/\$sender/g, (tmi.showWithAt ? '@' : '') + attr.sender.username)
           .replace(/\$param/g, attr.param);
-        tmi.message({
-          message: {
-            tags: attr.sender,
-            message: cmd,
-          },
-          skip: true,
-          quiet: true
-        });
+        const parse = new Parser({ sender: attr.sender, message: cmd, skip: true, quiet: true });
+        await parse.process();
         return '';
       },
       '(!#)': async function (filter) {
-        let cmd = filter
+        const cmd = filter
           .replace(/\(|\)/g, '')
           .replace(/\$sender/g, (tmi.showWithAt ? '@' : '') + attr.sender.username)
           .replace(/\$param/g, attr.param);
-        tmi.message({
-          message: {
-            tags: attr.sender,
-            message: cmd,
-          },
-          skip: true,
-          quiet: false
-        });
+        const parse = new Parser({ sender: attr.sender, message: cmd, skip: true, quiet: false });
+        await parse.process();
         return '';
       }
     };
