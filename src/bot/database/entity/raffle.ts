@@ -46,7 +46,6 @@ export const Raffle = new EntitySchema<Readonly<Required<RaffleInterface>>>({
     forFollowers: { type: Boolean },
     forSubscribers: { type: Boolean },
     isClosed: { type: Boolean, default: false },
-
   },
   indices: [
     { name: 'IDX_e83facaeb8fbe8b8ce9577209a', columns: ['keyword'] },

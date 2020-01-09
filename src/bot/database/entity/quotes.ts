@@ -1,20 +1,21 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { EntitySchema } from 'typeorm';
 import { ColumnNumericTransformer } from './_transformer';
 
-@Entity()
-export class Quotes {
-  @PrimaryGeneratedColumn('uuid')
-  id!: string;
-
-  @Column('simple-array')
-  tags!: string[];
-
-  @Column()
-  quote!: string;
-
-  @Column()
-  quotedBy!: number;
-
-  @Column('bigint', { transformer: new ColumnNumericTransformer() })
-  createdAt!: number;
+export interface QuotesInterface {
+  id?: string;
+  tags: string[];
+  quote: string;
+  quotedBy: number;
+  createdAt: number;
 };
+
+export const Quotes = new EntitySchema<Readonly<Required<QuotesInterface>>>({
+  name: 'quotes',
+  columns: {
+    id: { type: 'uuid', primary: true, generated: 'uuid' },
+    tags: { type: 'simple-array' },
+    quote: { type: String },
+    quotedBy: { type: Number },
+    createdAt: { type: 'bigint', transformer: new ColumnNumericTransformer() },
+  },
+});

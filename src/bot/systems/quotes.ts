@@ -6,9 +6,9 @@ import Expects from '../expects';
 import { permission } from '../helpers/permissions';
 import System from './_interface';
 import { adminEndpoint, publicEndpoint } from '../helpers/socket';
-import { getManager } from 'typeorm';
+import { getManager, getRepository } from 'typeorm';
 
-import { Quotes as QuotesEntity } from '../database/entity/quotes';
+import { Quotes as QuotesEntity, QuotesInterface } from '../database/entity/quotes';
 import users from '../users';
 import ui from '../ui';
 
@@ -21,60 +21,26 @@ class Quotes extends System {
 
   sockets() {
     publicEndpoint(this.nsp, 'quotes:getAll', async (_opts, cb) => {
-      const items = await getManager()
-        .createQueryBuilder()
-        .select('quote')
-        .from(QuotesEntity, 'quote')
-        .getMany();
-      for (const item of (items as any[])) {
-        item.quotedByName = await users.getNameById(item.quotedBy);
-      }
-      cb(null, items);
+      const items = await getRepository(QuotesEntity).find();
+      cb(null, await Promise.all(items.map(async (item) => {
+        return {
+          ...item,
+          quotedByName: await users.getNameById(item.quotedBy),
+        };
+      })));
     });
 
     adminEndpoint(this.nsp, 'getById', async (id, cb) => {
-      const item = await getManager()
-        .createQueryBuilder()
-        .select('quote')
-        .where('id = :id', { id })
-        .from(QuotesEntity, 'quote')
-        .getOne();
+      const item = await getRepository(QuotesEntity).findOne({ id });
       cb(null, item);
     });
 
     adminEndpoint(this.nsp, 'setById', async (id, dataset, cb) => {
-      let item = await getManager()
-        .createQueryBuilder()
-        .select('quote')
-        .where('id = :id', { id })
-        .from(QuotesEntity, 'quote')
-        .getOne();
-      if (item) {
-        await getManager()
-          .createQueryBuilder()
-          .update(QuotesEntity)
-          .where('id = :id', { id })
-          .set(dataset)
-          .execute();
-      } else {
-        const result = await getManager()
-          .createQueryBuilder()
-          .insert()
-          .into(QuotesEntity)
-          .values(dataset)
-          .execute();
-        item = result.generatedMaps[0] as QuotesEntity;
-      }
-      cb(null, item);
+      cb(null, await getRepository(QuotesEntity).save({ ...(await getRepository(QuotesEntity).findOne({ id })), ...dataset }));
     });
 
     adminEndpoint(this.nsp, 'deleteById', async (id, cb) => {
-      await getManager()
-        .createQueryBuilder()
-        .delete()
-        .from(QuotesEntity)
-        .where('id = :id', { id })
-        .execute();
+      await getRepository(QuotesEntity).delete({ id });
       cb(null);
     });
   }
@@ -113,36 +79,16 @@ class Quotes extends System {
         throw new Error();
       }
       const id = new Expects(opts.parameters).argument({ type: 'uuid', name: 'id' }).toArray()[0];
-      let item = await getManager()
-        .createQueryBuilder()
-        .select('quote')
-        .from(QuotesEntity, 'quote')
-        .where('id = :id', { id })
-        .getOne();
+      const item = await getRepository(QuotesEntity).findOne({id});
 
       if (!item) {
         const message = await prepare('systems.quotes.remove.not-found', { id });
         sendMessage(message, opts.sender, opts.attr);
         return;
       } else {
-        await getManager()
-          .createQueryBuilder()
-          .delete()
-          .from(QuotesEntity)
-          .where('id = :id', { id })
-          .execute();
-        item = await getManager()
-          .createQueryBuilder()
-          .select('quote')
-          .from(QuotesEntity, 'quote')
-          .where('id = :id', { id })
-          .getOne();
-        if (typeof item === 'undefined') {
-          const message = await prepare('systems.quotes.remove.ok', { id });
-          sendMessage(message, opts.sender, opts.attr);
-        } else {
-          throw new Error('Something went wrong');
-        }
+        await getRepository(QuotesEntity).delete({id});
+        const message = await prepare('systems.quotes.remove.ok', { id });
+        sendMessage(message, opts.sender, opts.attr);
       }
     } catch (e) {
       const message = await prepare('systems.quotes.remove.error');
@@ -158,12 +104,8 @@ class Quotes extends System {
         throw new Error();
       }
       const [id, tag] = new Expects(opts.parameters).argument({ type: 'uuid', name: 'id' }).argument({ name: 'tag', multi: true, delimiter: '' }).toArray();
-      const quote = await getManager()
-        .createQueryBuilder()
-        .select('quote')
-        .from(QuotesEntity, 'quote')
-        .where('id = :id', { id })
-        .getOne();
+
+      const quote = await getRepository(QuotesEntity).findOne({id});
       if (quote) {
         const tags = tag.split(',').map((o) => o.trim());
         await getManager()
@@ -202,12 +144,7 @@ class Quotes extends System {
     }
 
     if (!_.isNil(id)) {
-      const quote = await getManager()
-        .createQueryBuilder()
-        .select('quote')
-        .from(QuotesEntity, 'quote')
-        .where('id = :id', { id })
-        .getOne();
+      const quote = await getRepository(QuotesEntity).findOne({id});
       if (!_.isEmpty(quote) && typeof quote !== 'undefined') {
         const quotedBy = (await users.getUsernamesFromIds([quote.quotedBy]))[quote.quotedBy];
         const message = await prepare('systems.quotes.show.ok', { quote: quote.quote, id: quote.id, quotedBy });
@@ -217,13 +154,8 @@ class Quotes extends System {
         sendMessage(message, opts.sender, opts.attr);
       }
     } else {
-      const quotes = await getManager()
-        .createQueryBuilder()
-        .select('quote')
-        .from(QuotesEntity, 'quote')
-        .getMany();
-
-      const quotesWithTags: QuotesEntity[] = [];
+      const quotes = await getRepository(QuotesEntity).find();
+      const quotesWithTags: QuotesInterface[] = [];
       for (const quote of quotes) {
         if (quote.tags.includes(tag)) {
           quotesWithTags.push(quote);
