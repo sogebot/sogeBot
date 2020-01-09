@@ -76,12 +76,11 @@
 import { Vue, Component, Watch } from 'vue-property-decorator';
 import { getSocket } from 'src/panel/helpers/socket';
 
-import { Price } from 'src/bot/database/entity/price';
-
 import { Validations } from 'vuelidate-property-decorators';
 import { required, minValue } from 'vuelidate/lib/validators';
 
 import uuid from 'uuid/v4';
+import { PriceInterface } from '../../../../bot/database/entity/price';
 
 Component.registerHooks([
   'beforeRouteEnter',
@@ -108,7 +107,7 @@ export default class priceEdit extends Vue {
     pending: false,
   }
 
-  item: Price = {
+  item: PriceInterface = {
     id: uuid(), command: '', price: 1, enabled: true
   }
 

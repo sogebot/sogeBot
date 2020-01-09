@@ -1,14 +1,21 @@
-import { Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
+import { EntitySchema } from 'typeorm';
 
-@Entity()
-export class Price {
-  @PrimaryGeneratedColumn('uuid')
-  id!: string;
-  @Column()
-  @Index({ unique: true })
-  command!: string;
-  @Column({ default: true })
-  enabled!: boolean;
-  @Column()
-  price!: number;
-};
+export interface PriceInterface {
+  id?: string;
+  command: string;
+  enabled?: boolean;
+  price: number;
+}
+
+export const Price = new EntitySchema<Readonly<Required<PriceInterface>>>({
+  name: 'price',
+  columns: {
+    id: { type: String, primary: true, generated: 'uuid' },
+    command: { type: String },
+    enabled: { type: Boolean, default: true },
+    price: { type: Number },
+  },
+  indices: [
+    { name: 'IDX_d12db23d28020784096bcb41a3', unique: true, columns: ['command'] },
+  ],
+});

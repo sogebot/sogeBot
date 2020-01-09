@@ -102,9 +102,11 @@ class Polls extends System {
       if (!cVote) {
         throw new Error(String(ERROR.ALREADY_CLOSED));
       } else {
-        cVote.isOpened = false;
-        cVote.closedAt = Date.now();
-        await getRepository(Poll).save(cVote);
+        await getRepository(Poll).save({
+          ...cVote,
+          isOpened: false,
+          closedAt: Date.now(),
+        });
 
         const count = {};
         let _total = 0;
@@ -165,13 +167,13 @@ class Polls extends System {
         throw new Error(String(ERROR.NOT_ENOUGH_OPTIONS));
       }
 
-      const voting = new Poll();
-      voting.title = title;
-      voting.isOpened = true;
-      voting.options = options;
-      voting.type = type;
-      voting.openedAt = Date.now();
-      await getRepository(Poll).save(voting);
+      await getRepository(Poll).save({
+        title: title,
+        isOpened: true,
+        options: options,
+        type: type,
+        openedAt: Date.now(),
+      });
 
       const translations = `systems.polls.opened_${type}`;
       sendMessage(prepare(translations, {
@@ -273,17 +275,17 @@ class Polls extends System {
         if (cVote.options.length < index + 1 || index < 0) {
           throw new Error(String(ERROR.INVALID_VOTE));
         } else {
-          let vote = cVote.votes.find(o => o.votedBy === opts.sender.username);
+          const vote = cVote.votes.find(o => o.votedBy === opts.sender.username);
           if (vote) {
             vote.option = index;
             await getRepository(Poll).save(cVote);
           } else {
-            vote = new PollVote();
-            vote.poll = cVote;
-            vote.votedBy = opts.sender.username;
-            vote.votes = 1;
-            vote.option = index;
-            await getRepository(PollVote).save(vote);
+            await getRepository(PollVote).save({
+              poll: cVote,
+              votedBy: opts.sender.username,
+              votes: 1,
+              option: index,
+            });
           }
         }
       } else {
@@ -309,14 +311,13 @@ class Polls extends System {
       for (let i = cVote.options.length; i > 0; i--) {
         // we are going downwards because we are checking include and 1 === 10
         if (opts.message.includes('#vote' + i)) {
-          // vote found
-          const vote = new PollVote();
-          vote.poll = cVote;
-          vote.option = i - 1;
-          vote.votes = opts.amount;
-          vote.votedBy = opts.username;
           // no update as we will not switch vote option as in normal vote
-          await getRepository(PollVote).save(vote);
+          await getRepository(PollVote).save({
+            poll: cVote,
+            option: i - 1,
+            votes: opts.amount,
+            votedBy: opts.username,
+          });
           break;
         }
       }
@@ -331,14 +332,13 @@ class Polls extends System {
       for (let i = cVote.options.length; i > 0; i--) {
         // we are going downwards because we are checking include and 1 === 10
         if (opts.message.includes('#vote' + i)) {
-          // vote found
-          const vote = new PollVote();
-          vote.poll = cVote;
-          vote.option = i - 1;
-          vote.votes = Number(currency.exchange(opts.amount, opts.currency, currency.mainCurrency));
-          vote.votedBy = opts.username;
           // no update as we will not switch vote option as in normal vote
-          await getRepository(PollVote).save(vote);
+          await getRepository(PollVote).save({
+            poll: cVote,
+            option: i - 1,
+            votes: Number(currency.exchange(opts.amount, opts.currency, currency.mainCurrency)),
+            votedBy: opts.username,
+          });
           break;
         }
       }

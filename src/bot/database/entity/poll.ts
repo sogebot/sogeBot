@@ -1,41 +1,61 @@
-import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { EntitySchema } from 'typeorm';
 import { ColumnNumericTransformer } from './_transformer';
 
-@Entity()
-export class Poll {
-  @PrimaryGeneratedColumn('uuid')
-  id!: string;
-  @Column('varchar', { length: 6 })
-  type!: 'tips' | 'bits' | 'normal';
-  @Column()
-  title!: string;
-  @Column()
-  isOpened!: boolean;
-  @Column('bigint', { transformer: new ColumnNumericTransformer(), default: 0 })
-  openedAt!: number;
-  @Column('bigint', { transformer: new ColumnNumericTransformer(), default: 0 })
-  closedAt!: number;
-  @Column('simple-array')
-  options!: string[];
-  @OneToMany(() => PollVote, (opts) => opts.poll, {
-    cascade: true,
-  })
-  votes!: PollVote[];
+export interface PollInterface {
+  id?: string;
+  type: 'tips' | 'bits' | 'normal';
+  title: string;
+  isOpened: boolean;
+  openedAt?: number;
+  closedAt?: number;
+  options: string[];
+  votes?: PollVoteInterface[];
 };
 
-@Entity()
-export class PollVote {
-  @PrimaryGeneratedColumn('uuid')
-  id!: string;
-  @ManyToOne(() => Poll, (poll) => poll.votes, {
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
-  })
-  poll!: Poll;
-  @Column()
-  option!: number;
-  @Column()
-  votes!: number;
-  @Column()
-  votedBy!: string;
-}
+export interface PollVoteInterface {
+  id?: string;
+  poll: PollInterface;
+  option: number;
+  votes: number;
+  votedBy: string;
+};
+
+export const Poll = new EntitySchema<Readonly<Required<PollInterface>>>({
+  name: 'poll',
+  columns: {
+    id: { type: String, primary: true, generated: 'uuid' },
+    type: { type: 'varchar', length: 6 },
+    isOpened: { type: Boolean },
+    openedAt: { type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0 },
+    closedAt: { type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0 },
+    options: { type: 'simple-array'},
+    title: { type: String },
+  },
+  relations: {
+    votes: {
+      type: 'one-to-many',
+      target: 'poll_vote',
+      inverseSide: 'poll',
+      cascade: true,
+    },
+  },
+});
+
+export const PollVote = new EntitySchema<Readonly<Required<PollVoteInterface>>>({
+  name: 'poll_vote',
+  columns: {
+    id: { type: String, primary: true, generated: 'uuid' },
+    option: { type: Number },
+    votes: { type: Number },
+    votedBy: { type: String },
+  },
+  relations: {
+    poll: {
+      type: 'many-to-one',
+      target: 'poll',
+      inverseSide: 'votes',
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+    },
+  },
+});
