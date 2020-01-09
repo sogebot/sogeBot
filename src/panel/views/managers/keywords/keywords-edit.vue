@@ -74,7 +74,7 @@ import { Validate } from 'vuelidate-property-decorators';
 import { required } from 'vuelidate/lib/validators'
 
 import uuid from 'uuid/v4';
-import { Keyword } from 'src/bot/database/entity/keyword';
+import { KeywordInterface } from 'src/bot/database/entity/keyword';
 
 @Component({
   components: {
@@ -112,7 +112,7 @@ export default class keywordsEdit extends Vue {
 
   mounted() {
     if (this.$route.params.id) {
-      this.socket.emit('keywords::getById', this.$route.params.id, (err, data: Keyword) => {
+      this.socket.emit('keywords::getById', this.$route.params.id, (err, data: Required<KeywordInterface>) => {
         if (err) {
           return console.error(err)
         }
@@ -140,7 +140,7 @@ export default class keywordsEdit extends Vue {
   save() {
     this.$v.$touch();
     if (!this.$v.$invalid) {
-      const keyword: Keyword = {
+      const keyword: KeywordInterface = {
         id: this.id,
         keyword: this.keyword,
         response: this.response,

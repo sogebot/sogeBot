@@ -9,7 +9,7 @@ import Expects from '../expects';
 import { prepare, sendMessage } from '../commons';
 
 import { getRepository } from 'typeorm';
-import { HowLongToBeatGame } from '../database/entity/howLongToBeatGame';
+import { HowLongToBeatGame, HowLongToBeatGameInterface } from '../database/entity/howLongToBeatGame';
 import { adminEndpoint } from '../helpers/socket';
 import api from '../api';
 
@@ -34,7 +34,7 @@ class HowLongToBeat extends System {
     adminEndpoint(this.nsp, 'hltb::getAll', async (opts, cb) => {
       cb(await getRepository(HowLongToBeatGame).find({...opts}));
     });
-    adminEndpoint(this.nsp, 'hltb::save', async (dataset: HowLongToBeatGame, cb) => {
+    adminEndpoint(this.nsp, 'hltb::save', async (dataset: HowLongToBeatGameInterface, cb) => {
       const item = await getRepository(HowLongToBeatGame).save(dataset);
       cb(null, item);
     });
@@ -49,20 +49,18 @@ class HowLongToBeat extends System {
       return; // skip if we have empty game
     }
 
-    let gameToInc = await getRepository(HowLongToBeatGame).findOne({ where: { game: api.stats.currentGame } });
+    const gameToInc = await getRepository(HowLongToBeatGame).findOne({ where: { game: api.stats.currentGame } });
     if (gameToInc) {
-      if (!gameToInc.isFinishedMain) {
-        gameToInc.timeToBeatMain += this.interval;
-      }
-      if (!gameToInc.isFinishedCompletionist) {
-        gameToInc.timeToBeatCompletionist += this.interval;
+      const timeToBeatMain = gameToInc.isFinishedMain ? gameToInc.timeToBeatMain + this.interval : gameToInc.timeToBeatMain;
+      const timeToBeatCompletionist = gameToInc.isFinishedCompletionist ? gameToInc.timeToBeatCompletionist + this.interval : gameToInc.timeToBeatCompletionist;
+      if (gameToInc.gameplayMain > 0) {
+        // save only if we have numbers from hltb (possible MP game)
+        await getRepository(HowLongToBeatGame).save({...gameToInc, timeToBeatCompletionist, timeToBeatMain});
       }
     } else {
       const gamesFromHltb = await this.hltbService.search(api.stats.currentGame);
       const gameFromHltb = gamesFromHltb.length > 0 ? gamesFromHltb[0] : null;
-      gameToInc = new HowLongToBeatGame();
-      gameToInc = {
-        ...gameToInc,
+      const game = {
         game: api.stats.currentGame,
         gameplayMain: (gameFromHltb || { gameplayMain: 0 }).gameplayMain,
         gameplayCompletionist: (gameFromHltb || { gameplayMain: 0 }).gameplayCompletionist,
@@ -73,11 +71,10 @@ class HowLongToBeat extends System {
         imageUrl: (gameFromHltb || { imageUrl: '' }).imageUrl,
         startedAt: Date.now(),
       };
-    }
-
-    if (gameToInc.gameplayMain > 0) {
-      // sve only if we have numbers from hltb (possible MP game)
-      await getRepository(HowLongToBeatGame).save(gameToInc);
+      if (game.gameplayMain > 0) {
+        // save only if we have numbers from hltb (possible MP game)
+        await getRepository(HowLongToBeatGame).save(game);
+      }
     }
   }
 
