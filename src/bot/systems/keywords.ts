@@ -8,7 +8,7 @@ import { isUUID, prepare, sendMessage } from '../commons';
 import XRegExp from 'xregexp';
 import { debug, error } from '../helpers/log';
 
-import { Keyword } from '../database/entity/keyword';
+import { Keyword, KeywordInterface } from '../database/entity/keyword';
 import { getRepository } from 'typeorm';
 import { adminEndpoint } from '../helpers/socket';
 import { translate } from '../translate';
@@ -28,7 +28,7 @@ class Keywords extends System {
   }
 
   sockets () {
-    adminEndpoint(this.nsp, 'keywords::save', async (dataset: Keyword, cb) => {
+    adminEndpoint(this.nsp, 'keywords::save', async (dataset: KeywordInterface, cb) => {
       try {
         const item = await getRepository(Keyword).save(dataset);
         cb(null, item);
@@ -75,18 +75,18 @@ class Keywords extends System {
    *
    * format: !keyword add -k [regexp] -r [response]
    * @param {CommandOptions} opts - options
-   * @return {Promise<Keyword | null>}
+   * @return {Promise<Required<KeywordInterface> | null>}
    */
   @command('!keyword add')
   @default_permission(permission.CASTERS)
-  public async add(opts: CommandOptions): Promise<Keyword | null> {
+  public async add(opts: CommandOptions): Promise<Required<KeywordInterface> | null> {
     try {
       const [keywordRegex, response]
         = new Expects(opts.parameters)
           .argument({ name: 'k', optional: false, multi: true, delimiter: '' })
           .argument({ name: 'r', optional: false, multi: true, delimiter: '' })
           .toArray();
-      const data: Keyword = {
+      const data: Required<KeywordInterface> = {
         id: uuidv4(),
         keyword: keywordRegex,
         response,
@@ -107,11 +107,11 @@ class Keywords extends System {
    *
    * format: !keyword edit -k [uuid|regexp] -r [response]
    * @param {CommandOptions} opts - options
-   * @return {Promise<Keyword | null>}
+   * @return {Promise<Required<KeywordInterface> | null>}
    */
   @command('!keyword edit')
   @default_permission(permission.CASTERS)
-  public async edit(opts: CommandOptions): Promise<Keyword | null> {
+  public async edit(opts: CommandOptions): Promise<Required<KeywordInterface> | null> {
     try {
       const [keywordRegexOrUUID, response]
         = new Expects(opts.parameters)
@@ -119,7 +119,7 @@ class Keywords extends System {
           .argument({ name: 'r', optional: false, multi: true, delimiter: '' })
           .toArray();
 
-      let keywords: Keyword[] = [];
+      let keywords: Required<KeywordInterface>[] = [];
       if (isUUID(keywordRegexOrUUID)) {
         keywords = await getRepository(Keyword).find({ where: { id: keywordRegexOrUUID } });
       } else {
@@ -191,7 +191,7 @@ class Keywords extends System {
           .argument({ name: 'k', optional: false, multi: true, delimiter: '' })
           .toArray();
 
-      let keywords: Keyword[] = [];
+      let keywords: Required<KeywordInterface>[] = [];
       if (isUUID(keywordRegexOrUUID)) {
         keywords = await getRepository(Keyword).find({ where: { id: keywordRegexOrUUID } });
       } else {
@@ -233,7 +233,7 @@ class Keywords extends System {
           .argument({ name: 'k', optional: false, multi: true, delimiter: '' })
           .toArray();
 
-      let keywords: Keyword[] = [];
+      let keywords: Required<KeywordInterface>[] = [];
       if (isUUID(keywordRegexOrUUID)) {
         keywords = await getRepository(Keyword).find({ where: { id: keywordRegexOrUUID } });
       } else {

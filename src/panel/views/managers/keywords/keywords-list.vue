@@ -51,7 +51,7 @@
 import { Vue, Component/*, Watch */ } from 'vue-property-decorator';
 import { getSocket } from 'src/panel/helpers/socket';
 
-import { Keyword } from 'src/bot/database/entity/keyword';
+import { KeywordInterface } from 'src/bot/database/entity/keyword';
 
 @Component({
   components: {
@@ -61,7 +61,7 @@ import { Keyword } from 'src/bot/database/entity/keyword';
 export default class keywordsList extends Vue {
   socket = getSocket('/systems/keywords');
 
-  items: Keyword[] = [];
+  items: KeywordInterface[] = [];
   search: string = '';
   state: {
     loading: number;
@@ -76,7 +76,7 @@ export default class keywordsList extends Vue {
   ];
 
 
-  get fItems(): Keyword[] {
+  get fItems(): KeywordInterface[] {
     let items = this.items
     if (this.search.trim() !== '') {
       items = this.items.filter((o) => {
@@ -101,7 +101,7 @@ export default class keywordsList extends Vue {
 
   refresh() {
     this.state.loading = this.$state.progress;
-    this.socket.emit('keywords::getAll', (data: Keyword[]) => {
+    this.socket.emit('keywords::getAll', (data: KeywordInterface[]) => {
       this.items = data;
       this.state.loading = this.$state.success;
     })
@@ -113,7 +113,7 @@ export default class keywordsList extends Vue {
     })
   }
 
-  update(keyword: Keyword) {
+  update(keyword: KeywordInterface) {
     this.socket.emit('keywords::save', keyword, () => {});
   }
 

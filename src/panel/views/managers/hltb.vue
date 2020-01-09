@@ -86,7 +86,7 @@
   require('moment/locale/ru')
 
   import { getSocket } from '../../helpers/socket';
-import { HowLongToBeatGame } from 'src/bot/database/entity/howLongToBeatGame';
+  import { HowLongToBeatGameInterface } from 'src/bot/database/entity/howLongToBeatGame';
 
   Vue.use(VueMoment, {
       moment, momentTimezone
@@ -102,7 +102,7 @@ import { HowLongToBeatGame } from 'src/bot/database/entity/howLongToBeatGame';
         socket: any,
         itemsPerLine: number,
         interval: number,
-        games: HowLongToBeatGame[],
+        games: HowLongToBeatGameInterface[],
         domWidth: number,
       } = {
         chunk: chunk,
@@ -137,7 +137,7 @@ import { HowLongToBeatGame } from 'src/bot/database/entity/howLongToBeatGame';
       }
     },
     methods: {
-      update(game: HowLongToBeatGame) {
+      update(game: HowLongToBeatGameInterface) {
         this.socket.emit('hltb::save', game, () => {});
       },
       getHours(time: number): number {
