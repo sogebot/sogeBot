@@ -13,7 +13,7 @@ import { isOwner, prepare, sendMessage } from '../commons';
 
 import { getRepository } from 'typeorm';
 import { User } from '../database/entity/user';
-import { Price as PriceEntity } from '../database/entity/price';
+import { Price as PriceEntity, PriceInterface } from '../database/entity/price';
 import { adminEndpoint } from '../helpers/socket';
 import { error } from '../helpers/log';
 import { translate } from '../translate';
@@ -48,7 +48,7 @@ class Price extends System {
       cb(await getRepository(PriceEntity).findOne({ id }));
     });
 
-    adminEndpoint(this.nsp, 'price::save', async (price: PriceEntity, cb) => {
+    adminEndpoint(this.nsp, 'price::save', async (price: PriceInterface, cb) => {
       try {
         await getRepository(PriceEntity).save(price);
         cb(null);
@@ -92,13 +92,10 @@ class Price extends System {
       return false;
     }
 
-    let price = await getRepository(PriceEntity).findOne({ command });
-    if (!price) {
-      price = new PriceEntity();
-      price.command = command;
-      price.price = argPrice;
-    }
-    await getRepository(PriceEntity).save(price);
+    const price = await getRepository(PriceEntity).save({
+      ...(await getRepository(PriceEntity).findOne({ command })),
+      command, price: argPrice,
+    });
     const message = await prepare('price.price-was-set', { command, amount: parseInt(argPrice, 10), pointsName: await points.getPointsName(price) });
     sendMessage(message, opts.sender, opts.attr);
   }
@@ -139,9 +136,8 @@ class Price extends System {
       return false;
     }
 
-    price.enabled = !price.enabled;
-    await getRepository(PriceEntity).save(price);
-    const message = await prepare(!price.enabled ? 'price.price-was-enabled' : 'price.price-was-disabled', { command });
+    await getRepository(PriceEntity).save({...price, enabled: !price.enabled});
+    const message = await prepare(price.enabled ? 'price.price-was-enabled' : 'price.price-was-disabled', { command });
     sendMessage(message, opts.sender, opts.attr);
   }
 

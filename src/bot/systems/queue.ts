@@ -8,7 +8,7 @@ import { adminEndpoint } from '../helpers/socket';
 
 import { getRepository } from 'typeorm';
 import { User } from '../database/entity/user';
-import { Queue as QueueEntity } from '../database/entity/queue';
+import { Queue as QueueEntity, QueueInterface } from '../database/entity/queue';
 import { translate } from '../translate';
 import tmi from '../tmi';
 
@@ -33,7 +33,7 @@ class Queue extends System {
   @settings('eligibility')
   eligibilitySubscribers = true;
 
-  pickedUsers: QueueEntity[] = [];
+  pickedUsers: QueueInterface[] = [];
 
   constructor () {
     super();
@@ -82,7 +82,7 @@ class Queue extends System {
       users = users.sort(o => -(new Date(o.createdAt).getTime()));
     }
 
-    const toReturn: QueueEntity[] = [];
+    const toReturn: QueueInterface[] = [];
     let i = 0;
     for (const user of users) {
       const isNotFollowerEligible = !user.isFollower && (this.eligibilityFollowers);
@@ -148,16 +148,15 @@ class Queue extends System {
       }
 
       if (eligible) {
-        let queuedUser = await getRepository(QueueEntity).findOne({ username: opts.sender.username });
-        if (!queuedUser) {
-          queuedUser = new QueueEntity();
-          queuedUser.username = opts.sender.username;
-        }
-        queuedUser.isFollower = user.isFollower;
-        queuedUser.isSubscriber = user.isSubscriber;
-        queuedUser.isModerator = user.isModerator;
-        queuedUser.createdAt = Date.now();
-        await getRepository(QueueEntity).save(queuedUser);
+        await getRepository(QueueEntity).save({
+          ...(await getRepository(QueueEntity).findOne({ username: opts.sender.username })),
+          username: opts.sender.username,
+          isFollower: user.isFollower,
+          isSubscriber: user.isSubscriber,
+          isModerator: user.isModerator,
+          createdAt: Date.now(),
+
+        });
         sendMessage(translate('queue.join.opened'), opts.sender, opts.attr);
       }
     } else {

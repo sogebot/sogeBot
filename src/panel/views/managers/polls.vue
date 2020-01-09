@@ -167,7 +167,7 @@
   require('moment/locale/ru')
 
   import { getSocket } from 'src/panel/helpers/socket';
-  import { Poll } from 'src/bot/database/entity/poll';
+  import { PollInterface } from 'src/bot/database/entity/poll';
 
   import uuid from 'uuid'
 
@@ -183,8 +183,8 @@
       const object: {
         chunk: any,
         socket: any,
-        votes: Array<Poll>,
-        newVote: Poll,
+        votes: PollInterface[],
+        newVote: PollInterface,
         currentTime: any,
         isMounted: Boolean,
         domWidth: number,
@@ -194,7 +194,16 @@
         chunk: chunk,
         socket: getSocket('/systems/polls'),
         votes: [],
-        newVote: new Poll(),
+        newVote: {
+          id: uuid(),
+          type: 'normal',
+          title: '',
+          isOpened: true,
+          openedAt: Date.now(),
+          closedAt: 0,
+          options: ['', '', '', '', ''],
+          votes: [],
+        },
         currentTime: 0,
         isMounted: false,
         domWidth: 0,
@@ -205,16 +214,6 @@
     },
     beforeDestroy: function () {
       clearInterval(this.interval)
-    },
-    created() {
-      this.newVote.id = uuid();
-      this.newVote.type = 'normal';
-      this.newVote.title = '';
-      this.newVote.isOpened = true;
-      this.newVote.openedAt = Date.now();
-      this.newVote.closedAt = 0;
-      this.newVote.options = ['', '', '', '', ''];
-      this.newVote.votes = [];
     },
     mounted: function () {
       this.$moment.locale(this.configuration.lang)
@@ -231,8 +230,8 @@
       this.isMounted = true
     },
     computed: {
-      filteredVotes: function (): Array<Poll | 'new'> {
-        const votes: Array<'new' | Poll> = [
+      filteredVotes: function (): Array<PollInterface | 'new'> {
+        const votes: Array<'new' | PollInterface> = [
           'new', ...this.votes,
         ];
         if (this.search.trim().length === 0) return votes;
@@ -282,13 +281,14 @@
             if (err) return console.error(err)
             else {
               this.refresh();
-              this.newVote = new Poll();
-              this.newVote.id = uuid();
-              this.newVote.type = 'normal';
-              this.newVote.title = '';
-              this.newVote.isOpened = true;
-              this.newVote.options = ['', '', '', '', ''];
-              this.newVote.openedAt = Date.now();
+              this.newVote = {
+                id: uuid(),
+                type: 'normal',
+                title: '',
+                isOpened: true,
+                options: ['', '', '', '', ''],
+                openedAt: Date.now(),
+              }
             }
           })
       },
@@ -318,7 +318,7 @@
       totalVotes: function (vid) {
         let totalVotes = 0
         const votes = this.votes.find(o => o.id === vid);
-        if (votes) {
+        if (votes?.votes) {
           for (let i = 0, length = votes.votes.length; i < length; i++) {
             totalVotes += votes.votes[i].votes
           }
@@ -328,7 +328,7 @@
       activeTime: function (vid) {
         const vote = this.votes.find(o => typeof o !== 'string' && o.id === vid);
         if (typeof vote === 'object') {
-          return this.currentTime - (new Date(vote.openedAt)).getTime();
+          return this.currentTime - (new Date(vote.openedAt || Date.now())).getTime();
         } else {
           return 0;
         }
@@ -336,7 +336,7 @@
       getPercentage: function (vid, index, toFixed) {
         let numOfVotes = 0
         const votes = this.votes.find(o => o.id === vid);
-        if (votes) {
+        if (votes?.votes) {
           for (let i = 0, length = votes.votes.length; i < length; i++) {
             if (votes.votes[i].option === index) numOfVotes += votes.votes[i].votes
           }
