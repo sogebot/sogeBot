@@ -82,7 +82,7 @@ import { required } from 'vuelidate/lib/validators';
 import uuid from 'uuid/v4';
 
 import { getUsernameById } from '../../../helpers/userById';
-import { Quotes } from 'src/bot/database/entity/quotes';
+import { QuotesInterface } from 'src/bot/database/entity/quotes';
 
 Component.registerHooks([
   'beforeRouteEnter',
@@ -110,7 +110,7 @@ export default class QuotesEdit extends Vue {
   state: { loaded: number; save: number } = { loaded: this.$state.progress, save: this.$state.idle }
   pending: boolean = false;
 
-  item: Quotes = {
+  item: QuotesInterface = {
     id: uuid(),
     createdAt: Date.now(),
     tags: [],
@@ -151,7 +151,7 @@ export default class QuotesEdit extends Vue {
   async mounted() {
     this.state.loaded = this.$state.progress;
     if (this.$route.params.id) {
-      this.socket.emit('getById', this.$route.params.id, async (err, data: Quotes) => {
+      this.socket.emit('getById', this.$route.params.id, async (err, data: QuotesInterface) => {
         console.debug('Loaded', {data});
         this.item = data;
         this.state.loaded = this.$state.success;

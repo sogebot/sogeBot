@@ -71,11 +71,9 @@
 
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
-import { Quotes } from 'src/bot/database/entity/quotes';
+import { QuotesInterface } from 'src/bot/database/entity/quotes';
 import { getSocket } from 'src/panel/helpers/socket';
 import { orderBy, uniq, xor, flatten } from 'lodash-es';
-
-
 
 @Component({
   components: {
@@ -90,7 +88,7 @@ import { orderBy, uniq, xor, flatten } from 'lodash-es';
   }
 })
 export default class quotesList extends Vue {
-  quotesFromDb: Quotes[] = [];
+  quotesFromDb: QuotesInterface[] = [];
   filteredTags: string[] = [];
   changed: string[] = [];
   isDataChanged = false;
@@ -118,7 +116,7 @@ export default class quotesList extends Vue {
   socket = getSocket('/systems/quotes');
 
   created() {
-    this.socket.emit('quotes:getAll', {}, async (err, items: Quotes[]) => {
+    this.socket.emit('quotes:getAll', {}, async (err, items: QuotesInterface[]) => {
       this.quotesFromDb = items
       this.state.loading = this.$state.success;
     })
@@ -129,7 +127,7 @@ export default class quotesList extends Vue {
   };
 
   get quotes() {
-    let quotesFilteredBySearch: Quotes[] = []
+    let quotesFilteredBySearch: QuotesInterface[] = []
     if (this.search.trim().length > 0) {
       for (let quote of this.quotesFromDb) {
         if (quote.quote.toLowerCase().includes(this.search)) {
@@ -141,7 +139,7 @@ export default class quotesList extends Vue {
      }
     if (this.filteredTags.length === 0) return quotesFilteredBySearch
     else {
-      let quotesFilteredByTags: Quotes[] = []
+      let quotesFilteredByTags: QuotesInterface[] = []
       for (let quote of quotesFilteredBySearch) {
         for (let tag of quote.tags) {
           if (this.filteredTags.includes(tag)) {
