@@ -11,7 +11,7 @@
             {{group.name}}
             <small class="text-muted text-monospace" style="font-size:0.7rem">{{$route.params.id}}</small>
           </template>
-          <template v-else>{{translate('registry.goals.newGoalGroup')}}</template>
+          <template v-else>{{translate('registry.goals.newGoalGroupInterface')}}</template>
         </span>
       </div>
     </div>
@@ -319,7 +319,7 @@ import 'flatpickr/dist/flatpickr.css';
 
 import { getSocket } from 'src/panel/helpers/socket';
 import uuid from 'uuid/v4';
-import { Goal, GoalGroup } from 'src/bot/database/entity/goal';
+import { GoalGroupInterface, GoalInterface } from 'src/bot/database/entity/goal';
 
 export default Vue.extend({
   components: {
@@ -333,7 +333,7 @@ export default Vue.extend({
       socket: any,
       search: string,
       groupId: string,
-      group: GoalGroup,
+      group: Required<GoalGroupInterface>,
       fonts: string[],
       uiShowGoal: string,
       typeOpts: ['followers', 'currentFollowers', 'currentSubscribers', 'subscribers', 'tips', 'bits'],
@@ -380,7 +380,7 @@ export default Vue.extend({
   },
   computed: {
     isEditation: function (): boolean { return this.$route.params.id !== null },
-    currentGoal: function (): Goal | null {
+    currentGoal: function (): GoalInterface | null {
       if (this.uiShowGoal === '') return null
       else return this.group.goals.find((o) => o.id === this.uiShowGoal) || null
     }
@@ -438,9 +438,7 @@ export default Vue.extend({
     },
     addGoal: function () {
       const id = uuid()
-      const goal = new Goal();
       this.group.goals.push({
-        ...goal,
         id,
         name: '',
         type: 'followers',
@@ -501,7 +499,7 @@ export default Vue.extend({
   },
   mounted: async function () {
     if (this.$route.params.id) {
-      this.socket.emit('goals::getOne', this.$route.params.id, (err, d: GoalGroup) => {
+      this.socket.emit('goals::getOne', this.$route.params.id, (err, d: Required<GoalGroupInterface>) => {
         if (err) {
           console.error(err);
           return;
@@ -511,7 +509,7 @@ export default Vue.extend({
         this.group = d
 
         if (this.uiShowGoal === '' && this.group.goals.length > 0) {
-          this.uiShowGoal = this.group.goals[0].id;
+          this.uiShowGoal = this.group.goals[0].id ?? '';
         }
       })
     }
