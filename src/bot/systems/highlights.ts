@@ -12,7 +12,7 @@ import { error } from '../helpers/log';
 import { adminEndpoint } from '../helpers/socket';
 
 import { getRepository } from 'typeorm';
-import { Highlight } from '../database/entity/highlight';
+import { Highlight, HighlightInterface } from '../database/entity/highlight';
 import api from '../api';
 import oauth from '../oauth';
 import { translate } from '../translate';
@@ -102,12 +102,13 @@ class Highlights extends System {
       api.calls.bot.refresh = request.headers['ratelimit-reset'];
 
       const timestamp = moment.preciseDiff(moment.utc(), moment.utc(api.streamStatusChangeSince), true);
-      const highlight = new Highlight();
-      highlight.videoId = request.data.data[0].id;
-      highlight.timestamp = { hours: timestamp.hours, minutes: timestamp.minutes, seconds: timestamp.seconds };
-      highlight.game = api.stats.currentGame || 'n/a';
-      highlight.title = api.stats.currentTitle || 'n/a';
-      highlight.createdAt = Date.now();
+      const highlight = {
+        videoId: request.data.data[0].id,
+        timestamp: { hours: timestamp.hours, minutes: timestamp.minutes, seconds: timestamp.seconds },
+        game: api.stats.currentGame || 'n/a',
+        title: api.stats.currentTitle || 'n/a',
+        createdAt: Date.now(),
+      };
 
       panel.io.emit('api.stats', { data: request.data, timestamp: Date.now(), call: 'highlights', api: 'helix', endpoint: url, code: request.status, remaining: api.calls.bot.remaining });
 
@@ -128,7 +129,7 @@ class Highlights extends System {
     }
   }
 
-  public async add(highlight: Highlight, timestamp, sender) {
+  public async add(highlight: HighlightInterface, timestamp, sender) {
     api.createMarker();
     sendMessage(translate('highlights.saved')
       .replace(/\$hours/g, (timestamp.hours < 10) ? '0' + timestamp.hours : timestamp.hours)

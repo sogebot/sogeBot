@@ -1,12 +1,17 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { EntitySchema } from 'typeorm';
 import { ColumnNumericTransformer } from './_transformer';
 
-@Entity()
-export class HeistUser {
-  @PrimaryColumn()
-  userId!: number;
-  @Column()
-  username!: string;
-  @Column('bigint', { transformer: new ColumnNumericTransformer() })
-  points!: number;
+export interface HeistUserInterface {
+  userId: number;
+  username: string;
+  points: number;
 };
+
+export const HeistUser = new EntitySchema<Readonly<Required<HeistUserInterface>>>({
+  name: 'heist_user',
+  columns: {
+    userId: { type: Number, primary: true },
+    username: { type: String },
+    points: { type: 'bigint', transformer: new ColumnNumericTransformer() },
+  },
+});
