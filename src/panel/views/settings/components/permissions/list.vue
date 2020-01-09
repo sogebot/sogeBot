@@ -51,7 +51,7 @@
   import { getSocket } from 'src/panel/helpers/socket';
   import { orderBy } from 'lodash-es';
 
-  import { Permissions as PermissionEntity} from 'src/bot/database/entity/permissions'
+  import { PermissionsInterface } from 'src/bot/database/entity/permissions'
 
   export default Vue.extend({
     props: ['update'],
@@ -59,7 +59,7 @@
       const data: {
         orderBy: any;
         draggingPID: null | string,
-        currentData: PermissionEntity[],
+        currentData: PermissionsInterface[],
         socket: any,
         isLoading: boolean,
       } = {

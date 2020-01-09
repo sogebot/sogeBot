@@ -265,10 +265,11 @@ class Module {
                   if (currentValue === c.permission) {
                     await getRepository(PermissionCommands).delete({ name: c.name });
                   } else {
-                    const permCmd = await getRepository(PermissionCommands).findOne({ name: c.name }) || new PermissionCommands();
-                    permCmd.name = c.name;
-                    permCmd.permission = currentValue as string;
-                    await getRepository(PermissionCommands).save(permCmd);
+                    await getRepository(PermissionCommands).save({
+                      ...(await getRepository(PermissionCommands).findOne({ name: c.name })),
+                      name: c.name,
+                      permission: currentValue as string,
+                    });
                   }
                 }
               }

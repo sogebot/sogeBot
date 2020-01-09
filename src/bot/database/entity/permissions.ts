@@ -1,52 +1,79 @@
-import { Column, Entity, Index, ManyToOne,OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { EntitySchema } from 'typeorm';
 import { ColumnNumericTransformer } from './_transformer';
 
-@Entity()
-export class Permissions {
-  @PrimaryGeneratedColumn('uuid')
-  id!: string;
-  @Column()
-  name!: string;
-  @Column()
-  order!: number;
-  @Column()
-  isCorePermission!: boolean;
-  @Column()
-  isWaterfallAllowed!: boolean;
-  @Column('varchar', { length: 12 })
-  automation!: 'none' | 'casters' | 'moderators' | 'subscribers' | 'viewers' | 'followers' | 'vip';
-  @Column('simple-array')
-  userIds!: string[];
-  @OneToMany(() => PermissionFilters, (filter) => filter.permission, {
-    cascade: true,
-  })
-  filters!: PermissionFilters[];
+export interface PermissionsInterface {
+  id?: string;
+  name: string;
+  order: number;
+  isCorePermission: boolean;
+  isWaterfallAllowed: boolean;
+  automation: 'none' | 'casters' | 'moderators' | 'subscribers' | 'viewers' | 'followers' | 'vip';
+  userIds: string[];
+  filters: PermissionFiltersInterface[];
 };
 
-@Entity()
-export class PermissionFilters {
-  @PrimaryGeneratedColumn('uuid')
-  id!: string;
-  @ManyToOne(() => Permissions, (permission) => permission.filters, {
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
-  })
-  permission!: Permissions;
-  @Column('varchar', { length: 3 })
-  comparator!: '<' | '>' | '==' | '<=' | '>=';
-  @Column('varchar')
-  type!: 'points' | 'watched' | 'tips' | 'bits' | 'messages' | 'subtier' | 'subcumulativemonths' | 'substreakmonths';
-  @Column('bigint', { transformer: new ColumnNumericTransformer() })
-  value!: number;
+export interface PermissionFiltersInterface {
+  id?: string;
+  permission: PermissionsInterface;
+  comparator: '<' | '>' | '==' | '<=' | '>=';
+  type: 'points' | 'watched' | 'tips' | 'bits' | 'messages' | 'subtier' | 'subcumulativemonths' | 'substreakmonths';
+  value: number;
 };
 
-@Entity()
-export class PermissionCommands {
-  @PrimaryGeneratedColumn()
-  id!: string;
-  @Index()
-  @Column()
-  name!: string;
-  @Column('varchar', { nullable: true, length: 36 })
-  permission!: string | null;
+export interface PermissionCommandsInterface {
+  id?: string;
+  permission: string | null;
+  name: string;
 };
+
+export const Permissions = new EntitySchema<Readonly<Required<PermissionsInterface>>>({
+  name: 'permissions',
+  columns: {
+    id: { type: String, primary: true, generated: 'uuid' },
+    name: { type: String },
+    order: { type: Number },
+    isCorePermission: { type: Boolean },
+    isWaterfallAllowed: { type: Boolean },
+    automation: { type: 'varchar', length: 12 },
+    userIds: { type: 'simple-array' },
+  },
+  relations: {
+    filters: {
+      type: 'one-to-many',
+      target: 'permission_filters',
+      inverseSide: 'permission',
+      cascade: true,
+    },
+  },
+});
+
+export const PermissionFilters = new EntitySchema<Readonly<Required<PermissionFiltersInterface>>>({
+  name: 'permission_filters',
+  columns: {
+    id: { type: String, primary: true, generated: 'uuid' },
+    comparator: { type: 'varchar', length: 3 },
+    type: { type: 'varchar' },
+    value: { type: 'bigint', transformer: new ColumnNumericTransformer() },
+  },
+  relations: {
+    permission: {
+      type: 'many-to-one',
+      target: 'permissions',
+      inverseSide: 'filters',
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+    },
+  },
+});
+
+export const PermissionCommands = new EntitySchema<Readonly<Required<PermissionCommandsInterface>>>({
+  name: 'permission_commands',
+  columns: {
+    id: { type: Number, primary: true, generated: 'rowid' },
+    name: { type: String },
+    permission: { type: 'varchar', nullable: true, length: 36 },
+  },
+  indices: [
+    { name: 'IDX_ba6483f5c5882fa15299f22c0a', columns: ['name'] },
+  ],
+});

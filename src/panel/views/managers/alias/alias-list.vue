@@ -63,7 +63,7 @@
 import { getSocket } from 'src/panel/helpers/socket';
 
 import { Alias as AliasEntity } from 'src/bot/database/entity/alias';
-import { Permissions as PermissionsEntity } from 'src/bot/database/entity/permissions';
+import { PermissionsInterface } from 'src/bot/database/entity/permissions';
 
 import { Vue, Component/*, Watch */ } from 'vue-property-decorator';
 import { orderBy, isNil } from 'lodash-es';
@@ -84,7 +84,7 @@ export default class aliasList extends Vue {
   psocket = getSocket('/core/permissions')
 
   items: AliasEntity[] = [];
-  permissions: PermissionsEntity[] = [];
+  permissions: PermissionsInterface[] = [];
   search: string = '';
   state: {
     loadingAls: number;
