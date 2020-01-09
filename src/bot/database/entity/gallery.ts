@@ -1,14 +1,18 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { EntitySchema } from 'typeorm';
 
-@Entity()
-export class Gallery {
-  @PrimaryGeneratedColumn('uuid')
-  id!: string;
-
-  @Column()
-  type!: string;
-  @Column('text')
-  data!: string;
-  @Column()
-  name!: string;
+export interface GalleryInterface {
+  id?: string;
+  type: string;
+  data: string;
+  name: string;
 }
+
+export const Gallery = new EntitySchema<Readonly<Required<GalleryInterface>>>({
+  name: 'gallery',
+  columns: {
+    id: { type: String, primary: true, generated: 'uuid' },
+    type: { type: String },
+    data: { type: 'text' },
+    name: { type: String },
+  },
+});

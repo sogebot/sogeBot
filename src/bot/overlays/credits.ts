@@ -3,8 +3,8 @@ import _ from 'lodash';
 import Overlay from './_interface';
 import { settings, ui } from '../decorators';
 import { publicEndpoint } from '../helpers/socket';
-import { getManager } from 'typeorm';
-import { EventList } from '../database/entity/eventList';
+import { getRepository } from 'typeorm';
+import { EventList, EventListInterface } from '../database/entity/eventList';
 import api from '../api';
 import oauth from '../oauth';
 import currency from '../currency';
@@ -101,13 +101,16 @@ class Credits extends Overlay {
     publicEndpoint(this.nsp, 'load', async (cb) => {
       const when = api.isStreamOnline ? api.streamStatusChangeSince : _.now() - 50000000000;
       const timestamp = new Date(when).getTime();
-      const events: (EventList & { values?: {
+      const events: (EventListInterface & { values?: {
         currency: string; amount: number;
-      };})[] = await getManager().createQueryBuilder()
-        .select('events').from(EventList, 'events')
-        .orderBy('events.timestamp', 'DESC')
-        .where('events.timestamp >= :timestamp', { timestamp })
-        .getMany();
+      };})[] = await getRepository(EventList).find({
+        order: {
+          timestamp: 'DESC',
+        },
+        where: {
+          timestamp,
+        },
+      });
 
       // change tips if neccessary for aggregated events (need same currency)
       for (const event of events) {

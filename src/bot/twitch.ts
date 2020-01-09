@@ -15,7 +15,7 @@ import Core from './_interface';
 import * as configFile from '@config';
 import { adminEndpoint } from './helpers/socket';
 
-import { getManager, getRepository } from 'typeorm';
+import { getRepository } from 'typeorm';
 import { EventList } from './database/entity/eventList';
 
 import { User } from './database/entity/user';
@@ -63,8 +63,9 @@ class Twitch extends Core {
 
   @command('!followers')
   async followers (opts) {
-    const events = await getManager().createQueryBuilder()
-      .select('events').from(EventList, 'events')
+    const events = await getRepository(EventList)
+      .createQueryBuilder('events')
+      .select('events')
       .orderBy('events.timestamp', 'DESC')
       .where('events.event = :event', { event: 'follow' })
       .getMany();
@@ -96,8 +97,9 @@ class Twitch extends Core {
 
   @command('!subs')
   async subs (opts) {
-    const events = await getManager().createQueryBuilder()
-      .select('events').from(EventList, 'events')
+    const events = await getRepository(EventList)
+      .createQueryBuilder('events')
+      .select('events')
       .orderBy('events.timestamp', 'DESC')
       .where('events.event = :event', { event: 'sub' })
       .orWhere('events.event = :event2', { event2: 'resub' })

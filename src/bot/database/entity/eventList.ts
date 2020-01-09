@@ -1,21 +1,24 @@
-import { Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
+import { EntitySchema } from 'typeorm';
 import { ColumnNumericTransformer } from './_transformer';
 
-@Entity()
-export class EventList {
-  @PrimaryGeneratedColumn()
-  id!: number;
-
-  @Column()
-  event!: string;
-
-  @Column()
-  @Index()
-  username!: string;
-
-  @Column('bigint', { transformer: new ColumnNumericTransformer() })
-  timestamp!: number;
-
-  @Column('text')
-  values_json!: string;
+export interface EventListInterface {
+  id?: string;
+  event: string;
+  username: string;
+  timestamp: number;
+  values_json: string;
 }
+
+export const EventList = new EntitySchema<Readonly<Required<EventListInterface>>>({
+  name: 'event_list',
+  columns: {
+    id: { type: Number, primary: true, generated: 'rowid' },
+    event: { type: String },
+    username: { type: String },
+    timestamp: { type: 'bigint', transformer: new ColumnNumericTransformer() },
+    values_json: { type: 'text' },
+  },
+  indices: [
+    { name: 'IDX_8a80a3cf6b2d815920a390968a', columns: ['username'] },
+  ],
+});
