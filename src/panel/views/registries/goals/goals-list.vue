@@ -12,7 +12,7 @@
 
     <panel cards search @search="search = $event">
       <template v-slot:left>
-        <button-with-icon class="btn-primary btn-reverse" icon="plus" href="#/registry/goals/edit">{{translate('registry.goals.addGoalGroup')}}</button-with-icon>
+        <button-with-icon class="btn-primary btn-reverse" icon="plus" href="#/registry/goals/edit">{{translate('registry.goals.addGoalGroupInterface')}}</button-with-icon>
       </template>
     </panel>
 
@@ -90,7 +90,7 @@
   import { chunk, filter, orderBy } from 'lodash-es';
 
   import { getSocket } from 'src/panel/helpers/socket';
-import { GoalGroup } from 'src/bot/database/entity/goal';
+  import { GoalGroupInterface } from 'src/bot/database/entity/goal';
 
   export default Vue.extend({
     components: {
@@ -100,7 +100,7 @@ import { GoalGroup } from 'src/bot/database/entity/goal';
     },
     data: function () {
       const object: {
-        groups: GoalGroup[],
+        groups: GoalGroupInterface[],
         socket: any,
         search: string,
         currentTime: any,
@@ -125,8 +125,8 @@ import { GoalGroup } from 'src/bot/database/entity/goal';
       return object
     },
     computed: {
-      groupsFiltered: function (): GoalGroup[] {
-        return this.groups.filter((o: GoalGroup) => {
+      groupsFiltered: function (): GoalGroupInterface[] {
+        return this.groups.filter((o: GoalGroupInterface) => {
           return o.name.includes(this.search)
         })
       },
@@ -148,7 +148,7 @@ import { GoalGroup } from 'src/bot/database/entity/goal';
         this.currentTime = Date.now()
       }, 1000)
 
-      this.socket.emit('goals::getAll', (err: Error, items: GoalGroup[]) => {
+      this.socket.emit('goals::getAll', (err: Error, items: GoalGroupInterface[]) => {
         if (err) {
           console.error(err);
         } else {

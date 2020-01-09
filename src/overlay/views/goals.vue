@@ -153,12 +153,12 @@ Vue.use(VueMoment, {
 })
 
 import { gsap } from 'gsap'
-import { GoalGroup } from 'src/bot/database/entity/goal';
+import { GoalInterface, GoalGroupInterface } from 'src/bot/database/entity/goal';
 
 @Component({})
 export default class GoalsOverlay extends Vue {
   show: number = -1;
-  group: GoalGroup | null = null;
+  group: GoalGroupInterface | null = null;
   loadedFonts: string[] = [];
   socket = getSocket('/overlays/goals', true);
   lastSwapTime: number = Date.now();
@@ -261,7 +261,7 @@ export default class GoalsOverlay extends Vue {
         if (err) return console.error(err)
         this.current = current
       })
-      this.socket.emit('goals::getOne', id, (err, cb: GoalGroup | undefined) => {
+      this.socket.emit('goals::getOne', id, (err, cb: Required<GoalGroupInterface> | undefined) => {
         if (err) return console.error(err)
         this.group = cb || null;
 
@@ -272,7 +272,7 @@ export default class GoalsOverlay extends Vue {
               if (typeof _goal !== 'undefined') {
                 if (Number(_goal.currentAmount) !== Number(goal.currentAmount)) {
                   console.debug(_goal.currentAmount + ' => ' + goal.currentAmount)
-                  this.triggerUpdate.push(goal.id)
+                  this.triggerUpdate.push((goal as Required<GoalInterface>).id)
                 }
               }
             }
@@ -281,19 +281,19 @@ export default class GoalsOverlay extends Vue {
           // update currentAmount for current types
           for (const goal of this.group.goals) {
             if (goal.type === 'currentFollowers') {
-              if (goal.currentAmount !== this.current.followers) this.triggerUpdate.push(goal.id)
+              if (goal.currentAmount !== this.current.followers) this.triggerUpdate.push((goal as Required<GoalInterface>).id)
               goal.currentAmount = this.current.followers
             }
             if (goal.type === 'currentSubscribers') {
-              if (goal.currentAmount !== this.current.subscribers) this.triggerUpdate.push(goal.id)
+              if (goal.currentAmount !== this.current.subscribers) this.triggerUpdate.push((goal as Required<GoalInterface>).id)
               goal.currentAmount = this.current.subscribers
             }
           }
 
           // add css import
           for (const goal of this.group.goals) {
-            if (!this.cssLoaded.includes(goal.id)) {
-              this.cssLoaded.push(goal.id);
+            if (!this.cssLoaded.includes((goal as Required<GoalInterface>).id)) {
+              this.cssLoaded.push((goal as Required<GoalInterface>).id);
               const head = document.getElementsByTagName('head')[0]
               const style = document.createElement('style')
               style.type = 'text/css';
@@ -330,14 +330,14 @@ export default class GoalsOverlay extends Vue {
                 .replace(/\$type/g, goal.type)
                 .replace(/\$goalAmount/g, String(goal.goalAmount))
                 .replace(/\$currentAmount/g, String(goal.currentAmount))
-                .replace(/\$percentageAmount/g, Number((100 / goal.goalAmount) * goal.currentAmount).toFixed())
+                .replace(/\$percentageAmount/g, Number((100 / (goal.goalAmount ?? 0)) * (goal.currentAmount ?? 0)).toFixed())
                 .replace(/\$endAfter/g, new Date(goal.endAfter).toISOString())
             }
 
             // trigger onUpdate on nextTick
             this.$nextTick(() => {
-              if (this.triggerUpdate.includes(goal.id)) {
-                const idx = this.triggerUpdate.indexOf(goal.id);
+              if (this.triggerUpdate.includes((goal as Required<GoalInterface>).id)) {
+                const idx = this.triggerUpdate.indexOf((goal as Required<GoalInterface>).id);
                 this.triggerUpdate.splice(idx, 1);
 
                 console.debug('onUpdate : ' + goal.id)

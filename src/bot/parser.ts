@@ -230,10 +230,12 @@ class Parser {
   }
 
   async command (sender, message) {
+    debug('parser.command', { sender, message });
     if (!message.startsWith('!')) {
       return;
     }; // do nothing, this is not a command or user is ignored
     const command = await this.find(message, null);
+    debug('parser.command', { command });
     if (_.isNil(command)) {
       return;
     }; // command not found, do nothing
@@ -269,6 +271,7 @@ class Parser {
 
       if (typeof command.fnc === 'function' && !_.isNil(command.id)) {
         incrementCountOfCommandUsage(command.command);
+        debug('parser.command', 'Running ' + command.command);
         command.fnc.apply(command.this, [opts]);
       } else {
         error(command.command + ' have wrong undefined function ' + command._fncName + '() registered!');

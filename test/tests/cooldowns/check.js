@@ -134,7 +134,6 @@ describe('Cooldowns - check()', () => {
 
     it('Add koncha to keywords', async () => {
       await getRepository(Keyword).save({
-        ...new Keyword(),
         keyword: 'koncha',
         response: '$sender KonCha',
         enabled: true,
@@ -350,7 +349,6 @@ describe('Cooldowns - check()', () => {
 
     it('test', async () => {
       await getRepository(Keyword).save({
-        ...new Keyword(),
         keyword: 'me',
         response: '(!me)',
         enabled: true,
@@ -384,7 +382,6 @@ describe('Cooldowns - check()', () => {
 
     it('test', async () => {
       await getRepository(Keyword).save({
-        ...new Keyword(),
         keyword: 'me',
         response: '(!me)',
         enabled: true,

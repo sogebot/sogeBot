@@ -219,8 +219,9 @@ class UserInfo extends System {
         cache: true,
       });
 
+
       if (!user) {
-        return;
+        throw Error(`User ${opts.sender.username}#${opts.sender.userId} not found.`);
       }
 
       // build message

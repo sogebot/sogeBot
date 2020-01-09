@@ -1,22 +1,12 @@
-import { Column, Entity, Index, JoinColumn, ManyToOne,OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { EntitySchema } from 'typeorm';
 import { ColumnNumericTransformer } from './_transformer';
 
-
-@Entity()
-export class GoalGroup {
-  @PrimaryGeneratedColumn('uuid')
-  id!: string;
-  @OneToMany(() => Goal, (entity) => entity.group, {
-    cascade: true,
-  })
-  goals!: Goal[];
-
-  @Column('bigint', { transformer: new ColumnNumericTransformer(), default: 0 })
-  createdAt!: number;
-  @Column()
-  name!: string;
-  @Column('simple-json')
-  display!: {
+export interface GoalGroupInterface {
+  id?: string;
+  goals: GoalInterface[];
+  createdAt?: number;
+  name: string;
+  display: {
     type: 'fade';
     durationMs: number;
     animationInMs: number;
@@ -25,62 +15,89 @@ export class GoalGroup {
     type: 'multi';
     spaceBetweenGoalsInPx: number;
   };
-}
+};
 
-@Entity()
-export class Goal {
-  @PrimaryGeneratedColumn('uuid')
-  id!: string;
-  @ManyToOne(() => GoalGroup, (entity) => entity.goals, {
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
-  })
-  @JoinColumn({ name: 'groupId' })
-  group!: GoalGroup;
-  @Column({ name: 'groupId', nullable: true })
-  @Index()
-  groupId!: string | null;
-
-  @Column()
-  name!: string;
-  @Column('varchar', { length: 20 })
-  type!: 'followers' | 'currentFollowers' | 'currentSubscribers' | 'subscribers' | 'tips' | 'bits';
-  @Column()
-  countBitsAsTips!: boolean;
-  @Column('varchar', { length: 20 })
-  display!: 'simple' | 'full' | 'custom';
-
-  @Column('bigint', { transformer: new ColumnNumericTransformer(), default: 0 })
-  timestamp!: number;
-  @Column('float', { transformer: new ColumnNumericTransformer(), default: 0 })
-  goalAmount!: number;
-  @Column('float', { transformer: new ColumnNumericTransformer(), default: 0 })
-  currentAmount!: number;
-  @Column()
-  endAfter!: string;
-  @Column()
-  endAfterIgnore!: boolean;
-
-  @Column('simple-json')
-  customizationBar!: {
+export interface GoalInterface {
+  id?: string;
+  group?: GoalGroupInterface;
+  groupId?: string | null;
+  name: string;
+  type: 'followers' | 'currentFollowers' | 'currentSubscribers' | 'subscribers' | 'tips' | 'bits';
+  countBitsAsTips: boolean;
+  display: 'simple' | 'full' | 'custom';
+  timestamp?: number;
+  goalAmount?: number;
+  currentAmount?: number;
+  endAfter: string;
+  endAfterIgnore: boolean;
+  customizationBar: {
     color: string;
     backgroundColor: string;
     borderColor: string;
     borderPx: number;
     height: number;
   };
-  @Column('simple-json')
-  customizationFont!: {
+  customizationFont: {
     family: string;
     color: string;
     size: number;
     borderColor: string;
     borderPx: number;
   };
-  @Column('text')
-  customizationHtml!: string;
-  @Column('text')
-  customizationJs!: string;
-  @Column('text')
-  customizationCss!: string;
-};
+  customizationHtml: string;
+  customizationJs: string;
+  customizationCss: string;
+}
+
+export const GoalGroup = new EntitySchema<Readonly<Required<GoalGroupInterface>>>({
+  name: 'goal_group',
+  columns: {
+    id: { type: String, primary: true, generated: 'uuid' },
+    createdAt: { type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0 },
+    name: { type: String },
+    display: { type: 'simple-json' },
+  },
+  relations: {
+    goals: {
+      type: 'one-to-many',
+      target: 'goal',
+      inverseSide: 'group',
+      cascade: true,
+    },
+  },
+});
+
+export const Goal = new EntitySchema<Readonly<Required<GoalInterface>>>({
+  name: 'goal',
+  columns: {
+    id: { type: String, primary: true, generated: 'uuid' },
+    name: { type: String },
+    groupId: { type: String, nullable: true },
+    type: { type: 'varchar', length: 20 },
+    countBitsAsTips: { type: Boolean },
+    display: { type: 'varchar', length: 20 },
+    timestamp: { type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0 },
+    goalAmount: { type: 'float', transformer: new ColumnNumericTransformer(), default: 0 },
+    currentAmount: { type: 'float', transformer: new ColumnNumericTransformer(), default: 0 },
+    endAfter: { type: String },
+    endAfterIgnore: { type: Boolean },
+    customizationBar: { type: 'simple-json' },
+    customizationFont: { type: 'simple-json' },
+    customizationHtml: { type: 'text' },
+    customizationJs: { type: 'text' },
+    customizationCss: { type: 'text' },
+  },
+  indices: [
+    { name: 'IDX_a1a6bd23cb8ef7ddf921f54c0b', columns: ['groupId'] },
+  ],
+  relations: {
+    group: {
+      type: 'many-to-one',
+      target: 'goal',
+      inverseSide: 'group',
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+      joinColumn: { name: 'groupId' },
+    },
+  },
+});

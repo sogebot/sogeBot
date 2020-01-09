@@ -4,7 +4,7 @@ import Overlay from '../overlays/_interface';
 
 import { onBit, onFollow, onSub, onTip } from '../decorators/on';
 import { adminEndpoint, publicEndpoint } from '../helpers/socket';
-import { Goal, GoalGroup } from '../database/entity/goal';
+import { Goal, GoalGroup, GoalGroupInterface } from '../database/entity/goal';
 import { getRepository, IsNull } from 'typeorm';
 import api from '../api';
 import currency from '../currency';
@@ -18,7 +18,7 @@ class Goals extends Overlay {
   }
 
   public async sockets() {
-    adminEndpoint(this.nsp, 'goals::remove', async (item: GoalGroup, cb) => {
+    adminEndpoint(this.nsp, 'goals::remove', async (item: Required<GoalGroupInterface>, cb) => {
       try {
         await getRepository(GoalGroup).remove(item);
         cb(null);
@@ -26,7 +26,7 @@ class Goals extends Overlay {
         cb(e);
       }
     });
-    adminEndpoint(this.nsp, 'goals::save', async (item: GoalGroup, cb) => {
+    adminEndpoint(this.nsp, 'goals::save', async (item: Required<GoalGroupInterface>, cb) => {
       try {
         item = await getRepository(GoalGroup).save(item);
         // we need to delete id NULL as typeorm is not deleting but flagging as NULL
@@ -68,7 +68,7 @@ class Goals extends Overlay {
 
   @onBit()
   public async onBit(bit: onEventBit) {
-    const goals: Goal[] = await getRepository(Goal).find({ type: 'bits' });
+    const goals = await getRepository(Goal).find({ type: 'bits' });
     for (const goal of goals) {
       if (new Date(goal.endAfter).getTime() >= new Date().getTime() || goal.endAfterIgnore) {
         await getRepository(Goal).increment({ id: goal.id }, 'currentAmount', bit.amount);
@@ -76,7 +76,7 @@ class Goals extends Overlay {
     }
 
     // tips with tracking bits
-    const tipsGoals: Goal[] = await getRepository(Goal).find({ type: 'tips', countBitsAsTips: true });
+    const tipsGoals = await getRepository(Goal).find({ type: 'tips', countBitsAsTips: true });
     for (const goal of tipsGoals) {
       if (new Date(goal.endAfter).getTime() >= new Date().getTime() || goal.endAfterIgnore) {
         const amount = Number(currency.exchange(bit.amount / 100, 'USD', currency.mainCurrency));
@@ -87,7 +87,7 @@ class Goals extends Overlay {
 
   @onTip()
   public async onTip(tip: onEventTip) {
-    const goals: Goal[] = await getRepository(Goal).find({ type: 'tips' });
+    const goals = await getRepository(Goal).find({ type: 'tips' });
     for (const goal of goals) {
       const amount = Number(currency.exchange(tip.amount, tip.currency, currency.mainCurrency));
       if (new Date(goal.endAfter).getTime() >= new Date().getTime() || goal.endAfterIgnore) {
@@ -98,7 +98,7 @@ class Goals extends Overlay {
 
   @onFollow()
   public async onFollow() {
-    const goals: Goal[] = await getRepository(Goal).find({ type: 'followers' });
+    const goals = await getRepository(Goal).find({ type: 'followers' });
     for (const goal of goals) {
       if (new Date(goal.endAfter).getTime() >= new Date().getTime() || goal.endAfterIgnore) {
         await getRepository(Goal).increment({ id: goal.id }, 'currentAmount', 1);
@@ -108,7 +108,7 @@ class Goals extends Overlay {
 
   @onSub()
   public async onSub() {
-    const goals: Goal[] = await getRepository(Goal).find({ type: 'subscribers' });
+    const goals = await getRepository(Goal).find({ type: 'subscribers' });
     for (const goal of goals) {
       if (new Date(goal.endAfter).getTime() >= new Date().getTime() || goal.endAfterIgnore) {
         await getRepository(Goal).increment({ id: goal.id }, 'currentAmount', 1);
