@@ -1,33 +1,54 @@
-import { Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
+import { EntitySchema } from 'typeorm';
 import { ColumnNumericTransformer } from './_transformer';
 
-@Entity()
-export class ModerationWarning {
-  @PrimaryGeneratedColumn()
-  id!: number;
-  @Column()
-  @Index()
-  username!: string;
-  @Column('bigint', { transformer: new ColumnNumericTransformer(), default: 0 })
-  timestamp!: number;
+export interface ModerationWarningInterface {
+  id?: number;
+  username: string;
+  timestamp?: number;
 };
 
-@Entity()
-export class ModerationPermit {
-  @PrimaryGeneratedColumn()
-  id!: number;
-  @Column()
-  @Index()
-  username!: string;
+export interface ModerationPermitInterface {
+  id?: number;
+  username: string;
 };
 
-@Entity()
-export class ModerationMessageCooldown {
-  @PrimaryGeneratedColumn()
-  id!: number;
-  @Column()
-  @Index({ unique: true })
-  name!: string;
-  @Column('bigint', { transformer: new ColumnNumericTransformer(), default: 0 })
-  timestamp!: number;
+export interface ModerationMessageCooldownInterface {
+  id?: number;
+  name: string;
+  timestamp: number;
 };
+
+export const ModerationWarning = new EntitySchema<Readonly<Required<ModerationWarningInterface>>>({
+  name: 'moderation_warning',
+  columns: {
+    id: { type: Number, primary: true, generated: 'rowid' },
+    username: { type: String },
+    timestamp: { type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0 },
+  },
+  indices: [
+    { name: 'IDX_f941603aef2741795a9108d0d2', columns: ['username'] },
+  ],
+});
+
+export const ModerationPermit = new EntitySchema<Readonly<Required<ModerationPermitInterface>>>({
+  name: 'moderation_permit',
+  columns: {
+    id: { type: Number, primary: true, generated: 'rowid' },
+    username: { type: String },
+  },
+  indices: [
+    { name: 'IDX_69499e78c9ee1602baee77b97d', columns: ['username'] },
+  ],
+});
+
+export const ModerationMessageCooldown = new EntitySchema<Readonly<Required<ModerationMessageCooldownInterface>>>({
+  name: 'moderation_message_cooldown',
+  columns: {
+    id: { type: Number, primary: true, generated: 'rowid' },
+    name: { type: String },
+    timestamp: { type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0 },
+  },
+  indices: [
+    { name: 'IDX_45ad701f0c2955bc09b5661898', columns: ['name'], unique: true },
+  ],
+});

@@ -493,12 +493,11 @@ class Moderation extends System {
   }
 
   async isSilent (name) {
-    let item = await getRepository(ModerationMessageCooldown).findOne({ name });
+    const item = await getRepository(ModerationMessageCooldown).findOne({ name });
     if (!item || (Date.now() - item.timestamp) >= 60000) {
-      item = item || new ModerationMessageCooldown();
-      item.name = name;
-      item.timestamp = Date.now();
-      await getRepository(ModerationMessageCooldown).save(item);
+      await getRepository(ModerationMessageCooldown).save({
+        ...item, name, timestamp: Date.now(),
+      });
       return false;
     }
     return true;
