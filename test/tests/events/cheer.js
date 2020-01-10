@@ -41,7 +41,7 @@ describe('Events - cheer event', () => {
             commandToRun: '!points add $username (math.$bits*10)',
           },
         }],
-      }),
+      });
     });
 
     for (const username of ['losslezos', 'rigneir', 'mikasa_hraje', 'foufhs']) {
