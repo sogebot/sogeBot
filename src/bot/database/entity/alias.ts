@@ -4,7 +4,7 @@ import { Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
 export class Alias {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
-  @Column()
+  @Column({ nullable: false })
   @Index()
   alias!: string;
   @Column('text')

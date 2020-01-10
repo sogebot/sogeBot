@@ -22,7 +22,8 @@
     "skipLibCheck": false,
     "baseUrl": "./",
     "paths": {
-      "@config": ["config.json", "src/bot/data/config.example.json"]
+      "@config": ["config.json", "src/bot/data/config.example.json"],
+      "@ormconfig": ["ormconfig.json", "src/bot/data/ormconfig.sqlite.json"]
     },
     "sourceMap": true,
   },

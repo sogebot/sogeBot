@@ -1,3 +1,5 @@
+import * as configFile from '@ormconfig';
+
 import { EntitySchema } from 'typeorm';
 import { ColumnNumericTransformer } from './_transformer';
 
@@ -170,7 +172,7 @@ export const TwitchStats = new EntitySchema<Readonly<Required<TwitchStatsInterfa
     currentHosts: { type: Number, default: 0 },
     newChatters: { type: Number, default: 0 },
     currentBits: { type: 'bigint', transformer: new ColumnNumericTransformer() },
-    currentTips: { type: 'float', transformer: new ColumnNumericTransformer() },
+    currentTips: { type: 'float', transformer: new ColumnNumericTransformer(), precision: configFile.type === 'mysql' ? 12 : undefined  },
     currentWatched: { type: 'bigint', transformer: new ColumnNumericTransformer() },
   },
 });

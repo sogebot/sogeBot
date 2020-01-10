@@ -20,7 +20,8 @@
     "allowJs": true, /* REMOVE when jsfiles are gone */
     "baseUrl": "src/bot",
     "paths": {
-      "@config": ["../../config.json", "../../data/config.example.json"]
+      "@config": ["../../config.json", "../../data/config.example.json"],
+      "@ormconfig": ["../../ormconfig.json", "../..//data/ormconfig.sqlite.json"]
     },
     "outDir": "../../dest",
     "inlineSourceMap": true,
