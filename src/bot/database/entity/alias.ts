@@ -1,5 +1,3 @@
-require('module-alias/register');
-
 import { Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
