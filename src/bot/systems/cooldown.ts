@@ -197,7 +197,7 @@ class Cooldown extends System {
           cooldown.timestamp = now;
         } else {
           cooldown.viewers?.push({
-            ...cooldown.viewers?.find(o => o.username === opts.sender.username),
+            ...cooldown.viewers.find(o => o.username === opts.sender.username),
             username: opts.sender.username,
             lastTimestamp: timestamp,
             timestamp: now,
@@ -303,7 +303,7 @@ class Cooldown extends System {
           lastTimestamp: 0,
           timestamp: 0,
           username: opts.sender.username,
-          ...cooldown.viewers?.find(o => o.username === opts.sender.username),
+          ...cooldown.viewers.find(o => o.username === opts.sender.username),
         });
       }
       // rollback to lastTimestamp
