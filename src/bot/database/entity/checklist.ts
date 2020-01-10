@@ -1,11 +1,14 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { EntitySchema } from 'typeorm';
 
-@Entity()
-export class Checklist {
-  @PrimaryGeneratedColumn()
-  id!: string;
-  @Column()
-  isCompleted!: boolean;
-  @Column()
-  value!: string;
-};
+export interface ChecklistInterface {
+  id: number; isCompleted: boolean; value: string;
+}
+
+export const Checklist = new EntitySchema<Readonly<Required<ChecklistInterface>>>({
+  name: 'checklist',
+  columns: {
+    id: { type: Number, primary: true, generated: 'rowid' },
+    isCompleted: { type: Boolean },
+    value: { type: String },
+  },
+});

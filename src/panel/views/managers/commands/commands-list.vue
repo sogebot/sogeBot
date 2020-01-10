@@ -104,7 +104,7 @@ import { faEye, faExclamationTriangle, faEyeSlash, faPlay, faStop, faKey } from 
 library.add(faEye, faEyeSlash, faExclamationTriangle, faPlay, faKey, faStop);
 
 import { getSocket } from '../../../helpers/socket';
-import { Commands } from 'src/bot/database/entity/commands';
+import { CommandsInterface } from 'src/bot/database/entity/commands';
 
 @Component({
   components: {
@@ -129,7 +129,7 @@ export default class commandsList extends Vue {
 
   search = '';
 
-  commands: Commands[] = [];
+  commands: Required<CommandsInterface>[] = [];
   count: {
     command: string; id: number;
   }[] = []

@@ -10,12 +10,11 @@ import { parser } from '../decorators';
 import Expects from '../expects';
 import { getOwner, isBot, isBroadcaster, isModerator, isOwner, isSubscriber, isVIP, message, prepare, sendMessage } from '../commons';
 import { getAllCountOfCommandUsage, getCountOfCommandUsage, incrementCountOfCommandUsage, resetCountOfCommandUsage } from '../helpers/commands/count';
-import uuid from 'uuid';
 
 import { chatOut } from '../helpers/log';
 import { adminEndpoint } from '../helpers/socket';
 import { getRepository } from 'typeorm';
-import { Commands, CommandsResponses } from '../database/entity/commands';
+import { Commands, CommandsInterface, CommandsResponsesInterface } from '../database/entity/commands';
 import { User } from '../database/entity/user';
 import { Variable } from '../database/entity/variable';
 import { addToViewersCache, getfromViewersCache } from '../helpers/permissions';
@@ -48,8 +47,8 @@ class CustomCommands extends System {
       await resetCountOfCommandUsage(command);
       cb(null);
     });
-    adminEndpoint(this.nsp, 'commands::setById', async (id, dataset: Commands, cb: Function | SocketIOClient.Socket) => {
-      const item = await getRepository(Commands).findOne({ id }) || new Commands();
+    adminEndpoint(this.nsp, 'commands::setById', async (id, dataset: CommandsInterface, cb: Function | SocketIOClient.Socket) => {
+      const item = await getRepository(Commands).findOne({ id });
       await getRepository(Commands).save({ ...item, ...dataset});
       if (typeof cb === 'function') {
         cb(null, item);
@@ -159,13 +158,12 @@ class CustomCommands extends System {
         where: {
           command,
         },
-      }) || new Commands();
-      cDb.command = command;
-      cDb.enabled = true;
-      cDb.visible = true;
-      if (typeof cDb.id === 'undefined') {
-        cDb.id = uuid();
-        cDb.responses = [];
+      });
+      if (!cDb) {
+        await getRepository(Commands).save({
+          command, enabled: true, visible: true,
+        });
+        return this.add(opts);
       }
 
       const pItem = await permissions.get(userlevel);
@@ -173,15 +171,16 @@ class CustomCommands extends System {
         throw Error('Permission ' + userlevel + ' not found.');
       }
 
-      const new_response = new CommandsResponses();
-      new_response.order = cDb.responses.length;
-      new_response.permission = pItem.id ?? permission.VIEWERS;
-      new_response.stopIfExecuted = stopIfExecuted;
-      new_response.response = response;
-      new_response.filter = '';
-
-      cDb.responses = [...cDb.responses, new_response];
-      await getRepository(Commands).save(cDb);
+      await getRepository(Commands).save({
+        ...cDb,
+        responses: [...cDb.responses, {
+          order: cDb.responses.length,
+          permission: pItem.id ?? permission.VIEWERS,
+          stopIfExecuted: stopIfExecuted,
+          response: response,
+          filter: '',
+        }],
+      });
       sendMessage(prepare('customcmds.command-was-added', { command }), opts.sender, opts.attr);
     } catch (e) {
       sendMessage(prepare('customcmds.commands-parse-failed'), opts.sender, opts.attr);
@@ -190,12 +189,12 @@ class CustomCommands extends System {
 
   async find(search: string) {
     const commands: {
-      command: Commands;
+      command: CommandsInterface;
       cmdArray: string[];
     }[] = [];
     const cmdArray = search.toLowerCase().split(' ');
     for (let i = 0, len = search.toLowerCase().split(' ').length; i < len; i++) {
-      const db_commands: Commands[]
+      const db_commands: CommandsInterface[]
         = await getRepository(Commands).find({
           relations: ['responses'],
           where: {
@@ -229,7 +228,7 @@ class CustomCommands extends System {
     // go through all commands
     let atLeastOnePermissionOk = false;
     for (const command of commands) {
-      const _responses: CommandsResponses[] = [];
+      const _responses: CommandsResponsesInterface[] = [];
       // remove found command from message to get param
       const param = opts.message.replace(new RegExp('^(' + command.cmdArray.join(' ') + ')', 'i'), '').trim();
       const count = await incrementCountOfCommandUsage(command.command.command);
@@ -320,10 +319,12 @@ class CustomCommands extends System {
       sendMessage(message, opts.sender, opts.attr);
       return false;
     }
-    command.enabled = !command.enabled;
-    await getRepository(Commands).save(command);
+    await getRepository(Commands).save({
+      ...command,
+      enabled: !command.enabled,
+    });
 
-    const message = await prepare(command.enabled ? 'customcmds.command-was-enabled' : 'customcmds.command-was-disabled', { command: command.command });
+    const message = await prepare(!command.enabled ? 'customcmds.command-was-enabled' : 'customcmds.command-was-disabled', { command: command.command });
     sendMessage(message, opts.sender, opts.attr);
   }
 
@@ -345,10 +346,9 @@ class CustomCommands extends System {
       sendMessage(message, opts.sender, opts.attr);
       return false;
     }
-    command.visible = !command.visible;
-    await getRepository(Commands).save(command);
+    await getRepository(Commands).save({...command, visible: !command.visible});
 
-    const message = await prepare(command.visible ? 'customcmds.command-was-exposed' : 'customcmds.command-was-concealed', { command: command.command });
+    const message = await prepare(!command.visible ? 'customcmds.command-was-exposed' : 'customcmds.command-was-concealed', { command: command.command });
     sendMessage(message, opts.sender, opts.attr);
   }
 

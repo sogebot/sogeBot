@@ -3,7 +3,7 @@ import { settings } from '../decorators';
 import Widget from './_interface';
 import { adminEndpoint } from '../helpers/socket';
 import { getRepository } from 'typeorm';
-import { CommandsBoard } from '../database/entity/commands';
+import { CommandsBoard, CommandsBoardInterface } from '../database/entity/commands';
 import tmi from '../tmi';
 
 class Cmdboard extends Widget {
@@ -21,10 +21,10 @@ class Cmdboard extends Widget {
     adminEndpoint(this.nsp, 'cmdboard::getAll', async (cb) => {
       cb(await getRepository(CommandsBoard).find());
     });
-    adminEndpoint(this.nsp, 'cmdboard::save', async (items: CommandsBoard[], cb) => {
+    adminEndpoint(this.nsp, 'cmdboard::save', async (items: CommandsBoardInterface[], cb) => {
       cb(await getRepository(CommandsBoard).save(items));
     });
-    adminEndpoint(this.nsp, 'cmdboard::remove', async (item: CommandsBoard, cb) => {
+    adminEndpoint(this.nsp, 'cmdboard::remove', async (item: Required<CommandsBoardInterface>, cb) => {
       cb(await getRepository(CommandsBoard).remove(item));
     });
     adminEndpoint(this.nsp, 'cmdboard::run', (command) => {
