@@ -26,22 +26,22 @@ describe('Events - tip event', () => {
 
   describe('#2219 - Give points on tip not working', function () {
     before(async function () {
-      const event = new Event();
-      event.id = uuidv4();
-      event.name = 'tip';
-      event.givenName = 'Tip alert';
-      event.triggered = {};
-      event.definitions = {};
-      event.filter = '';
-      event.isEnabled = true;
-      event.operations = [{
-        name: 'run-command',
-        definitions: {
-          isCommandQuiet: true,
-          commandToRun: '!points add $username (math.$amount*10)',
-        },
-      }];
-      await getRepository(Event).save(event);
+      await getRepository(Event).save({
+        id: uuidv4(),
+        name: 'tip',
+        givenName: 'Tip alert',
+        triggered: {},
+        definitions: {},
+        filter: '',
+        isEnabled: true,
+        operations: [{
+          name: 'run-command',
+          definitions: {
+            isCommandQuiet: true,
+            commandToRun: '!points add $username (math.$amount*10)',
+          },
+        }],
+      });
 
       for (const user of ['losslezos', 'rigneir', 'mikasa_hraje', 'foufhs']) {
         await getRepository(User).save({ username: user, userId: Math.floor(Math.random() * 100000) });
