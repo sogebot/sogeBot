@@ -23,7 +23,7 @@ export interface TimerResponseInterface {
 export const Timer = new EntitySchema<Readonly<Required<TimerInterface>>>({
   name: 'timer',
   columns: {
-    id: { type: String, primary: true, generated: 'uuid' },
+    id: { type: 'uuid', primary: true, generated: 'uuid' },
     name: { type: String },
     isEnabled: { type: Boolean },
     triggerEveryMessage: { type: Number },

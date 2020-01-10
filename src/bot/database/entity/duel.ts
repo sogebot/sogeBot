@@ -1,11 +1,16 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { EntitySchema } from 'typeorm';
 
-@Entity()
-export class Duel {
-  @PrimaryColumn()
-  id!: number;
-  @Column()
-  username!: string;
-  @Column()
-  tickets!: number;
+export interface DuelInterface {
+  id?: number;
+  username: string;
+  tickets: number;
 }
+
+export const Duel = new EntitySchema<Readonly<Required<DuelInterface>>>({
+  name: 'duel',
+  columns: {
+    id: { type: Number, primary: true },
+    username: { type: String },
+    tickets: { type: Number },
+  },
+});

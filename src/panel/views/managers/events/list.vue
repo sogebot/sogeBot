@@ -167,7 +167,7 @@
 
   import { getSocket } from '../../../helpers/socket';
 
-  import { Event } from 'src/bot/database/entity/event';
+  import { EventInterface } from 'src/bot/database/entity/event';
 
   export default Vue.extend({
     components: {
@@ -176,7 +176,7 @@
     data: function () {
       const object: {
         socket: any,
-        events: Event[],
+        events: EventInterface[],
         search: string,
         showOperationsOfEvent: string[],
         showSettingsOfEvent: string[],
@@ -202,7 +202,7 @@
       return object
     },
     computed: {
-      filteredEvents(): Event[] {
+      filteredEvents(): EventInterface[] {
         let events = this.events
         if (this.search.trim() !== '') {
           events = this.events.filter((o) => {
@@ -223,7 +223,7 @@
       },
     },
     mounted() {
-      this.socket.emit('events::getAll', (data: Event[]) => {
+      this.socket.emit('events::getAll', (data: EventInterface[]) => {
         this.events = data;
         this.state.loading = this.$state.idle;
       });

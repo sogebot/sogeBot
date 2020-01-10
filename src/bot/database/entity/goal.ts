@@ -70,7 +70,7 @@ export const GoalGroup = new EntitySchema<Readonly<Required<GoalGroupInterface>>
 export const Goal = new EntitySchema<Readonly<Required<GoalInterface>>>({
   name: 'goal',
   columns: {
-    id: { type: String, primary: true, generated: 'uuid' },
+    id: { type: 'uuid', primary: true, generated: 'uuid' },
     name: { type: String },
     groupId: { type: String, nullable: true },
     type: { type: 'varchar', length: 20 },

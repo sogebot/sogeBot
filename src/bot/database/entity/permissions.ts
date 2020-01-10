@@ -29,7 +29,7 @@ export interface PermissionCommandsInterface {
 export const Permissions = new EntitySchema<Readonly<Required<PermissionsInterface>>>({
   name: 'permissions',
   columns: {
-    id: { type: String, primary: true, generated: 'uuid' },
+    id: { type: 'uuid', primary: true, generated: 'uuid' },
     name: { type: String },
     order: { type: Number },
     isCorePermission: { type: Boolean },
@@ -50,7 +50,7 @@ export const Permissions = new EntitySchema<Readonly<Required<PermissionsInterfa
 export const PermissionFilters = new EntitySchema<Readonly<Required<PermissionFiltersInterface>>>({
   name: 'permission_filters',
   columns: {
-    id: { type: String, primary: true, generated: 'uuid' },
+    id: { type: 'uuid', primary: true, generated: 'uuid' },
     comparator: { type: 'varchar', length: 3 },
     type: { type: 'varchar' },
     value: { type: 'bigint', transformer: new ColumnNumericTransformer() },

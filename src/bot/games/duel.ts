@@ -8,7 +8,7 @@ import { error } from '../helpers/log';
 
 import { getRepository } from 'typeorm';
 import { User } from '../database/entity/user';
-import { Duel as DuelEntity } from '../database/entity/duel';
+import { Duel as DuelEntity, DuelInterface } from '../database/entity/duel';
 import oauth from '../oauth';
 import { translate } from '../translate';
 import points from '../systems/points';
@@ -74,7 +74,7 @@ class Duel extends Game {
     }
 
     let winner = _.random(0, total, false);
-    let winnerUser: DuelEntity | undefined;
+    let winnerUser: DuelInterface | undefined;
     for (const user of users) {
       winner = winner - user.tickets;
       if (winner <= 0) { // winner tickets are <= 0 , we have winner
@@ -155,8 +155,7 @@ class Duel extends Game {
       const userFromDB = await getRepository(DuelEntity).findOne({ id: opts.sender.userId });
       const isNewDuelist = !userFromDB;
       if (userFromDB) {
-        userFromDB.tickets = Number(userFromDB.tickets) + Number(bet);
-        await getRepository(DuelEntity).save(userFromDB);
+        await getRepository(DuelEntity).save({...userFromDB, tickets: Number(userFromDB.tickets) + Number(bet) });
         await points.decrement({ userId: opts.sender.userId }, parseInt(bet, 10));
       } else {
         // check if under gambling cooldown
@@ -169,7 +168,6 @@ class Duel extends Game {
             this._cooldown = String(new Date());
           }
           await getRepository(DuelEntity).save({
-            ...new DuelEntity(),
             id: opts.sender.userId,
             username: opts.sender.username,
             tickets: Number(bet),

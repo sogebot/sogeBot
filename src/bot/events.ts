@@ -16,7 +16,7 @@ import { adminEndpoint } from './helpers/socket';
 import { getRepository } from 'typeorm';
 import { User } from './database/entity/user';
 import { Variable } from './database/entity/variable';
-import { Event } from './database/entity/event';
+import { Event, EventInterface } from './database/entity/event';
 import api from './api';
 import oauth from './oauth';
 import events from './events';
@@ -34,7 +34,7 @@ class Events extends Core {
   public supportedEventsList: {
     id: string;
     variables?: string[];
-    check?: (event: Event, attributes: any) => Promise<boolean>;
+    check?: (event: EventInterface, attributes: any) => Promise<boolean>;
     definitions?: {
       [x: string]: any;
     };
@@ -184,8 +184,7 @@ class Events extends Core {
   // set triggered attribute to empty object
   public async reset(eventId) {
     for (const event of await getRepository(Event).find({ name: eventId })) {
-      event.triggered = {};
-      await getRepository(Event).save(event);
+      await getRepository(Event).save({...event, triggered: {}});
     }
   }
 
@@ -391,7 +390,7 @@ class Events extends Core {
     }
   }
 
-  public async everyXMinutesOfStream(event: Event, attributes) {
+  public async everyXMinutesOfStream(event: EventInterface, attributes) {
     // set to Date.now() because 0 will trigger event immediatelly after stream start
     const shouldSave = _.get(event, 'triggered.runEveryXMinutes', 0) === 0 || typeof _.get(event, 'triggered.runEveryXMinutes', 0) !== 'number';
     event.triggered.runEveryXMinutes = _.get(event, 'triggered.runEveryXMinutes', Date.now());
@@ -404,20 +403,20 @@ class Events extends Core {
     return shouldTrigger;
   }
 
-  public async checkRaid(event: Event, attributes) {
+  public async checkRaid(event: EventInterface, attributes) {
     event.definitions.viewersAtLeast = Number(event.definitions.viewersAtLeast); // force Integer
     const shouldTrigger = (attributes.viewers >= event.definitions.viewersAtLeast);
     return shouldTrigger;
   }
 
-  public async checkHosted(event: Event, attributes) {
+  public async checkHosted(event: EventInterface, attributes) {
     event.definitions.viewersAtLeast = Number(event.definitions.viewersAtLeast); // force Integer
     const shouldTrigger = (attributes.viewers >= event.definitions.viewersAtLeast)
                         && ((!attributes.autohost && event.definitions.ignoreAutohost as boolean) || !(event.definitions.ignoreAutohost as boolean));
     return shouldTrigger;
   }
 
-  public async checkStreamIsRunningXMinutes(event: Event, attributes) {
+  public async checkStreamIsRunningXMinutes(event: EventInterface, attributes) {
     if (!api.isStreamOnline) {
       return false;
     }
@@ -431,7 +430,7 @@ class Events extends Core {
     return shouldTrigger;
   }
 
-  public async checkNumberOfViewersIsAtLeast(event: Event, attributes) {
+  public async checkNumberOfViewersIsAtLeast(event: EventInterface, attributes) {
     event.triggered.runInterval = _.get(event, 'triggered.runInterval', 0);
 
     event.definitions.runInterval = Number(event.definitions.runInterval); // force Integer
@@ -449,7 +448,7 @@ class Events extends Core {
     return shouldTrigger;
   }
 
-  public async checkCommandSendXTimes(event: Event, attributes) {
+  public async checkCommandSendXTimes(event: EventInterface, attributes) {
     const regexp = new RegExp(`^${event.definitions.commandToWatch}\\s`, 'i');
 
     let shouldTrigger = false;
@@ -475,7 +474,7 @@ class Events extends Core {
     return shouldTrigger;
   }
 
-  public async checkKeywordSendXTimes(event: Event, attributes) {
+  public async checkKeywordSendXTimes(event: EventInterface, attributes) {
     const regexp = new RegExp(`${event.definitions.keywordToWatch}`, 'gi');
 
     let shouldTrigger = false;
@@ -508,7 +507,7 @@ class Events extends Core {
     return shouldTrigger;
   }
 
-  public async checkDefinition(event: Event, attributes) {
+  public async checkDefinition(event: EventInterface, attributes) {
     const foundEvent = this.supportedEventsList.find((o) => o.id === event.name);
     if (!foundEvent || !foundEvent.check) {
       return true;
@@ -516,7 +515,7 @@ class Events extends Core {
     return foundEvent.check(event, attributes);
   }
 
-  public async checkFilter(event: Event, attributes) {
+  public async checkFilter(event: EventInterface, attributes) {
     if (event.filter.trim().length === 0) {
       return true;
     }
@@ -665,17 +664,15 @@ class Events extends Core {
       cb();
     });
 
-    adminEndpoint(this.nsp, 'events::save', async (event: Event, cb) => {
+    adminEndpoint(this.nsp, 'events::save', async (event: EventInterface, cb) => {
       try {
-        event.operations = event.operations.filter(o => o.name !== 'do-nothing');
-        await getRepository(Event).save(event);
-        cb(null, event);
+        cb(null, await getRepository(Event).save({...event, operations: event.operations.filter(o => o.name !== 'do-nothing')}));
       } catch (e) {
         cb(e, event);
       }
     });
 
-    adminEndpoint(this.nsp, 'events::remove', async (event: Event, cb) => {
+    adminEndpoint(this.nsp, 'events::remove', async (event: Required<EventInterface>, cb) => {
       await getRepository(Event).remove(event);
       cb(null);
     });
