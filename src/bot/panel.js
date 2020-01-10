@@ -314,23 +314,23 @@ function Panel () {
       callback(responses)
     })
     socket.on('responses.set', function (data) {
-      _.remove(translate.custom, function (o) { return o.key === data.key })
-      translate.custom.push(data)
-      translate._save()
+      _.remove(translateLib.custom, function (o) { return o.key === data.key });
+      translateLib.custom.push(data);
+      translateLib._save();
 
-      let lang = {}
+      const lang = {};
       _.merge(
         lang,
         translate({ root: 'webpanel' }),
-        translate({ root: 'ui' }) // add ui root -> slowly refactoring to new name
-      )
-      socket.emit('lang', lang)
-    })
+        translate({ root: 'ui' }), // add ui root -> slowly refactoring to new name
+      );
+      socket.emit('lang', lang);
+    });
     socket.on('responses.revert', async function (data, callback) {
-      _.remove(translate.custom, function (o) { return o.name === data.name })
-      await getRepository(Translation).delete({ name: data.name })
-      callback(translate(data.name))
-    })
+      _.remove(translateLib.custom, function (o) { return o.name === data.name });
+      await getRepository(Translation).delete({ name: data.name });
+      callback(translate(data.name));
+    });
 
     socket.on('getWidgetList', async (cb) => {
       const dashboards = await getRepository(Dashboard).find({

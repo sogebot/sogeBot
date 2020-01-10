@@ -40,7 +40,7 @@
                 type="text"
               ></b-form-input>
               <b-input-group-append v-if="data.item.current !== data.item.default">
-                <b-button variant="primary" @click="data.item.current = data.item.default; revertTranslation(data.item.key)">Revert</b-button>
+                <b-button variant="primary" @click="data.item.current = data.item.default; revertTranslation(data.item.name)">Revert</b-button>
               </b-input-group-append>
             </b-input-group>
           </b-form-group>
