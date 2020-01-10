@@ -95,7 +95,6 @@ export default class translations extends Vue {
   }
 
   revertTranslation(name) {
-    console.log({name})
     this.socket.emit('responses.revert', { name }, (orig) => {
       console.log('Reverted', name, orig)
     })
