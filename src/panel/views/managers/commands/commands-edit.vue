@@ -144,7 +144,7 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import { faExclamationTriangle, faPlay, faStop, faKey, faSortUp, faSortDown } from '@fortawesome/free-solid-svg-icons';
 library.add(faExclamationTriangle, faPlay, faKey, faStop, faSortUp, faSortDown);
 
-import { Commands } from 'src/bot/database/entity/commands';
+import { CommandsInterface } from 'src/bot/database/entity/commands';
 import { getSocket } from '../../../helpers/socket';
 
 Component.registerHooks([
@@ -170,7 +170,7 @@ export default class CommandsEdit extends Vue {
   orderBy = orderBy;
 
 
-  item: Commands = {
+  item: Required<CommandsInterface> = {
     id: uuid(),
     command: '',
     enabled: true,
@@ -244,7 +244,7 @@ export default class CommandsEdit extends Vue {
     });
 
     if (this.$route.params.id) {
-      this.socket.emit('commands::getById', this.$route.params.id, (err, data: Commands, count: number) => {
+      this.socket.emit('commands::getById', this.$route.params.id, (err, data: Required<CommandsInterface>, count: number) => {
         console.debug('Loaded', {data})
         // add empty filter if undefined
         for (let i = 0, length = data.responses.length; i < length; i++) {
