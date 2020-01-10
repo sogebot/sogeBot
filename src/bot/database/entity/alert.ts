@@ -1,3 +1,6 @@
+require('module-alias/register');
+import * as configFile from '@ormconfig';
+
 import { Column, Entity, Index, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { ColumnNumericTransformer } from './_transformer';
 
@@ -168,7 +171,7 @@ export class AlertMedia {
   @Index()
   id!: string;
 
-  @Column('text')
+  @Column(configFile.type === 'mysql' ? 'longtext' : 'text')
   b64data!: string;
   @Column()
   chunkNo!: number;

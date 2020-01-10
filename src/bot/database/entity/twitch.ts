@@ -170,7 +170,7 @@ export const TwitchStats = new EntitySchema<Readonly<Required<TwitchStatsInterfa
     currentHosts: { type: Number, default: 0 },
     newChatters: { type: Number, default: 0 },
     currentBits: { type: 'bigint', transformer: new ColumnNumericTransformer() },
-    currentTips: { type: 'float', transformer: new ColumnNumericTransformer() },
+    currentTips: { type: 'float', transformer: new ColumnNumericTransformer(), precision: 12 },
     currentWatched: { type: 'bigint', transformer: new ColumnNumericTransformer() },
   },
 });

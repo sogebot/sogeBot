@@ -1,4 +1,6 @@
+require('module-alias/register');
 import { EntitySchema } from 'typeorm';
+import * as configFile from '@ormconfig';
 
 export interface GalleryInterface {
   id?: string;
@@ -12,7 +14,7 @@ export const Gallery = new EntitySchema<Readonly<Required<GalleryInterface>>>({
   columns: {
     id: { type: String, primary: true, generated: 'uuid' },
     type: { type: String },
-    data: { type: 'text' },
+    data: { type: configFile.type === 'mysql' ? 'longtext' : 'text' },
     name: { type: String },
   },
 });

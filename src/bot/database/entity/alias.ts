@@ -1,10 +1,12 @@
+require('module-alias/register');
+
 import { Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class Alias {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
-  @Column()
+  @Column({ nullable: false })
   @Index()
   alias!: string;
   @Column('text')

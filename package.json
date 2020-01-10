@@ -241,6 +241,7 @@
   },
   "_moduleAliases": {
     "@root": ".",
-    "@config": "./config.json"
+    "@config": "./config.json",
+    "@ormconfig": "./ormconfig.json"
   }
 }

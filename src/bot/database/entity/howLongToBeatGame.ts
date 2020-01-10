@@ -25,8 +25,8 @@ export const HowLongToBeatGame = new EntitySchema<Readonly<Required<HowLongToBea
     startedAt: { type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0 },
     timeToBeatMain: { type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0 },
     timeToBeatCompletionist: { type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0 },
-    gameplayMain: { type: 'float', transformer: new ColumnNumericTransformer(), default: 0 },
-    gameplayCompletionist: { type: 'float', transformer: new ColumnNumericTransformer(), default: 0 },
+    gameplayMain: { type: 'float', transformer: new ColumnNumericTransformer(), default: 0, precision: 12 },
+    gameplayCompletionist: { type: 'float', transformer: new ColumnNumericTransformer(), default: 0, precision: 12 },
   },
   indices: [
     { name: 'IDX_301758e0e3108fc902d5436527', columns: ['game'], unique: true },
