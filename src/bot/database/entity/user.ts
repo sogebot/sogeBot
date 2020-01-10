@@ -1,3 +1,5 @@
+import * as configFile from '@ormconfig';
+
 import { EntitySchema } from 'typeorm';
 import { ColumnNumericTransformer, SafeNumberTransformer } from './_transformer';
 
@@ -13,11 +15,11 @@ export interface UserInterface {
 }
 
 export interface UserTipInterface {
-  id?: string; user?: UserInterface; amount: number; currency: string; message?: string; tippedAt?: number; sortAmount: number;
+  id?: string; user?: UserInterface; amount: number; currency: string; message: string; tippedAt?: number; sortAmount: number;
 }
 
 export interface UserBitInterface {
-  id?: string; user?: UserInterface; amount: number; message?: string; cheeredAt?: number;
+  id?: string; user?: UserInterface; amount: number; message: string; cheeredAt?: number;
 }
 
 export const User = new EntitySchema<Readonly<Required<UserInterface>>>({
@@ -117,10 +119,10 @@ export const UserTip = new EntitySchema<Readonly<Required<UserTipInterface>>>({
       primary: true,
       generated: 'rowid',
     },
-    amount: { type: 'float', precision: 12 },
-    sortAmount: { type: 'float', precision: 12 },
+    amount: { type: 'float', precision: configFile.type === 'mysql' ? 12 : undefined  },
+    sortAmount: { type: 'float', precision: configFile.type === 'mysql' ? 12 : undefined  },
     currency: { type: String },
-    message: { type: 'text', default: '' },
+    message: { type: 'text' },
     tippedAt: { type: 'bigint', default: 0, transformer: new ColumnNumericTransformer() },
   },
   relations: {
@@ -143,7 +145,7 @@ export const UserBit = new EntitySchema<Readonly<Required<UserBitInterface>>>({
       generated: 'rowid',
     },
     amount: { type: 'bigint', transformer: new ColumnNumericTransformer() },
-    message: { type: 'text', default: '' },
+    message: { type: 'text' },
     cheeredAt: { type: 'bigint', default: 0, transformer: new ColumnNumericTransformer() },
   },
   relations: {

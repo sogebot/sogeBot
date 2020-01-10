@@ -1,4 +1,4 @@
-require('module-alias/register');
+import * as configFile from '@ormconfig';
 
 import { EntitySchema } from 'typeorm';
 import { ColumnNumericTransformer } from './_transformer';
@@ -79,8 +79,8 @@ export const Goal = new EntitySchema<Readonly<Required<GoalInterface>>>({
     countBitsAsTips: { type: Boolean },
     display: { type: 'varchar', length: 20 },
     timestamp: { type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0 },
-    goalAmount: { type: 'float', transformer: new ColumnNumericTransformer(), default: 0, precision:12 },
-    currentAmount: { type: 'float', transformer: new ColumnNumericTransformer(), default: 0, precision: 12 },
+    goalAmount: { type: 'float', transformer: new ColumnNumericTransformer(), default: 0, precision: configFile.type === 'mysql' ? 12 : undefined },
+    currentAmount: { type: 'float', transformer: new ColumnNumericTransformer(), default: 0, precision: configFile.type === 'mysql' ? 12 : undefined },
     endAfter: { type: String },
     endAfterIgnore: { type: Boolean },
     customizationBar: { type: 'simple-json' },
