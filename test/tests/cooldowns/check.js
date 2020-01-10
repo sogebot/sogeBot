@@ -77,7 +77,6 @@ describe('Cooldowns - check()', () => {
 
     it('Add !cmd to cooldown', async () => {
       await getRepository(Cooldown).save({
-        ...new Cooldown(),
         name: '!cmd',
         miliseconds: 60000,
         type: 'global',
@@ -117,7 +116,6 @@ describe('Cooldowns - check()', () => {
 
     it('Add global KonCha to cooldown', async () => {
       await getRepository(Cooldown).save({
-        ...new Cooldown(),
         name: 'KonCha',
         miliseconds: 60000,
         type: 'global',
@@ -167,7 +165,6 @@ describe('Cooldowns - check()', () => {
 
     it('Add global !followage to cooldown', async () => {
       await getRepository(Cooldown).save({
-        ...new Cooldown(),
         name: '!followage',
         miliseconds: 30000,
         type: 'global',

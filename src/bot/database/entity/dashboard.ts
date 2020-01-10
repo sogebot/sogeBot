@@ -1,39 +1,57 @@
-import { Column, Entity, ManyToOne,OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { EntitySchema } from 'typeorm';
 import { ColumnNumericTransformer } from './_transformer';
 
-@Entity()
-export class Dashboard {
-  @PrimaryGeneratedColumn('uuid')
-  id!: string;
-  @OneToMany(() => Widget, (v) => v.dashboard, {
-    cascade: true,
-  })
-  widgets!: Widget[];
-
-  @Column()
-  name!: string;
-  @Column('bigint', { transformer: new ColumnNumericTransformer() })
-  createdAt!: number;
+export interface DashboardInterface {
+  id?: string;
+  widgets?: WidgetInterface[];
+  name: string;
+  createdAt: number;
 };
 
-@Entity()
-export class Widget {
-  @PrimaryGeneratedColumn('uuid')
-  id!: string;
-  @ManyToOne(() => Dashboard, (c) => c.widgets, {
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
-  })
-  dashboard!: Dashboard;
-
-  @Column()
-  name!: string;
-  @Column()
-  positionX!: number;
-  @Column()
-  positionY!: number;
-  @Column()
-  height!: number;
-  @Column()
-  width!: number;
+export interface WidgetInterface {
+  id?: string;
+  dashboard?: DashboardInterface;
+  name: string;
+  positionX: number;
+  positionY: number;
+  height: number;
+  width: number;
 };
+
+export const Dashboard = new EntitySchema<Readonly<Required<DashboardInterface>>>({
+  name: 'dashboard',
+  columns: {
+    id: { type: 'uuid', primary: true, generated: 'uuid' },
+    name: { type: String },
+    createdAt: { type: 'bigint', transformer: new ColumnNumericTransformer() },
+  },
+  relations: {
+    widgets: {
+      type: 'one-to-many',
+      target: 'widget',
+      inverseSide: 'poll',
+      cascade: true,
+    },
+  },
+});
+
+export const Widget = new EntitySchema<Readonly<Required<WidgetInterface>>>({
+  name: 'widget',
+  columns: {
+    id: { type: String, primary: true, generated: 'uuid' },
+    name: { type: String },
+    positionX: { type: Number },
+    positionY: { type: Number },
+    height: { type: Number },
+    width: { type: Number },
+  },
+  relations: {
+    dashboard: {
+      type: 'many-to-one',
+      target: 'dashboard',
+      inverseSide: 'widgets',
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+    },
+  },
+});

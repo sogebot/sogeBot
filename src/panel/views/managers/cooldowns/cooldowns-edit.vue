@@ -102,7 +102,7 @@ import uuid from 'uuid/v4';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faCheck, faTimes, faVolumeUp, faVolumeOff } from '@fortawesome/free-solid-svg-icons';
-import { Cooldown } from 'src/bot/database/entity/cooldown';
+import { CooldownInterface } from 'src/bot/database/entity/cooldown';
 library.add(faVolumeUp, faVolumeOff, faCheck, faTimes);
 
 Component.registerHooks([
@@ -136,7 +136,7 @@ export default class cooldownEdit extends Vue {
     pending: false,
   }
 
-  item: Cooldown = {
+  item: CooldownInterface = {
     id: uuid(),
     name: '',
     miliseconds: 600000,
@@ -179,7 +179,7 @@ export default class cooldownEdit extends Vue {
   async mounted() {
     if (this.$route.params.id) {
       await new Promise((resolve, reject) => {
-        this.socket.emit('cooldown::getById', this.$route.params.id, (err, data: Cooldown) => {
+        this.socket.emit('cooldown::getById', this.$route.params.id, (err, data: CooldownInterface) => {
           console.log({data});
           if (err) {
             this.$router.push({ name: 'cooldownsManagerList' });
