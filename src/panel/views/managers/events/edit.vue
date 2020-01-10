@@ -145,7 +145,7 @@
 
   import { getSocket } from '../../../helpers/socket';
 
-  import { Event, EventOperation } from 'src/bot/database/entity/event';
+  import { EventInterface, EventOperationInterface } from 'src/bot/database/entity/event';
 
   export default Vue.extend({
     components: {
@@ -157,8 +157,8 @@
         get: any,
         eventId: string,
         socket: any,
-        event: Event,
-        operationsClone: EventOperation[], // used as oldVal to check what actually ichanged
+        event: EventInterface,
+        operationsClone: EventOperationInterface[], // used as oldVal to check what actually ichanged
         watchOperationChange: boolean,
         watchEventChange: boolean,
 
@@ -285,9 +285,7 @@
           val = val.filter((o) => o.name !== 'do-nothing');
 
           // add do-nothing at the end
-          const operation = new EventOperation();
           val.push({
-            ...operation,
             id: uuid(),
             name: 'do-nothing',
             definitions: {}
@@ -340,16 +338,15 @@
     },
     mounted() {
       if (this.$route.params.id) {
-        this.socket.emit('events::getOne', this.$route.params.id, (event: Event) => {
+        this.socket.emit('events::getOne', this.$route.params.id, (event: Required<EventInterface>) => {
           this.watchEventChange = false;
 
           if (event.operations[event.operations.length - 1].name !== 'do-nothing') {
-            const operation = new EventOperation()
             event.operations.push({
-              ...operation,
               id: uuid(),
               name: 'do-nothing',
-              definitions: {}
+              definitions: {},
+              event,
             });
           }
 
@@ -394,11 +391,12 @@
 
         if (!this.$route.params.id) {
           // set first operation if we are in create mode
-          const operation = new EventOperation();
-          operation.id = uuid();
-          operation.name = 'do-nothing';
-          operation.definitions = {};
-          this.event.operations.push(operation);
+          this.event.operations.push({
+            id: uuid(),
+            name: 'do-nothing',
+            definitions: {},
+            event: this.event,
+          });
         }
 
       })
@@ -459,7 +457,7 @@
             this.state.save = 3
           } else {
             this.state.save = 2
-            this.$router.push({ name: 'EventsManagerEdit', params: { id: this.event.id } })
+            this.$router.push({ name: 'EventsManagerEdit', params: { id: this.event.id || '' } })
           }
           setTimeout(() => {
             this.state.save = 0
