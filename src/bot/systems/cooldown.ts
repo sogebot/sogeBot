@@ -346,7 +346,7 @@ class Cooldown extends System {
     }
 
     let path = '';
-    const status = cooldown[type] ? 'enabled' : 'disabled';
+    const status = !cooldown[type] ? 'enabled' : 'disabled';
 
     if (type === 'isModeratorAffected') {
       path = '-for-moderators';
