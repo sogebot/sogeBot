@@ -26,23 +26,22 @@ describe('Events - cheer event', () => {
 
   describe('#1699 - Cheer event is not waiting for user to save id', function () {
     before(async function () {
-      const event = new Event();
-      event.id = uuidv4();
-      event.name = 'cheer';
-      event.givenName = 'Cheer alert';
-      event.triggered = {};
-      event.definitions = {};
-      event.filter = '';
-      event.isEnabled = true;
-      event.operations = [{
-        name: 'run-command',
-        definitions: {
-          isCommandQuiet: true,
-          commandToRun: '!points add $username (math.$bits*10)',
-        },
-      }];
-      await getRepository(Event).save(event);
-
+      await getRepository(Event).save({
+        id: uuidv4(),
+        name: 'cheer',
+        givenName: 'Cheer alert',
+        triggered: {},
+        definitions: {},
+        filter: '',
+        isEnabled: true,
+        operations: [{
+          name: 'run-command',
+          definitions: {
+            isCommandQuiet: true,
+            commandToRun: '!points add $username (math.$bits*10)',
+          },
+        }],
+      }),
     });
 
     for (const username of ['losslezos', 'rigneir', 'mikasa_hraje', 'foufhs']) {

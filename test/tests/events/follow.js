@@ -23,7 +23,7 @@ describe('Events - follow event', () => {
 
   describe('#1370 - Second follow event didn\'t trigger event ', function () {
     before(async function () {
-      const event = new Event();
+      const event = {};
       event.id = uuidv4();
       event.name = 'follow';
       event.givenName = 'Follow alert';
