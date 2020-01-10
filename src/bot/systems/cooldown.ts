@@ -10,7 +10,7 @@ import { permission } from '../helpers/permissions';
 import System from './_interface';
 
 import { getRepository } from 'typeorm';
-import { Cooldown as CooldownEntity, CooldownViewer } from '../database/entity/cooldown';
+import { Cooldown as CooldownEntity, CooldownInterface, CooldownViewerInterface } from '../database/entity/cooldown';
 import { User } from '../database/entity/user';
 import { adminEndpoint } from '../helpers/socket';
 import { Keyword } from '../database/entity/keyword';
@@ -38,7 +38,7 @@ class Cooldown extends System {
   }
 
   sockets () {
-    adminEndpoint(this.nsp, 'cooldown::save', async (dataset: CooldownEntity, cb) => {
+    adminEndpoint(this.nsp, 'cooldown::save', async (dataset: CooldownInterface, cb) => {
       const item = await getRepository(CooldownEntity).save(dataset);
       cb(null, item);
     });
@@ -77,7 +77,7 @@ class Cooldown extends System {
       return false;
     }
 
-    let cooldown = await getRepository(CooldownEntity).findOne({
+    const cooldown = await getRepository(CooldownEntity).findOne({
       where: {
         name: match.command,
         type: match.type as 'global' | 'user',
@@ -92,11 +92,7 @@ class Cooldown extends System {
       return;
     }
 
-    if (!cooldown) {
-      cooldown = new CooldownEntity();
-    }
-
-    cooldown = {
+    await getRepository(CooldownEntity).save({
       ...cooldown,
       name: match.command,
       miliseconds: parseInt(match.seconds, 10) * 1000,
@@ -109,8 +105,7 @@ class Cooldown extends System {
       isModeratorAffected: false,
       isSubscriberAffected: true,
       isFollowerAffected: true,
-    };
-    await getRepository(CooldownEntity).save(cooldown);
+    });
 
     const message = await prepare('cooldowns.cooldown-was-set', { seconds: match.seconds, type: match.type, command: match.command });
     sendMessage(message, opts.sender, opts.attr);
@@ -118,8 +113,8 @@ class Cooldown extends System {
 
   @parser({ priority: constants.HIGH })
   async check (opts: Record<string, any>) {
-    let data: CooldownEntity[];
-    let viewer: CooldownViewer | undefined;
+    let data: CooldownInterface[];
+    let viewer: CooldownViewerInterface | undefined;
     let timestamp, now;
     const [command, subcommand] = new Expects(opts.message)
       .command({ optional: true })
@@ -188,7 +183,7 @@ class Cooldown extends System {
         continue;
       }
 
-      viewer = cooldown.viewers.find(o => o.username === opts.sender.username);
+      viewer = cooldown.viewers?.find(o => o.username === opts.sender.username);
       if (cooldown.type === 'global') {
         timestamp = cooldown.timestamp ?? 0;
       } else {
@@ -201,14 +196,12 @@ class Cooldown extends System {
           cooldown.lastTimestamp = timestamp;
           cooldown.timestamp = now;
         } else {
-          let viewer = cooldown.viewers.find(o => o.username === opts.sender.username);
-          if (!viewer) {
-            viewer = new CooldownViewer();
-            cooldown.viewers.push(viewer);
-          }
-          viewer.username = opts.sender.username;
-          viewer.lastTimestamp = timestamp;
-          viewer.timestamp = now;
+          cooldown.viewers?.push({
+            ...cooldown.viewers?.find(o => o.username === opts.sender.username),
+            username: opts.sender.username,
+            lastTimestamp: timestamp,
+            timestamp: now,
+          });
         }
         await getRepository(CooldownEntity).save(cooldown);
         result = true;
@@ -234,7 +227,7 @@ class Cooldown extends System {
   @rollback()
   async cooldownRollback (opts: Record<string, any>) {
     // TODO: redundant duplicated code (search of cooldown), should be unified for check and cooldownRollback
-    let data: CooldownEntity[];
+    let data: CooldownInterface[];
 
     const [command, subcommand] = new Expects(opts.message)
       .command({ optional: true })
@@ -306,14 +299,12 @@ class Cooldown extends System {
         cooldown.lastTimestamp = cooldown.lastTimestamp ?? 0;
         cooldown.timestamp = cooldown.lastTimestamp ?? 0;
       } else {
-        let viewer = cooldown.viewers.find(o => o.username === opts.sender.username);
-        if (!viewer) {
-          viewer = new CooldownViewer();
-          cooldown.viewers.push(viewer);
-        }
-        viewer.username = opts.sender.username;
-        viewer.lastTimestamp = viewer.lastTimestamp ?? 0;
-        viewer.timestamp = viewer.lastTimestamp ?? 0;
+        cooldown.viewers?.push({
+          lastTimestamp: 0,
+          timestamp: 0,
+          username: opts.sender.username,
+          ...cooldown.viewers?.find(o => o.username === opts.sender.username),
+        });
       }
       // rollback to lastTimestamp
       await getRepository(CooldownEntity).save(cooldown);
@@ -343,12 +334,16 @@ class Cooldown extends System {
     }
 
     if (type === 'type') {
-      cooldown[type] = cooldown[type] === 'global' ? 'user' : 'global';
+      await getRepository(CooldownEntity).save({
+        ...cooldown,
+        [type]: cooldown[type] === 'global' ? 'user' : 'global',
+      });
     } else {
-      cooldown[type] = !cooldown[type];
+      await getRepository(CooldownEntity).save({
+        ...cooldown,
+        [type]: !cooldown[type],
+      });
     }
-
-    await getRepository(CooldownEntity).save(cooldown);
 
     let path = '';
     const status = cooldown[type] ? 'enabled' : 'disabled';

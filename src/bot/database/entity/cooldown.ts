@@ -1,52 +1,74 @@
-import { Column, Entity, Index, ManyToOne,OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { EntitySchema } from 'typeorm';
 import { ColumnNumericTransformer } from './_transformer';
 
-@Entity()
-export class Cooldown {
-  @PrimaryGeneratedColumn('uuid')
-  id!: string;
-  @Column()
-  @Index({ unique: true })
-  name!: string;
-  @Column()
-  miliseconds!: number;
-  @Column('varchar', { length: 10 })
-  type!: 'global' | 'user';
-  @Column('bigint', { transformer: new ColumnNumericTransformer(), default: 0 })
-  timestamp!: number;
-  @Column('bigint', { transformer: new ColumnNumericTransformer(), default: 0 })
-  lastTimestamp!: number;
-  @Column()
-  isErrorMsgQuiet!: boolean;
-  @Column()
-  isEnabled!: boolean;
-  @Column()
-  isOwnerAffected!: boolean;
-  @Column()
-  isModeratorAffected!: boolean;
-  @Column()
-  isSubscriberAffected!: boolean;
-  @Column()
-  isFollowerAffected!: boolean;
-  @OneToMany(() => CooldownViewer, (v) => v.cooldown, {
-    cascade: true,
-  })
-  viewers!: CooldownViewer[];
+export interface CooldownInterface {
+  id?: string;
+  name: string;
+  miliseconds: number;
+  type: 'global' | 'user';
+  timestamp?: number;
+  lastTimestamp?: number;
+  isErrorMsgQuiet: boolean;
+  isEnabled: boolean;
+  isOwnerAffected: boolean;
+  isModeratorAffected: boolean;
+  isSubscriberAffected: boolean;
+  isFollowerAffected: boolean;
+  viewers?: CooldownViewerInterface[];
 };
 
-@Entity()
-export class CooldownViewer {
-  @PrimaryGeneratedColumn('uuid')
-  id!: string;
-  @ManyToOne(() => Cooldown, (c) => c.viewers, {
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
-  })
-  cooldown!: Cooldown;
-  @Column()
-  username!: string;
-  @Column('bigint', { transformer: new ColumnNumericTransformer() })
-  timestamp!: number;
-  @Column('bigint', { transformer: new ColumnNumericTransformer() })
-  lastTimestamp!: number;
+export interface CooldownViewerInterface {
+  id?: string;
+  cooldown?: CooldownInterface;
+  username: string;
+  timestamp: number;
+  lastTimestamp: number;
 };
+
+export const Cooldown = new EntitySchema<Readonly<Required<CooldownInterface>>>({
+  name: 'cooldown',
+  columns: {
+    id: { type: 'uuid', primary: true, generated: 'uuid' },
+    name: { type: String },
+    miliseconds: { type: Number },
+    type: { type: 'varchar', length: 10 },
+    timestamp: { type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0 },
+    lastTimestamp: { type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0 },
+    isErrorMsgQuiet: { type: Boolean },
+    isEnabled: { type: Boolean },
+    isOwnerAffected: { type: Boolean },
+    isModeratorAffected: { type: Boolean },
+    isSubscriberAffected: { type: Boolean },
+    isFollowerAffected: { type: Boolean },
+  },
+  relations: {
+    viewers: {
+      type: 'one-to-many',
+      target: 'cooldown_viewer',
+      inverseSide: 'cooldown',
+      cascade: true,
+    },
+  },
+  indices: [
+    { name: 'IDX_aa85aa267ec6eaddf7f93e3665', columns: [ 'name' ], unique: true },
+  ],
+});
+
+export const CooldownViewer = new EntitySchema<Readonly<Required<CooldownViewerInterface>>>({
+  name: 'cooldown_viewer',
+  columns: {
+    id: { type: 'uuid', primary: true, generated: 'uuid' },
+    username: { type: String },
+    timestamp: { type: 'bigint', transformer: new ColumnNumericTransformer() },
+    lastTimestamp: { type: 'bigint', transformer: new ColumnNumericTransformer() },
+  },
+  relations: {
+    cooldown: {
+      type: 'many-to-one',
+      target: 'cooldown',
+      inverseSide: 'viewers',
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+    },
+  },
+});

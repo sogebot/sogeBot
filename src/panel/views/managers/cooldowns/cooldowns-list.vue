@@ -72,7 +72,7 @@ import { capitalize } from 'src/panel/helpers/capitalize';
 import { Vue, Component/*, Watch */ } from 'vue-property-decorator';
 import { isNil } from 'lodash-es';
 import { escape } from 'xregexp';
-import { Cooldown } from 'src/bot/database/entity/cooldown';
+import { CooldownInterface } from 'src/bot/database/entity/cooldown';
 
 @Component({
   components: {
@@ -83,7 +83,7 @@ import { Cooldown } from 'src/bot/database/entity/cooldown';
 export default class cooldownList extends Vue {
   socket = getSocket('/systems/cooldown');
 
-  items: Cooldown[] = [];
+  items: CooldownInterface[] = [];
   search: string = '';
   state: {
     loading: number;
