@@ -60,10 +60,10 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: 13
-    - name: Install all dependencies
-      run: make
     - name: Set proper db to use
       run: npm run test:config:sqlite
+    - name: Install all dependencies
+      run: make
     - name: Run migration test
       run: node tools/migrationCheck.js
     - name: Run mocha
@@ -105,10 +105,10 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: 12
-    - name: Install all dependencies
-      run: make
     - name: Set proper db to use
       run: npm run test:config:postgres
+    - name: Install all dependencies
+      run: make
     - name: Run migration test
       run: node tools/migrationCheck.js
     - name: Run mocha
@@ -152,10 +152,10 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: 12
-    - name: Install all dependencies
-      run: make
     - name: Set proper db to use
       run: npm run test:config:mysql
+    - name: Install all dependencies
+      run: make
     - name: Run migration test
       run: node tools/migrationCheck.js
     - name: Run mocha
