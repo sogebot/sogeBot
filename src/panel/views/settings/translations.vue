@@ -40,7 +40,7 @@
                 type="text"
               ></b-form-input>
               <b-input-group-append v-if="data.item.current !== data.item.default">
-                <b-button variant="primary" @click="data.item.current = data.item.default; revertTranslation(data.item.key)">Revert</b-button>
+                <b-button variant="primary" @click="data.item.current = data.item.default; revertTranslation(data.item.name)">Revert</b-button>
               </b-input-group-append>
             </b-input-group>
           </b-form-group>
@@ -95,6 +95,7 @@ export default class translations extends Vue {
   }
 
   revertTranslation(name) {
+    console.log({name})
     this.socket.emit('responses.revert', { name }, (orig) => {
       console.log('Reverted', name, orig)
     })
