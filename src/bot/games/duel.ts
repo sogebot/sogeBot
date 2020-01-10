@@ -128,7 +128,7 @@ class Duel extends Game {
   }
 
   @command('!duel')
-  async main (opts: CommandOptions) {
+  async main (opts) {
     let message, bet;
 
     opts.sender['message-type'] = 'chat'; // force responses to chat
