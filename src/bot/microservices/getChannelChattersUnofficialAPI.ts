@@ -1,3 +1,5 @@
+require('module-alias/register');
+
 import axios from 'axios';
 import { flatMap, includes } from 'lodash';
 import { isMainThread, parentPort, Worker } from 'worker_threads';
