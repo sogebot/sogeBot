@@ -81,7 +81,7 @@ import VRuntimeTemplate from 'v-runtime-template';
 import { isEqual, get } from 'lodash-es';
 import urlRegex from 'url-regex';
 
-import { CacheEmotes } from 'src/bot/database/entity/cacheEmotes';
+import { CacheEmotesInterface } from 'src/bot/database/entity/cacheEmotes';
 import { EmitData, Alert, AlertFollow, AlertSub, AlertSubgift, AlertHost, AlertRaid, AlertTip, AlertCheer, AlertResub } from 'src/bot/database/entity/alert';
 
 require('../../../scss/letter-animations.css');
@@ -128,7 +128,7 @@ export default class AlertsRegistryOverlays extends Vue {
   data: null | Alert = null;
   defaultProfanityList: string[] = [];
   listHappyWords: string[] = [];
-  emotes: CacheEmotes[] = [];
+  emotes: CacheEmotesInterface[] = [];
 
   runningAlert: EmitData & {
     animation: string;

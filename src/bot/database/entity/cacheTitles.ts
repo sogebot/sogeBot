@@ -1,18 +1,22 @@
-import { Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
+import { EntitySchema } from 'typeorm';
 import { ColumnNumericTransformer } from './_transformer';
 
-@Entity()
-export class CacheTitles {
-  @PrimaryGeneratedColumn()
-  id!: number;
+export interface CacheTitlesInterface {
+  id?: number;
+  game: string;
+  title: string;
+  timestamp: number;
+};
 
-  @Column()
-  @Index()
-  game!: string;
-
-  @Column()
-  title!: string;
-
-  @Column('bigint', { transformer: new ColumnNumericTransformer() })
-  timestamp!: number;
-}
+export const CacheTitles = new EntitySchema<Readonly<Required<CacheTitlesInterface>>>({
+  name: 'cache_titles',
+  columns: {
+    id: { type: Number, primary: true, generated: 'rowid' },
+    game: { type: String },
+    title: { type: String },
+    timestamp: { type: 'bigint', transformer: new ColumnNumericTransformer() },
+  },
+  indices: [
+    { name: 'IDX_a0c6ce833b5b3b13325e6f49b0', columns: ['game'] },
+  ],
+});
