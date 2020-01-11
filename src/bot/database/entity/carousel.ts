@@ -23,7 +23,7 @@ export const Carousel = new EntitySchema<Readonly<Required<CarouselInterface>>>(
     type: { type: String },
     waitAfter: { type: Number },
     waitBefore: { type: Number },
-    duration: { type: String },
+    duration: { type: Number },
     animationIn: { type: String },
     animationInDuration: { type: Number },
     animationOut: { type: String },
