@@ -1,34 +1,34 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { EntitySchema } from 'typeorm';
 
-@Entity()
-export class Carousel {
-  @PrimaryGeneratedColumn('uuid')
-  id!: string;
-
-  @Column()
-  order!: number;
-  @Column()
-  type!: string;
-
-  @Column()
-  waitBefore!: number;
-  @Column()
-  waitAfter!: number;
-  @Column()
-  duration!: number;
-
-  @Column()
-  animationInDuration!: number;
-  @Column()
-  animationIn!: string;
-  @Column()
-  animationOutDuration!: number;
-  @Column()
-  animationOut!: string;
-
-  @Column()
-  showOnlyOncePerStream!: boolean;
-
-  @Column('text')
-  base64!: string;
+export interface CarouselInterface {
+  id?: string;
+  order: number;
+  type: string;
+  waitBefore: number;
+  waitAfter: number;
+  duration: number;
+  animationInDuration: number;
+  animationIn: string;
+  animationOutDuration: number;
+  animationOut: string;
+  showOnlyOncePerStream: boolean;
+  base64: string;
 }
+
+export const Carousel = new EntitySchema<Readonly<Required<CarouselInterface>>>({
+  name: 'carousel',
+  columns: {
+    id: { type: String, primary: true, generated: 'uuid' },
+    order: { type: Number },
+    type: { type: String },
+    waitAfter: { type: Number },
+    waitBefore: { type: Number },
+    duration: { type: Number },
+    animationIn: { type: String },
+    animationInDuration: { type: Number },
+    animationOut: { type: String },
+    animationOutDuration: { type: Number },
+    showOnlyOncePerStream: { type: Boolean },
+    base64: { type: 'text' },
+  },
+});

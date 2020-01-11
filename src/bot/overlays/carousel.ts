@@ -4,7 +4,7 @@ import uuid from 'uuid/v4';
 import { adminEndpoint, publicEndpoint } from '../helpers/socket';
 
 import { getRepository } from 'typeorm';
-import { Carousel as CarouselEntity } from '../database/entity/carousel';
+import { Carousel as CarouselEntity, CarouselInterface } from '../database/entity/carousel';
 
 class Carousel extends Overlay {
   @ui({
@@ -32,7 +32,7 @@ class Carousel extends Overlay {
         },
       }));
     });
-    adminEndpoint(this.nsp, 'carousel::save', async (items: CarouselEntity[], cb) => {
+    adminEndpoint(this.nsp, 'carousel::save', async (items: CarouselInterface[], cb) => {
       cb(await getRepository(CarouselEntity).save(items));
     });
 
@@ -44,10 +44,12 @@ class Carousel extends Overlay {
           order: 'ASC',
         },
       });
-      for (let order = 0; order < images.length; order++) {
-        images[order].order = 0;
-      }
-      await getRepository(CarouselEntity).save(images);
+      await getRepository(CarouselEntity).save(images.map((image, index) => {
+        return {
+          ...image,
+          order: index,
+        };
+      }));
       cb();
     });
 

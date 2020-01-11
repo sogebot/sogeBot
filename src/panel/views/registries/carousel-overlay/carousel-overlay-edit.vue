@@ -132,7 +132,7 @@
 <script lang="ts">
 import { Vue, Component, Watch } from 'vue-property-decorator';
 import { getSocket } from 'src/panel/helpers/socket';
-import { Carousel } from 'src/bot/database/entity/carousel';
+import { CarouselInterface } from 'src/bot/database/entity/carousel';
 
 import { Validations } from 'vuelidate-property-decorators';
 import { required, minValue } from 'vuelidate/lib/validators'
@@ -151,7 +151,7 @@ Component.registerHooks([
 export default class carouselOverlayEdit extends Vue {
   socket = getSocket('/overlays/carousel');
 
-  item: Carousel = {
+  item: CarouselInterface = {
     id: '',
     type: '',
     base64: '',
