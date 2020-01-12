@@ -62,7 +62,7 @@
 <script lang="ts">
 import { getSocket } from 'src/panel/helpers/socket';
 
-import { Alias as AliasEntity } from 'src/bot/database/entity/alias';
+import { AliasInterface } from 'src/bot/database/entity/alias';
 import { PermissionsInterface } from 'src/bot/database/entity/permissions';
 
 import { Vue, Component/*, Watch */ } from 'vue-property-decorator';
@@ -83,7 +83,7 @@ export default class aliasList extends Vue {
   socket = getSocket('/systems/alias');
   psocket = getSocket('/core/permissions')
 
-  items: AliasEntity[] = [];
+  items: AliasInterface[] = [];
   permissions: PermissionsInterface[] = [];
   search: string = '';
   state: {

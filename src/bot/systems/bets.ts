@@ -10,7 +10,7 @@ import { error, warning } from '../helpers/log';
 import { adminEndpoint } from '../helpers/socket';
 
 import { getRepository } from 'typeorm';
-import { Bets as BetsEntity, BetsParticipations } from '../database/entity/bets';
+import { Bets as BetsEntity, BetsInterface } from '../database/entity/bets';
 import { User } from '../database/entity/user';
 import { isDbConnected } from '../helpers/database';
 import oauth from '../oauth';
@@ -90,8 +90,6 @@ class Bets extends System {
       }
 
       if (currentBet.endedAt <= Date.now()) {
-        currentBet.isLocked = true;
-
         if (currentBet.participations.length > 0) {
           sendMessage(translate('bets.locked'), {
             username: oauth.botUsername,
@@ -110,7 +108,7 @@ class Bets extends System {
             badges: {},
             'message-type': 'chat',
           });
-          await getRepository(BetsEntity).save(currentBet);
+          await getRepository(BetsEntity).save({...currentBet, isLocked: true});
         }
       }
     } catch (e) {
@@ -146,12 +144,12 @@ class Bets extends System {
         throw new Error(ERROR_NOT_ENOUGH_OPTIONS);
       }
 
-      const bet = new BetsEntity();
-      bet.createdAt = Date.now();
-      bet.endedAt = Date.now() + (timeout * 1000 * 60);
-      bet.title = title;
-      bet.options = options;
-      await getRepository(BetsEntity).save(bet);
+      await getRepository(BetsEntity).save({
+        createdAt: Date.now(),
+        endedAt: Date.now() + (timeout * 1000 * 60),
+        title: title,
+        options: options,
+      });
 
       sendMessage(await prepare('bets.opened', {
         username: getOwner(),
@@ -170,8 +168,8 @@ class Bets extends System {
           sendMessage(
             prepare('bets.running', {
               command: this.getCommand('!bet'),
-              maxIndex: String((currentBet as BetsEntity).options.length),
-              options: (currentBet as BetsEntity).options.map((v, i) => `${i+1}. '${v}'`).join(', '),
+              maxIndex: String((currentBet as BetsInterface).options.length),
+              options: (currentBet as BetsInterface).options.map((v, i) => `${i+1}. '${v}'`).join(', '),
             }), opts.sender);
           break;
         default:
@@ -210,7 +208,7 @@ class Bets extends System {
       index--;
       if (!_.isNil(tickets) && !_.isNil(index)) {
         const pointsOfUser = await points.getPointsOf(opts.sender.userId);
-        let _betOfUser = currentBet?.participations.find(o => o.userId === opts.sender.userId);
+        const _betOfUser = currentBet?.participations.find(o => o.userId === opts.sender.userId);
 
         if (tickets === 'all' || tickets > pointsOfUser) {
           tickets = pointsOfUser;
@@ -233,16 +231,16 @@ class Bets extends System {
         }
 
         if (!_betOfUser) {
-          _betOfUser = new BetsParticipations();
-          _betOfUser.username = opts.sender.username;
-          _betOfUser.userId = Number(opts.sender.userId);
-          _betOfUser.optionIdx = index;
-          _betOfUser.points = 0;
-          currentBet.participations.push(_betOfUser);
+          currentBet.participations.push({
+            username: opts.sender.username,
+            userId: Number(opts.sender.userId),
+            optionIdx: index,
+            points: tickets,
+          });
+        } else {
+          // add points
+          _betOfUser.points = tickets + _betOfUser.points;
         }
-
-        // add points
-        _betOfUser.points = tickets + _betOfUser.points;
 
         // All OK
         await points.decrement({ userId: opts.sender.userId }, tickets);
@@ -266,12 +264,12 @@ class Bets extends System {
           sendMessage(translate('bets.timeUpBet'), opts.sender, opts.attr);
           break;
         case ERROR_DIFF_BET:
-          const result = (currentBet as BetsEntity).participations.find(o => o.userId === opts.sender.userId);
+          const result = (currentBet as Required<BetsInterface>).participations.find(o => o.userId === opts.sender.userId);
           sendMessage(translate('bets.diffBet').replace(/\$option/g, result?.optionIdx), opts.sender, opts.attr);
           break;
         default:
           warning(e.stack);
-          sendMessage((await prepare('bets.error', { command: opts.command })).replace(/\$maxIndex/g, String((currentBet as BetsEntity).options.length)), opts.sender, opts.attr);
+          sendMessage((await prepare('bets.error', { command: opts.command })).replace(/\$maxIndex/g, String((currentBet as BetsInterface).options.length)), opts.sender, opts.attr);
       }
     }
   }
@@ -302,9 +300,7 @@ class Bets extends System {
       }
     } finally {
       if (currentBet) {
-        currentBet.arePointsGiven = true;
-        currentBet.isLocked = true;
-        await getRepository(BetsEntity).save(currentBet);
+        await getRepository(BetsEntity).save({...currentBet, arePointsGiven: true, isLocked: true});
       }
     }
   }
@@ -342,9 +338,7 @@ class Bets extends System {
         .replace(/\$pointsName/g, await points.getPointsName(total))
         .replace(/\$points/g, total), opts.sender);
 
-      currentBet.arePointsGiven = true;
-      currentBet.isLocked = true;
-      await getRepository(BetsEntity).save(currentBet);
+      await getRepository(BetsEntity).save({...currentBet, arePointsGiven: true, isLocked: true});
     } catch (e) {
       switch (e.message) {
         case ERROR_NOT_ENOUGH_OPTIONS:

@@ -84,7 +84,7 @@ import { Vue, Component, Watch } from 'vue-property-decorator';
 import { getSocket } from 'src/panel/helpers/socket';
 import { permission } from 'src/bot/helpers/permissions'
 
-import { Alias as AliasEntity } from 'src/bot/database/entity/alias';
+import { AliasInterface } from 'src/bot/database/entity/alias';
 import { PermissionsInterface } from 'src/bot/database/entity/permissions';
 
 import { Validations } from 'vuelidate-property-decorators';
@@ -131,7 +131,7 @@ export default class aliasEdit extends Vue {
 
   permissions: PermissionsInterface[] = [];
 
-  item: AliasEntity = {
+  item: AliasInterface = {
     id: uuid(),
     alias: '',
     command: '',
@@ -166,7 +166,7 @@ export default class aliasEdit extends Vue {
 
     if (this.$route.params.id) {
       await new Promise((resolve, reject) => {
-        this.socket.emit('getById', this.$route.params.id, (err, data: AliasEntity) => {
+        this.socket.emit('getById', this.$route.params.id, (err, data: AliasInterface) => {
           if (err) {
             reject(err)
           }
