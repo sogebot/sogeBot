@@ -256,7 +256,7 @@ class Alias extends System {
         return false;
       }
       await getRepository(AliasEntity).save({...item, visible: !item.visible});
-      const message = await prepare(item.visible ? 'alias.alias-was-exposed' : 'alias.alias-was-concealed', item);
+      const message = await prepare(!item.visible ? 'alias.alias-was-exposed' : 'alias.alias-was-concealed', item);
       sendMessage(message, opts.sender, opts.attr);
     } catch (e) {
       const message = await prepare('alias.alias-parse-failed');
