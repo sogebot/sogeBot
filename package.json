@@ -188,7 +188,7 @@
     "terser-webpack-plugin": "2.2.1",
     "test-until": "1.1.1",
     "ts-loader": "6.2.1",
-    "typescript": "3.7.2",
+    "typescript": "3.8.0-beta",
     "url-regex": "5.0.0",
     "v-clipboard": "2.2.2",
     "v-runtime-template": "1.10.0",

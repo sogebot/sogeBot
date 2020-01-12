@@ -432,7 +432,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, PropSync, Watch } from 'vue-property-decorator';
-import { AlertResub } from 'src/bot/database/entity/alert';
+import type { AlertResub } from 'src/bot/database/entity/alert';
 
 import { codemirror } from 'vue-codemirror';
 import 'codemirror/mode/javascript/javascript.js';
