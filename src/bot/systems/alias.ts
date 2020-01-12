@@ -187,9 +187,8 @@ class Alias extends System {
         throw Error('Permission ' + perm + ' not found.');
       }
 
-
       const message = await prepare('alias.alias-was-added',
-        await getRepository(AliasEntity).insert({
+        await getRepository(AliasEntity).save({
           alias,
           command,
           enabled: true,
