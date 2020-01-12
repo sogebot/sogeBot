@@ -11,9 +11,8 @@ import { permission } from '../helpers/permissions';
 import System from './_interface';
 import { incrementCountOfCommandUsage } from '../helpers/commands/count';
 import { debug, warning } from '../helpers/log';
-import uuid from 'uuid/v4';
 
-import { Alias as AliasEntity } from '../database/entity/alias';
+import { Alias as AliasEntity, AliasInterface } from '../database/entity/alias';
 import { getRepository } from 'typeorm';
 import { adminEndpoint, publicEndpoint } from '../helpers/socket';
 import { addToViewersCache, getfromViewersCache } from '../helpers/permissions';
@@ -47,8 +46,8 @@ class Alias extends System {
       cb(null, await getRepository(AliasEntity).findOne({ id }));
     });
 
-    adminEndpoint(this.nsp, 'setById', async (id, dataset: AliasEntity, cb) => {
-      const item = await getRepository(AliasEntity).findOne({ id }) || new AliasEntity();
+    adminEndpoint(this.nsp, 'setById', async (id, dataset: AliasInterface, cb) => {
+      const item = await getRepository(AliasEntity).findOne({ id });
       await getRepository(AliasEntity).save({ ...item, ...dataset});
       cb(null, item);
     });
@@ -160,9 +159,7 @@ class Alias extends System {
         sendMessage(message, opts.sender, opts.attr);
         return false;
       }
-      item.command = command;
-      item.permission = pItem.id ?? permission.VIEWERS;
-      await getRepository(AliasEntity).save(item);
+      await getRepository(AliasEntity).save({...item, command, permission: pItem.id ?? permission.VIEWERS});
 
       const message = await prepare('alias.alias-was-edited', { alias, command });
       sendMessage(message, opts.sender, opts.attr);
@@ -190,16 +187,15 @@ class Alias extends System {
         throw Error('Permission ' + perm + ' not found.');
       }
 
-      const aliasObj: AliasEntity = {
-        id: uuid(),
-        alias,
-        command,
-        enabled: true,
-        visible: true,
-        permission: pItem.id ?? permission.VIEWERS,
-      };
-      await getRepository(AliasEntity).insert(aliasObj);
-      const message = await prepare('alias.alias-was-added', aliasObj);
+      const message = await prepare('alias.alias-was-added',
+        await getRepository(AliasEntity).save({
+          alias,
+          command,
+          enabled: true,
+          visible: true,
+          permission: pItem.id ?? permission.VIEWERS,
+        })
+      );
       sendMessage(message, opts.sender, opts.attr);
     } catch (e) {
       sendMessage(prepare('alias.alias-parse-failed'), opts.sender, opts.attr);
@@ -232,9 +228,8 @@ class Alias extends System {
         sendMessage(message, opts.sender, opts.attr);
         return;
       }
-      item.enabled = !item.enabled;
-      await getRepository(AliasEntity).save(item);
-      const message = await prepare(item.enabled ? 'alias.alias-was-enabled' : 'alias.alias-was-disabled', item);
+      await getRepository(AliasEntity).save({...item, enabled: !item.enabled});
+      const message = await prepare(!item.enabled ? 'alias.alias-was-enabled' : 'alias.alias-was-disabled', item);
       sendMessage(message, opts.sender, opts.attr);
     } catch (e) {
       const message = await prepare('alias.alias-parse-failed');
@@ -260,9 +255,8 @@ class Alias extends System {
         sendMessage(message, opts.sender, opts.attr);
         return false;
       }
-      item.visible = !item.visible;
-      await getRepository(AliasEntity).save(item);
-      const message = await prepare(item.visible ? 'alias.alias-was-exposed' : 'alias.alias-was-concealed', item);
+      await getRepository(AliasEntity).save({...item, visible: !item.visible});
+      const message = await prepare(!item.visible ? 'alias.alias-was-exposed' : 'alias.alias-was-concealed', item);
       sendMessage(message, opts.sender, opts.attr);
     } catch (e) {
       const message = await prepare('alias.alias-parse-failed');

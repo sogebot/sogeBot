@@ -27,13 +27,13 @@
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
 import { getSocket } from 'src/panel/helpers/socket';
-import { Bets } from 'src/bot/database/entity/bets';
+import { BetsInterface } from 'src/bot/database/entity/bets';
 
 @Component({})
 export default class BetsOverlay extends Vue {
   socket = getSocket('/overlays/bets', true);
   colors = [ 'blue', 'red', 'orange', 'green', 'purple', 'yellow', 'pink', 'cyan' ];
-  currentBet: Bets | null = null;
+  currentBet: Required<BetsInterface> | null = null;
 
   get timeToEnd() {
     if (this.currentBet && !this.currentBet.isLocked) {

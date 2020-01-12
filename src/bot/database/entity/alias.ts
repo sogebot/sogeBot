@@ -1,18 +1,25 @@
-import { Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
+import { EntitySchema } from 'typeorm';
 
-@Entity()
-export class Alias {
-  @PrimaryGeneratedColumn('uuid')
-  id!: string;
-  @Column({ nullable: false })
-  @Index()
-  alias!: string;
-  @Column('text')
-  command!: string;
-  @Column()
-  enabled!: boolean;
-  @Column()
-  visible!: boolean;
-  @Column()
-  permission!: string;
-};
+export interface AliasInterface {
+  id?: string;
+  alias: string;
+  command: string;
+  enabled: boolean;
+  visible: boolean;
+  permission: string;
+}
+
+export const Alias = new EntitySchema<Readonly<Required<AliasInterface>>>({
+  name: 'alias',
+  columns: {
+    id: { type: String, primary: true, generated: 'uuid' },
+    alias: { type: String, nullable: false },
+    command: { type: 'text' },
+    enabled: { type: Boolean },
+    visible: { type: Boolean },
+    permission: { type: String },
+  },
+  indices: [
+    { name: 'IDX_6a8a594f0a5546f8082b0c405c', columns: ['alias'] },
+  ],
+});
