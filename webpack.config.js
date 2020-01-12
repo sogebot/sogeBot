@@ -80,7 +80,6 @@ const webpackConfig = {
     alias: {
       'vue$': 'vue/dist/vue.esm.js',
       src: path.resolve(__dirname, 'src'),
-      '@ormconfig': path.resolve(__dirname, 'ormconfig.json'),
     }
   },
   output: {
