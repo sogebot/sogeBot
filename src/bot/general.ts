@@ -1,6 +1,6 @@
 import 'module-alias/register';
 
-import { readdirSync } from 'fs';
+import { readdirSync, writeFileSync } from 'fs';
 import gitCommitInfo from 'git-commit-info';
 import { get, isBoolean, isFinite, isNil, isNumber, isString, map } from 'lodash';
 import Core from './_interface';
@@ -16,14 +16,49 @@ import oauth from './oauth';
 import translateLib, { translate } from './translate';
 import tmi from './tmi';
 import glob from 'glob';
+import { HOUR, MINUTE } from './constants';
+import api from './api';
+
+let threadStartTimestamp = Date.now();
+const gracefulExit = () => {
+  if (general.gracefulExitEachXHours > 0) {
+    debug('thread', 'gracefulExit::check');
+    if (Date.now() - threadStartTimestamp >= general.gracefulExitEachXHours * HOUR) {
+      if (!api.isStreamOnline) {
+        warning('Gracefully exiting sogeBot as planned and configured in UI in settings->general.');
+        debug('thread', 'gracefulExit::exiting and creating restart file (so we dont have startup logging');
+        writeFileSync('./restart.pid', ' ');
+        process.exit(0);
+      } else {
+        debug('thread', 'gracefulExit::Gracefully exiting process skipped, stream online - moved by 15 minutes');
+        // if stream is online move exit by hour
+        threadStartTimestamp += 15 * MINUTE;
+      }
+    }
+  } else {
+    threadStartTimestamp = Date.now();
+  }
+};
 
 class General extends Core {
+  @ui({
+    type: 'helpbox',
+  }, 'graceful_exit')
+  shouldGracefulExitHelp = null;
+  @settings('graceful_exit')
+  gracefulExitEachXHours = 0;
+
   @settings('general')
   @ui({ type: 'selector', values: () => {
     const f = readdirSync('./locales/');
     return [...new Set(f.map((o) => o.split('.')[0]))];
   }})
   public lang = 'en';
+
+  constructor() {
+    super();
+    setInterval(gracefulExit, 1000);
+  }
 
   @command('!enable')
   @default_permission(permission.CASTERS)
@@ -189,4 +224,5 @@ class General extends Core {
   }
 }
 
-export default new General();
+const general = new General();
+export default general;

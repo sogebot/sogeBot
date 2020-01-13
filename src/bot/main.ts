@@ -19,6 +19,7 @@ import { init as clusterInit, isMainThread } from './cluster';
 import { changelog } from './changelog';
 import { autoLoad } from './commons';
 import chalk from 'chalk';
+import { existsSync, unlinkSync } from 'fs';
 
 const connect = async function () {
   const connectionOptions = await getConnectionOptions();
@@ -61,13 +62,15 @@ async function main () {
   }
 
   const version = _.get(process, 'env.npm_package_version', 'x.y.z');
-  process.stdout.write(figlet.textSync('sogeBot ' + version.replace('SNAPSHOT', gitCommitInfo().shortHash || 'SNAPSHOT'), {
-    font: 'ANSI Shadow',
-    horizontalLayout: 'default',
-    verticalLayout: 'default',
-  }));
-  process.stdout.write('\n\n\n');
-  info('Bot is starting up');
+  if (!existsSync('./restart.pid')) {
+    process.stdout.write(figlet.textSync('sogeBot ' + version.replace('SNAPSHOT', gitCommitInfo().shortHash || 'SNAPSHOT'), {
+      font: 'ANSI Shadow',
+      horizontalLayout: 'default',
+      verticalLayout: 'default',
+    }));
+    process.stdout.write('\n\n\n');
+    info('Bot is starting up');
+  }
   translate.default._load().then(async () => {
     await autoLoad('./dest/stats/');
     await autoLoad('./dest/registries/');
@@ -88,6 +91,12 @@ async function main () {
 
     // load tmi last
     require('./tmi');
+
+    setTimeout(() => {
+      if (existsSync('./restart.pid')) {
+        unlinkSync('./restart.pid');
+      }
+    }, 30000);
   });
 }
 

@@ -13,6 +13,7 @@ report
 tsconfig.tsbuildinfo
 ormconfig.json
 sogebot.db*
+restart.pid
 
 public/dist/*
 public/custom/*
