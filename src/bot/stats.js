@@ -1,7 +1,7 @@
 'use strict'
 var _ = require('lodash')
 
-const { TwitchStats, TwitchStatsInterface } = require('./database/entity/twitch');
+const { TwitchStats } = require('./database/entity/twitch');
 const { getRepository } = require('typeorm');
 const { error } = require('./helpers/log');
 import { adminEndpoint } from './helpers/socket';
