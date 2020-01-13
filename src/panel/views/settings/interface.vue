@@ -13,7 +13,7 @@
 
         <loading v-if="state.loaded !== 2 /* State.DONE */" />
         <template v-else v-for="(value, category) of settingsWithoutPermissions">
-          <h6 :key="category + '#1'" >{{ category }}</h6>
+          <h6 :key="category + '#1'" >{{ category.replace('_', ' ') }}</h6>
           <div class="card mb-2" :key="category + '#2'" v-if="value !== null">
             <div class="card-body">
               <template v-for="(currentValue, defaultValue) of value">
@@ -256,6 +256,7 @@ enum State {
     'global-ignorelist-exclude': () => import('./components/interface/global-ignorelist-exclude.vue'),
     'heist-levels': () => import('./components/interface/heist-levels.vue'),
     'heist-results': () => import('./components/interface/heist-results.vue'),
+    'helpbox': () => import('./components/interface/helpbox.vue'),
     'highlights-url-generator': () => import('./components/interface/highlights-url-generator.vue'),
     'loading': () => import('../../components/loading.vue'),
     'number-input': () => import('./components/interface/number-input.vue'),

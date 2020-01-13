@@ -13,6 +13,7 @@ import { Settings } from './database/entity/settings';
 import { PermissionCommands, Permissions as PermissionsEntity } from './database/entity/permissions';
 import { adminEndpoint, publicEndpoint } from './helpers/socket';
 import { flatten, unflatten } from './helpers/flatten';
+import { existsSync } from 'fs';
 
 let socket: import('./socket').Socket | any = null;
 let panel: null | any = null;
@@ -325,6 +326,10 @@ class Module {
       this.enabled = opts.state;
     } else {
       opts.state = this.enabled;
+    }
+
+    if (existsSync('./restart.pid')) {
+      opts.quiet = true; // force quiet if we have restart.pid
     }
 
     if (!this.areDependenciesEnabled || this.isDisabledByEnv) {
