@@ -157,7 +157,7 @@
 <script lang="ts">
 import { Vue, Component, Watch } from 'vue-property-decorator';
 import { getSocket } from 'src/panel/helpers/socket';
-import { Alert, CommonSettings } from 'src/bot/database/entity/alert';
+import type { AlertInterface, CommonSettingsInterface } from 'src/bot/database/entity/alert';
 
 import { remove, every } from 'lodash-es';
 
@@ -202,7 +202,7 @@ export default class AlertsEdit extends Vue {
   supportedEvents: string[] = ['follows', 'cheers', 'subs', 'resubs', 'subgifts',  'tips', 'hosts', 'raids']
   selectedTabIndex: number = 0;
 
-  item: Alert = {
+  item: AlertInterface = {
     id: uuid(),
     updatedAt: Date.now(),
     name: '',
@@ -272,7 +272,7 @@ export default class AlertsEdit extends Vue {
   async mounted() {
     this.state.loaded = this.$state.progress;
     if (this.$route.params.id) {
-      this.socket.emit('alerts::getOne', this.$route.params.id, (data: Alert) => {
+      this.socket.emit('alerts::getOne', this.$route.params.id, (data: AlertInterface) => {
         console.debug('Loaded', {data});
         this.item = data;
         this.state.loaded = this.$state.success;
@@ -319,7 +319,7 @@ export default class AlertsEdit extends Vue {
   }
 
   newAlert() {
-    const _default: CommonSettings = {
+    const _default: CommonSettingsInterface = {
       messageTemplate: '',
 
       id: uuid(),
@@ -471,7 +471,7 @@ export default class AlertsEdit extends Vue {
 
   deleteVariant(event, id) {
     console.debug('Removing', event, id);
-    remove(this.item[event], (o: CommonSettings) => o.id === id);
+    remove(this.item[event], (o: CommonSettingsInterface) => o.id === id);
     this.$forceUpdate();
   }
 

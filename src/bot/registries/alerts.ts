@@ -5,7 +5,7 @@ import { getLocalizedName } from '../commons';
 import { adminEndpoint, publicEndpoint } from '../helpers/socket';
 
 import { getRepository, In, IsNull, Not } from 'typeorm';
-import { Alert, AlertCheer, AlertFollow, AlertHost, AlertMedia, AlertRaid, AlertResub, AlertSub, AlertSubgift, AlertTip, EmitData } from '../database/entity/alert';
+import { Alert, AlertCheer, AlertFollow, AlertHost, AlertInterface, AlertMedia, AlertMediaInterface, AlertRaid, AlertResub, AlertSub, AlertSubgift, AlertTip, EmitData } from '../database/entity/alert';
 import panel from '../panel';
 import currency from '../currency';
 
@@ -51,7 +51,7 @@ class Alerts extends Registry {
         await getRepository(AlertMedia).delete({ id })
       );
     });
-    adminEndpoint(this.nsp, 'alerts::saveMedia', async (items: AlertMedia, cb) => {
+    adminEndpoint(this.nsp, 'alerts::saveMedia', async (items: AlertMediaInterface, cb) => {
       try {
         cb(
           null,
@@ -72,7 +72,7 @@ class Alerts extends Registry {
         cb(null, []);
       }
     });
-    adminEndpoint(this.nsp, 'alerts::save', async (item: Alert, cb) => {
+    adminEndpoint(this.nsp, 'alerts::save', async (item: AlertInterface, cb) => {
       try {
         cb(
           null,
@@ -97,7 +97,7 @@ class Alerts extends Registry {
         })
       );
     });
-    adminEndpoint(this.nsp, 'alerts::delete', async (item: Alert, cb) => {
+    adminEndpoint(this.nsp, 'alerts::delete', async (item: Required<AlertInterface>, cb) => {
       try {
         await getRepository(Alert).remove(item);
         await getRepository(AlertFollow).delete({ alertId: IsNull() });
@@ -137,7 +137,7 @@ class Alerts extends Registry {
         id: Not(In(mediaIds)),
       });
     });
-    publicEndpoint(this.nsp, 'test', async (event: keyof Omit<Alert, 'id' | 'updatedAt' | 'name' |'alertDelayInMs' | 'profanityFilterType' | 'loadStandardProfanityList' | 'customProfanityList'>) => {
+    publicEndpoint(this.nsp, 'test', async (event: keyof Omit<AlertInterface, 'id' | 'updatedAt' | 'name' |'alertDelayInMs' | 'profanityFilterType' | 'loadStandardProfanityList' | 'customProfanityList'>) => {
       this.test({ event });
     });
   }
@@ -146,15 +146,15 @@ class Alerts extends Registry {
     panel.io.of('/registries/alerts').emit('alert', opts);
   }
 
-  test(opts: { event: keyof Omit<Alert, 'id' | 'updatedAt' | 'name' |'alertDelayInMs' | 'profanityFilterType' | 'loadStandardProfanityList' | 'customProfanityList'> }) {
+  test(opts: { event: keyof Omit<AlertInterface, 'id' | 'updatedAt' | 'name' |'alertDelayInMs' | 'profanityFilterType' | 'loadStandardProfanityList' | 'customProfanityList'> }) {
     const amount = Math.floor(Math.random() * 1000);
     const messages = [
       'Lorem ipsum dolor sit amet, https://www.google.com',
-      /* 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Etiam dictum tincidunt diam. Aliquam erat volutpat. Mauris tincidunt sem sed arcu. Etiam sapien elit, consequat eget, tristique non, venenatis quis, ante. Praesent id justo in neque elementum ultrices. Integer pellentesque quam vel velit. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Etiam commodo dui eget wisi. Cras pede libero, dapibus nec, pretium sit amet, tempor quis. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.',
+      'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Etiam dictum tincidunt diam. Aliquam erat volutpat. Mauris tincidunt sem sed arcu. Etiam sapien elit, consequat eget, tristique non, venenatis quis, ante. Praesent id justo in neque elementum ultrices. Integer pellentesque quam vel velit. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Etiam commodo dui eget wisi. Cras pede libero, dapibus nec, pretium sit amet, tempor quis. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.',
       'Lorem ipsum dolor sit amet, consectetuer adipiscing elit.',
       'This is some testing message :)',
       'Lorem ipsum dolor sit amet',
-      '',*/
+      '',
     ];
     const data: EmitData = {
       name: generateUsername(),

@@ -84,7 +84,7 @@
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
 import { getSocket } from 'src/panel/helpers/socket';
-import { Alert } from 'src/bot/database/entity/alert';
+import type { AlertInterface } from 'src/bot/database/entity/alert';
 
 @Component({
   components: {
@@ -108,12 +108,12 @@ export default class customVariablesList extends Vue {
     { key: 'buttons', label: '' },
   ];
 
-  items: Alert[] = [];
+  items: AlertInterface[] = [];
   search: string = '';
 
   state: { loaded: number; } = { loaded: this.$state.progress }
 
-  get filtered(): Alert[] {
+  get filtered(): AlertInterface[] {
     let items = this.items
     if (this.search.trim() !== '') {
       items = this.items.filter((o) => {
@@ -149,7 +149,7 @@ export default class customVariablesList extends Vue {
 
   refresh() {
     this.state.loaded = this.$state.progress;
-    this.socket.emit('alerts::getAll', (data: Alert[]) => {
+    this.socket.emit('alerts::getAll', (data: AlertInterface[]) => {
       console.debug('Loaded', data)
       this.items = data;
       this.state.loaded = this.$state.success;

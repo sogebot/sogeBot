@@ -335,7 +335,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, PropSync, Watch } from 'vue-property-decorator';
-import type { AlertHost } from 'src/bot/database/entity/alert';
+import type { AlertHostInterface } from 'src/bot/database/entity/alert';
 
 import { codemirror } from 'vue-codemirror';
 import 'codemirror/mode/javascript/javascript.js';
@@ -363,7 +363,7 @@ import { required, minValue } from 'vuelidate/lib/validators'
   }
 })
 export default class AlertsEditHostForm extends Vue {
-  @PropSync('alert') readonly data !: AlertHost
+  @PropSync('alert') readonly data !: AlertHostInterface
   @Prop() readonly index !: number
 
   customShow: 'html' | 'css' | 'js' = 'html';

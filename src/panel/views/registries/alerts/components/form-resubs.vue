@@ -432,7 +432,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, PropSync, Watch } from 'vue-property-decorator';
-import type { AlertResub } from 'src/bot/database/entity/alert';
+import type { AlertResubInterface } from 'src/bot/database/entity/alert';
 
 import { codemirror } from 'vue-codemirror';
 import 'codemirror/mode/javascript/javascript.js';
@@ -460,7 +460,7 @@ import { required, minValue } from 'vuelidate/lib/validators'
   }
 })
 export default class AlertsEditFollowForm extends Vue {
-  @PropSync('alert') readonly data !: AlertResub
+  @PropSync('alert') readonly data !: AlertResubInterface
   @Prop() readonly index !: number
 
   customShow: 'html' | 'css' | 'js' = 'html';

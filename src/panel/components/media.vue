@@ -55,7 +55,7 @@ import uuid from 'uuid/v4';
 import { getSocket } from '../helpers/socket';
 
 import AudioVisual from 'vue-audio-visual'
-import { AlertMedia } from 'src/bot/database/entity/alert';
+import type { AlertMediaInterface } from 'src/bot/database/entity/alert';
 Vue.use(AudioVisual)
 
 @Component({
@@ -91,7 +91,7 @@ export default class MediaForm extends Vue {
 
   created() {
     this.io = getSocket(this.socket);
-    this.io.emit('alerts::getOneMedia', this.id, (err, data: AlertMedia[]) => {
+    this.io.emit('alerts::getOneMedia', this.id, (err, data: AlertMediaInterface[]) => {
       console.log({data})
       this.b64data = data.sort((a,b) => a.chunkNo - b.chunkNo).map(o => o.b64data).join('');
     });
