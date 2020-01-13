@@ -82,7 +82,7 @@ import { isEqual, get } from 'lodash-es';
 import urlRegex from 'url-regex';
 
 import { CacheEmotesInterface } from 'src/bot/database/entity/cacheEmotes';
-import { EmitData, Alert, AlertFollow, AlertSub, AlertSubgift, AlertHost, AlertRaid, AlertTip, AlertCheer, AlertResub } from 'src/bot/database/entity/alert';
+import { EmitData, AlertInterface, CommonSettingsInterface, AlertHostInterface, AlertTipInterface, AlertResubInterface } from 'src/bot/database/entity/alert';
 
 require('../../../scss/letter-animations.css');
 require('animate.css');
@@ -125,7 +125,7 @@ export default class AlertsRegistryOverlays extends Vue {
 
   id: null | string = null;
   updatedAt: number = -1; // force initial load
-  data: null | Alert = null;
+  data: null | AlertInterface = null;
   defaultProfanityList: string[] = [];
   listHappyWords: string[] = [];
   emotes: CacheEmotesInterface[] = [];
@@ -139,7 +139,7 @@ export default class AlertsRegistryOverlays extends Vue {
     hideAt: number;
     showTextAt: number;
     showAt: number;
-    alert: AlertFollow | AlertSub | AlertSubgift | AlertHost | AlertRaid | AlertTip | AlertCheer | AlertResub;
+    alert: CommonSettingsInterface | AlertHostInterface | AlertTipInterface | AlertResubInterface;
   } | null = null;
 
   beforeDestroyed() {
@@ -299,7 +299,7 @@ export default class AlertsRegistryOverlays extends Vue {
 
           // remove if autohost and autohosts are disabled for alert
           if (emitData.event === 'hosts' && emitData.autohost) {
-            possibleAlerts = (possibleAlerts as AlertHost[]).filter(o => o.showAutoHost)
+            possibleAlerts = (possibleAlerts as AlertHostInterface[]).filter(o => o.showAutoHost)
           }
 
           if (possibleAlerts.length > 0) {
@@ -318,7 +318,7 @@ export default class AlertsRegistryOverlays extends Vue {
             });
 
             // search for random variants
-            let possibleAlertsWithRandomCount: (AlertFollow | AlertSub | AlertSubgift | AlertHost | AlertRaid | AlertTip | AlertCheer | AlertResub)[] = [];
+            let possibleAlertsWithRandomCount: (CommonSettingsInterface | AlertHostInterface | AlertTipInterface | AlertResubInterface)[] = [];
             for (const alert of possibleAlerts) {
               if (!alert.enabled) {
                 continue;
@@ -499,7 +499,7 @@ export default class AlertsRegistryOverlays extends Vue {
         console.debug('Alert is updating')
         this.updatedAt = updatedAt;
         await new Promise((resolve) => {
-          this.socket.emit('alerts::getOne', this.id, async (data: Alert) => {
+          this.socket.emit('alerts::getOne', this.id, async (data: AlertInterface) => {
             if (this.runningAlert !== null) {
               return; // skip any changes if alert in progress
             }

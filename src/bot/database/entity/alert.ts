@@ -1,38 +1,29 @@
 import * as configFile from '@ormconfig';
 
-import { Column, Entity, Index, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { ColumnNumericTransformer } from './_transformer';
+import type { EntitySchemaColumnOptions } from 'typeorm';
+import { EntitySchema } from 'typeorm';
 
-export abstract class EmitData {
-  name!: string;
-  amount!: number;
-  currency!: string;
-  monthsName!: string;
-  event!: keyof Omit<Alert, 'id' | 'updatedAt' | 'name' |'alertDelayInMs' | 'profanityFilterType' | 'loadStandardProfanityList' | 'customProfanityList'>;
-  message!: string;
-  autohost!: boolean;
+export interface EmitData {
+  name: string;
+  amount: number;
+  currency: string;
+  monthsName: string;
+  event: keyof Omit<AlertInterface, 'id' | 'updatedAt' | 'name' |'alertDelayInMs' | 'profanityFilterType' | 'loadStandardProfanityList' | 'customProfanityList'>;
+  message: string;
+  autohost: boolean;
 }
 
-export abstract class CommonSettings {
-  @PrimaryGeneratedColumn('uuid')
-  id!: string;
-  @Column({ name: 'alertId', nullable: true })
+export interface CommonSettingsInterface {
+  id?: string;
   alertId?: string;
-
-  @Column()
-  enabled!: boolean;
-  @Column()
-  title!: string;
-  @Column()
-  variantCondition!: 'random' | 'exact' | 'gt-eq';
-  @Column()
-  variantAmount!: number;
-  @Column()
-  messageTemplate!: string;
-  @Column()
-  layout!: '1' | '2' | '3' | '4' | '5';
-  @Column()
-  animationIn!: 'fadeIn' | 'fadeInDown' | 'fadeInLeft' | 'fadeInRight'
+  enabled: boolean;
+  title: string;
+  variantCondition: 'random' | 'exact' | 'gt-eq';
+  variantAmount: number;
+  messageTemplate: string;
+  layout: '1' | '2' | '3' | '4' | '5';
+  animationIn: 'fadeIn' | 'fadeInDown' | 'fadeInLeft' | 'fadeInRight'
   | 'fadeInUp' | 'fadeInDownBig' | 'fadeInLeftBig' | 'fadeInRightBig'
   | 'fadeInUpBig' | 'bounceIn' | 'bounceInDown' | 'bounceInLeft'
   | 'bounceInRight' | 'bounceInUp' | 'flipInX' | 'flipInY' | 'lightSpeedIn'
@@ -40,8 +31,7 @@ export abstract class CommonSettings {
   | 'rotateInUpRight' | 'slideInDown' | 'slideInLeft' | 'slideInRight'
   | 'slideInUp' | 'zoomIn' | 'zoomInDown' | 'zoomInLeft' | 'zoomInRight'
   | 'zoomInUp' | 'rollIn' | 'jackInTheBox';
-  @Column()
-  animationOut!: 'fadeOut' | 'fadeOutDown' | 'fadeOutLeft' | 'fadeOutRight' | 'fadeOutUp'
+  animationOut: 'fadeOut' | 'fadeOutDown' | 'fadeOutLeft' | 'fadeOutRight' | 'fadeOutUp'
   | 'fadeOutDownBig' | 'fadeOutLeftBig' | 'fadeOutRightBig' | 'fadeOutUpBig'
   | 'bounceOut' | 'bounceOutDown' | 'bounceOutLeft' | 'bounceOutRight'
   | 'bounceOutUp' | 'flipOutX' | 'flipOutY' | 'lightSpeedOut' | 'rotateOut'
@@ -49,35 +39,25 @@ export abstract class CommonSettings {
   | 'rotateOutUpRight' | 'slideOutDown' | 'slideOutLeft' | 'slideOutRight'
   | 'slideOutUp' | 'zoomOut' | 'zoomOutDown' | 'zoomOutLeft' | 'zoomOutRight'
   | 'zoomOutUp' | 'rollOut';
-  @Column()
-  animationText!: 'none' | 'baffle' | 'bounce' | 'bounce2' | 'flip' | 'flash' | 'pulse2' | 'rubberBand'
+  animationText: 'none' | 'baffle' | 'bounce' | 'bounce2' | 'flip' | 'flash' | 'pulse2' | 'rubberBand'
   | 'shake2' | 'swing' | 'tada' | 'wave' | 'wobble' | 'wiggle' | 'wiggle2' | 'jello';
-  @Column('simple-json')
-  animationTextOptions!: {
+  animationTextOptions: {
     speed: number | 'slower' | 'slow' | 'fast' | 'faster';
     maxTimeToDecrypt: number;
     characters: string;
   };
-  @Column()
-  imageId!: string;
-  @Column()
-  soundId!: string;
-  @Column()
-  soundVolume!: number;
-  @Column()
-  alertDurationInMs!: number;
-  @Column()
-  alertTextDelayInMs!: number;
-  @Column()
-  enableAdvancedMode!: boolean;
-  @Column('simple-json')
-  advancedMode!: {
+  imageId: string;
+  soundId: string;
+  soundVolume: number;
+  alertDurationInMs: number;
+  alertTextDelayInMs: number;
+  enableAdvancedMode: boolean;
+  advancedMode: {
     html: null | string;
     css: string;
     js: null | string;
   };
-  @Column('simple-json')
-  tts!: {
+  tts: {
     enabled: boolean;
     skipUrls: boolean;
     keepAlertShown: boolean;
@@ -86,8 +66,7 @@ export abstract class CommonSettings {
     volume: number;
     rate: number;
   };
-  @Column('simple-json')
-  font!: {
+  font: {
     family: string;
     size: number;
     borderPx: number;
@@ -96,153 +75,44 @@ export abstract class CommonSettings {
     color: string;
     highlightcolor: string;
   };
+  alert?: AlertInterface;
 }
 
-@Entity()
-export class Alert {
-  @PrimaryGeneratedColumn('uuid')
-  id!: string;
-
-  @Column('bigint', { transformer: new ColumnNumericTransformer(), default: 0 })
-  updatedAt!: number;
-  @Column()
-  name!: string;
-  @Column()
-  alertDelayInMs!: number;
-  @Column()
-  profanityFilterType!: 'disabled' | 'replace-with-asterisk' | 'replace-with-happy-words' | 'hide-messages' | 'disable-alerts';
-  @Column('simple-json')
-  loadStandardProfanityList!: {
+export interface AlertInterface {
+  id?: string;
+  updatedAt?: number;
+  name: string;
+  alertDelayInMs: number;
+  profanityFilterType: 'disabled' | 'replace-with-asterisk' | 'replace-with-happy-words' | 'hide-messages' | 'disable-alerts';
+  loadStandardProfanityList: {
     cs: boolean;
     en: boolean;
     ru: boolean;
   };
-  @Column('text')
-  customProfanityList!: string;
-
-  @OneToMany(() => AlertFollow, (v) => v.alert, {
-    cascade: true,
-  })
-  follows!: AlertFollow[];
-
-  @OneToMany(() => AlertSub, (v) => v.alert, {
-    cascade: true,
-  })
-  subs!: AlertSub[];
-
-  @OneToMany(() => AlertSubgift, (v) => v.alert, {
-    cascade: true,
-  })
-  subgifts!: AlertSubgift[];
-
-  @OneToMany(() => AlertHost, (v) => v.alert, {
-    cascade: true,
-  })
-  hosts!: AlertHost[];
-
-  @OneToMany(() => AlertRaid, (v) => v.alert, {
-    cascade: true,
-  })
-  raids!: AlertRaid[];
-
-  @OneToMany(() => AlertTip, (v) => v.alert, {
-    cascade: true,
-  })
-  tips!: AlertTip[];
-
-  @OneToMany(() => AlertCheer, (v) => v.alert, {
-    cascade: true,
-  })
-  cheers!: AlertCheer[];
-
-  @OneToMany(() => AlertResub, (v) => v.alert, {
-    cascade: true,
-  })
-  resubs!: AlertResub[];
+  customProfanityList: string;
+  follows: CommonSettingsInterface[];
+  subs: CommonSettingsInterface[];
+  subgifts: CommonSettingsInterface[];
+  hosts: AlertHostInterface[];
+  raids: AlertHostInterface[];
+  tips: AlertTipInterface[];
+  cheers: AlertTipInterface[];
+  resubs: AlertResubInterface[];
 }
 
-@Entity()
-export class AlertMedia {
-  @PrimaryGeneratedColumn()
-  primaryId!: number;
-
-  @Column()
-  @Index()
-  id!: string;
-
-  @Column(configFile.type === 'mysql' ? 'longtext' : 'text')
-  b64data!: string;
-  @Column()
-  chunkNo!: number;
+export interface AlertMediaInterface {
+  primaryId: number;
+  id: string;
+  b64data: string;
+  chunkNo: number;
 }
 
-@Entity()
-export class AlertFollow extends CommonSettings {
-  @ManyToOne(() => Alert, (c) => c.follows, {
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
-  })
-  @JoinColumn({ name: 'alertId' })
-  alert?: Alert;
+export interface AlertHostInterface extends CommonSettingsInterface {
+  showAutoHost: boolean;
 }
 
-@Entity()
-export class AlertSub extends CommonSettings {
-  @ManyToOne(() => Alert, (c) => c.subs, {
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
-  })
-  @JoinColumn({ name: 'alertId' })
-  alert?: Alert;
-}
-
-@Entity()
-export class AlertSubgift extends CommonSettings {
-  @ManyToOne(() => Alert, (c) => c.subgifts, {
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
-  })
-  @JoinColumn({ name: 'alertId' })
-  alert?: Alert;
-}
-
-@Entity()
-export class AlertHost extends CommonSettings {
-  @ManyToOne(() => Alert, (c) => c.hosts, {
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
-  })
-  @JoinColumn({ name: 'alertId' })
-  alert?: Alert;
-
-  @Column()
-  showAutoHost!: boolean;
-}
-
-@Entity()
-export class AlertRaid extends CommonSettings {
-  @ManyToOne(() => Alert, (c) => c.raids, {
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
-  })
-  @JoinColumn({ name: 'alertId' })
-  alert?: Alert;
-
-  @Column()
-  showAutoHost!: boolean;
-}
-
-@Entity()
-export class AlertTip extends CommonSettings {
-  @ManyToOne(() => Alert, (c) => c.tips, {
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
-  })
-  @JoinColumn({ name: 'alertId' })
-  alert?: Alert;
-
-  @Column('simple-json')
-  message!: {
+export interface AlertTipInterface extends CommonSettingsInterface {
+  message: {
     minAmountToShow: number;
     allowEmotes: {
       twitch: boolean;
@@ -259,19 +129,8 @@ export class AlertTip extends CommonSettings {
     };
   };
 }
-
-@Entity()
-export class AlertCheer extends CommonSettings {
-  @ManyToOne(() => Alert, (c) => c.cheers, {
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
-  })
-  @JoinColumn({ name: 'alertId' })
-  alert?: Alert;
-
-  @Column('simple-json')
-  message!: {
-    minAmountToShow: number;
+export interface AlertResubInterface extends CommonSettingsInterface {
+  message: {
     allowEmotes: {
       twitch: boolean;
       ffz: boolean;
@@ -288,29 +147,243 @@ export class AlertCheer extends CommonSettings {
   };
 }
 
-@Entity()
-export class AlertResub extends CommonSettings {
-  @ManyToOne(() => Alert, (c) => c.resubs, {
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
-  })
-  @JoinColumn({ name: 'alertId' })
-  alert?: Alert;
+export const CommonSettingsSchema = {
+  id: { type: 'uuid', primary: true, generated: 'uuid' } as EntitySchemaColumnOptions,
+  alertId: { nullable: true, name: 'alertId', type: String } as EntitySchemaColumnOptions,
+  enabled: { type: Boolean } as EntitySchemaColumnOptions,
+  title: { type: String } as EntitySchemaColumnOptions,
+  variantCondition: { type: 'varchar' } as EntitySchemaColumnOptions,
+  variantAmount: { type: Number } as EntitySchemaColumnOptions,
+  messageTemplate: { type: String } as EntitySchemaColumnOptions,
+  layout: { type: 'varchar' } as EntitySchemaColumnOptions,
+  animationIn: { type: 'varchar' } as EntitySchemaColumnOptions,
+  animationOut: { type: 'varchar' } as EntitySchemaColumnOptions,
+  animationText: { type: 'varchar' } as EntitySchemaColumnOptions,
+  animationTextOptions: { type: 'simple-json' } as EntitySchemaColumnOptions,
+  imageId: { type: String } as EntitySchemaColumnOptions,
+  soundId: { type: String } as EntitySchemaColumnOptions,
+  soundVolume: { type: Number } as EntitySchemaColumnOptions,
+  alertDurationInMs: { type: Number } as EntitySchemaColumnOptions,
+  alertTextDelayInMs: { type: Number } as EntitySchemaColumnOptions,
+  enableAdvancedMode: { type: Boolean } as EntitySchemaColumnOptions,
+  advancedMode: { type: 'simple-json' } as EntitySchemaColumnOptions,
+  tts: { type: 'simple-json' } as EntitySchemaColumnOptions,
+  font: { type: 'simple-json' } as EntitySchemaColumnOptions,
+};
 
-  @Column('simple-json')
-  message!: {
-    allowEmotes: {
-      twitch: boolean;
-      ffz: boolean;
-      bttv: boolean;
-    };
-    font: {
-      family: string;
-      size: number;
-      borderPx: number;
-      borderColor: string;
-      weight: number;
-      color: string;
-    };
-  };
-}
+export const Alert = new EntitySchema<Readonly<Required<AlertInterface>>>({
+  name: 'alert',
+  columns: {
+    id: { type: String, primary: true, generated: 'uuid' },
+    updatedAt: { type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0 },
+    name: { type: String },
+    alertDelayInMs: { type: Number },
+    profanityFilterType: { type: String },
+    loadStandardProfanityList: { type: 'simple-json' },
+    customProfanityList: { type: 'text' },
+  },
+  relations: {
+    follows: {
+      type: 'one-to-many',
+      target: 'alert_follow',
+      inverseSide: 'alert',
+      cascade: true,
+    },
+    subs: {
+      type: 'one-to-many',
+      target: 'alert_sub',
+      inverseSide: 'alert',
+      cascade: true,
+    },
+    subgifts: {
+      type: 'one-to-many',
+      target: 'alert_subgift',
+      inverseSide: 'alert',
+      cascade: true,
+    },
+    hosts: {
+      type: 'one-to-many',
+      target: 'alert_host',
+      inverseSide: 'alert',
+      cascade: true,
+    },
+    raids: {
+      type: 'one-to-many',
+      target: 'alert_raid',
+      inverseSide: 'alert',
+      cascade: true,
+    },
+    tips: {
+      type: 'one-to-many',
+      target: 'alert_tip',
+      inverseSide: 'alert',
+      cascade: true,
+    },
+    cheers: {
+      type: 'one-to-many',
+      target: 'alert_cheer',
+      inverseSide: 'alert',
+      cascade: true,
+    },
+    resubs: {
+      type: 'one-to-many',
+      target: 'alert_resub',
+      inverseSide: 'alert',
+      cascade: true,
+    },
+  },
+});
+
+export const AlertMedia = new EntitySchema<Readonly<Required<AlertMediaInterface>>>({
+  name: 'alert_media',
+  columns: {
+    primaryId: { type: Number, primary: true, generated: true },
+    id: { type: String },
+    b64data: { type: ['mysql', 'mariadb'].includes(configFile.type.toLowerCase()) ? 'longtext' : 'text' },
+    chunkNo: { type: Number },
+  },
+  indices: [
+    { name: 'IDX_b0f12c32653ed88fd576d3520c', columns: ['id'] },
+  ],
+});
+
+export const AlertFollow = new EntitySchema<Readonly<Required<CommonSettingsInterface>>>({
+  name: 'alert_follow',
+  columns: {
+    ...CommonSettingsSchema,
+  },
+  relations: {
+    alert: {
+      type: 'many-to-one',
+      target: 'alert',
+      inverseSide: 'follows',
+      joinColumn: { name: 'alertId' },
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+    },
+  },
+});
+
+export const AlertSub = new EntitySchema<Readonly<Required<CommonSettingsInterface>>>({
+  name: 'alert_sub',
+  columns: {
+    ...CommonSettingsSchema,
+  },
+  relations: {
+    alert: {
+      type: 'many-to-one',
+      target: 'alert',
+      inverseSide: 'subs',
+      joinColumn: { name: 'alertId' },
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+    },
+  },
+});
+
+export const AlertSubgift = new EntitySchema<Readonly<Required<CommonSettingsInterface>>>({
+  name: 'alert_subgift',
+  columns: {
+    ...CommonSettingsSchema,
+  },
+  relations: {
+    alert: {
+      type: 'many-to-one',
+      target: 'alert',
+      inverseSide: 'subgifts',
+      joinColumn: { name: 'alertId' },
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+    },
+  },
+});
+
+export const AlertHost = new EntitySchema<Readonly<Required<AlertHostInterface>>>({
+  name: 'alert_host',
+  columns: {
+    ...CommonSettingsSchema,
+    showAutoHost: { type: Boolean },
+  },
+  relations: {
+    alert: {
+      type: 'many-to-one',
+      target: 'alert',
+      inverseSide: 'hosts',
+      joinColumn: { name: 'alertId' },
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+    },
+  },
+});
+
+export const AlertRaid = new EntitySchema<Readonly<Required<AlertHostInterface>>>({
+  name: 'alert_raid',
+  columns: {
+    ...CommonSettingsSchema,
+    showAutoHost: { type: Boolean },
+  },
+  relations: {
+    alert: {
+      type: 'many-to-one',
+      target: 'alert',
+      inverseSide: 'raids',
+      joinColumn: { name: 'alertId' },
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+    },
+  },
+});
+
+export const AlertTip = new EntitySchema<Readonly<Required<AlertTipInterface>>>({
+  name: 'alert_tip',
+  columns: {
+    ...CommonSettingsSchema,
+    message: { type: 'simple-json' },
+  },
+  relations: {
+    alert: {
+      type: 'many-to-one',
+      target: 'alert',
+      inverseSide: 'tips',
+      joinColumn: { name: 'alertId' },
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+    },
+  },
+});
+
+export const AlertCheer = new EntitySchema<Readonly<Required<AlertTipInterface>>>({
+  name: 'alert_cheer',
+  columns: {
+    ...CommonSettingsSchema,
+    message: { type: 'simple-json' },
+  },
+  relations: {
+    alert: {
+      type: 'many-to-one',
+      target: 'alert',
+      inverseSide: 'cheers',
+      joinColumn: { name: 'alertId' },
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+    },
+  },
+});
+
+export const AlertResub = new EntitySchema<Readonly<Required<AlertResubInterface>>>({
+  name: 'alert_resub',
+  columns: {
+    ...CommonSettingsSchema,
+    message: { type: 'simple-json' },
+  },
+  relations: {
+    alert: {
+      type: 'many-to-one',
+      target: 'alert',
+      inverseSide: 'resubs',
+      joinColumn: { name: 'alertId' },
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+    },
+  },
+});
