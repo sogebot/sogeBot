@@ -18,13 +18,14 @@ import tmi from './tmi';
 import glob from 'glob';
 import { HOUR, MINUTE } from './constants';
 import api from './api';
+import { socketsConnected } from './panel';
 
 let threadStartTimestamp = Date.now();
 const gracefulExit = () => {
   if (general.gracefulExitEachXHours > 0) {
     debug('thread', 'gracefulExit::check');
     if (Date.now() - threadStartTimestamp >= general.gracefulExitEachXHours * HOUR) {
-      if (!api.isStreamOnline) {
+      if (!api.isStreamOnline && socketsConnected === 0) {
         warning('Gracefully exiting sogeBot as planned and configured in UI in settings->general.');
         debug('thread', 'gracefulExit::exiting and creating restart file (so we dont have startup logging');
         writeFileSync('./restart.pid', ' ');

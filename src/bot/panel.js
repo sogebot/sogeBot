@@ -36,6 +36,8 @@ const config = require('@config')
 let app;
 let server;
 
+export let socketsConnected = 0;
+
 function Panel () {
   // setup static server
   app = express()
@@ -121,8 +123,12 @@ function Panel () {
 
   this.io.use(socket.authorize);
 
-  var self = this
   this.io.on('connection', async (socket) => {
+    var self = this
+    socket.on('disconnect', () => {
+      socketsConnected--;
+    });
+    socketsConnected++;
     // create main dashboard if needed;
     await getRepository(Dashboard).save({
       id: 'c287b750-b620-4017-8b3e-e48757ddaa83', // constant ID
