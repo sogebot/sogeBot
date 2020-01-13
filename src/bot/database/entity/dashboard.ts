@@ -29,7 +29,7 @@ export const Dashboard = new EntitySchema<Readonly<Required<DashboardInterface>>
     widgets: {
       type: 'one-to-many',
       target: 'widget',
-      inverseSide: 'poll',
+      inverseSide: 'dashboard',
       cascade: true,
     },
   },
