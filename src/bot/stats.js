@@ -1,7 +1,7 @@
 'use strict'
 var _ = require('lodash')
 
-const { TwitchStats } = require('./database/entity/twitch');
+const { TwitchStats, TwitchStatsInterface } = require('./database/entity/twitch');
 const { getRepository } = require('typeorm');
 const { error } = require('./helpers/log');
 import { adminEndpoint } from './helpers/socket';
@@ -74,27 +74,21 @@ Stats.prototype.sockets = function () {
 
 Stats.prototype.save = async function (data) {
   if (data.timestamp - this.latestTimestamp >= 30000) {
-    let stats = await getRepository(TwitchStats).findOne({'whenOnline': new Date(data.whenOnline).getTime() })
-    if (stats) {
-      // pseudo avg value through stream
-      stats.currentViewers = Math.round((data.currentViewers + stats.currentViewers) / 2);
-      stats.currentHosts = Math.round((data.currentHosts + stats.currentHosts) / 2);
-    } else {
-      stats = new TwitchStats();
-      stats.whenOnline = new Date(data.whenOnline).getTime();
-      stats.currentViewers = data.currentViewers;
-      stats.currentHosts = data.currentHosts;
-    }
-    stats.currentSubscribers = data.currentSubscribers;
-    stats.currentBits = data.currentBits;
-    stats.currentTips = data.currentTips;
-    stats.chatMessages = data.chatMessages;
-    stats.currentFollowers = data.currentFollowers;
-    stats.currentViews = data.currentViews;
-    stats.maxViewers = data.maxViewers;
-    stats.newChatters = data.newChatters;
-    stats.currentWatched = data.currentWatched;
-    await getRepository(TwitchStats).save(stats);
+    const statsFromDB = await getRepository(TwitchStats).findOne({'whenOnline': new Date(data.whenOnline).getTime() });
+    await getRepository(TwitchStats).save({
+      currentViewers: statsFromDb ? Math.round((data.currentViewers + statsFromDB.currentViewers) / 2) : data.currentViewers,
+      currentHosts: statsFromDb ? Math.round((data.currentHosts + statsFromDB.currentHosts) / 2) : data.currentHosts,
+      whenOnline: statsFromDb ? statsFromDB.whenOnline : Date.now(),
+      currentSubscribers: data.currentSubscribers,
+      currentBits: data.currentBits,
+      currentTips: data.currentTips,
+      chatMessages: data.chatMessages,
+      currentFollowers: data.currentFollowers,
+      currentViews: data.currentViews,
+      maxViewers: data.maxViewers,
+      newChatters: data.newChatters,
+      currentWatched: data.currentWatched,
+    });
 
     this.latestTimestamp = data.timestamp;
   }
