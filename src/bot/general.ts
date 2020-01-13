@@ -16,7 +16,7 @@ import oauth from './oauth';
 import translateLib, { translate } from './translate';
 import tmi from './tmi';
 import glob from 'glob';
-import { HOUR } from './constants';
+import { HOUR, MINUTE } from './constants';
 import api from './api';
 
 let threadStartTimestamp = Date.now();
@@ -30,9 +30,9 @@ const gracefulExit = () => {
         writeFileSync('./restart.pid', ' ');
         process.exit(0);
       } else {
-        debug('thread', 'gracefulExit::Gracefully exiting process skipped, stream online - moved by 1 hour');
+        debug('thread', 'gracefulExit::Gracefully exiting process skipped, stream online - moved by 15 minutes');
         // if stream is online move exit by hour
-        threadStartTimestamp += HOUR;
+        threadStartTimestamp += 15 * MINUTE;
       }
     }
   } else {
