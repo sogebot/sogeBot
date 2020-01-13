@@ -21,11 +21,11 @@ import api from './api';
 
 let threadStartTimestamp = Date.now();
 const gracefulExit = () => {
-  if (general.shouldGracefulExit) {
+  if (general.gracefulExitEachXHours > 0) {
     debug('thread', 'gracefulExit::check');
     if (Date.now() - threadStartTimestamp >= general.gracefulExitEachXHours * HOUR) {
       if (!api.isStreamOnline) {
-        warning('Gracefully exiting sogeBot as planned.');
+        warning('Gracefully exiting sogeBot as planned and configured in UI in settings->general.');
         debug('thread', 'gracefulExit::exiting and creating restart file (so we dont have startup logging');
         writeFileSync('./restart.pid', ' ');
         process.exit(0);
@@ -46,9 +46,7 @@ class General extends Core {
   }, 'graceful_exit')
   shouldGracefulExitHelp = null;
   @settings('graceful_exit')
-  shouldGracefulExit = false;
-  @settings('graceful_exit')
-  gracefulExitEachXHours = 12;
+  gracefulExitEachXHours = 0;
 
   @settings('general')
   @ui({ type: 'selector', values: () => {
