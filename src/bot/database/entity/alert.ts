@@ -174,7 +174,7 @@ export const CommonSettingsSchema = {
 export const Alert = new EntitySchema<Readonly<Required<AlertInterface>>>({
   name: 'alert',
   columns: {
-    id: { type: String, primary: true, generated: 'uuid' },
+    id: { type: 'uuid', primary: true, generated: 'uuid' },
     updatedAt: { type: 'bigint', transformer: new ColumnNumericTransformer(), default: 0 },
     name: { type: String },
     alertDelayInMs: { type: Number },
