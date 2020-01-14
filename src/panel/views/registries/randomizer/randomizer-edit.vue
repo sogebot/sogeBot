@@ -240,7 +240,7 @@ import { required, minLength, minValue } from 'vuelidate/lib/validators';
 import { cloneDeep, isEqual } from 'lodash-es';
 
 import { getSocket } from 'src/panel/helpers/socket';
-import { Randomizer, RandomizerItem } from 'src/bot/database/entity/randomizer';
+import type { RandomizerInterface, RandomizerItemInterface } from 'src/bot/database/entity/randomizer';
 import uuid from 'uuid/v4';
 import { permission } from 'src/bot/helpers/permissions';
 import { getRandomColor, getContrastColor } from 'src/panel/helpers/color';
@@ -292,7 +292,7 @@ export default class randomizerEdit extends Vue {
 
   permissions: {id: string; name: string;}[] = [];
   isShown = false;
-  item: Randomizer = {
+  item: Required<RandomizerInterface> = {
     id: uuid(),
     name: '',
     command: '',
@@ -343,13 +343,13 @@ export default class randomizerEdit extends Vue {
     }
   }
 
-  generateItems(items: RandomizerItem[], generatedItems: RandomizerItem[] = []) {
+  generateItems(items: Required<RandomizerItemInterface>[], generatedItems: Required<RandomizerItemInterface>[] = []) {
     const beforeItems = cloneDeep(items);
     items = cloneDeep(items);
     items = items.filter(o => o.numOfDuplicates > 0);
 
 
-    const countGroupItems = (item: RandomizerItem, count = 0) => {
+    const countGroupItems = (item: RandomizerItemInterface, count = 0) => {
       const child = items.find(o => o.groupId === item.id);
       if (child) {
         return countGroupItems(child, count + 1);
@@ -357,12 +357,12 @@ export default class randomizerEdit extends Vue {
         return count;
       }
     }
-    const haveMinimalSpacing = (item: RandomizerItem) => {
+    const haveMinimalSpacing = (item: Required<RandomizerItemInterface>) => {
       let lastIdx = generatedItems.map(o => o.name).lastIndexOf(item.name);
       const currentIdx = generatedItems.length;
       return lastIdx === -1 || lastIdx + item.minimalSpacing + countGroupItems(item) < currentIdx
     }
-    const addGroupItems = (item: RandomizerItem, generatedItems: RandomizerItem[]) => {
+    const addGroupItems = (item: RandomizerItemInterface, generatedItems: RandomizerItemInterface[]) => {
       const child = items.find(o => o.groupId === item.id);
       if (child) {
         generatedItems.push(child);
@@ -437,14 +437,14 @@ export default class randomizerEdit extends Vue {
   }
 
   addOption() {
-    const option = new RandomizerItem();
-    option.id = uuid();
-    option.name = '';
-    option.color = getRandomColor();
-    option.numOfDuplicates = 1;
-    option.minimalSpacing = 1;
-    option.groupId = null;
-    this.item.items.push(option)
+    this.item.items.push({
+      id: uuid(),
+      name: '',
+      color: getRandomColor(),
+      numOfDuplicates: 1,
+      minimalSpacing: 1,
+      groupId: null,
+    })
   }
 
   rmOption(id) {
@@ -501,7 +501,7 @@ export default class randomizerEdit extends Vue {
     await Promise.all([
       new Promise(async (done) => {
         if (this.$route.params.id) {
-          this.socket.emit('randomizer::getOne', this.$route.params.id, (err, d: Randomizer) => {
+          this.socket.emit('randomizer::getOne', this.$route.params.id, (err, d: Required<RandomizerInterface>) => {
             if (err) {
               console.error(err);
               return;

@@ -47,7 +47,7 @@
 import { Vue, Component } from 'vue-property-decorator';
 import { getSocket } from 'src/panel/helpers/socket';
 
-import { Randomizer } from 'src/bot/database/entity/randomizer';
+import type { RandomizerInterface } from 'src/bot/database/entity/randomizer';
 
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
@@ -71,7 +71,7 @@ export default class randomizerList extends Vue {
     { key: 'buttons', label: '' },
   ];
 
-  items: Randomizer[] = [];
+  items: Required<RandomizerInterface>[] = [];
   permissions: {id: string; name: string;}[] = [];
   search: string = '';
 

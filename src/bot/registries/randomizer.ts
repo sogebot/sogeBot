@@ -2,7 +2,7 @@ import Registry from './_interface';
 import { adminEndpoint } from '../helpers/socket';
 
 import { getRepository } from 'typeorm';
-import { Randomizer as RandomizerEntity } from '../database/entity/randomizer';
+import { Randomizer as RandomizerEntity, RandomizerInterface } from '../database/entity/randomizer';
 
 class Randomizer extends Registry {
   constructor() {
@@ -18,7 +18,7 @@ class Randomizer extends Registry {
         })
       );
     });
-    adminEndpoint(this.nsp, 'randomizer::remove', async (item: RandomizerEntity, cb) => {
+    adminEndpoint(this.nsp, 'randomizer::remove', async (item: Required<RandomizerInterface>, cb) => {
       try {
         cb(
           null,
@@ -28,7 +28,7 @@ class Randomizer extends Registry {
         cb (e, null);
       }
     });
-    adminEndpoint(this.nsp, 'randomizer::save', async (item: RandomizerEntity, cb) => {
+    adminEndpoint(this.nsp, 'randomizer::save', async (item: RandomizerInterface, cb) => {
       try {
         cb(
           null,
