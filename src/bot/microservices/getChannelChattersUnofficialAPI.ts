@@ -18,7 +18,7 @@ import { getAllOnlineUsernames } from '../helpers/getAllOnlineUsernames';
 import { Settings } from '../database/entity/settings';
 import { getUserFromTwitch } from './getUserFromTwitch';
 import { clusteredFetchAccountAge } from '../cluster';
-import { debug } from '../helpers/log';
+import { debug, warning } from '../helpers/log';
 
 export const getChannelChattersUnofficialAPI = async (): Promise<{ modStatus: boolean; partedUsers: string[]; joinedUsers: string[] }> => {
   if (!isMainThread) {
@@ -131,6 +131,8 @@ export const getChannelChattersUnofficialAPI = async (): Promise<{ modStatus: bo
     }
     return { modStatus, partedUsers, joinedUsers };
   } catch (e) {
+    warning('Microservice getChannelChattersUnofficialAPI ended with error');
+    warning(e);
     if (!isMainThread) {
       parentPort?.postMessage({ modStatus: false, partedUsers: [], joinedUsers: [] });
     }
