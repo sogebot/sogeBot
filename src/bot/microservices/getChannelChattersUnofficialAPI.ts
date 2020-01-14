@@ -131,6 +131,7 @@ export const getChannelChattersUnofficialAPI = async (): Promise<{ modStatus: bo
     }
     return { modStatus, partedUsers, joinedUsers };
   } catch (e) {
+    debug('microservice', e);
     if (!isMainThread) {
       parentPort?.postMessage({ modStatus: false, partedUsers: [], joinedUsers: [] });
     }
