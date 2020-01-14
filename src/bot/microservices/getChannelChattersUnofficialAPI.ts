@@ -63,10 +63,10 @@ export const getChannelChattersUnofficialAPI = async (): Promise<{ modStatus: bo
     if (typeof channel === 'undefined') {
       throw Error('channel undefined');
     } else {
-      channel = JSON.parse(channel);
+      channel = JSON.parse(channel).toLowerCase();
     }
     if (bot) {
-      bot = JSON.parse(bot);
+      bot = JSON.parse(bot).toLowerCase();
     }
 
     const url = `https://tmi.twitch.tv/group/user/${channel}/chatters`;
