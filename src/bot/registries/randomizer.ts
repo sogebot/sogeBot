@@ -65,6 +65,16 @@ class Randomizer extends Registry {
         cb (e, null);
       }
     });
+    adminEndpoint(this.nsp, 'randomizer::getVisible', async (cb) => {
+      try {
+        cb(
+          null,
+          await getRepository(RandomizerEntity).findOne({ where: { isShown: true }, relations: ['items'] })
+        );
+      } catch (e) {
+        cb (e, null);
+      }
+    });
   }
 }
 

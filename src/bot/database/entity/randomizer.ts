@@ -3,7 +3,7 @@ import { ColumnNumericTransformer } from './_transformer';
 
 export interface RandomizerInterface {
   id?: string;
-  items?: RandomizerItemInterface[];
+  items?: Required<RandomizerItemInterface>[];
   createdAt?: number;
   command: string;
   permissionId: string;
@@ -13,7 +13,6 @@ export interface RandomizerInterface {
   customizationFont: {
     family: string;
     size: number;
-    color: string;
     borderColor: string;
     borderPx: number;
   };
@@ -21,8 +20,8 @@ export interface RandomizerInterface {
 
 export interface RandomizerItemInterface {
   id?: string;
-  randomizer?: RandomizerInterface;
-  randomizerId?: string | null;
+  randomizer: RandomizerInterface | undefined;
+  randomizerId: string | null | undefined;
   /*
    * This should hlp with grouping things like Bancrupcy, WIN, Bancrupcy, to always appear beside
    */
@@ -42,6 +41,8 @@ export const Randomizer = new EntitySchema<Readonly<Required<RandomizerInterface
     isShown: { type: Boolean, default: false },
     type: { type: 'varchar', length: 20, default: 'simple' },
     customizationFont: { type: 'simple-json' },
+    permissionId: { type: String },
+    name: { type: String },
   },
   relations: {
     items: {

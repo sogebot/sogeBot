@@ -127,25 +127,6 @@
             b-col(cols="6")
               b-form-group
                 b-row.px-3
-                  label(for="fonts_color_input").w-100 {{ translate('registry.goals.input.color.title') }}
-                  b-input(
-                    class="col-10"
-                    v-model.trim="item.customizationFont.color"
-                    type="text"
-                    @input="$v.item.customizationFont.color.$touch()"
-                    :state="$v.item.customizationFont.color.$invalid && $v.item.customizationFont.color.$dirty ? false : null"
-                  )
-                  b-input(
-                    class="col-2"
-                    v-model.trim="item.customizationFont.color"
-                    type="color" id="fonts_color_input"
-                    @input="$v.item.customizationFont.color.$touch()"
-                    :state="$v.item.customizationFont.color.$invalid && $v.item.customizationFont.color.$dirty ? false : null"
-                  )
-                  b-form-invalid-feedback( :state="!($v.item.customizationFont.color.$invalid && $v.item.customizationFont.color.$dirty)")
-                    | {{ translate('errors.invalid_format') }}
-
-                b-row.px-3
                   label(for="fonts_border_color_input").w-100 {{ translate('registry.goals.input.borderColor.title') }}
                   b-input(
                     class="col-10"
@@ -223,6 +204,7 @@
         b-card-header
           | {{ translate('registry.randomizer.form.generatedOptionsPreview') }}
         b-card-text(style="overflow: auto;")
+          b-alert(show v-if="generateItems(item.items).length === 0").h-100.m-0.text-center {{translate('registry.randomizer.form.optionsAreEmpty')}}
           b-list-group(horizontal="md")
             b-list-group-item(
               v-for="(item, index) of generateItems(item.items)"
@@ -304,7 +286,6 @@ export default class randomizerEdit extends Vue {
     customizationFont: {
       family: 'PT Sans',
       size: 16,
-      color: '#ffffff',
       borderColor: '#000000',
       borderPx: 1,
     }
@@ -444,6 +425,8 @@ export default class randomizerEdit extends Vue {
       numOfDuplicates: 1,
       minimalSpacing: 1,
       groupId: null,
+      randomizer: undefined,
+      randomizerId: undefined,
     })
   }
 

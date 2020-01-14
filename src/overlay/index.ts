@@ -3,6 +3,7 @@ import Vue from 'vue';
 import translate from '../panel/helpers/translate';
 import LoadScript from 'vue-plugin-load-script';
 import VueRouter from 'vue-router';
+import BootstrapVue from 'bootstrap-vue';
 
 import { ButtonStates, states } from '../panel/helpers/buttonStates';
 
@@ -17,6 +18,7 @@ Vue.use(VueMoment, {
 });
 Vue.use(VueRouter);
 Vue.use(LoadScript);
+Vue.use(BootstrapVue);
 
 
 export interface Global {
@@ -57,6 +59,7 @@ const overlays = async () => {
       { path: '/overlays/eventlist', name: 'eventlistOverlay', component: () => import('./views/eventlist.vue') },
       { path: '/overlays/goals/:id', name: 'goalsOverlay', component: () => import('./views/goals.vue') },
       { path: '/overlays/polls', name: 'pollsOverlay', component: () => import('./views/polls.vue') },
+      { path: '/overlays/randomizer', name: 'randomizerOverlay', component: () => import('./views/randomizer.vue') },
       { path: '/overlays/stats', name: 'statsOverlay', component: () => import('./views/stats.vue') },
       { path: '/overlays/text', name: 'textOverlay', component: () => import('./views/text.vue') },
       { path: '/overlays/wheeloffortune', name: 'wheeloffortuneOverlay', component: () => import('./views/wheeloffortune.vue') },
