@@ -94,7 +94,8 @@ async function test() {
   })
 
   if(status !== 0) {
-    retest()
+    status = 0; // reset status for retest
+    retest();
   } else {
     process.exit(0);
   }
