@@ -76,9 +76,9 @@ Stats.prototype.save = async function (data) {
   if (data.timestamp - this.latestTimestamp >= 30000) {
     const statsFromDB = await getRepository(TwitchStats).findOne({'whenOnline': new Date(data.whenOnline).getTime() });
     await getRepository(TwitchStats).save({
-      currentViewers: statsFromDb ? Math.round((data.currentViewers + statsFromDB.currentViewers) / 2) : data.currentViewers,
-      currentHosts: statsFromDb ? Math.round((data.currentHosts + statsFromDB.currentHosts) / 2) : data.currentHosts,
-      whenOnline: statsFromDb ? statsFromDB.whenOnline : Date.now(),
+      currentViewers: statsFromDB ? Math.round((data.currentViewers + statsFromDB.currentViewers) / 2) : data.currentViewers,
+      currentHosts: statsFromDB ? Math.round((data.currentHosts + statsFromDB.currentHosts) / 2) : data.currentHosts,
+      whenOnline: statsFromDB ? statsFromDB.whenOnline : Date.now(),
       currentSubscribers: data.currentSubscribers,
       currentBits: data.currentBits,
       currentTips: data.currentTips,
