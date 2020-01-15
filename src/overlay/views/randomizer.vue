@@ -43,9 +43,9 @@ export default class RandomizerOverlay extends Vue {
   data: Required<RandomizerInterface> | null = null;
 
   showSimpleValueIndex = 0;
-  stopSimpleSpinAt = 0;
   showSimpleSpeed = 1; // lower = faster
   showSimpleBlink = true;
+  showSimpleLoop = 0;
 
   created () {
     setInterval(() => {
@@ -104,11 +104,12 @@ textStrokeGenerator(radius, color) {
   spin() {
     if (this.data !== null) {
       if (this.data.type === 'simple') {
-        this.stopSimpleSpinAt = Date.now() + 10000 + Math.floor(Math.random() * 2000);
-        this.showSimpleSpeed = 50;
+        this.showSimpleLoop = 500 + Math.floor(Math.random() * this.generateItems(this.data.items).length);
+        this.showSimpleSpeed = 1;
         const blink = () => {
-          if (Date.now() - this.stopSimpleSpinAt < 2000) {
+          if (this.showSimpleLoop > -10) {
             this.showSimpleBlink = !this.showSimpleBlink;
+            this.showSimpleLoop--;
             setTimeout(blink, 100);
           } else {
             this.showSimpleBlink = true;
@@ -118,20 +119,32 @@ textStrokeGenerator(radius, color) {
           if (this.data === null) {
             return;
           }
-
-          if (this.stopSimpleSpinAt - Date.now() < 4000 && this.stopSimpleSpinAt - Date.now() > 2000) {
-            this.showSimpleSpeed = 100;
-          } else if (this.stopSimpleSpinAt - Date.now() < 2000) {
-            this.showSimpleSpeed = 200;
-          } else {
+          if (this.showSimpleLoop > 300) {
+            this.showSimpleSpeed = 5;
+          } else if (this.showSimpleLoop > 80) {
+            this.showSimpleSpeed = 10;
+          } else if (this.showSimpleLoop > 60) {
+            this.showSimpleSpeed = 30;
+          } else if (this.showSimpleLoop > 40) {
             this.showSimpleSpeed = 50;
+          } else if (this.showSimpleLoop > 30) {
+            this.showSimpleSpeed = 75;
+          } else if (this.showSimpleLoop > 20) {
+            this.showSimpleSpeed = 100;
+          } else if (this.showSimpleLoop > 5) {
+            this.showSimpleSpeed = 200;
+          } else if (this.showSimpleLoop > 2) {
+            this.showSimpleSpeed = 500;
+          } else {
+            this.showSimpleSpeed = 1000;
           }
 
           this.showSimpleValueIndex++;
           if (typeof this.generateItems(this.data.items)[this.showSimpleValueIndex] === 'undefined') {
             this.showSimpleValueIndex = 0;
           }
-          if (this.stopSimpleSpinAt > Date.now()) {
+          this.showSimpleLoop--;
+          if (this.showSimpleLoop > 0) {
             setTimeout(next, this.showSimpleSpeed)
           } else {
             setTimeout(blink, this.showSimpleSpeed);
