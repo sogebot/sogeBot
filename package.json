@@ -221,7 +221,7 @@
     "webpack-bundle-analyzer": "3.6.0",
     "webpack-cli": "3.3.10",
     "weekstart": "1.0.1",
-    "winwheel": "1.0.1"
+    "winwheel": "git+https://github.com/sogehige/javascript-winwheel.git"
   },
   "husky": {
     "hooks": {

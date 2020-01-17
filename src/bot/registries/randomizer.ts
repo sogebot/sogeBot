@@ -38,6 +38,9 @@ class Randomizer extends Registry {
         cb (e, null);
       }
     });
+    adminEndpoint(this.nsp, 'randomizer::startSpin', async () => {
+      this.socket.emit('spin');
+    });
     adminEndpoint(this.nsp, 'randomizer::showById', async (id: string, cb) => {
       try {
         await getRepository(RandomizerEntity).update({}, { isShown: false });

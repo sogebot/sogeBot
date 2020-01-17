@@ -35,6 +35,11 @@
             :class="{ 'btn-success': data.item.isShown, 'btn-danger': !data.item.isShown }"
             :icon="!data.item.isShown ? 'eye-slash' : 'eye'"
           ).btn-only-icon
+          button-with-icon(
+            @click="startSpin"
+            class="btn-secondary ml-0 mr-0"
+            icon="circle-notch" :spin="spin" :disabled="spin"
+          ).btn-only-icon
           button-with-icon(icon="edit" v-bind:href="'#/registry/randomizer/edit/' + data.item.id").btn-only-icon.btn-primary.btn-reverse
             | {{ translate('dialog.buttons.edit') }}
           hold-button(@trigger="remove(data.item)" icon="trash").btn-danger.btn-reverse.btn-only-icon
@@ -74,6 +79,7 @@ export default class randomizerList extends Vue {
   items: Required<RandomizerInterface>[] = [];
   permissions: {id: string; name: string;}[] = [];
   search: string = '';
+  spin = false;
 
   state: {
     loading: number;
@@ -123,6 +129,14 @@ export default class randomizerList extends Vue {
     ])
 
     this.state.loading = this.$state.success;
+  }
+
+  startSpin() {
+    this.spin = true;
+    this.socket.emit('randomizer::startSpin', () => {});
+    setTimeout(() => {
+      this.spin = false;
+    }, 5000);
   }
 
   remove(item) {

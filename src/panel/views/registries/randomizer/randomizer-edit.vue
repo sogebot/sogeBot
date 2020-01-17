@@ -29,6 +29,12 @@
         ).btn-only-icon
         button-with-icon(
           v-if="$route.params.id && state.loading === $state.success"
+          @click="startSpin"
+          class="btn-secondary ml-0 mr-0"
+          icon="circle-notch" :spin="spin" :disabled="spin"
+        ).btn-only-icon
+        button-with-icon(
+          v-if="$route.params.id && state.loading === $state.success"
           text="/overlays/randomizer"
           href="/overlays/randomizer"
           class="btn-dark mr-2 ml-0"
@@ -269,6 +275,7 @@ export default class randomizerEdit extends Vue {
     save: this.$state.idle,
   };
   pending = false;
+  spin = false;
 
   fonts: { text: string, value: string }[] = [];
 
@@ -445,6 +452,14 @@ export default class randomizerEdit extends Vue {
         this.$router.push({ name: 'RandomizerRegistryList' });
       }
     })
+  }
+
+  startSpin() {
+    this.spin = true;
+    this.socket.emit('randomizer::startSpin', () => {});
+    setTimeout(() => {
+      this.spin = false;
+    }, 5000);
   }
 
   toggleVisibility() {
