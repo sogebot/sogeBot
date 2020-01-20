@@ -52,6 +52,9 @@ export const Randomizer = new EntitySchema<Readonly<Required<RandomizerInterface
       cascade: true,
     },
   },
+  indices: [
+    { name: 'idx_randomizer_cmdunique', unique: true, columns: ['command'] },
+  ],
 });
 
 export const RandomizerItem = new EntitySchema<Readonly<Required<RandomizerItemInterface>>>({

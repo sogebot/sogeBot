@@ -17,8 +17,10 @@ export const cleanViewersCache = () => {
   cachedViewers = {};
 };
 
-export const getfromViewersCache = (userId: number, permId: string) => {
+export const getFromViewersCache = (userId: number | string, permId: string) => {
+  userId = Number(userId);
   const permList = cachedViewers[userId];
+  console.log({get: true, userId, permId, permList});
   if (permList) {
     return permList[permId];
   } else {
@@ -26,9 +28,12 @@ export const getfromViewersCache = (userId: number, permId: string) => {
   }
 };
 
-export const addToViewersCache = (userId: number, permId: string, haveAccess: boolean) => {
+export const addToViewersCache = (userId: number | string, permId: string, haveAccess: boolean) => {
+  userId = Number(userId);
+  console.log({add: true, permId, userId, haveAccess});
   if (typeof cachedViewers[userId] === 'undefined') {
     cachedViewers[userId] = {};
   }
   cachedViewers[userId][permId] = haveAccess;
+  console.log({cachedViewers});
 };

@@ -1,8 +1,12 @@
-import Registry from './_interface';
-import { adminEndpoint } from '../helpers/socket';
-
 import { getRepository } from 'typeorm';
+
+import { LOW } from '../constants';
 import { Randomizer as RandomizerEntity, RandomizerInterface } from '../database/entity/randomizer';
+import { parser } from '../decorators';
+import { adminEndpoint } from '../helpers/socket';
+import Registry from './_interface';
+import { addToViewersCache, getFromViewersCache } from '../helpers/permissions';
+import permissions from '../permissions';
 
 class Randomizer extends Registry {
   constructor() {
@@ -78,6 +82,50 @@ class Randomizer extends Registry {
         cb (e, null);
       }
     });
+  }
+
+
+  /**
+   * Check if command is in randomizer (priority: low, fireAndForget)
+   *
+   * !<command> - hide/show randomizer
+   *
+   * !<command> go - spin up randomizer
+   */
+  @parser({ priority: LOW, fireAndForget: true })
+  async run (opts: ParserOptions) {
+    if (!opts.message.startsWith('!')) {
+      return true;
+    } // do nothing if it is not a command
+
+    const [command, subcommand] = opts.message.split(' ');
+
+    const randomizer = await getRepository(RandomizerEntity).findOne({ command });
+    if (!randomizer) {
+      return true;
+    }
+
+    if (typeof getFromViewersCache(opts.sender.userId, randomizer.permissionId) === 'undefined') {
+      addToViewersCache(
+        opts.sender.userId,
+        randomizer.permissionId,
+        (await permissions.check(opts.sender.userId, randomizer.permissionId, false)).access,
+      );
+    };
+
+    // user doesn't have permision to use command
+    if (!getFromViewersCache(opts.sender.userId, randomizer.permissionId)) {
+      return true;
+    }
+
+    if (!subcommand) {
+      await getRepository(RandomizerEntity).update({}, { isShown: false });
+      await getRepository(RandomizerEntity).update({ id: randomizer.id }, { isShown: !randomizer.isShown });
+    } else if (subcommand === 'go') {
+      this.socket.emit('spin');
+    }
+
+    return true;
   }
 }
 

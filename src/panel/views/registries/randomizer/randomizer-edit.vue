@@ -313,9 +313,6 @@ export default class randomizerEdit extends Vue {
         mustBeExisting: (value) => !!this.getPermissionName(value),
       },
       customizationFont: {
-        color: {
-          isColor: (value) => !!value.match(/^(#{1})([0-9A-F]{8}|[0-9A-F]{6})$/ig),
-        },
         borderColor: {
           isColor: (value) => !!value.match(/^(#{1})([0-9A-F]{8}|[0-9A-F]{6})$/ig),
         },
@@ -475,17 +472,18 @@ export default class randomizerEdit extends Vue {
     this.$v.$touch();
     if (!this.$v.$invalid) {
       this.state.save = this.$state.progress;
-      await new Promise((resolve, reject) => {
+      await new Promise((resolve) => {
         console.debug('Saving randomizer', this.item);
         this.socket.emit('randomizer::save', this.item, (err, data) => {
           if (err) {
             this.state.save = this.$state.fail;
-            reject(console.error(err));
+            console.error(err.message)
+          } else {
+            this.pending = false;
+            this.$router.push({ name: 'RandomizerRegistryEdit', params: { id: this.item.id } }).catch(err => {})
+            this.state.save = this.$state.success;
           }
-          this.pending = false;
-          this.$router.push({ name: 'RandomizerRegistryEdit', params: { id: this.item.id } }).catch(err => {})
-          this.state.save = this.$state.success;
-          resolve()
+          resolve();
         });
       });
     }
