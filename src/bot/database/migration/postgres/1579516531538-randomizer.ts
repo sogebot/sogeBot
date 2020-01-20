@@ -8,6 +8,7 @@ export class randomizer1579516531538 implements MigrationInterface {
     await queryRunner.query(`CREATE UNIQUE INDEX "idx_randomizer_cmdunique" ON "randomizer" ("command") `, undefined);
     await queryRunner.query(`CREATE TABLE "randomizer_item" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "randomizerId" uuid, "groupId" character varying, "name" character varying NOT NULL, "color" character varying(9), "numOfDuplicates" integer NOT NULL DEFAULT 1, "minimalSpacing" integer NOT NULL DEFAULT 1, CONSTRAINT "PK_14948f077878dd238f5490f33ec" PRIMARY KEY ("id"))`, undefined);
     await queryRunner.query(`ALTER TABLE "randomizer_item" ADD CONSTRAINT "FK_f4505c5b831084d188f4d1aabc7" FOREIGN KEY ("randomizerId") REFERENCES "randomizer"("id") ON DELETE CASCADE ON UPDATE CASCADE`, undefined);
+    await queryRunner.query(`DELETE FROM "settings" WHERE "namespace"="/games/wheeloffortune"`, undefined);
   }
 
   public async down(queryRunner: QueryRunner): Promise<any> {

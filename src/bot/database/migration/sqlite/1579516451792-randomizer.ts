@@ -11,6 +11,7 @@ export class randomizer1579516451792 implements MigrationInterface {
     await queryRunner.query(`INSERT INTO "temporary_randomizer_item"("id", "randomizerId", "groupId", "name", "color", "numOfDuplicates", "minimalSpacing") SELECT "id", "randomizerId", "groupId", "name", "color", "numOfDuplicates", "minimalSpacing" FROM "randomizer_item"`, undefined);
     await queryRunner.query(`DROP TABLE "randomizer_item"`, undefined);
     await queryRunner.query(`ALTER TABLE "temporary_randomizer_item" RENAME TO "randomizer_item"`, undefined);
+    await queryRunner.query(`DELETE FROM "settings" WHERE "namespace"="/games/wheeloffortune"`, undefined);
   }
 
   public async down(queryRunner: QueryRunner): Promise<any> {

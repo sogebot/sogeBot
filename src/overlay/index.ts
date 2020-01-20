@@ -62,7 +62,6 @@ const overlays = async () => {
       { path: '/overlays/randomizer', name: 'randomizerOverlay', component: () => import('./views/randomizer.vue') },
       { path: '/overlays/stats', name: 'statsOverlay', component: () => import('./views/stats.vue') },
       { path: '/overlays/text', name: 'textOverlay', component: () => import('./views/text.vue') },
-      { path: '/overlays/wheeloffortune', name: 'wheeloffortuneOverlay', component: () => import('./views/wheeloffortune.vue') },
     ],
   });
 
