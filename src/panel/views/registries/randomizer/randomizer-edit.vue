@@ -477,6 +477,11 @@ export default class randomizerEdit extends Vue {
         this.socket.emit('randomizer::save', this.item, (err, data) => {
           if (err) {
             this.state.save = this.$state.fail;
+            this.$bvToast.toast(err.message, {
+              title: `Error`,
+              variant: 'danger',
+              solid: true,
+            });
             console.error(err.message)
           } else {
             this.pending = false;
