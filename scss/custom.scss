@@ -1,3 +1,13 @@
+.table thead th {
+  font-size: 1rem !important;
+  color: #e9ecef;
+  font-variant: small-caps;
+  text-transform: lowercase;
+  font-weight: bold;
+  text-indent: 1rem;
+  letter-spacing: 1px;
+}
+
 .modal-w-90 {
   max-width: 90% !important;
 }
@@ -13,6 +23,10 @@ body {
 
 .font-bigger {
   font-size: 1.2rem;
+}
+
+.font-smaller {
+  font-size: 0.6rem;
 }
 
 @media (min-width: 900px) {

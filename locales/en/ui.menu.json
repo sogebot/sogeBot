@@ -42,7 +42,6 @@
   "seppuku": "Seppuku",
   "gamble": "Gamble",
   "roulette": "Roulette",
-  "wheeloffortune": "Wheel of Fortune",
   "heist": "Heist",
   "oauth": "OAuth",
   "socket": "Socket",
@@ -75,5 +74,6 @@
   "scrim": "Scrim",
   "commandcount": "Command count",
   "howlongtobeat": "How long to beat",
-  "responsivevoice": "ResponsiveVoice"
+  "responsivevoice": "ResponsiveVoice",
+  "randomizer": "Randomizer"
 }

@@ -267,7 +267,6 @@ enum State {
     'textarea-from-array': () => import('./components/interface/textarea-from-array.vue'),
     'uuid-generator': () => import('./components/interface/uuid-generator.vue'),
     'toggle-enable': () => import('../../components/toggle-enable.vue'),
-    'wof-responses': () => import('./components/interface/wof-responses.vue'),
     }
 })
 export default class interfaceSettings extends Vue {

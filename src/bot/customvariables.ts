@@ -12,7 +12,7 @@ import { getOwnerAsSender, getTime, isModerator, prepare, sendMessage } from './
 import { getRepository } from 'typeorm';
 import { User, UserInterface } from './database/entity/user';
 import { Variable, VariableInterface, VariableWatch } from './database/entity/variable';
-import { addToViewersCache, getfromViewersCache } from './helpers/permissions';
+import { addToViewersCache, getFromViewersCache } from './helpers/permissions';
 import users from './users';
 import api from './api';
 import permissions from './permissions';
@@ -391,11 +391,11 @@ class CustomVariables {
       }
 
       if (opts.sender) {
-        if (typeof getfromViewersCache(opts.sender.userId, item.permission) === 'undefined') {
+        if (typeof getFromViewersCache(opts.sender.userId, item.permission) === 'undefined') {
           addToViewersCache(opts.sender.userId, item.permission, (await permissions.check(opts.sender.userId, item.permission, false)).access);
         }
       }
-      const permissionsAreValid = isNil(opts.sender) || getfromViewersCache(opts.sender.userId, item.permission);
+      const permissionsAreValid = isNil(opts.sender) || getFromViewersCache(opts.sender.userId, item.permission);
       if ((item.readOnly && !opts.readOnlyBypass) || !permissionsAreValid) {
         isOk = false;
       } else {

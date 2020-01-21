@@ -5,7 +5,7 @@ import { debug, error } from './helpers/log';
 import { incrementCountOfCommandUsage } from './helpers/commands/count';
 import { getRepository } from 'typeorm';
 import { PermissionCommands } from './database/entity/permissions';
-import { addToViewersCache, getfromViewersCache } from './helpers/permissions';
+import { addToViewersCache, getFromViewersCache } from './helpers/permissions';
 import permissions from './permissions';
 import events from './events';
 import users from './users';
@@ -76,14 +76,14 @@ class Parser {
       }; // skip moderation parsers
 
       if (this.sender) {
-        if (typeof getfromViewersCache(this.sender.userId, parser.permission) === 'undefined') {
+        if (typeof getFromViewersCache(this.sender.userId, parser.permission) === 'undefined') {
           addToViewersCache(this.sender.userId, parser.permission, (await permissions.check(this.sender.userId, parser.permission, false)).access);
         }
       }
       if (
         _.isNil(this.sender) // if user is null -> we are running command through a bot
         || this.skip
-        || getfromViewersCache(this.sender.userId, parser.permission)
+        || getFromViewersCache(this.sender.userId, parser.permission)
       ) {
         debug('parser.process', 'Processing ' + parser.name + ' (fireAndForget: ' + parser.fireAndForget + ')');
         const opts = {
@@ -137,7 +137,7 @@ class Parser {
       general,
       tmi,
     ];
-    for (const dir of ['systems', 'games', 'overlays', 'integrations']) {
+    for (const dir of ['systems', 'games', 'overlays', 'integrations', 'registries']) {
       for (let system of glob.sync(__dirname + '/' + dir + '/*')) {
         system = system.split('/' + dir + '/')[1].replace('.js', '');
         if (system.startsWith('_')) {
@@ -244,7 +244,7 @@ class Parser {
     }; // command is disabled
 
     if (this.sender) {
-      if (typeof getfromViewersCache(this.sender.userId, command.permission) === 'undefined') {
+      if (typeof getFromViewersCache(this.sender.userId, command.permission) === 'undefined') {
         addToViewersCache(this.sender.userId, command.permission, (await permissions.check(this.sender.userId, command.permission, false)).access);
       }
     }
@@ -252,7 +252,7 @@ class Parser {
     if (
       _.isNil(this.sender) // if user is null -> we are running command through a bot
       || this.skip
-      || getfromViewersCache(this.sender.userId, command.permission)
+      || getFromViewersCache(this.sender.userId, command.permission)
     ) {
       const text = message.trim().replace(new RegExp('^(' + command.command + ')', 'i'), '').trim();
       const opts = {

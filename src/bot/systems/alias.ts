@@ -15,7 +15,7 @@ import { debug, warning } from '../helpers/log';
 import { Alias as AliasEntity, AliasInterface } from '../database/entity/alias';
 import { getRepository } from 'typeorm';
 import { adminEndpoint, publicEndpoint } from '../helpers/socket';
-import { addToViewersCache, getfromViewersCache } from '../helpers/permissions';
+import { addToViewersCache, getFromViewersCache } from '../helpers/permissions';
 import permissions from '../permissions';
 import { translate } from '../translate';
 import tmi from '../tmi';
@@ -105,10 +105,10 @@ class Alias extends System {
         warning(`Cannot run alias ${alias.alias}, because it exec ${alias.command}`);
         return false;
       } else {
-        if (typeof getfromViewersCache(opts.sender.userId, alias.permission) === 'undefined') {
+        if (typeof getFromViewersCache(opts.sender.userId, alias.permission) === 'undefined') {
           addToViewersCache(opts.sender.userId, alias.permission, (await permissions.check(opts.sender.userId, alias.permission, false)).access);
         }
-        if (getfromViewersCache(opts.sender.userId, alias.permission)) {
+        if (getFromViewersCache(opts.sender.userId, alias.permission)) {
           // parse variables
           const message = await new Message(opts.message.replace(replace, `${alias.command}`)).parse({
             sender: opts.sender,
