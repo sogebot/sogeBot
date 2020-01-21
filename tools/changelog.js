@@ -45,11 +45,12 @@ if (argv._[0] === 'cli') {
     } else if (body.stdout.toString().match(fixesRegexpForum)) {
       const text = body.stdout.toString().match(fixesRegexpForum)[0]
       const link = text.split(' ')[1];
-      const number = link.match(/\d*$/)[0];
-
-      fixes = [
-        `Fixes [community#${number}](${link})`
-      ]
+      if (link) {
+        const number = link.match(/\d*$/)[0];
+        fixes = [
+          `Fixes [community#${number}](${link})`,
+        ];
+      }
     }
 
     return { commit, message: o.slice(i+1).trim(), fixes };
