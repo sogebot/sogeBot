@@ -390,13 +390,13 @@ function Panel () {
       for (const w of dashboard.widgets) {
         y = Math.max(y, w.positionY + w.height);
       }
-      const widget = new Widget();
-      widget.name = widgetName;
-      widget.positionX = 0;
-      widget.positionY = y;
-      widget.width = 4;
-      widget.height = 3;
-      dashboard.widgets.push(widget);
+      dashboard.widgets.push({
+        name: widgetName,
+        positionX: 0,
+        positionY: y,
+        width: 4,
+        height: 3,
+      });
       cb(await getRepository(Dashboard).save(dashboard));
     })
     socket.on('updateWidgets', async (dashboards) => {
