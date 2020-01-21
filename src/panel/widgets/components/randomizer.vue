@@ -110,6 +110,8 @@ export default {
       isSpinning: false,
       diceIcon: ['one', 'two', 'three', 'four', 'five', 'six'],
       diceIconIdx: 0,
+
+      interval: 0,
       }
   },
   created: async function () {
@@ -119,11 +121,14 @@ export default {
     ])
     this.state.loading = this.$state.success;
 
-    setInterval(() => {
+    this.interval = setInterval(() => {
       if (this.isSpinning) {
         this.diceIconIdx = Math.floor(Math.random() * this.diceIcon.length);
       }
     }, 100)
+  },
+  beforeDestroy() {
+    clearInterval(this.interval);
   },
   computed: {
     watchedItems: function () {
