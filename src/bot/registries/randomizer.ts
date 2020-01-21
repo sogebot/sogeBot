@@ -33,7 +33,7 @@ class Randomizer extends Registry {
         cb (e, null);
       }
     });
-    adminEndpoint(this.nsp, 'randomizer::save', async (item: RandomizerInterface, cb) => {
+    adminEndpoint(this.nsp, 'randomizer::save', async (item: RandomizerInterface & RandomizerInterface[], cb) => {
       try {
         cb(
           null,
