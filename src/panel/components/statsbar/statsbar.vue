@@ -571,6 +571,8 @@
           } else {
             if (shorten) {
               f_difference = this.shortenNumber(f_difference, this.b_shortenNumber)
+            } else {
+              f_difference = Number(f_difference).toFixed(1)
             }
             if (toFixed) {
               f_difference = Number(f_difference).toFixed(toFixed)
