@@ -95,6 +95,7 @@ export default {
     part: () => import('src/panel/widgets/components/part.vue'),
     queue: () => import('src/panel/widgets/components/queue.vue'),
     raffles: () => import('src/panel/widgets/components/raffles.vue'),
+    randomizer: () => import('src/panel/widgets/components/randomizer.vue'),
     soundboard: () => import('src/panel/widgets/components/soundboard.vue'),
     spotify: () => import('src/panel/widgets/components/spotify.vue'),
     twitch: () => import('src/panel/widgets/components/twitch.vue'),
