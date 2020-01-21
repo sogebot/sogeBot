@@ -9,7 +9,7 @@ export interface RandomizerInterface {
   permissionId: string;
   name: string;
   isShown?: boolean;
-  widgetOrder?: number;
+  widgetOrder: number;
   type: 'simple' | 'wheelOfFortune';
   customizationFont: {
     family: string;
@@ -44,7 +44,7 @@ export const Randomizer = new EntitySchema<Readonly<Required<RandomizerInterface
     customizationFont: { type: 'simple-json' },
     permissionId: { type: String },
     name: { type: String },
-    widgetOrder: { type: Number, default: -1 },
+    widgetOrder: { type: Number },
   },
   relations: {
     items: {
