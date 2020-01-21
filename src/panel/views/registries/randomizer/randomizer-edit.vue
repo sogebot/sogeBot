@@ -28,10 +28,15 @@
           :icon="!isShown ? 'eye-slash' : 'eye'"
         ).btn-only-icon
         button-with-icon(
-          v-if="$route.params.id && state.loading === $state.success"
+          v-if="$route.params.id && state.loading === $state.success && !spin"
           @click="startSpin"
           class="btn-secondary ml-0 mr-0"
-          icon="circle-notch" :spin="spin" :disabled="spin"
+          icon="dice"
+        ).btn-only-icon
+        button-with-icon(
+          v-else-if="$route.params.id && state.loading === $state.success && spin"
+          class="btn-secondary ml-0 mr-0"
+          icon="circle-notch" spin disabled="disabled"
         ).btn-only-icon
         button-with-icon(
           v-if="$route.params.id && state.loading === $state.success"
@@ -290,6 +295,7 @@ export default class randomizerEdit extends Vue {
     permissionId: permission.CASTERS,
     isShown: false,
     type: 'simple',
+    widgetOrder: -1,
     customizationFont: {
       family: 'PT Sans',
       size: 16,

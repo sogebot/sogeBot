@@ -12,6 +12,7 @@ class Randomizer extends Registry {
   constructor() {
     super();
     this.addMenu({ category: 'registry', name: 'randomizer', id: 'registry/randomizer/list' });
+    this.addWidget('randomizer', 'widget-title-randomizer', 'fas fa-dice');
   }
 
   sockets () {
