@@ -1,7 +1,8 @@
 import { settings } from '../decorators';
 import Widget from './_interface';
 import { adminEndpoint } from '../helpers/socket';
-import { getManager } from 'typeorm';
+import { getRepository } from 'typeorm';
+import { EventList as EventListDB } from '../database/entity/eventList';
 
 class EventList extends Widget {
   @settings()
@@ -40,21 +41,17 @@ class EventList extends Widget {
     });
 
     adminEndpoint(this.nsp, 'cleanup', () => {
-      getManager().createQueryBuilder()
-        .delete()
-        .from(EventList)
-        .execute();
+      getRepository(EventListDB).delete({});
     });
   }
 
   public async update() {
     try {
       this.emit('update',
-        await getManager().createQueryBuilder()
-          .select('events').from(EventList, 'events')
-          .orderBy('events.timestamp', 'DESC')
-          .limit(this.widgetEventlistShow)
-          .getMany()
+        await getRepository(EventListDB).find({
+          order: { timestamp: 'DESC' },
+          take: this.widgetEventlistShow,
+        })
       );
     } catch (e) {
       this.emit('update', []);
