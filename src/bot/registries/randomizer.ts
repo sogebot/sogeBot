@@ -1,7 +1,7 @@
-import { getRepository } from 'typeorm';
+import { getRepository, IsNull } from 'typeorm';
 
 import { LOW } from '../constants';
-import { Randomizer as RandomizerEntity, RandomizerInterface } from '../database/entity/randomizer';
+import { Randomizer as RandomizerEntity, RandomizerInterface, RandomizerItem } from '../database/entity/randomizer';
 import { parser } from '../decorators';
 import { adminEndpoint } from '../helpers/socket';
 import Registry from './_interface';
@@ -24,20 +24,24 @@ class Randomizer extends Registry {
       );
     });
     adminEndpoint(this.nsp, 'randomizer::remove', async (item: Required<RandomizerInterface>, cb) => {
+      const result = await getRepository(RandomizerEntity).remove(item);
+      await getRepository(RandomizerItem).delete({ groupId: IsNull() });
       try {
         cb(
           null,
-          await getRepository(RandomizerEntity).remove(item)
+          result,
         );
       } catch (e) {
         cb (e, null);
       }
     });
     adminEndpoint(this.nsp, 'randomizer::save', async (item: RandomizerInterface & RandomizerInterface[], cb) => {
+      const result = await getRepository(RandomizerEntity).save(item);
+      await getRepository(RandomizerItem).delete({ groupId: IsNull() });
       try {
         cb(
           null,
-          await getRepository(RandomizerEntity).save(item)
+          result,
         );
       } catch (e) {
         cb (e, null);
