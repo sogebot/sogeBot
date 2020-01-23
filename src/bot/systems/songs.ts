@@ -13,7 +13,7 @@ import System from './_interface';
 import { onChange, onLoad } from '../decorators/on';
 import { error, info } from '../helpers/log';
 import { adminEndpoint, publicEndpoint } from '../helpers/socket';
-import { Brackets, getRepository, getConnection } from 'typeorm';
+import { Brackets, getConnection, getRepository } from 'typeorm';
 import { SongBan, SongPlaylist, SongPlaylistInterface, SongRequest } from '../database/entity/song';
 import oauth from '../oauth';
 import { translate } from '../translate';
