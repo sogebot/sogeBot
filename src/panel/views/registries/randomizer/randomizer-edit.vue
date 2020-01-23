@@ -211,6 +211,17 @@
                   template(slot="title") {{translate('dialog.buttons.delete')}}
                   template(slot="onHoldTitle") {{translate('dialog.buttons.hold-to-delete')}}
 
+      b-card(no-body).mt-2
+        b-card-header
+          | {{ translate('registry.randomizer.form.probability') }}
+        b-card-text(style="overflow: auto;")
+          b-list-group(style="flex-direction: row;").row.no-gutters
+            b-list-group-item.col-6.col-sm-4.col-md-2.text-center(
+              v-for="(uitem, index) of Array.from(new Set(item.items.map(o => o.name)))"
+              :key="'probability' + index + uitem"
+            )
+              | {{ uitem }} &nbsp;
+              strong {{Number((generateItems(item.items).filter(o => o.name === uitem).length / generateItems(item.items).length) * 100).toFixed(2)}}%
       b-card(no-body).mt-2.mb-5
         b-card-header
           | {{ translate('registry.randomizer.form.generatedOptionsPreview') }}
