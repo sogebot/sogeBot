@@ -80,7 +80,7 @@ class HowLongToBeat extends System {
 
   @command('!hltb')
   @default_permission(permission.CASTERS)
-  async currentGameInfo(opts: CommandOptions) {
+  async currentGameInfo(opts: CommandOptions, retry = false) {
     let [game] = new Expects(opts.parameters)
       .everything({ optional: true })
       .toArray();
@@ -93,7 +93,36 @@ class HowLongToBeat extends System {
       }
     }
     const gameToShow = await getRepository(HowLongToBeatGame).findOne({ where: { game } });
-    if (!gameToShow) {
+    if (!gameToShow && !retry) {
+      if (!api.stats.currentGame) {
+        this.currentGameInfo(opts, true);
+        return; // skip if we don't have game
+      }
+
+      if (api.stats.currentGame.trim().length === 0 || api.stats.currentGame.trim() === 'IRL') {
+        this.currentGameInfo(opts, true);
+        return; // skip if we have empty game
+      }
+      const gamesFromHltb = await this.hltbService.search(api.stats.currentGame);
+      const gameFromHltb = gamesFromHltb.length > 0 ? gamesFromHltb[0] : null;
+      const game = {
+        game: api.stats.currentGame,
+        gameplayMain: (gameFromHltb || { gameplayMain: 0 }).gameplayMain,
+        gameplayCompletionist: (gameFromHltb || { gameplayMain: 0 }).gameplayCompletionist,
+        isFinishedMain: false,
+        isFinishedCompletionist: false,
+        timeToBeatMain: 0,
+        timeToBeatCompletionist: 0,
+        imageUrl: (gameFromHltb || { imageUrl: '' }).imageUrl,
+        startedAt: Date.now(),
+      };
+      if (game.gameplayMain > 0) {
+        // save only if we have numbers from hltb (possible MP game)
+        await getRepository(HowLongToBeatGame).save(game);
+      }
+      this.currentGameInfo(opts, true);
+      return;
+    } else if (!gameToShow) {
       await sendMessage(prepare('systems.howlongtobeat.error', { game }), opts.sender, opts.attr);
       return;
     }
