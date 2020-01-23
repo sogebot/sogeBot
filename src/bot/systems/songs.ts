@@ -13,7 +13,7 @@ import System from './_interface';
 import { onChange, onLoad } from '../decorators/on';
 import { error, info } from '../helpers/log';
 import { adminEndpoint, publicEndpoint } from '../helpers/socket';
-import { Brackets, getRepository } from 'typeorm';
+import { Brackets, getRepository, getConnection } from 'typeorm';
 import { SongBan, SongPlaylist, SongPlaylistInterface, SongRequest } from '../database/entity/song';
 import oauth from '../oauth';
 import { translate } from '../translate';
@@ -87,6 +87,7 @@ class Songs extends System {
       return setTimeout(() => this.sockets(), 100);
     }
     publicEndpoint(this.nsp, 'find.playlist', async (opts: { page?: number; search?: string }, cb) => {
+      const connection = await getConnection();
       opts.page = opts.page ?? 0;
       const query = getRepository(SongPlaylist).createQueryBuilder('playlist')
         .offset(opts.page * 25)
@@ -94,8 +95,14 @@ class Songs extends System {
 
       if (typeof opts.search !== 'undefined') {
         query.andWhere(new Brackets(w => {
-          w.where('"playlist"."videoId" like :like', { like: `%${opts.search}%` });
-          w.orWhere('"playlist"."title" like :like', { like: `%${opts.search}%` });
+          if  (['postgres'].includes(connection.options.type.toLowerCase())) {
+            w.where('"playlist"."videoId" like :like', { like: `%${opts.search}%` });
+            w.orWhere('"playlist"."title" like :like', { like: `%${opts.search}%` });
+          } else {
+            w.where('playlist.videoId like :like', { like: `%${opts.search}%` });
+            w.orWhere('playlist.title like :like', { like: `%${opts.search}%` });
+          }
+
         }));
       }
 
