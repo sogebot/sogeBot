@@ -298,7 +298,7 @@ class Events extends Core {
   }
 
   public async fireSendChatMessageOrWhisper(operation, attributes, whisper) {
-    let username = _.isNil(attributes.username) ? getOwner() : attributes.username;
+    const username = _.isNil(attributes.username) ? getOwner() : attributes.username;
     let userId = attributes.userId;
     const userObj = await getRepository(User).findOne({ username });
     if (!userObj && !attributes.test) {
@@ -308,7 +308,6 @@ class Events extends Core {
       });
       return this.fireSendChatMessageOrWhisper(operation, {...attributes, userId, username }, whisper);
     } else if (attributes.test) {
-      username = username;
       userId = attributes.userId;
     } else if (!userObj) {
       return;
