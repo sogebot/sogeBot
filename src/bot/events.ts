@@ -298,14 +298,20 @@ class Events extends Core {
   }
 
   public async fireSendChatMessageOrWhisper(operation, attributes, whisper) {
-    const username = _.isNil(attributes.username) ? getOwner() : attributes.username;
+    let username = _.isNil(attributes.username) ? getOwner() : attributes.username;
+    let userId = attributes.userId;
     const userObj = await getRepository(User).findOne({ username });
-    if (!userObj) {
+    if (!userObj && !attributes.test) {
       await getRepository(User).save({
         userId: await api.getIdFromTwitch(username),
         username,
       });
-      return this.fireSendChatMessageOrWhisper(operation, attributes, whisper);
+      return this.fireSendChatMessageOrWhisper(operation, {...attributes, userId, username }, whisper);
+    } else if (attributes.test) {
+      username = username;
+      userId = attributes.userId;
+    } else if (!userObj) {
+      return;
     }
 
     let message = operation.messageToSend;
@@ -325,8 +331,8 @@ class Events extends Core {
     }
     sendMessage(message, {
       username,
-      displayName: userObj.displayname || username,
-      userId: userObj.userId,
+      displayName: userObj?.displayname || username,
+      userId: userId,
       emotes: [],
       badges: {},
       'message-type': (whisper ? 'whisper' : 'chat'),
@@ -596,6 +602,8 @@ class Events extends Core {
       const recipient = _.sample(['short', 'someFreakingLongUsername', generateUsername()]) || 'short';
       const months = _.random(0, 99, false);
       const attributes = {
+        test: true,
+        userId: 0,
         username,
         is: {
           moderator: _.random(0, 1, false) === 0,
