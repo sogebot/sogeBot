@@ -50,18 +50,18 @@
                     ).w-100
                       | {{ variable.name }} ... {{ variable.command }}
                     b-button(
-                      variant="primary"
+                      :variant="variable.isShown ? 'success' : 'danger'"
                       v-if="state.editation !== $state.progress"
                       @click="toggleIsShown(variable)"
-                    ).input-group-text
+                    )
                       fa(icon="eye" fixed-width v-if="variable.isShown")
                       fa(icon="eye-slash" fixed-width v-else)
                     b-button(
                       variant="dark"
-                      v-if="state.editation !== $state.progress"
+                      v-if="state.editation !== $state.progress && variable.isShown"
                       :disabled="!variable.isShown || isSpinning"
                       @click="spin"
-                    ).input-group-text
+                    )
                       fa(icon="dice" fixed-width v-if="!isSpinning || !variable.isShown")
                       fa(:icon="'dice-' + diceIcon[diceIconIdx]" fixed-width v-else)
 
