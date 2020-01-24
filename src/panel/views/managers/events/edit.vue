@@ -57,7 +57,6 @@
                   <option v-for="key of supported.events.map((o) => o.id)" :value="key" :key="key">{{translate(key)}}</option>
                 </select>
               </div>
-              {{ Object.keys(event.definitions) }}
               <div class="form-group col-md-12" v-for="defKey of Object.keys(event.definitions)" :key="defKey">
                 <label for="type_selector">{{ translate("events.definitions." + defKey + ".label") }}</label>
                 <template v-if="typeof event.definitions[defKey] === 'boolean'">
