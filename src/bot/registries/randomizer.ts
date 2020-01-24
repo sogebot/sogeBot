@@ -25,7 +25,7 @@ class Randomizer extends Registry {
     });
     adminEndpoint(this.nsp, 'randomizer::remove', async (item: Required<RandomizerInterface>, cb) => {
       const result = await getRepository(RandomizerEntity).remove(item);
-      await getRepository(RandomizerItem).delete({ groupId: IsNull() });
+      await getRepository(RandomizerItem).delete({ randomizerId: IsNull() });
       try {
         cb(
           null,
@@ -37,7 +37,7 @@ class Randomizer extends Registry {
     });
     adminEndpoint(this.nsp, 'randomizer::save', async (item: RandomizerInterface & RandomizerInterface[], cb) => {
       const result = await getRepository(RandomizerEntity).save(item);
-      await getRepository(RandomizerItem).delete({ groupId: IsNull() });
+      await getRepository(RandomizerItem).delete({ randomizerId: IsNull() });
       try {
         cb(
           null,
