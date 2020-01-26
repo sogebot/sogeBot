@@ -202,6 +202,106 @@ describe('Cooldowns - check()', () => {
     }
   });
 
+  describe('#3209 - cooldown not working on gamble changed command to !play', async () => {
+    before(async () => {
+      await db.cleanup();
+      await message.prepare();
+
+      gamble.enabled = true;
+      gamble.setCommand('!gamble', '!play');
+      await getRepository(Cooldown).update({}, { isOwnerAffected: false });
+    });
+
+    it('create cooldown on !play [user 300]', async () => {
+      const [command, type, seconds, quiet] = ['!play', 'user', '300', true];
+      cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` });
+      await message.isSent('cooldowns.cooldown-was-set', owner, { command: command, type: type, seconds: seconds, sender: owner.username });
+    });
+
+    it('check if cooldown is created', async () => {
+      const item = await getRepository(Cooldown).findOne({ where: { name: '!play' } });
+      assert.notEmpty(item);
+    });
+
+    it('testuser should not be affected by cooldown', async () => {
+      const isOk = await cooldown.check({ sender: testUser, message: '!play 10' });
+      assert.isTrue(isOk);
+    });
+
+    it('testuser should be affected by cooldown second time', async () => {
+      const isOk = await cooldown.check({ sender: testUser, message: '!play 15' });
+      assert.isFalse(isOk); // second should fail
+    });
+
+    it('testuser2 should not be affected by cooldown', async () => {
+      const isOk = await cooldown.check({ sender: testUser2, message: '!play 20' });
+      assert.isTrue(isOk);
+    });
+
+    it('testuser2 should be affected by cooldown second time', async () => {
+      const isOk = await cooldown.check({ sender: testUser2, message: '!play 25' });
+      assert.isFalse(isOk); // second should fail
+    });
+
+    it('owner should not be affected by cooldown', async () => {
+      const isOk = await cooldown.check({ sender: owner, message: '!play 20' });
+      assert.isTrue(isOk);
+    });
+
+    it('owner should not be affected by cooldown second time', async () => {
+      const isOk = await cooldown.check({ sender: owner, message: '!play 25' });
+      assert.isTrue(isOk);
+    });
+
+    it('owner should not be affected by cooldown second time', async () => {
+      const isOk = await cooldown.check({ sender: owner, message: '!play 25' });
+      assert.isTrue(isOk);
+    });
+  });
+
+  describe('#3209 - global cooldown not working on gamble changed command to !play', async () => {
+    before(async () => {
+      await db.cleanup();
+      await message.prepare();
+
+      gamble.enabled = true;
+      gamble.setCommand('!gamble', '!play');
+      // owners should not be persecuted
+      await getRepository(Cooldown).update({}, { isOwnerAffected: false });
+    });
+
+    it('create cooldown on !play [global 300]', async () => {
+      const [command, type, seconds, quiet] = ['!play', 'global', '300', true];
+      cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` });
+      await message.isSent('cooldowns.cooldown-was-set', owner, { command: command, type: type, seconds: seconds, sender: owner.username });
+    });
+
+    it('check if cooldown is created', async () => {
+      const item = await getRepository(Cooldown).findOne({ where: { name: '!play' } });
+      assert.notEmpty(item);
+    });
+
+    it('testuser should not be affected by cooldown', async () => {
+      const isOk = await cooldown.check({ sender: testUser, message: '!play 10' });
+      assert.isTrue(isOk);
+    });
+
+    it('testuser should be affected by cooldown second time', async () => {
+      const isOk = await cooldown.check({ sender: testUser, message: '!play 15' });
+      assert.isFalse(isOk); // second should fail
+    });
+
+    it('testuser2 should be affected by cooldown second time', async () => {
+      const isOk = await cooldown.check({ sender: testUser2, message: '!play 25' });
+      assert.isFalse(isOk); // third should fail
+    });
+
+    it('owner should not be affected by cooldown second time', async () => {
+      const isOk = await cooldown.check({ sender: owner, message: '!play 25' });
+      assert.isTrue(isOk);
+    });
+  });
+
   describe('#1406 - cooldown not working on gamble', async () => {
     before(async () => {
       await db.cleanup();
