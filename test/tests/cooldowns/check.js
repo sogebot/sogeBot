@@ -212,6 +212,10 @@ describe('Cooldowns - check()', () => {
       await getRepository(Cooldown).update({}, { isOwnerAffected: false });
     });
 
+    after(async () => {
+      gamble.setCommand('!gamble', '!gamble');
+    });
+
     it('create cooldown on !play [user 300]', async () => {
       const [command, type, seconds, quiet] = ['!play', 'user', '300', true];
       cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` });
@@ -268,6 +272,10 @@ describe('Cooldowns - check()', () => {
       gamble.setCommand('!gamble', '!play');
       // owners should not be persecuted
       await getRepository(Cooldown).update({}, { isOwnerAffected: false });
+    });
+
+    after(async () => {
+      gamble.setCommand('!gamble', '!gamble');
     });
 
     it('create cooldown on !play [global 300]', async () => {
