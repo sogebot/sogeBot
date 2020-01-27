@@ -146,14 +146,14 @@ class Points extends System {
           userId,
           username,
           points: 0,
-          pointsOfflineGivenAt: Date.now(),
-          pointsOnlineGivenAt: Date.now(),
+          pointsOfflineGivenAt: 0,
+          pointsOnlineGivenAt: 0,
         });
       } else {
         const chat = await users.getChatOf(userId, opts.isOnline);
         const userPointsKey = opts.isOnline ? 'pointsOnlineGivenAt' : 'pointsOfflineGivenAt';
         if (interval_calculated !== 0 && ptsPerInterval[permId]  !== 0) {
-          debug('points.update', `${user.username}#${userId}[${permId}] ${chat} | ${user[userPointsKey]}`);
+          debug('points.update', `${user.username}#${ userId}[${permId}] ${chat} | ${user[userPointsKey]}`);
           if (user[userPointsKey] + interval_calculated <= chat) {
             // add points to user[userPointsKey] + interval to user to not overcalculate (this should ensure recursive add points in time)
             const userTimePoints = user[userPointsKey] + interval_calculated;
