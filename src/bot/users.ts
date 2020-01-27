@@ -157,7 +157,7 @@ class Users extends Core {
       cb();
     });
     adminEndpoint(this.nsp, 'viewers::resetMessagesAll', async (cb) => {
-      await getRepository(User).update({}, { messages: 0 });
+      await getRepository(User).update({}, { messages: 0, pointsByMessageGivenAt: 0 });
       cb();
     });
     adminEndpoint(this.nsp, 'viewers::resetWatchedTimeAll', async (cb) => {
@@ -172,13 +172,17 @@ class Users extends Core {
       await getRepository(UserTip).clear();
       cb();
     });
-    adminEndpoint(this.nsp, 'viewers::save', async (viewer: UserInterface, cb) => {
+    adminEndpoint(this.nsp, 'viewers::save', async (viewer: Required<UserInterface>, cb) => {
       try {
         // recount sortAmount
         for (const tip of viewer.tips) {
           tip.sortAmount = currency.exchange(Number(tip.amount), tip.currency, 'EUR');
         }
-        await getRepository(User).save(viewer);
+
+        if (viewer.messages < viewer.pointsByMessageGivenAt) {
+          viewer.pointsByMessageGivenAt = viewer.messages;
+        }
+        await getRepository(User).save({...viewer, pointsByMessageGivenAt: 0});
         cb();
       } catch (e) {
         error(e);
