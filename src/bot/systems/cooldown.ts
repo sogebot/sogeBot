@@ -15,6 +15,7 @@ import { User } from '../database/entity/user';
 import { adminEndpoint } from '../helpers/socket';
 import { Keyword } from '../database/entity/keyword';
 import customCommands from './customcommands';
+import { debug } from '../helpers/log';
 
 /*
  * !cooldown [keyword|!command] [global|user] [seconds] [true/false] - set cooldown for keyword or !command - 0 for disable, true/false set quiet mode
@@ -123,17 +124,27 @@ class Cooldown extends System {
 
     if (!_.isNil(command)) { // command
       let name = subcommand ? `${command} ${subcommand}` : command;
+      let isFound = false;
+
       const parsed = await (new Parser().find(subcommand ? `${command} ${subcommand}` : command, null));
       if (parsed) {
+        debug('cooldown.check', `Command found ${parsed.command}`);
         name = parsed.command;
+        isFound = true;
       } else {
         // search in custom commands as well
         if (customCommands.enabled) {
           const foundCommands = await customCommands.find(subcommand ? `${command} ${subcommand}` : command);
           if (foundCommands.length > 0) {
             name = foundCommands[0].command.command;
+            isFound = true;
           }
         }
+      }
+
+      if (!isFound) {
+        debug('cooldown.check', `'${name}' not found, reverting to simple '${command}'`);
+        name = command; // revert to basic command if nothing was found
       }
 
       const cooldown = await getRepository(CooldownEntity).findOne({ where: { name }, relations: ['viewers'] });
@@ -170,7 +181,7 @@ class Cooldown extends System {
     }
 
     const user = await getRepository(User).save({
-      ...(await getRepository(User).findOne({ userId: opts.sender.userId })),
+      ...(await getRepository(User).findOne({ userId: Number(opts.sender.userId) })),
       userId: Number(opts.sender.userId),
       username: opts.sender.username,
       isSubscriber: typeof opts.sender.badges.subscriber !== 'undefined',
@@ -183,7 +194,7 @@ class Cooldown extends System {
         continue;
       }
 
-      viewer = cooldown.viewers?.find(o => o.username === opts.sender.username);
+      viewer = cooldown.viewers?.find(o => o.userId === Number(opts.sender.userId));
       if (cooldown.type === 'global') {
         timestamp = cooldown.timestamp ?? 0;
       } else {
@@ -196,9 +207,10 @@ class Cooldown extends System {
           cooldown.lastTimestamp = timestamp;
           cooldown.timestamp = now;
         } else {
+          debug('cooldown.check', `${opts.sender.username}#${opts.sender.userId} added to cooldown list.`);
           cooldown.viewers?.push({
-            ...cooldown.viewers.find(o => o.username === opts.sender.username),
-            username: opts.sender.username,
+            ...cooldown.viewers.find(o => o.userId === Number(opts.sender.userId)),
+            userId: Number(opts.sender.userId),
             lastTimestamp: timestamp,
             timestamp: now,
           });
@@ -236,18 +248,29 @@ class Cooldown extends System {
 
     if (!_.isNil(command)) { // command
       let name = subcommand ? `${command} ${subcommand}` : command;
+      let isFound = false;
+
       const parsed = await (new Parser().find(subcommand ? `${command} ${subcommand}` : command));
       if (parsed) {
+        debug('cooldown.revert', `Command found ${parsed.command}`);
         name = parsed.command;
+        isFound = true;
       } else {
         // search in custom commands as well
         if (customCommands.enabled) {
           const foundCommands = await customCommands.find(subcommand ? `${command} ${subcommand}` : command);
           if (foundCommands.length > 0) {
             name = foundCommands[0].command.command;
+            isFound = true;
           }
         }
       }
+
+      if (!isFound) {
+        debug('cooldown.revert', `'${name}' not found, reverting to simple '${command}'`);
+        name = command; // revert to basic command if nothing was found
+      }
+
 
       const cooldown = await getRepository(CooldownEntity).findOne({ where: { name }});
       if (!cooldown) { // command is not on cooldown -> recheck with text only
@@ -302,8 +325,8 @@ class Cooldown extends System {
         cooldown.viewers?.push({
           lastTimestamp: 0,
           timestamp: 0,
-          username: opts.sender.username,
-          ...cooldown.viewers.find(o => o.username === opts.sender.username),
+          userId: Number(opts.sender.userId),
+          ...cooldown.viewers.find(o => o.userId === Number(opts.sender.userId)),
         });
       }
       // rollback to lastTimestamp
