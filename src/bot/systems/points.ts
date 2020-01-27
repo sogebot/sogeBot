@@ -146,8 +146,8 @@ class Points extends System {
           userId,
           username,
           points: 0,
-          pointsOfflineGivenAt: Date.now(),
-          pointsOnlineGivenAt: Date.now(),
+          pointsOfflineGivenAt: 0,
+          pointsOnlineGivenAt: 0,
         });
       } else {
         const chat = await users.getChatOf(userId, opts.isOnline);
