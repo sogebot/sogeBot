@@ -182,7 +182,7 @@ class Users extends Core {
         if (viewer.messages < viewer.pointsByMessageGivenAt) {
           viewer.pointsByMessageGivenAt = viewer.messages;
         }
-        await getRepository(User).save({...viewer, pointsByMessageGivenAt: 0});
+        await getRepository(User).save(viewer);
         cb();
       } catch (e) {
         error(e);
