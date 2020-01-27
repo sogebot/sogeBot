@@ -1,6 +1,6 @@
 {
   "name": "sogebot",
-  "version": "10.4.0-SNAPSHOT",
+  "version": "10.6.0-SNAPSHOT",
   "lockfileVersion": 1,
   "requires": true,
   "dependencies": {
@@ -152,100 +152,100 @@
       "integrity": "sha512-1dVNHT76Uu5N3eJNTYcvxee+jzX4Z9lfciqRRHCU27ihbUcYi+iSc2iml5Ke1LXe1SyJCLA0+14Jh4tXJgOppA=="
     },
     "@interactjs/actions": {
-      "version": "1.7.3",
-      "resolved": "https://registry.npmjs.org/@interactjs/actions/-/actions-1.7.3.tgz",
-      "integrity": "sha512-oC0hWgoX3xqZXUZa9AoyY0bnomX9Vq27GaEStyptViSL4GoUvcxhGEVnZmb1D7RXZyd0U+rCMgGX4S/Cd916kw==",
+      "version": "1.8.1",
+      "resolved": "https://registry.npmjs.org/@interactjs/actions/-/actions-1.8.1.tgz",
+      "integrity": "sha512-9Ia5SNrBh565ZdQCEdJYTcxo0NntRtKlu5sMom8uUrfQ8PrHPIwlOzDutPTZklFsj6f7LyEcTqicR42aI5tDaA==",
       "dev": true
     },
     "@interactjs/auto-scroll": {
-      "version": "1.7.3",
-      "resolved": "https://registry.npmjs.org/@interactjs/auto-scroll/-/auto-scroll-1.7.3.tgz",
-      "integrity": "sha512-9I+tZl9DbeUuq/xYohoi+fh0eow1K2Q3FyhsTMnMe6oA4fSnAqUfQN8F+miGR8XUq/qXxDutYcZnuwGQCikDOg==",
+      "version": "1.8.1",
+      "resolved": "https://registry.npmjs.org/@interactjs/auto-scroll/-/auto-scroll-1.8.1.tgz",
+      "integrity": "sha512-jRnp7deun72+ccB4awMvyh0Po3kGaP/D2tO2+NMDDI08uQfp+itE4cSVQAVRObAPND3WA+b/izUjNPC8lFit4Q==",
       "dev": true
     },
     "@interactjs/auto-start": {
-      "version": "1.7.3",
-      "resolved": "https://registry.npmjs.org/@interactjs/auto-start/-/auto-start-1.7.3.tgz",
-      "integrity": "sha512-BquOLaJsyl9LJZAviitxJyIWJNcHHebSW8wYRnVqTxy9f4Sb9LjfrALmk+MkvuZRM0YFBM29RfHNqE8dKAtmBg==",
+      "version": "1.8.1",
+      "resolved": "https://registry.npmjs.org/@interactjs/auto-start/-/auto-start-1.8.1.tgz",
+      "integrity": "sha512-aQit6qcgACkzzGCcJL/WQ56wtBTDhg/4+IQxrYOQAbQ9ltXaw/purSUTSKR2Cizn6najzVyQ0wNDZwPeQRKQSg==",
       "dev": true
     },
     "@interactjs/core": {
-      "version": "1.7.3",
-      "resolved": "https://registry.npmjs.org/@interactjs/core/-/core-1.7.3.tgz",
-      "integrity": "sha512-Qlcmf/HZfhkvSLiOwcrnAbBNC2gCNT1yd6l0cd89HEphd4X9HpQyONbA07wDqn1F1Zh1W/v4HGzd1psgHnPc6A==",
+      "version": "1.8.1",
+      "resolved": "https://registry.npmjs.org/@interactjs/core/-/core-1.8.1.tgz",
+      "integrity": "sha512-yFy6Cl4lqUFW7LTaVzgqNTzmtgO/EtDy2fNRqUg+kmRlA+IX640wp69+FER7haCMfibDQedCevkdHLhGFdgifw==",
       "dev": true
     },
     "@interactjs/dev-tools": {
-      "version": "1.7.3",
-      "resolved": "https://registry.npmjs.org/@interactjs/dev-tools/-/dev-tools-1.7.3.tgz",
-      "integrity": "sha512-ac9eOnK8hk3BWX7yZBw1jDXyoML5j0bKA443rkZL9sYhhPXuly+qfbwC0XFDNLXHZMLXf6EhcdfydfJZqXAG5Q==",
+      "version": "1.8.1",
+      "resolved": "https://registry.npmjs.org/@interactjs/dev-tools/-/dev-tools-1.8.1.tgz",
+      "integrity": "sha512-06rvVePca98RjUfr17al4pxMOtcl/bkWm3x7NugpXTrMnSemVDF00x3SybXlC3tVhR2uioIuRMCy3Q++wFHrIg==",
       "dev": true,
       "requires": {
-        "@interactjs/utils": "1.7.3"
+        "@interactjs/utils": "1.8.1"
       }
     },
     "@interactjs/inertia": {
-      "version": "1.7.3",
-      "resolved": "https://registry.npmjs.org/@interactjs/inertia/-/inertia-1.7.3.tgz",
-      "integrity": "sha512-Am4JZVRLqTG9VcyFvSr0bIOn0UaI3WzPYXNAdu3zQaByx7k46mLpXzbs8Ezq2gUMjjUd/VdwDHlcPWYMidjp4Q==",
+      "version": "1.8.1",
+      "resolved": "https://registry.npmjs.org/@interactjs/inertia/-/inertia-1.8.1.tgz",
+      "integrity": "sha512-N8kYJxY89oPY8TD2T4LJrVnj4nOpJG+RIy43DzwOsSXUhM2E4twQsUkvP5GNK/xsjP0gdZB4C8nwmQCk9F/I9A==",
       "dev": true
     },
     "@interactjs/interact": {
-      "version": "1.7.3",
-      "resolved": "https://registry.npmjs.org/@interactjs/interact/-/interact-1.7.3.tgz",
-      "integrity": "sha512-omsauCTVnhhHXNiFKtERPm31Yo5Ly1NbuepSJLztkHyeKAfHDCT1GW0avjZ4ee1zmcaBJRcLuu9KbkFVpibTSw==",
+      "version": "1.8.1",
+      "resolved": "https://registry.npmjs.org/@interactjs/interact/-/interact-1.8.1.tgz",
+      "integrity": "sha512-qK1y/GASkOGPuk0nAeoluHBSnibisoKb9WnWe4DEuDCMx+Q0Y52IaPXT0SV1A+PmdacjBKLAm+pMEjcYwMwpAQ==",
       "dev": true
     },
     "@interactjs/interactjs": {
-      "version": "1.7.3",
-      "resolved": "https://registry.npmjs.org/@interactjs/interactjs/-/interactjs-1.7.3.tgz",
-      "integrity": "sha512-UYKHE5H5QJXKpsetx5yiqK27abUk66jCuQCpdck5Y3IFJADpW7ILODmjqVF20o5tYc5TBwztaeF3alPl1uyw0Q==",
+      "version": "1.8.1",
+      "resolved": "https://registry.npmjs.org/@interactjs/interactjs/-/interactjs-1.8.1.tgz",
+      "integrity": "sha512-QkNwXuMJMvCECQapYrr9mqkE1EB2W5bFQlZ1NDDe+sT+50Nz6rb2jfHXK+ApE94vwYfYWJFdY8QH9TOYSBshEQ==",
       "dev": true,
       "requires": {
-        "@interactjs/types": "1.7.3"
+        "@interactjs/types": "1.8.1"
       }
     },
     "@interactjs/modifiers": {
-      "version": "1.7.3",
-      "resolved": "https://registry.npmjs.org/@interactjs/modifiers/-/modifiers-1.7.3.tgz",
-      "integrity": "sha512-4uxacQFHA1d/yOb9GoCMAr4j+brvIsML5InkXyUErRk+tMap/BdenvkmBjoOIEb1anDFv8dPJ2vcFEOcW5SnZA==",
+      "version": "1.8.1",
+      "resolved": "https://registry.npmjs.org/@interactjs/modifiers/-/modifiers-1.8.1.tgz",
+      "integrity": "sha512-ilO9BgeLUmeoVKLvbejNcdp+WqIhBMKeg0zFcqHOL138q07NwyP66CmT3TC41DJ2QvroTNuDL7PCOIMbKmnO0A==",
       "dev": true
     },
     "@interactjs/pointer-events": {
-      "version": "1.7.3",
-      "resolved": "https://registry.npmjs.org/@interactjs/pointer-events/-/pointer-events-1.7.3.tgz",
-      "integrity": "sha512-Xiuopd6Osgc9NrqbAUVLwI8OpV+ZKqEf5IAdhr/DTqcT6Mk71vhvnEvFueiUf95joEJHPh6eqjrcFJ8Fbj0YBA==",
+      "version": "1.8.1",
+      "resolved": "https://registry.npmjs.org/@interactjs/pointer-events/-/pointer-events-1.8.1.tgz",
+      "integrity": "sha512-KemUF1wbUDkqMLV2GdcpiID82fXu8yOYTIz/ISWoqBl+FkT+gK6O+Tx4JWBrysRVQuRRBp7g5CG7ibuf17Q6XQ==",
       "dev": true
     },
     "@interactjs/reflow": {
-      "version": "1.7.3",
-      "resolved": "https://registry.npmjs.org/@interactjs/reflow/-/reflow-1.7.3.tgz",
-      "integrity": "sha512-0xiVbXuRZKk/jqfIvN7evHUAHcI/000uMIOmeJ7oeOOhHvkq6Y8sHxf5v2f4PKlKNqX0b62RkAWwDYKFGdJmOQ==",
+      "version": "1.8.1",
+      "resolved": "https://registry.npmjs.org/@interactjs/reflow/-/reflow-1.8.1.tgz",
+      "integrity": "sha512-PdhFYYbuJesAhfVHaGLnY3+hfFqHSX/Orq+HiKumihNLMF/gUA0bJbOaB0JjD9hXA/EqV1/nvbHjLPThsdbUlQ==",
       "dev": true
     },
     "@interactjs/types": {
-      "version": "1.7.3",
-      "resolved": "https://registry.npmjs.org/@interactjs/types/-/types-1.7.3.tgz",
-      "integrity": "sha512-2+ewGREySUWNqGaGpSCeN6sYeKCulznlLMBcCBOOW9sPq5Fss9P7Lj67OZETUQ2tOfE5BJhopfEWviuOKRYABw==",
+      "version": "1.8.1",
+      "resolved": "https://registry.npmjs.org/@interactjs/types/-/types-1.8.1.tgz",
+      "integrity": "sha512-XXxE3MadYSvN60JJDsPwTG7Zti6ob9nb6PKx4VtQQ0uYFH1kX2kD6AucCzJsRPv9aAbCJ5w8zp4L3M+YmdAB/g==",
       "dev": true,
       "requires": {
-        "@interactjs/actions": "1.7.3",
-        "@interactjs/auto-scroll": "1.7.3",
-        "@interactjs/auto-start": "1.7.3",
-        "@interactjs/core": "1.7.3",
-        "@interactjs/dev-tools": "1.7.3",
-        "@interactjs/inertia": "1.7.3",
-        "@interactjs/interact": "1.7.3",
-        "@interactjs/modifiers": "1.7.3",
-        "@interactjs/pointer-events": "1.7.3",
-        "@interactjs/reflow": "1.7.3",
-        "@interactjs/utils": "1.7.3"
+        "@interactjs/actions": "1.8.1",
+        "@interactjs/auto-scroll": "1.8.1",
+        "@interactjs/auto-start": "1.8.1",
+        "@interactjs/core": "1.8.1",
+        "@interactjs/dev-tools": "1.8.1",
+        "@interactjs/inertia": "1.8.1",
+        "@interactjs/interact": "1.8.1",
+        "@interactjs/modifiers": "1.8.1",
+        "@interactjs/pointer-events": "1.8.1",
+        "@interactjs/reflow": "1.8.1",
+        "@interactjs/utils": "1.8.1"
       }
     },
     "@interactjs/utils": {
-      "version": "1.7.3",
-      "resolved": "https://registry.npmjs.org/@interactjs/utils/-/utils-1.7.3.tgz",
-      "integrity": "sha512-GKE+cdwqVru7veZRDKvPtjsm/ii/iBjd0xyTMKDChiQUkcZ4LFKIJGD/3vjeNH5IU8pZIeY+KBqBm1F+8IVEzQ==",
+      "version": "1.8.1",
+      "resolved": "https://registry.npmjs.org/@interactjs/utils/-/utils-1.8.1.tgz",
+      "integrity": "sha512-o1d8ajsAYpxyaRTYnbU2HeXUnWuF91T2UzGFTmsUT3vpJQm8U6lovlo+CAT7rsqM40tEO1xZAe6o5TKvu5w+Cw==",
       "dev": true
     },
     "@momothepug/tsmodule-alias": {
@@ -3445,14 +3445,14 @@
       }
     },
     "browserslist": {
-      "version": "4.8.3",
-      "resolved": "https://registry.npmjs.org/browserslist/-/browserslist-4.8.3.tgz",
-      "integrity": "sha512-iU43cMMknxG1ClEZ2MDKeonKE1CCrFVkQK2AqO2YWFmvIrx4JWrvQ4w4hQez6EpVI8rHTtqh/ruHHDHSOKxvUg==",
+      "version": "4.8.4",
+      "resolved": "https://registry.npmjs.org/browserslist/-/browserslist-4.8.4.tgz",
+      "integrity": "sha512-3qv/Ar3nRnRTpwGD+LZc7F4YHDBb3NAEIn+DesNa8TcBhyxf8eDqYwTOa70kiWXwvFjQQz+abbykJcyOlfBfNg==",
       "dev": true,
       "requires": {
-        "caniuse-lite": "^1.0.30001017",
-        "electron-to-chromium": "^1.3.322",
-        "node-releases": "^1.1.44"
+        "caniuse-lite": "^1.0.30001021",
+        "electron-to-chromium": "^1.3.338",
+        "node-releases": "^1.1.46"
       }
     },
     "bson": {
@@ -3557,9 +3557,9 @@
       },
       "dependencies": {
         "fs-minipass": {
-          "version": "2.0.0",
-          "resolved": "https://registry.npmjs.org/fs-minipass/-/fs-minipass-2.0.0.tgz",
-          "integrity": "sha512-40Qz+LFXmd9tzYVnnBmZvFfvAADfUA14TXPK1s7IfElJTIZ97rA8w4Kin7Wt5JBrC3ShnnFJO/5vPjPEeJIq9A==",
+          "version": "2.0.1",
+          "resolved": "https://registry.npmjs.org/fs-minipass/-/fs-minipass-2.0.1.tgz",
+          "integrity": "sha512-22x6v7ceMyTfG8e4Y0YeudTuDNZEIR9pQoEVu1r5e6nLuMAbmrkTXlHADEHsdk2SHYM6opcRnKUbqB9bZ94D3g==",
           "dev": true,
           "requires": {
             "minipass": "^3.0.0"
@@ -3738,9 +3738,9 @@
       }
     },
     "caniuse-lite": {
-      "version": "1.0.30001021",
-      "resolved": "https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30001021.tgz",
-      "integrity": "sha512-wuMhT7/hwkgd8gldgp2jcrUjOU9RXJ4XxGumQeOsUr91l3WwmM68Cpa/ymCnWEDqakwFXhuDQbaKNHXBPgeE9g==",
+      "version": "1.0.30001022",
+      "resolved": "https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30001022.tgz",
+      "integrity": "sha512-FjwPPtt/I07KyLPkBQ0g7/XuZg6oUkYBVnPHNj3VHJbOjmmJ/GdSo/GUY6MwINEQvjhP6WZVbX8Tvms8xh0D5A==",
       "dev": true
     },
     "capture-stack-trace": {
@@ -4248,9 +4248,9 @@
       "integrity": "sha1-DQcLTQQ6W+ozovGkDi7bPZpMz3c="
     },
     "codemirror": {
-      "version": "5.50.2",
-      "resolved": "https://registry.npmjs.org/codemirror/-/codemirror-5.50.2.tgz",
-      "integrity": "sha512-PPjUsC1oXSM86lunKrw609P1oM0Wu8z9rqzjbeyBYCcx44VL41aUpccdOf1PfAZtTONlmN3sT3p2etLNYa1OGg==",
+      "version": "5.51.0",
+      "resolved": "https://registry.npmjs.org/codemirror/-/codemirror-5.51.0.tgz",
+      "integrity": "sha512-vyuYYRv3eXL0SCuZA4spRFlKNzQAewHcipRQCOKgRy7VNAvZxTKzbItdbCl4S5AgPZ5g3WkHp+ibWQwv9TLG7Q==",
       "dev": true
     },
     "coffee-script": {
@@ -4330,7 +4330,8 @@
     "commander": {
       "version": "2.20.3",
       "resolved": "https://registry.npmjs.org/commander/-/commander-2.20.3.tgz",
-      "integrity": "sha512-GpVkmM8vF2vQUkj2LvZmD35JxeJOLCwJ9cUkugyk2nuhbv3+mJvpLYYt+0+USMxE+oj+ey/lJEnhZw75x/OMcQ=="
+      "integrity": "sha512-GpVkmM8vF2vQUkj2LvZmD35JxeJOLCwJ9cUkugyk2nuhbv3+mJvpLYYt+0+USMxE+oj+ey/lJEnhZw75x/OMcQ==",
+      "dev": true
     },
     "commondir": {
       "version": "1.0.1",
@@ -8399,6 +8400,7 @@
       "version": "4.7.2",
       "resolved": "https://registry.npmjs.org/handlebars/-/handlebars-4.7.2.tgz",
       "integrity": "sha512-4PwqDL2laXtTWZghzzCtunQUTLbo31pcCJrd/B/9JP8XbhVzpS5ZXuKqlOzsd1rtcaLo4KqAn8nl8mkknS4MHw==",
+      "dev": true,
       "requires": {
         "neo-async": "^2.6.0",
         "optimist": "^0.6.1",
@@ -8583,12 +8585,9 @@
       "dev": true
     },
     "highlight.js": {
-      "version": "9.17.1",
-      "resolved": "https://registry.npmjs.org/highlight.js/-/highlight.js-9.17.1.tgz",
-      "integrity": "sha512-TA2/doAur5Ol8+iM3Ov7qy3jYcr/QiJ2eDTdRF4dfbjG7AaaB99J5G+zSl11ljbl6cIcahgPY6SKb3sC3EJ0fw==",
-      "requires": {
-        "handlebars": "^4.5.3"
-      }
+      "version": "9.18.0",
+      "resolved": "https://registry.npmjs.org/highlight.js/-/highlight.js-9.18.0.tgz",
+      "integrity": "sha512-A97kI1KAUzKoAiEoaGcf2O9YPS8nbDTCRFokaaeBhnqjQTvbAuAJrQMm21zw8s8xzaMtCQBtgbyGXLGxdxQyqQ=="
     },
     "hmac-drbg": {
       "version": "1.0.1",
@@ -9219,6 +9218,12 @@
       "resolved": "https://registry.npmjs.org/immediate/-/immediate-3.0.6.tgz",
       "integrity": "sha1-nbHb0Pr43m++D13V5Wu2BigN5ps="
     },
+    "immutable": {
+      "version": "4.0.0-rc.12",
+      "resolved": "https://registry.npmjs.org/immutable/-/immutable-4.0.0-rc.12.tgz",
+      "integrity": "sha512-0M2XxkZLx/mi3t8NVwIm1g8nHoEmM9p9UBl/G9k4+hm0kBgOVdMV/B3CY5dQ8qG8qc80NN4gDV4HQv6FTJ5q7A==",
+      "dev": true
+    },
     "import-cwd": {
       "version": "2.1.0",
       "resolved": "https://registry.npmjs.org/import-cwd/-/import-cwd-2.1.0.tgz",
@@ -9472,13 +9477,13 @@
       }
     },
     "interactjs": {
-      "version": "1.7.3",
-      "resolved": "https://registry.npmjs.org/interactjs/-/interactjs-1.7.3.tgz",
-      "integrity": "sha512-2DvhItFT+l3DRswUJ1WPnf/rGhSpLaXyPzbUNeDffcxtElTp09kUAEqQbsnK4IdCrMiQeNY2QFJ4iD8HYeyyiQ==",
+      "version": "1.8.1",
+      "resolved": "https://registry.npmjs.org/interactjs/-/interactjs-1.8.1.tgz",
+      "integrity": "sha512-Ivb+fQir6Ae3Al6C8ZJgU+evIaaeQ/M39L25PYhFzwAmK/zchrBmhyTBL0j3OZ1BQuOuO/yUVEZvGQFtL4ds/w==",
       "dev": true,
       "requires": {
-        "@interactjs/interactjs": "1.7.3",
-        "@interactjs/types": "1.7.3"
+        "@interactjs/interactjs": "1.8.1",
+        "@interactjs/types": "1.8.1"
       }
     },
     "interpret": {
@@ -12333,7 +12338,8 @@
     "neo-async": {
       "version": "2.6.1",
       "resolved": "https://registry.npmjs.org/neo-async/-/neo-async-2.6.1.tgz",
-      "integrity": "sha512-iyam8fBuCUpWeKPGpaNMetEocMt364qkCsfL9JuhjXX6dRnguRVOfk2GZaDpPjcOKiiXCPINZC1GczQ7iTq3Zw=="
+      "integrity": "sha512-iyam8fBuCUpWeKPGpaNMetEocMt364qkCsfL9JuhjXX6dRnguRVOfk2GZaDpPjcOKiiXCPINZC1GczQ7iTq3Zw==",
+      "dev": true
     },
     "nested-error-stacks": {
       "version": "2.1.0",
@@ -13006,6 +13012,7 @@
       "version": "0.6.1",
       "resolved": "https://registry.npmjs.org/optimist/-/optimist-0.6.1.tgz",
       "integrity": "sha1-2j6nRob6IaGaERwybpDrFaAZZoY=",
+      "dev": true,
       "requires": {
         "minimist": "~0.0.1",
         "wordwrap": "~0.0.2"
@@ -13014,7 +13021,8 @@
         "minimist": {
           "version": "0.0.10",
           "resolved": "https://registry.npmjs.org/minimist/-/minimist-0.0.10.tgz",
-          "integrity": "sha1-3j+YVD2/lggr5IrRoMfNqDYwHc8="
+          "integrity": "sha1-3j+YVD2/lggr5IrRoMfNqDYwHc8=",
+          "dev": true
         }
       }
     },
@@ -15285,12 +15293,6 @@
             "uglify-to-browserify": "~1.0.0",
             "yargs": "~3.10.0"
           }
-        },
-        "wordwrap": {
-          "version": "0.0.2",
-          "resolved": "https://registry.npmjs.org/wordwrap/-/wordwrap-0.0.2.tgz",
-          "integrity": "sha1-t5Zpu0LstAn4PVg8rVLKF+qhZD8=",
-          "dev": true
         },
         "yargs": {
           "version": "3.10.0",
@@ -18605,9 +18607,10 @@
       "integrity": "sha512-kMBmblijHJXyOpKzgDhKx9INYU4u4E1RPMB0HqmKSgWG8vEcf3exEfLh4FFfzd3xdQOw9EuIy/cP0akY6rHopQ=="
     },
     "uglify-js": {
-      "version": "3.7.5",
-      "resolved": "https://registry.npmjs.org/uglify-js/-/uglify-js-3.7.5.tgz",
-      "integrity": "sha512-GFZ3EXRptKGvb/C1Sq6nO1iI7AGcjyqmIyOw0DrD0675e+NNbGO72xmMM2iEBdFbxaTLo70NbjM/Wy54uZIlsg==",
+      "version": "3.7.6",
+      "resolved": "https://registry.npmjs.org/uglify-js/-/uglify-js-3.7.6.tgz",
+      "integrity": "sha512-yYqjArOYSxvqeeiYH2VGjZOqq6SVmhxzaPjJC1W2F9e+bqvFL9QXQ2osQuKUFjM2hGjKG2YclQnRKWQSt/nOTQ==",
+      "dev": true,
       "requires": {
         "commander": "~2.20.3",
         "source-map": "~0.6.1"
@@ -20304,9 +20307,10 @@
       "dev": true
     },
     "wordwrap": {
-      "version": "0.0.3",
-      "resolved": "https://registry.npmjs.org/wordwrap/-/wordwrap-0.0.3.tgz",
-      "integrity": "sha1-o9XabNXAvAAI03I0u68b7WMFkQc="
+      "version": "0.0.2",
+      "resolved": "https://registry.npmjs.org/wordwrap/-/wordwrap-0.0.2.tgz",
+      "integrity": "sha1-t5Zpu0LstAn4PVg8rVLKF+qhZD8=",
+      "dev": true
     },
     "worker-farm": {
       "version": "1.7.0",
