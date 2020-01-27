@@ -1,7 +1,6 @@
 'use strict';
 
 import * as _ from 'lodash';
-import { isMainThread } from '../cluster';
 import * as cronparser from 'cron-parser';
 import cron from 'node-cron';
 
@@ -61,14 +60,6 @@ class Points extends System {
   @permission_settings('points')
   perMessageOfflineInterval = 0;
 
-  constructor () {
-    super();
-
-    if (isMainThread) {
-      this.updatePoints();
-    }
-  }
-
   @onLoad('resetIntervalCron')
   @onLoad('isPointResetIntervalEnabled')
   initCron(key: string) {
@@ -95,10 +86,11 @@ class Points extends System {
     }
   }
 
+  @onLoad('enabled')
   async updatePoints () {
-    clearTimeout(this.timeouts.updatePoints);
     if (!this.enabled) {
-      this.timeouts.updatePoints = global.setTimeout(() => this.updatePoints(), 5000);
+      debug('points.update', 'Disabled, next check in 5s');
+      setTimeout(() => this.updatePoints(), 5000);
       return;
     }
 
@@ -112,6 +104,7 @@ class Points extends System {
 
     try {
       const userPromises: Promise<void>[] = [];
+      debug('points.update', `Started points adding, isOnline: ${isOnline}`);
       for (const username of (await getAllOnlineUsernames())) {
         if (isBot(username)) {
           continue;
@@ -123,7 +116,8 @@ class Points extends System {
       error(e);
       error(e.stack);
     } finally {
-      this.timeouts.updatePoints = global.setTimeout(() => this.updatePoints(), 60000);
+      debug('points.update', 'Finished points adding, triggering next check in 60s');
+      setTimeout(() => this.updatePoints(), 60000);
     }
   }
 
@@ -131,12 +125,14 @@ class Points extends System {
     return new Promise(async (resolve) => {
       const userId = await users.getIdByName(username);
       if (!userId) {
+        debug('points.update', `User ${username} missing userId`);
         return resolve(); // skip without id
       }
 
       // get user max permission
       const permId = await permissions.getUserHighestPermission(userId);
       if (!permId) {
+        debug('points.update', `User ${username}#${userId} permId not found`);
         return resolve(); // skip without id
       }
 
@@ -145,14 +141,14 @@ class Points extends System {
 
       const user = await getRepository(User).findOne({ username });
       if (!user) {
+        debug('points.update', `new user in db ${username}#${userId}[${permId}]`);
         await getRepository(User).save({
-          userId: Number(await api.getIdFromTwitch(username)),
+          userId,
           username,
           points: 0,
           pointsOfflineGivenAt: Date.now(),
           pointsOnlineGivenAt: Date.now(),
         });
-        return;
       } else {
         const chat = await users.getChatOf(userId, opts.isOnline);
         const userPointsKey = opts.isOnline ? 'pointsOnlineGivenAt' : 'pointsOfflineGivenAt';
@@ -173,7 +169,7 @@ class Points extends System {
             ...user,
             [userPointsKey]: chat,
           });
-          debug('points.update', `${user.username}#${userId}[${permId}] points disled or interval is 0, settint points time to chat`);
+          debug('points.update', `${user.username}#${userId}[${permId}] points disabled or interval is 0, settint points time to chat`);
         }
       }
       resolve();
