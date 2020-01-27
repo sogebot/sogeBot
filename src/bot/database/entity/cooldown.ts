@@ -20,7 +20,7 @@ export interface CooldownInterface {
 export interface CooldownViewerInterface {
   id?: string;
   cooldown?: CooldownInterface;
-  username: string;
+  userId: number;
   timestamp: number;
   lastTimestamp: number;
 };
@@ -58,7 +58,7 @@ export const CooldownViewer = new EntitySchema<Readonly<Required<CooldownViewerI
   name: 'cooldown_viewer',
   columns: {
     id: { type: 'uuid', primary: true, generated: 'uuid' },
-    username: { type: String },
+    userId: { type: Number },
     timestamp: { type: 'bigint', transformer: new ColumnNumericTransformer() },
     lastTimestamp: { type: 'bigint', transformer: new ColumnNumericTransformer() },
   },
