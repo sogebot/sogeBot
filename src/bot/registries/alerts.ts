@@ -133,9 +133,11 @@ class Alerts extends Registry {
           mediaIds.push(event.soundId);
         }
       }
-      await getRepository(AlertMedia).delete({
-        id: Not(In(mediaIds)),
-      });
+      if (mediaIds.length > 0) {
+        await getRepository(AlertMedia).delete({
+          id: Not(In(mediaIds)),
+        });
+      }
     });
     publicEndpoint(this.nsp, 'test', async (event: keyof Omit<AlertInterface, 'id' | 'updatedAt' | 'name' |'alertDelayInMs' | 'profanityFilterType' | 'loadStandardProfanityList' | 'customProfanityList'>) => {
       this.test({ event });
