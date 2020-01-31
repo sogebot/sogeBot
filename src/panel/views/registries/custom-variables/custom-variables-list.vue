@@ -19,8 +19,8 @@
     <loading v-if="!state.loaded /* State.DONE */" />
     <b-table v-else :fields="fields" :items="filteredVariables">
       <template v-slot:cell(description)="data">
-        <small v-bind:class="{ 'text-muted': data.value.length === 0 }">
-          {{ data.value.length !== 0 ? data.value : translate('not-available') }}
+        <small v-bind:class="{ 'text-muted': String(data.value).length === 0 }">
+          {{ String(data.value).length !== 0 ? data.value : translate('not-available') }}
         </small>
       </template>
       <template v-slot:cell(type)="data">
@@ -29,8 +29,8 @@
         </div>
       </template>
       <template v-slot:cell(currentValue)="data">
-        <small v-bind:class="{ 'text-muted': data.item.currentValue.length === 0 }">
-          {{ data.item.currentValue.length !== 0 ? data.item.currentValue : translate('not-available') }}
+        <small v-bind:class="{ 'text-muted': String(data.item.currentValue).length === 0 }">
+          {{ String(data.item.currentValue).length !== 0 ? data.item.currentValue : translate('not-available') }}
         </small>
       </template>
       <template v-slot:cell(additional-info)="data">
