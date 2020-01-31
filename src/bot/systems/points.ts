@@ -9,7 +9,7 @@ import { command, default_permission, parser, permission_settings, settings, ui 
 import Expects from '../expects';
 import { permission } from '../helpers/permissions';
 import System from './_interface';
-import { debug, error } from '../helpers/log';
+import { debug, error, warning } from '../helpers/log';
 import { adminEndpoint } from '../helpers/socket';
 import { FindConditions, getRepository } from 'typeorm';
 import { User, UserInterface } from '../database/entity/user';
@@ -66,7 +66,8 @@ class Points extends System {
     this.isLoaded.push(key);
     if (this.isLoaded.length === 2) {
       if (this.resetIntervalCron) {
-        this.cronTask = cron.schedule(this.resetIntervalCron, () =>  {
+        this.cronTask = cron.schedule(this.resetIntervalCron, () => {
+          warning('Points were reset by cron');
           getRepository(User).update({}, { points: 0 });
         });
       }
@@ -80,7 +81,8 @@ class Points extends System {
       this.cronTask.destroy();
     }
     if (this.resetIntervalCron) {
-      this.cronTask = cron.schedule(this.resetIntervalCron, () =>  {
+      this.cronTask = cron.schedule(this.resetIntervalCron, () => {
+        warning('Points were reset by cron');
         getRepository(User).update({}, { points: 0 });
       });
     }
