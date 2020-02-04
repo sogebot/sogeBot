@@ -11,7 +11,7 @@ import { User, UserTipInterface } from '../database/entity/user';
 import users from '../users';
 import events from '../events';
 import alerts from '../registries/alerts';
-import { exchange } from '../currency';
+import { exchange, mainCurrency } from '../currency';
 
 /* example payload (eventData)
 {
