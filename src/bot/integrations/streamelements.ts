@@ -11,6 +11,7 @@ import { User, UserTipInterface } from '../database/entity/user';
 import users from '../users';
 import events from '../events';
 import alerts from '../registries/alerts';
+import { exchange } from '../currency';
 
 /* example payload (eventData)
 {
@@ -125,7 +126,7 @@ class StreamElements extends Integration {
     const newTip: UserTipInterface = {
       amount: Number(amount),
       currency: currency,
-      sortAmount: currency.exchange(Number(amount), currency, 'EUR'),
+      sortAmount: exchange(Number(amount), currency, 'EUR'),
       message: message,
       tippedAt: Date.now(),
     };
@@ -137,7 +138,7 @@ class StreamElements extends Integration {
       username: username.toLowerCase(),
       amount: parseFloat(eventData.data.amount).toFixed(2),
       currency: eventData.data.currency,
-      amountInBotCurrency: parseFloat(currency.exchange(eventData.data.amount, eventData.data.currency, currency.mainCurrency)).toFixed(2),
+      amountInBotCurrency: parseFloat(exchange(eventData.data.amount, eventData.data.currency, currency.mainCurrency)).toFixed(2),
       currencyInBot: currency.mainCurrency,
       message: eventData.data.message,
     });
