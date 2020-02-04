@@ -138,8 +138,8 @@ class StreamElements extends Integration {
       username: username.toLowerCase(),
       amount: parseFloat(eventData.data.amount).toFixed(2),
       currency: eventData.data.currency,
-      amountInBotCurrency: parseFloat(exchange(eventData.data.amount, eventData.data.currency, currency.mainCurrency)).toFixed(2),
-      currencyInBot: currency.mainCurrency,
+      amountInBotCurrency: parseFloat(exchange(eventData.data.amount, eventData.data.currency, mainCurrency)).toFixed(2),
+      currencyInBot: mainCurrency,
       message: eventData.data.message,
     });
     alerts.trigger({

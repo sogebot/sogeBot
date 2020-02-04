@@ -13,7 +13,7 @@ import api from '../api.js';
 import events from '../events.js';
 import alerts from '../registries/alerts.js';
 import eventlist from '../overlays/eventlist.js';
-import { exchange } from '../currency';
+import { exchange, mainCurrency } from '../currency';
 
 class Qiwi extends Integration {
   interval: any = null;
@@ -102,7 +102,7 @@ class Qiwi extends Integration {
       }
 
       if (api.isStreamOnline) {
-        api.stats.currentTips += parseFloat(exchange(amount, currency, currency.mainCurrency));
+        api.stats.currentTips += parseFloat(exchange(amount, currency, mainCurrency));
       }
 
       eventlist.add({
@@ -120,8 +120,8 @@ class Qiwi extends Integration {
         username: username || 'Anonymous',
         amount,
         currency,
-        amountInBotCurrency: parseFloat(exchange(amount, currency, currency.mainCurrency)).toFixed(2),
-        currencyInBot: currency.mainCurrency,
+        amountInBotCurrency: parseFloat(exchange(amount, currency, mainCurrency)).toFixed(2),
+        currencyInBot: mainCurrency,
         message,
       });
 
