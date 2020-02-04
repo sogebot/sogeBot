@@ -13,7 +13,7 @@ import api from '../api.js';
 import events from '../events.js';
 import alerts from '../registries/alerts.js';
 import eventlist from '../overlays/eventlist.js';
-import { exchange, mainCurrency } from '../currency';
+import currency from '../currency';
 
 class Qiwi extends Integration {
   interval: any = null;
@@ -66,7 +66,6 @@ class Qiwi extends Integration {
       const username = DONATION_SENDER ? DONATION_SENDER.toLowerCase() : null;
       const message = DONATION_MESSAGE ? DONATION_MESSAGE : '';
       const amount = Number(DONATION_AMOUNT);
-      const currency = DONATION_CURRENCY;
 
       const getUser = async (username, id) => {
         const userByUsername = await getRepository(User).findOne({ where: { username: username.toLowerCase() }});
@@ -91,8 +90,8 @@ class Qiwi extends Integration {
         id = user.userId;
         const newTip: UserTipInterface = {
           amount: Number(amount),
-          currency: currency,
-          sortAmount: exchange(Number(amount), currency, 'EUR'),
+          currency: DONATION_CURRENCY,
+          sortAmount: currency.exchange(Number(amount), DONATION_CURRENCY, 'EUR'),
           message: message,
           tippedAt: Date.now(),
         };
@@ -102,13 +101,13 @@ class Qiwi extends Integration {
       }
 
       if (api.isStreamOnline) {
-        api.stats.currentTips += parseFloat(exchange(amount, currency, mainCurrency));
+        api.stats.currentTips += currency.exchange(amount, DONATION_CURRENCY, currency.mainCurrency);
       }
 
       eventlist.add({
         event: 'tip',
         amount,
-        currency,
+        currency: DONATION_CURRENCY,
         username: username || 'Anonymous',
         message,
         timestamp: Date.now(),
@@ -120,8 +119,8 @@ class Qiwi extends Integration {
         username: username || 'Anonymous',
         amount,
         currency,
-        amountInBotCurrency: parseFloat(exchange(amount, currency, mainCurrency)).toFixed(2),
-        currencyInBot: mainCurrency,
+        amountInBotCurrency: Number(currency.exchange(amount, DONATION_CURRENCY, currency.mainCurrency)).toFixed(2),
+        currencyInBot: currency.mainCurrency,
         message,
       });
 
@@ -129,7 +128,7 @@ class Qiwi extends Integration {
         event: 'tips',
         name: username || 'Anonymous',
         amount,
-        currency,
+        currency: DONATION_CURRENCY,
         monthsName: '',
         message,
         autohost: false,
@@ -137,9 +136,9 @@ class Qiwi extends Integration {
 
       triggerInterfaceOnTip({
         username: username || 'Anonymous',
-        amount: amount,
-        message: message,
-        currency: currency,
+        amount,
+        message,
+        currency: DONATION_CURRENCY,
         timestamp: Date.now(),
       });
 
