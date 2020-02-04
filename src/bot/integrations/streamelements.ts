@@ -11,7 +11,9 @@ import { User, UserTipInterface } from '../database/entity/user';
 import users from '../users';
 import events from '../events';
 import alerts from '../registries/alerts';
-import { exchange, mainCurrency } from '../currency';
+import currency from '../currency';
+import eventlist from '../overlays/eventlist';
+import api from '../api.js';
 
 /* example payload (eventData)
 {
@@ -103,7 +105,8 @@ class StreamElements extends Integration {
       return;
     }
 
-    const { username, amount, currency, message } = eventData.data;
+    const { username, amount, message } = eventData.data;
+    const DONATION_CURRENCY = eventData.data.currency;
 
     const getUser = async (username, id) => {
       const userByUsername = await getRepository(User).findOne({ where: { username: username.toLowerCase() }});
@@ -125,38 +128,51 @@ class StreamElements extends Integration {
     const user = await getUser(username, await users.getIdByName(username.toLowerCase()));
     const newTip: UserTipInterface = {
       amount: Number(amount),
-      currency: currency,
-      sortAmount: exchange(Number(amount), currency, 'EUR'),
-      message: message,
+      currency: DONATION_CURRENCY,
+      sortAmount: currency.exchange(Number(amount), DONATION_CURRENCY, 'EUR'),
+      message,
       tippedAt: Date.now(),
     };
     user.tips.push(newTip);
     getRepository(User).save(user);
 
-    tip(`${username.toLowerCase()}${user.userId ? '#' + user.userId : ''}, amount: ${Number(eventData.data.amount).toFixed(2)}${eventData.data.currency}, message: ${eventData.data.message}`);
+    if (api.isStreamOnline) {
+      api.stats.currentTips += currency.exchange(amount, DONATION_CURRENCY, currency.mainCurrency);
+    }
+
+    tip(`${username.toLowerCase()}${user.userId ? '#' + user.userId : ''}, amount: ${Number(amount).toFixed(2)}${DONATION_CURRENCY}, message: ${message}`);
+
+    eventlist.add({
+      event: 'tip',
+      amount,
+      currency: DONATION_CURRENCY,
+      username: username.toLowerCase(),
+      message,
+      timestamp: Date.now(),
+    });
     events.fire('tip', {
       username: username.toLowerCase(),
-      amount: parseFloat(eventData.data.amount).toFixed(2),
-      currency: eventData.data.currency,
-      amountInBotCurrency: parseFloat(exchange(eventData.data.amount, eventData.data.currency, mainCurrency)).toFixed(2),
-      currencyInBot: mainCurrency,
-      message: eventData.data.message,
+      amount: parseFloat(amount).toFixed(2),
+      currency: DONATION_CURRENCY,
+      amountInBotCurrency: Number(currency.exchange(amount, DONATION_CURRENCY, currency.mainCurrency)).toFixed(2),
+      currencyInBot: currency.mainCurrency,
+      message,
     });
     alerts.trigger({
       event: 'tips',
       name: username.toLowerCase(),
       amount: Number(parseFloat(eventData.data.amount).toFixed(2)),
-      currency: eventData.data.currency,
+      currency: DONATION_CURRENCY,
       monthsName: '',
-      message: eventData.data.message,
+      message,
       autohost: false,
     });
 
     triggerInterfaceOnTip({
       username: username.toLowerCase(),
-      amount: eventData.data.amount,
-      message: eventData.data.message,
-      currency: eventData.data.currency,
+      amount,
+      message,
+      currency: DONATION_CURRENCY,
       timestamp: Date.now(),
     });
   }
