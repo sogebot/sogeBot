@@ -23,7 +23,7 @@ describe('Parser - parse time check', async () => {
   ];
 
   for (const test of tests) {
-    describe.only(`'${test.test}' expect ${test.expected}ms`, async () => {
+    describe(`'${test.test}' expect ${test.expected}ms`, async () => {
       before(async () => {
         await db.cleanup();
         await message.prepare();
