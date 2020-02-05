@@ -2,7 +2,7 @@ import _ from 'lodash';
 import moment from 'moment';
 
 import { dateDiff, getLocalizedName, prepare, sendMessage } from '../commons';
-import { command, settings, ui } from '../decorators';
+import { command, default_permission, settings, ui } from '../decorators';
 import { onMessage } from '../decorators/on';
 import System from './_interface';
 import { debug, error } from '../helpers/log';
@@ -20,6 +20,7 @@ import Expects from '../expects';
 
 /*
  * !me
+ * !stats
  * !lastseen
  * !watched
  * !followage
@@ -184,7 +185,7 @@ class UserInfo extends System {
   }
 
   @command('!me')
-  async showMe(opts: CommandOptions) {
+  async showMe(opts: CommandOptions, returnOnly = false): Promise<string> {
     try {
       const message: (string | null)[] = [];
       const user = await getRepository(User).findOne({
@@ -263,10 +264,48 @@ class UserInfo extends System {
           }
         }
       }
-      sendMessage(message.filter(o => o !== null).join(this.formatSeparator), opts.sender, opts.attr);
+
+      const response = message.filter(o => o !== null).join(this.formatSeparator);
+      if (returnOnly) {
+        return response;
+      } else {
+        sendMessage(response, opts.sender, opts.attr);
+        return response;
+      }
     } catch (e) {
       error(e.stack);
+      return '';
     }
+  }
+
+  @command('!stats')
+  @default_permission(null)
+  async showStats(opts: CommandOptions) {
+    try {
+      const username = new Expects(opts.parameters).username().toArray()[0].toLowerCase();
+      const user = await getRepository(User).findOne({ where: { username: username.toLowerCase() }});
+
+      if (!user) {
+        throw Error(`User ${username} not found.`);
+      }
+
+      const response = await this.showMe({
+        ...opts,
+        sender: {
+          ...opts.sender,
+          username,
+          userId: user.userId,
+        },
+      }, true);
+      sendMessage(response.replace('$sender', '$touser'), opts.sender, { ...opts.attr, param: username });
+    } catch (e) {
+      if (e.message.includes('Expected parameter')) {
+        this.showMe(opts); // fallback to me without param
+      } else {
+        error(e.stack);
+      }
+    }
+
   }
 
   @onMessage()
