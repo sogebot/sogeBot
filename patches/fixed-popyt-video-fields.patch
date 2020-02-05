@@ -1,0 +1,10 @@
+--- node_modules/popyt/out/entities/video.js	2020-01-19 03:11:29.000000000 +0100
++++ patches/fixed-popyt-video-fields.js	2020-02-05 07:52:12.304916346 +0100
+@@ -123,6 +123,6 @@
+  * The fields to request for this entity.
+  */
+ Video.fields = 'items(kind,id,contentDetails(duration),statistics(likeCount,dislikeCount,viewCount,commentCount),status(privacyStatus),' +
+-    'snippet(title,description,thumbnails,tags,publishedAt,channelId,liveBroadcastContent))';
++    'snippet(title,description,thumbnails,tags,publishedAt,channelId,liveBroadcastContent,categoryId))';
+ 
+ //# sourceMappingURL=video.js.map

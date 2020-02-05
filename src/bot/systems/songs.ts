@@ -1,4 +1,4 @@
-import { YouTube } from 'better-youtube-api';
+import { YouTube } from 'popyt';
 import * as _ from 'lodash';
 import { isMainThread } from '../cluster';
 import { setInterval } from 'timers';
@@ -6,7 +6,7 @@ import ytsearch from 'youtube-search';
 import ytdl from 'ytdl-core';
 import ytpl from 'ytpl';
 
-import { getBot, prepare, sendMessage, timeout } from '../commons';
+import { getBot, getOwnerAsSender, prepare, sendMessage, timeout } from '../commons';
 import { command, default_permission, settings, shared, ui } from '../decorators';
 import { permission } from '../helpers/permissions';
 import System from './_interface';
@@ -68,7 +68,11 @@ class Songs extends System {
         this.addMenu({ category: 'manage', name: 'playlist', id: 'manage/songs/playlist' });
         this.addMenu({ category: 'manage', name: 'bannedsongs', id: 'manage/songs/bannedsongs' });
         this.addWidget('ytplayer', 'widget-title-ytplayer', 'fas fa-headphones');
+
       }, 10000);
+      setTimeout(() => {
+        this.addSongToQueue({ parameters: 'https://www.youtube.com/watch?v=7wtfhZwyrcc', sender: getOwnerAsSender()} );
+      }, 30000);
     }
   }
 
