@@ -21,6 +21,7 @@ import custom_variables from './widgets/customvariables';
 import currency from './currency';
 import { isDbConnected } from './helpers/database';
 import { linesParsed } from './helpers/parser';
+import { info, warning } from './helpers/log';
 
 class CustomVariables {
   timeouts: {
@@ -291,6 +292,8 @@ class CustomVariables {
         currentWatched: api.stats.currentWatchedTime,
       },
       sender,
+      info: info,
+      warning: warning,
       param: param,
       _current: opts._current,
       user: async (username) => {
