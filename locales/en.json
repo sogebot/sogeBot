@@ -390,6 +390,7 @@
         "latestCheerMessage": "Latest Cheer (message)",
         "latestCheer": "Latest Cheer (username)",
         "version": "Bot version",
+        "haveParam": "Have command parameter? (bool)",
         "is": {
           "moderator": "Is user mod? (bool)",
           "subscriber": "Is user sub? (bool)",

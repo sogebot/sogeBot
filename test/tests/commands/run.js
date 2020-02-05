@@ -47,7 +47,7 @@ describe('Custom Commands - run()', () => {
     it('create \'!test\' command without $param', async () => {
       await getRepository(Commands).save({
         id: uuid(), command: '!test', enabled: true, visible: true, responses: [{
-          filter: '', response: 'This should not be triggered', permission: permission.VIEWERS, stopIfExecuted: false, order: 0,
+          filter: '!$haveParam', response: 'This should not be triggered', permission: permission.VIEWERS, stopIfExecuted: false, order: 0,
         }]
       })
     });
@@ -67,7 +67,7 @@ describe('Custom Commands - run()', () => {
     });
 
     it('run command by owner', async () => {
-      await customcommands.run({ sender: owner, message: '!test qwerty' });
+      await customcommands.run({ sender: owner, message: '!test qwerty', parameters: 'qwerty' });
       await message.isSentRaw('qwerty by !test command with param', owner);
       await message.isSentRaw('@soge__, $_variable was set to qwerty.', owner);
       await message.isSentRaw('This should be triggered', owner);
@@ -76,7 +76,7 @@ describe('Custom Commands - run()', () => {
     });
 
     it('run command by viewer', async () => {
-      await customcommands.run({ sender: user1, message: '!test qwerty' });
+      await customcommands.run({ sender: user1, message: '!test qwerty', parameters: 'qwerty' });
       await message.isSentRaw('This should be triggered', user1);
       await message.isSentRaw('This should be triggered as well', user1);
       await message.isSentRaw('qwerty by !test command with param', user1);
@@ -98,12 +98,12 @@ describe('Custom Commands - run()', () => {
     });
 
     it('run command as user not defined in filter', async () => {
-      customcommands.run({ sender: owner, message: '!cmd' });
+      customcommands.run({ sender: owner, message: '!cmd', parameters: '' });
       await message.isNotSentRaw('Lorem Ipsum', owner);
     });
 
     it('run command as user defined in filter', async () => {
-      customcommands.run({ sender: user1, message: '!cmd' });
+      customcommands.run({ sender: user1, message: '!cmd', parameters: '' });
       await message.isSentRaw('Lorem Ipsum', user1);
     });
   });
@@ -112,7 +112,7 @@ describe('Custom Commands - run()', () => {
     customcommands.add({ sender: owner, parameters: '-c !a -r Lorem Ipsum' });
     await message.isSent('customcmds.command-was-added', owner, { command: '!a', response: 'Lorem Ipsum', sender: owner.username });
 
-    customcommands.run({ sender: owner, message: '!a' });
+    customcommands.run({ sender: owner, message: '!a', parameters: '' });
     await message.isSentRaw('Lorem Ipsum', owner);
 
     customcommands.remove({ sender: owner, parameters: '!a' });
@@ -123,7 +123,7 @@ describe('Custom Commands - run()', () => {
     customcommands.add({ sender: owner, parameters: '-c !한글 -r Lorem Ipsum' });
     await message.isSent('customcmds.command-was-added', owner, { command: '!한글', response: 'Lorem Ipsum', sender: owner.username });
 
-    customcommands.run({ sender: owner, message: '!한글' });
+    customcommands.run({ sender: owner, message: '!한글', parameters: '' });
     await message.isSentRaw('Lorem Ipsum', owner);
 
     customcommands.remove({ sender: owner, parameters: '!한글' });
@@ -134,7 +134,7 @@ describe('Custom Commands - run()', () => {
     customcommands.add({ sender: owner, parameters: '-c !русский -r Lorem Ipsum' });
     await message.isSent('customcmds.command-was-added', owner, { command: '!русский', response: 'Lorem Ipsum', sender: owner.username });
 
-    customcommands.run({ sender: owner, message: '!русский' });
+    customcommands.run({ sender: owner, message: '!русский', parameters: '' });
     await message.isSentRaw('Lorem Ipsum', owner);
 
     customcommands.remove({ sender: owner, parameters: '!русский' });

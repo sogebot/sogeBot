@@ -151,6 +151,7 @@ interface CommandOptions {
 
 interface ParserOptions {
   sender: UserStateTags;
+  parameters: string;
   message: string;
   skip: boolean;
 }
