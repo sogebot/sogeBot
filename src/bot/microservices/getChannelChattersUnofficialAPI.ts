@@ -129,6 +129,8 @@ export const getChannelChattersUnofficialAPI = async (): Promise<{ modStatus: bo
     if (!isMainThread) {
       parentPort?.postMessage({ modStatus, partedUsers, joinedUsers });
     }
+    debug('microservice', 'return::getChannelChattersUnofficialAPI');
+    debug('microservice', { modStatus, partedUsers, joinedUsers });
     return { modStatus, partedUsers, joinedUsers };
   } catch (e) {
     warning('Microservice getChannelChattersUnofficialAPI ended with error');
@@ -136,6 +138,8 @@ export const getChannelChattersUnofficialAPI = async (): Promise<{ modStatus: bo
     if (!isMainThread) {
       parentPort?.postMessage({ modStatus: false, partedUsers: [], joinedUsers: [] });
     }
+    debug('microservice', 'return::getChannelChattersUnofficialAPI');
+    debug('microservice', { modStatus: false, partedUsers: [], joinedUsers: [] });
     return { modStatus: false, partedUsers: [], joinedUsers: [] };
   } finally {
     // free event
