@@ -395,6 +395,7 @@
         "latestCheerMessage": "Poslední Cheer (zpráva)",
         "latestCheer": "Poslední Cheer (uživatel)",
         "version": "Bot version",
+        "haveParam": "Příkaz má parametr? (bool)",
         "is": {
           "moderator": "Je uživatel mod? (bool)",
           "subscriber": "Je uživatel sub? (bool)",

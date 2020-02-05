@@ -52,9 +52,12 @@ class Parser {
       if (parser.priority !== constants.MODERATION) {
         continue;
       }; // skip non-moderation parsers
+
+      const text = this.message.trim().replace(/^(!\w+)/i, '');
       const opts = {
         sender: this.sender,
         message: this.message.trim(),
+        parameters: text.trim(),
         skip: this.skip,
       };
       const isOk = await parser.fnc.apply(parser.this, [opts]);
@@ -86,9 +89,11 @@ class Parser {
         || getFromViewersCache(this.sender.userId, parser.permission)
       ) {
         debug('parser.process', 'Processing ' + parser.name + ' (fireAndForget: ' + parser.fireAndForget + ')');
+        const text = this.message.trim().replace(/^(!\w+)/i, '');
         const opts = {
           sender: this.sender,
           message: this.message.trim(),
+          parameters: text.trim(),
           skip: this.skip,
         };
 

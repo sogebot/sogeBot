@@ -240,12 +240,6 @@ class CustomCommands extends System {
 
         if (getFromViewersCache(opts.sender.userId, r.permission)
             && await this.checkFilter(opts, r.filter)) {
-          if (param.length > 0
-            && !(r.response.includes('$param')
-              || r.response.includes('$touser')
-              || r.response.search(/\$_[a-zA-Z_]*/g) >= 0)) {
-            continue;
-          }
           _responses.push(r);
           atLeastOnePermissionOk = true;
           if (r.stopIfExecuted) {
@@ -412,6 +406,7 @@ class CustomCommands extends System {
       $sender: opts.sender.username,
       $is,
       $rank,
+      $haveParam: opts.parameters.length > 0,
       // add global variables
       $game: api.stats.currentGame || 'n/a',
       $title: api.stats.currentTitle || 'n/a',
