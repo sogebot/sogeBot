@@ -1,4 +1,4 @@
-import { YouTube } from 'better-youtube-api';
+import { YouTube } from 'popyt';
 import * as _ from 'lodash';
 import { isMainThread } from '../cluster';
 import { setInterval } from 'timers';
@@ -68,6 +68,7 @@ class Songs extends System {
         this.addMenu({ category: 'manage', name: 'playlist', id: 'manage/songs/playlist' });
         this.addMenu({ category: 'manage', name: 'bannedsongs', id: 'manage/songs/bannedsongs' });
         this.addWidget('ytplayer', 'widget-title-ytplayer', 'fas fa-headphones');
+
       }, 10000);
     }
   }
