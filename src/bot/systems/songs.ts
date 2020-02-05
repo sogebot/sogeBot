@@ -493,7 +493,7 @@ class Songs extends System {
     const videoID = (match && match[1].length === 11) ? match[1] : opts.parameters;
 
     if (_.isNil(videoID.match(idRegex))) { // not id or url
-      ytsearch(opts.parameters, { maxResults: 1, key: 'AIzaSyDYevtuLOxbyqBjh17JNZNvSQO854sngK0' }, (err, results) => {
+      ytsearch(opts.parameters, { maxResults: 1, key: this.apiKey.trim().length > 0 ? this.apiKey : defaultApiKey }, (err, results) => {
         if (err) {
           return error(err);
         }
