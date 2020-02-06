@@ -79,8 +79,13 @@ class Parser {
       }; // skip moderation parsers
 
       if (this.sender) {
+        const permissionCheckTime = Date.now();
         if (typeof getFromViewersCache(this.sender.userId, parser.permission) === 'undefined') {
+          debug('parser.permission', `Permission not cached for ${this.sender.username}#${this.sender.userId} | ${parser.permission}`);
           addToViewersCache(this.sender.userId, parser.permission, (await permissions.check(this.sender.userId, parser.permission, false)).access);
+          debug('parser.time', `Permission check for ${this.sender.username}#${this.sender.userId} | ${parser.permission} took ${(Date.now() - permissionCheckTime) / 1000}`);
+        } else {
+          debug('parser.permission', `Permission cached for ${this.sender.username}#${this.sender.userId} | ${parser.permission}`);
         }
       }
       if (
