@@ -13,8 +13,18 @@ export let cachedViewers: {
   };
 } = {};
 
+let cachedHighestPermission: {
+  [userId: number]: string | undefined;
+} = {};
+
 export const cleanViewersCache = () => {
   cachedViewers = {};
+  cachedHighestPermission = {};
+};
+
+export const getFromCachedHighestPermission = (userId: number | string) => {
+  userId = Number(userId);
+  return cachedHighestPermission[userId];
 };
 
 export const getFromViewersCache = (userId: number | string, permId: string) => {
@@ -33,4 +43,9 @@ export const addToViewersCache = (userId: number | string, permId: string, haveA
     cachedViewers[userId] = {};
   }
   cachedViewers[userId][permId] = haveAccess;
+};
+
+export const addToCachedHighestPermission = (userId: number | string, permId: string) => {
+  userId = Number(userId);
+  cachedHighestPermission[userId] = permId;
 };
