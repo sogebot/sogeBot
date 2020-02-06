@@ -5,7 +5,7 @@ import {
   getBroadcaster, isBot, isBroadcaster, isFollower, isModerator, isOwner, isSubscriber, isVIP, prepare, sendMessage,
 } from './commons';
 import { debug, warning } from './helpers/log';
-import { cleanViewersCache, permission } from './helpers/permissions';
+import { addToCachedHighestPermission, cleanViewersCache, getFromCachedHighestPermission, permission } from './helpers/permissions';
 import { areDecoratorsLoaded, command, default_permission, settings } from './decorators';
 import { isMainThread } from './cluster';
 import { error } from './helpers/log';
@@ -129,18 +129,24 @@ class Permissions extends Core {
   }
 
   public async getUserHighestPermission(userId: number): Promise<null | string> {
-    const permissions = await getRepository(PermissionsEntity).find({
-      cache: true,
-      order: {
-        order: 'ASC',
-      },
-    });
-    for (const p of permissions) {
-      if ((await this.check(userId, p.id, true)).access) {
-        return p.id;
+    const cachedPermission = getFromCachedHighestPermission(userId);
+    if (!cachedPermission) {
+      const permissions = await getRepository(PermissionsEntity).find({
+        cache: true,
+        order: {
+          order: 'ASC',
+        },
+      });
+      for (const p of permissions) {
+        if ((await this.check(userId, p.id, true)).access) {
+          addToCachedHighestPermission(userId, p.id);
+          return p.id;
+        }
       }
+      return null;
+    } else {
+      return cachedPermission;
     }
-    return null;
   }
 
   public async check(userId: number, permId: string, partial = false): Promise<{access: boolean; permission: PermissionsInterface | undefined}> {
