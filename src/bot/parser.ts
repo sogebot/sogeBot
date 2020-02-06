@@ -43,16 +43,18 @@ class Parser {
   }
 
   async isModerated () {
+    debug('parser.process', 'ISMODERATED START of "' + this.message + '"');
     if (this.skip) {
       return false;
     };
 
     const parsers = await this.parsers();
     for (const parser of parsers) {
+      const time = Date.now();
       if (parser.priority !== constants.MODERATION) {
         continue;
       }; // skip non-moderation parsers
-
+      debug('parser.process', 'Processing ' + parser.name);
       const text = this.message.trim().replace(/^(!\w+)/i, '');
       const opts = {
         sender: this.sender,
@@ -61,8 +63,10 @@ class Parser {
         skip: this.skip,
       };
       const isOk = await parser.fnc.apply(parser.this, [opts]);
+
+      debug('parser.time', 'Processed ' + parser.name + ' took ' + ((Date.now() - time) / 1000));
       if (!isOk) {
-        debug('parser.isModerated', 'Moderation failed ' + JSON.stringify(parser.fnc));
+        debug('parser.process', 'Moderation failed ' + JSON.stringify(parser.fnc));
         return true;
       }
     }
