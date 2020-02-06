@@ -18,7 +18,7 @@ describe('Parser - parse time check', async () => {
   const tests = [
     {
       test: '!me',
-      expected: 100,
+      expected: 200,
     },
   ];
 
