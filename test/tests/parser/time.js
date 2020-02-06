@@ -18,7 +18,7 @@ describe('Parser - parse time check', async () => {
   const tests = [
     {
       test: '!me',
-      expected: 30,
+      expected: 100,
     },
   ];
 
@@ -39,7 +39,7 @@ describe('Parser - parse time check', async () => {
       });
 
       it(`Should take to ${test.expected}ms to parse`, async () => {
-        assert(Date.now() - time < test.expected);
+        assert(Date.now() - time < test.expected, `${Date.now() - time} > ${test.expected}`);
       });
     });
   }
