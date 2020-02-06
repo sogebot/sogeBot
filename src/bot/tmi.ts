@@ -774,7 +774,7 @@ class TMI extends Core {
           if (message.startsWith('!')) {
             events.fire('command-send-x-times', { username: sender.username, message: message });
           } else if (!message.startsWith('!')) {
-            await getRepository(User).increment({ userId: sender.userId }, 'messages', 1);
+            getRepository(User).increment({ userId: sender.userId }, 'messages', 1);
           }
         }
       }
