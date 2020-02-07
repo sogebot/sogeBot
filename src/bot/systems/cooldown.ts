@@ -195,6 +195,7 @@ class Cooldown extends System {
       }
 
       viewer = cooldown.viewers?.find(o => o.userId === Number(opts.sender.userId));
+      debug('cooldown.db', viewer ?? `${opts.sender.username}#${opts.sender.userId} not found in cooldown list`);
       if (cooldown.type === 'global') {
         timestamp = cooldown.timestamp ?? 0;
       } else {
@@ -229,6 +230,7 @@ class Cooldown extends System {
           const message = await prepare('cooldowns.cooldown-triggered', { command: cooldown.name, seconds: Math.ceil((cooldown.miliseconds - now + timestamp) / 1000) });
           await sendMessage(message, opts.sender, opts.attr);
         }
+        debug('cooldown.check', `${opts.sender.username}#${opts.sender.userId} have ${cooldown.name} on cooldown, remaining ${Math.ceil((cooldown.miliseconds - now + timestamp) / 1000)}s`);
         result = false;
         break; // disable _.each and updateQueue with false
       }
