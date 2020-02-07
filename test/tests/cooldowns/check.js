@@ -5,7 +5,7 @@
 require('../../general.js');
 
 const { getRepository } = require('typeorm');
-const { Cooldown } = require('../../../dest/database/entity/cooldown');
+const { Cooldown, CooldownViewer } = require('../../../dest/database/entity/cooldown');
 const { User } = require('../../../dest/database/entity/user');
 const { Keyword } = require('../../../dest/database/entity/keyword');
 
@@ -209,7 +209,7 @@ describe('Cooldowns - check()', () => {
 
       gamble.enabled = true;
       gamble.setCommand('!gamble', '!фортуна');
-      await getRepository(Cooldown).insert({
+      const cooldown = await getRepository(Cooldown).save({
         name: '!фортуна',
         miliseconds: 200000,
         type: 'user',
@@ -221,6 +221,9 @@ describe('Cooldowns - check()', () => {
         isModeratorAffected: true,
         isSubscriberAffected: true,
         isFollowerAffected: true,
+      });
+      await getRepository(CooldownViewer).insert({
+        cooldown, userId: testUser.userId, timestamp: 10000, lastTimestamp: 0,
       });
     });
 
