@@ -11,7 +11,7 @@ jobs:
     steps:
       - uses: actions/checkout@master
       - name: Build & Push to GitHub Package with shasum
-        uses: opspresso/action-docker@v0.2.5
+        uses: opspresso/action-docker@v0.2.1
         env:
           USERNAME: ${{ secrets.DOCKER_USERNAME }}
           PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
@@ -19,7 +19,7 @@ jobs:
           IMAGE_NAME: "sogehige/sogebot"
           TAG_NAME: nightly:${{ github.sha }}
       - name: Build & Push to GitHub Package as latest
-        uses: opspresso/action-docker@v0.2.5
+        uses: opspresso/action-docker@v0.2.1
         env:
           USERNAME: ${{ secrets.DOCKER_USERNAME }}
           PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
