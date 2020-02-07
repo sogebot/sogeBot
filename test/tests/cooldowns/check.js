@@ -202,7 +202,7 @@ describe('Cooldowns - check()', () => {
     }
   });
 
-  describe.only('#3209 - cooldown not working on gamble changed command to !фортуна', async () => {
+  describe('#3209 - cooldown not working on gamble changed command to !фортуна', async () => {
     before(async () => {
       await db.cleanup();
       await message.prepare();
