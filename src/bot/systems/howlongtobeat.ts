@@ -12,6 +12,7 @@ import { getRepository } from 'typeorm';
 import { HowLongToBeatGame, HowLongToBeatGameInterface } from '../database/entity/howLongToBeatGame';
 import { adminEndpoint } from '../helpers/socket';
 import api from '../api';
+import { error, info } from '../helpers/log';
 
 class HowLongToBeat extends System {
   interval: number = constants.SECOND * 15;
@@ -22,6 +23,7 @@ class HowLongToBeat extends System {
     this.addMenu({ category: 'manage', name: 'howlongtobeat', id: 'manage/hltb' });
 
     if (isMainThread) {
+      this.refreshImageThumbnail();
       setInterval(async () => {
         if (api.isStreamOnline) {
           this.addToGameTimestamp();
@@ -38,6 +40,23 @@ class HowLongToBeat extends System {
       const item = await getRepository(HowLongToBeatGame).save(dataset);
       cb(null, item);
     });
+  }
+
+  async refreshImageThumbnail() {
+    try {
+      const games = await getRepository(HowLongToBeatGame).find();
+      for (const game of games) {
+        const gamesFromHltb = await this.hltbService.search(game.game);
+        const gameFromHltb = gamesFromHltb.length > 0 ? gamesFromHltb[0] : null;
+        if (gameFromHltb && game.imageUrl !== gameFromHltb.imageUrl) {
+          info(`HowLongToBeat | Thumbnail for ${game.game} is updated.`);
+          getRepository(HowLongToBeatGame).update({ id: game.id }, { imageUrl: gameFromHltb.imageUrl });
+        }
+      }
+    } catch (e) {
+      error(e);
+    }
+    setTimeout(() => this.refreshImageThumbnail(), constants.HOUR);
   }
 
   async addToGameTimestamp() {
