@@ -15,9 +15,7 @@ jobs:
         id: get_version
         run: echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/}
       - name: Build & Push to GitHub Package with ref
-        uses: opspresso/action-docker@master
-        with:
-          args: --docker
+        uses: opspresso/action-docker@v0.2.5
         env:
           USERNAME: ${{ secrets.DOCKER_USERNAME }}
           PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
@@ -25,9 +23,7 @@ jobs:
           IMAGE_NAME: "sogehige/sogebot"
           TAG_NAME: release:${{ steps.get_version.outputs.VERSION }}
       - name: Build & Push to GitHub Package as latest
-        uses: opspresso/action-docker@master
-        with:
-          args: --docker
+        uses: opspresso/action-docker@v0.2.5
         env:
           USERNAME: ${{ secrets.DOCKER_USERNAME }}
           PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
