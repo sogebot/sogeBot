@@ -10,7 +10,7 @@ import { permission } from '../helpers/permissions';
 import System from './_interface';
 
 import { getRepository } from 'typeorm';
-import { Cooldown as CooldownEntity, CooldownInterface, CooldownViewerInterface } from '../database/entity/cooldown';
+import { Cooldown as CooldownEntity, CooldownInterface, CooldownViewer, CooldownViewerInterface } from '../database/entity/cooldown';
 import { User } from '../database/entity/user';
 import { adminEndpoint } from '../helpers/socket';
 import { Keyword } from '../database/entity/keyword';
@@ -194,7 +194,14 @@ class Cooldown extends System {
         continue;
       }
 
-      viewer = cooldown.viewers?.find(o => o.userId === Number(opts.sender.userId));
+      for (const item of cooldown.viewers?.filter(o => o.userId === Number(opts.sender.userId)) ?? []) {
+        if (!viewer || viewer.timestamp < item.timestamp) {
+          viewer = {...item};
+        } else {
+          // remove duplicate
+          cooldown.viewers = cooldown.viewers?.filter(o => o.id !== item.id);
+        }
+      }
       debug('cooldown.db', viewer ?? `${opts.sender.username}#${opts.sender.userId} not found in cooldown list`);
       if (cooldown.type === 'global') {
         timestamp = cooldown.timestamp ?? 0;
@@ -205,18 +212,17 @@ class Cooldown extends System {
 
       if (now - timestamp >= cooldown.miliseconds) {
         if (cooldown.type === 'global') {
-          cooldown.lastTimestamp = timestamp;
-          cooldown.timestamp = now;
-        } else {
-          debug('cooldown.check', `${opts.sender.username}#${opts.sender.userId} added to cooldown list.`);
-          cooldown.viewers?.push({
-            ...cooldown.viewers.find(o => o.userId === Number(opts.sender.userId)),
-            userId: Number(opts.sender.userId),
+          await getRepository(CooldownEntity).save({
+            ...cooldown,
             lastTimestamp: timestamp,
             timestamp: now,
           });
+        } else {
+          debug('cooldown.check', `${opts.sender.username}#${opts.sender.userId} added to cooldown list.`);
+          await getRepository(CooldownViewer).insert({
+            cooldown, userId: Number(opts.sender.userId), lastTimestamp: timestamp,  timestamp: now,
+          });
         }
-        await getRepository(CooldownEntity).save(cooldown);
         result = true;
         continue;
       } else {
