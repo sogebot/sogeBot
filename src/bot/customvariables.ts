@@ -21,7 +21,7 @@ import custom_variables from './widgets/customvariables';
 import currency from './currency';
 import { isDbConnected } from './helpers/database';
 import { linesParsed } from './helpers/parser';
-import { info, warning } from './helpers/log';
+import { debug, info, warning } from './helpers/log';
 
 class CustomVariables {
   timeouts: {
@@ -174,9 +174,9 @@ class CustomVariables {
   }
 
   async runScript (script, opts) {
-    let sender = isNil(opts.sender) ? opts.sender : null;
-    const param = isNil(opts.param) ? opts.param : null;
-
+    debug('customvariables.eval', opts);
+    let sender = !isNil(opts.sender) ? opts.sender : null;
+    const param = !isNil(opts.param) ? opts.param : null;
     if (typeof sender === 'string') {
       sender = {
         username: sender,
