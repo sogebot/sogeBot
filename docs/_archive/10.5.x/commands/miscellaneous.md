@@ -17,6 +17,4 @@
 
 `!me` - shows points, rank, watched time of user and message count
 
-`!stats <optional-username>` - shows points, rank, watched time of user and message count with optional username
-
 `!top <time|points|messages>` - shows top 10 users ordered by [time|points|messages]
